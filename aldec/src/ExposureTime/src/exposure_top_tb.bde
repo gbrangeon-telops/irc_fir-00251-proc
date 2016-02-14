@@ -1,0 +1,2984 @@
+SCHM0104
+
+HEADER
+{
+ FREEID 5958
+ VARIABLES
+ {
+  #ARCHITECTURE="sch"
+  #BLOCKTABLE_FILE="F:\\Bibliotheque\\Electronique\\Active-HDL\\Cartouche\\#Telops.bde"
+  #BLOCKTABLE_INCLUDED="1"
+  #ENTITY="exposure_top_tb"
+  #LANGUAGE="VHDL"
+  AUTHOR="Patrick Daraiche"
+  COMPANY="Telops inc."
+  CREATIONDATE="2013-11-20"
+  PAGECOUNT="2"
+  TITLE="No Title"
+ }
+ SYMBOL "#default" "exposure_time_ctrl" "exposure_time_ctrl"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1392242983"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="eef6f106-ee9b-4f99-9a01-56b08982843d"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,420,360)
+    FREEID 23
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,3,400,335)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,118,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (323,270,395,294)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,170,190,194)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 8
+     ORIENTATION 2
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (251,70,395,94)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 10
+     ORIENTATION 2
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (248,170,395,194)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,190,165,214)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,270,115,294)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 16
+     ORIENTATION 2
+    }
+    TEXT  19, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,250,115,274)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 18
+    }
+    TEXT  21, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,70,104,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 20
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (420,280)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ERROR"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (0,180)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="EXP_CTRL_BUSY"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (420,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_IMG_INFO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="img_info_type"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (420,180)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #INITIAL_VALUE=""
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_EXP_INFO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="exp_info_type"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (0,200)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #INITIAL_VALUE=""
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FW_EXP_INFO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="exp_info_type"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (0,280)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="MB_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="t_axi4_lite_miso"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  18, 0, 0
+    {
+     COORD (0,260)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="MB_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="t_axi4_lite_mosi"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  20, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="MB_CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "mb_model_wrapper" "mb_model_wrapper"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1391529334"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="cf48ad94-96d2-478a-ad99-aba59b743085"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,320,1060)
+    FREEID 75
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,300,1040)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,78,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (184,30,295,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,70,118,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (131,90,295,114)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (184,50,295,74)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 10
+     ORIENTATION 2
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (113,150,295,174)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (131,110,295,134)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 14
+     ORIENTATION 2
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (117,210,295,234)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 16
+    }
+    TEXT  19, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (113,170,295,194)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 18
+     ORIENTATION 2
+    }
+    TEXT  21, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (127,270,295,294)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 20
+    }
+    TEXT  23, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (117,230,295,254)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 22
+     ORIENTATION 2
+    }
+    TEXT  25, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (91,330,295,354)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 24
+    }
+    TEXT  27, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (127,290,295,314)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 26
+     ORIENTATION 2
+    }
+    TEXT  31, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (91,350,295,374)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 30
+     ORIENTATION 2
+    }
+    TEXT  33, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (188,450,295,474)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 32
+    }
+    TEXT  37, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (131,510,295,534)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 36
+    }
+    TEXT  39, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (188,470,295,494)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 38
+     ORIENTATION 2
+    }
+    TEXT  41, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (131,570,295,594)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 40
+    }
+    TEXT  43, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (131,530,295,554)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 42
+     ORIENTATION 2
+    }
+    TEXT  45, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (133,630,295,654)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 44
+    }
+    TEXT  47, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (131,590,295,614)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 46
+     ORIENTATION 2
+    }
+    TEXT  49, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (86,690,295,714)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 48
+    }
+    TEXT  51, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (133,650,295,674)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 50
+     ORIENTATION 2
+    }
+    TEXT  53, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (133,750,295,774)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 52
+    }
+    TEXT  55, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (86,710,295,734)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 54
+     ORIENTATION 2
+    }
+    TEXT  57, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (91,810,295,834)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 56
+    }
+    TEXT  59, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (133,770,295,794)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 58
+     ORIENTATION 2
+    }
+    TEXT  61, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (127,870,295,894)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 60
+    }
+    TEXT  63, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (91,830,295,854)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 62
+     ORIENTATION 2
+    }
+    TEXT  65, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (82,930,295,954)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 64
+    }
+    TEXT  67, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (127,890,295,914)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 66
+     ORIENTATION 2
+    }
+    TEXT  69, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (82,950,295,974)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 68
+     ORIENTATION 2
+    }
+    TEXT  71, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (179,410,295,434)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 70
+     ORIENTATION 2
+    }
+    TEXT  73, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (179,390,295,414)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 72
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ACLK"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (320,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="GPIO_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (320,100)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="USB_UART_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (320,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="GPIO_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (320,160)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLINK_UART_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (320,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="USB_UART_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (320,220)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPGA_UART_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  18, 0, 0
+    {
+     COORD (320,180)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLINK_UART_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  20, 0, 0
+    {
+     COORD (320,280)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="OEM_UART_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  22, 0, 0
+    {
+     COORD (320,240)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPGA_UART_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  24, 0, 0
+    {
+     COORD (320,340)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="PLEORA_UART_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  26, 0, 0
+    {
+     COORD (320,300)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="OEM_UART_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  30, 0, 0
+    {
+     COORD (320,360)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="PLEORA_UART_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  32, 0, 0
+    {
+     COORD (320,460)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="INTC_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  36, 0, 0
+    {
+     COORD (320,520)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AEC_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  38, 0, 0
+    {
+     COORD (320,480)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="INTC_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  40, 0, 0
+    {
+     COORD (320,580)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="BPR_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  42, 0, 0
+    {
+     COORD (320,540)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AEC_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  44, 0, 0
+    {
+     COORD (320,640)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CAL_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  46, 0, 0
+    {
+     COORD (320,600)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="BPR_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  48, 0, 0
+    {
+     COORD (320,700)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="EXPTIME_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  50, 0, 0
+    {
+     COORD (320,660)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CAL_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  52, 0, 0
+    {
+     COORD (320,760)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  54, 0, 0
+    {
+     COORD (320,720)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="EXPTIME_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  56, 0, 0
+    {
+     COORD (320,820)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HEADER_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  58, 0, 0
+    {
+     COORD (320,780)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  60, 0, 0
+    {
+     COORD (320,880)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="SFW_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  62, 0, 0
+    {
+     COORD (320,840)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HEADER_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  64, 0, 0
+    {
+     COORD (320,940)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TRIGGER_CTRL_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  66, 0, 0
+    {
+     COORD (320,900)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="SFW_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  68, 0, 0
+    {
+     COORD (320,960)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TRIGGER_CTRL_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  70, 0, 0
+    {
+     COORD (320,420)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="XADC_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  72, 0, 0
+    {
+     COORD (320,400)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="XADC_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+}
+
+PAGE ""
+{
+ PAGEHEADER
+ {
+  PAGESIZE (4400,3400)
+  MARGINS (200,200,200,200)
+  RECT (0,0,100,200)
+  VARIABLES
+  {
+   #BLOCKTABLE_VISIBLE="1"
+  }
+ }
+ 
+ BODY
+ {
+  VHDLDESIGNUNITHDR  2953, 0, 0
+  {
+   LABEL "Design Unit Header"
+   TEXT 
+"library IEEE;\n"+
+"use IEEE.std_logic_1164.all;\n"+
+"use work.tel2000.all;"
+   RECT (3600,240,4200,420)
+   MARGINS (20,20)
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  INSTANCE  2986, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="mb_model_wrapper"
+    #CUSTOM_NAME=""
+    #LIBRARY="#default"
+    #REFERENCE="U2"
+    #SYMBOL="mb_model_wrapper"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="cf48ad94-96d2-478a-ad99-aba59b743085"
+   }
+   COORD (820,1140)
+   VERTEXES ( (4,3301), (6,3648), (8,3480), (10,3306), (12,3488), (14,3325), (16,3496), (20,3504), (22,3339), (24,3512), (26,3346), (30,3353), (32,3528), (36,3536), (40,3544), (42,3374), (44,3557), (46,3381), (48,3565), (50,3388), (52,3573), (54,3395), (56,3581), (58,3402), (60,3589), (62,3409), (64,3597), (66,3416), (72,3757), (18,4218), (70,4225), (38,4232), (68,4448), (2,5228) )
+  }
+  TEXT  2987, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (820,1084,859,1119)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 2986
+  }
+  TEXT  2991, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (820,2200,1080,2235)
+   MARGINS (1,1)
+   PARENT 2986
+  }
+  VTX  3301, 0, 0
+  {
+   COORD (1140,1180)
+  }
+  VTX  3302, 0, 0
+  {
+   COORD (1420,1180)
+  }
+  RECORD  3304, 0, 0
+  {
+   NET 3311
+   VTX 3301, 3302
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  3306, 0, 0
+  {
+   COORD (1140,1200)
+  }
+  VTX  3307, 0, 0
+  {
+   COORD (1420,1200)
+  }
+  RECORD  3309, 0, 0
+  {
+   NET 3316
+   VTX 3306, 3307
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3311, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="GPIO_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3312, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1213,1150,1348,1179)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3304
+  }
+  NET RECORD  3316, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="GENERIC_MISO"
+    #VHDL_TYPE="t_axi4_lite_miso"
+   }
+  }
+  TEXT  3317, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1170,1372,1199)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3309
+  }
+  TEXT  3324, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1230,1372,1259)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3327
+  }
+  VTX  3325, 0, 0
+  {
+   COORD (1140,1260)
+  }
+  VTX  3326, 0, 0
+  {
+   COORD (1420,1260)
+  }
+  RECORD  3327, 0, 0
+  {
+   NET 3316
+   VTX 3325, 3326
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3335, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1350,1372,1379)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3341
+  }
+  VTX  3339, 0, 0
+  {
+   COORD (1140,1380)
+  }
+  VTX  3340, 0, 0
+  {
+   COORD (1420,1380)
+  }
+  RECORD  3341, 0, 0
+  {
+   NET 3316
+   VTX 3339, 3340
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3342, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1410,1372,1439)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3348
+  }
+  VTX  3346, 0, 0
+  {
+   COORD (1140,1440)
+  }
+  VTX  3347, 0, 0
+  {
+   COORD (1420,1440)
+  }
+  RECORD  3348, 0, 0
+  {
+   NET 3316
+   VTX 3346, 3347
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3349, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1470,1372,1499)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3355
+  }
+  VTX  3353, 0, 0
+  {
+   COORD (1140,1500)
+  }
+  VTX  3354, 0, 0
+  {
+   COORD (1420,1500)
+  }
+  RECORD  3355, 0, 0
+  {
+   NET 3316
+   VTX 3353, 3354
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3370, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1650,1372,1679)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3376
+  }
+  VTX  3374, 0, 0
+  {
+   COORD (1140,1680)
+  }
+  VTX  3375, 0, 0
+  {
+   COORD (1420,1680)
+  }
+  RECORD  3376, 0, 0
+  {
+   NET 3316
+   VTX 3374, 3375
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3377, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1710,1372,1739)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3383
+  }
+  VTX  3381, 0, 0
+  {
+   COORD (1140,1740)
+  }
+  VTX  3382, 0, 0
+  {
+   COORD (1420,1740)
+  }
+  RECORD  3383, 0, 0
+  {
+   NET 3316
+   VTX 3381, 3382
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3384, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1770,1372,1799)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3390
+  }
+  VTX  3388, 0, 0
+  {
+   COORD (1140,1800)
+  }
+  VTX  3389, 0, 0
+  {
+   COORD (1420,1800)
+  }
+  RECORD  3390, 0, 0
+  {
+   NET 3316
+   VTX 3388, 3389
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3391, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1155,1830,1406,1859)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3397
+  }
+  VTX  3395, 0, 0
+  {
+   COORD (1140,1860)
+  }
+  VTX  3396, 0, 0
+  {
+   COORD (1420,1860)
+  }
+  RECORD  3397, 0, 0
+  {
+   NET 5835
+   VTX 3395, 3396
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3398, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1890,1372,1919)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3404
+  }
+  VTX  3402, 0, 0
+  {
+   COORD (1140,1920)
+  }
+  VTX  3403, 0, 0
+  {
+   COORD (1420,1920)
+  }
+  RECORD  3404, 0, 0
+  {
+   NET 3316
+   VTX 3402, 3403
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3405, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1950,1372,1979)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3411
+  }
+  VTX  3409, 0, 0
+  {
+   COORD (1140,1980)
+  }
+  VTX  3410, 0, 0
+  {
+   COORD (1420,1980)
+  }
+  RECORD  3411, 0, 0
+  {
+   NET 3316
+   VTX 3409, 3410
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  3412, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,2010,1372,2039)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3418
+  }
+  VTX  3416, 0, 0
+  {
+   COORD (1140,2040)
+  }
+  VTX  3417, 0, 0
+  {
+   COORD (1420,2040)
+  }
+  RECORD  3418, 0, 0
+  {
+   NET 3316
+   VTX 3416, 3417
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  SIGNALASSIGN  3426, 0, 0
+  {
+   LABEL "Generic_MISO_Assignments"
+   TEXT 
+"GENERIC_MISO.AWREADY <= '1';\n"+
+"GENERIC_MISO.WREADY <= '1';\n"+
+"GENERIC_MISO.ARREADY <= '1';\n"+
+"GENERIC_MISO.BVALID <= '0';\n"+
+"GENERIC_MISO.BRESP <=(others => '0');\n"+
+"GENERIC_MISO.RVALID <= '0';\n"+
+"GENERIC_MISO.RDATA <=(others => '0');\n"+
+"GENERIC_MISO.RRESP <=(others => '0');\n"+
+"\n"+
+""
+   RECT (1880,1380,2740,1720)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  TEXT  3476, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1180,1210,1380,1239)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3482
+  }
+  VTX  3480, 0, 0
+  {
+   COORD (1140,1240)
+  }
+  VTX  3481, 0, 0
+  {
+   COORD (1420,1240)
+  }
+  RECORD  3482, 0, 0
+  {
+   NET 3483
+   VTX 3480, 3481
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3483, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="USB_UART_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3484, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1170,1270,1390,1299)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3490
+  }
+  VTX  3488, 0, 0
+  {
+   COORD (1140,1300)
+  }
+  VTX  3489, 0, 0
+  {
+   COORD (1420,1300)
+  }
+  RECORD  3490, 0, 0
+  {
+   NET 3491
+   VTX 3488, 3489
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3491, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="CLINK_UART_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3492, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1172,1330,1388,1359)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3498
+  }
+  VTX  3496, 0, 0
+  {
+   COORD (1140,1360)
+  }
+  VTX  3497, 0, 0
+  {
+   COORD (1420,1360)
+  }
+  RECORD  3498, 0, 0
+  {
+   NET 3499
+   VTX 3496, 3497
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3499, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="FPGA_UART_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3500, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1178,1390,1383,1419)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3506
+  }
+  VTX  3504, 0, 0
+  {
+   COORD (1140,1420)
+  }
+  VTX  3505, 0, 0
+  {
+   COORD (1420,1420)
+  }
+  RECORD  3506, 0, 0
+  {
+   NET 3507
+   VTX 3504, 3505
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3507, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="OEM_UART_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3508, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1157,1450,1404,1479)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3514
+  }
+  VTX  3512, 0, 0
+  {
+   COORD (1140,1480)
+  }
+  VTX  3513, 0, 0
+  {
+   COORD (1420,1480)
+  }
+  RECORD  3514, 0, 0
+  {
+   NET 3515
+   VTX 3512, 3513
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3515, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="PLEORA_UART_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3516, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1211,1510,1350,1539)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3760
+  }
+  TEXT  3524, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1216,1570,1345,1599)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3530
+  }
+  VTX  3528, 0, 0
+  {
+   COORD (1140,1600)
+  }
+  VTX  3529, 0, 0
+  {
+   COORD (1420,1600)
+  }
+  RECORD  3530, 0, 0
+  {
+   NET 3531
+   VTX 3528, 3529
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3531, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="INTC_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3532, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1182,1630,1379,1659)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3538
+  }
+  VTX  3536, 0, 0
+  {
+   COORD (1140,1660)
+  }
+  VTX  3537, 0, 0
+  {
+   COORD (1420,1660)
+  }
+  RECORD  3538, 0, 0
+  {
+   NET 3539
+   VTX 3536, 3537
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3539, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="AEC_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3540, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1181,1690,1379,1719)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3546
+  }
+  VTX  3544, 0, 0
+  {
+   COORD (1140,1720)
+  }
+  VTX  3545, 0, 0
+  {
+   COORD (1420,1720)
+  }
+  RECORD  3546, 0, 0
+  {
+   NET 3547
+   VTX 3544, 3545
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3547, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BPR_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3553, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1183,1750,1377,1779)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3559
+  }
+  VTX  3557, 0, 0
+  {
+   COORD (1140,1780)
+  }
+  VTX  3558, 0, 0
+  {
+   COORD (1420,1780)
+  }
+  RECORD  3559, 0, 0
+  {
+   NET 3560
+   VTX 3557, 3558
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3560, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="CAL_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3561, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1155,1810,1406,1839)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3567
+  }
+  VTX  3565, 0, 0
+  {
+   COORD (1140,1840)
+  }
+  VTX  3566, 0, 0
+  {
+   COORD (1420,1840)
+  }
+  RECORD  3567, 0, 0
+  {
+   NET 3568
+   VTX 3565, 3566
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3568, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="EXPTIME_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3569, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1183,1870,1378,1899)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3575
+  }
+  VTX  3573, 0, 0
+  {
+   COORD (1140,1900)
+  }
+  VTX  3574, 0, 0
+  {
+   COORD (1420,1900)
+  }
+  RECORD  3575, 0, 0
+  {
+   NET 3576
+   VTX 3573, 3574
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3576, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="FPA_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3577, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1157,1930,1404,1959)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3583
+  }
+  VTX  3581, 0, 0
+  {
+   COORD (1140,1960)
+  }
+  VTX  3582, 0, 0
+  {
+   COORD (1420,1960)
+  }
+  RECORD  3583, 0, 0
+  {
+   NET 3584
+   VTX 3581, 3582
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3584, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="HEADER_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3585, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1179,1990,1382,2019)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3591
+  }
+  VTX  3589, 0, 0
+  {
+   COORD (1140,2020)
+  }
+  VTX  3590, 0, 0
+  {
+   COORD (1420,2020)
+  }
+  RECORD  3591, 0, 0
+  {
+   NET 3592
+   VTX 3589, 3590
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3592, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="SFW_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  3593, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1152,2050,1409,2079)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3599
+  }
+  VTX  3597, 0, 0
+  {
+   COORD (1140,2080)
+  }
+  VTX  3598, 0, 0
+  {
+   COORD (1420,2080)
+  }
+  RECORD  3599, 0, 0
+  {
+   NET 3600
+   VTX 3597, 3598
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3600, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="TRIGGER_CTRL_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  NET WIRE  3629, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ARESETn"
+   }
+  }
+  TEXT  3641, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (611,1190,721,1219)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 3650
+  }
+  VTX  3648, 0, 0
+  {
+   COORD (820,1220)
+  }
+  VTX  3649, 0, 0
+  {
+   COORD (520,1220)
+  }
+  WIRE  3650, 0, 0
+  {
+   NET 3629
+   VTX 3648, 3649
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  3757, 0, 0
+  {
+   COORD (1140,1540)
+  }
+  VTX  3758, 0, 0
+  {
+   COORD (1420,1540)
+  }
+  RECORD  3760, 0, 0
+  {
+   NET 3761
+   VTX 3757, 3758
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  3761, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="XADC_MOSI"
+    #VHDL_TYPE="t_axi4_lite_mosi"
+   }
+  }
+  TEXT  4217, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1290,1372,1319)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 4220
+  }
+  VTX  4218, 0, 0
+  {
+   COORD (1140,1320)
+  }
+  VTX  4219, 0, 0
+  {
+   COORD (1420,1320)
+  }
+  RECORD  4220, 0, 0
+  {
+   NET 3316
+   VTX 4218, 4219
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  4224, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1530,1372,1559)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 4227
+  }
+  VTX  4225, 0, 0
+  {
+   COORD (1140,1560)
+  }
+  VTX  4226, 0, 0
+  {
+   COORD (1420,1560)
+  }
+  RECORD  4227, 0, 0
+  {
+   NET 3316
+   VTX 4225, 4226
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  4231, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,1590,1372,1619)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 4234
+  }
+  VTX  4232, 0, 0
+  {
+   COORD (1140,1620)
+  }
+  VTX  4233, 0, 0
+  {
+   COORD (1420,1620)
+  }
+  RECORD  4234, 0, 0
+  {
+   NET 3316
+   VTX 4232, 4233
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  4330, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="MB_CLK"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (700,1180)
+   VERTEXES ( (2,5229) )
+  }
+  TEXT  4331, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (533,1163,649,1198)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 4330
+  }
+  INSTANCE  4335, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="ARESETN"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (520,1220)
+   VERTEXES ( (2,3649) )
+  }
+  TEXT  4336, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (330,1203,469,1238)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 4335
+  }
+  NET WIRE  4368, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="aresetn"
+   }
+  }
+  TEXT  4369, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1859,1790,1941,1819)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 5852
+  }
+  TEXT  4444, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,2070,1372,2099)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 4450
+  }
+  VTX  4448, 0, 0
+  {
+   COORD (1140,2100)
+  }
+  VTX  4449, 0, 0
+  {
+   COORD (1420,2100)
+  }
+  RECORD  4450, 0, 0
+  {
+   NET 3316
+   VTX 4448, 4449
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  4516, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_IMG_INFO"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="img_info_type"
+   }
+   COORD (2420,1860)
+   ORIENTATION 2
+   VERTEXES ( (2,5824) )
+  }
+  TEXT  4517, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2471,1843,2683,1878)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 4516
+   ORIENTATION 2
+  }
+  INSTANCE  4525, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="TRIG_HIGH_TIME(31:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   COORD (1900,2420)
+  }
+  TEXT  4526, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1529,2403,1849,2438)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 4525
+  }
+  NET WIRE  5224, 0, 0
+  VTX  5228, 0, 0
+  {
+   COORD (820,1180)
+  }
+  VTX  5229, 0, 0
+  {
+   COORD (700,1180)
+  }
+  WIRE  5230, 0, 0
+  {
+   NET 5224
+   VTX 5228, 5229
+  }
+  VTX  5231, 0, 0
+  {
+   COORD (1900,2340)
+  }
+  VTX  5232, 0, 0
+  {
+   COORD (1760,2340)
+  }
+  WIRE  5234, 0, 0
+  {
+   NET 5235
+   VTX 5231, 5232
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  5235, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="MB_CLK"
+   }
+  }
+  TEXT  5236, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1782,2310,1878,2339)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 5234
+  }
+  INSTANCE  5814, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="exposure_time_ctrl"
+    #CUSTOM_NAME=""
+    #LIBRARY="#default"
+    #REFERENCE="U1"
+    #SYMBOL="exposure_time_ctrl"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="eef6f106-ee9b-4f99-9a01-56b08982843d"
+   }
+   COORD (2000,1780)
+   VERTEXES ( (2,5850), (4,5887), (8,5869), (10,5825), (12,5860), (14,5878), (16,5841), (18,5832), (20,5844) )
+  }
+  TEXT  5815, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2000,1724,2039,1759)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 5814
+  }
+  TEXT  5819, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (2000,2140,2248,2175)
+   MARGINS (1,1)
+   PARENT 5814
+  }
+  NET WIRE  5823, 0, 0
+  VTX  5824, 0, 0
+  {
+   COORD (2420,1860)
+  }
+  VTX  5825, 0, 0
+  {
+   COORD (2420,1860)
+  }
+  WIRE  5826, 0, 0
+  {
+   NET 5823
+   VTX 5824, 5825
+  }
+  TEXT  5827, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1735,2010,1986,2039)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 5833
+  }
+  VTX  5831, 0, 0
+  {
+   COORD (1720,2040)
+  }
+  VTX  5832, 0, 0
+  {
+   COORD (2000,2040)
+  }
+  RECORD  5833, 0, 0
+  {
+   NET 3568
+   VTX 5831, 5832
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  5835, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="EXPTIME_CTRL_MISO"
+    #VHDL_TYPE="t_axi4_lite_miso"
+   }
+  }
+  TEXT  5836, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1735,2030,1986,2059)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 5842
+  }
+  VTX  5840, 0, 0
+  {
+   COORD (1720,2060)
+  }
+  VTX  5841, 0, 0
+  {
+   COORD (2000,2060)
+  }
+  RECORD  5842, 0, 0
+  {
+   NET 5835
+   VTX 5840, 5841
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  5843, 0, 0
+  {
+   COORD (1800,1860)
+  }
+  VTX  5844, 0, 0
+  {
+   COORD (2000,1860)
+  }
+  WIRE  5845, 0, 0
+  {
+   NET 5235
+   VTX 5843, 5844
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  5846, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1852,1830,1948,1859)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 5845
+  }
+  VTX  5850, 0, 0
+  {
+   COORD (2000,1820)
+  }
+  VTX  5851, 0, 0
+  {
+   COORD (1800,1820)
+  }
+  WIRE  5852, 0, 0
+  {
+   NET 4368
+   VTX 5850, 5851
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  5853, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_EXP_INFO"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="exp_info_type"
+   }
+   COORD (2420,1960)
+   VERTEXES ( (2,5859) )
+  }
+  TEXT  5854, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2472,1943,2688,1978)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 5853
+  }
+  NET WIRE  5858, 0, 0
+  VTX  5859, 0, 0
+  {
+   COORD (2420,1960)
+  }
+  VTX  5860, 0, 0
+  {
+   COORD (2420,1960)
+  }
+  WIRE  5861, 0, 0
+  {
+   NET 5858
+   VTX 5859, 5860
+  }
+  INSTANCE  5862, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="EXP_CTRL_BUSY"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (2000,1960)
+   ORIENTATION 2
+   VERTEXES ( (2,5868) )
+  }
+  TEXT  5863, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1702,1943,1948,1978)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 5862
+  }
+  NET WIRE  5867, 0, 0
+  VTX  5868, 0, 0
+  {
+   COORD (2000,1960)
+  }
+  VTX  5869, 0, 0
+  {
+   COORD (2000,1960)
+  }
+  WIRE  5870, 0, 0
+  {
+   NET 5867
+   VTX 5868, 5869
+  }
+  INSTANCE  5871, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FW_EXP_INFO"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="exp_info_type"
+   }
+   COORD (2000,1980)
+   VERTEXES ( (2,5877) )
+  }
+  TEXT  5872, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1741,1963,1949,1998)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 5871
+  }
+  NET WIRE  5876, 0, 0
+  VTX  5877, 0, 0
+  {
+   COORD (2000,1980)
+  }
+  VTX  5878, 0, 0
+  {
+   COORD (2000,1980)
+  }
+  WIRE  5879, 0, 0
+  {
+   NET 5876
+   VTX 5877, 5878
+  }
+  INSTANCE  5880, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="ERROR"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (2420,2060)
+   VERTEXES ( (2,5886) )
+  }
+  TEXT  5881, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2472,2043,2579,2078)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 5880
+  }
+  NET WIRE  5885, 0, 0
+  VTX  5886, 0, 0
+  {
+   COORD (2420,2060)
+  }
+  VTX  5887, 0, 0
+  {
+   COORD (2420,2060)
+  }
+  WIRE  5888, 0, 0
+  {
+   NET 5885
+   VTX 5886, 5887
+  }
+ }
+ 
+}
+
+PAGE ""
+{
+ PAGEHEADER
+ {
+  PAGESIZE (4400,3400)
+  MARGINS (200,200,200,200)
+  RECT (0,0,0,0)
+  VARIABLES
+  {
+   #BLOCKTABLE_PAGE="1"
+   #BLOCKTABLE_TEMPL="1"
+   #BLOCKTABLE_VISIBLE="0"
+   #MODIFIED="1159531380"
+   FIRMWARE="FIR-XXX-YYY-ZZZ",BOTH
+   PAGENAME=""
+   PAGENUMBER="1"
+   PROJECT="FIRST",BOTH
+   REVISION="A",BOTH
+  }
+ }
+ 
+ BODY
+ {
+  TEXT  5935, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Project:"
+   RECT (3680,3136,3768,3184)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  5936, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$CREATIONDATE"
+   RECT (3400,3010,3640,3070)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  5937, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "Title:"
+   RECT (3680,3096,3736,3144)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  5938, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "$TITLE"
+   RECT (3800,3090,4180,3150)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  LINE  5939, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3660,3080), (4200,3080) )
+   FILL (1,(0,0,0),0)
+  }
+  LINE  5940, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3660,3080), (3660,3200) )
+  }
+  LINE  5941, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (4200,3200), (4200,2960), (3220,2960), (3220,3200), (4200,3200) )
+   FILL (1,(0,0,0),0)
+  }
+  TEXT  5942, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT 
+"100-2600 St-Jean-Baptiste\n"+
+"Québec, QC\t\t\t\t\tPhone:  418-874-7808\n"+
+"Canada, G2E 6J5 \t\tFax :     418-864-7843\n"+
+""
+   RECT (3680,2980,4176,3094)
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   VAR
+   MULTILINE
+  }
+  LINE  5943, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3660,2960), (3660,3080) )
+  }
+  LINE  5944, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (4200,2960), (4200,2840), (3660,2840), (3660,2960), (4200,2960) )
+   FILL (1,(0,0,0),0)
+  }
+  TEXT  5945, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$FIRMWARE"
+   RECT (3400,3090,3640,3150)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  5946, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$AUTHOR"
+   RECT (3400,2970,3640,3030)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  5947, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$PROJECT"
+   RECT (3800,3130,4000,3190)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  5948, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Design by:"
+   RECT (3240,2976,3361,3024)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  5949, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Date:"
+   RECT (3240,3016,3302,3064)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  LINE  5950, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3380,2960), (3380,3080) )
+  }
+  LINE  5951, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3220,3080), (3660,3080) )
+   FILL (1,(0,0,0),0)
+  }
+  TEXT  5952, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Firmware #:"
+   RECT (3240,3096,3376,3144)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  5953, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Revision:"
+   RECT (3240,3136,3345,3184)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  LINE  5954, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3380,3080), (3380,3200) )
+  }
+  LINE  5955, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3780,3080), (3780,3200) )
+  }
+  TEXT  5956, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$REVISION"
+   RECT (3400,3130,3640,3190)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  BMPPICT  5957, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (3740,2860,4120,2955)
+   TEXT
+   "ezE1QTMzOEZELTk0QjYtNGZmNC1BMUUwLTZCREEwNTg1QzkwRH0ALJEAACgAAAB8AQAAXwAAAAEACAAAAAAABI0AAMQOAADEDgAAAAEAAAAAAAD///8AVafzAAB87QA/nPEAf732AL/e+gCq0/kArnFvAMKVkwCGKycApGBdANa4twDgyskAZD9YAENTigAhZ7sAgYyxAIJ0jgBhiMAAoanEAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEBAQCAgICAgICAgICAgICAgICAgICAgQEBAUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFBAMCAgICAgICAwEBAQEBAQEBAQEBAQEBAgICAgICAgICAwQFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQEAgICAgIDAQEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQEBAwICAgICAgQEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQQCAgICAwEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAQICAgICAwQFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgIBBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAQICAgICBAUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAgMBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAwICAgIEBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAEDAgICAwQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQMCAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQMCAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQBAgICAwQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUDAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQMCAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgICBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICARQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAwICAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgICBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQICAwUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU"+
+"FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAECAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCAgICAgICBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAwICgkJCQkJCQkJCQkJCQkJCQgIDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAgJCQkJCQkJCQcHBwcHBwoJCQkJCQkJCQkIDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCgcLFBQUFBQUFBQUFBQUFAgHBwkJCQkJCQgMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkHCxQUFBQUFBQUFBQUFBQUFBQUBQQEBAMODgkJCQkJCAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAoJCQkHFBQUFBQUFBQUFBQUFBQUFBQEAwICAgICAgICAg8OCQkJCQ0TFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkHFBQUFBQUFBQUFBQUFBQUFAQDAgICAgICAgICAgICAgICDg0JCQkNEgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkKCxQUFBQUFBQUFBQUFBQUBQQCAgICAgICAgICAQEBAQEBAQECAg8NCQkJDRMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJChQUFBQUFBQUFBQUFBQUBQMCAgICAgICAwEGFBQUFBQUFBQUFBQUAQMPDQkJCQoFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQsUFBQUFBQUFBQUFBQUFAMCAgICAgIDARQUFBQUFBQUFBQUFBQUFBQUFAQDDw0JCQkMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkLFBQUFBQUFBQUFBQUFAQCAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAg8JCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJCBQUFBQUFBQUFBQUFAUDAgIPDg0JCQkJCQkJCQgIDBQUFBQUFBQUFBQUFBQUFBQUAwINCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAwICAgICAgICAgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICAgICAgICAgICAgICAgICAgICAgICAgICAgMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICAgICAgICAgICAgICAgICAgICAgICAgJCQkKCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQoUFBQUFBQUFBQUFBQFAgIOCQkJBwcLFBQUCAcHBwkJCQgMFBQUFBQUFBQUFBQUFBQUAwIPCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIFFBQUDAgICAgICAgICAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAgICAgICAgICAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJFBQUFBQUFBQUFBQUAwIPCQkOCxQUFBQUFBQUFBQUFBQRDQkJCBQUFBQUFBQUFBQUFBQUAgIPCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIUFBQICQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAgKCQkJCQkJCQkJCQkJCQkKCBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQgUFBQUFBQUFBQUFAMCDgkNEhQUFBQUFBQUFBQEAwICAgICAg4JCQoUFBQUFBQUFBQUFBQEAgIPDQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgMUFAgJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJFBQUFBQUFBQUFBQDAg0JDgYUFBQUFBQUFAUDAgICAgICAgICAgIOCQkIFBQUFBQUFBQUFBQDAgICCgkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgQUCAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkMFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQgUFBQUFBQUFBQUAwIPCQ4GFBQUFBQUFAUDAg8ODg4RCAgICBQUAQMCDgkKDBQUFBQUFBQUFAQCAgIFCgkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAhQICQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkMFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJFBQUFBQUFBQUFAMCAgkKBhQUFBQUFBQDDg0JCQkJCQkJCQkJCQoIFAQCDwkJDBQUFBQUFBQUFAICAgQUCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAwgJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkKBwcHBwcHBwcHBwcHBwcHBwcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJBwcHBwcHBwcHBwcHBwcJCQkKBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQoUFBQUFBQUFBQDAgIOCRQUFBQU"+
+"FBQFDgkJCQkJCQkJCQkJCQkJCQkJCAQCAg0JDBQUFBQUFBQUAwICBBQICQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAICEQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkKBwcUFBQUFAcKCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAQCFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCBQUFBQUFBQUBAICAgkIFBQUFBQUBQ0JCQkJCQkJCQkJCQkJCQkJCQkJCgQCAg0JDBQUFBQUFBQEAgIEFBQICQkMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIOCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQoHFBQUFBQUFBQUFBQICQkJCQkJCQkJChQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUBAIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkIFBQUFBQUFAUCAgIOCRQUFBQUFAMNCQkJCQkJCQkKBwcHCgkJCQkJCQkJCgMCAwoJFBQUFBQUFAQCAgIUFBQKCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAw4JCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQoLFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQEAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQsUFBQUFBQUAwICAg0KFBQUFBQFDQkJCQkJCQcLFBQUFBQUFBQHCQkJCQkJCgICFAkKFBQUFBQUBAICBBQUFBQJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEDgkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAcLFBQUFBQUFBQUFBQUFBQUCgkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAQCFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJFBQUFBQUFAQCAgIDCQgUFBQUBQ8JCQkJCQoUFBQUFBQUFBQUFBQUBwkJCQkJDwIECAkMFBQUFBQEAgIEFBQUFAgJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQRCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUBAIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkUFBQUFBQUAgICAhQJCxQUFBQDDgkJCQkIFBQUFBQUFBQUFBQUFBQUCAkJCQkNAgQUCgoUFBQUFAMCAgQUFBQUFAkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAwICgkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkKCAgICAgICAgICAgICAgICBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQEAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQwUFBQUFAQCAgIEFAkUFBQUBQIJCQkJChQUFBQUFBQUFBQUFBQUFBQUCgkJCQkCBBQICRQUFBQUAgICBBQUFBQUCAkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkICAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAgJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCBQUFBQUAwICAhQUCRQUFBQDAgkJCQkIFBQUFBQUFBQUFBQUFBQUFBQICQkJCQIEFBQJCBQUFAUCAgIGFBQUFBQUCQkMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCgkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkIFBQUFAUCAgIEFBQJCBQUFAICCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJDgQUFAoIFBQUBAICAhQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCgkJCQkJCQkJCQkJCQkJCQkJCQkJChQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUAgIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQoUFBQUBAICAhQUFAkIFBQEAgMJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkOBBQUCAkUFBQCAgIEFBQUFBQUFAgJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQEAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCRQUFBQDAgIDFBQUCAoUFAQCBAkJCQkMFBQUFBQUFBQUFBQUFBQUFBQMCQkJCQIUFBQICRQUBAICAgYUFBQUFBQUFAkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQkJCQkJCQkJCQkJCQkJCQkJCQcUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJDBQUFAICAgQUFBQICRQUBAIECQkJCQoUFBQUFBQUFBQUFBQUFBQUFAgJCQkJAxQUFAgJFBQCAgICFBQUFBQUFBQUCgkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkJCQkJCQkJCQkJCQkJCQkJCgcUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkKBwcHBwcHBwcHBwcHBwcHBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkKFBQUAgICBhQUFBQJChQEAgQKCQkJCQwUFBQUFBQUFBQUFBQUFBQMCQkJCQ0GFBQUCAoUBAICAgQUFBQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQgUFBQUFBQICgkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJCQkJCQkJCQkJCQkJCQkHBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUAwIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkUFBQCAgIUFBQUFAgJDAQCAwgJCQkJCQwUFBQUFBQUFBQUFBQUDAkJCQkJCBQUFBQKCAUCAgIDFBQUFBQUFBQUFAgJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCBQUFBQUFBQUCAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCgcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQEAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQgUFAICAhQUFBQUFAoKFAICFAoJCQkJCQoMFBQUFBQUFBQUDAoJCQkJCQoUFBQUFAkIAwICAgYUFBQUFBQUFBQUCAkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkIFBQUFBQUFBQICQkJCQkJCQkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQkJCQkJCQkJCgsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCRQUAgICFBQUFBQUCAkKAwIEFAkJCQkJCQkJCAgICAgICAkJCQkJCQkJCxQUFBQICQMCAgIDFBQUFBQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQgUFBQUFBQUFAwJCQkJCQkJCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQMFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFAMCBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJChQCAgIUFBQUFBQUCAkNAgIFCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFAoNAgICAxQUFBQUFBQUFBQUFAgJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCBQUFBQUFBQUCgkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJDBQUFBQUFBQUFBQUFAwICQkUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUBAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJDAICAgQUFBQUFBQUCAkNAgMUFAoJCQkJCQkJCQkJCQkJCQkJCQoUFBQUFBQICQ8CAgIGFBQUFBQUFBQUFBQUCAkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkIFBQUFAwICAkJCQkJCQkJCQkJCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCBQUFBQUFBQMCAoJCQkJCRQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJAgICBBQUFBQUFBQUCAkJDwMFFAgKCQkJCQkJCQkJCQkJCQ0QFBQUFBQUDAkNAgICBhQUFBQUFBQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQEAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkNAgICFBQUFBQUFBQUFAoJDQIEFBQUBwcHCQkJCQkODg4DFBQUFBQUFAwJDQICAgYUFBQUFBQUFBQUFBQUFAkJCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQU"+
+"FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkOAgIEFBQUFBQUFBQUFAcJCQ4CAwQEBAQEAgICAgIDBhQUFBQUFBQMCQkPAgIGFBQUFBQUFBQUFBQUFBQMCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFAQCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkPAgIUFBQUFBQUFBQUFBQHCQkNDwICAgICAgMBFBQUFBQUFBQUCAkNDwICBhQUFBQUFBQUFBQUFBQUFAgJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFAMCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkPAgMUFBQUFBQUFBQUFBQUBwoJCQ4OAQYUFBQUFBQUFBQMCAkJDgICAwYUFBQUFBQUFBQUFBQUFBQUCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAcKCQkJCQkJCQkJCQkJCQkJCQoHCxQUFAcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUBAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkPAgMUFBQUFBQUFBQUFBQUFAgHCgkJCQgICAgICAgKCQkJDgICAgMUFBQUFBQUFBQUFBQUFBQUFAgJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgHBwcODgcHBwcHBwcHBwcHBwcHBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBwcHCgkJCQkJCQcHBwsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkOAgMUFBQUFBQUFBQUFBQUFBQUFAgHBwoJCQkJCg4ODwICAgIGFBQUFBQUFBQUFBQUFBQUFBQUCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkNAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgICAgIDFBQUFBQUFBQUFBQUFBQUFBQUFAoJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQHCQkNDwIDBRQUFBQUFBQUFBQUFBQUFBQUBAMCAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQMCQkLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJDgICAwQUFBQUFBQUFBQUFAUEAwICAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICgkJCQ8CAgICAwQEBAQEAwICAgICAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUFAwJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQCAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBwkJCQ0PAgICAgICAgICAgICAgICAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQkNDwICAgICAgICAgICAwEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgKCQkJDQ4BAQEBAQEBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICgkJCQkIDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAoJCQkLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAcJCQkJCQgMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAoJCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICgkJCQkJCggMFBQUFBQUFBQUFBQUFBQUFBQICgkJCQkKCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAcHCQkJCQkJCQoICAgICAgICAgICAoJCQkJCQkHFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAcHCQkJCQkJCQkJCQkJCQkJCQkJCgcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQHBwcHBwcHBwcHBwcHFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU"+
+"FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICAwUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAECAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgICAwUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQICAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAwICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAECAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAwYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAgICAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQMCAgEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQBAgICAgQFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQMCAgICBAUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAwICAgIEBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgIBBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAEDAgICAgMEBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEBAICAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQECAgICAgMEBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQQDAgICAgEGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQECAgICAgICBAQEBBQUFBQUFBQUFBQUFBQUFBQFBAQEAgICAgICAQYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQEBAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgEBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAQEBAQICAgICAgICAgICAgMBAQEBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFA=="
+  }
+ }
+ 
+}
+

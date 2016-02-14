@@ -1,0 +1,3916 @@
+SCHM0104
+
+HEADER
+{
+ FREEID 2765
+ VARIABLES
+ {
+  #ARCHITECTURE="video_data_handler"
+  #BLOCKTABLE_FILE="F:\\Bibliotheque\\Electronique\\Active-HDL\\Cartouche\\#Telops.bde"
+  #BLOCKTABLE_INCLUDED="1"
+  #DEFAULT_RANGE0="<range<name=\"cmd_ehdri_index\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE1="<range<name=\"cmd_fwposition_index\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE2="<range<name=\"video_selector\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #ENTITY="video_data_handler"
+  #LANGUAGE="VHDL"
+  AUTHOR="Unknown"
+  COMPANY="Unknown"
+  CREATIONDATE="4/29/2015"
+  PAGECOUNT="2"
+  TITLE="video_data_handler"
+ }
+ SYMBOL "work" "axis16_hder_extractor" "axis16_hder_extractor"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1448032785"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="634ef56a-54e0-410b-bf09-2f86bc617289"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,400,500)
+    FREEID 33
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,380,480)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,118,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (224,30,375,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,156,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (207,70,375,94)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,70,157,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (212,150,375,174)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,150,186,174)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (204,190,375,214)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 16
+    }
+    TEXT  19, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,190,186,214)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 18
+    }
+    TEXT  21, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (204,390,375,414)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 20
+    }
+    TEXT  23, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (187,270,375,294)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 22
+    }
+    TEXT  25, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (188,310,375,334)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 24
+    }
+    TEXT  27, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (120,350,375,374)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 26
+    }
+    TEXT  29, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (159,110,375,134)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 28
+    }
+    TEXT  31, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (199,230,375,254)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 30
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (400,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="DECODED_HDR"
+      #NUMBER="0"
+      #VHDL_TYPE="DECODED_HDR_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK_STREAM"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (400,80)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HDR_INFO_VALID"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK_HDROUT"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (400,160)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="IMG_WIDTH(15:0)"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (0,160)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="IMG_DATA_MOSI"
+      #NUMBER="0"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (400,200)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="IMG_HEIGHT(15:0)"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  18, 0, 0
+    {
+     COORD (0,200)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="IMG_DATA_MISO"
+      #NUMBER="0"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  20, 0, 0
+    {
+     COORD (400,400)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="EHDRI_INDEX(7:0)"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  22, 0, 0
+    {
+     COORD (400,280)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="IMG_HDR_LEN(15:0)"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  24, 0, 0
+    {
+     COORD (400,320)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CAL_BLOCK_INDEX"
+      #NUMBER="0"
+      #VHDL_TYPE="CAL_BLOCK_INDEX_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  26, 0, 0
+    {
+     COORD (400,360)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CAL_BLOCK_INDEX_VALID"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  28, 0, 0
+    {
+     COORD (400,120)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="EXPOSURE_TIME(31:0)"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  30, 0, 0
+    {
+     COORD (400,240)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FW_POSITION(7:0)"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "badpixel_handler" "badpixel_handler"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1415040540"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="728e7f7c-11bd-4911-ae79-dd10a5490130"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,20,360,200)
+    FREEID 18
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,20,340,200)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (295,150,335,174)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 2
+     ORIENTATION 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,114,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+     ORIENTATION 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (242,130,335,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 6
+     ORIENTATION 2
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (248,30,335,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,114,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,150,221,174)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 12
+     ORIENTATION 2
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (248,50,335,74)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 14
+     ORIENTATION 2
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,221,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 16
+    }
+    PIN  2, 0, 0
+    {
+     COORD (360,160)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (360,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (360,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (0,160)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="BADPIXEL_RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (360,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TX_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="BADPIXEL_RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI8"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "work" "badpixel_replacer" "badpixel_replacer"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="BAD_PIX_TAG:STD_LOGIC_VECTOR(15 downto 0):=X\"FFFE\""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1430165151"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="804b0594-4bc2-49e2-9db5-00fcc2fb0304"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,260,240)
+    FREEID 16
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,240,220)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,65,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,114,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+     ORIENTATION 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,110,118,134)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (148,10,235,34)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,10,114,34)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (148,30,235,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 12
+     ORIENTATION 2
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,170,115,194)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (260,20)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,20)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (260,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (0,180)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #INITIAL_VALUE="'1'"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="REPL_EN"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "work" "t_axi4_stream8_fifo" "t_axi4_stream8_fifo"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="FifoSize:INTEGER:=16"
+    #GENERIC1="ASYNC:BOOLEAN:=false"
+    #HDL_ENTRIES=
+"library STD,IEEE,WORK;\n"+
+"use STD.STANDARD.all,ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1415040530"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="2bfffdde-09c6-48a3-ab30-4f50a3ee70b8"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,260,180)
+    FREEID 18
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,240,180)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,110,118,134)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,114,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+     ORIENTATION 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,103,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (148,30,235,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,114,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (182,110,235,134)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (159,130,235,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 14
+     ORIENTATION 2
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (148,50,235,74)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 16
+     ORIENTATION 2
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RX_CLK"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (260,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI8"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI8"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (260,120)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="OVFL"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (260,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TX_CLK"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (260,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TX_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "video_ehdri_selector" "video_ehdri_selector"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1446814590"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="3bae6109-9093-46fe-a216-b073ecd37aa3"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,300,480)
+    FREEID 31
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,280,460)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,118,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,210,114,234)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+     ORIENTATION 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,65,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (188,190,275,214)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,90,193,114)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,248,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,190,114,214)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 16
+    }
+    TEXT  19, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (188,210,275,234)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 18
+     ORIENTATION 2
+    }
+    TEXT  27, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,290,179,314)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 26
+    }
+    TEXT  29, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,250,219,274)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 28
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (0,220)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="t_axi4_stream_miso"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (300,200)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="t_axi4_stream_mosi16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,100)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HDR_INFO_VALID"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HDR_EHDRI_INDEX(7:0)"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (0,200)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="t_axi4_stream_mosi16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  18, 0, 0
+    {
+     COORD (300,220)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="t_axi4_stream_miso"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  26, 0, 0
+    {
+     COORD (0,300)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CMD_INDEX(7:0)"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  28, 0, 0
+    {
+     COORD (0,260)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="SELECTOR_ENABLE"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "video_freeze" "video_freeze"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1430503373"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="af40cdff-3f47-43f1-9dfa-ac1de24f3f28"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,260,240)
+    FREEID 17
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,240,240)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,118,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,150,114,174)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+     ORIENTATION 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,65,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (148,130,235,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,210,139,234)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,114,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (148,150,235,174)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 14
+     ORIENTATION 2
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (0,160)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (260,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,220)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="Freeze_Cmd"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (260,160)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "video_fwposition_selector" "video_fwposition_selector"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1446814670"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="6f8edd96-1ae0-4453-a44b-538f7e378743"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,280,360)
+    FREEID 23
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,260,360)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,118,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,210,114,234)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+     ORIENTATION 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,65,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (168,190,255,214)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,110,193,134)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,250,219,274)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,290,179,314)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,150,242,174)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 16
+    }
+    TEXT  19, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,190,114,214)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 18
+    }
+    TEXT  21, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (168,210,255,234)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 20
+     ORIENTATION 2
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESETN"
+      #NUMBER="0"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (0,220)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MISO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (280,200)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HDR_INFO_VALID"
+      #NUMBER="0"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (0,260)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="SELECTOR_ENABLE"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  14, 0, 0
+    {
+     COORD (0,300)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CMD_INDEX(7:0)"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC_VECTOR"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (0,160)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HDR_FWPOSITION(7:0)"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC_VECTOR"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  18, 0, 0
+    {
+     COORD (0,200)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RX_MOSI"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  20, 0, 0
+    {
+     COORD (280,220)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="TX_MISO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+}
+
+PAGE ""
+{
+ PAGEHEADER
+ {
+  PAGESIZE (3400,2200)
+  MARGINS (200,200,200,200)
+  RECT (0,0,0,0)
+ }
+ 
+ BODY
+ {
+  VHDLDESIGNUNITHDR  2, 0, 0
+  {
+   LABEL "Design Unit Header"
+   TEXT 
+"library IEEE;\n"+
+"use IEEE.std_logic_1164.all;\n"+
+"use IEEE.numeric_std.all;\n"+
+"use work.tel2000.all;\n"+
+"use work.calib_define.all;\n"+
+"library work;"
+   RECT (200,240,680,520)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(239,235,255),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  NET WIRE  3, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ARESETN"
+   }
+  }
+  NET WIRE  5, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="CLK"
+   }
+  }
+  INSTANCE  7, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Global"
+    #CUSTOM_NAME=""
+    #LIBRARY="#connectors"
+    #REFERENCE="ARESETN"
+    #SYMBOL="Global"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (820,580)
+  }
+  TEXT  8, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (835,563,974,598)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 7
+  }
+  INSTANCE  9, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Global"
+    #CUSTOM_NAME=""
+    #LIBRARY="#connectors"
+    #REFERENCE="CLK"
+    #SYMBOL="Global"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (820,620)
+  }
+  TEXT  10, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (835,603,893,638)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 9
+  }
+  INSTANCE  11, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="ARESETN"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (600,580)
+   VERTEXES ( (2,22) )
+  }
+  TEXT  13, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (410,563,549,598)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 11
+  }
+  INSTANCE  14, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="CLK"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (600,620)
+   VERTEXES ( (2,24) )
+  }
+  TEXT  16, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (491,603,549,638)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 14
+  }
+  TEXT  17, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (650,550,763,579)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 26
+  }
+  TEXT  18, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (685,591,733,620)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 27
+  }
+  VTX  22, 0, 0
+  {
+   COORD (600,580)
+  }
+  VTX  23, 0, 0
+  {
+   COORD (760,580)
+  }
+  VTX  24, 0, 0
+  {
+   COORD (600,620)
+  }
+  VTX  25, 0, 0
+  {
+   COORD (760,620)
+  }
+  WIRE  26, 0, 0
+  {
+   NET 3
+   VTX 22, 23
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  27, 0, 0
+  {
+   NET 5
+   VTX 24, 25
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  342, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (696,851,744,880)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2052
+  }
+  TEXT  349, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (744,871,792,900)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2053
+  }
+  TEXT  356, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (710,830,823,859)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2049
+  }
+  INSTANCE  363, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="IMG_DATA_MOSI"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+   }
+   COORD (760,980)
+   VERTEXES ( (2,2036) )
+  }
+  TEXT  364, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (472,963,709,998)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 363
+  }
+  INSTANCE  372, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #IS_UNCONSTRAINED_PORT="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="IMG_DATA_MISO"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+   COORD (760,1020)
+   VERTEXES ( (2,2038) )
+  }
+  TEXT  373, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (472,1003,709,1038)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 372
+  }
+  INSTANCE  419, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="video_ehdri_selector"
+    #CUSTOM_NAME=""
+    #LIBRARY="#default"
+    #REFERENCE="U2"
+    #SYMBOL="video_ehdri_selector"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="3bae6109-9093-46fe-a216-b073ecd37aa3"
+   }
+   COORD (1540,1280)
+   VERTEXES ( (4,2078), (16,2082), (26,2101), (28,2139), (8,2266), (18,2264), (14,2426), (10,2438) )
+  }
+  TEXT  420, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1540,1224,1579,1259)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 419
+  }
+  TEXT  424, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (1540,1760,1810,1795)
+   MARGINS (1,1)
+   PARENT 419
+  }
+  NET BUS  569, 0, 0
+  NET RECORD  606, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="RECORD606"
+    #VHDL_TYPE="t_axi4_stream_miso"
+    RECORD=""
+    T_AXI4_STREAM_MISO=""
+   }
+  }
+  NET RECORD  610, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="RECORD610"
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+    RECORD=""
+    T_AXI4_STREAM_MOSI16=""
+   }
+  }
+  INSTANCE  735, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="VIDEO_OUT_MISO"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+   COORD (3060,1500)
+   ORIENTATION 2
+   VERTEXES ( (2,2289) )
+  }
+  TEXT  736, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (3111,1483,3369,1518)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 735
+  }
+  INSTANCE  744, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="VIDEO_OUT_MOSI"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+   }
+   COORD (3060,1480)
+   VERTEXES ( (2,2287) )
+  }
+  TEXT  745, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (3112,1463,3370,1498)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 744
+  }
+  NET RECORD  776, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="IMG_DATA_MOSI"
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+    RECORD=""
+    T_AXI4_STREAM_MOSI16=""
+   }
+  }
+  NET RECORD  781, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="IMG_DATA_MISO"
+    #VHDL_TYPE="t_axi4_stream_miso"
+    RECORD=""
+    T_AXI4_STREAM_MISO=""
+   }
+  }
+  INSTANCE  987, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="video_freeze"
+    #CUSTOM_NAME=""
+    #LIBRARY="#default"
+    #REFERENCE="U3"
+    #SYMBOL="video_freeze"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="af40cdff-3f47-43f1-9dfa-ac1de24f3f28"
+   }
+   COORD (2720,1340)
+   VERTEXES ( (12,2295), (4,2293), (10,2290), (8,2286), (14,2288) )
+  }
+  TEXT  988, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2720,1304,2759,1339)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 987
+  }
+  TEXT  992, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (2720,1580,2886,1615)
+   MARGINS (1,1)
+   PARENT 987
+  }
+  NET RECORD  1044, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="RECORD1044"
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+    RECORD=""
+    T_AXI4_STREAM_MOSI16=""
+   }
+  }
+  NET RECORD  1052, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="RECORD1052"
+    #VHDL_TYPE="t_axi4_stream_miso"
+    RECORD=""
+    T_AXI4_STREAM_MISO=""
+   }
+  }
+  NET RECORD  1058, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="RECORD1058"
+    #VHDL_TYPE="t_axi4_stream_miso"
+    RECORD=""
+    T_AXI4_STREAM_MISO=""
+   }
+  }
+  NET RECORD  1062, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="RECORD1062"
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+    RECORD=""
+    T_AXI4_STREAM_MOSI16=""
+   }
+  }
+  INSTANCE  1284, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="t_axi4_stream8_fifo"
+    #CUSTOM_NAME=""
+    #LIBRARY="work"
+    #REFERENCE="U39"
+    #SYMBOL="t_axi4_stream8_fifo"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="2bfffdde-09c6-48a3-ab30-4f50a3ee70b8"
+   }
+   COORD (300,1540)
+   VERTEXES ( (10,1980), (4,1976), (6,1971), (14,1974), (8,1999), (16,1995) )
+  }
+  TEXT  1291, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (300,1504,355,1539)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 1284
+  }
+  TEXT  1292, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (300,1720,555,1755)
+   MARGINS (1,1)
+   PARENT 1284
+  }
+  TEXT  1293, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (226,1650,274,1679)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 1983
+  }
+  TEXT  1295, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (576,1650,624,1679)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 1984
+  }
+  INSTANCE  1297, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="badpixel_handler"
+    #CUSTOM_NAME=""
+    #LIBRARY="#default"
+    #REFERENCE="U40"
+    #SYMBOL="badpixel_handler"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="728e7f7c-11bd-4911-ae79-dd10a5490130"
+   }
+   COORD (600,1440)
+   VERTEXES ( (10,1994), (4,1990), (16,2000), (12,1996), (8,2018), (14,2014) )
+  }
+  TEXT  1304, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (600,1424,655,1459)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 1297
+  }
+  TEXT  1305, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (720,1640,942,1675)
+   MARGINS (1,1)
+   PARENT 1297
+  }
+  INSTANCE  1306, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="badpixel_replacer"
+    #CUSTOM_NAME=""
+    #GENERIC0="BAD_PIX_TAG : STD_LOGIC_VECTOR(15 downto 0) := "
+    #LIBRARY="work"
+    #NO_CONF="1"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U42"
+    #SYMBOL="badpixel_replacer"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="804b0594-4bc2-49e2-9db5-00fcc2fb0304"
+   }
+   COORD (1060,1460)
+   VERTEXES ( (10,2019), (4,2015), (14,2023), (8,2081), (12,2077) )
+   PINPROP 14,"#PIN_COMMENT",""
+   PINPROP 14,"#PIN_STATE","0"
+   PINPROP 12,"#PIN_COMMENT",""
+   PINPROP 12,"#PIN_STATE","0"
+   PINPROP 8,"#PIN_COMMENT",""
+   PINPROP 8,"#PIN_STATE","0"
+   PINPROP 6,"#PIN_COMMENT",""
+   PINPROP 6,"#PIN_STATE","0"
+   PINPROP 10,"#PIN_COMMENT",""
+   PINPROP 10,"#PIN_STATE","0"
+   PINPROP 4,"#PIN_COMMENT",""
+   PINPROP 4,"#PIN_STATE","0"
+   PINPROP 2,"#PIN_COMMENT",""
+   PINPROP 2,"#PIN_STATE","0"
+  }
+  TEXT  1312, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1060,1425,1115,1460)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 1306
+  }
+  TEXT  1313, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (1060,1680,1291,1715)
+   MARGINS (1,1)
+   PARENT 1306
+  }
+  NET RECORD  1314, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="RECORD59074"
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+    RECORD=""
+    T_AXI4_STREAM_MOSI16=""
+   }
+  }
+  NET RECORD  1316, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="RECORD59082"
+    #VHDL_TYPE="t_axi4_stream_miso"
+    RECORD=""
+    T_AXI4_STREAM_MISO=""
+   }
+  }
+  NET RECORD  1318, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BUS59155"
+    #VHDL_TYPE="t_axi4_stream_mosi8"
+   }
+  }
+  NET RECORD  1320, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BUS59169"
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+  }
+  NET WIRE  1322, 0, 0
+  INSTANCE  1334, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="BADPIXEL_MISO"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+   COORD (260,1600)
+   ORIENTATION 2
+   VERTEXES ( (2,1975) )
+  }
+  TEXT  1336, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (-29,1583,200,1618)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1334
+  }
+  INSTANCE  1337, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #IS_UNCONSTRAINED_PORT="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="VIDEO_IN_MISO"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+   COORD (260,1500)
+   ORIENTATION 2
+   VERTEXES ( (2,1989) )
+  }
+  TEXT  1339, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (-23,1483,200,1518)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1337
+  }
+  INSTANCE  1340, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="BADPIXEL_MOSI"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_mosi8"
+   }
+   COORD (260,1580)
+   VERTEXES ( (2,1979) )
+  }
+  TEXT  1342, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (-29,1563,200,1598)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1340
+  }
+  INSTANCE  1343, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="VIDEO_IN_MOSI"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+   }
+   COORD (260,1480)
+   VERTEXES ( (2,1993) )
+  }
+  TEXT  1345, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (-23,1463,200,1498)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1343
+  }
+  INSTANCE  1351, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="BADPIXEL_REPL_EN"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (980,1760)
+   VERTEXES ( (2,2022) )
+  }
+  TEXT  1353, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (632,1743,920,1778)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1351
+  }
+  NET RECORD  1355, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="VIDEO_IN_MOSI"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+   }
+  }
+  NET RECORD  1357, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="VIDEO_IN_MISO"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+  }
+  NET RECORD  1359, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BADPIXEL_MOSI"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_mosi8"
+   }
+  }
+  NET RECORD  1361, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BADPIXEL_MISO"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+  }
+  INSTANCE  1480, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="Freeze_Cmd"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (2600,1720)
+   VERTEXES ( (2,2291) )
+  }
+  TEXT  1481, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2379,1703,2549,1738)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1480
+  }
+  NET WIRE  1485, 0, 0
+  INSTANCE  1611, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="axis16_hder_extractor"
+    #CUSTOM_NAME=""
+    #LIBRARY="work"
+    #REFERENCE="U1"
+    #SYMBOL="axis16_hder_extractor"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="634ef56a-54e0-410b-bf09-2f86bc617289"
+   }
+   COORD (820,820)
+   VERTEXES ( (2,2034), (6,2039), (8,2074), (10,2041), (14,2035), (18,2037), (20,2427), (30,2736) )
+  }
+  TEXT  1612, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (820,764,859,799)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 1611
+  }
+  TEXT  1616, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (820,1320,1107,1355)
+   MARGINS (1,1)
+   PARENT 1611
+  }
+  INSTANCE  1764, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="VIDEO_SELECTOR(1:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (1620,1940)
+  }
+  TEXT  1765, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1245,1923,1569,1958)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1764
+  }
+  INSTANCE  1811, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="CMD_EHDRI_INDEX(7:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (1480,1760)
+   VERTEXES ( (2,2102) )
+  }
+  TEXT  1812, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1094,1743,1429,1778)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1811
+  }
+  NET BUS  1820, 0, 0
+  NET WIRE  1942, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ehdri_selector_enable"
+   }
+  }
+  TEXT  1943, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1311,1510,1550,1539)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2140
+  }
+  SIGNALASSIGN  1947, 0, 0
+  {
+   LABEL "SignalAssignments_1"
+   TEXT 
+"ehdri_selector_enable <= VIDEO_SELECTOR(0);\n"+
+"fwposition_selector_enable <= VIDEO_SELECTOR(1);\n"+
+""
+   RECT (1220,2000,2000,2180)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  VTX  1971, 0, 0
+  {
+   COORD (300,1680)
+  }
+  VTX  1972, 0, 0
+  {
+   COORD (220,1680)
+  }
+  VTX  1973, 0, 0
+  {
+   COORD (640,1680)
+  }
+  VTX  1974, 0, 0
+  {
+   COORD (560,1680)
+  }
+  VTX  1975, 0, 0
+  {
+   COORD (260,1600)
+  }
+  VTX  1976, 0, 0
+  {
+   COORD (300,1600)
+  }
+  VTX  1979, 0, 0
+  {
+   COORD (260,1580)
+  }
+  VTX  1980, 0, 0
+  {
+   COORD (300,1580)
+  }
+  WIRE  1983, 0, 0
+  {
+   NET 5
+   VTX 1971, 1972
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  1984, 0, 0
+  {
+   NET 5
+   VTX 1973, 1974
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  1985, 0, 0
+  {
+   NET 1361
+   VTX 1975, 1976
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  1987, 0, 0
+  {
+   NET 1359
+   VTX 1979, 1980
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  1989, 0, 0
+  {
+   COORD (260,1500)
+  }
+  VTX  1990, 0, 0
+  {
+   COORD (600,1500)
+  }
+  VTX  1993, 0, 0
+  {
+   COORD (260,1480)
+  }
+  VTX  1994, 0, 0
+  {
+   COORD (600,1480)
+  }
+  VTX  1995, 0, 0
+  {
+   COORD (560,1600)
+  }
+  VTX  1996, 0, 0
+  {
+   COORD (600,1600)
+  }
+  VTX  1999, 0, 0
+  {
+   COORD (560,1580)
+  }
+  VTX  2000, 0, 0
+  {
+   COORD (600,1580)
+  }
+  RECORD  2001, 0, 0
+  {
+   NET 1357
+   VTX 1989, 1990
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2003, 0, 0
+  {
+   NET 1355
+   VTX 1993, 1994
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2004, 0, 0
+  {
+   NET 1320
+   VTX 1995, 1996
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2006, 0, 0
+  {
+   NET 1318
+   VTX 1999, 2000
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  2014, 0, 0
+  {
+   COORD (960,1500)
+  }
+  VTX  2015, 0, 0
+  {
+   COORD (1060,1500)
+  }
+  VTX  2018, 0, 0
+  {
+   COORD (960,1480)
+  }
+  VTX  2019, 0, 0
+  {
+   COORD (1060,1480)
+  }
+  VTX  2022, 0, 0
+  {
+   COORD (980,1760)
+  }
+  VTX  2023, 0, 0
+  {
+   COORD (1060,1640)
+  }
+  RECORD  2024, 0, 0
+  {
+   NET 1316
+   VTX 2014, 2015
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2026, 0, 0
+  {
+   NET 1314
+   VTX 2018, 2019
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  2028, 0, 0
+  {
+   COORD (1040,1760)
+  }
+  WIRE  2029, 0, 0
+  {
+   NET 1322
+   VTX 2022, 2028
+  }
+  VTX  2030, 0, 0
+  {
+   COORD (1040,1640)
+  }
+  WIRE  2031, 0, 0
+  {
+   NET 1322
+   VTX 2028, 2030
+  }
+  WIRE  2032, 0, 0
+  {
+   NET 1322
+   VTX 2030, 2023
+  }
+  VTX  2033, 0, 0
+  {
+   COORD (660,860)
+  }
+  VTX  2034, 0, 0
+  {
+   COORD (820,860)
+  }
+  VTX  2035, 0, 0
+  {
+   COORD (820,980)
+  }
+  VTX  2036, 0, 0
+  {
+   COORD (760,980)
+  }
+  VTX  2037, 0, 0
+  {
+   COORD (820,1020)
+  }
+  VTX  2038, 0, 0
+  {
+   COORD (760,1020)
+  }
+  VTX  2039, 0, 0
+  {
+   COORD (820,880)
+  }
+  VTX  2040, 0, 0
+  {
+   COORD (660,880)
+  }
+  VTX  2041, 0, 0
+  {
+   COORD (820,900)
+  }
+  VTX  2042, 0, 0
+  {
+   COORD (660,900)
+  }
+  WIRE  2049, 0, 0
+  {
+   NET 3
+   VTX 2033, 2034
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2050, 0, 0
+  {
+   NET 776
+   VTX 2035, 2036
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2051, 0, 0
+  {
+   NET 781
+   VTX 2037, 2038
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  2052, 0, 0
+  {
+   NET 5
+   VTX 2039, 2040
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  2053, 0, 0
+  {
+   NET 5
+   VTX 2041, 2042
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  2074, 0, 0
+  {
+   COORD (1220,900)
+  }
+  VTX  2077, 0, 0
+  {
+   COORD (1320,1500)
+  }
+  VTX  2078, 0, 0
+  {
+   COORD (1540,1500)
+  }
+  VTX  2081, 0, 0
+  {
+   COORD (1320,1480)
+  }
+  VTX  2082, 0, 0
+  {
+   COORD (1540,1480)
+  }
+  VTX  2089, 0, 0
+  {
+   COORD (1520,900)
+  }
+  WIRE  2091, 0, 0
+  {
+   NET 2433
+   VTX 2089, 2074
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2097, 0, 0
+  {
+   NET 606
+   VTX 2077, 2078
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2099, 0, 0
+  {
+   NET 610
+   VTX 2081, 2082
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  2101, 0, 0
+  {
+   COORD (1540,1580)
+  }
+  VTX  2102, 0, 0
+  {
+   COORD (1480,1760)
+  }
+  VTX  2103, 0, 0
+  {
+   COORD (1500,1580)
+  }
+  BUS  2104, 0, 0
+  {
+   NET 1820
+   VTX 2101, 2103
+  }
+  VTX  2105, 0, 0
+  {
+   COORD (1500,1760)
+  }
+  BUS  2106, 0, 0
+  {
+   NET 1820
+   VTX 2103, 2105
+  }
+  BUS  2107, 0, 0
+  {
+   NET 1820
+   VTX 2105, 2102
+  }
+  VTX  2138, 0, 0
+  {
+   COORD (1320,1540)
+  }
+  VTX  2139, 0, 0
+  {
+   COORD (1540,1540)
+  }
+  WIRE  2140, 0, 0
+  {
+   NET 1942
+   VTX 2138, 2139
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  2164, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="video_fwposition_selector"
+    #CUSTOM_NAME=""
+    #LIBRARY="#default"
+    #REFERENCE="U4"
+    #SYMBOL="video_fwposition_selector"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="6f8edd96-1ae0-4453-a44b-538f7e378743"
+   }
+   COORD (2100,1280)
+   VERTEXES ( (4,2265), (8,2294), (10,2463), (12,2333), (14,2629), (18,2267), (20,2292), (16,2735) )
+  }
+  TEXT  2165, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2100,1244,2139,1279)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 2164
+  }
+  TEXT  2169, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (2100,1640,2435,1675)
+   MARGINS (1,1)
+   PARENT 2164
+  }
+  VTX  2264, 0, 0
+  {
+   COORD (1840,1500)
+  }
+  VTX  2265, 0, 0
+  {
+   COORD (2100,1500)
+  }
+  VTX  2266, 0, 0
+  {
+   COORD (1840,1480)
+  }
+  VTX  2267, 0, 0
+  {
+   COORD (2100,1480)
+  }
+  RECORD  2268, 0, 0
+  {
+   NET 1052
+   VTX 2264, 2265
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2269, 0, 0
+  {
+   NET 1044
+   VTX 2266, 2267
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  2286, 0, 0
+  {
+   COORD (2980,1480)
+  }
+  VTX  2287, 0, 0
+  {
+   COORD (3060,1480)
+  }
+  VTX  2288, 0, 0
+  {
+   COORD (2980,1500)
+  }
+  VTX  2289, 0, 0
+  {
+   COORD (3060,1500)
+  }
+  VTX  2290, 0, 0
+  {
+   COORD (2720,1560)
+  }
+  VTX  2291, 0, 0
+  {
+   COORD (2600,1720)
+  }
+  VTX  2292, 0, 0
+  {
+   COORD (2380,1500)
+  }
+  VTX  2293, 0, 0
+  {
+   COORD (2720,1500)
+  }
+  VTX  2294, 0, 0
+  {
+   COORD (2380,1480)
+  }
+  VTX  2295, 0, 0
+  {
+   COORD (2720,1480)
+  }
+  RECORD  2296, 0, 0
+  {
+   NET 1062
+   VTX 2286, 2287
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2297, 0, 0
+  {
+   NET 1058
+   VTX 2288, 2289
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  2298, 0, 0
+  {
+   COORD (2620,1560)
+  }
+  WIRE  2299, 0, 0
+  {
+   NET 1485
+   VTX 2290, 2298
+  }
+  VTX  2300, 0, 0
+  {
+   COORD (2620,1720)
+  }
+  WIRE  2301, 0, 0
+  {
+   NET 1485
+   VTX 2298, 2300
+  }
+  WIRE  2302, 0, 0
+  {
+   NET 1485
+   VTX 2300, 2291
+  }
+  RECORD  2303, 0, 0
+  {
+   NET 2534
+   VTX 2292, 2293
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  2304, 0, 0
+  {
+   NET 2539
+   VTX 2294, 2295
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  2328, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1844,1510,2136,1539)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2334
+  }
+  VTX  2332, 0, 0
+  {
+   COORD (1880,1540)
+  }
+  VTX  2333, 0, 0
+  {
+   COORD (2100,1540)
+  }
+  WIRE  2334, 0, 0
+  {
+   NET 2567
+   VTX 2332, 2333
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET BUS  2425, 0, 0
+  VTX  2426, 0, 0
+  {
+   COORD (1540,1420)
+  }
+  VTX  2427, 0, 0
+  {
+   COORD (1220,1220)
+  }
+  VTX  2428, 0, 0
+  {
+   COORD (1280,1420)
+  }
+  BUS  2429, 0, 0
+  {
+   NET 569
+   VTX 2426, 2428
+  }
+  VTX  2430, 0, 0
+  {
+   COORD (1280,1220)
+  }
+  BUS  2431, 0, 0
+  {
+   NET 569
+   VTX 2428, 2430
+  }
+  BUS  2432, 0, 0
+  {
+   NET 569
+   VTX 2430, 2427
+  }
+  NET WIRE  2433, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="hder_info_valid_i"
+   }
+  }
+  TEXT  2434, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1279,870,1462,899)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2091
+  }
+  VTX  2438, 0, 0
+  {
+   COORD (1540,1380)
+  }
+  VTX  2439, 0, 0
+  {
+   COORD (1320,1380)
+  }
+  WIRE  2441, 0, 0
+  {
+   NET 2433
+   VTX 2438, 2439
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  2443, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1339,1350,1522,1379)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2441
+  }
+  VTX  2463, 0, 0
+  {
+   COORD (2100,1400)
+  }
+  TEXT  2482, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1909,1371,2092,1400)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2487
+  }
+  VTX  2486, 0, 0
+  {
+   COORD (1920,1400)
+  }
+  WIRE  2487, 0, 0
+  {
+   NET 2433
+   VTX 2463, 2486
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET RECORD  2534, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="freeze_in_miso"
+    #VHDL_TYPE="t_axi4_stream_miso"
+   }
+  }
+  TEXT  2535, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2469,1470,2632,1499)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2303
+  }
+  NET RECORD  2539, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="freeze_in_mosi"
+    #VHDL_TYPE="t_axi4_stream_mosi16"
+   }
+  }
+  TEXT  2540, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2469,1450,2632,1479)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 2304
+  }
+  NET WIRE  2567, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="fwposition_selector_enable"
+   }
+  }
+  INSTANCE  2619, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="CMD_FWPOSITION_INDEX(7:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   COORD (2040,1820)
+   VERTEXES ( (2,2630) )
+  }
+  TEXT  2620, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1557,1803,1989,1838)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 2619
+  }
+  NET BUS  2628, 0, 0
+  VTX  2629, 0, 0
+  {
+   COORD (2100,1580)
+  }
+  VTX  2630, 0, 0
+  {
+   COORD (2040,1820)
+  }
+  VTX  2631, 0, 0
+  {
+   COORD (2060,1580)
+  }
+  BUS  2632, 0, 0
+  {
+   NET 2628
+   VTX 2629, 2631
+  }
+  VTX  2633, 0, 0
+  {
+   COORD (2060,1820)
+  }
+  BUS  2634, 0, 0
+  {
+   NET 2628
+   VTX 2631, 2633
+  }
+  BUS  2635, 0, 0
+  {
+   NET 2628
+   VTX 2633, 2630
+  }
+  VTX  2735, 0, 0
+  {
+   COORD (2100,1440)
+  }
+  VTX  2736, 0, 0
+  {
+   COORD (1220,1060)
+  }
+  VTX  2737, 0, 0
+  {
+   COORD (1860,1440)
+  }
+  BUS  2738, 0, 0
+  {
+   NET 2425
+   VTX 2735, 2737
+  }
+  VTX  2739, 0, 0
+  {
+   COORD (1860,1060)
+  }
+  BUS  2740, 0, 0
+  {
+   NET 2425
+   VTX 2737, 2739
+  }
+  BUS  2741, 0, 0
+  {
+   NET 2425
+   VTX 2739, 2736
+  }
+ }
+ 
+}
+
+PAGE ""
+{
+ PAGEHEADER
+ {
+  PAGESIZE (3400,2200)
+  MARGINS (200,200,200,200)
+  RECT (0,0,0,0)
+  VARIABLES
+  {
+   #BLOCKTABLE_PAGE="1"
+   #BLOCKTABLE_TEMPL="1"
+   #BLOCKTABLE_VISIBLE="0"
+   #MODIFIED="1159534980"
+   FIRMWARE="FIR-XXX-YYY-ZZZ",BOTH
+   PAGENAME=""
+   PAGENUMBER="1"
+   PROJECT="FIRST",BOTH
+   REVISION="A",BOTH
+  }
+ }
+ 
+ BODY
+ {
+  TEXT  2742, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Project:"
+   RECT (2680,1936,2768,1984)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  2743, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$CREATIONDATE"
+   RECT (2400,1810,2640,1870)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  2744, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "Title:"
+   RECT (2680,1896,2736,1944)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  2745, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "$TITLE"
+   RECT (2800,1890,3180,1950)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  LINE  2746, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2660,1880), (3200,1880) )
+   FILL (1,(0,0,0),0)
+  }
+  LINE  2747, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2660,1880), (2660,2000) )
+  }
+  LINE  2748, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3200,2000), (3200,1760), (2220,1760), (2220,2000), (3200,2000) )
+   FILL (1,(0,0,0),0)
+  }
+  TEXT  2749, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT 
+"100-2600 St-Jean-Baptiste\n"+
+"Québec, QC\t\t\t\t\tPhone:  418-874-7808\n"+
+"Canada, G2E 6J5 \t\tFax :     418-864-7843\n"+
+""
+   RECT (2680,1780,3176,1894)
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   VAR
+   MULTILINE
+  }
+  LINE  2750, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2660,1760), (2660,1880) )
+  }
+  LINE  2751, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (3200,1760), (3200,1640), (2660,1640), (2660,1760), (3200,1760) )
+   FILL (1,(0,0,0),0)
+  }
+  TEXT  2752, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$FIRMWARE"
+   RECT (2400,1890,2640,1950)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  2753, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$AUTHOR"
+   RECT (2400,1770,2640,1830)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  2754, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$PROJECT"
+   RECT (2800,1930,3000,1990)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  2755, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Design by:"
+   RECT (2240,1776,2361,1824)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  2756, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Date:"
+   RECT (2240,1816,2302,1864)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  LINE  2757, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2380,1760), (2380,1880) )
+  }
+  LINE  2758, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2220,1880), (2660,1880) )
+   FILL (1,(0,0,0),0)
+  }
+  TEXT  2759, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Firmware #:"
+   RECT (2240,1896,2376,1944)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  TEXT  2760, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Revision:"
+   RECT (2240,1936,2345,1984)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+  }
+  LINE  2761, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2380,1880), (2380,2000) )
+  }
+  LINE  2762, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 0,1, (128,128,128)
+   POINTS ( (2780,1880), (2780,2000) )
+  }
+  TEXT  2763, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$REVISION"
+   RECT (2400,1930,2640,1990)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (11,0,0,400,0,0,0,"Arial")
+   UPDATE 0
+  }
+  BMPPICT  2764, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (2740,1660,3120,1755)
+   TEXT
+   "ezE1QTMzOEZELTk0QjYtNGZmNC1BMUUwLTZCREEwNTg1QzkwRH0ALJEAACgAAAB8AQAAXwAAAAEACAAAAAAABI0AAMQOAADEDgAAAAEAAAAAAAD///8AVafzAAB87QA/nPEAf732AL/e+gCq0/kArnFvAMKVkwCGKycApGBdANa4twDgyskAZD9YAENTigAhZ7sAgYyxAIJ0jgBhiMAAoanEAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEBAQCAgICAgICAgICAgICAgICAgICAgQEBAUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFBAMCAgICAgICAwEBAQEBAQEBAQEBAQEBAgICAgICAgICAwQFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQEAgICAgIDAQEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQEBAwICAgICAgQEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQQCAgICAwEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAQICAgICAwQFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgIBBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAQICAgICBAUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAgMBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAwICAgIEBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAEDAgICAwQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQMCAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQMCAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQBAgICAwQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUDAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQMCAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgICBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICARQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAwICAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgICBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQICAwUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU"+
+"FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAECAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCAgICAgICBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAwICgkJCQkJCQkJCQkJCQkJCQgIDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAgJCQkJCQkJCQcHBwcHBwoJCQkJCQkJCQkIDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCgcLFBQUFBQUFBQUFBQUFAgHBwkJCQkJCQgMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkHCxQUFBQUFBQUFBQUFBQUFBQUBQQEBAMODgkJCQkJCAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAoJCQkHFBQUFBQUFBQUFBQUFBQUFBQEAwICAgICAgICAg8OCQkJCQ0TFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkHFBQUFBQUFBQUFBQUFBQUFAQDAgICAgICAgICAgICAgICDg0JCQkNEgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkKCxQUFBQUFBQUFBQUFBQUBQQCAgICAgICAgICAQEBAQEBAQECAg8NCQkJDRMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJChQUFBQUFBQUFBQUFBQUBQMCAgICAgICAwEGFBQUFBQUFBQUFBQUAQMPDQkJCQoFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQsUFBQUFBQUFBQUFBQUFAMCAgICAgIDARQUFBQUFBQUFBQUFBQUFBQUFAQDDw0JCQkMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkLFBQUFBQUFBQUFBQUFAQCAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAg8JCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJCBQUFBQUFBQUFBQUFAUDAgIPDg0JCQkJCQkJCQgIDBQUFBQUFBQUFBQUFBQUFBQUAwINCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAwICAgICAgICAgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICAgICAgICAgICAgICAgICAgICAgICAgICAgMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICAgICAgICAgICAgICAgICAgICAgICAgJCQkKCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQoUFBQUFBQUFBQUFBQFAgIOCQkJBwcLFBQUCAcHBwkJCQgMFBQUFBQUFBQUFBQUFBQUAwIPCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIFFBQUDAgICAgICAgICAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAgICAgICAgICAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJFBQUFBQUFBQUFBQUAwIPCQkOCxQUFBQUFBQUFBQUFBQRDQkJCBQUFBQUFBQUFBQUFBQUAgIPCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIUFBQICQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAgKCQkJCQkJCQkJCQkJCQkKCBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQgUFBQUFBQUFBQUFAMCDgkNEhQUFBQUFBQUFBQEAwICAgICAg4JCQoUFBQUFBQUFBQUFBQEAgIPDQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgMUFAgJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJFBQUFBQUFBQUFBQDAg0JDgYUFBQUFBQUFAUDAgICAgICAgICAgIOCQkIFBQUFBQUFBQUFBQDAgICCgkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgQUCAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkMFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQgUFBQUFBQUFBQUAwIPCQ4GFBQUFBQUFAUDAg8ODg4RCAgICBQUAQMCDgkKDBQUFBQUFBQUFAQCAgIFCgkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAhQICQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkMFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJFBQUFBQUFBQUFAMCAgkKBhQUFBQUFBQDDg0JCQkJCQkJCQkJCQoIFAQCDwkJDBQUFBQUFBQUFAICAgQUCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAwgJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkKBwcHBwcHBwcHBwcHBwcHBwcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJBwcHBwcHBwcHBwcHBwcJCQkKBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQoUFBQUFBQUFBQDAgIOCRQUFBQU"+
+"FBQFDgkJCQkJCQkJCQkJCQkJCQkJCAQCAg0JDBQUFBQUFBQUAwICBBQICQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAICEQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkKBwcUFBQUFAcKCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAQCFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCBQUFBQUFBQUBAICAgkIFBQUFBQUBQ0JCQkJCQkJCQkJCQkJCQkJCQkJCgQCAg0JDBQUFBQUFBQEAgIEFBQICQkMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIOCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQoHFBQUFBQUFBQUFBQICQkJCQkJCQkJChQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUBAIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkIFBQUFBQUFAUCAgIOCRQUFBQUFAMNCQkJCQkJCQkKBwcHCgkJCQkJCQkJCgMCAwoJFBQUFBQUFAQCAgIUFBQKCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAw4JCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQoLFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQEAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQsUFBQUFBQUAwICAg0KFBQUFBQFDQkJCQkJCQcLFBQUFBQUFBQHCQkJCQkJCgICFAkKFBQUFBQUBAICBBQUFBQJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEDgkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAcLFBQUFBQUFBQUFBQUFBQUCgkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAQCFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJFBQUFBQUFAQCAgIDCQgUFBQUBQ8JCQkJCQoUFBQUFBQUFBQUFBQUBwkJCQkJDwIECAkMFBQUFBQEAgIEFBQUFAgJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQRCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUBAIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkUFBQUFBQUAgICAhQJCxQUFBQDDgkJCQkIFBQUFBQUFBQUFBQUFBQUCAkJCQkNAgQUCgoUFBQUFAMCAgQUFBQUFAkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAwICgkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkKCAgICAgICAgICAgICAgICBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQEAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQwUFBQUFAQCAgIEFAkUFBQUBQIJCQkJChQUFBQUFBQUFBQUFBQUFBQUCgkJCQkCBBQICRQUFBQUAgICBBQUFBQUCAkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkICAwUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAgJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCBQUFBQUAwICAhQUCRQUFBQDAgkJCQkIFBQUFBQUFBQUFBQUFBQUFBQICQkJCQIEFBQJCBQUFAUCAgIGFBQUFBQUCQkMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCgkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkIFBQUFAUCAgIEFBQJCBQUFAICCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJDgQUFAoIFBQUBAICAhQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCgkJCQkJCQkJCQkJCQkJCQkJCQkJChQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUAgIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQoUFBQUBAICAhQUFAkIFBQEAgMJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkOBBQUCAkUFBQCAgIEFBQUFBQUFAgJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQEAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCRQUFBQDAgIDFBQUCAoUFAQCBAkJCQkMFBQUFBQUFBQUFBQUFBQUFBQMCQkJCQIUFBQICRQUBAICAgYUFBQUFBQUFAkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQkJCQkJCQkJCQkJCQkJCQkJCQcUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJDBQUFAICAgQUFBQICRQUBAIECQkJCQoUFBQUFBQUFBQUFBQUFBQUFAgJCQkJAxQUFAgJFBQCAgICFBQUFBQUFBQUCgkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkJCQkJCQkJCQkJCQkJCQkJCgcUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkKBwcHBwcHBwcHBwcHBwcHBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkKFBQUAgICBhQUFBQJChQEAgQKCQkJCQwUFBQUFBQUFBQUFBQUFBQMCQkJCQ0GFBQUCAoUBAICAgQUFBQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQgUFBQUFBQICgkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJCQkJCQkJCQkJCQkJCQkHBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUAwIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkUFBQCAgIUFBQUFAgJDAQCAwgJCQkJCQwUFBQUFBQUFBQUFBQUDAkJCQkJCBQUFBQKCAUCAgIDFBQUFBQUFBQUFAgJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCBQUFBQUFBQUCAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCgcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQEAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQgUFAICAhQUFBQUFAoKFAICFAoJCQkJCQoMFBQUFBQUFBQUDAoJCQkJCQoUFBQUFAkIAwICAgYUFBQUFBQUFBQUCAkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkIFBQUFBQUFBQICQkJCQkJCQkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQkJCQkJCQkJCgsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQCAhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCRQUAgICFBQUFBQUCAkKAwIEFAkJCQkJCQkJCAgICAgICAkJCQkJCQkJCxQUFBQICQMCAgIDFBQUFBQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQgUFBQUFBQUFAwJCQkJCQkJCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQMFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFAMCBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJChQCAgIUFBQUFBQUCAkNAgIFCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFAoNAgICAxQUFBQUFBQUFBQUFAgJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCBQUFBQUFBQUCgkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJDBQUFBQUFBQUFBQUFAwICQkUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUBAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJDAICAgQUFBQUFBQUCAkNAgMUFAoJCQkJCQkJCQkJCQkJCQkJCQoUFBQUFBQICQ8CAgIGFBQUFBQUFBQUFBQUCAkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkIFBQUFAwICAkJCQkJCQkJCQkJCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCBQUFBQUFBQMCAoJCQkJCRQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJAgICBBQUFBQUFBQUCAkJDwMFFAgKCQkJCQkJCQkJCQkJCQ0QFBQUFBQUDAkNAgICBhQUFBQUFBQUFBQUFBQICQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQEAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkNAgICFBQUFBQUFBQUFAoJDQIEFBQUBwcHCQkJCQkODg4DFBQUFBQUFAwJDQICAgYUFBQUFBQUFBQUFBQUFAkJCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQgUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQUFBQUFBQUFBQU"+
+"FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkOAgIEFBQUFBQUFBQUFAcJCQ4CAwQEBAQEAgICAgIDBhQUFBQUFBQMCQkPAgIGFBQUFBQUFBQUFBQUFBQMCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQJCQkJCQkJCQkJFBQUFBQUFBQUFBQUFBQUFBQUFAQCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkPAgIUFBQUFBQUFBQUFBQHCQkNDwICAgICAgMBFBQUFBQUFBQUCAkNDwICBhQUFBQUFBQUFBQUFBQUFAgJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJFBQJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAkJCQkJCQkJCQkUFBQUFBQUFBQUFBQUFBQUFBQUFAMCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkPAgMUFBQUFBQUFBQUFBQUBwoJCQ4OAQYUFBQUFBQUFBQMCAkJDgICAwYUFBQUFBQUFBQUFBQUFBQUCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJCQkJCQkJCQkJCQkJCQkJCQkJCQcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAcKCQkJCQkJCQkJCQkJCQkJCQoHCxQUFAcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCQkJCQkJCQkJCRQUFBQUFBQUFBQUFBQUFBQUFBQUBAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkPAgMUFBQUFBQUFBQUFBQUFAgHCgkJCQgICAgICAgKCQkJDgICAgMUFBQUFBQUFBQUFBQUFBQUFAgJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgHBwcODgcHBwcHBwcHBwcHBwcHBxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBwcHCgkJCQkJCQcHBwsUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkOAgMUFBQUFBQUFBQUFBQUFBQUFAgHBwoJCQkJCg4ODwICAgIGFBQUFBQUFBQUFBQUFBQUFBQUCQkIFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQKCQkNAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgICAgIDFBQUFBQUFBQUFBQUFBQUFBQUFAoJCRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQHCQkNDwIDBRQUFBQUFBQUFBQUFBQUFBQUBAMCAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQMCQkLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICQkJDgICAwQUFBQUFBQUFBQUFAUEAwICAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICgkJCQ8CAgICAwQEBAQEAwICAgICAgICAgIDBhQUFBQUFBQUFBQUFBQUFBQUFBQUFAwJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQCAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBwkJCQ0PAgICAgICAgICAgICAgICAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQMCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAoJCQkNDwICAgICAgICAgICAwEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCgkJChQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAgKCQkJDQ4BAQEBAQEBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAkJCQoUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICgkJCQkIDBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUDAoJCQkLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAcJCQkJCQgMFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAoJCQkKFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQICgkJCQkJCggMFBQUFBQUFBQUFBQUFBQUFBQICgkJCQkKCxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAcHCQkJCQkJCQoICAgICAgICAgICAoJCQkJCQkHFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUCAcHCQkJCQkJCQkJCQkJCQkJCQkJCgcLFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQHBwcHBwcHBwcHBwcHFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAxQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAMCBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU"+
+"FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgMUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgICBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAwICAwUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAUCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAECAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQDAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEAgICAwUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQDAgIGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQICAgMFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQFAwICBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAECAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAICAwYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAgICAgQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQMCAgEUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgIDBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgMGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQBAgICAgQFFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQMCAgICBAUUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQCAgIDFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAwICAgIEBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAMCAgIBBhQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAEDAgICAgMEBRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEBAICAgIBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQECAgICAgMEBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBQQDAgICAgEGFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQECAgICAgICBAQEBBQUFBQUFBQUFBQUFBQUFBQFBAQEAgICAgICAQYUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUAQEBAgICAgICAgICAgICAgIDAgICAgICAgICAgICAgEBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQBAQEBAQICAgICAgICAgICAgMBAQEBFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFA=="
+  }
+ }
+ 
+}
+

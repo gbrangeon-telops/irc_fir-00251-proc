@@ -1,0 +1,1160 @@
+V 000042 40 6187 1417453367818 flash_ctrl
+<?xml version="1.0"?>
+<symbol name="flash_ctrl">
+<shape guid="bf8cd9f4-88bf-430c-937f-1f8f9a2cca4b" default="1">
+<![CDATA[SYMB0100
+HEADER
+{
+ VARIABLES
+ {
+  #CUSTOM_NAME=""
+  #DESCRIPTION=""
+  #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.TEL2000.all;"
+  #LANGUAGE="VHDL"
+  #MODIFIED="1417453367"
+  #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="bf8cd9f4-88bf-430c-937f-1f8f9a2cca4b"
+ }
+}
+PAGE "" 
+{
+ PAGEHEADER
+ {
+  RECT (0,-60,440,680)
+  FREEID 31
+ }
+ 
+ BODY
+ {
+  RECT  1, -1, 0
+  {
+   VARIABLES
+   {
+    #OUTLINE_FILLING="1"
+   }
+   AREA (20,-60,420,679)
+  }
+  TEXT  3, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,30,93,54)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 2
+  }
+  TEXT  5, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,110,104,134)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 4
+   ORIENTATION 2
+  }
+  TEXT  7, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,50,56,74)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 6
+  }
+  TEXT  9, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,190,133,214)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 8
+   ORIENTATION 2
+  }
+  TEXT  11, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,90,104,114)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 10
+  }
+  TEXT  13, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (282,570,415,594)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 12
+  }
+  TEXT  15, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,210,133,234)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 14
+  }
+  TEXT  17, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (188,50,415,74)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 16
+  }
+  TEXT  19, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,290,176,314)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 18
+  }
+  TEXT  21, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (189,70,415,94)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 20
+  }
+  TEXT  23, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (202,30,415,54)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 22
+   ORIENTATION 2
+  }
+  TEXT  25, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (237,250,415,274)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 24
+  }
+  TEXT  27, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (25,270,189,294)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 26
+  }
+  TEXT  29, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (238,270,415,294)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 28
+  }
+  PIN  2, 0, 0
+  {
+   COORD (0,40)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Sys_clk"
+    #NUMBER="0"
+    #VHDL_TYPE="STD_LOGIC"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (20,0) )
+   }
+  }
+  PIN  4, 0, 0
+  {
+   COORD (0,120)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="Axi_Miso"
+    #NUMBER="0"
+    #SIDE="left"
+    #VHDL_TYPE="T_AXI4_A32_D32_MISO"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (20,0), (0,0) )
+   }
+  }
+  PIN  6, 0, 0
+  {
+   COORD (0,60)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Rst"
+    #NUMBER="0"
+    #SIDE="left"
+    #VHDL_TYPE="STD_LOGIC"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (20,0) )
+   }
+  }
+  PIN  8, 0, 0
+  {
+   COORD (0,200)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BRAM_Mosi"
+    #NUMBER="0"
+    #SIDE="left"
+    #VHDL_TYPE="T_AXI4_A32_D32_MOSI"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (20,0), (0,0) )
+   }
+  }
+  PIN  10, 0, 0
+  {
+   COORD (0,100)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="Axi_Mosi"
+    #NUMBER="0"
+    #SIDE="left"
+    #VHDL_TYPE="T_AXI4_A32_D32_MOSI"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (20,0) )
+   }
+  }
+  PIN  12, 0, 0
+  {
+   COORD (440,580)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="NAND_SM(3:0)"
+    #NUMBER="0"
+    #SIDE="right"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (-20,0), (0,0) )
+   }
+  }
+  PIN  14, 0, 0
+  {
+   COORD (0,220)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="BRAM_Miso"
+    #NUMBER="0"
+    #SIDE="left"
+    #VHDL_TYPE="T_AXI4_A32_D32_MISO"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (20,0) )
+   }
+  }
+  PIN  16, 0, 0
+  {
+   COORD (440,60)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Flash_Command_Out(9:0)"
+    #NUMBER="0"
+    #SIDE="right"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (-20,0), (0,0) )
+   }
+  }
+  PIN  18, 0, 0
+  {
+   COORD (0,300)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="ReadyBusyN(2:0)"
+    #NUMBER="0"
+    #SIDE="left"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (20,0) )
+   }
+  }
+  PIN  20, 0, 0
+  {
+   COORD (440,80)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Flash_Command_Ctrl(9:0)"
+    #NUMBER="0"
+    #SIDE="right"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (-20,0), (0,0) )
+   }
+  }
+  PIN  22, 0, 0
+  {
+   COORD (440,40)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Flash_Command_In(9:0)"
+    #NUMBER="0"
+    #SIDE="right"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (-20,0) )
+   }
+  }
+  PIN  24, 0, 0
+  {
+   COORD (440,260)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Flash_Data_Out(7:0)"
+    #NUMBER="0"
+    #SIDE="right"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (-20,0), (0,0) )
+   }
+  }
+  PIN  26, 0, 0
+  {
+   COORD (0,280)
+   VARIABLES
+   {
+    #DIRECTION="IN"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Flash_Data_In(7:0)"
+    #NUMBER="0"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (0,0), (20,0) )
+   }
+  }
+  PIN  28, 0, 0
+  {
+   COORD (440,280)
+   VARIABLES
+   {
+    #DIRECTION="OUT"
+    #DOWNTO="1"
+    #LENGTH="20"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="Flash_Data_Ctrl(7:0)"
+    #NUMBER="0"
+    #VHDL_TYPE="STD_LOGIC_VECTOR"
+   }
+   LINE  2, 0, 0
+   {
+    POINTS ( (-20,0), (0,0) )
+   }
+  }
+ }
+}
+
+]]>
+</shape>
+</symbol>
+
+
+V 000042 40 3464 1417621047582 flash_intf
+<?xml version="1.0"?>
+<symbol name="Flash_intf">
+<shape guid="aef86e33-b169-4734-916e-06b1b0e38b71" default="1">
+<![CDATA[SYMB0100
+HEADER
+{
+  VARIABLES
+  {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES="library IEEE,WORK;\nuse ieee.std_logic_1164.all,work.TEL2000.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1417621047"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="aef86e33-b169-4734-916e-06b1b0e38b71"
+  }
+}
+PAGE ""
+{
+  PAGEHEADER 
+  {
+    RECT (0,-20,260,200)
+    FREEID 16
+  }
+  BODY
+  {
+    RECT 1,-1,0
+    {
+      VARIABLES
+      {
+        #OUTLINE_FILLING="1"
+      }
+      AREA (20,0,240,180)
+    }
+    PIN 10,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AxiL_Mosi"
+        #NUMBER="0"
+        #SIDE="left"
+        #VHDL_TYPE="t_axi4_a32_d32_mosi"
+      }
+      COORD (0,80)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(20,0))
+      }
+    }
+    TEXT 11,0,0
+    {
+      TEXT "$#NAME"
+      RECT (25,70,115,94)
+      ALIGN 4
+      MARGINS (1,1)
+      PARENT 10
+    }
+    PIN 12,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="INOUT"
+        #DOWNTO="1"
+        #LENGTH="20"
+        #NAME="DataIO(7:0)"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (260,80)
+      LINE 2,0,0
+      {
+        POINTS ((-20,0),(0,0))
+      }
+    }
+    TEXT 13,0,0
+    {
+      TEXT "$#NAME"
+      RECT (134,70,235,94)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 12
+    }
+    PIN 14,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #DOWNTO="1"
+        #LENGTH="20"
+        #NAME="FlashReadyBusy(1:0)"
+      }
+      COORD (0,140)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(20,0))
+      }
+    }
+    TEXT 15,0,0
+    {
+      TEXT "$#NAME"
+      MARGINS (1,1)
+      PARENT 14
+      ALIGN 4
+      RECT (25,126,135,158)
+    }
+    PIN 2,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #LENGTH="20"
+        #NAME="Rst"
+        #NUMBER="0"
+      }
+      COORD (0,40)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(20,0))
+      }
+    }
+    TEXT 3,0,0
+    {
+      TEXT "$#NAME"
+      RECT (25,30,56,54)
+      ALIGN 4
+      MARGINS (1,1)
+      PARENT 2
+    }
+    PIN 4,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AxiL_Miso"
+        #NUMBER="0"
+        #SIDE="left"
+        #VHDL_TYPE="t_axi4_a32_d32_miso"
+      }
+      COORD (0,100)
+      LINE 2,0,0
+      {
+        POINTS ((20,0),(0,0))
+      }
+    }
+    TEXT 5,0,0
+    {
+      TEXT "$#NAME"
+      RECT (25,90,115,114)
+      ALIGN 4
+      MARGINS (1,1)
+      PARENT 4
+      ORIENTATION 2
+    }
+    PIN 6,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #LENGTH="20"
+        #NAME="Sys_clk"
+        #NUMBER="0"
+        #SIDE="left"
+      }
+      COORD (0,20)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(20,0))
+      }
+    }
+    TEXT 7,0,0
+    {
+      TEXT "$#NAME"
+      RECT (25,10,93,34)
+      ALIGN 4
+      MARGINS (1,1)
+      PARENT 6
+    }
+    PIN 8,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="INOUT"
+        #DOWNTO="1"
+        #LENGTH="20"
+        #NAME="CmdIO(5:0)"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (260,60)
+      LINE 2,0,0
+      {
+        POINTS ((-20,0),(0,0))
+      }
+    }
+    TEXT 9,0,0
+    {
+      TEXT "$#NAME"
+      RECT (132,50,235,74)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 8
+    }
+  }
+}
+
+]]>
+</shape>
+</symbol>
+
+
+I 000042 40 2352 1417442438716 ublaze_sim
+<?xml version="1.0"?>
+<symbol name="ublaze_sim">
+<shape guid="63c52e2c-6cfd-42a6-a534-d1c0852874b2" default="1">
+<![CDATA[SYMB0100
+HEADER
+{
+  VARIABLES
+  {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES="library WORK,IEEE;\nuse work.TEL2000.all,ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1417442438"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="63c52e2c-6cfd-42a6-a534-d1c0852874b2"
+  }
+}
+PAGE ""
+{
+  PAGEHEADER 
+  {
+    RECT (-20,-20,280,300)
+    FREEID 10
+  }
+  BODY
+  {
+    RECT 1,-1,0
+    {
+      VARIABLES
+      {
+        #OUTLINE_FILLING="1"
+      }
+      AREA (0,15,260,263)
+    }
+    PIN 2,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AXIL_MISO"
+        #NUMBER="0"
+        #SIDE="right"
+        #VHDL_TYPE="T_AXI4_A32_D32_MISO"
+      }
+      COORD (280,200)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 3,0,0
+    {
+      TEXT "$#NAME"
+      RECT (150,190,255,214)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 2
+      ORIENTATION 2
+    }
+    PIN 4,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AXIL_MOSI"
+        #NUMBER="0"
+        #SIDE="right"
+        #VHDL_TYPE="T_AXI4_A32_D32_MOSI"
+      }
+      COORD (280,180)
+      LINE 2,0,0
+      {
+        POINTS ((-20,0),(0,0))
+      }
+    }
+    TEXT 5,0,0
+    {
+      TEXT "$#NAME"
+      RECT (150,170,255,194)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 4
+    }
+    PIN 6,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #NAME="CLK100"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (280,40)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 7,0,0
+    {
+      TEXT "$#NAME"
+      RECT (182,30,255,54)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 6
+      ORIENTATION 2
+    }
+    PIN 8,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #NAME="Rst"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (280,60)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 9,0,0
+    {
+      TEXT "$#NAME"
+      RECT (224,50,255,74)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 8
+    }
+  }
+}
+
+]]>
+</shape>
+</symbol>
+
+
+I 000042 40 2808 1417621438951 ublaze_sim
+<?xml version="1.0"?>
+<symbol name="ublaze_sim">
+<shape guid="63c52e2c-6cfd-42a6-a534-d1c0852874b2" default="1">
+<![CDATA[SYMB0100
+HEADER
+{
+  VARIABLES
+  {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES="library WORK,IEEE;\nuse work.TEL2000.all,ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1417621438"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="63c52e2c-6cfd-42a6-a534-d1c0852874b2"
+  }
+}
+PAGE ""
+{
+  PAGEHEADER 
+  {
+    RECT (-20,-20,280,300)
+    FREEID 12
+  }
+  BODY
+  {
+    RECT 1,-1,0
+    {
+      VARIABLES
+      {
+        #OUTLINE_FILLING="1"
+      }
+      AREA (0,15,260,263)
+    }
+    PIN 10,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #IS_UNCONSTRAINED_PORT="1"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="OTHER"
+        #NAME="FlashReadyBusy"
+        #VHDL_TYPE="STD_LOGIC_VECTOR"
+      }
+      COORD (280,240)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 11,0,0
+    {
+      TEXT "$#NAME"
+      MARGINS (1,1)
+      PARENT 10
+      ALIGN 6
+      RECT (125,226,255,258)
+    }
+    PIN 2,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AXIL_MISO"
+        #NUMBER="0"
+        #SIDE="right"
+        #VHDL_TYPE="T_AXI4_A32_D32_MISO"
+      }
+      COORD (280,200)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 3,0,0
+    {
+      TEXT "$#NAME"
+      RECT (150,190,255,214)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 2
+      ORIENTATION 2
+    }
+    PIN 4,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AXIL_MOSI"
+        #NUMBER="0"
+        #SIDE="right"
+        #VHDL_TYPE="T_AXI4_A32_D32_MOSI"
+      }
+      COORD (280,180)
+      LINE 2,0,0
+      {
+        POINTS ((-20,0),(0,0))
+      }
+    }
+    TEXT 5,0,0
+    {
+      TEXT "$#NAME"
+      RECT (150,170,255,194)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 4
+    }
+    PIN 6,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #NAME="CLK100"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (280,40)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 7,0,0
+    {
+      TEXT "$#NAME"
+      RECT (182,30,255,54)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 6
+      ORIENTATION 2
+    }
+    PIN 8,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #NAME="Rst"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (280,60)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 9,0,0
+    {
+      TEXT "$#NAME"
+      RECT (224,50,255,74)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 8
+    }
+  }
+}
+
+]]>
+</shape>
+</symbol>
+
+
+V 000042 40 3516 1417621713576 ublaze_sim
+<?xml version="1.0"?>
+<symbol name="ublaze_sim">
+<shape guid="63c52e2c-6cfd-42a6-a534-d1c0852874b2" default="1">
+<![CDATA[SYMB0100
+HEADER
+{
+  VARIABLES
+  {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES="library WORK,IEEE;\nuse work.TEL2000.all,ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1417621713"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="63c52e2c-6cfd-42a6-a534-d1c0852874b2"
+  }
+}
+PAGE ""
+{
+  PAGEHEADER 
+  {
+    RECT (-20,-20,280,380)
+    FREEID 16
+  }
+  BODY
+  {
+    RECT 1,-1,0
+    {
+      VARIABLES
+      {
+        #OUTLINE_FILLING="1"
+      }
+      AREA (0,15,260,343)
+    }
+    PIN 10,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #DOWNTO="1"
+        #IS_UNCONSTRAINED_PORT="1"
+        #LENGTH="20"
+        #NAME="FlashReadyBusy(1:0)"
+        #NUMBER="0"
+      }
+      COORD (280,240)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 11,0,0
+    {
+      TEXT "$#NAME"
+      RECT (110,230,255,254)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 10
+    }
+    PIN 12,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="INOUT"
+        #DOWNTO="1"
+        #LENGTH="20"
+        #NAME="CmdIO(5:0)"
+      }
+      COORD (280,280)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 13,0,0
+    {
+      TEXT "$#NAME"
+      MARGINS (1,1)
+      PARENT 12
+      ALIGN 6
+      RECT (125,266,255,298)
+    }
+    PIN 14,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="INOUT"
+        #DOWNTO="1"
+        #LENGTH="20"
+        #NAME="DataIO(7:0)"
+      }
+      COORD (280,320)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 15,0,0
+    {
+      TEXT "$#NAME"
+      MARGINS (1,1)
+      PARENT 14
+      ALIGN 6
+      RECT (125,306,255,338)
+    }
+    PIN 2,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="IN"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AXIL_MISO"
+        #NUMBER="0"
+        #SIDE="right"
+        #VHDL_TYPE="T_AXI4_A32_D32_MISO"
+      }
+      COORD (280,200)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 3,0,0
+    {
+      TEXT "$#NAME"
+      RECT (150,190,255,214)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 2
+      ORIENTATION 2
+    }
+    PIN 4,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #MDA_RECORD_TOKEN="RECORD"
+        #NAME="AXIL_MOSI"
+        #NUMBER="0"
+        #SIDE="right"
+        #VHDL_TYPE="T_AXI4_A32_D32_MOSI"
+      }
+      COORD (280,180)
+      LINE 2,0,0
+      {
+        POINTS ((-20,0),(0,0))
+      }
+    }
+    TEXT 5,0,0
+    {
+      TEXT "$#NAME"
+      RECT (150,170,255,194)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 4
+    }
+    PIN 6,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #NAME="CLK100"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (280,40)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 7,0,0
+    {
+      TEXT "$#NAME"
+      RECT (182,30,255,54)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 6
+      ORIENTATION 2
+    }
+    PIN 8,0,0
+    {
+      VARIABLES
+      {
+        #DIRECTION="OUT"
+        #LENGTH="20"
+        #NAME="Rst"
+        #NUMBER="0"
+        #SIDE="right"
+      }
+      COORD (280,60)
+      LINE 2,0,0
+      {
+        POINTS ((0,0),(-20,0))
+      }
+    }
+    TEXT 9,0,0
+    {
+      TEXT "$#NAME"
+      RECT (224,50,255,74)
+      ALIGN 6
+      MARGINS (1,1)
+      PARENT 8
+    }
+  }
+}
+
+]]>
+</shape>
+</symbol>
+
+

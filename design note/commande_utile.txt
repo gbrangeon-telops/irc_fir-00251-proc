@@ -1,0 +1,19 @@
+#Liste de commandes utile
+
+#Générer le projet
+write_project_tcl -force -all_properties -absolute_path -verbose "D:/telops/FIR-00251-Output/script/gen_project.tcl"
+
+#liste des fichier utile d'un ip
+get_files -all -of_objects [get_files  CH2_CLINK.xci]
+
+#Générer le bloc diagram
+write_bd_tcl -force -verbose "D:/Telops/FIR-00251-Proc/scripts/gen_bd_core.tcl"
+
+#execution du script de génération
+source -verbose gen_project.tcl
+
+#Ajout du code elf au bitfile
+update_mem -meminfo arg [-data arg] -bit arg [-proc arg] -out arg [-force] [-quiet] [-verbose]
+
+#Ecrire le fichier bmm back annoter avec les localisations des BRAM
+write_bmm "d:/Telops/FIR-00251-Proc/sdk/hw/fir_00251_top_bd.bmm"

@@ -1,0 +1,1 @@
+-w -s "d:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\library.cfg"  -j "d:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\ehdri_tb\projlib.cfg"  -d "d:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\ehdri_tb\compile"   -work ehdri_tb  -O3 -e 100 -2002 "d:\Telops\FIR-00251-Proc\src\eHDRI\hdl\ehdri_sm.vhd"

@@ -1,0 +1,170 @@
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.2 [s].
+acom -O3 -work ehdri_tb -2002  $dsn/../../../hdl/ehdri_sm.vhd
+# Compile...
+# Warning: DAGGEN_0523: The source is compiled without the -dbg switch. Line breakpoints and assertion debug will not be available.
+# File: d:\Telops\FIR-00251-Proc\src\eHDRI\hdl\ehdri_sm.vhd
+# Compile Entity "ehdri_SM"
+# Compile Architecture "implementation" of Entity "ehdri_SM"
+# Compile success 0 Errors 0 Warnings  Analysis time :  0.1 [s]
+acom -O3 -work ehdri_tb -2002  $dsn/../../../hdl/ehdri_sm.vhd
+# Compile...
+# Warning: DAGGEN_0523: The source is compiled without the -dbg switch. Line breakpoints and assertion debug will not be available.
+# File: d:\Telops\FIR-00251-Proc\src\eHDRI\hdl\ehdri_sm.vhd
+# Compile Entity "ehdri_SM"
+# Compile Architecture "implementation" of Entity "ehdri_SM"
+# Compile success 0 Errors 0 Warnings  Analysis time :  46.0 [ms]
+asim -O5 +access +r +m+ehdri_tb_toplevel ehdri_tb_toplevel ehdri_tb_toplevel
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.1 [s].
+# asim: Stack memory: 32MB
+# asim: Retval memory: 32MB
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# SLP: Started
+# SLP: Elaboration phase ...
+# SLP: Elaboration phase ... skipped, nothing to simulate in SLP mode : 0.0 [s]
+# SLP: Finished : 0.0 [s]
+# ELAB2: Elaboration final pass complete - time: 0.2 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 14554 kB (elbread=6159 elab2=8184 kernel=210 sdf=0)
+# KERNEL: ASDB file was created in location d:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\ehdri_tb\src\wave.asdb
+#  13:15, 16 avril 2015
+#  Simulation has been initialized
+#  Selected Top-Level: ehdri_tb_toplevel (ehdri_tb_toplevel)
+do waveform.do
+onerror { resume }
+transcript off
+# 19 signal(s) traced.
+# Waveform file 'untitled.awc' connected to 'd:/Telops/FIR-00251-Proc/src/eHDRI/Sim/ehdri_tb/ehdri_tb/src/wave.asdb'.
+# 21 signal(s) traced.
+# 23 signal(s) traced.
+# 13 signal(s) traced.
+# 8 signal(s) traced.
+# KERNEL: Warning: KERNEL_0291 Signal '/ehdri_tb_toplevel/U2/U1/wea' has already been traced.
+# KERNEL: Warning: KERNEL_0291 Signal '/ehdri_tb_toplevel/U2/U1/addra' has already been traced.
+# KERNEL: Warning: KERNEL_0291 Signal '/ehdri_tb_toplevel/U2/U4/write_state' has already been traced.
+# 6 signal(s) traced.
+run 1 ms
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 10 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 10 ns,  Iteration: 4,  Instance: /ehdri_tb_toplevel/U2/U1/U0/inst_blk_mem_gen/\gnativebmg.native_blk_mem_gen\/\valid.cstr\/\ramloop[0].ram.r\/\prim_noinit.ram\/\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\/TDP/RAMB36E1_TDP_inst,  Process: prcs_clk.
+# EXECUTION:: ERROR  :  Memory Collision Error on RAMB36E1 ::ehdri_tb_toplevel:u2:u1:u0:inst_blk_mem_gen:\gnativebmg.native_blk_mem_gen\:\valid.cstr\:\ramloop[0].ram.r\:\prim_noinit.ram\:\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\:tdp:ramb36e1_tdp_inst: at simulation time 10 ns.
+#  A read was performed on address 8xxx (hex) of port B while a write was requested to the same address on port A.  The write will be successful however the read value on port B is unknown until the next CLKB cycle. 
+# EXECUTION:: Time: 10 ns,  Iteration: 4,  Instance: /ehdri_tb_toplevel/U2/U1/U0/inst_blk_mem_gen/\gnativebmg.native_blk_mem_gen\/\valid.cstr\/\ramloop[0].ram.r\/\prim_noinit.ram\/\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\/TDP/RAMB36E1_TDP_inst,  Process: prcs_clk.
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 30 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# KERNEL: stopped at time: 1 ms
+acom -O3 -work ehdri_tb -2002  $dsn/../../../hdl/ehdri_sm.vhd
+# Compile...
+# Warning: DAGGEN_0523: The source is compiled without the -dbg switch. Line breakpoints and assertion debug will not be available.
+# File: d:\Telops\FIR-00251-Proc\src\eHDRI\hdl\ehdri_sm.vhd
+# Compile Entity "ehdri_SM"
+# Compile Architecture "implementation" of Entity "ehdri_SM"
+# Error: COMP96_0019: ../../../../hdl/ehdri_sm.vhd : (184, 29): Keyword 'case' expected.
+# Error: COMP96_0036: ../../../../hdl/ehdri_sm.vhd : (184, 31): Boolean expression expected.
+# Error: COMP96_0019: ../../../../hdl/ehdri_sm.vhd : (186, 21): Keyword 'end' expected.
+# Error: COMP96_0019: ../../../../hdl/ehdri_sm.vhd : (194, 21): Keyword 'end' expected.
+# Error: COMP96_0019: ../../../../hdl/ehdri_sm.vhd : (200, 21): Keyword 'end' expected.
+# Error: COMP96_0015: ../../../../hdl/ehdri_sm.vhd : (202, 25): ';' expected.
+# Error: COMP96_0016: ../../../../hdl/ehdri_sm.vhd : (202, 29): Design unit declaration expected.
+# Compile failure 7 Errors 0 Warnings  Analysis time :  32.0 [ms]
+acom -O3 -work ehdri_tb -2002  $dsn/../../../hdl/ehdri_sm.vhd
+# Compile...
+# Warning: DAGGEN_0523: The source is compiled without the -dbg switch. Line breakpoints and assertion debug will not be available.
+# File: d:\Telops\FIR-00251-Proc\src\eHDRI\hdl\ehdri_sm.vhd
+# Compile Entity "ehdri_SM"
+# Compile Architecture "implementation" of Entity "ehdri_SM"
+# Compile success 0 Errors 0 Warnings  Analysis time :  63.0 [ms]
+asim -O5 +access +r +m+ehdri_tb_toplevel ehdri_tb_toplevel ehdri_tb_toplevel
+#  Simulation has been stopped
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.1 [s].
+# asim: Stack memory: 32MB
+# asim: Retval memory: 32MB
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# SLP: Started
+# SLP: Elaboration phase ...
+# SLP: Elaboration phase ... skipped, nothing to simulate in SLP mode : 0.0 [s]
+# SLP: Finished : 0.0 [s]
+# ELAB2: Elaboration final pass complete - time: 0.2 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 14554 kB (elbread=6159 elab2=8184 kernel=210 sdf=0)
+# KERNEL: ASDB file was created in location d:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\ehdri_tb\src\wave.asdb
+#  13:18, 16 avril 2015
+#  Simulation has been initialized
+#  Selected Top-Level: ehdri_tb_toplevel (ehdri_tb_toplevel)
+# Waveform file 'untitled.awc' connected to 'd:/Telops/FIR-00251-Proc/src/eHDRI/Sim/ehdri_tb/ehdri_tb/src/wave.asdb'.
+do waveform.do
+onerror { resume }
+transcript off
+# 19 signal(s) traced.
+# 21 signal(s) traced.
+# 23 signal(s) traced.
+# 13 signal(s) traced.
+# 8 signal(s) traced.
+# KERNEL: Warning: KERNEL_0291 Signal '/ehdri_tb_toplevel/U2/U1/wea' has already been traced.
+# KERNEL: Warning: KERNEL_0291 Signal '/ehdri_tb_toplevel/U2/U1/addra' has already been traced.
+# KERNEL: Warning: KERNEL_0291 Signal '/ehdri_tb_toplevel/U2/U4/write_state' has already been traced.
+# 6 signal(s) traced.
+run 1 ms
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 10 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 10 ns,  Iteration: 4,  Instance: /ehdri_tb_toplevel/U2/U1/U0/inst_blk_mem_gen/\gnativebmg.native_blk_mem_gen\/\valid.cstr\/\ramloop[0].ram.r\/\prim_noinit.ram\/\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\/TDP/RAMB36E1_TDP_inst,  Process: prcs_clk.
+# EXECUTION:: ERROR  :  Memory Collision Error on RAMB36E1 ::ehdri_tb_toplevel:u2:u1:u0:inst_blk_mem_gen:\gnativebmg.native_blk_mem_gen\:\valid.cstr\:\ramloop[0].ram.r\:\prim_noinit.ram\:\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\:tdp:ramb36e1_tdp_inst: at simulation time 10 ns.
+#  A read was performed on address 8xxx (hex) of port B while a write was requested to the same address on port A.  The write will be successful however the read value on port B is unknown until the next CLKB cycle. 
+# EXECUTION:: Time: 10 ns,  Iteration: 4,  Instance: /ehdri_tb_toplevel/U2/U1/U0/inst_blk_mem_gen/\gnativebmg.native_blk_mem_gen\/\valid.cstr\/\ramloop[0].ram.r\/\prim_noinit.ram\/\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\/TDP/RAMB36E1_TDP_inst,  Process: prcs_clk.
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 30 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 9080 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# KERNEL: stopped at time: 1 ms
+# 1 signal(s) traced.
+# Format saved to file: D:/Telops/FIR-00251-Proc/src/eHDRI/Sim/ehdri_tb/ehdri_tb/src/waveform.do
+# Adding file D:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\ehdri_tb\src\waveform.do ... Done
+restart
+# ELBREAD: Elaboration process.
+# ELBREAD: Elaboration time 0.1 [s].
+# KERNEL: Main thread initiated.
+# KERNEL: Kernel process initialization phase.
+# KERNEL: Time resolution set to 1ps.
+# ELAB2: Elaboration final pass...
+# ELAB2: Create instances ...
+# ELAB2: Create instances complete.
+# SLP: Started
+# SLP: Elaboration phase ...
+# SLP: Elaboration phase ... skipped, nothing to simulate in SLP mode : 0.0 [s]
+# SLP: Finished : 0.0 [s]
+# ELAB2: Elaboration final pass complete - time: 0.1 [s].
+# KERNEL: Kernel process initialization done.
+# Allocation: Simulator allocated 14554 kB (elbread=6159 elab2=8184 kernel=210 sdf=0)
+# KERNEL: ASDB file was created in location d:\Telops\FIR-00251-Proc\src\eHDRI\Sim\ehdri_tb\ehdri_tb\src\wave.asdb
+#  13:20, 16 avril 2015
+#  Simulation has been initialized
+#  Selected Top-Level: ehdri_tb_toplevel (ehdri_tb_toplevel)
+# Waveform file 'untitled.awc' connected to 'd:/Telops/FIR-00251-Proc/src/eHDRI/Sim/ehdri_tb/ehdri_tb/src/wave.asdb'.
+run 1 ms
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 10 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# KERNEL: WARNING: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+# KERNEL: Time: 10 ns,  Iteration: 4,  Instance: /ehdri_tb_toplevel/U2/U1/U0/inst_blk_mem_gen/\gnativebmg.native_blk_mem_gen\/\valid.cstr\/\ramloop[0].ram.r\/\prim_noinit.ram\/\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\/TDP/RAMB36E1_TDP_inst,  Process: prcs_clk.
+# EXECUTION:: ERROR  :  Memory Collision Error on RAMB36E1 ::ehdri_tb_toplevel:u2:u1:u0:inst_blk_mem_gen:\gnativebmg.native_blk_mem_gen\:\valid.cstr\:\ramloop[0].ram.r\:\prim_noinit.ram\:\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\:tdp:ramb36e1_tdp_inst: at simulation time 10 ns.
+#  A read was performed on address 8xxx (hex) of port B while a write was requested to the same address on port A.  The write will be successful however the read value on port B is unknown until the next CLKB cycle. 
+# EXECUTION:: Time: 10 ns,  Iteration: 4,  Instance: /ehdri_tb_toplevel/U2/U1/U0/inst_blk_mem_gen/\gnativebmg.native_blk_mem_gen\/\valid.cstr\/\ramloop[0].ram.r\/\prim_noinit.ram\/\DEVICE_7SERIES.NO_BMM_INFO.SDP.SIMPLE_PRIM36.ram\/TDP/RAMB36E1_TDP_inst,  Process: prcs_clk.
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 30 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# EXECUTION:: ERROR  : AxiLite fifo overflow!!!
+# EXECUTION:: Time: 9080 ns,  Iteration: 2,  Instance: /ehdri_tb_toplevel/U3,  Process: ovfl_proc.
+# KERNEL: stopped at time: 1 ms
+#  Simulation has been stopped

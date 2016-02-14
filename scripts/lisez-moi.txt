@@ -1,0 +1,13 @@
+Pour un build à neuf :
+
+1. dans vivado => "source D:/telops/FIR-00251-Proc/scripts/gen_managed_projet.tcl" (génère le projet des cores IP)
+
+2. Window=>Sources, Select all, Generate Output Products (ip source) (génère les sources pour les cores)
+
+3. compilation des sources dans aldec (génère les sources des .bde)
+
+4. dans vivado => "source D:/telops/FIR-00251-Proc/scripts/DETECTEUR_project.tcl" (créée rempli le dossier D:/telops/FIR-00251-Proc/xilinx/DETECTEUR/)
+
+5. vivado => generate bitstream
+
+6. optionnellement, remplacer les étapes 4 et 5 par "source D:/telops/FIR-00251-Proc/scripts/Build_all_project.tcl" 
