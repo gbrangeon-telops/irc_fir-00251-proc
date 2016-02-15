@@ -1031,7 +1031,7 @@ void GC_ComputeImageLimits()
       gcRegsData.HeightInc = FPA_HEIGHT_MULT;
       gcRegsData.HeightMin = MAX(gcRegsData.HeightInc, FPA_HEIGHT_MIN);
 
-      gcRegsData.OffsetXMin = FPA_OFFSETY_MIN;
+      gcRegsData.OffsetXMin = FPA_OFFSETX_MIN;
       gcRegsData.OffsetYMin = FPA_OFFSETY_MIN;
 
 #ifdef FPA_SUBWINDOW_WIDTH_MAX
