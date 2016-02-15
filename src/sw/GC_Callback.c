@@ -62,7 +62,7 @@ extern float FWExposureTime[8];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.1.0
+// Generated from XML camera definition file version 11.2.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -71,6 +71,7 @@ extern float FWExposureTime[8];
 void GC_Callback_Init()
 {
    gcRegsDef[AECImageFractionIdx].callback =                            &GC_AECImageFractionCallback;
+   gcRegsDef[AECPlusExtrapolationWeightIdx].callback =                  &GC_AECPlusExtrapolationWeightCallback;
    gcRegsDef[AECResponseTimeIdx].callback =                             &GC_AECResponseTimeCallback;
    gcRegsDef[AECTargetWellFillingIdx].callback =                        &GC_AECTargetWellFillingCallback;
    gcRegsDef[AcquisitionArmIdx].callback =                              &GC_AcquisitionArmCallback;
@@ -102,12 +103,10 @@ void GC_Callback_Init()
    gcRegsDef[CalibrationCollectionTypeIdx].callback =                   &GC_CalibrationCollectionTypeCallback;
    gcRegsDef[CalibrationModeIdx].callback =                             &GC_CalibrationModeCallback;
    gcRegsDef[CenterImageIdx].callback =                                 &GC_CenterImageCallback;
-   gcRegsDef[DeviceBuiltInTestsGlobalResultIdx].callback =              &GC_DeviceBuiltInTestsGlobalResultCallback;
    gcRegsDef[DeviceBuiltInTestsResults1Idx].callback =                  &GC_DeviceBuiltInTestsResults1Callback;
    gcRegsDef[DeviceBuiltInTestsResults2Idx].callback =                  &GC_DeviceBuiltInTestsResults2Callback;
    gcRegsDef[DeviceBuiltInTestsResults3Idx].callback =                  &GC_DeviceBuiltInTestsResults3Callback;
    gcRegsDef[DeviceBuiltInTestsResults4Idx].callback =                  &GC_DeviceBuiltInTestsResults4Callback;
-   gcRegsDef[DeviceBuiltInTestsResults5Idx].callback =                  &GC_DeviceBuiltInTestsResults5Callback;
    gcRegsDef[DeviceBuiltInTestsResults7Idx].callback =                  &GC_DeviceBuiltInTestsResults7Callback;
    gcRegsDef[DeviceBuiltInTestsResults8Idx].callback =                  &GC_DeviceBuiltInTestsResults8Callback;
    gcRegsDef[DeviceClockFrequencyIdx].callback =                        &GC_DeviceClockFrequencyCallback;
@@ -210,6 +209,7 @@ void GC_Callback_Init()
    gcRegsDef[ICUPositionIdx].callback =                                 &GC_ICUPositionCallback;
    gcRegsDef[ICUPositionSetpointIdx].callback =                         &GC_ICUPositionSetpointCallback;
    gcRegsDef[IntegrationModeIdx].callback =                             &GC_IntegrationModeCallback;
+   gcRegsDef[IsActiveFlagsIdx].callback =                               &GC_IsActiveFlagsCallback;
    gcRegsDef[LockedCenterImageIdx].callback =                           &GC_LockedCenterImageCallback;
    gcRegsDef[ManualFilterSerialNumberIdx].callback =                    &GC_ManualFilterSerialNumberCallback;
    gcRegsDef[MemoryBufferMOIActivationIdx].callback =                   &GC_MemoryBufferMOIActivationCallback;
@@ -238,8 +238,12 @@ void GC_Callback_Init()
    gcRegsDef[NDFilterPositionSetpointIdx].callback =                    &GC_NDFilterPositionSetpointCallback;
    gcRegsDef[OffsetXIdx].callback =                                     &GC_OffsetXCallback;
    gcRegsDef[OffsetXIncIdx].callback =                                  &GC_OffsetXIncCallback;
+   gcRegsDef[OffsetXMaxIdx].callback =                                  &GC_OffsetXMaxCallback;
+   gcRegsDef[OffsetXMinIdx].callback =                                  &GC_OffsetXMinCallback;
    gcRegsDef[OffsetYIdx].callback =                                     &GC_OffsetYCallback;
    gcRegsDef[OffsetYIncIdx].callback =                                  &GC_OffsetYIncCallback;
+   gcRegsDef[OffsetYMaxIdx].callback =                                  &GC_OffsetYMaxCallback;
+   gcRegsDef[OffsetYMinIdx].callback =                                  &GC_OffsetYMinCallback;
    gcRegsDef[POSIXTimeIdx].callback =                                   &GC_POSIXTimeCallback;
    gcRegsDef[PixelDataResolutionIdx].callback =                         &GC_PixelDataResolutionCallback;
    gcRegsDef[PixelFormatIdx].callback =                                 &GC_PixelFormatCallback;
@@ -293,6 +297,26 @@ void GC_AECImageFractionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
    {
 	   AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       HDER_UpdateAECHeader(&gHderInserter, &gcRegsData);
+   }
+}
+
+/**
+ * AECPlusExtrapolationWeight GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_AECPlusExtrapolationWeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
    }
 }
 
@@ -1132,65 +1156,7 @@ void GC_CenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      //GC_UpdateParameterLimits();    // Offsets have no impact on ExpTime and AcqFrameRate
       GC_ComputeImageLimits();
-   }
-}
-
-/**
- * DeviceBuiltInTestsGlobalResult GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_DeviceBuiltInTestsGlobalResultCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   static uint8_t builtInTestFailedErrorLatch = 0;
-   builtInTestResult_t builtInTestsGlobalResult[3];
-   uint32_t i;
-
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-
-      // Fetch FPGAs built-in tests global results
-      BuiltInTest_Execute(BITID_BuiltInTestsGlobalResult);
-      builtInTestsGlobalResult[0] = builtInTests[BITID_BuiltInTestsGlobalResult].result;
-      builtInTestsGlobalResult[1] = gcRegsData.DeviceBuiltInTestsResults5 & 0x00000003;
-      builtInTestsGlobalResult[2] = gcRegsData.DeviceBuiltInTestsResults7 & 0x00000003;
-
-      // Update built-in tests global result
-      gcRegsData.DeviceBuiltInTestsGlobalResult = BITR_Passed;
-
-      for (i = 0; i < 3; i++)
-      {
-         if (builtInTestsGlobalResult[i] == BITR_Failed)
-         {
-            gcRegsData.DeviceBuiltInTestsGlobalResult = BITR_Failed;
-            break;
-         }
-         else if (builtInTestsGlobalResult[i] == BITR_Pending)
-         {
-            gcRegsData.DeviceBuiltInTestsGlobalResult = BITR_Pending;
-         }
-      }
-
-      // Generate built-in tests failed error if global result is failure
-      if (gcRegsData.DeviceBuiltInTestsGlobalResult == BITR_Failed)
-      {
-         if (builtInTestFailedErrorLatch == 0)
-         {
-            GC_ERR("At least one of the built-in tests failed.");
-            GC_GenerateEventError(EECD_BuiltInTestFailed);
-            builtInTestFailedErrorLatch = 1;
-         }
-      }
-      else
-      {
-         // Unlatch error
-         builtInTestFailedErrorLatch = 0;
-      }
    }
 }
 
@@ -1256,26 +1222,6 @@ void GC_DeviceBuiltInTestsResults4Callback(gcCallbackPhase_t phase, gcCallbackAc
    {
       // Before read
       gcRegsData.DeviceBuiltInTestsResults4 = BuiltInTest_FillResultRegister(3);
-   }
-}
-
-/**
- * DeviceBuiltInTestsResults5 GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_DeviceBuiltInTestsResults5Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
-
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // After write
    }
 }
 
@@ -2299,6 +2245,7 @@ void GC_EHDRINumberOfExposuresCallback(gcCallbackPhase_t phase, gcCallbackAccess
          GC_UpdateParameterLimits();
       }
       CAL_UpdateVideo(&gCal, &gcRegsData);
+      GC_UpdateAECPlusIsAvailable();
    }
 }
 
@@ -3053,6 +3000,7 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
          ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint); // TODO should we set something always valid?
       }
 
+      GC_UpdateAECPlusIsAvailable();
       CAL_UpdateVideo(&gCal, &gcRegsData);
    }
 }
@@ -3519,6 +3467,32 @@ void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+   }
+}
+
+/**
+ * IsActiveFlags GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   uint8_t i;
+   uint32_t mask;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+
+      // Refresh TriggerIsActive flags
+      for (i = 0; i < TriggerModeAryLen; i++)
+      {
+         mask = 0x00000001 << i;
+         IsActiveFlagsClr(mask);
+         if (TriggerModeAry[i]) IsActiveFlagsSet(mask);
+      }
    }
 }
 
@@ -4158,6 +4132,46 @@ void GC_OffsetXIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 }
 
 /**
+ * OffsetXMax GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_OffsetXMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
+ * OffsetXMin GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_OffsetXMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
  * OffsetY GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -4187,6 +4201,46 @@ void GC_OffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
  * @param access indicates whether the operation is read or write.
  */
 void GC_OffsetYIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
+ * OffsetYMax GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_OffsetYMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
+ * OffsetYMin GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_OffsetYMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
@@ -4703,6 +4757,10 @@ void GC_TriggerSoftwareCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
 
             case TS_Flagging:
                FLAG_SendTrig(&gFlagging_ctrl);
+               break;
+
+            case TS_Gating:
+               // TODO Manage gating software trigger here.
                break;
          }
       }

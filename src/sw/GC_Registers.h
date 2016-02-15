@@ -24,21 +24,116 @@
 #include "utils.h"
 #include <stdint.h>
 
+/*
+ * Sensor code (based on firmware minor version number definition)
+ */
+#define Isc0207ASensor     1
+#define HawkASensor        2
+#define HerculesDSensor    3
+#define PelicanDSensor     4
+#define MarsASensor        5
+#define JupiterASensor     6
+#define ScorpiolwDSensor   7
+#define MarsDSensor        8
+#define ScorpiomwDSensor   9
+// ScorpiolwD_230HzSensor is not defined since it's using ScorpiomwDSensor
+#define Isc0209ASensor     11
 
-#define TDCFlagsSet(mask) BitMaskSet(gcRegsData.TDCFlags, mask)  /**< Set masked bits in TDCFlags register */
-#define TDCFlagsClr(mask) BitMaskClr(gcRegsData.TDCFlags, mask)  /**< Clear masked bits in TDCFlags register */
-#define TDCFlagsTst(mask) BitMaskTst(gcRegsData.TDCFlags, mask)  /**< Test if masked bits in TDCFlags register are all set */
-#define TDCFlagsTstAny(mask) BitMaskTstAny(gcRegsData.TDCFlags, mask)  /**< Test if at least one of the masked bits in TDCFlags register is set */
+/*
+ * TDCStatus register bit field definition
+ */
+#define WaitingForCoolerMask                    0x00000001  /**< TDCStatus register bit mask for WaitingForCooler field */
+#define WaitingForSensorMask                    0x00000002  /**< TDCStatus register bit mask for WaitingForSensor field */
+#define WaitingForInitMask                      0x00000004  /**< TDCStatus register bit mask for WaitingForInit field */
+// #define WaitingForCameraLinkMask                0x00000008  /**< TDCStatus register bit mask for WaitingForCameraLink field */
+#define WaitingForICUMask                       0x00000010  /**< TDCStatus register bit mask for WaitingForICU field */
+#define WaitingForNDFilterMask                  0x00000020  /**< TDCStatus register bit mask for WaitingForNDFilter field */
+#define WaitingForCalibrationInitMask           0x00000040  /**< TDCStatus register bit mask for WaitingForCalibrationInit field */
+#define WaitingForFilterWheelMask               0x00000080  /**< TDCStatus register bit mask for WaitingForFilterWheel field */
+#define WaitingForArmMask                       0x00000100  /**< TDCStatus register bit mask for WaitingForArm field */
+#define WaitingForValidParametersMask           0x00000200  /**< TDCStatus register bit mask for WaitingForValidParameters field */
+#define AcquisitionStartedMask                  0x00000400  /**< TDCStatus register bit mask for AcquisitionStarted field */
+// #define WaitingForSCDCmdAckMask                 0x00000800  /**< TDCStatus register bit mask for WaitingForSCDCmdAck field */
+#define WaitingForCalibrationDataMask           0x00001000  /**< TDCStatus register bit mask for WaitingForCalibrationData field */
+#define WaitingForCalibrationActualizationMask  0x00002000  /**< TDCStatus register bit mask for WaitingForCalibrationActualization field */
+#define WaitingForOutputFPGAMask                0x00004000  /**< TDCStatus register bit mask for WaitingForOutputFPGA field */
+#define WaitingForPowerMask                     0x00008000  /**< TDCStatus register bit mask for WaitingForPower field */
+#define WaitingForFlashSettingsInitMask         0x00010000  /**< TDCStatus register bit mask for WaitingForFlashSettingsInit field */
+
+#define TDC_STATUS_INIT                         (WaitingForCoolerMask | WaitingForInitMask | WaitingForCalibrationInitMask | WaitingForArmMask | \
+                                                WaitingForOutputFPGAMask | WaitingForFlashSettingsInitMask)
 
 #define TDCStatusSet(mask) BitMaskSet(gcRegsData.TDCStatus, mask)  /**< Set masked bits in TDCStatus register */
 #define TDCStatusClr(mask) BitMaskClr(gcRegsData.TDCStatus, mask)  /**< Clear masked bits in TDCStatus register */
 #define TDCStatusTst(mask) BitMaskTst(gcRegsData.TDCStatus, mask)  /**< Test if masked bits in TDCStatus register are all set */
 #define TDCStatusTstAny(mask) BitMaskTstAny(gcRegsData.TDCStatus, mask)  /**< Test if at least one of the masked bits in TDCStatus register is set */
 
+/*
+ * AvailabilityFlags register bit field definition
+ */
+#define DiscreteExposureTimeIsAvailableMask     0x00000001  /**< AvailabilityFlags register bit mask for DiscreteExposureTimeIsAvailable field */
+#define CalibrationIsAvailableMask              0x00000002  /**< AvailabilityFlags register bit mask for CalibrationIsAvailable field */
+#define Raw0IsAvailableMask                     0x00000004  /**< AvailabilityFlags register bit mask for Raw0IsAvailable field */
+#define RawIsAvailableMask                      0x00000008  /**< AvailabilityFlags register bit mask for RawIsAvailable field */
+#define NUCIsAvailableMask                      0x00000010  /**< AvailabilityFlags register bit mask for NUCIsAvailable field */
+#define RTIsAvailableMask                       0x00000020  /**< AvailabilityFlags register bit mask for RTIsAvailable field */
+#define IBRIsAvailableMask                      0x00000040  /**< AvailabilityFlags register bit mask for IBRIsAvailable field */
+#define IBIIsAvailableMask                      0x00000080  /**< AvailabilityFlags register bit mask for CalibrationIsAvailable field */
+#define AECPlusIsAvailableMask                  0x00000100  /**< AvailabilityFlags register bit mask for AECPlusIsAvailable field */
+
 #define AvailabilityFlagsSet(mask) BitMaskSet(gcRegsData.AvailabilityFlags, mask)  /**< Set masked bits in AvailabilityFlags register */
 #define AvailabilityFlagsClr(mask) BitMaskClr(gcRegsData.AvailabilityFlags, mask)  /**< Clear masked bits in AvailabilityFlags register */
 #define AvailabilityFlagsTst(mask) BitMaskTst(gcRegsData.AvailabilityFlags, mask)  /**< Test if masked bits in AvailabilityFlags register are all set */
 #define AvailabilityFlagsTstAny(mask) BitMaskTstAny(gcRegsData.AvailabilityFlags, mask)  /**< Test if at least one of the masked bits in AvailabilityFlags register is set */
+
+/*
+ * IsActiveFlags register bit field definition
+ */
+#define AcquisitionStartTriggerIsActiveMask     0x00000001  /**< IsActiveFlags register bit mask for AcquisitionStartTriggerIsActive field */
+#define FlaggingTriggerIsActiveMask             0x00000002  /**< IsActiveFlags register bit mask for FlaggingTriggerIsActive field */
+#define GatingTriggerIsActiveMask               0x00000004  /**< IsActiveFlags register bit mask for GatingTriggerIsActive field */
+
+#define IsActiveFlagsSet(mask) BitMaskSet(gcRegsData.IsActiveFlags, mask)  /**< Set masked bits in IsActiveFlags register */
+#define IsActiveFlagsClr(mask) BitMaskClr(gcRegsData.IsActiveFlags, mask)  /**< Clear masked bits in IsActiveFlags register */
+#define IsActiveFlagsTst(mask) BitMaskTst(gcRegsData.IsActiveFlags, mask)  /**< Test if masked bits in IsActiveFlags register are all set */
+#define IsActiveFlagsTstAny(mask) BitMaskTstAny(gcRegsData.IsActiveFlags, mask)  /**< Test if at least one of the masked bits in IsActiveFlags register is set */
+
+/*
+ * TDCFlags register bit field definition
+ */
+#define ITRIsImplementedMask                             0x00000001  /**< TDCFlags register bit mask for ITRIsImplemented field */
+#define IWRIsImplementedMask                             0x00000002  /**< TDCFlags register bit mask for IWRIsImplemented field */
+#define ClBaseIsImplementedMask                          0x00000004  /**< TDCFlags register bit mask for ClBaseIsImplemented field */
+#define ClFullIsImplementedMask                          0x00000008  /**< TDCFlags register bit mask for ClFullIsImplemented field */
+#define CalibrationActualizationIsImplementedMask        0x00000010  /**< TDCFlags register bit mask for CalibrationActualizationIsImplemented field */
+#define HighGainSWDIsImplementedMask                     0x00000020  /**< TDCFlags register bit mask for HighGainSWDIsImplemented field */
+#define ICUIsImplementedMask                             0x00000040  /**< TDCFlags register bit mask for ICUIsImplemented field */
+#define NDFilterIsImplementedMask                        0x00000080  /**< TDCFlags register bit mask for NDFilterIsImplemented field */
+#define FWIsImplementedMask                              0x00000100  /**< TDCFlags register bit mask for FWIsImplemented field */
+#define FWAsynchronouslyRotatingModeIsImplementedMask    0x00000200  /**< TDCFlags register bit mask for FWAsynchronouslyRotatingModeIsImplemented field */
+#define FWSynchronouslyRotatingModeIsImplementedMask     0x00000400  /**< TDCFlags register bit mask for FWSynchronouslyRotatingModeIsImplemented field */
+#define AECPlusIsImplementedMask                         0x00000800  /**< TDCFlags register bit mask for AECPlusIsImplemented field */
+#define ExternalMemoryBufferIsImplementedMask            0x00001000  /**< TDCFlags register bit mask for ExternalMemoryBufferIsImplemented field */
+#define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
+#define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
+
+#define SensorIsImplemented(sensorCode)   ((sensorCode << SensorIsImplementedBitPos) & SensorIsImplementedMask)
+
+#define Isc0207AIsImplemented          SensorIsImplemented(Isc0207ASensor)
+#define HawkAIsImplemented             SensorIsImplemented(HawkASensor)
+#define HerculesDIsImplemented         SensorIsImplemented(HerculesDSensor)
+#define PelicanDIsImplemented          SensorIsImplemented(PelicanDSensor)
+#define MarsAIsImplemented             SensorIsImplemented(MarsASensor)
+#define JupiterAIsImplemented          SensorIsImplemented(JupiterASensor)
+#define ScorpiolwDIsImplemented        SensorIsImplemented(ScorpiolwDSensor)
+#define MarsDIsImplemented             SensorIsImplemented(MarsDSensor)
+#define ScorpiomwDIsImplemented        SensorIsImplemented(ScorpiomwDSensor)
+#define Isc0209AIsImplemented          SensorIsImplemented(Isc0209ASensor)
+
+#define TDCFlagsSet(mask) BitMaskSet(gcRegsData.TDCFlags, mask)  /**< Set masked bits in TDCFlags register */
+#define TDCFlagsClr(mask) BitMaskClr(gcRegsData.TDCFlags, mask)  /**< Clear masked bits in TDCFlags register */
+#define TDCFlagsTst(mask) BitMaskTst(gcRegsData.TDCFlags, mask)  /**< Test if masked bits in TDCFlags register are all set */
+#define TDCFlagsTstAny(mask) BitMaskTstAny(gcRegsData.TDCFlags, mask)  /**< Test if at least one of the masked bits in TDCFlags register is set */
 
 // EHDRINumberOfExposures must be greater than one and filter wheel mode must be set to fixed to activate EHDRI
 #define EHDRIIsActive ((gcRegsData.EHDRINumberOfExposures > 1) && (gcRegsData.FWMode == FWM_Fixed))
@@ -51,10 +146,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.1.0
+// Generated from XML camera definition file version 11.2.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 1) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -66,6 +161,7 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
  */
 struct gcRegistersDataStruct {
    float AECImageFraction;
+   float AECPlusExtrapolationWeight;
    float AECResponseTime;
    float AECTargetWellFilling;
    float AcquisitionFrameRate;
@@ -134,12 +230,10 @@ struct gcRegistersDataStruct {
    uint32_t CalibrationCollectionType;
    uint32_t CalibrationMode;
    uint32_t CenterImage;
-   uint32_t DeviceBuiltInTestsGlobalResult;
    uint32_t DeviceBuiltInTestsResults1;
    uint32_t DeviceBuiltInTestsResults2;
    uint32_t DeviceBuiltInTestsResults3;
    uint32_t DeviceBuiltInTestsResults4;
-   uint32_t DeviceBuiltInTestsResults5;
    uint32_t DeviceBuiltInTestsResults7;
    uint32_t DeviceBuiltInTestsResults8;
    uint32_t DeviceClockSelector;
@@ -202,6 +296,7 @@ struct gcRegistersDataStruct {
    uint32_t ICUPosition;
    uint32_t ICUPositionSetpoint;
    uint32_t IntegrationMode;
+   uint32_t IsActiveFlags;
    uint32_t LockedCenterImage;
    uint32_t ManualFilterSerialNumber;
    uint32_t MemoryBufferMOIActivation;
@@ -227,8 +322,12 @@ struct gcRegistersDataStruct {
    uint32_t NDFilterPositionSetpoint;
    uint32_t OffsetX;
    uint32_t OffsetXInc;
+   uint32_t OffsetXMax;
+   uint32_t OffsetXMin;
    uint32_t OffsetY;
    uint32_t OffsetYInc;
+   uint32_t OffsetYMax;
+   uint32_t OffsetYMin;
    uint32_t POSIXTime;
    uint32_t PixelDataResolution;
    uint32_t PixelFormat;
@@ -303,19 +402,19 @@ extern uint32_t EventNotificationAry[EventNotificationAryLen];
 #define DeviceFirmwareModuleRevisionAryLen 12
 extern int32_t DeviceFirmwareModuleRevisionAry[DeviceFirmwareModuleRevisionAryLen];
 
-#define TriggerModeAryLen 2
+#define TriggerModeAryLen 3
 extern uint32_t TriggerModeAry[TriggerModeAryLen];
 
-#define TriggerSourceAryLen 2
+#define TriggerSourceAryLen 3
 extern uint32_t TriggerSourceAry[TriggerSourceAryLen];
 
-#define TriggerActivationAryLen 2
+#define TriggerActivationAryLen 3
 extern uint32_t TriggerActivationAry[TriggerActivationAryLen];
 
-#define TriggerDelayAryLen 2
+#define TriggerDelayAryLen 3
 extern float TriggerDelayAry[TriggerDelayAryLen];
 
-#define TriggerFrameCountAryLen 2
+#define TriggerFrameCountAryLen 3
 extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 
 // Shared registers write macros
@@ -351,31 +450,57 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetDeviceTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceTemperatureIdx], val)
 #define GC_SetDeviceVoltageSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceVoltageSelectorIdx], val)
 #define GC_SetDeviceVoltage(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceVoltageIdx], val)
-#define GC_SetDeviceBuiltInTestsResults7(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults7Idx], val)
 
 // Locked registers utility macros
 ////////////////////////////////////////////////////////////////////////////////
-#define GC_FWIsImplemented TDCFlagsTst(FWIsImplementedMask)
-#define GC_FWSynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWSynchronouslyRotatingModeIsImplementedMask))
-#define GC_FWSynchronouslyRotatingModeIsActive (GC_FWSynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_SynchronouslyRotating))
+#define GC_AECIsActive ((gcRegsData.ExposureAuto == EA_Once) || (gcRegsData.ExposureAuto == EA_Continuous))
+#define GC_AECPlusIsActive (GC_AECPlusIsImplemented && ((gcRegsData.ExposureAuto == EA_OnceNDFilter) || (gcRegsData.ExposureAuto == EA_ContinuousNDFilter)))
+#define GC_AECPlusIsImplemented TDCFlagsTst(AECPlusIsImplementedMask)
+#define GC_AcquisitionFrameRateIsLocked ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForCalibrationActualization)
+#define GC_AcquisitionStartTriggerIsActive IsActiveFlagsTst(AcquisitionStartTriggerIsActiveMask)
+#define GC_AcquisitionStartTriggerIsLocked ((gcRegsData.TriggerSelector == TS_AcquisitionStart) && (GC_FWSynchronouslyRotatingModeIsActive || GC_GatingTriggerIsActive))
+#define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
 #define GC_CalibrationCollectionTypeFWIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW))
+#define GC_CalibrationCollectionTypeMultipointIsActive (gcRegsData.CalibrationCollectionActiveType >= CCAT_MultipointFixed)
 #define GC_CalibrationCollectionTypeNDFIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsNDF) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointNDF))
+#define GC_CalibrationIsActive ((gcRegsData.CalibrationMode != CM_Raw0) && (gcRegsData.CalibrationMode != CM_Raw))
+#define GC_DiscreteExposureTimeIsAvailable AvailabilityFlagsTst(DiscreteExposureTimeIsAvailableMask)
+#define GC_EHDRIAdvancedSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Simple)
+#define GC_EHDRIExposureTimeIsLocked (GC_ExposureTimeIsLocked || (GC_EHDRIIsActive && (GC_AcquisitionStarted || GC_EHDRIAdvancedSettingsAreLocked)))
+#define GC_EHDRIIsActive (gcRegsData.EHDRINumberOfExposures > 1)
+#define GC_EHDRISimpleSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Advanced)
+#define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization)
 #define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
 #define GC_FWFixedModeIsActive (gcRegsData.FWMode == FWM_Fixed)
-#define GC_WaitingForCalibrationInit TDCStatusTst(WaitingForCalibrationInitMask)
-#define GC_EHDRIIsActive (gcRegsData.EHDRINumberOfExposures > 1)
-#define GC_DiscreteExposureTimeIsAvailable AvailabilityFlagsTst(DiscreteExposureTimeIsAvailableMask)
-#define GC_AECPlusIsImplemented TDCFlagsTst(AECPlusIsImplementedMask)
-#define GC_AECPlusIsActive (GC_AECPlusIsImplemented && ((gcRegsData.ExposureAuto == EA_OnceNDFilter) || (gcRegsData.ExposureAuto == EA_ContinuousNDFilter)))
-#define GC_AECIsActive ((gcRegsData.ExposureAuto == EA_Once) || (gcRegsData.ExposureAuto == EA_Continuous))
-#define GC_CalibrationCollectionTypeMultipointIsActive (gcRegsData.CalibrationCollectionActiveType >= CCAT_MultipointFixed)
-#define GC_CalibrationIsActive ((gcRegsData.CalibrationMode != CM_Raw0) && (gcRegsData.CalibrationMode != CM_Raw))
-#define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
+#define GC_FWIsImplemented TDCFlagsTst(FWIsImplementedMask)
+#define GC_FWSynchronouslyRotatingModeIsActive (GC_FWSynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_SynchronouslyRotating))
+#define GC_FWSynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWSynchronouslyRotatingModeIsImplementedMask))
+#define GC_FlaggingTriggerIsActive IsActiveFlagsTst(FlaggingTriggerIsActiveMask)
+#define GC_FlaggingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Flagging) && GC_GatingTriggerIsActive)
+#define GC_GatingTriggerIsActive IsActiveFlagsTst(GatingTriggerIsActiveMask)
+#define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWSynchronouslyRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive))
+#define GC_MemoryBufferNotEmpty (gcRegsData.MemoryBufferSequenceCount > 0)
+#define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForCalibrationActualization)
 #define GC_WaitingForCalibrationActualization TDCStatusTst(WaitingForCalibrationActualizationMask)
 
 void GC_Registers_Init();
 
 /* AUTO-CODE END */
+
+#define GC_FWAsynchronouslyRotatingModeIsActive (GC_FWIsImplemented && TDCFlagsTst(FWAsynchronouslyRotatingModeIsImplementedMask))
+
+// AEC+ is available when;
+//  - EHDRI is not active.
+//  - FW rotating modes are not active.
+//  - Active collection type is TelopsNDF.
+//  - NDFPosition are consecutive. Valid combinations  are [0 1], [1 2] or [0 1 2] but not [0 2].
+//    So must contain all three NDF positions or at least NDF position 1 when containing 2 NDF positions.
+#define GC_AECPlusIsAvailable (!GC_EHDRIIsActive && \
+   !GC_FWAsynchronouslyRotatingModeIsActive && !GC_FWSynchronouslyRotatingModeIsActive && \
+   (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
+   ((calibrationInfo.collection.NumberOfBlocks == 3) || \
+   ((calibrationInfo.collection.NumberOfBlocks == 2) && ((calibrationInfo.blocks[0].NDFPosition == 1) || (calibrationInfo.blocks[1].NDFPosition == 1)))))
+#define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
 
 void GC_UpdateLockedFlag();
 void GC_CalibrationUpdateRegisters();

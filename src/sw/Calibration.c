@@ -1311,6 +1311,7 @@ void Calibration_SM()
             GC_UpdateParameterLimits();
             GC_CalibrationUpdateRegisters();
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
+            GC_UpdateAECPlusIsAvailable();
 
             if (strcmp(cmCalibrationFile->type, FM_COLLECTION_FILE_TYPE) == 0)
             {
@@ -1396,6 +1397,9 @@ void Calibration_Reset()
    {
       AvailabilityFlagsSet(CalibrationIsAvailableMask);
    }
+
+   // Update AECPlusIsAvailable flag
+   GC_UpdateAECPlusIsAvailable();
 }
 
 /**
@@ -1419,14 +1423,22 @@ static IRC_Status_t Calibration_ValidateCollectionType()
       case CCT_TelopsFW:
          // Validate number of blocks
          if (calibrationInfo.collection.NumberOfBlocks != flashSettings.FWNumberOfFilters)
+         {
+            CM_ERR("FW collection block count mismatch (%d Block(s), %d Filter(s)).",
+                  calibrationInfo.collection.NumberOfBlocks, flashSettings.FWNumberOfFilters);
             return IRC_FAILURE;
+         }
          // All FWPosition must be different
          for (block_index = 1; block_index < calibrationInfo.collection.NumberOfBlocks; block_index++)
          {
             for (block_index_2 = 0; block_index_2 < block_index; block_index_2++)
             {
                if (calibrationInfo.blocks[block_index_2].FWPosition == calibrationInfo.blocks[block_index].FWPosition)
+               {
+                  CM_ERR("More than one block for FW position %d in FW collection (Block indices: %d, %d).",
+                        calibrationInfo.blocks[block_index].FWPosition, block_index, block_index_2);
                   return IRC_FAILURE;
+               }
             }
          }
          break;
@@ -1434,7 +1446,11 @@ static IRC_Status_t Calibration_ValidateCollectionType()
       case CCT_MultipointNDF:
          // Validate number of blocks
          if (calibrationInfo.collection.NumberOfBlocks < 2)
+         {
+            CM_ERR("Invalid NDF collection block count (%d Block(s)).",
+                  calibrationInfo.collection.NumberOfBlocks);
             return IRC_FAILURE;
+         }
          // All (NDFPosition, ExposureTime) pairs must be different
          for (block_index = 1; block_index < calibrationInfo.collection.NumberOfBlocks; block_index++)
          {
@@ -1442,7 +1458,12 @@ static IRC_Status_t Calibration_ValidateCollectionType()
             {
                if ((calibrationInfo.blocks[block_index_2].NDFPosition == calibrationInfo.blocks[block_index].NDFPosition) &&
                    (calibrationInfo.blocks[block_index_2].ExposureTime == calibrationInfo.blocks[block_index].ExposureTime))
+               {
+                  CM_ERR("More than one block for NDF position %d and exposure time %d in NDF collection (Block indices: %d, %d).",
+                        calibrationInfo.blocks[block_index].NDFPosition, calibrationInfo.blocks[block_index].ExposureTime,
+                        block_index, block_index_2);
                   return IRC_FAILURE;
+               }
             }
          }
          break;
@@ -1450,14 +1471,22 @@ static IRC_Status_t Calibration_ValidateCollectionType()
       case CCT_TelopsNDF:
          // Validate number of blocks
          if ((calibrationInfo.collection.NumberOfBlocks < 2) || (calibrationInfo.collection.NumberOfBlocks > flashSettings.NDFNumberOfFilters))
+         {
+            CM_ERR("Invalid NDF collection block count (%d Block(s), %d Filter(s)).",
+                  calibrationInfo.collection.NumberOfBlocks, flashSettings.NDFNumberOfFilters);
             return IRC_FAILURE;
+         }
          // All NDFPosition must be different
          for (block_index = 1; block_index < calibrationInfo.collection.NumberOfBlocks; block_index++)
          {
             for (block_index_2 = 0; block_index_2 < block_index; block_index_2++)
             {
                if (calibrationInfo.blocks[block_index_2].NDFPosition == calibrationInfo.blocks[block_index].NDFPosition)
+               {
+                  CM_ERR("More than one block for NDF position %d in NDF collection (Block indices: %d, %d).",
+                        calibrationInfo.blocks[block_index].NDFPosition, block_index, block_index_2);
                   return IRC_FAILURE;
+               }
             }
          }
          break;
@@ -1465,14 +1494,22 @@ static IRC_Status_t Calibration_ValidateCollectionType()
       case CCT_MultipointEHDRI:
          // Validate number of blocks
          if ((calibrationInfo.collection.NumberOfBlocks < 2) || (calibrationInfo.collection.NumberOfBlocks > EHDRI_IDX_NBR))
+         {
+            CM_ERR("Invalid EHDRI collection block count (%d Block(s)).",
+                  calibrationInfo.collection.NumberOfBlocks);
             return IRC_FAILURE;
+         }
          // All ExposureTime must be different
          for (block_index = 1; block_index < calibrationInfo.collection.NumberOfBlocks; block_index++)
          {
             for (block_index_2 = 0; block_index_2 < block_index; block_index_2++)
             {
                if (calibrationInfo.blocks[block_index_2].ExposureTime == calibrationInfo.blocks[block_index].ExposureTime)
+               {
+                  CM_ERR("More than one block for exposure time %d in EHDRI collection (Block indices: %d, %d).",
+                        calibrationInfo.blocks[block_index].ExposureTime, block_index, block_index_2);
                   return IRC_FAILURE;
+               }
             }
          }
          break;

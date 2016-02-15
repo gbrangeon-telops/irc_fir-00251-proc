@@ -38,7 +38,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.1.0
+// Generated from XML camera definition file version 11.2.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -49,6 +49,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
  */
 gcRegistersData_t gcRegsDataFactory = {
    /* AECImageFraction = */ 90.0F,
+   /* AECPlusExtrapolationWeight = */ 0.0F,
    /* AECResponseTime = */ 100.0F,
    /* AECTargetWellFilling = */ 60.0F,
    /* AcquisitionFrameRate = */ FPA_DEFAULT_FRAME_RATE,
@@ -117,12 +118,10 @@ gcRegistersData_t gcRegsDataFactory = {
    /* CalibrationCollectionType = */ 0,
    /* CalibrationMode = */ CM_Raw0,
    /* CenterImage = */ 1,
-   /* DeviceBuiltInTestsGlobalResult = */ 0,
    /* DeviceBuiltInTestsResults1 = */ 0,
    /* DeviceBuiltInTestsResults2 = */ 0,
    /* DeviceBuiltInTestsResults3 = */ 0,
    /* DeviceBuiltInTestsResults4 = */ 0,
-   /* DeviceBuiltInTestsResults5 = */ 0,
    /* DeviceBuiltInTestsResults7 = */ 0,
    /* DeviceBuiltInTestsResults8 = */ 0,
    /* DeviceClockSelector = */ 0,
@@ -179,12 +178,13 @@ gcRegistersData_t gcRegsDataFactory = {
    /* GPSModeIndicator = */ GPSMI_NotAvailable,
    /* GPSNumberOfSatellitesInUse = */ 0,
    /* Height = */ FPA_HEIGHT_MAX,
-   /* HeightInc = */ FPA_HEIGHT_INC,
+   /* HeightInc = */ FPA_HEIGHT_MULT,
    /* HeightMax = */ FPA_HEIGHT_MAX,
    /* HeightMin = */ FPA_HEIGHT_MIN,
    /* ICUPosition = */ ICUP_ICUNotImplemented,
    /* ICUPositionSetpoint = */ ICUPS_Scene,
    /* IntegrationMode = */ FPA_INTEGRATION_MODE,
+   /* IsActiveFlags = */ 0,
    /* LockedCenterImage = */ FPA_FORCE_CENTER,
    /* ManualFilterSerialNumber = */ 0,
    /* MemoryBufferMOIActivation = */ MBMOIA_RisingEdge,
@@ -210,8 +210,12 @@ gcRegistersData_t gcRegsDataFactory = {
    /* NDFilterPositionSetpoint = */ NDFPS_NDFilter1,
    /* OffsetX = */ 0,
    /* OffsetXInc = */ FPA_OFFSETX_MULT,
+   /* OffsetXMax = */ 0,
+   /* OffsetXMin = */ 0,
    /* OffsetY = */ 0,
    /* OffsetYInc = */ FPA_OFFSETY_MULT,
+   /* OffsetYMax = */ 0,
+   /* OffsetYMin = */ 0,
    /* POSIXTime = */ 0,
    /* PixelDataResolution = */ PDR_Bpp16,
    /* PixelFormat = */ PF_Mono16,
@@ -241,7 +245,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* VideoFWPosition = */ VFWP_Filter1,
    /* VideoFreeze = */ 0,
    /* Width = */ FPA_WIDTH_MAX,
-   /* WidthInc = */ FPA_WIDTH_INC,
+   /* WidthInc = */ FPA_WIDTH_MULT,
    /* WidthMax = */ FPA_WIDTH_MAX,
    /* WidthMin = */ FPA_WIDTH_MIN,
    /* DeviceID = */ "TEL00000",
@@ -296,27 +300,27 @@ int32_t DeviceFirmwareModuleRevisionAry[DeviceFirmwareModuleRevisionAryLen] = SV
 /**
  * TriggerMode data array
  */
-uint32_t TriggerModeAry[TriggerModeAryLen] = {TM_Off, TM_Off};
+uint32_t TriggerModeAry[TriggerModeAryLen] = {TM_Off, TM_Off, TM_Off};
 
 /**
  * TriggerSource data array
  */
-uint32_t TriggerSourceAry[TriggerSourceAryLen] = {TS_Software, TS_Software};
+uint32_t TriggerSourceAry[TriggerSourceAryLen] = {TS_Software, TS_Software, TS_Software};
 
 /**
  * TriggerActivation data array
  */
-uint32_t TriggerActivationAry[TriggerActivationAryLen] = {TA_RisingEdge, TA_RisingEdge};
+uint32_t TriggerActivationAry[TriggerActivationAryLen] = {TA_RisingEdge, TA_RisingEdge, TA_LevelHigh};
 
 /**
  * TriggerDelay data array
  */
-float TriggerDelayAry[TriggerDelayAryLen] = {0.0F, 0.0F};
+float TriggerDelayAry[TriggerDelayAryLen] = {0.0F, 0.0F, 0.0F};
 
 /**
  * TriggerFrameCount data array
  */
-uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen] = {1, 1};
+uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen] = {1, 1, 1};
 
 /**
  * GenICam registers data pointer initialization.
@@ -324,6 +328,7 @@ uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen] = {1, 1};
 void GC_Registers_Init()
 {
    gcRegsDef[AECImageFractionIdx].p_data = &gcRegsData.AECImageFraction;
+   gcRegsDef[AECPlusExtrapolationWeightIdx].p_data = &gcRegsData.AECPlusExtrapolationWeight;
    gcRegsDef[AECResponseTimeIdx].p_data = &gcRegsData.AECResponseTime;
    gcRegsDef[AECTargetWellFillingIdx].p_data = &gcRegsData.AECTargetWellFilling;
    gcRegsDef[AcquisitionFrameRateIdx].p_data = &gcRegsData.AcquisitionFrameRate;
@@ -392,12 +397,10 @@ void GC_Registers_Init()
    gcRegsDef[CalibrationCollectionTypeIdx].p_data = &gcRegsData.CalibrationCollectionType;
    gcRegsDef[CalibrationModeIdx].p_data = &gcRegsData.CalibrationMode;
    gcRegsDef[CenterImageIdx].p_data = &gcRegsData.CenterImage;
-   gcRegsDef[DeviceBuiltInTestsGlobalResultIdx].p_data = &gcRegsData.DeviceBuiltInTestsGlobalResult;
    gcRegsDef[DeviceBuiltInTestsResults1Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults1;
    gcRegsDef[DeviceBuiltInTestsResults2Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults2;
    gcRegsDef[DeviceBuiltInTestsResults3Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults3;
    gcRegsDef[DeviceBuiltInTestsResults4Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults4;
-   gcRegsDef[DeviceBuiltInTestsResults5Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults5;
    gcRegsDef[DeviceBuiltInTestsResults7Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults7;
    gcRegsDef[DeviceBuiltInTestsResults8Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults8;
    gcRegsDef[DeviceClockSelectorIdx].p_data = &gcRegsData.DeviceClockSelector;
@@ -460,6 +463,7 @@ void GC_Registers_Init()
    gcRegsDef[ICUPositionIdx].p_data = &gcRegsData.ICUPosition;
    gcRegsDef[ICUPositionSetpointIdx].p_data = &gcRegsData.ICUPositionSetpoint;
    gcRegsDef[IntegrationModeIdx].p_data = &gcRegsData.IntegrationMode;
+   gcRegsDef[IsActiveFlagsIdx].p_data = &gcRegsData.IsActiveFlags;
    gcRegsDef[LockedCenterImageIdx].p_data = &gcRegsData.LockedCenterImage;
    gcRegsDef[ManualFilterSerialNumberIdx].p_data = &gcRegsData.ManualFilterSerialNumber;
    gcRegsDef[MemoryBufferMOIActivationIdx].p_data = &gcRegsData.MemoryBufferMOIActivation;
@@ -485,8 +489,12 @@ void GC_Registers_Init()
    gcRegsDef[NDFilterPositionSetpointIdx].p_data = &gcRegsData.NDFilterPositionSetpoint;
    gcRegsDef[OffsetXIdx].p_data = &gcRegsData.OffsetX;
    gcRegsDef[OffsetXIncIdx].p_data = &gcRegsData.OffsetXInc;
+   gcRegsDef[OffsetXMaxIdx].p_data = &gcRegsData.OffsetXMax;
+   gcRegsDef[OffsetXMinIdx].p_data = &gcRegsData.OffsetXMin;
    gcRegsDef[OffsetYIdx].p_data = &gcRegsData.OffsetY;
    gcRegsDef[OffsetYIncIdx].p_data = &gcRegsData.OffsetYInc;
+   gcRegsDef[OffsetYMaxIdx].p_data = &gcRegsData.OffsetYMax;
+   gcRegsDef[OffsetYMinIdx].p_data = &gcRegsData.OffsetYMin;
    gcRegsDef[POSIXTimeIdx].p_data = &gcRegsData.POSIXTime;
    gcRegsDef[PixelDataResolutionIdx].p_data = &gcRegsData.PixelDataResolution;
    gcRegsDef[PixelFormatIdx].p_data = &gcRegsData.PixelFormat;
@@ -549,24 +557,24 @@ void GC_UpdateLockedFlag()
    GC_CalibrationCollectionActivePOSIXTimeCallback(GCCP_BEFORE, GCCA_READ);
 
 /* AUTO-CODE REGLOCKED BEGIN */
-   SetRegLocked(&gcRegsDef[WidthIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[HeightIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[WidthIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[HeightIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionStartIdx], gcRegsData.DeviceNotReady);
    SetRegLocked(&gcRegsDef[AcquisitionStopIdx], GC_WaitingForCalibrationActualization);
    SetRegLocked(&gcRegsDef[AcquisitionArmIdx], (GC_AcquisitionStarted || GC_WaitingForCalibrationActualization));
    SetRegLocked(&gcRegsDef[ExposureModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[ExposureTimeIdx], (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[ExposureTime1Idx], ((GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || (GC_EHDRIIsActive && (GC_AcquisitionStarted || (gcRegsData.EHDRIMode == EHDRIM_Simple)))));
-   SetRegLocked(&gcRegsDef[ExposureTime2Idx], ((GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || (GC_EHDRIIsActive && (GC_AcquisitionStarted || (gcRegsData.EHDRIMode == EHDRIM_Simple)))));
-   SetRegLocked(&gcRegsDef[ExposureTime3Idx], ((GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || (GC_EHDRIIsActive && (GC_AcquisitionStarted || (gcRegsData.EHDRIMode == EHDRIM_Simple)))));
-   SetRegLocked(&gcRegsDef[ExposureTime4Idx], ((GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || (GC_EHDRIIsActive && (GC_AcquisitionStarted || (gcRegsData.EHDRIMode == EHDRIM_Simple)))));
-   SetRegLocked(&gcRegsDef[ExposureTime5Idx], (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[ExposureTime6Idx], (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[ExposureTime7Idx], (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[ExposureTime8Idx], (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[ExposureTimeSetToMaxIdx], (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[AcquisitionFrameRateIdx], ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForCalibrationActualization));
+   SetRegLocked(&gcRegsDef[ExposureTimeIdx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime1Idx], GC_EHDRIExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime2Idx], GC_EHDRIExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime3Idx], GC_EHDRIExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime4Idx], GC_EHDRIExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime5Idx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime6Idx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime7Idx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTime8Idx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTimeSetToMaxIdx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[AcquisitionFrameRateIdx], GC_AcquisitionFrameRateIsLocked);
+   SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionModeIdx], (GC_WaitingForCalibrationActualization || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateModeIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[AECImageFractionIdx], GC_WaitingForCalibrationActualization);
@@ -574,8 +582,8 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[AECResponseTimeIdx], GC_WaitingForCalibrationActualization);
    SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
    SetRegLocked(&gcRegsDef[EHDRIModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMinIdx], ((gcRegsData.EHDRIMode == EHDRIM_Advanced) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMaxIdx], ((gcRegsData.EHDRIMode == EHDRIM_Advanced) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMinIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMaxIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRINumberOfExposuresIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIResetToDefaultIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence1Idx], GC_AcquisitionStarted);
@@ -583,37 +591,35 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence3Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence4Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[CalibrationModeIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForCalibrationActualization || GC_WaitingForCalibrationInit) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockSelectorIdx], GC_WaitingForCalibrationInit);
-   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockPOSIXTimeIdx], GC_WaitingForCalibrationInit);
-   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForCalibrationActualization || GC_WaitingForCalibrationInit));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForCalibrationActualization));
    SetRegLocked(&gcRegsDef[CalibrationActualizationModeIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && (gcRegsData.MemoryBufferSequenceCount > 0))) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForCalibrationActualization));
+   SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty)) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWSpeedSetpointIdx], GC_FWSynchronouslyRotatingModeIsActive);
    SetRegLocked(&gcRegsDef[ExternalLensSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ManualFilterSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ICUPositionSetpointIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[OffsetXIdx], (gcRegsData.CenterImage || GC_AcquisitionStarted || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[OffsetYIdx], (gcRegsData.CenterImage || GC_AcquisitionStarted || GC_WaitingForCalibrationActualization));
+   SetRegLocked(&gcRegsDef[CenterImageIdx], ((gcRegsData.LockedCenterImage || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[OffsetXIdx], (GC_OffsetIsLocked || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[OffsetYIdx], (GC_OffsetIsLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[PixelFormatIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TestImageSelectorIdx], (((gcRegsData.DevicePowerState == DPS_PowerInTransition) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[SensorWellDepthIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[IntegrationModeIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[CenterImageIdx], ((gcRegsData.LockedCenterImage || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[TriggerModeIdx], (((gcRegsData.TriggerSelector == TS_AcquisitionStart) && GC_FWSynchronouslyRotatingModeIsActive) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[TriggerModeIdx], ((GC_AcquisitionStartTriggerIsLocked || GC_FlaggingTriggerIsLocked || GC_GatingTriggerIsLocked) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[TriggerSourceIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerActivationIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerDelayIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerFrameCountIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[MemoryBufferModeIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferSequenceSizeIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferMOISourceIdx], (((gcRegsData.MemoryBufferSequenceCount > 0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferMOIActivationIdx], ((gcRegsData.MemoryBufferSequenceCount > 0) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferModeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferSequenceSizeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferMOISourceIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferMOIActivationIdx], (GC_MemoryBufferNotEmpty || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], GC_AcquisitionStarted);
@@ -780,44 +786,61 @@ void GC_UpdateParameterLimits()
  */
 IRC_Status_t GC_DeviceRegistersVerification()
 {
+   uint32_t heightMax = FPA_HEIGHT_MAX;
+   uint32_t widthMax = FPA_WIDTH_MAX;
    uint8_t error = 0;
 
    GC_UpdateParameterLimits();
 
-   if ((gcRegsData.Height > gcRegsData.HeightMax) || (gcRegsData.Height < gcRegsData.HeightMin) || ((gcRegsData.Height % gcRegsData.HeightInc) != 0))
+   if ((gcRegsData.Height != FPA_HEIGHT_MAX) || (gcRegsData.Width != FPA_WIDTH_MAX))
+   {
+      // Sub window
+#ifdef FPA_SUBWINDOW_HEIGHT_MAX
+      heightMax = FPA_SUBWINDOW_HEIGHT_MAX;
+#endif
+#ifdef FPA_SUBWINDOW_WIDTH_MAX
+      widthMax = FPA_SUBWINDOW_WIDTH_MAX;
+#endif
+   }
+
+   if ((gcRegsData.Height < gcRegsData.HeightMin) || (gcRegsData.Height > heightMax) || ((gcRegsData.Height % gcRegsData.HeightInc) != 0))
    {
 #ifdef SIM
-      PRINTF("Height = %d, HeightMin = %d, CurrentHeightMax = %d, HeightInc = %d, Height mod HeightInc = %d\n", gcRegsData.Height, gcRegsData.HeightMin, gcRegsData.CurrentHeightMax, gcRegsData.HeightInc, gcRegsData.Height % gcRegsData.HeightInc);
+      PRINTF("CenterImage = %d, Height = %d, HeightMin = %d, HeightMax = %d, HeightInc = %d\n",
+            gcRegsData.CenterImage, gcRegsData.Height, gcRegsData.HeightMin, gcRegsData.HeightMax, gcRegsData.HeightInc);
 #endif
       GC_ERR("Invalid image height (%d).", gcRegsData.Height);
       GC_GenerateEventError(EECD_InvalidHeight);
       error = 1;
    }
 
-   if ((gcRegsData.Width > gcRegsData.WidthMax) || (gcRegsData.Width < gcRegsData.WidthMin) || ((gcRegsData.Width % gcRegsData.WidthInc) != 0))
+   if ((gcRegsData.Width < gcRegsData.WidthMin) || (gcRegsData.Width > widthMax) || ((gcRegsData.Width % gcRegsData.WidthInc) != 0))
    {
 #ifdef SIM
-         PRINTF("CenterImage = %d, Width = %d, WidthMin = %d, CurrentWidthMax = %d, WidthInc = %d, Width mod WidthInc = %d\n", gcRegsData.CenterImage, gcRegsData.Width, gcRegsData.WidthMin, gcRegsData.CurrentWidthMax, gcRegsData.WidthInc, gcRegsData.Width % gcRegsData.WidthInc);
+      PRINTF("CenterImage = %d, Width = %d, WidthMin = %d, WidthMax = %d, WidthInc = %d\n",
+            gcRegsData.CenterImage, gcRegsData.Width, gcRegsData.WidthMin, gcRegsData.WidthMax, gcRegsData.WidthInc);
 #endif
       GC_ERR("Invalid image width (%d).", gcRegsData.Width);
       GC_GenerateEventError(EECD_InvalidWidth);
       error = 1;
    }
 
-   if ((((gcRegsData.OffsetX + gcRegsData.Width) > FPA_WIDTH_MAX) || ((gcRegsData.OffsetX % gcRegsData.OffsetXInc) != 0)) && (gcRegsData.OffsetX > 0))
+   if ((gcRegsData.OffsetX < gcRegsData.OffsetXMin) || (gcRegsData.OffsetX > gcRegsData.OffsetXMax) || ((gcRegsData.OffsetX % gcRegsData.OffsetXInc) != 0))
    {
 #ifdef SIM
-      PRINTF("CenterImage = %d, gcRegsData.OffsetX = %d, gcRegsData.Height = %d, gcRegsData.OffsetXInc = %d\n", gcRegsData.CenterImage, gcRegsData.OffsetX, gcRegsData.Height, gcRegsData.OffsetXInc);
+      PRINTF("CenterImage = %d, OffsetX = %d, OffsetXMin = %d, OffsetXMax = %d, OffsetXInc = %d\n",
+            gcRegsData.CenterImage, gcRegsData.OffsetX, gcRegsData.OffsetXMin, gcRegsData.OffsetXMax, gcRegsData.OffsetXInc);
 #endif
       GC_ERR("Invalid image X offset (%d).", gcRegsData.OffsetX);
       GC_GenerateEventError(EECD_InvalidOffsetX);
       error = 1;
    }
 
-   if ((((gcRegsData.OffsetY + gcRegsData.Height) > FPA_HEIGHT_MAX) || ((gcRegsData.OffsetY % gcRegsData.OffsetYInc) != 0)) && (gcRegsData.OffsetY > 0))
+   if ((gcRegsData.OffsetY < gcRegsData.OffsetYMin) || (gcRegsData.OffsetY > gcRegsData.OffsetYMax) || ((gcRegsData.OffsetY % gcRegsData.OffsetYInc) != 0))
    {
 #ifdef SIM
-      PRINTF("CenterImage = %d, gcRegsData.OffsetY = %d, gcRegsData.Height = %d, gcRegsData.OffsetYInc = %d\n", gcRegsData.CenterImage, gcRegsData.OffsetY, gcRegsData.Height, gcRegsData.OffsetYInc);
+      PRINTF("CenterImage = %d, OffsetY = %d, OffsetYMin = %d, OffsetYMax = %d, OffsetYInc = %d\n",
+            gcRegsData.CenterImage, gcRegsData.OffsetY, gcRegsData.OffsetYMin, gcRegsData.OffsetYMax, gcRegsData.OffsetYInc);
 #endif
       GC_ERR("Invalid image Y offset (%d).", gcRegsData.OffsetY);
       GC_GenerateEventError(EECD_InvalidOffsetY);
@@ -986,34 +1009,61 @@ void GC_ComputeImageLimits()
 {
    if (gcRegsData.CenterImage)
    {
-      gcRegsData.WidthInc = lcm(FPA_WIDTH_MULT, 2*FPA_OFFSETX_MULT);
-      gcRegsData.HeightInc = lcm(FPA_HEIGHT_MULT, 2*FPA_OFFSETY_MULT);
+      gcRegsData.WidthInc = lcm(FPA_WIDTH_MULT, 2 * FPA_OFFSETX_MULT);
+      gcRegsData.WidthMin = roundUp(FPA_WIDTH_MIN, gcRegsData.WidthInc);
 
-      gcRegsData.OffsetX = (uint16_t)(FPA_WIDTH_MAX - gcRegsData.Width)/2;
-      gcRegsData.OffsetY = (uint16_t)(FPA_HEIGHT_MAX - gcRegsData.Height)/2;
+      gcRegsData.HeightInc = lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT);
+      gcRegsData.HeightMin = roundUp(FPA_HEIGHT_MIN, gcRegsData.HeightInc);
 
-      // We have complete control over OffsetX and OffsetY, we don't need extra restriction on CurrentWidthMax and CurrentHeightMax
-      gcRegsData.WidthMax = FPA_WIDTH_MAX;
-      gcRegsData.HeightMax = FPA_HEIGHT_MAX;
+      gcRegsData.OffsetX = (FPA_WIDTH_MAX - gcRegsData.Width) / 2;
+      gcRegsData.OffsetXMin = gcRegsData.OffsetX;
+      gcRegsData.OffsetXMax = gcRegsData.OffsetX;
 
-      gcRegsData.WidthMin = ceil((float)FPA_WIDTH_MIN/(float)gcRegsData.WidthInc) * gcRegsData.WidthInc;
-      gcRegsData.HeightMin = ceil((float)FPA_HEIGHT_MIN/(float)gcRegsData.HeightInc) * gcRegsData.HeightInc;
+      gcRegsData.OffsetY = (FPA_HEIGHT_MAX - gcRegsData.Height) / 2;
+      gcRegsData.OffsetYMin = gcRegsData.OffsetY;
+      gcRegsData.OffsetYMax = gcRegsData.OffsetY;
    }
    else
    {
       gcRegsData.WidthInc = FPA_WIDTH_MULT;
+      gcRegsData.WidthMin = MAX(gcRegsData.WidthInc, FPA_WIDTH_MIN);
+
       gcRegsData.HeightInc = FPA_HEIGHT_MULT;
+      gcRegsData.HeightMin = MAX(gcRegsData.HeightInc, FPA_HEIGHT_MIN);
 
-      // We need to take into account the current OffsetX and OffsetY. This replaces the former SwissKnife in the XML file.
-      gcRegsData.WidthMax = FPA_WIDTH_MAX - gcRegsData.OffsetX;
-      gcRegsData.HeightMax = FPA_HEIGHT_MAX - gcRegsData.OffsetY;
+      gcRegsData.OffsetXMin = FPA_OFFSETY_MIN;
+      gcRegsData.OffsetYMin = FPA_OFFSETY_MIN;
 
-      gcRegsData.WidthMin = FPA_WIDTH_MIN;
-      gcRegsData.HeightMin = FPA_HEIGHT_MIN;
+#ifdef FPA_SUBWINDOW_WIDTH_MAX
+      if (gcRegsData.Width <= FPA_SUBWINDOW_WIDTH_MAX)
+      {
+         gcRegsData.OffsetXMax = FPA_SUBWINDOW_WIDTH_MAX - gcRegsData.Width;
+      }
+      else
+      {
+         gcRegsData.OffsetXMax = FPA_WIDTH_MAX - gcRegsData.Width;
+      }
+#else
+      gcRegsData.OffsetXMax = FPA_WIDTH_MAX - gcRegsData.Width;
+#endif
+
+      gcRegsData.OffsetX = MIN(gcRegsData.OffsetX, gcRegsData.OffsetXMax);
+
+#ifdef FPA_SUBWINDOW_HEIGHT_MAX
+      if (gcRegsData.Height <= FPA_SUBWINDOW_HEIGHT_MAX)
+      {
+         gcRegsData.OffsetYMax = FPA_SUBWINDOW_HEIGHT_MAX - gcRegsData.Height;
+      }
+      else
+      {
+         gcRegsData.OffsetYMax = FPA_HEIGHT_MAX - gcRegsData.Height;
+      }
+#else
+      gcRegsData.OffsetYMax = FPA_HEIGHT_MAX - gcRegsData.Height;
+#endif
+
+      gcRegsData.OffsetY = MIN(gcRegsData.OffsetY, gcRegsData.OffsetYMax);
    }
-
-   gcRegsData.WidthMin = MAX(gcRegsData.WidthInc, FPA_WIDTH_MIN);
-   gcRegsData.HeightMin = MAX(gcRegsData.HeightInc, FPA_HEIGHT_MIN);
 }
 
 /**

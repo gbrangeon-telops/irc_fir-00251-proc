@@ -20,12 +20,13 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.1.0
+// Generated from XML camera definition file version 11.2.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
 
 void GC_AECImageFractionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_AECPlusExtrapolationWeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AECResponseTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AECTargetWellFillingCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionArmCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -57,12 +58,10 @@ void GC_CalibrationCollectionSelectorCallback(gcCallbackPhase_t phase, gcCallbac
 void GC_CalibrationCollectionTypeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
-void GC_DeviceBuiltInTestsGlobalResultCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults3Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults4Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
-void GC_DeviceBuiltInTestsResults5Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults7Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults8Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceClockFrequencyCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -165,6 +164,7 @@ void GC_HeightMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ICUPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ICUPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_LockedCenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ManualFilterSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferMOIActivationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -193,8 +193,12 @@ void GC_NDFilterPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackA
 void GC_NDFilterPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_OffsetXCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_OffsetXIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_OffsetXMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_OffsetXMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_OffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_OffsetYIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_OffsetYMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_OffsetYMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_POSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_PixelDataResolutionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_PixelFormatCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
