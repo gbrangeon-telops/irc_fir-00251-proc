@@ -21,7 +21,7 @@
 						<toolChain id="xilinx.gnu.mb.exe.debug.toolchain.1989178780" name="Xilinx MicroBlaze GNU Toolchain" superClass="xilinx.gnu.mb.exe.debug.toolchain">
 							<targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.mb" id="xilinx.mb.target.gnu.base.debug.2048799364" isAbstract="false" name="Debug Platform" superClass="xilinx.mb.target.gnu.base.debug"/>
 							<builder buildPath="${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz}/Debug" enableAutoBuild="false" id="xilinx.gnu.mb.toolchain.builder.debug.901434393" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" stopOnErr="false" superClass="xilinx.gnu.mb.toolchain.builder.debug"/>
-							<tool id="xilinx.gnu.mb.c.toolchain.assembler.debug.388196062" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.debug">
+							<tool command="mb-as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="xilinx.gnu.mb.c.toolchain.assembler.debug.388196062" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.debug">
 								<option id="xilinx.gnu.mb.assembler.usele.782669838" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.assembler.usele" value="true" valueType="boolean"/>
 								<inputType id="xilinx.gnu.assembler.input.1236790797" superClass="xilinx.gnu.assembler.input"/>
 							</tool>
@@ -39,6 +39,7 @@
 									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/SFW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Gating}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/AEC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Buffering}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/BuildInfo}&quot;"/>
@@ -88,6 +89,34 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 								</option>
 								<option id="xilinx.gnu.compiler.symbols.undefined.763444905" name="Undefined symbols (-U)" superClass="xilinx.gnu.compiler.symbols.undefined"/>
+								<option id="xilinx.gnu.compiler.dircategory.includes.1050907507" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/SFW}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Gating}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/AEC}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Buffering}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/BuildInfo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/CalibFiles}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Calibration}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/EHDRI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/ExposureTime}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FAN}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FlashCtrl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FPA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FW}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/GPS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Hder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/ICU}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Irig}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/LUT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/MGT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Trig}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/uffs-v1.3.6}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/usart}&quot;"/>
+									<listOptionValue builtIn="false" value="../../standalone_bsp_0/MCU_microblaze_1/include"/>
+								</option>
 							</tool>
 							<tool id="xilinx.gnu.mb.toolchain.archiver.2032189282" name="MicroBlaze archiver" superClass="xilinx.gnu.mb.toolchain.archiver"/>
 							<tool id="xilinx.gnu.mb.c.toolchain.linker.debug.237210053" name="MicroBlaze gcc linker" superClass="xilinx.gnu.mb.c.toolchain.linker.debug">
@@ -175,6 +204,7 @@
 									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/SFW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Gating}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/AEC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Buffering}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/BuildInfo}&quot;"/>
@@ -222,6 +252,34 @@
 									<listOptionValue builtIn="false" value="ENABLE_PRINTF"/>
 								</option>
 								<option id="xilinx.gnu.compiler.symbols.undefined.1525361363" name="Undefined symbols (-U)" superClass="xilinx.gnu.compiler.symbols.undefined"/>
+								<option id="xilinx.gnu.compiler.dircategory.includes.347364778" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/SFW}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Gating}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/AEC}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Buffering}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/BuildInfo}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/CalibFiles}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Calibration}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/EHDRI}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/ExposureTime}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FAN}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FlashCtrl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FPA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/FW}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/GPS}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Hder}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/ICU}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Irig}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/LUT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/MGT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/Trig}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/uffs-v1.3.6}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_scorpiolwD_230Hz/src/usart}&quot;"/>
+									<listOptionValue builtIn="false" value="../../standalone_bsp_0/MCU_microblaze_1/include"/>
+								</option>
 							</tool>
 							<tool id="xilinx.gnu.mb.toolchain.archiver.148309924" name="MicroBlaze archiver" superClass="xilinx.gnu.mb.toolchain.archiver"/>
 							<tool id="xilinx.gnu.mb.c.toolchain.linker.release.1392032222" name="MicroBlaze gcc linker" superClass="xilinx.gnu.mb.c.toolchain.linker.release">

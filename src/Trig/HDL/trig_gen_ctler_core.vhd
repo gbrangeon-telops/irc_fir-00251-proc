@@ -36,9 +36,11 @@ entity trig_gen_ctler_core is
       
       SFW_SYNC_TRIG                   : in std_logic;
       
-      EXTERNAL_TRIG_OR_GATING         : in std_logic;  -- pulse en provenance de l'exterieur du ROIC
+      EXTERNAL_TRIG                   : in std_logic;  -- pulse en provenance de l'exterieur
       EXTERNAL_TRIG_HIGH_TIME		     : in std_logic_vector(31 downto 0);  
       SEQ_SOFTTRIG                    : in std_logic;  -- pulse en provenance du ublaze
+      
+      GATE                            : in std_logic;
       
       RAW_PULSE                       : out std_logic; -- pulse en envoyé aux conditionneurs de trigs         
       
@@ -72,19 +74,21 @@ architecture RTL of trig_gen_ctler_core is
    signal run                           : std_logic;
    signal integration_detect            : std_logic;
    signal acq_int_last                  : std_logic;
-   signal gated_image                   : std_logic; --pour le header de l'image 
    signal internal_pulse_cntraz_i       : std_logic; -- permet de mettre à '0' le compteur de generation des trigs
    signal trig_out_Allow_HighTimeChange : std_logic;
    signal fpa_trig_Allow_HighTimeChange : std_logic;
 
    signal frame_count        : unsigned(31 downto 0);
-   signal ext_trig_last      : std_logic;
+   signal seq_trig_last      : std_logic;
    signal seq_enable_i       : std_logic;
    signal seq_enable_last_i  : std_logic;
    signal seq_delay_enable_i : std_logic;
    signal seq_trig_i       : std_logic;
    
-   signal clk_counter_rising        : unsigned(31 downto 0); 
+   signal clk_counter_rising        : unsigned(31 downto 0);
+   
+   signal gating_enable : std_logic;
+   signal gate_i        : std_logic;
    
    component sync_reset
       port(
@@ -139,7 +143,7 @@ begin
          STATUS(4) <= '0'; 
          STATUS(3) <= trig_out_Allow_HighTimeChange; 
          STATUS(2) <= fpa_trig_Allow_HighTimeChange; 
-         STATUS(1) <= gated_image; 
+         STATUS(1) <= '0'; 
          STATUS(0) <= done;   -- done du contrôleur 
       end if;
    end process;
@@ -171,20 +175,18 @@ begin
    end process; 
    
    -----------------------------------------------------------------
-   -- detection  du front montant de acq_int et du gated_image
+   -- detection  du front montant de acq_int
    ---------------------------------------------------------------------	
    acqInt_sync_proc: process(CLK)
    begin		   
       if rising_edge(CLK) then
          if sreset ='1' then 
             integration_detect <= '0';	
-            acq_int_last <= '1'; 
-            gated_image <= '0';
+            acq_int_last <= '1';
          else 					   				
             acq_int_last <= ACQ_INT;
             if acq_int_last = '0' and ACQ_INT = '1' then 
-               integration_detect <= '1';
-               gated_image <= EXTERNAL_TRIG_OR_GATING;	
+               integration_detect <= '1';	
             else
                integration_detect <= '0';
             end if;					
@@ -206,7 +208,10 @@ begin
             raw_pulse_i <= '0';
             internal_pulse_period_i <= (others =>'0');
             internal_pulse_cntraz_i <= '1';
+            
          else				
+            gate_i <= GATE;
+            
             case mode_sm is 
                
                --------------
@@ -217,10 +222,14 @@ begin
                   fpa_trig_param_i.RUN  <= '0';-- arrêt des conditionneurs de trigs
                   trig_out_param_i.RUN <= '0';
                   internal_pulse_cntraz_i <='1';
+                  gating_enable <= '0';
 
                   if  fpa_trig_done = '1' and trig_out_done = '1'  and run = '1'  then 
                      if  CONFIG.MODE = INTTRIG then						
                         mode_sm <= IntTrig_st;						
+                     elsif CONFIG.MODE = GATING then						
+                        mode_sm <= IntTrig_st;
+                        gating_enable <= '1';
                      elsif CONFIG.MODE = EXTTRIG then			
                         mode_sm <= ExtTrig_st;
                         --fpa_trig_param_i.HIGH_TIME <= (others =>'1');-- donne le temps à la mesure du HIGH_TIME (sortie du processeur de trig  bloqué à '1' en attentant la fin de la mesure)
@@ -254,16 +263,24 @@ begin
                      fpa_trig_param_i.HIGH_TIME  <= CONFIG.HIGH_TIME; -- peut changer sans probleme car le temps d'integration change sans reconfiguration de la camera
                   end if;
                   fpa_trig_param_i.TRIG_ACTIV <= CONFIG.TRIG_ACTIV;
-                  fpa_trig_param_i.ACQ_WINDOW <= CONFIG.ACQ_WINDOW;
+                  if gating_enable = '1' and gate_i = '0' then
+                     fpa_trig_param_i.ACQ_WINDOW <= '0'; -- force des extra_trigs
+                  else
+                     fpa_trig_param_i.ACQ_WINDOW <= CONFIG.ACQ_WINDOW;
+                  end if;
                   
                   -- parametres pour le processeur de trigs du FPA distant (trig out)
-                  trig_out_param_i.RUN        <= '1'; -- EXTERNAL_TRIG_OR_GATING;  ENO: 30 janv2012 : changement de EXTERNAL_TRIG_OR_GATING à '1' sur demande de PDA
+                  trig_out_param_i.RUN        <= '1';
                   trig_out_param_i.DLY      <= CONFIG.TRIGOUT_DLY;
                   if trig_out_Allow_HighTimeChange = '1' then     --changement en live du HiGTH_TIME des trigs, decouple de celui du fpa_trig à cause du possible delai entre les Allow_HighTimeChange
                      trig_out_param_i.HIGH_TIME   <= CONFIG.HIGH_TIME;
                   end if;
                   trig_out_param_i.TRIG_ACTIV <= CONFIG.TRIG_ACTIV;
-                  trig_out_param_i.ACQ_WINDOW <= CONFIG.ACQ_WINDOW;
+                  if gating_enable = '1' and gate_i = '0' then
+                     trig_out_param_i.ACQ_WINDOW <= '0'; -- force des extra_trigs
+                  else
+                     trig_out_param_i.ACQ_WINDOW <= CONFIG.ACQ_WINDOW;
+                  end if;
                   
                   -- detection arrêt
                   if run = '0' then -- arreter les conditionneurs
@@ -277,7 +294,7 @@ begin
                when ExtTrig_st =>						
                   internal_pulse_cntraz_i <= '0';
                   -- pulse envoyé aux processeurs de trigs
-                  raw_pulse_i <= EXTERNAL_TRIG_OR_GATING and seq_enable_i;
+                  raw_pulse_i <= EXTERNAL_TRIG and seq_enable_i;
                   
                   -- pour le FPA local (trig interne)
                   fpa_trig_param_i.RUN        <= '1';	 
@@ -315,7 +332,7 @@ begin
                   fpa_trig_param_i.ACQ_WINDOW <= CONFIG.ACQ_WINDOW;
                   
                   -- parametres pour le processeur de trigs du FPA distant (trig out)
-                  trig_out_param_i.RUN        <= '1'; -- EXTERNAL_TRIG_OR_GATING;  ENO: 30 janv2012 : changement de EXTERNAL_TRIG_OR_GATING à '1' sur demande de PDA
+                  trig_out_param_i.RUN        <= '1';
                   trig_out_param_i.DLY      <= CONFIG.TRIGOUT_DLY;
                   if trig_out_Allow_HighTimeChange = '1' then     --changement en live du HiGTH_TIME des trigs, decouple de celui du fpa_trig à cause du possible delai entre les Allow_HighTimeChange
                      trig_out_param_i.HIGH_TIME   <= CONFIG.HIGH_TIME;
@@ -431,12 +448,12 @@ begin
       end if;		
    end process; 
    
-   seq_trig_i <= SEQ_SOFTTRIG when CONFIG.seq_trigsource = TRIGSEQ_SOFTWARE else EXTERNAL_TRIG_OR_GATING;
+   seq_trig_i <= SEQ_SOFTTRIG when CONFIG.seq_trigsource = TRIGSEQ_SOFTWARE else EXTERNAL_TRIG;
    
    TRIGSEQ_PROC : process(CLK)
    begin
       if rising_edge(CLK) then
-         ext_trig_last <= seq_trig_i;
+         seq_trig_last <= seq_trig_i;
          
          if sreset = '1' or fpa_trig_param_i.acq_window = '0' then
             seq_enable_i <= '0';
@@ -444,7 +461,7 @@ begin
          else
             if CONFIG.seq_trigsource = TRIGSEQ_SOFTWARE then
                -- CONFIG.seq_activ = RISINGEDGE si on utilise le trigger software
-               if (seq_trig_i = '1' and ext_trig_last = '0') then
+               if (seq_trig_i = '1' and seq_trig_last = '0') then
                   seq_enable_i <= '1';
                   frame_count <= (others => '0');
                end if;
@@ -452,19 +469,19 @@ begin
          
                case CONFIG.trig_activ is
                   when RISINGEDGE =>
-                     if (seq_trig_i = '1' and ext_trig_last = '0') then
+                     if (seq_trig_i = '1' and seq_trig_last = '0') then
                         seq_enable_i <= '1';
                         frame_count <= (others => '0');
                      end if;
                      
                   when FALLINGEDGE =>
-                     if (seq_trig_i = '0' and ext_trig_last = '1') then
+                     if (seq_trig_i = '0' and seq_trig_last = '1') then
                         seq_enable_i <= '1';
                         frame_count <= (others => '0');
                      end if;
                      
                   when ANYEDGE =>
-                     if (seq_trig_i /= ext_trig_last) then
+                     if (seq_trig_i /= seq_trig_last) then
                         seq_enable_i <= '1';
                         frame_count <= (others => '0');
                      end if;

@@ -47,7 +47,7 @@ package flag_define is
    DISABLE,
    to_unsigned(0,s_flag_cfg.delay'LENGTH), 
    to_unsigned(1,s_flag_cfg.frame_count'LENGTH),
-   '0',
+   FLAG_TRIG_HARDWARE,
    '0'
    );
    

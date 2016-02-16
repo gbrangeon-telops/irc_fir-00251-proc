@@ -56,6 +56,7 @@
 #include "UART_Utils.h"
 #include "NetworkInterface.h"
 #include "flagging.h"
+#include "gating.h"
 #include "DebugTerminal.h"
 #include <string.h>
 
@@ -74,6 +75,7 @@ t_bufferManager gBufManager = Buffering_Intf_Ctor(TEL_PAR_TEL_BUFFERING_CTRL_BAS
 t_EhdriManager gEHDRIManager = Ehdri_Intf_Ctor(TEL_PAR_TEL_EHDRI_CTRL_BASEADDR);
 t_mgt gMGT = MGT_Ctor(TEL_PAR_TEL_MGT_CTRL_BASEADDR);
 t_FlagCfg gFlagging_ctrl = Flagging_config_Ctor(TEL_PAR_TEL_TRIGGER_CTRL_BASEADDR + FLAGGING_AXILITE_OFFSET);
+t_GatingCfg gGating_ctrl = Gating_config_Ctor(TEL_PAR_TEL_TRIGGER_CTRL_BASEADDR + GATING_AXILITE_OFFSET);
 t_SfwCtrl gSFW_Ctrl = sfw_Intf_Ctor(TEL_PAR_TEL_SFW_CTRL_BASEADDR);
 
 XIntc gProcIntc;
@@ -767,8 +769,10 @@ IRC_Status_t Proc_CAL_Init()
 IRC_Status_t Proc_Trigger_Init()
 {
    TRIG_Init(&gTrig, &gcRegsData);
+   FLAG_Init(&gFlagging_ctrl);
+   GATING_Init(&gGating_ctrl);
 
-   return FLAG_Init(&gFlagging_ctrl);
+   return IRC_SUCCESS;
 }
 
 /**

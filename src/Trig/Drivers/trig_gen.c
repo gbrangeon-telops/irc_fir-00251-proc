@@ -92,6 +92,7 @@
 #define VHD_SINGLE_TRIG       0x02 
 #define VHD_SFW_TRIG          0x03
 #define VHD_SEQ_TRIG          0x04
+#define VHD_GATING            0x05
 
 // Define des trigs d'activation dans le VHD
 #define VHD_RisingEdge        0x00
@@ -208,7 +209,11 @@ void TRIG_SendConfigGC(t_Trig *a, const gcRegistersData_t *pGCRegs)
          }
          else // FWM_Fixed or FWM_AsynchronouslyRotating
          {
-            a->TRIG_Mode = VHD_INTTRIG;
+            // Internal trigs
+            if ((TriggerModeAry[TS_Gating] == TM_On) && (TriggerModeAry[TS_Flagging] == TM_Off))
+               a->TRIG_Mode = VHD_GATING; // GATE input is enabled
+            else
+               a->TRIG_Mode = VHD_INTTRIG; // GATE input is disabled
          }
 
          a->TRIG_FpaTrigDly = 0;

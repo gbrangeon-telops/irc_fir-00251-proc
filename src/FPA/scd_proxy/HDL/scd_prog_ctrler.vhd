@@ -134,7 +134,7 @@ begin
    SERIAL_EN <= serial_en_i;
    SERIAL_ABORT <= serial_abort_i;
    INT_INDX <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
-   FRAME_ID <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT et FPA_INT
+   FRAME_ID <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT
    ACQ_INT <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
    FPA_INT <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
    PROXY_TRIG <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_driver_output 
@@ -568,7 +568,7 @@ begin
                         int_gen_fsm <= check_fpa_st;
                      end if;
                   elsif XTRA_TRIG = '1' then    -- 
-                     --frame_id_i <= frame_id_i + 1; -- on ne change pas d,ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
+                     --frame_id_i <= frame_id_i + 1; -- on ne change pas d'ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
                      int_indx_i <= fpa_intf_cfg_i.scd_int.scd_int_indx;
                      acq_frame <= '0';
                      if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              

@@ -30,6 +30,7 @@
 #include "FlashDynamicValues.h"
 #include "BuiltInTests.h"
 #include "flagging.h"
+#include "gating.h"
 #include "BufferManager.h"
 #include "proc_init.h"
 #include "AEC.h"
@@ -119,6 +120,7 @@ void Acquisition_Arm()
    extern t_calib gCal;
    extern t_EhdriManager gEHDRIManager;
    extern t_FlagCfg gFlagging_ctrl;
+   extern t_GatingCfg gGating_ctrl;
 
    TRIG_SendConfigGC(&gTrig, &gcRegsData);
 
@@ -134,6 +136,7 @@ void Acquisition_Arm()
    HDER_SendHeaderGC(&gHderInserter, &gcRegsData);
 
    FLAG_SendConfigGC(&gFlagging_ctrl, &gcRegsData);
+   GATING_SendConfigGC(&gGating_ctrl, &gcRegsData);
 
    AEC_Arm();
 

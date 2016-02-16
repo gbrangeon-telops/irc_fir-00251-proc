@@ -32,12 +32,12 @@
 // #define FH_VERBOSE
 // #define FH_RX_VERBOSE
 // #define FH_TX_VERBOSE
+#define FLAGGING_VERBOSE
 // #define FM_VERBOSE
 // #define FS_VERBOSE
 // #define FU_VERBOSE
 // #define FW_VERBOSE
-// #define SFW_VERBOSE
-
+#define GATING_VERBOSE
 // #define GCM_VERBOSE
 // #define GCP_VERBOSE
 // #define GPS_VERBOSE
@@ -46,6 +46,7 @@
 // #define NDF_VERBOSE
 // #define PLEORA_VERBOSE
 // #define PM_VERBOSE
+// #define SFW_VERBOSE
 // #define SREC_VERBOSE
 // #define TM_VERBOSE
 // #define XADC_VERBOSE

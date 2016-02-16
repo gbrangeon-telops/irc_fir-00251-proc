@@ -74,6 +74,9 @@ do D:\Telops\FIR-00251-Proc\src\eHDRI\HDL\build_ehdri_intf.do
 #Flagging
 do D:\Telops\FIR-00251-Proc\src\Flagging\HDL\flagging_compile.do
 
+#Gating
+do D:\Telops\FIR-00251-Proc\src\Gating\HDL\gating_compile.do
+
 #SFW
 do D:\Telops\FIR-00251-Proc\src\SFW\HDL\build_SFW.do
 

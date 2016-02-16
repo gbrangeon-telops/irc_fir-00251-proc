@@ -43,6 +43,7 @@
 #include "Acquisition.h"
 #include "FlashDynamicValues.h"
 #include "flagging.h"
+#include "gating.h"
 #include "BuiltInTests.h"
 
 extern t_Trig gTrig;
@@ -55,6 +56,7 @@ extern t_EhdriManager gEHDRIManager;
 extern t_calib gCal;
 extern t_HderInserter gHderInserter;
 extern t_FlagCfg gFlagging_ctrl;
+extern t_GatingCfg gGating_ctrl;
 
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 extern float FWExposureTime[8];
@@ -2976,6 +2978,7 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
          gcRegsData.ExposureTime7 = FWExposureTime[6];
          gcRegsData.ExposureTime8 = FWExposureTime[7];
          TriggerModeAry[TS_AcquisitionStart] = TM_Off;
+         TriggerModeAry[TS_Gating] = TM_Off;
       }
       if(flashSettings.FWType == FW_SYNC)
          SFW_UpdateSFWMode(gcRegsData.FWMode);
@@ -4760,7 +4763,7 @@ void GC_TriggerSoftwareCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
                break;
 
             case TS_Gating:
-               // TODO Manage gating software trigger here.
+               GATING_SendTrig(&gGating_ctrl);
                break;
          }
       }

@@ -21,7 +21,7 @@
 						<toolChain id="xilinx.gnu.mb.exe.debug.toolchain.1989178780" name="Xilinx MicroBlaze GNU Toolchain" superClass="xilinx.gnu.mb.exe.debug.toolchain">
 							<targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.mb" id="xilinx.mb.target.gnu.base.debug.2048799364" isAbstract="false" name="Debug Platform" superClass="xilinx.mb.target.gnu.base.debug"/>
 							<builder buildPath="${workspace_loc:/fir_00251_proc_isc0207A}/Debug" enableAutoBuild="false" id="xilinx.gnu.mb.toolchain.builder.debug.901434393" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" stopOnErr="false" superClass="xilinx.gnu.mb.toolchain.builder.debug"/>
-							<tool id="xilinx.gnu.mb.c.toolchain.assembler.debug.388196062" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.debug">
+							<tool command="mb-as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="xilinx.gnu.mb.c.toolchain.assembler.debug.388196062" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.debug">
 								<option id="xilinx.gnu.mb.assembler.usele.782669838" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.assembler.usele" value="true" valueType="boolean"/>
 								<inputType id="xilinx.gnu.assembler.input.1236790797" superClass="xilinx.gnu.assembler.input"/>
 							</tool>
@@ -34,11 +34,12 @@
 								<option id="xilinx.gnu.mb.compiler.inferred.usele.1383401" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.compiler.inferred.usele" value="true" valueType="boolean"/>
 								<option id="xilinx.gnu.mb.compiler.inferred.fpu.2106184344" name="FPU" superClass="xilinx.gnu.mb.compiler.inferred.fpu" value="xilinx.gnu.mb.compiler.inferred.fpu.basic" valueType="enumerated"/>
 								<option id="xilinx.gnu.mb.compiler.inferred.mul.116213090" name="Hardware Multiplier" superClass="xilinx.gnu.mb.compiler.inferred.mul" value="xilinx.gnu.mb.compiler.inferred.mul.32bit" valueType="enumerated"/>
-								<option id="xilinx.gnu.compiler.inferred.swplatform.includes.36948888" name="Software Platform Include Path" superClass="xilinx.gnu.compiler.inferred.swplatform.includes" valueType="includePath"/>
+								<option id="xilinx.gnu.compiler.inferred.swplatform.includes.36948888" name="Software Platform Include Path" superClass="xilinx.gnu.compiler.inferred.swplatform.includes"/>
 								<option id="xilinx.gnu.compiler.dircategory.includes.829808362" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/SFW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Gating}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/AEC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Buffering}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/BuildInfo}&quot;"/>
@@ -90,18 +91,21 @@
 								<option id="xilinx.gnu.compiler.symbols.undefined.763444905" name="Undefined symbols (-U)" superClass="xilinx.gnu.compiler.symbols.undefined"/>
 								<option id="xilinx.gnu.compiler.dircategory.includes.1680554078" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/SFW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Gating}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/AEC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Buffering}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/BuildInfo}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/CalibFiles}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Calibration}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/EHDRI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/ExposureTime}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FAN}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FlashCtrl}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FPA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/GPS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Hder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/ICU}&quot;"/>
@@ -110,7 +114,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/MGT}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Trig}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/uffs-v1.3.6}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/USART}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/usart}&quot;"/>
 									<listOptionValue builtIn="false" value="../../standalone_bsp_0/MCU_microblaze_1/include"/>
 								</option>
 							</tool>
@@ -192,11 +196,12 @@
 								<option id="xilinx.gnu.mb.compiler.inferred.usele.983846503" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.compiler.inferred.usele" value="true" valueType="boolean"/>
 								<option id="xilinx.gnu.mb.compiler.inferred.fpu.1660881162" name="FPU" superClass="xilinx.gnu.mb.compiler.inferred.fpu" value="xilinx.gnu.mb.compiler.inferred.fpu.basic" valueType="enumerated"/>
 								<option id="xilinx.gnu.mb.compiler.inferred.mul.871799514" name="Hardware Multiplier" superClass="xilinx.gnu.mb.compiler.inferred.mul" value="xilinx.gnu.mb.compiler.inferred.mul.32bit" valueType="enumerated"/>
-								<option id="xilinx.gnu.compiler.inferred.swplatform.includes.669980917" name="Software Platform Include Path" superClass="xilinx.gnu.compiler.inferred.swplatform.includes" valueType="includePath"/>
+								<option id="xilinx.gnu.compiler.inferred.swplatform.includes.669980917" name="Software Platform Include Path" superClass="xilinx.gnu.compiler.inferred.swplatform.includes"/>
 								<option id="xilinx.gnu.compiler.dircategory.includes.1538872305" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/SFW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Gating}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/AEC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Buffering}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/BuildInfo}&quot;"/>
@@ -246,18 +251,21 @@
 								<option id="xilinx.gnu.compiler.symbols.undefined.1525361363" name="Undefined symbols (-U)" superClass="xilinx.gnu.compiler.symbols.undefined"/>
 								<option id="xilinx.gnu.compiler.dircategory.includes.102660834" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;D:\Telops\FIR-00251-Proc\src\sw&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/SFW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Flagging}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Gating}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/AEC}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Buffering}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/BuildInfo}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/CalibFiles}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Calibration}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/EHDRI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/ExposureTime}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FAN}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FlashCtrl}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FPA}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/FW}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/GPS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Hder}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/ICU}&quot;"/>
@@ -266,7 +274,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/MGT}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/Trig}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/uffs-v1.3.6}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/USART}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/fir_00251_proc_isc0207A/src/usart}&quot;"/>
 									<listOptionValue builtIn="false" value="../../standalone_bsp_0/MCU_microblaze_1/include"/>
 								</option>
 							</tool>

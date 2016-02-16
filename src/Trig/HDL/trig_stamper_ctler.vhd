@@ -31,7 +31,7 @@ entity trig_stamper_ctler is
       -- Signal from FPA which triggers the latching of a time stamp.
       FPA_IMG_INFO            : in img_info_type; 
       
-      -- External trigger that also acts as a "gating" signal
+      -- External trigger
       EXT_TRIG                : in std_logic;
       
       -- New time from MB
@@ -42,9 +42,6 @@ entity trig_stamper_ctler is
       
       -- Live POSIX Time
       POSIX_TIME              : out POSIX_time_type;
-      
-      -- Timestamp and gating signal
-      GATING                  : out std_logic;
       
       -- interface avec le module GPS/IRIG
       PPS_SYNC                : out std_logic;
@@ -187,13 +184,12 @@ begin
             seconds_cnt <= seconds_cnt + 1;   
          end if; 
          
-         -- Latching of time stamp and gating signal
+         -- Latching of time stamp
          if exposure_feedbk_re = '1' then
             time_stamp_i.Seconds <= seconds_cnt;    
             time_stamp_i.SubSeconds <= subseconds_cnt;
             img_time_stamp_rdy <= '1';
             frame_id <= std_logic_vector(FPA_IMG_INFO.FRAME_ID);
-            GATING <= ext_trig_sync;
          else
             img_time_stamp_rdy <= '0'; 
          end if;
@@ -203,7 +199,6 @@ begin
             seconds_cnt <= (others => '0');   
             subseconds_temp_cnt <= (others => '0'); 
             subseconds_wrap <= '0';
-            GATING <= '0';
             img_time_stamp_rdy <= '0'; 
          end if;          
          

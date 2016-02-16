@@ -198,7 +198,7 @@ begin
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
-            flag_cfg_o <= flag_cfg_default;  -- la config par defaut est faite de sorte à lancer les triggers en mode XTRA_TRIG
+            flag_cfg_o <= flag_cfg_default;
             trig_o <= '0';
          else
             

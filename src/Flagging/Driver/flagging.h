@@ -44,13 +44,13 @@ typedef struct s_FlagCfg t_FlagCfg;
 #define FLAGMODE_LEVELHIGH       0x4
 #define FLAGMODE_LEVELLOW        0x5
 
-#define FLAGSOURCE_TRIGIN        0x0
+#define FLAGSOURCE_EXTERNAL      0x0
 #define FLAGSOURCE_SOFTWARE      0x1
 
 #define FLAGGING_AXILITE_OFFSET  0x400
 
 /***************** Macros (Inline Functions) Definitions ********************/
-#define Flagging_config_Ctor(add) {sizeof(t_FlagCfg)/4 - 2, add, FLAGMODE_DISABLE, 0, 0, FLAGSOURCE_TRIGIN}
+#define Flagging_config_Ctor(add) {sizeof(t_FlagCfg)/4 - 2, add, FLAGMODE_DISABLE, 0, 0, FLAGSOURCE_EXTERNAL}
 
 IRC_Status_t FLAG_Init(t_FlagCfg *a);
 void FLAG_SendConfigGC(t_FlagCfg *a, const gcRegistersData_t *pGCRegs);

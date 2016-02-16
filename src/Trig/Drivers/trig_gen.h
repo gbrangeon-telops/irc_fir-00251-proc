@@ -28,9 +28,6 @@
 #define TRIG_BASE_CLOCK_FREQ_HZ    100000000.0  // horloge de referene des trigs passe à 100 MHz
 
 
-// modes du trigger
-enum TRIG_Mode_Enum {InternalTrig =0, ExternalTrig = 1, SingleTrig = 2};
-
 // structure de configuration du trigger
 struct s_Trig
 {

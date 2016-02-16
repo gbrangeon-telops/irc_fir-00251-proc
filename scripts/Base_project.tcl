@@ -115,6 +115,9 @@ set filelist  [concat $filelist [glob -nocomplain $src_dir/QuadADC/HDL/*.vhd]]
 #FLAGGING
 set filelist  [concat $filelist [glob -nocomplain $src_dir/Flagging/HDL/*.vhd]]
 
+#GATING
+set filelist  [concat $filelist [glob -nocomplain $src_dir/Gating/HDL/*.vhd]]
+
 #SFW
 set filelist  [concat $filelist [glob -nocomplain $src_dir/SFW/HDL/*.vhd]]
 

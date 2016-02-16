@@ -36,11 +36,7 @@ architecture rtl of trig_gen_status is
    signal TimeOffset_err                  : std_logic; 
    signal TSfifo_cleared                  : std_logic; 
    signal Overwrite_done                  : std_logic; 
-   signal TimeStamp_Ready                 : std_logic; 
-   signal Trig_ctler_done                 : std_logic;
-   signal Gated_image                     : std_logic;
-   signal trig_out_Allow_HighTimeChange   : std_logic;
-   signal fpa_trig_Allow_HighTimeChange   : std_logic;
+   signal TimeStamp_Ready                 : std_logic;
    
    
    component sync_reset
@@ -56,20 +52,15 @@ begin
    --output map             
    ERROR <= '0';
    STATUS(15 downto 9) <= (others =>'0');
-   STATUS(8) <= trig_out_Allow_HighTimeChange;
-   STATUS(7) <= fpa_trig_Allow_HighTimeChange;
-   STATUS(6) <= Gated_image;
+   STATUS(8) <= TRIG_CTLER_STAT(3);
+   STATUS(7) <= TRIG_CTLER_STAT(2);
+   STATUS(6) <= TRIG_CTLER_STAT(1);
    STATUS(5) <= '0';    
    STATUS(4) <= '0';
    STATUS(3) <= '0';
    STATUS(2) <= '0';
    STATUS(1) <= '0';
-   STATUS(0) <= Trig_ctler_done;	
-   
-   trig_out_Allow_HighTimeChange <= TRIG_CTLER_STAT(3);  -- pour savoir quand changer en live la durée haute des trigs en accord avec le changement live du temps d'integration
-   fpa_trig_Allow_HighTimeChange <= TRIG_CTLER_STAT(2);  -- pour savoir quand changer en live la durée haute des trigs en accord avec le changement live du temps d'integration 
-   Gated_image     <= TRIG_CTLER_STAT(1);
-   Trig_ctler_done <= TRIG_CTLER_STAT(0); 
+   STATUS(0) <= TRIG_CTLER_STAT(0); 
    
    
    -- sync reset

@@ -24,11 +24,12 @@ use work.tel2000.all;
 package trig_define is    	  
    
    -- les differents modes d'operation du controleur
-   constant INTTRIG                : std_logic_vector(7 downto 0) := x"00";  -- trig interne gating interne ou externe
+   constant INTTRIG                : std_logic_vector(7 downto 0) := x"00";  -- trig interne
    constant EXTTRIG                : std_logic_vector(7 downto 0) := x"01";  -- trig externe
    constant SINGLE_TRIG            : std_logic_vector(7 downto 0) := x"02";  -- un seul trig (mode speciale calibration) 
    constant SFW_TRIG               : std_logic_vector(7 downto 0) := x"03";  -- trig quand un nouveau filtre spectral est valide sur le FPA
    constant SEQ_TRIG               : std_logic_vector(7 downto 0) := x"04";  -- trig de sequence
+   constant GATING                 : std_logic_vector(7 downto 0) := x"05";  -- gating des trigs internes
    
    -- Mapping des types d'activation du Trig: doit etre rigoureusement les valeurs dans le fichier trig.h
    constant RisingEdge             : std_logic_vector(7 downto 0) := x"00";   -- TriggerActivation  sur  RisingEdge  
