@@ -1009,31 +1009,20 @@ void GC_ComputeImageLimits()
 {
    if (gcRegsData.CenterImage)
    {
-      gcRegsData.WidthInc = lcm(FPA_WIDTH_MULT, 2 * FPA_OFFSETX_MULT);
-      gcRegsData.WidthMin = roundUp(FPA_WIDTH_MIN, gcRegsData.WidthInc);
-
-      gcRegsData.HeightInc = lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT);
-      gcRegsData.HeightMin = roundUp(FPA_HEIGHT_MIN, gcRegsData.HeightInc);
-
+      // Offset X limits
       gcRegsData.OffsetX = (FPA_WIDTH_MAX - gcRegsData.Width) / 2;
       gcRegsData.OffsetXMin = gcRegsData.OffsetX;
       gcRegsData.OffsetXMax = gcRegsData.OffsetX;
 
+      // Offset Y limits
       gcRegsData.OffsetY = (FPA_HEIGHT_MAX - gcRegsData.Height) / 2;
       gcRegsData.OffsetYMin = gcRegsData.OffsetY;
       gcRegsData.OffsetYMax = gcRegsData.OffsetY;
    }
    else
    {
-      gcRegsData.WidthInc = FPA_WIDTH_MULT;
-      gcRegsData.WidthMin = MAX(gcRegsData.WidthInc, FPA_WIDTH_MIN);
-
-      gcRegsData.HeightInc = FPA_HEIGHT_MULT;
-      gcRegsData.HeightMin = MAX(gcRegsData.HeightInc, FPA_HEIGHT_MIN);
-
+      // Offset X limits
       gcRegsData.OffsetXMin = FPA_OFFSETX_MIN;
-      gcRegsData.OffsetYMin = FPA_OFFSETY_MIN;
-
 #ifdef FPA_SUBWINDOW_WIDTH_MAX
       if (gcRegsData.Width <= FPA_SUBWINDOW_WIDTH_MAX)
       {
@@ -1046,9 +1035,10 @@ void GC_ComputeImageLimits()
 #else
       gcRegsData.OffsetXMax = FPA_WIDTH_MAX - gcRegsData.Width;
 #endif
-
       gcRegsData.OffsetX = MIN(gcRegsData.OffsetX, gcRegsData.OffsetXMax);
 
+      // Offset Y limits
+      gcRegsData.OffsetYMin = FPA_OFFSETY_MIN;
 #ifdef FPA_SUBWINDOW_HEIGHT_MAX
       if (gcRegsData.Height <= FPA_SUBWINDOW_HEIGHT_MAX)
       {
@@ -1061,7 +1051,6 @@ void GC_ComputeImageLimits()
 #else
       gcRegsData.OffsetYMax = FPA_HEIGHT_MAX - gcRegsData.Height;
 #endif
-
       gcRegsData.OffsetY = MIN(gcRegsData.OffsetY, gcRegsData.OffsetYMax);
    }
 }
