@@ -438,7 +438,7 @@ void Power_SM()
 
                      if (flashSettings.ActualizationEnabled && flashSettings.ActualizationAtPowerOn)
                      {
-                        startBetaCorrectionSM(true);
+                        startActualization(true);
                      }
                      break;
 

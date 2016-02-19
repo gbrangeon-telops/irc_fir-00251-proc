@@ -61,7 +61,12 @@
 
 #define DELTA_BETA_NUM_BITS 11
 
-#define ACT_MAX_N_COADD (uint32_t)256 // maximum number of images to coadd
+#define ACT_DEFAULT_FPS         (float)25.0f
+#define ACT_MAX_N_COADD         (uint32_t)256 // maximum number of images to coadd
+
+#define ACT_NUM_DEBUG_FRAMES   12
+
+#define MAX_FRAME_SIZE ((uint32_t)(FPA_HEIGHT_MAX+2) * (uint32_t)FPA_WIDTH_MAX)
 
 #define ACT_FILENAME (char*)"Actualization.tsac"
 
@@ -73,26 +78,58 @@
    #define KELVIN_TO_CELSIUS (float)-273.15f
 #endif
 
+#define ACT_STATES(ACTION) \
+		ACTION(ACT_Init)                    /**< initial state with some initialisations */ \
+		ACTION(ACT_Idle)                    /**< wait for a start actualization command */ \
+		ACTION(ACT_Start)                   /**< find the reference block (if using ICU) an trigger a load command to the calibration manager */ \
+		ACTION(ACT_WaitForCalibData)        /**< wait until the calibration manager has finished loading the reference block */ \
+		ACTION(ACT_TransitionICU)           /**< waiting during while ICU is in transition */ \
+		ACTION(ACT_WaitICU)                 /**< waiting phases for ICU measurements */ \
+		ACTION(ACT_StabilizeICU)            /**< ICU temperature stabilization phases */ \
+		ACTION(ACT_StartAECAcquisition)     /**< choose a best exposure time in AEC mode*/ \
+		ACTION(ACT_StartAEC)                /**< once configure, start acquisition with AEC active*/ \
+		ACTION(ACT_StopAECAcquisition)      /**< stop acquisition after some time */ \
+		ACTION(ACT_StartAcquisition)        /**< configure the buffer mode and trigger the buffered acquisition */ \
+		ACTION(ACT_WaitSequenceReady)       /**< wait for the buffered sequence to be ready */ \
+		ACTION(ACT_FinalizeSequence)        /**< stop acquisition and initialise variables for average computation */ \
+		ACTION(ACT_ComputeAveragedImage)    /**< the buffered sequence is accumulated (block-computation to yield some time to other processes)*/ \
+		ACTION(ACT_ComputeBlackBodyFCal)    /**< the scalar value FCalBB is computed from the temperature measurement */ \
+		ACTION(ACT_ComputeDeltaBeta)        /**< for each pixel, compute delta-beta (block-computation to yield some time to other processes) */ \
+		ACTION(ACT_DetectBadPixels)         /**< perform detection of bad pixel based on noise and flicker criteria */ \
+		ACTION(ACT_ApplyBadPixelMap)        /**< merge the bad pixel map with the delta beta map */ \
+		ACTION(ACT_WriteActualizationFile)  /**< the file writer state machine is on during this state */ \
+		ACTION(ACT_Finalize)                /**< a reload calibration command is issued to the calibration manager */
+
+#define BPD_STATES(ACTION) \
+		ACTION(BPD_Idle) \
+		ACTION(BPD_StartAcquisition) \
+		ACTION(BPD_WaitSequenceReady) \
+		ACTION(BPD_FinalizeSequence) \
+		ACTION(BPD_ComputeStatistics) \
+		ACTION(BPD_BuildCriteria) \
+		ACTION(BPD_AdjustThresholds) \
+		ACTION(BPD_UpdateBPMap) \
+		ACTION(BPD_DebugState) \
+		ACTION(BPD_Finalize)
+
+#define GENERATE_ENUM(x) x,
+#define GENERATE_STRING(x) #x,
+
 typedef enum {
-   BC_Init = 0,                /**< initial state with some initialisations */
-   BC_Idle,                    /**< wait for a start actualization command */
-   BC_Start,              /**< find the reference block (if using ICU) an trigger a load command to the calibration manager */
-   BC_WaitForCalibData,        /**< wait until the calibration manager has finished loading the reference block */
-   BC_TransitionICU,           /**< waiting during while ICU is in transition */
-   BC_WaitICU,                 /**< waiting phases for ICU measurements */
-   BC_StabilizeICU,            /**< ICU temperature stabilization phases */
-   BC_StartAECAcquisition,     /**< choose a best exposure time in AEC mode*/
-   BC_StartAEC,                /**< */
-   BC_StopAECAcquisition,      /**< */
-   BC_StartAcquisition,        /**< configure the buffer mode and trigger the buffered acquisition */
-   BC_WaitSequenceReady,       /**< wait for the buffered sequence to be ready */
-   BC_FinalizeSequence,
-   BC_ComputeAveragedImage,    /**< the buffered sequence is accumulated (block-computation to yield some time to other processes)*/
-   BC_ComputeBlackBodyFCal,    /**< the scalar value FCalBB is computed from the temperature measurement */
-   BC_ComputeDeltaBeta,        /**< for each pixel, compute delta-beta (block-computation to yield some time to other processes) */
-   BC_WriteActualizationFile,  /**< the file writer state machine is on during this state */
-   BC_Finalize                 /**< a reload calibration command is issued to the calibration manager */
-}  BC_State_t;
+   ACT_STATES(GENERATE_ENUM)
+} ACT_State_t;
+
+static const char *ACT_State_str[] __attribute__ ((unused)) = {
+      ACT_STATES(GENERATE_STRING)
+};
+
+typedef enum {
+   BPD_STATES(GENERATE_ENUM)
+} BPD_State_t;
+
+static const char *BPD_State_str[] __attribute__ ((unused)) = {
+      BPD_STATES(GENERATE_STRING)
+};
 
 /**< a datatype for keeping a copy of the genicam register to get tampered with during this process */
 typedef struct {
@@ -117,7 +154,7 @@ typedef struct {
    uint32_t MemoryBufferMode;
    uint32_t OffsetX;
    uint32_t OffsetY;
-} BC_GCRegsBackup_t;
+} ACT_GCRegsBackup_t;
 
 typedef struct {
    uint8_t TemperatureSelector;
@@ -131,25 +168,97 @@ typedef struct {
    uint32_t Timeout2;
 } ICUParams_t;
 
+typedef struct {
+   uint32_t startIndex; // index of first element to process
+   uint32_t blockIdx; // current block being processed
+   uint32_t blockLength; // number of elements to process in the next pass
+   uint32_t initialBlockLength;
+   uint32_t totalLength; // total number of elements to process
+} context_t;
+
+typedef struct {
+   float deltaBeta[MAX_FRAME_SIZE];
+   float max;
+   float min;
+   float offset;
+} deltabeta_t; // for future use
+
+void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength);
+uint32_t ctxtIterate(context_t* ctxt);
+uint32_t ctxtStep(context_t* ctxt, uint32_t n);
+bool ctxtIsDone(const context_t* ctxt);
+
 typedef struct
 {
    bool useDebugData; // defaults to false
    bool clearBufferAfterCompletion; // defaults to true
    bool bypassAEC; // defaults to false
-} actOptions_t;
+   bool bypassChecks;
+   bool disableDelteBeta;
+   bool disableBPDetection;
+   bool useDynamicTestPattern;
+   uint32_t mode; // bit mask, default to 0
+} actDebugOptions_t;
+
+typedef struct
+{
+   uint32_t numFrames; // number of recorded frames (minus the extra frames for debugging)
+   uint32_t BPNumSamples;
+   uint32_t deltaBetaNCoadd;
+   float flickerThreshold; // threshold for flicker identification
+   float noiseThreshold; // threshold for noisy pixels identification
+   uint32_t flickersNCoadd; // number of frames to use for average estimation
+   uint32_t badPixelsDetection;
+   uint32_t duration; // duration of observation
+} actParams_t;
+
+typedef struct
+{
+   uint16_t* m;
+   uint16_t* M;
+   uint16_t* mu;
+   uint16_t* R;
+   int32_t* Z;
+   uint16_t* bpMap;
+   uint32_t length; // size of the arrays (number of pixels)
+} actBuffers_t;
+
+typedef struct
+{
+   uint32_t type;                 // 0 : ICU, 1 : External BB
+   float internalLensTemperature; // temperature of internal lens at time of actualisation [K]
+   float referenceTemperature;    // temperature used as reference [K]
+   float exposureTime;            // [µs]
+} actualisationInfo_t;
+
+// actOptions_t.mode switches
+#define ACT_MODE_DELTA_BETA_OFF 0x01 // go directly to bad pixel detection (if enabled)
+#define ACT_MODE_BP_OFF 0x02
+#define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
+#define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
 
 extern bool gActDeltaBetaAvailable; /**< indicates the validity of the actualization data in memory */
-extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process */
+extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */
 extern uint32_t gActualisationPosixTime; /**< POSIX time of the most current actualization */
-extern actOptions_t gActualizationOptions;
+extern actDebugOptions_t gActDebugOptions;
+extern actParams_t gActualizationParams;
 
-void setDefaultIcuParams(ICUParams_t* p);
+void configureIcuParams(ICUParams_t* p);
 
-IRC_Status_t startBetaCorrectionSM( bool internalTrig );
-IRC_Status_t BetaCorrection_SM( void );
+IRC_Status_t startActualization( bool internalTrig );
+void stopActualization();
+IRC_Status_t Actualization_SM();
+IRC_Status_t BadPixelDetection_SM();
 
 bool shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const uint32_t* p_actData, uint32_t numData);
-void ACT_ResetOptions();
+uint32_t updateBadPixelMap(uint32_t* p_CalData, const uint16_t* p_bpMap, uint32_t numData);
+void ACT_resetDebugOptions();
+void ACT_parseDebugMode();
+void ACT_resetParams(actParams_t* p);
+
+void updateMoments(float* m1, float* m2, float* m3, float x, uint32_t N); /**< iterative statistical moments update. */
+
+void testMomentComputations();
 
 #endif // ACTUALIZATION_H

@@ -726,7 +726,7 @@ void GC_CalibrationActualizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      startBetaCorrectionSM(false);
+      startActualization(false);
    }
 }
 

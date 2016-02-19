@@ -19,6 +19,7 @@
 #include "CircularByteBuffer.h"
 #include "IRC_Status.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 #if ((STDOUT_BASEADDRESS != XPAR_AXI_USB_UART_BASEADDR) || (STDIN_BASEADDRESS != XPAR_AXI_USB_UART_BASEADDR))
 #ifdef DEBUG
@@ -52,5 +53,7 @@ typedef enum debugTerminalStateEnum debugTerminalState_t;
 
 IRC_Status_t DebugTerminal_Init();
 void DebugTerminal_SM();
+
+extern bool gDisableFilterWheel;
 
 #endif // DEBUGTERMINAL_H

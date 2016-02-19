@@ -1636,6 +1636,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern ICU_config_t gICU_ctrl;
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern t_FpaIntf gFpaIntf;
+   extern bool gDisableFilterWheel;
    uint8_t externalMemoryBufferDetected = BufferManager_DetectExternalMemoryBuffer();
 
    // Update device serial number
@@ -1681,6 +1682,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    // Update FW
+   p_flashSettings->FWPresent &= ~gDisableFilterWheel;
    gcRegsData.FWFilterNumber = p_flashSettings->FWNumberOfFilters;
    if (p_flashSettings->FWPresent && (p_flashSettings->FWNumberOfFilters > 0))
    {

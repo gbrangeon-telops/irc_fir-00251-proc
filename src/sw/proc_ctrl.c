@@ -220,7 +220,7 @@ void disable_caches()
       Led_UpdateCameraLedState(&gLedCtrl);
       AEC_InterruptProcess(&gcRegsData, &gAEC_Ctrl);
       IRIG_Processing(&gcRegsData);
-      BetaCorrection_SM();
+      Actualization_SM();
       ICU_process(&gcRegsData, &gICU_ctrl, &gHderInserter);
       FW_ControllerProcess();
       NetIntf_SM(&gNetworkIntf);

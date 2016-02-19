@@ -123,6 +123,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    uint16_t crc16;
    uint32_t i;
    uint32_t *p_uint32;
+   extern bool gDisableFilterWheel;
 
    // Open collection file
    sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, file->name);
@@ -201,7 +202,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   if ((flashSettings.FWPresent == 0) && ((collectionFileHeader.CollectionType == CCT_TelopsFW) || (collectionFileHeader.CollectionType == CCT_MultipointFW)))
+   if ((gDisableFilterWheel == 0) && (flashSettings.FWPresent == 0) && ((collectionFileHeader.CollectionType == CCT_TelopsFW) || (collectionFileHeader.CollectionType == CCT_MultipointFW)))
    {
       CM_ERR("Invalid CollectionType (FWPresent = %d, CollectionType = %d).", flashSettings.FWPresent, collectionFileHeader.CollectionType);
       error = 1;
@@ -252,7 +253,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   if (((flashSettings.FWPresent == 0) && (collectionFileHeader.FWPosition != FWP_FilterWheelNotImplemented)) ||
+   if (((gDisableFilterWheel == 0) && (flashSettings.FWPresent == 0) && (collectionFileHeader.FWPosition != FWP_FilterWheelNotImplemented)) ||
          ((flashSettings.FWPresent == 1) &&
           (collectionFileHeader.FWPosition >= flashSettings.FWNumberOfFilters) &&
           (collectionFileHeader.FWPosition != FWP_FilterWheelInTransition)))
@@ -414,6 +415,7 @@ void Calibration_SM()
 
    extern flashDynamicValues_t gFlashDynamicValues;
    extern bool blockLoadCmdFlag;
+   extern bool gDisableFilterWheel;
 
    char filelongname[FM_LONG_FILENAME_SIZE];
    int byteCount;
@@ -660,7 +662,7 @@ void Calibration_SM()
                   }
                }
 
-               if (((flashSettings.FWPresent == 0) && (headerData.blockFile.FWPosition != FWP_FilterWheelNotImplemented)) ||
+               if ((((gDisableFilterWheel == 0) && flashSettings.FWPresent == 0) && (headerData.blockFile.FWPosition != FWP_FilterWheelNotImplemented)) ||
                      ((flashSettings.FWPresent == 1) &&
                       (headerData.blockFile.FWPosition >= flashSettings.FWNumberOfFilters) &&
                       (headerData.blockFile.FWPosition != FWP_FilterWheelInTransition)))

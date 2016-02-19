@@ -34,9 +34,8 @@
 #include "BufferManager.h"
 #include "proc_init.h"
 #include "AEC.h"
+#include "Actualization.h"
 #include <stdbool.h> // bool
-
-extern bool gActAllowAcquisitionStart;
 
 static uint8_t gAcquisitionTurnOn = 0;
 static uint8_t gAcquisitionTurnOff = 0;
@@ -86,8 +85,12 @@ DevicePowerState_t Acquisition_GetPowerState()
 
 bool actualisationAcqStartReady()
 {
-   return gActAllowAcquisitionStart &&
-         (gcRegsData.TDCStatus & ~WaitingForCalibrationActualizationMask) == 0;
+   extern bool gActAllowAcquisitionStart; // from Actualization.h
+   extern actDebugOptions_t gActDebugOptions; // from Actualization.h
+
+   return (gActAllowAcquisitionStart &&
+         (gcRegsData.TDCStatus & ~WaitingForCalibrationActualizationMask) == 0) ||
+         (gActDebugOptions.bypassChecks == true);
 }
 
 /**

@@ -62,6 +62,9 @@ static IRC_Status_t ParseNumHex(char *str, uint8_t length, uint32_t *value);
 static IRC_Status_t ParseNumDec(char *str, uint8_t length, uint32_t *value);
 static IRC_Status_t ParseSignedNumDec(char *str, uint8_t length, int32_t *value);
 
+
+bool gDisableFilterWheel = false;
+
 /**
  * Debug terminal UART device
  */
@@ -360,9 +363,11 @@ IRC_Status_t DebugTerminalParser(circByteBuffer_t *cbuf)
             return IRC_FAILURE;
          }
 
-         flashSettings.FWPresent = 0;
-         TDCFlagsClr(FWIsImplementedMask);
-         TDCFlagsClr(FWSynchronouslyRotatingModeIsImplementedMask);
+         gDisableFilterWheel = 1;
+         FM_InitFileDB(); // this will re-scan the flash for files and reload the flashSettings
+         if (gFM_collections.count > 0)
+            Calibration_LoadCalibrationFilePOSIXTime(gFM_collections.item[0]->posixTime);
+
          return IRC_SUCCESS;
       }
       else if (strcasecmp((char *)cmdStr, "HLP") == 0)
@@ -412,7 +417,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    PRINTF("  Camera status:      STATUS\n");
    PRINTF("  Power status:       POWER\n");
    PRINTF("  Network status:     NET [0|1]\n");
-   PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC\n");
+   PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP\n");
    PRINTF("  List files:         LS\n");
    PRINTF("  Remove file:        RM filename\n");
    PRINTF("  Loopback:           LB CLINK|PLEORA|OEM|USART 0|1\n");
@@ -426,8 +431,8 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    PRINTF("  DDR R/W test:       MRW\n");
    PRINTF("  Reset:              RST\n");
    PRINTF("  Power:              PWR\n");
-   PRINTF("  Buffer selection:   BUF EXT|INT\n");
-   PRINTF("  Disable FW:         DFW\n");
+   PRINTF("  Buffer selection:   BUF EXT|INT (broken)\n");
+   PRINTF("  Disable/ignore FW:  DFW\n");
    PRINTF("  Print help:         HLP\n");
 
    return IRC_SUCCESS;
@@ -852,7 +857,7 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
 
    GC_SetMemoryBufferMode(currentMode);
 
-   BufferManager_SetBufferMode(&gBufManager, currentMode, &gcRegsData);
+   //BufferManager_SetBufferMode(&gBufManager, currentMode, &gcRegsData);
 
    return BufferManager_Init(&gBufManager, &gcRegsData);
 }
@@ -1062,6 +1067,10 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       cmd = 5;
    else if (strcasecmp((char*)argStr, "AEC") == 0) // AEC enable/disable
       cmd = 6;
+   else if (strcasecmp((char*)argStr, "CFG") == 0) // Mode configuration
+      cmd = 7;
+   else if (strcasecmp((char*)argStr, "STP") == 0) // Cancel currently running actualization
+      cmd = 8;
 
    switch (cmd)
    {
@@ -1077,18 +1086,18 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
             if (value == 0)
             {
                DT_PRINTF("using detector data for actualization");
-               gActualizationOptions.useDebugData = false;
+               gActDebugOptions.useDebugData = false;
             }
             else
             {
                DT_PRINTF("using constant test pattern data for actualization");
-               gActualizationOptions.useDebugData = true;
+               gActDebugOptions.useDebugData = true;
             }
          }
          break;
 
       case 1: // reset options
-         ACT_ResetOptions();
+         ACT_resetDebugOptions();
          DT_PRINTF("actualization options were reset");
          break;
 
@@ -1119,12 +1128,12 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                if (value == 1)
                {
                   DT_PRINTF("will clear the buffer after actualisation");
-                  gActualizationOptions.clearBufferAfterCompletion = true;
+                  gActDebugOptions.clearBufferAfterCompletion = true;
                }
                else
                {
                   DT_PRINTF("will not clear the buffer after actualisation");
-                  gActualizationOptions.clearBufferAfterCompletion = false;
+                  gActDebugOptions.clearBufferAfterCompletion = false;
                }
             }
             break;
@@ -1132,13 +1141,13 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       case 4: // perform actualization using ICU
          DT_PRINTF("Triggering an actualization (icu)");
          gcRegsData.CalibrationActualizationMode = CAM_ICU;
-         startBetaCorrectionSM(false);
+         startActualization(false);
          break;
 
       case 5: // perform actualization using external BB
          DT_PRINTF("Triggering an actualization (xbb)");
          gcRegsData.CalibrationActualizationMode = CAM_BlackBody;
-         startBetaCorrectionSM(false);
+         startActualization(false);
          break;
 
       case 6: // AEC on/off
@@ -1153,14 +1162,67 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
             if (value == 1)
             {
                DT_PRINTF("AEC enabled during actualisation");
-               gActualizationOptions.bypassAEC = false;
+               gActDebugOptions.bypassAEC = false;
             }
             else
             {
                DT_PRINTF("AEC disabled during actualisation");
-               gActualizationOptions.bypassAEC = true;
+               gActDebugOptions.bypassAEC = true;
             }
          }
+         break;
+      case 7: // CFG mode
+               arglen = GetNextArg(cbuf, argStr, 10);
+               if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+               {
+                  DT_ERR("Invalid data length.");
+                  return IRC_FAILURE;
+               }
+               else
+               {
+                  gActDebugOptions.mode = value;
+                  if (BitMaskTst(value, ACT_MODE_DEBUG))
+                  {
+                     DT_PRINTF("Actualisation : debug mode activated (0x%02X)", ACT_MODE_DEBUG);
+                  }
+                  else
+                  {
+                     DT_PRINTF("Actualisation : debug mode disabled (0x%02X)", ACT_MODE_DEBUG);
+                  }
+
+                  if (BitMaskTst(value, ACT_MODE_DELTA_BETA_OFF))
+                  {
+                     DT_PRINTF("Actualisation : beta correction disabled (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
+                  }
+                  else
+                  {
+                     DT_PRINTF("Actualisation : beta correction activated (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
+                  }
+
+                  if (BitMaskTst(value, ACT_MODE_BP_OFF))
+                  {
+                     DT_PRINTF("Actualisation : bad pixel detection disabled (0x%02X)", ACT_MODE_BP_OFF);
+                  }
+                  else
+                  {
+                     DT_PRINTF("Actualisation : bad pixel detection activated (0x%02X)", ACT_MODE_BP_OFF);
+                  }
+
+                  if (BitMaskTst(value, ACT_MODE_DYN_TST_PTRN))
+                  {
+                     DT_PRINTF("Actualisation : dynamic test pattern is ON (0x%02X)", ACT_MODE_DYN_TST_PTRN);
+                  }
+                  else
+                  {
+                     DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
+                  }
+
+               }
+               break;
+
+      case 8:
+         DT_PRINTF("Cancelling current actualization");
+         stopActualization();
          break;
 
       default:
