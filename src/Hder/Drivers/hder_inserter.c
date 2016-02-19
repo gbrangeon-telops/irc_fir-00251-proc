@@ -134,9 +134,10 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(hdrTestImageSelector), a->ADD + A_BASE_HEADER + TestImageSelectorHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->SensorWellDepth), a->ADD + A_BASE_HEADER + SensorWellDepthHdrAddr);
    AXI4L_write32((uint32_t)(pGCRegs->AcquisitionFrameRate * 1000.0F), a->ADD + A_BASE_HEADER + AcquisitionFrameRateHdrAddr);
-   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + TriggerDelayHdrAddr);
-   AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + TriggerModeHdrAddr);
-   AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + TriggerSourceHdrAddr);
+   memcpy((void*)&data32, (void*)&(TriggerDelayAry[TS_AcquisitionStart]), sizeof(uint32_t));
+   AXI4L_write32(data32, a->ADD + A_BASE_HEADER + TriggerDelayHdrAddr);
+   AXI4L_write8((uint8_t)(TriggerModeAry[TS_AcquisitionStart]), a->ADD + A_BASE_HEADER + TriggerModeHdrAddr);
+   AXI4L_write8((uint8_t)(TriggerSourceAry[TS_AcquisitionStart]), a->ADD + A_BASE_HEADER + TriggerSourceHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->IntegrationMode), a->ADD + A_BASE_HEADER + IntegrationModeHdrAddr);
    AXI4L_write8((uint8_t)(1), a->ADD + A_BASE_HEADER + AveragingNumberHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->ExposureAuto), a->ADD + A_BASE_HEADER + ExposureAutoHdrAddr);
