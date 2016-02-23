@@ -987,10 +987,10 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
       gFM_calibrationActualizationFile = NULL;
    }
 
-   // Check if the file is used by actual calibration
+   // Check if the file is used by current calibration
    if (CM_FileUsedByActualCalibration(file))
    {
-      PRINTF("FM: Warning: Removed file was used by actual calibration. Calibration is reset.\n");
+      PRINTF("FM: Warning: Removed file was used by current calibration. Calibration is reset.\n");
       Calibration_Reset();
    }
 

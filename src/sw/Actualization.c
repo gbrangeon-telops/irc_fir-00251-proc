@@ -1715,7 +1715,7 @@ IRC_Status_t BadPixelDetection_SM()
             noiseThreshold = (float)mu_R * gActualizationParams.noiseThreshold;
             flickerThreshold1 = -(float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
             flickerThreshold2 = (float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
-            outlierThreshold = 3.907816 * sigma_mu; // todo utiliser flash settings
+            outlierThreshold = 5.5 * sigma_mu; // todo utiliser flash settings
             outlierThreshold1 = p50 - outlierThreshold;
             outlierThreshold2 = p50 + outlierThreshold;
 
