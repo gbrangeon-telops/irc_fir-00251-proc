@@ -1318,7 +1318,7 @@ IRC_Status_t BadPixelDetection_SM()
    static uint32_t numberOfBadPixels = 0;
    static uint32_t numberOfNoisy = 0;
    static uint32_t numberOfFlickers = 0;
-   static uint32_t numberOfOffPixels = 0;
+   static uint32_t numberOfOutliers = 0;
 
    const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
    const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
@@ -1377,7 +1377,7 @@ IRC_Status_t BadPixelDetection_SM()
          numberOfBadPixels = 0;
          numberOfNoisy = 0;
          numberOfFlickers = 0;
-         numberOfOffPixels = 0;
+         numberOfOutliers = 0;
 
          GETTIME(&tic_TotalDuration);
          GETTIME(&tic_AvgDuration);
@@ -1749,7 +1749,7 @@ IRC_Status_t BadPixelDetection_SM()
       {
          const uint8_t flicker_mask = 0x02;
          const uint8_t noisy_mask = 0x01;
-         const uint8_t offset_mask = 0x04;
+         const uint8_t outlier_mask = 0x04;
 
          GETTIME(&t0);
 
@@ -1767,8 +1767,8 @@ IRC_Status_t BadPixelDetection_SM()
 
             if (mu_buffer[k] < outlierThreshold1 || mu_buffer[k] > outlierThreshold2)
             {
-               tag |= offset_mask;
-               ++numberOfOffPixels;
+               tag |= outlier_mask;
+               ++numberOfOutliers;
             }
 
             if (z_val < flickerThreshold1 || z_val > flickerThreshold2)
@@ -1797,7 +1797,7 @@ IRC_Status_t BadPixelDetection_SM()
                PRINTF( "ACT: bad pixel map duration (real-time) : " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
                PRINTF( "ACT: Bad pixel detection took (real-time) " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
                PRINTF( "ACT: Bad pixel detection took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
-               PRINTF( "ACT: number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOffPixels);
+               PRINTF( "ACT: number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOutliers);
                }
 
             if (gActDebugOptions.clearBufferAfterCompletion == false)
