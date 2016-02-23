@@ -197,6 +197,7 @@ typedef struct
    bool disableDelteBeta;
    bool disableBPDetection;
    bool useDynamicTestPattern;
+   bool verbose;
    uint32_t mode; // bit mask, default to 0
 } actDebugOptions_t;
 
@@ -236,6 +237,7 @@ typedef struct
 #define ACT_MODE_BP_OFF 0x02
 #define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
 #define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
+#define ACT_MODE_VERBOSE 0x10 // add some verbose
 
 extern bool gActDeltaBetaAvailable; /**< indicates the validity of the actualization data in memory */
 extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */

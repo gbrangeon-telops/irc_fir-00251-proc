@@ -1217,6 +1217,15 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                      DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
                   }
 
+                  if (BitMaskTst(value, ACT_MODE_VERBOSE))
+                  {
+                     DT_PRINTF("Actualisation : verbose is ON (0x%02X)", ACT_MODE_VERBOSE);
+                  }
+                  else
+                  {
+                     DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
+                  }
+
                }
                break;
 

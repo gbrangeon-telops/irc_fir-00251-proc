@@ -139,6 +139,7 @@ uint32_t gActualisationPosixTime = 0; // (not a rigorous posix time, merely a un
 static uint32_t privateActualisationPosixTime = 0; // this one is the actual value
 
 static uint32_t mu_buffer[MAX_FRAME_SIZE];
+static uint32_t prctile_buffer[MAX_FRAME_SIZE];
 static uint16_t max_buffer[MAX_FRAME_SIZE];
 static uint16_t min_buffer[MAX_FRAME_SIZE];
 static uint16_t R_buffer[MAX_FRAME_SIZE]; // array for computing the range of each pixels
@@ -774,7 +775,7 @@ IRC_Status_t Actualization_SM()
             BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
             gcRegsData.MemoryBufferSequencePreMOISize = 0;
 
-            PRINTF( "ACT: BufferManager_GetNbImageMax = %d\n", (uint32_t) BufferManager_GetNbImageMax(&gBufManager, &gcRegsData) );
+            ACT_PRINTF( "BufferManager_GetNbImageMax = %d\n", (uint32_t) BufferManager_GetNbImageMax(&gBufManager, &gcRegsData) );
 
             //gcRegsData.MemoryBufferSequenceSize = gActualizationParams.numFrames;
             gcRegsData.MemoryBufferSequenceSize = gActualizationParams.deltaBetaNCoadd + numExtraImages; // + 1 because the first image is offset most of the time
@@ -801,14 +802,11 @@ IRC_Status_t Actualization_SM()
          break;
 
       case ACT_WaitSequenceReady: // State 9
-         // Wait until we have all the requested images for averaging (fait planter l'enregistrement dans le buffer)
+         // Wait until we have all the requested images for averaging
          if (elapsed_time_us(tic_TotalDuration) % 5000000 < 3000)
          {
-            if (gActualizationParams.badPixelsDetection)
-               PRINTF("ACT: Acquiring data for actualisation/bad pixel detection...\n");
-            else
-               PRINTF("ACT: Acquiring data for actualisation...\n");
-            //ACT_PRINTF("Current number of images in sequence = %d\n", BufferManager_GetSequenceLength(&gBufManager, 0));
+            PRINTF("ACT: Acquiring data for actualisation...\n");
+            //ACT_PRINTF("Current number of images in sequence = %d\n", BufferManager_GetSequenceLength(&gBufManager, 0)); // (fait planter l'enregistrement dans le buffer)
          }
 
          if (TDCStatusTst(AcquisitionStartedMask) && BufferManager_GetNumSequenceCount(&gBufManager) == 1)
@@ -1227,10 +1225,7 @@ IRC_Status_t Actualization_SM()
                BufferManager_SetBufferMode(&gBufManager, BM_WRITE, &gcRegsData);   // Make sure internal buffering is ON
 
             // Restore registers value
-            ACT_PRINTF( "Number of images in buffer (avant restoreGCRegisters()): %d\n", BufferManager_GetSequenceLength(&gBufManager, 0));
             restoreGCRegisters( &GCRegsBackup );
-            ACT_PRINTF( "Number of images in buffer: %d\n", BufferManager_GetSequenceLength(&gBufManager, 0));
-            ACT_PRINTF( "Number of images in buffer (apres restoreGCRegisters()): %d\n", BufferManager_GetSequenceLength(&gBufManager, 0));
 
             // Reload original calibration data (will update the calibration at the same time)
             if (savedCalibPosixTime != 0)
@@ -1309,13 +1304,14 @@ IRC_Status_t BadPixelDetection_SM()
    static context_t blockContext; // information structure for block processing
    static uint64_t mu_R; // sample mean of the range R
    static int64_t mu_Z;
-   static int64_t mu_Image; // sample mean of the average image
+   static uint64_t mu_Image; // sample mean of the average image
+   static uint32_t N_mu; // number of samples for computing mu_image
    static uint32_t noiseThreshold;
-   static int32_t pos_thresh;
-   static int32_t neg_thresh;
-   static uint32_t offThreshold1;
-   static uint32_t offThreshold2;
-   static uint32_t offsetThreshold;
+   static int32_t flickerThreshold2;
+   static int32_t flickerThreshold1;
+   static uint32_t outlierThreshold1;
+   static uint32_t outlierThreshold2;
+   static uint32_t outlierThreshold;
 
    static uint16_t* data_buffer = NULL; // address of the image sequence in DDR
 
@@ -1358,8 +1354,6 @@ IRC_Status_t BadPixelDetection_SM()
 
          sequenceOffset = 0;
 
-         ACT_PRINTF( "Number of images in buffer: %d\n", BufferManager_GetSequenceLength(&gBufManager, 0));
-
          // if debug mode is ON, the first few images are used as buffers for intermediate results
          if (gActDebugOptions.clearBufferAfterCompletion == false)
          {
@@ -1391,8 +1385,6 @@ IRC_Status_t BadPixelDetection_SM()
          StartTimer(&verbose_timeout, 10000);
          StartTimer(&bpd_timer, 1000);
 
-         //gActualizationParams.flickersNCoadd = gActualizationParams.numFrames;
-
          setBpdState(&state, BPD_StartAcquisition);
       }
 
@@ -1421,23 +1413,22 @@ IRC_Status_t BadPixelDetection_SM()
          }
          GC_SetAcquisitionFrameRate(frameRate);
 
-         ACT_PRINTF( "Frame rate : " _PCF(2) " Hz\n", _FFMT(frameRate, 2));
-
-         // set the starting point for the exposure time
-         gcRegsData.ExposureTime = (float)refBlockFileHdr.ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US;
-         if (gcRegsData.ExposureTime <= FPA_MIN_EXPOSURE || gcRegsData.ExposureTime >= FPA_MAX_EXPOSURE)
-            gcRegsData.ExposureTime = FPA_DEFAULT_EXPOSURE;
-
          // Setup an AEC
-         GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], 80.0f/*flashSettings.ActualizationAECTargetWellFilling*/);
-         GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], AEC_responseTime_ms/*flashSettings.ActualizationAECResponseTime*/);
+         GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], flashSettings.ActualizationAECTargetWellFilling);
+         GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], flashSettings.ActualizationAECResponseTime);//AEC_responseTime_ms/*flashSettings.ActualizationAECResponseTime*/);
          GC_RegisterWriteFloat(&gcRegsDef[AECImageFractionIdx], flashSettings.ActualizationAECImageFraction);
          GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Continuous);
 
          // compute the number of frames to skip (5 times the time constant)
          numFramesToSkip = ceilf(5 * AEC_responseTime_ms/1000.0f * frameRate);
          sequenceOffset += numFramesToSkip * frameSize * 2;
-         ACT_PRINTF( "Will skip %d frames (AEC transient)\n", numFramesToSkip);
+#ifndef ACT_VERBOSE
+         if (gActDebugOptions.verbose)
+#endif
+         {
+            PRINTF( "ACT: Frame rate : " _PCF(2) " Hz\n", _FFMT(frameRate, 2));
+            PRINTF( "ACT: Using %d frames for AEC transient\n", numFramesToSkip);
+         }
          
          gcRegsData.CalibrationMode = CM_NUC;
 
@@ -1449,8 +1440,6 @@ IRC_Status_t BadPixelDetection_SM()
          // always using the internal buffer
          BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
          gcRegsData.MemoryBufferSequencePreMOISize = 0;
-
-         PRINTF( "ACT: BufferManager_GetNbImageMax = %d\n", (uint32_t) BufferManager_GetNbImageMax(&gBufManager, &gcRegsData) );
 
          gcRegsData.MemoryBufferSequenceSize = gActualizationParams.numFrames + numFramesToSkip;
          if (gActDebugOptions.clearBufferAfterCompletion == 0)
@@ -1480,13 +1469,10 @@ IRC_Status_t BadPixelDetection_SM()
 
    case BPD_WaitSequenceReady:
 
-      // just some verbose
-      if (elapsed_time_us(tic_TotalDuration) % 5000000 < 3000)
+      if (TimedOut(&verbose_timeout))
       {
-         if (gActualizationParams.badPixelsDetection)
-            PRINTF("ACT: Acquiring data for actualisation/bad pixel detection...\n");
-         else
-            PRINTF("ACT: Acquiring data for actualisation...\n");
+         PRINTF("ACT: Acquiring data for bad pixel detection...\n");
+         RestartTimer(&verbose_timeout);
       }
 
       if (TDCStatusTst(AcquisitionStartedMask) && BufferManager_GetNumSequenceCount(&gBufManager) == 1)
@@ -1523,6 +1509,8 @@ IRC_Status_t BadPixelDetection_SM()
 
             // Move the ICU back to scene position
             ICU_scene(&gcRegsData, &gICU_ctrl);
+
+            GETTIME(&tic_TotalDuration);
 
             setBpdState(&state, BPD_ComputeStatistics);
          }
@@ -1627,7 +1615,7 @@ IRC_Status_t BadPixelDetection_SM()
    case BPD_BuildCriteria:
       {
          const int Ndiv2 = gActualizationParams.flickersNCoadd/2;
-         const int N = gActualizationParams.flickersNCoadd;
+         //const int N = gActualizationParams.flickersNCoadd;
 
          GETTIME(&t0);
 
@@ -1646,20 +1634,13 @@ IRC_Status_t BadPixelDetection_SM()
             Z_buffer[k] = M + m - mu_x2;
          }
 
-         // just for debugging purposes
-         if (gActDebugOptions.clearBufferAfterCompletion == false)
-         {
-            for (i=0, k=blockContext.startIndex; i<blockContext.blockLength; ++i, ++k)
-               mu_buffer[k] /= N;
-         }
-
          ctxtIterate(&blockContext);
 
          tic_RT_Duration += elapsed_time_us(t0);
 
          if (ctxtIsDone(&blockContext))
          {
-            ctxtInit(&blockContext, imageDataOffset, frameSize, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
+            ctxtInit(&blockContext, imageDataOffset, frameSize, 10*ACT_MAX_PIX_DATA_TO_PROCESS);
 
             ACT_PRINTF( "duration of test statistics computation: " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
 
@@ -1671,6 +1652,9 @@ IRC_Status_t BadPixelDetection_SM()
 
    case BPD_AdjustThresholds:
       {
+         const uint32_t maxValidValue = 0xFFF0;
+
+         GETTIME(&t0);
          // compute the 1st order moment of the range, which equals mu_R = mu_R0 * sigma_x
 
          if (blockContext.blockIdx == 0)
@@ -1678,45 +1662,83 @@ IRC_Status_t BadPixelDetection_SM()
             mu_R = 0;
             mu_Z = 0;
             mu_Image = 0;
+            N_mu = 0;
          }
 
          for (i=0, k=blockContext.startIndex; i<blockContext.blockLength; ++i, ++k)
          {
-            mu_R += R_buffer[k];
-            mu_Z += Z_buffer[k];
-            mu_Image += mu_buffer[k];
+            // do not use bad pixels
+            if (max_buffer[k] <= maxValidValue)
+            {
+               mu_R += R_buffer[k];
+               mu_Z += Z_buffer[k];
+               ++N_mu;
+            }
          }
 
          ctxtIterate(&blockContext);
+
+         tic_RT_Duration += elapsed_time_us(t0);
 
          if (ctxtIsDone(&blockContext))
          {
             ctxtInit(&blockContext, imageDataOffset, frameSize, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
 
-            mu_R /= numPixels;
-            mu_Z /= numPixels;
-            mu_Image /= numPixels;
-            if (gActDebugOptions.clearBufferAfterCompletion == true)
-               mu_Image /= gActualizationParams.flickersNCoadd; // because it was not divided by N
+            if (N_mu > 1)
+            {
+               mu_R /= N_mu;
+               mu_Z /= N_mu;
+            }
 
+            const float IQR_to_sigma = 20.0f/27; // sigma \approx IQR / sigma_factor
+            uint32_t IQR; // inter-quantile range, used for estimating the std of the spatial distribution
+            uint32_t sigma_mu; // std of the spatial average distribution
+            int i50 = 0.50f * numPixels; // index of the median
+            int i25 = 0.25f * numPixels; // index of the 1st quartile
+            int i75 = 0.75f * numPixels; // index of the 3rd quartile
+            uint32_t p25,p50,p75; // percentiles
+
+            // the order of these 3 calls is important
+            // since select() modifies the input array
+            memcpy(prctile_buffer, mu_buffer + imageDataOffset, numPixels * sizeof(uint32_t));
+            p75 = select(prctile_buffer, 0, numPixels-1, i75);
+            p50 = select(prctile_buffer, 0, i75, i50);
+            p25 = select(prctile_buffer, 0, i50, i25);
+
+            IQR = p75 - p25;
+            sigma_mu = (float)IQR * IQR_to_sigma;
+
+            tic_RT_Duration += elapsed_time_us(t0);
+
+            // compute thresholds based on the actual data statistics
             // multiply it by the normalized threshold parameter
             noiseThreshold = (float)mu_R * gActualizationParams.noiseThreshold;
-            pos_thresh = (float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
-            neg_thresh = -(float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
+            flickerThreshold1 = -(float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
+            flickerThreshold2 = (float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
+            outlierThreshold = 3.907816 * sigma_mu; // todo utiliser flash settings
+            outlierThreshold1 = p50 - outlierThreshold;
+            outlierThreshold2 = p50 + outlierThreshold;
 
-            offsetThreshold = 3.0 * (float)mu_R/6.0; // not used
-            offThreshold1 = mu_Image - offsetThreshold; // not used
-            offThreshold2 = mu_Image + offsetThreshold; // not used
+#ifndef ACT_VERBOSE
+            if (gActDebugOptions.verbose)
+#endif
+            {
+               const int NCoadd = gActualizationParams.flickersNCoadd;
+               PRINTF( "ACT: p25, p50, p75 = %d, %d, %d\n", p25/NCoadd, p50/NCoadd, p75/NCoadd);
+               PRINTF( "ACT: mu_R = %d\n", (int32_t)mu_R);
+               PRINTF( "ACT: mu_Z = %d\n", (int32_t)mu_Z);
+               PRINTF( "ACT: N_mu = %d (number of good pixels in original block)\n", N_mu);
+               PRINTF( "ACT: mu_Image = %d\n", (int32_t)mu_Image/NCoadd);
+               PRINTF( "ACT: sigma image (IQR-based) = %d\n", sigma_mu/NCoadd);
+               PRINTF( "ACT: noiseThreshold = %d\n", noiseThreshold);
+               PRINTF( "ACT: offThreshold = %d\n", outlierThreshold/NCoadd);
+               PRINTF( "ACT: flickerThreshold = +/-%d\n", (uint32_t)((float)mu_R * gActualizationParams.flickerThreshold));
+               PRINTF( "ACT: flickerThreshold1 = %d\n", flickerThreshold1);
+               PRINTF( "ACT: flickerThreshold2 = %d\n", flickerThreshold2);
+               PRINTF( "ACT: duration of BPD_AdjustThresholds: " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
+            }
 
-            ACT_PRINTF( "mu_R = %d\n", (int32_t)mu_R);
-            ACT_PRINTF( "mu_Z = %d\n", (int32_t)mu_Z);
-            ACT_PRINTF( "mu_Image = %d\n", (int32_t)mu_Image);
-            ACT_PRINTF( "noiseThreshold = %d\n", noiseThreshold);
-            ACT_PRINTF( "offThreshold = %d\n", offsetThreshold);
-            ACT_PRINTF( "flickerThreshold = +/-%d\n", (uint32_t)((float)mu_R * gActualizationParams.flickerThreshold));
-            ACT_PRINTF( "pos_flickerThreshold = %d\n", pos_thresh);
-            ACT_PRINTF( "neg_flickerThreshold = %d\n", neg_thresh);
-
+            tic_RT_Duration = 0;
             setBpdState(&state, BPD_UpdateBPMap);
          }
       }
@@ -1743,13 +1765,13 @@ IRC_Status_t BadPixelDetection_SM()
                ++numberOfNoisy;
             }
 
-            if (min_buffer[k] < offThreshold1 || max_buffer[k] > offThreshold2)
+            if (mu_buffer[k] < outlierThreshold1 || mu_buffer[k] > outlierThreshold2)
             {
-               //tag |= offset_mask;
+               tag |= offset_mask;
                ++numberOfOffPixels;
             }
 
-            if (z_val < neg_thresh || z_val > pos_thresh)
+            if (z_val < flickerThreshold1 || z_val > flickerThreshold2)
             {
                tag |= flicker_mask;
                ++numberOfFlickers;
@@ -1767,13 +1789,16 @@ IRC_Status_t BadPixelDetection_SM()
          if (ctxtIsDone(&blockContext))
          {
             gActBPMapAvailable = true;
-            ACT_PRINTF( "bad pixel map duration (real-time) : " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
-            ACT_PRINTF( "Bad pixel detection took (real-time) " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_RT_Duration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
 
-            ACT_PRINTF( "Bad pixel detection took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
-
-            ACT_PRINTF( "number of bad pixels found : %d (%d noisy, %d flickers, %d off)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOffPixels);
-            //ACT_PRINTF( "number of bad pixels found : %d (%d noisy, %d flickers)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers);
+#ifndef ACT_VERBOSE
+            if (gActDebugOptions.verbose)
+#endif
+            {
+               PRINTF( "ACT: bad pixel map duration (real-time) : " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
+               PRINTF( "ACT: Bad pixel detection took (real-time) " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
+               PRINTF( "ACT: Bad pixel detection took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
+               PRINTF( "ACT: number of bad pixels found : %d (%d noisy, %d flickers, %d off)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOffPixels);
+               }
 
             if (gActDebugOptions.clearBufferAfterCompletion == false)
                setBpdState(&state, BPD_DebugState);
@@ -1790,6 +1815,7 @@ IRC_Status_t BadPixelDetection_SM()
    case BPD_DebugState:
       {
          const int headerOffset = 2*FPA_WIDTH_MAX;
+         const int N = gActualizationParams.flickersNCoadd;
 
          // dans cet état, on copie les images de calcul dans le buffer externe
 
@@ -1797,7 +1823,7 @@ IRC_Status_t BadPixelDetection_SM()
          {
             actDataBuffers.m[i] = min_buffer[i];
             actDataBuffers.M[i] = max_buffer[i];
-            actDataBuffers.mu[i] = mu_buffer[i];
+            actDataBuffers.mu[i] = mu_buffer[i]/N;
             actDataBuffers.R[i] = R_buffer[i];
             actDataBuffers.Z[i] = Z_buffer[i];
             actDataBuffers.bpMap[i] = (uint16_t)badPixelMap[i];
@@ -3068,6 +3094,7 @@ void ACT_resetDebugOptions()
    gActDebugOptions.useDynamicTestPattern = false;
    gActDebugOptions.bypassChecks = false;
    gActDebugOptions.mode = 0;
+   gActDebugOptions.verbose = 0;
 }
 
 void ACT_parseDebugMode()
@@ -3109,6 +3136,15 @@ void ACT_parseDebugMode()
    else
    {
       gActDebugOptions.useDynamicTestPattern = false;
+   }
+
+   if (BitMaskTst(gActDebugOptions.mode, ACT_MODE_VERBOSE))
+   {
+      gActDebugOptions.verbose = true;
+   }
+   else
+   {
+      gActDebugOptions.verbose = false;
    }
 }
 
