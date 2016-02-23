@@ -1797,7 +1797,7 @@ IRC_Status_t BadPixelDetection_SM()
                PRINTF( "ACT: bad pixel map duration (real-time) : " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
                PRINTF( "ACT: Bad pixel detection took (real-time) " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
                PRINTF( "ACT: Bad pixel detection took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
-               PRINTF( "ACT: number of bad pixels found : %d (%d noisy, %d flickers, %d off)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOffPixels);
+               PRINTF( "ACT: number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOffPixels);
                }
 
             if (gActDebugOptions.clearBufferAfterCompletion == false)
