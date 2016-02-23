@@ -1640,7 +1640,7 @@ IRC_Status_t BadPixelDetection_SM()
 
          if (ctxtIsDone(&blockContext))
          {
-            ctxtInit(&blockContext, imageDataOffset, frameSize, 10*ACT_MAX_PIX_DATA_TO_PROCESS);
+            ctxtInit(&blockContext, imageDataOffset, frameSize, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
 
             ACT_PRINTF( "duration of test statistics computation: " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
 
