@@ -360,7 +360,7 @@ void FPA_SpecificParams(hawk_param_t *ptrH, float exposureTime_usec, const gcReg
    ptrH->mlck_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
-   ptrH->fpa_delay_mclk          = 2.0F;   // FPA: delai de sortie des pixels après integration   ENO: 08 fev 2016: aucune justification dans le doc du Hawk pour maintenauir ce delai à 9. Je le fais passer à 2
+   ptrH->fpa_delay_mclk          = 7.33F;   // FPA: delai de sortie des pixels après integration   ENO: 08 fev 2016: aucune justification dans le doc du Hawk pour maintenauir ce delai à 9. Je le fais passer à 9.33 pour avoir 120Kfps en 64x2
    ptrH->vhd_delay_mclk          = 2.0F;   // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 8.0F;
