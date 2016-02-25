@@ -65,12 +65,12 @@ typedef enum fslImmediateEnum fslImmediate_t;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.8.1
+// Generated from the Flash Settings definition XLS file version 1.9.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 #define FS_FILESTRUCTUREMAJORVERSION      1
-#define FS_FILESTRUCTUREMINORVERSION      8
-#define FS_FILESTRUCTURESUBMINORVERSION   1
+#define FS_FILESTRUCTUREMINORVERSION      9
+#define FS_FILESTRUCTURESUBMINORVERSION   0
 
 /**
  * Flash settings fields definition
@@ -336,8 +336,20 @@ typedef enum fslImmediateEnum fslImmediate_t;
 #define FS_AECPLUSFLUXMARGIN_OFFSET   272
 #define FS_AECPLUSFLUXMARGIN_LENGTH   4
 
-#define FS_SPARE_FREE_SPACE_OFFSET   276
-#define FS_SPARE_FREE_SPACE_LENGTH   65258
+#define FS_BPOUTLIERTHRESHOLD_OFFSET   276
+#define FS_BPOUTLIERTHRESHOLD_LENGTH   4
+
+#define FS_BPAECIMAGEFRACTION_OFFSET   280
+#define FS_BPAECIMAGEFRACTION_LENGTH   4
+
+#define FS_BPAECWELLFILLING_OFFSET   284
+#define FS_BPAECWELLFILLING_LENGTH   4
+
+#define FS_BPAECRESPONSETIME_OFFSET   288
+#define FS_BPAECRESPONSETIME_LENGTH   4
+
+#define FS_SPARE_FREE_SPACE_OFFSET   292
+#define FS_SPARE_FREE_SPACE_LENGTH   65242
 
 #define FS_FLASHSETTINGSFILECRC16_OFFSET   65534
 #define FS_FLASHSETTINGSFILECRC16_LENGTH   2
@@ -369,6 +381,10 @@ struct flashSettingsStruct {
    float FluxRatio12;   /**< Flux ratio between filter 1 and filter 2. */
    float AECPlusExpTimeMargin;   /**< Margin on the exposure time for hysteresis purpose of the AEC+. */
    float AECPlusFluxMargin;   /**< Margin on the detector's flux for hysteresis purpose of the AEC+. */
+   float BPOutlierThreshold;   /**< Threshold for tagging a pixel as an outlier. */
+   float BPAECImageFraction;   /**< AEC image fraction used during bad pixel measurement. */
+   float BPAECWellFilling;   /**< AEC target well filling used during bad pixel measurement. */
+   float BPAECResponseTime;   /**< AEC response time used during bad pixel measurement. */
    int32_t FW0CenterPosition;   /**< Raw position of the first filter wheel filter center. */
    int32_t FW1CenterPosition;   /**< Raw position of the second filter wheel filter center. */
    int32_t FW2CenterPosition;   /**< Raw position of the third filter wheel filter center. */
