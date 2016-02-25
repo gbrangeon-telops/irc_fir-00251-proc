@@ -48,7 +48,7 @@ int fdFlashSettings;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.8.0
+// Generated from the Flash Settings definition XLS file version 1.8.1
 // using generateFlashSettingsCLib.m Matlab script.
 
 /**
@@ -69,8 +69,8 @@ flashSettings_t flashSettingsDefault = {
    /* FWCornerPixRadius = */ (3.24/2.0)/25.4F,
    /* FWExposureTimeMaxMargin = */ 95.000000F,
    /* ExternalFanSpeedSetpoint = */ 50.000000F,
-   /* BPFlickerThreshold = */  0.2659F,
-   /* BPNoiseThreshold = */ 1.3046F,
+   /* BPFlickerThreshold = */  0.312236F,
+   /* BPNoiseThreshold = */ 1.304589F,
    /* MaximumTotalFlux = */ FLT_MAX,
    /* FluxRatio01 = */ 1.0F,
    /* FluxRatio12 = */ 1.0F,
@@ -523,7 +523,7 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
 
 /* AUTO-CODE FIELDS BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.8.0
+// Generated from the Flash Settings definition XLS file version 1.8.1
 // using generateFlashSettingsCLib.m Matlab script.
 
    // Read DeviceSerialNumber flash settings field

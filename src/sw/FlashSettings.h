@@ -65,12 +65,12 @@ typedef enum fslImmediateEnum fslImmediate_t;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.8.0
+// Generated from the Flash Settings definition XLS file version 1.8.1
 // using generateFlashSettingsCLib.m Matlab script.
 
 #define FS_FILESTRUCTUREMAJORVERSION      1
 #define FS_FILESTRUCTUREMINORVERSION      8
-#define FS_FILESTRUCTURESUBMINORVERSION   0
+#define FS_FILESTRUCTURESUBMINORVERSION   1
 
 /**
  * Flash settings fields definition
