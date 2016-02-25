@@ -38,7 +38,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.2.1
+// Generated from XML camera definition file version 11.3.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -133,6 +133,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* DeviceFirmwareMinorVersion = */ 0,
    /* DeviceFirmwareModuleSelector = */ 0,
    /* DeviceFirmwareSubMinorVersion = */ 0,
+   /* DeviceKeyValidationHigh = */ 0,
+   /* DeviceKeyValidationLow = */ 0,
    /* DeviceLedIndicatorState = */ DLIS_Busy,
    /* DeviceNotReady = */ 0,
    /* DevicePowerOnCycles = */ 0,
@@ -412,6 +414,8 @@ void GC_Registers_Init()
    gcRegsDef[DeviceFirmwareMinorVersionIdx].p_data = &gcRegsData.DeviceFirmwareMinorVersion;
    gcRegsDef[DeviceFirmwareModuleSelectorIdx].p_data = &gcRegsData.DeviceFirmwareModuleSelector;
    gcRegsDef[DeviceFirmwareSubMinorVersionIdx].p_data = &gcRegsData.DeviceFirmwareSubMinorVersion;
+   gcRegsDef[DeviceKeyValidationHighIdx].p_data = &gcRegsData.DeviceKeyValidationHigh;
+   gcRegsDef[DeviceKeyValidationLowIdx].p_data = &gcRegsData.DeviceKeyValidationLow;
    gcRegsDef[DeviceLedIndicatorStateIdx].p_data = &gcRegsData.DeviceLedIndicatorState;
    gcRegsDef[DeviceNotReadyIdx].p_data = &gcRegsData.DeviceNotReady;
    gcRegsDef[DevicePowerOnCyclesIdx].p_data = &gcRegsData.DevicePowerOnCycles;
@@ -592,7 +596,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence4Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[CalibrationModeIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForCalibrationActualization));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[CalibrationActualizationModeIdx], GC_WaitingForCalibrationActualization);
    SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty)) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));

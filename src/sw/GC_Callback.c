@@ -64,7 +64,7 @@ extern float FWExposureTime[8];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.2.1
+// Generated from XML camera definition file version 11.3.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -125,6 +125,8 @@ void GC_Callback_Init()
    gcRegsDef[DeviceFirmwareModuleSelectorIdx].callback =                &GC_DeviceFirmwareModuleSelectorCallback;
    gcRegsDef[DeviceFirmwareSubMinorVersionIdx].callback =               &GC_DeviceFirmwareSubMinorVersionCallback;
    gcRegsDef[DeviceIDIdx].callback =                                    &GC_DeviceIDCallback;
+   gcRegsDef[DeviceKeyValidationHighIdx].callback =                     &GC_DeviceKeyValidationHighCallback;
+   gcRegsDef[DeviceKeyValidationLowIdx].callback =                      &GC_DeviceKeyValidationLowCallback;
    gcRegsDef[DeviceLedIndicatorStateIdx].callback =                     &GC_DeviceLedIndicatorStateCallback;
    gcRegsDef[DeviceManufacturerInfoIdx].callback =                      &GC_DeviceManufacturerInfoCallback;
    gcRegsDef[DeviceModelNameIdx].callback =                             &GC_DeviceModelNameCallback;
@@ -1521,6 +1523,46 @@ void GC_DeviceFirmwareSubMinorVersionCallback(gcCallbackPhase_t phase, gcCallbac
  * @param access indicates whether the operation is read or write.
  */
 void GC_DeviceIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
+ * DeviceKeyValidationHigh GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceKeyValidationHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
+ * DeviceKeyValidationLow GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceKeyValidationLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {

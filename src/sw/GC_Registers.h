@@ -146,10 +146,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.2.1
+// Generated from XML camera definition file version 11.3.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 3) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -245,6 +245,8 @@ struct gcRegistersDataStruct {
    uint32_t DeviceFirmwareMinorVersion;
    uint32_t DeviceFirmwareModuleSelector;
    uint32_t DeviceFirmwareSubMinorVersion;
+   uint32_t DeviceKeyValidationHigh;
+   uint32_t DeviceKeyValidationLow;
    uint32_t DeviceLedIndicatorState;
    uint32_t DeviceNotReady;
    uint32_t DevicePowerOnCycles;
