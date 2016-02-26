@@ -67,6 +67,7 @@
 #define ACT_NUM_DEBUG_FRAMES   12
 
 #define MAX_FRAME_SIZE ((uint32_t)(FPA_HEIGHT_MAX+2) * (uint32_t)FPA_WIDTH_MAX)
+#define MAX_PIXEL_COUNT ((uint32_t)(FPA_HEIGHT_MAX) * (uint32_t)FPA_WIDTH_MAX)
 
 #define ACT_FILENAME (char*)"Actualization.tsac"
 
@@ -102,6 +103,7 @@
 
 #define BPD_STATES(ACTION) \
 		ACTION(BPD_Idle) \
+		ACTION(BPD_UpdateBeta) \
 		ACTION(BPD_StartAcquisition) \
 		ACTION(BPD_WaitSequenceReady) \
 		ACTION(BPD_FinalizeSequence) \
@@ -178,9 +180,11 @@ typedef struct {
 
 typedef struct {
    float deltaBeta[MAX_FRAME_SIZE];
+   float alpha[MAX_FRAME_SIZE];
    float max;
    float min;
    float offset;
+   bool ready;
 } deltabeta_t; // for future use
 
 void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength);
@@ -221,6 +225,7 @@ typedef struct
    uint16_t* R;
    int32_t* Z;
    uint16_t* bpMap;
+   float* deltaBeta;
    uint32_t length; // size of the arrays (number of pixels)
 } actBuffers_t;
 
