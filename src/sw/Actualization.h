@@ -180,7 +180,6 @@ typedef struct {
 
 typedef struct {
    float deltaBeta[MAX_FRAME_SIZE];
-   float alpha[MAX_FRAME_SIZE];
    float max;
    float min;
    float offset;

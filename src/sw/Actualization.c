@@ -142,7 +142,7 @@ static uint16_t R_buffer[MAX_FRAME_SIZE]; // array for computing the range of ea
 static int32_t Z_buffer[MAX_FRAME_SIZE];  // array for computing the test statistics for the flicker pixels
 static uint8_t badPixelMap[MAX_FRAME_SIZE]; // 0x00 good, 0x01 noisy, 0x02 flicker
 
-static deltabeta_t deltaBetaICU __attribute__ ((unused));
+static deltabeta_t deltaBetaICU;
 
 #define LUT_RT_ADDR TEL_PAR_TEL_RQC_LUT_BASEADDR
 
@@ -1078,7 +1078,7 @@ IRC_Status_t Actualization_SM()
             //DeltaBetaL = computeDeltaBeta( p_Data++, FCal, FCalBB, Alpha_LSB, Beta_LSB, blockInfo,/*delta_beta_full++*/0);
             //newBadPixelCount += computeDeltaBeta( &calData, FCal, FCalBB, Alpha_LSB, Beta_LSB, blockInfo, &DeltaBetaL);
 
-            computeDeltaBeta2(&calData, FCal, FCalBB, Alpha_LSB, scaleFCal, blockInfo, &deltaBetaICU.deltaBeta[i], &deltaBetaICU.alpha[i]);
+            computeDeltaBeta2(&calData, FCal, FCalBB, Alpha_LSB, scaleFCal, blockInfo, &deltaBetaICU.deltaBeta[i], NULL);
             newBadPixelCount += quantizeDeltaBeta(BetaLSB_raw, deltaBetaICU.deltaBeta[i], &DeltaBetaL);
 
 #if SCALE_FACTOR_TRICK
@@ -1091,7 +1091,7 @@ IRC_Status_t Actualization_SM()
             //DeltaBetaH = computeDeltaBeta( p_Data++, FCal, FCalBB, Alpha_LSB, Beta_LSB, blockInfo,/*delta_beta_full++*/0);
             //newBadPixelCount += computeDeltaBeta( &calData, FCal, FCalBB, Alpha_LSB, Beta_LSB, blockInfo, &DeltaBetaH);
 
-            computeDeltaBeta2(&calData, FCal, FCalBB, Alpha_LSB, scaleFCal, blockInfo, &deltaBetaICU.deltaBeta[i+1], &deltaBetaICU.alpha[i+1]);
+            computeDeltaBeta2(&calData, FCal, FCalBB, Alpha_LSB, scaleFCal, blockInfo, &deltaBetaICU.deltaBeta[i+1], NULL);
             newBadPixelCount += quantizeDeltaBeta(BetaLSB_raw, deltaBetaICU.deltaBeta[i+1], &DeltaBetaH);
 
             data32 = ( DeltaBetaH << 16 ) | ( DeltaBetaL & 0x0000FFFF );
