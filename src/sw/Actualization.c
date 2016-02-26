@@ -146,7 +146,7 @@ static uint16_t R_buffer[MAX_FRAME_SIZE]; // array for computing the range of ea
 static int32_t Z_buffer[MAX_FRAME_SIZE];  // array for computing the test statistics for the flicker pixels
 static uint8_t badPixelMap[MAX_FRAME_SIZE]; // 0x00 good, 0x01 noisy, 0x02 flicker
 
-static deltabeta_t deltaBetaICU;
+static deltabeta_t deltaBetaICU __attribute__ ((unused));
 
 #define LUT_RT_ADDR TEL_PAR_TEL_RQC_LUT_BASEADDR
 
@@ -154,11 +154,12 @@ static void setActState( ACT_State_t* p_state, ACT_State_t next_state );
 static void setBpdState( BPD_State_t* p_state, BPD_State_t next_state );
 static void backupGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
 static void restoreGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
-static float applyLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float x );
-static float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float y_target, bool verbose );
+static float applyLUT(uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float x );
+static float applyReverseLUT(uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float y_target, bool verbose );
 static LUTRQInfo_t* selectLUT(calibBlockInfo_t* blockInfo, uint8_t type);
-static void unpackLUTData( uint32_t LUTData, LUTRQInfo_t* p_LUTInfo, float* p_m, float* p_b, bool verbose );
-static bool computeDeltaBeta( uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, int32_t* deltaBetaOut);
+static void unpackLUTData(uint32_t LUTData, LUTRQInfo_t* p_LUTInfo, float* p_m, float* p_b, bool verbose );
+static bool computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, int32_t* deltaBetaOut);
+static void computeDeltaBeta2(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, float* deltaBetaOut);
 static IRC_Status_t ActualizationFileWriter_SM();
 static fileRecord_t* findIcuReferenceBlock();
 static uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_CalData, int16_t deltaBeta, int8_t expBitShift);
@@ -1304,8 +1305,7 @@ IRC_Status_t BadPixelDetection_SM()
    static context_t blockContext; // information structure for block processing
    static uint64_t mu_R; // sample mean of the range R
    static int64_t mu_Z;
-   static uint64_t mu_Image; // sample mean of the average image
-   static uint32_t N_mu; // number of samples for computing mu_image
+   static uint32_t N_mu; // number of good pixels in block
    static uint32_t noiseThreshold;
    static int32_t flickerThreshold2;
    static int32_t flickerThreshold1;
@@ -1323,7 +1323,6 @@ IRC_Status_t BadPixelDetection_SM()
    const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
    const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
    const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
-   const float AEC_responseTime_ms = 1000.0f; // ms
    uint32_t numFramesToSkip;// number of frames to skip at the beginning, corresponding to the AEC transient -> a number of time constants
 
    bool error = false;
@@ -1332,7 +1331,11 @@ IRC_Status_t BadPixelDetection_SM()
    IRC_Status_t rtnStatus = IRC_NOT_DONE;
 
    if (gActDebugOptions.disableBPDetection || gActualizationParams.badPixelsDetection == 0)
+   {
+      gStartBadPixelDetection = false;
+      gActBPMapAvailable = false;
       return IRC_DONE;
+   }
 
    switch (state)
    {
@@ -1414,13 +1417,13 @@ IRC_Status_t BadPixelDetection_SM()
          GC_SetAcquisitionFrameRate(frameRate);
 
          // Setup an AEC
-         GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], flashSettings.ActualizationAECTargetWellFilling);
-         GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], flashSettings.ActualizationAECResponseTime);//AEC_responseTime_ms/*flashSettings.ActualizationAECResponseTime*/);
-         GC_RegisterWriteFloat(&gcRegsDef[AECImageFractionIdx], flashSettings.ActualizationAECImageFraction);
+         GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], flashSettings.BPAECWellFilling);
+         GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], flashSettings.BPAECResponseTime);
+         GC_RegisterWriteFloat(&gcRegsDef[AECImageFractionIdx], flashSettings.BPAECImageFraction);
          GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Continuous);
 
          // compute the number of frames to skip (5 times the time constant)
-         numFramesToSkip = ceilf(5 * AEC_responseTime_ms/1000.0f * frameRate);
+         numFramesToSkip = ceilf(5 * flashSettings.BPAECResponseTime/1000.0f * frameRate);
          sequenceOffset += numFramesToSkip * frameSize * 2;
 #ifndef ACT_VERBOSE
          if (gActDebugOptions.verbose)
@@ -1661,7 +1664,6 @@ IRC_Status_t BadPixelDetection_SM()
          {
             mu_R = 0;
             mu_Z = 0;
-            mu_Image = 0;
             N_mu = 0;
          }
 
@@ -1715,7 +1717,7 @@ IRC_Status_t BadPixelDetection_SM()
             noiseThreshold = (float)mu_R * gActualizationParams.noiseThreshold;
             flickerThreshold1 = -(float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
             flickerThreshold2 = (float)mu_R * gActualizationParams.flickerThreshold + (float)mu_Z;
-            outlierThreshold = 5.5 * sigma_mu; // todo utiliser flash settings
+            outlierThreshold = flashSettings.BPOutlierThreshold * sigma_mu;
             outlierThreshold1 = p50 - outlierThreshold;
             outlierThreshold2 = p50 + outlierThreshold;
 
@@ -1728,10 +1730,9 @@ IRC_Status_t BadPixelDetection_SM()
                PRINTF( "ACT: mu_R = %d\n", (int32_t)mu_R);
                PRINTF( "ACT: mu_Z = %d\n", (int32_t)mu_Z);
                PRINTF( "ACT: N_mu = %d (number of good pixels in original block)\n", N_mu);
-               PRINTF( "ACT: mu_Image = %d\n", (int32_t)mu_Image/NCoadd);
                PRINTF( "ACT: sigma image (IQR-based) = %d\n", sigma_mu/NCoadd);
                PRINTF( "ACT: noiseThreshold = %d\n", noiseThreshold);
-               PRINTF( "ACT: offThreshold = %d\n", outlierThreshold/NCoadd);
+               PRINTF( "ACT: outlierThreshold = %d\n", outlierThreshold/NCoadd);
                PRINTF( "ACT: flickerThreshold = +/-%d\n", (uint32_t)((float)mu_R * gActualizationParams.flickerThreshold));
                PRINTF( "ACT: flickerThreshold1 = %d\n", flickerThreshold1);
                PRINTF( "ACT: flickerThreshold2 = %d\n", flickerThreshold2);
@@ -2252,14 +2253,6 @@ bool computeDeltaBeta( uint64_t *p_CalData, float FCal, float FCalBB, float Alph
 
    const float alpha_off = blockInfo->pixelData.Alpha_Off;
 
-   #ifdef ACT_VERBOSE
-   bool isAlreadyBadPixel = (calData & CALIB_PIXELDATA_BADPIXEL_MASK) == 0; // check the bad pixel status of the current calibration. Can't use the BitTst utility for uin64_t
-   uint32_t col = PixCounter % gcRegsData.SensorWidth;
-   uint32_t line = PixCounter / gcRegsData.SensorWidth;
-   bool outputData = ( col % 128 == 0 ) && (( line % 128 == 0 ) || line+1 == gcRegsData.SensorHeight);
-   PixCounter++;
-   #endif
-
    // Extract alpha from current calibration data => 12 lsb
    raw_alpha = (uint16_t) (( calData & alpha_mask ) >> CALIB_PIXELDATA_ALPHA_SHIFT);
    alpha = (float) raw_alpha * Alpha_LSB + alpha_off;
@@ -2295,7 +2288,16 @@ bool computeDeltaBeta( uint64_t *p_CalData, float FCal, float FCalBB, float Alph
    else
       BitSet(raw_delta_beta, CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT);
 
-   #ifdef ACT_VERBOSE
+   // Return raw delta Beta value
+   *deltaBetaOut = raw_delta_beta;
+
+#ifdef ACT_VERBOSE
+   bool isAlreadyBadPixel = (calData & CALIB_PIXELDATA_BADPIXEL_MASK) == 0; // check the bad pixel status of the current calibration. Can't use the BitTst utility for uin64_t
+   uint32_t col = PixCounter % gcRegsData.SensorWidth;
+   uint32_t line = PixCounter / gcRegsData.SensorWidth;
+   bool outputData = ( col % 128 == 0 ) && (( line % 128 == 0 ) || line+1 == gcRegsData.SensorHeight);
+   PixCounter++;
+
    if ( outputData )
    {
       int16_t tmp;
@@ -2325,14 +2327,57 @@ bool computeDeltaBeta( uint64_t *p_CalData, float FCal, float FCalBB, float Alph
       }
       ACT_PRINTF( "   raw_delta_beta (sat) : %d\n", tmp );
    }
-   #endif
+#endif
 
-   // Return raw delta Beta value
-   *deltaBetaOut = raw_delta_beta;
    return isNewBadPixel;
 }
 
-// this function is not used
+void computeDeltaBeta2(uint64_t *p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, float* deltaBetaOut)
+{
+   static const uint64_t alpha_mask = CALIB_PIXELDATA_ALPHA_MASK;
+   float alpha, delta_beta;
+   uint16_t raw_alpha;
+   uint64_t calData;
+
+   calData = *p_CalData;
+
+   const float alpha_off = blockInfo->pixelData.Alpha_Off;
+
+   // Extract alpha from current calibration data => 12 lsb
+   raw_alpha = (uint16_t) (( calData & alpha_mask ) >> CALIB_PIXELDATA_ALPHA_SHIFT);
+   alpha = (float) raw_alpha * Alpha_LSB + alpha_off;
+
+   // Compute delta beta ( see notes in function header )
+   delta_beta = ( FCal - FCalBB ) * alpha;
+
+   // Return raw delta Beta value
+   if (deltaBetaOut)
+      *deltaBetaOut = delta_beta;
+
+#ifdef ACT_VERBOSE
+   bool isAlreadyBadPixel = (calData & CALIB_PIXELDATA_BADPIXEL_MASK) == 0; // check the bad pixel status of the current calibration. Can't use the BitTst utility for uin64_t
+   uint32_t col = PixCounter % gcRegsData.SensorWidth;
+   uint32_t line = PixCounter / gcRegsData.SensorWidth;
+   bool n = ( col % 128 == 0 ) && (( line % 128 == 0 ) || line+1 == gcRegsData.SensorHeight);
+   PixCounter++;
+   if ( outputData )
+   {
+      int16_t tmp;
+      float tmp2 = delta_beta;
+      ACT_PRINTF( "Pixel (r=%d, c=%d)\n", line, col );
+      ACT_PRINTF( "   FCal: " _PCF(3) "\n", _FFMT(FCal,3));
+      ACT_PRINTF( "   CalData: 0x%08X%08X\n", (uint32_t)(calData >> 32), (uint32_t)(calData & 0x00000000FFFFFFFF));
+      ACT_PRINTF( "   alpha: " _PCF(3) " + %d x 2^%d (" _PCF(3) ")\n", _FFMT(alpha_off,3), raw_alpha,
+            blockInfo->pixelData.Alpha_Exp, _FFMT(alpha,3) );
+      if (!isAlreadyBadPixel)
+         ACT_PRINTF( "   delta_beta: %d x 2^%d (" _PCF(6) ")\n", tmp, DeltaBeta_Exp, _FFMT(delta_beta, 6) );
+      else
+         ACT_PRINTF( "   delta_beta: %d x 2^%d (" _PCF(6) ") ** bad pixel **\n", tmp, DeltaBeta_Exp, _FFMT(delta_beta, 6) );
+   }
+#endif
+}
+
+// this function is not used yet
 bool quantizeDeltaBeta(float FCal, float Beta_LSB, const calibBlockInfo_t* blockInfo, float deltaBetaIn, int32_t* rawDeltaBetaOut)
 {
    static const int16_t minRawData = -CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS; //-2^10
@@ -2365,7 +2410,45 @@ bool quantizeDeltaBeta(float FCal, float Beta_LSB, const calibBlockInfo_t* block
       BitSet(raw_delta_beta, CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT);
 
    *rawDeltaBetaOut = raw_delta_beta;
-      return isNewBadPixel;
+
+#ifdef ACT_VERBOSE
+   bool isAlreadyBadPixel = (calData & CALIB_PIXELDATA_BADPIXEL_MASK) == 0; // check the bad pixel status of the current calibration. Can't use the BitTst utility for uin64_t
+   uint32_t col = PixCounter % gcRegsData.SensorWidth;
+   uint32_t line = PixCounter / gcRegsData.SensorWidth;
+   bool outputData = ( col % 128 == 0 ) && (( line % 128 == 0 ) || line+1 == gcRegsData.SensorHeight);
+   PixCounter++;
+   if ( outputData )
+   {
+      int16_t tmp;
+      float tmp2 = delta_beta;
+      ACT_PRINTF( "Pixel (r=%d, c=%d)\n", line, col );
+      ACT_PRINTF( "   FCal: " _PCF(3) "\n", _FFMT(FCal,3));
+      ACT_PRINTF( "   CalData: 0x%08X%08X\n", (uint32_t)(calData >> 32), (uint32_t)(calData & 0x00000000FFFFFFFF));
+      ACT_PRINTF( "   alpha: " _PCF(3) " + %d x 2^%d (" _PCF(3) ")\n", _FFMT(alpha_off,3), raw_alpha,
+            blockInfo->pixelData.Alpha_Exp, _FFMT(alpha,3) );
+      tmp = (raw_delta_beta & CALIB_ACTUALIZATIONDATA_DELTABETA_MASK);
+      SIGN_EXT16(tmp, DELTA_BETA_NUM_BITS);
+      delta_beta = tmp * exp2f(DeltaBeta_Exp);
+      if (isNewBadPixel)
+      {
+         if (!isAlreadyBadPixel)
+            ACT_PRINTF( "   delta_beta: %d x 2^%d (" _PCF(6) ") **new bad pixel**\n", tmp, DeltaBeta_Exp, _FFMT(delta_beta, 6) );
+         else
+            ACT_PRINTF( "   delta_beta: %d x 2^%d (" _PCF(6) ") **already a bad pixel in reference block**\n", tmp, DeltaBeta_Exp, _FFMT(delta_beta, 6) );
+         ACT_PRINTF("unsaturated value = " _PCF(4) "\n", _FFMT(tmp2, 4));
+      }
+      else
+      {
+         if (!isAlreadyBadPixel)
+            ACT_PRINTF( "   delta_beta: %d x 2^%d (" _PCF(6) ")\n", tmp, DeltaBeta_Exp, _FFMT(delta_beta, 6) );
+         else
+            ACT_PRINTF( "   delta_beta: %d x 2^%d (" _PCF(6) ") ** bad pixel **\n", tmp, DeltaBeta_Exp, _FFMT(delta_beta, 6) );
+      }
+      ACT_PRINTF( "   raw_delta_beta (sat) : %d\n", tmp );
+   }
+   #endif
+
+   return isNewBadPixel;
 }
 
 /**
@@ -2735,15 +2818,14 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       ACT_INF("FWR_DELETE_PREVIOUS");
 
-      privateActualisationPosixTime = gcRegsData.DeviceRunningTime + (TRIG_GetRTC(&gTrig).Seconds % 60); // this yields a unique value for a given device ID
-      privateActualisationPosixTime = MAX(privateActualisationPosixTime, TRIG_GetRTC(&gTrig).Seconds);
+      privateActualisationPosixTime = TRIG_GetRTC(&gTrig).Seconds;
       if (gFM_calibrationActualizationFile != NULL)
       {
          // read the POSIX time of that file before deleting it
          uint32_t timestampOffset = gFM_calibrationActualizationFile->posixTime;
 
-         if (privateActualisationPosixTime < timestampOffset)
-            privateActualisationPosixTime += timestampOffset;
+         if (privateActualisationPosixTime < timestampOffset) // this can happen if the camera was not yet synchronize with a RTC.
+            privateActualisationPosixTime = timestampOffset + privateActualisationPosixTime % 60;
 
          ACT_INF("Removing previous actualisation file (%s).", gFM_calibrationActualizationFile->name);
          if (FM_RemoveFile(gFM_calibrationActualizationFile) != IRC_SUCCESS)

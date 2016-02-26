@@ -1180,6 +1180,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                }
                else
                {
+                  DT_PRINTF("Actualisation : mode = (0x%02X)", value);
                   gActDebugOptions.mode = value;
                   if (BitMaskTst(value, ACT_MODE_DEBUG))
                   {
