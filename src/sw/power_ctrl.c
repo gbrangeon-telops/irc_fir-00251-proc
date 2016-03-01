@@ -23,6 +23,7 @@
 #include "Buffermanager.h"
 #include "Actualization.h"
 #include "BuiltInTests.h"
+#include "DeviceKey.h"
 
 powerCtrl_t gPowerCtrl;
 
@@ -351,6 +352,7 @@ void Power_ToggleDevicePowerState()
 void Power_SM()
 {
    extern t_bufferManager gBufManager;
+   extern flashDynamicValues_t gFlashDynamicValues;
    static uint8_t startup = 1;
 
    switch (gcRegsData.DevicePowerState)
@@ -367,11 +369,19 @@ void Power_SM()
 
          if (gcRegsData.DevicePowerStateSetpoint == DPSS_PowerOn)
          {
-            PM_INF("Powering the camera...");
-            // TODO Turn on FW.
-            Acquisition_SetPowerState(DPSS_PowerOn);
-            TDCStatusSet(WaitingForPowerMask);
-            gcRegsData.DevicePowerState = DPS_PowerInTransition;
+            if ((DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS) || (gGC_ProprietaryFeatureKeyIsValid == 1))
+            {
+               PM_INF("Powering the camera...");
+               // TODO Turn on FW.
+               Acquisition_SetPowerState(DPSS_PowerOn);
+               TDCStatusSet(WaitingForPowerMask);
+               gcRegsData.DevicePowerState = DPS_PowerInTransition;
+            }
+            else
+            {
+               gcRegsData.DevicePowerStateSetpoint = DPSS_PowerStandby;
+               PM_ERR("Power On failed, device key is expired.");
+            }
          }
          break;
 

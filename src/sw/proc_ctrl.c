@@ -43,6 +43,7 @@
 #include "printf_utils.h"
 #include "CtrlInterface.h"
 #include "NetworkInterface.h"
+#include "DeviceKey.h"
 
 
 #define DEVICE_RUNNING_TIME_REFRESH_PERIOD_US   TIME_ONE_MINUTE_US
@@ -198,6 +199,13 @@ void disable_caches()
          if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
          {
             PRINTF("Error: Failed to update flash dynamic values.\n");
+         }
+
+         // Check for device key expiration
+         if ((DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS) &&
+               (GC_GetTimestamp() > flashSettings.DeviceKeyExpirationPOSIXTime))
+         {
+            DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
          }
 
          resetStats(&prof_stats);

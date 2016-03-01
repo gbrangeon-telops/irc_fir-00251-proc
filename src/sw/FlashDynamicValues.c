@@ -24,7 +24,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.3.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.4.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
 /**
@@ -41,6 +41,8 @@ flashDynamicValues_t flashDynamicValuesDefault = {
    /* DeviceCoolerRunningTime = */ 0,
    /* CalibrationCollectionPOSIXTimeAtStartup = */ 0,
    /* CalibrationCollectionBlockPOSIXTimeAtStartup = */ 0,
+   /* DeviceKeyValidationLow = */ 0xF01BCA90,
+   /* DeviceKeyValidationHigh = */ 0x77CFA1EE,
    /* FlashDynamicValuesFileCRC16 = */ 0,
    /* FileStructureMajorVersion = */ 0,
    /* FileStructureMinorVersion = */ 0,
@@ -151,7 +153,7 @@ IRC_Status_t FlashDynamicValues_Read(uint8_t *buffer, uint32_t buflen, flashDyna
 
 /* AUTO-CODE READ BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.3.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.4.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
    memcpy(&p_flashDynamicValues->DeviceSerialNumber, &buffer[FDV_DEVICESERIALNUMBER_OFFSET], FDV_DEVICESERIALNUMBER_LENGTH);
@@ -165,6 +167,8 @@ IRC_Status_t FlashDynamicValues_Read(uint8_t *buffer, uint32_t buflen, flashDyna
    memcpy(&p_flashDynamicValues->StealthMode, &buffer[FDV_STEALTHMODE_OFFSET], FDV_STEALTHMODE_LENGTH);
    memcpy(&p_flashDynamicValues->CalibrationCollectionPOSIXTimeAtStartup, &buffer[FDV_CALIBRATIONCOLLECTIONPOSIXTIMEATSTARTUP_OFFSET], FDV_CALIBRATIONCOLLECTIONPOSIXTIMEATSTARTUP_LENGTH);
    memcpy(&p_flashDynamicValues->CalibrationCollectionBlockPOSIXTimeAtStartup, &buffer[FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_OFFSET], FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_LENGTH);
+   memcpy(&p_flashDynamicValues->DeviceKeyValidationLow, &buffer[FDV_DEVICEKEYVALIDATIONLOW_OFFSET], FDV_DEVICEKEYVALIDATIONLOW_LENGTH);
+   memcpy(&p_flashDynamicValues->DeviceKeyValidationHigh, &buffer[FDV_DEVICEKEYVALIDATIONHIGH_OFFSET], FDV_DEVICEKEYVALIDATIONHIGH_LENGTH);
    memcpy(&p_flashDynamicValues->FlashDynamicValuesFileCRC16, &buffer[FDV_FLASHDYNAMICVALUESFILECRC16_OFFSET], FDV_FLASHDYNAMICVALUESFILECRC16_LENGTH);
 /* AUTO-CODE READ END */
 
@@ -219,7 +223,7 @@ IRC_Status_t FlashDynamicValues_Write(uint8_t *buffer, uint32_t buflen, flashDyn
 
 /* AUTO-CODE WRITE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.3.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.4.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
    memcpy(&buffer[FDV_DEVICESERIALNUMBER_OFFSET], &p_flashDynamicValues->DeviceSerialNumber, FDV_DEVICESERIALNUMBER_LENGTH);
@@ -233,6 +237,8 @@ IRC_Status_t FlashDynamicValues_Write(uint8_t *buffer, uint32_t buflen, flashDyn
    memcpy(&buffer[FDV_STEALTHMODE_OFFSET], &p_flashDynamicValues->StealthMode, FDV_STEALTHMODE_LENGTH);
    memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONPOSIXTIMEATSTARTUP_OFFSET], &p_flashDynamicValues->CalibrationCollectionPOSIXTimeAtStartup, FDV_CALIBRATIONCOLLECTIONPOSIXTIMEATSTARTUP_LENGTH);
    memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_OFFSET], &p_flashDynamicValues->CalibrationCollectionBlockPOSIXTimeAtStartup, FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_LENGTH);
+   memcpy(&buffer[FDV_DEVICEKEYVALIDATIONLOW_OFFSET], &p_flashDynamicValues->DeviceKeyValidationLow, FDV_DEVICEKEYVALIDATIONLOW_LENGTH);
+   memcpy(&buffer[FDV_DEVICEKEYVALIDATIONHIGH_OFFSET], &p_flashDynamicValues->DeviceKeyValidationHigh, FDV_DEVICEKEYVALIDATIONHIGH_LENGTH);
 /* AUTO-CODE WRITE END */
 
    crc16 = CRC16(0xFFFF, buffer, FDV_FLASHDYNAMICVALUESFILECRC16_OFFSET);
@@ -474,6 +480,11 @@ void FlashDynamicValues_UpdateVersion(flashDynamicValues_t *p_flashDynamicValues
                // 1.2.x -> 1.3.x
                p_flashDynamicValues->CalibrationCollectionPOSIXTimeAtStartup = flashDynamicValuesDefault.CalibrationCollectionPOSIXTimeAtStartup;
                p_flashDynamicValues->CalibrationCollectionBlockPOSIXTimeAtStartup = flashDynamicValuesDefault.CalibrationCollectionBlockPOSIXTimeAtStartup;
+
+             case 3:
+               // 1.3.x -> 1.4.x
+               p_flashDynamicValues->DeviceKeyValidationLow = flashDynamicValuesDefault.DeviceKeyValidationLow;
+               p_flashDynamicValues->DeviceKeyValidationHigh = flashDynamicValuesDefault.DeviceKeyValidationHigh;
 
                break; // Break after the last minor version only
 

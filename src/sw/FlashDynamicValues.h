@@ -39,11 +39,11 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.3.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.4.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
 #define FDV_FILESTRUCTUREMAJORVERSION      1
-#define FDV_FILESTRUCTUREMINORVERSION      3
+#define FDV_FILESTRUCTUREMINORVERSION      4
 #define FDV_FILESTRUCTURESUBMINORVERSION   0
 
 /**
@@ -97,6 +97,12 @@
 #define FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_OFFSET   44
 #define FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_LENGTH   4
 
+#define FDV_DEVICEKEYVALIDATIONLOW_OFFSET   48
+#define FDV_DEVICEKEYVALIDATIONLOW_LENGTH   4
+
+#define FDV_DEVICEKEYVALIDATIONHIGH_OFFSET   52
+#define FDV_DEVICEKEYVALIDATIONHIGH_LENGTH   4
+
 #define FDV_FLASHDYNAMICVALUESFILECRC16_OFFSET   510
 #define FDV_FLASHDYNAMICVALUESFILECRC16_LENGTH   2
 
@@ -110,12 +116,14 @@ struct flashDynamicValuesStruct {
    uint32_t FlashDynamicValuesFileLength;   /**< Camera flash dynamic values file length */
    uint32_t DeviceSerialNumber;   /**< Unique Telops 32-bit device serial number */
    uint32_t POSIXTime;   /**< Camera flash dynamic values file generation date and time. */
-   uint32_t DevicePowerOnCycles;   /**< Number of times the device has been power cycled. It corrseponds to the number of times the device passes from Off power state to Standby power state. */
-   uint32_t DeviceCoolerPowerOnCycles;   /**< Number of times the device cooler has been power cycled. It corrseponds to the number of times the device passes from Standby power state to On power state. */
+   uint32_t DevicePowerOnCycles;   /**< Number of times the device has been power cycled. It corresponds to the number of times the device passes from Off power state to Standby power state. */
+   uint32_t DeviceCoolerPowerOnCycles;   /**< Number of times the device cooler has been power cycled. It corresponds to the number of times the device passes from Standby power state to On power state. */
    uint32_t DeviceRunningTime;   /**< Running time of the device. */
    uint32_t DeviceCoolerRunningTime;   /**< Running time of the device cooler. */
    uint32_t CalibrationCollectionPOSIXTimeAtStartup;   /**< POSIX time of the calibration collection to load at camera startup. */
    uint32_t CalibrationCollectionBlockPOSIXTimeAtStartup;   /**< POSIX time of the calibration block to load at camera startup. */
+   uint32_t DeviceKeyValidationLow;   /**< Device 64-bit key validation value (LSB) */
+   uint32_t DeviceKeyValidationHigh;   /**< Device 64-bit key validation value (MSB) */
    uint16_t FlashDynamicValuesFileCRC16;   /**< Camera flash dynamic values file CRC-16 */
    uint8_t FileStructureMajorVersion;   /**< Camera flash dynamic values file structure Major Version */
    uint8_t FileStructureMinorVersion;   /**< Camera flash dynamic values file structure Minor Version */

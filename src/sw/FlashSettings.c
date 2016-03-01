@@ -48,7 +48,7 @@ int fdFlashSettings;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.9.0
+// Generated from the Flash Settings definition XLS file version 1.10.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 /**
@@ -100,6 +100,9 @@ flashSettings_t flashSettingsDefault = {
    /* ActualizationStabilizationTime2 = */ 0,
    /* ActualizationTimeout2 = */ 300000,
    /* BPDuration = */ 60000,
+   /* DeviceKeyExpirationPOSIXTime = */ 0xFFFFFFFF,
+   /* DeviceKeyLow = */ 0x00000000,
+   /* DeviceKeyHigh = */ 0x00000000,
    /* ActualizationTemperatureTolerance1 = */ 20,
    /* ActualizationTemperatureTolerance2 = */ 20,
    /* DetectorPolarizationVoltage = */ 0,
@@ -527,7 +530,7 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
 
 /* AUTO-CODE FIELDS BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.9.0
+// Generated from the Flash Settings definition XLS file version 1.10.0
 // using generateFlashSettingsCLib.m Matlab script.
 
    // Read DeviceSerialNumber flash settings field
@@ -1422,6 +1425,33 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
    }
    *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->BPAECResponseTime, FS_BPAECRESPONSETIME_LENGTH);
 
+   // Read DeviceKeyExpirationPOSIXTime flash settings field
+   byteCount = uffs_read(fd, &p_flashSettings->DeviceKeyExpirationPOSIXTime, FS_DEVICEKEYEXPIRATIONPOSIXTIME_LENGTH);
+   if (byteCount != FS_DEVICEKEYEXPIRATIONPOSIXTIME_LENGTH)
+   {
+      FS_ERR("Failed to read DeviceKeyExpirationPOSIXTime field.");
+      return IRC_FAILURE;
+   }
+   *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->DeviceKeyExpirationPOSIXTime, FS_DEVICEKEYEXPIRATIONPOSIXTIME_LENGTH);
+
+   // Read DeviceKeyLow flash settings field
+   byteCount = uffs_read(fd, &p_flashSettings->DeviceKeyLow, FS_DEVICEKEYLOW_LENGTH);
+   if (byteCount != FS_DEVICEKEYLOW_LENGTH)
+   {
+      FS_ERR("Failed to read DeviceKeyLow field.");
+      return IRC_FAILURE;
+   }
+   *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->DeviceKeyLow, FS_DEVICEKEYLOW_LENGTH);
+
+   // Read DeviceKeyHigh flash settings field
+   byteCount = uffs_read(fd, &p_flashSettings->DeviceKeyHigh, FS_DEVICEKEYHIGH_LENGTH);
+   if (byteCount != FS_DEVICEKEYHIGH_LENGTH)
+   {
+      FS_ERR("Failed to read DeviceKeyHigh field.");
+      return IRC_FAILURE;
+   }
+   *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->DeviceKeyHigh, FS_DEVICEKEYHIGH_LENGTH);
+
 /* AUTO-CODE FIELDS END */
 
    return IRC_SUCCESS;
@@ -1597,6 +1627,33 @@ void FlashSettings_UpdateVersion(flashSettings_t *p_flashSettings)
                // 1.6.x -> 1.7.x
                p_flashSettings->FWExposureTimeMaxMargin = flashSettingsDefault.FWExposureTimeMaxMargin;
                p_flashSettings->ExternalFanSpeedSetpoint = flashSettingsDefault.ExternalFanSpeedSetpoint;
+
+            case 7:
+               // 1.7.x -> 1.8.x
+               p_flashSettings->BPDetectionEnabled = flashSettingsDefault.BPDetectionEnabled;
+               p_flashSettings->BPNumSamples = flashSettingsDefault.BPNumSamples;
+               p_flashSettings->BPFlickerThreshold = flashSettingsDefault.BPFlickerThreshold;
+               p_flashSettings->BPNoiseThreshold = flashSettingsDefault.BPNoiseThreshold;
+               p_flashSettings->BPDuration = flashSettingsDefault.BPDuration;
+               p_flashSettings->BPNCoadd = flashSettingsDefault.BPNCoadd;
+               p_flashSettings->MaximumTotalFlux = flashSettingsDefault.MaximumTotalFlux;
+               p_flashSettings->FluxRatio01 = flashSettingsDefault.FluxRatio01;
+               p_flashSettings->FluxRatio12 = flashSettingsDefault.FluxRatio12;
+               p_flashSettings->AECPlusExpTimeMargin = flashSettingsDefault.AECPlusExpTimeMargin;
+               p_flashSettings->AECPlusFluxMargin = flashSettingsDefault.AECPlusFluxMargin;
+
+            case 8:
+               // 1.8.x -> 1.9.x
+               p_flashSettings->BPOutlierThreshold = flashSettingsDefault.BPOutlierThreshold;
+               p_flashSettings->BPAECImageFraction = flashSettingsDefault.BPAECImageFraction;
+               p_flashSettings->BPAECWellFilling = flashSettingsDefault.BPAECWellFilling;
+               p_flashSettings->BPAECResponseTime = flashSettingsDefault.BPAECResponseTime;
+
+            case 9:
+               // 1.9.x -> 1.10.x
+               p_flashSettings->DeviceKeyExpirationPOSIXTime = flashSettingsDefault.DeviceKeyExpirationPOSIXTime;
+               p_flashSettings->DeviceKeyLow = flashSettingsDefault.DeviceKeyLow;
+               p_flashSettings->DeviceKeyHigh = flashSettingsDefault.DeviceKeyHigh;
 
                break; // Break after the last minor version only
 

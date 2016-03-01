@@ -20,24 +20,25 @@
 
 
 #ifdef DEBUG
-#define ACQ_VERBOSE
-#define ACT_VERBOSE
+// #define ACQ_VERBOSE
+// #define ACT_VERBOSE
 // #define BUFFERING_VERBOSE
 // #define CAL_VERBOSE
 // #define CI_VERBOSE
 // #define CM_VERBOSE
+// #define DK_VERBOSE
 // #define EHDRI_VERBOSE
 // #define F1F2_VERBOSE
 // #define FDV_VERBOSE
 // #define FH_VERBOSE
 // #define FH_RX_VERBOSE
 // #define FH_TX_VERBOSE
-#define FLAGGING_VERBOSE
+// #define FLAGGING_VERBOSE
 // #define FM_VERBOSE
 // #define FS_VERBOSE
 // #define FU_VERBOSE
 // #define FW_VERBOSE
-#define GATING_VERBOSE
+// #define GATING_VERBOSE
 // #define GCM_VERBOSE
 // #define GCP_VERBOSE
 // #define GPS_VERBOSE

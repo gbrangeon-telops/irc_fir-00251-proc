@@ -65,11 +65,11 @@ typedef enum fslImmediateEnum fslImmediate_t;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.9.0
+// Generated from the Flash Settings definition XLS file version 1.10.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 #define FS_FILESTRUCTUREMAJORVERSION      1
-#define FS_FILESTRUCTUREMINORVERSION      9
+#define FS_FILESTRUCTUREMINORVERSION      10
 #define FS_FILESTRUCTURESUBMINORVERSION   0
 
 /**
@@ -348,8 +348,17 @@ typedef enum fslImmediateEnum fslImmediate_t;
 #define FS_BPAECRESPONSETIME_OFFSET   288
 #define FS_BPAECRESPONSETIME_LENGTH   4
 
-#define FS_SPARE_FREE_SPACE_OFFSET   292
-#define FS_SPARE_FREE_SPACE_LENGTH   65242
+#define FS_DEVICEKEYEXPIRATIONPOSIXTIME_OFFSET   292
+#define FS_DEVICEKEYEXPIRATIONPOSIXTIME_LENGTH   4
+
+#define FS_DEVICEKEYLOW_OFFSET   296
+#define FS_DEVICEKEYLOW_LENGTH   4
+
+#define FS_DEVICEKEYHIGH_OFFSET   300
+#define FS_DEVICEKEYHIGH_LENGTH   4
+
+#define FS_SPARE_FREE_SPACE_OFFSET   304
+#define FS_SPARE_FREE_SPACE_LENGTH   65230
 
 #define FS_FLASHSETTINGSFILECRC16_OFFSET   65534
 #define FS_FLASHSETTINGSFILECRC16_LENGTH   2
@@ -405,6 +414,9 @@ struct flashSettingsStruct {
    uint32_t ActualizationStabilizationTime2;   /**< Minimum stabilisation time in second stabilization phase. */
    uint32_t ActualizationTimeout2;   /**< Maximum waiting time during second stabilization phase. */
    uint32_t BPDuration;   /**< Duration of the acquisition. */
+   uint32_t DeviceKeyExpirationPOSIXTime;   /**< Device key expiration POSIX time. */
+   uint32_t DeviceKeyLow;   /**< Device 64-bit key (LSB). */
+   uint32_t DeviceKeyHigh;   /**< Device 64-bit key (MSB). */
    int16_t ActualizationTemperatureTolerance1;   /**< Temperature variation tolerance during the first stabilization phase (prior to placing the ICU in front of the detector). */
    int16_t ActualizationTemperatureTolerance2;   /**< Temperature variation tolerance during the second stabilization phase (prior to acquiring ICU measurements). */
    int16_t DetectorPolarizationVoltage;   /**< Detector photodiodes polarization voltage. */

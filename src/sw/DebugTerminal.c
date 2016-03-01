@@ -32,6 +32,7 @@
 #include "proc_memory.h"
 #include "GPS.h"
 #include "trig_gen.h"
+#include "DeviceKey.h"
 #include <string.h>
 #include <time.h>
 
@@ -56,6 +57,7 @@ static IRC_Status_t DebugTerminalParseFRW(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf);
 static uint16_t GetNextArg(circByteBuffer_t *cbuf, uint8_t *buffer, uint16_t buflen);
 static IRC_Status_t ParseNumArg(char *str, uint8_t length, uint32_t *value);
 static IRC_Status_t ParseNumHex(char *str, uint8_t length, uint32_t *value);
@@ -370,6 +372,10 @@ IRC_Status_t DebugTerminalParser(circByteBuffer_t *cbuf)
 
          return IRC_SUCCESS;
       }
+      else if (strcasecmp((char *)cmdStr, "KEY") == 0)
+      {
+         return DebugTerminalParseKEY(cbuf);
+      }
       else if (strcasecmp((char *)cmdStr, "HLP") == 0)
       {
          return DebugTerminalParseHLP(cbuf);
@@ -433,6 +439,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    PRINTF("  Power:              PWR\n");
    PRINTF("  Buffer selection:   BUF EXT|INT (broken)\n");
    PRINTF("  Disable/ignore FW:  DFW\n");
+   PRINTF("  Device key:         KEY [RENEW|RESET]\n");
    PRINTF("  Print help:         HLP\n");
 
    return IRC_SUCCESS;
@@ -1667,8 +1674,8 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
          }
          DT_PRINTF("UTC Time:  %02d:%02d:%02d  %02d/%02d/%4d", rTClock.tm_hour, rTClock.tm_min, rTClock.tm_sec,
                rTClock.tm_mon + 1, rTClock.tm_mday, rTClock.tm_year + 1900);
-         DT_PRINTF("Latitude:  %d°\%d'%d\" %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
-         DT_PRINTF("Longitude: %d°\%d'%d\" %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
+         DT_PRINTF("Latitude:  %d?\%d'%d\" %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
+         DT_PRINTF("Longitude: %d?\%d'%d\" %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
          DT_PRINTF("Altitude:  %d,%d m", Gps_struct.Altitude, Gps_struct.Altitude_frac);
          break;
 
@@ -1868,6 +1875,66 @@ IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf)
    }
 
    DT_PRINT("DDR memory read and write test succeeded.");
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Device Key command parser.
+ * This parser is used to parse and validate Device Key command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Device Key command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
+{
+   extern flashDynamicValues_t gFlashDynamicValues;
+   uint8_t argStr[6];
+   uint32_t arglen;
+
+   // Check for key command argument presence
+   if (!CBB_Empty(cbuf))
+   {
+      // Read key command argument
+      arglen = GetNextArg(cbuf, argStr, 5);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid key command argument.");
+         return IRC_FAILURE;
+      }
+      argStr[arglen++] = '\0'; // Add string terminator
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!CBB_Empty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      if (strcasecmp((char *)argStr, "RENEW") == 0)
+      {
+         DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
+         return IRC_SUCCESS;
+      }
+      else if (strcasecmp((char *)argStr, "RESET") == 0)
+      {
+         DeviceKey_Reset(&gFlashDynamicValues, &gcRegsData);
+         return IRC_SUCCESS;
+      }
+      else
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+   }
+
+   DT_PRINTF("Device key:            0x%08X%08X", flashSettings.DeviceKeyHigh, flashSettings.DeviceKeyLow);
+   DT_PRINTF("Device key validation: 0x%08X%08X (%s)", gcRegsData.DeviceKeyValidationHigh, gcRegsData.DeviceKeyValidationLow,
+         (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS)? "Passed" : "Failed");
+   DT_PRINTF("Device key expiration: 0x%08X", flashSettings.DeviceKeyExpirationPOSIXTime);
 
    return IRC_SUCCESS;
 }
