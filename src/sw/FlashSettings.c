@@ -1766,7 +1766,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    {
       TDCFlagsClr(ICUIsImplementedMask);
    }
-   ICU_init(&gcRegsData, &gICU_ctrl);
 
    // Validate that FW and NDF are not both present
    if (p_flashSettings->FWPresent && p_flashSettings->NDFPresent)
@@ -1833,7 +1832,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
 
    // Update detector polarization voltage
    gFpaDetectorPolarizationVoltage = p_flashSettings->DetectorPolarizationVoltage;
-   FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
 
    // Validate ExternalMemoryBufferPresent field
    if (XOR(p_flashSettings->ExternalMemoryBufferPresent, externalMemoryBufferDetected))
@@ -1844,7 +1842,14 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
 
    // Update external fan speed setpoint
    gcRegsData.ExternalFanSpeedSetpoint = p_flashSettings->ExternalFanSpeedSetpoint;
-   GC_SetExternalFanSpeed();
+
+   // Update camera state if initialization is done
+   if (!TDCStatusTst(WaitingForInitMask))
+   {
+      ICU_init(&gcRegsData, &gICU_ctrl);
+      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+      GC_SetExternalFanSpeed();
+   }
 
    return IRC_SUCCESS;
 }
