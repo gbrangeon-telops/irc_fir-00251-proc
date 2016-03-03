@@ -38,6 +38,7 @@
 #define ScorpiomwDSensor   9
 // ScorpiolwD_230HzSensor is not defined since it's using ScorpiomwDSensor
 #define Isc0209ASensor     11
+#define ScorpiomwASensor   12
 
 /*
  * TDCStatus register bit field definition
@@ -129,6 +130,7 @@
 #define MarsDIsImplemented             SensorIsImplemented(MarsDSensor)
 #define ScorpiomwDIsImplemented        SensorIsImplemented(ScorpiomwDSensor)
 #define Isc0209AIsImplemented          SensorIsImplemented(Isc0209ASensor)
+#define ScorpiomwAIsImplemented        SensorIsImplemented(ScorpiomwASensor)
 
 #define TDCFlagsSet(mask) BitMaskSet(gcRegsData.TDCFlags, mask)  /**< Set masked bits in TDCFlags register */
 #define TDCFlagsClr(mask) BitMaskClr(gcRegsData.TDCFlags, mask)  /**< Clear masked bits in TDCFlags register */
