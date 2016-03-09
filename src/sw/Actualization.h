@@ -189,6 +189,7 @@ typedef struct {
    float deltaBeta[MAX_PIXEL_COUNT]; // the bad pixels from the reference block have a deltaBeta value of infinity
    statistics_t stats;
    uint32_t saturatedData; // number of pixel values with saturation in the NUC data
+   uint32_t type; // 0: icu, 1: external BB
    bool ready;
 } deltabeta_t; // for future use
 
@@ -266,7 +267,7 @@ IRC_Status_t Actualization_SM();
 IRC_Status_t BadPixelDetection_SM();
 
 bool shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
-uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const float* p_deltaBeta, const float offset, uint32_t numData);
+uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);
 uint32_t updateBadPixelMap(uint32_t* p_CalData, const uint16_t* p_bpMap, uint32_t numData);
 void ACT_resetDebugOptions();
 void ACT_parseDebugMode();

@@ -972,11 +972,13 @@ IRC_Status_t Actualization_SM()
          {
             if (usingICU)
             {
+               deltaBetaICU.type = 0; // todo changer quand multi-actualisation sera implanté
                T_BB = ICUTemp + CELSIUS_TO_KELVIN;
                PRINTF( "ACT: T_BB (internal) is " _PCF(3) " K\n", _FFMT(T_BB,3));
             }
             else
             {
+               deltaBetaICU.type = 1; // todo changer quand multi-actualisation sera implanté
                T_BB = gcRegsData.ExternalBlackBodyTemperature + CELSIUS_TO_KELVIN;
                PRINTF( "ACT: T_BB (external) is " _PCF(3) " K\n", _FFMT(T_BB,3));
             }
@@ -1411,9 +1413,8 @@ IRC_Status_t BadPixelDetection_SM()
    case BPD_UpdateBeta:
       {
          uint32_t* calAddr = (uint32_t*)PROC_MEM_PIXEL_DATA_BASEADDR; // CR_TRICKY the pointer is in 32-bit elements (64 bits per pixel data)
-         float* deltaBetaAddr = &deltaBetaICU.deltaBeta[blockContext.startIndex];
 
-         updateCurrentCalibration(&calibrationInfo.blocks[0], &calAddr[blockContext.startIndex*2], deltaBetaAddr, 0, blockContext.blockLength);
+         updateCurrentCalibration(&calibrationInfo.blocks[0], &calAddr[blockContext.startIndex*2], &deltaBetaICU, blockContext.startIndex, blockContext.blockLength);
 
          ctxtIterate(&blockContext);
 
@@ -2456,7 +2457,7 @@ bool shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t 
   *      Only factory calibrations can be updated
   *
   */
-uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const float* p_deltaBeta, const float offset, uint32_t numData)
+uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData)
 {
    int16_t DeltaBetaH, DeltaBetaL;
    uint32_t numBadPixels = 0;
@@ -2464,7 +2465,13 @@ uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p
    uint64_t calData;
    uint64_t* calDataAddr;
    const float BetaLSB = exp2f((float)blockInfo->pixelData.Beta0_Exp);
-   const float* deltaBetaAddr = p_deltaBeta;
+   const float* deltaBetaAddr = &deltaBeta->deltaBeta[startIdx];
+   float offset;
+
+   if ((deltaBeta->type == 0 && gActualizationParams.deltaBetaDiscardOffset) || gActDebugOptions.forceDiscardOffset)
+      offset = deltaBeta->stats.avg;
+   else
+      offset = 0;
 
    while (numData)
    {

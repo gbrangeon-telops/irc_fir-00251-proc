@@ -867,17 +867,11 @@ void Calibration_SM()
             uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
             deltabeta_t* deltaBetaDataAddr = ACT_getDeltaBetaForBlock(&calibrationInfo.blocks[blockIndex]);
             uint32_t blockSize = MIN(CM_CALIB_UPDATE_BLOCK_SIZE, numberOfDataToProcess - dataOffset);
-            float* deltaBetaAddr = deltaBetaDataAddr->deltaBeta;
-            float offset = 0;
 
-            if (gActualizationParams.deltaBetaDiscardOffset || gActDebugOptions.forceDiscardOffset)
-               offset = deltaBetaDataAddr->stats.avg;
-
-            deltaBetaAddr += dataOffset;
             calAddr += 2*dataOffset;
 
             calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
-            newBadPixelCount += updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaAddr, offset, blockSize);
+            newBadPixelCount += updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaDataAddr, dataOffset, blockSize);
 
             dataOffset += blockSize; // dataOffset is given in pixels
 
