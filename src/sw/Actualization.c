@@ -471,11 +471,15 @@ IRC_Status_t Actualization_SM()
             savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
             Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.collection.POSIXTime);
 
-            // the reference block is the current bloc
+            // the reference block is the current bloc // todo utiliser le "current block"
             refBlockFileHdr.PixelDataResolution = calibrationInfo.collection.PixelDataResolution;
             refBlockFileHdr.SensorWellDepth = calibrationInfo.collection.SensorWellDepth;
             refBlockFileHdr.IntegrationMode = calibrationInfo.collection.IntegrationMode;
             refBlockFileHdr.POSIXTime = calibrationInfo.collection.ReferencePOSIXTime;
+            refBlockFileHdr.SensorID = calibrationInfo.collection.SensorID;
+            refBlockFileHdr.DeviceSerialNumber = gcRegsData.DeviceSerialNumber;
+            //refBlockFileHdr.DeviceDataFlowMajorVersion = 0; // not available
+            //refBlockFileHdr.DeviceDataFlowMinorVersion = 0; // not available
 
             setActState(&state, ACT_WaitForCalibData);
             StartTimer(&act_timer, ACT_WAIT_FOR_DATA_TIMEOUT/1000);
@@ -1214,7 +1218,7 @@ IRC_Status_t Actualization_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               PRINTF( "ACT: Beta correction completed in " _PCF(2) "s\n", _FFMT(elapsed_time_us((float)tic_TotalDuration) / ((float)TIME_ONE_SECOND_US), 2));
+               PRINTF( "ACT: Beta correction completed in " _PCF(2) " s\n", _FFMT(elapsed_time_us((float)tic_TotalDuration) / ((float)TIME_ONE_SECOND_US), 2));
             }
             PRINTF( "ACT: Actualization done.\n");
 
@@ -2770,7 +2774,6 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       ACT_INF("FWR_FILE_HEADER");
 
-      //t_PosixTime time = TRIG_GetRTC(&gTrig);
       actFileHeader.DeviceSerialNumber = refBlockFileHdr.DeviceSerialNumber;
       actFileHeader.POSIXTime = privateActualisationPosixTime;
       strcpy(actFileHeader.FileDescription, "");
@@ -2974,7 +2977,7 @@ IRC_Status_t ActualizationFileWriter_SM()
       state = FWR_IDLE;
       retVal = IRC_DONE;
 
-      ACT_PRINTF( "File IO completed in %dms\n", (uint32_t) elapsed_time_us( tic_io_duration ) / 1000 );
+      ACT_PRINTF( "File IO completed in %d ms\n", (uint32_t) elapsed_time_us( tic_io_duration ) / 1000 );
 
       break;
 
