@@ -866,13 +866,16 @@ void Calibration_SM()
             const uint32_t numberOfDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
             uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
             uint32_t* deltaBetaAddr = (uint32_t*)PROC_MEM_DELTA_BETA_BASEADDR;
+            deltabeta_t* deltaBetaDataAddr = ACT_getDeltaBetaForBlock(&calibrationInfo.blocks[blockIndex]);
             uint32_t blockSize = MIN(CM_CALIB_UPDATE_BLOCK_SIZE, numberOfDataToProcess - dataOffset);
+            float* dB = deltaBetaDataAddr->deltaBeta;
 
+            dB += dataOffset;
             calAddr += 2*dataOffset;
             deltaBetaAddr += dataOffset/2; // because the pointer is in 32-bit elements (2x16 bits)
 
             calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
-            newBadPixelCount += updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaAddr, blockSize);
+            newBadPixelCount += updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaAddr, dB, blockSize);
 
             dataOffset += blockSize; // dataOffset is given in pixels
 

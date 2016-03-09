@@ -98,6 +98,7 @@
 		ACTION(ACT_ComputeDeltaBeta)        /**< for each pixel, compute delta-beta (block-computation to yield some time to other processes) */ \
 		ACTION(ACT_DetectBadPixels)         /**< perform detection of bad pixel based on noise and flicker criteria */ \
 		ACTION(ACT_ApplyBadPixelMap)        /**< merge the bad pixel map with the delta beta map */ \
+		ACTION(ACT_ComputeDeltaBetaStats)   /**< fill the remaining fields of the deltaBeta_t structure (min, max, etc.) */ \
 		ACTION(ACT_WriteActualizationFile)  /**< the file writer state machine is on during this state */ \
 		ACTION(ACT_Finalize)                /**< a reload calibration command is issued to the calibration manager */
 
@@ -179,10 +180,12 @@ typedef struct {
 } context_t;
 
 typedef struct {
-   float deltaBeta[MAX_FRAME_SIZE];
+   float deltaBeta[MAX_PIXEL_COUNT]; // the bad pixels from the reference block have a deltaBeta value of infinity
    float max;
    float min;
-   float offset;
+   float offset; // the DC value of the delta beta map
+   statistics_t stats;
+   uint32_t saturatedData; // number of pixel values with saturation in the NUC data
    bool ready;
 } deltabeta_t; // for future use
 
@@ -214,6 +217,7 @@ typedef struct
    uint32_t flickersNCoadd; // number of frames to use for average estimation
    uint32_t badPixelsDetection;
    uint32_t duration; // duration of observation
+   uint32_t deltaBetaDiscardOffset; // remove the DC component of the deltaBeta map (only applies to ICU updates). Default is false
 } actParams_t;
 
 typedef struct
@@ -257,7 +261,7 @@ IRC_Status_t Actualization_SM();
 IRC_Status_t BadPixelDetection_SM();
 
 bool shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
-uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const uint32_t* p_actData, uint32_t numData);
+uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, /*obsolete*/const uint32_t* p_actData, const float* p_deltaBeta, uint32_t numData);
 uint32_t updateBadPixelMap(uint32_t* p_CalData, const uint16_t* p_bpMap, uint32_t numData);
 void ACT_resetDebugOptions();
 void ACT_parseDebugMode();
@@ -266,5 +270,7 @@ void ACT_resetParams(actParams_t* p);
 void updateMoments(float* m1, float* m2, float* m3, float x, uint32_t N); /**< iterative statistical moments update. */
 
 void testMomentComputations();
+
+deltabeta_t* ACT_getDeltaBetaForBlock(const calibBlockInfo_t* blockInfo);
 
 #endif // ACTUALIZATION_H
