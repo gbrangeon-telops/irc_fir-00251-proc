@@ -43,6 +43,12 @@
    #define ACT_TRC(fmt, ...)        DUMMY_PRINTF("Trace: " fmt "\n", ##__VA_ARGS__)
 #endif
 
+#ifndef ACT_VERBOSE
+   #define VERBOSE_IF(x) if (x)
+#else
+   #define VERBOSE_IF(x)
+#endif
+
 #define ACT_MAX_PIX_DATA_TO_PROCESS   128 // number of pixels to process in a single time shared pass. Must be even
 #define ACT_MAX_DATABLOCK_TO_WRITE    256 // for file IO
 
@@ -181,9 +187,6 @@ typedef struct {
 
 typedef struct {
    float deltaBeta[MAX_PIXEL_COUNT]; // the bad pixels from the reference block have a deltaBeta value of infinity
-   float max;
-   float min;
-   float offset; // the DC value of the delta beta map
    statistics_t stats;
    uint32_t saturatedData; // number of pixel values with saturation in the NUC data
    bool ready;
@@ -204,6 +207,7 @@ typedef struct
    bool disableBPDetection;
    bool useDynamicTestPattern;
    bool verbose;
+   bool forceDiscardOffset;
    uint32_t mode; // bit mask, default to 0
 } actDebugOptions_t;
 
@@ -246,6 +250,7 @@ typedef struct
 #define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
 #define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
 #define ACT_MODE_VERBOSE 0x10 // add some verbose
+#define ACT_MODE_DISCARD_OFFSET 0x20 // add some verbose
 
 extern bool gActDeltaBetaAvailable; /**< indicates the validity of the actualization data in memory */
 extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */
@@ -261,7 +266,7 @@ IRC_Status_t Actualization_SM();
 IRC_Status_t BadPixelDetection_SM();
 
 bool shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
-uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, /*obsolete*/const uint32_t* p_actData, const float* p_deltaBeta, uint32_t numData);
+uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const float* p_deltaBeta, const float offset, uint32_t numData);
 uint32_t updateBadPixelMap(uint32_t* p_CalData, const uint16_t* p_bpMap, uint32_t numData);
 void ACT_resetDebugOptions();
 void ACT_parseDebugMode();

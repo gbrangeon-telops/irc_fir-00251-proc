@@ -1234,6 +1234,15 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                      DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
                   }
 
+                  if (BitMaskTst(value, ACT_MODE_DISCARD_OFFSET))
+                  {
+                     DT_PRINTF("Actualisation : discard delta beta offset is ON (0x%02X)", ACT_MODE_DISCARD_OFFSET);
+                  }
+                  else
+                  {
+                     DT_PRINTF("Actualisation : discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
+                  }
+
                }
                break;
 
