@@ -1188,14 +1188,14 @@ IRC_Status_t Actualization_SM()
 
                float* buffer = (float*)prctile_buffer;
                int i50 = 0.50f * numPixels; // index of the median
-               int N = deltaBetaICU.stats.N;
+               int N = numPixels;
 
                GETTIME(&t0);
 
                //memcpy(buffer, deltaBetaICU.deltaBeta, N * sizeof(float));
                for (i=0; i<numPixels; ++i)
                   buffer[i] = deltaBetaICU.deltaBeta[i] - deltaBetaICU.stats.min;
-               // CR_TRICKY comparing strictly positive floats typecasted as uint32_t is equivalent
+               // CR_TRICKY comparing positive floats typecasted as uint32_t is equivalent
                p50.i = select((uint32_t*)buffer, 0, N, i50);
                p50.f += deltaBetaICU.stats.min;
 
@@ -2915,7 +2915,6 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       ACT_INF("FWR_DATA_HEADER");
 
-      actDataHeader.Beta0_Median = 0;
       actDataHeader.Beta0_Nbits = DELTA_BETA_NUM_BITS;
       actDataHeader.Beta0_Signed = 1;
       actDataHeader.ActualizationDataCRC16 = dataCRC;

@@ -1182,68 +1182,68 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                arglen = GetNextArg(cbuf, argStr, 10);
                if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
                {
-                  DT_ERR("Invalid data length.");
-                  return IRC_FAILURE;
+                  // without argument : display the current mode
+                  value = gActDebugOptions.mode;
+               }
+               else
+                  gActDebugOptions.mode = value;
+
+               DT_PRINTF("Actualisation : current mode = 0x%02X", value);
+
+               if (BitMaskTst(value, ACT_MODE_DEBUG))
+               {
+                  DT_PRINTF("Actualisation : debug mode activated (0x%02X)", ACT_MODE_DEBUG);
                }
                else
                {
-                  DT_PRINTF("Actualisation : mode = (0x%02X)", value);
-                  gActDebugOptions.mode = value;
-                  if (BitMaskTst(value, ACT_MODE_DEBUG))
-                  {
-                     DT_PRINTF("Actualisation : debug mode activated (0x%02X)", ACT_MODE_DEBUG);
-                  }
-                  else
-                  {
-                     DT_PRINTF("Actualisation : debug mode disabled (0x%02X)", ACT_MODE_DEBUG);
-                  }
-
-                  if (BitMaskTst(value, ACT_MODE_DELTA_BETA_OFF))
-                  {
-                     DT_PRINTF("Actualisation : beta correction disabled (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
-                  }
-                  else
-                  {
-                     DT_PRINTF("Actualisation : beta correction activated (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
-                  }
-
-                  if (BitMaskTst(value, ACT_MODE_BP_OFF))
-                  {
-                     DT_PRINTF("Actualisation : bad pixel detection disabled (0x%02X)", ACT_MODE_BP_OFF);
-                  }
-                  else
-                  {
-                     DT_PRINTF("Actualisation : bad pixel detection activated (0x%02X)", ACT_MODE_BP_OFF);
-                  }
-
-                  if (BitMaskTst(value, ACT_MODE_DYN_TST_PTRN))
-                  {
-                     DT_PRINTF("Actualisation : dynamic test pattern is ON (0x%02X)", ACT_MODE_DYN_TST_PTRN);
-                  }
-                  else
-                  {
-                     DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
-                  }
-
-                  if (BitMaskTst(value, ACT_MODE_VERBOSE))
-                  {
-                     DT_PRINTF("Actualisation : verbose is ON (0x%02X)", ACT_MODE_VERBOSE);
-                  }
-                  else
-                  {
-                     DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
-                  }
-
-                  if (BitMaskTst(value, ACT_MODE_DISCARD_OFFSET))
-                  {
-                     DT_PRINTF("Actualisation : discard delta beta offset is ON (0x%02X)", ACT_MODE_DISCARD_OFFSET);
-                  }
-                  else
-                  {
-                     DT_PRINTF("Actualisation : discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
-                  }
-
+                  DT_PRINTF("Actualisation : debug mode disabled (0x%02X)", ACT_MODE_DEBUG);
                }
+
+               if (BitMaskTst(value, ACT_MODE_DELTA_BETA_OFF))
+               {
+                  DT_PRINTF("Actualisation : beta correction disabled (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
+               }
+               else
+               {
+                  DT_PRINTF("Actualisation : beta correction activated (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
+               }
+
+               if (BitMaskTst(value, ACT_MODE_BP_OFF))
+               {
+                  DT_PRINTF("Actualisation : bad pixel detection disabled (0x%02X)", ACT_MODE_BP_OFF);
+               }
+               else
+               {
+                  DT_PRINTF("Actualisation : bad pixel detection activated (0x%02X)", ACT_MODE_BP_OFF);
+               }
+
+               if (BitMaskTst(value, ACT_MODE_DYN_TST_PTRN))
+               {
+                  DT_PRINTF("Actualisation : dynamic test pattern is ON (0x%02X)", ACT_MODE_DYN_TST_PTRN);
+               }
+               else
+               {
+                  DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
+               }
+
+               if (BitMaskTst(value, ACT_MODE_VERBOSE))
+               {
+                  DT_PRINTF("Actualisation : verbose is ON (0x%02X)", ACT_MODE_VERBOSE);
+               }
+               else
+               {
+                  DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
+               }
+
+               if (BitMaskTst(value, ACT_MODE_DISCARD_OFFSET))
+               {
+                  DT_PRINTF("Actualisation : discard delta beta offset is ON (0x%02X)", ACT_MODE_DISCARD_OFFSET);
+               }
+               else
+               {
+                  DT_PRINTF("Actualisation : discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
+               }
+
                break;
 
       case 8:
