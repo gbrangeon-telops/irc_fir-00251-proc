@@ -750,8 +750,8 @@ IRC_Status_t Actualization_SM()
                gcRegsData.TestImageSelector = TIS_TelopsConstantValue1;
             }
 
-            PRINTF( "ACT: Exposure time = %d\n", (uint32_t) gcRegsData.ExposureTime );
-            ACT_PRINTF( "AcquisitionFrameRate = %d\n", (uint32_t) gcRegsData.AcquisitionFrameRate );
+            PRINTF( "ACT: Exposure time = %d us\n", (uint32_t) gcRegsData.ExposureTime );
+            ACT_PRINTF( "AcquisitionFrameRate = %d fps\n", (uint32_t) gcRegsData.AcquisitionFrameRate );
 
             // configurer le buffering pour coaddData.NCoadd images
             // always using the internal buffer
@@ -947,11 +947,14 @@ IRC_Status_t Actualization_SM()
                // we're done
                dataOffset = 0;
 
-               ACT_PRINTF( "Computing average took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_AvgDuration )) / ((float)TIME_ONE_SECOND_US), 2) );
-               ACT_PRINTF( "Computing average took " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_AvgDuration )) / ((float)numPixelsToProcess), 2) );
+               VERBOSE_IF(gActDebugOptions.verbose)
+               {
+                  PRINTF( "ACT: Computing average took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_AvgDuration )) / ((float)TIME_ONE_SECOND_US), 2) );
+                  PRINTF( "ACT: Computing average took " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_AvgDuration )) / ((float)numPixelsToProcess), 2) );
 
-               ACT_PRINTF( "Computing average took (real time) " _PCF(2) " s\n", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
-               ACT_PRINTF( "Computing average took (real time) " _PCF(2) " us/px\n", _FFMT((float) (tic_RT_Duration) / ((float)numPixelsToProcess), 2) );
+                  PRINTF( "ACT: Computing average took (real time) " _PCF(2) " s\n", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
+                  PRINTF( "ACT: Computing average took (real time) " _PCF(2) " us/px\n", _FFMT((float) (tic_RT_Duration) / ((float)numPixelsToProcess), 2) );
+               }
 
                if (gActDebugOptions.useDebugData)
                {
@@ -1177,9 +1180,33 @@ IRC_Status_t Actualization_SM()
 
             if (ctxtIsDone(&blockContext))
             {
+               union {
+                  float f;
+                  uint32_t i;
+               } p50;
+               // compute the median (can not be split over multiple iterations)
+
+               float* buffer = (float*)prctile_buffer;
+               int i50 = 0.50f * numPixels; // index of the median
+               int N = deltaBetaICU.stats.N;
+
+               GETTIME(&t0);
+
+               //memcpy(buffer, deltaBetaICU.deltaBeta, N * sizeof(float));
+               for (i=0; i<numPixels; ++i)
+                  buffer[i] = deltaBetaICU.deltaBeta[i] - deltaBetaICU.stats.min;
+               // CR_TRICKY comparing strictly positive floats typecasted as uint32_t is equivalent
+               p50.i = select((uint32_t*)buffer, 0, N, i50);
+               p50.f += deltaBetaICU.stats.min;
+
+               deltaBetaICU.p50 = p50.f;
+
+               tic_RT_Duration += elapsed_time_us(t0);
+
                VERBOSE_IF(gActDebugOptions.verbose)
                {
                   reportStats(&deltaBetaICU.stats, "DeltaBeta");
+                  PRINTF( "Median value : " _PCF(4) ", (%d)\n", _FFMT(p50.f, 4), p50.i);
                   PRINTF( "ACT: Computing delta beta stats (real time) " _PCF(4) " s\n", _FFMT((float)tic_RT_Duration/((float)TIME_ONE_SECOND_US), 2));
                }
 
@@ -2469,7 +2496,7 @@ uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p
    float offset;
 
    if ((deltaBeta->type == 0 && gActualizationParams.deltaBetaDiscardOffset) || gActDebugOptions.forceDiscardOffset)
-      offset = deltaBeta->stats.avg;
+      offset = deltaBetaICU.p50;
    else
       offset = 0;
 
@@ -2833,7 +2860,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
    case FWR_QUANTIZE_DATA:
       {
-         const float offset = deltaBetaICU.stats.avg;
+         const float offset = deltaBetaICU.stats.mu;
          int16_t* d = (int16_t*)PROC_MEM_DELTA_BETA_BASEADDR;
 
          if (blockContext.startIndex == 0)
@@ -2848,6 +2875,7 @@ IRC_Status_t ActualizationFileWriter_SM()
             }
 
             actDataHeader.Beta0_Off = offset;
+            actDataHeader.Beta0_Median = deltaBetaICU.p50;
             actDataHeader.Beta0_Exp = Exp;
          }
 

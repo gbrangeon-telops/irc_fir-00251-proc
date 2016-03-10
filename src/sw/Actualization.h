@@ -188,6 +188,7 @@ typedef struct {
 typedef struct {
    float deltaBeta[MAX_PIXEL_COUNT]; // the bad pixels from the reference block have a deltaBeta value of infinity
    statistics_t stats;
+   float p50; // median value
    uint32_t saturatedData; // number of pixel values with saturation in the NUC data
    uint32_t type; // 0: icu, 1: external BB
    bool ready;
