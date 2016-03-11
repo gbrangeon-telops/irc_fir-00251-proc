@@ -1138,12 +1138,12 @@ IRC_Status_t Actualization_SM()
 
       case ACT_ApplyBadPixelMap:
          {
-            uint16_t* deltaBeta = (uint16_t *)(PROC_MEM_DELTA_BETA_BASEADDR + 2*blockContext.startIndex); // adresse des données d'actualisation
+            float* deltaBeta = &deltaBetaICU.deltaBeta[blockContext.startIndex];
 
             for (i=0, k=blockContext.startIndex+imageDataOffset; i<blockContext.blockLength; ++i, ++k)
             {
                if (badPixelMap[k] != 0)
-                  BitClr(*deltaBeta, CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT);
+                  *deltaBeta = INFINITY;
 
                ++deltaBeta;
             }
