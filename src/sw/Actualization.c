@@ -486,7 +486,7 @@ IRC_Status_t Actualization_SM()
          }
 
          gActInfo.type = usingICU ? 0x00 : 0x01;
-         if (gActualizationParams.deltaBetaDiscardOffset || gActDebugOptions.forceDiscardOffset)
+         if ((usingICU && gActualizationParams.deltaBetaDiscardOffset) || gActDebugOptions.forceDiscardOffset)
             gActInfo.type |= 0x02;
 
          break;
@@ -3225,7 +3225,7 @@ void ACT_resetParams(actParams_t* p)
 
    p->numFrames = flashSettings.BPNumSamples;
 
-   p->deltaBetaDiscardOffset = false; // todo prendre la valeur des flash settings
+   p->deltaBetaDiscardOffset = true; // todo prendre la valeur des flash settings. Redeviendra false par défaut.
 }
 
 static void ACT_clearDeltaBeta()
