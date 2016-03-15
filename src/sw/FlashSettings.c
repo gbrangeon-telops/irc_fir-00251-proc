@@ -48,7 +48,7 @@ int fdFlashSettings;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.10.0
+// Generated from the Flash Settings definition XLS file version 1.11.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 /**
@@ -145,6 +145,7 @@ flashSettings_t flashSettingsDefault = {
    /* FWNumberOfFilters = */ 4,
    /* FWType = */ 0,
    /* ActualizationTemperatureSelector = */ 0,
+   /* ActualizationDiscardOffset = */ 0,
    /* ExternalMemoryBufferPresent = */ 0,
    /* NDFPresent = */ 0,
    /* NDFNumberOfFilters = */ 3,
@@ -530,7 +531,7 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
 
 /* AUTO-CODE FIELDS BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.10.0
+// Generated from the Flash Settings definition XLS file version 1.11.0
 // using generateFlashSettingsCLib.m Matlab script.
 
    // Read DeviceSerialNumber flash settings field
@@ -858,14 +859,23 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
    }
    *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->ActualizationTemperatureSelector, FS_ACTUALIZATIONTEMPERATURESELECTOR_LENGTH);
 
+   // Read ActualizationDiscardOffset flash settings field
+   byteCount = uffs_read(fd, &p_flashSettings->ActualizationDiscardOffset, FS_ACTUALIZATIONDISCARDOFFSET_LENGTH);
+   if (byteCount != FS_ACTUALIZATIONDISCARDOFFSET_LENGTH)
+   {
+      FS_ERR("Failed to read ActualizationDiscardOffset field.");
+      return IRC_FAILURE;
+   }
+   *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->ActualizationDiscardOffset, FS_ACTUALIZATIONDISCARDOFFSET_LENGTH);
+
    // Skip FREE space
-   byteCount = uffs_read(fd, tmpFileDataBuffer, 3);
-   if (byteCount != 3)
+   byteCount = uffs_read(fd, tmpFileDataBuffer, 2);
+   if (byteCount != 2)
    {
       FS_ERR("Failed to read free space.");
       return IRC_FAILURE;
    }
-   *p_crc16 = CRC16(*p_crc16, tmpFileDataBuffer, 3);
+   *p_crc16 = CRC16(*p_crc16, tmpFileDataBuffer, 2);
 
    // Read ActualizationWaitTime1 flash settings field
    byteCount = uffs_read(fd, &p_flashSettings->ActualizationWaitTime1, FS_ACTUALIZATIONWAITTIME1_LENGTH);
@@ -1655,14 +1665,21 @@ void FlashSettings_UpdateVersion(flashSettings_t *p_flashSettings)
                p_flashSettings->DeviceKeyLow = flashSettingsDefault.DeviceKeyLow;
                p_flashSettings->DeviceKeyHigh = flashSettingsDefault.DeviceKeyHigh;
 
-               break; // Break after the last minor version only
+            case 10:
+               // 1.10.x -> 1.11.x
+               p_flashSettings->ActualizationDiscardOffset = flashSettingsDefault.ActualizationDiscardOffset;
+
+            case FS_FILESTRUCTUREMINORVERSION:
+               // Break after the last minor version only
+               break;
 
             default:
                // Up to date, nothing to do
                return;
          }
 
-         break; // Break after the last major version only
+         // Break after the last major version only
+         break;
 
       default:
          // Up to date, nothing to do

@@ -65,11 +65,11 @@ typedef enum fslImmediateEnum fslImmediate_t;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.10.0
+// Generated from the Flash Settings definition XLS file version 1.11.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 #define FS_FILESTRUCTUREMAJORVERSION      1
-#define FS_FILESTRUCTUREMINORVERSION      10
+#define FS_FILESTRUCTUREMINORVERSION      11
 #define FS_FILESTRUCTURESUBMINORVERSION   0
 
 /**
@@ -179,6 +179,9 @@ typedef enum fslImmediateEnum fslImmediate_t;
 
 #define FS_ACTUALIZATIONTEMPERATURESELECTOR_OFFSET   108
 #define FS_ACTUALIZATIONTEMPERATURESELECTOR_LENGTH   1
+
+#define FS_ACTUALIZATIONDISCARDOFFSET_OFFSET   109
+#define FS_ACTUALIZATIONDISCARDOFFSET_LENGTH   1
 
 #define FS_ACTUALIZATIONWAITTIME1_OFFSET   112
 #define FS_ACTUALIZATIONWAITTIME1_LENGTH   4
@@ -459,6 +462,7 @@ struct flashSettingsStruct {
    uint8_t FWNumberOfFilters;   /**< Indicates the number of filters in the camera head filter wheel. */
    uint8_t FWType;   /**< Indicates whether the filter wheel supports  the synchronously rotating mode. */
    uint8_t ActualizationTemperatureSelector;   /**< Indicates which temperature is used for actualization stabilization. */
+   uint8_t ActualizationDiscardOffset;   /**< Indicates whether a zero-mean beta correction is applied. */
    uint8_t ExternalMemoryBufferPresent;   /**< Indicates whether an external memory buffer board is installed in the camera. */
    uint8_t NDFPresent;   /**< Indicates whether a neutral density filter fan is installed in the camera. */
    uint8_t NDFNumberOfFilters;   /**< Indicates the number of neutral density filters in the camera head  neutral density filter fan. */
