@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : isc0209A_digio_map
+--!   @file : scorpiomwA_digio_map
 --!   @brief
 --!   @details
 --!
@@ -17,46 +17,53 @@ use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 use work.fleg_brd_define.all;
 
-entity isc0209A_digio_map is
+entity scorpiomwA_digio_map is
    port(
       
-      MCLK_SOURCE   : in std_logic;
-      ARESET        : in std_logic;      
-      
-      FPA_INT       : in std_logic;
-      FPA_MCLK      : in std_logic;
-      
-      PROG_CSN      : in std_logic;  
-      PROG_SD       : in std_logic;
-      
-      DAC_CSN       : in std_logic;  
-      DAC_SCLK      : in std_logic;
-      DAC_SD        : in std_logic;
-      
-      FPA_LSYNC     : in std_logic;
-      
-      FPA_PWR       : in std_logic;      
-      FPA_POWERED   : out std_logic;      
-      DAC_POWERED   : out std_logic;
-      
-      FPA_ON        : out std_logic;
-      FPA_DIGIO1    : out std_logic;
-      FPA_DIGIO2    : out std_logic;
-      FPA_DIGIO3    : out std_logic;
-      FPA_DIGIO4    : out std_logic;
-      FPA_DIGIO5    : out std_logic;
-      FPA_DIGIO6    : out std_logic;
-      FPA_DIGIO7    : out std_logic;
-      FPA_DIGIO8    : out std_logic;
-      FPA_DIGIO9    : out std_logic;
-      FPA_DIGIO10   : out std_logic;
-      FPA_DIGIO11   : in std_logic;
-      FPA_DIGIO12   : in std_logic
+      MCLK_SOURCE    : in std_logic;
+      ARESET         : in std_logic;      
+                     
+      FPA_INT        : in std_logic;
+      FPA_MCLK       : in std_logic;
+                     
+      PROG_CSN       : in std_logic;  
+      PROG_SD        : in std_logic;
+                     
+      DAC_CSN        : in std_logic;  
+      DAC_SCLK       : in std_logic;
+      DAC_SD         : in std_logic;
+                     
+      SIZEA_SIZEB    : in std_logic;
+      UPROW_UPCOL    : in std_logic;
+      ITR            : in std_logic;
+                     
+      FPA_PWR        : in std_logic;      
+      FPA_POWERED    : out std_logic;      
+      DAC_POWERED    : out std_logic;                     
+                     
+      FPA_ERROR      : out std_logic;
+      FPA_DATA_VALID : out std_logic;                     
+                     
+      FPA_ON         : out std_logic;
+      FPA_DIGIO1     : out std_logic;
+      FPA_DIGIO2     : out std_logic;
+      FPA_DIGIO3     : out std_logic;
+      FPA_DIGIO4     : out std_logic;
+      FPA_DIGIO5     : out std_logic;
+      FPA_DIGIO6     : out std_logic;
+      FPA_DIGIO7     : out std_logic;
+      FPA_DIGIO8     : out std_logic;
+      FPA_DIGIO9     : out std_logic;
+      FPA_DIGIO10    : out std_logic;
+      FPA_DIGIO11    : in std_logic;
+      FPA_DIGIO12    : in std_logic
       );
-end isc0209A_digio_map;
+end scorpiomwA_digio_map;
 
 
-architecture rtl of isc0209A_digio_map is
+architecture rtl of scorpiomwA_digio_map is
+   
+   constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
    
    component sync_reset
       port(
@@ -67,8 +74,10 @@ architecture rtl of isc0209A_digio_map is
    
    type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, check_mclk_st, fpa_pwred_st); 
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
+   type serclr_fsm_type is (idle, wait_spi_csn_st, signal_length_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
+   signal serclr_fsm       : serclr_fsm_type;
    signal sreset           : std_logic;
    signal dac_timer_cnt    : natural;
    signal fpa_timer_cnt    : natural;
@@ -77,35 +86,50 @@ architecture rtl of isc0209A_digio_map is
    
    signal fpa_on_i         : std_logic;
    signal prog_data_i      : std_logic;
-   signal lsync_i          : std_logic;
-   signal fsync_i          : std_logic;
+   signal sizea_sizeb_i    : std_logic;
+   signal int_i            : std_logic;
    signal mclk_i           : std_logic;
    signal dac_csn_i        : std_logic;
    signal dac_sd_i         : std_logic;
    signal dac_sclk_i       : std_logic;
+   signal error_i          : std_logic;
+   signal data_valid_i     : std_logic;
+   signal serclr_i         : std_logic;
+   signal uprow_upcol_i    : std_logic;
    
    signal fpa_on_iob       : std_logic;
    signal prog_data_iob    : std_logic;
-   signal lsync_iob         : std_logic;
-   signal fsync_iob        : std_logic;
+   signal sizea_sizeb_iob  : std_logic;
+   signal int_iob          : std_logic;
    signal mclk_iob         : std_logic;
    signal dac_csn_iob      : std_logic;
    signal dac_sd_iob       : std_logic;
    signal dac_sclk_iob     : std_logic;
+   signal itr_iob          : std_logic;
+   signal serclr_iob       : std_logic;
+   signal uprow_upcol_iob  : std_logic;
+   signal error_iob        : std_logic;
+   signal data_valid_iob   : std_logic;
+   signal itr_i            : std_logic;
+   signal prog_csn_last    : std_logic;
+   
    signal fsm_sreset       : std_logic;
+   signal cnter            : integer range 0 to DEFINE_FPA_MCLK_RATE_FACTOR;
    
    signal prog_mclk_i      : std_logic;
    signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
    
    attribute IOB : string;
-   attribute IOB of fpa_on_iob   : signal is "TRUE";
-   attribute IOB of prog_data_iob: signal is "TRUE";
-   attribute IOB of lsync_iob    : signal is "TRUE";
-   attribute IOB of fsync_iob    : signal is "TRUE";
-   attribute IOB of mclk_iob     : signal is "TRUE";
-   attribute IOB of dac_csn_iob  : signal is "TRUE";
-   attribute IOB of dac_sd_iob   : signal is "TRUE";
-   attribute IOB of dac_sclk_iob : signal is "TRUE";
+   attribute IOB of fpa_on_iob         : signal is "TRUE";
+   attribute IOB of prog_data_iob      : signal is "TRUE";
+   attribute IOB of sizea_sizeb_iob    : signal is "TRUE";
+   attribute IOB of int_iob            : signal is "TRUE";
+   attribute IOB of itr_iob            : signal is "TRUE";
+   attribute IOB of mclk_iob           : signal is "TRUE";
+   attribute IOB of dac_csn_iob        : signal is "TRUE";
+   attribute IOB of dac_sd_iob         : signal is "TRUE";
+   attribute IOB of dac_sclk_iob       : signal is "TRUE";
+   attribute IOB of serclr_iob         : signal is "TRUE";
    
    
 begin
@@ -119,13 +143,16 @@ begin
    FPA_ON      <= fpa_on_iob;
    
    -- fpa_digio
-   FPA_DIGIO1  <= '0';
-   FPA_DIGIO2  <= '0'; 
+   FPA_DIGIO1  <= itr_iob;
+   FPA_DIGIO2  <= uprow_upcol_iob; 
    FPA_DIGIO3  <= prog_data_iob;
-   FPA_DIGIO4  <= lsync_iob; 
-   FPA_DIGIO5  <= '0';            
-   FPA_DIGIO6  <= fsync_iob;   
+   FPA_DIGIO4  <= serclr_iob; 
+   FPA_DIGIO5  <= sizea_sizeb_iob;            
+   FPA_DIGIO6  <= int_iob;   
    FPA_DIGIO7  <= mclk_iob;
+   
+   FPA_ERROR <= error_i;
+   FPA_DATA_VALID <= data_valid_i;
    
    -- dac_digio
    FPA_DIGIO8  <= dac_sclk_iob;
@@ -161,23 +188,76 @@ begin
          fpa_on_iob <= fpa_on_i; 
          
          -- contrôle detecteur
+         serclr_iob <= serclr_i;
          prog_data_iob <= prog_data_i;           
-         lsync_iob <= lsync_i;   
-         fsync_iob <= fsync_i;
-         mclk_iob <= mclk_i;  
+         sizea_sizeb_iob <= sizea_sizeb_i;   
+         int_iob <= int_i;
+         mclk_iob <= mclk_i;
+         itr_iob <= itr_i;
+         uprow_upcol_iob <= uprow_upcol_i;
          
          -- contrôle DAC
          dac_csn_iob <= dac_csn_i;
          dac_sd_iob <= dac_sd_i;
-         dac_sclk_iob <= dac_sclk_i;         
+         dac_sclk_iob <= dac_sclk_i;
+         
+         -- en provenance du détecteur
+         error_iob <= FPA_DIGIO12;
+         data_valid_iob <= FPA_DIGIO11;
       end if;   
    end process;  
    
    
    --------------------------------------------------------- 
+   -- fsm de generation de serclr_i                               
+   ---------------------------------------------------------
+   U12A: process(MCLK_SOURCE)
+   begin
+      if rising_edge(MCLK_SOURCE) then
+         if fsm_sreset = '1' then        -- fsm_sreset vaut '1' si sreset ou détecteur non allumé.
+            serclr_fsm <= idle; 
+            prog_csn_last <= '1';
+            serclr_i <= '0';
+            
+         else
+            
+            prog_csn_last <= PROG_CSN;             
+            
+            case serclr_fsm is          
+               
+               -- idle
+               when idle =>
+                  serclr_i <= '0';
+                  cnter <= 1;
+                  if fpa_powered_i = '1' then 
+                     serclr_fsm <= wait_spi_csn_st;
+                  end if;
+                  
+               -- detecter la tombée de PROG_CSN et lancer la generation de serclr_i
+               when wait_spi_csn_st =>
+                  if PROG_CSN = '0' and prog_csn_last = '1' then 
+                     serclr_i <= '1'; 
+                     serclr_fsm <= signal_length_st;
+                  end if; 
+               
+               when signal_length_st =>
+                  cnter <=  cnter + 1;
+                  if cnter = C_FPA_MCLK_RATE_FACTOR_M1 then
+                     serclr_fsm <= idle; 
+                  end if;
+               
+               when others =>
+               
+            end case;             
+            
+         end if;  
+      end if;
+   end process; 
+   
+   --------------------------------------------------------- 
    -- fsm fpa digio                                 
    ---------------------------------------------------------
-   U12: process(MCLK_SOURCE)
+   U12B: process(MCLK_SOURCE)
    begin
       if rising_edge(MCLK_SOURCE) then
          if fsm_sreset = '1' then        -- fsm_sreset vaut '1' si sreset ou détecteur non allumé.
@@ -185,16 +265,18 @@ begin
             fpa_timer_cnt <= 0;
             fpa_powered_i <= '0';
             prog_data_i <= '0';
-            lsync_i <= '0';
-            fsync_i <= '1';
+            sizea_sizeb_i <= '1';
+            int_i <= '0';
             prog_data_i <= '0';
             mclk_i <= '0';
+            error_i <= '0';
+            data_valid_i <= '0';
             
          else
             
             case fpa_digio_fsm is          
                
-               -- delai
+               -- idle
                when idle =>
                   if dac_powered_i = '1' then 
                      fpa_digio_fsm <= ldo_pwr_pause_st;
@@ -236,11 +318,16 @@ begin
                when fpa_pwred_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
                   fpa_powered_i <= '1';
                   prog_data_i <= PROG_SD;
-                  lsync_i <= FPA_LSYNC;
-                  fsync_i <= not FPA_INT and PROG_CSN;  -- normalement on n'aura jamais FPA_INT à '1' et PROG_CSN à '0' en même temps => un et un seul de ces deux signaux fait baisser fsync_i 
+                  sizea_sizeb_i <= SIZEA_SIZEB;
+                  int_i <= FPA_INT;            
                   mclk_i <= FPA_MCLK;  --
+                  itr_i <= ITR;
+                  uprow_upcol_i <= UPROW_UPCOL;
+                  error_i <= error_iob;
+                  data_valid_i <= data_valid_iob;
+                  
                   -- pragma translate_off
-                  fsync_i <= PROG_CSN;              
+                  int_i <= PROG_CSN;              
                   -- pragma translate_on              
                
                when others =>
@@ -250,7 +337,6 @@ begin
          end if;  
       end if;
    end process; 
-   
    
    --------------------------------------------------------- 
    -- fsm dac                                 

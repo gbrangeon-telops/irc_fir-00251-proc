@@ -151,6 +151,9 @@ package FPA_define is
       uprow_upcol                    : std_logic;
       sizea_sizeb                    : std_logic;
       
+      -- readout mode
+      itr                            : std_logic;
+      
       -- gain
       gain                           : std_logic;   
       
@@ -220,7 +223,9 @@ package FPA_define is
    to_unsigned(511, 7),       --windcfg_part4
    
    '1',                       --uprow_upcol                         
-   '0',                       --sizea_sizeb 
+   '1',                       --sizea_sizeb 
+   
+   '1',                       --itr
    
    '0',                       --gain                           
    
@@ -228,24 +233,24 @@ package FPA_define is
    to_unsigned(6, 8),         --real_mode_active_pixel_dly   
    '1',                       --adc_quad2_en                 
    '1',                       --chn_diversity_en             
-   to_unsigned(28897, 17),    --readout_pclk_cnt_max         
-   to_unsigned(112, 8),       --line_period_pclk             
-   to_unsigned(3, 4),         --active_line_start_num        
-   to_unsigned(258, 9),       --active_line_end_num
-   to_unsigned(4, 8),         --pix_samp_num_per_ch          
-   to_unsigned(225, 9),       --sof_posf_pclk                
-   to_unsigned(28864, 17),    --eof_posf_pclk                
+   to_unsigned(76801, 17),    --readout_pclk_cnt_max         
+   to_unsigned(160, 8),       --line_period_pclk             
+   to_unsigned(1, 4),         --active_line_start_num        
+   to_unsigned(512, 9),       --active_line_end_num
+   to_unsigned(2, 8),         --pix_samp_num_per_ch          
+   to_unsigned(1, 9),         --sof_posf_pclk                
+   to_unsigned(76800, 17),    --eof_posf_pclk                
    to_unsigned(1, 8),         --sol_posl_pclk                
-   to_unsigned(80, 8),        --eol_posl_pclk                
-   to_unsigned(81, 8),        --eol_posl_pclk_p1             
+   to_unsigned(160, 8),       --eol_posl_pclk                
+   to_unsigned(161, 8),       --eol_posl_pclk_p1             
    to_unsigned(2, 4),         --hgood_samp_sum_num           
    to_unsigned(1048576, 23),  --hgood_samp_mean_numerator    
    to_unsigned(2, 4),         --vgood_samp_sum_num           
    to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
-   to_unsigned(3, 8),         --good_samp_first_pos_per_ch   
-   to_unsigned(4, 8),         --good_samp_last_pos_per_ch    
-   to_unsigned(80, 8),        --xsize_div_tapnum             
-   (to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(0, 14), to_unsigned(3730, 14)),           
+   to_unsigned(2, 8),         --good_samp_first_pos_per_ch   
+   to_unsigned(2, 8),         --good_samp_last_pos_per_ch    
+   to_unsigned(160, 8),       --xsize_div_tapnum             
+   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
    to_unsigned(0, 4)          --adc_clk_phase 
    );
    

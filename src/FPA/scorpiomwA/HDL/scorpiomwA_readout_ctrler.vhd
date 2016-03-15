@@ -30,7 +30,7 @@ entity scorpiomwA_readout_ctrler is
       
       QUAD_CLK_COPY     : in std_logic;
       
-      DATA_VALID        : in std_logic;         
+      FPA_DATA_VALID    : in std_logic;         
       READOUT_INFO      : out readout_info_type;
       ADC_SYNC_FLAG     : out std_logic
       );  
@@ -80,8 +80,8 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    --signal lsync_last           : std_logic;
-   signal data_valid_i         : std_logic;
-   signal data_valid_last      : std_logic;
+   signal fpa_data_valid_i         : std_logic;
+   signal fpa_data_valid_last      : std_logic;
    
    
 --   attribute dont_touch : string;
@@ -129,16 +129,16 @@ begin
          if sreset = '1' then            
             sync_flag_fsm <= idle;
             adc_sync_flag_i <= '0';
-            data_valid_i <= '0';
-            data_valid_last <= '0';            
+            fpa_data_valid_i <= '0';
+            fpa_data_valid_last <= '0';            
             --fpa_pclk_last <= '0';
             --pclk_rise <= '0'; 
             --pclk_fall <= '0';
             
          else           
             
-            data_valid_i <= DATA_VALID;
-            data_valid_last <= data_valid_i;            
+            fpa_data_valid_i <= FPA_DATA_VALID;
+            fpa_data_valid_last <= fpa_data_valid_i;            
             
             fpa_pclk_last <= FPA_PCLK;
             
@@ -152,7 +152,7 @@ begin
                
                when idle =>   
                   adc_sync_flag_i <= '0';
-                  if data_valid_i = '1' and data_valid_last = '0' then -- détection du FM de data_valid                     
+                  if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- détection du FM de FPA_DATA_VALID                     
                      sync_flag_fsm <= sync_flag_on_st;
                   end if;                        
                
@@ -199,7 +199,7 @@ begin
                
                when idle =>   
                   readout_in_progress <= '0';
-                  if data_valid_i = '1' and data_valid_last = '0' then -- debut d'une image
+                  if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- debut d'une image
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
