@@ -14,7 +14,7 @@ open(my $fh, "<", $inputfile)
 my $inputStr = <$fh>;
 close ($fh);
 
-if ($inputStr =~ /$fieldName\D+(\d+)/)
+if ($inputStr =~ /$fieldName[^\n\r0-9]+(\d+)/)
 {
    print $1;
 }
