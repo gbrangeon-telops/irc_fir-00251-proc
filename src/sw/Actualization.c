@@ -1759,7 +1759,7 @@ IRC_Status_t BadPixelDetection_SM()
                mu_Z /= N_mu;
             }
 
-            const float IQR_to_sigma = 20.0f/27; // sigma \approx IQR / sigma_factor
+            const float IQR_to_sigma = 20.0f/27; // IQR \approx 27/20 x \sigma
             uint32_t IQR; // inter-quantile range, used for estimating the std of the spatial distribution
             uint32_t sigma_mu; // std of the spatial average distribution
             int i50 = 0.50f * numPixels; // index of the median
@@ -1767,7 +1767,7 @@ IRC_Status_t BadPixelDetection_SM()
             int i75 = 0.75f * numPixels; // index of the 3rd quartile
             uint32_t p25,p50,p75; // percentiles
 
-            // the order of these 3 calls is important
+            // the order of these 3 calls is important!
             // since select() modifies the input array
             memcpy(prctile_buffer, mu_buffer + imageDataOffset, numPixels * sizeof(uint32_t));
             p75 = select(prctile_buffer, 0, numPixels-1, i75);
@@ -3225,7 +3225,7 @@ void ACT_resetParams(actParams_t* p)
 
    p->numFrames = flashSettings.BPNumSamples;
 
-   p->deltaBetaDiscardOffset = true; // todo prendre la valeur des flash settings. Redeviendra false par défaut.
+   p->deltaBetaDiscardOffset = flashSettings.ActualizationDiscardOffset;
 }
 
 static void ACT_clearDeltaBeta()
