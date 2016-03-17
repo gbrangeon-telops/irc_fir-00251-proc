@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Thu Feb 25 18:08:45 2016" VIVADOVERSION="2013.4">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Mar 16 13:27:26 2016" VIVADOVERSION="2013.4">
 
   <SYSTEMINFO ARCH="kintex7" DEVICE="7k160t" NAME="core_imp" PACKAGE="fbg676" SPEEDGRADE="-1"/>
 
@@ -94,12 +94,7 @@
     <PORT DIR="O" NAME="USB_UART_rxrdyn" SIGIS="undef"/>
     <PORT DIR="O" NAME="USB_UART_txd" SIGIS="undef"/>
     <PORT DIR="O" NAME="USB_UART_txrdyn" SIGIS="undef"/>
-    <PORT DIR="I" NAME="AEC_INTC" SIGIS="undef" SIGNAME="External_Ports_AEC_INTC">
-      <CONNECTIONS>
-        <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="intr"/>
-      </CONNECTIONS>
-    </PORT>
-    <PORT DIR="I" NAME="bulk_interrupt" SIGIS="undef" SIGNAME="External_Ports_bulk_interrupt">
+    <PORT DIR="I" NAME="AEC_INTC" SENSITIVITY="EDGE_RISING" SIGIS="INTERRUPT" SIGNAME="External_Ports_AEC_INTC">
       <CONNECTIONS>
         <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="intr"/>
       </CONNECTIONS>
@@ -107,6 +102,11 @@
     <PORT DIR="O" NAME="GPS_UART_SOUT" SIGIS="undef" SIGNAME="axi_gps_uart_sout">
       <CONNECTIONS>
         <CONNECTION INSTANCE="axi_gps_uart" PORT="sout"/>
+      </CONNECTIONS>
+    </PORT>
+    <PORT DIR="I" NAME="bulk_interrupt" SENSITIVITY="EDGE_RISING" SIGIS="INTERRUPT" SIGNAME="External_Ports_bulk_interrupt">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="intr"/>
       </CONNECTIONS>
     </PORT>
     <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_50" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
@@ -4960,7 +4960,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_2"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_4"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -5401,7 +5401,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_26"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_37"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -5837,7 +5837,7 @@
         <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_3"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_6"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6153,7 +6153,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_6"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_12"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6551,7 +6551,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="0"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_df_7"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_df_13"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6747,7 +6747,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_8"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_14"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6983,7 +6983,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_9"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_15"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -8945,7 +8945,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_3"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_5"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -9383,7 +9383,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="0"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_10"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_16"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -9763,7 +9763,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="0"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_11"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_17"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -13404,7 +13404,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_27"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_38"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15275,7 +15275,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_29"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_40"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15511,7 +15511,7 @@
         <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_4"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_7"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15690,7 +15690,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m01_data_fifo_30"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m01_data_fifo_41"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15929,7 +15929,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m11_data_fifo_31"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m11_data_fifo_42"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -16168,7 +16168,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m12_data_fifo_32"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m12_data_fifo_43"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -16407,7 +16407,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_28"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_39"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -18658,7 +18658,7 @@
         <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_5"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_8"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
