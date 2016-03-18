@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : isc0209A_mblaze_intf
+--!   @file : scorpiomwA_mblaze_intf
 --!   @brief
 --!   @details
 --!
@@ -20,7 +20,7 @@ use work.fpa_common_pkg.all;
 use work.fleg_brd_define.all;
 
 
-entity isc0209A_mblaze_intf is
+entity scorpiomwA_mblaze_intf is
    port(
       
       ARESET                : in std_logic;
@@ -43,9 +43,9 @@ entity isc0209A_mblaze_intf is
       
       FPA_SOFTW_STAT        : out fpa_firmw_stat_type
       );
-end isc0209A_mblaze_intf; 
+end scorpiomwA_mblaze_intf; 
 
-architecture rtl of isc0209A_mblaze_intf is  
+architecture rtl of scorpiomwA_mblaze_intf is  
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26  : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   

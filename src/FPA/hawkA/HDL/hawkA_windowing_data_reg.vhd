@@ -196,7 +196,7 @@ begin
                
                when idle =>
                   wdr_change <= '0';            
-                  if (j_pos_change or k_pos_change or l_pos_change or m_pos_change) ='1' and wdr_fsm_done = '1' then  
+                  if (j_pos_change or k_pos_change or l_pos_change or m_pos_change) = '1' and wdr_fsm_done = '1' then  
                      wdr_change_fsm <=  wdr_change_st;
                      j_pos_last <= j_pos;    -- fait office de lacth en même temps
                      k_pos_last <= k_pos;

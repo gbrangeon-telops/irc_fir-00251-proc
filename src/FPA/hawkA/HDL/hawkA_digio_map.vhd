@@ -23,6 +23,7 @@ entity hawkA_digio_map is
       MCLK_SOURCE   : in std_logic;
       ARESET        : in std_logic;      
       
+      FPA_DRIVER_EN : in std_logic;
       FPA_INT       : in std_logic;
       
       PROG_CSN      : in std_logic;  
@@ -101,17 +102,33 @@ architecture rtl of hawkA_digio_map is
    signal prog_mclk_i      : std_logic;
    signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
    
---   attribute IOB : string;
---   attribute IOB of fpa_on_iob   : signal is "TRUE";
---   attribute IOB of ncs_iob      : signal is "TRUE";
---   attribute IOB of mdin_iob     : signal is "TRUE";
---   attribute IOB of fdem_iob     : signal is "TRUE";
---   attribute IOB of digen_iob    : signal is "TRUE";
---   attribute IOB of mclk_iob     : signal is "TRUE";
---   attribute IOB of dac_csn_iob  : signal is "TRUE";
---   attribute IOB of dac_sd_iob   : signal is "TRUE";
---   attribute IOB of dac_sclk_iob : signal is "TRUE";
+   attribute IOB : string;
+   attribute dont_touch : string;
    
+   attribute IOB of fpa_on_iob   : signal is "TRUE";
+   attribute IOB of ncs_iob      : signal is "TRUE";
+   attribute IOB of mdin_iob     : signal is "TRUE";
+   attribute IOB of fdem_iob     : signal is "TRUE";
+   attribute IOB of digen_iob    : signal is "TRUE";
+   attribute IOB of mclk_iob     : signal is "TRUE";
+   attribute IOB of dac_csn_iob  : signal is "TRUE";
+   attribute IOB of dac_sd_iob   : signal is "TRUE";
+   attribute IOB of dac_sclk_iob : signal is "TRUE";
+   
+   attribute dont_touch of fpa_timer_cnt : signal is "TRUE";
+   attribute dont_touch of dac_timer_cnt : signal is "TRUE"; 
+   attribute dont_touch of fpa_powered_i : signal is "TRUE";
+   attribute dont_touch of dac_powered_i : signal is "TRUE";
+   attribute dont_touch of fpa_on_i      : signal is "TRUE";
+   attribute dont_touch of ncs_i         : signal is "TRUE";
+   attribute dont_touch of mdin_i        : signal is "TRUE";
+   attribute dont_touch of fdem_i        : signal is "TRUE";
+   attribute dont_touch of digen_i       : signal is "TRUE";
+   attribute dont_touch of mclk_i        : signal is "TRUE";
+   attribute dont_touch of dac_csn_i     : signal is "TRUE";
+   attribute dont_touch of dac_sd_i      : signal is "TRUE";
+   attribute dont_touch of dac_sclk_i    : signal is "TRUE";
+   attribute dont_touch of fsm_sreset    : signal is "TRUE";
    
 begin
    
@@ -186,7 +203,7 @@ begin
             fpa_digio_fsm <= idle; 
             fpa_timer_cnt <= 0;
             fpa_powered_i <= '0';
-            ncs_i <= '1';
+            ncs_i <= '0';
             mdin_i <= '0';
             fdem_i <= '0';
             digen_i <= '0';
@@ -217,11 +234,6 @@ begin
                   if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
                      fpa_digio_fsm <= rst_cnt_st;
                   end if; 
-                  -- pragma translate_off
-                  if fpa_timer_cnt = 10 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
-                     fpa_digio_fsm <= rst_cnt_st;
-                  end if;                
-                  -- pragma translate_on
                
                when rst_cnt_st =>
                   fpa_timer_cnt <= 0;
@@ -229,23 +241,19 @@ begin
                   
                -- regarder si fin de la pause  
                when fpa_pwr_pause_st =>
+                  ncs_i <= '1';
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
                      fpa_digio_fsm <= check_mclk_st;
                   end if;
-                  -- pragma translate_off
-                  if fpa_timer_cnt = 380000 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
-                     fpa_digio_fsm <= check_mclk_st;
-                  end if;                
-                  -- pragma translate_on
                
                when check_mclk_st =>
-                  if PROG_MCLK = '0' and FPA_INT = '0' then  -- pour eviter troncature sur ces signaux
+                  fpa_powered_i <= '1';        -- permet au driver de placer une requete de programmation en sortant du reset
+                  if FPA_DRIVER_EN = '1' then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué
                      fpa_digio_fsm <= fpa_pwred_st;
                   end if;                   
                
                when fpa_pwred_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  fpa_powered_i <= '1';
                   ncs_i <= PROG_CSN;
                   mdin_i <= PROG_SD;
                   fdem_i <= FPA_FDEM;
@@ -285,12 +293,6 @@ begin
                   if dac_timer_cnt = DEFINE_FLEG_DAC_PWR_WAIT_FACTOR then
                      dac_digio_fsm <= dac_pwred_st;
                   end if;
-                  
-                  -- pragma translate_off
-                  if dac_timer_cnt = 50 then 
-                     dac_digio_fsm <= dac_pwred_st;
-                  end if;                
-                  -- pragma translate_on
                   
                -- dac rdy
                when dac_pwred_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
