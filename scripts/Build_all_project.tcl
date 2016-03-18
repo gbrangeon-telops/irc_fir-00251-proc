@@ -22,6 +22,7 @@ report_utilization -file $base_dir/Reports/pelicanD/fir_00251_proc_pelicanD_util
 open_bd_design $base_dir/xilinx/pelicanD/fir_00251_proc_pelicanD.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/pelicanD/fir_00251_proc_pelicanD.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_pelicanD
+exec $base_dir/scripts/updateHwSvnRev.bat pelicanD
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -49,6 +50,7 @@ report_utilization -file $base_dir/Reports/isc0207A/fir_00251_proc_isc0207A_util
 open_bd_design $base_dir/xilinx/isc0207A/fir_00251_proc_isc0207A.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/isc0207A/fir_00251_proc_isc0207A.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_isc0207A
+exec $base_dir/scripts/updateHwSvnRev.bat isc0207A
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -76,6 +78,7 @@ report_utilization -file $base_dir/Reports/isc0209A/fir_00251_proc_isc0209A_util
 open_bd_design $base_dir/xilinx/isc0209A/fir_00251_proc_isc0209A.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/isc0209A/fir_00251_proc_isc0209A.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_isc0209A
+exec $base_dir/scripts/updateHwSvnRev.bat isc0209A
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -103,6 +106,7 @@ report_utilization -file $base_dir/Reports/hawkA/fir_00251_proc_hawkA_utilizatio
 open_bd_design $base_dir/xilinx/hawkA/fir_00251_proc_hawkA.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/hawkA/fir_00251_proc_hawkA.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_hawkA
+exec $base_dir/scripts/updateHwSvnRev.bat hawkA
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -130,6 +134,7 @@ report_utilization -file $base_dir/Reports/scorpiolwD/fir_00251_proc_scorpiolwD_
 open_bd_design $base_dir/xilinx/scorpiolwD/fir_00251_proc_scorpiolwD.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/scorpiolwD/fir_00251_proc_scorpiolwD.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_scorpiolwD
+exec $base_dir/scripts/updateHwSvnRev.bat scorpiolwD
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -157,6 +162,7 @@ report_utilization -file $base_dir/Reports/marsD/fir_00251_proc_marsD_utilizatio
 open_bd_design $base_dir/xilinx/marsD/fir_00251_proc_marsD.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/marsD/fir_00251_proc_marsD.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_marsD
+exec $base_dir/scripts/updateHwSvnRev.bat marsD
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -184,6 +190,7 @@ report_utilization -file $base_dir/Reports/herculesD/fir_00251_proc_herculesD_ut
 open_bd_design $base_dir/xilinx/herculesD/fir_00251_proc_herculesD.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/herculesD/fir_00251_proc_herculesD.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_herculesD
+exec $base_dir/scripts/updateHwSvnRev.bat herculesD
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -211,6 +218,7 @@ report_utilization -file $base_dir/Reports/scorpiolwD_230Hz/fir_00251_proc_scorp
 open_bd_design $base_dir/xilinx/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_scorpiolwD_230Hz
+exec $base_dir/scripts/updateHwSvnRev.bat scorpiolwD_230Hz
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
@@ -238,6 +246,7 @@ report_utilization -file $base_dir/Reports/scorpiomwD/fir_00251_proc_scorpiomwD_
 open_bd_design $base_dir/xilinx/scorpiomwD/fir_00251_proc_scorpiomwD.srcs/sources_1/bd/core/core.bd
 #Export hardware for sdk
 export_hardware [get_files $base_dir/xilinx/scorpiomwD/fir_00251_proc_scorpiomwD.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_scorpiomwD
+exec $base_dir/scripts/updateHwSvnRev.bat scorpiomwD
 #Change back target constraints file
 set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
