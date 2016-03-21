@@ -17,11 +17,11 @@ _HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 0x400;
 
 MEMORY
 {
-   Code_mem_mig_7series_0 : ORIGIN = 0x50000000, LENGTH = 0x10000000
-   Code_mem_axi_bram_ctrl_0_S_AXI_BASEADDR : ORIGIN = 0xC0000000, LENGTH = 0x00008000
-   MCU_microblaze_1_local_memory_ilmb_bram_if_cntlr_MCU_microblaze_1_local_memory_dlmb_bram_if_cntlr : ORIGIN = 0x00000050, LENGTH = 0x0007FFB0
+   MIG_Code_mig_7series_0 : ORIGIN = 0x50000000, LENGTH = 0x10000000
+   MCU_microblaze_1_local_memory_ilmb_bram_if_cntlr_MCU_microblaze_1_local_memory_dlmb_bram_if_cntlr : ORIGIN = 0x00000050, LENGTH = 0x00007FB0
    MIG_Calibration_CAL_DDR_MIG : ORIGIN = 0x80000000, LENGTH = 0x40000000
 }
+
 
 /* Specify the default entry point to the program */
 
