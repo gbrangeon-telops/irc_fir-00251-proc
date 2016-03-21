@@ -377,6 +377,7 @@ begin
                   prog_trig_i <= '1';
                   if readout_i = '1' then
                      driver_seq_fsm <= post_prog_img_end_st;
+                     prog_trig_i <= '0';                   
                   end if;                  
                
                when post_prog_img_end_st =>

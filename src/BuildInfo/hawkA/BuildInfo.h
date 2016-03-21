@@ -1,10 +1,10 @@
 #ifndef BUILDINFO_H
 #define BUILDINFO_H
 
-#define SVN_HARDWARE_REV      18136
-#define SVN_SOFTWARE_REV      18136
-#define SVN_BOOTLOADER_REV    18136
-#define SVN_COMMON_REV        18129
+#define SVN_HARDWARE_REV      -18283
+#define SVN_SOFTWARE_REV      -18283
+#define SVN_BOOTLOADER_REV    -18283
+#define SVN_COMMON_REV        -18284
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -12,4 +12,10 @@
 #warning Uncommitted changes detected.
 #endif
 
+#define HARDWARE_MISMATCH (0)
+
+#if HARDWARE_MISMATCH
+#error D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_hawkA\hw_platform_0\fir_00251_proc_hawkA.bit does not match D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_hawkA\hw\fir_00251_proc_hawkA.bit.
 #endif
+
+#endif // BUILDINFO_H

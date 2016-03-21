@@ -28,6 +28,7 @@ entity isc0209A_digio_map is
       
       PROG_CSN      : in std_logic;  
       PROG_SD       : in std_logic;
+      PROG_EN       : in std_logic;
       
       DAC_CSN       : in std_logic;  
       DAC_SCLK      : in std_logic;
@@ -65,7 +66,7 @@ architecture rtl of isc0209A_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
-   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, check_mclk_st, fpa_pwred_st); 
+   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, fpa_pwred_st, passthru_st); 
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
@@ -186,7 +187,7 @@ begin
             fpa_powered_i <= '0';
             prog_data_i <= '0';
             lsync_i <= '0';
-            fsync_i <= '1';
+            fsync_i <= '0';
             prog_data_i <= '0';
             mclk_i <= '0';
             
@@ -206,42 +207,36 @@ begin
                   if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
                      fpa_digio_fsm <= rst_cnt_st;
                   end if; 
-                  -- pragma translate_off
-                  if fpa_timer_cnt = 10 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
-                     fpa_digio_fsm <= rst_cnt_st;
-                  end if;                
-                  -- pragma translate_on
                
                when rst_cnt_st =>
                   fpa_timer_cnt <= 0;
                   fpa_digio_fsm <= fpa_pwr_pause_st;
                   
-               -- regarder si fin de la pause  
+               -- observer le delai FPA_POWER_WAIT  
                when fpa_pwr_pause_st =>
+                  fsync_i <= '1';
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
-                     fpa_digio_fsm <= check_mclk_st;
+                     fpa_digio_fsm <=  fpa_pwred_st;
                   end if;
-                  -- pragma translate_off
-                  if fpa_timer_cnt = 380000 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
-                     fpa_digio_fsm <= check_mclk_st;
-                  end if;                
-                  -- pragma translate_on
-               
-               when check_mclk_st =>
-                  if FPA_MCLK = '0' and FPA_INT = '0' then  -- pour eviter troncature sur ces signaux
-                     fpa_digio_fsm <= fpa_pwred_st;
+                  
+               -- annoncer la bonne nouvelle relative à l'allumage du détecteur
+               when fpa_pwred_st =>
+                  fpa_powered_i <= '1';        -- permet au driver de placer une requete de programmation              
+                  fpa_digio_fsm <= wait_trig_stop_st;                
+                  
+               -- attendre que le programmateur du FPA soit activée => trig arrêté
+               when wait_trig_stop_st =>                  
+                  if PROG_EN = '1'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
+                     fpa_digio_fsm <= passthru_st;
                   end if;                   
-               
-               when fpa_pwred_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  fpa_powered_i <= '1';
+                  
+               -- venir ici rapidement pour ne pas manquer la communication du programmateur
+               when passthru_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
                   prog_data_i <= PROG_SD;
                   lsync_i <= FPA_LSYNC;
                   fsync_i <= not FPA_INT and PROG_CSN;  -- normalement on n'aura jamais FPA_INT à '1' et PROG_CSN à '0' en même temps => un et un seul de ces deux signaux fait baisser fsync_i 
-                  mclk_i <= FPA_MCLK;  --
-                  -- pragma translate_off
-                  fsync_i <= PROG_CSN;              
-                  -- pragma translate_on              
+                  mclk_i <= FPA_MCLK;  --             
                
                when others =>
                
