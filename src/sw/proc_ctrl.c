@@ -44,7 +44,7 @@
 #include "CtrlInterface.h"
 #include "NetworkInterface.h"
 #include "DeviceKey.h"
-
+#include "StackUtils.h"
 
 #define DEVICE_RUNNING_TIME_REFRESH_PERIOD_US   TIME_ONE_MINUTE_US
 
@@ -117,6 +117,9 @@ void disable_caches()
    uint64_t tic = 0;
 
    enable_caches();
+
+   Stack_ConfigStackViolationException();
+   Stack_FillRemaining();
 
 #ifdef SIM
    (*global_trans_ptr)->initialize();  // Initialize the SystemC ports

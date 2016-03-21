@@ -23,6 +23,7 @@
 #include "led_ctrl.h"
 #include "QSPIFlash.h"
 #include "SREC.h"
+#include "StackUtils.h"
 #include <string.h>
 
 
@@ -63,6 +64,8 @@ int main()
    ledCtrl_t ledCtrl;
    XIntc intc;
    qspiFlash_t qspiFlash;
+
+   Stack_ConfigStackViolationException();
 
    // Initialize general purpose 64-bit timer
    Timer_Init(XPAR_TMRCTR_0_BASEADDR, XPAR_TMRCTR_0_CLOCK_FREQ_HZ);

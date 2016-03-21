@@ -26,7 +26,7 @@ set versionFile=%binDir%\version.txt
 set sensorInfoFile=%projectDir%\bin\SensorInformation.txt
 
 for /F "skip=2 tokens=1-4 delims=," %%G in (%sensorInfoFile%) do (
-   echo %%G^(%%H^) %%Ix%%J
+   rem echo %%G^(%%H^) %%Ix%%J
    if "%sensorName%" == "%%G" (
       set sensorCode=%%H
       set sensorWidth=%%I
