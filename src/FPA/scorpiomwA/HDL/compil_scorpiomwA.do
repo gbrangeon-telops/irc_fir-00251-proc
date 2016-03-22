@@ -61,13 +61,12 @@ acom -nowarn DAGGEN_0523 -incr \
 
 # fichiers scorpiomwA
 acom  -nowarn DAGGEN_0523 -incr \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen_core.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_mblaze_intf.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_mode_reg.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_window_reg.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_mux.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.bde \
 d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_spi_feeder.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_hw_driver.bde \

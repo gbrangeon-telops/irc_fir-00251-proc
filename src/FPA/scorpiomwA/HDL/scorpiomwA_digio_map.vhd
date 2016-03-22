@@ -22,28 +22,29 @@ entity scorpiomwA_digio_map is
       
       MCLK_SOURCE    : in std_logic;
       ARESET         : in std_logic;      
-                     
+      
       FPA_INT        : in std_logic;
       FPA_MCLK       : in std_logic;
-                     
+      
+      PROG_EN        : in std_logic;
       PROG_CSN       : in std_logic;  
       PROG_SD        : in std_logic;
-                     
+      
       DAC_CSN        : in std_logic;  
       DAC_SCLK       : in std_logic;
       DAC_SD         : in std_logic;
-                     
+      
       SIZEA_SIZEB    : in std_logic;
       UPROW_UPCOL    : in std_logic;
       ITR            : in std_logic;
-                     
+      
       FPA_PWR        : in std_logic;      
       FPA_POWERED    : out std_logic;      
       DAC_POWERED    : out std_logic;                     
-                     
+      
       FPA_ERROR      : out std_logic;
       FPA_DATA_VALID : out std_logic;                     
-                     
+      
       FPA_ON         : out std_logic;
       FPA_DIGIO1     : out std_logic;
       FPA_DIGIO2     : out std_logic;
@@ -72,7 +73,7 @@ architecture rtl of scorpiomwA_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
-   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, check_mclk_st, fpa_pwred_st); 
+   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, passthru_st, fpa_pwred_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    type serclr_fsm_type is (idle, wait_spi_csn_st, signal_length_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
@@ -114,7 +115,7 @@ architecture rtl of scorpiomwA_digio_map is
    signal prog_csn_last    : std_logic;
    
    signal fsm_sreset       : std_logic;
-   signal cnter            : integer range 0 to DEFINE_FPA_MCLK_RATE_FACTOR;
+   signal cnter            : integer range 0 to DEFINE_FPA_MCLK_RATE_FACTOR + 1;
    
    signal prog_mclk_i      : std_logic;
    signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
@@ -293,30 +294,37 @@ begin
                      fpa_digio_fsm <= rst_cnt_st;
                   end if;                
                   -- pragma translate_on
-               
+                  
+               -- reset compteur
                when rst_cnt_st =>
                   fpa_timer_cnt <= 0;
                   fpa_digio_fsm <= fpa_pwr_pause_st;
                   
-               -- regarder si fin de la pause  
+               -- observer le delai FPA_POWER_WAIT  
                when fpa_pwr_pause_st =>
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
-                     fpa_digio_fsm <= check_mclk_st;
+                     fpa_digio_fsm <= fpa_pwred_st;
                   end if;
                   -- pragma translate_off
-                  if fpa_timer_cnt = 380000 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
-                     fpa_digio_fsm <= check_mclk_st;
+                  if fpa_timer_cnt = 38000 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
+                     fpa_digio_fsm <= fpa_pwred_st;
                   end if;                
                   -- pragma translate_on
-               
-               when check_mclk_st =>
-                  if FPA_MCLK = '0' and FPA_INT = '0' then  -- pour eviter troncature sur ces signaux
-                     fpa_digio_fsm <= fpa_pwred_st;
+                  
+               -- annoncer la bonne nouvelle relative à l'allumage du détecteur
+               when fpa_pwred_st =>
+                  fpa_powered_i <= '1';        -- permet au driver de placer une requete de programmation 
+                  fpa_digio_fsm <= wait_trig_stop_st;
+                  
+               -- vérification trig stoppé
+               when wait_trig_stop_st =>                  
+                  if PROG_EN = '1'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
+                     fpa_digio_fsm <= passthru_st;
                   end if;                   
-               
-               when fpa_pwred_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  fpa_powered_i <= '1';
+                  
+               -- venir ici rapidement pour ne pas manquer la communication du programmateur
+               when passthru_st =>          -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
                   prog_data_i <= PROG_SD;
                   sizea_sizeb_i <= SIZEA_SIZEB;
                   int_i <= FPA_INT;            
@@ -325,10 +333,7 @@ begin
                   uprow_upcol_i <= UPROW_UPCOL;
                   error_i <= error_iob;
                   data_valid_i <= data_valid_iob;
-                  
-                  -- pragma translate_off
-                  int_i <= PROG_CSN;              
-                  -- pragma translate_on              
+             
                
                when others =>
                

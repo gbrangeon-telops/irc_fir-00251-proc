@@ -40,7 +40,7 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\Gating\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL
 IMPL_TOOL=
 SYNTH_TOOL=
 
@@ -128,6 +128,7 @@ FPA\Common=1
 FPA\fast=1
 FPA\Hawk=1
 FPA\isc0209=1
+FPA\scorpiomwA=1
 HeaderInserter=1
 HeaderInserter\src=1
 HeaderInserter\src\TestBench=1
@@ -152,7 +153,6 @@ Buffering=1
 EHDRI=1
 ADC_deserializer=1
 Flagging=1
-Gating=1
 SFW=1
 USART=1
 
@@ -161,16 +161,6 @@ USART=1
 
 [file_out:FPA\fast/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_data_ctrl.bde]
 FPA\fast/..\..\..\compile\isc0207A_data_ctrl.vhd=-1
-
-[file_out:MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_block.bde]
-MGT/..\..\compile\mgt_block.vhd=-1
-
-[file_out:FPGA_COMM/..\..\..\src\fpga_comm\HDL\FPGA_COMM.bde]
-FPGA_COMM/..\..\compile\FPGA_COMM.vhd=-1
-
-[file_out:Flash_Ctrl/..\..\..\src\Flash_Ctrl\HDL\Flash_intf.bde]
-Flash_Ctrl/..\..\compile\Flash_intf.vhd=-1
-SFW=1
 
 [Files]
 /..\..\src\fir_00251_proc_acq.bde=-1
@@ -198,6 +188,9 @@ SFW=1
 /..\..\src\fir_00251_top_isc0209A_build.do=-1
 /..\..\src\FPA\hawkA\HDL\compil_hawkA.do=-1
 /..\..\src\fir_00251_top_hawkA_build.do=-1
+/..\..\src\fir_00251_proc_scorpiomwA.bde=-1
+/..\..\src\fir_00251_top_scorpiomwA.do=-1
+/..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_mmcm.vhd=-1
 MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_data_mgt_rtl.do=-1
 MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_exp_mgt_rtl.do=-1
 MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_video_mgt_rtl.do=-1
@@ -467,6 +460,20 @@ FPA\isc0209/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_prog_spi_feeder.vhd=-1
 FPA\isc0209/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_readout_ctrler.vhd=-1
 FPA\isc0209/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_window_reg.vhd=-1
 FPA\isc0209/..\..\..\..\src\FPA\isc0209A\HDL\proxy_define.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\FPA_define.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\proxy_define.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_hw_driver.bde=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_intf.bde=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_mblaze_intf.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_spi_feeder.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_window_reg.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.bde=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen_core.vhd=-1
+FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_mmcm.vhd=-1
 HeaderInserter/..\..\..\src\Hder\HDL\dbus_reorder.vhd=-1
 HeaderInserter/bde.set=-1
 HeaderInserter/compilation.order=-1
@@ -673,15 +680,10 @@ ADC_deserializer/..\..\..\src\QuadADC\HDL\quad_adc_ctrl.vhd=-1
 ADC_deserializer/..\..\..\src\QuadADC\HDL\test_pattern_validator.vhd=-1
 ADC_deserializer/..\..\..\src\QuadADC\HDL\adc_data_deserializer_8chn.bde=-1
 Flagging/..\..\..\src\Flagging\HDL\flag_define.vhd=-1
-Flagging/..\..\..\src\Flagging\HDL\flagging_top.bde=-1
 Flagging/..\..\..\src\Flagging\HDL\flagging_mblaze_intf.vhd=-1
 Flagging/..\..\..\src\Flagging\HDL\flagging_SM.vhd=-1
+Flagging/..\..\..\src\Flagging\HDL\flagging_top.bde=-1
 Flagging/..\..\..\src\Flagging\HDL\flagging_compile.do=-1
-Gating/..\..\..\src\Gating\HDL\gating_define.vhd=-1
-Gating/..\..\..\src\Gating\HDL\gating_top.bde=-1
-Gating/..\..\..\src\Gating\HDL\gating_mblaze_intf.vhd=-1
-Gating/..\..\..\src\Gating\HDL\gating_SM.vhd=-1
-Gating/..\..\..\src\Gating\HDL\gating_compile.do=-1
 SFW/..\..\..\src\SFW\HDL\build_SFW.do=-1
 SFW/..\..\..\src\SFW\HDL\fw_decoder.vhd=-1
 SFW/..\..\..\src\SFW\HDL\SFW.bde=-1
@@ -725,6 +727,9 @@ USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_tx.vhd=-1
 .\..\src\fir_00251_top_isc0209A_build.do=Macro
 .\..\src\FPA\hawkA\HDL\compil_hawkA.do=Macro
 .\..\src\fir_00251_top_hawkA_build.do=Macro
+.\..\src\fir_00251_proc_scorpiomwA.bde=Block Diagram
+.\..\src\fir_00251_top_scorpiomwA.do=Macro
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_mmcm.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_data_mgt_rtl.do=Macro
 .\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_exp_mgt_rtl.do=Macro
 .\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_video_mgt_rtl.do=Macro
@@ -927,6 +932,19 @@ USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_tx.vhd=-1
 .\..\src\FPA\isc0209A\HDL\isc0209A_readout_ctrler.vhd=VHDL Source Code
 .\..\src\FPA\isc0209A\HDL\isc0209A_window_reg.vhd=VHDL Source Code
 .\..\src\FPA\isc0209A\HDL\proxy_define.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do=Macro
+.\..\src\FPA\scorpiomwA\HDL\FPA_define.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\proxy_define.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_hw_driver.bde=Block Diagram
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_intf.bde=Block Diagram
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_mblaze_intf.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde=Block Diagram
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_spi_feeder.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_window_reg.vhd=VHDL Source Code
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.bde=Block Diagram
+.\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen_core.vhd=VHDL Source Code
 .\..\src\Hder\HDL\dbus_reorder.vhd=VHDL Source Code
 .\src\HeaderInserter\bde.set=External File
 .\src\HeaderInserter\compilation.order=External File
@@ -1128,15 +1146,10 @@ USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_tx.vhd=-1
 .\..\src\QuadADC\HDL\test_pattern_validator.vhd=VHDL Source Code
 .\..\src\QuadADC\HDL\adc_data_deserializer_8chn.bde=Block Diagram
 .\..\src\Flagging\HDL\flag_define.vhd=VHDL Source Code
-.\..\src\Flagging\HDL\flagging_top.bde=Block Diagram
 .\..\src\Flagging\HDL\flagging_mblaze_intf.vhd=VHDL Source Code
 .\..\src\Flagging\HDL\flagging_SM.vhd=VHDL Source Code
+.\..\src\Flagging\HDL\flagging_top.bde=Block Diagram
 .\..\src\Flagging\HDL\flagging_compile.do=Macro
-.\..\src\Gating\HDL\gating_define.vhd=VHDL Source Code
-.\..\src\Gating\HDL\gating_top.bde=Block Diagram
-.\..\src\Gating\HDL\gating_mblaze_intf.vhd=VHDL Source Code
-.\..\src\Gating\HDL\gating_SM.vhd=VHDL Source Code
-.\..\src\Gating\HDL\gating_compile.do=Macro
 .\..\src\SFW\HDL\build_SFW.do=Macro
 .\..\src\SFW\HDL\fw_decoder.vhd=VHDL Source Code
 .\..\src\SFW\HDL\SFW.bde=Block Diagram
@@ -1303,6 +1316,18 @@ FPA\isc0209/..\..\..\compile\isc0209A_intf.vhd=-1
 
 [file_out:FPA\isc0209/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_prog_ctrler.bde]
 FPA\isc0209/..\..\..\compile\isc0209A_prog_ctrler.vhd=-1
+
+[file_out:FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_hw_driver.bde]
+FPA\scorpiomwA/..\..\..\compile\scorpiomwA_hw_driver.vhd=-1
+
+[file_out:FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_intf.bde]
+FPA\scorpiomwA/..\..\..\compile\scorpiomwA_intf.vhd=-1
+
+[file_out:FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde]
+FPA\scorpiomwA/..\..\..\compile\scorpiomwA_prog_ctrler.vhd=-1
+
+[file_out:FPA\scorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.bde]
+FPA\scorpiomwA/..\..\..\compile\scorpiomwA_clks_gen.vhd=-1
 
 [file_out:HeaderInserter\src/hder_inserter_top_tb.bde]
 HeaderInserter\src/..\..\..\compile\hder_inserter_top_tb.vhd=-1
