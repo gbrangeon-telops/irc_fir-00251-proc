@@ -2,7 +2,7 @@
 #define BUILDINFO_H
 
 #define SVN_HARDWARE_REV      18307
-#define SVN_SOFTWARE_REV      18307
+#define SVN_SOFTWARE_REV      18310
 #define SVN_BOOTLOADER_REV    18307
 #define SVN_COMMON_REV        18300
 
