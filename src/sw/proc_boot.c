@@ -55,15 +55,19 @@ char gProgress[PROC_BOOT_PROGRESS_SIZE] = {'|', '/', '-', '\\', '|', '/', '-', '
 #define PROC_BOOT_VECTOR_SECTION_ADDR  0x00000000
 #define PROC_BOOT_VECTOR_SECTION_SIZE  0x50
 
+/**
+ * Global variables
+ */
+ledCtrl_t gLedCtrl;
+XIntc gIntc;
+qspiFlash_t gQSPIFlash;
+
 /*--------------------------------------------------------------------------------------*/
 /* main                                                                                 */
 /*--------------------------------------------------------------------------------------*/
 int main()
 {
    IRC_Status_t status;
-   ledCtrl_t ledCtrl;
-   XIntc intc;
-   qspiFlash_t qspiFlash;
 
    Stack_ConfigStackViolationException();
 
@@ -77,19 +81,19 @@ int main()
    PRINTF("Boot loader starting...\n");
 
    // Initialize LED
-   Led_Init(&ledCtrl, XPAR_AXI_GPIO_0_DEVICE_ID);
+   Led_Init(&gLedCtrl, XPAR_AXI_GPIO_0_DEVICE_ID);
 
    // Initialize the interrupt controller driver.
-   status = XIntc_Initialize(&intc, XPAR_INTC_0_DEVICE_ID);
+   status = XIntc_Initialize(&gIntc, XPAR_INTC_0_DEVICE_ID);
    if (status != XST_SUCCESS)
    {
       PRINTF("Failed to initialize interrupt controller.\n");
    }
 
    // QSPI flash initialization
-   status = QSPIFlash_Init(&qspiFlash,
+   status = QSPIFlash_Init(&gQSPIFlash,
          XPAR_AXI_QUAD_SPI_0_DEVICE_ID,
-         &intc,
+         &gIntc,
          XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
    if (status != IRC_SUCCESS)
    {
@@ -101,14 +105,14 @@ int main()
     * all devices that cause interrupts, specifies real mode so that only
     * hardware interrupts are enabled.
     */
-   status = XIntc_Start(&intc, XIN_REAL_MODE);
+   status = XIntc_Start(&gIntc, XIN_REAL_MODE);
    if (status != XST_SUCCESS)
    {
       PRINTF("Failed to start interrupt controller.\n");
    }
 
    // Enable the interrupt for the SPI driver instances.
-   XIntc_Enable(&intc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
+   XIntc_Enable(&gIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
 
    // Initialize the exception table.
    Xil_ExceptionInit();
@@ -116,7 +120,7 @@ int main()
    // Register the interrupt controller handler with the exception table.
    Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
           (Xil_ExceptionHandler)XIntc_InterruptHandler,
-          &intc);
+          &gIntc);
 
    // Enable exceptions.
    Xil_ExceptionEnable();
@@ -126,8 +130,8 @@ int main()
    // Main loop
    while(1)
    {
-      Led_ToggleDebugLedState(&ledCtrl);
-      if (ProcBoot_SM(&qspiFlash) != IRC_SUCCESS)
+      Led_ToggleDebugLedState(&gLedCtrl);
+      if (ProcBoot_SM(&gQSPIFlash) != IRC_SUCCESS)
       {
          // Halt
          PRINTF("Boot loader halted.\n");

@@ -33,6 +33,7 @@
 #include "GPS.h"
 #include "trig_gen.h"
 #include "DeviceKey.h"
+#include "StackUtils.h"
 #include <string.h>
 #include <time.h>
 
@@ -58,6 +59,7 @@ static IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseSTACK(circByteBuffer_t *cbuf);
 static uint16_t GetNextArg(circByteBuffer_t *cbuf, uint8_t *buffer, uint16_t buflen);
 static IRC_Status_t ParseNumArg(char *str, uint8_t length, uint32_t *value);
 static IRC_Status_t ParseNumHex(char *str, uint8_t length, uint32_t *value);
@@ -375,6 +377,10 @@ IRC_Status_t DebugTerminalParser(circByteBuffer_t *cbuf)
       else if (strcasecmp((char *)cmdStr, "KEY") == 0)
       {
          return DebugTerminalParseKEY(cbuf);
+      }
+      else if (strcasecmp((char *)cmdStr, "STACK") == 0)
+      {
+         return DebugTerminalParseSTACK(cbuf);
       }
       else if (strcasecmp((char *)cmdStr, "HLP") == 0)
       {
@@ -1944,6 +1950,31 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
    DT_PRINTF("Device key validation: 0x%08X%08X (%s)", gcRegsData.DeviceKeyValidationHigh, gcRegsData.DeviceKeyValidationLow,
          (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS)? "Passed" : "Failed");
    DT_PRINTF("Device key expiration: 0x%08X", flashSettings.DeviceKeyExpirationPOSIXTime);
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Get Stack Level command parser.
+ * This parser is used to parse and validateGet Stack Level command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Get Stack Level command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseSTACK(circByteBuffer_t *cbuf)
+{
+   // There is supposed to be no remaining bytes in the buffer
+   if (!CBB_Empty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   DT_PRINTF("Stack level: %d/%d (%d)",
+         Stack_GetActualLevel(), Stack_GetSize(), Stack_GetMaximumLevel());
 
    return IRC_SUCCESS;
 }
