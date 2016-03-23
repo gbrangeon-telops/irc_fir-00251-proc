@@ -44,7 +44,7 @@ package FPA_define is
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
-   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le scorpioMW, c'est fixé à 10MHz.
+   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 18_000;       -- pour le scorpioMW, c'est fixé à 10MHz.
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := integer(real(3076)*real(1_000_000)/real(DEFINE_FPA_MCLK_RATE_KHZ));     --  3076 MCLK en ns et en fonction de la frequence d'horloge detecteur
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le scorpioMW, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant DEFINE_XSIZE_MAX                      : integer   := 640;         -- dimension en X maximale
@@ -66,9 +66,9 @@ package FPA_define is
    constant DEFINE_FPA_80M_CLK_RATE_KHZ           : integer   := 80_000;     --  horloge de 80M en KHz
    
    -- quelques caractéristiques de la carte ADC requise
-   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 40_000;     -- l'horloge par defaut est celle des Quads au demarrage en attendant la detection de la carte ADC. C,est une frequence utilisable quelle que soit la carte ADC. Une fois la carte ADC détectée, celle-ci imposera une frequence maximale à ne pas depasser.
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 40_000;     -- c'est l'horolge reelle des quads pour laquelle le design est fait. Elle doit être inférieure à la limite imposée par la carte ADC détectée. Si telle n'est pas le cas, sortir une erreur  
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
+   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 36_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M,  
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 36_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M, 
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_72M_CLK_RATE_KHZ;     -- DEFINE_FPA_80M_CLK_RATE_KHZ => MCLK = 10M, DEFINE_FPA_60M_CLK_RATE_KHZ => MCLK = 15M, DEFINE_FPA_72M_CLK_RATE_KHZ => MCLK = 18M,-- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
    constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
    
    -- limites imposées aux tensions VDAC provenant de celles de FP_VCC1 à FP_VCC8 du Fleg 
@@ -172,8 +172,8 @@ package FPA_define is
       line_period_pclk              : unsigned(7 downto 0);     --  pour scorpioMW: nombre de pclk =  XSIZE/TAP_NUM + LOVH)
       
       -- ligne active = ligne excluant les portions/pixels non valides     
-      active_line_start_num          : unsigned(3 downto 0);    --  pour scorpioMW: le numero de la premiere ligne active. Il vaut 3 car on laisse deux lignes de tests
-      active_line_end_num            : unsigned(10 downto 0);   --  pour scorpioMW: le numero de la derniere ligne active. Il vaut Ysize + 2
+      active_line_start_num          : unsigned(3 downto 0);    --  pour scorpioMW: le numero de la premiere ligne active. Il vaut 1
+      active_line_end_num            : unsigned(9 downto 0);   --  pour scorpioMW: le numero de la derniere ligne active. Il vaut Ysize
       
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch            : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
@@ -212,15 +212,15 @@ package FPA_define is
    to_unsigned(3176, 32),     --int_signal_high_time           
    --comn                           
    ('0', x"D2", '0', x"02", to_unsigned(1000000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32)),
-   to_unsigned(0, 10),        --xstart                         
-   to_unsigned(0, 10),        --ystart                         
-   to_unsigned(640, 10),      --xsize                          
-   to_unsigned(512, 10),      --ysize
+   to_unsigned(0, 11),        --xstart                         
+   to_unsigned(0, 11),        --ystart                         
+   to_unsigned(640, 11),      --xsize                          
+   to_unsigned(512, 11),      --ysize
    
-   to_unsigned(0, 8),         --windcfg_part1                         
-   to_unsigned(159, 8),       --windcfg_part2                         
-   to_unsigned(0, 7),         --windcfg_part3                          
-   to_unsigned(511, 7),       --windcfg_part4
+   to_unsigned(0, 9),         --windcfg_part1                         
+   to_unsigned(159, 9),       --windcfg_part2                         
+   to_unsigned(0, 8),         --windcfg_part3                          
+   to_unsigned(511, 8),       --windcfg_part4
    
    '1',                       --uprow_upcol                         
    '1',                       --sizea_sizeb 
@@ -236,7 +236,7 @@ package FPA_define is
    to_unsigned(76801, 17),    --readout_pclk_cnt_max         
    to_unsigned(160, 8),       --line_period_pclk             
    to_unsigned(1, 4),         --active_line_start_num        
-   to_unsigned(512, 9),       --active_line_end_num
+   to_unsigned(512, 10),       --active_line_end_num
    to_unsigned(2, 8),         --pix_samp_num_per_ch          
    to_unsigned(1, 9),         --sof_posf_pclk                
    to_unsigned(76800, 17),    --eof_posf_pclk                

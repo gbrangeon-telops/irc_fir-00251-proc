@@ -26,7 +26,7 @@ entity scorpiomwA_window_reg is
       
       -- spi
       SPI_EN         : out std_logic;
-      SPI_DATA       : out std_logic_vector(33 downto 0);
+      SPI_DATA       : out std_logic_vector(39 downto 0);  -- en fait 33 downro 0 seulement utilisé
       SPI_DONE       : in std_logic;
       
       -- io 
@@ -60,7 +60,7 @@ architecture rtl of scorpiomwA_window_reg is
    type   roic_cfg_fsm_type is (idle, check_done_st, rqst_st, cfg_io_st, send_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_reg_st, pause_st);
    signal roic_cfg_fsm        : roic_cfg_fsm_type;  
    signal spi_en_i            : std_logic;
-   signal spi_data_i          : std_logic_vector(33 downto 0);
+   signal spi_data_i          : std_logic_vector(39 downto 0);
    signal new_cfg             : std_logic_vector(39 downto 0);
    signal sreset              : std_logic;
    signal actual_cfg          : std_logic_vector(39 downto 0);
@@ -187,7 +187,7 @@ begin
                   uprow_upcol_i <= new_cfg(35);
                   sizea_sizeb_i <= new_cfg(34); 
                   roic_cfg_fsm <= send_cfg_st;   
-                  spi_data_i <= new_cfg(33 downto 0);   -- assigné un clk plus tôt
+                  spi_data_i <= "000000" & new_cfg(33 downto 0);   -- assigné un clk plus tôt
                
                when send_cfg_st => 
                   rqst_i <= '0';

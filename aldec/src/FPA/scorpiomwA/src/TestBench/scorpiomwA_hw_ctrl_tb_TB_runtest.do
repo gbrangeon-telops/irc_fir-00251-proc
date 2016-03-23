@@ -15,7 +15,7 @@ acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\Proxy_define.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do  
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do 
+
 
 #pour la simulation
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_funcsim.vhdl
@@ -26,7 +26,11 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_10MHz_mmcm\scorpiomwA_10MHz_mmcm_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_15MHz_mmcm\scorpiomwA_15MHz_mmcm_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_18MHz_mmcm\scorpiomwA_18MHz_mmcm_funcsim.vhdl 
 
+do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do 
 
 --acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
@@ -39,8 +43,11 @@ asim -ses scorpiomwa_hw_ctrl_tb_TB
 
 
 -- mb interface
-wave UUT/U4/*
-
+--wave UUT/U4/*
+  
+wave UUT/U26/*  
+  
+  
 -- afpa_hw_driver_ctrler
 --wave UUT/U5/U4/*
 
@@ -77,4 +84,4 @@ wave UUT/U4/*
 -- diag data gen
 --wave UUT/U9/U2/U4/* 
  
-run 10 ms
+run 1 ms

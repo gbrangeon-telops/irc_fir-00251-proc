@@ -62,6 +62,7 @@ acom -nowarn DAGGEN_0523 -incr \
 # fichiers scorpiomwA
 acom  -nowarn DAGGEN_0523 -incr \
 D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen_core.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_mmcm.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_mblaze_intf.vhd \

@@ -23,7 +23,7 @@ entity scorpiomwA_prog_spi_feeder is
       ARESET      : in std_logic;
       CLK         : in std_logic;
       
-      SPI_DATA    : in std_logic_vector(31 downto 0);
+      SPI_DATA    : in std_logic_vector(39 downto 0);
       SPI_DONE    : out std_logic;
       SPI_EN      : in std_logic;
       

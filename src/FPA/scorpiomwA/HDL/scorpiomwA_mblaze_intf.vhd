@@ -61,7 +61,7 @@ architecture rtl of scorpiomwA_mblaze_intf is
    type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
    signal exp_time_pipe                : exp_time_pipe_type; 
-   signal sreset_mb_clk                : std_logic;
+   --signal sreset_mb_clk                : std_logic;
    signal axi_awaddr	                  : std_logic_vector(31 downto 0);
    signal axi_awready	               : std_logic;
    signal axi_wready	                  : std_logic;
@@ -97,21 +97,21 @@ architecture rtl of scorpiomwA_mblaze_intf is
    signal sreset                       : std_logic;
    signal user_cfg_rdy_pipe            : std_logic_vector(7 downto 0) := (others => '0');
    signal user_cfg_rdy                 : std_logic := '0';
-   signal tri_min                      : integer;
-   signal tri_int_part                 : integer;
+   --signal tri_min                      : integer;
+   --signal tri_int_part                 : integer;
    signal exp_time_reg                 : unsigned(30 downto 0);
---   
---   attribute dont_touch                         : string;
---   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
---   attribute dont_touch of user_cfg             : signal is "true";
---   attribute dont_touch of user_cfg_in_progress : signal is "true";
---   attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
---   attribute dont_touch of tri_min              : signal is "true";
---   attribute dont_touch of tri_int_part         : signal is "true";
---   attribute dont_touch of exp_time_reg         : signal is "true";
+   --   
+   --   attribute dont_touch                         : string;
+   --   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
+   --   attribute dont_touch of user_cfg             : signal is "true";
+   --   attribute dont_touch of user_cfg_in_progress : signal is "true";
+   --   attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
+   --   attribute dont_touch of tri_min              : signal is "true";
+   --   attribute dont_touch of tri_int_part         : signal is "true";
+   --   attribute dont_touch of exp_time_reg         : signal is "true";
    
 begin   
-    
+   
    CTRLED_RESET <= ctrled_reset_i;
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
@@ -263,15 +263,15 @@ begin
                   when X"C4" =>    user_cfg_i.adc_clk_phase                   <= unsigned(data_i(user_cfg_i.adc_clk_phase'length-1 downto 0)); user_cfg_in_progress <= '0';
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
-                  when X"E0" =>    fpa_softw_stat_i.fpa_roic                <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
-                  when X"E4" =>    fpa_softw_stat_i.fpa_output              <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
-                  when X"E8" =>    fpa_softw_stat_i.fpa_input               <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
+                  when X"E0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
+                  when X"E4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
+                  when X"E8" =>    fpa_softw_stat_i.fpa_input                 <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
                      
                   -- pour effacer erreurs latchées
-                  when X"EC" =>    reset_err_i                              <= data_i(0); 
+                  when X"EC" =>    reset_err_i                                <= data_i(0); 
                      
                   -- pour un reset complet du module FPA
-                  when X"F0" =>   ctrled_reset_i                            <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                  when X"F0" =>   ctrled_reset_i                              <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                   
                   when others =>
                   
@@ -295,7 +295,7 @@ begin
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
          int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) - DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+         int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
          
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
