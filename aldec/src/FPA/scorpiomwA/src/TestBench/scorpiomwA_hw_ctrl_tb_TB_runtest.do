@@ -45,43 +45,19 @@ asim -ses scorpiomwa_hw_ctrl_tb_TB
 -- mb interface
 --wave UUT/U4/*
   
-wave UUT/U26/*  
-  
-  
--- afpa_hw_driver_ctrler
---wave UUT/U5/U4/*
-
--- dac ctrler 
---wave UUT/U5/U3/U2/* 
-
--- dac spi 
---wave UUT/U5/U3/U1/*
-  
   -- fpa_ ctler
---wave UUT/U5/U2/U2/*
+--wave UUT/U5/U2/U3/*
   
-   -- fpa_ ctler
---wave UUT/U5/U2/U5/*
+   -- readout controller
+wave UUT/U5/U5/*
  
  
 -- scorpiomwA_digio_map
---wave UUT/U19/*                 
+--wave UUT/U19/* 
+
+
+-- scorpiomwA_digio_map
+--wave UUT/U19/* 
                   
--- diag dval gen
---wave UUT/U3/* 
---wave UUT/U9/U1/U1/*
-
--- diag dval gen
---wave UUT/U9/U2/U1/*
-
---wave UUT/U9/U18/* 
-
--- integration
---wave UUT/U5/U1/* 
-
---wave UUT/U5/U4/*
-
--- diag data gen
---wave UUT/U9/U2/U4/* 
  
-run 1 ms
+run 10 ms

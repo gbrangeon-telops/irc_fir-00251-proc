@@ -53,21 +53,21 @@ architecture TB_ARCHITECTURE of scorpiomwa_hw_ctrl_tb_tb is
    constant ACQ_TRIG_PERIOD         : time := 700 us;
    constant DOUT_CLK_PERIOD         : time := 6.25 ns;                    
    
-   constant PAUSE_SIZE     : integer := 16;
+   constant PAUSE_SIZE     : integer := 0;
    
-   constant xsize : natural := 128;
-   constant ysize : natural := 6; 
+   constant xsize : natural := 640;
+   constant ysize : natural := 512; 
    constant TRIG_PERIOD : time := 100 us;
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
    signal ARESET       : STD_LOGIC  := '1';
    signal CLK_80M      : STD_LOGIC  := '1';
-   signal FPA_DIGIO11 : STD_LOGIC;
-   signal FPA_DIGIO12 : STD_LOGIC;
+   signal FPA_DIGIO11  : STD_LOGIC;
+   signal FPA_DIGIO12  : STD_LOGIC;
    signal FPA_EXP_INFO : exp_info_type;
-   signal MB_CLK : STD_LOGIC:= '1';
-   signal MB_MOSI : t_axi4_lite_mosi;
-   signal ACQ_TRIG : STD_LOGIC;
+   signal MB_CLK       : STD_LOGIC:= '1';
+   signal MB_MOSI      : t_axi4_lite_mosi;
+   signal ACQ_TRIG     : STD_LOGIC;
    
    -- Observed signals - signals mapped to the output ports of tested entity
    signal ADC_DESERIALIZER_RST : STD_LOGIC;
@@ -159,8 +159,8 @@ begin
    user_cfg_i.windcfg_part3  <= to_unsigned(3, user_cfg_i.windcfg_part3'length);
    user_cfg_i.windcfg_part4  <= to_unsigned(4, user_cfg_i.windcfg_part4'length);
    
-   user_cfg_i.uprow_upcol    <= '1';
-   user_cfg_i.sizea_sizeb    <= '1';
+   user_cfg_i.uprow_upcol    <= '0';
+   user_cfg_i.sizea_sizeb    <= '0';
    user_cfg_i.itr            <= '1';
    user_cfg_i.gain           <= '0';
    
@@ -171,18 +171,18 @@ begin
    user_cfg_i.adc_quad2_en  <= '1';
    user_cfg_i.chn_diversity_en  <= '1'; 
    
-   user_cfg_i.line_period_pclk <= to_unsigned((XSIZE/8 + PAUSE_SIZE)*2, user_cfg_i.line_period_pclk'length);
-   user_cfg_i.readout_pclk_cnt_max   <= to_unsigned((XSIZE/8 + PAUSE_SIZE)*(YSIZE + 2)*2 + 1, user_cfg_i.readout_pclk_cnt_max'length);
+   user_cfg_i.line_period_pclk <= to_unsigned((XSIZE/4 + PAUSE_SIZE), user_cfg_i.line_period_pclk'length);
+   user_cfg_i.readout_pclk_cnt_max   <= to_unsigned((XSIZE/4 + PAUSE_SIZE)*(YSIZE) + 1, user_cfg_i.readout_pclk_cnt_max'length);
    
-   user_cfg_i.active_line_start_num            <= to_unsigned(3, user_cfg_i.active_line_start_num'length); 
+   user_cfg_i.active_line_start_num            <= to_unsigned(1, user_cfg_i.active_line_start_num'length); 
    user_cfg_i.active_line_end_num         <= to_unsigned(YSIZE + to_integer(user_cfg_i.active_line_start_num) - 1, user_cfg_i.active_line_end_num'length);
    
-   user_cfg_i.pix_samp_num_per_ch   <= to_unsigned(4, user_cfg_i.pix_samp_num_per_ch'length);
+   user_cfg_i.pix_samp_num_per_ch   <= to_unsigned(2, user_cfg_i.pix_samp_num_per_ch'length);
    
    user_cfg_i.sof_posf_pclk   <= resize(user_cfg_i.line_period_pclk*(to_integer(user_cfg_i.active_line_start_num) - 1) + 1, user_cfg_i.sof_posf_pclk'length);
    user_cfg_i.eof_posf_pclk   <= resize(user_cfg_i.active_line_end_num* user_cfg_i.line_period_pclk - PAUSE_SIZE*2, user_cfg_i.eof_posf_pclk'length);
    user_cfg_i.sol_posl_pclk   <= to_unsigned(1, user_cfg_i.sol_posl_pclk'length);
-   user_cfg_i.eol_posl_pclk   <= to_unsigned((XSIZE/8)*2, user_cfg_i.eol_posl_pclk'length);
+   user_cfg_i.eol_posl_pclk   <= to_unsigned((XSIZE/4), user_cfg_i.eol_posl_pclk'length);
    user_cfg_i.eol_posl_pclk_p1   <= user_cfg_i.eol_posl_pclk + 1;
    
    
