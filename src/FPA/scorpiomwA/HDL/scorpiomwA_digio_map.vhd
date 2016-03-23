@@ -73,7 +73,7 @@ architecture rtl of scorpiomwA_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
-   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, passthru_st, fpa_pwred_st);
+   type fpa_digio_fsm_type   is (idle, wait_mclk_st, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, passthru_st, fpa_pwred_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    type serclr_fsm_type is (idle, wait_spi_csn_st, signal_length_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
@@ -113,12 +113,13 @@ architecture rtl of scorpiomwA_digio_map is
    signal data_valid_iob   : std_logic;
    signal itr_i            : std_logic;
    signal prog_csn_last    : std_logic;
+   signal mclk_temp        : std_logic;
    
    signal fsm_sreset       : std_logic;
    signal cnter            : integer range 0 to DEFINE_FPA_MCLK_RATE_FACTOR + 1;
    
-   signal prog_mclk_i      : std_logic;
-   signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
+   signal mclk_reg         : std_logic;
+   signal mclk_pipe        : std_logic_vector(7 downto 0);
    
    attribute IOB : string;
    attribute IOB of fpa_on_iob         : signal is "TRUE";
@@ -255,6 +256,50 @@ begin
       end if;
    end process; 
    
+   
+   --------------------------------------------------------- 
+   -- decalage de l'horloge                                
+   --------------------------------------------------------- 
+   -- pour synchro parfaite avec les données allant vers le detecteur
+   MCLK10M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 10_000 generate   
+      --begin                                             
+      U10M :  process(MCLK_SOURCE)
+      begin  
+         if rising_edge(MCLK_SOURCE) then 
+            mclk_pipe(0) <= FPA_MCLK;
+            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0);
+            mclk_reg <= mclk_pipe(0);                          -- ajusté via simulation
+         end if;
+      end process;
+   end generate;
+   
+   ----
+   MCLK15M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 15_000 generate   
+      --begin                                             
+      U15M :  process(MCLK_SOURCE)
+      begin  
+         if rising_edge(MCLK_SOURCE) then 
+            mclk_pipe(0) <= FPA_MCLK;
+            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0);
+            mclk_reg <= mclk_pipe(0);                           -- ajusté via simulation
+         end if;
+      end process;         
+   end generate;
+   
+   ---------
+   MCLK18M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 18_000 generate                                              
+      --begin                                             
+      U18M :  process(MCLK_SOURCE)
+      begin  
+         if rising_edge(MCLK_SOURCE) then 
+            mclk_pipe(0) <= FPA_MCLK;
+            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0);   
+            mclk_reg <= mclk_pipe(0);                          -- ajusté via simulation
+         end if;
+      end process;
+   end generate; 
+   
+   
    --------------------------------------------------------- 
    -- fsm fpa digio                                 
    ---------------------------------------------------------
@@ -266,14 +311,18 @@ begin
             fpa_timer_cnt <= 0;
             fpa_powered_i <= '0';
             prog_data_i <= '0';
-            sizea_sizeb_i <= '1';
+            sizea_sizeb_i <= '0';
             int_i <= '0';
             prog_data_i <= '0';
+            mclk_temp <= '0';
             mclk_i <= '0';
             error_i <= '0';
             data_valid_i <= '0';
+            uprow_upcol_i <= '0';
+            itr_i <= '0';
             
          else
+            
             
             case fpa_digio_fsm is          
                
@@ -301,7 +350,9 @@ begin
                   fpa_digio_fsm <= fpa_pwr_pause_st;
                   
                -- observer le delai FPA_POWER_WAIT  
-               when fpa_pwr_pause_st =>
+               when fpa_pwr_pause_st =>              
+                  itr_i <= '1';
+                  sizea_sizeb_i <= '1';
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
                      fpa_digio_fsm <= fpa_pwred_st;
@@ -320,20 +371,25 @@ begin
                -- vérification trig stoppé
                when wait_trig_stop_st =>                  
                   if PROG_EN = '1'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
-                     fpa_digio_fsm <= passthru_st;
+                     fpa_digio_fsm <= wait_mclk_st;
                   end if;                   
+               
+               when wait_mclk_st =>                  
+                  if mclk_reg = '0'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
+                     fpa_digio_fsm <= passthru_st;
+                  end if; 
                   
                -- venir ici rapidement pour ne pas manquer la communication du programmateur
                when passthru_st =>          -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
                   prog_data_i <= PROG_SD;
                   sizea_sizeb_i <= SIZEA_SIZEB;
-                  int_i <= FPA_INT;            
-                  mclk_i <= FPA_MCLK;  --
+                  int_i <= FPA_INT;
+                  mclk_i <= mclk_reg;  --
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
                   error_i <= error_iob;
                   data_valid_i <= data_valid_iob;
-             
+                  
                
                when others =>
                

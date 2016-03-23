@@ -52,7 +52,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    signal sync_flag_fsm        : sync_flag_fsm_type;
    signal readout_fsm          : readout_fsm_type;
-   signal fpa_int_last         : std_logic;
+   --signal fpa_int_last         : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
@@ -204,7 +204,7 @@ begin
                   end if;
                
                when wait_mclk_fe_st => 
-                  if pclk_fall = '1' then                              -- on attend la tombée de la MCLK pour eviter des troncatures 
+                  if pclk_rise = '1' then                              -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
                   end if;                           
                
@@ -347,7 +347,7 @@ begin
          -- generation de samp_pulse_i : on echantillonne les signaux fval, lval etc avec samp_pulse_i
          quad_clk_copy_i <= QUAD_CLK_COPY;
          quad_clk_copy_last <= quad_clk_copy_i;
-         samp_pulse_pipe(3) <= ((not quad_clk_copy_last and quad_clk_copy_i)and fval_pipe(3)); 
+         samp_pulse_pipe(3) <= ((quad_clk_copy_last and not quad_clk_copy_i)and fval_pipe(3)); 
          
          -------------------------
          -- reset des identificateurs

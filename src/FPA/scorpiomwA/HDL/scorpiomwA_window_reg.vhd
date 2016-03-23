@@ -166,7 +166,7 @@ begin
                   done_i <= '1'; 
                   rqst_i <= '0';
                   pause_cnt <= (others => '0');
-                  if new_cfg_pending /= '1' then
+                  if new_cfg_pending = '1' then
                      roic_cfg_fsm <= check_done_st;  
                   end if;   
                
@@ -216,7 +216,7 @@ begin
                   roic_cfg_fsm <= update_reg_st;   --même si error_i arrive on met quand même à jour la conmfig pour sortir de cet état sinon risque de planter la camera
                
                when update_reg_st =>
-                  actual_cfg <= "000" & itr_i & uprow_upcol_i & sizea_sizeb_i & spi_data_i;
+                  actual_cfg <= "000" & itr_i & uprow_upcol_i & sizea_sizeb_i & spi_data_i(33 downto 0);
                   roic_cfg_fsm <= pause_st; 
                
                when  pause_st =>

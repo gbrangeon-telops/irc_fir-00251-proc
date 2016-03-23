@@ -79,7 +79,7 @@ begin
    
    MCLK15M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 15_000 generate   
       begin                                             
-      U10M :  scorpiomwA_15MHz_mmcm
+      U15M :  scorpiomwA_15MHz_mmcm
       port map (   
          clk_in         => CLK_80M,
          mclk_source    => MCLK_SOURCE,
@@ -92,7 +92,7 @@ begin
    
    MCLK18M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 18_000 generate   
       begin                                             
-      U10M :  scorpiomwA_18MHz_mmcm
+      U18M :  scorpiomwA_18MHz_mmcm
       port map (   
          clk_in         => CLK_80M,
          mclk_source    => MCLK_SOURCE,
