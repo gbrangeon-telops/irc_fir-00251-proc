@@ -24,6 +24,7 @@
 #include "QSPIFlash.h"
 #include "SREC.h"
 #include "StackUtils.h"
+#include "mb_interface.h"
 #include <string.h>
 
 
@@ -242,6 +243,14 @@ IRC_Status_t ProcBoot_SM(qspiFlash_t *qspiFlash)
                      p_vectorSection[i] = vectorSection[i];
                   }
                   PRINTF("Executing program starting @ 0x%08X\n", (uint32_t)startAddr);
+
+                  /*
+                   * Reset stack violation protection registers to their default value to make sure stack violation
+                   * protection won't be triggered when firmware will start using different stack location and size.
+                   */
+                  mtslr(0x00000000);
+                  mtshr(0xFFFFFFFF);
+
                   (*startAddr)();
 
                   // Should never get there

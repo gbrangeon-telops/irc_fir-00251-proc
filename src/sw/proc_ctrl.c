@@ -112,19 +112,20 @@ void disable_caches()
    extern ctrlIntf_t gOutputCtrlIntf;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
-   resetStats(&prof_stats);
+   uint64_t tic;
 
-   uint64_t tic = 0;
+   Stack_ConfigStackViolationException();
 
    enable_caches();
 
-   Stack_ConfigStackViolationException();
    Stack_FillRemaining();
 
+   resetStats(&prof_stats);
+   
 #ifdef SIM
    (*global_trans_ptr)->initialize();  // Initialize the SystemC ports
 #endif
-   
+
    BuiltInTest_Execute(BITID_BuiltInTestsVerification);
    BuiltInTest_Execute(BITID_DebugTerminalInitialization);
 
