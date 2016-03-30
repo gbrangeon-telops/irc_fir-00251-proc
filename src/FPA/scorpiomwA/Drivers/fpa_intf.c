@@ -39,11 +39,9 @@
 #define MODE_READOUT_END_TO_TRIG_START    0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
 #define MODE_INT_END_TO_TRIG_START        0x02      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du IWR et ITR
 
-// Gains definis par Indigo  
+// Gains  
 #define FPA_GAIN_0                        0x00      // lowest gain
-#define FPA_GAIN_1                        0x01      // 
-#define FPA_GAIN_2                        0x02      // 
-#define FPA_GAIN_3                        0x03      // highest gain                               
+                               
  
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                0x0400    // adresse de base 
@@ -55,9 +53,9 @@
 #define AW_FPA_INPUT_SW_TYPE              0xE8      // obligaoire pour les deteceteurs analogiques
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
-#define FPA_ROIC                          0x11      // 0x11 -> isc0209A . Provient du fichier fpa_common_pkg.vhd.
+#define FPA_ROIC                          0x18      // 0x18 -> FPA_ROIC_SCORPIO_MW . Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                   0x01      // 0x01 -> output analogique .provient du fichier fpa_common_pkg.vhd. La valeur 0x01 est celle de OUTPUT_ANALOG
-#define FPA_INPUT_TYPE                    0x03      // 0x03 -> input LVTTL50 .provient du fichier fpa_common_pkg.vhd
+#define FPA_INPUT_TYPE                    0x04      // 0x04 -> input LVCMOS33 .provient du fichier fpa_common_pkg.vhd
 
 
 // adresse d'écriture du régistre du reset des erreurs
@@ -76,34 +74,33 @@
 // horloges du module FPA
 #define VHD_CLK_100M_RATE_HZ              100000000
 #define VHD_CLK_80M_RATE_HZ                80000000
-#define ADC_SAMPLING_RATE_HZ               40000000    // les ADC  roulent à 40MHz
+
+// horloge des ADCs
+#ifdef FPA_MCLK_RATE_HZ == 10E6F
+   #define ADC_SAMPLING_RATE_HZ           40000000    // les ADC roulent à 40MHz
+#elif  FPA_MCLK_RATE_HZ == 15E6F
+   #define ADC_SAMPLING_RATE_HZ           30000000    // les ADC roulent à 30MHz
+#elif  FPA_MCLK_RATE_HZ == 18E6F
+   #define ADC_SAMPLING_RATE_HZ           36000000    // les ADC roulent à 36MHz
+#endif
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
 #define FPA_TEMP_READER_FULL_SCALE_mV     2048          // plage dynamnique de l'ADC
 #define FPA_TEMP_READER_GAIN              1             // gain du canal de lecture de temperature sur la carte ADC
 
-// les DAcs de la carte Fleg
-#define ISC0209_VPOS_VOLTAGE_V            5.5           // VPOS en volts
-#define ISC0209_VPOSOUT_VOLTAGE_V         5.5           // VPOSOUT en volts
-#define ISC0209_VPD_VOLTAGE_V             5.5           // VPD en volts
-#define ISC0209_VOUTREF_VOLTAGE_V         1.6           // VOUTREF en volts
-#define ISC0209_VREF_VOLTAGE_V            1.6           // VREF en volts
-
 // fleg
 #define FLEG_DAC_RESOLUTION_BITS          14            // le DAC est à 14 bits
 #define FLEG_DAC_REF_VOLTAGE_V            2.5           // on utilise la reference interne de 2.5V du DAC 
-
+#define FLEG_DAC_REF_GAIN                 2             // le gain est de 2 sur VREF
 
 #define VHD_PIXEL_PIPE_DLY_SEC            360E-9        // delai max du pipe des pixels
 
 #define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
 
-#define ISC0209_DET_BIAS_VOLTAGE_MIN_mV   100           // voltage minimale de 100 mV pour detBias (selon rapport Qmagiq)
-#define ISC0209_DET_BIAS_VOLTAGE_MAX_mV   518           // voltage maximale de 518 mV pour detBias (on ne peut atteindre les 700 mV du rapport Q magiq en mode commande)
 
-// structure interne pour les parametres du isc0209
-struct isc0209_param_s             //
+// structure interne pour les parametres du scorpiomw
+struct scorpiomw_param_s             //
 {					   
    // parametres à rentrer
    float mlck_period_usec;
@@ -133,7 +130,7 @@ struct isc0209_param_s             //
    float mode_int_end_to_trig_start_dly_usec;
    float mode_readout_end_to_trig_start_dly_usec;
 };
-typedef struct isc0209_param_s  isc0209_param_t;
+typedef struct scorpiomw_param_s  scorpiomw_param_t;
 
 
 // Prototypes fonctions internes
@@ -141,7 +138,7 @@ void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 
 
-void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
+void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -191,15 +188,16 @@ void  FPA_PowerDown(const t_FpaIntf *ptrA)
 }
  
 //--------------------------------------------------------------------------                                                                            
-//pour configuer le bloc vhd FPA_interface et le lancer
+// pour configuer le bloc vhd FPA_interface et le lancer
 //--------------------------------------------------------------------------
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
-    isc0209_param_t hh;
+    scorpiomw_param_t hh;
+    uint32_t Cmin, Cmax, Rmin, Rmax;
     extern int16_t gFpaDetectorPolarizationVoltage;
-    static int16_t actualPolarizationVoltage = 150;
+    static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
 
-   // on bâtit les parametres specifiques du isc0209
+   // on bâtit les parametres specifiques du scorpiomw
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
    
    // diag mode and diagType
@@ -233,33 +231,53 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
    ptrA->xsize     = (uint32_t)pGCRegs->Width;
    ptrA->ysize     = (uint32_t)pGCRegs->Height;
+   
+   // direction de lecture
+   ptrA->uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
+   
+   
+   // calculé specialement pour le ScorpioMW
+   Cmin  = (uint32_t)pGCRegs->OffsetX/4;
+   Cmax  = (uint32_t)pGCRegs->OffsetX/4 + (uint32_t)pGCRegs->Width/4 - 1;
+   Rmin  = (uint32_t)pGCRegs->OffsetY;
+   Rmax  = (uint32_t)pGCRegs->OffsetY + (uint32_t)pGCRegs->Height - 1;
     
-   //  gain 
-   ptrA->gain = FPA_GAIN_0;   	//Low gain
-   if (pGCRegs->SensorWellDepth == SWD_HighGain)
-      ptrA->gain = FPA_GAIN_3;	//High gain
-      
-   // direction de readout
-   ptrA->invert = 0;
-   ptrA->revert = 0;
-   
-   // fenetrage
-   ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
-   ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
-   ptrA->xsize     = (uint32_t)pGCRegs->Width;
-   ptrA->ysize     = (uint32_t)pGCRegs->Height;
-      
-    // DIG voltage 
-   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)
-   {
-      if ((gFpaDetectorPolarizationVoltage >= (int16_t)ISC0209_DET_BIAS_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)ISC0209_DET_BIAS_VOLTAGE_MAX_mV))
-         ptrA->detpol_code = (uint32_t)(127.0F * ((float)gFpaDetectorPolarizationVoltage/1000.0F + 0.1F)/0.62F);  // dig_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+   // config détecteur 
+   if (ptrA->uprow_upcol == 1){   
+      ptrA->windcfg_part1    = Rmin;
+      ptrA->windcfg_part2    = Rmax;
+      ptrA->windcfg_part3    = Cmin;
+      ptrA->windcfg_part4    = Cmax;
    }
-   actualPolarizationVoltage = (int16_t)roundf(1000.0F * (0.62F * (float)ptrA->detpol_code/127.0F - 0.1F));
-   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
+   else{   
+      ptrA->windcfg_part1    = Rmax;
+      ptrA->windcfg_part2    = Rmin;
+      ptrA->windcfg_part3    = Cmax;
+      ptrA->windcfg_part4    = Cmin;
+   }
    
-   // skimming                     
-   ptrA->skimming_en = 0;                          
+   //  windowing
+   ptrA->sizea_sizeb = 0;     // toujours en mode windowing 
+   
+   
+   //  itr
+   ptrA->itr = 0;     // toujours en mode itr 
+       
+   //  gain 
+   ptrA->gain = FPA_GAIN_0;   	//Low gain only
+      
+    // GPOL voltage 
+   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
+   {
+      if ((gFpaDetectorPolarizationVoltage >= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV))
+         ptrA->gpol_code = (int32_t) FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // gpol_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+   }
+   actualPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
+   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
+   
+   
+   /  ARRET 
+   
    
    // ajustement de delais de la chaine
    ptrA->real_mode_active_pixel_dly = 42;                             // ajuster via chipscope
@@ -270,11 +288,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //
    ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + hh.fovh_line) + 1;                    // ligne de reset du isc0209 prise en compte
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + hh.fovh_line) + 1;                    // ligne de reset du scorpiomw prise en compte
    
-   ptrA->active_line_start_num             = 3;                    // pour le isc0209, numero de la première ligne active
-   ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le isc0209, numero de la derniere ligne active
-   ptrA->window_lsync_num                  = ptrA->ysize + ptrA->active_line_start_num - 1;
+   ptrA->active_line_start_num             = 3;                    // pour le scorpiomw, numero de la première ligne active
+   ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le scorpiomw, numero de la derniere ligne active
    
    // nombre d'échantillons par canal  de carte ADC
    ptrA->pix_samp_num_per_ch               = (uint32_t)((float)ADC_SAMPLING_RATE_HZ/(hh.pclk_rate_hz));
@@ -298,14 +315,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;                                        
    
    // les DACs (1 à 8)
-   ptrA->vdac_value[0]                     = 12812;          // DAC1 -> VPD à 5.5V
-   ptrA->vdac_value[1]                     = 12812;          // VPOSOUT à 5.5V
-   ptrA->vdac_value[2]                     = 12812;          // DAC2 -> VPOS à 5.5V
-   ptrA->vdac_value[3]                     = 3711;           // Vref   OK
-   ptrA->vdac_value[4]                     = 3711;           // Voutref  OK
-   ptrA->vdac_value[5]                     = 3711;           // VOS      OK
-   ptrA->vdac_value[6]                     = 0;
-   ptrA->vdac_value[7]                     = 5300;  //4800--> 700 cnts,  4466-->900 cnts,   4296 --> 1000 cnts //4975  // 3618;           // DAC8 -> VCC8 5391;   3904
+   ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 1);      // VCC1 -> VDDA = 3300 mV
+   ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(3600.0F, 2);      // VCC2 -> VDDO = 3600 mV
+   ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV
+   ptrA->vdac_value[3]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 4);      // VCC4 -> VDD  = 3300 mV
+   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
+   ptrA->vdac_value[5]                     = ptrA->gpol_code;                             // VCC6 -> GPOL   
+   ptrA->vdac_value[6]                     = FLEG_VccVoltage_To_DacWord(1950.0F, 7);      // VCC7 -> offset1 = 1950.0 mV
+   ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(3159.4F, 8);      // VCC8 -> offset2 = 3159.4 mV
 
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC
@@ -327,30 +344,30 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 
    diode_voltage = (float)raw_temp*((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
 
-// courbe de conversion de Sofradir pour une polarisation de 100µA   
-   temperature  =  -170.50F * powf(diode_voltage,4);
-   temperature +=   173.45F * powf(diode_voltage,3);
-   temperature +=   137.86F * powf(diode_voltage,2);
-   temperature += (-667.07F * diode_voltage) + 623.1F;  // 625 remplacé par 623 en guise de calibration de la diode
+// courbe de conversion de Sofradir pour une polarisation de 25µA   
+   temperature  =  -302.64F * powf(diode_voltage,4);
+   temperature +=   687.45F * powf(diode_voltage,3);
+   temperature +=  -595.36F * powf(diode_voltage,2);
+   temperature += (-188.47F * diode_voltage) + 490.33F;
 
    return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
 }       
 
 //--------------------------------------------------------------------------                                                                            
-// Pour avoir les parametres propres au isc0209 avec une config
+// Pour avoir les parametres propres au scorpiomw avec une config
 //--------------------------------------------------------------------------
-void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
+void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // parametres statiques
    ptrH->mlck_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
-   ptrH->pixnum_per_tap_per_mclk = 2.0F;
-   ptrH->fpa_delay_mclk          = 5.0F;   // FPA: estimation delai max de sortie des pixels après integration
-   ptrH->vhd_delay_mclk          = 3.5F;   // estimation des differerents delais accumulés par le vhd
+   ptrH->pixnum_per_tap_per_mclk = 1.0F;
+   ptrH->fpa_delay_mclk          = 4.0F;   // FPA: estimation delai max de sortie des pixels après integration + delai après readout
+   ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (float)FPA_MCLK_RATE_HZ;   // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
-   ptrH->lovh_mclk               = 16.0F;
-   ptrH->fovh_line               = 2.0F;
-   ptrH->int_time_offset_mclk    = (5.0E-6F) * (float)FPA_MCLK_RATE_HZ;
+   ptrH->lovh_mclk               = 0.0F;
+   ptrH->fovh_line               = 0.0F;
+   ptrH->int_time_offset_mclk    = 3076.0F;
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
       
    // readout time
@@ -362,9 +379,9 @@ void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mlck_period_usec;
    ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mlck_period_usec; 
    
-   // 
+   // integration time/signal
    ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mlck_period_usec;
-   ptrH->int_signal_high_time_usec = exposureTime_usec - ptrH->int_time_offset_usec;
+   ptrH->int_signal_high_time_usec = exposureTime_usec + ptrH->int_time_offset_usec;
       
    // calcul de la periode minimale
    ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;
@@ -383,7 +400,7 @@ void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gc
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
    float MaxFrameRate; 
-   isc0209_param_t hh;
+   scorpiomw_param_t hh;
    
    FPA_SpecificParams(&hh,(float)pGCRegs->ExposureTime, pGCRegs);
    MaxFrameRate = floorMultiple(hh.frame_rate_max_hz, 0.01);
@@ -396,7 +413,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
-   isc0209_param_t hh;
+   scorpiomw_param_t hh;
    float periodMinWithNullExposure_usec;
    float actualPeriod_sec;
    float max_exposure_usec;
@@ -524,3 +541,67 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
    AXI4L_write32(FPA_INPUT_TYPE, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
 }
 
+//--------------------------------------------------------------------------
+// Conversion de VccVoltage_mV en DAC Word 
+//-------------------------------------------------------------------------- 
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG 
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
+uint32_t  FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
+{  
+  float Rs, Rd, RL, Is, DacVoltage_Volt;
+  uint32_t DacWord;
+   
+   if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
+      Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
+      Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
+      RL = 3.01e3F;    // sur EFA-00266-001, vaut R35
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   else{                                                   // les canaux VCC4, VCC5, VCC6, et VCC7 sont identiques à VCC4
+      Rs = 4.99e3F;    // sur EFA-00266-001, vaut R30
+      Rd = 24.9F;      // sur EFA-00266-001, vaut R29
+      RL = 806.0F;     // sur EFA-00266-001, vaut R28
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   // calculs de la tension du dac en volt
+   DacVoltage_Volt =  ((1 + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
+            
+   // deduction du bitstream du DAC
+   DacWord = (uint32_t) (powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
+   DacWord =  MAX(MIN(DacWord, 16383), 0);
+   
+   return DacWord;
+}
+
+//--------------------------------------------------------------------------
+// Conversion de DAC Word  en VccVoltage_mV
+//-------------------------------------------------------------------------- 
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG 
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
+float  FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
+{  
+   float Rs, Rd, RL, Is, DacVoltage_Volt, VccVoltage_mV;
+   uint32_t DacWordTemp;
+   
+   if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
+      Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
+      Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
+      RL = 3.01e3F;    // sur EFA-00266-001, vaut R35
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   else{                                                   // les canaux VCC4, VCC5, VCC6, et VCC7 sont identiques à VCC4
+      Rs = 4.99e3F;    // sur EFA-00266-001, vaut R30
+      Rd = 24.9F;      // sur EFA-00266-001, vaut R29
+      RL = 806.0F;     // sur EFA-00266-001, vaut R28
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   
+   // deduction de la tension du DAC 
+   DacWordTemp =  MAX(MIN(DacWord, 16383), 0);   
+   DacVoltage_Volt = (float)DacWordTemp * ((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN)/powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS);
+   
+   //calculs de la tension du LDO en volt
+   VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1 + RL/Rd);
+   
+   return VccVoltage_mV;
+}

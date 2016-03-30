@@ -20,58 +20,64 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0209A"
+#define FPA_DEVICE_MODEL_NAME    "SCORPIOMWD"
 
-#define FPA_WIDTH_MIN      128    //
-#define FPA_WIDTH_MAX      320
-#define FPA_WIDTH_MULT     8
+#define FPA_WIDTH_MIN      136    //
+#define FPA_WIDTH_MAX      640
+#define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
-#define FPA_HEIGHT_MIN     8
-#define FPA_HEIGHT_MAX     256
-#define FPA_HEIGHT_MULT    2
+#define FPA_HEIGHT_MIN     1
+#define FPA_HEIGHT_MAX     512
+#define FPA_HEIGHT_MULT    1
 #define FPA_HEIGHT_INC     FPA_HEIGHT_MULT
 
 #define FPA_OFFSETX_MIN    0
-#define FPA_OFFSETX_MULT   8
+#define FPA_OFFSETX_MULT   4
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_OFFSETX_MULT)
 #define FPA_OFFSETY_MIN    0
-#define FPA_OFFSETY_MULT   2
+#define FPA_OFFSETY_MULT   1
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_OFFSETY_MULT)
 
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
 
-#define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
-#define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)  // HawkAIsImplemented conservé temporairement
-
-#define FPA_MAX_GAIN       3
-#define FPA_NUMTAPS        4  // [taps]
-
-#define FPA_COOLER_TEMP_THRES    -17300
-#define FPA_DEFAULT_EXPOSURE     100.0F //[us]
-#define FPA_DEFAULT_FRAME_RATE   50.0F   //[Hz]
-
-// TODO Update EHDRI default exposure times.
-#define FPA_EHDRI_EXP_0    10.0F
-#define FPA_EHDRI_EXP_1    250.0F
-#define FPA_EHDRI_EXP_2    500.0F
-#define FPA_EHDRI_EXP_3    1000.0F
-
-#define FPA_CAL_MIN_EXPOSURE  5.1F
-#define FPA_CAL_MAX_EXPOSURE  1000000.0F
-
-#define FPA_MIN_EXPOSURE               5.1F     // [us]
-#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
-
 #define FPA_DATA_RESOLUTION 14
 
-#define FPA_INVALID_TEMP               -32768   // cC
 
-#define FPA_MCLK_RATE_HZ             5000000    // le master clock du FPA est à 5MHz
-#define FPA_CLOCK_FREQ_HZ            FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
+#define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
+#define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
+#define FPA_TDC_FLAGS            (ScorpiomwDIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask)
+#define FPA_NB_PIX_CLK     1
+
+
+#define FPA_MAX_GAIN       0
+#define FPA_NUMTAPS        4  // [taps]
+
+#define FPA_COOLER_TEMP_THRES    -18300        // temp très basse avant allumage car détecteur à haute vitesse
+#define FPA_DEFAULT_EXPOSURE     500.0F //[us]
+#define FPA_DEFAULT_FRAME_RATE   44.0F   //[Hz]
+
+// TODO Update EHDRI default exposure times.
+#define FPA_EHDRI_EXP_0          320.0F  //
+#define FPA_EHDRI_EXP_1          350.0F
+#define FPA_EHDRI_EXP_2          400.0F
+#define FPA_EHDRI_EXP_3          600.0F  //
+
+#define FPA_CAL_MIN_EXPOSURE     310.0F
+#define FPA_CAL_MAX_EXPOSURE     800000.0F
+
+#define FPA_MIN_EXPOSURE         0.150F    // [us]
+#define FPA_MAX_EXPOSURE         800000.0F // [us]
+
+#define FPA_DATA_RESOLUTION      14
+
+#define FPA_INVALID_TEMP         -32768   // cC
+
+#define FPA_MCLK_RATE_HZ         10E+6F            // le master clock du FPA est à 10MHz
+#define FPA_CLOCK_FREQ_HZ        FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c 
+
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
 {					   
@@ -88,24 +94,29 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_xtra_trig_ctrl_dly;     // utilisé par le trig_controller.vhd  
    uint32_t  fpa_xtra_trig_period_min;   // utilisé par le trig_controller.vhd
    
-   // partie propre au 0209
-   uint32_t  xstart;             
-   uint32_t  ystart;             
-   uint32_t  xsize;            
-   uint32_t  ysize;            
-   uint32_t  gain;            
-   uint32_t  invert;
-   uint32_t  revert;
-    int32_t  detpol_code;
-   uint32_t  skimming_en;
+   // partie propre au scorpiomw
+   uint32_t  xstart;       
+   uint32_t  ystart;       
+   uint32_t  xsize;        
+   uint32_t  ysize;        
+   uint32_t  windcfg_part1;
+   uint32_t  windcfg_part2;
+   uint32_t  windcfg_part3;
+   uint32_t  windcfg_part4;
+   uint32_t  uprow_upcol;  
+   uint32_t  sizea_sizeb;  
+   
+   uint32_t  itr;          
+   uint32_t  gain;
+    int32_t  gpol_code;
    uint32_t  real_mode_active_pixel_dly;
-   uint32_t  adc_quad2_en;          
+   uint32_t  adc_quad2_en;
    uint32_t  chn_diversity_en;
-   uint32_t  line_period_pclk;
    uint32_t  readout_pclk_cnt_max;
+   
+   uint32_t  line_period_pclk;
    uint32_t  active_line_start_num;
    uint32_t  active_line_end_num;                   
-   uint32_t  window_lsync_num;
    uint32_t  pix_samp_num_per_ch;
    uint32_t  sof_posf_pclk;
    uint32_t  eof_posf_pclk;   
@@ -176,7 +187,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,0,0}, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,0,0}, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ

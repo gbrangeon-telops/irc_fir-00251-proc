@@ -33,7 +33,7 @@ entity scorpiomwA_clks_gen_core is
       
       QUAD_CLK_COPY     : out std_logic;  -- quad_clk utilisé par le readout_ctrler
       
-      QUAD1_CLK         : out std_logic;
+      QUAD1_CLK         : out std_logic;  -- 40 MHz pour FPA_CLK = 10MHz,   30 MHz pour FPA_CLK = 15MHz, 36 MHz pour FPA_CLK = 18MHz
       QUAD2_CLK         : out std_logic;
       
       ADC_DESERIALIZER_RST  : out std_logic  -- à '1' si ARESET à '1' ou si aucune carte ADC valide n'est détectée.
@@ -195,7 +195,6 @@ begin
          
       end if;
    end process;
-   
    
    -- clocks des ADCS
    U3E : process(ADC_PHASE_CLK)
