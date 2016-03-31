@@ -111,10 +111,10 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
     int32_t  gpol_code;
    uint32_t  real_mode_active_pixel_dly;
    uint32_t  adc_quad2_en;
-   uint32_t  chn_diversity_en;
-   uint32_t  readout_pclk_cnt_max;
-   
+   uint32_t  chn_diversity_en;  
    uint32_t  line_period_pclk;
+   uint32_t  readout_pclk_cnt_max;
+      
    uint32_t  active_line_start_num;
    uint32_t  active_line_end_num;                   
    uint32_t  pix_samp_num_per_ch;

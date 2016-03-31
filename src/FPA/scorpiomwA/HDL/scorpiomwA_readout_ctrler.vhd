@@ -340,6 +340,8 @@ begin
          line_cnt_pipe(3) <= line_cnt_pipe(2);
          if line_cnt_pipe(2) <= FPA_INTF_CFG.ACTIVE_LINE_END_NUM then  
             dval_pipe(3)   <= active_line_en1 and lval_pipe(2); 
+         else
+            dval_pipe(3)   <= '0';
          end if;
          
          global_reset <= sreset or rd_end_pipe(2);

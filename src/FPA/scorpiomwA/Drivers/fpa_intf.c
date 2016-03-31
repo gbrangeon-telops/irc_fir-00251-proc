@@ -264,7 +264,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->sizea_sizeb = 0;     // toujours en mode windowing 
      
    //  itr
-   ptrA->itr = 0;     // toujours en mode itr 
+   ptrA->itr = 1;     // toujours en mode itr 
        
    //  gain 
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
@@ -287,7 +287,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //
    ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + hh.fovh_line) + 1;                    // ligne de reset du scorpiomw prise en compte
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * (ptrA->ysize + hh.fovh_line) + 1;                    //
    
    ptrA->active_line_start_num             = 1;                    // pour le scorpiomw, numero de la première ligne active
    ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le scorpiomw, numero de la derniere ligne active
@@ -361,11 +361,11 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->mlck_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
-   ptrH->fpa_delay_mclk          = 4.0F;   // FPA: estimation delai max de sortie des pixels après integration + delai après readout
+   ptrH->fpa_delay_mclk          = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number);   // FPA: estimation delai max de sortie des pixels après integration + delai après readout
    ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (float)FPA_MCLK_RATE_HZ;   // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 0.0F;
-   ptrH->fovh_line               = 0.0F;
+   ptrH->fovh_line               = 0.0F;   
    ptrH->int_time_offset_mclk    = 3076.0F;
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
       
@@ -390,7 +390,7 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
 
    //autres calculs
    ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec;  // utilisé en mode int_end_trig_start
-   ptrH->mode_readout_end_to_trig_start_dly_usec = 1.0F;                                                   // utilisé en mode readout_end_trig_start
+   ptrH->mode_readout_end_to_trig_start_dly_usec = 0.0F;                                                   // utilisé en mode readout_end_trig_start
 }
  
 //--------------------------------------------------------------------------                                                                            

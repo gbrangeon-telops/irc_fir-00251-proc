@@ -69,8 +69,8 @@ begin
       U10M :  scorpiomwA_10MHz_mmcm
       port map (   
          clk_in         => CLK_80M,
-         mclk_source    => MCLK_SOURCE,      //  80 MHz
-         adc_phase_clk  => ADC_PHASE_CLK,    // 160 MHz        soit 6.25 ns de delai par tap 
+         mclk_source    => MCLK_SOURCE,      --  80 MHz
+         adc_phase_clk  => ADC_PHASE_CLK,    -- 160 MHz        soit 6.25 ns de delai par tap 
          reset          => ARESET,
          locked         => MMCM_LOCKED            
          );      
@@ -82,8 +82,8 @@ begin
       U15M :  scorpiomwA_15MHz_mmcm
       port map (   
          clk_in         => CLK_80M,
-         mclk_source    => MCLK_SOURCE,        //  60 MHz
-         adc_phase_clk  => ADC_PHASE_CLK,      // 180 MHz      soit 5.6 ns de delai par tap  
+         mclk_source    => MCLK_SOURCE,        --  60 MHz
+         adc_phase_clk  => ADC_PHASE_CLK,      -- 180 MHz      soit 5.6 ns de delai par tap  
          reset          => ARESET,
          locked         => MMCM_LOCKED            
          );      
@@ -95,8 +95,8 @@ begin
       U18M :  scorpiomwA_18MHz_mmcm
       port map (   
          clk_in         => CLK_80M,
-         mclk_source    => MCLK_SOURCE,        //  72 MHz
-         adc_phase_clk  => ADC_PHASE_CLK,      // 144 MHz      soit 6.9 ns de delai par tap  
+         mclk_source    => MCLK_SOURCE,        --  72 MHz
+         adc_phase_clk  => ADC_PHASE_CLK,      -- 144 MHz      soit 6.9 ns de delai par tap  
          reset          => ARESET,
          locked         => MMCM_LOCKED            
          );      
