@@ -248,16 +248,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     
    // config détecteur 
    if (ptrA->uprow_upcol == 1){   
-      ptrA->windcfg_part1    = Rmin;
-      ptrA->windcfg_part2    = Rmax;
-      ptrA->windcfg_part3    = Cmin;
-      ptrA->windcfg_part4    = Cmax;
+      ptrA->windcfg_part1 = Rmin;
+      ptrA->windcfg_part2 = Rmax;
+      ptrA->windcfg_part3 = Cmin;
+      ptrA->windcfg_part4 = Cmax;
    }
    else{   
-      ptrA->windcfg_part1    = Rmax;
-      ptrA->windcfg_part2    = Rmin;
-      ptrA->windcfg_part3    = Cmax;
-      ptrA->windcfg_part4    = Cmin;
+      ptrA->windcfg_part1 = Rmax;
+      ptrA->windcfg_part2 = Rmin;
+      ptrA->windcfg_part3 = Cmax;
+      ptrA->windcfg_part4 = Cmin;
    }
    
    //  windowing
@@ -563,11 +563,11 @@ uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccP
       Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
    }
    // calculs de la tension du dac en volt
-   DacVoltage_Volt =  ((1 + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
+   DacVoltage_Volt =  ((1.0F + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
             
    // deduction du bitstream du DAC
-   DacWord = (uint32_t) (powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
-   DacWord =  MAX(MIN(DacWord, 16383), 0);
+   DacWord = (uint32_t)(powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
+   DacWord = (uint32_t) MAX(MIN(DacWord, 16383), 0);
    
    return DacWord;
 }
@@ -596,11 +596,11 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
    }
    
    // deduction de la tension du DAC 
-   DacWordTemp =  MAX(MIN(DacWord, 16383), 0);   
+   DacWordTemp =  (uint32_t) MAX(MIN(DacWord, 16383), 0);   
    DacVoltage_Volt = (float)DacWordTemp * ((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN)/powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS);
    
    //calculs de la tension du LDO en volt
-   VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1 + RL/Rd);
+   VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
    
    return VccVoltage_mV;
 }

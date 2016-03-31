@@ -299,13 +299,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // les DACs (1 à 8)
    ptrA->vdac_value[0]                     = 12812;          // DAC1 -> VPD à 5.5V
-   ptrA->vdac_value[1]                     = 12812;          // VPOSOUT à 5.5V
-   ptrA->vdac_value[2]                     = 12812;          // DAC2 -> VPOS à 5.5V
-   ptrA->vdac_value[3]                     = 3711;           // Vref   OK
-   ptrA->vdac_value[4]                     = 3711;           // Voutref  OK
-   ptrA->vdac_value[5]                     = 3711;           // VOS      OK
-   ptrA->vdac_value[6]                     = 0;
-   ptrA->vdac_value[7]                     = 5300;  //4800--> 700 cnts,  4466-->900 cnts,   4296 --> 1000 cnts //4975  // 3618;           // DAC8 -> VCC8 5391;   3904
+   ptrA->vdac_value[1]                     = 12812;          // DAC2 -> VPOSOUT à 5.5V
+   ptrA->vdac_value[2]                     = 12812;          // DAC3 -> VPOS à 5.5V
+   ptrA->vdac_value[3]                     = 3711;           // DAC4 -> Vref à 1.6V  
+   ptrA->vdac_value[4]                     = 3711;           // DAC5 -> Voutref à 1.6V
+   ptrA->vdac_value[5]                     = 3711;           // DAC6 -> VOS à 1.6V 
+   ptrA->vdac_value[6]                     = 0;              // DAC7 -> non utilisé, à 501 mV
+   ptrA->vdac_value[7]                     = 5300;           // DAC8 -> à 3.779V
 
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC

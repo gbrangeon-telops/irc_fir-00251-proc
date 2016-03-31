@@ -308,7 +308,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vdac_value[4]                     = 0;
    ptrA->vdac_value[5]                     = 0;
    ptrA->vdac_value[6]                     = 0;
-   ptrA->vdac_value[7]                     = 1791;           // DAC8 -> VCC8 à 3.1110V pour INREF // 2383                         2091-> 3.044 V
+   ptrA->vdac_value[7]                     = 1791;           // DAC8 -> VCC8 à 2.975V
    
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC
