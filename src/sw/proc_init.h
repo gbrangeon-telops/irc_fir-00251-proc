@@ -56,7 +56,7 @@
 #define CLINK_CI_CMD_QUEUE_SIZE     1
 #define PLEORA_CI_CMD_QUEUE_SIZE    1
 #define OEM_CI_CMD_QUEUE_SIZE       1
-#define OUTPUT_CI_CMD_QUEUE_SIZE    5  // Must be greater than 1 since broadcast packet are not put back in NI command queue
+#define OUTPUT_CI_CMD_QUEUE_SIZE    3
 #define FM_CMD_QUEUE_SIZE           1
 #define FM_CI_CMD_QUEUE_SIZE        1
 #define FU_CMD_QUEUE_SIZE           1
