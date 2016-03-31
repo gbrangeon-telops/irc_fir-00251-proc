@@ -22,7 +22,7 @@
 #include "BuiltInTests.h"
 #include "Utils.h"
 
-IRC_Status_t GC_Poller_SetPollingIndex(uint32_t *pollingIdx);
+IRC_Status_t GC_Poller_ValidatePollingIndex(uint32_t *pollingIdx);
 void GC_Poller_FirmwareRevisionCallback(gcPolledReg_t *polledReg);
 void GC_Poller_OutputErrorCallback(gcPolledReg_t *polledReg);
 void GC_Poller_StorageErrorCallback(gcPolledReg_t *polledReg);
@@ -39,6 +39,17 @@ uint32_t gOutputEventErrorValue;
 gcEvent_t gOutputEvent;
 uint32_t gStorageEventErrorValue;
 gcEvent_t gStorageEvent;
+
+
+/**
+ * Indicates whether GenICam poller state machine must be stopped.
+ */
+static uint8_t gcpStopRequested;
+
+/**
+ * GenICam poller current state.
+ */
+static gcpState_t gcpCurrentState;
 
 /**
  * GenICam polled registers list.
@@ -76,7 +87,6 @@ gcPolledReg_t gcPolledRegsList[] = {
 /**
  * Initializes the GenICam poller.
  *
- * @param gcPoller is the pointer to the GenICam poller data structure to initialize.
  * @param netIntf is the pointer to the network interface data structure.
  * @param cmdQueue is the pointer to the file manager command queue.
  *
@@ -91,8 +101,12 @@ IRC_Status_t GC_Poller_Init(netIntf_t *netIntf, circBuffer_t *cmdQueue)
       return IRC_FAILURE;
    }
 
+   gcpCurrentState = GCPS_WAITING_FOR_NETWORK_INTF;
+
    gcpPort.port = NIP_GC_POLLER;
    gcpPort.cmdQueue = cmdQueue;
+
+   gcpStopRequested = 0;
 
    // Connect GenICam poller to network interface
    if (NetIntf_Connect(netIntf, &gcpPort) != IRC_SUCCESS)
@@ -104,24 +118,55 @@ IRC_Status_t GC_Poller_Init(netIntf_t *netIntf, circBuffer_t *cmdQueue)
    return IRC_SUCCESS;
 }
 
+/**
+ * Starts the GenICam poller.
+ *
+ * @return IRC_SUCCESS if successfully started.
+ * @return IRC_FAILURE if failed to start.
+ */
+IRC_Status_t GC_Poller_Start()
+{
+   gcpStopRequested = 0;
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Generate a GenICam poller stop request.
+ *
+ * @return IRC_SUCCESS if successfully stopped.
+ * @return IRC_FAILURE if failed to stop.
+ */
+IRC_Status_t GC_Poller_Stop()
+{
+   gcpStopRequested = 1;
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Return the GenICam poller active state.
+ *
+ * @return 0 if GenICam poller is stopped.
+ * @return 1 if GenICam poller is started.
+ */
+uint8_t GC_Poller_IsActive()
+{
+   return (gcpCurrentState != GCPS_IDLE);
+}
+
 void GC_Poller_SM()
 {
-   static gcpState_t currentState = GCPS_INIT;
-   static uint32_t pollingIdx;
+   static uint32_t pollingIdx = 0;
    static uint64_t tic_timeout;
-   static uint32_t retryCount;
+   static uint32_t retryCount = 0;
 
    gcRegister_t *p_register;
    networkCommand_t gcpRequest;
    networkCommand_t gcpResponse;
 
-   switch (currentState)
+   switch (gcpCurrentState)
    {
-      case GCPS_INIT:
-         // Nothing to do
-         currentState = GCPS_WAITING_FOR_NETWORK_INTF;
-         break;
-         
       case GCPS_WAITING_FOR_NETWORK_INTF:
          if ((gcpPort.netIntf->currentState == NIS_READY) &&
                (builtInTests[BITID_NetworkHostsSynchronization].result == BITR_Passed))
@@ -142,48 +187,60 @@ void GC_Poller_SM()
                builtInTests[BITID_NetworkHostsReady].result = BITR_Passed;
             }
 
-            if (NUM_OF(gcPolledRegsList) > 0)
-            {
-               pollingIdx = 0;
-               retryCount = 0;
-               currentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
-            }
-            else
-            {
-               currentState = GCPS_DONE;
-            }
+            gcpCurrentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
          }
          break;
        
-      case GCPS_SENDING_SELECTOR_WRITE_REQ:
-         if (gcPolledRegsList[pollingIdx].selectorRegIdx != GCP_SELECTOR_NONE)
+      case GCPS_IDLE:
+         if (gcpStopRequested == 0)
          {
-            p_register = &gcRegsDef[gcPolledRegsList[pollingIdx].selectorRegIdx];
-            F1F2_CommandClear(&gcpRequest.f1f2);
-            gcpRequest.f1f2.isNetwork = 1;
-            gcpRequest.f1f2.srcAddr = NIA_PROCESSING_FPGA;
-            gcpRequest.f1f2.srcPort = NIP_GC_POLLER;
-            gcpRequest.f1f2.destAddr = gcPolledRegsList[pollingIdx].address;
-            gcpRequest.f1f2.destPort = NIP_GC_MANAGER;
-            gcpRequest.f1f2.cmd = F1F2_CMD_REG_WRITE;
-            gcpRequest.f1f2.payload.regRW.address = p_register->address;
-            memcpy_swap(gcpRequest.f1f2.payload.regRW.data, &gcPolledRegsList[pollingIdx].selectorRegValue,
-                  p_register->dataLength, p_register->dataLength, RegIsBigEndian(p_register));
-            gcpRequest.f1f2.payload.regRW.dataLength = p_register->dataLength;
-            gcpRequest.f1f2.payload.regRW.padLength = p_register->length - p_register->dataLength;
-            gcpRequest.port = &gcpPort;
+            retryCount = 0;
+            gcpCurrentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
+         }
+         break;
 
-            if (NetIntf_EnqueueCmd(gcpPort.netIntf, &gcpRequest) != IRC_SUCCESS)
-            {
-               GCP_ERR("Failed to push register selector write poller command in network interface command queue.");
-            }
+      case GCPS_SENDING_SELECTOR_WRITE_REQ:
+         // Check that there is a register to poll (valid polling index)
+         if (GC_Poller_ValidatePollingIndex(&pollingIdx) != IRC_SUCCESS)
+         {
+            gcpStopRequested = 1;
+         }
 
-            GETTIME(&tic_timeout);
-            currentState = GCPS_WAITING_FOR_SELECTOR_WRITE_RESP;
+         if (gcpStopRequested == 1)
+         {
+            gcpCurrentState = GCPS_IDLE;
          }
          else
          {
-            currentState = GCPS_SENDING_READ_REQ;
+            if (gcPolledRegsList[pollingIdx].selectorRegIdx != GCP_SELECTOR_NONE)
+            {
+               p_register = &gcRegsDef[gcPolledRegsList[pollingIdx].selectorRegIdx];
+               F1F2_CommandClear(&gcpRequest.f1f2);
+               gcpRequest.f1f2.isNetwork = 1;
+               gcpRequest.f1f2.srcAddr = NIA_PROCESSING_FPGA;
+               gcpRequest.f1f2.srcPort = NIP_GC_POLLER;
+               gcpRequest.f1f2.destAddr = gcPolledRegsList[pollingIdx].address;
+               gcpRequest.f1f2.destPort = NIP_GC_MANAGER;
+               gcpRequest.f1f2.cmd = F1F2_CMD_REG_WRITE;
+               gcpRequest.f1f2.payload.regRW.address = p_register->address;
+               memcpy_swap(gcpRequest.f1f2.payload.regRW.data, &gcPolledRegsList[pollingIdx].selectorRegValue,
+                     p_register->dataLength, p_register->dataLength, RegIsBigEndian(p_register));
+               gcpRequest.f1f2.payload.regRW.dataLength = p_register->dataLength;
+               gcpRequest.f1f2.payload.regRW.padLength = p_register->length - p_register->dataLength;
+               gcpRequest.port = &gcpPort;
+
+               if (NetIntf_EnqueueCmd(gcpPort.netIntf, &gcpRequest) != IRC_SUCCESS)
+               {
+                  GCP_ERR("Failed to push register selector write poller command in network interface command queue.");
+               }
+
+               GETTIME(&tic_timeout);
+               gcpCurrentState = GCPS_WAITING_FOR_SELECTOR_WRITE_RESP;
+            }
+            else
+            {
+               gcpCurrentState = GCPS_SENDING_READ_REQ;
+            }
          }
          break;
 
@@ -196,7 +253,7 @@ void GC_Poller_SM()
                      gcRegsDef[gcPolledRegsList[pollingIdx].selectorRegIdx].address,
                      gcPolledRegsList[pollingIdx].selectorRegValue);
 
-               currentState = GCPS_SENDING_READ_REQ;
+               gcpCurrentState = GCPS_SENDING_READ_REQ;
             }
             else
             {
@@ -204,7 +261,7 @@ void GC_Poller_SM()
             }
          }
 
-         if ((currentState == GCPS_WAITING_FOR_SELECTOR_WRITE_RESP) &&
+         if ((gcpCurrentState == GCPS_WAITING_FOR_SELECTOR_WRITE_RESP) &&
                (elapsed_time_us(tic_timeout) > GCP_REQUEST_TIMEOUT_US))
          {
             retryCount++;
@@ -216,20 +273,10 @@ void GC_Poller_SM()
             if (retryCount >= GCP_REQUEST_MAX_RETRY)
             {
                // Skip register
-               if (GC_Poller_SetPollingIndex(&pollingIdx) == IRC_SUCCESS)
-               {
-                  retryCount = 0;
-                  currentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
-               }
-               else
-               {
-                  currentState = GCPS_DONE;
-               }
+               pollingIdx++;
+               retryCount = 0;
             }
-            else
-            {
-               currentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
-            }
+            gcpCurrentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
          }
          break;
 
@@ -253,7 +300,7 @@ void GC_Poller_SM()
          }
 
          GETTIME(&tic_timeout);
-         currentState = GCPS_WAITING_FOR_READ_RESP;
+         gcpCurrentState = GCPS_WAITING_FOR_READ_RESP;
          break;
       
       case GCPS_WAITING_FOR_READ_RESP:
@@ -282,15 +329,9 @@ void GC_Poller_SM()
                   (*gcPolledRegsList[pollingIdx].callback)(&gcPolledRegsList[pollingIdx]);
                }
 
-               if (GC_Poller_SetPollingIndex(&pollingIdx) == IRC_SUCCESS)
-               {
-                  retryCount = 0;
-                  currentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
-               }
-               else
-               {
-                  currentState = GCPS_DONE;
-               }
+               pollingIdx++;
+               retryCount = 0;
+               gcpCurrentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
             }
             else
             {
@@ -298,7 +339,7 @@ void GC_Poller_SM()
             }
          }
 
-         if ((currentState == GCPS_WAITING_FOR_READ_RESP) &&
+         if ((gcpCurrentState == GCPS_WAITING_FOR_READ_RESP) &&
                (elapsed_time_us(tic_timeout) > GCP_REQUEST_TIMEOUT_US))
          {
             retryCount++;
@@ -310,45 +351,36 @@ void GC_Poller_SM()
             if (retryCount >= GCP_REQUEST_MAX_RETRY)
             {
                // Skip register
-               if (GC_Poller_SetPollingIndex(&pollingIdx) == IRC_SUCCESS)
-               {
-                  retryCount = 0;
-                  currentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
-               }
-               else
-               {
-                  currentState = GCPS_DONE;
-               }
+               pollingIdx++;
+               retryCount = 0;
+               gcpCurrentState = GCPS_SENDING_SELECTOR_WRITE_REQ;
             }
             else
             {
-               currentState = GCPS_SENDING_READ_REQ;
+               gcpCurrentState = GCPS_SENDING_READ_REQ;
             }
          }
-         break;
-         
-      case GCPS_DONE:
-         // Nothing to do
          break;
    }
 }
 
 /**
- * Set polling index to the next register to poll.
+ * Validate specified polling index. If not valid, polling index is set to the
+ * next valid polling index.
  *
- * @param p_pollingIdx is the pointer to the polling index to update.
+ * @param p_pollingIdx is the pointer to the polling index to validate.
  *
- * @return IRC_SUCCESS if there is a register to poll.
- * @return IRC_FAILURE if there is no register to next. Pointed polling time won't be modified.
+ * @return IRC_SUCCESS if returned polling index is valid.
+ * @return IRC_FAILURE if there is no valid polling index. Pointed polling time won't be modified.
  */
-IRC_Status_t GC_Poller_SetPollingIndex(uint32_t *p_pollingIdx)
+IRC_Status_t GC_Poller_ValidatePollingIndex(uint32_t *p_pollingIdx)
 {
    uint32_t i;
    uint32_t pollingIdx = *p_pollingIdx;
 
    for (i = 0; i < NUM_OF(gcPolledRegsList); i++)
    {
-      pollingIdx = (pollingIdx + 1) % NUM_OF(gcPolledRegsList);
+      pollingIdx = (*p_pollingIdx + i) % NUM_OF(gcPolledRegsList);
 
       /* Validate that register polling mode is not once after first pass and
          that register is not a storage register when external memory buffer is not implemented */

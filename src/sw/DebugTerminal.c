@@ -34,6 +34,7 @@
 #include "trig_gen.h"
 #include "DeviceKey.h"
 #include "StackUtils.h"
+#include "GC_Poller.h"
 #include <string.h>
 #include <time.h>
 
@@ -60,6 +61,7 @@ static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseSTACK(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf);
 static uint16_t GetNextArg(circByteBuffer_t *cbuf, uint8_t *buffer, uint16_t buflen);
 static IRC_Status_t ParseNumArg(char *str, uint8_t length, uint32_t *value);
 static IRC_Status_t ParseNumHex(char *str, uint8_t length, uint32_t *value);
@@ -382,6 +384,10 @@ IRC_Status_t DebugTerminalParser(circByteBuffer_t *cbuf)
       {
          return DebugTerminalParseSTACK(cbuf);
       }
+      else if (strcasecmp((char *)cmdStr, "GCP") == 0)
+      {
+         return DebugTerminalParseGCP(cbuf);
+      }
       else if (strcasecmp((char *)cmdStr, "HLP") == 0)
       {
          return DebugTerminalParseHLP(cbuf);
@@ -446,6 +452,8 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    PRINTF("  Buffer selection:   BUF EXT|INT (broken)\n");
    PRINTF("  Disable/ignore FW:  DFW\n");
    PRINTF("  Device key:         KEY [RENEW|RESET]\n");
+   PRINTF("  Get Stack Level:    STACK\n");
+   PRINTF("  Set GCP state:      GCP [0|1]\n");
    PRINTF("  Print help:         HLP\n");
 
    return IRC_SUCCESS;
@@ -1975,6 +1983,45 @@ IRC_Status_t DebugTerminalParseSTACK(circByteBuffer_t *cbuf)
 
    DT_PRINTF("Stack level: %d/%d (%d)",
          Stack_GetActualLevel(), Stack_GetSize(), Stack_GetMaximumLevel());
+
+   return IRC_SUCCESS;
+}
+
+IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf)
+{
+   uint8_t argStr[2];
+   uint32_t arglen;
+   uint32_t gcpState;
+
+   if (!CBB_Empty(cbuf))
+   {
+      // Read GenICam poller state
+      arglen = GetNextArg(cbuf, argStr, 1);
+      if ((ParseNumArg((char *)argStr, arglen, &gcpState) != IRC_SUCCESS) ||
+            ((gcpState != 0) && (gcpState != 1)))
+      {
+         DT_ERR("Invalid logical value.");
+         return IRC_FAILURE;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!CBB_Empty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      if (gcpState == 1)
+      {
+         GC_Poller_Start();
+      }
+      else
+      {
+         GC_Poller_Stop();
+      }
+   }
+
+   DT_PRINTF("GCP state: %s", (GC_Poller_IsActive() == 1)? "STARTED":"STOPPED");
 
    return IRC_SUCCESS;
 }

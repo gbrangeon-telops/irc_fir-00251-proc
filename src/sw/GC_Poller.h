@@ -39,13 +39,12 @@
  * GenICam poller state.
  */
 enum gcpStateEnum {
-   GCPS_INIT = 0,                         /**< GenICam poller initialization state */
-   GCPS_WAITING_FOR_NETWORK_INTF,         /**< Waiting for network interface to be ready */
+   GCPS_WAITING_FOR_NETWORK_INTF = 0,     /**< Waiting for network interface to be ready */
+   GCPS_IDLE,                             /**< GenICam poller idle state */
    GCPS_SENDING_SELECTOR_WRITE_REQ,       /**< Transmit selector write request */
    GCPS_WAITING_FOR_SELECTOR_WRITE_RESP,  /**< Waiting for selector write response to be received */
    GCPS_SENDING_READ_REQ,                 /**< Transmit read request */
-   GCPS_WAITING_FOR_READ_RESP,            /**< Waiting for read response to be received */
-   GCPS_DONE                              /**< Done */
+   GCPS_WAITING_FOR_READ_RESP             /**< Waiting for read response to be received */
 };
 
 /**
@@ -131,6 +130,9 @@ struct gcPolledRegStruct {
 
 
 IRC_Status_t GC_Poller_Init(netIntf_t *netIntf, circBuffer_t *cmdQueue);
+IRC_Status_t GC_Poller_Start();
+IRC_Status_t GC_Poller_Stop();
+uint8_t GC_Poller_IsActive();
 void GC_Poller_SM();
 
 #endif // GC_POLLER_H
