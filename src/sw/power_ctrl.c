@@ -30,6 +30,8 @@ powerCtrl_t gPowerCtrl;
 uint32_t gTestLed = 0;
 DeviceLedIndicatorState_t gTestLedState = DLIS_Error;
 
+uint8_t gPowerOnIsAllowed = 1;
+
 /**
  * Initializes power manager module.
  *
@@ -352,7 +354,6 @@ void Power_ToggleDevicePowerState()
 void Power_SM()
 {
    extern t_bufferManager gBufManager;
-   extern flashDynamicValues_t gFlashDynamicValues;
    static uint8_t startup = 1;
 
    switch (gcRegsData.DevicePowerState)
@@ -369,7 +370,7 @@ void Power_SM()
 
          if (gcRegsData.DevicePowerStateSetpoint == DPSS_PowerOn)
          {
-            if ((DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS) || (gGC_ProprietaryFeatureKeyIsValid == 1))
+            if ((gPowerOnIsAllowed == 1) || (gGC_ProprietaryFeatureKeyIsValid == 1))
             {
                PM_INF("Powering the camera...");
                // TODO Turn on FW.
@@ -380,7 +381,7 @@ void Power_SM()
             else
             {
                gcRegsData.DevicePowerStateSetpoint = DPSS_PowerStandby;
-               PM_ERR("Power On failed, device key is expired.");
+               PM_ERR("Power On is not allowed.");
             }
          }
          break;

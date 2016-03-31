@@ -1915,8 +1915,11 @@ IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
 {
    extern flashDynamicValues_t gFlashDynamicValues;
+   extern uint8_t gPowerOnIsAllowed;
+   extern uint8_t gFuPromIsWriteProtected;
    uint8_t argStr[6];
    uint32_t arglen;
+   uint8_t deviceKeyIsValid;
 
    // Check for key command argument presence
    if (!CBB_Empty(cbuf))
@@ -1940,12 +1943,10 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
       if (strcasecmp((char *)argStr, "RENEW") == 0)
       {
          DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
-         return IRC_SUCCESS;
       }
       else if (strcasecmp((char *)argStr, "RESET") == 0)
       {
          DeviceKey_Reset(&gFlashDynamicValues, &gcRegsData);
-         return IRC_SUCCESS;
       }
       else
       {
@@ -1954,9 +1955,17 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
       }
    }
 
+   deviceKeyIsValid = 1;
+   if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
+   {
+      deviceKeyIsValid = 0;
+      gPowerOnIsAllowed = 0;
+      gFuPromIsWriteProtected = 1;
+   }
+
    DT_PRINTF("Device key:            0x%08X%08X", flashSettings.DeviceKeyHigh, flashSettings.DeviceKeyLow);
    DT_PRINTF("Device key validation: 0x%08X%08X (%s)", gcRegsData.DeviceKeyValidationHigh, gcRegsData.DeviceKeyValidationLow,
-         (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS)? "Passed" : "Failed");
+         (deviceKeyIsValid == 1)? "Passed" : "Failed");
    DT_PRINTF("Device key expiration: 0x%08X", flashSettings.DeviceKeyExpirationPOSIXTime);
 
    return IRC_SUCCESS;

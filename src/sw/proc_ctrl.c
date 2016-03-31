@@ -110,6 +110,8 @@ void disable_caches()
    extern ctrlIntf_t gOemCtrlIntf;
 #endif
    extern ctrlIntf_t gOutputCtrlIntf;
+   extern uint8_t gPowerOnIsAllowed;
+   extern uint8_t gFuPromIsWriteProtected;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
@@ -175,6 +177,13 @@ void disable_caches()
       PRINTF("Error: Failed to update flash dynamic values.\n");
    }
 
+   // Validate device key
+   if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
+   {
+      gPowerOnIsAllowed = 0;
+      gFuPromIsWriteProtected = 1;
+   }
+
    TDCStatusClr(WaitingForInitMask);
 
    GETTIME(&tic);
@@ -210,6 +219,8 @@ void disable_caches()
                (GC_GetTimestamp() > flashSettings.DeviceKeyExpirationPOSIXTime))
          {
             DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
+            gPowerOnIsAllowed = 0;
+            gFuPromIsWriteProtected = 1;
          }
 
          resetStats(&prof_stats);

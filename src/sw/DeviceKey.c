@@ -86,7 +86,6 @@ IRC_Status_t DeviceKey_Renew(flashDynamicValues_t *p_flashDynamicValues, gcRegis
    deviceKeyValidation = hash_64(deviceKey, (uint64_t) 0xFFFFFFFFFFFFFFFF);
 
    DK_INF("Device key (renewed):  0x%08X%08X", p_deviceKey32[DK_KEY_DWORD_HIGH], p_deviceKey32[DK_KEY_DWORD_LOW]);
-   DK_INF("Device key validation: 0x%08X%08X", p_deviceKeyValidation32[DK_KEY_DWORD_HIGH], p_deviceKeyValidation32[DK_KEY_DWORD_LOW]);
 
    p_flashDynamicValues->DeviceKeyValidationLow = p_deviceKeyValidation32[DK_KEY_DWORD_LOW];
    p_flashDynamicValues->DeviceKeyValidationHigh = p_deviceKeyValidation32[DK_KEY_DWORD_HIGH];
