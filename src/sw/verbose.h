@@ -45,6 +45,7 @@
 // #define ICU_VERBOSE
 // #define IHEX_VERBOSE
 // #define NDF_VERBOSE
+// #define NI_VERBOSE
 // #define PLEORA_VERBOSE
 // #define PM_VERBOSE
 // #define SFW_VERBOSE
