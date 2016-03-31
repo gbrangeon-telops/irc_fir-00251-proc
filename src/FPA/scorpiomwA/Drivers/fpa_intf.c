@@ -76,11 +76,11 @@
 #define VHD_CLK_80M_RATE_HZ                80000000
 
 // horloge des ADCs
-#ifdef FPA_MCLK_RATE_HZ == 10E6F
+#ifdef FPA_MCLK_RATE_HZ == 10000000
    #define ADC_SAMPLING_RATE_HZ           40000000    // les ADC roulent à 40MHz
-#elif  FPA_MCLK_RATE_HZ == 15E6F
+#elif  FPA_MCLK_RATE_HZ == 15000000
    #define ADC_SAMPLING_RATE_HZ           30000000    // les ADC roulent à 30MHz
-#elif  FPA_MCLK_RATE_HZ == 18E6F
+#elif  FPA_MCLK_RATE_HZ == 18000000
    #define ADC_SAMPLING_RATE_HZ           36000000    // les ADC roulent à 36MHz
 #endif
 
@@ -98,6 +98,8 @@
 
 #define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
 
+#define SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV 500
+#define SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV 1000
 
 // structure interne pour les parametres du scorpiomw
 struct scorpiomw_param_s             //
@@ -136,6 +138,8 @@ typedef struct scorpiomw_param_s  scorpiomw_param_t;
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 
 
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
@@ -258,8 +262,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //  windowing
    ptrA->sizea_sizeb = 0;     // toujours en mode windowing 
-   
-   
+     
    //  itr
    ptrA->itr = 0;     // toujours en mode itr 
        
@@ -275,10 +278,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    actualPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
    
-   
-   /  ARRET 
-   
-   
    // ajustement de delais de la chaine
    ptrA->real_mode_active_pixel_dly = 42;                             // ajuster via chipscope
    
@@ -290,7 +289,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
    ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + hh.fovh_line) + 1;                    // ligne de reset du scorpiomw prise en compte
    
-   ptrA->active_line_start_num             = 3;                    // pour le scorpiomw, numero de la première ligne active
+   ptrA->active_line_start_num             = 1;                    // pour le scorpiomw, numero de la première ligne active
    ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le scorpiomw, numero de la derniere ligne active
    
    // nombre d'échantillons par canal  de carte ADC
@@ -304,8 +303,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
    // echantillons choisis
-   ptrA->good_samp_first_pos_per_ch        = 3;     // position premier echantillon
-   ptrA->good_samp_last_pos_per_ch         = 4;     // position dernier echantillon
+   ptrA->good_samp_first_pos_per_ch        = ptrA->pix_samp_num_per_ch;     // position premier echantillon
+   ptrA->good_samp_last_pos_per_ch         = ptrA->pix_samp_num_per_ch;     // position dernier echantillon
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                = 2;
@@ -546,7 +545,7 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
 //-------------------------------------------------------------------------- 
 // VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG 
 // VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
-uint32_t  FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
 {  
   float Rs, Rd, RL, Is, DacVoltage_Volt;
   uint32_t DacWord;
@@ -578,7 +577,7 @@ uint32_t  FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t Vcc
 //-------------------------------------------------------------------------- 
 // VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG 
 // VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
-float  FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
 {  
    float Rs, Rd, RL, Is, DacVoltage_Volt, VccVoltage_mV;
    uint32_t DacWordTemp;
