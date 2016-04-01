@@ -180,6 +180,7 @@ void disable_caches()
    // Validate device key
    if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
    {
+      PRINTF("Error: Device key is not valid.\n");
       gPowerOnIsAllowed = 0;
       gFuPromIsWriteProtected = 1;
    }
@@ -219,8 +220,11 @@ void disable_caches()
                (GC_GetTimestamp() > flashSettings.DeviceKeyExpirationPOSIXTime))
          {
             DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
-            gPowerOnIsAllowed = 0;
-            gFuPromIsWriteProtected = 1;
+            if (gGC_ProprietaryFeatureKeyIsValid == 0)
+            {
+               gPowerOnIsAllowed = 0;
+               gFuPromIsWriteProtected = 1;
+            }
          }
 
          resetStats(&prof_stats);

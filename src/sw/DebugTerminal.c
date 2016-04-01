@@ -1959,8 +1959,11 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
    if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
    {
       deviceKeyIsValid = 0;
-      gPowerOnIsAllowed = 0;
-      gFuPromIsWriteProtected = 1;
+      if (gGC_ProprietaryFeatureKeyIsValid == 0)
+      {
+         gPowerOnIsAllowed = 0;
+         gFuPromIsWriteProtected = 1;
+      }
    }
 
    DT_PRINTF("Device key:            0x%08X%08X", flashSettings.DeviceKeyHigh, flashSettings.DeviceKeyLow);

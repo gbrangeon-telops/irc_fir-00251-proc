@@ -370,7 +370,7 @@ void Power_SM()
 
          if (gcRegsData.DevicePowerStateSetpoint == DPSS_PowerOn)
          {
-            if ((gPowerOnIsAllowed == 1) || (gGC_ProprietaryFeatureKeyIsValid == 1))
+            if (gPowerOnIsAllowed == 1)
             {
                PM_INF("Powering the camera...");
                // TODO Turn on FW.
