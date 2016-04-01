@@ -18,7 +18,6 @@
 
 #include "printf_utils.h"
 
-
 #ifdef DEBUG
 // #define ACQ_VERBOSE
 // #define ACT_VERBOSE

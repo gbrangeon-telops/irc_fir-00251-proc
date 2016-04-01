@@ -15,6 +15,7 @@
 #include "exposure_time_ctrl.h"
 #include "GC_Registers.h"
 #include "hder_inserter.h"
+#include "Actualization.h"
 #include "FlashSettings.h"
 #include "FlashDynamicValues.h"
 #include "proc_memory.h"
@@ -35,6 +36,9 @@
 
 // ADRESSES
 #define AW_BLOCK_SEL_MODE  0x20
+#define AW_BLOCK_IDX_ADDR  0x24
+#define AW_BLOCK_CFG_DONE  0x28
+#define AW_BLOCK_OFFSET    0x2C
 
 #define AW_FLUSHPIPE       0xD0
 #define AW_RESET_ERR       0xD4
@@ -47,7 +51,7 @@
 #define AR_ERR_REG4        0xFC
 
 
-// Adresse des  switchs et trous
+// Adresse des  switchs et trous // todo ajouter 0x20 à tous apres changement du HW pour multi-actualisation
 #define AW_INPUT_SW        0xA4
 #define AW_DATATYPE_SW     0xA8
 #define AW_OUTPUT_SW       0xAC
@@ -94,19 +98,39 @@ typedef enum
 bool blockLoadCmdFlag = false;  // Reset command of block load
 // privé
 static calibBlockRamInfo_t blockRam = CAL_Param_Ctor(0);
+static calibBlockHdrInfo_t calib_blocks[CALIB_MAX_NUM_OF_BLOCKS];
 
 
 // declaration fonctions internes
 static void CAL_flushPipe(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 static void CAL_configSwitchesAndHoles(const t_calib *pA, cal_mode_t calib_mode, const gcRegistersData_t *pGCRegs);
 static void CAL_resetErr(const t_calib *pA);
+static void CAL_initCalBlockInfo(calibBlockHdrInfo_t* b, uint32_t n);
 
+void CAL_initCalBlockInfo(calibBlockHdrInfo_t* b, uint32_t n)
+{
+   int i;
+
+   for (i=0; i<n; ++i)
+   {
+      b->SIZE = sizeof(calibBlockHdrInfo_t)/4 - 2;
+      b->ADD = TEL_PAR_TEL_CAL_CTRL_BASEADDR + AW_BLOCK_OFFSET;
+      b->sel_value = 0;
+      b->POSIXTime = 0;
+      b->offset_fp32 = 0;
+      b->data_exponent = 0;
+      b->actualizationPOSIXTime = 0;
+   }
+}
 
 void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs)
 {
    // Init constant values
    pA->calib_ram_block_offset = blockRam.SIZE;
    pA->pixel_data_base_addr = PROC_MEM_PIXEL_DATA_BASEADDR;
+
+   pA->calib_block = calib_blocks;
+   CAL_initCalBlockInfo(pA->calib_block, CALIB_MAX_NUM_OF_BLOCKS);
 
    // bloquer les SW
    CAL_configSwitchesAndHoles(pA, Mode_block, pGCRegs);
@@ -207,7 +231,7 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    pA->exposure_time_mult_fp32 = (1.0F/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ) * 1E+6F;  // facteur de multiplication pour avoir le temps d'exposition en µsec
 
    // Reset header info of all blocks
-   memset((uint8_t *)pA->calib_block, 0, sizeof(pA->calib_block));
+   CAL_initCalBlockInfo(pA->calib_block, CALIB_MAX_NUM_OF_BLOCKS);
 
    pA->calib_block_index_max = 0;
    CAL_INF("calib_block_sel_mode = %d", (uint32_t)pA->calib_block_sel_mode);
@@ -258,10 +282,24 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
             pA->calib_block[blockIndex].data_exponent = (int32_t)calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].Data_Exp;
          }
          // else, info stays to 0
+
+         deltabeta_t* data = ACT_getSuitableDeltaBetaForBlock(&calibrationInfo, blockIndex);
+         if (data)
+            pA->calib_block[blockIndex].actualizationPOSIXTime = data->info.POSIXTime;
+         else
+            pA->calib_block[blockIndex].actualizationPOSIXTime = 0;
       }
    }
 
    WriteStruct(pA);
+
+   // write all block configurations
+   for (blockIndex = 0; blockIndex < CALIB_MAX_NUM_OF_BLOCKS; blockIndex++)
+   {
+      AXI4L_write32(blockIndex, pA->ADD + AW_BLOCK_IDX_ADDR);
+      WriteStruct(&pA->calib_block[blockIndex]);
+   }
+   AXI4L_write32(1, pA->ADD + AW_BLOCK_CFG_DONE);
 
    // on reconfigure les switches
    CAL_configSwitchesAndHoles(pA, calib_mode, pGCRegs);

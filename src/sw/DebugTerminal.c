@@ -435,7 +435,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    PRINTF("  Camera status:      STATUS\n");
    PRINTF("  Power status:       POWER\n");
    PRINTF("  Network status:     NET [0|1]\n");
-   PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP\n");
+   PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST\n");
    PRINTF("  List files:         LS\n");
    PRINTF("  Remove file:        RM filename\n");
    PRINTF("  Loopback:           LB CLINK|PLEORA|OEM|USART 0|1\n");
@@ -1092,6 +1092,8 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       cmd = 7;
    else if (strcasecmp((char*)argStr, "STP") == 0) // Cancel currently running actualization
       cmd = 8;
+   else if (strcasecmp((char*)argStr, "LST") == 0) // List all actualization in memory and flash memory
+      cmd = 9;
 
    switch (cmd)
    {
@@ -1125,8 +1127,23 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       case 2: // invalidate and reload
          if (TDCStatusTst(WaitingForCalibrationActualizationMask) == 0 && TDCStatusTst(AcquisitionStartedMask) == 0)
          {
-            gActDeltaBetaAvailable = false;
-            DT_PRINTF("current actualization was invalidated");
+            arglen = GetNextArg(cbuf, argStr, 10);
+            if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+            {
+               value = 0; // clear current by default
+            }
+
+            if (value == 0)
+            {
+               ACT_invalidateActualizations(ACT_CURRENT);
+               DT_PRINTF("all actualizations were invalidated");
+            }
+            else
+            {
+               ACT_invalidateActualizations(ACT_ALL);
+               DT_PRINTF("current actualization was invalidated");
+            }
+
             // reload the calibration to unapply the actualization
             Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.collection.POSIXTime);
          }
@@ -1263,6 +1280,10 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       case 8:
          DT_PRINTF("Cancelling current actualization");
          stopActualization();
+         break;
+
+      case 9:
+         ACT_listActualizationData();
          break;
 
       default:

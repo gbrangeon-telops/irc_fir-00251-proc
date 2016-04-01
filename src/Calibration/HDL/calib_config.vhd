@@ -156,6 +156,7 @@ architecture rtl of calib_config is
    signal cfg_wr_data                  : std_logic_vector(31 downto 0);
    signal mb_cfg_done                  : std_logic;
    signal mb_cfg_done_sync             : std_logic;
+   signal calib_block_index            : std_logic_vector(2 downto 0);
    
 begin
    
@@ -260,8 +261,11 @@ begin
    -- reception Config                                
    -------------------------------------------------   
    U3: process(MB_CLK)
+   variable idx : integer range 0 to 7;
    begin
       if rising_edge(MB_CLK) then
+         
+         idx := to_integer(unsigned(calib_block_index));
          
          if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
             mb_cfg_done <= '0';
@@ -279,46 +283,15 @@ begin
                when X"1C" => cal_block_index_max_i       <= unsigned(cfg_wr_data(cal_block_index_max_i'range));
                when X"20" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);
                
-               when X"24" => calib_block_array(0).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"28" => calib_block_array(0).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"2C" => calib_block_array(0).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"30" => calib_block_array(0).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
+               when X"24" => calib_block_index <= cfg_wr_data(calib_block_index'range);
+               when X"28" => config_dval_i <= '1';
                
-               when X"34" => calib_block_array(1).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"38" => calib_block_array(1).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"3C" => calib_block_array(1).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"40" => calib_block_array(1).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               
-               when X"44" => calib_block_array(2).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"48" => calib_block_array(2).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"4C" => calib_block_array(2).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"50" => calib_block_array(2).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               
-               when X"54" => calib_block_array(3).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"58" => calib_block_array(3).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"5C" => calib_block_array(3).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"60" => calib_block_array(3).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               
-               when X"64" => calib_block_array(4).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"68" => calib_block_array(4).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"6C" => calib_block_array(4).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"70" => calib_block_array(4).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               
-               when X"74" => calib_block_array(5).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"78" => calib_block_array(5).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"7C" => calib_block_array(5).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"80" => calib_block_array(5).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               
-               when X"84" => calib_block_array(6).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"88" => calib_block_array(6).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"8C" => calib_block_array(6).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"90" => calib_block_array(6).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
-               
-               when X"94" => calib_block_array(7).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
-               when X"98" => calib_block_array(7).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
-               when X"9C" => calib_block_array(7).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
-               when X"A0" => calib_block_array(7).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range); config_dval_i <= '1';     
-                  
+               when X"2C" => calib_block_array(idx).sel_value                   <= cfg_wr_data(calib_block_info_type.sel_value'range);
+               when X"30" => calib_block_array(idx).hder_info.cal_block_posix   <= cfg_wr_data(calib_hder_type.cal_block_posix'range);            
+               when X"34" => calib_block_array(idx).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
+               when X"38" => calib_block_array(idx).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
+               when X"3C" => calib_block_array(idx).hder_info.block_act_posix   <= cfg_wr_data(calib_hder_type.block_act_posix'range);
+              
                -- control des switches et des trous
                when X"A4" => input_sw_i            <= cfg_wr_data(input_sw_i'range);
                when X"A8" => datatype_sw_i         <= cfg_wr_data(datatype_sw_i'range);

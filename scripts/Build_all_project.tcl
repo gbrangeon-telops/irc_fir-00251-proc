@@ -252,3 +252,30 @@ set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
 # End of this build
 close_project
+
+file attributes $base_dir/xilinx/ -readonly 0
+source $base_dir/scripts/scorpiomwA_project.tcl
+#Use release target constraints file
+set_property is_enabled false [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
+set_property target_constrs_file [get_files -of_objects constrs_1 *release_target.xdc] [current_fileset -constrset]
+#generate bitstream
+launch_runs impl_1 -to_step write_bitstream
+#wait for run end
+wait_on_run impl_1
+#open implemented design
+open_run impl_1
+#Save Report
+report_timing_summary -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_timing_summary_routed.rpt
+report_clock_utilization -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_clock_utilization_placed.rpt
+report_utilization -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_utilization_placed.rpt
+report_utilization -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
+#Open Block diagram
+open_bd_design $base_dir/xilinx/scorpiomwA/fir_00251_proc_scorpiomwA.srcs/sources_1/bd/core/core.bd
+#Export hardware for sdk
+export_hardware [get_files $base_dir/xilinx/scorpiomwA/fir_00251_proc_scorpiomwA.srcs/sources_1/bd/core/core.bd] [get_runs impl_1] -bitstream -dir $base_dir/sdk/fir_00251_proc_scorpiomwA
+exec $base_dir/scripts/updateHwSvnRev.bat scorpiomwA
+#Change back target constraints file
+set_property is_enabled true [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
+set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]
+# End of this build
+close_project

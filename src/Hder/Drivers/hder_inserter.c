@@ -86,6 +86,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    static const char headerSignature[3] = "TC";
    uint32_t data32;
    uint8_t i;
+   uint32_t gActualisationPosixTime = 0; // todo corriger la ârtie autocodée et enlever cette ligne quand c'est fait
 
    uint8_t hdrTestImageSelector;
 

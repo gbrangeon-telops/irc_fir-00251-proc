@@ -412,6 +412,7 @@ void Calibration_SM()
    static uint32_t lutNLCount;
    static uint32_t newBadPixelCount;
    static uint8_t startup = 1;
+   static deltabeta_t* deltaBetaDataAddr = NULL;
 
    extern flashDynamicValues_t gFlashDynamicValues;
    extern bool blockLoadCmdFlag;
@@ -845,11 +846,17 @@ void Calibration_SM()
                else
                {
                   CM_INF("Pixel data loaded.");
-                  if (shouldUpdateCurrentCalibration(&calibrationInfo, blockIndex))
+                  if (ACT_shouldUpdateCurrentCalibration(&calibrationInfo, blockIndex))
                   {
                      newBadPixelCount = 0;
                      cmCurrentState = CMS_UPDATE_PIXEL_DATA;
                      dataOffset = 0;
+                     deltaBetaDataAddr = ACT_getSuitableDeltaBetaForBlock(&calibrationInfo, blockIndex);
+                     if (deltaBetaDataAddr == NULL)
+                     {
+                        CM_ERR("No actualisation found");
+                        cmCurrentState = CMS_LOAD_MAXTK_DATA_HEADER;
+                     }
                      GETTIME(&tic_calibUpdate);
                   }
                   else
@@ -865,13 +872,12 @@ void Calibration_SM()
          {
             const uint32_t numberOfDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
             uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
-            deltabeta_t* deltaBetaDataAddr = ACT_getDeltaBetaForBlock(&calibrationInfo.blocks[blockIndex]);
             uint32_t blockSize = MIN(CM_CALIB_UPDATE_BLOCK_SIZE, numberOfDataToProcess - dataOffset);
 
             calAddr += 2*dataOffset;
 
             calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
-            newBadPixelCount += updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaDataAddr, dataOffset, blockSize);
+            newBadPixelCount += ACT_updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaDataAddr, dataOffset, blockSize);
 
             dataOffset += blockSize; // dataOffset is given in pixels
 

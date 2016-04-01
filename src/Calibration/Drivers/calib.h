@@ -106,10 +106,14 @@ typedef struct calibBlockRamInfoStruct calibBlockRamInfo_t;
  */
 struct calibBlockHdrInfoStruct
 {
+   uint32_t SIZE;                   /**< Number of config elements, excluding SIZE and ADD. */
+   uint32_t ADD;                    /**< AXIL base address. */
+
    uint32_t sel_value;
    uint32_t POSIXTime;
    float    offset_fp32;
    int32_t  data_exponent;
+   uint32_t actualizationPOSIXTime; // todo sera activé lors de l'ajout du champ rapide du posix time de l'actualisation
 };
 typedef struct calibBlockHdrInfoStruct calibBlockHdrInfo_t;
 
@@ -130,7 +134,7 @@ typedef struct
    float    exposure_time_mult_fp32;
    uint32_t calib_block_index_max;
    calibBlockSelMode_t calib_block_sel_mode;
-   calibBlockHdrInfo_t calib_block[CALIB_MAX_NUM_OF_BLOCKS];
+   calibBlockHdrInfo_t* calib_block; // not to be written by WriteStruct (see associated Ctor macro)
 } t_calib;
 
 // statuts provenant du vhd
@@ -143,9 +147,8 @@ typedef struct s_CalStatus t_CalStatus;
 
 
 /***************** Macros (Inline Functions) Definitions ********************/
-#define CAL_Config_Ctor(add) {sizeof(t_calib)/4 - 2, add}//, 0, 0, 0, 0, 0, 0, 0.0F, 0, 0, {}}
+#define CAL_Config_Ctor(add) {sizeof(t_calib)/4 - 4, add}//, 0, 0, 0, 0, 0, 0, 0.0F, 0, 0, 0} // CR_WARNING le pointeur à la fin n'est pas inclu
 #define CAL_Param_Ctor(add) {sizeof(calibBlockRamInfo_t)/4 - 2, add}//, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0, 0}
-
 
 /************************** Prototypes des fonctions *****************************/
 void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs);

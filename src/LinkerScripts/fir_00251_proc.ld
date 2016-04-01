@@ -187,6 +187,17 @@ SECTIONS
    __bss_end = .;
 } > MIG_Code_mig_7series_0
 
+.noinit (NOLOAD) : {
+   . = ALIGN(4);
+   __noinit_start = .;
+   *(.noinit)
+   *(.noinit.*)
+   *(.gnu.linkonce.b.*)
+   *(COMMON)
+   . = ALIGN(4);
+   __noinit_end = .;
+} > MIG_Code_mig_7series_0
+
 _SDA_BASE_ = __sdata_start + ((__sbss_end - __sdata_start) / 2 );
 
 _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );

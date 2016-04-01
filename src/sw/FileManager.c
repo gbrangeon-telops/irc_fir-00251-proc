@@ -63,14 +63,14 @@ fileList_t gFM_nlBlocks;
 fileList_t gFM_icuBlocks;
 
 /**
+ * File manager calibration actualization file list.
+ */
+fileList_t gFM_calibrationActualizationFiles;
+
+/**
  * File manager flash settings file pointer.
  */
 fileRecord_t *gFM_flashSettingsFile;
-
-/**
- * File manager calibration actualization file pointer.
- */
-fileRecord_t *gFM_calibrationActualizationFile;
 
 /**
  * File manager flash dynamic values file pointer.
@@ -473,10 +473,10 @@ IRC_Status_t FM_InitFileDB()
    gFM_calibrationBlocks.count = 0;
    gFM_nlBlocks.count = 0;
    gFM_icuBlocks.count = 0;
+   gFM_calibrationActualizationFiles.count = 0;
 
    // Clear file pointers
    gFM_flashSettingsFile = NULL;
-   gFM_calibrationActualizationFile = NULL;
 
    // Clear file database
    memset(gFM_fileDB, 0, sizeof(gFM_fileDB));
@@ -881,7 +881,7 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
          }
          else if (strcmp(file->type, FM_ACTUALIZATION_FILE_TYPE) == 0)
          {
-            gFM_calibrationActualizationFile = file;
+            FM_AddFileToList(file, &gFM_calibrationActualizationFiles);
          }
          else if (strcmp(file->type, FM_FLASHSETTINGS_FILE_TYPE) == 0)
          {
@@ -967,6 +967,7 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
    FM_RemoveFileFromList(file, &gFM_calibrationBlocks);
    FM_RemoveFileFromList(file, &gFM_nlBlocks);
    FM_RemoveFileFromList(file, &gFM_icuBlocks);
+   FM_RemoveFileFromList(file, &gFM_calibrationActualizationFiles);
 
    // Check if its the flash settings file
    if (file == gFM_flashSettingsFile)
@@ -979,12 +980,6 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
    if (file == gFM_flashDynamicValuesFile)
    {
       gFM_flashDynamicValuesFile = NULL;
-   }
-
-   // Check if its the calibration actualization file
-   if (file == gFM_calibrationActualizationFile)
-   {
-      gFM_calibrationActualizationFile = NULL;
    }
 
    // Check if the file is used by current calibration

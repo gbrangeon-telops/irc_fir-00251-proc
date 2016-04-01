@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ACT_VERBOSE_LEVEL 2
+#define ACT_VERBOSE_LEVEL 1
 
 #ifdef ACT_VERBOSE
    #define ACT_PRINTF(fmt, ...)  PRINTF("ACT: " fmt, ##__VA_ARGS__)
@@ -74,6 +74,8 @@
 
 #define MAX_FRAME_SIZE ((uint32_t)(FPA_HEIGHT_MAX+2) * (uint32_t)FPA_WIDTH_MAX)
 #define MAX_PIXEL_COUNT ((uint32_t)(FPA_HEIGHT_MAX) * (uint32_t)FPA_WIDTH_MAX)
+
+#define MAX_DELTA_BETA_SIZE 32 // maximum allowed number of delta beta data locations in memory
 
 #define ACT_FILENAME (char*)"Actualization.tsac"
 
@@ -185,19 +187,47 @@ typedef struct {
    uint32_t totalLength; // total number of elements to process
 } context_t;
 
-typedef struct {
+typedef struct
+{
+   uint32_t type;                 // 0 : ICU, 1 : External BB
+   uint32_t discardOffset;
+   float internalLensTemperature; // temperature of internal lens at time of actualisation [K]
+   float referenceTemperature;    // temperature used as reference [K]
+   float exposureTime;            // [µs]
+   uint32_t referencePOSIXTime;   // POSIX time of the reference block
+   uint32_t POSIXTime;            // POSIX time of this actualisation
+   fileRecord_t* file;            // associated file
+   uint32_t age;                  // age of the actualisation [s]
+   uint8_t PixelDataResolution;
+   uint8_t SensorWellDepth;
+   uint8_t IntegrationMode;
+} actualisationInfo_t;
+
+typedef struct
+{
    float deltaBeta[MAX_PIXEL_COUNT]; // the bad pixels from the reference block have a deltaBeta value of infinity
    statistics_t stats;
    float p50; // median value
-   uint32_t saturatedData; // number of pixel values with saturation in the NUC data
-   uint32_t type; // 0: icu, 1: external BB
-   bool ready;
-} deltabeta_t; // for future use
+   uint32_t saturatedDataCount; // number of pixel values with saturation in the NUC data
+   actualisationInfo_t info;
+   bool valid;
+} deltabeta_t;
 
-void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength);
-uint32_t ctxtIterate(context_t* ctxt);
-uint32_t ctxtStep(context_t* ctxt, uint32_t n);
-bool ctxtIsDone(const context_t* ctxt);
+typedef struct
+{
+   uint32_t count;
+   deltabeta_t* deltaBeta[MAX_DELTA_BETA_SIZE];
+} deltaBetaList_t;
+
+enum actualizationTypeEnum {
+   ACT_ICU = 0,
+   ACT_XBB = 1,
+   ACT_CURRENT,
+   ACT_ALL
+};
+
+#define ACT_TYPE_MODE_MASK (uint32_t)0x0001
+#define ACT_TYPE_DISCARD_MASK (uint32_t)0x0010
 
 typedef struct
 {
@@ -238,14 +268,6 @@ typedef struct
    uint32_t length; // size of the arrays (number of pixels)
 } actBuffers_t;
 
-typedef struct
-{
-   uint32_t type;                 // 0 : ICU, 1 : External BB
-   float internalLensTemperature; // temperature of internal lens at time of actualisation [K]
-   float referenceTemperature;    // temperature used as reference [K]
-   float exposureTime;            // [µs]
-} actualisationInfo_t;
-
 // actOptions_t.mode switches
 #define ACT_MODE_DELTA_BETA_OFF 0x01 // go directly to bad pixel detection (if enabled)
 #define ACT_MODE_BP_OFF 0x02
@@ -254,9 +276,7 @@ typedef struct
 #define ACT_MODE_VERBOSE 0x10 // add some verbose
 #define ACT_MODE_DISCARD_OFFSET 0x20 // add some verbose
 
-extern bool gActDeltaBetaAvailable; /**< indicates the validity of the actualization data in memory */
 extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */
-extern uint32_t gActualisationPosixTime; /**< POSIX time of the most current actualization */
 extern actDebugOptions_t gActDebugOptions;
 extern actParams_t gActualizationParams;
 
@@ -267,8 +287,8 @@ void stopActualization();
 IRC_Status_t Actualization_SM();
 IRC_Status_t BadPixelDetection_SM();
 
-bool shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
-uint32_t updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);
+bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
+uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);
 uint32_t updateBadPixelMap(uint32_t* p_CalData, const uint16_t* p_bpMap, uint32_t numData);
 void ACT_resetDebugOptions();
 void ACT_parseDebugMode();
@@ -278,6 +298,16 @@ void updateMoments(float* m1, float* m2, float* m3, float x, uint32_t N); /**< i
 
 void testMomentComputations();
 
-deltabeta_t* ACT_getDeltaBetaForBlock(const calibBlockInfo_t* blockInfo);
+deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
+
+void ACT_listActualizationData();
+void ACT_invalidateActualizations(int type);
+deltabeta_t* ACT_getActiveDeltaBeta();
+uint32_t ACT_getActiveDeltaBetaPOSIXTime();
+
+void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength);
+uint32_t ctxtIterate(context_t* ctxt);
+uint32_t ctxtStep(context_t* ctxt, uint32_t n);
+bool ctxtIsDone(const context_t* ctxt);
 
 #endif // ACTUALIZATION_H

@@ -415,6 +415,7 @@ void Power_SM()
 
                      if (TDCFlagsTst(CalibrationActualizationIsImplementedMask) && calibrationInfo.isValid)
                      {
+                        ACT_invalidateActualizations(ACT_ALL);
                         // Reload the current calibration to revert actualization
                         Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.collection.POSIXTime);
                      }

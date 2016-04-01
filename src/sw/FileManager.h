@@ -39,7 +39,7 @@
 #define FM_INF(fmt, ...)         PRINTF("FM: Info: " fmt "\n", ##__VA_ARGS__)
 #define FM_DBG(fmt, ...)         FM_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
-#define FM_MAX_NUM_FILE          64    /**< Maximum number of file */
+#define FM_MAX_NUM_FILE          128    /**< Maximum number of file */
 
 #define FM_TEMP_FILE_DATA_BUFFER_SIZE  512
 
@@ -132,9 +132,9 @@ extern fileList_t gFM_collections;
 extern fileList_t gFM_calibrationBlocks;
 extern fileList_t gFM_nlBlocks;
 extern fileList_t gFM_icuBlocks;
+extern fileList_t gFM_calibrationActualizationFiles;
 
 extern fileRecord_t *gFM_flashSettingsFile;
-extern fileRecord_t *gFM_calibrationActualizationFile;
 
 extern uint8_t tmpFileDataBuffer[FM_TEMP_FILE_DATA_BUFFER_SIZE];
 
