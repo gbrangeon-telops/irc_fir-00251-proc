@@ -93,24 +93,21 @@ void EHDRI_UpdateExpIndexSequence(t_EhdriManager *pEhdriCtrl, const gcRegistersD
    {
       sum_percent += EHDRIExposureOccurrenceAry[i];
    }
-   EHDRI_PRINTF( "sum_percent = %f\n\r", sum_percent );
+   EHDRI_PRINTF( "sum_percent = " _PCF(2) "\n\r", _FFMT(sum_percent, 2) );
 
-   // Transform percentage to occurence ... max EHDRI_BRAM_SIZE
+   // Transform percentage to occurrence ... max EHDRI_BRAM_SIZE
    for ( i = 0; i < pGCRegs->EHDRINumberOfExposures; i++ )
    {
       exp_occurrence[i] = (uint16_t)( roundf( ( EHDRIExposureOccurrenceAry[i] / sum_percent ) * (float) EHDRI_BRAM_SIZE ) );
-      EHDRI_PRINTF( "exp_occurrence[%d] = %d\n\r", i, exp_occurrence[i] );
    }
 
    EHDRI_GetUpdate( exp_occurrence, &Q_idx, &Q_max, &N, pGCRegs->EHDRINumberOfExposures );
 
-   // If sum of occurence lower than EHDRI_BRAM_SIZE, we add 1 to the maximum idx
-   if( N < EHDRI_BRAM_SIZE )
+   // If sum of occurrence is not equal to EHDRI_BRAM_SIZE, we adjust the maximum occurrence
+   if( N != EHDRI_BRAM_SIZE )
    {
       exp_occurrence[Q_idx] += ( EHDRI_BRAM_SIZE - N );
-      Q_max = exp_occurrence[Q_idx];
-      N = EHDRI_BRAM_SIZE;
-      EHDRI_PRINTF( "exp_occurrence[%d] = %d\n\r", Q_idx, Q_max );
+      EHDRI_GetUpdate( exp_occurrence, &Q_idx, &Q_max, &N, pGCRegs->EHDRINumberOfExposures );
    }
 
    // Set empty flags to 1
@@ -376,6 +373,7 @@ void EHDRI_GetUpdate(uint16_t *exp_occurrence, uint8_t *Q_idx, uint16_t *Q_max, 
    for (i=0; i<nb_index; i++)
    {
       *N += exp_occurrence[i];
+      EHDRI_PRINTF( "exp_occurrence[%d] = %d\n\r", i, exp_occurrence[i] );
    }
    EHDRI_PRINTF("Sum of occurrence N = %d\n\r",*N);
 
