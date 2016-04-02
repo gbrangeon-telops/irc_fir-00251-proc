@@ -121,7 +121,9 @@ architecture rtl of scorpiomwA_digio_map is
    signal mclk_reg         : std_logic;
    signal mclk_pipe        : std_logic_vector(7 downto 0);
    
-   attribute IOB : string;
+   attribute IOB           : string;
+   attribute keep    : string;
+   
    attribute IOB of fpa_on_iob         : signal is "TRUE";
    attribute IOB of prog_data_iob      : signal is "TRUE";
    attribute IOB of sizea_sizeb_iob    : signal is "TRUE";
@@ -133,8 +135,20 @@ architecture rtl of scorpiomwA_digio_map is
    attribute IOB of dac_sclk_iob       : signal is "TRUE";
    attribute IOB of serclr_iob         : signal is "TRUE";
    
+   attribute keep of fpa_on_i      : signal is "TRUE";
+   attribute keep of prog_data_i   : signal is "TRUE";
+   attribute keep of sizea_sizeb_i : signal is "TRUE";
+   attribute keep of int_i         : signal is "TRUE";
+   attribute keep of mclk_i        : signal is "TRUE";
+   attribute keep of dac_csn_i     : signal is "TRUE";
+   attribute keep of dac_sd_i      : signal is "TRUE";
+   attribute keep of dac_sclk_i    : signal is "TRUE";
+   attribute keep of error_i       : signal is "TRUE";
+   attribute keep of data_valid_i  : signal is "TRUE";
+   attribute keep of serclr_i      : signal is "TRUE";
    
-begin
+ begin   
+   
    
    --------------------------------------------------------
    -- maps

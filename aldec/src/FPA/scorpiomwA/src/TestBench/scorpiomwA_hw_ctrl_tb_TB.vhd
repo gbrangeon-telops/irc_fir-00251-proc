@@ -125,7 +125,7 @@ begin
    end process;
    ACQ_TRIG <= trig;
    
-   FPA_EXP_INFO.exp_time <=  to_unsigned(3000, 32);
+   FPA_EXP_INFO.exp_time <=  to_unsigned(1, 32);
    FPA_EXP_INFO.exp_indx <=  x"05";
    FPA_EXP_INFO.exp_dval <= '1';
    XTRA_TRIG <= '0'; 
@@ -172,7 +172,7 @@ begin
    user_cfg_i.chn_diversity_en  <= '1'; 
    
    user_cfg_i.line_period_pclk <= to_unsigned((XSIZE/4 + PAUSE_SIZE), user_cfg_i.line_period_pclk'length);
-   user_cfg_i.readout_pclk_cnt_max   <= to_unsigned((XSIZE/4 + PAUSE_SIZE)*(YSIZE) + 1, user_cfg_i.readout_pclk_cnt_max'length);
+   user_cfg_i.readout_pclk_cnt_max   <= to_unsigned((XSIZE/4 + PAUSE_SIZE)*(YSIZE + 1) + 1, user_cfg_i.readout_pclk_cnt_max'length);
    
    user_cfg_i.active_line_start_num            <= to_unsigned(1, user_cfg_i.active_line_start_num'length); 
    user_cfg_i.active_line_end_num         <= to_unsigned(YSIZE + to_integer(user_cfg_i.active_line_start_num) - 1, user_cfg_i.active_line_end_num'length);

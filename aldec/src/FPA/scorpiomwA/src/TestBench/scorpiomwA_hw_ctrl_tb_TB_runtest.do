@@ -58,6 +58,8 @@ wave UUT/U5/U5/*
 
 -- scorpiomwA_digio_map
 --wave UUT/U19/* 
-                  
+
+-- readout controller
+--wave UUT/U9/U1/U1/*
  
-run 10 ms
+run 20 ms

@@ -41,7 +41,10 @@ entity scorpiomwA_mblaze_intf is
       USER_CFG              : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;
       
-      FPA_SOFTW_STAT        : out fpa_firmw_stat_type
+      FPA_SOFTW_STAT        : out fpa_firmw_stat_type;
+      
+      adc_clk_dly           : in std_logic_vector(4 downto 0);
+      sample_dly            : in std_logic_vector(4 downto 0)
       );
 end scorpiomwA_mblaze_intf; 
 
@@ -186,20 +189,16 @@ begin
             
             ctrled_reset_i <= '0';            
             
+            user_cfg_i.adc_clk_phase  <= resize(unsigned(adc_clk_dly), user_cfg.adc_clk_phase'length); 
+            user_cfg_i.real_mode_active_pixel_dly  <= resize(unsigned(sample_dly), user_cfg.real_mode_active_pixel_dly'length);         
+            
             -- temps d'exposition  en mclk
             if int_dval_i = '1' then
                user_cfg_i.int_time <= int_time_i;
                user_cfg_i.int_indx <= int_indx_i;
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
-            
-            --user_cfg_i.real_mode_active_pixel_dly      <= 30 + resize(unsigned(probe_out0), user_cfg_i.real_mode_active_pixel_dly'length); -- ENO: 3 janv 2016. probe_out0 =  0x0C =>   real_mode_active_pixel_dly =  42  ( en decimal)
-            
-            -- pragma translate_off
-            user_cfg_i.real_mode_active_pixel_dly      <= to_unsigned(40, user_cfg_i.real_mode_active_pixel_dly'length);
-            -- pragma translate_on
-            
-            
+                        
             -- reste de la config
             if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
                case axi_awaddr(7 downto 0) is             
@@ -231,7 +230,7 @@ begin
                   when X"4C" =>    user_cfg_i.gain                            <= data_i(0);
                   
                   when X"50" =>    user_cfg_i.gpol_code                       <= data_i(user_cfg_i.gpol_code'length-1 downto 0);
-                  when X"54" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));
+                  --when X"54" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));
                   when X"58" =>    user_cfg_i.adc_quad2_en                    <= data_i(0);
                   when X"5C" =>    user_cfg_i.chn_diversity_en                <= data_i(0); 
                   
@@ -260,8 +259,8 @@ begin
                   when X"B8" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));
                   when X"BC" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));
                   when X"C0" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); 
-                  when X"C4" =>    user_cfg_i.adc_clk_phase                   <= unsigned(data_i(user_cfg_i.adc_clk_phase'length-1 downto 0)); user_cfg_in_progress <= '0';
-                     
+                  when X"C4" =>  user_cfg_in_progress <= '0';    --user_cfg_i.adc_clk_phase                   <= unsigned(data_i(user_cfg_i.adc_clk_phase'length-1 downto 0)); 
+                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"E4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
