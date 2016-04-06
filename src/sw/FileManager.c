@@ -911,7 +911,8 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
 
             gFM_flashSettingsFile = file;
          }
-         else if (strcmp(file->type, FM_FLASHDYNAMICVALUES_FILE_TYPE) == 0)
+         else if ((strcmp(file->type, FM_FLASHDYNAMICVALUES_FILE_TYPE) == 0) &&
+               (strcmp(file->name, FDV_FILENAME) == 0))
          {
             gFM_flashDynamicValuesFile = file;
          }

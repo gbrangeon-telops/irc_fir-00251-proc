@@ -20,6 +20,8 @@
 
 IRC_Status_t DeviceKey_Validate(flashSettings_t *p_flashSettings, flashDynamicValues_t *p_flashDynamicValues)
 {
+   extern uint8_t gPowerOnIsAllowed;
+   extern uint8_t gFuPromIsWriteProtected;
    uint64_t deviceKey;
    uint32_t *p_deviceKey32 = (uint32_t *) &deviceKey;
    uint64_t deviceKeyValidation;
@@ -37,8 +39,16 @@ IRC_Status_t DeviceKey_Validate(flashSettings_t *p_flashSettings, flashDynamicVa
    if ((p_deviceKeyValidation32[DK_KEY_DWORD_LOW] != p_flashDynamicValues->DeviceKeyValidationLow) ||
          (p_deviceKeyValidation32[DK_KEY_DWORD_HIGH] != p_flashDynamicValues->DeviceKeyValidationHigh))
    {
+      // Device key is not valid
+      gPowerOnIsAllowed = 0;
+      gFuPromIsWriteProtected = 1;
+
       return IRC_FAILURE;
    }
+
+   // Device key is valid
+   gPowerOnIsAllowed = 1;
+   gFuPromIsWriteProtected = 0;
 
    return IRC_SUCCESS;
 }

@@ -27,6 +27,8 @@
 #include "BuiltInTests.h"
 #include "utils.h"
 #include "FWController.h"
+#include "DeviceKey.h"
+#include "FlashDynamicValues.h"
 #include <string.h>
 #include <float.h>
 
@@ -1751,6 +1753,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern t_FpaIntf gFpaIntf;
    extern bool gDisableFilterWheel;
+   extern flashDynamicValues_t gFlashDynamicValues;
    uint8_t externalMemoryBufferDetected = BufferManager_DetectExternalMemoryBuffer();
 
    // Update device serial number
@@ -1859,6 +1862,9 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
 
    // Update external fan speed setpoint
    gcRegsData.ExternalFanSpeedSetpoint = p_flashSettings->ExternalFanSpeedSetpoint;
+
+   // Validate device key
+   DeviceKey_Validate(p_flashSettings, &gFlashDynamicValues);
 
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))

@@ -451,7 +451,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    PRINTF("  Power:              PWR\n");
    PRINTF("  Buffer selection:   BUF EXT|INT (broken)\n");
    PRINTF("  Disable/ignore FW:  DFW\n");
-   PRINTF("  Device key:         KEY [RENEW|RESET]\n");
+   PRINTF("  Device key:         KEY [RENEW]\n");
    PRINTF("  Get Stack Level:    STACK\n");
    PRINTF("  Set GCP state:      GCP [0|1]\n");
    PRINTF("  Print help:         HLP\n");
@@ -1386,6 +1386,13 @@ IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
       return IRC_FAILURE;
    }
 
+   // Protect flash dynamic values file
+   if (strcmp(filename, FM_UFFS_MOUNT_POINT FDV_FILENAME) == 0)
+   {
+      DT_ERR("%s is protected.", filename);
+      return IRC_FAILURE;
+   }
+
    retval = uffs_remove(filename);
    if (retval == -1)
    {
@@ -1936,11 +1943,8 @@ IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
 {
    extern flashDynamicValues_t gFlashDynamicValues;
-   extern uint8_t gPowerOnIsAllowed;
-   extern uint8_t gFuPromIsWriteProtected;
    uint8_t argStr[6];
    uint32_t arglen;
-   uint8_t deviceKeyIsValid;
 
    // Check for key command argument presence
    if (!CBB_Empty(cbuf))
@@ -1976,20 +1980,9 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
       }
    }
 
-   deviceKeyIsValid = 1;
-   if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
-   {
-      deviceKeyIsValid = 0;
-      if (gGC_ProprietaryFeatureKeyIsValid == 0)
-      {
-         gPowerOnIsAllowed = 0;
-         gFuPromIsWriteProtected = 1;
-      }
-   }
-
    DT_PRINTF("Device key:            0x%08X%08X", flashSettings.DeviceKeyHigh, flashSettings.DeviceKeyLow);
    DT_PRINTF("Device key validation: 0x%08X%08X (%s)", gcRegsData.DeviceKeyValidationHigh, gcRegsData.DeviceKeyValidationLow,
-         (deviceKeyIsValid == 1)? "Passed" : "Failed");
+         (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS)? "Passed" : "Failed");
    DT_PRINTF("Device key expiration: 0x%08X", flashSettings.DeviceKeyExpirationPOSIXTime);
 
    return IRC_SUCCESS;

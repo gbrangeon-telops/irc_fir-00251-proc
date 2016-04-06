@@ -1112,9 +1112,6 @@ void GC_UpdateMemoryBufferSequencePreMOISizeLimits()
  */
 void GC_UnlockCamera()
 {
-   extern uint8_t gPowerOnIsAllowed;
-   extern uint8_t gFuPromIsWriteProtected;
-
    gGC_ProprietaryFeatureKeyIsValid = 1;
    PRINTF("Camera unlocked!!!\n");
 
@@ -1122,8 +1119,6 @@ void GC_UnlockCamera()
    AvailabilityFlagsSet(CalibrationIsAvailableMask);
    AvailabilityFlagsSet(Raw0IsAvailableMask);
    TDCFlagsSet(FWAsynchronouslyRotatingModeIsImplementedMask);
-   gFuPromIsWriteProtected = 0;
-   gPowerOnIsAllowed = 1;
 }
 
 void GC_SetMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)

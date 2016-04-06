@@ -110,8 +110,6 @@ void disable_caches()
    extern ctrlIntf_t gOemCtrlIntf;
 #endif
    extern ctrlIntf_t gOutputCtrlIntf;
-   extern uint8_t gPowerOnIsAllowed;
-   extern uint8_t gFuPromIsWriteProtected;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
@@ -181,8 +179,6 @@ void disable_caches()
    if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
    {
       PRINTF("Error: Device key is not valid.\n");
-      gPowerOnIsAllowed = 0;
-      gFuPromIsWriteProtected = 1;
    }
 
    TDCStatusClr(WaitingForInitMask);
@@ -219,12 +215,10 @@ void disable_caches()
          if ((DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS) &&
                (GC_GetTimestamp() > flashSettings.DeviceKeyExpirationPOSIXTime))
          {
+            // Renew device key and revalidate it
             DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
-            if (gGC_ProprietaryFeatureKeyIsValid == 0)
-            {
-               gPowerOnIsAllowed = 0;
-               gFuPromIsWriteProtected = 1;
-            }
+            DeviceKey_Validate(&flashSettings, &gFlashDynamicValues);
+            PRINTF("Error: Device key is expired.\n");
          }
 
          resetStats(&prof_stats);
