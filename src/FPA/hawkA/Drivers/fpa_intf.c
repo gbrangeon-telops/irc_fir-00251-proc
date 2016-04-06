@@ -266,7 +266,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
     
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 6;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = 5;                             // ajuster via chipscope
    
    // quad2    
    ptrA->adc_quad2_en = 1;
@@ -290,8 +290,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
    // echantillons choisis
-   ptrA->hgood_samp_first_pos_per_ch       = 3;     // position premier echantillon
-   ptrA->hgood_samp_last_pos_per_ch        = 4;     // position dernier echantillon
+   ptrA->hgood_samp_first_pos_per_ch       = 4;     // position premier echantillon
+   ptrA->hgood_samp_last_pos_per_ch        = 4;     // position dernier echantillon    ENO: 05 avril 2016: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
    ptrA->hgood_samp_sum_num                = ptrA->hgood_samp_last_pos_per_ch - ptrA->hgood_samp_first_pos_per_ch + 1;         
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                = 2;
@@ -308,10 +308,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vdac_value[4]                     = 0;
    ptrA->vdac_value[5]                     = 0;
    ptrA->vdac_value[6]                     = 0;
-   ptrA->vdac_value[7]                     = 1791;           // DAC8 -> VCC8 à 2.975V
+   ptrA->vdac_value[7]                     = 1650;           // DAC8 -> VCC8 à 2.943V
    
    // adc_clk_phase
-   ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC
+   ptrA->adc_clk_phase                     = 1;              // on dephase l'horloge des ADC
    
    WriteStruct(ptrA);
 }
@@ -332,23 +332,21 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    diode_voltage = (float)raw_temp*((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
   
    if (diode_voltage >= 1.020) {
-      TempCoeff[0] = 541.7409F;                                                     
+      TempCoeff[0] = 540.7409F;                                                     
       TempCoeff[1] = -442.2857F;
    }
    else if ((diode_voltage >= 0.86)&&(diode_voltage < 1.020)) { 
-      TempCoeff[0] = 610.0F;                                                     
-      TempCoeff[1] = -488.3721F;
+      TempCoeff[0] = 587.7490F;                                                   
+      TempCoeff[1] = -488.3721F; 
    }
    else { 
-      TempCoeff[0] = 673.75F;                                                     
-      TempCoeff[1] = -562.5F;
+      TempCoeff[0] = 651.4990F;                                                     
+      TempCoeff[1] = -562.5000F;  
    }
    
    temperature = TempCoeff[0] + (diode_voltage*TempCoeff[1]);  
    
-   return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
-   
-   
+   return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius  
 }       
 
 //--------------------------------------------------------------------------                                                                            
