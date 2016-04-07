@@ -211,13 +211,14 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
       if(calibrationInfo.isValid == false)
       {
-         PDRmin = DEFAULT_PIXDYNRANGEMIN ;
+         PDRmin = DEFAULT_PIXDYNRANGEMIN;
          PDRmax = DEFAULT_PIXDYNRANGEMAX;
       }
       else
       {
-         PDRmin = calibrationInfo.blocks[AEC_Int_FWPosition].PixelDynamicRangeMin;
-         PDRmax = calibrationInfo.blocks[AEC_Int_FWPosition].PixelDynamicRangeMax;
+         // NL calibration parameters are always the same for all the blocks of a collection
+         PDRmin = calibrationInfo.blocks[0].PixelDynamicRangeMin;
+         PDRmax = calibrationInfo.blocks[0].PixelDynamicRangeMax;
       }
 
       // Check for errors
