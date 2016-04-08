@@ -1548,6 +1548,14 @@ IRC_Status_t FlashSettings_ValidateCRC16(int fd, flashSettings_t *p_flashSetting
  */
 void FlashSettings_UpdateVersion(flashSettings_t *p_flashSettings)
 {
+   if ((p_flashSettings->FileStructureMajorVersion == FS_FILESTRUCTUREMAJORVERSION) &&
+         (p_flashSettings->FileStructureMinorVersion == FS_FILESTRUCTUREMINORVERSION) &&
+         (p_flashSettings->FileStructureSubMinorVersion == FS_FILESTRUCTURESUBMINORVERSION))
+   {
+      // Up to date
+      return;
+   }
+
    switch (p_flashSettings->FileStructureMajorVersion)
    {
       case 1:
