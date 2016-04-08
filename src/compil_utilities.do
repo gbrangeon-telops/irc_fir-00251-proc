@@ -13,5 +13,5 @@ acom -nowarn DAGGEN_0523 -incr \
  D:\Telops\Common_HDL\Utilities\double_sync_vector.vhd \
  D:\Telops\Common_HDL\SPI\spi_tx.vhd \
  D:\Telops\Common_HDL\Utilities\reset_extension.vhd \
- D:\Telops\Common_HDL\SPI\spi_rx.vhd
- D:\Telops\Common_HDL\Utilities\Clk_Divider_Async.vhd \
+ D:\Telops\Common_HDL\SPI\spi_rx.vhd \
+ D:\Telops\Common_HDL\Utilities\Clk_Divider_Async.vhd
