@@ -6,8 +6,6 @@ BEGIN OS
  PARAMETER OS_NAME = standalone
  PARAMETER OS_VER = 3.12.a
  PARAMETER PROC_INSTANCE = MCU_microblaze_1
- PARAMETER STDIN = axi_usb_uart
- PARAMETER STDOUT = axi_usb_uart
 END
 
 

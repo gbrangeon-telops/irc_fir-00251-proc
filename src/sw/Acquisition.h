@@ -22,13 +22,13 @@
 #include "utils.h"
 
 #ifdef ACQ_VERBOSE
-   #define ACQ_PRINTF(fmt, ...)  PRINTF("ACQ: " fmt, ##__VA_ARGS__)
+   #define ACQ_PRINTF(fmt, ...)  FPGA_PRINTF("ACQ: " fmt, ##__VA_ARGS__)
 #else
    #define ACQ_PRINTF(fmt, ...)  DUMMY_PRINTF("ACQ: " fmt, ##__VA_ARGS__)
 #endif
 
-#define ACQ_ERR(fmt, ...)        PRINTF("ACQ: Error: " fmt "\n", ##__VA_ARGS__)
-#define ACQ_INF(fmt, ...)        PRINTF("ACQ: Info: " fmt "\n", ##__VA_ARGS__)
+#define ACQ_ERR(fmt, ...)        FPGA_PRINTF("ACQ: Error: " fmt "\n", ##__VA_ARGS__)
+#define ACQ_INF(fmt, ...)        FPGA_PRINTF("ACQ: Info: " fmt "\n", ##__VA_ARGS__)
 #define ACQ_DBG(fmt, ...)        ACQ_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define WAITING_FOR_SENSOR_DELAY_US             (2 * TIME_ONE_SECOND_US)

@@ -22,12 +22,12 @@
 #include "utils.h"
 
 #ifdef TM_VERBOSE
-   #define TM_PRINTF(fmt, ...)   PRINTF("TM: " fmt, ##__VA_ARGS__)
+   #define TM_PRINTF(fmt, ...)   FPGA_PRINTF("TM: " fmt, ##__VA_ARGS__)
 #else
    #define TM_PRINTF(fmt, ...)   DUMMY_PRINTF("TM: " fmt, ##__VA_ARGS__)
 #endif
 
-#define TM_ERR(fmt, ...)         PRINTF("TM: Error: " fmt "\n", ##__VA_ARGS__)
+#define TM_ERR(fmt, ...)         FPGA_PRINTF("TM: Error: " fmt "\n", ##__VA_ARGS__)
 #define TM_INF(fmt, ...)         TM_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define FPA_TEMPERATURE_SAMPLING_PERIOD_US   TIME_ONE_SECOND_US

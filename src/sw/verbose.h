@@ -18,6 +18,8 @@
 
 #include "printf_utils.h"
 
+#define FPGA_PRINT_PREFIX        "P> "
+
 #ifdef DEBUG
 // #define ACQ_VERBOSE
 // #define ACT_VERBOSE
@@ -26,6 +28,7 @@
 // #define CI_VERBOSE
 // #define CM_VERBOSE
 // #define DK_VERBOSE
+// #define DT_VERBOSE
 // #define EHDRI_VERBOSE
 // #define F1F2_VERBOSE
 // #define FDV_VERBOSE
@@ -43,10 +46,12 @@
 // #define GPS_VERBOSE
 // #define ICU_VERBOSE
 // #define IHEX_VERBOSE
+// #define MGT_VERBOSE
 // #define NDF_VERBOSE
 // #define NI_VERBOSE
 // #define PLEORA_VERBOSE
 // #define PM_VERBOSE
+// #define QSPI_VERBOSE
 // #define SFW_VERBOSE
 // #define SREC_VERBOSE
 // #define TM_VERBOSE

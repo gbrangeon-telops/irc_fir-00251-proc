@@ -29,12 +29,12 @@
 #define ACT_VERBOSE_LEVEL 1
 
 #ifdef ACT_VERBOSE
-   #define ACT_PRINTF(fmt, ...)  PRINTF("ACT: " fmt, ##__VA_ARGS__)
+   #define ACT_PRINTF(fmt, ...)  FPGA_PRINTF("ACT: " fmt, ##__VA_ARGS__)
 #else
    #define ACT_PRINTF(fmt, ...)  DUMMY_PRINTF("ACT: " fmt, ##__VA_ARGS__)
 #endif
 
-#define ACT_ERR(fmt, ...)        PRINTF("ACT: Error: " fmt "\n", ##__VA_ARGS__)
+#define ACT_ERR(fmt, ...)        FPGA_PRINTF("ACT: Error: " fmt "\n", ##__VA_ARGS__)
 #define ACT_INF(fmt, ...)        ACT_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #if ACT_VERBOSE_LEVEL>1

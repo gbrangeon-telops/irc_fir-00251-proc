@@ -25,13 +25,13 @@
 
 
 #ifdef CM_VERBOSE
-   #define CM_PRINTF(fmt, ...)   PRINTF("CM: " fmt, ##__VA_ARGS__)
+   #define CM_PRINTF(fmt, ...)   FPGA_PRINTF("CM: " fmt, ##__VA_ARGS__)
 #else
    #define CM_PRINTF(fmt, ...)   DUMMY_PRINTF("CM: " fmt, ##__VA_ARGS__)
 #endif
 
-#define CM_ERR(fmt, ...)         PRINTF("CM: Error: " fmt "\n", ##__VA_ARGS__)
-#define CM_INF(fmt, ...)         PRINTF("CM: Info: " fmt "\n", ##__VA_ARGS__)
+#define CM_ERR(fmt, ...)         FPGA_PRINTF("CM: Error: " fmt "\n", ##__VA_ARGS__)
+#define CM_INF(fmt, ...)         FPGA_PRINTF("CM: Info: " fmt "\n", ##__VA_ARGS__)
 #define CM_DBG(fmt, ...)         CM_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define CM_MAX_FILE_READ_SIZE    512

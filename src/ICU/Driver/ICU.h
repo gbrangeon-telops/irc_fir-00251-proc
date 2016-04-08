@@ -23,12 +23,12 @@
 #include "verbose.h"
 
 #ifdef ICU_VERBOSE
-   #define ICU_PRINTF(fmt, ...)  PRINTF("ICU: " fmt, ##__VA_ARGS__)
+   #define ICU_PRINTF(fmt, ...)  FPGA_PRINTF("ICU: " fmt, ##__VA_ARGS__)
 #else
    #define ICU_PRINTF(fmt, ...)  DUMMY_PRINTF("ICU: " fmt, ##__VA_ARGS__)
 #endif
 
-#define ICU_ERR(fmt, ...)        PRINTF("ICU: Error: " fmt "\n", ##__VA_ARGS__)
+#define ICU_ERR(fmt, ...)        FPGA_PRINTF("ICU: Error: " fmt "\n", ##__VA_ARGS__)
 #define ICU_INF(fmt, ...)        ICU_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 // ADRESSE du registre des statuts

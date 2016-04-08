@@ -111,6 +111,64 @@ IRC_Status_t Proc_NI_Init()
 }
 
 /**
+ * Initializes debug terminal (phase 1).
+ *
+ * @return IRC_SUCCESS if successfully initialized.
+ * @return IRC_FAILURE if failed to initialize.
+ */
+IRC_Status_t Proc_DebugTerminal_InitPhase1()
+{
+   static uint8_t dtRxDataCircBuffer[DT_UART_RX_CIRC_BUFFER_SIZE];
+   static uint8_t dtTxDataCircBuffer[DT_UART_TX_CIRC_BUFFER_SIZE];
+
+   IRC_Status_t status;
+
+   // Initialize debug terminal
+   status =  DebugTerminal_Init(dtRxDataCircBuffer,
+         DT_UART_RX_CIRC_BUFFER_SIZE,
+         dtTxDataCircBuffer,
+         DT_UART_TX_CIRC_BUFFER_SIZE);
+   if (status != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Initializes debug terminal (phase 2).
+ *
+ * @return IRC_SUCCESS if successfully initialized.
+ * @return IRC_FAILURE if failed to initialize.
+ */
+IRC_Status_t Proc_DebugTerminal_InitPhase2()
+{
+   static networkCommand_t dtCmdQueueBuffer[DT_CMD_QUEUE_SIZE];
+   static circBuffer_t dtCmdQueue =
+         CB_Ctor(dtCmdQueueBuffer, DT_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+
+   IRC_Status_t status;
+
+   // Initialize debug terminal serial port
+   status =  DebugTerminal_InitSerial(DEBUG_TERMINAL_DEVICE_ID);
+   if (status != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Connect debug terminal to network interface
+   status =  DebugTerminal_Connect(&gNetworkIntf,
+         &dtCmdQueue);
+   if (status != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
  * Initializes file manager
  *
  * @return IRC_SUCCESS if successfully initialized.
@@ -118,7 +176,7 @@ IRC_Status_t Proc_NI_Init()
  */
 IRC_Status_t Proc_FM_Init()
 {
-   static uint8_t fileRxDataCircBuffer[FILE_CI_UART_RX_CIRC_BUFFER_SIZE];
+   static uint8_t fmRxDataCircBuffer[FILE_CI_UART_RX_CIRC_BUFFER_SIZE];
    static uint8_t fmTxDataBuffer[FILE_CI_USART_TX_BUFFER_SIZE];
    static networkCommand_t fmCtrlIntfCmdQueueBuffer[FM_CI_CMD_QUEUE_SIZE];
    static circBuffer_t fmCtrlIntfCmdQueue =
@@ -136,7 +194,7 @@ IRC_Status_t Proc_FM_Init()
          TEL_PAR_TEL_USART_CTRL_BASEADDR,
          &gProcIntc,
          XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_BULK_INTERRUPT_0_INTR,
-         fileRxDataCircBuffer,
+         fmRxDataCircBuffer,
          FILE_CI_UART_RX_CIRC_BUFFER_SIZE,
          fmTxDataBuffer,
          FILE_CI_USART_TX_BUFFER_SIZE,
@@ -453,14 +511,12 @@ IRC_Status_t Proc_Intc_Start()
     */
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_CLINK_UART_IP2INTC_IRPT_INTR);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
-#if (!OEM_UART_IS_DEBUG_TERMINAL)
+#if (OEM_UART_ENABLED)
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR);
 #endif
 
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR);
-#if (!OEM_UART_IS_GPS)
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_GPS_UART_IP2INTC_IRPT_INTR);
-#endif
+   XIntc_Enable(&gProcIntc, GPS_INTR_ID);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FW_UART_IP2INTC_IRPT_INTR);
 
    /*
@@ -515,17 +571,9 @@ IRC_Status_t Proc_GPS_Init()
    IRC_Status_t status;
 
    status = GPS_Init(&Gps_struct,
-#if (OEM_UART_IS_GPS)
-         XPAR_OEM_UART_DEVICE_ID,
-#else
-         XPAR_AXI_GPS_UART_DEVICE_ID,
-#endif
+         GPS_DEVICE_ID,
          &gProcIntc,
-#if (OEM_UART_IS_GPS)
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR,
-#else
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_GPS_UART_IP2INTC_IRPT_INTR,
-#endif
+         GPS_INTR_ID,
          gpsRxDataCircBuffer,
          GPS_UART_RX_CIRC_BUFFER_SIZE);
 

@@ -21,13 +21,13 @@
 #include "verbose.h"
 
 #ifdef FDV_VERBOSE
-   #define FDV_PRINTF(fmt, ...)  PRINTF("FDV: " fmt, ##__VA_ARGS__)
+   #define FDV_PRINTF(fmt, ...)  FPGA_PRINTF("FDV: " fmt, ##__VA_ARGS__)
 #else
    #define FDV_PRINTF(fmt, ...)  DUMMY_PRINTF("FDV: " fmt, ##__VA_ARGS__)
 #endif
 
-#define FDV_ERR(fmt, ...)        PRINTF("FDV: Error: " fmt "\n", ##__VA_ARGS__)
-#define FDV_INF(fmt, ...)        PRINTF("FDV: Info: " fmt "\n", ##__VA_ARGS__)
+#define FDV_ERR(fmt, ...)        FPGA_PRINTF("FDV: Error: " fmt "\n", ##__VA_ARGS__)
+#define FDV_INF(fmt, ...)        FPGA_PRINTF("FDV: Info: " fmt "\n", ##__VA_ARGS__)
 #define FDV_DBG(fmt, ...)        FDV_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 

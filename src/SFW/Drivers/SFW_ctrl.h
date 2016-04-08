@@ -8,12 +8,12 @@
 #include "verbose.h"
 
 #ifdef SFW_VERBOSE
-   #define SFW_PRINTF(fmt, ...)    PRINTF("SFW: " fmt, ##__VA_ARGS__)
+   #define SFW_PRINTF(fmt, ...)    FPGA_PRINTF("SFW: " fmt, ##__VA_ARGS__)
 #else
    #define SFW_PRINTF(fmt, ...)    DUMMY_PRINTF("SFW: " fmt, ##__VA_ARGS__)
 #endif
 
-#define SFW_ERR(fmt, ...)          SFW_PRINTF("Error: " fmt "\n", ##__VA_ARGS__)
+#define SFW_ERR(fmt, ...)          FPGA_PRINTF("SFW: Error: " fmt "\n", ##__VA_ARGS__)
 #define SFW_INF(fmt, ...)          SFW_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define SFW_BRAM_SIZE           128

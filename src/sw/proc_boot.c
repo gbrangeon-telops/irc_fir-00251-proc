@@ -63,6 +63,22 @@ ledCtrl_t gLedCtrl;
 XIntc gIntc;
 qspiFlash_t gQSPIFlash;
 
+/**
+ * STDOUT definition
+ */
+#if (defined(STDOUT_BASEADDRESS) || defined(STDIN_BASEADDRESS))
+#error STDIN and STDOUT must be set to "none" in the BSP.
+#endif
+#define STDOUT_BASEADDRESS    XPAR_AXI_USB_UART_BASEADDR
+
+/**
+ * Standard outbyte function implementation
+ */
+void outbyte(char c)
+{
+   XUartNs550_SendByte(STDOUT_BASEADDRESS, c);
+}
+
 /*--------------------------------------------------------------------------------------*/
 /* main                                                                                 */
 /*--------------------------------------------------------------------------------------*/

@@ -21,13 +21,13 @@
 #include "verbose.h"
 
 #ifdef GCP_VERBOSE
-   #define GCP_PRINTF(fmt, ...)  PRINTF("GCP: " fmt, ##__VA_ARGS__)
+   #define GCP_PRINTF(fmt, ...)  FPGA_PRINTF("GCP: " fmt, ##__VA_ARGS__)
 #else
    #define GCP_PRINTF(fmt, ...)  DUMMY_PRINTF("GCP: " fmt, ##__VA_ARGS__)
 #endif
 
-#define GCP_ERR(fmt, ...)        PRINTF("GCP: Error: " fmt "\n", ##__VA_ARGS__)
-#define GCP_INF(fmt, ...)        PRINTF("GCP: Info: " fmt "\n", ##__VA_ARGS__)
+#define GCP_ERR(fmt, ...)        FPGA_PRINTF("GCP: Error: " fmt "\n", ##__VA_ARGS__)
+#define GCP_INF(fmt, ...)        FPGA_PRINTF("GCP: Info: " fmt "\n", ##__VA_ARGS__)
 #define GCP_DBG(fmt, ...)        GCP_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define GCP_REQUEST_TIMEOUT_US   TIME_ONE_SECOND_US

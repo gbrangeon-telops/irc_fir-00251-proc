@@ -23,12 +23,12 @@
 #include <stdint.h>
 
 #ifdef BUFFERING_VERBOSE
-   #define BUFFERING_PRINTF(fmt, ...)    PRINTF("BUF: " fmt, ##__VA_ARGS__)
+   #define BUFFERING_PRINTF(fmt, ...)    FPGA_PRINTF("BUF: " fmt, ##__VA_ARGS__)
 #else
    #define BUFFERING_PRINTF(fmt, ...)    DUMMY_PRINTF("BUF: " fmt, ##__VA_ARGS__)
 #endif
 
-#define BUFFERING_ERR(fmt, ...)          BUFFERING_PRINTF("Error: " fmt "\n", ##__VA_ARGS__)
+#define BUFFERING_ERR(fmt, ...)          FPGA_PRINTF("BUF: Error: " fmt "\n", ##__VA_ARGS__)
 #define BUFFERING_INF(fmt, ...)          BUFFERING_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 

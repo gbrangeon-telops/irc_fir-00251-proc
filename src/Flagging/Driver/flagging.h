@@ -10,7 +10,7 @@
 #include "GC_Registers.h"
 
 #ifdef FLAGGING_VERBOSE
-   #define FLAGGING_PRINTF(fmt, ...)  PRINTF("Flag: " fmt, ##__VA_ARGS__)
+   #define FLAGGING_PRINTF(fmt, ...)  FPGA_PRINTF("Flag: " fmt, ##__VA_ARGS__)
 #else
    #define FLAGGING_PRINTF(fmt, ...)  DUMMY_PRINTF("flag: " fmt, ##__VA_ARGS__)
 #endif

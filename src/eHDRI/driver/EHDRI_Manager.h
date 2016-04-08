@@ -8,12 +8,12 @@
 #include "verbose.h"
 
 #ifdef EHDRI_VERBOSE
-   #define EHDRI_PRINTF(fmt, ...)    PRINTF("EHDRI: " fmt, ##__VA_ARGS__)
+   #define EHDRI_PRINTF(fmt, ...)    FPGA_PRINTF("EHDRI: " fmt, ##__VA_ARGS__)
 #else
    #define EHDRI_PRINTF(fmt, ...)    DUMMY_PRINTF("EHDRI: " fmt, ##__VA_ARGS__)
 #endif
 
-#define EHDRI_ERR(fmt, ...)          EHDRI_PRINTF("Error: " fmt "\n", ##__VA_ARGS__)
+#define EHDRI_ERR(fmt, ...)          FPGA_PRINTF("EHDRI: Error: " fmt "\n", ##__VA_ARGS__)
 #define EHDRI_INF(fmt, ...)          EHDRI_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define EHDRI_BRAM_SIZE           1024

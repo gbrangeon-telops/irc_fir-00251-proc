@@ -16,14 +16,13 @@
 #include "BuiltInTestsdef.h"
 #include "BuiltInTests.h"
 #include "proc_init.h"
-#include "DebugTerminal.h"
 
 builtInTest_t builtInTests[BITID_Count] =
 {
    {BITID_BuiltInTestsGlobalResult, "", BuiltInTest_UpdateGlobalResult, BITR_Pending},
-   {BITID_BuiltInTestsVerification, "", BuiltInTest_Check, BITR_Pending},
-   {BITID_DebugTerminalInitialization, "", DebugTerminal_Init, BITR_Pending},
-   {BITID_TimerInitialization, "", Proc_Timer_Init, BITR_Pending},
+   {BITID_BuiltInTestsVerification, "Verifying built-in tests", BuiltInTest_Check, BITR_Pending},
+   {BITID_DebugTerminalInitialization, "Initializing debug terminal", Proc_DebugTerminal_InitPhase2, BITR_Pending},
+   {BITID_TimerInitialization, "Initializing timer", Proc_Timer_Init, BITR_Pending},
    {BITID_InterruptControllerInitialization, "Initializing interrupt controller", Proc_Intc_Init, BITR_Pending},
    {BITID_NetworkInterfaceInitialization, "Initializing network interface", Proc_NI_Init, BITR_Pending},
    {BITID_GenICamManagerInitialization, "Initializing GenICam manager", Proc_GC_Init, BITR_Pending},

@@ -17,7 +17,7 @@
 #define FILE_MANAGER_H
 
 #include "CtrlInterface.h"
-#include "circularBuffer.h"
+#include "CircularBuffer.h"
 #include "CalibCollectionFile.h"
 #include "CalibBlockFile.h"
 #include "NetworkInterface.h"
@@ -30,13 +30,13 @@
 
 
 #ifdef FM_VERBOSE
-   #define FM_PRINTF(fmt, ...)   PRINTF("FM: " fmt, ##__VA_ARGS__)
+   #define FM_PRINTF(fmt, ...)   FPGA_PRINTF("FM: " fmt, ##__VA_ARGS__)
 #else
    #define FM_PRINTF(fmt, ...)   DUMMY_PRINTF("FM: " fmt, ##__VA_ARGS__)
 #endif
 
-#define FM_ERR(fmt, ...)         PRINTF("FM: Error: " fmt "\n", ##__VA_ARGS__)
-#define FM_INF(fmt, ...)         PRINTF("FM: Info: " fmt "\n", ##__VA_ARGS__)
+#define FM_ERR(fmt, ...)         FPGA_PRINTF("FM: Error: " fmt "\n", ##__VA_ARGS__)
+#define FM_INF(fmt, ...)         FPGA_PRINTF("FM: Info: " fmt "\n", ##__VA_ARGS__)
 #define FM_DBG(fmt, ...)         FM_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define FM_MAX_NUM_FILE          128    /**< Maximum number of file */

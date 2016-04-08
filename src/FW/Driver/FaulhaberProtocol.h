@@ -28,24 +28,24 @@
 #include <stdbool.h>
 
 #ifdef FH_VERBOSE
-   #define FH_PRINTF(fmt, ...)   PRINTF("FH: " fmt, ##__VA_ARGS__)
+   #define FH_PRINTF(fmt, ...)   FPGA_PRINTF("FH: " fmt, ##__VA_ARGS__)
 #else
    #define FH_PRINTF(fmt, ...)   DUMMY_PRINTF("FH: " fmt, ##__VA_ARGS__)
 #endif
 
 #ifdef FH_RX_VERBOSE
-   #define FH_TRX(fmt, ...)         PRINTF(fmt, ##__VA_ARGS__)
+   #define FH_TRX(fmt, ...)      PRINTF(fmt, ##__VA_ARGS__)
 #else
    #define FH_TRX(fmt, ...)      DUMMY_PRINTF(fmt, ##__VA_ARGS__)
 #endif
 
 #ifdef FH_TX_VERBOSE
-   #define FH_TTX(fmt, ...)         PRINTF(fmt, ##__VA_ARGS__)
+   #define FH_TTX(fmt, ...)      PRINTF(fmt, ##__VA_ARGS__)
 #else
    #define FH_TTX(fmt, ...)      DUMMY_PRINTF(fmt, ##__VA_ARGS__)
 #endif
 
-#define FH_ERR(fmt, ...)         PRINTF("FH: Error: " fmt "\n", ##__VA_ARGS__)
+#define FH_ERR(fmt, ...)         FPGA_PRINTF("FH: Error: " fmt "\n", ##__VA_ARGS__)
 #define FH_WARN(fmt, ...)        FH_PRINTF("Warning: " fmt "\n", ##__VA_ARGS__)
 #define FH_INF(fmt, ...)         FH_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 

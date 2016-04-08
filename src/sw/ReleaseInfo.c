@@ -41,7 +41,7 @@ IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo
    } while (status == IRC_NOT_DONE);
    if (status != IRC_SUCCESS)
    {
-      PRINT("Release information QSPI flash page read failed.\n");
+      RI_ERR("Release information QSPI flash page read failed.");
       return IRC_FAILURE;
    }
 
@@ -53,7 +53,7 @@ IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo
 
    if (releaseInfo->length != RELEASEINFO_LENGTH)
    {
-      PRINTF("Wrong release information length (%d).\n", releaseInfo->length);
+      RI_ERR("Wrong release information length (%d).", releaseInfo->length);
       return IRC_FAILURE;
    }
 
@@ -69,7 +69,7 @@ IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo
          (releaseInfo->versionMinor != RELEASEINFO_MINOR_VERSION) ||
          (releaseInfo->versionSubMinor != RELEASEINFO_SUBMINOR_VERSION))
    {
-      PRINTF("Wrong release information version (%d.%d.&d).\n",
+      RI_ERR("Wrong release information version (%d.%d.&d).",
             releaseInfo->versionMajor, releaseInfo->versionMinor, releaseInfo->versionSubMinor);
       return IRC_FAILURE;
    }
@@ -171,21 +171,21 @@ IRC_Status_t ReleaseInfo_Validate(releaseInfo_t *releaseInfo)
  */
 void ReleaseInfo_Print(releaseInfo_t *releaseInfo)
 {
-   PRINTF("Firmware version: %s\n", gcRegsData.DeviceVersion);
-   PRINTF("Processing FPGA hardware revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGAHardwareRevision]);
-   PRINTF("Processing FPGA software revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGASoftwareRevision]);
-   PRINTF("Processing FPGA boot loader revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGABootLoaderRevision]);
-   PRINTF("Processing FPGA common revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGACommonRevision]);
-   PRINTF("Output FPGA hardware revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGAHardwareRevision]);
-   PRINTF("Output FPGA software revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGASoftwareRevision]);
-   PRINTF("Output FPGA boot loader revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGABootLoaderRevision]);
-   PRINTF("Output FPGA common revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGACommonRevision]);
+   RI_INF("Firmware version: %s", gcRegsData.DeviceVersion);
+   RI_INF("Processing FPGA hardware revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGAHardwareRevision]);
+   RI_INF("Processing FPGA software revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGASoftwareRevision]);
+   RI_INF("Processing FPGA boot loader revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGABootLoaderRevision]);
+   RI_INF("Processing FPGA common revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGACommonRevision]);
+   RI_INF("Output FPGA hardware revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGAHardwareRevision]);
+   RI_INF("Output FPGA software revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGASoftwareRevision]);
+   RI_INF("Output FPGA boot loader revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGABootLoaderRevision]);
+   RI_INF("Output FPGA common revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGACommonRevision]);
    if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
    {
-      PRINTF("Storage FPGA hardware revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGAHardwareRevision]);
-      PRINTF("Storage FPGA software revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGASoftwareRevision]);
-      PRINTF("Storage FPGA boot loader revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGABootLoaderRevision]);
-      PRINTF("Storage FPGA common revision: %d\n", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGACommonRevision]);
+      RI_INF("Storage FPGA hardware revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGAHardwareRevision]);
+      RI_INF("Storage FPGA software revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGASoftwareRevision]);
+      RI_INF("Storage FPGA boot loader revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGABootLoaderRevision]);
+      RI_INF("Storage FPGA common revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGACommonRevision]);
    }
-   PRINTF("XML version: %d.%d.%d\n", gcRegsData.DeviceXMLMajorVersion, gcRegsData.DeviceXMLMinorVersion, gcRegsData.DeviceXMLSubMinorVersion);
+   RI_INF("XML version: %d.%d.%d", gcRegsData.DeviceXMLMajorVersion, gcRegsData.DeviceXMLMinorVersion, gcRegsData.DeviceXMLSubMinorVersion);
 }

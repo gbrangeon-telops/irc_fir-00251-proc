@@ -21,14 +21,14 @@
 #include "verbose.h"
 
 #ifdef FS_VERBOSE
-   #define FS_PRINTF(fmt, ...)  PRINTF("FS: " fmt, ##__VA_ARGS__)
+   #define FS_PRINTF(fmt, ...)   FPGA_PRINTF("FS: " fmt, ##__VA_ARGS__)
 #else
-   #define FS_PRINTF(fmt, ...)  DUMMY_PRINTF("FS: " fmt, ##__VA_ARGS__)
+   #define FS_PRINTF(fmt, ...)   DUMMY_PRINTF("FS: " fmt, ##__VA_ARGS__)
 #endif
 
-#define FS_ERR(fmt, ...)        PRINTF("FS: Error: " fmt "\n", ##__VA_ARGS__)
-#define FS_INF(fmt, ...)        PRINTF("FS: Info: " fmt "\n", ##__VA_ARGS__)
-#define FS_DBG(fmt, ...)        FS_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
+#define FS_ERR(fmt, ...)         FPGA_PRINTF("FS: Error: " fmt "\n", ##__VA_ARGS__)
+#define FS_INF(fmt, ...)         FPGA_PRINTF("FS: Info: " fmt "\n", ##__VA_ARGS__)
+#define FS_DBG(fmt, ...)         FS_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define FS_MAX_SPARE_FREE_SPACE_READ_BYTES   512
 

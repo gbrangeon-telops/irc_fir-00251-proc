@@ -24,14 +24,14 @@
 #include "verbose.h"
 
 #ifdef PM_VERBOSE
-   #define PM_PRINTF(fmt, ...)  PRINTF("PM: " fmt, ##__VA_ARGS__)
+   #define PM_PRINTF(fmt, ...)   FPGA_PRINTF("PM: " fmt, ##__VA_ARGS__)
 #else
-   #define PM_PRINTF(fmt, ...)  DUMMY_PRINTF("PM: " fmt, ##__VA_ARGS__)
+   #define PM_PRINTF(fmt, ...)   DUMMY_PRINTF("PM: " fmt, ##__VA_ARGS__)
 #endif
 
-#define PM_ERR(fmt, ...)        PRINTF("PM: Error: " fmt "\n", ##__VA_ARGS__)
-#define PM_INF(fmt, ...)        PRINTF("PM: Info: " fmt "\n", ##__VA_ARGS__)
-#define PM_DBG(fmt, ...)        PM_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
+#define PM_ERR(fmt, ...)         FPGA_PRINTF("PM: Error: " fmt "\n", ##__VA_ARGS__)
+#define PM_INF(fmt, ...)         FPGA_PRINTF("PM: Info: " fmt "\n", ##__VA_ARGS__)
+#define PM_DBG(fmt, ...)         PM_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define POWER_UPDATE_CAMERA_LED_STATE_PERIOD_US    TIME_ONE_SECOND_US
 

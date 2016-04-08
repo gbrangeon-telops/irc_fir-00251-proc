@@ -20,6 +20,9 @@
 #include "IRC_Status.h"
 #include "proc_prom.h"
 
+#define RI_ERR(fmt, ...)         FPGA_PRINTF("RI: Error: " fmt "\n", ##__VA_ARGS__)
+#define RI_INF(fmt, ...)         FPGA_PRINTF("RI: Info: " fmt "\n", ##__VA_ARGS__)
+
 /**
  * Release information page index in QPSI flash memory
  */

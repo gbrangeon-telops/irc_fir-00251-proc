@@ -45,6 +45,7 @@
 #include "NetworkInterface.h"
 #include "DeviceKey.h"
 #include "StackUtils.h"
+#include "verbose.h"
 
 #define DEVICE_RUNNING_TIME_REFRESH_PERIOD_US   TIME_ONE_MINUTE_US
 
@@ -121,23 +122,26 @@ void disable_caches()
    Stack_FillRemaining();
 
    resetStats(&prof_stats);
-   
+
+   Proc_DebugTerminal_InitPhase1();
+
+   FPGA_PRINT("TSIR starting...\n");
+
 #ifdef SIM
    (*global_trans_ptr)->initialize();  // Initialize the SystemC ports
 #endif
 
    BuiltInTest_Execute(BITID_BuiltInTestsVerification);
-   BuiltInTest_Execute(BITID_DebugTerminalInitialization);
 
 #ifndef SIM
    BuiltInTest_Execute(BITID_TimerInitialization);
 #endif
 
    WAIT_US(30);
-   PRINTF("TSIR starting...\n");
 
    BuiltInTest_Execute(BITID_InterruptControllerInitialization);
    BuiltInTest_Execute(BITID_NetworkInterfaceInitialization);
+   BuiltInTest_Execute(BITID_DebugTerminalInitialization);
    BuiltInTest_Execute(BITID_GenICamManagerInitialization);
    BuiltInTest_Execute(BITID_PowerManagerInitialization);
    BuiltInTest_Execute(BITID_LedControllerInitialization);
@@ -172,13 +176,13 @@ void disable_caches()
 
    if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
    {
-      PRINTF("Error: Failed to update flash dynamic values.\n");
+      FPGA_PRINT("Error: Failed to update flash dynamic values.\n");
    }
 
    // Validate device key
    if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
    {
-      PRINTF("Error: Device key is not valid.\n");
+      FPGA_PRINT("Error: Device key is not valid.\n");
    }
 
    TDCStatusClr(WaitingForInitMask);
@@ -194,7 +198,7 @@ void disable_caches()
       {
          GETTIME(&tic);
 
-         PRINTF("Still Alive\n");
+         FPGA_PRINT("Still Alive\n");
 
          // Update Device Running Time
          gFlashDynamicValues.DeviceRunningTime += DEVICE_RUNNING_TIME_REFRESH_PERIOD_US / 1000000;
@@ -208,7 +212,7 @@ void disable_caches()
 
          if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
          {
-            PRINTF("Error: Failed to update flash dynamic values.\n");
+            FPGA_PRINT("Error: Failed to update flash dynamic values.\n");
          }
 
          // Check for device key expiration
@@ -218,7 +222,7 @@ void disable_caches()
             // Renew device key and revalidate it
             DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
             DeviceKey_Validate(&flashSettings, &gFlashDynamicValues);
-            PRINTF("Error: Device key is expired.\n");
+            FPGA_PRINT("Error: Device key is expired.\n");
          }
 
          resetStats(&prof_stats);
@@ -234,7 +238,7 @@ void disable_caches()
       TempMonitor_SM();
       Acquisition_SM();
       BufferManager_SM();
-      DebugTerminal_SM();
+      DebugTerminal_Process();
       Power_SM();
       Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 0);
       Led_ToggleDebugLedState(&gLedCtrl);

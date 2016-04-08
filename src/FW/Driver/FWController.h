@@ -21,12 +21,12 @@
 #include "FlashSettings.h"
 
 #ifdef FW_VERBOSE
-   #define FW_PRINTF(fmt, ...)   PRINTF("FilterWheel: " fmt, ##__VA_ARGS__)
+   #define FW_PRINTF(fmt, ...)   FPGA_PRINTF("FilterWheel: " fmt, ##__VA_ARGS__)
 #else
    #define FW_PRINTF(fmt, ...)   DUMMY_PRINTF("FilterWheel: " fmt, ##__VA_ARGS__)
 #endif
 
-#define FW_ERR(fmt, ...)         PRINTF("FilterWheel: Error: " fmt "\n", ##__VA_ARGS__)
+#define FW_ERR(fmt, ...)         FPGA_PRINTF("FilterWheel: Error: " fmt "\n", ##__VA_ARGS__)
 #define FW_INF(fmt, ...)         FW_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define FAULHABER_MAX_IDLE_SPEED          10    // rpm

@@ -25,13 +25,13 @@
 #include "verbose.h"
 
 #ifdef CAL_VERBOSE
-   #define CAL_PRINTF(fmt, ...)  PRINTF("CAL: " fmt, ##__VA_ARGS__)
+   #define CAL_PRINTF(fmt, ...)  FPGA_PRINTF("CAL: " fmt, ##__VA_ARGS__)
 #else
    #define CAL_PRINTF(fmt, ...)  DUMMY_PRINTF("CAL: " fmt, ##__VA_ARGS__)
 #endif
 
-#define CAL_ERR(fmt, ...)        PRINTF("CAL: Error: " fmt "\n", ##__VA_ARGS__)
-#define CAL_INF(fmt, ...)        PRINTF("CAL: Info: " fmt "\n", ##__VA_ARGS__)
+#define CAL_ERR(fmt, ...)        FPGA_PRINTF("CAL: Error: " fmt "\n", ##__VA_ARGS__)
+#define CAL_INF(fmt, ...)        FPGA_PRINTF("CAL: Info: " fmt "\n", ##__VA_ARGS__)
 #define CAL_DBG(fmt, ...)        CAL_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 /************************** Constant Definitions ****************************/

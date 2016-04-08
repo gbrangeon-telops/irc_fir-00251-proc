@@ -25,13 +25,13 @@
 #include <stdint.h>
 
 #ifdef GPS_VERBOSE
-   #define GPS_PRINTF(fmt, ...)  PRINTF("GPS: " fmt, ##__VA_ARGS__)
+   #define GPS_PRINTF(fmt, ...)  FPGA_PRINTF("GPS: " fmt, ##__VA_ARGS__)
 #else
    #define GPS_PRINTF(fmt, ...)  DUMMY_PRINTF("GPS: " fmt, ##__VA_ARGS__)
 #endif
 
-#define GPS_ERR(fmt, ...)        PRINTF("GPS: Error: " fmt "\n", ##__VA_ARGS__)
-#define GPS_INF(fmt, ...)        PRINTF("GPS: Info: " fmt "\n", ##__VA_ARGS__)
+#define GPS_ERR(fmt, ...)        FPGA_PRINTF("GPS: Error: " fmt "\n", ##__VA_ARGS__)
+#define GPS_INF(fmt, ...)        FPGA_PRINTF("GPS: Info: " fmt "\n", ##__VA_ARGS__)
 #define GPS_DBG(fmt, ...)        GPS_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 // This only works if you are sure you have an upper case hex digit

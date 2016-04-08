@@ -19,12 +19,12 @@
 #include <stdbool.h>
 
 #ifdef NDF_VERBOSE
-   #define NDF_PRINTF(fmt, ...)   PRINTF("NDF: " fmt, ##__VA_ARGS__)
+   #define NDF_PRINTF(fmt, ...)   FPGA_PRINTF("NDF: " fmt, ##__VA_ARGS__)
 #else
    #define NDF_PRINTF(fmt, ...)   DUMMY_PRINTF("NDF: " fmt, ##__VA_ARGS__)
 #endif
 
-#define NDF_ERR(fmt, ...)         PRINTF("NDF: Error: " fmt "\n", ##__VA_ARGS__)
+#define NDF_ERR(fmt, ...)         FPGA_PRINTF("NDF: Error: " fmt "\n", ##__VA_ARGS__)
 #define NDF_INF(fmt, ...)         NDF_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define NDF_INIT_TIMEOUT            1000 // ms : Long timeout because FAULHABER controller may start a few seconds after CLink board
