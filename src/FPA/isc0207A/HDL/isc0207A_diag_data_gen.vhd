@@ -59,7 +59,7 @@ architecture rtl of isc0207_diag_data_gen is
          CLK : in std_logic);
    end component;
    
-   component clk_divider_asyn is
+   component Clk_Divider_Async is
       Generic(	
          Factor : integer := 2);		
       Port ( 
@@ -155,7 +155,7 @@ begin
    -- 16 channels diag data gen 
    -------------------------------------------------- 
    -- sampling clk enable
-   UCa: clk_divider_asyn
+   UCa: Clk_Divider_Async
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_FACTOR
       )
@@ -339,7 +339,7 @@ begin
    --------------------------------------------------------
    -- Genereteur d'impulsion de 2 secondes environ de periode
    -------------------------------------------------------- 
-   U4: clk_divider_asyn
+   U4: Clk_Divider_Async
    Generic map(
       Factor=> 200_000_000
       -- pragma translate_off

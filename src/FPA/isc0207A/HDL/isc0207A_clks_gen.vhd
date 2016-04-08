@@ -46,7 +46,7 @@ architecture rtl of isc0207A_clks_gen is
          CLK    : in std_logic);
    end component;
    
-   component clk_divider_asyn is
+   component Clk_Divider_Async is
       Generic(	
          Factor : integer := 2);		
       Port ( 
@@ -89,7 +89,7 @@ begin
    --------------------------------------------------------
    -- Genereteur clock enable pour le détecteur
    -------------------------------------------------------- 
-   U2A: clk_divider_asyn
+   U2A: Clk_Divider_Async
    Generic map(
       Factor=> DEFINE_FPA_MCLK_RATE_FACTOR
       )
@@ -110,7 +110,7 @@ begin
    -- Genereteur clock des adcs quads
    -------------------------------------------------------- 
    -- clock par defaut
-   U3A: clk_divider_asyn
+   U3A: Clk_Divider_Async
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_DEFAULT_FACTOR
       )
@@ -121,7 +121,7 @@ begin
       );   
    
    --   clock reelle utilisable après vérification des limites de la carte ADC
-   U3B: clk_divider_asyn
+   U3B: Clk_Divider_Async
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_FACTOR
       )
