@@ -58,6 +58,7 @@
 #include "flagging.h"
 #include "gating.h"
 #include "DebugTerminal.h"
+#include "DeviceKey.h"
 #include <string.h>
 
 
@@ -885,4 +886,16 @@ IRC_Status_t Proc_BufferManager_Init()
 IRC_Status_t Proc_Timer_Init()
 {
    return Timer_Init(XPAR_TMRCTR_0_BASEADDR, XPAR_TMRCTR_0_CLOCK_FREQ_HZ);
+}
+
+
+/**
+ * Device key validation.
+ *
+ * @return IRC_SUCCESS if device key is valid.
+ * @return IRC_FAILURE if device key is not valid.
+ */
+IRC_Status_t Proc_DeviceKeyValidation()
+{
+   return DeviceKey_Validate(&flashSettings, &gFlashDynamicValues);
 }

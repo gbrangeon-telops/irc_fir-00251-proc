@@ -33,6 +33,7 @@
 #include "trig_gen.h"
 #include "DeviceKey.h"
 #include "GC_Poller.h"
+#include "BuiltInTests.h"
 #include <stdbool.h>
 #include <time.h>
 #include <string.h>
@@ -1452,10 +1453,12 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
       if (strcasecmp((char *)argStr, "RENEW") == 0)
       {
          DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
+         BuiltInTest_Execute(BITID_DeviceKeyValidation);
       }
       else if (strcasecmp((char *)argStr, "RESET") == 0)
       {
          DeviceKey_Reset(&gFlashDynamicValues, &gcRegsData);
+         BuiltInTest_Execute(BITID_DeviceKeyValidation);
       }
       else
       {
@@ -1466,7 +1469,7 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
 
    DT_PRINTF("Device key:            0x%08X%08X", flashSettings.DeviceKeyHigh, flashSettings.DeviceKeyLow);
    DT_PRINTF("Device key validation: 0x%08X%08X (%s)", gcRegsData.DeviceKeyValidationHigh, gcRegsData.DeviceKeyValidationLow,
-         (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS)? "Passed" : "Failed");
+         (builtInTests[BITID_DeviceKeyValidation].result == BITR_Passed)? "Passed" : "Failed");
    DT_PRINTF("Device key expiration: %d%d (0x%08X)", flashSettings.DeviceKeyExpirationPOSIXTime / 10,
          flashSettings.DeviceKeyExpirationPOSIXTime % 10, flashSettings.DeviceKeyExpirationPOSIXTime);
 

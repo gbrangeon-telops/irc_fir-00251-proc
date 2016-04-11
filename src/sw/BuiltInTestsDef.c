@@ -60,5 +60,6 @@ builtInTest_t builtInTests[BITID_Count] =
    {BITID_Cooldown, "", NULL, BITR_NotApplicable},
    {BITID_ActualizationDataAcquisition, "", NULL, BITR_NotApplicable},
    {BITID_FlashSettingsFileLoading, "", NULL, BITR_NotApplicable},
-   {BITID_CalibrationFilesLoading, "", NULL, BITR_NotApplicable}
+   {BITID_CalibrationFilesLoading, "", NULL, BITR_NotApplicable},
+   {BITID_DeviceKeyValidation, "Device key validation", Proc_DeviceKeyValidation, BITR_Pending}
 };

@@ -55,18 +55,15 @@ enum builtInTestIDEnum {
    BITID_NetworkHostsReady,
    BITID_NetworkHostsSynchronization,
    BITID_FirmwareRevisionsConsistency,
-
-   // Sensor built-in tests
    BITID_SensorControllerInitialization,
    BITID_SensorControllerDetection,
    BITID_CoolerVoltageVerification,
    BITID_CoolerCurrentVerification,
    BITID_Cooldown,
    BITID_ActualizationDataAcquisition,
-
-   // File loading built-in tests
    BITID_FlashSettingsFileLoading,
    BITID_CalibrationFilesLoading,
+   BITID_DeviceKeyValidation,
 
    // Built-in test count
    BITID_Count

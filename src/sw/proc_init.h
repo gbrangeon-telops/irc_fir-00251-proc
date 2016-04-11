@@ -118,5 +118,6 @@ IRC_Status_t Proc_ICU_Init();
 IRC_Status_t Proc_XADC_Init();
 IRC_Status_t Proc_BufferManager_Init();
 IRC_Status_t Proc_Timer_Init();
+IRC_Status_t Proc_DeviceKeyValidation();
 
 #endif // PROC_INIT_H

@@ -168,6 +168,7 @@ void disable_caches()
    BuiltInTest_Execute(BITID_FlashDynamicValuesInitialization);
    BuiltInTest_Execute(BITID_InterruptControllerStartup);
    BuiltInTest_Execute(BITID_FirmwareReleaseInfoInitialization);
+   BuiltInTest_Execute(BITID_DeviceKeyValidation);
 
    Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 1);
 
@@ -177,12 +178,6 @@ void disable_caches()
    if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
    {
       FPGA_PRINT("Error: Failed to update flash dynamic values.\n");
-   }
-
-   // Validate device key
-   if (DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) != IRC_SUCCESS)
-   {
-      FPGA_PRINT("Error: Device key is not valid.\n");
    }
 
    TDCStatusClr(WaitingForInitMask);
@@ -216,13 +211,13 @@ void disable_caches()
          }
 
          // Check for device key expiration
-         if ((DeviceKey_Validate(&flashSettings, &gFlashDynamicValues) == IRC_SUCCESS) &&
+         if ((builtInTests[BITID_DeviceKeyValidation].result == BITR_Passed) &&
                (GC_GetTimestamp() > flashSettings.DeviceKeyExpirationPOSIXTime))
          {
-            // Renew device key and revalidate it
-            DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
-            DeviceKey_Validate(&flashSettings, &gFlashDynamicValues);
+            // Renew device key
             FPGA_PRINT("Error: Device key is expired.\n");
+            DeviceKey_Renew(&gFlashDynamicValues, &gcRegsData);
+            BuiltInTest_Execute(BITID_DeviceKeyValidation);
          }
 
          resetStats(&prof_stats);

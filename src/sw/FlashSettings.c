@@ -1761,7 +1761,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern t_FpaIntf gFpaIntf;
    extern bool gDisableFilterWheel;
-   extern flashDynamicValues_t gFlashDynamicValues;
    uint8_t externalMemoryBufferDetected = BufferManager_DetectExternalMemoryBuffer();
 
    // Update device serial number
@@ -1872,7 +1871,10 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gcRegsData.ExternalFanSpeedSetpoint = p_flashSettings->ExternalFanSpeedSetpoint;
 
    // Validate device key
-   DeviceKey_Validate(p_flashSettings, &gFlashDynamicValues);
+   if (builtInTests[BITID_FlashDynamicValuesInitialization].result == BITR_Passed)
+   {
+      BuiltInTest_Execute(BITID_DeviceKeyValidation);
+   }
 
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))
