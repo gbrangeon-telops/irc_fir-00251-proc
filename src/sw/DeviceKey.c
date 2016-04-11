@@ -18,6 +18,15 @@
 #include "trig_gen.h"
 #include "CRC.h"
 
+/**
+ * Validate device key using device key validation code.
+ *
+ * @param p_flashSettings is the pointer to the flash settings data structure.
+ * @param p_flashDynamicValues is the pointer to the flash dynamic values data structure.
+ *
+ * @return IRC_SUCCESS if device key is valid.
+ * @return IRC_FAILURE if device key is not valid.
+ */
 IRC_Status_t DeviceKey_Validate(flashSettings_t *p_flashSettings, flashDynamicValues_t *p_flashDynamicValues)
 {
    extern uint8_t gPowerOnIsAllowed;
@@ -53,6 +62,15 @@ IRC_Status_t DeviceKey_Validate(flashSettings_t *p_flashSettings, flashDynamicVa
    return IRC_SUCCESS;
 }
 
+/**
+ * Renew device key and update device validation code (flash dynamic values and GenIcam registers).
+ *
+ * @param p_flashDynamicValues is the pointer to the flash dynamic values data structure.
+ * @param p_gcRegsData is the pointer to the GenICam registers data structure.
+ *
+ * @return IRC_SUCCESS if successfully renewed device key.
+ * @return IRC_FAILURE if failed to renew device key.
+ */
 IRC_Status_t DeviceKey_Renew(flashDynamicValues_t *p_flashDynamicValues, gcRegistersData_t *p_gcRegsData)
 {
    extern t_Trig gTrig;
@@ -111,6 +129,15 @@ IRC_Status_t DeviceKey_Renew(flashDynamicValues_t *p_flashDynamicValues, gcRegis
    return IRC_SUCCESS;
 }
 
+/**
+ * Reset device validation code to its default value (flash dynamic values and GenIcam registers).
+ *
+ * @param p_flashDynamicValues is the pointer to the flash dynamic values data structure.
+ * @param p_gcRegsData is the pointer to the GenICam registers data structure.
+ *
+ * @return IRC_SUCCESS if successfully reset device key.
+ * @return IRC_FAILURE if failed to reset device key.
+ */
 IRC_Status_t DeviceKey_Reset(flashDynamicValues_t *p_flashDynamicValues, gcRegistersData_t *p_gcRegsData)
 {
    extern flashDynamicValues_t flashDynamicValuesDefault;
