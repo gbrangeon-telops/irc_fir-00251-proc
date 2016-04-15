@@ -538,7 +538,10 @@ IRC_Status_t Proc_Intc_Start()
    /*
     * Enable the interrupt for the power push button.
     */
+#ifndef STARTUP
+   // Pushbutton interrupt is disabled for Startup tests
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+#endif
 
    /*
     * Initialize the exception table.

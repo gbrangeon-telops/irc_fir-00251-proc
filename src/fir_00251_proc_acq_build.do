@@ -78,7 +78,10 @@ do D:\Telops\FIR-00251-Proc\src\Flagging\HDL\flagging_compile.do
 do D:\Telops\FIR-00251-Proc\src\Gating\HDL\gating_compile.do
 
 #SFW
-do D:\Telops\FIR-00251-Proc\src\SFW\HDL\build_SFW.do
+do D:\Telops\FIR-00251-Proc\src\SFW\HDL\build_SFW.do 
+
+#Startup Hardware
+acom D:\Telops\FIR-00251-Proc\src\startup\HDL\Startup_HW_Test.vhd -relax
 
 #CORE
 #acom  "$FIR251PROC\xilinx\scorpiolwD\fir_00251_proc_scorpiolwD.srcs\sources_1\bd\core\hdl\core.vhd"

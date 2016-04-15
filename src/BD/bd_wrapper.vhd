@@ -78,6 +78,8 @@ entity bd_wrapper is
    GPS_UART_SOUT : out STD_LOGIC;
    FW_UART_OUT : out t_uartns550_out;
    FW_UART_IN : in t_uartns550_in;
+    NDF_UART_rxd : in STD_LOGIC;
+    NDF_UART_txd : out STD_LOGIC;
 
    LED_GPIO_tri_o : out STD_LOGIC_VECTOR ( 3 downto 0 );
 	POWER_GPIO : inout STD_LOGIC_VECTOR ( 10 downto 0 );
@@ -165,9 +167,8 @@ entity bd_wrapper is
     AXIS_USART_TX_MISO : in t_axi4_stream_miso;
 
     
-    CALDDR_S2MM_ACLK :  in std_logic;
-
-    
+    CALDDR_S2MM_ACLK :  in std_logic;		  	   
+	
     --QSPI
     qspi_io0_io : inout STD_LOGIC;
     qspi_io1_io : inout STD_LOGIC;
@@ -608,6 +609,20 @@ component core_wrapper is
     M_ICU_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
     M_ICU_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
     M_ICU_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    NDF_UART_baudoutn : out STD_LOGIC;
+    NDF_UART_ctsn : in STD_LOGIC;
+    NDF_UART_dcdn : in STD_LOGIC;
+    NDF_UART_ddis : out STD_LOGIC;
+    NDF_UART_dsrn : in STD_LOGIC;
+    NDF_UART_dtrn : out STD_LOGIC;
+    NDF_UART_out1n : out STD_LOGIC;
+    NDF_UART_out2n : out STD_LOGIC;
+    NDF_UART_ri : in STD_LOGIC;
+    NDF_UART_rtsn : out STD_LOGIC;
+    NDF_UART_rxd : in STD_LOGIC;
+    NDF_UART_rxrdyn : out STD_LOGIC;
+    NDF_UART_txd : out STD_LOGIC;
+    NDF_UART_txrdyn : out STD_LOGIC;
     NLC_LUT_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
     NLC_LUT_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
     NLC_LUT_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
@@ -1392,6 +1407,15 @@ port map (
     qspi_io2_io => qspi_io2_io,
     qspi_io3_io => qspi_io3_io,
     qspi_ss_io(0) => qspi_ss_io,
+    				   
+    NDF_UART_rxd => NDF_UART_rxd,
+    NDF_UART_txd => NDF_UART_txd,
+
+    NDF_UART_ctsn => '1',
+    NDF_UART_dcdn => '1',
+    NDF_UART_dsrn => '1',
+    NDF_UART_ri=> '1',
+
   --aec intc
   AEC_INTC(0) => AEC_INTC
 );											

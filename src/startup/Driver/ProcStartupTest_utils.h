@@ -1,0 +1,120 @@
+/**
+ * @file ProcStartupTest_utils.h
+ * Processing FPGA Startup Test utilities definition
+ *
+ * This file defines the Startup Test tools used for various functionality tests
+ *
+ * $Rev: 17659 $
+ * $Author: dalain $
+ * $Date: 2015-12-10 11:42:57 -0500 (jeu., 10 déc. 2015) $
+ * $Id: DebugTerminal.h 17659 2015-12-10 16:42:57Z dalain $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/trunk/src/sw/DebugTerminal.h $
+ *
+ * (c) Copyright 2016 Telops Inc.
+ */
+
+
+#ifndef AUTOTEST_UTILS_H_
+#define AUTOTEST_UTILS_H_
+
+
+// Included standard libraries
+#include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
+#include <time.h>
+#include <stdlib.h>
+
+// Included XILINX-defined headers
+#include "xil_types.h"
+
+// Included TELOPS-defined headers
+#include "utils.h"
+#include "IRC_status.h"
+#include "verbose.h"
+#include "GC_Registers.h"
+
+#include "ProcStartupTest_Def.h"
+
+#define ONE_SECOND_US            1000000
+
+#define ATR_ERR(fmt, ...)        PRINTF("\nATR> Error: " fmt, ##__VA_ARGS__)
+#define ATR_INF(fmt, ...)        PRINTF("\nATR> Info: " fmt, ##__VA_ARGS__)
+#define ATR_PRINTF(fmt, ...)     PRINTF("\nATR> " fmt, ##__VA_ARGS__)
+#define ATR_PRINT(fmt, ...)      PRINTF("\nATR> " fmt, ##__VA_ARGS__)
+
+#ifdef ATR_VERBOSE
+   #define ATR_DBG(fmt, ...)     PRINTF("\nATR> Debug: " fmt, ##__VA_ARGS__)
+#else
+   #define ATR_DBG(fmt, ...)     DUMMY_PRINTF("\nATR> Debug: " fmt, ##__VA_ARGS__)
+#endif
+
+// Global variables broadcasting
+extern volatile bool isRunningATR;
+extern volatile bool waitingForNULL;
+extern volatile bool waitingForYN;
+extern volatile bool userAns;
+extern volatile bool waitingForTI;
+extern volatile bool waitingForTR;
+extern volatile bool exitUnitaryTests;
+extern volatile bool breakBatchMode;
+extern volatile IRC_Status_t oTestResult;
+extern volatile int32_t unitaryTestIndex;
+
+// XADC Measurements storage variables
+enum XADC_MeasurementEnum {
+   VOLTAGE_COOLER,
+   CURRENT_COOLER,
+   VOLTAGE_24V,
+   CURRENT_24V,
+   INTERNAL_LENS_TEMP,
+   EXTERNAL_LENS_TEMP,
+   ICU_TEMP,
+   SFW_TEMP,
+   COMPRESSOR_TEMP,
+   COLDFINGER_TEMP,
+   SPARE_TEMP,
+   EXTERNAL_TEMP,
+   VOLTAGE_USB_BUS,
+   VOLTAGE_USB_1V8,
+   VOLTAGE_DDR3_REF,
+   VOLTAGE_GIGE,
+   VOLTAGE_AUX_IO_PROC,
+   VOLTAGE_AUX_IO_OUT,
+   VOLTAGE_3V3,
+   VOLTAGE_2V5,
+   VOLTAGE_1V8,
+   VOLTAGE_1V5,
+   VOLTAGE_MGT_1V0,
+   VOLTAGE_MGT_1V2,
+   VOLTAGE_12V,
+   VOLTAGE_5V,
+   FPGA_INTERNAL_TEMP,
+   FPGA_VCCINT,
+   FPGA_AUX_VCC,
+   FPGA_VREF_POS,
+   FPGA_VREF_NEG,
+   FPGA_BRAM,
+
+   XADC_CHANNEL_COUNT
+};
+
+#define XADC_MEASUREMENT_PWR_IDX          0
+#define XADC_MEASUREMENT_EXT_INTF_IDX     INTERNAL_LENS_TEMP
+#define XADC_MEASUREMENT_EXT_VOLT_IDX     VOLTAGE_AUX_IO_PROC
+#define XADC_MEASUREMENT_INT_VOLT_IDX     FPGA_INTERNAL_TEMP
+#define XADC_MEASUREMENT_END_IDX          XADC_CHANNEL_COUNT
+
+extern float XADC_Measurement[XADC_CHANNEL_COUNT];
+extern uint8_t XADC_Result[XADC_CHANNEL_COUNT];
+extern uint8_t XADC_measIdx;
+
+void AutoTest_RunMinimalStateMachines(void);
+bool AutoTest_getUserYN(void);
+void AutoTest_getUserNULL(void);
+void AutoTest_getUserTI(void);
+IRC_Status_t AutoTest_getOutputTR(void);
+void AutoTest_SaveGCRegisters(void);
+IRC_Status_t AutoTest_RestoreGCRegisters(void);
+
+#endif /* AUTOTEST_UTILS_H_ */

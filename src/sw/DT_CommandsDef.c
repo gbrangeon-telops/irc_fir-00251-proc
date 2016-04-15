@@ -38,6 +38,10 @@
 #include <time.h>
 #include <string.h>
 
+#ifdef STARTUP
+#include "DT_CommandsDef_startup.h"
+#endif
+
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePOL(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
@@ -94,6 +98,9 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"KEY", DebugTerminalParseKEY},
    {"STACK", DebugTerminalParseSTACK},
    {"GCP", DebugTerminalParseGCP},
+#ifdef STARTUP
+   DT_STARTUP_CMDS
+#endif
    {"HLP", DebugTerminalParseHLP}
 };
 

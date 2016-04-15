@@ -27,6 +27,10 @@
 #include "mb_interface.h"
 #include <string.h>
 
+#ifdef STARTUP
+#include "Startup_TestMem.h"
+#endif
+
 
 /**
  * Processing FPGA boot loader state machine state enumeration.
@@ -56,6 +60,13 @@ char gProgress[PROC_BOOT_PROGRESS_SIZE] = {'|', '/', '-', '\\', '|', '/', '-', '
 #define PROC_BOOT_VECTOR_SECTION_ADDR  0x00000000
 #define PROC_BOOT_VECTOR_SECTION_SIZE  0x50
 
+#ifdef STARTUP
+#define PROC_CODE_MEMORY_ADDR          (uint32_t)XPAR_MIG_CODE_MIG_7SERIES_0_BASEADDR
+#define PROC_CODE_MEMORY_SIZE_WORDS    (uint32_t)((XPAR_MIG_CODE_MIG_7SERIES_0_HIGHADDR - XPAR_MIG_CODE_MIG_7SERIES_0_BASEADDR) / 4)
+#define ONE_SECOND_US                  1000000
+#define STARTUP_MSG_REFRESH_TMR        2 * ONE_SECOND_US
+#endif
+
 /**
  * Global variables
  */
@@ -70,6 +81,7 @@ qspiFlash_t gQSPIFlash;
 #error STDIN and STDOUT must be set to "none" in the BSP.
 #endif
 #define STDOUT_BASEADDRESS    XPAR_AXI_USB_UART_BASEADDR
+#define STDIN_BASEADDRESS     XPAR_AXI_USB_UART_BASEADDR
 
 /**
  * Standard outbyte function implementation
@@ -143,6 +155,33 @@ int main()
    Xil_ExceptionEnable();
 
    PRINTF("Loading application image...\n");
+
+#ifdef STARTUP
+   char userAns = 0;
+   uint64_t msg_refresh_tic;
+
+   GETTIME(&msg_refresh_tic);
+
+   do {
+
+      if (XUartNs550_IsReceiveData(STDIN_BASEADDRESS)) {
+         userAns = XUartNs550_ReadReg(STDIN_BASEADDRESS, XUN_RBR_OFFSET);
+      }
+
+      if (elapsed_time_us(msg_refresh_tic) > STARTUP_MSG_REFRESH_TMR) {
+         // Reprint message in case the console was opened too late
+         GETTIME(&msg_refresh_tic);
+         PRINTF("\rSU2.2.1 : Perform a Processing Code Memory Test? (Y/N) ");
+      }
+
+   } while (userAns != 'Y' && userAns != 'N' && userAns != 'y' && userAns != 'n');
+
+   if (userAns == 'Y' || userAns == 'y') {
+      if (Startup_TestMem(PROC_CODE_MEMORY_ADDR, PROC_CODE_MEMORY_SIZE_WORDS) != IRC_SUCCESS){
+         return 0;
+      }
+   }
+#endif
 
    // Main loop
    while(1)

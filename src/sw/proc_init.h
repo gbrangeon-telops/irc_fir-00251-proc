@@ -25,6 +25,10 @@
 
 #define OEM_UART_IS_DEBUG_TERMINAL  (0)
 
+#if (defined(STARTUP) && (OEM_UART_IS_GPS || OEM_UART_IS_DEBUG_TERMINAL))
+#error OEM UART cannot be GPS or Debug Terminal for STARTUP Project
+#endif
+
 #if (!defined(DEBUG) && OEM_UART_IS_GPS)
 #error "OEM UART is used as GPS."
 #endif
@@ -38,6 +42,7 @@
 #endif
 
 #define OEM_UART_ENABLED            (!OEM_UART_IS_DEBUG_TERMINAL && !OEM_UART_IS_GPS)
+
 
 #if (OEM_UART_IS_GPS)
 #define GPS_DEVICE_ID               XPAR_OEM_UART_DEVICE_ID
@@ -84,6 +89,7 @@
 #define FM_CI_CMD_QUEUE_SIZE        1
 #define FU_CMD_QUEUE_SIZE           1
 #define DT_CMD_QUEUE_SIZE           1
+
 
 #define GC_EVENT_ERROR_QUEUE_SIZE   10
 

@@ -1,0 +1,667 @@
+/**
+ * @file ProcStartupTest_PowerIntf.h
+ * Processing FPGA Startup Power Interfaces Tests implementation
+ *
+ * This file implements the Startup Power interfaces tests
+ *
+ * $Rev: 17659 $
+ * $Author: dalain $
+ * $Date: 2015-12-10 11:42:57 -0500 (jeu., 10 déc. 2015) $
+ * $Id: DebugTerminal.h 17659 2015-12-10 16:42:57Z dalain $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/trunk/src/sw/DebugTerminal.h $
+ *
+ * (c) Copyright 2016 Telops Inc.
+ */
+
+#include "ProcStartupTest_PowerIntf.h"
+#include "ProcStartupTest_SSM.h"
+
+#include "GC_Registers.h"
+#include "GC_Poller.h"
+#include "fan_ctrl.h"
+#include "power_ctrl.h"
+#include "XADC_Channels.h"
+#include "XADC_valid.h"
+#include "DebugTerminal.h"
+#include "xgpio.h"
+#include "xintc.h"
+#include "xparameters.h"
+
+#define MAX_INTR_DELAY_US                                8 * ONE_SECOND_US
+#define XADC_DEVICE_ADDR                                 XPAR_SYSMON_0_DEVICE_ID
+#define FAN_CTRL_DBG_CMD_LENGTH                          10
+#define NUM_FAN_TESTS                                    5
+#define ALL_GPIO_INTR_MASK                               0
+
+extern t_fan gFan;
+extern ledCtrl_t gLedCtrl;
+extern XSysMon xsm;
+extern powerCtrl_t gPowerCtrl;
+extern XIntc gProcIntc;
+extern debugTerminal_t gDebugTerminal;
+
+
+/*
+ * Fan Control Function Pointer type
+ */
+typedef void (*FanCtrlFunc_t)(unsigned int speed);
+
+/*
+ * Fan Tests Index enumeration
+ */
+enum testFanIndexEnum {
+   PROCESSING,
+   OUTPUT,
+   INTERNAL,
+   EXTERNAL_1,
+   EXTERNAL_2
+};
+
+/*
+ * Fan Tests Index data type
+ */
+typedef enum testFanIndexEnum testFanIndex_t;
+
+/*
+ * Fan Test structure
+ */
+struct testFanStruct {
+   char           *desc;
+   FanCtrlFunc_t  ctrlFunc;
+};
+
+/*
+ * Fan test data type
+ */
+typedef struct testFanStruct testFan_t;
+
+static bool PwrBtn_intr = false;
+
+static void Startup_SetOutputFanSpeed(unsigned int speed);
+static void Startup_SetProcFanSpeed(unsigned int speed);
+static void Startup_SetInternalFanSpeed(unsigned int speed);
+static void Startup_SetExternalFanSpeed(unsigned int speed);
+static IRC_Status_t Startup_FanCtrlTest(testFanIndex_t fanIndex);
+
+/*
+ * Fan test reference table
+ */
+static testFan_t testFanCtrl_Table[NUM_FAN_TESTS] = {
+      { "Processing FPGA", Startup_SetProcFanSpeed },
+      { "Output FPGA", Startup_SetOutputFanSpeed },
+      { "Internal", Startup_SetInternalFanSpeed },
+      { "External 1", Startup_SetExternalFanSpeed },
+      { "External 2", Startup_SetExternalFanSpeed },
+};
+
+
+/*
+ * Starts the FPGA fans at 100% speed, then slows to 25%, then stops.
+ * Queries the user for correct fan operation at each step.
+ *
+ * @return IRC_SUCCESS if FPGA fan operation successfully controlled
+ * @return IRC_FAILURE otherwise
+ */
+IRC_Status_t AutoTest_FPGAFanCtrl(void) {
+
+   ATR_PRINTF("Connect the FPGA Fan Harness to J21.\nPress ENTER to continue...");
+   AutoTest_getUserNULL();
+
+   return Startup_FanCtrlTest(PROCESSING);
+}
+
+IRC_Status_t AutoTest_OutFanCtrl(void) {
+
+   ATR_PRINTF("Connect the FPGA Fan Harness to J22.\nPress ENTER to continue...");
+   AutoTest_getUserNULL();
+
+   return Startup_FanCtrlTest(OUTPUT);
+}
+
+/*
+ * Starts the internal fan at 100% speed, then slows to 25%, then stops.
+ * Queries the user for correct fan operation at each step.
+ *
+ * @return IRC_SUCCESS if internal fan operation successfully controlled
+ * @return IRC_FAILURE otherwise
+ */
+IRC_Status_t AutoTest_IntFanCtrl(void) {
+
+   ATR_PRINTF("Connect the FPGA Fan Harness to J29.\nPress ENTER to continue...");
+   AutoTest_getUserNULL();
+
+   return Startup_FanCtrlTest(INTERNAL);
+}
+
+/*
+ * Starts the external fan at 100% speed, then slows to 25%, then stops.
+ * Queries the user for correct fan operation at each step.
+ *
+ * @return IRC_SUCCESS if external fan operation successfully controlled
+ * @return IRC_FAILURE otherwise
+ */
+IRC_Status_t AutoTest_ExtFanCtrl(void) {
+
+   IRC_Status_t status1;
+   IRC_Status_t status2;
+
+   // External fan initial speed is not 0
+   Startup_SetExternalFanSpeed(0);
+
+   ATR_PRINTF("Connect the External Fan Harness to J9.\nPress ENTER to continue...");
+   AutoTest_getUserNULL();
+
+   status1 = Startup_FanCtrlTest(EXTERNAL_1);
+
+   ATR_PRINTF("Connect the External Fan Harness to J10.\nPress ENTER to continue...");
+   AutoTest_getUserNULL();
+
+   status2 = Startup_FanCtrlTest(EXTERNAL_2);
+
+   return ((status1 == IRC_SUCCESS) && (status2 == IRC_SUCCESS)) ? IRC_SUCCESS : IRC_FAILURE;
+}
+
+/*
+ * Toggles each power line in sequence and queries the user for proper
+ * Power LED state at each step.
+ *
+ * @return IRC_SUCCESS if every step completed successfully
+ * @return IRC_FAILURE otherwise
+ *
+ * @note The BUFFER power line cannot be switched OFF (the control MOSFET is
+ *       jumped in hardware)
+ */
+IRC_Status_t AutoTest_PwrConnectOnOff(void) {
+
+   bool testFailed = false;
+
+   powerChannel_t channelIndex;
+   static char* powerChannelEnumStrings[] = {
+         "PLEORA",
+         "ADC_DDC",
+         "COOLER",
+         "BUFFER",
+         "FW",
+         "EXPANSION",
+         "SPARE1",
+         "SPARE2",
+         "SPARE3",
+         "SELF RESET",
+         "PUSH_BUTTON"
+   };
+
+   PRINTF("\n");
+   ATR_PRINTF("...............................................");
+   ATR_PRINTF("....................WARNING....................");
+   ATR_PRINTF("...............................................");
+   ATR_PRINTF("Make sure no cooler is connected to J3, as the \nfollowing test risks damaging it.");
+   ATR_PRINTF("Press ENTER to continue...\n");
+
+   AutoTest_getUserNULL();
+
+   for (channelIndex = PC_PLEORA; channelIndex <= PC_PUSH_BUTTON; channelIndex++)
+   {
+
+      if (channelIndex != PC_SELFRESET && channelIndex != PC_BUFFER && channelIndex != PC_COOLER &&
+            channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON)
+      {
+         Power_TurnOn(channelIndex);
+         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+
+         Power_TurnOff(channelIndex);
+         ATR_PRINTF("Is the %s LED Power Indicator OFF? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+      }
+
+      // Filter Wheel power channel is already ON at startup, therefore we reverse the operation order
+      if (channelIndex == PC_FW)
+      {
+         Power_TurnOff(channelIndex);
+         ATR_PRINTF("Is the %s LED Power Indicator OFF? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+
+         Power_TurnOn(channelIndex);
+         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+      }
+
+      // Cannot turn off PC_BUFFER power channel
+      if (channelIndex == PC_BUFFER)
+      {
+         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+      }
+
+      // The COOLER power line requires special handling, as the regular Power_TurnOn function
+      // does not allow COOLER power channel control.
+      if (channelIndex == PC_COOLER)
+      {
+         uint32_t mask = 1 << channelIndex;
+         uint32_t regValue;
+
+         regValue = XGpio_DiscreteRead(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT) | mask;
+         XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
+
+         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+
+         regValue &= ~mask;
+         XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
+
+         ATR_PRINTF("Is the %s LED Power Indicator OFF? (Y/N) ", powerChannelEnumStrings[channelIndex]);
+         if (!AutoTest_getUserYN())
+         {
+            testFailed = true;
+         }
+      }
+   }
+
+   return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;
+}
+
+/*
+ * Initializes the Camera LED GPIO, then cycles through all 3 LED colors.
+ * Queries the user for correct LED lighting at every step.
+ *
+ * @return IRC_SUCCESS if every step completed successfully.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t AutoTest_CamLEDColors(void) {
+
+   bool testFailed = false;
+
+   Led_SetCameraLedState(&gLedCtrl, CLS_OFF);
+
+   ATR_PRINTF("Connect the LED Indicator Harness to J13.\nPress ENTER to continue...");
+
+   AutoTest_getUserNULL();
+
+   Led_SetCameraLedState(&gLedCtrl, CLS_GREEN);
+   ATR_PRINTF("Is the Camera LED lit GREEN? (Y/N) ");
+   if (!AutoTest_getUserYN()){
+      testFailed = true;
+   }
+
+   Led_SetCameraLedState(&gLedCtrl, CLS_YELLOW);
+   ATR_PRINTF("Is the Camera LED lit YELLOW? (Y/N) ");
+   if (!AutoTest_getUserYN()){
+      testFailed = true;
+   }
+
+   Led_SetCameraLedState(&gLedCtrl, CLS_RED);
+   ATR_PRINTF("Is the Camera LED lit RED? (Y/N) ");
+   if (!AutoTest_getUserYN()){
+      testFailed = true;
+   }
+
+   Led_SetCameraLedBlinking(&gLedCtrl, CLS_RED, CLS_GREEN, 0.5 * ONE_SECOND_US);
+   ATR_PRINTF("Is the Camera LED blinking RED and GREEN? (Y/N) ");
+   if (!AutoTest_getUserYN()){
+      testFailed = true;
+   }
+
+   Led_SetCameraLedState(&gLedCtrl, CLS_OFF);
+   Led_SetCameraLedBlinking(&gLedCtrl, CLS_OFF, CLS_OFF, 0);
+
+   return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;
+}
+
+/*
+ * Ties the Power button interrupt to a test handler and attempts to detect
+ * Power button interrupts.
+ *
+ * @return IRC_SUCCESS if one interrupt is detected
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t AutoTest_PwrBtnInt(void) {
+
+   uint64_t pwr_tic;
+
+   // Replace the Power button handler with a test handler
+   XIntc_Disconnect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+   XIntc_Connect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR, (XInterruptHandler)Power_IntrHandler_Test, &gPowerCtrl);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+
+   ATR_PRINTF("Connect the Power Button to J8.\nPress ENTER to continue...");
+   GC_Poller_Stop();
+   AutoTest_getUserNULL();
+
+   while (GC_Poller_IsActive()) {
+      AutoTest_RunMinimalStateMachines();
+   }
+
+   ATR_PRINTF("Press the Power button now.");
+
+   GETTIME(&pwr_tic);
+   while ((elapsed_time_us(pwr_tic) < MAX_INTR_DELAY_US) && !PwrBtn_intr) {
+      AutoTest_RunMinimalStateMachines();
+   }
+
+   if (!PwrBtn_intr)
+   {
+      ATR_ERR("No interrupt detected");
+      XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+      return IRC_FAILURE;
+   }
+
+   ATR_PRINTF("Release the Power button now.");
+
+   GETTIME(&pwr_tic);
+   while ((elapsed_time_us(pwr_tic) < MAX_INTR_DELAY_US) && PwrBtn_intr) {
+      AutoTest_RunMinimalStateMachines();
+   }
+
+   if (PwrBtn_intr)
+   {
+      ATR_ERR("No interrupt detected");
+      XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+      return IRC_FAILURE;
+   }
+
+   XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+   GC_Poller_Start();
+
+   return IRC_SUCCESS;
+}
+
+/*
+ * Uses a modified XADC state machine (XADC_SM_Test) to acquire ADC readings
+ * from the Cooler and 24V voltage and current channels.
+ *
+ * @return IRC_SUCCESS if every measurement completed successfully and every
+ *         value is in range.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t AutoTest_XADCPwrMonitor(void) {
+
+   xadcExtCh_t curExtChannel;
+   bool invalidValue = false;
+
+   // External Interfaces use XADC measurement indices 4 to 15
+   XADC_measIdx = XADC_MEASUREMENT_PWR_IDX;
+
+   ATR_PRINTF("Make sure the following test harnesses are disconnected:");
+   ATR_PRINTF("\tFPGA Fan");
+   ATR_PRINTF("\tInternal Fan");
+   ATR_PRINTF("\tExternal Fan");
+   PRINTF("\n");
+   ATR_PRINTF("Press ENTER to continue...");
+   AutoTest_getUserNULL();
+
+   PRINTF("\n");
+   // Turn off LED indicator so that current status does not impact the XADC 24V Current Sense test
+   Led_SetCameraLedState(&gLedCtrl, CLS_OFF);
+
+   IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);
+   if (Status != IRC_SUCCESS)
+   {
+      ATR_ERR("Failed to initialize Device: XADC\n");
+      return IRC_FAILURE;
+   }
+
+   for (curExtChannel = XEC_COOLER_SENSE; curExtChannel <= XEC_24V_CUR; curExtChannel++)
+   {
+      // Keep alive
+      AutoTest_RunMinimalStateMachines();
+
+      XADC_SM_Test(curExtChannel);
+      if (!extAdcChannels[curExtChannel].isValid)
+      {
+         ATR_ERR("Invalid XADC reading on external channel %d.", curExtChannel);
+         return IRC_FAILURE;
+      }
+   }
+
+   // Requires validation with theoretical values
+   if (extAdcChannels[XEC_COOLER_SENSE].raw.unipolar <= 0xF0)
+      {
+         ATR_PRINTF("XADC -- Cooler Voltage..........");
+         PRINTF("\t\tNC");
+         XADC_Result[XADC_measIdx] = 1;
+      }
+   else
+   {
+      ATR_PRINTF("XADC -- Cooler Voltage : " _PCF(3) " V", _FFMT(DeviceVoltageAry[DVS_Cooler], 3));
+      if ((DeviceVoltageAry[DVS_Cooler] >= COOLER_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_Cooler] <= COOLER_VOLTAGE_MAX))
+      {
+         PRINTF("\tPASS");
+         XADC_Result[XADC_measIdx] = 2;
+      }
+      else
+      {
+         PRINTF("\tFAIL");
+         invalidValue = true;
+      }
+   }
+
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_Cooler];
+
+   if (extAdcChannels[XEC_COOLER_CUR].raw.unipolar <= 0xF0)
+      {
+         ATR_PRINTF("XADC -- Cooler Current...........");
+         PRINTF("\tNC");
+         XADC_Result[XADC_measIdx] = 1;
+      }
+   else
+   {
+      ATR_PRINTF("XADC -- Cooler Current : " _PCF(3)" A", _FFMT(DeviceCurrentAry[DCS_Cooler], 3));
+      if ((DeviceCurrentAry[DCS_Cooler] >= COOLER_CURRENT_MIN) && (DeviceCurrentAry[DCS_Cooler] <= COOLER_CURRENT_MAX))
+      {
+         PRINTF("\tPASS");
+         XADC_Result[XADC_measIdx] = 2;
+      }
+      else
+      {
+         PRINTF("\tFAIL");
+         invalidValue = true;
+      }
+   }
+
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DCS_Cooler];
+
+   ATR_PRINTF("XADC -- 24V Voltage :    " _PCF(3) " V", _FFMT(DeviceVoltageAry[DVS_Supply24V], 3));
+   if ((DeviceVoltageAry[DVS_Supply24V] >= P24V_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_Supply24V] <= P24V_VOLTAGE_MAX))
+   {
+      PRINTF("\tPASS");
+      XADC_Result[XADC_measIdx] = 2;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      invalidValue = true;
+   }
+
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_Supply24V];
+
+   ATR_PRINTF("XADC -- 24V Current :    " _PCF(3) " A", _FFMT(DeviceCurrentAry[DCS_Supply24V], 3));
+   if ((DeviceCurrentAry[DCS_Supply24V] >= P24V_CURRENT_MIN) && (DeviceCurrentAry[DCS_Supply24V] <= P24V_CURRENT_MAX))
+   {
+      PRINTF("\tPASS");
+      XADC_Result[XADC_measIdx] = 2;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      invalidValue = true;
+   }
+
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DCS_Supply24V];
+
+   if (XADC_measIdx != XADC_MEASUREMENT_EXT_INTF_IDX) {
+      ATR_ERR("Invalid XADC Measurement Index.");
+   }
+
+   PRINTF("\n");
+
+   return (invalidValue) ? IRC_FAILURE : IRC_SUCCESS;
+}
+
+/*
+ * Sends a command through the Debug Terminal to the Output FPGA to set fan
+ * speed to the specified value.
+ *
+ * @return void
+ */
+static void Startup_SetOutputFanSpeed(unsigned int speed) {
+
+   networkCommand_t dtRequest;
+   debugTerminal_t *debugTerminal = &gDebugTerminal;
+
+   // SFS is the Output Buffer Memory Test command
+   char debugTerminalCMD[FAN_CTRL_DBG_CMD_LENGTH] = {0};
+
+   if (speed < 0 || speed > 100) {
+      DT_ERR("Invalid Output FPGA Fan Speed.");
+      return;
+   }
+
+   sprintf(debugTerminalCMD, "SFS %u", speed);
+
+   F1F2_CommandClear(&dtRequest.f1f2);
+   dtRequest.f1f2.isNetwork = 1;
+   dtRequest.f1f2.srcAddr = debugTerminal->port.netIntf->address;
+   dtRequest.f1f2.srcPort = debugTerminal->port.port;
+   dtRequest.f1f2.destAddr = NIA_OUTPUT_FPGA;
+   dtRequest.f1f2.destPort = NIP_DEBUG_TERMINAL;
+   dtRequest.f1f2.cmd = F1F2_CMD_DEBUG_CMD;
+
+   snprintf(dtRequest.f1f2.payload.debug.text, F1F2_MAX_DEBUG_DATA_SIZE + 1, debugTerminalCMD);
+
+   dtRequest.port = &debugTerminal->port;
+
+   if (NetIntf_EnqueueCmd(debugTerminal->port.netIntf, &dtRequest) != IRC_SUCCESS)
+      DT_ERR("Failed to push debug CMD command in network interface command queue");
+
+   return;
+}
+
+/**
+ * Sets the Processing FPGA Fan Speed
+ *
+ * @param speed is the target FPGA Fan speed
+ */
+static void Startup_SetProcFanSpeed(unsigned int speed) {
+
+   FAN_SET_PWM1(&gFan, (float)speed);
+
+   return;
+}
+
+/**
+ * Sets the Internal Fan Speed
+ *
+ * @param speed is the target internal fan speed
+ */
+static void Startup_SetInternalFanSpeed(unsigned int speed) {
+
+   FAN_SET_PWM2(&gFan, (float)speed);
+
+   return;
+}
+
+/**
+ * Sets the External Fan Speed
+ *
+ * @param speed is the target external fan speed
+ */
+static void Startup_SetExternalFanSpeed(unsigned int speed) {
+
+   gcRegsData.ExternalFanSpeedSetpoint = (float)speed;
+   GC_SetExternalFanSpeed();
+
+   return;
+}
+
+/*
+ * Sets the fan speed to 100%, then 25%, then 0%. Queries the user at each step
+ * to verify correct fan operation.
+ *
+ * @param fanIndex is a member of testFanIndexEnum indicating upon which fan the
+ *        tests are to be performed.
+ *
+ * @return IRC_SUCCESS if fan control was successful at every step
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t Startup_FanCtrlTest(testFanIndex_t fanIndex) {
+
+   bool testFailed = false;
+
+   testFanCtrl_Table[fanIndex].ctrlFunc(100);
+   ATR_PRINTF("Does the %s fan run at 100%% speed? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+   testFanCtrl_Table[fanIndex].ctrlFunc(25);
+   ATR_PRINTF("Does the %s fan run at 25%% speed? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+   testFanCtrl_Table[fanIndex].ctrlFunc(0);
+   ATR_PRINTF("Has the %s fan completely stopped? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+   if (fanIndex == PROCESSING || fanIndex == OUTPUT) {
+      testFanCtrl_Table[fanIndex].ctrlFunc(100);
+   }
+   else {
+      testFanCtrl_Table[fanIndex].ctrlFunc(0);
+   }
+
+   return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;
+}
+
+/*
+ * Test interrupt handler for the Power Button test function
+ * Sets and clears the PwrBtn_intr flag to be read by the test function
+ *
+ * @return void
+ */
+void Power_IntrHandler_Test(powerCtrl_t *p_powerCtrl) {
+
+   if (!TDCStatusTst(WaitingForInitMask))
+   {
+      if (Power_GetPushButtonState() == PBS_RELEASED)
+      {
+         ATR_PRINTF("Power Button Interrupt detected.");
+         ATR_DBG("Button released.");
+         PwrBtn_intr = false;
+      }
+      else
+      {
+         ATR_PRINTF("Power Button Interrupt detected.");
+         ATR_DBG("Button pushed.");
+         PwrBtn_intr = true;
+      }
+   }
+
+   XGpio_InterruptClear(&p_powerCtrl->GPIO, PGPIOC_POWER_MANAGEMENT);
+
+   return;
+
+}

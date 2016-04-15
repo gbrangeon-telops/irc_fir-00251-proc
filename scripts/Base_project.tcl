@@ -121,6 +121,9 @@ set filelist  [concat $filelist [glob -nocomplain $src_dir/Gating/HDL/*.vhd]]
 #SFW
 set filelist  [concat $filelist [glob -nocomplain $src_dir/SFW/HDL/*.vhd]]
 
+#Startup
+set filelist  [concat $filelist [glob -nocomplain $src_dir/startup/HDL/*.vhd]]
+
 
 
 # Add the file list

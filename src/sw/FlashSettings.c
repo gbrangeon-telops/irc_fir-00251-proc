@@ -1722,7 +1722,7 @@ IRC_Status_t FlashSettings_Finalize(flashSettings_t *p_flashSettings)
    p_flashSettings->isValid = 1;
    TDCStatusClr(WaitingForFlashSettingsInitMask);
 
-   return FlashSettings_UpdateCameraSettings(p_flashSettings);;
+   return FlashSettings_UpdateCameraSettings(p_flashSettings);
 }
 
 /**
