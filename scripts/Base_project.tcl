@@ -147,6 +147,7 @@ add_files $common_hdl_dir/Utilities/Clk_Divider.vhd
 add_files $common_hdl_dir/Utilities/Clk_Divider_Pulse.vhd
 add_files $common_hdl_dir/RS232/uarts.vhd
 add_files $common_hdl_dir/Utilities/dcm_reset.vhd
+add_files $common_hdl_dir/Utilities/Clk_Divider_Async.vhd
 
 #Add constraint file
 add_files -norecurse -fileset constrs_1 $constr_dir
