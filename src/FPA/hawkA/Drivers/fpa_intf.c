@@ -308,7 +308,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vdac_value[4]                     = 0;
    ptrA->vdac_value[5]                     = 0;
    ptrA->vdac_value[6]                     = 0;
-   ptrA->vdac_value[7]                     = 1650;           // DAC8 -> VCC8 à 2.943V
+   
+   if (pGCRegs->DeviceSerialNumber == 4466)                  // pour IRC1511 
+      ptrA->vdac_value[7]                     = 1650;           // DAC8 -> VCC8 à 2.943V 
+   else                                                      // pour IRC1512 ou autres
+      ptrA->vdac_value[7]                     = 2200;           // DAC8 ->
    
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 1;              // on dephase l'horloge des ADC
