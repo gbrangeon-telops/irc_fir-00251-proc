@@ -34,15 +34,15 @@ entity isc0207A_dummy is
       MCLK_SOURCE       : in std_logic;
       
       FPA_INTF_CFG      : fpa_intf_cfg_type;
-      DIAG_MODE_EN      : in std_logic;
+      RUN               : in std_logic;
       
       FPA_INT           : in std_logic;
-      DATA_SYNC_FLAG    : in std_logic;
+      --DATA_SYNC_FLAG    : in std_logic;
       
-      QUAD1_DIAG_DATA   : out std_logic_vector(56 downto 0); --! sortie des données 
-      QUAD2_DIAG_DATA   : out std_logic_vector(56 downto 0);
-      QUAD3_DIAG_DATA   : out std_logic_vector(56 downto 0);
-      QUAD4_DIAG_DATA   : out std_logic_vector(56 downto 0);
+      QUAD1_DIAG_DATA   : out std_logic_vector(55 downto 0); --! sortie des données 
+      QUAD2_DIAG_DATA   : out std_logic_vector(55 downto 0);
+      QUAD3_DIAG_DATA   : out std_logic_vector(55 downto 0);
+      QUAD4_DIAG_DATA   : out std_logic_vector(55 downto 0);
       QUAD_DIAG_DVAL    : out std_logic
       );
 end isc0207A_dummy;
@@ -120,7 +120,7 @@ architecture rtl of isc0207A_dummy is
    signal clk_div_i         : std_logic;
    signal clk_div_last      : std_logic;
    signal pix_count         : unsigned(31 downto 0);
-   signal sync_flag         : std_logic;
+   --signal sync_flag         : std_logic;
    signal pixel_samp_trig   : std_logic;
    signal diag_quad_clk_i   : std_logic;
    signal diag_quad_clk_last: std_logic;
@@ -134,10 +134,10 @@ begin
    ----------------------------------------------
    -- OUTPUTS                                    
    ----------------------------------------------
-   QUAD4_DIAG_DATA <= sync_flag & not (data(15)(13 downto 0) & data(14)(13 downto 0) & data(13)(13 downto 0) & data(12)(13 downto 0)); -- inverion des données pour emuler le 0207
-   QUAD3_DIAG_DATA <= sync_flag & not (data(11)(13 downto 0) & data(10)(13 downto 0) & data(9)(13 downto 0)  & data(8)(13 downto 0));
-   QUAD2_DIAG_DATA <= sync_flag & not (data(7)(13 downto 0)  & data(6)(13 downto 0)  & data(5)(13 downto 0)  & data(4)(13 downto 0));
-   QUAD1_DIAG_DATA <= sync_flag & not (data(3)(13 downto 0)  & data(2)(13 downto 0)  & data(1)(13 downto 0)  & data(0)(13 downto 0));
+   QUAD4_DIAG_DATA <= not (data(15)(13 downto 0) & data(14)(13 downto 0) & data(13)(13 downto 0) & data(12)(13 downto 0)); -- inverion des données pour emuler le 0207
+   QUAD3_DIAG_DATA <= not (data(11)(13 downto 0) & data(10)(13 downto 0) & data(9)(13 downto 0)  & data(8)(13 downto 0));
+   QUAD2_DIAG_DATA <= not (data(7)(13 downto 0)  & data(6)(13 downto 0)  & data(5)(13 downto 0)  & data(4)(13 downto 0));
+   QUAD1_DIAG_DATA <= not (data(3)(13 downto 0)  & data(2)(13 downto 0)  & data(1)(13 downto 0)  & data(0)(13 downto 0));
    QUAD_DIAG_DVAL  <= dval_i;
    
    --------------------------------------------------
@@ -236,7 +236,7 @@ begin
             
             diag_done_last <= diag_done(0); 
             
-            sync_flag <= DATA_SYNC_FLAG;
+            --sync_flag <= DATA_SYNC_FLAG;
             fpa_int_i <= FPA_INT;
             fpa_int_last <= fpa_int_i; 
             
@@ -273,7 +273,7 @@ begin
                   dval_i <= '0';
                   diag_frame_done <= '1';
                   diag_line_gen_en <= '0'; 
-                  if DIAG_MODE_EN = '1' then 
+                  if RUN = '1' then 
                      if fpa_int_last = '0' and fpa_int_i = '1' then   -- seul le mode ITR est supporté poour le momeent.
                         diag_fsm <=  int_st;                  
                      end if;
