@@ -38,7 +38,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.3.1
+// Generated from XML camera definition file version 11.4.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -102,7 +102,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AcquisitionStop = */ 0,
    /* AutomaticExternalFanSpeedMode = */ AEFSM_Off,
    /* AvailabilityFlags = */ 0,
-   /* CalibrationActualizationMode = */ CAM_ICU,
+   /* BadPixelReplacement = */ 0,
+   /* CalibrationActualizationMode = */ CAM_BlackBody,
    /* CalibrationActualize = */ 0,
    /* CalibrationCollectionActiveBlockPOSIXTime = */ 0,
    /* CalibrationCollectionActivePOSIXTime = */ 0,
@@ -175,7 +176,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* FWPosition = */ FWP_FilterWheelNotImplemented,
    /* FWPositionSetpoint = */ FWPS_Filter1,
    /* FWSpeed = */ 0,
-   /* FWSpeedMax = */ 5999,
+   /* FWSpeedMax = */ 5000,
    /* FWSpeedSetpoint = */ 0,
    /* GPSModeIndicator = */ GPSMI_NotAvailable,
    /* GPSNumberOfSatellitesInUse = */ 0,
@@ -207,6 +208,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferSequenceSelector = */ 0,
    /* MemoryBufferSequenceSize = */ 2,
    /* MemoryBufferSequenceSizeMax = */ 0,
+   /* NDFilterArmedPositionSetpoint = */ NDFAPS_NDFilter1,
    /* NDFilterNumber = */ 0,
    /* NDFilterPosition = */ NDFP_NDFilterNotImplemented,
    /* NDFilterPositionSetpoint = */ NDFPS_NDFilter1,
@@ -383,6 +385,7 @@ void GC_Registers_Init()
    gcRegsDef[AcquisitionStopIdx].p_data = &gcRegsData.AcquisitionStop;
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].p_data = &gcRegsData.AutomaticExternalFanSpeedMode;
    gcRegsDef[AvailabilityFlagsIdx].p_data = &gcRegsData.AvailabilityFlags;
+   gcRegsDef[BadPixelReplacementIdx].p_data = &gcRegsData.BadPixelReplacement;
    gcRegsDef[CalibrationActualizationModeIdx].p_data = &gcRegsData.CalibrationActualizationMode;
    gcRegsDef[CalibrationActualizeIdx].p_data = &gcRegsData.CalibrationActualize;
    gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx].p_data = &gcRegsData.CalibrationCollectionActiveBlockPOSIXTime;
@@ -488,6 +491,7 @@ void GC_Registers_Init()
    gcRegsDef[MemoryBufferSequenceSelectorIdx].p_data = &gcRegsData.MemoryBufferSequenceSelector;
    gcRegsDef[MemoryBufferSequenceSizeIdx].p_data = &gcRegsData.MemoryBufferSequenceSize;
    gcRegsDef[MemoryBufferSequenceSizeMaxIdx].p_data = &gcRegsData.MemoryBufferSequenceSizeMax;
+   gcRegsDef[NDFilterArmedPositionSetpointIdx].p_data = &gcRegsData.NDFilterArmedPositionSetpoint;
    gcRegsDef[NDFilterNumberIdx].p_data = &gcRegsData.NDFilterNumber;
    gcRegsDef[NDFilterPositionIdx].p_data = &gcRegsData.NDFilterPosition;
    gcRegsDef[NDFilterPositionSetpointIdx].p_data = &gcRegsData.NDFilterPositionSetpoint;
@@ -581,10 +585,10 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionModeIdx], (GC_WaitingForCalibrationActualization || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateModeIdx], GC_AcquisitionStarted);
+   SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
    SetRegLocked(&gcRegsDef[AECImageFractionIdx], GC_WaitingForCalibrationActualization);
    SetRegLocked(&gcRegsDef[AECTargetWellFillingIdx], GC_WaitingForCalibrationActualization);
    SetRegLocked(&gcRegsDef[AECResponseTimeIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
    SetRegLocked(&gcRegsDef[EHDRIModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMinIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMaxIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));

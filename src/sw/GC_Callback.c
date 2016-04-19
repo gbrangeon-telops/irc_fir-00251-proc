@@ -64,7 +64,7 @@ extern float FWExposureTime[8];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.3.1
+// Generated from XML camera definition file version 11.4.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -89,6 +89,7 @@ void GC_Callback_Init()
    gcRegsDef[AcquisitionStopIdx].callback =                             &GC_AcquisitionStopCallback;
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].callback =               &GC_AutomaticExternalFanSpeedModeCallback;
    gcRegsDef[AvailabilityFlagsIdx].callback =                           &GC_AvailabilityFlagsCallback;
+   gcRegsDef[BadPixelReplacementIdx].callback =                         &GC_BadPixelReplacementCallback;
    gcRegsDef[CalibrationActualizationModeIdx].callback =                &GC_CalibrationActualizationModeCallback;
    gcRegsDef[CalibrationActualizeIdx].callback =                        &GC_CalibrationActualizeCallback;
    gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx].callback =   &GC_CalibrationCollectionActiveBlockPOSIXTimeCallback;
@@ -235,6 +236,7 @@ void GC_Callback_Init()
    gcRegsDef[MemoryBufferSequenceSelectorIdx].callback =                &GC_MemoryBufferSequenceSelectorCallback;
    gcRegsDef[MemoryBufferSequenceSizeIdx].callback =                    &GC_MemoryBufferSequenceSizeCallback;
    gcRegsDef[MemoryBufferSequenceSizeMaxIdx].callback =                 &GC_MemoryBufferSequenceSizeMaxCallback;
+   gcRegsDef[NDFilterArmedPositionSetpointIdx].callback =               &GC_NDFilterArmedPositionSetpointCallback;
    gcRegsDef[NDFilterNumberIdx].callback =                              &GC_NDFilterNumberCallback;
    gcRegsDef[NDFilterPositionIdx].callback =                            &GC_NDFilterPositionCallback;
    gcRegsDef[NDFilterPositionRawIdx].callback =                         &GC_NDFilterPositionRawCallback;
@@ -692,6 +694,26 @@ void GC_AvailabilityFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t ac
 }
 
 /**
+ * BadPixelReplacement GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
  * CalibrationActualizationMode GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -743,9 +765,7 @@ void GC_CalibrationCollectionActiveBlockPOSIXTimeCallback(gcCallbackPhase_t phas
 {
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
-      if (!calibrationInfo.isValid)
-         gcRegsData.CalibrationCollectionActiveBlockPOSIXTime = 0;
-      // else CalibrationCollectionActivePOSIXTime is updated with the calibration block in CAL_ApplyCalibBlockSelMode.
+      // Before read
    }
 }
 
@@ -761,14 +781,6 @@ void GC_CalibrationCollectionActivePOSIXTimeCallback(gcCallbackPhase_t phase, gc
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-      if (calibrationInfo.isValid)
-      {
-         gcRegsData.CalibrationCollectionActivePOSIXTime = calibrationInfo.collection.POSIXTime;
-      }
-      else
-      {
-         gcRegsData.CalibrationCollectionActivePOSIXTime = 0;
-      }
    }
 }
 
@@ -784,14 +796,6 @@ void GC_CalibrationCollectionActiveTypeCallback(gcCallbackPhase_t phase, gcCallb
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-      if (calibrationInfo.isValid)
-      {
-         gcRegsData.CalibrationCollectionActiveType = calibrationInfo.collection.CollectionType;
-      }
-      else
-      {
-         gcRegsData.CalibrationCollectionActiveType = CCAT_TelopsFixed;
-      }
    }
 }
 
@@ -4017,6 +4021,26 @@ void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackA
 
       // Since MemoryBufferSequenceSize must be even, make sure MemoryBufferSequenceSizeMax is even too
       gcRegsData.MemoryBufferSequenceSizeMax = roundDown(BufferManager_GetNbImageMax(&gBufManager, &gcRegsData), 2);
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
+ * NDFilterArmedPositionSetpoint GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_NDFilterArmedPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
    }
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))

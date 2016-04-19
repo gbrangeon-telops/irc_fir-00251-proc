@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.3.1
+// Generated from XML camera definition file version 11.4.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -42,6 +42,7 @@ void GC_AcquisitionStartAtStartupCallback(gcCallbackPhase_t phase, gcCallbackAcc
 void GC_AcquisitionStopCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AutomaticExternalFanSpeedModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AvailabilityFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationActualizationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationActualizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActiveBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -188,6 +189,7 @@ void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCall
 void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceSizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_NDFilterArmedPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_NDFilterNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_NDFilterPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_NDFilterPositionRawCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

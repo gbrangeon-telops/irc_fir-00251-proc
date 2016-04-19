@@ -81,6 +81,9 @@
 #define IBRIsAvailableMask                      0x00000040  /**< AvailabilityFlags register bit mask for IBRIsAvailable field */
 #define IBIIsAvailableMask                      0x00000080  /**< AvailabilityFlags register bit mask for CalibrationIsAvailable field */
 #define AECPlusIsAvailableMask                  0x00000100  /**< AvailabilityFlags register bit mask for AECPlusIsAvailable field */
+#define NDFilter1IsAvailableMask                0x00000200  /**< AvailabilityFlags register bit mask for NDFilter1IsAvailable field */
+#define NDFilter2IsAvailableMask                0x00000400  /**< AvailabilityFlags register bit mask for NDFilter2IsAvailable field */
+#define NDFilter3IsAvailableMask                0x00000800  /**< AvailabilityFlags register bit mask for NDFilter3IsAvailable field */
 
 #define AvailabilityFlagsSet(mask) BitMaskSet(gcRegsData.AvailabilityFlags, mask)  /**< Set masked bits in AvailabilityFlags register */
 #define AvailabilityFlagsClr(mask) BitMaskClr(gcRegsData.AvailabilityFlags, mask)  /**< Clear masked bits in AvailabilityFlags register */
@@ -148,10 +151,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.3.1
+// Generated from XML camera definition file version 11.4.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 3) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -216,6 +219,7 @@ struct gcRegistersDataStruct {
    uint32_t AcquisitionStop;
    uint32_t AutomaticExternalFanSpeedMode;
    uint32_t AvailabilityFlags;
+   uint32_t BadPixelReplacement;
    uint32_t CalibrationActualizationMode;
    uint32_t CalibrationActualize;
    uint32_t CalibrationCollectionActiveBlockPOSIXTime;
@@ -321,6 +325,7 @@ struct gcRegistersDataStruct {
    uint32_t MemoryBufferSequenceSelector;
    uint32_t MemoryBufferSequenceSize;
    uint32_t MemoryBufferSequenceSizeMax;
+   uint32_t NDFilterArmedPositionSetpoint;
    uint32_t NDFilterNumber;
    uint32_t NDFilterPosition;
    uint32_t NDFilterPositionSetpoint;
@@ -458,7 +463,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 // Locked registers utility macros
 ////////////////////////////////////////////////////////////////////////////////
 #define GC_AECIsActive ((gcRegsData.ExposureAuto == EA_Once) || (gcRegsData.ExposureAuto == EA_Continuous))
-#define GC_AECPlusIsActive (GC_AECPlusIsImplemented && ((gcRegsData.ExposureAuto == EA_OnceNDFilter) || (gcRegsData.ExposureAuto == EA_ContinuousNDFilter)))
+#define GC_AECPlusIsActive (GC_AECPlusIsImplemented && ((gcRegsData.ExposureAuto == EA_OnceNDFilter) || (gcRegsData.ExposureAuto == EA_ContinuousNDFilter) || (gcRegsData.ExposureAuto == EA_ArmedNDFilter)))
 #define GC_AECPlusIsImplemented TDCFlagsTst(AECPlusIsImplementedMask)
 #define GC_AcquisitionFrameRateIsLocked ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForCalibrationActualization)
 #define GC_AcquisitionStartTriggerIsActive IsActiveFlagsTst(AcquisitionStartTriggerIsActiveMask)
@@ -496,14 +501,17 @@ void GC_Registers_Init();
 // AEC+ is available when;
 //  - EHDRI is not active.
 //  - FW rotating modes are not active.
+//  - Valid collection is loaded.
 //  - Active collection type is TelopsNDF.
-//  - NDFPosition are consecutive. Valid combinations  are [0 1], [1 2] or [0 1 2] but not [0 2].
-//    So must contain all three NDF positions or at least NDF position 1 when containing 2 NDF positions.
-#define GC_AECPlusIsAvailable (!GC_EHDRIIsActive && \
+//  - NDF positions are consecutive. Valid combinations are [NDfilter1 NDfilter2], [NDfilter2 NDfilter3] or
+//    [NDfilter1 NDfilter2 NDfilter3] but not [NDfilter1 NDfilter3]. So it must contain NDFilter2 and at least
+//    one of the two other positions.
+#define GC_AECPlusIsAvailable ( \
+   !GC_EHDRIIsActive && \
    !GC_FWAsynchronouslyRotatingModeIsActive && !GC_FWSynchronouslyRotatingModeIsActive && \
+   (calibrationInfo.isValid == 1) && \
    (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
-   ((calibrationInfo.collection.NumberOfBlocks == 3) || \
-   ((calibrationInfo.collection.NumberOfBlocks == 2) && ((calibrationInfo.blocks[0].NDFPosition == 1) || (calibrationInfo.blocks[1].NDFPosition == 1)))))
+   (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))))
 #define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
 
 void GC_UpdateLockedFlag();

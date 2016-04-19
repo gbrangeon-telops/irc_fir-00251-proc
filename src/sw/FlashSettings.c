@@ -1788,10 +1788,12 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    if (p_flashSettings->ICUPresent)
    {
       TDCFlagsSet(ICUIsImplementedMask);
+      gcRegsData.CalibrationActualizationMode = CAM_ICU;
    }
    else
    {
       TDCFlagsClr(ICUIsImplementedMask);
+      gcRegsData.CalibrationActualizationMode = CAM_BlackBody;
    }
 
    // Validate that FW and NDF are not both present

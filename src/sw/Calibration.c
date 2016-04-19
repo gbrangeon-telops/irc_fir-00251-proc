@@ -1286,6 +1286,32 @@ void Calibration_SM()
             GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
             GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
 
+            // Update active calibration collection registers
+            gcRegsData.CalibrationCollectionActivePOSIXTime = calibrationInfo.collection.POSIXTime;
+            gcRegsData.CalibrationCollectionActiveType = calibrationInfo.collection.CollectionType;
+
+            // Update NDF position availability
+            if (flashSettings.NDFPresent == 1)
+            {
+               for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
+               {
+                  switch (calibrationInfo.blocks[blockIndex].NDFPosition)
+                  {
+                     case NDFP_NDFilter1:
+                        AvailabilityFlagsSet(NDFilter1IsAvailableMask);
+                        break;
+
+                     case NDFP_NDFilter2:
+                        AvailabilityFlagsSet(NDFilter2IsAvailableMask);
+                        break;
+
+                     case NDFP_NDFilter3:
+                        AvailabilityFlagsSet(NDFilter3IsAvailableMask);
+                        break;
+                  }
+               }
+            }
+
             blockIndex = 0;
 
             if (startup)
@@ -1381,6 +1407,14 @@ static void Calibration_Init()
    AvailabilityFlagsClr(RTIsAvailableMask);
    AvailabilityFlagsClr(IBRIsAvailableMask);
    AvailabilityFlagsClr(IBIIsAvailableMask);
+   AvailabilityFlagsClr(NDFilter1IsAvailableMask);
+   AvailabilityFlagsClr(NDFilter2IsAvailableMask);
+   AvailabilityFlagsClr(NDFilter3IsAvailableMask);
+
+   // Update active calibration collection registers
+   gcRegsData.CalibrationCollectionActivePOSIXTime = 0;
+   gcRegsData.CalibrationCollectionActiveType = CCAT_TelopsFixed;
+   gcRegsData.CalibrationCollectionActiveBlockPOSIXTime = 0;
 
    // Update registers related to calibration control
    GC_UpdateParameterLimits();

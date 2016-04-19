@@ -86,7 +86,6 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    static const char headerSignature[3] = "TC";
    uint32_t data32;
    uint8_t i;
-   uint32_t gActualisationPosixTime = 0; // todo corriger la ârtie autocodée et enlever cette ligne quand c'est fait
 
    uint8_t hdrTestImageSelector;
 
@@ -108,7 +107,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 11.3
+// Generated from the IRCam header definition XLS file version 11.4
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -192,7 +191,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareMinorVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareSubMinorVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareSubMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareBuildVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareBuildVersionHdrAddr);
-   AXI4L_write32((uint32_t)(gActualisationPosixTime), a->ADD + A_BASE_HEADER + ActualizationPOSIXTimeHdrAddr);
+   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + ActualizationPOSIXTimeHdrAddr);
    AXI4L_write32((uint32_t)(pGCRegs->DeviceSerialNumber), a->ADD + A_BASE_HEADER + DeviceSerialNumberHdrAddr);
 
 /* AUTO-CODE END */
