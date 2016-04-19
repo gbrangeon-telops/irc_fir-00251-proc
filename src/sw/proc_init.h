@@ -29,11 +29,11 @@
 #error OEM UART cannot be GPS or Debug Terminal for STARTUP Project
 #endif
 
-#if (!defined(DEBUG) && OEM_UART_IS_GPS)
+#if (!defined(TELOPS_DEBUG) && OEM_UART_IS_GPS)
 #error "OEM UART is used as GPS."
 #endif
 
-#if (!defined(DEBUG) && OEM_UART_IS_DEBUG_TERMINAL)
+#if (!defined(TELOPS_DEBUG) && OEM_UART_IS_DEBUG_TERMINAL)
 #error "OEM UART is used as debug terminal."
 #endif
 
