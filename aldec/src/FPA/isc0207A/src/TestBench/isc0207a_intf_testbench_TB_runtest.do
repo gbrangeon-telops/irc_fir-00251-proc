@@ -93,7 +93,7 @@ asim -ses isc0207a_intf_testbench_TB
 -- monit adc
 --wave UUT/U1/U21/U4/*
 
- -- monit adc dummy
+-- monit adc dummy
 --wave UUT/U7/* 
  
 -- switch
@@ -107,7 +107,12 @@ asim -ses isc0207a_intf_testbench_TB
 --wave UUT/U1/U21/U8/* 
 
 -- mb_interface
-wave UUT/U1/U4/*  
+--wave UUT/U1/U4/*  
 
+-- digio map
+--wave UUT/U1/U19/*
+
+-- intf_sequencer
+wave UUT/U1/U2/*
 
 run 40 ms

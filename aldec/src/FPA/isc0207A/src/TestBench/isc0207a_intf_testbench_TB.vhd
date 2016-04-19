@@ -60,7 +60,7 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
    constant ysize : natural := 256;
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
-   signal ACQ_TRIG : STD_LOGIC;
+   signal ACQ_TRIG : STD_LOGIC := '0';
    signal ARESET : STD_LOGIC;
    signal CLK_100M : STD_LOGIC := '0';
    signal CLK_80M : STD_LOGIC := '0';
@@ -135,7 +135,7 @@ begin
    begin
       ACQ_TRIG <= not ACQ_TRIG after ACQ_TRIG_PERIOD/2; 
    end process;
-   XTRA_TRIG <= transport ACQ_TRIG after 50ns;
+   XTRA_TRIG <= '0';
    
    DOUT_MISO.TREADY <= '1';
    
@@ -193,7 +193,7 @@ begin
    user_cfg_i.XSIZE_DIV_TAPNUM <= to_unsigned(xsize/16, user_cfg_i.XSIZE_DIV_TAPNUM'length);
    
    user_cfg_i.readout_plus_delay <= to_unsigned(20*(6 + xsize*ysize/32), user_cfg_i.readout_plus_delay'length);
-   user_cfg_i.tri_window_and_intmode_part <= to_signed(-200, user_cfg_i.tri_window_and_intmode_part'length);
+   user_cfg_i.tri_window_and_intmode_part <= to_unsigned(10, user_cfg_i.tri_window_and_intmode_part'length);
    user_cfg_i.int_time_offset <= to_unsigned(80, user_cfg_i.int_time_offset'length);
    user_cfg_i.tsh_min <= to_unsigned(780, user_cfg_i.tsh_min'length);
    user_cfg_i.tsh_min_minus_int_time_offset <= to_unsigned(700, user_cfg_i.tsh_min_minus_int_time_offset'length);
@@ -344,8 +344,10 @@ begin
       wait for 30 ns; 
       
       write_axi_lite (MB_CLK, resize(X"E4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
-      wait for 4 ns; 
+      wait for 30 ns; 
       
+      write_axi_lite (MB_CLK, resize(X"E8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns; 
       
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;

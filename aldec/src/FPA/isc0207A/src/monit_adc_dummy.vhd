@@ -48,7 +48,7 @@ architecture rtl of monit_adc_dummy is
          );
    end component;
    
-   type ads1118_sm_type is (idle, send_data_st);
+   type ads1118_sm_type is (idle, send_data_st, wait_csn_st1, wait_csn_st2);
    type din_type is array (0 to 3) of std_logic_vector(15 downto 0);
    
    signal ads1118_sm : ads1118_sm_type;
@@ -118,11 +118,11 @@ begin
             
             sclk_last <= sclk_i;
             
-            if mux_i(2) = '1' and pga_i = "010" and mode_i = '1' and pull_up_enable_i = '1' and nop_i = "01" then
-               cfg_valid <= ss_i;
-            else
-               cfg_valid <= '0';
-            end if;                                               
+            ---if mux_i(2) = '1' and pga_i = "010" and mode_i = '0' and pull_up_enable_i = '1' and nop_i = "01" then
+            cfg_valid <= cfg_dval_i;
+            ---else
+            ---   cfg_valid <= '0';
+            ---end if;                                               
             
             ch_id <= to_integer(unsigned(mux_i(1 downto 0)));            
             
@@ -132,9 +132,19 @@ begin
                   SPI_SDO <= '0';
                   bitcnt <= 15;
                   data_to_send <= din(ch_id);
-                  if cfg_valid = '1' and SPI_CSN = '0' then
+                  if cfg_valid = '1'  then
+                     ads1118_sm <= wait_csn_st1;
+                  end if;
+               
+               when wait_csn_st1 =>
+                  if SPI_CSN = '1' then 
+                     ads1118_sm <= wait_csn_st2;
+                  end if;
+               
+               when wait_csn_st2 =>
+                  if SPI_CSN = '0' then 
                      ads1118_sm <= send_data_st;
-                  end if;   
+                  end if;
                
                when send_data_st =>
                   if sclk_i = '1' and sclk_last = '0' then
