@@ -142,11 +142,11 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(134, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(10, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
-      FPA_EXP_INFO.exp_dval <='0';
-      wait for 300 ns;
-      FPA_EXP_INFO.exp_time <= to_unsigned(600,FPA_EXP_INFO.exp_time'length);
+      --FPA_EXP_INFO.exp_dval <='0';
+      --wait for 300 ns;
+      --FPA_EXP_INFO.exp_time <= to_unsigned(10,FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_dval <= '1';
       wait;
    end process;
@@ -155,14 +155,14 @@ begin
    HDER_MISO.WREADY  <= '1';
    HDER_MISO.AWREADY <= '1';
    
-   user_cfg_i.COMN.FPA_DIAG_MODE <= '1';
+   user_cfg_i.COMN.FPA_DIAG_MODE <= '0';
    user_cfg_i.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR;
    user_cfg_i.COMN.fpa_pwr_on <= '1';
-   user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_READOUT_END_TO_TRIG_START;
-   user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(1, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);
-   user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(100, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
-   user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(10, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
-   user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(100, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);
+   user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_INT_END_TO_TRIG_START;
+   user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(60000, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);
+   user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(10000, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
+   user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(60000, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
+   user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(10000, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);
    
    
    user_cfg_i.XSTART <= (others => '0');

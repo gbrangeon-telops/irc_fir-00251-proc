@@ -26,6 +26,7 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl
 
 
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd
@@ -113,6 +114,10 @@ asim -ses isc0207a_intf_testbench_TB
 --wave UUT/U1/U19/*
 
 -- intf_sequencer
-wave UUT/U1/U2/*
+--wave UUT/U1/U2/*  
 
-run 40 ms
+-- fpa_prog_controller
+wave UUT/U1/U5/U2/*
+
+
+run 17 ms
