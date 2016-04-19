@@ -122,7 +122,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((int8_t)(0), a->ADD + A_BASE_HEADER + DataExpHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + ExposureTimeHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->CalibrationMode), a->ADD + A_BASE_HEADER + CalibrationModeHdrAddr);
-   AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + BPRAppliedHdrAddr);
+   AXI4L_write8((uint8_t)(pGCRegs->BadPixelReplacement), a->ADD + A_BASE_HEADER + BPRAppliedHdrAddr);
    AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + FrameBufferModeHdrAddr);
    AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + CalibrationBlockIndexHdrAddr);
    AXI4L_write16((uint16_t)(pGCRegs->Width), a->ADD + A_BASE_HEADER + WidthHdrAddr);
@@ -421,4 +421,15 @@ uint32_t HDER_GetStatus(const t_HderInserter *a)
 void HDER_UpdateFWSpeedSetpointHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
 {
    AXI4L_write16((uint16_t)(pGCRegs->FWSpeedSetpoint), a->ADD + A_BASE_HEADER + FWSpeedSetpointHdrAddr);
+}
+
+/**
+ * Update Image header BadPixelReplacement field.
+ *
+ * @param a is a pointer to the header inserter structure.
+ * @param pGCRegs is a pointer to registers data.
+ */
+void HDER_UpdateBadPixelReplacementHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
+{
+   AXI4L_write8((uint8_t)(pGCRegs->BadPixelReplacement), a->ADD + A_BASE_HEADER + BPRAppliedHdrAddr);
 }

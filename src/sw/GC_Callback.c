@@ -702,14 +702,24 @@ void GC_AvailabilityFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t ac
  */
 void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
+   extern flashDynamicValues_t gFlashDynamicValues;
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+
+      // Update BadPixelReplacement flash dynamic value
+      gFlashDynamicValues.BadPixelReplacement = gcRegsData.BadPixelReplacement;
+
+      if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
+      {
+         GC_ERR("Failed to update flash dynamic values.");
+      }
+
+      // TODO Update bad pixel replacement state
+
+      // Update BadPixelReplacement image header field
+      HDER_UpdateBadPixelReplacementHeader(&gHderInserter, &gcRegsData);
    }
 }
 

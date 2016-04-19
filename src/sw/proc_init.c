@@ -652,6 +652,7 @@ IRC_Status_t Proc_FlashDynamicValues_Init()
    gcRegsData.PowerOnAtStartup = gFlashDynamicValues.PowerOnAtStartup;
    gcRegsData.AcquisitionStartAtStartup = gFlashDynamicValues.AcquisitionStartAtStartup;
    gcRegsData.StealthMode = gFlashDynamicValues.StealthMode;
+   gcRegsData.BadPixelReplacement = gFlashDynamicValues.BadPixelReplacement;
    gcRegsData.DeviceKeyValidationLow = gFlashDynamicValues.DeviceKeyValidationLow;
    gcRegsData.DeviceKeyValidationHigh = gFlashDynamicValues.DeviceKeyValidationHigh;
 

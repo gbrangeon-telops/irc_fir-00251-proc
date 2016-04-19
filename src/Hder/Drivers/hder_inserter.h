@@ -119,4 +119,7 @@ uint32_t HDER_GetStatus(const t_HderInserter *a);
 // Pour update du frame rate
 void HDER_UpdateAcquisitionFrameRateHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
 
+// Pour update du champ BadPixelReplacement dans le header
+void HDER_UpdateBadPixelReplacementHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
+
 #endif // __HDER_INSERTER_H__

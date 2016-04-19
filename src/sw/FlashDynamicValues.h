@@ -39,11 +39,11 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.4.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.5.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
 #define FDV_FILESTRUCTUREMAJORVERSION      1
-#define FDV_FILESTRUCTUREMINORVERSION      4
+#define FDV_FILESTRUCTUREMINORVERSION      5
 #define FDV_FILESTRUCTURESUBMINORVERSION   0
 
 /**
@@ -91,6 +91,9 @@
 #define FDV_STEALTHMODE_OFFSET   38
 #define FDV_STEALTHMODE_LENGTH   1
 
+#define FDV_BADPIXELREPLACEMENT_OFFSET   39
+#define FDV_BADPIXELREPLACEMENT_LENGTH   1
+
 #define FDV_CALIBRATIONCOLLECTIONPOSIXTIMEATSTARTUP_OFFSET   40
 #define FDV_CALIBRATIONCOLLECTIONPOSIXTIMEATSTARTUP_LENGTH   4
 
@@ -131,6 +134,7 @@ struct flashDynamicValuesStruct {
    uint8_t PowerOnAtStartup;   /**< Indicates whether the device is powered on at device startup. */
    uint8_t AcquisitionStartAtStartup;   /**< Indicates whether an acquisition is started at device startup. */
    uint8_t StealthMode;   /**< Indicates whether the device is in stealth mode. */
+   uint8_t BadPixelReplacement;   /**< Indicates whether the Bad Pixels Replacement is enabled. */
    char FileSignature[5];   /**< Camera flash dynamic values file signature */
 };
 
