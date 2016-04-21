@@ -117,7 +117,12 @@ asim -ses isc0207a_intf_testbench_TB
 --wave UUT/U1/U2/*  
 
 -- fpa_prog_controller
-wave UUT/U1/U5/U2/*
+--wave UUT/U1/U5/U2/* 
 
 
-run 17 ms
+-- module FPA
+wave UUT/U1/* 
+
+
+
+run 40 ms

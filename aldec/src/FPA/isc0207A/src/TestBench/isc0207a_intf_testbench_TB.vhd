@@ -63,8 +63,8 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
    signal ACQ_TRIG : STD_LOGIC := '0';
    signal ARESET : STD_LOGIC;
    signal CLK_100M : STD_LOGIC := '0';
-   signal CLK_80M : STD_LOGIC := '0';
-   signal DOUT_CLK : STD_LOGIC;
+   signal CLK_80M : STD_LOGIC  := '0';
+   signal DOUT_CLK : STD_LOGIC := '0';
    signal DOUT_MISO : t_axi4_stream_miso;
    signal FPA_EXP_INFO : exp_info_type;
    signal HDER_MISO : t_axi4_lite_miso;
