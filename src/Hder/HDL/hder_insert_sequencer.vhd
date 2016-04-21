@@ -149,7 +149,8 @@ architecture rtl of hder_insert_sequencer is
     signal wstrb_buff                   : std_logic_vector(3 downto 0);
     signal pix_fifo_rd_en               : std_logic;
     signal fpa_hder_fast_received       : std_logic;
-    
+    signal cal_hder_fast_received       : std_logic;
+	
 begin
     
     OUT_MOSI <= out_mosi_i;
@@ -369,6 +370,7 @@ begin
                 fast_hder_reorder_sm <= idle;
                 hder_reorder_done <= '0';
                 fpa_hder_fast_received <= '0';
+                cal_hder_fast_received <= '0';
                 for j in 1 to FAST_HDER_CLIENT_NUMBER loop
                     fast_hder_client_out(j).fifo_rd <= '0';
                     fast_hder_client_out(j).miso_bvalid <= '0';
@@ -389,6 +391,7 @@ begin
                     when idle =>
                         hder_reorder_done <= '1';
                         fpa_hder_fast_received <= '0';
+                        cal_hder_fast_received <= '0';
                         fast_hder_client_cnt <= (others => '0');
                         ram_bwe_i <= (others => '0');         -- valeur par defauut plaçant la ram en mode read
                         
@@ -406,7 +409,7 @@ begin
                     when check_st =>
                         hder_reorder_done <= '0';
                         ram_bwe_i <= (others => '0');  -- ram protegée contre toute ecriture hasardeuse 
-                        if fast_hder_client_cnt >= 3 and fpa_hder_fast_received = '1' then -- ainsi, si la FW n'est pas active, on retourne à idle. Sinon, on il doit y avoir des données à mettre en RAM et donc fast_hder_reorder_sm ira en ram_wr_st; 
+                        if fast_hder_client_cnt >= 3 and fpa_hder_fast_received = '1' and cal_hder_fast_received  = '1' then -- ainsi, si la FW n'est pas active, on retourne à idle. Sinon, on il doit y avoir des données à mettre en RAM et donc fast_hder_reorder_sm ira en ram_wr_st; 
                             fast_hder_reorder_sm <= idle;
                         end if;
                         for j in 1 to FAST_HDER_CLIENT_NUMBER loop
@@ -422,6 +425,10 @@ begin
                         if num = 1 then
                             fpa_hder_fast_received <= '1';
                         end if;
+                        if num = 5 then
+                            cal_hder_fast_received <= '1';
+                        end if;
+                        
                         add_buff <= unsigned(fast_hder_client_in(num).mosi.awaddr(ALEN_M1 downto 0));
                         data_buff <= fast_hder_client_in(num).mosi.wdata;
                         eof_code_buff <= fast_hder_client_in(num).hder_eof_code;
