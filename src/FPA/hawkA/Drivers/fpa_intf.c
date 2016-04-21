@@ -193,6 +193,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    hawk_param_t hh;
    extern int16_t gFpaDetectorPolarizationVoltage;
    static int16_t actualPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   float Nr, Nc, No, R, H, C, W;
    
    // on bâtit les parametres specifiques du hawk
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -239,11 +240,29 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->revert = 0; 
    
    // formule implantée pour le mode normal (revert = 0, Invert = 0)
-   ptrA->jpos = (uint32_t)(2.0F * (float)FPA_HEIGHT_MAX + (float)FPA_WIDTH_MAX/(float)FPA_NUMTAPS + floorf((float)pGCRegs->OffsetX/(float)FPA_NUMTAPS) + 1.0F); 
-   ptrA->kpos = (uint32_t)(2.0F * (float)FPA_HEIGHT_MAX + floorf(((float)pGCRegs->OffsetX + (float)pGCRegs->Width - 1.0F)/(float)FPA_NUMTAPS) + 1.0F);
-   ptrA->lpos = (uint32_t)((float)FPA_HEIGHT_MAX + (float)pGCRegs->OffsetY + 1.0F);
-   ptrA->mpos = (uint32_t)((float)pGCRegs->OffsetY + (float)pGCRegs->Height);
+   Nr = (float)FPA_HEIGHT_MAX;
+   Nc = (float)FPA_WIDTH_MAX;
+   No = (float)FPA_NUMTAPS;
    
+   // ENO   20 avril 2016 : la formule de Selex semble ne pas marcher. Celle ci-dessous a établie par moi-meme et marche très bien.
+   // à la formule de la doc qui est 
+   R = (float)pGCRegs->OffsetY + 1.0F;        //  frame pixel row start index  
+   H = (float)pGCRegs->Height;                //  frame height in pixels 
+   C = (float)pGCRegs->OffsetX + 1.0F;        //  frame pixel column start index 
+   W = (float)pGCRegs->Width;                 //  frame width in pixels                 
+   
+   // nous avons fait un ajustement (patch de soustraction de 1 et 4 sur la formule de R et C)pour tenir compte des decalages de sous-fenetres observés par PTR lors des tests du Hawk.
+   // Toutefois, cela crée un autre problème sur les fenetres pleines. Nous avons donc effectué un second patch qui se matérialise par les IF qu'on retrouve sur a->FPA_Mpos et a->FPA_Kpos
+   if ((uint32_t)pGCRegs->Height != (uint32_t)FPA_HEIGHT_MAX)   
+      R = (float)pGCRegs->OffsetY;            // sub frame pixel row start index  
+   if ((uint32_t)pGCRegs->Width != (uint32_t)FPA_WIDTH_MAX)
+      C = (float)pGCRegs->OffsetX - 3;        // sub frame pixel column start index 
+      
+   ptrA->jpos = (uint32_t)(2.0F * Nr + Nc/No + floorf((C - 1.0F)/No) + 1.0F); 
+   ptrA->kpos = (uint32_t)(2.0F * Nr + floorf((C + W - 2.0F)/No) + 1.0F);
+   ptrA->lpos = (uint32_t)(Nr + R);
+   ptrA->mpos = (uint32_t)(R + H - 1.0F);
+     
    // CBIT 
    ptrA->cbit_en = 1;                    
    
