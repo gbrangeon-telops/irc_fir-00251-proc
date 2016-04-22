@@ -86,11 +86,11 @@ begin
             delta_fe <= abs(signed('0' & TOC_FE_DLY) - to_signed(FE_DISTANCE_REF, 33));
             delta_fe_dval <= TOC_FE_DLY_DVAL;
             
-            if delta_re > 5 then
+            if delta_re > 2 then
                re_err_i <= delta_re_dval;               
             end if;
             
-            if delta_fe > 5 then
+            if delta_fe > 2 then
                fe_err_i <= delta_fe_dval;               
             end if;        
             
