@@ -78,6 +78,14 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\digio_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\flexV_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\brd_switch_dummy.vhd
 
+acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\detector_trace_define.vhd
+acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\re_distance_measure.vhd
+acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\edge_measure_ref_clk.vhd
+acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\edge_measure_stat.vhd
+acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\edge_distance_measure.bde
+
+
+
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\isc0207a_intf_testbench.bde
 
 acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\TestBench\isc0207a_intf_testbench_TB.vhd
@@ -121,8 +129,11 @@ asim -ses isc0207a_intf_testbench_TB
 
 
 -- module FPA
-wave UUT/U1/* 
+--wave UUT/U1/* 
+
+--wave UUT/U14/U1/* 
+--wave UUT/U14/U11/*
+wave UUT/TRACE_ERR*
 
 
-
-run 40 ms
+run 20 ms

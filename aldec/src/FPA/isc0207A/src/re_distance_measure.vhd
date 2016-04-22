@@ -51,6 +51,7 @@ architecture rtl of re_distance_measure is
    signal tic_sync_last       : std_logic;
    signal toc_sync            : std_logic;
    signal toc_sync_last       : std_logic;
+   signal toc_re              : std_logic;
    
 begin
    
@@ -75,13 +76,16 @@ begin
             tic_sync_last <= tic_sync;  
             meas_count <= (others => '0');
             DLY_DVAL <= '0';
+            toc_re <= '0';
          else 
             
             tic_sync <= TIC;
             tic_sync_last <= tic_sync;
             
             toc_sync <= TOC;
-            toc_sync_last <= toc_sync;
+            toc_sync_last <= toc_sync; 
+            
+            toc_re <= toc_sync and not toc_sync_last;  -- permet de retarder la falling edge de 1 Clk
             
             case meas_fsm is 
                
@@ -94,7 +98,7 @@ begin
                
                when meas_high_st => 
                   meas_count <= meas_count + 1;                   
-                  if toc_sync = '1' or toc_sync_last = '1' then
+                  if (toc_sync = '1' and toc_sync_last = '0') or toc_re = '1' then
                      meas_fsm <= idle; 
                      DLY <= std_logic_vector(meas_count);
                      DLY_DVAL <= '1';

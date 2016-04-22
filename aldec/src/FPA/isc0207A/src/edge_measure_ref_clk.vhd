@@ -29,6 +29,8 @@ architecture rtl of edge_measure_ref_clk is
    
 begin
    
+   REF_CLK <= clk_i;
+   
    -- clk
    U1: process(clk_i)
    begin
