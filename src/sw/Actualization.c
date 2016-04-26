@@ -168,7 +168,6 @@ static void initDeltaBetaData(deltabeta_t* data);
 static deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool verbose);
 static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 static void advanceDeltaBetaAge(uint32_t increment_s);
-static uint8_t getActiveBlockIdx(const calibrationInfo_t* calibInfo);
 
 #ifdef ACT_TEST_NOBUFFERING
 static uint32_t fillDebugData(uint16_t* data, uint32_t c0, uint32_t frameSize, uint32_t numFrames);
@@ -177,7 +176,7 @@ static uint32_t fillDebugData(uint16_t* data, uint32_t c0, uint32_t frameSize, u
 static void defineActualizationFilename(char* buf, uint8_t length, uint32_t timestamp, deltabeta_t* data);
 
 static void ACT_init();
-static void ACT_clearDeltaBeta(); // initialize the delta beta map with value 0 and bad pixel status 1 (all good pixels)
+//static void ACT_clearDeltaBeta(); // initialize the delta beta map with value 0 and bad pixel status 1 (all good pixels)
 
 // debugging and diagnosis functions
 static bool validateAverage(const uint32_t* coadd_buffer, uint32_t numPixels, uint32_t expectedSum);
@@ -524,7 +523,7 @@ IRC_Status_t Actualization_SM()
 
             activeDeltaBeta = currentDeltaBeta;
 
-            blockIdx = getActiveBlockIdx(&calibrationInfo);
+            blockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
             blockInfo = &calibrationInfo.blocks[blockIdx];
 
             if (usingICU)
@@ -1018,6 +1017,8 @@ IRC_Status_t Actualization_SM()
       case ACT_ComputeBlackBodyFCal: // State 11
          if ( TDCStatusTst(AcquisitionStartedMask) == 0 )
          {
+            uint8_t currentBlockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
+
             if (usingICU)
             {
                T_BB = ICUTemp + CELSIUS_TO_KELVIN;
@@ -1037,7 +1038,7 @@ IRC_Status_t Actualization_SM()
             ACT_PRINTF( "Computing FCalBB...\n" );
 
             // Compute FCal scale according to exposure time. We apply it to FCalBB to save on floating point operations
-            scaleFCal = gcRegsData.ExposureTime * calibrationInfo.blocks[gcRegsData.CalibrationCollectionBlockSelector].NUCMultFactor * coaddData.NCoadd; // CR_WARNING exposure time is assumed to be in µs
+            scaleFCal = gcRegsData.ExposureTime * calibrationInfo.blocks[currentBlockIdx].NUCMultFactor * coaddData.NCoadd; // CR_WARNING exposure time is assumed to be in µs
 
             // Compute sqrt(FCalBB)
             // find the index of the LUT which has the ICU type
@@ -1064,7 +1065,7 @@ IRC_Status_t Actualization_SM()
             #endif
 
             // Compute Alpha and Beta LSB
-            Alpha_LSB = exp2f( (float) calibrationInfo.blocks[gcRegsData.CalibrationCollectionBlockSelector].pixelData.Alpha_Exp );
+            Alpha_LSB = exp2f( (float) calibrationInfo.blocks[currentBlockIdx].pixelData.Alpha_Exp );
 
 #if SCALE_FACTOR_TRICK
             // this saves a bunch of floating point operations later
@@ -1082,7 +1083,7 @@ IRC_Status_t Actualization_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               PRINTF( "ACT: ICU Beta0 Exponent = %d\n", calibrationInfo.blocks[gcRegsData.CalibrationCollectionBlockSelector].pixelData.Beta0_Exp);
+               PRINTF( "ACT: ICU Beta0 Exponent = %d\n", calibrationInfo.blocks[currentBlockIdx].pixelData.Beta0_Exp);
             }
 
             tic_RT_Duration = 0;
@@ -1470,7 +1471,7 @@ IRC_Status_t BadPixelDetection_SM()
          StartTimer(&bpd_timer, 1000);
 
          // trouver le deltaBeta ICU
-         currentDeltaBeta = findMatchingDeltaBetaForBlock(&calibrationInfo, getActiveBlockIdx(&calibrationInfo));
+         currentDeltaBeta = findMatchingDeltaBetaForBlock(&calibrationInfo, Calibration_GetActiveBlockIdx(&calibrationInfo));
          if (currentDeltaBeta->valid)
          {
             ctxtInit(&blockContext, 0, numPixels, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
@@ -1490,7 +1491,7 @@ IRC_Status_t BadPixelDetection_SM()
          uint8_t blockIdx;
          uint32_t* calAddr = (uint32_t*)PROC_MEM_PIXEL_DATA_BASEADDR; // CR_TRICKY the pointer is in 32-bit elements (64 bits per pixel data)
 
-         blockIdx = getActiveBlockIdx(&calibrationInfo);
+         blockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
          ACT_updateCurrentCalibration(&calibrationInfo.blocks[blockIdx], &calAddr[blockContext.startIndex*2], currentDeltaBeta, blockContext.startIndex, blockContext.blockLength);
          calibrationInfo.blocks[blockIdx].CalibrationSource = CS_ACTUALIZED;
 
@@ -3316,7 +3317,7 @@ void ACT_resetParams(actParams_t* p)
    p->deltaBetaDiscardOffset = flashSettings.ActualizationDiscardOffset;
 }
 
-static void ACT_clearDeltaBeta()
+/*static void ACT_clearDeltaBeta()
 {
    int i;
    const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
@@ -3326,7 +3327,7 @@ static void ACT_clearDeltaBeta()
    {
       d[i] = CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_MASK;
    }
-}
+}*/
 
 static void ACT_init()
 {
@@ -3716,7 +3717,7 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
 
    *newDataOut = NULL;
 
-   blockIdx = getActiveBlockIdx(calibInfo);
+   blockIdx = Calibration_GetActiveBlockIdx(calibInfo);
    if (blockIdx < 0)
    {
       ACT_ERR("newDeltaBetaForBlock(): No active calibration block index was found!");
@@ -3800,28 +3801,12 @@ void advanceDeltaBetaAge(uint32_t increment_s)
    }
 }
 
-uint8_t getActiveBlockIdx(const calibrationInfo_t* calibInfo)
-{
-   int i = calibInfo->collection.NumberOfBlocks - 1;
-   int idx = -1;
-
-   while (i >= 0 && idx < 0)
-   {
-      if (calibInfo->blocks[i].POSIXTime == gcRegsData.CalibrationCollectionActiveBlockPOSIXTime)
-         idx = i;
-
-      --i;
-   }
-
-   return idx;
-}
-
 /*
  * Return a pointer to the currently applied correction (the active calibration block). Returns NULL is none is applied.
  */
 deltabeta_t* ACT_getActiveDeltaBeta()
 {
-   int8_t idx = getActiveBlockIdx(&calibrationInfo);
+   int8_t idx = Calibration_GetActiveBlockIdx(&calibrationInfo);
    deltabeta_t* data = NULL;
 
    if (idx >= 0 && calibrationInfo.blocks[idx].CalibrationSource == CS_ACTUALIZED)

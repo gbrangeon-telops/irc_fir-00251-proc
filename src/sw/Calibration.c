@@ -1819,3 +1819,26 @@ uint8_t CM_FileUsedByActualCalibration(fileRecord_t *file)
    }
    return 0;
 }
+
+/**
+ * Determine the active calibration block
+ *
+ * @param calibration info structure
+ *
+ * @return 0-based index to address the "blocks" field of calibInfo
+ */
+uint8_t Calibration_GetActiveBlockIdx(const calibrationInfo_t* calibInfo)
+{
+   int i = calibInfo->collection.NumberOfBlocks - 1;
+   int idx = -1;
+
+   while (i >= 0 && idx < 0)
+   {
+      if (calibInfo->blocks[i].POSIXTime == gcRegsData.CalibrationCollectionActiveBlockPOSIXTime)
+         idx = i;
+
+      --i;
+   }
+
+   return idx;
+}
