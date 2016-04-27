@@ -420,6 +420,7 @@ void File_Manager_SM()
             {
                FM_ERR("File read failed.");
                F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+               fmCurresntState = FMS_WAITING_FOR_REQUEST;
             }
          }
 
