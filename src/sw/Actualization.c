@@ -1083,7 +1083,7 @@ IRC_Status_t Actualization_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               PRINTF( "ACT: ICU Beta0 Exponent = %d\n", calibrationInfo.blocks[currentBlockIdx].pixelData.Beta0_Exp);
+               PRINTF( "ACT: Reference block Beta0 Exponent = %d\n", calibrationInfo.blocks[currentBlockIdx].pixelData.Beta0_Exp);
             }
 
             tic_RT_Duration = 0;
