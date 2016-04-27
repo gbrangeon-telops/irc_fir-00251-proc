@@ -366,7 +366,7 @@ void NDF_ControllerProcess()
       gcRegsData.NDFilterPosition = NDFP_NDFilterInTransition;
 
    if (NDF_rawMode)
-      gcRegsData.NDFilterPosition = NDFP_NDFilterInTransition; // TODO définir un enum dans GenICam
+      gcRegsData.NDFilterPosition = NDFP_NDFilterInTransition;
 
    // raw mode does not set the TDCStatus
    if (!NDF_rawMode && gcRegsData.NDFilterPosition == NDFP_NDFilterInTransition)

@@ -132,6 +132,7 @@ void Acquisition_Arm()
    EXP_SendConfigGC(&gExposureTime, &gcRegsData);
 
    CAL_SendConfigGC(&gCal, &gcRegsData);
+   CAL_UpdateCalibBprMode(&gCal, &gcRegsData);
 
    FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
 

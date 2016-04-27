@@ -158,6 +158,7 @@ void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs);
 void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs);
 IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 void CAL_GetStatus(t_CalStatus *Stat, const t_calib *pA);
-void CAL_UpdateVideo(const t_calib *pA, gcRegistersData_t *pGCRegs);
+void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs);
+void CAL_UpdateCalibBprMode(const t_calib *pA, const gcRegistersData_t *pGCRegs);
  
 #endif // __calib_H__

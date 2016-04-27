@@ -61,7 +61,10 @@ entity calib_config is
       VIDEO_FWPOSITION_INDEX      : out std_logic_vector(7 downto 0);
       VIDEO_SELECTOR 	          : out std_logic_vector(1 downto 0);
       VIDEO_FREEZE_CMD            : out std_logic;
-      VIDEO_BPR_ENABLE         	 : out std_logic;
+      VIDEO_BPR_MODE          	 : out std_logic_vector(2 downto 0);
+      
+      -- BPR mode for calib data
+      CALIB_BPR_MODE          	 : out std_logic_vector(2 downto 0);
       
       -- Flush Pipe               
       FLUSH_PIPE                  : out std_logic;
@@ -127,12 +130,13 @@ architecture rtl of calib_config is
    signal rqc_fall_i                   : std_logic := '1';
    signal fcc_fall_i                   : std_logic := '1';
    
-   signal video_ehdriindex_i            : std_logic_vector(7 downto 0) := x"05";
-   signal video_fwposition_i            : std_logic_vector(7 downto 0) := x"05";
-   signal video_selector_i         : std_logic_vector(7 downto 0) := x"00";
-   signal video_selector_hold      : std_logic_vector(7 downto 0) := x"00";
-   signal video_freeze_i                 : std_logic := '0';
-   signal video_bpr_enable_i             : std_logic := '0';
+   signal video_ehdriindex_i           : std_logic_vector(7 downto 0) := x"05";
+   signal video_fwposition_i           : std_logic_vector(7 downto 0) := x"05";
+   signal video_selector_i             : std_logic_vector(7 downto 0) := x"00";
+   signal video_freeze_i               : std_logic := '0';
+   signal video_bpr_mode_i             : std_logic_vector(2 downto 0) := "001";   -- LAST_VALID_BPR_MODE by default
+   
+   signal calib_bpr_mode_i             : std_logic_vector(2 downto 0) := "000";   -- NO_REPL_BPR_MODE by default
    
    signal flush_pipe_i                 : std_logic := '1';
    signal flush_pipe_sync              : std_logic;
@@ -154,8 +158,9 @@ architecture rtl of calib_config is
    signal slv_reg_rden                 : std_logic;
    signal slv_reg_wren                 : std_logic;
    signal cfg_wr_data                  : std_logic_vector(31 downto 0);
-   signal mb_cfg_done                  : std_logic;
+   signal mb_cfg_done                  : std_logic := '0';     -- to have a rising edge at start-up
    signal mb_cfg_done_sync             : std_logic;
+   signal mb_cfg_done_sync_last        : std_logic;
    signal calib_block_index            : std_logic_vector(2 downto 0);
    
 begin
@@ -192,32 +197,31 @@ begin
             RQC_FALL       <= rqc_fall_i;        
             FCC_FALL       <= fcc_fall_i;
          end if;
-      end if;
-   end process;
-   -- These outputs are updated everytime (with clk domain change)
-   U1A: double_sync port map(D => config_dval_i, Q => config_dval_sync, RESET => '0', CLK => CLK);
-   U1B: double_sync port map(D => video_freeze_i, Q => VIDEO_FREEZE_CMD, RESET => '0', CLK => CLK);
-   U1C: double_sync port map(D => video_bpr_enable_i, Q => VIDEO_BPR_ENABLE, RESET => '0', CLK => CLK);
-   U1D: double_sync port map(D => flush_pipe_i, Q => flush_pipe_sync, RESET => '0', CLK => CLK);
-   U1E: double_sync port map(D => reset_err_i, Q => RESET_ERR, RESET => '0', CLK => CLK);
-   U1F: double_sync port map(D => done_i, Q => done_sync, RESET => '0', CLK => MB_CLK);
-   sync_mb_cfg: double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync, RESET => '0', CLK => CLK);
-   
-   VIDEO_SELECTOR <= video_selector_hold(1 downto 0);
-   
-   -- clock domain crossing of the vector parameters
-   video_params_hold: process(CLK)
-   begin
-      if rising_edge(CLK) then
-         if mb_cfg_done_sync = '1' then
-            VIDEO_EHDRI_INDEX <= video_ehdriindex_i;
-            VIDEO_FWPOSITION_INDEX <= video_fwposition_i;
-            video_selector_hold <= video_selector_i;
+         
+         mb_cfg_done_sync_last <= mb_cfg_done_sync;
+         
+         -- These outputs are updated everytime (when clk domain crossing is done)
+         if mb_cfg_done_sync = '1' and mb_cfg_done_sync_last = '0' then
+            VIDEO_EHDRI_INDEX       <= video_ehdriindex_i;
+            VIDEO_FWPOSITION_INDEX  <= video_fwposition_i;
+            VIDEO_SELECTOR          <= video_selector_i(1 downto 0);
+            VIDEO_FREEZE_CMD        <= video_freeze_i;
+            VIDEO_BPR_MODE          <= video_bpr_mode_i;
+            
+            CALIB_BPR_MODE    <= calib_bpr_mode_i;
+            
+            flush_pipe_sync   <= flush_pipe_i;
+            RESET_ERR         <= reset_err_i;
          end if;
       end if;
    end process;
    
-   -- make sure the fluch_pipe pulse is >16 clock pulses wide as per Xilinx requirement for AXIS cores
+   -- Clk domain crossing config signals
+   sync_dval   : double_sync port map(D => config_dval_i, Q => config_dval_sync, RESET => '0', CLK => CLK);
+   sync_done   : double_sync port map(D => done_i, Q => done_sync, RESET => '0', CLK => MB_CLK);
+   sync_mb_cfg : double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync, RESET => '0', CLK => CLK);
+   
+   -- make sure the flush_pipe pulse is >16 clock pulses wide as per Xilinx requirement for AXIS cores
    fpipe_stretch : gh_stretch
    generic map (stretch_count => 20)
    port map(
@@ -291,7 +295,7 @@ begin
                when X"34" => calib_block_array(idx).hder_info.offset_fp32       <= cfg_wr_data(calib_hder_type.offset_fp32'range); 
                when X"38" => calib_block_array(idx).hder_info.data_exponent     <= cfg_wr_data(calib_hder_type.data_exponent'range);
                when X"3C" => calib_block_array(idx).hder_info.block_act_posix   <= cfg_wr_data(calib_hder_type.block_act_posix'range);
-              
+               
                -- control des switches et des trous
                when X"A4" => input_sw_i            <= cfg_wr_data(input_sw_i'range);
                when X"A8" => datatype_sw_i         <= cfg_wr_data(datatype_sw_i'range);
@@ -305,13 +309,16 @@ begin
                when X"C0" => video_fwposition_i       <= cfg_wr_data(video_fwposition_i'range);
                when X"C4" => video_selector_i         <= cfg_wr_data(video_selector_i'range);
                when X"C8" => video_freeze_i     	   <= cfg_wr_data(0);
-               when X"CC" => video_bpr_enable_i       <= cfg_wr_data(0);
+               when X"CC" => video_bpr_mode_i         <= cfg_wr_data(video_bpr_mode_i'range);
                   
                -- flush 
                when X"D0" => flush_pipe_i          <= cfg_wr_data(0);                  
                
                -- reset errors
                when X"D4" => reset_err_i           <= cfg_wr_data(0);
+               
+               -- BPR mode for calib data
+               when X"D8" => calib_bpr_mode_i      <= cfg_wr_data(calib_bpr_mode_i'range);
                
                when others =>
                

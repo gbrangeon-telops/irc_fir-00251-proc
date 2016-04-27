@@ -64,7 +64,9 @@
 #define AW_VIDEO_FWPOSITION         0xC0
 #define AW_VIDEO_SELECTOR_ENABLE    0xC4
 #define AW_VIDEO_FREEZE             0xC8
-#define AW_VIDEO_BPR_ENABLE         0xCC
+#define AW_VIDEO_BPR_MODE           0xCC
+
+#define AW_CALIB_BPR_MODE           0xD8
 
 #define VIDEO_EHDRI_INDEX_DEFAULT   0x5   // Valeur pour EHDRI desactiver
 
@@ -144,7 +146,9 @@ void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs)
    AXI4L_write32(VIDEO_EHDRI_INDEX_DEFAULT, pA->ADD + AW_VIDEO_EHDRIINDEX );
    AXI4L_write32(0, pA->ADD + AW_VIDEO_SELECTOR_ENABLE );
    AXI4L_write32(FALSE, pA->ADD + AW_VIDEO_FREEZE);
-   AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_ENABLE);
+   AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_MODE);
+
+   CAL_UpdateCalibBprMode(pA, pGCRegs);
 }
 
 
@@ -688,7 +692,7 @@ static void CAL_configSwitchesAndHoles(const t_calib *pA, cal_mode_t calib_mode,
 
 }
 
-void CAL_UpdateVideo(const t_calib *pA, gcRegistersData_t *pGCRegs)
+void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs)
 {
    uint32_t video_selector = 0;
 
@@ -706,5 +710,10 @@ void CAL_UpdateVideo(const t_calib *pA, gcRegistersData_t *pGCRegs)
 
    AXI4L_write32(video_selector, pA->ADD + AW_VIDEO_SELECTOR_ENABLE );
    AXI4L_write32(pGCRegs->VideoFreeze, pA->ADD + AW_VIDEO_FREEZE);
-   AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_ENABLE);
+   AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_MODE);
+}
+
+void CAL_UpdateCalibBprMode(const t_calib *pA, const gcRegistersData_t *pGCRegs)
+{
+   AXI4L_write32(pGCRegs->BadPixelReplacement, pA->ADD + AW_CALIB_BPR_MODE);
 }

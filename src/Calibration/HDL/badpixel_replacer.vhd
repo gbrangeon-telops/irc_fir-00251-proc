@@ -15,7 +15,8 @@
 -------------------------------------------------------------------------------
 
 library IEEE;
-use IEEE.STD_LOGIC_1164.all; 
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
 use work.TEL2000.all;
 
 entity badpixel_replacer is
@@ -25,7 +26,7 @@ entity badpixel_replacer is
    port(
       CLK         : in  std_logic;
       ARESETN     : in  std_logic;
-      REPL_EN     : in  std_logic := '1';
+      REPL_MODE   : in  std_logic_vector(2 downto 0);
    
       RX_MOSI     : in  t_axi4_stream_mosi16;      
       RX_MISO     : out t_axi4_stream_miso;  
@@ -44,6 +45,10 @@ architecture RTL of badpixel_replacer is
          CLK    : in std_logic);
    end component;
    
+   -- Replacement modes
+   constant NO_REPL    : std_logic_vector(REPL_MODE'range) := std_logic_vector(to_unsigned(0, REPL_MODE'length));
+   constant LAST_VALID : std_logic_vector(REPL_MODE'range) := std_logic_vector(to_unsigned(1, REPL_MODE'length));
+   
    signal sresetn          : std_logic;
    signal last_valid_pix   : std_logic_vector(TX_MOSI.TDATA'range);
 
@@ -55,7 +60,9 @@ begin
    RX_MISO.TREADY <= TX_MISO.TREADY;
    
    TX_MOSI.TVALID <= RX_MOSI.TVALID;
-   TX_MOSI.TDATA  <= last_valid_pix when (RX_MOSI.TDATA = BAD_PIX_TAG and REPL_EN = '1') else RX_MOSI.TDATA;
+   TX_MOSI.TDATA  <= last_valid_pix when (RX_MOSI.TDATA = BAD_PIX_TAG and REPL_MODE = LAST_VALID) else 
+                     --signal when (RX_MOSI.TDATA = BAD_PIX_TAG and REPL_MODE = mode) else 
+                     RX_MOSI.TDATA;
    TX_MOSI.TSTRB  <= RX_MOSI.TSTRB;  
    TX_MOSI.TKEEP  <= RX_MOSI.TKEEP;  
    TX_MOSI.TLAST  <= RX_MOSI.TLAST;  
@@ -68,7 +75,7 @@ begin
       if rising_edge(CLK) then
          
          if sresetn = '0' then 
-            last_valid_pix <= (others => '0');
+            last_valid_pix <= (last_valid_pix'high => '1', others => '0'); -- Reset value is the median
          
          elsif (TX_MISO.TREADY = '1' and RX_MOSI.TVALID = '1' and RX_MOSI.TDATA /= BAD_PIX_TAG) then
             -- Update last valid pixel value

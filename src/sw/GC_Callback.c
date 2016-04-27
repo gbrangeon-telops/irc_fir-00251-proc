@@ -598,7 +598,8 @@ void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
          GC_ERR("Failed to update flash dynamic values.");
       }
 
-      // TODO Update bad pixel replacement state
+      // Update bad pixel replacement state
+      CAL_UpdateCalibBprMode(&gCal, &gcRegsData);
 
       // Update BadPixelReplacement image header field
       HDER_UpdateBadPixelReplacementHeader(&gHderInserter, &gcRegsData);
