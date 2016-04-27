@@ -50,7 +50,7 @@ int fdFlashSettings;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.11.0
+// Generated from the Flash Settings definition XLS file version 1.12.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 /**
@@ -82,6 +82,8 @@ flashSettings_t flashSettingsDefault = {
    /* BPAECImageFraction = */ 50.000000F,
    /* BPAECWellFilling = */ 50.000000F,
    /* BPAECResponseTime = */ 1000.000000F,
+   /* DetectorElectricalTapsRef = */ 0.000000F,
+   /* DetectorElectricalRefOffset = */ 0.000000F,
    /* FW0CenterPosition = */ 0,
    /* FW1CenterPosition = */ 47652,
    /* FW2CenterPosition = */ 31768,
@@ -533,7 +535,7 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
 
 /* AUTO-CODE FIELDS BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.11.0
+// Generated from the Flash Settings definition XLS file version 1.12.0
 // using generateFlashSettingsCLib.m Matlab script.
 
    // Read DeviceSerialNumber flash settings field
@@ -1464,6 +1466,24 @@ IRC_Status_t FlashSettings_LoadFieldsData(int fd, flashSettings_t *p_flashSettin
    }
    *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->DeviceKeyHigh, FS_DEVICEKEYHIGH_LENGTH);
 
+   // Read DetectorElectricalTapsRef flash settings field
+   byteCount = uffs_read(fd, &p_flashSettings->DetectorElectricalTapsRef, FS_DETECTORELECTRICALTAPSREF_LENGTH);
+   if (byteCount != FS_DETECTORELECTRICALTAPSREF_LENGTH)
+   {
+      FS_ERR("Failed to read DetectorElectricalTapsRef field.");
+      return IRC_FAILURE;
+   }
+   *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->DetectorElectricalTapsRef, FS_DETECTORELECTRICALTAPSREF_LENGTH);
+
+   // Read DetectorElectricalRefOffset flash settings field
+   byteCount = uffs_read(fd, &p_flashSettings->DetectorElectricalRefOffset, FS_DETECTORELECTRICALREFOFFSET_LENGTH);
+   if (byteCount != FS_DETECTORELECTRICALREFOFFSET_LENGTH)
+   {
+      FS_ERR("Failed to read DetectorElectricalRefOffset field.");
+      return IRC_FAILURE;
+   }
+   *p_crc16 = CRC16(*p_crc16, (uint8_t *) &p_flashSettings->DetectorElectricalRefOffset, FS_DETECTORELECTRICALREFOFFSET_LENGTH);
+
 /* AUTO-CODE FIELDS END */
 
    return IRC_SUCCESS;
@@ -1679,6 +1699,11 @@ void FlashSettings_UpdateVersion(flashSettings_t *p_flashSettings)
                // 1.10.x -> 1.11.x
                p_flashSettings->ActualizationDiscardOffset = flashSettingsDefault.ActualizationDiscardOffset;
 
+            case 11:
+               // 1.11.x -> 1.12.x
+               p_flashSettings->DetectorElectricalTapsRef = flashSettingsDefault.DetectorElectricalTapsRef;
+               p_flashSettings->DetectorElectricalRefOffset = flashSettingsDefault.DetectorElectricalRefOffset;
+
             case FS_FILESTRUCTUREMINORVERSION:
                // Break after the last minor version only
                break;
@@ -1759,6 +1784,8 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
 {
    extern ICU_config_t gICU_ctrl;
    extern int16_t gFpaDetectorPolarizationVoltage;
+   extern float gFpaDetectorElectricalTapsRef;
+   extern float gFpaDetectorElectricalRefOffset;
    extern t_FpaIntf gFpaIntf;
    extern bool gDisableFilterWheel;
    uint8_t externalMemoryBufferDetected = BufferManager_DetectExternalMemoryBuffer();
@@ -1859,8 +1886,10 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       TDCFlagsClr(CalibrationActualizationIsImplementedMask);
    }
 
-   // Update detector polarization voltage
+   // Update detector parameters
    gFpaDetectorPolarizationVoltage = p_flashSettings->DetectorPolarizationVoltage;
+   gFpaDetectorElectricalTapsRef = p_flashSettings->DetectorElectricalTapsRef;
+   gFpaDetectorElectricalRefOffset = p_flashSettings->DetectorElectricalRefOffset;
 
    // Validate ExternalMemoryBufferPresent field
    if (XOR(p_flashSettings->ExternalMemoryBufferPresent, externalMemoryBufferDetected))

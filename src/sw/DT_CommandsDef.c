@@ -43,7 +43,6 @@
 #endif
 
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
-static IRC_Status_t DebugTerminalParsePOL(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseSTATUS(circByteBuffer_t *cbuf);
@@ -73,7 +72,6 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"RDM", DebugTerminalParseRDM},
    {"WRM", DebugTerminalParseWRM},
    {"FPA", DebugTerminalParseFPA},
-   {"POL", DebugTerminalParsePOL},
    {"HDER", DebugTerminalParseHDER},
    {"CAL", DebugTerminalParseCAL},
    {"STATUS", DebugTerminalParseSTATUS},
@@ -119,13 +117,92 @@ bool gDisableFilterWheel;
 IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 {
    extern t_FpaIntf gFpaIntf;
+   extern int16_t gFpaDetectorPolarizationVoltage;
+   extern float gFpaDetectorElectricalTapsRef;
+   extern float gFpaDetectorElectricalRefOffset;
+   uint8_t argStr[12];
+   uint32_t arglen;
+   uint32_t cmd = 0;
+   int32_t iValue = 0;
+   float fValue = 0.0F;
    t_FpaStatus status;
 
-   // There is supposed to be no remaining bytes in the buffer
+   // Check for FPA command argument presence
    if (!CBB_Empty(cbuf))
    {
-      DT_ERR("Unsupported command arguments");
-      return IRC_FAILURE;
+      // Read FPA command argument
+      arglen = GetNextArg(cbuf, argStr, 3);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid FPA command argument.");
+         return IRC_FAILURE;
+      }
+      argStr[arglen++] = '\0'; // Add string terminator
+
+      if (strcasecmp((char *)argStr, "POL") == 0)
+      {
+         cmd = 1;
+      }
+      else if (strcasecmp((char *)argStr, "REF") == 0)
+      {
+         cmd = 2;
+      }
+      else if (strcasecmp((char *)argStr, "OFF") == 0)
+      {
+         cmd = 3;
+      }
+      else
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      // Read FPA command parameter value
+      arglen = GetNextArg(cbuf, argStr, 12);
+      switch (cmd)
+      {
+         case 1: // POL
+            if ((ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS) ||
+                  (iValue < -32768) || (iValue > 32767))
+            {
+               DT_ERR("Invalid int16 value.");
+               return IRC_FAILURE;
+            }
+            break;
+
+         case 2: // REF
+         case 3: // OFF
+            if (ParseFloatNumDec((char *)argStr, arglen, &fValue) != IRC_SUCCESS)
+            {
+               DT_ERR("Invalid float value.");
+               return IRC_FAILURE;
+            }
+            break;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!CBB_Empty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      // Update FPA parameter
+      switch (cmd)
+      {
+         case 1: // POL
+            gFpaDetectorPolarizationVoltage = (int16_t)iValue;
+            break;
+
+         case 2: // REF
+            gFpaDetectorElectricalTapsRef = fValue;
+            break;
+
+         case 3: // OFF
+            gFpaDetectorElectricalRefOffset = fValue;
+            break;
+      }
+      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
 
    FPA_GetStatus(&status, &gFpaIntf);
@@ -133,6 +210,10 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA model name = " FPA_DEVICE_MODEL_NAME);
 
    DT_PRINTF("FPA temperature = %dcC", FPA_GetTemperature(&gFpaIntf));
+
+   DT_PRINTF("FPA detector polarization voltage = %d", gFpaDetectorPolarizationVoltage);
+   DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
+   DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
 
    DT_PRINTF("fpa.adc_oper_freq_max_khz = %d", status.adc_oper_freq_max_khz);
    DT_PRINTF("fpa.adc_analog_channel_num = %d", status.adc_analog_channel_num);
@@ -162,49 +243,6 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.flex_present = %d", status.flex_present);
    
    DT_PRINTF("fpa.id_cmd_in_error = 0x%08X", status.id_cmd_in_error);
-
-   return IRC_SUCCESS;
-}
-
-/**
- * Debug terminal get/set FPA polarization voltage command parser.
- * This parser is used to parse and validate get/set FPA polarization voltage
- * command arguments and to execute the command.
- *
- * @return IRC_SUCCESS whenget/set FPA polarization voltage command was successfully executed.
- * @return IRC_FAILURE otherwise.
- */
-IRC_Status_t DebugTerminalParsePOL(circByteBuffer_t *cbuf)
-{
-   extern t_FpaIntf gFpaIntf;
-   extern int16_t gFpaDetectorPolarizationVoltage;
-   uint8_t argStr[12];
-   uint32_t arglen;
-   int32_t detPolVoltage;
-
-   if (!CBB_Empty(cbuf))
-   {
-      // Detector polarization voltage
-      arglen = GetNextArg(cbuf, argStr, 12);
-      if ((ParseSignedNumDec((char *)argStr, arglen, &detPolVoltage) != IRC_SUCCESS) ||
-            (detPolVoltage < -32768) || (detPolVoltage > 32767))
-      {
-         DT_ERR("Invalid int16 value.");
-         return IRC_FAILURE;
-      }
-
-      // There is supposed to be no remaining bytes in the buffer
-      if (!CBB_Empty(cbuf))
-      {
-         DT_ERR("Unsupported command arguments");
-         return IRC_FAILURE;
-      }
-
-      gFpaDetectorPolarizationVoltage = (int16_t)detPolVoltage;
-      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
-   }
-
-   DT_INF("Detector Polarization Voltage = %d", gFpaDetectorPolarizationVoltage);
 
    return IRC_SUCCESS;
 }
@@ -1550,8 +1588,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("Debug terminal commands:");
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
-   DT_PRINTF("  FPA status:         FPA");
-   DT_PRINTF("  Polarization:       POL [detector_polarization_voltage]");
+   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  Camera status:      STATUS");

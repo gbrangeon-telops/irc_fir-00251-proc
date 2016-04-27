@@ -65,11 +65,11 @@ typedef enum fslImmediateEnum fslImmediate_t;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Settings library.
-// Generated from the Flash Settings definition XLS file version 1.11.0
+// Generated from the Flash Settings definition XLS file version 1.12.0
 // using generateFlashSettingsCLib.m Matlab script.
 
 #define FS_FILESTRUCTUREMAJORVERSION      1
-#define FS_FILESTRUCTUREMINORVERSION      11
+#define FS_FILESTRUCTUREMINORVERSION      12
 #define FS_FILESTRUCTURESUBMINORVERSION   0
 
 /**
@@ -360,8 +360,14 @@ typedef enum fslImmediateEnum fslImmediate_t;
 #define FS_DEVICEKEYHIGH_OFFSET   300
 #define FS_DEVICEKEYHIGH_LENGTH   4
 
-#define FS_SPARE_FREE_SPACE_OFFSET   304
-#define FS_SPARE_FREE_SPACE_LENGTH   65230
+#define FS_DETECTORELECTRICALTAPSREF_OFFSET   304
+#define FS_DETECTORELECTRICALTAPSREF_LENGTH   4
+
+#define FS_DETECTORELECTRICALREFOFFSET_OFFSET   308
+#define FS_DETECTORELECTRICALREFOFFSET_LENGTH   4
+
+#define FS_SPARE_FREE_SPACE_OFFSET   312
+#define FS_SPARE_FREE_SPACE_LENGTH   65222
 
 #define FS_FLASHSETTINGSFILECRC16_OFFSET   65534
 #define FS_FLASHSETTINGSFILECRC16_LENGTH   2
@@ -397,6 +403,8 @@ struct flashSettingsStruct {
    float BPAECImageFraction;   /**< AEC image fraction used during bad pixel measurement. */
    float BPAECWellFilling;   /**< AEC target well filling used during bad pixel measurement. */
    float BPAECResponseTime;   /**< AEC response time used during bad pixel measurement. */
+   float DetectorElectricalTapsRef;   /**< Electrical reference of detector taps. */
+   float DetectorElectricalRefOffset;   /**< Electrical offset of detector taps reference opamp. */
    int32_t FW0CenterPosition;   /**< Raw position of the first filter wheel filter center. */
    int32_t FW1CenterPosition;   /**< Raw position of the second filter wheel filter center. */
    int32_t FW2CenterPosition;   /**< Raw position of the third filter wheel filter center. */
