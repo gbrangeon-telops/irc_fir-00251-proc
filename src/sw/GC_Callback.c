@@ -674,20 +674,11 @@ void GC_CalibrationCollectionActiveTypeCallback(gcCallbackPhase_t phase, gcCallb
  */
 void GC_CalibrationCollectionBlockCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   fileRecord_t *file;
-
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-
-      // Validate calibration collection selector
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
-      file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
-      // Set calibration collection block count register value
-      gcRegsData.CalibrationCollectionBlockCount = file->info.collection.NumberOfBlocks;
+      gcRegsData.CalibrationCollectionBlockCount =
+            gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->info.collection.NumberOfBlocks;
    }
 }
 
@@ -709,15 +700,7 @@ void GC_CalibrationCollectionBlockLoadCallback(gcCallbackPhase_t phase, gcCallba
       // After write
       if (gcRegsData.CalibrationCollectionBlockLoad == 1)
       {
-         // Validate calibration collection selector
-         gcRegsData.CalibrationCollectionSelector =
-               MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
          file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
-         // Validate calibration collection block selector
-         gcRegsData.CalibrationCollectionBlockSelector =
-               MIN(gcRegsData.CalibrationCollectionBlockSelector, file->info.collection.NumberOfBlocks - 1);
 
          if ((!calibrationInfo.isValid) || (file->posixTime != calibrationInfo.collection.POSIXTime))
          {
@@ -756,30 +739,13 @@ void GC_CalibrationCollectionBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcC
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-
-      // Validate calibration collection selector
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
-      file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
-      // Validate calibration collection block selector
-      gcRegsData.CalibrationCollectionBlockSelector =
-            MIN(gcRegsData.CalibrationCollectionBlockSelector, file->info.collection.NumberOfBlocks - 1);
-
-      // Set calibration collection block POSIX time register value
       gcRegsData.CalibrationCollectionBlockPOSIXTime =
-            file->info.collection.BlockPOSIXTime[gcRegsData.CalibrationCollectionBlockSelector];
+            gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->info.collection.BlockPOSIXTime[gcRegsData.CalibrationCollectionBlockSelector];
    }
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-
-      // Validate calibration collection selector
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
       file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
 
       // Try to find calibration collection block index corresponding to specified calibration collection block POSIX time
@@ -791,10 +757,6 @@ void GC_CalibrationCollectionBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcC
             break;
          }
       }
-
-      // Validate calibration collection block selector (in case specified POSIX time not found)
-      gcRegsData.CalibrationCollectionBlockSelector =
-            MIN(gcRegsData.CalibrationCollectionBlockSelector, file->info.collection.NumberOfBlocks - 1);
 
       // Update calibration collection block POSIX time register value (in case specified POSIX time not found)
       gcRegsData.CalibrationCollectionBlockPOSIXTime =
@@ -811,19 +773,12 @@ void GC_CalibrationCollectionBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcC
  */
 void GC_CalibrationCollectionBlockSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   fileRecord_t *file;
-
-   if (((phase == GCCP_BEFORE) && (access == GCCA_READ)) || ((phase == GCCP_AFTER) && (access == GCCA_WRITE)))
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // Validate calibration collection selector
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
-      file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
       // Validate calibration collection block selector
       gcRegsData.CalibrationCollectionBlockSelector =
-            MIN(gcRegsData.CalibrationCollectionBlockSelector, file->info.collection.NumberOfBlocks - 1);
+            MIN(gcRegsData.CalibrationCollectionBlockSelector,
+                  gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->info.collection.NumberOfBlocks - 1);
    }
 }
 
@@ -859,10 +814,6 @@ void GC_CalibrationCollectionLoadCallback(gcCallbackPhase_t phase, gcCallbackAcc
       // After write
       if (gcRegsData.CalibrationCollectionLoad == 1)
       {
-         // Validate calibration collection selector
-         gcRegsData.CalibrationCollectionSelector =
-               MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
          file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
 
          if (((!calibrationInfo.isValid) || (file->posixTime != calibrationInfo.collection.POSIXTime)) && (!TDCStatusTst(AcquisitionStartedMask)))
@@ -884,21 +835,12 @@ void GC_CalibrationCollectionLoadCallback(gcCallbackPhase_t phase, gcCallbackAcc
  */
 void GC_CalibrationCollectionPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   fileRecord_t *file;
    uint32_t i;
 
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-
-      // Validate calibration collection selector
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
-      file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
-      // Set calibration collection POSIX time register value
-      gcRegsData.CalibrationCollectionPOSIXTime = file->posixTime;
+      gcRegsData.CalibrationCollectionPOSIXTime = gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->posixTime;
    }
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
@@ -915,14 +857,8 @@ void GC_CalibrationCollectionPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallba
          }
       }
 
-      // Validate calibration collection selector (in case specified POSIX time not found)
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
-      file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
       // Set calibration collection POSIX time register value (in case specified POSIX time not found)
-      gcRegsData.CalibrationCollectionPOSIXTime = file->posixTime;
+      gcRegsData.CalibrationCollectionPOSIXTime = gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->posixTime;
    }
 }
 
@@ -935,10 +871,15 @@ void GC_CalibrationCollectionPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallba
  */
 void GC_CalibrationCollectionSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if (((phase == GCCP_BEFORE) && (access == GCCA_READ)) || ((phase == GCCP_AFTER) && (access == GCCA_WRITE)))
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // Validate calibration collection selector
       gcRegsData.CalibrationCollectionSelector = MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
+
+      // Validate calibration collection block selector
+      gcRegsData.CalibrationCollectionBlockSelector =
+            MIN(gcRegsData.CalibrationCollectionBlockSelector,
+                  gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->info.collection.NumberOfBlocks - 1);
    }
 }
 
@@ -951,20 +892,10 @@ void GC_CalibrationCollectionSelectorCallback(gcCallbackPhase_t phase, gcCallbac
  */
 void GC_CalibrationCollectionTypeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   fileRecord_t *file;
-
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-
-      // Validate calibration collection selector
-      gcRegsData.CalibrationCollectionSelector =
-            MIN(gcRegsData.CalibrationCollectionSelector, gFM_collections.count - 1);
-
-      file = gFM_collections.item[gcRegsData.CalibrationCollectionSelector];
-
-      // Set calibration collection type register value
-      gcRegsData.CalibrationCollectionType = file->info.collection.CollectionType;
+      gcRegsData.CalibrationCollectionType = gFM_collections.item[gcRegsData.CalibrationCollectionSelector]->info.collection.CollectionType;
    }
 }
 
