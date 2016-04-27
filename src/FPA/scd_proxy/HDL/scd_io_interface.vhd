@@ -281,6 +281,7 @@ begin
                when idle =>
                   if PROXY_PWR = '1' then
                      timer_cnt <=  timer_cnt + 1;
+                     output_disabled <= '0';
                   else
                      timer_cnt <= (others => '0');
                   end if;                  
