@@ -373,7 +373,6 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
 
       if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
       {
-
          FW_CalculateSpeedSetpoint(&gcRegsData);
          GC_FWSpeedSetpointCallback(GCCP_AFTER, GCCA_WRITE);
          SFW_CalculateMaximalValues(&gcRegsData, FRAME_RATE_CHANGED);
@@ -398,8 +397,6 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
                gcRegsData.ExposureTime = gcRegsData.ExposureTimeMax;
             }
          }
-
-
       }
 
 
@@ -644,10 +641,6 @@ void GC_CalibrationActualizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
  */
 void GC_CalibrationCollectionActiveBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -659,10 +652,6 @@ void GC_CalibrationCollectionActiveBlockPOSIXTimeCallback(gcCallbackPhase_t phas
  */
 void GC_CalibrationCollectionActivePOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -674,10 +663,6 @@ void GC_CalibrationCollectionActivePOSIXTimeCallback(gcCallbackPhase_t phase, gc
  */
 void GC_CalibrationCollectionActiveTypeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -2555,17 +2540,6 @@ void GC_FWPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
  */
 void GC_FWSpeedCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-
-   }
-
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // After write
-
-   }
 }
 
 /**
@@ -2780,7 +2754,6 @@ void GC_ICUPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       // Before read
 	   ICU_getCurrentState(&gcRegsData, &gICU_ctrl);
    }
-
 }
 
 /**
@@ -2959,7 +2932,6 @@ void GC_MemoryBufferModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
            BufferManager_SetBufferMode(&gBufManager, BM_READ,  &gcRegsData);
         }
 	  }
-
    }
 }
 
@@ -2977,7 +2949,6 @@ void GC_MemoryBufferNumberOfImagesMaxCallback(gcCallbackPhase_t phase, gcCallbac
       // Before read
 	   gcRegsData.MemoryBufferNumberOfImagesMax = BufferManager_GetNbImageMax(&gBufManager, &gcRegsData);
    }
-
 }
 
 /**
@@ -3019,7 +2990,6 @@ void GC_MemoryBufferNumberOfSequencesMaxCallback(gcCallbackPhase_t phase, gcCall
       // Before read
 	   gcRegsData.MemoryBufferNumberOfSequencesMax = BufferManager_GetNumberOfSequenceMax();
    }
-
 }
 
 /**
@@ -3083,7 +3053,6 @@ void GC_MemoryBufferSequenceDownloadImageFrameIDCallback(gcCallbackPhase_t phase
       if (gcRegsData.MemoryBufferSequenceDownloadImageFrameID > lastFrameID)
          gcRegsData.MemoryBufferSequenceDownloadImageFrameID = lastFrameID;
    }
-
 }
 
 /**
@@ -3116,7 +3085,6 @@ void GC_MemoryBufferSequenceFirstFrameIDCallback(gcCallbackPhase_t phase, gcCall
       // Before read
       gcRegsData.MemoryBufferSequenceFirstFrameID = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
    }
-
 }
 
 /**
@@ -3133,7 +3101,6 @@ void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallba
       // Before read
       gcRegsData.MemoryBufferSequenceMOIFrameID = BufferManager_GetSequenceMOIFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
    }
-
 }
 
 /**
@@ -3145,18 +3112,11 @@ void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallba
  */
 void GC_MemoryBufferSequencePreMOISizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-
-   }
-
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
       GC_UpdateMemoryBufferSequencePreMOISizeLimits();
       BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
-
    }
 }
 
@@ -3174,12 +3134,6 @@ void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCall
       // Before read
       gcRegsData.MemoryBufferSequenceRecordedSize = BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
    }
-
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // After write
-
-   }
 }
 
 /**
@@ -3191,12 +3145,6 @@ void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCall
  */
 void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-
-   }
-
 }
 
 /**
@@ -3233,7 +3181,6 @@ void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackA
       // Since MemoryBufferSequenceSize must be even, make sure MemoryBufferSequenceSizeMax is even too
       gcRegsData.MemoryBufferSequenceSizeMax = roundDown(BufferManager_GetNbImageMax(&gBufManager, &gcRegsData), 2);
    }
-
 }
 
 /**
@@ -3321,7 +3268,7 @@ void GC_NDFilterPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAcce
          CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);   // Updates NDFilterPositionSetpoint
       else
          GC_SetNDFPositionSetpoint(prevNDFPositionSetpoint, gcRegsData.NDFilterPositionSetpoint);
-      }
+   }
 }
 
 /**
