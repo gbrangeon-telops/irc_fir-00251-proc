@@ -1593,7 +1593,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  Camera status:      STATUS");
    DT_PRINTF("  Power status:       POWER");
-   DT_PRINTF("  Network status:     NET [0|1]");
+   DT_PRINTF("  Network status:     NET [0|1 [port]]");
    DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST");
    DT_PRINTF("  List files:         LS");
    DT_PRINTF("  Remove file:        RM filename");
