@@ -116,7 +116,6 @@
 #define SCD_PE_IO_TEST1    2
 #define SCD_PE_IO_TEST2    3
 #define SCD_PE_TEST1       4
-#define SCD_PE_TEST2       6
 
 #define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
@@ -327,8 +326,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->scd_bit_pattern = SCD_PE_IO_TEST2;
    else if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3)
       ptrA->scd_bit_pattern = SCD_PE_TEST1;
-   else if (pGCRegs->TestImageSelector == TIS_ManufacturerDynamicImage)
-      ptrA->scd_bit_pattern = SCD_PE_TEST2;   
                                       
    // valeurs converties en coups d'horloge du module FPA_INTF
    ptrA->scd_fig1_or_fig2_t4_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
