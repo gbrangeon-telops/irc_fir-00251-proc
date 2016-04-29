@@ -126,23 +126,18 @@
 struct Scd_Fig1orFig2Param_s             // 
 {					   
    float TFPP_CLK;                       
-   float Tdelay;
-   float NCDS;
+   float Trelax;
    float Tline_conv;
    float T0;
    float T1;
    float T2;
    float T3;
    float T4;
-   float T5_1;
+   float T5min;
    float T5;
    float T6;
    float T7;
    float T8;
-   float T9;
-   float T10;
-   float T11;
-   float T12;         
 };
 typedef struct Scd_Fig1orFig2Param_s Scd_Fig1orFig2Param_t;
 
@@ -500,51 +495,54 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
 {
    // ATTENTION!! ne pas changer l'ordre des calculs des parametres
    // se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD
-   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)  // ENO: 15 avril 2015: IWR non validé. Si doit Être supporté, vérifier la formule
+
+   // Update on 2016-04-28 with spec D1K3008-RevA.1 from SCD
+
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)  // ODI 2016-04-28: IWR non validé. Si doit être supporté, vérifier la formule
    {
       ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MASTER_CLK_RATE_HZ);
-      ptrH->T2        = exposureTime_usec * 1E-6F;                                            
-      ptrH->T4        = 40.0F * ptrH->TFPP_CLK;
-      ptrH->T5_1      = 7984.0F * ptrH->TFPP_CLK;         
-      ptrH->T9        = 2128.0F * ptrH->TFPP_CLK;
-      ptrH->Tdelay    = 32.0F * ptrH->TFPP_CLK;
-      ptrH->T6        = ptrH->T9 + ptrH->Tdelay;        // worst case
-      ptrH->T7        = 250.0 * 1E-6F;
-      ptrH->T8        = 60.0 * 1E-6F;      
-      ptrH->T10       = 816.0F * ptrH->TFPP_CLK;
-      ptrH->T11       = MAX(ptrH->T10, (16.0F + 2.0F * (float)pGCRegs->Width) * ptrH->TFPP_CLK); 
-      ptrH->NCDS      = 0.0F;      
-      if (FPA_NUM_CH == 2)  
-         ptrH->Tline_conv = ptrH->T10;
+      if (FPA_NUM_CH == 2)
+         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;  //13 bit resolution
       else
-         ptrH->Tline_conv = ptrH->T11;
-      ptrH->T3        = ptrH->T9 + ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F + ptrH->NCDS);
-      ptrH->T12       = MAX(ptrH->T4 + ptrH->T5_1 + ptrH->T6 + ptrH->T3, ptrH->T2 + ptrH->T4 + ptrH->T5_1);
-      ptrH->T5        = ptrH->T5_1 + ptrH->T12 * 0.1F / 100.0F;            
-      ptrH->T0        = MIN(ptrH->T4 + ptrH->T6 + ptrH->T3 + ptrH->T5 + 1000.0F * ptrH->TFPP_CLK, 90.0E-3); // don't forget that T0 must be < 90msec
+         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;
+
+      ptrH->T2        = exposureTime_usec * 1E-6F;
+      ptrH->T4        = 1E-6F;
+      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv);
+      ptrH->Trelax    = 10E-6F;
+      ptrH->T6        = ptrH->Tline_conv + ptrH->Trelax;        // worst case
+      ptrH->T8        = 250E-6F;
+      ptrH->T3        = (2128.0F * ptrH->TFPP_CLK) + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F)) + 60E-6F;
+
+      // T0 = T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
+      ptrH->T0        = (ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
+      ptrH->T0        = MIN(ptrH->T0, 90E-3F); // don't forget that T0 must be < 90msec
+
+      ptrH->T5        = ptrH->T5min + (ptrH->T0 * 0.1F / 100.0F);
+      ptrH->T7        = 300E-6F + (ptrH->T0 * 0.1F / 100.0F);
    }
    else // ITR mode
    {      
       ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MASTER_CLK_RATE_HZ);
-      ptrH->T2        = exposureTime_usec * 1E-6F;                                            
-      ptrH->T4        = 40.0F * ptrH->TFPP_CLK;
-      ptrH->T5_1      = 7984.0F * ptrH->TFPP_CLK;         
-      ptrH->T9        = 2128.0F * ptrH->TFPP_CLK;
-      ptrH->Tdelay    = 32.0F * ptrH->TFPP_CLK;
-      ptrH->T6        = ptrH->Tdelay;
-      ptrH->T7        = 250.0 * 1E-6F;
-      ptrH->T8        = 60.0 *  1E-6F;      
-      ptrH->T10       = 816.0F * ptrH->TFPP_CLK;
-      ptrH->T11       = MAX(ptrH->T10, (16.0F + 2.0F * (float)pGCRegs->Width) * ptrH->TFPP_CLK); 
-      ptrH->NCDS      = 0.0F;      
-      if (FPA_NUM_CH == 2)  
-         ptrH->Tline_conv = ptrH->T10;
+      if (FPA_NUM_CH == 2)
+         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;  //13 bit resolution
       else
-         ptrH->Tline_conv = ptrH->T11;
-      ptrH->T3        = ptrH->T9 + ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F + ptrH->NCDS);
-      ptrH->T12       = ptrH->T2 + ptrH->T3 + ptrH->T4 + ptrH->T5_1 + ptrH->T6;
-      ptrH->T5        = ptrH->T5_1 + ptrH->T12 * 0.1F / 100.0F;            
-      ptrH->T0        = MIN(ptrH->T4 + ptrH->T2 + ptrH->T6 + ptrH->T3 + ptrH->T5 + 1000.0F * ptrH->TFPP_CLK, 90.0E-3); // don't forget that T0 must be < 90msec
+         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;
+
+      ptrH->T2        = exposureTime_usec * 1E-6F;
+      ptrH->T4        = 1E-6F;
+      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv);
+      ptrH->Trelax    = 10E-6F;
+      ptrH->T6        = ptrH->Trelax;
+      ptrH->T8        = 250E-6F;
+      ptrH->T3        = (2128.0F * ptrH->TFPP_CLK) + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F));
+
+      // T0 = T2 + T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
+      ptrH->T0        = (ptrH->T2 + ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
+      ptrH->T0        = MIN(ptrH->T0, 90E-3F); // don't forget that T0 must be < 90msec
+
+      ptrH->T5        = ptrH->T5min + (ptrH->T0 * 0.1F / 100.0F);
+      ptrH->T7        = 300E-6F + (ptrH->T0 * 0.1F / 100.0F);
    }
    
    // verification des calculs en simulation
@@ -552,17 +550,12 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
       PRINTF("1e10 * ptrH->TFPP_CLK = %d\n", (uint32_t)(1e10*ptrH->TFPP_CLK));
       PRINTF("1e10 * ptrH->T2 = %d\n", (uint32_t)(1e10*ptrH->T2));
       PRINTF("1e10 * ptrH->T4 = %d\n", (uint32_t)(1e10*ptrH->T4));
-      PRINTF("1e10 * ptrH->T5_1 = %d\n", (uint32_t)(1e10*ptrH->T5_1));
-      PRINTF("1e10 * ptrH->T9 = %d\n", (uint32_t)(1e10*ptrH->T9));
+      PRINTF("1e10 * ptrH->T5min = %d\n", (uint32_t)(1e10*ptrH->T5min));
       PRINTF("1e10 * ptrH->T6 = %d\n", (uint32_t)(1e10*ptrH->T6));
       PRINTF("1e10 * ptrH->T7 = %d\n", (uint32_t)(1e10*ptrH->T7));
       PRINTF("1e10 * ptrH->T8 = %d\n", (uint32_t)(1e10*ptrH->T8));
-      PRINTF("1e10 * ptrH->T10 = %d\n", (uint32_t)(1e10*ptrH->T10));
-      PRINTF("1e10 * ptrH->T11 = %d\n", (uint32_t)(1e10*ptrH->T11));
-      PRINTF("1e10 * ptrH->NCDS = %d\n", (uint32_t)(1e10*ptrH->NCDS));
       PRINTF("1e10 * ptrH->Tline_conv = %d\n", (uint32_t)(1e10*ptrH->Tline_conv));
       PRINTF("1e10 * ptrH->T3 = %d\n", (uint32_t)(1e10*ptrH->T3));
-      PRINTF("1e10 * ptrH->T12 = %d\n", (uint32_t)(1e10*ptrH->T12));
       PRINTF("1e10 * ptrH->T5 = %d\n", (uint32_t)(1e10*ptrH->T5));
       PRINTF("1e10 * ptrH->T0 = %d\n", (uint32_t)(1e10*ptrH->T0));
    #endif  
@@ -574,21 +567,31 @@ void FPA_Fig4SpecificParams(Scd_Fig4Param_t *ptrK, const gcRegistersData_t *pGCR
    // ATTENTION!! ne pas changer l'ordre des calculs des parametres
    // se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD
    
+   // Update on 2016-04-28 with spec D1K3008-RevA.1 from SCD
+
    Scd_Fig1orFig2Param_t hh;
    FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs);
    
-   ptrK->T1  = hh.Tline_conv + 2e-6F;
-   ptrK->T2  = 0.0F;
-   ptrK->T3  = 640.0F * hh.TFPP_CLK; // resultat du calcul non  utilisé finalement
-   ptrK->T4  = 8.0F * hh.TFPP_CLK;
-   ptrK->T6  = 128.0F * hh.TFPP_CLK;  // resultat du calcul non  utilisé finalement
-   if (FPA_NUM_CH == 1)  
-      ptrK->T5 = 140e-6F;  // No CDS 1 CHN
+   ptrK->T2  = 5.0F * hh.TFPP_CLK;  // un peu plus de 0
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+      ptrK->T1  = ptrK->T2;
    else
-      ptrK->T5 = 90e-6F;  // No CDS 2 CHN
-   
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
-      ptrK->T1 = ptrK->T2;      
+      ptrK->T1  = hh.Tline_conv + 2e-6F;
+
+   if (FPA_NUM_CH == 1)
+   {
+      ptrK->T3  = 640.0F * hh.TFPP_CLK; // resultat du calcul non  utilisé finalement
+      ptrK->T4  = 8.0F * hh.TFPP_CLK;
+      ptrK->T5  = 80e-6F;
+      ptrK->T6  = 128.0F * hh.TFPP_CLK;  // resultat du calcul non  utilisé finalement
+   }
+   else
+   {
+      ptrK->T3  = 320.0F * hh.TFPP_CLK; // resultat du calcul non  utilisé finalement
+      ptrK->T4  = 22.0F * hh.TFPP_CLK;
+      ptrK->T5  = 70e-6F;     // Pire cas entre 13 et 14 bits
+      ptrK->T6  = 64.0F * hh.TFPP_CLK;  // resultat du calcul non  utilisé finalement
+   }
 }
 
 
