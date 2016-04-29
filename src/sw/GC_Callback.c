@@ -373,6 +373,7 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
 
       if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
       {
+
          FW_CalculateSpeedSetpoint(&gcRegsData);
          GC_FWSpeedSetpointCallback(GCCP_AFTER, GCCA_WRITE);
          SFW_CalculateMaximalValues(&gcRegsData, FRAME_RATE_CHANGED);
@@ -397,6 +398,8 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
                gcRegsData.ExposureTime = gcRegsData.ExposureTimeMax;
             }
          }
+
+
       }
 
 
@@ -2864,6 +2867,7 @@ void GC_MemoryBufferModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
            BufferManager_SetBufferMode(&gBufManager, BM_READ,  &gcRegsData);
         }
 	  }
+
    }
 }
 
@@ -3049,6 +3053,7 @@ void GC_MemoryBufferSequencePreMOISizeCallback(gcCallbackPhase_t phase, gcCallba
       // After write
       GC_UpdateMemoryBufferSequencePreMOISizeLimits();
       BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
+
    }
 }
 
@@ -3124,6 +3129,14 @@ void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackA
  */
 void GC_NDFilterArmedPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      if (gcRegsData.ExposureAuto == EA_ArmedNDFilter)
+      {
+         GC_SetNDFPositionSetpoint(gcRegsData.NDFilterPositionSetpoint, gcRegsData.NDFilterArmedPositionSetpoint);
+      }
+   }
 }
 
 /**
@@ -3196,10 +3209,7 @@ void GC_NDFilterPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAcce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)))
-         CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);   // Updates NDFilterPositionSetpoint
-      else
-         GC_SetNDFPositionSetpoint(prevNDFPositionSetpoint, gcRegsData.NDFilterPositionSetpoint);
+      GC_SetNDFPositionSetpoint(prevNDFPositionSetpoint, gcRegsData.NDFilterPositionSetpoint);
    }
 }
 

@@ -38,6 +38,7 @@ acom -nowarn DAGGEN_0523 \
 #source AEC
 acom -nowarn DAGGEN_0523 "$AEC_INTF\AEC_CUMSUM.vhd" \
  -relax "$AEC_INTF\AEC_Ctrl.vhd" \
+ "$AEC_INTF\AECPlus.vhd" \
  "$AEC_INTF\AEC.bde"
 
 #sim

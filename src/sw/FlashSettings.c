@@ -1823,15 +1823,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       gcRegsData.CalibrationActualizationMode = CAM_BlackBody;
    }
 
-   // Validate that FW and NDF are not both present
-   if (p_flashSettings->FWPresent && p_flashSettings->NDFPresent)
-   {
-      // Disable both of them
-      p_flashSettings->FWPresent = 0;
-      p_flashSettings->NDFPresent = 0;
-
-      FS_ERR("FW and NDF are both present. They have been disabled.");
-   }
 
    // Update FW
    p_flashSettings->FWPresent &= ~gDisableFilterWheel;

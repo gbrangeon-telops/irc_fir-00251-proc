@@ -92,7 +92,8 @@ ctrlIntf_t gOemCtrlIntf;
 #endif
 ctrlIntf_t gOutputCtrlIntf;
 qspiFlash_t gQSPIFlash;
-FH_ctrl_t gFaulhaberCtrl;
+FH_ctrl_t gFWFaulhaberCtrl;
+FH_ctrl_t gNDFFaulhaberCtrl;
 releaseInfo_t gReleaseInfo;
 ledCtrl_t gLedCtrl;
 flashDynamicValues_t gFlashDynamicValues;
@@ -521,6 +522,7 @@ IRC_Status_t Proc_Intc_Start()
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR);
    XIntc_Enable(&gProcIntc, GPS_INTR_ID);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FW_UART_IP2INTC_IRPT_INTR);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
 
    /*
     * Enable the interrupt for the USART driver instance.
@@ -602,7 +604,7 @@ IRC_Status_t Proc_FH_Init()
     IRC_Status_t status;
 
     status = FH_init(&gcRegsData,
-          &gFaulhaberCtrl,
+          &gFWFaulhaberCtrl,
          XPAR_FW_UART_DEVICE_ID,
          &gProcIntc,
          XPAR_MCU_MICROBLAZE_1_AXI_INTC_FW_UART_IP2INTC_IRPT_INTR);
@@ -610,6 +612,17 @@ IRC_Status_t Proc_FH_Init()
    if (status != IRC_SUCCESS)
    {
      return IRC_FAILURE;
+   }
+
+   status = FH_init(&gcRegsData,
+         &gNDFFaulhaberCtrl,
+        XPAR_AXI_NDF_UART_DEVICE_ID,
+        &gProcIntc,
+        XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
+
+   if (status != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
    }
 
    return IRC_SUCCESS;
@@ -784,7 +797,7 @@ IRC_Status_t Proc_FW_Init()
       SFW_Disable();
    }
 
-	return FWControllerInit(&gFaulhaberCtrl);}
+	return FWControllerInit(&gFWFaulhaberCtrl);}
 
 /**
  * Initializes neutral density filter controller.
@@ -794,7 +807,7 @@ IRC_Status_t Proc_FW_Init()
  */
 IRC_Status_t Proc_NDF_Init()
 {
-   return NDF_ControllerInit(&gFaulhaberCtrl);
+   return NDF_ControllerInit(&gNDFFaulhaberCtrl);
 }
 
 /**

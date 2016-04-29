@@ -106,7 +106,8 @@ void disable_caches()
    extern ctrlIntf_t gFileCtrlIntf;
    extern ctrlIntf_t gClinkCtrlIntf;
    extern ctrlIntf_t gPleoraCtrlIntf;
-   extern FH_ctrl_t gFaulhaberCtrl;
+   extern FH_ctrl_t gFWFaulhaberCtrl;
+   extern FH_ctrl_t gNDFFaulhaberCtrl;
 #if (OEM_UART_ENABLED)
    extern ctrlIntf_t gOemCtrlIntf;
 #endif
@@ -252,7 +253,8 @@ void disable_caches()
 #endif
       CtrlIntf_Process(&gOutputCtrlIntf);
       NDF_ControllerProcess();
-      FH_ProtocolHandler(&gFaulhaberCtrl);
+      FH_ProtocolHandler(&gNDFFaulhaberCtrl);
+      FH_ProtocolHandler(&gFWFaulhaberCtrl);
       GPS_Process(&Gps_struct);
    }
 }

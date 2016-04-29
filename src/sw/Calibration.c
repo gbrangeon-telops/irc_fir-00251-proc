@@ -1316,15 +1316,27 @@ void Calibration_SM()
 
             if (startup)
             {
+               uint8_t LowerNDFIndex = 0;
+
                for (blockIndex = calibrationInfo.collection.NumberOfBlocks - 1; blockIndex > 0 ; blockIndex--)
                {
-                  if (calibrationInfo.blocks[blockIndex].POSIXTime == gFlashDynamicValues.CalibrationCollectionBlockPOSIXTimeAtStartup)
+                  if (calibrationInfo.collection.CollectionType == CCT_TelopsNDF)
                   {
-                     break;
+                     if (calibrationInfo.blocks[blockIndex].NDFPosition < calibrationInfo.blocks[LowerNDFIndex].NDFPosition)
+                     {
+                        LowerNDFIndex = blockIndex;
+                     }
+                  }
+                  else
+                  {
+                     if (calibrationInfo.blocks[blockIndex].POSIXTime == gFlashDynamicValues.CalibrationCollectionBlockPOSIXTimeAtStartup)
+                     {
+                        break;
+                     }
                   }
                }
 
-               gcRegsData.CalibrationCollectionBlockSelector = blockIndex;
+               gcRegsData.CalibrationCollectionBlockSelector = ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) ? LowerNDFIndex : blockIndex);
                blockLoadCmdFlag = true;
 
                startup = 0;
@@ -1338,6 +1350,12 @@ void Calibration_SM()
             if (flashSettings.NDFPresent == 1)
             {
                GC_RegisterWriteUI32(&gcRegsDef[NDFilterPositionSetpointIdx], calibrationInfo.blocks[blockIndex].NDFPosition);
+
+               if (GC_AECPlusIsAvailable)
+               {
+                  // Update AEC+ parameters coming from blocks and collection
+                  AEC_UpdateAECPlusParameters();
+               }
             }
 
             // Update registers related to calibration control

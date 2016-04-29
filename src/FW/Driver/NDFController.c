@@ -29,6 +29,7 @@
 #include "GenICam.h"
 #include "GC_Registers.h"
 #include "GC_Events.h"
+#include "calib.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -179,6 +180,8 @@ void ChangeNDFControllerMode(NDF_ControllerMode_t newMode, int32_t target)
  */
 void NDF_ControllerProcess()
 {
+   extern t_calib gCal;
+
    static NDF_ControllerMode_t currentMode = NDF_STARTUP_MODE;
    static NDF_ControllerMode_t lastMode = NDF_STARTUP_MODE;
    static bool NDF_newModeAvailable = false;
@@ -382,6 +385,14 @@ void NDF_ControllerProcess()
       {
          HDER_UpdateNDFPositionHeader(&gHderInserter, gcRegsData.NDFilterPosition);
          prevPosition = gcRegsData.NDFilterPosition;
+
+         // Change calibration block
+         if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) &&
+               (calibrationInfo.blocks[gCal.calib_block_sel_mode - CBSM_USER_SEL_0].NDFPosition != gcRegsData.NDFilterPositionSetpoint))
+         {
+            CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
+         }
+
       }
       else
       {
@@ -857,7 +868,9 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
    bool ready = false;
    static bool nowInTransition = false;
    static bool queryMode = false;
+   static bool TransitionOver = true;
    static int32_t protectionModeFinalTarget = -1;
+   static uint32_t DestinationSetpoint = NDFP_NDFilterInTransition;
 
    uint32_t threshold;
    int numAck;
@@ -874,10 +887,15 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
          StopTimer(&transitionTimer);
          StopTimer(&protectionTimer);
          nowInTransition = false;
+         TransitionOver = true;
       }
       else
       {
-         if (posMode == NPM_TIMEOUT)
+         if ((posMode == NPM_QUERY_POS) || (posMode == NPM_PAUSE))
+         {
+            posMode = NPM_NEW_POS;
+         }
+         else if (posMode == NPM_TIMEOUT)
          {
             posMode = NPM_QUERY_POS;
          }
@@ -889,7 +907,6 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
 
    if (TimedOut(&transitionTimer))
    {
-      nowInTransition = false;
       StopTimer(&transitionTimer);
 
       // two-step travel to filter 1 (or 3) from filter 3 (or 1)
@@ -897,24 +914,38 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
       {
          StartTimer(&protectionTimer, NDF_POS_PROTECTION_PERIOD);
       }
+      else
+      {
+         nowInTransition = false;
+      }
    }
 
    if (TimedOut(&protectionTimer))
    {
       StopTimer(&protectionTimer);
       if (protectionModeFinalTarget == -1)
+      {
          queryMode = true;
+      }
       else
+      {
          queryMode = false;
+      }
    }
 
    if (FH_readNotification(FH_instance, (uint8_t*)&notification) && notification == FH_P)
    {
-      if (nowInTransition == false)
-      {
+      // if received position notification before move's ACK then pass to query mode
+      if (posMode == NPM_NEW_POS_ACK)
+         posMode = NPM_QUERY_POS;
+
+      // if waiting of move's ACK timedout then don't restart the timer
+      if (transitionTimer.enabled == false)
          StartTimer(&transitionTimer, 40);
-         nowInTransition = true;
-      }
+
+      nowInTransition = true;
+      DestinationSetpoint = NDF_getFilterIndex(NDF_RequestedTarget, 0);
+      TransitionOver = false;
    }
 
    switch(posMode)
@@ -942,6 +973,13 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
             NDF_currentRawPosition = value;
             //NDF_INF("Current position : %d", NDF_currentRawPosition);
 
+            // reset TransitionOver flag to update header with current position
+            if (!nowInTransition && !TransitionOver && (NDF_getFilterIndex(NDF_currentRawPosition, NDF_filterWidth/4) == NDF_getFilterIndex(NDF_RequestedTarget, 0)))
+            {
+               TransitionOver = true;
+               DestinationSetpoint = NDF_getFilterIndex(NDF_RequestedTarget, 0);
+            }
+			
             if (queryMode)
             {
                // position was queried just for updating the register
@@ -1014,13 +1052,13 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
          {
             NDF_PRINTF("NPM_NEW_POS_ACK\n");
 
-            StartTimer(&NDF_commTimer, FH_REQUEST_TIMEOUT);
+            StartTimer(&NDF_commTimer, NDF_QUERY_MOVE_TIMEOUT);
             posMode = NPM_NEW_POS_ACK;
          }
          else
          {
             // this else clause should never occur in normal conditions...
-            NDF_PRINTF("Setting notification command failed, retrying...\n");
+            NDF_ERR("Setting notification command failed, retrying...\n");
             if (protectionModeFinalTarget != -1)
             {
                NDF_RequestedTarget = protectionModeFinalTarget;
@@ -1038,25 +1076,29 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
       {
          StopTimer(&NDF_commTimer);
          NDF_ClearErrors(NDF_ERR_FAULHABERCOMM_TIMEOUT);
-         StartTimer(&NDF_commTimer, NDF_POSITION_TIMEOUT);
+         StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD);
 
          queryMode = true;
          posMode = NPM_QUERY_POS; // en polling seulement
       }
       else if (TimedOut(&NDF_commTimer))
       {
-         NDF_SetErrors(NDF_ERR_FAULHABERCOMM_TIMEOUT);
-         NDF_ERR("Time out while in NPM_POSITION_NEWPOS_ACK_MODE");
-         StopTimer(&NDF_commTimer);
-         posMode = NPM_TIMEOUT;
+         NDF_INF("didn't received NPM_NEW_POS_ACK, skipping...");
+
+         // Pretend we received ACK and position notification
+         FH_consumeResponses(FH_instance);
+         StartTimer(&transitionTimer, 28);
+         nowInTransition = true;
+         DestinationSetpoint = NDF_getFilterIndex(NDF_RequestedTarget, 0);
+         TransitionOver = false;
+         queryMode = true;
+         posMode = NPM_QUERY_POS; // en polling seulement
       }
 
       break;
 
    case NPM_TIMEOUT:
       ready = true;
-      nowInTransition = false;
-      StopTimer(&transitionTimer);
       FH_consumeResponses(FH_instance);
       NDF_ClearErrors(NDF_ERR_ALL);
 
@@ -1073,7 +1115,10 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
    gcRegsData.NDFilterPositionRaw = NDF_currentRawPosition;
 
    threshold = 3*NDF_filterWidth/4;
-   gcRegsData.NDFilterPosition = nowInTransition ? NDFP_NDFilterInTransition : NDF_getFilterIndex(NDF_currentRawPosition, threshold);
+
+   // If nowInTransition then tag in transition,
+   // else TransitionOver allow to tag the header with gcRegsData.NDFilterPositionSetpoint until NDF_currentRawPosition is within the new filter range
+   gcRegsData.NDFilterPosition = nowInTransition ? NDFP_NDFilterInTransition : (TransitionOver ? NDF_getFilterIndex(NDF_currentRawPosition, threshold) : DestinationSetpoint);
 
    return ready;
 }

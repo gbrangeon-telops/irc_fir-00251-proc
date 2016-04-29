@@ -39,6 +39,11 @@
 #define AEC_CUMSUM_ERR_OFFSET		      0x2C
 #define AEC_IMAGEFRACTION_FBCK_OFFSET  0x30
 #define AEC_FWPOSITION_OFFSET          0x34
+#define AECP_EXPTIME_OFFSET            0x38
+#define AECP_SUMCNT_MSB_OFFSET         0x3C
+#define AECP_SUMCNT_LSB_OFFSET         0x40
+#define AECP_NBPIXELS_OFFSET           0x44
+#define AECP_DATAVALID_OFFSET          0x48
 
 /************************** Constant Definitions ****************************/
 #define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_0_INTR // TO CONFIRM
@@ -181,5 +186,12 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,t_AEC *gAEC_Ctrl);
 
 AEC_MSBPOS_t AEC_GetMsbPos();
 
+/***************************************************************************//**
+   Update AEC Plus parameters from blocks and collection.
+
+   @return void
+
+*******************************************************************************/
+void AEC_UpdateAECPlusParameters(void);
 
 #endif // __AEC_H__

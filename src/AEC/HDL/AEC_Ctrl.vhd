@@ -35,6 +35,13 @@ entity AEC_Ctrl is
       H_FWPOSITION         : in  std_logic_vector(7 downto 0);
       CUMSUM_ERROR         : in  std_logic_vector(0 downto 0);
       
+      --------------------------------
+      -- AEC+ Interface
+      --------------------------------                       
+      EXP_TIME_AECPLUS : in STD_LOGIC_VECTOR(31 downto 0);
+      SUM_CNT_AECPLUS : in STD_LOGIC_VECTOR(41 downto 0);
+      NB_PIXELS_AECPLUS : in STD_LOGIC_VECTOR(31 downto 0);
+      DATA_VALID_AECPLUS : in STD_LOGIC;
       
       
       IMAGE_FRACTION : out std_logic_vector(23 downto 0); -- in pixel
@@ -85,6 +92,11 @@ architecture RTL of AEC_Ctrl is
    constant CUMSUM_ERROR_ADDR         : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(44,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
    constant IMAGE_FRACTION_FBCK_ADDR  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(48,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
    constant IMAGE_FWPOSITION_ADDR  	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(52,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_EXPTIME_ADDR  	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(56,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_SUMCNT_MSB_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(60,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_SUMCNT_LSB_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(64,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_NBPIXELS_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(68,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_DATAVALID_ADDR 	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(72,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
    
    ----------------------------   
    -- Component Declaration
@@ -158,8 +170,10 @@ architecture RTL of AEC_Ctrl is
    signal slv_reg_wren : std_logic;
    signal reg_data_out : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
    
-
-   
+   signal exptime_aecplus_i : std_logic_vector(31 downto 0);
+   signal sumcnt_aecplus_i : std_logic_vector(41 downto 0);
+   signal nbpixels_aecplus_i : std_logic_vector(31 downto 0);
+   signal aecplus_dval_i : std_logic;
    
 begin
   
@@ -184,6 +198,10 @@ begin
    U1J : double_sync port map(D => clear_mem_o,   Q => CLEAR_MEM , RESET => sreset,  CLK => CLK_DATA);
    U1K : double_sync_vector port map(D => aec_mode_o,   Q => AEC_MODE ,  CLK => CLK_DATA); 
  
+   U1Q : double_sync_vector port map(D => EXP_TIME_AECPLUS,   Q => exptime_aecplus_i,  CLK => CLK_DATA); 
+   U1R : double_sync_vector port map(D => SUM_CNT_AECPLUS,   Q => sumcnt_aecplus_i,  CLK => CLK_DATA); 
+   U1S : double_sync_vector port map(D => NB_PIXELS_AECPLUS,   Q => nbpixels_aecplus_i,  CLK => CLK_DATA); 
+   U1T : double_sync port map(D => DATA_VALID_AECPLUS,   Q => aecplus_dval_i, RESET => sreset, CLK => CLK_DATA); 
 
    -- I/O Connections assignments
    AXI4_LITE_MISO.AWREADY  <= axi_awready;
@@ -197,9 +215,9 @@ begin
    
 
    ----------------------------------------------------------------------------
-   -- AXI WR : contrôle du flow 
+   -- AXI WR : contr?du flow 
    ---------------------------------------------------------------------------- 
-   -- (pour l'instant transaction se fait à au max 1 CLK sur 2 
+   -- (pour l'instant transaction se fait ?u max 1 CLK sur 2 
    U2: process (CLK_CTRL)
    begin
       if rising_edge(CLK_CTRL) then 
@@ -276,9 +294,9 @@ begin
    end process; 
    
    ----------------------------------------------------------------------------
-   -- RD : contrôle du flow
+   -- RD : contr?du flow
    ---------------------------------------------------------------------------- 
-   -- (pour l'instant transaction se fait à au max 1 CLK sur 2   
+   -- (pour l'instant transaction se fait ?u max 1 CLK sur 2   
    U5: process (CLK_CTRL)
    begin
       if rising_edge(CLK_CTRL) then 
@@ -311,7 +329,7 @@ begin
    
    
    ---------------------------------------------------------------------------- 
-   -- RD : données vers µBlaze                                       
+   -- RD : donn? vers ?Blaze                                       
    ---------------------------------------------------------------------------- 
    U6: process(CLK_CTRL)
    begin
@@ -326,6 +344,11 @@ begin
             when  CUMSUM_ERROR_ADDR         => reg_data_out <= std_logic_vector(resize(cumsum_error_i, reg_data_out'length));
             when  IMAGE_FRACTION_FBCK_ADDR  => reg_data_out <= std_logic_vector(resize(h_imagefraction_fbck_i     , reg_data_out'length));
             when  IMAGE_FWPOSITION_ADDR     => reg_data_out <= std_logic_vector(resize(h_fwposition_i     , reg_data_out'length));
+            when  AECPLUS_EXPTIME_ADDR      => reg_data_out <= std_logic_vector(resize(exptime_aecplus_i     , reg_data_out'length));
+            when  AECPLUS_SUMCNT_MSB_ADDR   => reg_data_out <= std_logic_vector(resize(sumcnt_aecplus_i(41 downto 32), reg_data_out'length));
+            when  AECPLUS_SUMCNT_LSB_ADDR   => reg_data_out <= std_logic_vector(resize(sumcnt_aecplus_i(31 downto 0), reg_data_out'length));
+            when  AECPLUS_NBPIXELS_ADDR     => reg_data_out <= std_logic_vector(resize(nbpixels_aecplus_i, reg_data_out'length));
+            when  AECPLUS_DATAVALID_ADDR    => reg_data_out <= x"0000000" & "000" & aecplus_dval_i;
             when others                     => reg_data_out <= (others => '0');
          end case;        
       end if;     

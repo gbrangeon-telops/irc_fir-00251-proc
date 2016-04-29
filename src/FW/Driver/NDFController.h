@@ -28,8 +28,9 @@
 #define NDF_INF(fmt, ...)         NDF_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define NDF_INIT_TIMEOUT            1000 // ms : Long timeout because FAULHABER controller may start a few seconds after CLink board
-#define NDF_POSITION_TIMEOUT        150  // ms
-#define NDF_QUERY_POS_TIMEOUT       10  // ms
+#define NDF_POSITION_TIMEOUT        500  // ms
+#define NDF_QUERY_POS_TIMEOUT       25  // ms
+#define NDF_QUERY_MOVE_TIMEOUT      25  // ms
 
 #define NDF_POS_POLLING_PERIOD            1 /*< polling period during displacements [ms] */
 #define NDF_POS_PROTECTION_PERIOD         30 /*< forced pause between end to end displacement [ms] */
