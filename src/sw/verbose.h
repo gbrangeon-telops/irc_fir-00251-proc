@@ -21,6 +21,7 @@
 #define FPGA_PRINT_PREFIX        "P> "
 
 #ifdef TELOPS_DEBUG
+// #define AEC_VERBOSE
 // #define ACQ_VERBOSE
 // #define ACT_VERBOSE
 // #define ATR_VERBOSE

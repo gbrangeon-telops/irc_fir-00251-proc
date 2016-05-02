@@ -17,9 +17,6 @@
 //#define AEC_INT_TIME_PRINT
 #define ALPHA_MAX    0.976f   // ToDo: determiner la variation minimale de l'ExpTime pour chaque detecteur
 
-#define AEC_PRINT    //PRINT
-#define AEC_PRINTF   //PRINTF
-
 static volatile bool gAEC_Data_Ready  = false;
 
 extern XIntc gProcIntc;

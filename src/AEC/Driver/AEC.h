@@ -19,6 +19,13 @@
 #include "xintc.h"
 #include "irc_status.h"
 #include "tel2000_param.h"
+#include "verbose.h"
+
+#ifdef AEC_VERBOSE
+   #define AEC_PRINTF(fmt, ...)  FPGA_PRINTF("AEC: " fmt, ##__VA_ARGS__)
+#else
+   #define AEC_PRINTF(fmt, ...)  DUMMY_PRINTF("AEC: " fmt, ##__VA_ARGS__)
+#endif
 
 
 // ADRESSE du registre des statuts
