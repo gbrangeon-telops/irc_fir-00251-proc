@@ -200,7 +200,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalRefOffset;
    static int16_t actualPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
-   static float actualElectricalRefOffset = 0;     0// valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    
    float Nr, Nc, No, R, H, C, W;
    
