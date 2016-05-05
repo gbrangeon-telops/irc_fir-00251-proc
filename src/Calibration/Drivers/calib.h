@@ -113,7 +113,7 @@ struct calibBlockHdrInfoStruct
    uint32_t POSIXTime;
    float    offset_fp32;
    int32_t  data_exponent;
-   uint32_t actualizationPOSIXTime; // todo sera activé lors de l'ajout du champ rapide du posix time de l'actualisation
+   uint32_t actualizationPOSIXTime;
 };
 typedef struct calibBlockHdrInfoStruct calibBlockHdrInfo_t;
 
@@ -147,7 +147,7 @@ typedef struct s_CalStatus t_CalStatus;
 
 
 /***************** Macros (Inline Functions) Definitions ********************/
-#define CAL_Config_Ctor(add) {sizeof(t_calib)/4 - 4, add}//, 0, 0, 0, 0, 0, 0, 0.0F, 0, 0, 0} // CR_WARNING le pointeur à la fin n'est pas inclu
+#define CAL_Config_Ctor(add) {sizeof(t_calib)/4 - 3, add}//, 0, 0, 0, 0, 0, 0, 0.0F, 0, 0, 0} // CR_WARNING le pointeur à la fin n'est pas inclu
 #define CAL_Param_Ctor(add) {sizeof(calibBlockRamInfo_t)/4 - 2, add}//, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0, 0}
 
 /************************** Prototypes des fonctions *****************************/

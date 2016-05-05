@@ -51,7 +51,7 @@
 #define AR_ERR_REG4        0xFC
 
 
-// Adresse des  switchs et trous // todo ajouter 0x20 à tous apres changement du HW pour multi-actualisation
+// Adresse des  switchs et trous
 #define AW_INPUT_SW        0xA4
 #define AW_DATATYPE_SW     0xA8
 #define AW_OUTPUT_SW       0xAC
@@ -122,6 +122,7 @@ void CAL_initCalBlockInfo(calibBlockHdrInfo_t* b, uint32_t n)
       b->offset_fp32 = 0;
       b->data_exponent = 0;
       b->actualizationPOSIXTime = 0;
+      b++;
    }
 }
 
