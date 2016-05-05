@@ -151,10 +151,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.4.0
+// Generated from XML camera definition file version 11.4.1
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 1))
 #error "XML version mismatch."
 #endif
 
@@ -480,14 +480,17 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_EHDRISimpleSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Advanced)
 #define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization)
 #define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
+#define GC_FWAsynchronouslyRotatingModeIsActive (GC_FWAsynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_AsynchronouslyRotating))
+#define GC_FWAsynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWAsynchronouslyRotatingModeIsImplementedMask))
 #define GC_FWFixedModeIsActive (gcRegsData.FWMode == FWM_Fixed)
 #define GC_FWIsImplemented TDCFlagsTst(FWIsImplementedMask)
+#define GC_FWRotatingModeIsActive (GC_FWAsynchronouslyRotatingModeIsActive || GC_FWSynchronouslyRotatingModeIsActive)
 #define GC_FWSynchronouslyRotatingModeIsActive (GC_FWSynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_SynchronouslyRotating))
 #define GC_FWSynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWSynchronouslyRotatingModeIsImplementedMask))
 #define GC_FlaggingTriggerIsActive IsActiveFlagsTst(FlaggingTriggerIsActiveMask)
 #define GC_FlaggingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Flagging) && GC_GatingTriggerIsActive)
 #define GC_GatingTriggerIsActive IsActiveFlagsTst(GatingTriggerIsActiveMask)
-#define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWSynchronouslyRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive))
+#define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive || GC_AECPlusIsActive))
 #define GC_MemoryBufferNotEmpty (gcRegsData.MemoryBufferSequenceCount > 0)
 #define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForCalibrationActualization)
 #define GC_WaitingForCalibrationActualization TDCStatusTst(WaitingForCalibrationActualizationMask)
@@ -496,21 +499,23 @@ void GC_Registers_Init();
 
 /* AUTO-CODE END */
 
-#define GC_FWAsynchronouslyRotatingModeIsActive (GC_FWIsImplemented && TDCFlagsTst(FWAsynchronouslyRotatingModeIsImplementedMask))
-
 // AEC+ is available when;
 //  - EHDRI is not active.
 //  - FW rotating modes are not active.
+//  - Gating trigger is not active.
 //  - Valid collection is loaded.
 //  - Active collection type is TelopsNDF.
+//  - FW position is the one that is calibrated.
 //  - NDF positions are consecutive. Valid combinations are [NDfilter1 NDfilter2], [NDfilter2 NDfilter3] or
 //    [NDfilter1 NDfilter2 NDfilter3] but not [NDfilter1 NDfilter3]. So it must contain NDFilter2 and at least
 //    one of the two other positions.
 #define GC_AECPlusIsAvailable ( \
    !GC_EHDRIIsActive && \
-   !GC_FWAsynchronouslyRotatingModeIsActive && !GC_FWSynchronouslyRotatingModeIsActive && \
+   !GC_FWRotatingModeIsActive && \
+   !GC_GatingTriggerIsActive && \
    (calibrationInfo.isValid == 1) && \
    (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
+   (gcRegsData.FWPosition == calibrationInfo.collection.FWPosition) && \
    (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))))
 #define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
 

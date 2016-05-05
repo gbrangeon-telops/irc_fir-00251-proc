@@ -38,7 +38,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.4.0
+// Generated from XML camera definition file version 11.4.1
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -605,7 +605,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty)) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWSpeedSetpointIdx], GC_FWSynchronouslyRotatingModeIsActive);
    SetRegLocked(&gcRegsDef[ExternalLensSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ManualFilterSerialNumberIdx], GC_AcquisitionStarted);
