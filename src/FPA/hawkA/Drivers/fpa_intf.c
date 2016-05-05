@@ -137,7 +137,8 @@ typedef struct hawk_param_s  hawk_param_t;
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
-
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 
 void FPA_SpecificParams(hawk_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 
