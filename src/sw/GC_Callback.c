@@ -2727,21 +2727,6 @@ void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
  */
 void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   uint8_t i;
-   uint32_t mask;
-
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-
-      // Refresh TriggerIsActive flags
-      for (i = 0; i < TriggerModeAryLen; i++)
-      {
-         mask = 0x00000001 << i;
-         IsActiveFlagsClr(mask);
-         if (TriggerModeAry[i]) IsActiveFlagsSet(mask);
-      }
-   }
 }
 
 /**
@@ -2896,12 +2881,6 @@ void GC_MemoryBufferNumberOfImagesMaxCallback(gcCallbackPhase_t phase, gcCallbac
  */
 void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-
-   }
-
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
@@ -3652,6 +3631,8 @@ void GC_TriggerFrameCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t ac
  */
 void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   uint32_t triggerIsActiveFlagMask;
+
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
@@ -3662,6 +3643,14 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    {
       // After write
       TriggerModeAry[gcRegsData.TriggerSelector] = gcRegsData.TriggerMode;
+
+      // Update TriggerIsActive flags
+      triggerIsActiveFlagMask = 0x00000001 << gcRegsData.TriggerSelector;
+      IsActiveFlagsClr(triggerIsActiveFlagMask);
+      if (TriggerModeAry[gcRegsData.TriggerMode])
+      {
+         IsActiveFlagsSet(triggerIsActiveFlagMask);
+      }
    }
 }
 
