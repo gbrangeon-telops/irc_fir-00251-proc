@@ -240,6 +240,7 @@ uint32_t FW_GetErrors(uint32_t mask);
 //static bool FWErrorMode(bool reset);
 
 int32_t FW_CalculateMove(int32_t target, int32_t pos);
+bool FW_CalculateBacklashFreeMove(int32_t target, int32_t pos, int32_t* setpoint);
 
 uint8_t FW_getFilterIndex(int32_t counts);
 bool FW_getFilterPosition(uint8_t idx, int32_t* counts, const FWType_t type);

@@ -51,6 +51,7 @@ static int32_t FW_currentRawPosition = 1000000;
 static FH_ctrl_t* FH_instance = 0;
 
 static int32_t FW_COUNTS_IN_ONE_TURN = 0;
+static int32_t FW_BACKLASH_OFFSET = 0;
 
 extern t_HderInserter gHderInserter;
 
@@ -139,6 +140,18 @@ static void FW_initPositionLUT()
       FW_positionsLUT[6] = flashSettings.FW6CenterPosition;
       FW_positionsLUT[7] = flashSettings.FW7CenterPosition;
    }
+
+   // define the special base position for counteracting backlash. Set it about half-way between FW3 and FW0
+   FW_BACKLASH_OFFSET = INT32_MAX;
+   for (i=0; i<FW_numberOfFilters-1; ++i)
+   {
+      // take the minimum distance between two successive filters
+      int32_t v = abs(FW_positionsLUT[i] - FW_positionsLUT[i+1])/2;
+      FW_INF("v = %d", v);
+      if (v < abs(FW_BACKLASH_OFFSET))
+         FW_BACKLASH_OFFSET = v;
+   }
+   FW_INF("FW_BACKLASH_OFFSET = %d", FW_BACKLASH_OFFSET);
 }
 
 /*
@@ -929,6 +942,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
    bool ready = false;
    static int32_t newSetpoint;
    static bool queryPosInfo = false;
+   static bool backlashMode = false;
    int numAck;
    char notification;
    uint32_t FilterStart, FilterEnd, EncoderCurrentPos;
@@ -1075,7 +1089,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
             StopTimer(&FW_commTimer);
             FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
-            FW_currentRawPosition = mod(value, FW_COUNTS_IN_ONE_TURN);
+            FW_currentRawPosition = value;
             FW_INF("Current position : %d", FW_currentRawPosition);
 
             if (queryPosInfo)
@@ -1122,13 +1136,22 @@ static bool FWPositionMode(bool reset, bool newTarget)
                }
                else
                {
-                  posMode = POSITION_READY_MODE;
-                  FW_PRINTF("POSITION_READY_MODE\n");
+                  if (backlashMode == false)
+                  {
+                     posMode = POSITION_READY_MODE;
+                     FW_PRINTF("POSITION_READY_MODE\n");
+                  }
+                  else
+                  {
+                     backlashMode = false;
+                     posMode = POSITION_NEW_POS_MODE;
+                     FW_PRINTF("POSITION_NEW_POS_MODE (backlash prevention)\n");
+                  }
                }
             }
             else
             {
-               // position was queried prior to issueing a relative move command
+               // position was queried prior to issuing a relative move command
                posMode = POSITION_NEW_POS_MODE;
                FW_PRINTF("POSITION_NEW_POS_MODE\n");
             }
@@ -1154,19 +1177,26 @@ static bool FWPositionMode(bool reset, bool newTarget)
       break;
 
      case POSITION_NEW_POS_MODE:
-         FW_RequestedTarget %= FW_COUNTS_IN_ONE_TURN;
-         newSetpoint = FW_CalculateMove(FW_RequestedTarget, FW_currentRawPosition);
+        {
+           bool isRelativeMove = flashSettings.FWType == FW_SYNC; // FW_FIX commands absolute positions
+           FW_RequestedTarget %= FW_COUNTS_IN_ONE_TURN;
 
-         FW_INF("New target position: %d", FW_RequestedTarget);
+           if (flashSettings.FWType == FW_SYNC)
+              newSetpoint = FW_CalculateMove(FW_RequestedTarget, FW_currentRawPosition);
+           else
+              backlashMode = FW_CalculateBacklashFreeMove(FW_RequestedTarget, FW_currentRawPosition, &newSetpoint);
 
-         StopTimer(&FW_commTimer);
-         if (setPosition(FH_instance, newSetpoint, FH_RELATIVE))
-         {
-            StartTimer(&FW_commTimer, FH_REQUEST_TIMEOUT);
-            posMode = POSITION_NEWPOS_ACK_MODE;
-            FW_PRINTF("POSITION_NEWPOS_ACK_MODE\n");
-         }
-         break;
+           FW_INF("New target position: %d", FW_RequestedTarget);
+
+           StopTimer(&FW_commTimer);
+           if (setPosition(FH_instance, newSetpoint, isRelativeMove))
+           {
+              StartTimer(&FW_commTimer, FH_REQUEST_TIMEOUT);
+              posMode = POSITION_NEWPOS_ACK_MODE;
+              FW_PRINTF("POSITION_NEWPOS_ACK_MODE\n");
+           }
+        }
+        break;
 
       case POSITION_NEWPOS_ACK_MODE:
          numAck = FH_readAcks(FH_instance);
@@ -1528,6 +1558,24 @@ int32_t FW_CalculateMove(int32_t target, int32_t pos)
       relativeMove = delta;
 
    return relativeMove;
+}
+
+bool FW_CalculateBacklashFreeMove(int32_t target, int32_t pos, int32_t* setpoint_out)
+{
+   int32_t setpoint = 0;
+   bool backlashMode = false;
+
+   if (target < pos)
+   {
+      setpoint = target - FW_BACKLASH_OFFSET;
+      backlashMode = true;
+   }
+   else
+      setpoint = target;
+
+   *setpoint_out = setpoint;
+
+   return backlashMode;
 }
 
 void FW_ConfigParameterSet( flashSettings_t *flashSetting, FW_config_t *Config)
