@@ -387,8 +387,9 @@ void NDF_ControllerProcess()
          prevPosition = gcRegsData.NDFilterPosition;
 
          // Change calibration block
-         if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) &&
-               (calibrationInfo.blocks[gCal.calib_block_sel_mode - CBSM_USER_SEL_0].NDFPosition != gcRegsData.NDFilterPositionSetpoint))
+         if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) && // NDF Collection
+               (calibrationInfo.blocks[gCal.calib_block_sel_mode - CBSM_USER_SEL_0].NDFPosition != gcRegsData.NDFilterPositionSetpoint) && // Block NDF Position changed
+               ((gcRegsData.CalibrationMode != CM_Raw) && (gcRegsData.CalibrationMode != CM_Raw0))) // Not in RAW or RAW0
          {
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
          }
@@ -872,6 +873,9 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
    static int32_t protectionModeFinalTarget = -1;
    static uint32_t DestinationSetpoint = NDFP_NDFilterInTransition;
 
+   static int32_t RawPosition[3] = {1000000, 1000000, 1000000};
+   static uint8_t RawPositionIndex = 0;
+
    uint32_t threshold;
    int numAck;
    char notification;
@@ -964,14 +968,36 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
 
       {
          int32_t value;
+         uint8_t i;
 
          if (FH_readValue(FH_instance, &value))
          {
             StopTimer(&NDF_commTimer);
             NDF_ClearErrors(NDF_ERR_FAULHABER_RESP_TIMEOUT);
 
-            NDF_currentRawPosition = value;
-            //NDF_INF("Current position : %d", NDF_currentRawPosition);
+            // insert position in array
+            RawPosition[RawPositionIndex++] = value;
+            RawPositionIndex %= sizeof(RawPosition)/sizeof(int32_t);
+
+            // sort array to find the median
+            for (i = 0; i < 2; i++)
+            {
+               if (RawPosition[i] > RawPosition[i+1])
+               {
+                  value = RawPosition[i+1];
+                  RawPosition[i+1] = RawPosition[i];
+                  RawPosition[i] = value;
+               }
+            }
+
+            if (RawPosition[0] > RawPosition[1])
+            {
+               value = RawPosition[1];
+               RawPosition[1] = RawPosition[0];
+               RawPosition[0] = value;
+            }
+
+            NDF_currentRawPosition = RawPosition[1];
 
             // reset TransitionOver flag to update header with current position
             if (!nowInTransition && !TransitionOver && (NDF_getFilterIndex(NDF_currentRawPosition, NDF_filterWidth/4) == NDF_getFilterIndex(NDF_RequestedTarget, 0)))
@@ -983,7 +1009,11 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
             if (queryMode)
             {
                // position was queried just for updating the register
-               StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD);
+               if (abs(NDF_currentRawPosition - NDF_RequestedTarget) < 30)
+                  StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD_STATIC);
+               else
+                  StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD);
+
                posMode = NPM_PAUSE;
             }
             else
@@ -1004,7 +1034,7 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
       break;
 
    case NPM_PAUSE:
-      if (TimedOut(&NDF_commTimer))
+      if (TimedOut(&NDF_commTimer) || (!queryMode))
       {
          ready = true;
 
@@ -1083,11 +1113,11 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
       }
       else if (TimedOut(&NDF_commTimer))
       {
-         NDF_INF("didn't received NPM_NEW_POS_ACK, skipping...");
+         NDF_ERR("didn't received NPM_NEW_POS_ACK, skipping...");
 
          // Pretend we received ACK and position notification
          FH_consumeResponses(FH_instance);
-         StartTimer(&transitionTimer, 28);
+         StartTimer(&transitionTimer, 38);
          nowInTransition = true;
          DestinationSetpoint = NDF_getFilterIndex(NDF_RequestedTarget, 0);
          TransitionOver = false;
