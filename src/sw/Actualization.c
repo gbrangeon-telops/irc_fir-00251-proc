@@ -109,6 +109,8 @@ extern flashSettings_t flashSettings;
 
 extern fileList_t gFM_calibrationBlocks;
 
+int8_t gActualisationLoadBlockIdx = -1;
+
 // private stuff
 static BlockFileHeader_t refBlockFileHdr; // a header buffer for searching through blocks in flash memory
 static ActualizationFileHeader_t actFileHeader;
@@ -330,6 +332,7 @@ IRC_Status_t Actualization_SM()
    static float scaleFCal;
    static ACT_CoaddData_t coaddData;
    static uint32_t savedCalibPosixTime; // posix time of the calibration block to be reloaded at the end of the update
+   static uint32_t savedCurrentBlockIdx;
    static uint32_t dataOffset;
    static uint32_t pixelOffset;
    static uint32_t sequenceOffset = 0; // start of the first image of the buffered sequence [bytes]
@@ -467,6 +470,9 @@ IRC_Status_t Actualization_SM()
                // initiate the loading of the reference block
                savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
 
+               // save the value of the current block index
+               savedCurrentBlockIdx = 0;
+
                Calibration_LoadCalibrationFile(icuCalibFileRec);
 
                setActState(&state, ACT_WaitForCalibData);
@@ -489,6 +495,11 @@ IRC_Status_t Actualization_SM()
 
             // reload the current calibration, because we do not want to update a calibration that has already been calibrated
             savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
+            // save the value of the current block index
+            savedCurrentBlockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
+
+            // make sure we activate the correct block index, because reloading a collection always makes block 0 the active one
+            gActualisationLoadBlockIdx = savedCurrentBlockIdx;
             Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.collection.POSIXTime);
 
             // the reference block is the current bloc
@@ -1307,7 +1318,11 @@ IRC_Status_t Actualization_SM()
 
             // Reload original calibration data (will update the calibration at the same time)
             if (savedCalibPosixTime != 0)
+            {
+               // make sure we activate the correct block index, because reloading a collection always makes block 0 the active one
+               gActualisationLoadBlockIdx = savedCurrentBlockIdx;
                Calibration_LoadCalibrationFilePOSIXTime(savedCalibPosixTime);
+            }
 
             TDCStatusClr(WaitingForCalibrationActualizationMask);
 
@@ -1353,7 +1368,11 @@ IRC_Status_t Actualization_SM()
 
       // Reload original calibration data (will update the calibration at the same time)
       if (savedCalibPosixTime != 0)
+      {
+         // make sure we activate the correct block index, because reloading a collection always makes block 0 the active one
+         gActualisationLoadBlockIdx = savedCurrentBlockIdx;
          Calibration_LoadCalibrationFilePOSIXTime(savedCalibPosixTime);
+      }
 
       TDCStatusClr(WaitingForCalibrationActualizationMask);
 

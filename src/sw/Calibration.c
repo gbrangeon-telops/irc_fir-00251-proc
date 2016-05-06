@@ -31,6 +31,7 @@
 #include "FlashDynamicValues.h"
 
 extern t_calib gCal;
+extern int8_t gActualisationLoadBlockIdx;
 
 /**
  * Calibration block information
@@ -1340,6 +1341,14 @@ void Calibration_SM()
                blockLoadCmdFlag = true;
 
                startup = 0;
+            }
+
+            // allows the actualisation process to load the right block when it requests the reloading of a collection
+            if (gActualisationLoadBlockIdx > -1)
+            {
+               gcRegsData.CalibrationCollectionBlockSelector = gActualisationLoadBlockIdx;
+               blockLoadCmdFlag = true;
+               gActualisationLoadBlockIdx = -1;
             }
 
             if (flashSettings.FWPresent == 1)

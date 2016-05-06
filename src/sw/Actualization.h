@@ -279,6 +279,7 @@ typedef struct
 extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */
 extern actDebugOptions_t gActDebugOptions;
 extern actParams_t gActualizationParams;
+extern int8_t gActualisationLoadBlockIdx;
 
 void configureIcuParams(ICUParams_t* p);
 
