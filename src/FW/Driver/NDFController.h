@@ -33,6 +33,7 @@
 #define NDF_QUERY_MOVE_TIMEOUT      25  // ms
 
 #define NDF_POS_POLLING_PERIOD            1 /*< polling period during displacements [ms] */
+#define NDF_POS_POLLING_PERIOD_STATIC     500 /*< polling period outside displacements [ms] */
 #define NDF_POS_PROTECTION_PERIOD         30 /*< forced pause between end to end displacement [ms] */
 
 #define NDF_POS_LIMIT_DIST                10 /*< distance in counts to keep from the bumpers (used as a parameter for Load Position Limit after homing) */
