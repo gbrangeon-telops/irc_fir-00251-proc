@@ -2369,9 +2369,8 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
          gcRegsData.ExposureTime6 = FWExposureTime[5];
          gcRegsData.ExposureTime7 = FWExposureTime[6];
          gcRegsData.ExposureTime8 = FWExposureTime[7];
-         TriggerModeAry[TS_AcquisitionStart] = TM_Off;
-         TriggerModeAry[TS_Gating] = TM_Off;
       }
+
       if(flashSettings.FWType == FW_SYNC)
          SFW_UpdateSFWMode(gcRegsData.FWMode);
 
@@ -3651,6 +3650,9 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       {
          IsActiveFlagsSet(triggerIsActiveFlagMask);
       }
+
+      // Update AECPlusIsAvailableMask value
+      GC_UpdateAECPlusIsAvailable();
    }
 }
 

@@ -515,7 +515,7 @@ void GC_Registers_Init();
    !GC_GatingTriggerIsActive && \
    (calibrationInfo.isValid == 1) && \
    (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
-   (gcRegsData.FWPosition == calibrationInfo.collection.FWPosition) && \
+   ((gcRegsData.FWPositionSetpoint == calibrationInfo.collection.FWPosition) || (gcRegsData.CalibrationMode == CM_Raw) || (gcRegsData.CalibrationMode == CM_Raw0)) && \
    (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))))
 #define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
 

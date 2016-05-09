@@ -1360,11 +1360,8 @@ void Calibration_SM()
             {
                GC_RegisterWriteUI32(&gcRegsDef[NDFilterPositionSetpointIdx], calibrationInfo.blocks[blockIndex].NDFPosition);
 
-               if (GC_AECPlusIsAvailable)
-               {
-                  // Update AEC+ parameters coming from blocks and collection
-                  AEC_UpdateAECPlusParameters();
-               }
+               // Update AEC+ parameters coming from blocks and collection
+               AEC_UpdateAECPlusParameters();
             }
 
             // Update registers related to calibration control

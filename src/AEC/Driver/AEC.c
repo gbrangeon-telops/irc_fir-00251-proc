@@ -625,9 +625,6 @@ void AEC_UpdateAECPlusParameters(void)
    if (MinNDFPosition == MaxNDFPosition)
       return;
 
-   // set AECPlusIsImplemented
-   TDCFlagsSet(AECPlusIsImplementedMask);
-
    for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks ; blockIndex++)
    {
       // Searching for maximal total flux value

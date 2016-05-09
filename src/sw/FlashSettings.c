@@ -1856,10 +1856,12 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters > 0))
    {
       TDCFlagsSet(NDFilterIsImplementedMask);
+      TDCFlagsSet(AECPlusIsImplementedMask);
    }
    else
    {
       TDCFlagsClr(NDFilterIsImplementedMask);
+      TDCFlagsClr(AECPlusIsImplementedMask);
 
       if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters == 0))
       {
