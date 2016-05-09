@@ -1089,7 +1089,11 @@ static bool FWPositionMode(bool reset, bool newTarget)
             StopTimer(&FW_commTimer);
             FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
-            FW_currentRawPosition = value;
+            if (flashSettings.FWType == FW_SYNC)
+               FW_currentRawPosition = mod(value, FW_COUNTS_IN_ONE_TURN);
+            else
+               FW_currentRawPosition = value;
+
             FW_INF("Current position : %d", FW_currentRawPosition);
 
             if (queryPosInfo)
