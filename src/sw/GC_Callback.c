@@ -3646,7 +3646,7 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       // Update TriggerIsActive flags
       triggerIsActiveFlagMask = 0x00000001 << gcRegsData.TriggerSelector;
       IsActiveFlagsClr(triggerIsActiveFlagMask);
-      if (TriggerModeAry[gcRegsData.TriggerMode])
+      if (TriggerModeAry[gcRegsData.TriggerSelector] == TM_On)
       {
          IsActiveFlagsSet(triggerIsActiveFlagMask);
       }
