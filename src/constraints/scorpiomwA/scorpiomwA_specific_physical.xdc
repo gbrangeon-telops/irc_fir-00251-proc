@@ -93,6 +93,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports FPA_DIGIO*]
 #set_property IOB TRUE [get_ports FPA_DIGIO*] 
 
 # fpa_freq_id
+set_property PACKAGE_PIN N16 [get_ports FPA_FREQ_ID]
 set_property IOSTANDARD LVCMOS25 [get_ports FPA_FREQ_ID]
 set_property IOB TRUE [get_ports FPA_FREQ_ID]
 set_property PULLDOWN true [get_ports FPA_FREQ_ID]
@@ -107,6 +108,8 @@ set_property PACKAGE_PIN V22 [get_ports SPI_CSN]
 set_property PACKAGE_PIN U22 [get_ports SPI_SCLK]
 set_property PACKAGE_PIN AF25 [get_ports SPI_SDI]
 set_property PACKAGE_PIN AF24 [get_ports SPI_SDO]
+set_property PACKAGE_PIN AE21 [get_ports SPI_MUX0]
+set_property PACKAGE_PIN AD21 [get_ports SPI_MUX1]
 
 set_property IOSTANDARD LVCMOS25 [get_ports SPI_*]
 set_property IOB TRUE [get_ports SPI_SDO]
@@ -129,12 +132,6 @@ set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH1/q*_delay/delay_inst]
 #set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/g0.idelayctrl_inst]
 #set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/CLK_delay/delay_inst]
 #set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/q*_delay/delay_inst]
-
-
-
-
-
-
 
 
 
