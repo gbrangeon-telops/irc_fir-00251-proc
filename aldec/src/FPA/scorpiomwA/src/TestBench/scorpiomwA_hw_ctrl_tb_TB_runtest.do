@@ -49,7 +49,7 @@ asim -ses scorpiomwa_hw_ctrl_tb_TB
 --wave UUT/U5/U2/U3/*
   
    -- readout controller
-wave UUT/U5/U5/*
+--wave UUT/U5/U5/*
  
  
 -- scorpiomwA_digio_map
@@ -60,6 +60,8 @@ wave UUT/U5/U5/*
 --wave UUT/U19/* 
 
 -- readout controller
---wave UUT/U9/U1/U1/*
+--wave UUT/U9/U1/U1/* 
+
+wave UUT/*
  
 run 20 ms

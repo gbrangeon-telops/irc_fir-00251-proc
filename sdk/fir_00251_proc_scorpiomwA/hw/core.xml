@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Apr 01 21:28:25 2016" VIVADOVERSION="2013.4">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri May 13 07:50:49 2016" VIVADOVERSION="2013.4">
 
   <SYSTEMINFO ARCH="kintex7" DEVICE="7k160t" NAME="core_imp" PACKAGE="fbg676" SPEEDGRADE="-1"/>
 
@@ -48,6 +48,20 @@
     <PORT DIR="O" NAME="FW_UART_txrdyn" SIGIS="undef"/>
     <PORT DIR="O" NAME="LED_GPIO_tri_o" SIGIS="undef"/>
     <PORT DIR="O" NAME="MUX_ADDR_tri_o" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_baudoutn" SIGIS="undef"/>
+    <PORT DIR="I" NAME="NDF_UART_ctsn" SIGIS="undef"/>
+    <PORT DIR="I" NAME="NDF_UART_dcdn" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_ddis" SIGIS="undef"/>
+    <PORT DIR="I" NAME="NDF_UART_dsrn" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_dtrn" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_out1n" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_out2n" SIGIS="undef"/>
+    <PORT DIR="I" NAME="NDF_UART_ri" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_rtsn" SIGIS="undef"/>
+    <PORT DIR="I" NAME="NDF_UART_rxd" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_rxrdyn" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_txd" SIGIS="undef"/>
+    <PORT DIR="O" NAME="NDF_UART_txrdyn" SIGIS="undef"/>
     <PORT DIR="O" NAME="OEM_UART_baudoutn" SIGIS="undef"/>
     <PORT DIR="I" NAME="OEM_UART_ctsn" SIGIS="undef"/>
     <PORT DIR="I" NAME="OEM_UART_dcdn" SIGIS="undef"/>
@@ -1808,6 +1822,7 @@
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x40400000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x40401FFF" INSTANCE="axi_gps_uart" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x41C00000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x41C0FFFF" INSTANCE="axi_timer_0" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44A90000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44A9FFFF" INSTANCE="axi_quad_spi_0" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
+        <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x4040E000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x4040FFFF" INSTANCE="axi_ndf_uart" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x40000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x4000FFFF" INSTANCE="axi_gpio_0" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x80000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0xBFFFFFFF" INSTANCE="MIG_Calibration_CAL_DDR_MIG" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="MEMORY"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x50000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x5FFFFFFF" INSTANCE="MIG_Code_mig_7series_0" IS_DATA="FALSE" IS_INSTRUCTION="TRUE" MEMTYPE="MEMORY"/>
@@ -1829,6 +1844,7 @@
         <PERIPHERAL INSTANCE="axi_gps_uart"/>
         <PERIPHERAL INSTANCE="axi_timer_0"/>
         <PERIPHERAL INSTANCE="axi_quad_spi_0"/>
+        <PERIPHERAL INSTANCE="axi_ndf_uart"/>
         <PERIPHERAL INSTANCE="axi_gpio_0"/>
         <PERIPHERAL INSTANCE="MIG_Calibration_CAL_DDR_MIG"/>
         <PERIPHERAL INSTANCE="MCU_microblaze_1_local_memory_ilmb_bram_if_cntlr"/>
@@ -1840,12 +1856,12 @@
         <PARAMETER NAME="C_INSTANCE" VALUE="axi_intc_inst"/>
         <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="9"/>
         <PARAMETER NAME="C_S_AXI_DATA_WIDTH" VALUE="32"/>
-        <PARAMETER NAME="C_NUM_INTR_INPUTS" VALUE="14"/>
+        <PARAMETER NAME="C_NUM_INTR_INPUTS" VALUE="15"/>
         <PARAMETER NAME="C_NUM_SW_INTR" VALUE="0"/>
-        <PARAMETER NAME="C_KIND_OF_INTR" VALUE="0xffffe038"/>
+        <PARAMETER NAME="C_KIND_OF_INTR" VALUE="0xffffc070"/>
         <PARAMETER NAME="C_KIND_OF_EDGE" VALUE="0xffffffff"/>
         <PARAMETER NAME="C_KIND_OF_LVL" VALUE="0xffffffff"/>
-        <PARAMETER NAME="C_ASYNC_INTR" VALUE="0xFFFFC038"/>
+        <PARAMETER NAME="C_ASYNC_INTR" VALUE="0xFFFF8070"/>
         <PARAMETER NAME="C_NUM_SYNC_FF" VALUE="2"/>
         <PARAMETER NAME="C_IVAR_RESET_VALUE" VALUE="0x00000010"/>
         <PARAMETER NAME="C_ENABLE_ASYNC" VALUE="0"/>
@@ -1965,7 +1981,7 @@
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="intr" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="MCU_mdm_1_Interrupt &amp; oem_uart_ip2intc_irpt &amp; clink_uart_ip2intc_irpt &amp; xadc_wiz_1_ip2intc_irpt &amp; axi_timer_0_interrupt &amp; pleora_uart_ip2intc_irpt &amp; fpga_output_uart_ip2intc_irpt &amp; axi_usb_uart_ip2intc_irpt &amp; External_Ports_bulk_interrupt &amp; axi_quad_spi_0_ip2intc_irpt &amp; External_Ports_AEC_INTC &amp; axi_gps_uart_ip2intc_irpt &amp; fw_uart_ip2intc_irpt &amp; power_management_ip2intc_irpt">
+        <PORT DIR="I" NAME="intr" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="MCU_mdm_1_Interrupt &amp; oem_uart_ip2intc_irpt &amp; clink_uart_ip2intc_irpt &amp; xadc_wiz_1_ip2intc_irpt &amp; axi_timer_0_interrupt &amp; pleora_uart_ip2intc_irpt &amp; fpga_output_uart_ip2intc_irpt &amp; axi_usb_uart_ip2intc_irpt &amp; External_Ports_bulk_interrupt &amp; axi_quad_spi_0_ip2intc_irpt &amp; External_Ports_AEC_INTC &amp; axi_gps_uart_ip2intc_irpt &amp; fw_uart_ip2intc_irpt &amp; power_management_ip2intc_irpt &amp; axi_ndf_uart_ip2intc_irpt">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_mdm_1" PORT="Interrupt"/>
             <CONNECTION INSTANCE="oem_uart" PORT="ip2intc_irpt"/>
@@ -1981,6 +1997,7 @@
             <CONNECTION INSTANCE="axi_gps_uart" PORT="ip2intc_irpt"/>
             <CONNECTION INSTANCE="fw_uart" PORT="ip2intc_irpt"/>
             <CONNECTION INSTANCE="power_management" PORT="ip2intc_irpt"/>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="ip2intc_irpt"/>
           </CONNECTIONS>
         </PORT>
         <PORT CLKFREQUENCY="100000000" DIR="I" NAME="processor_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out1">
@@ -13371,6 +13388,187 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
+    <MODULE FULLNAME="/axi_ndf_uart" HWVERSION="2.0" INSTANCE="axi_ndf_uart" IPTYPE="PERIPHERAL" MODCLASS="PERIPHERAL" MODTYPE="axi_uart16550" VLNV="xilinx.com:ip:axi_uart16550:2.0">
+      <PARAMETERS>
+        <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
+        <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ" VALUE="100000000"/>
+        <PARAMETER NAME="C_S_AXI_ADDR_WIDTH" VALUE="13"/>
+        <PARAMETER NAME="C_S_AXI_DATA_WIDTH" VALUE="32"/>
+        <PARAMETER NAME="C_IS_A_16550" VALUE="1"/>
+        <PARAMETER NAME="C_HAS_EXTERNAL_XIN" VALUE="0"/>
+        <PARAMETER NAME="C_HAS_EXTERNAL_RCLK" VALUE="0"/>
+        <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
+        <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
+        <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_axi_ndf_uart_1"/>
+        <PARAMETER NAME="BASE_USER" VALUE="1"/>
+        <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
+        <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
+        <PARAMETER NAME="USE_BOARD_FLOW" VALUE="false"/>
+        <PARAMETER NAME="UART_BOARD_INTERFACE" VALUE="Custom"/>
+        <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
+        <PARAMETER NAME="C_BASEADDR" VALUE="0x4040E000"/>
+        <PARAMETER NAME="C_HIGHADDR" VALUE="0x4040FFFF"/>
+      </PARAMETERS>
+      <PORTS>
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out1">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="ip2intc_irpt" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="axi_ndf_uart_ip2intc_irpt">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="intr"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="freeze" SIGIS="undef"/>
+        <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_awaddr">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_awaddr"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_awvalid" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_awvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_awvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_awready" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_awready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_awready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_wdata" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_wdata">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_wdata"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_wstrb" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_wstrb">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_wstrb"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_wvalid" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_wvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_wvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_wready" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_wready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_wready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_bresp" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_bresp">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_bresp"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_bvalid" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_bvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_bvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_bready" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_bready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_bready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_araddr" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_araddr">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_araddr"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_arvalid" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_arvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_arvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_arready" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_arready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_arready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_rdata" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_rdata">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rdata"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_rresp" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_rresp">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rresp"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="s_axi_rvalid" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_rvalid">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rvalid"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="s_axi_rready" SIGIS="undef" SIGNAME="axi_ndf_uart_s_axi_rready">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rready"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="baudoutn" SIGIS="undef"/>
+        <PORT DIR="I" NAME="ctsn" SIGIS="undef"/>
+        <PORT DIR="I" NAME="dcdn" SIGIS="undef"/>
+        <PORT DIR="O" NAME="ddis" SIGIS="undef"/>
+        <PORT DIR="I" NAME="dsrn" SIGIS="undef"/>
+        <PORT DIR="O" NAME="dtrn" SIGIS="undef"/>
+        <PORT DIR="O" NAME="out1n" SIGIS="undef"/>
+        <PORT DIR="O" NAME="out2n" SIGIS="undef"/>
+        <PORT DIR="I" NAME="rin" SIGIS="undef"/>
+        <PORT DIR="O" NAME="rtsn" SIGIS="undef"/>
+        <PORT DIR="O" NAME="rxrdyn" SIGIS="undef"/>
+        <PORT DIR="I" NAME="sin" SIGIS="undef"/>
+        <PORT DIR="O" NAME="sout" SIGIS="undef"/>
+        <PORT DIR="O" NAME="txrdyn" SIGIS="undef"/>
+      </PORTS>
+      <BUSINTERFACES>
+        <BUSINTERFACE BUSNAME="axi_peripheral_axi_interconnect_2_xbar" NAME="S_AXI" TYPE="SLAVE">
+          <PORTMAPS>
+            <PORTMAP PHYSICAL="s_axi_araddr"/>
+            <PORTMAP PHYSICAL="s_axi_arready"/>
+            <PORTMAP PHYSICAL="s_axi_arvalid"/>
+            <PORTMAP PHYSICAL="s_axi_awaddr"/>
+            <PORTMAP PHYSICAL="s_axi_awready"/>
+            <PORTMAP PHYSICAL="s_axi_awvalid"/>
+            <PORTMAP PHYSICAL="s_axi_bready"/>
+            <PORTMAP PHYSICAL="s_axi_bresp"/>
+            <PORTMAP PHYSICAL="s_axi_bvalid"/>
+            <PORTMAP PHYSICAL="s_axi_rdata"/>
+            <PORTMAP PHYSICAL="s_axi_rready"/>
+            <PORTMAP PHYSICAL="s_axi_rresp"/>
+            <PORTMAP PHYSICAL="s_axi_rvalid"/>
+            <PORTMAP PHYSICAL="s_axi_wdata"/>
+            <PORTMAP PHYSICAL="s_axi_wready"/>
+            <PORTMAP PHYSICAL="s_axi_wstrb"/>
+            <PORTMAP PHYSICAL="s_axi_wvalid"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+        <BUSINTERFACE NAME="UART">
+          <PORTMAPS>
+            <PORTMAP PHYSICAL="baudoutn"/>
+            <PORTMAP PHYSICAL="ctsn"/>
+            <PORTMAP PHYSICAL="dcdn"/>
+            <PORTMAP PHYSICAL="ddis"/>
+            <PORTMAP PHYSICAL="dsrn"/>
+            <PORTMAP PHYSICAL="dtrn"/>
+            <PORTMAP PHYSICAL="out1n"/>
+            <PORTMAP PHYSICAL="out2n"/>
+            <PORTMAP PHYSICAL="rin"/>
+            <PORTMAP PHYSICAL="rtsn"/>
+            <PORTMAP PHYSICAL="sin"/>
+            <PORTMAP PHYSICAL="rxrdyn"/>
+            <PORTMAP PHYSICAL="sout"/>
+            <PORTMAP PHYSICAL="txrdyn"/>
+          </PORTMAPS>
+        </BUSINTERFACE>
+      </BUSINTERFACES>
+    </MODULE>
     <MODULE FULLNAME="/axi_peripheral/axi_interconnect_0/s00_couplers/s00_data_fifo" HWVERSION="2.1" INSTANCE="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo" IPTYPE="BUS" MODCLASS="BUS" MODTYPE="axi_data_fifo" VLNV="xilinx.com:ip:axi_data_fifo:2.1">
       <PARAMETERS>
         <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
@@ -16623,8 +16821,8 @@
         <PARAMETER NAME="C_AXI_DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_AXI_PROTOCOL" VALUE="2"/>
         <PARAMETER NAME="C_NUM_ADDR_RANGES" VALUE="16"/>
-        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040c000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b400000000000044b300000000000044a400000000000044a300000000000044a2000000000000412000000000000044b200000000000044af00000000000044ae00000000000044ac00000000000044ab00000000000044aa00000000000044a800000000000044a600000000000044a500000000000044a100000000000044a000000000000041c000000000000040406000000000004040200000000000400100000000000040000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a70000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040a000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040404000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040408000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000041400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a90000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b00000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044ad0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b10000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000080000000"/>
-        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000010000000100000000c0000000e000000100000000c0000000e0000000f0000000c0000000c0000000c0000000c0000000c0000000c0000000c0000000c000000100000000d0000000d00000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e"/>
+        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040c000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b400000000000044b300000000000044a400000000000044a300000000000044a200000000000041200000000000004040e0000000000044b200000000000044af00000000000044ae00000000000044ac00000000000044ab00000000000044aa00000000000044a800000000000044a600000000000044a500000000000044a100000000000044a000000000000041c000000000000040406000000000004040200000000000400100000000000040000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a70000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040a000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040404000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040408000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000041400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a90000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b00000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044ad0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b10000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000080000000"/>
+        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000c00000010000000100000000c0000000e000000100000000d0000000c0000000e0000000f0000000c0000000c0000000c0000000c0000000c0000000c0000000c0000000c000000100000000d0000000d00000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e"/>
         <PARAMETER NAME="C_S_AXI_BASE_ID" VALUE="0x00000000"/>
         <PARAMETER NAME="C_S_AXI_THREAD_ID_WIDTH" VALUE="0x00000000"/>
         <PARAMETER NAME="C_AXI_SUPPORTS_USER_SIGNALS" VALUE="0"/>
@@ -17523,13 +17721,13 @@
         <PARAMETER NAME="M11_A13_BASE_ADDR" VALUE="0x0000000044ae0000"/>
         <PARAMETER NAME="M11_A14_BASE_ADDR" VALUE="0x0000000044af0000"/>
         <PARAMETER NAME="M11_A15_BASE_ADDR" VALUE="0x0000000044b20000"/>
-        <PARAMETER NAME="M12_A00_BASE_ADDR" VALUE="0x0000000041200000"/>
-        <PARAMETER NAME="M12_A01_BASE_ADDR" VALUE="0x0000000044a20000"/>
-        <PARAMETER NAME="M12_A02_BASE_ADDR" VALUE="0x0000000044a30000"/>
-        <PARAMETER NAME="M12_A03_BASE_ADDR" VALUE="0x0000000044a40000"/>
-        <PARAMETER NAME="M12_A04_BASE_ADDR" VALUE="0x0000000044b30000"/>
-        <PARAMETER NAME="M12_A05_BASE_ADDR" VALUE="0x0000000044b40000"/>
-        <PARAMETER NAME="M12_A06_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M12_A00_BASE_ADDR" VALUE="0x000000004040e000"/>
+        <PARAMETER NAME="M12_A01_BASE_ADDR" VALUE="0x0000000041200000"/>
+        <PARAMETER NAME="M12_A02_BASE_ADDR" VALUE="0x0000000044a20000"/>
+        <PARAMETER NAME="M12_A03_BASE_ADDR" VALUE="0x0000000044a30000"/>
+        <PARAMETER NAME="M12_A04_BASE_ADDR" VALUE="0x0000000044a40000"/>
+        <PARAMETER NAME="M12_A05_BASE_ADDR" VALUE="0x0000000044b30000"/>
+        <PARAMETER NAME="M12_A06_BASE_ADDR" VALUE="0x0000000044b40000"/>
         <PARAMETER NAME="M12_A07_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M12_A08_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M12_A09_BASE_ADDR" VALUE="0xffffffffffffffff"/>
@@ -17779,13 +17977,13 @@
         <PARAMETER NAME="M11_A13_ADDR_WIDTH" VALUE="15"/>
         <PARAMETER NAME="M11_A14_ADDR_WIDTH" VALUE="14"/>
         <PARAMETER NAME="M11_A15_ADDR_WIDTH" VALUE="12"/>
-        <PARAMETER NAME="M12_A00_ADDR_WIDTH" VALUE="16"/>
-        <PARAMETER NAME="M12_A01_ADDR_WIDTH" VALUE="14"/>
-        <PARAMETER NAME="M12_A02_ADDR_WIDTH" VALUE="12"/>
-        <PARAMETER NAME="M12_A03_ADDR_WIDTH" VALUE="16"/>
+        <PARAMETER NAME="M12_A00_ADDR_WIDTH" VALUE="13"/>
+        <PARAMETER NAME="M12_A01_ADDR_WIDTH" VALUE="16"/>
+        <PARAMETER NAME="M12_A02_ADDR_WIDTH" VALUE="14"/>
+        <PARAMETER NAME="M12_A03_ADDR_WIDTH" VALUE="12"/>
         <PARAMETER NAME="M12_A04_ADDR_WIDTH" VALUE="16"/>
-        <PARAMETER NAME="M12_A05_ADDR_WIDTH" VALUE="12"/>
-        <PARAMETER NAME="M12_A06_ADDR_WIDTH" VALUE="0"/>
+        <PARAMETER NAME="M12_A05_ADDR_WIDTH" VALUE="16"/>
+        <PARAMETER NAME="M12_A06_ADDR_WIDTH" VALUE="12"/>
         <PARAMETER NAME="M12_A07_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M12_A08_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M12_A09_ADDR_WIDTH" VALUE="0"/>
@@ -18808,14 +19006,14 @@
       <PARAMETERS>
         <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
         <PARAMETER NAME="C_NUM_SLAVE_SLOTS" VALUE="1"/>
-        <PARAMETER NAME="C_NUM_MASTER_SLOTS" VALUE="6"/>
+        <PARAMETER NAME="C_NUM_MASTER_SLOTS" VALUE="7"/>
         <PARAMETER NAME="C_AXI_ID_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_AXI_ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_AXI_DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_AXI_PROTOCOL" VALUE="2"/>
         <PARAMETER NAME="C_NUM_ADDR_RANGES" VALUE="1"/>
-        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0x0000000044b400000000000044b300000000000044a4000000000000412000000000000044a300000000000044a20000"/>
-        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000c0000001000000010000000100000000c0000000e"/>
+        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0x000000004040e0000000000044b400000000000044b300000000000044a4000000000000412000000000000044a300000000000044a20000"/>
+        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000d0000000c0000001000000010000000100000000c0000000e"/>
         <PARAMETER NAME="C_S_AXI_BASE_ID" VALUE="0x00000000"/>
         <PARAMETER NAME="C_S_AXI_THREAD_ID_WIDTH" VALUE="0x00000000"/>
         <PARAMETER NAME="C_AXI_SUPPORTS_USER_SIGNALS" VALUE="0"/>
@@ -18824,20 +19022,20 @@
         <PARAMETER NAME="C_AXI_WUSER_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_AXI_RUSER_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_AXI_BUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_M_AXI_WRITE_CONNECTIVITY" VALUE="0x000000010000000100000001000000010000000100000001"/>
-        <PARAMETER NAME="C_M_AXI_READ_CONNECTIVITY" VALUE="0x000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_WRITE_CONNECTIVITY" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_READ_CONNECTIVITY" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
         <PARAMETER NAME="C_R_REGISTER" VALUE="1"/>
         <PARAMETER NAME="C_S_AXI_SINGLE_THREAD" VALUE="0x00000001"/>
         <PARAMETER NAME="C_S_AXI_WRITE_ACCEPTANCE" VALUE="0x00000001"/>
         <PARAMETER NAME="C_S_AXI_READ_ACCEPTANCE" VALUE="0x00000001"/>
-        <PARAMETER NAME="C_M_AXI_WRITE_ISSUING" VALUE="0x000000010000000100000001000000010000000100000001"/>
-        <PARAMETER NAME="C_M_AXI_READ_ISSUING" VALUE="0x000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_WRITE_ISSUING" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_READ_ISSUING" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
         <PARAMETER NAME="C_S_AXI_ARB_PRIORITY" VALUE="0x00000000"/>
-        <PARAMETER NAME="C_M_AXI_SECURE" VALUE="0x000000000000000000000000000000000000000000000000"/>
+        <PARAMETER NAME="C_M_AXI_SECURE" VALUE="0x00000000000000000000000000000000000000000000000000000000"/>
         <PARAMETER NAME="C_CONNECTIVITY_MODE" VALUE="0"/>
         <PARAMETER NAME="ADDR_RANGES" VALUE="1"/>
         <PARAMETER NAME="NUM_SI" VALUE="1"/>
-        <PARAMETER NAME="NUM_MI" VALUE="6"/>
+        <PARAMETER NAME="NUM_MI" VALUE="7"/>
         <PARAMETER NAME="ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="STRATEGY" VALUE="0"/>
         <PARAMETER NAME="PROTOCOL" VALUE="AXI4LITE"/>
@@ -19618,22 +19816,22 @@
         <PARAMETER NAME="M05_A13_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M05_A14_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M05_A15_BASE_ADDR" VALUE="0xffffffffffffffff"/>
-        <PARAMETER NAME="M06_A00_BASE_ADDR" VALUE="0x0000000000600000"/>
-        <PARAMETER NAME="M06_A01_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A02_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A03_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A04_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A05_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A06_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A07_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A08_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A09_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A10_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A11_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A12_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A13_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A14_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M06_A15_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
+        <PARAMETER NAME="M06_A00_BASE_ADDR" VALUE="0x000000004040e000"/>
+        <PARAMETER NAME="M06_A01_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A02_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A03_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A04_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A05_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A06_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A07_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A08_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A09_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A10_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A11_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A12_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A13_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A14_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M06_A15_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M07_A00_BASE_ADDR" VALUE="0x0000000000700000"/>
         <PARAMETER NAME="M07_A01_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
         <PARAMETER NAME="M07_A02_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
@@ -19874,7 +20072,7 @@
         <PARAMETER NAME="M05_A13_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M05_A14_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M05_A15_ADDR_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="M06_A00_ADDR_WIDTH" VALUE="12"/>
+        <PARAMETER NAME="M06_A00_ADDR_WIDTH" VALUE="13"/>
         <PARAMETER NAME="M06_A01_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M06_A02_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M06_A03_ADDR_WIDTH" VALUE="0"/>
@@ -20148,6 +20346,9 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_awaddr"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_awaddr"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_awaddr"/>
           </CONNECTIONS>
         </PORT>
@@ -20161,12 +20362,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_awvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_awvalid"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_awvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_awready" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_awready">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_awready"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_awready"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_awready"/>
@@ -20177,12 +20384,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_wdata"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_wdata"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_wdata"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_wstrb" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_wstrb">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_wstrb"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_wstrb"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_wstrb"/>
@@ -20193,12 +20406,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_wvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_wvalid"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_wvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_wready" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_wready">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_wready"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_wready"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_wready"/>
@@ -20209,12 +20428,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_bresp"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_bresp"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_bresp"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_bvalid" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_bvalid">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_bvalid"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_bvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_bvalid"/>
@@ -20225,12 +20450,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_bready"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_bready"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_bready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_araddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_araddr">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_araddr"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_araddr"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_araddr"/>
@@ -20246,12 +20477,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_arvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_arvalid"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_arvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_arready" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_arready">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_arready"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_arready"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_arready"/>
@@ -20262,12 +20499,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_rdata"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_rdata"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_rdata"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_rresp" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_rresp">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_rresp"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_rresp"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_rresp"/>
@@ -20278,12 +20521,18 @@
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_rvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_rvalid"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_rvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_rready" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_rready">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_rready"/>
+          </CONNECTIONS>
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_rready"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="s_axi_rready"/>
@@ -20655,7 +20904,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_axi_usb_uart_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_axi_usb_uart_2"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -20836,7 +21085,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_clink_uart_2"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_clink_uart_3"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -21493,6 +21742,7 @@
             <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_s01_couplers_auto_us" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_gpio_0" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_gps_uart" PORT="s_axi_aclk"/>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_xbar" PORT="aclk"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo" PORT="aclk"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_1_xbar" PORT="aclk"/>
@@ -21574,7 +21824,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_fpga_output_uart_3"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_fpga_output_uart_4"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -21755,7 +22005,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_fw_uart_4"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_fw_uart_5"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -21936,7 +22186,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_oem_uart_5"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_oem_uart_6"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -22117,7 +22367,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_pleora_uart_6"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_pleora_uart_7"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -22554,6 +22804,7 @@
             <CONNECTION INSTANCE="MIG_Code_mig_7series_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_gpio_0" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_gps_uart" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_xbar" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_1_xbar" PORT="aresetn"/>

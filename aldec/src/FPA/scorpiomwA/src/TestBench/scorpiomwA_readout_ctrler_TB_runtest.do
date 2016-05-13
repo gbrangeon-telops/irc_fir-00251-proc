@@ -15,11 +15,11 @@ acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\Proxy_define.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do  
-
+do d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do
 #pour la simulation 
 
-acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.vhd
-acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
+--acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.vhd
+--acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
 --acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_diag_data_gen.vhd
 --acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd
 

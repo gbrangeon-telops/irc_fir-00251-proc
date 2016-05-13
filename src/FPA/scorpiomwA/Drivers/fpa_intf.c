@@ -101,6 +101,14 @@
 #define SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV 500
 #define SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV 1000
 
+#define SCORPIOMWA_TAPREF_VOLTAGE_MIN_mV  510
+#define SCORPIOMWA_TAPREF_VOLTAGE_MAX_mV  5310
+
+#define SCORPIOMWA_REFOFS_VOLTAGE_MIN_mV  3000 
+#define SCORPIOMWA_REFOFS_VOLTAGE_MAX_mV  6200  
+
+
+  
 // structure interne pour les parametres du scorpiomw
 struct scorpiomw_param_s             //
 {					   
@@ -196,10 +204,15 @@ void  FPA_PowerDown(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
-    scorpiomw_param_t hh;
-    uint32_t Cmin, Cmax, Rmin, Rmax;
-    extern int16_t gFpaDetectorPolarizationVoltage;
-    static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   scorpiomw_param_t hh;
+   uint32_t Cmin, Cmax, Rmin, Rmax;
+   extern int16_t gFpaDetectorPolarizationVoltage;
+   static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   extern float gFpaDetectorElectricalTapsRef;
+   extern float gFpaDetectorElectricalRefOffset;
+   static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+   static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+
 
    // on bâtit les parametres specifiques du scorpiomw
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
@@ -319,9 +332,29 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV
    ptrA->vdac_value[3]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 4);      // VCC4 -> VDD  = 3300 mV
    ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
-   ptrA->vdac_value[5]                     = ptrA->gpol_code;                             // VCC6 -> GPOL   
-   ptrA->vdac_value[6]                     = FLEG_VccVoltage_To_DacWord(1950.0F, 7);      // VCC7 -> offset1 = 1950.0 mV
-   ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(3159.4F, 8);      // VCC8 -> offset2 = 3159.4 mV
+   ptrA->vdac_value[5]                     = ptrA->gpol_code;                             // VCC6 -> GPOL
+
+   
+   // Reference of the tap (VCC7 ou DAC6)      
+   if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
+   {
+      if ((gFpaDetectorElectricalTapsRef >= (float)SCORPIOMWA_TAPREF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)SCORPIOMWA_TAPREF_VOLTAGE_MAX_mV))
+         ptrA->vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 7);  // 
+	}                                                                                                       
+   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
+   gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;   
+   
+   // offset of the tap_reference (VCC8 ou DAC7)      
+   if (gFpaDetectorElectricalRefOffset != actualElectricalRefOffset)
+   {
+      if ((gFpaDetectorElectricalRefOffset >= (float)SCORPIOMWA_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)SCORPIOMWA_REFOFS_VOLTAGE_MAX_mV))
+         ptrA->vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 8);  // 
+	}                                                                                                       
+   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[7], 8);            
+   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
+   
+   //ptrA->vdac_value[6]                     = FLEG_VccVoltage_To_DacWord(1950.0F, 7);      // VCC7 -> offset1(TapRef) = 1950.0 mV    soit word = 4893
+   //ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(3159.4F, 8);      // VCC8 -> offset2(RefOFs) = 3159.4 mV    soit word = 2594
 
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC

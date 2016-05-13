@@ -5,7 +5,7 @@ version=3
 Current Config=compile
 
 [Configurations]
-compile=isc0207A
+compile=isc0207a
 
 [Library]
 isc0207A=.\isc0207A\isc0207A.lib
@@ -26,7 +26,7 @@ REFRESH_FLOW=1
 FAMILY=Xilinx VIRTEX4
 IMPL_TOOL=
 SYNTH_TOOL=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -71,18 +71,29 @@ Extension7=
 FPA_common=1
 TestBench=1
 
+[file_out:/..\..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_intf.bde]
+/..\compile\isc0207A_intf.vhd=-1
+
+[file_out:/..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
+/..\compile\afpa_services.vhd=-1
+
 [file_out:/..\..\..\..\..\src\fir_00251_proc_isc0207A.bde]
 /..\compile\fir_00251_proc_isc0207A.vhd=-1
 
 [file_out:/fpa_isc0207_intf_tb.bde]
 /..\compile\fpa_isc0207_intf_tb.vhd=-1
 
+[file_out:/isc0207A_intf_testbench.bde]
+/..\compile\isc0207a_intf_testbench.vhd=-1
+
+[file_out:/..\..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde]
+/..\compile\isc0207A_hw_driver.vhd=-1
+
+[file_out:/edge_distance_measure.bde]
+/..\compile\edge_distance_measure.vhd=-1
+
 [file_out:FPA_common/..\..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
 FPA_common/..\compile\afpa_services.vhd=-1
-
-
-
-
 
 [Files]
 /..\..\..\..\..\src\FPA\isc0207A\HDL\compil_isc0207A.do=-1
@@ -109,6 +120,10 @@ FPA_common/..\compile\afpa_services.vhd=-1
 /..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_mean.vhd=-1
 /fpa_isc0207_hw_driver_tb.bde=-1
 /..\..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde=-1
+/edge_measure_ref_clk.vhd=-1
+/edge_distance_measure.vhd=-1
+/edge_distance_measure.bde=-1
+/edge_measure_stat.vhd=-1
 FPA_common/..\..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde=-1
 FPA_common/..\..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat_gen.vhd=-1
 FPA_common/..\..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=-1
@@ -127,6 +142,10 @@ TestBench/isc0207a_intf_testbench_TB.vhd=-1
 TestBench/isc0207a_intf_testbench_TB_runtest.do=-1
 TestBench/signal_filter_TB.vhd=-1
 TestBench/signal_filter_TB_runtest.do=-1
+TestBench/..\isc0207A_dummy.vhd=-1
+TestBench/..\edge_measure_ref_clk.vhd=-1
+TestBench/..\re_distance_measure.vhd=-1
+TestBench/..\detector_trace_define.vhd=-1
 
 [Files.Data]
 .\..\..\..\..\src\FPA\isc0207A\HDL\compil_isc0207A.do=Macro
@@ -153,6 +172,10 @@ TestBench/signal_filter_TB_runtest.do=-1
 .\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_mean.vhd=VHDL Source Code
 .\src\fpa_isc0207_hw_driver_tb.bde=Block Diagram
 .\..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde=Block Diagram
+.\src\edge_measure_ref_clk.vhd=VHDL Source Code
+.\src\edge_distance_measure.vhd=VHDL Source Code
+.\src\edge_distance_measure.bde=Block Diagram
+.\src\edge_measure_stat.vhd=VHDL Source Code
 .\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat_gen.vhd=VHDL Source Code
 .\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=VHDL Source Code
 .\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd=VHDL Source Code
@@ -170,16 +193,7 @@ TestBench/signal_filter_TB_runtest.do=-1
 .\src\TestBench\isc0207a_intf_testbench_TB_runtest.do=Macro
 .\src\TestBench\signal_filter_TB.vhd=VHDL Test Bench
 .\src\TestBench\signal_filter_TB_runtest.do=Macro
-.\compile\afpa_services.vhd=VHDL Source Code
-.\compile\isc0207A_hw_driver.vhd=VHDL Source Code
-.\compile\isc0207A_intf.vhd=VHDL Source Code
-.\compile\isc0207a_intf_testbench.vhd=VHDL Source Code
+.\src\isc0207A_dummy.vhd=VHDL Source Code
+.\src\re_distance_measure.vhd=VHDL Source Code
+.\src\detector_trace_define.vhd=VHDL Source Code
 
-[file_out:/..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
-/..\compile\afpa_services.vhd=-1
-[file_out:/..\..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde]
-/..\compile\isc0207A_hw_driver.vhd=-1
-[file_out:/..\..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_intf.bde]
-/..\compile\isc0207A_intf.vhd=-1
-[file_out:/isc0207A_intf_testbench.bde]
-/..\compile\isc0207a_intf_testbench.vhd=-1

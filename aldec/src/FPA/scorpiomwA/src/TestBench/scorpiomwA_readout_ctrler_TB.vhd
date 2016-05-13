@@ -121,7 +121,7 @@ begin
    
    FPA_INTF_CFG.active_line_start_num            <= to_unsigned(3, FPA_INTF_CFG.active_line_start_num'length); 
    FPA_INTF_CFG.active_line_end_num         <= to_unsigned(YSIZE + to_integer(FPA_INTF_CFG.active_line_start_num) - 1, FPA_INTF_CFG.active_line_end_num'length);
-   FPA_INTF_CFG.window_lsync_num    <= to_unsigned(YSIZE + to_integer(FPA_INTF_CFG.active_line_start_num) - 1, FPA_INTF_CFG.window_lsync_num'length);
+   --FPA_INTF_CFG.window_lsync_num    <= to_unsigned(YSIZE + to_integer(FPA_INTF_CFG.active_line_start_num) - 1, FPA_INTF_CFG.window_lsync_num'length);
    
    FPA_INTF_CFG.pix_samp_num_per_ch   <= to_unsigned(4, FPA_INTF_CFG.pix_samp_num_per_ch'length);
    

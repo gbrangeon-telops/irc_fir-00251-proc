@@ -186,12 +186,12 @@ begin
    user_cfg_i.eol_posl_pclk_p1   <= user_cfg_i.eol_posl_pclk + 1;
    
    
-   user_cfg_i.hgood_samp_sum_num          		<= to_unsigned(2, user_cfg_i.hgood_samp_sum_num'length); 
+   user_cfg_i.hgood_samp_sum_num          		<= to_unsigned(1, user_cfg_i.hgood_samp_sum_num'length); 
    user_cfg_i.hgood_samp_mean_numerator   		<= to_unsigned(2**21/2, user_cfg_i.hgood_samp_mean_numerator'length); 
    user_cfg_i.vgood_samp_sum_num          		<= to_unsigned(2, user_cfg_i.vgood_samp_sum_num'length); 
    user_cfg_i.vgood_samp_mean_numerator   		<= to_unsigned(2**21/2, user_cfg_i.vgood_samp_mean_numerator'length); 
-   user_cfg_i.good_samp_first_pos_per_ch  		<= to_unsigned(3, user_cfg_i.good_samp_first_pos_per_ch'length); 
-   user_cfg_i.good_samp_last_pos_per_ch   		<= to_unsigned(4, user_cfg_i.good_samp_last_pos_per_ch'length); 
+   user_cfg_i.good_samp_first_pos_per_ch  		<= to_unsigned(2, user_cfg_i.good_samp_first_pos_per_ch'length); 
+   user_cfg_i.good_samp_last_pos_per_ch   		<= to_unsigned(2, user_cfg_i.good_samp_last_pos_per_ch'length); 
    user_cfg_i.xsize_div_tapnum            		<= to_unsigned(xsize/4, user_cfg_i.xsize_div_tapnum'length); 
    user_cfg_i.vdac_value(1)               		<= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
    user_cfg_i.vdac_value(2)               		<= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 

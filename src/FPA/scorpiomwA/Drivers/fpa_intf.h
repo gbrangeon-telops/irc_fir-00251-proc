@@ -75,7 +75,7 @@
 
 #define FPA_INVALID_TEMP         -32768   // cC
 
-#define FPA_MCLK_RATE_HZ         10000000            // le master clock du FPA est à 10MHz
+#define FPA_MCLK_RATE_HZ         18000000            // le master clock du FPA est à 10MHz
 #define FPA_CLOCK_FREQ_HZ        FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c 
 
 // structure de config envoyée au vhd 
@@ -187,8 +187,8 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,0,0}, 0}
-
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,4893,2594}, 0}
+                                                                                                                     //ENO 11 mai 2016:  ne pas changer le 671, ce n'est pas en mV mais en cnt DAC qui donneront 700 mV
 
 // pour initialiser le module vhd avec les bons parametres de départ
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);

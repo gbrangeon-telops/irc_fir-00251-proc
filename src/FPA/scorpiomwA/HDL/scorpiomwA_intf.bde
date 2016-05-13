@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 38472
+ FREEID 38625
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -5761,7 +5761,7 @@ PAGE ""
   {
    LABEL "SignalAssignments_1"
    TEXT 
-"FPA_VHD_STAT.FPA_ROIC <= FPA_ROIC_ISC0209;  --\n"+
+"FPA_VHD_STAT.FPA_ROIC <= FPA_ROIC_SCORPIO_MW;  --\n"+
 "FPA_VHD_STAT.FPA_OUTPUT <= OUTPUT_ANALOG;\n"+
 "FPA_VHD_STAT.FPA_INPUT <=  FPA_SOFTW_STAT.FPA_INPUT; -- Car le MB est supposé lire la tension de la banque. Sinon, peut provenir d'un module VHD de mesure de la tension de la banque du FPGA. \n"+
 "FPA_VHD_STAT.DVAL <= FPA_SOFTW_STAT.DVAL; -- peut provenir du module mesureur de la tension de la banque\n"+
@@ -13062,12 +13062,15 @@ PAGE ""
   {
    LABEL "SignalAssignments_5"
    TEXT 
-"phase_VIO : idelay_vio\n"+
-"  PORT MAP (\n"+
-"    clk => MB_CLK,\n"+
-"    probe_in0 => probe_in0,\n"+
-"    probe_out0 => adc_clk_dly\n"+
-"  );"
+"adc_clk_dly <= (others => '0');\n"+
+"--phase_VIO : idelay_vio\n"+
+"--  PORT MAP (\n"+
+"--    clk => MB_CLK,\n"+
+"--    probe_in0 => probe_in0,\n"+
+"--    probe_out0 => adc_clk_dly\n"+
+"--  );\n"+
+"\n"+
+""
    RECT (3640,2440,4180,2680)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,255,156),0)
@@ -13201,6 +13204,53 @@ PAGE ""
     #NAMED="1"
    }
   }
+  INSTANCE  38564, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="DESERIALIZER_CLK_DOUT"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (3560,3240)
+   VERTEXES ( (2,38577) )
+  }
+  TEXT  38565, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (3612,3223,3992,3258)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 38564
+  }
+  TEXT  38569, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (3289,3211,3471,3240)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 38578
+  }
+  VTX  38576, 0, 0
+  {
+   COORD (3200,3240)
+  }
+  VTX  38577, 0, 0
+  {
+   COORD (3560,3240)
+  }
+  WIRE  38578, 0, 0
+  {
+   NET 37464
+   VTX 38576, 38577
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
  }
  
 }
@@ -13226,7 +13276,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  38449, 0, 0
+  TEXT  38602, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -13237,7 +13287,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  38450, 0, 0
+  TEXT  38603, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -13248,7 +13298,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  38451, 0, 0
+  TEXT  38604, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -13258,7 +13308,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  38452, 0, 0
+  TEXT  38605, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -13270,27 +13320,27 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  LINE  38453, 0, 0
+  LINE  38606, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3680), (5200,3680) )
    FILL (1,(0,0,0),0)
   }
-  LINE  38454, 0, 0
+  LINE  38607, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3680), (4660,3800) )
   }
-  LINE  38455, 0, 0
+  LINE  38608, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (5200,3800), (5200,3560), (4220,3560), (4220,3800), (5200,3800) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  38456, 0, 0
+  TEXT  38609, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -13305,20 +13355,20 @@ PAGE ""
    VAR
    MULTILINE
   }
-  LINE  38457, 0, 0
+  LINE  38610, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3560), (4660,3680) )
   }
-  LINE  38458, 0, 0
+  LINE  38611, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (5200,3560), (5200,3440), (4660,3440), (4660,3560), (5200,3560) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  38459, 0, 0
+  TEXT  38612, 0, 0
   {
    PAGEALIGN 10
    TEXT "$FIRMWARE"
@@ -13329,7 +13379,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  38460, 0, 0
+  TEXT  38613, 0, 0
   {
    PAGEALIGN 10
    TEXT "$AUTHOR"
@@ -13340,7 +13390,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  38461, 0, 0
+  TEXT  38614, 0, 0
   {
    PAGEALIGN 10
    TEXT "$PROJECT"
@@ -13351,7 +13401,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  38462, 0, 0
+  TEXT  38615, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -13362,7 +13412,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  38463, 0, 0
+  TEXT  38616, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -13373,20 +13423,20 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  38464, 0, 0
+  LINE  38617, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,3560), (4380,3680) )
   }
-  LINE  38465, 0, 0
+  LINE  38618, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4220,3680), (4660,3680) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  38466, 0, 0
+  TEXT  38619, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -13397,7 +13447,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  38467, 0, 0
+  TEXT  38620, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -13408,19 +13458,19 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  38468, 0, 0
+  LINE  38621, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,3680), (4380,3800) )
   }
-  LINE  38469, 0, 0
+  LINE  38622, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4780,3680), (4780,3800) )
   }
-  TEXT  38470, 0, 0
+  TEXT  38623, 0, 0
   {
    PAGEALIGN 10
    TEXT "$REVISION"
@@ -13431,7 +13481,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  BMPPICT  38471, 0, 0
+  BMPPICT  38624, 0, 0
   {
    PAGEALIGN 10
    RECT (4740,3460,5120,3555)

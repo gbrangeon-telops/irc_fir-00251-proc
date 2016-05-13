@@ -129,7 +129,7 @@ asim -ses isc0207a_intf_testbench_TB
 
 
 -- module FPA
---wave UUT/U1/* 
+wave UUT/U1/* 
 
 --wave UUT/U14/U1/* 
 --wave UUT/U14/U11/*
