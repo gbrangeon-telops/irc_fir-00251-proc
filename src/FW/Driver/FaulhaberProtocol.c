@@ -86,8 +86,8 @@ void FH_parseResponse(FH_ctrl_t* chan)
 
    static bool resyncFlag = false; // indicates that the next CR/LF termination sequence is a resync following an error. This response will be lost, since it can't be trusted
 
-   if (state == FHRX_IDLE || state == FHRX_UNEXPECTED)
-      FH_TRX("FH: Rx: ");
+   //if (state == FHRX_IDLE || state == FHRX_UNEXPECTED)
+      //FH_TRX("FH: Rx: ");
 
    ierRegister = XUartNs550_ReadReg(chan->link.uart.BaseAddress, XUN_IER_OFFSET);
    XUartNs550_WriteReg(chan->link.uart.BaseAddress, XUN_IER_OFFSET, 0);

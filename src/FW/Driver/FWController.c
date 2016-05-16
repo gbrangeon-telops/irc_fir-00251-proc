@@ -520,8 +520,64 @@ static bool FWInitialisationMode(bool reset)
          //Init FW_Config parameter
          FW_ConfigParameterSet( &flashSettings, FW_config);
 
-         initMode = INIT_SET_GAIN;
+         if ((flashSettings.FWType == FW_SYNC ) && (gcRegsData.FWSpeed >= 1))
+         {
+            initMode = INIT_STOP_WHEEL;
+         }
+         else
+         {
+            initMode = INIT_SET_GAIN;
+         }
 
+         break;
+
+      case INIT_STOP_WHEEL:
+         if(setVelocityWithoutNotification(FH_instance, 1))
+         {
+            FW_INF("Stopping Filter Wheel");
+            StartTimer(&FW_commTimer, FAULHABER_INIT_TIMEOUT);
+            FW_PRINTF("INIT_WAIT_STOP_WHEEL_ACK\n");
+            initMode = INIT_WAIT_STOP_WHEEL_ACK;
+         }
+         break;
+
+      case INIT_WAIT_STOP_WHEEL_ACK:
+         numAck = FH_readAcks(FH_instance);
+         FH_clearAcks(FH_instance, numAck);
+
+         if (FH_numExpectedAcks(FH_instance) == 0)
+         {
+            StopTimer(&FW_commTimer);
+            initMode = INIT_WAIT_STOP_WHEEL;
+            FW_PRINTF("INIT_WAIT_STOP_WHEEL\n");
+            StartTimer(&FW_commTimer, FAULHABER_VELOCITY_TIMEOUT);
+         }
+         else if (TimedOut(&FW_commTimer))
+         {
+            FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
+            FW_ERR("Time out while in WAIT_STOP_WHEEL_ACK");
+            StopTimer(&FW_commTimer);
+            initMode = INIT_DONE_MODE;
+            FW_PRINTF("INIT_DONE_MODE\n");
+         }
+         break;
+
+      case INIT_WAIT_STOP_WHEEL:
+         gcRegsData.FWSpeed = SFW_Get_RPM();
+
+         if (gcRegsData.FWSpeed <= 1)
+         {
+            StopTimer(&FW_commTimer);
+            FW_PRINTF("INIT_SET_GAIN\n");
+            initMode = INIT_SET_GAIN;
+         }
+         else if (TimedOut(&FW_commTimer))
+         {
+            FW_SetErrors(FW_ERR_FAULHABER_VEL_TIMEOUT);
+            FW_ERR("Timeout in WAIT_STOP_WHEEL (velocity = 0 not reached within the timeout period).");
+            initMode = INIT_DONE_MODE;
+            FW_PRINTF("INIT_DONE_MODE\n");
+         }
          break;
 
       case INIT_SET_GAIN:
@@ -849,14 +905,21 @@ static bool FWVelocityMode(bool reset, bool newTarget )
          }
          break;
       
+      case VELOCITY_PAUSE_QUERY_MODE:
+         if(TimedOut(&FW_commTimer))
+         {
+            velMode = VELOCITY_QUERY_MODE;
+         }
+         break;
+
       case VELOCITY_QUERY_MODE:
          if(queryVelocity(FH_instance))
          {
-            StartTimer(&FW_commTimer, FAULHABER_VELOCITY_TIMEOUT);
+            StartTimer(&FW_commTimer, FAULHABER_VELOCITY_QUERY_TIMEOUT);
             velMode = VELOCITY_WAIT_QUERY_MODE;
          }
          break;
-      
+
       case VELOCITY_WAIT_QUERY_MODE:
          numAck = FH_readAcks(FH_instance);
          FH_clearAcks(FH_instance, numAck);
@@ -888,7 +951,8 @@ static bool FWVelocityMode(bool reset, bool newTarget )
                   }
                   else
                   {
-                     velMode = VELOCITY_QUERY_MODE;
+                     velMode = VELOCITY_PAUSE_QUERY_MODE;
+                     StartTimer(&FW_commTimer, FAULHABER_VELOCITY_QUERY_PAUSE);
                   }
 
             }

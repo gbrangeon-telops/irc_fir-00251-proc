@@ -93,7 +93,7 @@
 #define FH_UNAVAILABLE_STR (char*)"Command not available"
 #define FH_INVALID_STR (char*)"Invalid parameter"
 
-#define FH_REQUEST_TIMEOUT         500 // [ms]
+#define FH_REQUEST_TIMEOUT         1000 // [ms]
 
 typedef enum FH_RESPONSE_TYPE
 {
