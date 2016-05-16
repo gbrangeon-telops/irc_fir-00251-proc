@@ -90,6 +90,7 @@
 // fleg
 #define FLEG_DAC_RESOLUTION_BITS          14            // le DAC est à 14 bits
 #define FLEG_DAC_REF_VOLTAGE_V            2.5           // on utilise la reference interne de 2.5V du DAC 
+#define FLEG_DAC_REF_GAIN                 2.0           // gain de référence du DAC
 
 
 #define VHD_PIXEL_PIPE_DLY_SEC            300E-9        // delai max du pipe des pixels
