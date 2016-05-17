@@ -1870,13 +1870,16 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    // Update actualization
+   TDCFlagsClr(CalibrationActualizationIsImplementedMask);
+   TDCFlagsClr(ExternalZeroMeanBetaCorrectionIsImplementedMask);
    if (p_flashSettings->ActualizationEnabled)
    {
       TDCFlagsSet(CalibrationActualizationIsImplementedMask);
-   }
-   else
-   {
-      TDCFlagsClr(CalibrationActualizationIsImplementedMask);
+
+      if (BitTst(p_flashSettings->ActualizationDiscardOffset, 1))
+      {
+         TDCFlagsSet(ExternalZeroMeanBetaCorrectionIsImplementedMask);
+      }
    }
 
    // Update detector parameters

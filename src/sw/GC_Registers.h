@@ -118,6 +118,7 @@
 #define FWSynchronouslyRotatingModeIsImplementedMask     0x00000400  /**< TDCFlags register bit mask for FWSynchronouslyRotatingModeIsImplemented field */
 #define AECPlusIsImplementedMask                         0x00000800  /**< TDCFlags register bit mask for AECPlusIsImplemented field */
 #define ExternalMemoryBufferIsImplementedMask            0x00001000  /**< TDCFlags register bit mask for ExternalMemoryBufferIsImplemented field */
+#define ExternalZeroMeanBetaCorrectionIsImplementedMask  0x00002000  /**< TDCFlags register bit mask for ExternalZeroMeanBetaCorrectionIsImplemented field */
 #define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
 #define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
 
@@ -151,10 +152,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.4.1
+// Generated from XML camera definition file version 11.5.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 5) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -516,7 +517,8 @@ void GC_Registers_Init();
    (calibrationInfo.isValid == 1) && \
    (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
    ((gcRegsData.FWPositionSetpoint == calibrationInfo.collection.FWPosition) || (gcRegsData.CalibrationMode == CM_Raw) || (gcRegsData.CalibrationMode == CM_Raw0)) && \
-   (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))))
+   (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))) \
+)
 #define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
 
 void GC_UpdateLockedFlag();

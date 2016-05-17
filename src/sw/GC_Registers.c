@@ -38,7 +38,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.4.1
+// Generated from XML camera definition file version 11.5.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -602,7 +602,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[CalibrationActualizationModeIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty)) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty) || GC_AECPlusIsActive || GC_FWRotatingModeIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
