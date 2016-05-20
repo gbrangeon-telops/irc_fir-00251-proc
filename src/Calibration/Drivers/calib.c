@@ -424,7 +424,8 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
          GC_SetFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
 
       // Update NDF position if necessary
-      if ((flashSettings.NDFPresent == 1) && (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition))
+      if ((flashSettings.NDFPresent == 1) && (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition) &&
+            (pGCRegs->CalibrationMode != CM_Raw0) && (pGCRegs->CalibrationMode != CM_Raw))
          GC_SetNDFPositionSetpoint(pGCRegs->NDFilterPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition);
 
       // Update optical serial numbers with block values
