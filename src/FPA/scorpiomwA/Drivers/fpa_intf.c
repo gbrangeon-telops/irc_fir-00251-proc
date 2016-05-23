@@ -292,7 +292,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 42;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = 2;                             // ajuster via chipscope
    
    // quad2    
    ptrA->adc_quad2_en = 1;
@@ -398,7 +398,7 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (float)FPA_MCLK_RATE_HZ;   // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 0.0F;
-   ptrH->fovh_line               = 0.0F;   
+   ptrH->fovh_line               = 1.0F;   
    ptrH->int_time_offset_mclk    = 3076.0F;
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
       

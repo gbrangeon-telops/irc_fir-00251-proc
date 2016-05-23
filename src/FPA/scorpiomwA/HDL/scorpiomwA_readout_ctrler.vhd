@@ -52,7 +52,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    signal sync_flag_fsm        : sync_flag_fsm_type;
    signal readout_fsm          : readout_fsm_type;
-   --signal fpa_int_last         : std_logic;
+   signal fpa_int_last         : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
@@ -74,14 +74,13 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal active_line_en1      : std_logic;
    signal global_reset         : std_logic;
    signal lsync_pipe           : std_logic_vector(7 downto 0);
-   --signal lsync_cnt            : unsigned(FPA_INTF_CFG.WINDOW_LSYNC_NUM'LENGTH-1 downto 0);
    signal line_cnt             : unsigned(FPA_INTF_CFG.ACTIVE_LINE_END_NUM'LENGTH-1 downto 0);
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
-   --signal lsync_last           : std_logic;
-   signal fpa_data_valid_i         : std_logic;
-   signal fpa_data_valid_last      : std_logic;
+   signal fpa_data_valid_i     : std_logic;
+   signal fpa_data_valid_last  : std_logic;
+   signal fpa_int_i            : std_logic;
    
    
 --   attribute dont_touch : string;
@@ -134,6 +133,7 @@ begin
             --fpa_pclk_last <= '0';
             --pclk_rise <= '0'; 
             --pclk_fall <= '0';
+            fpa_int_last <= '0';
             
          else           
             
@@ -146,6 +146,10 @@ begin
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
             
             fpa_mclk_last <= FPA_MCLK;             
+            
+            fpa_int_i <= FPA_INT;
+            fpa_int_last <= fpa_int_i;
+            
             
             -- contrôleur
             case sync_flag_fsm is           

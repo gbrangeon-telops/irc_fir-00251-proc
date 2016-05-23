@@ -71,6 +71,14 @@ architecture rtl of scorpiomwA_digio_map is
          ARESET : in STD_LOGIC;
          SRESET : out STD_LOGIC;
          CLK    : in STD_LOGIC);
+   end component; 
+   
+   component signal_filter
+      port (
+         CLK : in STD_LOGIC;
+         SIG_IN : in STD_LOGIC;
+         SIG_OUT : out STD_LOGIC
+         );
    end component;
    
    type fpa_digio_fsm_type   is (idle, wait_mclk_st, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, passthru_st, fpa_pwred_st);
@@ -114,6 +122,8 @@ architecture rtl of scorpiomwA_digio_map is
    signal itr_i            : std_logic;
    signal prog_csn_last    : std_logic;
    signal mclk_temp        : std_logic;
+   signal data_valid_filt  : std_logic;
+   signal error_filt       : std_logic;
    
    signal fsm_sreset       : std_logic;
    signal cnter            : integer range 0 to DEFINE_FPA_MCLK_RATE_FACTOR + 1;
@@ -147,7 +157,7 @@ architecture rtl of scorpiomwA_digio_map is
    attribute keep of data_valid_i  : signal is "TRUE";
    attribute keep of serclr_i      : signal is "TRUE";
    
- begin   
+begin   
    
    
    --------------------------------------------------------
@@ -191,8 +201,27 @@ architecture rtl of scorpiomwA_digio_map is
          fpa_on_i <= not ARESET and FPA_PWR;
          fsm_sreset <= sreset or not FPA_PWR; 
       end if;   
-   end process; 
+   end process;  
    
+   --------------------------------------------------
+   -- fpa_datavalid est filtré avant d'être utilisé
+   -------------------------------------------------- 
+   Uf0 : signal_filter
+   port map(
+      CLK => MCLK_SOURCE,
+      SIG_IN => data_valid_iob,
+      SIG_OUT => data_valid_filt
+      );  
+   
+   --------------------------------------------------
+   -- fpa_error est filtré avant d'être utilisé
+   -------------------------------------------------- 
+   Uf1 : signal_filter
+   port map(
+      CLK => MCLK_SOURCE,
+      SIG_IN => error_iob,
+      SIG_OUT => error_filt
+      );    
    
    --------------------------------------------------------- 
    -- registres dans iob
@@ -401,9 +430,8 @@ architecture rtl of scorpiomwA_digio_map is
                   mclk_i <= mclk_reg;  --
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
-                  error_i <= error_iob;
-                  data_valid_i <= data_valid_iob;
-                  
+                  error_i <= error_filt;
+                  data_valid_i <= data_valid_filt; --(data_valid_filt and not fpa_powered_i) or (FPA_INT and fpa_powered_i);                  
                
                when others =>
                

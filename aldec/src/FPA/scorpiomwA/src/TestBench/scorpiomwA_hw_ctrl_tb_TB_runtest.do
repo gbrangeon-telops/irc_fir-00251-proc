@@ -20,8 +20,8 @@ do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 #pour la simulation
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\sfifo_w10_d256\sfifo_w10_d256_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d64\fwft_sfifo_w8_d64_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d16\fwft_sfifo_w56_d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
@@ -62,6 +62,8 @@ asim -ses scorpiomwa_hw_ctrl_tb_TB
 -- readout controller
 --wave UUT/U9/U1/U1/* 
 
-wave UUT/*
+wave UUT/*   
+--wave UUT/U9/U6/*
+
  
-run 20 ms
+run 30 ms
