@@ -74,6 +74,9 @@ architecture rtl of scorpiomwA_digio_map is
    end component; 
    
    component signal_filter
+      generic(
+         SCAN_WINDOW_LEN : natural range 3 to 127 := 64
+         );      
       port (
          CLK : in STD_LOGIC;
          SIG_IN : in STD_LOGIC;
@@ -206,17 +209,21 @@ begin
    --------------------------------------------------
    -- fpa_datavalid est filtré avant d'être utilisé
    -------------------------------------------------- 
-   Uf0 : signal_filter
-   port map(
-      CLK => MCLK_SOURCE,
-      SIG_IN => data_valid_iob,
-      SIG_OUT => data_valid_filt
-      );  
+--   Uf0 : signal_filter
+--   generic map(
+--      SCAN_WINDOW_LEN => 6)
+--   port map(
+--      CLK => MCLK_SOURCE,
+--      SIG_IN => data_valid_iob,
+--      SIG_OUT => data_valid_filt
+--      );  
    
    --------------------------------------------------
    -- fpa_error est filtré avant d'être utilisé
    -------------------------------------------------- 
    Uf1 : signal_filter
+   generic map(
+      SCAN_WINDOW_LEN => 6)
    port map(
       CLK => MCLK_SOURCE,
       SIG_IN => error_iob,
@@ -431,7 +438,10 @@ begin
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
                   error_i <= error_filt;
-                  data_valid_i <= data_valid_filt; --(data_valid_filt and not fpa_powered_i) or (FPA_INT and fpa_powered_i);                  
+                  data_valid_i <= data_valid_iob; --data_valid_filt;              
+                  -- pragma translate_off
+                  data_valid_i <= data_valid_iob;
+                  -- pragma translate_on                 
                
                when others =>
                

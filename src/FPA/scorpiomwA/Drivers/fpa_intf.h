@@ -176,12 +176,12 @@ struct s_FpaStatus    //
 
    uint32_t  fpa_diag_mode;
    uint32_t  fpa_diag_type;
-   uint32_t  fpa_pwr_on;
-   uint32_t  fpa_trig_ctrl_mode;
-   uint32_t  fpa_acq_trig_ctrl_dly;
-   uint32_t  fpa_acq_trig_period_min;
-   uint32_t  fpa_xtra_trig_ctrl_dly;
-   uint32_t  fpa_xtra_trig_period_min;
+   uint32_t fpa_pwr_on;                  
+   uint32_t fpa_trig_ctrl_mode;          
+   uint32_t fpa_acq_trig_ctrl_dly;       
+   uint32_t fpa_acq_trig_period_min;     
+   uint32_t fpa_xtra_trig_ctrl_dly;      
+   uint32_t fpa_xtra_trig_period_min;    
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

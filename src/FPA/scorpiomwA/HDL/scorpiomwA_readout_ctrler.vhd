@@ -353,7 +353,7 @@ begin
          -- generation de samp_pulse_i : on echantillonne les signaux fval, lval etc avec samp_pulse_i
          quad_clk_copy_i <= QUAD_CLK_COPY;
          quad_clk_copy_last <= quad_clk_copy_i;
-         samp_pulse_pipe(3) <= ((quad_clk_copy_last and not quad_clk_copy_i)and fval_pipe(3)); 
+         samp_pulse_pipe(3) <= ((quad_clk_copy_last and not quad_clk_copy_i)and fval_pipe(2)); 
          
          -------------------------
          -- reset des identificateurs

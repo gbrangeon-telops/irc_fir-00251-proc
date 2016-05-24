@@ -231,9 +231,9 @@ package FPA_define is
    to_unsigned(512, 11),      --ysize
    
    to_unsigned(0, 9),         --windcfg_part1                         
-   to_unsigned(159, 9),       --windcfg_part2                         
+   to_unsigned(511, 9),       --windcfg_part2                         
    to_unsigned(0, 8),         --windcfg_part3                          
-   to_unsigned(511, 8),       --windcfg_part4
+   to_unsigned(159, 8),       --windcfg_part4
    
    '1',                       --uprow_upcol                         
    '1',                       --sizea_sizeb 
@@ -242,26 +242,26 @@ package FPA_define is
    
    '0',                       --gain                           
    
-   std_logic_vector(to_unsigned(100, 14)),      --det_code
-   to_unsigned(6, 8),         --real_mode_active_pixel_dly   
+   std_logic_vector(to_unsigned(671, 14)),      --det_code
+   to_unsigned(0, 8),         --real_mode_active_pixel_dly   
    '1',                       --adc_quad2_en                 
    '1',                       --chn_diversity_en             
-   to_unsigned(76801, 17),    --readout_pclk_cnt_max         
+   to_unsigned(82081, 17),    --readout_pclk_cnt_max         
    to_unsigned(160, 8),       --line_period_pclk             
    to_unsigned(1, 4),         --active_line_start_num        
    to_unsigned(512, 10),       --active_line_end_num
-   to_unsigned(2, 8),         --pix_samp_num_per_ch          
+   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
    to_unsigned(1, 9),         --sof_posf_pclk                
-   to_unsigned(76800, 17),    --eof_posf_pclk                
+   to_unsigned(81920, 17),    --eof_posf_pclk                
    to_unsigned(1, 8),         --sol_posl_pclk                
    to_unsigned(160, 8),       --eol_posl_pclk                
    to_unsigned(161, 8),       --eol_posl_pclk_p1             
-   to_unsigned(2, 4),         --hgood_samp_sum_num           
-   to_unsigned(1048576, 23),  --hgood_samp_mean_numerator    
+   to_unsigned(1, 4),         --hgood_samp_sum_num           
+   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
    to_unsigned(2, 4),         --vgood_samp_sum_num           
    to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
-   to_unsigned(2, 8),         --good_samp_first_pos_per_ch   
-   to_unsigned(2, 8),         --good_samp_last_pos_per_ch    
+   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
+   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
    to_unsigned(160, 8),       --xsize_div_tapnum             
    (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
    to_unsigned(0, 4)          --adc_clk_phase 
