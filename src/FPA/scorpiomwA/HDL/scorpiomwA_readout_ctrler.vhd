@@ -109,6 +109,8 @@ begin
    READOUT_INFO.READ_END <= rd_end_pipe(3);
    READOUT_INFO.SAMP_PULSE <= samp_pulse_pipe(3);
    
+   fpa_data_valid_i <= FPA_DATA_VALID;
+   
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
@@ -128,7 +130,7 @@ begin
          if sreset = '1' then            
             sync_flag_fsm <= idle;
             adc_sync_flag_i <= '0';
-            fpa_data_valid_i <= '0';
+            --fpa_data_valid_i <= '0';
             fpa_data_valid_last <= '0';            
             --fpa_pclk_last <= '0';
             --pclk_rise <= '0'; 
@@ -137,9 +139,8 @@ begin
             
          else           
             
-            fpa_data_valid_i <= FPA_DATA_VALID;
-            fpa_data_valid_last <= fpa_data_valid_i;            
-            
+            fpa_data_valid_last <= fpa_data_valid_i;
+          
             fpa_pclk_last <= FPA_PCLK;
             
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
@@ -157,11 +158,11 @@ begin
                when idle =>   
                   adc_sync_flag_i <= '0';
                   if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- détection du FM de FPA_DATA_VALID                     
+                     adc_sync_flag_i <= '1';
                      sync_flag_fsm <= sync_flag_on_st;
                   end if;                        
                
-               when sync_flag_on_st =>
-                  adc_sync_flag_i <= '1';
+               when sync_flag_on_st =>                  
                   if pclk_fall = '1' then 
                      sync_flag_fsm <= sync_flag_off_st;
                   end if;

@@ -42,7 +42,9 @@ package FPA_define is
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 0;        -- int_time offset de 0 nsec 
    constant DEFINE_FPA_PROG_INT_TIME              : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
-      
+   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := true;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
+
+   
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le 0207, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C

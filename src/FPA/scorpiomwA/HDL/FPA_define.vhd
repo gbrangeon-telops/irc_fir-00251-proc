@@ -41,6 +41,8 @@ package FPA_define is
    --constant DEFINE_FPA_BITSTREAM_LENGTH           : natural   := 58;     -- nombre de bits contenu  dans le bitstream de configuration serielle
    constant DEFINE_FPA_PROG_INT_TIME              : natural   := 100 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 100 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
+   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
+   
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
