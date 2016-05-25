@@ -1034,10 +1034,10 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
       break;
 
    case NPM_PAUSE:
+      ready = true;
+
       if (TimedOut(&NDF_commTimer) || (!queryMode))
       {
-         ready = true;
-
          posMode = NPM_QUERY_POS;
          StopTimer(&NDF_commTimer);
       }
