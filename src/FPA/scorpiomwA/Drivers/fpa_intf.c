@@ -94,7 +94,7 @@
 #define FLEG_DAC_REF_VOLTAGE_V            2.5           // on utilise la reference interne de 2.5V du DAC 
 #define FLEG_DAC_REF_GAIN                 2             // le gain est de 2 sur VREF
 
-#define VHD_PIXEL_PIPE_DLY_SEC            360E-9        // delai max du pipe des pixels
+#define VHD_PIXEL_PIPE_DLY_SEC            500E-9        // delai max du pipe des pixels
 
 #define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
 
@@ -122,7 +122,7 @@ struct scorpiomw_param_s             //
    float delay_mclk;
    float lovh_mclk;
    float fovh_line;
-   float int_time_offset_mclk;   
+   float fpa_reset_time_mclk;   
    
    // parametres calculés
    float readout_mclk;   
@@ -132,7 +132,7 @@ struct scorpiomw_param_s             //
    float delay_usec;
    float lovh_usec;
    float fovh_usec;
-   float int_time_offset_usec;
+   float fpa_reset_time_usec;
    float int_signal_high_time_usec;
    float tri_min_usec;
    float frame_period_usec;
@@ -274,7 +274,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    //  windowing
-   ptrA->sizea_sizeb = 0;     // toujours en mode windowing 
+   ptrA->sizea_sizeb = 0;     // 0 --> toujours en mode windowing
      
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 
@@ -292,7 +292,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 2;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = 2;                             // ENO : 25 mai 2016: prendre 2 pour MCLK = 10MHz
    
    // quad2    
    ptrA->adc_quad2_en = 1;
@@ -394,12 +394,12 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->mlck_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
-   ptrH->fpa_delay_mclk          = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number);   // FPA: estimation delai max de sortie des pixels après integration + delai après readout
+   ptrH->fpa_reset_time_mclk     = 3076.0F;
+   ptrH->fpa_delay_mclk          = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->fpa_reset_time_mclk;   // FPA: estimation delai max de sortie des pixels après integration + delai après readout
    ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (float)FPA_MCLK_RATE_HZ;   // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 0.0F;
-   ptrH->fovh_line               = 1.0F;   
-   ptrH->int_time_offset_mclk    = 3076.0F;
+   ptrH->fovh_line               = 0.0F;   
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
       
    // readout time
@@ -412,17 +412,17 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mlck_period_usec; 
    
    // integration time/signal
-   ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mlck_period_usec;
-   ptrH->int_signal_high_time_usec = exposureTime_usec + ptrH->int_time_offset_usec;
+   ptrH->fpa_reset_time_usec  = ptrH->fpa_reset_time_mclk * ptrH->mlck_period_usec;
+   ptrH->int_signal_high_time_usec = exposureTime_usec + ptrH->fpa_reset_time_usec;
       
    // calcul de la periode minimale
-   ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;
+   ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;  
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
 
    //autres calculs
-   ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec;  // utilisé en mode int_end_trig_start
+   ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec;  // utilisé en mode int_end_trig_start. // pour le scorpiomW, ptrH->fpa_reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
    ptrH->mode_readout_end_to_trig_start_dly_usec = 0.0F;                                                   // utilisé en mode readout_end_trig_start
 }
  
