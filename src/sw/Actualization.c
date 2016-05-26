@@ -24,6 +24,7 @@
 #include "CalibActualizationFile.h"
 #include "hder_inserter.h"
 #include "CalibBlockFile.h"
+#include "calib.h"
 #include "CRC.h"
 #include "trig_gen.h"
 #include "xil_cache.h"
@@ -129,6 +130,8 @@ static timerData_t act_tic_stability; // used during the ICU temperature stabili
 static bool gStartActualization = false;
 static bool gStopActualization = false; // for debugging
 static bool gStartBadPixelDetection = false;
+static bool gStartBetaQuantization = false;
+static bool gBetaUpdateDone = false;
 static uint8_t gWriteActualizationFile = 0;
 static bool usingICU = true; // set to true when the actualisation was internally triggered
 static bool allowCalibUpdate = true; // flag for enabling/disabling the correction of Beta when loading a calibration block
@@ -146,10 +149,9 @@ static deltabeta_t deltaBetaArray[MAX_DELTA_BETA_SIZE] __attribute__ ((section (
 static deltaBetaList_t deltaBetaDB;
 static deltabeta_t* activeDeltaBeta = NULL;
 
-#define LUT_RT_ADDR TEL_PAR_TEL_RQC_LUT_BASEADDR
-
-static void setActState( ACT_State_t* p_state, ACT_State_t next_state );
-static void setBpdState( BPD_State_t* p_state, BPD_State_t next_state );
+static void setActState(ACT_State_t* p_state, ACT_State_t next_state);
+static void setBpdState(BPD_State_t* p_state, BPD_State_t next_state);
+static void setBqState(BQ_State_t* p_state, BQ_State_t next_state);
 static void backupGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
 static void restoreGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
 static float applyLUT(uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float x );
@@ -170,6 +172,14 @@ static void initDeltaBetaData(deltabeta_t* data);
 static deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool verbose);
 static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 static void advanceDeltaBetaAge(uint32_t increment_s);
+
+// function for detecting bad pixels in the updated Beta parameter before computing its optimal quantization
+static uint32_t cleanBetaDistribution(float* beta, int N, float p_FA);
+static float nth_element_f(const float* input, float minval, float* buffer, int N, int r);
+static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r);
+static uint32_t countBadPixels(const uint64_t* pixelData, int N);
+static float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo);
+static void encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo);
 
 #ifdef ACT_TEST_NOBUFFERING
 static uint32_t fillDebugData(uint16_t* data, uint32_t c0, uint32_t frameSize, uint32_t numFrames);
@@ -218,6 +228,19 @@ static void setBpdState(BPD_State_t* p_state, BPD_State_t next_state)
       ACT_PRINTF("State = %s\n", BPD_State_str[next_state]);
    else
       ACT_PRINTF( "State = %d (unknown)\n", next_state);
+
+   return;
+}
+
+static void setBqState(BQ_State_t* p_state, BQ_State_t next_state)
+{
+   int num_states = sizeof(BQ_State_str)/sizeof(BQ_State_str[0]);
+   *p_state = next_state;
+
+   if (next_state < num_states)
+      ACT_PRINTF("State = %s\n", BQ_State_str[next_state]);
+   else
+      ACT_PRINTF("State = %d (unknown)\n", next_state);
 
    return;
 }
@@ -896,6 +919,8 @@ IRC_Status_t Actualization_SM()
 
                if (gActDebugOptions.useDebugData)
                {
+                  uint8_t currentBlockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
+                  uint32_t lutAddr = TEL_PAR_TEL_RQC_LUT_BASEADDR + (currentBlockIdx * RQC_LUT_PAGE_SIZE);
                   expectedSum = 0x1000 * coaddData.NCoadd;
       #ifdef ACT_TEST_NOBUFFERING
                   ACT_PRINTF( "Preparing debug data...\n");
@@ -909,7 +934,7 @@ IRC_Status_t Actualization_SM()
                   test_data.alpha_test = 1.0;
                   refBlockFileHdr.NUCMultFactor = MAX(1.0, refBlockFileHdr.NUCMultFactor);
                   test_data.FcalBB_test = (float)expectedSum / (gcRegsData.ExposureTime * refBlockFileHdr.NUCMultFactor * coaddData.NCoadd) - test_data.deltaBeta_test / test_data.alpha_test;
-                  test_data.TcalBB_test = applyLUT(LUT_RT_ADDR, &blockInfo->lutRQData[0], sqrtf(test_data.FcalBB_test));
+                  test_data.TcalBB_test = applyLUT(lutAddr, &blockInfo->lutRQData[0], sqrtf(test_data.FcalBB_test));
                }
 
                // fill the accumulator buffer with zeros
@@ -1029,6 +1054,10 @@ IRC_Status_t Actualization_SM()
          if ( TDCStatusTst(AcquisitionStartedMask) == 0 )
          {
             uint8_t currentBlockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
+            uint32_t i50; // index of the median element
+            float medianFCal; // estimated from image (median of image)
+            float Tmin, Tmax; // range of the LUTRQ
+            uint32_t lutAddr;
 
             if (usingICU)
             {
@@ -1053,8 +1082,8 @@ IRC_Status_t Actualization_SM()
 
             // Compute sqrt(FCalBB)
             // find the index of the LUT which has the ICU type
-            // TODO utiliser le data de la bonne LUTRQ
             LUTRQInfo_t* lutInfo = selectLUT(blockInfo, RQT_RT);
+            lutAddr = TEL_PAR_TEL_RQC_LUT_BASEADDR + (currentBlockIdx * RQC_LUT_PAGE_SIZE);
             if (lutInfo == NULL)
             {
                ACT_ERR("Could not find a valid LUTRQ data (type == %s) in the %s block.", usingICU?"RQT_RT":"RQT_RT", usingICU?"reference":"calibration");
@@ -1063,7 +1092,10 @@ IRC_Status_t Actualization_SM()
                break;
             }
 
-            FCalBB = applyReverseLUT( LUT_RT_ADDR, lutInfo, T_BB, true ); // TODO utiliser la bonne LUTRQ (cas BB externe)
+            Tmin = applyLUT(lutAddr, lutInfo, lutInfo->LUT_Xmin);
+            Tmax = applyLUT(lutAddr, lutInfo, lutInfo->LUT_Xmin+lutInfo->LUT_Xrange);
+
+            FCalBB = applyReverseLUT(lutAddr, lutInfo, T_BB, true);
 
             // Compute FCalBB = sqrt(FCalBB)^ 2
             FCalBB *= FCalBB;
@@ -1085,16 +1117,36 @@ IRC_Status_t Actualization_SM()
 
             // Initialize number of data to process and data pointers
             coadd_buffer = mu_buffer;
-            p_PixData = coadd_buffer + 2*gcRegsData.SensorWidth; // skip the header lines (2 rows)
-            p_Data = (uint32_t *) PROC_MEM_PIXEL_DATA_BASEADDR; // adresse des données de calibration
+            p_PixData = coadd_buffer + imageDataOffset; // skip the header lines (2 rows)
+            p_Data = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (currentBlockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE)); // adresse des données de calibration
+
+            uint32_t numBadPixels = MIN(numPixels, countBadPixels((uint64_t*)p_Data, numPixels));
+
+            // compute the index of the median sample in the sorted array, not counting bad pixels, which are all falling in the high range of the array
+            i50 = 0.50f * (float)(numPixels - numBadPixels);
+            medianFCal = nth_element_i(p_PixData, prctile_buffer, numPixels, i50);
+
+            if ((T_BB < Tmin || T_BB > Tmax) && currentDeltaBeta->info.discardOffset == 0)
+            {
+               PRINTF( "TBB out of LUT range, forcing zero-mean correction\n");
+               currentDeltaBeta->info.discardOffset = 1;
+            }
 
             ACT_PRINTF( "p_Data = 0x%08X\n", p_Data  );
-
             ACT_PRINTF( "PixData(0) = %d\n", *p_PixData );
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
+               PRINTF( "numBadPixels in block %d: %d\n", currentBlockIdx, numBadPixels);
+               PRINTF( "Tmin = " _PCF(3) " K, Tmax = " _PCF(3) " K\n", _FFMT(Tmin,3), _FFMT(Tmax,3) );
+               PRINTF( "FCalBB = " _PCF(4) ", medianFCal = " _PCF(4) " (index of the median: %d)\n", _FFMT(FCalBB/scaleFCal,4), _FFMT(medianFCal/scaleFCal,4), i50);
                PRINTF( "ACT: Reference block Beta0 Exponent = %d\n", calibrationInfo.blocks[currentBlockIdx].pixelData.Beta0_Exp);
+            }
+
+            if (currentDeltaBeta->info.discardOffset)
+            {
+               ACT_PRINTF( "Using FCalBB estimated from image\n");
+               FCalBB = medianFCal;
             }
 
             tic_RT_Duration = 0;
@@ -1214,8 +1266,11 @@ IRC_Status_t Actualization_SM()
          {
             uint64_t t0; // just for benchmarking
 
-            if (blockContext.blockIdx == 0)
+            if (blockContext.blockIdx == 0) // first iteration
+            {
+               tic_RT_Duration = 0;
                resetStats(&currentDeltaBeta->stats);
+            }
 
             GETTIME(&t0);
 
@@ -1234,33 +1289,22 @@ IRC_Status_t Actualization_SM()
 
             if (ctxtIsDone(&blockContext))
             {
-               union {
-                  float f;
-                  uint32_t i;
-               } p50;
-               // compute the median (can not be split over multiple iterations)
-
-               float* buffer = (float*)prctile_buffer;
+               float p50;
                int i50 = 0.50f * numPixels; // index of the median
-               int N = numPixels;
 
                GETTIME(&t0);
 
-               for (i=0; i<numPixels; ++i)
-                  buffer[i] = currentDeltaBeta->deltaBeta[i] - currentDeltaBeta->stats.min;
+               // compute the median (can not be split over multiple block operations)
+               p50 = nth_element_f(currentDeltaBeta->deltaBeta, currentDeltaBeta->stats.min, (float*)prctile_buffer, numPixels, i50);
 
-               // CR_TRICKY comparing positive floats typecasted as uint32_t is equivalent
-               p50.i = select((uint32_t*)buffer, 0, N, i50);
-               p50.f += currentDeltaBeta->stats.min;
-
-               currentDeltaBeta->p50 = p50.f;
+               currentDeltaBeta->p50 = p50;
 
                tic_RT_Duration += elapsed_time_us(t0);
 
                VERBOSE_IF(gActDebugOptions.verbose)
                {
                   reportStats(&currentDeltaBeta->stats, "DeltaBeta");
-                  PRINTF( "Median value : " _PCF(4) ", (%d)\n", _FFMT(p50.f, 4), p50.i);
+                  PRINTF( "Median value : " _PCF(4) "\n", _FFMT(p50, 4));
                   PRINTF( "ACT: Computing delta beta stats (real time) " _PCF(4) " s\n", _FFMT((float)tic_RT_Duration/((float)TIME_ONE_SECOND_US), 2));
                }
 
@@ -1507,8 +1551,8 @@ IRC_Status_t BadPixelDetection_SM()
 
    case BPD_UpdateBeta:
       {
-         uint8_t blockIdx;
-         uint32_t* calAddr = (uint32_t*)PROC_MEM_PIXEL_DATA_BASEADDR; // CR_TRICKY the pointer is in 32-bit elements (64 bits per pixel data)
+         uint8_t blockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
+         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE)); // CR_TRICKY the pointer is in 32-bit elements (64 bits per pixel data)
 
          blockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
          ACT_updateCurrentCalibration(&calibrationInfo.blocks[blockIdx], &calAddr[blockContext.startIndex*2], currentDeltaBeta, blockContext.startIndex, blockContext.blockLength);
@@ -3855,4 +3899,258 @@ uint32_t ACT_getActiveDeltaBetaPOSIXTime()
 deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx)
 {
    return findSuitableDeltaBetaForBlock(calibInfo, blockIdx, false);
+}
+
+uint32_t cleanBetaDistribution(float* beta, int N, float p_FA)
+{
+   const float thresh = invnormcdf(1-p_FA); //
+   const float bp_value = infinity();
+   statistics_t stats;
+   int i;
+   float data_thresh; // threshold scaled on the actual data
+
+   uint32_t nbp, prev_nbp;
+   float lowerThreshold, higherThreshold; // thresholds centered about the average value
+
+   prev_nbp = 1;
+   nbp = 0;
+   while (prev_nbp != nbp)
+   {
+      resetStats(&stats);
+      prev_nbp = nbp;
+
+      // calculer std de x, sans inclure les bad pixels (inf). Compter le nombre de bad pixels.
+      for (i=0; i<N; ++i)
+      {
+         float val = beta[i];
+         if (!isinf(val))
+            updateStats(&stats, val);
+      }
+
+      // calculer le nouveau seuil
+      data_thresh = thresh * sqrt(stats.var);
+
+      // etiquetter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
+      lowerThreshold = stats.mu - data_thresh;
+      higherThreshold = stats.mu + data_thresh;
+
+      nbp = 0;
+      for (i=0; i<N; ++i)
+      {
+         float val = beta[i];
+         if (val < lowerThreshold || val > higherThreshold)
+         {
+            beta[i] = bp_value;
+            ++nbp;
+         }
+      }
+   }
+
+   return nbp;
+}
+
+float nth_element_f(const float* input, float minval, float* buffer, int N, int r)
+{
+   int i;
+   union {
+      float f;
+      uint32_t i;
+   } p;
+
+   // compute the median (can not be split over multiple block operations)
+
+   // copy the data into buffer first because the select() function modifies the array
+   for (i=0; i<N; ++i)
+      buffer[i] = input[i] - minval;
+
+   // CR_TRICKY comparing positive floats type-casted as uint32_t is equivalent
+   p.i = select((uint32_t*)buffer, 0, N, r);
+   p.f += minval;
+
+   return p.f;
+}
+
+uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r)
+{
+   uint32_t p;
+   int i;
+
+   // copy the data into buffer first because the select() function modifies the array
+   for (i=0; i<N; ++i)
+      buffer[i] = input[i];
+
+   p = select(buffer, 0, N, r);
+
+   return p;
+}
+
+uint32_t countBadPixels(const uint64_t* pixelData, int N)
+{
+   int i;
+   int bp = 0;
+
+   for (i=0; i<N; ++i)
+   {
+      if (BitMaskTst(*pixelData, CALIB_PIXELDATA_BADPIXEL_MASK) == 0)
+         ++bp;
+
+      ++pixelData;
+   }
+
+   return bp;
+}
+
+IRC_Status_t BetaQuantizer_SM()
+{
+   static BQ_State_t state = BQ_Idle;
+
+   static timerData_t verbose_timeout;
+   static timerData_t bq_timer;
+   uint64_t t0; // for RT benchmarking
+   static uint64_t tic_AvgDuration; //used for measuring the elapsed time during the averaged (not real time)
+   static uint64_t tic_TotalDuration; // used for benchmarking the total time
+   static uint64_t tic_RT_Duration; // used for benchmarking the actual time taken for building the statistics
+
+   static context_t blockContext; // information structure for block processing
+
+   static deltabeta_t* currentDeltaBeta = NULL;
+
+   static uint8_t blockIdx;
+
+   bool error = false;
+
+   int i, k;
+   IRC_Status_t rtnStatus = IRC_NOT_DONE;
+
+   const float p_fa = 1.0/MAX_PIXEL_COUNT; // allow 1 good pixel to be excluded
+   const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
+   const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
+   const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+
+   float* betaArray = (float*)mu_buffer; // buffer recycling
+
+   switch (state)
+   {
+   case BQ_Idle:
+
+      gBetaUpdateDone = true;
+      if (gStartBetaQuantization)
+      {
+         gStartBetaQuantization = false;
+
+         gBetaUpdateDone = false;
+
+         blockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo); // todo attention! ça se peut que cette valeur ne soit pas valide lors du chargement de la collection
+
+         currentDeltaBeta = ACT_getActiveDeltaBeta();
+         if (currentDeltaBeta != NULL)
+            setBqState(&state, BQ_UpdateBeta);
+      }
+      break;
+
+   case BQ_UpdateBeta:
+      {
+         // decode beta and update it with deltaBeta into betaArray
+         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
+
+         for (i=0; i<numPixels; ++i)
+         {
+            betaArray[i] = decodeBeta(&calAddr[i], &calibrationInfo.blocks[blockIdx]) + currentDeltaBeta->deltaBeta[i];
+         }
+
+         setBqState(&state, BQ_DetectBadPixels);
+      }
+      break;
+
+   case BQ_DetectBadPixels:
+      {
+         uint32_t numBadPixels = cleanBetaDistribution(betaArray, numPixels, p_fa);
+
+         ACT_PRINTF("Number of bad pixels after clean distribution: %d\n", numBadPixels);
+
+         setBqState(&state, BQ_QuantizeBeta);
+      }
+      break;
+
+   case BQ_QuantizeBeta:
+      {
+         uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIdx * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
+         // compute a new value for beta exponent
+         //calibrationInfo.blocks[blockIdx].pixelData.Beta0_Exp = newExponent;
+
+         for (i=0; i<numPixels; ++i)
+         {
+            encodeBeta(betaArray[i], &calAddr[i], &calibrationInfo.blocks[blockIdx]);
+         }
+
+         setBqState(&state, BQ_Done);
+      }
+      break;
+
+   case BQ_Done:
+
+      gBetaUpdateDone = true;
+
+      setBqState(&state, BQ_Idle);
+      rtnStatus = IRC_DONE;
+
+      break;
+
+   default:
+      ACT_ERR("Unknown BPD state (%d)", state);
+      rtnStatus = IRC_FAILURE;
+   }
+
+   if (error == true)
+   {
+      builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
+      ACT_ERR("An error occurred during bad pixel detection. No bad pixels were identified.");
+      gActBPMapAvailable = false;
+      allowCalibUpdate = true;
+
+      if (gActDebugOptions.clearBufferAfterCompletion)
+      {
+         BufferManager_ClearSequence(&gBufManager, &gcRegsData);
+         BufferManager_SetBufferMode(&gBufManager, BM_OFF, &gcRegsData);   // Make sure internal buffering is OFF
+      }
+      else
+         BufferManager_SetBufferMode(&gBufManager, BM_WRITE, &gcRegsData);   // Make sure internal buffering is ON
+
+      ICU_scene(&gcRegsData, &gICU_ctrl);
+
+      GC_SetAcquisitionStop(1);
+
+      // Reset state machine
+      setBqState(&state, BQ_Idle);
+
+      rtnStatus = IRC_FAILURE;
+   }
+
+   return rtnStatus;
+}
+
+float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
+{
+   int16_t raw_beta;
+   uint64_t calData;
+   float beta;
+
+   float exponent = exp2f(blockInfo->pixelData.Beta0_Exp);
+   float offset = blockInfo->pixelData.Beta0_Off; // usually 0
+
+   calData = (uint64_t)*p_CalData++;
+   calData |= ((uint64_t)*p_CalData++ << 32);
+
+   // Extract current beta from current calibration data
+   raw_beta = (int16_t) ((calData & CALIB_PIXELDATA_BETA0_MASK) >> CALIB_PIXELDATA_BETA0_SHIFT );
+   SIGN_EXT16( raw_beta, blockInfo->pixelData.Beta0_Nbits );
+
+   beta = (float)raw_beta * exponent + offset;
+
+   return beta;
+}
+
+void encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
+{
+
 }

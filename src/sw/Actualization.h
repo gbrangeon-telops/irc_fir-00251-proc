@@ -123,6 +123,13 @@
 		ACTION(BPD_DebugState) \
 		ACTION(BPD_Finalize)
 
+#define BQ_STATES(ACTION) \
+   ACTION(BQ_Idle) /**< wait for a start quantization command */ \
+   ACTION(BQ_UpdateBeta) /**< decode beta and compute the new value of beta with deltaBeta (float version) */ \
+   ACTION(BQ_DetectBadPixels) /**< check distribution and exclude outliers before quantization */ \
+   ACTION(BQ_QuantizeBeta) /**< compute Beta0 exponent and modify the pixelData */ \
+   ACTION(BQ_Done)/**< cleanup and return to BQ_Idle */
+
 #define GENERATE_ENUM(x) x,
 #define GENERATE_STRING(x) #x,
 
@@ -141,6 +148,15 @@ typedef enum {
 static const char *BPD_State_str[] __attribute__ ((unused)) = {
       BPD_STATES(GENERATE_STRING)
 };
+
+typedef enum {
+   BQ_STATES(GENERATE_ENUM)
+} BQ_State_t;
+
+static const char *BQ_State_str[] __attribute__ ((unused)) = {
+      BQ_STATES(GENERATE_STRING)
+};
+
 
 /**< a datatype for keeping a copy of the genicam register to get tampered with during this process */
 typedef struct {
@@ -287,6 +303,7 @@ IRC_Status_t startActualization( bool internalTrig );
 void stopActualization();
 IRC_Status_t Actualization_SM();
 IRC_Status_t BadPixelDetection_SM();
+IRC_Status_t BetaQuantizer_SM();
 
 bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);
