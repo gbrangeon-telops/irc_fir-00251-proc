@@ -75,7 +75,7 @@
 
 #define FPA_INVALID_TEMP         -32768   // cC
 
-#define FPA_MCLK_RATE_HZ         10000000            // le master clock du FPA est à 10MHz
+#define FPA_MCLK_RATE_HZ         18000000            // le master clock du FPA est à 18MHz
 #define FPA_CLOCK_FREQ_HZ        FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c 
 
 // structure de config envoyée au vhd 

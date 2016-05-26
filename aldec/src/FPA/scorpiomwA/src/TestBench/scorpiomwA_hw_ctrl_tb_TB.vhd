@@ -201,7 +201,7 @@ begin
    user_cfg_i.vdac_value(6)               		<= to_unsigned(11630, user_cfg_i.vdac_value(6)'length); 
    user_cfg_i.vdac_value(7)               		<= to_unsigned(11630, user_cfg_i.vdac_value(7)'length); 
    user_cfg_i.vdac_value(8)               		<= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);
-   user_cfg_i.adc_clk_phase                     <= to_unsigned(2, user_cfg_i.adc_clk_phase'length);
+   user_cfg_i.adc_clk_phase                     <= to_unsigned(0, user_cfg_i.adc_clk_phase'length);
    
    fpa_softw_stat_i.fpa_roic <= FPA_ROIC_SCORPIO_MW;
    fpa_softw_stat_i.fpa_output <= OUTPUT_ANALOG;    
