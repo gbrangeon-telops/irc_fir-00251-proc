@@ -3183,7 +3183,8 @@ IRC_Status_t ActualizationFileWriter_SM()
          ACT_ERR("File close failed.");
       }
 
-      retVal = IRC_FAILURE;
+      // return DONE even in case of failure to write the file, otherwise the beta correction is not applied
+      retVal = IRC_DONE;
    }
 
    return retVal;
@@ -3299,6 +3300,7 @@ void ACT_resetDebugOptions()
    gActDebugOptions.mode = 0;
    gActDebugOptions.forceDiscardOffset = false;
    gActDebugOptions.verbose = 0;
+   gActDebugOptions.liveBetaQuantization = false;
 }
 
 void ACT_parseDebugMode()
@@ -3359,6 +3361,11 @@ void ACT_parseDebugMode()
    {
       gActDebugOptions.forceDiscardOffset = false;
    }
+
+   if (BitMaskTst(gActDebugOptions.mode, ACT_MODE_LIVE_BETA_QUANTIZATION))
+      gActDebugOptions.liveBetaQuantization = true;
+   else
+      gActDebugOptions.liveBetaQuantization = false;
 }
 
 void ACT_resetParams(actParams_t* p)
@@ -4094,12 +4101,6 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
          {
             float beta = decodeBeta(&calAddr[k*2], &calibrationInfo.blocks[blockIdx]);
             betaArray[k] = beta + currentDeltaBeta->deltaBeta[k];
-
-            if (k<10)
-            {
-               PRINTF("beta[%d] = "_PCF(4) "\n", k, _FFMT(beta, 4));
-               PRINTF("betaArray[%d] = "_PCF(4) "\n", k, _FFMT(betaArray[k], 4));
-            }
 
             if (isinf(beta))
                ++initialNumBadPixels;
