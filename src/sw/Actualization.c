@@ -174,12 +174,13 @@ static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calib
 static void advanceDeltaBetaAge(uint32_t increment_s);
 
 // function for detecting bad pixels in the updated Beta parameter before computing its optimal quantization
-static uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose);
+static uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose) __attribute__ ((unused));
+static IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose);
 static float nth_element_f(const float* input, float minval, float* buffer, int N, int r);
 static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r);
 static uint32_t countBadPixels(const uint64_t* pixelData, int N);
-static float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo);
-static bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo);
+static float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo); // convert a single beta value from a packed pixel data element to float value
+static bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo); // convert a float value and pack it into the 64-bit pixel data element
 
 #ifdef ACT_TEST_NOBUFFERING
 static uint32_t fillDebugData(uint16_t* data, uint32_t c0, uint32_t frameSize, uint32_t numFrames);
@@ -383,9 +384,9 @@ IRC_Status_t Actualization_SM()
    // float* delta_beta_full = NULL; // address of the single float delta beta image in DDR
    uint16_t* seq_buffer = NULL; // address of the image sequence in DDR
 
-   const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
-   const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
-   const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
+   static const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
+   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
    const uint32_t age_increment = 10; // [s]
 
    if (TimedOut(&age_timer))
@@ -1464,9 +1465,9 @@ IRC_Status_t BadPixelDetection_SM()
 
    static deltabeta_t* currentDeltaBeta = NULL;
 
-   const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
-   const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
-   const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
+   static const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
+   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
    uint32_t numFramesToSkip;// number of frames to skip at the beginning, corresponding to the AEC transient -> a number of time constants
 
    bool error = false;
@@ -2875,7 +2876,7 @@ IRC_Status_t ActualizationFileWriter_SM()
    fileRecord_t* previousFile;
    int i, k;
 
-   const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
 
    switch (state)
    {
@@ -3909,11 +3910,59 @@ deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo
    return findSuitableDeltaBetaForBlock(calibInfo, blockIdx, false);
 }
 
-uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose)
+uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose)
+{
+   const float bp_code = infinity(); // bad pixels are replaced by inf
+
+   int i;
+   float data_thresh; // threshold scaled on the actual data
+   uint32_t nbp = 0;
+   float lowerThreshold, higherThreshold; // thresholds centered about the average value
+
+   resetStats(stats);
+
+   // calculer std de x, sans inclure les bad pixels (inf). Compter le nombre de bad pixels.
+   for (i=0; i<N; ++i)
+   {
+      float val = beta[i];
+      if (!isinf(val))
+         updateStats(stats, val);
+   }
+
+   // calculer le nouveau seuil
+   data_thresh = threshold * sqrtf(stats->var);
+
+   // étiqueter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
+   lowerThreshold = stats->mu - data_thresh;
+   higherThreshold = stats->mu + data_thresh;
+
+   nbp = 0;
+   for (i=0; i<N; ++i)
+   {
+      float val = beta[i];
+      if (val < lowerThreshold || val > higherThreshold)
+      {
+         beta[i] = bp_code;
+         ++nbp;
+      }
+   }
+   VERBOSE_IF(verbose)
+   {
+      PRINTF("std = " _PCF(2) ", mu = " _PCF(2) "\n", _FFMT(sqrtf(stats->var),2), _FFMT(stats->mu,2));
+      PRINTF("min = " _PCF(2) ", max = " _PCF(2) "\n", _FFMT(stats->min,2), _FFMT(stats->max,2));
+      PRINTF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2) "\n", _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
+   }
+
+   return nbp;
+}
+
+uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* stats, bool verbose)
 {
    const float thresh = invnormcdf(1-p_FA); //
-   const float bp_code = infinity();
    const int maxIter = 100;
+
+   int niter;
+   uint32_t nbp, prev_nbp;
 
    VERBOSE_IF(verbose)
    {
@@ -3921,61 +3970,65 @@ uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* fin
       PRINTF("cleanBetaDistribution: thresh = " _PCF(4) "\n", _FFMT(thresh,4));
    }
 
-   statistics_t stats;
-   int i;
-   int niter;
-   float data_thresh; // threshold scaled on the actual data
-
-   uint32_t nbp, prev_nbp;
-   float lowerThreshold, higherThreshold; // thresholds centered about the average value
-
    prev_nbp = 1;
    nbp = 0;
    niter = 0;
    while (prev_nbp != nbp && niter < maxIter)
    {
-      resetStats(&stats);
       prev_nbp = nbp;
 
-      // calculer std de x, sans inclure les bad pixels (inf). Compter le nombre de bad pixels.
-      for (i=0; i<N; ++i)
-      {
-         float val = beta[i];
-         if (!isinf(val))
-            updateStats(&stats, val);
-      }
+      nbp = cleanBetaDistributionIterate(beta, N, thresh, stats, verbose);
 
-      // calculer le nouveau seuil
-      data_thresh = thresh * sqrtf(stats.var);
-
-      // etiquetter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
-      lowerThreshold = stats.mu - data_thresh;
-      higherThreshold = stats.mu + data_thresh;
-
-      nbp = 0;
-      for (i=0; i<N; ++i)
-      {
-         float val = beta[i];
-         if (val < lowerThreshold || val > higherThreshold)
-         {
-            beta[i] = bp_code;
-            ++nbp;
-         }
-      }
       VERBOSE_IF(verbose)
       {
-         PRINTF("std = " _PCF(2) ", mu = " _PCF(2) "\n", _FFMT(sqrtf(stats.var),2), _FFMT(stats.mu,2));
-         PRINTF("min = " _PCF(2) ", max = " _PCF(2) "\n", _FFMT(stats.min,2), _FFMT(stats.max,2));
-         PRINTF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2) "\n", _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
          PRINTF("Iteration %d, number of BP %d\n", niter, nbp);
       }
       ++niter;
    }
 
-   if (finalStats != NULL)
-      memcpy(finalStats, &stats, sizeof(statistics_t));
-
    return nbp;
+}
+
+IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose)
+{
+   const float thresh = invnormcdf(1-p_FA);
+   const int maxIter = 15;
+
+   static uint32_t prev_nbp = 0;
+   static uint8_t niter = 0;
+   uint32_t nbp;
+
+   IRC_Status_t status;
+
+   VERBOSE_IF(verbose && niter == 0)
+   {
+      PRINTF("cleanBetaDistribution: p_FA = " _PCF(6) ", thresh = "  _PCF(4) "\n", _FFMT(p_FA,6), _FFMT(thresh,4));
+   }
+
+   nbp = cleanBetaDistributionIterate(beta, N, thresh, stats, verbose);
+
+   ++niter;
+
+   VERBOSE_IF(verbose)
+   {
+      PRINTF("Iteration %d, number of bad pixels: %d\n", niter, nbp);
+   }
+
+   if (prev_nbp == nbp || niter >= maxIter)
+   {
+      niter = 0;
+      prev_nbp = 0;
+      status = IRC_DONE;
+   }
+   else
+   {
+      prev_nbp = nbp;
+      status = IRC_NOT_DONE;
+   }
+
+   *numBadPixels = nbp;
+
+   return status;
 }
 
 float nth_element_f(const float* input, float minval, float* buffer, int N, int r)
@@ -4033,10 +4086,7 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
 {
    static BQ_State_t state = BQ_Idle;
 
-   static timerData_t verbose_timeout;
-   static timerData_t bq_timer;
    uint64_t t0; // for RT benchmarking
-   static uint64_t tic_AvgDuration; //used for measuring the elapsed time during the averaged (not real time)
    static uint64_t tic_TotalDuration; // used for benchmarking the total time
    static uint64_t tic_RT_Duration; // used for benchmarking the actual time taken for building the statistics
 
@@ -4052,10 +4102,8 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
    int i, k;
    IRC_Status_t rtnStatus = IRC_NOT_DONE;
 
-   const float p_FA = 1.0/MAX_PIXEL_COUNT; // allow 1 good pixel to be excluded
-   const uint32_t frameSize = (FPA_HEIGHT_MAX + 2) * FPA_WIDTH_MAX;
-   const uint32_t imageDataOffset = 2*FPA_WIDTH_MAX; // number of header pixels to skip [pixels]
-   const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
+   static const float p_FA = 1.0/MAX_PIXEL_COUNT; // allow 1 good pixel to be excluded
+   static const uint32_t numPixels = FPA_HEIGHT_MAX * FPA_WIDTH_MAX;
 
    float* betaArray = (float*)mu_buffer; // buffer recycling
 
@@ -4118,20 +4166,26 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
 
    case BQ_CleanDistribution:
       {
-         numBadPixels = cleanBetaDistribution(betaArray, numPixels, p_FA, &beta_stats, gActDebugOptions.verbose);
-
+         IRC_Status_t cleanDistribStatus;
          GETTIME(&t0);
 
-         VERBOSE_IF(gActDebugOptions.verbose)
-         {
-            PRINTF("Number of bad pixels after cleaning distribution: %d\n", numBadPixels);
-         }
+         //numBadPixels = cleanBetaDistribution(betaArray, numPixels, p_FA, &beta_stats, gActDebugOptions.verbose);
+         cleanDistribStatus = cleanBetaDistribution2(betaArray, numPixels, p_FA, &beta_stats, &numBadPixels, gActDebugOptions.verbose);
 
          tic_RT_Duration += elapsed_time_us(t0);
 
-         ctxtInit(&blockContext, 0, numPixels, ACT_MAX_PIX_DATA_TO_PROCESS);
+         if (cleanDistribStatus == IRC_DONE)
+         {
+            VERBOSE_IF(gActDebugOptions.verbose)
+            {
+               PRINTF("Number of bad pixels after cleaning distribution: %d\n", numBadPixels);
+               PRINTF( "ACT: cleanBetaDistribution took %d ms\n", (uint32_t)elapsed_time_us(t0)/1000);
+            }
 
-         setBqState(&state, BQ_QuantizeBeta);
+            ctxtInit(&blockContext, 0, numPixels, ACT_MAX_PIX_DATA_TO_PROCESS);
+
+            setBqState(&state, BQ_QuantizeBeta);
+         }
       }
       break;
 
@@ -4267,9 +4321,6 @@ float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
 
 bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
 {
-   const uint8_t nbits = blockInfo->pixelData.Beta0_Nbits;
-   const bool isSigned = blockInfo->pixelData.Beta0_Signed;
-   const int8_t exp = blockInfo->pixelData.Beta0_Exp;
    const float qstep = exp2f(blockInfo->pixelData.Beta0_Exp);
 
    uint64_t* pixelDataAddr = (uint64_t*)p_CalData;

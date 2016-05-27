@@ -617,6 +617,15 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
                   DT_PRINTF("Actualisation : force discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
                }
 
+               if (BitMaskTst(value, ACT_MODE_LIVE_BETA_QUANTIZATION))
+               {
+                  DT_PRINTF("Actualisation : live beta quantization is ON (0x%02X)", ACT_MODE_LIVE_BETA_QUANTIZATION);
+               }
+               else
+               {
+                  DT_PRINTF("Actualisation : live beta quantization is OFF (0x%02X)", ACT_MODE_LIVE_BETA_QUANTIZATION);
+               }
+
                break;
 
       case 8:
