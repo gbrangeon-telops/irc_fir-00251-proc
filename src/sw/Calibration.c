@@ -32,6 +32,7 @@
 
 extern t_calib gCal;
 extern int8_t gActualisationLoadBlockIdx;
+extern bool gStartBetaQuantization;
 
 /**
  * Calibration block information
@@ -850,7 +851,11 @@ void Calibration_SM()
                   if (ACT_shouldUpdateCurrentCalibration(&calibrationInfo, blockIndex))
                   {
                      newBadPixelCount = 0;
-                     cmCurrentState = CMS_UPDATE_PIXEL_DATA;
+                     if (gActDebugOptions.liveBetaQuantization)
+                        cmCurrentState = CMS_QUANTIZE_AND_UPDATE_DATA;
+                     else
+                        cmCurrentState = CMS_UPDATE_PIXEL_DATA;
+                     gStartBetaQuantization = true;
                      dataOffset = 0;
                      deltaBetaDataAddr = ACT_getSuitableDeltaBetaForBlock(&calibrationInfo, blockIndex);
                      if (deltaBetaDataAddr == NULL)
@@ -869,6 +874,18 @@ void Calibration_SM()
          }
          break;
 
+      case CMS_QUANTIZE_AND_UPDATE_DATA: // etat temporaire pour debug
+         {
+            IRC_Status_t bq_status = BetaQuantizer_SM(blockIndex);
+
+            if (bq_status == IRC_DONE)
+            {
+               calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
+               cmCurrentState = CMS_LOAD_MAXTK_DATA_HEADER;//CMS_UPDATE_PIXEL_DATA;
+            }
+         }
+         break;
+
       case CMS_UPDATE_PIXEL_DATA:
          {
             const uint32_t numberOfDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
@@ -879,7 +896,7 @@ void Calibration_SM()
 
             calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
             newBadPixelCount += ACT_updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaDataAddr, dataOffset, blockSize);
-
+            // todo devra utiliser la fonction de démarrage de la SM de mise à jour de beta et vérifier la fin de cette SM
             dataOffset += blockSize; // dataOffset is given in pixels
 
             if (dataOffset == numberOfDataToProcess)

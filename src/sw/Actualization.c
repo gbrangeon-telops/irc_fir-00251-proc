@@ -175,7 +175,8 @@ static void advanceDeltaBetaAge(uint32_t increment_s);
 
 // function for detecting bad pixels in the updated Beta parameter before computing its optimal quantization
 static uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose) __attribute__ ((unused));
-static IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose);
+static uint32_t cleanBetaDistributionNew(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose) __attribute__ ((unused));
+static IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose) __attribute__ ((unused));
 static float nth_element_f(const float* input, float minval, float* buffer, int N, int r);
 static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r);
 static uint32_t countBadPixels(const uint64_t* pixelData, int N);
@@ -3910,6 +3911,75 @@ deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo
    return findSuitableDeltaBetaForBlock(calibInfo, blockIdx, false);
 }
 
+uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose)
+{
+   const float thresh = invnormcdf(1-p_FA); //
+   const float bp_code = infinity();
+   const int maxIter = 100;
+
+   VERBOSE_IF(verbose)
+   {
+      PRINTF("cleanBetaDistribution: p_FA = " _PCF(6) "\n", _FFMT(p_FA,6));
+      PRINTF("cleanBetaDistribution: thresh = " _PCF(4) "\n", _FFMT(thresh,4));
+   }
+
+   statistics_t stats;
+   int i;
+   int niter;
+   float data_thresh; // threshold scaled on the actual data
+
+   uint32_t nbp, prev_nbp;
+   float lowerThreshold, higherThreshold; // thresholds centered about the average value
+
+   prev_nbp = 1;
+   nbp = 0;
+   niter = 0;
+   while (prev_nbp != nbp && niter < maxIter)
+   {
+      resetStats(&stats);
+      prev_nbp = nbp;
+
+      // calculer std de x, sans inclure les bad pixels (inf). Compter le nombre de bad pixels.
+      for (i=0; i<N; ++i)
+      {
+         float val = beta[i];
+         if (!isinf(val))
+            updateStats(&stats, val);
+      }
+
+      // calculer le nouveau seuil
+      data_thresh = thresh * sqrtf(stats.var);
+
+      // etiquetter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
+      lowerThreshold = stats.mu - data_thresh;
+      higherThreshold = stats.mu + data_thresh;
+
+      nbp = 0;
+      for (i=0; i<N; ++i)
+      {
+         float val = beta[i];
+         if (val < lowerThreshold || val > higherThreshold)
+         {
+            beta[i] = bp_code;
+            ++nbp;
+         }
+      }
+      VERBOSE_IF(verbose)
+      {
+         PRINTF("std = " _PCF(2) ", mu = " _PCF(2) "\n", _FFMT(sqrtf(stats.var),2), _FFMT(stats.mu,2));
+         PRINTF("min = " _PCF(2) ", max = " _PCF(2) "\n", _FFMT(stats.min,2), _FFMT(stats.max,2));
+         PRINTF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2) "\n", _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
+         PRINTF("Iteration %d, number of BP %d\n", niter, nbp);
+      }
+      ++niter;
+   }
+
+   if (finalStats != NULL)
+      memcpy(finalStats, &stats, sizeof(statistics_t));
+
+   return nbp;
+}
+
 uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose)
 {
    const float bp_code = infinity(); // bad pixels are replaced by inf
@@ -3956,7 +4026,7 @@ uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, stati
    return nbp;
 }
 
-uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* stats, bool verbose)
+uint32_t cleanBetaDistributionNew(float* beta, int N, float p_FA, statistics_t* stats, bool verbose)
 {
    const float thresh = invnormcdf(1-p_FA); //
    const int maxIter = 100;
@@ -4169,12 +4239,12 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
          IRC_Status_t cleanDistribStatus;
          GETTIME(&t0);
 
-         //numBadPixels = cleanBetaDistribution(betaArray, numPixels, p_FA, &beta_stats, gActDebugOptions.verbose);
-         cleanDistribStatus = cleanBetaDistribution2(betaArray, numPixels, p_FA, &beta_stats, &numBadPixels, gActDebugOptions.verbose);
+         numBadPixels = cleanBetaDistribution(betaArray, numPixels, p_FA, &beta_stats, gActDebugOptions.verbose);
+         //cleanDistribStatus = cleanBetaDistribution2(betaArray, numPixels, p_FA, &beta_stats, &numBadPixels, gActDebugOptions.verbose);
 
          tic_RT_Duration += elapsed_time_us(t0);
 
-         if (cleanDistribStatus == IRC_DONE)
+         if (1 || cleanDistribStatus == IRC_DONE)
          {
             VERBOSE_IF(gActDebugOptions.verbose)
             {
