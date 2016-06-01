@@ -53,7 +53,7 @@ architecture RTL of dbg_clk_high_measure is
    signal done_o                  : std_logic;
    signal sig_valid_i             : std_logic;
    signal sig_valid_last          : std_logic;
-   signal enable_i                : std_logic;
+   signal global_reset                : std_logic;
    
    
 begin
@@ -61,12 +61,13 @@ begin
    SIG_LENGTH <= std_logic_vector(meas_count_o);
    DONE  <= done_o;
    
+   global_reset <= ARESET or not ENABLE;
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
    U1 : sync_reset
    port map(
-      ARESET => ARESET,
+      ARESET => global_reset,
       CLK    => CLK,
       SRESET => sreset
       );
@@ -80,17 +81,17 @@ begin
          if sreset = '1' then 
             meas_count_i <= (others => '0');
             done_o <= '0';
-            enable_i <= '0';
+            --enable_i <= '0';
             sig_valid_i <= '0';
             sig_valid_last <= '0';
             
          else 
             
-            if SIG_IN = '0' then 
-               enable_i <= ENABLE;
-            end if;
+           -- if SIG_IN = '0' then 
+               --enable_i <= ENABLE;
+           -- end if;
             
-            sig_valid_i <= SIG_IN and enable_i;            
+            sig_valid_i <= SIG_IN; --and enable_i;            
             sig_valid_last <= sig_valid_i;
             
             -- mesure de la durée                
