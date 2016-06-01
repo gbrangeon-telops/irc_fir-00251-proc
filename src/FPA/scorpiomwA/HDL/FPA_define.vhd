@@ -49,7 +49,7 @@ package FPA_define is
    --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
    -- ATTENTION : la ligne suivante à changer avec MCLK
    --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 18_000;       -- 10_000 => MCLK = 10M, 15_000 => MCLK = 15M, 18_000 => MCLK = 18M, 
+   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 15_000;       -- 10_000 => MCLK = 10M, 15_000 => MCLK = 15M, 18_000 => MCLK = 18M, 
    
    
    
@@ -77,9 +77,9 @@ package FPA_define is
    --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
    -- ATTENTION : les 3 lignes suivantes à changer avec MCLK
    --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 36_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M,  
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 36_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M, 
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_72M_CLK_RATE_KHZ;     -- DEFINE_FPA_80M_CLK_RATE_KHZ => MCLK = 10M, DEFINE_FPA_60M_CLK_RATE_KHZ => MCLK = 15M, DEFINE_FPA_72M_CLK_RATE_KHZ => MCLK = 18M,-- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
+   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 30_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M,  
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 30_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M, 
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_60M_CLK_RATE_KHZ;     -- DEFINE_FPA_80M_CLK_RATE_KHZ => MCLK = 10M, DEFINE_FPA_60M_CLK_RATE_KHZ => MCLK = 15M, DEFINE_FPA_72M_CLK_RATE_KHZ => MCLK = 18M,-- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
    
    
    
