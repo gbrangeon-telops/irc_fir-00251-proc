@@ -107,7 +107,7 @@ begin
    CH0_FVAL <= fval_i; 
    
    
-   CH1_CLK <= transport CLK_40M after 1000 ns; 
+   CH1_CLK <=  '0';--transport CLK_40M after 1000 ns; 
    CH1_DVAL <= transport lval_i after 1000 ns;
    CH1_LVAL <= transport lval_i after 1000 ns;
    CH1_FVAL <= transport fval_i after 1000 ns;
