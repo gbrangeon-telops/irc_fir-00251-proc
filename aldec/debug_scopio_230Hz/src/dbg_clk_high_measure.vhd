@@ -87,9 +87,9 @@ begin
             
          else 
             
-           -- if SIG_IN = '0' then 
-               --enable_i <= ENABLE;
-           -- end if;
+            -- if SIG_IN = '0' then 
+            --enable_i <= ENABLE;
+            -- end if;
             
             sig_valid_i <= SIG_IN; --and enable_i;            
             sig_valid_last <= sig_valid_i;
@@ -104,18 +104,20 @@ begin
             -- wrap du compteur (donc un signal qui ne descend pas
             if meas_count_i = C_ALL_ONES then 
                meas_count_o <= C_ALL_ONES;
-               done_o <= '1';
-            else
-               done_o <= '0';
             end if;
             
             -- registres de sortie 
             if sig_valid_last = '1' and sig_valid_i = '0' then 
                meas_count_o <= meas_count_i;      -- latch de la valeur avant RAZ sur meas_count_i
             end if;         
-            done_o <= sig_valid_last and not sig_valid_i; 
             
-
+            if meas_count_i = C_ALL_ONES then
+               done_o <= '1';
+            else
+               done_o <= sig_valid_last and not sig_valid_i;
+            end if;
+            
+            
             
          end if;
       end if;
