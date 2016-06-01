@@ -44,7 +44,7 @@ architecture RTL of dbg_clk_high_measure is
          );
    end component;   
    
-   constant C_ALL_ONES            : unsigned(SIG_LENGTH'length-1 downto 0) := (others => '1');
+   constant C_EOC                 : unsigned(SIG_LENGTH'length-1 downto 0) := "00" & x"EC";
    
    signal meas_count_i            : unsigned(SIG_LENGTH'length-1 downto 0);
    signal meas_count_o            : unsigned(SIG_LENGTH'length-1 downto 0);
@@ -102,8 +102,8 @@ begin
             end if;            
             
             -- wrap du compteur (donc un signal qui ne descend pas
-            if meas_count_i = C_ALL_ONES then 
-               meas_count_o <= C_ALL_ONES;
+            if meas_count_i = C_EOC then 
+               meas_count_o <= C_EOC;
             end if;
             
             -- registres de sortie 
@@ -111,7 +111,7 @@ begin
                meas_count_o <= meas_count_i;      -- latch de la valeur avant RAZ sur meas_count_i
             end if;         
             
-            if meas_count_i = C_ALL_ONES then
+            if meas_count_i = C_EOC then
                done_o <= '1';
             else
                done_o <= sig_valid_last and not sig_valid_i;
