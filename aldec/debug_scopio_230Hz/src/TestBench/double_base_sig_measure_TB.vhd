@@ -25,6 +25,7 @@ architecture TB_ARCHITECTURE of double_base_sig_measure_tb is
          CH1_FVAL : in STD_LOGIC;
          CH1_LVAL : in STD_LOGIC;
          CLK_100M : in STD_LOGIC;
+         CLK_80M : in STD_LOGIC;
          DBG_STAT : out dbg_stat_type );
    end component;
    
@@ -46,6 +47,7 @@ architecture TB_ARCHITECTURE of double_base_sig_measure_tb is
    constant ysize : natural := 16;
    
    constant CLK_40M_PERIOD  : time := 25.0 ns;
+   constant CLK_80M_PERIOD  : time := 12.5 ns;
    constant CLK_100M_PERIOD : time := 10.0 ns; 
    constant lval_period     : time := 16_000 ns; 
    constant fval_period     : time := 16_384 us;
@@ -56,6 +58,7 @@ architecture TB_ARCHITECTURE of double_base_sig_measure_tb is
    signal ARESET       : STD_LOGIC  := '1';
    signal CLK_40M      : STD_LOGIC  := '1';
    signal CLK_100M     : STD_LOGIC  := '1';
+   signal CLK_80M      : STD_LOGIC  := '1';
    signal lval_i       : STD_LOGIC  := '0';
    signal fval_i       : STD_LOGIC  := '0';  
    signal cnt          : integer := 0;
@@ -80,6 +83,11 @@ begin
    U2b: process(CLK_100M)
    begin
       CLK_100M <= not CLK_100M after CLK_100M_PERIOD/2; 
+   end process;  
+   
+   U2c: process(CLK_80M)
+   begin
+      CLK_80M <= not CLK_80M after CLK_80M_PERIOD/2; 
    end process;
    
    U3: process(lval_i)
@@ -119,6 +127,7 @@ begin
       CH1_FVAL => CH1_FVAL,
       CH1_LVAL => CH1_LVAL,
       CLK_100M => CLK_100M,
+      CLK_80M => CLK_80M,
       DBG_STAT => DBG_STAT
       );
    

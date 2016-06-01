@@ -44,6 +44,16 @@ package dbg_define is
       ch_desync_length_min              : unsigned(9 downto 0);	
       ch_desync_length_max              : unsigned(9 downto 0);
       
+      ch0_clk_low_min                  : unsigned(9 downto 0);
+      ch0_clk_low_max                  : unsigned(9 downto 0);
+      ch0_clk_high_min                 : unsigned(9 downto 0);
+      ch0_clk_high_max                 : unsigned(9 downto 0);
+                                                              
+      ch1_clk_low_min                  : unsigned(9 downto 0);
+      ch1_clk_low_max                  : unsigned(9 downto 0);
+      ch1_clk_high_min                 : unsigned(9 downto 0);
+      ch1_clk_high_max                 : unsigned(9 downto 0);
+      
    end record;
    
    

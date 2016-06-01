@@ -13,6 +13,6 @@ acom  d:\Telops\FIR-00251-Proc\aldec\debug_scopio_230Hz\src\TestBench\double_bas
 asim -ses double_base_sig_measure_TB 
 
 
-wave UUT/*
+wave UUT/U2/U1/*
 
 run 40 ms
