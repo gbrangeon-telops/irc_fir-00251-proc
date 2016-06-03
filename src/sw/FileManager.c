@@ -24,8 +24,18 @@
 #include "Calibration.h"
 #include "FlashDynamicValues.h"
 #include "FlashSettings.h"
-#include <string.h> // For memcpy
+#include <string.h> // For memcpy and strcmp
 
+int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
+
+char gFM_FileSignature[][F1F2_FILE_TYPE_SIZE + 1] = {
+      "",
+      "TSAC",
+      "TSBL",
+      "TSCO",
+      "TSDV",
+      "TSFS"
+};
 
 /**
  * File manager network port.
@@ -143,6 +153,7 @@ void File_Manager_SM()
    static uint32_t fileSize;
    static uint16_t fileCRC16;
    IRC_Status_t status;
+   fileRecord_t *file;
    uint32_t length;
 
    F1F2_CommandClear(&fmResponse.f1f2);
@@ -185,7 +196,7 @@ void File_Manager_SM()
                         fmResponse.f1f2.payload.fileInfo.size = gFM_files.item[fileIndex]->size;
                         fmResponse.f1f2.payload.fileInfo.attributes = gFM_files.item[fileIndex]->attributes;
                         fmResponse.f1f2.payload.fileInfo.id = GetFileID(gFM_files.item[fileIndex]);
-                        memcpy(fmResponse.f1f2.payload.fileInfo.type, gFM_files.item[fileIndex]->type, F1F2_FILE_TYPE_SIZE);
+                        memcpy(fmResponse.f1f2.payload.fileInfo.type, gFM_FileSignature[gFM_files.item[fileIndex]->type], F1F2_FILE_TYPE_SIZE);
                      }
                      else
                      {
@@ -195,12 +206,23 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_CREATE_REQ:
-                     status = FM_CreateFile(fmRequest.f1f2.payload.fileName.name, &fileIndex);
-                     if (status == IRC_SUCCESS)
+                     // Create file
+                     file = FM_CreateFile(fmRequest.f1f2.payload.fileName.name);
+                     if (file != NULL)
                      {
-                        F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
-                        fmResponse.f1f2.cmd = F1F2_CMD_FILE_CREATE_RSP;
-                        fmResponse.f1f2.payload.fileIndex.index = fileIndex;
+                        // Add file to list
+                        status = FM_AddFileToList(file, &gFM_files, &fileIndex);
+                        if (status == IRC_SUCCESS)
+                        {
+                           F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                           fmResponse.f1f2.cmd = F1F2_CMD_FILE_CREATE_RSP;
+                           fmResponse.f1f2.payload.fileIndex.index = fileIndex;
+                        }
+                        else
+                        {
+                           FM_ERR("Failed to add file to list.");
+                           F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                        }
                      }
                      else
                      {
@@ -305,6 +327,7 @@ void File_Manager_SM()
                      {
                         if (FM_CloseFile(gFM_files.item[fileIndex], FMP_RUNNING) == IRC_SUCCESS)
                         {
+                           FM_SortFileList(&gFM_files);
                            F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                         }
                         else
@@ -341,11 +364,11 @@ void File_Manager_SM()
                      if (fileIndex < gFM_files.count)
                      {
                         if ((gGC_ProprietaryFeatureKeyIsValid == 0) &&
-                           ((strcmp(gFM_files.item[fileIndex]->type, FM_ACTUALIZATION_FILE_TYPE) == 0) ||
-                           (strcmp(gFM_files.item[fileIndex]->type, FM_FLASHSETTINGS_FILE_TYPE) == 0) ||
-                           (strcmp(gFM_files.item[fileIndex]->type, FM_FLASHDYNAMICVALUES_FILE_TYPE) == 0)))
+                           ((gFM_files.item[fileIndex]->type == FT_TSAC) ||
+                           (gFM_files.item[fileIndex]->type == FT_TSFS) ||
+                           (gFM_files.item[fileIndex]->type == FT_TSDV)))
                         {
-                           FM_ERR("%s files are protected.", gFM_files.item[fileIndex]->type);
+                           FM_ERR("%s files are protected.", gFM_FileSignature[gFM_files.item[fileIndex]->type]);
                            F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                         }
                         else
@@ -469,12 +492,14 @@ IRC_Status_t FM_InitFileDB()
    uint32_t i;
 
    // Clear file lists
-   gFM_files.count = 0;
-   gFM_collections.count = 0;
-   gFM_calibrationBlocks.count = 0;
-   gFM_nlBlocks.count = 0;
-   gFM_icuBlocks.count = 0;
-   gFM_calibrationActualizationFiles.count = 0;
+   memset(&gFM_files, 0, sizeof(gFM_files));
+   memset(&gFM_collections, 0, sizeof(gFM_collections));
+   memset(&gFM_calibrationBlocks, 0, sizeof(gFM_calibrationBlocks));
+   memset(&gFM_nlBlocks, 0, sizeof(gFM_nlBlocks));
+   memset(&gFM_icuBlocks, 0, sizeof(gFM_icuBlocks));
+   memset(&gFM_calibrationActualizationFiles, 0, sizeof(gFM_calibrationActualizationFiles));
+
+   // TODO Set collection file order keys using flash dynamic values
 
    // Clear file pointers
    gFM_flashSettingsFile = NULL;
@@ -501,15 +526,15 @@ IRC_Status_t FM_InitFileDB()
                strcpy(gFM_fileDB[fileCount].name, de->d_name);
                gFM_fileDB[fileCount].size = filestat.st_size;
 
-               // Add file to list
-               FM_AddFileToList(&gFM_fileDB[fileCount], &gFM_files);
-
                // Close file
                status = FM_CloseFile(&gFM_fileDB[fileCount], FMP_INIT);
                if (status != IRC_SUCCESS)
                {
                   FM_ERR("File %s failed to close.", filelongname);
                }
+
+               // Add file to list
+               FM_AddFileToList(&gFM_fileDB[fileCount], &gFM_files, NULL);
 
                fileCount++;
             }
@@ -573,7 +598,7 @@ void FM_ListFileDB()
                gFM_fileDB[i].attributes,
                gFM_fileDB[i].deviceSerialNumber,
                gFM_fileDB[i].posixTime,
-               gFM_fileDB[i].type);
+               gFM_FileSignature[gFM_fileDB[i].type]);
       }
       else
       {
@@ -729,12 +754,11 @@ IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t of
  * Create zero length file in file system.
  *
  * @param filename is the name of the file to create.
- * @param fileIndex is a pointer to the newly created file index.
  *
- * @return IRC_SUCCESS if file was successfully created.
- * @return IRC_FAILURE if failed to create file.
+ * @return file record pointer if file was successfully created.
+ * @return NULL if failed to create file.
  */
-IRC_Status_t FM_CreateFile(const char *filename, uint32_t *fileIndex)
+fileRecord_t *FM_CreateFile(const char *filename)
 {
    int fd;
    char filelongname[FM_LONG_FILENAME_SIZE];
@@ -745,7 +769,7 @@ IRC_Status_t FM_CreateFile(const char *filename, uint32_t *fileIndex)
    if (FM_FileExists(filename))
    {
       FM_ERR("File already exists.");
-      return IRC_FAILURE;
+      return NULL;
    }
 
    // Find empty file record index
@@ -758,7 +782,7 @@ IRC_Status_t FM_CreateFile(const char *filename, uint32_t *fileIndex)
    if (i == FM_MAX_NUM_FILE)
    {
       FM_ERR("File system is full.");
-      return IRC_FAILURE;
+      return NULL;
    }
 
    // Create file
@@ -767,7 +791,7 @@ IRC_Status_t FM_CreateFile(const char *filename, uint32_t *fileIndex)
    if (fd == -1)
    {
       FM_ERR("File open failed.");
-      return IRC_FAILURE;
+      return NULL;
    }
 
    retval = uffs_close(fd);
@@ -781,18 +805,12 @@ IRC_Status_t FM_CreateFile(const char *filename, uint32_t *fileIndex)
          FM_ERR("File remove failed.");
       }
 
-      return IRC_FAILURE;
+      return NULL;
    }
 
    strcpy(gFM_fileDB[i].name, filename);
 
-   // Add file to list
-   FM_AddFileToList(&gFM_fileDB[i], &gFM_files);
-
-   // Return file index (index of the last file of the list)
-   *fileIndex = gFM_files.count - 1;
-
-   return IRC_SUCCESS;
+   return &gFM_fileDB[i];
 }
 
 /**
@@ -810,6 +828,8 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
    IRC_Status_t status;
    uint32_t dataLength;
    BlockFileHeader_t blockFileHeader;
+   char fileType[F1F2_FILE_TYPE_SIZE + 1];
+   uint32_t i;
 
    if ((file == NULL) || (file->name[0] == '\0'))
    {
@@ -823,105 +843,119 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
       return IRC_FAILURE;
    }
 
+   file->type = FT_NONE;
+
    dataLength = MIN(file->size, FM_TEMP_FILE_DATA_BUFFER_SIZE);
    status = FM_ReadDataFromFile(tmpFileDataBuffer, file->name, 0, dataLength);
-   if (status == IRC_SUCCESS)
+   if ((status == IRC_SUCCESS) && (dataLength >= 20))
    {
-      // Detect Telops format files
-      if (dataLength >= 20)
+      // Detect Telops file types
+      memcpy(fileType, tmpFileDataBuffer, F1F2_FILE_TYPE_SIZE);
+      fileType[F1F2_FILE_TYPE_SIZE] = '\0';
+
+      i = 1; // Skip "None" file type
+      while (i < NUM_OF(gFM_FileSignature))
       {
-         memcpy(file->type, tmpFileDataBuffer, F1F2_FILE_TYPE_SIZE);
-         file->type[F1F2_FILE_TYPE_SIZE] = '\0';
+         if (strcmp(fileType, gFM_FileSignature[i]) == 0)
+         {
+            file->type = i;
+            break;
+         }
+
+         i++;
+      }
+
+      if (file->type != FT_NONE)
+      {
          memcpy(&file->deviceSerialNumber, &tmpFileDataBuffer[12], sizeof(uint32_t));
          memcpy(&file->posixTime, &tmpFileDataBuffer[16], sizeof(uint32_t));
 
-         if (strcmp(file->type, FM_COLLECTION_FILE_TYPE) == 0)
+         switch(file->type)
          {
-            if (phase == FMP_RUNNING)
-            {
-               if (FM_FillCollectionInfo(file) == IRC_SUCCESS)
+            case FT_TSCO:
+               if (phase == FMP_RUNNING)
+               {
+                  if (FM_FillCollectionInfo(file) == IRC_SUCCESS)
+                  {
+                     // Add file to collection list
+                     FM_AddFileToList(file, &gFM_collections, NULL);
+                  }
+               }
+               else
                {
                   // Add file to collection list
-                  FM_AddFileToList(file, &gFM_collections);
+                  FM_AddFileToList(file, &gFM_collections, NULL);
                }
-            }
-            else
-            {
-               // Add file to collection list
-               FM_AddFileToList(file, &gFM_collections);
-            }
-         }
-         else if (strcmp(file->type, FM_BLOCK_FILE_TYPE) == 0)
-         {
-            if (ParseCalibBlockFileHeader(tmpFileDataBuffer, dataLength, &blockFileHeader) > 0)
-            {
-               switch (blockFileHeader.CalibrationType)
+               break;
+
+            case FT_TSBL:
+               if (ParseCalibBlockFileHeader(tmpFileDataBuffer, dataLength, &blockFileHeader) > 0)
                {
-                  case CALT_NL:
-                     FM_AddFileToList(file, &gFM_nlBlocks);
-                     break;
+                  switch (blockFileHeader.CalibrationType)
+                  {
+                     case CALT_NL:
+                        FM_AddFileToList(file, &gFM_nlBlocks, NULL);
+                        break;
 
-                  case CALT_ICU:
-                     FM_AddFileToList(file, &gFM_icuBlocks);
-                     break;
+                     case CALT_ICU:
+                        FM_AddFileToList(file, &gFM_icuBlocks, NULL);
+                        break;
 
-                  case CALT_MULTIPOINT:
-                  case CALT_TELOPS:
-                     FM_AddFileToList(file, &gFM_calibrationBlocks);
-                     break;
+                     case CALT_MULTIPOINT:
+                     case CALT_TELOPS:
+                        FM_AddFileToList(file, &gFM_calibrationBlocks, NULL);
+                        break;
 
-                  default:
-                     FM_ERR("Unknown block calibration type (%s).", file->name);
-                     break;
+                     default:
+                        FM_ERR("Unknown block calibration type (%s).", file->name);
+                        break;
+                  }
                }
-            }
-            else
-            {
-               FM_ERR("Failed to parse block file header (%s).", file->name);
-            }
-         }
-         else if (strcmp(file->type, FM_ACTUALIZATION_FILE_TYPE) == 0)
-         {
-            FM_AddFileToList(file, &gFM_calibrationActualizationFiles);
-         }
-         else if (strcmp(file->type, FM_FLASHSETTINGS_FILE_TYPE) == 0)
-         {
-            if (phase == FMP_INIT)
-            {
-               status = FlashSettings_Load(file->name, FSLI_LOAD_IMMEDIATELY);
-            }
-            else
-            {
-               status = FlashSettings_Load(file->name, FSLI_DEFERRED_LOADING);
-            }
+               else
+               {
+                  FM_ERR("Failed to parse block file header (%s).", file->name);
+               }
+               break;
 
-            if (status != IRC_SUCCESS)
-            {
-               FM_ERR("Failed to load flash settings.");
-            }
+            case FT_TSAC:
+               FM_AddFileToList(file, &gFM_calibrationActualizationFiles, NULL);
+               break;
 
-            // Remove existing flash settings file
-            if ((gFM_flashSettingsFile != NULL) && (gFM_flashSettingsFile != file))
-            {
-               status = FM_RemoveFile(gFM_flashSettingsFile);
+            case FT_TSFS:
+               if (phase == FMP_INIT)
+               {
+                  status = FlashSettings_Load(file->name, FSLI_LOAD_IMMEDIATELY);
+               }
+               else
+               {
+                  status = FlashSettings_Load(file->name, FSLI_DEFERRED_LOADING);
+               }
+
                if (status != IRC_SUCCESS)
                {
-                  FM_ERR("Failed to remove %s.", gFM_flashSettingsFile->name);
+                  FM_ERR("Failed to load flash settings.");
                }
-            }
 
-            gFM_flashSettingsFile = file;
-         }
-         else if ((strcmp(file->type, FM_FLASHDYNAMICVALUES_FILE_TYPE) == 0) &&
-               (strcmp(file->name, FDV_FILENAME) == 0))
-         {
-            gFM_flashDynamicValuesFile = file;
-         }
-         else
-         {
-            memset(file->type, 0, F1F2_FILE_TYPE_SIZE + 1);
-            file->deviceSerialNumber = 0;
-            file->posixTime = 0;
+               // Remove existing flash settings file
+               if ((gFM_flashSettingsFile != NULL) && (gFM_flashSettingsFile != file))
+               {
+                  status = FM_RemoveFile(gFM_flashSettingsFile);
+                  if (status != IRC_SUCCESS)
+                  {
+                     FM_ERR("Failed to remove %s.", gFM_flashSettingsFile->name);
+                  }
+               }
+
+               gFM_flashSettingsFile = file;
+               break;
+
+            case FT_TSDV:
+               gFM_flashDynamicValuesFile = file;
+               break;
+
+            case FT_NONE:
+               // Do nothing
+               break;
          }
       }
    }
@@ -1042,12 +1076,16 @@ IRC_Status_t FM_Format()
  *
  * @param file is a pointer to the file to add.
  * @param fileList is a pointer to the file list.
+ * @param fileIndex is a pointer to the file index to be returned.
  *
  * @return IRC_SUCCESS if file was successfully added.
  * @return IRC_FAILURE if failed to add file.
  */
-IRC_Status_t FM_AddFileToList(fileRecord_t *file, fileList_t *fileList)
+IRC_Status_t FM_AddFileToList(fileRecord_t *file, fileList_t *fileList, uint32_t *fileIndex)
 {
+   uint32_t fi;
+   uint32_t i;
+
    if ((file == NULL) || (file->name[0] == '\0'))
    {
       return IRC_FAILURE;
@@ -1055,7 +1093,34 @@ IRC_Status_t FM_AddFileToList(fileRecord_t *file, fileList_t *fileList)
 
    if (fileList->count < FM_MAX_NUM_FILE)
    {
-      fileList->item[fileList->count++] = file;
+      if ((fileList->keyCount == 0) || (fileList->keys[0] == FO_NONE))
+      {
+         fi = fileList->count;
+      }
+      else
+      {
+         fi = 0;
+
+         while ((fi < fileList->count) && (FM_filecmp(file, fileList->item[fi], fileList->keys, fileList->keyCount) > 0))
+         {
+            fi++;
+         }
+
+         // Shift other files to insert the new file
+         for (i = fileList->count; i > fi; i--)
+         {
+            fileList->item[i] = fileList->item[i - 1];
+         }
+      }
+
+      fileList->item[fi] = file;
+
+      fileList->count++;
+
+      if (fileIndex != NULL)
+      {
+         *fileIndex = fi;
+      }
    }
    else
    {
@@ -1106,6 +1171,187 @@ IRC_Status_t FM_RemoveFileFromList(fileRecord_t *file, fileList_t *fileList)
    }
 
    return found ? IRC_SUCCESS : IRC_FAILURE;
+}
+
+/**
+ * Set file list file order keys and sort it.
+ *
+ * @param fileList is a pointer to the file list.
+ * @param keys is an array of file order keys.
+ * @param keyCount is the number of file order keys in the keys array.
+ */
+void FM_SetFileListKeys(fileList_t *fileList, const fileOrder_t *keys, const uint32_t keyCount)
+{
+   // Update file list file order keys and sort it
+   memset(fileList->keys, 0, sizeof(fileList->keys));
+   fileList->keyCount = 0;
+
+   while ((fileList->keyCount < MIN(keyCount, FM_MAX_NUM_FILE_ORDER_KEY)) && (keys[fileList->keyCount] != FO_NONE) && (keys[fileList->keyCount] < FO_COUNT))
+   {
+      fileList->keys[fileList->keyCount] = keys[fileList->keyCount];
+      fileList->keyCount++;
+   }
+   FM_SortFileList(fileList);
+}
+
+/**
+ * Sort file list.
+ *
+ * @param fileList is a pointer to the file list.
+ */
+void FM_SortFileList(fileList_t *fileList)
+{
+   fileRecord_t *tmpFileRecord;
+   uint32_t fileMovedCount;
+   uint32_t i;
+
+   if ((fileList->keyCount == 0) || (fileList->keys[0] == FO_NONE))
+   {
+      return;
+   }
+
+   do
+   {
+      fileMovedCount = 0;
+
+      for (i = 0; i < (fileList->count - 1); i++)
+      {
+         if (FM_filecmp(fileList->item[i], fileList->item[i + 1], fileList->keys, fileList->keyCount) > 0)
+         {
+            tmpFileRecord = fileList->item[i];
+            fileList->item[i] = fileList->item[i + 1];
+            fileList->item[i + 1] = tmpFileRecord;
+            fileMovedCount++;
+         }
+      }
+   }
+   while (fileMovedCount != 0);
+}
+
+/**
+ * Compare two files key using specified file order keys.
+ *
+ * @param file1 is the pointer to the first file to be compared.
+ * @param file2 is the pointer to the second file to be compared.
+ * @param keys is an array of file order keys to use.
+ * @param keyCount is the number of file order keys in the keys array.
+ *
+ * @return <0 the file key has a lower value in file1 than in file2
+ * @return 0 the file key of both files are equal
+ * @return >0 the file key has a greater value in file1 than in file2
+ */
+int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount)
+{
+   int retval = 0;
+   fileOrder_t tmpKeys[3];
+   fileOrder_t key = FO_NONE;
+
+   if (keyCount > 0)
+   {
+      key = keys[0];
+
+      if (key == FO_NONE)
+      {
+         keyCount = 0;
+      }
+   }
+
+   switch (key)
+   {
+      case FO_NONE:
+      case FO_FILE_NAME:
+      default:
+         retval = strcmp(file1->name, file2->name);
+         break;
+
+      case FO_POSIX_TIME:
+         retval = (file1->posixTime - file2->posixTime);
+         break;
+
+      case FO_FILE_TYPE:
+         retval = file1->type - file2->type;
+         break;
+
+      case FO_COLLECTION_TYPE:
+      case FO_FW_POSITION:
+      case FO_NDF_POSITION:
+      case FO_EXT_LENS_SERIAL:
+         if ((file1->type == FT_TSCO) && (file2->type == FT_TSCO))
+         {
+            switch (key)
+            {
+               case FO_COLLECTION_TYPE:
+                  retval = file1->info.collection.CollectionType - file2->info.collection.CollectionType;
+
+                  if ((retval == 0) && (keyCount == 1))
+                  {
+                     // Smart mode
+                     switch (file1->info.collection.CollectionType)
+                     {
+                        case CCT_TelopsFixed:
+                        case CCT_MultipointFixed:
+                        case CCT_MultipointEHDRI:
+                           tmpKeys[0] = FO_FW_POSITION;
+                           tmpKeys[1] = FO_NDF_POSITION;
+                           tmpKeys[2] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 3);
+                           break;
+
+                        case CCT_TelopsFW:
+                        case CCT_MultipointFW:
+                           tmpKeys[0] = FO_NDF_POSITION;
+                           tmpKeys[1] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 2);
+                           break;
+
+                        case CCT_TelopsNDF:
+                        case CCT_MultipointNDF:
+                           tmpKeys[0] = FO_FW_POSITION;
+                           tmpKeys[1] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 2);
+                           break;
+                     }
+                  }
+                  break;
+
+               case FO_FW_POSITION:
+                  retval = file1->info.collection.FWPosition - file2->info.collection.FWPosition;
+                  break;
+
+               case FO_NDF_POSITION:
+                  retval = file1->info.collection.NDFPosition - file2->info.collection.NDFPosition;
+                  break;
+
+               case FO_EXT_LENS_SERIAL:
+                  retval = file1->info.collection.ExternalLensSerialNumber - file2->info.collection.ExternalLensSerialNumber;
+                  break;
+
+               default:
+                  // Not supposed to get there.
+                  break;
+            }
+         }
+         else
+         {
+            retval = (int)(file1->type == FT_TSCO) - (int)(file2->type == FT_TSCO);
+         }
+         break;
+   }
+
+   if ((retval == 0) && (keyCount > 0))
+   {
+      keyCount--;
+      keys++;
+
+      if (keyCount == 0)
+      {
+         keys = NULL;
+      }
+
+      retval = FM_filecmp(file1, file2, keys, keyCount);
+   }
+
+   return retval;
 }
 
 /**
@@ -1190,6 +1436,9 @@ IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file)
       // Copy collection file information in file record data structure
       file->info.collection.CollectionType = collectionInfo.CollectionType;
       file->info.collection.CalibrationType = collectionInfo.CalibrationType;
+      file->info.collection.FWPosition = collectionInfo.FWPosition;
+      file->info.collection.NDFPosition = collectionInfo.NDFPosition;
+      file->info.collection.ExternalLensSerialNumber = collectionInfo.ExternalLensSerialNumber;
       file->info.collection.NumberOfBlocks = collectionInfo.NumberOfBlocks;
 
       for (i = 0; i < collectionInfo.NumberOfBlocks; i++)

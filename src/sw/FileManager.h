@@ -47,11 +47,7 @@
 #define FM_UFFS_MOUNT_POINT_SIZE       5
 #define FM_LONG_FILENAME_SIZE          (FM_UFFS_MOUNT_POINT_SIZE + F1F2_FILE_NAME_SIZE + 1) /** mount point + filename + null char */
 
-#define FM_COLLECTION_FILE_TYPE           "TSCO"
-#define FM_BLOCK_FILE_TYPE                "TSBL"
-#define FM_ACTUALIZATION_FILE_TYPE        "TSAC"
-#define FM_FLASHSETTINGS_FILE_TYPE        "TSFS"
-#define FM_FLASHDYNAMICVALUES_FILE_TYPE   "TSDV"
+#define FM_MAX_NUM_FILE_ORDER_KEY      4    /**< Maximum number of file order key */
 
 #define GetFileID(fr) ((((uint64_t) fr->deviceSerialNumber) << 32) | (uint64_t) fr->posixTime)
 
@@ -83,6 +79,23 @@ enum fmDBPhaseEnum {
 typedef enum fmDBPhaseEnum fmDBPhase_t;
 
 /**
+ * File type.
+ */
+enum fileTypeEnum {
+   FT_NONE = 0,         /**< None */
+   FT_TSAC,             /**< Actualization file */
+   FT_TSBL,             /**< Calibration bloc file */
+   FT_TSCO,             /**< Calibration collection file */
+   FT_TSDV,             /**< Flash dynamic values file */
+   FT_TSFS              /**< Flash settings file */
+};
+
+/**
+ * File type data type.
+ */
+typedef enum fileTypeEnum fileType_t;
+
+/**
  * File record data structure.
  */
 struct fileRecordStruct {
@@ -90,13 +103,16 @@ struct fileRecordStruct {
    uint32_t attributes;                /**< File attributes */
    uint32_t deviceSerialNumber;        /**< File device serial number */
    uint32_t posixTime;                 /**< File POSIX time */
+   fileType_t type;                    /**< File type */
    char name[F1F2_FILE_NAME_SIZE + 1]; /**< File name (F1F2_FILE_NAME_SIZE + NULL char) */
-   char type[F1F2_FILE_TYPE_SIZE + 1]; /**< File type (4 char + NULL char) */
    uint8_t isClosed;                   /**< Indicates whether the file is closed */
    union {
       struct {
          CalibrationCollectionType_t CollectionType;
          calibrationType_t CalibrationType;
+         uint32_t ExternalLensSerialNumber;
+         uint8_t FWPosition;
+         uint8_t NDFPosition;
          uint8_t NumberOfBlocks;
          uint32_t BlockPOSIXTime[CALIB_MAX_NUM_OF_BLOCKS];
       } collection;                    /**< Collection file info */
@@ -110,11 +126,33 @@ struct fileRecordStruct {
 typedef struct fileRecordStruct fileRecord_t;
 
 /**
+ * File order.
+ */
+enum fileOrderEnum {
+   FO_NONE = 0,         /**< None */
+   FO_POSIX_TIME,       /**< Files are ordered by their POSIX time */
+   FO_FILE_TYPE,        /**< Files are ordered by their file type */
+   FO_FILE_NAME,        /**< Files are ordered by their file name */
+   FO_COLLECTION_TYPE,  /**< Collection files are ordered by their collection type */
+   FO_FW_POSITION,      /**< Collection files are ordered by their FW position */
+   FO_NDF_POSITION,     /**< Collection files are ordered by their ND filer position */
+   FO_EXT_LENS_SERIAL,  /**< Collection files are ordered by their external lens serial number */
+   FO_COUNT             /**< File order count */
+};
+
+/**
+ * File order data type.
+ */
+typedef enum fileOrderEnum fileOrder_t;
+
+/**
  * File list data structure.
  */
 struct fileListStruct {
-   uint32_t count;                        /**< File count */
-   fileRecord_t *item[FM_MAX_NUM_FILE];  /**< File record pointer list */
+   uint32_t count;                                    /**< File count */
+   fileRecord_t *item[FM_MAX_NUM_FILE];               /**< File record pointer list */
+   uint32_t keyCount;                                 /**< File order key count */
+   fileOrder_t keys[FM_MAX_NUM_FILE_ORDER_KEY];       /**< File order key list */
 };
 
 /**
@@ -145,17 +183,20 @@ IRC_Status_t FM_InitFileDB();
 void FM_ListFileDB();
 uint8_t FM_FileExists(const char *filename);
 uint32_t FM_GetFileSize(const char *filename);
+fileRecord_t *FM_CreateFile(const char *filename);
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
-IRC_Status_t FM_CreateFile(const char *filename, uint32_t *fileIndex);
 IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase);
 IRC_Status_t FM_RemoveFile(fileRecord_t *file);
 IRC_Status_t FM_Format();
-IRC_Status_t FM_AddFileToList(fileRecord_t *file, fileList_t *fileList);
+IRC_Status_t FM_AddFileToList(fileRecord_t *file, fileList_t *fileList, uint32_t *fileIndex);
 IRC_Status_t FM_RemoveFileFromList(fileRecord_t *file, fileList_t *fileList);
+void FM_SetFileListKeys(fileList_t *fileList, const fileOrder_t *keys, const uint32_t keyCount);
+void FM_SortFileList(fileList_t *fileList);
 fileRecord_t *FM_FindFilePOSIXTimeInList(uint32_t posixTime, const fileList_t *fileList);
 fileRecord_t *FM_FindFileNameInList(const char *filename, const fileList_t *fileList);
 fileRecord_t *FM_GetFileRecord(uint32_t fileIndex);
+
 #endif // FILE_MANAGER_H
 
 

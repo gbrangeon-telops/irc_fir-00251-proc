@@ -2860,7 +2860,7 @@ IRC_Status_t ActualizationFileWriter_SM()
    static uint32_t numDataToProcess;
    static uint16_t dataCRC;
    static uint64_t tic_io_duration;
-   static uint32_t actualization_file_idx = 0xFFFF;
+   static fileRecord_t* actualization_file;
    static int fd = -1;
    static char shortFileName[48];
    static context_t blockContext; // information structure for block processing
@@ -2868,7 +2868,6 @@ IRC_Status_t ActualizationFileWriter_SM()
    static deltabeta_t* currentDeltaBeta = NULL;
 
    char longFilename[FM_LONG_FILENAME_SIZE];
-   fileRecord_t* file;
 
    IRC_Status_t retVal = IRC_NOT_DONE;
    bool error = false;
@@ -2929,10 +2928,13 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       ACT_INF("Will write to file : %s", shortFileName);
 
+      actualization_file = NULL;
+
       // if file does not exist, create it
       if (!FM_FileExists(shortFileName))
       {
-         if (FM_CreateFile(shortFileName, &actualization_file_idx) != IRC_SUCCESS)
+         actualization_file = FM_CreateFile(shortFileName);
+         if (actualization_file == NULL)
          {
             ACT_ERR("Error creating file %s.", shortFileName);
             error = true;
@@ -3145,8 +3147,7 @@ IRC_Status_t ActualizationFileWriter_SM()
          break;
       }
 
-      file = FM_GetFileRecord(actualization_file_idx);
-      file->size = uffs_tell(fd);
+      actualization_file->size = uffs_tell(fd);
 
       // now close the file
       if (uffs_close(fd) == -1)
@@ -3156,10 +3157,11 @@ IRC_Status_t ActualizationFileWriter_SM()
          break;
       }
 
-      FM_CloseFile(file, FMP_RUNNING);
-      //FM_RefreshFileInfoAtIdx(actualization_file_idx);
+      FM_CloseFile(actualization_file, FMP_RUNNING);
 
-      currentDeltaBeta->info.file = file;
+      FM_AddFileToList(actualization_file, &gFM_files, NULL);
+
+      currentDeltaBeta->info.file = actualization_file;
 
       state = FWR_IDLE;
       retVal = IRC_DONE;

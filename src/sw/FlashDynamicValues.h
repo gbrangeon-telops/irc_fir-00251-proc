@@ -39,11 +39,11 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.5.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.6.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
 #define FDV_FILESTRUCTUREMAJORVERSION      1
-#define FDV_FILESTRUCTUREMINORVERSION      5
+#define FDV_FILESTRUCTUREMINORVERSION      6
 #define FDV_FILESTRUCTURESUBMINORVERSION   0
 
 /**
@@ -106,6 +106,30 @@
 #define FDV_DEVICEKEYVALIDATIONHIGH_OFFSET   52
 #define FDV_DEVICEKEYVALIDATIONHIGH_LENGTH   4
 
+#define FDV_FILEORDERKEY1_OFFSET   56
+#define FDV_FILEORDERKEY1_LENGTH   1
+
+#define FDV_FILEORDERKEY2_OFFSET   57
+#define FDV_FILEORDERKEY2_LENGTH   1
+
+#define FDV_FILEORDERKEY3_OFFSET   58
+#define FDV_FILEORDERKEY3_LENGTH   1
+
+#define FDV_FILEORDERKEY4_OFFSET   59
+#define FDV_FILEORDERKEY4_LENGTH   1
+
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY1_OFFSET   60
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY1_LENGTH   1
+
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY2_OFFSET   61
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY2_LENGTH   1
+
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY3_OFFSET   62
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY3_LENGTH   1
+
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY4_OFFSET   63
+#define FDV_CALIBRATIONCOLLECTIONFILEORDERKEY4_LENGTH   1
+
 #define FDV_FLASHDYNAMICVALUESFILECRC16_OFFSET   510
 #define FDV_FLASHDYNAMICVALUESFILECRC16_LENGTH   2
 
@@ -135,6 +159,14 @@ struct flashDynamicValuesStruct {
    uint8_t AcquisitionStartAtStartup;   /**< Indicates whether an acquisition is started at device startup. */
    uint8_t StealthMode;   /**< Indicates whether the device is in stealth mode. */
    uint8_t BadPixelReplacement;   /**< Indicates whether the Bad Pixels Replacement is enabled. */
+   uint8_t FileOrderKey1;   /**< First key for files ordering. */
+   uint8_t FileOrderKey2;   /**< Second key for files ordering. */
+   uint8_t FileOrderKey3;   /**< Third key for files ordering. */
+   uint8_t FileOrderKey4;   /**< Fourth key for files ordering. */
+   uint8_t CalibrationCollectionFileOrderKey1;   /**< First key for calibration collection files ordering. */
+   uint8_t CalibrationCollectionFileOrderKey2;   /**< Second key for calibration collection files ordering. */
+   uint8_t CalibrationCollectionFileOrderKey3;   /**< Third key for calibration collection files ordering. */
+   uint8_t CalibrationCollectionFileOrderKey4;   /**< Fourth key for calibration collection files ordering. */
    char FileSignature[5];   /**< Camera flash dynamic values file signature */
 };
 

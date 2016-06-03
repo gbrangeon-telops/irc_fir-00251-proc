@@ -490,11 +490,11 @@ void Calibration_SM()
             // Initialize average
             calibrationInfo.collection.DeviceTemperatureSensor = 0;
 
-            if (strcmp(cmCalibrationFile->type, FM_COLLECTION_FILE_TYPE) == 0)
+            if (cmCalibrationFile->type == FT_TSCO)
             {
                cmCurrentState = CMS_LOAD_COLLECTION_FILE;
             }
-            else if (strcmp(cmCalibrationFile->type, FM_BLOCK_FILE_TYPE) == 0)
+            else if (cmCalibrationFile->type == FT_TSBL)
             {
                calibrationInfo.collection.NumberOfBlocks = 1;
                blockFiles[0] = cmCalibrationFile;
@@ -590,7 +590,7 @@ void Calibration_SM()
                }
 
                // Validate calibration collection/block consistency
-               if (strcmp(cmCalibrationFile->type, FM_COLLECTION_FILE_TYPE) == 0)
+               if (cmCalibrationFile->type == FT_TSCO)
                {
                   if (headerData.blockFile.CalibrationType != calibrationInfo.collection.CalibrationType)
                   {
@@ -693,7 +693,7 @@ void Calibration_SM()
 
                if (cmCurrentState != CMS_ERROR)
                {
-                  if (strcmp(cmCalibrationFile->type, FM_BLOCK_FILE_TYPE) == 0)
+                  if (cmCalibrationFile->type == FT_TSBL)
                   {
                      // Emulate calibration collection
                      calibrationInfo.collection.POSIXTime = headerData.blockFile.POSIXTime;
@@ -1387,7 +1387,7 @@ void Calibration_SM()
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
             GC_UpdateAECPlusIsAvailable();
 
-            if (strcmp(cmCalibrationFile->type, FM_COLLECTION_FILE_TYPE) == 0)
+            if (cmCalibrationFile->type == FT_TSCO)
             {
                CM_INF("Calibration collection has been successfully loaded (%dms).", elapsed_time_us(tic_collection) / 1000);
             }

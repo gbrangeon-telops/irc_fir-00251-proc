@@ -662,6 +662,7 @@ IRC_Status_t Proc_Sensor_Init()
  */
 IRC_Status_t Proc_FlashDynamicValues_Init()
 {
+   fileOrder_t keys[4];
    IRC_Status_t status = FlashDynamicValues_Init(&gFlashDynamicValues);
 
    gcRegsData.PowerOnAtStartup = gFlashDynamicValues.PowerOnAtStartup;
@@ -670,6 +671,18 @@ IRC_Status_t Proc_FlashDynamicValues_Init()
    gcRegsData.BadPixelReplacement = gFlashDynamicValues.BadPixelReplacement;
    gcRegsData.DeviceKeyValidationLow = gFlashDynamicValues.DeviceKeyValidationLow;
    gcRegsData.DeviceKeyValidationHigh = gFlashDynamicValues.DeviceKeyValidationHigh;
+
+   keys[0] = gFlashDynamicValues.FileOrderKey1;
+   keys[1] = gFlashDynamicValues.FileOrderKey2;
+   keys[2] = gFlashDynamicValues.FileOrderKey3;
+   keys[3] = gFlashDynamicValues.FileOrderKey4;
+   FM_SetFileListKeys(&gFM_files, keys, 4);
+
+   keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
+   keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
+   keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
+   keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
+   FM_SetFileListKeys(&gFM_collections, keys, 4);
 
    return status;
 }

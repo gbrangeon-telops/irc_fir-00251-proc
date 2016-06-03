@@ -24,7 +24,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.5.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.6.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
 /**
@@ -51,6 +51,14 @@ flashDynamicValues_t flashDynamicValuesDefault = {
    /* AcquisitionStartAtStartup = */ 0,
    /* StealthMode = */ 0,
    /* BadPixelReplacement = */ 0,
+   /* FileOrderKey1 = */ 1,
+   /* FileOrderKey2 = */ 0,
+   /* FileOrderKey3 = */ 0,
+   /* FileOrderKey4 = */ 0,
+   /* CalibrationCollectionFileOrderKey1 = */ 4,
+   /* CalibrationCollectionFileOrderKey2 = */ 0,
+   /* CalibrationCollectionFileOrderKey3 = */ 0,
+   /* CalibrationCollectionFileOrderKey4 = */ 0,
    /* FileSignature = */ "TSDV"
 };
 
@@ -154,7 +162,7 @@ IRC_Status_t FlashDynamicValues_Read(uint8_t *buffer, uint32_t buflen, flashDyna
 
 /* AUTO-CODE READ BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.5.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.6.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
    memcpy(&p_flashDynamicValues->DeviceSerialNumber, &buffer[FDV_DEVICESERIALNUMBER_OFFSET], FDV_DEVICESERIALNUMBER_LENGTH);
@@ -171,6 +179,14 @@ IRC_Status_t FlashDynamicValues_Read(uint8_t *buffer, uint32_t buflen, flashDyna
    memcpy(&p_flashDynamicValues->CalibrationCollectionBlockPOSIXTimeAtStartup, &buffer[FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_OFFSET], FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_LENGTH);
    memcpy(&p_flashDynamicValues->DeviceKeyValidationLow, &buffer[FDV_DEVICEKEYVALIDATIONLOW_OFFSET], FDV_DEVICEKEYVALIDATIONLOW_LENGTH);
    memcpy(&p_flashDynamicValues->DeviceKeyValidationHigh, &buffer[FDV_DEVICEKEYVALIDATIONHIGH_OFFSET], FDV_DEVICEKEYVALIDATIONHIGH_LENGTH);
+   memcpy(&p_flashDynamicValues->FileOrderKey1, &buffer[FDV_FILEORDERKEY1_OFFSET], FDV_FILEORDERKEY1_LENGTH);
+   memcpy(&p_flashDynamicValues->FileOrderKey2, &buffer[FDV_FILEORDERKEY2_OFFSET], FDV_FILEORDERKEY2_LENGTH);
+   memcpy(&p_flashDynamicValues->FileOrderKey3, &buffer[FDV_FILEORDERKEY3_OFFSET], FDV_FILEORDERKEY3_LENGTH);
+   memcpy(&p_flashDynamicValues->FileOrderKey4, &buffer[FDV_FILEORDERKEY4_OFFSET], FDV_FILEORDERKEY4_LENGTH);
+   memcpy(&p_flashDynamicValues->CalibrationCollectionFileOrderKey1, &buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY1_OFFSET], FDV_CALIBRATIONCOLLECTIONFILEORDERKEY1_LENGTH);
+   memcpy(&p_flashDynamicValues->CalibrationCollectionFileOrderKey2, &buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY2_OFFSET], FDV_CALIBRATIONCOLLECTIONFILEORDERKEY2_LENGTH);
+   memcpy(&p_flashDynamicValues->CalibrationCollectionFileOrderKey3, &buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY3_OFFSET], FDV_CALIBRATIONCOLLECTIONFILEORDERKEY3_LENGTH);
+   memcpy(&p_flashDynamicValues->CalibrationCollectionFileOrderKey4, &buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY4_OFFSET], FDV_CALIBRATIONCOLLECTIONFILEORDERKEY4_LENGTH);
    memcpy(&p_flashDynamicValues->FlashDynamicValuesFileCRC16, &buffer[FDV_FLASHDYNAMICVALUESFILECRC16_OFFSET], FDV_FLASHDYNAMICVALUESFILECRC16_LENGTH);
 /* AUTO-CODE READ END */
 
@@ -225,7 +241,7 @@ IRC_Status_t FlashDynamicValues_Write(uint8_t *buffer, uint32_t buflen, flashDyn
 
 /* AUTO-CODE WRITE BEGIN */
 // Auto-generated Flash Dynamic Values library.
-// Generated from the Flash Dynamic Values definition XLS file version 1.5.0
+// Generated from the Flash Dynamic Values definition XLS file version 1.6.0
 // using generateFlashDynamicValuesCLib.m Matlab script.
 
    memcpy(&buffer[FDV_DEVICESERIALNUMBER_OFFSET], &p_flashDynamicValues->DeviceSerialNumber, FDV_DEVICESERIALNUMBER_LENGTH);
@@ -242,6 +258,14 @@ IRC_Status_t FlashDynamicValues_Write(uint8_t *buffer, uint32_t buflen, flashDyn
    memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_OFFSET], &p_flashDynamicValues->CalibrationCollectionBlockPOSIXTimeAtStartup, FDV_CALIBRATIONCOLLECTIONBLOCKPOSIXTIMEATSTARTUP_LENGTH);
    memcpy(&buffer[FDV_DEVICEKEYVALIDATIONLOW_OFFSET], &p_flashDynamicValues->DeviceKeyValidationLow, FDV_DEVICEKEYVALIDATIONLOW_LENGTH);
    memcpy(&buffer[FDV_DEVICEKEYVALIDATIONHIGH_OFFSET], &p_flashDynamicValues->DeviceKeyValidationHigh, FDV_DEVICEKEYVALIDATIONHIGH_LENGTH);
+   memcpy(&buffer[FDV_FILEORDERKEY1_OFFSET], &p_flashDynamicValues->FileOrderKey1, FDV_FILEORDERKEY1_LENGTH);
+   memcpy(&buffer[FDV_FILEORDERKEY2_OFFSET], &p_flashDynamicValues->FileOrderKey2, FDV_FILEORDERKEY2_LENGTH);
+   memcpy(&buffer[FDV_FILEORDERKEY3_OFFSET], &p_flashDynamicValues->FileOrderKey3, FDV_FILEORDERKEY3_LENGTH);
+   memcpy(&buffer[FDV_FILEORDERKEY4_OFFSET], &p_flashDynamicValues->FileOrderKey4, FDV_FILEORDERKEY4_LENGTH);
+   memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY1_OFFSET], &p_flashDynamicValues->CalibrationCollectionFileOrderKey1, FDV_CALIBRATIONCOLLECTIONFILEORDERKEY1_LENGTH);
+   memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY2_OFFSET], &p_flashDynamicValues->CalibrationCollectionFileOrderKey2, FDV_CALIBRATIONCOLLECTIONFILEORDERKEY2_LENGTH);
+   memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY3_OFFSET], &p_flashDynamicValues->CalibrationCollectionFileOrderKey3, FDV_CALIBRATIONCOLLECTIONFILEORDERKEY3_LENGTH);
+   memcpy(&buffer[FDV_CALIBRATIONCOLLECTIONFILEORDERKEY4_OFFSET], &p_flashDynamicValues->CalibrationCollectionFileOrderKey4, FDV_CALIBRATIONCOLLECTIONFILEORDERKEY4_LENGTH);
 /* AUTO-CODE WRITE END */
 
    crc16 = CRC16(0xFFFF, buffer, FDV_FLASHDYNAMICVALUESFILECRC16_OFFSET);
@@ -374,15 +398,15 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       strcpy(gFM_fileDB[i].name, FDV_FILENAME);
       gFM_fileDB[i].size = FM_GetFileSize(gFM_fileDB[i].name);
 
-      // Add file to list
-      FM_AddFileToList(&gFM_fileDB[i], &gFM_files);
-
       // Close flash dynamic values file data
       if (FM_CloseFile(&gFM_fileDB[i], FMP_RUNNING) != IRC_SUCCESS)
       {
          FDV_ERR("Cannot close flash dynamic values file.");
          return IRC_FAILURE;
       }
+
+      // Add file to list
+      FM_AddFileToList(&gFM_fileDB[i], &gFM_files, NULL);
    }
 
    FDV_DBG("Flash dynamic values file has been successfully updated (%dms).", elapsed_time_us(tic) / 1000);
@@ -492,6 +516,17 @@ void FlashDynamicValues_UpdateVersion(flashDynamicValues_t *p_flashDynamicValues
              case 4:
                // 1.4.x -> 1.5.x
                p_flashDynamicValues->BadPixelReplacement = flashDynamicValuesDefault.BadPixelReplacement;
+
+             case 5:
+               // 1.5.x -> 1.6.x
+               p_flashDynamicValues->FileOrderKey1 = flashDynamicValuesDefault.FileOrderKey1;
+               p_flashDynamicValues->FileOrderKey2 = flashDynamicValuesDefault.FileOrderKey2;
+               p_flashDynamicValues->FileOrderKey3 = flashDynamicValuesDefault.FileOrderKey3;
+               p_flashDynamicValues->FileOrderKey4 = flashDynamicValuesDefault.FileOrderKey4;
+               p_flashDynamicValues->CalibrationCollectionFileOrderKey1 = flashDynamicValuesDefault.CalibrationCollectionFileOrderKey1;
+               p_flashDynamicValues->CalibrationCollectionFileOrderKey2 = flashDynamicValuesDefault.CalibrationCollectionFileOrderKey2;
+               p_flashDynamicValues->CalibrationCollectionFileOrderKey3 = flashDynamicValuesDefault.CalibrationCollectionFileOrderKey3;
+               p_flashDynamicValues->CalibrationCollectionFileOrderKey4 = flashDynamicValuesDefault.CalibrationCollectionFileOrderKey4;
 
                break; // Break after the last minor version only
 

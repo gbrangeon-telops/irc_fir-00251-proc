@@ -28,6 +28,7 @@
 #include "uffs\uffs.h"
 #include "uffs\uffs_fd.h"
 #include "FlashSettings.h"
+#include "FlashDynamicValues.h"
 #include "proc_memory.h"
 #include "GPS.h"
 #include "trig_gen.h"
@@ -51,6 +52,7 @@ static IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLED(circByteBuffer_t *cbuf);
@@ -81,6 +83,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"BUF", DebugTerminalParseBUF},
    {"LS", DebugTerminalParseLS},
    {"RM", DebugTerminalParseRM},
+   {"FO", DebugTerminalParseFO},
    {"LB", DebugTerminalParseLB},
    {"SB", DebugTerminalParseSB},
    {"LED", DebugTerminalParseLED},
@@ -413,7 +416,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
    uint8_t argStr[11];
    uint32_t arglen;
 
-   arglen = GetNextArg(cbuf, argStr, 10);
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
    argStr[arglen++] = '\0';
    if (strcasecmp((char*)argStr, "DBG") == 0) // data debug diagnosis mode
       cmd = 0;
@@ -669,7 +672,7 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
    uint32_t arglen;
    uint32_t currentMode;
 
-   arglen = GetNextArg(cbuf, argStr, 10);
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
    if (arglen != 3)
    {
       DT_ERR("Unsupported command arguments");
@@ -726,11 +729,57 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
 {
+   uint8_t argStr[6];
+   uint32_t arglen;
+   fileList_t *fileList = NULL;
    uffs_DIR *dp;
    struct uffs_dirent *ep;
    struct uffs_stat filestat;
    long spaceTotal, spaceUsed, spaceFree;
    char filename[FM_LONG_FILENAME_SIZE];
+   uint32_t i;
+
+   if (!CBB_Empty(cbuf))
+   {
+      // Read file list value
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid file list value.");
+         return IRC_FAILURE;
+      }
+      argStr[arglen++] = '\0'; // Add string terminator
+
+      if (strcasecmp((char *)argStr, "FILE") == 0)
+      {
+         fileList = &gFM_files;
+      }
+      else if (strcasecmp((char *)argStr, "COL") == 0)
+      {
+         fileList = &gFM_collections;
+      }
+      else if (strcasecmp((char *)argStr, "BLOCK") == 0)
+      {
+         fileList = &gFM_calibrationBlocks;
+      }
+      else if (strcasecmp((char *)argStr, "NL") == 0)
+      {
+         fileList = &gFM_nlBlocks;
+      }
+      else if (strcasecmp((char *)argStr, "ICU") == 0)
+      {
+         fileList = &gFM_icuBlocks;
+      }
+      else if (strcasecmp((char *)argStr, "ACT") == 0)
+      {
+         fileList = &gFM_calibrationActualizationFiles;
+      }
+      else
+      {
+         DT_ERR("Unknown file list value.");
+         return IRC_FAILURE;
+      }
+   }
 
    // There is supposed to be no remaining bytes in the buffer
    if (!CBB_Empty(cbuf))
@@ -739,42 +788,57 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
       return IRC_FAILURE;
    }
 
-   dp = uffs_opendir(FM_UFFS_MOUNT_POINT);
-   if (dp != NULL)
+   if (fileList == NULL)
    {
-      DT_PRINTF("%s:", FM_UFFS_MOUNT_POINT);
-      while ((ep = uffs_readdir(dp)) != NULL)
+      dp = uffs_opendir(FM_UFFS_MOUNT_POINT);
+      if (dp != NULL)
       {
-         sprintf(filename, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
-         uffs_stat(filename, &filestat);
-         DT_PRINTF("   %s (%d)", ep->d_name, filestat.st_size);
-      }
+         i = 0;
+         while ((ep = uffs_readdir(dp)) != NULL)
+         {
+            sprintf(filename, "%s%s", FM_UFFS_MOUNT_POINT, ep->d_name);
+            uffs_stat(filename, &filestat);
+            DT_PRINTF("%3d: %s (%d)", i++, ep->d_name, filestat.st_size);
+         }
+         DT_PRINTF("%d file(s)", i);
 
-      uffs_closedir(dp);
+         uffs_closedir(dp);
+      }
+      else
+      {
+         DT_ERR("List failed.");
+         return IRC_FAILURE;
+      }
    }
    else
    {
-      DT_ERR("List failed.");
-      return IRC_FAILURE;
+      for (i = 0; i < fileList->count; i++)
+      {
+         DT_PRINTF("%3d: %s (%d)", i, fileList->item[i]->name, fileList->item[i]->size);
+      }
+      DT_PRINTF("%d file(s)", fileList->count);
    }
 
-   spaceTotal = uffs_space_total(FM_UFFS_MOUNT_POINT);
-   spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
-   spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+   if ((fileList == NULL) || (fileList == &gFM_files))
+   {
+      spaceTotal = uffs_space_total(FM_UFFS_MOUNT_POINT);
+      spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
+      spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
 
-   DT_PRINTF("Space used = %d / %d (free = %d / %d)", spaceUsed, spaceTotal, spaceFree, spaceTotal);
+      DT_PRINTF("Space used = %d / %d (free = %d / %d)", spaceUsed, spaceTotal, spaceFree, spaceTotal);
+   }
 
    return IRC_SUCCESS;
 }
 
 /**
  * Debug terminal Remove File command parser.
- * This parser is used to parse and validate Write Memory command arguments and to
+ * This parser is used to parse and validate Remove File command arguments and to
  * execute the command.
  *
  * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
  *
- * @return IRC_SUCCESS when Write Memory command was successfully executed.
+ * @return IRC_SUCCESS when Remove File command was successfully executed.
  * @return IRC_FAILURE otherwise.
  */
 IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
@@ -820,6 +884,156 @@ IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
 }
 
 /**
+ * Debug terminal File Order command parser.
+ * This parser is used to parse and validate File Order command arguments and to
+ * execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when File Order command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
+{
+   extern flashDynamicValues_t gFlashDynamicValues;
+
+   uint8_t argStr[6];
+   uint32_t arglen;
+   fileList_t *fileList;
+   uint32_t keyCount;
+   fileOrder_t keys[FM_MAX_NUM_FILE_ORDER_KEY];
+   uint32_t i;
+
+   const char *strKeys[FO_COUNT] = {
+         "NONE",
+         "POSIX",
+         "TYPE",
+         "NAME",
+         "CTYPE",
+         "FW",
+         "NDF",
+         "LENS"
+   };
+
+   // Read file list value
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid file list value.");
+      return IRC_FAILURE;
+   }
+   argStr[arglen++] = '\0'; // Add string terminator
+
+   if (strcasecmp((char *)argStr, "FILE") == 0)
+   {
+      fileList = &gFM_files;
+   }
+   else if (strcasecmp((char *)argStr, "COL") == 0)
+   {
+      fileList = &gFM_collections;
+   }
+   else if (strcasecmp((char *)argStr, "BLOCK") == 0)
+   {
+      fileList = &gFM_calibrationBlocks;
+   }
+   else if (strcasecmp((char *)argStr, "NL") == 0)
+   {
+      fileList = &gFM_nlBlocks;
+   }
+   else if (strcasecmp((char *)argStr, "ICU") == 0)
+   {
+      fileList = &gFM_icuBlocks;
+   }
+   else if (strcasecmp((char *)argStr, "ACT") == 0)
+   {
+      fileList = &gFM_calibrationActualizationFiles;
+   }
+   else
+   {
+      DT_ERR("Unknown file list value.");
+      return IRC_FAILURE;
+   }
+
+   memset(keys, 0, sizeof(keys));
+   keyCount = 0;
+   while (!CBB_Empty(cbuf) && (keyCount < FM_MAX_NUM_FILE_ORDER_KEY))
+   {
+      // Read file order key value
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid file order key value.");
+         return IRC_FAILURE;
+      }
+      argStr[arglen++] = '\0'; // Add string terminator
+
+      for (i = 0; i < FO_COUNT; i++)
+      {
+         if (strcasecmp((char *)argStr, strKeys[i]) == 0)
+         {
+            keys[keyCount++] = i;
+            break;
+         }
+      }
+
+      if (i == FO_COUNT)
+      {
+         DT_ERR("Unknown file order key value.");
+         return IRC_FAILURE;
+      }
+   }
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!CBB_Empty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   if (keyCount > 0)
+   {
+      // Update file list file order keys and sort it
+      FM_SetFileListKeys(fileList, keys, keyCount);
+
+      // Fill remaining file order keys
+      keyCount = fileList->keyCount;
+      while (keyCount < FM_MAX_NUM_FILE_ORDER_KEY)
+      {
+         keys[keyCount++] = FO_NONE;
+      }
+
+      // Update flash dynamic values
+      if (fileList == &gFM_files)
+      {
+         gFlashDynamicValues.FileOrderKey1 = keys[0];
+         gFlashDynamicValues.FileOrderKey2 = keys[1];
+         gFlashDynamicValues.FileOrderKey3 = keys[2];
+         gFlashDynamicValues.FileOrderKey4 = keys[3];
+         FlashDynamicValues_Update(&gFlashDynamicValues);
+      }
+      else if (fileList == &gFM_collections)
+      {
+         gFlashDynamicValues.CalibrationCollectionFileOrderKey1 = keys[0];
+         gFlashDynamicValues.CalibrationCollectionFileOrderKey2 = keys[1];
+         gFlashDynamicValues.CalibrationCollectionFileOrderKey3 = keys[2];
+         gFlashDynamicValues.CalibrationCollectionFileOrderKey4 = keys[3];
+         FlashDynamicValues_Update(&gFlashDynamicValues);
+      }
+   }
+   else
+   {
+      FPGA_PRINTF("DT: File order keys (%d):", fileList->keyCount);
+      for (i = 0; i < fileList->keyCount; i++)
+      {
+         PRINTF(" %s", strKeys[fileList->keys[i]]);
+      }
+      PRINTF("\n");
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
  * Loopback command parser.
  * This parser is used to parse and validate Loopback command arguments
  * and to execute the command.
@@ -843,7 +1057,7 @@ IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
    uint32_t loopback;
 
    // Read port value
-   arglen = GetNextArg(cbuf, argStr, 6);
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
    if (arglen == 0)
    {
       DT_ERR("Invalid port value.");
@@ -931,7 +1145,7 @@ IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf)
    uint32_t showBytes;
 
    // Read port value
-   arglen = GetNextArg(cbuf, argStr, 6);
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
    if (arglen == 0)
    {
       DT_ERR("Invalid port value.");
@@ -1011,7 +1225,7 @@ IRC_Status_t DebugTerminalParseLED(circByteBuffer_t *cbuf)
    DeviceLedIndicatorState_t testLedState;
 
    // Read LED color value
-   arglen = GetNextArg(cbuf, argStr, 8);
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
    if (arglen == 0)
    {
       DT_ERR("Invalid LED state value.");
@@ -1489,7 +1703,7 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
    if (!CBB_Empty(cbuf))
    {
       // Read key command argument
-      arglen = GetNextArg(cbuf, argStr, 5);
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
       if (arglen == 0)
       {
          DT_ERR("Invalid key command argument.");
@@ -1604,8 +1818,9 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Power status:       POWER");
    DT_PRINTF("  Network status:     NET [0|1 [port]]");
    DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST");
-   DT_PRINTF("  List files:         LS");
+   DT_PRINTF("  List files:         LS [FILE|COL|BLOCK|NL|ICU|ACT]");
    DT_PRINTF("  Remove file:        RM filename");
+   DT_PRINTF("  File order:         FO FILE|COL|BLOCK|NL|ICU|ACT [NONE|POSIX|TYPE|NAME|CTYPE|FW|NDF|LENS]");
    DT_PRINTF("  Loopback:           LB CLINK|PLEORA|OEM|USART 0|1");
    DT_PRINTF("  Show bytes:         SB CLINK|PLEORA|OEM|USART|OUTPUT 0|1");
    DT_PRINTF("  Set led state:      LED AUTO|ERR|WARN|STBY|WARNSTRM|STRM|BUSY|RDY");
