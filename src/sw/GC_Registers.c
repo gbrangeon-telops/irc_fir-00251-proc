@@ -269,7 +269,7 @@ gcRegistersData_t gcRegsData;
 /**
  * DeviceClockFrequency data array
  */
-float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 80000000.0F};
+float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 50000000.0F};
 
 /**
  * DeviceTemperature data array
