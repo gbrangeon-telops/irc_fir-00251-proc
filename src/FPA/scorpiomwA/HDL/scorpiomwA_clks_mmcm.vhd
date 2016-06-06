@@ -60,6 +60,17 @@ architecture rtl of scorpiomwA_clks_mmcm is
          );
    end component;
    
+   component scorpiomwA_17MHz_mmcm
+      port
+         (
+         clk_in            : in     std_logic;
+         mclk_source       : out    std_logic;
+         adc_phase_clk     : out    std_logic;
+         reset             : in     std_logic;
+         locked            : out    std_logic
+         );
+   end component;
+   
    
 begin
    
@@ -97,6 +108,18 @@ begin
          clk_in         => CLK_80M,
          mclk_source    => MCLK_SOURCE,        --  72 MHz
          adc_phase_clk  => ADC_PHASE_CLK,      -- 144 MHz      soit 6.9 ns de delai par tap  
+         reset          => ARESET,
+         locked         => MMCM_LOCKED            
+         );      
+   end generate;
+   
+   MCLK17M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 17_500 generate   
+      begin                                             
+      U17M :  scorpiomwA_17MHz_mmcm
+      port map (   
+         clk_in         => CLK_80M,
+         mclk_source    => MCLK_SOURCE,        --  70.0 MHz
+         adc_phase_clk  => ADC_PHASE_CLK,      -- 210.0 MHz      soit 4.8 ns de delai par tap  
          reset          => ARESET,
          locked         => MMCM_LOCKED            
          );      

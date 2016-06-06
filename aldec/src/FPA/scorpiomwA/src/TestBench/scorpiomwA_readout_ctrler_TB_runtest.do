@@ -31,6 +31,7 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_10MHz_mmcm\scorpiomwA_10MHz_mmcm_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_15MHz_mmcm\scorpiomwA_15MHz_mmcm_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_18MHz_mmcm\scorpiomwA_18MHz_mmcm_funcsim.vhdl 
+acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_17MHz_mmcm\scorpiomwA_17MHz_mmcm_funcsim.vhdl
 
 acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd
 acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\TestBench\scorpiomwA_readout_ctrler_TB.vhd
