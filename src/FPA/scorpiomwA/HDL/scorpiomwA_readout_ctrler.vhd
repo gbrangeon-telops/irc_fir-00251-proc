@@ -32,12 +32,18 @@ entity scorpiomwA_readout_ctrler is
       
       FPA_DATA_VALID    : in std_logic;         
       READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic
+      ADC_SYNC_FLAG     : out std_logic;
+      FPA_ACTIVE_INT    : out std_logic
+      
       );  
 end scorpiomwA_readout_ctrler;
 
 
 architecture rtl of scorpiomwA_readout_ctrler is
+   
+   constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR - 2; -- -2 donne une incertitude de 1.5 MCL sur le début réel de l'integration
+   
+   type active_int_fsm_type is (idle, active_int_st, wait_int_end_st, wait_mclk_st1, wait_mclk_st2);
    type sync_flag_fsm_type is (idle, sync_flag_on_st, sync_flag_off_st, wait_img_begin_st, wait_img_end_st);
    type readout_fsm_type is (idle, readout_st, wait_mclk_fe_st, wait_readout_end_st);
    type line_cnt_pipe_type is array (0 to 3) of unsigned(10 downto 0);
@@ -52,6 +58,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    signal sync_flag_fsm        : sync_flag_fsm_type;
    signal readout_fsm          : readout_fsm_type;
+   signal active_int_fsm       : active_int_fsm_type;
    signal fpa_int_last         : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
@@ -81,15 +88,19 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal fpa_data_valid_i     : std_logic;
    signal fpa_data_valid_last  : std_logic;
    signal fpa_int_i            : std_logic;
+   signal fpa_active_int_i     : std_logic;
+   signal fpa_mclk_rising_edge : std_logic;
+   signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR;
+  
    
    
---   attribute dont_touch : string;
---   attribute dont_touch of sof_pipe         : signal is "true"; 
---   attribute dont_touch of eof_pipe         : signal is "true";
---   attribute dont_touch of sol_pipe         : signal is "true"; 
---   attribute dont_touch of eol_pipe         : signal is "true";
---   attribute dont_touch of fval_pipe        : signal is "true"; 
---   attribute dont_touch of lval_pipe        : signal is "true";
+   --   attribute dont_touch : string;
+   --   attribute dont_touch of sof_pipe         : signal is "true"; 
+   --   attribute dont_touch of eof_pipe         : signal is "true";
+   --   attribute dont_touch of sol_pipe         : signal is "true"; 
+   --   attribute dont_touch of eol_pipe         : signal is "true";
+   --   attribute dont_touch of fval_pipe        : signal is "true"; 
+   --   attribute dont_touch of lval_pipe        : signal is "true";
    
 begin
    
@@ -110,6 +121,8 @@ begin
    READOUT_INFO.SAMP_PULSE <= samp_pulse_pipe(3);
    
    fpa_data_valid_i <= FPA_DATA_VALID;
+   
+   FPA_ACTIVE_INT <= fpa_active_int_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -140,17 +153,13 @@ begin
          else           
             
             fpa_data_valid_last <= fpa_data_valid_i;
-          
+            
             fpa_pclk_last <= FPA_PCLK;
             
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
             
             fpa_mclk_last <= FPA_MCLK;             
-            
-            fpa_int_i <= FPA_INT;
-            fpa_int_last <= fpa_int_i;
-            
             
             -- contrôleur
             case sync_flag_fsm is           
@@ -184,7 +193,74 @@ begin
             
          end if;
       end if;
-   end process;  
+   end process;    
+   
+   --------------------------------------------------
+   -- generation acq_int_o
+   --------------------------------------------------
+   Uo: process(CLK)
+   
+   variable mclk_cnt_inc : std_logic_vector(1 downto 0);
+   
+   begin
+      if rising_edge(CLK) then
+         if sreset = '1' then            
+            active_int_fsm <= idle;
+            fpa_active_int_i <= '0'; 
+            fpa_int_last <= '1';
+            mclk_cnt_inc :=  (others => '0');
+            
+         else  
+            
+            fpa_int_last <= FPA_INT;
+            
+            fpa_mclk_last <= FPA_MCLK;
+            fpa_mclk_rising_edge <= not fpa_mclk_last and FPA_MCLK;
+            
+            mclk_cnt_inc := '0' & fpa_mclk_rising_edge;
+            
+            -- contrôleur
+            case active_int_fsm is           
+               
+               when idle =>   
+                  fpa_active_int_i <= '0';
+                  mclk_cnt <= 0;
+                  if fpa_int_last = '0' and FPA_INT = '1' then 
+                     active_int_fsm <= active_int_st;
+                  end if;
+               
+               when active_int_st =>
+                  mclk_cnt <= mclk_cnt + to_integer(unsigned(mclk_cnt_inc));
+                  if mclk_cnt >= C_FPA_WELL_RESET_TIME_FACTOR then 
+                     fpa_active_int_i <= '1';
+                     active_int_fsm <= wait_int_end_st;        
+                  end if;
+               
+               when wait_int_end_st =>
+                  if fpa_int_last = '1' and FPA_INT = '0' then
+                     active_int_fsm <= wait_mclk_st1;  
+                  end if;
+               
+               when wait_mclk_st1 =>                -- on rallonge au delà de FPA_INT
+                  if fpa_mclk_rising_edge = '1' then 
+                     active_int_fsm <= wait_mclk_st2; 
+                  end if;
+               
+               when wait_mclk_st2 =>                -- on rallonge au delà de FPA_INT
+                  if fpa_mclk_rising_edge = '1' then 
+                     active_int_fsm <= idle; 
+                  end if;
+                  
+               
+               when others =>
+               
+            end case;
+            
+         end if;
+         
+         
+      end if;
+   end process;    
    
    --------------------------------------------------
    -- generation de readout_in_progress
@@ -209,7 +285,7 @@ begin
                   end if;
                
                when wait_mclk_fe_st => 
-                  if pclk_rise = '1' then                              -- on attend la tombée de la MCLK pour eviter des troncatures 
+                  if pclk_rise = '1' then                                      -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
                   end if;                           
                

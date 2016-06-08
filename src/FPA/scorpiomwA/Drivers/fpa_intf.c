@@ -294,7 +294,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 2;                             // ENO : 25 mai 2016: prendre 2 pour MCLK = 10MHz
+   ptrA->real_mode_active_pixel_dly = 3;                             // ENO : 06 juin 2016: prendre 3 pour MCLK = 18MHz
    
    // quad2    
    ptrA->adc_quad2_en = 1;
@@ -359,7 +359,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(3159.4F, 8);      // VCC8 -> offset2(RefOFs) = 3159.4 mV    soit word = 2594
 
    // adc_clk_phase
-   ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC
+   ptrA->adc_clk_phase                     = 0;              // 
      
    WriteStruct(ptrA);
 }
