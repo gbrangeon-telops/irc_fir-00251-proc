@@ -876,6 +876,8 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
    static int32_t RawPosition[3] = {1000000, 1000000, 1000000};
    static uint8_t RawPositionIndex = 0;
 
+   static uint32_t pollingPeriod_ms = NDF_POS_POLLING_PERIOD;
+
    uint32_t threshold;
    int numAck;
    char notification;
@@ -907,6 +909,11 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
 
       StopTimer(&NDF_modeChangeTimer);
       StopTimer(&NDF_commTimer);
+   }
+
+   if (newTarget)
+   {
+      pollingPeriod_ms = NDF_POS_POLLING_PERIOD;
    }
 
    if (TimedOut(&transitionTimer))
@@ -968,7 +975,6 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
 
       {
          int32_t value;
-         uint8_t i;
 
          if (FH_readValue(FH_instance, &value))
          {
@@ -979,25 +985,7 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
             RawPosition[RawPositionIndex++] = value;
             RawPositionIndex %= sizeof(RawPosition)/sizeof(int32_t);
 
-            // sort array to find the median
-            for (i = 0; i < 2; i++)
-            {
-               if (RawPosition[i] > RawPosition[i+1])
-               {
-                  value = RawPosition[i+1];
-                  RawPosition[i+1] = RawPosition[i];
-                  RawPosition[i] = value;
-               }
-            }
-
-            if (RawPosition[0] > RawPosition[1])
-            {
-               value = RawPosition[1];
-               RawPosition[1] = RawPosition[0];
-               RawPosition[0] = value;
-            }
-
-            NDF_currentRawPosition = RawPosition[1];
+            NDF_currentRawPosition = medianOf3(RawPosition);
 
             // reset TransitionOver flag to update header with current position
             if (!nowInTransition && !TransitionOver && (NDF_getFilterIndex(NDF_currentRawPosition, NDF_filterWidth/4) == NDF_getFilterIndex(NDF_RequestedTarget, 0)))
@@ -1009,10 +997,12 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
             if (queryMode)
             {
                // position was queried just for updating the register
-               if (abs(NDF_currentRawPosition - NDF_RequestedTarget) < 30)
-                  StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD_STATIC);
+               if (abs(NDF_currentRawPosition - NDF_RequestedTarget) < 30) // on peut determiner autrement qu'on est en statique ou en dynamique?
+                  pollingPeriod_ms = NDF_POS_POLLING_PERIOD_STATIC;
                else
-                  StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD);
+                  pollingPeriod_ms = NDF_POS_POLLING_PERIOD;
+
+               StartTimer(&NDF_commTimer, pollingPeriod_ms);
 
                posMode = NPM_PAUSE;
             }
@@ -1106,7 +1096,7 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
       {
          StopTimer(&NDF_commTimer);
          NDF_ClearErrors(NDF_ERR_FAULHABERCOMM_TIMEOUT);
-         StartTimer(&NDF_commTimer, NDF_POS_POLLING_PERIOD);
+         StartTimer(&NDF_commTimer, pollingPeriod_ms);
 
          queryMode = true;
          posMode = NPM_QUERY_POS; // en polling seulement

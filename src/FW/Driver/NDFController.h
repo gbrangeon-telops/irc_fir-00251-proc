@@ -46,8 +46,8 @@
 #define NDF_HOMING_TOL                   (uint32_t)5 // counts todo TBD
 #define NDF_HOMING_MAX_PEAK_CURRENT       (uint32_t)100 // [mA]
 #define NDF_HOMING_MAX_CONT_CURRENT       (uint32_t)100 // [mA]
-#define NDF_MAX_PEAK_CURRENT              (uint32_t)1500 // [mA]
-#define NDF_MAX_CONT_CURRENT              (uint32_t)1500 // [mA]
+#define NDF_MAX_PEAK_CURRENT              (uint32_t)3000 // [mA]
+#define NDF_MAX_CONT_CURRENT              (uint32_t)2300 // [mA]
 
 #define NDF_MAX_RPM                     (int32_t)1326 /*< maximum speed */
 #define NDF_ENCODER_COUNTS              (int32_t)2048 /*< number of counts in one motor revolution */
