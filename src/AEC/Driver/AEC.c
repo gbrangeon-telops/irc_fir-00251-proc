@@ -215,7 +215,6 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
    const float binWidth = powf(2, FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
 
-#define AEC_ENABLE_PROFILER
 #ifdef AEC_ENABLE_PROFILER
    static statistics_t aec_stats;
    static statistics_t aec_plus_stats;
