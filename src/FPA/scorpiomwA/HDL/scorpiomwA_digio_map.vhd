@@ -209,26 +209,26 @@ begin
    --------------------------------------------------
    -- fpa_datavalid est filtré avant d'être utilisé
    -------------------------------------------------- 
---   Uf0 : signal_filter
---   generic map(
---      SCAN_WINDOW_LEN => 6)
---   port map(
---      CLK => MCLK_SOURCE,
---      SIG_IN => data_valid_iob,
---      SIG_OUT => data_valid_filt
---      );  
+   --   Uf0 : signal_filter
+   --   generic map(
+   --      SCAN_WINDOW_LEN => 6)
+   --   port map(
+   --      CLK => MCLK_SOURCE,
+   --      SIG_IN => data_valid_iob,
+   --      SIG_OUT => data_valid_filt
+   --      );  
    
    --------------------------------------------------
    -- fpa_error est filtré avant d'être utilisé
    -------------------------------------------------- 
-   Uf1 : signal_filter
-   generic map(
-      SCAN_WINDOW_LEN => 6)
-   port map(
-      CLK => MCLK_SOURCE,
-      SIG_IN => error_iob,
-      SIG_OUT => error_filt
-      );    
+   --   Uf1 : signal_filter
+   --   generic map(
+   --      SCAN_WINDOW_LEN => 6)
+   --   port map(
+   --      CLK => MCLK_SOURCE,
+   --      SIG_IN => error_iob,
+   --      SIG_OUT => error_filt
+   --      );    
    
    --------------------------------------------------------- 
    -- registres dans iob
@@ -437,7 +437,7 @@ begin
                   mclk_i <= mclk_reg;  --
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
-                  error_i <= error_filt;
+                  error_i <= error_iob; -- error_filt;
                   data_valid_i <= data_valid_iob; --data_valid_filt;              
                   -- pragma translate_off
                   data_valid_i <= data_valid_iob;
