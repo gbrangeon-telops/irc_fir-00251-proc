@@ -17,8 +17,8 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #do  "$FIR251PROC\src\fir_00251_top_pelicanD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_230Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_build.do"
-#do  "$FIR251PROC\src\fir_00251_top_scorpiomwD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwA_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_scorpiomwD_build.do"
 
 #Collective builds (non-recursive)
 #---------------------------------
@@ -54,11 +54,11 @@ acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD.bde"
 #FPA scorpiolwD_230Hz
 do D:\Telops\FIR-00251-Proc\src\FPA\scorpiolwD_230Hz\HDL\compil_scorpiolwD_230Hz.do
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD_230Hz.bde"
-#FPA scorpiomwD
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do
-acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwD.bde"
 #FPA scorpiomwA
 do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwA.bde"
+#FPA scorpiomwD
+do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do
+acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwD.bde"
 
 #__END BUILD ALL PROC
