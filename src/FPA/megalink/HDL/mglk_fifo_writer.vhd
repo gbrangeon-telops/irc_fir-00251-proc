@@ -79,10 +79,10 @@ architecture rtl of mglk_fifo_writer is
    signal lval_timeout     : std_logic;
    signal lval_timeout_sync: std_logic;
    
-   attribute dont_touch    : string;
-   attribute dont_touch of lpause_cnt    : signal is "true";
-   attribute dont_touch of lval_i        : signal is "true";
-   attribute dont_touch of fval_i        : signal is "true"; 
+   -- attribute dont_touch    : string;
+   -- attribute dont_touch of lpause_cnt    : signal is "true";
+   -- attribute dont_touch of lval_i        : signal is "true";
+   -- attribute dont_touch of fval_i        : signal is "true"; 
    
 begin
    

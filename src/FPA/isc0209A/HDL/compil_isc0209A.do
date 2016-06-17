@@ -11,7 +11,8 @@ acom -nowarn DAGGEN_0523 -incr \
  D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\FPA_define.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\proxy_define.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_define.vhd \
- d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
+ d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd \
+ d:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
    
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do

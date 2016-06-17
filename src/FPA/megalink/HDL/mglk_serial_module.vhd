@@ -190,17 +190,17 @@ architecture RTL of mglk_serial_module is
    signal hex_data_reg3           : std_logic_vector(3 downto 0);
    signal hex_data_reg4           : std_logic_vector(3 downto 0);   
    
-   attribute dont_touch           : string;
-   attribute dont_touch of resp_err             : signal is "true";
-   attribute dont_touch of resp_sof             : signal is "true";
-   attribute dont_touch of cmd_eof_latch        : signal is "true";
-   attribute dont_touch of resp_dcnt            : signal is "true";
-   attribute dont_touch of serial_cmd_failure   : signal is "true";
-   attribute dont_touch of resp_ack             : signal is "true";
-   attribute dont_touch of fpa_temp_reg         : signal is "true";
-   attribute dont_touch of sub_cmd_byte_cnt     : signal is "true"; 
-   attribute dont_touch of timeout_reached      : signal is "true";
-   --attribute dont_touch of failure_resp_data    : signal is "true";
+   -- attribute dont_touch           : string;
+   -- attribute dont_touch of resp_err             : signal is "true";
+   -- attribute dont_touch of resp_sof             : signal is "true";
+   -- attribute dont_touch of cmd_eof_latch        : signal is "true";
+   -- attribute dont_touch of resp_dcnt            : signal is "true";
+   -- attribute dont_touch of serial_cmd_failure   : signal is "true";
+   -- attribute dont_touch of resp_ack             : signal is "true";
+   -- attribute dont_touch of fpa_temp_reg         : signal is "true";
+   -- attribute dont_touch of sub_cmd_byte_cnt     : signal is "true"; 
+   -- attribute dont_touch of timeout_reached      : signal is "true";
+   ---- attribute dont_touch of failure_resp_data    : signal is "true";
 begin
    
    areset <= not ARESETN;
@@ -609,11 +609,11 @@ begin
       variable temp_lsb_id       : unsigned(7 downto 0);
       variable temp_msb_id       : unsigned(7 downto 0);
       variable temp_bytes_concat : std_logic_vector(15 downto 0);
-      attribute dont_touch : string;
-      attribute dont_touch of temp_lsb             : variable is "true";
-      attribute dont_touch of temp_msb             : variable is "true";
-      attribute dont_touch of temp_lsb_id          : variable is "true";
-      attribute dont_touch of temp_msb_id          : variable is "true";
+      -- attribute dont_touch : string;
+      -- attribute dont_touch of temp_lsb             : variable is "true";
+      -- attribute dont_touch of temp_msb             : variable is "true";
+      -- attribute dont_touch of temp_lsb_id          : variable is "true";
+      -- attribute dont_touch of temp_msb_id          : variable is "true";
       
    begin
       if rising_edge(CLK) then 

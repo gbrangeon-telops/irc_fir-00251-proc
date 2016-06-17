@@ -24,20 +24,8 @@ set_property IOSTANDARD LVDS_25 [get_ports CH0_DATA_*]
 set_property IOSTANDARD LVDS_25 [get_ports CH1_DATA_*]
 #set_property IOSTANDARD LVDS_25 [get_ports CH2_DATA_*]
 set_property DIFF_TERM true [get_ports CH0_DATA_*]
-#set_property DIFF_TERM TRUE [get_ports {CH0_DATA_N[0]}]
-#set_property DIFF_TERM TRUE [get_ports {CH0_DATA_N[1]}]
-#set_property DIFF_TERM TRUE [get_ports {CH0_DATA_N[2]}]
-#set_property DIFF_TERM TRUE [get_ports {CH0_DATA_N[3]}]
 set_property DIFF_TERM true [get_ports CH1_DATA_*]
-#set_property DIFF_TERM TRUE [get_ports {CH1_DATA_N[0]}]
-#set_property DIFF_TERM TRUE [get_ports {CH1_DATA_N[1]}]
-#set_property DIFF_TERM TRUE [get_ports {CH1_DATA_N[2]}]
-#set_property DIFF_TERM TRUE [get_ports {CH1_DATA_N[3]}]
 #set_property DIFF_TERM true [get_ports CH2_DATA_*]
-#set_property DIFF_TERM TRUE [get_ports {CH2_DATA_N[0]}]
-#set_property DIFF_TERM TRUE [get_ports {CH2_DATA_N[1]}]
-#set_property DIFF_TERM TRUE [get_ports {CH2_DATA_N[2]}]
-#set_property DIFF_TERM TRUE [get_ports {CH2_DATA_N[3]}]
 
 set_property PACKAGE_PIN R20 [get_ports {CH0_DATA_N[0]}]
 set_property PACKAGE_PIN T23 [get_ports {CH0_DATA_N[1]}]
@@ -49,24 +37,10 @@ set_property PACKAGE_PIN T19 [get_ports {CH1_DATA_N[1]}]
 set_property PACKAGE_PIN K26 [get_ports {CH1_DATA_N[2]}]
 set_property PACKAGE_PIN N17 [get_ports {CH1_DATA_N[3]}]
 
-#set_property PACKAGE_PIN R18 [get_ports {CH2_DATA_P[0]}]
 #set_property PACKAGE_PIN P18 [get_ports {CH2_DATA_N[0]}]
-#set_property PACKAGE_PIN U17 [get_ports {CH2_DATA_P[1]}]
 #set_property PACKAGE_PIN T17 [get_ports {CH2_DATA_N[1]}]
-#set_property PACKAGE_PIN N18 [get_ports {CH2_DATA_P[2]}]
 #set_property PACKAGE_PIN M19 [get_ports {CH2_DATA_N[2]}]
-#set_property PACKAGE_PIN R16 [get_ports {CH2_DATA_P[3]}]
 #set_property PACKAGE_PIN R17 [get_ports {CH2_DATA_N[3]}]
-
-#iogroup define for bank 13 Chan0-Chan2
-#set_property IODELAY_GROUP IODBANK13 [get_cells U5/idelayctrl_b13]
-#set_property IODELAY_GROUP IODBANK13 [get_cells U5/Ch0_delay*]
-#set_property IODELAY_GROUP IODBANK13 [get_cells U5/Ch1_delay*]
-#set_property IODELAY_GROUP IODBANK13 [get_cells U5/Ch2_delay*]
-
-#iogroup define for bank 12 Chan3
-#set_property IODELAY_GROUP IODBANK12 [get_cells U2/idelayctrl_b12]
-#set_property IODELAY_GROUP IODBANK12 [get_cells U2/Ch3_delay*]
 
 ##################### DETECTOR ################################
 set_property PACKAGE_PIN M26 [get_ports DET_CC_N1]
@@ -119,4 +93,3 @@ set_property IOSTANDARD LVCMOS25 [get_ports DET_FPA_ON]
 
 set_property PACKAGE_PIN N16 [get_ports DET_FREQ_ID]
 set_property IOSTANDARD LVCMOS25 [get_ports DET_FREQ_ID]
-

@@ -68,7 +68,7 @@ architecture rtl of mglk_base_mode_ctrl is
    signal fval_p1             : std_logic;
    signal dval_p1             : std_logic;
    signal din_p1              : std_logic_vector(27 downto 0);
-
+   
    
 begin
    
@@ -76,18 +76,32 @@ begin
    --      double base mode 
    -------------------------------------------------------------------------
    
-   double_base_mode_gen: if DEFINE_FPA_ROIC /= FPA_ROIC_MARS generate	
+   double_base_mode_gen: if PROXY_CLINK_CHANNEL_NUM = 2 generate	
       begin
-      FPA_CH1_OUT_RST   <= FPA_CH1_IN_RST or FPA_CH1_FIFO_FLUSH;
-      FPA_CH1_DOUT_CLK  <= FPA_CH1_DIN_CLK;
+      
+      FPA_CH1_DOUT_CLK  <= FPA_CH1_DIN_CLK;            
       FPA_CH1_DOUT      <= FPA_CH1_DIN;
       FPA_CH1_DOUT_DVAL <= FPA_CH1_DIN_DVAL;
       
-      FPA_CH2_OUT_RST   <= FPA_CH2_IN_RST or FPA_CH2_FIFO_FLUSH;
-      FPA_CH2_DOUT_CLK  <= FPA_CH2_DIN_CLK;
+      FPA_CH2_DOUT_CLK  <= FPA_CH2_DIN_CLK;              
       FPA_CH2_DOUT      <= FPA_CH2_DIN;
       FPA_CH2_DOUT_DVAL <= FPA_CH2_DIN_DVAL;
-      FPA_CH2_CLK_SW    <= '1'; -- l'horloge du canal 2 est FPA_CH2_CLK
+      FPA_CH2_CLK_SW    <= '0'; -- l'horloge du canal 2 est FPA_CH2_CLK
+      -- repartition des pixels
+      U2A: process(FPA_CH1_DIN_CLK) 
+      begin
+         if rising_edge(FPA_CH1_DIN_CLK) then 
+            FPA_CH1_OUT_RST   <= FPA_CH1_IN_RST or FPA_CH1_FIFO_FLUSH;         
+         end if;
+      end process;    
+      
+      U2B: process(FPA_CH2_DIN_CLK) 
+      begin
+         if rising_edge(FPA_CH2_DIN_CLK) then 
+            FPA_CH2_OUT_RST   <= FPA_CH2_IN_RST or FPA_CH2_FIFO_FLUSH;            
+         end if;
+      end process;
+      
    end generate;
    
    
@@ -96,7 +110,7 @@ begin
    --      simple base mode 
    -------------------------------------------------------------------------  
    
-   simple_base_mode_gen: if DEFINE_FPA_ROIC = FPA_ROIC_MARS generate	
+   simple_base_mode_gen: if PROXY_CLINK_CHANNEL_NUM = 1 generate	
       begin
       -- horloges et reset 
       FPA_CH1_DOUT_CLK  <= FPA_CH1_DIN_CLK;      

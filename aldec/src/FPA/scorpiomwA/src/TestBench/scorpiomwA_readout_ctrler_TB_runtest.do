@@ -15,23 +15,13 @@ acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\Proxy_define.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do  
-do d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do
+
 #pour la simulation 
 
-
-#pour la simulation
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\sfifo_w10_d256\sfifo_w10_d256_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_10MHz_mmcm\scorpiomwA_10MHz_mmcm_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_15MHz_mmcm\scorpiomwA_15MHz_mmcm_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_18MHz_mmcm\scorpiomwA_18MHz_mmcm_funcsim.vhdl 
-acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_17MHz_mmcm\scorpiomwA_17MHz_mmcm_funcsim.vhdl
+acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.vhd
+acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
+--acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_diag_data_gen.vhd
+--acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd
 
 acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd
 acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\TestBench\scorpiomwA_readout_ctrler_TB.vhd
@@ -47,7 +37,6 @@ asim -ses scorpiomwA_readout_ctrler_TB
 
 -- dval gen
 wave UUT/*
-wave -noreg samp_cnt
 
 --wave UUT/U6/*
 
@@ -69,4 +58,4 @@ wave -noreg samp_cnt
 -- data reorder
 --wave UUT/U12/*
                      
-run 13 ms
+run 10 ms

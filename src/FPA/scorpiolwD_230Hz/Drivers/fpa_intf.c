@@ -23,6 +23,7 @@
 #include "IRC_status.h"
 #include "CRC.h"
 #include <math.h>
+#include <string.h>
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -428,6 +429,8 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 { 
+   uint32_t temp_32b;
+
    Stat->adc_oper_freq_max_khz   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x00);    
    Stat->adc_analog_channel_num  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x04);   
    Stat->adc_resolution          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x08);   
@@ -449,6 +452,16 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
    Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
+   Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
+   Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
+   temp_32b                            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x6C);
+   memcpy(Stat->fpa_serdes_delay, (uint8_t *)&temp_32b, sizeof(Stat->fpa_serdes_delay));
+   Stat->fpa_serdes_edges[0]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x70);
+   Stat->fpa_serdes_edges[1]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x74);
+   Stat->fpa_serdes_edges[2]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x78);
+   Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
+   Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
+   Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
    
    // verification des statuts en simulation
    #ifdef SIM
@@ -673,12 +686,17 @@ void FPA_SendStatic_SerialCmd(const t_FpaIntf *ptrA)
    // on remplit la table de caractères
    FPA_FillCmdCharTable(0x100, 0x03, 1, &Cmd, &CharIndex);        // adresse 0x100 : double base mode, 4 taps, normal consumption, no inversion 
    
-   CmdByte = 0x7A;                                               // adresse 0x102 : MC interne, MCFreq2 (valider si c'est le 10MHz), Int Source External, CC1 used to start Integration, sampling Position4
+   CmdByte = 0x7A;                                               // adresse 0x102 : MC interne, locking range 2 (8-13MHz), Int Source External, CC1 used to start Integration, sampling Position4
    if ((uint32_t)MGLK_MASTER_CLOCK_IS_EXTERNAL == 1)
       CmdByte |= 0x01;
+   if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+   {
+      // locking range 3 (10-20MHz)
+      CmdByte |= 0x04;
+      CmdByte &= 0xFD;
+   }
    if ((uint32_t)MGLK_INT_SIGNAL_IS_EXTERNAL == 1)
       CmdByte &= 0xEF;
-      
    FPA_FillCmdCharTable(0x102, CmdByte, 1, &Cmd, &CharIndex);        
    
    FPA_FillCmdCharTable(0x140, 0x00, 1, &Cmd, &CharIndex);        // adresse 0x140 : video1 on channelX, Video1 in 1st position in clink frame
@@ -712,19 +730,6 @@ void FPA_SendWindow_SerialCmd(const t_FpaIntf *ptrA)
    // on definit la commande
    Cmd.CmdID         = PROXY_WINDW_CMD_ID;   
    
-   // adresse 0x1A0 : inversion des colonnes ou des lignes, windowing, binning 
-   CmdByte = 0x03;          // valeur par defaut pour ne pas avoir d'inversion et rouler tout le temps en mode windowing pour éviter offset d'image.
-   if (FPA_FLIP_UD == 1)
-      CmdByte &= 0xFE;
-   if (FPA_FLIP_LR == 1)
-      CmdByte &= 0xFD;
-   //if ((ptrA->proxy_xsize != (uint32_t)FPA_WIDTH_MAX) || (ptrA->proxy_ysize != (uint32_t)FPA_HEIGHT_MAX)) 
-   //CmdByte &= 0xF3; 
-   //else
-   //	  CmdByte |= 0x0C;
-   FPA_FillCmdCharTable(0x1A0, CmdByte, 1, &Cmd, &CharIndex);
-   
-   
    // adresse 0x1A1 Power Management pour le windowing
    CmdByte = 0x00;          // valeur par defaut
    if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
@@ -746,6 +751,18 @@ void FPA_SendWindow_SerialCmd(const t_FpaIntf *ptrA)
    FPA_FillCmdCharTable(MGLK_X1MAX_LSB_ADD, ptrA->proxy_x1max, 2, &Cmd, &CharIndex);
    FPA_FillCmdCharTable(MGLK_Y1MAX_LSB_ADD, ptrA->proxy_y1max, 2, &Cmd, &CharIndex);
         
+   // adresse 0x1A0 : inversion des colonnes ou des lignes, windowing, binning
+   CmdByte = 0x03;          // valeur par defaut pour ne pas avoir d'inversion et rouler tout le temps en mode windowing pour éviter offset d'image.
+   if (FPA_FLIP_UD == 1)
+      CmdByte &= 0xFE;
+   if (FPA_FLIP_LR == 1)
+      CmdByte &= 0xFD;
+   //if ((ptrA->proxy_xsize != (uint32_t)FPA_WIDTH_MAX) || (ptrA->proxy_ysize != (uint32_t)FPA_HEIGHT_MAX))
+   //CmdByte &= 0xF3;
+   //else
+   //   CmdByte |= 0x0C;
+   FPA_FillCmdCharTable(0x1A0, CmdByte, 1, &Cmd, &CharIndex);
+
    // nombre de carateres total de la commande
    Cmd.CmdCharNum = CharIndex;
    

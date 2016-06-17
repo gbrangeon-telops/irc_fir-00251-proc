@@ -165,45 +165,17 @@ struct s_FpaStatus    //
    uint32_t  flex_detect_process_done;    // dit si le  processus de détection du flex est achevé
    uint32_t  flex_present;                // dit si une carte valide est détectée
 
-   uint32_t id_cmd_in_error;              // donne la commande en erreur pour les detecteurs numeriques
+   uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 
-   uint32_t  fpa_diag_mode;
-   uint32_t  fpa_diag_type;
-   uint32_t  fpa_pwr_on;
-   uint32_t  fpa_trig_ctrl_mode;
-   uint32_t  fpa_acq_trig_ctrl_dly;
-   uint32_t  fpa_acq_trig_period_min;
-   uint32_t  fpa_xtra_trig_ctrl_dly;
-   uint32_t  fpa_xtra_trig_period_min;
+   // fpa serdes
+   uint32_t  fpa_serdes_done;             // donne l'état de la calibration des serdes pour chaque canal
+   uint32_t  fpa_serdes_success;          // donne le résultat de la calibration des serdes pour chaque canal
+   uint8_t   fpa_serdes_delay[4];         // donne le délai de calibration des serdes pour chaque canal
+   uint32_t  fpa_serdes_edges[4];         // donne les edges trouvés lors de la calibration des serdes pour chaque canal
 
-   //// partie propre au 0207
-//   uint32_t  xstart;
-//   uint32_t  ystart;
-//   uint32_t  xsize;
-//   uint32_t  ysize;
-//   uint32_t  gain;
-//   uint32_t  invert;
-//   uint32_t  revert;
-//   uint32_t  onchip_bin_256;
-//   uint32_t  onchip_bin_128;
-//   uint32_t  pix_samp_num_per_ch;
-//   uint32_t  good_samp_first_pos_per_ch;
-//   uint32_t  good_samp_last_pos_per_ch;
-//   uint32_t  good_samp_sum_num;
-//   uint32_t  good_samp_mean_numerator;
-//   uint32_t  good_samp_mean_div_bit_pos;
-//   uint32_t  ysize_div2_m1;
-//   uint32_t  img_samp_num;
-//   uint32_t  img_samp_num_per_ch;
-//   uint32_t  fpa_active_pixel_dly;
-//   uint32_t  diag_active_pixel_dly;
-//   uint32_t  sof_samp_pos_start_per_ch;
-//   uint32_t  sof_samp_pos_end_per_ch;
-//   uint32_t  eof_samp_pos_start_per_ch;
-//   uint32_t  eof_samp_pos_end_per_ch;
-//   uint32_t  diag_tir;
-//   uint32_t  xsize_div_tapnum;
-
+   // fpa init status
+   uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
+   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

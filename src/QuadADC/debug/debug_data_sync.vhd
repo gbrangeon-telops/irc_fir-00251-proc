@@ -25,7 +25,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
 library work;
-use work.qadc_intf.all;
+use work.fpa_serdes_define.all;
 
 entity debug_data_sync is
    port(

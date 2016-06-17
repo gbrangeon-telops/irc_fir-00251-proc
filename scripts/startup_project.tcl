@@ -5,6 +5,7 @@ set FPA_path $root_dir/src/FPA/isc0207A
 set proj_dir $root_dir/xilinx/${sensor}
 set script_dir $root_dir/scripts
 set aldec_dir $root_dir/aldec/compile
+set common_dir "d:/Telops/fir-00251-Common/VHDL"
 
 
 # Create project
@@ -18,6 +19,9 @@ set_property "target_language" "VHDL" $obj
 
 # Add FPA Files
 add_files $FPA_path/HDL
+
+# Add iserdes (adc) files
+add_files $common_dir/iserdes/adc
 
 # Add top level
 add_files $aldec_dir/$proj_name.vhd
@@ -34,6 +38,8 @@ add_files -norecurse -fileset constrs_1 $constr_dir/$sensor
 # make sure the files are in correct precedence order (as per UG903 recommendation)
 reorder_files -fileset constrs_1 -after [get_files -of_objects constrs_1 -filter {NAME !~ "*specific*"} *timing.xdc] [get_files -of_objects constrs_1 *specific*.xdc]
 reorder_files -fileset constrs_1 -after [get_files -of_objects constrs_1 -filter {NAME !~ "*specific*"} *physical.xdc] [get_files -of_objects constrs_1 *specific_physical.xdc]
+reorder_files -fileset constrs_1 -back  [get_files -of_objects constrs_1 *target.xdc]
+reorder_files -fileset constrs_1 -after [get_files -of_objects constrs_1 *release_target.xdc] [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc]
 
 #Set top level constraint
 set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME !~ "*release*"} *target.xdc] [current_fileset -constrset]

@@ -2,13 +2,14 @@
 #setActivelib work
 	   
 setenv ADC_INTF "D:\Telops\FIR-00251-Proc\src\QuadADC\HDL"
-setenv COMMON "D:\Telops\FIR-00251-Common"
+setenv COMMON "D:\Telops\FIR-00251-Common\VHDL"
 setenv COMMON_HDL "D:\Telops\Common_HDL"
 setenv PROC "D:\Telops\FIR-00251-Proc"
 setenv FPA_COMMON "$COMMON_HDL\Common_Projects\TEL2000\FPA_common\src"
 	   
 # Package
-acom -incr "D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd"
+acom -incr "$COMMON\tel2000pkg.vhd"
+acom "$COMMON\iserdes\adc\fpa_serdes_define.vhd"
 
 #common_hdl
 acom -incr -nowarn DAGGEN_0523 \
@@ -25,13 +26,12 @@ acom -incr -nowarn DAGGEN_0523 \
 	   	 
 acom -incr -nowarn DAGGEN_0523 \
 #"$PROC\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl" \
-"$PROC\src\clink\HDL\idelay_wrapper.vhd" \
-"$ADC_INTF\qadc_intf_defines.vhd" \
+"$COMMON\iserdes\idelay_wrapper.vhd" \
 "$ADC_INTF\adc_clk7x_wrapper.vhd" \
-"$ADC_INTF\adc_iserdes_wrapper.vhd" \
-"$ADC_INTF\delay_calibration.vhd" \
+"$COMMON\iserdes\adc\adc_iserdes_wrapper.vhd" \
+"$COMMON\iserdes\delay_calibration.vhd" \
 "$ADC_INTF\adc_data_sync.vhd" \
-"$ADC_INTF\test_pattern_validator.vhd" \
+"$COMMON\iserdes\adc\test_pattern_validator.vhd" \
 "$ADC_INTF\quad_adc_ctrl.vhd" \
 "$ADC_INTF\adc_receiver_1ch.bde" \
 "$ADC_INTF\adc_data_deserializer_8chn.bde" \

@@ -27,7 +27,7 @@ entity fpa_trig_precontroller is
       CLK_100M         : in std_logic;
       
       -- configuration
-      FPA_INTF_CFG     : in fpa_intf_cfg_type;
+      FPA_INTF_CFG      : in fpa_intf_cfg_type;
       
       -- premier Xtra trig mode  
       PRIM_XTRA_TRIG_ACTIVE: in std_logic;  -- le front montant de ce signal permet de rentrer en mode xtra trig 1
@@ -68,10 +68,10 @@ architecture RTL of fpa_trig_precontroller is
    signal acq_trig_last                : std_logic;
    signal xtra_trig_last               : std_logic; 
    
-   attribute dont_touch                : string;
-   attribute dont_touch of acq_trig_o  : signal is "true";
-   attribute dont_touch of xtra_trig_o : signal is "true";
-   attribute dont_touch of fpa_readout_last  : signal is "true";
+   -- attribute dont_touch                : string;
+   -- attribute dont_touch of acq_trig_o  : signal is "true";
+   -- attribute dont_touch of xtra_trig_o : signal is "true";
+   -- attribute dont_touch of fpa_readout_last  : signal is "true";
    
    
 begin

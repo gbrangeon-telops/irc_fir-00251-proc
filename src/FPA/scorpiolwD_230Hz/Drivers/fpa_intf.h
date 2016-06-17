@@ -175,7 +175,17 @@ struct s_FpaStatus    //
    uint32_t  flex_detect_process_done;    // dit si le  processus de détection du flex est achevé
    uint32_t  flex_present;                // dit si une carte valide est détectée
 
-   uint32_t id_cmd_in_error;              // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
+   uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
+
+   // fpa serdes
+   uint32_t  fpa_serdes_done;             // donne l'état de la calibration des serdes pour chaque canal
+   uint32_t  fpa_serdes_success;          // donne le résultat de la calibration des serdes pour chaque canal
+   uint8_t   fpa_serdes_delay[4];         // donne le délai de calibration des serdes pour chaque canal
+   uint32_t  fpa_serdes_edges[4];         // donne les edges trouvés lors de la calibration des serdes pour chaque canal
+
+   // fpa init status
+   uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
+   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

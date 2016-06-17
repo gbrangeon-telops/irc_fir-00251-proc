@@ -184,14 +184,14 @@ architecture RTL of scd_serial_module is
    signal force_xtra_trig_mode    : std_logic;
    
    
-   attribute dont_touch           : string;
-   attribute dont_touch of resp_err             : signal is "true";
-   attribute dont_touch of resp_hder            : signal is "true";
-   attribute dont_touch of resp_payload         : signal is "true";
-   attribute dont_touch of resp_dcnt            : signal is "true";
-   attribute dont_touch of serial_cmd_failure   : signal is "true";
-   attribute dont_touch of resp_id              : signal is "true";
-   attribute dont_touch of failure_resp_data    : signal is "true";
+   -- attribute dont_touch           : string;
+   -- attribute dont_touch of resp_err             : signal is "true";
+   -- attribute dont_touch of resp_hder            : signal is "true";
+   -- attribute dont_touch of resp_payload         : signal is "true";
+   -- attribute dont_touch of resp_dcnt            : signal is "true";
+   -- attribute dont_touch of serial_cmd_failure   : signal is "true";
+   -- attribute dont_touch of resp_id              : signal is "true";
+   -- attribute dont_touch of failure_resp_data    : signal is "true";
 begin
    
    areset <= not ARESETN;

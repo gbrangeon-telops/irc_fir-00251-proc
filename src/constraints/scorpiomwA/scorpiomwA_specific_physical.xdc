@@ -17,7 +17,6 @@ set_property DIFF_TERM TRUE [get_ports CH1_CLK_N]
 
 # quad3 outputs clock
 #set_property PACKAGE_PIN R23 [get_ports CH2_CLK_N]
-#set_property PACKAGE_PIN R22 [get_ports CH2_CLK_P]
 #set_property IOSTANDARD LVDS_25 [get_ports CH2_CLK_P]
 #set_property IOSTANDARD LVDS_25 [get_ports CH2_CLK_N]
 #set_property DIFF_TERM TRUE [get_ports CH2_CLK_P]
@@ -25,7 +24,6 @@ set_property DIFF_TERM TRUE [get_ports CH1_CLK_N]
 
 # quad4 outputs clock
 #set_property PACKAGE_PIN AC24 [get_ports CH3_CLK_N]
-#set_property PACKAGE_PIN AC23 [get_ports CH3_CLK_P]
 #set_property IOSTANDARD LVDS_25 [get_ports CH3_CLK_P]
 #set_property IOSTANDARD LVDS_25 [get_ports CH3_CLK_N]
 #set_property DIFF_TERM TRUE [get_ports CH3_CLK_P]
@@ -52,7 +50,7 @@ set_property DIFF_TERM true [get_ports CH1_DATA_*]
 #set_property PACKAGE_PIN T17 [get_ports {CH2_DATA_N[1]}]
 #set_property PACKAGE_PIN M19 [get_ports {CH2_DATA_N[2]}]
 #set_property PACKAGE_PIN R17 [get_ports {CH2_DATA_N[3]}]
-#set_property IOSTANDARD LVCMOS25 [get_ports CH2_DATA_*]
+#set_property IOSTANDARD LVDS_25 [get_ports CH2_DATA_*]
 #set_property DIFF_TERM true [get_ports CH2_DATA_*]
 
 # quad4 (adc13 to adc16) data link                                                                            
@@ -60,7 +58,7 @@ set_property DIFF_TERM true [get_ports CH1_DATA_*]
 #set_property PACKAGE_PIN AD24 [get_ports {CH3_DATA_N[1]}]
 #set_property PACKAGE_PIN AC22 [get_ports {CH3_DATA_N[2]}]
 #set_property PACKAGE_PIN AC21 [get_ports {CH3_DATA_N[3]}]
-#set_property IOSTANDARD LVCMOS25 [get_ports CH3_DATA_*]
+#set_property IOSTANDARD LVDS_25 [get_ports CH3_DATA_*]
 #set_property DIFF_TERM true [get_ports CH3_DATA_*]
 
 # quads clks sources                                                         
@@ -118,28 +116,3 @@ set_property IOB TRUE [get_ports SPI_MUX0]
 set_property IOB TRUE [get_ports SPI_MUX1]
 set_property IOB TRUE [get_ports SPI_SCLK]
 set_property IOB TRUE [get_ports SPI_SDI]
-
-#iogroup define for bank13                                                   
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH0/g0.idelayctrl_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH0/CLK_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH0/q*_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH1/CLK_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH1/q*_delay/delay_inst]
-#set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH2/CLK_delay/delay_inst]
-#set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH2/q*_delay/delay_inst]
-
-#iogroup define for bank12                                                    
-#set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/g0.idelayctrl_inst]
-#set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/CLK_delay/delay_inst]
-#set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/q*_delay/delay_inst]
-
-
-
-
-
-
-
-
-
-
-

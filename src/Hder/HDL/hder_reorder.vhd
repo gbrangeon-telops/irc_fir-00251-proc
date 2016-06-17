@@ -75,15 +75,15 @@ architecture RTL of hder_reorder is
    signal ram_dinb, ram_dinb_buf : std_logic_vector(WR_DATA_SLOW'range);
    signal ram_addb, ram_addb_buf : std_logic_vector(RD_ADD'range);
    
-   attribute dont_touch : string;                                   
-   attribute dont_touch of ram_dina  : signal is "true";  
-   attribute dont_touch of ram_adda  : signal is "true";  
-   attribute dont_touch of ram_wea   : signal is "true";  
-   attribute dont_touch of ram_dinb  : signal is "true";  
-   attribute dont_touch of ram_addb  : signal is "true";  
-   attribute dont_touch of ram_web   : signal is "true";  
-   attribute dont_touch of RD_DATA   : signal is "true";  
-   attribute dont_touch of RD_DVAL   : signal is "true";  
+   -- attribute dont_touch : string;                                   
+   -- attribute dont_touch of ram_dina  : signal is "true";  
+   -- attribute dont_touch of ram_adda  : signal is "true";  
+   -- attribute dont_touch of ram_wea   : signal is "true";  
+   -- attribute dont_touch of ram_dinb  : signal is "true";  
+   -- attribute dont_touch of ram_addb  : signal is "true";  
+   -- attribute dont_touch of ram_web   : signal is "true";  
+   -- attribute dont_touch of RD_DATA   : signal is "true";  
+   -- attribute dont_touch of RD_DVAL   : signal is "true";  
    
 begin
    

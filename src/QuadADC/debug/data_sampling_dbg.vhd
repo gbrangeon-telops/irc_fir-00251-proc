@@ -148,19 +148,19 @@ architecture RTL of data_sampling_dbg is
    
    signal gnd : std_ulogic;
    
-   attribute dont_touch : string; 
-   attribute dont_touch of clk560 : signal is "true";
-   attribute dont_touch of clk560_90 : signal is "true";
-   attribute dont_touch of data_0_s : signal is "true";
-   attribute dont_touch of data_1_s : signal is "true";
-   attribute dont_touch of data_2_s : signal is "true";
-   attribute dont_touch of data_3_s : signal is "true";
-   attribute dont_touch of data_0_i : signal is "true";
-   attribute dont_touch of data_1_i : signal is "true";
-   attribute dont_touch of data_2_i : signal is "true";
-   attribute dont_touch of data_3_i : signal is "true";
-   attribute dont_touch of clk_s    : signal is "true";
-   attribute dont_touch of clk_i    : signal is "true";
+   -- attribute dont_touch : string; 
+   -- attribute dont_touch of clk560 : signal is "true";
+   -- attribute dont_touch of clk560_90 : signal is "true";
+   -- attribute dont_touch of data_0_s : signal is "true";
+   -- attribute dont_touch of data_1_s : signal is "true";
+   -- attribute dont_touch of data_2_s : signal is "true";
+   -- attribute dont_touch of data_3_s : signal is "true";
+   -- attribute dont_touch of data_0_i : signal is "true";
+   -- attribute dont_touch of data_1_i : signal is "true";
+   -- attribute dont_touch of data_2_i : signal is "true";
+   -- attribute dont_touch of data_3_i : signal is "true";
+   -- attribute dont_touch of clk_s    : signal is "true";
+   -- attribute dont_touch of clk_i    : signal is "true";
    
 begin
    

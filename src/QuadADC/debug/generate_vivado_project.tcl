@@ -22,7 +22,10 @@ set_property "target_language" "VHDL" $obj
 
 set filelist ""
 
+# Add common project sources
 add_files -norecurse $common_dir
+add_files -norecurse $common_dir/iserdes
+add_files $common_dir/iserdes/adc
 
 #read_ip $ip_dir/ch0_clink_clk_80MHz/ch0_clink_clk_80MHz.xci
 read_ip $ip_dir/afifo_w57d16/afifo_w57d16.xci

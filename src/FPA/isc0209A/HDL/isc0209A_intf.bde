@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 37646
+ FREEID 37807
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -1725,7 +1725,7 @@ HEADER
    }
   }
  }
- SYMBOL "#default" "fpa_status_gen" "fpa_status_gen"
+ SYMBOL "work" "fpa_status_gen" "fpa_status_gen"
  {
   HEADER
   {
@@ -1734,7 +1734,7 @@ HEADER
     #CUSTOM_NAME=""
     #DESCRIPTION=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1437520005"
+    #MODIFIED="1459883594"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="0e299664-6957-489c-b3b5-04717e80637a"
    }
   }
@@ -1743,7 +1743,7 @@ HEADER
    PAGEHEADER
    {
     RECT (-40,-20,400,640)
-    FREEID 227
+    FREEID 228
    }
    
    BODY
@@ -1754,7 +1754,7 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (-20,-6,380,622)
+     AREA (-20,-8,380,620)
     }
     TEXT  39, 0, 0
     {
@@ -1900,6 +1900,14 @@ HEADER
      MARGINS (1,1)
      PARENT 224
      ORIENTATION 2
+    }
+    TEXT  227, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-15,190,177,214)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 226
     }
     PIN  38, 0, 0
     {
@@ -2245,6 +2253,24 @@ HEADER
      LINE  2, 0, 0
      {
       POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  226, 0, 0
+    {
+     COORD (-40,200)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="FPA_SERDES_STAT"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="FPA_SERDES_STAT_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
      }
     }
    }
@@ -5492,7 +5518,7 @@ PAGE ""
 "\n"+
 "\n"+
 ""
-   RECT (4300,3240,5360,3420)
+   RECT (4040,3120,5180,3320)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,255,156),0)
    MARGINS (20,20)
@@ -5616,13 +5642,13 @@ PAGE ""
    {
     #COMPONENT="fpa_status_gen"
     #CUSTOM_NAME=""
-    #LIBRARY="#default"
+    #LIBRARY="work"
     #REFERENCE="U6"
     #SYMBOL="fpa_status_gen"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="0e299664-6957-489c-b3b5-04717e80637a"
    }
    COORD (3160,1400)
-   VERTEXES ( (38,25845), (74,26532), (104,25902), (110,26534), (122,25849), (128,25847), (134,25851), (188,26709), (194,25841), (213,25874), (215,25872), (217,25882), (219,25887), (222,25862), (224,25880), (92,32151), (116,32153) )
+   VERTEXES ( (38,25845), (74,26532), (92,32151), (104,25902), (110,26534), (116,32153), (122,25849), (128,25847), (134,25851), (188,26709), (194,25841), (213,25874), (215,25872), (217,25882), (219,25887), (222,25862), (224,25880), (226,37781) )
    PINPROP 176,"#PIN_STATE","0"
   }
   TEXT  215, 0, 0
@@ -6362,29 +6388,6 @@ PAGE ""
    COLOR (0,4,255)
    FONT (16,0,0,700,1,0,0,"Arial")
   }
-  INSTANCE  857, 0, 0
-  {
-   VARIABLES
-   {
-    #COMPONENT="BusOutput"
-    #CUSTOM_NAME=""
-    #LIBRARY="#terminals"
-    #MDA_RECORD_TOKEN="RECORD"
-    #REFERENCE="IMAGE_INFO"
-    #SYMBOL="BusOutput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
-    #VHDL_TYPE="img_info_type"
-   }
-   COORD (3300,2660)
-  }
-  TEXT  859, 0, 0
-  {
-   TEXT "$#REFERENCE"
-   RECT (3352,2643,3530,2678)
-   ALIGN 4
-   MARGINS (1,1)
-   PARENT 857
-  }
   NET RECORD  1499, 0, 0
   {
    VARIABLES
@@ -6638,6 +6641,20 @@ PAGE ""
     #NAME="DATA_MISO"
     #VHDL_TYPE="t_axi4_stream_miso"
    }
+  }
+  INSTANCE  3439, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="and2"
+    #CUSTOM_NAME=""
+    #LIBRARY="#builtin"
+    #REFERENCE="U3"
+    #SYMBOL="and2"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (2340,2980)
+   VERTEXES ( (6,25988), (2,25990), (4,25978) )
   }
   TEXT  3446, 0, 0
   {
@@ -7040,7 +7057,7 @@ PAGE ""
   {
    LABEL "SignalAssignments_3"
    TEXT "DATA_PATH_STAT(15 downto 9) <=  (others => '0');"
-   RECT (2420,3300,3220,3380)
+   RECT (2420,3300,3220,3400)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,255,156),0)
    MARGINS (20,20)
@@ -7061,10 +7078,18 @@ PAGE ""
 "use work.Fpa_define.all;\n"+
 "use work.fpa_common_pkg.all;\n"+
 "use work.tel2000.all;\n"+
+"use work.fpa_serdes_define.all;\n"+
 "\n"+
 "library work;\n"+
+"library work;\n"+
+"library work;\n"+
+"library work;\n"+
+"library work;\n"+
+"library work;\n"+
+"library work;\n"+
+"library work;\n"+
 "library work;"
-   RECT (200,3500,860,3740)
+   RECT (1160,3480,1820,3780)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(239,235,255),0)
    MARGINS (20,20)
@@ -7122,39 +7147,6 @@ PAGE ""
    ALIGN 9
    MARGINS (1,1)
    PARENT 26119
-  }
-  INSTANCE  11233, 0, 0
-  {
-   VARIABLES
-   {
-    #COMPONENT="BusOutput"
-    #CUSTOM_NAME=""
-    #IS_UNCONSTRAINED_PORT="1"
-    #LIBRARY="#terminals"
-    #MDA_RECORD_TOKEN="RECORD"
-    #REFERENCE="INTF_CFG_FOR_SIM"
-    #SYMBOL="BusOutput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
-    #VHDL_TYPE="fpa_intf_cfg_type"
-   }
-   COORD (3560,3160)
-   VERTEXES ( (2,25994) )
-  }
-  TEXT  11234, 0, 0
-  {
-   TEXT "$#REFERENCE"
-   RECT (3612,3143,3900,3178)
-   ALIGN 4
-   MARGINS (1,1)
-   PARENT 11233
-  }
-  TEXT  11276, 0, 0
-  {
-   TEXT "$#NAME"
-   RECT (3292,3130,3469,3159)
-   ALIGN 9
-   MARGINS (1,1)
-   PARENT 26185
   }
   TEXT  13412, 0, 0
   {
@@ -7888,7 +7880,6 @@ PAGE ""
    MARGINS (1,1)
    PARENT 26095
   }
-  NET WIRE  19096, 0, 0
   TEXT  20334, 0, 0
   {
    TEXT "$#NAME"
@@ -8234,34 +8225,6 @@ PAGE ""
    ALIGN 9
    MARGINS (1,1)
    PARENT 33583
-  }
-  SIGNALASSIGN  25085, 0, 0
-  {
-   LABEL "SignalAssignments_4"
-   TEXT 
-"Uo: process(CLK_80M)\n"+
-"begin       \n"+
-"   if rising_edge(CLK_80M) then \n"+
-"      IMAGE_INFO.EXP_FEEDBK <= ACQ_INT;\n"+
-"      IMAGE_INFO.FRAME_ID <=  unsigned(FRAME_ID);\n"+
-"      IMAGE_INFO.EXP_INFO <=   DISPATCH_INFO.EXP_INFO;\n"+
-"    end if;\n"+
-"end process;\n"+
-"\n"+
-"\n"+
-"\n"+
-""
-   RECT (260,3080,1160,3400)
-   OUTLINE 5,1, (0,0,0)
-   FILL (0,(255,255,156),0)
-   MARGINS (20,20)
-   FONT (12,0,0,400,0,0,0,"Arial")
-   MULTILINE
-   SYNTAXCOLORED
-   SHOWLABEL
-   SHOWTEXT
-   CORNER 10
-   VTX (  37397, 37398 )
   }
   VTX  25654, 0, 0
   {
@@ -9038,14 +9001,6 @@ PAGE ""
   VTX  25993, 0, 0
   {
    COORD (2020,2960)
-  }
-  VTX  25994, 0, 0
-  {
-   COORD (3560,3160)
-  }
-  VTX  25995, 0, 0
-  {
-   COORD (3200,3160)
   }
   VTX  25996, 0, 0
   {
@@ -9838,15 +9793,6 @@ PAGE ""
   {
    NET 37
    VTX 25992, 25993
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
-  RECORD  26185, 0, 0
-  {
-   NET 37
-   VTX 25994, 25995
    VARIABLES
    {
     #NAMED="1"
@@ -12424,37 +12370,6 @@ PAGE ""
     #NAMED="1"
    }
   }
-  VTX  37397, 0, 0
-  {
-   COORD (680,3400)
-  }
-  VTX  37398, 0, 0
-  {
-   COORD (700,3400)
-  }
-  VTX  37399, 0, 0
-  {
-   COORD (680,3420)
-  }
-  WIRE  37400, 0, 0
-  {
-   NET 19096
-   VTX 37397, 37399
-  }
-  VTX  37401, 0, 0
-  {
-   COORD (700,3420)
-  }
-  WIRE  37402, 0, 0
-  {
-   NET 19096
-   VTX 37399, 37401
-  }
-  WIRE  37403, 0, 0
-  {
-   NET 19096
-   VTX 37401, 37398
-  }
   NET WIRE  37454, 0, 0
   {
    VARIABLES
@@ -12551,15 +12466,168 @@ PAGE ""
   {
    VARIABLES
    {
-    #COMPONENT="or2"
+    #COMPONENT="BusOutput"
     #CUSTOM_NAME=""
-    #LIBRARY="#builtin"
-    #REFERENCE="U3"
-    #SYMBOL="or2"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="IMAGE_INFO"
+    #SYMBOL="BusOutput"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="img_info_type"
    }
-   COORD (2340,2980)
-   VERTEXES ( (2,25990), (4,25978), (6,25988) )
+   COORD (2700,2640)
+  }
+  TEXT  37623, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2752,2623,2930,2658)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 37622
+  }
+  SIGNALASSIGN  37624, 0, 0
+  {
+   LABEL "SignalAssignments_2"
+   TEXT 
+"UoA: process(CLK_80M)\n"+
+"begin       \n"+
+"   if rising_edge(CLK_80M) then \n"+
+"      IMAGE_INFO.EXP_FEEDBK <= ACQ_INT;\n"+
+"      IMAGE_INFO.FRAME_ID <=  unsigned(FRAME_ID);\n"+
+"      IMAGE_INFO.EXP_INFO <=   DISPATCH_INFO.EXP_INFO;\n"+
+"    end if;\n"+
+"end process;\n"+
+"\n"+
+"UoB: process(CLK_80M)\n"+
+"begin       \n"+
+"   if rising_edge(CLK_80M) then \n"+
+"      FPA_INTF_CFG_OUT <= FPA_INTF_CFG;\n"+
+"    end if;\n"+
+"end process;\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
+""
+   RECT (220,3200,1120,3780)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  INSTANCE  37625, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="FPA_INTF_CFG_OUT"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="fpa_intf_cfg_type"
+   }
+   COORD (2700,2680)
+  }
+  TEXT  37626, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2752,2663,3048,2698)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 37625
+  }
+  NET RECORD  37698, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="FPA_SERDES_STAT"
+    #VHDL_TYPE="fpa_serdes_stat_type"
+    FPA_SERDES_STAT_TYPE=""
+    RECORD=""
+   }
+  }
+  INSTANCE  37700, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="FPA_SERDES_STAT"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="fpa_serdes_stat_type"
+   }
+   COORD (2760,2740)
+   VERTEXES ( (2,37706) )
+  }
+  TEXT  37702, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2416,2723,2700,2758)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 37700
+  }
+  TEXT  37703, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2765,2711,2996,2740)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 37707
+  }
+  VTX  37705, 0, 0
+  {
+   COORD (3000,2740)
+  }
+  VTX  37706, 0, 0
+  {
+   COORD (2760,2740)
+  }
+  RECORD  37707, 0, 0
+  {
+   NET 37698
+   VTX 37705, 37706
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  37731, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2865,1571,3096,1600)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 37783
+  }
+  VTX  37733, 0, 0
+  {
+   COORD (2860,1600)
+  }
+  VTX  37781, 0, 0
+  {
+   COORD (3120,1600)
+  }
+  RECORD  37783, 0, 0
+  {
+   NET 37698
+   VTX 37733, 37781
+   VARIABLES
+   {
+    #NAMED="1"
+   }
   }
  }
  
@@ -12586,7 +12654,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  37623, 0, 0
+  TEXT  37784, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -12597,7 +12665,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  37624, 0, 0
+  TEXT  37785, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -12608,7 +12676,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  37625, 0, 0
+  TEXT  37786, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -12618,7 +12686,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  37626, 0, 0
+  TEXT  37787, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -12630,27 +12698,27 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  LINE  37627, 0, 0
+  LINE  37788, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3680), (5200,3680) )
    FILL (1,(0,0,0),0)
   }
-  LINE  37628, 0, 0
+  LINE  37789, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3680), (4660,3800) )
   }
-  LINE  37629, 0, 0
+  LINE  37790, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (5200,3800), (5200,3560), (4220,3560), (4220,3800), (5200,3800) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  37630, 0, 0
+  TEXT  37791, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -12665,20 +12733,20 @@ PAGE ""
    VAR
    MULTILINE
   }
-  LINE  37631, 0, 0
+  LINE  37792, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3560), (4660,3680) )
   }
-  LINE  37632, 0, 0
+  LINE  37793, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (5200,3560), (5200,3440), (4660,3440), (4660,3560), (5200,3560) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  37633, 0, 0
+  TEXT  37794, 0, 0
   {
    PAGEALIGN 10
    TEXT "$FIRMWARE"
@@ -12689,7 +12757,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  37634, 0, 0
+  TEXT  37795, 0, 0
   {
    PAGEALIGN 10
    TEXT "$AUTHOR"
@@ -12700,7 +12768,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  37635, 0, 0
+  TEXT  37796, 0, 0
   {
    PAGEALIGN 10
    TEXT "$PROJECT"
@@ -12711,7 +12779,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  37636, 0, 0
+  TEXT  37797, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -12722,7 +12790,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  37637, 0, 0
+  TEXT  37798, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -12733,20 +12801,20 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  37638, 0, 0
+  LINE  37799, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,3560), (4380,3680) )
   }
-  LINE  37639, 0, 0
+  LINE  37800, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4220,3680), (4660,3680) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  37640, 0, 0
+  TEXT  37801, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -12757,7 +12825,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  37641, 0, 0
+  TEXT  37802, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -12768,19 +12836,19 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  37642, 0, 0
+  LINE  37803, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,3680), (4380,3800) )
   }
-  LINE  37643, 0, 0
+  LINE  37804, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4780,3680), (4780,3800) )
   }
-  TEXT  37644, 0, 0
+  TEXT  37805, 0, 0
   {
    PAGEALIGN 10
    TEXT "$REVISION"
@@ -12791,7 +12859,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  BMPPICT  37645, 0, 0
+  BMPPICT  37806, 0, 0
   {
    PAGEALIGN 10
    RECT (4740,3460,5120,3555)

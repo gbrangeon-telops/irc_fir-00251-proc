@@ -77,7 +77,7 @@ architecture rtl of calib_block_sel is
    signal ndf_position_i            : std_logic_vector(calib_block_info_type.sel_value'range);
    signal cal_block_index_max_i     : cal_block_index_type;
    signal calib_block_array         : calib_block_array_type;
-   signal active_block_index        : cal_block_index_type;
+   signal block_index_found        : cal_block_index_type;
    signal calib_block_sel_mode_i    : calib_block_sel_mode_type;
    signal sel_state                 : sel_state_type;
    
@@ -93,11 +93,9 @@ begin
       if rising_edge(CLK) then
          if sresetn = '0' then
             ERR <= (others => '0');
-            error <= (others => '0');
             exp_dval_i <= '0';
             exp_dval_last <= '0';
             calib_block_array <= CALIB_BLOCK_ARRAY_TYPE_DEF;
-            active_block_index <= CAL_BLOCK_INDEX_0;
             FRAME_ID <= (others => '0');
             HDER_INFO <= calib_block_array(0).hder_info;
             HDER_SEND_START <= '0';
@@ -109,7 +107,6 @@ begin
             
             case sel_state is
                when STANDBY =>
-                  error <= (others => '0');
                   cal_block_index_max_i <= CAL_BLOCK_INDEX_MAX;
                   calib_block_sel_mode_i <= CALIB_BLOCK_SEL_MODE;
                   frame_id_i <= std_logic_vector(resize(FPA_IMG_INFO.frame_id, frame_id_i'length));
@@ -125,61 +122,16 @@ begin
                   end if;
                
                when SEL_INDEX =>
-                  -- Determine index depending on mode
-                  case calib_block_sel_mode_i is
-                     when CBSM_USER_SEL_0 =>    active_block_index <= CAL_BLOCK_INDEX_0;
-                     when CBSM_USER_SEL_1 =>    active_block_index <= CAL_BLOCK_INDEX_1;
-                     when CBSM_USER_SEL_2 =>    active_block_index <= CAL_BLOCK_INDEX_2;
-                     when CBSM_USER_SEL_3 =>    active_block_index <= CAL_BLOCK_INDEX_3;
-                     when CBSM_USER_SEL_4 =>    active_block_index <= CAL_BLOCK_INDEX_4;
-                     when CBSM_USER_SEL_5 =>    active_block_index <= CAL_BLOCK_INDEX_5;
-                     when CBSM_USER_SEL_6 =>    active_block_index <= CAL_BLOCK_INDEX_6;
-                     when CBSM_USER_SEL_7 =>    active_block_index <= CAL_BLOCK_INDEX_7;
-                     
-                     when CBSM_EXPOSURE_TIME =>
-                        error(ERR_EXP_TIME_NOT_FOUND) <= '1';
-                        for block_index in 0 to NB_CALIB_BLOCK_MAX-1 loop
-                           if exposure_time = calib_block_array(block_index).sel_value then
-                              active_block_index <= to_unsigned(block_index, active_block_index'length);
-                              error(ERR_EXP_TIME_NOT_FOUND) <= '0';
-                              exit;
-                           end if;
-                        end loop;
-                     
-                     when CBSM_FW_POSITION =>
-                        error(ERR_FW_POS_NOT_FOUND) <= '1';
-                        for block_index in 0 to NB_CALIB_BLOCK_MAX-1 loop
-                           if fw_position_i = calib_block_array(block_index).sel_value then
-                              active_block_index <= to_unsigned(block_index, active_block_index'length);
-                              error(ERR_FW_POS_NOT_FOUND) <= '0';
-                              exit;
-                           end if;
-                        end loop;
-                     
-                     when CBSM_NDF_POSITION =>
-                        error(ERR_NDF_POS_NOT_FOUND) <= '1';
-                        for block_index in 0 to NB_CALIB_BLOCK_MAX-1 loop
-                           if ndf_position_i = calib_block_array(block_index).sel_value then
-                              active_block_index <= to_unsigned(block_index, active_block_index'length);
-                              error(ERR_NDF_POS_NOT_FOUND) <= '0';
-                              exit;
-                           end if;
-                        end loop;
-                     
-                     when others => 
-                        error(ERR_INVALID_SEL_MODE) <= '1';
-                     
-                  end case;
+                  -- Delay for block index selection
                   sel_state <= WRITE_HEADER;
                
                when WRITE_HEADER =>
                   -- Verify index is valid
-                  if active_block_index > cal_block_index_max_i or error /= to_unsigned(0, error'length) then
-                     active_block_index <= CAL_BLOCK_INDEX_0;
+                  if block_index_found > cal_block_index_max_i or error /= to_unsigned(0, error'length) then
                      HDER_INFO <= calib_block_array(0).hder_info;
                      ERR <= std_logic_vector(error or resize((ERR_INVALID_INDEX_FOUND => '1'), error'length));     -- ERR output is latched until next header
                   else
-                     HDER_INFO <= calib_block_array(to_integer(active_block_index)).hder_info;
+                     HDER_INFO <= calib_block_array(to_integer(block_index_found)).hder_info;
                      ERR <= std_logic_vector(error);     -- ERR output is latched until next header
                   end if;
                   FRAME_ID <= frame_id_i;
@@ -189,6 +141,143 @@ begin
                when others =>
                   sel_state <= STANDBY;
                   
+            end case;
+            
+         end if;
+      end if;
+   end process;
+   
+   --------------------------------------------
+   -- Block index selection
+   --------------------------------------------
+   U2 : process(CLK)
+   begin
+      if rising_edge(CLK) then
+         if sresetn = '0' then
+            error <= (others => '0');
+            block_index_found <= CAL_BLOCK_INDEX_0;
+         else
+            -- Determine index depending on mode
+            case calib_block_sel_mode_i is
+               when CBSM_USER_SEL_0 =>
+                  block_index_found <= CAL_BLOCK_INDEX_0;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_1 =>
+                  block_index_found <= CAL_BLOCK_INDEX_1;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_2 =>
+                  block_index_found <= CAL_BLOCK_INDEX_2;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_3 =>
+                  block_index_found <= CAL_BLOCK_INDEX_3;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_4 =>
+                  block_index_found <= CAL_BLOCK_INDEX_4;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_5 =>
+                  block_index_found <= CAL_BLOCK_INDEX_5;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_6 =>
+                  block_index_found <= CAL_BLOCK_INDEX_6;
+                  error <= (others => '0');
+               when CBSM_USER_SEL_7 =>
+                  block_index_found <= CAL_BLOCK_INDEX_7;
+                  error <= (others => '0');
+               
+               when CBSM_EXPOSURE_TIME =>
+                  if exposure_time = calib_block_array(0).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_0;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(1).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_1;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(2).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_2;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(3).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_3;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(4).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_4;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(5).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_5;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(6).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_6;
+                     error <= (others => '0');
+                  elsif exposure_time = calib_block_array(7).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_7;
+                     error <= (others => '0');
+                  else
+                     block_index_found <= CAL_BLOCK_INDEX_0;
+                     error <= (ERR_EXP_TIME_NOT_FOUND => '1', others => '0');
+                  end if;
+               
+               when CBSM_FW_POSITION =>
+                  if fw_position_i = calib_block_array(0).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_0;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(1).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_1;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(2).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_2;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(3).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_3;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(4).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_4;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(5).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_5;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(6).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_6;
+                     error <= (others => '0');
+                  elsif fw_position_i = calib_block_array(7).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_7;
+                     error <= (others => '0');
+                  else
+                     block_index_found <= CAL_BLOCK_INDEX_0;
+                     error <= (ERR_FW_POS_NOT_FOUND => '1', others => '0');
+                  end if;
+               
+               when CBSM_NDF_POSITION =>
+                  if ndf_position_i = calib_block_array(0).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_0;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(1).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_1;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(2).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_2;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(3).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_3;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(4).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_4;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(5).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_5;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(6).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_6;
+                     error <= (others => '0');
+                  elsif ndf_position_i = calib_block_array(7).sel_value then
+                     block_index_found <= CAL_BLOCK_INDEX_7;
+                     error <= (others => '0');
+                  else
+                     block_index_found <= CAL_BLOCK_INDEX_0;
+                     error <= (ERR_NDF_POS_NOT_FOUND => '1', others => '0');
+                  end if;
+               
+               when others => 
+                  block_index_found <= CAL_BLOCK_INDEX_0;
+                  error <= (ERR_INVALID_SEL_MODE => '1', others => '0');
+               
             end case;
             
          end if;

@@ -112,18 +112,18 @@ architecture RTL of irig_frame_decoder_v2 is
    signal idle_cnt                 : unsigned(2 downto 0);
    signal irig_data_i              : irig_data_type;
    
-   attribute dont_touch : string; 
-   --   attribute dont_touch of irig_seconds_reg     : signal is "true"; 
-   --   attribute dont_touch of irig_minutes_reg     : signal is "true";
-   --   attribute dont_touch of irig_hours_reg       : signal is "true";
-   --   attribute dont_touch of irig_dayofyear_reg   : signal is "true";
-   --   attribute dont_touch of irig_tenthsofsec_reg : signal is "true";
-   --   attribute dont_touch of irig_year_reg        : signal is "true"; 
-   attribute dont_touch of irig_data_i          : signal is "true"; 
-   attribute dont_touch of frm_received         : signal is "true";  
-   attribute dont_touch of irig_dout            : signal is "true";
-   attribute dont_touch of irig_dout_dval       : signal is "true";
-   attribute dont_touch of irig_dout_sel        : signal is "true";
+   -- attribute dont_touch : string; 
+   --   -- attribute dont_touch of irig_seconds_reg     : signal is "true"; 
+   --   -- attribute dont_touch of irig_minutes_reg     : signal is "true";
+   --   -- attribute dont_touch of irig_hours_reg       : signal is "true";
+   --   -- attribute dont_touch of irig_dayofyear_reg   : signal is "true";
+   --   -- attribute dont_touch of irig_tenthsofsec_reg : signal is "true";
+   --   -- attribute dont_touch of irig_year_reg        : signal is "true"; 
+   -- attribute dont_touch of irig_data_i          : signal is "true"; 
+   -- attribute dont_touch of frm_received         : signal is "true";  
+   -- attribute dont_touch of irig_dout            : signal is "true";
+   -- attribute dont_touch of irig_dout_dval       : signal is "true";
+   -- attribute dont_touch of irig_dout_sel        : signal is "true";
    
    
 begin 

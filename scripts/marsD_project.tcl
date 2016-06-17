@@ -5,6 +5,7 @@ set FPA_path $root_dir/src/FPA/${sensor}
 set proj_dir $root_dir/xilinx/${sensor}
 set script_dir $root_dir/scripts
 set aldec_dir $root_dir/aldec/compile
+set common_dir "d:/Telops/fir-00251-Common/VHDL"
 
 
 # Create project
@@ -19,6 +20,9 @@ set_property "target_language" "VHDL" $obj
 # Add FPA Files
 add_files $FPA_path/HDL
 add_files $root_dir/src/FPA/megalink/HDL
+
+# Add iserdes (clink) files
+add_files $common_dir/iserdes/clink
 
 # Add top level
 add_files $aldec_dir/$proj_name.vhd

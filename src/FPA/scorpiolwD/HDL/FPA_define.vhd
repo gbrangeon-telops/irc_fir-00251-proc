@@ -36,7 +36,9 @@ package FPA_define is
    constant MGLK_INT_SIGNAL_IS_EXTERNAL   : std_logic := '1';   -- '1' if INT source is external CC1 (FSYNC), '0' si generé sur le Megalink. Doit être compatible avec les registres du piloteC
    constant FPA_INT_TIME_OFFSET_MCLK      : integer   := 0;    -- 0 MCLK d'offset sur le temps d'integration 
    constant MGLK_LVAL_TIMEOUT_MCLK        : integer   := 6;     -- ENO 19 nov 2015: pour corriger bug du Megalink avec son fval qui ne tombe jamais. Si le lval reste à '0' durant 6 MCLK, on suppose que l'image est terminée.  
-
+   constant PROXY_CLINK_CHANNEL_NUM       : integer   := 2;     -- Number of channels in the Camera Link interface with the Megalink (1-> base mode or 2-> dual base mode)
+   
+   
    
    --------------------------------------------
    --  modes diag

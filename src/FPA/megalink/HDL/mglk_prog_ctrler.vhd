@@ -146,16 +146,16 @@ architecture rtl of mglk_prog_ctrler is
    type prog_trig_fsm_type is (idle, img_start, img_end, check_done);
    signal prog_trig_state            : prog_trig_fsm_type;
    
-   attribute dont_touch                         : string;
-   attribute dont_touch of acq_int_i            : signal is "true";
-   attribute dont_touch of fpa_int_i            : signal is "true";
-   attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   attribute dont_touch of acq_frame            : signal is "true";
-   attribute dont_touch of fpa_mclk_p           : signal is "true";
-   attribute dont_touch of Allow_IntTimeChange  : signal is "true";
-   attribute dont_touch of enable_prog_trig     : signal is "true";
-   attribute dont_touch of prog_trig_i          : signal is "true";
-   attribute dont_touch of prog_trig_done       : signal is "true";
+   -- attribute dont_touch                         : string;
+   -- attribute dont_touch of acq_int_i            : signal is "true";
+   -- attribute dont_touch of fpa_int_i            : signal is "true";
+   -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
+   -- attribute dont_touch of acq_frame            : signal is "true";
+   -- attribute dont_touch of fpa_mclk_p           : signal is "true";
+   -- attribute dont_touch of Allow_IntTimeChange  : signal is "true";
+   -- attribute dont_touch of enable_prog_trig     : signal is "true";
+   -- attribute dont_touch of prog_trig_i          : signal is "true";
+   -- attribute dont_touch of prog_trig_done       : signal is "true";
    
 begin
    
@@ -625,6 +625,8 @@ begin
                
                when output_windw_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_windw <= fpa_ser_cfg_to_update.proxy_windw;
+                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.proxy_windw.proxy_ysize;
+                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.proxy_windw.proxy_xsize / PROXY_CLINK_CHANNEL_NUM;
                   actual_cfg.proxy_windw <= fpa_ser_cfg_to_update.proxy_windw;  
                   cfg_updater_fsm <= pause_st1;
                

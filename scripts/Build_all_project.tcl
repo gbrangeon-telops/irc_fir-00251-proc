@@ -253,6 +253,7 @@ set_property target_constrs_file [get_files -of_objects constrs_1 -filter {NAME 
 # End of this build
 close_project
 
+#Build project scorpiomwA
 file attributes $base_dir/xilinx/ -readonly 0
 source $base_dir/scripts/scorpiomwA_project.tcl
 #Use release target constraints file

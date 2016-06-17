@@ -260,19 +260,19 @@ architecture rtl of scd_data_dispatcher is
    signal byte_19                      : std_logic_vector(7 downto 0);
    signal byte_20                      : std_logic_vector(7 downto 0);
    
-   attribute dont_touch                         : string;
-   attribute dont_touch of hder_mosi_i          : signal is "true";
-   attribute dont_touch of last_cmd_id          : signal is "true"; 
-   attribute dont_touch of fpa_int_time         : signal is "true"; 
-   attribute dont_touch of byte_18              : signal is "true";
-   attribute dont_touch of byte_19              : signal is "true";
-   attribute dont_touch of byte_20              : signal is "true";
-   attribute dont_touch of fpa_xsize            : signal is "true";
-   attribute dont_touch of fpa_ysize            : signal is "true";
-   attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
-   attribute dont_touch of fpa_temp_reg_dval    : signal is "true";
-   attribute dont_touch of fpa_temp_reg         : signal is "true";
-   attribute dont_touch of int_indx_i           : signal is "true";
+   -- attribute dont_touch                         : string;
+   -- attribute dont_touch of hder_mosi_i          : signal is "true";
+   -- attribute dont_touch of last_cmd_id          : signal is "true"; 
+   -- attribute dont_touch of fpa_int_time         : signal is "true"; 
+   -- attribute dont_touch of byte_18              : signal is "true";
+   -- attribute dont_touch of byte_19              : signal is "true";
+   -- attribute dont_touch of byte_20              : signal is "true";
+   -- attribute dont_touch of fpa_xsize            : signal is "true";
+   -- attribute dont_touch of fpa_ysize            : signal is "true";
+   -- attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
+   -- attribute dont_touch of fpa_temp_reg_dval    : signal is "true";
+   -- attribute dont_touch of fpa_temp_reg         : signal is "true";
+   -- attribute dont_touch of int_indx_i           : signal is "true";
    
    
 begin

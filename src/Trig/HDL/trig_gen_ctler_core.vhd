@@ -77,13 +77,14 @@ architecture RTL of trig_gen_ctler_core is
    signal internal_pulse_cntraz_i       : std_logic; -- permet de mettre à '0' le compteur de generation des trigs
    signal trig_out_Allow_HighTimeChange : std_logic;
    signal fpa_trig_Allow_HighTimeChange : std_logic;
-
+   
    signal frame_count        : unsigned(31 downto 0);
    signal seq_trig_last      : std_logic;
    signal seq_enable_i       : std_logic;
    signal seq_enable_last_i  : std_logic;
    signal seq_delay_enable_i : std_logic;
-   signal seq_trig_i       : std_logic;
+   signal seq_trig_i         : std_logic;
+   signal trig_seq_sreset    : std_logic := '1';
    
    signal clk_counter_rising        : unsigned(31 downto 0);
    
@@ -200,7 +201,7 @@ begin
    control_proc : process(CLK)
    begin  
       if rising_edge(CLK)then
-         if sreset ='1' then
+         if sreset = '1' then
             mode_sm <= idle;
             done <= '0';
             fpa_trig_param_i.RUN  <= '0';
@@ -223,7 +224,7 @@ begin
                   trig_out_param_i.RUN <= '0';
                   internal_pulse_cntraz_i <='1';
                   gating_enable <= '0';
-
+                  
                   if  fpa_trig_done = '1' and trig_out_done = '1'  and run = '1'  then 
                      if  CONFIG.MODE = INTTRIG then						
                         mode_sm <= IntTrig_st;						
@@ -350,7 +351,7 @@ begin
                   -----------------
                -- etat single Trig	
                when SingleTrig_st =>
-               
+                  
                   --internal_pulse_cntraz_i <= '0';
                   if (seq_enable_i = '1') then
                      internal_pulse_cntraz_i <= '0';
@@ -390,7 +391,7 @@ begin
                      mode_sm <= feedback_to_ppc_st; 
                   end if;
                   --end if;	
-
+                  
                   -----------------
                -- etat sequence Trig	
                when SeqTrig_st =>
@@ -426,7 +427,7 @@ begin
                      trig_out_param_i.RUN <= '0';
                      mode_sm <= feedback_to_ppc_st; 
                   end if;
-                                    
+                  
                   -----------------
                -- etat où on attend que le PPC arrête ce mode avant d'en sortir sinon boucle lorsqu'on ira à idle.
                when Feedback_to_ppc_st =>                  
@@ -455,7 +456,9 @@ begin
       if rising_edge(CLK) then
          seq_trig_last <= seq_trig_i;
          
-         if sreset = '1' or fpa_trig_param_i.acq_window = '0' then
+         trig_seq_sreset <= sreset or not fpa_trig_param_i.acq_window;
+         
+         if trig_seq_sreset = '1' then
             seq_enable_i <= '0';
             frame_count <= (others => '0');
          else
@@ -466,29 +469,29 @@ begin
                   frame_count <= (others => '0');
                end if;
             else
-         
+               
                case CONFIG.trig_activ is
                   when RISINGEDGE =>
                      if (seq_trig_i = '1' and seq_trig_last = '0') then
                         seq_enable_i <= '1';
                         frame_count <= (others => '0');
                      end if;
-                     
+                  
                   when FALLINGEDGE =>
                      if (seq_trig_i = '0' and seq_trig_last = '1') then
                         seq_enable_i <= '1';
                         frame_count <= (others => '0');
                      end if;
-                     
+                  
                   when ANYEDGE =>
                      if (seq_trig_i /= seq_trig_last) then
                         seq_enable_i <= '1';
                         frame_count <= (others => '0');
                      end if;
-                     
+                  
                   when others =>
                      seq_enable_i <= '0';
-                     frame_count <= (others => '0');
+                  frame_count <= (others => '0');
                end case;
             end if;
             
@@ -523,34 +526,34 @@ begin
    begin
       if rising_edge(CLK) then
          seq_enable_last_i <= seq_enable_i;
-
-         if sreset = '1' or fpa_trig_param_i.acq_window = '0' then
+         
+         if trig_seq_sreset = '1' then
             clk_counter_rising <= (others => '0');
             seq_delay_enable_i <= seq_enable_i;
          else
-
-           if CONFIG.FPATRIG_DLY /= to_unsigned(0, CONFIG.FPATRIG_DLY'length) then
-              -- Active les compteurs lors de detection de edge
-              if seq_enable_i = '1' and seq_enable_last_i = '0' and clk_counter_rising = to_unsigned(0, clk_counter_rising'length) then  -- rising edge et aucun rising edge est presentement en traitement
-                 clk_counter_rising <= clk_counter_rising + 1;
-              end if;
-
-              -- rising edge en delai
-              if clk_counter_rising /= to_unsigned(0, clk_counter_rising'length) then
-                 if clk_counter_rising >= (CONFIG.FPATRIG_DLY - 1) then
-                    seq_delay_enable_i <= '1';
-                    clk_counter_rising <= (others => '0');
-                 else
-                    clk_counter_rising <= clk_counter_rising + 1;
-                 end if;
-              end if;
-
-              -- falling edge
-              if seq_delay_enable_i = '1' and seq_enable_i = '0' then
-                 seq_delay_enable_i <= '0';
-              end if;
-
-           end if;
+            
+            if CONFIG.FPATRIG_DLY /= to_unsigned(0, CONFIG.FPATRIG_DLY'length) then
+               -- Active les compteurs lors de detection de edge
+               if seq_enable_i = '1' and seq_enable_last_i = '0' and clk_counter_rising = to_unsigned(0, clk_counter_rising'length) then  -- rising edge et aucun rising edge est presentement en traitement
+                  clk_counter_rising <= clk_counter_rising + 1;
+               end if;
+               
+               -- rising edge en delai
+               if clk_counter_rising /= to_unsigned(0, clk_counter_rising'length) then
+                  if clk_counter_rising >= (CONFIG.FPATRIG_DLY - 1) then
+                     seq_delay_enable_i <= '1';
+                     clk_counter_rising <= (others => '0');
+                  else
+                     clk_counter_rising <= clk_counter_rising + 1;
+                  end if;
+               end if;
+               
+               -- falling edge
+               if seq_delay_enable_i = '1' and seq_enable_i = '0' then
+                  seq_delay_enable_i <= '0';
+               end if;
+               
+            end if;
          end if;
       end if;
    end process DELAY_PROC;

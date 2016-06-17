@@ -46,7 +46,7 @@ architecture rtl of isc0207A_clks_gen is
          CLK    : in std_logic);
    end component;
    
-   component Clk_Divider_Async is
+   component Clk_divider is
       Generic(	
          Factor : integer := 2);		
       Port ( 
@@ -61,7 +61,8 @@ architecture rtl of isc0207A_clks_gen is
    signal quad_clk_default               : std_logic;
    signal quad_clk_raw                   : std_logic;
    signal disable_quad_clk_default_i     : std_logic;
-   signal quad_clk_i                     : std_logic;
+   signal quad_clk_i_0                   : std_logic;
+   signal quad_clk_i_1                   : std_logic;
    signal adc_deserializer_rst_i         : std_logic;
    
    attribute equivalent_register_removal : string;
@@ -89,7 +90,7 @@ begin
    --------------------------------------------------------
    -- Genereteur clock enable pour le détecteur
    -------------------------------------------------------- 
-   U2A: Clk_Divider_Async
+   U2A: Clk_divider
    Generic map(
       Factor=> DEFINE_FPA_MCLK_RATE_FACTOR
       )
@@ -110,7 +111,7 @@ begin
    -- Genereteur clock des adcs quads
    -------------------------------------------------------- 
    -- clock par defaut
-   U3A: Clk_Divider_Async
+   U3A: Clk_divider
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_DEFAULT_FACTOR
       )
@@ -121,7 +122,7 @@ begin
       );   
    
    --   clock reelle utilisable après vérification des limites de la carte ADC
-   U3B: Clk_Divider_Async
+   U3B: Clk_divider
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_FACTOR
       )
@@ -144,11 +145,13 @@ begin
          end if;
          
          -- choix de l'horloge des adcs
-         quad_clk_i <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
+         quad_clk_i_0 <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
+         
+         quad_clk_i_1 <= quad_clk_i_0; -- requis pour conservation trace détecteur
          
          -- registres des IOBs
          for ii in 1 to 4 loop
-            quad_clk_iob(ii) <= quad_clk_i; 
+            quad_clk_iob(ii) <= quad_clk_i_1; 
          end loop;
          
       end if;

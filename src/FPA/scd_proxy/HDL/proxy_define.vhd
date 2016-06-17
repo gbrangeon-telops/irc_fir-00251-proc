@@ -27,11 +27,14 @@ package Proxy_define is
    --------------------------------------------
    -- PROJET: definition
    --------------------------------------------   
+   constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY_SCD;
    constant PROG_FREE_RUNNING_TRIG       : std_logic := '1';   -- cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
    constant FPA_INTF_CLK_RATE_MHZ        : integer := 100;     --  FPA_INTF_CLK_RATE en MHz
    constant SCD_INT_TIME_MIN_US          : integer := 1; 
    constant SCD_MASTER_CLK_RATE_MHZ      : integer := 80;      --
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 3; -- pour le pelicanD, on doit laisser une image dès qu'on change le frameRate car le changement de framerate s'opere toujours en temps d'integration minimale pour ne pas planter mon code
+   constant PROXY_CLINK_CHANNEL_NUM      : integer := 2;     -- Number of channels in the Camera Link interface with the proxy 
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;  -- CLINK IN est à 80MHz ns pour les SCD
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -168,13 +171,15 @@ package Proxy_define is
    ------------------------------------------------
    type fpa_intf_cfg_type is
    record     
-      cmd_to_update_id : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
-	   comn             : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
-      scd_op           : scd_op_cfg_type;     -- tout changement dans scd_op entraine la programmation du detecteur (commnde operationnelle)
-      scd_int          : scd_int_cfg_type;    -- tout changement dans scd_int entraine la programmation du detecteur (commnde temps d'intégration)
-      scd_diag         : scd_diag_cfg_type;   -- tout changement dans scd_diag entraine la programmation du detecteur (commnde PE Syntehtique)
-      scd_temp         : scd_temp_cfg_type;   -- tout changement dans scd_temp entraine la programmation du detecteur (commnde temperature read)  
-      scd_misc         : scd_misc_cfg_type;   -- les changements dans scd_misc ne font pas programmer le detecteur
+      cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
+	   comn                 : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
+      scd_op               : scd_op_cfg_type;     -- tout changement dans scd_op entraine la programmation du detecteur (commnde operationnelle)
+      scd_int              : scd_int_cfg_type;    -- tout changement dans scd_int entraine la programmation du detecteur (commnde temps d'intégration)
+      scd_diag             : scd_diag_cfg_type;   -- tout changement dans scd_diag entraine la programmation du detecteur (commnde PE Syntehtique)
+      scd_temp             : scd_temp_cfg_type;   -- tout changement dans scd_temp entraine la programmation du detecteur (commnde temperature read)  
+      scd_misc             : scd_misc_cfg_type;   -- les changements dans scd_misc ne font pas programmer le detecteur
+      fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
    end record;    
    
    ----------------------------------------------								

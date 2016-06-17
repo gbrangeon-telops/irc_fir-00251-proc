@@ -26,7 +26,7 @@ REFRESH_FLOW=1
 FAMILY=Xilinx14x KINTEX7
 IMPL_TOOL=
 SYNTH_TOOL=
-fileopenfolder=D:\Telops\FIR-00251-Proc\IP\clink_clk_7x80MHz
+fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\iserdes\clink
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -65,24 +65,71 @@ Name7=HTML
 Directory7=d:\Telops\FIR-00251-Proc\aldec\src\Clink_Receiver\
 Extension7=
 
+[Groups]
+TestBench=1
+
+[file_out:/Clink_receiver_tb.bde]
+/..\compile\Clink_receiver_tb.vhd=-1
+
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde]
+/..\compile\clink_signals_validator.vhd=-1
+
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\dly_calib_data_ctrler.bde]
+/..\compile\dly_calib_data_ctrler.vhd=-1
+
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
+/..\compile\clink_calibration.vhd=-1
+
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde]
+/..\compile\clink_delay_validator.vhd=-1
+
 [Files]
 /..\..\..\..\IP\clink_clk_7x80MHz\clink_clk_7x80MHz_funcsim.vhdl=-1
 /..\..\..\IP\clink_deserializer_1ch\clink_deserializer_1ch_funcsim.vhdl=-1
-/..\..\..\..\src\clink\HDL\scd_clink_receiver_2ch.bde=-1
-/..\..\..\..\src\clink\HDL\clink_receiver.vhd=-1
 /..\..\..\..\src\FPA\PelicanD\HDL\FPA_define.vhd=-1
 /..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=-1
 /Clink_receiver_tb.bde=-1
+/..\..\..\..\src\clink\HDL\compil_clink_receiver.do=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_calibration.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_pattern_validator.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_validator_ctrler.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\dly_calib_data_ctler_core.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\dly_calib_data_ctrler.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\high_duration_meas.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\iserdes_wrapper.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_ctrl.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator_core.vhd=-1
+TestBench/clink_receiver_tb_TB.vhd=-1
+TestBench/clink_receiver_tb_TB_runtest.do=-1
 
 [Files.Data]
 .\..\..\..\IP\clink_clk_7x80MHz\clink_clk_7x80MHz_funcsim.vhdl=VHDL Source Code
 .\..\..\IP\clink_deserializer_1ch\clink_deserializer_1ch_funcsim.vhdl=VHDL Source Code
-.\..\..\..\src\clink\HDL\scd_clink_receiver_2ch.bde=Block Diagram
-.\..\..\..\src\clink\HDL\clink_receiver.vhd=VHDL Source Code
-.\..\..\..\src\FPA\PelicanD\HDL\FPA_define.vhd=VHDL Source Code
+.\..\PelicanD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=VHDL Source Code
 .\src\Clink_receiver_tb.bde=Block Diagram
-.\compile\scd_clink_receiver_2ch.vhd=VHDL Source Code
+.\..\..\clink\HDL\compil_clink_receiver.do=Macro
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_calibration.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_pattern_validator.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_validator_ctrler.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\dly_calib_data_ctler_core.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\dly_calib_data_ctrler.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\high_duration_meas.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\iserdes_wrapper.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_ctrl.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator_core.vhd=VHDL Source Code
+.\src\TestBench\clink_receiver_tb_TB.vhd=VHDL Test Bench
+.\src\TestBench\clink_receiver_tb_TB_runtest.do=Macro
 
-[file_out:/..\..\..\..\src\clink\HDL\scd_clink_receiver_2ch.bde]
-/..\compile\scd_clink_receiver_2ch.vhd=-1
+.\..\..\..\src\FPA\PelicanD\HDL\FPA_define.vhd=VHDL Source Code
+.\..\..\..\src\clink\HDL\compil_clink_receiver.do=Macro

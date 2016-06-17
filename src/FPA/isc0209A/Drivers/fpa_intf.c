@@ -23,6 +23,7 @@
 #include "IRC_status.h"
 #include "CRC.h"
 #include <math.h>
+#include <string.h>
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -421,6 +422,8 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 { 
+   uint32_t temp_32b;
+
    Stat->adc_oper_freq_max_khz   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x00);    
    Stat->adc_analog_channel_num  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x04);   
    Stat->adc_resolution          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x08);   
@@ -442,51 +445,17 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
    Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
+   Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
+   Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
+   temp_32b                            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x6C);
+   memcpy(Stat->fpa_serdes_delay, (uint8_t *)&temp_32b, sizeof(Stat->fpa_serdes_delay));
+   Stat->fpa_serdes_edges[0]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x70);
+   Stat->fpa_serdes_edges[1]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x74);
+   Stat->fpa_serdes_edges[2]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x78);
+   Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
+   Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
+   Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
    
-   //Stat->fpa_diag_mode                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
-//   Stat->fpa_diag_type                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
-//   Stat->fpa_pwr_on                    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x6C);
-//
-//   Stat->fpa_trig_ctrl_mode            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x70);
-//   Stat->fpa_acq_trig_ctrl_dly         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x74);
-//   Stat->fpa_acq_trig_period_min       = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x78);
-//   Stat->fpa_xtra_trig_ctrl_dly        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
-//
-//   Stat->fpa_xtra_trig_period_min      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
-//   Stat->xstart                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
-//   Stat->ystart                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
-//   Stat->xsize                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
-//
-//   Stat->ysize                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
-//   Stat->gain                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x94);
-//   Stat->invert                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x98);
-//   Stat->revert                        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x9C);
-//
-//   Stat->onchip_bin_256                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA0);
-//   Stat->onchip_bin_128                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);
-//   Stat->pix_samp_num_per_ch           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
-//   Stat->good_samp_first_pos_per_ch    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xAC);
-//
-//   Stat->good_samp_last_pos_per_ch     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB0);
-//   Stat->good_samp_sum_num             = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB4);
-//   Stat->good_samp_mean_numerator      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);
-//   Stat->good_samp_mean_div_bit_pos    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
-//
-//   Stat->ysize_div2_m1                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
-//   Stat->img_samp_num                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC4);
-//   Stat->img_samp_num_per_ch           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC8);
-//   Stat->fpa_active_pixel_dly          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xCC);
-//
-//   Stat->diag_active_pixel_dly         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD0);
-//   Stat->sof_samp_pos_start_per_ch     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD4);
-//   Stat->sof_samp_pos_end_per_ch       = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD8);
-//   Stat->eof_samp_pos_start_per_ch     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xDC);
-//
-//   Stat->eof_samp_pos_end_per_ch       = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE0);
-//   Stat->diag_tir                      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE4);
-//   Stat->xsize_div_tapnum              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE8);
-
-
    // verification des statuts en simulation
    #ifdef SIM
       PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);

@@ -155,12 +155,12 @@ architecture rtl of mglk_mblaze_intf is
    signal exp_cfg_fsm_state               : integer range 0 to 15; 
    signal ctrled_reset_i                  : std_logic;
    
-   attribute dont_touch                   : string;
-   attribute dont_touch of exp_time_i     : signal is "true";
-   attribute dont_touch of exp_cfg_en     : signal is "true";
-   attribute dont_touch of fpa_exp_info_i : signal is "true";
-   attribute dont_touch of arbiter_fsm_state : signal is "true";
-   attribute dont_touch of exp_cfg_fsm_state : signal is "true";
+   -- attribute dont_touch                   : string;
+   -- attribute dont_touch of exp_time_i     : signal is "true";
+   -- attribute dont_touch of exp_cfg_en     : signal is "true";
+   -- attribute dont_touch of fpa_exp_info_i : signal is "true";
+   -- attribute dont_touch of arbiter_fsm_state : signal is "true";
+   -- attribute dont_touch of exp_cfg_fsm_state : signal is "true";
    
 begin
    

@@ -34379,8 +34379,8 @@ architecture STRUCTURE of blk_mem is
   attribute C_WRITE_WIDTH_B of U0 : label is 128;
   attribute C_XDEVICEFAMILY : string;
   attribute C_XDEVICEFAMILY of U0 : label is "kintex7";
-  attribute DONT_TOUCH : boolean;
-  attribute DONT_TOUCH of U0 : label is true;
+  -- attribute dont_touch : boolean;
+  -- attribute dont_touch of U0 : label is true;
   attribute downgradeipidentifiedwarnings of U0 : label is "yes";
 begin
 GND: unisim.vcomponents.GND

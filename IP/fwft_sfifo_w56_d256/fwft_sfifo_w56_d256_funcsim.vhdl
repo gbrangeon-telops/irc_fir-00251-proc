@@ -1,10 +1,10 @@
 -- Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2013.4 (win64) Build 353583 Mon Dec  9 17:49:19 MST 2013
--- Date        : Tue May 17 02:05:01 2016
+-- Date        : Tue Jun 14 05:19:30 2016
 -- Host        : TELOPS177 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim
---               d:/Telops/FIR-00251-Proc/IP/fwft_sfifo_w56_d256/fwft_sfifo_w56_d256_funcsim.vhdl
+--               D:/Telops/FIR-00251-Proc/IP/fwft_sfifo_w56_d256/fwft_sfifo_w56_d256_funcsim.vhdl
 -- Design      : fwft_sfifo_w56_d256
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.

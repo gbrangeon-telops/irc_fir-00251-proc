@@ -27,6 +27,7 @@ package Proxy_define is
    ----------------------------------------------
    -- Proxy 
    ---------------------------------------------- 
+   constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY_MGLK;
    constant PROXY_GAIN_0                 : std_logic_vector(7 downto 0) := x"00";
    constant PROXY_GAIN_1                 : std_logic_vector(7 downto 0) := x"02";
    constant PROXY_ITR                    : std_logic_vector(7 downto 0) := x"00";
@@ -89,6 +90,7 @@ package Proxy_define is
    constant FPA_MCLK_RATE_FACTOR             : integer := integer(FPA_INTF_CLK_RATE_HZ/FPA_MCLK_RATE_HZ);
    constant FPA_INT_TIME_MIN_FACTOR          : integer := integer((real(FPA_INT_TIME_MIN_NS)*real(FPA_INTF_CLK_RATE_HZ)/1_000_000_000.0));
    constant PROXY_LVAL_TIMEOUT_FACTOR        : integer := integer(MGLK_LVAL_TIMEOUT_MCLK*FPA_INTF_CLK_RATE_HZ/FPA_MCLK_RATE_HZ);
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS     : real    := 1_000_000_000.0/real(FPA_MCLK_RATE_HZ*(4/PROXY_CLINK_CHANNEL_NUM));
    
    -- pour convertir le temps d'integration en coups de 100MHz vers les coups de MCLK
    constant PROXY_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de PROXY_EXP_TIME_CONV_DENOMINATOR  
@@ -165,16 +167,17 @@ package Proxy_define is
    ------------------------------------------------
    type fpa_intf_cfg_type is
    record     
-      cmd_to_update_id : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
-      comn             : fpa_comn_cfg_type;     -- partie commune (utilisée par les modules communs)      
-      proxy_diag       : proxy_diag_cfg_type;   -- tout changement dans proxy_diag entraine la programmation du detecteur (commnde PE Syntehtique) 
-      proxy_windw      : proxy_windw_cfg_type;  -- tout changement dans proxy_diag entraine la programmation du detecteur (commnde PE Syntehtique)
-      proxy_op         : proxy_op_cfg_type;     -- tout changement dans proxy_op entraine la programmation du detecteur (commnde operationnelle)
-      proxy_misc       : proxy_misc_cfg_type;   -- les changements dans proxy_misc ne font pas programmer le detecteur      
-      proxy_int        : proxy_int_cfg_type;    -- tout changement dans proxy_int entraine la programmation du detecteur (commnde temps d'intégration)
-      proxy_temp       : proxy_temp_cfg_type;   -- tout changement dans proxy_temp entraine la programmation du detecteur (commnde temperature read)
-      proxy_static     : proxy_static_cfg_type; -- tout changement dans proxy_temp entraine la programmation du detecteur (commnde temperature read)
-      
+      cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
+      comn                 : fpa_comn_cfg_type;     -- partie commune (utilisée par les modules communs)      
+      proxy_diag           : proxy_diag_cfg_type;   -- tout changement dans proxy_diag entraine la programmation du detecteur (commnde PE Syntehtique) 
+      proxy_windw          : proxy_windw_cfg_type;  -- tout changement dans proxy_diag entraine la programmation du detecteur (commnde PE Syntehtique)
+      proxy_op             : proxy_op_cfg_type;     -- tout changement dans proxy_op entraine la programmation du detecteur (commnde operationnelle)
+      proxy_misc           : proxy_misc_cfg_type;   -- les changements dans proxy_misc ne font pas programmer le detecteur      
+      proxy_int            : proxy_int_cfg_type;    -- tout changement dans proxy_int entraine la programmation du detecteur (commnde temps d'intégration)
+      proxy_temp           : proxy_temp_cfg_type;   -- tout changement dans proxy_temp entraine la programmation du detecteur (commnde temperature read)
+      proxy_static         : proxy_static_cfg_type; -- tout changement dans proxy_temp entraine la programmation du detecteur (commnde temperature read)
+      fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
    end record;
    
    ----------------------------------------------								

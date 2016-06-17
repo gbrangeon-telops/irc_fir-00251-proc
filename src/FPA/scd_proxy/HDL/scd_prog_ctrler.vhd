@@ -118,11 +118,11 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    
-   attribute dont_touch                         : string;
-   attribute dont_touch of acq_int_i            : signal is "true";
-   attribute dont_touch of fpa_int_i            : signal is "true";
-   attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   attribute dont_touch of int_indx_i           : signal is "true";
+   -- attribute dont_touch                         : string;
+   -- attribute dont_touch of acq_int_i            : signal is "true";
+   -- attribute dont_touch of fpa_int_i            : signal is "true";
+   -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
+   -- attribute dont_touch of int_indx_i           : signal is "true";
    
 begin
    
@@ -494,6 +494,8 @@ begin
                
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_op <= fpa_ser_cfg_to_update.scd_op;
+                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;
+                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_CHANNEL_NUM;
                   actual_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
                   actual_cfg.scd_int.scd_int_time <= to_unsigned(SCD_OP_INT_TIME_DEFAULT_FACTOR, actual_cfg.scd_int.scd_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
                   proxy_static_done <= '1';

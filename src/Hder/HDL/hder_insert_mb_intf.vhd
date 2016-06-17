@@ -130,12 +130,12 @@ architecture rtl of hder_insert_mb_intf is
    signal ram_wr_data_i      : std_logic_vector(31 downto 0);
    signal ram_bwe_i           : std_logic_vector(3 downto 0);
    
-   attribute dont_touch        : string;                                   
-   attribute dont_touch of config_i  : signal is "true";    
-   attribute dont_touch of hdr_rx_mosi  : signal is "true";
-   attribute dont_touch of ram_wr_add_i  : signal is "true";
-   attribute dont_touch of ram_wr_data_i  : signal is "true";
-   attribute dont_touch of ram_bwe_i  : signal is "true";
+   -- attribute dont_touch        : string;                                   
+   -- attribute dont_touch of config_i  : signal is "true";    
+   -- attribute dont_touch of hdr_rx_mosi  : signal is "true";
+   -- attribute dont_touch of ram_wr_add_i  : signal is "true";
+   -- attribute dont_touch of ram_wr_data_i  : signal is "true";
+   -- attribute dont_touch of ram_bwe_i  : signal is "true";
    
 begin	
    

@@ -5,6 +5,7 @@ acom d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\FPA_define.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\Proxy_define.vhd 
+acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
@@ -109,7 +110,7 @@ asim -ses isc0207a_intf_testbench_TB
 --wave UUT/U1/U21/U3/*
 
 
--- brd_id_reader
+-- adc brd_id_reader
 --wave UUT/U1/U21/U5/U2/*
 
 -- services ctrl
@@ -129,11 +130,16 @@ asim -ses isc0207a_intf_testbench_TB
 
 
 -- module FPA
-wave UUT/U1/* 
+--wave UUT/U1/* 
 
 --wave UUT/U14/U1/* 
 --wave UUT/U14/U11/*
-wave UUT/TRACE_ERR*
+--wave UUT/TRACE_ERR*
+ 
+ -- flex brd_id_reader
+--wave UUT/U1/U21/U6/U2/*
+--wave UUT/U1/U21/U6/*
 
+wave UUT/U1/U21/U2/*
 
-run 20 ms
+run 3.0 ms

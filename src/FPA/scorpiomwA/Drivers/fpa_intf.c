@@ -76,15 +76,15 @@
 #define VHD_CLK_80M_RATE_HZ                80000000
 
 // horloge des ADCs
-#ifdef FPA_MCLK_RATE_HZ == 10000000
-   #define ADC_SAMPLING_RATE_HZ           40000000    // les ADC roulent à 40MHz
-#elif  FPA_MCLK_RATE_HZ == 15000000
-   #define ADC_SAMPLING_RATE_HZ           30000000    // les ADC roulent à 30MHz
-#elif  FPA_MCLK_RATE_HZ == 17500000
-   #define ADC_SAMPLING_RATE_HZ           35000000    // les ADC roulent à 35MHz
-#elif  FPA_MCLK_RATE_HZ == 18000000
+//#ifdef FPA_MCLK_RATE_HZ == 10000000
+//   #define ADC_SAMPLING_RATE_HZ           40000000    // les ADC roulent à 40MHz
+//#elif  FPA_MCLK_RATE_HZ == 15000000
+//   #define ADC_SAMPLING_RATE_HZ           30000000    // les ADC roulent à 30MHz
+//#elif  FPA_MCLK_RATE_HZ == 17500000
+//   #define ADC_SAMPLING_RATE_HZ           35000000    // les ADC roulent à 35MHz
+//#elif  FPA_MCLK_RATE_HZ == 18000000
    #define ADC_SAMPLING_RATE_HZ           36000000    // les ADC roulent à 36MHz
-#endif
+//#endif
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits

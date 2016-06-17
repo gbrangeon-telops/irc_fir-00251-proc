@@ -58,8 +58,8 @@ architecture RTL of exp_time_manager is
    signal exp_feedbk_sync_last    : std_logic;
    signal fpa_synchro_done        : std_logic;
    
-   attribute dont_touch                        : string;
-   attribute dont_touch of fpa_exp_info_latch  : signal is "true";
+   -- attribute dont_touch                        : string;
+   -- attribute dont_touch of fpa_exp_info_latch  : signal is "true";
    
 begin
    

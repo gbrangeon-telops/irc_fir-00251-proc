@@ -247,14 +247,14 @@ architecture rtl of mglk_data_dispatcher is
    signal pix_count                    : unsigned(31 downto 0);
    signal proxy_int_time               : unsigned(23 downto 0);
    
-   attribute dont_touch                         : string;
-   attribute dont_touch of frame_start_id       : signal is "true";
-   attribute dont_touch of last_cmd_id          : signal is "true"; 
-   attribute dont_touch of fpa_int_time         : signal is "true"; 
-   attribute dont_touch of byte_18              : signal is "true";
-   attribute dont_touch of byte_19              : signal is "true";
-   attribute dont_touch of byte_20              : signal is "true";
-   attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
+   -- attribute dont_touch                         : string;
+   -- attribute dont_touch of frame_start_id       : signal is "true";
+   -- attribute dont_touch of last_cmd_id          : signal is "true"; 
+   -- attribute dont_touch of fpa_int_time         : signal is "true"; 
+   -- attribute dont_touch of byte_18              : signal is "true";
+   -- attribute dont_touch of byte_19              : signal is "true";
+   -- attribute dont_touch of byte_20              : signal is "true";
+   -- attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
    
 begin
    

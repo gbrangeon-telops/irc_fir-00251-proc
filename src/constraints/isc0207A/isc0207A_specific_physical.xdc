@@ -88,7 +88,6 @@ set_property PACKAGE_PIN N19 [get_ports FPA_DIGIO10]
 set_property PACKAGE_PIN P25 [get_ports FPA_DIGIO11]
 set_property PACKAGE_PIN R25 [get_ports FPA_DIGIO12]
 set_property IOSTANDARD LVCMOS25 [get_ports FPA_DIGIO*]
-set_property IOSTANDARD LVCMOS25 [get_ports FPA_DIGIO*]
 #set_property IOB TRUE [get_ports FPA_DIGIO*] 
 
 # fpa_freq_id
@@ -117,28 +116,3 @@ set_property IOB TRUE [get_ports SPI_MUX0]
 set_property IOB TRUE [get_ports SPI_MUX1]
 set_property IOB TRUE [get_ports SPI_SCLK]
 set_property IOB TRUE [get_ports SPI_SDI]
-
-#iogroup define for bank13                                                   
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH0/g0.idelayctrl_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH0/CLK_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH0/q*_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH1/CLK_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH1/q*_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH2/CLK_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK13 [get_cells U1/CH2/q*_delay/delay_inst]
-
-#iogroup define for bank12                                                    
-set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/g0.idelayctrl_inst]
-set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/CLK_delay/delay_inst]
-set_property IODELAY_GROUP IODBANK12 [get_cells U1/CH3/q*_delay/delay_inst]
-
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-## Timing Assertions Section
+## Timing Constraints Section
 
 # Primary clocks
 create_clock -period 5.000 -name SYS_CLK_0 -waveform {0.000 2.500} [get_ports SYS_CLK_P0]
@@ -10,83 +10,148 @@ create_clock -period 8.000 -name video_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/VID
 create_clock -period 8.000 -name exp_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/EXP/tx_out_clk]
 create_clock -period 8.000 -name data_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/DATA/user_clk]
 create_clock -period 8.000 -name exp_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/EXP/user_clk]
-#create_clock -period 12.500 -name CH0_CLK_P -waveform {0.000 6.250} [get_ports CH0_CLK_P]
-#create_clock -period 12.500 -name CH1_CLK_P -waveform {0.000 6.250} [get_ports CH1_CLK_P]
-#create_clock -period 12.500 -name CH2_CLK_P -waveform {0.000 6.250} [get_ports CH2_CLK_P]
 create_clock -period 60.000 -name usart_clk -waveform {0.000 30.000} [get_ports R_GIGE_BULK_CLK0]
 
 # Virtual clocks
+
 # Generated clocks
 
-# renommer les horloges rérivées
-#create_generated_clock -name CLK20 [get_pins ACQ/U8/U0/mmcm_adv_inst/CLKOUT0]
-#create_generated_clock -name BDCLK80 [get_pins ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/mmcm_adv_inst/CLKOUT5]
-#create_generated_clock -name BDCLK20 [get_pins ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/mmcm_adv_inst/CLKOUT4]
-#create_generated_clock -name BDCLK50 [get_pins ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/mmcm_adv_inst/CLKOUT3]
-#create_generated_clock -name BDCLK200 [get_pins ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/mmcm_adv_inst/CLKOUT2]
-#create_generated_clock -name BDCLK160 [get_pins ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/mmcm_adv_inst/CLKOUT1]
-#create_generated_clock -name BDCLK100 [get_pins ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/mmcm_adv_inst/CLKOUT0]
-
 # Clock Groups
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {SYS_CLK_0 SYS_CLK_1}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {MGT_CLK_0 MGT_CLK_1}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks data_mgt_tx_out_clk]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks video_mgt_tx_out_clk]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks exp_mgt_tx_out_clk]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks data_mgt_user_clk_i]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks exp_mgt_user_clk_i]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks usart_clk]
+
 # Input and output delay constraints
+#set_output_delay [get_ports R_GIGE_BULK_RXD0]
+#set_input_delay [get_ports GIGE_BULK_TXD0]
+#set_disable_timing [get_ports R_FLASH_ALE]
+#set_disable_timing [get_ports R_FLASH_CE2_N]
+#set_disable_timing [get_ports R_FLASH_CE_N]
+#set_disable_timing [get_ports R_FLASH_CLE]
+#set_disable_timing [get_ports R_FLASH_RE_N]
+#set_disable_timing [get_ports R_FLASH_WE_N]
+#set_disable_timing [get_ports R_FLASH_RB_N1]
+#set_disable_timing [get_ports R_FLASH_RB_N2]
+#set_disable_timing [get_ports R_FLASH_DQS]
+#set_disable_timing [get_ports R_FLASH_IO*]
+#set_disable_timing [get_ports PROC_PROM_D0]
+#set_disable_timing [get_ports PROC_PROM_D1]
+#set_disable_timing [get_ports PROC_PROM_D3]
+#set_disable_timing [get_ports PROC_PROM_D2]
+#set_disable_timing [get_ports R_PROC_PROM_CS_N]
+#set_disable_timing [get_ports IRIG_B_ADC_SDO]
+#set_disable_timing [get_ports R_IRIG_B_ADC_CS_N]
+#set_disable_timing [get_ports IRIG_B_G*]
+#set_disable_timing [get_ports SFW_ENCA]
+#set_disable_timing [get_ports SFW_ENCB]
+#set_disable_timing [get_ports SFW_INDEX]
+
 
 ## Timing Exceptions Section
+
 # False Paths
-set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks data_mgt_user_clk_i]
-set_false_path -from [get_clocks data_mgt_user_clk_i] -to [get_clocks clk_out4_core_clk_wiz_1*]
-set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks data_mgt_tx_out_clk]
-set_false_path -from [get_clocks data_mgt_tx_out_clk] -to [get_clocks clk_out4_core_clk_wiz_1*]
-
-set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks exp_mgt_user_clk_i]
-set_false_path -from [get_clocks exp_mgt_user_clk_i] -to [get_clocks clk_out4_core_clk_wiz_1*]
-set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks exp_mgt_tx_out_clk]
-set_false_path -from [get_clocks exp_mgt_tx_out_clk] -to [get_clocks clk_out4_core_clk_wiz_1*]
-
 set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks clk_out1_core_clk_wiz_1*]
-set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks clk_out1_core_clk_wiz_1*]
-
-set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks data_mgt_user_clk_i]
-set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks exp_mgt_user_clk_i]
-set_false_path -from [get_clocks data_mgt_user_clk_i] -to [get_clocks clk_out1_core_clk_wiz_1*]
-set_false_path -from [get_clocks exp_mgt_user_clk_i] -to [get_clocks clk_out1_core_clk_wiz_1*]
-
-set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks data_mgt_tx_out_clk]
-set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks exp_mgt_tx_out_clk]
-set_false_path -from [get_clocks data_mgt_tx_out_clk] -to [get_clocks clk_out1_core_clk_wiz_1*]
-set_false_path -from [get_clocks exp_mgt_tx_out_clk] -to [get_clocks clk_out1_core_clk_wiz_1*]
+set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_out4_core_clk_wiz_1*]
 
 set_false_path -from [get_clocks clk_out2_core_clk_wiz_1*] -to [get_clocks clk_out1_core_clk_wiz_1*]
 set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_out2_core_clk_wiz_1*]
 
+set_false_path -from [get_clocks clk_out6_core_clk_wiz_1*] -to [get_clocks clk_out1_core_clk_wiz_1*]
+set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_out6_core_clk_wiz_1*]
+
+set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks clk_out2_core_clk_wiz_1*]
+set_false_path -from [get_clocks clk_out2_core_clk_wiz_1*] -to [get_clocks clk_out4_core_clk_wiz_1*]
+
+set_false_path -from [get_clocks clk_out6_core_clk_wiz_1*] -to [get_clocks clk_out2_core_clk_wiz_1*]
+set_false_path -from [get_clocks clk_out2_core_clk_wiz_1*] -to [get_clocks clk_out6_core_clk_wiz_1*]
+
+set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_pll_i_4]
+set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks clk_pll_i_4]
+
+set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_20M_mmcm*]
+set_false_path -from [get_clocks clk_20M_mmcm*] -to [get_clocks clk_out1_core_clk_wiz_1*] 
+
 set_false_path -from [get_cells {ACQ/BD/core_wrapper_i/core_i/proc_sys_reset_1/U0/ACTIVE_LOW_PR_OUT_DFF[0].peripheral_aresetn_reg[0]}] -to [all_registers]
-
-#PELICAND
-#set_false_path -from [get_clocks proxy_dclk_out_ch0_clink_clk_7x80MHz] -to [get_clocks clk_out1_core_clk_wiz_1*]
-#set_false_path -from [get_clocks proxy_dclk_out_ch1_clink_clk_7x80MHz] -to [get_clocks clk_out1_core_clk_wiz_1*]
-
-#set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks proxy_dclk_out_ch0_clink_clk_7x80MHz]
-#set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks proxy_dclk_out_ch1_clink_clk_7x80MHz]
-
-#set_false_path -from [get_clocks proxy_dclk_0_clink_clk_7x80MHz] -to [get_clocks clk_out1_core_clk_wiz_1*]
-#set_false_path -from [get_clocks proxy_dclk_0_clink_clk_7x80MHz_1] -to [get_clocks clk_out1_core_clk_wiz_1*]
-
-#set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks proxy_dclk_0_clink_clk_7x80MHz]
-#set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks proxy_dclk_0_clink_clk_7x80MHz_1]
+set_false_path -from [get_cells {ACQ/BD/core_wrapper_i/core_i/proc_sys_reset_1/U0/ACTIVE_LOW_BSR_OUT_DFF[0].interconnect_aresetn_reg[0]}] -to [all_registers]
 
 ### Header False Path
 set_false_path -from [get_pins {ACQ/HEADER/U4/SEQ_STATUS_reg[*]/C}] -to [get_clocks clk_out1_core_clk_wiz_1*]
 set_false_path -from [get_pins {ACQ/HEADER/U1/CONFIG_reg[*][*]/C}] -to [get_clocks clk_out2_core_clk_wiz_1*]
 
+set_false_path -through [get_nets IMAGE_INFO*]
+
 # Max Delay / Min Delay
 # Multicycle Paths
 # Case Analysis
+
 # Disable Timing
+set_disable_timing [get_ports GIGE_SERTC]
+set_disable_timing [get_ports GIGE_UART_TXD1]
+set_disable_timing [get_ports R_GIGE_SERTFG]
+set_disable_timing [get_ports R_GIGE_UART_RXD1]
+set_disable_timing [get_ports POWER_ON_ADC_DDC]
+set_disable_timing [get_ports POWER_ON_BUFFER]
+set_disable_timing [get_ports POWER_ON_COOLER]
+set_disable_timing [get_ports POWER_ON_EXPANSION]
+set_disable_timing [get_ports POWER_ON_PLEORA]
+set_disable_timing [get_ports POWER_ON_SFW]
+set_disable_timing [get_ports POWER_ON_SPARE1]
+set_disable_timing [get_ports POWER_ON_SPARE2]
+set_disable_timing [get_ports PWR_SPARE]
+set_disable_timing [get_ports LED_RED]
+set_disable_timing [get_ports LED_GREEN]
+set_disable_timing [get_ports LED_YELLOW]
+set_disable_timing [get_ports SELF_RESET]
+set_disable_timing [get_ports BUTTON]
+set_disable_timing [get_ports R_ACBUS*]
+set_disable_timing [get_ports R_ADBUS*]
+set_disable_timing [get_ports USB_EECS]
+set_disable_timing [get_ports USB_EEDATA]
+set_disable_timing [get_ports USB_RESET_N]
+set_disable_timing [get_ports GPS_PPS_BUF]
+set_disable_timing [get_ports GPS_RX_TO_FPGA]
+set_disable_timing [get_ports GPS_TX_FROM_FPGA]
+set_disable_timing [get_ports IRIG_B_002_BUF]
+set_disable_timing [get_ports IRIG_B_PPMS]
+set_disable_timing [get_ports XADC_MUX*]
+set_disable_timing [get_ports SFW_RX_TO_FPGA]
+set_disable_timing [get_ports SFW_TX_FROM_FPGA]
+set_disable_timing [get_ports SHUTTER_INA]
+set_disable_timing [get_ports SHUTTER_INB]
+set_disable_timing [get_ports EXTERNAL_FAN_PWM]
+set_disable_timing [get_ports INTERNAL_FAN_PWM]
+set_disable_timing [get_ports FPGA_PROC_PWM]
+set_disable_timing [get_ports R_TRIG_OUT]
+set_disable_timing [get_ports TRIG_IN_BUF]
+set_disable_timing [get_ports PWR_PRSNT_N]
+set_disable_timing [get_ports JTAG_PRSNT_N]
+set_disable_timing [get_ports BUFFER_PRSNT_N]
+set_disable_timing [get_ports EXP_PRSNT_N]
+set_disable_timing [get_ports FPGA_TO_FPGA0]
+set_disable_timing [get_ports FPGA_TO_FPGA1]
+set_disable_timing [get_ports FPGA_TO_FPGA2]
+set_disable_timing [get_ports FPGA_TO_FPGA3]
+set_disable_timing [get_ports WATER_LEVEL]
+set_disable_timing [get_ports FPGA_TO_FPGA5]
+set_disable_timing [get_ports OEM_RX_TO_FPGA]
+set_disable_timing [get_ports OEM_TX_FROM_FPGA]
+set_disable_timing [get_ports VIDEO_FAULT1_N]
+set_disable_timing [get_ports VIDEO_FAULT2_N]
+set_disable_timing [get_ports FPGA_OUT_INIT_B]
+set_disable_timing [get_ports COOLER_READY]
+set_disable_timing [get_ports COOLER_RX_TO_FPGA]
+set_disable_timing [get_ports COOLER_TX_FROM_FPGA]
+set_disable_timing [get_ports DDR_POWERGOOD]
+set_disable_timing [get_ports DEBUG_LED_N]
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/U8/U0/clk_20M_mmcm_clk_20MHz]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/U8/U0/clkfbout_mmcm_clk_20MHz]
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U6/O1]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U12/DATAOUT]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/U8/U0/clk_20M_mmcm_clk_20MHz]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/U8/U0/clkfbout_mmcm_clk_20MHz]
 
 
 #set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets R_GIGE_BULK_CLK0_IBUF]
@@ -97,27 +162,12 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets R_GIGE_BULK_CLK0]
 #set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/USART/clk_usart_0/U0/clk_out1_clk_usart]
 
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/clk_in1*]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/clk_out3*]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/clk_out2*]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/proxy_dclk_mult7_b_ch0_clink_clk_7x80MHz]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/clkfbout_ch0_clink_clk_7x80MHz]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/proxy_dclk_out_mult7_ch0_clink_clk_7x80MHz]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/proxy_dclk_out_ch0_clink_clk_7x80MHz]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/clk_in1*]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/clk_out3*]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/U0/clk_out2*]
 
-#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/proxy_dclk_mult7_b_ch0_clink_clk_7x10MHz]
-#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/clkfbout_ch0_clink_clk_7x10MHz]
-#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/proxy_dclk_out_mult7_ch0_clink_clk_7x10MHz]
-#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets CLINK/U1/U14/U0/proxy_dclk_out_ch0_clink_clk_7x10MHz]
-set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets CLINK/U1/U14/U0/proxy_dclk_in_ch0_clink_clk_7x10MHz]
-
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/clk_pll_i]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/mmcm_clkout0]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_clk_ibuf/sys_clk_ibufg]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/clk_pll_i]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/mmcm_clkout0]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_clk_ibuf/sys_clk_ibufg]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_1_mig/u_ddr3_infrastructure/pll_clk3_out]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_1_mig/u_ddr3_infrastructure/clk_pll_i]
-
-set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets CLINK/U1/n_0_U3]
-set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets CLINK/U1/n_2_U3]
-
-

@@ -25,6 +25,7 @@ add_files -norecurse $common_dir/MGT/hdl/
 add_files -norecurse $common_dir/PWM_CTRL/HDL/
 add_files $common_dir/Buffering/
 add_files -norecurse $common_dir/Calibration/
+add_files -norecurse $common_dir/iserdes/
 
 # Add common project IP sources (should be  move to fir-00251-Proc)
 read_ip $common_dir_ip/AXI4_Stream32_to_64/AXI4_Stream32_to_64.xci
@@ -179,3 +180,10 @@ set_property generate_synth_checkpoint true [get_files  d:/Telops/fir-00251-Proc
 #Disable unused file
 set_property is_enabled false [get_files  $root_dir/src/constraints/chipscope.xdc]
 set_property is_enabled false [get_files  $root_dir/src/constraints/core_mig_7series_1_0.xdc]
+
+#Limit max fanout (see UG949 p143 for Fanout Guidelines table)
+set_property STEPS.SYNTH_DESIGN.ARGS.FANOUT_LIMIT 200 [get_runs synth_1]
+
+#Enable post-place optimization (see UG904 p87-93 for more details)
+set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED true [get_runs impl_1]
+set_property STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE Default [get_runs impl_1]

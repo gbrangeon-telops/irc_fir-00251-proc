@@ -62,38 +62,28 @@ architecture rtl of flagging_SM is
    signal flag_enable_i             : std_logic;
    signal flag_hder_enable          : std_logic;
    signal exp_feedbk_last           : std_logic;  
-
+   
    signal clk_counter_rising        : unsigned(31 downto 0); 
    signal clk_counter_falling       : unsigned(31 downto 0); 
    signal frame_count               : unsigned(31 downto 0); 
    
    signal axil_mosi_i : t_axi4_lite_mosi;
    signal axil_miso_i : t_axi4_lite_miso;
-
+   
    type HEADERWRITE_STATE_TYPE is (WRITE_STANDBY, WRITE_DATA, WAIT_WRITE_COMPLETED, WAIT_NEXT_FEEDBACK);
    signal writing_state       : HEADERWRITE_STATE_TYPE;
    
    constant FLAGGED_VALUE     : unsigned(31 downto 0) := x"00000001";
    constant NOTFLAGGED_VALUE  : unsigned(31 downto 0) := x"00000000";
    
-   signal img_info_i                  : img_info_type;
-   attribute KEEP of img_info_i : signal is "TRUE";  
-   signal flag_cfg_i                  : flag_cfg_type;
-   attribute KEEP of flag_cfg_i : signal is "TRUE";  
-   signal hard_trig_i : std_logic;
-   attribute KEEP of hard_trig_i : signal is "TRUE";  
-   signal ublaze_soft_trig_i : std_logic;
-   attribute KEEP of ublaze_soft_trig_i : signal is "TRUE";  
-   
-   attribute KEEP of trig_i : signal is "TRUE";  
-   attribute KEEP of mixed_trig_i : signal is "TRUE";  
-   attribute KEEP of flag_enable_i : signal is "TRUE";  
-   attribute KEEP of soft_trig_i : signal is "TRUE";  
-   attribute KEEP of writing_state : signal is "TRUE";  
-   attribute KEEP of enable_softtrig_i : signal is "TRUE";  
-   attribute KEEP of wait_for_init_i : signal is "TRUE";  
-   attribute KEEP of trig_delay_i : signal is "TRUE";  
-   attribute KEEP of frame_count : signal is "TRUE";  
+   signal img_info_i                   : img_info_type;
+   signal flag_cfg_i                   : flag_cfg_type;
+   signal hard_trig_i                  : std_logic;
+   signal ublaze_soft_trig_i           : std_logic;
+   signal initcfg_proc_sreset          : std_logic := '1';
+   signal soft_trig_proc_sreset        : std_logic := '1';
+   signal delay_proc_sreset            : std_logic := '1';
+   signal flagging_proc_sreset         : std_logic := '1';
    
 begin
    
@@ -109,11 +99,15 @@ begin
       CLK    => CLK,
       SRESET => sreset
       );
-      
+   
    INITCFG_PROC : process(CLK)
    begin
       if rising_edge(CLK) then
-         if sreset = '1' or FLAG_CFG.dval = '0' then
+         
+         initcfg_proc_sreset <= sreset or not FLAG_CFG.dval; 
+         
+         --
+         if initcfg_proc_sreset = '1' then
             flag_cfg_dval_last <= '0';
             wait_for_init_i <= '1';
          else			
@@ -128,7 +122,7 @@ begin
          end if;
       end if;
    end process INITCFG_PROC;
-
+   
    -- active la gestion du signal SOFT_TRIG   
    enable_softtrig_i <= FLAG_CFG.trig_source and FLAG_CFG.dval;
    
@@ -138,7 +132,11 @@ begin
    SOFT_TRIG_PROC : process(CLK)
    begin
       if rising_edge(CLK) then
-         if sreset = '1' or enable_softtrig_i = '0' then
+         
+         soft_trig_proc_sreset <= sreset or not enable_softtrig_i;
+         
+         --
+         if soft_trig_proc_sreset = '1' then
             soft_trig_i <= '0';
             soft_trig_last <= '0';
          else			
@@ -153,27 +151,27 @@ begin
                      -- Changement de configuration, desactiver le flagging par defaut
                      soft_trig_i <= '0';
                   else
-                     if SOFT_TRIG = '1' and soft_trig_last = '0' and enable_softtrig_i = '1' then
+                     if SOFT_TRIG = '1' and soft_trig_last = '0' then
                         -- L'ecriture du registre ublaze toggle l'etat
                         soft_trig_i <= not soft_trig_i;
                      else
                         soft_trig_i <= soft_trig_i;
                      end if;
                   end if;
-                  
+               
                when LEVELLOW =>
                   if FLAG_CFG.dval = '1' and flag_cfg_dval_last = '0' then
                      -- Changement de configuration, desactiver le flagging par defaut
                      soft_trig_i <= '1';
                   else
-                     if SOFT_TRIG = '1' and soft_trig_last = '0' and enable_softtrig_i = '1' then
+                     if SOFT_TRIG = '1' and soft_trig_last = '0' then
                         -- L'ecriture du registre ublaze toggle l'etat
                         soft_trig_i <= not soft_trig_i;
                      else
                         soft_trig_i <= soft_trig_i;
                      end if;
                   end if;
-
+               
                when RISINGEDGE =>
                   if FLAG_CFG.dval = '1' and flag_cfg_dval_last = '0' then
                      -- Changement de configuration
@@ -182,7 +180,7 @@ begin
                      -- SOFT_TRIG genere un rising edge a chaque trig
                      soft_trig_i <= SOFT_TRIG;
                   end if;
-                  
+               
                when FALLINGEDGE =>
                   if FLAG_CFG.dval = '1' and flag_cfg_dval_last = '0' then
                      -- Changement de configuration
@@ -191,23 +189,23 @@ begin
                      -- not SOFT_TRIG genere un falling edge a chaque trig
                      soft_trig_i <= not SOFT_TRIG;
                   end if;
-
+               
                when ANYEDGE =>
                   if FLAG_CFG.dval = '1' and flag_cfg_dval_last = '0' then
                      -- Changement de configuration, desactiver le flagging par defaut
                      soft_trig_i <= '0';
                   else
-                     if SOFT_TRIG = '1' and soft_trig_last = '0' and enable_softtrig_i = '1' then
+                     if SOFT_TRIG = '1' and soft_trig_last = '0' then
                         -- L'ecriture du registre ublaze toggle l'etat
                         soft_trig_i <= not soft_trig_i;
                      else
                         soft_trig_i <= soft_trig_i;
                      end if;
                   end if;
-                  
+               
                when others =>
                   soft_trig_i <= '0';
-                  
+               
             end case;
          end if;
       end if;
@@ -219,48 +217,49 @@ begin
    begin
       if rising_edge(CLK) then
          mixed_trig_last_i <= mixed_trig_i;
-
-         if sreset = '1' or wait_for_init_i = '1' or FLAG_CFG.dval = '0' then
+         
+         delay_proc_sreset <= sreset or wait_for_init_i or not FLAG_CFG.dval;
+         --
+         
+         if delay_proc_sreset = '1' then
             clk_counter_rising <= (others => '0');
             clk_counter_falling <= (others => '0');
             trig_delay_i <= mixed_trig_i;
          else
-
-            if wait_for_init_i = '0' then
-               if FLAG_CFG.delay /= to_unsigned(0, FLAG_CFG.delay'length) then
-                  -- Active les compteurs lors de detection de edge
-                  if mixed_trig_i = '1' and mixed_trig_last_i = '0' and clk_counter_rising = to_unsigned(0, clk_counter_rising'length) then  -- rising edge et aucun rising edge est presentement en traitement
+            
+            if FLAG_CFG.delay /= to_unsigned(0, FLAG_CFG.delay'length) then
+               -- Active les compteurs lors de detection de edge
+               if mixed_trig_i = '1' and mixed_trig_last_i = '0' and clk_counter_rising = to_unsigned(0, clk_counter_rising'length) then  -- rising edge et aucun rising edge est presentement en traitement
+                  clk_counter_rising <= clk_counter_rising + 1;
+               elsif mixed_trig_i = '0' and mixed_trig_last_i = '1'  and clk_counter_falling = to_unsigned(0, clk_counter_falling'length) then  -- falling edge et aucun falling edge est presentement en traitement
+                  clk_counter_falling <= clk_counter_falling + 1;
+               end if;
+               
+               -- rising edge en delai
+               if clk_counter_rising /= to_unsigned(0, clk_counter_rising'length) then
+                  if clk_counter_rising = (FLAG_CFG.delay - 1) then -- (FLAG_CFG.delay - 1) evite d'avoir un coup de clock de retard dans FLAGGING_PROC
+                     trig_delay_i <= '1';
+                     clk_counter_rising <= (others => '0');
+                  else
                      clk_counter_rising <= clk_counter_rising + 1;
-                  elsif mixed_trig_i = '0' and mixed_trig_last_i = '1'  and clk_counter_falling = to_unsigned(0, clk_counter_falling'length) then  -- falling edge et aucun falling edge est presentement en traitement
+                  end if;
+               end if;
+               
+               -- falling edge en delai
+               if clk_counter_falling /= to_unsigned(0, clk_counter_falling'length) then
+                  if clk_counter_falling = (FLAG_CFG.delay - 1) then -- (FLAG_CFG.delay - 1) evite d'avoir un coup de clock de retard dans FLAGGING_PROC
+                     trig_delay_i <= '0';
+                     clk_counter_falling <= (others => '0');
+                  else
                      clk_counter_falling <= clk_counter_falling + 1;
                   end if;
-
-                  -- rising edge en delai
-                  if clk_counter_rising /= to_unsigned(0, clk_counter_rising'length) then
-                     if clk_counter_rising = (FLAG_CFG.delay - 1) then -- (FLAG_CFG.delay - 1) evite d'avoir un coup de clock de retard dans FLAGGING_PROC
-                        trig_delay_i <= '1';
-                        clk_counter_rising <= (others => '0');
-                     else
-                        clk_counter_rising <= clk_counter_rising + 1;
-                     end if;
-                  end if;
-
-                  -- falling edge en delai
-                  if clk_counter_falling /= to_unsigned(0, clk_counter_falling'length) then
-                     if clk_counter_falling = (FLAG_CFG.delay - 1) then -- (FLAG_CFG.delay - 1) evite d'avoir un coup de clock de retard dans FLAGGING_PROC
-                        trig_delay_i <= '0';
-                        clk_counter_falling <= (others => '0');
-                     else
-                        clk_counter_falling <= clk_counter_falling + 1;
-                     end if;
-                  end if;
-
                end if;
+               
             end if;
          end if;
       end if;
    end process DELAY_PROC;
-
+   
    trig_i <= trig_delay_i when FLAG_CFG.delay /= to_unsigned(0, FLAG_CFG.delay'length) else mixed_trig_i;
    
    Hder_Axil_Mosi <= axil_mosi_i;
@@ -272,21 +271,23 @@ begin
          trig_last_i <= trig_i;
          exp_feedbk_last <= IMG_INFO.exp_feedbk;
          
-         if sreset = '1' or wait_for_init_i = '1' or FLAG_CFG.dval = '0' then
+         flagging_proc_sreset <= sreset or wait_for_init_i or not FLAG_CFG.dval;
+         
+         if flagging_proc_sreset = '1' then
             flag_enable_i <= '0';
             frame_count <= (others => '0');
          else
-         
+            
             case FLAG_CFG.mode is
                when DISABLE =>
                   flag_enable_i <= '0';
                
                when LEVELHIGH =>
                   flag_enable_i <= trig_i;
-                  
+               
                when LEVELLOW =>
                   flag_enable_i <= not trig_i;
-                  
+               
                when RISINGEDGE =>
                   if (trig_i = '1' and trig_last_i = '0') then
                      flag_enable_i <= '1';
@@ -304,7 +305,7 @@ begin
                         flag_enable_i <= '1';
                      end if;
                   end if;
-                     
+               
                when FALLINGEDGE =>
                   if (trig_i = '0' and trig_last_i = '1') then
                      flag_enable_i <= '1';
@@ -322,7 +323,7 @@ begin
                         flag_enable_i <= '1';
                      end if;
                   end if;
-                  
+               
                when ANYEDGE =>
                   if (trig_i /= trig_last_i) then
                      flag_enable_i <= '1';
@@ -340,7 +341,7 @@ begin
                         flag_enable_i <= '1';
                      end if;
                   end if;
-                  
+               
                when others =>
             end case;
          end if;
@@ -376,28 +377,28 @@ begin
                      
                      writing_state <= WRITE_DATA;
                   end if;
-                  
+               
                when WRITE_DATA =>
                   if axil_miso_i.awready = '1' and axil_miso_i.wready = '1' then
                      axil_mosi_i.awvalid <= '1';
                      axil_mosi_i.wvalid <= '1';
                      writing_state <= WAIT_WRITE_COMPLETED;
                   end if;
-
+               
                when WAIT_WRITE_COMPLETED =>
                   axil_mosi_i.awvalid <= '0';
                   axil_mosi_i.wvalid <= '0';
                   axil_mosi_i.wstrb <= (others => '0');
-
+                  
                   if axil_miso_i.bvalid = '1' then
                      writing_state <= WAIT_NEXT_FEEDBACK;
                   end if;
-                  
+               
                when WAIT_NEXT_FEEDBACK =>
                   if IMG_INFO.exp_feedbk = '0' then
                      writing_state <= WRITE_STANDBY;
                   end if;
-                  
+               
                when others =>
             end case;
             

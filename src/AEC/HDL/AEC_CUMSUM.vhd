@@ -85,6 +85,7 @@ architecture RTL of AEC_CUMSUM is
    type cumsum_acc_type is array(HistRegLen-1 downto 0) of unsigned(NB_PIXEL'left downto 0);
 
    signal sreset         : std_logic;
+   signal aec_sm_reset   : std_logic := '1';
 
    -- Internal Histogram Ports 
    signal H_ready             : std_logic;
@@ -167,7 +168,16 @@ begin
    AEC_SM : process(CLK_DATA)
    begin
       if rising_edge(CLK_DATA) then
-         if sreset = '1' then
+         
+         ----------------
+         if sreset = '1' or AEC_mode = "00" then
+            aec_sm_reset <= '1';
+         else
+            aec_sm_reset <= '0';
+         end if;                  
+         ----------------
+         
+         if aec_sm_reset = '1' then -- Reset or AEC Stopped
             AEC_state      <= RESET;
             cumsum_ready_s <= '0';
             H_clearmem     <= '1';

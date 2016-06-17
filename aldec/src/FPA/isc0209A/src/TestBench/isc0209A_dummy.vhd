@@ -129,8 +129,8 @@ architecture rtl of isc0209A_dummy is
    signal diag_eol_last     : std_logic;
    signal fpa_fdem_last     : std_logic;
    
-   attribute dont_touch     : string;
-   attribute dont_touch of diag_fsm : signal is "true";
+   -- attribute dont_touch     : string;
+   -- attribute dont_touch of diag_fsm : signal is "true";
    
 begin
    
