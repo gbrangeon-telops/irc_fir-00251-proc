@@ -25,7 +25,7 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
-fileopenfolder=D:\telops\FIR-00251-Proc\src\QuadADC\Sim\src
+fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\iserdes\adc
 IMPL_TOOL=
 SYNTH_TOOL=
 
@@ -77,30 +77,6 @@ Name7=HTML
 Directory7=d:\Telops\FIR-00251-Proc\src\QuadADC\Sim\
 Extension7=
 
-[file_out:/adc_tb_stim_top_level.bde]
-/..\compile\adc_tb_stim_top_level.vhd=-1
-
-[file_out:/adc_tb_4ch_top_level.bde]
-/..\compile\adc_tb_4ch_top_level.vhd=-1
-
-[file_out:/adc_cfg_tb_top_level.bde]
-/..\compile\adc_cfg_tb_top_level.vhd=-1
-
-[file_out:/adc_deser_tb_top_level.bde]
-/..\compile\adc_deser_tb_top_level.vhd=-1
-
-[file_out:adc_receiver/..\..\..\HDL\adc_receiver_1ch.bde]
-adc_receiver/..\..\compile\adc_receiver_1ch.vhd=-1
-
-[file_out:adc_receiver/..\..\..\HDL\adc_data_deserializer.bde]
-adc_receiver/..\..\compile\adc_data_deserializer.vhd=-1
-
-[file_out:adc_receiver\debug/..\..\..\..\debug\high_low_duration.bde]
-adc_receiver\debug/..\..\..\compile\high_low_duration.vhd=-1
-
-[file_out:adc_receiver\debug/..\..\..\..\debug\adc_board_startup_top_level.bde]
-adc_receiver\debug/..\..\..\compile\adc_board_startup_top_level.vhd=-1
-
 [Files]
 /build_adc_sim.do=-1
 /run_adc_tb.do=-1
@@ -122,13 +98,12 @@ adc_receiver\debug/..\..\..\compile\adc_board_startup_top_level.vhd=-1
 /run_adc_deser.do=-1
 /data_cdc_tb_stim.vhd=-1
 /data_cdc_tb_stim_top_level.bde=-1
-/build_data_cdc_sim.do=-1
 /run_data_cdc_tb.do=-1
 /waveform_data_cdc.do=-1
 adc_receiver/..\..\..\HDL\build_adc_receiver.do=-1
-adc_receiver/..\..\..\HDL\adc_iserdes_wrapper.vhd=-1
-adc_receiver/..\..\..\HDL\test_pattern_validator.vhd=-1
-adc_receiver/..\..\..\HDL\delay_calibration.vhd=-1
+adc_receiver/..\..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\adc_iserdes_wrapper.vhd=-1
+adc_receiver/..\..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\test_pattern_validator.vhd=-1
+adc_receiver/..\..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\delay_calibration.vhd=-1
 adc_receiver/..\..\..\HDL\adc_data_sync.vhd=-1
 adc_receiver/..\..\..\HDL\adc_receiver_1ch.bde=-1
 adc_receiver/..\..\..\HDL\adc_data_deserializer.bde=-1
@@ -167,18 +142,17 @@ adc_receiver\debug/..\..\..\..\debug\debug_data_sync.vhd=-1
 .\src\run_adc_deser.do=Macro
 .\src\data_cdc_tb_stim.vhd=VHDL Source Code
 .\src\data_cdc_tb_stim_top_level.bde=Block Diagram
-.\src\build_data_cdc_sim.do=Macro
 .\src\run_data_cdc_tb.do=Macro
 .\src\waveform_data_cdc.do=Macro
 .\..\HDL\build_adc_receiver.do=Macro
-.\..\HDL\adc_iserdes_wrapper.vhd=VHDL Source Code
-.\..\HDL\test_pattern_validator.vhd=VHDL Source Code
-.\..\HDL\delay_calibration.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\adc_iserdes_wrapper.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\test_pattern_validator.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\delay_calibration.vhd=VHDL Source Code
 .\..\HDL\adc_data_sync.vhd=VHDL Source Code
 .\..\HDL\adc_receiver_1ch.bde=Block Diagram
 .\..\HDL\adc_data_deserializer.bde=Block Diagram
 .\..\HDL\quad_adc_ctrl.vhd=VHDL Source Code
-.\HDL\isc0207A_clks_gen.vhd=VHDL Source Code
+.\..\..\FPA\isc0207A\HDL\isc0207A_clks_gen.vhd=VHDL Source Code
 .\..\..\..\..\Common_HDL\Utilities\oddr_clk_vector.vhd=VHDL Source Code
 .\..\HDL\qadc_intf_defines.vhd=VHDL Source Code
 .\..\debug\build_startup_adc_receiver.do=Macro
@@ -190,4 +164,28 @@ adc_receiver\debug/..\..\..\..\debug\debug_data_sync.vhd=-1
 .\..\debug\adc_rcv_clk_560MHz.vhd=VHDL Source Code
 .\..\debug\adc_startup_clks.vhd=VHDL Source Code
 .\..\debug\debug_data_sync.vhd=VHDL Source Code
+
+[file_out:/adc_tb_stim_top_level.bde]
+/..\compile\adc_tb_stim_top_level.vhd=-1
+
+[file_out:/adc_tb_4ch_top_level.bde]
+/..\compile\adc_tb_4ch_top_level.vhd=-1
+
+[file_out:/adc_cfg_tb_top_level.bde]
+/..\compile\adc_cfg_tb_top_level.vhd=-1
+
+[file_out:/adc_deser_tb_top_level.bde]
+/..\compile\adc_deser_tb_top_level.vhd=-1
+
+[file_out:adc_receiver/..\..\..\HDL\adc_receiver_1ch.bde]
+adc_receiver/..\..\compile\adc_receiver_1ch.vhd=-1
+
+[file_out:adc_receiver/..\..\..\HDL\adc_data_deserializer.bde]
+adc_receiver/..\..\compile\adc_data_deserializer.vhd=-1
+
+[file_out:adc_receiver\debug/..\..\..\..\debug\high_low_duration.bde]
+adc_receiver\debug/..\..\..\compile\high_low_duration.vhd=-1
+
+[file_out:adc_receiver\debug/..\..\..\..\debug\adc_board_startup_top_level.bde]
+adc_receiver\debug/..\..\..\compile\adc_board_startup_top_level.vhd=-1
 
