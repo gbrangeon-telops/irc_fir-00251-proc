@@ -473,6 +473,8 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 { 
+   uint32_t temp_32b;
+
    Stat->adc_oper_freq_max_khz   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x00);    
    Stat->adc_analog_channel_num  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x04);   
    Stat->adc_resolution          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x08);   

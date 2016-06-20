@@ -20,8 +20,8 @@ use IEEE.numeric_std.ALL;
 
 entity AEC_CUMSUM is
    generic(
-   ADD_WITDH : integer := 7
-   );
+      ADD_WITDH : integer := 7
+      );
    port(     
       --------------------------------
       -- CTRL Interface
@@ -54,13 +54,13 @@ entity AEC_CUMSUM is
       TMI_MOSI_RNW	   : out std_logic;
       TMI_MOSI_DVAL	   : out std_logic;
       TMI_MOSI_WR_DATA  : out std_logic_vector(20 downto 0);
-
+      
       TMI_MISO_BUSY     : in std_logic;
       TMI_MISO_RD_DATA  : in std_logic_vector(20 downto 0);           
       TMI_MISO_RD_DVAL  : in std_logic;
       TMI_MISO_IDLE     : in std_logic;
       TMI_MISO_ERROR    : in std_logic;
-
+      
       --------------------------------
       -- MISC
       --------------------------------   
@@ -71,22 +71,22 @@ entity AEC_CUMSUM is
 end AEC_CUMSUM;
 
 architecture RTL of AEC_CUMSUM is
-
+   
    component sync_reset
       port(
          ARESET                 : in std_logic;
          SRESET                 : out std_logic;
          CLK                    : in std_logic);
    end component;
-
+   
    constant HistRegLen        : integer := 2;
-
+   
    type AECState_type   is (RESET, IDLE, PROC_CUMSUM, DONE, HIST_RESET);
    type cumsum_acc_type is array(HistRegLen-1 downto 0) of unsigned(NB_PIXEL'left downto 0);
-
+   
    signal sreset         : std_logic;
    signal aec_sm_reset   : std_logic := '1';
-
+   
    -- Internal Histogram Ports 
    signal H_ready             : std_logic;
    signal H_clearmem          : std_logic;
@@ -100,13 +100,13 @@ architecture RTL of AEC_CUMSUM is
    -- TMI SIGNAL
    signal tmi_add_s     : std_logic_vector(9 downto 0);
    signal tmi_dval_s    : std_logic;
-
+   
    signal tmi_busy_s       : std_logic;
    signal tmi_rddata_s     : std_logic_vector(20 downto 0);
    signal tmi_rddval_s     : std_logic;
    signal tmi_idle_s       : std_logic;
    signal tmi_error_s      : std_logic;
-
+   
    
    -- INTERNAL ctrl intf signal
    signal image_fraction_s       : unsigned(23 downto 0);
@@ -115,21 +115,21 @@ architecture RTL of AEC_CUMSUM is
    signal lowercumsum_value      : unsigned(23 downto 0);
    signal uppercumsum_value      : unsigned(23 downto 0);
    signal hist_nb_pix_s          : unsigned(23 downto 0);
-
-
+   
+   
    -- Internal AEC status - DATA
    signal AEC_state           : AECState_type := RESET;
    signal AEC_reseti          : std_logic;
-
+   
    -- TMI addr gen signal
    signal TMI_add             : unsigned( 9 downto 0);
    signal TMI_add_done        : std_logic;
    signal TMI_add_out         : unsigned( 9 downto 0);
    signal TMI_add_out_started : std_logic;
    signal TMI_add_max         : unsigned(12 downto 0) := (others => '1');
-
+   
 begin
-
+   
    ----------------------------------------
    -- CLK DATA
    ----------------------------------------
@@ -139,13 +139,13 @@ begin
       CLK    => CLK_DATA,
       SRESET => sreset
       );
-
+   
    ----------------------------------------
    -- TMI ASSIGNATION
    ----------------------------------------
    TMI_MOSI_WR_DATA <= (others => '0');
    TMI_MOSI_RNW   <= '1';
-
+   
    ------------------------------
    -- Histogram assignation
    ------------------------------
@@ -163,7 +163,7 @@ begin
    UPPERCUMSUM          <= std_logic_vector(resize(uppercumsum_value, UPPERCUMSUM'length));
    IMAGE_FRACTION_FBCK  <= std_logic_vector(resize(image_fraction_fbck_s, IMAGE_FRACTION_FBCK'length));
    NB_PIXEL             <= std_logic_vector(resize(hist_nb_pix_s, NB_PIXEL'length));    
-
+   
    
    AEC_SM : process(CLK_DATA)
    begin
@@ -191,76 +191,62 @@ begin
             else
                H_clearmem  <= '0';
             end if;
-
-            --------------------
-            -- AEC Stopped
-            --------------------
-            if (AEC_mode = "00") then 
-               H_clearmem        <= '1';
-               AEC_state         <= RESET;
-               cumsum_ready_s    <= '0';
-               AEC_reseti <= '1'; -- Hold histogram generator in reset
+            
+            AEC_reseti <= '0';
+            
+            case AEC_state is
+               when RESET =>
+                  AEC_state         <= IDLE;
+                  cumsum_ready_s    <= '0';
+                  CUMSUM_ERROR      <= '0';
                
-            --------------------
-            -- AEC Running
-            --------------------
-            else --if AEC_mode /= "00" then
-               AEC_reseti <= '0';
+               when IDLE =>
+                  if H_ready = '1' then
+                     AEC_state   <= PROC_CUMSUM;
+                     cumsum_ready_s    <= '0';                        
+                  end if;
+                  CUMSUM_ERROR      <= '0';
                
-               case AEC_state is
-                  when RESET =>
-                     AEC_state         <= IDLE;
+               when PROC_CUMSUM =>
+                  if Cumsum_valid = '1' then
+                     cumsum_ready_s    <= '1';
+                     AEC_state   <= DONE;
+                     --                     if( if_maxfound = '0') then
+                     CUMSUM_ERROR      <= not if_maxfound;    
+                     --                     else
+                     --                        CUMSUM_ERROR      <= '0';   
+                     --                     end if;
+                  else
                      cumsum_ready_s    <= '0';
                      CUMSUM_ERROR      <= '0';
+                  end if;
                   
-                  when IDLE =>
-                     if H_ready = '1' then
-                        AEC_state   <= PROC_CUMSUM;
-                        cumsum_ready_s    <= '0';                        
-                     end if;
-                     CUMSUM_ERROR      <= '0';
-                     
-                  when PROC_CUMSUM =>
-                     if Cumsum_valid = '1' then
-                        cumsum_ready_s    <= '1';
-                        AEC_state   <= DONE;
-                        if( if_maxfound = '0') then
-                            CUMSUM_ERROR      <= '1';    
-                        else
-                            CUMSUM_ERROR      <= '0';   
-                        end if;
-                     else
-                        cumsum_ready_s    <= '0';
-                        CUMSUM_ERROR      <= '0';
-                     end if;
-                     
-                     
-                  when DONE => -- GEN interrupt and wait for clear mem
-                     if AEC_CTRL_CLEARMEM = '1' then
-                        cumsum_ready_s   <= '0';
-                        H_clearmem <= '1';
-                        AEC_state   <= HIST_RESET;
-                     else
-                        cumsum_ready_s   <= '1';
-                        H_clearmem <= '0';
-                     end if;
-
-                     
-                  when HIST_RESET => -- GEN interrupt and wait for clear mem
-                     if H_ready = '0' then
-                        AEC_state   <= IDLE;
-                     end if;
-
-                     
-                  when others =>
-                     AEC_state <= RESET;
-               end case;
-            end if;
+               
+               when DONE => -- GEN interrupt and wait for clear mem
+                  if AEC_CTRL_CLEARMEM = '1' then
+                     cumsum_ready_s   <= '0';
+                     H_clearmem <= '1';
+                     AEC_state   <= HIST_RESET;
+                  else
+                     cumsum_ready_s   <= '1';
+                     H_clearmem <= '0';
+                  end if;
+                  
+               
+               when HIST_RESET => -- GEN interrupt and wait for clear mem
+                  if H_ready = '0' then
+                     AEC_state   <= IDLE;
+                  end if;
+                  
+               
+               when others =>
+               AEC_state <= RESET;
+            end case;
             
          end if;
       end if;
    end process;
-
+   
    
    
    CUMSUM_SM : process(CLK_DATA)
@@ -280,7 +266,7 @@ begin
             tmi_add_s         <= (others => '0');
             CumSum_Acc        <= (others => (others => '0'));
             TMI_add_out       <= (others => '0');
-
+            
          else
             -- Check if we are processing an histogram
             if AEC_state = IDLE then
@@ -298,7 +284,7 @@ begin
                TMI_add_out       <= (others => '0');
                TMI_add_out_started <= '0';
                
-
+               
                
             elsif AEC_state = PROC_CUMSUM then
                if (AEC_mode(0) = '1' and Cumsum_valid ='0' and tmi_busy_s = '0' )then -- AEC IS ON and processing result is not valid yet
@@ -345,26 +331,26 @@ begin
             end if; -- end AEC_state = IDLE
          end if; --sreset = '1'
       end if; -- rising_edge(CLK_DATA)
-    end process;     
+   end process;     
    
    
--- TMI_SYNC
+   -- TMI_SYNC
    TMI_SYNC : process(CLK_DATA)
    begin
       if rising_edge(CLK_DATA) then
          -- TMI SIGNAL
-
+         
          TMI_MOSI_ADD   <= tmi_add_s(ADD_WITDH-1 downto 0);
          TMI_MOSI_DVAL  <= tmi_dval_s;
-
+         
          tmi_busy_s     <= TMI_MISO_BUSY;   
          tmi_rddata_s   <= TMI_MISO_RD_DATA;       
          tmi_rddval_s   <= TMI_MISO_RD_DVAL;
          tmi_idle_s     <= TMI_MISO_IDLE ;  
          tmi_error_s    <= TMI_MISO_ERROR;  
       end if;
-
+      
    end process;
-
+   
    
 end RTL;

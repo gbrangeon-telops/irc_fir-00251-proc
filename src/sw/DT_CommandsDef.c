@@ -247,6 +247,21 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    
    DT_PRINTF("fpa.id_cmd_in_error = 0x%08X", status.id_cmd_in_error);
 
+   DT_PRINTF("fpa.serdes_done = 0b%s", dec2bin(status.fpa_serdes_done, 4));
+   DT_PRINTF("fpa.serdes_success = 0b%s", dec2bin(status.fpa_serdes_success, 4));
+   
+   DT_PRINTF("fpa.serdes_edges_ch0 = 0x%08X", status.fpa_serdes_edges[0]);
+   DT_PRINTF("fpa.serdes_delay_ch0 = %d", status.fpa_serdes_delay[0]);
+   DT_PRINTF("fpa.serdes_edges_ch1 = 0x%08X", status.fpa_serdes_edges[1]);
+   DT_PRINTF("fpa.serdes_delay_ch1 = %d", status.fpa_serdes_delay[1]);
+   DT_PRINTF("fpa.serdes_edges_ch2 = 0x%08X", status.fpa_serdes_edges[2]);
+   DT_PRINTF("fpa.serdes_delay_ch2 = %d", status.fpa_serdes_delay[2]);
+   DT_PRINTF("fpa.serdes_edges_ch3 = 0x%08X", status.fpa_serdes_edges[3]);
+   DT_PRINTF("fpa.serdes_delay_ch3 = %d", status.fpa_serdes_delay[3]);
+
+   DT_PRINTF("fpa.init_done = %d", status.fpa_init_done);
+   DT_PRINTF("fpa.init_success = %d", status.fpa_init_success);
+
    return IRC_SUCCESS;
 }
 

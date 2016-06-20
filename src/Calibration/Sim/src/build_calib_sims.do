@@ -13,6 +13,7 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w192_d16\fwft_sfifo_w192_d16_funcsim
 acom "$COMMON\VHDL\Utilities\axil32_to_native.vhd"
 acom "$COMMON_HDL\Utilities\sync_resetn.vhd"
 acom "$COMMON_HDL\Utilities\sync_reset.vhd"
+acom "$COMMON_HDL\Utilities\double_sync.vhd"
 acom "$COMMON_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd"
 acom "$COMMON_HDL\gh_vhdl_lib\custom_MSI\gh_edge_det.vhd"
 

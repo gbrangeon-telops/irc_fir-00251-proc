@@ -258,6 +258,9 @@ void TRIG_SendConfigGC(t_Trig *a, const gcRegistersData_t *pGCRegs)
          if (TriggerSourceAry[TS_AcquisitionStart] == TS_Software)
          {
             a->TRIG_SeqTrigSource = VHD_TRIGSEG_SOFTWARE;
+
+            // En mode Trig Software on utilise toujours le rising edge
+            a->TRIG_Activation = VHD_RisingEdge;
          }
          else if (TriggerSourceAry[TS_AcquisitionStart] == TS_ExternalSignal)
          {
