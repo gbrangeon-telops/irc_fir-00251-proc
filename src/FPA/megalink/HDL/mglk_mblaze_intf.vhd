@@ -282,7 +282,7 @@ begin
                      end if;
                      user_cfg_i.proxy_temp   <= mb_struct_cfg.proxy_temp;
                      user_cfg_i.proxy_static <= mb_struct_cfg.proxy_static;
-                     user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min + resize(fpa_int_time_last, 32); -- car mb_struct_cfg.fpa_trig_period_min est la periode min calculée par le mB  pour Int_time = 0
+                     --user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min + resize(fpa_int_time_last, 32); -- car mb_struct_cfg.fpa_trig_period_min est la periode min calculée par le mB  pour Int_time = 0
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
                   arbiter_fsm_state <= 3;
@@ -302,7 +302,7 @@ begin
                   if exp_struct_cfg_valid = '1' then
                      user_cfg_i.proxy_int.proxy_int_time <= proxy_exp_time_i;
                      user_cfg_i.proxy_int.proxy_int_indx <= exp_indx_i;
-                     user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min + resize(exp_time_i, 32); -- car mb_struct_cfg.fpa_trig_period_min est la periode min calculée par le mB  pour Int_time = 0 et exp_time_i est en coups de 100MHz
+                     --user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min + resize(exp_time_i, 32); -- car mb_struct_cfg.fpa_trig_period_min est la periode min calculée par le mB  pour Int_time = 0 et exp_time_i est en coups de 100MHz
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
