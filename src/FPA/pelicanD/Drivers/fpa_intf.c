@@ -45,6 +45,8 @@
 
 // Mode d'operation choisi pour le contrôleur de trig 
 #define MODE_READOUT_END_TO_TRIG_START    0x00    // provient du fichier fpa_common_pkg.vhd. Ce mode est choisi car plus simple pour le PelicanD
+#define MODE_TRIG_START_TO_TRIG_START     0x01
+#define MODE_INT_END_TO_TRIG_START        0x02
 
 // PelicanD integration modes definies par SCD  
 #define SCD_ITR_MODE                      0x00    // valeur provenant du manuel de SCD
@@ -272,11 +274,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs (il est sur l'horolge de 100MHz)
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    
-   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T5 - (float)VHD_PIXEL_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ);   // en fait c,est le fameux t_ri
-   ptrA->fpa_acq_trig_period_min   = (uint32_t)(0.8F*(hh.T0) * (float)FPA_VHD_INTF_CLK_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
-   ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ); 
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min;                         // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le PelicanD en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
+   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T3 + hh.T5 + hh.T6 - (float)VHD_PIXEL_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ); 
+   ptrA->fpa_acq_trig_period_min   = (uint32_t)((hh.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);   //
+   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.5F*(float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min;                          // 
    
    #ifdef SIM
       ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation

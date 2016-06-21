@@ -238,7 +238,7 @@ begin
                      elsif mb_struct_cfg.cmd_to_update_id = SCD_DIAG_CMD_ID then
                         user_cfg_i.scd_diag <= mb_struct_cfg.scd_diag;
                      end if;
-                     user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min + resize(fpa_int_time_last, 32); -- car mb_struct_cfg.fpa_trig_period_min est la periode min calculée par le mB  pour Int_time = 0
+                     --user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min;
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
                
@@ -256,7 +256,7 @@ begin
                   if exp_struct_cfg_valid = '1' then
                      user_cfg_i.scd_int.scd_int_time <= scd_exp_time_i;
                      user_cfg_i.scd_int.scd_int_indx <= exp_indx_i;
-                     user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min + resize(exp_time_i, 32); -- car mb_struct_cfg.fpa_trig_period_min est la periode min calculée par le mB  pour Int_time = 0 et exp_time_i est en coups de 100MHz
+                     --user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min; 
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
