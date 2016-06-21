@@ -6,7 +6,7 @@
 #__BEGIN BUILD CLINK
 
 # common
-acom \
+acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\marsD\HDL\FPA_define.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\proxy_define.vhd \
@@ -24,7 +24,7 @@ acom \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde
 
 # CLINK
-acom \
+acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\clink\HDL\scd_clink_dout_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\clink\HDL\mglk_clink_dout_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_dout_ctrl.bde \
