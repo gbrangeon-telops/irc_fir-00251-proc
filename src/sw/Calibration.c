@@ -14,6 +14,7 @@
  */
 
 #include "Calibration.h"
+#include "FileInfo.h"
 #include "calib.h"
 #include "FlashSettings.h"
 #include "GC_Registers.h"
@@ -117,19 +118,18 @@ IRC_Status_t Calibration_LoadCalibrationFilePOSIXTime(uint32_t posixTime)
  */
 IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionInfo_t *collectionInfo)
 {
-   char filelongname[FM_LONG_FILENAME_SIZE];
    int fd;
    int byteCount;
+   fileInfo_t fileInfo;
    uint8_t error = 0;
-   CollectionFileHeader_t collectionFileHeader;
+   CalibCollection_CollectionFileHeader_t collectionFileHeader;
    uint16_t crc16;
    uint32_t i;
    uint32_t *p_uint32;
    extern bool gDisableFilterWheel;
 
    // Open collection file
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, file->name);
-   fd = uffs_open(filelongname, UO_RDONLY);
+   fd = FM_OpenFile(file->name);
    if (fd == -1)
    {
       CM_ERR("Failed to open %s.", file->name);
@@ -139,24 +139,10 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    collectionInfo->file = file;
 
    // Read collection file header
-   byteCount = uffs_read(fd, tmpFileDataBuffer, CALIB_COLLECTIONFILEHEADER_SIZE);
-   if (byteCount != CALIB_COLLECTIONFILEHEADER_SIZE)
+   if (CalibCollection_ParseCollectionFileHeader(fd, &collectionFileHeader, &fileInfo) == 0)
    {
-      CM_ERR("Failed to read collection file header.");
-      error = 1;
-   }
-   else
-   {
-      if (ParseCalibCollectionFileHeader(tmpFileDataBuffer, byteCount, &collectionFileHeader) == 0)
-      {
-         CM_ERR("Failed to parse collection file header.");
-         error = 1;
-      }
-   }
+      CM_ERR("Failed to parse collection file header.");
 
-   // Check for error
-   if (error)
-   {
       // Close collection file
       if (uffs_close(fd) == -1)
       {
@@ -165,6 +151,8 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
 
       return IRC_FAILURE;
    }
+
+   CM_INF("Calibration collection file version is %d.%d.%d.", fileInfo.version.major, fileInfo.version.minor, fileInfo.version.subMinor);
 
    if (collectionFileHeader.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
    {
@@ -317,8 +305,8 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
 
    CM_INF("Collection file header loaded.");
 
-   byteCount = uffs_read(fd, tmpFileDataBuffer, collectionFileHeader.CollectionFileDataLength);
-   if (byteCount != collectionFileHeader.CollectionFileDataLength)
+   byteCount = uffs_read(fd, tmpFileDataBuffer, collectionFileHeader.CollectionDataLength);
+   if (byteCount != collectionFileHeader.CollectionDataLength)
    {
       CM_ERR("Failed to read collection data.");
       error = 1;
@@ -326,10 +314,10 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    else
    {
       // Test collection file data CRC-16
-      crc16 = CRC16(0xFFFF, (uint8_t *) tmpFileDataBuffer, collectionFileHeader.CollectionFileDataLength);
-      if (crc16 != collectionFileHeader.CollectionFileDataCRC16)
+      crc16 = CRC16(0xFFFF, (uint8_t *) tmpFileDataBuffer, collectionFileHeader.CollectionDataLength);
+      if (crc16 != collectionFileHeader.CollectionDataCRC16)
       {
-         CM_ERR("Collection file data CRC-16 mismatch (computed:0x%04X, file:0x%04X).", crc16, collectionFileHeader.CollectionFileDataCRC16);
+         CM_ERR("Collection file data CRC-16 mismatch (computed:0x%04X, file:0x%04X).", crc16, collectionFileHeader.CollectionDataCRC16);
          error = 1;
       }
       else
@@ -399,6 +387,7 @@ digraph G {
 void Calibration_SM()
 {
    static cmState_t cmCurrentState = CMS_INIT;
+   static fileInfo_t fileInfo;
    static int fdCalib;
    static uint32_t dataOffset;
    static uint16_t crc16;
@@ -420,18 +409,17 @@ void Calibration_SM()
    extern bool blockLoadCmdFlag;
    extern bool gDisableFilterWheel;
 
-   char filelongname[FM_LONG_FILENAME_SIZE];
    int byteCount;
    int retval;
    uint32_t length;
    uint32_t i;
    uint32_t *p_uint32;
    union {
-      BlockFileHeader_t blockFile;
-      PixelDataHeader_t pixelData;
-      MaxTKDataHeader_t maxTKData;
-      LUTNLDataHeader_t lutNLData;
-      LUTRQDataHeader_t lutRQData;
+      CalibBlock_BlockFileHeader_t blockFile;
+      CalibBlock_PixelDataHeader_t pixelData;
+      CalibBlock_MaxTKDataHeader_t maxTKData;
+      CalibBlock_LUTNLDataHeader_t lutNLData;
+      CalibBlock_LUTRQDataHeader_t lutRQData;
    } headerData;
 
    switch (cmCurrentState)
@@ -537,8 +525,7 @@ void Calibration_SM()
          CM_INF("Loading calibration block file %s (POSIX time = %d)...", blockFiles[blockIndex]->name, blockFiles[blockIndex]->posixTime);
          GETTIME(&tic_block);
 
-         sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, blockFiles[blockIndex]->name);
-         fdCalib = uffs_open(filelongname, UO_RDONLY);
+         fdCalib = FM_OpenFile(blockFiles[blockIndex]->name);
          if (fdCalib != -1)
          {
             calibrationInfo.blocks[blockIndex].file = blockFiles[blockIndex];
@@ -552,199 +539,192 @@ void Calibration_SM()
          break;
 
       case CMS_LOAD_BLOCK_FILE_HEADER:
-         byteCount = uffs_read(fdCalib, tmpFileDataBuffer, CALIB_BLOCKFILEHEADER_SIZE);
-         if (byteCount != CALIB_BLOCKFILEHEADER_SIZE)
+         byteCount = CalibBlock_ParseBlockFileHeader(fdCalib, &headerData.blockFile, &fileInfo);
+         if (byteCount == 0)
          {
-            CM_ERR("Failed to read calibration block file header.");
+            CM_ERR("Failed to parse calibration block file header.");
             cmCurrentState = CMS_ERROR;
          }
          else
          {
-            byteCount = ParseCalibBlockFileHeader(tmpFileDataBuffer, byteCount, &headerData.blockFile);
-            if (byteCount == 0)
+            CM_INF("Calibration block file version is %d.%d.%d.", fileInfo.version.major, fileInfo.version.minor, fileInfo.version.subMinor);
+
+            cmCurrentState = CMS_LOAD_PIXEL_DATA_HEADER;
+
+            if (headerData.blockFile.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
             {
-               CM_ERR("Failed to parse calibration block file header.");
+               CM_ERR("Block %d: Wrong block DeviceSerialNumber TEL%05d. Device serial number is TEL%05d.",
+               headerData.blockFile.POSIXTime, headerData.blockFile.DeviceSerialNumber, flashSettings.DeviceSerialNumber);
                cmCurrentState = CMS_ERROR;
             }
-            else
+
+            if (((headerData.blockFile.DeviceDataFlowMajorVersion == CALIB_DATAFLOWMAJORVERSION) &&
+                 (headerData.blockFile.DeviceDataFlowMinorVersion > CALIB_DATAFLOWMINORVERSION)) ||
+                (headerData.blockFile.DeviceDataFlowMajorVersion > CALIB_DATAFLOWMAJORVERSION))
             {
-               cmCurrentState = CMS_LOAD_PIXEL_DATA_HEADER;
+               CM_ERR("Block data flow version %d.%d is not supported (%d.%d).",
+                     headerData.blockFile.DeviceDataFlowMajorVersion,
+                     headerData.blockFile.DeviceDataFlowMinorVersion,
+                     CALIB_DATAFLOWMAJORVERSION,
+                     CALIB_DATAFLOWMINORVERSION);
+               cmCurrentState = CMS_ERROR;
+            }
 
-               if (headerData.blockFile.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
+            // Validate calibration collection/block consistency
+            if (cmCalibrationFile->type == FT_TSCO)
+            {
+               if (headerData.blockFile.CalibrationType != calibrationInfo.collection.CalibrationType)
                {
-                  CM_ERR("Block %d: Wrong block DeviceSerialNumber TEL%05d. Device serial number is TEL%05d.",
-                  headerData.blockFile.POSIXTime, headerData.blockFile.DeviceSerialNumber, flashSettings.DeviceSerialNumber);
+                  CM_ERR("Block %d: Calibration type mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.CalibrationType, headerData.blockFile.CalibrationType);
                   cmCurrentState = CMS_ERROR;
                }
 
-               if (((headerData.blockFile.DeviceDataFlowMajorVersion == CALIB_DATAFLOWMAJORVERSION) &&
-                    (headerData.blockFile.DeviceDataFlowMinorVersion > CALIB_DATAFLOWMINORVERSION)) ||
-                   (headerData.blockFile.DeviceDataFlowMajorVersion > CALIB_DATAFLOWMAJORVERSION))
+               if (headerData.blockFile.SensorID != calibrationInfo.collection.SensorID)
                {
-                  CM_ERR("Block data flow version %d.%d is not supported (%d.%d).",
-                        headerData.blockFile.DeviceDataFlowMajorVersion,
-                        headerData.blockFile.DeviceDataFlowMinorVersion,
-                        CALIB_DATAFLOWMAJORVERSION,
-                        CALIB_DATAFLOWMINORVERSION);
+                  CM_ERR("Block %d: Sensor ID mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.SensorID, headerData.blockFile.SensorID);
                   cmCurrentState = CMS_ERROR;
                }
 
-               // Validate calibration collection/block consistency
-               if (cmCalibrationFile->type == FT_TSCO)
+               if (headerData.blockFile.IntegrationMode != calibrationInfo.collection.IntegrationMode)
                {
-                  if (headerData.blockFile.CalibrationType != calibrationInfo.collection.CalibrationType)
-                  {
-                     CM_ERR("Block %d: Calibration type mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.CalibrationType, headerData.blockFile.CalibrationType);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.SensorID != calibrationInfo.collection.SensorID)
-                  {
-                     CM_ERR("Block %d: Sensor ID mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.SensorID, headerData.blockFile.SensorID);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.IntegrationMode != calibrationInfo.collection.IntegrationMode)
-                  {
-                     CM_ERR("Block %d: Integration mode mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.IntegrationMode, headerData.blockFile.IntegrationMode);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.SensorWellDepth != calibrationInfo.collection.SensorWellDepth)
-                  {
-                     CM_ERR("Block %d: Sensor well depth mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.SensorWellDepth, headerData.blockFile.SensorWellDepth);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.PixelDataResolution != calibrationInfo.collection.PixelDataResolution)
-                  {
-                     CM_ERR("Block %d: Pixel data resolution mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.PixelDataResolution, headerData.blockFile.PixelDataResolution);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.Width != calibrationInfo.collection.Width)
-                  {
-                     CM_ERR("Block %d: Width mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.Width, headerData.blockFile.Width);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.Height != calibrationInfo.collection.Height)
-                  {
-                     CM_ERR("Block %d: Height mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.Height, headerData.blockFile.Height);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.OffsetX != calibrationInfo.collection.OffsetX)
-                  {
-                     CM_ERR("Block %d: OffsetX mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.OffsetX, headerData.blockFile.OffsetX);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.OffsetY != calibrationInfo.collection.OffsetY)
-                  {
-                     CM_ERR("Block %d: OffsetY mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.OffsetY, headerData.blockFile.OffsetY);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if ((calibrationInfo.collection.FWPosition != FWP_FilterWheelInTransition) && (headerData.blockFile.FWPosition != calibrationInfo.collection.FWPosition))
-                  {
-                     CM_ERR("Block %d: Filter wheel position mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.FWPosition, headerData.blockFile.FWPosition);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if ((calibrationInfo.collection.NDFPosition != NDFP_NDFilterInTransition) && (headerData.blockFile.NDFPosition != calibrationInfo.collection.NDFPosition))
-                  {
-                     CM_ERR("Block %d: Neutral density filter position mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.NDFPosition, headerData.blockFile.NDFPosition);
-                     cmCurrentState = CMS_ERROR;
-                  }
-
-                  if (headerData.blockFile.ReferencePOSIXTime != calibrationInfo.collection.ReferencePOSIXTime)
-                  {
-                     CM_ERR("Block %d: Reference POSIX time mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.ReferencePOSIXTime, headerData.blockFile.ReferencePOSIXTime);
-                     cmCurrentState = CMS_ERROR;
-                  }
-               }
-
-               if ((((gDisableFilterWheel == 0) && flashSettings.FWPresent == 0) && (headerData.blockFile.FWPosition != FWP_FilterWheelNotImplemented)) ||
-                     ((flashSettings.FWPresent == 1) &&
-                      (headerData.blockFile.FWPosition >= flashSettings.FWNumberOfFilters) &&
-                      (headerData.blockFile.FWPosition != FWP_FilterWheelInTransition)))
-               {
-                  CM_ERR("Block %d: Invalid filter wheel position (FWPosition = %d, FWPresent = %d, FWNumberOfFilters = %d).",
-                        headerData.blockFile.POSIXTime, headerData.blockFile.FWPosition, flashSettings.FWPresent, flashSettings.FWNumberOfFilters);
+                  CM_ERR("Block %d: Integration mode mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.IntegrationMode, headerData.blockFile.IntegrationMode);
                   cmCurrentState = CMS_ERROR;
                }
 
-               if (((flashSettings.NDFPresent == 0) && (headerData.blockFile.NDFPosition != NDFP_NDFilterNotImplemented)) ||
-                     ((flashSettings.NDFPresent == 1) &&
-                      (headerData.blockFile.NDFPosition >= flashSettings.NDFNumberOfFilters) &&
-                      (headerData.blockFile.NDFPosition != NDFP_NDFilterInTransition)))
+               if (headerData.blockFile.SensorWellDepth != calibrationInfo.collection.SensorWellDepth)
                {
-                  CM_ERR("Block %d: Invalid neutral density filter position (NDFPosition = %d, NDFPresent = %d, NDFNumberOfFilters = %d).",
-                        headerData.blockFile.POSIXTime, headerData.blockFile.NDFPosition, flashSettings.NDFPresent, flashSettings.NDFNumberOfFilters);
+                  CM_ERR("Block %d: Sensor well depth mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.SensorWellDepth, headerData.blockFile.SensorWellDepth);
                   cmCurrentState = CMS_ERROR;
                }
 
-               if ((headerData.blockFile.LUTRQDataPresence) && ((headerData.blockFile.NumberOfLUTRQ < 1) || (headerData.blockFile.NumberOfLUTRQ > LUTRQI_MAX_NUM_OF_LUTRQ)))
+               if (headerData.blockFile.PixelDataResolution != calibrationInfo.collection.PixelDataResolution)
                {
-                  CM_ERR("Number of radiometric LUT in block (%d) must be between 1 and %d (block POSIX time = %d).", headerData.blockFile.NumberOfLUTRQ, LUTRQI_MAX_NUM_OF_LUTRQ, headerData.blockFile.POSIXTime);
+                  CM_ERR("Block %d: Pixel data resolution mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.PixelDataResolution, headerData.blockFile.PixelDataResolution);
                   cmCurrentState = CMS_ERROR;
                }
 
-               if (cmCurrentState != CMS_ERROR)
+               if (headerData.blockFile.Width != calibrationInfo.collection.Width)
                {
-                  if (cmCalibrationFile->type == FT_TSBL)
-                  {
-                     // Emulate calibration collection
-                     calibrationInfo.collection.POSIXTime = headerData.blockFile.POSIXTime;
-                     calibrationInfo.collection.CollectionType =  DefaultCollectionType(headerData.blockFile.CalibrationType);
-                     calibrationInfo.collection.CalibrationType = headerData.blockFile.CalibrationType;
-                     calibrationInfo.collection.SensorID = headerData.blockFile.SensorID;
-                     calibrationInfo.collection.IntegrationMode = headerData.blockFile.IntegrationMode;
-                     calibrationInfo.collection.SensorWellDepth = headerData.blockFile.SensorWellDepth;
-                     calibrationInfo.collection.PixelDataResolution = headerData.blockFile.PixelDataResolution;
-                     calibrationInfo.collection.Width = headerData.blockFile.Width;
-                     calibrationInfo.collection.Height = headerData.blockFile.Height;
-                     calibrationInfo.collection.OffsetX = headerData.blockFile.OffsetX;
-                     calibrationInfo.collection.OffsetY = headerData.blockFile.OffsetY;
-                     calibrationInfo.collection.ReverseX = headerData.blockFile.ReverseX;
-                     calibrationInfo.collection.ReverseY = headerData.blockFile.ReverseY;
-                     calibrationInfo.collection.FWPosition = headerData.blockFile.FWPosition;
-                     calibrationInfo.collection.NDFPosition = headerData.blockFile.NDFPosition;
-                     calibrationInfo.collection.ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
-                     calibrationInfo.collection.ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
-                     calibrationInfo.collection.ReferencePOSIXTime = headerData.blockFile.ReferencePOSIXTime;
-                     calibrationInfo.collection.FluxRatio01 = 0;
-                     calibrationInfo.collection.FluxRatio12 = 0;
-                     calibrationInfo.collection.isValid = 1;
-                  }
-
-                  calibrationInfo.collection.DeviceTemperatureSensor += headerData.blockFile.DeviceTemperatureSensor;
-                  calibrationInfo.blocks[blockIndex].POSIXTime = headerData.blockFile.POSIXTime;
-                  calibrationInfo.blocks[blockIndex].ExposureTime = headerData.blockFile.ExposureTime;
-                  calibrationInfo.blocks[blockIndex].AcquisitionFrameRate = headerData.blockFile.AcquisitionFrameRate;
-                  calibrationInfo.blocks[blockIndex].FWPosition = headerData.blockFile.FWPosition;
-                  calibrationInfo.blocks[blockIndex].NDFPosition = headerData.blockFile.NDFPosition;
-                  calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
-                  calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
-                  calibrationInfo.blocks[blockIndex].PixelDynamicRangeMin = headerData.blockFile.PixelDynamicRangeMin;
-                  calibrationInfo.blocks[blockIndex].PixelDynamicRangeMax = headerData.blockFile.PixelDynamicRangeMax;
-                  calibrationInfo.blocks[blockIndex].SaturationThreshold = headerData.blockFile.SaturationThreshold;
-                  calibrationInfo.blocks[blockIndex].BlockBadPixelCount = headerData.blockFile.BlockBadPixelCount;
-                  calibrationInfo.blocks[blockIndex].MaximumTotalFlux = headerData.blockFile.MaximumTotalFlux;
-                  calibrationInfo.blocks[blockIndex].NUCMultFactor = headerData.blockFile.NUCMultFactor;
-                  calibrationInfo.blocks[blockIndex].T0 = headerData.blockFile.T0;
-                  calibrationInfo.blocks[blockIndex].Nu = headerData.blockFile.Nu;
-                  calibrationInfo.blocks[blockIndex].DeviceTemperatureSensor = headerData.blockFile.DeviceTemperatureSensor;
-                  calibrationInfo.blocks[blockIndex].PixelDataPresence = headerData.blockFile.PixelDataPresence;
-                  calibrationInfo.blocks[blockIndex].MaxTKDataPresence = headerData.blockFile.MaxTKDataPresence;
-                  calibrationInfo.blocks[blockIndex].LUTNLDataPresence = headerData.blockFile.LUTNLDataPresence;
-                  calibrationInfo.blocks[blockIndex].LUTRQDataPresence = headerData.blockFile.LUTRQDataPresence;
-                  calibrationInfo.blocks[blockIndex].NumberOfLUTRQ = headerData.blockFile.NumberOfLUTRQ;
-                  calibrationInfo.blocks[blockIndex].CalibrationSource = headerData.blockFile.CalibrationSource;
-
-                  CM_INF("Calibration block file header loaded.");
+                  CM_ERR("Block %d: Width mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.Width, headerData.blockFile.Width);
+                  cmCurrentState = CMS_ERROR;
                }
+
+               if (headerData.blockFile.Height != calibrationInfo.collection.Height)
+               {
+                  CM_ERR("Block %d: Height mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.Height, headerData.blockFile.Height);
+                  cmCurrentState = CMS_ERROR;
+               }
+
+               if (headerData.blockFile.OffsetX != calibrationInfo.collection.OffsetX)
+               {
+                  CM_ERR("Block %d: OffsetX mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.OffsetX, headerData.blockFile.OffsetX);
+                  cmCurrentState = CMS_ERROR;
+               }
+
+               if (headerData.blockFile.OffsetY != calibrationInfo.collection.OffsetY)
+               {
+                  CM_ERR("Block %d: OffsetY mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.OffsetY, headerData.blockFile.OffsetY);
+                  cmCurrentState = CMS_ERROR;
+               }
+
+               if ((calibrationInfo.collection.FWPosition != FWP_FilterWheelInTransition) && (headerData.blockFile.FWPosition != calibrationInfo.collection.FWPosition))
+               {
+                  CM_ERR("Block %d: Filter wheel position mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.FWPosition, headerData.blockFile.FWPosition);
+                  cmCurrentState = CMS_ERROR;
+               }
+
+               if ((calibrationInfo.collection.NDFPosition != NDFP_NDFilterInTransition) && (headerData.blockFile.NDFPosition != calibrationInfo.collection.NDFPosition))
+               {
+                  CM_ERR("Block %d: Neutral density filter position mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.NDFPosition, headerData.blockFile.NDFPosition);
+                  cmCurrentState = CMS_ERROR;
+               }
+
+               if (headerData.blockFile.ReferencePOSIXTime != calibrationInfo.collection.ReferencePOSIXTime)
+               {
+                  CM_ERR("Block %d: Reference POSIX time mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.ReferencePOSIXTime, headerData.blockFile.ReferencePOSIXTime);
+                  cmCurrentState = CMS_ERROR;
+               }
+            }
+
+            if ((((gDisableFilterWheel == 0) && flashSettings.FWPresent == 0) && (headerData.blockFile.FWPosition != FWP_FilterWheelNotImplemented)) ||
+                  ((flashSettings.FWPresent == 1) &&
+                   (headerData.blockFile.FWPosition >= flashSettings.FWNumberOfFilters) &&
+                   (headerData.blockFile.FWPosition != FWP_FilterWheelInTransition)))
+            {
+               CM_ERR("Block %d: Invalid filter wheel position (FWPosition = %d, FWPresent = %d, FWNumberOfFilters = %d).",
+                     headerData.blockFile.POSIXTime, headerData.blockFile.FWPosition, flashSettings.FWPresent, flashSettings.FWNumberOfFilters);
+               cmCurrentState = CMS_ERROR;
+            }
+
+            if (((flashSettings.NDFPresent == 0) && (headerData.blockFile.NDFPosition != NDFP_NDFilterNotImplemented)) ||
+                  ((flashSettings.NDFPresent == 1) &&
+                   (headerData.blockFile.NDFPosition >= flashSettings.NDFNumberOfFilters) &&
+                   (headerData.blockFile.NDFPosition != NDFP_NDFilterInTransition)))
+            {
+               CM_ERR("Block %d: Invalid neutral density filter position (NDFPosition = %d, NDFPresent = %d, NDFNumberOfFilters = %d).",
+                     headerData.blockFile.POSIXTime, headerData.blockFile.NDFPosition, flashSettings.NDFPresent, flashSettings.NDFNumberOfFilters);
+               cmCurrentState = CMS_ERROR;
+            }
+
+            if ((headerData.blockFile.LUTRQDataPresence) && ((headerData.blockFile.NumberOfLUTRQ < 1) || (headerData.blockFile.NumberOfLUTRQ > LUTRQI_MAX_NUM_OF_LUTRQ)))
+            {
+               CM_ERR("Number of radiometric LUT in block (%d) must be between 1 and %d (block POSIX time = %d).", headerData.blockFile.NumberOfLUTRQ, LUTRQI_MAX_NUM_OF_LUTRQ, headerData.blockFile.POSIXTime);
+               cmCurrentState = CMS_ERROR;
+            }
+
+            if (cmCurrentState != CMS_ERROR)
+            {
+               if (cmCalibrationFile->type == FT_TSBL)
+               {
+                  // Emulate calibration collection
+                  calibrationInfo.collection.POSIXTime = headerData.blockFile.POSIXTime;
+                  calibrationInfo.collection.CollectionType =  DefaultCollectionType(headerData.blockFile.CalibrationType);
+                  calibrationInfo.collection.CalibrationType = headerData.blockFile.CalibrationType;
+                  calibrationInfo.collection.SensorID = headerData.blockFile.SensorID;
+                  calibrationInfo.collection.IntegrationMode = headerData.blockFile.IntegrationMode;
+                  calibrationInfo.collection.SensorWellDepth = headerData.blockFile.SensorWellDepth;
+                  calibrationInfo.collection.PixelDataResolution = headerData.blockFile.PixelDataResolution;
+                  calibrationInfo.collection.Width = headerData.blockFile.Width;
+                  calibrationInfo.collection.Height = headerData.blockFile.Height;
+                  calibrationInfo.collection.OffsetX = headerData.blockFile.OffsetX;
+                  calibrationInfo.collection.OffsetY = headerData.blockFile.OffsetY;
+                  calibrationInfo.collection.ReverseX = headerData.blockFile.ReverseX;
+                  calibrationInfo.collection.ReverseY = headerData.blockFile.ReverseY;
+                  calibrationInfo.collection.FWPosition = headerData.blockFile.FWPosition;
+                  calibrationInfo.collection.NDFPosition = headerData.blockFile.NDFPosition;
+                  calibrationInfo.collection.ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
+                  calibrationInfo.collection.ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
+                  calibrationInfo.collection.ReferencePOSIXTime = headerData.blockFile.ReferencePOSIXTime;
+                  calibrationInfo.collection.FluxRatio01 = 0;
+                  calibrationInfo.collection.FluxRatio12 = 0;
+                  calibrationInfo.collection.isValid = 1;
+               }
+
+               calibrationInfo.collection.DeviceTemperatureSensor += headerData.blockFile.DeviceTemperatureSensor;
+               calibrationInfo.blocks[blockIndex].POSIXTime = headerData.blockFile.POSIXTime;
+               calibrationInfo.blocks[blockIndex].ExposureTime = headerData.blockFile.ExposureTime;
+               calibrationInfo.blocks[blockIndex].AcquisitionFrameRate = headerData.blockFile.AcquisitionFrameRate;
+               calibrationInfo.blocks[blockIndex].FWPosition = headerData.blockFile.FWPosition;
+               calibrationInfo.blocks[blockIndex].NDFPosition = headerData.blockFile.NDFPosition;
+               calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
+               calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
+               calibrationInfo.blocks[blockIndex].PixelDynamicRangeMin = headerData.blockFile.PixelDynamicRangeMin;
+               calibrationInfo.blocks[blockIndex].PixelDynamicRangeMax = headerData.blockFile.PixelDynamicRangeMax;
+               calibrationInfo.blocks[blockIndex].SaturationThreshold = headerData.blockFile.SaturationThreshold;
+               calibrationInfo.blocks[blockIndex].BlockBadPixelCount = headerData.blockFile.BlockBadPixelCount;
+               calibrationInfo.blocks[blockIndex].MaximumTotalFlux = headerData.blockFile.MaximumTotalFlux;
+               calibrationInfo.blocks[blockIndex].NUCMultFactor = headerData.blockFile.NUCMultFactor;
+               calibrationInfo.blocks[blockIndex].T0 = headerData.blockFile.T0;
+               calibrationInfo.blocks[blockIndex].Nu = headerData.blockFile.Nu;
+               calibrationInfo.blocks[blockIndex].DeviceTemperatureSensor = headerData.blockFile.DeviceTemperatureSensor;
+               calibrationInfo.blocks[blockIndex].PixelDataPresence = headerData.blockFile.PixelDataPresence;
+               calibrationInfo.blocks[blockIndex].MaxTKDataPresence = headerData.blockFile.MaxTKDataPresence;
+               calibrationInfo.blocks[blockIndex].LUTNLDataPresence = headerData.blockFile.LUTNLDataPresence;
+               calibrationInfo.blocks[blockIndex].LUTRQDataPresence = headerData.blockFile.LUTRQDataPresence;
+               calibrationInfo.blocks[blockIndex].NumberOfLUTRQ = headerData.blockFile.NumberOfLUTRQ;
+               calibrationInfo.blocks[blockIndex].CalibrationSource = headerData.blockFile.CalibrationSource;
+
+               CM_INF("Calibration block file header loaded.");
             }
          }
          break;
@@ -752,67 +732,58 @@ void Calibration_SM()
       case CMS_LOAD_PIXEL_DATA_HEADER:
          if (calibrationInfo.blocks[blockIndex].PixelDataPresence == 1)
          {
-            byteCount = uffs_read(fdCalib, tmpFileDataBuffer, CALIB_PIXELDATAHEADER_SIZE);
-            if (byteCount != CALIB_PIXELDATAHEADER_SIZE)
+            byteCount = CalibBlock_ParsePixelDataHeader(fdCalib, &fileInfo, &headerData.pixelData);
+            if (byteCount == 0)
             {
-               CM_ERR("Failed to read pixel data header.");
+               CM_ERR("Failed to parse pixel data header.");
                cmCurrentState = CMS_ERROR;
             }
             else
             {
-               byteCount = ParseCalibPixelDataHeader(tmpFileDataBuffer, byteCount, &headerData.pixelData);
-               if (byteCount == 0)
+               if (headerData.pixelData.PixelDataLength > CM_CALIB_BLOCK_PIXEL_DATA_SIZE)  //memory for one block
                {
-                  CM_ERR("Failed to parse pixel data header.");
+                  CM_ERR("Pixel data length exceeds DDR memory pixel data buffer size.");
                   cmCurrentState = CMS_ERROR;
                }
                else
                {
-                  if (headerData.pixelData.PixelDataLength > CM_CALIB_BLOCK_PIXEL_DATA_SIZE)  //memory for one block
-                  {
-                     CM_ERR("Pixel data length exceeds DDR memory pixel data buffer size.");
-                     cmCurrentState = CMS_ERROR;
-                  }
-                  else
-                  {
-                     calibrationInfo.blocks[blockIndex].pixelData.Offset_Off = headerData.pixelData.Offset_Off;
-                     calibrationInfo.blocks[blockIndex].pixelData.Offset_Median = headerData.pixelData.Offset_Median;
-                     calibrationInfo.blocks[blockIndex].pixelData.Offset_Exp = headerData.pixelData.Offset_Exp;
-                     calibrationInfo.blocks[blockIndex].pixelData.Offset_Nbits = headerData.pixelData.Offset_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.Offset_Signed = headerData.pixelData.Offset_Signed;
-                     calibrationInfo.blocks[blockIndex].pixelData.Range_Off = headerData.pixelData.Range_Off;
-                     calibrationInfo.blocks[blockIndex].pixelData.Range_Median = headerData.pixelData.Range_Median;
-                     calibrationInfo.blocks[blockIndex].pixelData.Range_Exp = headerData.pixelData.Range_Exp;
-                     calibrationInfo.blocks[blockIndex].pixelData.Range_Nbits = headerData.pixelData.Range_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.Range_Signed = headerData.pixelData.Range_Signed;
-                     calibrationInfo.blocks[blockIndex].pixelData.Kappa_Off = headerData.pixelData.Kappa_Off;
-                     calibrationInfo.blocks[blockIndex].pixelData.Kappa_Median = headerData.pixelData.Kappa_Median;
-                     calibrationInfo.blocks[blockIndex].pixelData.Kappa_Exp = headerData.pixelData.Kappa_Exp;
-                     calibrationInfo.blocks[blockIndex].pixelData.Kappa_Nbits = headerData.pixelData.Kappa_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.Kappa_Signed = headerData.pixelData.Kappa_Signed;
-                     calibrationInfo.blocks[blockIndex].pixelData.Beta0_Off = headerData.pixelData.Beta0_Off;
-                     calibrationInfo.blocks[blockIndex].pixelData.Beta0_Median = headerData.pixelData.Beta0_Median;
-                     calibrationInfo.blocks[blockIndex].pixelData.Beta0_Exp = headerData.pixelData.Beta0_Exp;
-                     calibrationInfo.blocks[blockIndex].pixelData.Beta0_Nbits = headerData.pixelData.Beta0_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.Beta0_Signed = headerData.pixelData.Beta0_Signed;
-                     calibrationInfo.blocks[blockIndex].pixelData.Alpha_Off = headerData.pixelData.Alpha_Off;
-                     calibrationInfo.blocks[blockIndex].pixelData.Alpha_Median = headerData.pixelData.Alpha_Median;
-                     calibrationInfo.blocks[blockIndex].pixelData.Alpha_Exp = headerData.pixelData.Alpha_Exp;
-                     calibrationInfo.blocks[blockIndex].pixelData.Alpha_Nbits = headerData.pixelData.Alpha_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.Alpha_Signed = headerData.pixelData.Alpha_Signed;
-                     calibrationInfo.blocks[blockIndex].pixelData.LUTNLIndex_Nbits = headerData.pixelData.LUTNLIndex_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.LUTNLIndex_Signed = headerData.pixelData.LUTNLIndex_Signed;
-                     calibrationInfo.blocks[blockIndex].pixelData.BadPixel_Nbits = headerData.pixelData.BadPixel_Nbits;
-                     calibrationInfo.blocks[blockIndex].pixelData.BadPixel_Signed = headerData.pixelData.BadPixel_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.Offset_Off = headerData.pixelData.Offset_Off;
+                  calibrationInfo.blocks[blockIndex].pixelData.Offset_Median = headerData.pixelData.Offset_Median;
+                  calibrationInfo.blocks[blockIndex].pixelData.Offset_Exp = headerData.pixelData.Offset_Exp;
+                  calibrationInfo.blocks[blockIndex].pixelData.Offset_Nbits = headerData.pixelData.Offset_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.Offset_Signed = headerData.pixelData.Offset_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.Range_Off = headerData.pixelData.Range_Off;
+                  calibrationInfo.blocks[blockIndex].pixelData.Range_Median = headerData.pixelData.Range_Median;
+                  calibrationInfo.blocks[blockIndex].pixelData.Range_Exp = headerData.pixelData.Range_Exp;
+                  calibrationInfo.blocks[blockIndex].pixelData.Range_Nbits = headerData.pixelData.Range_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.Range_Signed = headerData.pixelData.Range_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.Kappa_Off = headerData.pixelData.Kappa_Off;
+                  calibrationInfo.blocks[blockIndex].pixelData.Kappa_Median = headerData.pixelData.Kappa_Median;
+                  calibrationInfo.blocks[blockIndex].pixelData.Kappa_Exp = headerData.pixelData.Kappa_Exp;
+                  calibrationInfo.blocks[blockIndex].pixelData.Kappa_Nbits = headerData.pixelData.Kappa_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.Kappa_Signed = headerData.pixelData.Kappa_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.Beta0_Off = headerData.pixelData.Beta0_Off;
+                  calibrationInfo.blocks[blockIndex].pixelData.Beta0_Median = headerData.pixelData.Beta0_Median;
+                  calibrationInfo.blocks[blockIndex].pixelData.Beta0_Exp = headerData.pixelData.Beta0_Exp;
+                  calibrationInfo.blocks[blockIndex].pixelData.Beta0_Nbits = headerData.pixelData.Beta0_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.Beta0_Signed = headerData.pixelData.Beta0_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.Alpha_Off = headerData.pixelData.Alpha_Off;
+                  calibrationInfo.blocks[blockIndex].pixelData.Alpha_Median = headerData.pixelData.Alpha_Median;
+                  calibrationInfo.blocks[blockIndex].pixelData.Alpha_Exp = headerData.pixelData.Alpha_Exp;
+                  calibrationInfo.blocks[blockIndex].pixelData.Alpha_Nbits = headerData.pixelData.Alpha_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.Alpha_Signed = headerData.pixelData.Alpha_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.LUTNLIndex_Nbits = headerData.pixelData.LUTNLIndex_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.LUTNLIndex_Signed = headerData.pixelData.LUTNLIndex_Signed;
+                  calibrationInfo.blocks[blockIndex].pixelData.BadPixel_Nbits = headerData.pixelData.BadPixel_Nbits;
+                  calibrationInfo.blocks[blockIndex].pixelData.BadPixel_Signed = headerData.pixelData.BadPixel_Signed;
 
-                     dataLength = headerData.pixelData.PixelDataLength;
-                     dataCRC16 = headerData.pixelData.PixelDataCRC16;
-                     dataOffset = 0;
-                     crc16 = 0xFFFF;
+                  dataLength = headerData.pixelData.PixelDataLength;
+                  dataCRC16 = headerData.pixelData.PixelDataCRC16;
+                  dataOffset = 0;
+                  crc16 = 0xFFFF;
 
-                     CM_INF("Pixel data header loaded.");
-                     cmCurrentState = CMS_LOAD_PIXEL_DATA;
-                  }
+                  CM_INF("Pixel data header loaded.");
+                  cmCurrentState = CMS_LOAD_PIXEL_DATA;
                }
             }
          }
@@ -912,39 +883,30 @@ void Calibration_SM()
       case CMS_LOAD_MAXTK_DATA_HEADER:
          if (calibrationInfo.blocks[blockIndex].MaxTKDataPresence == 1)
          {
-            byteCount = uffs_read(fdCalib, tmpFileDataBuffer, CALIB_MAXTKDATAHEADER_SIZE);
-            if (byteCount != CALIB_MAXTKDATAHEADER_SIZE)
+            byteCount = CalibBlock_ParseMaxTKDataHeader(fdCalib, &fileInfo, &headerData.maxTKData);
+            if (byteCount == 0)
             {
-               CM_ERR("Failed to read MaxTK data header.");
+               CM_ERR("Failed to parse MaxTK data header.");
                cmCurrentState = CMS_ERROR;
             }
             else
             {
-               byteCount = ParseCalibMaxTKDataHeader(tmpFileDataBuffer, byteCount, &headerData.maxTKData);
-               if (byteCount == 0)
-               {
-                  CM_ERR("Failed to parse MaxTK data header.");
-                  cmCurrentState = CMS_ERROR;
-               }
-               else
-               {
-                  calibrationInfo.blocks[blockIndex].maxTKData.TCalMin = headerData.maxTKData.TCalMin;
-                  calibrationInfo.blocks[blockIndex].maxTKData.TCalMax = headerData.maxTKData.TCalMax;
-                  calibrationInfo.blocks[blockIndex].maxTKData.TCalMinExpTimeMin = headerData.maxTKData.TCalMinExpTimeMin;
-                  calibrationInfo.blocks[blockIndex].maxTKData.TCalMinExpTimeMax = headerData.maxTKData.TCalMinExpTimeMax;
-                  calibrationInfo.blocks[blockIndex].maxTKData.TCalMaxExpTimeMin = headerData.maxTKData.TCalMaxExpTimeMin;
-                  calibrationInfo.blocks[blockIndex].maxTKData.TCalMaxExpTimeMax = headerData.maxTKData.TCalMaxExpTimeMax;
-                  calibrationInfo.blocks[blockIndex].maxTKData.TvsINT_FitOrder = headerData.maxTKData.TvsINT_FitOrder;
-                  calibrationInfo.blocks[blockIndex].maxTKData.INTvsT_FitOrder = headerData.maxTKData.INTvsT_FitOrder;
+               calibrationInfo.blocks[blockIndex].maxTKData.TCalMin = headerData.maxTKData.TCalMin;
+               calibrationInfo.blocks[blockIndex].maxTKData.TCalMax = headerData.maxTKData.TCalMax;
+               calibrationInfo.blocks[blockIndex].maxTKData.TCalMinExpTimeMin = headerData.maxTKData.TCalMinExpTimeMin;
+               calibrationInfo.blocks[blockIndex].maxTKData.TCalMinExpTimeMax = headerData.maxTKData.TCalMinExpTimeMax;
+               calibrationInfo.blocks[blockIndex].maxTKData.TCalMaxExpTimeMin = headerData.maxTKData.TCalMaxExpTimeMin;
+               calibrationInfo.blocks[blockIndex].maxTKData.TCalMaxExpTimeMax = headerData.maxTKData.TCalMaxExpTimeMax;
+               calibrationInfo.blocks[blockIndex].maxTKData.TvsINT_FitOrder = headerData.maxTKData.TvsINT_FitOrder;
+               calibrationInfo.blocks[blockIndex].maxTKData.INTvsT_FitOrder = headerData.maxTKData.INTvsT_FitOrder;
 
-                  dataLength = headerData.maxTKData.MaxTKDataLength;
-                  dataCRC16 = headerData.maxTKData.MaxTKDataCRC16;
-                  dataOffset = 0;
-                  crc16 = 0xFFFF;
+               dataLength = headerData.maxTKData.MaxTKDataLength;
+               dataCRC16 = headerData.maxTKData.MaxTKDataCRC16;
+               dataOffset = 0;
+               crc16 = 0xFFFF;
 
-                  CM_INF("MaxTK data header loaded.");
-                  cmCurrentState = CMS_LOAD_MAXTK_DATA;
-               }
+               CM_INF("MaxTK data header loaded.");
+               cmCurrentState = CMS_LOAD_MAXTK_DATA;
             }
          }
          else
@@ -988,41 +950,32 @@ void Calibration_SM()
       case CMS_LOAD_LUTNL_DATA_HEADER:
          if (calibrationInfo.blocks[blockIndex].LUTNLDataPresence == 1)
          {
-            byteCount = uffs_read(fdCalib, tmpFileDataBuffer, CALIB_LUTNLDATAHEADER_SIZE);
-            if (byteCount != CALIB_LUTNLDATAHEADER_SIZE)
+            byteCount = CalibBlock_ParseLUTNLDataHeader(fdCalib, &fileInfo, &headerData.lutNLData);
+            if (byteCount == 0)
             {
-               CM_ERR("Failed to read LUTNL data header.");
+               CM_ERR("Failed to parse LUTNL data header.");
                cmCurrentState = CMS_ERROR;
             }
             else
             {
-               byteCount = ParseCalibLUTNLDataHeader(tmpFileDataBuffer, byteCount, &headerData.lutNLData);
-               if (byteCount == 0)
-               {
-                  CM_ERR("Failed to parse LUTNL data header.");
-                  cmCurrentState = CMS_ERROR;
-               }
-               else
-               {
-                  calibrationInfo.blocks[blockIndex].lutNLData.LUT_Xmin = headerData.lutNLData.LUT_Xmin;
-                  calibrationInfo.blocks[blockIndex].lutNLData.LUT_Xrange = headerData.lutNLData.LUT_Xrange;
-                  calibrationInfo.blocks[blockIndex].lutNLData.LUT_Size = headerData.lutNLData.LUT_Size;
-                  calibrationInfo.blocks[blockIndex].lutNLData.M_Exp = headerData.lutNLData.M_Exp;
-                  calibrationInfo.blocks[blockIndex].lutNLData.B_Exp = headerData.lutNLData.B_Exp;
-                  calibrationInfo.blocks[blockIndex].lutNLData.M_Nbits = headerData.lutNLData.M_Nbits;
-                  calibrationInfo.blocks[blockIndex].lutNLData.B_Nbits = headerData.lutNLData.B_Nbits;
-                  calibrationInfo.blocks[blockIndex].lutNLData.M_Signed = headerData.lutNLData.M_Signed;
-                  calibrationInfo.blocks[blockIndex].lutNLData.B_Signed = headerData.lutNLData.B_Signed;
-                  calibrationInfo.blocks[blockIndex].lutNLData.NumberOfLUTNL = headerData.lutNLData.NumberOfLUTNL;
+               calibrationInfo.blocks[blockIndex].lutNLData.LUT_Xmin = headerData.lutNLData.LUT_Xmin;
+               calibrationInfo.blocks[blockIndex].lutNLData.LUT_Xrange = headerData.lutNLData.LUT_Xrange;
+               calibrationInfo.blocks[blockIndex].lutNLData.LUT_Size = headerData.lutNLData.LUT_Size;
+               calibrationInfo.blocks[blockIndex].lutNLData.M_Exp = headerData.lutNLData.M_Exp;
+               calibrationInfo.blocks[blockIndex].lutNLData.B_Exp = headerData.lutNLData.B_Exp;
+               calibrationInfo.blocks[blockIndex].lutNLData.M_Nbits = headerData.lutNLData.M_Nbits;
+               calibrationInfo.blocks[blockIndex].lutNLData.B_Nbits = headerData.lutNLData.B_Nbits;
+               calibrationInfo.blocks[blockIndex].lutNLData.M_Signed = headerData.lutNLData.M_Signed;
+               calibrationInfo.blocks[blockIndex].lutNLData.B_Signed = headerData.lutNLData.B_Signed;
+               calibrationInfo.blocks[blockIndex].lutNLData.NumberOfLUTNL = headerData.lutNLData.NumberOfLUTNL;
 
-                  dataLength = headerData.lutNLData.LUT_Size * sizeof(uint32_t);    //read 1 LUT at a time
-                  dataCRC16 = headerData.lutNLData.LUTNLDataCRC16;
-                  dataOffset = 0;
-                  crc16 = 0xFFFF;
+               dataLength = headerData.lutNLData.LUT_Size * sizeof(uint32_t);    //read 1 LUT at a time
+               dataCRC16 = headerData.lutNLData.LUTNLDataCRC16;
+               dataOffset = 0;
+               crc16 = 0xFFFF;
 
-                  CM_INF("LUTNL data header loaded.");
-                  cmCurrentState = CMS_LOAD_LUTNL_DATA;
-               }
+               CM_INF("LUTNL data header loaded.");
+               cmCurrentState = CMS_LOAD_LUTNL_DATA;
             }
          }
          else
@@ -1085,67 +1038,58 @@ void Calibration_SM()
       case CMS_LOAD_LUTRQ_DATA_HEADER:
          if (calibrationInfo.blocks[blockIndex].LUTRQDataPresence == 1)
          {
-            byteCount = uffs_read(fdCalib, tmpFileDataBuffer, CALIB_LUTRQDATAHEADER_SIZE);
-            if (byteCount != CALIB_LUTRQDATAHEADER_SIZE)
+            byteCount = CalibBlock_ParseLUTRQDataHeader(fdCalib, &fileInfo, &headerData.lutRQData);
+            if (byteCount == 0)
             {
-               CM_ERR("Failed to read LUTRQ data header.");
+               CM_ERR("Failed to parse LUTRQ data header.");
                cmCurrentState = CMS_ERROR;
             }
             else
             {
-               byteCount = ParseCalibLUTRQDataHeader(tmpFileDataBuffer, byteCount, &headerData.lutRQData);
-               if (byteCount == 0)
+               switch (headerData.lutRQData.RadiometricQuantityType)
                {
-                  CM_ERR("Failed to parse LUTRQ data header.");
+                  case RQT_RT:
+                     lutRQIndex = LUTRQI_RT;
+                     break;
+
+                  case RQT_IBR:
+                     lutRQIndex = LUTRQI_IBR;
+                     break;
+
+                  case RQT_IBI:
+                     lutRQIndex = LUTRQI_IBI;
+                     break;
+               }
+
+               if (calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].isValid)
+               {
+                  CM_ERR("Calibration block cannot have more than one LUTRQ of the same radiometric quantity type (RQT=%d).",
+                        headerData.lutRQData.RadiometricQuantityType);
                   cmCurrentState = CMS_ERROR;
                }
                else
                {
-                  switch (headerData.lutRQData.RadiometricQuantityType)
-                  {
-                     case RQT_RT:
-                        lutRQIndex = LUTRQI_RT;
-                        break;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].LUT_Xmin = headerData.lutRQData.LUT_Xmin;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].LUT_Xrange = headerData.lutRQData.LUT_Xrange;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].LUT_Size = headerData.lutRQData.LUT_Size;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].M_Exp = headerData.lutRQData.M_Exp;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].B_Exp = headerData.lutRQData.B_Exp;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].Data_Off = headerData.lutRQData.Data_Off;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].Data_Exp = headerData.lutRQData.Data_Exp;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].RadiometricQuantityType = headerData.lutRQData.RadiometricQuantityType;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].M_Nbits = headerData.lutRQData.M_Nbits;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].B_Nbits = headerData.lutRQData.B_Nbits;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].M_Signed = headerData.lutRQData.M_Signed;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].B_Signed = headerData.lutRQData.B_Signed;
 
-                     case RQT_IBR:
-                        lutRQIndex = LUTRQI_IBR;
-                        break;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataOffset = uffs_tell(fdCalib);
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataLength = headerData.lutRQData.LUTRQDataLength;
+                  calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataCRC16 = headerData.lutRQData.LUTRQDataCRC16;
+                  dataOffset = 0;
+                  crc16 = 0xFFFF;
 
-                     case RQT_IBI:
-                        lutRQIndex = LUTRQI_IBI;
-                        break;
-                  }
-
-                  if (calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].isValid)
-                  {
-                     CM_ERR("Calibration block cannot have more than one LUTRQ of the same radiometric quantity type (RQT=%d).",
-                           headerData.lutRQData.RadiometricQuantityType);
-                     cmCurrentState = CMS_ERROR;
-                  }
-                  else
-                  {
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].LUT_Xmin = headerData.lutRQData.LUT_Xmin;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].LUT_Xrange = headerData.lutRQData.LUT_Xrange;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].LUT_Size = headerData.lutRQData.LUT_Size;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].M_Exp = headerData.lutRQData.M_Exp;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].B_Exp = headerData.lutRQData.B_Exp;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].Data_Off = headerData.lutRQData.Data_Off;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].Data_Exp = headerData.lutRQData.Data_Exp;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].RadiometricQuantityType = headerData.lutRQData.RadiometricQuantityType;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].M_Nbits = headerData.lutRQData.M_Nbits;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].B_Nbits = headerData.lutRQData.B_Nbits;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].M_Signed = headerData.lutRQData.M_Signed;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].B_Signed = headerData.lutRQData.B_Signed;
-
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataOffset = uffs_tell(fdCalib);
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataLength = headerData.lutRQData.LUTRQDataLength;
-                     calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataCRC16 = headerData.lutRQData.LUTRQDataCRC16;
-                     dataOffset = 0;
-                     crc16 = 0xFFFF;
-
-                     CM_INF("LUTRQ data header loaded.");
-                     cmCurrentState = CMS_LOAD_LUTRQ_DATA;
-                  }
+                  CM_INF("LUTRQ data header loaded.");
+                  cmCurrentState = CMS_LOAD_LUTRQ_DATA;
                }
             }
          }
@@ -1692,7 +1636,6 @@ IRC_Status_t Calibration_LoadLUTRQ(uint8_t initLUTRQ)
  */
 static IRC_Status_t Calibration_LoadBlockLUTRQ(uint32_t blockIndex, uint32_t lutRQIndex)
 {
-   char filelongname[FM_LONG_FILENAME_SIZE];
    int fdCalib;
    uint32_t dataOffset;
    uint32_t length;
@@ -1731,8 +1674,7 @@ static IRC_Status_t Calibration_LoadBlockLUTRQ(uint32_t blockIndex, uint32_t lut
    }
 
    // Open block file
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, calibrationInfo.blocks[blockIndex].file->name);
-   fdCalib = uffs_open(filelongname, UO_RDONLY);
+   fdCalib = FM_OpenFile(calibrationInfo.blocks[blockIndex].file->name);
    if (fdCalib == -1)
    {
       CM_ERR("Failed to open block file.");

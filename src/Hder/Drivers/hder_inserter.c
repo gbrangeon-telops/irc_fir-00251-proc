@@ -185,9 +185,9 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write32((uint32_t)(pGCRegs->ManualFilterSerialNumber), a->ADD + A_BASE_HEADER + ManualFilterSerialNumberHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->SensorID), a->ADD + A_BASE_HEADER + SensorIDHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->PixelDataResolution), a->ADD + A_BASE_HEADER + PixelDataResolutionHdrAddr);
-   AXI4L_write8((uint8_t)(CALIB_BLOCKFILEMAJORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesMajorVersionHdrAddr);
-   AXI4L_write8((uint8_t)(CALIB_BLOCKFILEMINORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesMinorVersionHdrAddr);
-   AXI4L_write8((uint8_t)(CALIB_BLOCKFILESUBMINORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesSubMinorVersionHdrAddr);
+   AXI4L_write8((uint8_t)(CALIBBLOCK_FILEMAJORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesMajorVersionHdrAddr);
+   AXI4L_write8((uint8_t)(CALIBBLOCK_FILEMINORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesMinorVersionHdrAddr);
+   AXI4L_write8((uint8_t)(CALIBBLOCK_FILESUBMINORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesSubMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(CALIB_DATAFLOWMAJORVERSION), a->ADD + A_BASE_HEADER + DeviceDataFlowMajorVersionHdrAddr);
    AXI4L_write8((uint8_t)(CALIB_DATAFLOWMINORVERSION), a->ADD + A_BASE_HEADER + DeviceDataFlowMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareMajorVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareMajorVersionHdrAddr);

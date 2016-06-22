@@ -678,7 +678,7 @@ void GC_CalibrationUpdateRegisters()
             // Configure ExposureTime for FW module
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
             {
-               FWExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US;
+               FWExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
                SFW_SetExposureTimeArray(i, FWExposureTime[i]);
             }
 
@@ -701,7 +701,7 @@ void GC_CalibrationUpdateRegisters()
             gcRegsData.EHDRIMode = EHDRIM_Advanced;
             gcRegsData.EHDRINumberOfExposures = calibrationInfo.collection.NumberOfBlocks;
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
-               EHDRIExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US;
+               EHDRIExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
             gcRegsData.ExposureTime1 = EHDRIExposureTime[0];
             gcRegsData.ExposureTime2 = EHDRIExposureTime[1];
             gcRegsData.ExposureTime3 = EHDRIExposureTime[2];
@@ -727,9 +727,9 @@ void GC_UpdateParameterLimits()
    {
       // Find max ExposureTime in calibration blocks
       index = 0;
-      gcRegsData.ExposureTime = (float)calibrationInfo.blocks[index++].ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US;
+      gcRegsData.ExposureTime = (float)calibrationInfo.blocks[index++].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
       for (; index < calibrationInfo.collection.NumberOfBlocks; index++)
-         gcRegsData.ExposureTime = MAX(gcRegsData.ExposureTime, (float)calibrationInfo.blocks[index].ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US);
+         gcRegsData.ExposureTime = MAX(gcRegsData.ExposureTime, (float)calibrationInfo.blocks[index].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
    }
    // Validate ExposureTimes of EHDRI module
    else if (EHDRIIsActive)

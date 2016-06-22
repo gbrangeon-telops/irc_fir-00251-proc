@@ -14,6 +14,7 @@
  */
 
 #include "FileManager.h"
+#include "FileInfo.h"
 #include "GC_Registers.h"
 #include "CRC.h"
 #include "uffs\uffs.h"
@@ -27,15 +28,6 @@
 #include <string.h> // For memcpy and strcmp
 
 int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
-
-char gFM_FileSignature[][F1F2_FILE_TYPE_SIZE + 1] = {
-      "",
-      "TSAC",
-      "TSBL",
-      "TSCO",
-      "TSDV",
-      "TSFS"
-};
 
 /**
  * File manager network port.
@@ -152,6 +144,7 @@ void File_Manager_SM()
    static uint32_t fileIndex;
    static uint32_t fileSize;
    static uint16_t fileCRC16;
+   extern char gFI_FileSignature[][5];
    IRC_Status_t status;
    fileRecord_t *file;
    uint32_t length;
@@ -196,7 +189,7 @@ void File_Manager_SM()
                         fmResponse.f1f2.payload.fileInfo.size = gFM_files.item[fileIndex]->size;
                         fmResponse.f1f2.payload.fileInfo.attributes = gFM_files.item[fileIndex]->attributes;
                         fmResponse.f1f2.payload.fileInfo.id = GetFileID(gFM_files.item[fileIndex]);
-                        memcpy(fmResponse.f1f2.payload.fileInfo.type, gFM_FileSignature[gFM_files.item[fileIndex]->type], F1F2_FILE_TYPE_SIZE);
+                        memcpy(fmResponse.f1f2.payload.fileInfo.type, gFI_FileSignature[gFM_files.item[fileIndex]->type], F1F2_FILE_TYPE_SIZE);
                      }
                      else
                      {
@@ -368,7 +361,7 @@ void File_Manager_SM()
                            (gFM_files.item[fileIndex]->type == FT_TSFS) ||
                            (gFM_files.item[fileIndex]->type == FT_TSDV)))
                         {
-                           FM_ERR("%s files are protected.", gFM_FileSignature[gFM_files.item[fileIndex]->type]);
+                           FM_ERR("%s files are protected.", gFI_FileSignature[gFM_files.item[fileIndex]->type]);
                            F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                         }
                         else
@@ -486,7 +479,6 @@ IRC_Status_t FM_InitFileDB()
    struct uffs_dirent *de;
    struct uffs_stat filestat;
    char filelongname[FM_LONG_FILENAME_SIZE];
-   int retval;
    IRC_Status_t status;
    uint32_t fileCount;
    uint32_t i;
@@ -519,8 +511,7 @@ IRC_Status_t FM_InitFileDB()
          if (fileCount < FM_MAX_NUM_FILE)
          {
             sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, de->d_name);
-            retval = uffs_stat(filelongname, &filestat);
-            if (retval == 0)
+            if (uffs_stat(filelongname, &filestat) == 0)
             {
                // Add file in database
                strcpy(gFM_fileDB[fileCount].name, de->d_name);
@@ -585,6 +576,7 @@ IRC_Status_t FM_InitFileDB()
  */
 void FM_ListFileDB()
 {
+   extern char gFI_FileSignature[][5];
    uint32_t i;
 
    for (i = 0; i < FM_MAX_NUM_FILE; i++)
@@ -598,7 +590,7 @@ void FM_ListFileDB()
                gFM_fileDB[i].attributes,
                gFM_fileDB[i].deviceSerialNumber,
                gFM_fileDB[i].posixTime,
-               gFM_FileSignature[gFM_fileDB[i].type]);
+               gFI_FileSignature[gFM_fileDB[i].type]);
       }
       else
       {
@@ -619,12 +611,9 @@ uint8_t FM_FileExists(const char *filename)
 {
    char filelongname[FM_LONG_FILENAME_SIZE];
    struct uffs_stat filestat;
-   int retval;
 
    sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   retval = uffs_stat(filelongname, &filestat);
-
-   return (retval == 0);
+   return (uffs_stat(filelongname, &filestat) == 0);
 }
 
 /**
@@ -639,17 +628,31 @@ uint32_t FM_GetFileSize(const char *filename)
 {
    char filelongname[FM_LONG_FILENAME_SIZE];
    struct uffs_stat filestat;
-   int retval;
 
    sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   retval = uffs_stat(filelongname, &filestat);
-   if (retval == -1)
+   if (uffs_stat(filelongname, &filestat) == -1)
    {
       FM_ERR("File stat failed.");
       return 0;
    }
 
    return filestat.st_size;
+}
+
+/**
+ * Open file and return file descriptor.
+ *
+ * @param filename is the name of the file.
+ *
+ * @return the file descriptor.
+ * @return -1 if failed to open file.
+ */
+int FM_OpenFile(const char *filename)
+{
+   char filelongname[FM_LONG_FILENAME_SIZE];
+
+   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
+   return uffs_open(filelongname, UO_RDONLY);
 }
 
 /**
@@ -665,34 +668,26 @@ uint32_t FM_GetFileSize(const char *filename)
  */
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length)
 {
-   int fd;
-   char filelongname[FM_LONG_FILENAME_SIZE];
-   int retval;
-
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   fd = uffs_open(filelongname, UO_RDONLY);
+   int fd = FM_OpenFile(filename);
    if (fd == -1)
    {
       FM_ERR("File open failed.");
       return IRC_FAILURE;
    }
 
-   retval = uffs_seek(fd, offset, USEEK_SET);
-   if (retval == -1)
+   if (uffs_seek(fd, offset, USEEK_SET) == -1)
    {
       FM_ERR("File seek failed.");
       return IRC_FAILURE;
    }
 
-   retval = uffs_read(fd, data, length);
-   if (retval != length)
+   if (uffs_read(fd, data, length) != length)
    {
       FM_ERR("File read failed.");
       return IRC_FAILURE;
    }
 
-   retval = uffs_close(fd);
-   if (retval == -1)
+   if (uffs_close(fd) == -1)
    {
       FM_ERR("File close failed.");
       return IRC_FAILURE;
@@ -714,34 +709,26 @@ IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t o
  */
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length)
 {
-   int fd;
-   char filelongname[FM_LONG_FILENAME_SIZE];
-   int retval;
-
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   fd = uffs_open(filelongname, UO_WRONLY);
+   int fd = FM_OpenFile(filename);
    if (fd == -1)
    {
-      FM_ERR("Failed to open %s.", filelongname);
+      FM_ERR("Failed to open %s.", filename);
       return IRC_FAILURE;
    }
 
-   retval = uffs_seek(fd, offset, USEEK_SET);
-   if (retval == -1)
+   if (uffs_seek(fd, offset, USEEK_SET) == -1)
    {
       FM_ERR("File seek failed.");
       return IRC_FAILURE;
    }
 
-   retval = uffs_write(fd, data, length);
-   if (retval != length)
+   if (uffs_write(fd, data, length) != length)
    {
       FM_ERR("File write failed.");
       return IRC_FAILURE;
    }
 
-   retval = uffs_close(fd);
-   if (retval == -1)
+   if (uffs_close(fd) == -1)
    {
       FM_ERR("File close failed.\n");
       return IRC_FAILURE;
@@ -762,7 +749,6 @@ fileRecord_t *FM_CreateFile(const char *filename)
 {
    int fd;
    char filelongname[FM_LONG_FILENAME_SIZE];
-   int retval;
    uint32_t i;
 
    // Check if file exists
@@ -786,21 +772,19 @@ fileRecord_t *FM_CreateFile(const char *filename)
    }
 
    // Create file
-   sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   fd = uffs_open(filelongname, UO_WRONLY | UO_CREATE | UO_TRUNC);
+   fd = FM_OpenFile(filename);
    if (fd == -1)
    {
       FM_ERR("File open failed.");
       return NULL;
    }
 
-   retval = uffs_close(fd);
-   if (retval == -1)
+   if (uffs_close(fd) == -1)
    {
       FM_ERR("File close failed.");
 
-      retval = uffs_remove(filelongname);
-      if (retval == -1)
+      sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
+      if (uffs_remove(filelongname) == -1)
       {
          FM_ERR("File remove failed.");
       }
@@ -826,10 +810,9 @@ fileRecord_t *FM_CreateFile(const char *filename)
 IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
 {
    IRC_Status_t status;
-   uint32_t dataLength;
-   BlockFileHeader_t blockFileHeader;
-   char fileType[F1F2_FILE_TYPE_SIZE + 1];
-   uint32_t i;
+   CalibBlock_BlockFileHeader_t blockFileHeader;
+   fileInfo_t fileInfo;
+   int fd;
 
    if ((file == NULL) || (file->name[0] == '\0'))
    {
@@ -843,120 +826,103 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
       return IRC_FAILURE;
    }
 
-   file->type = FT_NONE;
+   FI_GetFileInfo(file->name, &fileInfo);
+   file->type = fileInfo.type;
 
-   dataLength = MIN(file->size, FM_TEMP_FILE_DATA_BUFFER_SIZE);
-   status = FM_ReadDataFromFile(tmpFileDataBuffer, file->name, 0, dataLength);
-   if ((status == IRC_SUCCESS) && (dataLength >= 20))
+   if (file->type != FT_NONE)
    {
-      // Detect Telops file types
-      memcpy(fileType, tmpFileDataBuffer, F1F2_FILE_TYPE_SIZE);
-      fileType[F1F2_FILE_TYPE_SIZE] = '\0';
+      file->deviceSerialNumber = fileInfo.deviceSerialNumber;
+      file->posixTime = fileInfo.posixTime;
 
-      i = 1; // Skip "None" file type
-      while (i < NUM_OF(gFM_FileSignature))
+      switch(file->type)
       {
-         if (strcmp(fileType, gFM_FileSignature[i]) == 0)
-         {
-            file->type = i;
-            break;
-         }
-
-         i++;
-      }
-
-      if (file->type != FT_NONE)
-      {
-         memcpy(&file->deviceSerialNumber, &tmpFileDataBuffer[12], sizeof(uint32_t));
-         memcpy(&file->posixTime, &tmpFileDataBuffer[16], sizeof(uint32_t));
-
-         switch(file->type)
-         {
-            case FT_TSCO:
-               if (phase == FMP_RUNNING)
-               {
-                  if (FM_FillCollectionInfo(file) == IRC_SUCCESS)
-                  {
-                     // Add file to collection list
-                     FM_AddFileToList(file, &gFM_collections, NULL);
-                  }
-               }
-               else
+         case FT_TSCO:
+            if (phase == FMP_RUNNING)
+            {
+               if (FM_FillCollectionInfo(file) == IRC_SUCCESS)
                {
                   // Add file to collection list
                   FM_AddFileToList(file, &gFM_collections, NULL);
                }
-               break;
+            }
+            else
+            {
+               // Add file to collection list
+               FM_AddFileToList(file, &gFM_collections, NULL);
+            }
+            break;
 
-            case FT_TSBL:
-               if (ParseCalibBlockFileHeader(tmpFileDataBuffer, dataLength, &blockFileHeader) > 0)
+         case FT_TSBL:
+            fd = FM_OpenFile(file->name);
+            if (CalibBlock_ParseBlockFileHeader(fd, &blockFileHeader, NULL) > 0)
+            {
+               switch (blockFileHeader.CalibrationType)
                {
-                  switch (blockFileHeader.CalibrationType)
-                  {
-                     case CALT_NL:
-                        FM_AddFileToList(file, &gFM_nlBlocks, NULL);
-                        break;
+                  case CALT_NL:
+                     FM_AddFileToList(file, &gFM_nlBlocks, NULL);
+                     break;
 
-                     case CALT_ICU:
-                        FM_AddFileToList(file, &gFM_icuBlocks, NULL);
-                        break;
+                  case CALT_ICU:
+                     FM_AddFileToList(file, &gFM_icuBlocks, NULL);
+                     break;
 
-                     case CALT_MULTIPOINT:
-                     case CALT_TELOPS:
-                        FM_AddFileToList(file, &gFM_calibrationBlocks, NULL);
-                        break;
+                  case CALT_MULTIPOINT:
+                  case CALT_TELOPS:
+                     FM_AddFileToList(file, &gFM_calibrationBlocks, NULL);
+                     break;
 
-                     default:
-                        FM_ERR("Unknown block calibration type (%s).", file->name);
-                        break;
-                  }
+                  default:
+                     FM_ERR("Unknown block calibration type (%s).", file->name);
+                     break;
                }
-               else
-               {
-                  FM_ERR("Failed to parse block file header (%s).", file->name);
-               }
-               break;
+            }
+            else
+            {
+               FM_ERR("Failed to parse block file header (%s).", file->name);
+            }
+            uffs_close(fd);
+            break;
 
-            case FT_TSAC:
-               FM_AddFileToList(file, &gFM_calibrationActualizationFiles, NULL);
-               break;
+         case FT_TSAC:
+         case FT_TSIC:
+            FM_AddFileToList(file, &gFM_calibrationActualizationFiles, NULL);
+            break;
 
-            case FT_TSFS:
-               if (phase == FMP_INIT)
-               {
-                  status = FlashSettings_Load(file->name, FSLI_LOAD_IMMEDIATELY);
-               }
-               else
-               {
-                  status = FlashSettings_Load(file->name, FSLI_DEFERRED_LOADING);
-               }
+         case FT_TSFS:
+            if (phase == FMP_INIT)
+            {
+               status = FlashSettings_Load(file->name, FSLI_LOAD_IMMEDIATELY);
+            }
+            else
+            {
+               status = FlashSettings_Load(file->name, FSLI_DEFERRED_LOADING);
+            }
 
+            if (status != IRC_SUCCESS)
+            {
+               FM_ERR("Failed to load flash settings.");
+            }
+
+            // Remove existing flash settings file
+            if ((gFM_flashSettingsFile != NULL) && (gFM_flashSettingsFile != file))
+            {
+               status = FM_RemoveFile(gFM_flashSettingsFile);
                if (status != IRC_SUCCESS)
                {
-                  FM_ERR("Failed to load flash settings.");
+                  FM_ERR("Failed to remove %s.", gFM_flashSettingsFile->name);
                }
+            }
 
-               // Remove existing flash settings file
-               if ((gFM_flashSettingsFile != NULL) && (gFM_flashSettingsFile != file))
-               {
-                  status = FM_RemoveFile(gFM_flashSettingsFile);
-                  if (status != IRC_SUCCESS)
-                  {
-                     FM_ERR("Failed to remove %s.", gFM_flashSettingsFile->name);
-                  }
-               }
+            gFM_flashSettingsFile = file;
+            break;
 
-               gFM_flashSettingsFile = file;
-               break;
+         case FT_TSDV:
+            gFM_flashDynamicValuesFile = file;
+            break;
 
-            case FT_TSDV:
-               gFM_flashDynamicValuesFile = file;
-               break;
-
-            case FT_NONE:
-               // Do nothing
-               break;
-         }
+         case FT_NONE:
+            // Do nothing
+            break;
       }
    }
 
@@ -978,7 +944,6 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
    extern flashDynamicValues_t gFlashDynamicValues;
 
    char filelongname[FM_LONG_FILENAME_SIZE];
-   int retval;
 
    if ((file == NULL) || (file->name[0] == '\0'))
    {
@@ -988,8 +953,7 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
 
    // Remove file from file system
    sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, file->name);
-   retval = uffs_remove(filelongname);
-   if (retval == -1)
+   if (uffs_remove(filelongname) == -1)
    {
       FM_ERR("File remove failed.");
       return IRC_FAILURE;
@@ -1205,7 +1169,7 @@ void FM_SortFileList(fileList_t *fileList)
    uint32_t fileMovedCount;
    uint32_t i;
 
-   if ((fileList->keyCount == 0) || (fileList->keys[0] == FO_NONE))
+   if ((fileList->count == 0) || (fileList->keyCount == 0) || (fileList->keys[0] == FO_NONE))
    {
       return;
    }
@@ -1224,6 +1188,7 @@ void FM_SortFileList(fileList_t *fileList)
             fileMovedCount++;
          }
       }
+
    }
    while (fileMovedCount != 0);
 }

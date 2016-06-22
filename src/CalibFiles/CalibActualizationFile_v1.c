@@ -1,29 +1,25 @@
 /**
- * @file CalibActualizationFile.c
- * Camera calibration actualization file structure definition.
+ * @file CalibActualizationFile_v1.c
+ * Camera image correction calibration file structure v1 definition.
  *
- * This file defines camera calibration actualization file structure.
- * 
+ * This file defines camera image correction calibration file structure v1.
+ *
+ * Auto-generated Image Correction Calibration File library.
+ * Generated from the image correction calibration file structure definition XLS file version 1.1.0
+ * using generateIRCamCalibrationFileCLib.m Matlab script.
+ *
  * $Rev$
  * $Author$
  * $Date$
  * $Id$
  * $URL$
  *
- * (c) Copyright 2014 Telops Inc.
+ * (c) Copyright 2016 Telops Inc.
  */
 
-#include "CalibActualizationFile.h"
-#include "verbose.h"
+#include "CalibActualizationFile_v1.h"
 #include "CRC.h"
 #include <string.h>
-
-void CalibActualizationFileHeader_UpdateVersion(ActualizationFileHeader_t *hdr);
-
-/* AUTO-CODE BEGIN */
-// Auto-generated Calibration Actualization File library.
-// Generated from the calibration actualization file structure definition XLS file version 1.1.0
-// using generateIRCamActualizationCalibrationFileCLib.m Matlab script.
 
 /**
  * ActualizationFileHeader parser.
@@ -35,7 +31,7 @@ void CalibActualizationFileHeader_UpdateVersion(ActualizationFileHeader_t *hdr);
  * @return the number of byte read from the buffer.
  * @return 0 if an error occurred.
  */
-uint32_t ParseCalibActualizationFileHeader(uint8_t *buffer, uint32_t buflen, ActualizationFileHeader_t *hdr)
+uint32_t CalibActualization_ParseActualizationFileHeader_v1(uint8_t *buffer, uint32_t buflen, CalibActualization_ActualizationFileHeader_v1_t *hdr)
 {
    uint32_t numBytes = 0;
 
@@ -93,8 +89,6 @@ uint32_t ParseCalibActualizationFileHeader(uint8_t *buffer, uint32_t buflen, Act
       return 0;
    }
 
-   CalibActualizationFileHeader_UpdateVersion(hdr);
-
    return numBytes;
 }
 
@@ -108,7 +102,7 @@ uint32_t ParseCalibActualizationFileHeader(uint8_t *buffer, uint32_t buflen, Act
  * @return the number of byte written to the buffer.
  * @return 0 if an error occurred.
  */
-uint32_t WriteCalibActualizationFileHeader(ActualizationFileHeader_t *hdr, uint8_t *buffer, uint32_t buflen)
+uint32_t CalibActualization_WriteActualizationFileHeader_v1(CalibActualization_ActualizationFileHeader_v1_t *hdr, uint8_t *buffer, uint32_t buflen)
 {
    uint32_t numBytes = 0;
 
@@ -142,7 +136,7 @@ uint32_t WriteCalibActualizationFileHeader(ActualizationFileHeader_t *hdr, uint8
 
    hdr->ActualizationFileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
    memcpy(&buffer[510], &hdr->ActualizationFileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-
+   
    return numBytes;
 }
 
@@ -156,7 +150,7 @@ uint32_t WriteCalibActualizationFileHeader(ActualizationFileHeader_t *hdr, uint8
  * @return the number of byte read from the buffer.
  * @return 0 if an error occurred.
  */
-uint32_t ParseCalibActualizationDataHeader(uint8_t *buffer, uint32_t buflen, ActualizationDataHeader_t *hdr)
+uint32_t CalibActualization_ParseActualizationDataHeader_v1(uint8_t *buffer, uint32_t buflen, CalibActualization_ActualizationDataHeader_v1_t *hdr)
 {
    uint32_t numBytes = 0;
 
@@ -203,7 +197,7 @@ uint32_t ParseCalibActualizationDataHeader(uint8_t *buffer, uint32_t buflen, Act
  * @return the number of byte written to the buffer.
  * @return 0 if an error occurred.
  */
-uint32_t WriteCalibActualizationDataHeader(ActualizationDataHeader_t *hdr, uint8_t *buffer, uint32_t buflen)
+uint32_t CalibActualization_WriteActualizationDataHeader_v1(CalibActualization_ActualizationDataHeader_v1_t *hdr, uint8_t *buffer, uint32_t buflen)
 {
    uint32_t numBytes = 0;
 
@@ -221,7 +215,7 @@ uint32_t WriteCalibActualizationDataHeader(ActualizationDataHeader_t *hdr, uint8
 
    hdr->ActualizationDataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
    memcpy(&buffer[254], &hdr->ActualizationDataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-
+   
    return numBytes;
 }
 
@@ -235,7 +229,7 @@ uint32_t WriteCalibActualizationDataHeader(ActualizationDataHeader_t *hdr, uint8
  * @return the number of byte read from the buffer.
  * @return 0 if an error occurred.
  */
-uint32_t ParseCalibActualizationData(uint8_t *buffer, uint32_t buflen, ActualizationData_t *data)
+uint32_t CalibActualization_ParseActualizationData_v1(uint8_t *buffer, uint32_t buflen, CalibActualization_ActualizationData_v1_t *data)
 {
    uint32_t numBytes = 0;
    uint16_t rawData;
@@ -248,13 +242,13 @@ uint32_t ParseCalibActualizationData(uint8_t *buffer, uint32_t buflen, Actualiza
 
    memcpy(&rawData, buffer, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
-   data->DeltaBeta = ((rawData & CALIB_ACTUALIZATIONDATA_DELTABETA_MASK) >> CALIB_ACTUALIZATIONDATA_DELTABETA_SHIFT);
-   if ((data->DeltaBeta & CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS) == CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS)
+   data->DeltaBeta = ((rawData & CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_MASK_V1) >> CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_SHIFT_V1);
+   if ((data->DeltaBeta & CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_SIGNPOS_V1) == CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_SIGNPOS_V1)
    {
       // Sign extension
       data->DeltaBeta |= 0xF800;
    }
-   data->NewBadPixel = ((rawData & CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_MASK) >> CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT);
+   data->NewBadPixel = ((rawData & CALIBACTUALIZATION_ACTUALIZATIONDATA_NEWBADPIXEL_MASK_V1) >> CALIBACTUALIZATION_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT_V1);
 
    return numBytes;
 }
@@ -269,7 +263,7 @@ uint32_t ParseCalibActualizationData(uint8_t *buffer, uint32_t buflen, Actualiza
  * @return the number of byte written to the buffer.
  * @return 0 if an error occurred.
  */
-uint32_t WriteCalibActualizationData(ActualizationData_t *data, uint8_t *buffer, uint32_t buflen)
+uint32_t CalibActualization_WriteActualizationData_v1(CalibActualization_ActualizationData_v1_t *data, uint8_t *buffer, uint32_t buflen)
 {
    uint32_t numBytes = 0;
    uint16_t tmpData;
@@ -282,51 +276,12 @@ uint32_t WriteCalibActualizationData(ActualizationData_t *data, uint8_t *buffer,
    }
 
    tmpData = data->DeltaBeta;
-   rawData |= ((tmpData << CALIB_ACTUALIZATIONDATA_DELTABETA_SHIFT) & CALIB_ACTUALIZATIONDATA_DELTABETA_MASK);
+   rawData |= ((tmpData << CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_SHIFT_V1) & CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_MASK_V1);
    tmpData = data->NewBadPixel;
-   rawData |= ((tmpData << CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT) & CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_MASK);
+   rawData |= ((tmpData << CALIBACTUALIZATION_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT_V1) & CALIBACTUALIZATION_ACTUALIZATIONDATA_NEWBADPIXEL_MASK_V1);
 
    memcpy(buffer, &rawData, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }
 
-/* AUTO-CODE END */
-
-void CalibActualizationFileHeader_UpdateVersion(ActualizationFileHeader_t *hdr)
-{
-   switch (hdr->FileStructureMajorVersion)
-   {
-      case 1:
-         // 1.x.x
-         switch (hdr->FileStructureMinorVersion)
-         {
-            case 0:
-               // 1.0.x -> 1.1.x
-               hdr->SensorID = 0;
-
-               break; // Break after the last minor version only
-
-            default:
-               // Up to date, nothing to do
-               return;
-         }
-
-         break; // Break after the last major version only
-
-      default:
-         // Up to date, nothing to do
-         return;
-   }
-
-   PRINTF("Calibration actualization file structure version %d.%d.%d has been updated to version %d.%d.%d.\n",
-         hdr->FileStructureMajorVersion,
-         hdr->FileStructureMinorVersion,
-         hdr->FileStructureSubMinorVersion,
-         CALIB_ACTUALIZATIONFILEMAJORVERSION,
-         CALIB_ACTUALIZATIONFILEMINORVERSION,
-         CALIB_ACTUALIZATIONFILESUBMINORVERSION);
-
-   hdr->FileStructureMinorVersion = CALIB_ACTUALIZATIONFILEMINORVERSION;
-   hdr->FileStructureSubMinorVersion = CALIB_ACTUALIZATIONFILESUBMINORVERSION;
-}

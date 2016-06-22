@@ -435,7 +435,7 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
 
       // Update exposure time if necessary
       if (calibrationInfo.collection.CalibrationType == CALT_MULTIPOINT)
-         GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], (float)calibrationInfo.blocks[blockIndex].ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US);
+         GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], (float)calibrationInfo.blocks[blockIndex].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
 
       // Save calibration block POSIX time
       if (gFlashDynamicValues.CalibrationCollectionBlockPOSIXTimeAtStartup != calibrationInfo.blocks[blockIndex].POSIXTime)

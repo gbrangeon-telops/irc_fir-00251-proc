@@ -16,6 +16,7 @@
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
+#include "FileInfo.h"
 #include "CtrlInterface.h"
 #include "CircularBuffer.h"
 #include "CalibCollectionFile.h"
@@ -77,23 +78,6 @@ enum fmDBPhaseEnum {
  * File manager phase data type.
  */
 typedef enum fmDBPhaseEnum fmDBPhase_t;
-
-/**
- * File type.
- */
-enum fileTypeEnum {
-   FT_NONE = 0,         /**< None */
-   FT_TSAC,             /**< Actualization file */
-   FT_TSBL,             /**< Calibration bloc file */
-   FT_TSCO,             /**< Calibration collection file */
-   FT_TSDV,             /**< Flash dynamic values file */
-   FT_TSFS              /**< Flash settings file */
-};
-
-/**
- * File type data type.
- */
-typedef enum fileTypeEnum fileType_t;
 
 /**
  * File record data structure.
@@ -183,6 +167,7 @@ IRC_Status_t FM_InitFileDB();
 void FM_ListFileDB();
 uint8_t FM_FileExists(const char *filename);
 uint32_t FM_GetFileSize(const char *filename);
+int FM_OpenFile(const char *filename);
 fileRecord_t *FM_CreateFile(const char *filename);
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);

@@ -21,7 +21,7 @@
 #include "FileManager.h"
 #include "flashSettings.h"
 #include "fpa_intf.h"
-#include "CalibActualizationFile.h"
+#include "CalibImageCorrectionFile.h"
 #include "hder_inserter.h"
 #include "CalibBlockFile.h"
 #include "calib.h"
@@ -113,9 +113,9 @@ extern fileList_t gFM_calibrationBlocks;
 int8_t gActualisationLoadBlockIdx = -1;
 
 // private stuff
-static BlockFileHeader_t refBlockFileHdr; // a header buffer for searching through blocks in flash memory
-static ActualizationFileHeader_t actFileHeader;
-static ActualizationDataHeader_t actDataHeader;
+static CalibBlock_BlockFileHeader_t refBlockFileHdr; // a header buffer for searching through blocks in flash memory
+static CalibImageCorrection_ImageCorrectionFileHeader_t actFileHeader;
+static CalibImageCorrection_ImageCorrectionDataHeader_t actDataHeader;
 
 static ICUParams_t icuParams;
 
@@ -722,7 +722,7 @@ IRC_Status_t Actualization_SM()
                GC_SetAcquisitionFrameRate(ACT_DEFAULT_FPS);
 
             // set the starting point for the exposure time
-            gcRegsData.ExposureTime = (float)refBlockFileHdr.ExposureTime * CALIB_BLOCKFILE_EXP_TIME_TO_US;
+            gcRegsData.ExposureTime = (float)refBlockFileHdr.ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
             if (gcRegsData.ExposureTime <= FPA_MIN_EXPOSURE || gcRegsData.ExposureTime >= FPA_MAX_EXPOSURE)
                gcRegsData.ExposureTime = FPA_DEFAULT_EXPOSURE;
 
@@ -2434,7 +2434,7 @@ void unpackLUTData( uint32_t LUTData, LUTRQInfo_t *p_LUTInfo, float *p_m, float 
   */
 void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, float* deltaBetaOut, float* alphaOut)
 {
-   static const uint64_t alpha_mask = CALIB_PIXELDATA_ALPHA_MASK;
+   static const uint64_t alpha_mask = CALIBBLOCK_PIXELDATA_ALPHA_MASK;
    float alpha, delta_beta;
    uint16_t raw_alpha;
    uint64_t calData;
@@ -2444,7 +2444,7 @@ void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha
    const float alpha_offset = blockInfo->pixelData.Alpha_Off;
 
    // Extract alpha from current calibration data => 12 lsb
-   raw_alpha = (uint16_t) (( calData & alpha_mask ) >> CALIB_PIXELDATA_ALPHA_SHIFT);
+   raw_alpha = (uint16_t) (( calData & alpha_mask ) >> CALIBBLOCK_PIXELDATA_ALPHA_SHIFT);
    alpha = (float) raw_alpha * Alpha_LSB + alpha_offset;
 
    // Compute delta beta ( see notes in function header )
@@ -2506,8 +2506,8 @@ void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha
 
 bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut)
 {
-   static const int16_t minRawData = -CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS; //-2^10
-   static const int16_t maxRawData = CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
+   static const int16_t minRawData = -CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS; //-2^10
+   static const int16_t maxRawData = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
    static const int16_t max16s = SHRT_MAX;
    static const int16_t min16s = SHRT_MIN;
    int16_t raw_delta_beta = 0;
@@ -2531,9 +2531,9 @@ bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* ra
 
    // now set the NewBadPixel bit (in reverse logic)
    if (isNewBadPixel)
-      BitClr(raw_delta_beta, CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT);
+      BitClr(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT);
    else
-      BitSet(raw_delta_beta, CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT);
+      BitSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT);
 
    *rawDeltaBetaOut = raw_delta_beta;
 
@@ -2696,8 +2696,8 @@ uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_
   */
 uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_CalData, int16_t deltaBeta, int8_t expBitShift)
 {
-   static const int32_t minRawData = -CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS; //-2^10
-   static const int32_t maxRawData = CALIB_ACTUALIZATIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
+   static const int32_t minRawData = -CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS; //-2^10
+   static const int32_t maxRawData = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
 
    int16_t raw_current_beta, raw_corr_beta, corr_deltaBeta;
    uint8_t saturation = false;
@@ -2710,11 +2710,11 @@ uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_Ca
    isAlreadyBad = isBadPixel(&calData);
 
    // Extract current beta from current calibration data
-   raw_current_beta = (int16_t) ((calData & CALIB_PIXELDATA_BETA0_MASK) >> CALIB_PIXELDATA_BETA0_SHIFT );
+   raw_current_beta = (int16_t) ((calData & CALIBBLOCK_PIXELDATA_BETA0_MASK) >> CALIBBLOCK_PIXELDATA_BETA0_SHIFT );
    SIGN_EXT16( raw_current_beta, blockInfo->pixelData.Beta0_Nbits );
 
-   newBadPixel = !BitTst(deltaBeta, CALIB_ACTUALIZATIONDATA_NEWBADPIXEL_SHIFT); // the bad pixel bit is in reverse logic
-   deltaBeta &= CALIB_ACTUALIZATIONDATA_DELTABETA_MASK; // extract the data without the bad pixel flag
+   newBadPixel = !BitTst(deltaBeta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT); // the bad pixel bit is in reverse logic
+   deltaBeta &= CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_MASK; // extract the data without the bad pixel flag
    SIGN_EXT16( deltaBeta, DELTA_BETA_NUM_BITS);
 
    // the following implements :  corr_deltaBeta = deltaBeta * 2^(+/-)expBitShift
@@ -2762,11 +2762,11 @@ uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_Ca
    // Write corrected beta value into calibration data
 
    // clear the beta data bits first
-   calData &= ~CALIB_PIXELDATA_BETA0_MASK;
-   calData |= ( ((uint64_t)raw_corr_beta) << CALIB_PIXELDATA_BETA0_SHIFT ) & CALIB_PIXELDATA_BETA0_MASK;
+   calData &= ~CALIBBLOCK_PIXELDATA_BETA0_MASK;
+   calData |= ( ((uint64_t)raw_corr_beta) << CALIBBLOCK_PIXELDATA_BETA0_SHIFT ) & CALIBBLOCK_PIXELDATA_BETA0_MASK;
 
    if (newBadPixel) // clear the badpixel bit when it is bad (reverse logic) (do nothing otherwise)
-      BitMaskClr(calData, CALIB_PIXELDATA_BADPIXEL_MASK);
+      BitMaskClr(calData, CALIBBLOCK_PIXELDATA_BADPIXEL_MASK);
 
    *p_CalData = calData;
 
@@ -2796,8 +2796,8 @@ fileRecord_t* findIcuReferenceBlock()
 {
    int n = gFM_icuBlocks.count;
    int i = 0;
+   int fd;
    uint32_t length=0;
-   IRC_Status_t status;
    fileRecord_t* filerec = NULL;
 
    if (!calibrationInfo.isValid)
@@ -2806,12 +2806,12 @@ fileRecord_t* findIcuReferenceBlock()
    // get through all block files in flash and find the matching ICU reference
    while (i < n)
    {
-      //status = FM_ReadDataFromFile(tmpFileDataBuffer, gFM_calibrationBlocks.item[i]->name, 0, CALIB_BLOCKFILEHEADER_SIZE);
-      status = FM_ReadDataFromFile(tmpFileDataBuffer, gFM_icuBlocks.item[i]->name, 0, CALIB_BLOCKFILEHEADER_SIZE);
-      if (status != IRC_SUCCESS)
-         break;
+      fd = FM_OpenFile(gFM_icuBlocks.item[i]->name);
 
-      length = ParseCalibBlockFileHeader(tmpFileDataBuffer, CALIB_BLOCKFILEHEADER_SIZE, &refBlockFileHdr);
+      length = CalibBlock_ParseBlockFileHeader(fd, &refBlockFileHdr, NULL);
+
+      uffs_close(fd);
+
       if (length == 0)
       {
          ++i;
@@ -2979,11 +2979,11 @@ IRC_Status_t ActualizationFileWriter_SM()
 
 
       // write file header
-      numBytes = WriteCalibActualizationFileHeader(&actFileHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);
+      numBytes = CalibImageCorrection_WriteImageCorrectionFileHeader(&actFileHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);
 
-      if (numBytes != CALIB_ACTUALIZATIONFILEHEADER_SIZE)
+      if (numBytes != CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE)
       {
-         ACT_ERR("Abnormal file header length (expected %d, got %d).", CALIB_ACTUALIZATIONFILEHEADER_SIZE, numBytes);
+         ACT_ERR("Abnormal file header length (expected %d, got %d).", CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE, numBytes);
          error = true;
          break;
       }
@@ -2995,7 +2995,7 @@ IRC_Status_t ActualizationFileWriter_SM()
          break;
       }
 
-      if (uffs_write(fd, tmpFileDataBuffer, numBytes) != CALIB_ACTUALIZATIONFILEHEADER_SIZE)
+      if (uffs_write(fd, tmpFileDataBuffer, numBytes) != CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE)
       {
          ACT_ERR("Error writing file header to file %s.", shortFileName);
          error = true;
@@ -3051,11 +3051,11 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       uint8_t* dataPtr = (uint8_t*)PROC_MEM_DELTA_BETA_BASEADDR + dataOffset;
 
-      dataCRC = CRC16(dataCRC, dataPtr, blockSize * CALIB_ACTUALIZATIONDATA_SIZE);
+      dataCRC = CRC16(dataCRC, dataPtr, blockSize * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE);
 
       numDataToProcess -= blockSize;
 
-      dataOffset += blockSize * CALIB_ACTUALIZATIONDATA_SIZE;
+      dataOffset += blockSize * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
 
       if (numDataToProcess == 0)
       {
@@ -3070,15 +3070,15 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       actDataHeader.Beta0_Nbits = DELTA_BETA_NUM_BITS;
       actDataHeader.Beta0_Signed = 1;
-      actDataHeader.ActualizationDataCRC16 = dataCRC;
-      actDataHeader.ActualizationDataLength = CALIB_ACTUALIZATIONDATA_SIZE * gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+      actDataHeader.ImageCorrectionDataCRC16 = dataCRC;
+      actDataHeader.ImageCorrectionDataLength = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE * gcRegsData.SensorWidth * gcRegsData.SensorHeight;
 
       // write file data header
-      numBytes = WriteCalibActualizationDataHeader(&actDataHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);
+      numBytes = CalibImageCorrection_WriteImageCorrectionDataHeader(&actDataHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);
 
-      if (numBytes != CALIB_ACTUALIZATIONDATAHEADER_SIZE)
+      if (numBytes != CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE)
       {
-         ACT_ERR("Abnormal data header length (expected %d, got %d).", CALIB_ACTUALIZATIONDATAHEADER_SIZE, numBytes);
+         ACT_ERR("Abnormal data header length (expected %d, got %d).", CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE, numBytes);
          error = true;
          break;
       }
@@ -3089,7 +3089,7 @@ IRC_Status_t ActualizationFileWriter_SM()
          error = true;
          break;
       }
-      if (uffs_write(fd, tmpFileDataBuffer, numBytes) != CALIB_ACTUALIZATIONDATAHEADER_SIZE)
+      if (uffs_write(fd, tmpFileDataBuffer, numBytes) != CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE)
       {
          ACT_ERR("Error writing data header to file %s.", shortFileName);
          error = true;
@@ -3117,7 +3117,7 @@ IRC_Status_t ActualizationFileWriter_SM()
          break;
       }
 
-      numBytes = blockSize * CALIB_ACTUALIZATIONDATA_SIZE;
+      numBytes = blockSize * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
       if (uffs_write(fd, dataAddr, numBytes) != numBytes)
       {
          ACT_ERR("Error writing data to file %s.", shortFileName);
@@ -3127,7 +3127,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       numDataToProcess -= blockSize;
 
-      dataOffset += blockSize * CALIB_ACTUALIZATIONDATA_SIZE;
+      dataOffset += blockSize * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
 
       if (numDataToProcess == 0)
       {
@@ -3485,7 +3485,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
 
 bool isBadPixel(uint64_t* pixelData)
 {
-   return !BitTst(*pixelData, CALIB_PIXELDATA_BADPIXEL_SHIFT);
+   return !BitTst(*pixelData, CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT);
 }
 
 void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength)
@@ -3664,7 +3664,8 @@ IRC_Status_t deleteExternalActualizationFiles()
 {
    int i,j;
    IRC_Status_t status = IRC_FAILURE;
-   ActualizationFileHeader_t header;
+   int fd;
+   CalibImageCorrection_ImageCorrectionFileHeader_t header;
    uint32_t length;
 
    PRINTF("ACT: Deleting external actualization files from a previous boot up\n");
@@ -3672,11 +3673,14 @@ IRC_Status_t deleteExternalActualizationFiles()
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
    {
-      status = FM_ReadDataFromFile(tmpFileDataBuffer, gFM_calibrationActualizationFiles.item[i]->name, 0, CALIB_ACTUALIZATIONFILEHEADER_SIZE);
-      if (status != IRC_SUCCESS)
-         break;
+      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name);
+      length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
+      uffs_close(fd);
 
-      length = ParseCalibActualizationFileHeader(tmpFileDataBuffer, CALIB_ACTUALIZATIONFILEHEADER_SIZE, &header);
+      if (length == 0)
+      {
+         break;
+      }
 
       if (length>0 && 0/*header.type*/) // todo utiliser le futur champ "type" pour filtre les externes des internes
       {
@@ -3710,19 +3714,17 @@ IRC_Status_t deleteExternalActualizationFiles()
 fileRecord_t* findActualizationFile(uint32_t ref_posixtime)
 {
    int i;
-   IRC_Status_t status = IRC_FAILURE;
-   ActualizationFileHeader_t header;
+   int fd;
+   CalibImageCorrection_ImageCorrectionFileHeader_t header;
    uint32_t length;
    fileRecord_t* file = NULL;
 
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
    {
-      status = FM_ReadDataFromFile(tmpFileDataBuffer, gFM_calibrationActualizationFiles.item[i]->name, 0, CALIB_ACTUALIZATIONFILEHEADER_SIZE);
-      if (status != IRC_SUCCESS)
-         break;
-
-      length = ParseCalibActualizationFileHeader(tmpFileDataBuffer, CALIB_ACTUALIZATIONFILEHEADER_SIZE, &header);
+      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name);
+      length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
+      uffs_close(fd);
 
       if (length>0 && header.ReferencePOSIXTime == ref_posixtime)
       {
@@ -3741,10 +3743,10 @@ fileRecord_t* findActualizationFile(uint32_t ref_posixtime)
 void ACT_listActualizationData()
 {
    int i;
-   IRC_Status_t status = IRC_FAILURE;
-   ActualizationFileHeader_t header;
+   CalibImageCorrection_ImageCorrectionFileHeader_t header;
    uint32_t length;
    fileRecord_t* file = NULL;
+   int fd;
    deltabeta_t* current = ACT_getActiveDeltaBeta();
 
    PRINTF("\n");
@@ -3754,11 +3756,9 @@ void ACT_listActualizationData()
    {
       file = gFM_calibrationActualizationFiles.item[i];
 
-      status = FM_ReadDataFromFile(tmpFileDataBuffer, file->name, 0, CALIB_ACTUALIZATIONFILEHEADER_SIZE);
-      if (status != IRC_SUCCESS)
-         break;
-
-      length = ParseCalibActualizationFileHeader(tmpFileDataBuffer, CALIB_ACTUALIZATIONFILEHEADER_SIZE, &header);
+      fd = FM_OpenFile(file->name);
+      length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
+      uffs_close(fd);
 
       // todo afficher les nouveaux champs au lieu de file description
       if (length > 0)
@@ -4145,7 +4145,7 @@ uint32_t countBadPixels(const uint64_t* pixelData, int N)
 
    for (i=0; i<N; ++i)
    {
-      if (BitMaskTst(*pixelData, CALIB_PIXELDATA_BADPIXEL_MASK) == 0)
+      if (BitMaskTst(*pixelData, CALIBBLOCK_PIXELDATA_BADPIXEL_MASK) == 0)
          ++bp;
 
       ++pixelData;
@@ -4377,10 +4377,10 @@ float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
    calData |= ((uint64_t)*p_CalData << 32);
 
    // Extract current beta from current calibration data
-   raw_beta = (int16_t) ((calData & CALIB_PIXELDATA_BETA0_MASK) >> CALIB_PIXELDATA_BETA0_SHIFT );
+   raw_beta = (int16_t) ((calData & CALIBBLOCK_PIXELDATA_BETA0_MASK) >> CALIBBLOCK_PIXELDATA_BETA0_SHIFT );
    SIGN_EXT16( raw_beta, blockInfo->pixelData.Beta0_Nbits );
 
-   if (BitTst(calData, CALIB_PIXELDATA_BADPIXEL_SHIFT) == 0)
+   if (BitTst(calData, CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT) == 0)
       isBad = true;
 
    beta = (float)raw_beta * exponent + offset;
@@ -4398,8 +4398,8 @@ bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockI
    uint64_t* pixelDataAddr = (uint64_t*)p_CalData;
    uint64_t pixelData;
 
-   static const int16_t minRawData = -CALIB_PIXELDATA_BETA0_SIGNPOS; //-2^10
-   static const int16_t maxRawData = CALIB_PIXELDATA_BETA0_SIGNPOS - 1;  // 2^10 - 1
+   static const int16_t minRawData = -CALIBBLOCK_PIXELDATA_BETA0_SIGNPOS; //-2^10
+   static const int16_t maxRawData = CALIBBLOCK_PIXELDATA_BETA0_SIGNPOS - 1;  // 2^10 - 1
    static const int16_t max16s = SHRT_MAX;
    static const int16_t min16s = SHRT_MIN;
    int16_t raw_beta = 0;
@@ -4425,17 +4425,17 @@ bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockI
    pixelData = (uint64_t)*p_CalData++;
    pixelData |= ((uint64_t)*p_CalData++ << 32);
 
-   BitMaskClr(pixelData, CALIB_PIXELDATA_BETA0_MASK);
-   pixelData |= ( ((uint64_t)raw_beta) << CALIB_PIXELDATA_BETA0_SHIFT ) & CALIB_PIXELDATA_BETA0_MASK;
+   BitMaskClr(pixelData, CALIBBLOCK_PIXELDATA_BETA0_MASK);
+   pixelData |= ( ((uint64_t)raw_beta) << CALIBBLOCK_PIXELDATA_BETA0_SHIFT ) & CALIBBLOCK_PIXELDATA_BETA0_MASK;
 
-   //calData &= ~CALIB_PIXELDATA_BETA0_MASK;
-   //calData |= ( ((uint64_t)raw_corr_beta) << CALIB_PIXELDATA_BETA0_SHIFT ) & CALIB_PIXELDATA_BETA0_MASK;
+   //calData &= ~CALIBBLOCK_PIXELDATA_BETA0_MASK;
+   //calData |= ( ((uint64_t)raw_corr_beta) << CALIBBLOCK_PIXELDATA_BETA0_SHIFT ) & CALIBBLOCK_PIXELDATA_BETA0_MASK;
 
    // now set the NewBadPixel bit (in reverse logic)
    if (isNewBadPixel)
-      BitClr(pixelData, CALIB_PIXELDATA_BADPIXEL_SHIFT);
+      BitClr(pixelData, CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT);
    else
-      BitSet(pixelData, CALIB_PIXELDATA_BADPIXEL_SHIFT);
+      BitSet(pixelData, CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT);
 
    *pixelDataAddr = pixelData;
 
