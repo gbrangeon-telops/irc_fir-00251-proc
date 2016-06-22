@@ -265,7 +265,7 @@ IRC_Status_t startActualization( bool internalTrig )
 {
    builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Pending;
 
-   if ( TDCFlagsTst(CalibrationActualizationIsImplementedMask) == 0 )
+   if ( TDCFlagsTst(ImageCorrectionIsImplementedMask) == 0 )
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
       ACT_ERR("Actualization is not implemented on this model.");
@@ -289,7 +289,7 @@ IRC_Status_t startActualization( bool internalTrig )
 
    usingICU = internalTrig;
 
-   if ( TDCStatusTst(WaitingForCalibrationActualizationMask) )
+   if ( TDCStatusTst(WaitingForImageCorrectionMask) )
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
       PRINTF("ACT: Actualization is already running.\n");
@@ -299,7 +299,7 @@ IRC_Status_t startActualization( bool internalTrig )
    if (internalTrig)
    {
       // set the flag early so that the status LED does not become green for a short period of time.
-      TDCStatusSet(WaitingForCalibrationActualizationMask);
+      TDCStatusSet(WaitingForImageCorrectionMask);
       PRINTF( "Starting actualization (internal command)...\n" );
    }
    else
@@ -429,7 +429,7 @@ IRC_Status_t Actualization_SM()
             gStartActualization = 0;
             savedCalibPosixTime = 0;
 
-            TDCStatusSet(WaitingForCalibrationActualizationMask);
+            TDCStatusSet(WaitingForImageCorrectionMask);
 
             setActState(&state, ACT_Start);
          }
@@ -482,7 +482,7 @@ IRC_Status_t Actualization_SM()
             gcRegsData.TestImageSelector = TIS_TelopsDynamicShade;
          }
 
-         if ( TDCFlagsTst(ICUIsImplementedMask) && (usingICU || gcRegsData.CalibrationActualizationMode == CAM_ICU))
+         if ( TDCFlagsTst(ICUIsImplementedMask) && (usingICU || gcRegsData.ImageCorrectionMode == ICM_ICU))
          {
             usingICU = true;
             PRINTF("ACT: Updating calibration using the internal calibration unit.\n");
@@ -505,7 +505,7 @@ IRC_Status_t Actualization_SM()
             else
             {
                ACT_ERR( "Could not find a matching ICU file.");
-               GC_GenerateEventError(EECD_ActualizationInvalidReferenceBlock);
+               GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
                error = true;
             }
 
@@ -553,7 +553,7 @@ IRC_Status_t Actualization_SM()
             if (currentDeltaBeta == NULL)
             {
                ACT_ERR("No active calibration block found.");
-               GC_GenerateEventError(EECD_ActualizationInvalidReferenceBlock);
+               GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
                error = true;
             }
 
@@ -585,7 +585,7 @@ IRC_Status_t Actualization_SM()
                else
                {
                   ACT_ERR( "Could not load the ICU reference block." );
-                  GC_GenerateEventError(EECD_ActualizationInvalidReferenceBlock);
+                  GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
                   error = true;
                }
             }
@@ -602,7 +602,7 @@ IRC_Status_t Actualization_SM()
          else if (TimedOut(&act_timer))
          {
             ACT_ERR( "Timeout while loading reference block." );
-            GC_GenerateEventError(EECD_ActualizationInvalidReferenceBlock);
+            GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
             error = true;
          }
 
@@ -757,7 +757,7 @@ IRC_Status_t Actualization_SM()
          else if (TimedOut(&act_timer))
          {
             ACT_ERR( "Timeout while waiting for acquisition stop.");
-            GC_GenerateEventError(EECD_ActualizationAcquisitionTimeout);
+            GC_GenerateEventError(EECD_ImageCorrectionAcquisitionTimeout);
             error = true;
          }
          break;
@@ -783,7 +783,7 @@ IRC_Status_t Actualization_SM()
          else if (TimedOut(&act_timer))
          {
             ACT_ERR( "Timeout while waiting for acquisition start.");
-            GC_GenerateEventError(EECD_ActualizationAcquisitionTimeout);
+            GC_GenerateEventError(EECD_ImageCorrectionAcquisitionTimeout);
             error = true;
          }
          break;
@@ -881,7 +881,7 @@ IRC_Status_t Actualization_SM()
          else if (TimedOut(&act_timer))
          {
             ACT_ERR( "Timeout while acquiring buffer sequence (number of sequences = %d).", BufferManager_GetNumSequenceCount(&gBufManager));
-            GC_GenerateEventError(EECD_ActualizationAcquisitionTimeout);
+            GC_GenerateEventError(EECD_ImageCorrectionAcquisitionTimeout);
             error = true;
          }
 
@@ -1089,7 +1089,7 @@ IRC_Status_t Actualization_SM()
             if (lutInfo == NULL)
             {
                ACT_ERR("Could not find a valid LUTRQ data (type == %s) in the %s block.", usingICU?"RQT_RT":"RQT_RT", usingICU?"reference":"calibration");
-               GC_GenerateEventError(EECD_ActualizationInvalidReferenceBlock);
+               GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
                error = true;
                break;
             }
@@ -1370,7 +1370,7 @@ IRC_Status_t Actualization_SM()
                Calibration_LoadCalibrationFilePOSIXTime(savedCalibPosixTime);
             }
 
-            TDCStatusClr(WaitingForCalibrationActualizationMask);
+            TDCStatusClr(WaitingForImageCorrectionMask);
 
             currentDeltaBeta->info.age = 0;
             if (usingICU)
@@ -1420,7 +1420,7 @@ IRC_Status_t Actualization_SM()
          Calibration_LoadCalibrationFilePOSIXTime(savedCalibPosixTime);
       }
 
-      TDCStatusClr(WaitingForCalibrationActualizationMask);
+      TDCStatusClr(WaitingForImageCorrectionMask);
 
       // Reset state machine
       setActState( &state, ACT_Idle );
@@ -1648,7 +1648,7 @@ IRC_Status_t BadPixelDetection_SM()
       else if (TimedOut(&bpd_timer))
       {
          ACT_ERR( "Timeout while waiting for acquisition stop.");
-         GC_GenerateEventError(EECD_ActualizationAcquisitionTimeout);
+         GC_GenerateEventError(EECD_ImageCorrectionAcquisitionTimeout);
          error = true;
       }
 
@@ -1672,7 +1672,7 @@ IRC_Status_t BadPixelDetection_SM()
       else if (TimedOut(&bpd_timer))
       {
          ACT_ERR( "Timeout while acquiring buffer sequence (number of sequences = %d).", BufferManager_GetNumSequenceCount(&gBufManager));
-         GC_GenerateEventError(EECD_ActualizationAcquisitionTimeout);
+         GC_GenerateEventError(EECD_ImageCorrectionAcquisitionTimeout);
          error = true;
       }
 
@@ -2590,13 +2590,13 @@ bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint
    // check if the current block is compatible
    if (allowCalibUpdate && data != NULL &&
          (calibInfo->collection.CalibrationType == CALT_TELOPS || calibInfo->collection.CalibrationType == CALT_MULTIPOINT) &&
-         calibInfo->blocks[blockIdx].PixelDataPresence == 1 && TDCStatusTst(WaitingForCalibrationActualizationMask) == 0)
+         calibInfo->blocks[blockIdx].PixelDataPresence == 1 && TDCStatusTst(WaitingForImageCorrectionMask) == 0)
    {
       retval = true;
    }
    else
    {
-      if (!allowCalibUpdate || TDCStatusTst(WaitingForCalibrationActualizationMask))
+      if (!allowCalibUpdate || TDCStatusTst(WaitingForImageCorrectionMask))
          PRINTF("ACT: Calibration actualization is not applicable to the current block (actualization is currently running).\n");
       else if (data == NULL)
          PRINTF("ACT: No calibration actualization has been computed yet.\n");
@@ -3179,7 +3179,7 @@ IRC_Status_t ActualizationFileWriter_SM()
       // Reset state machine
       state = FWR_IDLE;
 
-      GC_GenerateEventError(EECD_ActualizationFileIOError);
+      GC_GenerateEventError(EECD_ImageCorrectionFileIOError);
 
       if (fd != -1)
       {

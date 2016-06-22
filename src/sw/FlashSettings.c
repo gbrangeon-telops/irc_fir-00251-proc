@@ -1815,12 +1815,12 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    if (p_flashSettings->ICUPresent)
    {
       TDCFlagsSet(ICUIsImplementedMask);
-      gcRegsData.CalibrationActualizationMode = CAM_ICU;
+      gcRegsData.ImageCorrectionMode = ICM_ICU;
    }
    else
    {
       TDCFlagsClr(ICUIsImplementedMask);
-      gcRegsData.CalibrationActualizationMode = CAM_BlackBody;
+      gcRegsData.ImageCorrectionMode = ICM_BlackBody;
    }
 
 
@@ -1870,11 +1870,11 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    // Update actualization
-   TDCFlagsClr(CalibrationActualizationIsImplementedMask);
+   TDCFlagsClr(ImageCorrectionIsImplementedMask);
    TDCFlagsClr(ExternalZeroMeanBetaCorrectionIsImplementedMask);
    if (p_flashSettings->ActualizationEnabled)
    {
-      TDCFlagsSet(CalibrationActualizationIsImplementedMask);
+      TDCFlagsSet(ImageCorrectionIsImplementedMask);
 
       if (BitTst(p_flashSettings->ActualizationDiscardOffset, 1))
       {

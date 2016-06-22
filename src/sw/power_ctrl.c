@@ -213,7 +213,7 @@ void Power_UpdateDeviceLedIndicatorState(ledCtrl_t *p_ledCtrl, uint8_t init)
                WaitingForNDFilterMask |
                WaitingForFilterWheelMask |
                WaitingForCalibrationDataMask |
-               WaitingForCalibrationActualizationMask |
+               WaitingForImageCorrectionMask |
                WaitingForOutputFPGAMask |
                WaitingForPowerMask);
 
@@ -413,7 +413,7 @@ void Power_SM()
                      TDCStatusClr(WaitingForPowerMask);
                      PM_INF("Device power state is Standby");
 
-                     if (TDCFlagsTst(CalibrationActualizationIsImplementedMask) && calibrationInfo.isValid)
+                     if (TDCFlagsTst(ImageCorrectionIsImplementedMask) && calibrationInfo.isValid)
                      {
                         ACT_invalidateActualizations(ACT_ALL);
                         // Reload the current calibration to revert actualization

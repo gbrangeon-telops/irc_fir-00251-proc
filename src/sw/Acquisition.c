@@ -89,7 +89,7 @@ bool actualisationAcqStartReady()
    extern actDebugOptions_t gActDebugOptions; // from Actualization.h
 
    return (gActAllowAcquisitionStart &&
-         (gcRegsData.TDCStatus & ~WaitingForCalibrationActualizationMask) == 0) ||
+         (gcRegsData.TDCStatus & ~WaitingForImageCorrectionMask) == 0) ||
          (gActDebugOptions.bypassChecks == true);
 }
 

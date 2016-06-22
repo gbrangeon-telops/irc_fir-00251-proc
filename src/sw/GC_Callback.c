@@ -64,7 +64,7 @@ extern float FWExposureTime[8];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.5.0
+// Generated from XML camera definition file version 12.0.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -90,8 +90,6 @@ void GC_Callback_Init()
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].callback =               &GC_AutomaticExternalFanSpeedModeCallback;
    gcRegsDef[AvailabilityFlagsIdx].callback =                           &GC_AvailabilityFlagsCallback;
    gcRegsDef[BadPixelReplacementIdx].callback =                         &GC_BadPixelReplacementCallback;
-   gcRegsDef[CalibrationActualizationModeIdx].callback =                &GC_CalibrationActualizationModeCallback;
-   gcRegsDef[CalibrationActualizeIdx].callback =                        &GC_CalibrationActualizeCallback;
    gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx].callback =   &GC_CalibrationCollectionActiveBlockPOSIXTimeCallback;
    gcRegsDef[CalibrationCollectionActivePOSIXTimeIdx].callback =        &GC_CalibrationCollectionActivePOSIXTimeCallback;
    gcRegsDef[CalibrationCollectionActiveTypeIdx].callback =             &GC_CalibrationCollectionActiveTypeCallback;
@@ -118,6 +116,8 @@ void GC_Callback_Init()
    gcRegsDef[DeviceCoolerRunningTimeIdx].callback =                     &GC_DeviceCoolerRunningTimeCallback;
    gcRegsDef[DeviceCurrentIdx].callback =                               &GC_DeviceCurrentCallback;
    gcRegsDef[DeviceCurrentSelectorIdx].callback =                       &GC_DeviceCurrentSelectorCallback;
+   gcRegsDef[DeviceDetectorElectricalRefOffsetIdx].callback =           &GC_DeviceDetectorElectricalRefOffsetCallback;
+   gcRegsDef[DeviceDetectorElectricalTapsRefIdx].callback =             &GC_DeviceDetectorElectricalTapsRefCallback;
    gcRegsDef[DeviceDetectorPolarizationVoltageIdx].callback =           &GC_DeviceDetectorPolarizationVoltageCallback;
    gcRegsDef[DeviceFirmwareBuildVersionIdx].callback =                  &GC_DeviceFirmwareBuildVersionCallback;
    gcRegsDef[DeviceFirmwareMajorVersionIdx].callback =                  &GC_DeviceFirmwareMajorVersionCallback;
@@ -213,6 +213,8 @@ void GC_Callback_Init()
    gcRegsDef[HeightMinIdx].callback =                                   &GC_HeightMinCallback;
    gcRegsDef[ICUPositionIdx].callback =                                 &GC_ICUPositionCallback;
    gcRegsDef[ICUPositionSetpointIdx].callback =                         &GC_ICUPositionSetpointCallback;
+   gcRegsDef[ImageCorrectionIdx].callback =                             &GC_ImageCorrectionCallback;
+   gcRegsDef[ImageCorrectionModeIdx].callback =                         &GC_ImageCorrectionModeCallback;
    gcRegsDef[IntegrationModeIdx].callback =                             &GC_IntegrationModeCallback;
    gcRegsDef[IsActiveFlagsIdx].callback =                               &GC_IsActiveFlagsCallback;
    gcRegsDef[LockedCenterImageIdx].callback =                           &GC_LockedCenterImageCallback;
@@ -606,33 +608,6 @@ void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
 
       // Update BadPixelReplacement image header field
       HDER_UpdateBadPixelReplacementHeader(&gHderInserter, &gcRegsData);
-   }
-}
-
-/**
- * CalibrationActualizationMode GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_CalibrationActualizationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-}
-
-/**
- * CalibrationActualize GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_CalibrationActualizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // After write
-      startActualization(false);
    }
 }
 
@@ -1125,6 +1100,42 @@ void GC_DeviceCurrentCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
  */
 void GC_DeviceCurrentSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+}
+
+/**
+ * DeviceDetectorElectricalRefOffset GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceDetectorElectricalRefOffsetCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   extern float gFpaDetectorElectricalRefOffset;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+      gcRegsData.DeviceDetectorElectricalRefOffset = gFpaDetectorElectricalRefOffset;
+   }
+}
+
+/**
+ * DeviceDetectorElectricalTapsRef GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceDetectorElectricalTapsRefCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   extern float gFpaDetectorElectricalTapsRef;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+      gcRegsData.DeviceDetectorElectricalTapsRef = gFpaDetectorElectricalTapsRef;
+   }
 }
 
 /**
@@ -2387,6 +2398,12 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       }
       else if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
       {
+         // Make sure CenterImage is set when FW is synchronously rotating
+         if (!gcRegsData.CenterImage)
+         {
+            GC_RegisterWriteUI32(&gcRegsDef[CenterImageIdx], 1);
+         }
+
          //Limit Parameter
          FW_CalculateSpeedSetpoint(&gcRegsData);
          SFW_CalculateMaximalValues(&gcRegsData, ALL_CHANGED);
@@ -2704,6 +2721,33 @@ void GC_ICUPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
       // After write
       ICU_setpointUpdated(&gcRegsData, &gICU_ctrl);
    }
+}
+
+/**
+ * ImageCorrection GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_ImageCorrectionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      startActualization(false);
+   }
+}
+
+/**
+ * ImageCorrectionMode GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_ImageCorrectionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
 }
 
 /**

@@ -342,23 +342,23 @@ IRC_Status_t DebugTerminalParseSTATUS(circByteBuffer_t *cbuf)
    }
 
    DT_PRINTF("TDCStatus = 0x%08X", gcRegsData.TDCStatus);
-   DT_PRINTF("Bit0:  WaitingForCooler =                   %d", TDCStatusTst(WaitingForCoolerMask));
-   DT_PRINTF("Bit1:  WaitingForSensor =                   %d", TDCStatusTst(WaitingForSensorMask));
-   DT_PRINTF("Bit2:  WaitingForInit =                     %d", TDCStatusTst(WaitingForInitMask));
-   DT_PRINTF("Bit3:  Reserved =                           %d", TDCStatusTst(1L << 3));
-   DT_PRINTF("Bit4:  WaitingForICU =                      %d", TDCStatusTst(WaitingForICUMask));
-   DT_PRINTF("Bit5:  WaitingForNDFilter =                 %d", TDCStatusTst(WaitingForNDFilterMask));
-   DT_PRINTF("Bit6:  WaitingForCalibrationInit =          %d", TDCStatusTst(WaitingForCalibrationInitMask));
-   DT_PRINTF("Bit7:  WaitingForFilterWheel =              %d", TDCStatusTst(WaitingForFilterWheelMask));
-   DT_PRINTF("Bit8:  WaitingForArm =                      %d", TDCStatusTst(WaitingForArmMask));
-   DT_PRINTF("Bit9:  WaitingForValidParameters =          %d", TDCStatusTst(WaitingForValidParametersMask));
-   DT_PRINTF("Bit10: AcquisitionStarted =                 %d", TDCStatusTst(AcquisitionStartedMask));
-   DT_PRINTF("Bit11: Reserved =                           %d", TDCStatusTst(1L << 11));
-   DT_PRINTF("Bit12: WaitingForCalibrationData =          %d", TDCStatusTst(WaitingForCalibrationDataMask));
-   DT_PRINTF("Bit13: WaitingForCalibrationActualization = %d", TDCStatusTst(WaitingForCalibrationActualizationMask));
-   DT_PRINTF("Bit14: WaitingForOutputFPGA =               %d", TDCStatusTst(WaitingForOutputFPGAMask));
-   DT_PRINTF("Bit15: WaitingForPower =                    %d", TDCStatusTst(WaitingForPowerMask));
-   DT_PRINTF("Bit16: WaitingForFlashSettingsInit =        %d", TDCStatusTst(WaitingForFlashSettingsInitMask));
+   DT_PRINTF("Bit0:  WaitingForCooler =             %d", TDCStatusTst(WaitingForCoolerMask));
+   DT_PRINTF("Bit1:  WaitingForSensor =             %d", TDCStatusTst(WaitingForSensorMask));
+   DT_PRINTF("Bit2:  WaitingForInit =               %d", TDCStatusTst(WaitingForInitMask));
+   DT_PRINTF("Bit3:  Reserved =                     %d", TDCStatusTst(1L << 3));
+   DT_PRINTF("Bit4:  WaitingForICU =                %d", TDCStatusTst(WaitingForICUMask));
+   DT_PRINTF("Bit5:  WaitingForNDFilter =           %d", TDCStatusTst(WaitingForNDFilterMask));
+   DT_PRINTF("Bit6:  WaitingForCalibrationInit =    %d", TDCStatusTst(WaitingForCalibrationInitMask));
+   DT_PRINTF("Bit7:  WaitingForFilterWheel =        %d", TDCStatusTst(WaitingForFilterWheelMask));
+   DT_PRINTF("Bit8:  WaitingForArm =                %d", TDCStatusTst(WaitingForArmMask));
+   DT_PRINTF("Bit9:  WaitingForValidParameters =    %d", TDCStatusTst(WaitingForValidParametersMask));
+   DT_PRINTF("Bit10: AcquisitionStarted =           %d", TDCStatusTst(AcquisitionStartedMask));
+   DT_PRINTF("Bit11: Reserved =                     %d", TDCStatusTst(1L << 11));
+   DT_PRINTF("Bit12: WaitingForCalibrationData =    %d", TDCStatusTst(WaitingForCalibrationDataMask));
+   DT_PRINTF("Bit13: WaitingForImageCorrection =    %d", TDCStatusTst(WaitingForImageCorrectionMask));
+   DT_PRINTF("Bit14: WaitingForOutputFPGA =         %d", TDCStatusTst(WaitingForOutputFPGAMask));
+   DT_PRINTF("Bit15: WaitingForPower =              %d", TDCStatusTst(WaitingForPowerMask));
+   DT_PRINTF("Bit16: WaitingForFlashSettingsInit =  %d", TDCStatusTst(WaitingForFlashSettingsInitMask));
 
    return IRC_SUCCESS;
 }
@@ -484,7 +484,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 2: // invalidate and reload
-         if (TDCStatusTst(WaitingForCalibrationActualizationMask) == 0 && TDCStatusTst(AcquisitionStartedMask) == 0)
+         if (TDCStatusTst(WaitingForImageCorrectionMask) == 0 && TDCStatusTst(AcquisitionStartedMask) == 0)
          {
             arglen = GetNextArg(cbuf, argStr, 10);
             if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
@@ -537,13 +537,13 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
 
       case 4: // perform actualization using ICU
          DT_INF("Triggering an actualization (icu)");
-         gcRegsData.CalibrationActualizationMode = CAM_ICU;
+         gcRegsData.ImageCorrectionMode = ICM_ICU;
          startActualization(false);
          break;
 
       case 5: // perform actualization using external BB
          DT_INF("Triggering an actualization (xbb)");
-         gcRegsData.CalibrationActualizationMode = CAM_BlackBody;
+         gcRegsData.ImageCorrectionMode = ICM_BlackBody;
          startActualization(false);
          break;
 

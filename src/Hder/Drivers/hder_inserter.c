@@ -107,7 +107,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 11.5
+// Generated from the IRCam header definition XLS file version 12.0
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -140,6 +140,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(TriggerSourceAry[TS_AcquisitionStart]), a->ADD + A_BASE_HEADER + TriggerSourceHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->IntegrationMode), a->ADD + A_BASE_HEADER + IntegrationModeHdrAddr);
    AXI4L_write8((uint8_t)(1), a->ADD + A_BASE_HEADER + AveragingNumberHdrAddr);
+   AXI4L_write16((int16_t)(0), a->ADD + A_BASE_HEADER + ADCReadoutHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->ExposureAuto), a->ADD + A_BASE_HEADER + ExposureAutoHdrAddr);
    memcpy((void*)&data32, (void*)&(pGCRegs->AECResponseTime), sizeof(uint32_t));
    AXI4L_write32(data32, a->ADD + A_BASE_HEADER + AECResponseTimeHdrAddr);
@@ -167,6 +168,8 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(0), a->ADD + A_BASE_HEADER + PostProcessedHdrAddr);
    AXI4L_write16((uint16_t)(0), a->ADD + A_BASE_HEADER + SensorTemperatureRawHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + AlarmVectorHdrAddr);
+   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + LowCutHdrAddr);
+   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + HighCutHdrAddr);
    memcpy((void*)&data32, (void*)&(pGCRegs->ExternalBlackBodyTemperature), sizeof(uint32_t));
    AXI4L_write32(data32, a->ADD + A_BASE_HEADER + ExternalBlackBodyTemperatureHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_Sensor] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureSensorHdrAddr);
@@ -191,7 +194,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareMinorVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareSubMinorVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareSubMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareBuildVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareBuildVersionHdrAddr);
-   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + ActualizationPOSIXTimeHdrAddr);
+   AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + ImageCorrectionPOSIXTimeHdrAddr);
    AXI4L_write32((uint32_t)(pGCRegs->DeviceSerialNumber), a->ADD + A_BASE_HEADER + DeviceSerialNumberHdrAddr);
 
 /* AUTO-CODE END */

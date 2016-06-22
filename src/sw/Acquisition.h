@@ -49,11 +49,11 @@
 
 #define TDCStatusAllowSensorAcquisitionArmMask        (WaitingForCoolerMask | WaitingForInitMask | WaitingForICUMask | WaitingForNDFilterMask | \
                                                       WaitingForFilterWheelMask | AcquisitionStartedMask | \
-                                                      WaitingForCalibrationDataMask | WaitingForCalibrationActualizationMask | \
+                                                      WaitingForCalibrationDataMask | WaitingForImageCorrectionMask | \
                                                       WaitingForOutputFPGAMask | WaitingForPowerMask)
 
 #define TDCStatusAllowTestImageAcquisitionArmMask     (WaitingForInitMask | AcquisitionStartedMask | WaitingForCalibrationDataMask | \
-                                                      WaitingForCalibrationActualizationMask | WaitingForOutputFPGAMask | WaitingForPowerMask)
+                                                      WaitingForImageCorrectionMask | WaitingForOutputFPGAMask | WaitingForPowerMask)
 
 #define AllowSensorAcquisitionArm()                   (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask))
 

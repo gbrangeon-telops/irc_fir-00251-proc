@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 11.5.0
+// Generated from XML camera definition file version 12.0.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -43,8 +43,6 @@ void GC_AcquisitionStopCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
 void GC_AutomaticExternalFanSpeedModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AvailabilityFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
-void GC_CalibrationActualizationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
-void GC_CalibrationActualizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActiveBlockPOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActivePOSIXTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CalibrationCollectionActiveTypeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -71,6 +69,8 @@ void GC_DeviceCoolerPowerOnCyclesCallback(gcCallbackPhase_t phase, gcCallbackAcc
 void GC_DeviceCoolerRunningTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceCurrentCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceCurrentSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_DeviceDetectorElectricalRefOffsetCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_DeviceDetectorElectricalTapsRefCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceDetectorPolarizationVoltageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceFirmwareBuildVersionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceFirmwareMajorVersionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -166,6 +166,8 @@ void GC_HeightMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_HeightMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ICUPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ICUPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_LockedCenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

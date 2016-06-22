@@ -56,7 +56,7 @@
 #define AcquisitionStartedMask                  0x00000400  /**< TDCStatus register bit mask for AcquisitionStarted field */
 // #define WaitingForSCDCmdAckMask                 0x00000800  /**< TDCStatus register bit mask for WaitingForSCDCmdAck field */
 #define WaitingForCalibrationDataMask           0x00001000  /**< TDCStatus register bit mask for WaitingForCalibrationData field */
-#define WaitingForCalibrationActualizationMask  0x00002000  /**< TDCStatus register bit mask for WaitingForCalibrationActualization field */
+#define WaitingForImageCorrectionMask           0x00002000  /**< TDCStatus register bit mask for WaitingForImageCorrection field */
 #define WaitingForOutputFPGAMask                0x00004000  /**< TDCStatus register bit mask for WaitingForOutputFPGA field */
 #define WaitingForPowerMask                     0x00008000  /**< TDCStatus register bit mask for WaitingForPower field */
 #define WaitingForFlashSettingsInitMask         0x00010000  /**< TDCStatus register bit mask for WaitingForFlashSettingsInit field */
@@ -109,7 +109,7 @@
 #define IWRIsImplementedMask                             0x00000002  /**< TDCFlags register bit mask for IWRIsImplemented field */
 #define ClBaseIsImplementedMask                          0x00000004  /**< TDCFlags register bit mask for ClBaseIsImplemented field */
 #define ClFullIsImplementedMask                          0x00000008  /**< TDCFlags register bit mask for ClFullIsImplemented field */
-#define CalibrationActualizationIsImplementedMask        0x00000010  /**< TDCFlags register bit mask for CalibrationActualizationIsImplemented field */
+#define ImageCorrectionIsImplementedMask                 0x00000010  /**< TDCFlags register bit mask for ImageCorrectionIsImplemented field */
 #define HighGainSWDIsImplementedMask                     0x00000020  /**< TDCFlags register bit mask for HighGainSWDIsImplemented field */
 #define ICUIsImplementedMask                             0x00000040  /**< TDCFlags register bit mask for ICUIsImplemented field */
 #define NDFilterIsImplementedMask                        0x00000080  /**< TDCFlags register bit mask for NDFilterIsImplemented field */
@@ -152,10 +152,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.5.0
+// Generated from XML camera definition file version 12.0.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 11) || (GC_XMLMINORVERSION != 5) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 0) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -176,6 +176,8 @@ struct gcRegistersDataStruct {
    float AcquisitionFrameRateMin;
    float DeviceClockFrequency;
    float DeviceCurrent;
+   float DeviceDetectorElectricalRefOffset;
+   float DeviceDetectorElectricalTapsRef;
    float DeviceDetectorPolarizationVoltage;
    float DeviceTemperature;
    float DeviceVoltage;
@@ -221,8 +223,6 @@ struct gcRegistersDataStruct {
    uint32_t AutomaticExternalFanSpeedMode;
    uint32_t AvailabilityFlags;
    uint32_t BadPixelReplacement;
-   uint32_t CalibrationActualizationMode;
-   uint32_t CalibrationActualize;
    uint32_t CalibrationCollectionActiveBlockPOSIXTime;
    uint32_t CalibrationCollectionActivePOSIXTime;
    uint32_t CalibrationCollectionActiveType;
@@ -304,6 +304,8 @@ struct gcRegistersDataStruct {
    uint32_t HeightMin;
    uint32_t ICUPosition;
    uint32_t ICUPositionSetpoint;
+   uint32_t ImageCorrection;
+   uint32_t ImageCorrectionMode;
    uint32_t IntegrationMode;
    uint32_t IsActiveFlags;
    uint32_t LockedCenterImage;
@@ -466,7 +468,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_AECIsActive ((gcRegsData.ExposureAuto == EA_Once) || (gcRegsData.ExposureAuto == EA_Continuous))
 #define GC_AECPlusIsActive (GC_AECPlusIsImplemented && ((gcRegsData.ExposureAuto == EA_OnceNDFilter) || (gcRegsData.ExposureAuto == EA_ContinuousNDFilter) || (gcRegsData.ExposureAuto == EA_ArmedNDFilter)))
 #define GC_AECPlusIsImplemented TDCFlagsTst(AECPlusIsImplementedMask)
-#define GC_AcquisitionFrameRateIsLocked ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForCalibrationActualization)
+#define GC_AcquisitionFrameRateIsLocked ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForImageCorrection)
 #define GC_AcquisitionStartTriggerIsActive IsActiveFlagsTst(AcquisitionStartTriggerIsActiveMask)
 #define GC_AcquisitionStartTriggerIsLocked ((gcRegsData.TriggerSelector == TS_AcquisitionStart) && (GC_FWSynchronouslyRotatingModeIsActive || GC_GatingTriggerIsActive))
 #define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
@@ -479,7 +481,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_EHDRIExposureTimeIsLocked (GC_ExposureTimeIsLocked || (GC_EHDRIIsActive && (GC_AcquisitionStarted || GC_EHDRIAdvancedSettingsAreLocked)))
 #define GC_EHDRIIsActive (gcRegsData.EHDRINumberOfExposures > 1)
 #define GC_EHDRISimpleSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Advanced)
-#define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization)
+#define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection)
 #define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
 #define GC_FWAsynchronouslyRotatingModeIsActive (GC_FWAsynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_AsynchronouslyRotating))
 #define GC_FWAsynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWAsynchronouslyRotatingModeIsImplementedMask))
@@ -493,8 +495,8 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_GatingTriggerIsActive IsActiveFlagsTst(GatingTriggerIsActiveMask)
 #define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive || GC_AECPlusIsActive))
 #define GC_MemoryBufferNotEmpty (gcRegsData.MemoryBufferSequenceCount > 0)
-#define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForCalibrationActualization)
-#define GC_WaitingForCalibrationActualization TDCStatusTst(WaitingForCalibrationActualizationMask)
+#define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForImageCorrection)
+#define GC_WaitingForImageCorrection TDCStatusTst(WaitingForImageCorrectionMask)
 
 void GC_Registers_Init();
 

@@ -38,7 +38,7 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 11.5.0
+// Generated from XML camera definition file version 12.0.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -58,6 +58,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AcquisitionFrameRateMin = */ 0.1F,
    /* DeviceClockFrequency = */ 0.0F,
    /* DeviceCurrent = */ 0.0F,
+   /* DeviceDetectorElectricalRefOffset = */ 0.0F,
+   /* DeviceDetectorElectricalTapsRef = */ 0.0F,
    /* DeviceDetectorPolarizationVoltage = */ 0.0F,
    /* DeviceTemperature = */ 0.0F,
    /* DeviceVoltage = */ 0.0F,
@@ -103,8 +105,6 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AutomaticExternalFanSpeedMode = */ AEFSM_Off,
    /* AvailabilityFlags = */ 0,
    /* BadPixelReplacement = */ 0,
-   /* CalibrationActualizationMode = */ CAM_BlackBody,
-   /* CalibrationActualize = */ 0,
    /* CalibrationCollectionActiveBlockPOSIXTime = */ 0,
    /* CalibrationCollectionActivePOSIXTime = */ 0,
    /* CalibrationCollectionActiveType = */ 0,
@@ -186,6 +186,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* HeightMin = */ FPA_HEIGHT_MIN,
    /* ICUPosition = */ ICUP_ICUNotImplemented,
    /* ICUPositionSetpoint = */ ICUPS_Scene,
+   /* ImageCorrection = */ 0,
+   /* ImageCorrectionMode = */ ICM_BlackBody,
    /* IntegrationMode = */ FPA_INTEGRATION_MODE,
    /* IsActiveFlags = */ 0,
    /* LockedCenterImage = */ FPA_FORCE_CENTER,
@@ -289,7 +291,7 @@ float DeviceCurrentAry[DeviceCurrentAryLen] = {0.0F, 0.0F};
 /**
  * DeviceSerialPortBaudRate data array
  */
-uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen] = {DSPBR_Baud115200 , 0, DSPBR_Baud115200, DSPBR_Baud9600};
+uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen] = {DSPBR_Baud115200 , 0, DSPBR_Baud115200, DSPBR_Baud115200};
 
 /**
  * EventNotification data array
@@ -341,6 +343,8 @@ void GC_Registers_Init()
    gcRegsDef[AcquisitionFrameRateMinIdx].p_data = &gcRegsData.AcquisitionFrameRateMin;
    gcRegsDef[DeviceClockFrequencyIdx].p_data = &gcRegsData.DeviceClockFrequency;
    gcRegsDef[DeviceCurrentIdx].p_data = &gcRegsData.DeviceCurrent;
+   gcRegsDef[DeviceDetectorElectricalRefOffsetIdx].p_data = &gcRegsData.DeviceDetectorElectricalRefOffset;
+   gcRegsDef[DeviceDetectorElectricalTapsRefIdx].p_data = &gcRegsData.DeviceDetectorElectricalTapsRef;
    gcRegsDef[DeviceDetectorPolarizationVoltageIdx].p_data = &gcRegsData.DeviceDetectorPolarizationVoltage;
    gcRegsDef[DeviceTemperatureIdx].p_data = &gcRegsData.DeviceTemperature;
    gcRegsDef[DeviceVoltageIdx].p_data = &gcRegsData.DeviceVoltage;
@@ -386,8 +390,6 @@ void GC_Registers_Init()
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].p_data = &gcRegsData.AutomaticExternalFanSpeedMode;
    gcRegsDef[AvailabilityFlagsIdx].p_data = &gcRegsData.AvailabilityFlags;
    gcRegsDef[BadPixelReplacementIdx].p_data = &gcRegsData.BadPixelReplacement;
-   gcRegsDef[CalibrationActualizationModeIdx].p_data = &gcRegsData.CalibrationActualizationMode;
-   gcRegsDef[CalibrationActualizeIdx].p_data = &gcRegsData.CalibrationActualize;
    gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx].p_data = &gcRegsData.CalibrationCollectionActiveBlockPOSIXTime;
    gcRegsDef[CalibrationCollectionActivePOSIXTimeIdx].p_data = &gcRegsData.CalibrationCollectionActivePOSIXTime;
    gcRegsDef[CalibrationCollectionActiveTypeIdx].p_data = &gcRegsData.CalibrationCollectionActiveType;
@@ -469,6 +471,8 @@ void GC_Registers_Init()
    gcRegsDef[HeightMinIdx].p_data = &gcRegsData.HeightMin;
    gcRegsDef[ICUPositionIdx].p_data = &gcRegsData.ICUPosition;
    gcRegsDef[ICUPositionSetpointIdx].p_data = &gcRegsData.ICUPositionSetpoint;
+   gcRegsDef[ImageCorrectionIdx].p_data = &gcRegsData.ImageCorrection;
+   gcRegsDef[ImageCorrectionModeIdx].p_data = &gcRegsData.ImageCorrectionMode;
    gcRegsDef[IntegrationModeIdx].p_data = &gcRegsData.IntegrationMode;
    gcRegsDef[IsActiveFlagsIdx].p_data = &gcRegsData.IsActiveFlags;
    gcRegsDef[LockedCenterImageIdx].p_data = &gcRegsData.LockedCenterImage;
@@ -565,12 +569,12 @@ void GC_UpdateLockedFlag()
    GC_CalibrationCollectionActivePOSIXTimeCallback(GCCP_BEFORE, GCCA_READ);
 
 /* AUTO-CODE REGLOCKED BEGIN */
-   SetRegLocked(&gcRegsDef[WidthIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[HeightIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[WidthIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[HeightIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionStartIdx], gcRegsData.DeviceNotReady);
-   SetRegLocked(&gcRegsDef[AcquisitionStopIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[AcquisitionArmIdx], (GC_AcquisitionStarted || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[ExposureModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[AcquisitionStopIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[AcquisitionArmIdx], (GC_AcquisitionStarted || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[ExposureModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[ExposureTimeIdx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime1Idx], GC_EHDRIExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime2Idx], GC_EHDRIExposureTimeIsLocked);
@@ -583,50 +587,50 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[ExposureTimeSetToMaxIdx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], GC_AcquisitionFrameRateIsLocked);
-   SetRegLocked(&gcRegsDef[AcquisitionModeIdx], (GC_WaitingForCalibrationActualization || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[AcquisitionModeIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateModeIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization));
-   SetRegLocked(&gcRegsDef[AECImageFractionIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[AECTargetWellFillingIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[AECResponseTimeIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[EHDRIModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[AECImageFractionIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[AECTargetWellFillingIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[AECResponseTimeIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[EHDRIModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMinIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMaxIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[EHDRINumberOfExposuresIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[EHDRIResetToDefaultIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[EHDRINumberOfExposuresIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[EHDRIResetToDefaultIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence1Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence2Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence3Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence4Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[CalibrationModeIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
-   SetRegLocked(&gcRegsDef[CalibrationActualizationModeIdx], GC_WaitingForCalibrationActualization);
-   SetRegLocked(&gcRegsDef[CalibrationActualizeIdx], ((GC_WaitingForCalibrationActualization || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty) || GC_AECPlusIsActive || GC_FWRotatingModeIsActive) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForCalibrationActualization || GC_AECPlusIsActive));
-   SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForImageCorrection || GC_AECPlusIsActive));
+   SetRegLocked(&gcRegsDef[ImageCorrectionModeIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[ImageCorrectionIdx], ((GC_WaitingForImageCorrection || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty) || GC_AECPlusIsActive || GC_FWRotatingModeIsActive) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForImageCorrection || GC_AECPlusIsActive));
+   SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWSpeedSetpointIdx], GC_FWSynchronouslyRotatingModeIsActive);
    SetRegLocked(&gcRegsDef[ExternalLensSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ManualFilterSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ICUPositionSetpointIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[CenterImageIdx], ((gcRegsData.LockedCenterImage || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CenterImageIdx], ((gcRegsData.LockedCenterImage || GC_WaitingForImageCorrection || GC_FWSynchronouslyRotatingModeIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[OffsetXIdx], (GC_OffsetIsLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[OffsetYIdx], (GC_OffsetIsLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[PixelFormatIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[TestImageSelectorIdx], (((gcRegsData.DevicePowerState == DPS_PowerInTransition) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[SensorWellDepthIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[IntegrationModeIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[TestImageSelectorIdx], (((gcRegsData.DevicePowerState == DPS_PowerInTransition) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[SensorWellDepthIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[IntegrationModeIdx], (((gcRegsData.CalibrationMode != CM_Raw0) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[TriggerModeIdx], ((GC_AcquisitionStartTriggerIsLocked || GC_FlaggingTriggerIsLocked || GC_GatingTriggerIsLocked) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[TriggerSourceIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerActivationIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerDelayIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[TriggerFrameCountIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[MemoryBufferModeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferSequenceSizeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[MemoryBufferMOISourceIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForCalibrationActualization) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferModeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferSequenceSizeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[MemoryBufferMOISourceIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[MemoryBufferMOIActivationIdx], (GC_MemoryBufferNotEmpty || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx], GC_AcquisitionStarted);
@@ -635,8 +639,8 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceClearAllIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[POSIXTimeIdx], ((gcRegsData.TimeSource != TS_InternalRealTimeClock) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[VideoBadPixelReplacementIdx], (gcRegsData.VideoAGC != VAGC_Off));
-   SetRegLocked(&gcRegsDef[DeviceRegistersStreamingStartIdx], (GC_WaitingForCalibrationActualization || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[DeviceRegistersStreamingEndIdx], (GC_WaitingForCalibrationActualization || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[DeviceRegistersStreamingStartIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[DeviceRegistersStreamingEndIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[DeviceSerialPortSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[DeviceSerialPortBaudRateIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EventSelectorIdx], GC_AcquisitionStarted);
