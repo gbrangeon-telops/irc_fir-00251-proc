@@ -338,7 +338,7 @@ begin
          img_write_reset <= sreset or not config_valid_s;
          
          --
-         if img_write_reset = '0' then
+         if img_write_reset = '1' then
             write_state <= STANDBY_WR;
             next_write_state <= STANDBY_WR;
             --signal/output to assigned during the process
