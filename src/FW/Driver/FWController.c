@@ -1311,7 +1311,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
          break;
 
       case POSITION_READY_MODE:
-         //PRINTF("FW ready\n");
+         //FW_PRINTF("FW ready\n");
          ready = true;
          FH_consumeResponses(FH_instance);
          break;

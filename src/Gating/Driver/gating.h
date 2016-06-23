@@ -10,7 +10,7 @@
 #include "GC_Registers.h"
 
 #ifdef GATING_VERBOSE
-   #define GATING_PRINTF(fmt, ...)  PRINTF("Gating: " fmt, ##__VA_ARGS__)
+   #define GATING_PRINTF(fmt, ...)  FPGA_PRINTF("Gating: " fmt, ##__VA_ARGS__)
 #else
    #define GATING_PRINTF(fmt, ...)  DUMMY_PRINTF("Gating: " fmt, ##__VA_ARGS__)
 #endif

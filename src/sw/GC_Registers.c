@@ -1121,7 +1121,7 @@ void GC_UpdateMemoryBufferSequencePreMOISizeLimits()
 void GC_UnlockCamera()
 {
    gGC_ProprietaryFeatureKeyIsValid = 1;
-   PRINTF("Camera unlocked!!!\n");
+   FPGA_PRINTF("Camera unlocked!!!\n");
 
    // Unlock features
    AvailabilityFlagsSet(CalibrationIsAvailableMask);

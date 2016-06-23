@@ -723,11 +723,11 @@ IRC_Status_t Proc_FileSystem_Init()
    }
 
 #ifndef MOD_FAST
-   PRINTF("Warning: Flash interface is configured in slow mode.\n");
+   FPGA_PRINTF("Warning: Flash interface is configured in slow mode.\n");
 #endif
 
 #ifdef LOW_FORMAT
-   PRINTF("Warning: Flash interface low format is activated.\n");
+   FPGA_PRINTF("Warning: Flash interface low format is activated.\n");
 #endif
 
    return IRC_SUCCESS;

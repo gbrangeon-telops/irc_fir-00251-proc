@@ -467,7 +467,7 @@ void Power_SM()
 void Power_CameraReset()
 {
    Power_TurnOn(PC_SELFRESET);
-   PRINTF("Camera will be reset!\n");
+   FPGA_PRINTF("Camera will be reset!\n");
 }
 
 /**

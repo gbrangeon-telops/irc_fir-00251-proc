@@ -502,7 +502,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       reportStats(&aec_stats, "AEC (µs)");
       resetStats(&aec_stats);
 
-      PRINTF("AEC: busy ratio: " _PCF(2) "\n", _FFMT((float)numNotReady/(numNotReady+numReady), 2));
+      AEC_PRINTF("AEC: busy ratio: " _PCF(2) "\n", _FFMT((float)numNotReady/(numNotReady+numReady), 2));
       numNotReady = 0;
       numReady = 0;
    }
@@ -663,7 +663,7 @@ void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate)
 
    t0 = TRIG_GetRTC(&gTrig);
    AEC_PRINTF("AECPlus_ExpTime (x100) = %d\n", ((uint32_t)AECPlus_ExpTime * 100));
-   PRINTF("AEC+: change filter request @ %010d.%d s\n", t0.Seconds, t0.SubSeconds);
+   AEC_PRINTF("AEC+: change filter request @ %010d.%d s\n", t0.Seconds, t0.SubSeconds);
 }
 
 void AEC_UpdateAECPlusParameters(void)

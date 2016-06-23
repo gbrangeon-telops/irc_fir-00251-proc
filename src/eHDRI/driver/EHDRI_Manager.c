@@ -199,7 +199,7 @@ void EHDRI_UpdateExpIndexSequence(t_EhdriManager *pEhdriCtrl, const gcRegistersD
 //    // Verification
 //    for ( i = 0; i < EHDRI_BRAM_SIZE; i++ )
 //    {
-//       PRINTF( "%d\n", p_sequence[i] );
+//       EHDRI_PRINTF( "%d\n", p_sequence[i] );
 //    }
 #endif
 }

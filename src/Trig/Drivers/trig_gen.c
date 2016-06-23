@@ -277,7 +277,7 @@ void TRIG_SendConfigGC(t_Trig *a, const gcRegistersData_t *pGCRegs)
    a->TRIG_Period = (uint32_t)((float)TRIG_BASE_CLOCK_FREQ_HZ / pGCRegs->AcquisitionFrameRate);
    a->TRIG_ForceHigh = 0;
 
-   //PRINTF("TriggerActivation = %d, a->TRIG_Activation = %d\n", TriggerActivationAry[T_AcquisitionStart_Sel], a->TRIG_Activation);
+   //FPGA_PRINTF("TriggerActivation = %d, a->TRIG_Activation = %d\n", TriggerActivationAry[T_AcquisitionStart_Sel], a->TRIG_Activation);
    a->TRIG_AcqWindow      = TRIG_ExtraTrig; // TRIG_ExtraTrig permet de generer des extra_trigs (images non envoyées dans la chaine)   
 
    WriteStruct(a);

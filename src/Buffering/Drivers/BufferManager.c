@@ -437,11 +437,11 @@ void BufferManager_SM()
       timeout_delay_us = 1.0e6 * frameSize * bits_per_pixel / maxBandWidth;
       timeout_delay_us = MIN(timeout_delay_us, max_delay_us);
 
-      PRINTF("Initiating sequence/image download from the memory buffer.\n");
-      PRINTF("BUF: max output average bit rate target: " _PCF(2) " Mbps\n", _FFMT(maxBandWidth/1.0e6,2));
-      PRINTF("BUF: max output frame rate: " _PCF(2) "Hz\n", _FFMT(1.0e6/timeout_delay_us, 2));
+      BUFFERING_INF("Initiating sequence/image download from the memory buffer.\n");
+      BUFFERING_INF("BUF: max output average bit rate target: " _PCF(2) " Mbps\n", _FFMT(maxBandWidth/1.0e6,2));
+      BUFFERING_INF("BUF: max output frame rate: " _PCF(2) "Hz\n", _FFMT(1.0e6/timeout_delay_us, 2));
 
-      PRINTF("Buffer download started.\n");
+      BUFFERING_INF("Buffer download started.\n");
 
       StartTimer(&timer, 10); // workaround for buffer reactivation
 
@@ -503,7 +503,7 @@ void BufferManager_SM()
       // go to the DONE state only when in download mode
       if (enabled && cstate == BMS_READ)
       {
-         PRINTF("Buffer download stopped.\n");
+         BUFFERING_INF("Buffer download stopped.\n");
 
          cstate = BMS_DONE;
       }

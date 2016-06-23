@@ -1057,7 +1057,7 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
             protectionModeFinalTarget = -1;
          }
 
-         PRINTF("NDF: Selecting filter %d\n", NDF_getFilterIndex(NDF_RequestedTarget, NDF_filterWidth/2));
+         NDF_PRINTF("NDF: Selecting filter %d\n", NDF_getFilterIndex(NDF_RequestedTarget, NDF_filterWidth/2));
 
          if (NDF_currentRawPosition < NDF_RequestedTarget)
             notificationPosition = NDF_currentRawPosition + 3*NDF_filterWidth/4;//NDF_RequestedTarget - NDF_filterWidth/2;

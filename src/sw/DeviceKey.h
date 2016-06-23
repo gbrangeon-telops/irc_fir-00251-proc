@@ -24,13 +24,13 @@
 #include <stdint.h>
 
 #ifdef DK_VERBOSE
-   #define DK_PRINTF(fmt, ...)      PRINTF("DK: " fmt, ##__VA_ARGS__)
+   #define DK_PRINTF(fmt, ...)      FPGA_PRINTF("DK: " fmt, ##__VA_ARGS__)
 #else
    #define DK_PRINTF(fmt, ...)      DUMMY_PRINTF("DK: " fmt, ##__VA_ARGS__)
 #endif
 
-#define DK_ERR(fmt, ...)            PRINTF("DK: Error: " fmt "\n", ##__VA_ARGS__)
-#define DK_INF(fmt, ...)            PRINTF("DK: Info: " fmt "\n", ##__VA_ARGS__)
+#define DK_ERR(fmt, ...)            FPGA_PRINTF("DK: Error: " fmt "\n", ##__VA_ARGS__)
+#define DK_INF(fmt, ...)            FPGA_PRINTF("DK: Info: " fmt "\n", ##__VA_ARGS__)
 #define DK_DBG(fmt, ...)            DK_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define DK_KEY_DWORD_LOW   0
