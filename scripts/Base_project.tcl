@@ -178,8 +178,7 @@ set_property generate_synth_checkpoint true [get_files  d:/Telops/fir-00251-Proc
 set_property generate_synth_checkpoint true [get_files  d:/Telops/fir-00251-Proc/IP/afifo_w57d16/afifo_w57d16.xci]
 
 #Disable unused file
-set_property is_enabled false [get_files  $root_dir/src/constraints/chipscope.xdc]
-set_property is_enabled false [get_files  $root_dir/src/constraints/core_mig_7series_1_0.xdc]
+
 
 #Limit max fanout (see UG949 p143 for Fanout Guidelines table)
 set_property STEPS.SYNTH_DESIGN.ARGS.FANOUT_LIMIT 200 [get_runs synth_1]
