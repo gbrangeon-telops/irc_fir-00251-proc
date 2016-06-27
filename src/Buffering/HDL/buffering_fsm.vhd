@@ -144,7 +144,6 @@ architecture rtl of BUFFERING_FSM is
    signal rd_sequence_offset : unsigned(31 downto 0);
    signal rd_image_offset : unsigned(31 downto 0);
    signal rd_image_offset_temp : unsigned(31 downto 0);
-   signal rd_start_image : unsigned(31 downto 0);
    signal rd_memory_offset_temp : unsigned(31 downto 0);
    signal rd_memory_offset : unsigned(31 downto 0);
    signal rd_img_memory_offset : unsigned(31 downto 0);
@@ -312,7 +311,6 @@ begin
             rd_sequence_offset <= resize( (read_seq_id_u * SeqSizeMax_bytes_u),32);
             rd_image_offset_temp <= resize( (read_img_loc * shift_left(unsigned(frame_size_u),1)), 32);
             rd_image_offset <= rd_image_offset_temp;
-            rd_start_image <= resize(read_start_id_u * shift_left(unsigned(frame_size_u),1),32);
             
             wr_memory_offset_temp <= resize(baseaddr_u + wr_sequence_offset,32);
             wr_memory_offset <= resize(wr_memory_offset_temp +  wr_frame_offset,32);
@@ -333,11 +331,9 @@ begin
       --  il aurait été préférbale de le scinder en plusieurs petites machines à états.
    begin
       if rising_edge(CLK_DATA) then
-         
-         --Multiplication register
+
          img_write_reset <= sreset or not config_valid_s;
          
-         --
          if img_write_reset = '1' then
             write_state <= STANDBY_WR;
             next_write_state <= STANDBY_WR;
@@ -772,7 +768,7 @@ begin
             s_mm2s_eof <=  '0';
             s_mm2s_btt <= (others => '0');
             mm2s_cmd_mosi.tvalid <= '0';
-            read_img_loc <= to_unsigned(0,read_img_loc'length);
+            read_img_loc <= read_start_id_u;
             mm2s_err_o <= (others => '0');
             mm2s_sts_miso.tready <= '0';
             
@@ -791,7 +787,7 @@ begin
                      read_state <= WAIT_RD_HDR_ACK;
                      
                      --fill the tag with the img position
-                     s_mm2s_cmd_tag <= resize(std_logic_vector(read_start_id_u),4);                        
+                     s_mm2s_cmd_tag <= resize(std_logic_vector(read_img_loc),4);                        
                      s_mm2s_saddr <= resize(std_logic_vector(rd_memory_offset),32);
                      s_mm2s_eof <=  '1';
                      s_mm2s_btt <= resize(std_logic_vector(hdr_bytessize_u),s_s2mm_btt'length); -- Transfert of the hdr data 
@@ -799,15 +795,15 @@ begin
                      mm2s_sts_miso.tready <= '0';
                      
                      
-                     if(read_start_id_u = read_stop_id_u) then -- only one image to read
+                     if(read_img_loc = read_stop_id_u) then -- only one image to read
                         next_read_state <= RD_SEQ_END;
-                        read_img_loc <= read_start_id_u; -- does not matter
-                     elsif(read_start_id_u = total_img_per_seq_u-1 ) then
+                        read_img_loc <= read_start_id_u;
+                     elsif(read_img_loc = total_img_per_seq_u-1 ) then
                         next_read_state <= RD_IMG;
                         read_img_loc <= to_unsigned(0,read_img_loc'length); -- counter reset at 0
                      else
                         next_read_state <= RD_IMG;
-                        read_img_loc <= read_start_id_u + 1; --increase counter position
+                        read_img_loc <= read_img_loc + 1; --increase counter position
                      end if;
                      
                      
@@ -821,7 +817,7 @@ begin
                      mm2s_cmd_mosi.tvalid <= '0';
                      mm2s_sts_miso.tready <= '0';
                      
-                     read_img_loc <= read_img_loc;
+                     read_img_loc <= read_start_id_u;
                      
                   end if;
                
@@ -841,7 +837,7 @@ begin
                      
                      if(read_img_loc = read_stop_id_u) then -- only one image to read
                         next_read_state <= RD_SEQ_END;
-                        read_img_loc <= read_start_id_u; -- does not matter
+                        read_img_loc <= read_start_id_u;
                      elsif(read_img_loc = total_img_per_seq_u-1 ) then
                         next_read_state <= RD_IMG;
                         read_img_loc <= to_unsigned(0,read_img_loc'length); -- counter reset at 0
@@ -884,7 +880,7 @@ begin
                      
                      if(read_img_loc = read_stop_id_u) then -- only one image to read
                         next_read_state <= RD_SEQ_END;
-                        read_img_loc <= read_start_id_u; -- does not matter
+                        read_img_loc <= read_start_id_u;
                      elsif(read_img_loc = total_img_per_seq_u-1 ) then
                         next_read_state <= RD_IMG;
                         read_img_loc <= to_unsigned(0,read_img_loc'length); -- counter reset at 0
@@ -1048,12 +1044,12 @@ begin
                   s_mm2s_btt <=s_mm2s_btt;
                   mm2s_cmd_mosi.tvalid <= '0';
                   
-                  read_img_loc <= read_img_loc;
+                  read_img_loc <= read_start_id_u;
                   
                
                when ERROR_RD =>
                   read_state <= STANDBY_RD;
-               read_img_loc <= to_unsigned(0,read_img_loc'length);
+               read_img_loc <= read_start_id_u;
                when others =>
             end case;
          end if;
