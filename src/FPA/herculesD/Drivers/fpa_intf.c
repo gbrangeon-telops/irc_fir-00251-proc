@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "IRC_status.h"
 #include <math.h>
+#include <string.h>
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
