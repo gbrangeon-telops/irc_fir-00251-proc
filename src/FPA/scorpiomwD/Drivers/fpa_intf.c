@@ -38,7 +38,7 @@
 
 
 // Periode minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define MGLK_XTRA_TRIG_FREQ_MAX_HZ        10     // soit une frequence de 10Hz         
+#define MGLK_XTRA_TRIG_FREQ_MAX_HZ        44     // soit une frequence de 44 Hz         
   
 // Parametres de la commande serielle du ScorpioMW
 #define MGLK_LONGEST_CMD_CHAR_NUM         128     // longueur en bytes de la plus longue commande serielle du ScorpioMW )(en realité , moins que ça mais juste pour reserver de la memoire)
@@ -299,8 +299,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)(((hh.mode_int_end_to_trig_start_dly_mclk)* (hh.TMCLK) - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // hh.T0 est la periode avec temps d'intégration nul
    }
    ptrA->fpa_acq_trig_period_min   = (uint32_t)(0.8F*(hh.T0)* (hh.TMCLK)* (float)FPA_VHD_INTF_CLK_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
-   ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)MGLK_XTRA_TRIG_FREQ_MAX_HZ); 
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min;                         // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)MGLK_XTRA_TRIG_FREQ_MAX_HZ);                      // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly); 
    #ifdef SIM
    ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
    ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min; 

@@ -37,7 +37,7 @@
  
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define SCD_XTRA_TRIG_FREQ_MAX_HZ         10     // soit une frequence de 10Hz         
+#define SCD_XTRA_TRIG_FREQ_MAX_HZ         44     // soit une frequence de 44 Hz         
   
 // Parametres de la commande serielle du PelicanD
 #define SCD_LONGEST_CMD_BYTES_NUM         32      // longueur en bytes de la plus longue commande serielle du PelicanD
@@ -277,8 +277,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le PelicanD en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
    ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T3 + hh.T5 + hh.T6 - (float)VHD_PIXEL_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ); 
    ptrA->fpa_acq_trig_period_min   = (uint32_t)((hh.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);   //
-   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.5F*(float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min;                          // 
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);                      // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly);                          // 
    
    #ifdef SIM
       ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
