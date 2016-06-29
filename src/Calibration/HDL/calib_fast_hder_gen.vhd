@@ -128,11 +128,11 @@ begin
                         hder_mosi_i.wstrb <= CalibrationBlockPOSIXTimeBWE;
                      
                      elsif hcnt = 5 then -- block_act_posix
-                        hder_mosi_i.awaddr <= x"FFFF" & frame_id_i & std_logic_vector(resize(ActualizationPOSIXTimeAdd32, 8));
+                        hder_mosi_i.awaddr <= x"FFFF" & frame_id_i & std_logic_vector(resize(ImageCorrectionPOSIXTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
-                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.block_act_posix), 32), ActualizationPOSIXTimeShift));
+                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.block_act_posix), 32), ImageCorrectionPOSIXTimeShift));
                         hder_mosi_i.wvalid <= '1';
-                        hder_mosi_i.wstrb <= ActualizationPOSIXTimeBWE;
+                        hder_mosi_i.wstrb <= ImageCorrectionPOSIXTimeBWE;
                         fast_hder_sm <= idle;
                      end if;
                      hcnt <= hcnt + 1;

@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 58858
+ FREEID 58915
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -14033,6 +14033,49 @@ PAGE ""
    RECT (1100,4140,1894,4173)
    PARENT 58803
   }
+  SIGNALASSIGN  58858, 0, 0
+  {
+   LABEL "SignalAssignments_1"
+   TEXT 
+"SERDES_TRIG <= not (ch0_done and ch1_done) and not ch0_iserdes_rst; -- en combinatoire mais pas grave.\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
+""
+   RECT (3380,2540,4520,2640)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  INSTANCE  58893, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="SERDES_TRIG"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4580,2580)
+  }
+  TEXT  58894, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4632,2563,4838,2598)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 58893
+  }
  }
  
 }
@@ -14058,7 +14101,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  58841, 0, 0
+  TEXT  58898, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -14069,7 +14112,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  58842, 0, 0
+  TEXT  58899, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -14080,7 +14123,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  58843, 0, 0
+  TEXT  58900, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -14090,7 +14133,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  58844, 0, 0
+  TEXT  58901, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -14102,7 +14145,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  58845, 0, 0
+  TEXT  58902, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -14115,7 +14158,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  58846, 0, 0
+  TEXT  58903, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -14125,7 +14168,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  58847, 0, 0
+  TEXT  58904, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -14137,7 +14180,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  58848, 0, 0
+  TEXT  58905, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -14147,7 +14190,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  58849, 0, 0
+  TEXT  58906, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -14158,7 +14201,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  58850, 0, 0
+  GROUP  58907, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,6220,5001,6601)
@@ -14170,7 +14213,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  58851, 0, 0
+  GROUP  58908, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,6420,5001,6421)
@@ -14182,7 +14225,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  58852, 0, 0
+  GROUP  58909, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,6360,5001,6361)
@@ -14194,7 +14237,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  58853, 0, 0
+  GROUP  58910, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,6480,5001,6481)
@@ -14206,7 +14249,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  58854, 0, 0
+  GROUP  58911, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,6540,5001,6541)
@@ -14218,7 +14261,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  58855, 0, 0
+  GROUP  58912, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,6220,4301,6361)
@@ -14229,7 +14272,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  58856, 0, 0
+  GROUP  58913, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,6360,4301,6601)
@@ -14240,7 +14283,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  58857, 0, 0
+  BMPPICT  58914, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,6280,4279,6325)
