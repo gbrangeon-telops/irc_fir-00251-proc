@@ -1169,7 +1169,7 @@ void FM_SortFileList(fileList_t *fileList)
    uint32_t fileMovedCount;
    uint32_t i;
 
-   if ((fileList->count == 0) || (fileList->keyCount == 0) || (fileList->keys[0] == FO_NONE))
+   if ((fileList->count <= 1) || (fileList->keyCount == 0) || (fileList->keys[0] == FO_NONE))
    {
       return;
    }
