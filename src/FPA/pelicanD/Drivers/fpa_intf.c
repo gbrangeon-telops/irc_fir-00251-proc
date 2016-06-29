@@ -313,8 +313,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // Resolution des pixels (13, 14 ou 15 bits)
    ptrA->scd_pix_res = SCD_PIX_RESOLUTION_13BITS;    // resolution pour l'instant figée à 13 bits   
     
-    // frame_period_min
-   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, pGCRegs->AcquisitionFrameRate) * (float)FPA_MASTER_CLK_RATE_HZ);                       //
+   // frame_period_min
+   ptrA->scd_frame_period_min = (uint32_t) MIN((float)FPA_MASTER_CLK_RATE_HZ/SCD_MIN_OPER_FPS, (hh.T0 + pGCRegs->ExposureTimeMax*1E-6F) * (float)FPA_MASTER_CLK_RATE_HZ);   // hh.T0 a été calculé avec un temps d'integration nul
    
    // mode diag scd
    ptrA->scd_bit_pattern = 0;
