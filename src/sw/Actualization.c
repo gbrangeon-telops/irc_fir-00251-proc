@@ -2806,7 +2806,7 @@ fileRecord_t* findIcuReferenceBlock()
    // get through all block files in flash and find the matching ICU reference
    while (i < n)
    {
-      fd = FM_OpenFile(gFM_icuBlocks.item[i]->name);
+      fd = FM_OpenFile(gFM_icuBlocks.item[i]->name, UO_RDONLY);
 
       length = CalibBlock_ParseBlockFileHeader(fd, &refBlockFileHdr, NULL);
 
@@ -2866,8 +2866,6 @@ IRC_Status_t ActualizationFileWriter_SM()
    static context_t blockContext; // information structure for block processing
    static float deltaBetaLSB;
    static deltabeta_t* currentDeltaBeta = NULL;
-
-   char longFilename[FM_LONG_FILENAME_SIZE];
 
    IRC_Status_t retVal = IRC_NOT_DONE;
    bool error = false;
@@ -2943,11 +2941,10 @@ IRC_Status_t ActualizationFileWriter_SM()
       }
 
       // open the file
-      sprintf(longFilename, "%s%s", FM_UFFS_MOUNT_POINT, shortFileName);
-      fd = uffs_open(longFilename, UO_WRONLY);
+      fd = FM_OpenFile(shortFileName, UO_WRONLY);
       if (fd == -1)
       {
-         ACT_ERR("Failed to open %s.", longFilename);
+         ACT_ERR("Failed to open %s.", shortFileName);
          error = true;
          break;
       }
@@ -3673,7 +3670,7 @@ IRC_Status_t deleteExternalActualizationFiles()
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
    {
-      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name);
+      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name, UO_RDONLY);
       length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
       uffs_close(fd);
 
@@ -3722,7 +3719,7 @@ fileRecord_t* findActualizationFile(uint32_t ref_posixtime)
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
    {
-      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name);
+      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name, UO_RDONLY);
       length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
       uffs_close(fd);
 
@@ -3756,7 +3753,7 @@ void ACT_listActualizationData()
    {
       file = gFM_calibrationActualizationFiles.item[i];
 
-      fd = FM_OpenFile(file->name);
+      fd = FM_OpenFile(file->name, UO_RDONLY);
       length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
       uffs_close(fd);
 

@@ -643,16 +643,17 @@ uint32_t FM_GetFileSize(const char *filename)
  * Open file and return file descriptor.
  *
  * @param filename is the name of the file.
+ * @param oflag is the file open flag specification (see uffs.h).
  *
  * @return the file descriptor.
  * @return -1 if failed to open file.
  */
-int FM_OpenFile(const char *filename)
+int FM_OpenFile(const char *filename, int oflag)
 {
    char filelongname[FM_LONG_FILENAME_SIZE];
 
    sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, filename);
-   return uffs_open(filelongname, UO_RDONLY);
+   return uffs_open(filelongname, oflag);
 }
 
 /**
@@ -668,7 +669,7 @@ int FM_OpenFile(const char *filename)
  */
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length)
 {
-   int fd = FM_OpenFile(filename);
+   int fd = FM_OpenFile(filename, UO_RDONLY);
    if (fd == -1)
    {
       FM_ERR("File open failed.");
@@ -709,7 +710,7 @@ IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t o
  */
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length)
 {
-   int fd = FM_OpenFile(filename);
+   int fd = FM_OpenFile(filename, UO_WRONLY);
    if (fd == -1)
    {
       FM_ERR("Failed to open %s.", filename);
@@ -772,7 +773,7 @@ fileRecord_t *FM_CreateFile(const char *filename)
    }
 
    // Create file
-   fd = FM_OpenFile(filename);
+   fd = FM_OpenFile(filename, UO_WRONLY | UO_CREATE | UO_TRUNC);
    if (fd == -1)
    {
       FM_ERR("File open failed.");
@@ -853,7 +854,7 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
             break;
 
          case FT_TSBL:
-            fd = FM_OpenFile(file->name);
+            fd = FM_OpenFile(file->name, UO_RDONLY);
             if (CalibBlock_ParseBlockFileHeader(fd, &blockFileHeader, NULL) > 0)
             {
                switch (blockFileHeader.CalibrationType)

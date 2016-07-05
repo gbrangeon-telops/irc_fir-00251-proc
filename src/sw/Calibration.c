@@ -129,7 +129,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    extern bool gDisableFilterWheel;
 
    // Open collection file
-   fd = FM_OpenFile(file->name);
+   fd = FM_OpenFile(file->name, UO_RDONLY);
    if (fd == -1)
    {
       CM_ERR("Failed to open %s.", file->name);
@@ -525,7 +525,7 @@ void Calibration_SM()
          CM_INF("Loading calibration block file %s (POSIX time = %d)...", blockFiles[blockIndex]->name, blockFiles[blockIndex]->posixTime);
          GETTIME(&tic_block);
 
-         fdCalib = FM_OpenFile(blockFiles[blockIndex]->name);
+         fdCalib = FM_OpenFile(blockFiles[blockIndex]->name, UO_RDONLY);
          if (fdCalib != -1)
          {
             calibrationInfo.blocks[blockIndex].file = blockFiles[blockIndex];
@@ -1674,7 +1674,7 @@ static IRC_Status_t Calibration_LoadBlockLUTRQ(uint32_t blockIndex, uint32_t lut
    }
 
    // Open block file
-   fdCalib = FM_OpenFile(calibrationInfo.blocks[blockIndex].file->name);
+   fdCalib = FM_OpenFile(calibrationInfo.blocks[blockIndex].file->name, UO_RDONLY);
    if (fdCalib == -1)
    {
       CM_ERR("Failed to open block file.");

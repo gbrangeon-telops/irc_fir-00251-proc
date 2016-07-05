@@ -167,7 +167,7 @@ IRC_Status_t FM_InitFileDB();
 void FM_ListFileDB();
 uint8_t FM_FileExists(const char *filename);
 uint32_t FM_GetFileSize(const char *filename);
-int FM_OpenFile(const char *filename);
+int FM_OpenFile(const char *filename, int oflag);
 fileRecord_t *FM_CreateFile(const char *filename);
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);

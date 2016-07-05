@@ -42,7 +42,7 @@ IRC_Status_t FI_GetFileInfo(const char *filename, fileInfo_t *fileInfo)
 {
    int fd;
 
-   fd = FM_OpenFile(filename);
+   fd = FM_OpenFile(filename, UO_RDONLY);
    if (fd == -1)
    {
       return IRC_FAILURE;
