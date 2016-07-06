@@ -117,7 +117,7 @@ static void NDF_initPositionLUT()
 
    NDF_filterWidth = NDF_DEFAULT_FILTER_WIDTH;
 
-   if (flashSettings.isValid)
+   if (FS_FLASHSETTINGS_IS_VALID)
    {
       NDF_numberOfFilters = MIN(3, flashSettings.NDFNumberOfFilters);
 

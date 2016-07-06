@@ -120,13 +120,16 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
 {
    int fd;
    int byteCount;
-   fileInfo_t fileInfo;
    uint8_t error = 0;
    CalibCollection_CollectionFileHeader_t collectionFileHeader;
    uint16_t crc16;
    uint32_t i;
    uint32_t *p_uint32;
    extern bool gDisableFilterWheel;
+
+   CM_INF("Loading calibration collection file %s (v%d.%d.%d, POSIX time = %d)...", file->name,
+         file->version.major, file->version.minor, file->version.subMinor,
+         file->posixTime);
 
    // Open collection file
    fd = FM_OpenFile(file->name, UO_RDONLY);
@@ -139,7 +142,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    collectionInfo->file = file;
 
    // Read collection file header
-   if (CalibCollection_ParseCollectionFileHeader(fd, &collectionFileHeader, &fileInfo) == 0)
+   if (CalibCollection_ParseCollectionFileHeader(fd, &collectionFileHeader, NULL) == 0)
    {
       CM_ERR("Failed to parse collection file header.");
 
@@ -151,8 +154,6 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
 
       return IRC_FAILURE;
    }
-
-   CM_INF("Calibration collection file version is %d.%d.%d.", fileInfo.version.major, fileInfo.version.minor, fileInfo.version.subMinor);
 
    if (collectionFileHeader.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
    {
@@ -305,7 +306,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
 
    CM_INF("Collection file header loaded.");
 
-   byteCount = uffs_read(fd, tmpFileDataBuffer, collectionFileHeader.CollectionDataLength);
+   byteCount = FM_ReadFileToTmpFileDataBuffer(fd, collectionFileHeader.CollectionDataLength);
    if (byteCount != collectionFileHeader.CollectionDataLength)
    {
       CM_ERR("Failed to read collection data.");
@@ -497,7 +498,6 @@ void Calibration_SM()
          break;
 
       case CMS_LOAD_COLLECTION_FILE:
-         CM_INF("Loading calibration collection file %s (POSIX time = %d)...", cmCalibrationFile->name, cmCalibrationFile->posixTime);
          GETTIME(&tic_collection);
 
          cmCurrentState = CMS_OPEN_BLOCK_FILE;
@@ -522,7 +522,9 @@ void Calibration_SM()
          break;
 
       case CMS_OPEN_BLOCK_FILE:
-         CM_INF("Loading calibration block file %s (POSIX time = %d)...", blockFiles[blockIndex]->name, blockFiles[blockIndex]->posixTime);
+         CM_INF("Loading calibration block file %s (v%d.%d.%d, POSIX time = %d)...", blockFiles[blockIndex]->name,
+               blockFiles[blockIndex]->version.major, blockFiles[blockIndex]->version.minor, blockFiles[blockIndex]->version.subMinor,
+               blockFiles[blockIndex]->posixTime);
          GETTIME(&tic_block);
 
          fdCalib = FM_OpenFile(blockFiles[blockIndex]->name, UO_RDONLY);
@@ -547,8 +549,6 @@ void Calibration_SM()
          }
          else
          {
-            CM_INF("Calibration block file version is %d.%d.%d.", fileInfo.version.major, fileInfo.version.minor, fileInfo.version.subMinor);
-
             cmCurrentState = CMS_LOAD_PIXEL_DATA_HEADER;
 
             if (headerData.blockFile.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
@@ -987,7 +987,7 @@ void Calibration_SM()
       case CMS_LOAD_LUTNL_DATA:
          length = MIN(FM_TEMP_FILE_DATA_BUFFER_SIZE, dataLength - dataOffset);
 
-         byteCount = uffs_read(fdCalib, tmpFileDataBuffer, length);
+         byteCount = FM_ReadFileToTmpFileDataBuffer(fdCalib, length);
          if (byteCount != length)
          {
             CM_ERR("Failed to read LUTNL data.");
@@ -1102,7 +1102,7 @@ void Calibration_SM()
       case CMS_LOAD_LUTRQ_DATA:
          length = MIN(FM_TEMP_FILE_DATA_BUFFER_SIZE, calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataLength - dataOffset);
 
-         byteCount = uffs_read(fdCalib, tmpFileDataBuffer, length);
+         byteCount = FM_ReadFileToTmpFileDataBuffer(fdCalib, length);
          if (byteCount != length)
          {
             CM_ERR("Failed to read LUTRQ data.");
@@ -1691,7 +1691,7 @@ static IRC_Status_t Calibration_LoadBlockLUTRQ(uint32_t blockIndex, uint32_t lut
       length = MIN(FM_TEMP_FILE_DATA_BUFFER_SIZE, calibrationInfo.blocks[blockIndex].lutRQData[lutRQIndex].DataLength - dataOffset);
 
       // Read LUTRQ data
-      byteCount = uffs_read(fdCalib, tmpFileDataBuffer, length);
+      byteCount = FM_ReadFileToTmpFileDataBuffer(fdCalib, length);
       if (byteCount != length)
       {
          CM_ERR("Failed to read LUTRQ data.");

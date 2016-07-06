@@ -6,7 +6,7 @@
  *
  * Auto-generated Image Correction Calibration File library.
  * Generated from the image correction calibration file structure definition XLS file version 2.0.0
- * using generateIRCamCalibrationFileCLib.m Matlab script.
+ * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
  * $Author$
@@ -20,6 +20,167 @@
 #include "CalibBlockFile_v2.h"
 #include "CRC.h"
 #include <string.h>
+#include <float.h>
+
+/**
+ * BlockFileHeader default values.
+ */
+CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
+   /* FileSignature = */ "TSBL",
+   /* FileStructureMajorVersion = */ 0,
+   /* FileStructureMinorVersion = */ 0,
+   /* FileStructureSubMinorVersion = */ 0,
+   /* FileHeaderLength = */ 512,
+   /* DeviceSerialNumber = */ 0,
+   /* POSIXTime = */ 0,
+   /* FileDescription = */ "",
+   /* DeviceDataFlowMajorVersion = */ 1,
+   /* DeviceDataFlowMinorVersion = */ 1,
+   /* SensorID = */ 0,
+   /* CalibrationSource = */ 0,
+   /* CalibrationType = */ 0,
+   /* IntegrationMode = */ 0,
+   /* SensorWellDepth = */ 0,
+   /* PixelDataResolution = */ 16,
+   /* Width = */ 0,
+   /* Height = */ 0,
+   /* OffsetX = */ 0,
+   /* OffsetY = */ 0,
+   /* ReverseX = */ 0,
+   /* ReverseY = */ 0,
+   /* ExternalLensSerialNumber = */ 0,
+   /* ExternalLensName = */ "",
+   /* ManualFilterSerialNumber = */ 0,
+   /* ManualFilterName = */ "",
+   /* ExposureTime = */ 0,
+   /* AcquisitionFrameRate = */ 0,
+   /* FWPosition = */ 0,
+   /* NDFPosition = */ 0,
+   /* SensorWidth = */ 0,
+   /* SensorHeight = */ 0,
+   /* PixelDynamicRangeMin = */ 0,
+   /* PixelDynamicRangeMax = */ 65535,
+   /* SaturationThreshold = */ 65535,
+   /* BlockBadPixelCount = */ 0,
+   /* MaximumTotalFlux = */ 0.000000F,
+   /* NUCMultFactor = */ 1.000000F,
+   /* T0 = */ 0,
+   /* Nu = */ 1.000000F,
+   /* DeviceTemperatureSensor = */ 0,
+   /* SpectralResponsePOSIXTime = */ 0,
+   /* ReferencePOSIXTime = */ 0,
+   /* FWFilterID = */ 0,
+   /* NDFilterID = */ 0,
+   /* ManualFilterID = */ 0,
+   /* LensID = */ 0,
+   /* LowCut = */ 0.000000F,
+   /* HighCut = */ 0.000000F,
+   /* PixelDataPresence = */ 0,
+   /* MaxTKDataPresence = */ 0,
+   /* LUTNLDataPresence = */ 0,
+   /* LUTRQDataPresence = */ 0,
+   /* NumberOfLUTRQ = */ 0,
+   /* FileHeaderCRC16 = */ 0,
+};
+
+/**
+ * PixelDataHeader default values.
+ */
+CalibBlock_PixelDataHeader_v2_t CalibBlock_PixelDataHeader_v2_default = {
+   /* DataHeaderLength = */ 256,
+   /* Offset_Off = */ 0.000000F,
+   /* Offset_Median = */ 0.000000F,
+   /* Offset_Exp = */ 0,
+   /* Offset_Nbits = */ 12,
+   /* Offset_Signed = */ 0,
+   /* Range_Off = */ 0.000000F,
+   /* Range_Median = */ 0.000000F,
+   /* Range_Exp = */ 0,
+   /* Range_Nbits = */ 12,
+   /* Range_Signed = */ 0,
+   /* Kappa_Off = */ 0.000000F,
+   /* Kappa_Median = */ 0.000000F,
+   /* Kappa_Exp = */ 0,
+   /* Kappa_Nbits = */ 10,
+   /* Kappa_Signed = */ 0,
+   /* Beta0_Off = */ 0.000000F,
+   /* Beta0_Median = */ 0.000000F,
+   /* Beta0_Exp = */ 0,
+   /* Beta0_Nbits = */ 11,
+   /* Beta0_Signed = */ 1,
+   /* Alpha_Off = */ 0.000000F,
+   /* Alpha_Median = */ 0.000000F,
+   /* Alpha_Exp = */ 0,
+   /* Alpha_Nbits = */ 12,
+   /* Alpha_Signed = */ 0,
+   /* LUTNLIndex_Nbits = */ 6,
+   /* LUTNLIndex_Signed = */ 0,
+   /* BadPixel_Nbits = */ 1,
+   /* BadPixel_Signed = */ 0,
+   /* PixelDataLength = */ 0,
+   /* PixelDataCRC16 = */ 0,
+   /* DataHeaderCRC16 = */ 0,
+};
+
+/**
+ * MaxTKDataHeader default values.
+ */
+CalibBlock_MaxTKDataHeader_v2_t CalibBlock_MaxTKDataHeader_v2_default = {
+   /* DataHeaderLength = */ 256,
+   /* TCalMin = */ 0.000000F,
+   /* TCalMax = */ 0.000000F,
+   /* TCalMinExpTimeMin = */ 0.000000F,
+   /* TCalMinExpTimeMax = */ 0.000000F,
+   /* TCalMaxExpTimeMin = */ 0.000000F,
+   /* TCalMaxExpTimeMax = */ 0.000000F,
+   /* TvsINT_FitOrder = */ 0,
+   /* INTvsT_FitOrder = */ 0,
+   /* MaxTKDataLength = */ 0,
+   /* MaxTKDataCRC16 = */ 0,
+   /* DataHeaderCRC16 = */ 0,
+};
+
+/**
+ * LUTNLDataHeader default values.
+ */
+CalibBlock_LUTNLDataHeader_v2_t CalibBlock_LUTNLDataHeader_v2_default = {
+   /* DataHeaderLength = */ 256,
+   /* LUT_Xmin = */ 0.000000F,
+   /* LUT_Xrange = */ 0.000000F,
+   /* LUT_Size = */ 0,
+   /* M_Exp = */ 0,
+   /* B_Exp = */ 0,
+   /* M_Nbits = */ 16,
+   /* B_Nbits = */ 16,
+   /* M_Signed = */ 0,
+   /* B_Signed = */ 0,
+   /* NumberOfLUTNL = */ 0,
+   /* LUTNLDataLength = */ 0,
+   /* LUTNLDataCRC16 = */ 0,
+   /* DataHeaderCRC16 = */ 0,
+};
+
+/**
+ * LUTRQDataHeader default values.
+ */
+CalibBlock_LUTRQDataHeader_v2_t CalibBlock_LUTRQDataHeader_v2_default = {
+   /* DataHeaderLength = */ 256,
+   /* LUT_Xmin = */ 0.000000F,
+   /* LUT_Xrange = */ 0.000000F,
+   /* LUT_Size = */ 0,
+   /* M_Exp = */ 0,
+   /* B_Exp = */ 0,
+   /* Data_Off = */ 0.000000F,
+   /* Data_Exp = */ 1,
+   /* RadiometricQuantityType = */ 0,
+   /* M_Nbits = */ 16,
+   /* B_Nbits = */ 16,
+   /* M_Signed = */ 0,
+   /* B_Signed = */ 0,
+   /* LUTRQDataLength = */ 0,
+   /* LUTRQDataCRC16 = */ 0,
+   /* DataHeaderCRC16 = */ 0,
+};
 
 /**
  * BlockFileHeader parser.
@@ -35,94 +196,96 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 12)
+   if (buflen < CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(hdr->FileSignature, &buffer[0], 4); numBytes += 4;
+   memcpy(hdr->FileSignature, &buffer[numBytes], 4); numBytes += 4;
    hdr->FileSignature[4] = '\0';
 
-   if (strcmp(hdr->FileSignature, "TSBL") != 0)   {
+   if (strcmp(hdr->FileSignature, "TSBL") != 0)
+   {
       // Wrong file signature
       return 0;
    }
 
-   memcpy(&hdr->FileStructureMajorVersion, &buffer[4], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureMajorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
 
-   if (hdr->FileStructureMajorVersion != 2)   {
+   if (hdr->FileStructureMajorVersion != 2)
+   {
       // Wrong file major version
       return 0;
    }
 
-   memcpy(&hdr->FileStructureMinorVersion, &buffer[5], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->FileStructureSubMinorVersion, &buffer[6], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureSubMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->FileHeaderLength, &buffer[8], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->FileHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->FileHeaderLength)
+   if (hdr->FileHeaderLength != CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2)
    {
-      // Not enough bytes in buffer
+      // File header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->DeviceSerialNumber, &buffer[12], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->POSIXTime, &buffer[16], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->FileDescription, &buffer[20], 64); numBytes += 64;
+   memcpy(&hdr->DeviceSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->POSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->FileDescription, &buffer[numBytes], 64); numBytes += 64;
    hdr->FileDescription[64] = '\0';
-   memcpy(&hdr->DeviceDataFlowMajorVersion, &buffer[84], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->DeviceDataFlowMinorVersion, &buffer[85], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->SensorID, &buffer[86], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->CalibrationSource, &buffer[87], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->CalibrationType, &buffer[88], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->IntegrationMode, &buffer[89], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->SensorWellDepth, &buffer[90], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->PixelDataResolution, &buffer[91], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Width, &buffer[92], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->Height, &buffer[94], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->OffsetX, &buffer[96], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->OffsetY, &buffer[98], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->ReverseX, &buffer[100], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->ReverseY, &buffer[101], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->DeviceDataFlowMajorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->DeviceDataFlowMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->SensorID, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CalibrationSource, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CalibrationType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->IntegrationMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->SensorWellDepth, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->PixelDataResolution, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Width, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->Height, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->OffsetX, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->OffsetY, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ReverseX, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->ReverseY, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 2; // Skip FREE space
-   memcpy(&hdr->ExternalLensSerialNumber, &buffer[104], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->ExternalLensName, &buffer[108], 64); numBytes += 64;
+   memcpy(&hdr->ExternalLensSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->ExternalLensName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ExternalLensName[64] = '\0';
-   memcpy(&hdr->ManualFilterSerialNumber, &buffer[172], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->ManualFilterName, &buffer[176], 64); numBytes += 64;
+   memcpy(&hdr->ManualFilterSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->ManualFilterName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ManualFilterName[64] = '\0';
-   memcpy(&hdr->ExposureTime, &buffer[240], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->AcquisitionFrameRate, &buffer[244], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->FWPosition, &buffer[248], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->NDFPosition, &buffer[249], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->SensorWidth, &buffer[250], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->SensorHeight, &buffer[252], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->PixelDynamicRangeMin, &buffer[254], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->PixelDynamicRangeMax, &buffer[256], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->SaturationThreshold, &buffer[258], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->BlockBadPixelCount, &buffer[260], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->MaximumTotalFlux, &buffer[264], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->NUCMultFactor, &buffer[268], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->T0, &buffer[272], sizeof(int32_t)); numBytes += sizeof(int32_t);
-   memcpy(&hdr->Nu, &buffer[276], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->DeviceTemperatureSensor, &buffer[280], sizeof(int32_t)); numBytes += sizeof(int32_t);
-   memcpy(&hdr->SpectralResponsePOSIXTime, &buffer[284], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->ReferencePOSIXTime, &buffer[288], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->FWFilterID, &buffer[292], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->NDFilterID, &buffer[294], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->ManualFilterID, &buffer[296], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->LensID, &buffer[298], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->LowCut, &buffer[300], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->HighCut, &buffer[304], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->ExposureTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->AcquisitionFrameRate, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->FWPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->NDFPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->SensorWidth, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->SensorHeight, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->PixelDynamicRangeMin, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->PixelDynamicRangeMax, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->SaturationThreshold, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->BlockBadPixelCount, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->MaximumTotalFlux, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->NUCMultFactor, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->T0, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memcpy(&hdr->Nu, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->DeviceTemperatureSensor, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memcpy(&hdr->SpectralResponsePOSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->ReferencePOSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->FWFilterID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->NDFilterID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ManualFilterID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->LensID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->LowCut, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->HighCut, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    numBytes += 194; // Skip FREE space
-   memcpy(&hdr->PixelDataPresence, &buffer[502], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->MaxTKDataPresence, &buffer[503], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->LUTNLDataPresence, &buffer[504], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->LUTRQDataPresence, &buffer[505], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->NumberOfLUTRQ, &buffer[506], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUTRQDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->NumberOfLUTRQ, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 3; // Skip FREE space
-   memcpy(&hdr->FileHeaderCRC16, &buffer[510], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->FileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->FileHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -147,75 +310,94 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
 {
    uint32_t numBytes = 0;
 
-   strncpy(hdr->FileSignature, "TSBL", 4);
-   hdr->FileStructureMajorVersion = 2;
-   hdr->FileStructureMinorVersion = 0;
-   hdr->FileStructureSubMinorVersion = 0;
-   hdr->DeviceDataFlowMajorVersion = 1;
-   hdr->DeviceDataFlowMinorVersion = 1;
-   hdr->FileHeaderLength = 512;
+   if (buflen < CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], hdr->FileSignature, 4); numBytes += 4;
-   memcpy(&buffer[4], &hdr->FileStructureMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[5], &hdr->FileStructureMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[6], &hdr->FileStructureSubMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[7], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[8], &hdr->FileHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[12], &hdr->DeviceSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[16], &hdr->POSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[20], hdr->FileDescription, 64); numBytes += 64;
-   memcpy(&buffer[84], &hdr->DeviceDataFlowMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[85], &hdr->DeviceDataFlowMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[86], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[87], &hdr->CalibrationSource, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[88], &hdr->CalibrationType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[89], &hdr->IntegrationMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[90], &hdr->SensorWellDepth, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[91], &hdr->PixelDataResolution, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[92], &hdr->Width, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[94], &hdr->Height, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[96], &hdr->OffsetX, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[98], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[100], &hdr->ReverseX, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[101], &hdr->ReverseY, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[102], 0, 2); numBytes += 2; // FREE space
-   memcpy(&buffer[104], &hdr->ExternalLensSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[108], hdr->ExternalLensName, 64); numBytes += 64;
-   memcpy(&buffer[172], &hdr->ManualFilterSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[176], hdr->ManualFilterName, 64); numBytes += 64;
-   memcpy(&buffer[240], &hdr->ExposureTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[244], &hdr->AcquisitionFrameRate, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[248], &hdr->FWPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[249], &hdr->NDFPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[250], &hdr->SensorWidth, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[252], &hdr->SensorHeight, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[254], &hdr->PixelDynamicRangeMin, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[256], &hdr->PixelDynamicRangeMax, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[258], &hdr->SaturationThreshold, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[260], &hdr->BlockBadPixelCount, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[264], &hdr->MaximumTotalFlux, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[268], &hdr->NUCMultFactor, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[272], &hdr->T0, sizeof(int32_t)); numBytes += sizeof(int32_t);
-   memcpy(&buffer[276], &hdr->Nu, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[280], &hdr->DeviceTemperatureSensor, sizeof(int32_t)); numBytes += sizeof(int32_t);
-   memcpy(&buffer[284], &hdr->SpectralResponsePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[288], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[292], &hdr->FWFilterID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[294], &hdr->NDFilterID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[296], &hdr->ManualFilterID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[298], &hdr->LensID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[300], &hdr->LowCut, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[304], &hdr->HighCut, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[308], 0, 194); numBytes += 194; // FREE space
-   memcpy(&buffer[502], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[503], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[504], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[505], &hdr->LUTRQDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[506], &hdr->NumberOfLUTRQ, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[507], 0, 3); numBytes += 3; // FREE space
+
+   strncpy(hdr->FileSignature, "TSBL", 4);
+
+   memcpy(&buffer[numBytes], hdr->FileSignature, 4); numBytes += 4;
+
+   hdr->FileStructureMajorVersion = CALIBBLOCK_FILEMAJORVERSION_V2;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->FileStructureMinorVersion = CALIBBLOCK_FILEMINORVERSION_V2;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->FileStructureSubMinorVersion = CALIBBLOCK_FILESUBMINORVERSION_V2;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureSubMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+
+   hdr->FileHeaderLength = CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2;
+
+   memcpy(&buffer[numBytes], &hdr->FileHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->DeviceSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->POSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->FileDescription, 64); numBytes += 64;
+
+   hdr->DeviceDataFlowMajorVersion = 1;
+
+   memcpy(&buffer[numBytes], &hdr->DeviceDataFlowMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->DeviceDataFlowMinorVersion = 1;
+
+   memcpy(&buffer[numBytes], &hdr->DeviceDataFlowMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CalibrationSource, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CalibrationType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->IntegrationMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->SensorWellDepth, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->PixelDataResolution, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Width, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->Height, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->OffsetX, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->ReverseX, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->ReverseY, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+   memcpy(&buffer[numBytes], &hdr->ExternalLensSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->ExternalLensName, 64); numBytes += 64;
+   memcpy(&buffer[numBytes], &hdr->ManualFilterSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->ManualFilterName, 64); numBytes += 64;
+   memcpy(&buffer[numBytes], &hdr->ExposureTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->AcquisitionFrameRate, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->FWPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->NDFPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->SensorWidth, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->SensorHeight, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->PixelDynamicRangeMin, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->PixelDynamicRangeMax, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->SaturationThreshold, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->BlockBadPixelCount, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->MaximumTotalFlux, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->NUCMultFactor, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->T0, sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memcpy(&buffer[numBytes], &hdr->Nu, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->DeviceTemperatureSensor, sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memcpy(&buffer[numBytes], &hdr->SpectralResponsePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->FWFilterID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->NDFilterID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->ManualFilterID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->LensID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->LowCut, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->HighCut, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 194); numBytes += 194; // FREE space
+   memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->LUTRQDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->NumberOfLUTRQ, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
 
    hdr->FileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[510], &hdr->FileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->FileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }
@@ -234,59 +416,59 @@ uint32_t CalibBlock_ParsePixelDataHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_PIXELDATAHEADER_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(&hdr->DataHeaderLength, &buffer[0], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->DataHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->DataHeaderLength)
+   if (hdr->DataHeaderLength != CALIBBLOCK_PIXELDATAHEADER_SIZE_V2)
    {
-      // Not enough bytes in buffer
+      // Data header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->Offset_Off, &buffer[4], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Offset_Median, &buffer[8], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Offset_Exp, &buffer[12], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Offset_Nbits, &buffer[13], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Offset_Signed, &buffer[14], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Offset_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Offset_Median, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Offset_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Offset_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Offset_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->Range_Off, &buffer[16], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Range_Median, &buffer[20], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Range_Exp, &buffer[24], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Range_Nbits, &buffer[25], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Range_Signed, &buffer[26], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Range_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Range_Median, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Range_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Range_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Range_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->Kappa_Off, &buffer[28], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Kappa_Median, &buffer[32], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Kappa_Exp, &buffer[36], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Kappa_Nbits, &buffer[37], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Kappa_Signed, &buffer[38], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Kappa_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Kappa_Median, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Kappa_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Kappa_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Kappa_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->Beta0_Off, &buffer[40], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Beta0_Median, &buffer[44], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Beta0_Exp, &buffer[48], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Beta0_Nbits, &buffer[49], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Beta0_Signed, &buffer[50], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Beta0_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Beta0_Median, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Beta0_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Beta0_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Beta0_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->Alpha_Off, &buffer[52], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Alpha_Median, &buffer[56], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Alpha_Exp, &buffer[60], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Alpha_Nbits, &buffer[61], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Alpha_Signed, &buffer[62], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Alpha_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Alpha_Median, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Alpha_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Alpha_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Alpha_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->LUTNLIndex_Nbits, &buffer[64], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->LUTNLIndex_Signed, &buffer[65], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUTNLIndex_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUTNLIndex_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 2; // Skip FREE space
-   memcpy(&hdr->BadPixel_Nbits, &buffer[68], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->BadPixel_Signed, &buffer[69], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->BadPixel_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->BadPixel_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 178; // Skip FREE space
-   memcpy(&hdr->PixelDataLength, &buffer[248], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->PixelDataCRC16, &buffer[252], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->DataHeaderCRC16, &buffer[254], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->PixelDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->PixelDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->DataHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->DataHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -311,50 +493,57 @@ uint32_t CalibBlock_WritePixelDataHeader_v2(CalibBlock_PixelDataHeader_v2_t *hdr
 {
    uint32_t numBytes = 0;
 
-   hdr->DataHeaderLength = 256;
+   if (buflen < CALIBBLOCK_PIXELDATAHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[4], &hdr->Offset_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[8], &hdr->Offset_Median, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[12], &hdr->Offset_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[13], &hdr->Offset_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[14], &hdr->Offset_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[15], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[16], &hdr->Range_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[20], &hdr->Range_Median, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[24], &hdr->Range_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[25], &hdr->Range_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[26], &hdr->Range_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[27], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[28], &hdr->Kappa_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[32], &hdr->Kappa_Median, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[36], &hdr->Kappa_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[37], &hdr->Kappa_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[38], &hdr->Kappa_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[39], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[40], &hdr->Beta0_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[44], &hdr->Beta0_Median, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[48], &hdr->Beta0_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[49], &hdr->Beta0_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[50], &hdr->Beta0_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[51], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[52], &hdr->Alpha_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[56], &hdr->Alpha_Median, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[60], &hdr->Alpha_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[61], &hdr->Alpha_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[62], &hdr->Alpha_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[63], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[64], &hdr->LUTNLIndex_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[65], &hdr->LUTNLIndex_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[66], 0, 2); numBytes += 2; // FREE space
-   memcpy(&buffer[68], &hdr->BadPixel_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[69], &hdr->BadPixel_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[70], 0, 178); numBytes += 178; // FREE space
-   memcpy(&buffer[248], &hdr->PixelDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[252], &hdr->PixelDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   hdr->DataHeaderLength = CALIBBLOCK_PIXELDATAHEADER_SIZE_V2;
+
+   memcpy(&buffer[numBytes], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->Offset_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Offset_Median, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Offset_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Offset_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Offset_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->Range_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Range_Median, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Range_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Range_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Range_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->Kappa_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Kappa_Median, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Kappa_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Kappa_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Kappa_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->Beta0_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Median, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->Alpha_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Alpha_Median, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Alpha_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Alpha_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Alpha_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->LUTNLIndex_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->LUTNLIndex_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+   memcpy(&buffer[numBytes], &hdr->BadPixel_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->BadPixel_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 178); numBytes += 178; // FREE space
+   memcpy(&buffer[numBytes], &hdr->PixelDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->PixelDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    hdr->DataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[254], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }
@@ -374,7 +563,7 @@ uint32_t CalibBlock_ParsePixelData_v2(uint8_t *buffer, uint32_t buflen, CalibBlo
    uint32_t numBytes = 0;
    uint64_t rawData;
 
-   if (buflen < 8)
+   if (buflen < CALIBBLOCK_PIXELDATA_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
@@ -414,7 +603,7 @@ uint32_t CalibBlock_WritePixelData_v2(CalibBlock_PixelData_v2_t *data, uint8_t *
    uint64_t tmpData;
    uint64_t rawData = 0;
 
-   if (buflen < 8)
+   if (buflen < CALIBBLOCK_PIXELDATA_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
@@ -454,32 +643,32 @@ uint32_t CalibBlock_ParseMaxTKDataHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_MAXTKDATAHEADER_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(&hdr->DataHeaderLength, &buffer[0], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->DataHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->DataHeaderLength)
+   if (hdr->DataHeaderLength != CALIBBLOCK_MAXTKDATAHEADER_SIZE_V2)
    {
-      // Not enough bytes in buffer
+      // Data header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->TCalMin, &buffer[4], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->TCalMax, &buffer[8], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->TCalMinExpTimeMin, &buffer[12], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->TCalMinExpTimeMax, &buffer[16], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->TCalMaxExpTimeMin, &buffer[20], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->TCalMaxExpTimeMax, &buffer[24], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->TvsINT_FitOrder, &buffer[28], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->INTvsT_FitOrder, &buffer[29], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->TCalMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->TCalMax, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->TCalMinExpTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->TCalMinExpTimeMax, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->TCalMaxExpTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->TCalMaxExpTimeMax, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->TvsINT_FitOrder, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->INTvsT_FitOrder, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 218; // Skip FREE space
-   memcpy(&hdr->MaxTKDataLength, &buffer[248], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->MaxTKDataCRC16, &buffer[252], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->DataHeaderCRC16, &buffer[254], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->MaxTKDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->MaxTKDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->DataHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->DataHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -504,23 +693,30 @@ uint32_t CalibBlock_WriteMaxTKDataHeader_v2(CalibBlock_MaxTKDataHeader_v2_t *hdr
 {
    uint32_t numBytes = 0;
 
-   hdr->DataHeaderLength = 256;
+   if (buflen < CALIBBLOCK_MAXTKDATAHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[4], &hdr->TCalMin, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[8], &hdr->TCalMax, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[12], &hdr->TCalMinExpTimeMin, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[16], &hdr->TCalMinExpTimeMax, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[20], &hdr->TCalMaxExpTimeMin, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[24], &hdr->TCalMaxExpTimeMax, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[28], &hdr->TvsINT_FitOrder, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[29], &hdr->INTvsT_FitOrder, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[30], 0, 218); numBytes += 218; // FREE space
-   memcpy(&buffer[248], &hdr->MaxTKDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[252], &hdr->MaxTKDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   hdr->DataHeaderLength = CALIBBLOCK_MAXTKDATAHEADER_SIZE_V2;
+
+   memcpy(&buffer[numBytes], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->TCalMin, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->TCalMax, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->TCalMinExpTimeMin, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->TCalMinExpTimeMax, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->TCalMaxExpTimeMin, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->TCalMaxExpTimeMax, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->TvsINT_FitOrder, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->INTvsT_FitOrder, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 218); numBytes += 218; // FREE space
+   memcpy(&buffer[numBytes], &hdr->MaxTKDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->MaxTKDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    hdr->DataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[254], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }
@@ -539,34 +735,34 @@ uint32_t CalibBlock_ParseLUTNLDataHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_LUTNLDATAHEADER_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(&hdr->DataHeaderLength, &buffer[0], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->DataHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->DataHeaderLength)
+   if (hdr->DataHeaderLength != CALIBBLOCK_LUTNLDATAHEADER_SIZE_V2)
    {
-      // Not enough bytes in buffer
+      // Data header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->LUT_Xmin, &buffer[4], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->LUT_Xrange, &buffer[8], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->LUT_Size, &buffer[12], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->M_Exp, &buffer[14], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->B_Exp, &buffer[15], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->M_Nbits, &buffer[16], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->B_Nbits, &buffer[17], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->M_Signed, &buffer[18], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->B_Signed, &buffer[19], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUT_Xmin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LUT_Xrange, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LUT_Size, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->M_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->B_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->M_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->B_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->M_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->B_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 227; // Skip FREE space
-   memcpy(&hdr->NumberOfLUTNL, &buffer[247], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->LUTNLDataLength, &buffer[248], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->LUTNLDataCRC16, &buffer[252], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->DataHeaderCRC16, &buffer[254], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->NumberOfLUTNL, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUTNLDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->LUTNLDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->DataHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->DataHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -591,25 +787,32 @@ uint32_t CalibBlock_WriteLUTNLDataHeader_v2(CalibBlock_LUTNLDataHeader_v2_t *hdr
 {
    uint32_t numBytes = 0;
 
-   hdr->DataHeaderLength = 256;
+   if (buflen < CALIBBLOCK_LUTNLDATAHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[4], &hdr->LUT_Xmin, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[8], &hdr->LUT_Xrange, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[12], &hdr->LUT_Size, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[14], &hdr->M_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[15], &hdr->B_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[16], &hdr->M_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[17], &hdr->B_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[18], &hdr->M_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[19], &hdr->B_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[20], 0, 227); numBytes += 227; // FREE space
-   memcpy(&buffer[247], &hdr->NumberOfLUTNL, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[248], &hdr->LUTNLDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[252], &hdr->LUTNLDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   hdr->DataHeaderLength = CALIBBLOCK_LUTNLDATAHEADER_SIZE_V2;
+
+   memcpy(&buffer[numBytes], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->LUT_Xmin, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LUT_Xrange, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LUT_Size, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->M_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->B_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->M_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->B_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->M_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->B_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 227); numBytes += 227; // FREE space
+   memcpy(&buffer[numBytes], &hdr->NumberOfLUTNL, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->LUTNLDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->LUTNLDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    hdr->DataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[254], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }
@@ -629,7 +832,7 @@ uint32_t CalibBlock_ParseLUTNLData_v2(uint8_t *buffer, uint32_t buflen, CalibBlo
    uint32_t numBytes = 0;
    uint32_t rawData;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_LUTNLDATA_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
@@ -659,7 +862,7 @@ uint32_t CalibBlock_WriteLUTNLData_v2(CalibBlock_LUTNLData_v2_t *data, uint8_t *
    uint32_t tmpData;
    uint32_t rawData = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_LUTNLDATA_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
@@ -689,36 +892,36 @@ uint32_t CalibBlock_ParseLUTRQDataHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_LUTRQDATAHEADER_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(&hdr->DataHeaderLength, &buffer[0], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->DataHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->DataHeaderLength)
+   if (hdr->DataHeaderLength != CALIBBLOCK_LUTRQDATAHEADER_SIZE_V2)
    {
-      // Not enough bytes in buffer
+      // Data header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->LUT_Xmin, &buffer[4], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->LUT_Xrange, &buffer[8], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->LUT_Size, &buffer[12], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->M_Exp, &buffer[14], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->B_Exp, &buffer[15], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Data_Off, &buffer[16], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Data_Exp, &buffer[20], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->RadiometricQuantityType, &buffer[21], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->M_Nbits, &buffer[22], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->B_Nbits, &buffer[23], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->M_Signed, &buffer[24], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->B_Signed, &buffer[25], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->LUT_Xmin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LUT_Xrange, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LUT_Size, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->M_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->B_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Data_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Data_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->RadiometricQuantityType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->M_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->B_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->M_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->B_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 222; // Skip FREE space
-   memcpy(&hdr->LUTRQDataLength, &buffer[248], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->LUTRQDataCRC16, &buffer[252], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->DataHeaderCRC16, &buffer[254], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->LUTRQDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->LUTRQDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->DataHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->DataHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -743,27 +946,34 @@ uint32_t CalibBlock_WriteLUTRQDataHeader_v2(CalibBlock_LUTRQDataHeader_v2_t *hdr
 {
    uint32_t numBytes = 0;
 
-   hdr->DataHeaderLength = 256;
+   if (buflen < CALIBBLOCK_LUTRQDATAHEADER_SIZE_V2)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[4], &hdr->LUT_Xmin, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[8], &hdr->LUT_Xrange, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[12], &hdr->LUT_Size, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[14], &hdr->M_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[15], &hdr->B_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[16], &hdr->Data_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[20], &hdr->Data_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[21], &hdr->RadiometricQuantityType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[22], &hdr->M_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[23], &hdr->B_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[24], &hdr->M_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[25], &hdr->B_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[26], 0, 222); numBytes += 222; // FREE space
-   memcpy(&buffer[248], &hdr->LUTRQDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[252], &hdr->LUTRQDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   hdr->DataHeaderLength = CALIBBLOCK_LUTRQDATAHEADER_SIZE_V2;
+
+   memcpy(&buffer[numBytes], &hdr->DataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->LUT_Xmin, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LUT_Xrange, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LUT_Size, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->M_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->B_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Data_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Data_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->RadiometricQuantityType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->M_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->B_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->M_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->B_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 222); numBytes += 222; // FREE space
+   memcpy(&buffer[numBytes], &hdr->LUTRQDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->LUTRQDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    hdr->DataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[254], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }
@@ -783,7 +993,7 @@ uint32_t CalibBlock_ParseLUTRQData_v2(uint8_t *buffer, uint32_t buflen, CalibBlo
    uint32_t numBytes = 0;
    uint32_t rawData;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_LUTRQDATA_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;
@@ -813,7 +1023,7 @@ uint32_t CalibBlock_WriteLUTRQData_v2(CalibBlock_LUTRQData_v2_t *data, uint8_t *
    uint32_t tmpData;
    uint32_t rawData = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBBLOCK_LUTRQDATA_SIZE_V2)
    {
       // Not enough bytes in buffer
       return 0;

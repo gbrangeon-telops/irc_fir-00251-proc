@@ -6,7 +6,7 @@
  *
  * Auto-generated Image Correction Calibration File library.
  * Generated from the image correction calibration file structure definition XLS file version 1.1.0
- * using generateIRCamCalibrationFileCLib.m Matlab script.
+ * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
  * $Author$
@@ -20,6 +20,45 @@
 #include "CalibActualizationFile_v1.h"
 #include "CRC.h"
 #include <string.h>
+#include <float.h>
+
+/**
+ * ActualizationFileHeader default values.
+ */
+CalibActualization_ActualizationFileHeader_v1_t CalibActualization_ActualizationFileHeader_v1_default = {
+   /* FileSignature = */ "TSAC",
+   /* FileStructureMajorVersion = */ 0,
+   /* FileStructureMinorVersion = */ 0,
+   /* FileStructureSubMinorVersion = */ 0,
+   /* ActualizationFileHeaderLength = */ 512,
+   /* DeviceSerialNumber = */ 0,
+   /* POSIXTime = */ 0,
+   /* FileDescription = */ "",
+   /* DeviceDataFlowMajorVersion = */ 1,
+   /* DeviceDataFlowMinorVersion = */ 1,
+   /* SensorID = */ 0,
+   /* Width = */ 0,
+   /* Height = */ 0,
+   /* OffsetX = */ 0,
+   /* OffsetY = */ 0,
+   /* ReferencePOSIXTime = */ 0,
+   /* ActualizationFileHeaderCRC16 = */ 0,
+};
+
+/**
+ * ActualizationDataHeader default values.
+ */
+CalibActualization_ActualizationDataHeader_v1_t CalibActualization_ActualizationDataHeader_v1_default = {
+   /* ActualizationDataHeaderLength = */ 256,
+   /* Beta0_Off = */ 0.000000F,
+   /* Beta0_Median = */ 0.000000F,
+   /* Beta0_Exp = */ 0,
+   /* Beta0_Nbits = */ 11,
+   /* Beta0_Signed = */ 1,
+   /* ActualizationDataLength = */ 0,
+   /* ActualizationDataCRC16 = */ 0,
+   /* ActualizationDataHeaderCRC16 = */ 0,
+};
 
 /**
  * ActualizationFileHeader parser.
@@ -35,53 +74,55 @@ uint32_t CalibActualization_ParseActualizationFileHeader_v1(uint8_t *buffer, uin
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 12)
+   if (buflen < CALIBACTUALIZATION_ACTUALIZATIONFILEHEADER_SIZE_V1)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(hdr->FileSignature, &buffer[0], 4); numBytes += 4;
+   memcpy(hdr->FileSignature, &buffer[numBytes], 4); numBytes += 4;
    hdr->FileSignature[4] = '\0';
 
-   if (strcmp(hdr->FileSignature, "TSAC") != 0)   {
+   if (strcmp(hdr->FileSignature, "TSAC") != 0)
+   {
       // Wrong file signature
       return 0;
    }
 
-   memcpy(&hdr->FileStructureMajorVersion, &buffer[4], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureMajorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
 
-   if (hdr->FileStructureMajorVersion != 1)   {
+   if (hdr->FileStructureMajorVersion != 1)
+   {
       // Wrong file major version
       return 0;
    }
 
-   memcpy(&hdr->FileStructureMinorVersion, &buffer[5], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->FileStructureSubMinorVersion, &buffer[6], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureSubMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->ActualizationFileHeaderLength, &buffer[8], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->ActualizationFileHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->ActualizationFileHeaderLength)
+   if (hdr->ActualizationFileHeaderLength != CALIBACTUALIZATION_ACTUALIZATIONFILEHEADER_SIZE_V1)
    {
-      // Not enough bytes in buffer
+      // File header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->DeviceSerialNumber, &buffer[12], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->POSIXTime, &buffer[16], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->FileDescription, &buffer[20], 64); numBytes += 64;
+   memcpy(&hdr->DeviceSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->POSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->FileDescription, &buffer[numBytes], 64); numBytes += 64;
    hdr->FileDescription[64] = '\0';
-   memcpy(&hdr->DeviceDataFlowMajorVersion, &buffer[84], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->DeviceDataFlowMinorVersion, &buffer[85], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->SensorID, &buffer[86], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->DeviceDataFlowMajorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->DeviceDataFlowMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->SensorID, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->Width, &buffer[88], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->Height, &buffer[90], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->OffsetX, &buffer[92], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->OffsetY, &buffer[94], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->ReferencePOSIXTime, &buffer[96], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->Width, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->Height, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->OffsetX, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->OffsetY, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ReferencePOSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    numBytes += 410; // Skip FREE space
-   memcpy(&hdr->ActualizationFileHeaderCRC16, &buffer[510], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ActualizationFileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->ActualizationFileHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -106,37 +147,56 @@ uint32_t CalibActualization_WriteActualizationFileHeader_v1(CalibActualization_A
 {
    uint32_t numBytes = 0;
 
-   strncpy(hdr->FileSignature, "TSAC", 4);
-   hdr->FileStructureMajorVersion = 1;
-   hdr->FileStructureMinorVersion = 1;
-   hdr->FileStructureSubMinorVersion = 0;
-   hdr->DeviceDataFlowMajorVersion = 1;
-   hdr->DeviceDataFlowMinorVersion = 1;
-   hdr->ActualizationFileHeaderLength = 512;
+   if (buflen < CALIBACTUALIZATION_ACTUALIZATIONFILEHEADER_SIZE_V1)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], hdr->FileSignature, 4); numBytes += 4;
-   memcpy(&buffer[4], &hdr->FileStructureMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[5], &hdr->FileStructureMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[6], &hdr->FileStructureSubMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[7], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[8], &hdr->ActualizationFileHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[12], &hdr->DeviceSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[16], &hdr->POSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[20], hdr->FileDescription, 64); numBytes += 64;
-   memcpy(&buffer[84], &hdr->DeviceDataFlowMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[85], &hdr->DeviceDataFlowMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[86], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[87], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[88], &hdr->Width, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[90], &hdr->Height, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[92], &hdr->OffsetX, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[94], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[96], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memset(&buffer[100], 0, 410); numBytes += 410; // FREE space
+
+   strncpy(hdr->FileSignature, "TSAC", 4);
+
+   memcpy(&buffer[numBytes], hdr->FileSignature, 4); numBytes += 4;
+
+   hdr->FileStructureMajorVersion = CALIBACTUALIZATION_FILEMAJORVERSION_V1;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->FileStructureMinorVersion = CALIBACTUALIZATION_FILEMINORVERSION_V1;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->FileStructureSubMinorVersion = CALIBACTUALIZATION_FILESUBMINORVERSION_V1;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureSubMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+
+   hdr->ActualizationFileHeaderLength = CALIBACTUALIZATION_ACTUALIZATIONFILEHEADER_SIZE_V1;
+
+   memcpy(&buffer[numBytes], &hdr->ActualizationFileHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->DeviceSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->POSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->FileDescription, 64); numBytes += 64;
+
+   hdr->DeviceDataFlowMajorVersion = 1;
+
+   memcpy(&buffer[numBytes], &hdr->DeviceDataFlowMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->DeviceDataFlowMinorVersion = 1;
+
+   memcpy(&buffer[numBytes], &hdr->DeviceDataFlowMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->Width, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->Height, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->OffsetX, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memset(&buffer[numBytes], 0, 410); numBytes += 410; // FREE space
 
    hdr->ActualizationFileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[510], &hdr->ActualizationFileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   
+   memcpy(&buffer[numBytes], &hdr->ActualizationFileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
    return numBytes;
 }
 
@@ -154,29 +214,29 @@ uint32_t CalibActualization_ParseActualizationDataHeader_v1(uint8_t *buffer, uin
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 4)
+   if (buflen < CALIBACTUALIZATION_ACTUALIZATIONDATAHEADER_SIZE_V1)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(&hdr->ActualizationDataHeaderLength, &buffer[0], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->ActualizationDataHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->ActualizationDataHeaderLength)
+   if (hdr->ActualizationDataHeaderLength != CALIBACTUALIZATION_ACTUALIZATIONDATAHEADER_SIZE_V1)
    {
-      // Not enough bytes in buffer
+      // Data header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->Beta0_Off, &buffer[4], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Beta0_Median, &buffer[8], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->Beta0_Exp, &buffer[12], sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&hdr->Beta0_Nbits, &buffer[13], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Beta0_Signed, &buffer[14], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Beta0_Off, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Beta0_Median, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->Beta0_Exp, &buffer[numBytes], sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&hdr->Beta0_Nbits, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Beta0_Signed, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 233; // Skip FREE space
-   memcpy(&hdr->ActualizationDataLength, &buffer[248], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->ActualizationDataCRC16, &buffer[252], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->ActualizationDataHeaderCRC16, &buffer[254], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ActualizationDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->ActualizationDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ActualizationDataHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->ActualizationDataHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -201,21 +261,28 @@ uint32_t CalibActualization_WriteActualizationDataHeader_v1(CalibActualization_A
 {
    uint32_t numBytes = 0;
 
-   hdr->ActualizationDataHeaderLength = 256;
+   if (buflen < CALIBACTUALIZATION_ACTUALIZATIONDATAHEADER_SIZE_V1)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], &hdr->ActualizationDataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[4], &hdr->Beta0_Off, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[8], &hdr->Beta0_Median, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[12], &hdr->Beta0_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
-   memcpy(&buffer[13], &hdr->Beta0_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[14], &hdr->Beta0_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[15], 0, 233); numBytes += 233; // FREE space
-   memcpy(&buffer[248], &hdr->ActualizationDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[252], &hdr->ActualizationDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   hdr->ActualizationDataHeaderLength = CALIBACTUALIZATION_ACTUALIZATIONDATAHEADER_SIZE_V1;
+
+   memcpy(&buffer[numBytes], &hdr->ActualizationDataHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Off, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Median, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Exp, sizeof(int8_t)); numBytes += sizeof(int8_t);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Nbits, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Beta0_Signed, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 233); numBytes += 233; // FREE space
+   memcpy(&buffer[numBytes], &hdr->ActualizationDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->ActualizationDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    hdr->ActualizationDataHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[254], &hdr->ActualizationDataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   
+   memcpy(&buffer[numBytes], &hdr->ActualizationDataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
    return numBytes;
 }
 
@@ -234,7 +301,7 @@ uint32_t CalibActualization_ParseActualizationData_v1(uint8_t *buffer, uint32_t 
    uint32_t numBytes = 0;
    uint16_t rawData;
 
-   if (buflen < 2)
+   if (buflen < CALIBACTUALIZATION_ACTUALIZATIONDATA_SIZE_V1)
    {
       // Not enough bytes in buffer
       return 0;
@@ -269,7 +336,7 @@ uint32_t CalibActualization_WriteActualizationData_v1(CalibActualization_Actuali
    uint16_t tmpData;
    uint16_t rawData = 0;
 
-   if (buflen < 2)
+   if (buflen < CALIBACTUALIZATION_ACTUALIZATIONDATA_SIZE_V1)
    {
       // Not enough bytes in buffer
       return 0;

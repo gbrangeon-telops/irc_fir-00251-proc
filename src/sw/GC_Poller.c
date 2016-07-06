@@ -20,6 +20,7 @@
 #include "Protocol_F1F2.h"
 #include "BufferManager.h"
 #include "BuiltInTests.h"
+#include "ReleaseInfo.h"
 #include "Utils.h"
 
 IRC_Status_t GC_Poller_ValidatePollingIndex(uint32_t *pollingIdx);

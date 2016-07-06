@@ -140,10 +140,10 @@ IRC_Status_t DeviceKey_Renew(flashDynamicValues_t *p_flashDynamicValues, gcRegis
  */
 IRC_Status_t DeviceKey_Reset(flashDynamicValues_t *p_flashDynamicValues, gcRegistersData_t *p_gcRegsData)
 {
-   extern flashDynamicValues_t flashDynamicValuesDefault;
+   extern flashDynamicValues_t flashDynamicValues_default;
 
-   p_flashDynamicValues->DeviceKeyValidationLow = flashDynamicValuesDefault.DeviceKeyValidationLow;
-   p_flashDynamicValues->DeviceKeyValidationHigh = flashDynamicValuesDefault.DeviceKeyValidationHigh;
+   p_flashDynamicValues->DeviceKeyValidationLow = flashDynamicValues_default.DeviceKeyValidationLow;
+   p_flashDynamicValues->DeviceKeyValidationHigh = flashDynamicValues_default.DeviceKeyValidationHigh;
    p_gcRegsData->DeviceKeyValidationLow = p_flashDynamicValues->DeviceKeyValidationLow;
    p_gcRegsData->DeviceKeyValidationHigh = p_flashDynamicValues->DeviceKeyValidationHigh;
 

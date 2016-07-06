@@ -35,6 +35,7 @@
 #include "DeviceKey.h"
 #include "GC_Poller.h"
 #include "BuiltInTests.h"
+#include "ReleaseInfo.h"
 #include <stdbool.h>
 #include <time.h>
 #include <string.h>

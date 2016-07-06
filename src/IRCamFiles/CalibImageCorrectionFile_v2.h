@@ -6,7 +6,7 @@
  *
  * Auto-generated image correction calibration file library.
  * Generated from the image correction calibration file structure definition XLS file version 2.0.0
- * using generateIRCamCalibrationFileCLib.m Matlab script.
+ * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
  * $Author$
@@ -27,6 +27,7 @@
 #define CALIBIMAGECORRECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE_V2   512
+
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE_V2   256
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE_V2   2
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_MASK_V2    (uint16_t)(0x07FF)

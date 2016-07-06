@@ -8,6 +8,7 @@
 #include "SFW_ctrl.h"
 #include "exposure_time_ctrl.h"
 #include "GC_Registers.h"
+#include "FlashSettings.h"
 #include "Timer.h"
 #include "trig_gen.h"   // for TRIG_GetRTC()
 

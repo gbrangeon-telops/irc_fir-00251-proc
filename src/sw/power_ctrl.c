@@ -448,7 +448,7 @@ void Power_SM()
                      TDCStatusClr(WaitingForPowerMask);
                      PM_INF("Device power state is On");
 
-                     if (flashSettings.ActualizationEnabled && flashSettings.ActualizationAtPowerOn)
+                     if (flashSettings.ImageCorrectionEnabled && flashSettings.ImageCorrectionAtPowerOn)
                      {
                         startActualization(true);
                      }

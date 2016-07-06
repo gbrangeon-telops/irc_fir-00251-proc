@@ -59,7 +59,7 @@ IRC_Status_t FI_GetFileInfo(const char *filename, fileInfo_t *fileInfo)
 }
 
 /**
- * Parse file info.
+ * Parse file info and place back the file cursor to its initial position.
  *
  * @param fd is the file descriptor.
  * @param fileInfo is the pointer to the file info data structure to be returned.
@@ -69,14 +69,29 @@ IRC_Status_t FI_GetFileInfo(const char *filename, fileInfo_t *fileInfo)
  */
 IRC_Status_t FI_ParseFileInfo(int fd, fileInfo_t *fileInfo)
 {
+   uint32_t fileOffset;
    char fileType[F1F2_FILE_TYPE_SIZE + 1];
    uint32_t i;
 
    fileInfo->type = FT_NONE;
 
-   if (uffs_read(fd, tmpFileDataBuffer, 20) != 20)
+   // Get initial file cursor position
+   fileOffset = uffs_tell(fd);
+   if (fileOffset == -1)
    {
+      return 0;
+   }
+
+   if (FM_ReadFileToTmpFileDataBuffer(fd, 20) != 20)
+   {
+      uffs_seek(fd, fileOffset, USEEK_SET);
       return IRC_FAILURE;
+   }
+
+   // Place back file cursor to its initial position
+   if (uffs_seek(fd, fileOffset, USEEK_SET) == -1)
+   {
+      return 0;
    }
 
    memcpy(fileType, &tmpFileDataBuffer[0], F1F2_FILE_TYPE_SIZE);

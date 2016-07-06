@@ -6,7 +6,7 @@
  *
  * Auto-generated Image Correction Calibration File library.
  * Generated from the image correction calibration file structure definition XLS file version 1.1.0
- * using generateIRCamCalibrationFileCLib.m Matlab script.
+ * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
  * $Author$
@@ -20,6 +20,48 @@
 #include "CalibCollectionFile_v1.h"
 #include "CRC.h"
 #include <string.h>
+#include <float.h>
+
+/**
+ * CollectionFileHeader default values.
+ */
+CalibCollection_CollectionFileHeader_v1_t CalibCollection_CollectionFileHeader_v1_default = {
+   /* FileSignature = */ "TSCO",
+   /* FileStructureMajorVersion = */ 0,
+   /* FileStructureMinorVersion = */ 0,
+   /* FileStructureSubMinorVersion = */ 0,
+   /* CollectionFileHeaderLength = */ 512,
+   /* DeviceSerialNumber = */ 0,
+   /* POSIXTime = */ 0,
+   /* FileDescription = */ "",
+   /* DeviceDataFlowMajorVersion = */ 1,
+   /* DeviceDataFlowMinorVersion = */ 1,
+   /* SensorID = */ 0,
+   /* CollectionType = */ 0,
+   /* CalibrationType = */ 3,
+   /* IntegrationMode = */ 0,
+   /* SensorWellDepth = */ 0,
+   /* PixelDataResolution = */ 16,
+   /* Width = */ 0,
+   /* Height = */ 0,
+   /* OffsetX = */ 0,
+   /* OffsetY = */ 0,
+   /* ReverseX = */ 0,
+   /* ReverseY = */ 0,
+   /* FWPosition = */ 0,
+   /* NDFPosition = */ 0,
+   /* ExternalLensSerialNumber = */ 0,
+   /* ExternalLensName = */ "",
+   /* ManualFilterSerialNumber = */ 0,
+   /* ManualFilterName = */ "",
+   /* ReferencePOSIXTime = */ 0,
+   /* FluxRatio01 = */ 0.000000F,
+   /* FluxRatio12 = */ 0.000000F,
+   /* CollectionFileDataLength = */ 0,
+   /* NumberOfBlocks = */ 0,
+   /* CollectionFileDataCRC16 = */ 0,
+   /* CollectionFileHeaderCRC16 = */ 0,
+};
 
 /**
  * CollectionFileHeader parser.
@@ -35,73 +77,75 @@ uint32_t CalibCollection_ParseCollectionFileHeader_v1(uint8_t *buffer, uint32_t 
 {
    uint32_t numBytes = 0;
 
-   if (buflen < 12)
+   if (buflen < CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V1)
    {
       // Not enough bytes in buffer
       return 0;
    }
 
-   memcpy(hdr->FileSignature, &buffer[0], 4); numBytes += 4;
+   memcpy(hdr->FileSignature, &buffer[numBytes], 4); numBytes += 4;
    hdr->FileSignature[4] = '\0';
 
-   if (strcmp(hdr->FileSignature, "TSCO") != 0)   {
+   if (strcmp(hdr->FileSignature, "TSCO") != 0)
+   {
       // Wrong file signature
       return 0;
    }
 
-   memcpy(&hdr->FileStructureMajorVersion, &buffer[4], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureMajorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
 
-   if (hdr->FileStructureMajorVersion != 1)   {
+   if (hdr->FileStructureMajorVersion != 1)
+   {
       // Wrong file major version
       return 0;
    }
 
-   memcpy(&hdr->FileStructureMinorVersion, &buffer[5], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->FileStructureSubMinorVersion, &buffer[6], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FileStructureSubMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    numBytes += 1; // Skip FREE space
-   memcpy(&hdr->CollectionFileHeaderLength, &buffer[8], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->CollectionFileHeaderLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
 
-   if (buflen < hdr->CollectionFileHeaderLength)
+   if (hdr->CollectionFileHeaderLength != CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V1)
    {
-      // Not enough bytes in buffer
+      // File header length mismatch
       return 0;
    }
 
-   memcpy(&hdr->DeviceSerialNumber, &buffer[12], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->POSIXTime, &buffer[16], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->FileDescription, &buffer[20], 64); numBytes += 64;
+   memcpy(&hdr->DeviceSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->POSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->FileDescription, &buffer[numBytes], 64); numBytes += 64;
    hdr->FileDescription[64] = '\0';
-   memcpy(&hdr->DeviceDataFlowMajorVersion, &buffer[84], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->DeviceDataFlowMinorVersion, &buffer[85], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->SensorID, &buffer[86], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->CollectionType, &buffer[87], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->CalibrationType, &buffer[88], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->IntegrationMode, &buffer[89], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->SensorWellDepth, &buffer[90], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->PixelDataResolution, &buffer[91], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->Width, &buffer[92], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->Height, &buffer[94], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->OffsetX, &buffer[96], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->OffsetY, &buffer[98], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->ReverseX, &buffer[100], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->ReverseY, &buffer[101], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->FWPosition, &buffer[102], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->NDFPosition, &buffer[103], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->ExternalLensSerialNumber, &buffer[104], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->ExternalLensName, &buffer[108], 64); numBytes += 64;
+   memcpy(&hdr->DeviceDataFlowMajorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->DeviceDataFlowMinorVersion, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->SensorID, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CollectionType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CalibrationType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->IntegrationMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->SensorWellDepth, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->PixelDataResolution, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->Width, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->Height, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->OffsetX, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->OffsetY, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ReverseX, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->ReverseY, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FWPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->NDFPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->ExternalLensSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->ExternalLensName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ExternalLensName[64] = '\0';
-   memcpy(&hdr->ManualFilterSerialNumber, &buffer[172], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(hdr->ManualFilterName, &buffer[176], 64); numBytes += 64;
+   memcpy(&hdr->ManualFilterSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->ManualFilterName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ManualFilterName[64] = '\0';
-   memcpy(&hdr->ReferencePOSIXTime, &buffer[240], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&hdr->FluxRatio01, &buffer[244], sizeof(float)); numBytes += sizeof(float);
-   memcpy(&hdr->FluxRatio12, &buffer[248], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->ReferencePOSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->FluxRatio01, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->FluxRatio12, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    numBytes += 248; // Skip FREE space
-   memcpy(&hdr->CollectionFileDataLength, &buffer[500], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&hdr->CollectionFileDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    numBytes += 3; // Skip FREE space
-   memcpy(&hdr->NumberOfBlocks, &buffer[507], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&hdr->CollectionFileDataCRC16, &buffer[508], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&hdr->CollectionFileHeaderCRC16, &buffer[510], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->NumberOfBlocks, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CollectionFileDataCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->CollectionFileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->CollectionFileHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
    {
@@ -126,54 +170,73 @@ uint32_t CalibCollection_WriteCollectionFileHeader_v1(CalibCollection_Collection
 {
    uint32_t numBytes = 0;
 
-   strncpy(hdr->FileSignature, "TSCO", 4);
-   hdr->FileStructureMajorVersion = 1;
-   hdr->FileStructureMinorVersion = 1;
-   hdr->FileStructureSubMinorVersion = 0;
-   hdr->DeviceDataFlowMajorVersion = 1;
-   hdr->DeviceDataFlowMinorVersion = 1;
-   hdr->CollectionFileHeaderLength = 512;
+   if (buflen < CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V1)
+   {
+      // Not enough bytes in buffer
+      return 0;
+   }
 
-   memcpy(&buffer[0], hdr->FileSignature, 4); numBytes += 4;
-   memcpy(&buffer[4], &hdr->FileStructureMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[5], &hdr->FileStructureMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[6], &hdr->FileStructureSubMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[7], 0, 1); numBytes += 1; // FREE space
-   memcpy(&buffer[8], &hdr->CollectionFileHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[12], &hdr->DeviceSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[16], &hdr->POSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[20], hdr->FileDescription, 64); numBytes += 64;
-   memcpy(&buffer[84], &hdr->DeviceDataFlowMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[85], &hdr->DeviceDataFlowMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[86], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[87], &hdr->CollectionType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[88], &hdr->CalibrationType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[89], &hdr->IntegrationMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[90], &hdr->SensorWellDepth, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[91], &hdr->PixelDataResolution, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[92], &hdr->Width, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[94], &hdr->Height, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[96], &hdr->OffsetX, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[98], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-   memcpy(&buffer[100], &hdr->ReverseX, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[101], &hdr->ReverseY, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[102], &hdr->FWPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[103], &hdr->NDFPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[104], &hdr->ExternalLensSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[108], hdr->ExternalLensName, 64); numBytes += 64;
-   memcpy(&buffer[172], &hdr->ManualFilterSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[176], hdr->ManualFilterName, 64); numBytes += 64;
-   memcpy(&buffer[240], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memcpy(&buffer[244], &hdr->FluxRatio01, sizeof(float)); numBytes += sizeof(float);
-   memcpy(&buffer[248], &hdr->FluxRatio12, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[252], 0, 248); numBytes += 248; // FREE space
-   memcpy(&buffer[500], &hdr->CollectionFileDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memset(&buffer[504], 0, 3); numBytes += 3; // FREE space
-   memcpy(&buffer[507], &hdr->NumberOfBlocks, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memcpy(&buffer[508], &hdr->CollectionFileDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+
+   strncpy(hdr->FileSignature, "TSCO", 4);
+
+   memcpy(&buffer[numBytes], hdr->FileSignature, 4); numBytes += 4;
+
+   hdr->FileStructureMajorVersion = CALIBCOLLECTION_FILEMAJORVERSION_V1;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->FileStructureMinorVersion = CALIBCOLLECTION_FILEMINORVERSION_V1;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->FileStructureSubMinorVersion = CALIBCOLLECTION_FILESUBMINORVERSION_V1;
+
+   memcpy(&buffer[numBytes], &hdr->FileStructureSubMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+
+   hdr->CollectionFileHeaderLength = CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V1;
+
+   memcpy(&buffer[numBytes], &hdr->CollectionFileHeaderLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->DeviceSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->POSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->FileDescription, 64); numBytes += 64;
+
+   hdr->DeviceDataFlowMajorVersion = 1;
+
+   memcpy(&buffer[numBytes], &hdr->DeviceDataFlowMajorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+
+   hdr->DeviceDataFlowMinorVersion = 1;
+
+   memcpy(&buffer[numBytes], &hdr->DeviceDataFlowMinorVersion, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CollectionType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CalibrationType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->IntegrationMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->SensorWellDepth, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->PixelDataResolution, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->Width, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->Height, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->OffsetX, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->ReverseX, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->ReverseY, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->FWPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->NDFPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->ExternalLensSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->ExternalLensName, 64); numBytes += 64;
+   memcpy(&buffer[numBytes], &hdr->ManualFilterSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->ManualFilterName, 64); numBytes += 64;
+   memcpy(&buffer[numBytes], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], &hdr->FluxRatio01, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->FluxRatio12, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 248); numBytes += 248; // FREE space
+   memcpy(&buffer[numBytes], &hdr->CollectionFileDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
+   memcpy(&buffer[numBytes], &hdr->NumberOfBlocks, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CollectionFileDataCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    hdr->CollectionFileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
-   memcpy(&buffer[510], &hdr->CollectionFileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->CollectionFileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
 }

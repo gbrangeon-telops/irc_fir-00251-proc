@@ -6,7 +6,7 @@
  *
  * Auto-generated calibration collection file library.
  * Generated from the calibration collection file structure definition XLS file version 1.1.0
- * using generateIRCamCalibrationFileCLib.m Matlab script.
+ * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
  * $Author$

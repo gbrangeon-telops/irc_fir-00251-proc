@@ -19,8 +19,6 @@
 #include "IRC_Status.h"
 #include "GenICam.h"
 #include "GC_Manager.h"
-#include "ReleaseInfo.h"
-#include "FlashSettings.h"
 #include "utils.h"
 #include <stdint.h>
 

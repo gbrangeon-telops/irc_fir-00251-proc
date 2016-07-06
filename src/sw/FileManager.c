@@ -656,6 +656,28 @@ int FM_OpenFile(const char *filename, int oflag)
    return uffs_open(filelongname, oflag);
 }
 
+
+/**
+ * Read data from file specified by the file descriptor and
+ * write it in the temporary file data buffer.
+ * The buffer is protected.
+ *
+ * @param fd is the file descriptor.
+ * @param length is the number of bytes to read from the file.
+ *
+ * @return the number of bytes read from file.
+ * @return 0 if failed to read file.
+ */
+int FM_ReadFileToTmpFileDataBuffer(int fd, uint32_t length)
+{
+   if (length > FM_TEMP_FILE_DATA_BUFFER_SIZE)
+   {
+      return 0;
+   }
+
+   return uffs_read(fd, tmpFileDataBuffer, length);
+}
+
 /**
  * Read data from file stored in file system.
  *
@@ -834,6 +856,7 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
    {
       file->deviceSerialNumber = fileInfo.deviceSerialNumber;
       file->posixTime = fileInfo.posixTime;
+      file->version = fileInfo.version;
 
       switch(file->type)
       {
@@ -892,11 +915,11 @@ IRC_Status_t FM_CloseFile(fileRecord_t *file, fmDBPhase_t phase)
          case FT_TSFS:
             if (phase == FMP_INIT)
             {
-               status = FlashSettings_Load(file->name, FSLI_LOAD_IMMEDIATELY);
+               status = FlashSettings_Load(file, FSLI_LOAD_IMMEDIATELY);
             }
             else
             {
-               status = FlashSettings_Load(file->name, FSLI_DEFERRED_LOADING);
+               status = FlashSettings_Load(file, FSLI_DEFERRED_LOADING);
             }
 
             if (status != IRC_SUCCESS)

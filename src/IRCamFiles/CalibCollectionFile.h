@@ -16,7 +16,7 @@
 #ifndef CALIBCOLLECTIONFILE_H
 #define CALIBCOLLECTIONFILE_H
 
-#include "CalibFiles.h"
+#include "IRCamFiles.h"
 #include "CalibCollectionFile_v1.h"
 #include "CalibCollectionFile_v2.h"
 #include "FileInfo.h"
@@ -24,17 +24,20 @@
 #include <stdint.h>
 
 // Calibration collection macros versioning
-#define CALIBCOLLECTION_FILEMAJORVERSION     VER_MACRO(CALIBBLOCK_FILEMAJORVERSION, CALIBFILES_VERSION)
-#define CALIBCOLLECTION_FILEMINORVERSION     VER_MACRO(CALIBBLOCK_FILEMINORVERSION, CALIBFILES_VERSION)
-#define CALIBCOLLECTION_FILESUBMINORVERSION  VER_MACRO(CALIBBLOCK_FILESUBMINORVERSION, CALIBFILES_VERSION)
+#define CALIBCOLLECTION_FILEMAJORVERSION     VER_MACRO(CALIBBLOCK_FILEMAJORVERSION, TSCOFILES_VERSION)
+#define CALIBCOLLECTION_FILEMINORVERSION     VER_MACRO(CALIBBLOCK_FILEMINORVERSION, TSCOFILES_VERSION)
+#define CALIBCOLLECTION_FILESUBMINORVERSION  VER_MACRO(CALIBBLOCK_FILESUBMINORVERSION, TSCOFILES_VERSION)
 
-#define CALIBCOLLECTION_CALIBCOLLECTIONFILEHEADER_SIZE   VER_MACRO(CALIBCOLLECTION_CALIBCOLLECTIONFILEHEADER_SIZE, CALIBFILES_VERSION)
+#define CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE   VER_MACRO(CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE, TSCOFILES_VERSION)
 
 // Calibration collection types versioning
-#define CalibCollection_CollectionFileHeader_t  VER_TYPE(CalibCollection_CollectionFileHeader, CALIBFILES_VERSION)
+#define CalibCollection_CollectionFileHeader_t  VER_TYPE(CalibCollection_CollectionFileHeader, TSCOFILES_VERSION)
+
+// Calibration collection default value versionning
+#define CalibCollection_CollectionFileHeader_default  VER_DEFAULT(CalibCollection_CollectionFileHeader, TSCOFILES_VERSION)
 
 // Calibration collection function versioning
-#define CalibCollection_WriteCollectionFileHeader  VER_FUN(CalibCollection_WriteCollectionFileHeader, CALIBFILES_VERSION)
+#define CalibCollection_WriteCollectionFileHeader  VER_FUN(CalibCollection_WriteCollectionFileHeader, TSCOFILES_VERSION)
 
 #define CALIB_MAX_NUM_OF_BLOCKS              8
 

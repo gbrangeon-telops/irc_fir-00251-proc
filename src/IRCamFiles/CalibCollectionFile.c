@@ -17,8 +17,6 @@
 #include "CalibBlockFile.h"
 #include "FileManager.h"
 #include "FlashSettings.h"
-#include "uffs\uffs.h"
-#include "uffs\uffs_fd.h"
 #include <string.h>
 
 /**
@@ -33,50 +31,19 @@
  */
 uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_CollectionFileHeader_t *hdr, fileInfo_t *fileInfo)
 {
+   extern CalibCollection_CollectionFileHeader_t CalibCollection_CollectionFileHeader_default;
+
    fileInfo_t fi;
    CalibCollection_CollectionFileHeader_v1_t hdr_v1;
    uint32_t headerSize;
-   uint32_t byteCount;
+   uint32_t minorVersion;
 
    if ((fd == -1) || (hdr == NULL))
    {
       return 0;
    }
 
-   if (FI_ParseFileInfo(fd, &fi) != IRC_SUCCESS)
-   {
-      return 0;
-   }
-
-   if (fi.type != FT_TSCO)
-   {
-      return 0;
-   }
-
-   if (uffs_seek(fd, 0, USEEK_SET) == -1)
-   {
-      return 0;
-   }
-
-   if (fi.version.major == 1) headerSize = CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V1;
-   else if (fi.version.major == 2) headerSize = CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V2;
-
-   byteCount = uffs_read(fd, tmpFileDataBuffer, headerSize);
-   if (byteCount != headerSize)
-   {
-      return 0;
-   }
-
-   if (fi.version.major == 1)
-   {
-      byteCount = CalibCollection_ParseCollectionFileHeader_v1(tmpFileDataBuffer, byteCount, &hdr_v1);
-   }
-   else if (fi.version.major == 2)
-   {
-      byteCount = CalibCollection_ParseCollectionFileHeader_v2(tmpFileDataBuffer, byteCount, hdr);
-   }
-
-   if (byteCount == 0)
+   if ((FI_ParseFileInfo(fd, &fi) != IRC_SUCCESS) || (fi.type != FT_TSCO))
    {
       return 0;
    }
@@ -84,31 +51,66 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
    switch (fi.version.major)
    {
       case 1:
+         headerSize = CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V1;
+         if (FM_ReadFileToTmpFileDataBuffer(fd, headerSize) == headerSize)
+         {
+            if (CalibCollection_ParseCollectionFileHeader_v1(tmpFileDataBuffer, headerSize, &hdr_v1) == headerSize)
+            {
+               break;
+            }
+         }
+         return 0;
+
+      case 2:
+         headerSize = CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V2;
+         if (FM_ReadFileToTmpFileDataBuffer(fd, headerSize) == headerSize)
+         {
+            if (CalibCollection_ParseCollectionFileHeader_v2(tmpFileDataBuffer, headerSize, hdr) == headerSize)
+            {
+               break;
+            }
+         }
+         return 0;
+
+      default:
+         return 0;
+   }
+
+   minorVersion = fi.version.minor;
+   switch (fi.version.major)
+   {
+      case 1:
          // 1.x.x
-         switch (fi.version.minor)
+         switch (minorVersion)
          {
             case 0:
                // 1.0.x -> 1.1.x
                hdr_v1.CollectionType = DefaultCollectionType(hdr_v1.CalibrationType);
                hdr_v1.CollectionFileDataLength = hdr_v1.NumberOfBlocks * sizeof(uint32_t);
-               hdr_v1.SensorID = 0;
+               hdr_v1.SensorID = CalibCollection_CollectionFileHeader_default.SensorID;
                hdr_v1.NDFPosition = (flashSettings.NDFPresent == 1) ? NDFP_NDFilterInTransition : NDFP_NDFilterNotImplemented;
                hdr_v1.FileStructureMinorVersion = 1;
 
             case 1:
                // 1.1.x -> 2.0.x
                memcpy(hdr, &hdr_v1, sizeof(*hdr));
+
                hdr->FileStructureMajorVersion = 2;
                hdr->FileStructureMinorVersion = 0;
+               hdr->FileHeaderLength = CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE;
+               hdr->FileHeaderCRC16 = 0;
+
+               minorVersion = 0;
          }
 
       case 2:
          // 2.x.x
-         switch (fi.version.minor)
+         switch (minorVersion)
          {
             case 0:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBCOLLECTION_FILESUBMINORVERSION;
+               break;
          }
    }
 
@@ -117,5 +119,5 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
       *fileInfo = fi;
    }
 
-   return byteCount;
+   return headerSize;
 }

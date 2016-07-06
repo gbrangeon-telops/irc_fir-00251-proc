@@ -124,7 +124,7 @@ static void FW_initPositionLUT()
       FW_positionsLUT[i] = i * fraction;
    }
 
-   if (flashSettings.isValid)
+   if (FS_FLASHSETTINGS_IS_VALID)
    {
       FW_numberOfFilters = MIN(8, flashSettings.FWNumberOfFilters);
 

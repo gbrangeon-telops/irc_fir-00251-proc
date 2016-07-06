@@ -272,7 +272,7 @@ IRC_Status_t startActualization( bool internalTrig )
       return IRC_FAILURE;
    }
 
-   if (!flashSettings.ActualizationEnabled || !flashSettings.isValid)
+   if (!flashSettings.ImageCorrectionEnabled || !FS_FLASHSETTINGS_IS_VALID)
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
       ACT_ERR("Actualization is not enabled on this camera.");
@@ -767,9 +767,9 @@ IRC_Status_t Actualization_SM()
          if ( TDCStatusTst(AcquisitionStartedMask) )
          {
             // Perform an AEC
-            GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], flashSettings.ActualizationAECTargetWellFilling);
-            GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], flashSettings.ActualizationAECResponseTime);
-            GC_RegisterWriteFloat(&gcRegsDef[AECImageFractionIdx], flashSettings.ActualizationAECImageFraction);
+            GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], flashSettings.ImageCorrectionAECTargetWellFilling);
+            GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], flashSettings.ImageCorrectionAECResponseTime);
+            GC_RegisterWriteFloat(&gcRegsDef[AECImageFractionIdx], flashSettings.ImageCorrectionAECImageFraction);
             GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Continuous);
 
             prevExpTime = gcRegsData.ExposureTime;
@@ -2582,7 +2582,7 @@ bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint
    bool retval = false;
    deltabeta_t* data = NULL;
 
-   if (!flashSettings.ActualizationEnabled)
+   if (!flashSettings.ImageCorrectionEnabled)
       return false;
 
    data = findSuitableDeltaBetaForBlock(calibInfo, blockIdx, true);
@@ -3275,18 +3275,18 @@ LUTRQInfo_t* selectLUT(calibBlockInfo_t* blockInfo, uint8_t type)
   */
 void configureIcuParams(ICUParams_t* p)
 {
-   if (flashSettings.ActualizationTemperatureSelector == 0)
+   if (flashSettings.ImageCorrectionTemperatureSelector == 0)
       p->TemperatureSelector = DTS_InternalCalibrationUnit;
    else
       p->TemperatureSelector = DTS_InternalLens;
-   p->WaitTime1 = flashSettings.ActualizationWaitTime1; // [ms]
-   p->StabilizationTime1 = flashSettings.ActualizationStabilizationTime1; // [ms]
-   p->Timeout1 = flashSettings.ActualizationTimeout1; // [ms]
-   p->TemperatureTolerance1 = CC_TO_C(flashSettings.ActualizationTemperatureTolerance1); // [°C]
-   p->WaitTime2 = flashSettings.ActualizationWaitTime2; // [ms]
-   p->StabilizationTime2 = flashSettings.ActualizationStabilizationTime2; // [ms]
-   p->Timeout2 = flashSettings.ActualizationTimeout2; // [ms]
-   p->TemperatureTolerance2 = CC_TO_C(flashSettings.ActualizationTemperatureTolerance2); // [°C]
+   p->WaitTime1 = flashSettings.ImageCorrectionWaitTime1; // [ms]
+   p->StabilizationTime1 = flashSettings.ImageCorrectionStabilizationTime1; // [ms]
+   p->Timeout1 = flashSettings.ImageCorrectionTimeout1; // [ms]
+   p->TemperatureTolerance1 = CC_TO_C(flashSettings.ImageCorrectionTemperatureTolerance1); // [°C]
+   p->WaitTime2 = flashSettings.ImageCorrectionWaitTime2; // [ms]
+   p->StabilizationTime2 = flashSettings.ImageCorrectionStabilizationTime2; // [ms]
+   p->Timeout2 = flashSettings.ImageCorrectionTimeout2; // [ms]
+   p->TemperatureTolerance2 = CC_TO_C(flashSettings.ImageCorrectionTemperatureTolerance2); // [°C]
 }
 
 void ACT_resetDebugOptions()
@@ -3372,7 +3372,7 @@ void ACT_parseDebugMode()
 void ACT_resetParams(actParams_t* p)
 {
    p->badPixelsDetection = flashSettings.BPDetectionEnabled;
-   p->deltaBetaNCoadd = MIN(flashSettings.ActualizationNumberOfImagesCoadd, ACT_MAX_N_COADD);
+   p->deltaBetaNCoadd = MIN(flashSettings.ImageCorrectionNumberOfImagesCoadd, ACT_MAX_N_COADD);
    p->flickerThreshold = flashSettings.BPFlickerThreshold; // normalized threshold for a P_fa of 0.1%
    p->noiseThreshold = flashSettings.BPNoiseThreshold; // normalized threshold for a P_fa of 0.1%
    p->duration = flashSettings.BPDuration;
@@ -3385,7 +3385,7 @@ void ACT_resetParams(actParams_t* p)
 
    p->numFrames = flashSettings.BPNumSamples;
 
-   p->deltaBetaDiscardOffset = flashSettings.ActualizationDiscardOffset;
+   p->deltaBetaDiscardOffset = flashSettings.ImageCorrectionDiscardOffset;
 }
 
 /*static void ACT_clearDeltaBeta()

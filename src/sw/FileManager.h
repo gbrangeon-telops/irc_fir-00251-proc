@@ -25,7 +25,6 @@
 #include "Protocol_F1F2.h"
 #include "IRC_Status.h"
 #include "xparameters.h"
-#include "FlashSettings.h"
 #include "verbose.h"
 #include <stdint.h>
 
@@ -88,6 +87,7 @@ struct fileRecordStruct {
    uint32_t deviceSerialNumber;        /**< File device serial number */
    uint32_t posixTime;                 /**< File POSIX time */
    fileType_t type;                    /**< File type */
+   fileVersion_t version;              /**< File version */
    char name[F1F2_FILE_NAME_SIZE + 1]; /**< File name (F1F2_FILE_NAME_SIZE + NULL char) */
    uint8_t isClosed;                   /**< Indicates whether the file is closed */
    union {
@@ -168,6 +168,7 @@ void FM_ListFileDB();
 uint8_t FM_FileExists(const char *filename);
 uint32_t FM_GetFileSize(const char *filename);
 int FM_OpenFile(const char *filename, int oflag);
+int FM_ReadFileToTmpFileDataBuffer(int fd, uint32_t length);
 fileRecord_t *FM_CreateFile(const char *filename);
 IRC_Status_t FM_ReadDataFromFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);
 IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t offset, uint32_t length);

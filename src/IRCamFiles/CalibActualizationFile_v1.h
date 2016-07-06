@@ -1,12 +1,12 @@
 /**
  * @file CalibActualizationFile_v1.h
- * Camera calibration actualization file structure v1 declaration.
+ * Camera actualization calibration file structure v1 declaration.
  *
- * This file declares the camera calibration actualization file structure v1.
+ * This file declares the camera actualization calibration file structure v1.
  *
- * Auto-generated calibration actualization file library.
- * Generated from the calibration actualization file structure definition XLS file version 1.1.0
- * using generateIRCamCalibrationFileCLib.m Matlab script.
+ * Auto-generated actualization calibration file library.
+ * Generated from the actualization calibration file structure definition XLS file version 1.1.0
+ * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
  * $Author$
@@ -27,6 +27,7 @@
 #define CALIBACTUALIZATION_FILESUBMINORVERSION_V1   0
 
 #define CALIBACTUALIZATION_ACTUALIZATIONFILEHEADER_SIZE_V1   512
+
 #define CALIBACTUALIZATION_ACTUALIZATIONDATAHEADER_SIZE_V1   256
 #define CALIBACTUALIZATION_ACTUALIZATIONDATA_SIZE_V1   2
 #define CALIBACTUALIZATION_ACTUALIZATIONDATA_DELTABETA_MASK_V1    (uint16_t)(0x07FF)
