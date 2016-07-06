@@ -5,7 +5,7 @@
  * This file declares the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.0.0
+ * Generated from the calibration block file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBBLOCK_FILEMAJORVERSION_V2      2
-#define CALIBBLOCK_FILEMINORVERSION_V2      0
+#define CALIBBLOCK_FILEMINORVERSION_V2      1
 #define CALIBBLOCK_FILESUBMINORVERSION_V2   0
 
 #define CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2   512
@@ -115,6 +115,11 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint16_t LensID;   /**< Lens identification number. */
    float LowCut;   /**< Low wavelength at mid-height of the IBR integration start. */
    float HighCut;   /**< High wavelength at mid-height of the IBR integration start. */
+   float LowReferenceTemperature;   /**< Lowest blackbody reference temperature used in calibration. */
+   float HighReferenceTemperature;   /**< Highest blackbody reference temperature used in calibration. */
+   float LowExtrapolationTemperature;   /**< Lowest calculated valid LUT temperature based on extrapolation. */
+   float HighExtrapolationTemperature;   /**< Highest calculated valid LUT temperature based on extrapolation. */
+   float FluxOffset;   /**< Calculated flux at 0K. */
    uint8_t PixelDataPresence;   /**< Indicates the presence of pixel data in calibration block */
    uint8_t MaxTKDataPresence;   /**< Indicates the presence of MaxTK data in calibration block */
    uint8_t LUTNLDataPresence;   /**< Indicates the presence of LUTNL data in calibration block */

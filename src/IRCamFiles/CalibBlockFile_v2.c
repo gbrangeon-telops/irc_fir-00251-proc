@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.0.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -75,6 +75,11 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* LensID = */ 0,
    /* LowCut = */ 0.000000F,
    /* HighCut = */ 0.000000F,
+   /* LowReferenceTemperature = */ -273.15F,
+   /* HighReferenceTemperature = */ -273.15F,
+   /* LowExtrapolationTemperature = */ -273.15F,
+   /* HighExtrapolationTemperature = */ -273.15F,
+   /* FluxOffset = */ 0.000000F,
    /* PixelDataPresence = */ 0,
    /* MaxTKDataPresence = */ 0,
    /* LUTNLDataPresence = */ 0,
@@ -278,7 +283,12 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->LensID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&hdr->LowCut, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->HighCut, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 194; // Skip FREE space
+   memcpy(&hdr->LowReferenceTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->HighReferenceTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LowExtrapolationTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->HighExtrapolationTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->FluxOffset, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   numBytes += 174; // Skip FREE space
    memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -388,7 +398,12 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->LensID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&buffer[numBytes], &hdr->LowCut, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->HighCut, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 194); numBytes += 194; // FREE space
+   memcpy(&buffer[numBytes], &hdr->LowReferenceTemperature, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->HighReferenceTemperature, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LowExtrapolationTemperature, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->HighExtrapolationTemperature, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->FluxOffset, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 174); numBytes += 174; // FREE space
    memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);

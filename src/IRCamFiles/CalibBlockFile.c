@@ -152,6 +152,14 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               hdr->LowReferenceTemperature = CalibBlock_BlockFileHeader_default.LowReferenceTemperature;
+               hdr->HighReferenceTemperature = CalibBlock_BlockFileHeader_default.HighReferenceTemperature;
+               hdr->LowExtrapolationTemperature = CalibBlock_BlockFileHeader_default.LowExtrapolationTemperature;
+               hdr->HighExtrapolationTemperature = CalibBlock_BlockFileHeader_default.HighExtrapolationTemperature;
+               hdr->FluxOffset = CalibBlock_BlockFileHeader_default.FluxOffset;
+
+            case 1:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBBLOCK_FILESUBMINORVERSION;
                break;
@@ -237,6 +245,10 @@ uint32_t CalibBlock_ParsePixelDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               // Nothing to do
+
+            case 1:
                // Up to date, nothing to do
                break;
          }
@@ -316,6 +328,10 @@ uint32_t CalibBlock_ParseMaxTKDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               // Nothing to do
+
+            case 1:
                // Up to date, nothing to do
                break;
          }
@@ -395,6 +411,10 @@ uint32_t CalibBlock_ParseLUTNLDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               // Nothing to do
+
+            case 1:
                // Up to date, nothing to do
                break;
          }
@@ -474,6 +494,10 @@ uint32_t CalibBlock_ParseLUTRQDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               // Nothing to do
+
+            case 1:
                // Up to date, nothing to do
                break;
          }

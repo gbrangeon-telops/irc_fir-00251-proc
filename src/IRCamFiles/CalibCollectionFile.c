@@ -108,6 +108,10 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               // Nothing to do
+
+            case 1:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBCOLLECTION_FILESUBMINORVERSION;
                break;
