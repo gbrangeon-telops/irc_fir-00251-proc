@@ -10,15 +10,17 @@ create_clock -period 8.000 -name video_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/VID
 create_clock -period 8.000 -name exp_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/EXP/tx_out_clk]
 create_clock -period 8.000 -name data_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/DATA/user_clk]
 create_clock -period 8.000 -name exp_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/EXP/user_clk]
-create_clock -period 60.000 -name usart_clk -waveform {0.000 30.000} [get_ports R_GIGE_BULK_CLK0]
+create_clock -period 60.000 -name usart_clk -waveform {0.000 30.000} [get_pins ACQ/BULK_USART/U11/CLK]
 
 # Virtual clocks
 
 # Generated clocks
 
 # Clock Groups
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {SYS_CLK_0 SYS_CLK_1}]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {MGT_CLK_0 MGT_CLK_1}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks SYS_CLK_0]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks SYS_CLK_1]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MGT_CLK_0]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MGT_CLK_1]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks data_mgt_tx_out_clk]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks video_mgt_tx_out_clk]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks exp_mgt_tx_out_clk]
@@ -70,9 +72,6 @@ set_false_path -from [get_clocks clk_out2_core_clk_wiz_1*] -to [get_clocks clk_o
 set_false_path -from [get_clocks clk_out6_core_clk_wiz_1*] -to [get_clocks clk_out2_core_clk_wiz_1*]
 set_false_path -from [get_clocks clk_out2_core_clk_wiz_1*] -to [get_clocks clk_out6_core_clk_wiz_1*]
 
-set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_pll_i_4]
-set_false_path -from [get_clocks clk_out4_core_clk_wiz_1*] -to [get_clocks clk_pll_i_4]
-
 set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_20M_mmcm*]
 set_false_path -from [get_clocks clk_20M_mmcm*] -to [get_clocks clk_out1_core_clk_wiz_1*] 
 
@@ -81,7 +80,7 @@ set_false_path -from [get_cells {ACQ/BD/core_wrapper_i/core_i/proc_sys_reset_1/U
 
 ### Header False Path
 set_false_path -from [get_pins {ACQ/HEADER/U4/SEQ_STATUS_reg[*]/C}] -to [get_clocks clk_out1_core_clk_wiz_1*]
-set_false_path -from [get_pins {ACQ/HEADER/U1/CONFIG_reg[*][*]/C}] -to [get_clocks clk_out2_core_clk_wiz_1*]
+set_false_path -from [get_pins {ACQ/HEADER/U1/CONFIG_reg[*][*]/C}] -to [get_clocks clk_out6_core_clk_wiz_1*]
 
 set_false_path -through [get_nets IMAGE_INFO*]
 
