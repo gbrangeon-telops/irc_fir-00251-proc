@@ -1326,8 +1326,8 @@ void Calibration_SM()
             }
 
             // Update registers related to calibration control
-            GC_UpdateParameterLimits();
             GC_CalibrationUpdateRegisters();
+            GC_UpdateParameterLimits();
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
             GC_UpdateAECPlusIsAvailable();
 

@@ -348,23 +348,23 @@ void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs)
             pA->calib_block_sel_mode = CBSM_FW_POSITION;
          }
          else if (blockLoadCmdFlag)
-            {
-               // Take block selector as selected mode
+         {
+            // Take block selector as selected mode
             pA->calib_block_sel_mode = pGCRegs->CalibrationCollectionBlockSelector + CBSM_USER_SEL_0;
-            }
-            else
-            {
+         }
+         else
+         {
             pA->calib_block_sel_mode = CBSM_USER_SEL_0;
-               // Find block corresponding to FW Position Setpoint
+            // Find block corresponding to FW Position Setpoint
             for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
+            {
+               if (pGCRegs->FWPositionSetpoint == calibrationInfo.blocks[blockIndex].FWPosition)
                {
-                  if (pGCRegs->FWPositionSetpoint == calibrationInfo.blocks[blockIndex].FWPosition)
-                  {
                   pA->calib_block_sel_mode = blockIndex + CBSM_USER_SEL_0;
-                     break;
-                  }
+                  break;
                }
             }
+         }
          break;
 
       case CCT_MultipointNDF:

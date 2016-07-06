@@ -913,8 +913,8 @@ void GC_CalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
          else
          {
             // Update registers related to calibration control
-            GC_UpdateParameterLimits();
             GC_CalibrationUpdateRegisters();
+            GC_UpdateParameterLimits();
             CAL_ApplyCalibBlockSelMode(&gCal, &gcRegsData);
             CAL_WriteBlockParam(&gCal, &gcRegsData);
             Calibration_LoadLUTRQ(0);
@@ -1735,7 +1735,7 @@ void GC_EHDRINumberOfExposuresCallback(gcCallbackPhase_t phase, gcCallbackAccess
          gcRegsData.ExposureTime2 = EHDRIExposureTime[1];
          gcRegsData.ExposureTime3 = EHDRIExposureTime[2];
          gcRegsData.ExposureTime4 = EHDRIExposureTime[3];
-         GC_UpdateParameterLimits();
+         //GC_UpdateParameterLimits(); //Redundant
       }
       CAL_UpdateVideo(&gCal, &gcRegsData);
       GC_UpdateAECPlusIsAvailable();
