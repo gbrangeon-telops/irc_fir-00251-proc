@@ -143,6 +143,8 @@ struct calibBlockInfoStruct {
    int32_t T0;                      /**< Internal lens temperature during calibration */
    float Nu;                        /**< Thermal compensation exponent */
    int32_t DeviceTemperatureSensor; /**< Device Sensor Temperature during calibration */
+   float LowCut;                    /**< Low wavelength at mid-height of the IBR integration start. */
+   float HighCut;                   /**< High wavelength at mid-height of the IBR integration start. */
    uint8_t PixelDataPresence;       /**< Indicates the presence of pixel data in calibration block */
    struct {
       float Offset_Off;             /**< Offset offset */

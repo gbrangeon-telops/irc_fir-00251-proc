@@ -723,6 +723,8 @@ void Calibration_SM()
                calibrationInfo.blocks[blockIndex].LUTRQDataPresence = headerData.blockFile.LUTRQDataPresence;
                calibrationInfo.blocks[blockIndex].NumberOfLUTRQ = headerData.blockFile.NumberOfLUTRQ;
                calibrationInfo.blocks[blockIndex].CalibrationSource = headerData.blockFile.CalibrationSource;
+               calibrationInfo.blocks[blockIndex].LowCut = (float)(blockIndex+1);//headerData.blockFile.LowCut;
+               calibrationInfo.blocks[blockIndex].HighCut = (float)(blockIndex+2);//headerData.blockFile.HighCut;
 
                CM_INF("Calibration block file header loaded.");
             }

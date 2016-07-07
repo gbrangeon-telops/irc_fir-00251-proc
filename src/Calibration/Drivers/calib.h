@@ -114,6 +114,8 @@ struct calibBlockHdrInfoStruct
    float    offset_fp32;
    int32_t  data_exponent;
    uint32_t actualizationPOSIXTime;
+   float    low_cut;
+   float    high_cut;
 };
 typedef struct calibBlockHdrInfoStruct calibBlockHdrInfo_t;
 

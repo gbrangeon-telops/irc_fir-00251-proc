@@ -122,6 +122,8 @@ void CAL_initCalBlockInfo(calibBlockHdrInfo_t* b, uint32_t n)
       b->offset_fp32 = 0;
       b->data_exponent = 0;
       b->actualizationPOSIXTime = 0;
+      b->low_cut = 0;
+      b->high_cut = 0;
       b++;
    }
 }
@@ -293,6 +295,9 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
             pA->calib_block[blockIndex].actualizationPOSIXTime = data->info.POSIXTime;
          else
             pA->calib_block[blockIndex].actualizationPOSIXTime = 0;
+
+         pA->calib_block[blockIndex].low_cut = calibrationInfo.blocks[blockIndex].LowCut;
+         pA->calib_block[blockIndex].high_cut = calibrationInfo.blocks[blockIndex].HighCut;
       }
    }
 

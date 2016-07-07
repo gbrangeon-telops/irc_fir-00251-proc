@@ -120,14 +120,28 @@ begin
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= CalibrationBlockIndexBWE;
                         
-                     elsif hcnt = 4 then -- cal_block_posix
+                     elsif hcnt = 4 then -- low_cut
+                        hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(LowCutAdd32, 8));
+                        hder_mosi_i.awvalid <= '1';
+                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.low_cut), 32), LowCutShift));
+                        hder_mosi_i.wvalid <= '1';
+                        hder_mosi_i.wstrb <= LowCutBWE;
+                        
+                     elsif hcnt = 5 then -- high_cut
+                        hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(HighCutAdd32, 8));
+                        hder_mosi_i.awvalid <= '1';
+                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.high_cut), 32), HighCutShift));
+                        hder_mosi_i.wvalid <= '1';
+                        hder_mosi_i.wstrb <= HighCutBWE;
+                        
+                     elsif hcnt = 6 then -- cal_block_posix
                         hder_mosi_i.awaddr <= x"0000" & frame_id_i & std_logic_vector(resize(CalibrationBlockPOSIXTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.cal_block_posix), 32), CalibrationBlockPOSIXTimeShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= CalibrationBlockPOSIXTimeBWE;
                      
-                     elsif hcnt = 5 then -- block_act_posix
+                     elsif hcnt = 7 then -- block_act_posix
                         hder_mosi_i.awaddr <= x"FFFF" & frame_id_i & std_logic_vector(resize(ImageCorrectionPOSIXTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.block_act_posix), 32), ImageCorrectionPOSIXTimeShift));
