@@ -101,6 +101,9 @@ set filelist  [concat $filelist [glob -nocomplain $src_dir/irig/HDL/*.vhd]]
 # TRIG
 set filelist  [concat $filelist [glob -nocomplain $src_dir/Trig/HDL/*.vhd]]
 
+# ADC Readout
+set filelist  [concat $filelist [glob -nocomplain $src_dir/ADCReadout/HDL/*.vhd]]
+
 #USB
 set filelist  [concat $filelist [glob -nocomplain $src_dir/USB/HDL/*.vhd]]
 
@@ -136,6 +139,7 @@ add_files $common_hdl_dir/Utilities/double_sync.vhd
 add_files $common_hdl_dir/Utilities/sync_reset.vhd
 add_files $common_hdl_dir/Utilities/sync_resetn.vhd
 add_files $common_hdl_dir/Utilities/reset_extension.vhd
+add_files $common_hdl_dir/Utilities/data_cdc_sync.vhd
 add_files $common_hdl_dir/SPI/ads1118_driver.vhd
 add_files $common_hdl_dir/SPI/spi_tx.vhd
 add_files $common_hdl_dir/SPI/spi_rx.vhd
@@ -143,6 +147,7 @@ add_files $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_PWM.vhd
 add_files $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_stretch.vhd
 add_files $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_edge_det.vhd
 add_files $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_edge_det_xcd.vhd
+add_files $common_hdl_dir/gh_vhdl_lib/memory/gh_fifo_async_sr.vhd
 add_files $common_hdl_dir/Utilities/err_sync.vhd
 add_files $common_hdl_dir/Utilities/Clk_Divider.vhd
 add_files $common_hdl_dir/Utilities/Clk_Divider_Pulse.vhd

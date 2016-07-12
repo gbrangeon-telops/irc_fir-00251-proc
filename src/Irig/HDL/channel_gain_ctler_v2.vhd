@@ -69,12 +69,7 @@ begin
    --------------------------------------------------
    -- interfaçage 
    -------------------------------------------------- 
-   -- le design sur EFA-00229-00X donne 3.3V lorsque la sortie 
-   -- du FPGA est à l'etat '1'.cela est insuffisant pour l'opamp. Ainsi, on s'aide avec les pull-ups de 5V.
-   -- 
-   gen : for j in OPAMP_GAIN'LENGTH-1 downto 0 generate      
-      OPAMP_GAIN(j) <= '0' when opamp_gain_iob(j) = '0' else 'Z';
-   end generate;     
+   OPAMP_GAIN <= opamp_gain_iob;
    
    --------------------------------------------------
    -- synchro reset 

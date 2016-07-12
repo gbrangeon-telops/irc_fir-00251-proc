@@ -38,7 +38,7 @@ entity hder_insert_mb_intf is
       RAM_WR_DATA   : out std_logic_vector(31 downto 0); -- sortie vers le port B de la block ram
       RAM_BWE       : out std_logic_vector(3 downto 0);  -- sortie vers le port B de la block ram
       
-      STATUS        : in std_logic_vector(11 downto 0);
+      STATUS        : in std_logic_vector(12 downto 0);
       ERR           : out std_logic
       );
 end hder_insert_mb_intf;

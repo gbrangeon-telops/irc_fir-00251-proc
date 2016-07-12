@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri May 06 04:40:49 2016" VIVADOVERSION="2013.4">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Tue Jul 12 15:17:56 2016" VIVADOVERSION="2013.4">
 
   <SYSTEMINFO ARCH="kintex7" DEVICE="7k160t" NAME="core_imp" PACKAGE="fbg676" SPEEDGRADE="-1"/>
 
@@ -157,13 +157,7 @@
       <CONNECTIONS>
         <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axi_mm2s_aclk"/>
         <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axis_mm2s_cmdsts_aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_aclk"/>
-        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_aclk"/>
+        <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_aclk"/>
       </CONNECTIONS>
     </PORT>
     <PORT DIR="O" NAME="PLEORA_UART_SOUT" SIGIS="undef" SIGNAME="pleora_uart_sout">
@@ -196,6 +190,25 @@
         <CONNECTION INSTANCE="xadc_wiz_1" PORT="vp_in"/>
       </CONNECTIONS>
     </PORT>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_awaddr" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_awprot" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_awvalid" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_awready" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_wdata" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_wstrb" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_wvalid" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_wready" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_bresp" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_bvalid" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_bready" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_araddr" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_arprot" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_arvalid" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_arready" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_rdata" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_rresp" SIGIS="undef"/>
+    <PORT DIR="I" NAME="ADC_READOUT_CTRL_rvalid" SIGIS="undef"/>
+    <PORT DIR="O" NAME="ADC_READOUT_CTRL_rready" SIGIS="undef"/>
     <PORT DIR="O" NAME="M_EHDRI_CTRL_awaddr" SIGIS="undef"/>
     <PORT DIR="O" NAME="M_EHDRI_CTRL_awlen" SIGIS="undef"/>
     <PORT DIR="O" NAME="M_EHDRI_CTRL_awsize" SIGIS="undef"/>
@@ -1807,6 +1820,7 @@
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44B30000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44B3FFFF" INSTANCE="M_BUF_TABLE" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44A40000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44A4FFFF" INSTANCE="M_BUFFERING_CTRL" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44A00000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44A00FFF" INSTANCE="AEC_CTRL" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
+        <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44B50000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44B50FFF" INSTANCE="ADC_READOUT_CTRL" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44B00000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44B0FFFF" INSTANCE="xadc_wiz_1" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x40010000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x4001FFFF" INSTANCE="power_management" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x4040A000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x4040BFFF" INSTANCE="pleora_uart" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
@@ -4038,203 +4052,208 @@
         <PORT DIR="O" NAME="ui_clk_sync_rst" SIGIS="rst"/>
         <PORT CLKFREQUENCY="100000000" DIR="O" NAME="ui_clk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT CLKFREQUENCY="100000000" DIR="O" NAME="ui_addn_clk_0" SIGIS="clk"/>
         <PORT CLKFREQUENCY="200000000" DIR="O" NAME="ui_addn_clk_1" SIGIS="clk"/>
         <PORT DIR="I" NAME="s_axi_awid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awaddr">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awaddr"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awaddr"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awlen" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awlen">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awlen"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awlen"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awsize" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awsize">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awsize"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awsize"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awburst" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awburst">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awburst"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awburst"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awlock" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awlock">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awlock"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awlock"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awcache" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awcache">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awcache"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awcache"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awprot" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awprot">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awprot"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awprot"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awqos" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awqos">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awqos"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awqos"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_awready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_awready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_wdata" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_wdata"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wdata"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_wstrb" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wstrb">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_wstrb"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wstrb"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_wlast" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_wlast"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wlast"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_wvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_wvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_wready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_wready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_bready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_bready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_bid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_bid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_bresp" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bresp">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_bresp"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bresp"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_bvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_bvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_araddr">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_araddr"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_araddr"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arlen">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arlen"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arlen"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arsize">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arsize"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arsize"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arburst">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arburst"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arburst"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arlock">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arlock"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arlock"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arcache">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arcache"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arcache"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arprot">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arprot"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arprot"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arqos">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arqos"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arqos"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_arready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_rready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_rid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_rid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_rdata"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rdata"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rresp">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_rresp"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rresp"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_rlast"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rlast"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_rvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mmcm_locked" SIGIS="undef"/>
         <PORT DIR="I" NAME="sys_clk_p" SIGIS="undef"/>
         <PORT DIR="I" NAME="sys_clk_n" SIGIS="undef"/>
         <PORT DIR="O" NAME="init_calib_complete" SIGIS="undef"/>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
       </PORTS>
@@ -4258,7 +4277,7 @@
             <PORTMAP PHYSICAL="ddr3_odt"/>
           </PORTMAPS>
         </BUSINTERFACE>
-        <BUSINTERFACE BUSNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" NAME="S_AXI" TYPE="SLAVE">
+        <BUSINTERFACE BUSNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" NAME="S_AXI" TYPE="SLAVE">
           <PORTMAPS>
             <PORTMAP PHYSICAL="s_axi_awid"/>
             <PORTMAP PHYSICAL="s_axi_awaddr"/>
@@ -4388,9 +4407,9 @@
             <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_mm2s_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="m_axi_mm2s_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mm2s_err" SIGIS="undef"/>
@@ -4399,9 +4418,9 @@
             <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axis_mm2s_cmdsts_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="m_axis_mm2s_cmdsts_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axis_mm2s_cmd_tvalid" SIGIS="undef"/>
@@ -4414,73 +4433,73 @@
         <PORT DIR="O" NAME="m_axis_mm2s_sts_tlast" SIGIS="undef"/>
         <PORT DIR="O" NAME="m_axi_mm2s_arid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_araddr">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_araddr"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_araddr"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arlen">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arlen"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arlen"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arsize">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arsize"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arsize"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arburst">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arburst"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arburst"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arprot">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arprot"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arprot"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arcache">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arcache"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arcache"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_aruser" SIGIS="undef"/>
         <PORT DIR="O" NAME="m_axi_mm2s_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_mm2s_arready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_arready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_arready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_mm2s_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_rdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_rdata"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_rdata"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_mm2s_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_rresp">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_rresp"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_rresp"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_mm2s_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_rlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_rlast"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_rlast"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_mm2s_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_rvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_rvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_rvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_mm2s_rready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_rready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_rready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_rready"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axis_mm2s_tdata" SIGIS="undef"/>
@@ -4490,7 +4509,7 @@
         <PORT DIR="I" NAME="m_axis_mm2s_tready" SIGIS="undef"/>
       </PORTS>
       <BUSINTERFACES>
-        <BUSINTERFACE BUSNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" NAME="M_AXI_MM2S" TYPE="MASTER">
+        <BUSINTERFACE BUSNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" NAME="M_AXI_MM2S" TYPE="MASTER">
           <PORTMAPS>
             <PORTMAP PHYSICAL="m_axi_mm2s_araddr"/>
             <PORTMAP PHYSICAL="m_axi_mm2s_arburst"/>
@@ -4618,25 +4637,25 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_mm2s_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_mm2s_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_mm2s_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="m_axi_mm2s_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mm2s_err" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_mm2s_cmdsts_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_mm2s_cmdsts_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axis_mm2s_cmdsts_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="m_axis_mm2s_cmdsts_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axis_mm2s_cmd_tvalid" SIGIS="undef"/>
@@ -4723,25 +4742,25 @@
         <PORT DIR="O" NAME="m_axis_mm2s_tlast" SIGIS="undef"/>
         <PORT DIR="O" NAME="m_axis_mm2s_tvalid" SIGIS="undef"/>
         <PORT DIR="I" NAME="m_axis_mm2s_tready" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_s2mm_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_s2mm_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_s2mm_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="m_axi_s2mm_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s2mm_err" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_s2mm_cmdsts_awclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_s2mm_cmdsts_awclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axis_s2mm_cmdsts_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="m_axis_s2mm_cmdsts_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axis_s2mm_cmd_tvalid" SIGIS="undef"/>
@@ -4945,446 +4964,6 @@
         <PERIPHERAL INSTANCE="MIG_Calibration_CAL_DDR_MIG"/>
       </PERIPHERALS>
     </MODULE>
-    <MODULE FULLNAME="/MIG_Calibration/axi_interconnect_ddrcal/m00_couplers/auto_cc" HWVERSION="2.1" INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" IPTYPE="BUS" MODCLASS="BUS" MODTYPE="axi_clock_converter" VLNV="xilinx.com:ip:axi_clock_converter:2.1">
-      <PARAMETERS>
-        <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
-        <PARAMETER NAME="C_AXI_ID_WIDTH" VALUE="2"/>
-        <PARAMETER NAME="C_AXI_ADDR_WIDTH" VALUE="32"/>
-        <PARAMETER NAME="C_AXI_DATA_WIDTH" VALUE="256"/>
-        <PARAMETER NAME="C_S_AXI_ACLK_RATIO" VALUE="1"/>
-        <PARAMETER NAME="C_M_AXI_ACLK_RATIO" VALUE="2"/>
-        <PARAMETER NAME="C_AXI_IS_ACLK_ASYNC" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_PROTOCOL" VALUE="0"/>
-        <PARAMETER NAME="C_AXI_SUPPORTS_USER_SIGNALS" VALUE="0"/>
-        <PARAMETER NAME="C_AXI_AWUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_ARUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_WUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_RUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_BUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_SUPPORTS_WRITE" VALUE="1"/>
-        <PARAMETER NAME="C_AXI_SUPPORTS_READ" VALUE="1"/>
-        <PARAMETER NAME="C_SYNCHRONIZER_STAGE" VALUE="3"/>
-        <PARAMETER NAME="PROTOCOL" VALUE="AXI4"/>
-        <PARAMETER NAME="READ_WRITE_MODE" VALUE="READ_WRITE"/>
-        <PARAMETER NAME="ADDR_WIDTH" VALUE="32"/>
-        <PARAMETER NAME="DATA_WIDTH" VALUE="256"/>
-        <PARAMETER NAME="ID_WIDTH" VALUE="2"/>
-        <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
-        <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
-        <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_2"/>
-        <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
-      </PARAMETERS>
-      <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="External_Ports_M_AXIS_CALDDR_MM2S_ACLK">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awaddr">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awaddr"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awlen">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awlen"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awsize">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awsize"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awburst">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awburst"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awlock" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awlock">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awlock"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awcache">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awcache"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awprot">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awprot"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awregion" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awregion">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awregion"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awqos" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awqos">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awqos"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_awvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_awready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_awready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_wdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wdata">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wdata"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_wstrb" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wstrb">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wstrb"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_wlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wlast">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wlast"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_wvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_wready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_wready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_bid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_bresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bresp">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bresp"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_bvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_bready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_bready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_araddr">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_araddr"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arlen">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arlen"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arsize">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arsize"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arburst">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arburst"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arlock">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arlock"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arcache">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arcache"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arprot">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arprot"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arregion" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arregion">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arregion"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arqos">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arqos"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_arready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_rid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rdata">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rdata"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rresp">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rresp"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rlast">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rlast"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="s_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="s_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="m_axi_rready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awaddr">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awaddr"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awlen" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awlen">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awlen"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awsize" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awsize">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awsize"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awburst" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awburst">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awburst"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awlock" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awlock">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awlock"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awcache" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awcache">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awcache"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awprot" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awprot">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awprot"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awregion" SIGIS="undef"/>
-        <PORT DIR="O" NAME="m_axi_awqos" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awqos">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awqos"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_awvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_awready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_wdata" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wdata">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wdata"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_wstrb" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wstrb">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wstrb"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_wlast" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wlast">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wlast"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_wvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_wready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_bid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_bresp" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bresp">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bresp"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_bvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_bready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_araddr">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_araddr"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arlen">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arlen"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arsize">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arsize"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arburst">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arburst"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arlock">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arlock"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arcache">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arcache"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arprot">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arprot"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arregion" SIGIS="undef"/>
-        <PORT DIR="O" NAME="m_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arqos">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arqos"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arready"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_rid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rdata">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rdata"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rresp">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rresp"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rlast">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rlast"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rready"/>
-          </CONNECTIONS>
-        </PORT>
-      </PORTS>
-    </MODULE>
     <MODULE FULLNAME="/MIG_Calibration/axi_interconnect_ddrcal/m00_couplers/m00_data_fifo" HWVERSION="2.1" INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" IPTYPE="BUS" MODCLASS="BUS" MODTYPE="axi_data_fifo" VLNV="xilinx.com:ip:axi_data_fifo:2.1">
       <PARAMETERS>
         <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
@@ -5422,9 +5001,9 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="aclk" SIGIS="clk" SIGNAME="External_Ports_M_AXIS_CALDDR_MM2S_ACLK">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
@@ -5627,199 +5206,191 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="m_axi_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awid">
+        <PORT DIR="O" NAME="m_axi_awid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awaddr">
+        <PORT DIR="O" NAME="m_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awaddr">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awaddr"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awaddr"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awlen">
+        <PORT DIR="O" NAME="m_axi_awlen" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awlen">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awlen"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awlen"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awsize">
+        <PORT DIR="O" NAME="m_axi_awsize" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awsize">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awsize"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awsize"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awburst">
+        <PORT DIR="O" NAME="m_axi_awburst" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awburst">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awburst"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awburst"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awlock" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awlock">
+        <PORT DIR="O" NAME="m_axi_awlock" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awlock">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awlock"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awlock"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awcache">
+        <PORT DIR="O" NAME="m_axi_awcache" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awcache">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awcache"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awcache"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awprot">
+        <PORT DIR="O" NAME="m_axi_awprot" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awprot">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awprot"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awprot"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awregion" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awregion">
+        <PORT DIR="O" NAME="m_axi_awregion" SIGIS="undef"/>
+        <PORT DIR="O" NAME="m_axi_awqos" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awqos">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awregion"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awqos"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awqos" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awqos">
+        <PORT DIR="O" NAME="m_axi_awvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awqos"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_awvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awvalid">
+        <PORT DIR="I" NAME="m_axi_awready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_awready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_awready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_awready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_awready">
+        <PORT DIR="O" NAME="m_axi_wdata" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_awready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wdata"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_wdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wdata">
+        <PORT DIR="O" NAME="m_axi_wstrb" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wstrb">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_wdata"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wstrb"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_wstrb" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wstrb">
+        <PORT DIR="O" NAME="m_axi_wlast" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_wstrb"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wlast"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_wlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wlast">
+        <PORT DIR="O" NAME="m_axi_wvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_wlast"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_wvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wvalid">
+        <PORT DIR="I" NAME="m_axi_wready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_wready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_wvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_wready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_wready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_wready">
+        <PORT DIR="I" NAME="m_axi_bid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_wready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_bid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bid">
+        <PORT DIR="I" NAME="m_axi_bresp" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bresp">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_bid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bresp"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_bresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bresp">
+        <PORT DIR="I" NAME="m_axi_bvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_bresp"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_bvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bvalid">
+        <PORT DIR="O" NAME="m_axi_bready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_bready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_bvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_bready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_bready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_bready">
+        <PORT DIR="O" NAME="m_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_bready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arid">
+        <PORT DIR="O" NAME="m_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_araddr">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_araddr"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_araddr">
+        <PORT DIR="O" NAME="m_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arlen">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_araddr"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arlen"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arlen">
+        <PORT DIR="O" NAME="m_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arsize">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arlen"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arsize"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arsize">
+        <PORT DIR="O" NAME="m_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arburst">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arsize"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arburst"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arburst">
+        <PORT DIR="O" NAME="m_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arlock">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arburst"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arlock"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arlock">
+        <PORT DIR="O" NAME="m_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arcache">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arlock"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arcache"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arcache">
+        <PORT DIR="O" NAME="m_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arprot">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arcache"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arprot"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arprot">
+        <PORT DIR="O" NAME="m_axi_arregion" SIGIS="undef"/>
+        <PORT DIR="O" NAME="m_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arqos">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arprot"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arqos"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arregion" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arregion">
+        <PORT DIR="O" NAME="m_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arregion"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arqos">
+        <PORT DIR="I" NAME="m_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_arready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arqos"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_arready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arvalid">
+        <PORT DIR="I" NAME="m_axi_rid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_arready">
+        <PORT DIR="I" NAME="m_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_arready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rdata"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rid">
+        <PORT DIR="I" NAME="m_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rresp">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_rid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rresp"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rdata">
+        <PORT DIR="I" NAME="m_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_rdata"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rlast"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rresp">
+        <PORT DIR="I" NAME="m_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_rresp"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rlast">
+        <PORT DIR="O" NAME="m_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_CAL_DDR_MIG_s_axi_rready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_rlast"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="I" NAME="m_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rvalid">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_rvalid"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="m_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc_s_axi_rready">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_rready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="s_axi_rready"/>
           </CONNECTIONS>
         </PORT>
       </PORTS>
@@ -5863,9 +5434,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_pc_s_axi_awaddr">
@@ -6179,9 +5750,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_pc_m_axi_awaddr">
@@ -6359,9 +5930,9 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_pc" PORT="m_axi_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="External_Ports_M_AXIS_CALDDR_MM2S_ACLK">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
@@ -6538,7 +6109,7 @@
         </PORT>
       </PORTS>
     </MODULE>
-    <MODULE FULLNAME="/MIG_Calibration/axi_interconnect_ddrcal/s01_couplers/auto_us_df" HWVERSION="2.1" INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" IPTYPE="BUS" MODCLASS="BUS" MODTYPE="axi_dwidth_converter" VLNV="xilinx.com:ip:axi_dwidth_converter:2.1">
+    <MODULE FULLNAME="/MIG_Calibration/axi_interconnect_ddrcal/s01_couplers/auto_us_cc_df" HWVERSION="2.1" INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" IPTYPE="BUS" MODCLASS="BUS" MODTYPE="axi_dwidth_converter" VLNV="xilinx.com:ip:axi_dwidth_converter:2.1">
       <PARAMETERS>
         <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
         <PARAMETER NAME="C_AXI_PROTOCOL" VALUE="0"/>
@@ -6549,10 +6120,10 @@
         <PARAMETER NAME="C_M_AXI_DATA_WIDTH" VALUE="256"/>
         <PARAMETER NAME="C_AXI_SUPPORTS_WRITE" VALUE="0"/>
         <PARAMETER NAME="C_AXI_SUPPORTS_READ" VALUE="1"/>
-        <PARAMETER NAME="C_FIFO_MODE" VALUE="1"/>
+        <PARAMETER NAME="C_FIFO_MODE" VALUE="2"/>
         <PARAMETER NAME="C_S_AXI_ACLK_RATIO" VALUE="1"/>
         <PARAMETER NAME="C_M_AXI_ACLK_RATIO" VALUE="2"/>
-        <PARAMETER NAME="C_AXI_IS_ACLK_ASYNC" VALUE="0"/>
+        <PARAMETER NAME="C_AXI_IS_ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="C_MAX_SPLIT_BEATS" VALUE="16"/>
         <PARAMETER NAME="C_PACKING_LEVEL" VALUE="1"/>
         <PARAMETER NAME="C_SYNCHRONIZER_STAGE" VALUE="3"/>
@@ -6564,11 +6135,11 @@
         <PARAMETER NAME="MI_DATA_WIDTH" VALUE="256"/>
         <PARAMETER NAME="SI_ID_WIDTH" VALUE="4"/>
         <PARAMETER NAME="MAX_SPLIT_BEATS" VALUE="256"/>
-        <PARAMETER NAME="FIFO_MODE" VALUE="1"/>
-        <PARAMETER NAME="ACLK_ASYNC" VALUE="0"/>
+        <PARAMETER NAME="FIFO_MODE" VALUE="2"/>
+        <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_df_7"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_7"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6577,9 +6148,9 @@
             <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_datamover_ddrcal_m_axi_mm2s_arid">
@@ -6656,78 +6227,88 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axi_mm2s_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_araddr">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" NAME="m_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="m_axi_araddr" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_araddr">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_araddr"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arlen">
+        <PORT DIR="O" NAME="m_axi_arlen" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arlen">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arlen"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arsize">
+        <PORT DIR="O" NAME="m_axi_arsize" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arsize">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arsize"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arburst">
+        <PORT DIR="O" NAME="m_axi_arburst" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arburst">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arburst"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arlock">
+        <PORT DIR="O" NAME="m_axi_arlock" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arlock">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arlock"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arcache">
+        <PORT DIR="O" NAME="m_axi_arcache" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arcache">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arcache"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arprot">
+        <PORT DIR="O" NAME="m_axi_arprot" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arprot">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arprot"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axi_arregion" SIGIS="undef"/>
-        <PORT DIR="O" NAME="m_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arqos">
+        <PORT DIR="O" NAME="m_axi_arqos" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arqos">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arqos"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arvalid">
+        <PORT DIR="O" NAME="m_axi_arvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arvalid">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_arready">
+        <PORT DIR="I" NAME="m_axi_arready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_arready">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_arready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_rdata">
+        <PORT DIR="I" NAME="m_axi_rdata" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_rdata">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_rdata"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_rresp">
+        <PORT DIR="I" NAME="m_axi_rresp" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_rresp">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_rresp"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_rlast">
+        <PORT DIR="I" NAME="m_axi_rlast" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_rlast">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_rlast"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="m_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_rvalid">
+        <PORT DIR="I" NAME="m_axi_rvalid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_rvalid">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_rvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="m_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df_m_axi_rready">
+        <PORT DIR="O" NAME="m_axi_rready" SIGIS="undef" SIGNAME="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df_m_axi_rready">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="s_axi_rready"/>
           </CONNECTIONS>
@@ -6768,14 +6349,14 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_dm_buffer_m_axi_s2mm_awid">
@@ -6867,9 +6448,9 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_s2mm_bready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="External_Ports_M_AXIS_CALDDR_MM2S_ACLK">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
@@ -7004,14 +6585,14 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
+            <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
+        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_arid" SIGIS="undef" SIGNAME="MIG_Calibration_axi_dm_buffer_m_axi_mm2s_arid">
@@ -7088,9 +6669,9 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_mm2s_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="External_Ports_M_AXIS_CALDDR_MM2S_ACLK">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
@@ -8410,9 +7991,9 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="aclk" SIGIS="clk" SIGNAME="External_Ports_M_AXIS_CALDDR_MM2S_ACLK">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="aclk" SIGIS="clk" SIGNAME="MIG_Calibration_CAL_DDR_MIG_ui_clk">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="M_AXIS_CALDDR_MM2S_ACLK"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="ui_clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
@@ -8572,7 +8153,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_araddr"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_araddr"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_araddr"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_araddr"/>
@@ -8583,7 +8164,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arlen"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arlen"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arlen"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arlen"/>
@@ -8594,7 +8175,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arsize"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arsize"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arsize"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arsize"/>
@@ -8605,7 +8186,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arburst"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arburst"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arburst"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arburst"/>
@@ -8616,7 +8197,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arlock"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arlock"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arlock"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arlock"/>
@@ -8627,7 +8208,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arcache"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arcache"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arcache"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arcache"/>
@@ -8638,7 +8219,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arprot"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arprot"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arprot"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arprot"/>
@@ -8649,7 +8230,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arqos"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arqos"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arqos"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arqos"/>
@@ -8660,7 +8241,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arvalid"/>
@@ -8671,7 +8252,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_arready"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_arready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_arready"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_arready"/>
@@ -8683,7 +8264,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_rdata"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_rdata"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_rdata"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_rdata"/>
@@ -8694,7 +8275,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_rresp"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_rresp"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_rresp"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_rresp"/>
@@ -8705,7 +8286,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_rlast"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_rlast"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_rlast"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_rlast"/>
@@ -8716,7 +8297,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_rvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_rvalid"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_rvalid"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_rvalid"/>
@@ -8727,7 +8308,7 @@
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_rready"/>
           </CONNECTIONS>
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="m_axi_rready"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_rready"/>
           </CONNECTIONS>
           <CONNECTIONS>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_rready"/>
@@ -8962,7 +8543,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_3"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_1"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -8971,9 +8552,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="s_axi_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awid" SIGIS="undef" SIGNAME="MIG_Code_axi_interconnect_0_m00_couplers_auto_cc_s_axi_awid">
@@ -11187,9 +10768,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awid" SIGIS="undef"/>
@@ -13611,9 +13192,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo_s_axi_awaddr">
@@ -15047,9 +14628,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo_m_axi_awaddr">
@@ -15482,9 +15063,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_m00_couplers_m00_data_fifo_s_axi_awaddr">
@@ -15718,9 +15299,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_m01_couplers_auto_pc_s_axi_awaddr">
@@ -15897,9 +15478,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_m01_couplers_m01_data_fifo_s_axi_awaddr">
@@ -16136,9 +15717,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_m11_couplers_m11_data_fifo_s_axi_awaddr">
@@ -16375,9 +15956,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_m12_couplers_m12_data_fifo_s_axi_awaddr">
@@ -16614,9 +16195,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="MCU_microblaze_1_M_AXI_DP_AWADDR">
@@ -16821,8 +16402,8 @@
         <PARAMETER NAME="C_AXI_DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_AXI_PROTOCOL" VALUE="2"/>
         <PARAMETER NAME="C_NUM_ADDR_RANGES" VALUE="16"/>
-        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040c000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b400000000000044b300000000000044a400000000000044a300000000000044a200000000000041200000000000004040e0000000000044b200000000000044af00000000000044ae00000000000044ac00000000000044ab00000000000044aa00000000000044a800000000000044a600000000000044a500000000000044a100000000000044a000000000000041c000000000000040406000000000004040200000000000400100000000000040000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a70000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040a000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040404000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040408000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000041400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a90000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b00000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044ad0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b10000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000080000000"/>
-        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000c00000010000000100000000c0000000e000000100000000d0000000c0000000e0000000f0000000c0000000c0000000c0000000c0000000c0000000c0000000c0000000c000000100000000d0000000d00000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e"/>
+        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040c000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b500000000000044b400000000000044b300000000000044a400000000000044a300000000000044a200000000000041200000000000004040e0000000000044b200000000000044af00000000000044ae00000000000044ac00000000000044ab00000000000044aa00000000000044a800000000000044a600000000000044a500000000000044a100000000000044a000000000000041c000000000000040406000000000004040200000000000400100000000000040000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a70000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000004040a000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040404000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000040408000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000041400000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044a90000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b00000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044ad0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000044b10000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000080000000"/>
+        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d00000000000000000000000000000000000000000000000000000000000000000000000c0000000c00000010000000100000000c0000000e000000100000000d0000000c0000000e0000000f0000000c0000000c0000000c0000000c0000000c0000000c0000000c0000000c000000100000000d0000000d00000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e"/>
         <PARAMETER NAME="C_S_AXI_BASE_ID" VALUE="0x00000000"/>
         <PARAMETER NAME="C_S_AXI_THREAD_ID_WIDTH" VALUE="0x00000000"/>
         <PARAMETER NAME="C_AXI_SUPPORTS_USER_SIGNALS" VALUE="0"/>
@@ -17728,7 +17309,7 @@
         <PARAMETER NAME="M12_A04_BASE_ADDR" VALUE="0x0000000044a40000"/>
         <PARAMETER NAME="M12_A05_BASE_ADDR" VALUE="0x0000000044b30000"/>
         <PARAMETER NAME="M12_A06_BASE_ADDR" VALUE="0x0000000044b40000"/>
-        <PARAMETER NAME="M12_A07_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M12_A07_BASE_ADDR" VALUE="0x0000000044b50000"/>
         <PARAMETER NAME="M12_A08_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M12_A09_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M12_A10_BASE_ADDR" VALUE="0xffffffffffffffff"/>
@@ -17984,7 +17565,7 @@
         <PARAMETER NAME="M12_A04_ADDR_WIDTH" VALUE="16"/>
         <PARAMETER NAME="M12_A05_ADDR_WIDTH" VALUE="16"/>
         <PARAMETER NAME="M12_A06_ADDR_WIDTH" VALUE="12"/>
-        <PARAMETER NAME="M12_A07_ADDR_WIDTH" VALUE="0"/>
+        <PARAMETER NAME="M12_A07_ADDR_WIDTH" VALUE="12"/>
         <PARAMETER NAME="M12_A08_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M12_A09_ADDR_WIDTH" VALUE="0"/>
         <PARAMETER NAME="M12_A10_ADDR_WIDTH" VALUE="0"/>
@@ -18050,9 +17631,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_s00_couplers_s00_data_fifo_m_axi_awaddr">
@@ -18865,9 +18446,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc_s_axi_awaddr">
@@ -19006,14 +18587,14 @@
       <PARAMETERS>
         <PARAMETER NAME="C_FAMILY" VALUE="kintex7"/>
         <PARAMETER NAME="C_NUM_SLAVE_SLOTS" VALUE="1"/>
-        <PARAMETER NAME="C_NUM_MASTER_SLOTS" VALUE="7"/>
+        <PARAMETER NAME="C_NUM_MASTER_SLOTS" VALUE="8"/>
         <PARAMETER NAME="C_AXI_ID_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_AXI_ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_AXI_DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="C_AXI_PROTOCOL" VALUE="2"/>
         <PARAMETER NAME="C_NUM_ADDR_RANGES" VALUE="1"/>
-        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0x000000004040e0000000000044b400000000000044b300000000000044a4000000000000412000000000000044a300000000000044a20000"/>
-        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000d0000000c0000001000000010000000100000000c0000000e"/>
+        <PARAMETER NAME="C_M_AXI_BASE_ADDR" VALUE="0x0000000044b50000000000004040e0000000000044b400000000000044b300000000000044a4000000000000412000000000000044a300000000000044a20000"/>
+        <PARAMETER NAME="C_M_AXI_ADDR_WIDTH" VALUE="0x0000000c0000000d0000000c0000001000000010000000100000000c0000000e"/>
         <PARAMETER NAME="C_S_AXI_BASE_ID" VALUE="0x00000000"/>
         <PARAMETER NAME="C_S_AXI_THREAD_ID_WIDTH" VALUE="0x00000000"/>
         <PARAMETER NAME="C_AXI_SUPPORTS_USER_SIGNALS" VALUE="0"/>
@@ -19022,20 +18603,20 @@
         <PARAMETER NAME="C_AXI_WUSER_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_AXI_RUSER_WIDTH" VALUE="1"/>
         <PARAMETER NAME="C_AXI_BUSER_WIDTH" VALUE="1"/>
-        <PARAMETER NAME="C_M_AXI_WRITE_CONNECTIVITY" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
-        <PARAMETER NAME="C_M_AXI_READ_CONNECTIVITY" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_WRITE_CONNECTIVITY" VALUE="0x0000000100000001000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_READ_CONNECTIVITY" VALUE="0x0000000100000001000000010000000100000001000000010000000100000001"/>
         <PARAMETER NAME="C_R_REGISTER" VALUE="1"/>
         <PARAMETER NAME="C_S_AXI_SINGLE_THREAD" VALUE="0x00000001"/>
         <PARAMETER NAME="C_S_AXI_WRITE_ACCEPTANCE" VALUE="0x00000001"/>
         <PARAMETER NAME="C_S_AXI_READ_ACCEPTANCE" VALUE="0x00000001"/>
-        <PARAMETER NAME="C_M_AXI_WRITE_ISSUING" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
-        <PARAMETER NAME="C_M_AXI_READ_ISSUING" VALUE="0x00000001000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_WRITE_ISSUING" VALUE="0x0000000100000001000000010000000100000001000000010000000100000001"/>
+        <PARAMETER NAME="C_M_AXI_READ_ISSUING" VALUE="0x0000000100000001000000010000000100000001000000010000000100000001"/>
         <PARAMETER NAME="C_S_AXI_ARB_PRIORITY" VALUE="0x00000000"/>
-        <PARAMETER NAME="C_M_AXI_SECURE" VALUE="0x00000000000000000000000000000000000000000000000000000000"/>
+        <PARAMETER NAME="C_M_AXI_SECURE" VALUE="0x0000000000000000000000000000000000000000000000000000000000000000"/>
         <PARAMETER NAME="C_CONNECTIVITY_MODE" VALUE="0"/>
         <PARAMETER NAME="ADDR_RANGES" VALUE="1"/>
         <PARAMETER NAME="NUM_SI" VALUE="1"/>
-        <PARAMETER NAME="NUM_MI" VALUE="7"/>
+        <PARAMETER NAME="NUM_MI" VALUE="8"/>
         <PARAMETER NAME="ADDR_WIDTH" VALUE="32"/>
         <PARAMETER NAME="STRATEGY" VALUE="0"/>
         <PARAMETER NAME="PROTOCOL" VALUE="AXI4LITE"/>
@@ -19832,22 +19413,22 @@
         <PARAMETER NAME="M06_A13_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M06_A14_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M06_A15_BASE_ADDR" VALUE="0xffffffffffffffff"/>
-        <PARAMETER NAME="M07_A00_BASE_ADDR" VALUE="0x0000000000700000"/>
-        <PARAMETER NAME="M07_A01_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A02_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A03_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A04_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A05_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A06_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A07_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A08_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A09_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A10_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A11_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A12_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A13_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A14_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
-        <PARAMETER NAME="M07_A15_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
+        <PARAMETER NAME="M07_A00_BASE_ADDR" VALUE="0x0000000044b50000"/>
+        <PARAMETER NAME="M07_A01_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A02_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A03_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A04_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A05_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A06_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A07_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A08_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A09_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A10_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A11_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A12_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A13_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A14_BASE_ADDR" VALUE="0xffffffffffffffff"/>
+        <PARAMETER NAME="M07_A15_BASE_ADDR" VALUE="0xffffffffffffffff"/>
         <PARAMETER NAME="M08_A00_BASE_ADDR" VALUE="0x0000000000800000"/>
         <PARAMETER NAME="M08_A01_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
         <PARAMETER NAME="M08_A02_BASE_ADDR" VALUE="0xFFFFFFFFFFFFFFFF"/>
@@ -20241,9 +19822,9 @@
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+        <PORT DIR="I" NAME="aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="interconnect_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="s_axi_awaddr" SIGIS="undef" SIGNAME="axi_peripheral_axi_interconnect_1_m12_couplers_m12_data_fifo_m_axi_awaddr">
@@ -21769,12 +21350,6 @@
         <PORT CLKFREQUENCY="160000000" DIR="O" NAME="clk_out2" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
           <CONNECTIONS>
             <CONNECTION INSTANCE="External_Ports" PORT="clk_160"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_mm2s_aclk"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_s2mm_aclk"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_mm2s_cmdsts_aclk"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_s2mm_cmdsts_awclk"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="s_axi_aclk"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="s_axi_aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT CLKFREQUENCY="200000000" DIR="O" NAME="clk_out3" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out3">
@@ -21797,6 +21372,12 @@
         <PORT CLKFREQUENCY="80000000" DIR="O" NAME="clk_out6" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="External_Ports" PORT="clk_80"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_mm2s_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_s2mm_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_mm2s_cmdsts_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_s2mm_cmdsts_awclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="s_axi_aclk"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="s_axi_aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="reset" SIGIS="rst" SIGNAME="GND_const">
@@ -22770,41 +22351,14 @@
         <PORT DIR="O" NAME="peripheral_reset" SIGIS="rst"/>
         <PORT DIR="O" NAME="interconnect_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_interconnect_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axi_mm2s_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axis_mm2s_cmdsts_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_mm2s_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_s2mm_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_mm2s_cmdsts_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_s2mm_cmdsts_aresetn"/>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_xbar" PORT="aresetn"/>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="m_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="m_axi_aresetn"/>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="m_axi_aresetn"/>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="m_axi_aresetn"/>
             <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_m00_data_fifo" PORT="aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_m00_couplers_auto_cc" PORT="m_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_pc" PORT="aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_df" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
-          </CONNECTIONS>
-        </PORT>
-        <PORT DIR="O" NAME="peripheral_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
-          <CONNECTIONS>
-            <CONNECTION INSTANCE="External_Ports" PORT="ARESETN"/>
-            <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MCU_mdm_1" PORT="S_AXI_ARESETN"/>
             <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_xbar" PORT="aresetn"/>
             <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_m00_couplers_auto_cc" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_m00_couplers_auto_cc" PORT="m_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_s00_couplers_auto_us" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_s01_couplers_auto_us" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="MIG_Code_mig_7series_0" PORT="aresetn"/>
-            <CONNECTION INSTANCE="axi_gpio_0" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="axi_gps_uart" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_xbar" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_1_xbar" PORT="aresetn"/>
@@ -22816,6 +22370,32 @@
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_1_m12_couplers_m12_data_fifo" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_m05_couplers_auto_pc" PORT="aresetn"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" NAME="peripheral_aresetn" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="External_Ports" PORT="ARESETN"/>
+            <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MCU_mdm_1" PORT="S_AXI_ARESETN"/>
+            <CONNECTION INSTANCE="MIG_Calibration_CAL_DDR_MIG" PORT="aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axi_mm2s_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_datamover_ddrcal" PORT="m_axis_mm2s_cmdsts_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_mm2s_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axi_s2mm_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_mm2s_cmdsts_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_dm_buffer" PORT="m_axis_s2mm_cmdsts_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_pc" PORT="aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s00_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s01_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s02_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Calibration_axi_interconnect_ddrcal_s03_couplers_auto_us_cc_df" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_m00_couplers_auto_cc" PORT="m_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_s00_couplers_auto_us" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_s01_couplers_auto_us" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="MIG_Code_mig_7series_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="axi_gpio_0" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="axi_gps_uart" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_quad_spi_0" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_timer_0" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_usb_uart" PORT="s_axi_aresetn"/>

@@ -45,6 +45,7 @@
 #include "NetworkInterface.h"
 #include "DeviceKey.h"
 #include "StackUtils.h"
+#include "adc_readout.h"
 #include "verbose.h"
 
 #define DEVICE_RUNNING_TIME_REFRESH_PERIOD_US   TIME_ONE_MINUTE_US
@@ -170,6 +171,8 @@ void disable_caches()
    BuiltInTest_Execute(BITID_InterruptControllerStartup);
    BuiltInTest_Execute(BITID_FirmwareReleaseInfoInitialization);
    BuiltInTest_Execute(BITID_DeviceKeyValidation);
+
+   ADC_readout_init(&flashSettings);
 
    Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 1);
 

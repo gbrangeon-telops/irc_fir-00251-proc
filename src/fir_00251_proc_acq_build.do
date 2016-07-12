@@ -65,6 +65,9 @@ do D:\Telops\FIR-00251-Proc\src\AEC\HDL\build_AEC_intf.do
 #ICU
 do D:\Telops\FIR-00251-Proc\src\ICU\HDL\build_ICU.do
 
+#ADC Readout
+do D:\telops\FIR-00251-Proc\src\ADCReadout\HDL\build_adc_readout.do
+
 #Buffering
 do D:\Telops\FIR-00251-Proc\src\Buffering\HDL\build_buffering_intf.do
 								 

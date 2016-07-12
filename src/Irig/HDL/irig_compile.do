@@ -16,7 +16,7 @@ acom D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_reset_v2.vhd
 -- conditionneur
 acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_clock_detector_v2.vhd \
- d:\Telops\FIR-00251-Proc\src\Irig\HDL\ad7478_driver_v2.vhd \
+ d:\Telops\FIR-00251-Proc\src\Irig\HDL\ad747x_driver.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\adc_sample_counter_v2.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\adc_sample_sel_v2.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\adc_sample_averaging_v2.vhd \

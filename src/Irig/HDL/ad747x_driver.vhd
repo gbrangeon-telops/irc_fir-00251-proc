@@ -24,9 +24,10 @@ use IEEE.numeric_std.all;
 use work.IRIG_define_v2.all;
 use work.tel2000.all;
 
-entity ad7478_driver_v2 is
+entity ad747x_driver is
    generic(
       ADC_SCLK_FACTOR   : integer := 32;
+      ADC_NBITS         : integer := 8; -- legal values are 8, 10, 12
       FIRST_CLK_EDGE_IS_FE : boolean := true
       );
    port (
@@ -39,15 +40,16 @@ entity ad7478_driver_v2 is
       ADC_SCLK		      : out std_logic;
       ADC_CS_N				: out std_logic;                      
       ADC_ERR           : out std_logic;
-      ADC_DATA 			: out std_logic_vector(7 downto 0)
+      ADC_DATA 			: out std_logic_vector(ADC_NBITS-1 downto 0)
       );
-end ad7478_driver_v2;
+end ad747x_driver;
 
-architecture RTL of ad7478_driver_v2 is
+architecture RTL of ad747x_driver is
    
    constant NB_BIT_CLK_CNT  : integer := log2(ADC_SCLK_FACTOR)-1;   
    constant NBIT_TO_ACQ     : integer := 16; -- nombre de bits total à acquerir lors d'une acquisition
    constant NBIT_TO_ACQ_P_2 : integer := NBIT_TO_ACQ + 2;
+   constant DEBUG_VALUE     : std_logic_vector(15 downto 0) := x"AAAA"; 
    
    type acq_fsm_type is (idle, start_st, acq_st, end_st);
    
@@ -262,7 +264,7 @@ begin
    
    
    --------------------------------------------------
-   -- cas particulier de ADC7478
+   -- ADC747x extraction des bits de données
    --------------------------------------------------  
    U6 : process (CLK)
    begin
@@ -271,13 +273,13 @@ begin
             ADC_ERR <= '0';
             ADC_DATA_RDY <= '0';
             -- translate_off
-            ADC_DATA <= x"AA"; 
+            ADC_DATA <= DEBUG_VALUE(ADC_NBITS-1 downto 0); 
             -- translate_on
          else
             if data_rdy_i = '1' then 
-               ADC_DATA <=  data_register(12 downto 5);  
+               ADC_DATA <=  data_register(12 downto 12-ADC_NBITS+1);  
                ADC_DATA_RDY <= '1';
-               if data_register(15 downto 13) /= "000" or data_register(4 downto 0) /= "00000" then
+               if unsigned(data_register(15 downto 13)) /= 0 or unsigned(data_register(12-ADC_NBITS downto 0)) /= 0 then
                   ADC_ERR <= '1';
                end if;
             else

@@ -45,6 +45,9 @@ entity hder_insert_sequencer is
         FLAGGING_HDER_MOSI  : in t_axi4_lite_mosi;
         FLAGGING_HDER_MISO  : out t_axi4_lite_miso;
         
+        ADC_RDOUT_HDER_MOSI  : in t_axi4_lite_mosi;
+        ADC_RDOUT_HDER_MISO  : out t_axi4_lite_miso;
+        
         RAM_WR_ADD       : out std_logic_vector(5 downto 0);
         RAM_WR_DATA      : out std_logic_vector(31 downto 0);
         RAM_BWE          : out std_logic_vector(3 downto 0);
@@ -231,6 +234,17 @@ begin
     FLAGGING_HDER_MISO.ARREADY              <= '0'; -- lecture non autorisée
     FLAGGING_HDER_MISO.RVALID               <= '0'; -- lecture non autorisée 
 	
+    -- ADC READOUT HDER PART
+    fast_hder_client_in(7).hder_id       <= ADC_RDOUT_HDER_MOSI.AWADDR(15 downto 8); -- selon le protocole de transfert, AWADDR(15 downto 8) = frame_id. C'est aussi le hder_id 
+    fast_hder_client_in(7).hder_eof_code <= ADC_RDOUT_HDER_MOSI.AWADDR(31 downto 16); -- selon le protocole de transfert, AWADDR(31 downto 16) = EOF.
+    fast_hder_client_in(7).mosi          <= ADC_RDOUT_HDER_MOSI;
+    ADC_RDOUT_HDER_MISO.AWREADY              <= fast_hder_client_out(7).fifo_rd;
+    ADC_RDOUT_HDER_MISO.WREADY               <= fast_hder_client_out(7).fifo_rd;
+    ADC_RDOUT_HDER_MISO.BVALID               <= fast_hder_client_out(7).miso_bvalid;
+    ADC_RDOUT_HDER_MISO.BRESP                <= AXI_OKAY;
+    ADC_RDOUT_HDER_MISO.ARREADY              <= '0'; -- lecture non autorisée
+    ADC_RDOUT_HDER_MISO.RVALID               <= '0'; -- lecture non autorisée  
+    
     ------------------------------------------------------------------
     --  synchro reset
     ------------------------------------------------------------------
