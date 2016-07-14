@@ -268,14 +268,14 @@ IRC_Status_t startActualization( bool internalTrig )
    if ( TDCFlagsTst(ImageCorrectionIsImplementedMask) == 0 )
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
-      ACT_ERR("Actualization is not implemented on this model.");
+      ACT_ERR("Image correction is not implemented on this model.");
       return IRC_FAILURE;
    }
 
    if (!flashSettings.ImageCorrectionEnabled || !FS_FLASHSETTINGS_IS_VALID)
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
-      ACT_ERR("Actualization is not enabled on this camera.");
+      ACT_ERR("Image correction is not enabled on this camera.");
       return IRC_FAILURE;
    }
 
@@ -283,7 +283,7 @@ IRC_Status_t startActualization( bool internalTrig )
    if (!TDCFlagsTst(ExternalMemoryBufferIsImplementedMask) && BufferManager_GetNumSequenceCount(&gBufManager) != 0)
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
-      ACT_ERR("Could not perform actualization because there are recorded sequences in buffer memory.");
+      ACT_ERR("Could not perform image correction because there are recorded sequences in buffer memory.");
       return IRC_FAILURE;
    }
 
@@ -292,7 +292,7 @@ IRC_Status_t startActualization( bool internalTrig )
    if ( TDCStatusTst(WaitingForImageCorrectionMask) )
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
-      FPGA_PRINTF("ACT: Actualization is already running.\n");
+      FPGA_PRINTF("ACT: Image correction is already running.\n");
       return IRC_FAILURE;
    }
 
@@ -300,10 +300,10 @@ IRC_Status_t startActualization( bool internalTrig )
    {
       // set the flag early so that the status LED does not become green for a short period of time.
       TDCStatusSet(WaitingForImageCorrectionMask);
-      FPGA_PRINTF( "Starting actualization (internal command)...\n" );
+      FPGA_PRINTF( "Starting image correction (internal command)...\n" );
    }
    else
-      FPGA_PRINTF( "Starting actualization (external command)...\n" );
+      FPGA_PRINTF( "Starting image correction (external command)...\n" );
 
    // Start beta correction
    gStartActualization = 1;
@@ -1347,9 +1347,9 @@ IRC_Status_t Actualization_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF( "ACT: Beta correction completed in " _PCF(2) " s\n", _FFMT(elapsed_time_us((float)tic_TotalDuration) / ((float)TIME_ONE_SECOND_US), 2));
+               FPGA_PRINTF( "ACT: image correction completed in " _PCF(2) " s\n", _FFMT(elapsed_time_us((float)tic_TotalDuration) / ((float)TIME_ONE_SECOND_US), 2));
             }
-            FPGA_PRINTF( "ACT: Actualization done.\n");
+            FPGA_PRINTF( "ACT: Image correction done.\n");
 
             if (gActDebugOptions.clearBufferAfterCompletion)
             {
@@ -1386,7 +1386,7 @@ IRC_Status_t Actualization_SM()
    {
       gStopActualization = false;
       error = true;
-      ACT_ERR("Actualization was interrupted by user.");
+      ACT_ERR("Image correction process was interrupted by user.");
    }
 
 
@@ -2597,11 +2597,11 @@ bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint
    else
    {
       if (!allowCalibUpdate || TDCStatusTst(WaitingForImageCorrectionMask))
-         FPGA_PRINTF("ACT: Calibration actualization is not applicable to the current block (actualization is currently running).\n");
+         FPGA_PRINTF("ACT: Calibration image correction is not applicable to the current block (it is already running).\n");
       else if (data == NULL)
-         FPGA_PRINTF("ACT: No calibration actualization has been computed yet.\n");
+         FPGA_PRINTF("ACT: No calibration image correction has been computed yet.\n");
       else
-         FPGA_PRINTF("ACT: Calibration actualization is not applicable to the current block.\n");
+         FPGA_PRINTF("ACT: Calibration image correction is not applicable to the current block.\n");
    }
 
    return retval;
@@ -2835,7 +2835,7 @@ fileRecord_t* findIcuReferenceBlock()
 }
 
 /**
-  *  State machine for the actualization data file
+  *  State machine for the image correction data file
   *
   *   @param none
   *
@@ -2969,11 +2969,10 @@ IRC_Status_t ActualizationFileWriter_SM()
       actFileHeader.ReferencePOSIXTime = currentDeltaBeta->info.referencePOSIXTime;
       actFileHeader.SensorID = refBlockFileHdr.SensorID;
 
-      // fill FileDescription with some info
-      // TODO ajouter les champs pertinents dans l'en-tête du fichier TSAC.
-      sprintf(actFileHeader.FileDescription, "\ntype: %d\nTIL: %0.2f K\nTRef: %0.2f K\nET: %0.1f µs",
-            (int)currentDeltaBeta->info.type, currentDeltaBeta->info.internalLensTemperature, currentDeltaBeta->info.referenceTemperature, currentDeltaBeta->info.exposureTime);
-
+      actFileHeader.ImageCorrectionType = currentDeltaBeta->info.type;
+      actFileHeader.TemperatureInternalLens = currentDeltaBeta->info.internalLensTemperature;
+      actFileHeader.TemperatureReference = currentDeltaBeta->info.referenceTemperature;
+      actFileHeader.ExposureTime = currentDeltaBeta->info.exposureTime;
 
       // write file header
       numBytes = CalibImageCorrection_WriteImageCorrectionFileHeader(&actFileHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);
@@ -3021,7 +3020,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF("Quantization exponent for .tsac file = %d\n", Exp);
+               FPGA_PRINTF("Quantization exponent for .tsic file = %d\n", Exp);
             }
 
             actDataHeader.Beta0_Off = offset;
@@ -3235,7 +3234,7 @@ static void defineActualizationFilename(char* buf, uint8_t length, uint32_t time
    else
       strcpy(buf, "TEL00000");
 
-   sprintf(buf + strlen(buf), "-%010u_%c_%010u.tsac", (unsigned int)timestamp,
+   sprintf(buf + strlen(buf), "-%010u_%c_%010u.tsic", (unsigned int)timestamp,
          (data->info.type == ACT_ICU)?'i':'e', (unsigned int)data->info.referencePOSIXTime);
 }
 
@@ -3411,7 +3410,7 @@ static void ACT_init()
    //memset(deltaBetaDB.deltaBeta, 0, MAX_DELTA_BETA_SIZE * sizeof(deltabeta_t*));
    deltaBetaDB.count = 0;
 
-   ACT_INF("Actualization state machine starting...");
+   ACT_INF("Image correction state machine starting...");
 }
 
 static bool validateAverage(const uint32_t* coadd_buffer, uint32_t numPixels, uint32_t expectedSum)
@@ -3588,7 +3587,7 @@ deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, u
 
    if (db_out != NULL && verbose == true)
    {
-      FPGA_PRINTF("ACT: Found valid actualization data at location %d (type=%d, age=%d)\n", idx, db_out->info.type, db_out->info.age);
+      FPGA_PRINTF("ACT: Found valid image correction data at location %d (type=%d, age=%d)\n", idx, db_out->info.type, db_out->info.age);
    }
 
    return db_out;
@@ -3621,7 +3620,7 @@ deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calibInfo, u
 
    if (db_out != NULL)
    {
-      FPGA_PRINTF("ACT: Found existing actualization data at location %d (valid=%d, type=%d, age=%d)\n", idx, db_out->valid, db_out->info.type, db_out->info.age);
+      FPGA_PRINTF("ACT: Found existing image correction data at location %d (valid=%d, type=%d, age=%d)\n", idx, db_out->valid, db_out->info.type, db_out->info.age);
    }
 
    return db_out;
@@ -3636,17 +3635,17 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
    switch (type)
    {
    case ACT_ALL:
-      FPGA_PRINTF("ACT: Invalidating all actualization data\n");
+      FPGA_PRINTF("ACT: Invalidating all image correction data\n");
       break;
 
    case ACT_CURRENT:
-      FPGA_PRINTF("ACT: Invalidating active actualization data\n");
+      FPGA_PRINTF("ACT: Invalidating active image correction data\n");
       current = ACT_getActiveDeltaBeta();
       current->valid = 0;
       break;
 
    default:
-      FPGA_PRINTF("ACT: Invalidating %s actualization data\n", type == ACT_ICU ? "internal":"external");
+      FPGA_PRINTF("ACT: Invalidating %s image correction data\n", type == ACT_ICU ? "internal":"external");
    };
 
    if (type == ACT_CURRENT)
@@ -3659,47 +3658,48 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
 
 IRC_Status_t deleteExternalActualizationFiles()
 {
-   int i,j;
-   IRC_Status_t status = IRC_FAILURE;
+   IRC_Status_t status = IRC_SUCCESS;
+   int i;
    int fd;
+   fileRecord_t* file = NULL;
    CalibImageCorrection_ImageCorrectionFileHeader_t header;
    uint32_t length;
 
-   FPGA_PRINTF("ACT: Deleting external actualization files from a previous boot up\n");
+   FPGA_PRINTF("ACT: Deleting external image correction files from a previous boot up\n");
 
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
    {
-      fd = FM_OpenFile(gFM_calibrationActualizationFiles.item[i]->name, UO_RDONLY);
+      fileType_t type;
+
+      file = gFM_calibrationActualizationFiles.item[i];
+      type = file->type;
+
+      if (type != FT_TSIC)
+      {
+         if (type == FT_TSAC)
+         {
+            FPGA_PRINTF("ACT: Deleting obsolete TSAC file %s\n", file->name);
+            FM_RemoveFile(file);
+         }
+         --i;
+         continue;
+      }
+
+      fd = FM_OpenFile(file->name, UO_RDONLY);
       length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
       uffs_close(fd);
 
       if (length == 0)
       {
+         status = IRC_FAILURE;
          break;
       }
 
-      if (length>0 && 0/*header.type*/) // todo utiliser le futur champ "type" pour filtre les externes des internes
+      if (length>0 && header.ImageCorrectionType == 1)
       {
-         FPGA_PRINTF("ACT: Deleting %s\n", gFM_calibrationActualizationFiles.item[i]->name);
-         FM_RemoveFile(gFM_calibrationActualizationFiles.item[i]);
-      }
-
-      // todo enlever quand nouveau format de fichier existant
-      bool isICU = false;
-      for (j=0; j<gFM_icuBlocks.count; ++j)
-      {
-         if (gFM_icuBlocks.item[j]->posixTime == header.ReferencePOSIXTime)
-         {
-            isICU = true;
-            break;
-         }
-      }
-
-      if (!isICU)
-      {
-         FPGA_PRINTF("ACT: Deleting %s\n", gFM_calibrationActualizationFiles.item[i]->name);
-         FM_RemoveFile(gFM_calibrationActualizationFiles.item[i]);
+         FPGA_PRINTF("ACT: Deleting %s\n", file->name);
+         FM_RemoveFile(file);
       }
 
       --i;
@@ -3747,30 +3747,31 @@ void ACT_listActualizationData()
    deltabeta_t* current = ACT_getActiveDeltaBeta();
 
    PRINTF("\n");
-   FPGA_PRINTF("Listing actualization data...\n");
-   FPGA_PRINTF("Found %d actualization file(s)\n", gFM_calibrationActualizationFiles.count);
+   FPGA_PRINTF("Listing image correction data...\n");
+   FPGA_PRINTF("Found %d image correction file(s)\n", gFM_calibrationActualizationFiles.count);
    for (i=0; i<gFM_calibrationActualizationFiles.count; ++i)
    {
       file = gFM_calibrationActualizationFiles.item[i];
+
+      if (file->type == FT_TSAC)
+         continue;
 
       fd = FM_OpenFile(file->name, UO_RDONLY);
       length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
       uffs_close(fd);
 
-      // todo afficher les nouveaux champs au lieu de file description
       if (length > 0)
       {
-         char descr[16];
-         strncpy(descr, &header.FileDescription[1], 16);
-         descr[7] = 0;
-         FPGA_PRINTF("#%d: Name = %s, Reference POSIX time = %010d, description = %s\n", i+1, file->name, (unsigned int)header.ReferencePOSIXTime, descr);
+         FPGA_PRINTF("#%d: Name = %s, Reference POSIX time = %010d, type = %d, T_IL = " _PCF(2) " K, T_Ref = " _PCF(2) " K, t_exp = " _PCF(2), "us\n",
+               i+1, file->name, (unsigned int)header.ReferencePOSIXTime, header.ImageCorrectionType,
+               _FFMT(header.TemperatureInternalLens, 2), _FFMT(header.TemperatureReference, 2), _FFMT(header.ExposureTime, 2));
       }
       else
-         FPGA_PRINTF("#%d: Name = %s (Invalid actualization file)\n", i+1, file->name);
+         FPGA_PRINTF("#%d: Name = %s (Invalid image correction file)\n", i+1, file->name);
    }
 
    PRINTF("\n");
-   FPGA_PRINTF("%d/%d actualization data locations used in memory\n", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
+   FPGA_PRINTF("%d/%d image correction data locations used in memory\n", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
    for (i=0; i<deltaBetaDB.count; ++i)
    {
       deltabeta_t* data = deltaBetaDB.deltaBeta[i];
@@ -3797,7 +3798,7 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
    }
    blockInfo = &calibInfo->blocks[blockIdx];
 
-   FPGA_PRINTF("ACT: Allocating an actualization data location in memory for block with POSIX time %010d\n", blockInfo->POSIXTime);
+   FPGA_PRINTF("ACT: Allocating an image correction data location in memory for block with POSIX time %010d\n", blockInfo->POSIXTime);
 
    // first, find the corresponding data if it already exists.
    newData = findMatchingDeltaBetaForBlock(calibInfo, blockIdx);
@@ -3810,14 +3811,14 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
          newData = &deltaBetaArray[deltaBetaDB.count];
          deltaBetaDB.deltaBeta[deltaBetaDB.count] = newData;
          ++deltaBetaDB.count;
-         FPGA_PRINTF("ACT: Allocated a new actualization data location (%d/%d)\n", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
+         FPGA_PRINTF("ACT: Allocated a new image correction data location (%d/%d)\n", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
       }
       else // the DB is full: we must recycle a data location
       {
          uint32_t idx = 0;
          uint32_t M = 0;
 
-         FPGA_PRINTF("ACT: Actualization database is full: recycling a data location...\n");
+         FPGA_PRINTF("ACT: Image correction database is full: recycling a data location...\n");
 
          for (i=0; i<deltaBetaDB.count; ++i)
          {
@@ -3838,7 +3839,7 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
       }
    }
    else
-      FPGA_PRINTF("ACT: Existing actualization data in database (valid=%d, age=%d) will be updated\n", newData->valid, newData->info.age);
+      FPGA_PRINTF("ACT: Existing image correction data in database (valid=%d, age=%d) will be updated\n", newData->valid, newData->info.age);
 
    if (newData) // this pointer should not be null at this point...
    {

@@ -77,8 +77,6 @@
 
 #define MAX_DELTA_BETA_SIZE 32 // maximum allowed number of delta beta data locations in memory
 
-#define ACT_FILENAME (char*)"Actualization.tsac"
-
 #ifndef CELSIUS_TO_KELVIN
    #define CELSIUS_TO_KELVIN (float)273.15f
 #endif
