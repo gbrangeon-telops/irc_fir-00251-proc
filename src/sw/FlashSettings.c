@@ -29,6 +29,7 @@
 #include "FWController.h"
 #include "DeviceKey.h"
 #include "FlashDynamicValues.h"
+#include "adc_readout.h"
 #include <string.h>
 #include <float.h>
 
@@ -48,7 +49,6 @@ int fdFlashSettings;
 flashSettings_t flashSettings;
 
 static IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings);
-static void FlashSettings_UpdateFixFWSettings(flashSettings_t *p_flashSettings);
 
 /**
  * Initializes the flash settings loader.
@@ -148,7 +148,6 @@ void FlashSettings_SM()
              else
              {
                 flashSettings = tmpFlashSettings;
-                FlashSettings_UpdateFixFWSettings(&flashSettings);
                 if (FlashSettings_UpdateCameraSettings(&flashSettings) == IRC_SUCCESS)
                 {
                    TDCStatusClr(WaitingForFlashSettingsInitMask);
@@ -206,6 +205,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern float gFpaDetectorElectricalRefOffset;
    extern t_FpaIntf gFpaIntf;
    extern bool gDisableFilterWheel;
+   extern flashSettings_t flashSettings_default;
    uint8_t externalMemoryBufferDetected = BufferManager_DetectExternalMemoryBuffer();
 
    // Update device serial number
@@ -241,12 +241,25 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       gcRegsData.ImageCorrectionMode = ICM_BlackBody;
    }
 
-
    // Update FW
    p_flashSettings->FWPresent &= ~gDisableFilterWheel;
    gcRegsData.FWFilterNumber = p_flashSettings->FWNumberOfFilters;
    if (p_flashSettings->FWPresent && (p_flashSettings->FWNumberOfFilters > 0))
    {
+      // Validate default fixed filter wheel PID settings
+      if (  (p_flashSettings->FWType == FW_FIX) &&
+            (p_flashSettings->FWPositionControllerI == 3) &&
+            (p_flashSettings->FWPositionControllerPD == 5) &&
+            (p_flashSettings->FWPositionControllerPOR == 30) &&
+            (p_flashSettings->FWPositionControllerPP == 5) )
+      {
+         // Had the wrong default fixed filter wheel PID settings, force to new default values
+         p_flashSettings->FWPositionControllerI = flashSettings_default.FWPositionControllerI;
+         p_flashSettings->FWPositionControllerPD = flashSettings_default.FWPositionControllerPD;
+         p_flashSettings->FWPositionControllerPOR = flashSettings_default.FWPositionControllerPOR;
+         p_flashSettings->FWPositionControllerPP = flashSettings_default.FWPositionControllerPP;
+      }
+
       TDCFlagsSet(FWIsImplementedMask);
       if(p_flashSettings->FWType == 1)
       {
@@ -321,6 +334,14 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       BuiltInTest_Execute(BITID_DeviceKeyValidation);
    }
 
+   // Update ADC readout calibration
+   TDCFlagsClr(ADCReadoutIsImplementedMask);
+   if (p_flashSettings->ADCReadoutEnabled)
+   {
+      TDCFlagsSet(ADCReadoutIsImplementedMask);
+   }
+   ADC_readout_init(p_flashSettings);
+
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))
    {
@@ -330,20 +351,4 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    return IRC_SUCCESS;
-}
-
-static void FlashSettings_UpdateFixFWSettings(flashSettings_t *p_flashSettings)
-{
-   extern flashSettings_t flashSettings_default;
-
-   if (( p_flashSettings->FWType == FW_FIX ) &&
-         (( (p_flashSettings->FileStructureMajorVersion == 1) && (p_flashSettings->FileStructureMinorVersion == 6) ) ||
-          ( (p_flashSettings->FileStructureMajorVersion == 1) && (p_flashSettings->FileStructureMinorVersion == 7) && (p_flashSettings->FileStructureSubMinorVersion == 0) )) )
-   {
-      // Had the wrong PID settings for the Fix Fw, cause probleme with the FW
-      p_flashSettings->FWPositionControllerI = flashSettings_default.FWPositionControllerI;
-      p_flashSettings->FWPositionControllerPD = flashSettings_default.FWPositionControllerPD;
-      p_flashSettings->FWPositionControllerPOR = flashSettings_default.FWPositionControllerPOR;
-      p_flashSettings->FWPositionControllerPP = flashSettings_default.FWPositionControllerPP;
-   }
 }

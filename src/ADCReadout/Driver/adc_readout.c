@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
-#include <limits.h>
 
 #define ADC_Q_FIXP_FORMAT_M (uint32_t)11
 #define ADC_Q_FIXP_FORMAT_N (uint32_t)4
@@ -16,7 +15,7 @@
 
 bool adcReadoutEnabled = false;
 
-// fonction appelée au démarrage ou au chargement des flash settings
+// fonction appelée au chargement des flash settings
 IRC_Status_t ADC_readout_init(flashSettings_t* fs)
 {
    IRC_Status_t status = IRC_FAILURE;
@@ -51,10 +50,12 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    AXI4L_write32(adcReadoutEnabled, ADC_BASE_ADDR + ADC_ENABLE_OFFSET);
    AXI4L_write32(1, ADC_BASE_ADDR + ADC_CFG_VALID);
 
+   /*
    PRINTF("ADC_READOUT: r (float) = " _PCF(5) "\n", _FFMT(r, 5));
    PRINTF("ADC_READOUT: q (float) = " _PCF(3) "\n", _FFMT(q, 3));
    PRINTF("ADC_READOUT: r (fixed point) = %d\n", ri);
    PRINTF("ADC_READOUT: q (fixed point) = %d\n", qi);
+   */
 
    status = IRC_SUCCESS;
 

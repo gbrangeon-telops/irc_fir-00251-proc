@@ -36,7 +36,9 @@
 #include "GC_Poller.h"
 #include "BuiltInTests.h"
 #include "ReleaseInfo.h"
+#include "adc_readout.h"
 #include <stdbool.h>
+#include <limits.h>
 #include <time.h>
 #include <string.h>
 
@@ -68,6 +70,7 @@ static IRC_Status_t DebugTerminalParsePWR(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDFW(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -100,6 +103,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"KEY", DebugTerminalParseKEY},
    {"STACK", DebugTerminalParseSTACK},
    {"GCP", DebugTerminalParseGCP},
+   {"ADC", DebugTerminalParseADC},
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -1808,6 +1812,75 @@ IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf)
 
    return IRC_SUCCESS;
 }
+
+/**
+ * Get/Set ADC readout calibration command parser.
+ * This parser is used to parse and validate Get/Set ADC readout calibration command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Get/Set ADC readout calibration command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
+{
+   uint8_t argStr[10];
+   uint32_t arglen;
+   float adc_m;
+   int32_t adc_b;
+
+   // Check for ADC command argument presence
+   if (!CBB_Empty(cbuf))
+   {
+      // Read ADC command m argument
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if (ParseFloatNumDec((char *)argStr, arglen, &adc_m) != IRC_SUCCESS)
+      {
+         DT_ERR("Invalid ADC command m argument.");
+         return IRC_FAILURE;
+      }
+
+      // Read ADC command b argument
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if ((ParseSignedNumDec((char *)argStr, arglen, &adc_b) != IRC_SUCCESS) ||
+            ((adc_b < SHRT_MIN) && (adc_b > SHRT_MAX)))
+      {
+         DT_ERR("Invalid ADC command b argument.");
+         return IRC_FAILURE;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!CBB_Empty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments.");
+         return IRC_FAILURE;
+      }
+
+      if (TDCFlagsTst(ADCReadoutIsImplementedMask))
+      {
+         flashSettings.ADCReadout_m = adc_m;
+         flashSettings.ADCReadout_b = adc_b;
+
+         if (ADC_readout_init(&flashSettings) != IRC_SUCCESS)
+         {
+            DT_ERR("Failed to update ADC calibration.");
+            return IRC_FAILURE;
+         }
+      }
+   }
+
+   if (!TDCFlagsTst(ADCReadoutIsImplementedMask))
+   {
+      DT_ERR("ADC readout is disabled.");
+      return IRC_FAILURE;
+   }
+
+   DT_PRINTF("ADC: m = " _PCF(6) ", b = %d\n", _FFMT(flashSettings.ADCReadout_m, 6), flashSettings.ADCReadout_b);
+
+   return IRC_SUCCESS;
+}
+
 
 /**
  * Debug terminal Help command parser parser.

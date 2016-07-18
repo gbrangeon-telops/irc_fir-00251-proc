@@ -117,6 +117,7 @@
 #define AECPlusIsImplementedMask                         0x00000800  /**< TDCFlags register bit mask for AECPlusIsImplemented field */
 #define ExternalMemoryBufferIsImplementedMask            0x00001000  /**< TDCFlags register bit mask for ExternalMemoryBufferIsImplemented field */
 #define ExternalZeroMeanBetaCorrectionIsImplementedMask  0x00002000  /**< TDCFlags register bit mask for ExternalZeroMeanBetaCorrectionIsImplemented field */
+#define ADCReadoutIsImplementedMask                      0x00004000  /**< TDCFlags register bit mask for ADCReadoutIsImplemented field */
 #define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
 #define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
 
