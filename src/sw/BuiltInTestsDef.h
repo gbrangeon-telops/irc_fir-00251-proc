@@ -64,6 +64,7 @@ enum builtInTestIDEnum {
    BITID_FlashSettingsFileLoading,
    BITID_CalibrationFilesLoading,
    BITID_DeviceKeyValidation,
+   BITID_SensorInitialization,
 
    // Built-in test count
    BITID_Count

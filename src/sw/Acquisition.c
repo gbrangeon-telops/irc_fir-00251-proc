@@ -198,6 +198,7 @@ void Acquisition_SM()
 
    static uint64_t tic_delay;
    static uint64_t tic_timeout;
+   static uint64_t tic_fpaInitTimeout;
 
    // Cooldown static variables
    static int16_t initial_temp;
@@ -240,12 +241,14 @@ void Acquisition_SM()
             builtInTests[BITID_CoolerVoltageVerification].result = BITR_Pending;
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Pending;
             builtInTests[BITID_Cooldown].result = BITR_Pending;
+            builtInTests[BITID_SensorInitialization].result = BITR_Pending;
 
             Power_TurnOn(PC_ADC_DDC);
             FPA_Init(&fpaStatus, &gFpaIntf, &gcRegsData);
             builtInTests[BITID_SensorControllerInitialization].result = BITR_Passed;
 
             GETTIME(&tic_timeout);
+            GETTIME(&tic_fpaInitTimeout);
             GETTIME(&tic_delay);
             ACQ_INF("Waiting for ADC or DDC to be ready...");
             acquisitionState = ACQ_WAITING_FOR_ADC_DDC_PRESENCE;
@@ -259,6 +262,7 @@ void Acquisition_SM()
             builtInTests[BITID_CoolerVoltageVerification].result = BITR_NotApplicable;
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Pending;
             builtInTests[BITID_Cooldown].result = BITR_NotApplicable;
+            builtInTests[BITID_SensorInitialization].result = BITR_NotApplicable;
 
             GETTIME(&tic_timeout);
             ACQ_INF("Waiting for global done...");
@@ -393,7 +397,7 @@ void Acquisition_SM()
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_ADC_DDC_PRESENCE_TIMEOUT_US)
          {
             builtInTests[BITID_SensorControllerDetection].result = BITR_Failed;
-            ACQ_ERR("Waiting for ADC or DDC presence timeout.");
+            ACQ_ERR("ADC or DDC presence detection timeout.");
             acquisitionState = ACQ_POWER_RESET;
          }
          break;
@@ -417,7 +421,7 @@ void Acquisition_SM()
          }
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_VOLTAGE_TIMEOUT_US)
          {
-            ACQ_ERR("Waiting for cooler voltage timeout.");
+            ACQ_ERR("Cooler voltage detection timeout.");
             acquisitionState = ACQ_POWER_RESET;
          }
          break;
@@ -444,7 +448,7 @@ void Acquisition_SM()
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_POWER_ON_TIMEOUT_US)
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Failed;
-            ACQ_ERR("Waiting for cooler power on timeout.");
+            ACQ_ERR("Cooler power on timeout.");
             acquisitionState = ACQ_POWER_RESET;
          }
          break;
@@ -472,7 +476,7 @@ void Acquisition_SM()
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_SENSOR_TEMP_TIMEOUT_US)
          {
             builtInTests[BITID_Cooldown].result = BITR_Failed;
-            ACQ_ERR("Waiting for sensor temperature timeout.");
+            ACQ_ERR("Sensor temperature timeout.");
             acquisitionState = ACQ_POWER_RESET;
          }
          break;
@@ -526,20 +530,50 @@ void Acquisition_SM()
                   ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
                      ((uint32_t) elapsed_time_us( tic_cooldownStart )) / 1000000);
                   TDCStatusClr(WaitingForCoolerMask);
-                  gAcquisitionPowerState = DPS_PowerOn;
-                  acquisitionState = ACQ_STOPPED;
-
-                  if (startup)
-                  {
-                     startup = 0;
-                     if (gcRegsData.PowerOnAtStartup && gcRegsData.AcquisitionStartAtStartup)
-                     {
-                        GC_SetAcquisitionStart(1);
-                     }
-                  }
+                  ACQ_INF("Waiting for sensor initialization...");
+                  acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
                }
             }
             GETTIME(&tic_cooldownSampling);
+         }
+         break;
+
+      case ACQ_WAITING_FOR_FPA_INIT:
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);
+         if (fpaStatus.fpa_init_done == 1)
+         {
+            if (fpaStatus.fpa_init_success == 1)
+            {
+               builtInTests[BITID_SensorInitialization].result = BITR_Passed;
+               ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
+               acquisitionState = ACQ_FINALIZE_POWER_ON;
+            }
+            else
+            {
+               builtInTests[BITID_SensorInitialization].result = BITR_Failed;
+               ACQ_ERR("Sensor initialization failed.");
+               acquisitionState = ACQ_POWER_RESET;
+            }
+         }
+         else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
+         {
+            builtInTests[BITID_SensorInitialization].result = BITR_Failed;
+            ACQ_ERR("Sensor initialization timeout.");
+            acquisitionState = ACQ_POWER_RESET;
+         }
+         break;
+
+      case ACQ_FINALIZE_POWER_ON:
+         gAcquisitionPowerState = DPS_PowerOn;
+         acquisitionState = ACQ_STOPPED;
+
+         if (startup)
+         {
+            startup = 0;
+            if (gcRegsData.PowerOnAtStartup && gcRegsData.AcquisitionStartAtStartup)
+            {
+               GC_SetAcquisitionStart(1);
+            }
          }
          break;
 
@@ -595,6 +629,7 @@ void Acquisition_SM()
          if (builtInTests[BITID_CoolerVoltageVerification].result == BITR_Pending) builtInTests[BITID_CoolerVoltageVerification].result = BITR_NotApplicable;
          if (builtInTests[BITID_CoolerCurrentVerification].result == BITR_Pending) builtInTests[BITID_CoolerCurrentVerification].result = BITR_NotApplicable;
          if (builtInTests[BITID_Cooldown].result == BITR_Pending) builtInTests[BITID_Cooldown].result = BITR_NotApplicable;
+         if (builtInTests[BITID_SensorInitialization].result == BITR_Pending) builtInTests[BITID_SensorInitialization].result = BITR_NotApplicable;
 
          FPA_PowerDown(&gFpaIntf);
          Power_TurnOff(PC_ADC_DDC);

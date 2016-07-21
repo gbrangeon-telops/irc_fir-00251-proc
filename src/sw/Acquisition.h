@@ -38,6 +38,7 @@
 #define WAITING_FOR_COOLER_VOLTAGE_TIMEOUT_US   (30 * TIME_ONE_SECOND_US)
 #define WAITING_FOR_COOLER_POWER_ON_TIMEOUT_US  (30 * TIME_ONE_SECOND_US)
 #define WAITING_FOR_SENSOR_TEMP_TIMEOUT_US      (10 * TIME_ONE_MINUTE_US)
+#define WAITING_FOR_FPA_INIT_TIMEOUT_US         (44 * TIME_ONE_SECOND_US) // 32 + 7 images @ 0.9Hz
 #define WAITING_FOR_GLOBAL_DONE_TIMEOUT_US      (30 * TIME_ONE_SECOND_US)
 #define WAITING_FOR_COOLER_POWER_OFF_TIMEOUT_US (30 * TIME_ONE_SECOND_US)
 
@@ -87,6 +88,8 @@ enum acquisitionStateEnum {
    ACQ_WAITING_FOR_COOLER_POWER_ON,    /**< Waiting for cooler to be powered on */
    ACQ_WAITING_FOR_SENSOR_TEMP,        /**< Waiting for sensor temperature to be available */
    ACQ_WAITING_FOR_SENSOR_COOLDOWN,    /**< Waiting for sensor cooldown */
+   ACQ_WAITING_FOR_FPA_INIT,           /**< Waiting for FPA initialization to be done */
+   ACQ_FINALIZE_POWER_ON,              /**< Finalize power on */
 
    // Power OFF states
    ACQ_WAITING_FOR_GLOBAL_DONE,        /**< Waiting for global done signal */
