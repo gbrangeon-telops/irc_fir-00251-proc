@@ -103,6 +103,9 @@
 #define ISC0209_DET_BIAS_VOLTAGE_MIN_mV   100           // voltage minimale de 100 mV pour detBias (selon rapport Qmagiq)
 #define ISC0209_DET_BIAS_VOLTAGE_MAX_mV   518           // voltage maximale de 518 mV pour detBias (on ne peut atteindre les 700 mV du rapport Q magiq en mode commande)
 
+#define ISC0209_REFOFS_VOLTAGE_MIN_mV     3000           // valeur en provenance du fichier fpa_define
+#define ISC0209_REFOFS_VOLTAGE_MAX_mV     6200           // valeur en provenance du fichier fpa_define
+
 // structure interne pour les parametres du isc0209
 struct isc0209_param_s             //
 {					   
@@ -199,6 +202,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     isc0209_param_t hh;
     extern int16_t gFpaDetectorPolarizationVoltage;
     static int16_t actualPolarizationVoltage = 150;
+    //extern float gFpaDetectorElectricalTapsRef;
+    extern float gFpaDetectorElectricalRefOffset;
+    //static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+    static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+
 
    // on bâtit les parametres specifiques du isc0209
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
@@ -306,8 +314,22 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vdac_value[4]                     = 3711;           // DAC5 -> Voutref à 1.6V
    ptrA->vdac_value[5]                     = 3711;           // DAC6 -> VOS à 1.6V 
    ptrA->vdac_value[6]                     = 0;              // DAC7 -> non utilisé, à 501 mV
-   ptrA->vdac_value[7]                     = 5300;           // DAC8 -> à 3.779V
-
+   //ptrA->vdac_value[7]                     = 5300;           // DAC8 -> à 3.779V
+   
+   // offset of the tap_reference (VCC8)      
+   if (gFpaDetectorElectricalRefOffset != actualElectricalRefOffset)
+   {
+      if ((gFpaDetectorElectricalRefOffset >= (float)ISC0209_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)ISC0209_REFOFS_VOLTAGE_MAX_mV))
+         ptrA->vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 8);  // 
+	}                                                                                                       
+   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[7], 8);            
+   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;    
+    
+   // pour securiser les livraisons d'avant l'entrée en vigueur des offsets dans les flash settings 
+   if (pGCRegs->DeviceSerialNumber == 4302)                  // pour IRC1505 
+      ptrA->vdac_value[7]                   = 5300;          // DAC8 -> à 3.779V
+   
+   
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 0;              // on dephase l'horloge des ADC
      
