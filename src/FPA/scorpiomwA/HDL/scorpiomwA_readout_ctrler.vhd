@@ -41,7 +41,7 @@ end scorpiomwA_readout_ctrler;
 
 architecture rtl of scorpiomwA_readout_ctrler is
    
-   constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR - 2; -- -2 donne une incertitude de 1.5 MCL sur le début réel de l'integration
+   constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR; --  donne une incertitude de 1.5 MCL sur le début réel de l'integration
    
    type active_int_fsm_type is (idle, active_int_st, wait_int_end_st, wait_mclk_st1, wait_mclk_st2);
    type sync_flag_fsm_type is (idle, sync_flag_on_st, sync_flag_off_st, wait_img_begin_st, wait_img_end_st);
@@ -87,7 +87,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    signal fpa_data_valid_i     : std_logic;
    signal fpa_data_valid_last  : std_logic;
-   signal fpa_int_i            : std_logic;
+   --signal fpa_int_i            : std_logic;
    signal fpa_active_int_i     : std_logic;
    signal fpa_mclk_rising_edge : std_logic;
    signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR;
@@ -148,7 +148,7 @@ begin
             --fpa_pclk_last <= '0';
             --pclk_rise <= '0'; 
             --pclk_fall <= '0';
-            fpa_int_last <= '0';
+            --fpa_int_last <= '0';
             
          else           
             
