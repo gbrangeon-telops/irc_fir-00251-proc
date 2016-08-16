@@ -57,7 +57,10 @@ entity scorpiomwA_digio_map is
       FPA_DIGIO9     : out std_logic;
       FPA_DIGIO10    : out std_logic;
       FPA_DIGIO11    : in std_logic;
-      FPA_DIGIO12    : in std_logic
+      FPA_DIGIO12    : in std_logic;
+      
+      FPA_DVALID_ERR : out std_logic
+      
       );
 end scorpiomwA_digio_map;
 
@@ -87,8 +90,10 @@ architecture rtl of scorpiomwA_digio_map is
    type fpa_digio_fsm_type   is (idle, wait_mclk_st, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, passthru_st, fpa_pwred_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    type serclr_fsm_type is (idle, wait_spi_csn_st, signal_length_st); 
+   type dval_en_fsm_type is (idle, dval_en_st);
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
+   signal dval_en_fsm      : dval_en_fsm_type;
    signal serclr_fsm       : serclr_fsm_type;
    signal sreset           : std_logic;
    signal dac_timer_cnt    : natural;
@@ -133,6 +138,12 @@ architecture rtl of scorpiomwA_digio_map is
    
    signal mclk_reg         : std_logic;
    signal mclk_pipe        : std_logic_vector(7 downto 0);
+   signal dval_en          : std_logic;
+   
+   signal dval_length_cnt     : unsigned(26 downto 0);
+   signal int_last            : std_logic;
+   signal data_valid_iob_last : std_logic;
+   signal fpa_dvalid_err_i    : std_logic;
    
    attribute IOB           : string;
    attribute keep    : string;
@@ -148,17 +159,17 @@ architecture rtl of scorpiomwA_digio_map is
    attribute IOB of dac_sclk_iob       : signal is "TRUE";
    attribute IOB of serclr_iob         : signal is "TRUE";
    
-   attribute keep of fpa_on_i      : signal is "TRUE";
-   attribute keep of prog_data_i   : signal is "TRUE";
-   attribute keep of sizea_sizeb_i : signal is "TRUE";
-   attribute keep of int_i         : signal is "TRUE";
-   attribute keep of mclk_i        : signal is "TRUE";
-   attribute keep of dac_csn_i     : signal is "TRUE";
-   attribute keep of dac_sd_i      : signal is "TRUE";
-   attribute keep of dac_sclk_i    : signal is "TRUE";
-   attribute keep of error_i       : signal is "TRUE";
-   attribute keep of data_valid_i  : signal is "TRUE";
-   attribute keep of serclr_i      : signal is "TRUE";
+   --attribute keep of fpa_on_i      : signal is "TRUE";
+--   attribute keep of prog_data_i   : signal is "TRUE";
+--   attribute keep of sizea_sizeb_i : signal is "TRUE";
+--   attribute keep of int_i         : signal is "TRUE";
+--   attribute keep of mclk_i        : signal is "TRUE";
+--   attribute keep of dac_csn_i     : signal is "TRUE";
+--   attribute keep of dac_sd_i      : signal is "TRUE";
+--   attribute keep of dac_sclk_i    : signal is "TRUE";
+--   attribute keep of error_i       : signal is "TRUE";
+--   attribute keep of data_valid_i  : signal is "TRUE";
+--   attribute keep of serclr_i      : signal is "TRUE";
    
 begin   
    
@@ -182,6 +193,7 @@ begin
    
    FPA_ERROR <= error_i;
    FPA_DATA_VALID <= data_valid_i;
+   FPA_DVALID_ERR <= fpa_dvalid_err_i;
    
    -- dac_digio
    FPA_DIGIO8  <= dac_sclk_iob;
@@ -351,6 +363,62 @@ begin
    
    
    --------------------------------------------------------- 
+   -- validation de data_valid                             
+   ---------------------------------------------------------
+   -- data_valid doit être défini ssi il y a eu integration vers le détecteur
+   Udv: process(MCLK_SOURCE)
+   begin
+      if rising_edge(MCLK_SOURCE) then
+         if fsm_sreset = '1' then        -- fsm_sreset vaut '1' si sreset ou détecteur non allumé.
+            dval_en_fsm <= idle; 
+            dval_en <= '0';
+            int_last <= '0';
+            data_valid_iob_last <= '0';
+            fpa_dvalid_err_i <= '0';
+            dval_length_cnt <= (others => '0');
+            
+         else
+            
+            int_last <= int_i;
+            data_valid_iob_last <= data_valid_iob;
+            
+            -- cas où aucune image n'est renvoyée suite à une integration
+            if dval_en = '1' then 
+               dval_length_cnt <= dval_length_cnt + 1;               
+            else
+               dval_length_cnt <= (others => '0');
+            end if;            
+            if dval_length_cnt =  72_000_000 then  -- à notre frequence de FPA_MCLK, aucune image ne dure 1sec. Si cela arrivaitr. Alors c'est une erreur qui aura des conséquences graves
+               fpa_dvalid_err_i <= '1';
+            end if;             
+            
+            -- dval_en generation
+            case dval_en_fsm is          
+               
+               -- idle
+               when idle =>
+                  dval_en <= '0';
+                  if int_last = '1' and int_i = '0' then 
+                     dval_en_fsm <= dval_en_st;
+                  end if;
+                  
+               -- data_valid a un sens si integration effectuée
+               when dval_en_st =>
+                  dval_en <= '1'; 
+                  if data_valid_iob_last = '1' and data_valid_iob = '0' then   -- ainsi, si dval_en reste indéfiniment à '1', cela signifie qu'une image n'a pas été renvoyée par le détecteur, suite à une intégration. C'est grave!
+                     dval_en_fsm <= idle;
+                  end if;
+               
+               when others =>
+               
+            end case;           
+            
+         end if;  
+      end if;
+   end process; 
+   
+   
+   --------------------------------------------------------- 
    -- fsm fpa digio                                 
    ---------------------------------------------------------
    U12B: process(MCLK_SOURCE)
@@ -438,7 +506,7 @@ begin
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
                   error_i <= error_iob; -- error_filt;
-                  data_valid_i <= data_valid_iob; --data_valid_filt;              
+                  data_valid_i <= data_valid_iob and dval_en; --data_valid_filt;              
                   -- pragma translate_off
                   data_valid_i <= data_valid_iob;
                   -- pragma translate_on                 

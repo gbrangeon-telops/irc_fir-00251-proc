@@ -39,6 +39,8 @@
 // Mode d'operation choisi pour le contrôleur de trig 
 #define MODE_READOUT_END_TO_TRIG_START    0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
 #define MODE_INT_END_TO_TRIG_START        0x02      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du IWR et ITR
+ 
+#define FPA_XTRA_TRIG_FREQ_MAX_HZ         50        // en extra trig, rouler à au max 50 fps afin que meme en changemet de fenetre, le delai tri soit toujours respecté pour le détecteur 
 
 // Gains  
 #define FPA_GAIN_0                        0x00      // lowest gain
@@ -242,10 +244,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_acq_trig_period_min   = (uint32_t)(0.8F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
-   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min;                          // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
-
+   ptrA->fpa_acq_trig_period_min   = (uint32_t)(0.5F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
+   ptrA->fpa_xtra_trig_period_min  = ptrA->fpa_acq_trig_period_min;
+   
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
    ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
