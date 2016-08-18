@@ -1876,7 +1876,7 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
       return IRC_FAILURE;
    }
 
-   DT_PRINTF("ADC: m = " _PCF(6) ", b = %d\n", _FFMT(flashSettings.ADCReadout_m, 6), flashSettings.ADCReadout_b);
+   DT_PRINTF("ADC: enabled = %d, m = " _PCF(6) ", b = %d\n", flashSettings.ADCReadoutEnabled, _FFMT(flashSettings.ADCReadout_m, 6), flashSettings.ADCReadout_b);
 
    return IRC_SUCCESS;
 }
@@ -1926,6 +1926,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Device key:         KEY [RENEW]");
    DT_PRINTF("  Get Stack Level:    STACK");
    DT_PRINTF("  Set GCP state:      GCP [0|1]");
+   DT_PRINTF("  ADC calibration:    ADC [m b]");
    DT_PRINTF("  Print help:         HLP");
 
    return IRC_SUCCESS;

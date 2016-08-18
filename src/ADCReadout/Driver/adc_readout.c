@@ -51,6 +51,9 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    AXI4L_write32(1, ADC_BASE_ADDR + ADC_CFG_VALID);
 
    /*
+   PRINTF("ADC_READOUT: enabled = %d\n", adcReadoutEnabled);
+   PRINTF("ADC_READOUT: m (float) = " _PCF(3) "\n", _FFMT(fs->ADCReadout_m, 3));
+   PRINTF("ADC_READOUT: b (int16) = %d\n", fs->ADCReadout_b);
    PRINTF("ADC_READOUT: r (float) = " _PCF(5) "\n", _FFMT(r, 5));
    PRINTF("ADC_READOUT: q (float) = " _PCF(3) "\n", _FFMT(q, 3));
    PRINTF("ADC_READOUT: r (fixed point) = %d\n", ri);
