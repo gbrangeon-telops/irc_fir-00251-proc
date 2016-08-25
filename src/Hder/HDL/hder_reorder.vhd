@@ -153,17 +153,21 @@ begin
             --Carte Matrox(les entitées à largeur de 1 byte doivent etre inversés)
             case ram_wea_buf is            
                when "1000" => 
-                  ram_dina(23 downto 16) <= ram_dina_buf(31 downto 24);
-               ram_wea <= "0100";            
+                    ram_dina(23 downto 16) <= ram_dina_buf(31 downto 24);
+                    ram_wea <= "0100";            
                when "0100" =>
-                  ram_dina(31 downto 24) <= ram_dina_buf(23 downto 16);
-               ram_wea <= "1000";           
+                    ram_dina(31 downto 24) <= ram_dina_buf(23 downto 16);
+                    ram_wea <= "1000";           
                when "0010" =>
-                  ram_dina(7 downto 0) <= ram_dina_buf(15 downto 8);
-               ram_wea <= "0001";           
+                    ram_dina(7 downto 0) <= ram_dina_buf(15 downto 8);
+                    ram_wea <= "0001";           
                when "0001" =>
-                  ram_dina(15 downto 8) <= ram_dina_buf(7 downto 0);
-               ram_wea <= "0010";           
+                    ram_dina(15 downto 8) <= ram_dina_buf(7 downto 0);
+                    ram_wea <= "0010";
+               when "0110" =>
+                    ram_dina(31 downto 24) <= ram_dina_buf(15 downto 8);
+                    ram_dina(7 downto 0) <= ram_dina_buf(23 downto 16);
+                    ram_wea <= "1001";
                when others =>            
             end case;
             
