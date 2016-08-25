@@ -847,7 +847,7 @@ void Calibration_SM()
          }
          break;
 
-      case CMS_QUANTIZE_AND_UPDATE_DATA: // etat temporaire pour debug
+      case CMS_QUANTIZE_AND_UPDATE_DATA:
          {
             IRC_Status_t bq_status = BetaQuantizer_SM(blockIndex);
 
@@ -859,7 +859,7 @@ void Calibration_SM()
          }
          break;
 
-      case CMS_UPDATE_PIXEL_DATA:
+      case CMS_UPDATE_PIXEL_DATA: // cet etat sera obsolete quand live beta quantization activée
          {
             const uint32_t numberOfDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
             uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));

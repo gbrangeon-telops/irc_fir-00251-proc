@@ -1616,7 +1616,7 @@ IRC_Status_t BadPixelDetection_SM()
             FPGA_PRINTF( "ACT: Frame rate : " _PCF(2) " Hz\n", _FFMT(frameRate, 2));
             FPGA_PRINTF( "ACT: Using %d frames for AEC transient\n", numFramesToSkip);
          }
-         
+
          gcRegsData.CalibrationMode = CM_NUC;
 
          gcRegsData.SensorWellDepth = refBlockFileHdr.SensorWellDepth;
@@ -3300,6 +3300,7 @@ void ACT_resetDebugOptions()
    gActDebugOptions.mode = 0;
    gActDebugOptions.forceDiscardOffset = false;
    gActDebugOptions.verbose = 0;
+#warning mettre cette option à true par défaut
    gActDebugOptions.liveBetaQuantization = false;
 }
 
@@ -3362,6 +3363,7 @@ void ACT_parseDebugMode()
       gActDebugOptions.forceDiscardOffset = false;
    }
 
+#warning inverser ces deux lignes quand sera true par défaut. Le mode devrait alors etre renommé ACT_MODE_DISABLE_LIVE_BETA_QUANTIZATION...
    if (BitMaskTst(gActDebugOptions.mode, ACT_MODE_LIVE_BETA_QUANTIZATION))
       gActDebugOptions.liveBetaQuantization = true;
    else
