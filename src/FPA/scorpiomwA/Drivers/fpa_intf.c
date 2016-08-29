@@ -157,16 +157,26 @@ uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccP
 
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 
+
+// configuration à l'allumage du détecteur
+gcRegistersData_t InitGCRegs;
+
+
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {   
+   InitGCRegs.TestImageSelector = 0;
+   InitGCRegs.OffsetX = 0;
+   InitGCRegs.OffsetY = 0;
+   InitGCRegs.Width   = 640;  
+   InitGCRegs.Height  = 512;
    FPA_Reset(ptrA);
-   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
+   FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour. placé en dernier lieu afin que la config d'initialisation soit latchée avant allumage du détecteur
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
 }
  
@@ -207,9 +217,11 @@ void  FPA_PowerDown(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------                                                                            
 // pour configuer le bloc vhd FPA_interface et le lancer
 //--------------------------------------------------------------------------
-void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
+void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pUserGCRegs)
 { 
    scorpiomw_param_t hh;
+   gcRegistersData_t localGCRegs; 
+   
    uint32_t Cmin, Cmax, Rmin, Rmax;
    extern int16_t gFpaDetectorPolarizationVoltage;
    static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
@@ -217,23 +229,31 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalRefOffset;
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   t_FpaStatus  Stat;
 
-
+   // ont lit les statuts
+   FPA_GetStatus(&Stat, ptrA);
+   
+   localGCRegs = *pUserGCRegs;
+   
+   if ((Stat.prog_init_done == 0) && (pUserGCRegs->TestImageSelector == 0))  // en mode détecteur, on s'assure que la configuration d'initialisation passe avant le reste
+      localGCRegs = InitGCRegs;  
+   
    // on bâtit les parametres specifiques du scorpiomw
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
+   FPA_SpecificParams(&hh, 0.0F, &localGCRegs);               //
    
    // diag mode and diagType
    ptrA->fpa_diag_mode = 0;                 // par defaut
    ptrA->fpa_diag_type = 0;                 // par defaut   
-   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade) {              // mode diagnostique degradé lineaire
+   if (localGCRegs.TestImageSelector == TIS_TelopsStaticShade) {              // mode diagnostique degradé lineaire
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR;
    }
-   else if (pGCRegs->TestImageSelector == TIS_TelopsConstantValue1) {      // mode diagnostique avec valeur constante
+   else if (localGCRegs.TestImageSelector == TIS_TelopsConstantValue1) {      // mode diagnostique avec valeur constante
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_CNST;
    }
-   else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade) {
+   else if (localGCRegs.TestImageSelector == TIS_TelopsDynamicShade) {
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
    }
@@ -249,20 +269,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_xtra_trig_period_min  = ptrA->fpa_acq_trig_period_min;
    
    // fenetrage
-   ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
-   ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
-   ptrA->xsize     = (uint32_t)pGCRegs->Width;
-   ptrA->ysize     = (uint32_t)pGCRegs->Height;
+   ptrA->xstart    = (uint32_t)localGCRegs.OffsetX;
+   ptrA->ystart    = (uint32_t)localGCRegs.OffsetY;
+   ptrA->xsize     = (uint32_t)localGCRegs.Width;
+   ptrA->ysize     = (uint32_t)localGCRegs.Height;
    
    // direction de lecture
    ptrA->uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
    
    
    // calculé specialement pour le ScorpioMW
-   Cmin  = (uint32_t)pGCRegs->OffsetX/4;
-   Cmax  = (uint32_t)pGCRegs->OffsetX/4 + (uint32_t)pGCRegs->Width/4 - 1;
-   Rmin  = (uint32_t)pGCRegs->OffsetY;
-   Rmax  = (uint32_t)pGCRegs->OffsetY + (uint32_t)pGCRegs->Height - 1;
+   Cmin  = (uint32_t)localGCRegs.OffsetX/4;
+   Cmax  = (uint32_t)localGCRegs.OffsetX/4 + (uint32_t)localGCRegs.Width/4 - 1;
+   Rmin  = (uint32_t)localGCRegs.OffsetY;
+   Rmax  = (uint32_t)localGCRegs.OffsetY + (uint32_t)localGCRegs.Height - 1;
     
    // config détecteur 
    if (ptrA->uprow_upcol == 1){   
@@ -279,7 +299,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    //  windowing
-   ptrA->sizea_sizeb = 1;     // 0 --> toujours en mode windowing
+   ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
+   if (Stat.prog_init_done == 1)
+      ptrA->sizea_sizeb = 0;      // 0 --> toujours en mode windowing
      
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 
@@ -476,7 +498,8 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 { 
    uint32_t temp_32b;
-
+   uint32_t temp_init_done;
+   
    Stat->adc_oper_freq_max_khz   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x00);    
    Stat->adc_analog_channel_num  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x04);   
    Stat->adc_resolution          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x08);   
@@ -506,8 +529,11 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_serdes_edges[1]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x74);
    Stat->fpa_serdes_edges[2]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x78);
    Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
-   Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
+   temp_init_done                      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
+   
+   Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
+   Stat->fpa_init_done                 = temp_init_done & Stat->prog_init_done;     // pour le scorpiomwA, la programmation de la configuration d'initialisation est un prérequis avant de faire quoi que ce soit.
    
    // verification des statuts en simulation
    #ifdef SIM

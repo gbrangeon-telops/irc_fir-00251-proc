@@ -120,7 +120,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  diag_tir;
    uint32_t  xsize_div_tapnum;
    uint32_t  readout_plus_delay;
-   uint32_t   tri_window_and_intmode_part;  // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR....
+   uint32_t  tri_window_and_intmode_part;  // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR....
    uint32_t  int_time_offset;
    uint32_t  tsh_min;
    uint32_t  tsh_min_minus_int_time_offset;
