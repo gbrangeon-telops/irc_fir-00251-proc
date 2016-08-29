@@ -453,7 +453,7 @@ begin
                -- delai du monostable sur le fleg
                when ldo_pwr_pause_st =>
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
-                  if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
+                  if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR/2 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
                      fpa_digio_fsm <= rst_cnt_st;
                   end if; 
                   -- pragma translate_off
