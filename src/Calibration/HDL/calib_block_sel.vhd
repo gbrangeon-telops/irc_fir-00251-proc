@@ -109,7 +109,7 @@ begin
                when STANDBY =>
                   cal_block_index_max_i <= CAL_BLOCK_INDEX_MAX;
                   calib_block_sel_mode_i <= CALIB_BLOCK_SEL_MODE;
-                  frame_id_i <= std_logic_vector(resize(FPA_IMG_INFO.frame_id, frame_id_i'length));
+                  frame_id_i <= std_logic_vector(FPA_IMG_INFO.frame_id(7 downto 0));
                   exposure_time <= std_logic_vector(resize(FPA_IMG_INFO.exp_info.exp_time, exposure_time'length));
                   fw_position_i <= resize(FPA_IMG_INFO.exp_info.exp_indx, fw_position_i'length);
                   ndf_position_i <= resize(NDF_POSITION, ndf_position_i'length);

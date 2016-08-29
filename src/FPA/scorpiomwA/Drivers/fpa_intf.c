@@ -279,7 +279,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    //  windowing
-   ptrA->sizea_sizeb = 0;     // 0 --> toujours en mode windowing
+   ptrA->sizea_sizeb = 1;     // 0 --> toujours en mode windowing
      
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 

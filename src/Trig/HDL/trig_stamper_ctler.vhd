@@ -109,13 +109,13 @@ begin
    PPS_SYNC <=  pps_sync_i;
    exposure_feedbk <= FPA_IMG_INFO.EXP_FEEDBK;
    hder_link_rdy <= HDER_MISO.WREADY and HDER_MISO.AWREADY;
-    
+   
    -- Detect various rising edges   
-   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => CLK_10M, re => clk_10M_re);      
-   E2 : gh_edge_det port map(clk => CLK, rst => sreset, D => MB_OVERWRITE, re => mb_overwrite_re);   
-   E3 : gh_edge_det port map(clk => CLK, rst => sreset, D => exposure_feedbk, re => exposure_feedbk_re);
-   E4 : gh_edge_det port map(clk => CLK, rst => sreset, D => PPS_sync_i, re => pps_re); 
-   E5 : gh_edge_det port map(clk => CLK, rst => sreset, D => START_PPS_PERMIT_WINDW, re => start_pps_permit_windw_re); 
+   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => CLK_10M, sre => clk_10M_re, re => open, fe => open, sfe => open);      
+   E2 : gh_edge_det port map(clk => CLK, rst => sreset, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
+   E3 : gh_edge_det port map(clk => CLK, rst => sreset, D => exposure_feedbk, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
+   E4 : gh_edge_det port map(clk => CLK, rst => sreset, D => PPS_sync_i, sre => pps_re, re => open, fe => open, sfe => open); 
+   E5 : gh_edge_det port map(clk => CLK, rst => sreset, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
    
    -----------------------------------------------------
    -- Synchronisation reset
@@ -281,6 +281,9 @@ begin
                         fast_hder_sm <= idle;
                      end if;
                      hcnt <= hcnt + 1;
+                  else
+                     hder_mosi_i.awvalid <= '0';
+                     hder_mosi_i.wvalid <= '0';
                   end if;
                
                when others =>

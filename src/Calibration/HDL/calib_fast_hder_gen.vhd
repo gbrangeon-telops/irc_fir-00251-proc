@@ -30,7 +30,7 @@ entity calib_fast_hder_gen is
       -- envoi de la partie du Header
       HDER_MOSI           : out t_axi4_lite_mosi;
       HDER_MISO           : in t_axi4_lite_miso  
-   );
+      );
 end calib_fast_hder_gen;
 
 
@@ -140,7 +140,7 @@ begin
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_info_i.cal_block_posix), 32), CalibrationBlockPOSIXTimeShift));
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= CalibrationBlockPOSIXTimeBWE;
-                     
+                        
                      elsif hcnt = 7 then -- block_act_posix
                         hder_mosi_i.awaddr <= x"FFFF" & frame_id_i & std_logic_vector(resize(ImageCorrectionPOSIXTimeAdd32, 8));
                         hder_mosi_i.awvalid <= '1';
@@ -150,6 +150,9 @@ begin
                         fast_hder_sm <= idle;
                      end if;
                      hcnt <= hcnt + 1;
+                  else
+                     hder_mosi_i.awvalid <= '0';
+                     hder_mosi_i.wvalid <= '0';                     
                   end if;
                
                when others =>

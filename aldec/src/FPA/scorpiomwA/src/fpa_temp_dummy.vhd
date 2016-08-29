@@ -24,7 +24,7 @@ end fpa_temp_dummy;
 
 architecture rtl of fpa_temp_dummy is
 
-constant FPA_TEMPERATURE_V        : real := 1040.0;  
+constant FPA_TEMPERATURE_V        : real := 1030.0;  
 constant BRD_GAIN                 : real := 1.0;
 constant ADC_RANGE_V              : real := 2048.0;
 constant ADC_RESOLUTION           : integer := 15; 

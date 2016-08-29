@@ -27,6 +27,10 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_18MHz_mmcm\scorpiomwA_18MHz_mmcm_funcsim.vhdl
@@ -122,6 +126,12 @@ asim -ses scorpiomwA_intf_testbench_TB
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U21/U6/*
 
-wave UUT/U1/U8/*
+--wave UUT/U1/U9/U1/*
+--wave UUT/U1/U9/U22/* 
+--wave UUT/U1/U9/U7/*
+--wave UUT/U1/U9/U2/U1/* 
+--wave UUT/U1/U9/U18/*
+wave UUT/U1/*
+--wave UUT/U1/U5/U5/*
 
-run 20.0 ms
+run 22 ms
