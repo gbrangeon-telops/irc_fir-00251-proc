@@ -182,26 +182,26 @@ begin
 
    -- enter your statements here --
    U0A : sync_resetn port map(ARESETN => ARESETN, SRESETN => sresetn, CLK => CLK_CTRL);   
-   U1B : double_sync_vector port map(D => LOWERCUMSUM, Q => h_lowercumsum_i ,  CLK => CLK_CTRL);   
-   U1C : double_sync_vector port map(D => UPPERCUMSUM, Q => h_uppercumsum_i,   CLK => CLK_CTRL);
-   U1D : double_sync_vector port map(D => LOWERBINID,  Q => h_lowerbin_id_i ,  CLK => CLK_CTRL);
-   U1N : double_sync_vector port map(D => IMAGE_FRACTION_FBCK, Q => h_imagefraction_fbck_i ,  CLK => CLK_CTRL);
-   U1E : double_sync_vector port map(D => H_TIMESTAMP,   Q => h_timestamp_i,  CLK => CLK_CTRL); 
-   U1F : double_sync_vector port map(D => H_EXPTIME,     Q => h_exptime_i ,   CLK => CLK_CTRL);
-   U1L : double_sync_vector port map(D => H_NB_PIXEL,     Q => h_img_nb_pix_i ,   CLK => CLK_CTRL);
-   U1M : double_sync_vector port map(D => CUMSUM_ERROR,   Q => cumsum_error_i ,   CLK => CLK_CTRL);
-   U1P : double_sync_vector port map(D => H_FWPOSITION,   Q => h_fwposition_i ,   CLK => CLK_CTRL);
+   h_lowercumsum_i <= LOWERCUMSUM;                                -- U1B : double_sync_vector port map(D => LOWERCUMSUM, Q => h_lowercumsum_i ,  CLK => CLK_CTRL);   
+   h_uppercumsum_i <= UPPERCUMSUM;                                -- U1C : double_sync_vector port map(D => UPPERCUMSUM, Q => h_uppercumsum_i,   CLK => CLK_CTRL);
+   h_lowerbin_id_i <= LOWERBINID;                                 -- U1D : double_sync_vector port map(D => LOWERBINID,  Q => h_lowerbin_id_i ,  CLK => CLK_CTRL);
+   h_imagefraction_fbck_i <= IMAGE_FRACTION_FBCK;                 -- U1N : double_sync_vector port map(D => IMAGE_FRACTION_FBCK, Q => h_imagefraction_fbck_i ,  CLK => CLK_CTRL);
+   h_timestamp_i <= H_TIMESTAMP;                                  -- U1E : double_sync_vector port map(D => H_TIMESTAMP,   Q => h_timestamp_i,  CLK => CLK_CTRL); 
+   h_exptime_i <= H_EXPTIME;                                      -- U1F : double_sync_vector port map(D => H_EXPTIME,     Q => h_exptime_i ,   CLK => CLK_CTRL);
+   h_img_nb_pix_i <= H_NB_PIXEL;                                  -- U1L : double_sync_vector port map(D => H_NB_PIXEL,     Q => h_img_nb_pix_i ,   CLK => CLK_CTRL);
+   cumsum_error_i <= CUMSUM_ERROR;                                -- U1M : double_sync_vector port map(D => CUMSUM_ERROR,   Q => cumsum_error_i ,   CLK => CLK_CTRL);
+   h_fwposition_i <= H_FWPOSITION;                                -- U1P : double_sync_vector port map(D => H_FWPOSITION,   Q => h_fwposition_i ,   CLK => CLK_CTRL);
    
-   U1G : double_sync_vector port map(D => ImageFraction_o,  Q => IMAGE_FRACTION, CLK => CLK_DATA);
-   U1H : double_sync_vector port map(D => msb_pos_o,        Q => MSB_POS,        CLK => CLK_DATA); 
-   U1I : double_sync_vector port map(D => nb_bin_o,         Q => NB_BIN ,        CLK => CLK_DATA);
-   U1J : double_sync port map(D => clear_mem_o,   Q => CLEAR_MEM , RESET => sreset,  CLK => CLK_DATA);
-   U1K : double_sync_vector port map(D => aec_mode_o,   Q => AEC_MODE ,  CLK => CLK_DATA); 
+   IMAGE_FRACTION <= ImageFraction_o;                             -- U1G : double_sync_vector port map(D => ImageFraction_o,  Q => IMAGE_FRACTION, CLK => CLK_DATA);
+   MSB_POS <= msb_pos_o;                                          -- U1H : double_sync_vector port map(D => msb_pos_o,        Q => MSB_POS,        CLK => CLK_DATA); 
+   NB_BIN <= nb_bin_o;                                            -- U1I : double_sync_vector port map(D => nb_bin_o,         Q => NB_BIN ,        CLK => CLK_DATA);
+   CLEAR_MEM <= clear_mem_o;                                      -- U1J : double_sync port map(D => clear_mem_o,   Q => CLEAR_MEM , RESET => sreset,  CLK => CLK_DATA);
+   AEC_MODE <= aec_mode_o;                                        -- U1K : double_sync_vector port map(D => aec_mode_o,   Q => AEC_MODE ,  CLK => CLK_DATA); 
  
-   U1Q : double_sync_vector port map(D => EXP_TIME_AECPLUS,   Q => exptime_aecplus_i,  CLK => CLK_DATA); 
-   U1R : double_sync_vector port map(D => SUM_CNT_AECPLUS,   Q => sumcnt_aecplus_i,  CLK => CLK_DATA); 
-   U1S : double_sync_vector port map(D => NB_PIXELS_AECPLUS,   Q => nbpixels_aecplus_i,  CLK => CLK_DATA); 
-   U1T : double_sync port map(D => DATA_VALID_AECPLUS,   Q => aecplus_dval_i, RESET => sreset, CLK => CLK_DATA); 
+   exptime_aecplus_i <= EXP_TIME_AECPLUS;                         -- U1Q : double_sync_vector port map(D => EXP_TIME_AECPLUS,   Q => exptime_aecplus_i,  CLK => CLK_DATA); 
+   sumcnt_aecplus_i <= SUM_CNT_AECPLUS;                           -- U1R : double_sync_vector port map(D => SUM_CNT_AECPLUS,   Q => sumcnt_aecplus_i,  CLK => CLK_DATA); 
+   nbpixels_aecplus_i <= NB_PIXELS_AECPLUS;                       -- U1S : double_sync_vector port map(D => NB_PIXELS_AECPLUS,   Q => nbpixels_aecplus_i,  CLK => CLK_DATA); 
+   aecplus_dval_i <= DATA_VALID_AECPLUS;                          -- U1T : double_sync port map(D => DATA_VALID_AECPLUS,   Q => aecplus_dval_i, RESET => sreset, CLK => CLK_DATA); 
 
    -- I/O Connections assignments
    AXI4_LITE_MISO.AWREADY  <= axi_awready;

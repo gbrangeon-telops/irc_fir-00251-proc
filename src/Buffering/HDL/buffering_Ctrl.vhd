@@ -263,31 +263,31 @@ begin
     U0A : sync_resetn port map(ARESETN => ARESETN, SRESETN => sresetn, CLK => CLK_CTRL);
     
     -- Input ctrl double Sync
-    U1A : double_sync_vector port map(D => nb_seq_in_mem_b, Q => nb_seq_in_mem_i ,  CLK => CLK_CTRL);
-    U1B : double_sync_vector port map(D => FSM_ERROR(3 downto 0), Q => fsm_wr_err_i ,  CLK => CLK_CTRL);   
-    U1C : double_sync_vector port map(D => FSM_ERROR(7 downto 4), Q => fsm_rd_err_i,   CLK => CLK_CTRL);
+    nb_seq_in_mem_i <= nb_seq_in_mem_b;     -- U1A : double_sync_vector port map(D => nb_seq_in_mem_b, Q => nb_seq_in_mem_i ,  CLK => CLK_CTRL);
+    fsm_wr_err_i <= FSM_ERROR(3 downto 0);  -- U1B : double_sync_vector port map(D => FSM_ERROR(3 downto 0), Q => fsm_wr_err_i ,  CLK => CLK_CTRL);   
+    fsm_rd_err_i <= FSM_ERROR(7 downto 4);  -- U1C : double_sync_vector port map(D => FSM_ERROR(7 downto 4), Q => fsm_rd_err_i,   CLK => CLK_CTRL);
     
     -- Output ctrl double Sync
-    U2A : double_sync_vector port map(D => memorybaseaddr_o,Q => MEMORY_BASE_ADDR,  CLK => CLK_DATA);
-    U2B : double_sync_vector port map(D => nb_seq_max_o,    Q => nb_seq_max_b,      CLK => CLK_DATA); 
-    U2C : double_sync_vector port map(D => seq_img_total_o, Q => seq_img_total_b ,  CLK => CLK_DATA);
-    U2D : double_sync_vector port map(D => framesize_o,     Q => framesize_b ,      CLK => CLK_DATA);
-    U2E : double_sync_vector port map(D => bufferswitch_o(3 downto 0),  Q => BUFFER_SWITCH ,    CLK => CLK_DATA); 
-    U2F : double_sync_vector port map(D => nb_img_pre_o,    Q => nb_img_pre_b,      CLK => CLK_DATA);
-    U2G : double_sync_vector port map(D => nb_img_post_o,   Q => nb_img_post_b,     CLK => CLK_DATA); 
-    U2H : double_sync_vector port map(D => rd_seq_id_o,     Q => rd_seq_id_b ,        CLK => CLK_DATA);
-    U2I : double_sync_vector port map(D => rd_start_id_o,     Q => rd_start_id_b ,        CLK => CLK_DATA);
-    U2J : double_sync_vector port map(D => buffermode_o,  Q => buffermode_b ,    CLK => CLK_DATA);
-    U2K : double_sync_vector port map(D => moi_mode_o,  Q => moi_mode_b ,    CLK => CLK_DATA);
-    U2L : double_sync_vector port map(D => ext_edge_o,  Q => ext_edge_b ,    CLK => CLK_DATA);
-    U2M : double_sync_vector port map(D => rd_stop_id_o,     Q => rd_stop_id_b ,        CLK => CLK_DATA);
-    U2N : double_sync_vector port map(D => hdr_bytessize_o,     Q => hdr_bytessize_b ,      CLK => CLK_DATA);
-    U2O : double_sync_vector port map(D => img_bytessize_o,     Q => img_bytessize_b ,      CLK => CLK_DATA);
+    MEMORY_BASE_ADDR <= memorybaseaddr_o;          -- U2A : double_sync_vector port map(D => memorybaseaddr_o,Q => MEMORY_BASE_ADDR,  CLK => CLK_DATA);
+    nb_seq_max_b <= nb_seq_max_o;                  -- U2B : double_sync_vector port map(D => nb_seq_max_o,    Q => nb_seq_max_b,      CLK => CLK_DATA); 
+    seq_img_total_b <= seq_img_total_o;            -- U2C : double_sync_vector port map(D => seq_img_total_o, Q => seq_img_total_b ,  CLK => CLK_DATA);
+    framesize_b <= framesize_o;                    -- U2D : double_sync_vector port map(D => framesize_o,     Q => framesize_b ,      CLK => CLK_DATA);
+    BUFFER_SWITCH <= bufferswitch_o(3 downto 0);   -- U2E : double_sync_vector port map(D => bufferswitch_o(3 downto 0),  Q => BUFFER_SWITCH ,    CLK => CLK_DATA); 
+    nb_img_pre_b <= nb_img_pre_o;                  -- U2F : double_sync_vector port map(D => nb_img_pre_o,    Q => nb_img_pre_b,      CLK => CLK_DATA);
+    nb_img_post_b <= nb_img_post_o;                -- U2G : double_sync_vector port map(D => nb_img_post_o,   Q => nb_img_post_b,     CLK => CLK_DATA); 
+    rd_seq_id_b <= rd_seq_id_o;                    -- U2H : double_sync_vector port map(D => rd_seq_id_o,     Q => rd_seq_id_b ,        CLK => CLK_DATA);
+    rd_start_id_b <= rd_start_id_o;                -- U2I : double_sync_vector port map(D => rd_start_id_o,     Q => rd_start_id_b ,        CLK => CLK_DATA);
+    buffermode_b <= buffermode_o;                  -- U2J : double_sync_vector port map(D => buffermode_o,  Q => buffermode_b ,    CLK => CLK_DATA);
+    moi_mode_b <= moi_mode_o;                      -- U2K : double_sync_vector port map(D => moi_mode_o,  Q => moi_mode_b ,    CLK => CLK_DATA);
+    ext_edge_b <= ext_edge_o;                      -- U2L : double_sync_vector port map(D => ext_edge_o,  Q => ext_edge_b ,    CLK => CLK_DATA);
+    rd_stop_id_b <= rd_stop_id_o;                  -- U2M : double_sync_vector port map(D => rd_stop_id_o,     Q => rd_stop_id_b ,        CLK => CLK_DATA);
+    hdr_bytessize_b <= hdr_bytessize_o;            -- U2N : double_sync_vector port map(D => hdr_bytessize_o,     Q => hdr_bytessize_b ,      CLK => CLK_DATA);
+    img_bytessize_b <= img_bytessize_o;            -- U2O : double_sync_vector port map(D => img_bytessize_o,     Q => img_bytessize_b ,      CLK => CLK_DATA);
     
-    U3A : double_sync port map(D => clear_mem_o,            Q => CLEAR_MEMORY_CONTENT , RESET => sreset,    CLK => CLK_DATA);
-    U3B : double_sync port map(D => config_valid_o,         Q => CONFIG_VALID ,         RESET => sreset,    CLK => CLK_DATA);    
-    U3C : double_sync port map(D => soft_moi_o,              Q => SOFT_MOI ,         RESET => sreset,    CLK => CLK_DATA);    
-    U3D : double_sync port map(D => acq_stop_o,              Q => ACQ_STOP ,         RESET => sreset,    CLK => CLK_DATA);
+    CLEAR_MEMORY_CONTENT <= clear_mem_o;           -- U3A : double_sync port map(D => clear_mem_o,            Q => CLEAR_MEMORY_CONTENT , RESET => sreset,    CLK => CLK_DATA);
+    CONFIG_VALID <= config_valid_o;                -- U3B : double_sync port map(D => config_valid_o,         Q => CONFIG_VALID ,         RESET => sreset,    CLK => CLK_DATA);    
+    SOFT_MOI <= soft_moi_o;                        -- U3C : double_sync port map(D => soft_moi_o,              Q => SOFT_MOI ,         RESET => sreset,    CLK => CLK_DATA);    
+    ACQ_STOP <= acq_stop_o;                        -- U3D : double_sync port map(D => acq_stop_o,              Q => ACQ_STOP ,         RESET => sreset,    CLK => CLK_DATA);
 
 
    -- I/O Connections assignments
