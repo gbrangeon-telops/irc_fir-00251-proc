@@ -1,10 +1,10 @@
 -- Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2013.4 (win64) Build 353583 Mon Dec  9 17:49:19 MST 2013
--- Date        : Fri Aug 19 13:59:27 2016
--- Host        : TELOPS229 running 64-bit Service Pack 1  (build 7601)
+-- Date        : Tue Sep 06 15:07:15 2016
+-- Host        : TELOPS177 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/scorpiomwA_18MHz_mmcm/scorpiomwA_18MHz_mmcm_funcsim.vhdl
+--               d:/Telops/fir-00251-Proc/IP/scorpiomwA_18MHz_mmcm/scorpiomwA_18MHz_mmcm_funcsim.vhdl
 -- Design      : scorpiomwA_18MHz_mmcm
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
