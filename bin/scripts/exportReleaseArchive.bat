@@ -31,8 +31,11 @@ rem Generate firmware updater batch file
 echo @echo off> %fubatch%
 echo.>> %fubatch%
 echo set fu_exe=tsirfu.exe>> %fubatch%
-echo set fu_retry=0 >> %fubatch%
 echo.>> %fubatch%
+echo where %%fu_exe%%>> %fubatch%
+echo if %%errorlevel%% == 0 goto start_fu>> %fubatch%
+echo.>> %fubatch%
+echo set fu_retry=0 >> %fubatch%
 echo :findfu>> %fubatch%
 echo if not exist %%fu_exe%% (>> %fubatch%
 echo    if %%fu_retry%% == 2 (>> %fubatch%
@@ -45,12 +48,14 @@ echo    set /a fu_retry+=1 >> %fubatch%
 echo    goto findfu>> %fubatch%
 echo )>> %fubatch%
 echo.>> %fubatch%
+echo :start_fu>> %fubatch%
+echo.>> %fubatch%
 echo FIR-00251-NTx-Mini\%ntxminiFile%>> %fubatch%
 echo if not %%errorlevel%% == 0 goto end>> %fubatch%
 echo.>> %fubatch%
-echo tsirfu.exe -p p FIR-00251-Proc\fir_00251_proc_%sensorName%.mcs>> %fubatch%
-echo tsirfu.exe -p o FIR-00251-Output\fir_00251_output.mcs>> %fubatch%
-echo tsirfu.exe -p s FIR-00257-Storage\fir_00257_storage.mcs>> %fubatch%
+echo %%fu_exe%% -p p FIR-00251-Proc\fir_00251_proc_%sensorName%.mcs>> %fubatch%
+echo %%fu_exe%% -p o FIR-00251-Output\fir_00251_output.mcs>> %fubatch%
+echo %%fu_exe%% -p s FIR-00257-Storage\fir_00257_storage.mcs>> %fubatch%
 echo.>> %fubatch%
 echo pause>> %fubatch%
 echo.>> %fubatch%
