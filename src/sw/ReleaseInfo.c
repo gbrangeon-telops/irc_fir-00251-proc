@@ -14,6 +14,9 @@
  */
 
 #include "ReleaseInfo.h"
+#include "FlashSettingsFile.h"
+#include "FlashDynamicValuesFile.h"
+#include "CalibBlockFile.h"
 #include "GC_Registers.h"
 #include "printf_utils.h"
 #include "string.h"
@@ -188,4 +191,7 @@ void ReleaseInfo_Print(releaseInfo_t *releaseInfo)
       RI_INF("Storage FPGA common revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGACommonRevision]);
    }
    RI_INF("XML version: %d.%d.%d", gcRegsData.DeviceXMLMajorVersion, gcRegsData.DeviceXMLMinorVersion, gcRegsData.DeviceXMLSubMinorVersion);
+   RI_INF("Flash settings version: %d.%d.%d", FLASHSETTINGS_FILEMAJORVERSION, FLASHSETTINGS_FILEMINORVERSION, FLASHSETTINGS_FILESUBMINORVERSION);
+   RI_INF("Flash dynamic values version: %d.%d.%d", FLASHDYNAMICVALUES_FILEMAJORVERSION, FLASHDYNAMICVALUES_FILEMINORVERSION, FLASHDYNAMICVALUES_FILESUBMINORVERSION);
+   RI_INF("Calibration files version: %d.%d.%d", CALIBBLOCK_FILEMAJORVERSION, CALIBBLOCK_FILEMINORVERSION, CALIBBLOCK_FILESUBMINORVERSION);
 }
