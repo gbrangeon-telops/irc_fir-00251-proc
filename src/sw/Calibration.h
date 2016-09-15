@@ -58,7 +58,6 @@ enum cmStateEnum {
    CMS_LOAD_PIXEL_DATA_HEADER,         /**< Load pixel data header */
    CMS_LOAD_PIXEL_DATA,                /**< Load pixel data */
    CMS_UPDATE_PIXEL_DATA,              /**< Apply the delta beta computed from the calibration Actualization process */
-   CMS_QUANTIZE_AND_UPDATE_DATA,       /**< État intermédiaire temporaire pour quantification dynamique de beta */
    CMS_LOAD_MAXTK_DATA_HEADER,         /**< Load MAXTK data header */
    CMS_LOAD_MAXTK_DATA,                /**< Load MAXTK data */
    CMS_LOAD_LUTNL_DATA_HEADER,         /**< Load LUTNL data header */

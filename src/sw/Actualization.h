@@ -254,7 +254,6 @@ typedef struct
    bool useDynamicTestPattern;
    bool verbose;
    bool forceDiscardOffset;
-   bool liveBetaQuantization;
    uint32_t mode; // bit mask, default to 0
 } actDebugOptions_t;
 
@@ -289,8 +288,7 @@ typedef struct
 #define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
 #define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
 #define ACT_MODE_VERBOSE 0x10 // add some verbose
-#define ACT_MODE_DISCARD_OFFSET 0x20 // add some verbose
-#define ACT_MODE_LIVE_BETA_QUANTIZATION 0x40 // add some verbose
+#define ACT_MODE_DISCARD_OFFSET 0x20
 
 extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */
 extern actDebugOptions_t gActDebugOptions;

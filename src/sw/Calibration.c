@@ -824,10 +824,7 @@ void Calibration_SM()
                   if (ACT_shouldUpdateCurrentCalibration(&calibrationInfo, blockIndex))
                   {
                      newBadPixelCount = 0;
-                     if (gActDebugOptions.liveBetaQuantization)
-                        cmCurrentState = CMS_QUANTIZE_AND_UPDATE_DATA;
-                     else
-                        cmCurrentState = CMS_UPDATE_PIXEL_DATA;
+                     cmCurrentState = CMS_UPDATE_PIXEL_DATA;
                      gStartBetaQuantization = true;
                      dataOffset = 0;
                      deltaBetaDataAddr = ACT_getSuitableDeltaBetaForBlock(&calibrationInfo, blockIndex);
@@ -847,38 +844,21 @@ void Calibration_SM()
          }
          break;
 
-      case CMS_QUANTIZE_AND_UPDATE_DATA:
+      case CMS_UPDATE_PIXEL_DATA:
          {
             IRC_Status_t bq_status = BetaQuantizer_SM(blockIndex);
 
             if (bq_status == IRC_DONE)
             {
                calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
-               cmCurrentState = CMS_LOAD_MAXTK_DATA_HEADER;//CMS_UPDATE_PIXEL_DATA;
-            }
-         }
-         break;
-
-      case CMS_UPDATE_PIXEL_DATA: // cet etat sera obsolete quand live beta quantization activée
-         {
-            const uint32_t numberOfDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
-            uint32_t* calAddr = (uint32_t*)(PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE));
-            uint32_t blockSize = MIN(CM_CALIB_UPDATE_BLOCK_SIZE, numberOfDataToProcess - dataOffset);
-
-            calAddr += 2*dataOffset;
-
-            calibrationInfo.blocks[blockIndex].CalibrationSource = CS_ACTUALIZED;
-            newBadPixelCount += ACT_updateCurrentCalibration(&calibrationInfo.blocks[blockIndex], calAddr, deltaBetaDataAddr, dataOffset, blockSize);
-            // todo devra utiliser la fonction de démarrage de la SM de mise à jour de beta et vérifier la fin de cette SM
-            dataOffset += blockSize; // dataOffset is given in pixels
-
-            if (dataOffset == numberOfDataToProcess)
-            {
-               CM_INF("Calibration actualization completed in %dms", (uint32_t)(elapsed_time_us(tic_calibUpdate) / 1000));
-               CM_INF("Number of new bad pixels following actualization: %d", newBadPixelCount);
                cmCurrentState = CMS_LOAD_MAXTK_DATA_HEADER;
             }
 
+            if (bq_status == IRC_FAILURE)
+            {
+               CM_ERR("Failed to update pixel data.");
+               cmCurrentState = CMS_ERROR;
+            }
          }
          break;
 

@@ -3300,8 +3300,6 @@ void ACT_resetDebugOptions()
    gActDebugOptions.mode = 0;
    gActDebugOptions.forceDiscardOffset = false;
    gActDebugOptions.verbose = 0;
-#warning mettre cette option à true par défaut
-   gActDebugOptions.liveBetaQuantization = false;
 }
 
 void ACT_parseDebugMode()
@@ -3362,12 +3360,6 @@ void ACT_parseDebugMode()
    {
       gActDebugOptions.forceDiscardOffset = false;
    }
-
-#warning inverser ces deux lignes quand sera true par défaut. Le mode devrait alors etre renommé ACT_MODE_DISABLE_LIVE_BETA_QUANTIZATION...
-   if (BitMaskTst(gActDebugOptions.mode, ACT_MODE_LIVE_BETA_QUANTIZATION))
-      gActDebugOptions.liveBetaQuantization = true;
-   else
-      gActDebugOptions.liveBetaQuantization = false;
 }
 
 void ACT_resetParams(actParams_t* p)
