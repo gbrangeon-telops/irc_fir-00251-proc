@@ -58,6 +58,8 @@ entity scorpiomwA_digio_map is
       FPA_DIGIO10    : out std_logic;
       FPA_DIGIO11    : in std_logic;
       FPA_DIGIO12    : in std_logic;
+      PROG_INIT_DONE : in std_logic;
+      FPA_INIT_CFG_RECEIVED : in std_logic;
       
       FPA_DVALID_ERR : out std_logic
       
@@ -213,7 +215,7 @@ begin
    U1: process(MCLK_SOURCE)
    begin
       if rising_edge(MCLK_SOURCE) then
-         fpa_on_i <= not ARESET and FPA_PWR;
+         fpa_on_i <= not ARESET and FPA_PWR and FPA_INIT_CFG_RECEIVED;  -- on allume le détecteur si la configuration d'initialisation est aussi reçue
          fsm_sreset <= sreset or not FPA_PWR; 
       end if;   
    end process;  
@@ -293,7 +295,7 @@ begin
                when idle =>
                   serclr_i <= '0';
                   cnter <= 1;
-                  if fpa_powered_i = '1' then 
+                  if fpa_powered_i = '1' and PROG_INIT_DONE = '1' then        -- PROG_INIT_DONE assure qu'on ne lancera pas serclr_i tant que l'initialisation n'est pas faite avec la config par defaut
                      serclr_fsm <= wait_spi_csn_st;
                   end if;
                   
@@ -501,7 +503,7 @@ begin
                   
                -- venir ici rapidement pour ne pas manquer la communication du programmateur
                when passthru_st =>          -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  prog_data_i <= PROG_SD;
+                  prog_data_i <= PROG_SD and PROG_INIT_DONE;
                   sizea_sizeb_i <= SIZEA_SIZEB;
                   int_i <= FPA_INT;
                   mclk_i <= mclk_reg;  --

@@ -37,6 +37,7 @@ entity scorpiomwA_mblaze_intf is
       CTRLED_RESET          : out std_logic;
       
       FPA_DRIVER_STAT       : in std_logic_vector(15 downto 0);
+      FPA_INIT_CFG_RECEIVED : out std_logic;
       
       USER_CFG              : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;
@@ -80,7 +81,8 @@ architecture rtl of scorpiomwA_mblaze_intf is
    signal stat_rd_dval                 : std_logic;
    signal slv_reg_rden                 : std_logic;
    signal slv_reg_wren                 : std_logic;
-   signal fpa_intf_cfg_i               : fpa_intf_cfg_type; 
+   signal fpa_intf_cfg_i               : fpa_intf_cfg_type;
+   signal user_init_cfg_i               : fpa_intf_cfg_type;
    signal data_i                       : std_logic_vector(31 downto 0);
    signal permit_inttime_change        : std_logic;
    signal update_cfg                   : std_logic;
@@ -101,6 +103,7 @@ architecture rtl of scorpiomwA_mblaze_intf is
    --signal tri_min                      : integer;
    --signal tri_int_part                 : integer;
    signal exp_time_reg                 : unsigned(30 downto 0);
+   signal fpa_init_done_i              : std_logic;
    --   
    --   attribute dont_touch                         : string;
    --   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -116,7 +119,8 @@ begin
    CTRLED_RESET <= ctrled_reset_i;
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
-   COOLER_STAT.COOLER_ON <= '1';     
+   COOLER_STAT.COOLER_ON <= '1'; 
+   FPA_INIT_CFG_RECEIVED <= user_init_cfg_i.fpa_init_cfg_received;
    
    --------------------------------------------------
    -- Sync reset
@@ -129,20 +133,38 @@ begin
    -------------------------------------------------  
    U2: process(MB_CLK)
    begin
-      if rising_edge(MB_CLK) then  
+      if rising_edge(MB_CLK) then
+         
          -- pragma translate_off
          if sreset = '1' then 
             fpa_intf_cfg_i.int_signal_high_time <= to_unsigned(30, 32);
             fpa_intf_cfg_i.int_time <= to_unsigned(30, 32);
          end if;
-         -- pragma translate_on
+         -- pragma translate_on         
          
-         --permit_inttime_change <= FPA_DRIVER_STAT(7);
-         update_cfg <= user_cfg_rdy; --permit_inttime_change and  user_cfg_rdy;
+         fpa_init_done_i <= FPA_DRIVER_STAT(9);
          
-         if update_cfg = '1' then -- la config au complet 
-            USER_CFG <= user_cfg_i;          
+         -- permit_inttime_change <= FPA_DRIVER_STAT(7);
+         update_cfg <= user_cfg_rdy;         
+         
+         -- on enregistre la config d'initilaisation du FPA
+         if user_cfg_i.fpa_init_cfg = '1' and user_cfg_rdy = '1' then 
+            user_init_cfg_i <= user_cfg_i;
+            user_init_cfg_i.fpa_init_cfg_received <= '1';
          end if;
+         if ctrled_reset_i = '1' then      -- RAZ à chaque reset du module. Ainsi, on est certain qu'on programmera le détecteur avec une config d'initialisation à chaque allumage
+            user_init_cfg_i.fpa_init_cfg_received <= '0';
+         end if; 
+         
+         -- configuration     
+         if update_cfg = '1' then 
+            if fpa_init_done_i = '0' then -- tant que l'initialisation n'est pas terminée, la config de l,usager n'est pas utilisée                
+               USER_CFG <= user_init_cfg_i;     
+            else
+               USER_CFG <= user_cfg_i;
+            end if;
+         end if;
+         
       end if;  
    end process;   
    
@@ -181,8 +203,8 @@ begin
          if sreset = '1' then
             ctrled_reset_i <= '1';
             reset_err_i <= '0';
-            user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
-            
+            user_cfg_in_progress <= '1';                  -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
+            user_cfg_i.fpa_init_cfg <= '0';               -- à '1' <=> dit que la config reçue est une config d'initialisation. À '0' sinon 
          else                   
             
             ctrled_reset_i <= '0';            
@@ -193,8 +215,8 @@ begin
                user_cfg_i.int_indx <= int_indx_i;
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
-                        
-            -- reste de la config
+            
+            -- reception de la config
             if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
                case axi_awaddr(7 downto 0) is             
                   
@@ -254,8 +276,11 @@ begin
                   when X"B8" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));
                   when X"BC" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));
                   when X"C0" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); 
-                  when X"C4" =>    user_cfg_i.adc_clk_phase                   <= unsigned(data_i(user_cfg_i.adc_clk_phase'length-1 downto 0));user_cfg_in_progress <= '0'; 
-                   
+                  when X"C4" =>    user_cfg_i.adc_clk_phase                   <= unsigned(data_i(user_cfg_i.adc_clk_phase'length-1 downto 0));
+                  when X"C8" =>    user_cfg_i.fpa_init_cfg                    <= data_i(0);   user_cfg_in_progress <= '0';
+                     
+                     
+                     
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"E4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  

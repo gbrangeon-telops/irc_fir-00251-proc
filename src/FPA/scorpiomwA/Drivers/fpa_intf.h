@@ -131,7 +131,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  good_samp_last_pos_per_ch;           
    uint32_t  xsize_div_tapnum;                
    uint32_t  vdac_value[8];   
-   uint32_t  adc_clk_phase;    
+   uint32_t  adc_clk_phase;
+   uint32_t  init_cfg;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
@@ -189,7 +190,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,4927,2594}, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,4927,2594}, 0, 0}
                                                                                                                      //ENO 11 mai 2016:  ne pas changer le 671, ce n'est pas en mV mais en cnt DAC qui donneront 700 mV
 
 // pour initialiser le module vhd avec les bons parametres de départ

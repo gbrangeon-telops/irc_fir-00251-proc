@@ -128,38 +128,40 @@ begin
             axil_mosi_i.wstrb <= (others => '0');
             axil_mosi_i.bready <= '1';
             write_state <= write_standby;
-            exp_feedbk_last <= '0';
+            --exp_feedbk_last <= '0';
             exp_info_dval_last <= '0';
-            exp_dval_latch <= '0';
+            --exp_dval_latch <= '0';
          else
             
             
             -- ENO: 10 ocobre 2016 : le FPA_Img_Info.exp_info.exp_dval peut devancer FPA_Img_Info.exp_feedbk (par exemple dans les scorpiomA) d'òu un latch 
-            if (FPA_Img_Info.exp_info.exp_dval = '1') then
-               exp_indx_latch <= FPA_Img_Info.exp_info.exp_indx;
-               exp_dval_latch <= '1';
-            end if;
+            --if (FPA_Img_Info.exp_info.exp_dval = '1') then
+            --   exp_indx_latch <= FPA_Img_Info.exp_info.exp_indx;
+            --   exp_dval_latch <= '1';
+            --end if;
             
             
             case write_state is
                when write_standby =>
-                  if FPA_Img_Info.exp_feedbk = '1' and exp_feedbk_last = '0' then
+                  --if FPA_Img_Info.exp_feedbk = '1' and exp_feedbk_last = '0' then
+                  if FPA_Img_Info.exp_info.exp_dval = '1' then 
                      axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(FPA_Img_Info.frame_id(7 downto 0)) &  std_logic_vector(resize(EHDRIExposureIndexAdd32, 8));
-                     exp_feedbk_last <= '1';
+                    -- exp_feedbk_last <= '1';
                      write_state <= write_info;
-                  elsif exp_feedbk_last = '0' then
-                     exp_feedbk_last <= FPA_Img_Info.exp_feedbk;
                   end if;
+                  --elsif exp_feedbk_last = '0' then
+                  --   exp_feedbk_last <= FPA_Img_Info.exp_feedbk;
+                  --end if;
                
                when write_info =>
-                  if exp_dval_latch = '1' and FPA_Img_Info.exp_info.exp_dval = '0' then
-                     axil_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(exp_indx_latch), 32), EHDRIExposureIndexShift));
-                     axil_mosi_i.wstrb <= EHDRIExposureIndexBWE;
-                     write_state <= wait_write_ready;
-                  end if;
+                  --if exp_dval_latch = '1' and FPA_Img_Info.exp_info.exp_dval = '0' then
+                  axil_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(FPA_Img_Info.exp_info.exp_indx), 32), EHDRIExposureIndexShift));
+                  axil_mosi_i.wstrb <= EHDRIExposureIndexBWE;
+                  write_state <= wait_write_ready;
+                  --end if;
                
                when wait_write_ready =>
-                  exp_dval_latch <= '0';
+                  --exp_dval_latch <= '0';
                   if axil_miso_i.awready = '1' and axil_miso_i.wready = '1' then
                      axil_mosi_i.awvalid <= '1';
                      axil_mosi_i.wvalid <= '1';
@@ -169,16 +171,15 @@ begin
                when wait_write_completed =>
                   axil_mosi_i.awvalid <= '0';
                   axil_mosi_i.wvalid <= '0';
-                  axil_mosi_i.wstrb <= (others => '0');
-                  
+                  axil_mosi_i.wstrb <= (others => '0');                  
                   if axil_miso_i.bvalid = '1' then
                      write_state <= wait_next_feedfbk;
                   end if;
                
                when wait_next_feedfbk =>
-                  if FPA_Img_Info.exp_feedbk = '0' then
+                  if FPA_Img_Info.exp_info.exp_dval = '0' then
                      write_state <= write_standby;
-                     exp_feedbk_last <= '0';
+                     --exp_feedbk_last <= '0';
                      exp_info_dval_last <= '0';
                   end if;
                

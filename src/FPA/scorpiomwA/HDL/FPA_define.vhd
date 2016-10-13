@@ -219,6 +219,10 @@ package FPA_define is
       -- adc clk_phase
       adc_clk_phase                  : unsigned(3 downto 0);     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
       
+      -- fpa_init_config
+      fpa_init_cfg                   : std_logic; -- à '1' si la configuration en provenance du pilote en est une d'initialisation
+      fpa_init_cfg_received          : std_logic; -- ne provient pas du µBlaze. À '1' si on a reçu une config d'initialisation de la part du pilote. Cela devrait être le cas au reset et à tout pwrdown de la carte ADC
+      
    end record;    
    
    -- Configuration par defaut
@@ -267,7 +271,9 @@ package FPA_define is
    to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
    to_unsigned(160, 8),       --xsize_div_tapnum             
    (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
-   to_unsigned(0, 4)          --adc_clk_phase 
+   to_unsigned(0, 4),         --adc_clk_phase
+   '0',                       --fpa_init_cfg
+   '0'                        --fpa_init_cfg_received
    );
    
    
