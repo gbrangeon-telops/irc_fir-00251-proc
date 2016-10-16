@@ -125,7 +125,7 @@ begin
    end process;
    ACQ_TRIG <= trig;
    
-   FPA_EXP_INFO.exp_time <=  to_unsigned(1, 32);
+   FPA_EXP_INFO.exp_time <=  to_unsigned(100000, 32);
    FPA_EXP_INFO.exp_indx <=  x"05";
    FPA_EXP_INFO.exp_dval <= '1';
    XTRA_TRIG <= '0'; 

@@ -7,7 +7,7 @@ use work.img_header_define.all;
 entity ehdri_SM is
    port(
       --clk and reset
-      Clk_Data         : in std_logic; -- at 160 MHZ
+      Clk_Data         : in std_logic; -- at 160 MHz
       AReset          : in std_logic;
       
       -- Hder AXI signals

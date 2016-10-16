@@ -88,6 +88,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_diag_mode;              // utilisé par le trig_controller.vhd            
    uint32_t  fpa_diag_type;              // utilisé par le generateur de données diag de Telops
    uint32_t  fpa_pwr_on;                 // utilisé par le fpa_intf_sequencer.vhd            
+   uint32_t  fpa_init_cfg;               // utilisé par le fpa_intf_sequencer.vhd. à '1' lorsque la config en transit en est une d'initialisation (ie à programmer dans le ROIC du détecteur dès le bootup).
+   uint32_t  fpa_init_cfg_received;      // utilisé par le fpa_intf_sequencer.vhd. La valeur envoyée par le piloteC n'a aucune importance. La véritable valeur est déterminée par le mb_intf.vhd  
    uint32_t  fpa_trig_ctrl_mode;         // utilisé par le trig_controller.vhd    
    uint32_t  fpa_acq_trig_ctrl_dly;      // utilisé par le trig_controller.vhd  
    uint32_t  fpa_acq_trig_period_min;    // utilisé par le trig_controller.vhd
@@ -190,7 +192,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,4927,2594}, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,4927,2594}, 0, 0}
                                                                                                                      //ENO 11 mai 2016:  ne pas changer le 671, ce n'est pas en mV mais en cnt DAC qui donneront 700 mV
 
 // pour initialiser le module vhd avec les bons parametres de départ

@@ -35,14 +35,14 @@ package FPA_define is
    constant DEFINE_FPA_VIDEO_DATA_INVERTED        : std_logic := '1';      -- les données du scorpioMW sont en video inverse
    constant DEFINE_FPA_TEMP_DIODE_CURRENT_uA      : natural   := 25;       -- consigne pour courant de polarisation de la diode de lecture de température
    constant DEFINE_FPA_TAP_NUMBER                 : natural   := 4;                                                                                     
-   constant DEFINE_FLEX_VOLTAGEP_mV               : natural   := 8_000;    -- ENO 03 juin 2016: le flex de ce détecteur doit être alimenté à 8000 V 
+   constant DEFINE_FLEX_VOLTAGEP_mV               : natural   := 8_000;    -- ENO 03 juin 2016: le flex de ce détecteur doit être alimenté à 8000 mV 
    constant DEFINE_FPA_TEMP_CH_GAIN               : real      := 1.0;      -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l,ampli buffer et des resistances entre les deux 
    constant DEFINE_FPA_PIX_PER_MCLK_PER_TAP       : natural   := 1;        -- 1 pixels par coup d'horloge pour le scorpioMW
    --constant DEFINE_FPA_BITSTREAM_LENGTH           : natural   := 58;     -- nombre de bits contenu  dans le bitstream de configuration serielle
-   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 100 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
-   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 100 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
+   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
+   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
-   
+   constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '1';
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -125,12 +125,13 @@ package FPA_define is
    constant DEFINE_ADC_QUAD_CLK_FACTOR            : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    constant DEFINE_FPA_MCLK_RATE_FACTOR           : integer := integer(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ);
    constant DEFINE_FPA_PCLK_RATE_FACTOR           : integer := integer(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ);
-   constant DEFINE_FPA_MCLK_RATE_FACTOR_100M      : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ);    -- pour la conversion du temps d'integration en coups de 100MHz 
+   --constant DEFINE_FPA_MCLK_RATE_FACTOR_100M      : integer := integer(DEFINE_FPA_100M_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ);    -- pour la conversion du temps d'integration en coups de 100MHz 
    constant DEFINE_FPA_INT_TIME_OFFSET_FACTOR     : integer := integer((real(DEFINE_FPA_INT_TIME_OFFSET_nS)*real(DEFINE_FPA_MCLK_RATE_KHZ))/1_000_000.0);
    constant DEFINE_FPA_PIX_SAMPLE_NUM_PER_CH      : natural := integer(DEFINE_ADC_QUAD_CLK_RATE_KHZ/(DEFINE_FPA_PIX_PER_MCLK_PER_TAP*DEFINE_FPA_MCLK_RATE_KHZ));
    constant XSIZE_MAX                             : integer := DEFINE_XSIZE_MAX;  -- pour les modules utilisant XSIZE_MAX
    constant YSIZE_MAX                             : integer := DEFINE_YSIZE_MAX;  -- pour les modules utilisant YSIZE_MAX   
-   
+   constant DEFINE_FPA_MCLK_RATE_FACTOR_100M_X_2P15 : integer := integer((DEFINE_FPA_100M_CLK_RATE_KHZ*(2**15))/DEFINE_FPA_MCLK_RATE_KHZ);    -- pour la conversion du temps d'integration en coups de 100MHz 
+
    ---------------------------------------------------------------------------------								
    -- Configuration
    ---------------------------------------------------------------------------------  
@@ -218,11 +219,7 @@ package FPA_define is
       
       -- adc clk_phase
       adc_clk_phase                  : unsigned(3 downto 0);     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
-      
-      -- fpa_init_config
-      fpa_init_cfg                   : std_logic; -- à '1' si la configuration en provenance du pilote en est une d'initialisation
-      fpa_init_cfg_received          : std_logic; -- ne provient pas du µBlaze. À '1' si on a reçu une config d'initialisation de la part du pilote. Cela devrait être le cas au reset et à tout pwrdown de la carte ADC
-      
+                  
    end record;    
    
    -- Configuration par defaut
@@ -231,7 +228,7 @@ package FPA_define is
    (others => '0'),           --int_indx                       
    to_unsigned(3176, 32),     --int_signal_high_time           
    --comn                           
-   ('0', x"D2", '0', x"02", to_unsigned(1000000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32)),
+   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32)),
    to_unsigned(0, 11),        --xstart                         
    to_unsigned(0, 11),        --ystart                         
    to_unsigned(640, 11),      --xsize                          
@@ -271,9 +268,7 @@ package FPA_define is
    to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
    to_unsigned(160, 8),       --xsize_div_tapnum             
    (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
-   to_unsigned(0, 4),         --adc_clk_phase
-   '0',                       --fpa_init_cfg
-   '0'                        --fpa_init_cfg_received
+   to_unsigned(0, 4)
    );
    
    

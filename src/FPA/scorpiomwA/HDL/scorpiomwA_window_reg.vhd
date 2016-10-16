@@ -57,7 +57,7 @@ architecture rtl of scorpiomwA_window_reg is
          );
    end component;
    
-   type   roic_cfg_fsm_type is (idle, check_done_st, rqst_st, cfg_io_st, send_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_reg_st, pause_st);
+   type   roic_cfg_fsm_type is (idle, check_done_st, rqst_st, cfg_io_st, check_init_st, send_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_reg_st, pause_st);
    signal roic_cfg_fsm        : roic_cfg_fsm_type;  
    signal spi_en_i            : std_logic;
    signal spi_data_i          : std_logic_vector(39 downto 0);
@@ -146,9 +146,9 @@ begin
             done_i <= '0'; 
             rqst_i <= '0';
             roic_cfg_fsm <= idle;
-            itr_i <= '1';
-            uprow_upcol_i <= '1';
-            sizea_sizeb_i <= '1';
+            itr_i <= FPA_INTF_CFG.ITR;                  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
+            uprow_upcol_i <= FPA_INTF_CFG.UPROW_UPCOL;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
+            sizea_sizeb_i <= FPA_INTF_CFG.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             actual_cfg(39) <= '1';   -- le bit 39 seul forcé à '1'. Cela suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             error_i <= '0';
             
@@ -181,16 +181,27 @@ begin
                      roic_cfg_fsm <= cfg_io_st;  
                   end if;
                
-               when cfg_io_st =>
+               when cfg_io_st => 
+                  rqst_i <= '0';
                   done_i <= '0';
                   itr_i <= new_cfg(36);
                   uprow_upcol_i <= new_cfg(35);
                   sizea_sizeb_i <= new_cfg(34); 
-                  roic_cfg_fsm <= send_cfg_st;   
-                  spi_data_i <= "000000" & new_cfg(33 downto 0);   -- assigné un clk plus tôt
+                  spi_data_i <= "000000" & new_cfg(33 downto 0);   -- assigné un clk plus tôt                   
+                  roic_cfg_fsm <= check_init_st;
                
-               when send_cfg_st => 
-                  rqst_i <= '0';
+               when check_init_st =>                   
+                  if FPA_INTF_CFG.COMN.FPA_INIT_CFG = '1' then 
+                     if sizea_sizeb_i = '1' then     -- s'il s'agit d'une config d'initialisation du ScorpiomwA en pleine fenetre, alors ne pas activer la programmation spi
+                        roic_cfg_fsm <= update_reg_st;
+                     else
+                        roic_cfg_fsm <= send_cfg_st;
+                     end if;
+                  else
+                     roic_cfg_fsm <= send_cfg_st;
+                  end if;
+               
+               when send_cfg_st =>                   
                   spi_en_i <= '1';
                   if SPI_DONE = '0'  then 
                      roic_cfg_fsm <= wait_end_st;

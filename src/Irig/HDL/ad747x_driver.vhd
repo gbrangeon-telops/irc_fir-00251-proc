@@ -21,7 +21,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
 --library Common_HDL;
 --use Common_HDL.Telops.all;
-use work.IRIG_define_v2.all;
+--use work.IRIG_define_v2.all;
 use work.tel2000.all;
 
 entity ad747x_driver is

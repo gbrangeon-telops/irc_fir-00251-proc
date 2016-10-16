@@ -64,7 +64,7 @@
 // adresse d'écriture du régistre du reset des erreurs
 #define AW_RESET_ERR                      0xEC
 
- // adresse d'écriture du régistre du reset du module FPA
+// adresse d'écriture du régistre du reset du module FPA
 #define AW_CTRLED_RESET                   0xF0
 
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
@@ -173,8 +173,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    InitGCRegs.TestImageSelector = 0;
    InitGCRegs.OffsetX = 0;
    InitGCRegs.OffsetY = 0;
-   InitGCRegs.Width   = 640;  
-   InitGCRegs.Height  = 512;
+   InitGCRegs.Width   = 320;
+   InitGCRegs.Height  = 256;
    FPA_Reset(ptrA);
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
    FPA_GetTemperature(ptrA);                                                // demande de lecture
@@ -263,7 +263,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    // allumage du détecteur 
-   ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
+   ptrA->fpa_pwr_on   = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
+   
+   // config d'initialisation du détecteur ou non
+   ptrA->fpa_init_cfg =  init_cfg_in_progress;
+   ptrA->fpa_init_cfg_received =  0;     // ENO 15 oct. 2016: valeur sans importance. Le module  mb_intf.vhd génère convenablement cette valeur.
    
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
@@ -280,6 +284,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // direction de lecture
    ptrA->uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
+   if (init_cfg_in_progress == 1)
+        ptrA->uprow_upcol = 0;
    
    // calculé specialement pour le ScorpioMW
    Cmin  = (uint32_t)pGCRegs->OffsetX/4;
@@ -303,11 +309,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //  windowing
    ptrA->sizea_sizeb = 0;           // 0 --> toujours en mode windowing
-   if (init_cfg_in_progress == 1)
+   if ((init_cfg_in_progress == 1) && ((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
       ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
      
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 
+   if (init_cfg_in_progress == 1)
+      ptrA->itr = 0;     // toujours en mode itr
        
    //  gain 
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
@@ -388,9 +396,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 0;              //
-
-   // config d'initialisation du détecteur ou non
-   ptrA->init_cfg                          =  init_cfg_in_progress;
      
    WriteStruct(ptrA);
 }

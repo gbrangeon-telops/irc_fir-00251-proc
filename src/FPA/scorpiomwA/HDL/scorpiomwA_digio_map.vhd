@@ -58,8 +58,8 @@ entity scorpiomwA_digio_map is
       FPA_DIGIO10    : out std_logic;
       FPA_DIGIO11    : in std_logic;
       FPA_DIGIO12    : in std_logic;
-      PROG_INIT_DONE : in std_logic;
-      FPA_INIT_CFG_RECEIVED : in std_logic;
+      --PROG_INIT_DONE : in std_logic;
+      --FPA_INIT_CFG_RECEIVED : in std_logic;
       
       FPA_DVALID_ERR : out std_logic
       
@@ -69,7 +69,8 @@ end scorpiomwA_digio_map;
 
 architecture rtl of scorpiomwA_digio_map is
    
-   constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
+constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
+constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEFINE_FLEG_DAC_PWR_WAIT_FACTOR;
    
    component sync_reset
       port(
@@ -215,7 +216,7 @@ begin
    U1: process(MCLK_SOURCE)
    begin
       if rising_edge(MCLK_SOURCE) then
-         fpa_on_i <= not ARESET and FPA_PWR and FPA_INIT_CFG_RECEIVED;  -- on allume le détecteur si la configuration d'initialisation est aussi reçue
+         fpa_on_i <= not ARESET and FPA_PWR;
          fsm_sreset <= sreset or not FPA_PWR; 
       end if;   
    end process;  
@@ -295,7 +296,7 @@ begin
                when idle =>
                   serclr_i <= '0';
                   cnter <= 1;
-                  if fpa_powered_i = '1' and PROG_INIT_DONE = '1' then        -- PROG_INIT_DONE assure qu'on ne lancera pas serclr_i tant que l'initialisation n'est pas faite avec la config par defaut
+                  if fpa_powered_i = '1' then 
                      serclr_fsm <= wait_spi_csn_st;
                   end if;
                   
@@ -455,11 +456,11 @@ begin
                -- delai du monostable sur le fleg
                when ldo_pwr_pause_st =>
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
-                  if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
+                  if fpa_timer_cnt = C_FLEG_DLY_FACTOR then    -- soit DEFINE_FLEG_LDO_DLY_FACTOR de coups d'horloge après l'ordre d'allumage, la fsm quitte cet état
                      fpa_digio_fsm <= rst_cnt_st;
                   end if; 
                   -- pragma translate_off
-                  if fpa_timer_cnt = 10 then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
+                  if fpa_timer_cnt = 10 then  
                      fpa_digio_fsm <= rst_cnt_st;
                   end if;                
                   -- pragma translate_on
@@ -471,10 +472,10 @@ begin
                   
                -- observer le delai FPA_POWER_WAIT  
                when fpa_pwr_pause_st =>              
-                  itr_i <= '1';
-                  sizea_sizeb_i <= '1';
+                  itr_i <= ITR;
+                  sizea_sizeb_i <= SIZEA_SIZEB;
                   mclk_i <= mclk_reg;      -- horloge requise
-                  uprow_upcol_i <= '1';
+                  uprow_upcol_i <= UPROW_UPCOL;
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
                      fpa_digio_fsm <= fpa_pwred_st;
@@ -489,21 +490,24 @@ begin
                when fpa_pwred_st =>
                   fpa_powered_i <= '1';        -- permet au driver de placer une requete de programmation 
                   fpa_digio_fsm <= wait_trig_stop_st;
+                  mclk_i <= mclk_reg;      -- horloge requise
                   
                -- vérification trig stoppé
                when wait_trig_stop_st =>                  
                   if PROG_EN = '1'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
                      fpa_digio_fsm <= wait_mclk_st;
                   end if;                   
-               
+                  mclk_i <= mclk_reg;      -- horloge requise
+                  
                when wait_mclk_st =>                  
                   if mclk_reg = '0'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
                      fpa_digio_fsm <= passthru_st;
                   end if; 
+                  mclk_i <= mclk_reg;      -- horloge requise
                   
                -- venir ici rapidement pour ne pas manquer la communication du programmateur
                when passthru_st =>          -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
-                  prog_data_i <= PROG_SD and PROG_INIT_DONE;
+                  prog_data_i <= PROG_SD;
                   sizea_sizeb_i <= SIZEA_SIZEB;
                   int_i <= FPA_INT;
                   mclk_i <= mclk_reg;  --
@@ -512,7 +516,7 @@ begin
                   error_i <= error_iob; -- error_filt;
                   data_valid_i <= data_valid_iob and dval_en; --data_valid_filt;              
                   -- pragma translate_off
-                  data_valid_i <= data_valid_iob;
+                  data_valid_i <= data_valid_iob and dval_en;
                   -- pragma translate_on                 
                
                when others =>
