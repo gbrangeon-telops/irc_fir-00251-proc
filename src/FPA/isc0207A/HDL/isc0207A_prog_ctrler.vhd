@@ -46,7 +46,7 @@ entity isc0207A_prog_ctrler is
       
       FPA_PWR              : out std_logic;         -- envoi de l'ordre d'allumage du FPA
       PROG_TRIG            : out std_logic;         -- pour la prise d'images post_programmation
-      FPA_DRIVER_STAT      : out std_logic_vector(15 downto 0)    
+      FPA_DRIVER_STAT      : out std_logic_vector(31 downto 0)    
       
       );                 
 end isc0207A_prog_ctrler;
@@ -113,6 +113,9 @@ begin
    PROG_TRIG <= prog_trig_i;
    
    --FPA_INTF_CFG_PRELIM <= fpa_intf_cfg_prelim_i;   -- sortie de la fpa_intf_cfg.  Elle passera dans le module de generation du temps d'exprotion pour etre complete  
+   
+   
+   FPA_DRIVER_STAT(17 downto 8)  <= (others => '0'); 
    FPA_DRIVER_STAT(7)  <= PERMIT_INT_CHANGE;         --  on permet les changements de tems p'integration si ce signal est high
    FPA_DRIVER_STAT(6)  <= fpa_driver_trig_err; 
    FPA_DRIVER_STAT(5)  <= ram_err;                  -- erreur de colision dans la ram (s/o pour le 0207)

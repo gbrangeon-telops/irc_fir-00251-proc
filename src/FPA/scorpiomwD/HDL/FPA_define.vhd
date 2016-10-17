@@ -37,7 +37,8 @@ package FPA_define is
    constant FPA_INT_TIME_OFFSET_MCLK      : integer   := 3076;    -- 3075.5 MCLK d'offset sur le temps d'integration pour reset des puits 
    constant MGLK_LVAL_TIMEOUT_MCLK        : integer   := 6;     -- ENO 19 nov 2015: pour corriger bug du Megalink avec son fval qui ne tombe jamais. Si le lval reste à '0' durant 6 MCLK, on suppose que l'image est terminée.  
    constant PROXY_CLINK_CHANNEL_NUM       : integer   := 2;     -- Number of channels in the Camera Link interface with the Megalink
-
+   constant DEFINE_FPA_INIT_CFG_NEEDED    : std_logic := '0';   -- pas besoin de config particulière au demarrage du ScorpiomwD
+   
    --------------------------------------------
    --  modes diag
    --------------------------------------------

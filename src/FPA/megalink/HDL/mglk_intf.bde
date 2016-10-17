@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 16552
+ FREEID 16576
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -11,7 +11,7 @@ HEADER
   #DEFAULT_RANGE0="<range<name=\"data_path_stat\"><left=\"15\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE1="<range<name=\"fpa_ch1_data\"><left=\"27\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE2="<range<name=\"fpa_ch2_data\"><left=\"27\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE3="<range<name=\"fpa_driver_stat\"><left=\"15\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE3="<range<name=\"fpa_driver_stat\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE4="<range<name=\"frame_id\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE5="<range<name=\"int_indx\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE6="<range<name=\"intf_seq_stat\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
@@ -174,7 +174,7 @@ HEADER
     #CUSTOM_NAME=""
     #DESCRIPTION=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1438013174"
+    #MODIFIED="1476662232"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="2c62d888-fb9f-409d-881f-a110527ce631"
    }
   }
@@ -503,7 +503,7 @@ HEADER
       #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="FPA_DRIVER_STAT(15:0)"
+      #NAME="FPA_DRIVER_STAT(31:0)"
       #NUMBER="0"
       #SIDE="left"
      }
@@ -613,7 +613,7 @@ HEADER
     #CUSTOM_NAME=""
     #DESCRIPTION=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1465234920"
+    #MODIFIED="1476662238"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="0e299664-6957-489c-b3b5-04717e80637a"
    }
   }
@@ -923,7 +923,7 @@ HEADER
       #LABEL="Bus In"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="FPA_DRIVER_STAT(15:0)"
+      #NAME="FPA_DRIVER_STAT(31:0)"
       #NUMBER="0"
      }
      LINE  1, 0, 0
@@ -2260,7 +2260,7 @@ HEADER
     #CUSTOM_NAME=""
     #DESCRIPTION=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1448380526"
+    #MODIFIED="1476662187"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="6a4213e1-0b34-43fd-8d7e-c8de7435a5a3"
    }
   }
@@ -2962,7 +2962,7 @@ HEADER
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
       #MODIFIED="1"
-      #NAME="FPA_DRIVER_STAT(15:0)"
+      #NAME="FPA_DRIVER_STAT(31:0)"
       #NUMBER="0"
       #SIDE="left"
      }
@@ -6004,13 +6004,13 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="6a4213e1-0b34-43fd-8d7e-c8de7435a5a3"
    }
    COORD (2020,480)
-   VERTEXES ( (253,15530), (251,15527), (249,14830), (247,12538), (245,10930), (242,14959), (240,5534), (238,5511), (236,5514), (234,2974), (232,15514), (230,6447), (228,7748), (226,4899), (224,4903), (222,4901), (220,2964), (218,2947), (216,2915), (214,2912), (212,2904), (210,6594), (208,15517), (200,2675), (182,2677), (176,2679), (170,2681), (164,2683), (152,15121), (116,5029), (110,2696) )
+   VERTEXES ( (110,2696), (116,5029), (152,15121), (164,2683), (170,2681), (176,2679), (182,2677), (200,2675), (208,15517), (210,6594), (212,2904), (214,2912), (216,2915), (218,2947), (220,2964), (222,4901), (224,4903), (226,4899), (228,7748), (230,6447), (232,15514), (234,2974), (236,5514), (238,5511), (240,5534), (242,14959), (245,10930), (247,12538), (249,14830), (251,15527), (253,15530) )
    PINPROP 116,"#PIN_STATE","0"
   }
   TEXT  657, 0, 0
   {
    TEXT "$#COMPONENT"
-   RECT (1960,1120,2165,1155)
+   RECT (1940,1100,2145,1135)
    MARGINS (1,1)
    PARENT 636
   }
@@ -6921,7 +6921,7 @@ PAGE ""
   }
   BUS  2976, 0, 0
   {
-   NET 15291
+   NET 16552
    VTX 2974, 2975
    VARIABLES
    {
@@ -10066,7 +10066,7 @@ PAGE ""
   }
   BUS  11647, 0, 0
   {
-   NET 15291
+   NET 16552
    VTX 11645, 11646
    VARIABLES
    {
@@ -10700,15 +10700,6 @@ PAGE ""
     #NAMED="1"
    }
   }
-  NET BUS  15291, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="1"
-    #MDA_RECORD_TOKEN="OTHER"
-    #NAME="FPA_DRIVER_STAT(15:0)"
-   }
-  }
   VTX  15361, 0, 0
   {
    COORD (2540,1840)
@@ -11088,6 +11079,15 @@ PAGE ""
     #NAME="PROG_TRIG"
    }
   }
+  NET BUS  16552, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="FPA_DRIVER_STAT(31:0)"
+   }
+  }
  }
  
 }
@@ -11113,7 +11113,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  16529, 0, 0
+  TEXT  16553, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -11124,7 +11124,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  16530, 0, 0
+  TEXT  16554, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -11135,7 +11135,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  16531, 0, 0
+  TEXT  16555, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -11145,7 +11145,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  16532, 0, 0
+  TEXT  16556, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -11157,27 +11157,27 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  LINE  16533, 0, 0
+  LINE  16557, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3660,3080), (4200,3080) )
    FILL (1,(0,0,0),0)
   }
-  LINE  16534, 0, 0
+  LINE  16558, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3660,3080), (3660,3200) )
   }
-  LINE  16535, 0, 0
+  LINE  16559, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4200,3200), (4200,2960), (3220,2960), (3220,3200), (4200,3200) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  16536, 0, 0
+  TEXT  16560, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -11192,20 +11192,20 @@ PAGE ""
    VAR
    MULTILINE
   }
-  LINE  16537, 0, 0
+  LINE  16561, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3660,2960), (3660,3080) )
   }
-  LINE  16538, 0, 0
+  LINE  16562, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4200,2960), (4200,2840), (3660,2840), (3660,2960), (4200,2960) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  16539, 0, 0
+  TEXT  16563, 0, 0
   {
    PAGEALIGN 10
    TEXT "$FIRMWARE"
@@ -11216,7 +11216,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  16540, 0, 0
+  TEXT  16564, 0, 0
   {
    PAGEALIGN 10
    TEXT "$AUTHOR"
@@ -11227,7 +11227,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  16541, 0, 0
+  TEXT  16565, 0, 0
   {
    PAGEALIGN 10
    TEXT "$PROJECT"
@@ -11238,7 +11238,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  16542, 0, 0
+  TEXT  16566, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -11249,7 +11249,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  16543, 0, 0
+  TEXT  16567, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -11260,20 +11260,20 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  16544, 0, 0
+  LINE  16568, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3380,2960), (3380,3080) )
   }
-  LINE  16545, 0, 0
+  LINE  16569, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3220,3080), (3660,3080) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  16546, 0, 0
+  TEXT  16570, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -11284,7 +11284,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  16547, 0, 0
+  TEXT  16571, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -11295,19 +11295,19 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  16548, 0, 0
+  LINE  16572, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3380,3080), (3380,3200) )
   }
-  LINE  16549, 0, 0
+  LINE  16573, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3780,3080), (3780,3200) )
   }
-  TEXT  16550, 0, 0
+  TEXT  16574, 0, 0
   {
    PAGEALIGN 10
    TEXT "$REVISION"
@@ -11318,7 +11318,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  BMPPICT  16551, 0, 0
+  BMPPICT  16575, 0, 0
   {
    PAGEALIGN 10
    RECT (3740,2860,4120,2955)

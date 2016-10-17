@@ -35,7 +35,7 @@ entity isc0207A_mblaze_intf is
       STATUS_MISO           : in t_axi4_lite_miso;
       CTRLED_RESET          : out std_logic;
       
-      FPA_DRIVER_STAT       : in std_logic_vector(15 downto 0);
+      FPA_DRIVER_STAT       : in std_logic_vector(31 downto 0);
       
       FPA_INTF_CFG          : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;

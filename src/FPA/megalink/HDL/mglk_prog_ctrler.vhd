@@ -53,7 +53,7 @@ entity mglk_prog_ctrler is
       
       PROXY_PWR            : out std_logic;
       PROXY_TRIG           : out std_logic;
-      FPA_DRIVER_STAT      : out std_logic_vector(15 downto 0);
+      FPA_DRIVER_STAT      : out std_logic_vector(31 downto 0);
       FRAME_ID             : out std_logic_vector(31 downto 0); --  synchronisé avec ACQ_INT
       INT_INDX             : out std_logic_vector(7 downto 0);
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
@@ -177,6 +177,7 @@ begin
    FPA_MCLK <= fpa_mclk_p(2);
    
    
+   FPA_DRIVER_STAT(17 downto 16) <= (others => '0');
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err; 
    FPA_DRIVER_STAT(7) <= '0'; 
    FPA_DRIVER_STAT(6) <= '0'; 

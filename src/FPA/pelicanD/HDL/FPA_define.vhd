@@ -29,6 +29,7 @@ package FPA_define is
    --------------------------------------------   
    constant DEFINE_FPA_ROIC              : std_logic_vector(7 downto 0) := FPA_ROIC_PELICAND;  -- roic du détecteur. Cela veut dire que le vhd actuel peut contrôler in détecteur de ce type qque soit le cooler.
    constant DEFINE_FPA_OUTPUT            : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL; 
+   constant DEFINE_FPA_INIT_CFG_NEEDED   : std_logic := '0';     -- pas besoin de config particulière au demarrage du PelicanD
    
    ----------------------------------------------
    -- FPA 
