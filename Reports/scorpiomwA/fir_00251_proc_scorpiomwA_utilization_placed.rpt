@@ -1,13 +1,13 @@
 Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2013.4 (win64) Build 353583 Mon Dec  9 17:49:19 MST 2013
-| Date         : Wed Sep 07 23:54:42 2016
+| Date         : Tue Oct 18 00:34:44 2016
 | Host         : TELOPS177 running 64-bit Service Pack 1  (build 7601)
-| Command      : report_utilization -file fir_00251_proc_scorpiomwA_utilization_placed.rpt -pb fir_00251_proc_scorpiomwA_utilization_placed.pb
+| Command      : report_utilization -file d:/Telops/fir-00251-Proc/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_utilization_placed.rpt
 | Design       : fir_00251_proc_scorpiomwA
 | Device       : xc7k160t
-| Design State : Fully Placed
------------------------------------------------------------------------------------------------------------------------------------------------
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------
 
 Utilization Design Information
 
@@ -30,15 +30,15 @@ Table of Contents
 +----------------------------+--------+-------+-----------+-------+
 |          Site Type         |  Used  | Loced | Available | Util% |
 +----------------------------+--------+-------+-----------+-------+
-| Slice LUTs                 |  74418 |     0 |    101400 | 73.39 |
-|   LUT as Logic             |  67542 |     0 |    101400 | 66.60 |
-|   LUT as Memory            |   6876 |     0 |     35000 | 19.64 |
+| Slice LUTs                 |  74951 |     0 |    101400 | 73.91 |
+|   LUT as Logic             |  68078 |     0 |    101400 | 67.13 |
+|   LUT as Memory            |   6873 |     0 |     35000 | 19.63 |
 |     LUT as Distributed RAM |   2892 |     0 |           |       |
-|     LUT as Shift Register  |   3984 |     0 |           |       |
-| Slice Registers            | 129218 |     2 |    202800 | 63.71 |
-|   Register as Flip Flop    | 129218 |     2 |    202800 | 63.71 |
+|     LUT as Shift Register  |   3981 |     0 |           |       |
+| Slice Registers            | 131702 |     2 |    202800 | 64.94 |
+|   Register as Flip Flop    | 131702 |     2 |    202800 | 64.94 |
 |   Register as Latch        |      0 |     0 |    202800 |  0.00 |
-| F7 Muxes                   |    443 |     0 |     50700 |  0.87 |
+| F7 Muxes                   |    441 |     0 |     50700 |  0.86 |
 | F8 Muxes                   |     17 |     0 |     25350 |  0.06 |
 +----------------------------+--------+-------+-----------+-------+
 
@@ -49,26 +49,26 @@ Table of Contents
 +-------------------------------------------------------------+-------------+-------+-----------+-------+
 |                          Site Type                          |     Used    | Loced | Available | Util% |
 +-------------------------------------------------------------+-------------+-------+-----------+-------+
-| Slice                                                       |       25326 |     0 |     25350 | 99.90 |
-| LUT as Logic                                                |       67542 |     0 |    101400 | 66.60 |
-|   using O5 output only                                      |          14 |       |           |       |
-|   using O6 output only                                      |       53171 |       |           |       |
-|   using O5 and O6                                           |       14357 |       |           |       |
-| LUT as Memory                                               |        6876 |     0 |     35000 | 19.64 |
+| Slice                                                       |       25295 |     0 |     25350 | 99.78 |
+| LUT as Logic                                                |       68078 |     0 |    101400 | 67.13 |
+|   using O5 output only                                      |          10 |       |           |       |
+|   using O6 output only                                      |       53564 |       |           |       |
+|   using O5 and O6                                           |       14504 |       |           |       |
+| LUT as Memory                                               |        6873 |     0 |     35000 | 19.63 |
 |   LUT as Distributed RAM                                    |        2892 |     0 |           |       |
 |     using O5 output only                                    |           0 |       |           |       |
 |     using O6 output only                                    |          96 |       |           |       |
 |     using O5 and O6                                         |        2796 |       |           |       |
-|   LUT as Shift Register                                     |        3984 |     0 |           |       |
-|     using O5 output only                                    |         120 |       |           |       |
-|     using O6 output only                                    |        1588 |       |           |       |
-|     using O5 and O6                                         |        2276 |       |           |       |
-| LUT Flip Flop Pairs                                         |       97697 |     0 |    101400 | 96.34 |
-|   fully used LUT-FF pairs                                   |       60482 |       |           |       |
-|   LUT-FF pairs with unused LUT                              |       23413 |       |           |       |
-|   LUT-FF pairs with unused Flip Flop                        |       13802 |       |           |       |
-| Unique Control Sets                                         |        4503 |       |           |       |
-| Minimum number of registers lost to control set restriction | 12614(Lost) |       |           |       |
+|   LUT as Shift Register                                     |        3981 |     0 |           |       |
+|     using O5 output only                                    |         126 |       |           |       |
+|     using O6 output only                                    |        1575 |       |           |       |
+|     using O5 and O6                                         |        2280 |       |           |       |
+| LUT Flip Flop Pairs                                         |       98370 |     0 |    101400 | 97.01 |
+|   fully used LUT-FF pairs                                   |       61306 |       |           |       |
+|   LUT-FF pairs with unused LUT                              |       23555 |       |           |       |
+|   LUT-FF pairs with unused Flip Flop                        |       13509 |       |           |       |
+| Unique Control Sets                                         |        4500 |       |           |       |
+| Minimum number of registers lost to control set restriction | 12594(Lost) |       |           |       |
 +-------------------------------------------------------------+-------------+-------+-----------+-------+
 
 
@@ -177,22 +177,22 @@ Table of Contents
 +--------------------------+--------+
 |         Ref Name         |  Used  |
 +--------------------------+--------+
-| FDRE                     | 115081 |
-| LUT6                     |  20845 |
-| LUT3                     |  20375 |
-| LUT4                     |  13404 |
-| LUT2                     |  12443 |
-| LUT5                     |  11625 |
+| FDRE                     | 117588 |
+| LUT3                     |  21036 |
+| LUT6                     |  20747 |
+| LUT4                     |  13306 |
+| LUT2                     |  12608 |
+| LUT5                     |  11733 |
 | FDCE                     |   8342 |
-| SRL16E                   |   5292 |
-| CARRY4                   |   4287 |
+| SRL16E                   |   5293 |
+| CARRY4                   |   4373 |
 | RAMD32                   |   4210 |
-| FDPE                     |   3347 |
-| LUT1                     |   3207 |
-| FDSE                     |   2466 |
+| FDPE                     |   3343 |
+| LUT1                     |   3152 |
+| FDSE                     |   2447 |
 | RAMS32                   |   1382 |
 | SRLC32E                  |    924 |
-| MUXF7                    |    443 |
+| MUXF7                    |    441 |
 | RAMB36E1                 |    209 |
 | IBUF                     |    111 |
 | OBUF                     |    108 |
@@ -249,257 +249,8 @@ Table of Contents
 10. Instantiated Netlists
 -------------------------
 
-+---------------------------------------------+------+
-|                   Ref Name                  | Used |
-+---------------------------------------------+------+
-| video_mgt                                   |    1 |
-| usart_mmcm                                  |    1 |
-| tdp_ram_w32_d32768                          |    1 |
-| tdp_ram_w32_d16384                          |    1 |
-| t_axi4_stream8_sfifo_d2048_HD2866           |    1 |
-| t_axi4_stream8_sfifo_d2048                  |    1 |
-| t_axi4_stream32_sfifo_d64_HD989             |    1 |
-| t_axi4_stream32_sfifo_d64_HD968             |    1 |
-| t_axi4_stream32_sfifo_d64_HD947             |    1 |
-| t_axi4_stream32_sfifo_d64_HD926             |    1 |
-| t_axi4_stream32_sfifo_d64_HD905             |    1 |
-| t_axi4_stream32_sfifo_d64_HD884             |    1 |
-| t_axi4_stream32_sfifo_d64_HD863             |    1 |
-| t_axi4_stream32_sfifo_d64_HD842             |    1 |
-| t_axi4_stream32_sfifo_d64_HD821             |    1 |
-| t_axi4_stream32_sfifo_d64_HD800             |    1 |
-| t_axi4_stream32_sfifo_d64_HD779             |    1 |
-| t_axi4_stream32_sfifo_d64_HD758             |    1 |
-| t_axi4_stream32_sfifo_d64_HD1136            |    1 |
-| t_axi4_stream32_sfifo_d64_HD1115            |    1 |
-| t_axi4_stream32_sfifo_d64_HD1094            |    1 |
-| t_axi4_stream32_sfifo_d64_HD1073            |    1 |
-| t_axi4_stream32_sfifo_d64_HD1052            |    1 |
-| t_axi4_stream32_sfifo_d64_HD1031            |    1 |
-| t_axi4_stream32_sfifo_d64_HD1010            |    1 |
-| t_axi4_stream32_sfifo_d64                   |    1 |
-| t_axi4_stream32_sfifo_d256_HD1796           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1775           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1754           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1733           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1712           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1691           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1670           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1649           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1628           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1607           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1586           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1565           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1544           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1523           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1502           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1481           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1460           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1439           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1418           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1397           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1376           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1355           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1334           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1313           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1292           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1271           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1250           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1229           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1208           |    1 |
-| t_axi4_stream32_sfifo_d256_HD1187           |    1 |
-| t_axi4_stream32_sfifo_d256                  |    1 |
-| t_axi4_stream32_sfifo_d2048_HD1818          |    1 |
-| t_axi4_stream32_sfifo_d2048                 |    1 |
-| t_axi4_stream32_sfifo_d16_HD2222            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2201            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2180            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2159            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2138            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2117            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2096            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2075            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2054            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2033            |    1 |
-| t_axi4_stream32_sfifo_d16_HD2012            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1991            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1970            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1949            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1928            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1907            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1886            |    1 |
-| t_axi4_stream32_sfifo_d16_HD1865            |    1 |
-| t_axi4_stream32_sfifo_d16                   |    1 |
-| t_axi4_stream32_sfifo_d1024_HD2356          |    1 |
-| t_axi4_stream32_sfifo_d1024_HD2329          |    1 |
-| t_axi4_stream32_sfifo_d1024_HD2302          |    1 |
-| t_axi4_stream32_sfifo_d1024_HD2275          |    1 |
-| t_axi4_stream32_sfifo_d1024_HD2248          |    1 |
-| t_axi4_stream32_sfifo_d1024                 |    1 |
-| t_axi4_stream32_afifo_d512_HD2477           |    1 |
-| t_axi4_stream32_afifo_d512_HD2447           |    1 |
-| t_axi4_stream32_afifo_d512_HD2417           |    1 |
-| t_axi4_stream32_afifo_d512_HD2387           |    1 |
-| t_axi4_stream32_afifo_d512                  |    1 |
-| t_axi4_stream16_sfifo_d16_HD2973            |    1 |
-| t_axi4_stream16_sfifo_d16_HD2952            |    1 |
-| t_axi4_stream16_sfifo_d16                   |    1 |
-| t_axi4_lite32_w_afifo_d16_HD3360            |    1 |
-| t_axi4_lite32_w_afifo_d16_HD3288            |    1 |
-| t_axi4_lite32_w_afifo_d16_HD3216            |    1 |
-| t_axi4_lite32_w_afifo_d16_HD3144            |    1 |
-| t_axi4_lite32_w_afifo_d16_HD3072            |    1 |
-| t_axi4_lite32_w_afifo_d16_HD3000            |    1 |
-| t_axi4_lite32_w_afifo_d16                   |    1 |
-| sdp_ram_w32_d128                            |    1 |
-| scorpiomwA_18MHz_mmcm                       |    1 |
-| mmcm_clk_20MHz                              |    1 |
-| ip_fp32_axis_subtract_HD2543                |    1 |
-| ip_fp32_axis_subtract_HD2539                |    1 |
-| ip_fp32_axis_subtract_HD2535                |    1 |
-| ip_fp32_axis_subtract_HD2531                |    1 |
-| ip_fp32_axis_subtract_HD2527                |    1 |
-| ip_fp32_axis_subtract_HD2523                |    1 |
-| ip_fp32_axis_subtract_HD2519                |    1 |
-| ip_fp32_axis_subtract_HD2515                |    1 |
-| ip_fp32_axis_subtract                       |    1 |
-| ip_fp32_axis_sqroot                         |    1 |
-| ip_fp32_axis_mult_HD2830                    |    1 |
-| ip_fp32_axis_mult_HD2825                    |    1 |
-| ip_fp32_axis_mult_HD2820                    |    1 |
-| ip_fp32_axis_mult_HD2815                    |    1 |
-| ip_fp32_axis_mult_HD2810                    |    1 |
-| ip_fp32_axis_mult_HD2805                    |    1 |
-| ip_fp32_axis_mult_HD2800                    |    1 |
-| ip_fp32_axis_mult_HD2795                    |    1 |
-| ip_fp32_axis_mult_HD2790                    |    1 |
-| ip_fp32_axis_mult_HD2785                    |    1 |
-| ip_fp32_axis_mult_HD2780                    |    1 |
-| ip_fp32_axis_mult_HD2775                    |    1 |
-| ip_fp32_axis_mult_HD2770                    |    1 |
-| ip_fp32_axis_mult_HD2765                    |    1 |
-| ip_fp32_axis_mult_HD2760                    |    1 |
-| ip_fp32_axis_mult_HD2755                    |    1 |
-| ip_fp32_axis_mult_HD2750                    |    1 |
-| ip_fp32_axis_mult_HD2745                    |    1 |
-| ip_fp32_axis_mult_HD2740                    |    1 |
-| ip_fp32_axis_mult                           |    1 |
-| ip_fp32_axis_greaterThan_HD2548             |    1 |
-| ip_fp32_axis_greaterThan                    |    1 |
-| ip_fp32_axis_divide_HD2902                  |    1 |
-| ip_fp32_axis_divide_HD2898                  |    1 |
-| ip_fp32_axis_divide_HD2894                  |    1 |
-| ip_fp32_axis_divide                         |    1 |
-| ip_fp32_axis_add_HD2861                     |    1 |
-| ip_fp32_axis_add_HD2857                     |    1 |
-| ip_fp32_axis_add_HD2853                     |    1 |
-| ip_fp32_axis_add_HD2849                     |    1 |
-| ip_fp32_axis_add_HD2845                     |    1 |
-| ip_fp32_axis_add_HD2841                     |    1 |
-| ip_fp32_axis_add                            |    1 |
-| ip_blk_mem_gen_w32_d8192                    |    1 |
-| ip_axis_fp32tofi32_HD2573                   |    1 |
-| ip_axis_fp32tofi32_HD2570                   |    1 |
-| ip_axis_fp32tofi32_HD2567                   |    1 |
-| ip_axis_fp32tofi32_HD2564                   |    1 |
-| ip_axis_fp32tofi32_HD2561                   |    1 |
-| ip_axis_fp32tofi32_HD2558                   |    1 |
-| ip_axis_fp32tofi32                          |    1 |
-| ip_axis_fi32tofp32_HD2657                   |    1 |
-| ip_axis_fi32tofp32_HD2653                   |    1 |
-| ip_axis_fi32tofp32_HD2649                   |    1 |
-| ip_axis_fi32tofp32_HD2645                   |    1 |
-| ip_axis_fi32tofp32_HD2641                   |    1 |
-| ip_axis_fi32tofp32_HD2637                   |    1 |
-| ip_axis_fi32tofp32_HD2633                   |    1 |
-| ip_axis_fi32tofp32_HD2629                   |    1 |
-| ip_axis_fi32tofp32_HD2625                   |    1 |
-| ip_axis_fi32tofp32_HD2621                   |    1 |
-| ip_axis_fi32tofp32_HD2617                   |    1 |
-| ip_axis_fi32tofp32_HD2613                   |    1 |
-| ip_axis_fi32tofp32_HD2609                   |    1 |
-| ip_axis_fi32tofp32_HD2605                   |    1 |
-| ip_axis_fi32tofp32_HD2601                   |    1 |
-| ip_axis_fi32tofp32_HD2597                   |    1 |
-| ip_axis_fi32tofp32_HD2593                   |    1 |
-| ip_axis_fi32tofp32                          |    1 |
-| ip_axis8_fanout2                            |    1 |
-| ip_axis32_fanout2_HD2718                    |    1 |
-| ip_axis32_fanout2_HD2715                    |    1 |
-| ip_axis32_fanout2_HD2712                    |    1 |
-| ip_axis32_fanout2_HD2709                    |    1 |
-| ip_axis32_fanout2_HD2706                    |    1 |
-| ip_axis32_fanout2_HD2703                    |    1 |
-| ip_axis32_fanout2_HD2700                    |    1 |
-| ip_axis32_fanout2_HD2697                    |    1 |
-| ip_axis32_fanout2_HD2694                    |    1 |
-| ip_axis32_fanout2_HD2691                    |    1 |
-| ip_axis32_fanout2_HD2688                    |    1 |
-| ip_axis32_fanout2_HD2685                    |    1 |
-| ip_axis32_fanout2_HD2682                    |    1 |
-| ip_axis32_fanout2_HD2679                    |    1 |
-| ip_axis32_fanout2_HD2676                    |    1 |
-| ip_axis32_fanout2                           |    1 |
-| ip_axis16_merge_axis32_HD3437               |    1 |
-| ip_axis16_merge_axis32_HD3434               |    1 |
-| ip_axis16_merge_axis32                      |    1 |
-| ip_axi_bram_ctrl                            |    1 |
-| histogram_axis_tmi_c_counter_binary_v12_0_0 |    1 |
-| histogram_axis_tmi_c_addsub_v12_0_0         |    1 |
-| histogram_axis_tmi_blk_mem_gen_v8_1_0       |    1 |
-| fwft_sfifo_w8_d256_HD2907                   |    1 |
-| fwft_sfifo_w8_d256                          |    1 |
-| fwft_sfifo_w8_d16                           |    1 |
-| fwft_sfifo_w76_d16_HD3441                   |    1 |
-| fwft_sfifo_w76_d16                          |    1 |
-| fwft_sfifo_w72_d16_HD468                    |    1 |
-| fwft_sfifo_w72_d16                          |    1 |
-| fwft_sfifo_w56_d256_HD2929                  |    1 |
-| fwft_sfifo_w56_d256                         |    1 |
-| fwft_sfifo_w3_d16_HD50                      |    1 |
-| fwft_sfifo_w3_d16_HD29                      |    1 |
-| fwft_sfifo_w3_d16                           |    1 |
-| fwft_sfifo_w33_d16_HD490                    |    1 |
-| fwft_sfifo_w33_d16                          |    1 |
-| fwft_sfifo_w32_d16_HD89                     |    1 |
-| fwft_sfifo_w32_d16_HD446                    |    1 |
-| fwft_sfifo_w32_d16_HD425                    |    1 |
-| fwft_sfifo_w32_d16_HD404                    |    1 |
-| fwft_sfifo_w32_d16_HD383                    |    1 |
-| fwft_sfifo_w32_d16_HD362                    |    1 |
-| fwft_sfifo_w32_d16_HD341                    |    1 |
-| fwft_sfifo_w32_d16_HD320                    |    1 |
-| fwft_sfifo_w32_d16_HD299                    |    1 |
-| fwft_sfifo_w32_d16_HD278                    |    1 |
-| fwft_sfifo_w32_d16_HD257                    |    1 |
-| fwft_sfifo_w32_d16_HD236                    |    1 |
-| fwft_sfifo_w32_d16_HD215                    |    1 |
-| fwft_sfifo_w32_d16_HD194                    |    1 |
-| fwft_sfifo_w32_d16_HD173                    |    1 |
-| fwft_sfifo_w32_d16_HD152                    |    1 |
-| fwft_sfifo_w32_d16_HD131                    |    1 |
-| fwft_sfifo_w32_d16_HD110                    |    1 |
-| fwft_sfifo_w32_d16                          |    1 |
-| fwft_sfifo_w192_d16_HD2                     |    1 |
-| fwft_sfifo_w192_d16                         |    1 |
-| fwft_afifo_w62_d16_HD3465                   |    1 |
-| fwft_afifo_w62_d16                          |    1 |
-| exp_mgt                                     |    1 |
-| ehdri_index_mem                             |    1 |
-| dp_ram_byte_w32_d64                         |    1 |
-| data_mgt                                    |    1 |
-| core                                        |    1 |
-| calib_param_ram                             |    1 |
-| buffer_table_ram                            |    1 |
-| axis_32_to_16                               |    1 |
-| afifo_w57d16_HD3487                         |    1 |
-| afifo_w57d16                                |    1 |
-| AXI4_Stream64_to_32_HD569                   |    1 |
-| AXI4_Stream64_to_32_HD513                   |    1 |
-| AXI4_Stream64_to_32                         |    1 |
-| AXI4_Stream32_to_64_HD683                   |    1 |
-| AXI4_Stream32_to_64_HD627                   |    1 |
-| AXI4_Stream32_to_64                         |    1 |
-+---------------------------------------------+------+
++----------+------+
+| Ref Name | Used |
++----------+------+
 
 
