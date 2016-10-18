@@ -631,7 +631,6 @@ bool AECPlusCheckForUnattenuation(gcRegistersData_t *pGCRegs, float PET)
 
 void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate)
 {
-   t_PosixTime t0;
    // if NDF Continuous Hold keep the filter in place
    if (AECArmed)
       return;
@@ -662,7 +661,10 @@ void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate)
       AECPlus_ExpTime = pGCRegs->ExposureTimeMin;
    }
 
-   t0 = TRIG_GetRTC(&gTrig);
+#ifdef AEC_VERBOSE
+   t_PosixTime t0 = TRIG_GetRTC(&gTrig);
+#endif
+
    AEC_PRINTF("AECPlus_ExpTime (x100) = %d\n", ((uint32_t)AECPlus_ExpTime * 100));
    AEC_PRINTF("AEC+: change filter request @ %010d.%d s\n", t0.Seconds, t0.SubSeconds);
 }

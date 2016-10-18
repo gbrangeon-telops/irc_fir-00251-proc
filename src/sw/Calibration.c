@@ -402,7 +402,6 @@ void Calibration_SM()
    static uint32_t lutRQIndex;
    static uint32_t lutRQCount;
    static uint32_t lutNLCount;
-   static uint32_t newBadPixelCount;
    static uint8_t startup = 1;
    static deltabeta_t* deltaBetaDataAddr = NULL;
 
@@ -823,7 +822,6 @@ void Calibration_SM()
                   CM_INF("Pixel data loaded.");
                   if (ACT_shouldUpdateCurrentCalibration(&calibrationInfo, blockIndex))
                   {
-                     newBadPixelCount = 0;
                      cmCurrentState = CMS_UPDATE_PIXEL_DATA;
                      gStartBetaQuantization = true;
                      dataOffset = 0;
