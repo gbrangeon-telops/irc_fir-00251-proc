@@ -94,6 +94,7 @@
 // fleg
 #define FLEG_DAC_RESOLUTION_BITS          14            // le DAC est à 14 bits
 #define FLEG_DAC_REF_VOLTAGE_V            2.5           // on utilise la reference interne de 2.5V du DAC 
+#define FLEG_DAC_REF_GAIN                 2.0           // gain de référence du DAC
 
 
 #define VHD_PIXEL_PIPE_DLY_SEC            360E-9        // delai max du pipe des pixels
@@ -103,7 +104,7 @@
 #define ISC0209_DET_BIAS_VOLTAGE_MIN_mV   100           // voltage minimale de 100 mV pour detBias (selon rapport Qmagiq)
 #define ISC0209_DET_BIAS_VOLTAGE_MAX_mV   518           // voltage maximale de 518 mV pour detBias (on ne peut atteindre les 700 mV du rapport Q magiq en mode commande)
 
-#define ISC0209_REFOFS_VOLTAGE_MIN_mV     3000           // valeur en provenance du fichier fpa_define
+#define ISC0209_REFOFS_VOLTAGE_MIN_mV     2810           // valeur en provenance du fichier fpa_define
 #define ISC0209_REFOFS_VOLTAGE_MAX_mV     6200           // valeur en provenance du fichier fpa_define
 
 // structure interne pour les parametres du isc0209
@@ -143,6 +144,8 @@ typedef struct isc0209_param_s  isc0209_param_t;
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 
 
 void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
@@ -515,3 +518,67 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
    AXI4L_write32(FPA_INPUT_TYPE, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
 }
 
+//--------------------------------------------------------------------------
+// Conversion de VccVoltage_mV en DAC Word
+//--------------------------------------------------------------------------
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8)
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
+{
+  float Rs, Rd, RL, Is, DacVoltage_Volt;
+  uint32_t DacWord;
+
+   if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
+      Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
+      Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
+      RL = 3.01e3F;    // sur EFA-00266-001, vaut R35
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   else{                                                   // les canaux VCC4, VCC5, VCC6, et VCC7 sont identiques à VCC4
+      Rs = 4.99e3F;    // sur EFA-00266-001, vaut R30
+      Rd = 24.9F;      // sur EFA-00266-001, vaut R29
+      RL = 806.0F;     // sur EFA-00266-001, vaut R28
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   // calculs de la tension du dac en volt
+   DacVoltage_Volt =  ((1.0F + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
+
+   // deduction du bitstream du DAC
+   DacWord = (uint32_t)(powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
+   DacWord = (uint32_t) MAX(MIN(DacWord, 16383), 0);
+
+   return DacWord;
+}
+
+//--------------------------------------------------------------------------
+// Conversion de DAC Word  en VccVoltage_mV
+//--------------------------------------------------------------------------
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8)
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
+{
+   float Rs, Rd, RL, Is, DacVoltage_Volt, VccVoltage_mV;
+   uint32_t DacWordTemp;
+
+   if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
+      Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
+      Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
+      RL = 3.01e3F;    // sur EFA-00266-001, vaut R35
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   else{                                                   // les canaux VCC4, VCC5, VCC6, et VCC7 sont identiques à VCC4
+      Rs = 4.99e3F;    // sur EFA-00266-001, vaut R30
+      Rd = 24.9F;      // sur EFA-00266-001, vaut R29
+      RL = 806.0F;     // sur EFA-00266-001, vaut R28
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+
+   // deduction de la tension du DAC
+   DacWordTemp =  (uint32_t) MAX(MIN(DacWord, 16383), 0);
+   DacVoltage_Volt = (float)DacWordTemp * ((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN)/powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS);
+
+   //calculs de la tension du LDO en volt
+   VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
+
+   return VccVoltage_mV;
+}
