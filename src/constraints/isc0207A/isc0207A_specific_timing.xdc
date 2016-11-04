@@ -50,6 +50,12 @@ set_false_path -from CLK_RX_2 -to [get_cells U1/CH2/U12/iserdese2_master]
 set_false_path -from CLK_RX_3 -to [get_cells U1/CH3/U12/iserdese2_master]
 set_false_path -from [get_clocks DCO*] -to [get_clocks clk_7x*]
 
+set_false_path -from [get_clocks clk_out1_isc0207A_pll_1] -to [get_clocks clk_out6_core_clk_wiz_1_0_2]
+set_false_path -from [get_clocks clk_out6_core_clk_wiz_1_0_2] -to [get_clocks clk_out1_isc0207A_pll_1]
+set_false_path -from [get_clocks clk_out1_isc0207A_pll_1] -to [get_clocks clk_out1_core_clk_wiz_1_0_2]
+set_false_path -from [get_clocks clk_out1_core_clk_wiz_1_0_2] -to [get_clocks clk_out1_isc0207A_pll_1]
+
+
 # Max Delay / Min Delay
 # Multicycle Paths
 # Case Analysis

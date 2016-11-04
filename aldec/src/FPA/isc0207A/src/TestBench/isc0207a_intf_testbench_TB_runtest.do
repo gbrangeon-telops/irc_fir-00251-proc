@@ -26,6 +26,7 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\isc0207A_pll\isc0207A_pll_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl
 
@@ -140,6 +141,6 @@ asim -ses isc0207a_intf_testbench_TB
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U21/U6/*
 
-wave UUT/U1/U21/U2/*
+wave UUT/U1/*
 
-run 3.0 ms
+run 20 ms

@@ -239,8 +239,9 @@ begin
                   when X"8C" =>    user_cfg.tri_window_and_intmode_part     <= unsigned(data_i(user_cfg.tri_window_and_intmode_part'length-1 downto 0));  
                   when X"90" =>    user_cfg.int_time_offset                 <= unsigned(data_i(user_cfg.int_time_offset'length-1 downto 0)); 
                   when X"94" =>    user_cfg.tsh_min                         <= unsigned(data_i(user_cfg.tsh_min'length-1 downto 0));
-                  when X"98" =>    user_cfg.tsh_min_minus_int_time_offset   <= unsigned(data_i(user_cfg.tsh_min_minus_int_time_offset'length-1 downto 0)); user_cfg_in_progress <= '0'; 
-                     
+                  when X"98" =>    user_cfg.tsh_min_minus_int_time_offset   <= unsigned(data_i(user_cfg.tsh_min_minus_int_time_offset'length-1 downto 0)); 
+                  when X"9C" =>    user_cfg.adc_clk_phase                   <= unsigned(data_i(user_cfg.adc_clk_phase'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic                <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

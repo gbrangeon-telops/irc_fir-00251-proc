@@ -13,6 +13,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
+use IEEE.numeric_std.all;
 use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 
@@ -21,8 +22,10 @@ entity isc0207A_clks_gen is
       ARESET            : in std_logic;
       
       CLK_80M           : in std_logic; 
+      ADC_PHASE_CLK     : in std_logic; 
       
       DISABLE_QUAD_CLK_DEFAULT : in std_logic;
+      FPA_INTF_CFG      : in fpa_intf_cfg_type;
       
       FPA_MCLK          : out std_logic;
       
@@ -64,19 +67,23 @@ architecture rtl of isc0207A_clks_gen is
    signal quad_clk_i_0                   : std_logic;
    signal quad_clk_i_1                   : std_logic;
    signal adc_deserializer_rst_i         : std_logic;
+   signal quad_clk_d, quad_clk_r         : std_logic;
+   signal quad_clk_pipe                  : std_logic_vector(15 downto 0);
    
    attribute equivalent_register_removal : string;
    attribute equivalent_register_removal of quad_clk_iob: signal is "no";
    
-   attribute dont_touch : string;
-   attribute dont_touch of quad_clk_iob: signal is "true";
+   
+   attribute IOB : string;
+   attribute IOB of quad_clk_iob : signal is "TRUE";
+   attribute IOB of quad_clk_d   : signal is "TRUE";
    
 begin
    
    QUAD1_CLK <= quad_clk_iob(1);
    QUAD2_CLK <= quad_clk_iob(2);
    QUAD3_CLK <= quad_clk_iob(3);
-   QUAD4_CLK <= quad_clk_iob(4);
+   QUAD4_CLK <= quad_clk_d;--quad_clk_iob(4);   -- ENO: 02 nov 2016: quad_clk_d est ici pour garder la trace détecteur intacte.
    
    ADC_DESERIALIZER_RST <= adc_deserializer_rst_i;
    -----------------------------------------------------
@@ -155,6 +162,20 @@ begin
          end loop;
          
       end if;
-   end process;   
+   end process; 
+   
+   -- dephaseur sur quad 4 pour retrouver delai avant timing
+   U4C : process(ADC_PHASE_CLK)
+   begin
+      if rising_edge(ADC_PHASE_CLK) then                                          
+         
+         -- choix de l'horloge des adcs
+         quad_clk_pipe(0) <= quad_clk_i_0;
+         quad_clk_pipe(15 downto 1) <= quad_clk_pipe(14 downto 0);                        
+         quad_clk_r <= quad_clk_pipe(to_integer(FPA_INTF_CFG.ADC_CLK_PHASE));
+         quad_clk_d <= quad_clk_r; 
+         
+      end if;
+   end process; 
         
 end rtl;

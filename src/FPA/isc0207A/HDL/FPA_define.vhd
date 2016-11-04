@@ -166,6 +166,7 @@ package FPA_define is
       int_time_offset              : unsigned(7 downto 0);
       tsh_min                      : unsigned(15 downto 0);
       tsh_min_minus_int_time_offset: unsigned(15 downto 0);
+      adc_clk_phase                : unsigned(4 downto 0);
       
    end record;    
    

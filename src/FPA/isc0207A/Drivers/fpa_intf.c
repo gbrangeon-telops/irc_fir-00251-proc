@@ -190,8 +190,10 @@ void  FPA_PowerDown(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
-    isc0207_param_t hh;   
-    uint32_t test_pattern_dly;
+   isc0207_param_t hh;   
+   uint32_t test_pattern_dly;
+   //extern int16_t gFpaDetectorPolarizationVoltage;
+   //static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
 	
    // on bâtit les parametres specifiques du 0207
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -279,7 +281,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->ysize_div2_m1 = ptrA->ysize/2 - 1;
    ptrA->diag_tir = 2;
    ptrA->xsize_div_tapnum = ptrA->xsize/FPA_NUMTAPS;
-  
+   
+   
+   // ENO 03 novembre 2016: ADC_CLK_PHASE est introduit pour conserver la trace détecteur
+   ptrA->adc_clk_phase = 13;   // delai empirique optimal pour la trace détecteur
+
    WriteStruct(ptrA);   
 }
 

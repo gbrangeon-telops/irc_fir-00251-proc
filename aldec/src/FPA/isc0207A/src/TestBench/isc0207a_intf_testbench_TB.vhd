@@ -197,6 +197,7 @@ begin
    user_cfg_i.int_time_offset <= to_unsigned(80, user_cfg_i.int_time_offset'length);
    user_cfg_i.tsh_min <= to_unsigned(780, user_cfg_i.tsh_min'length);
    user_cfg_i.tsh_min_minus_int_time_offset <= to_unsigned(700, user_cfg_i.tsh_min_minus_int_time_offset'length);
+   user_cfg_i.adc_clk_phase <= to_unsigned(13, user_cfg_i.adc_clk_phase'length);
    
    
    fpa_softw_stat_i.fpa_roic <= FPA_ROIC_ISC0207;
@@ -338,7 +339,10 @@ begin
       wait for 30 ns;
       
       write_axi_lite (MB_CLK, x"00000098", std_logic_vector(resize(user_cfg_i.tsh_min_minus_int_time_offset, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
+      wait for 30 ns;
+      
+      write_axi_lite (MB_CLK, x"0000009C", std_logic_vector(resize(user_cfg_i.adc_clk_phase, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
       
       write_axi_lite (MB_CLK, resize(X"E0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
