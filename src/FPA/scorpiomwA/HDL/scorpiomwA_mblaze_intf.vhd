@@ -37,7 +37,7 @@ entity scorpiomwA_mblaze_intf is
       CTRLED_RESET          : out std_logic;
       
       FPA_DRIVER_STAT       : in std_logic_vector(31 downto 0);
-      --FPA_INIT_CFG_RECEIVED : out std_logic;
+      DIAG_MODE_ONLY        : in std_logic;
       
       USER_CFG              : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;
@@ -159,7 +159,7 @@ begin
          
          -- configuration     
          if update_cfg = '1' then 
-            if fpa_init_done_i = '0' then -- tant que l'initialisation n'est pas terminée, la config de l,usager n'est pas utilisée                
+            if fpa_init_done_i = '0' and  DIAG_MODE_ONLY = '0' then -- tant qu'en mode détecteur, l'initialisation n'est pas terminée, la config de l,usager n'est pas utilisée                
                USER_CFG <= user_init_cfg_i;     
             else
                USER_CFG <= user_cfg_i;
