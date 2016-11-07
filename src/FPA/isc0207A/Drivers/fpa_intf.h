@@ -124,7 +124,10 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  int_time_offset;
    uint32_t  tsh_min;
    uint32_t  tsh_min_minus_int_time_offset;
-   uint32_t  adc_clk_phase;
+   uint32_t  quad1_clk_phase;
+   uint32_t  quad2_clk_phase;
+   uint32_t  quad3_clk_phase;
+   uint32_t  quad4_clk_phase;
    
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
@@ -182,7 +185,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ

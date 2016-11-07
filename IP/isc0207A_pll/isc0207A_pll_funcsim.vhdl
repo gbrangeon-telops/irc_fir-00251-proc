@@ -1,7 +1,7 @@
 -- Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2013.4 (win64) Build 353583 Mon Dec  9 17:49:19 MST 2013
--- Date        : Tue Nov 01 21:18:42 2016
+-- Date        : Fri Nov 04 16:08:45 2016
 -- Host        : TELOPS177 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim d:/Telops/FIR-00251-Proc/IP/isc0207A_pll/isc0207A_pll_funcsim.vhdl
 -- Design      : isc0207A_pll

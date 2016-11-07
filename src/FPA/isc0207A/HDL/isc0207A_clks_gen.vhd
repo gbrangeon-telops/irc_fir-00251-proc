@@ -58,6 +58,8 @@ architecture rtl of isc0207A_clks_gen is
          Clk_div   : out std_logic);
    end component;
    
+   type quad_clk_pipe_type is array (1 to 4) of std_logic_vector(15 downto 0);
+   
    signal sreset                         : std_logic;
    signal quad_clk_iob                   : std_logic_vector(4 downto 1);
    signal fpa_mclk_i                     : std_logic;
@@ -67,8 +69,8 @@ architecture rtl of isc0207A_clks_gen is
    signal quad_clk_i_0                   : std_logic;
    signal quad_clk_i_1                   : std_logic;
    signal adc_deserializer_rst_i         : std_logic;
-   signal quad_clk_d, quad_clk_r         : std_logic;
-   signal quad_clk_pipe                  : std_logic_vector(15 downto 0);
+   signal quad_clk_d, quad_clk_r         : std_logic_vector(4 downto 1);
+   signal quad_clk_pipe                  : quad_clk_pipe_type;
    
    attribute equivalent_register_removal : string;
    attribute equivalent_register_removal of quad_clk_iob: signal is "no";
@@ -76,14 +78,14 @@ architecture rtl of isc0207A_clks_gen is
    
    attribute IOB : string;
    attribute IOB of quad_clk_iob : signal is "TRUE";
-   attribute IOB of quad_clk_d   : signal is "TRUE";
+   --attribute IOB of quad_clk_d      : signal is "TRUE";
    
 begin
    
    QUAD1_CLK <= quad_clk_iob(1);
    QUAD2_CLK <= quad_clk_iob(2);
    QUAD3_CLK <= quad_clk_iob(3);
-   QUAD4_CLK <= quad_clk_d;--quad_clk_iob(4);   -- ENO: 02 nov 2016: quad_clk_d est ici pour garder la trace détecteur intacte.
+   QUAD4_CLK <= quad_clk_iob(4);      --quad_clk_iob(4);   -- ENO: 02 nov 2016: quad_clk_d est ici pour garder la trace détecteur intacte.
    
    ADC_DESERIALIZER_RST <= adc_deserializer_rst_i;
    -----------------------------------------------------
@@ -156,11 +158,6 @@ begin
          
          quad_clk_i_1 <= quad_clk_i_0; -- requis pour conservation trace détecteur
          
-         -- registres des IOBs
-         for ii in 1 to 4 loop
-            quad_clk_iob(ii) <= quad_clk_i_1; 
-         end loop;
-         
       end if;
    end process; 
    
@@ -169,13 +166,24 @@ begin
    begin
       if rising_edge(ADC_PHASE_CLK) then                                          
          
-         -- choix de l'horloge des adcs
-         quad_clk_pipe(0) <= quad_clk_i_0;
-         quad_clk_pipe(15 downto 1) <= quad_clk_pipe(14 downto 0);                        
-         quad_clk_r <= quad_clk_pipe(to_integer(FPA_INTF_CFG.ADC_CLK_PHASE));
-         quad_clk_d <= quad_clk_r; 
+         -- pipe de l'horloge des adcs
+         for ii  in 1 to 4 loop
+            quad_clk_pipe(ii)(0) <= quad_clk_i_1;
+            quad_clk_pipe(ii)(15 downto 1) <= quad_clk_pipe(ii)(14 downto 0);
+         end loop;
+         
+         -- selection de l'horloge dephasagée pour chaque quad
+         for jj in 1 to 4 loop
+            quad_clk_r(jj) <= quad_clk_pipe(jj)(to_integer(FPA_INTF_CFG.QUAD_CLK_PHASE(jj)));  
+         end loop; 
+         
+         -- registres des IOBs
+         for kk in 1 to 4 loop
+            quad_clk_iob(kk) <= quad_clk_r(kk); 
+         end loop;
+         
          
       end if;
    end process; 
-        
+   
 end rtl;

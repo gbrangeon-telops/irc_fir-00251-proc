@@ -123,6 +123,8 @@ package FPA_define is
       xsize_div_tapnum           : unsigned(7 downto 0);
    end record;
    
+   type quad_clk_phase_type is array (1 to 4) of unsigned(3 downto 0);
+   
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------
@@ -166,7 +168,7 @@ package FPA_define is
       int_time_offset              : unsigned(7 downto 0);
       tsh_min                      : unsigned(15 downto 0);
       tsh_min_minus_int_time_offset: unsigned(15 downto 0);
-      adc_clk_phase                : unsigned(4 downto 0);
+      quad_clk_phase               : quad_clk_phase_type;
       
    end record;    
    
