@@ -192,10 +192,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
    isc0207_param_t hh;   
    uint32_t test_pattern_dly;
-   extern int16_t gFpaDetectorPolarizationVoltage;
-   extern float gFpaDetectorElectricalTapsRef;
-   static float actualElectricalTapsRef = 10;
-   static float actualPolarizationVoltage = 10;
+   //extern int16_t gFpaDetectorPolarizationVoltage;
+   //extern float gFpaDetectorElectricalTapsRef;
+   //static float actualElectricalTapsRef = 10;
+   //static float actualPolarizationVoltage = 10;
    //uint32_t quads_phase;
 	
    // on bâtit les parametres specifiques du 0207
@@ -287,27 +287,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    
    // ENO 03 novembre 2016: ADC_CLK_PHASE est introduit pour conserver la trace détecteur
-   // quads_phase = (uint32_t)gFpaDetectorElectricalTapsRef;  //
-   if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
-   {
-     if ((gFpaDetectorElectricalTapsRef >= 0.0F) && (gFpaDetectorElectricalTapsRef <= 15.0F))
-     {
-        ptrA->quad1_clk_phase = (uint32_t)gFpaDetectorElectricalTapsRef;
-        ptrA->quad2_clk_phase = (uint32_t)gFpaDetectorElectricalTapsRef;
-        ptrA->quad3_clk_phase = (uint32_t)gFpaDetectorElectricalTapsRef;
-     }
-	}                                                                                                       
-   actualElectricalTapsRef = (float)ptrA->quad2_clk_phase;
-   gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;  
-
-   // GPOL voltage
-   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
-   {
-      if ((gFpaDetectorPolarizationVoltage >= 0.0F) && (gFpaDetectorPolarizationVoltage <= 15.0F))
-         ptrA->quad4_clk_phase = (uint32_t) gFpaDetectorPolarizationVoltage;
-   }
-   actualPolarizationVoltage = (float)ptrA->quad4_clk_phase;
-   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
+   ptrA->quad1_clk_phase = 6;
+   ptrA->quad2_clk_phase = 6;
+   ptrA->quad3_clk_phase = 6;
+   ptrA->quad4_clk_phase = 6;
 
    WriteStruct(ptrA);   
 }
