@@ -21,6 +21,8 @@
 #include "uffs\uffs_fd.h"
 #include <string.h> // For memcpy
 
+uint8_t gDisableFlashDynamicValuesUpdate = 0;
+
 IRC_Status_t FlashDynamicValues_ReadFlashDynamicValuesFile(const char *filename, flashDynamicValues_t *p_flashDynamicValues);
 
 
@@ -99,6 +101,12 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
    uint32_t i;
    fileRecord_t *p_file;
 
+   if (gDisableFlashDynamicValuesUpdate != 0)
+   {
+      FDV_ERR("Flash dynamic values update is disabled.");
+      return IRC_FAILURE;
+   }
+   
    GETTIME(&tic);
 
    // Update GenICam registers
