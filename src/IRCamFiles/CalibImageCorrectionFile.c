@@ -60,7 +60,7 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageC
           return 0;
 
        case 2:
-          headerSize = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE_V2;
+          headerSize = CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE_V2;
           if (FM_ReadFileToTmpFileDataBuffer(fd, headerSize) == headerSize)
           {
              if (CalibImageCorrection_ParseImageCorrectionFileHeader_v2(tmpFileDataBuffer, headerSize, hdr) == headerSize)

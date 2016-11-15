@@ -358,6 +358,7 @@ void File_Manager_SM()
                      {
                         if ((gGC_ProprietaryFeatureKeyIsValid == 0) &&
                            ((gFM_files.item[fileIndex]->type == FT_TSAC) ||
+                           (gFM_files.item[fileIndex]->type == FT_TSIC) ||
                            (gFM_files.item[fileIndex]->type == FT_TSFS) ||
                            (gFM_files.item[fileIndex]->type == FT_TSDV)))
                         {
