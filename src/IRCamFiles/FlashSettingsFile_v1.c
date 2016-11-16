@@ -123,6 +123,7 @@ FlashSettings_FlashSettingsFile_v1_t FlashSettings_FlashSettingsFile_v1_default 
    /* DeviceKeyHigh = */ 0x00000000,
    /* DetectorElectricalTapsRef = */ 0.000000F,
    /* DetectorElectricalRefOffset = */ 0.000000F,
+   /* AECPlusExposureTimeMin = */ 0.000000F,
    /* FlashSettingsFileCRC16 = */ 0,
 };
 
@@ -284,7 +285,9 @@ uint32_t FlashSettings_ParseFlashSettingsFile_v1(uint8_t *buffer, uint32_t bufle
       memcpy(&hdr->DeviceKeyHigh, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&hdr->DetectorElectricalTapsRef, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->DetectorElectricalRefOffset, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 200; // Skip FREE space
+      numBytes += 8; // Skip FREE space
+      memcpy(&hdr->AECPlusExposureTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      numBytes += 188; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -479,7 +482,9 @@ uint32_t FlashSettings_WriteFlashSettingsFile_v1(FlashSettings_FlashSettingsFile
       memcpy(&buffer[numBytes], &hdr->DeviceKeyHigh, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
       memcpy(&buffer[numBytes], &hdr->DetectorElectricalTapsRef, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->DetectorElectricalRefOffset, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 200); numBytes += 200; // FREE space
+      memset(&buffer[numBytes], 0, 8); numBytes += 8; // FREE space
+      memcpy(&buffer[numBytes], &hdr->AECPlusExposureTimeMin, sizeof(float)); numBytes += sizeof(float);
+      memset(&buffer[numBytes], 0, 188); numBytes += 188; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }

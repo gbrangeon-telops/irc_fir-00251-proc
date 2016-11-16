@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V1      1
-#define FLASHSETTINGS_FILEMINORVERSION_V1      12
+#define FLASHSETTINGS_FILEMINORVERSION_V1      13
 #define FLASHSETTINGS_FILESUBMINORVERSION_V1   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILE_SIZE_V1   65536
@@ -131,6 +131,7 @@ struct FlashSettings_FlashSettingsFile_v1Struct {
    uint32_t DeviceKeyHigh;   /**< Device 64-bit key (MSB). */
    float DetectorElectricalTapsRef;   /**< Electrical reference of detector taps. */
    float DetectorElectricalRefOffset;   /**< Electrical offset of detector taps reference opamp. */
+   float AECPlusExposureTimeMin;   /**< Minimum exposure time when AEC+ is active. */
    uint16_t FlashSettingsFileCRC16;   /**< Camera flash settings file CRC-16 */
 };
 

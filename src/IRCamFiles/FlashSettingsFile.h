@@ -40,6 +40,7 @@
 
 // Flash settings function versioning
 #define FlashSettings_WriteFlashSettingsFileHeader  VER_FUN(FlashSettings_WriteFlashSettingsFileHeader, TSFSFILES_VERSION)
+#define FlashSettings_PrintFlashSettingsFileHeader  VER_FUN(FlashSettings_PrintFlashSettingsFileHeader, TSFSFILES_VERSION)
 
 
 IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_FlashSettingsFileHeader_t *hdr, fileInfo_t *fileInfo);

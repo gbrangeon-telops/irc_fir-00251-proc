@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.0.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -19,6 +19,8 @@
 
 #include "FlashSettingsFile_v2.h"
 #include "CRC.h"
+#include "utils.h"
+#include "verbose.h"
 #include <string.h>
 #include <float.h>
 
@@ -40,8 +42,8 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ICUPresent = */ 0,
    /* ICUMode = */ 1,
    /* ICUCalibPosition = */ 0,
-   /* ICUPulseWidth = */ 80,
-   /* ICUPeriod = */ 350,
+   /* ICUPulseWidth = */ 15,
+   /* ICUPeriod = */ 100,
    /* ICUTransitionDuration = */ 500,
    /* ImageCorrectionEnabled = */ 1,
    /* ImageCorrectionAtPowerOn = */ 0,
@@ -126,6 +128,9 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ADCReadoutEnabled = */ 0,
    /* ADCReadout_b = */ 0,
    /* ADCReadout_m = */ 1.0F,
+   /* AECPlusExposureTimeMin = */ 0.000000F,
+   /* AECSaturatedCorrectionFactor = */ 0.2F,
+   /* FWFramePeriodMinMargin = */ 0.05F,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -291,7 +296,10 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ADCReadoutEnabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->ADCReadout_b, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
       memcpy(&hdr->ADCReadout_m, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 192; // Skip FREE space
+      memcpy(&hdr->AECPlusExposureTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->AECSaturatedCorrectionFactor, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->FWFramePeriodMinMargin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      numBytes += 180; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -490,7 +498,10 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ADCReadoutEnabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->ADCReadout_b, sizeof(int16_t)); numBytes += sizeof(int16_t);
       memcpy(&buffer[numBytes], &hdr->ADCReadout_m, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 192); numBytes += 192; // FREE space
+      memcpy(&buffer[numBytes], &hdr->AECPlusExposureTimeMin, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->AECSaturatedCorrectionFactor, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->FWFramePeriodMinMargin, sizeof(float)); numBytes += sizeof(float);
+      memset(&buffer[numBytes], 0, 180); numBytes += 180; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -529,5 +540,118 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
    }
 
    return numBytes;
+}
+
+/**
+ * FlashSettingsFileHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFileHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("FileSignature: %s\n", hdr->FileSignature);
+   FPGA_PRINTF("FileStructureMajorVersion: %d\n", hdr->FileStructureMajorVersion);
+   FPGA_PRINTF("FileStructureMinorVersion: %d\n", hdr->FileStructureMinorVersion);
+   FPGA_PRINTF("FileStructureSubMinorVersion: %d\n", hdr->FileStructureSubMinorVersion);
+   FPGA_PRINTF("FileHeaderLength: %d\n", hdr->FileHeaderLength);
+   FPGA_PRINTF("DeviceSerialNumber: %d\n", hdr->DeviceSerialNumber);
+   FPGA_PRINTF("DeviceModelName: %s\n", hdr->DeviceModelName);
+   FPGA_PRINTF("SensorID: %d\n", hdr->SensorID);
+   FPGA_PRINTF("PixelDataResolution: %d\n", hdr->PixelDataResolution);
+   FPGA_PRINTF("ReverseX: %d\n", hdr->ReverseX);
+   FPGA_PRINTF("ReverseY: %d\n", hdr->ReverseY);
+   FPGA_PRINTF("ICUPresent: %d\n", hdr->ICUPresent);
+   FPGA_PRINTF("ICUMode: %d\n", hdr->ICUMode);
+   FPGA_PRINTF("ICUCalibPosition: %d\n", hdr->ICUCalibPosition);
+   FPGA_PRINTF("ICUPulseWidth: %d\n", hdr->ICUPulseWidth);
+   FPGA_PRINTF("ICUPeriod: %d\n", hdr->ICUPeriod);
+   FPGA_PRINTF("ICUTransitionDuration: %d\n", hdr->ICUTransitionDuration);
+   FPGA_PRINTF("ImageCorrectionEnabled: %d\n", hdr->ImageCorrectionEnabled);
+   FPGA_PRINTF("ImageCorrectionAtPowerOn: %d\n", hdr->ImageCorrectionAtPowerOn);
+   FPGA_PRINTF("ImageCorrectionNumberOfImagesCoadd: %d\n", hdr->ImageCorrectionNumberOfImagesCoadd);
+   FPGA_PRINTF("ImageCorrectionAECImageFraction: _PCF(3)\n", _FFMT(hdr->ImageCorrectionAECImageFraction, 3));
+   FPGA_PRINTF("ImageCorrectionAECTargetWellFilling: _PCF(3)\n", _FFMT(hdr->ImageCorrectionAECTargetWellFilling, 3));
+   FPGA_PRINTF("ImageCorrectionAECResponseTime: _PCF(3)\n", _FFMT(hdr->ImageCorrectionAECResponseTime, 3));
+   FPGA_PRINTF("FWPresent: %d\n", hdr->FWPresent);
+   FPGA_PRINTF("FWNumberOfFilters: %d\n", hdr->FWNumberOfFilters);
+   FPGA_PRINTF("FWType: %d\n", hdr->FWType);
+   FPGA_PRINTF("FW0CenterPosition: %d\n", hdr->FW0CenterPosition);
+   FPGA_PRINTF("FW1CenterPosition: %d\n", hdr->FW1CenterPosition);
+   FPGA_PRINTF("FW2CenterPosition: %d\n", hdr->FW2CenterPosition);
+   FPGA_PRINTF("FW3CenterPosition: %d\n", hdr->FW3CenterPosition);
+   FPGA_PRINTF("FW4CenterPosition: %d\n", hdr->FW4CenterPosition);
+   FPGA_PRINTF("FW5CenterPosition: %d\n", hdr->FW5CenterPosition);
+   FPGA_PRINTF("FW6CenterPosition: %d\n", hdr->FW6CenterPosition);
+   FPGA_PRINTF("FW7CenterPosition: %d\n", hdr->FW7CenterPosition);
+   FPGA_PRINTF("ImageCorrectionTemperatureSelector: %d\n", hdr->ImageCorrectionTemperatureSelector);
+   FPGA_PRINTF("ImageCorrectionDiscardOffset: %d\n", hdr->ImageCorrectionDiscardOffset);
+   FPGA_PRINTF("ImageCorrectionWaitTime1: %d\n", hdr->ImageCorrectionWaitTime1);
+   FPGA_PRINTF("ImageCorrectionTemperatureTolerance1: %d\n", hdr->ImageCorrectionTemperatureTolerance1);
+   FPGA_PRINTF("ImageCorrectionStabilizationTime1: %d\n", hdr->ImageCorrectionStabilizationTime1);
+   FPGA_PRINTF("ImageCorrectionTimeout1: %d\n", hdr->ImageCorrectionTimeout1);
+   FPGA_PRINTF("ImageCorrectionWaitTime2: %d\n", hdr->ImageCorrectionWaitTime2);
+   FPGA_PRINTF("ImageCorrectionTemperatureTolerance2: %d\n", hdr->ImageCorrectionTemperatureTolerance2);
+   FPGA_PRINTF("ImageCorrectionStabilizationTime2: %d\n", hdr->ImageCorrectionStabilizationTime2);
+   FPGA_PRINTF("ImageCorrectionTimeout2: %d\n", hdr->ImageCorrectionTimeout2);
+   FPGA_PRINTF("DetectorPolarizationVoltage: %d\n", hdr->DetectorPolarizationVoltage);
+   FPGA_PRINTF("ExternalMemoryBufferPresent: %d\n", hdr->ExternalMemoryBufferPresent);
+   FPGA_PRINTF("NDFPresent: %d\n", hdr->NDFPresent);
+   FPGA_PRINTF("NDFNumberOfFilters: %d\n", hdr->NDFNumberOfFilters);
+   FPGA_PRINTF("NDFClearFOVWidth: %d\n", hdr->NDFClearFOVWidth);
+   FPGA_PRINTF("NDF0CenterPosition: %d\n", hdr->NDF0CenterPosition);
+   FPGA_PRINTF("NDF1CenterPosition: %d\n", hdr->NDF1CenterPosition);
+   FPGA_PRINTF("NDF2CenterPosition: %d\n", hdr->NDF2CenterPosition);
+   FPGA_PRINTF("FWSpeedMax: %d\n", hdr->FWSpeedMax);
+   FPGA_PRINTF("FWEncoderCyclePerTurn: %d\n", hdr->FWEncoderCyclePerTurn);
+   FPGA_PRINTF("FWOpticalAxisPosX: _PCF(3)\n", _FFMT(hdr->FWOpticalAxisPosX, 3));
+   FPGA_PRINTF("FWOpticalAxisPosY: _PCF(3)\n", _FFMT(hdr->FWOpticalAxisPosY, 3));
+   FPGA_PRINTF("FWMountingHoleRadius: _PCF(3)\n", _FFMT(hdr->FWMountingHoleRadius, 3));
+   FPGA_PRINTF("FWBeamMarging: _PCF(3)\n", _FFMT(hdr->FWBeamMarging, 3));
+   FPGA_PRINTF("FWCornerPixDistX: _PCF(3)\n", _FFMT(hdr->FWCornerPixDistX, 3));
+   FPGA_PRINTF("FWCornerPixDistY: _PCF(3)\n", _FFMT(hdr->FWCornerPixDistY, 3));
+   FPGA_PRINTF("FWCenterPixRadius: _PCF(3)\n", _FFMT(hdr->FWCenterPixRadius, 3));
+   FPGA_PRINTF("FWCornerPixRadius: _PCF(3)\n", _FFMT(hdr->FWCornerPixRadius, 3));
+   FPGA_PRINTF("FWPositionControllerPP: %d\n", hdr->FWPositionControllerPP);
+   FPGA_PRINTF("FWPositionControllerPD: %d\n", hdr->FWPositionControllerPD);
+   FPGA_PRINTF("FWPositionControllerPOR: %d\n", hdr->FWPositionControllerPOR);
+   FPGA_PRINTF("FWPositionControllerI: %d\n", hdr->FWPositionControllerI);
+   FPGA_PRINTF("FWSlowSpeedControllerPP: %d\n", hdr->FWSlowSpeedControllerPP);
+   FPGA_PRINTF("FWSlowSpeedControllerPD: %d\n", hdr->FWSlowSpeedControllerPD);
+   FPGA_PRINTF("FWSlowSpeedControllerPOR: %d\n", hdr->FWSlowSpeedControllerPOR);
+   FPGA_PRINTF("FWSlowSpeedControllerPI: %d\n", hdr->FWSlowSpeedControllerPI);
+   FPGA_PRINTF("FWFastSpeedControllerPP: %d\n", hdr->FWFastSpeedControllerPP);
+   FPGA_PRINTF("FWFastSpeedControllerPD: %d\n", hdr->FWFastSpeedControllerPD);
+   FPGA_PRINTF("FWFastSpeedControllerPOR: %d\n", hdr->FWFastSpeedControllerPOR);
+   FPGA_PRINTF("FWFastSpeedControllerI: %d\n", hdr->FWFastSpeedControllerI);
+   FPGA_PRINTF("FWSpeedControllerSwitchingThreshold: %d\n", hdr->FWSpeedControllerSwitchingThreshold);
+   FPGA_PRINTF("FWExposureTimeMaxMargin: _PCF(3)\n", _FFMT(hdr->FWExposureTimeMaxMargin, 3));
+   FPGA_PRINTF("ExternalFanSpeedSetpoint: _PCF(3)\n", _FFMT(hdr->ExternalFanSpeedSetpoint, 3));
+   FPGA_PRINTF("BPDetectionEnabled: %d\n", hdr->BPDetectionEnabled);
+   FPGA_PRINTF("BPNumSamples: %d\n", hdr->BPNumSamples);
+   FPGA_PRINTF("BPFlickerThreshold: _PCF(3)\n", _FFMT(hdr->BPFlickerThreshold, 3));
+   FPGA_PRINTF("BPNoiseThreshold: _PCF(3)\n", _FFMT(hdr->BPNoiseThreshold, 3));
+   FPGA_PRINTF("BPDuration: %d\n", hdr->BPDuration);
+   FPGA_PRINTF("BPNCoadd: %d\n", hdr->BPNCoadd);
+   FPGA_PRINTF("MaximumTotalFlux: _PCF(3)\n", _FFMT(hdr->MaximumTotalFlux, 3));
+   FPGA_PRINTF("FluxRatio01: _PCF(3)\n", _FFMT(hdr->FluxRatio01, 3));
+   FPGA_PRINTF("FluxRatio12: _PCF(3)\n", _FFMT(hdr->FluxRatio12, 3));
+   FPGA_PRINTF("AECPlusExpTimeMargin: _PCF(3)\n", _FFMT(hdr->AECPlusExpTimeMargin, 3));
+   FPGA_PRINTF("AECPlusFluxMargin: _PCF(3)\n", _FFMT(hdr->AECPlusFluxMargin, 3));
+   FPGA_PRINTF("BPOutlierThreshold: _PCF(3)\n", _FFMT(hdr->BPOutlierThreshold, 3));
+   FPGA_PRINTF("BPAECImageFraction: _PCF(3)\n", _FFMT(hdr->BPAECImageFraction, 3));
+   FPGA_PRINTF("BPAECWellFilling: _PCF(3)\n", _FFMT(hdr->BPAECWellFilling, 3));
+   FPGA_PRINTF("BPAECResponseTime: _PCF(3)\n", _FFMT(hdr->BPAECResponseTime, 3));
+   FPGA_PRINTF("DeviceKeyExpirationPOSIXTime: %d\n", hdr->DeviceKeyExpirationPOSIXTime);
+   FPGA_PRINTF("DeviceKeyLow: %d\n", hdr->DeviceKeyLow);
+   FPGA_PRINTF("DeviceKeyHigh: %d\n", hdr->DeviceKeyHigh);
+   FPGA_PRINTF("DetectorElectricalTapsRef: _PCF(3)\n", _FFMT(hdr->DetectorElectricalTapsRef, 3));
+   FPGA_PRINTF("DetectorElectricalRefOffset: _PCF(3)\n", _FFMT(hdr->DetectorElectricalRefOffset, 3));
+   FPGA_PRINTF("ADCReadoutEnabled: %d\n", hdr->ADCReadoutEnabled);
+   FPGA_PRINTF("ADCReadout_b: %d\n", hdr->ADCReadout_b);
+   FPGA_PRINTF("ADCReadout_m: _PCF(3)\n", _FFMT(hdr->ADCReadout_m, 3));
+   FPGA_PRINTF("AECPlusExposureTimeMin: _PCF(3)\n", _FFMT(hdr->AECPlusExposureTimeMin, 3));
+   FPGA_PRINTF("AECSaturatedCorrectionFactor: _PCF(3)\n", _FFMT(hdr->AECSaturatedCorrectionFactor, 3));
+   FPGA_PRINTF("FWFramePeriodMinMargin: _PCF(3)\n", _FFMT(hdr->FWFramePeriodMinMargin, 3));
+   FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

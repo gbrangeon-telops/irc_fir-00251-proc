@@ -250,7 +250,13 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr_v1.FileStructureMinorVersion = 12;
 
                case 12:
-                  // 1.12.x -> 2.0.x
+                  // 1.12.x -> 1.13.x
+                  hdr_v1.AECPlusExpTimeMargin = FlashSettings_FlashSettingsFileHeader_default.AECPlusExposureTimeMin;
+                  hdr_v1.FileStructureMinorVersion = 13;
+
+               case 13:
+               default:
+                  // 1.13.x -> 2.0.x
                   memcpy(hdr->FileSignature, hdr_v1.FileSignature, 5);
                   hdr->DeviceSerialNumber = hdr_v1.DeviceSerialNumber;
                   memcpy(hdr->DeviceModelName, hdr_v1.DeviceModelName, 21);
@@ -347,6 +353,7 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->ADCReadoutEnabled = FlashSettings_FlashSettingsFileHeader_default.ADCReadoutEnabled;
                   hdr->ADCReadout_b = FlashSettings_FlashSettingsFileHeader_default.ADCReadout_b;
                   hdr->ADCReadout_m = FlashSettings_FlashSettingsFileHeader_default.ADCReadout_m;
+                  hdr->AECPlusExposureTimeMin = hdr_v1.AECPlusExposureTimeMin;
 
                   hdr->FileStructureMajorVersion = 2;
                   hdr->FileStructureMinorVersion = 0;
@@ -361,6 +368,16 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
             switch (minorVersion)
             {
                case 0:
+                  // 2.0.x -> 2.1.x
+                  if (fi.version.major == 2)
+                  {
+                     // Set AECPlusExpTimeMargin field to its default value only if it is a 2.0.0 flash settings file version
+                     // to make sure 1.13.0 flash settings file version AECPlusExposureTimeMin field value is not overwritten.
+                     hdr_v1.AECPlusExpTimeMargin = FlashSettings_FlashSettingsFileHeader_default.AECPlusExposureTimeMin;
+                  }
+                  hdr_v1.FileStructureMinorVersion = 1;
+
+               case 1:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.0.0
+ * Generated from the flash settings file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      0
+#define FLASHSETTINGS_FILEMINORVERSION_V2      1
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -134,6 +134,9 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint8_t ADCReadoutEnabled;   /**< Indicates whether the ADC channel readout is enabled. */
    int16_t ADCReadout_b;   /**< ADC channel readout calibration offset. */
    float ADCReadout_m;   /**< ADC channel readout calibration gain. */
+   float AECPlusExposureTimeMin;   /**< Minimum exposure time when AEC+ is active. */
+   float AECSaturatedCorrectionFactor;   /**< AEC correction factor when image is saturated. */
+   float FWFramePeriodMinMargin;   /**< Minimum frame period margin. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 
@@ -144,5 +147,6 @@ typedef struct FlashSettings_FlashSettingsFileHeader_v2Struct FlashSettings_Flas
 
 uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t buflen, uint32_t idxChunk, FlashSettings_FlashSettingsFileHeader_v2_t *hdr, uint16_t *crc16);
 uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFileHeader_v2_t *hdr, uint32_t idxChunk, uint8_t *buffer, uint32_t buflen, uint16_t *crc16);
+void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFileHeader_v2_t *hdr);
 
 #endif // FLASHSETTINGSFILE_V2_H

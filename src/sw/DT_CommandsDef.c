@@ -72,6 +72,7 @@ static IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -106,6 +107,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"GCP", DebugTerminalParseGCP},
    {"ADC", DebugTerminalParseADC},
    {"DFDVU", DebugTerminalParseDFDVU},
+   {"FS", DebugTerminalParseFS},
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -1903,6 +1905,31 @@ static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf)
 }
 
 /**
+ * Flash Settings command parser.
+ * This parser is used to parse and validate Flash Settings command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Flash Settings command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf)
+{
+   // There is supposed to be no remaining bytes in the buffer
+   if (!CBB_Empty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   // Print flash settings
+   FlashSettings_PrintFlashSettingsFileHeader(&flashSettings);
+
+   return IRC_SUCCESS;
+}
+
+/**
  * Debug terminal Help command parser parser.
  * This parser is used to print debug terminal help.
  *
@@ -1947,6 +1974,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Get Stack Level:    STACK");
    DT_PRINTF("  Set GCP state:      GCP [0|1]");
    DT_PRINTF("  ADC calibration:    ADC [m b]");
+   DT_PRINTF("  Flash Settings:     FS");
    DT_PRINTF("  Print help:         HLP");
 
    /*
