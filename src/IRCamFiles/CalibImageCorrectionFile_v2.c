@@ -19,6 +19,8 @@
 
 #include "CalibImageCorrectionFile_v2.h"
 #include "CRC.h"
+#include "utils.h"
+#include "verbose.h"
 #include <string.h>
 #include <float.h>
 

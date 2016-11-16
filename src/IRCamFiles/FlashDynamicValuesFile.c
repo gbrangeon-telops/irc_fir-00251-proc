@@ -122,6 +122,7 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader(int fd, FlashDynam
                 hdr_v1.FileStructureMinorVersion = 6;
 
             case 6:
+            default:
                // 1.6.x -> 2.0.x
                memcpy(hdr, &hdr_v1, sizeof(*hdr));
 

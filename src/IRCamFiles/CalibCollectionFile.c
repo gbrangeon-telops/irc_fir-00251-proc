@@ -92,6 +92,7 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
                hdr_v1.FileStructureMinorVersion = 1;
 
             case 1:
+            default:
                // 1.1.x -> 2.0.x
                memcpy(hdr, &hdr_v1, sizeof(*hdr));
 

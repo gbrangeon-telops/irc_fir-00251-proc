@@ -87,6 +87,7 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr_v1.FileStructureMinorVersion = 1;
 
             case 1:
+            default:
                // 1.1.x -> 2.0.x
                memcpy(hdr->FileSignature, hdr_v1.FileSignature, 5);
                hdr->DeviceSerialNumber = hdr_v1.DeviceSerialNumber;
