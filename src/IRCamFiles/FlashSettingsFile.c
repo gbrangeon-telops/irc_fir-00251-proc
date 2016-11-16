@@ -373,9 +373,11 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   {
                      // Set AECPlusExpTimeMargin field to its default value only if it is a 2.0.0 flash settings file version
                      // to make sure 1.13.0 flash settings file version AECPlusExposureTimeMin field value is not overwritten.
-                     hdr_v1.AECPlusExpTimeMargin = FlashSettings_FlashSettingsFileHeader_default.AECPlusExposureTimeMin;
+                     hdr->AECPlusExpTimeMargin = FlashSettings_FlashSettingsFileHeader_default.AECPlusExposureTimeMin;
                   }
-                  hdr_v1.FileStructureMinorVersion = 1;
+                  hdr->AECSaturatedCorrectionFactor = FlashSettings_FlashSettingsFileHeader_default.AECSaturatedCorrectionFactor;
+                  hdr->FWFramePeriodMinMargin = FlashSettings_FlashSettingsFileHeader_default.FWFramePeriodMinMargin;
+                  hdr->FileStructureMinorVersion = 1;
 
                case 1:
                   // Up to date, nothing to do
