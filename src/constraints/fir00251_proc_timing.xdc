@@ -5,11 +5,11 @@ create_clock -period 5.000 -name SYS_CLK_0 -waveform {0.000 2.500} [get_ports SY
 create_clock -period 5.000 -name SYS_CLK_1 -waveform {0.000 2.500} [get_ports SYS_CLK_P1]
 create_clock -period 8.000 -name MGT_CLK_0 -waveform {0.000 4.000} [get_ports AURORA_CLK_P0]
 create_clock -period 8.000 -name MGT_CLK_1 -waveform {0.000 4.000} [get_ports AURORA_CLK_P1]
-create_clock -period 8.000 -name data_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/DATA/tx_out_clk]
-create_clock -period 8.000 -name video_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/VIDEO/tx_out_clk]
-create_clock -period 8.000 -name exp_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/EXP/tx_out_clk]
-create_clock -period 8.000 -name data_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/DATA/user_clk]
-create_clock -period 8.000 -name exp_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/EXP/user_clk]
+create_clock -period 10.000 -name data_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/DATA/tx_out_clk]
+create_clock -period 10.000 -name video_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/VIDEO/tx_out_clk]
+create_clock -period 10.000 -name exp_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/EXP/tx_out_clk]
+create_clock -period 10.000 -name data_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/DATA/user_clk]
+create_clock -period 10.000 -name exp_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/EXP/user_clk]
 create_clock -period 60.000 -name usart_clk -waveform {0.000 30.000} [get_pins ACQ/BULK_USART/U11/CLK]
 
 # Virtual clocks
