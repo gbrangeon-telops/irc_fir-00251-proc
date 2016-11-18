@@ -176,7 +176,6 @@ uint32_t BufferManager_GetNumSequenceCount(t_bufferManager *pBufferCtrl)
 
 uint32_t BufferManager_GetFrameId(t_bufferManager *pBufferCtrl, uint32_t SequenceID, uint32_t ImageLocation)
 {
-	// TODO READ DDR up to the image location then return the FrameId of that image
 	uint32_t FrameID;
 	uint32_t readAddrLoc;
 
@@ -529,7 +528,7 @@ void BufferManager_SM()
  */
 void BufferManager_ConfigureMinFrameTime(t_bufferManager *pBufferCtrl, float time_us)
 {
-   const float clk_freq_MHz = 160;
+   const float clk_freq_MHz = 80;
    uint32_t cnt;
 
    cnt = time_us * clk_freq_MHz;
