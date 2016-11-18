@@ -22,17 +22,13 @@
 #include "IRC_status.h"
 
 // adresse du registre de contrôle
-#define A_CONTROL             0xC0
 #define A_BASE_HEADER         0x200    // pour faire la commutation entre le domaine du header et de la config
-#define A_STATUS              0x50
+#define AR_STATUS             0x50
+#define AW_RESET_ERR          0xC0
 
-// STATUS masks
-#define M_HDER_DONE            0x0001
+// STATUS bit positions
 #define HDER_DONE_BIT          0
 
-// CONTROL
-#define C_HDER_STOP            0x0000
-#define C_HDER_START           0x0001
 
 #define EFFECTIVE_HDER_LENGTH  128     // taille minimale du header en pixels
 
@@ -65,19 +61,17 @@ void HDER_SendConfigGC(t_HderInserter *a, const gcRegistersData_t *pGCRegs);
 //pour envoyer le header 
 void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
 
-// ENO 14 fev 2014: HDER_Start et HDER_Stop non necessaires. Il fgaut juste utiliser HDER_SendConfigGC après changement de config.
+// ENO 14 fev 2014: HDER_Start et HDER_Stop non necessaires. Il faut juste utiliser HDER_SendConfigGC après changement de config.
 
-////pour lancer le bloc hder_inserter avec une config precedemment envoyée
-//IRC_Status HDER_Start(const t_HderInserter *a); 
-//
-////pour stopper le bloc hder_inserter et s'assurer de son arrêt
-//IRC_Status HDER_Stop(const t_HderInserter *a);
 
 //pour avoir le DONE du bloc hder_inserter
 IRC_Status_t HDER_Done(const t_HderInserter *a);
 
-//// Pour update le Exposure Auto dans le Header
-//void HDER_UpdateExposureAuto(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
+//pour avoir les statuts
+uint32_t HDER_GetStatus(const t_HderInserter *a);
+
+//pour reset des registres d'erreurs
+void HDER_ResetErr(const t_HderInserter *a);
 
 // Pour update du NDF dans le Header
 void HDER_UpdateNDFPositionHeader(const t_HderInserter *a, uint8_t position);
@@ -112,9 +106,6 @@ void HDER_UpdateOpticalSerialNumbersHeader(const t_HderInserter *a, const gcRegi
 // Pour update des reverse X et Y dans le header
 void HDER_UpdateReverseXHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
 void HDER_UpdateReverseYHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
-
-//pour avoir les statuts
-uint32_t HDER_GetStatus(const t_HderInserter *a); 
 
 // Pour update du frame rate
 void HDER_UpdateAcquisitionFrameRateHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);

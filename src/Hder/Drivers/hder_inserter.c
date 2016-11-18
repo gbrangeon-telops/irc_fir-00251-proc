@@ -39,11 +39,11 @@
 // pour connaitre l'etat du Done 
 //----------------------------------------------------------------
 IRC_Status_t HDER_Done(const t_HderInserter *a)
- {
+{
    uint32_t Status;
    uint32_t DoneBit;
    
-   Status = AXI4L_read32(a->ADD + A_STATUS);
+   Status = AXI4L_read32(a->ADD + AR_STATUS);
    DoneBit = bitget(Status, HDER_DONE_BIT);
      
    if (DoneBit == 0)
@@ -54,8 +54,27 @@ IRC_Status_t HDER_Done(const t_HderInserter *a)
    {
       return IRC_DONE;
    }      
- }															  
+}
   
+//----------------------------------------------------------------
+// pour avoir le statut du bloc
+//----------------------------------------------------------------
+uint32_t HDER_GetStatus(const t_HderInserter *a)
+{
+   uint32_t Status;
+   Status = AXI4L_read32(a->ADD + AR_STATUS);
+   return Status;
+}
+
+//----------------------------------------------------------------
+// pour reset des registres d'erreurs
+//----------------------------------------------------------------
+void HDER_ResetErr(const t_HderInserter *a)
+{
+   AXI4L_write32(1, a->ADD + AW_RESET_ERR);           //on active l'effacement
+   AXI4L_write32(0, a->ADD + AW_RESET_ERR);           //on desactive l'effacement
+}
+
 //----------------------------------------------------------------
 // pour envoyer la configuration de CLINK Interface
 //----------------------------------------------------------------
@@ -76,6 +95,9 @@ void HDER_SendConfigGC(t_HderInserter *a, const gcRegistersData_t *pGCRegs)
    }   
    a->hder_tlast_en  = (uint32_t) HDER_TLAST_ENABLED;   //
    WriteStruct(a);                                      // envoi de la structure
+
+   // Reset des erreurs
+   HDER_ResetErr(a);
 }                  
 
 //----------------------------------------------------------------
@@ -199,27 +221,6 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE END */
 }
-
-////----------------------------------------------------------------
-//// pour lancer le bloc et s'assurer qu'il est lancé
-////----------------------------------------------------------------
-//IRC_Status HDER_Start(const t_HderInserter *a)
-//{
-//   IRC_Status DoneStatus;
-//   // on lance le bloc
-//    AXI4L_write32(C_HDER_START, a->ADD + A_CONTROL); 
-//	return IRC_SUCCESS;
-//}
-//
-////----------------------------------------------------------------
-//// pour stoper le bloc
-////----------------------------------------------------------------
-//IRC_Status HDER_Stop(const t_HderInserter *a)
-//{
-//   IRC_Status DoneStatus;   
-//   AXI4L_write32(C_HDER_STOP, a->ADD + A_CONTROL); // denmande de stop		 
-//	return IRC_SUCCESS;
-//}
 
 //-------------------------------------------------------------------------
 // Pour update du NDF dans le Header
@@ -402,17 +403,6 @@ void HDER_UpdateReverseYHeader(const t_HderInserter *a, const gcRegistersData_t 
 void HDER_UpdateAcquisitionFrameRateHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
 {
    AXI4L_write32((uint32_t)(pGCRegs->AcquisitionFrameRate * 1000.0F), a->ADD + A_BASE_HEADER + AcquisitionFrameRateHdrAddr);
-}
-
-
-//----------------------------------------------------------------
- //pour avoir le statut du bloc
-//----------------------------------------------------------------
-uint32_t HDER_GetStatus(const t_HderInserter *a) 
-{ 
-   uint32_t Status;
-   Status = AXI4L_read32(a->ADD + A_STATUS);
-   return Status;
 } 
 
 /**

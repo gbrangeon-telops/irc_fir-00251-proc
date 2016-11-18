@@ -113,7 +113,6 @@ architecture rtl of hder_insert_mb_intf is
    signal data_i               : std_logic_vector(31 downto 0);
    signal slv_reg_rden	       : std_logic;
    signal slv_reg_wren	       : std_logic;
-   signal control_i            : std_logic_vector(31 downto 0);
    signal status_to_mb         : std_logic_vector(15 downto 0);
    signal reset_err_i          : std_logic;
    signal error                : std_logic_vector(15 downto 0);
@@ -248,8 +247,6 @@ begin
             when X"10" => axi_rdata <= resize(std_logic_vector(config_i.zero_pad_len_div2_m1),32);
             when X"14" => axi_rdata <= resize(("0000"& config_i.need_padding),32);
             when X"18" => axi_rdata <= resize(("0000"& config_i.hder_tlast_en),32);
-            -- 
-            when X"C0" => axi_rdata <= resize(control_i,32);
             -- statut
             when X"50" => axi_rdata <= resize(status_to_mb,32);	
             when others=> 
@@ -349,7 +346,7 @@ begin
                            config_i.hder_tlast_en <= data_i(0);  
                            config_valid <= '1';
                         
-                        when X"C0" => reset_err_i <= data_i(1);
+                        when X"C0" => reset_err_i <= data_i(0);
                         
                         when others => --do nothing
                         
