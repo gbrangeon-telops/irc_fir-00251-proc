@@ -70,6 +70,8 @@
 #define FPA_MIN_EXPOSURE               0.5F     // [us]
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]
 
+#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 #define FPA_MASTER_CLK_RATE_HZ         6666666   // fréquence de l'horloge du FPA
 #define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ

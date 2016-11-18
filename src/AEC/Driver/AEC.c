@@ -215,6 +215,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    bool done = false;
 
    const float binWidth = powf(2, FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
+   extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 #ifdef AEC_ENABLE_PROFILER
    static statistics_t aec_stats;
@@ -337,6 +338,11 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       den = MAX(1.0, CurrentWF - ((float)PDRmin));
       CorrectionFactor =  (TargetWF - ((float) PDRmin)) / den;
 
+      // Verify saturation
+      if (CurrentWF >= (float)PDRmax)
+         // Reduce the correction factor if the calculation is distorted by saturation
+         CorrectionFactor = MIN(CorrectionFactor, 0.2f);    //TODO: change for flashSettings.AECSaturatedCorrectionFactor
+
       // Check if Correction factor is valid
       if(CorrectionFactor > CORRECTION_FACTOR_MAX)
       {
@@ -394,35 +400,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       {
          SFW_SetExposureTimeArray(AEC_Int_FWPosition, PET);
          FWExposureTime[AEC_Int_FWPosition] = PET;
-
-         switch (AEC_Int_FWPosition)
-         {
-         case 0:
-            pGCRegs->ExposureTime1 = PET;
-            break;
-         case 1:
-            pGCRegs->ExposureTime2 = PET;
-            break;
-         case 2:
-            pGCRegs->ExposureTime3 = PET;
-            break;
-         case 3:
-            pGCRegs->ExposureTime4 = PET;
-            break;
-         case 4:
-            pGCRegs->ExposureTime5 = PET;
-            break;
-         case 5:
-            pGCRegs->ExposureTime6 = PET;
-            break;
-         case 6:
-            pGCRegs->ExposureTime7 = PET;
-            break;
-         case 7:
-            pGCRegs->ExposureTime8 = PET;
-            break;
-         }
-
+         *pGcRegsDataExposureTimeX[AEC_Int_FWPosition] = PET;
       }
    }
 

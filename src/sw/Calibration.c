@@ -19,7 +19,6 @@
 #include "FlashSettings.h"
 #include "GC_Registers.h"
 #include "Actualization.h"
-#include "GC_Callback.h"
 #include "string.h"
 #include "uffs\uffs.h"
 #include "uffs\uffs_fd.h"

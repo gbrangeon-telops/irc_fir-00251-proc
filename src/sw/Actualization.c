@@ -32,7 +32,6 @@
 #include "uffs\uffs_fd.h"
 #include "GC_Registers.h"
 #include "GC_Events.h"
-#include "GC_Callback.h"
 #include "GenICam.h"
 #include "tel2000_param.h"
 #include "proc_memory.h"
@@ -210,7 +209,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
   */
 void setActState( ACT_State_t *p_state, ACT_State_t next_state )
 {
-   int num_states = sizeof(ACT_State_str)/sizeof(ACT_State_str[0]);
+   int num_states = NUM_OF(ACT_State_str);
    *p_state = next_state;
 
    if (next_state < num_states)
@@ -223,7 +222,7 @@ void setActState( ACT_State_t *p_state, ACT_State_t next_state )
 
 static void setBpdState(BPD_State_t* p_state, BPD_State_t next_state)
 {
-   int num_states = sizeof(BPD_State_str)/sizeof(BPD_State_str[0]);
+   int num_states = NUM_OF(BPD_State_str);
    *p_state = next_state;
 
    if (next_state < num_states)
@@ -236,7 +235,7 @@ static void setBpdState(BPD_State_t* p_state, BPD_State_t next_state)
 
 static void setBqState(BQ_State_t* p_state, BQ_State_t next_state)
 {
-   int num_states = sizeof(BQ_State_str)/sizeof(BQ_State_str[0]);
+   int num_states = NUM_OF(BQ_State_str);
    *p_state = next_state;
 
    if (next_state < num_states)
@@ -415,7 +414,7 @@ IRC_Status_t Actualization_SM()
 
    case ACT_Idle:
       {
-         bool cameraReady = !TDCStatusTstAny(WaitingForCoolerMask | WaitingForCalibrationInitMask | WaitingForPowerMask)
+         bool cameraReady = !TDCStatusTstAny(WaitingForCoolerMask | WaitingForCalibrationInitMask | WaitingForPowerMask | WaitingForOutputFPGAMask)
                      || gActDebugOptions.bypassChecks;
 
          StopTimer(&act_tic_verbose);
@@ -524,8 +523,8 @@ IRC_Status_t Actualization_SM()
             savedCurrentBlockIdx = Calibration_GetActiveBlockIdx(&calibrationInfo);
 
             // make sure we activate the correct block index, because reloading a collection always makes block 0 the active one
-            gActualisationLoadBlockIdx = savedCurrentBlockIdx;
-            Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.collection.POSIXTime);
+            gActualisationLoadBlockIdx = 0;
+            Calibration_LoadCalibrationFilePOSIXTime(calibrationInfo.blocks[savedCurrentBlockIdx].POSIXTime);
 
             // the reference block is the current bloc
             refBlockFileHdr.PixelDataResolution = calibrationInfo.collection.PixelDataResolution;
@@ -1306,7 +1305,7 @@ IRC_Status_t Actualization_SM()
                VERBOSE_IF(gActDebugOptions.verbose)
                {
                   reportStats(&currentDeltaBeta->stats, "DeltaBeta");
-                  FPGA_PRINTF( "Median value : " _PCF(4) "\n", _FFMT(p50, 4));
+                  FPGA_PRINTF( "Median value : " _PCF(6) "\n", _FFMT(p50, 6));
                   FPGA_PRINTF( "ACT: Computing delta beta stats (real time) " _PCF(4) " s\n", _FFMT((float)tic_RT_Duration/((float)TIME_ONE_SECOND_US), 2));
                }
 
@@ -1537,19 +1536,79 @@ IRC_Status_t BadPixelDetection_SM()
 
          // trouver le deltaBeta ICU
          currentDeltaBeta = findMatchingDeltaBetaForBlock(&calibrationInfo, Calibration_GetActiveBlockIdx(&calibrationInfo));
-         if (currentDeltaBeta->valid)
+         if (currentDeltaBeta != NULL && currentDeltaBeta->valid)
          {
             ctxtInit(&blockContext, 0, numPixels, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
-            setBpdState(&state, BPD_UpdateBeta);
+            setBpdState(&state, BPD_ComputeDeltaBetaStats);
          }
          else
          {
+            if (currentDeltaBeta == NULL)
+            {
+               ACT_ERR("No actualisation data was found for bad pixel detection (pointer is NULL)");
+            }
+            else if (!currentDeltaBeta->valid)
+            {
+               ACT_ERR("No valid actualisation data was found for bad pixel detection (valid == FALSE).");
+            }
+
             ctxtInit(&blockContext, imageDataOffset, frameSize, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
             setBpdState(&state, BPD_StartAcquisition);
          }
       }
 
       break;
+
+   case BPD_ComputeDeltaBetaStats:
+            {
+               uint64_t t0; // just for benchmarking
+
+               if (blockContext.blockIdx == 0) // first iteration
+               {
+                  tic_RT_Duration = 0;
+                  resetStats(&currentDeltaBeta->stats);
+               }
+
+               GETTIME(&t0);
+
+               for (i=0, k=blockContext.startIndex; i<blockContext.blockLength; ++i, ++k)
+               {
+                  float x = currentDeltaBeta->deltaBeta[k];
+                  if (!isinf(x)) // only count pixels that are not bad according to the reference block for computing the stats
+                  {
+                     updateStats(&currentDeltaBeta->stats, currentDeltaBeta->deltaBeta[k]);
+                  }
+               }
+
+               tic_RT_Duration += elapsed_time_us(t0);
+
+               ctxtIterate(&blockContext);
+
+               if (ctxtIsDone(&blockContext))
+               {
+                  float p50;
+                  int i50 = 0.50f * numPixels; // index of the median
+
+                  GETTIME(&t0);
+
+                  // compute the median (can not be split over multiple block operations)
+                  p50 = nth_element_f(currentDeltaBeta->deltaBeta, currentDeltaBeta->stats.min, (float*)prctile_buffer, numPixels, i50);
+
+                  currentDeltaBeta->p50 = p50;
+
+                  tic_RT_Duration += elapsed_time_us(t0);
+
+                  VERBOSE_IF(gActDebugOptions.verbose)
+                  {
+                     reportStats(&currentDeltaBeta->stats, "DeltaBeta (pre-bad pixel detection)");
+                     PRINTF( "Median value : " _PCF(6) "\n", _FFMT(p50, 6));
+                     PRINTF( "ACT: Computing delta beta stats (BP_SM) (real time) " _PCF(4) " s\n", _FFMT((float)tic_RT_Duration/((float)TIME_ONE_SECOND_US), 2));
+                  }
+
+                  setBpdState(&state, BPD_UpdateBeta);
+               }
+            }
+            break;
 
    case BPD_UpdateBeta:
       {
@@ -2157,6 +2216,9 @@ static void backupGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
    p_GCRegsBackup->MemoryBufferMode = gcRegsData.MemoryBufferMode;
    p_GCRegsBackup->OffsetX = gcRegsData.OffsetX;
    p_GCRegsBackup->OffsetY = gcRegsData.OffsetY;
+
+
+
 }
 
 /**
@@ -2174,11 +2236,13 @@ static void backupGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
   */
 static void restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
 {
+   GC_SetWidth(p_GCRegsBackup->Width);
+   GC_SetHeight(p_GCRegsBackup->Height);
+   GC_RegisterWriteUI32(&gcRegsDef[OffsetXIdx], p_GCRegsBackup->OffsetX);
+   GC_RegisterWriteUI32(&gcRegsDef[OffsetYIdx], p_GCRegsBackup->OffsetY);
    GC_SetAcquisitionFrameRate(p_GCRegsBackup->AcquisitionFrameRate);
    GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], p_GCRegsBackup->ExposureTime);
    GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], p_GCRegsBackup->AECTargetWellFilling);
-   GC_SetWidth(p_GCRegsBackup->Width);
-   GC_SetHeight(p_GCRegsBackup->Height);
    GC_RegisterWriteUI32(&gcRegsDef[CalibrationModeIdx], p_GCRegsBackup->CalibrationMode);
    GC_RegisterWriteUI32(&gcRegsDef[SensorWellDepthIdx], p_GCRegsBackup->SensorWellDepth);
    GC_RegisterWriteUI32(&gcRegsDef[IntegrationModeIdx], p_GCRegsBackup->IntegrationMode);
@@ -2188,9 +2252,7 @@ static void restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
    GC_RegisterWriteUI32(&gcRegsDef[FWPositionSetpointIdx], p_GCRegsBackup->FWPositionSetpoint);
    GC_RegisterWriteUI32(&gcRegsDef[TestImageSelectorIdx], p_GCRegsBackup->TestImageSelector);
    GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], p_GCRegsBackup->EHDRINumberOfExposures);
-   GC_RegisterWriteUI32(&gcRegsDef[OffsetXIdx], p_GCRegsBackup->OffsetX);
-   GC_RegisterWriteUI32(&gcRegsDef[OffsetYIdx], p_GCRegsBackup->OffsetY);
-   if (gActDebugOptions.clearBufferAfterCompletion == 0)
+   if (gActDebugOptions.clearBufferAfterCompletion)
    {
       GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferMOISourceIdx], p_GCRegsBackup->MemoryBufferMOISource);
       GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], p_GCRegsBackup->MemoryBufferNumberOfSequences);
@@ -2198,6 +2260,8 @@ static void restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
       GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], p_GCRegsBackup->MemoryBufferSequencePreMOISize);
       GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferModeIdx], p_GCRegsBackup->MemoryBufferMode);
    }
+
+
 }
 
 /**

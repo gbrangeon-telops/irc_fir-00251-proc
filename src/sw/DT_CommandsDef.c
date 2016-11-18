@@ -49,6 +49,7 @@
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseSTATUS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePOWER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf);
@@ -82,6 +83,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"FPA", DebugTerminalParseFPA},
    {"HDER", DebugTerminalParseHDER},
    {"CAL", DebugTerminalParseCAL},
+   {"TRIG", DebugTerminalParseTRIG},
    {"STATUS", DebugTerminalParseSTATUS},
    {"POWER", DebugTerminalParsePOWER},
    {"NET", DebugTerminalParseNET},
@@ -223,7 +225,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 
    DT_PRINTF("FPA temperature = %dcC", FPA_GetTemperature(&gFpaIntf));
 
-   DT_PRINTF("FPA detector polarization voltage = %d", gFpaDetectorPolarizationVoltage);
+   DT_PRINTF("FPA detector polarization voltage = %d mV", gFpaDetectorPolarizationVoltage);
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
    DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
 
@@ -329,6 +331,50 @@ IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf)
    {
       DT_PRINTF("cal.error_set[%d] = 0x%08X", i, status.error_set[i]);
    }
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Debug terminal get TRIG status command parser.
+ * This parser is used to parse and validate get TRIG status command arguments and to
+ * execute the command.
+ *
+ * @return IRC_SUCCESS when TRIG status command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf)
+{
+   extern t_Trig gTrig;
+   t_TrigStatus status;
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!CBB_Empty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   TRIG_GetStatus(&gTrig, &status);
+
+   DT_PRINTF("trig_ctlr_status = 0x%08X", status.ctlr_status);
+
+   DT_PRINTF("trig_period_min[0] = %d", status.trig_period_min[0]);
+   DT_PRINTF("trig_period_max[0] = %d", status.trig_period_max[0]);
+   DT_PRINTF("trig_period_min[1] = %d", status.trig_period_min[1]);
+   DT_PRINTF("trig_period_max[1] = %d", status.trig_period_max[1]);
+   DT_PRINTF("trig_period_min[2] = %d", status.trig_period_min[2]);
+   DT_PRINTF("trig_period_max[2] = %d", status.trig_period_max[2]);
+   DT_PRINTF("trig_period_min[3] = %d", status.trig_period_min[3]);
+   DT_PRINTF("trig_period_max[3] = %d", status.trig_period_max[3]);
+   DT_PRINTF("trig_period_min[4] = %d", status.trig_period_min[4]);
+   DT_PRINTF("trig_period_max[4] = %d", status.trig_period_max[4]);
+   DT_PRINTF("trig_period_min[5] = %d", status.trig_period_min[5]);
+   DT_PRINTF("trig_period_max[5] = %d", status.trig_period_max[5]);
+   DT_PRINTF("trig_period_min[6] = %d", status.trig_period_min[6]);
+   DT_PRINTF("trig_period_max[6] = %d", status.trig_period_max[6]);
+   DT_PRINTF("trig_period_min[7] = %d", status.trig_period_min[7]);
+   DT_PRINTF("trig_period_max[7] = %d", status.trig_period_max[7]);
 
    return IRC_SUCCESS;
 }
@@ -1950,6 +1996,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
+   DT_PRINTF("  TRIG status:        TRIG");
    DT_PRINTF("  Camera status:      STATUS");
    DT_PRINTF("  Power status:       POWER");
    DT_PRINTF("  Network status:     NET [0|1 [port]]");

@@ -178,6 +178,30 @@ uint32_t TRIG_Start(const t_Trig *a)
 }
 
 //--------------------------------------------------------------------------
+// Pour avoir les statuts au complet
+//--------------------------------------------------------------------------
+void TRIG_GetStatus(const t_Trig *a, t_TrigStatus *Stat)
+{
+   Stat->ctlr_status                   = AXI4L_read32(a->ADD + A_STATUS);
+   Stat->trig_period_min[0]            = AXI4L_read32(a->ADD + 0x54);
+   Stat->trig_period_max[0]            = AXI4L_read32(a->ADD + 0x58);
+   Stat->trig_period_min[1]            = AXI4L_read32(a->ADD + 0x5C);
+   Stat->trig_period_max[1]            = AXI4L_read32(a->ADD + 0x60);
+   Stat->trig_period_min[2]            = AXI4L_read32(a->ADD + 0x64);
+   Stat->trig_period_max[2]            = AXI4L_read32(a->ADD + 0x68);
+   Stat->trig_period_min[3]            = AXI4L_read32(a->ADD + 0x6C);
+   Stat->trig_period_max[3]            = AXI4L_read32(a->ADD + 0x70);
+   Stat->trig_period_min[4]            = AXI4L_read32(a->ADD + 0x74);
+   Stat->trig_period_max[4]            = AXI4L_read32(a->ADD + 0x78);
+   Stat->trig_period_min[5]            = AXI4L_read32(a->ADD + 0x7C);
+   Stat->trig_period_max[5]            = AXI4L_read32(a->ADD + 0x80);
+   Stat->trig_period_min[6]            = AXI4L_read32(a->ADD + 0x84);
+   Stat->trig_period_max[6]            = AXI4L_read32(a->ADD + 0x88);
+   Stat->trig_period_min[7]            = AXI4L_read32(a->ADD + 0x8C);
+   Stat->trig_period_max[7]            = AXI4L_read32(a->ADD + 0x90);
+}
+
+//--------------------------------------------------------------------------
 // Changement du frame rate
 //--------------------------------------------------------------------------
 void TRIG_ChangeFrameRate(t_Trig *a, t_FpaIntf *b, const gcRegistersData_t *pGCRegs)

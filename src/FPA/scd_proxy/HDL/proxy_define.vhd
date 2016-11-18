@@ -55,6 +55,9 @@ package Proxy_define is
    constant SCD_GAIN_1                   : std_logic_vector(7 downto 0) := x"02";
    constant SCD_ITR                      : std_logic_vector(7 downto 0) := x"00";
    constant SCD_IWR                      : std_logic_vector(7 downto 0) := x"01";
+   constant SCD_PIX_RES_15B              : std_logic_vector(1 downto 0) := "00";
+   constant SCD_PIX_RES_14B              : std_logic_vector(1 downto 0) := "01";
+   constant SCD_PIX_RES_13B              : std_logic_vector(1 downto 0) := "10";
    constant FPA_INT_FBK_AVAILABLE        : std_logic := '1';
    constant SCD_FSYNC_HIGH_TIME_US       : integer := 5;     -- duree de FSYNC en usec
    constant SCD_POWER_WAIT_US            : integer := 2_000_000;  -- duree d'attente après allumage en usec. selon la doc, le proxy prend 1 sec. Pour plus de securité, j'en mets 2
@@ -164,6 +167,7 @@ package Proxy_define is
       scd_fig1_or_fig2_t5_dly : unsigned(15 downto 0);
       scd_fig1_or_fig2_t4_dly : unsigned(15 downto 0);
       scd_xsize_div2          : unsigned(9 downto 0);
+      scd_stretch_acq_trig    : std_logic;          -- permet d'utiliser une version étirée du trig pour supporter les instabilités de la roue à filtre
    end record;
    
    ------------------------------------------------								

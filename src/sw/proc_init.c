@@ -286,6 +286,7 @@ IRC_Status_t Proc_GC_Init()
          CB_Ctor(gcpCmdQueueBuffer, GCP_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
 
    IRC_Status_t status;
+   extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
    // Initialize GenICam registers data pointer
    GC_Registers_Init();
@@ -296,11 +297,22 @@ IRC_Status_t Proc_GC_Init()
    // Initialize GenICam register data
    gcRegsData = gcRegsDataFactory;
 
+   // Initialize pointer array on ExposureTimeX registers
+   pGcRegsDataExposureTimeX[0] = &gcRegsData.ExposureTime1;
+   pGcRegsDataExposureTimeX[1] = &gcRegsData.ExposureTime2;
+   pGcRegsDataExposureTimeX[2] = &gcRegsData.ExposureTime3;
+   pGcRegsDataExposureTimeX[3] = &gcRegsData.ExposureTime4;
+   pGcRegsDataExposureTimeX[4] = &gcRegsData.ExposureTime5;
+   pGcRegsDataExposureTimeX[5] = &gcRegsData.ExposureTime6;
+   pGcRegsDataExposureTimeX[6] = &gcRegsData.ExposureTime7;
+   pGcRegsDataExposureTimeX[7] = &gcRegsData.ExposureTime8;
+
    // Initialize image size limits
    gcRegsData.WidthInc = lcm(FPA_WIDTH_MULT, 2 * FPA_OFFSETX_MULT);
    gcRegsData.WidthMin = roundUp(FPA_WIDTH_MIN, gcRegsData.WidthInc);
    gcRegsData.HeightInc = lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT);
    gcRegsData.HeightMin = roundUp(FPA_HEIGHT_MIN, gcRegsData.HeightInc);
+   GC_ComputeImageLimits();   // must be called first
 
    // Memory buffer GenICam registers initialization
    GC_MemoryBufferNumberOfImagesMaxCallback(GCCP_BEFORE, GCCA_READ);
@@ -309,8 +321,8 @@ IRC_Status_t Proc_GC_Init()
    gcRegsData.MemoryBufferNumberOfSequences = gcRegsData.MemoryBufferNumberOfSequencesMax;
 
    GC_UpdateLockedFlag();
+   GC_UpdateFpaPeriodMinMargin();
    GC_UpdateParameterLimits();
-   GC_ComputeImageLimits();
 
    // Initialize Camera Link GenICam control interface
    status = CtrlIntf_InitCircularUART(&gClinkCtrlIntf,

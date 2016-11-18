@@ -70,6 +70,8 @@
 #define FPA_MIN_EXPOSURE               0.2F     // [us]
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
 
+#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+
 //#define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 //#define FPA_MASTER_CLK_RATE_HZ         6666000   // fréquence de l'horloge du FPA
 //#define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ

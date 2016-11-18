@@ -178,6 +178,9 @@ struct Command_s            //
 };
 typedef struct Command_s Command_t;                                                            
 
+// Global variables
+float gFpaPeriodMinMargin = 0.0F;
+
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 
@@ -396,11 +399,15 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    float period, MaxFrameRate;   
    Proxy_Fig2Param_t Proxy_Fig2Param;
    FPA_Fig2SpecificParams(&Proxy_Fig2Param, (float)pGCRegs->ExposureTime, pGCRegs);
-   period = Proxy_Fig2Param.T0*Proxy_Fig2Param.TMCLK;      // selon le chronogrammme : T0 = readout time
+   period = Proxy_Fig2Param.T0*Proxy_Fig2Param.TMCLK;      // selon le chronogrammme : T0 = frame period
+   
    #ifdef SIM
       PRINTF("FPA_Period_Min_usec = %f\n", 1e6F*period);      
    #endif          
-   MaxFrameRate = 1.0F / period;  
+   MaxFrameRate = 1.0F / period;
+
+   // ENO: 10 sept 2016: Apply margin 
+   MaxFrameRate = MaxFrameRate * (1.0F - gFpaPeriodMinMargin);
 
    // Round maximum frame rate
    MaxFrameRate = floorMultiple(MaxFrameRate, 0.01);
@@ -414,12 +421,16 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    float maxExposure_us, periodMinWithNullExposure;
-   float actualPeriod;
+   float actualPeriod, fpaAcquisitionFrameRate;
    Proxy_Fig2Param_t hh;
       
+   // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
+   fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
+
+   // ENO: 10 sept 2016: tout reste inchangé
    FPA_Fig2SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure = hh.T0*hh.TMCLK;
-   actualPeriod = 1.0F / pGCRegs->AcquisitionFrameRate;                // periode avec le frame rate actuel
+   actualPeriod = 1.0F / fpaAcquisitionFrameRate;                // periode avec le frame rate actuel
    
    maxExposure_us = (actualPeriod - periodMinWithNullExposure)*1e6F;
    

@@ -220,7 +220,11 @@ architecture rtl of scd_data_dispatcher is
    --signal fpa_fifo_valid_pipe          : std_logic_vector(1 downto 0);
    --signal diag_fifo_valid_pipe         : std_logic_vector(1 downto 0);
    signal pix_dval_i                   : std_logic;
+   signal pix_dval_temp                : std_logic;
    signal pix_data_i                   : std_logic_vector(31 downto 0);
+   signal pix1_data_temp               : std_logic_vector(15 downto 0);
+   signal pix2_data_temp               : std_logic_vector(15 downto 0);
+   signal fpa_pix_max                  : unsigned(15 downto 0);
    signal fpa_temp_reg_dval            : std_logic;
    signal hder_cnt                     : unsigned(7 downto 0) := (others => '0');
    signal int_time_mismatch            : std_logic;
@@ -629,6 +633,7 @@ begin
    --------------------------------------------------   
    --
    U9: process(CLK)
+      variable fpa_pix_res_bit_shift : integer range 0 to fpa_pix_max'high;
    begin          
       if rising_edge(CLK) then 
          if sreset = '1' then 
@@ -647,14 +652,29 @@ begin
             
             acq_fringe_last <= acq_fringe;
             fpa_hder_assump_err <= '0';
+            fpa_pix_res_bit_shift := to_integer(unsigned(FPA_INTF_CFG.scd_op.scd_pix_res));
+            fpa_pix_max <= x"7FFF" srl fpa_pix_res_bit_shift;
             
             -- dispatching des données et header en mode DIAG et REEL (ou FPA)
+            pix_dval_i <= pix_dval_temp;
+            pix_data_i <= pix1_data_temp & pix2_data_temp;
             if real_data_mode = '1' then 
-               pix_dval_i <= fpa_fifo_rd and fpa_fifo_dval and not fpa_header and fpa_dval and acq_fringe;
-               pix_data_i <= fpa_pix1_data & fpa_pix2_data;              
+               pix_dval_temp <= fpa_fifo_rd and fpa_fifo_dval and not fpa_header and fpa_dval and acq_fringe;
+               -- verify overflow on the number of bits corresponding to resolution
+               if unsigned(fpa_pix1_data) > fpa_pix_max then
+                  pix1_data_temp <= std_logic_vector(fpa_pix_max);
+               else
+                  pix1_data_temp <= fpa_pix1_data;
+               end if;
+               if unsigned(fpa_pix2_data) > fpa_pix_max then
+                  pix2_data_temp <= std_logic_vector(fpa_pix_max);
+               else
+                  pix2_data_temp <= fpa_pix2_data;
+               end if;
             else
-               pix_dval_i <= diag_fifo_rd and diag_fifo_dval and not diag_header and diag_dval and acq_fringe;
-               pix_data_i <= diag_pix1_data & diag_pix2_data;
+               pix_dval_temp <= diag_fifo_rd and diag_fifo_dval and not diag_header and diag_dval and acq_fringe;
+               pix1_data_temp <= diag_pix1_data;
+               pix2_data_temp <= diag_pix2_data;
             end if;
             
             -- le header en provenance du fpa doit sortir en tout temps pour aller vers l'extracteur de données. On mettra ainsi à jour les signes vitaux du détecteur (la température etc...) si possible

@@ -16,6 +16,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all; 
 use work.tel2000.all;
 use work.trig_define.all;
+use work.min_max_define.all;
 
 entity trig_gen_mblaze_intf is
    port(
@@ -40,7 +41,10 @@ entity trig_gen_mblaze_intf is
       PPS_TIMEOUT_RE            : in std_logic;
       MB_TIME_SUBSEC            : out std_logic_vector(23 downto 0);
 	  
-	   SEQ_SOFTTRIG				  : out std_logic
+	   SEQ_SOFTTRIG				  : out std_logic;
+      
+      TRIG_PERIOD_MIN           : in  array8_slv32;
+      TRIG_PERIOD_MAX           : in  array8_slv32
       );
 end trig_gen_mblaze_intf;
 
@@ -248,8 +252,24 @@ begin
             
             when X"50" => axi_rdata <= resize(STATUS,32);					--
             
-            when others=> 
-            axi_rdata <= (others =>'1');
+            when X"54" => axi_rdata <= resize(TRIG_PERIOD_MIN(0),32);
+            when X"58" => axi_rdata <= resize(TRIG_PERIOD_MAX(0),32);
+            when X"5C" => axi_rdata <= resize(TRIG_PERIOD_MIN(1),32);
+            when X"60" => axi_rdata <= resize(TRIG_PERIOD_MAX(1),32);
+            when X"64" => axi_rdata <= resize(TRIG_PERIOD_MIN(2),32);
+            when X"68" => axi_rdata <= resize(TRIG_PERIOD_MAX(2),32);
+            when X"6C" => axi_rdata <= resize(TRIG_PERIOD_MIN(3),32);
+            when X"70" => axi_rdata <= resize(TRIG_PERIOD_MAX(3),32);
+            when X"74" => axi_rdata <= resize(TRIG_PERIOD_MIN(4),32);
+            when X"78" => axi_rdata <= resize(TRIG_PERIOD_MAX(4),32);
+            when X"7C" => axi_rdata <= resize(TRIG_PERIOD_MIN(5),32);
+            when X"80" => axi_rdata <= resize(TRIG_PERIOD_MAX(5),32);
+            when X"84" => axi_rdata <= resize(TRIG_PERIOD_MIN(6),32);
+            when X"88" => axi_rdata <= resize(TRIG_PERIOD_MAX(6),32);
+            when X"8C" => axi_rdata <= resize(TRIG_PERIOD_MIN(7),32);
+            when X"90" => axi_rdata <= resize(TRIG_PERIOD_MAX(7),32);
+            
+            when others=> axi_rdata <= (others =>'1');
          end case;        
       end if;     
    end process;   

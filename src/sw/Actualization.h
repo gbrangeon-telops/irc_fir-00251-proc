@@ -57,7 +57,7 @@
 
 #define TIC
 #define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)5 * TIME_ONE_SECOND_US // [us]
-#define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)30 * TIME_ONE_SECOND_US // [us]
+#define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)360 * TIME_ONE_SECOND_US // [us]
 #define ACT_WAIT_FOR_ICU_TIMEOUT (uint32_t)2*gICU_ctrl.ICU_TransitionDuration*1000 // [us]
 #define ACT_WAIT_FOR_AEC_TIMEOUT (uint32_t)3 * TIME_ONE_SECOND_US // [us] // TODO periode à valider (vient du code de TEL-1000)
 #define ACT_WAIT_FOR_SEQ_TIMEOUT (uint32_t)10 * TIME_ONE_SECOND_US // [us]
@@ -110,6 +110,7 @@
 
 #define BPD_STATES(ACTION) \
 		ACTION(BPD_Idle) \
+		ACTION(BPD_ComputeDeltaBetaStats)   /**< stats must be computed independently of the ACT_ComputeDeltaBetaStats state because the BP detection occurs before and it modifies the statistics */\
 		ACTION(BPD_UpdateBeta) \
 		ACTION(BPD_StartAcquisition) \
 		ACTION(BPD_WaitSequenceReady) \

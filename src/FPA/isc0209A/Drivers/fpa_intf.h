@@ -66,6 +66,8 @@
 #define FPA_MIN_EXPOSURE               5.1F     // [us]
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
 
+#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+
 #define FPA_DATA_RESOLUTION 14
 
 #define FPA_INVALID_TEMP               -32768   // cC

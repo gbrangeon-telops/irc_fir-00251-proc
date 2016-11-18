@@ -17,7 +17,6 @@
 #include "GC_Registers.h"
 #include "FPA_intf.h"
 #include "XADC_channels.h"
-#include "GC_Callback.h"
 #include "Acquisition.h"
 #include "Calibration.h"
 #include "Buffermanager.h"

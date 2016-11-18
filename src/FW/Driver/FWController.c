@@ -413,7 +413,7 @@ void FW_ControllerProcess()
       gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
    if (FW_rawMode)
-      gcRegsData.FWPosition = FWP_FilterWheelInTransition;/*FWP_FilterWheelNotImplemented + 1;*/ // TODO définir un enum dans GenICam
+      gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
    if (!FW_rawMode && !modeReady)
       TDCStatusSet(WaitingForFilterWheelMask);
@@ -1696,7 +1696,7 @@ void FW_SetFWEncoderCountInOneTurn()
 
 void FW_CalculateSpeedSetpoint(gcRegistersData_t *pGCRegs)
 {
-   pGCRegs->FWSpeedSetpoint = (uint32_t) floor(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
+   pGCRegs->FWSpeedSetpoint = (uint32_t) floorf(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
    if (pGCRegs->FWSpeedSetpoint == 0)
    {
       pGCRegs->FWSpeedSetpoint = 1;

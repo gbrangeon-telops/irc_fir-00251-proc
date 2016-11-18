@@ -140,6 +140,8 @@ struct isc0209_param_s             //
 };
 typedef struct isc0209_param_s  isc0209_param_t;
 
+// Global variables
+float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -412,7 +414,12 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    isc0209_param_t hh;
    
    FPA_SpecificParams(&hh,(float)pGCRegs->ExposureTime, pGCRegs);
-   MaxFrameRate = floorMultiple(hh.frame_rate_max_hz, 0.01);
+   
+   // ENO: 10 sept 2016: Apply margin 
+   MaxFrameRate = hh.frame_rate_max_hz * (1.0F - gFpaPeriodMinMargin);
+   
+   // Round maximum frame rate
+   MaxFrameRate = floorMultiple(MaxFrameRate, 0.01);
 
    return MaxFrameRate;                          
 }
@@ -426,10 +433,15 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    float periodMinWithNullExposure_usec;
    float actualPeriod_sec;
    float max_exposure_usec;
+   float fpaAcquisitionFrameRate;
    
+   // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
+   fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
+   
+   // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure_usec = hh.frame_period_usec;
-   actualPeriod_sec = 1.0F/pGCRegs->AcquisitionFrameRate; // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
+   actualPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
    
    max_exposure_usec = (actualPeriod_sec*1e6F - periodMinWithNullExposure_usec);
 

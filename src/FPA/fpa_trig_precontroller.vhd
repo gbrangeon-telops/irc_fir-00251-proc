@@ -57,9 +57,21 @@ architecture RTL of fpa_trig_precontroller is
          );
    end component;
    
+   component gh_stretch 
+      generic (stretch_count: integer := 3072);
+      port(
+         CLK : in STD_LOGIC;
+         rst : in STD_LOGIC;
+         D : in STD_LOGIC;
+         Q : out STD_LOGIC
+         );
+   end component;
+   
    type trig_prectrl_sm_type is (idle, init_st, wait_xtra_img_st, prim_xtra_st, second_xtra_st);
    signal trig_prectrl_sm              : trig_prectrl_sm_type;
    signal sreset                       : std_logic;
+   signal acq_trig_temp                : std_logic;
+   signal acq_trig_stretch             : std_logic;
    signal acq_trig_o                   : std_logic;
    signal xtra_trig_o                  : std_logic;
    signal done                         : std_logic;
@@ -68,10 +80,10 @@ architecture RTL of fpa_trig_precontroller is
    signal acq_trig_last                : std_logic;
    signal xtra_trig_last               : std_logic; 
    
-   -- attribute dont_touch                : string;
-   -- attribute dont_touch of acq_trig_o  : signal is "true";
-   -- attribute dont_touch of xtra_trig_o : signal is "true";
-   -- attribute dont_touch of fpa_readout_last  : signal is "true";
+   --attribute dont_touch                : string;
+   --attribute dont_touch of acq_trig_temp  : signal is "true";
+   --attribute dont_touch of xtra_trig_o : signal is "true";
+   --attribute dont_touch of fpa_readout_last  : signal is "true";
    
    
 begin
@@ -81,6 +93,16 @@ begin
    ACQ_TRIG_OUT <=  acq_trig_o; --! '1' ssi l'image suivant l'integration en court doit être envoyée dans la chaine. Sinon, à '0'.
    XTRA_TRIG_OUT <=  xtra_trig_o; --! '1' si l'image suivant l'integration en court doit être envoyée ou non dans la chaine.
    
+   
+   
+   U0 : gh_stretch 
+   generic map (stretch_count => 3072)   -- sur demande de MDA, acq_trig étiré de 30 usec pour supporter instabilité de la roue à filtres en mode synchrone uniquement et ce, pour les SCD 
+   port map(
+      CLK  => CLK_100M,
+      rst  => sreset,
+      D    => acq_trig_temp,
+      Q    => acq_trig_stretch
+      );
    
    --------------------------------------------------
    -- synchro reset 
@@ -109,6 +131,14 @@ begin
             
          else
             
+            -- étirement ou non 
+            if FPA_INTF_CFG.SCD_MISC.SCD_STRETCH_ACQ_TRIG = '1' then 
+               acq_trig_o <= acq_trig_stretch;               
+            else
+               acq_trig_o <= acq_trig_temp; 
+            end if;
+            
+            
             -- pour detection front de FPA_readout
             fpa_readout_last <= FPA_READOUT;
             
@@ -117,7 +147,7 @@ begin
                
                -- etat init_st : oin envoie les trigs tels qu,on les reçoit et on attend que l'idDCA soit fonctionnel.
                when init_st =>
-                  acq_trig_o <= ACQ_TRIG_IN;
+                  acq_trig_temp <= ACQ_TRIG_IN;
                   xtra_trig_o <= XTRA_TRIG_IN;
                   if FPA_READOUT = '1' and FPA_INTF_CFG.COMN.FPA_DIAG_MODE = '0' and PRIM_XTRA_TRIG_ACTIVE = '0' then -- donc l'IDDCA est actif et on veut se synchroniser sur le prochain PRIM_XTRA_TRIG_ACTIVE = '1'
                      trig_prectrl_sm <= idle;
@@ -125,20 +155,20 @@ begin
                   
                -- etat idle
                when idle => 
-                  acq_trig_o <= ACQ_TRIG_IN;
+                  acq_trig_temp <= ACQ_TRIG_IN;
                   xtra_trig_o <= XTRA_TRIG_IN;
                   done <= '1'; 
                   xtra_img_cnt <= (others => '0');
                   if PRIM_XTRA_TRIG_ACTIVE = '1' then
                      xtra_trig_o <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
-                     acq_trig_o <= '0';
+                     acq_trig_temp <= '0';
                      trig_prectrl_sm <= prim_xtra_st;                        
                   end if;                     
                   
                -- mode xtra_trig 1. on y reste tant que  PRIM_XTRA_TRIG_ACTIVE reste à '1'
                when prim_xtra_st => 
                   xtra_trig_o <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
-                  acq_trig_o <= '0';
+                  acq_trig_temp <= '0';
                   if fpa_readout_last = '1' and  FPA_READOUT = '0' then --! fin du readout.
                      trig_prectrl_sm <= wait_xtra_img_st;
                   end if;

@@ -179,6 +179,10 @@ struct ScdPacketTx_s             //
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
 
+// Global variables
+uint8_t FPA_StretchAcqTrig = 0;
+float gFpaPeriodMinMargin = 0.0F;
+
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
@@ -245,6 +249,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    Scd_Fig1orFig2Param_t hh;
    Scd_Fig4Param_t kk;
+   float fpaAcquisitionFrameRate;
    
    //-----------------------------------------                                           
    // bâtir les configurations
@@ -315,16 +320,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // Resolution des pixels (13, 14 ou 15 bits)
    ptrA->scd_pix_res = SCD_PIX_RESOLUTION_14BITS;    // resolution pour l'instant figée à 14 bits
     
-    // frame_period_min
-   ptrA->scd_frame_period_min = (uint32_t) MIN((float)FPA_MASTER_CLK_RATE_HZ/SCD_MIN_OPER_FPS, (hh.T0 + pGCRegs->ExposureTimeMax*1E-6F) * (float)FPA_MASTER_CLK_RATE_HZ);   // hh.T0 a été calculé avec un temps d'integration nul
+   // frame_period_min
+   //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
+   fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
+   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * (float)FPA_MASTER_CLK_RATE_HZ);
+   FPGA_PRINTF("scd_frame_period_min = %d x 12.5ns\n", ptrA->scd_frame_period_min);
    
    // mode diag scd
    ptrA->scd_bit_pattern = 0;
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1)
-      ptrA->scd_bit_pattern = SCD_PE_IO_TEST1;
-   else if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2)
-      ptrA->scd_bit_pattern = SCD_PE_IO_TEST2;
-   else if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3)
+   if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
       ptrA->scd_bit_pattern = SCD_PE_TEST1;
                                       
    // valeurs converties en coups d'horloge du module FPA_INTF
@@ -338,7 +344,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_MASTER_CLK_RATE_HZ);  
    ptrA->scd_fig4_t6_dly = (uint32_t)FPA_SCD_HDER_EFF_LEN;                             // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
    ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  
-     
+   ptrA->scd_stretch_acq_trig  =  (uint32_t) FPA_StretchAcqTrig;
+      
    //-----------------------------------------                                           
    // Envoyer commande synthetique
    ptrA->proxy_cmd_to_update_id = SCD_DIAG_CMD_ID;
@@ -393,11 +400,15 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    float period, MaxFrameRate;   
    Scd_Fig1orFig2Param_t Scd_Fig1orFig2Param;
    FPA_Fig1orFig2SpecificParams(&Scd_Fig1orFig2Param, (float)pGCRegs->ExposureTime, pGCRegs);
-   period = Scd_Fig1orFig2Param.T0;      // selon scd : T0 = readout time
+   period = Scd_Fig1orFig2Param.T0;      // selon scd : T0 = frame period
+   
    #ifdef SIM
       PRINTF("FPA_Period_Min_usec = %f\n", 1e6F*period);      
    #endif          
-   MaxFrameRate = 1.0F / period;  
+   MaxFrameRate = 1.0F / period;
+
+   // ENO: 10 sept 2016: Apply margin 
+   MaxFrameRate = MaxFrameRate * (1.0F - gFpaPeriodMinMargin);
 
    // Round maximum frame rate
    MaxFrameRate = floorMultiple(MaxFrameRate, 0.01);
@@ -411,12 +422,16 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    float maxExposure_us, periodMinWithNullExposure;
-   float operatingPeriod;
+   float operatingPeriod, fpaAcquisitionFrameRate;
    Scd_Fig1orFig2Param_t hh;
       
+   // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
+   fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
+
+   // ENO: 10 sept 2016: tout reste inchangé
    FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure = hh.T0;
-   operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, pGCRegs->AcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
+   operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
    

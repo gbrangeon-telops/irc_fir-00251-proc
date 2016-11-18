@@ -47,6 +47,15 @@ struct s_Trig
   };
 typedef struct s_Trig t_Trig;
 
+// statuts provenant du vhd
+struct s_TrigStatus    //
+{
+   uint32_t ctlr_status;
+   uint32_t trig_period_min[8];
+   uint32_t trig_period_max[8];
+};
+typedef struct s_TrigStatus t_TrigStatus;
+
 // structure PosixTime que retourne le bloc TRIGGER
 struct s_PosixTime
 {
@@ -79,6 +88,9 @@ void TRIG_ChangeAcqWindow(t_Trig *a, const enum TRIG_AcqWindow AcqWindow, const 
 
 //pour effacer les bits d'erreurs
 void TRIG_ClearErr(const t_Trig *a);
+
+//pour avoir les statuts complets
+void TRIG_GetStatus(const t_Trig *a, t_TrigStatus *Stat);
 
 //pour un overwrite du time
 void TRIG_OverWritePOSIXNow(uint32_t PPCTime_Sec, const t_Trig *a);

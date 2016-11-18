@@ -104,7 +104,7 @@ void Acquisition_Stop()
    TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
 
    BufferManager_AcquisitionStop(&gBufManager, 1);
-   BufferManager_AcquisitionStop(&gBufManager, 0);
+
 
    TDCStatusSet(WaitingForArmMask);
 
@@ -124,6 +124,9 @@ void Acquisition_Arm()
    extern t_EhdriManager gEHDRIManager;
    extern t_FlagCfg gFlagging_ctrl;
    extern t_GatingCfg gGating_ctrl;
+   extern t_bufferManager gBufManager;
+
+   BufferManager_AcquisitionStop(&gBufManager, 0); // Clear the ACQ stop to resume recording REDMINE#8350
 
    TRIG_SendConfigGC(&gTrig, &gcRegsData);
 
@@ -417,6 +420,7 @@ void Acquisition_SM()
             else
             {
                ACQ_ERR("Cooler cannot be turned on.");
+               acquisitionState = ACQ_POWER_RESET;
             }
          }
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_VOLTAGE_TIMEOUT_US)

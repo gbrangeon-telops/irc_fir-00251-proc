@@ -92,6 +92,8 @@
 #define FPA_MIN_EXPOSURE               1.0F     // [us]
 #define FPA_MAX_EXPOSURE               80000.0F // [us]
 
+#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 #define FPA_MASTER_CLK_RATE_HZ         80E+6F   // fréquence de l'horloge du FPA
 #define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ
@@ -144,6 +146,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  scd_fig1_or_fig2_t5_dly;
    uint32_t  scd_fig1_or_fig2_t4_dly;
    uint32_t  scd_xsize_div2;
+   uint32_t  scd_stretch_acq_trig;
    
       // specifie la partie de la structure à mettre à jour (pour evter des bugs)
    uint32_t  proxy_cmd_to_update_id;
@@ -204,7 +207,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ

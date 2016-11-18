@@ -260,6 +260,7 @@ void BufferManager_SetBufferMode(t_bufferManager *pBufferCtrl,t_bufferMode Mode 
 	}
 
 	BUFFERING_INF("SetBufferMode");
+
 }
 
 void BufferManager_SetSwitchConfig(t_bufferManager *pBufferCtrl, t_bufferSwitch config)

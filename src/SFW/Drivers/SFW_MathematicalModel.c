@@ -13,7 +13,6 @@
 
 //TODO Valider que kles define du model mathematique correspondre toujours à ceux de fpa_intf
 // ATTENTION CES DEFINE SONT IDENTIQUE A CEUX DE FAP_INTF
-#define SFW_FPA_EXPOSUREMARGIN 0.0F // TODO: Interroger le module FPA pour avoir le temps de readout
 #define SFW_EXPOSUREMAX_MARGING     (flashSettings.FWExposureTimeMaxMargin / 100.0F)
 
 static void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, float* maxTheta1, float* maxTheta2);
@@ -158,8 +157,7 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
       else
          SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
 
-      // TODO: Verifier si SFW_FPA_EXPOSUREMARGIN est necessaire dans tous les cas
-      SFW_ExposureTimeMax = MIN(SFW_ExposureTimeMax , FPA_MaxExposureTime(pGCRegs)*SFW_EXPOSUREMAX_MARGING - SFW_FPA_EXPOSUREMARGIN); //Min entre Temps ou le filtre est devant et Temps du FPA qui tient compte du temps d'exposition+readout possible selon le framerate
+      SFW_ExposureTimeMax = MIN(SFW_ExposureTimeMax , FPA_MaxExposureTime(pGCRegs)); //Min entre Temps ou le filtre est devant et Temps du FPA qui tient compte du temps d'exposition+readout possible selon le framerate
 
       // if width or height changed, limit the acquisition frame rate only
       if (((changedParameter == WIDTH_CHANGED) || (changedParameter == HEIGHT_CHANGED)) && (SFW_ExposureTimeMax_temp > SFW_ExposureTimeMax) && (SFW_maxExposureTime > SFW_ExposureTimeMax))
@@ -430,7 +428,7 @@ void SFW_LimitParameter(gcRegistersData_t * pGCRegs)
       {
          uint32_t sfw; //,hdri;
          pGCRegs->ExposureTimeMax = SFW_GetExposureTimeMax();
-         for(sfw=0;sfw<8;sfw++)
+         for(sfw=0; sfw<NUM_OF(FWExposureTime); sfw++)
          {
                if(FWExposureTime[sfw]> pGCRegs->ExposureTimeMax)
                {
@@ -439,12 +437,8 @@ void SFW_LimitParameter(gcRegistersData_t * pGCRegs)
                   SFW_SetExposureTimeArray(sfw, FWExposureTime[sfw]);
                   SFW_INF(" After(x100) = %d \n",(uint32_t) FWExposureTime[sfw] *100);
                }
-
          }
-         if(pGCRegs->ExposureTime > pGCRegs->ExposureTimeMax)
-         {
-            pGCRegs->ExposureTime = pGCRegs->ExposureTimeMax;
-         }
+         GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime));
       }
    }
 }

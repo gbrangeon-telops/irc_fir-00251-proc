@@ -2,9 +2,18 @@
 SetActiveLib -work
 #clearlibrary 	
 
+setenv COMMON "D:\Telops\FIR-00251-Common"
+
 #Packages and utilities
 acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_define.vhd         
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
+
+#signal stat
+acom \
+ "$COMMON\VHDL\signal_stat\min_max_define.vhd" \
+ "$COMMON\VHDL\signal_stat\min_max_ctrl.vhd" \
+ "$COMMON\VHDL\signal_stat\period_duration.vhd" \
+ "$COMMON\VHDL\signal_stat\trig_period_8ch.bde"
 
 #MBlaze config
 acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_mblaze_intf.vhd	

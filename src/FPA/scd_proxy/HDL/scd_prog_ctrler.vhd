@@ -438,6 +438,9 @@ begin
             
          else                       
             
+            -- ENO 14 juillet 2016: requis pour supporter instabilités de la rue à filtre 
+            fpa_intf_cfg_i.scd_misc.scd_stretch_acq_trig <= new_cfg.scd_misc.scd_stretch_acq_trig;
+            
             
             case  cfg_updater_fsm is 
                

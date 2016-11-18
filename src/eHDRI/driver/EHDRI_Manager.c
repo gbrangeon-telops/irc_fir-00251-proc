@@ -11,7 +11,6 @@
 #include <string.h>
 #include <math.h>
 
-extern gcRegistersData_t gcRegsDataFactory;
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 
 void EHDRI_GetUpdate(uint16_t *exp_occurrence, uint8_t *Q_idx, uint16_t *Q_max, uint16_t *N, uint8_t nb_index);
@@ -38,7 +37,7 @@ void EHDRI_Reset(t_EhdriManager *pEhdriCtrl, gcRegistersData_t *pGCRegs)
    pGCRegs->EHDRIExposureOccurrence3 = 25.0f;
    pGCRegs->EHDRIExposureOccurrence4 = 25.0f;
 
-   pGCRegs->EHDRINumberOfExposures = 1;
+   GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], 1);
 
    EHDRI_SendConfig(pEhdriCtrl, pGCRegs);
 }

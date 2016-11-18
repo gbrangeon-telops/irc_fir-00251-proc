@@ -26,6 +26,7 @@ add_files -norecurse $common_dir/PWM_CTRL/HDL/
 add_files $common_dir/Buffering/
 add_files -norecurse $common_dir/Calibration/
 add_files -norecurse $common_dir/iserdes/
+add_files -norecurse $common_dir/signal_stat/
 
 # Add common project IP sources (should be  move to fir-00251-Proc)
 read_ip $common_dir_ip/AXI4_Stream32_to_64/AXI4_Stream32_to_64.xci

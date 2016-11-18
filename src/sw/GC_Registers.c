@@ -27,6 +27,7 @@
 #include "FWController.h"
 #include "NDFController.h"
 #include "SFW_MathematicalModel.h"
+#include "exposure_time_ctrl.h"
 #include "utils.h"
 #include <string.h>
 #include <math.h>
@@ -35,6 +36,10 @@
 
 uint8_t gGC_RegistersStreaming = 0;
 uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
+
+float EHDRIExposureTime[EHDRI_IDX_NBR] = {FPA_EHDRI_EXP_0, FPA_EHDRI_EXP_1, FPA_EHDRI_EXP_2, FPA_EHDRI_EXP_3};
+float FWExposureTime[MAX_NUM_FILTER] = {FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE};
+float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
@@ -271,7 +276,7 @@ gcRegistersData_t gcRegsData;
 /**
  * DeviceClockFrequency data array
  */
-float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 50000000.0F};
+float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 80000000.0F};
 
 /**
  * DeviceTemperature data array
@@ -550,9 +555,6 @@ void GC_Registers_Init()
 
 /* AUTO-CODE END */
 
-float EHDRIExposureTime[EHDRI_IDX_NBR] = {FPA_EHDRI_EXP_0, FPA_EHDRI_EXP_1, FPA_EHDRI_EXP_2, FPA_EHDRI_EXP_3};
-
-float FWExposureTime[8] = {FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE};
 
 /**
  * Update GenICam registers lock flag.
@@ -663,52 +665,57 @@ void GC_CalibrationUpdateRegisters()
       {
          case CCT_MultipointFixed:
          case CCT_MultipointNDF:
-            gcRegsData.ExposureMode = EM_Timed;
+            GC_RegisterWriteUI32(&gcRegsDef[ExposureModeIdx], EM_Timed);
             GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Off);
-            gcRegsData.EHDRINumberOfExposures = 1;
+            GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], 1);
          case CCT_TelopsFixed:
          case CCT_TelopsNDF:
-            gcRegsData.FWMode = FWM_Fixed;
+            GC_RegisterWriteUI32(&gcRegsDef[FWModeIdx], FWM_Fixed);
             break;
 
          case CCT_MultipointFW:
-            gcRegsData.ExposureMode = EM_Timed;
+            GC_RegisterWriteUI32(&gcRegsDef[ExposureModeIdx], EM_Timed);
             GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Off);
-            gcRegsData.EHDRINumberOfExposures = 1;
+            GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], 1);
             // Configure ExposureTime for FW module
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
             {
                FWExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
                SFW_SetExposureTimeArray(i, FWExposureTime[i]);
             }
-
-            gcRegsData.ExposureTime1 = FWExposureTime[0];
-            gcRegsData.ExposureTime2 = FWExposureTime[1];
-            gcRegsData.ExposureTime3 = FWExposureTime[2];
-            gcRegsData.ExposureTime4 = FWExposureTime[3];
-            gcRegsData.ExposureTime5 = FWExposureTime[4];
-            gcRegsData.ExposureTime6 = FWExposureTime[5];
-            gcRegsData.ExposureTime7 = FWExposureTime[6];
-            gcRegsData.ExposureTime8 = FWExposureTime[7];
+            GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime));
          case CCT_TelopsFW:
             break;
 
          case CCT_MultipointEHDRI:
-            gcRegsData.ExposureMode = EM_Timed;
+            GC_RegisterWriteUI32(&gcRegsDef[ExposureModeIdx], EM_Timed);
             GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Off);
-            gcRegsData.FWMode = FWM_Fixed;
+            GC_RegisterWriteUI32(&gcRegsDef[FWModeIdx], FWM_Fixed);
             // Configure and activate EHDRI
-            gcRegsData.EHDRIMode = EHDRIM_Advanced;
-            gcRegsData.EHDRINumberOfExposures = calibrationInfo.collection.NumberOfBlocks;
+            GC_RegisterWriteUI32(&gcRegsDef[EHDRIModeIdx], EHDRIM_Advanced);
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
                EHDRIExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
-            gcRegsData.ExposureTime1 = EHDRIExposureTime[0];
-            gcRegsData.ExposureTime2 = EHDRIExposureTime[1];
-            gcRegsData.ExposureTime3 = EHDRIExposureTime[2];
-            gcRegsData.ExposureTime4 = EHDRIExposureTime[3];
+            GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime));
+            GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], calibrationInfo.collection.NumberOfBlocks);
             break;
       }
    }
+}
+
+/**
+ * Update margin on the minimal period used by FPA module.
+ * This function updates FPA period min margin according to active mode.
+ */
+void GC_UpdateFpaPeriodMinMargin()
+{
+   extern float gFpaPeriodMinMargin;
+
+   if (gcRegsData.FWMode == FWM_SynchronouslyRotating)
+      gFpaPeriodMinMargin = 0.05F;  //TODO: change for flashSettings.FWFramePeriodMinMargin
+   else
+      gFpaPeriodMinMargin = 0.0F;
+
+   FPGA_PRINTF("Update FPA frame period margin: " _PCF(1) "%%\n", _FFMT((gFpaPeriodMinMargin * 100.0F), 1));
 }
 
 /**
@@ -778,17 +785,16 @@ void GC_UpdateParameterLimits()
    // Calculate ExposureTimeMax with current AcquisitionFrameRate
    gcRegsData.ExposureTimeMax = FPA_MaxExposureTime(&gcRegsData);
 
-   // Validate current ExposureTime
-   if (gcRegsData.ExposureTime > gcRegsData.ExposureTimeMax)
-   {
-      gcRegsData.ExposureTime = gcRegsData.ExposureTimeMax;
-   }
-
    if (FWSynchronoulyRotatingModeIsActive)
    {
       gcRegsData.ExposureTimeMax = MIN(gcRegsData.ExposureTimeMax, SFW_GetExposureTimeMax());
    }
 
+   // Validate current ExposureTime
+   if (gcRegsData.ExposureTime > gcRegsData.ExposureTimeMax)
+   {
+      gcRegsData.ExposureTime = gcRegsData.ExposureTimeMax;
+   }
 }
 
 /**
@@ -801,6 +807,7 @@ IRC_Status_t GC_DeviceRegistersVerification()
    uint32_t heightMax = FPA_HEIGHT_MAX;
    uint32_t widthMax = FPA_WIDTH_MAX;
    uint8_t error = 0;
+   uint32_t idx;
 
    GC_UpdateParameterLimits();
 
@@ -859,14 +866,43 @@ IRC_Status_t GC_DeviceRegistersVerification()
       error = 1;
    }
 
-   if ((gcRegsData.ExposureTime > gcRegsData.ExposureTimeMax) || (gcRegsData.ExposureTime < gcRegsData.ExposureTimeMin))
+   if (FWSynchronoulyRotatingModeIsActive)
    {
+      for (idx = 0; idx < NUM_OF(pGcRegsDataExposureTimeX); idx++)
+      {
+         if ((*pGcRegsDataExposureTimeX[idx] > gcRegsData.ExposureTimeMax) || (*pGcRegsDataExposureTimeX[idx] < gcRegsData.ExposureTimeMin))
+         {
+            GC_ERR("Invalid exposure time %d (" _PCF(1) "us).", idx, _FFMT(*pGcRegsDataExposureTimeX[idx], 1));
+            GC_GenerateEventError(EECD_InvalidExposure);
+            error = 1;
+            break;
+         }
+      }
+   }
+   else if (EHDRIIsActive)
+   {
+      for (idx = 0; idx < gcRegsData.EHDRINumberOfExposures; idx++)
+      {
+         if ((*pGcRegsDataExposureTimeX[idx] > gcRegsData.ExposureTimeMax) || (*pGcRegsDataExposureTimeX[idx] < gcRegsData.ExposureTimeMin))
+         {
+            GC_ERR("Invalid exposure time %d (" _PCF(1) "us).", idx, _FFMT(*pGcRegsDataExposureTimeX[idx], 1));
+            GC_GenerateEventError(EECD_InvalidExposure);
+            error = 1;
+            break;
+         }
+      }
+   }
+   else
+   {
+      if ((gcRegsData.ExposureTime > gcRegsData.ExposureTimeMax) || (gcRegsData.ExposureTime < gcRegsData.ExposureTimeMin))
+      {
 #ifdef SIM
-      PRINTF("ExposureTime = %f, ExposureTimeMax = %f, \n", gcRegsData.ExposureTime, gcRegsData.ExposureTimeMax);
+         PRINTF("ExposureTime = %f, ExposureTimeMax = %f\n", gcRegsData.ExposureTime, gcRegsData.ExposureTimeMax);
 #endif
-      GC_ERR("Invalid exposure time (%dms).", (uint32_t)(gcRegsData.ExposureTime * 1000.0F));
-      GC_GenerateEventError(EECD_InvalidExposure);
-      error = 1;
+         GC_ERR("Invalid exposure time (" _PCF(1) "us).", _FFMT(gcRegsData.ExposureTime, 1));
+         GC_GenerateEventError(EECD_InvalidExposure);
+         error = 1;
+      }
    }
    
    if ((gcRegsData.AcquisitionFrameRate > gcRegsData.AcquisitionFrameRateMax) || (gcRegsData.AcquisitionFrameRate < gcRegsData.AcquisitionFrameRateMin))
@@ -879,7 +915,8 @@ IRC_Status_t GC_DeviceRegistersVerification()
       error = 1;
    }
 
-   if ((gcRegsData.SensorWellDepth != SWD_LowGain) && (gcRegsData.SensorWellDepth != SWD_HighGain))
+   if ((gcRegsData.SensorWellDepth != SWD_LowGain) &&
+         ((gcRegsData.SensorWellDepth != SWD_HighGain) || (!TDCFlagsTst(HighGainSWDIsImplementedMask))))
    {
       GC_ERR("Invalid sensor well depth (%d).", gcRegsData.SensorWellDepth);
       GC_GenerateEventError(EECD_InvalidWellDepth);
@@ -1098,7 +1135,7 @@ void GC_UpdateMemoryBufferNumberOfSequenceLimits()
    }
 
    //Check if the NumberofSequence is compatible with the sequence size
-   if(gcRegsData.MemoryBufferNumberOfSequences > ( (uint32_t) floor((gcRegsData.MemoryBufferNumberOfImagesMax / gcRegsData.MemoryBufferSequenceSize))))
+   if(gcRegsData.MemoryBufferNumberOfSequences > ( (uint32_t) floorf((gcRegsData.MemoryBufferNumberOfImagesMax / gcRegsData.MemoryBufferSequenceSize))))
    {
       gcRegsData.MemoryBufferSequenceSize = roundDown(gcRegsData.MemoryBufferNumberOfImagesMax / gcRegsData.MemoryBufferNumberOfSequences, 2);
    }
@@ -1195,7 +1232,6 @@ void GC_SetNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDF
    }
 }
 
-
 /**
  * Return a timestamp corresponding to actual POSIX time.
  *
@@ -1206,4 +1242,23 @@ uint32_t GC_GetTimestamp()
    extern t_Trig gTrig;
    t_PosixTime time = TRIG_GetRTC(&gTrig);
    return time.Seconds;
+}
+
+/**
+ * Update ExposureTimeX registers.
+ *
+ * @param p_src is a pointer on the data to copy.
+ * @param len is the number of elements to update.
+ */
+void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len)
+{
+   uint32_t idx;
+
+   // Verify length
+   if (len > NUM_OF(pGcRegsDataExposureTimeX))
+      return;
+
+   // Copy data in the referenced registers
+   for (idx = 0; idx < len; idx++)
+      *pGcRegsDataExposureTimeX[idx] = p_src[idx];
 }

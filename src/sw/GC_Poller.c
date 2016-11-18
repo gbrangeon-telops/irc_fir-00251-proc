@@ -179,7 +179,7 @@ void GC_Poller_SM()
             }
 
             // Check that the all FPGAs have been detected by network interface
-            if (!NetIntf_HostReached(gcpPort.netIntf, NIA_OUTPUT_FPGA) || (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask) && !NetIntf_HostReached(gcpPort.netIntf, NIA_OUTPUT_FPGA)))
+            if (!NetIntf_HostReached(gcpPort.netIntf, NIA_OUTPUT_FPGA) || (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask) && !NetIntf_HostReached(gcpPort.netIntf, NIA_STORAGE_FPGA)))
             {
                builtInTests[BITID_NetworkHostsReady].result = BITR_Failed;
             }

@@ -544,8 +544,10 @@ begin
                         when X"68" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly'length-1 downto 0));
                         when X"6C" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly'length-1 downto 0));
                         when X"70" =>    mb_struct_cfg.scd_misc.scd_xsize_div2          <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div2'length-1 downto 0));
+                        when X"74" =>    mb_struct_cfg.scd_misc.scd_stretch_acq_trig    <= data_i(0);
+                        
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"74" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
+                        when X"78" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
                         -- mode diag manufacturier 
                         when X"B0" =>    mb_struct_cfg.scd_diag.scd_bit_pattern <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   

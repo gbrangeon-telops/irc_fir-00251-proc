@@ -983,7 +983,7 @@ static bool NDF_PositionMode(bool reset, bool newTarget)
 
             // insert position in array
             RawPosition[RawPositionIndex++] = value;
-            RawPositionIndex %= sizeof(RawPosition)/sizeof(int32_t);
+            RawPositionIndex %= NUM_OF(RawPosition);
 
             NDF_currentRawPosition = medianOf3(RawPosition);
 

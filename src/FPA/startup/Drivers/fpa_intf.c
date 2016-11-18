@@ -126,6 +126,8 @@ struct isc0207_param_s             //
 };
 typedef struct isc0207_param_s  isc0207_param_t;
 
+// Global variables
+float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);

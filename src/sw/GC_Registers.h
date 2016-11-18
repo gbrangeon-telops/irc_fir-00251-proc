@@ -524,6 +524,7 @@ void GC_Registers_Init();
 
 void GC_UpdateLockedFlag();
 void GC_CalibrationUpdateRegisters();
+void GC_UpdateFpaPeriodMinMargin();
 void GC_UpdateParameterLimits();
 IRC_Status_t GC_DeviceRegistersVerification();
 void GC_ComputeImageLimits();
@@ -536,5 +537,6 @@ void GC_SetMemoryBufferRegistersOwner();
 void GC_SetFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPositionSetpoint);
 void GC_SetNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDFPositionSetpoint);
 uint32_t GC_GetTimestamp();
+void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len);
 
 #endif // GC_REGISTERS_H
