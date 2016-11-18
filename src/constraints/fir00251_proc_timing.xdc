@@ -10,6 +10,7 @@ create_clock -period 10.000 -name video_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/VI
 create_clock -period 10.000 -name exp_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/EXP/tx_out_clk]
 create_clock -period 10.000 -name data_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/DATA/user_clk]
 create_clock -period 10.000 -name exp_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/EXP/user_clk]
+create_clock -period 60.000 -name usart_clk_in -waveform {0.000 30.000} [get_ports R_GIGE_BULK_CLK0]
 create_clock -period 60.000 -name usart_clk -waveform {0.000 30.000} [get_pins ACQ/BULK_USART/U11/CLK]
 
 # Virtual clocks
