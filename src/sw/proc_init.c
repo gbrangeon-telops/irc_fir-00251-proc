@@ -796,7 +796,6 @@ IRC_Status_t Proc_MGT_Init()
    MGT_Init(&gMGT);
    MGT_ReadCoreStatus(&gMGT);
    MGT_ReadPLLStatus(&gMGT);
-   MGT_SetMGTLoopback(&gMGT, DATA_MGT, LOOPBACK_NEAREND_PMA);
 
    return IRC_SUCCESS;
 }
