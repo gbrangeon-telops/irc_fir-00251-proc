@@ -341,7 +341,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       // Verify saturation
       if (CurrentWF >= (float)PDRmax)
          // Reduce the correction factor if the calculation is distorted by saturation
-         CorrectionFactor = MIN(CorrectionFactor, 0.2f);    //TODO: change for flashSettings.AECSaturatedCorrectionFactor
+         CorrectionFactor = MIN(CorrectionFactor, flashSettings.AECSaturatedCorrectionFactor);
 
       // Check if Correction factor is valid
       if(CorrectionFactor > CORRECTION_FACTOR_MAX)

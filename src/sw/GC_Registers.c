@@ -711,7 +711,7 @@ void GC_UpdateFpaPeriodMinMargin()
    extern float gFpaPeriodMinMargin;
 
    if (gcRegsData.FWMode == FWM_SynchronouslyRotating)
-      gFpaPeriodMinMargin = 0.05F;  //TODO: change for flashSettings.FWFramePeriodMinMargin
+      gFpaPeriodMinMargin = flashSettings.FWFramePeriodMinMargin;
    else
       gFpaPeriodMinMargin = 0.0F;
 
