@@ -21,13 +21,6 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-// adresse du registre de contrôle
-#define A_BASE_HEADER         0x200    // pour faire la commutation entre le domaine du header et de la config
-#define AR_STATUS             0x50
-#define AW_RESET_ERR          0xC0
-
-// STATUS bit positions
-#define HDER_DONE_BIT          0
 
 
 #define EFFECTIVE_HDER_LENGTH  128     // taille minimale du header en pixels
