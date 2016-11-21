@@ -55,7 +55,6 @@ static IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashS
  */
 IRC_Status_t FlashSettings_Init()
 {
-   FlashSettings_Reset(&flashSettings);
    fdFlashSettings = -1;
    fsLoadImmediately = FSLI_DEFERRED_LOADING;
 

@@ -27,7 +27,6 @@
 #include "FlashSettings.h"
 #include <string.h> // For memcpy and strcmp
 
-int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
 
 /**
  * File manager network port.
@@ -85,6 +84,8 @@ fileRecord_t *gFM_flashDynamicValuesFile;
 uint8_t tmpFileDataBuffer[FM_TEMP_FILE_DATA_BUFFER_SIZE];
 
 
+void FM_ClearFileDB();
+int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
 static IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file);
 
 /**
@@ -484,21 +485,7 @@ IRC_Status_t FM_InitFileDB()
    uint32_t fileCount;
    uint32_t i;
 
-   // Clear file lists
-   memset(&gFM_files, 0, sizeof(gFM_files));
-   memset(&gFM_collections, 0, sizeof(gFM_collections));
-   memset(&gFM_calibrationBlocks, 0, sizeof(gFM_calibrationBlocks));
-   memset(&gFM_nlBlocks, 0, sizeof(gFM_nlBlocks));
-   memset(&gFM_icuBlocks, 0, sizeof(gFM_icuBlocks));
-   memset(&gFM_calibrationActualizationFiles, 0, sizeof(gFM_calibrationActualizationFiles));
-
-   // TODO Set collection file order keys using flash dynamic values
-
-   // Clear file pointers
-   gFM_flashSettingsFile = NULL;
-
-   // Clear file database
-   memset(gFM_fileDB, 0, sizeof(gFM_fileDB));
+   FM_ClearFileDB();
 
    fileCount = 0;
 
@@ -546,6 +533,7 @@ IRC_Status_t FM_InitFileDB()
       if (gFM_flashSettingsFile == NULL)
       {
          FM_ERR("Cannot find valid flash setting file.");
+         FlashSettings_Reset(&flashSettings);
       }
 
       // Validate collection files and fill information
@@ -998,7 +986,6 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
    if (file == gFM_flashSettingsFile)
    {
       gFM_flashSettingsFile = NULL;
-      FlashSettings_Reset(&flashSettings);
    }
 
    // Check if its the flash dynamic values file
@@ -1029,7 +1016,12 @@ IRC_Status_t FM_RemoveFile(fileRecord_t *file)
    return IRC_SUCCESS;
 }
 
-
+/**
+ * Format file system.
+ *
+ * @return IRC_SUCCESS if file system was successfully formated.
+ * @return IRC_FAILURE if failed to format file system.
+ */
 IRC_Status_t FM_Format()
 {
    extern flashDynamicValues_t gFlashDynamicValues;
@@ -1037,7 +1029,6 @@ IRC_Status_t FM_Format()
    IRC_Status_t status = IRC_SUCCESS;
 
    Calibration_Reset();
-   FlashSettings_Reset(&flashSettings);
 
    if (uffs_format(FM_UFFS_MOUNT_POINT) != 0)
    {
@@ -1045,11 +1036,7 @@ IRC_Status_t FM_Format()
       status =  IRC_FAILURE;
    }
 
-   if (FM_InitFileDB() != IRC_SUCCESS)
-   {
-      FM_ERR("Failed to initialize file database.");
-      status =  IRC_FAILURE;
-   }
+   FM_ClearFileDB();
 
    if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
    {
@@ -1442,4 +1429,26 @@ IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file)
    }
 
    return IRC_SUCCESS;
+}
+
+/**
+ * Clear file manager file database.
+ **/
+void FM_ClearFileDB()
+{
+   memset(&gFM_files, 0, sizeof(gFM_files));
+   memset(&gFM_collections, 0, sizeof(gFM_collections));
+   memset(&gFM_calibrationBlocks, 0, sizeof(gFM_calibrationBlocks));
+   memset(&gFM_nlBlocks, 0, sizeof(gFM_nlBlocks));
+   memset(&gFM_icuBlocks, 0, sizeof(gFM_icuBlocks));
+   memset(&gFM_calibrationActualizationFiles, 0, sizeof(gFM_calibrationActualizationFiles));
+
+   // TODO Set collection file order keys using flash dynamic values
+
+   // Clear file pointers
+   gFM_flashSettingsFile = NULL;
+   gFM_flashDynamicValuesFile = NULL;
+
+   // Clear file database
+   memset(gFM_fileDB, 0, sizeof(gFM_fileDB));
 }
