@@ -43,7 +43,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.0.0
+// Generated from XML camera definition file version 12.0.1
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -276,7 +276,7 @@ gcRegistersData_t gcRegsData;
 /**
  * DeviceClockFrequency data array
  */
-float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 80000000.0F};
+float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 50000000.0F};
 
 /**
  * DeviceTemperature data array
