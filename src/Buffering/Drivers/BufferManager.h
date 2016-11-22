@@ -21,6 +21,7 @@
 #include "tel2000_param.h"
 #include "verbose.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef BUFFERING_VERBOSE
    #define BUFFERING_PRINTF(fmt, ...)    FPGA_PRINTF("BUF: " fmt, ##__VA_ARGS__)
@@ -34,9 +35,8 @@
 
 
 
-// DEFINE CONSTANT PARAMTER HERE
+// DEFINE CONSTANT PARAMETER HERE
 #define BUF_MAX_SEQUENCE 		255
-#define BUF_BASE_ADDR_OFFSET	0x10000000
 
 //BUFFER CTRL ADDRESS MAP
 #define BM_BASE_ADDR 			0x0
@@ -64,8 +64,9 @@
 #define BM_READ_ERR 	         0x54	// Return read error (Not implemented yet)
 #define BM_EXT_BUF_PRSNT      0x58  //Return number of sequence int the buffer
 #define BM_MIN_FRAME_TIME     0x5C  //Configure frame duration in read mode
+#define BM_MEM_READY          0x60  //Return status of memory interface
 
-#define BT_START_IMG_OFFSET		0
+#define BT_START_IMG_OFFSET	0
 #define BT_MOI_IMG_OFFSET		1
 #define BT_END_IMG_OFFSET		2
 
@@ -99,6 +100,16 @@ struct s_bufferManagerStruct {
 
 };
 typedef struct s_bufferManagerStruct t_bufferManager;
+
+// statuts provenant du vhd
+struct s_bufferStatus
+{
+   uint8_t  write_err;
+   uint8_t  read_err;
+   bool     mem_ready;
+   bool     ext_buf_prsnt;
+};
+typedef struct s_bufferStatus t_bufferStatus;
 
 //Buffer Mode
 enum BufferMode_enum {
@@ -156,6 +167,7 @@ typedef enum
 
 // Fonction definition
 IRC_Status_t BufferManager_Init(t_bufferManager *pBufferCtrl, gcRegistersData_t *pGCRegs);
+void BufferManager_GetStatus(t_bufferStatus *pStat, const t_bufferManager *pBufferCtrl);
 void BufferManager_SendSoftwareMoi(t_bufferManager *pBufferCtrl);
 t_bufferTable BufferManager_ReadBufferTable(uint32_t SequenceID);
 void BufferManager_ReadSequence(t_bufferManager *pBufferCtrl, 	const gcRegistersData_t *pGCRegs);

@@ -52,6 +52,14 @@ IRC_Status_t BufferManager_Init(t_bufferManager *pBufferCtrl, gcRegistersData_t 
 
 }
 
+void BufferManager_GetStatus(t_bufferStatus *pStat, const t_bufferManager *pBufferCtrl)
+{
+   pStat->write_err        = (uint8_t)AXI4L_read32(pBufferCtrl->ADD + BM_WRITE_ERR);
+   pStat->read_err         = (uint8_t)AXI4L_read32(pBufferCtrl->ADD + BM_READ_ERR);
+   pStat->mem_ready        = (bool)AXI4L_read32(pBufferCtrl->ADD + BM_MEM_READY);
+   pStat->ext_buf_prsnt    = (bool)AXI4L_read32(pBufferCtrl->ADD + BM_EXT_BUF_PRSNT);
+}
+
 t_bufferTable BufferManager_ReadBufferTable(uint32_t SequenceID)
 {
 	t_bufferTable SequenceTable;

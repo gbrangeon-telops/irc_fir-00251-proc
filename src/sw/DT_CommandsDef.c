@@ -20,7 +20,7 @@
 #include "FPA_intf.h"
 #include "hder_inserter.h"
 #include "calib.h"
-#include "Utils.h"
+#include "utils.h"
 #include "Actualization.h"
 #include "BufferManager.h"
 #include "FileManager.h"
@@ -327,7 +327,7 @@ IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf)
    CAL_GetStatus(&status, &gCal);
 
    DT_PRINTF("cal.done = %d", status.done);
-   for (i = 0; i < 5; i++)
+   for (i = 0; i < NUM_OF(status.error_set); i++)
    {
       DT_PRINTF("cal.error_set[%d] = 0x%08X", i, status.error_set[i]);
    }
@@ -717,68 +717,33 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
 }
 
 /**
- * Debug terminal buffer selection command parser.
- * This parser is used to parse and validate buffer selection command arguments and to
+ * Debug terminal buffering status command parser.
+ * This parser is used to parse and validate buffering status command arguments and to
  * execute the command.
  *
- * @return IRC_SUCCESS when buffer selection command was successfully executed.
+ * @return IRC_SUCCESS when buffering status command was successfully executed.
  * @return IRC_FAILURE otherwise.
  */
 IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
 {
    extern t_bufferManager gBufManager;
-   extern gcRegistersData_t gcRegsData;
-   uint32_t useExternalBuffer = 1;
-   uint8_t argStr[11];
-   uint32_t arglen;
-   uint32_t currentMode;
+   t_bufferStatus status;
 
-   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-   if (arglen != 3)
+   // There is supposed to be no remaining bytes in the buffer
+   if (!CBB_Empty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
    }
 
-   argStr[arglen++] = '\0';
-   if (strcasecmp((char*)argStr, "EXT") == 0) // enable external buffer
-      useExternalBuffer = 1;
-   else if (strcasecmp((char*)argStr, "INT") == 0) // enable internal buffer (disable external buffer)
-      useExternalBuffer = 0;
-   else
-   {
-      DT_ERR("Unsupported command arguments");
-      return IRC_FAILURE;
-   }
+   BufferManager_GetStatus(&status, &gBufManager);
 
-   currentMode = gcRegsData.MemoryBufferMode;
+   DT_PRINTF("buf.write_err      = 0b%s", dec2bin(status.write_err, 4));
+   DT_PRINTF("buf.read_err       = 0b%s", dec2bin(status.read_err, 4));
+   //DT_PRINTF("buf.mem_ready      = %d", status.mem_ready);   //TODO: de-comment when connected in hdl
+   DT_PRINTF("buf.ext_buf_prsnt  = %d", status.ext_buf_prsnt);
 
-   BufferManager_ClearSequence(&gBufManager, &gcRegsData);
-
-   GC_SetMemoryBufferMode(BM_OFF);
-
-   if (useExternalBuffer && BufferManager_DetectExternalMemoryBuffer())
-   {
-      DT_INF("Switching to external buffer");
-      TDCFlagsSet(ExternalMemoryBufferIsImplementedMask);
-      GC_SetMemoryBufferRegistersOwner(GCRO_Storage_FPGA);
-   }
-   else
-   {
-      if (useExternalBuffer)
-         DT_INF("External buffer is not present. Will continue with the built-in internal buffer");
-      else
-         DT_INF("Switching to internal buffer");
-
-      TDCFlagsClr(ExternalMemoryBufferIsImplementedMask);
-      GC_SetMemoryBufferRegistersOwner(GCRO_Processing_FPGA);
-   }
-
-   GC_SetMemoryBufferMode(currentMode);
-
-   // BufferManager_SetBufferMode(&gBufManager, currentMode, &gcRegsData);
-
-   return BufferManager_Init(&gBufManager, &gcRegsData);
+   return IRC_SUCCESS;
 }
 
 /**
@@ -1997,6 +1962,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
+   DT_PRINTF("  Buffering status:   BUF");
    DT_PRINTF("  Camera status:      STATUS");
    DT_PRINTF("  Power status:       POWER");
    DT_PRINTF("  Network status:     NET [0|1 [port]]");
@@ -2015,7 +1981,6 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  DDR R/W test:       MRW");
    DT_PRINTF("  Reset:              RST");
    DT_PRINTF("  Power:              PWR");
-   DT_PRINTF("  Buffer selection:   BUF EXT|INT (broken)");
    DT_PRINTF("  Disable/ignore FW:  DFW");
    DT_PRINTF("  Device key:         KEY [RENEW]");
    DT_PRINTF("  Get Stack Level:    STACK");
