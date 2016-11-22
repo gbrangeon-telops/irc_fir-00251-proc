@@ -47,7 +47,7 @@ IRC_Status_t BufferManager_Init(t_bufferManager *pBufferCtrl, gcRegistersData_t 
 	pBufferCtrl->ConfigValid = 0;
 	WriteStruct(pBufferCtrl);
 
-	BUFFERING_INF("Init");
+	BUFFERING_DBG("Init");
 	return IRC_SUCCESS;
 
 }
@@ -60,7 +60,7 @@ t_bufferTable BufferManager_ReadBufferTable(uint32_t SequenceID)
 	SequenceTable.moi_img 	=  AXI4L_read32( TEL_PAR_TEL_BUFTABLE_BASEADDR + SequenceID*4 + BT_MOI_IMG_OFFSET);
 	SequenceTable.stop_img 	=  AXI4L_read32( TEL_PAR_TEL_BUFTABLE_BASEADDR + SequenceID*4 + BT_END_IMG_OFFSET);
 
-	BUFFERING_INF("ReadBufferTable");
+	BUFFERING_DBG("ReadBufferTable");
 	return SequenceTable;
 }
 
@@ -81,7 +81,7 @@ void BufferManager_ReadSequence(t_bufferManager *pBufferCtrl, 	const gcRegisters
 	AXI4L_write32(pBufferCtrl->rd_stop_img, 	pBufferCtrl->ADD + BM_READ_STOP_ID);
 
 	//BufferManager_EnableBuffer(pBufferCtrl); // workaround : on doit laisser un peu de temps à la config avant de la réactiver
-	BUFFERING_INF("ReadSequence");
+	BUFFERING_DBG("ReadSequence");
 
 }
 
@@ -116,7 +116,7 @@ void BufferManager_ReadImage(t_bufferManager *pBufferCtrl, 	const gcRegistersDat
 	AXI4L_write32(pBufferCtrl->rd_stop_img, 	pBufferCtrl->ADD + BM_READ_STOP_ID);
 
 	//BufferManager_EnableBuffer(pBufferCtrl); // workaround : on doit laisser un peu de temps à la config avant de la réactiver
-	BUFFERING_INF("ReadImage");
+	BUFFERING_DBG("ReadImage");
 }
 
 bool gBufferClearedTrigger = false;
@@ -132,7 +132,7 @@ void BufferManager_ClearSequence(t_bufferManager *pBufferCtrl, 	const gcRegister
 
 	if (pBufferCtrl->BufferMode == BM_WRITE)  // Do not enable in read mode wait for ACQ_Start
       BufferManager_EnableBuffer(pBufferCtrl);
-	BUFFERING_INF("ClearSequence");
+	BUFFERING_DBG("ClearSequence");
 
 	gBufferClearedTrigger = true;
 }
@@ -141,7 +141,7 @@ void BufferManager_EnableBuffer(t_bufferManager *pBufferCtrl)
 {
 	pBufferCtrl->ConfigValid = 1;
 	AXI4L_write32(pBufferCtrl->ConfigValid, pBufferCtrl->ADD + BM_CONFIG_VALID);
-	BUFFERING_INF("EnableBuffer");
+	BUFFERING_DBG("EnableBuffer");
 }
 
 void BufferManager_DisableBuffer(t_bufferManager *pBufferCtrl)
@@ -151,22 +151,22 @@ void BufferManager_DisableBuffer(t_bufferManager *pBufferCtrl)
 //	pBufferCtrl->BufferMode = BM_OFF;
 //	AXI4L_write32(pBufferCtrl->BufferMode, pBufferCtrl->ADD + BM_BUFFER_MODE);
 
-	BUFFERING_INF("DisableBuffer");
+	BUFFERING_DBG("DisableBuffer");
 }
 
 
 uint32_t BufferManager_GetBufferSize(t_bufferManager *pBufferCtrl)
 {
-	BUFFERING_INF("GetBufferSize");
+   BUFFERING_DBG("GetBufferSize");
 
-	return PROC_MEM_MEMORY_BUFFER_SIZE; // in bytes
+   return PROC_MEM_MEMORY_BUFFER_SIZE; // in bytes
 }
 
-uint32_t BufferManager_GetNbImageMax(t_bufferManager *pBufferCtrl, const gcRegistersData_t *pGCRegs){
+uint32_t BufferManager_GetNbImageMax(t_bufferManager *pBufferCtrl, const gcRegistersData_t *pGCRegs)
+{
+   BUFFERING_DBG("GetNbImageMax");
 
-	BUFFERING_INF("GetNbImageMax");
-
-	return  BufferManager_GetBufferSize(pBufferCtrl) / (pGCRegs->Width * (pGCRegs->Height+2) *2);
+   return  BufferManager_GetBufferSize(pBufferCtrl) / (pGCRegs->Width * (pGCRegs->Height+2) *2);
 }
 
 uint32_t BufferManager_GetNumSequenceCount(t_bufferManager *pBufferCtrl)
@@ -183,7 +183,7 @@ uint32_t BufferManager_GetFrameId(t_bufferManager *pBufferCtrl, uint32_t Sequenc
 	readAddrLoc = pBufferCtrl->Buffer_base_addr + (SequenceID * (pBufferCtrl->FrameSize * 2 * pBufferCtrl->nbImagePerSeq)) + (ImageLocation * pBufferCtrl->FrameSize * 2) + FrameIDHdrAddr; // frame size is in pixel
 	FrameID = AXI4L_read32(readAddrLoc);
 
-	BUFFERING_INF("GetFrameId");
+	BUFFERING_DBG("GetFrameId");
 
 	return FrameID;
 }
@@ -196,7 +196,7 @@ uint32_t BufferManager_GetSequenceFirstFrameId(t_bufferManager *pBufferCtrl, uin
 
 	FrameId = BufferManager_GetFrameId(pBufferCtrl, SequenceID, ImageLoc);
 
-	BUFFERING_INF("GetSequenceFirstFrameId");
+	BUFFERING_DBG("GetSequenceFirstFrameId");
 
 	return FrameId;
 
@@ -210,7 +210,7 @@ uint32_t BufferManager_GetSequenceMOIFrameId(t_bufferManager *pBufferCtrl, uint3
 
 	FrameId = BufferManager_GetFrameId(pBufferCtrl, SequenceID, ImageLoc);
 
-	BUFFERING_INF("GetSequenceMOIFrameId");
+	BUFFERING_DBG("GetSequenceMOIFrameId");
 
 	return FrameId;
 }
@@ -232,7 +232,7 @@ uint32_t BufferManager_GetSequenceLength(t_bufferManager *pBufferCtrl, uint32_t 
 		SequenceLength = SequenceTable.stop_img - SequenceTable.start_img + 1;
 	}
 
-	BUFFERING_INF("GetSequenceLength");
+	BUFFERING_DBG("GetSequenceLength");
 	return SequenceLength;
 }
 
@@ -258,7 +258,7 @@ void BufferManager_SetBufferMode(t_bufferManager *pBufferCtrl,t_bufferMode Mode 
       BufferManager_EnableBuffer(pBufferCtrl);
 	}
 
-	BUFFERING_INF("SetBufferMode");
+	BUFFERING_DBG("SetBufferMode");
 
 }
 
@@ -266,7 +266,7 @@ void BufferManager_SetSwitchConfig(t_bufferManager *pBufferCtrl, t_bufferSwitch 
 {
    pBufferCtrl->switchConfig = config;
    AXI4L_write32(pBufferCtrl->switchConfig, pBufferCtrl->ADD + BM_SWITCH_CONFIG);
-   BUFFERING_INF("SetSwitchConfig");
+   BUFFERING_DBG("SetSwitchConfig");
 }
 
 void BufferManager_SetMoiConfig(t_bufferManager *pBufferCtrl)
@@ -308,13 +308,13 @@ void BufferManager_SetMoiConfig(t_bufferManager *pBufferCtrl)
    AXI4L_write32(pBufferCtrl->moiSource,     pBufferCtrl->ADD + BM_MOI_SOURCE);
    AXI4L_write32(pBufferCtrl->moiActivation, pBufferCtrl->ADD + BM_MOI_ACTIVATION);
 
-   BUFFERING_INF("SetMoiConfig");
+   BUFFERING_DBG("SetMoiConfig");
 }
 
 uint32_t BufferManager_GetNumberOfSequenceMax()
 {
-	BUFFERING_INF("GetNumberOfSequenceMax");
-	return BUF_MAX_SEQUENCE;
+   BUFFERING_DBG("GetNumberOfSequenceMax");
+   return BUF_MAX_SEQUENCE;
 }
 
 void BufferManager_SetSequenceParams(t_bufferManager *pBufferCtrl, const gcRegistersData_t *pGCRegs )
@@ -330,17 +330,20 @@ void BufferManager_SetSequenceParams(t_bufferManager *pBufferCtrl, const gcRegis
    AXI4L_write32(pBufferCtrl->nb_img_post,      pBufferCtrl->ADD + BM_NB_IMG_POST);
 	BufferManager_EnableBuffer(pBufferCtrl);
 
-	BUFFERING_INF("SetSequenceParams");
+	BUFFERING_DBG("SetSequenceParams");
 }
 
-uint32_t BufferManager_ReturnNumberOfImagePost(t_bufferManager *pBufferCtrl){
-
+uint32_t BufferManager_ReturnNumberOfImagePost(t_bufferManager *pBufferCtrl)
+{
 	return pBufferCtrl->nbImagePerSeq- pBufferCtrl->nb_img_pre;
 }
 
-void BufferManager_SendSoftwareMoi(t_bufferManager *pBufferCtrl){
+void BufferManager_SendSoftwareMoi(t_bufferManager *pBufferCtrl)
+{
 	AXI4L_write32( 1,	pBufferCtrl->ADD + BM_SOFT_MOI_SIG);
 	AXI4L_write32( 0, pBufferCtrl->ADD + BM_SOFT_MOI_SIG);
+
+	BUFFERING_INF("Software MOI");
 }
 
 bool gBufferStartDownloadTrigger = false;
@@ -437,11 +440,11 @@ void BufferManager_SM()
       timeout_delay_us = 1.0e6 * frameSize * bits_per_pixel / maxBandWidth;
       timeout_delay_us = MIN(timeout_delay_us, max_delay_us);
 
-      BUFFERING_INF("Initiating sequence/image download from the memory buffer.\n");
-      BUFFERING_INF("BUF: max output average bit rate target: " _PCF(2) " Mbps\n", _FFMT(maxBandWidth/1.0e6,2));
-      BUFFERING_INF("BUF: max output frame rate: " _PCF(2) "Hz\n", _FFMT(1.0e6/timeout_delay_us, 2));
+      BUFFERING_INF("Initiating sequence/image download from the memory buffer");
+      BUFFERING_INF("max output average bit rate target: " _PCF(2) " Mbps", _FFMT(maxBandWidth/1.0e6,2));
+      BUFFERING_INF("max output frame rate: " _PCF(2) "Hz", _FFMT(1.0e6/timeout_delay_us, 2));
 
-      BUFFERING_INF("Buffer download started.\n");
+      BUFFERING_INF("Buffer download started");
 
       StartTimer(&timer, 10); // workaround for buffer reactivation
 
@@ -503,7 +506,7 @@ void BufferManager_SM()
       // go to the DONE state only when in download mode
       if (enabled && cstate == BMS_READ)
       {
-         BUFFERING_INF("Buffer download stopped.\n");
+         BUFFERING_INF("Buffer download stopped");
 
          cstate = BMS_DONE;
       }

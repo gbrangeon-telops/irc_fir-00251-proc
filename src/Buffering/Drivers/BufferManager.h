@@ -29,7 +29,8 @@
 #endif
 
 #define BUFFERING_ERR(fmt, ...)          FPGA_PRINTF("BUF: Error: " fmt "\n", ##__VA_ARGS__)
-#define BUFFERING_INF(fmt, ...)          BUFFERING_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
+#define BUFFERING_INF(fmt, ...)          FPGA_PRINTF("BUF: Info: " fmt "\n", ##__VA_ARGS__)
+#define BUFFERING_DBG(fmt, ...)          BUFFERING_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 
 
