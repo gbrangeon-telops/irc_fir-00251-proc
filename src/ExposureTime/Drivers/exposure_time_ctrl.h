@@ -20,6 +20,7 @@
 #define __EXPOSURE_TIME_CTRL_H__
 
 #include "GC_Registers.h"
+#include "tel2000_param.h"
 #include <stdint.h>
 #include "xbasic_types.h"
 
@@ -29,7 +30,8 @@
 //   #define FPA_MAX_EXPOSURE  1000000.0F    // en usec 
 //#endif
 
-#define EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ    100E6  // horloge de reference des temps d'exposition passe à 100 MHz
+#define EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ     CLK_100_FREQ_HZ  // horloge de reference des temps d'exposition
+#define EXPOSURE_TIME_FACTOR                 ((float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ / 1E+6F) // convertit us en coups d'horloge
 #define MAX_NUM_FILTER  8
 
 // sources du temps d'intégration
@@ -42,9 +44,9 @@ struct s_ExposureTime
    uint32_t ADD;
 
    uint32_t EXP_Source;             // dit qui forunit le temps d'intégration au détecteur (microBlaze, roue à filtre etc...)
-   uint32_t EXP_Time_Min;           // le temps d'intégration minimal autorisé pour le detecteur (en coups de 100MHz)
-   uint32_t EXP_Time_Max;           // le temps d'intégration maximal pour le detecteur (en coups de 100MHz)
-   uint32_t EXP_Time;               // le temps d'intégration à utiliser
+   uint32_t EXP_Time_Min;           // le temps d'intégration minimal autorisé pour le detecteur (en coups d'horloge)
+   uint32_t EXP_Time_Max;           // le temps d'intégration maximal pour le detecteur (en coups d'horloge)
+   uint32_t EXP_Time;               // le temps d'intégration à utiliser (en coups d'horloge)
   };
 typedef struct s_ExposureTime t_ExposureTime;
 

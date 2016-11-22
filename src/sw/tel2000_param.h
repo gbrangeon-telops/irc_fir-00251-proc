@@ -18,6 +18,16 @@
 #define TEL2000_PARAM_H
  
  /**
+* Clock declaration
+*/
+#define CLK_100_FREQ_HZ 100000000
+#define CLK_160_FREQ_HZ 160000000
+#define CLK_20_FREQ_HZ 20000000
+#define CLK_200_FREQ_HZ 200000000
+#define CLK_50_FREQ_HZ 50000000
+#define CLK_80_FREQ_HZ 80000000
+
+/**
  * AXI PORT declaration
  */
 /* Definitions for peripheral TEL_ADC_READOUT_CTRL */

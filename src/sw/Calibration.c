@@ -23,7 +23,7 @@
 #include "uffs\uffs.h"
 #include "uffs\uffs_fd.h"
 #include "CRC.h"
-#include "Tel2000_param.h"
+#include "tel2000_param.h"
 #include "proc_memory.h"
 #include "EHDRI_Manager.h"
 #include "xil_io.h"

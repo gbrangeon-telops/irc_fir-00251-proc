@@ -20,12 +20,13 @@
 #define __TRIG_GEN_H__
 
 #include "GC_Registers.h"
+#include "tel2000_param.h"
 #include <stdint.h>
 #include "xbasic_types.h"
 #include "fpa_intf.h"
 
 
-#define TRIG_BASE_CLOCK_FREQ_HZ    100000000.0  // horloge de referene des trigs passe à 100 MHz
+#define TRIG_BASE_CLOCK_FREQ_HZ    CLK_100_FREQ_HZ  // horloge de reference des trigs
 
 
 // structure de configuration du trigger
@@ -35,9 +36,9 @@ struct s_Trig
    uint32_t ADD;
 
    uint32_t TRIG_Mode;                // le mode de fonctionnement
-   uint32_t TRIG_Period;              // la période du trig, en coups de 100MHz
-   uint32_t TRIG_FpaTrigDly;          // retard du trig envoyé au fpa local en coup de 100MHz
-   uint32_t TRIG_TrigOutDly;          // retard du trig envoyé au fpa distant en coup de 100MHz
+   uint32_t TRIG_Period;              // la période du trig, en coups d'horloge
+   uint32_t TRIG_FpaTrigDly;          // retard du trig envoyé au fpa local en coup d'horloge
+   uint32_t TRIG_TrigOutDly;          // retard du trig envoyé au fpa distant en coup d'horloge
    uint32_t TRIG_ForceHigh;           // si le trig doit rester indefiniment à '1' (convient au mode vitesse maximale)
    uint32_t TRIG_Activation;          // permet de savoir si le Trg du fpa local doit etre triggé  sur Rising_edge , HighLevel etc..
    uint32_t TRIG_AcqWindow;           // AcqWindow à '1' permet de generer les trigs d'acquisiiotn(image envoyées dans la chaine)

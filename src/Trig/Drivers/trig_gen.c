@@ -35,7 +35,7 @@
 #endif
 
 
-#define SUBSEC_BASE_CLOCK_FREQ_HZ  10000000.0   // les subsecondes sont en coups d'horloge de 100ns 
+#define SUBSEC_BASE_CLOCK_FREQ_HZ  (TRIG_BASE_CLOCK_FREQ_HZ / 10)   // les subsecondes sont sur l'horloge de reference divisee par 10
 
 
 // adresse des registres du temps RTC

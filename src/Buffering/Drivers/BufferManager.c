@@ -14,7 +14,7 @@
 
 #include "BufferManager.h"
 #include "xparameters.h"
-#include "Tel2000_param.h"
+#include "tel2000_param.h"
 #include "xil_io.h"
 #include "irc_status.h"
 #include "utils.h"
@@ -528,7 +528,7 @@ void BufferManager_SM()
  */
 void BufferManager_ConfigureMinFrameTime(t_bufferManager *pBufferCtrl, float time_us)
 {
-   const float clk_freq_MHz = 80;
+   const float clk_freq_MHz = CLK_80_FREQ_HZ / 1E6;
    uint32_t cnt;
 
    cnt = time_us * clk_freq_MHz;

@@ -1,7 +1,7 @@
 
 #include "EHDRI_Manager.h"
 #include "xparameters.h"
-#include "Tel2000_param.h"
+#include "tel2000_param.h"
 #include "xil_io.h"
 #include "irc_status.h"
 #include "utils.h"
@@ -51,7 +51,7 @@ void EHDRI_SendConfig(t_EhdriManager *a, gcRegistersData_t *pGCRegs)
       a->Enable = TRUE;
 
       for (i = 0; i < EHDRI_IDX_NBR; i++) {
-         a->ExposureTime[i] = EHDRIExposureTime[i] * ((float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ/1E+6F);
+         a->ExposureTime[i] = EHDRIExposureTime[i] * EXPOSURE_TIME_FACTOR;
       }
 
       EHDRI_UpdateExpIndexSequence(a, pGCRegs);

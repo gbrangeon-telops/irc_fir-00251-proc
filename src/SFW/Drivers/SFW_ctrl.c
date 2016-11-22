@@ -1,6 +1,6 @@
 #include "SFW_ctrl.h"
 #include "xparameters.h"
-#include "Tel2000_param.h"
+#include "tel2000_param.h"
 #include "irc_status.h"
 #include "utils.h"
 #include "GC_Registers.h"
@@ -9,9 +9,8 @@
 #include "FWController.h"
 #include "exposure_time_ctrl.h"
 
-#define SYS_CLK_HZ            100000000
-#define EXPOSURE_TIME_FACTOR  (float)100E6/1E+6F
-#define FILTER_DEFAULT_RANGE  125
+#define SFW_BASE_CLOCK_FREQ_HZ   CLK_100_FREQ_HZ  // horloge de reference de la SFW
+#define FILTER_DEFAULT_RANGE     125
 
 #define FIXED_WHEEL     0
 #define ROTATING_WHEEL  1
@@ -52,7 +51,7 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
    AXI4L_write32( flashSettings.FWEncoderCyclePerTurn, pSFWCtrl->ADD + NB_ENCODER_CNT_Addr);
 
    // This calcul is done in the PPC to save a division (or multiplication) in the FPGA
-   clock_to_rpm_factor = (uint32_t)( (SYS_CLK_HZ * 60.0f/ ( (float) flashSettings.FWEncoderCyclePerTurn))+0.5f);
+   clock_to_rpm_factor = (uint32_t)( (SFW_BASE_CLOCK_FREQ_HZ * 60.0f/ ( (float) flashSettings.FWEncoderCyclePerTurn))+0.5f);
    AXI4L_write32(clock_to_rpm_factor, pSFWCtrl->ADD + RPM_FACTOR_ADDR);
 
    AXI4L_write32( (uint32_t)flashSettings.FWSpeedMax + SFW_MAX_SPEED_MARGING, pSFWCtrl->ADD + RPM_MAX_ADDR);

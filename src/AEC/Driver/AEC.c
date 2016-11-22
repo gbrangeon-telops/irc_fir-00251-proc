@@ -359,11 +359,11 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       // IIR Filter
       if(AEC_Int_timeStamp <= AEC_TimeStamps_d1[AEC_Int_FWPosition]) // Check for wrap around
       {
-         DeltaT =(float) (( 4294967296 - AEC_TimeStamps_d1[AEC_Int_FWPosition] ) + AEC_Int_timeStamp) * TIME_CONSTANT ; //(2^32 - Last Value) + NewValue
+         DeltaT = (float)(( 4294967296 - AEC_TimeStamps_d1[AEC_Int_FWPosition] ) + AEC_Int_timeStamp) / (float)AEC_BASE_CLOCK_FREQ_HZ; //(2^32 - Last Value) + NewValue
       }
       else
       {
-         DeltaT =  ( ((float)(AEC_Int_timeStamp - AEC_TimeStamps_d1[AEC_Int_FWPosition])) * TIME_CONSTANT) ; //(2^32 - Last Value) + NewValue
+         DeltaT = (float)(AEC_Int_timeStamp - AEC_TimeStamps_d1[AEC_Int_FWPosition]) / (float)AEC_BASE_CLOCK_FREQ_HZ;
       }
 
       AEC_TimeStamps_d1[AEC_Int_FWPosition] = AEC_Int_timeStamp;

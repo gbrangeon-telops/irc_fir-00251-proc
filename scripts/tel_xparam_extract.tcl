@@ -16,10 +16,14 @@ if  {$comparison != 0} {
    puts "Core is open"
 }
 
-#First Extract the port information
-set DataName [get_property NAME [get_bd_addr_segs -of_objects [get_bd_addr_spaces -of_objects [get_bd_cells /MCU/microblaze_1]] -filter {NAME =~ "TEL_*"}]]
-set DataAddr [get_property offset [get_bd_addr_segs -of_objects [get_bd_addr_spaces -of_objects [get_bd_cells /MCU/microblaze_1]] -filter {NAME =~ "TEL_*"}]]
-set Datarange [get_property range [get_bd_addr_segs -of_objects [get_bd_addr_spaces -of_objects [get_bd_cells /MCU/microblaze_1]] -filter {NAME =~ "TEL_*"}]]
+#Extract the clock information
+set clkName [get_property NAME [get_bd_ports -filter {TYPE == clk && DIR == O}]]
+set clkFreq [get_property CONFIG.FREQ_HZ [get_bd_ports -filter {TYPE == clk && DIR == O}]]
+
+#Extract the port information
+set DataName [get_property NAME [get_bd_addr_segs -filter {NAME =~ "TEL_*"}]]
+set DataAddr [get_property offset [get_bd_addr_segs -filter {NAME =~ "TEL_*"}]]
+set Datarange [get_property range [get_bd_addr_segs -filter {NAME =~ "TEL_*"}]]
 
 #open a file to write to
 set filename  "d:/telops/fir-00251-Proc/src/sw/tel2000_param.h"
@@ -46,6 +50,18 @@ puts $fd1 "/**
 #define TEL2000_PARAM_H
  
  /**
+* Clock declaration
+*/"
+
+#enter a loop that write all the information
+set i 0
+foreach j $clkName {
+   puts $fd1 "#define [string toupper [lindex $clkName $i]]_FREQ_HZ [lindex $clkFreq $i]"
+   incr i
+}
+
+puts $fd1 "
+/**
  * AXI PORT declaration
  */"
 

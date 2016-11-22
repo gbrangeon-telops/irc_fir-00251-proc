@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include "GC_Registers.h"
+#include "tel2000_param.h"
 
 #ifdef FLAGGING_VERBOSE
    #define FLAGGING_PRINTF(fmt, ...)  FPGA_PRINTF("Flag: " fmt, ##__VA_ARGS__)
@@ -29,7 +30,7 @@ struct s_FlagCfg
    
 typedef struct s_FlagCfg t_FlagCfg;
 
-#define FLAG_BASE_CLOCK_FREQ_HZ    100000000.0  // horloge de reference du flagging
+#define FLAG_BASE_CLOCK_FREQ_HZ    CLK_100_FREQ_HZ  // horloge de reference du flagging
 
 #define FLAGADDR_MODE            0x0
 #define FLAGADDR_DELAY           0x4

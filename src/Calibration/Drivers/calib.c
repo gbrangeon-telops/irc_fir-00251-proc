@@ -235,7 +235,7 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    pA->height = pGCRegs->Height;
    pA->offsetx = pGCRegs->OffsetX;
    pA->offsety = pGCRegs->OffsetY;
-   pA->exposure_time_mult_fp32 = (1.0F/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ) * 1E+6F;  // facteur de multiplication pour avoir le temps d'exposition en µsec
+   pA->exposure_time_mult_fp32 = (1.0F / EXPOSURE_TIME_FACTOR);  // facteur de multiplication pour avoir le temps d'exposition en µsec
 
    // Reset header info of all blocks
    CAL_initCalBlockInfo(pA->calib_block, CALIB_MAX_NUM_OF_BLOCKS);

@@ -80,7 +80,7 @@ enum ICU_Mode_Enum
 #define ICU_DEFAULT_TRANSITION_DURATION    	(uint32_t)1000 // [ms]
 #define ICU_DEFAULT_MODE        			ICU_MODE_REPEAT
 #define ICU_DEFAULT_POLARITY    			ICU_POL_FORWARD
-#define ICU_CLK_PER_MS						(uint32_t)100000 // [clock ticks in one ms]
+#define ICU_CLK_PER_MS						((uint32_t)(CLK_100_FREQ_HZ / 1000)) // [clock ticks in one ms]
 
 #define ICU_STATUS_REFRESH_RATE 10 // [ms]
 
