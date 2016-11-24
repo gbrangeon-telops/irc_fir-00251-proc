@@ -439,7 +439,7 @@ begin
          else                       
             
             -- ENO 14 juillet 2016: requis pour supporter instabilités de la roue à filtre. Mettre à jour même si détecteur n'est pas reprogrammé
-            fpa_intf_cfg_i.comn.fpa_stretch_acq_trig <= new_cfg.comn.fpa_stretch_acq_trig;
+            fpa_intf_cfg_i.comn.fpa_stretch_acq_trig <= USER_CFG.comn.fpa_stretch_acq_trig;
             
             
             case  cfg_updater_fsm is 
