@@ -344,8 +344,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_MASTER_CLK_RATE_HZ);  
    ptrA->scd_fig4_t6_dly = (uint32_t)FPA_SCD_HDER_EFF_LEN;                             // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
    ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  
-   ptrA->scd_stretch_acq_trig  =  (uint32_t) FPA_StretchAcqTrig;
-      
+   
+   // Élargit le pulse de trig
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
+   
    //-----------------------------------------                                           
    // Envoyer commande synthetique
    ptrA->proxy_cmd_to_update_id = SCD_DIAG_CMD_ID;

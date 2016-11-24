@@ -167,7 +167,6 @@ package Proxy_define is
       scd_fig1_or_fig2_t5_dly : unsigned(15 downto 0);
       scd_fig1_or_fig2_t4_dly : unsigned(15 downto 0);
       scd_xsize_div2          : unsigned(9 downto 0);
-      scd_stretch_acq_trig    : std_logic;          -- permet d'utiliser une version étirée du trig pour supporter les instabilités de la roue à filtre
    end record;
    
    ------------------------------------------------								

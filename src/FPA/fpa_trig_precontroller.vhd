@@ -132,7 +132,7 @@ begin
          else
             
             -- étirement ou non 
-            if FPA_INTF_CFG.SCD_MISC.SCD_STRETCH_ACQ_TRIG = '1' then 
+            if FPA_INTF_CFG.comn.fpa_stretch_acq_trig = '1' then 
                acq_trig_o <= acq_trig_stretch;               
             else
                acq_trig_o <= acq_trig_temp; 
