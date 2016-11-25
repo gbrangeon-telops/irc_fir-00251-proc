@@ -380,11 +380,19 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 
    diode_voltage = (float)raw_temp*((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
   
-   if (diode_voltage >= 1.020) {
+   if (diode_voltage >= 1.056) {
+      TempCoeff[0] = 676.9270F;                                                     
+      TempCoeff[1] = -573.9683F; 
+   }
+   else if ((diode_voltage >= 1.049)&&(diode_voltage < 1.056)) {
+      TempCoeff[0] =  964.8404F;                                                     
+      TempCoeff[1] = -846.6000F;
+   }
+   else if ((diode_voltage >= 1.020)&&(diode_voltage < 1.049)) {
       TempCoeff[0] = 540.7409F;                                                     
       TempCoeff[1] = -442.2857F;
    }
-   else if ((diode_voltage >= 0.86)&&(diode_voltage < 1.020)) { 
+   else if ((diode_voltage >= 0.860)&&(diode_voltage < 1.020)) { 
       TempCoeff[0] = 587.7490F;                                                   
       TempCoeff[1] = -488.3721F; 
    }
