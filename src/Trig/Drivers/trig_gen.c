@@ -82,9 +82,8 @@
 
 // CONTROL
 #define C_TRIG_STOP           0x00000000
-#define C_TRIG_START          0x01
-#define C_RESET_ERR           0x02
-#define C_FLUSH_STAMPER       0x04             // pour flusher le fifo du stamper
+#define C_TRIG_START          0x00000001
+#define C_RESET_ERR           0x00000002
 
 // les differents modes d'operation du controleur
 #define VHD_INTTRIG           0x00 
@@ -173,8 +172,13 @@ uint32_t TRIG_Start(const t_Trig *a)
 //--------------------------------------------------------------------------
  void  TRIG_ClearErr(const t_Trig *a)
 {
-   AXI4L_write32(C_RESET_ERR, a->ADD + A_CONTROL);  //on active l'effacement
-   AXI4L_write32(0x00, a->ADD + A_CONTROL);         //on desactive l'effacement mais attention on a aussi arrêté le bloc
+   uint32_t control;
+
+   // Read current control value
+   control = AXI4L_read32(a->ADD + A_CONTROL);
+
+   AXI4L_write32(BitMaskSet(control, C_RESET_ERR), a->ADD + A_CONTROL);    //on active l'effacement, sans changer les autres bits de control
+   AXI4L_write32(BitMaskClr(control, C_RESET_ERR), a->ADD + A_CONTROL);    //on desactive l'effacement, sans changer les autres bits de control
 }
 
 //--------------------------------------------------------------------------
