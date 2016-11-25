@@ -127,6 +127,7 @@ struct isc0207_param_s             //
 typedef struct isc0207_param_s  isc0207_param_t;
 
 // Global variables
+uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
@@ -293,6 +294,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->quad2_clk_phase = 6;
    ptrA->quad3_clk_phase = 6;
    ptrA->quad4_clk_phase = 6;
+   
+   // Élargit le pulse de trig
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
 
    WriteStruct(ptrA);   
 }

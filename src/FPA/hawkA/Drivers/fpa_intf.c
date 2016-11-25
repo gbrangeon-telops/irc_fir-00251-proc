@@ -136,6 +136,7 @@ struct hawk_param_s             //
 typedef struct hawk_param_s  hawk_param_t;
 
 // Global variables
+uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
@@ -357,6 +358,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc_clk_phase
    ptrA->adc_clk_phase                     = 1;              // on dephase l'horloge des ADC
+   
+   // Élargit le pulse de trig
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
    WriteStruct(ptrA);
 }

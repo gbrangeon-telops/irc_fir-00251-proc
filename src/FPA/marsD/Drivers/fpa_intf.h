@@ -125,8 +125,11 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  proxy_fig2_t5_dly;
    uint32_t  proxy_fig2_t4_dly;
    uint32_t  proxy_xsize_div2;
+   
+   // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
+   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
 
-   // specifie la partie de la structure à mettre à jour (pour evter des bugs)
+   // specifie la partie de la structure à mettre à jour (pour eviter des bugs)
    uint32_t  proxy_cmd_to_update_id;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;

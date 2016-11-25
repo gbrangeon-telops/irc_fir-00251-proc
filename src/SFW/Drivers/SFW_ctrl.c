@@ -82,21 +82,17 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
    //Send to the hardware the mode of the wheel if present
    if(flashSettings.FWPresent == 1 && flashSettings.FWType == FW_SYNC)
    {
-     #ifdef SCD_PROXY
-	    FPA_StretchAcqTrig = 0;
-	 #endif
-	  
-	  if(pGCRegs->FWMode == FWM_Fixed)
+      FPA_StretchAcqTrig = 0;
+
+      if (pGCRegs->FWMode == FWM_Fixed)
          AXI4L_write32(FIXED_WHEEL, pSFWCtrl->ADD  + WHEEL_STATE_ADDR);
-      else{
+      else
+      {
          AXI4L_write32(ROTATING_WHEEL, pSFWCtrl->ADD  + WHEEL_STATE_ADDR);
-		 #ifdef SCD_PROXY
-	       FPA_StretchAcqTrig = 1;
-	     #endif
-	  }
-		 
-		 
-      //TODO is it necessay in tel2000 to wait for
+         FPA_StretchAcqTrig = 1;
+      }
+
+      //TODO is it necessary in tel2000 to wait for
       TDCStatusSet( WaitingForFilterWheelMask);
    }
    else
@@ -238,10 +234,7 @@ uint32_t SFW_Get_RPM()
 
 void SFW_UpdateSFWMode(FWMode_t Mode)
 {
-   
-   #ifdef SCD_PROXY
-      FPA_StretchAcqTrig = 0;
-   #endif
+   FPA_StretchAcqTrig = 0;
    
    if(flashSettings.FWType == FW_SYNC)
    {
@@ -257,9 +250,7 @@ void SFW_UpdateSFWMode(FWMode_t Mode)
          case FWM_AsynchronouslyRotating:
          case FWM_SynchronouslyRotating:
             AXI4L_write32( ROTATING_WHEEL, gSFW_Ctrl.ADD + WHEEL_STATE_ADDR);
-			   #ifdef SCD_PROXY
-	           FPA_StretchAcqTrig = 1;
-	         #endif
+	         FPA_StretchAcqTrig = 1;
             break;
          default: // SHould not happen...
             AXI4L_write32( NOT_IMPLEMENTED, gSFW_Ctrl.ADD + WHEEL_STATE_ADDR);

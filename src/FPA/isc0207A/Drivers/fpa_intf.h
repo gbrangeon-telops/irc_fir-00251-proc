@@ -131,6 +131,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  quad3_clk_phase;
    uint32_t  quad4_clk_phase;
    
+   // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
+   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 

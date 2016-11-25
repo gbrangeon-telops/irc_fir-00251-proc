@@ -43,6 +43,7 @@ package FPA_define is
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '1';
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -228,7 +229,7 @@ package FPA_define is
    (others => '0'),           --int_indx                       
    to_unsigned(3176, 32),     --int_signal_high_time           
    --comn                           
-   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32)),
+   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), '0'),
    to_unsigned(0, 11),        --xstart                         
    to_unsigned(0, 11),        --ystart                         
    to_unsigned(640, 11),      --xsize                          

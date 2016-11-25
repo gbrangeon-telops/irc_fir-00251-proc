@@ -41,4 +41,5 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\mglk_mblaze_intf.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream32_fifo.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\mglk_io_interface.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\mglk_intf.bde

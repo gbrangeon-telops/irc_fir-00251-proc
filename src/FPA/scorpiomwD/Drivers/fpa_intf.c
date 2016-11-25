@@ -181,6 +181,7 @@ struct Command_s            //
 typedef struct Command_s Command_t;                                                            
 
 // Global variables
+uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
@@ -348,6 +349,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->proxy_pattern_activation = 0;
    if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage)
       ptrA->proxy_pattern_activation = 1;
+   
+   // Élargit le pulse de trig
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
 
    // Envoyer commande window
    ptrA->proxy_cmd_to_update_id = PROXY_WINDW_CMD_ID;

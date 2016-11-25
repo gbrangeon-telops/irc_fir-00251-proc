@@ -710,10 +710,11 @@ begin
                         when X"60" =>    mb_struct_cfg.proxy_misc.proxy_fig4_t4_dly     <= unsigned(data_i(mb_struct_cfg.proxy_misc.proxy_fig4_t4_dly'length-1 downto 0));  
                         when X"64" =>    mb_struct_cfg.proxy_misc.proxy_fig2_t5_dly     <= unsigned(data_i(mb_struct_cfg.proxy_misc.proxy_fig2_t5_dly'length-1 downto 0));
                         when X"68" =>    mb_struct_cfg.proxy_misc.proxy_fig2_t4_dly     <= unsigned(data_i(mb_struct_cfg.proxy_misc.proxy_fig2_t4_dly'length-1 downto 0));
-                        when X"6C" =>    mb_struct_cfg.proxy_misc.proxy_xsize_div2      <= unsigned(data_i(mb_struct_cfg.proxy_misc.proxy_xsize_div2'length-1 downto 0)); 
+                        when X"6C" =>    mb_struct_cfg.proxy_misc.proxy_xsize_div2      <= unsigned(data_i(mb_struct_cfg.proxy_misc.proxy_xsize_div2'length-1 downto 0));
+                        when X"70" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
                            
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"70" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
+                        when X"74" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
                         -- proxy_temp
                         when X"D0" =>    mb_struct_cfg.proxy_temp.proxy_temp_read_num   <= unsigned(data_i(mb_struct_cfg.proxy_temp.proxy_temp_read_num'length-1 downto 0)); mb_cfg_rqst <= '1';

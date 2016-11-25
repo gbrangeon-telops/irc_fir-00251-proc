@@ -41,6 +41,7 @@ package FPA_define is
    constant DEFINE_FPA_PROG_INT_TIME              : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';     -- pas besoin de config particulière au demarrage du ISC0207
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
    
    -- quelques caractéristiques du FPA
    constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 

@@ -148,6 +148,7 @@ struct scorpiomw_param_s             //
 typedef struct scorpiomw_param_s  scorpiomw_param_t;
 
 // Global variables
+uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
@@ -397,7 +398,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(3159.4F, 8);      // VCC8 -> offset2(RefOFs) = 3159.4 mV    soit word = 2594
 
    // adc_clk_phase
-   ptrA->adc_clk_phase                     = 0;              //
+   ptrA->adc_clk_phase                     = 0;
+   
+   // Élargit le pulse de trig
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
      
    WriteStruct(ptrA);
 }
