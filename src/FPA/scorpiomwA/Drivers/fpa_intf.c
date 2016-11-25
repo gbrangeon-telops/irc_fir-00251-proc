@@ -176,8 +176,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    InitGCRegs.TestImageSelector = 0;
    InitGCRegs.OffsetX = 0;
    InitGCRegs.OffsetY = 0;
-   InitGCRegs.Width   = 320;
-   InitGCRegs.Height  = 256;
+   InitGCRegs.Width   = 640;
+   InitGCRegs.Height  = 512;
    FPA_Reset(ptrA);
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
    FPA_GetTemperature(ptrA);                                                // demande de lecture
@@ -288,7 +288,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // direction de lecture
    ptrA->uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
    if (init_cfg_in_progress == 1)
-        ptrA->uprow_upcol = 0;
+        ptrA->uprow_upcol = 1;
    
    // calculé specialement pour le ScorpioMW
    Cmin  = (uint32_t)pGCRegs->OffsetX/4;
