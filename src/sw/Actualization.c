@@ -3820,7 +3820,7 @@ void ACT_listActualizationData()
 
       if (length > 0)
       {
-         FPGA_PRINTF("#%d: Name = %s, Reference POSIX time = %010d, type = %d, T_IL = " _PCF(2) " K, T_Ref = " _PCF(2) " K, t_exp = " _PCF(2), "us\n",
+         FPGA_PRINTF("#%d: Name = %s, Reference POSIX time = %010d, type = %d, T_IL = " _PCF(2) " K, T_Ref = " _PCF(2) " K, t_exp = " _PCF(2) " us\n",
                i+1, file->name, (unsigned int)header.ReferencePOSIXTime, header.ImageCorrectionType,
                _FFMT(header.TemperatureInternalLens, 2), _FFMT(header.TemperatureReference, 2), _FFMT(header.ExposureTime, 2));
       }
