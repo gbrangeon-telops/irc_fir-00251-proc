@@ -357,7 +357,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->vdac_value[7]                     = 2200;        // DAC8 ->
    
    // adc_clk_phase
-   ptrA->adc_clk_phase                     = 1;              // on dephase l'horloge des ADC
+   ptrA->adc_clk_phase     = 1;              // on dephase l'horloge des ADC
+   if (pGCRegs->DeviceSerialNumber == 4665)                  // pour IRC1607 (VLW) 
+      ptrA->adc_clk_phase  = 0;        // Selon les tests faits par PTR, c'est la valeur optimale pour le ghost
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
