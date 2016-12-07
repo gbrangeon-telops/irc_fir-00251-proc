@@ -242,7 +242,7 @@ void FH_parseResponse(FH_ctrl_t* chan)
             case FHR_STRING:
             {
                char tmp[64];
-               uint8_t length = CBB_Length(partialResp);
+               uint8_t length = (uint8_t)CBB_Length(partialResp);
 
                tmp[length] = 0;
                CBB_Popn(partialResp, CBB_Length(partialResp), (uint8_t*)tmp);
@@ -606,7 +606,7 @@ uint8_t FH_readAcks(FH_ctrl_t* data)
       --data->fh_data.numResponses;
       ++numRead;
 
-      length = CBB_Length(&data->fh_data.respTypes);
+      length = (uint8_t)CBB_Length(&data->fh_data.respTypes);
       status = CBB_Peek(&data->fh_data.respTypes, 0, &respType);
    }
 

@@ -397,9 +397,8 @@ void GPS_ParseGPRMC(t_GPS *GPS_Data)
 void GPS_Process(t_GPS *GPS_Data)
 {
    uint8_t byte;
-   uint8_t i;
    uint32_t POSIXTimeAtNextPPS;
-   uint32_t len;
+   uint16_t i, len;
    extern t_HderInserter gHderInserter;
    extern t_Trig gTrig;
       
