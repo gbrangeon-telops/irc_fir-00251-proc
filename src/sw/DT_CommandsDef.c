@@ -134,6 +134,10 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
+   extern int32_t gFpaDebugRegA;
+   extern int32_t gFpaDebugRegB;
+   extern int32_t gFpaDebugRegC;
+   extern int32_t gFpaDebugRegD;
    uint8_t argStr[12];
    uint32_t arglen;
    uint32_t cmd = 0;
@@ -165,6 +169,22 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       {
          cmd = 3;
       }
+      else if (strcasecmp((char *)argStr, "REGA") == 0)
+      {
+         cmd = 4;
+      }
+      else if (strcasecmp((char *)argStr, "REGB") == 0)
+      {
+         cmd = 5;
+      }
+      else if (strcasecmp((char *)argStr, "REGC") == 0)
+      {
+         cmd = 6;
+      }
+      else if (strcasecmp((char *)argStr, "REGD") == 0)
+      {
+         cmd = 7;
+      }
       else
       {
          DT_ERR("Unsupported command arguments");
@@ -180,6 +200,17 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
                   (iValue < -32768) || (iValue > 32767))
             {
                DT_ERR("Invalid int16 value.");
+               return IRC_FAILURE;
+            }
+            break;
+
+         case 4: // REGA
+         case 5: // REGB
+         case 6: // REGC
+         case 7: // REGD
+            if (ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS)
+            {
+               DT_ERR("Invalid int32 value.");
                return IRC_FAILURE;
             }
             break;
@@ -215,6 +246,22 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
          case 3: // OFF
             gFpaDetectorElectricalRefOffset = fValue;
             break;
+
+         case 4: // REGA
+            gFpaDebugRegA = iValue;
+            break;
+
+         case 5: // REGB
+            gFpaDebugRegB = iValue;
+            break;
+
+         case 6: // REGC
+            gFpaDebugRegC = iValue;
+            break;
+
+         case 7: // REGD
+            gFpaDebugRegD = iValue;
+            break;
       }
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
@@ -228,6 +275,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA detector polarization voltage = %d mV", gFpaDetectorPolarizationVoltage);
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
    DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
+
+   DT_PRINTF("FPA debug register A = %d", gFpaDebugRegA);
+   DT_PRINTF("FPA debug register B = %d", gFpaDebugRegB);
+   DT_PRINTF("FPA debug register C = %d", gFpaDebugRegC);
+   DT_PRINTF("FPA debug register D = %d", gFpaDebugRegD);
 
    DT_PRINTF("fpa.adc_oper_freq_max_khz = %d", status.adc_oper_freq_max_khz);
    DT_PRINTF("fpa.adc_analog_channel_num = %d", status.adc_analog_channel_num);
@@ -1381,8 +1433,8 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
          }
          DT_PRINTF("UTC Time:  %02d:%02d:%02d  %02d/%02d/%4d", rTClock.tm_hour, rTClock.tm_min, rTClock.tm_sec,
                rTClock.tm_mon + 1, rTClock.tm_mday, rTClock.tm_year + 1900);
-         DT_PRINTF("Latitude:  %d°\%d'%d\" %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
-         DT_PRINTF("Longitude: %d°\%d'%d\" %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
+         DT_PRINTF("Latitude:  %d?\%d'%d\" %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
+         DT_PRINTF("Longitude: %d?\%d'%d\" %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
          DT_PRINTF("Altitude:  %d,%d m", Gps_struct.Altitude, Gps_struct.Altitude_frac);
          break;
 
