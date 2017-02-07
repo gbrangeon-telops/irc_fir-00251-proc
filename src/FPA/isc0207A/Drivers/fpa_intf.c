@@ -307,9 +307,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eof_samp_pos_end_per_ch   =   ptrA->img_samp_num_per_ch;
    
    // delai avant image (mode réel)
-   ptrA->fpa_active_pixel_dly  = 59;        //  valeur pour le flex 
-   if (FPA_proxim_is_flegx == 1) // valeur pour le fleGX
-      ptrA->fpa_active_pixel_dly = (uint32_t)gFpaDebugRegA;
+   ptrA->fpa_active_pixel_dly  = 59;         //  valeur pour le flex
+   if (FPA_proxim_is_flegx == 1)
+      ptrA->fpa_active_pixel_dly = 59;       // valeur pour le fleGX
       
    // delai avant image (mode diag)   
    ptrA->diag_active_pixel_dly = 2;  // à ajuster via simulation
@@ -327,10 +327,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->quad4_clk_phase = 6;
    if (FPA_proxim_is_flegx == 1) // valeur pour le fleGX
    {
-      ptrA->quad1_clk_phase = gFpaDebugRegD;
-      ptrA->quad2_clk_phase = gFpaDebugRegD;
-      ptrA->quad3_clk_phase = gFpaDebugRegD;
-      ptrA->quad4_clk_phase = gFpaDebugRegD;
+      ptrA->quad1_clk_phase = 10;
+      ptrA->quad2_clk_phase = 10;
+      ptrA->quad3_clk_phase = 10;
+      ptrA->quad4_clk_phase = 10;
   }
    
    // Élargit le pulse de trig
