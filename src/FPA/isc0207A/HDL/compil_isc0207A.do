@@ -41,6 +41,8 @@ acom -nowarn DAGGEN_0523 -incr \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_sum.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_dispatcher.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_prog_ctler_kernel.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_dac_spi_feeder.vhd \
  d:\Telops\FIR-00251-Proc\src\QuadADC\HDL\quad_adc_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_clks_gen.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_diag_data_gen.vhd \
@@ -56,6 +58,7 @@ acom -nowarn DAGGEN_0523 -incr \
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_data_ctrl.bde \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_intf.bde
  

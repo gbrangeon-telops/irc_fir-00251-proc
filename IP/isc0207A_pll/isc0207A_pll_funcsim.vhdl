@@ -1,9 +1,9 @@
 -- Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2013.4 (win64) Build 353583 Mon Dec  9 17:49:19 MST 2013
--- Date        : Fri Nov 04 16:08:45 2016
+-- Date        : Tue Feb 07 12:00:41 2017
 -- Host        : TELOPS177 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim d:/Telops/FIR-00251-Proc/IP/isc0207A_pll/isc0207A_pll_funcsim.vhdl
+-- Command     : write_vhdl -force -mode funcsim D:/Telops/FIR-00251-Proc/IP/isc0207A_pll/isc0207A_pll_funcsim.vhdl
 -- Design      : isc0207A_pll
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -13,21 +13,22 @@ library IEEE; use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM; use UNISIM.VCOMPONENTS.ALL; 
 entity isc0207A_pllisc0207A_pll_clk_wiz is
   port (
-    clk_in1 : in STD_LOGIC;
-    clk_out1 : out STD_LOGIC;
-    reset : in STD_LOGIC;
-    locked : out STD_LOGIC
+    locked : out STD_LOGIC;
+    clk_80m : out STD_LOGIC;
+    adc_phase_clk : out STD_LOGIC;
+    clk_100m : in STD_LOGIC;
+    reset : in STD_LOGIC
   );
 end isc0207A_pllisc0207A_pll_clk_wiz;
 
 architecture STRUCTURE of isc0207A_pllisc0207A_pll_clk_wiz is
   signal \<const0>\ : STD_LOGIC;
   signal \<const1>\ : STD_LOGIC;
-  signal clk_in1_isc0207A_pll : STD_LOGIC;
-  signal clk_out1_isc0207A_pll : STD_LOGIC;
+  signal adc_phase_clk_isc0207A_pll : STD_LOGIC;
+  signal clk_100m_isc0207A_pll : STD_LOGIC;
+  signal clk_80m_isc0207A_pll : STD_LOGIC;
   signal clkfbout_buf_isc0207A_pll : STD_LOGIC;
   signal clkfbout_isc0207A_pll : STD_LOGIC;
-  signal NLW_plle2_adv_inst_CLKOUT1_UNCONNECTED : STD_LOGIC;
   signal NLW_plle2_adv_inst_CLKOUT2_UNCONNECTED : STD_LOGIC;
   signal NLW_plle2_adv_inst_CLKOUT3_UNCONNECTED : STD_LOGIC;
   signal NLW_plle2_adv_inst_CLKOUT4_UNCONNECTED : STD_LOGIC;
@@ -38,6 +39,7 @@ architecture STRUCTURE of isc0207A_pllisc0207A_pll_clk_wiz is
   attribute box_type of clkf_buf : label is "PRIMITIVE";
   attribute box_type of clkin1_bufg : label is "PRIMITIVE";
   attribute box_type of clkout1_buf : label is "PRIMITIVE";
+  attribute box_type of clkout2_buf : label is "PRIMITIVE";
   attribute box_type of plle2_adv_inst : label is "PRIMITIVE";
 begin
 GND: unisim.vcomponents.GND
@@ -55,25 +57,30 @@ clkf_buf: unisim.vcomponents.BUFG
     );
 clkin1_bufg: unisim.vcomponents.BUFG
     port map (
-      I => clk_in1,
-      O => clk_in1_isc0207A_pll
+      I => clk_100m,
+      O => clk_100m_isc0207A_pll
     );
 clkout1_buf: unisim.vcomponents.BUFG
     port map (
-      I => clk_out1_isc0207A_pll,
-      O => clk_out1
+      I => clk_80m_isc0207A_pll,
+      O => clk_80m
+    );
+clkout2_buf: unisim.vcomponents.BUFG
+    port map (
+      I => adc_phase_clk_isc0207A_pll,
+      O => adc_phase_clk
     );
 plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
     generic map(
       BANDWIDTH => "OPTIMIZED",
-      CLKFBOUT_MULT => 16,
+      CLKFBOUT_MULT => 64,
       CLKFBOUT_PHASE => 0.000000,
-      CLKIN1_PERIOD => 12.500000,
+      CLKIN1_PERIOD => 10.000000,
       CLKIN2_PERIOD => 0.000000,
-      CLKOUT0_DIVIDE => 2,
+      CLKOUT0_DIVIDE => 16,
       CLKOUT0_DUTY_CYCLE => 0.500000,
       CLKOUT0_PHASE => 0.000000,
-      CLKOUT1_DIVIDE => 1,
+      CLKOUT1_DIVIDE => 2,
       CLKOUT1_DUTY_CYCLE => 0.500000,
       CLKOUT1_PHASE => 0.000000,
       CLKOUT2_DIVIDE => 1,
@@ -89,7 +96,7 @@ plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
       CLKOUT5_DUTY_CYCLE => 0.500000,
       CLKOUT5_PHASE => 0.000000,
       COMPENSATION => "BUF_IN",
-      DIVCLK_DIVIDE => 1,
+      DIVCLK_DIVIDE => 5,
       IS_CLKINSEL_INVERTED => '0',
       IS_PWRDWN_INVERTED => '0',
       IS_RST_INVERTED => '0',
@@ -100,11 +107,11 @@ plle2_adv_inst: unisim.vcomponents.PLLE2_ADV
     port map (
       CLKFBIN => clkfbout_buf_isc0207A_pll,
       CLKFBOUT => clkfbout_isc0207A_pll,
-      CLKIN1 => clk_in1_isc0207A_pll,
+      CLKIN1 => clk_100m_isc0207A_pll,
       CLKIN2 => \<const0>\,
       CLKINSEL => \<const1>\,
-      CLKOUT0 => clk_out1_isc0207A_pll,
-      CLKOUT1 => NLW_plle2_adv_inst_CLKOUT1_UNCONNECTED,
+      CLKOUT0 => clk_80m_isc0207A_pll,
+      CLKOUT1 => adc_phase_clk_isc0207A_pll,
       CLKOUT2 => NLW_plle2_adv_inst_CLKOUT2_UNCONNECTED,
       CLKOUT3 => NLW_plle2_adv_inst_CLKOUT3_UNCONNECTED,
       CLKOUT4 => NLW_plle2_adv_inst_CLKOUT4_UNCONNECTED,
@@ -146,23 +153,25 @@ library IEEE; use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM; use UNISIM.VCOMPONENTS.ALL; 
 entity isc0207A_pll is
   port (
-    clk_in1 : in STD_LOGIC;
-    clk_out1 : out STD_LOGIC;
+    clk_100m : in STD_LOGIC;
+    clk_80m : out STD_LOGIC;
+    adc_phase_clk : out STD_LOGIC;
     reset : in STD_LOGIC;
     locked : out STD_LOGIC
   );
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of isc0207A_pll : entity is true;
   attribute core_generation_info : string;
-  attribute core_generation_info of isc0207A_pll : entity is "isc0207A_pll,clk_wiz_v5_1,{component_name=isc0207A_pll,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,enable_axi=0,feedback_source=FDBK_AUTO,PRIMITIVE=PLL,num_out_clk=1,clkin1_period=12.5,clkin2_period=10.0,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,feedback_type=SINGLE,CLOCK_MGR_TYPE=NA,manual_override=false}";
+  attribute core_generation_info of isc0207A_pll : entity is "isc0207A_pll,clk_wiz_v5_1,{component_name=isc0207A_pll,use_phase_alignment=true,use_min_o_jitter=false,use_max_i_jitter=false,use_dyn_phase_shift=false,use_inclk_switchover=false,use_dyn_reconfig=false,enable_axi=0,feedback_source=FDBK_AUTO,PRIMITIVE=PLL,num_out_clk=2,clkin1_period=10.0,clkin2_period=10.0,use_power_down=false,use_reset=true,use_locked=true,use_inclk_stopped=false,feedback_type=SINGLE,CLOCK_MGR_TYPE=NA,manual_override=false}";
 end isc0207A_pll;
 
 architecture STRUCTURE of isc0207A_pll is
 begin
 U0: entity work.isc0207A_pllisc0207A_pll_clk_wiz
     port map (
-      clk_in1 => clk_in1,
-      clk_out1 => clk_out1,
+      adc_phase_clk => adc_phase_clk,
+      clk_100m => clk_100m,
+      clk_80m => clk_80m,
       locked => locked,
       reset => reset
     );

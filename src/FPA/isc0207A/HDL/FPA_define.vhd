@@ -20,7 +20,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.MATH_REAL.all;
-use work.fpa_common_pkg.all; 
+use work.fpa_common_pkg.all;
+use work.fleg_brd_define.all; 
 
 package FPA_define is    
    
@@ -98,25 +99,22 @@ package FPA_define is
    constant XSIZE_MAX                             : integer := DEFINE_XSIZE_MAX;  -- pour les modules utilisant XSIZE_MAX
    constant YSIZE_MAX                             : integer := DEFINE_YSIZE_MAX;  -- pour les modules utilisant YSIZE_MAX
    constant DEFINE_FPA_MCLK_RATE_FACTOR_100M_X_2P15 : integer := integer((DEFINE_FPA_100M_CLK_RATE_KHZ*(2**15))/DEFINE_FPA_MCLK_RATE_KHZ);    -- pour la conversion du temps d'integration en coups de 100MHz 
-
-   ---------------------------------------------------------------------------------								
-   -- Configuration
-   ---------------------------------------------------------------------------------  
-   --   -- config propre au détecteur
-   --   -- tout changement implique sa reprogrammation
-   --   type det_cfg_type is
-   --   record  
-   --      xstart              : unsigned(10 downto 0); 
-   --      ystart              : unsigned(10 downto 0);
-   --      xsize               : unsigned(10 downto 0);
-   --      ysize               : unsigned(10 downto 0);
-   --      gain                : std_logic;
-   --      invert              : std_logic; 
-   --      revert              : std_logic;
-   --      onchip_binning      : std_logic;    
-   --   end record;
-   --   
-   --   
+   
+   
+   -- limites imposées aux tensions VDAC provenant de celles de FP_VCC1 à FP_VCC8 du Fleg 
+   -- provient du script F:\Bibliotheque\Electronique\PCB\EFP-00266-001 (Generic Flex Board TEL-2000)\Documentation\calcul_LT3042.m
+   -- ATTENTION il faut avoir completer la correspondance entre VCC et  les tensions du détecteur avant que le script ne donne des resultats valides
+   constant DEFINE_DAC_LIMIT : fleg_vdac_limit_array_type   := (
+   (11939, 13685),     -- limites du DAC1 pour le isc0207A_3k     VPOS_OUT
+   (11939, 13685),     -- limites du DAC2 pour le isc0207A_3k     VPOS
+   (11939, 13685),     -- limites du DAC3 pour le isc0207A_3k     VPOS_UC
+   (    0, 16383),     -- limites du DAC4 pour le isc0207A_3k     VOUTREF
+   (    0, 16383),     -- limites du DAC5 pour le isc0207A_3k     VOS
+   (    0, 16383),     -- limites du DAC6 pour le isc0207A_3k     VDETCOM
+   (	  0, 16210),     -- limites du DAC7 pour le isc0207A_3k     inref
+   (11939, 13685));    -- limites du DAC8 pour le isc0207A_3k     VPD
+   
+   
    -- misc                    
    type misc_cfg_type is
    record
@@ -169,7 +167,8 @@ package FPA_define is
       int_time_offset              : unsigned(7 downto 0);
       tsh_min                      : unsigned(15 downto 0);
       tsh_min_minus_int_time_offset: unsigned(15 downto 0);
-      quad_clk_phase               : quad_clk_phase_type;
+      quad_clk_phase               : quad_clk_phase_type;      
+      vdac_value                   : fleg_vdac_value_type;     --  les valeurs Vdaccalculé dans le MB pour dac(1) à dac(8)  -- dac6 -> VOS pour le skimming
       
    end record;    
    

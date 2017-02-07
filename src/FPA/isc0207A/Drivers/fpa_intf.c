@@ -91,7 +91,23 @@
 #define FPA_TEMP_READER_FULL_SCALE_mV     2048          // plage dynamnique de l'ADC
 #define FPA_TEMP_READER_GAIN              1             // gain du canal de lecture de temperature sur la carte ADC
 
+// fleg
+#define FLEG_DAC_RESOLUTION_BITS          14            // le DAC est à 14 bits
+#define FLEG_DAC_REF_VOLTAGE_V            2.5           // on utilise la reference interne de 2.5V du DAC 
+#define FLEG_DAC_REF_GAIN                 2             // le gain est de 2 sur VREF
+
 #define TEST_PATTERN_LINE_DLY             12            // J'Estime que mon patron de test actuel a besoin de 12 clks de 10 ns entre chaque ligne.
+
+#define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
+
+#define ISC0207_REF_VOLTAGE_MIN_mV        1700
+#define ISC0207_REF_VOLTAGE_MAX_mV        4500
+
+#define ISC0207_VDETCOM_VOLTAGE_MIN_mV    1700
+#define ISC0207_VDETCOM_VOLTAGE_MAX_mV    5300
+
+#define ISC0207_REFOFS_VOLTAGE_MIN_mV     502
+#define ISC0207_REFOFS_VOLTAGE_MAX_mV     2500
 
 
 // structure interne pour les parametres du 0207
@@ -133,11 +149,10 @@ float gFpaPeriodMinMargin = 0.0F;
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
-//float FPA_ReadoutTime(const gcRegistersData_t *pGCRegs);
-//float FPGA_ProcessTime(const gcRegistersData_t *pGCRegs);
-//float FPA_Tri_Min_Calc(float ExposureTime, const gcRegistersData_t *pGCRegs);
-//float FPA_Tri_To_Apply_Calc(const gcRegistersData_t *pGCRegs);
-//float FPA_Tii_To_Apply_Calc(const gcRegistersData_t *pGCRegs);
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
+
+
 
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 
@@ -195,12 +210,24 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
    isc0207_param_t hh;   
    uint32_t test_pattern_dly;
-   //extern int16_t gFpaDetectorPolarizationVoltage;
-   //extern float gFpaDetectorElectricalTapsRef;
-   //static float actualElectricalTapsRef = 10;
-   //static float actualPolarizationVoltage = 10;
-   //uint32_t quads_phase;
+   extern int16_t gFpaDetectorPolarizationVoltage;
+   static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   extern float gFpaDetectorElectricalTapsRef;
+   extern float gFpaDetectorElectricalRefOffset;
+   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
+   static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+   static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   uint8_t FPA_proxim_is_flegx;
+   
+   t_FpaStatus Stat;
 	
+  
+   // on lit le statut 
+   FPA_GetStatus(&Stat, ptrA);
+	FPA_proxim_is_flegx = (uint8_t)(Stat.adc_brd_spare & 0x01);    // on sait quelle electronique de proximité est présente (FlegX eou Flex)
+   
+   
+   
    // on bâtit les parametres specifiques du 0207
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
    
@@ -242,7 +269,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (ptrA->fpa_diag_mode == 1)
    {   
       test_pattern_dly  = (uint32_t)pGCRegs->Height * (uint32_t)TEST_PATTERN_LINE_DLY;    // delay total en coups de 10 ns sur une image de patron de tests 
-	  ptrA->readout_plus_delay         =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F) + test_pattern_dly;  // (readout_time + delay -vhd_delay) converti en coups de 100MHz + test_pattern_dly qui est deja en coups de 10 ns
+	   ptrA->readout_plus_delay         =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F) + test_pattern_dly;  // (readout_time + delay -vhd_delay) converti en coups de 100MHz + test_pattern_dly qui est deja en coups de 10 ns
    }   
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
@@ -279,8 +306,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eof_samp_pos_start_per_ch =   ptrA->img_samp_num_per_ch - ptrA->pix_samp_num_per_ch + 1;
    ptrA->eof_samp_pos_end_per_ch   =   ptrA->img_samp_num_per_ch;
    
-   // delai avant d'avoir l'image
-   ptrA->fpa_active_pixel_dly  = 59;//57, 58 et 59 sont OK // 91; // 102;//117;  // à ajuster via chipscope
+   // delai avant image (mode réel)
+   ptrA->fpa_active_pixel_dly  = 59;        //  valeur pour le flex 
+   if (FPA_proxim_is_flegx == 1) // valeur pour le fleGX
+      ptrA->fpa_active_pixel_dly = (uint32_t)gFpaDebugRegA;
+      
+   // delai avant image (mode diag)   
    ptrA->diag_active_pixel_dly = 2;  // à ajuster via simulation
    
    // calculs
@@ -294,10 +325,51 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->quad2_clk_phase = 6;
    ptrA->quad3_clk_phase = 6;
    ptrA->quad4_clk_phase = 6;
+   if (FPA_proxim_is_flegx == 1) // valeur pour le fleGX
+   {
+      ptrA->quad1_clk_phase = gFpaDebugRegD;
+      ptrA->quad2_clk_phase = gFpaDebugRegD;
+      ptrA->quad3_clk_phase = gFpaDebugRegD;
+      ptrA->quad4_clk_phase = gFpaDebugRegD;
+  }
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
-
+   
+   // les DACs (1 à 8)  (utilisé par le FleGX mais envoyé quel que soit le proxim)
+   ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 1);           // DAC1 -> VPOS_OUT à 5.5V
+   ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 2);           // DAC2 -> VPOS     à 5.5V
+   ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 3);           // DAC3 -> VPOS_UC  à 5.5V
+   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(2000.0F, 5);           // DAC5 -> VOS      à 2.0V   (ajustable)
+   ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 8);           // DAC8 -> VPD      à 5.5V
+   
+   // Reference of the tap (VCC4)      
+   if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
+   {
+      if ((gFpaDetectorElectricalTapsRef >= (float)ISC0207_REF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)ISC0207_REF_VOLTAGE_MAX_mV))
+         ptrA->vdac_value[3] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 4);  //
+   }                                                                                                       
+   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[3], 4);          
+   gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;
+   
+   // VdetCom Voltage (VCC6)
+   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
+   {
+      if ((gFpaDetectorPolarizationVoltage >= (int16_t)ISC0207_VDETCOM_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)ISC0207_VDETCOM_VOLTAGE_MAX_mV))
+         ptrA->vdac_value[5] = (int32_t) FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // vdetCom change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+   }
+   actualPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[5], 6));
+   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                    
+   
+   // offset of the tap_reference (VCC7)      
+   if (gFpaDetectorElectricalRefOffset != actualElectricalRefOffset)
+   {
+      if ((gFpaDetectorElectricalRefOffset >= (float)ISC0207_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)ISC0207_REFOFS_VOLTAGE_MAX_mV))
+         ptrA->vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 7);  // 
+	}                                                                                                       
+   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
+   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;   
+   
    WriteStruct(ptrA);   
 }
 
@@ -514,5 +586,70 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
    AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);          
    AXI4L_write32(FPA_OUTPUT_TYPE, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);
    AXI4L_write32(FPA_INPUT_TYPE, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
+}
+
+//--------------------------------------------------------------------------
+// Conversion de VccVoltage_mV en DAC Word
+//--------------------------------------------------------------------------
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8)
+uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
+{
+  float Rs, Rd, RL, Is, DacVoltage_Volt;
+  uint32_t DacWord;
+
+   if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
+      Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
+      Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
+      RL = 3.01e3F;    // sur EFA-00266-001, vaut R35
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   else{                                                   // les canaux VCC4, VCC5, VCC6, et VCC7 sont identiques à VCC4
+      Rs = 4.99e3F;    // sur EFA-00266-001, vaut R30
+      Rd = 24.9F;      // sur EFA-00266-001, vaut R29
+      RL = 806.0F;     // sur EFA-00266-001, vaut R28
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   // calculs de la tension du dac en volt
+   DacVoltage_Volt =  ((1.0F + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
+
+   // deduction du bitstream du DAC
+   DacWord = (uint32_t)(powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
+   DacWord = (uint32_t) MAX(MIN(DacWord, 16383), 0);
+
+   return DacWord;
+}
+
+//--------------------------------------------------------------------------
+// Conversion de DAC Word  en VccVoltage_mV
+//--------------------------------------------------------------------------
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8)
+float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
+{
+   float Rs, Rd, RL, Is, DacVoltage_Volt, VccVoltage_mV;
+   uint32_t DacWordTemp;
+
+   if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
+      Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
+      Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
+      RL = 3.01e3F;    // sur EFA-00266-001, vaut R35
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+   else{                                                   // les canaux VCC4, VCC5, VCC6, et VCC7 sont identiques à VCC4
+      Rs = 4.99e3F;    // sur EFA-00266-001, vaut R30
+      Rd = 24.9F;      // sur EFA-00266-001, vaut R29
+      RL = 806.0F;     // sur EFA-00266-001, vaut R28
+      Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
+   }
+
+   // deduction de la tension du DAC
+   DacWordTemp =  (uint32_t) MAX(MIN(DacWord, 16383), 0);
+   DacVoltage_Volt = (float)DacWordTemp * ((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN)/powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS);
+
+   //calculs de la tension du LDO en volt
+   VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
+
+   return VccVoltage_mV;
 }
 

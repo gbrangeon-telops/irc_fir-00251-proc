@@ -20,7 +20,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0207A"
+#define FPA_DEVICE_MODEL_NAME    "ISC0207A_2K"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      320
@@ -129,10 +129,12 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  quad1_clk_phase;
    uint32_t  quad2_clk_phase;
    uint32_t  quad3_clk_phase;
-   uint32_t  quad4_clk_phase;
-   
+   uint32_t  quad4_clk_phase;   
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
    uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
+   uint32_t  vdac_value[8];
+   
+   
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
@@ -189,7 +191,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 5062, 8440, 12663, 5062, 12812}}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ

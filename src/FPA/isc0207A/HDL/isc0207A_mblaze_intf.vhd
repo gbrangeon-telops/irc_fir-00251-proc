@@ -244,8 +244,16 @@ begin
                   when X"A0" =>    user_cfg.quad_clk_phase(2)               <= unsigned(data_i(user_cfg.quad_clk_phase(2)'length-1 downto 0)); 
                   when X"A4" =>    user_cfg.quad_clk_phase(3)               <= unsigned(data_i(user_cfg.quad_clk_phase(3)'length-1 downto 0)); 
                   when X"A8" =>    user_cfg.quad_clk_phase(4)               <= unsigned(data_i(user_cfg.quad_clk_phase(4)'length-1 downto 0));
-                  when X"AC" =>    user_cfg.comn.fpa_stretch_acq_trig       <= data_i(0);  user_cfg_in_progress <= '0';
-                                     
+                  when X"AC" =>    user_cfg.comn.fpa_stretch_acq_trig       <= data_i(0);
+                  when X"B0" =>    user_cfg.vdac_value(1)                 <= unsigned(data_i(user_cfg.vdac_value(1)'length-1 downto 0));                                                                                                                          
+                  when X"B4" =>    user_cfg.vdac_value(2)                 <= unsigned(data_i(user_cfg.vdac_value(2)'length-1 downto 0));                                                                                                                                        
+                  when X"B8" =>    user_cfg.vdac_value(3)                 <= unsigned(data_i(user_cfg.vdac_value(3)'length-1 downto 0));                                                                                                                                        
+                  when X"BC" =>    user_cfg.vdac_value(4)                 <= unsigned(data_i(user_cfg.vdac_value(4)'length-1 downto 0));                                                                                                                                        
+                  when X"C0" =>    user_cfg.vdac_value(5)                 <= unsigned(data_i(user_cfg.vdac_value(5)'length-1 downto 0));                                                                                                                                        
+                  when X"C4" =>    user_cfg.vdac_value(6)                 <= unsigned(data_i(user_cfg.vdac_value(6)'length-1 downto 0));                                                                                                                                        
+                  when X"C8" =>    user_cfg.vdac_value(7)                 <= unsigned(data_i(user_cfg.vdac_value(7)'length-1 downto 0));                                                                                                                                        
+                  when X"CC" =>    user_cfg.vdac_value(8)                 <= unsigned(data_i(user_cfg.vdac_value(8)'length-1 downto 0)); user_cfg_in_progress <= '0';
+                                                                    
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic                <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"E4" =>    fpa_softw_stat_i.fpa_output              <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
