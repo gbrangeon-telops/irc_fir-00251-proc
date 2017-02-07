@@ -145,7 +145,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    if (!CBB_Empty(cbuf))
    {
       // Read FPA command argument
-      arglen = GetNextArg(cbuf, argStr, 3);
+      arglen = GetNextArg(cbuf, argStr, 4);
       if (arglen == 0)
       {
          DT_ERR("Invalid FPA command argument.");
