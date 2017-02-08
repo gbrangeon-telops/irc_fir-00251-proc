@@ -257,7 +257,7 @@ begin
                   fpa_digio3_i <= PROG_SD;
                   fpa_digio4_i <= not PROXIM_IS_FLEGX and ROIC_RESET_B;
                   fpa_digio6_i <= not FPA_INT and PROG_CSN;
-                  fpa_digio7_i <= mclk_reg;                
+                  fpa_digio7_i <= (PROXIM_IS_FLEGX and mclk_reg) or (not PROXIM_IS_FLEGX and FPA_MCLK);                
                
                when others =>
                
