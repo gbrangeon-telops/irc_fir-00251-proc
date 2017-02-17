@@ -14,6 +14,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/hawkA/fir_00251_proc_hawkA_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/hawkA/fir_00251_proc_hawkA_power.rpt
 report_clock_utilization -file $base_dir/Reports/hawkA/fir_00251_proc_hawkA_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/hawkA/fir_00251_proc_hawkA_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/hawkA/fir_00251_proc_hawkA_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -42,6 +43,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/herculesD/fir_00251_proc_herculesD_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/herculesD/fir_00251_proc_herculesD_power.rpt
 report_clock_utilization -file $base_dir/Reports/herculesD/fir_00251_proc_herculesD_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/herculesD/fir_00251_proc_herculesD_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/herculesD/fir_00251_proc_herculesD_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -70,6 +72,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/isc0207A/fir_00251_proc_isc0207A_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/isc0207A/fir_00251_proc_isc0207A_power.rpt
 report_clock_utilization -file $base_dir/Reports/isc0207A/fir_00251_proc_isc0207A_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/isc0207A/fir_00251_proc_isc0207A_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/isc0207A/fir_00251_proc_isc0207A_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -98,6 +101,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/isc0209A/fir_00251_proc_isc0209A_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/isc0209A/fir_00251_proc_isc0209A_power.rpt
 report_clock_utilization -file $base_dir/Reports/isc0209A/fir_00251_proc_isc0209A_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/isc0209A/fir_00251_proc_isc0209A_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/isc0209A/fir_00251_proc_isc0209A_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -126,6 +130,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/marsD/fir_00251_proc_marsD_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/marsD/fir_00251_proc_marsD_power.rpt
 report_clock_utilization -file $base_dir/Reports/marsD/fir_00251_proc_marsD_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/marsD/fir_00251_proc_marsD_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/marsD/fir_00251_proc_marsD_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -154,6 +159,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/pelicanD/fir_00251_proc_pelicanD_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/pelicanD/fir_00251_proc_pelicanD_power.rpt
 report_clock_utilization -file $base_dir/Reports/pelicanD/fir_00251_proc_pelicanD_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/pelicanD/fir_00251_proc_pelicanD_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/pelicanD/fir_00251_proc_pelicanD_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -182,6 +188,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/scorpiolwD/fir_00251_proc_scorpiolwD_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/scorpiolwD/fir_00251_proc_scorpiolwD_power.rpt
 report_clock_utilization -file $base_dir/Reports/scorpiolwD/fir_00251_proc_scorpiolwD_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiolwD/fir_00251_proc_scorpiolwD_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiolwD/fir_00251_proc_scorpiolwD_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -210,6 +217,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz_power.rpt
 report_clock_utilization -file $base_dir/Reports/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiolwD_230Hz/fir_00251_proc_scorpiolwD_230Hz_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -238,6 +246,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_power.rpt
 report_clock_utilization -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiomwA/fir_00251_proc_scorpiomwA_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
@@ -266,6 +275,7 @@ wait_on_run impl_1
 open_run impl_1
 #Save Report
 report_timing_summary -file $base_dir/Reports/scorpiomwD/fir_00251_proc_scorpiomwD_timing_summary_routed.rpt
+report_power -file $base_dir/Reports/scorpiomwD/fir_00251_proc_scorpiomwD_power.rpt
 report_clock_utilization -file $base_dir/Reports/scorpiomwD/fir_00251_proc_scorpiomwD_clock_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiomwD/fir_00251_proc_scorpiomwD_utilization_placed.rpt
 report_utilization -file $base_dir/Reports/scorpiomwD/fir_00251_proc_scorpiomwD_utilization_placed_hier.rpt -hierarchical -hierarchical_depth 5
