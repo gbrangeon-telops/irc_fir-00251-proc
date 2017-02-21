@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.1.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.1.1
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -42,8 +42,8 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ICUPresent = */ 0,
    /* ICUMode = */ 1,
    /* ICUCalibPosition = */ 0,
-   /* ICUPulseWidth = */ 15,
-   /* ICUPeriod = */ 100,
+   /* ICUPulseWidth = */ 150,
+   /* ICUPeriod = */ 1000,
    /* ICUTransitionDuration = */ 500,
    /* ImageCorrectionEnabled = */ 1,
    /* ImageCorrectionAtPowerOn = */ 0,

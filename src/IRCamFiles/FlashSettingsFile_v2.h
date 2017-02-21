@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.1.0
+ * Generated from the flash settings file structure definition XLS file version 2.1.1
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -24,7 +24,7 @@
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
 #define FLASHSETTINGS_FILEMINORVERSION_V2      1
-#define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
+#define FLASHSETTINGS_FILESUBMINORVERSION_V2   1
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_CHUNKSIZE_V2   512
