@@ -340,7 +340,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 1);           // DAC1 -> VPOS_OUT à 5.5V
    ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 2);           // DAC2 -> VPOS     à 5.5V
    ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 3);           // DAC3 -> VPOS_UC  à 5.5V
-   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(2000.0F, 5);           // DAC5 -> VOS      à 2.0V   (ajustable)
+   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(1950.0F, 5);           // DAC5 -> VOS      à 1.950V   (ajustable)
    ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 8);           // DAC8 -> VPD      à 5.5V
    
    // Reference of the tap (VCC4)      
