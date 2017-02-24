@@ -161,15 +161,11 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   if (((collectionFileHeader.DeviceDataFlowMajorVersion == CALIB_DATAFLOWMAJORVERSION) &&
-        (collectionFileHeader.DeviceDataFlowMinorVersion > CALIB_DATAFLOWMINORVERSION)) ||
-       (collectionFileHeader.DeviceDataFlowMajorVersion > CALIB_DATAFLOWMAJORVERSION))
+   if (collectionFileHeader.DeviceDataFlowMajorVersion > CALIB_DATAFLOWMAJORVERSION)
    {
-      CM_ERR("Collection data flow version %d.%d is not supported (%d.%d).",
+      CM_ERR("Collection data flow major version %d is not supported. Collection data is supported up to major version %d.",
             collectionFileHeader.DeviceDataFlowMajorVersion,
-            collectionFileHeader.DeviceDataFlowMinorVersion,
-            CALIB_DATAFLOWMAJORVERSION,
-            CALIB_DATAFLOWMINORVERSION);
+            CALIB_DATAFLOWMAJORVERSION);
       error = 1;
    }
 
@@ -556,15 +552,11 @@ void Calibration_SM()
                cmCurrentState = CMS_ERROR;
             }
 
-            if (((headerData.blockFile.DeviceDataFlowMajorVersion == CALIB_DATAFLOWMAJORVERSION) &&
-                 (headerData.blockFile.DeviceDataFlowMinorVersion > CALIB_DATAFLOWMINORVERSION)) ||
-                (headerData.blockFile.DeviceDataFlowMajorVersion > CALIB_DATAFLOWMAJORVERSION))
+            if (headerData.blockFile.DeviceDataFlowMajorVersion > CALIB_DATAFLOWMAJORVERSION)
             {
-               CM_ERR("Block data flow version %d.%d is not supported (%d.%d).",
+               CM_ERR("Block data flow major version %d is not supported. Block data is supported up to major version %d.",
                      headerData.blockFile.DeviceDataFlowMajorVersion,
-                     headerData.blockFile.DeviceDataFlowMinorVersion,
-                     CALIB_DATAFLOWMAJORVERSION,
-                     CALIB_DATAFLOWMINORVERSION);
+                     CALIB_DATAFLOWMAJORVERSION);
                cmCurrentState = CMS_ERROR;
             }
 
