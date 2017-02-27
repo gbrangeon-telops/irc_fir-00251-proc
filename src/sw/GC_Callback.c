@@ -57,6 +57,7 @@ extern t_calib gCal;
 extern t_HderInserter gHderInserter;
 extern t_FlagCfg gFlagging_ctrl;
 extern t_GatingCfg gGating_ctrl;
+extern bool gBufferStartDownloadTrigger;
 
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 extern float FWExposureTime[MAX_NUM_FILTER];
@@ -2948,6 +2949,11 @@ void GC_MemoryBufferSequenceDownloadImageFrameIDCallback(gcCallbackPhase_t phase
 
       if (gcRegsData.MemoryBufferSequenceDownloadImageFrameID > lastFrameID)
          gcRegsData.MemoryBufferSequenceDownloadImageFrameID = lastFrameID;
+         
+   }
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      gBufferStartDownloadTrigger = 1;
    }
 }
 
