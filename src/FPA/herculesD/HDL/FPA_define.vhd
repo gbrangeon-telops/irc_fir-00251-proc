@@ -36,7 +36,9 @@ package FPA_define is
    ---------------------------------------------- 
    constant XSIZE_MAX                    : integer := 1280;              -- dimension en X maximale                                      -- dimension en X maximale
    constant YSIZE_MAX                    : integer := 1024;              -- dimension en Y maximale  
-
+   
+   -- increment des données en mode diag compteur
+   constant DIAG_DATA_INC                : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
    
 end FPA_define;
 
