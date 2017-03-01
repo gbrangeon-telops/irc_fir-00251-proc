@@ -2067,12 +2067,11 @@ IRC_Status_t BadPixelDetection_SM()
 
    case BPD_DebugState:
       {
-         const int headerOffset = 2*FPA_WIDTH_MAX;
          const int N = gActualizationParams.flickersNCoadd;
 
          // dans cet état, on copie les images de calcul dans le buffer externe
 
-         for (i=headerOffset; i<frameSize; ++i)
+         for (i=imageDataOffset; i<frameSize; ++i)
          {
             actDataBuffers.m[i] = min_buffer[i];
             actDataBuffers.M[i] = max_buffer[i];
@@ -2080,7 +2079,7 @@ IRC_Status_t BadPixelDetection_SM()
             actDataBuffers.R[i] = R_buffer[i];
             actDataBuffers.Z[i] = Z_buffer[i];
             actDataBuffers.bpMap[i] = (uint16_t)badPixelMap[i];
-            actDataBuffers.deltaBeta[i] = currentDeltaBeta->deltaBeta[i];
+            actDataBuffers.deltaBeta[i] = currentDeltaBeta->deltaBeta[i-imageDataOffset];
          }
 
          setBpdState(&state, BPD_Idle);
