@@ -67,9 +67,9 @@
 
 #define A_TRIG_MODE           0x00
 #define A_PERIOD              0x04
-#define A_ACQ_WINDOW          0x18
+#define A_ACQ_WINDOW          0x14
 #define A_PPS_SOURCE          0xE0
-#define A_SEQSOFT_TRIG        0x24
+#define A_SEQSOFT_TRIG        0x20
 
 // STATUS masks
 #define M_TRIG_DONE           0x01
@@ -245,7 +245,6 @@ void TRIG_SendConfigGC(t_Trig *a, const gcRegistersData_t *pGCRegs)
          }
 
          a->TRIG_FpaTrigDly = 0;
-         a->TRIG_TrigOutDly = 0;
          a->TRIG_Activation = VHD_RisingEdge;
          a->TRIG_SeqFrameCount = 0;
          a->TRIG_SeqTrigSource = VHD_TRIGSEQ_HARDWARE;
@@ -254,7 +253,6 @@ void TRIG_SendConfigGC(t_Trig *a, const gcRegistersData_t *pGCRegs)
       case TM_On:
          delay_us = MAX(0, TriggerDelayAry[TS_AcquisitionStart])*1.0e-6F;
          a->TRIG_FpaTrigDly = (uint32_t)(delay_us * (float)TRIG_BASE_CLOCK_FREQ_HZ);
-         a->TRIG_TrigOutDly = (uint32_t)(delay_us * (float)TRIG_BASE_CLOCK_FREQ_HZ);
 
          // modes d'activation des trigs
          switch (TriggerActivationAry[TS_AcquisitionStart])                   // modes d'activation du trigger
@@ -267,12 +265,6 @@ void TRIG_SendConfigGC(t_Trig *a, const gcRegistersData_t *pGCRegs)
                break;
             case TA_AnyEdge :
                a->TRIG_Activation = VHD_AnyEdge;
-               break;
-            case TA_LevelHigh :
-               a->TRIG_Activation = VHD_LevelHigh;
-               break;
-            case TA_LevelLow :
-               a->TRIG_Activation = VHD_LevelLow;
                break;
             default:
                a->TRIG_Activation = VHD_RisingEdge;
@@ -329,7 +321,7 @@ void TRIG_SendTrigSoft(t_Trig *a, const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 t_PosixTime TRIG_GetRTC(const t_Trig *a)
 {
-t_PosixTime RTC;
+   t_PosixTime RTC;
    RTC.Seconds = AXI4L_read32(a->ADD + A_RTC_SECONDS);
    RTC.SubSeconds = AXI4L_read32(a->ADD + A_RTC_SUBSECOND);
    return RTC;

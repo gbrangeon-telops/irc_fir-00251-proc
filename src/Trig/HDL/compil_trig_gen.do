@@ -25,7 +25,6 @@ acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_status.vhd
 acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_conditioner.vhd
 
 # trigger controller
-acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\hightime_measure.vhd
 acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\progr_clk_div.vhd 
 acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_ctler_core.vhd
 acom D:\Telops\FIR-00251-Proc\src\Trig\HDL\trig_gen_ctler.bde  

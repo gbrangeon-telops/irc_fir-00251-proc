@@ -51,16 +51,8 @@ begin
    
    --output map             
    ERROR <= '0';
-   STATUS(15 downto 9) <= (others =>'0');
-   STATUS(8) <= TRIG_CTLER_STAT(3);
-   STATUS(7) <= TRIG_CTLER_STAT(2);
-   STATUS(6) <= TRIG_CTLER_STAT(1);
-   STATUS(5) <= '0';    
-   STATUS(4) <= '0';
-   STATUS(3) <= '0';
-   STATUS(2) <= '0';
-   STATUS(1) <= '0';
-   STATUS(0) <= TRIG_CTLER_STAT(0); 
+   STATUS(15 downto 8) <= (others =>'0');
+   STATUS(7 downto 0) <= TRIG_CTLER_STAT; 
    
    
    -- sync reset

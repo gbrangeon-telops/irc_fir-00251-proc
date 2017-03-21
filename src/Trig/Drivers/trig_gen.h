@@ -38,7 +38,6 @@ struct s_Trig
    uint32_t TRIG_Mode;                // le mode de fonctionnement
    uint32_t TRIG_Period;              // la période du trig, en coups d'horloge
    uint32_t TRIG_FpaTrigDly;          // retard du trig envoyé au fpa local en coup d'horloge
-   uint32_t TRIG_TrigOutDly;          // retard du trig envoyé au fpa distant en coup d'horloge
    uint32_t TRIG_ForceHigh;           // si le trig doit rester indefiniment à '1' (convient au mode vitesse maximale)
    uint32_t TRIG_Activation;          // permet de savoir si le Trg du fpa local doit etre triggé  sur Rising_edge , HighLevel etc..
    uint32_t TRIG_AcqWindow;           // AcqWindow à '1' permet de generer les trigs d'acquisiiotn(image envoyées dans la chaine)

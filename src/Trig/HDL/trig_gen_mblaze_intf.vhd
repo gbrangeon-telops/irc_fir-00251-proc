@@ -234,12 +234,11 @@ begin
             when X"00" => axi_rdata <= resize(trig_cfg_i.mode, 32);
             when X"04" => axi_rdata <= resize(std_logic_vector(trig_cfg_i.period), 32); 
             when X"08" => axi_rdata <= resize(std_logic_vector(trig_cfg_i.fpatrig_dly), 32);
-            when X"0C" => axi_rdata <= resize(std_logic_vector(trig_cfg_i.trigout_dly), 32); 
-            when X"10" => axi_rdata <= resize('0'& trig_cfg_i.force_high, 32) ;
-            when X"14" => axi_rdata <= resize(trig_cfg_i.trig_activ,32);
-            when X"18" => axi_rdata <= resize('0'& trig_cfg_i.acq_window, 32);
-            when X"1C" => axi_rdata <= resize(std_logic_vector(trig_cfg_i.seq_framecount), 32);
-            when X"20" => axi_rdata <= resize('0'& trig_cfg_i.seq_trigsource, 32);
+            when X"0C" => axi_rdata <= resize('0'& trig_cfg_i.force_high, 32) ;
+            when X"10" => axi_rdata <= resize(trig_cfg_i.trig_activ,32);
+            when X"14" => axi_rdata <= resize('0'& trig_cfg_i.acq_window, 32);
+            when X"18" => axi_rdata <= resize(std_logic_vector(trig_cfg_i.seq_framecount), 32);
+            when X"1C" => axi_rdata <= resize('0'& trig_cfg_i.seq_trigsource, 32);
             
             when X"40" => axi_rdata <= resize('0'& PPS_TIMEOUT_RE,32);			
                
@@ -332,14 +331,13 @@ begin
                   -- cfg partie trigger
                   when X"00" => trig_cfg_i.mode          <= data_i(trig_cfg_i.mode'length-1 downto 0);					
                   when X"04" => trig_cfg_i.period        <= unsigned(data_i(trig_cfg_i.period'length-1 downto 0)); 		
-                  when X"08" => trig_cfg_i.fpatrig_dly   <= unsigned(data_i(trig_cfg_i.fpatrig_dly'length-1 downto 0));                              
-                  when X"0C" => trig_cfg_i.trigout_dly   <= unsigned(data_i(trig_cfg_i.trigout_dly'length-1 downto 0)); 
-                  when X"10" => trig_cfg_i.force_high    <= data_i(0);
-                  when X"14" => trig_cfg_i.trig_activ    <= data_i(trig_cfg_i.trig_activ'length-1 downto 0);
-                  when X"18" => trig_cfg_i.acq_window    <= data_i(0);
-                  when X"1C" => trig_cfg_i.seq_framecount <= unsigned(data_i(trig_cfg_i.seq_framecount'length-1 downto 0)); 
-                  when X"20" => trig_cfg_i.seq_trigsource <= data_i(0);
-                  when X"24" => seq_softtrig_i			  <= data_i(0);
+                  when X"08" => trig_cfg_i.fpatrig_dly   <= unsigned(data_i(trig_cfg_i.fpatrig_dly'length-1 downto 0));
+                  when X"0C" => trig_cfg_i.force_high    <= data_i(0);
+                  when X"10" => trig_cfg_i.trig_activ    <= data_i(trig_cfg_i.trig_activ'length-1 downto 0);
+                  when X"14" => trig_cfg_i.acq_window    <= data_i(0);
+                  when X"18" => trig_cfg_i.seq_framecount <= unsigned(data_i(trig_cfg_i.seq_framecount'length-1 downto 0)); 
+                  when X"1C" => trig_cfg_i.seq_trigsource <= data_i(0);
+                  when X"20" => seq_softtrig_i			  <= data_i(0);
                      
                   -- cfg partie stamper                  
                   when X"30" => mb_time_sec_i            <= data_i;

@@ -29,7 +29,7 @@ end trig_conditioner;
 
 architecture rtl of trig_conditioner is
    
-   type trig_gen_sm_type is (idle, out_on_st, out_delay_st, pause_st);
+   type trig_gen_sm_type is (idle, out_on_st, pause_st);
    signal trig_gen_sm            : trig_gen_sm_type;
    signal sreset                 : std_logic;
    signal done                   : std_logic;
@@ -38,14 +38,13 @@ architecture rtl of trig_conditioner is
    signal acq_window_last        : std_logic;
    signal acq_window_change      : std_logic;
    signal raw_trig_i             : std_logic;
-   signal raw_trig_last          : std_logic;
    signal raw_acq_trig_i         : std_logic;
    signal raw_xtra_trig_i        : std_logic;
    signal raw_acq_trig_pipe      : std_logic_vector(2 downto 0);
    signal raw_xtra_trig_pipe     : std_logic_vector(2 downto 0);
    signal acq_trig_i             : std_logic;
    signal xtra_trig_i            : std_logic;
-   signal trig_out_i              : std_logic;
+   signal trig_out_i             : std_logic;
    signal Allow_HighTimeChange   : std_logic;
    signal acq_window_i           : std_logic;
    
@@ -116,6 +115,8 @@ begin
             xtra_trig_i <= '0';
             raw_acq_trig_pipe <= (others =>'0');
             raw_xtra_trig_pipe <= (others =>'0');
+            trig_out_i <= '0';
+            cnt_trigout <= to_unsigned(0, cnt_trigout'length);
          else
             --la duree du pipe definit la largeur de activation_trig_i
             -- comme il sera envoyé au FPA local qui est dans le domaine ADC_CLK
@@ -127,44 +128,12 @@ begin
             raw_xtra_trig_pipe(0) <= raw_xtra_trig_i;
             raw_xtra_trig_pipe(1) <= raw_xtra_trig_pipe(0);
             raw_xtra_trig_pipe(2) <= raw_xtra_trig_pipe(1);
-            case PARAM.TRIG_ACTIV is
-               when RisingEdge  =>
-                  acq_trig_i <= raw_acq_trig_i and not raw_acq_trig_pipe(2);
-                  xtra_trig_i <= raw_xtra_trig_i and not raw_xtra_trig_pipe(2);
-               when FallingEdge  =>
-                  acq_trig_i <= not raw_acq_trig_i and raw_acq_trig_pipe(2);
-                  xtra_trig_i <= not raw_xtra_trig_i and raw_xtra_trig_pipe(2);
-               when AnyEdge  =>
-                  acq_trig_i <= raw_acq_trig_i xor raw_acq_trig_pipe(2);
-                  xtra_trig_i <= raw_xtra_trig_i xor raw_xtra_trig_pipe(2);
-               when LevelHigh  =>
-                  acq_trig_i <= raw_acq_trig_i;
-                  xtra_trig_i <= raw_xtra_trig_i;
-               when LevelLow  =>
-                  acq_trig_i <= not raw_acq_trig_i;
-                  xtra_trig_i <= not raw_xtra_trig_i;
-               when others =>
-                  acq_trig_i <= '0';
-                  xtra_trig_i <= '0';
-            end case;
-         end if;
-      end if;
-   end process;
-   
-   --------------------------------------------------
-   -- Trigger Out
-   --------------------------------------------------
-   TRIGOUT_PROC: process(CLK)
-   begin
-      if rising_edge(CLK) then
-         if sreset = '1' then
-            trig_out_i <= '0';
-            raw_trig_last <= '0';
-            cnt_trigout <= to_unsigned(0, cnt_trigout'length);
-         else
-            raw_trig_last <= acq_trig_i;
+
+            acq_trig_i <= raw_acq_trig_i and not raw_acq_trig_pipe(2);
+            xtra_trig_i <= raw_xtra_trig_i and not raw_xtra_trig_pipe(2);
             
-            if (acq_trig_i = '1' and raw_trig_last = '0' and cnt_trigout = to_unsigned(0, cnt_trigout'length)) then -- acq_trig_i envoie toujours des rising edges au FPA
+            -- Trig Out
+            if (raw_acq_trig_i = '1' and raw_acq_trig_pipe(2) = '0' and cnt_trigout = to_unsigned(0, cnt_trigout'length)) then -- synchro avec acq_trig_i
                trig_out_i <= '1';
                cnt_trigout <= to_unsigned(1, cnt_trigout'length);
             end if;
@@ -181,7 +150,7 @@ begin
 
          end if;
       end if;
-   end process TRIGOUT_PROC;
+   end process;
    
       ----------------------------------------------------------------------
    -- Machine: trig_gen_sm
@@ -204,25 +173,16 @@ begin
                   done <= '1';
                   Allow_HighTimeChange <= '1';
                   if PARAM.RUN = '1' and TRIG_IN = '1' then	
-                     trig_gen_sm <= out_delay_st;
-                     done <= '0';
-                  end if;                  
-               
-               when out_delay_st =>
-                  Cnt <= Cnt + 1;                    
-                  if PARAM.RUN = '0' then	  -- abandon
-                     trig_gen_sm <= idle;
-                  elsif Cnt >= PARAM.DLY then	
                      trig_gen_sm <= out_on_st;
+                     done <= '0';
                      raw_trig_i <= '1';
-                     Cnt <= to_unsigned(2, cnt'length);
                      Allow_HighTimeChange <= '0';                     
                      acq_window_i <= PARAM.ACQ_WINDOW; -- (synchro avec raw_trig_i)
                   end if;  
                
                when out_on_st =>
                   Cnt <= Cnt + 1;
-                  if Cnt > PARAM.HIGH_TIME  or PARAM.RUN = '0' or acq_window_change = '1' then	
+                  if Cnt > raw_acq_trig_pipe'length  or PARAM.RUN = '0' or acq_window_change = '1' then	
                      trig_gen_sm <= pause_st;
                      done <= '1';
                      raw_trig_i <= '0';

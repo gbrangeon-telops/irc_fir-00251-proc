@@ -49,7 +49,6 @@ package trig_define is
       mode          : std_logic_vector(7 downto 0);   -- mode du controleur de trig
       period	     : unsigned(31 downto 0);          -- periode du generateur local de trigs, en coup de cloks de 100 MHz       
       fpatrig_dly   : unsigned(31 downto 0);          -- delai pour le trig du FPA local,, en coup de cloks de 100 MHz      
-      trigout_dly   : unsigned(31 downto 0);          -- delai pour le trig sortant (FPA distant), en coup de cloks de 100 MHz      
       force_high    : std_logic;                      -- Trig à mettre toujours à HIGH, pour avoir frame rate max                    
       trig_activ    : std_logic_vector(7 downto 0);   -- permet de savoir comment declencher le trig.
       acq_window	  : std_logic;                      -- acq_ window à '1' permet de generer les trigs d'acquisition(image envoyées dans la chaine);-- à '0' permet de generer des extra_trigs (images non envoyées dans la chaine) 
@@ -66,7 +65,6 @@ package trig_define is
    INTTRIG,
    to_unsigned(10_000_000,s_trig_cfg.PERIOD'LENGTH), 
    (others =>'0'),
-   (others =>'0'),
    '0',
    RisingEdge,
    '0',
@@ -82,9 +80,7 @@ package trig_define is
    type trig_conditioner_type is
    record      
       run           : std_logic;    -- run
-      dly           : unsigned(s_trig_cfg.FPATRIG_DLY'LENGTH-1 downto 0);  -- delay 
-      high_time     : unsigned(s_trig_cfg.HIGH_TIME'LENGTH-1 downto 0);    -- temps durant lequel rester à on     
-      trig_activ    : std_logic_vector(7 downto 0); -- permet de savoir comment declencher le trig.
+      high_time     : unsigned(s_trig_cfg.HIGH_TIME'LENGTH-1 downto 0);    -- temps durant lequel rester à on
       acq_window	  : std_logic;    -- acq_ window à '1' permet de generer les trigs d'acquisiiotn(image envoyées dans la chaine), à '0' permet de generer des extra_trigs (images non envoyées dans la chaine)
    end record trig_conditioner_type; 
    
