@@ -52,6 +52,8 @@ architecture rtl of trig_tb_stim is
    constant PERIOD_CLK_CYCLE        : real := 50.0;
    constant TRIG_SEQ_FRAME_CNT      : integer := 5;
    
+   signal trig_hw_o : std_logic;
+   signal trig_sfw_o : std_logic;
    signal readData : std_logic_vector(31 downto 0);
 
 begin
@@ -74,13 +76,17 @@ begin
       wait;
    end process;
    
+   --! Outputs
+   TRIG_HW <= trig_hw_o;
+   TRIG_SFW <= trig_sfw_o;
+   
    --! µBlaze simulation
    MB_PROCESS : process 
    begin
       -- Reset
       if rstn_i = '0' then
-         TRIG_HW <= '0';
-         TRIG_SFW <= '0';
+         trig_hw_o <= '0';
+         trig_sfw_o <= '0';
          FPA_EXP_INFO.exp_dval <= '0';
       end if;
       
@@ -137,12 +143,12 @@ begin
       
       -- Trig
       wait until rising_edge(clk100_o);
-      TRIG_HW <= '1';
+      trig_hw_o <= '1';
       
       wait for 50 ns;
       
       wait until rising_edge(clk100_o);
-      TRIG_HW <= '0';
+      trig_hw_o <= '0';
       
       wait for (TRIG_SEQ_FRAME_CNT * integer(PERIOD_CLK_CYCLE) * clk100_per);
       
@@ -162,12 +168,12 @@ begin
       
       -- Trig
       wait until rising_edge(clk100_o);
-      TRIG_HW <= '1';
+      trig_hw_o <= '1';
       
       wait for 50 ns;
       
       wait until rising_edge(clk100_o);
-      TRIG_HW <= '0';
+      trig_hw_o <= '0';
       
       wait for (TRIG_SEQ_FRAME_CNT * integer(PERIOD_CLK_CYCLE) * clk100_per);
       
@@ -214,10 +220,10 @@ begin
       -- Trig
       SFW_TRIG_LOOP: for index in 1 to 3 loop
          wait until rising_edge(clk100_o);
-         TRIG_SFW <= '1';
+         trig_sfw_o <= '1';
          
          wait until rising_edge(clk100_o);
-         TRIG_SFW <= '0';
+         trig_sfw_o <= '0';
          
          wait for 100 ns;
       end loop SFW_TRIG_LOOP;
