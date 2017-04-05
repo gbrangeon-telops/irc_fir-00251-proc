@@ -49,12 +49,6 @@ typedef enum procBootStateEnum procBootState_t;
 IRC_Status_t ProcBoot_SM(qspiFlash_t *qspiFlash);
 
 /**
- * Progress character values definition.
- */
-#define PROC_BOOT_PROGRESS_SIZE  8
-char gProgress[PROC_BOOT_PROGRESS_SIZE] = {'|', '/', '-', '\\', '|', '/', '-', '\\'};
-
-/**
  * Vector section information
  */
 #define PROC_BOOT_VECTOR_SECTION_ADDR  0x00000000
@@ -214,7 +208,7 @@ IRC_Status_t ProcBoot_SM(qspiFlash_t *qspiFlash)
    static char lbuffer[SREC_MAX_LINE_SIZE] = "\0";
    static uint32_t lbuflen = 0;
    static uint32_t srecLineIndex = 0;
-   static uint32_t progress;
+   static uint32_t progress = 0;
    static uint8_t vectorSection[PROC_BOOT_VECTOR_SECTION_SIZE];
 
    uint8_t *p_vectorSection = (uint8_t *)PROC_BOOT_VECTOR_SECTION_ADDR;
@@ -244,7 +238,7 @@ IRC_Status_t ProcBoot_SM(qspiFlash_t *qspiFlash)
             return IRC_FAILURE;
          }
 
-         PRINTF("%c\r", gProgress[(progress++ >> 8) % PROC_BOOT_PROGRESS_SIZE]);
+         if (++progress % 128 == 0) PRINT("=");
 
          state = PBS_PARSE_SREC;
          break;
@@ -273,7 +267,7 @@ IRC_Status_t ProcBoot_SM(qspiFlash_t *qspiFlash)
                   {
                      PRINTF("%c", srecInfo.dataBytes[i]);
                   }
-                  PRINTF("\n");
+                  PRINTF(" [");
                   break;
 
                case SRECT_S1:
@@ -297,7 +291,7 @@ IRC_Status_t ProcBoot_SM(qspiFlash_t *qspiFlash)
                   {
                      p_vectorSection[i] = vectorSection[i];
                   }
-                  PRINTF("Executing program starting @ 0x%08X\n", (uint32_t)startAddr);
+                  PRINTF("]\nExecuting program starting @ 0x%08X\n", (uint32_t)startAddr);
 
                   /*
                    * Reset stack violation protection registers to their default value to make sure stack violation

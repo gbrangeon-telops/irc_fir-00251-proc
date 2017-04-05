@@ -82,6 +82,8 @@
 #define NDFilter1IsAvailableMask                0x00000200  /**< AvailabilityFlags register bit mask for NDFilter1IsAvailable field */
 #define NDFilter2IsAvailableMask                0x00000400  /**< AvailabilityFlags register bit mask for NDFilter2IsAvailable field */
 #define NDFilter3IsAvailableMask                0x00000800  /**< AvailabilityFlags register bit mask for NDFilter3IsAvailable field */
+#define ManufacturerTestImageIsAvailableMask    0x00001000  /**< AvailabilityFlags register bit mask for ManufacturerTestImageIsAvailable field */
+#define ExternalFanControlIsAvailableMask       0x00002000  /**< AvailabilityFlags register bit mask for ExternalFanControlIsAvailable field */
 
 #define AvailabilityFlagsSet(mask) BitMaskSet(gcRegsData.AvailabilityFlags, mask)  /**< Set masked bits in AvailabilityFlags register */
 #define AvailabilityFlagsClr(mask) BitMaskClr(gcRegsData.AvailabilityFlags, mask)  /**< Clear masked bits in AvailabilityFlags register */
@@ -151,10 +153,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.0.1
+// Generated from XML camera definition file version 12.1.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 0) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 1) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -266,6 +268,7 @@ struct gcRegistersDataStruct {
    uint32_t DeviceRunningTime;
    uint32_t DeviceSerialNumber;
    uint32_t DeviceSerialPortBaudRate;
+   uint32_t DeviceSerialPortFunction;
    uint32_t DeviceSerialPortSelector;
    uint32_t DeviceTemperatureSelector;
    uint32_t DeviceVoltageSelector;
@@ -286,6 +289,7 @@ struct gcRegistersDataStruct {
    uint32_t ExposureAuto;
    uint32_t ExposureMode;
    uint32_t ExposureTimeSetToMax;
+   uint32_t ExposureTimeSetToMin;
    uint32_t ExternalLensSerialNumber;
    uint32_t FValSize;
    uint32_t FWFilterNumber;
@@ -309,6 +313,11 @@ struct gcRegistersDataStruct {
    uint32_t IsActiveFlags;
    uint32_t LockedCenterImage;
    uint32_t ManualFilterSerialNumber;
+   uint32_t MemoryBufferAvailableFreeSpaceHigh;
+   uint32_t MemoryBufferAvailableFreeSpaceLow;
+   uint32_t MemoryBufferFragmentedFreeSpaceHigh;
+   uint32_t MemoryBufferFragmentedFreeSpaceLow;
+   uint32_t MemoryBufferLegacyMode;
    uint32_t MemoryBufferMOIActivation;
    uint32_t MemoryBufferMOISoftware;
    uint32_t MemoryBufferMOISource;
@@ -316,17 +325,30 @@ struct gcRegistersDataStruct {
    uint32_t MemoryBufferNumberOfImagesMax;
    uint32_t MemoryBufferNumberOfSequences;
    uint32_t MemoryBufferNumberOfSequencesMax;
+   uint32_t MemoryBufferSequenceClear;
    uint32_t MemoryBufferSequenceClearAll;
    uint32_t MemoryBufferSequenceCount;
+   uint32_t MemoryBufferSequenceDefrag;
+   uint32_t MemoryBufferSequenceDownloadFrameCount;
+   uint32_t MemoryBufferSequenceDownloadFrameID;
    uint32_t MemoryBufferSequenceDownloadImageFrameID;
    uint32_t MemoryBufferSequenceDownloadMode;
    uint32_t MemoryBufferSequenceFirstFrameID;
+   uint32_t MemoryBufferSequenceHeight;
    uint32_t MemoryBufferSequenceMOIFrameID;
+   uint32_t MemoryBufferSequenceOffsetX;
+   uint32_t MemoryBufferSequenceOffsetY;
    uint32_t MemoryBufferSequencePreMOISize;
    uint32_t MemoryBufferSequenceRecordedSize;
    uint32_t MemoryBufferSequenceSelector;
    uint32_t MemoryBufferSequenceSize;
+   uint32_t MemoryBufferSequenceSizeInc;
    uint32_t MemoryBufferSequenceSizeMax;
+   uint32_t MemoryBufferSequenceSizeMin;
+   uint32_t MemoryBufferSequenceWidth;
+   uint32_t MemoryBufferStatus;
+   uint32_t MemoryBufferTotalSpaceHigh;
+   uint32_t MemoryBufferTotalSpaceLow;
    uint32_t NDFilterArmedPositionSetpoint;
    uint32_t NDFilterNumber;
    uint32_t NDFilterPosition;
@@ -404,8 +426,11 @@ extern float DeviceVoltageAry[DeviceVoltageAryLen];
 #define DeviceCurrentAryLen 2
 extern float DeviceCurrentAry[DeviceCurrentAryLen];
 
-#define DeviceSerialPortBaudRateAryLen 4
+#define DeviceSerialPortBaudRateAryLen 3
 extern uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen];
+
+#define DeviceSerialPortFunctionAryLen 3
+extern uint32_t DeviceSerialPortFunctionAry[DeviceSerialPortFunctionAryLen];
 
 #define EventNotificationAryLen 33
 extern uint32_t EventNotificationAry[EventNotificationAryLen];
@@ -438,11 +463,16 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetAcquisitionArm(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionArmIdx], val)
 #define GC_SetAcquisitionFrameRate(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateIdx], val)
 #define GC_SetAcquisitionFrameRateMode(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionFrameRateModeIdx], val)
+#define GC_SetOffsetX(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetXIdx], val)
+#define GC_SetOffsetY(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetYIdx], val)
 #define GC_SetReverseX(val) GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], val)
 #define GC_SetReverseY(val) GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], val)
 #define GC_SetTriggerSelector(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerSelectorIdx], val)
 #define GC_SetTriggerMode(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerModeIdx], val)
 #define GC_SetMemoryBufferMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferModeIdx], val)
+#define GC_SetMemoryBufferLegacyMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferLegacyModeIdx], val)
+#define GC_SetMemoryBufferStatus(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferStatusIdx], val)
+#define GC_SetMemoryBufferMOISource(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferMOISourceIdx], val)
 #define GC_SetMemoryBufferSequenceCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceCountIdx], val)
 #define GC_SetMemoryBufferSequenceDownloadMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], val)
 #define GC_SetSensorWidth(val) GC_RegisterWriteUI32(&gcRegsDef[SensorWidthIdx], val)
@@ -538,5 +568,6 @@ void GC_SetFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPos
 void GC_SetNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDFPositionSetpoint);
 uint32_t GC_GetTimestamp();
 void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len);
+void GC_SetExposureTimeRegisters(float exposureTime);
 
 #endif // GC_REGISTERS_H

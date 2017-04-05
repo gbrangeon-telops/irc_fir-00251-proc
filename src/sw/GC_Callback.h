@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.0.1
+// Generated from XML camera definition file version 12.1.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -96,6 +96,7 @@ void GC_DeviceResetCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceRunningTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceSerialPortBaudRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_DeviceSerialPortFunctionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceSerialPortSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceTemperatureCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceTemperatureSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -139,6 +140,7 @@ void GC_ExposureTime8Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 void GC_ExposureTimeMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExposureTimeMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExposureTimeSetToMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ExposureTimeSetToMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExternalBlackBodyTemperatureCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExternalFanSpeedCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExternalFanSpeedSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -172,6 +174,11 @@ void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
 void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_LockedCenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ManualFilterSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferAvailableFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferAvailableFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferFragmentedFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferFragmentedFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferLegacyModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferMOIActivationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferMOISoftwareCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferMOISourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -179,18 +186,31 @@ void GC_MemoryBufferModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
 void GC_MemoryBufferNumberOfImagesMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferNumberOfSequencesMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceClearCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceClearAllCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceDefragCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadBitRateMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceDownloadFrameCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceDownloadFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadImageFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceFirstFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceHeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceOffsetXCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceOffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequencePreMOISizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceSizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceSizeIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceSizeMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceWidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferStatusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferTotalSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferTotalSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_NDFilterArmedPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_NDFilterNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_NDFilterPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

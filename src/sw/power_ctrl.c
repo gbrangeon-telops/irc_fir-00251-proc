@@ -52,25 +52,25 @@ IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t gpioIntrI
    }
 
    XGpio_InterruptEnable(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT);
-	XGpio_InterruptGlobalEnable(&gPowerCtrl.GPIO);
+   XGpio_InterruptGlobalEnable(&gPowerCtrl.GPIO);
 
-	status = XIntc_Connect(p_intc, gpioIntrId, (XInterruptHandler)Power_IntrHandler, &gPowerCtrl);
+   status = XIntc_Connect(p_intc, gpioIntrId, (XInterruptHandler)Power_IntrHandler, &gPowerCtrl);
    if (status != XST_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-	// Set power management GPIO direction (0 for output, 1 for input)
-	XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, 0x00000400);
+   // Set power management GPIO direction (0 for output, 1 for input)
+   XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, 0x00000400);
 
-	// Set power management GPIO initial value
+   // Set power management GPIO initial value
    XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, POWER_BUFFER_MASK);
 
    // Set direction for XADC mux address GPIO (0 for output, 1 for input)
-	XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, 0x00000000);
+   XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, 0x00000000);
 
-	// Set XADC mux address initial value
-	XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, 0x00000000);
+   // Set XADC mux address initial value
+   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, 0x00000000);
 
    return IRC_SUCCESS;
 }
@@ -178,7 +178,7 @@ channelPowerState_t Power_SetChannelPowerState(powerChannel_t channel, channelPo
  */
 void Power_SetMuxAddr(uint32_t muxAddr)
 {
-	XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, muxAddr);
+   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, muxAddr);
 }
 
 /**
@@ -409,6 +409,7 @@ void Power_SM()
                      {
                         gcRegsData.TestImageSelector = gcRegsDataFactory.TestImageSelector;
                      }
+                     AvailabilityFlagsClr(ManufacturerTestImageIsAvailableMask);
                      TDCStatusClr(WaitingForPowerMask);
                      PM_INF("Device power state is Standby");
 
@@ -444,6 +445,10 @@ void Power_SM()
                   case DPS_PowerOn:
                      gcRegsData.DevicePowerState = DPS_PowerOn;
                      gcRegsData.TestImageSelector = TIS_Off;
+                     if (gGC_ProprietaryFeatureKeyIsValid == 1)
+                     {
+                        AvailabilityFlagsSet(ManufacturerTestImageIsAvailableMask);
+                     }
                      TDCStatusClr(WaitingForPowerMask);
                      PM_INF("Device power state is On");
 

@@ -43,7 +43,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.0.1
+// Generated from XML camera definition file version 12.1.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -154,6 +154,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* DeviceRunningTime = */ 0,
    /* DeviceSerialNumber = */ 0,
    /* DeviceSerialPortBaudRate = */ 0,
+   /* DeviceSerialPortFunction = */ 0,
    /* DeviceSerialPortSelector = */ DSPS_CameraLink,
    /* DeviceTemperatureSelector = */ DTS_Sensor,
    /* DeviceVoltageSelector = */ DVS_ProcessingFPGA_VCCINT,
@@ -174,6 +175,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ExposureAuto = */ EA_Continuous,
    /* ExposureMode = */ EM_Timed,
    /* ExposureTimeSetToMax = */ 0,
+   /* ExposureTimeSetToMin = */ 0,
    /* ExternalLensSerialNumber = */ 0,
    /* FValSize = */ 0,
    /* FWFilterNumber = */ 0,
@@ -197,6 +199,11 @@ gcRegistersData_t gcRegsDataFactory = {
    /* IsActiveFlags = */ 0,
    /* LockedCenterImage = */ FPA_FORCE_CENTER,
    /* ManualFilterSerialNumber = */ 0,
+   /* MemoryBufferAvailableFreeSpaceHigh = */ 0,
+   /* MemoryBufferAvailableFreeSpaceLow = */ 0,
+   /* MemoryBufferFragmentedFreeSpaceHigh = */ 0,
+   /* MemoryBufferFragmentedFreeSpaceLow = */ 0,
+   /* MemoryBufferLegacyMode = */ MBLM_On,
    /* MemoryBufferMOIActivation = */ MBMOIA_RisingEdge,
    /* MemoryBufferMOISoftware = */ 0,
    /* MemoryBufferMOISource = */ MBMOIS_AcquisitionStarted,
@@ -204,17 +211,30 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferNumberOfImagesMax = */ 0,
    /* MemoryBufferNumberOfSequences = */ 1,
    /* MemoryBufferNumberOfSequencesMax = */ 0,
+   /* MemoryBufferSequenceClear = */ 0,
    /* MemoryBufferSequenceClearAll = */ 0,
    /* MemoryBufferSequenceCount = */ 0,
+   /* MemoryBufferSequenceDefrag = */ 0,
+   /* MemoryBufferSequenceDownloadFrameCount = */ 0,
+   /* MemoryBufferSequenceDownloadFrameID = */ 0,
    /* MemoryBufferSequenceDownloadImageFrameID = */ 0,
    /* MemoryBufferSequenceDownloadMode = */ MBSDM_Off,
    /* MemoryBufferSequenceFirstFrameID = */ 0,
+   /* MemoryBufferSequenceHeight = */ 0,
    /* MemoryBufferSequenceMOIFrameID = */ 0,
+   /* MemoryBufferSequenceOffsetX = */ 0,
+   /* MemoryBufferSequenceOffsetY = */ 0,
    /* MemoryBufferSequencePreMOISize = */ 0,
    /* MemoryBufferSequenceRecordedSize = */ 0,
    /* MemoryBufferSequenceSelector = */ 0,
    /* MemoryBufferSequenceSize = */ 2,
+   /* MemoryBufferSequenceSizeInc = */ 0,
    /* MemoryBufferSequenceSizeMax = */ 0,
+   /* MemoryBufferSequenceSizeMin = */ 0,
+   /* MemoryBufferSequenceWidth = */ 0,
+   /* MemoryBufferStatus = */ MEMORY_BUFFER_STATUS_INIT,
+   /* MemoryBufferTotalSpaceHigh = */ 0,
+   /* MemoryBufferTotalSpaceLow = */ 0,
    /* NDFilterArmedPositionSetpoint = */ NDFAPS_NDFilter1,
    /* NDFilterNumber = */ 0,
    /* NDFilterPosition = */ NDFP_NDFilterNotImplemented,
@@ -296,7 +316,12 @@ float DeviceCurrentAry[DeviceCurrentAryLen] = {0.0F, 0.0F};
 /**
  * DeviceSerialPortBaudRate data array
  */
-uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen] = {DSPBR_Baud115200 , 0, DSPBR_Baud115200, DSPBR_Baud115200};
+uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen] = {DSPBR_Baud115200, DSPBR_Baud115200, DSPBR_Baud115200};
+
+/**
+ * DeviceSerialPortFunction data array
+ */
+uint32_t DeviceSerialPortFunctionAry[DeviceSerialPortFunctionAryLen] = {DSPF_Control, DSPF_Control, DSPF_Terminal};
 
 /**
  * EventNotification data array
@@ -439,6 +464,7 @@ void GC_Registers_Init()
    gcRegsDef[DeviceRunningTimeIdx].p_data = &gcRegsData.DeviceRunningTime;
    gcRegsDef[DeviceSerialNumberIdx].p_data = &gcRegsData.DeviceSerialNumber;
    gcRegsDef[DeviceSerialPortBaudRateIdx].p_data = &gcRegsData.DeviceSerialPortBaudRate;
+   gcRegsDef[DeviceSerialPortFunctionIdx].p_data = &gcRegsData.DeviceSerialPortFunction;
    gcRegsDef[DeviceSerialPortSelectorIdx].p_data = &gcRegsData.DeviceSerialPortSelector;
    gcRegsDef[DeviceTemperatureSelectorIdx].p_data = &gcRegsData.DeviceTemperatureSelector;
    gcRegsDef[DeviceVoltageSelectorIdx].p_data = &gcRegsData.DeviceVoltageSelector;
@@ -459,6 +485,7 @@ void GC_Registers_Init()
    gcRegsDef[ExposureAutoIdx].p_data = &gcRegsData.ExposureAuto;
    gcRegsDef[ExposureModeIdx].p_data = &gcRegsData.ExposureMode;
    gcRegsDef[ExposureTimeSetToMaxIdx].p_data = &gcRegsData.ExposureTimeSetToMax;
+   gcRegsDef[ExposureTimeSetToMinIdx].p_data = &gcRegsData.ExposureTimeSetToMin;
    gcRegsDef[ExternalLensSerialNumberIdx].p_data = &gcRegsData.ExternalLensSerialNumber;
    gcRegsDef[FValSizeIdx].p_data = &gcRegsData.FValSize;
    gcRegsDef[FWFilterNumberIdx].p_data = &gcRegsData.FWFilterNumber;
@@ -482,6 +509,11 @@ void GC_Registers_Init()
    gcRegsDef[IsActiveFlagsIdx].p_data = &gcRegsData.IsActiveFlags;
    gcRegsDef[LockedCenterImageIdx].p_data = &gcRegsData.LockedCenterImage;
    gcRegsDef[ManualFilterSerialNumberIdx].p_data = &gcRegsData.ManualFilterSerialNumber;
+   gcRegsDef[MemoryBufferAvailableFreeSpaceHighIdx].p_data = &gcRegsData.MemoryBufferAvailableFreeSpaceHigh;
+   gcRegsDef[MemoryBufferAvailableFreeSpaceLowIdx].p_data = &gcRegsData.MemoryBufferAvailableFreeSpaceLow;
+   gcRegsDef[MemoryBufferFragmentedFreeSpaceHighIdx].p_data = &gcRegsData.MemoryBufferFragmentedFreeSpaceHigh;
+   gcRegsDef[MemoryBufferFragmentedFreeSpaceLowIdx].p_data = &gcRegsData.MemoryBufferFragmentedFreeSpaceLow;
+   gcRegsDef[MemoryBufferLegacyModeIdx].p_data = &gcRegsData.MemoryBufferLegacyMode;
    gcRegsDef[MemoryBufferMOIActivationIdx].p_data = &gcRegsData.MemoryBufferMOIActivation;
    gcRegsDef[MemoryBufferMOISoftwareIdx].p_data = &gcRegsData.MemoryBufferMOISoftware;
    gcRegsDef[MemoryBufferMOISourceIdx].p_data = &gcRegsData.MemoryBufferMOISource;
@@ -489,17 +521,30 @@ void GC_Registers_Init()
    gcRegsDef[MemoryBufferNumberOfImagesMaxIdx].p_data = &gcRegsData.MemoryBufferNumberOfImagesMax;
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequences;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequencesMax;
+   gcRegsDef[MemoryBufferSequenceClearIdx].p_data = &gcRegsData.MemoryBufferSequenceClear;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].p_data = &gcRegsData.MemoryBufferSequenceClearAll;
    gcRegsDef[MemoryBufferSequenceCountIdx].p_data = &gcRegsData.MemoryBufferSequenceCount;
+   gcRegsDef[MemoryBufferSequenceDefragIdx].p_data = &gcRegsData.MemoryBufferSequenceDefrag;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadFrameCount;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadFrameID;
    gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadImageFrameID;
    gcRegsDef[MemoryBufferSequenceDownloadModeIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadMode;
    gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceFirstFrameID;
+   gcRegsDef[MemoryBufferSequenceHeightIdx].p_data = &gcRegsData.MemoryBufferSequenceHeight;
    gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceMOIFrameID;
+   gcRegsDef[MemoryBufferSequenceOffsetXIdx].p_data = &gcRegsData.MemoryBufferSequenceOffsetX;
+   gcRegsDef[MemoryBufferSequenceOffsetYIdx].p_data = &gcRegsData.MemoryBufferSequenceOffsetY;
    gcRegsDef[MemoryBufferSequencePreMOISizeIdx].p_data = &gcRegsData.MemoryBufferSequencePreMOISize;
    gcRegsDef[MemoryBufferSequenceRecordedSizeIdx].p_data = &gcRegsData.MemoryBufferSequenceRecordedSize;
    gcRegsDef[MemoryBufferSequenceSelectorIdx].p_data = &gcRegsData.MemoryBufferSequenceSelector;
    gcRegsDef[MemoryBufferSequenceSizeIdx].p_data = &gcRegsData.MemoryBufferSequenceSize;
+   gcRegsDef[MemoryBufferSequenceSizeIncIdx].p_data = &gcRegsData.MemoryBufferSequenceSizeInc;
    gcRegsDef[MemoryBufferSequenceSizeMaxIdx].p_data = &gcRegsData.MemoryBufferSequenceSizeMax;
+   gcRegsDef[MemoryBufferSequenceSizeMinIdx].p_data = &gcRegsData.MemoryBufferSequenceSizeMin;
+   gcRegsDef[MemoryBufferSequenceWidthIdx].p_data = &gcRegsData.MemoryBufferSequenceWidth;
+   gcRegsDef[MemoryBufferStatusIdx].p_data = &gcRegsData.MemoryBufferStatus;
+   gcRegsDef[MemoryBufferTotalSpaceHighIdx].p_data = &gcRegsData.MemoryBufferTotalSpaceHigh;
+   gcRegsDef[MemoryBufferTotalSpaceLowIdx].p_data = &gcRegsData.MemoryBufferTotalSpaceLow;
    gcRegsDef[NDFilterArmedPositionSetpointIdx].p_data = &gcRegsData.NDFilterArmedPositionSetpoint;
    gcRegsDef[NDFilterNumberIdx].p_data = &gcRegsData.NDFilterNumber;
    gcRegsDef[NDFilterPositionIdx].p_data = &gcRegsData.NDFilterPosition;
@@ -586,6 +631,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[ExposureTime6Idx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime7Idx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime8Idx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTimeSetToMinIdx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTimeSetToMaxIdx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], GC_AcquisitionFrameRateIsLocked);
@@ -636,6 +682,8 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[MemoryBufferMOIActivationIdx], (GC_MemoryBufferNotEmpty || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx], GC_AcquisitionStarted);
+   SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx], GC_AcquisitionStarted);
+   SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx], (GC_AcquisitionStarted && (gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off)));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceClearAllIdx], GC_AcquisitionStarted);
@@ -645,6 +693,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[DeviceRegistersStreamingEndIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[DeviceSerialPortSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[DeviceSerialPortBaudRateIdx], GC_AcquisitionStarted);
+   SetRegLocked(&gcRegsDef[DeviceSerialPortFunctionIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EventSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EventNotificationIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[DeviceRegistersCheckIdx], GC_AcquisitionStarted);
@@ -1163,7 +1212,12 @@ void GC_UnlockCamera()
    // Unlock features
    AvailabilityFlagsSet(CalibrationIsAvailableMask);
    AvailabilityFlagsSet(Raw0IsAvailableMask);
+   AvailabilityFlagsSet(ExternalFanControlIsAvailableMask);
    TDCFlagsSet(FWAsynchronouslyRotatingModeIsImplementedMask);
+   if (gcRegsData.DevicePowerState == DPS_PowerOn)
+   {
+      AvailabilityFlagsSet(ManufacturerTestImageIsAvailableMask);
+   }
 }
 
 void GC_SetMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)
@@ -1171,21 +1225,39 @@ void GC_SetMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)
    gcRegsDef[DeviceBuiltInTestsResults7Idx].owner = regOwner;
    gcRegsDef[DeviceBuiltInTestsResults8Idx].owner = regOwner;
    gcRegsDef[MemoryBufferModeIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferLegacyModeIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferStatusIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferAvailableFreeSpaceHighIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferAvailableFreeSpaceLowIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferFragmentedFreeSpaceHighIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferFragmentedFreeSpaceLowIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferTotalSpaceHighIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferTotalSpaceLowIdx].owner = regOwner;
    gcRegsDef[MemoryBufferNumberOfImagesMaxIdx].owner = regOwner;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].owner = regOwner;
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].owner = regOwner;
-   gcRegsDef[MemoryBufferSequenceSizeMaxIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceSizeIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceSizeMinIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceSizeMaxIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceSizeIncIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequencePreMOISizeIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceCountIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceSelectorIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceOffsetXIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceOffsetYIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceWidthIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceHeightIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceRecordedSizeIdx].owner = regOwner;
-   gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceDownloadModeIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceClearIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceDefragIdx].owner = regOwner;
 }
 
 /**
@@ -1261,4 +1333,43 @@ void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len)
    // Copy data in the referenced registers
    for (idx = 0; idx < len; idx++)
       *pGcRegsDataExposureTimeX[idx] = p_src[idx];
+}
+
+
+/**
+ * Set exposure time register(s) depending on activated features.
+ *
+ * @param exposureTime is the exposure time value.
+ */
+void GC_SetExposureTimeRegisters(float exposureTime)
+{
+   uint32_t expIdx;
+
+   if (EHDRIIsActive)
+   {
+      for (expIdx = 0; expIdx < EHDRI_IDX_NBR; expIdx++)
+      {
+         EHDRIExposureTime[expIdx] = exposureTime;
+         *pGcRegsDataExposureTimeX[expIdx] = EHDRIExposureTime[expIdx];
+      }
+
+      GC_UpdateParameterLimits();
+   }
+   else if (FWSynchronoulyRotatingModeIsActive)
+   {
+      for (expIdx = 0; expIdx < MAX_NUM_FILTER; expIdx++)
+      {
+         FWExposureTime[expIdx] = exposureTime;
+         *pGcRegsDataExposureTimeX[expIdx] = FWExposureTime[expIdx];
+         SFW_SetExposureTimeArray(expIdx, FWExposureTime[expIdx]);
+      }
+
+      SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+      GC_UpdateParameterLimits();
+      SFW_LimitParameter(&gcRegsData);
+   }
+   else
+   {
+      GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], exposureTime);
+   }
 }

@@ -65,7 +65,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.0.1
+// Generated from XML camera definition file version 12.1.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -144,6 +144,7 @@ void GC_Callback_Init()
    gcRegsDef[DeviceRunningTimeIdx].callback =                           &GC_DeviceRunningTimeCallback;
    gcRegsDef[DeviceSerialNumberIdx].callback =                          &GC_DeviceSerialNumberCallback;
    gcRegsDef[DeviceSerialPortBaudRateIdx].callback =                    &GC_DeviceSerialPortBaudRateCallback;
+   gcRegsDef[DeviceSerialPortFunctionIdx].callback =                    &GC_DeviceSerialPortFunctionCallback;
    gcRegsDef[DeviceSerialPortSelectorIdx].callback =                    &GC_DeviceSerialPortSelectorCallback;
    gcRegsDef[DeviceTemperatureIdx].callback =                           &GC_DeviceTemperatureCallback;
    gcRegsDef[DeviceTemperatureSelectorIdx].callback =                   &GC_DeviceTemperatureSelectorCallback;
@@ -187,6 +188,7 @@ void GC_Callback_Init()
    gcRegsDef[ExposureTimeMaxIdx].callback =                             &GC_ExposureTimeMaxCallback;
    gcRegsDef[ExposureTimeMinIdx].callback =                             &GC_ExposureTimeMinCallback;
    gcRegsDef[ExposureTimeSetToMaxIdx].callback =                        &GC_ExposureTimeSetToMaxCallback;
+   gcRegsDef[ExposureTimeSetToMinIdx].callback =                        &GC_ExposureTimeSetToMinCallback;
    gcRegsDef[ExternalBlackBodyTemperatureIdx].callback =                &GC_ExternalBlackBodyTemperatureCallback;
    gcRegsDef[ExternalFanSpeedIdx].callback =                            &GC_ExternalFanSpeedCallback;
    gcRegsDef[ExternalFanSpeedSetpointIdx].callback =                    &GC_ExternalFanSpeedSetpointCallback;
@@ -220,6 +222,11 @@ void GC_Callback_Init()
    gcRegsDef[IsActiveFlagsIdx].callback =                               &GC_IsActiveFlagsCallback;
    gcRegsDef[LockedCenterImageIdx].callback =                           &GC_LockedCenterImageCallback;
    gcRegsDef[ManualFilterSerialNumberIdx].callback =                    &GC_ManualFilterSerialNumberCallback;
+   gcRegsDef[MemoryBufferAvailableFreeSpaceHighIdx].callback =          &GC_MemoryBufferAvailableFreeSpaceHighCallback;
+   gcRegsDef[MemoryBufferAvailableFreeSpaceLowIdx].callback =           &GC_MemoryBufferAvailableFreeSpaceLowCallback;
+   gcRegsDef[MemoryBufferFragmentedFreeSpaceHighIdx].callback =         &GC_MemoryBufferFragmentedFreeSpaceHighCallback;
+   gcRegsDef[MemoryBufferFragmentedFreeSpaceLowIdx].callback =          &GC_MemoryBufferFragmentedFreeSpaceLowCallback;
+   gcRegsDef[MemoryBufferLegacyModeIdx].callback =                      &GC_MemoryBufferLegacyModeCallback;
    gcRegsDef[MemoryBufferMOIActivationIdx].callback =                   &GC_MemoryBufferMOIActivationCallback;
    gcRegsDef[MemoryBufferMOISoftwareIdx].callback =                     &GC_MemoryBufferMOISoftwareCallback;
    gcRegsDef[MemoryBufferMOISourceIdx].callback =                       &GC_MemoryBufferMOISourceCallback;
@@ -227,18 +234,31 @@ void GC_Callback_Init()
    gcRegsDef[MemoryBufferNumberOfImagesMaxIdx].callback =               &GC_MemoryBufferNumberOfImagesMaxCallback;
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].callback =               &GC_MemoryBufferNumberOfSequencesCallback;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].callback =            &GC_MemoryBufferNumberOfSequencesMaxCallback;
+   gcRegsDef[MemoryBufferSequenceClearIdx].callback =                   &GC_MemoryBufferSequenceClearCallback;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].callback =                &GC_MemoryBufferSequenceClearAllCallback;
    gcRegsDef[MemoryBufferSequenceCountIdx].callback =                   &GC_MemoryBufferSequenceCountCallback;
+   gcRegsDef[MemoryBufferSequenceDefragIdx].callback =                  &GC_MemoryBufferSequenceDefragCallback;
    gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx].callback =      &GC_MemoryBufferSequenceDownloadBitRateMaxCallback;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx].callback =      &GC_MemoryBufferSequenceDownloadFrameCountCallback;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx].callback =         &GC_MemoryBufferSequenceDownloadFrameIDCallback;
    gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx].callback =    &GC_MemoryBufferSequenceDownloadImageFrameIDCallback;
    gcRegsDef[MemoryBufferSequenceDownloadModeIdx].callback =            &GC_MemoryBufferSequenceDownloadModeCallback;
    gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx].callback =            &GC_MemoryBufferSequenceFirstFrameIDCallback;
+   gcRegsDef[MemoryBufferSequenceHeightIdx].callback =                  &GC_MemoryBufferSequenceHeightCallback;
    gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx].callback =              &GC_MemoryBufferSequenceMOIFrameIDCallback;
+   gcRegsDef[MemoryBufferSequenceOffsetXIdx].callback =                 &GC_MemoryBufferSequenceOffsetXCallback;
+   gcRegsDef[MemoryBufferSequenceOffsetYIdx].callback =                 &GC_MemoryBufferSequenceOffsetYCallback;
    gcRegsDef[MemoryBufferSequencePreMOISizeIdx].callback =              &GC_MemoryBufferSequencePreMOISizeCallback;
    gcRegsDef[MemoryBufferSequenceRecordedSizeIdx].callback =            &GC_MemoryBufferSequenceRecordedSizeCallback;
    gcRegsDef[MemoryBufferSequenceSelectorIdx].callback =                &GC_MemoryBufferSequenceSelectorCallback;
    gcRegsDef[MemoryBufferSequenceSizeIdx].callback =                    &GC_MemoryBufferSequenceSizeCallback;
+   gcRegsDef[MemoryBufferSequenceSizeIncIdx].callback =                 &GC_MemoryBufferSequenceSizeIncCallback;
    gcRegsDef[MemoryBufferSequenceSizeMaxIdx].callback =                 &GC_MemoryBufferSequenceSizeMaxCallback;
+   gcRegsDef[MemoryBufferSequenceSizeMinIdx].callback =                 &GC_MemoryBufferSequenceSizeMinCallback;
+   gcRegsDef[MemoryBufferSequenceWidthIdx].callback =                   &GC_MemoryBufferSequenceWidthCallback;
+   gcRegsDef[MemoryBufferStatusIdx].callback =                          &GC_MemoryBufferStatusCallback;
+   gcRegsDef[MemoryBufferTotalSpaceHighIdx].callback =                  &GC_MemoryBufferTotalSpaceHighCallback;
+   gcRegsDef[MemoryBufferTotalSpaceLowIdx].callback =                   &GC_MemoryBufferTotalSpaceLowCallback;
    gcRegsDef[NDFilterArmedPositionSetpointIdx].callback =               &GC_NDFilterArmedPositionSetpointCallback;
    gcRegsDef[NDFilterNumberIdx].callback =                              &GC_NDFilterNumberCallback;
    gcRegsDef[NDFilterPositionIdx].callback =                            &GC_NDFilterPositionCallback;
@@ -299,7 +319,7 @@ void GC_AECImageFractionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-	   AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
+      AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       HDER_UpdateAECHeader(&gHderInserter, &gcRegsData);
    }
 }
@@ -1460,6 +1480,35 @@ void GC_DeviceSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
  */
 void GC_DeviceSerialPortBaudRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+      gcRegsData.DeviceSerialPortBaudRate = DeviceSerialPortBaudRateAry[gcRegsData.DeviceSerialPortSelector];
+   }
+}
+
+/**
+ * DeviceSerialPortFunction GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_DeviceSerialPortFunctionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+      gcRegsData.DeviceSerialPortFunction = DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector];
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      // TODO
+      // DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] = gcRegsData.DeviceSerialPortFunction;
+      // Update serial port baud rate using DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] value.
+   }
 }
 
 /**
@@ -1946,7 +1995,7 @@ void GC_ExposureTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      if(gcRegsData.FWMode != FWM_SynchronouslyRotating)
+      if (!FWSynchronoulyRotatingModeIsActive && !EHDRIIsActive)
       {
          // Update ExposureTime and FrameRate limits
          GC_UpdateParameterLimits();
@@ -1979,6 +2028,7 @@ void GC_ExposureTime1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       if (EHDRIIsActive)
       {
          EHDRIExposureTime[0] = gcRegsData.ExposureTime1;
+         GC_UpdateParameterLimits();
       }
       else if (FWSynchronoulyRotatingModeIsActive)
       {
@@ -2008,10 +2058,11 @@ void GC_ExposureTime2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       if (EHDRIIsActive)
       {
          EHDRIExposureTime[1] = gcRegsData.ExposureTime2;
+         GC_UpdateParameterLimits();
       }
       else if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[1] = gcRegsData.ExposureTime2;
+         FWExposureTime[1] = gcRegsData.ExposureTime2;
          SFW_SetExposureTimeArray(1, FWExposureTime[1]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2037,10 +2088,11 @@ void GC_ExposureTime3Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       if (EHDRIIsActive)
       {
          EHDRIExposureTime[2] = gcRegsData.ExposureTime3;
+         GC_UpdateParameterLimits();
       }
       else if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[2] = gcRegsData.ExposureTime3;
+         FWExposureTime[2] = gcRegsData.ExposureTime3;
          SFW_SetExposureTimeArray(2, FWExposureTime[2]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2066,10 +2118,11 @@ void GC_ExposureTime4Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       if (EHDRIIsActive)
       {
          EHDRIExposureTime[3] = gcRegsData.ExposureTime4;
+         GC_UpdateParameterLimits();
       }
       else if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[3] = gcRegsData.ExposureTime4;
+         FWExposureTime[3] = gcRegsData.ExposureTime4;
          SFW_SetExposureTimeArray(3, FWExposureTime[3]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2094,7 +2147,7 @@ void GC_ExposureTime5Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 
       if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[4] = gcRegsData.ExposureTime5;
+         FWExposureTime[4] = gcRegsData.ExposureTime5;
          SFW_SetExposureTimeArray(4, FWExposureTime[4]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2119,7 +2172,7 @@ void GC_ExposureTime6Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 
       if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[5] = gcRegsData.ExposureTime6;
+         FWExposureTime[5] = gcRegsData.ExposureTime6;
          SFW_SetExposureTimeArray(5, FWExposureTime[5]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2144,7 +2197,7 @@ void GC_ExposureTime7Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 
       if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[6] = gcRegsData.ExposureTime7;
+         FWExposureTime[6] = gcRegsData.ExposureTime7;
          SFW_SetExposureTimeArray(6, FWExposureTime[6]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2169,7 +2222,7 @@ void GC_ExposureTime8Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 
       if (FWSynchronoulyRotatingModeIsActive)
       {
-     	   FWExposureTime[7] = gcRegsData.ExposureTime8;
+         FWExposureTime[7] = gcRegsData.ExposureTime8;
          SFW_SetExposureTimeArray(7, FWExposureTime[7]);
 
          SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
@@ -2217,7 +2270,28 @@ void GC_ExposureTimeSetToMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
       {
          gcRegsData.ExposureTimeSetToMax = 0;
 
-         GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], gcRegsData.ExposureTimeMax);
+         GC_SetExposureTimeRegisters(gcRegsData.ExposureTimeMax);
+      }
+   }
+}
+
+/**
+ * ExposureTimeSetToMin GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_ExposureTimeSetToMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      if(gcRegsData.ExposureTimeSetToMin == 1)
+      {
+         gcRegsData.ExposureTimeSetToMin = 0;
+
+         GC_SetExposureTimeRegisters(gcRegsData.ExposureTimeMin);
       }
    }
 }
@@ -2590,9 +2664,9 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       SFW_LimitParameter(&gcRegsData);
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
-		AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
+      AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
 
-		// Update Memory Buffer params
+      // Update Memory Buffer params
       GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
    }
 }
@@ -2642,7 +2716,7 @@ void GC_ICUPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-	   ICU_getCurrentState(&gcRegsData, &gICU_ctrl);
+      ICU_getCurrentState(&gcRegsData, &gICU_ctrl);
    }
 }
 
@@ -2734,6 +2808,86 @@ void GC_ManualFilterSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAcce
 }
 
 /**
+ * MemoryBufferAvailableFreeSpaceHigh GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferAvailableFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferAvailableFreeSpaceLow GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferAvailableFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferFragmentedFreeSpaceHigh GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferFragmentedFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferFragmentedFreeSpaceLow GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferFragmentedFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferLegacyMode GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferLegacyModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
  * MemoryBufferMOIActivation GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -2797,43 +2951,43 @@ void GC_MemoryBufferModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-     BufferManager_SetMoiConfig(&gBufManager);
-	  if(gcRegsData.MemoryBufferMode == MBM_Off)
-	  {
-		  if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
-		  {
-		     BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_LIVE);
-		  }
-		  else
-		  {
-           BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
-           BufferManager_SetBufferMode(&gBufManager, BM_OFF,  &gcRegsData);
-		  }
-	  }
-	  else if(gcRegsData.MemoryBufferMode == MBM_On && gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off)
-	  {
-		  if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
-        {
-           BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_LIVE);
-        }
-        else
-        {
-           BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
-           BufferManager_SetBufferMode(&gBufManager, BM_WRITE,  &gcRegsData);
-        }
-	  }
-	  else
-	  {
-	     if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
-        {
-           BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_PLAYBACK);
-        }
-        else
-        {
-           BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_PLAYBACK);
-           BufferManager_SetBufferMode(&gBufManager, BM_READ,  &gcRegsData);
-        }
-	  }
+      BufferManager_SetMoiConfig(&gBufManager);
+      if(gcRegsData.MemoryBufferMode == MBM_Off)
+      {
+         if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
+         {
+            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_LIVE);
+         }
+         else
+         {
+            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
+            BufferManager_SetBufferMode(&gBufManager, BM_OFF,  &gcRegsData);
+         }
+      }
+      else if(gcRegsData.MemoryBufferMode == MBM_On && gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off)
+      {
+         if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
+         {
+            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_LIVE);
+         }
+         else
+         {
+            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
+            BufferManager_SetBufferMode(&gBufManager, BM_WRITE,  &gcRegsData);
+         }
+      }
+      else
+      {
+         if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
+         {
+            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_PLAYBACK);
+         }
+         else
+         {
+            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_PLAYBACK);
+            BufferManager_SetBufferMode(&gBufManager, BM_READ,  &gcRegsData);
+         }
+      }
 
    }
 }
@@ -2850,7 +3004,7 @@ void GC_MemoryBufferNumberOfImagesMaxCallback(gcCallbackPhase_t phase, gcCallbac
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-	   gcRegsData.MemoryBufferNumberOfImagesMax = BufferManager_GetNbImageMax(&gBufManager, &gcRegsData);
+      gcRegsData.MemoryBufferNumberOfImagesMax = BufferManager_GetNbImageMax(&gBufManager, &gcRegsData);
    }
 }
 
@@ -2868,7 +3022,7 @@ void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbac
       // After write
       //Limit Number of image
       GC_UpdateMemoryBufferNumberOfSequenceLimits();
-	   BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
+      BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
 
    }
 }
@@ -2885,7 +3039,22 @@ void GC_MemoryBufferNumberOfSequencesMaxCallback(gcCallbackPhase_t phase, gcCall
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
-	   gcRegsData.MemoryBufferNumberOfSequencesMax = BufferManager_GetNumberOfSequenceMax();
+      gcRegsData.MemoryBufferNumberOfSequencesMax = BufferManager_GetNumberOfSequenceMax();
+   }
+}
+
+/**
+ * MemoryBufferSequenceClear GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceClearCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
    }
 }
 
@@ -2901,7 +3070,7 @@ void GC_MemoryBufferSequenceClearAllCallback(gcCallbackPhase_t phase, gcCallback
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-	   BufferManager_ClearSequence(&gBufManager, &gcRegsData);
+      BufferManager_ClearSequence(&gBufManager, &gcRegsData);
    }
 }
 
@@ -2917,6 +3086,21 @@ void GC_MemoryBufferSequenceCountCallback(gcCallbackPhase_t phase, gcCallbackAcc
 }
 
 /**
+ * MemoryBufferSequenceDefrag GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceDefragCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
  * MemoryBufferSequenceDownloadBitRateMax GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -2928,6 +3112,52 @@ void GC_MemoryBufferSequenceDownloadBitRateMaxCallback(gcCallbackPhase_t phase, 
 }
 
 /**
+ * MemoryBufferSequenceDownloadFrameCount GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceDownloadFrameCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      uint32_t sequenceFirstFrameId = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
+      uint32_t sequenceFrameCount = BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
+
+      if ((gcRegsData.MemoryBufferSequenceDownloadFrameID - sequenceFirstFrameId) + gcRegsData.MemoryBufferSequenceDownloadFrameCount > sequenceFrameCount)
+      {
+         // Adjust download frame ID
+         gcRegsData.MemoryBufferSequenceDownloadFrameID = (sequenceFrameCount - gcRegsData.MemoryBufferSequenceDownloadFrameCount) + sequenceFirstFrameId;
+      }
+   }
+}
+
+/**
+ * MemoryBufferSequenceDownloadFrameID GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceDownloadFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      uint32_t sequenceFirstFrameId = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
+      uint32_t sequenceFrameCount = BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
+
+      if ((gcRegsData.MemoryBufferSequenceDownloadFrameID - sequenceFirstFrameId) + gcRegsData.MemoryBufferSequenceDownloadFrameCount > sequenceFrameCount)
+      {
+         // Adjust download frame count
+         gcRegsData.MemoryBufferSequenceDownloadFrameCount = sequenceFrameCount - (gcRegsData.MemoryBufferSequenceDownloadFrameID - sequenceFirstFrameId);
+      }
+   }
+}
+
+/**
  * MemoryBufferSequenceDownloadImageFrameID GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -2936,23 +3166,9 @@ void GC_MemoryBufferSequenceDownloadBitRateMaxCallback(gcCallbackPhase_t phase, 
  */
 void GC_MemoryBufferSequenceDownloadImageFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   uint32_t firstFrameID, lastFrameID;
-
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-      firstFrameID = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-      lastFrameID = firstFrameID + BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector) - 1;
-
-      if (gcRegsData.MemoryBufferSequenceDownloadImageFrameID < firstFrameID)
-         gcRegsData.MemoryBufferSequenceDownloadImageFrameID = firstFrameID;
-
-      if (gcRegsData.MemoryBufferSequenceDownloadImageFrameID > lastFrameID)
-         gcRegsData.MemoryBufferSequenceDownloadImageFrameID = lastFrameID;
-         
-   }
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+      // After write
       gBufferStartDownloadTrigger = 1;
    }
 }
@@ -2990,6 +3206,21 @@ void GC_MemoryBufferSequenceFirstFrameIDCallback(gcCallbackPhase_t phase, gcCall
 }
 
 /**
+ * MemoryBufferSequenceHeight GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceHeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
  * MemoryBufferSequenceMOIFrameID GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -3002,6 +3233,36 @@ void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallba
    {
       // Before read
       gcRegsData.MemoryBufferSequenceMOIFrameID = BufferManager_GetSequenceMOIFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
+   }
+}
+
+/**
+ * MemoryBufferSequenceOffsetX GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceOffsetXCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferSequenceOffsetY GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceOffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
    }
 }
 
@@ -3019,7 +3280,6 @@ void GC_MemoryBufferSequencePreMOISizeCallback(gcCallbackPhase_t phase, gcCallba
       // After write
       GC_UpdateMemoryBufferSequencePreMOISizeLimits();
       BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
-
    }
 }
 
@@ -3048,6 +3308,22 @@ void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCall
  */
 void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   static uint32_t previousValue;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
+   {
+      // Before write
+      previousValue = gcRegsData.MemoryBufferSequenceSelector;
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      if (gcRegsData.MemoryBufferSequenceSelector != previousValue)
+      {
+         BufferManager_SetSequenceDownloadDefaultParams(&gBufManager, &gcRegsData);
+      }
+   }
 }
 
 /**
@@ -3069,6 +3345,21 @@ void GC_MemoryBufferSequenceSizeCallback(gcCallbackPhase_t phase, gcCallbackAcce
 }
 
 /**
+ * MemoryBufferSequenceSizeInc GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceSizeIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
  * MemoryBufferSequenceSizeMax GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -3083,6 +3374,81 @@ void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackA
 
       // Since MemoryBufferSequenceSize must be even, make sure MemoryBufferSequenceSizeMax is even too
       gcRegsData.MemoryBufferSequenceSizeMax = roundDown(BufferManager_GetNbImageMax(&gBufManager, &gcRegsData), 2);
+   }
+}
+
+/**
+ * MemoryBufferSequenceSizeMin GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceSizeMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferSequenceWidth GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferSequenceWidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferStatus GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferStatusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferTotalSpaceHigh GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferTotalSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+}
+
+/**
+ * MemoryBufferTotalSpaceLow GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferTotalSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
    }
 }
 
@@ -3811,9 +4177,9 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       SFW_LimitParameter(&gcRegsData);
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
-		AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
+      AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
 
-		// Update Memory Buffer params
+      // Update Memory Buffer params
       GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
    }
 }

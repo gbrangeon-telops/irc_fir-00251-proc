@@ -139,7 +139,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 12.0
+// Generated from the IRCam header definition XLS file version 12.1
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
