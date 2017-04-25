@@ -149,8 +149,26 @@ constant SPEED_RPM      : integer := 1200;
 constant sim_nb_turn    : integer := 5000;
 CONSTANT CLK_FREQ       : INTEGER := 100000000;
 constant RPM_FACTOR_VAL : unsigned(31 downto 0) := to_unsigned(1464843,32);
-constant ENCODER_COUNT_DURATION : INTEGER := CLK_FREQ/(SPEED_RPM/60 *4096);
-CONSTANT COUNT_DURATION : TIME := ENCODER_COUNT_DURATION* clk100_per;
+constant ENCODER_COUNT_DURATION : INTEGER := CLK_FREQ/(SPEED_RPM/60 * NB_ENCODER_COUNT);
+CONSTANT COUNT_DURATION : TIME := ENCODER_COUNT_DURATION * clk100_per;
+
+
+
+constant ENCODER_INSTABILITY_VAR : TIME := COUNT_DURATION * 0.05;    -- 5% instability
+type encoder_instability_type is array (0 to NB_ENCODER_COUNT-1) of TIME;
+
+function encoder_instability_init return encoder_instability_type is
+   variable temp : encoder_instability_type;
+begin
+   for i in 0 to NB_ENCODER_COUNT-1 loop
+      temp(i) := SIN(real(i)*2.0*MATH_PI/real(NB_ENCODER_COUNT)) * ENCODER_INSTABILITY_VAR;  -- instability is a sine modulating the encoder position
+   end loop;
+   return temp;
+end function encoder_instability_init;
+
+constant ENCODER_INSTABILITY : encoder_instability_type := encoder_instability_init;
+
+
 
 CONSTANT DETECTOR_DELAY : TIME := 30 ns;
 
@@ -191,7 +209,6 @@ constant FW7_EXPTIME_ADDR          : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BI
 
 --Signals
 signal lock : std_logic_vector(31 downto 0) ;
-signal rand_num : integer := 0;
 signal frame_id : unsigned(31 downto 0) := to_unsigned(0,32);
 
 --Exposure time ctrl
@@ -375,7 +392,7 @@ begin
             end if;
             
             --pause for the duration of a encoder step
-            WAIT FOR COUNT_DURATION;
+            WAIT FOR COUNT_DURATION + ENCODER_INSTABILITY(i);
         end loop;
      end loop;
     wait;    

@@ -8,6 +8,7 @@ setenv PROC "D:\Telops\FIR-00251-Proc"
 
 # Package
 acom -nowarn DAGGEN_0523 "D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd"
+acom -nowarn DAGGEN_0523 "D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd"
 acom -nowarn DAGGEN_0523 "$SFW_INTF\sfw_define.vhd"
 acom -nowarn DAGGEN_0523 "$PROC\"
 
