@@ -117,6 +117,7 @@ begin
             raw_xtra_trig_pipe <= (others =>'0');
             trig_out_i <= '0';
             cnt_trigout <= to_unsigned(0, cnt_trigout'length);
+            Allow_HighTimeChange <= '1';
          else
             --la duree du pipe definit la largeur de activation_trig_i
             -- comme il sera envoyé au FPA local qui est dans le domaine ADC_CLK
@@ -136,12 +137,14 @@ begin
             if (raw_acq_trig_i = '1' and raw_acq_trig_pipe(2) = '0' and cnt_trigout = to_unsigned(0, cnt_trigout'length)) then -- synchro avec acq_trig_i
                trig_out_i <= '1';
                cnt_trigout <= to_unsigned(1, cnt_trigout'length);
+               Allow_HighTimeChange <= '0';
             end if;
             
             if (trig_out_i = '1') then
                if (cnt_trigout >= PARAM.HIGH_TIME) then
                   trig_out_i <= '0';
                   cnt_trigout <= to_unsigned(0, cnt_trigout'length);
+                  Allow_HighTimeChange <= '1';
                else
                   trig_out_i <= trig_out_i;
                   cnt_trigout <= cnt_trigout + 1;
@@ -161,7 +164,6 @@ begin
          if sreset ='1' then	
             done <= '0';
             raw_trig_i <= '0';
-            Allow_HighTimeChange <= '1';
             acq_window_i <= '0';
             trig_gen_sm <= idle;
          else
@@ -171,12 +173,10 @@ begin
                   raw_trig_i <= '0';
                   Cnt <= to_unsigned(0, cnt'length);
                   done <= '1';
-                  Allow_HighTimeChange <= '1';
                   if PARAM.RUN = '1' and TRIG_IN = '1' then	
                      trig_gen_sm <= out_on_st;
                      done <= '0';
                      raw_trig_i <= '1';
-                     Allow_HighTimeChange <= '0';                     
                      acq_window_i <= PARAM.ACQ_WINDOW; -- (synchro avec raw_trig_i)
                   end if;  
                
@@ -186,7 +186,6 @@ begin
                      trig_gen_sm <= pause_st;
                      done <= '1';
                      raw_trig_i <= '0';
-                     Allow_HighTimeChange <= '1';
                   end if;
                
                when pause_st =>				-- necessaire pour le single trig.

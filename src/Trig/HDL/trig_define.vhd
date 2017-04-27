@@ -70,7 +70,7 @@ package trig_define is
    '0',
    to_unsigned(0,s_trig_cfg.seq_FRAMECOUNT'LENGTH), 
    TRIGSEQ_HARDWARE,
-   to_unsigned(10_000,s_trig_cfg.PERIOD'LENGTH), 
+   to_unsigned(10,s_trig_cfg.PERIOD'LENGTH), 
    '0'
    );
    
