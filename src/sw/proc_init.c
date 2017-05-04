@@ -88,13 +88,22 @@ t_SfwCtrl gSFW_Ctrl = sfw_Intf_Ctor(TEL_PAR_TEL_SFW_CTRL_BASEADDR);
 XIntc gProcIntc;
 t_GPS Gps_struct;
 netIntf_t gNetworkIntf;
-ctrlIntf_t gFileCtrlIntf;
-ctrlIntf_t gClinkCtrlIntf;
-ctrlIntf_t gPleoraCtrlIntf;
-#if (OEM_UART_ENABLED)
-ctrlIntf_t gOemCtrlIntf;
-#endif
-ctrlIntf_t gOutputCtrlIntf;
+
+circularUART_t gCircularUART_USB;
+circularUART_t gCircularUART_NTxMini;
+circularUART_t gCircularUART_RS232;
+circularUART_t gCircularUART_CameraLink;
+circularUART_t gCircularUART_OutputFPGA;
+usart_t gUSART_NTxMiniBulk;
+
+debugTerminal_t gDebugTerminal;
+IRC_Status_t gDebugTerminalStatus;
+ctrlIntf_t gCtrlIntf_NTxMini;
+ctrlIntf_t gCtrlIntf_OEM;
+ctrlIntf_t gCtrlIntf_CameraLink;
+ctrlIntf_t gCtrlIntf_OutputFPGA;
+ctrlIntf_t gCtrlIntf_FileManager;
+
 qspiFlash_t gQSPIFlash;
 FH_ctrl_t gFWFaulhaberCtrl;
 FH_ctrl_t gNDFFaulhaberCtrl;
@@ -119,6 +128,121 @@ IRC_Status_t Proc_NI_Init()
 }
 
 /**
+ * Initializes device serial ports
+ *
+ * @return IRC_SUCCESS if successfully initialized.
+ * @return IRC_FAILURE if failed to initialize.
+ */
+IRC_Status_t Proc_DeviceSerialPorts_Init()
+{
+   IRC_Status_t status;
+   IRC_Status_t retval = IRC_SUCCESS;
+
+   // Initialize USB UART serial port
+   status = CircularUART_Init(&gCircularUART_USB,
+         XPAR_AXI_USB_UART_DEVICE_ID,
+         &gProcIntc,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_USB_UART_IP2INTC_IRPT_INTR);
+   if (status == IRC_SUCCESS)
+   {
+      // Configure USB UART serial port
+      if (UART_Config(&gCircularUART_USB.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      {
+         retval = IRC_FAILURE;
+      }
+   }
+   else
+   {
+      retval = IRC_FAILURE;
+   }
+
+   // Initialize Camera Link UART serial port
+   status = CircularUART_Init(&gCircularUART_CameraLink,
+         XPAR_CLINK_UART_DEVICE_ID,
+         &gProcIntc,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_CLINK_UART_IP2INTC_IRPT_INTR);
+   if (status == IRC_SUCCESS)
+   {
+      // Configure Camera Link UART serial port
+      if (UART_Config(&gCircularUART_CameraLink.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      {
+         retval = IRC_FAILURE;
+      }
+   }
+   else
+   {
+      retval = IRC_FAILURE;
+   }
+
+   // Initialize NTx-Mini UART serial port
+   status = CircularUART_Init(&gCircularUART_NTxMini,
+         XPAR_PLEORA_UART_DEVICE_ID,
+         &gProcIntc,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
+   if (status == IRC_SUCCESS)
+   {
+      // Configure NTx-Mini UART serial port
+      if (UART_Config(&gCircularUART_NTxMini.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      {
+         retval = IRC_FAILURE;
+      }
+   }
+   else
+   {
+      retval = IRC_FAILURE;
+   }
+
+
+   // Initialize RS-232 UART serial port
+   status = CircularUART_Init(&gCircularUART_RS232,
+         XPAR_OEM_UART_DEVICE_ID,
+         &gProcIntc,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR);
+   if (status == IRC_SUCCESS)
+   {
+      // Configure RS-232 UART serial port
+      if (UART_Config(&gCircularUART_RS232.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      {
+         retval = IRC_FAILURE;
+      }
+   }
+   else
+   {
+      retval = IRC_FAILURE;
+   }
+
+   // Initialize Output FPGA UART serial port
+   status = CircularUART_Init(&gCircularUART_OutputFPGA,
+         XPAR_FPGA_OUTPUT_UART_DEVICE_ID,
+         &gProcIntc,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR);
+   if (status == IRC_SUCCESS)
+   {
+      // Configure Output FPGA UART serial port
+      if (UART_Config(&gCircularUART_OutputFPGA.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      {
+         retval = IRC_FAILURE;
+      }
+   }
+   else
+   {
+      retval = IRC_FAILURE;
+   }
+
+   // Initialize USART serial port
+   status = Usart_Init(&gUSART_NTxMiniBulk,
+         TEL_PAR_TEL_USART_CTRL_BASEADDR,
+         &gProcIntc,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_BULK_INTERRUPT_0_INTR);
+   if (status != IRC_SUCCESS)
+   {
+      retval = IRC_FAILURE;
+   }
+
+   return retval;
+}
+
+/**
  * Initializes debug terminal (phase 1).
  *
  * @return IRC_SUCCESS if successfully initialized.
@@ -126,17 +250,26 @@ IRC_Status_t Proc_NI_Init()
  */
 IRC_Status_t Proc_DebugTerminal_InitPhase1()
 {
-   static uint8_t dtRxDataCircBuffer[DT_UART_RX_CIRC_BUFFER_SIZE];
-   static uint8_t dtTxDataCircBuffer[DT_UART_TX_CIRC_BUFFER_SIZE];
+   static uint8_t dtRxCircBufferBytes[DT_UART_RX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t dtRxCircBuffer;
 
-   IRC_Status_t status;
+   static uint8_t dtTxCircBufferBytes[DT_UART_TX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t dtTxCircBuffer;
 
-   // Initialize debug terminal
-   status =  DebugTerminal_Init(dtRxDataCircBuffer,
-         DT_UART_RX_CIRC_BUFFER_SIZE,
-         dtTxDataCircBuffer,
-         DT_UART_TX_CIRC_BUFFER_SIZE);
-   if (status != IRC_SUCCESS)
+   // Initialize debug terminal RX circular buffer
+   if (CBB_Init(&dtRxCircBuffer, dtRxCircBufferBytes, DT_UART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Initialize debug terminal TX circular buffer
+   if (CBB_Init(&dtTxCircBuffer, dtTxCircBufferBytes, DT_UART_TX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Initialize debug terminal data structure
+   if (DebugTerminal_Init(&gDebugTerminal, &dtRxCircBuffer, &dtTxCircBuffer) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
@@ -152,23 +285,42 @@ IRC_Status_t Proc_DebugTerminal_InitPhase1()
  */
 IRC_Status_t Proc_DebugTerminal_InitPhase2()
 {
-   static networkCommand_t dtCmdQueueBuffer[DT_CMD_QUEUE_SIZE];
-   static circBuffer_t dtCmdQueue =
-         CB_Ctor(dtCmdQueueBuffer, DT_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+   circularUART_t *p_cuart = &gCircularUART_USB;
 
-   IRC_Status_t status;
+   if (gFlashDynamicValues.DeviceSerialPortFunctionRS232 == DSPF_Terminal)
+   {
+      p_cuart = &gCircularUART_RS232;
+   }
 
-   // Initialize debug terminal serial port
-   status =  DebugTerminal_InitSerial(DEBUG_TERMINAL_DEVICE_ID);
-   if (status != IRC_SUCCESS)
+   // Connect USB UART serial port to debug terminal interface
+   if (DebugTerminal_SetSerial(&gDebugTerminal, p_cuart) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
+   return IRC_SUCCESS;
+}
+
+/**
+ * Initializes debug terminal (phase 3).
+ *
+ * @return IRC_SUCCESS if successfully initialized.
+ * @return IRC_FAILURE if failed to initialize.
+ */
+IRC_Status_t Proc_DebugTerminal_InitPhase3()
+{
+   static networkCommand_t dtCmdQueueBuffer[DT_CMD_QUEUE_SIZE];
+   static circBuffer_t dtCmdQueue =
+         CB_Ctor(dtCmdQueueBuffer, DT_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+
    // Connect debug terminal to network interface
-   status =  DebugTerminal_Connect(&gNetworkIntf,
-         &dtCmdQueue);
-   if (status != IRC_SUCCESS)
+   if (DebugTerminal_Connect(&gDebugTerminal, &gNetworkIntf, &dtCmdQueue) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+   
+   // Look for global debug terminal initialization tests result
+   if (gDebugTerminalStatus != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
@@ -184,8 +336,12 @@ IRC_Status_t Proc_DebugTerminal_InitPhase2()
  */
 IRC_Status_t Proc_FM_Init()
 {
-   static uint8_t fmRxDataCircBuffer[FILE_CI_UART_RX_CIRC_BUFFER_SIZE];
-   static uint8_t fmTxDataBuffer[FILE_CI_USART_TX_BUFFER_SIZE];
+   static uint8_t fmRxCircBufferBytes[FILE_CI_USART_RX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t fmRxCircBuffer;
+
+   static uint8_t fmTxCircBufferBytes[FILE_CI_USART_TX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t fmTxCircBuffer;
+
    static networkCommand_t fmCtrlIntfCmdQueueBuffer[FM_CI_CMD_QUEUE_SIZE];
    static circBuffer_t fmCtrlIntfCmdQueue =
          CB_Ctor(fmCtrlIntfCmdQueueBuffer, FM_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
@@ -195,21 +351,35 @@ IRC_Status_t Proc_FM_Init()
          CB_Ctor(fmCmdQueueBuffer, FM_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
 
    IRC_Status_t status;
+   fileOrder_t keys[4];
+
+   // Initialize file manager RX circular buffer
+   if (CBB_Init(&fmRxCircBuffer, fmRxCircBufferBytes, FILE_CI_USART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Initialize file manager TX circular buffer
+   if (CBB_Init(&fmTxCircBuffer, fmTxCircBufferBytes, FILE_CI_USART_TX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
 
    // Initialize file manager control interface
-   status = CtrlIntf_InitUSART(&gFileCtrlIntf,
+   status = CtrlIntf_Init(&gCtrlIntf_FileManager,
          CIP_F1F2,
-         TEL_PAR_TEL_USART_CTRL_BASEADDR,
-         &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_BULK_INTERRUPT_0_INTR,
-         fmRxDataCircBuffer,
-         FILE_CI_UART_RX_CIRC_BUFFER_SIZE,
-         fmTxDataBuffer,
-         FILE_CI_USART_TX_BUFFER_SIZE,
+         &fmRxCircBuffer,
+         &fmTxCircBuffer,
          &gNetworkIntf,
          &fmCtrlIntfCmdQueue,
          NIP_CI_FILE_MANAGER);
    if (status != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Connect USART serial port to file manager control interface
+   if (CtrlIntf_SetLink(&gCtrlIntf_FileManager, CILT_USART, &gUSART_NTxMiniBulk) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
@@ -219,6 +389,18 @@ IRC_Status_t Proc_FM_Init()
    {
       return IRC_FAILURE;
    }
+
+   keys[0] = gFlashDynamicValues.FileOrderKey1;
+   keys[1] = gFlashDynamicValues.FileOrderKey2;
+   keys[2] = gFlashDynamicValues.FileOrderKey3;
+   keys[3] = gFlashDynamicValues.FileOrderKey4;
+   FM_SetFileListKeys(&gFM_files, keys, 4);
+
+   keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
+   keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
+   keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
+   keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
+   FM_SetFileListKeys(&gFM_collections, keys, 4);
 
    return IRC_SUCCESS;
 }
@@ -252,43 +434,6 @@ IRC_Status_t Proc_FU_Init()
  */
 IRC_Status_t Proc_GC_Init()
 {
-   static uint8_t clinkRxDataCircBuffer[CLINK_CI_UART_RX_CIRC_BUFFER_SIZE];
-   static networkCommand_t clinkCtrlIntfCmdQueueBuffer[CLINK_CI_CMD_QUEUE_SIZE];
-   static circBuffer_t clinkCtrlIntfCmdQueue =
-         CB_Ctor(clinkCtrlIntfCmdQueueBuffer, CLINK_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
-
-   static uint8_t pleoraRxDataCircBuffer[PLEORA_CI_UART_RX_CIRC_BUFFER_SIZE];
-   static networkCommand_t pleoraCtrlIntfCmdQueueBuffer[PLEORA_CI_CMD_QUEUE_SIZE];
-   static circBuffer_t pleoraCtrlIntfCmdQueue =
-         CB_Ctor(pleoraCtrlIntfCmdQueueBuffer, PLEORA_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
-
-#if (OEM_UART_ENABLED)
-   static uint8_t oemRxDataCircBuffer[OEM_CI_UART_RX_CIRC_BUFFER_SIZE];
-   static networkCommand_t oemCtrlIntfCmdQueueBuffer[OEM_CI_CMD_QUEUE_SIZE];
-   static circBuffer_t oemCtrlIntfCmdQueue =
-         CB_Ctor(oemCtrlIntfCmdQueueBuffer, OEM_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
-#endif
-
-   static uint8_t masterTxDataBuffer[MASTER_UART_TX_BUFFER_SIZE];
-
-   static uint8_t outputRxDataCircBuffer[OUTPUT_CI_UART_RX_CIRC_BUFFER_SIZE];
-   static uint8_t outputTxDataBuffer[OUTPUT_CI_UART_TX_BUFFER_SIZE];
-   static networkCommand_t outputCtrlIntfCmdQueueBuffer[OUTPUT_CI_CMD_QUEUE_SIZE];
-   static circBuffer_t outputCtrlIntfCmdQueue =
-         CB_Ctor(outputCtrlIntfCmdQueueBuffer, OUTPUT_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
-
-   static networkCommand_t gcmCmdQueueBuffer[GCM_CMD_QUEUE_SIZE];
-   static circBuffer_t gcmCmdQueue =
-         CB_Ctor(gcmCmdQueueBuffer, GCM_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
-
-   static gcEvent_t gcEventErrorQueueBuffer[GC_EVENT_ERROR_QUEUE_SIZE];
-   static circBuffer_t gcEventErrorQueue =
-         CB_Ctor(gcEventErrorQueueBuffer, GC_EVENT_ERROR_QUEUE_SIZE, sizeof(gcEvent_t));
-
-   static networkCommand_t gcpCmdQueueBuffer[GCP_CMD_QUEUE_SIZE];
-   static circBuffer_t gcpCmdQueue =
-         CB_Ctor(gcpCmdQueueBuffer, GCP_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
-
    IRC_Status_t status;
    extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
@@ -300,6 +445,19 @@ IRC_Status_t Proc_GC_Init()
 
    // Initialize GenICam register data
    gcRegsData = gcRegsDataFactory;
+
+   // Initialize registers from flash dynamic values
+   gcRegsData.PowerOnAtStartup = gFlashDynamicValues.PowerOnAtStartup;
+   gcRegsData.AcquisitionStartAtStartup = gFlashDynamicValues.AcquisitionStartAtStartup;
+   gcRegsData.StealthMode = gFlashDynamicValues.StealthMode;
+   gcRegsData.BadPixelReplacement = gFlashDynamicValues.BadPixelReplacement;
+   gcRegsData.DeviceKeyValidationLow = gFlashDynamicValues.DeviceKeyValidationLow;
+   gcRegsData.DeviceKeyValidationHigh = gFlashDynamicValues.DeviceKeyValidationHigh;
+   DeviceSerialPortFunctionAry[DSPS_RS232] = gFlashDynamicValues.DeviceSerialPortFunctionRS232;
+   if (DeviceSerialPortFunctionAry[DSPS_RS232] == DSPF_Terminal)
+   {
+      DeviceSerialPortFunctionAry[DSPS_USB] = DSPF_Disabled;
+   }
 
    // Initialize pointer array on ExposureTimeX registers
    pGcRegsDataExposureTimeX[0] = &gcRegsData.ExposureTime1;
@@ -328,16 +486,37 @@ IRC_Status_t Proc_GC_Init()
    GC_UpdateFpaPeriodMinMargin();
    GC_UpdateParameterLimits();
 
+   static uint8_t genicamTxCircBufferBytes[GENICAM_UART_TX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t genicamTxCircBuffer;
+
+   // Initialize GenICam control interfaces TX circular buffer
+   if (CBB_Init(&genicamTxCircBuffer, genicamTxCircBufferBytes, GENICAM_UART_TX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   /************************************************************************************
+    * Camera Link GenICam Control interface
+    ************************************************************************************/
+
+   static uint8_t clinkRxCircBufferBytes[CLINK_CI_UART_RX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t clinkRxCircBuffer;
+
+   static networkCommand_t clinkCtrlIntfCmdQueueBuffer[CLINK_CI_CMD_QUEUE_SIZE];
+   static circBuffer_t clinkCtrlIntfCmdQueue =
+         CB_Ctor(clinkCtrlIntfCmdQueueBuffer, CLINK_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+
+   // Initialize Camera Link GenICam control interface RX circular buffer
+   if (CBB_Init(&clinkRxCircBuffer, clinkRxCircBufferBytes, CLINK_CI_UART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
    // Initialize Camera Link GenICam control interface
-   status = CtrlIntf_InitCircularUART(&gClinkCtrlIntf,
+   status = CtrlIntf_Init(&gCtrlIntf_CameraLink,
          CIP_F1F2,
-         XPAR_CLINK_UART_DEVICE_ID,
-         &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_CLINK_UART_IP2INTC_IRPT_INTR,
-         clinkRxDataCircBuffer,
-         CLINK_CI_UART_RX_CIRC_BUFFER_SIZE,
-         masterTxDataBuffer,
-         MASTER_UART_TX_BUFFER_SIZE,
+         &clinkRxCircBuffer,
+         &genicamTxCircBuffer,
          &gNetworkIntf,
          &clinkCtrlIntfCmdQueue,
          NIP_CI_CLINK);
@@ -346,45 +525,70 @@ IRC_Status_t Proc_GC_Init()
       return IRC_FAILURE;
    }
 
-   if (UART_Config(&gClinkCtrlIntf.link.cuart.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+   // Connect Camera Link UART serial port to Camera Link GenICam control interface
+   if (CtrlIntf_SetLink(&gCtrlIntf_CameraLink, CILT_CUART, &gCircularUART_CameraLink) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-   // Initialize Pleora GenICam control interface
-   status = CtrlIntf_InitCircularUART(&gPleoraCtrlIntf,
+   /************************************************************************************
+    * NTx-Mini GenICam Control interface
+    ************************************************************************************/
+
+   static uint8_t ntxMiniRxCircBufferBytes[NTXMINI_CI_UART_RX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t ntxMiniRxCircBuffer;
+
+   static networkCommand_t ntxMiniCtrlIntfCmdQueueBuffer[NTXMINI_CI_CMD_QUEUE_SIZE];
+   static circBuffer_t ntxMiniCtrlIntfCmdQueue =
+         CB_Ctor(ntxMiniCtrlIntfCmdQueueBuffer, NTXMINI_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+
+   // Initialize NTx-Mini GenICam control interface RX circular buffer
+   if (CBB_Init(&ntxMiniRxCircBuffer, ntxMiniRxCircBufferBytes, NTXMINI_CI_UART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Initialize NTx-Mini GenICam control interface
+   status = CtrlIntf_Init(&gCtrlIntf_NTxMini,
          CIP_PLEORA,
-         XPAR_PLEORA_UART_DEVICE_ID,
-         &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR,
-         pleoraRxDataCircBuffer,
-         PLEORA_CI_UART_RX_CIRC_BUFFER_SIZE,
-         masterTxDataBuffer,
-         MASTER_UART_TX_BUFFER_SIZE,
+         &ntxMiniRxCircBuffer,
+         &genicamTxCircBuffer,
          &gNetworkIntf,
-         &pleoraCtrlIntfCmdQueue,
+         &ntxMiniCtrlIntfCmdQueue,
          NIP_CI_PLEORA);
    if (status != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-   if (UART_Config(&gPleoraCtrlIntf.link.cuart.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+   // Connect NTx-Mini UART serial port to NTx-Mini GenICam control interface
+   if (CtrlIntf_SetLink(&gCtrlIntf_NTxMini, CILT_CUART, &gCircularUART_NTxMini) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-#if (OEM_UART_ENABLED)
+   /************************************************************************************
+    * OEM GenICam Control interface
+    ************************************************************************************/
+
+   static uint8_t oemRxCircBufferBytes[OEM_CI_UART_RX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t oemRxCircBuffer;
+
+   static networkCommand_t oemCtrlIntfCmdQueueBuffer[OEM_CI_CMD_QUEUE_SIZE];
+   static circBuffer_t oemCtrlIntfCmdQueue =
+         CB_Ctor(oemCtrlIntfCmdQueueBuffer, OEM_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+
+   // Initialize OEM GenICam control interface RX circular buffer
+   if (CBB_Init(&oemRxCircBuffer, oemRxCircBufferBytes, OEM_CI_UART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
    // Initialize OEM GenICam control interface
-   status = CtrlIntf_InitCircularUART(&gOemCtrlIntf,
+   status = CtrlIntf_Init(&gCtrlIntf_OEM,
          CIP_F1F2,
-         XPAR_OEM_UART_DEVICE_ID,
-         &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR,
-         oemRxDataCircBuffer,
-         OEM_CI_UART_RX_CIRC_BUFFER_SIZE,
-         masterTxDataBuffer,
-         MASTER_UART_TX_BUFFER_SIZE,
+         &oemRxCircBuffer,
+         &genicamTxCircBuffer,
          &gNetworkIntf,
          &oemCtrlIntfCmdQueue,
          NIP_CI_OEM);
@@ -393,22 +597,46 @@ IRC_Status_t Proc_GC_Init()
       return IRC_FAILURE;
    }
 
-   if (UART_Config(&gOemCtrlIntf.link.cuart.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+   if (DeviceSerialPortFunctionAry[DSPS_RS232] != DSPF_Terminal)
+   {
+      // Connect RS-232 UART serial port to OEM GenICam control interface
+      if (CtrlIntf_SetLink(&gCtrlIntf_OEM, CILT_CUART, &gCircularUART_RS232) != IRC_SUCCESS)
+      {
+         return IRC_FAILURE;
+      }
+   }
+
+   /************************************************************************************
+    * Output FPGA Control interface
+    ************************************************************************************/
+
+   static uint8_t outputRxCircBufferBytes[OUTPUT_CI_UART_RX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t outputRxCircBuffer;
+
+   static uint8_t outputTxCircBufferBytes[OUTPUT_CI_UART_TX_CIRC_BUFFER_SIZE];
+   static circByteBuffer_t outputTxCircBuffer;
+
+   static networkCommand_t outputCtrlIntfCmdQueueBuffer[OUTPUT_CI_CMD_QUEUE_SIZE];
+   static circBuffer_t outputCtrlIntfCmdQueue =
+         CB_Ctor(outputCtrlIntfCmdQueueBuffer, OUTPUT_CI_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
+
+   // Initialize Output FPGA control interface RX circular buffer
+   if (CBB_Init(&outputRxCircBuffer, outputRxCircBufferBytes, OUTPUT_CI_UART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
-#endif
 
-   // Initialize Output FPGA GenICam control interface
-   status = CtrlIntf_InitCircularUART(&gOutputCtrlIntf,
+   // Initialize Output FPGA control interface TX circular buffer
+   if (CBB_Init(&outputTxCircBuffer, outputTxCircBufferBytes, OUTPUT_CI_UART_TX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   // Initialize Output FPGA control interface
+   status = CtrlIntf_Init(&gCtrlIntf_OutputFPGA,
          CIP_F1F2_NETWORK,
-         XPAR_FPGA_OUTPUT_UART_DEVICE_ID,
-         &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR,
-         outputRxDataCircBuffer,
-         OUTPUT_CI_UART_RX_CIRC_BUFFER_SIZE,
-         outputTxDataBuffer,
-         OUTPUT_CI_UART_TX_BUFFER_SIZE,
+         &outputRxCircBuffer,
+         &outputTxCircBuffer,
          &gNetworkIntf,
          &outputCtrlIntfCmdQueue,
          NIP_UNDEFINED);
@@ -417,11 +645,19 @@ IRC_Status_t Proc_GC_Init()
       return IRC_FAILURE;
    }
 
-   status = UART_Config(&gOutputCtrlIntf.link.cuart.uart, 115200, 8, 'N', 1);
-   if (status != IRC_SUCCESS)
+   // Connect Output FPGA UART serial port to Output FPGA control interface
+   if (CtrlIntf_SetLink(&gCtrlIntf_OutputFPGA, CILT_CUART, &gCircularUART_OutputFPGA) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
+
+   /************************************************************************************
+    * GenICam manager
+    ************************************************************************************/
+
+   static networkCommand_t gcmCmdQueueBuffer[GCM_CMD_QUEUE_SIZE];
+   static circBuffer_t gcmCmdQueue =
+         CB_Ctor(gcmCmdQueueBuffer, GCM_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
 
    // Initialize GenICam Manager
    if (GC_Manager_Init(&gNetworkIntf, &gcmCmdQueue) != IRC_SUCCESS)
@@ -429,11 +665,27 @@ IRC_Status_t Proc_GC_Init()
       return IRC_FAILURE;
    }
 
+   /************************************************************************************
+    * GenICam events
+    ************************************************************************************/
+
+   static gcEvent_t gcEventErrorQueueBuffer[GC_EVENT_ERROR_QUEUE_SIZE];
+   static circBuffer_t gcEventErrorQueue =
+         CB_Ctor(gcEventErrorQueueBuffer, GC_EVENT_ERROR_QUEUE_SIZE, sizeof(gcEvent_t));
+
    // Initialize GenICam Events
    if (GC_Events_Init(&gcEventErrorQueue, NULL) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
+
+   /************************************************************************************
+    * GenICam poller
+    ************************************************************************************/
+
+   static networkCommand_t gcpCmdQueueBuffer[GCP_CMD_QUEUE_SIZE];
+   static circBuffer_t gcpCmdQueue =
+         CB_Ctor(gcpCmdQueueBuffer, GCP_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
 
    // Initialize GenICam Poller
    if (GC_Poller_Init(&gNetworkIntf, &gcpCmdQueue) != IRC_SUCCESS)
@@ -529,21 +781,19 @@ IRC_Status_t Proc_Intc_Start()
    /*
     * Enable the interrupt for the UartNs550 driver instances.
     */
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_CLINK_UART_IP2INTC_IRPT_INTR);
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
-#if (OEM_UART_ENABLED)
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR);
-#endif
-
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR);
-   XIntc_Enable(&gProcIntc, GPS_INTR_ID);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_GPS_UART_IP2INTC_IRPT_INTR);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FW_UART_IP2INTC_IRPT_INTR);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
+   CircularUART_Enable(&gCircularUART_NTxMini);
+   CircularUART_Enable(&gCircularUART_OutputFPGA);
+   if (DeviceSerialPortFunctionAry[DSPS_CameraLink] != DSPF_Disabled) CircularUART_Enable(&gCircularUART_CameraLink);
+   if (DeviceSerialPortFunctionAry[DSPS_RS232] != DSPF_Disabled) CircularUART_Enable(&gCircularUART_RS232);
+   if (DeviceSerialPortFunctionAry[DSPS_USB] != DSPF_Disabled) CircularUART_Enable(&gCircularUART_USB);
 
    /*
     * Enable the interrupt for the USART driver instance.
     */
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_BULK_INTERRUPT_0_INTR);
+   Usart_Enable(&gUSART_NTxMiniBulk);
 
    /*
     * Enable the interrupt for the SPI driver instance.
@@ -595,9 +845,9 @@ IRC_Status_t Proc_GPS_Init()
    IRC_Status_t status;
 
    status = GPS_Init(&Gps_struct,
-         GPS_DEVICE_ID,
+         XPAR_AXI_GPS_UART_DEVICE_ID,
          &gProcIntc,
-         GPS_INTR_ID,
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_GPS_UART_IP2INTC_IRPT_INTR,
          gpsRxDataCircBuffer,
          GPS_UART_RX_CIRC_BUFFER_SIZE);
 
@@ -678,29 +928,16 @@ IRC_Status_t Proc_Sensor_Init()
  */
 IRC_Status_t Proc_FlashDynamicValues_Init()
 {
-   fileOrder_t keys[4];
-   IRC_Status_t status = FlashDynamicValues_Init(&gFlashDynamicValues);
+   // Recover flash dynamic values file update
+   if (FlashDynamicValues_Recover() != IRC_SUCCESS)
+   {
+      FM_ERR("Failed to recover flash dynamic values file update.");
+   }
 
-   gcRegsData.PowerOnAtStartup = gFlashDynamicValues.PowerOnAtStartup;
-   gcRegsData.AcquisitionStartAtStartup = gFlashDynamicValues.AcquisitionStartAtStartup;
-   gcRegsData.StealthMode = gFlashDynamicValues.StealthMode;
-   gcRegsData.BadPixelReplacement = gFlashDynamicValues.BadPixelReplacement;
-   gcRegsData.DeviceKeyValidationLow = gFlashDynamicValues.DeviceKeyValidationLow;
-   gcRegsData.DeviceKeyValidationHigh = gFlashDynamicValues.DeviceKeyValidationHigh;
+   return FlashDynamicValues_Init(&gFlashDynamicValues);
 
-   keys[0] = gFlashDynamicValues.FileOrderKey1;
-   keys[1] = gFlashDynamicValues.FileOrderKey2;
-   keys[2] = gFlashDynamicValues.FileOrderKey3;
-   keys[3] = gFlashDynamicValues.FileOrderKey4;
-   FM_SetFileListKeys(&gFM_files, keys, 4);
 
-   keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
-   keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
-   keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
-   keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
-   FM_SetFileListKeys(&gFM_collections, keys, 4);
-
-   return status;
+   // TODO DAL Transf鲥r dans GC INit
 }
 
 /**

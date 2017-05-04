@@ -5,7 +5,7 @@
  * This file declares the camera flash dynamic values file structure v2.
  *
  * Auto-generated flash dynamic values file library.
- * Generated from the flash dynamic values file structure definition XLS file version 2.0.0
+ * Generated from the flash dynamic values file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHDYNAMICVALUES_FILEMAJORVERSION_V2      2
-#define FLASHDYNAMICVALUES_FILEMINORVERSION_V2      0
+#define FLASHDYNAMICVALUES_FILEMINORVERSION_V2      1
 #define FLASHDYNAMICVALUES_FILESUBMINORVERSION_V2   0
 
 #define FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE_V2   512
@@ -59,6 +59,7 @@ struct FlashDynamicValues_FlashDynamicValuesFileHeader_v2Struct {
    uint8_t CalibrationCollectionFileOrderKey2;   /**< Second key for calibration collection files ordering. */
    uint8_t CalibrationCollectionFileOrderKey3;   /**< Third key for calibration collection files ordering. */
    uint8_t CalibrationCollectionFileOrderKey4;   /**< Fourth key for calibration collection files ordering. */
+   uint8_t DeviceSerialPortFunctionRS232;   /**<  RS-232 device serial port function. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

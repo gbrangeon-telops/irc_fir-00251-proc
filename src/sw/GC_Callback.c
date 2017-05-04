@@ -1505,9 +1505,18 @@ void GC_DeviceSerialPortFunctionCallback(gcCallbackPhase_t phase, gcCallbackAcce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      // TODO
-      // DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] = gcRegsData.DeviceSerialPortFunction;
-      // Update serial port baud rate using DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] value.
+      if ((gcRegsData.DeviceSerialPortSelector == DSPS_USB) && (gcRegsData.DeviceSerialPortFunction == DSPF_Control))
+      {
+         // USB serial port cannot be a control port
+         // Revert change
+         gcRegsData.DeviceSerialPortFunction = DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector];
+      }
+      else if (DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] != gcRegsData.DeviceSerialPortFunction)
+      {
+         // Device serial port function changed
+         DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] = gcRegsData.DeviceSerialPortFunction;
+         GC_SetDeviceSerialPortFunction(gcRegsData.DeviceSerialPortSelector);
+      }
    }
 }
 

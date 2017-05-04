@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.0.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -55,6 +55,7 @@ FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t FlashDynamicValues_FlashDyn
    /* CalibrationCollectionFileOrderKey2 = */ 0,
    /* CalibrationCollectionFileOrderKey3 = */ 0,
    /* CalibrationCollectionFileOrderKey4 = */ 0,
+   /* DeviceSerialPortFunctionRS232 = */ 1,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -128,7 +129,8 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader_v2(uint8_t *buffer
    memcpy(&hdr->CalibrationCollectionFileOrderKey2, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->CalibrationCollectionFileOrderKey3, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->CalibrationCollectionFileOrderKey4, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 446; // Skip FREE space
+   memcpy(&hdr->DeviceSerialPortFunctionRS232, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 445; // Skip FREE space
    memcpy(&hdr->FileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    if (hdr->FileHeaderCRC16 != CRC16(0xFFFF, buffer, numBytes - sizeof(uint16_t)))
@@ -203,7 +205,8 @@ uint32_t FlashDynamicValues_WriteFlashDynamicValuesFileHeader_v2(FlashDynamicVal
    memcpy(&buffer[numBytes], &hdr->CalibrationCollectionFileOrderKey2, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->CalibrationCollectionFileOrderKey3, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->CalibrationCollectionFileOrderKey4, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 446); numBytes += 446; // FREE space
+   memcpy(&buffer[numBytes], &hdr->DeviceSerialPortFunctionRS232, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 445); numBytes += 445; // FREE space
 
    hdr->FileHeaderCRC16 = CRC16(0xFFFF, buffer, numBytes);
    memcpy(&buffer[numBytes], &hdr->FileHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);

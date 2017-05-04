@@ -109,12 +109,6 @@ IRC_Status_t File_Manager_Init(netIntf_t *netIntf, circBuffer_t *cmdQueue)
       return IRC_FAILURE;
    }
 
-   // Recover flash dynamic values file update
-   if (FlashDynamicValues_Recover() != IRC_SUCCESS)
-   {
-      FM_ERR("Failed to recover flash dynamic values file update.");
-   }
-
    // Initialize file database
    if (FM_InitFileDB() != IRC_SUCCESS)
    {

@@ -34,7 +34,7 @@
 #define FLASH_TEST_CIRCULAR_BUFFER_SIZE            128
 
 extern debugTerminal_t gDebugTerminal;
-extern ctrlIntf_t gPleoraCtrlIntf;
+extern ctrlIntf_t gCtrlIntf_NTxMini;
 extern XIntc gProcIntc;
 
 
@@ -59,8 +59,8 @@ IRC_Status_t AutoTest_ProcCalibMem(void) {
    testResult = Startup_TestMem(PROCESSING_CALIBRATION_MEMORY_BASEADDR, PROCESSING_CALIBRATION_MEMORY_SIZE);
 
    GC_Poller_Start();
-   CBB_Flush(&gPleoraCtrlIntf.rxCircDataBuffer);
-   UART_ResetRxFifo(&gPleoraCtrlIntf.link.uart);
+   CBB_Flush(gCtrlIntf_NTxMini.rxCircBuffer);
+   UART_ResetRxFifo(&((circularUART_t *)gCtrlIntf_NTxMini.p_link)->uart);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
 
    return testResult;
@@ -113,8 +113,8 @@ IRC_Status_t AutoTest_OBufMem(void) {
 
    // Re-enable disabled modules
    GC_Poller_Start();
-   CBB_Flush(&gPleoraCtrlIntf.rxCircDataBuffer);
-   UART_ResetRxFifo(&gPleoraCtrlIntf.link.uart);
+   CBB_Flush(gCtrlIntf_NTxMini.rxCircBuffer);
+   UART_ResetRxFifo(&((circularUART_t *)gCtrlIntf_NTxMini.p_link)->uart);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
 
    return testResult;
@@ -252,8 +252,8 @@ IRC_Status_t AutoTest_FlashMem(void) {
    // End DebugTerminalParseFRW()
 
    GC_Poller_Start();
-   CBB_Flush(&gPleoraCtrlIntf.rxCircDataBuffer);
-   UART_ResetRxFifo(&gPleoraCtrlIntf.link.uart);
+   CBB_Flush(gCtrlIntf_NTxMini.rxCircBuffer);
+   UART_ResetRxFifo(&((circularUART_t *)gCtrlIntf_NTxMini.p_link)->uart);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
 
    return IRC_SUCCESS;

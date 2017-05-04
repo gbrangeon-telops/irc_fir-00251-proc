@@ -65,9 +65,11 @@ enum builtInTestIDEnum {
    BITID_CalibrationFilesLoading,
    BITID_DeviceKeyValidation,
    BITID_SensorInitialization,
+   BITID_DeviceSerialPortsInitialization,
 
    // Built-in test count
    BITID_Count
 };
 
 #endif // BUILTINTESTSDEF_H
+

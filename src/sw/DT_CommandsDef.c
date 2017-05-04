@@ -74,6 +74,7 @@ static IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -110,6 +111,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"ADC", DebugTerminalParseADC},
    {"DFDVU", DebugTerminalParseDFDVU},
    {"FS", DebugTerminalParseFS},
+   {"DTO", DebugTerminalParseDTO},
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -146,7 +148,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    t_FpaStatus status;
 
    // Check for FPA command argument presence
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read FPA command argument
       arglen = GetNextArg(cbuf, argStr, 4);
@@ -226,7 +228,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       }
 
       // There is supposed to be no remaining bytes in the buffer
-      if (!CBB_Empty(cbuf))
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
       {
          DT_ERR("Unsupported command arguments");
          return IRC_FAILURE;
@@ -342,7 +344,7 @@ IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf)
    uint32_t status;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -370,7 +372,7 @@ IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf)
    uint32_t i;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -401,7 +403,7 @@ IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf)
    t_TrigStatus status;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -442,7 +444,7 @@ IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseSTATUS(circByteBuffer_t *cbuf)
 {
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -481,7 +483,7 @@ IRC_Status_t DebugTerminalParseSTATUS(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParsePOWER(circByteBuffer_t *cbuf)
 {
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -759,7 +761,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
    };
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -782,7 +784,7 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
    t_bufferStatus status;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -817,7 +819,7 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
    char filename[FM_LONG_FILENAME_SIZE];
    uint32_t i;
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read file list value
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
@@ -860,7 +862,7 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
    }
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -938,7 +940,7 @@ IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf)
    filename[FM_UFFS_MOUNT_POINT_SIZE + arglen] = '\0';
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1034,7 +1036,7 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
 
    memset(keys, 0, sizeof(keys));
    keyCount = 0;
-   while (!CBB_Empty(cbuf) && (keyCount < FM_MAX_NUM_FILE_ORDER_KEY))
+   while (!DebugTerminal_CommandIsEmpty(cbuf) && (keyCount < FM_MAX_NUM_FILE_ORDER_KEY))
    {
       // Read file order key value
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
@@ -1062,7 +1064,7 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
    }
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1123,12 +1125,10 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
 {
-   extern ctrlIntf_t gClinkCtrlIntf;
-   extern ctrlIntf_t gPleoraCtrlIntf;
-#if (OEM_UART_ENABLED)
-   extern ctrlIntf_t gOemCtrlIntf;
-#endif
-   extern ctrlIntf_t gFileCtrlIntf;
+   extern ctrlIntf_t gCtrlIntf_NTxMini;
+   extern ctrlIntf_t gCtrlIntf_OEM;
+   extern ctrlIntf_t gCtrlIntf_CameraLink;
+   extern ctrlIntf_t gCtrlIntf_FileManager;
    ctrlIntf_t *p_ctrlIntf;
    uint8_t argStr[7];
    uint32_t arglen;
@@ -1145,24 +1145,19 @@ IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
 
    if (strcasecmp((char *)argStr, "CLINK") == 0)
    {
-      p_ctrlIntf = &gClinkCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_CameraLink;
    }
    else if (strcasecmp((char *)argStr, "PLEORA") == 0)
    {
-      p_ctrlIntf = &gPleoraCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_NTxMini;
    }
    else if (strcasecmp((char *)argStr, "OEM") == 0)
    {
-#if (OEM_UART_ENABLED)
-      p_ctrlIntf = &gOemCtrlIntf;
-#else
-      DT_ERR("OEM port is disabled.");
-      return IRC_FAILURE;
-#endif
+      p_ctrlIntf = &gCtrlIntf_OEM;
    }
    else if (strcasecmp((char *)argStr, "USART") == 0)
    {
-      p_ctrlIntf = &gFileCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_FileManager;
    }
    else
    {
@@ -1180,7 +1175,7 @@ IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
    }
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1193,7 +1188,7 @@ IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
       return IRC_FAILURE;
    }
 
-   p_ctrlIntf->loopback = loopback;
+   ((usart_t*)p_ctrlIntf->p_link)->loopback = loopback;
 
    return IRC_SUCCESS;
 }
@@ -1210,13 +1205,11 @@ IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf)
 {
-   extern ctrlIntf_t gClinkCtrlIntf;
-   extern ctrlIntf_t gPleoraCtrlIntf;
-#if (OEM_UART_ENABLED)
-   extern ctrlIntf_t gOemCtrlIntf;
-#endif
-   extern ctrlIntf_t gFileCtrlIntf;
-   extern ctrlIntf_t gOutputCtrlIntf;
+   extern ctrlIntf_t gCtrlIntf_NTxMini;
+   extern ctrlIntf_t gCtrlIntf_OEM;
+   extern ctrlIntf_t gCtrlIntf_CameraLink;
+   extern ctrlIntf_t gCtrlIntf_FileManager;
+   extern ctrlIntf_t gCtrlIntf_OutputFPGA;
    ctrlIntf_t *p_ctrlIntf;
    uint8_t argStr[7];
    uint32_t arglen;
@@ -1233,28 +1226,23 @@ IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf)
 
    if (strcasecmp((char *)argStr, "CLINK") == 0)
    {
-      p_ctrlIntf = &gClinkCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_CameraLink;
    }
    else if (strcasecmp((char *)argStr, "PLEORA") == 0)
    {
-      p_ctrlIntf = &gPleoraCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_NTxMini;
    }
    else if (strcasecmp((char *)argStr, "OEM") == 0)
    {
-#if (OEM_UART_ENABLED)
-      p_ctrlIntf = &gOemCtrlIntf;
-#else
-      DT_ERR("OEM port is disabled.");
-      return IRC_FAILURE;
-#endif
+      p_ctrlIntf = &gCtrlIntf_OEM;
    }
    else if (strcasecmp((char *)argStr, "USART") == 0)
    {
-      p_ctrlIntf = &gFileCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_FileManager;
    }
    else if (strcasecmp((char *)argStr, "OUTPUT") == 0)
    {
-      p_ctrlIntf = &gOutputCtrlIntf;
+      p_ctrlIntf = &gCtrlIntf_OutputFPGA;
    }
    else
    {
@@ -1272,7 +1260,7 @@ IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf)
    }
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1358,7 +1346,7 @@ IRC_Status_t DebugTerminalParseLED(circByteBuffer_t *cbuf)
    }
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1388,7 +1376,7 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
    uint32_t showNMEA;
 
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read show packet value
       arglen = GetNextArg(cbuf, argStr, 1);
@@ -1400,7 +1388,7 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
       }
 
       // There is supposed to be no remaining bytes in the buffer
-      if (!CBB_Empty(cbuf))
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
       {
          DT_ERR("Unsupported command arguments");
          return IRC_FAILURE;
@@ -1481,7 +1469,7 @@ IRC_Status_t DebugTerminalParseVER(circByteBuffer_t *cbuf)
 {
    extern releaseInfo_t gReleaseInfo;
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1501,7 +1489,7 @@ IRC_Status_t DebugTerminalParseVER(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseUNLOCK(circByteBuffer_t *cbuf)
 {
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1521,7 +1509,7 @@ IRC_Status_t DebugTerminalParseUNLOCK(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseFORMAT(circByteBuffer_t *cbuf)
 {
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1552,7 +1540,7 @@ IRC_Status_t DebugTerminalParseFRW(circByteBuffer_t *cbuf)
    uint32_t progressStep;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1668,7 +1656,7 @@ IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf)
    uint32_t i;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1707,7 +1695,7 @@ IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseRST(circByteBuffer_t *cbuf)
 {
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1727,7 +1715,7 @@ IRC_Status_t DebugTerminalParseRST(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParsePWR(circByteBuffer_t *cbuf)
 {
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1747,7 +1735,7 @@ IRC_Status_t DebugTerminalParsePWR(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseDFW(circByteBuffer_t *cbuf)
 {
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1778,7 +1766,7 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
    uint32_t arglen;
 
    // Check for key command argument presence
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read key command argument
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
@@ -1790,7 +1778,7 @@ IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf)
       argStr[arglen++] = '\0'; // Add string terminator
 
       // There is supposed to be no remaining bytes in the buffer
-      if (!CBB_Empty(cbuf))
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
       {
          DT_ERR("Unsupported command arguments");
          return IRC_FAILURE;
@@ -1838,7 +1826,7 @@ IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf)
    uint32_t arglen;
    uint32_t gcpState;
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read GenICam poller state
       arglen = GetNextArg(cbuf, argStr, 1);
@@ -1850,7 +1838,7 @@ IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf)
       }
 
       // There is supposed to be no remaining bytes in the buffer
-      if (!CBB_Empty(cbuf))
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
       {
          DT_ERR("Unsupported command arguments");
          return IRC_FAILURE;
@@ -1889,7 +1877,7 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
    int32_t adc_b;
 
    // Check for ADC command argument presence
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       // Read ADC command m argument
       arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
@@ -1909,7 +1897,7 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
       }
 
       // There is supposed to be no remaining bytes in the buffer
-      if (!CBB_Empty(cbuf))
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
       {
          DT_ERR("Unsupported command arguments.");
          return IRC_FAILURE;
@@ -1954,7 +1942,7 @@ static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf)
    extern uint8_t gDisableFlashDynamicValuesUpdate;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1980,7 +1968,7 @@ static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf)
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf)
 {
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -1988,6 +1976,65 @@ static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf)
 
    // Print flash settings
    FlashSettings_PrintFlashSettingsFileHeader(&flashSettings);
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Debug Terminal Output command parser.
+ * This parser is used to parse and validate Debug Terminal Output command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Flash Settings command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf)
+{
+   uint8_t argStr[6];
+   uint32_t arglen;
+   DeviceSerialPortSelector_t port;
+
+   // Read port value
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid port value.");
+      return IRC_FAILURE;
+   }
+   argStr[arglen++] = '\0'; // Add string terminator
+
+   if (strcasecmp((char *)argStr, "CLINK") == 0)
+   {
+      port = DSPS_CameraLink;
+   }
+   else if (strcasecmp((char *)argStr, "OEM") == 0)
+   {
+      port = DSPS_RS232;
+
+   }
+   else if (strcasecmp((char *)argStr, "USB") == 0)
+   {
+      port = DSPS_USB;
+   }
+   else
+   {
+      DT_ERR("Unknown port value.");
+      return IRC_FAILURE;
+   }
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   DeviceSerialPortFunctionAry[port] = DSPF_Terminal;
+   GC_SetDeviceSerialPortFunction(port);
+
+   DT_PRINTF("Debug terminal output set to %s.", argStr);
 
    return IRC_SUCCESS;
 }
@@ -2001,7 +2048,7 @@ static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
 {
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -2039,6 +2086,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Set GCP state:      GCP [0|1]");
    DT_PRINTF("  ADC calibration:    ADC [m b]");
    DT_PRINTF("  Flash Settings:     FS");
+   DT_PRINTF("  Debug Term. Output: DTO [CLINK|OEM|USB]");
    DT_PRINTF("  Print help:         HLP");
 
    /*

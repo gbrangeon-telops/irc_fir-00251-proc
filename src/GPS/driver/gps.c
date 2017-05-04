@@ -159,10 +159,7 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data,
    status = CircularUART_Init(&GPS_Data->uart,
 		   uartDeviceId,
 		   intc,
-		   uartIntrId,
-		   GPS_UART_IntrHandler,
-		   GPS_Data,
-		   &GPS_Data->rxCircDataBuffer);
+		   uartIntrId);
 	if (status != IRC_SUCCESS)
 	{
 	  return IRC_FAILURE;
@@ -172,6 +169,11 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data,
 	{
 	  return IRC_FAILURE;
 	}
+
+	GPS_Data->uart.rxCircBuffer = &GPS_Data->rxCircDataBuffer;
+	GPS_Data->uart.txCircBuffer = NULL;
+	GPS_Data->uart.uart.Handler = GPS_UART_IntrHandler;
+	GPS_Data->uart.uart.CallBackRef = GPS_Data;
 
    // Set ModeIndicator to "Data Not Valid"
 	GPS_Data->ModeIndicator = 'N';

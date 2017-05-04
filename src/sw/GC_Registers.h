@@ -569,5 +569,6 @@ void GC_SetNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDF
 uint32_t GC_GetTimestamp();
 void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len);
 void GC_SetExposureTimeRegisters(float exposureTime);
+void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort);
 
 #endif // GC_REGISTERS_H

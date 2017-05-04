@@ -89,7 +89,7 @@ static void Test_UART_IntrHandler(void *CallBackRef, u32 Event, unsigned int Eve
  * Global variables
  */
 extern XIntc gProcIntc;
-extern ctrlIntf_t gFileCtrlIntf;
+extern ctrlIntf_t gCtrlIntf_FileManager;
 
 /*
  * Displays the XML Major, Minor and Subminor versions and asks the user whether
@@ -213,14 +213,14 @@ IRC_Status_t AutoTest_USARTLoopback(void) {
 
    bool testFailed = false;
 
-   gFileCtrlIntf.loopback = 1;
+   ((usart_t *)gCtrlIntf_FileManager.p_link)->loopback = 1;
 
    ATR_PRINTF("Run USART_Packet_Transfer.bat.");
    ATR_PRINTF("Was the test successful? (Y/N) ");
 
    testFailed = AutoTest_getUserYN();
 
-   gFileCtrlIntf.loopback = 0;
+   ((usart_t *)gCtrlIntf_FileManager.p_link)->loopback = 0;
 
    return (testFailed) ? IRC_SUCCESS : IRC_FAILURE;
 }

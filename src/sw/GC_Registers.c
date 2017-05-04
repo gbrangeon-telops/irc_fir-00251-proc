@@ -28,6 +28,8 @@
 #include "NDFController.h"
 #include "SFW_MathematicalModel.h"
 #include "exposure_time_ctrl.h"
+#include "DebugTerminal.h"
+#include "FlashDynamicValues.h"
 #include "utils.h"
 #include <string.h>
 #include <math.h>
@@ -1371,5 +1373,129 @@ void GC_SetExposureTimeRegisters(float exposureTime)
    else
    {
       GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], exposureTime);
+   }
+}
+
+/**
+ * Set device serial ports function according to DeviceSerialPortFunctionAry.
+ *
+ * @param updatedPort is the port that has been updated. It is prioritised for terminal assignation.
+ */
+void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort)
+{
+   extern ctrlIntf_t gCtrlIntf_OEM;
+   extern ctrlIntf_t gCtrlIntf_CameraLink;
+   extern debugTerminal_t gDebugTerminal;
+   extern circularUART_t gCircularUART_USB;
+   extern circularUART_t gCircularUART_RS232;
+   extern circularUART_t gCircularUART_CameraLink;
+   extern flashDynamicValues_t gFlashDynamicValues;
+   uint32_t i;
+
+   // Make sure that no other serial port is configured as terminal
+   if (DeviceSerialPortFunctionAry[updatedPort] == DSPF_Terminal)
+   {
+      for (i = 0; i < DeviceSerialPortFunctionAryLen; i++)
+      {
+         if ((i != updatedPort) && (DeviceSerialPortFunctionAry[i] == DSPF_Terminal))
+         {
+            DeviceSerialPortFunctionAry[i] = DSPF_Disabled;
+         }
+      }
+   }
+
+   /*******************************************
+    * Camera Link circular UART
+    *******************************************/
+
+   // Disconnect camera link circular UART if necessary
+   if ((&gCircularUART_CameraLink == gCtrlIntf_CameraLink.p_link) && (DeviceSerialPortFunctionAry[DSPS_CameraLink] != DSPF_Control))
+   {
+      CtrlIntf_SetLink(&gCtrlIntf_CameraLink, CILT_UNDEFINED, NULL);
+   }
+   if ((&gCircularUART_CameraLink == gDebugTerminal.cuart) && (DeviceSerialPortFunctionAry[DSPS_CameraLink] != DSPF_Terminal))
+   {
+      DebugTerminal_SetSerial(&gDebugTerminal, NULL);
+   }
+
+   // Set camera link circular UART function
+   switch (DeviceSerialPortFunctionAry[DSPS_CameraLink])
+   {
+      case DSPF_Disabled:
+         CircularUART_Disable(&gCircularUART_CameraLink);
+         break;
+
+      case DSPF_Control:
+         CtrlIntf_SetLink(&gCtrlIntf_CameraLink, CILT_CUART, &gCircularUART_CameraLink);
+         CircularUART_Enable(&gCircularUART_CameraLink);
+         break;
+
+      case DSPF_Terminal:
+         DebugTerminal_SetSerial(&gDebugTerminal, &gCircularUART_CameraLink);
+         CircularUART_Enable(&gCircularUART_CameraLink);
+         break;
+   }
+
+   /*******************************************
+    * RS-232 circular UART
+    *******************************************/
+
+   // Disconnect RS-232 circular UART if necessary
+   if ((&gCircularUART_RS232 == gCtrlIntf_OEM.p_link) && (DeviceSerialPortFunctionAry[DSPS_RS232] != DSPF_Control))
+   {
+      CtrlIntf_SetLink(&gCtrlIntf_OEM, CILT_UNDEFINED, NULL);
+   }
+   if ((&gCircularUART_RS232 == gDebugTerminal.cuart) && (DeviceSerialPortFunctionAry[DSPS_RS232] != DSPF_Terminal))
+   {
+      DebugTerminal_SetSerial(&gDebugTerminal, NULL);
+   }
+
+   // Set RS-232 circular UART function
+   switch (DeviceSerialPortFunctionAry[DSPS_RS232])
+   {
+      case DSPF_Disabled:
+         CircularUART_Disable(&gCircularUART_RS232);
+         break;
+
+      case DSPF_Control:
+         CtrlIntf_SetLink(&gCtrlIntf_OEM, CILT_CUART, &gCircularUART_RS232);
+         CircularUART_Enable(&gCircularUART_RS232);
+         break;
+
+      case DSPF_Terminal:
+         DebugTerminal_SetSerial(&gDebugTerminal, &gCircularUART_RS232);
+         CircularUART_Enable(&gCircularUART_RS232);
+         break;
+   }
+
+   gFlashDynamicValues.DeviceSerialPortFunctionRS232 = DeviceSerialPortFunctionAry[DSPS_RS232];
+
+   if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
+   {
+      FPGA_PRINT("Error: Failed to update flash dynamic values.\n");
+   }
+
+   /*******************************************
+    * USB circular UART
+    *******************************************/
+
+   // Disconnect USB circular UART if necessary
+   if ((&gCircularUART_USB == gDebugTerminal.cuart) && (DeviceSerialPortFunctionAry[DSPS_USB] != DSPF_Terminal))
+   {
+      DebugTerminal_SetSerial(&gDebugTerminal, NULL);
+   }
+
+   // Set RS-232 circular UART function
+   switch (DeviceSerialPortFunctionAry[DSPS_USB])
+   {
+      case DSPF_Disabled:
+      case DSPF_Control:
+         CircularUART_Disable(&gCircularUART_USB);
+         break;
+
+      case DSPF_Terminal:
+         DebugTerminal_SetSerial(&gDebugTerminal, &gCircularUART_USB);
+         CircularUART_Enable(&gCircularUART_USB);
+         break;
    }
 }

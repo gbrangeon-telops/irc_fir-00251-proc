@@ -103,15 +103,15 @@ void disable_caches()
    extern t_HderInserter gHderInserter;
    extern t_AEC gAEC_Ctrl;
    extern netIntf_t gNetworkIntf;
-   extern ctrlIntf_t gFileCtrlIntf;
-   extern ctrlIntf_t gClinkCtrlIntf;
-   extern ctrlIntf_t gPleoraCtrlIntf;
+   extern debugTerminal_t gDebugTerminal;
+   extern IRC_Status_t gDebugTerminalStatus;
+   extern ctrlIntf_t gCtrlIntf_NTxMini;
+   extern ctrlIntf_t gCtrlIntf_OEM;
+   extern ctrlIntf_t gCtrlIntf_CameraLink;
+   extern ctrlIntf_t gCtrlIntf_OutputFPGA;
+   extern ctrlIntf_t gCtrlIntf_FileManager;
    extern FH_ctrl_t gFWFaulhaberCtrl;
    extern FH_ctrl_t gNDFFaulhaberCtrl;
-#if (OEM_UART_ENABLED)
-   extern ctrlIntf_t gOemCtrlIntf;
-#endif
-   extern ctrlIntf_t gOutputCtrlIntf;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
@@ -124,7 +124,7 @@ void disable_caches()
 
    resetStats(&prof_stats);
 
-   Proc_DebugTerminal_InitPhase1();
+   gDebugTerminalStatus = Proc_DebugTerminal_InitPhase1();
 
    FPGA_PRINT("TSIR starting...\n");
 
@@ -141,13 +141,16 @@ void disable_caches()
    WAIT_US(30);
 
    BuiltInTest_Execute(BITID_InterruptControllerInitialization);
+   BuiltInTest_Execute(BITID_FileSystemInitialization);
+   BuiltInTest_Execute(BITID_FlashDynamicValuesInitialization);
+   BuiltInTest_Execute(BITID_DeviceSerialPortsInitialization);
+   if (Proc_DebugTerminal_InitPhase2() != IRC_SUCCESS) gDebugTerminalStatus = IRC_FAILURE;
+   BuiltInTest_Execute(BITID_PowerManagerInitialization);
+   BuiltInTest_Execute(BITID_LedControllerInitialization);
    BuiltInTest_Execute(BITID_NetworkInterfaceInitialization);
    BuiltInTest_Execute(BITID_DebugTerminalInitialization);
    BuiltInTest_Execute(BITID_GenICamManagerInitialization);
-   BuiltInTest_Execute(BITID_PowerManagerInitialization);
-   BuiltInTest_Execute(BITID_LedControllerInitialization);
    BuiltInTest_Execute(BITID_FlashSettingsManagerInitialization);
-   BuiltInTest_Execute(BITID_FileSystemInitialization);
    BuiltInTest_Execute(BITID_FileManagerInitialization);
    BuiltInTest_Execute(BITID_QSPIFlashInerfaceInitialization);
    BuiltInTest_Execute(BITID_FirmwareUpdaterInitialization);
@@ -166,7 +169,6 @@ void disable_caches()
    BuiltInTest_Execute(BITID_ADCControllerInitialization);
    BuiltInTest_Execute(BITID_AECControllerInitialization);
    BuiltInTest_Execute(BITID_MemoryBufferControllerInitialization);
-   BuiltInTest_Execute(BITID_FlashDynamicValuesInitialization);
    BuiltInTest_Execute(BITID_InterruptControllerStartup);
    BuiltInTest_Execute(BITID_FirmwareReleaseInfoInitialization);
    BuiltInTest_Execute(BITID_DeviceKeyValidation);
@@ -234,7 +236,7 @@ void disable_caches()
       TempMonitor_SM();
       Acquisition_SM();
       BufferManager_SM();
-      DebugTerminal_Process();
+      DebugTerminal_Process(&gDebugTerminal);
       Power_SM();
       Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 0);
       Led_ToggleDebugLedState(&gLedCtrl);
@@ -245,13 +247,11 @@ void disable_caches()
       ICU_process(&gcRegsData, &gICU_ctrl, &gHderInserter);
       FW_ControllerProcess();
       NetIntf_SM(&gNetworkIntf);
-      CtrlIntf_Process(&gFileCtrlIntf);
-      CtrlIntf_Process(&gClinkCtrlIntf);
-      CtrlIntf_Process(&gPleoraCtrlIntf);
-#if (OEM_UART_ENABLED)
-      CtrlIntf_Process(&gOemCtrlIntf);
-#endif
-      CtrlIntf_Process(&gOutputCtrlIntf);
+      CtrlIntf_Process(&gCtrlIntf_FileManager);
+      CtrlIntf_Process(&gCtrlIntf_CameraLink);
+      CtrlIntf_Process(&gCtrlIntf_NTxMini);
+      CtrlIntf_Process(&gCtrlIntf_OEM);
+      CtrlIntf_Process(&gCtrlIntf_OutputFPGA);
       NDF_ControllerProcess();
       FH_ProtocolHandler(&gNDFFaulhaberCtrl);
       FH_ProtocolHandler(&gFWFaulhaberCtrl);

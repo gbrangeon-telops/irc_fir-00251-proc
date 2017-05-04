@@ -29,14 +29,16 @@
 #include "GC_Callback.h"
 #include "Calibration.h"
 #include "BufferManager.h"
+#include "FlashSettings.h"
 
 extern ledCtrl_t gLedCtrl;
 extern netIntf_t gNetworkIntf;
-extern ctrlIntf_t gFileCtrlIntf;
-extern ctrlIntf_t gClinkCtrlIntf;
-extern ctrlIntf_t gOutputCtrlIntf;
-extern ctrlIntf_t gPleoraCtrlIntf;
-extern ctrlIntf_t gOemCtrlIntf;
+extern ctrlIntf_t gCtrlIntf_FileManager;
+extern ctrlIntf_t gCtrlIntf_CameraLink;
+extern ctrlIntf_t gCtrlIntf_OutputFPGA;
+extern ctrlIntf_t gCtrlIntf_NTxMini;
+extern ctrlIntf_t gCtrlIntf_OEM;
+extern debugTerminal_t gDebugTerminal;
 
 // Global test control variables
 volatile bool isRunningATR = false;
@@ -84,14 +86,14 @@ void AutoTest_RunMinimalStateMachines(void) {
    Led_UpdateCameraLedState(&gLedCtrl);
    XADC_SM();
    NetIntf_SM(&gNetworkIntf);
-   CtrlIntf_Process(&gFileCtrlIntf);
-   CtrlIntf_Process(&gClinkCtrlIntf);
-   CtrlIntf_Process(&gPleoraCtrlIntf);
+   CtrlIntf_Process(&gCtrlIntf_FileManager);
+   CtrlIntf_Process(&gCtrlIntf_CameraLink);
+   CtrlIntf_Process(&gCtrlIntf_NTxMini);
 #if (OEM_UART_ENABLED)
    CtrlIntf_Process(&gOemCtrlIntf);
 #endif
-   CtrlIntf_Process(&gOutputCtrlIntf);
-   DebugTerminal_Process();
+   CtrlIntf_Process(&gCtrlIntf_OutputFPGA);
+   DebugTerminal_Process(&gDebugTerminal);
 
    File_Manager_SM();
    Calibration_SM();

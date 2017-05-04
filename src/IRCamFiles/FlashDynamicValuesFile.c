@@ -139,6 +139,11 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader(int fd, FlashDynam
          switch (minorVersion)
          {
             case 0:
+               // 2.0.x -> 2.1.x
+               hdr->DeviceSerialPortFunctionRS232 = FlashDynamicValues_FlashDynamicValuesFileHeader_default.DeviceSerialPortFunctionRS232;
+               hdr->FileStructureMinorVersion = 1;
+               
+            case 1:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = FLASHDYNAMICVALUES_FILESUBMINORVERSION;
                break;
