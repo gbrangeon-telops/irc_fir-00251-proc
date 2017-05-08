@@ -175,6 +175,7 @@ begin
             ctrled_reset_i <= '1';
             reset_err_i <= '0';
             user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
+            user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
             
          else                   
             

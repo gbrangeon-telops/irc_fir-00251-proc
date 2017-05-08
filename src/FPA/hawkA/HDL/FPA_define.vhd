@@ -200,6 +200,9 @@ package FPA_define is
       -- adc clk_phase
       adc_clk_phase                  : unsigned(3 downto 0);     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
       
+      -- reorder_column
+      reorder_column                 : std_logic;
+      
    end record; 
    
    -- Configuration par defaut
@@ -245,7 +248,8 @@ package FPA_define is
       to_unsigned(4, 8),         --good_samp_last_pos_per_ch    
       to_unsigned(160, 8),       --xsize_div_tapnum             
       (to_unsigned(14995, 14), to_unsigned(0, 14), to_unsigned(14122, 14), to_unsigned(0, 14), to_unsigned(0, 14), to_unsigned(0, 14), to_unsigned(0, 14), to_unsigned(1791, 14)),           
-      to_unsigned(0, 4)          --adc_clk_phase 
+      to_unsigned(0, 4),          --adc_clk_phase
+      '0'                         --reorder_column
    );                                               
    
    ----------------------------------
