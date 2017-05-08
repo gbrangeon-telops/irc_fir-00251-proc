@@ -180,7 +180,8 @@ begin
          if sreset = '1' then
             ctrled_reset_i <= '1';
             reset_err_i <= '0';
-            user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
+            user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre
+            user_cfg_i.reorder_column <= '0'; -- non evvoyé par le MBlaze
             
          else                   
             
