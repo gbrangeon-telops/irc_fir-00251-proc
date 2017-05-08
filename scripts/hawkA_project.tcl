@@ -22,6 +22,7 @@ add_files $FPA_path/HDL
 
 # Add iserdes (adc) files
 add_files $common_dir/iserdes/adc
+add_files $root_dir/src/QuadADC/HDL
 
 # Add top level
 add_files $aldec_dir/$proj_name.vhd
