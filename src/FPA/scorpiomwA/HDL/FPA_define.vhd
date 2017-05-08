@@ -43,19 +43,12 @@ package FPA_define is
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '1';
-   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
    
-   -- quelques caractéristiques du FPA
-   --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
-   --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-   -- ATTENTION : la ligne suivante à changer avec MCLK
-   --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 18_000;       -- 10_000 => MCLK = 10M, 15_000 => MCLK = 15M, 18_000 => MCLK = 18M, 
-   
-   
    
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := integer(real(3076)*real(1_000_000)/real(DEFINE_FPA_MCLK_RATE_KHZ));     --  3076 MCLK en ns et en fonction de la frequence d'horloge detecteur
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le scorpioMW, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
    constant DEFINE_XSIZE_MAX                      : integer   := 640;         -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 512;         -- dimension en Y maximale  
    --constant DEFINE_GAIN0                          : std_logic := '0';
@@ -65,23 +58,20 @@ package FPA_define is
    constant DEFINE_FPA_INT_FBK_AVAILABLE          : std_logic := '0';
    constant DEFINE_FPA_POWER_ON_WAIT_US           : integer   := 100_000;    -- en usec, duree d'attente après allumage  pour declarer le FPA rdy. Faible chiffre car comptabilisé dans 
    constant DEFINE_FPA_TEMP_TRIG_PERIOD_US        : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
-   constant DEFINE_FPA_TEMP_RAW_MIN               : integer   := 32000;      -- Minimum ADC value for scorpioMW power-on : 1.00 V de 2N2222 (soit 91K)  
+   constant DEFINE_FPA_TEMP_RAW_MIN               : integer   := 31466;      -- Minimum ADC value for scorpioMW power-on : 983.3 mV de 2N2222 (soit 100K)  
    constant DEFINE_FPA_TEMP_RAW_MAX               : integer   := 33248;      -- Maximum ADC value for scorpioMW power-on : (to protect against ultra low temp). 1.039V 
    
    constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer   := 100_000;    --  horloge de 100M en KHz
-   constant DEFINE_FPA_60M_CLK_RATE_KHZ           : integer   := 60_000;     --  horloge de 60M en KHz
-   constant DEFINE_FPA_72M_CLK_RATE_KHZ           : integer   := 72_000;     --  horloge de 72M en KHz
-   constant DEFINE_FPA_80M_CLK_RATE_KHZ           : integer   := 80_000;     --  horloge de 80M en KHz
-   constant DEFINE_FPA_70M_CLK_RATE_KHZ           : integer   := 70_000;     --  horloge de 68.2M en KHz
+
    
    -- quelques caractéristiques de la carte ADC requise
    --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
    -- ATTENTION : les 3 lignes suivantes à changer avec MCLK
    --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 36_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M,  
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 36_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M, 
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_72M_CLK_RATE_KHZ;     -- DEFINE_FPA_80M_CLK_RATE_KHZ => MCLK = 10M, DEFINE_FPA_60M_CLK_RATE_KHZ => MCLK = 15M, DEFINE_FPA_72M_CLK_RATE_KHZ => MCLK = 18M,-- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
+   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 18_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M,  
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 18_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M, 
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := 72_000;     --  ENO 02 mai 2017 doit valoir au moins 4xMCLK pour éviter des problèmes dans LL8_ext_to_spi_tx
    
    
    
@@ -132,7 +122,7 @@ package FPA_define is
    constant XSIZE_MAX                             : integer := DEFINE_XSIZE_MAX;  -- pour les modules utilisant XSIZE_MAX
    constant YSIZE_MAX                             : integer := DEFINE_YSIZE_MAX;  -- pour les modules utilisant YSIZE_MAX   
    constant DEFINE_FPA_MCLK_RATE_FACTOR_100M_X_2P15 : integer := integer((DEFINE_FPA_100M_CLK_RATE_KHZ*(2**15))/DEFINE_FPA_MCLK_RATE_KHZ);    -- pour la conversion du temps d'integration en coups de 100MHz 
-
+    constant ADC_SERDES_CLK_1X_PERIOD_NS           : real    := 1_000_000.0/real(DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    ---------------------------------------------------------------------------------								
    -- Configuration
    ---------------------------------------------------------------------------------  
@@ -142,6 +132,8 @@ package FPA_define is
       tir                        : unsigned(7 downto 0);
       xsize_div_tapnum           : unsigned(7 downto 0);
    end record;
+   
+   type quad_clk_phase_type is array (1 to 2) of unsigned(4 downto 0);
    
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
@@ -219,7 +211,10 @@ package FPA_define is
       vdac_value                     : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)  -- dac6 -> VOS pour le skimming
       
       -- adc clk_phase
-      adc_clk_phase                  : unsigned(3 downto 0);     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
+      adc_clk_phase                  : quad_clk_phase_type;     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
+      
+      -- reorder column
+      reorder_column                 : std_logic;               -- utilisé principalemet par les Sofradir pour contrer l'inversion des columns
                   
    end record;    
    
@@ -229,7 +224,7 @@ package FPA_define is
    (others => '0'),           --int_indx                       
    to_unsigned(3176, 32),     --int_signal_high_time           
    --comn                           
-   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), '0'),
+   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32),'0'),
    to_unsigned(0, 11),        --xstart                         
    to_unsigned(0, 11),        --ystart                         
    to_unsigned(640, 11),      --xsize                          
@@ -269,7 +264,8 @@ package FPA_define is
    to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
    to_unsigned(160, 8),       --xsize_div_tapnum             
    (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
-   to_unsigned(0, 4)
+   (to_unsigned(1, 5),to_unsigned(1, 5)),
+   '0'
    );
    
    

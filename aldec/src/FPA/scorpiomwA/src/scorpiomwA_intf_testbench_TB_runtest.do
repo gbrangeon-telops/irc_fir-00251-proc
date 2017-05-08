@@ -20,7 +20,7 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_intf_sequencer.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_status_gen.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_define.vhd
-
+acom d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd
 
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
 acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.vhdl
@@ -129,11 +129,13 @@ asim -ses scorpiomwA_intf_testbench_TB
 --wave UUT/U1/U21/U6/*
 
 --wave UUT/U1/U9/U1/*
---wave UUT/U1/U9/U22/* 
+--wave UUT/U1/U9/U22/*  OK
+--wave UUT/U1/U9/U23/*  OK
+
 --wave UUT/U1/U9/U7/*
 --wave UUT/U1/U9/U2/U1/* 
 --wave UUT/U1/U9/U18/*
-wave UUT/U1/*
---wave UUT/U1/U5/U5/*
+--wave UUT/U1/*
+wave UUT/U1/U5/U2/U6/*
 
 run 40 ms

@@ -60,6 +60,8 @@ architecture rtl of scorpiomwA_clks_gen_core is
          Clk_div   : out std_logic);
    end component;
    
+   type quad_clk_pipe_type is array (1 to 2) of std_logic_vector(31 downto 0);
+   
    signal sreset                         : std_logic;
    signal quad_clk_iob                   : std_logic_vector(2 downto 1);
    signal fpa_mclk_i                     : std_logic;
@@ -67,10 +69,10 @@ architecture rtl of scorpiomwA_clks_gen_core is
    signal quad_clk_default               : std_logic;
    signal quad_clk_raw                   : std_logic;
    signal disable_quad_clk_default_i     : std_logic;
-   signal quad_clk_pipe                  : std_logic_vector(15 downto 0);
    signal adc_deserializer_rst_i         : std_logic;
    signal quad_clk_copy_i                : std_logic;
    signal quad_clk_r                     : std_logic_vector(2 downto 1);
+   signal quad_clk_pipe                  : quad_clk_pipe_type;
    
    attribute equivalent_register_removal : string;
    attribute equivalent_register_removal of quad_clk_iob: signal is "no";
@@ -180,33 +182,28 @@ begin
       end if;
    end process;
    
-   -- dephaseurs
+   -- dephaseur sur quad 4 pour retrouver delai avant timing
    U3D : process(ADC_PHASE_CLK)
    begin
       if rising_edge(ADC_PHASE_CLK) then                                          
          
-         -- choix de l'horloge des adcs
-         quad_clk_pipe(0) <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
-         quad_clk_pipe(15 downto 1) <= quad_clk_pipe(14 downto 0);
-         
-         for ii in 1 to 2 loop
-            quad_clk_r(ii) <= quad_clk_pipe(to_integer(FPA_INTF_CFG.ADC_CLK_PHASE));
+         -- pipe de l'horloge des adcs
+         for ii  in 1 to 2 loop
+            quad_clk_pipe(ii)(0) <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
+            quad_clk_pipe(ii)(31 downto 1) <= quad_clk_pipe(ii)(30 downto 0);
          end loop;
          
-      end if;
-   end process;
-   
-   -- clocks des ADCS
-   U3E : process(ADC_PHASE_CLK)
-   begin
-      if rising_edge(ADC_PHASE_CLK) then                                          
+         -- selection de l'horloge dephasagée pour chaque quad
+         for jj in 1 to 2 loop
+            quad_clk_r(jj) <= quad_clk_pipe(jj)(to_integer(FPA_INTF_CFG.ADC_CLK_PHASE(jj)));  
+         end loop; 
          
          -- registres des IOBs
-         for ii in 1 to 2 loop
-            quad_clk_iob(ii) <= quad_clk_r(ii); 
+         for kk in 1 to 2 loop
+            quad_clk_iob(kk) <= quad_clk_r(kk); 
          end loop;
          
       end if;
-   end process;
+   end process; 
    
 end rtl;

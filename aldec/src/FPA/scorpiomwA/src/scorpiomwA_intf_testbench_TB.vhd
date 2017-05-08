@@ -191,8 +191,8 @@ begin
    
    
    user_cfg_i.real_mode_active_pixel_dly  <= to_unsigned(0, user_cfg_i.real_mode_active_pixel_dly'length);
-   user_cfg_i.adc_quad2_en  <= '1';
-   user_cfg_i.chn_diversity_en  <= '1'; 
+   user_cfg_i.adc_quad2_en  <= '0';
+   user_cfg_i.chn_diversity_en  <= '0'; 
    
    user_cfg_i.line_period_pclk <= to_unsigned((XSIZE/4 + PAUSE_SIZE), user_cfg_i.line_period_pclk'length);
    user_cfg_i.readout_pclk_cnt_max   <= to_unsigned((XSIZE/4 + PAUSE_SIZE)*(YSIZE + 1) + 1, user_cfg_i.readout_pclk_cnt_max'length);
@@ -200,7 +200,7 @@ begin
    user_cfg_i.active_line_start_num            <= to_unsigned(1, user_cfg_i.active_line_start_num'length); 
    user_cfg_i.active_line_end_num         <= to_unsigned(YSIZE + to_integer(user_cfg_i.active_line_start_num) - 1, user_cfg_i.active_line_end_num'length);
    
-   user_cfg_i.pix_samp_num_per_ch   <= to_unsigned(2, user_cfg_i.pix_samp_num_per_ch'length);
+   user_cfg_i.pix_samp_num_per_ch   <= to_unsigned(1, user_cfg_i.pix_samp_num_per_ch'length);
    
    user_cfg_i.sof_posf_pclk   <= resize(user_cfg_i.line_period_pclk*(to_integer(user_cfg_i.active_line_start_num) - 1) + 1, user_cfg_i.sof_posf_pclk'length);
    user_cfg_i.eof_posf_pclk   <= resize(user_cfg_i.active_line_end_num* user_cfg_i.line_period_pclk - PAUSE_SIZE*2, user_cfg_i.eof_posf_pclk'length);
@@ -210,11 +210,11 @@ begin
    
    
    user_cfg_i.hgood_samp_sum_num          		<= to_unsigned(1, user_cfg_i.hgood_samp_sum_num'length); 
-   user_cfg_i.hgood_samp_mean_numerator   		<= to_unsigned(2**21/2, user_cfg_i.hgood_samp_mean_numerator'length); 
-   user_cfg_i.vgood_samp_sum_num          		<= to_unsigned(2, user_cfg_i.vgood_samp_sum_num'length); 
-   user_cfg_i.vgood_samp_mean_numerator   		<= to_unsigned(2**21/2, user_cfg_i.vgood_samp_mean_numerator'length); 
-   user_cfg_i.good_samp_first_pos_per_ch  		<= to_unsigned(2, user_cfg_i.good_samp_first_pos_per_ch'length); 
-   user_cfg_i.good_samp_last_pos_per_ch   		<= to_unsigned(2, user_cfg_i.good_samp_last_pos_per_ch'length); 
+   user_cfg_i.hgood_samp_mean_numerator   		<= to_unsigned(2**21, user_cfg_i.hgood_samp_mean_numerator'length); 
+   user_cfg_i.vgood_samp_sum_num          		<= to_unsigned(1, user_cfg_i.vgood_samp_sum_num'length); 
+   user_cfg_i.vgood_samp_mean_numerator   		<= to_unsigned(2**21, user_cfg_i.vgood_samp_mean_numerator'length); 
+   user_cfg_i.good_samp_first_pos_per_ch  		<= to_unsigned(1, user_cfg_i.good_samp_first_pos_per_ch'length); 
+   user_cfg_i.good_samp_last_pos_per_ch   		<= to_unsigned(1, user_cfg_i.good_samp_last_pos_per_ch'length); 
    user_cfg_i.xsize_div_tapnum            		<= to_unsigned(xsize/4, user_cfg_i.xsize_div_tapnum'length); 
    user_cfg_i.vdac_value(1)               		<= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
    user_cfg_i.vdac_value(2)               		<= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 
@@ -224,7 +224,10 @@ begin
    user_cfg_i.vdac_value(6)               		<= to_unsigned(11630, user_cfg_i.vdac_value(6)'length); 
    user_cfg_i.vdac_value(7)               		<= to_unsigned(11630, user_cfg_i.vdac_value(7)'length); 
    user_cfg_i.vdac_value(8)               		<= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);
-   user_cfg_i.adc_clk_phase                     <= to_unsigned(2, user_cfg_i.adc_clk_phase'length);
+   user_cfg_i.adc_clk_phase(1)                  <= to_unsigned(2, user_cfg_i.adc_clk_phase(1)'length);
+   user_cfg_i.adc_clk_phase(2)                  <= to_unsigned(2, user_cfg_i.adc_clk_phase(2)'length);
+   user_cfg_i.comn.fpa_stretch_acq_trig         <= '0';
+   user_cfg_i.reorder_column               <= '1';
    
    fpa_softw_stat_i.fpa_roic <= FPA_ROIC_SCORPIO_MW;
    fpa_softw_stat_i.fpa_output <= OUTPUT_ANALOG;    
@@ -359,7 +362,13 @@ begin
       wait for 30 ns;
       write_axi_lite (MB_CLK, x"000000C8", std_logic_vector(resize(user_cfg_i.vdac_value(8), 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000CC", std_logic_vector(resize(user_cfg_i.adc_clk_phase, 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"000000CC", std_logic_vector(resize(user_cfg_i.adc_clk_phase(1), 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000D0", std_logic_vector(resize(user_cfg_i.adc_clk_phase(2), 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000D4", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_stretch_acq_trig, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000D8", std_logic_vector(resize('0'&user_cfg_i.reorder_column, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
       
       write_axi_lite (MB_CLK, resize(X"E0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);

@@ -22,6 +22,10 @@ add_files $FPA_path/HDL
 
 # Add iserdes (adc) files
 add_files $common_dir/iserdes/adc
+add_files $root_dir/src/Quad_serdes/HDL
+add_files $common_dir/iserdes/clink/clink_bitslip_ctrl.vhd
+add_files $common_dir/iserdes/clink/clink_delay_ctrl.vhd
+
 
 # Add top level
 add_files $aldec_dir/$proj_name.vhd
@@ -56,4 +60,5 @@ set_property top $proj_name [current_fileset]
 
 update_compile_order -fileset sources_1
 
-set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FANOUT_LIMIT 5000 [get_runs synth_1]

@@ -86,7 +86,11 @@ begin
             rst_cnt <= rst_cnt + 1;
             if rst_cnt = 200_000_000 then -- le reest dure 2 secondes de plus 
                sreset <= '0';
-            end if;              
+            end if;
+            -- pragma translate_off
+              sreset <= '0';
+            -- pragma translate_on
+            
          end if;
       end if;
    end process;    

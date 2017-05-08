@@ -55,7 +55,7 @@
 #define FPA_MAX_GAIN       0
 #define FPA_NUMTAPS        4  // [taps]
 
-#define FPA_COOLER_TEMP_THRES    -18300        // temp très basse avant allumage car détecteur à haute vitesse
+#define FPA_COOLER_TEMP_THRES    -18700        // temp très basse avant allumage car détecteur à haute vitesse
 #define FPA_DEFAULT_EXPOSURE     500.0F //[us]
 #define FPA_DEFAULT_FRAME_RATE   44.0F   //[Hz]
 
@@ -135,11 +135,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  good_samp_last_pos_per_ch;           
    uint32_t  xsize_div_tapnum;                
    uint32_t  vdac_value[8];   
-   uint32_t  adc_clk_phase;
-   uint32_t  init_cfg;
-   
-   // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
+   uint32_t  adc_clk_phase[2];
+   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd 
+   uint32_t  reorder_column;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
@@ -197,7 +195,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,5096,2594}, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,5096,2594}, {0, 0}, 0, 0}
                                                                                                                      //ENO 11 mai 2016:  ne pas changer le 671, ce n'est pas en mV mais en cnt DAC qui donneront 700 mV
 
 // pour initialiser le module vhd avec les bons parametres de départ

@@ -76,18 +76,9 @@
 
 // horloges du module FPA
 #define VHD_CLK_100M_RATE_HZ              100000000
-#define VHD_CLK_80M_RATE_HZ                80000000
 
 // horloge des ADCs
-//#ifdef FPA_MCLK_RATE_HZ == 10000000
-//   #define ADC_SAMPLING_RATE_HZ           40000000    // les ADC roulent à 40MHz
-//#elif  FPA_MCLK_RATE_HZ == 15000000
-//   #define ADC_SAMPLING_RATE_HZ           30000000    // les ADC roulent à 30MHz
-//#elif  FPA_MCLK_RATE_HZ == 17500000
-//   #define ADC_SAMPLING_RATE_HZ           35000000    // les ADC roulent à 35MHz
-//#elif  FPA_MCLK_RATE_HZ == 18000000
-   #define ADC_SAMPLING_RATE_HZ           36000000    // les ADC roulent à 36MHz
-//#endif
+#define ADC_SAMPLING_RATE_HZ              18000000    // les ADC roulent à 18MHz
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
@@ -236,15 +227,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalRefOffset;
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   //t_FpaStatus  Stat;
-
-   // ont lit les statuts
-   //FPA_GetStatus(&Stat, ptrA);
-   
-   //localGCRegs = *pUserGCRegs;
-   
-   //if ((Stat.prog_init_done == 0) && (pUserGCRegs->TestImageSelector == 0))  // en mode détecteur, on s'assure que la configuration d'initialisation passe avant le reste
-   //   localGCRegs = InitGCRegs;
+   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
    
    // on bâtit les parametres specifiques du scorpiomw
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
@@ -312,13 +295,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //  windowing
    ptrA->sizea_sizeb = 0;           // 0 --> toujours en mode windowing
-   if ((init_cfg_in_progress == 1) && ((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
       ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
-     
+
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 
    if (init_cfg_in_progress == 1)
-      ptrA->itr = 0;     // toujours en mode itr
+      ptrA->itr = 1;     // toujours en mode itr
        
    //  gain 
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
@@ -333,10 +316,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 3;                             // ENO : 06 juin 2016: prendre 3 pour MCLK = 18MHz
+   ptrA->real_mode_active_pixel_dly = 4;                             //3
    
-   // quad2    
-   ptrA->adc_quad2_en = 1;
+   // quad2
+   ptrA->adc_quad2_en = 0;   //
+
    ptrA->chn_diversity_en = ptrA->adc_quad2_en;                      // 
    
    //
@@ -361,7 +345,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->good_samp_last_pos_per_ch         = ptrA->pix_samp_num_per_ch;     // position dernier echantillon
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
-   ptrA->vgood_samp_sum_num                = 2;
+   ptrA->vgood_samp_sum_num                = ptrA->adc_quad2_en + 1;
    ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);                              
       
    // calculs
@@ -370,7 +354,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // les DACs (1 à 8)
    ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 1);      // VCC1 -> VDDA = 3300 mV
    ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(3600.0F, 2);      // VCC2 -> VDDO = 3600 mV
-   ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV
+   ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV  // pour allumer la LED
    ptrA->vdac_value[3]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 4);      // VCC4 -> VDD  = 3300 mV
    ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
    ptrA->vdac_value[5]                     = ptrA->gpol_code;                             // VCC6 -> GPOL
@@ -394,15 +378,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[7], 8);            
    gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
-   //ptrA->vdac_value[6]                     = FLEG_VccVoltage_To_DacWord(1950.0F, 7);      // VCC7 -> offset1(TapRef) = 1950.0 mV    soit word = 4893
-   //ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(3159.4F, 8);      // VCC8 -> offset2(RefOFs) = 3159.4 mV    soit word = 2594
-
    // adc_clk_phase
-   ptrA->adc_clk_phase                     = 0;
+   ptrA->adc_clk_phase[0] = 11;
+   ptrA->adc_clk_phase[1] = 11;
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
-     
+   
+   // reorder column
+   ptrA->reorder_column = 0;
+   if ((ptrA->fpa_diag_mode == 0)&&(ptrA->uprow_upcol == 0))  // en mode détecteur et avec uprow_upcol=0 le scorpioMW inverse les colonnes
+      ptrA->reorder_column = 1;
+      
    WriteStruct(ptrA);
 }
 

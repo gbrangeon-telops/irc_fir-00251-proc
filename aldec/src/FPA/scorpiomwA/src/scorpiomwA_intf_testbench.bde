@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 33032
+ FREEID 33925
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -1272,7 +1272,7 @@ HEADER
 "library IEEE,WORK;\n"+
 "use ieee.std_logic_1164.all,work.TEL2000.all,work.FPA_define.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1470925700"
+    #MODIFIED="1493650160"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="34459332-912f-4c71-b4e0-bb6ca9746f29"
    }
   }
@@ -1342,14 +1342,6 @@ HEADER
      ALIGN 6
      MARGINS (1,1)
      PARENT 12
-    }
-    TEXT  15, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (-75,110,13,134)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 14
     }
     TEXT  17, 0, 0
     {
@@ -1813,23 +1805,6 @@ HEADER
       POINTS ( (-20,0), (0,0) )
      }
     }
-    PIN  14, 0, 0
-    {
-     COORD (-100,120)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="CLK_80M"
-      #NUMBER="0"
-      #SIDE="left"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (0,0), (20,0) )
-     }
-    }
     PIN  16, 0, 0
     {
      COORD (420,160)
@@ -1959,7 +1934,7 @@ HEADER
       #NAME="FPA_EXP_INFO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="EXP_INFO_TYPE"
+      #VHDL_TYPE="exp_info_type"
      }
      LINE  2, 0, 0
      {
@@ -2249,7 +2224,7 @@ HEADER
       #NAME="DOUT_MISO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -2267,7 +2242,7 @@ HEADER
       #NAME="HDER_MISO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_LITE_MISO"
+      #VHDL_TYPE="t_axi4_lite_miso"
      }
      LINE  2, 0, 0
      {
@@ -2285,7 +2260,7 @@ HEADER
       #NAME="MB_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+      #VHDL_TYPE="t_axi4_lite_mosi"
      }
      LINE  2, 0, 0
      {
@@ -2441,7 +2416,7 @@ HEADER
       #NAME="DOUT_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI32"
+      #VHDL_TYPE="t_axi4_stream_mosi32"
      }
      LINE  2, 0, 0
      {
@@ -2459,7 +2434,7 @@ HEADER
       #NAME="HDER_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+      #VHDL_TYPE="t_axi4_lite_mosi"
      }
      LINE  2, 0, 0
      {
@@ -2477,7 +2452,7 @@ HEADER
       #NAME="IMAGE_INFO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="IMG_INFO_TYPE"
+      #VHDL_TYPE="img_info_type"
      }
      LINE  2, 0, 0
      {
@@ -2495,7 +2470,7 @@ HEADER
       #NAME="MB_MISO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_LITE_MISO"
+      #VHDL_TYPE="t_axi4_lite_miso"
      }
      LINE  2, 0, 0
      {
@@ -2544,7 +2519,7 @@ HEADER
       #MDA_RECORD_TOKEN="RECORD"
       #NAME="FPA_SERDES_STAT"
       #NUMBER="0"
-      #VHDL_TYPE="FPA_SERDES_STAT_TYPE"
+      #VHDL_TYPE="fpa_serdes_stat_type"
      }
      LINE  2, 0, 0
      {
@@ -2561,7 +2536,7 @@ HEADER
       #MDA_RECORD_TOKEN="RECORD"
       #NAME="FPA_INTF_CFG_OUT"
       #NUMBER="0"
-      #VHDL_TYPE="FPA_INTF_CFG_TYPE"
+      #VHDL_TYPE="fpa_intf_cfg_type"
      }
      LINE  2, 0, 0
      {
@@ -2610,25 +2585,14 @@ PAGE ""
    TEXT 
 "library IEEE;\n"+
 "use IEEE.std_logic_1164.all;\n"+
+"use IEEE.numeric_std.all;\n"+
 "use work.tel2000.all;\n"+
 "use work.fpa_define.all;\n"+
 "use work.fpa_common_pkg.all;\n"+
 "--use work.detector_trace_define.all;\n"+
 "use work.fpa_serdes_define.all;\n"+
 "\n"+
-"\n"+
-"library work;\n"+
-"library work;\n"+
-"library work;\n"+
-"library work;\n"+
-"library work;\n"+
-"library work;\n"+
-"library work;\n"+
-"library work;\n"+
-"library scorpiomwA;\n"+
-"library scorpiomwA;\n"+
-"use scorpiomwA.fpa_serdes_define.all;\n"+
-"use scorpiomwA.fpa_define.all;"
+""
    RECT (4100,240,4700,480)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(239,235,255),0)
@@ -2662,7 +2626,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="34459332-912f-4c71-b4e0-bb6ca9746f29"
    }
    COORD (1740,580)
-   VERTEXES ( (2,23249), (4,23320), (6,23250), (8,23323), (10,23239), (12,23259), (14,23241), (16,23361), (18,23245), (20,23379), (22,23324), (24,23363), (26,23326), (28,23365), (30,23257), (32,23367), (34,23346), (36,23369), (38,23243), (40,23371), (42,28579), (44,23373), (46,23352), (48,23375), (52,23377), (56,23255), (62,23396), (64,23313), (66,23247), (68,23315), (70,23269), (74,23265), (78,23271), (80,23398), (82,27785), (84,23388), (86,23331), (88,23390), (90,23333), (92,23394), (96,23392), (100,23267), (102,23263), (104,23261), (108,23273), (110,27790), (112,27795), (114,27800), (116,27808), (50,32320), (118,32342) )
+   VERTEXES ( (2,23249), (4,23320), (6,23250), (8,23323), (10,23239), (12,23259), (16,23361), (18,23245), (20,23379), (22,23324), (24,23363), (26,23326), (28,23365), (30,23257), (32,23367), (34,23346), (36,23369), (38,23243), (40,23371), (42,28579), (44,23373), (46,23352), (48,23375), (50,32320), (52,23377), (56,23255), (62,23396), (64,23313), (66,23247), (68,23315), (70,23269), (74,23265), (78,23271), (80,23398), (82,27785), (84,23388), (86,23331), (88,23390), (90,23333), (92,23394), (96,23392), (100,23267), (102,23263), (104,23261), (108,23273), (110,27790), (112,27795), (114,27800), (116,27808), (118,32342) )
   }
   TEXT  11129, 0, 0
   {
@@ -4179,9 +4143,16 @@ PAGE ""
    LABEL "SignalAssignments_1"
    TEXT 
 "QUAD1_DATA(56) <= adc_sync_flag_i;\n"+
-"QUAD1_DATA(55 downto 0) <= (others => '0');\n"+
+"QUAD1_DATA(55 downto 42) <= std_logic_vector(to_unsigned(16384 - 4, 14));\n"+
+"QUAD1_DATA(41 downto 28) <= std_logic_vector(to_unsigned(16384 - 3, 14));\n"+
+"QUAD1_DATA(27 downto 14) <= std_logic_vector(to_unsigned(16384 - 2, 14));\n"+
+"QUAD1_DATA(13 downto 0) <=  std_logic_vector(to_unsigned(16384 - 1, 14));\n"+
+"\n"+
 "QUAD2_DATA(56) <= adc_sync_flag_i;\n"+
-"QUAD2_DATA(55 downto 0) <= (others => '1');\n"+
+"QUAD2_DATA(55 downto 42) <= std_logic_vector(to_unsigned(16384 - 4, 14));\n"+
+"QUAD2_DATA(41 downto 28) <= std_logic_vector(to_unsigned(16384 - 3, 14));\n"+
+"QUAD2_DATA(27 downto 14) <= std_logic_vector(to_unsigned(16384 - 2, 14));\n"+
+"QUAD2_DATA(13 downto 0) <=  std_logic_vector(to_unsigned(16384 - 1, 14));\n"+
 "\n"+
 "U0: process(DESERIALIZER_CLK_DOUT)\n"+
 "begin\n"+
@@ -4197,6 +4168,12 @@ PAGE ""
 "\n"+
 "FPA_DIGIO11 <= transport DATA_VALID after 1 us; \n"+
 "FPA_DIGIO12 <= '0';\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
+"\n"+
 "\n"+
 "\n"+
 "\n"+
@@ -6008,7 +5985,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  33009, 0, 0
+  TEXT  33902, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -6019,7 +5996,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  33010, 0, 0
+  TEXT  33903, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -6030,7 +6007,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  33011, 0, 0
+  TEXT  33904, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -6040,7 +6017,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  33012, 0, 0
+  TEXT  33905, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -6052,27 +6029,27 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  LINE  33013, 0, 0
+  LINE  33906, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4260,3680), (4800,3680) )
    FILL (1,(0,0,0),0)
   }
-  LINE  33014, 0, 0
+  LINE  33907, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4260,3680), (4260,3800) )
   }
-  LINE  33015, 0, 0
+  LINE  33908, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4800,3800), (4800,3560), (3820,3560), (3820,3800), (4800,3800) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  33016, 0, 0
+  TEXT  33909, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -6087,20 +6064,20 @@ PAGE ""
    VAR
    MULTILINE
   }
-  LINE  33017, 0, 0
+  LINE  33910, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4260,3560), (4260,3680) )
   }
-  LINE  33018, 0, 0
+  LINE  33911, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4800,3560), (4800,3440), (4260,3440), (4260,3560), (4800,3560) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  33019, 0, 0
+  TEXT  33912, 0, 0
   {
    PAGEALIGN 10
    TEXT "$FIRMWARE"
@@ -6111,7 +6088,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  33020, 0, 0
+  TEXT  33913, 0, 0
   {
    PAGEALIGN 10
    TEXT "$AUTHOR"
@@ -6122,7 +6099,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  33021, 0, 0
+  TEXT  33914, 0, 0
   {
    PAGEALIGN 10
    TEXT "$PROJECT"
@@ -6133,7 +6110,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  33022, 0, 0
+  TEXT  33915, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -6144,7 +6121,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  33023, 0, 0
+  TEXT  33916, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -6155,20 +6132,20 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  33024, 0, 0
+  LINE  33917, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3980,3560), (3980,3680) )
   }
-  LINE  33025, 0, 0
+  LINE  33918, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3820,3680), (4260,3680) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  33026, 0, 0
+  TEXT  33919, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -6179,7 +6156,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  33027, 0, 0
+  TEXT  33920, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -6190,19 +6167,19 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  33028, 0, 0
+  LINE  33921, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (3980,3680), (3980,3800) )
   }
-  LINE  33029, 0, 0
+  LINE  33922, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,3680), (4380,3800) )
   }
-  TEXT  33030, 0, 0
+  TEXT  33923, 0, 0
   {
    PAGEALIGN 10
    TEXT "$REVISION"
@@ -6213,7 +6190,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  BMPPICT  33031, 0, 0
+  BMPPICT  33924, 0, 0
   {
    PAGEALIGN 10
    RECT (4340,3460,4720,3555)
