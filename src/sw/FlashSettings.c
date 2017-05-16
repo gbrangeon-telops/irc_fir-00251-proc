@@ -225,8 +225,16 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gcRegsData.SensorID = p_flashSettings->SensorID;
 
    // Update reverse X/Y
-   GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
-   GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
+   if (calibrationInfo.isValid)
+   {
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
+   }
+   else
+   {
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX);
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY);
+   }
 
    // Update ICU
    if (p_flashSettings->ICUPresent)
