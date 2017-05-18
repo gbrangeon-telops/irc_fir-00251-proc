@@ -33,12 +33,13 @@ extern uint8_t FPA_StretchAcqTrig;
 
 IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
 {
-   pGCRegs->FWSpeedSetpoint = (uint16_t)round(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
-
    uint8_t i;
    uint16_t pos;
    uint32_t val;
    uint32_t clock_to_rpm_factor;
+   int32_t counts = 0;
+
+   pGCRegs->FWSpeedSetpoint = (uint16_t)round(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
 
    AXI4L_write32(  0, pSFWCtrl->ADD + VALID_PARAM_ADDR);
 
@@ -54,14 +55,16 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
    clock_to_rpm_factor = (uint32_t)( (SFW_BASE_CLOCK_FREQ_HZ * 60.0f/ ( (float) flashSettings.FWEncoderCyclePerTurn))+0.5f);
    AXI4L_write32(clock_to_rpm_factor, pSFWCtrl->ADD + RPM_FACTOR_ADDR);
 
-   AXI4L_write32( (uint32_t)flashSettings.FWSpeedMax + SFW_MAX_SPEED_MARGING, pSFWCtrl->ADD + RPM_MAX_ADDR);
+   AXI4L_write32( (uint32_t)flashSettings.FWSpeedMax + SFW_MAX_SPEED_MARGIN, pSFWCtrl->ADD + RPM_MAX_ADDR);
 
    gSFW_precisionFactor = (uint16_t)AXI4L_read32(pSFWCtrl->ADD  + SPEED_PRECISION_BIT_ADDR);
 
    //Write to hardware the position of the filter
    for(i=0; i<8; i++)
    {
-      pos = SFW_CTRL_GetFilterPosition(i) + FILTER_DEFAULT_RANGE;
+      FW_getFilterPosition(i, &counts);
+
+      pos = (uint16_t)counts + FILTER_DEFAULT_RANGE;
       if(pos >= flashSettings.FWEncoderCyclePerTurn)
       {
          pos -= flashSettings.FWEncoderCyclePerTurn;
@@ -69,7 +72,7 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
 
       val = (uint32_t)pos << 16;
 
-      pos = SFW_CTRL_GetFilterPosition(i)-FILTER_DEFAULT_RANGE;
+      pos = (uint16_t)counts - FILTER_DEFAULT_RANGE;
       if(pos >= flashSettings.FWEncoderCyclePerTurn)
       {
          pos += flashSettings.FWEncoderCyclePerTurn;
@@ -91,14 +94,10 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
          AXI4L_write32(ROTATING_WHEEL, pSFWCtrl->ADD  + WHEEL_STATE_ADDR);
          FPA_StretchAcqTrig = 1;
       }
-
-      //TODO is it necessary in tel2000 to wait for
-      TDCStatusSet( WaitingForFilterWheelMask);
    }
    else
    {
       AXI4L_write32(NOT_IMPLEMENTED,  pSFWCtrl->ADD  + WHEEL_STATE_ADDR);
-      TDCStatusClr(WaitingForFilterWheelMask);
    }
 
    //Set exposure time arrays to default value
@@ -123,6 +122,7 @@ void SFW_UpdateFilterRanges(float deltaTheta1, float deltaTheta2)
    uint8_t i;
    uint16_t pos;
    uint32_t val = 0;
+   int32_t counts = 0;
 
    SFW_INF("deltaTheta1*1000 = %d, deltaTheta2*1000 = %d",(int32_t)(deltaTheta1*1000),(int32_t)(deltaTheta2*1000));
 
@@ -135,62 +135,26 @@ void SFW_UpdateFilterRanges(float deltaTheta1, float deltaTheta2)
 
    for(i=0; i<flashSettings.FWNumberOfFilters; i++)
    {
-      pos = (SFW_CTRL_GetFilterPosition(i) + gSFW_deltaFilterEnd );
+      FW_getFilterPosition(i, &counts);
+
+      pos = (uint16_t)counts + gSFW_deltaFilterEnd;
 
       if(pos >= flashSettings.FWEncoderCyclePerTurn)   //Verify if pos exceeds encoder values
          pos -= flashSettings.FWEncoderCyclePerTurn; // if so, wrap the value
 
-      val = (uint32_t) pos << 16;
-      SFW_PRINTF("SFW_UpdateFilterRanges Filter[%d] -- Max Pos2=%d",i, pos);
+      val = (uint32_t)pos << 16;
+      SFW_INF("SFW_UpdateFilterRanges Filter[%d] -- Max Pos2=%d",i, pos);
 
-      pos = (SFW_CTRL_GetFilterPosition(i) - gSFW_deltaFilterBegin);
+      pos = (uint16_t)counts - gSFW_deltaFilterBegin;
 
       if(pos >= flashSettings.FWEncoderCyclePerTurn)   //Verify if pos exceeds encoder values
          pos += flashSettings.FWEncoderCyclePerTurn; // if so, wrap the value
-      val |= (uint32_t) pos;
+      val |= (uint32_t)pos;
       SFW_INF("SFW_UpdateFilterRanges Filter[%d] -- Min Pos2=%d",i, pos);
 
       AXI4L_write32(val, gSFW_Ctrl.ADD + FW_POSITION_0_ADDR + 4 * i);
    }
 
-}
-
-int32_t SFW_CTRL_GetFilterPosition(uint8_t filterid)
-{
-   int32_t position;
-
-   switch(filterid)
-   {
-   case 0:
-      position = flashSettings.FW0CenterPosition;
-      break;
-   case 1:
-      position = flashSettings.FW1CenterPosition;
-      break;
-   case 2:
-      position = flashSettings.FW2CenterPosition;
-      break;
-   case 3:
-      position = flashSettings.FW3CenterPosition;
-      break;
-   case 4:
-      position = flashSettings.FW4CenterPosition;
-      break;
-   case 5:
-      position = flashSettings.FW5CenterPosition;
-      break;
-   case 6:
-      position = flashSettings.FW6CenterPosition;
-      break;
-   case 7:
-      position = flashSettings.FW7CenterPosition;
-      break;
-   default:
-      position = flashSettings.FW0CenterPosition;
-      break;
-   }
-
-   return position;
 }
 
 /*

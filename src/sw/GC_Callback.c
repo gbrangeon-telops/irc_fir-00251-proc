@@ -29,6 +29,7 @@
 #include "FileManager.h"
 #include "Trig_gen.h"
 #include <math.h>
+#include <stdlib.h>
 #include "aec.h"
 #include "exposure_time_ctrl.h"
 #include "icu.h"
@@ -2409,7 +2410,7 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
       if( gcRegsData.FWMode == FWM_Fixed)
       {
-         if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts, flashSettings.FWType))
+         if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts))
          {
             ChangeFWControllerMode(FW_POSITION_MODE, counts);
          }
@@ -2469,11 +2470,26 @@ void GC_FWPositionRawCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
  */
 void GC_FWPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   static int32_t prevFWPositionRawSetpoint;
+   extern int32_t FW_COUNTS_IN_ONE_TURN;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
+   {
+      // Before write
+      prevFWPositionRawSetpoint = gcRegsData.FWPositionRawSetpoint;
+   }
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      FW_setRawPositionMode(true);
-      ChangeFWControllerMode(FW_POSITION_MODE, gcRegsData.FWPositionRawSetpoint);
+      if (abs(gcRegsData.FWPositionRawSetpoint) < FW_COUNTS_IN_ONE_TURN)
+      {
+         ChangeFWControllerMode(FW_POSITION_MODE, gcRegsData.FWPositionRawSetpoint);
+      }
+      else
+      {
+         gcRegsData.FWPositionRawSetpoint = prevFWPositionRawSetpoint;
+      }
    }
 }
 

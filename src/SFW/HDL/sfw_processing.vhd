@@ -199,6 +199,14 @@ begin
                else
                   ACQ_FILTER_NUMBER <= std_logic_vector(to_unsigned(0,ACQ_FILTER_NUMBER'length));
                end if;
+               
+               -- Wait for integration end to update next filter value
+               if DIR = '0' then
+                  next_filter_number_i <= current_filter_number_i + 1;
+               else
+                  next_filter_number_i <= current_filter_number_i - 1;
+               end if;
+               
             end if;
             
          end if;
@@ -207,9 +215,9 @@ begin
    
 
       
-   next_filter_number_i    <= 
-      current_filter_number_i + 1 when DIR = '0' else
-      current_filter_number_i - 1;
+--   next_filter_number_i    <= 
+--      current_filter_number_i + 1 when DIR = '0' else
+--      current_filter_number_i - 1;
    
    -- Generate TRIG, the filter number and valid_filter
    filter_process : process(CLK)

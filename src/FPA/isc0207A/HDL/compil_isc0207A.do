@@ -18,10 +18,12 @@ acom -nowarn DAGGEN_0523 -incr \
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 
 # sources FPa common 
+acom -relax d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ad5648_driver.vhd 
+
 acom -nowarn DAGGEN_0523 -incr \
  d:\Telops\Common_HDL\SPI\ads1118_driver.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_trig_controller.vhd  \
- d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_intf_sequencer.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_status_gen.vhd \
@@ -41,24 +43,39 @@ acom -nowarn DAGGEN_0523 -incr \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_sum.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_dispatcher.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_mode_dval_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_diag_data_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_flow_mux.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_pixel_reorder.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\concat_1_to_8.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hw_driver_ctrler.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_prog_ctler_kernel.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_dac_spi_feeder.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_chn_diversity_ctrler.vhd \
  d:\Telops\FIR-00251-Proc\src\QuadADC\HDL\quad_adc_ctrl.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_clks_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_diag_data_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_digio_map.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_dval_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_pixel_reorder.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_prog_ctrler.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_spi_feeder.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_sync_flag_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_mblaze_intf.vhd  \
- d:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream32_fifo.vhd
- 
-acom -incr -nowarn DAGGEN_0523 \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_map.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_data_ctrl.bde \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde \
- d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_intf.bde
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde
+
+
+# fichiers isc0207A
+acom  -nowarn DAGGEN_0523 -incr \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_clks_gen_core.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_clks_mmcm.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_readout_ctrler.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_digio_map.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_mblaze_intf.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_bitstream_gen.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_clks_gen.bde \
+d:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_spi_feeder.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_prog_ctrler.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_hw_driver.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\isc0207A_intf.bde
  
+                                            

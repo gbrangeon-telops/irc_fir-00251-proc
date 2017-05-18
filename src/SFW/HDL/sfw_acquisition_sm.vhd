@@ -54,7 +54,7 @@ entity SFW_ACQUISITION_SM is
         SYNC_TRIG           : in std_logic;     -- Assert SYNC_TRIG when a new filter is valid in front of the lens
         FPA_IMG_INFO        : in  img_info_type;
         FPA_EXP_INFO        : out exp_info_type;
-        EXP_INFO_BUSY       :in std_logic;
+        --EXP_INFO_BUSY       :in std_logic;
 
         --------------------------------
         -- RAM INTF
@@ -205,7 +205,7 @@ begin
                 exp_time_indx(RAM_BUS_WIDTH-1 downto 0) <= unsigned(CURRENT_FILTER_NUMBER(RAM_BUS_WIDTH-1 downto 0));
                 current_exp_time <= next_exp_time;
             else
-                exp_time_indx(RAM_BUS_WIDTH-1 downto 0) <= unsigned(exp_time_indx(RAM_BUS_WIDTH-1 downto 0));
+                exp_time_indx <= exp_time_indx;
                 current_exp_time <= current_exp_time;                
             end if;
             
@@ -246,11 +246,11 @@ begin
                     -- Check for the start of delayed integration then write Speed
                     if exp_feedbk_sr(HDR_INSERT_CLK_DELAY-1) = '1' then 
                         write_state <= wr_speed;
-                        if next_hdr_index = FPA_IMG_INFO.exp_info.exp_indx    then
+--                        if next_hdr_index = FPA_IMG_INFO.exp_info.exp_indx    then
                             sync_err_o <= '0'; --hdr is in sync
-                        else
-                            sync_err_o <= '1'; --hdr is out of sync
-                        end if;
+--                        else
+--                            sync_err_o <= '1'; --hdr is out of sync
+--                        end if;
                     end if;
 
 

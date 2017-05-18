@@ -20,7 +20,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0207A_2K"
+#define FPA_DEVICE_MODEL_NAME    "ISC0207A_3K_5.0_MHz_160T"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      320
@@ -67,74 +67,68 @@
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
 
 #define FPA_AECP_MIN_EXPOSURE          10.0F // [us] Minimum exposure time when AEC+ is active.
-
-//#define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
-//#define FPA_MASTER_CLK_RATE_HZ         6666000   // fréquence de l'horloge du FPA
-//#define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ
-
 #define FPA_DATA_RESOLUTION 14
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
-#define FPA_MCLK_RATE_HZ             5000000    // le master clock du PFA est à 5MHz
-#define FPA_CLOCK_FREQ_HZ            FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
+#define FPA_MCLK_RATE_HZ            5000000          // le master clock du FPA
+#define FPA_CLOCK_FREQ_HZ           FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
-{					   
+{   
    uint32_t  SIZE;                       
    uint32_t  ADD;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_diag_mode;              // utilisé par le trig_controller.vhd            
-   uint32_t  fpa_diag_type;              // utilisé par le generateur de données diag de Telops
-   uint32_t  fpa_pwr_on;                 // utilisé par le fpa_intf_sequencer.vhd            
-   uint32_t  fpa_trig_ctrl_mode;         // utilisé par le trig_controller.vhd    
-   uint32_t  fpa_acq_trig_ctrl_dly;      // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_acq_trig_period_min;    // utilisé par le trig_controller.vhd
-   uint32_t  fpa_xtra_trig_ctrl_dly;     // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_xtra_trig_period_min;   // utilisé par le trig_controller.vhd
+   uint32_t  fpa_diag_mode;                   //utilisé par le trig_controller.vhd            
+   uint32_t  fpa_diag_type;                   //utilisé par le generateur de données diag de Telops
+   uint32_t  fpa_pwr_on;                      //utilisé par le fpa_intf_sequencer.vhd            
+   uint32_t  fpa_trig_ctrl_mode;              //utilisé par le trig_controller.vhd    
+   uint32_t  fpa_acq_trig_ctrl_dly;           //utilisé par le trig_controller.vhd  
+   uint32_t  fpa_acq_trig_period_min;         //utilisé par le trig_controller.vhd
+   uint32_t  fpa_xtra_trig_ctrl_dly;          //utilisé par le trig_controller.vhd  
+   uint32_t  fpa_xtra_trig_period_min;        //utilisé par le trig_controller.vhd
+                                             
+   uint32_t  xstart;                         
+   uint32_t  ystart;                         
+   uint32_t  xsize;                          
+   uint32_t  ysize;                          
+   uint32_t  boost_mode;
+   uint32_t  internal_outr;
+   uint32_t  onchip_bin_256;                 
+   uint32_t  onchip_bin_128;                 
+   uint32_t  itr;                            
+   uint32_t  gain;                                 
+   uint32_t  skimming; 
    
-   // partie propre au 0207
-   uint32_t  xstart;             
-   uint32_t  ystart;             
-   uint32_t  xsize;            
-   uint32_t  ysize;            
-   uint32_t  gain;            
-   uint32_t  invert;
-   uint32_t  revert;
-   uint32_t  onchip_bin_256;
-   uint32_t  onchip_bin_128;                     
-   uint32_t  pix_samp_num_per_ch;
-   uint32_t  good_samp_first_pos_per_ch;
-   uint32_t  good_samp_last_pos_per_ch;
-   uint32_t  good_samp_sum_num;                     
-   uint32_t  good_samp_mean_numerator;
-   uint32_t  good_samp_mean_div_bit_pos;
-   uint32_t  ysize_div2_m1;                   
-   uint32_t  img_samp_num;
-   uint32_t  img_samp_num_per_ch;
-   uint32_t  fpa_active_pixel_dly;
-   uint32_t  diag_active_pixel_dly;
-   uint32_t  sof_samp_pos_start_per_ch;
-   uint32_t  sof_samp_pos_end_per_ch;
-   uint32_t  eof_samp_pos_start_per_ch;
-   uint32_t  eof_samp_pos_end_per_ch;
-   uint32_t  diag_tir;
-   uint32_t  xsize_div_tapnum;
-   uint32_t  readout_plus_delay;
-   uint32_t  tri_window_and_intmode_part;  // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR....
-   uint32_t  int_time_offset;
-   uint32_t  tsh_min;
-   uint32_t  tsh_min_minus_int_time_offset;
-   uint32_t  quad1_clk_phase;
-   uint32_t  quad2_clk_phase;
-   uint32_t  quad3_clk_phase;
-   uint32_t  quad4_clk_phase;   
-   // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
-   uint32_t  vdac_value[8];
-   
-   
+   uint32_t  real_mode_active_pixel_dly;     
+   uint32_t  line_period_pclk;                        
+   uint32_t  readout_pclk_cnt_max;           
+   uint32_t  active_line_start_num;          
+   uint32_t  active_line_end_num;               
+   uint32_t  pix_samp_num_per_ch;            
+   uint32_t  sof_posf_pclk;                  
+   uint32_t  eof_posf_pclk;                  
+   uint32_t  sol_posl_pclk;                  
+   uint32_t  eol_posl_pclk;                  
+   uint32_t  eol_posl_pclk_p1;               
+   uint32_t  hgood_samp_sum_num;             
+   uint32_t  hgood_samp_mean_numerator;      
+   uint32_t  vgood_samp_sum_num;             
+   uint32_t  vgood_samp_mean_numerator;      
+   uint32_t  good_samp_first_pos_per_ch;     
+   uint32_t  good_samp_last_pos_per_ch;    
+   uint32_t  xsize_div_tapnum;               
+   uint32_t  ysize_div2_m1;                  
+   uint32_t  readout_plus_delay;             
+   uint32_t  tri_window_and_intmode_part;   // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR.... 
+   uint32_t  int_time_offset;                
+   uint32_t  tsh_min;                        
+   uint32_t  tsh_min_minus_int_time_offset;  
+                                             
+   uint32_t  vdac_value[8];                    
+   uint32_t  quad_clk_phase[4];
+   //uint32_t  proxim_is_flegx;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
@@ -185,13 +179,43 @@ struct s_FpaStatus    //
 
    // fpa init status
    uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
-   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
+   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA 
+   
+   
+//   uint32_t fpa_trig_ctrl_mode;           
+//   uint32_t xsize;                        
+//   uint32_t ysize;                        
+//   uint32_t misc;                         
+//   uint32_t real_mode_active_pixel_dly;   
+//   uint32_t line_period_pclk;             
+//   uint32_t readout_pclk_cnt_max;         
+//   uint32_t active_line_start_num;        
+//   uint32_t active_line_end_num;          
+//   uint32_t pix_samp_num_per_ch;          
+//   uint32_t sof_posf_pclk;                
+//   uint32_t eof_posf_pclk;                
+//   uint32_t sol_posl_pclk;                
+//   uint32_t eol_posl_pclk;                
+//   uint32_t eol_posl_pclk_p1;             
+//   uint32_t hgood_samp_sum_num;           
+//   uint32_t hgood_samp_mean_numerator;    
+//   uint32_t vgood_samp_sum_num;           
+//   uint32_t vgood_samp_mean_numerator;    
+//   uint32_t good_samp_first_pos_per_ch;   
+//   uint32_t good_samp_last_pos_per_ch;    
+//   uint32_t xsize_div_tapnum;    
+//   uint32_t ysize_div2_m1;                
+//   uint32_t readout_plus_delay;           
+//   uint32_t tri_window_and_intmode_part;  
+//   uint32_t int_time_offset;              
+//   uint32_t tsh_min;                      
+//   uint32_t tsh_min_minus_int_time_offset;  
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812,  4893, 8440, 12663, 5062, 12812}}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {0,0,0,0}}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ

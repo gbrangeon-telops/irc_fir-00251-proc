@@ -8,7 +8,8 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 do  "$FIR251PROC\src\fir_00251_proc_acq_build.do"
 
 #ADC receiver interface
-do D:\telops\FIR-00251-Proc\src\QuadADC\HDL\build_adc_receiver.do
+--do D:\telops\FIR-00251-Proc\src\QuadADC\HDL\build_adc_receiver.do
+do D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\build_quad_receiver.do
 
 #FPA isc0207A
 do D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\compil_isc0207A.do

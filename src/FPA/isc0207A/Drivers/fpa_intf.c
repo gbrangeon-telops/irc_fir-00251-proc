@@ -7,9 +7,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision: 12286 $
--- $Author: pdaraiche $
--- $LastChangedDate: 2013-01-25 14:24:16 -0500 (ven., 25 janv. 2013) $
+-- $Revision: 20186 $
+-- $Author: enofodjie $
+-- $LastChangedDate: 2017-03-15 03:40:34 -0400 (mer., 15 mars 2017) $
 --
 -------------------------------------------------------------------------------
 --
@@ -84,7 +84,30 @@
 // horloges du module FPA
 #define VHD_CLK_100M_RATE_HZ              100000000
 #define VHD_CLK_80M_RATE_HZ                80000000
-#define ADC_SAMPLING_RATE_HZ               40000000    // les ADC  roulent à 40MHz
+
+
+// horloge des ADCs
+//#ifdef FPA_MCLK_RATE_HZ == 5000000
+//#define ADC_SAMPLING_RATE_HZ 10000000    //
+//#elif FPA_MCLK_RATE_HZ == 6500000
+//   #define ADC_SAMPLING_RATE_HZ 39000000    //
+//#elif  FPA_MCLK_RATE_HZ == 6600000
+//   #define ADC_SAMPLING_RATE_HZ 39600000    //
+//#elif  FPA_MCLK_RATE_HZ == 7100000
+//   #define ADC_SAMPLING_RATE_HZ 28400000    //
+//#elif  FPA_MCLK_RATE_HZ == 7500000
+//   #define ADC_SAMPLING_RATE_HZ 30000000    //
+//#elif  FPA_MCLK_RATE_HZ == 8000000
+//#define ADC_SAMPLING_RATE_HZ 16000000    //
+//#elif  FPA_MCLK_RATE_HZ == 8500000
+//   #define ADC_SAMPLING_RATE_HZ 34000000    //
+//#elif  FPA_MCLK_RATE_HZ == 9000000
+//#define ADC_SAMPLING_RATE_HZ 18000000
+//#elif  FPA_MCLK_RATE_HZ == 9500000
+// #define ADC_SAMPLING_RATE_HZ 19000000
+//#elif  FPA_MCLK_RATE_HZ == 10000000
+#define ADC_SAMPLING_RATE_HZ  (2*FPA_MCLK_RATE_HZ)
+//#endif
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
@@ -107,7 +130,7 @@
 #define ISC0207_VDETCOM_VOLTAGE_MAX_mV    5300
 
 #define ISC0207_REFOFS_VOLTAGE_MIN_mV     502
-#define ISC0207_REFOFS_VOLTAGE_MAX_mV     2500
+#define ISC0207_REFOFS_VOLTAGE_MAX_mV     5300
 
 
 // structure interne pour les parametres du 0207
@@ -120,7 +143,7 @@ struct isc0207_param_s             //
    float vhd_delay_mclk;
    float delay_mclk;
    float lovh_mclk;
-   float fovh_mclk;
+   float fovh_line;
    float tsh_min_usec;
    float trst_min_usec;
    float itr_tri_min_usec;
@@ -138,9 +161,12 @@ struct isc0207_param_s             //
    float tri_window_and_intmode_part_usec;
    float tri_min_usec;
    float frame_period_min_usec;
-   float frame_rate_max_hz;       
+   float frame_rate_max_hz;
+
+   float pclk_rate_hz;
 };
 typedef struct isc0207_param_s  isc0207_param_t;
+
 
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
@@ -151,7 +177,6 @@ void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
-
 
 
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
@@ -221,13 +246,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    t_FpaStatus Stat;
 	
-  
    // on lit le statut 
    FPA_GetStatus(&Stat, ptrA);
 	FPA_proxim_is_flegx = (uint8_t)(Stat.adc_brd_spare & 0x01);    // on sait quelle electronique de proximité est présente (FlegX eou Flex)
-   
-   
-   
+
    // on bâtit les parametres specifiques du 0207
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
    
@@ -282,65 +304,65 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
       ptrA->gain = FPA_GAIN_0;	//High gain
       
-   // inversion image
-   ptrA->invert = 0;
-   ptrA->revert = 0;
+   // misc
+   ptrA->internal_outr = 0;
+
+   ptrA->boost_mode = 0;
+   if (gFpaDebugRegB == 1)
+      ptrA->boost_mode = 1;
    
    // onchip binning
    ptrA->onchip_bin_256 = 0;
    ptrA->onchip_bin_128 = 0;
    
-   // sampling à l'interieur d'un pixel
-   ptrA->pix_samp_num_per_ch =  (uint32_t)((float)ADC_SAMPLING_RATE_HZ/(hh.pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ));
-   ptrA->good_samp_first_pos_per_ch = 3;
-   ptrA->good_samp_last_pos_per_ch  = 4;
-   ptrA->good_samp_sum_num  =  ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
-   ptrA->good_samp_mean_div_bit_pos = 21; // ne pas changer meme si le detecteur change.
-   ptrA->good_samp_mean_numerator   = (uint32_t)(powf(2.0F, (float)ptrA->good_samp_mean_div_bit_pos)/(float)ptrA->good_samp_sum_num);
-    
-   // image sampling
-   ptrA->img_samp_num =   ptrA->xsize * ptrA->ysize * ptrA->pix_samp_num_per_ch;
-   ptrA->img_samp_num_per_ch   = ptrA->img_samp_num/FPA_NUMTAPS;
-   ptrA->sof_samp_pos_start_per_ch =  1;
-   ptrA->sof_samp_pos_end_per_ch   =   ptrA->pix_samp_num_per_ch;
-   ptrA->eof_samp_pos_start_per_ch =   ptrA->img_samp_num_per_ch - ptrA->pix_samp_num_per_ch + 1;
-   ptrA->eof_samp_pos_end_per_ch   =   ptrA->img_samp_num_per_ch;
+   //itr
+   ptrA->itr = 1;
+   //skimming
+   ptrA->skimming = 0;
    
-   // delai avant image (mode réel)
-   ptrA->fpa_active_pixel_dly  = 59;         //  valeur pour le flex
+   // ajustement de delais de la chaine
    if (FPA_proxim_is_flegx == 1)
-      ptrA->fpa_active_pixel_dly = 59;       // valeur pour le fleGX
-      
-   // delai avant image (mode diag)   
-   ptrA->diag_active_pixel_dly = 2;  // à ajuster via simulation
+      ptrA->real_mode_active_pixel_dly = 18;       // valeur pour le fleGX
+   else
+      ptrA->real_mode_active_pixel_dly = 18;
+
+   //
+   ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * (ptrA->ysize + hh.fovh_line) + 1;                    //
+   
+   ptrA->active_line_start_num             = 1;                    // pour le isc0207A, numero de la première ligne active
+   ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le isc0207A, numero de la derniere ligne active
+   
+   // nombre d'échantillons par canal  de carte ADC
+   ptrA->pix_samp_num_per_ch               = (uint32_t)(((float)ADC_SAMPLING_RATE_HZ)/(hh.pclk_rate_hz));
+   
+   // identificateurs de trames
+   ptrA->sof_posf_pclk                     = ptrA->line_period_pclk * (ptrA->active_line_start_num - 1) + 1;
+   ptrA->eof_posf_pclk                     = ptrA->active_line_end_num * ptrA->line_period_pclk - hh.lovh_mclk*hh.pixnum_per_tap_per_mclk;
+   ptrA->sol_posl_pclk                     = 1;
+   ptrA->eol_posl_pclk                     = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk;
+   ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
+
+   // echantillons choisis
+   ptrA->good_samp_first_pos_per_ch        = ptrA->pix_samp_num_per_ch;     // position premier echantillon
+   ptrA->good_samp_last_pos_per_ch         = ptrA->pix_samp_num_per_ch;     // position dernier echantillon
+   ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
+   ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
+   ptrA->vgood_samp_sum_num                = 1;
+   ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);    
    
    // calculs
    ptrA->ysize_div2_m1 = ptrA->ysize/2 - 1;
-   ptrA->diag_tir = 2;
    ptrA->xsize_div_tapnum = ptrA->xsize/FPA_NUMTAPS;
    
-   
-   // ENO 03 novembre 2016: ADC_CLK_PHASE est introduit pour conserver la trace détecteur
-   ptrA->quad1_clk_phase = 6;
-   ptrA->quad2_clk_phase = 6;
-   ptrA->quad3_clk_phase = 6;
-   ptrA->quad4_clk_phase = 6;
-   if (FPA_proxim_is_flegx == 1) // valeur pour le fleGX
-   {
-      ptrA->quad1_clk_phase = 10;
-      ptrA->quad2_clk_phase = 10;
-      ptrA->quad3_clk_phase = 10;
-      ptrA->quad4_clk_phase = 10;
-  }
-   
-   // Élargit le pulse de trig
-   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
-   
-   // les DACs (1 à 8)  (utilisé par le FleGX mais envoyé quel que soit le proxim)
+   // les DACs (1 à 8)
    ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 1);           // DAC1 -> VPOS_OUT à 5.5V
    ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 2);           // DAC2 -> VPOS     à 5.5V
    ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 3);           // DAC3 -> VPOS_UC  à 5.5V
-   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(1950.0F, 5);           // DAC5 -> VOS      à 1.950V   (ajustable)
+   //ptrA->vdac_value[3]                     = FLEG_VccVoltage_To_DacWord(3000.0F, 4);           // DAC4 -> VOUTREF  à 3.0V   (ajustable)
+   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(2050.0F, 5);           // DAC5 -> VOS      à 1.95V   (ajustable)
+   //ptrA->vdac_value[5]                     = FLEG_VccVoltage_To_DacWord(4250.0F, 6);           // DAC6 -> VDETCOM  à 4.25V  (ajustable)
+   //ptrA->vdac_value[6]                     = FLEG_VccVoltage_To_DacWord( 500.0F, 7);           // DAC7 -> INREF    à 501 mV (ajustable)
    ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 8);           // DAC8 -> VPD      à 5.5V
    
    // Reference of the tap (VCC4)      
@@ -368,8 +390,23 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ptrA->vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 7);  // 
 	}                                                                                                       
    actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
-   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;   
+   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
+   if (FPA_proxim_is_flegx == 0) //
+   {
+      ptrA->quad_clk_phase[0] = 6;
+      ptrA->quad_clk_phase[1] = 6;
+      ptrA->quad_clk_phase[2] = 6;
+      ptrA->quad_clk_phase[3] = 6;
+   }
+   else
+   {
+      ptrA->quad_clk_phase[0] = 2;
+      ptrA->quad_clk_phase[1] = 2;
+      ptrA->quad_clk_phase[2] = 2;
+      ptrA->quad_clk_phase[3] = 2;
+   }
+
    WriteStruct(ptrA);   
 }
 
@@ -406,22 +443,35 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 2.0F;
    ptrH->fpa_delay_mclk          = 6.0F;   // FPA: delai de sortie des pixels après integration
-   ptrH->vhd_delay_mclk          = 2.55F;  // estimation des differerents delais accumulés par le vhd
+   
+   ptrH->vhd_delay_mclk          = 6.0F;   // estimation des differerents delais accumulés par le vhd
+   if ((uint32_t)FPA_MCLK_RATE_HZ == 5000000) 
+      ptrH->vhd_delay_mclk       = 2.55F;
+      
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 0.0F;
-   ptrH->fovh_mclk               = 0.0F;
-   ptrH->tsh_min_usec            = 7.8F;
-   ptrH->trst_min_usec           = 0.2F;
+   ptrH->fovh_line               = 0.0F;
+   
+   ptrH->tsh_min_usec            = 9.0F;
+   ptrH->trst_min_usec           = 4.0F;
+   if ((uint32_t)FPA_MCLK_RATE_HZ == 5000000){
+      ptrH->tsh_min_usec         = 7.8F;
+      ptrH->trst_min_usec        = 0.2F;
+   }
+   
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
    ptrH->int_time_offset_usec    = 0.8F;  // offset du temps d'integration
    
+   ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
+   
+   
    // readout time
-   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_mclk);
+   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
    ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mlck_period_usec;
    
    // delay
-   ptrH->vhd_delay_usec           = ptrH->vhd_delay_mclk * ptrH->mlck_period_usec;
-   ptrH->fpa_delay_usec           = ptrH->fpa_delay_mclk * ptrH->mlck_period_usec;
+   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mlck_period_usec;
+   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mlck_period_usec;
    ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mlck_period_usec; 
    
    // fsync_high_min
@@ -551,6 +601,35 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
    
+   //  Stat->fpa_trig_ctrl_mode            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
+   //  Stat->xsize                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x94);
+   //  Stat->ysize                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x98);
+   //  Stat->misc                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x9C);
+   //  Stat->real_mode_active_pixel_dly    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA0);
+   //  Stat->line_period_pclk              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);
+   //  Stat->readout_pclk_cnt_max          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
+   //  Stat->active_line_start_num         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xAC);
+   //  Stat->active_line_end_num           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB0);
+   //  Stat->pix_samp_num_per_ch           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB4);
+   //  Stat->sof_posf_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);
+   //  Stat->eof_posf_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
+   //  Stat->sol_posl_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
+   //  Stat->eol_posl_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC4);
+   //  Stat->eol_posl_pclk_p1              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC8);
+   //  Stat->hgood_samp_sum_num            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xCC);
+   //  Stat->hgood_samp_mean_numerator     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD0);
+   //  Stat->vgood_samp_sum_num            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD4);
+   //  Stat->vgood_samp_mean_numerator     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD8);
+   //  Stat->good_samp_first_pos_per_ch    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xDC);
+   //  Stat->good_samp_last_pos_per_ch     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE0);
+   //  Stat->xsize_div_tapnum              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE4);
+   //  Stat->ysize_div2_m1                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE8);
+   //  Stat->readout_plus_delay            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xEC);
+   //  Stat->tri_window_and_intmode_part   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xF0);
+   //  Stat->int_time_offset               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xF4);
+   //  Stat->tsh_min                       = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xF8);
+   //  Stat->tsh_min_minus_int_time_offset = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xFC);
+   
    // verification des statuts en simulation
    #ifdef SIM
       PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
@@ -589,15 +668,15 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
 }
 
 //--------------------------------------------------------------------------
-// Conversion de VccVoltage_mV en DAC Word
-//--------------------------------------------------------------------------
-// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG
-// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8)
+// Conversion de VccVoltage_mV en DAC Word 
+//-------------------------------------------------------------------------- 
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG 
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
-{
+{  
   float Rs, Rd, RL, Is, DacVoltage_Volt;
   uint32_t DacWord;
-
+   
    if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
       Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
       Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
@@ -612,24 +691,24 @@ uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccP
    }
    // calculs de la tension du dac en volt
    DacVoltage_Volt =  ((1.0F + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
-
+            
    // deduction du bitstream du DAC
    DacWord = (uint32_t)(powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
    DacWord = (uint32_t) MAX(MIN(DacWord, 16383), 0);
-
+   
    return DacWord;
 }
 
 //--------------------------------------------------------------------------
 // Conversion de DAC Word  en VccVoltage_mV
-//--------------------------------------------------------------------------
-// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG
-// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8)
+//-------------------------------------------------------------------------- 
+// VccVoltage_mV : en milliVolt, tension de sortie des LDO du FLeG 
+// VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition)
-{
+{  
    float Rs, Rd, RL, Is, DacVoltage_Volt, VccVoltage_mV;
    uint32_t DacWordTemp;
-
+   
    if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
       Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
       Rd = 1000.0F;    // sur EFA-00266-001, vaut R41
@@ -642,14 +721,13 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
       RL = 806.0F;     // sur EFA-00266-001, vaut R28
       Is = 100e-6F;    // sur EFA-00266-001, vaut le courant du LT3042
    }
-
-   // deduction de la tension du DAC
-   DacWordTemp =  (uint32_t) MAX(MIN(DacWord, 16383), 0);
+   
+   // deduction de la tension du DAC 
+   DacWordTemp =  (uint32_t) MAX(MIN(DacWord, 16383), 0);   
    DacVoltage_Volt = (float)DacWordTemp * ((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN)/powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS);
-
+   
    //calculs de la tension du LDO en volt
    VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
-
+   
    return VccVoltage_mV;
 }
-

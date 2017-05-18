@@ -552,9 +552,9 @@ uint8_t InitiateMotion(uint8_t node, char *TxBuffer)
 }
 
 /*
- * Name         : GetActualPosition
+ * Name         : GetCurrentPosition
  *
- * Synopsis     : uint8_t GetActualPosition(uint8_t node, char *TxBuffer)
+ * Synopsis     : uint8_t GetCurrentPosition(uint8_t node, char *TxBuffer)
  * Arguments    : uint8_t  node : 1 -> ICU, 2 -> NDF, 3 -> SFW
  *                char  *TxBuffer : pointer to a string buffer to send to controller
  *
@@ -569,6 +569,30 @@ uint8_t GetCurrentPosition(uint8_t node, char *TxBuffer)
 
    commandPreamble(node, TxBuffer);
    strcat(TxBuffer,"POS");
+
+   length = commandPostamble(TxBuffer);
+
+   return length;
+}
+
+/*
+ * Name         : GetCurrentTargetPosition
+ *
+ * Synopsis     : uint8_t GetCurrentTargetPosition(uint8_t node, char *TxBuffer)
+ * Arguments    : uint8_t  node : 1 -> ICU, 2 -> NDF, 3 -> SFW
+ *                char  *TxBuffer : pointer to a string buffer to send to controller
+ *
+ * Description  : Current target position
+ *
+ * Returns      : uint8_t length of string to send
+ */
+uint8_t GetCurrentTargetPosition(uint8_t node, char *TxBuffer)
+{
+
+   uint8_t length;
+
+   commandPreamble(node, TxBuffer);
+   strcat(TxBuffer,"TPOS");
 
    length = commandPostamble(TxBuffer);
 

@@ -1049,7 +1049,7 @@ IRC_Status_t Proc_MGT_Init()
  */
 IRC_Status_t Proc_FW_Init()
 {
-   // Initialize the SFW Module event if not used
+   // Initialize the SFW Module even if not used
    SFW_CTRL_Init(&gcRegsData, &gSFW_Ctrl);
 
    //Check the filterwheel type(slow or fast)  and init the SFW mathematical model if needed

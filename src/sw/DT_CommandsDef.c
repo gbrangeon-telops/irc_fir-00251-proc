@@ -41,6 +41,7 @@
 #include <limits.h>
 #include <time.h>
 #include <string.h>
+#include "FWController.h"
 
 #ifdef STARTUP
 #include "DT_CommandsDef_startup.h"
@@ -75,6 +76,8 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFWC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -112,6 +115,8 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"DFDVU", DebugTerminalParseDFDVU},
    {"FS", DebugTerminalParseFS},
    {"DTO", DebugTerminalParseDTO},
+   {"FWPID", DebugTerminalParseFWPID},
+  // {"FWC", DebugTerminalParseFWC}, //TODO
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -2040,6 +2045,209 @@ static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf)
 }
 
 /**
+ * Filter Wheel Settings command parser.
+ * This parser is used to parse and validate Filter Wheel Settings command arguments and to
+ * execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Filter Wheel Settings command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf)
+{
+   extern FW_config_t FW_config[FW_Config_table_size];
+   FW_Config_type_t config;
+   uint8_t argStr[5], valueStr[6];
+   uint32_t arglen, valuelen;
+   uint32_t value;
+
+   // Read config
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid config value.");
+      return IRC_FAILURE;
+   }
+   argStr[arglen++] = '\0'; // Add string terminator
+
+   if (strcasecmp((char *)argStr, "POS") == 0)
+   {
+      config = FW_Position_Pid;
+   }
+   else if (strcasecmp((char *)argStr, "SLOW") == 0)
+   {
+      config = FW_Vel_Pid_Slow;
+   }
+   else if (strcasecmp((char *)argStr, "FAST") == 0)
+   {
+      config = FW_Vel_Pid_Fast;
+   }
+   else
+   {
+      DT_ERR("Unknown config value.");
+      return IRC_FAILURE;
+   }
+
+   // Read PID parameter
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid parameter value.");
+      return IRC_FAILURE;
+   }
+   argStr[arglen++] = '\0'; // Add string terminator
+
+
+   // Read PID VALUE
+   valuelen = GetNextArg(cbuf, valueStr, sizeof(valueStr) - 1);
+   if (ParseNumArg((char *)valueStr, valuelen, &value) != IRC_SUCCESS)
+   {
+      DT_ERR("Invalid value.");
+      return IRC_FAILURE;
+   }
+
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+
+   if (strcasecmp((char *)argStr, "POR") == 0)
+   {
+      FW_config[config].POR = (uint8_t)value;
+   }
+   else if (strcasecmp((char *)argStr, "INT") == 0)
+   {
+      FW_config[config].I_GAIN = (uint8_t)value;
+   }
+   else if (strcasecmp((char *)argStr, "PP") == 0)
+   {
+      FW_config[config].PP = (uint8_t)value;
+   }
+   else if (strcasecmp((char *)argStr, "PD") == 0)
+   {
+      FW_config[config].PD = (uint8_t)value;
+   }
+   else if (strcasecmp((char *)argStr, "SP") == 0)
+   {
+      FW_config[config].maxVelocity = (uint16_t)value;
+   }
+   else
+   {
+      DT_ERR("Unknown parameter value.");
+      return IRC_FAILURE;
+   }
+
+   FWControllerReset();
+
+   return IRC_SUCCESS;
+}
+
+IRC_Status_t DebugTerminalParseFWC(circByteBuffer_t *cbuf)
+{
+   uint8_t argStr[4], valueStr[6];
+   uint32_t arglen, valuelen;
+   uint32_t value;
+   bool setter = false;
+
+
+   // Read SET/GET
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid SET/GET value.");
+      return IRC_FAILURE;
+   }
+   argStr[arglen++] = '\0'; // Add string terminator
+
+   if (strcasecmp((char *)argStr, "SET") == 0)
+   {
+      setter = true;
+   }
+   else if (strcasecmp((char *)argStr, "GET") == 0)
+   {
+      setter = false;
+   }
+   else
+   {
+      DT_ERR("Unknown control param(SET or GET) value.");
+      return IRC_FAILURE;
+   }
+
+   // Read PID parameter
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (arglen == 0)
+   {
+      DT_ERR("Invalid parameter value.");
+      return IRC_FAILURE;
+   }
+   argStr[arglen++] = '\0'; // Add string terminator
+
+
+   // Read PID VALUE
+   valuelen = GetNextArg(cbuf, valueStr, 1);
+   if (ParseNumArg((char *)valueStr, valuelen, &value) != IRC_SUCCESS)
+   {
+      DT_ERR("Invalid value.");
+      return IRC_FAILURE;
+   }
+
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+
+   if (strcasecmp((char *)argStr, "EN") == 0)
+   {
+      if(setter)
+      {
+
+      }
+      else
+      {
+         //ERROR
+      }
+   }
+   else if (strcasecmp((char *)argStr, "POS") == 0)
+   {
+      if(setter)
+      {
+            //ERROR
+      }
+      else
+      {
+
+      }
+   }
+   else if (strcasecmp((char *)argStr, "VEL") == 0)
+   {
+      if(setter)
+      {
+         //ERROR
+      }
+      else
+      {
+
+      }
+   }
+   else
+   {
+      DT_ERR("Unknown parameter value.");
+      return IRC_FAILURE;
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
  * Debug terminal Help command parser parser.
  * This parser is used to print debug terminal help.
  *
@@ -2087,6 +2295,8 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  ADC calibration:    ADC [m b]");
    DT_PRINTF("  Flash Settings:     FS");
    DT_PRINTF("  Debug Term. Output: DTO [CLINK|OEM|USB]");
+   DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
+   //DT_PRINTF("  FW Control SET/GET Param:   FWC SET|GET EN|POS|VEL [value]"); //TODO
    DT_PRINTF("  Print help:         HLP");
 
    /*

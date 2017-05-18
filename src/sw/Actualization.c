@@ -38,6 +38,7 @@
 #include "timer.h"
 #include "utils.h"
 #include "BuiltInTests.h"
+#include "Acquisition.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -544,7 +545,7 @@ IRC_Status_t Actualization_SM()
 
       case ACT_WaitForCalibData:
          // Check for calib data loading
-         if (TDCStatusTst(WaitingForCalibrationDataMask) == 0 && TDCStatusTst(WaitingForFilterWheelMask) == 0)
+         if (TDCStatusTst(WaitingForCalibrationDataMask) == 0)
          {
             uint8_t blockIdx;
 
@@ -595,6 +596,7 @@ IRC_Status_t Actualization_SM()
                if (gActDebugOptions.forceDiscardOffset)
                   currentDeltaBeta->info.discardOffset = 1;
 
+               StartTimer(&act_timer, ACT_WAIT_FOR_ACQ_TIMEOUT/1000);
                setActState(&state, ACT_StartAECAcquisition);
             }
          }
@@ -702,8 +704,8 @@ IRC_Status_t Actualization_SM()
 
       case ACT_StartAECAcquisition:
 
-         // Ensure that no acquisition is running, cooldown period is over and camera is powered on
-         if (!TDCStatusTst(AcquisitionStartedMask))
+         // Ensure that camera is ready to be armed
+         if (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask))
          {
             ACT_PRINTF( "Ready for AEC acquisition! (%dms)\n", (uint32_t) elapsed_time_us( tic_TotalDuration ) / 1000 );
 
@@ -755,7 +757,7 @@ IRC_Status_t Actualization_SM()
          }
          else if (TimedOut(&act_timer))
          {
-            ACT_ERR( "Timeout while waiting for acquisition stop.");
+            ACT_ERR( "Timeout while waiting for camera ready.");
             GC_GenerateEventError(EECD_ImageCorrectionAcquisitionTimeout);
             error = true;
          }

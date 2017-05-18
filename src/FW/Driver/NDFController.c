@@ -409,9 +409,9 @@ void NDF_ControllerProcess()
 }
 
 /*
- * Name         : IsFWControllerReady
+ * Name         : IsNDFControllerReady
  *
- * Synopsis     : uint32_t IsFWControllerReady()
+ * Synopsis     : uint32_t IsNDFControllerReady()
  * Description  : Check if the FW is ready to accept a new command
  * 
  * Returns      : bool : false -> not ready, true -> Ready

@@ -42,7 +42,8 @@
 
 #define FW_EXPOSURETIME_OFFSET		1024
 
-#define SFW_MAX_SPEED_MARGING          500
+#define SFW_POS_TOLERANCE_MARGIN       0.5F
+#define SFW_MAX_SPEED_MARGIN           500
 #define SFW_FILTER_NB                  8
 
 #define FWPOSITION_IN_TRANSITION          8
@@ -76,7 +77,6 @@ typedef struct s_SFW_CTRL_Struct t_SfwCtrl;
 IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl);
 //IRC_Status_t SFW_CTRL_Reset(t_SfwCtrl *pSFWCtrl);
 void SFW_UpdateFilterRanges(float deltaTheta1, float deltaTheta2);
-int32_t SFW_CTRL_GetFilterPosition(uint8_t filterid);
 uint16_t SFW_GetEncoderPosition();
 void SFW_SetExposureTimeArray(uint8_t ExpId, float Exptime);
 void SFW_Enable();

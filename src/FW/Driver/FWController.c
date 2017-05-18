@@ -45,12 +45,11 @@ static bool                 FW_ModeRequest = false;
 static FW_ControllerMode_t   FW_NewMode;
 static int32_t              FW_NewTarget;
 static FW_ControllerMode_t  FW_currentMode = FW_STARTUP_MODE;
-static bool FW_rawMode = false;
 static int32_t FW_currentRawPosition = 1000000;
 
 static FH_ctrl_t* FH_instance = 0;
 
-static int32_t FW_COUNTS_IN_ONE_TURN = 0;
+int32_t FW_COUNTS_IN_ONE_TURN = 0;
 static int32_t FW_BACKLASH_OFFSET = 0;
 
 extern t_HderInserter gHderInserter;
@@ -71,7 +70,7 @@ static uint8_t FW_numberOfFilters = 8;
 
 static bool FW_initialized = false;
 
-static FW_config_t FW_config[3];
+FW_config_t FW_config[FW_Config_table_size];
 
 
 
@@ -106,6 +105,8 @@ IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
    FW_SetFWEncoderCountInOneTurn();
 
    FW_initialized = true;
+
+
 
    return status;
 }
@@ -222,7 +223,7 @@ void FW_ControllerProcess()
    static int numRetryErrorMode = 0;
 
 
-   static int32_t prevPosition = 100000000;
+   static uint32_t prevPosition = 100000000;
 
    if (FW_Reset || FW_initialized == false)
    {
@@ -233,7 +234,7 @@ void FW_ControllerProcess()
       modeReady = false;
       FW_Reset = false;
       // allow the current setpoint be applied immediately at the end of the homing sequence
-      FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &newTarget,flashSettings.FWType);
+      FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &newTarget);
       numRetryErrorMode = 0;
    }
    if (FW_ModeRequest && !FW_newModeAvailable)
@@ -388,6 +389,7 @@ void FW_ControllerProcess()
          modeReady = FWPositionMode(modeChanged, targetChanged);
          FW_HomingValid = modeReady;
          FW_Ready = modeReady && !FW_ModeRequest;
+         //gcRegsData.FWPosition is updated in FWPositionMode()
 
          break;
 
@@ -406,37 +408,19 @@ void FW_ControllerProcess()
       default:
          break;
    }
-   
-   if (currentMode == FW_DISABLED_MODE)
-      gcRegsData.FWPosition = FWP_FilterWheelNotImplemented;
-   else if (currentMode != FW_POSITION_MODE || FW_rawMode)
-      gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
-   if (FW_rawMode)
-      gcRegsData.FWPosition = FWP_FilterWheelInTransition;
-
-   if (!FW_rawMode && !modeReady)
+   if (!modeReady)
       TDCStatusSet(WaitingForFilterWheelMask);
    else
       TDCStatusClr(WaitingForFilterWheelMask);
 
    // transmit the new position upon a change
-   if ( (!FW_rawMode && prevPosition != gcRegsData.FWPosition)
-      || (FW_rawMode && prevPosition != gcRegsData.FWPositionRaw))
+   if (prevPosition != gcRegsData.FWPosition)
    {
       HDER_UpdateFWPositionHeader(&gHderInserter, gcRegsData.FWPosition);
-      if (!FW_rawMode)
-      {
-         HDER_UpdateFWPositionHeader(&gHderInserter, gcRegsData.FWPosition);
-         prevPosition = gcRegsData.FWPosition;
-      }
-      else
-      {
-         HDER_UpdateFWPositionHeader(&gHderInserter, gcRegsData.FWPositionRaw);
-         prevPosition = gcRegsData.FWPositionRaw;
-      }
+      prevPosition = gcRegsData.FWPosition;
 
-      FW_INF("Updating FWPosition in header (%d) (RawMode %s)", gcRegsData.FWPosition, FW_rawMode?"on":"off");
+      FW_INF("Updating FWPosition in header (%d)", gcRegsData.FWPosition);
    }
 
    FW_currentMode = currentMode;
@@ -502,6 +486,7 @@ static bool FWInitialisationMode(bool reset)
    static FW_initialisationMode_t initMode = INIT_TIMEOUTSETUP_MODE;
    int numAck;
    bool done = false;
+   static bool gFWConfigInit = true;
 
    if(reset)
    {
@@ -517,8 +502,15 @@ static bool FWInitialisationMode(bool reset)
 
          //Init LUT Position
          FW_initPositionLUT();
-         //Init FW_Config parameter
-         FW_ConfigParameterSet( &flashSettings, FW_config);
+
+         //Init FW_Config parameter only at first boot. Do not override FW_config when we reset for Debug terminal or an FW issue
+         if(gFWConfigInit == true)
+         {
+            FW_ConfigParameterSet( &flashSettings, FW_config);
+            gFWConfigInit = false;
+         }
+
+
 
          if ((flashSettings.FWType == FW_SYNC ) && (gcRegsData.FWSpeed >= 1))
          {
@@ -568,8 +560,8 @@ static bool FWInitialisationMode(bool reset)
          if (gcRegsData.FWSpeed <= 1)
          {
             StopTimer(&FW_commTimer);
-            FW_PRINTF("INIT_SET_GAIN\n");
-            initMode = INIT_SET_GAIN;
+            FW_PRINTF("INIT_DISABLEMOTOR_MODE\n");
+            initMode = INIT_DISABLEMOTOR_MODE;
          }
          else if (TimedOut(&FW_commTimer))
          {
@@ -579,6 +571,36 @@ static bool FWInitialisationMode(bool reset)
             FW_PRINTF("INIT_DONE_MODE\n");
          }
          break;
+
+      case INIT_DISABLEMOTOR_MODE:
+         StopTimer(&FW_commTimer);
+         if (setEnableDrive(FH_instance, false))
+         {
+            StartTimer(&FW_commTimer, FH_REQUEST_TIMEOUT);
+            initMode = INIT_WAIT_DISABLEMOTOR_ACK;
+         }
+         break;
+
+      case INIT_WAIT_DISABLEMOTOR_ACK:
+         numAck = FH_readAcks(FH_instance);
+         FH_clearAcks(FH_instance, numAck);
+
+         if (FH_numExpectedAcks(FH_instance) == 0)
+         {
+            StopTimer(&FW_commTimer);
+            FW_PRINTF("INIT_SET_GAIN\n");
+            initMode = INIT_SET_GAIN;
+         }
+         else if (TimedOut(&FW_commTimer))
+         {
+            FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
+            FW_ERR("Time out while in INIT_WAIT_DISABLEMOTOR_ACK");
+            StopTimer(&FW_commTimer);
+            initMode = INIT_DONE_MODE;
+            FW_PRINTF("INIT_DONE_MODE\n");
+         }
+         break;
+
 
       case INIT_SET_GAIN:
          StopTimer(&FW_commTimer);
@@ -735,8 +757,7 @@ static bool FWInitialisationMode(bool reset)
  */
 static bool FWIdleMode(bool reset)
 {
-   // static int32_t prevPosition;
-   int32_t counts;
+   int32_t counts = 0;
    bool ready = true;
    FH_consumeResponses(FH_instance);
 
@@ -744,9 +765,9 @@ static bool FWIdleMode(bool reset)
    //Set the basic parameter
    if(gcRegsData.FWMode == FWM_Fixed)
    {
-      if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts,flashSettings.FWType) == 0)
+      if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts) == 0)
       {
-         FW_getFilterPosition(FWPS_Filter1, &counts, flashSettings.FWType);
+         FW_getFilterPosition(FWPS_Filter1, &counts);
       }
       ChangeFWControllerMode(FW_POSITION_MODE, counts);
    }
@@ -1004,12 +1025,15 @@ static bool FWPositionMode(bool reset, bool newTarget)
 {
    static FW_positionMode_t posMode = POSITION_HOMECMD_MODE;
    bool ready = false;
-   static int32_t newSetpoint;
-   static bool queryPosInfo = false;
+   int32_t newSetpoint, correctionMove;
+   uint32_t maxTolerance;
+   static bool verifyPos = false;
    static bool backlashMode = false;
    int numAck;
    char notification;
-   uint32_t FilterStart, FilterEnd, EncoderCurrentPos;
+
+   extern uint16_t gSFW_deltaFilterEnd;
+   extern uint16_t gSFW_deltaFilterBegin;
 
    if(reset || newTarget)
    {
@@ -1031,6 +1055,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
       {
          if (posMode == POSITION_READY_MODE)
          {
+            verifyPos = false;
             posMode = POSITION_QUERY_POS_MODE;
             FW_PRINTF("POSITION_QUERY_POS_MODE\n");
          }
@@ -1114,6 +1139,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
             StopTimer(&FW_commTimer);
             FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
+            verifyPos = false;
             posMode = POSITION_QUERY_POS_MODE;
             FW_PRINTF("POSITION_QUERY_POS_MODE\n");
          }
@@ -1154,52 +1180,52 @@ static bool FWPositionMode(bool reset, bool newTarget)
             FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
             if (flashSettings.FWType == FW_SYNC)
-               FW_currentRawPosition = mod(value, FW_COUNTS_IN_ONE_TURN);
-            else
-               FW_currentRawPosition = value;
-
-            FW_INF("Current position : %d", FW_currentRawPosition);
-
-            if (queryPosInfo)
             {
-               // position was queried just for updating the register
-               queryPosInfo = false;
+               // Use external encoder as current position
+               FW_currentRawPosition = (int32_t)SFW_GetEncoderPosition();
+               FW_INF("Current position: %d", FW_currentRawPosition);
 
+               // For feedback only
+               value = mod(value, FW_HALL_ENCODER_COUNTS);
+               FW_INF("FH position: %d (%d)", value, FWPositionToSFWPosition(value));
+            }
+            else
+            {
+               // Use feedback as current position
+               FW_currentRawPosition = value;
+               FW_INF("Current position: %d", FW_currentRawPosition);
+            }
+
+            if (verifyPos)
+            {
                if (flashSettings.FWType == FW_SYNC)
                {
-                  // end of new pos sequence, check for valid position
-                  SFW_GetCurrentFilterRange(FWPositionToSFWPosition(FW_RequestedTarget % FW_COUNTS_IN_ONE_TURN), &FilterStart, &FilterEnd);
-                  EncoderCurrentPos = SFW_GetEncoderPosition();
+                  // Calculate move needed to correct position
+                  correctionMove = FW_CalculateMove(FW_RequestedTarget, FW_currentRawPosition);
 
-                  if  (FilterStart <= FilterEnd)
+                  // Determine maximum tolerance on position
+                  if (correctionMove < 0)
                   {
-                     if ((EncoderCurrentPos < FilterStart) || (EncoderCurrentPos > FilterEnd))
-                     {
-                        // Offset Vs filter range, requery a move
-                        posMode = POSITION_NEW_POS_MODE;
-                        FW_PRINTF("Warning: Filter misaligned, requery move\n");
-                        FW_PRINTF("POSITION_NEW_POS_MODE\n");
-                     }
-                     else
-                     {
-                        posMode = POSITION_READY_MODE;
-                        FW_PRINTF("POSITION_READY_MODE\n");
-                     }
+                     // Position is over target (filter center), so use filter end as tolerance
+                     maxTolerance = (uint32_t)(SFW_POS_TOLERANCE_MARGIN * (float)gSFW_deltaFilterEnd);
                   }
                   else
                   {
-                     if ( !( ((EncoderCurrentPos < FilterStart) && (EncoderCurrentPos < FilterEnd)) || ((EncoderCurrentPos > FilterStart) && (EncoderCurrentPos > FilterEnd)) ) )
-                     {
-                        // Offset Vs filter range, requery a move
-                        posMode = POSITION_NEW_POS_MODE;
-                        FW_PRINTF("Warning: Filter misaligned, requery move\n");
-                        FW_PRINTF("POSITION_NEW_POS_MODE\n");
-                     }
-                     else
-                     {
-                        posMode = POSITION_READY_MODE;
-                        FW_PRINTF("POSITION_READY_MODE\n");
-                     }
+                     // Position is under target (filter center), so use filter begin as tolerance
+                     maxTolerance = (uint32_t)(SFW_POS_TOLERANCE_MARGIN * (float)gSFW_deltaFilterBegin);
+                  }
+
+                  // Requery move if tolerance is exceeded
+                  if (abs(correctionMove) > maxTolerance)
+                  {
+                     posMode = POSITION_NEW_POS_MODE;
+                     FW_PRINTF("Warning: Filter misaligned (delta: %d, maxTolerance: %d)\n", -correctionMove, maxTolerance);
+                     FW_PRINTF("POSITION_NEW_POS_MODE\n");
+                  }
+                  else
+                  {
+                     posMode = POSITION_READY_MODE;
+                     FW_PRINTF("POSITION_READY_MODE\n");
                   }
                }
                else
@@ -1219,7 +1245,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
             }
             else
             {
-               // position was queried prior to issuing a relative move command
+               // position was queried prior to issuing a move command
                posMode = POSITION_NEW_POS_MODE;
                FW_PRINTF("POSITION_NEW_POS_MODE\n");
             }
@@ -1247,14 +1273,21 @@ static bool FWPositionMode(bool reset, bool newTarget)
      case POSITION_NEW_POS_MODE:
         {
            bool isRelativeMove = flashSettings.FWType == FW_SYNC; // FW_FIX commands absolute positions
-           FW_RequestedTarget %= FW_COUNTS_IN_ONE_TURN;
 
            if (flashSettings.FWType == FW_SYNC)
+           {
+              // Current and requested positions are in external encoder counts
               newSetpoint = FW_CalculateMove(FW_RequestedTarget, FW_currentRawPosition);
-           else
-              backlashMode = FW_CalculateBacklashFreeMove(FW_RequestedTarget, FW_currentRawPosition, &newSetpoint);
+              FW_INF("New target position: %d, relative move: %d", FW_RequestedTarget, newSetpoint);
 
-           FW_INF("New target position: %d", FW_RequestedTarget);
+              // Convert to Hall encoder position
+              newSetpoint = SFWPositionToFWPosition(newSetpoint);
+           }
+           else
+           {
+              backlashMode = FW_CalculateBacklashFreeMove(FW_RequestedTarget, FW_currentRawPosition, &newSetpoint);
+              FW_INF("New target position: %d, absolute move: %d, backlashMode: %d", FW_RequestedTarget, newSetpoint, backlashMode);
+           }
 
            StopTimer(&FW_commTimer);
            if (setPosition(FH_instance, newSetpoint, isRelativeMove))
@@ -1277,7 +1310,10 @@ static bool FWPositionMode(bool reset, bool newTarget)
             StartTimer(&FW_commTimer, FAULHABER_POSITION_TIMEOUT);
             FW_PRINTF("POSITION_WAIT_MODE\n");
             posMode = POSITION_WAIT_MODE;
-            StartTimer(&FW_moveTimer, 5000);
+            if (flashSettings.FWType == FW_SYNC)
+               StartTimer(&FW_moveTimer, 5000);    // protection against early notification caused by overshoot
+            else
+               StartTimer(&FW_moveTimer, 0);       // no protection needed with this wheel
          }
          else if (TimedOut(&FW_commTimer))
          {
@@ -1297,7 +1333,7 @@ static bool FWPositionMode(bool reset, bool newTarget)
             StopTimer(&FW_moveTimer);
             FW_ClearErrors(FW_ERR_FAULHABER_POS_TIMEOUT);
             FW_PRINTF("POSITION_QUERY_POS_MODE\n");
-            queryPosInfo = true;
+            verifyPos = true;
             posMode = POSITION_QUERY_POS_MODE;
          }
          else if (TimedOut(&FW_commTimer))
@@ -1324,58 +1360,37 @@ static bool FWPositionMode(bool reset, bool newTarget)
    gcRegsData.FWPositionRaw = FW_currentRawPosition;
 
    if (ready)
-   {
-      /*if (prevPosition != FW_currentRawPosition)*/
-      {
-         gcRegsData.FWPosition = FW_getFilterIndex(FW_currentRawPosition);
-         // prevPosition = FW_currentRawPosition;
-      }
-   }
+      gcRegsData.FWPosition = FW_getFilterIndex(FW_currentRawPosition);
    else
       gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
    return ready;
 }
 
-bool FW_getFilterPosition(uint8_t idx, int32_t* counts, const FWType_t type)
+bool FW_getFilterPosition(uint8_t idx, int32_t* counts)
 {
    bool success = false;
 
    if (counts!=0 && idx >= 0 && idx < FW_numberOfFilters)
    {
-      if(type == FW_FIX)
-      {
-         *counts = FW_positionsLUT[idx];
-      }
-      else
-      {
-         *counts = SFWPositionToFWPosition(FW_positionsLUT[idx]) ;
-      }
+      *counts = FW_positionsLUT[idx];
       success = true;
    }
 
    return success;
 }
 
-void FW_setRawPositionMode(bool enable)
-{
-   FW_rawMode = enable;
-}
-
 uint8_t FW_getFilterIndex(int32_t counts)
 {
    const uint8_t fnames[8] = {FWP_Filter1, FWP_Filter2, FWP_Filter3, FWP_Filter4, FWP_Filter5, FWP_Filter6, FWP_Filter7, FWP_Filter8};
    const uint32_t threshold = FW_MAPPING_DIST_THRESHOLD; // counts
-   int i;
-   int dist;
+   uint32_t i;
+   int32_t dist;
    uint8_t p = FWP_FilterWheelInTransition;
 
    for (i=0; i<FW_numberOfFilters; ++i)
    {
-      if(flashSettings.FWType == FW_FIX)
-         dist = FW_positionsLUT[i] - counts;
-      else
-         dist = SFWPositionToFWPosition(FW_positionsLUT[i]) - counts;
+      dist = FW_positionsLUT[i] - counts;
 
       if (dist > FW_COUNTS_IN_ONE_TURN/2)
          dist = dist - FW_COUNTS_IN_ONE_TURN;
@@ -1601,14 +1616,14 @@ uint32_t FW_GetErrors(uint32_t mask)
 /*
  * Name         : FW_CalculateMove
  *
- * Synopsis     : int16_t FW_CalculateMove(uint16_t target, uint16_t pos)
+ * Synopsis     : int32_t FW_CalculateMove(int32_t target, int32_t pos)
  *
- * Arguments    : uint16_t  target : target to reach
- *                uint16_t  pos : actual position
+ * Arguments    : int32_t  target : target to reach
+ *                int32_t  pos : actual position
  *
  * Description  : Calculate the shortest path between the target and the current position
  * 
- * Returns      : int16_t Distance and orientation of the move
+ * Returns      : int32_t Distance and orientation of the move
  */
 int32_t FW_CalculateMove(int32_t target, int32_t pos)
 {
@@ -1685,12 +1700,11 @@ void FW_SetFWEncoderCountInOneTurn()
 {
    if( flashSettings.FWType == FW_FIX)
    {
-      FW_COUNTS_IN_ONE_TURN = FW_INTERNAL_GEAR_RATIO * FW_EXTERNAL_GEAR_RATIO * FW_ENCODER_COUNTS;
+      FW_COUNTS_IN_ONE_TURN = (int32_t)(FW_INTERNAL_GEAR_RATIO * FW_EXTERNAL_GEAR_RATIO * FW_ENCODER_COUNTS);
    }
    else
    {
-      //FW_COUNTS_IN_ONE_TURN = flashSettings.FWEncoderCyclePerTurn;
-      FW_COUNTS_IN_ONE_TURN = FW_HALL_ENCODER_COUNTS;
+      FW_COUNTS_IN_ONE_TURN = (int32_t)(flashSettings.FWEncoderCyclePerTurn);
    }
 }
 

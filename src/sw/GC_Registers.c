@@ -1273,7 +1273,7 @@ void GC_SetFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPos
 
    if (gcRegsData.FWPositionSetpoint < flashSettings.FWNumberOfFilters)
    {
-      if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts, flashSettings.FWType))
+      if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts))
       {
          ChangeFWControllerMode(FW_POSITION_MODE, counts);
       }

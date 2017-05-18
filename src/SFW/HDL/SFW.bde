@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 18130
+ FREEID 18147
  VARIABLES
  {
   #ARCHITECTURE="SFW"
@@ -34,7 +34,7 @@ HEADER
 "library IEEE,WORK;\n"+
 "use ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1442858615"
+    #MODIFIED="1493063863"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5cd6ddd1-f09e-47c0-8c09-2c61623d2bc8"
    }
   }
@@ -186,14 +186,6 @@ HEADER
      PARENT 32
      ORIENTATION 2
     }
-    TEXT  35, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (25,590,185,614)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 34
-    }
     TEXT  37, 0, 0
     {
      TEXT "$#NAME"
@@ -243,7 +235,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="SFW_HDR_MOSI"
       #NUMBER="0"
       #SIDE="right"
@@ -278,7 +270,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="FPA_EXP_INFO"
       #NUMBER="0"
       #SIDE="right"
@@ -403,7 +395,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="SFW_HDR_MISO"
       #NUMBER="0"
       #SIDE="right"
@@ -501,23 +493,6 @@ HEADER
       POINTS ( (0,0), (20,0) )
      }
     }
-    PIN  34, 0, 0
-    {
-     COORD (0,600)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="EXP_INFO_BUSY"
-      #NUMBER="0"
-      #SIDE="left"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (0,0), (20,0) )
-     }
-    }
     PIN  36, 0, 0
     {
      COORD (0,-100)
@@ -543,7 +518,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="FPA_IMG_INFO"
       #NUMBER="0"
       #SIDE="left"
@@ -3913,7 +3888,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5cd6ddd1-f09e-47c0-8c09-2c61623d2bc8"
    }
    COORD (3320,1700)
-   VERTEXES ( (2,15990), (4,15948), (6,15979), (8,15936), (10,15963), (12,15789), (14,15791), (16,15793), (18,15795), (20,15797), (22,15960), (24,16112), (26,15806), (28,15858), (30,15909), (32,15886), (38,17380), (34,17383), (36,17386) )
+   VERTEXES ( (2,15990), (4,15948), (6,15979), (8,15936), (10,15963), (12,15789), (14,15791), (16,15793), (18,15795), (20,15797), (22,15960), (24,16112), (26,15806), (28,15858), (30,15909), (32,15886), (36,17386), (38,17380) )
   }
   TEXT  15006, 0, 0
   {
@@ -5297,29 +5272,6 @@ PAGE ""
    MARGINS (1,1)
    PARENT 17082
   }
-  INSTANCE  17350, 0, 0
-  {
-   VARIABLES
-   {
-    #COMPONENT="Input"
-    #CUSTOM_NAME=""
-    #LIBRARY="#terminals"
-    #REFERENCE="EXP_INFO_BUSY"
-    #SYMBOL="Input"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
-   }
-   COORD (3280,2300)
-   VERTEXES ( (2,17384) )
-  }
-  TEXT  17351, 0, 0
-  {
-   TEXT "$#REFERENCE"
-   RECT (2991,2283,3229,2318)
-   ALIGN 6
-   MARGINS (1,1)
-   PARENT 17350
-  }
-  NET WIRE  17355, 0, 0
   NET WIRE  17376, 0, 0
   VTX  17380, 0, 0
   {
@@ -5333,19 +5285,6 @@ PAGE ""
   {
    NET 17376
    VTX 17380, 17381
-  }
-  VTX  17383, 0, 0
-  {
-   COORD (3320,2300)
-  }
-  VTX  17384, 0, 0
-  {
-   COORD (3280,2300)
-  }
-  WIRE  17385, 0, 0
-  {
-   NET 17355
-   VTX 17383, 17384
   }
   VTX  17386, 0, 0
   {
@@ -5802,7 +5741,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  18113, 0, 0
+  TEXT  18130, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5813,7 +5752,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  18114, 0, 0
+  TEXT  18131, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5824,7 +5763,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  18115, 0, 0
+  TEXT  18132, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5834,7 +5773,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  18116, 0, 0
+  TEXT  18133, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5846,7 +5785,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  18117, 0, 0
+  TEXT  18134, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5859,7 +5798,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  18118, 0, 0
+  TEXT  18135, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5869,7 +5808,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  18119, 0, 0
+  TEXT  18136, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5881,7 +5820,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  18120, 0, 0
+  TEXT  18137, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5891,7 +5830,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  18121, 0, 0
+  TEXT  18138, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5902,7 +5841,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  18122, 0, 0
+  GROUP  18139, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2820,4201,3201)
@@ -5914,7 +5853,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  18123, 0, 0
+  GROUP  18140, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3020,4201,3021)
@@ -5926,7 +5865,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  18124, 0, 0
+  GROUP  18141, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2960,4201,2961)
@@ -5938,7 +5877,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  18125, 0, 0
+  GROUP  18142, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3080,4201,3081)
@@ -5950,7 +5889,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  18126, 0, 0
+  GROUP  18143, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3140,4201,3141)
@@ -5962,7 +5901,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  18127, 0, 0
+  GROUP  18144, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2820,3501,2961)
@@ -5973,7 +5912,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  18128, 0, 0
+  GROUP  18145, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2960,3501,3201)
@@ -5984,7 +5923,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  18129, 0, 0
+  BMPPICT  18146, 0, 0
   {
    PAGEALIGN 10
    RECT (3340,2880,3479,2925)

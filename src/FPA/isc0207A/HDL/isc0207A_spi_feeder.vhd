@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 19527 $
+--!   $Author: enofodjie $
+--!   $Date: 2016-11-19 13:49:39 -0500 (sam., 19 nov. 2016) $
+--!   $Id: isc0207A_spi_feeder.vhd 19527 2016-11-19 18:49:39Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2016-11-08%20Forrest%20Gump/src/FPA/isc0207A_3k/HDL/isc0207A_spi_feeder.vhd $
 ------------------------------------------------------------------
 
 
@@ -16,12 +16,12 @@ use IEEE.std_logic_1164.all;
 use IEEE. numeric_std.all;
 use work.fpa_common_pkg.all;
 use work.fpa_define.all;
-use work.tel2000.all;
+--use work.tel2000.all;
 
 entity isc0207A_spi_feeder is
    port(		 
       ARESET      : in std_logic;
-      MCLK_SOURCE : in std_logic;
+      CLK         : in std_logic;
       
       SPI_DATA    : in std_logic_vector(63 downto 0);
       SPI_DONE    : out std_logic;
@@ -37,7 +37,8 @@ end isc0207A_spi_feeder;
 
 architecture rtl of isc0207A_spi_feeder is
    
-   constant C_FPA_BITSTREAM_BYTE_NUM_M1 : natural := DEFINE_FPA_BITSTREAM_BYTE_NUM - 1;
+   constant C_SPI_DATA_BYTE_NUM    : natural := DEFINE_FPA_BITSTREAM_BYTE_NUM;
+   constant C_SPI_DATA_BYTE_NUM_M1 : natural := C_SPI_DATA_BYTE_NUM - 1;
    
    component sync_reset
       port(
@@ -46,16 +47,17 @@ architecture rtl of isc0207A_spi_feeder is
          CLK    : in std_logic);
    end component;  
    
-   type spi_feeder_fsm_type  is (idle, launch_spi_tx_st, check_end_st, wait_spi_end_st, count_inc_st, check_eof_gen_st);
-   type byte_array_type is array (0 to C_FPA_BITSTREAM_BYTE_NUM_M1) of std_logic_vector(7 downto 0); 
+   type spi_feeder_fsm_type  is (idle, latch_data_st, launch_spi_tx_st, check_end_st, wait_spi_end_st, count_dec_st, check_eof_gen_st);
+   type byte_array_type is array (0 to C_SPI_DATA_BYTE_NUM_M1) of std_logic_vector(7 downto 0); 
    signal spi_feeder_fsm            : spi_feeder_fsm_type;
    signal sreset                    : std_logic; 
    signal tx_mosi_i                 : t_ll_ext_mosi8;
    signal spi_done_i                : std_logic; 
    signal tx_drem_i                 : unsigned(TX_DREM'range);
-   signal byte_cnt                  : natural range 0 to DEFINE_FPA_BITSTREAM_BYTE_NUM;
-   signal spi_data_i                : std_logic_vector(DEFINE_FPA_BITSTREAM_BYTE_NUM*8 - 1 downto 0);
+   signal byte_cnt                  : natural range 0 to C_SPI_DATA_BYTE_NUM;
+   signal spi_data_i                : std_logic_vector(C_SPI_DATA_BYTE_NUM*8 - 1 downto 0);
    signal spi_byte                  : byte_array_type;
+   signal spi_byte_latch            : byte_array_type;
    
 begin  
    
@@ -66,14 +68,9 @@ begin
    ------------------------------------------------
    -- determination des bytes
    ------------------------------------------------
-   Ub : process(SPI_DATA)
-   begin
-      --if rising_edge(MCLK_SOURCE) then 
-      for ii in 0 to C_FPA_BITSTREAM_BYTE_NUM_M1 loop 
-         spi_byte(ii) <= SPI_DATA(8*ii + 7 downto 8*ii);
-      end loop;
-      --end if;
-   end process;
+   Ub : for ii in 0 to C_SPI_DATA_BYTE_NUM_M1 generate 
+      spi_byte(ii) <= SPI_DATA(8*ii + 7 downto 8*ii);
+   end generate; 
    
    --------------------------------------------------
    -- synchro reset 
@@ -81,16 +78,16 @@ begin
    U1 : sync_reset
    port map(
       ARESET => ARESET,
-      CLK    => MCLK_SOURCE,
+      CLK    => CLK,
       SRESET => sreset
       );   
    
    ------------------------------------------------
    -- Voir s'il faut programmer le détecteur
    ------------------------------------------------
-   U3 : process(MCLK_SOURCE)
+   U3 : process(CLK)
    begin
-      if rising_edge(MCLK_SOURCE) then 
+      if rising_edge(CLK) then 
          if sreset = '1' then
             tx_mosi_i.dval <= '0';
             spi_feeder_fsm <= idle;			
@@ -104,15 +101,21 @@ begin
                   tx_mosi_i.sof  <= '1'; 
                   tx_mosi_i.eof  <= '0';
                   tx_drem_i <= to_unsigned(2, tx_drem_i'length);
-                  byte_cnt <= C_FPA_BITSTREAM_BYTE_NUM_M1; 
+                  byte_cnt <= C_SPI_DATA_BYTE_NUM_M1; 
                   spi_done_i <= '1';
                   if SPI_EN = '1' then
-                     spi_feeder_fsm <= launch_spi_tx_st; 
+                     spi_feeder_fsm <= latch_data_st; 
                   end if;
                
+               when latch_data_st =>
+                  for ii in 0 to C_SPI_DATA_BYTE_NUM_M1 loop
+                     spi_byte_latch(ii) <= spi_byte(ii);
+                  end loop;
+                  spi_feeder_fsm <= launch_spi_tx_st; 
+                           
                when launch_spi_tx_st =>              -- on prend des morceaux de 8 bits qu'on envoie au driver spi
                   spi_done_i <= '0';
-                  tx_mosi_i.data <= spi_byte(byte_cnt); -- SPI_DATA pas besoin d'etre latché car il ne change pas tant que la configiration n'est pas envoyée au complet.
+                  tx_mosi_i.data <= spi_byte_latch(byte_cnt);
                   tx_mosi_i.dval <= '1';
                   if TX_MISO.BUSY = '0' then
                      spi_feeder_fsm <= check_end_st;
@@ -124,10 +127,10 @@ begin
                   if byte_cnt = 0 then
                      spi_feeder_fsm <= wait_spi_end_st;
                   else 
-                     spi_feeder_fsm <= count_inc_st;
+                     spi_feeder_fsm <= count_dec_st;
                   end if; 
                
-               when count_inc_st =>        -- ce compteur permet de balayer lentement le mpt de configuraion du detecteur 
+               when count_dec_st =>        -- ce compteur permet de balayer lentement le mpt de configuraion du detecteur 
                   byte_cnt <= byte_cnt - 1;          
                   tx_drem_i <= to_unsigned(8, tx_drem_i'length);
                   spi_feeder_fsm <= check_eof_gen_st; 

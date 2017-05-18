@@ -21,12 +21,12 @@
 #include "FlashSettings.h"
 
 #ifdef FW_VERBOSE
-   #define FW_PRINTF(fmt, ...)   FPGA_PRINTF("FilterWheel: " fmt, ##__VA_ARGS__)
+   #define FW_PRINTF(fmt, ...)   FPGA_PRINTF("FW: " fmt, ##__VA_ARGS__)
 #else
-   #define FW_PRINTF(fmt, ...)   DUMMY_PRINTF("FilterWheel: " fmt, ##__VA_ARGS__)
+   #define FW_PRINTF(fmt, ...)   DUMMY_PRINTF("FW: " fmt, ##__VA_ARGS__)
 #endif
 
-#define FW_ERR(fmt, ...)         FPGA_PRINTF("FilterWheel: Error: " fmt "\n", ##__VA_ARGS__)
+#define FW_ERR(fmt, ...)         FPGA_PRINTF("FW: Error: " fmt "\n", ##__VA_ARGS__)
 #define FW_INF(fmt, ...)         FW_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 #define FAULHABER_MAX_IDLE_SPEED          10    // rpm
@@ -97,7 +97,6 @@
 #define FW_EXTERNAL_ENCODER_COUNTS   4096
 
 
-//extern const int FW_COUNTS_IN_ONE_TURN;
 
 ////////////////////
 // Define Errors
@@ -137,6 +136,8 @@ typedef enum
    INIT_STOP_WHEEL,
    INIT_WAIT_STOP_WHEEL_ACK,
    INIT_WAIT_STOP_WHEEL,
+   INIT_DISABLEMOTOR_MODE,
+   INIT_WAIT_DISABLEMOTOR_ACK,
    INIT_DONE_MODE
 }  FW_initialisationMode_t;
 
@@ -203,8 +204,9 @@ typedef enum
 {
    FW_Position_Pid = 0,
    FW_Vel_Pid_Slow,
-   FW_Vel_Pid_Fast
-} FW_Conftig_type_t;
+   FW_Vel_Pid_Fast,
+   FW_Config_table_size
+} FW_Config_type_t;
 
 typedef enum
 {
@@ -231,6 +233,12 @@ bool IsFWHomingValid();
 IRC_Status_t FWControllerInit(FH_ctrl_t* instance);
 
 ////////////////////
+// External Variable
+////////////////////
+
+
+
+////////////////////
 // Error functions
 ////////////////////
 void FW_SetErrors(uint32_t mask);
@@ -250,9 +258,7 @@ int32_t FW_CalculateMove(int32_t target, int32_t pos);
 bool FW_CalculateBacklashFreeMove(int32_t target, int32_t pos, int32_t* setpoint);
 
 uint8_t FW_getFilterIndex(int32_t counts);
-bool FW_getFilterPosition(uint8_t idx, int32_t* counts, const FWType_t type);
-
-void FW_setRawPositionMode(bool enable);
+bool FW_getFilterPosition(uint8_t idx, int32_t* counts);
 
 void FW_ResetTimers();
 

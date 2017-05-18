@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : isc0207A_clks_gen
+--!   @file : isc0207A_clks_gen_core
 --!   @brief
 --!   @details
 --!
@@ -17,17 +17,21 @@ use IEEE.numeric_std.all;
 use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 
-entity isc0207A_clks_gen is
+entity isc0207A_clks_gen_core is
    port(
       ARESET            : in std_logic;
       
-      CLK_80M           : in std_logic; 
-      ADC_PHASE_CLK     : in std_logic; 
+      MCLK_SOURCE       : in std_logic;
+      QUAD_PHASE_CLK    : in std_logic;
       
-      DISABLE_QUAD_CLK_DEFAULT : in std_logic;
       FPA_INTF_CFG      : in fpa_intf_cfg_type;
       
+      DISABLE_QUAD_CLK_DEFAULT : in std_logic;
+      
       FPA_MCLK          : out std_logic;
+      FPA_PCLK          : out std_logic;  -- pour le hawk, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo
+      
+      QUAD_CLK_COPY     : out std_logic;  -- quad_clk utilisé par le readout_ctrler
       
       QUAD1_CLK         : out std_logic;
       QUAD2_CLK         : out std_logic;
@@ -37,9 +41,9 @@ entity isc0207A_clks_gen is
       ADC_DESERIALIZER_RST  : out std_logic  -- à '1' si ARESET à '1' ou si aucune carte ADC valide n'est détectée.
       
       );
-end isc0207A_clks_gen;
+end isc0207A_clks_gen_core;
 
-architecture rtl of isc0207A_clks_gen is   
+architecture rtl of isc0207A_clks_gen_core is   
    
    
    component sync_reset
@@ -49,7 +53,7 @@ architecture rtl of isc0207A_clks_gen is
          CLK    : in std_logic);
    end component;
    
-   component Clk_divider is
+   component Clk_Divider is
       Generic(	
          Factor : integer := 2);		
       Port ( 
@@ -63,88 +67,112 @@ architecture rtl of isc0207A_clks_gen is
    signal sreset                         : std_logic;
    signal quad_clk_iob                   : std_logic_vector(4 downto 1);
    signal fpa_mclk_i                     : std_logic;
+   signal fpa_pclk_i                     : std_logic;
    signal quad_clk_default               : std_logic;
    signal quad_clk_raw                   : std_logic;
    signal disable_quad_clk_default_i     : std_logic;
-   signal quad_clk_i_0                   : std_logic;
-   signal quad_clk_i_1                   : std_logic;
    signal adc_deserializer_rst_i         : std_logic;
-   signal quad_clk_d, quad_clk_r         : std_logic_vector(4 downto 1);
+   signal quad_clk_copy_i                : std_logic;
+   signal quad_clk_r                     : std_logic_vector(4 downto 1);
    signal quad_clk_pipe                  : quad_clk_pipe_type;
    
    attribute equivalent_register_removal : string;
    attribute equivalent_register_removal of quad_clk_iob: signal is "no";
    
+   attribute iob : string;
+   attribute iob of quad_clk_iob: signal is "true";
    
-   attribute IOB : string;
-   attribute IOB of quad_clk_iob : signal is "TRUE";
-   --attribute IOB of quad_clk_d      : signal is "TRUE";
+   attribute dont_touch : string;
+   attribute dont_touch of quad_clk_iob: signal is "true";
    
 begin
    
    QUAD1_CLK <= quad_clk_iob(1);
    QUAD2_CLK <= quad_clk_iob(2);
    QUAD3_CLK <= quad_clk_iob(3);
-   QUAD4_CLK <= quad_clk_iob(4);      --quad_clk_iob(4);   -- ENO: 02 nov 2016: quad_clk_d est ici pour garder la trace détecteur intacte.
+   QUAD4_CLK <= quad_clk_iob(4);
+   QUAD_CLK_COPY <= quad_clk_copy_i;
    
    ADC_DESERIALIZER_RST <= adc_deserializer_rst_i;
+   
+   
    -----------------------------------------------------
    -- Synchronisation reset
    -----------------------------------------------------
    U1B: sync_reset
    Port map(		
-      ARESET => ARESET, SRESET => sreset, CLK => CLK_80M);
+      ARESET => ARESET, SRESET => sreset, CLK => MCLK_SOURCE);
    
    
    --------------------------------------------------------
-   -- Genereteur clock enable pour le détecteur
+   -- Genereteur master clock enable pour le détecteur
    -------------------------------------------------------- 
-   U2A: Clk_divider
+   U2A: Clk_Divider
    Generic map(
       Factor=> DEFINE_FPA_MCLK_RATE_FACTOR
       )
    Port map( 
-      Clock   => CLK_80M,     -- choix de 80MHz pour le FPA
+      Clock   => MCLK_SOURCE,     -- choix de 80MHz pour le FPA
       Reset   => sreset, 
       Clk_div => fpa_mclk_i   -- attention, c'est en realité un clock enable. 
       );
-   U2B : process(CLK_80M)
+   
+   
+   --------------------------------------------------------
+   -- Genereteur pixel clock enable pour les process
+   -------------------------------------------------------- 
+   U2B: Clk_Divider
+   Generic map(
+      Factor=> DEFINE_FPA_PCLK_RATE_FACTOR
+      )
+   Port map( 
+      Clock   => MCLK_SOURCE,     -- choix de 80MHz pour le FPA
+      Reset   => sreset, 
+      Clk_div => fpa_pclk_i   -- attention, c'est en realité un clock enable. 
+      );
+   
+   
+   --------------------------------------------------------
+   -- passage à travers des registres
+   --------------------------------------------------------    
+   U2C : process(MCLK_SOURCE)
    begin
-      if rising_edge(CLK_80M) then
-         FPA_MCLK <= fpa_mclk_i;
+      if rising_edge(MCLK_SOURCE) then
+         FPA_MCLK <= fpa_mclk_i;  
+         FPA_PCLK <= fpa_pclk_i;    -- pour le hawk, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo
       end if;
-   end process;   
+   end process;
    
    
    --------------------------------------------------------
    -- Genereteur clock des adcs quads
    -------------------------------------------------------- 
    -- clock par defaut
-   U3A: Clk_divider
+   U3A: Clk_Divider
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_DEFAULT_FACTOR
       )
    Port map( 
-      Clock   => CLK_80M,    -- choix de la même horloge source que fpa_mclk_i !!!!!
+      Clock   => MCLK_SOURCE,    -- choix de la même horloge source que fpa_mclk_i !!!!!
       Reset   => sreset, 
       Clk_div => quad_clk_default   -- attention, c'est en realité un clock enable.
       );   
    
    --   clock reelle utilisable après vérification des limites de la carte ADC
-   U3B: Clk_divider
+   U3B: Clk_Divider
    Generic map(
       Factor => DEFINE_ADC_QUAD_CLK_FACTOR
       )
    Port map( 
-      Clock   => CLK_80M, 
+      Clock   => MCLK_SOURCE, 
       Reset   => sreset, 
       Clk_div => quad_clk_raw   -- attention, c'est en realité un clock enable.
       );  
    
-   -- horloge des quads
-   U3C : process(CLK_80M)
+   -- horloge des quads .Attention, c'est en realité un clock enable.
+   U3C : process(MCLK_SOURCE)
    begin
-      if rising_edge(CLK_80M) then                                          
+      if rising_edge(MCLK_SOURCE) then                                          
          
          adc_deserializer_rst_i <= ARESET or not disable_quad_clk_default_i;
          
@@ -153,35 +181,31 @@ begin
             disable_quad_clk_default_i <= DISABLE_QUAD_CLK_DEFAULT;              -- changement seulement à la tombée des deux clocks pour viter des pointes.
          end if;
          
-         -- choix de l'horloge des adcs
-         quad_clk_i_0 <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
-         
-         quad_clk_i_1 <= quad_clk_i_0; -- requis pour conservation trace détecteur
+         quad_clk_copy_i <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
          
       end if;
-   end process; 
+   end process;
    
    -- dephaseur sur quad 4 pour retrouver delai avant timing
-   U4C : process(ADC_PHASE_CLK)
+   U3D : process(QUAD_PHASE_CLK)
    begin
-      if rising_edge(ADC_PHASE_CLK) then                                          
+      if rising_edge(QUAD_PHASE_CLK) then                                          
          
          -- pipe de l'horloge des adcs
          for ii  in 1 to 4 loop
-            quad_clk_pipe(ii)(0) <= quad_clk_i_1;
+            quad_clk_pipe(ii)(0) <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
             quad_clk_pipe(ii)(15 downto 1) <= quad_clk_pipe(ii)(14 downto 0);
          end loop;
          
          -- selection de l'horloge dephasagée pour chaque quad
          for jj in 1 to 4 loop
-            quad_clk_r(jj) <= quad_clk_pipe(jj)(to_integer(FPA_INTF_CFG.QUAD_CLK_PHASE(jj)));  
+            quad_clk_r(jj) <= quad_clk_pipe(jj)(to_integer(FPA_INTF_CFG.ADC_CLK_PHASE(jj)));  
          end loop; 
          
          -- registres des IOBs
          for kk in 1 to 4 loop
             quad_clk_iob(kk) <= quad_clk_r(kk); 
          end loop;
-         
          
       end if;
    end process; 

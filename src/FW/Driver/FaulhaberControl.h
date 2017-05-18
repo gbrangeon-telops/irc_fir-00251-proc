@@ -73,5 +73,6 @@ uint8_t SetPC(uint8_t node, uint16_t pc, char *TxBuffer);
 // Query Commands
 uint8_t GetVelocity(uint8_t node, char *TxBuffer);
 uint8_t GetCurrentPosition(uint8_t node, char *TxBuffer);
+uint8_t GetCurrentTargetPosition(uint8_t node, char *TxBuffer);
 
 #endif // FAULHABER_CONTROL_H
