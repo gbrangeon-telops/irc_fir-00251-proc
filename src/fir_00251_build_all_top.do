@@ -38,6 +38,10 @@ do D:\Telops\FIR-00251-Proc\src\FPA\herculesD\hdl\compil_HerculesD.do
 acom  "$FIR251PROC\src\fir_00251_proc_herculesD.bde"
 #FPA isc0207A
 do D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\compil_isc0207A.do
+
+#TO-DO place before FPA section
+do D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\build_quad_receiver.do
+
 acom  "$FIR251PROC\src\fir_00251_proc_isc0207A.bde"
 #FPA isc0209A
 do D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\compil_isc0209A.do
