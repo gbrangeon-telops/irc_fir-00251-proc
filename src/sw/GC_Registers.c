@@ -1116,6 +1116,9 @@ void GC_ComputeImageLimits()
 
       // Offset Y limits
       gcRegsData.OffsetY = (FPA_HEIGHT_MAX - gcRegsData.Height) / 2;
+#ifdef FPA_OFFSETY_MULT_CORR
+      gcRegsData.OffsetY = roundDown(gcRegsData.OffsetY, FPA_OFFSETY_MULT_CORR);
+#endif
       gcRegsData.OffsetYMin = gcRegsData.OffsetY;
       gcRegsData.OffsetYMax = gcRegsData.OffsetY;
    }

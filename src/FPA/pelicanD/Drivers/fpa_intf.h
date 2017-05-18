@@ -46,6 +46,7 @@
 
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   2
+#define FPA_OFFSETY_MULT_CORR    4
 #define FPA_OFFSETY_MAX    508
 
 #define FPA_FORCE_CENTER   1
