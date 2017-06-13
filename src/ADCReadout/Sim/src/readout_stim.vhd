@@ -24,6 +24,9 @@ use ieee.numeric_std.all;
 use work.tel2000.all;
 
 entity readout_stim is
+   generic(
+    ADC_NBITS         : integer := 16 -- legal values are 14, 16, 18
+   );
    port(
       MBCLK  : in STD_LOGIC;
       ARESET : in STD_LOGIC;
@@ -90,7 +93,13 @@ begin
    FPA_Img_Info.exp_feedbk <= int_i;
    FPA_Img_Info.frame_id <= frame_id;
 
-   R <= x"00001000"; -- decimal 4096 -> 1.0
-   Q <= x"00008000"; -- decimal 2048.0
+   R <= x"00004E40" when ADC_NBITS = 16 else  --0.305mv/count
+        x"00013880" when ADC_NBITS = 14 else  --1.22mV/count
+        x"0004E400" when ADC_NBITS = 12 else  --4.88mV/count
+        x"00000000";
+   Q <= x"00080000" when ADC_NBITS = 16 else --32768
+        x"00020000" when ADC_NBITS = 14 else --8192
+        x"00008000" when ADC_NBITS = 12 else --2048
+        x"00000000"; -- decimal 2048.0
    
 end rtl;

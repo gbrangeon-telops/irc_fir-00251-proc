@@ -72,7 +72,7 @@ constant CONV_TIME_REQ : time := 750 ns;
 constant conv_time_u : unsigned(15 downto 0) := to_unsigned(natural(CONV_TIME_REQ/CLK_PERIOD),16);
 
 signal acq_cnt : unsigned(15 downto 0);
-constant ACQ_LEN : unsigned(7 downto 0) := to_unsigned(17,8);
+constant ACQ_LEN : unsigned(7 downto 0) := to_unsigned(ADC_NBITS+1,8);
 
 signal vin : unsigned(15 downto 0);
 
@@ -141,7 +141,7 @@ begin
     
     wait until falling_edge(ADC_SCLK);
     acq_cnt <= acq_cnt + 1;
-    for i in 15 downto 0 loop
+    for i in ADC_NBITS-1 downto 0 loop
         wait for thsdo;
         ADC_SDO <= vin(i);
         wait until falling_edge(ADC_SCLK);
