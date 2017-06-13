@@ -219,13 +219,15 @@ begin
                    
                    if master_clk_cnt = NBIT_TO_ACQ then 
                       acq_fsm <= end_st;
+                      data_rdy_i <= '1'; 
                    end if;
                    
                 when end_st =>
                    adc_conv_i <= '0';
-                   acq_window <= '0';                    
+                   acq_window <= '0';
+                   data_rdy_i <= '0'; 
                    acq_fsm <= idle;
-                   data_rdy_i <= '1';  
+                    
                 when others =>                  
             end case;    
         end if;
