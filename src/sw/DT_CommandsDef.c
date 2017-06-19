@@ -2294,7 +2294,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Set GCP state:      GCP [0|1]");
    DT_PRINTF("  ADC calibration:    ADC [m b]");
    DT_PRINTF("  Flash Settings:     FS");
-   DT_PRINTF("  Debug Term. Output: DTO [CLINK|OEM|USB]");
+   DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
    //DT_PRINTF("  FW Control SET/GET Param:   FWC SET|GET EN|POS|VEL [value]"); //TODO
    DT_PRINTF("  Print help:         HLP");
