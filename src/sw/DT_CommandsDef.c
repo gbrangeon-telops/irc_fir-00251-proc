@@ -58,8 +58,6 @@ static IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseRM(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf);
-static IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf);
-static IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLED(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseVER(circByteBuffer_t *cbuf);
@@ -96,8 +94,6 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"LS", DebugTerminalParseLS},
    {"RM", DebugTerminalParseRM},
    {"FO", DebugTerminalParseFO},
-   {"LB", DebugTerminalParseLB},
-   {"SB", DebugTerminalParseSB},
    {"LED", DebugTerminalParseLED},
    {"GPS", DebugTerminalParseGPS},
    {"VER", DebugTerminalParseVER},
@@ -117,6 +113,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"DTO", DebugTerminalParseDTO},
    {"FWPID", DebugTerminalParseFWPID},
   // {"FWC", DebugTerminalParseFWC}, //TODO
+   {"CI", DebugTerminalParseCI},
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -126,6 +123,23 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
 uint32_t gDebugTerminalCommandsCount = NUM_OF(gDebugTerminalCommands);
 
 bool gDisableFilterWheel;
+
+extern ctrlIntf_t gCtrlIntf_NTxMini;
+extern ctrlIntf_t gCtrlIntf_OEM;
+extern ctrlIntf_t gCtrlIntf_CameraLink;
+extern ctrlIntf_t gCtrlIntf_OutputFPGA;
+extern ctrlIntf_t gCtrlIntf_FileManager;
+
+debugTerminalCtrlIntf_t gDebugTerminalCtrlIntfs[] =
+{
+   {"PLEORA", &gCtrlIntf_NTxMini},
+   {"OEM", &gCtrlIntf_OEM},
+   {"CLINK", &gCtrlIntf_CameraLink},
+   {"OUTPUT", &gCtrlIntf_OutputFPGA},
+   {"USART", &gCtrlIntf_FileManager}
+};
+
+uint32_t gDebugTerminalCtrlIntfsCount = NUM_OF(gDebugTerminalCtrlIntfs);
 
 /**
  * Debug terminal get FPA status command parser.
@@ -1119,164 +1133,6 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
 }
 
 /**
- * Loopback command parser.
- * This parser is used to parse and validate Loopback command arguments
- * and to execute the command.
- *
- * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
- *
- * @return IRC_SUCCESS when Loopback command was successfully executed.
- * @return IRC_FAILURE otherwise.
- */
-IRC_Status_t DebugTerminalParseLB(circByteBuffer_t *cbuf)
-{
-   extern ctrlIntf_t gCtrlIntf_NTxMini;
-   extern ctrlIntf_t gCtrlIntf_OEM;
-   extern ctrlIntf_t gCtrlIntf_CameraLink;
-   extern ctrlIntf_t gCtrlIntf_FileManager;
-   ctrlIntf_t *p_ctrlIntf;
-   uint8_t argStr[7];
-   uint32_t arglen;
-   uint32_t loopback;
-
-   // Read port value
-   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-   if (arglen == 0)
-   {
-      DT_ERR("Invalid port value.");
-      return IRC_FAILURE;
-   }
-   argStr[arglen++] = '\0'; // Add string terminator
-
-   if (strcasecmp((char *)argStr, "CLINK") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_CameraLink;
-   }
-   else if (strcasecmp((char *)argStr, "PLEORA") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_NTxMini;
-   }
-   else if (strcasecmp((char *)argStr, "OEM") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_OEM;
-   }
-   else if (strcasecmp((char *)argStr, "USART") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_FileManager;
-   }
-   else
-   {
-      DT_ERR("Unknown port value.");
-      return IRC_FAILURE;
-   }
-
-   // Read loopback value
-   arglen = GetNextArg(cbuf, argStr, 6);
-   if ((ParseNumArg((char *)argStr, arglen, &loopback) != IRC_SUCCESS) ||
-         ((loopback != 0) && (loopback != 1)))
-   {
-      DT_ERR("Invalid logical value.");
-      return IRC_FAILURE;
-   }
-
-   // There is supposed to be no remaining bytes in the buffer
-   if (!DebugTerminal_CommandIsEmpty(cbuf))
-   {
-      DT_ERR("Unsupported command arguments");
-      return IRC_FAILURE;
-   }
-
-   // Validate control interface link type
-   if (p_ctrlIntf->linkType != CILT_USART)
-   {
-      DT_ERR("Loopback feature is only supported for USART link.");
-      return IRC_FAILURE;
-   }
-
-   ((usart_t*)p_ctrlIntf->p_link)->loopback = loopback;
-
-   return IRC_SUCCESS;
-}
-
-/**
- * Show Bytes command parser.
- * This parser is used to parse and validate Show Bytes command arguments
- * and to execute the command.
- *
- * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
- *
- * @return IRC_SUCCESS when Show Bytes command was successfully executed.
- * @return IRC_FAILURE otherwise.
- */
-IRC_Status_t DebugTerminalParseSB(circByteBuffer_t *cbuf)
-{
-   extern ctrlIntf_t gCtrlIntf_NTxMini;
-   extern ctrlIntf_t gCtrlIntf_OEM;
-   extern ctrlIntf_t gCtrlIntf_CameraLink;
-   extern ctrlIntf_t gCtrlIntf_FileManager;
-   extern ctrlIntf_t gCtrlIntf_OutputFPGA;
-   ctrlIntf_t *p_ctrlIntf;
-   uint8_t argStr[7];
-   uint32_t arglen;
-   uint32_t showBytes;
-
-   // Read port value
-   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-   if (arglen == 0)
-   {
-      DT_ERR("Invalid port value.");
-      return IRC_FAILURE;
-   }
-   argStr[arglen++] = '\0'; // Add string terminator
-
-   if (strcasecmp((char *)argStr, "CLINK") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_CameraLink;
-   }
-   else if (strcasecmp((char *)argStr, "PLEORA") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_NTxMini;
-   }
-   else if (strcasecmp((char *)argStr, "OEM") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_OEM;
-   }
-   else if (strcasecmp((char *)argStr, "USART") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_FileManager;
-   }
-   else if (strcasecmp((char *)argStr, "OUTPUT") == 0)
-   {
-      p_ctrlIntf = &gCtrlIntf_OutputFPGA;
-   }
-   else
-   {
-      DT_ERR("Unknown port value.");
-      return IRC_FAILURE;
-   }
-
-   // Read show bytes value
-   arglen = GetNextArg(cbuf, argStr, 6);
-   if ((ParseNumArg((char *)argStr, arglen, &showBytes) != IRC_SUCCESS) ||
-         ((showBytes != 0) && (showBytes != 1)))
-   {
-      DT_ERR("Invalid logical value.");
-      return IRC_FAILURE;
-   }
-
-   // There is supposed to be no remaining bytes in the buffer
-   if (!DebugTerminal_CommandIsEmpty(cbuf))
-   {
-      DT_ERR("Unsupported command arguments");
-      return IRC_FAILURE;
-   }
-
-   p_ctrlIntf->showBytes = showBytes;
-
-   return IRC_SUCCESS;
-}
-
-/**
  * LED command parser.
  * This parser is used to parse and validate LED command arguments
  * and to execute the command.
@@ -2262,7 +2118,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
       return IRC_FAILURE;
    }
 
-   DT_PRINTF("Debug terminal commands:");
+   DT_PRINTF("Processing FPGA debug terminal commands:");
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF value]");
@@ -2277,8 +2133,6 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  List files:         LS [FILE|COL|BLOCK|NL|ICU|ACT]");
    DT_PRINTF("  Remove file:        RM filename");
    DT_PRINTF("  File order:         FO FILE|COL|BLOCK|NL|ICU|ACT [NONE|POSIX|TYPE|NAME|CTYPE|FW|NDF|LENS]");
-   DT_PRINTF("  Loopback:           LB CLINK|PLEORA|OEM|USART 0|1");
-   DT_PRINTF("  Show bytes:         SB CLINK|PLEORA|OEM|USART|OUTPUT 0|1");
    DT_PRINTF("  Set led state:      LED AUTO|ERR|WARN|STBY|WARNSTRM|STRM|BUSY|RDY");
    DT_PRINTF("  GPS status:         GPS [0|1]");
    DT_PRINTF("  Print version:      VER");
@@ -2297,6 +2151,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
    //DT_PRINTF("  FW Control SET/GET Param:   FWC SET|GET EN|POS|VEL [value]"); //TODO
+   DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
    DT_PRINTF("  Print help:         HLP");
 
    /*
