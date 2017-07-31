@@ -246,7 +246,7 @@ void EHDRI_UpdateExpIndexSequence(t_EhdriManager *pEhdriCtrl, const gcRegistersD
          EHDRI_PRINTF( "Loop %x: Total: 0x=%x, pow:0x%x, CoefMax :%x, ID:%x\n", i, tempResult, powf( log10f( EHDRIExposureTimeAry[0] ), i ), SDHdrData.NDFilter.INTtoT_polyFit[id], id );
       }
    }
-   pGCRegs->EHDRIExpectedTemperatureMax = tempResult - EHDRI_C_TO_KELVIN;
+   pGCRegs->EHDRIExpectedTemperatureMax = K_TO_C(tempResult);
    EHDRI_PRINTF( "EHDRIMaxExpectedTemp : %x\n", (uint32_t) pGCRegs->EHDRIMaxExpectedTemp );
    
    // EHDRIExposureTimeAry[pGCRegs->EHDRINumberOfExposures-1] must be the largest exp time if not reorder the exptime
@@ -268,7 +268,7 @@ void EHDRI_UpdateExpIndexSequence(t_EhdriManager *pEhdriCtrl, const gcRegistersD
          EHDRI_PRINTF( "Loop %x: Total: 0x=%x, pow:0x%x, CoefMin :%x, ID:%x\n", i, tempResult, powf( log10f( EHDRIExposureTimeAry[pGCRegs->EHDRINumberOfExposures - 1]), i ), SDHdrData.NDFilter.INTtoT_polyFit[id], id );
       }
    }
-   pGCRegs->EHDRIExpectedTemperatureMin = tempResult - EHDRI_C_TO_KELVIN;
+   pGCRegs->EHDRIExpectedTemperatureMin = K_TO_C(tempResult);
    EHDRI_PRINTF( "MinExpectedTemp : %x\n", (uint32_t) pGCRegs->EHDRIMinExpectedTemp );
 }
 
@@ -279,12 +279,12 @@ void HDRA_UpdateExpectedExposure(GeniCam_Registers_Set_t *pGCRegs)
    uint32_t Ncoef = SDHdrData.NDFilter.INTvsT_fitOrder;
    
    // Limit minimum expected temperature
-   pGCRegs->EHDRIMinExpectedTemp = MIN( pGCRegs->EHDRIMinExpectedTemp, SDHdrData.NDFilter.TCalMax - EHDRI_C_TO_KELVIN );
-   pGCRegs->EHDRIMinExpectedTemp = MAX( pGCRegs->EHDRIMinExpectedTemp, SDHdrData.NDFilter.TCalMin - EHDRI_C_TO_KELVIN );
+   pGCRegs->EHDRIMinExpectedTemp = MIN( pGCRegs->EHDRIMinExpectedTemp, K_TO_C(SDHdrData.NDFilter.TCalMax) );
+   pGCRegs->EHDRIMinExpectedTemp = MAX( pGCRegs->EHDRIMinExpectedTemp, K_TO_C(SDHdrData.NDFilter.TCalMin) );
       
    // Limit maximum expected temperature                                                 
-   pGCRegs->EHDRIMaxExpectedTemp = MIN( pGCRegs->EHDRIMaxExpectedTemp, SDHdrData.NDFilter.TCalMax - EHDRI_C_TO_KELVIN );
-   pGCRegs->EHDRIMaxExpectedTemp = MAX( pGCRegs->EHDRIMaxExpectedTemp, SDHdrData.NDFilter.TCalMin - EHDRI_C_TO_KELVIN );
+   pGCRegs->EHDRIMaxExpectedTemp = MIN( pGCRegs->EHDRIMaxExpectedTemp, K_TO_C(SDHdrData.NDFilter.TCalMax) );
+   pGCRegs->EHDRIMaxExpectedTemp = MAX( pGCRegs->EHDRIMaxExpectedTemp, K_TO_C(SDHdrData.NDFilter.TCalMin) );
       
    // Make sure minimum expected temperature is not greater than maximum expected temperature
    pGCRegs->EHDRIMinExpectedTemp = MIN( pGCRegs->EHDRIMinExpectedTemp, pGCRegs->EHDRIMaxExpectedTemp );
@@ -293,7 +293,7 @@ void HDRA_UpdateExpectedExposure(GeniCam_Registers_Set_t *pGCRegs)
    tempResult = 0.0f;
    for( i = 0; i <= Ncoef; i++ )
    {
-      tempResult += powf( ( pGCRegs->EHDRIMaxExpectedTemp + EHDRI_C_TO_KELVIN ), i ) * SDHdrData.NDFilter.TtoINT_polyFit[Ncoef - i];
+      tempResult += powf( C_TO_K(pGCRegs->EHDRIMaxExpectedTemp), i ) * SDHdrData.NDFilter.TtoINT_polyFit[Ncoef - i];
       EHDRI_PRINTF( "Loop %x: 0x=%08X   Coef : 0x%08X\n", i, *( (uint32_t *) &tempResult ), *( (uint32_t *) &SDHdrData.NDFilter.TtoINT_polyFit[Ncoef - i] ) );
    }
    EHDRIExposureTimeAry[0] = powf( 10.0f, tempResult );
@@ -305,7 +305,7 @@ void HDRA_UpdateExpectedExposure(GeniCam_Registers_Set_t *pGCRegs)
    tempResult = 0.0f;
    for( i = 0; i <= Ncoef; i++ )
    {
-      tempResult += powf( ( pGCRegs->EHDRIMinExpectedTemp + EHDRI_C_TO_KELVIN ), i ) * SDHdrData.NDFilter.TtoINT_polyFit[ Ncoef + 1 + Ncoef - i];
+      tempResult += powf( C_TO_K(pGCRegs->EHDRIMinExpectedTemp), i ) * SDHdrData.NDFilter.TtoINT_polyFit[ Ncoef + 1 + Ncoef - i];
       EHDRI_PRINTF( "Loop %x: 0x=%08X   Coef : 0x%08X\n", i, *( (uint32_t *) &tempResult ), *( (uint32_t *) &SDHdrData.NDFilter.TtoINT_polyFit[ Ncoef + 1 + Ncoef - i ] ) );
    }
    EHDRIExposureTimeAry[pGCRegs->EHDRINumberOfExposures - 1] = powf( 10.0f, tempResult );

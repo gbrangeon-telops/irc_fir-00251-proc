@@ -20,8 +20,6 @@
 #define EHDRI_INDEX_TABLE_SIZE    EHDRI_BRAM_SIZE / 16
 #define EHDRI_IDX_NBR      4
 
-#define EHDRI_C_TO_KELVIN       273.15f
-
 // Struct Definition
 /**
  * EHDRI MANAGER STRUCT

@@ -17,6 +17,7 @@
 #include "GC_Registers.h"
 #include "calib.h"
 #include "hder_inserter.h"
+#include "utils.h"
 
 // The current value for DCS_Cooler and DCS_Supply24V currents was computed using the following tests results:
 // I_load [A] = [0.0  , 0.2  , 0.5  , 0.8  , 1.0  , 1.2  , 1.5  , 1.8  , 2.0  , 2.2  , 2.5  , 2.8  , 3.0 ];
@@ -134,7 +135,7 @@ void XADC_ThPhyConv(xadcChannel_t *xadcCh)
       // + d(Ln(Rt/R25))?
       partial_result += (Conv_Fact_MC65[TempCoeff_D][range]*powf(log(Rth), 3));
 
-      *(xadcCh->p_physical) = ((1.0F/partial_result)-273.15F);
+      *(xadcCh->p_physical) = K_TO_C(1.0F/partial_result);
    }
 }
 
