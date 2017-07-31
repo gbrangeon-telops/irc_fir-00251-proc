@@ -79,7 +79,7 @@ IRC_Status_t NDF_ControllerInit(FH_ctrl_t* instance)
    IRC_Status_t status = IRC_SUCCESS;
    NDF_initialized = false;
 
-   if (flashSettings.NDFPresent) // TODO FWPresent et NDFPresent ne doivent pas être à 1 en même temps...
+   if (flashSettings.NDFPresent)
       FH_instance->fh_data.id = NDF_NODE_ID;
 
    if (instance)

@@ -84,7 +84,7 @@ IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
    else
       status = IRC_FAILURE;
 
-   if (flashSettings.FWPresent) // TODO FWPresent et NDFPresent ne devraient pas être à 1 en même temps...
+   if (flashSettings.FWPresent)
    {
       if(flashSettings.FWType == FW_SYNC)
          FH_instance->fh_data.id = SFW_NODE_ID; // Synchronous wheel
@@ -949,7 +949,7 @@ static bool FWVelocityMode(bool reset, bool newTarget )
          {
             int32_t value;
 
-            if (FH_readValue(FH_instance, &value)) // TODO COMPLETE THIS FONCTION
+            if (FH_readValue(FH_instance, &value))
             {
                   StopTimer(&FW_commTimer);
                   FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
@@ -1664,7 +1664,7 @@ bool FW_CalculateBacklashFreeMove(int32_t target, int32_t pos, int32_t* setpoint
 void FW_ConfigParameterSet( flashSettings_t *flashSetting, FW_config_t *Config)
 {
    //Check what is the filterWheel Type (Slow 4 position or Fast 8 position)
-   if ( flashSetting->FWType == FW_FIX ) // TODO Set the good DEFINE here
+   if ( flashSetting->FWType == FW_FIX )
    {
       Config[FW_Position_Pid].I_GAIN    = flashSetting->FWPositionControllerI;
       Config[FW_Position_Pid].PD        = flashSetting->FWPositionControllerPD;
@@ -1672,27 +1672,26 @@ void FW_ConfigParameterSet( flashSettings_t *flashSetting, FW_config_t *Config)
       Config[FW_Position_Pid].PP        = flashSetting->FWPositionControllerPP;
       Config[FW_Position_Pid].maxVelocity  = flashSetting->FWSpeedMax;
    }
-   else if( flashSetting->FWType == FW_SYNC ) // TODO Set the good DEFINE here
+   else if( flashSetting->FWType == FW_SYNC )
    {
       //Set the slow PID for the homing
-      //TODO enter the good parameter name for the flash setting
       Config[FW_Position_Pid].I_GAIN  = flashSetting->FWPositionControllerI;
       Config[FW_Position_Pid].PD      = flashSetting->FWPositionControllerPD;
       Config[FW_Position_Pid].POR     = flashSetting->FWPositionControllerPOR;
       Config[FW_Position_Pid].PP      = flashSetting->FWPositionControllerPP;
-      Config[FW_Position_Pid].maxVelocity   = flashSetting->FWSpeedMax; // TODO Very slow to test
+      Config[FW_Position_Pid].maxVelocity   = flashSetting->FWSpeedMax;
 
       Config[FW_Vel_Pid_Slow].I_GAIN  = flashSetting->FWSlowSpeedControllerPI;
       Config[FW_Vel_Pid_Slow].PD      = flashSetting->FWSlowSpeedControllerPD;
       Config[FW_Vel_Pid_Slow].POR     = flashSetting->FWSlowSpeedControllerPOR;
       Config[FW_Vel_Pid_Slow].PP      = flashSetting->FWSlowSpeedControllerPP;
-      Config[FW_Vel_Pid_Slow].maxVelocity   = flashSetting->FWSpeedMax; // TODO Very slow to test
+      Config[FW_Vel_Pid_Slow].maxVelocity   = flashSetting->FWSpeedMax;
 
       Config[FW_Vel_Pid_Fast].I_GAIN  = flashSetting->FWFastSpeedControllerI;
       Config[FW_Vel_Pid_Fast].PD      = flashSetting->FWFastSpeedControllerPD;
       Config[FW_Vel_Pid_Fast].POR     = flashSetting->FWFastSpeedControllerPOR;
       Config[FW_Vel_Pid_Fast].PP      = flashSetting->FWFastSpeedControllerPP;
-      Config[FW_Vel_Pid_Fast].maxVelocity   = flashSetting->FWSpeedMax; // TODO Very slow to test
+      Config[FW_Vel_Pid_Fast].maxVelocity   = flashSetting->FWSpeedMax;
    }
 }
 

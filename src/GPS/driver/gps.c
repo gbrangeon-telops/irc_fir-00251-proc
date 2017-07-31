@@ -343,7 +343,7 @@ void GPS_ParseGPRMC(t_GPS *GPS_Data)
          
 	//GPS Fix
    GPS_Data->Gps_Fix = (char) GPS_Data->dataArray[2][0];
-   // GPS UTC Time = hhmmss.xxx at position [1]of our NMEA data table
+   // GPS UTC Time = hhmmss at position [1]of our NMEA data table
    // Extract hh
    GPS_Data->rTClock.tm_hour = str2int((char *)(GPS_Data->dataArray[1]),0,2);
    // Extract mm   
@@ -352,11 +352,11 @@ void GPS_ParseGPRMC(t_GPS *GPS_Data)
    GPS_Data->rTClock.tm_sec = str2int((char *)(GPS_Data->dataArray[1]),4,2);
      
    // GPS UTC Date = ddmmyy
-   // Extract hh   
+   // Extract dd
    GPS_Data->rTClock.tm_mday = str2int((char *)(GPS_Data->dataArray[9]),0,2);
    // Extract mm   
    GPS_Data->rTClock.tm_mon = str2int((char *)(GPS_Data->dataArray[9]),2,2)-1; //Month = 0 to 11
-   // Extract ss   
+   // Extract yy
    GPS_Data->rTClock.tm_year = 100 + str2int((char *)(GPS_Data->dataArray[9]),4,2);
       
    // Latitude ddmm.mmmm   

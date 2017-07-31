@@ -935,9 +935,6 @@ IRC_Status_t Proc_FlashDynamicValues_Init()
    }
 
    return FlashDynamicValues_Init(&gFlashDynamicValues);
-
-
-   // TODO DAL Transf鲥r dans GC INit
 }
 
 /**

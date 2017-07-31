@@ -1437,8 +1437,6 @@ void FM_ClearFileDB()
    memset(&gFM_icuBlocks, 0, sizeof(gFM_icuBlocks));
    memset(&gFM_calibrationActualizationFiles, 0, sizeof(gFM_calibrationActualizationFiles));
 
-   // TODO Set collection file order keys using flash dynamic values
-
    // Clear file pointers
    gFM_flashSettingsFile = NULL;
    gFM_flashDynamicValuesFile = NULL;

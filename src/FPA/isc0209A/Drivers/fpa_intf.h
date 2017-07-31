@@ -133,7 +133,7 @@ typedef struct s_FpaIntfConfig t_FpaIntf;
 struct s_FpaStatus    // 
 {					            
    // adc board (iddcas analogiques)
-   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253-XXX  (lié à l'ID)
+   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
    uint32_t  adc_resolution;           // statut du built_in test de la carte ADC
    uint32_t  adc_brd_spare;            // spare de statut pour la carte ADC

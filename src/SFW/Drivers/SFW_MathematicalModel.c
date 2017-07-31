@@ -11,8 +11,7 @@
 #include "exposure_time_ctrl.h"
 
 
-//TODO Valider que kles define du model mathematique correspondre toujours à ceux de fpa_intf
-// ATTENTION CES DEFINE SONT IDENTIQUE A CEUX DE FAP_INTF
+
 #define SFW_EXPOSUREMAX_MARGING     (flashSettings.FWExposureTimeMaxMargin / 100.0F)
 
 static void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, float* maxTheta1, float* maxTheta2);
