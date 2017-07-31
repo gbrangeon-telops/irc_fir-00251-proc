@@ -200,14 +200,6 @@ typedef struct {
    uint32_t Timeout2;
 } ICUParams_t;
 
-typedef struct {
-   uint32_t startIndex; // index of first element to process
-   uint32_t blockIdx; // current block being processed
-   uint32_t blockLength; // number of elements to process in the next pass
-   uint32_t initialBlockLength;
-   uint32_t totalLength; // total number of elements to process
-} context_t;
-
 typedef struct
 {
    uint32_t type;                 // 0 : ICU, 1 : External BB
@@ -328,10 +320,5 @@ void ACT_listActualizationData();
 void ACT_invalidateActualizations(int type);
 deltabeta_t* ACT_getActiveDeltaBeta();
 uint32_t ACT_getActiveDeltaBetaPOSIXTime();
-
-void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength);
-uint32_t ctxtIterate(context_t* ctxt);
-uint32_t ctxtStep(context_t* ctxt, uint32_t n);
-bool ctxtIsDone(const context_t* ctxt);
 
 #endif // ACTUALIZATION_H

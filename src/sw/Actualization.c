@@ -3503,35 +3503,6 @@ bool isBadPixel(uint64_t* pixelData)
    return !BitTst(*pixelData, CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT);
 }
 
-void ctxtInit(context_t* ctxt, uint32_t i0, uint32_t totalLength, uint32_t blockLength)
-{
-   ctxt->startIndex = i0;
-   ctxt->totalLength = totalLength;
-   ctxt->blockIdx = 0;
-   ctxt->blockLength = blockLength;
-   ctxt->initialBlockLength = blockLength;
-}
-
-uint32_t ctxtIterate(context_t* ctxt)
-{
-   return ctxtStep(ctxt, ctxt->blockLength);
-}
-
-uint32_t ctxtStep(context_t* ctxt, uint32_t stepSize)
-{
-   ctxt->startIndex = MIN(ctxt->startIndex + stepSize, ctxt->totalLength);
-
-   ctxt->blockLength = MIN(ctxt->totalLength - ctxt->startIndex, stepSize);
-   ++ctxt->blockIdx;
-
-   return ctxt->blockLength;
-}
-
-bool ctxtIsDone(const context_t* ctxt)
-{
-   return ctxt->blockLength == 0;
-}
-
 /*
  * Find a valid delta beta data that matches the current block.
  * Order of precedence : xbb->icu->none
