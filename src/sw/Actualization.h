@@ -55,15 +55,14 @@
 #define ACT_ICU_TEMP_TOL              (float)0.25f // [°C]
 #define ACT_AEC_EXPTIME_TOL           (float)2.0f // [us] convergence criterion for AEC
 
-#define TIC
 #define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)5 * TIME_ONE_SECOND_US // [us]
 #define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)360 * TIME_ONE_SECOND_US // [us]
 #define ACT_WAIT_FOR_ICU_TIMEOUT (uint32_t)2*gICU_ctrl.ICU_TransitionDuration*1000 // [us]
-#define ACT_WAIT_FOR_AEC_TIMEOUT (uint32_t)3 * TIME_ONE_SECOND_US // [us] // TODO periode à valider (vient du code de TEL-1000)
+#define ACT_WAIT_FOR_AEC_TIMEOUT (uint32_t)3 * TIME_ONE_SECOND_US // [us]
 #define ACT_WAIT_FOR_SEQ_TIMEOUT (uint32_t)10 * TIME_ONE_SECOND_US // [us]
-#define ACT_ICU_TEMP_STABLE_TIME (uint32_t)15 * TIME_ONE_SECOND_US // [us] // TODO mettre la bonne duree
-#define ACT_ICU_TEMP_WAIT_TIME (uint32_t)5 * TIME_ONE_SECOND_US // [us] // TODO mettre la bonne duree
-#define ACT_ICU_STABILISATION_TIMEOUT (uint32_t)300 * TIME_ONE_SECOND_US // [us] // TODO mettre la bonne duree
+#define ACT_ICU_TEMP_STABLE_TIME (uint32_t)15 * TIME_ONE_SECOND_US // [us]
+#define ACT_ICU_TEMP_WAIT_TIME (uint32_t)5 * TIME_ONE_SECOND_US // [us]
+#define ACT_ICU_STABILISATION_TIMEOUT (uint32_t)300 * TIME_ONE_SECOND_US // [us]
 
 #define DELTA_BETA_NUM_BITS 11
 
@@ -79,10 +78,6 @@
 
 #ifndef CELSIUS_TO_KELVIN
    #define CELSIUS_TO_KELVIN (float)273.15f
-#endif
-
-#ifndef KELVIN_TO_CELSIUS
-   #define KELVIN_TO_CELSIUS (float)-273.15f
 #endif
 
 #define ACT_STATES(ACTION) \
@@ -156,6 +151,17 @@ static const char *BQ_State_str[] __attribute__ ((unused)) = {
       BQ_STATES(GENERATE_STRING)
 };
 
+typedef enum {
+   FWR_IDLE = 0,
+   FWR_INIT_IO,
+   FWR_DELETE_PREVIOUS,
+   FWR_FILE_HEADER,
+   FWR_DATA_HEADER,
+   FWR_QUANTIZE_DATA,
+   FWR_CALC_CRC,
+   FWR_DATA,
+   FWR_CLOSEFILE
+} ACT_Write_State_t;
 
 /**< a datatype for keeping a copy of the genicam register to get tampered with during this process */
 typedef struct {
@@ -250,7 +256,7 @@ typedef struct
    bool clearBufferAfterCompletion; // defaults to true
    bool bypassAEC; // defaults to false
    bool bypassChecks;
-   bool disableDelteBeta;
+   bool disableDeltaBeta;
    bool disableBPDetection;
    bool useDynamicTestPattern;
    bool verbose;
@@ -299,7 +305,7 @@ extern bool gStartBetaQuantization;
 
 void configureIcuParams(ICUParams_t* p);
 
-IRC_Status_t startActualization( bool internalTrig );
+IRC_Status_t startActualization();
 void stopActualization();
 IRC_Status_t Actualization_SM();
 IRC_Status_t BadPixelDetection_SM();

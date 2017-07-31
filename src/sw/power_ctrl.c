@@ -454,7 +454,8 @@ void Power_SM()
 
                      if (flashSettings.ImageCorrectionEnabled && flashSettings.ImageCorrectionAtPowerOn)
                      {
-                        startActualization(true);
+                        gcRegsData.ImageCorrectionMode = ICM_ICU;
+                        startActualization();
                      }
                      break;
 

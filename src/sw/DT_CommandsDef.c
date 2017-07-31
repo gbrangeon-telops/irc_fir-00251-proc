@@ -666,13 +666,13 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       case 4: // perform actualization using ICU
          DT_INF("Triggering an actualization (icu)");
          gcRegsData.ImageCorrectionMode = ICM_ICU;
-         startActualization(false);
+         startActualization();
          break;
 
       case 5: // perform actualization using external BB
          DT_INF("Triggering an actualization (xbb)");
          gcRegsData.ImageCorrectionMode = ICM_BlackBody;
-         startActualization(false);
+         startActualization();
          break;
 
       case 6: // AEC on/off

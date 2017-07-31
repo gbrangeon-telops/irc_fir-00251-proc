@@ -2773,7 +2773,7 @@ void GC_ImageCorrectionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      startActualization(false);
+      startActualization();
    }
 }
 
