@@ -35,7 +35,7 @@
 #endif
 
 #define ACT_ERR(fmt, ...)        FPGA_PRINTF("ACT: Error: " fmt "\n", ##__VA_ARGS__)
-#define ACT_INF(fmt, ...)        ACT_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
+#define ACT_INF(fmt, ...)        FPGA_PRINTF("ACT: Info: " fmt "\n", ##__VA_ARGS__)
 
 #if ACT_VERBOSE_LEVEL>1
    #define ACT_TRC(fmt, ...)        ACT_PRINTF("Trace: " fmt "\n", ##__VA_ARGS__)
@@ -55,14 +55,14 @@
 #define ACT_ICU_TEMP_TOL              (float)0.25f // [°C]
 #define ACT_AEC_EXPTIME_TOL           (float)2.0f // [us] convergence criterion for AEC
 
-#define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)5 * TIME_ONE_SECOND_US // [us]
-#define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)360 * TIME_ONE_SECOND_US // [us]
-#define ACT_WAIT_FOR_ICU_TIMEOUT (uint32_t)2*gICU_ctrl.ICU_TransitionDuration*1000 // [us]
-#define ACT_WAIT_FOR_AEC_TIMEOUT (uint32_t)3 * TIME_ONE_SECOND_US // [us]
-#define ACT_WAIT_FOR_SEQ_TIMEOUT (uint32_t)10 * TIME_ONE_SECOND_US // [us]
-#define ACT_ICU_TEMP_STABLE_TIME (uint32_t)15 * TIME_ONE_SECOND_US // [us]
-#define ACT_ICU_TEMP_WAIT_TIME (uint32_t)5 * TIME_ONE_SECOND_US // [us]
-#define ACT_ICU_STABILISATION_TIMEOUT (uint32_t)300 * TIME_ONE_SECOND_US // [us]
+#define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)(5 * TIME_ONE_SECOND_US) // [us]
+#define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)(360 * TIME_ONE_SECOND_US) // [us]
+#define ACT_WAIT_FOR_ICU_TIMEOUT (uint32_t)(2 * gICU_ctrl.ICU_TransitionDuration * 1000) // [us]
+#define ACT_WAIT_FOR_AEC_TIMEOUT (uint32_t)(3 * TIME_ONE_SECOND_US) // [us]
+#define ACT_WAIT_FOR_SEQ_TIMEOUT (uint32_t)(10 * TIME_ONE_SECOND_US) // [us]
+#define ACT_ICU_TEMP_STABLE_TIME (uint32_t)(15 * TIME_ONE_SECOND_US) // [us]
+#define ACT_ICU_TEMP_WAIT_TIME (uint32_t)(5 * TIME_ONE_SECOND_US) // [us]
+#define ACT_ICU_STABILISATION_TIMEOUT (uint32_t)(300 * TIME_ONE_SECOND_US) // [us]
 
 #define DELTA_BETA_NUM_BITS 11
 
@@ -75,10 +75,6 @@
 #define MAX_PIXEL_COUNT ((uint32_t)(FPA_HEIGHT_MAX) * (uint32_t)FPA_WIDTH_MAX)
 
 #define MAX_DELTA_BETA_SIZE 32 // maximum allowed number of delta beta data locations in memory
-
-#ifndef CELSIUS_TO_KELVIN
-   #define CELSIUS_TO_KELVIN (float)273.15f
-#endif
 
 #define ACT_STATES(ACTION) \
 		ACTION(ACT_Init)                    /**< initial state with some initialisations */ \

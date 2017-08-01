@@ -293,7 +293,7 @@ IRC_Status_t startActualization()
       return IRC_FAILURE;
    }
 
-   FPGA_PRINTF( "Starting image correction...\n" );
+   ACT_INF( "Starting image correction" );
 
    // Start beta correction
    gStartActualization = 1;
@@ -474,7 +474,7 @@ IRC_Status_t Actualization_SM()
          if ( TDCFlagsTst(ICUIsImplementedMask) && (gcRegsData.ImageCorrectionMode == ICM_ICU) )
          {
             usingICU = true;
-            FPGA_PRINTF("ACT: Updating calibration using the internal calibration unit.\n");
+            ACT_INF("Using ICU");
 
             // Load ICU calibration data
             icuCalibFileRec = findIcuReferenceBlock();
@@ -503,7 +503,7 @@ IRC_Status_t Actualization_SM()
          else // gcRegsData.ImageCorrectionMode == ICM_BlackBody
          {
             // cas sans ICU -> BB externe. Utiliser alors la calibration en cours comme bloc de référence Passer à l'état ACT_StartAECAcquisition
-            FPGA_PRINTF("ACT: Updating calibration using an external blackbody.\n");
+            ACT_INF("Using external BB");
 
             usingICU = false;
 
@@ -810,8 +810,8 @@ IRC_Status_t Actualization_SM()
                gcRegsData.TestImageSelector = TIS_TelopsConstantValue1;
             }
 
-            FPGA_PRINTF( "ACT: Exposure time = %d us\n", (uint32_t) gcRegsData.ExposureTime );
-            ACT_PRINTF( "AcquisitionFrameRate = %d fps\n", (uint32_t) gcRegsData.AcquisitionFrameRate );
+            ACT_INF( "Exposure time = %d us", (uint32_t) gcRegsData.ExposureTime );
+            ACT_INF( "AcquisitionFrameRate = %d fps", (uint32_t) gcRegsData.AcquisitionFrameRate );
 
             // configurer le buffering pour coaddData.NCoadd images
             // always using the internal buffer
@@ -848,7 +848,7 @@ IRC_Status_t Actualization_SM()
          // Wait until we have all the requested images for averaging
          if (elapsed_time_us(tic_TotalDuration) % 5000000 < 3000)
          {
-            FPGA_PRINTF("ACT: Acquiring data for actualisation...\n");
+            ACT_INF("Acquiring data for actualisation...");
             //ACT_PRINTF("Current number of images in sequence = %d\n", BufferManager_GetSequenceLength(&gBufManager, 0)); // (fait planter l'enregistrement dans le buffer)
          }
 
@@ -967,8 +967,8 @@ IRC_Status_t Actualization_SM()
 
          if (coaddData.numProcessedPixels == 0)
          {
-            ACT_INF("first value (32-bits) 0x%08X", data_in[0]);
-            ACT_INF("first value 0x%04X", seq_buffer[0]);
+            ACT_PRINTF("first value (32-bits) 0x%08X\n", data_in[0]);
+            ACT_PRINTF("first value 0x%04X\n", seq_buffer[0]);
          }
 
          for (k=0; k<ACT_MAX_PIX_DATA_TO_PROCESS; k += 2)
@@ -1011,12 +1011,12 @@ IRC_Status_t Actualization_SM()
             VERBOSE_IF(gActDebugOptions.verbose)
             {
                float etime = (float) (elapsed_time_us( tic_AvgDuration )) / ((float)TIME_ONE_SECOND_US);
-               FPGA_PRINTF( "ACT: Computing average took %d ms\n", (uint32_t)elapsed_time_us( tic_AvgDuration )/1000);
-               FPGA_PRINTF( "ACT: Computing average took " _PCF(2) " s\n", _FFMT(etime, 2) );
-               FPGA_PRINTF( "ACT: Computing average took " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_AvgDuration )) / ((float)numPixelsToProcess), 2) );
+               ACT_INF( "Computing average took %d ms", (uint32_t)elapsed_time_us( tic_AvgDuration )/1000);
+               ACT_INF( "Computing average took " _PCF(2) " s", _FFMT(etime, 2) );
+               ACT_INF( "Computing average took " _PCF(2) " us/px", _FFMT((float) (elapsed_time_us( tic_AvgDuration )) / ((float)numPixelsToProcess), 2) );
 
-               FPGA_PRINTF( "ACT: Computing average took (real time) " _PCF(2) " s\n", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
-               FPGA_PRINTF( "ACT: Computing average took (real time) " _PCF(2) " us/px\n", _FFMT((float) (tic_RT_Duration) / ((float)numPixelsToProcess), 2) );
+               ACT_INF( "Computing average took (real time) " _PCF(2) " s", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
+               ACT_INF( "Computing average took (real time) " _PCF(2) " us/px", _FFMT((float) (tic_RT_Duration) / ((float)numPixelsToProcess), 2) );
             }
 
             if (gActDebugOptions.useDebugData)
@@ -1044,12 +1044,12 @@ IRC_Status_t Actualization_SM()
             if (usingICU)
             {
                T_BB = C_TO_K(ICUTemp);
-               FPGA_PRINTF( "ACT: T_BB (ICU) is " _PCF(3) " K\n", _FFMT(T_BB,3));
+               ACT_INF( "T_BB (ICU) is " _PCF(3) " K", _FFMT(T_BB,3));
             }
             else
             {
                T_BB = C_TO_K(gcRegsData.ExternalBlackBodyTemperature);
-               FPGA_PRINTF( "ACT: T_BB (ext BB) is " _PCF(3) " K\n", _FFMT(T_BB,3));
+               ACT_INF( "T_BB (ext BB) is " _PCF(3) " K", _FFMT(T_BB,3));
             }
 
             if (gActDebugOptions.useDebugData)
@@ -1110,7 +1110,7 @@ IRC_Status_t Actualization_SM()
 
             if ((T_BB < Tmin || T_BB > Tmax) && currentDeltaBeta->info.discardOffset == 0)
             {
-               FPGA_PRINTF( "TBB out of LUT range, forcing zero-mean correction\n");
+               ACT_INF( "TBB out of LUT range, forcing zero-mean correction");
                currentDeltaBeta->info.discardOffset = 1;
             }
 
@@ -1119,10 +1119,10 @@ IRC_Status_t Actualization_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF( "numBadPixels in block %d: %d\n", currentBlockIdx, numBadPixels);
-               FPGA_PRINTF( "Tmin = " _PCF(3) " K, Tmax = " _PCF(3) " K\n", _FFMT(Tmin,3), _FFMT(Tmax,3) );
-               FPGA_PRINTF( "FCalBB = " _PCF(4) ", medianFCal = " _PCF(4) " (index of the median: %d)\n", _FFMT(FCalBB/scaleFCal,4), _FFMT(medianFCal/scaleFCal,4), i50);
-               FPGA_PRINTF( "ACT: Reference block Beta0 Exponent = %d\n", calibrationInfo.blocks[currentBlockIdx].pixelData.Beta0_Exp);
+               ACT_INF( "numBadPixels in block %d: %d", currentBlockIdx, numBadPixels);
+               ACT_INF( "Tmin = " _PCF(3) " K, Tmax = " _PCF(3) " K", _FFMT(Tmin,3), _FFMT(Tmax,3) );
+               ACT_INF( "FCalBB = " _PCF(4) ", medianFCal = " _PCF(4) " (index of the median: %d)", _FFMT(FCalBB/scaleFCal,4), _FFMT(medianFCal/scaleFCal,4), i50);
+               ACT_INF( "Reference block Beta0 Exponent = %d", calibrationInfo.blocks[currentBlockIdx].pixelData.Beta0_Exp);
             }
 
             if (currentDeltaBeta->info.discardOffset)
@@ -1176,15 +1176,15 @@ IRC_Status_t Actualization_SM()
          {
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF( "ACT: Computing delta beta took (real time) " _PCF(4) " s\n", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
-               FPGA_PRINTF( "ACT: Computing delta beta (real time) " _PCF(4) " us/px\n", _FFMT((float) (tic_RT_Duration) / ((float)(numPixels * coaddData.NCoadd)), 2) );
+               ACT_INF( "Computing delta beta took (real time) " _PCF(4) " s", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
+               ACT_INF( "Computing delta beta (real time) " _PCF(4) " us/px", _FFMT((float) (tic_RT_Duration) / ((float)(numPixels * coaddData.NCoadd)), 2) );
             }
 
             tic_RT_Duration = 0;
 
             if (currentDeltaBeta->saturatedDataCount > 0)
             {
-               FPGA_PRINTF("ACT: WARNING %d pixel value(s) reached saturation value during delta beta measurement\n", currentDeltaBeta->saturatedDataCount);
+               ACT_INF("%d pixel value(s) reached saturation value during delta beta measurement", currentDeltaBeta->saturatedDataCount);
             }
 
             if (usingICU) // update bad pixel map only if using ICU
@@ -1286,8 +1286,8 @@ IRC_Status_t Actualization_SM()
             VERBOSE_IF(gActDebugOptions.verbose)
             {
                reportStats(&currentDeltaBeta->stats, "DeltaBeta");
-               FPGA_PRINTF( "Median value : " _PCF(6) "\n", _FFMT(p50, 6));
-               FPGA_PRINTF( "ACT: Computing delta beta stats (real time) " _PCF(4) " s\n", _FFMT((float)tic_RT_Duration/((float)TIME_ONE_SECOND_US), 2));
+               ACT_INF( "Median value : " _PCF(6), _FFMT(p50, 6));
+               ACT_INF( "Computing delta beta stats (real time) " _PCF(4) " s", _FFMT((float)tic_RT_Duration/((float)TIME_ONE_SECOND_US), 2));
             }
 
             gWriteActualizationFile = 1;
@@ -1324,11 +1324,7 @@ IRC_Status_t Actualization_SM()
 
             builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Passed;
 
-            VERBOSE_IF(gActDebugOptions.verbose)
-            {
-               FPGA_PRINTF( "ACT: image correction completed in " _PCF(2) " s\n", _FFMT(elapsed_time_us((float)tic_TotalDuration) / ((float)TIME_ONE_SECOND_US), 2));
-            }
-            FPGA_PRINTF( "ACT: Image correction done.\n");
+            ACT_INF( "image correction completed in " _PCF(2) " s", _FFMT(elapsed_time_us((float)tic_TotalDuration) / ((float)TIME_ONE_SECOND_US), 2));
 
             if (gActDebugOptions.clearBufferAfterCompletion)
             {
@@ -1607,7 +1603,7 @@ IRC_Status_t BadPixelDetection_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF( "ACT: BPD_UpdateBeta took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
+               ACT_INF( "BPD_UpdateBeta took " _PCF(2) " s", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
             }
 
             setBpdState(&state, BPD_StartAcquisition);
@@ -1651,8 +1647,8 @@ IRC_Status_t BadPixelDetection_SM()
 
          VERBOSE_IF(gActDebugOptions.verbose)
          {
-            FPGA_PRINTF( "ACT: Frame rate : " _PCF(2) " Hz\n", _FFMT(frameRate, 2));
-            FPGA_PRINTF( "ACT: Using %d frames for AEC transient\n", numFramesToSkip);
+            ACT_INF( "BPD Frame rate : " _PCF(2) " Hz", _FFMT(frameRate, 2));
+            ACT_INF( "BPD using %d frames for AEC transient", numFramesToSkip);
          }
 
          gcRegsData.CalibrationMode = CM_NUC;
@@ -1696,7 +1692,7 @@ IRC_Status_t BadPixelDetection_SM()
 
       if (TimedOut(&verbose_timeout))
       {
-         FPGA_PRINTF("ACT: Acquiring data for bad pixel detection...\n");
+         ACT_INF("Acquiring data for bad pixel detection...");
          RestartTimer(&verbose_timeout);
       }
 
@@ -1814,7 +1810,7 @@ IRC_Status_t BadPixelDetection_SM()
 
       if (TimedOut(&verbose_timeout))
       {
-         FPGA_PRINTF("ACT: Computing statistics %d/%d...\n", statData.currentCount, gActualizationParams.BPNumSamples);
+         ACT_INF("Computing statistics %d/%d...", statData.currentCount, gActualizationParams.BPNumSamples);
          RestartTimer(&verbose_timeout);
       }
 
@@ -1959,17 +1955,17 @@ IRC_Status_t BadPixelDetection_SM()
             VERBOSE_IF(gActDebugOptions.verbose)
             {
                const int NCoadd = gActualizationParams.flickersNCoadd;
-               FPGA_PRINTF( "ACT: p25, p50, p75 = %d, %d, %d\n", p25/NCoadd, p50/NCoadd, p75/NCoadd);
-               FPGA_PRINTF( "ACT: mu_R = %d\n", (int32_t)mu_R);
-               FPGA_PRINTF( "ACT: mu_Z = %d\n", (int32_t)mu_Z);
-               FPGA_PRINTF( "ACT: N_mu = %d (number of good pixels in original block)\n", N_mu);
-               FPGA_PRINTF( "ACT: sigma image (IQR-based) = %d\n", sigma_mu/NCoadd);
-               FPGA_PRINTF( "ACT: noiseThreshold = %d\n", noiseThreshold);
-               FPGA_PRINTF( "ACT: outlierThreshold = %d\n", outlierThreshold/NCoadd);
-               FPGA_PRINTF( "ACT: flickerThreshold = +/-%d\n", (uint32_t)((float)mu_R * gActualizationParams.flickerThreshold));
-               FPGA_PRINTF( "ACT: flickerThreshold1 = %d\n", flickerThreshold1);
-               FPGA_PRINTF( "ACT: flickerThreshold2 = %d\n", flickerThreshold2);
-               FPGA_PRINTF( "ACT: duration of BPD_AdjustThresholds: " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
+               ACT_INF( "p25, p50, p75 = %d, %d, %d", p25/NCoadd, p50/NCoadd, p75/NCoadd);
+               ACT_INF( "mu_R = %d", (int32_t)mu_R);
+               ACT_INF( "mu_Z = %d", (int32_t)mu_Z);
+               ACT_INF( "N_mu = %d (number of good pixels in original block)", N_mu);
+               ACT_INF( "sigma image (IQR-based) = %d", sigma_mu/NCoadd);
+               ACT_INF( "noiseThreshold = %d", noiseThreshold);
+               ACT_INF( "outlierThreshold = %d", outlierThreshold/NCoadd);
+               ACT_INF( "flickerThreshold = +/-%d", (uint32_t)((float)mu_R * gActualizationParams.flickerThreshold));
+               ACT_INF( "flickerThreshold1 = %d", flickerThreshold1);
+               ACT_INF( "flickerThreshold2 = %d", flickerThreshold2);
+               ACT_INF( "duration of BPD_AdjustThresholds: " _PCF(2) " s", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
             }
 
             tic_RT_Duration = 0;
@@ -2026,11 +2022,11 @@ IRC_Status_t BadPixelDetection_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF( "ACT: bad pixel map duration (real-time) : " _PCF(2) " s\n", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
-               FPGA_PRINTF( "ACT: Bad pixel detection took (real-time) " _PCF(2) " us/px\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
-               FPGA_PRINTF( "ACT: Bad pixel detection took " _PCF(2) " s\n", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
-               FPGA_PRINTF( "ACT: number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)\n", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOutliers);
-               }
+               ACT_INF( "bad pixel map duration (real-time) : " _PCF(2) " s", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
+               ACT_INF( "Bad pixel detection took (real-time) " _PCF(2) " us/px", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
+               ACT_INF( "Bad pixel detection took " _PCF(2) " s", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
+               ACT_INF( "number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOutliers);
+            }
 
             if (gActDebugOptions.clearBufferAfterCompletion == false)
                setBpdState(&state, BPD_DebugState);
@@ -2639,11 +2635,11 @@ bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint
    else
    {
       if (!allowCalibUpdate || TDCStatusTst(WaitingForImageCorrectionMask))
-         FPGA_PRINTF("ACT: Calibration image correction is not applicable to the current block (it is already running).\n");
+         ACT_INF("Calibration image correction is not applicable to the current block (it is already running).");
       else if (data == NULL)
-         FPGA_PRINTF("ACT: No calibration image correction has been computed yet.\n");
+         ACT_INF("No calibration image correction has been computed yet.");
       else
-         FPGA_PRINTF("ACT: Calibration image correction is not applicable to the current block.\n");
+         ACT_INF("Calibration image correction is not applicable to the current block.");
    }
 
    return retval;
@@ -2867,7 +2863,7 @@ fileRecord_t* findIcuReferenceBlock()
             refBlockFileHdr.POSIXTime == calibrationInfo.collection.ReferencePOSIXTime)
       {
          filerec = gFM_icuBlocks.item[i];
-         ACT_INF("Found ICU reference block %s", filerec->name);
+         ACT_PRINTF("Found ICU reference block %s\n", filerec->name);
          break;
       }
       ++i;
@@ -2921,7 +2917,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
    case FWR_DELETE_PREVIOUS:
    {
-      ACT_INF("FWR_DELETE_PREVIOUS");
+      ACT_PRINTF("FWR_DELETE_PREVIOUS\n");
       uint32_t timestampOffset = 0;
 
       privateActualisationPosixTime = TRIG_GetRTC(&gTrig).Seconds;
@@ -2936,7 +2932,7 @@ IRC_Status_t ActualizationFileWriter_SM()
       previousFile = findActualizationFile(currentDeltaBeta->info.referencePOSIXTime);
       if (previousFile != NULL)
       {
-         ACT_INF("Removing previous actualisation file (%s).", previousFile->name);
+         ACT_PRINTF("Removing previous actualisation file (%s).\n", previousFile->name);
          if (FM_RemoveFile(previousFile) != IRC_SUCCESS)
          {
             ACT_ERR("Error deleting previous actualisation file (%s).", previousFile->name);
@@ -2944,17 +2940,17 @@ IRC_Status_t ActualizationFileWriter_SM()
          }
       }
       else
-         ACT_INF("No existing previous file to remove.");
+         ACT_PRINTF("No existing previous file to remove.\n");
 
       state = FWR_INIT_IO;
    }
    case FWR_INIT_IO:
 
-      ACT_INF("FWR_INIT_IO");
+      ACT_PRINTF("FWR_INIT_IO\n");
 
       defineActualizationFilename(shortFileName, sizeof(shortFileName), privateActualisationPosixTime, currentDeltaBeta);
 
-      ACT_INF("Will write to file : %s", shortFileName);
+      ACT_PRINTF("Will write to file : %s\n", shortFileName);
 
       actualization_file = NULL;
 
@@ -2985,7 +2981,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
    case FWR_FILE_HEADER:
 
-      ACT_INF("FWR_FILE_HEADER");
+      ACT_PRINTF("FWR_FILE_HEADER\n");
 
       actFileHeader.DeviceSerialNumber = refBlockFileHdr.DeviceSerialNumber;
       actFileHeader.POSIXTime = privateActualisationPosixTime;
@@ -3050,7 +3046,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF("Quantization exponent for .tsic file = %d\n", Exp);
+               ACT_INF("Quantization exponent for .tsic file = %d", Exp);
             }
 
             actDataHeader.Beta0_Off = offset;
@@ -3092,7 +3088,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
    case FWR_DATA_HEADER:
 
-      ACT_INF("FWR_DATA_HEADER");
+      ACT_PRINTF("FWR_DATA_HEADER\n");
 
       actDataHeader.Beta0_Nbits = DELTA_BETA_NUM_BITS;
       actDataHeader.Beta0_Signed = 1;
@@ -3127,7 +3123,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
       state = FWR_DATA;
 
-      ACT_INF("Going to FWR_DATA");
+      ACT_PRINTF("Going to FWR_DATA\n");
 
       break;
 
@@ -3164,7 +3160,7 @@ IRC_Status_t ActualizationFileWriter_SM()
 
    case FWR_CLOSEFILE:
 
-      ACT_INF("FWR_CLOSEFILE");
+      ACT_PRINTF("FWR_CLOSEFILE\n");
 
       if (fd == -1)
       {
@@ -3429,7 +3425,7 @@ static void ACT_init()
    //memset(deltaBetaDB.deltaBeta, 0, MAX_DELTA_BETA_SIZE * sizeof(deltabeta_t*));
    deltaBetaDB.count = 0;
 
-   ACT_INF("Image correction state machine starting...");
+   ACT_PRINTF("Image correction state machine starting...\n");
 }
 
 static bool validateAverage(const uint32_t* coadd_buffer, uint32_t numPixels, uint32_t expectedSum)
@@ -3449,7 +3445,7 @@ static bool validateAverage(const uint32_t* coadd_buffer, uint32_t numPixels, ui
       ++coadd_buffer;
    }
    if (k == numPixels)
-      FPGA_PRINTF( "ACT: Average validation success\n");
+      ACT_INF( "Average validation success");
 
    return k == numPixels;
 }
@@ -3462,7 +3458,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
    const int header_sz = 2*gcRegsData.SensorWidth * 2;
    const int frame_size = gcRegsData.SensorWidth * (gcRegsData.SensorHeight+2);
 
-   FPGA_PRINTF( "ACT: Check data integrity in buffer...\n");
+   ACT_INF( "Check data integrity in buffer...");
    for (k=0; k<nCoadd; ++k)
    {
         if (coadd_buffer[k] != 0)
@@ -3472,7 +3468,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
         }
    }
    if (all_good_coadd)
-      FPGA_PRINTF( "ACT: Coadd buffer validation complete...\n");
+      ACT_INF( "Coadd buffer validation complete...");
 
    for (k=0; k<nSeq; ++k)
    {
@@ -3493,7 +3489,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
       }
    }
    if (all_good_seq)
-      FPGA_PRINTF( "ACT: Data validation complete...\n");
+      ACT_INF( "Data validation complete");
 
    return all_good_coadd && all_good_seq;
 }
@@ -3577,7 +3573,7 @@ deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, u
 
    if (db_out != NULL && verbose == true)
    {
-      FPGA_PRINTF("ACT: Found valid image correction data at location %d (type=%d, age=%d)\n", idx, db_out->info.type, db_out->info.age);
+      ACT_INF("Found valid image correction data at location %d (type=%d, age=%d)", idx, db_out->info.type, db_out->info.age);
    }
 
    return db_out;
@@ -3610,7 +3606,7 @@ deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calibInfo, u
 
    if (db_out != NULL)
    {
-      FPGA_PRINTF("ACT: Found existing image correction data at location %d (valid=%d, type=%d, age=%d)\n", idx, db_out->valid, db_out->info.type, db_out->info.age);
+      ACT_INF("Found existing image correction data at location %d (valid=%d, type=%d, age=%d)", idx, db_out->valid, db_out->info.type, db_out->info.age);
    }
 
    return db_out;
@@ -3625,17 +3621,17 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
    switch (type)
    {
    case ACT_ALL:
-      FPGA_PRINTF("ACT: Invalidating all image correction data\n");
+      ACT_INF("Invalidating all image correction data");
       break;
 
    case ACT_CURRENT:
-      FPGA_PRINTF("ACT: Invalidating active image correction data\n");
+      ACT_INF("Invalidating active image correction data");
       current = ACT_getActiveDeltaBeta();
       current->valid = 0;
       break;
 
    default:
-      FPGA_PRINTF("ACT: Invalidating %s image correction data\n", type == ACT_ICU ? "ICU":"ext BB");
+      ACT_INF("Invalidating %s image correction data", type == ACT_ICU ? "ICU":"ext BB");
    };
 
    if (type == ACT_CURRENT)
@@ -3655,7 +3651,7 @@ IRC_Status_t deleteExternalActualizationFiles()
    CalibImageCorrection_ImageCorrectionFileHeader_t header;
    uint32_t length;
 
-   FPGA_PRINTF("ACT: Deleting external image correction files from a previous boot up\n");
+   ACT_INF("Deleting external image correction files from a previous boot up");
 
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
@@ -3669,7 +3665,7 @@ IRC_Status_t deleteExternalActualizationFiles()
       {
          if (type == FT_TSAC)
          {
-            FPGA_PRINTF("ACT: Deleting obsolete TSAC file %s\n", file->name);
+            ACT_INF("Deleting obsolete TSAC file %s", file->name);
             FM_RemoveFile(file);
          }
          --i;
@@ -3688,7 +3684,7 @@ IRC_Status_t deleteExternalActualizationFiles()
 
       if (length>0 && header.ImageCorrectionType == 1)
       {
-         FPGA_PRINTF("ACT: Deleting %s\n", file->name);
+         ACT_INF("Deleting %s", file->name);
          FM_RemoveFile(file);
       }
 
@@ -3737,8 +3733,7 @@ void ACT_listActualizationData()
    deltabeta_t* current = ACT_getActiveDeltaBeta();
 
    PRINTF("\n");
-   FPGA_PRINTF("Listing image correction data...\n");
-   FPGA_PRINTF("Found %d image correction file(s)\n", gFM_calibrationActualizationFiles.count);
+   ACT_INF("Found %d image correction file(s)", gFM_calibrationActualizationFiles.count);
    for (i=0; i<gFM_calibrationActualizationFiles.count; ++i)
    {
       file = gFM_calibrationActualizationFiles.item[i];
@@ -3752,20 +3747,20 @@ void ACT_listActualizationData()
 
       if (length > 0)
       {
-         FPGA_PRINTF("#%d: Name = %s, Reference POSIX time = %010d, type = %d, T_IL = " _PCF(2) " K, T_Ref = " _PCF(2) " K, t_exp = " _PCF(2) " us\n",
+         ACT_INF("#%d: Name = %s, Reference POSIX time = %010d, type = %d, T_IL = " _PCF(2) " K, T_Ref = " _PCF(2) " K, t_exp = " _PCF(2) " us",
                i+1, file->name, (unsigned int)header.ReferencePOSIXTime, header.ImageCorrectionType,
                _FFMT(header.TemperatureInternalLens, 2), _FFMT(header.TemperatureReference, 2), _FFMT(header.ExposureTime, 2));
       }
       else
-         FPGA_PRINTF("#%d: Name = %s (Invalid image correction file)\n", i+1, file->name);
+         ACT_INF("#%d: Name = %s (Invalid image correction file)", i+1, file->name);
    }
 
    PRINTF("\n");
-   FPGA_PRINTF("%d/%d image correction data locations used in memory\n", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
+   ACT_INF("%d/%d image correction data locations used in memory", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
    for (i=0; i<deltaBetaDB.count; ++i)
    {
       deltabeta_t* data = deltaBetaDB.deltaBeta[i];
-      FPGA_PRINTF("#%d: type = %d, discard offset = %d, valid = %d, age = %d s, reference POSIX time = %010d %s\n",
+      ACT_INF("#%d: type = %d, discard offset = %d, valid = %d, age = %d s, reference POSIX time = %010d %s",
             i+1, data->info.type, data->info.discardOffset, data->valid, data->info.age, (unsigned int)data->info.referencePOSIXTime, (current==data)?"*** active ***":"");
    }
    PRINTF("\n");
@@ -3788,7 +3783,7 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
    }
    blockInfo = &calibInfo->blocks[blockIdx];
 
-   FPGA_PRINTF("ACT: Allocating an image correction data location in memory for block with POSIX time %010d\n", blockInfo->POSIXTime);
+   ACT_INF("Allocating an image correction data location in memory for block with POSIX time %010d", blockInfo->POSIXTime);
 
    // first, find the corresponding data if it already exists.
    newData = findMatchingDeltaBetaForBlock(calibInfo, blockIdx);
@@ -3801,14 +3796,12 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
          newData = &deltaBetaArray[deltaBetaDB.count];
          deltaBetaDB.deltaBeta[deltaBetaDB.count] = newData;
          ++deltaBetaDB.count;
-         FPGA_PRINTF("ACT: Allocated a new image correction data location (%d/%d)\n", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
+         ACT_INF("Allocated a new image correction data location (%d/%d)", deltaBetaDB.count, MAX_DELTA_BETA_SIZE);
       }
       else // the DB is full: we must recycle a data location
       {
          uint32_t idx = 0;
          uint32_t M = 0;
-
-         FPGA_PRINTF("ACT: Image correction database is full: recycling a data location...\n");
 
          for (i=0; i<deltaBetaDB.count; ++i)
          {
@@ -3824,12 +3817,12 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, deltab
             }
          }
 
-         FPGA_PRINTF("ACT: Location at index %d was recycled (aged %d s)\n", idx, deltaBetaDB.deltaBeta[idx]->info.age);
+         ACT_INF("Location at index %d was recycled (aged %d s)", idx, deltaBetaDB.deltaBeta[idx]->info.age);
          newData = deltaBetaDB.deltaBeta[idx];
       }
    }
    else
-      FPGA_PRINTF("ACT: Existing image correction data in database (valid=%d, age=%d) will be updated\n", newData->valid, newData->info.age);
+      ACT_INF("Existing image correction data in database (valid=%d, age=%d) will be updated", newData->valid, newData->info.age);
 
    if (newData) // this pointer should not be null at this point...
    {
@@ -3909,8 +3902,8 @@ uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* fin
 
    VERBOSE_IF(verbose)
    {
-      FPGA_PRINTF("cleanBetaDistribution: p_FA = " _PCF(6) "\n", _FFMT(p_FA,6));
-      FPGA_PRINTF("cleanBetaDistribution: thresh = " _PCF(4) "\n", _FFMT(thresh,4));
+      ACT_INF("cleanBetaDistribution: p_FA = " _PCF(6), _FFMT(p_FA,6));
+      ACT_INF("cleanBetaDistribution: thresh = " _PCF(4), _FFMT(thresh,4));
    }
 
    statistics_t stats;
@@ -3956,10 +3949,10 @@ uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* fin
       }
       VERBOSE_IF(verbose)
       {
-         FPGA_PRINTF("std = " _PCF(2) ", mu = " _PCF(2) "\n", _FFMT(sqrtf(stats.var),2), _FFMT(stats.mu,2));
-         FPGA_PRINTF("min = " _PCF(2) ", max = " _PCF(2) "\n", _FFMT(stats.min,2), _FFMT(stats.max,2));
-         FPGA_PRINTF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2) "\n", _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
-         FPGA_PRINTF("Iteration %d, number of BP %d\n", niter, nbp);
+         ACT_INF("std = " _PCF(2) ", mu = " _PCF(2), _FFMT(sqrtf(stats.var),2), _FFMT(stats.mu,2));
+         ACT_INF("min = " _PCF(2) ", max = " _PCF(2), _FFMT(stats.min,2), _FFMT(stats.max,2));
+         ACT_INF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2), _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
+         ACT_INF("Iteration %d, number of BP %d", niter, nbp);
       }
       ++niter;
    }
@@ -4008,9 +4001,9 @@ uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, stati
    }
    VERBOSE_IF(verbose)
    {
-      FPGA_PRINTF("std = " _PCF(2) ", mu = " _PCF(2) "\n", _FFMT(sqrtf(stats->var),2), _FFMT(stats->mu,2));
-      FPGA_PRINTF("min = " _PCF(2) ", max = " _PCF(2) "\n", _FFMT(stats->min,2), _FFMT(stats->max,2));
-      FPGA_PRINTF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2) "\n", _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
+      ACT_INF("std = " _PCF(2) ", mu = " _PCF(2), _FFMT(sqrtf(stats->var),2), _FFMT(stats->mu,2));
+      ACT_INF("min = " _PCF(2) ", max = " _PCF(2), _FFMT(stats->min,2), _FFMT(stats->max,2));
+      ACT_INF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2), _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
    }
 
    return nbp;
@@ -4026,8 +4019,8 @@ uint32_t cleanBetaDistributionNew(float* beta, int N, float p_FA, statistics_t* 
 
    VERBOSE_IF(verbose)
    {
-      FPGA_PRINTF("cleanBetaDistribution: p_FA = " _PCF(6) "\n", _FFMT(p_FA,6));
-      FPGA_PRINTF("cleanBetaDistribution: thresh = " _PCF(4) "\n", _FFMT(thresh,4));
+      ACT_INF("cleanBetaDistribution: p_FA = " _PCF(6), _FFMT(p_FA,6));
+      ACT_INF("cleanBetaDistribution: thresh = " _PCF(4), _FFMT(thresh,4));
    }
 
    prev_nbp = 1;
@@ -4041,7 +4034,7 @@ uint32_t cleanBetaDistributionNew(float* beta, int N, float p_FA, statistics_t* 
 
       VERBOSE_IF(verbose)
       {
-         FPGA_PRINTF("Iteration %d, number of BP %d\n", niter, nbp);
+         ACT_INF("Iteration %d, number of BP %d", niter, nbp);
       }
       ++niter;
    }
@@ -4062,7 +4055,7 @@ IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t
 
    VERBOSE_IF(verbose && niter == 0)
    {
-      FPGA_PRINTF("cleanBetaDistribution: p_FA = " _PCF(6) ", thresh = "  _PCF(4) "\n", _FFMT(p_FA,6), _FFMT(thresh,4));
+      ACT_INF("cleanBetaDistribution: p_FA = " _PCF(6) ", thresh = "  _PCF(4), _FFMT(p_FA,6), _FFMT(thresh,4));
    }
 
    nbp = cleanBetaDistributionIterate(beta, N, thresh, stats, verbose);
@@ -4071,7 +4064,7 @@ IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t
 
    VERBOSE_IF(verbose)
    {
-      FPGA_PRINTF("Iteration %d, number of bad pixels: %d\n", niter, nbp);
+      ACT_INF("Iteration %d, number of bad pixels: %d", niter, nbp);
    }
 
    if (prev_nbp == nbp || niter >= maxIter)
@@ -4238,8 +4231,8 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
          {
             VERBOSE_IF(gActDebugOptions.verbose)
             {
-               FPGA_PRINTF("Number of bad pixels after cleaning distribution: %d\n", numBadPixels);
-               FPGA_PRINTF( "ACT: cleanBetaDistribution took %d ms\n", (uint32_t)elapsed_time_us(t0)/1000);
+               ACT_INF("%d bad pixels after cleaning distribution", numBadPixels);
+               ACT_INF("cleanBetaDistribution took %d ms", (uint32_t)elapsed_time_us(t0)/1000);
             }
 
             ctxtInit(&blockContext, 0, numPixels, ACT_MAX_PIX_DATA_TO_PROCESS);
@@ -4294,8 +4287,8 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
                   qmin = beta_offset;
                   qmax = qstep * (exp2f(nbits) - 1) + beta_offset;
                }
-               FPGA_PRINTF("New beta exponent = %d (original exponent = %d)\n", newExponent, calibrationInfo.blocks[blockIdx].pixelData.Beta0_Exp);
-               FPGA_PRINTF("qmin = " _PCF(4) ", qmax = " _PCF(4) "\n", _FFMT(qmin, 4), _FFMT(qmax,4));
+               ACT_INF("New beta exponent = %d (original exponent = %d)", newExponent, calibrationInfo.blocks[blockIdx].pixelData.Beta0_Exp);
+               ACT_INF("qmin = " _PCF(4) ", qmax = " _PCF(4), _FFMT(qmin, 4), _FFMT(qmax,4));
             }
 
             calibrationInfo.blocks[blockIdx].pixelData.Beta0_Exp = newExponent;
@@ -4314,7 +4307,7 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
 
          if (ctxtIsDone(&blockContext))
          {
-            FPGA_PRINTF("ACT: %d bad pixels after beta update (%d new, %d from block)\n", numBadPixels, numBadPixels-initialNumBadPixels, initialNumBadPixels);
+            ACT_INF("%d bad pixels after beta update (%d new, %d from block)", numBadPixels, numBadPixels-initialNumBadPixels, initialNumBadPixels);
             setBqState(&state, BQ_Done);
          }
       }
@@ -4326,8 +4319,8 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
 
       VERBOSE_IF(gActDebugOptions.verbose)
       {
-         FPGA_PRINTF( "ACT: BetaQuantization took %d ms\n", (uint32_t)elapsed_time_us(tic_TotalDuration)/1000);
-         FPGA_PRINTF( "ACT: BetaQuantization took (real time) " _PCF(2) " s\n", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
+         ACT_INF( "BetaQuantization took %d ms", (uint32_t)elapsed_time_us(tic_TotalDuration)/1000);
+         ACT_INF( "BetaQuantization took (real time) " _PCF(2) " s", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
       }
 
       setBqState(&state, BQ_Idle);
