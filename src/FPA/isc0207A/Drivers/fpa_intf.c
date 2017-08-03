@@ -324,7 +324,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (FPA_proxim_is_flegx == 1)
       ptrA->real_mode_active_pixel_dly = 18;       // valeur pour le fleGX
    else
-      ptrA->real_mode_active_pixel_dly = 18;
+      ptrA->real_mode_active_pixel_dly = 18;       //(uint32_t)gFpaDebugRegA;
 
    //
    ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
@@ -392,19 +392,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
    gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
-   if (FPA_proxim_is_flegx == 0) //
-   {
-      ptrA->quad_clk_phase[0] = 6;
-      ptrA->quad_clk_phase[1] = 6;
-      ptrA->quad_clk_phase[2] = 6;
-      ptrA->quad_clk_phase[3] = 6;
-   }
-   else
+   if (FPA_proxim_is_flegx == 1) //
    {
       ptrA->quad_clk_phase[0] = 2;
       ptrA->quad_clk_phase[1] = 2;
       ptrA->quad_clk_phase[2] = 2;
       ptrA->quad_clk_phase[3] = 2;
+   }
+   else
+   {
+      ptrA->quad_clk_phase[0] = 2; //(uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[1] = 2; //(uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[2] = 2; //(uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[3] = 2; //(uint32_t)gFpaDebugRegD;
    }
 
    WriteStruct(ptrA);   
