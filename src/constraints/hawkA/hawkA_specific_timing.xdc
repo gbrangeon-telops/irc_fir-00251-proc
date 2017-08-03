@@ -1,14 +1,14 @@
 ## Timing Constraints Section
 
 # Primary clocks
-create_clock -period 25.000 -name CLK_RX_0 -waveform {0.000 12.500} [get_ports CH0_CLK_P]
-create_clock -period 25.000 -name CLK_RX_1 -waveform {0.000 12.500} [get_ports CH1_CLK_P]
+create_clock -period 100.000 -name CLK_RX_0 -waveform {0.000 50.000} [get_ports CH0_CLK_P]
+create_clock -period 100.000 -name CLK_RX_1 -waveform {0.000 50.000} [get_ports CH1_CLK_P]
 #create_clock -period 25.000 -name CLK_RX_2 -waveform {0.000 12.500} [get_ports CH2_CLK_P]
 #create_clock -period 25.000 -name CLK_RX_3 -waveform {0.000 12.500} [get_ports CH3_CLK_P]
 
 # Virtual clocks
-create_clock -period 3.571 -name DCO_0_VIRT -waveform {0.000 1.786}
-create_clock -period 3.571 -name DCO_1_VIRT -waveform {0.000 1.786}
+create_clock -period 14.286 -name DCO_0_VIRT -waveform {0.000 7.143}
+create_clock -period 14.286 -name DCO_1_VIRT -waveform {0.000 7.143}
 #create_clock -period 3.571 -name DCO_2_VIRT -waveform {0.000 1.786}
 #create_clock -period 3.571 -name DCO_3_VIRT -waveform {0.000 1.786}
 
@@ -49,6 +49,7 @@ set_false_path -from CLK_RX_1 -to [get_cells U1/CH1/U12/iserdese2_master]
 #set_false_path -from CLK_RX_2 -to [get_cells U1/CH2/U12/iserdese2_master]
 #set_false_path -from CLK_RX_3 -to [get_cells U1/CH3/U12/iserdese2_master]
 set_false_path -from [get_clocks DCO*] -to [get_clocks clk_7x*]
+set_clock_groups -asynchronous -group {mclk_source_hawkA_10MHz_mmcm_1}
 
 # Max Delay / Min Delay
 # Multicycle Paths

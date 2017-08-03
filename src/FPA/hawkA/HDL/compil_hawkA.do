@@ -70,7 +70,9 @@ acom -nowarn DAGGEN_0523 -incr \
 
 # fichiers hawk
 acom  -nowarn DAGGEN_0523 -incr \
-D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_clks_gen_core.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_clks_mmcm.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_clks_gen.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_detector_ctrler.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_dig_data_reg.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_mux_ctrl_reg.vhd \

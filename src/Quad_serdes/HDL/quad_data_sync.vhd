@@ -25,17 +25,18 @@ use ieee.numeric_std.all;
 
 entity quad_data_sync is
    port(
-      ARESET : in std_logic;
-      CLKD : in std_logic; -- same as output clock of the iserdes
-      DVAL_IN : in std_logic; -- same as output clock of the iserdes
-      D0 : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
-      D1 : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
-      D2 : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
-      D3 : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
-      CLK_DOUT : in std_logic;
-      FLAG : in std_logic; -- CLK_DOUT domain
-      Q : out std_logic_vector(56 downto 0); -- CLK_DOUT domain
-      DVAL : out std_logic -- CLK_DOUT domain
+      ARESET         : in std_logic;
+      CLKD           : in std_logic; -- same as output clock of the iserdes
+      DVAL_IN        : in std_logic; -- same as output clock of the iserdes
+      D0             : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
+      D1             : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
+      D2             : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
+      D3             : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
+      CLK_DOUT       : in std_logic;
+      FRAME_FLAG     : in std_logic; -- CLK_DOUT domain
+      LINE_FLAG      : in std_logic; -- CLK_DOUT domain
+      Q              : out std_logic_vector(57 downto 0); -- CLK_DOUT domain
+      DVAL           : out std_logic -- CLK_DOUT domain
       );
 end quad_data_sync;
 
@@ -49,25 +50,28 @@ architecture rtl of quad_data_sync is
          );
    end component;
    
-   component afifo_w57d16 is
+   component afifo_w58_d256 is
       port (
-         RST : in std_logic;
-         WR_CLK : in std_logic;
-         RD_CLK : in std_logic;
-         DIN : in std_logic_vector ( 56 downto 0 );
-         WR_EN : in std_logic;
-         RD_EN : in std_logic;
-         DOUT : out std_logic_vector ( 56 downto 0 );
-         FULL : out std_logic;
-         EMPTY : out std_logic;
-         VALID : out std_logic
+         RST            : in std_logic;
+         WR_CLK         : in std_logic;
+         RD_CLK         : in std_logic;
+         DIN            : in std_logic_vector (57 downto 0);
+         WR_EN          : in std_logic;
+         RD_EN          : in std_logic;
+         DOUT           : out std_logic_vector (57 downto 0);
+         FULL           : out std_logic;         
+         ALMOST_FULL    : out std_logic;
+         OVERFLOW       : out std_logic;
+         EMPTY          : out std_logic;
+         VALID          : out std_logic
          );
    end component;
    
-   signal sreset : std_ulogic;
-   signal flag_sync : std_ulogic;
+   signal sreset           : std_ulogic;
+   signal frame_flag_sync  : std_ulogic;
+   signal line_flag_sync   : std_ulogic;
    signal dval_i, dval_out : std_ulogic;
-   signal data_i, data_o : std_logic_vector(Q'length-1 downto 0) := (others => '0');
+   signal data_i, data_o   : std_logic_vector(Q'length-1 downto 0) := (others => '0');
    
    signal full_i, empty_i : std_ulogic;
    
@@ -80,10 +84,17 @@ begin
    Q <= std_logic_vector(data_o);
    DVAL <= dval_out;
    
-   sync_en : double_sync
+   frame_sync_en : double_sync
    port map(
-      D => FLAG,
-      Q => flag_sync,
+      D => FRAME_FLAG,
+      Q => frame_flag_sync,
+      RESET => '0',
+      CLK => CLKD);
+   
+   line_sync_en : double_sync
+   port map(
+      D => LINE_FLAG,
+      Q => line_flag_sync,
       RESET => '0',
       CLK => CLKD);
    
@@ -95,11 +106,11 @@ begin
          else
             dval_i <= '0';
          end if;
-         data_i <= flag_sync & D3 & D2 & D1 & D0;
+         data_i <= frame_flag_sync & line_flag_sync & D3 & D2 & D1 & D0;
       end if;
    end process;
    
-   fifo : afifo_w57d16
+   fifo : afifo_w58_d256
    port map(
       rst => ARESET,
       wr_clk => CLKD,
@@ -109,6 +120,8 @@ begin
       rd_en => '1',
       dout => data_o,
       full => full_i,
+      almost_full => open,
+      overflow => open,
       empty => empty_i,
       valid => dval_out);
 end rtl;

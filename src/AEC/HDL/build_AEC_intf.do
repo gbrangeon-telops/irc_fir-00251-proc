@@ -22,9 +22,9 @@ acom "$COMMON\VHDL\Utilities\axis16_img_extractor.vhd"
 
 #source Histogram
 acom -nowarn DAGGEN_0523 \
- "$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl" \
- "$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_c_addsub_v12_0_0\histogram_axis_tmi_c_addsub_v12_0_0_funcsim.vhdl" \
- "$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_c_counter_binary_v12_0_0\histogram_axis_tmi_c_counter_binary_v12_0_0_funcsim.vhdl" \
+ #"$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl" \
+ #"$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_c_addsub_v12_0_0\histogram_axis_tmi_c_addsub_v12_0_0_funcsim.vhdl" \
+ #"$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_c_counter_binary_v12_0_0\histogram_axis_tmi_c_counter_binary_v12_0_0_funcsim.vhdl" \
  "$AEC_INTF\netlist\sysgen\conv_pkg.vhd" \
  "$AEC_INTF\netlist\sysgen\srl17e.vhd" \
  "$AEC_INTF\netlist\sysgen\single_reg_w_init.vhd" \

@@ -1,7 +1,7 @@
 -- Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2013.4 (win64) Build 353583 Mon Dec  9 17:49:19 MST 2013
--- Date        : Tue Aug 01 13:16:22 2017
+-- Date        : Wed Aug 02 12:47:38 2017
 -- Host        : TELOPS228 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim d:/Telops/FIR-00251-Proc/IP/hawkA_10MHz_mmcm/hawkA_10MHz_mmcm_funcsim.vhdl
 -- Design      : hawkA_10MHz_mmcm
@@ -25,7 +25,6 @@ architecture STRUCTURE of hawkA_10MHz_mmcmhawkA_10MHz_mmcm_clk_wiz is
   signal \<const0>\ : STD_LOGIC;
   signal \<const1>\ : STD_LOGIC;
   signal adc_phase_clk_hawkA_10MHz_mmcm : STD_LOGIC;
-  signal clk_in_hawkA_10MHz_mmcm : STD_LOGIC;
   signal clkfbout_buf_hawkA_10MHz_mmcm : STD_LOGIC;
   signal clkfbout_hawkA_10MHz_mmcm : STD_LOGIC;
   signal mclk_source_hawkA_10MHz_mmcm : STD_LOGIC;
@@ -46,13 +45,6 @@ architecture STRUCTURE of hawkA_10MHz_mmcmhawkA_10MHz_mmcm_clk_wiz is
   signal NLW_mmcm_adv_inst_DO_UNCONNECTED : STD_LOGIC_VECTOR ( 15 downto 0 );
   attribute box_type : string;
   attribute box_type of clkf_buf : label is "PRIMITIVE";
-  attribute CAPACITANCE : string;
-  attribute CAPACITANCE of clkin1_ibufg : label is "DONT_CARE";
-  attribute IBUF_DELAY_VALUE : string;
-  attribute IBUF_DELAY_VALUE of clkin1_ibufg : label is "0";
-  attribute IFD_DELAY_VALUE : string;
-  attribute IFD_DELAY_VALUE of clkin1_ibufg : label is "AUTO";
-  attribute box_type of clkin1_ibufg : label is "PRIMITIVE";
   attribute box_type of clkout1_buf : label is "PRIMITIVE";
   attribute box_type of clkout2_buf : label is "PRIMITIVE";
   attribute box_type of mmcm_adv_inst : label is "PRIMITIVE";
@@ -69,14 +61,6 @@ clkf_buf: unisim.vcomponents.BUFG
     port map (
       I => clkfbout_hawkA_10MHz_mmcm,
       O => clkfbout_buf_hawkA_10MHz_mmcm
-    );
-clkin1_ibufg: unisim.vcomponents.IBUF
-    generic map(
-      IOSTANDARD => "DEFAULT"
-    )
-    port map (
-      I => clk_in,
-      O => clk_in_hawkA_10MHz_mmcm
     );
 clkout1_buf: unisim.vcomponents.BUFG
     port map (
@@ -144,7 +128,7 @@ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
       CLKFBOUT => clkfbout_hawkA_10MHz_mmcm,
       CLKFBOUTB => NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED,
       CLKFBSTOPPED => NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED,
-      CLKIN1 => clk_in_hawkA_10MHz_mmcm,
+      CLKIN1 => clk_in,
       CLKIN2 => \<const0>\,
       CLKINSEL => \<const1>\,
       CLKINSTOPPED => NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED,

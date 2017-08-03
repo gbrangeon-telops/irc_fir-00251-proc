@@ -204,6 +204,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalTapsRef;
    static int16_t actualPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+   extern int32_t gFpaDebugRegA, gFpaDebugRegD;
    
    float Nr, Nc, No, R, H, C, W;
    
@@ -297,7 +298,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
     
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 5;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegA;                             // ajuster via chipscope
    
    // quad2    
    ptrA->adc_quad2_en = 1;
@@ -357,9 +358,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->vdac_value[7]                     = 2200;        // DAC8 ->
    
    // adc_clk_phase
-   ptrA->adc_clk_phase     = 1;              // on dephase l'horloge des ADC
-   if (pGCRegs->DeviceSerialNumber == 4665)                  // pour IRC1607 (VLW) 
-      ptrA->adc_clk_phase  = 0;        // Selon les tests faits par PTR, c'est la valeur optimale pour le ghost
+   ptrA->adc_clk_phase     = gFpaDebugRegD;              // on dephase l'horloge des ADC
+   //if (pGCRegs->DeviceSerialNumber == 4665)                  // pour IRC1607 (VLW)
+   //   ptrA->adc_clk_phase  = 0;        // Selon les tests faits par PTR, c'est la valeur optimale pour le ghost
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
