@@ -8,17 +8,17 @@ use ieee.std_logic_1164.all;
 
 -- Add your library and packages declaration here ...
 
-entity scorpiomwA_intf_testbench_tb is
-end scorpiomwA_intf_testbench_tb;
+entity hawkA_intf_testbench_tb is
+end hawkA_intf_testbench_tb;
 
-architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
+architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
    -- Component declaration of the tested unit
-   component scorpiomwA_intf_testbench
+   component hawkA_intf_testbench
       port(
          ACQ_TRIG : in STD_LOGIC;
          ARESET : in STD_LOGIC;
          CLK_100M : in STD_LOGIC;
-         CLK_80M : in STD_LOGIC;
+         --CLK_80M : in STD_LOGIC;
          DOUT_CLK : in STD_LOGIC;
          DOUT_MISO : in t_axi4_stream_miso;
          FPA_EXP_INFO : in exp_info_type;
@@ -51,11 +51,12 @@ architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
    constant CLK_80M_PERIOD          : time := 12.5 ns;
    constant ACQ_TRIG_PERIOD         : time := 700 us;
    constant DOUT_CLK_PERIOD         : time := 6.25 ns;
-   constant PAUSE_SIZE             : integer := 0;
+   constant PAUSE_SIZE              : integer := 8;
+   constant TAP_NUM                 : integer := 4;
    
    
-   constant xsize : natural := 128;
-   constant ysize : natural := 2;
+   constant user_xsize : natural := 640;
+   constant user_ysize : natural := 512;
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
    signal ACQ_TRIG : STD_LOGIC := '0';
@@ -97,6 +98,62 @@ architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
    signal status                         : std_logic_vector(31 downto 0);
    signal ACQ_TRIG_i                     : std_logic := '0';
    signal ACQ_TRIG_Last                  : std_logic := '0';
+   
+   signal comn_fpa_diag_mode             : unsigned(31 downto 0);
+   signal comn_fpa_diag_type             : unsigned(31 downto 0);
+   signal comn_fpa_pwr_on                : unsigned(31 downto 0);
+   signal comn_fpa_trig_ctrl_mode        : unsigned(31 downto 0);
+   signal comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto 0);
+   signal comn_fpa_acq_trig_period_min   : unsigned(31 downto 0);
+   signal comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto 0);
+   signal comn_fpa_xtra_trig_period_min  : unsigned(31 downto 0);                                     
+   signal xstart                         : unsigned(31 downto 0);
+   signal ystart                         : unsigned(31 downto 0);
+   signal xsize                          : unsigned(31 downto 0);
+   signal ysize                          : unsigned(31 downto 0);
+   signal gain                           : unsigned(31 downto 0);
+   signal invert                         : unsigned(31 downto 0);
+   signal revert                         : unsigned(31 downto 0);
+   signal cbit_en                        : unsigned(31 downto 0);
+   signal dig_code                       : unsigned(31 downto 0);
+   signal jpos                           : unsigned(31 downto 0);
+   signal kpos                           : unsigned(31 downto 0);
+   signal lpos                           : unsigned(31 downto 0);
+   signal mpos                           : unsigned(31 downto 0);
+   signal wdr_len                        : unsigned(31 downto 0);
+   signal full_window                    : unsigned(31 downto 0);
+   signal real_mode_active_pixel_dly     : unsigned(31 downto 0);
+   signal adc_quad2_en                   : unsigned(31 downto 0);
+   signal chn_diversity_en               : unsigned(31 downto 0);           
+   signal line_period_pclk               : unsigned(31 downto 0);
+   signal readout_pclk_cnt_max           : unsigned(31 downto 0);
+   signal active_line_start_num          : unsigned(31 downto 0);
+   signal active_line_end_num            : unsigned(31 downto 0);
+   signal pix_samp_num_per_ch            : unsigned(31 downto 0);
+   signal sof_posf_pclk                  : unsigned(31 downto 0);
+   signal eof_posf_pclk                  : unsigned(31 downto 0);
+   signal sol_posl_pclk                  : unsigned(31 downto 0);
+   signal eol_posl_pclk                  : unsigned(31 downto 0);
+   signal eol_posl_pclk_p1               : unsigned(31 downto 0);      
+   signal good_samp_first_pos_per_ch     : unsigned(31 downto 0);
+   signal good_samp_last_pos_per_ch      : unsigned(31 downto 0);
+   signal hgood_samp_sum_num             : unsigned(31 downto 0);
+   signal hgood_samp_mean_numerator      : unsigned(31 downto 0);
+   signal vgood_samp_sum_num             : unsigned(31 downto 0);
+   signal vgood_samp_mean_numerator      : unsigned(31 downto 0);  
+   signal xsize_div_tapnum               : unsigned(31 downto 0);
+   signal vdac_value_1                   : unsigned(31 downto 0);
+   signal vdac_value_2                   : unsigned(31 downto 0); 
+   signal vdac_value_3                   : unsigned(31 downto 0); 
+   signal vdac_value_4                   : unsigned(31 downto 0); 
+   signal vdac_value_5                   : unsigned(31 downto 0); 
+   signal vdac_value_6                   : unsigned(31 downto 0); 
+   signal vdac_value_7                   : unsigned(31 downto 0); 
+   signal vdac_value_8                   : unsigned(31 downto 0); 
+   signal adc_clk_phase                  : unsigned(31 downto 0);
+   signal comn_fpa_stretch_acq_trig      : unsigned(31 downto 0);
+   
+   signal user_cfg_vector                : unsigned(53*32-1 downto 0);
    
    -- Add your code here ...
    
@@ -152,89 +209,143 @@ begin
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
       --FPA_EXP_INFO.exp_time <= to_unsigned(10,FPA_EXP_INFO.exp_time'length);
-      FPA_EXP_INFO.exp_dval <= '1';
+      FPA_EXP_INFO.exp_dval <= '1'; 
+      
       wait;
    end process;
+   
    
    
    HDER_MISO.WREADY  <= '1';
    HDER_MISO.AWREADY <= '1';
    
-   user_cfg_i.COMN.FPA_DIAG_MODE <= '0';
-   user_cfg_i.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR;
-   user_cfg_i.COMN.fpa_pwr_on <= '1';
-   user_cfg_i.COMN.fpa_init_cfg <= '1';
-   user_cfg_i.COMN.fpa_init_cfg_received <= '0';
+   comn_fpa_diag_mode              <=  (others =>'0');                                               
+   comn_fpa_diag_type              <=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
+   comn_fpa_pwr_on                 <=  (others =>'1');                                               
+   comn_fpa_trig_ctrl_mode         <=  resize(unsigned(MODE_INT_END_TO_TRIG_START),32);          
+   comn_fpa_acq_trig_ctrl_dly      <=  to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);            
+   comn_fpa_acq_trig_period_min    <=  to_unsigned(100, comn_fpa_acq_trig_period_min'length);        
+   comn_fpa_xtra_trig_ctrl_dly     <=  to_unsigned(600, comn_fpa_xtra_trig_ctrl_dly'length);         
+   comn_fpa_xtra_trig_period_min   <=  to_unsigned(100, comn_fpa_xtra_trig_period_min'length);       
    
    
-   user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_READOUT_END_TO_TRIG_START;
-   user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(1, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);
-   user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(100, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
-   user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(10, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
-   user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(100, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);  
-   user_cfg_i.XSTART <= (others => '0');
-   user_cfg_i.YSTART <= (others => '0');
-   user_cfg_i.XSIZE  <= to_unsigned(xsize, user_cfg_i.XSIZE'length);
-   user_cfg_i.YSIZE  <= to_unsigned(ysize, user_cfg_i.YSIZE'length);
+   xstart                          <= to_unsigned(0, 32);  
+   ystart                          <= to_unsigned(0, 32);  
+   xsize                           <= to_unsigned(user_xsize, 32);  
+   ysize                           <= to_unsigned(user_ysize, 32);  
+   gain                            <= (others => '0');
+   invert                          <= (others => '0');
+   revert                          <= (others => '0');
+   cbit_en                         <= (others => '0');
+   dig_code                        <= (others => '0');
+   jpos                            <= to_unsigned(1185, 32);  
+   kpos                            <= to_unsigned(1184, 32);  
+   lpos                            <= to_unsigned(513, 32);  
+   mpos                            <= to_unsigned(512, 32);  
+   wdr_len                         <= to_unsigned(1344, 32); 
+   full_window                     <= (others => '0');
+   real_mode_active_pixel_dly      <= to_unsigned(6, 32);
+   adc_quad2_en                    <= (others => '1');
+   chn_diversity_en                <= (others => '0'); 
    
-   user_cfg_i.windcfg_part1  <= to_unsigned(1, user_cfg_i.windcfg_part1'length);
-   user_cfg_i.windcfg_part2  <= to_unsigned(2, user_cfg_i.windcfg_part2'length);
-   user_cfg_i.windcfg_part3  <= to_unsigned(3, user_cfg_i.windcfg_part3'length);
-   user_cfg_i.windcfg_part4  <= to_unsigned(4, user_cfg_i.windcfg_part4'length);
+   line_period_pclk                <= to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
+   readout_pclk_cnt_max            <= to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize + 1) + 3, 32);   
+   active_line_start_num           <= to_unsigned(1, 32);
+   active_line_end_num             <= active_line_start_num + to_unsigned(user_ysize - 1, 32);
+   pix_samp_num_per_ch             <= to_unsigned(1, 32);
+   sof_posf_pclk                   <= to_unsigned(PAUSE_SIZE, 32);
+   eof_posf_pclk                   <= to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE) - 1, 32);
+   sol_posl_pclk                   <= to_unsigned(PAUSE_SIZE, 32);
+   eol_posl_pclk                   <= line_period_pclk - 1;
+   eol_posl_pclk_p1                <= eol_posl_pclk + 1;
    
-   user_cfg_i.uprow_upcol    <= '0';
-   user_cfg_i.sizea_sizeb    <= '0';
-   user_cfg_i.itr            <= '1';
-   user_cfg_i.gain           <= '0';
+   good_samp_first_pos_per_ch      <= to_unsigned(1, 32);
+   good_samp_last_pos_per_ch       <= to_unsigned(1, 32);   
+   hgood_samp_sum_num              <= to_unsigned(1, 32); 
+   hgood_samp_mean_numerator       <= to_unsigned(2**22/1, 32);
+   vgood_samp_sum_num              <= 1 + chn_diversity_en;
+   vgood_samp_mean_numerator       <= to_unsigned(2**22/1, 32);
    
-   user_cfg_i.gpol_code      <=  std_logic_vector(to_unsigned(2, user_cfg_i.gpol_code'length));
-   
-   
-   user_cfg_i.real_mode_active_pixel_dly  <= to_unsigned(0, user_cfg_i.real_mode_active_pixel_dly'length);
-   user_cfg_i.adc_quad2_en  <= '0';
-   user_cfg_i.chn_diversity_en  <= '0'; 
-   
-   user_cfg_i.line_period_pclk <= to_unsigned((XSIZE/4 + PAUSE_SIZE), user_cfg_i.line_period_pclk'length);
-   user_cfg_i.readout_pclk_cnt_max   <= to_unsigned((XSIZE/4 + PAUSE_SIZE)*(YSIZE + 1) + 1, user_cfg_i.readout_pclk_cnt_max'length);
-   
-   user_cfg_i.active_line_start_num            <= to_unsigned(1, user_cfg_i.active_line_start_num'length); 
-   user_cfg_i.active_line_end_num         <= to_unsigned(YSIZE + to_integer(user_cfg_i.active_line_start_num) - 1, user_cfg_i.active_line_end_num'length);
-   
-   user_cfg_i.pix_samp_num_per_ch   <= to_unsigned(1, user_cfg_i.pix_samp_num_per_ch'length);
-   
-   user_cfg_i.sof_posf_pclk   <= resize(user_cfg_i.line_period_pclk*(to_integer(user_cfg_i.active_line_start_num) - 1) + 1, user_cfg_i.sof_posf_pclk'length);
-   user_cfg_i.eof_posf_pclk   <= resize(user_cfg_i.active_line_end_num* user_cfg_i.line_period_pclk - PAUSE_SIZE*2, user_cfg_i.eof_posf_pclk'length);
-   user_cfg_i.sol_posl_pclk   <= to_unsigned(1, user_cfg_i.sol_posl_pclk'length);
-   user_cfg_i.eol_posl_pclk   <= to_unsigned((XSIZE/4), user_cfg_i.eol_posl_pclk'length);
-   user_cfg_i.eol_posl_pclk_p1   <= user_cfg_i.eol_posl_pclk + 1;
+   xsize_div_tapnum                <=  to_unsigned(user_xsize/TAP_NUM, 32);
+   vdac_value_1                    <=  (others => '0'); 
+   vdac_value_2                    <=  (others => '0'); 
+   vdac_value_3                    <=  (others => '0'); 
+   vdac_value_4                    <=  (others => '0'); 
+   vdac_value_5                    <=  (others => '0'); 
+   vdac_value_6                    <=  (others => '0'); 
+   vdac_value_7                    <=  (others => '0'); 
+   vdac_value_8                    <=  (others => '0'); 
+   adc_clk_phase                   <=  (others => '0'); 
+   comn_fpa_stretch_acq_trig       <=  (others => '0'); 
    
    
-   user_cfg_i.hgood_samp_sum_num          		<= to_unsigned(1, user_cfg_i.hgood_samp_sum_num'length); 
-   user_cfg_i.hgood_samp_mean_numerator   		<= to_unsigned(2**21, user_cfg_i.hgood_samp_mean_numerator'length); 
-   user_cfg_i.vgood_samp_sum_num          		<= to_unsigned(1, user_cfg_i.vgood_samp_sum_num'length); 
-   user_cfg_i.vgood_samp_mean_numerator   		<= to_unsigned(2**21, user_cfg_i.vgood_samp_mean_numerator'length); 
-   user_cfg_i.good_samp_first_pos_per_ch  		<= to_unsigned(1, user_cfg_i.good_samp_first_pos_per_ch'length); 
-   user_cfg_i.good_samp_last_pos_per_ch   		<= to_unsigned(1, user_cfg_i.good_samp_last_pos_per_ch'length); 
-   user_cfg_i.xsize_div_tapnum            		<= to_unsigned(xsize/4, user_cfg_i.xsize_div_tapnum'length); 
-   user_cfg_i.vdac_value(1)               		<= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
-   user_cfg_i.vdac_value(2)               		<= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 
-   user_cfg_i.vdac_value(3)               		<= to_unsigned(11630, user_cfg_i.vdac_value(3)'length);
-   user_cfg_i.vdac_value(4)               		<= to_unsigned(11630, user_cfg_i.vdac_value(4)'length); 
-   user_cfg_i.vdac_value(5)               		<= to_unsigned(11630, user_cfg_i.vdac_value(5)'length); 
-   user_cfg_i.vdac_value(6)               		<= to_unsigned(11630, user_cfg_i.vdac_value(6)'length); 
-   user_cfg_i.vdac_value(7)               		<= to_unsigned(11630, user_cfg_i.vdac_value(7)'length); 
-   user_cfg_i.vdac_value(8)               		<= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);
-   user_cfg_i.adc_clk_phase(1)                  <= to_unsigned(2, user_cfg_i.adc_clk_phase(1)'length);
-   user_cfg_i.adc_clk_phase(2)                  <= to_unsigned(2, user_cfg_i.adc_clk_phase(2)'length);
-   user_cfg_i.comn.fpa_stretch_acq_trig         <= '0';
-   user_cfg_i.reorder_column               <= '1';
    
-   fpa_softw_stat_i.fpa_roic <= FPA_ROIC_SCORPIO_MW;
+   user_cfg_vector <=  comn_fpa_diag_mode              
+   & comn_fpa_diag_type              
+   & comn_fpa_pwr_on                 
+   & comn_fpa_trig_ctrl_mode         
+   & comn_fpa_acq_trig_ctrl_dly      
+   & comn_fpa_acq_trig_period_min    
+   & comn_fpa_xtra_trig_ctrl_dly     
+   & comn_fpa_xtra_trig_period_min   
+   
+   & xstart                              
+   & ystart                              
+   & xsize                               
+   & ysize                               
+   & gain                                
+   & invert                              
+   & revert                              
+   & cbit_en                             
+   & dig_code                            
+   & jpos                                
+   & kpos                                
+   & lpos                                
+   & mpos                                
+   & wdr_len                             
+   & full_window                         
+   & real_mode_active_pixel_dly          
+   & adc_quad2_en                        
+   & chn_diversity_en                    
+   & readout_pclk_cnt_max                
+   & line_period_pclk                    
+   & active_line_start_num               
+   & active_line_end_num
+   & pix_samp_num_per_ch
+   & sof_posf_pclk                       
+   & eof_posf_pclk                       
+   & sol_posl_pclk                       
+   & eol_posl_pclk                       
+   & eol_posl_pclk_p1                    
+   & hgood_samp_sum_num                  
+   & hgood_samp_mean_numerator           
+   & vgood_samp_sum_num                  
+   & vgood_samp_mean_numerator           
+   & good_samp_first_pos_per_ch          
+   & good_samp_last_pos_per_ch           
+   & xsize_div_tapnum                                        
+   & vdac_value_1                       
+   & vdac_value_2
+   & vdac_value_3 
+   & vdac_value_4                       
+   & vdac_value_5                       
+   & vdac_value_6                       
+   & vdac_value_7                       
+   & vdac_value_8                        
+   & adc_clk_phase                       
+   & comn_fpa_stretch_acq_trig;      
+   
+   
+   fpa_softw_stat_i.fpa_roic <= FPA_ROIC_HAWK;
    fpa_softw_stat_i.fpa_output <= OUTPUT_ANALOG;    
-   fpa_softw_stat_i.fpa_input <= LVCMOS33;
+   fpa_softw_stat_i.fpa_input <= LVTTL50;
    
    -- envoyer cfg
    ublaze_sim: process is
+      
+      variable start_pos : integer;
+      variable end_pos   : integer;
+      
    begin
       MB_MOSI.awaddr <= (others => '0');
       MB_MOSI.awprot <= (others => '0');
@@ -249,138 +360,22 @@ begin
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';
       
-      
       wait until areset = '0';
       
-      wait until rising_edge(MB_CLK);
-      
-      write_axi_lite (MB_CLK, x"00000000", resize('0'&user_cfg_i.COMN.FPA_DIAG_MODE, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK,  x"00000004", resize('0'&user_cfg_i.COMN.FPA_DIAG_TYPE, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK,  x"00000008", resize('0'&user_cfg_i.COMN.fpa_pwr_on, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK,  x"0000000C", resize('0'&user_cfg_i.COMN.fpa_init_cfg, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK,  x"00000010", resize('0'&user_cfg_i.COMN.fpa_init_cfg_received, 32), MB_MISO,  MB_MOSI);      
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"00000014", resize('0'&user_cfg_i.COMN.fpa_trig_ctrl_mode, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"00000018", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"0000001C", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_period_min, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"00000020", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"00000024", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_period_min, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;        
-      write_axi_lite (MB_CLK, x"00000028", std_logic_vector(resize(user_cfg_i.XSTART, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"0000002C", std_logic_vector(resize(user_cfg_i.YSTART, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000030", std_logic_vector(resize(user_cfg_i.XSIZE, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000034", std_logic_vector(resize(user_cfg_i.YSIZE, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000038", std_logic_vector(resize(user_cfg_i.windcfg_part1, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"0000003C", std_logic_vector(resize(user_cfg_i.windcfg_part2, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000040", std_logic_vector(resize(user_cfg_i.windcfg_part3, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000044", std_logic_vector(resize(user_cfg_i.windcfg_part4, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000048", (resize('0'&user_cfg_i.uprow_upcol, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"0000004C", (resize('0'&user_cfg_i.sizea_sizeb, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000050", (resize('0'&user_cfg_i.itr, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000054", (resize('0'&user_cfg_i.gain, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"00000058", std_logic_vector(resize(user_cfg_i.gpol_code, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;     
-      
-      write_axi_lite (MB_CLK, x"0000005C", std_logic_vector(resize(user_cfg_i.real_mode_active_pixel_dly, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000060", std_logic_vector(resize('0'& user_cfg_i.adc_quad2_en, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000064", std_logic_vector(resize('0'& user_cfg_i.chn_diversity_en, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000068", std_logic_vector(resize(user_cfg_i.line_period_pclk, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;                 
-      write_axi_lite (MB_CLK, x"0000006C", std_logic_vector(resize(user_cfg_i.readout_pclk_cnt_max, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;                 
-      write_axi_lite (MB_CLK, x"00000070", std_logic_vector(resize('0'&user_cfg_i.active_line_start_num, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;                 
-      write_axi_lite (MB_CLK, x"00000074", std_logic_vector(resize(user_cfg_i.active_line_end_num, 32)), MB_MISO,  MB_MOSI);    
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000078", std_logic_vector(resize('0'&user_cfg_i.pix_samp_num_per_ch, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"0000007C", std_logic_vector(resize(user_cfg_i.sof_posf_pclk, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000080", std_logic_vector(resize(user_cfg_i.eof_posf_pclk, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"00000084", std_logic_vector(resize(user_cfg_i.sol_posl_pclk, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, x"00000088", std_logic_vector(resize(user_cfg_i.eol_posl_pclk, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"0000008C", std_logic_vector(resize(user_cfg_i.eol_posl_pclk_p1, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000090", std_logic_vector(resize(user_cfg_i.hgood_samp_sum_num, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"00000094", std_logic_vector(resize(user_cfg_i.hgood_samp_mean_numerator, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"00000098", std_logic_vector(resize(user_cfg_i.vgood_samp_sum_num, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"0000009C", std_logic_vector(resize(user_cfg_i.vgood_samp_mean_numerator, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000A0", std_logic_vector(resize(user_cfg_i.good_samp_first_pos_per_ch, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000A4", std_logic_vector(resize(user_cfg_i.good_samp_last_pos_per_ch, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000A8", std_logic_vector(resize(user_cfg_i.xsize_div_tapnum, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000AC", std_logic_vector(resize(user_cfg_i.vdac_value(1), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000B0", std_logic_vector(resize(user_cfg_i.vdac_value(2), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000B4", std_logic_vector(resize(user_cfg_i.vdac_value(3), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000B8", std_logic_vector(resize(user_cfg_i.vdac_value(4), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000BC", std_logic_vector(resize(user_cfg_i.vdac_value(5), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"000000C0", std_logic_vector(resize(user_cfg_i.vdac_value(6), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000C4", std_logic_vector(resize(user_cfg_i.vdac_value(7), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000C8", std_logic_vector(resize(user_cfg_i.vdac_value(8), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000CC", std_logic_vector(resize(user_cfg_i.adc_clk_phase(1), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000D0", std_logic_vector(resize(user_cfg_i.adc_clk_phase(2), 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000D4", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_stretch_acq_trig, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000D8", std_logic_vector(resize('0'&user_cfg_i.reorder_column, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
+      for ii in 0 to 52 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
       
       write_axi_lite (MB_CLK, resize(X"E0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
+      wait for 30 ns;      
       write_axi_lite (MB_CLK, resize(X"E4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
+      wait for 30 ns; 
       write_axi_lite (MB_CLK, resize(X"E8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
-      
-      --write_axi_lite (MB_CLK, resize(X"F0",32), resize("00", 32), MB_MISO,  MB_MOSI);
-      --wait for 30 ns;
-      
       
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
@@ -391,19 +386,19 @@ begin
       
       report "FCR written"; 
       
-      ----report "END OF SIMULATION" 
-      --severity error;
+      report "END OF SIMULATION" 
+      severity error;
    end process ublaze_sim;
    
    
    
    -- Unit Under Test port map
-   UUT : scorpiomwA_intf_testbench
+   UUT : hawkA_intf_testbench
    port map (
       ACQ_TRIG => ACQ_TRIG,
       ARESET => ARESET,
       CLK_100M => CLK_100M,
-      CLK_80M => CLK_80M,
+      --CLK_80M => CLK_80M,
       DOUT_CLK => DOUT_CLK,
       DOUT_MISO => DOUT_MISO,
       FPA_EXP_INFO => FPA_EXP_INFO,
@@ -436,11 +431,11 @@ begin
    
 end TB_ARCHITECTURE;
 
-configuration TESTBENCH_FOR_scorpiomwA_intf_testbench of scorpiomwA_intf_testbench_tb is
+configuration TESTBENCH_FOR_hawkA_intf_testbench of hawkA_intf_testbench_tb is
    for TB_ARCHITECTURE
-      for UUT : scorpiomwA_intf_testbench
-         use entity work.scorpiomwA_intf_testbench(sch);
+      for UUT : hawkA_intf_testbench
+         use entity work.hawkA_intf_testbench(sch);
       end for;
    end for;
-end TESTBENCH_FOR_scorpiomwA_intf_testbench;
+end TESTBENCH_FOR_hawkA_intf_testbench;
 

@@ -142,7 +142,7 @@ package FPA_define is
       xsize                          : unsigned(10 downto 0);
       ysize                          : unsigned(10 downto 0);
       xsize_div_tapnum               : unsigned(7 downto 0);
-      ysize_div4_m1                  : unsigned(6 downto 0);
+      ysize_div4_m1                  : unsigned(7 downto 0);
       lovh_mclk_source               : unsigned(3 downto 0);    -- lovh converti en coups d'hotloges mclk_source.Utilisé en mode diag 
    end record;   
    

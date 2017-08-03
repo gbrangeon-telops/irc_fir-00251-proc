@@ -77,7 +77,7 @@
 // horloges du module FPA
 #define VHD_CLK_100M_RATE_HZ              100000000
 #define VHD_CLK_80M_RATE_HZ                80000000
-#define ADC_SAMPLING_RATE_HZ               40000000    // les ADC  roulent à 40MHz
+#define ADC_SAMPLING_RATE_HZ              FPA_MCLK_RATE_HZ    // les ADC  roulent à FPA_MCLK_RATE_HZ
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
@@ -302,7 +302,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // quad2    
    ptrA->adc_quad2_en = 1;
-   ptrA->chn_diversity_en = ptrA->adc_quad2_en;                      // 
+   ptrA->chn_diversity_en = 0;                      // iversité de canal n'est plus utilisé dans le hawk
    
    //
    ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + hh.lovh_mclk;
@@ -322,11 +322,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
    // echantillons choisis
-   ptrA->hgood_samp_first_pos_per_ch       = 4;     // position premier echantillon
-   ptrA->hgood_samp_last_pos_per_ch        = 4;     // position dernier echantillon    ENO: 05 avril 2016: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
+   ptrA->hgood_samp_first_pos_per_ch       = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position premier echantillon
+   ptrA->hgood_samp_last_pos_per_ch        = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2016: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
    ptrA->hgood_samp_sum_num                = ptrA->hgood_samp_last_pos_per_ch - ptrA->hgood_samp_first_pos_per_ch + 1;         
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
-   ptrA->vgood_samp_sum_num                = 2;
+   ptrA->vgood_samp_sum_num                = 1 + ptrA->chn_diversity_en;
    ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);                              
       
    // calculs

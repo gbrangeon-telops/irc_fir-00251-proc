@@ -233,7 +233,12 @@ begin
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG. Enq uittant cet etat, le détecteur est allumé avec les IOs dans l'état définis dans le fsm_sreset
                      fpa_digio_fsm <= rst_cnt_st;
-                  end if; 
+                  end if;
+                  -- pragma translate_off
+                  if fpa_timer_cnt = 10 then  
+                     fpa_digio_fsm <= rst_cnt_st;
+                  end if;                
+                  -- pragma translate_on
                   
                -- reset compteur
                when rst_cnt_st =>
@@ -247,6 +252,11 @@ begin
                   if fpa_timer_cnt > DEFINE_FPA_POWER_WAIT_FACTOR then
                      fpa_digio_fsm <= fpa_pwred_st;
                   end if;
+                  -- pragma translate_off
+                  if fpa_timer_cnt = 30 then  
+                     fpa_digio_fsm <= fpa_pwred_st;
+                  end if;                
+                  -- pragma translate_on
                   
                -- annoncer la bonne nouvelle relative à l'allumage du détecteur
                when fpa_pwred_st =>
@@ -300,6 +310,12 @@ begin
                   if dac_timer_cnt = DEFINE_FLEG_DAC_PWR_WAIT_FACTOR then
                      dac_digio_fsm <= dac_pwred_st;
                   end if;
+                  
+                  -- pragma translate_off
+                  if dac_timer_cnt = 50 then 
+                     dac_digio_fsm <= dac_pwred_st;
+                  end if;                
+                  -- pragma translate_on
                   
                -- dac rdy
                when dac_pwred_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'

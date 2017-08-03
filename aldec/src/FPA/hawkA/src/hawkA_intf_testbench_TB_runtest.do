@@ -4,8 +4,8 @@ acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
 acom d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd
-acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\FPA_define.vhd
-acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\Proxy_define.vhd 
+acom d:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\FPA_define.vhd
+acom d:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\Proxy_define.vhd 
 acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 
 #utilities
@@ -32,8 +32,8 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\scorpiomwA_18MHz_mmcm\scorpiomwA_18MHz_mmcm_funcsim.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\hawkA_10MHz_mmcm\hawkA_10MHz_mmcm_funcsim.vhdl
 
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_id_reader.vhd
@@ -63,21 +63,21 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_g
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream32_fifo.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde
 
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do 
+do D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\compil_hawkA.do 
 
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\brd_mux_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\monit_adc_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\brd_switch_dummy.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\fpa_temp_dummy.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\digio_dummy.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\flexV_dummy.vhd
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\fpa_temp_dummy.vhd
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\digio_dummy.vhd
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\flexV_dummy.vhd
 
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\scorpiomwA_intf_testbench.bde
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawkA_intf_testbench.bde
 
-acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\scorpiomwA_intf_testbench_TB.vhd
+acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawkA_intf_testbench_TB.vhd
 
-asim -ses scorpiomwA_intf_testbench_TB 
+asim -ses hawkA_intf_testbench_TB 
 
 -- wave UUT/U1/U2/* 
 
@@ -111,7 +111,7 @@ asim -ses scorpiomwA_intf_testbench_TB
 --wave UUT/U1/U19/*
 
 -- intf_sequencer
---wave UUT/U1/U2/*  
+wave UUT/U1/U2/*  
 
 -- fpa_prog_controller
 --wave UUT/U1/U5/U2/* 
@@ -136,6 +136,6 @@ asim -ses scorpiomwA_intf_testbench_TB
 --wave UUT/U1/U9/U2/U1/* 
 --wave UUT/U1/U9/U18/*
 --wave UUT/U1/*
-wave UUT/U1/U5/U2/U6/*
+wave UUT/U1/*
 
 run 40 ms
