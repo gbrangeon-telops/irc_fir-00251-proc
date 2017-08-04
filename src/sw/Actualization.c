@@ -1261,7 +1261,7 @@ IRC_Status_t Actualization_SM()
             float x = currentDeltaBeta->deltaBeta[k];
             if (!isinf(x)) // only count pixels that are not bad according to the reference block for computing the stats
             {
-               updateStats(&currentDeltaBeta->stats, currentDeltaBeta->deltaBeta[k]);
+               updateStats(&currentDeltaBeta->stats, x);
             }
          }
 
@@ -3897,7 +3897,7 @@ deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo
 uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose)
 {
    const float thresh = invnormcdf(1-p_FA); //
-   const float bp_code = infinity();
+   const float bp_code = infinityf();
    const int maxIter = 100;
 
    VERBOSE_IF(verbose)
@@ -3965,7 +3965,7 @@ uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* fin
 
 uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose)
 {
-   const float bp_code = infinity(); // bad pixels are replaced by inf
+   const float bp_code = infinityf(); // bad pixels are replaced by inf
 
    int i;
    float data_thresh; // threshold scaled on the actual data
@@ -4261,21 +4261,21 @@ IRC_Status_t BetaQuantizer_SM(int blockIdx)
 
             if (beta_stats.max - beta_offset <= 0) // negative values only
             {
-               newExponent = ceil(log2f(arg1));
+               newExponent = (int8_t)ceilf(log2f(arg1));
             }
             else if (beta_stats.min - beta_offset >= 0) // positive values only
             {
-               newExponent = ceil(log2f(arg2));
+               newExponent = (int8_t)ceilf(log2f(arg2));
             }
             else // double-sided (most probable)
             {
-               newExponent = MAX(ceilf(log2f(arg1)), ceilf(log2f(arg2)));
+               newExponent = (int8_t)MAX(ceilf(log2f(arg1)), ceilf(log2f(arg2)));
             }
 
             VERBOSE_IF(gActDebugOptions.verbose)
             {
                float qmin, qmax;
-               float qstep = exp2f(newExponent);
+               float qstep = exp2f((float)newExponent);
 
                if (calibrationInfo.blocks[blockIdx].pixelData.Beta0_Signed)
                {

@@ -73,7 +73,7 @@ uint32_t floatToFixedPoint(float val, uint32_t m, uint32_t n, bool s)
    val *= (1 << n);
 
    if (s && val < 0)
-      qval = max_int - abs(val);
+      qval = max_int - (uint32_t)fabsf(val);
    else
       qval = val;
 

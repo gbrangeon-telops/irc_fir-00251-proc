@@ -127,13 +127,13 @@ void XADC_ThPhyConv(xadcChannel_t *xadcCh)
 
       // a + b(Ln Rt/R25)
       partial_result =   Conv_Fact_MC65[TempCoeff_A][range] +
-                        (Conv_Fact_MC65[TempCoeff_B][range]*log(Rth));
+                        (Conv_Fact_MC65[TempCoeff_B][range]*logf(Rth));
 
       // + c(Ln(Rt/R25))?
-      partial_result += (Conv_Fact_MC65[TempCoeff_C][range]*powf(log(Rth), 2));
+      partial_result += (Conv_Fact_MC65[TempCoeff_C][range]*powf(logf(Rth), 2));
 
       // + d(Ln(Rt/R25))?
-      partial_result += (Conv_Fact_MC65[TempCoeff_D][range]*powf(log(Rth), 3));
+      partial_result += (Conv_Fact_MC65[TempCoeff_D][range]*powf(logf(Rth), 3));
 
       *(xadcCh->p_physical) = K_TO_C(1.0F/partial_result);
    }

@@ -39,7 +39,7 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
    uint32_t clock_to_rpm_factor;
    int32_t counts = 0;
 
-   pGCRegs->FWSpeedSetpoint = (uint16_t)round(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
+   pGCRegs->FWSpeedSetpoint = (uint16_t)roundf(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
 
    AXI4L_write32(  0, pSFWCtrl->ADD + VALID_PARAM_ADDR);
 
@@ -126,8 +126,8 @@ void SFW_UpdateFilterRanges(float deltaTheta1, float deltaTheta2)
 
    SFW_INF("deltaTheta1*1000 = %d, deltaTheta2*1000 = %d",(int32_t)(deltaTheta1*1000),(int32_t)(deltaTheta2*1000));
 
-   gSFW_deltaFilterEnd = (uint16_t)floorf(deltaTheta1 * (float)flashSettings.FWEncoderCyclePerTurn / (2.0f * M_PI));
-   gSFW_deltaFilterBegin = (uint16_t)floorf(deltaTheta2 * (float)flashSettings.FWEncoderCyclePerTurn / (2.0f * M_PI));
+   gSFW_deltaFilterEnd = (uint16_t)floorf(deltaTheta1 * (float)flashSettings.FWEncoderCyclePerTurn / (2.0f * (float)M_PI));
+   gSFW_deltaFilterBegin = (uint16_t)floorf(deltaTheta2 * (float)flashSettings.FWEncoderCyclePerTurn / (2.0f * (float)M_PI));
 
    SFW_INF("Sending filter min and max through AxiLite\n");
    SFW_INF("deltaFilterEnd = %d\n",gSFW_deltaFilterEnd);

@@ -65,35 +65,31 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
 {
    SFW_INF("InitMathematicalModel");
    
-   SFW_FiltersRadius = sqrt(flashSettings.FWOpticalAxisPosX*flashSettings.FWOpticalAxisPosX + flashSettings.FWOpticalAxisPosY*flashSettings.FWOpticalAxisPosY );
+   SFW_FiltersRadius = sqrtf(flashSettings.FWOpticalAxisPosX*flashSettings.FWOpticalAxisPosX + flashSettings.FWOpticalAxisPosY*flashSettings.FWOpticalAxisPosY );
    SFW_INF("SFW_FiltersRadius *1000 = %d",(int32_t)(SFW_FiltersRadius*1000));
 
-   SFW_OpticalAxisTheta = atan2(flashSettings.FWOpticalAxisPosY, flashSettings.FWOpticalAxisPosX);
+   SFW_OpticalAxisTheta = atan2f(flashSettings.FWOpticalAxisPosY, flashSettings.FWOpticalAxisPosX);
    SFW_INF("SFW_OpticalAxisTheta *1000 = %d",(int32_t)(SFW_OpticalAxisTheta*1000));
    
-   SFW_Ox = SFW_FiltersRadius*cos(SFW_OpticalAxisTheta);
-   SFW_Oy = SFW_FiltersRadius*sin(SFW_OpticalAxisTheta);
+   SFW_Ox = SFW_FiltersRadius*cosf(SFW_OpticalAxisTheta);
+   SFW_Oy = SFW_FiltersRadius*sinf(SFW_OpticalAxisTheta);
    SFW_INF("SFW_Ox *1000 = %d",(int32_t)(SFW_Ox*1000));
    SFW_INF("SFW_Oy *1000 = %d",(int32_t)(SFW_Oy*1000));
    
    SFW_ClearanceRadius = flashSettings.FWMountingHoleRadius - flashSettings.FWBeamMarging;
    SFW_INF("SFW_ClearanceRadius *1000 = %d",(int32_t)(SFW_ClearanceRadius*1000));
    
-   SFW_PixelRadius_To_RealRadius = (flashSettings.FWCenterPixRadius-flashSettings.FWCornerPixRadius)/sqrt((float)(FPA_WIDTH_MAX*FPA_WIDTH_MAX + FPA_HEIGHT_MAX*FPA_HEIGHT_MAX));
+   SFW_PixelRadius_To_RealRadius = (flashSettings.FWCenterPixRadius-flashSettings.FWCornerPixRadius) / sqrtf((float)(FPA_WIDTH_MAX*FPA_WIDTH_MAX + FPA_HEIGHT_MAX*FPA_HEIGHT_MAX));
    SFW_INF("SFW_PixelRadius_To_RealRadius *1000 = %d",(int32_t)(SFW_PixelRadius_To_RealRadius*1000));
    
    // Calculate new maximal values considering that all parameters has been changed
    // Need to be called at least once to set all global variables
-
    SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);
 
-      if(pGCRegs->FWSpeedSetpoint != 0)
-         SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / pGCRegs->FWSpeedSetpoint);
-      else
-         SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
-
-
-
+   if(pGCRegs->FWSpeedSetpoint != 0)
+      SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / (float)pGCRegs->FWSpeedSetpoint);
+   else
+      SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
 }
 
 float SFW_GetAcquisitionFrameRateMax()
@@ -133,13 +129,13 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
       ConvertSizeToDeltaAndTarget(pGCRegs->Width, pGCRegs->Height, changedParameter, &SFW_dX, &SFW_dY, &SFW_CurrentParameters_Target, &SFW_CurrentParameters_TargetPhysMarging);
       SFW_INF("Width = %d, Height = %d, SFW_dX = %d, SFW_dY=%d, SFW_CurrentParameters_Target=%d\n",pGCRegs->Width,pGCRegs->Height,(int32_t)(SFW_dX*1000.0f) ,(int32_t)(SFW_dY*1000.0f),(int32_t)(SFW_CurrentParameters_Target*1000.0f));
 
-	  //Calculate the beam intersect without the Physical marging to get the good encoder count
+	   //Calculate the beam intersect without the Physical marging to get the good encoder count
       BeamIntersect(SFW_dX, SFW_dY, SFW_CurrentParameters_TargetPhysMarging, &SFW_CurrentParameters_MaxTheta1, &SFW_CurrentParameters_MaxTheta2);
       SFW_UpdateFilterRanges(SFW_CurrentParameters_MaxTheta1-SFW_OpticalAxisTheta, SFW_OpticalAxisTheta-SFW_CurrentParameters_MaxTheta2);
 
-	  //Calculate the beam intersect with the Physical marging to get the parameter limit (exposure and frame rate)
-	  BeamIntersect(SFW_dX, SFW_dY, SFW_CurrentParameters_Target, &SFW_CurrentParameters_MaxTheta1, &SFW_CurrentParameters_MaxTheta2);
-      SFW_RPM_uSec_Max = (SFW_CurrentParameters_MaxTheta1 - SFW_CurrentParameters_MaxTheta2) * 60.0f / 2.0f / M_PI / 0.000001f  * SFW_EXPOSUREMAX_MARGING;
+	   //Calculate the beam intersect with the Physical marging to get the parameter limit (exposure and frame rate)
+	   BeamIntersect(SFW_dX, SFW_dY, SFW_CurrentParameters_Target, &SFW_CurrentParameters_MaxTheta1, &SFW_CurrentParameters_MaxTheta2);
+      SFW_RPM_uSec_Max = (SFW_CurrentParameters_MaxTheta1 - SFW_CurrentParameters_MaxTheta2) * 60.0f / 2.0f / (float)M_PI / 0.000001f  * SFW_EXPOSUREMAX_MARGING;
       //SFW_INF("MaxTheta1 = %d, MaxTheta2 = %d, SFW_RPM_uSec_Max = %d\n",(int32_t) (SFW_CurrentParameters_MaxTheta1 *1000.0f),(int32_t) (SFW_CurrentParameters_MaxTheta2 *1000.0f),(int32_t) (SFW_RPM_uSec_Max * 1e6f)  );
    }
 
@@ -152,7 +148,7 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
       float SFW_ExposureTimeMax_temp = SFW_ExposureTimeMax;
 
       if(pGCRegs->FWSpeedSetpoint != 0)
-         SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / pGCRegs->FWSpeedSetpoint); //Temps max ou le filtre est devant le detecteur
+         SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / (float)pGCRegs->FWSpeedSetpoint); //Temps max ou le filtre est devant le detecteur
       else
          SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
 
@@ -179,16 +175,16 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
    }
 
    // If a parameter, other than the frame rate, changed, set the new maximum frame rate
-    if(changedParameter != FRAME_RATE_CHANGED)
-    {
+   if(changedParameter != FRAME_RATE_CHANGED)
+   {
       SFW_AcquisitionFrameRateMax = floorf(SFW_RPM_uSec_Max / SFW_maxExposureTime)*flashSettings.FWNumberOfFilters/60.0f;
       SFW_AcquisitionFrameRateMax = MIN(SFW_AcquisitionFrameRateMax, pGCRegs->FWSpeedMax*flashSettings.FWNumberOfFilters/60.0f);
       SFW_INF("SFW_AcquisitionFrameRateMax = %d\n", (uint32_t) (SFW_AcquisitionFrameRateMax * 10));
-    }
+   }
 
    if(changedParameter == EXPOSURE_TIME_CHANGED || changedParameter == FRAME_RATE_CHANGED || changedParameter == ALL_CHANGED)
    {
-      SFW_CurrentParameters_UsedTheta = pGCRegs->FWSpeedSetpoint / 60.0f * 2.0f * M_PI * SFW_maxExposureTime * 0.000001f;
+      SFW_CurrentParameters_UsedTheta = (float)pGCRegs->FWSpeedSetpoint / 60.0f * 2.0f * (float)M_PI * SFW_maxExposureTime * 0.000001f;
    }
 
    SplitUsedTheta(SFW_CurrentParameters_MaxTheta1, SFW_CurrentParameters_MaxTheta2, &usedTheta1, &usedTheta2);
@@ -252,17 +248,17 @@ void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, float* m
    A = -(SFW_Ox + dX);
    B = -(SFW_Oy + dY);
    T = (SFW_FiltersRadius*SFW_FiltersRadius + A*A + B*B - cornerPixelPositionRadius*cornerPixelPositionRadius) / (2.0f*SFW_FiltersRadius);
-   *maxTheta1 = asin(-T/sqrt(A*A + B*B)) - atan2(A,B);
+   *maxTheta1 = asinf(-T/sqrtf(A*A + B*B)) - atan2f(A,B);
    if (*maxTheta1 > 0)
-      *maxTheta1 -= (2.0*M_PI);
+      *maxTheta1 -= (2.0f * (float)M_PI);
 
    // Second corner
    A = (SFW_Ox - dX);
    B = (SFW_Oy - dY);
    T = (SFW_FiltersRadius*SFW_FiltersRadius + A*A + B*B - cornerPixelPositionRadius*cornerPixelPositionRadius) / (2.0f*SFW_FiltersRadius);
-   *maxTheta2 = asin(T/sqrt(A*A + B*B)) - atan2(A,B);
+   *maxTheta2 = asinf(T/sqrtf(A*A + B*B)) - atan2f(A,B);
    if (*maxTheta2 > 0)
-      *maxTheta2 -= (2.0*M_PI);
+      *maxTheta2 -= (2.0f * (float)M_PI);
 
 }
 
@@ -275,12 +271,12 @@ uint16_t MaxWindowSizeX(float dX, float dY, float cornerPixelPositionRadius, flo
    float dX_a, tempValue;
    uint16_t Xmax_1, Xmax_2;
 
-   tempValue = SFW_FiltersRadius*sin(usedTheta1) - (SFW_Oy + dY);
-   dX_a =   SFW_FiltersRadius*cos(usedTheta1) - SFW_Ox - sqrt(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue);
+   tempValue = SFW_FiltersRadius*sinf(usedTheta1) - (SFW_Oy + dY);
+   dX_a =   SFW_FiltersRadius*cosf(usedTheta1) - SFW_Ox - sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue);
    Xmax_1 = (uint16_t)floorf(dX_a/flashSettings.FWCornerPixDistX*FPA_WIDTH_MAX);
 
-   tempValue = SFW_FiltersRadius*sin(usedTheta2) - (SFW_Oy - dY);
-   dX_a =   -(SFW_FiltersRadius*cos(usedTheta2) - SFW_Ox + sqrt(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue));
+   tempValue = SFW_FiltersRadius*sinf(usedTheta2) - (SFW_Oy - dY);
+   dX_a =   -(SFW_FiltersRadius*cosf(usedTheta2) - SFW_Ox + sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue));
    Xmax_2 = (uint16_t)floorf(dX_a/flashSettings.FWCornerPixDistX*FPA_WIDTH_MAX);
 
    // return the minimal value between Xmax_1, Xmax_2 and FPA_WIDTH_MAX
@@ -302,12 +298,12 @@ uint16_t MaxWindowSizeY(float dX, float dY, float cornerPixelPositionRadius, flo
    float dY_a, tempValue;
    uint16_t Ymax_1, Ymax_2;
 
-   tempValue = SFW_FiltersRadius*cos(usedTheta1) - (SFW_Ox + dX);
-   dY_a =   SFW_FiltersRadius*sin(usedTheta1) - SFW_Oy + sqrt(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue);
+   tempValue = SFW_FiltersRadius*cosf(usedTheta1) - (SFW_Ox + dX);
+   dY_a =   SFW_FiltersRadius*sinf(usedTheta1) - SFW_Oy + sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue);
    Ymax_1 = (uint16_t)floorf(dY_a/flashSettings.FWCornerPixDistY*FPA_HEIGHT_MAX);
 
-   tempValue = SFW_FiltersRadius*cos(usedTheta2) - (SFW_Ox - dX);
-   dY_a =   -(SFW_FiltersRadius*sin(usedTheta2) - SFW_Oy - sqrt(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue));
+   tempValue = SFW_FiltersRadius*cosf(usedTheta2) - (SFW_Ox - dX);
+   dY_a =   -(SFW_FiltersRadius*sinf(usedTheta2) - SFW_Oy - sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue));
    Ymax_2 = (uint16_t)floorf(dY_a/flashSettings.FWCornerPixDistY*FPA_HEIGHT_MAX);
 
    // return the minimal value between Ymax_1, Ymax_2 and FPA_HEIGHT_MAX
@@ -346,8 +342,8 @@ void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedPar
    if(changedParameter != WIDTH_CHANGED)
       *dY = (float)height / FPA_HEIGHT_MAX * flashSettings.FWCornerPixDistY;
 
-   *cornerPixelPositionRadius = SFW_ClearanceRadius - (sqrt((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
-   *cornerPixelPositionRadiusWithoutMarging = (flashSettings.FWMountingHoleRadius - SFW_PhysicalMarging * flashSettings.FWBeamMarging) - (sqrt((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
+   *cornerPixelPositionRadius = SFW_ClearanceRadius - (sqrtf((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
+   *cornerPixelPositionRadiusWithoutMarging = (flashSettings.FWMountingHoleRadius - SFW_PhysicalMarging * flashSettings.FWBeamMarging) - (sqrtf((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
 }
 
 float SFW_GetMaxExposureTime(gcRegistersData_t *pGCRegs)
