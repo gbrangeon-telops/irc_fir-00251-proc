@@ -67,8 +67,8 @@ package FPA_define is
    constant DEFINE_FPA_80M_CLK_RATE_KHZ           : integer   := 80_000;     --  horloge de 80M en KHz
    
    -- quelques caractéristiques de la carte ADC requise
-   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 40_000;     -- l'horloge par defaut est celle des Quads au demarrage en attendant la detection de la carte ADC. C,est une frequence utilisable quelle que soit la carte ADC. Une fois la carte ADC détectée, celle-ci imposera une frequence maximale à ne pas depasser.
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 40_000;     -- c'est l'horolge reelle des quads pour laquelle le design est fait. Elle doit être inférieure à la limite imposée par la carte ADC détectée. Si telle n'est pas le cas, sortir une erreur  
+   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 2*DEFINE_FPA_MCLK_RATE_KHZ;      -- l'horloge par defaut est celle des Quads au demarrage en attendant la detection de la carte ADC. C,est une frequence utilisable quelle que soit la carte ADC. Une fois la carte ADC détectée, celle-ci imposera une frequence maximale à ne pas depasser.
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 2*DEFINE_FPA_MCLK_RATE_KHZ;      -- c'est l'horolge reelle des quads pour laquelle le design est fait. Elle doit être inférieure à la limite imposée par la carte ADC détectée. Si telle n'est pas le cas, sortir une erreur  
    constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
    constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
    
@@ -84,7 +84,7 @@ package FPA_define is
    (    0, 16210),     -- limites du DAC6 pour le isc0209A
    (    0, 16210),     -- limites du DAC7 pour le isc0209A
    ( 1026, 15868));    -- limites du DAC8 pour le isc0209A 
-    
+   
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -116,7 +116,9 @@ package FPA_define is
    constant XSIZE_MAX                             : integer := DEFINE_XSIZE_MAX;  -- pour les modules utilisant XSIZE_MAX
    constant YSIZE_MAX                             : integer := DEFINE_YSIZE_MAX;  -- pour les modules utilisant YSIZE_MAX   
    constant DEFINE_FPA_MCLK_RATE_FACTOR_100M_X_2P15 : integer := integer((DEFINE_FPA_100M_CLK_RATE_KHZ*(2**15))/DEFINE_FPA_MCLK_RATE_KHZ);    -- pour la conversion du temps d'integration en coups de 100MHz 
-
+   constant ADC_SERDES_CLK_1X_PERIOD_NS           : real    := 1_000_000.0/real(DEFINE_ADC_QUAD_CLK_RATE_KHZ);
+   constant DEFINE_FPA_PEAK_THROUGHPUT_MPixS      : integer := integer(ceil(real(DEFINE_FPA_PCLK_RATE_KHZ) * real(DEFINE_FPA_TAP_NUMBER))/1000.0);
+   
    ---------------------------------------------------------------------------------								
    -- Configuration
    ---------------------------------------------------------------------------------  
@@ -130,6 +132,18 @@ package FPA_define is
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------
+   -- window_cfg_type                    
+   type window_cfg_type is
+   record      
+      xstart                         : unsigned(9 downto 0); 
+      ystart                         : unsigned(9 downto 0);
+      xsize                          : unsigned(9 downto 0);
+      ysize                          : unsigned(9 downto 0);
+      xsize_div_tapnum               : unsigned(7 downto 0);
+      ysize_div4_m1                  : unsigned(7 downto 0);
+      lovh_mclk_source               : unsigned(15 downto 0);    -- lovh converti en coups d'hotloges mclk_source.Utilisé en mode diag 
+   end record;   
+   
    type fpa_intf_cfg_type is
    record     
       -- cette partie provient du contrôleur du temps d'integration
@@ -140,6 +154,9 @@ package FPA_define is
       -- cette partie provient du microBlaze
       -- common
       comn                           : fpa_comn_cfg_type;      -- partie commune (utilisée par les modules communs)
+      
+      -- diag window
+      diag                           : window_cfg_type; 
       
       -- window, gain
       xstart                         : unsigned(9 downto 0); 
@@ -158,18 +175,18 @@ package FPA_define is
       -- chn diversity
       adc_quad2_en                   : std_logic; -- à '1' si les données du quad2 doivent êre prises en compte par la chaine
       chn_diversity_en               : std_logic; -- dit quoi faire avec les données du quad2. '1' si ces données sont des repliques du quad1 => chn diversity. '0' si ces données doient être considérées comme des des données de taps 5, 6, 7, 8 d'un détrecteur 8 taps.
-            
+      
       -- pour les referentiels de trame et de lignes
       readout_pclk_cnt_max          : unsigned(16 downto 0);    --  pour 0209: readout_pclk_cnt_max = taille en pclk de l'image incluant les pauses, les lignes non valides etc.. = (XSIZE/TAP_NUM + LOVH)* (YSIZE + FOVH) + 1  (un dernier PCLK pur finir)
       line_period_pclk              : unsigned(7 downto 0);     --  pour 0209: nombre de pclk =  2*XSIZE/TAP_NUM + LOVH)
-           
+      
       -- ligne active = ligne excluant les portions/pixels non valides     
       active_line_start_num          : unsigned(3 downto 0);     --  pour 0209: le numero de la premiere ligne active. Il vaut 3 car on laisse deux lignes de tests
       active_line_end_num            : unsigned(8 downto 0);     --  pour 0209: le numero de la derniere ligne active. Il vaut Ysize + 2
       
       -- nombre de lsync à envoyer pour une taille donnée de l'image
       window_lsync_num               : unsigned(8 downto 0);     --  pour 0209: le nombre de pulse Lsync à envoyer. Il vaut active_line_end_num puisqu'il n'y a pas de ligne non actuive après les lignes actives. 
-            
+      
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch            : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
       
@@ -202,47 +219,47 @@ package FPA_define is
       reorder_column                 : std_logic;
    end record;    
    
-   -- Configuration par defaut
-   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
-      to_unsigned(100, 32),      --int_time                       
-      (others => '0'),           --int_indx                       
-      to_unsigned(100, 32),      --int_signal_high_time           
-      --comn                           
-      ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(1000000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), '0'),
-      to_unsigned(0, 10),        --xstart                         
-      to_unsigned(0, 10),        --ystart                         
-      to_unsigned(640, 10),      --xsize                          
-      to_unsigned(512, 10),      --ysize                          
-      (others => '1'),           --gain                           
-      '0',                       --invert                         
-      '0',                       --revert                                              
-      "0110011",                 --det_code
-      '0',                       --skimming
-      to_unsigned(6, 8),         --real_mode_active_pixel_dly   
-      '1',                       --adc_quad2_en                 
-      '1',                       --chn_diversity_en             
-      to_unsigned(28897, 17),    --readout_pclk_cnt_max         
-      to_unsigned(112, 8),       --line_period_pclk             
-      to_unsigned(3, 4),         --active_line_start_num        
-      to_unsigned(258, 9),       --active_line_end_num
-      to_unsigned(258, 9),       --window_lsync_num
-      to_unsigned(4, 8),         --pix_samp_num_per_ch          
-      to_unsigned(225, 9),       --sof_posf_pclk                
-      to_unsigned(28864, 17),    --eof_posf_pclk                
-      to_unsigned(1, 8),         --sol_posl_pclk                
-      to_unsigned(80, 8),        --eol_posl_pclk                
-      to_unsigned(81, 8),        --eol_posl_pclk_p1             
-      to_unsigned(2, 4),         --hgood_samp_sum_num           
-      to_unsigned(1048576, 23),  --hgood_samp_mean_numerator    
-      to_unsigned(2, 4),         --vgood_samp_sum_num           
-      to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
-      to_unsigned(3, 8),         --good_samp_first_pos_per_ch   
-      to_unsigned(4, 8),         --good_samp_last_pos_per_ch    
-      to_unsigned(80, 8),        --xsize_div_tapnum             
-      (to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(0, 14), to_unsigned(3730, 14)),           
-      to_unsigned(0, 4),          --adc_clk_phase
-      '0'
-   );
+   ---- Configuration par defaut
+--   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
+--   to_unsigned(100, 32),      --int_time                       
+--   (others => '0'),           --int_indx                       
+--   to_unsigned(100, 32),      --int_signal_high_time           
+--   --comn                           
+--   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(1000000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), '0'),
+--   to_unsigned(0, 10),        --xstart                         
+--   to_unsigned(0, 10),        --ystart                         
+--   to_unsigned(640, 10),      --xsize                          
+--   to_unsigned(512, 10),      --ysize                          
+--   (others => '1'),           --gain                           
+--   '0',                       --invert                         
+--   '0',                       --revert                                              
+--   "0110011",                 --det_code
+--   '0',                       --skimming
+--   to_unsigned(6, 8),         --real_mode_active_pixel_dly   
+--   '1',                       --adc_quad2_en                 
+--   '1',                       --chn_diversity_en             
+--   to_unsigned(28897, 17),    --readout_pclk_cnt_max         
+--   to_unsigned(112, 8),       --line_period_pclk             
+--   to_unsigned(3, 4),         --active_line_start_num        
+--   to_unsigned(258, 9),       --active_line_end_num
+--   to_unsigned(258, 9),       --window_lsync_num
+--   to_unsigned(4, 8),         --pix_samp_num_per_ch          
+--   to_unsigned(225, 9),       --sof_posf_pclk                
+--   to_unsigned(28864, 17),    --eof_posf_pclk                
+--   to_unsigned(1, 8),         --sol_posl_pclk                
+--   to_unsigned(80, 8),        --eol_posl_pclk                
+--   to_unsigned(81, 8),        --eol_posl_pclk_p1             
+--   to_unsigned(2, 4),         --hgood_samp_sum_num           
+--   to_unsigned(1048576, 23),  --hgood_samp_mean_numerator    
+--   to_unsigned(2, 4),         --vgood_samp_sum_num           
+--   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
+--   to_unsigned(3, 8),         --good_samp_first_pos_per_ch   
+--   to_unsigned(4, 8),         --good_samp_last_pos_per_ch    
+--   to_unsigned(80, 8),        --xsize_div_tapnum             
+--   (to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(0, 14), to_unsigned(3730, 14)),           
+--   to_unsigned(0, 4),          --adc_clk_phase
+--   '0'
+--   );
    
    
    ----------------------------------------------								

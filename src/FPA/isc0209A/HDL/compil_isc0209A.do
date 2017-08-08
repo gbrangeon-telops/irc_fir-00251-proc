@@ -63,7 +63,9 @@ acom -nowarn DAGGEN_0523 -incr \
 
 # fichiers isc0209A
 acom  -nowarn DAGGEN_0523 -incr \
-D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_clks_gen.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_clks_gen_core.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_clks_mmcm.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_readout_ctrler.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_digio_map.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\isc0209A_mblaze_intf.vhd \
