@@ -6,9 +6,7 @@
 #include "Genicam.h"
 #include "GC_Registers.h"
 #include "SFW_ctrl.h"
-//#include "SFW_Processing.h"
 
-#define SFW_PhysicalMarging 0.5F // Apply 50% of the physical marging to limit the encoder position
  
 
 typedef enum {   

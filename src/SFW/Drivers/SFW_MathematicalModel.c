@@ -18,7 +18,7 @@ static void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, f
 static uint16_t MaxWindowSizeX(float dX, float dY, float cornerPixelPositionRadius, float usedTheta1, float usedTheta2);
 static uint16_t MaxWindowSizeY(float dX, float dY, float cornerPixelPositionRadius, float usedTheta1, float usedTheta2);
 static void SplitUsedTheta(float maxTheta1, float maxTheta2, float* usedTheta1, float* usedTheta2);
-static void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius, float* cornerPixelPositionRadiusWithoutMarging);
+static void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius);
 
 extern flashSettings_t flashSettings;
 extern float FWExposureTime[MAX_NUM_FILTER];
@@ -38,7 +38,6 @@ static float SFW_PixelRadius_To_RealRadius;
 static float SFW_CurrentParameters_MaxTheta1;
 static float SFW_CurrentParameters_MaxTheta2;
 static float SFW_CurrentParameters_Target;
-static float SFW_CurrentParameters_TargetPhysMarging;
 static float SFW_CurrentParameters_UsedTheta;
 static float SFW_RPM_uSec_Max;
 static float SFW_dX;
@@ -126,16 +125,15 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
    // If the window size changed, recalculate the max angles
    if(changedParameter == WIDTH_CHANGED || changedParameter == HEIGHT_CHANGED || changedParameter == ALL_CHANGED)
    {
-      ConvertSizeToDeltaAndTarget(pGCRegs->Width, pGCRegs->Height, changedParameter, &SFW_dX, &SFW_dY, &SFW_CurrentParameters_Target, &SFW_CurrentParameters_TargetPhysMarging);
+      ConvertSizeToDeltaAndTarget(pGCRegs->Width, pGCRegs->Height, changedParameter, &SFW_dX, &SFW_dY, &SFW_CurrentParameters_Target);
       SFW_INF("Width = %d, Height = %d, SFW_dX = %d, SFW_dY=%d, SFW_CurrentParameters_Target=%d\n",pGCRegs->Width,pGCRegs->Height,(int32_t)(SFW_dX*1000.0f) ,(int32_t)(SFW_dY*1000.0f),(int32_t)(SFW_CurrentParameters_Target*1000.0f));
 
-	   //Calculate the beam intersect without the Physical marging to get the good encoder count
-      BeamIntersect(SFW_dX, SFW_dY, SFW_CurrentParameters_TargetPhysMarging, &SFW_CurrentParameters_MaxTheta1, &SFW_CurrentParameters_MaxTheta2);
-      SFW_UpdateFilterRanges(SFW_CurrentParameters_MaxTheta1-SFW_OpticalAxisTheta, SFW_OpticalAxisTheta-SFW_CurrentParameters_MaxTheta2);
-
-	   //Calculate the beam intersect with the Physical marging to get the parameter limit (exposure and frame rate)
+	   //Calculate the beam intersect to get the filter ranges and angular speed parameter limit (for exposure and frame rate max)
 	   BeamIntersect(SFW_dX, SFW_dY, SFW_CurrentParameters_Target, &SFW_CurrentParameters_MaxTheta1, &SFW_CurrentParameters_MaxTheta2);
-      SFW_RPM_uSec_Max = (SFW_CurrentParameters_MaxTheta1 - SFW_CurrentParameters_MaxTheta2) * 60.0f / 2.0f / (float)M_PI / 0.000001f  * SFW_EXPOSUREMAX_MARGING;
+
+	   SFW_UpdateFilterRanges(SFW_CurrentParameters_MaxTheta1-SFW_OpticalAxisTheta, SFW_OpticalAxisTheta-SFW_CurrentParameters_MaxTheta2);
+
+	   SFW_RPM_uSec_Max = (SFW_CurrentParameters_MaxTheta1 - SFW_CurrentParameters_MaxTheta2) * 60.0f / 2.0f / (float)M_PI / 0.000001f  * SFW_EXPOSUREMAX_MARGING;
       //SFW_INF("MaxTheta1 = %d, MaxTheta2 = %d, SFW_RPM_uSec_Max = %d\n",(int32_t) (SFW_CurrentParameters_MaxTheta1 *1000.0f),(int32_t) (SFW_CurrentParameters_MaxTheta2 *1000.0f),(int32_t) (SFW_RPM_uSec_Max * 1e6f)  );
    }
 
@@ -206,7 +204,7 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
    {
       // Height is unchanged so keep using SFW_dY
       // Width is changed so recalculate dX and Target;
-      ConvertSizeToDeltaAndTarget(tempWidthMax, pGCRegs->Height, WIDTH_CHANGED, &temp_dX, &temp_dY, &tempCornerPixelPositionRadius,&SFW_CurrentParameters_TargetPhysMarging);
+      ConvertSizeToDeltaAndTarget(tempWidthMax, pGCRegs->Height, WIDTH_CHANGED, &temp_dX, &temp_dY, &tempCornerPixelPositionRadius);
 
       // Find maximal angles with the new width
       BeamIntersect(temp_dX, SFW_dY, tempCornerPixelPositionRadius, &maxTheta1, &maxTheta2);
@@ -222,7 +220,7 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
    {
       // Width is unchanged so keep using SFW_dY
       // Height is changed so recalculate dY and Target;
-      ConvertSizeToDeltaAndTarget(pGCRegs->Width, tempHeightMax, HEIGHT_CHANGED, &temp_dX, &temp_dY, &tempCornerPixelPositionRadius,&SFW_CurrentParameters_TargetPhysMarging);
+      ConvertSizeToDeltaAndTarget(pGCRegs->Width, tempHeightMax, HEIGHT_CHANGED, &temp_dX, &temp_dY, &tempCornerPixelPositionRadius);
 
       // Find maximal angles with the new height
       BeamIntersect(SFW_dX, temp_dY, tempCornerPixelPositionRadius, &maxTheta1, &maxTheta2);
@@ -334,7 +332,7 @@ void SplitUsedTheta(float maxTheta1, float maxTheta2, float* usedTheta1, float* 
  *    substract clearance radius with the linear interpolation between center pixel radius and corner pixel radius for the given window size
  */ 
 
-void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius, float* cornerPixelPositionRadiusWithoutMarging)
+void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius)
 {
    if(changedParameter != HEIGHT_CHANGED)
       *dX = (float)width / FPA_WIDTH_MAX * flashSettings.FWCornerPixDistX;
@@ -343,7 +341,6 @@ void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedPar
       *dY = (float)height / FPA_HEIGHT_MAX * flashSettings.FWCornerPixDistY;
 
    *cornerPixelPositionRadius = SFW_ClearanceRadius - (sqrtf((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
-   *cornerPixelPositionRadiusWithoutMarging = (flashSettings.FWMountingHoleRadius - SFW_PhysicalMarging * flashSettings.FWBeamMarging) - (sqrtf((float)(width*width + height*height))*SFW_PixelRadius_To_RealRadius+flashSettings.FWCornerPixRadius);
 }
 
 float SFW_GetMaxExposureTime(gcRegistersData_t *pGCRegs)
