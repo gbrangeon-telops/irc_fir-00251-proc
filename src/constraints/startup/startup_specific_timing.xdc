@@ -44,10 +44,10 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CLK_
 ## Timing Exceptions Section
 
 # False Paths
-set_false_path -from CLK_RX_0 -to [get_cells U1/CH0/U12/iserdese2_master]
-set_false_path -from CLK_RX_1 -to [get_cells U1/CH1/U12/iserdese2_master]
-set_false_path -from CLK_RX_2 -to [get_cells U1/CH2/U12/iserdese2_master]
-set_false_path -from CLK_RX_3 -to [get_cells U1/CH3/U12/iserdese2_master]
+set_false_path -from CLK_RX_0 -to [get_cells */U1/CH0/U12/iserdese2_master]
+set_false_path -from CLK_RX_1 -to [get_cells */U1/CH1/U12/iserdese2_master]
+set_false_path -from CLK_RX_2 -to [get_cells */U1/CH2/U12/iserdese2_master]
+set_false_path -from CLK_RX_3 -to [get_cells */U1/CH3/U12/iserdese2_master]
 set_false_path -from [get_clocks DCO*] -to [get_clocks clk_7x*]
 
 # Max Delay / Min Delay

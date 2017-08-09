@@ -43,6 +43,9 @@ const float Conv_Fact_MC65[4][4] =
 void XADC_ThPhyConv(xadcChannel_t *xadcCh);
 void XADC_ThUpdated(xadcChannel_t *xadcCh);
 
+// Array for xadc calibration voltage reference
+float DeviceVoltageCalibrationAry[3] = {0.0F, 0.0F, 0.0F};
+
 xadcChannel_t intAdcChannels[XIC_COUNT] =
 {
    // {id,                 isValid, muxAddr, polarity,      unit,          raw,  voltOffset, voltGain,         voltage, phyOffset,        phyGain,       phyConverter,     p_physical,                                           callback}
@@ -82,7 +85,10 @@ xadcChannel_t extAdcChannels[XEC_COUNT] =
    {XEC_1V0MGT_SENSE,      0,       0x16,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             2.0f,          XADC_OGPhyConv,   &DeviceVoltageAry[DVS_MGT1V0],                        NULL},
    {XEC_1V2MGT_SENSE,      0,       0x17,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             2.0f,          XADC_OGPhyConv,   &DeviceVoltageAry[DVS_MGT1V2],                        NULL},
    {XEC_12V_SENSE,         0,       0x18,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             144.7f / 4.7f, XADC_OGPhyConv,   &DeviceVoltageAry[DVS_Supply12V],                     NULL},
-   {XEC_5V0_SENSE,         0,       0x19,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             5.7f,          XADC_OGPhyConv,   &DeviceVoltageAry[DVS_Supply5V],                      NULL}
+   {XEC_5V0_SENSE,         0,       0x19,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             5.7f,          XADC_OGPhyConv,   &DeviceVoltageAry[DVS_Supply5V],                      NULL},
+   {XEC_ADC_REF_1,         0,       0x1A,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref0],              NULL},
+   {XEC_ADC_REF_2,         0,       0x1B,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref1],              NULL},
+   {XEC_ADC_REF_3,         0,       0x1C,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref2],              NULL}
 };
 
 

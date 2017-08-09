@@ -153,7 +153,7 @@ IRC_Status_t AutoTest_FlashMem(void) {
    uint32_t progressStep;
 
    // There is supposed to be no remaining bytes in the buffer
-   if (!CBB_Empty(&cbuf))
+   if (!DebugTerminal_CommandIsEmpty(&cbuf))
    {
       ATR_ERR("Unsupported command arguments");
       return IRC_FAILURE;

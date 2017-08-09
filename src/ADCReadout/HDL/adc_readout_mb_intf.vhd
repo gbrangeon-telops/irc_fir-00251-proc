@@ -24,7 +24,7 @@ entity adc_readout_mb_intf is
       CLK               : in std_logic;
       MB_CLK            : in std_logic;     
       
-      ADC_ENABLE        : out std_logic;
+      ADC_CFG        : out std_logic_vector(1 downto 0);
       ADC_CALIB_R       : out std_logic_vector(31 downto 0);
       ADC_CALIB_Q       : out std_logic_vector(31 downto 0);
       
@@ -69,7 +69,7 @@ architecture rtl of adc_readout_mb_intf is
    signal slv_reg_rden	            : std_logic;
    signal slv_reg_wren	            : std_logic;
    
-   signal adc_en_i                  : std_logic;
+   signal adc_cfg_i                  : std_logic_vector(1 downto 0);
    signal adc_calib_r_i             : std_logic_vector(31 downto 0);
    signal adc_calib_q_i              : std_logic_vector(31 downto 0);
    signal adc_cfg_valid_i            : std_logic;
@@ -77,16 +77,16 @@ architecture rtl of adc_readout_mb_intf is
    
    signal adc_calib_r_hold          : std_logic_vector(31 downto 0);
    signal adc_calib_q_hold          : std_logic_vector(31 downto 0);
-   signal adc_en_hold               : std_logic;
+   signal adc_cfg_hold               : std_logic_vector(1 downto 0);
    
    attribute dont_touch : string; 
    attribute dont_touch of adc_calib_r_hold : signal is "true";
    attribute dont_touch of adc_calib_q_hold : signal is "true";
-   attribute dont_touch of adc_en_hold : signal is "true";
+   attribute dont_touch of adc_cfg_hold : signal is "true";
    
 begin
    
-   ADC_ENABLE <= adc_en_hold;
+   ADC_CFG <= adc_cfg_hold;
    ADC_CALIB_R <= adc_calib_r_hold;
    ADC_CALIB_Q <= adc_calib_q_hold;
    
@@ -110,7 +110,7 @@ begin
          if adc_cfg_valid_sync_pipe = "01" then
             adc_calib_r_hold <= adc_calib_r_i;
             adc_calib_q_hold <= adc_calib_q_i;
-            adc_en_hold <= adc_en_i;
+            adc_cfg_hold <= adc_cfg_i;
          end if;
          
          adc_cfg_valid_sync_pipe := adc_cfg_valid_sync_pipe(0) & adc_cfg_valid_sync;
@@ -214,14 +214,14 @@ begin
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
-            adc_en_i <= '0';
+            adc_cfg_i <= "00";
             adc_calib_r_i <= (others => '0');
             adc_calib_q_i <= (others => '0');
             adc_cfg_valid_i <= '0';
          else			                    
             if slv_reg_wren = '1' and MB_MOSI.WSTRB =  "1111" then -- Master write, toutes les transcations à 32 bits !!! comme dans IRCDEV 					
                case axi_awaddr(7 downto 0) is 
-                  when X"00" =>  adc_en_i <= data_i(0);
+                  when X"00" =>  adc_cfg_i <= data_i(1 downto 0);
                   when X"04" =>  adc_calib_r_i <= data_i;
                   when X"08" =>  adc_calib_q_i <= data_i;
                   when X"0C" =>  adc_cfg_valid_i <= data_i(0);

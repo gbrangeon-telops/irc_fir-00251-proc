@@ -44,7 +44,7 @@ package FPA_define is
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';
    constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '0';      -- pour le 0207, on ne peut utiliser la chaine Vprocessing. Donc ne pas le generer pour gain de ressources
-   
+   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 5_000;   --  
    
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 800;

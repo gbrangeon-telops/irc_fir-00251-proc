@@ -63,5 +63,6 @@ builtInTest_t builtInTests[BITID_Count] =
    {BITID_CalibrationFilesLoading, "", NULL, BITR_NotApplicable},
    {BITID_DeviceKeyValidation, "Device key validation", Proc_DeviceKeyValidation, BITR_Pending},
    {BITID_SensorInitialization, "", NULL, BITR_NotApplicable},
-   {BITID_DeviceSerialPortsInitialization, "Initializing device serial ports", Proc_DeviceSerialPorts_Init, BITR_Pending}
+   {BITID_DeviceSerialPortsInitialization, "Initializing device serial ports", Proc_DeviceSerialPorts_Init, BITR_Pending},
+   {BITID_BoardRevisionValidation, "Check for HW board revision", Proc_BoardRevisionValidation, BITR_Pending}
 };

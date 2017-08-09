@@ -64,7 +64,7 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
          }
       }
 
-      else if (CBB_Empty(cbuf))
+      else if (DebugTerminal_CommandIsEmpty(cbuf))
       {
          DT_ERR("ATR: Test Routine is already running.");
          return IRC_FAILURE;
@@ -88,7 +88,7 @@ IRC_Status_t DebugTerminalParseATR(circByteBuffer_t *cbuf) {
       }
    }
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments.");
       return IRC_FAILURE;
@@ -120,7 +120,7 @@ IRC_Status_t DebugTerminalParseYES(circByteBuffer_t *cbuf) {
       return IRC_FAILURE;
    }
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -148,7 +148,7 @@ IRC_Status_t DebugTerminalParseNO(circByteBuffer_t *cbuf) {
       return IRC_FAILURE;
    }
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -176,7 +176,7 @@ IRC_Status_t DebugTerminalParseNULL(circByteBuffer_t *cbuf) {
       return IRC_FAILURE;
    }
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -203,7 +203,7 @@ IRC_Status_t DebugTerminalParseTRS(circByteBuffer_t *cbuf) {
       return IRC_FAILURE;
    }
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
@@ -230,7 +230,7 @@ IRC_Status_t DebugTerminalParseTRF(circByteBuffer_t *cbuf) {
       return IRC_FAILURE;
    }
 
-   if (!CBB_Empty(cbuf))
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;

@@ -110,7 +110,7 @@ int main()
    status = XIntc_Initialize(&gIntc, XPAR_INTC_0_DEVICE_ID);
    if (status != XST_SUCCESS)
    {
-      PRINTF("Failed to initialize interrupt controller.\n");
+      //PRINTF("Failed to initialize interrupt controller.\n");
    }
 
    // QSPI flash initialization
@@ -120,7 +120,7 @@ int main()
          XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
    if (status != IRC_SUCCESS)
    {
-      PRINTF("Failed to initialize QSPI flash.\n");
+      //PRINTF("Failed to initialize QSPI flash.\n");
    }
 
    /*
@@ -131,7 +131,7 @@ int main()
    status = XIntc_Start(&gIntc, XIN_REAL_MODE);
    if (status != XST_SUCCESS)
    {
-      PRINTF("Failed to start interrupt controller.\n");
+      //PRINTF("Failed to start interrupt controller.\n");
    }
 
    // Enable the interrupt for the SPI driver instances.
@@ -148,7 +148,7 @@ int main()
    // Enable exceptions.
    Xil_ExceptionEnable();
 
-   PRINTF("Loading application image...\n");
+   //PRINTF("Loading application image...\n");
 
 #ifdef STARTUP
    char userAns = 0;

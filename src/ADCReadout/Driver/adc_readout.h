@@ -14,7 +14,7 @@
 #define __ADC_READOUT_H__
 
 #include "FlashSettings.h"
-#include "IRC_status.h" 
+#include "IRC_status.h"
 
 #include <stdbool.h>
 
@@ -24,6 +24,16 @@
 #define ADC_R_OFFSET  0x04
 #define ADC_Q_OFFSET  0x08
 #define ADC_CFG_VALID 0x0C
+
+enum adc_readout_cfg {
+   ADC_IRIG_ONLY = 0,
+   ADC_READOUT = 1,
+   ADC_AND_IRIG = 2
+};
+
+typedef enum adc_readout_cfg adc_readout_cfg_t ;
+
+
 
 IRC_Status_t ADC_readout_init(flashSettings_t* fs);
 

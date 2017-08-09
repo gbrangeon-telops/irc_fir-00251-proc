@@ -24,7 +24,7 @@
 // #define AEC_VERBOSE
 // #define ACQ_VERBOSE
 // #define ACT_VERBOSE
-// #define ATR_VERBOSE
+#define ATR_VERBOSE
 // #define BUFFERING_VERBOSE
 // #define CAL_VERBOSE
 // #define CI_VERBOSE

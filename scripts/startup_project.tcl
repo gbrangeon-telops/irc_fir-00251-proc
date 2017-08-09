@@ -22,6 +22,9 @@ add_files $FPA_path/HDL
 
 # Add iserdes (adc) files
 add_files $common_dir/iserdes/adc
+add_files $root_dir/src/Quad_serdes/HDL
+add_files $common_dir/iserdes/clink/clink_bitslip_ctrl.vhd
+add_files $common_dir/iserdes/clink/clink_delay_ctrl.vhd
 
 # Add top level
 add_files $aldec_dir/$proj_name.vhd
@@ -33,7 +36,10 @@ add_files $aldec_dir/$proj_name.vhd
 source $script_dir/Base_project.tcl
 
 #Add specific constraint files
-add_files -norecurse -fileset constrs_1 $constr_dir/$sensor
+add_files -norecurse -fileset constrs_1 $constr_dir/$sensor/startup_release_target.xdc
+add_files -norecurse -fileset constrs_1 $constr_dir/$sensor/startup_target.xdc
+add_files -norecurse -fileset constrs_1 $constr_dir/isc0207A/isc0207A_specific_physical.xdc
+add_files -norecurse -fileset constrs_1 $constr_dir/isc0207A/isc0207A_specific_timing.xdc
 
 # make sure the files are in correct precedence order (as per UG903 recommendation)
 reorder_files -fileset constrs_1 -after [get_files -of_objects constrs_1 -filter {NAME !~ "*specific*"} *timing.xdc] [get_files -of_objects constrs_1 *specific*.xdc]

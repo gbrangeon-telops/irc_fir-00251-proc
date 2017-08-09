@@ -87,5 +87,6 @@ IRC_Status_t Proc_XADC_Init();
 IRC_Status_t Proc_BufferManager_Init();
 IRC_Status_t Proc_Timer_Init();
 IRC_Status_t Proc_DeviceKeyValidation();
+IRC_Status_t Proc_BoardRevisionValidation();
 
 #endif // PROC_INIT_H

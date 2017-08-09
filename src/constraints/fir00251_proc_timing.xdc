@@ -5,12 +5,13 @@ create_clock -period 5.000 -name SYS_CLK_0 -waveform {0.000 2.500} [get_ports SY
 create_clock -period 5.000 -name SYS_CLK_1 -waveform {0.000 2.500} [get_ports SYS_CLK_P1]
 create_clock -period 8.000 -name MGT_CLK_0 -waveform {0.000 4.000} [get_ports AURORA_CLK_P0]
 create_clock -period 8.000 -name MGT_CLK_1 -waveform {0.000 4.000} [get_ports AURORA_CLK_P1]
-create_clock -period 8.000 -name data_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/DATA/tx_out_clk]
-create_clock -period 8.000 -name video_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/VIDEO/tx_out_clk]
-create_clock -period 8.000 -name exp_mgt_tx_out_clk [get_pins ACQ/MGT/MGTS/EXP/tx_out_clk]
-create_clock -period 8.000 -name data_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/DATA/user_clk]
-create_clock -period 8.000 -name exp_mgt_user_clk_i [get_pins ACQ/MGT/MGTS/EXP/user_clk]
-create_clock -period 60.000 -name usart_clk -waveform {0.000 30.000} [get_pins ACQ/BULK_USART/U11/CLK]
+create_clock -period 8.000 -name data_mgt_tx_out_clk [get_pins *TXOUTCLK -hier -filter {name =~ *gt0_data_mgt*}]
+create_clock -period 8.000 -name video_mgt_tx_out_clk [get_pins *TXOUTCLK -hier -filter {name =~ *gt0_video_mgt*}]
+create_clock -period 8.000 -name exp_mgt_tx_out_clk [get_pins *TXOUTCLK -hier -filter {name =~ *gt0_exp_mgt*}]
+create_clock -period 8.000 -name data_mgt_user_clk_i [get_pins -hier DATA/user_clk]
+create_clock -period 8.000 -name exp_mgt_user_clk_i [get_pins -hier EXP/user_clk]
+create_clock -period 60.000 -name usart_clk_in [get_ports R_GIGE_BULK_CLK0]
+create_clock -period 60.000 -name usart_clk [get_pins *CLKOUT0 -hier -filter {name =~ *BULK_USART*}]
 
 # Virtual clocks
 
@@ -75,14 +76,13 @@ set_false_path -from [get_clocks clk_out2_core_clk_wiz_1*] -to [get_clocks clk_o
 set_false_path -from [get_clocks clk_out1_core_clk_wiz_1*] -to [get_clocks clk_20M_mmcm*]
 set_false_path -from [get_clocks clk_20M_mmcm*] -to [get_clocks clk_out1_core_clk_wiz_1*] 
 
-set_false_path -from [get_cells {ACQ/BD/core_wrapper_i/core_i/proc_sys_reset_1/U0/ACTIVE_LOW_PR_OUT_DFF[0].peripheral_aresetn_reg[0]}] -to [all_registers]
-set_false_path -from [get_cells {ACQ/BD/core_wrapper_i/core_i/proc_sys_reset_1/U0/ACTIVE_LOW_BSR_OUT_DFF[0].interconnect_aresetn_reg[0]}] -to [all_registers]
+set_false_path -from [get_cells *reset*_reg* -hierarchical -filter {NAME =~ *proc_sys_reset_1*}]
 
 ### Header False Path
-set_false_path -from [get_pins {ACQ/HEADER/U4/SEQ_STATUS_reg[*]/C}] -to [get_clocks clk_out1_core_clk_wiz_1*]
-set_false_path -from [get_pins {ACQ/HEADER/U1/CONFIG_reg[*][*]/C}] -to [get_clocks clk_out6_core_clk_wiz_1*]
+set_false_path -from [get_pins -hier SEQ_STATUS_reg[*]/C] -to [get_clocks clk_out1_core_clk_wiz_1*]
+set_false_path -from [get_pins -hier CONFIG_reg[*][*]/C] -to [get_clocks clk_out6_core_clk_wiz_1*]
 
-set_false_path -through [get_nets IMAGE_INFO*]
+set_false_path -through [get_nets -of_objects [get_pins -hier */IMAGE_INFO[*][*]]]
 
 # Max Delay / Min Delay
 # Multicycle Paths
@@ -168,5 +168,5 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets R_GIGE_BULK_CLK0]
 #set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/clk_pll_i]
 #set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/mmcm_clkout0]
 #set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_clk_ibuf/sys_clk_ibufg]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_1_mig/u_ddr3_infrastructure/pll_clk3_out]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_1_mig/u_ddr3_infrastructure/clk_pll_i]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets */BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_1_mig/u_ddr3_infrastructure/pll_clk3_out]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets */BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_1_mig/u_ddr3_infrastructure/clk_pll_i]

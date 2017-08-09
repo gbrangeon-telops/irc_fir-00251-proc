@@ -41,6 +41,7 @@
 #define ICU_TRANSITION_DURATION_OFFSET	0x10
 #define ICU_PULSE_CMD_OFFSET	    	   0x14
 #define ICU_POSITION_OFFSET		    	0x18
+#define ICU_BRAKEPOLARITY_OFFSET       0x1C
 
 /**************************** Type Definitions ******************************/
 

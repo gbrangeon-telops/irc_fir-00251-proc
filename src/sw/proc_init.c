@@ -59,6 +59,7 @@
 #include "gating.h"
 #include "DebugTerminal.h"
 #include "DeviceKey.h"
+#include "HwRevision.h"
 #include <string.h>
 
 
@@ -110,6 +111,7 @@ FH_ctrl_t gNDFFaulhaberCtrl;
 releaseInfo_t gReleaseInfo;
 ledCtrl_t gLedCtrl;
 flashDynamicValues_t gFlashDynamicValues;
+brd_rev_ver_t gBrdRevid;
 
 
 /**
@@ -1179,4 +1181,16 @@ IRC_Status_t Proc_Timer_Init()
 IRC_Status_t Proc_DeviceKeyValidation()
 {
    return DeviceKey_Validate(&flashSettings, &gFlashDynamicValues);
+}
+
+/**
+ * HW board revision validation
+ *
+ * @return IRC_SUCCESS if the HW board is correctly identified
+ * @return IRC_FAILURE if the HW board is not identified
+ */
+IRC_Status_t Proc_BoardRevisionValidation()
+{
+
+   return Get_board_hw_revision(XPAR_AXI_GPIO_0_DEVICE_ID,&gBrdRevid);
 }

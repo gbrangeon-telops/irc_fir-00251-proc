@@ -6,6 +6,17 @@ add wave -noreg -logic {/adc_readout_adc_tb_top/SIN_GEN/clk}
 add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/SIN_GEN/sin_out}
 add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/SIN_GEN/sine}
 add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/SIN_GEN/cnt}
+add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/ANALOG_IN}
+add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_CNV}
+add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_SCLK}
+add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_SDI}
+add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_SDO}
+add wave -noreg -literal {/adc_readout_adc_tb_top/AD7980/adc_mode}
+add wave -noreg -literal {/adc_readout_adc_tb_top/AD7980/adc_state}
+add wave -noreg -literal {/adc_readout_adc_tb_top/AD7980/adc_state_d1}
+add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/conv_cnt}
+add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/acq_cnt}
+add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/vin}
 add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/CLK}
 add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/ARESET}
 add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/START_ADC}
@@ -18,17 +29,23 @@ add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/ADC_INT
 add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/ADC_BUSY}
 add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/ADC_ERR}
 add wave -noreg -literal {/adc_readout_adc_tb_top/ADC_INTF/acq_fsm}
-add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/ANALOG_IN}
-add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_CNV}
-add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_SCLK}
-add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_SDI}
-add wave -noreg -logic {/adc_readout_adc_tb_top/AD7980/ADC_SDO}
-add wave -noreg -literal {/adc_readout_adc_tb_top/AD7980/adc_mode}
-add wave -noreg -literal {/adc_readout_adc_tb_top/AD7980/adc_state}
-add wave -noreg -literal {/adc_readout_adc_tb_top/AD7980/adc_state_d1}
-add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/conv_cnt}
-add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/acq_cnt}
-add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/AD7980/vin}
+add wave -noreg -literal {/adc_readout_adc_tb_top/ADC_INTF/acq_fsm}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/start_adc_i}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/data_rdy_i}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/busy_i}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/master_clk_i}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/sclk_i}
+add wave -noreg -hexadecimal -literal {/adc_readout_adc_tb_top/ADC_INTF/div_clk_cnt}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/adc_conv_i}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/acq_window}
+add wave -noreg -hexadecimal -literal {/adc_readout_adc_tb_top/ADC_INTF/data_register}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/sreset}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/adc_din_reg}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/master_clk_i_last}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/master_clk_acq_edge}
+add wave -noreg -hexadecimal -literal {/adc_readout_adc_tb_top/ADC_INTF/master_clk_cnt}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/sclk_iob}
+add wave -noreg -logic {/adc_readout_adc_tb_top/ADC_INTF/adc_conv_iob}
 add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/U2/FPA_Img_Info}
 add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/U2/R}
 add wave -noreg -hexadecimal -literal -unsigned {/adc_readout_adc_tb_top/U2/Q}
@@ -78,7 +95,8 @@ add wave -noreg -vanalogbus "Sin_out_analog"  {/adc_readout_adc_tb_top/SIN_GEN/s
 add wave -noreg -vanalogbus "Running_sum_an"  {/adc_readout_adc_tb_top/U1/running_sum}
 add wave -noreg -vanalogbus "millivold_out_an"  {/adc_readout_adc_tb_top/U1/millivolt_data_out}
 add wave -noreg -vanalogbus "millivolt_out_an_decimal"  {/adc_readout_adc_tb_top/U1/millivolt_data_out}
+cursor "Cursor 6" 5ms  
 cursor "Cursor 1" 2453347967ps  
-cursor "Cursor 2" 62175ns  
+cursor "Cursor 2" 8025ns  
 cursor "Cursor 3" 2469813.39ns  
 transcript on

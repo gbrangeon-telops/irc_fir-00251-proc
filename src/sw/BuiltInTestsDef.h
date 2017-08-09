@@ -66,6 +66,7 @@ enum builtInTestIDEnum {
    BITID_DeviceKeyValidation,
    BITID_SensorInitialization,
    BITID_DeviceSerialPortsInitialization,
+   BITID_BoardRevisionValidation,
 
    // Built-in test count
    BITID_Count

@@ -16,6 +16,7 @@ do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 acom -nowarn DAGGEN_0523 "$ADC_READOUT\adc_readout_mb_intf.vhd" \
  "D:\telops\FIR-00251-Proc\src\Irig\HDL\IRIG_define_v2.vhd" \
  "D:\telops\FIR-00251-Proc\src\Irig\HDL\ad747x_driver.vhd" \
+ "$ADC_READOUT\ad798x_driver.vhd" \
  "$ADC_READOUT\adc_readout.vhd" \
  "$ADC_READOUT\adc_switch.vhd" \
  "$ADC_READOUT\adc_readout_top.bde"

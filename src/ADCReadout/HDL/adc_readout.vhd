@@ -7,7 +7,7 @@
 --!   $Author$
 --!   $Date$
 --!   $Id$
---!   $URL$
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/trunk/src/ADCReadout/HDL/adc_readout_generic.vhd $
 ------------------------------------------------------------------
 
 
@@ -15,6 +15,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.math_real.all;
 use work.tel2000.all;
 use work.img_header_define.all;
 
@@ -100,21 +101,23 @@ architecture rtl of adc_readout is
    type hder_write_state_t is (write_standby, wait_write_ready, wait_write_completed, write_finish );
    signal write_state : hder_write_state_t := write_standby;
    
-   signal running_sum          : signed(16 downto 0);
-   signal running_sum_hold          : signed(15 downto 0);
+   
+   constant running_sum_size    : integer := 21; --1 pour bit signer, 4 pour SR de 16
+   signal running_sum          : signed(running_sum_size-1 downto 0);
+   signal running_sum_hold          : signed(running_sum_size-1 downto 0);
    signal delta               : signed(16 downto 0);
    type data_shift_register is array (16 downto 1) of signed(16 downto 0);
    signal shift_register        : data_shift_register;
    
-   signal adc_calib_q_S12Q4_i       : signed(16 downto 0);
-   signal adc_calib_r_S3Q12_i       : signed(15 downto 0);
+   signal adc_calib_q_S16Q4_i       : signed(20 downto 0);
+   signal adc_calib_r_S3Q16_i       : signed(19 downto 0);
    
    signal millivolt_data_S15Q16 : signed(31 downto 0);
    signal millivolt_data_out : std_logic_vector(15 downto 0);
    
-   signal raw_data_S12Q4 : signed(16 downto 0);
-   signal temp_S12Q4 : signed(16 downto 0);
-   signal product_SS15Q16 : signed(32 downto 0);
+   signal raw_data_S16Q4 : signed(20 downto 0);
+   signal temp_S16Q4 : signed(20 downto 0);
+   signal product_SS19Q20 : signed(40 downto 0);
    
    signal millivolt_data_out_sync : std_logic_vector(15 downto 0);
    signal millivolt_data_out_sync_hold : std_logic_vector(15 downto 0);
@@ -140,11 +143,11 @@ architecture rtl of adc_readout is
    attribute dont_touch : string; 
    attribute dont_touch of start_transaction : signal is "true";
    attribute dont_touch of millivolt_data_out : signal is "true";
-   attribute dont_touch of raw_data_S12Q4 : signal is "true";
-   attribute dont_touch of temp_S12Q4 : signal is "true";
-   attribute dont_touch of product_SS15Q16 : signal is "true";
-   attribute dont_touch of adc_calib_q_S12Q4_i : signal is "true";
-   attribute dont_touch of adc_calib_r_S3Q12_i : signal is "true";
+   attribute dont_touch of raw_data_S16Q4 : signal is "true";
+   attribute dont_touch of temp_S16Q4 : signal is "true";
+   attribute dont_touch of product_SS19Q20 : signal is "true";
+   attribute dont_touch of adc_calib_q_S16Q4_i : signal is "true";
+   attribute dont_touch of adc_calib_r_S3Q16_i : signal is "true";
    attribute dont_touch of running_sum : signal is "true";
    attribute dont_touch of dout_valid : signal is "true";
    attribute dont_touch of adc_data_i : signal is "true";
@@ -161,10 +164,10 @@ begin
    process(CLK)
    begin
       if rising_edge(CLK) then 
-         adc_calib_q_S12Q4_i <= signed('0' & ADC_CALIB_Q(15 downto 0));
-         adc_calib_r_S3Q12_i <= signed(ADC_CALIB_R(15 downto 0));
+         adc_calib_q_S16Q4_i <= signed('0' & ADC_CALIB_Q(19 downto 0));
+         adc_calib_r_S3Q16_i <= signed(ADC_CALIB_R(19 downto 0));
          adc_dval_i <= ADC_DVAL;
-         adc_data_i <= ADC_DATA;
+         adc_data_i <= std_logic_vector(resize(unsigned(ADC_DATA),adc_data_i'length));
       end if;
    end process;
    
@@ -236,7 +239,7 @@ begin
       fe => open,
       sre => start_transaction, 
       sfe => open
-      );
+   );
    
    conversion_SM : process(CLK)
    begin
@@ -245,30 +248,30 @@ begin
             millivolt_data_S15Q16 <= (others => '0');
          else
             if new_sum_data = '1' then
-               running_sum_hold <= running_sum(15 downto 0);
+               running_sum_hold <= running_sum(running_sum_size-1 downto 0);
             end if;
             
             case conv_state is
                when IDLE =>
                   dout_valid <= '0';
                   if new_sum_data = '1' then
-                     raw_data_S12Q4 <= running_sum;--running_sum_hold;
+                     raw_data_S16Q4 <= resize(running_sum,raw_data_S16Q4'length);--running_sum_hold;
                      conv_state <= APPLY_OFFSET;
                   end if;
                
                when APPLY_OFFSET =>
                   
-                  temp_S12Q4 <= raw_data_S12Q4 - adc_calib_q_S12Q4_i;
+                  temp_S16Q4 <= raw_data_S16Q4 - adc_calib_q_S16Q4_i;
                   conv_state <= APPLY_GAIN;
                
                when APPLY_GAIN =>
                   
-                  product_SS15Q16 <= temp_S12Q4 * adc_calib_r_S3Q12_i;
+                  product_SS19Q20 <= temp_S16Q4 * adc_calib_r_S3Q16_i;
                   conv_state <= FINISH;
                
                when FINISH =>
                   
-                  millivolt_data_S15Q16 <= product_SS15Q16(31 downto 0);
+                  millivolt_data_S15Q16 <= product_SS19Q20(39) & product_SS19Q20(34 downto 4);
                   dout_valid <= '1';
                   conv_state <= IDLE;
                
@@ -352,3 +355,4 @@ begin
    end process; 
    
 end rtl;
+

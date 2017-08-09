@@ -68,6 +68,9 @@ enum xadcExtChEnum {
    XEC_1V2MGT_SENSE,       /**<  */
    XEC_12V_SENSE,          /**<  */
    XEC_5V0_SENSE,          /**<  */
+   XEC_ADC_REF_1,          /**<  */
+   XEC_ADC_REF_2,          /**<  */
+   XEC_ADC_REF_3,          /**<  */
    XEC_COUNT               /**< Number of XADC external channels */
 };
 
@@ -75,6 +78,21 @@ enum xadcExtChEnum {
  * XADC external channels data type.
  */
 typedef enum xadcExtChEnum xadcExtCh_t;
+
+/**
+ * DeviceVoltageSelector for calibration enumeration values
+ */
+enum DeviceVoltageCalibrationSelectorEnum {
+   DVCS_Ref0 = 0,
+   DVCS_Ref1 = 1,
+   DVCS_Ref2 = 2
+};
+
+/**
+ * DeviceVoltageSelector enumeration values data type
+ */
+typedef enum DeviceVoltageCalibrationSelectorEnum DeviceVoltageCalibrationSelector_t;
+
 
 
 extern xadcChannel_t intAdcChannels[XIC_COUNT];
