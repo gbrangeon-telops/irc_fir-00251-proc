@@ -46,7 +46,7 @@ package FPA_define is
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s 
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';      -- pas besoin de config particulière au demarrage des Hawks
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
-   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '0';      -- pour le Hawk, on bn'utilise plus la chaine Vprocessing. Donc ne pas le generer pour gain de ressources
+   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le Hawk, on utilise la chaine Vprocessing.
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -145,8 +145,7 @@ package FPA_define is
       ysize_div4_m1                  : unsigned(7 downto 0);
       lovh_mclk_source               : unsigned(15 downto 0);    -- lovh converti en coups d'hotloges mclk_source.Utilisé en mode diag 
    end record;   
-   
-   
+       
    type fpa_intf_cfg_type is
    record     
       -- cette partie provient du contrôleur du temps d'integration

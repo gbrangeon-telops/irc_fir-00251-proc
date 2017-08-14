@@ -50,7 +50,8 @@ end scorpiomwA_mblaze_intf;
 architecture rtl of scorpiomwA_mblaze_intf is  
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26  : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
-   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
+   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;
+   constant C_DIAG_LOVH_MCLK                          : natural := 0;
    
    component sync_reset
       port(
@@ -218,6 +219,15 @@ begin
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
             
+            -- diag 
+            user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
+            user_cfg_i.diag.ystart             <=  user_cfg_i.ystart;               
+            user_cfg_i.diag.xsize              <=  user_cfg_i.xsize;  
+            user_cfg_i.diag.ysize              <=  user_cfg_i.ysize;  
+            user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
+            user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
+            user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
+                        
             -- reception de la config
             if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
                case axi_awaddr(7 downto 0) is             

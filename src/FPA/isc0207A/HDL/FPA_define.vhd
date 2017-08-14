@@ -49,6 +49,7 @@ package FPA_define is
    
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 800;
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le isc0207A_3k, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
    constant DEFINE_XSIZE_MAX                      : integer   := 320;         -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 256;         -- dimension en Y maximale  
    constant DEFINE_GAIN0                          : std_logic := '0';
@@ -134,7 +135,19 @@ package FPA_define is
    
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
-   ------------------------------------------------
+   ------------------------------------------------ 
+    -- window_cfg_type                    
+   type window_cfg_type is
+   record      
+      xstart                         : unsigned(10 downto 0); 
+      ystart                         : unsigned(10 downto 0);
+      xsize                          : unsigned(10 downto 0);
+      ysize                          : unsigned(10 downto 0);
+      xsize_div_tapnum               : unsigned(7 downto 0);
+      ysize_div4_m1                  : unsigned(7 downto 0);
+      lovh_mclk_source               : unsigned(15 downto 0);    -- lovh converti en coups d'hotloges mclk_source.Utilisé en mode diag 
+   end record;   
+   
    type fpa_intf_cfg_type is
    record     
       -- cette partie provient du contrôleur du temps d'integration
@@ -145,6 +158,9 @@ package FPA_define is
       -- cette partie provient du microBlaze
       -- common
       comn                           : fpa_comn_cfg_type;        -- partie commune (utilisée par les modules communs)
+      
+            -- diag window
+      diag                           : window_cfg_type; 
       
       -- window
       xstart                         : unsigned(10 downto 0); 
@@ -216,62 +232,62 @@ package FPA_define is
       -- adc clk_phase
       adc_clk_phase                  : quad_clk_phase_type;     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
       
-      --proxim
-      --proxim_is_flegx                : std_logic;    --'1' si la carte de proximité est un FleGX, '0' si c'est un FleX
+      -- reorder_column
+      reorder_column                 : std_logic;
       
    end record;    
    
-   -- Configuration par defaut
-   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
-   to_unsigned(100, 32),      --int_time                       
-   (others => '0'),           --int_indx                       
-   to_unsigned(102, 32),      --int_signal_high_time           
-   --comn                           
-   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), '0'),
-   to_unsigned(0, 11),        --xstart                         
-   to_unsigned(0, 11),        --ystart                         
-   to_unsigned(320, 11),      --xsize                          
-   to_unsigned(256, 11),      --ysize
-   
-   '0',                       --                         
-   '0',                       --    
-   '0',                       --   
-   '0',                       --  
-   
-   '1',                       --  itr 
-   '0',                       --
-   '0',                       -- skimming
-   '1',                       -- adc_quad2_en
-   
-   to_unsigned(2, 8),         --real_mode_active_pixel_dly   
-   to_unsigned(5121, 17),    --readout_pclk_cnt_max         
-   to_unsigned(20, 8),       --line_period_pclk             
-   to_unsigned(1, 4),         --active_line_start_num        
-   to_unsigned(256, 10),       --active_line_end_num
-   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
-   to_unsigned(1, 9),         --sof_posf_pclk                
-   to_unsigned(5120, 17),    --eof_posf_pclk                
-   to_unsigned(1, 8),         --sol_posl_pclk                
-   to_unsigned(20, 8),       --eol_posl_pclk                
-   to_unsigned(21, 8),       --eol_posl_pclk_p1             
-   to_unsigned(1, 4),         --hgood_samp_sum_num           
-   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
-   to_unsigned(1, 4),         --vgood_samp_sum_num           
-   to_unsigned(2097152, 23),  --vgood_samp_mean_numerator    
-   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
-   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
-   to_unsigned(20, 8),       --xsize_div_tapnum             
-   to_unsigned(127, 7),
-   to_unsigned(51320, 16),
-   to_unsigned(10, 18),
-   to_unsigned(80, 8),
-   to_unsigned(780, 16),
-   to_unsigned(700, 16),
-   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
-   (to_unsigned(1, 6),to_unsigned(1, 6),to_unsigned(1, 6),to_unsigned(1, 6))
-   --'0'
-   );
-   
+   ---- Configuration par defaut
+--   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
+--   to_unsigned(100, 32),      --int_time                       
+--   (others => '0'),           --int_indx                       
+--   to_unsigned(102, 32),      --int_signal_high_time           
+--   --comn                           
+--   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), '0'),
+--   to_unsigned(0, 11),        --xstart                         
+--   to_unsigned(0, 11),        --ystart                         
+--   to_unsigned(320, 11),      --xsize                          
+--   to_unsigned(256, 11),      --ysize
+--   
+--   '0',                       --                         
+--   '0',                       --    
+--   '0',                       --   
+--   '0',                       --  
+--   
+--   '1',                       --  itr 
+--   '0',                       --
+--   '0',                       -- skimming
+--   '1',                       -- adc_quad2_en
+--   
+--   to_unsigned(2, 8),         --real_mode_active_pixel_dly   
+--   to_unsigned(5121, 17),    --readout_pclk_cnt_max         
+--   to_unsigned(20, 8),       --line_period_pclk             
+--   to_unsigned(1, 4),         --active_line_start_num        
+--   to_unsigned(256, 10),       --active_line_end_num
+--   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
+--   to_unsigned(1, 9),         --sof_posf_pclk                
+--   to_unsigned(5120, 17),    --eof_posf_pclk                
+--   to_unsigned(1, 8),         --sol_posl_pclk                
+--   to_unsigned(20, 8),       --eol_posl_pclk                
+--   to_unsigned(21, 8),       --eol_posl_pclk_p1             
+--   to_unsigned(1, 4),         --hgood_samp_sum_num           
+--   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
+--   to_unsigned(1, 4),         --vgood_samp_sum_num           
+--   to_unsigned(2097152, 23),  --vgood_samp_mean_numerator    
+--   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
+--   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_PCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
+--   to_unsigned(20, 8),       --xsize_div_tapnum             
+--   to_unsigned(127, 7),
+--   to_unsigned(51320, 16),
+--   to_unsigned(10, 18),
+--   to_unsigned(80, 8),
+--   to_unsigned(780, 16),
+--   to_unsigned(700, 16),
+--   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
+--   (to_unsigned(1, 6),to_unsigned(1, 6),to_unsigned(1, 6),to_unsigned(1, 6))
+--   --'0'
+--   );
+--   
    
    ----------------------------------------------								
    -- Type hder_param

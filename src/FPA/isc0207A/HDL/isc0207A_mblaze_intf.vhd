@@ -52,6 +52,7 @@ architecture rtl of isc0207A_mblaze_intf is
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26  : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
+   constant C_DIAG_LOVH_MCLK                          : natural := 0;
    
    component sync_reset
       port(
@@ -104,6 +105,8 @@ architecture rtl of isc0207A_mblaze_intf is
    signal tri_min                      : integer;
    signal tri_int_part                 : integer;
    signal exp_time_reg                 : unsigned(30 downto 0);
+   signal valid_cfg_received           : std_logic := '0';
+   signal mb_ctrled_reset_i            : std_logic := '0';
    --   
    --   attribute dont_touch                         : string;
    --   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -120,7 +123,7 @@ begin
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
    COOLER_STAT.COOLER_ON <= '1';
-  
+   
    --FPA_INIT_CFG_RECEIVED <= user_init_cfg_i.comn.fpa_init_cfg_received;
    
    --------------------------------------------------
@@ -144,6 +147,7 @@ begin
          -- configuration     
          if update_cfg = '1' then 
             USER_CFG <= user_cfg_i;
+            valid_cfg_received <= '1'; 
          end if;
          
          -- PROXIM_IS_FLEGX <= user_cfg_i.proxim_is_flegx;
@@ -188,10 +192,13 @@ begin
             ctrled_reset_i <= '1';
             reset_err_i <= '0';
             user_cfg_in_progress <= '1';                         
-            user_cfg_i.adc_quad2_en  <= '1';     -- provient pas du µBlaze         
+            user_cfg_i.adc_quad2_en  <= '1';     -- provient pas du µBlaze
+            user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
+            mb_ctrled_reset_i <= '0';
+            
          else                   
             
-            ctrled_reset_i <= '0';            
+            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
             
             -- temps d'exposition  en mclk
             if int_dval_i = '1' then
@@ -206,6 +213,15 @@ begin
             user_cfg_i.comn.fpa_xtra_trig_ctrl_dly   <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
             user_cfg_i.comn.fpa_xtra_trig_period_min <=  user_cfg_i.comn.fpa_xtra_trig_ctrl_dly  ;      --  pas utilisé en mode MODE_INT_END_TO_TRIG_START avec les détecteurs analogiques. Donc n,importe quelle valeur fera l'affaire
             
+            -- diag 
+            user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
+            user_cfg_i.diag.ystart             <=  user_cfg_i.ystart;               
+            user_cfg_i.diag.xsize              <=  user_cfg_i.xsize;  
+            user_cfg_i.diag.ysize              <=  user_cfg_i.ysize;  
+            user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
+            user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length); 
+            user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
+                        
             -- reste de la config            
             if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
                case axi_awaddr(7 downto 0) is             
@@ -271,7 +287,7 @@ begin
                   when X"D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));
                   when X"D4" =>    user_cfg_i.adc_clk_phase(3)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(3)'length-1 downto 0));
                   when X"D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); user_cfg_in_progress <= '0'; 
-                  --when X"DC" =>    user_cfg_i.proxim_is_flegx                 <= data_i(0);                          
+                     --when X"DC" =>    user_cfg_i.proxim_is_flegx                 <= data_i(0);                          
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -282,7 +298,7 @@ begin
                   when X"EC" =>    reset_err_i                                <= data_i(0); 
                      
                   -- pour un reset complet du module FPA
-                  when X"F0" =>   ctrled_reset_i                              <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                  when X"F0" =>   mb_ctrled_reset_i                           <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                   
                   when others =>
                   

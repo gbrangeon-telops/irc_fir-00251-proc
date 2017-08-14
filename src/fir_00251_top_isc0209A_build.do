@@ -14,4 +14,4 @@ do D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\compil_isc0209A.do
 do D:\telops\FIR-00251-Proc\src\quad_serdes\HDL\build_quad_receiver.do
 
 #TOP_LEVEL
-acom  "$FIR251PROC\src\fir_00251_proc_isc0209A.bde"
+acom  D:\telops\FIR-00251-Proc\src\fir_00251_proc_isc0209A.bde

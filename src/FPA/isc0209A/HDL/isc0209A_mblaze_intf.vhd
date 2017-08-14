@@ -205,7 +205,7 @@ begin
             user_cfg_i.diag.xsize              <=  user_cfg_i.xsize;  
             user_cfg_i.diag.ysize              <=  user_cfg_i.ysize;  
             user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
-            user_cfg_i.diag.ysize_div4_m1      <=  user_cfg_i.xsize_div_tapnum - 1; -- vrai pour les 4 taps uniquement
+            user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
             
             -- pragma translate_off

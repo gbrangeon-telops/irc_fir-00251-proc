@@ -45,6 +45,8 @@ package FPA_define is
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := true;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';     -- pas besoin de config particulière au demarrage du ISC0209
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
+   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;  
+   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le isc0209, on peut utiliser la chaine Vprocessing.
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
