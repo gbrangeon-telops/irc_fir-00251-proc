@@ -42,11 +42,11 @@ begin
    
    MCLK5M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 5_000 generate   
       begin                                             
-      U18M :  isc0209A_5_0_MHz_mmcm
+      U5M :  isc0209A_5_0_MHz_mmcm
       port map (   
          clk_in         => CLK_100M,
-         mclk_source    => MCLK_SOURCE,        --  80 MHz
-         adc_phase_clk  => ADC_PHASE_CLK,      -- 320 MHz      
+         mclk_source    => MCLK_SOURCE,        
+         adc_phase_clk  => ADC_PHASE_CLK,           
          reset          => ARESET,
          locked         => MMCM_LOCKED            
          );      
