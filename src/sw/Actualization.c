@@ -462,7 +462,7 @@ IRC_Status_t Actualization_SM()
          }
 
          gcRegsData.EHDRINumberOfExposures = 1; // disable EHDRI
-         gcRegsData.CalibrationMode = CM_RT; // make sure the RT LUTRQ gets loaded by the calibration manager
+         GC_SetCalibrationMode(CM_RT); // make sure the RT LUTRQ gets loaded by the calibration manager
          gcRegsData.TestImageSelector = TIS_Off;
 
          if (gActDebugOptions.useDynamicTestPattern || TDCStatusTst(WaitingForCoolerMask))
@@ -710,9 +710,9 @@ IRC_Status_t Actualization_SM()
                gcRegsData.ExposureTime = FPA_DEFAULT_EXPOSURE;
 
             if (gActDebugOptions.useDebugData)
-               gcRegsData.CalibrationMode = CM_Raw0;
+               GC_SetCalibrationMode(CM_Raw0);
             else
-               gcRegsData.CalibrationMode = CM_NUC;
+               GC_SetCalibrationMode(CM_NUC);
 
             gcRegsData.SensorWellDepth = refBlockFileHdr.SensorWellDepth;
 
@@ -1651,7 +1651,7 @@ IRC_Status_t BadPixelDetection_SM()
             ACT_INF( "BPD using %d frames for AEC transient", numFramesToSkip);
          }
 
-         gcRegsData.CalibrationMode = CM_NUC;
+         GC_SetCalibrationMode(CM_NUC);
 
          gcRegsData.SensorWellDepth = refBlockFileHdr.SensorWellDepth;
 
@@ -2217,7 +2217,7 @@ static void restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
    GC_SetAcquisitionFrameRate(p_GCRegsBackup->AcquisitionFrameRate);
    GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], p_GCRegsBackup->ExposureTime);
    GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], p_GCRegsBackup->AECTargetWellFilling);
-   GC_RegisterWriteUI32(&gcRegsDef[CalibrationModeIdx], p_GCRegsBackup->CalibrationMode);
+   GC_SetCalibrationMode(p_GCRegsBackup->CalibrationMode);
    GC_RegisterWriteUI32(&gcRegsDef[SensorWellDepthIdx], p_GCRegsBackup->SensorWellDepth);
    GC_RegisterWriteUI32(&gcRegsDef[IntegrationModeIdx], p_GCRegsBackup->IntegrationMode);
    GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], p_GCRegsBackup->ExposureAuto);

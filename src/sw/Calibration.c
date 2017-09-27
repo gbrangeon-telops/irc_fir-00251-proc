@@ -1191,14 +1191,14 @@ void Calibration_SM()
          // Update CalibrationMode register
          if ((gcRegsData.CalibrationMode == CM_Raw0) && (!gGC_ProprietaryFeatureKeyIsValid))
          {
-            gcRegsData.CalibrationMode = CM_RT;
+            GC_SetCalibrationMode(CM_RT);
          }
 
          if (((gcRegsData.CalibrationMode == CM_RT) && (!AvailabilityFlagsTst(RTIsAvailableMask))) ||
                ((gcRegsData.CalibrationMode == CM_IBR) && (!AvailabilityFlagsTst(IBRIsAvailableMask))) ||
                ((gcRegsData.CalibrationMode == CM_IBI) && (!AvailabilityFlagsTst(IBIIsAvailableMask))))
          {
-            gcRegsData.CalibrationMode = CM_NUC;
+            GC_SetCalibrationMode(CM_NUC);
          }
 
          if ((Calibration_ValidateCollectionType() != IRC_SUCCESS) ||
@@ -1387,7 +1387,7 @@ void Calibration_Reset()
    AvailabilityFlagsSet(Raw0IsAvailableMask);
 
    // Update CalibrationMode register
-   gcRegsData.CalibrationMode = CM_Raw0;
+   GC_SetCalibrationMode(CM_Raw0);
 
    // Show Raw0 only in Telops mode
    if (gGC_ProprietaryFeatureKeyIsValid == 1)
