@@ -2568,7 +2568,7 @@ void GC_FWSpeedSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
       }
       else
       {
-         gcRegsData.FWSpeedMax = prevFWSpeedSetpoint;
+         gcRegsData.FWSpeedSetpoint = prevFWSpeedSetpoint;
       }
    }
 }
