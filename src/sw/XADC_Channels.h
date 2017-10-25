@@ -88,6 +88,13 @@ enum DeviceVoltageCalibrationSelectorEnum {
    DVCS_Ref2 = 2
 };
 
+enum thermistorModelEnum {
+   DC95 = 0, // Model Standard DC95F103V //TODO valider le numero de modele pour documentation
+   USX3431 = 1, // Model Calibrer NIST pour IRC1720
+   UNKNOWN = 2
+};
+typedef enum thermistorModelEnum thermistorModel_t;
+
 /**
  * DeviceVoltageSelector enumeration values data type
  */
@@ -97,5 +104,8 @@ typedef enum DeviceVoltageCalibrationSelectorEnum DeviceVoltageCalibrationSelect
 
 extern xadcChannel_t intAdcChannels[XIC_COUNT];
 extern xadcChannel_t extAdcChannels[XEC_COUNT];
+
+void xadcSetphyConverter(xadcChannel_t* chan, thermistorModel_t ThermistorTypeId);
+void xadcCalibrationUpdate(xadcChannel_t *xadcCh);
 
 #endif // XADC_CHANNELS_H

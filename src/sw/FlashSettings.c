@@ -30,6 +30,7 @@
 #include "DeviceKey.h"
 #include "FlashDynamicValues.h"
 #include "adc_readout.h"
+#include "XADC_Channels.h"
 #include <string.h>
 #include <float.h>
 
@@ -348,6 +349,17 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       TDCFlagsSet(ADCReadoutIsImplementedMask);
    }
    ADC_readout_init(p_flashSettings);
+
+
+   // Update Thermistor model type
+   xadcSetphyConverter(&extAdcChannels[XEC_INTERNAL_LENS] , p_flashSettings->InternalLensThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_EXTERNAL_LENS] , p_flashSettings->ExternalLensThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_ICU]           , p_flashSettings->ICUThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_SFW]           , p_flashSettings->SFWThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_COMPRESSOR]    , p_flashSettings->CompressorThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_COLD_FINGER]   , p_flashSettings->ColdfingerThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_SPARE]         , p_flashSettings->SpareThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_EXT_THERMISTOR] ,p_flashSettings->ExternalTempThType);
 
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))

@@ -18,6 +18,7 @@
 #include "calib.h"
 #include "hder_inserter.h"
 #include "utils.h"
+#include "FlashSettings.h"
 
 // The current value for DCS_Cooler and DCS_Supply24V currents was computed using the following tests results:
 // I_load [A] = [0.0  , 0.2  , 0.5  , 0.8  , 1.0  , 1.2  , 1.5  , 1.8  , 2.0  , 2.2  , 2.5  , 2.8  , 3.0 ];
@@ -38,6 +39,13 @@ const float Conv_Fact_MC65[4][4] =
    {2.5654090e-4F, 2.5627725e-4F, 2.5609446e-4F,  2.4057263e-4F}, //TempCoeff_B
    {1.9243889e-6F, 2.0829210e-6F, 1.9621987e-6F, -2.6687093e-6F}, //TempCoeff_C
    {1.0969244e-7F, 7.3003206e-8F, 4.6045930e-8F, -4.0719355e-7F}};//TempCoeff_D
+
+const float Conv_Fact_USX3431[4][2] =
+   // Range 0        Range 1
+{{1.14288192250106e-3F, 1.13929600457259e-3F}, //TempCoeff_A
+ {2.31314273877631e-4F, 2.31949467390149e-4F}, //TempCoeff_B
+ {1.0934242301857e-7F, 1.05992476218967e-7F}, //TempCoeff_C
+ {-7.25110851146496e-11F, -6.67898975192618e-11F}};//TempCoeff_D
 
 
 void XADC_ThPhyConv(xadcChannel_t *xadcCh);
@@ -87,7 +95,7 @@ xadcChannel_t extAdcChannels[XEC_COUNT] =
    {XEC_12V_SENSE,         0,       0x18,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             144.7f / 4.7f, XADC_OGPhyConv,   &DeviceVoltageAry[DVS_Supply12V],                     NULL},
    {XEC_5V0_SENSE,         0,       0x19,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             5.7f,          XADC_OGPhyConv,   &DeviceVoltageAry[DVS_Supply5V],                      NULL},
    {XEC_ADC_REF_1,         0,       0x1A,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref0],              NULL},
-   {XEC_ADC_REF_2,         0,       0x1B,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref1],              NULL},
+   {XEC_ADC_REF_2,         0,       0x1B,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref1],              xadcCalibrationUpdate},
    {XEC_ADC_REF_3,         0,       0x1C,    XCP_UNIPOLAR,  XCU_VOLT,      {0},  0.0f,       1.0f / 65536.0f,  0.0F,    0.0f,             1.0f,          XADC_OGPhyConv,   &DeviceVoltageCalibrationAry[DVCS_Ref2],              NULL}
 };
 
@@ -132,8 +140,7 @@ void XADC_ThPhyConv(xadcChannel_t *xadcCh)
       }
 
       // a + b(Ln Rt/R25)
-      partial_result =   Conv_Fact_MC65[TempCoeff_A][range] +
-                        (Conv_Fact_MC65[TempCoeff_B][range]*logf(Rth));
+      partial_result =   Conv_Fact_MC65[TempCoeff_A][range] + (Conv_Fact_MC65[TempCoeff_B][range]*logf(Rth));
 
       // + c(Ln(Rt/R25))?
       partial_result += (Conv_Fact_MC65[TempCoeff_C][range]*powf(logf(Rth), 2));
@@ -144,6 +151,50 @@ void XADC_ThPhyConv(xadcChannel_t *xadcCh)
       *(xadcCh->p_physical) = K_TO_C(1.0F/partial_result);
    }
 }
+
+void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh)
+{
+   float Vth = xadcCh->voltage;
+   float Rth_100K = 0;
+   float Rth;
+   int range;
+   float partial_result;
+
+   if (xadcCh->p_physical != NULL)
+   {
+      Rth_100K = (25000.0F * Vth) / ((DeviceVoltageAry[DVS_ProcessingFPGA_VREFP] != 0 ? (DeviceVoltageAry[DVS_ProcessingFPGA_VREFP] - DeviceVoltageAry[DVS_ProcessingFPGA_VREFN]) : 1.25F) - Vth);
+
+      Rth = (Rth_100K * 100000.0F) / (100000.0F - Rth_100K);
+
+      // Choice of range
+      if(Rth <= 1751.73F)       // Select range
+         range = 0;
+      else if((Rth > 1751.73F) && (Rth <= 32650.00F))
+         range = 1;
+      else if(Rth > 32650.00F)
+         range = 0;
+      else
+      {
+         //TODO DEBUG XADC_ERR
+         XADC_ERR("ReadTemperature: Rth = %d mohms \n", (int32_t)(Rth * 1000.0F));
+         Rth = 687000.0F;
+         range = 0;
+      }
+
+      // a + b(Ln Rt)
+      partial_result =   Conv_Fact_USX3431[TempCoeff_A][range] +
+                        (Conv_Fact_USX3431[TempCoeff_B][range]*logf(Rth));
+
+      // + c(Ln(Rt))^3
+      partial_result += (Conv_Fact_USX3431[TempCoeff_C][range]*powf(logf(Rth), 3));
+
+      // + d(Ln(Rt))^5?
+      partial_result += (Conv_Fact_USX3431[TempCoeff_D][range]*powf(logf(Rth), 5));
+
+      *(xadcCh->p_physical) = K_TO_C(1.0F/partial_result);
+   }
+}
+
 
 void XADC_ThUpdated(xadcChannel_t *xadcCh)
 {
@@ -187,5 +238,65 @@ void XADC_ThUpdated(xadcChannel_t *xadcCh)
             // Nothing to do for other external XADC channels
             return;
       }
+   }
+}
+
+
+void xadcSetphyConverter(xadcChannel_t * xadcCh, thermistorModel_t ThermistorTypeId)
+{
+   switch( ThermistorTypeId)
+   {
+      case DC95:
+         xadcCh->phyConverter = XADC_ThPhyConv;
+         break;
+      case USX3431:
+         xadcCh->phyConverter = XADC_ThPhyConv_USX3431;
+         break;
+      case UNKNOWN:
+      default:
+         break;
+   }
+}
+
+void xadcCalibrationUpdate(xadcChannel_t *xadcCh)
+{
+   extern flashSettings_t flashSettings;
+   float gain = 0.0F;
+   float offset = 0.0F;
+   uint8_t i = 0;
+   static bool firstpass = true;
+
+
+   if (xadcCh->isValid)
+   {
+      //TODO ADD the code for the xadc calibration
+      //Check if the Flash setting reference value are available( not equal 0)
+      // REf 1 should be 0.9765625Volt and Ref 2 = 0.099940 Volts
+      if(flashSettings.XADCRefVoltage1 != 0.0f && flashSettings.XADCRefVoltage2 != 0.0f){
+         //Process  the xadx gain offset calibration
+
+         // m = (Ref1-Ref2) / (x1-x2)
+         // b = Ref1 - (m * x1)
+         gain = (flashSettings.XADCRefVoltage1 - flashSettings.XADCRefVoltage2 ) / (extAdcChannels[XEC_ADC_REF_1].raw.unipolar - extAdcChannels[XEC_ADC_REF_2].raw.unipolar);
+         offset = flashSettings.XADCRefVoltage1 - (gain*extAdcChannels[XEC_ADC_REF_1].raw.unipolar);
+
+         //TODO TEMP Display new Gain offset
+         if(firstpass)
+         {
+            firstpass = false;
+            XADC_INF("Old Value   m = " _PCF(8) " Volt/count, b = "_PCF(8) " Volt", _FFMT(extAdcChannels[0].voltGain,8) , _FFMT(extAdcChannels[0].voltOffset,8));
+            XADC_INF("New Value   m = " _PCF(8) " Volt/count, b = "_PCF(8) " Volt", _FFMT(gain,8) , _FFMT(offset,8) );
+         }
+
+         //Applied to all the external channel except the reference (XEC_ADC_REF_1 , 2 , 3)
+         for (i=0; i < (XEC_COUNT - 3); i++){
+            extAdcChannels[i].voltGain = gain;
+            extAdcChannels[i].voltOffset = offset;
+         }
+
+
+
+      }
+
    }
 }

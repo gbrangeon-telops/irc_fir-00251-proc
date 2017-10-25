@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.1.1
+ * Generated from the image correction calibration file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -131,6 +131,17 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* AECPlusExposureTimeMin = */ 0.000000F,
    /* AECSaturatedCorrectionFactor = */ 0.2F,
    /* FWFramePeriodMinMargin = */ 0.05F,
+   /* InternalLensThType = */ 0,
+   /* ExternalLensThType = */ 0,
+   /* ICUThType = */ 0,
+   /* SFWThType = */ 0,
+   /* CompressorThType = */ 0,
+   /* ColdfingerThType = */ 0,
+   /* SpareThType = */ 0,
+   /* ExternalTempThType = */ 0,
+   /* XADCRefVoltage1 = */ 0.000000F,
+   /* XADCRefVoltage2 = */ 0.000000F,
+   /* XADCRefVoltage3 = */ 0.000000F,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -299,7 +310,18 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->AECPlusExposureTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->AECSaturatedCorrectionFactor, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->FWFramePeriodMinMargin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 180; // Skip FREE space
+      memcpy(&hdr->InternalLensThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->ExternalLensThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->ICUThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->SFWThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->CompressorThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->ColdfingerThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->SpareThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->ExternalTempThType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->XADCRefVoltage1, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->XADCRefVoltage2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->XADCRefVoltage3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      numBytes += 160; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -501,7 +523,18 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->AECPlusExposureTimeMin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->AECSaturatedCorrectionFactor, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->FWFramePeriodMinMargin, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 180); numBytes += 180; // FREE space
+      memcpy(&buffer[numBytes], &hdr->InternalLensThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->ExternalLensThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->ICUThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->SFWThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->CompressorThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->ColdfingerThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->SpareThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->ExternalTempThType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->XADCRefVoltage1, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->XADCRefVoltage2, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->XADCRefVoltage3, sizeof(float)); numBytes += sizeof(float);
+      memset(&buffer[numBytes], 0, 160); numBytes += 160; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -652,6 +685,17 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("AECPlusExposureTimeMin: " _PCF(3) "\n", _FFMT(hdr->AECPlusExposureTimeMin, 3));
    FPGA_PRINTF("AECSaturatedCorrectionFactor: " _PCF(3) "\n", _FFMT(hdr->AECSaturatedCorrectionFactor, 3));
    FPGA_PRINTF("FWFramePeriodMinMargin: " _PCF(3) "\n", _FFMT(hdr->FWFramePeriodMinMargin, 3));
+   FPGA_PRINTF("InternalLensThType: %d\n", hdr->InternalLensThType);
+   FPGA_PRINTF("ExternalLensThType: %d\n", hdr->ExternalLensThType);
+   FPGA_PRINTF("ICUThType: %d\n", hdr->ICUThType);
+   FPGA_PRINTF("SFWThType: %d\n", hdr->SFWThType);
+   FPGA_PRINTF("CompressorThType: %d\n", hdr->CompressorThType);
+   FPGA_PRINTF("ColdfingerThType: %d\n", hdr->ColdfingerThType);
+   FPGA_PRINTF("SpareThType: %d\n", hdr->SpareThType);
+   FPGA_PRINTF("ExternalTempThType: %d\n", hdr->ExternalTempThType);
+   FPGA_PRINTF("XADCRefVoltage1: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage1, 3));
+   FPGA_PRINTF("XADCRefVoltage2: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage2, 3));
+   FPGA_PRINTF("XADCRefVoltage3: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage3, 3));
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

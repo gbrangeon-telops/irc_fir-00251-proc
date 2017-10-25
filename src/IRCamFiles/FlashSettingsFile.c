@@ -380,6 +380,21 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 1;
 
                case 1:
+                  // 2.1.x -> 2.2.x
+                  hdr->InternalLensThType = 0;
+                  hdr->ExternalLensThType = 0;
+                  hdr->ICUThType = 0;
+                  hdr->SFWThType = 0;
+                  hdr->CompressorThType = 0;
+                  hdr->ColdfingerThType = 0;
+                  hdr->SpareThType = 0;
+                  hdr->ExternalTempThType = 0;
+                  hdr->XADCRefVoltage1 = 0.0F;
+                  hdr->XADCRefVoltage2 = 0.0F;
+                  hdr->XADCRefVoltage3 = 0.0F;
+                  hdr->FileStructureMinorVersion = 2;
+
+               case 2:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;
