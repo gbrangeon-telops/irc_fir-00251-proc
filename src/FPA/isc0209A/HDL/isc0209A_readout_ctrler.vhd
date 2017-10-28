@@ -32,12 +32,16 @@ entity isc0209A_readout_ctrler is
       
       FPA_LSYNC         : out std_logic;         
       READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic
+      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0) 
       );  
 end isc0209A_readout_ctrler;
 
 
 architecture rtl of isc0209A_readout_ctrler is
+   
+   constant C_FLAG_PIPE_LEN : integer := DEFINE_ADC_QUAD_CLK_FACTOR;
+   constant C_PIPE_POS      : integer := 3;
+   
    type sync_flag_fsm_type is (idle, sync_flag_on_st, sync_flag_off_st, wait_img_begin_st, wait_img_end_st);
    type readout_fsm_type is (idle, readout_st, wait_mclk_fe_st, wait_readout_end_st);
    type line_cnt_pipe_type is array (0 to 3) of unsigned(FPA_INTF_CFG.WINDOW_LSYNC_NUM'LENGTH-1 downto 0);
@@ -60,7 +64,7 @@ architecture rtl of isc0209A_readout_ctrler is
    signal lval_pclk_cnt        : unsigned(FPA_INTF_CFG.LINE_PERIOD_PCLK'LENGTH-1 downto 0);
    signal quad_clk_copy_i      : std_logic;
    signal quad_clk_copy_last   : std_logic;
-   signal adc_sync_flag_i      : std_logic;
+   signal adc_sync_flag_i      : std_logic_vector(15 downto 0);
    signal eol_pipe             : std_logic_vector(3 downto 0);
    signal sol_pipe             : std_logic_vector(3 downto 0);
    signal eof_pipe             : std_logic_vector(3 downto 0);
@@ -78,16 +82,17 @@ architecture rtl of isc0209A_readout_ctrler is
    signal line_cnt             : unsigned(FPA_INTF_CFG.ACTIVE_LINE_END_NUM'LENGTH-1 downto 0);
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
-   signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
-   --signal lsync_last           : std_logic;
+   signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
+   signal fpa_int_i            : std_logic;
    
-   attribute dont_touch : string;
-   attribute dont_touch of sof_pipe         : signal is "true"; 
-   attribute dont_touch of eof_pipe         : signal is "true";
-   attribute dont_touch of sol_pipe         : signal is "true"; 
-   attribute dont_touch of eol_pipe         : signal is "true";
-   attribute dont_touch of fval_pipe        : signal is "true"; 
-   attribute dont_touch of lval_pipe        : signal is "true";
+   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
+   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
+   signal elec_ofs_end_i       : std_logic;
+   signal elec_ofs_start_i     : std_logic;
+   signal readout_info_i       : readout_info_type;
+   signal eof_pulse            : std_logic;
+   signal eof_pulse_last       : std_logic;
+   signal elec_ofs_fval_i      : std_logic;
    
 begin
    
@@ -95,17 +100,14 @@ begin
    -- Outputs map
    --------------------------------------------------  
    FPA_LSYNC <= lsync_pipe(6);              -- pipe(6) choisi apres simulation pour avoir 1 clk de delai avec FPA_MCLK (meme delai  que le signal d'integration). Ainsi le dodule io_interface aura juste à decaler l'horloge FPA_MCLK de 2 clk et tout sera ok
-   ADC_SYNC_FLAG <= adc_sync_flag_i;        -- pour le hawk adc_sync_flag vaut sync_flag 
    
-   READOUT_INFO.SOF  <= sof_pipe(3);
-   READOUT_INFO.EOF  <= eof_pipe(3);
-   READOUT_INFO.SOL  <= sol_pipe(3);
-   READOUT_INFO.EOL  <= eol_pipe(3);
-   READOUT_INFO.FVAL <= fval_pipe(3);
-   READOUT_INFO.LVAL <= lval_pipe(3);
-   READOUT_INFO.DVAL <= dval_pipe(3);
-   READOUT_INFO.READ_END <= rd_end_pipe(3);
-   READOUT_INFO.SAMP_PULSE <= samp_pulse_pipe(3);
+   ADC_SYNC_FLAG(15 downto 4)  <= (others => '0');    -- non utilisé
+   ADC_SYNC_FLAG(3)  <= readout_info_i.naoi.stop;
+   ADC_SYNC_FLAG(2)  <= readout_info_i.naoi.start;
+   ADC_SYNC_FLAG(1)  <= sof_pipe(C_PIPE_POS);                  -- frame_flag(doit durer 1 CLK ADC)
+   ADC_SYNC_FLAG(0)  <= sol_pipe(C_PIPE_POS);                  -- line_flag (doit durer 1 CLK ADC)
+   
+   READOUT_INFO  <= readout_info_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -123,53 +125,68 @@ begin
    U2: process(CLK)
    begin
       if rising_edge(CLK) then 
-         if sreset = '1' then            
-            sync_flag_fsm <= idle;
-            adc_sync_flag_i <= '0';
-            --fpa_mclk_last <= '0';
-            --fpa_int_last <= '0';            
-            --fpa_pclk_last <= '0';
-            --pclk_rise <= '0'; 
-            --pclk_fall <= '0';
+         if sreset = '1' then 
+            fpa_int_i <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;
+            elec_ofs_start_pipe <= (others => '0');
+            elec_ofs_start_i <= '0';
+            elec_ofs_fval_i <= '0';
+            elec_ofs_end_i <= '0';
+            readout_info_i.aoi.dval <= '0';
+            readout_info_i.naoi.dval <= '0';
+            
+            eof_pulse <= '0';
+            eof_pulse_last <= '0';
             
          else           
             
-            fpa_int_last <= FPA_INT;            
+            fpa_int_i <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;            
             fpa_pclk_last <= FPA_PCLK;
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
             
             fpa_mclk_last <= FPA_MCLK;             
             
-            -- contrôleur
-            case sync_flag_fsm is           
-               
-               when idle =>   
-                  adc_sync_flag_i <= '0';
-                  if fpa_int_last = '1' and FPA_INT = '0' then -- fin d'une integration
-                     sync_flag_fsm <= sync_flag_on_st;
-                  end if;                        
-               
-               when sync_flag_on_st =>
-                  if pclk_fall = '1' then 
-                     adc_sync_flag_i <= '1';
-                     sync_flag_fsm <= sync_flag_off_st;
-                  end if;
-               
-               when sync_flag_off_st =>
-                  if pclk_fall = '1' then 
-                     adc_sync_flag_i <= '0';
-                     sync_flag_fsm <= wait_img_end_st;
-                  end if;
-               
-               when wait_img_end_st =>
-                  if rd_end_pipe(0) = '1' then
-                     sync_flag_fsm <= idle;
-                  end if;
-               
-               when others =>
-               
-            end case;
+            -- elec_ofs_start_i dure 1 PCLK
+            eof_pulse <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);
+            eof_pulse_last <= eof_pulse;
+            elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
+            if unsigned(elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+               elec_ofs_start_i <= '1';
+               elec_ofs_fval_i  <= '1'; 
+            else
+               elec_ofs_start_i <= '0';
+            end if;
+            
+            -- elec_ofs_end_i dure 1 PCLK
+            elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
+            if unsigned(elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+               elec_ofs_end_i <= '1';
+            else
+               elec_ofs_end_i  <= '0';
+               if elec_ofs_end_i = '1' then 
+                  elec_ofs_fval_i <= '0';
+               end if;
+            end if;
+            
+            -- READOUT_INFO
+            -- aoi
+            readout_info_i.aoi.sof           <= sof_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.eof           <= eof_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.sol           <= sol_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.eol           <= eol_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.fval          <= fval_pipe(C_PIPE_POS);
+            readout_info_i.aoi.lval          <= lval_pipe(C_PIPE_POS);
+            readout_info_i.aoi.dval          <= dval_pipe(C_PIPE_POS);
+            readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
+            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
+            
+            -- naoi
+            readout_info_i.naoi.start        <= elec_ofs_start_i;
+            readout_info_i.naoi.stop         <= elec_ofs_end_i;
+            readout_info_i.naoi.dval         <= elec_ofs_fval_i;
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i; 
             
          end if;
       end if;
@@ -209,7 +226,7 @@ begin
                   readout_in_progress <= '0';
                   lsync_cnt <=  (others => '0');
                   lsync_pipe(0) <= '0';
-                  if fpa_int_last = '1' and FPA_INT = '0' then -- fin d'une integration
+                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                

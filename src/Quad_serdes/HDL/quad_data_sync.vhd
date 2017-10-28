@@ -14,7 +14,15 @@
 --
 -------------------------------------------------------------------------------
 --
--- Description : 
+-- Description :
+
+-- data_o (71:58)   :  misc_flags
+-- data_o (57)      : frame_flag_sync
+-- data_o (56)      : line_flag_sync
+-- data_o (55:0)    : échantillons des ADCs
+
+
+
 --
 -------------------------------------------------------------------------------
 
@@ -33,9 +41,8 @@ entity quad_data_sync is
       D2             : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
       D3             : in std_logic_vector(13 downto 0); -- parallel data from the iserdes (CLKD domain)
       CLK_DOUT       : in std_logic;
-      FRAME_FLAG     : in std_logic; -- CLK_DOUT domain
-      LINE_FLAG      : in std_logic; -- CLK_DOUT domain
-      Q              : out std_logic_vector(57 downto 0); -- CLK_DOUT domain
+      SYNC_FLAG      : in std_logic_vector(15 downto 0); -- signaux de synchro à usage divers. (Peut dépoendre de chaque détecteur)
+      Q              : out std_logic_vector(71 downto 0);-- CLK_DOUT domain
       DVAL           : out std_logic -- CLK_DOUT domain
       );
 end quad_data_sync;
@@ -48,17 +55,25 @@ architecture rtl of quad_data_sync is
          RESET : in std_logic;
          CLK : in std_logic
          );
+   end component; 
+   
+   component double_sync_vector is       -- ENO : 10 oct 2017: necessaire pour ce module
+      port(
+         D : in STD_LOGIC_vector;
+         Q : out STD_LOGIC_vector;
+         CLK : in STD_LOGIC
+         );
    end component;
    
-   component afifo_w58_d256 is
+   component afifo_w72_d256 is
       port (
          RST            : in std_logic;
          WR_CLK         : in std_logic;
          RD_CLK         : in std_logic;
-         DIN            : in std_logic_vector (57 downto 0);
+         DIN            : in std_logic_vector (71 downto 0);
          WR_EN          : in std_logic;
          RD_EN          : in std_logic;
-         DOUT           : out std_logic_vector (57 downto 0);
+         DOUT           : out std_logic_vector (71 downto 0);
          FULL           : out std_logic;         
          ALMOST_FULL    : out std_logic;
          OVERFLOW       : out std_logic;
@@ -68,35 +83,26 @@ architecture rtl of quad_data_sync is
    end component;
    
    signal sreset           : std_ulogic;
-   signal frame_flag_sync  : std_ulogic;
-   signal line_flag_sync   : std_ulogic;
    signal dval_i, dval_out : std_ulogic;
    signal data_i, data_o   : std_logic_vector(Q'length-1 downto 0) := (others => '0');
+   signal sync_flag_i      : std_logic_vector(SYNC_FLAG'length-1 downto 0);
    
    signal full_i, empty_i : std_ulogic;
    
-   attribute keep : string;
-   attribute keep of dval_out : signal is "true";
-   attribute keep of data_o : signal is "true";
+   --   attribute keep : string;
+   --   attribute keep of dval_out : signal is "true";
+   --   attribute keep of data_o : signal is "true";
    
 begin
    
    Q <= std_logic_vector(data_o);
    DVAL <= dval_out;
    
-   frame_sync_en : double_sync
+   sync_en : double_sync_vector  
    port map(
-      D => FRAME_FLAG,
-      Q => frame_flag_sync,
-      RESET => '0',
-      CLK => CLKD);
-   
-   line_sync_en : double_sync
-   port map(
-      D => LINE_FLAG,
-      Q => line_flag_sync,
-      RESET => '0',
-      CLK => CLKD);
+      D => SYNC_FLAG,
+      Q => sync_flag_i,
+      CLK => CLKD);   
    
    merge_proc : process(CLKD)
    begin
@@ -106,11 +112,11 @@ begin
          else
             dval_i <= '0';
          end if;
-         data_i <= frame_flag_sync & line_flag_sync & D3 & D2 & D1 & D0;
+         data_i <= sync_flag_i & D3 & D2 & D1 & D0;
       end if;
    end process;
    
-   fifo : afifo_w58_d256
+   fifo : afifo_w72_d256
    port map(
       rst => ARESET,
       wr_clk => CLKD,
@@ -124,4 +130,5 @@ begin
       overflow => open,
       empty => empty_i,
       valid => dval_out);
+   
 end rtl;

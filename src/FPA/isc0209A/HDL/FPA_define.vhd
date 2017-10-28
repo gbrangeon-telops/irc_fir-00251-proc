@@ -42,16 +42,17 @@ package FPA_define is
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 5000;     -- ENO 05 fev 2016 : int_time offset de 5000 nsec. Un bon compromis entre 4.9usec et 5.1usec et aussi en tenant compte des mesures de PTR
    constant DEFINE_FPA_PROG_INT_TIME              : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
-   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := true;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
-   constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';     -- pas besoin de config particulière au demarrage du ISC0209
-   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
-   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;  
+   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
+   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
+   constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';     -- pas besoin de config particulière au demarrage du ISC0209 
    constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le isc0209, on peut utiliser la chaine Vprocessing.
+   constant DEFINE_GENERATE_ELEC_OFFSET_CORR_CHAIN: std_logic := '1';
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 5_000;       -- pour le 0209, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le 0209, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
    constant DEFINE_XSIZE_MAX                      : integer   := 320;         -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 256;         -- dimension en Y maximale  
    --constant DEFINE_GAIN0                          : std_logic := '0';
@@ -219,6 +220,18 @@ package FPA_define is
       
       -- reorder_column
       reorder_column                 : std_logic;
+      
+      -- electrical offset param  
+      elec_ofs_offset_null_forced         : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
+      elec_ofs_pix_faked_value_forced     : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
+      elec_ofs_pix_faked_value            : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      elec_ofs_offset_minus_pix_value     : std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
+      elec_ofs_add_const                  : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
+      
+      elec_ofs_start_dly                  : unsigned(7 downto 0);   -- elec_ofs_pix_fakedvalue_forced
+      elec_ofs_samp_num_per_ch            : unsigned(6 downto 0);
+      elec_ofs_samp_mean_numerator        : unsigned(22 downto 0);
+
    end record;    
    
    ---- Configuration par defaut
@@ -276,21 +289,41 @@ package FPA_define is
       rdy                 : std_logic;                     -- pulse signifiant que les parametres du header sont prêts
    end record;
    
-   ----------------------------------------------								
-   -- Type readout_info
+  ----------------------------------------------								
+   -- Type readout_info_type
    ----------------------------------------------
+   -- aoi
+   type aoi_readout_info_type is
+   record
+      sof            : std_logic;        
+      eof            : std_logic;
+      sol            : std_logic;
+      eol            : std_logic;
+      fval           : std_logic;                     
+      lval           : std_logic;
+      dval           : std_logic;
+      read_end       : std_logic;                     -- pulse  en dehors de fval mais qui signifie que le readout est terminé
+      samp_pulse     : std_logic;                     -- sampling pluse de frequence valant celle des adc
+      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+   end record;
+   
+   -- non_aoi
+   type non_aoi_readout_info_type is
+   record
+      start          : std_logic;                     -- pulse  en dehors de fval mais qui signifie que le readout est terminé
+      stop           : std_logic;                     -- divers flags synchronisables avec readout_info. Attention: après read_end, les misc flags ne servent à rien. Si besoin d'utilser des flags après rd_end alors utiliser les ADC_FLAG  
+      dval           : std_logic;  
+      samp_pulse     : std_logic;                     -- sampling pulse de frequence valant celle des adc
+      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+   end record;
+   
+   -- readout_type
    type readout_info_type is
    record
-      sof        : std_logic;        
-      eof        : std_logic;
-      sol        : std_logic;
-      eol        : std_logic;
-      fval       : std_logic;                     
-      lval       : std_logic;
-      dval       : std_logic;
-      read_end   : std_logic;  -- pulse  en dehors de fval mais qui signifie que le readout est terminé
-      samp_pulse : std_logic;  -- sampling pluse de frequence valant celle des adc
+      aoi            : aoi_readout_info_type;        
+      naoi           : non_aoi_readout_info_type;
    end record;
+   
    
    ----------------------------------------------
    -- quues fontions                                    
