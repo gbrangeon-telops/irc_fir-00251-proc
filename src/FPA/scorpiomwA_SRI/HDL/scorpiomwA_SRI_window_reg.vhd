@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : scorpiomwA_window_reg
+--!   @file : scorpiomwA_SRI_window_reg
 --!   @brief
 --!   @details
 --!
@@ -17,7 +17,7 @@ use IEEE.numeric_std.all;
 use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 
-entity scorpiomwA_window_reg is
+entity scorpiomwA_SRI_window_reg is
    port(
       ARESET         : in std_logic;
       CLK            : in std_logic;
@@ -45,9 +45,9 @@ entity scorpiomwA_window_reg is
       
       
       );
-end scorpiomwA_window_reg;
+end scorpiomwA_SRI_window_reg;
 
-architecture rtl of scorpiomwA_window_reg is
+architecture rtl of scorpiomwA_SRI_window_reg is
    
    component sync_reset
       port (

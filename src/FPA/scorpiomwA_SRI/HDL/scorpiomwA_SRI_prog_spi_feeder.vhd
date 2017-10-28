@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : scorpiomwA_prog_spi_feeder
+--!   @file : scorpiomwA_SRI_prog_spi_feeder
 --!   @brief
 --!   @details
 --!
@@ -18,7 +18,7 @@ use work.fpa_common_pkg.all;
 use work.fpa_define.all;
 use work.tel2000.all;
 
-entity scorpiomwA_prog_spi_feeder is
+entity scorpiomwA_SRI_prog_spi_feeder is
    port(		 
       ARESET      : in std_logic;
       CLK         : in std_logic;
@@ -33,9 +33,9 @@ entity scorpiomwA_prog_spi_feeder is
       TX_DREM     : out std_logic_vector(3 downto 0); -- DREM = 8, 7, 6, ....1, pour signifier le nnombre de Bit valides dans le EOF  
       FRM_DONE    : in std_logic
       );
-end scorpiomwA_prog_spi_feeder;
+end scorpiomwA_SRI_prog_spi_feeder;
 
-architecture rtl of scorpiomwA_prog_spi_feeder is
+architecture rtl of scorpiomwA_SRI_prog_spi_feeder is
    
    constant C_SPI_DATA_BYTE_NUM    : natural := 5;
    constant C_SPI_DATA_BYTE_NUM_M1 : natural := C_SPI_DATA_BYTE_NUM - 1;

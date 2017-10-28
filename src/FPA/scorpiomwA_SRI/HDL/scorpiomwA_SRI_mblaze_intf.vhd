@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : scorpiomwA_mblaze_intf
+--!   @file : scorpiomwA_SRI_mblaze_intf
 --!   @brief
 --!   @details
 --!
@@ -20,7 +20,7 @@ use work.fpa_common_pkg.all;
 use work.fleg_brd_define.all;
 
 
-entity scorpiomwA_mblaze_intf is
+entity scorpiomwA_SRI_mblaze_intf is
    port(
       
       ARESET                : in std_logic;
@@ -45,12 +45,13 @@ entity scorpiomwA_mblaze_intf is
       FPA_SOFTW_STAT        : out fpa_firmw_stat_type
       
       );
-end scorpiomwA_mblaze_intf; 
+end scorpiomwA_SRI_mblaze_intf; 
 
-architecture rtl of scorpiomwA_mblaze_intf is  
+architecture rtl of scorpiomwA_SRI_mblaze_intf is  
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26  : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
-   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
+   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;
+   constant C_DIAG_LOVH_MCLK                          : natural := 0;
    
    component sync_reset
       port(
@@ -218,6 +219,15 @@ begin
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
             
+            -- diag 
+            user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
+            user_cfg_i.diag.ystart             <=  user_cfg_i.ystart;               
+            user_cfg_i.diag.xsize              <=  user_cfg_i.xsize;  
+            user_cfg_i.diag.ysize              <=  user_cfg_i.ysize;  
+            user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
+            user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
+            user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
+                        
             -- reception de la config
             if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
                case axi_awaddr(7 downto 0) is             
@@ -279,8 +289,10 @@ begin
                   when X"CC" =>    user_cfg_i.adc_clk_phase(1)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(1)'length-1 downto 0));
                   when X"D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));                 
                   when X"D4" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
-                  when X"D8" =>    user_cfg_i.reorder_column                  <= data_i(0);  user_cfg_in_progress <= '0';
-                     
+                  when X"D8" =>    user_cfg_i.reorder_column                  <= data_i(0);  
+                  when X"DC" =>    user_cfg_i.common_noise_chn_num            <= unsigned(data_i(user_cfg_i.common_noise_chn_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  
+                  
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"E4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  

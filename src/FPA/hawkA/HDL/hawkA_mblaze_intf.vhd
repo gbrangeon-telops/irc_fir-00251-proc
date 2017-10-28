@@ -135,7 +135,7 @@ begin
       if rising_edge(MB_CLK) then  
          --permit_inttime_change <= FPA_DRIVER_STAT(7);
          update_cfg <= user_cfg_rdy; --permit_inttime_change and  user_cfg_rdy;
-                     
+         
          if update_cfg = '1' then -- la config au complet 
             USER_CFG <= user_cfg_i;  
             valid_cfg_received <= '1';         
@@ -181,6 +181,9 @@ begin
             user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
             user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
             mb_ctrled_reset_i <= '0';
+            -- pragma translate_off
+            user_cfg_i.ysize <= to_unsigned(DEFINE_YSIZE_MAX, user_cfg_i.ysize'length);
+            -- pragma translate_on
             
          else                   
             
@@ -192,7 +195,7 @@ begin
                user_cfg_i.int_indx <= int_indx_i;
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
-                          
+            
             -- diag 
             user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
             user_cfg_i.diag.ystart             <=  user_cfg_i.ystart;               
@@ -201,7 +204,7 @@ begin
             user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
             user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
-                          
+            
             -- reste de la config
             if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
                case axi_awaddr(7 downto 0) is             

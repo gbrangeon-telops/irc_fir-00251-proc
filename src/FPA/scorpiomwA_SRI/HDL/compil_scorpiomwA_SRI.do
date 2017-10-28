@@ -8,8 +8,8 @@ acom -nowarn DAGGEN_0523 -incr \
  d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd \
- D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\FPA_define.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\proxy_define.vhd \
+ D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\FPA_define.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\proxy_define.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_define.vhd \
  d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
@@ -60,18 +60,18 @@ acom -nowarn DAGGEN_0523 -incr \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde
 
 
-# fichiers scorpiomwA
+# fichiers scorpiomwA_SRI
 acom  -nowarn DAGGEN_0523 -incr \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen_core.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_mmcm.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_digio_map.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_mblaze_intf.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_window_reg.vhd \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.bde \
-d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_spi_feeder.vhd \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_hw_driver.bde \
-D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\scorpiomwA_intf.bde
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_clks_gen_core.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_clks_mmcm.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_readout_ctrler.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_digio_map.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_mblaze_intf.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_window_reg.vhd \
+d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_clks_gen.bde \
+d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_prog_spi_feeder.vhd \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_prog_ctrler.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_hw_driver.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA_SRI\HDL\scorpiomwA_SRI_intf.bde
  
                                             

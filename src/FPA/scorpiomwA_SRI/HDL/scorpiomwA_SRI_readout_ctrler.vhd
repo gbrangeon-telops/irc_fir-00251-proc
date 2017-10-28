@@ -18,7 +18,7 @@ use IEEE.NUMERIC_STD.all;
 use work.fpa_define.all;
 use work.fpa_common_pkg.all; 
 
-entity scorpiomwA_readout_ctrler is
+entity scorpiomwA_SRI_readout_ctrler is
    port (
       ARESET            : in std_logic;
       CLK               : in std_logic; 
@@ -36,10 +36,10 @@ entity scorpiomwA_readout_ctrler is
       FPA_ACTIVE_INT    : out std_logic
       
       );  
-end scorpiomwA_readout_ctrler;
+end scorpiomwA_SRI_readout_ctrler;
 
 
-architecture rtl of scorpiomwA_readout_ctrler is
+architecture rtl of scorpiomwA_SRI_readout_ctrler is
    
    constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR; --  donne une incertitude de 1.5 MCL sur le début réel de l'integration
    

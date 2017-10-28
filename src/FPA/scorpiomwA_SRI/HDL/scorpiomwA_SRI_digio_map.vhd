@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : scorpiomwA_digio_map
+--!   @file : scorpiomwA_SRI_digio_map
 --!   @brief
 --!   @details
 --!
@@ -17,7 +17,7 @@ use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 use work.fleg_brd_define.all;
 
-entity scorpiomwA_digio_map is
+entity scorpiomwA_SRI_digio_map is
    port(
       
       MCLK_SOURCE    : in std_logic;
@@ -64,10 +64,10 @@ entity scorpiomwA_digio_map is
       FPA_DVALID_ERR : out std_logic
       
       );
-end scorpiomwA_digio_map;
+end scorpiomwA_SRI_digio_map;
 
 
-architecture rtl of scorpiomwA_digio_map is
+architecture rtl of scorpiomwA_SRI_digio_map is
    
 constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
 constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEFINE_FLEG_DAC_PWR_WAIT_FACTOR;

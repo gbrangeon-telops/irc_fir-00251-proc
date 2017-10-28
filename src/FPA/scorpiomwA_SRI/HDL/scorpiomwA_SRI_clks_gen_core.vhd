@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : scorpiomwA_clks_gen_core
+--!   @file : scorpiomwA_SRI_clks_gen_core
 --!   @brief
 --!   @details
 --!
@@ -17,7 +17,7 @@ use IEEE.numeric_std.all;
 use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 
-entity scorpiomwA_clks_gen_core is
+entity scorpiomwA_SRI_clks_gen_core is
    port(
       ARESET            : in std_logic;
       
@@ -39,9 +39,9 @@ entity scorpiomwA_clks_gen_core is
       ADC_DESERIALIZER_RST  : out std_logic  -- à '1' si ARESET à '1' ou si aucune carte ADC valide n'est détectée.
       
       );
-end scorpiomwA_clks_gen_core;
+end scorpiomwA_SRI_clks_gen_core;
 
-architecture rtl of scorpiomwA_clks_gen_core is   
+architecture rtl of scorpiomwA_SRI_clks_gen_core is   
    
    
    component sync_reset

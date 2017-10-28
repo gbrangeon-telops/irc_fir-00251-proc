@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : scorpiomwA_clks_mmcm
+--!   @file : scorpiomwA_SRI_clks_mmcm
 --!   @brief
 --!   @details
 --!
@@ -15,7 +15,7 @@ use IEEE.STD_LOGIC_1164.all;
 use work.FPA_Define.all; 
 use work.fpa_common_pkg.all;
 
-entity scorpiomwA_clks_mmcm is
+entity scorpiomwA_SRI_clks_mmcm is
    port(
       ARESET           : in std_logic;
       CLK_100M          : in std_logic;
@@ -23,11 +23,11 @@ entity scorpiomwA_clks_mmcm is
       ADC_PHASE_CLK    : out std_logic;
       MMCM_LOCKED      : out std_logic  
       );
-end scorpiomwA_clks_mmcm;
+end scorpiomwA_SRI_clks_mmcm;
 
-architecture rtl of scorpiomwA_clks_mmcm is
+architecture rtl of scorpiomwA_SRI_clks_mmcm is
    
-   component scorpiomwA_18MHz_mmcm
+   component scorpiomwA_SRI_18MHz_mmcm
       port
          (
          clk_in            : in     std_logic;
@@ -43,7 +43,7 @@ begin
    
    MCLK18M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 18_000 generate   
       begin                                             
-      U18M :  scorpiomwA_18MHz_mmcm
+      U18M :  scorpiomwA_SRI_18MHz_mmcm
       port map (   
          clk_in         => CLK_100M,
          mclk_source    => MCLK_SOURCE,        --  36 MHz
