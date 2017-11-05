@@ -29,51 +29,56 @@ package FPA_define is
    -- FPA 
    ---------------------------------------------- 
    -- consignes pour vérification avec infos en provenance du vhd, flex, et adc
-   constant DEFINE_FPA_ROIC                       : std_logic_vector(7 downto 0) := FPA_ROIC_ISC0209;  -- roic du détecteur. Cela veut dire que le vhd actuel peut contrôler in détecteur de ce type qque soit le cooler.
-   constant DEFINE_FPA_OUTPUT                     : std_logic_vector(1 downto 0) := OUTPUT_ANALOG; 
-   constant DEFINE_FPA_INPUT                      : std_logic_vector(7 downto 0) := LVTTL50;       -- le 0209 sera contrôlé à 3.3V en vue de reduire de 56% la puissance nuisible de l'horloge
-   constant DEFINE_FPA_VIDEO_DATA_INVERTED        : std_logic := '0';      -- les données du 0209 sont en video non inverse
-   constant DEFINE_FPA_TEMP_DIODE_CURRENT_uA      : natural   := 100;      -- consigne pour courant de polarisation de la diode de lecture de température
-   constant DEFINE_FPA_TAP_NUMBER                 : natural   := 4;                                                                                     
-   constant DEFINE_FLEX_VOLTAGEP_mV               : natural   := 8000;     -- le flex de ce détecteur doit être alimenté à 8V 
-   constant DEFINE_FPA_TEMP_CH_GAIN               : real      := 1.0;      -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l,ampli buffer et des resistances entre les deux 
-   constant DEFINE_FPA_PIX_PER_MCLK_PER_TAP       : natural   := 2;        -- 2 pixels par coup d'horloge pour le 0209
-   --constant DEFINE_FPA_BITSTREAM_LENGTH           : natural   := 58;     -- nombre de bits contenu  dans le bitstream de configuration serielle
-   constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 5000;     -- ENO 05 fev 2016 : int_time offset de 5000 nsec. Un bon compromis entre 4.9usec et 5.1usec et aussi en tenant compte des mesures de PTR
-   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
-   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
-   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
-   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
-   constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';     -- pas besoin de config particulière au demarrage du ISC0209 
-   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le isc0209, on peut utiliser la chaine Vprocessing.
-   constant DEFINE_GENERATE_ELEC_OFFSET_CORR_CHAIN: std_logic := '1';
+   constant DEFINE_FPA_ROIC                           : std_logic_vector(7 downto 0) := FPA_ROIC_ISC0209;  -- roic du détecteur. Cela veut dire que le vhd actuel peut contrôler in détecteur de ce type qque soit le cooler.
+   constant DEFINE_FPA_OUTPUT                         : std_logic_vector(1 downto 0) := OUTPUT_ANALOG; 
+   constant DEFINE_FPA_INPUT                          : std_logic_vector(7 downto 0) := LVTTL50;       -- le 0209 sera contrôlé à 3.3V en vue de reduire de 56% la puissance nuisible de l'horloge
+   constant DEFINE_FPA_VIDEO_DATA_INVERTED            : std_logic := '0';      -- les données du 0209 sont en video non inverse
+   constant DEFINE_FPA_TEMP_DIODE_CURRENT_uA          : natural   := 100;      -- consigne pour courant de polarisation de la diode de lecture de température
+   constant DEFINE_FPA_TAP_NUMBER                     : natural   := 4;                                                                                     
+   constant DEFINE_FLEX_VOLTAGEP_mV                   : natural   := 8000;     -- le flex de ce détecteur doit être alimenté à 8V 
+   constant DEFINE_FPA_TEMP_CH_GAIN                   : real      := 1.0;      -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l,ampli buffer et des resistances entre les deux 
+   constant DEFINE_FPA_PIX_PER_MCLK_PER_TAP           : natural   := 2;        -- 2 pixels par coup d'horloge pour le 0209
+   
+   -- integration, offset d'integration,  feddeback
+   constant DEFINE_FPA_INT_TIME_OFFSET_nS             : natural   := 5000;     -- ENO 05 fev 2016 : int_time offset de 5000 nsec. Un bon compromis entre 4.9usec et 5.1usec et aussi en tenant compte des mesures de PTR
+   constant DEFINE_GENERATE_INT_FDBK_MODULE           : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START
+   constant DEFINE_FPA_INT_FDBK_DLY                   : natural   := 0;        -- pour isc0209A, le fedback commence en même temps que la consigne (fpa_int) mais les deux signaux n'ont pas la même durée (DEFINE_FPA_INT_TIME_OFFSET_nS les differencie)
+ 
+   --
+   constant DEFINE_FPA_PROG_INT_TIME                  : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
+   constant DEFINE_FPA_XTRA_TRIG_INT_TIME             : natural   := 100;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
+   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE          : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
+   constant DEFINE_FPA_LINE_SYNC_MODE                 : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
+   constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';      -- pas besoin de config particulière au demarrage du ISC0209 
+   constant DEFINE_GENERATE_VPROCESSING_CHAIN         : std_logic := '0';      -- pour le isc0209, on peut ne fait plus de diversité de canaux doncn ne plus utiliser la chaine Vprocessing.
+   constant DEFINE_GENERATE_ELEC_OFFSET_CORR_CHAIN    : std_logic := '1';      -- pour le isc0209, on fait de la ccorrection d'offset
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
-   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 5_000;       -- pour le 0209, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
-   constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le 0209, on doit laisser 3 images dès qu'on reprogramme le détecteur
-   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
-   constant DEFINE_XSIZE_MAX                      : integer   := 320;         -- dimension en X maximale
-   constant DEFINE_YSIZE_MAX                      : integer   := 256;         -- dimension en Y maximale  
-   --constant DEFINE_GAIN0                          : std_logic := '0';
-   --constant DEFINE_GAIN1                          : std_logic := '1';    
-   constant DEFINE_ITR_MODE                       : std_logic := '0';
-   constant DEFINE_IWR_MODE                       : std_logic := '1';
-   constant DEFINE_FPA_INT_FBK_AVAILABLE          : std_logic := '0';
-   constant DEFINE_FPA_POWER_ON_WAIT_US           : integer   := 600_000;    -- en usec, duree d'attente après allumage  pour declarer le FPA rdy
-   constant DEFINE_FPA_TEMP_TRIG_PERIOD_US        : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
-   constant DEFINE_FPA_TEMP_RAW_MIN               : integer   := 30720;      -- Minimum ADC value for isc0209A power-on : 0.960V de 2N2222 (soit 120K)  
-   constant DEFINE_FPA_TEMP_RAW_MAX               : integer   := 35200;      -- Maximum ADC value for isc0209A power-on : (to protect against ultra low temp). 1.1V 
-   
-   constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
-   constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer   := 100_000;    --  horloge de 100M en KHz
-   constant DEFINE_FPA_80M_CLK_RATE_KHZ           : integer   := 80_000;     --  horloge de 80M en KHz
+   constant DEFINE_FPA_MCLK_RATE_KHZ                  : integer   := 5_000;       -- pour le 0209, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
+   constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP         : integer   := 3;           -- pour le 0209, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP                : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
+   constant DEFINE_XSIZE_MAX                          : integer   := 320;         -- dimension en X maximale
+   constant DEFINE_YSIZE_MAX                          : integer   := 256;         -- dimension en Y maximale  
+   --constant DEFINE_GAIN0                              : std_logic := '0';
+   --constant DEFINE_GAIN1                              : std_logic := '1';    
+   constant DEFINE_ITR_MODE                           : std_logic := '0';
+   constant DEFINE_IWR_MODE                           : std_logic := '1';
+   constant DEFINE_FPA_INT_FBK_AVAILABLE              : std_logic := '0';
+   constant DEFINE_FPA_POWER_ON_WAIT_US               : integer   := 600_000;    -- en usec, duree d'attente après allumage  pour declarer le FPA rdy
+   constant DEFINE_FPA_TEMP_TRIG_PERIOD_US            : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
+   constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 30720;      -- Minimum ADC value for isc0209A power-on : 0.960V de 2N2222 (soit 120K)  
+   constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 35200;      -- Maximum ADC value for isc0209A power-on : (to protect against ultra low temp). 1.1V 
+                                                      
+   constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
+   constant DEFINE_FPA_100M_CLK_RATE_KHZ              : integer   := 100_000;    --  horloge de 100M en KHz
+   constant DEFINE_FPA_80M_CLK_RATE_KHZ               : integer   := 80_000;     --  horloge de 80M en KHz
    
    -- quelques caractéristiques de la carte ADC requise
-   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 2*DEFINE_FPA_MCLK_RATE_KHZ;      -- l'horloge par defaut est celle des Quads au demarrage en attendant la detection de la carte ADC. C,est une frequence utilisable quelle que soit la carte ADC. Une fois la carte ADC détectée, celle-ci imposera une frequence maximale à ne pas depasser.
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 2*DEFINE_FPA_MCLK_RATE_KHZ;      -- c'est l'horolge reelle des quads pour laquelle le design est fait. Elle doit être inférieure à la limite imposée par la carte ADC détectée. Si telle n'est pas le cas, sortir une erreur  
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
-   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
+   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ      : integer   := 2*DEFINE_FPA_MCLK_RATE_KHZ;      -- l'horloge par defaut est celle des Quads au demarrage en attendant la detection de la carte ADC. C,est une frequence utilisable quelle que soit la carte ADC. Une fois la carte ADC détectée, celle-ci imposera une frequence maximale à ne pas depasser.
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ              : integer   := 2*DEFINE_FPA_MCLK_RATE_KHZ;      -- c'est l'horolge reelle des quads pour laquelle le design est fait. Elle doit être inférieure à la limite imposée par la carte ADC détectée. Si telle n'est pas le cas, sortir une erreur  
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ       : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
+   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ     : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
    
    -- limites imposées aux tensions VDAC provenant de celles de FP_VCC1 à FP_VCC8 du Fleg 
    -- provient du script F:\Bibliotheque\Electronique\PCB\EFP-00266-001 (Generic Flex Board TEL-2000)\Documentation\calcul_LT3042.m
@@ -154,6 +159,9 @@ package FPA_define is
       int_indx                       : std_logic_vector(7 downto 0);   -- index du  temps d'integration
       int_signal_high_time           : unsigned(31 downto 0);          -- dureen en MCLK pendant laquelle lever le signal d'integration pour avoir int_time. depend des offsets de temps d'intégration   
       
+      -- provenance hybride (µBlaze ou vhd)
+      int_fdbk_dly                   : unsigned(1 downto 0);          -- delai avant generation du feedback d'integration. Utilisé pour certains détecteurs uniquement dont le ISC0209A à cause de l'offset dynamique
+      
       -- cette partie provient du microBlaze
       -- common
       comn                           : fpa_comn_cfg_type;      -- partie commune (utilisée par les modules communs)
@@ -216,7 +224,7 @@ package FPA_define is
       vdac_value                     : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)  -- dac6 -> VOS pour le skimming
       
       -- adc clk_phase
-      adc_clk_phase                  : unsigned(3 downto 0);     -- dit en coup de 80MHz, de combien déphaser l'horloge des ADCs
+      adc_clk_phase                  : unsigned(4 downto 0);     -- dit en coup de adc_clk, de combien déphaser l'horloge des ADCs
       
       -- reorder_column
       reorder_column                 : std_logic;
@@ -228,10 +236,10 @@ package FPA_define is
       elec_ofs_offset_minus_pix_value     : std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
       elec_ofs_add_const                  : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
       
-      elec_ofs_start_dly                  : unsigned(7 downto 0);   -- elec_ofs_pix_fakedvalue_forced
+      elec_ofs_start_dly_sampclk          : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
       elec_ofs_samp_num_per_ch            : unsigned(6 downto 0);
       elec_ofs_samp_mean_numerator        : unsigned(22 downto 0);
-
+  
    end record;    
    
    ---- Configuration par defaut

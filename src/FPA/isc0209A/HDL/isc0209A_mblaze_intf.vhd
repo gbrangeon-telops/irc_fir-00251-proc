@@ -187,6 +187,7 @@ begin
             user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre
             user_cfg_i.reorder_column <= '0'; -- non evvoyé par le MBlaze
             mb_ctrled_reset_i <= '0';
+            user_cfg_i.ysize <= to_unsigned(320, user_cfg_i.ysize'length);
             
          else                   
             
@@ -199,6 +200,9 @@ begin
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
             
+            -- 
+            user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);  -- isc0209A
+            
             -- diag 
             user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
             user_cfg_i.diag.ystart             <=  user_cfg_i.ystart;               
@@ -207,11 +211,6 @@ begin
             user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
             user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
-            
-            -- pragma translate_off
-            user_cfg_i.real_mode_active_pixel_dly      <= to_unsigned(40, user_cfg_i.real_mode_active_pixel_dly'length);
-            -- pragma translate_on
-            
             
             -- reste de la config
             if slv_reg_wren = '1' then  
@@ -268,17 +267,17 @@ begin
                   when X"0B4" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); 
                   when X"0B8" =>    user_cfg_i.adc_clk_phase                   <= unsigned(data_i(user_cfg_i.adc_clk_phase'length-1 downto 0));
                   when X"0BC" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
-                  
+                     
                   -- electrical offset
                   when X"0C0" =>    user_cfg_i.elec_ofs_offset_null_forced     <= data_i(0);
                   when X"0C4" =>    user_cfg_i.elec_ofs_pix_faked_value_forced <= data_i(0);
                   when X"0C8" =>    user_cfg_i.elec_ofs_pix_faked_value        <= unsigned(data_i(user_cfg_i.elec_ofs_pix_faked_value'length-1 downto 0));
                   when X"0CC" =>    user_cfg_i.elec_ofs_offset_minus_pix_value <= data_i(0);
                   when X"0D0" =>    user_cfg_i.elec_ofs_add_const              <= unsigned(data_i(user_cfg_i.elec_ofs_add_const'length-1 downto 0)); 
-                  when X"0D4" =>    user_cfg_i.elec_ofs_start_dly              <= unsigned(data_i(user_cfg_i.elec_ofs_start_dly'length-1 downto 0)); 
+                  when X"0D4" =>    user_cfg_i.elec_ofs_start_dly_sampclk      <= unsigned(data_i(user_cfg_i.elec_ofs_start_dly_sampclk'length-1 downto 0)); 
                   when X"0D8" =>    user_cfg_i.elec_ofs_samp_num_per_ch        <= unsigned(data_i(user_cfg_i.elec_ofs_samp_num_per_ch'length-1 downto 0));
-                  when X"0DC" =>    user_cfg_i.elec_ofs_samp_mean_numerator    <= unsigned(data_i(user_cfg_i.elec_ofs_samp_mean_numerator'length-1 downto 0)); user_cfg_in_progress <= '0';
-                  
+                  when X"0DC" =>    user_cfg_i.elec_ofs_samp_mean_numerator    <= unsigned(data_i(user_cfg_i.elec_ofs_samp_mean_numerator'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output              <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
@@ -312,7 +311,13 @@ begin
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
          int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) - DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+         
+         -- protection
+         if to_integer(exp_time_pipe(3)(int_time_i'length-1 downto 0)) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR then
+            int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) - DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+         else
+            int_signal_high_time_i <= to_unsigned(1, int_signal_high_time_i'length); -- 1 coup MCLK
+         end if;
          
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;

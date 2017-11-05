@@ -56,7 +56,6 @@ set_clock_groups -asynchronous -group {mclk_source_isc0209A_5_0_MHz_mmcm}
 set_clock_groups -asynchronous -group {adc_phase_clk_isc0209A_5_0_MHz_mmcm_1}
 set_clock_groups -asynchronous -group {adc_phase_clk_isc0209A_5_0_MHz_mmcm}
 
-
 # Max Delay / Min Delay
 # Multicycle Paths
 # Case Analysis

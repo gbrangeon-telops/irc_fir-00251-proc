@@ -106,7 +106,7 @@
 
 #define ISC0209_REFOFS_VOLTAGE_MIN_mV     2810           // valeur en provenance du fichier fpa_define
 #define ISC0209_REFOFS_VOLTAGE_MAX_mV     6200           // valeur en provenance du fichier fpa_define
-#define ISC0209_CONST_ELEC_OFFSET_VALUE   600            // aussi pour ne pas provoquer saturation au dela de (2^14 - 1) soit 16383
+#define ISC0209_CONST_ELEC_OFFSET_VALUE   340            // aussi pour ne pas provoquer saturation au dela de (2^14 - 1) soit 16383
 
 // structure interne pour les parametres du isc0209
 struct isc0209_param_s             //
@@ -212,7 +212,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     isc0209_param_t hh;
     extern int16_t gFpaDetectorPolarizationVoltage;
     static int16_t actualPolarizationVoltage = 150;
-    uint32_t elec_ofs_enabled = 0;
+    uint32_t elec_ofs_enabled = 1;
     uint32_t elec_ofs_map_image_enabled = 0;
     //extern float gFpaDetectorElectricalTapsRef;
     extern float gFpaDetectorElectricalRefOffset;
@@ -283,10 +283,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->skimming_en = 0;                          
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 16;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = 13;                             // ajuster via chipscope
    
    // quad2    
-   ptrA->adc_quad2_en = 1;
+   ptrA->adc_quad2_en = 0;                                            // ENO : 14 aout 2017 : plus besoin de la diversité de canal dans un iSC0209
    ptrA->chn_diversity_en = 0;                                        // ENO : 14 aout 2017 : plus besoin de la diversité de canal dans un iSC0209
    
    //
@@ -371,7 +371,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly;
    
    // valeurs par defaut
-   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (((hh.pixnum_per_tap_per_mclk * hh.tap_number) * (7.0F/hh.mclk_period_usec)) / (2.0F * hh.tap_number) - 2.0F); // nombre d'échantillons dans la ligne de reset / (2* taps_number). Chaque tap comporte deux canaux . Pour plus de securité, on enleve 3 de ce nombre
+   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) ((hh.pixnum_per_tap_per_mclk * hh.tap_number) * (hh.lovh_mclk) / (2.0F * hh.tap_number)); // 16 echantillons à la fin de l'image
    ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (2.0F*floorf((float)ptrA->elec_ofs_samp_num_per_ch/2.0F)); // doit être un nombre pair absolûment pour éviter que les zones (1:Ntaps) et (Ntaps+1: 2*Natps) se superposent
    ptrA->elec_ofs_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elec_ofs_samp_num_per_ch);  
    ptrA->elec_ofs_add_const               = (uint32_t) ISC0209_CONST_ELEC_OFFSET_VALUE;         // vaut "constante" dans le modèle décrit plus haut
@@ -393,8 +393,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->elec_ofs_offset_null_forced      =  1;                   //     etape 1: on force "estimé_offset_elec" à 0.
       ptrA->elec_ofs_add_const               =  0;                   //     etape 2: la quanité "constante"  vaut aussi 0. Au final on a bien ce qui est voulu.
   } 
-
-     
+       
    WriteStruct(ptrA);
 }
 
@@ -449,7 +448,7 @@ void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gc
    
    // 
    ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec;
-   ptrH->int_signal_high_time_usec = exposureTime_usec - ptrH->int_time_offset_usec;
+   ptrH->int_signal_high_time_usec = MAX(exposureTime_usec - ptrH->int_time_offset_usec, 0.0F);
       
    // calcul de la periode minimale
    ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;
@@ -458,7 +457,7 @@ void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
 
    //autres calculs
-   ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec;  // utilisé en mode int_end_trig_start
+   ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec;   
    ptrH->mode_readout_end_to_trig_start_dly_usec = 1.0F;                                                   // utilisé en mode readout_end_trig_start
 }
  

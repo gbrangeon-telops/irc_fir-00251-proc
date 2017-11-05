@@ -26,7 +26,8 @@ entity isc0209A_readout_ctrler is
       FPA_PCLK          : in std_logic;  -- FPA_PCLK est l'horloge des pixels. Il peut valoir soit 1xMCLK (par ex. Hawk) ou 2xMCLK (par ex. Indigo).    
       FPA_MCLK          : in std_logic;  -- 
       FPA_INTF_CFG      : in fpa_intf_cfg_type;      
-      FPA_INT           : in std_logic;              
+      FPA_INT           : in std_logic;  -- requis pour ISC0209A puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
+      FPA_INT_FDBK      : in std_logic;  -- requis pour ISC0209A puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
       
       QUAD_CLK_COPY     : in std_logic;
       
@@ -57,6 +58,7 @@ architecture rtl of isc0209A_readout_ctrler is
    signal sync_flag_fsm        : sync_flag_fsm_type;
    signal readout_fsm          : readout_fsm_type;
    signal fpa_int_last         : std_logic;
+   signal fpa_int_fdbk_last    : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
@@ -64,7 +66,7 @@ architecture rtl of isc0209A_readout_ctrler is
    signal lval_pclk_cnt        : unsigned(FPA_INTF_CFG.LINE_PERIOD_PCLK'LENGTH-1 downto 0);
    signal quad_clk_copy_i      : std_logic;
    signal quad_clk_copy_last   : std_logic;
-   signal adc_sync_flag_i      : std_logic_vector(15 downto 0);
+   signal adc_sync_flag_i      : std_logic_vector(ADC_SYNC_FLAG'LENGTH-1 downto 0);
    signal eol_pipe             : std_logic_vector(3 downto 0);
    signal sol_pipe             : std_logic_vector(3 downto 0);
    signal eof_pipe             : std_logic_vector(3 downto 0);
@@ -83,6 +85,7 @@ architecture rtl of isc0209A_readout_ctrler is
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
+   signal fpa_int_fdbk_i       : std_logic;
    signal fpa_int_i            : std_logic;
    
    signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
@@ -99,14 +102,8 @@ begin
    --------------------------------------------------
    -- Outputs map
    --------------------------------------------------  
-   FPA_LSYNC <= lsync_pipe(6);              -- pipe(6) choisi apres simulation pour avoir 1 clk de delai avec FPA_MCLK (meme delai  que le signal d'integration). Ainsi le dodule io_interface aura juste à decaler l'horloge FPA_MCLK de 2 clk et tout sera ok
-   
-   ADC_SYNC_FLAG(15 downto 4)  <= (others => '0');    -- non utilisé
-   ADC_SYNC_FLAG(3)  <= readout_info_i.naoi.stop;
-   ADC_SYNC_FLAG(2)  <= readout_info_i.naoi.start;
-   ADC_SYNC_FLAG(1)  <= sof_pipe(C_PIPE_POS);                  -- frame_flag(doit durer 1 CLK ADC)
-   ADC_SYNC_FLAG(0)  <= sol_pipe(C_PIPE_POS);                  -- line_flag (doit durer 1 CLK ADC)
-   
+   FPA_LSYNC <= lsync_pipe(6);                        -- pipe(6) choisi apres simulation pour avoir 1 clk de delai avec FPA_MCLK (meme delai  que le signal d'integration). Ainsi le dodule io_interface aura juste à decaler l'horloge FPA_MCLK de 2 clk et tout sera ok
+   ADC_SYNC_FLAG <= adc_sync_flag_i;    -- non utilisé  
    READOUT_INFO  <= readout_info_i;
    
    --------------------------------------------------
@@ -120,28 +117,52 @@ begin
       );
    
    --------------------------------------------------
+   -- definition sync_flag
+   --------------------------------------------------
+   Ud: process(CLK)
+   begin
+      if rising_edge(CLK) then 
+         adc_sync_flag_i(15 downto 4)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(3)  <= readout_info_i.naoi.stop;
+         adc_sync_flag_i(2)  <= readout_info_i.naoi.start;
+         adc_sync_flag_i(1)  <= sof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(0)  <= sol_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+      end if;
+   end process;
+   
+   --------------------------------------------------
    -- generation sync_flag
    --------------------------------------------------
    U2: process(CLK)
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then 
-            fpa_int_i <= FPA_INT;            
-            fpa_int_last <= fpa_int_i;
+            fpa_int_fdbk_i <= FPA_INT_FDBK;            
+            fpa_int_fdbk_last <= fpa_int_fdbk_i;
             elec_ofs_start_pipe <= (others => '0');
+            elec_ofs_end_pipe <= (others => '0');
             elec_ofs_start_i <= '0';
             elec_ofs_fval_i <= '0';
             elec_ofs_end_i <= '0';
             readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
-            
+            readout_info_i.naoi.samp_pulse <= '0';
+            readout_info_i.naoi.start <= '0';
+            readout_info_i.naoi.stop <= '0';
+            fpa_int_i <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;
             eof_pulse <= '0';
             eof_pulse_last <= '0';
             
          else           
             
+            fpa_int_fdbk_i <= FPA_INT_FDBK;            
+            fpa_int_fdbk_last <= fpa_int_fdbk_i;
+            
             fpa_int_i <= FPA_INT;            
-            fpa_int_last <= fpa_int_i;            
+            fpa_int_last <= fpa_int_i;
+            
+            
             fpa_pclk_last <= FPA_PCLK;
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
@@ -215,9 +236,7 @@ begin
                sol_pipe_pclk(1) <= sol_pipe_pclk(0);
             end if;
             
-            lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0); 
-            
-            
+            lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0);           
             
             -- contrôleur
             case readout_fsm is           
@@ -226,7 +245,7 @@ begin
                   readout_in_progress <= '0';
                   lsync_cnt <=  (others => '0');
                   lsync_pipe(0) <= '0';
-                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
+                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin de la consigne d'integration
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
@@ -399,6 +418,8 @@ begin
             eof_pipe    <= (others => '0');
             rd_end_pipe <= (others => '0');
             samp_pulse_pipe <= (others => '0');
+            quad_clk_copy_last <= '0';
+            quad_clk_copy_i <= '0';
             for ii in 0 to lval_pipe'length-1 loop
                line_cnt_pipe(ii) <= (others => '0'); 
             end loop;

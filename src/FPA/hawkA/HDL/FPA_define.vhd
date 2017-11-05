@@ -218,7 +218,7 @@ package FPA_define is
       vdac_value                     : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)
       
       -- adc clk_phase
-      adc_clk_phase                  : unsigned(3 downto 0);     -- dit de combien déphaser l'horloge des ADCs
+      adc_clk_phase                  : unsigned(4 downto 0);     -- dit de combien déphaser l'horloge des ADCs
       
       -- reorder_column
       reorder_column                 : std_logic;
