@@ -20,7 +20,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0209A_ELEC_OFS__05_NOV_v2"
+#define FPA_DEVICE_MODEL_NAME    "ISC0209A_ELEC_OFS__05_NOV_v3"
 
 #define FPA_WIDTH_MIN      128    //
 #define FPA_WIDTH_MAX      320
