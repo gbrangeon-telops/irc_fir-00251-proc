@@ -30,11 +30,11 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    float m = 1.0; // [counts/mV]
    float b = 0.0f;  // [counts]
    
-   if(gBrdRevid == BRD_REV_201){
+   if(gBrdRevid == BRD_REV_20x){
       adcReadoutcgf = ADC_AND_IRIG;
       N_ADC_BITS = 16;
    }
-   else if(gBrdRevid == BRD_REV_001 && fs->ADCReadoutEnabled)
+   else if(gBrdRevid == BRD_REV_00x && fs->ADCReadoutEnabled)
    {
       adcReadoutcgf = ADC_READOUT;
       N_ADC_BITS = 12;

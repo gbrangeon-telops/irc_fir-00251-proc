@@ -41,12 +41,12 @@ IRC_Status_t Get_board_hw_revision(uint16_t gpioDeviceId, brd_rev_ver_t* brd_rev
 
    switch(brd_rev){
       case 0:
-         *(brd_rev_id) = BRD_REV_001;
-         HWR_INF("\nHW Board Revision is 001");
+         *(brd_rev_id) = BRD_REV_00x;
+         HWR_INF("\nHW Board Revision is 00x");
          break;
       case 1:
-         *(brd_rev_id) = BRD_REV_201;
-         HWR_INF("\nHW Board Revision is 201");
+         *(brd_rev_id) = BRD_REV_20x;
+         HWR_INF("\nHW Board Revision is 20x");
          break;
       default:
          *(brd_rev_id) = BRD_REV_UNKNOWN;
