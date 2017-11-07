@@ -139,8 +139,21 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
    uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
+   
+   //electrical offset
+   uint32_t  elec_ofs_offset_null_forced;    
+   uint32_t  elec_ofs_pix_faked_value_forced;
+   uint32_t  elec_ofs_pix_faked_value;       
+   uint32_t  elec_ofs_offset_minus_pix_value;
+   uint32_t  elec_ofs_add_const;             
+   uint32_t  elec_ofs_start_dly;             
+   uint32_t  elec_ofs_samp_num_per_ch;       
+   uint32_t  elec_ofs_samp_mean_numerator;    
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
+
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x0065, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,{0,0,0,0,0,0,0,2200}, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0}
+
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
@@ -194,9 +207,6 @@ struct s_FpaStatus    //
 typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
-
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x0065, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,{0,0,0,0,0,0,0,2200}, 0, 0}
-
 
 // pour initialiser le module vhd avec les bons parametres de départ
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);

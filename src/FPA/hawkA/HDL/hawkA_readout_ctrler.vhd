@@ -26,19 +26,25 @@ entity hawkA_readout_ctrler is
       FPA_PCLK          : in std_logic;  -- FPA_PCLK est l'horloge des pixels. Il peut valoir soit 1xMCLK (par ex. Hawk) ou 2xMCLK (par ex. Indigo).    
       FPA_MCLK          : in std_logic;  -- 
       FPA_INTF_CFG      : in fpa_intf_cfg_type;      
-      FPA_INT           : in std_logic;              
+      FPA_INT           : in std_logic;  -- requis pour ISC0209A puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
+      FPA_INT_FDBK      : in std_logic;  -- requis pour ISC0209A puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
+      
       
       QUAD_CLK_COPY     : in std_logic;
       
       FPA_FDEM          : out std_logic;
       FPA_RD_MCLK       : out std_logic;         
       READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic
+      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0) 
       );  
 end hawkA_readout_ctrler;
 
 
 architecture rtl of hawkA_readout_ctrler is
+   
+   constant C_FLAG_PIPE_LEN : integer := DEFINE_ADC_QUAD_CLK_FACTOR;
+   constant C_PIPE_POS      : integer := 3;
+   
    type sync_flag_fsm_type is (idle, sync_flag_on_st, sync_flag_off_st, wait_img_begin_st, wait_img_end_st);
    type readout_fsm_type is (idle, readout_st, wait_mclk_fe_st1, wait_mclk_fe_st2, wait_readout_end_st);
    type line_cnt_pipe_type is array (0 to 3) of unsigned(9 downto 0);
@@ -55,12 +61,14 @@ architecture rtl of hawkA_readout_ctrler is
    signal readout_fsm          : readout_fsm_type;
    signal fpa_int_last         : std_logic;
    signal fpa_pclk_last        : std_logic;
+   signal fpa_int_fdbk_last    : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
    signal fval_pclk_cnt        : unsigned(FPA_INTF_CFG.READOUT_PCLK_CNT_MAX'LENGTH-1 downto 0); 
    signal lval_pclk_cnt        : unsigned(FPA_INTF_CFG.LINE_PERIOD_PCLK'LENGTH-1 downto 0);
    signal quad_clk_copy_i      : std_logic;
    signal quad_clk_copy_last   : std_logic;
+   signal adc_sync_flag_i      : std_logic_vector(ADC_SYNC_FLAG'LENGTH-1 downto 0);
    signal fdem_i               : std_logic;
    signal eol_pipe             : std_logic_vector(3 downto 0);
    signal sol_pipe             : std_logic_vector(3 downto 0);
@@ -80,14 +88,17 @@ architecture rtl of hawkA_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    signal rd_mclk_i            : std_logic;
    signal line_cnt_pipe        : line_cnt_pipe_type;
+   signal fpa_int_fdbk_i       : std_logic;
+   signal fpa_int_i            : std_logic;
    
-   attribute dont_touch : string;
-   attribute dont_touch of sof_pipe         : signal is "true"; 
-   attribute dont_touch of eof_pipe         : signal is "true";
-   attribute dont_touch of sol_pipe         : signal is "true"; 
-   attribute dont_touch of eol_pipe         : signal is "true";
-   attribute dont_touch of fval_pipe        : signal is "true"; 
-   attribute dont_touch of lval_pipe        : signal is "true";
+   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
+   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
+   signal elec_ofs_end_i       : std_logic;
+   signal elec_ofs_start_i     : std_logic;
+   signal readout_info_i       : readout_info_type;
+   signal eof_pulse            : std_logic;
+   signal eof_pulse_last       : std_logic;
+   signal elec_ofs_fval_i      : std_logic;
    
 begin
    
@@ -95,18 +106,9 @@ begin
    -- Outputs map
    --------------------------------------------------  
    FPA_RD_MCLK <= rd_mclk_i;              
-   ADC_SYNC_FLAG <= fdem_i;       
+   ADC_SYNC_FLAG <= adc_sync_flag_i;    -- non utilisé  
+   READOUT_INFO  <= readout_info_i;      
    FPA_FDEM <= fdem_i;
-   
-   READOUT_INFO.SOF  <= sof_pipe(3);
-   READOUT_INFO.EOF  <= eof_pipe(3);
-   READOUT_INFO.SOL  <= sol_pipe(3);
-   READOUT_INFO.EOL  <= eol_pipe(3);
-   READOUT_INFO.FVAL <= fval_pipe(3);
-   READOUT_INFO.LVAL <= lval_pipe(3);
-   READOUT_INFO.DVAL <= dval_pipe(3);
-   READOUT_INFO.READ_END <= rd_end_pipe(3);
-   READOUT_INFO.SAMP_PULSE <= samp_pulse_pipe(3);
    
    --------------------------------------------------
    -- synchro reset 
@@ -119,6 +121,20 @@ begin
       );
    
    --------------------------------------------------
+   -- definition sync_flag
+   --------------------------------------------------
+   Ud: process(CLK)
+   begin
+      if rising_edge(CLK) then 
+         adc_sync_flag_i(15 downto 4)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(3)  <= readout_info_i.naoi.stop;
+         adc_sync_flag_i(2)  <= readout_info_i.naoi.start;
+         adc_sync_flag_i(1)  <= sof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(0)  <= sol_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+      end if;
+   end process;   
+   
+   --------------------------------------------------
    -- generation sync_flag
    --------------------------------------------------
    U2: process(CLK)
@@ -127,15 +143,31 @@ begin
          if sreset = '1' then            
             sync_flag_fsm <= idle;
             fdem_i <= '0';
-            --fpa_mclk_last <= '0';
-            --fpa_int_last <= '0';            
-            --fpa_pclk_last <= '0';
-            --pclk_rise <= '0'; 
-            --pclk_fall <= '0';
+            fpa_int_fdbk_last <= fpa_int_fdbk_i;
+            elec_ofs_start_pipe <= (others => '0');
+            elec_ofs_end_pipe <= (others => '0');
+            elec_ofs_start_i <= '0';
+            elec_ofs_fval_i <= '0';
+            elec_ofs_end_i <= '0';
+            readout_info_i.aoi.dval <= '0';
+            readout_info_i.naoi.dval <= '0';
+            readout_info_i.naoi.samp_pulse <= '0';
+            readout_info_i.naoi.start <= '0';
+            readout_info_i.naoi.stop <= '0';
+            fpa_int_i <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;
+            eof_pulse <= '0';
+            eof_pulse_last <= '0';
             
          else           
             
-            fpa_int_last <= FPA_INT;            
+            fpa_int_fdbk_i <= FPA_INT_FDBK;            
+            fpa_int_fdbk_last <= fpa_int_fdbk_i;
+            
+            fpa_int_i <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;
+            
+            
             fpa_pclk_last <= FPA_PCLK;
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
@@ -147,7 +179,7 @@ begin
                
                when idle =>   
                   fdem_i <= '0';
-                  if fpa_int_last = '1' and FPA_INT = '0' then -- fin d'une integration
+                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
                      sync_flag_fsm <= sync_flag_on_st;
                   end if;                        
                
@@ -170,7 +202,47 @@ begin
                
                when others =>
                
-            end case;
+            end case;            
+            
+            -- elec_ofs_start_i dure 1 PCLK
+            eof_pulse <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);
+            eof_pulse_last <= eof_pulse;
+            elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
+            if unsigned(elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+               elec_ofs_start_i <= '1';
+               elec_ofs_fval_i  <= '1'; 
+            else
+               elec_ofs_start_i <= '0';
+            end if;
+            
+            -- elec_ofs_end_i dure 1 PCLK
+            elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
+            if unsigned(elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+               elec_ofs_end_i <= '1';
+            else
+               elec_ofs_end_i  <= '0';
+               if elec_ofs_end_i = '1' then 
+                  elec_ofs_fval_i <= '0';
+               end if;
+            end if;
+            
+            -- READOUT_INFO
+            -- aoi
+            readout_info_i.aoi.sof           <= sof_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.eof           <= eof_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.sol           <= sol_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.eol           <= eol_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.fval          <= fval_pipe(C_PIPE_POS);
+            readout_info_i.aoi.lval          <= lval_pipe(C_PIPE_POS);
+            readout_info_i.aoi.dval          <= dval_pipe(C_PIPE_POS);
+            readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
+            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
+            
+            -- naoi
+            readout_info_i.naoi.start        <= elec_ofs_start_i;
+            readout_info_i.naoi.stop         <= elec_ofs_end_i;
+            readout_info_i.naoi.dval         <= elec_ofs_fval_i;
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i;      
             
          end if;
       end if;
@@ -206,7 +278,7 @@ begin
                
                when idle =>   
                   readout_in_progress <= '0';
-                  if fpa_int_last = '1' and FPA_INT = '0' then -- fin d'une integration
+                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
                      readout_fsm <= wait_mclk_fe_st1;
                   end if;
                
@@ -374,7 +446,9 @@ begin
             sof_pipe    <= (others => '0');
             eof_pipe    <= (others => '0');
             rd_end_pipe <= (others => '0');
-            samp_pulse_pipe <= (others => '0');
+            samp_pulse_pipe <= (others => '0'); 
+            quad_clk_copy_last <= '0';
+            quad_clk_copy_i <= '0';
             for ii in 0 to lval_pipe'length-1 loop
                line_cnt_pipe(ii) <= (others => '0'); 
             end loop;

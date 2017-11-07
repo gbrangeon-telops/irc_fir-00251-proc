@@ -45,8 +45,8 @@ begin
       U18M :  hawkA_10MHz_mmcm
       port map (   
          clk_in         => CLK_100M,
-         mclk_source    => MCLK_SOURCE,        --  80 MHz
-         adc_phase_clk  => ADC_PHASE_CLK,      -- 320 MHz      
+         mclk_source    => MCLK_SOURCE,        --  
+         adc_phase_clk  => ADC_PHASE_CLK,      --    
          reset          => ARESET,
          locked         => MMCM_LOCKED            
          );      

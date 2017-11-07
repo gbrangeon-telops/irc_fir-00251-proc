@@ -51,9 +51,9 @@
 #define AR_FPA_TEMPERATURE                0x002C    // adresse temperature
 
 // adresse d'écriture du régistre du type du pilote C 
-#define AW_FPA_ROIC_SW_TYPE               0xE0      // adresse à lauquelle on dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-#define AW_FPA_OUTPUT_SW_TYPE             0xE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
-#define AW_FPA_INPUT_SW_TYPE              0xE8      // obligaoire pour les deteceteurs analogiques
+#define AW_FPA_ROIC_SW_TYPE               0xAE0      // adresse à lauquelle on dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+#define AW_FPA_OUTPUT_SW_TYPE             0xAE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
+#define AW_FPA_INPUT_SW_TYPE              0xAE8      // obligaoire pour les deteceteurs analogiques
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                          0x13      // 0x13 -> hawkA . Provient du fichier fpa_common_pkg.vhd.
@@ -62,10 +62,10 @@
 
 
 // adresse d'écriture du régistre du reset des erreurs
-#define AW_RESET_ERR                      0xEC
+#define AW_RESET_ERR                      0xAEC
 
  // adresse d'écriture du régistre du reset du module FPA
-#define AW_CTRLED_RESET                   0xF0
+#define AW_CTRLED_RESET                   0xAF0
 
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
 #define TELOPS_DIAG_CNST                  0xD1      // mode diag constant (patron de test generé par la carte d'acquisition : tous les pixels à la même valeur) 
@@ -106,18 +106,20 @@
 #define HAWK_TAPREF_VOLTAGE_MIN_mV       2810           // valeur en provenance du fichier fpa_define
 #define HAWK_TAPREF_VOLTAGE_MAX_mV       6100           // valeur en provenance du fichier fpa_define
 
+#define HAWK_CONST_ELEC_OFFSET_VALUE     340            //correction d'offset non implantée sur Hawk
+
 // structure interne pour les parametres du hawk
 struct hawk_param_s             // 
 {					   
    // parametres à rentrer
-   float mlck_period_usec;                       
+   float mclk_period_usec;                       
    float tap_number;
    float pixnum_per_tap_per_mclk;
    float fpa_delay_mclk;
    float vhd_delay_mclk;
    float delay_mclk;
    float lovh_mclk;
-   float fovh_mclk;   
+   float fovh_line;   
    float int_time_offset_mclk;   
    
    // parametres calculés
@@ -138,6 +140,7 @@ typedef struct hawk_param_s  hawk_param_t;
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
+uint8_t init_done = 0;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -152,12 +155,14 @@ void FPA_SpecificParams(hawk_param_t *ptrH, float exposureTime_usec, const gcReg
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {   
+   init_done = 0;
    FPA_Reset(ptrA);
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
+   init_done = 1;
 }
  
 //--------------------------------------------------------------------------
@@ -204,7 +209,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalTapsRef;
    static int16_t actualPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
-   extern int32_t gFpaDebugRegA, gFpaDebugRegD;
+   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
+   uint32_t elec_ofs_enabled = 0;                   // offst dynamique non implanté sur Hawk
+   uint32_t elec_ofs_map_image_enabled = 0;
    
    float Nr, Nc, No, R, H, C, W;
    
@@ -298,15 +305,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
     
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegA;                             // ajuster via chipscope
+   if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_done == 1))   
+      ptrA->real_mode_active_pixel_dly  = (uint32_t) gFpaDebugRegA;
+   gFpaDebugRegA = (int32_t)ptrA->real_mode_active_pixel_dly;
    
    // quad2    
-   ptrA->adc_quad2_en = 1;
-   ptrA->chn_diversity_en = 0;                      // iversité de canal n'est plus utilisé dans le hawk
+   ptrA->adc_quad2_en = 0;                          // ENO : 07 nov 2017 : plus besoin de la diversité de canal dans un Hawk
+   ptrA->chn_diversity_en = 0;                      // ENO : 07 nov 2017 : plus besoin de la diversité de canal dans un Hawk
    
    //
    ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + hh.lovh_mclk;
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + 1) + 3;                              // ligne de reset du hawk prise en compte
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + hh.fovh_line) + 3;                              // ligne de reset du hawk prise en compte
    
    ptrA->active_line_start_num             = 1;                    // pour le hawk, numero de la première ligne active
    ptrA->active_line_end_num               = ptrA->ysize;          // pour le hawk, numero de la derniere ligne active
@@ -323,7 +332,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // echantillons choisis
    ptrA->hgood_samp_first_pos_per_ch       = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position premier echantillon
-   ptrA->hgood_samp_last_pos_per_ch        = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2016: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
+   ptrA->hgood_samp_last_pos_per_ch        = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2017: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
    ptrA->hgood_samp_sum_num                = ptrA->hgood_samp_last_pos_per_ch - ptrA->hgood_samp_first_pos_per_ch + 1;         
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                = 1 + ptrA->chn_diversity_en;
@@ -358,12 +367,55 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->vdac_value[7]                     = 2200;        // DAC8 ->
    
    // adc_clk_phase
-   ptrA->adc_clk_phase     = gFpaDebugRegD;              // on dephase l'horloge des ADC
-   //if (pGCRegs->DeviceSerialNumber == 4665)                  // pour IRC1607 (VLW)
-   //   ptrA->adc_clk_phase  = 0;        // Selon les tests faits par PTR, c'est la valeur optimale pour le ghost
+   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_phase) && (init_done == 1))
+      ptrA->adc_clk_phase = (uint32_t)gFpaDebugRegD;         // on dephase l'horloge des ADC
+   gFpaDebugRegD = (int32_t)ptrA->adc_clk_phase;
+
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
+   
+   /* offset electronique
+    sans correction offset, on a : signal_elec =  gain_elec * signal_fpa + offset_elec;
+    avec correction,               signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec +  constante;   la constante permet de compenser la plage dynamique suite à la disparition de l'offset
+   */
+                
+   // 
+   elec_ofs_enabled  = 0;       // offset dynamique non actif sur Hawk
+
+   // registreB : contrôle la sortie ou non de l'image du map d'offset 
+   if (((uint32_t)gFpaDebugRegB != elec_ofs_map_image_enabled) && (init_done == 1))   
+     elec_ofs_map_image_enabled  = (uint32_t) gFpaDebugRegB;
+   gFpaDebugRegB = (int32_t)elec_ofs_map_image_enabled;
+   
+   // registreC : contrôle le delai avant calcul d'offset
+   if (((uint32_t)gFpaDebugRegC != ptrA->elec_ofs_start_dly) && (init_done == 1))   
+     ptrA->elec_ofs_start_dly  = (uint32_t) gFpaDebugRegC;
+   gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly;
+   
+   // valeurs par defaut
+   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) ((hh.pixnum_per_tap_per_mclk * hh.tap_number) * ((uint32_t)FPA_WIDTH_MIN/(hh.pixnum_per_tap_per_mclk * hh.tap_number)) / (2.0F * hh.tap_number)); // 16 echantillons durant la plus petite ligne de reset
+   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (2.0F*floorf((float)ptrA->elec_ofs_samp_num_per_ch/2.0F)); // doit être un nombre pair absolûment pour éviter que les zones (1:Ntaps) et (Ntaps+1: 2*Natps) se superposent
+   ptrA->elec_ofs_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elec_ofs_samp_num_per_ch);  
+   ptrA->elec_ofs_add_const               = (uint32_t) HAWK_CONST_ELEC_OFFSET_VALUE;         // vaut "constante" dans le modèle décrit plus haut
+   ptrA->elec_ofs_pix_faked_value         =  0; 
+   ptrA->elec_ofs_pix_faked_value_forced  =  0;
+   ptrA->elec_ofs_offset_minus_pix_value  =  0;
+   ptrA->elec_ofs_offset_null_forced      =  0;
+    
+  // sortie de la map d'offset
+  if (elec_ofs_map_image_enabled == 1){       // pour sortir le map d'offset en image. Soit obtenir "signal_elec = estimé_offset_elec" à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
+      ptrA->elec_ofs_pix_faked_value_forced  =  1;       //      etape 1: on permet de forcer la valeur des pixels à une valeur fixe. 
+      ptrA->elec_ofs_pix_faked_value         =  0;       //               soit "gain_elec * signal_fpa" vaut 0
+      ptrA->elec_ofs_add_const               =  0;       //      etape 2: la quanité "constante"  vaut aussi 0
+      ptrA->elec_ofs_offset_minus_pix_value  =  1;       //      etape 3: le soustracteur inverse l'ordre de la soustraction. Au final on a bien l'offset_electrique en image
+   }
+  
+  // desactivation de la correction de l'offset dynamique
+  if ((elec_ofs_enabled == 0) || (ptrA->fpa_diag_mode == 1)) {  // desactivation de la correction d'offset dynamique. Soit obtenir signal_elec =  gain_elec * signal_fpa + offset_elec " à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
+      ptrA->elec_ofs_offset_null_forced      =  1;                   //     etape 1: on force "estimé_offset_elec" à 0.
+      ptrA->elec_ofs_add_const               =  0;                   //     etape 2: la quanité "constante"  vaut aussi 0. Au final on a bien ce qui est voulu.
+  }
    
    WriteStruct(ptrA);
 }
@@ -415,27 +467,27 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 void FPA_SpecificParams(hawk_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // parametres statiques
-   ptrH->mlck_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
+   ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_delay_mclk          = 7.33F;   // FPA: delai de sortie des pixels après integration   ENO: 08 fev 2016: aucune justification dans le doc du Hawk pour maintenauir ce delai à 9. Je le fais passer à 9.33 pour avoir 120Kfps en 64x2
    ptrH->vhd_delay_mclk          = 2.0F;   // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 8.0F;
-   ptrH->fovh_mclk               = 1.0F;
+   ptrH->fovh_line               = 1.0F;
    ptrH->int_time_offset_mclk    = 0.0F;   // aucun offset sur le temps d'integration
       
    // readout time
-   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_mclk);
-   ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mlck_period_usec;
+   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
+   ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
-   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mlck_period_usec;
-   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mlck_period_usec;
-   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mlck_period_usec; 
+   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
    
    // 
-   ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mlck_period_usec; ; 
+   ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec; ; 
       
    // calcul de la periode minimale
    ptrH->frame_period_usec = (exposureTime_usec + ptrH->int_time_offset_usec) + ptrH->delay_usec + ptrH->readout_usec;

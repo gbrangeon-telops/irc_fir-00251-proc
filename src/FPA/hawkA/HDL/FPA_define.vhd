@@ -38,20 +38,26 @@ package FPA_define is
    constant DEFINE_FLEX_VOLTAGEP_mV               : natural   := 8000;     -- le flex de ce détecteur doit être alimenté à 8V 
    constant DEFINE_FPA_TEMP_CH_GAIN               : real      := 1.0;      -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l,ampli buffer et des resistances entre les deux 
    constant DEFINE_FPA_PIX_PER_MCLK_PER_TAP       : natural   := 1;        -- 1 pixels par coup d'horloge pour le hawk
-   --constant DEFINE_FPA_BITSTREAM_LENGTH           : natural   := 58;       -- nombre de bits contenu  dans le bitstream de configuration serielle
+   
+   -- integration, offset d'integration,  feddeback
+   constant DEFINE_GENERATE_INT_FDBK_MODULE       : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START
+   constant DEFINE_FPA_INT_FDBK_DLY               : natural   := 0;        -- pour isc0209A, le fedback commence en même temps que la consigne (fpa_int) mais les deux signaux n'ont pas la même durée (DEFINE_FPA_INT_TIME_OFFSET_nS les differencie)
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 0;        -- int_time offset de 0 nsec 
+   
    constant DEFINE_FPA_PROG_INT_TIME              : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
-   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := true;     -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
-   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s 
+   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;     -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';      -- pas besoin de config particulière au demarrage des Hawks
-   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := 0;        -- not used
-   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le Hawk, on utilise la chaine Vprocessing.
+   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '0';      -- pour le Hawk, on n'utilise plus la chaine Vprocessing.
+   constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- à '1' permet de generer la chaine de traitement pour le quad 2. Ce qui est utile en diversité de canal
+   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
+   constant DEFINE_GENERATE_ELEC_OFFSET_CORR_CHAIN: std_logic := '0';      -- pour le hawk, on ne fait pas de la correction d'offset
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le 0207, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;            -- pour le Hawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;        -- not used
    constant DEFINE_XSIZE_MAX                      : integer   := 640;          -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 512;          -- dimension en Y maximale  
    --constant DEFINE_GAIN0                          : std_logic := '0';
@@ -145,83 +151,98 @@ package FPA_define is
       ysize_div4_m1                  : unsigned(7 downto 0);
       lovh_mclk_source               : unsigned(15 downto 0);    -- lovh converti en coups d'hotloges mclk_source.Utilisé en mode diag 
    end record;   
-       
+   
    type fpa_intf_cfg_type is
    record     
       -- cette partie provient du contrôleur du temps d'integration
-      int_time                       : unsigned(31 downto 0);          -- temps d'integration en coups de MCLK. 
-      int_indx                       : std_logic_vector(7 downto 0);   -- index du  temps d'integration
-      int_signal_high_time           : unsigned(31 downto 0);          -- dureen en MCLK pendant laquelle lever le signal d'integration pour avoir int_time. depend des offsets de temps d'intégration   
+      int_time                            : unsigned(31 downto 0);          -- temps d'integration en coups de MCLK. 
+      int_indx                            : std_logic_vector(7 downto 0);   -- index du  temps d'integration
+      int_signal_high_time                : unsigned(31 downto 0);          -- dureen en MCLK pendant laquelle lever le signal d'integration pour avoir int_time. depend des offsets de temps d'intégration   
+      
+      -- provenance hybride (µBlaze ou vhd)
+      int_fdbk_dly                        : unsigned(1 downto 0);          -- delai avant generation du feedback d'integration. Utilisé pour certains détecteurs uniquement dont le ISC0209A à cause de l'offset dynamique
       
       -- cette partie provient du microBlaze
       -- common
-      comn                           : fpa_comn_cfg_type;      -- partie commune (utilisée par les modules communs)
+      comn                                : fpa_comn_cfg_type;      -- partie commune (utilisée par les modules communs)
       
-      -- diag window
-      diag                           : window_cfg_type; 
+      -- diag window                     
+      diag                                : window_cfg_type; 
       
-      -- window, gain
-      xstart                         : unsigned(10 downto 0); 
-      ystart                         : unsigned(10 downto 0);
-      xsize                          : unsigned(10 downto 0);
-      ysize                          : unsigned(10 downto 0);
-      gain                           : std_logic_vector(1 downto 0);
-      invert                         : std_logic; 
-      revert                         : std_logic;   
-      cbit_en                        : std_logic;
-      dig_code                       : unsigned(15 downto 0);
-      jpos                           : unsigned(15 downto 0); 
-      kpos                           : unsigned(15 downto 0);
-      lpos                           : unsigned(15 downto 0);
-      mpos                           : unsigned(15 downto 0);
-      wdr_len                        : unsigned(15 downto 0);    
-      full_window                    : std_logic;     -- '1' si fenetre pleine
+      -- window, gain                    
+      xstart                              : unsigned(10 downto 0); 
+      ystart                              : unsigned(10 downto 0);
+      xsize                               : unsigned(10 downto 0);
+      ysize                               : unsigned(10 downto 0);
+      gain                                : std_logic_vector(1 downto 0);
+      invert                              : std_logic; 
+      revert                              : std_logic;   
+      cbit_en                             : std_logic;
+      dig_code                            : unsigned(15 downto 0);
+      jpos                                : unsigned(15 downto 0); 
+      kpos                                : unsigned(15 downto 0);
+      lpos                                : unsigned(15 downto 0);
+      mpos                                : unsigned(15 downto 0);
+      wdr_len                             : unsigned(15 downto 0);    
+      full_window                         : std_logic;     -- '1' si fenetre pleine
       
       -- delai 
-      real_mode_active_pixel_dly     : unsigned(7 downto 0);
+      real_mode_active_pixel_dly          : unsigned(7 downto 0);
       
       -- chn diversity
-      adc_quad2_en                   : std_logic; -- à '1' si les données du quad2 doivent êre prises en compte par la chaine
-      chn_diversity_en               : std_logic; -- dit quoi faire avec les données du quad2. '1' si ces données sont des repliques du quad1 => chn diversity. '0' si ces données doient être considérées comme des des données de taps 5, 6, 7, 8 d'un détrecteur 8 taps.
+      adc_quad2_en                        : std_logic; -- à '1' si les données du quad2 doivent êre prises en compte par la chaine
+      chn_diversity_en                    : std_logic; -- dit quoi faire avec les données du quad2. '1' si ces données sont des repliques du quad1 => chn diversity. '0' si ces données doient être considérées comme des des données de taps 5, 6, 7, 8 d'un détrecteur 8 taps.
       
       -- pour les referentiels de trame et de lignes
-      readout_pclk_cnt_max           : unsigned(16 downto 0);    --  pour hawk: readout_pclk_cnt_max = taille en pclk de l'image incluant les pauses, les lignes non valides etc.. = (XSIZE/TAP_NUM + LOVH)* (YSIZE + FOVH) + 1  (un dernier PCLK pur finir)
-      line_period_pclk               : unsigned(7 downto 0);     --  pour hawk: nombre de pclk =  (XSIZE/TAP_NUM + LOVH)
+      readout_pclk_cnt_max                : unsigned(16 downto 0);    --  pour hawk: readout_pclk_cnt_max = taille en pclk de l'image incluant les pauses, les lignes non valides etc.. = (XSIZE/TAP_NUM + LOVH)* (YSIZE + FOVH) + 1  (un dernier PCLK pur finir)
+      line_period_pclk                    : unsigned(7 downto 0);     --  pour hawk: nombre de pclk =  (XSIZE/TAP_NUM + LOVH)
       
       -- ligne active = ligne excluant les portions/pixels non valides     
-      active_line_start_num          : unsigned(3 downto 0);     --  pour hawk: le numero de la premiere ligne active. Il vaut 1
-      active_line_end_num            : unsigned(10 downto 0);     --  pour hawk: le numero de la derniere ligne active. Il vaut Ysize
+      active_line_start_num               : unsigned(3 downto 0);     --  pour hawk: le numero de la premiere ligne active. Il vaut 1
+      active_line_end_num                 : unsigned(10 downto 0);     --  pour hawk: le numero de la derniere ligne active. Il vaut Ysize
       
       -- nombre d'échantillons dans un pixel
-      pix_samp_num_per_ch            : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
+      pix_samp_num_per_ch                 : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
       
       -- delimiteurs de trames et de lignes
-      sof_posf_pclk                  : unsigned(8 downto 0);     --  pour hawk: 
-      eof_posf_pclk                  : unsigned(16 downto 0);    --  pour hawk:
-      sol_posl_pclk                  : unsigned(7 downto 0);     --  pour hawk:
-      eol_posl_pclk                  : unsigned(7 downto 0);     --  pour hawk:
-      eol_posl_pclk_p1               : unsigned(7 downto 0);     --  pour hawk: eol_posl_pclk + 1
+      sof_posf_pclk                       : unsigned(8 downto 0);     --  pour hawk: 
+      eof_posf_pclk                       : unsigned(16 downto 0);    --  pour hawk:
+      sol_posl_pclk                       : unsigned(7 downto 0);     --  pour hawk:
+      eol_posl_pclk                       : unsigned(7 downto 0);     --  pour hawk:
+      eol_posl_pclk_p1                    : unsigned(7 downto 0);     --  pour hawk: eol_posl_pclk + 1
       
       -- calculs pour diversité des canaux
-      hgood_samp_sum_num             : unsigned(3 downto 0);    --  nombre d'échantillons horizontaux par pixel et par canal 
-      hgood_samp_mean_numerator      : unsigned(22 downto 0);   --  ne pas changer la taille de ce registre 
+      hgood_samp_sum_num                  : unsigned(3 downto 0);    --  nombre d'échantillons horizontaux par pixel et par canal 
+      hgood_samp_mean_numerator           : unsigned(22 downto 0);   --  ne pas changer la taille de ce registre 
       
-      vgood_samp_sum_num             : unsigned(3 downto 0);    --  nombre d'échantillons verticaux par pixel (>=2 => diversité des canaux active sinon vaut 1)
-      vgood_samp_mean_numerator      : unsigned(22 downto 0);   --  ne pas changer la taille de ce registre 
+      vgood_samp_sum_num                  : unsigned(3 downto 0);    --  nombre d'échantillons verticaux par pixel (>=2 => diversité des canaux active sinon vaut 1)
+      vgood_samp_mean_numerator           : unsigned(22 downto 0);   --  ne pas changer la taille de ce registre 
       
       -- choix des échantillons par canal
-      good_samp_first_pos_per_ch     : unsigned(7 downto 0);    -- position du premier bon echantillon 
-      good_samp_last_pos_per_ch      : unsigned(7 downto 0);    -- position du dernier bon echantillon 
-      xsize_div_tapnum               : unsigned(7 downto 0);      
+      good_samp_first_pos_per_ch          : unsigned(7 downto 0);    -- position du premier bon echantillon 
+      good_samp_last_pos_per_ch           : unsigned(7 downto 0);    -- position du dernier bon echantillon 
+      xsize_div_tapnum                    : unsigned(7 downto 0);      
       
       -- les valeurs Vdac
-      vdac_value                     : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)
+      vdac_value                          : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)
       
-      -- adc clk_phase
-      adc_clk_phase                  : unsigned(4 downto 0);     -- dit de combien déphaser l'horloge des ADCs
+      -- adc clk_phase                    
+      adc_clk_phase                       : unsigned(4 downto 0);     -- dit de combien déphaser l'horloge des ADCs
       
-      -- reorder_column
-      reorder_column                 : std_logic;
+      -- reorder_column                   
+      reorder_column                      : std_logic;
+      
+      -- electrical offset param  
+      elec_ofs_offset_null_forced         : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
+      elec_ofs_pix_faked_value_forced     : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
+      elec_ofs_pix_faked_value            : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      elec_ofs_offset_minus_pix_value     : std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
+      elec_ofs_add_const                  : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
+      
+      elec_ofs_start_dly_sampclk          : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
+      elec_ofs_samp_num_per_ch            : unsigned(6 downto 0);
+      elec_ofs_samp_mean_numerator        : unsigned(22 downto 0);
+      
       
    end record; 
    
@@ -285,19 +306,38 @@ package FPA_define is
    end record;
    
    ----------------------------------------------								
-   -- Type readout_info
+   -- Type readout_info_type
    ----------------------------------------------
+   -- aoi
+   type aoi_readout_info_type is
+   record
+      sof            : std_logic;        
+      eof            : std_logic;
+      sol            : std_logic;
+      eol            : std_logic;
+      fval           : std_logic;                     
+      lval           : std_logic;
+      dval           : std_logic;
+      read_end       : std_logic;                     -- pulse  en dehors de fval mais qui signifie que le readout est terminé
+      samp_pulse     : std_logic;                     -- sampling pluse de frequence valant celle des adc
+      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+   end record;
+   
+   -- non_aoi
+   type non_aoi_readout_info_type is
+   record
+      start          : std_logic;                     -- pulse  en dehors de fval mais qui signifie que le readout est terminé
+      stop           : std_logic;                     -- divers flags synchronisables avec readout_info. Attention: après read_end, les misc flags ne servent à rien. Si besoin d'utilser des flags après rd_end alors utiliser les ADC_FLAG  
+      dval           : std_logic;  
+      samp_pulse     : std_logic;                     -- sampling pulse de frequence valant celle des adc
+      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+   end record;
+   
+   -- readout_type
    type readout_info_type is
    record
-      sof        : std_logic;        
-      eof        : std_logic;
-      sol        : std_logic;
-      eol        : std_logic;
-      fval       : std_logic;                     
-      lval       : std_logic;
-      dval       : std_logic;
-      read_end   : std_logic;  -- pulse  en dehors de fval mais qui signifie que le readout est terminé
-      samp_pulse : std_logic;  -- sampling pluse de frequence valant celle des adc
+      aoi            : aoi_readout_info_type;        
+      naoi           : non_aoi_readout_info_type;
    end record;
    
    ----------------------------------------------
