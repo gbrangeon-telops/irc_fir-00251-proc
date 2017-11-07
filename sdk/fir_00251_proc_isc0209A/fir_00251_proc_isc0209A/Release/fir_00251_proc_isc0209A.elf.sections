@@ -6,66 +6,62 @@ EXEC_P, HAS_SYMS
 start address 0x00000000
 
 Program Header:
-    LOAD off    0x000000b4 vaddr 0x00000000 paddr 0x00000000 align 2**2
+    LOAD off    0x00000094 vaddr 0x00000000 paddr 0x00000000 align 2**2
          filesz 0x00000028 memsz 0x00000028 flags r-x
-    LOAD off    0x000000dc vaddr 0x00000050 paddr 0x00000050 align 2**0
+    LOAD off    0x000000bc vaddr 0x00000050 paddr 0x00000050 align 2**0
          filesz 0x00000000 memsz 0x00001400 flags rw-
-    LOAD off    0x000000dc vaddr 0x50000000 paddr 0x50000000 align 2**2
-         filesz 0x000a6824 memsz 0x000a6828 flags rwx
-    LOAD off    0x000a6900 vaddr 0x500a6828 paddr 0x500a6828 align 2**2
-         filesz 0x00003b34 memsz 0x00bd528c flags rw-
+    LOAD off    0x000000bc vaddr 0x50000000 paddr 0x50000000 align 2**2
+         filesz 0x000aa35c memsz 0x00c7bab4 flags rwx
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .vectors.reset 00000008  00000000  00000000  000000b4  2**2
+  0 .vectors.reset 00000008  00000000  00000000  00000094  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .vectors.sw_exception 00000008  00000008  00000008  000000bc  2**2
+  1 .vectors.sw_exception 00000008  00000008  00000008  0000009c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .vectors.interrupt 00000008  00000010  00000010  000000c4  2**2
+  2 .vectors.interrupt 00000008  00000010  00000010  000000a4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  3 .vectors.hw_exception 00000008  00000020  00000020  000000d4  2**2
+  3 .vectors.hw_exception 00000008  00000020  00000020  000000b4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  4 .text         00095870  50000000  50000000  000000dc  2**2
+  4 .text         00095870  50000000  50000000  000000bc  2**2
                   CONTENTS, ALLOC, LOAD, CODE
-  5 .init         0000003c  50095870  50095870  0009594c  2**2
+  5 .init         0000003c  50095870  50095870  0009592c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  6 .fini         00000020  500958ac  500958ac  00095988  2**2
+  6 .fini         00000020  500958ac  500958ac  00095968  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  7 .ctors        00000008  500958cc  500958cc  000959a8  2**2
+  7 .ctors        00000008  500958cc  500958cc  00095988  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .dtors        00000008  500958d4  500958d4  000959b0  2**2
+  8 .dtors        00000008  500958d4  500958d4  00095990  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .rodata       00010f48  500958dc  500958dc  000959b8  2**2
+  9 .rodata       00010f4c  500958dc  500958dc  00095998  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
- 10 .sdata2       00000004  500a6824  500a6824  000a6900  2**0
-                  ALLOC
- 11 .data         00003b34  500a6828  500a6828  000a6900  2**2
+ 10 .data         00003b34  500a6828  500a6828  000a68e4  2**2
                   CONTENTS, ALLOC, LOAD, DATA
- 12 .sdata        00000004  500aa35c  500aa35c  000aa434  2**0
+ 11 .sdata        00000004  500aa35c  500aa35c  000aa418  2**0
                   ALLOC
- 13 .bss          00051e54  500aa360  500aa360  000aa434  2**2
+ 12 .bss          00051e54  500aa360  500aa360  000aa418  2**2
                   ALLOC
- 14 .noinit       00b7f900  500fc1b4  500fc1b4  000aa434  2**2
+ 13 .noinit       00b7f900  500fc1b4  500fc1b4  000aa418  2**2
                   ALLOC
- 15 .heap         00000400  00000050  00000050  000000dc  2**0
+ 14 .heap         00000400  00000050  00000050  000000bc  2**0
                   ALLOC
- 16 .stack        00001000  00000450  00000450  000000dc  2**0
+ 15 .stack        00001000  00000450  00000450  000000bc  2**0
                   ALLOC
- 17 .debug_line   0000a9e7  00000000  00000000  000aa434  2**0
+ 16 .debug_line   0000a9e7  00000000  00000000  000aa418  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_info   0000dd56  00000000  00000000  000b4e1b  2**0
+ 17 .debug_info   0000dd56  00000000  00000000  000b4dff  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_abbrev 000052f0  00000000  00000000  000c2b71  2**0
+ 18 .debug_abbrev 000052f0  00000000  00000000  000c2b55  2**0
                   CONTENTS, READONLY, DEBUGGING
- 20 .debug_aranges 00000de8  00000000  00000000  000c7e68  2**3
+ 19 .debug_aranges 00000de8  00000000  00000000  000c7e48  2**3
                   CONTENTS, READONLY, DEBUGGING
- 21 .debug_ranges 00000bf8  00000000  00000000  000c8c50  2**3
+ 20 .debug_ranges 00000bf8  00000000  00000000  000c8c30  2**3
                   CONTENTS, READONLY, DEBUGGING
- 22 .debug_frame  000015a8  00000000  00000000  000c9848  2**2
+ 21 .debug_frame  000015a8  00000000  00000000  000c9828  2**2
                   CONTENTS, READONLY, DEBUGGING
- 23 .debug_loc    000095bd  00000000  00000000  000cadf0  2**0
+ 22 .debug_loc    000095bd  00000000  00000000  000cadd0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 24 .debug_str    00002513  00000000  00000000  000d43ad  2**0
+ 23 .debug_str    00002513  00000000  00000000  000d438d  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00000000 l    d  .vectors.reset	00000000 .vectors.reset
@@ -78,7 +74,6 @@ SYMBOL TABLE:
 500958cc l    d  .ctors	00000000 .ctors
 500958d4 l    d  .dtors	00000000 .dtors
 500958dc l    d  .rodata	00000000 .rodata
-500a6824 l    d  .sdata2	00000000 .sdata2
 500a6828 l    d  .data	00000000 .data
 500aa35c l    d  .sdata	00000000 .sdata
 500aa360 l    d  .bss	00000000 .bss
@@ -123,14 +118,14 @@ SYMBOL TABLE:
 50003d0c l     F .text	0000072c _fpadd_parts
 00000000 l    df *ABS*	00000000 lib_a-mktime.o
 50007340 l     F .text	00000324 validate_structure
-500a4118 l     O .rodata	00000030 DAYS_IN_MONTH
-500a40e8 l     O .rodata	00000030 _DAYS_BEFORE_MONTH
+500a411c l     O .rodata	00000030 DAYS_IN_MONTH
+500a40ec l     O .rodata	00000030 _DAYS_BEFORE_MONTH
 00000000 l    df *ABS*	00000000 lib_a-mktm_r.o
-500a4150 l     O .rodata	00000060 mon_lengths
-500a4148 l     O .rodata	00000008 year_lengths
+500a4154 l     O .rodata	00000060 mon_lengths
+500a414c l     O .rodata	00000008 year_lengths
 00000000 l    df *ABS*	00000000 lib_a-svfprintf.o
-500a4358 l     O .rodata	00000010 blanks.3883
-500a4368 l     O .rodata	00000010 zeroes.3884
+500a435c l     O .rodata	00000010 blanks.3883
+500a436c l     O .rodata	00000010 zeroes.3884
 00000000 l    df *ABS*	00000000 lib_a-dtoa.o
 5000c468 l     F .text	000004ec quorem
 00000000 l    df *ABS*	00000000 lib_a-gettzinfo.o
@@ -140,27 +135,27 @@ SYMBOL TABLE:
 500a69c8 l     O .data	00000020 lc_message_charset
 500a69e8 l     O .data	00000038 lconv
 00000000 l    df *ABS*	00000000 lib_a-mprec.o
-500a4518 l     O .rodata	0000000c p05.2400
+500a451c l     O .rodata	0000000c p05.2400
 00000000 l    df *ABS*	00000000 lib_a-svfiprintf.o
-500a46b8 l     O .rodata	00000010 blanks.3827
-500a46c8 l     O .rodata	00000010 zeroes.3828
+500a46bc l     O .rodata	00000010 blanks.3827
+500a46cc l     O .rodata	00000010 zeroes.3828
 00000000 l    df *ABS*	00000000 sbrk.o
 500aa3bc l     O .bss	00000004 heap_ptr
 00000000 l    df *ABS*	00000000 lib_a-ef_pow.o
-500a4738 l     O .rodata	00000008 bp
-500a4740 l     O .rodata	00000008 dp_l
-500a4748 l     O .rodata	00000008 dp_h
+500a473c l     O .rodata	00000008 bp
+500a4744 l     O .rodata	00000008 dp_l
+500a474c l     O .rodata	00000008 dp_h
 00000000 l    df *ABS*	00000000 lib_a-ef_rem_pio2.o
-500a47d0 l     O .rodata	00000318 two_over_pi
-500a4750 l     O .rodata	00000080 npio2_hw
+500a47d4 l     O .rodata	00000318 two_over_pi
+500a4754 l     O .rodata	00000080 npio2_hw
 00000000 l    df *ABS*	00000000 lib_a-kf_rem_pio2.o
-500a4ae8 l     O .rodata	0000000c init_jk
-500a4af4 l     O .rodata	0000002c PIo2
+500a4aec l     O .rodata	0000000c init_jk
+500a4af8 l     O .rodata	0000002c PIo2
 00000000 l    df *ABS*	00000000 lib_a-sf_atan.o
-500a4b30 l     O .rodata	00000010 atanlo
-500a4b20 l     O .rodata	00000010 atanhi
+500a4b34 l     O .rodata	00000010 atanlo
+500a4b24 l     O .rodata	00000010 atanhi
 00000000 l    df *ABS*	00000000 lib_a-s_rint.o
-500a4b44 l     O .rodata	00000010 TWO52
+500a4b48 l     O .rodata	00000010 TWO52
 00000000 l    df *ABS*	00000000 c:/xilinx/sdk/2013.4/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/4.6.4/m/le/crtend.o
 500958d0 l     O .ctors	00000000 __CTOR_END__
 50019148 l       .text	00000000 __do_global_ctors_aux
@@ -181,21 +176,21 @@ SYMBOL TABLE:
 500aa3fc l     O .bss	0000060c demo_device_1
 500aaa08 l     O .bss	00041f70 static_buffer_par1
 00000000 l    df *ABS*	00000000 ./src/uffs-v1.3.6/uffs_badblock.o
-500a4b54 l     O .rodata	0000000c CSWTCH.4
+500a4b58 l     O .rodata	0000000c CSWTCH.4
 00000000 l    df *ABS*	00000000 ./src/uffs-v1.3.6/uffs_buf.o
 5001fbe8 l     F .text	0000006c _MoveNodeToHead
 5001fc54 l     F .text	00000128 _BreakFromDirty
 50020538 l     F .text	00000f54 uffs_BufFlush_Exist_With_BlockRecover
 00000000 l    df *ABS*	00000000 ./src/uffs-v1.3.6/uffs_crc.o
-500a4b60 l     O .rodata	00000200 CRC16_TBL
+500a4b64 l     O .rodata	00000200 CRC16_TBL
 00000000 l    df *ABS*	00000000 ./src/uffs-v1.3.6/uffs_debug.o
 500ec978 l     O .bss	00000004 m_ops
 500ec97c l     O .bss	00000004 m_msg_level
 00000000 l    df *ABS*	00000000 ./src/uffs-v1.3.6/uffs_ecc.o
-500a4d60 l     O .rodata	00000100 column_parity_tbl
-500a4e70 l     O .rodata	00000010 line_parity_prime_tbl
-500a4e60 l     O .rodata	00000010 line_parity_tbl
-500a4e80 l     O .rodata	00000100 bits_tbl
+500a4d64 l     O .rodata	00000100 column_parity_tbl
+500a4e74 l     O .rodata	00000010 line_parity_prime_tbl
+500a4e64 l     O .rodata	00000010 line_parity_tbl
+500a4e84 l     O .rodata	00000100 bits_tbl
 00000000 l    df *ABS*	00000000 ./src/uffs-v1.3.6/uffs_fd.o
 50023280 l     F .text	000000dc do_stat
 500edb90 l     O .bss	00000004 _uffs_errno
@@ -251,7 +246,7 @@ SYMBOL TABLE:
 500ee900 l     O .bss	00000002 crc16.5177
 500ee7c4 l     O .bss	0000013c hdr_v1.5175
 00000000 l    df *ABS*	00000000 ./src/ICU/ICU.o
-500a4ffc l     O .rodata	0000000c CSWTCH.5
+500a5000 l     O .rodata	0000000c CSWTCH.5
 500a7338 l     O .data	00000001 prev_position.5572
 500a7339 l     O .data	00000001 reset
 500ee904 l     O .bss	00000014 refreshRateTimer
@@ -347,10 +342,10 @@ SYMBOL TABLE:
 500a7378 l     O .data	00000002 actualPolarizationVoltage.4318
 500eeaa8 l     O .bss	00000004 actualElectricalRefOffset.4322
 00000000 l    df *ABS*	00000000 ./src/Common/CRC.o
-500a51ec l     O .rodata	00000200 crcTable.2795
+500a51f0 l     O .rodata	00000200 crcTable.2795
 00000000 l    df *ABS*	00000000 ./src/Common/CircularUART.o
 50045f50 l     F .text	00000044 CircularUART_InterruptHandler
-500a53ec l     O .rodata	00000034 HandlerTable
+500a53f0 l     O .rodata	00000034 HandlerTable
 50045f94 l     F .text	00000088 NoInterruptHandler
 5004601c l     F .text	0000004c ModemHandler
 50046068 l     F .text	00000134 CircularUART_SendCircBuffer
@@ -383,7 +378,7 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 ./src/Common/NetworkInterface.o
 5004af8c l     F .text	00000128 NetIntf_PingHosts.part.0
 00000000 l    df *ABS*	00000000 ./src/Common/Protocol_F1F2.o
-500a5eb8 l     O .rodata	00000400 CSWTCH.16
+500a5ebc l     O .rodata	00000400 CSWTCH.16
 00000000 l    df *ABS*	00000000 ./src/Common/XADC.o
 500eeef8 l     O .bss	00000004 xadcState.4530
 500eef00 l     O .bss	00000008 tic_xadcSampling.4531
@@ -393,14 +388,14 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 ./src/Calibration/calib.o
 500506e8 l     F .text	00000070 CAL_resetErr
 50050758 l     F .text	00000118 CAL_configSwitchesAndHoles.isra.0
-500a6400 l     O .rodata	00000004 CSWTCH.4
-500a6404 l     O .rodata	00000004 CSWTCH.5
-500a6408 l     O .rodata	00000004 CSWTCH.6
-500a640c l     O .rodata	00000004 CSWTCH.7
-500a6410 l     O .rodata	00000004 CSWTCH.8
-500a6414 l     O .rodata	00000004 CSWTCH.9
+500a6404 l     O .rodata	00000004 CSWTCH.4
+500a6408 l     O .rodata	00000004 CSWTCH.5
+500a640c l     O .rodata	00000004 CSWTCH.6
+500a6410 l     O .rodata	00000004 CSWTCH.7
+500a6414 l     O .rodata	00000004 CSWTCH.8
+500a6418 l     O .rodata	00000004 CSWTCH.9
 500a8894 l     O .data	00000080 blockRam
-500a6418 l     O .rodata	0000000c CSWTCH.11
+500a641c l     O .rodata	0000000c CSWTCH.11
 500eef2c l     O .bss	00000120 calib_blocks
 00000000 l    df *ABS*	00000000 ./src/Buffering/BufferManager.o
 500ef050 l     O .bss	00000004 cstate.5598
@@ -620,9 +615,9 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 ./src/XADC_Channels.o
 500a9d08 l     O .data	00000001 firstpass.6071
 00000000 l    df *ABS*	00000000 ./src/power_ctrl.o
-500a6710 l     O .rodata	0000001c CSWTCH.9
-500a672c l     O .rodata	0000001c CSWTCH.10
-500a6748 l     O .rodata	00000038 CSWTCH.11
+500a6714 l     O .rodata	0000001c CSWTCH.9
+500a6730 l     O .rodata	0000001c CSWTCH.10
+500a674c l     O .rodata	00000038 CSWTCH.11
 500efb90 l     O .bss	00000008 tic.6689
 500a9d0a l     O .data	00000001 startup.6717
 00000000 l    df *ABS*	00000000 ./src/proc_init.o
@@ -682,28 +677,28 @@ SYMBOL TABLE:
 50093348 l     F .text	000000d4 ReceiveStatusHandler
 5009341c l     F .text	0000006c ReceiveDataHandler
 50093488 l     F .text	00000084 SendDataHandler
-500a6780 l     O .rodata	00000034 HandlerTable
+500a6784 l     O .rodata	00000034 HandlerTable
 00000000 l    df *ABS*	00000000 xuartns550_options.o
 5009367c l     F .text	00000028 ReadFcrRegister
-500a67b4 l     O .rodata	00000048 OptionsTable
+500a67b8 l     O .rodata	00000048 OptionsTable
 00000000 l    df *ABS*	00000000 xuartns550_selftest.o
 500aa268 l     O .data	00000021 TestString
 500f274c l     O .bss	00000021 ReturnString
 00000000 l    df *ABS*	00000000 xspi.o
 50093dbc l     F .text	00000034 StubStatusHandler
 00000000 l    df *ABS*	00000000 xspi_options.o
-500a67fc l     O .rodata	00000028 OptionsTable
+500a6800 l     O .rodata	00000028 OptionsTable
 00000000 l    df *ABS*	00000000 xil_assert.o
 500f2770 l     O .bss	00000004 Xil_AssertCallbackRoutine
 00000000 l    df *ABS*	00000000 lib_a-ctype_.o
-500a3f60 l     O .rodata	00000180 _ctype_b
+500a3f64 l     O .rodata	00000180 _ctype_b
 00000000 l    df *ABS*	00000000 lib_a-impure.o
 500a6874 l     O .data	000000f0 impure_data
 00000000 l    df *ABS*	00000000 
 500aa360 l       .sdata	00000000 __sdata_start
-500a6828 l       .sdata2	00000000 __sbss2_end
+500a6828 l       .data	00000000 __sbss2_end
 00000400 l       *ABS*	00000000 _HEAP_SIZE
-500a6828 l       .sdata2	00000000 __sdata2_start
+500a6828 l       .data	00000000 __sdata2_start
 00001450 l       .stack	00000000 _end
 50051adc g     F .text	00000038 BufferManager_GetNbImageMax
 5007b52c g     F .text	00000084 GC_Poller_StorageErrorCallback
@@ -721,7 +716,7 @@ SYMBOL TABLE:
 500466b8 g     F .text	000000b4 CtrlIntf_Init
 5004a434 g     F .text	00000220 GC_RegisterWriteRequest
 500111b8 g     F .text	000000e4 __any_on
-500a4400 g     O .rodata	00000028 __mprec_tinytens
+500a4404 g     O .rodata	00000028 __mprec_tinytens
 5002688c g     F .text	00000304 uffs_FlashCheckErasedBlock
 5008eac0 g     F .text	00000384 xadcCalibrationUpdate
 500087c8 g     F .text	000000ac strcpy
@@ -969,7 +964,7 @@ SYMBOL TABLE:
 500efb20 g     O .bss	00000034 DeviceTemperatureAry
 5002296c g     F .text	00000050 uffs_BufRead
 5003f628 g     F .text	0000010c setControllerGain
-500a66d0 g     O .rodata	00000040 Conv_Fact_MC65
+500a66d4 g     O .rodata	00000040 Conv_Fact_MC65
 5006c37c g     F .text	000000bc GC_ExposureTime5Callback
 500aa1d0 g     O .data	00000098 XIntc_ConfigTable
 500fb334 g     O .bss	00000030 gLedCtrl
@@ -1006,7 +1001,7 @@ SYMBOL TABLE:
 500aa3f0 g     O .bss	00000004 g_nand_chip_1
 5006960c g     F .text	00000008 GC_WidthMaxCallback
 50024004 g     F .text	000000a4 uffs_remove
-500a6824 g       .rodata	00000000 __rodata_end
+500a6828 g       .rodata	00000000 __rodata_end
 500242d4 g     F .text	00000158 uffs_readdir
 500a737c g     O .data	00001515 gcRegsDef
 5003e4f4 g     F .text	000000cc LoadAbsolutePosition
@@ -1036,7 +1031,7 @@ SYMBOL TABLE:
 500394c4 g     F .text	000000d8 ICU_init
 5003305c g     F .text	00000160 CalibBlock_ParseLUTNLDataHeader_v2
 5002fcd4 g     F .text	00000030 SFW_GetEncoderPosition
-500a4450 g     O .rodata	000000c8 __mprec_tens
+500a4454 g     O .rodata	000000c8 __mprec_tens
 50091cd0 g     F .text	000000f0 XIntc_Start
 5003a5d4 g     F .text	00000044 GPS_RstData
 5003ba00 g     F .text	000027d4 FW_ControllerProcess
@@ -1154,7 +1149,7 @@ SYMBOL TABLE:
 5002a18c g     F .text	00000234 uffs_Mount
 500694a8 g     F .text	00000008 GC_MemoryBufferAvailableFreeSpaceLowCallback
 50092cf4 g     F .text	00000158 XUartNs550_Recv
-500a40e0 g     O .rodata	00000004 _global_impure_ptr
+500a40e4 g     O .rodata	00000004 _global_impure_ptr
 50052d6c g     F .text	00000048 AEC_ClearMem
 5001129c g     F .text	000006f8 _realloc_r
 5001877c g     F .text	00000108 __kernel_sinf
@@ -1171,7 +1166,7 @@ SYMBOL TABLE:
 50001c08 g     F .text	00000bd8 __udivdi3
 500efb7c g     O .bss	0000000c DeviceVoltageCalibrationAry
 50051f38 g     F .text	000000b0 BufferManager_SetMoiConfig
-500a4428 g     O .rodata	00000028 __mprec_bigtens
+500a442c g     O .rodata	00000028 __mprec_bigtens
 5000fafc g     F .text	00000120 __s2b
 5004e184 g     F .text	000002c8 QSPIFlash_Write
 50069200 g     F .text	00000008 GC_DeviceBuiltInTestsResults8Callback
@@ -1309,7 +1304,7 @@ SYMBOL TABLE:
 5002c0f4 g     F .text	000000a0 uffs_FindFromTree
 50014fa8 g     F .text	000002e8 __ieee754_asinf
 5006a118 g     F .text	00000054 GC_EventSelectorCallback
-500a438c g     O .rodata	00000020 __sf_fake_stderr
+500a4390 g     O .rodata	00000020 __sf_fake_stderr
 50093d10 g     F .text	000000ac XUartNs550_ClearStats
 5004b528 g     F .text	00000224 NetIntf_ShowPacket
 500aa098 g     O .data	00000018 gExposureTime
@@ -1355,7 +1350,7 @@ SYMBOL TABLE:
 50093df0 g     F .text	000000ec XSpi_Start
 50005a90 g     F .text	00000084 __clzsi2
 50022bfc g     F .text	00000008 uffs_DeviceLock
-500a6828 g       .sdata2	00000000 __sbss2_start
+500a6828 g       .data	00000000 __sbss2_start
 500669dc g     F .text	00000100 FM_SortFileList
 5001fb60 g     F .text	00000088 uffs_BlockInfoInitErased
 500691a0 g     F .text	00000008 GC_AcquisitionStartCallback
@@ -1549,7 +1544,7 @@ SYMBOL TABLE:
 500159ec g     F .text	00000ad8 __ieee754_powf
 5005d244 g     F .text	000012e4 BetaQuantizer_SM
 50053f3c g     F .text	000011f8 Acquisition_SM
-500a3d38 g     O .rodata	00000010 __thenan_sf
+500a3d3c g     O .rodata	00000010 __thenan_sf
 5006cbd0 g     F .text	0000007c GC_AECImageFractionCallback
 50095250 g     F .text	000000dc XSysMon_GetSequencerMode
 50047230 g     F .text	00000068 outbyte
@@ -1579,7 +1574,7 @@ SYMBOL TABLE:
 5004f554 g     F .text	0000000c AXI4L_write32
 500ee7ae g     O .bss	00000002 gSFW_deltaFilterEnd
 50094498 g     F .text	000000b8 XSpi_SetStatusHandler
-500a43cc g     O .rodata	00000020 __sf_fake_stdin
+500a43d0 g     O .rodata	00000020 __sf_fake_stdin
 5000c0ac g     F .text	00000008 __tz_lock
 5003b3bc g     F .text	00000024 FLAG_Init
 5003ef20 g     F .text	000000a0 setVelocity
@@ -1684,7 +1679,7 @@ SYMBOL TABLE:
 500057f4 g     F .text	0000009c __divsi3
 5008f7c0 g     F .text	00000038 Power_ToggleDevicePowerState
 50049d38 g     F .text	00000394 GC_RegisterReadRequest
-500a3d48 g     O .rodata	00000014 __thenan_df
+500a3d4c g     O .rodata	00000014 __thenan_df
 500aa360 g       .sdata	00000000 __sdata_end
 5000e384 g     F .text	0000014c _malloc_trim_r
 5003f250 g     F .text	000000e0 configurePositionLimits
@@ -1739,7 +1734,7 @@ SYMBOL TABLE:
 50091750 g     F .text	00000028 Proc_NDF_Init
 50046af0 g     F .text	00000074 CtrlIntf_Disable
 500085f4 g     F .text	00000078 sprintf
-500a3d5c g     O .rodata	00000100 __clz_tab
+500a3d60 g     O .rodata	00000100 __clz_tab
 500694b8 g     F .text	00000008 GC_MemoryBufferFragmentedFreeSpaceLowCallback
 50031278 g     F .text	000001ec CalibBlock_ParsePixelDataHeader
 50069dfc g     F .text	00000044 GC_DeviceDetectorPolarizationVoltageCallback
@@ -1791,7 +1786,7 @@ SYMBOL TABLE:
 5002a688 g     F .text	000000dc uffs_GetMatchedMountPointSize
 5003530c g     F .text	00000d54 FlashSettings_ParseFlashSettingsFileHeader
 500fbe3c g     O .bss	00000044 gFlashDynamicValues
-500a6828 g       .sdata2	00000000 __sdata2_end
+500a6828 g       .data	00000000 __sdata2_end
 500694a0 g     F .text	00000008 GC_MemoryBufferAvailableFreeSpaceHighCallback
 5008f298 g     F .text	00000080 Power_IntrHandler
 500693c8 g     F .text	00000008 GC_EHDRIModeCallback
@@ -1819,7 +1814,7 @@ SYMBOL TABLE:
 5003b570 g     F .text	00000110 FWControllerInit
 500913f8 g     F .text	00000030 Proc_ReleaseInfo_Init
 5002376c g     F .text	000001c8 uffs_read
-500a66b0 g     O .rodata	00000020 Conv_Fact_USX3431
+500a66b4 g     O .rodata	00000020 Conv_Fact_USX3431
 50043710 g     F .text	00000048 FPA_ClearErr
 50013e80 g     F .text	000000e8 sinf
 50039480 g     F .text	00000024 ICU_calib
@@ -1953,7 +1948,7 @@ SYMBOL TABLE:
 5003f914 g     F .text	0000010c FH_UART_IntrHandler
 50018884 g     F .text	00000294 atanf
 500efbac g     O .bss	00000004 gFpaDetectorElectricalTapsRef
-500a43ac g     O .rodata	00000020 __sf_fake_stdout
+500a43b0 g     O .rodata	00000020 __sf_fake_stdout
 50069458 g     F .text	00000008 GC_GevSecondURLCallback
 500f2794 g     O .bss	00000024 rTClock
 50069410 g     F .text	00000008 GC_FWPositionRawCallback
@@ -1966,7 +1961,7 @@ SYMBOL TABLE:
 5003a360 g     F .text	00000028 HDER_UpdateBadPixelReplacementHeader
 500617d8 g     F .text	000000d4 Calibration_GetActiveBlockIdx
 500efbb0 g     O .bss	00000002 gFpaDetectorPolarizationVoltage
-500a3e5c g     O .rodata	00000101 _ctype_
+500a3e60 g     O .rodata	00000101 _ctype_
 50067044 g     F .text	0000008c FM_FindFileNameInList
 50028fa4 g     F .text	00000028 uffs_GetCurOffset
 500ef04e g     O .bss	00000001 gBufferStartDownloadTrigger

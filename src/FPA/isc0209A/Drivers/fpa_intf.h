@@ -20,7 +20,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0209A__ADC_10MHz__ELEC_OFS"
+#define FPA_DEVICE_MODEL_NAME    "ISC0209A__ADC_10MHz__ELEC_OFS_V2"
 
 #define FPA_WIDTH_MIN      128    //
 #define FPA_WIDTH_MAX      320
@@ -139,7 +139,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,0,1730}, 25, 0, 0, 0, 0, 0, 0, 4, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0,0,0,0,0,0,0,1730}, 25, 0, 0, 0, 0, 0, 0, 5, 0, 0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
