@@ -18,8 +18,7 @@ use work.fpa_common_pkg.all;
 entity isc0207A_clks_mmcm is
    port(
       ARESET           : in std_logic;
-      CLK_100M_IN      : in std_logic;
-      --CLK_100M_OUT     : out std_logic;
+      CLK_100M         : in std_logic;
       MCLK_SOURCE      : out std_logic;
       QUAD_PHASE_CLK   : out std_logic;
       MMCM_LOCKED      : out std_logic  
@@ -48,7 +47,7 @@ begin
       begin                                             
       U10M :  isc0207A_5_0_MHz_mmcm
       port map (   
-         clk_in         => CLK_100M_IN,
+         clk_in         => CLK_100M,
          mclk_source    => MCLK_SOURCE,       --  
          quad_phase_clk => QUAD_PHASE_CLK,    --   
          reset          => ARESET,

@@ -70,7 +70,7 @@ architecture rtl of isc0207A_clks_gen_core is
    signal fpa_pclk_i                     : std_logic;
    signal quad_clk_default               : std_logic;
    signal quad_clk_raw                   : std_logic;
-   signal disable_quad_clk_default_i     : std_logic;
+   signal disable_quad_clk_default_i     : std_logic  := '0';
    signal adc_deserializer_rst_i         : std_logic;
    signal quad_clk_copy_i                : std_logic;
    signal quad_clk_r                     : std_logic_vector(4 downto 1);

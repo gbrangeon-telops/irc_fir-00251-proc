@@ -127,10 +127,21 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  tsh_min_minus_int_time_offset;  
                                              
    uint32_t  vdac_value[8];                    
-   uint32_t  quad_clk_phase[4];
-   //uint32_t  proxim_is_flegx;
+   uint32_t  quad_clk_phase[4];               
+   
+   //electrical offset
+   uint32_t  elec_ofs_offset_null_forced;    
+   uint32_t  elec_ofs_pix_faked_value_forced;
+   uint32_t  elec_ofs_pix_faked_value;       
+   uint32_t  elec_ofs_offset_minus_pix_value;
+   uint32_t  elec_ofs_add_const;             
+   uint32_t  elec_ofs_start_dly;             
+   uint32_t  elec_ofs_samp_num_per_ch;       
+   uint32_t  elec_ofs_samp_mean_numerator;    
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
+
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {0,0,0,0}, 0, 0, 0, 0, 0, 5, 0, 0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
@@ -214,9 +225,6 @@ struct s_FpaStatus    //
 typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
-
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {0,0,0,0}}
-
 
 // pour initialiser le module vhd avec les bons parametres de départ
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);

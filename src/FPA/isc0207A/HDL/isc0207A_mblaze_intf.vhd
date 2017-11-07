@@ -207,6 +207,9 @@ begin
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
             
+            -- 
+            user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);  -- 
+            
             -- veritable calcul des delais : seul fpa_acq_trig_ctrl_dly et fpa_xtra_trig_ctrl_dly sont importants pour le mode MODE_INT_END_TO_TRIG_START des detecteurs analogiques
             user_cfg_i.comn.fpa_acq_trig_ctrl_dly    <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
             user_cfg_i.comn.fpa_acq_trig_period_min  <=  user_cfg_i.comn.fpa_acq_trig_ctrl_dly  ;     --  pas utilisé en mode MODE_INT_END_TO_TRIG_START avec les détecteurs analogiques. Donc n,importe quelle valeur fera l'affaire
@@ -221,84 +224,93 @@ begin
             user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
             user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length); 
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
-                        
+            
             -- reste de la config            
-            if slv_reg_wren = '1' and axi_wstrb =  "1111" then  
-               case axi_awaddr(7 downto 0) is             
+            if slv_reg_wren = '1'then  
+               case axi_awaddr(11 downto 0) is             
                   
                   -- comn                                                                                              
-                  when X"00" =>    user_cfg_i.comn.fpa_diag_mode              <= data_i(0); user_cfg_in_progress <= '1';                       
-                  when X"04" =>    user_cfg_i.comn.fpa_diag_type              <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
-                  when X"08" =>    user_cfg_i.comn.fpa_pwr_on                 <= data_i(0);						
-                  when X"0C" =>    user_cfg_i.comn.fpa_trig_ctrl_mode         <= data_i(user_cfg_i.comn.fpa_trig_ctrl_mode'length-1 downto 0);                                                                        
-                  when X"10" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
-                  when X"14" =>    user_cfg_i.comn.fpa_acq_trig_period_min    <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_period_min'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
-                  when X"18" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
-                  when X"1C" =>    user_cfg_i.comn.fpa_xtra_trig_period_min   <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_period_min'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
+                  when X"000" =>    user_cfg_i.comn.fpa_diag_mode              <= data_i(0); user_cfg_in_progress <= '1';                       
+                  when X"004" =>    user_cfg_i.comn.fpa_diag_type              <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
+                  when X"008" =>    user_cfg_i.comn.fpa_pwr_on                 <= data_i(0);						
+                  when X"00C" =>    user_cfg_i.comn.fpa_trig_ctrl_mode         <= data_i(user_cfg_i.comn.fpa_trig_ctrl_mode'length-1 downto 0);                                                                        
+                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
+                  when X"014" =>    user_cfg_i.comn.fpa_acq_trig_period_min    <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_period_min'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
+                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
+                  when X"01C" =>    user_cfg_i.comn.fpa_xtra_trig_period_min   <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_period_min'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
                      
                   -- non common
-                  when X"20" =>    user_cfg_i.xstart                          <= unsigned(data_i(user_cfg_i.xstart'length-1 downto 0));                                 
-                  when X"24" =>    user_cfg_i.ystart                          <= unsigned(data_i(user_cfg_i.ystart'length-1 downto 0));                                 
-                  when X"28" =>    user_cfg_i.xsize                           <= unsigned(data_i(user_cfg_i.xsize'length-1 downto 0));                                                                                                                                                
-                  when X"2C" =>    user_cfg_i.ysize                           <= unsigned(data_i(user_cfg_i.ysize'length-1 downto 0));                                                                                                                                                
-                  when X"30" =>    user_cfg_i.boost_mode                      <= data_i(0);                                                                                                                                                                                           
-                  when X"34" =>    user_cfg_i.internal_outr                   <= data_i(0);                                                                                                                                                                                           
-                  when X"38" =>    user_cfg_i.onchip_bin_256                  <= data_i(0);                                                                                                                                        
-                  when X"3C" =>    user_cfg_i.onchip_bin_128                  <= data_i(0);                                                                                                                                        
-                  when X"40" =>    user_cfg_i.itr                             <= data_i(0);                                                                                                                                        
-                  when X"44" =>    user_cfg_i.gain                            <= data_i(0);                                                                                                                                        
-                  when X"48" =>    user_cfg_i.skimming                        <= data_i(0);                                                                                                                                                                                           
+                  when X"020" =>    user_cfg_i.xstart                          <= unsigned(data_i(user_cfg_i.xstart'length-1 downto 0));                                 
+                  when X"024" =>    user_cfg_i.ystart                          <= unsigned(data_i(user_cfg_i.ystart'length-1 downto 0));                                 
+                  when X"028" =>    user_cfg_i.xsize                           <= unsigned(data_i(user_cfg_i.xsize'length-1 downto 0));                                                                                                                                                
+                  when X"02C" =>    user_cfg_i.ysize                           <= unsigned(data_i(user_cfg_i.ysize'length-1 downto 0));                                                                                                                                                
+                  when X"030" =>    user_cfg_i.boost_mode                      <= data_i(0);                                                                                                                                                                                           
+                  when X"034" =>    user_cfg_i.internal_outr                   <= data_i(0);                                                                                                                                                                                           
+                  when X"038" =>    user_cfg_i.onchip_bin_256                  <= data_i(0);                                                                                                                                        
+                  when X"03C" =>    user_cfg_i.onchip_bin_128                  <= data_i(0);                                                                                                                                        
+                  when X"040" =>    user_cfg_i.itr                             <= data_i(0);                                                                                                                                        
+                  when X"044" =>    user_cfg_i.gain                            <= data_i(0);                                                                                                                                        
+                  when X"048" =>    user_cfg_i.skimming                        <= data_i(0);                                                                                                                                                                                           
                   
-                  when X"4C" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));                                                                                                                           
-                  when X"50" =>    user_cfg_i.line_period_pclk                <= unsigned(data_i(user_cfg_i.line_period_pclk'length-1 downto 0));                                                                                                                                                         
-                  when X"54" =>    user_cfg_i.readout_pclk_cnt_max            <= unsigned(data_i(user_cfg_i.readout_pclk_cnt_max'length-1 downto 0));                                                                                                                                                                                                                                                 
-                  when X"58" =>    user_cfg_i.active_line_start_num           <= unsigned(data_i(user_cfg_i.active_line_start_num'length-1 downto 0));                                                                                                                                                                                                                                
-                  when X"5C" =>    user_cfg_i.active_line_end_num             <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));                                                                                                                                  
-                  when X"60" =>    user_cfg_i.pix_samp_num_per_ch             <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));                                                                                                                                  
-                  when X"64" =>    user_cfg_i.sof_posf_pclk                   <= unsigned(data_i(user_cfg_i.sof_posf_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"68" =>    user_cfg_i.eof_posf_pclk                   <= unsigned(data_i(user_cfg_i.eof_posf_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"6C" =>    user_cfg_i.sol_posl_pclk                   <= unsigned(data_i(user_cfg_i.sol_posl_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"70" =>    user_cfg_i.eol_posl_pclk                   <= unsigned(data_i(user_cfg_i.eol_posl_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"74" =>    user_cfg_i.eol_posl_pclk_p1                <= unsigned(data_i(user_cfg_i.eol_posl_pclk_p1'length-1 downto 0));                                                                                                                                     
-                  when X"78" =>    user_cfg_i.hgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
-                  when X"7C" =>    user_cfg_i.hgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
-                  when X"80" =>    user_cfg_i.vgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
-                  when X"84" =>    user_cfg_i.vgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
-                  when X"88" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0));                                                                                                                           
-                  when X"8C" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
-                  when X"90" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0));                                                                                                                                     
-                  when X"94" =>    user_cfg_i.ysize_div2_m1                   <= unsigned(data_i(user_cfg_i.ysize_div2_m1'length-1 downto 0));                                                                                                                                        
-                  when X"98" =>    user_cfg_i.readout_plus_delay              <= unsigned(data_i(user_cfg_i.readout_plus_delay'length-1 downto 0));                                                                                                      
-                  when X"9C" =>    user_cfg_i.tri_window_and_intmode_part     <= unsigned(data_i(user_cfg_i.tri_window_and_intmode_part'length-1 downto 0));                                                                                             
-                  when X"A0" =>    user_cfg_i.int_time_offset                 <= unsigned(data_i(user_cfg_i.int_time_offset'length-1 downto 0));                                                             
-                  when X"A4" =>    user_cfg_i.tsh_min                         <= unsigned(data_i(user_cfg_i.tsh_min'length-1 downto 0));                       
-                  when X"A8" =>    user_cfg_i.tsh_min_minus_int_time_offset   <= unsigned(data_i(user_cfg_i.tsh_min_minus_int_time_offset'length-1 downto 0)); 
+                  when X"04C" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));                                                                                                                           
+                  when X"050" =>    user_cfg_i.line_period_pclk                <= unsigned(data_i(user_cfg_i.line_period_pclk'length-1 downto 0));                                                                                                                                                         
+                  when X"054" =>    user_cfg_i.readout_pclk_cnt_max            <= unsigned(data_i(user_cfg_i.readout_pclk_cnt_max'length-1 downto 0));                                                                                                                                                                                                                                                 
+                  when X"058" =>    user_cfg_i.active_line_start_num           <= unsigned(data_i(user_cfg_i.active_line_start_num'length-1 downto 0));                                                                                                                                                                                                                                
+                  when X"05C" =>    user_cfg_i.active_line_end_num             <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));                                                                                                                                  
+                  when X"060" =>    user_cfg_i.pix_samp_num_per_ch             <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));                                                                                                                                  
+                  when X"064" =>    user_cfg_i.sof_posf_pclk                   <= unsigned(data_i(user_cfg_i.sof_posf_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"068" =>    user_cfg_i.eof_posf_pclk                   <= unsigned(data_i(user_cfg_i.eof_posf_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"06C" =>    user_cfg_i.sol_posl_pclk                   <= unsigned(data_i(user_cfg_i.sol_posl_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"070" =>    user_cfg_i.eol_posl_pclk                   <= unsigned(data_i(user_cfg_i.eol_posl_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"074" =>    user_cfg_i.eol_posl_pclk_p1                <= unsigned(data_i(user_cfg_i.eol_posl_pclk_p1'length-1 downto 0));                                                                                                                                     
+                  when X"078" =>    user_cfg_i.hgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
+                  when X"07C" =>    user_cfg_i.hgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
+                  when X"080" =>    user_cfg_i.vgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
+                  when X"084" =>    user_cfg_i.vgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
+                  when X"088" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0));                                                                                                                           
+                  when X"08C" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
+                  when X"090" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0));                                                                                                                                     
+                  when X"094" =>    user_cfg_i.ysize_div2_m1                   <= unsigned(data_i(user_cfg_i.ysize_div2_m1'length-1 downto 0));                                                                                                                                        
+                  when X"098" =>    user_cfg_i.readout_plus_delay              <= unsigned(data_i(user_cfg_i.readout_plus_delay'length-1 downto 0));                                                                                                      
+                  when X"09C" =>    user_cfg_i.tri_window_and_intmode_part     <= unsigned(data_i(user_cfg_i.tri_window_and_intmode_part'length-1 downto 0));                                                                                             
+                  when X"0A0" =>    user_cfg_i.int_time_offset                 <= unsigned(data_i(user_cfg_i.int_time_offset'length-1 downto 0));                                                             
+                  when X"0A4" =>    user_cfg_i.tsh_min                         <= unsigned(data_i(user_cfg_i.tsh_min'length-1 downto 0));                       
+                  when X"0A8" =>    user_cfg_i.tsh_min_minus_int_time_offset   <= unsigned(data_i(user_cfg_i.tsh_min_minus_int_time_offset'length-1 downto 0)); 
                      
                   -- dacs et quads
-                  when X"AC" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0));                                                                                                                          
-                  when X"B0" =>    user_cfg_i.vdac_value(2)                   <= unsigned(data_i(user_cfg_i.vdac_value(2)'length-1 downto 0));                                                                                                                                        
-                  when X"B4" =>    user_cfg_i.vdac_value(3)                   <= unsigned(data_i(user_cfg_i.vdac_value(3)'length-1 downto 0));                                                                                                                                        
-                  when X"B8" =>    user_cfg_i.vdac_value(4)                   <= unsigned(data_i(user_cfg_i.vdac_value(4)'length-1 downto 0));                                                                                                                                        
-                  when X"BC" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));                                                                                                                                        
-                  when X"C0" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));                                                                                                                                        
-                  when X"C4" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));                                                                                                                                        
-                  when X"C8" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0));                                                                                                                                        
-                  when X"CC" =>    user_cfg_i.adc_clk_phase(1)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(1)'length-1 downto 0));                                                                                                                                        
-                  when X"D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));
-                  when X"D4" =>    user_cfg_i.adc_clk_phase(3)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(3)'length-1 downto 0));
-                  when X"D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); user_cfg_in_progress <= '0'; 
-                     --when X"DC" =>    user_cfg_i.proxim_is_flegx                 <= data_i(0);                          
+                  when X"0AC" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0));                                                                                                                          
+                  when X"0B0" =>    user_cfg_i.vdac_value(2)                   <= unsigned(data_i(user_cfg_i.vdac_value(2)'length-1 downto 0));                                                                                                                                        
+                  when X"0B4" =>    user_cfg_i.vdac_value(3)                   <= unsigned(data_i(user_cfg_i.vdac_value(3)'length-1 downto 0));                                                                                                                                        
+                  when X"0B8" =>    user_cfg_i.vdac_value(4)                   <= unsigned(data_i(user_cfg_i.vdac_value(4)'length-1 downto 0));                                                                                                                                        
+                  when X"0BC" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));                                                                                                                                        
+                  when X"0C0" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));                                                                                                                                        
+                  when X"0C4" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));                                                                                                                                        
+                  when X"0C8" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0));                                                                                                                                        
+                  when X"0CC" =>    user_cfg_i.adc_clk_phase(1)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(1)'length-1 downto 0));                                                                                                                                        
+                  when X"0D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));
+                  when X"0D4" =>    user_cfg_i.adc_clk_phase(3)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(3)'length-1 downto 0));
+                  when X"0D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); 
+                     
+                  -- electrical offset
+                  when X"0DC" =>    user_cfg_i.elec_ofs_offset_null_forced     <= data_i(0);
+                  when X"0E0" =>    user_cfg_i.elec_ofs_pix_faked_value_forced <= data_i(0);
+                  when X"0E4" =>    user_cfg_i.elec_ofs_pix_faked_value        <= unsigned(data_i(user_cfg_i.elec_ofs_pix_faked_value'length-1 downto 0));
+                  when X"0E8" =>    user_cfg_i.elec_ofs_offset_minus_pix_value <= data_i(0);
+                  when X"0EC" =>    user_cfg_i.elec_ofs_add_const              <= unsigned(data_i(user_cfg_i.elec_ofs_add_const'length-1 downto 0)); 
+                  when X"0F0" =>    user_cfg_i.elec_ofs_start_dly_sampclk      <= unsigned(data_i(user_cfg_i.elec_ofs_start_dly_sampclk'length-1 downto 0)); 
+                  when X"0F4" =>    user_cfg_i.elec_ofs_samp_num_per_ch        <= unsigned(data_i(user_cfg_i.elec_ofs_samp_num_per_ch'length-1 downto 0));
+                  when X"0F8" =>    user_cfg_i.elec_ofs_samp_mean_numerator    <= unsigned(data_i(user_cfg_i.elec_ofs_samp_mean_numerator'length-1 downto 0)); user_cfg_in_progress <= '0';                   
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
-                  when X"E0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
-                  when X"E4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
-                  when X"E8" =>    fpa_softw_stat_i.fpa_input                 <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
+                  when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
+                  when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
+                  when X"AE8" =>    fpa_softw_stat_i.fpa_input                 <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
                      
                   -- pour effacer erreurs latchées
-                  when X"EC" =>    reset_err_i                                <= data_i(0); 
+                  when X"AEC" =>    reset_err_i                                <= data_i(0); 
                      
                   -- pour un reset complet du module FPA
-                  when X"F0" =>   mb_ctrled_reset_i                           <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                  when X"AF0" =>   mb_ctrled_reset_i                           <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                   
                   when others =>
                   
