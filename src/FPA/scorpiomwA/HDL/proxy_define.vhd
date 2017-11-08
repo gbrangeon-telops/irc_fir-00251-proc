@@ -19,8 +19,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all; 
-use work.fpa_common_pkg.all;
-use work.fpa_define.all;  
+--use work.fpa_common_pkg.all;
+--use work.fpa_define.all;  
 
 package Proxy_define is       
 

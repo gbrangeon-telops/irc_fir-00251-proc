@@ -51,9 +51,9 @@
 #define AR_FPA_TEMPERATURE                0x002C    // adresse temperature
 
 // adresse d'écriture du régistre du type du pilote C 
-#define AW_FPA_ROIC_SW_TYPE               0xE0      // adresse à lauquelle on dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-#define AW_FPA_OUTPUT_SW_TYPE             0xE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
-#define AW_FPA_INPUT_SW_TYPE              0xE8      // obligaoire pour les deteceteurs analogiques
+#define AW_FPA_ROIC_SW_TYPE               0xAE0      // adresse à lauquelle on dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+#define AW_FPA_OUTPUT_SW_TYPE             0xAE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
+#define AW_FPA_INPUT_SW_TYPE              0xAE8      // obligaoire pour les deteceteurs analogiques
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                          0x18      // 0x18 -> FPA_ROIC_SCORPIO_MW . Provient du fichier fpa_common_pkg.vhd.
@@ -62,10 +62,10 @@
 
 
 // adresse d'écriture du régistre du reset des erreurs
-#define AW_RESET_ERR                      0xEC
+#define AW_RESET_ERR                      0xAEC
 
 // adresse d'écriture du régistre du reset du module FPA
-#define AW_CTRLED_RESET                   0xF0
+#define AW_CTRLED_RESET                   0xAF0
 
 // Differents types de mode diagnostic (vient du fichier fpa_define.vhd et de la doc de Mglk)
 #define TELOPS_DIAG_CNST                  0xD1      // mode diag constant (patron de test generé par la carte d'acquisition : tous les pixels à la même valeur) 
@@ -101,7 +101,10 @@
 #define SCORPIOMWA_TAPREF_VOLTAGE_MAX_mV  5310
 
 #define SCORPIOMWA_REFOFS_VOLTAGE_MIN_mV  3000 
-#define SCORPIOMWA_REFOFS_VOLTAGE_MAX_mV  6200  
+#define SCORPIOMWA_REFOFS_VOLTAGE_MAX_mV  6200
+
+#define SCORPIOMWA_CONST_ELEC_OFFSET_VALUE 340            // aussi pour ne pas provoquer saturation au dela de (2^14 - 1) soit 16383
+
 
 
   
@@ -109,7 +112,7 @@
 struct scorpiomw_param_s             //
 {					   
    // parametres à rentrer
-   float mlck_period_usec;
+   float mclk_period_usec;
    float pclk_rate_hz;
    float tap_number;
    float pixnum_per_tap_per_mclk;
@@ -223,6 +226,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    uint32_t Cmin, Cmax, Rmin, Rmax;
    extern int16_t gFpaDetectorPolarizationVoltage;
    static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   uint32_t elec_ofs_enabled = 0;
+   uint32_t elec_ofs_map_image_enabled = 0;
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
@@ -315,8 +320,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    actualPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
    
-   // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 4;                             //3
+   // ajustement de delais de la chaine 
+   if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_cfg_in_progress == 0))   
+      ptrA->real_mode_active_pixel_dly  = (uint32_t) gFpaDebugRegA;
+   gFpaDebugRegA = (int32_t)ptrA->real_mode_active_pixel_dly;  
    
    // quad2
    ptrA->adc_quad2_en = 0;   //
@@ -379,8 +386,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
    // adc_clk_phase
-   ptrA->adc_clk_phase[0] = 11;
-   ptrA->adc_clk_phase[1] = 11;
+   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_phase[0]) && (init_cfg_in_progress == 0)){
+      ptrA->adc_clk_phase[0] = (uint32_t)gFpaDebugRegD;
+      ptrA->adc_clk_phase[1] = (uint32_t)gFpaDebugRegD;
+   }
+   gFpaDebugRegD = (int32_t)ptrA->adc_clk_phase[0];
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
@@ -389,6 +399,53 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->reorder_column = 0;
    if ((ptrA->fpa_diag_mode == 0)&&(ptrA->uprow_upcol == 0))  // en mode détecteur et avec uprow_upcol=0 le scorpioMW inverse les colonnes
       ptrA->reorder_column = 1;
+  
+  /* offset electronique
+    sans correction offset, on a : signal_elec =  gain_elec * signal_fpa + offset_elec;
+    avec correction,               signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec +  constante;   la constante permet de compenser la plage dynamique suite à la disparition de l'offset
+   */
+                
+   // registreA : contrôle l'activation du correcteur de l'offset electronique              
+   //if (((uint32_t)gFpaDebugRegA != elec_ofs_enabled) && (init_done == 1))   
+   //   elec_ofs_enabled  = (uint32_t) gFpaDebugRegA;
+   //gFpaDebugRegA = (int32_t)elec_ofs_enabled;
+   elec_ofs_enabled = 0;
+   
+
+   // registreB : contrôle la sortie ou non de l'image du map d'offset 
+   //if (((uint32_t)gFpaDebugRegB != elec_ofs_map_image_enabled) && (init_done == 1))   
+   //  elec_ofs_map_image_enabled  = (uint32_t) gFpaDebugRegB;
+   //gFpaDebugRegB = (int32_t)elec_ofs_map_image_enabled;
+   elec_ofs_map_image_enabled = 0;
+   
+   // registreC : contrôle le delai avant calcul d'offset
+   //if (((uint32_t)gFpaDebugRegC != ptrA->elec_ofs_start_dly) && (init_done == 1))   
+   //  ptrA->elec_ofs_start_dly  = (uint32_t) gFpaDebugRegC;
+   //gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly;
+   
+   // valeurs par defaut
+   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (((hh.pixnum_per_tap_per_mclk * hh.tap_number) * (hh.itr_tri_min_usec/hh.mclk_period_usec)) / (2.0F * hh.tap_number) - 2.0F); // nombre d'échantillons dans la ligne de reset / (2* taps_number). Chaque tap comporte deux canaux . Pour plus de securité, on enleve 3 de ce nombre
+   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (2.0F*floorf((float)ptrA->elec_ofs_samp_num_per_ch/2.0F)); // doit être un nombre pair absolûment pour éviter que les zones (1:Ntaps) et (Ntaps+1: 2*Natps) se superposent
+   ptrA->elec_ofs_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elec_ofs_samp_num_per_ch);  
+   ptrA->elec_ofs_add_const               = (uint32_t) ISC0207_CONST_ELEC_OFFSET_VALUE;         // vaut "constante" dans le modèle décrit plus haut
+   ptrA->elec_ofs_pix_faked_value         =  0; 
+   ptrA->elec_ofs_pix_faked_value_forced  =  0;
+   ptrA->elec_ofs_offset_minus_pix_value  =  0;
+   ptrA->elec_ofs_offset_null_forced      =  0;
+    
+  // sortie de la map d'offset
+  if (elec_ofs_map_image_enabled == 1){       // pour sortir le map d'offset en image. Soit obtenir "signal_elec = estimé_offset_elec" à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
+      ptrA->elec_ofs_pix_faked_value_forced  =  1;       //      etape 1: on permet de forcer la valeur des pixels à une valeur fixe. 
+      ptrA->elec_ofs_pix_faked_value         =  0;       //               soit "gain_elec * signal_fpa" vaut 0
+      ptrA->elec_ofs_add_const               =  0;       //      etape 2: la quanité "constante"  vaut aussi 0
+      ptrA->elec_ofs_offset_minus_pix_value  =  1;       //      etape 3: le soustracteur inverse l'ordre de la soustraction. Au final on a bien l'offset_electrique en image
+   }
+  
+  // desactivation de la correction de l'offset dynamique
+  if ((elec_ofs_enabled == 0) || (ptrA->fpa_diag_mode == 1)) {  // desactivation de la correction d'offset dynamique. Soit obtenir signal_elec =  gain_elec * signal_fpa + offset_elec " à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
+      ptrA->elec_ofs_offset_null_forced      =  1;                   //     etape 1: on force "estimé_offset_elec" à 0.
+      ptrA->elec_ofs_add_const               =  0;                   //     etape 2: la quanité "constante"  vaut aussi 0. Au final on a bien ce qui est voulu.
+  } 
       
    WriteStruct(ptrA);
 }
@@ -422,7 +479,7 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // parametres statiques
-   ptrH->mlck_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
+   ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_reset_time_mclk     = 3076.0F;
@@ -435,15 +492,15 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
       
    // readout time
    ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
-   ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mlck_period_usec;
+   ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
-   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mlck_period_usec;
-   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mlck_period_usec;
-   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mlck_period_usec; 
+   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
    
    // integration time/signal
-   ptrH->fpa_reset_time_usec  = ptrH->fpa_reset_time_mclk * ptrH->mlck_period_usec;
+   ptrH->fpa_reset_time_usec  = ptrH->fpa_reset_time_mclk * ptrH->mclk_period_usec;
    ptrH->int_signal_high_time_usec = exposureTime_usec + ptrH->fpa_reset_time_usec;
       
    // calcul de la periode minimale

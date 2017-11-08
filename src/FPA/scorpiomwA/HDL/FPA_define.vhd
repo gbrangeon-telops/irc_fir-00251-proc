@@ -38,17 +38,24 @@ package FPA_define is
    constant DEFINE_FLEX_VOLTAGEP_mV               : natural   := 8_000;    -- ENO 03 juin 2016: le flex de ce détecteur doit être alimenté à 8000 mV 
    constant DEFINE_FPA_TEMP_CH_GAIN               : real      := 1.0;      -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l,ampli buffer et des resistances entre les deux 
    constant DEFINE_FPA_PIX_PER_MCLK_PER_TAP       : natural   := 1;        -- 1 pixels par coup d'horloge pour le scorpioMW
-   --constant DEFINE_FPA_BITSTREAM_LENGTH           : natural   := 58;     -- nombre de bits contenu  dans le bitstream de configuration serielle
-   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
-   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
-   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
-   constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '1';
-   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le scorpiomwA, on  peut utiliser la chaine Vprocessing. 
-   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s 
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 18_000;       -- 10_000 => MCLK = 10M, 15_000 => MCLK = 15M, 18_000 => MCLK = 18M, 
    
+   -- integration, offset d'integration,  feddeback
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := integer(real(3076)*real(1_000_000)/real(DEFINE_FPA_MCLK_RATE_KHZ));     --  3076 MCLK en ns et en fonction de la frequence d'horloge detecteur
+   constant DEFINE_GENERATE_INT_FDBK_MODULE       : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START
+   constant DEFINE_FPA_INT_FDBK_DLY               : natural   := 3076;     -- pour isc0209A, le fedback commence en même temps que la consigne (fpa_int) mais les deux signaux n'ont pas la même durée (DEFINE_FPA_INT_TIME_OFFSET_nS les differencie)
+   
+   constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- à '1' permet de generer la chaine de traitement pour le quad 2. Ce qui est utile en diversité de canal
+   
+   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
+   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
+   constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
+   constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
+   constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '1';
+   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '0';      -- pour le ScorpioMW, on peut ne fait plus de diversité de canaux doncn ne plus utiliser la chaine Vprocessing.
+   constant DEFINE_GENERATE_ELEC_OFFSET_CORR_CHAIN: std_logic := '0';      -- 
+   
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;           -- pour le scorpioMW, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;
    constant DEFINE_XSIZE_MAX                      : integer   := 640;         -- dimension en X maximale
@@ -66,11 +73,6 @@ package FPA_define is
    constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer   := 100_000;    --  horloge de 100M en KHz
    
-   
-   -- quelques caractéristiques de la carte ADC requise
-   --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-   -- ATTENTION : les 3 lignes suivantes à changer avec MCLK
-   --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
    constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 18_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M,  
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 18_000;     -- 40_000 => MCLK = 10M, 30_000 => MCLK = 15M, 36_000 => MCLK = 18M, 
    constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := 72_000;     --  ENO 02 mai 2017 doit valoir au moins 4xMCLK pour éviter des problèmes dans LL8_ext_to_spi_tx
@@ -159,11 +161,14 @@ package FPA_define is
       int_indx                       : std_logic_vector(7 downto 0);   -- index du  temps d'integration
       int_signal_high_time           : unsigned(31 downto 0);          -- dureen en MCLK pendant laquelle lever le signal d'integration pour avoir int_time. depend des offsets de temps d'intégration   
       
+      -- provenance hybride (µBlaze ou vhd)
+      int_fdbk_dly                   : unsigned(1 downto 0);          -- delai avant generation du feedback d'integration. Utilisé pour certains détecteurs uniquement dont le ISC0209A à cause de l'offset dynamique
+      
       -- cette partie provient du microBlaze
       -- common
       comn                           : fpa_comn_cfg_type;        -- partie commune (utilisée par les modules communs)
       
-       -- diag window
+      -- diag window
       diag                           : window_cfg_type; 
       
       -- window
@@ -233,58 +238,69 @@ package FPA_define is
       -- reorder column
       reorder_column                 : std_logic;               -- utilisé principalemet par les Sofradir pour contrer l'inversion des columns
       
+      -- electrical offset param  
+      elec_ofs_offset_null_forced         : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
+      elec_ofs_pix_faked_value_forced     : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
+      elec_ofs_pix_faked_value            : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      elec_ofs_offset_minus_pix_value     : std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
+      elec_ofs_add_const                  : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
+      
+      elec_ofs_start_dly_sampclk          : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
+      elec_ofs_samp_num_per_ch            : unsigned(6 downto 0);
+      elec_ofs_samp_mean_numerator        : unsigned(22 downto 0);      
+      
    end record;    
    
    ---- Configuration par defaut
---   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
---   to_unsigned(100, 32),      --int_time                       
---   (others => '0'),           --int_indx                       
---   to_unsigned(3176, 32),     --int_signal_high_time           
---   --comn                           
---   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32),'0'),
---   to_unsigned(0, 11),        --xstart                         
---   to_unsigned(0, 11),        --ystart                         
---   to_unsigned(640, 11),      --xsize                          
---   to_unsigned(512, 11),      --ysize
---   
---   to_unsigned(0, 9),         --windcfg_part1                         
---   to_unsigned(511, 9),       --windcfg_part2                         
---   to_unsigned(0, 8),         --windcfg_part3                          
---   to_unsigned(159, 8),       --windcfg_part4
---   
---   '1',                       --uprow_upcol                         
---   '1',                       --sizea_sizeb 
---   
---   '1',                       --itr
---   
---   '0',                       --gain                           
---   
---   std_logic_vector(to_unsigned(671, 14)),      --det_code
---   to_unsigned(0, 8),         --real_mode_active_pixel_dly   
---   '1',                       --adc_quad2_en                 
---   '1',                       --chn_diversity_en             
---   to_unsigned(82081, 17),    --readout_pclk_cnt_max         
---   to_unsigned(160, 8),       --line_period_pclk             
---   to_unsigned(1, 4),         --active_line_start_num        
---   to_unsigned(512, 10),       --active_line_end_num
---   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
---   to_unsigned(1, 9),         --sof_posf_pclk                
---   to_unsigned(81920, 17),    --eof_posf_pclk                
---   to_unsigned(1, 8),         --sol_posl_pclk                
---   to_unsigned(160, 8),       --eol_posl_pclk                
---   to_unsigned(161, 8),       --eol_posl_pclk_p1             
---   to_unsigned(1, 4),         --hgood_samp_sum_num           
---   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
---   to_unsigned(2, 4),         --vgood_samp_sum_num           
---   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
---   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
---   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
---   to_unsigned(160, 8),       --xsize_div_tapnum             
---   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
---   (to_unsigned(1, 5),to_unsigned(1, 5)),
---   '0'
---   );
---   
+   --   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
+   --   to_unsigned(100, 32),      --int_time                       
+   --   (others => '0'),           --int_indx                       
+   --   to_unsigned(3176, 32),     --int_signal_high_time           
+   --   --comn                           
+   --   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32),'0'),
+   --   to_unsigned(0, 11),        --xstart                         
+   --   to_unsigned(0, 11),        --ystart                         
+   --   to_unsigned(640, 11),      --xsize                          
+   --   to_unsigned(512, 11),      --ysize
+   --   
+   --   to_unsigned(0, 9),         --windcfg_part1                         
+   --   to_unsigned(511, 9),       --windcfg_part2                         
+   --   to_unsigned(0, 8),         --windcfg_part3                          
+   --   to_unsigned(159, 8),       --windcfg_part4
+   --   
+   --   '1',                       --uprow_upcol                         
+   --   '1',                       --sizea_sizeb 
+   --   
+   --   '1',                       --itr
+   --   
+   --   '0',                       --gain                           
+   --   
+   --   std_logic_vector(to_unsigned(671, 14)),      --det_code
+   --   to_unsigned(0, 8),         --real_mode_active_pixel_dly   
+   --   '1',                       --adc_quad2_en                 
+   --   '1',                       --chn_diversity_en             
+   --   to_unsigned(82081, 17),    --readout_pclk_cnt_max         
+   --   to_unsigned(160, 8),       --line_period_pclk             
+   --   to_unsigned(1, 4),         --active_line_start_num        
+   --   to_unsigned(512, 10),       --active_line_end_num
+   --   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
+   --   to_unsigned(1, 9),         --sof_posf_pclk                
+   --   to_unsigned(81920, 17),    --eof_posf_pclk                
+   --   to_unsigned(1, 8),         --sol_posl_pclk                
+   --   to_unsigned(160, 8),       --eol_posl_pclk                
+   --   to_unsigned(161, 8),       --eol_posl_pclk_p1             
+   --   to_unsigned(1, 4),         --hgood_samp_sum_num           
+   --   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
+   --   to_unsigned(2, 4),         --vgood_samp_sum_num           
+   --   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
+   --   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
+   --   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
+   --   to_unsigned(160, 8),       --xsize_div_tapnum             
+   --   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
+   --   (to_unsigned(1, 5),to_unsigned(1, 5)),
+   --   '0'
+   --   );
+   --   
    
    ----------------------------------------------								
    -- Type hder_param
@@ -299,19 +315,38 @@ package FPA_define is
    end record;
    
    ----------------------------------------------								
-   -- Type readout_info
+   -- Type readout_info_type
    ----------------------------------------------
+   -- aoi
+   type aoi_readout_info_type is
+   record
+      sof            : std_logic;        
+      eof            : std_logic;
+      sol            : std_logic;
+      eol            : std_logic;
+      fval           : std_logic;                     
+      lval           : std_logic;
+      dval           : std_logic;
+      read_end       : std_logic;                     -- pulse  en dehors de fval mais qui signifie que le readout est terminé
+      samp_pulse     : std_logic;                     -- sampling pluse de frequence valant celle des adc
+      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+   end record;
+   
+   -- non_aoi
+   type non_aoi_readout_info_type is
+   record
+      start          : std_logic;                     -- pulse  en dehors de fval mais qui signifie que le readout est terminé
+      stop           : std_logic;                     -- divers flags synchronisables avec readout_info. Attention: après read_end, les misc flags ne servent à rien. Si besoin d'utilser des flags après rd_end alors utiliser les ADC_FLAG  
+      dval           : std_logic;  
+      samp_pulse     : std_logic;                     -- sampling pulse de frequence valant celle des adc
+      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+   end record;
+   
+   -- readout_type
    type readout_info_type is
    record
-      sof        : std_logic;        
-      eof        : std_logic;
-      sol        : std_logic;
-      eol        : std_logic;
-      fval       : std_logic;                     
-      lval       : std_logic;
-      dval       : std_logic;
-      read_end   : std_logic;  -- pulse  en dehors de fval mais qui signifie que le readout est terminé
-      samp_pulse : std_logic;  -- sampling pluse de frequence valant celle des adc
+      aoi            : aoi_readout_info_type;        
+      naoi           : non_aoi_readout_info_type;
    end record;
    
    ----------------------------------------------
