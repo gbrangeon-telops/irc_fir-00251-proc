@@ -131,7 +131,7 @@
 #define ISC0207_REFOFS_VOLTAGE_MIN_mV     502
 #define ISC0207_REFOFS_VOLTAGE_MAX_mV     5300
 
-#define ISC0207_CONST_ELEC_OFFSET_VALUE   8120            //correction d'offset non implantée sur 0207
+#define ISC0207_CONST_ELEC_OFFSET_VALUE   8120            //correction d'offset (non implantée sur 0207)
 
 
 // structure interne pour les parametres du 0207
@@ -239,7 +239,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
    isc0207_param_t hh;   
    uint32_t test_pattern_dly;
-   uint32_t elec_ofs_enabled = 1;
+   uint32_t elec_ofs_enabled = 0;
    uint32_t elec_ofs_map_image_enabled = 0;
    extern int16_t gFpaDetectorPolarizationVoltage;
    static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
@@ -327,11 +327,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->skimming = 0;
    
    // ajustement de delais de la chaine
-   if (FPA_proxim_is_flegx == 1)
-      ptrA->real_mode_active_pixel_dly = 11;       // valeur pour le fleGX
-   else
-      ptrA->real_mode_active_pixel_dly = 11;       //(uint32_t)gFpaDebugRegA;
-
+   //if (FPA_proxim_is_flegx == 1)
+   //   ptrA->real_mode_active_pixel_dly = 11;       // valeur pour le fleGX
+   //else
+   //   ptrA->real_mode_active_pixel_dly = 11;       //(uint32_t)gFpaDebugRegA;
+   
+   if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_done == 1))   
+      ptrA->real_mode_active_pixel_dly  = (uint32_t) gFpaDebugRegA;
+   gFpaDebugRegA = (int32_t)ptrA->real_mode_active_pixel_dly;  
+   
    //
    ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
    ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * (ptrA->ysize + hh.fovh_line) + 1;                    //
@@ -398,40 +402,38 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
    gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
-   if (FPA_proxim_is_flegx == 1) //
+   // phase de l'horloge des quads
+   if ((gFpaDebugRegD != (int32_t) ptrA->quad_clk_phase[0]) && (init_done == 1))
    {
-      ptrA->quad_clk_phase[0] = 2;
-      ptrA->quad_clk_phase[1] = 2;
-      ptrA->quad_clk_phase[2] = 2;
-      ptrA->quad_clk_phase[3] = 2;
+      ptrA->quad_clk_phase[0] = (uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[1] = (uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[2] = (uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[3] = (uint32_t)gFpaDebugRegD;
    }
-   else
-   {
-      ptrA->quad_clk_phase[0] = 2; //(uint32_t)gFpaDebugRegD;
-      ptrA->quad_clk_phase[1] = 2; //(uint32_t)gFpaDebugRegD;
-      ptrA->quad_clk_phase[2] = 2; //(uint32_t)gFpaDebugRegD;
-      ptrA->quad_clk_phase[3] = 2; //(uint32_t)gFpaDebugRegD;
-   }
+   gFpaDebugRegD = (int32_t)ptrA->quad_clk_phase[0];
    
-      /* offset electronique
+   /* offset electronique
     sans correction offset, on a : signal_elec =  gain_elec * signal_fpa + offset_elec;
     avec correction,               signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec +  constante;   la constante permet de compenser la plage dynamique suite à la disparition de l'offset
    */
                 
    // registreA : contrôle l'activation du correcteur de l'offset electronique              
-   if (((uint32_t)gFpaDebugRegA != elec_ofs_enabled) && (init_done == 1))   
-      elec_ofs_enabled  = (uint32_t) gFpaDebugRegA;
-   gFpaDebugRegA = (int32_t)elec_ofs_enabled;
+   //if (((uint32_t)gFpaDebugRegA != elec_ofs_enabled) && (init_done == 1))   
+   //   elec_ofs_enabled  = (uint32_t) gFpaDebugRegA;
+   //gFpaDebugRegA = (int32_t)elec_ofs_enabled;
+   elec_ofs_enabled = 0;
+   
 
    // registreB : contrôle la sortie ou non de l'image du map d'offset 
-   if (((uint32_t)gFpaDebugRegB != elec_ofs_map_image_enabled) && (init_done == 1))   
-     elec_ofs_map_image_enabled  = (uint32_t) gFpaDebugRegB;
-   gFpaDebugRegB = (int32_t)elec_ofs_map_image_enabled;
+   //if (((uint32_t)gFpaDebugRegB != elec_ofs_map_image_enabled) && (init_done == 1))   
+   //  elec_ofs_map_image_enabled  = (uint32_t) gFpaDebugRegB;
+   //gFpaDebugRegB = (int32_t)elec_ofs_map_image_enabled;
+   elec_ofs_map_image_enabled = 0;
    
    // registreC : contrôle le delai avant calcul d'offset
-   if (((uint32_t)gFpaDebugRegC != ptrA->elec_ofs_start_dly) && (init_done == 1))   
-     ptrA->elec_ofs_start_dly  = (uint32_t) gFpaDebugRegC;
-   gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly;
+   //if (((uint32_t)gFpaDebugRegC != ptrA->elec_ofs_start_dly) && (init_done == 1))   
+   //  ptrA->elec_ofs_start_dly  = (uint32_t) gFpaDebugRegC;
+   //gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly;
    
    // valeurs par defaut
    ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (((hh.pixnum_per_tap_per_mclk * hh.tap_number) * (hh.itr_tri_min_usec/hh.mclk_period_usec)) / (2.0F * hh.tap_number) - 2.0F); // nombre d'échantillons dans la ligne de reset / (2* taps_number). Chaque tap comporte deux canaux . Pour plus de securité, on enleve 3 de ce nombre
