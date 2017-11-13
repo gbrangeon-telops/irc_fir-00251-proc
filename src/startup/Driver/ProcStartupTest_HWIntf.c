@@ -66,8 +66,10 @@ IRC_Status_t AutoTest_ICUIntf(void) {
    ATR_PRINTF("...............................................");
    ATR_PRINTF("....................WARNING....................");
    ATR_PRINTF("...............................................");
-   ATR_PRINTF("Make sure no motor is connected to J30, as the \nfollowing test risks damaging it.");
-   ATR_PRINTF("Connect ICU Test Harness to J30.\nPress ENTER to continue...");
+   //ATR_PRINTF("Make sure no motor is connected to J30, as the \nfollowing test risks damaging it.");
+   //ATR_PRINTF("Connect ICU Test Harness to J30.\nPress ENTER to continue..."); --> EC
+   ATR_PRINTF("Make sure no motor is connected to J28, as the \nfollowing test risks damaging it.");
+   ATR_PRINTF("Connect ICU Test Harness to J28.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    // ICU Pulse Generation Test
@@ -142,7 +144,8 @@ IRC_Status_t AutoTest_TrigIntf(void) {
    // Reset the Startup_HW_Test module
    SIG_PROBE_RESET();
 
-   ATR_PRINTF("Connect the Trig Test Harness to J4 and J5.\nPress ENTER to continue...\n");
+   //ATR_PRINTF("Connect the Trig Test Harness to J4 and J5.\nPress ENTER to continue...\n");   --> EC
+   ATR_PRINTF("Connect the Trig Test Harness to J9 and J10.\nPress ENTER to continue...\n");
    AutoTest_getUserNULL();
 
    GC_SetAcquisitionStop(0);
@@ -284,7 +287,8 @@ IRC_Status_t AutoTest_SWFIntf(void) {
    /*
     * Test function body
     */
-   ATR_PRINTF("Connect the Filter Wheel Test Harness to J26.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the Filter Wheel Test Harness to J26.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the Filter Wheel Test Harness to J25.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    // All signals initially undetected

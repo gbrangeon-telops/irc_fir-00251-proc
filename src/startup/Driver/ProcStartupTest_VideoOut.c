@@ -85,7 +85,8 @@ IRC_Status_t AutoTest_GIGEVideoOut(void) {
  */
 IRC_Status_t AutoTest_SDIVideoOut(void) {
 
-   ATR_PRINTF("Connect the SDI Video monitor to the device.");
+   //ATR_PRINTF("Connect the SDI Video monitor to the device."); --> EC
+   ATR_PRINTF("Connect the SDI Video monitor to J11.");
    ATR_PRINTF("Is the SDI Test Pattern displayed correctly? (Y/N)\n");
 
 

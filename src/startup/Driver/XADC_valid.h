@@ -19,8 +19,10 @@
 #define TOLERANCE           0.0165f
 #define THERM_TOL           0.0048828125f       // 20 LSBs of a 12-bit ADC, VREF = 1V
 
-#define COOLER_VOLTAGE_MAX    (24.0f * (1.0f + TOLERANCE))
-#define COOLER_VOLTAGE_MIN  	(24.0f * (1.0f - TOLERANCE))
+//#define COOLER_VOLTAGE_MAX    (24.0f * (1.0f + TOLERANCE))
+//#define COOLER_VOLTAGE_MIN  	(24.0f * (1.0f - TOLERANCE))  --> EC
+#define COOLER_VOLTAGE_MAX    (24.0f * (1.45f + TOLERANCE))
+#define COOLER_VOLTAGE_MIN    (24.0f * (1.50f - TOLERANCE))
 								
 #define COOLER_CURRENT_MAX  	0
 #define COOLER_CURRENT_MIN  	0

@@ -25,7 +25,7 @@ autoTest_t autoTests[ATID_Count] =
    // Test ID                          Test Description                                            Test Function                 Test Result
    {ATID_ProcessingCalibrationMemory,  "SU2.2.2  : Processing Calibration Memory Test",            AutoTest_ProcCalibMem,        ATR_PENDING},
    {ATID_OutputBufferMemory,           "SU2.2.3  : Output Buffer Memory Test",                     AutoTest_OBufMem,             ATR_PENDING},
-   {ATID_FlashMemory,                  "SU2.2.4  : FLASH Memory Test",                             AutoTest_FlashMem,            ATR_PENDING},
+   //{ATID_FlashMemory,                  "SU2.2.4  : FLASH Memory Test",                             AutoTest_FlashMem,            ATR_PENDING},   --> EC
    {ATID_FPGAFanControl,               "SU2.3.1  : Processing FPGA Fan Control Test",              AutoTest_FPGAFanCtrl,         ATR_PENDING},
    {ATID_OutputFanControl,             "SU2.3.2  : Output FPGA Fan Control Test",                  AutoTest_OutFanCtrl,          ATR_PENDING},
    {ATID_InternalFanControl,           "SU2.3.3  : Internal Fan Control Test",                     AutoTest_IntFanCtrl,          ATR_PENDING},
@@ -53,6 +53,7 @@ autoTest_t autoTests[ATID_Count] =
    {ATID_USARTFileWrite,               "SU2.12.2 : USART File Write Test",                         AutoTest_USARTFileTx,         ATR_PENDING},
    {ATID_GIGEOutput,                   "SU2.13.1 : GIGE Video Output Test",                        AutoTest_GIGEVideoOut,        ATR_PENDING},
    {ATID_CamLinkOutput,                "SU2.13.2 : CameraLink Video Output Test",                  AutoTest_CamLinkVideoOut,     ATR_PENDING},
-   {ATID_SDIOutput,                    "SU2.13.3 : SDI Video Output Test",                         AutoTest_SDIVideoOut,         ATR_PENDING}
+   {ATID_SDIOutput,                    "SU2.13.3 : SDI Video Output Test",                         AutoTest_SDIVideoOut,         ATR_PENDING},
+   {ATID_FlashMemory,                  "SU2.2.4  : FLASH Memory Test",                             AutoTest_FlashMem,            ATR_PENDING},
 
 };

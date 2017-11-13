@@ -40,7 +40,8 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    // External Interfaces use XADC measurement indices 4 to 15
    XADC_measIdx = XADC_MEASUREMENT_EXT_INTF_IDX;
 
-   ATR_PRINTF("Connect the Thermistor Test Harness to J17 and J20.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the Thermistor Test Harness to J17 and J20.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the Thermistor Test Harness to J20 and J21.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);

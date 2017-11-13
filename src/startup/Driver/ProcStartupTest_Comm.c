@@ -126,7 +126,8 @@ IRC_Status_t AutoTest_OEM_UART(void) {
    /**
     * Test Harness query
     */
-   ATR_PRINTF("Connect the UART Test Harness to J23.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the UART Test Harness to J23.\nPress ENTER to continue..."); --> EC
+   ATR_PRINTF("Connect the UART Test Harness to J22.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    return Startup_TestUARTDevice(OEM);
@@ -180,7 +181,8 @@ IRC_Status_t AutoTest_FilterWheel_UART(void) {
    /**
     * Test Harness query
     */
-   ATR_PRINTF("Connect the Filter Wheel Test Harness to J26.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the Filter Wheel Test Harness to J26.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the Filter Wheel Test Harness to J25.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    return Startup_TestUARTDevice(FILTER_WHEEL);
@@ -196,7 +198,8 @@ IRC_Status_t AutoTest_Cooler_UART(void) {
    /**
     * Test Harness query
     */
-   ATR_PRINTF("Connect the Cooler Test Harness to J14.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the Cooler Test Harness to J14.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the Cooler Test Harness to J19.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    return Startup_TestUARTDevice(COOLER);

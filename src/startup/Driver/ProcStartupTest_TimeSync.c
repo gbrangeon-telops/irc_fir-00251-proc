@@ -120,7 +120,8 @@ IRC_Status_t AutoTest_GPSSync(void) {
    TRIG_PpsSrcSelect(TS_GPS, &gTrig);
    Gps_struct.GpsStatus = GPS_NOTDETECTED;
 
-   ATR_PRINTF("Connect the GPS Test Harness to J3 and J4.\nPress ENTER to continue...\n\n");
+   //ATR_PRINTF("Connect the GPS Test Harness to J3 and J4.\nPress ENTER to continue...\n\n");  --> EC
+   ATR_PRINTF("Connect the GPS Test Harness to J17 and J9.\nPress ENTER to continue...\n\n");
    AutoTest_getUserNULL();
 
    GC_SetAcquisitionStop(0);
@@ -264,7 +265,8 @@ IRC_Status_t AutoTest_IRIGSync(void) {
    GC_TimeSourceCallback(GCCP_AFTER, GCCA_WRITE);
 
    // Begin test
-   ATR_PRINTF("Connect the IRIG Test Harness to J7, then start IRIG Output in NMEATime.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the IRIG Test Harness to J7, then start IRIG Output in NMEATime.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the IRIG Test Harness to J13, then start IRIG Output in NMEATime.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    ATR_PRINTF("Seeking valid IRIG-B Signal source...\n");

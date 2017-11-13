@@ -104,18 +104,20 @@ static testFan_t testFanCtrl_Table[NUM_FAN_TESTS] = {
  */
 IRC_Status_t AutoTest_FPGAFanCtrl(void) {
 
-   ATR_PRINTF("Connect the FPGA Fan Harness to J21.\nPress ENTER to continue...");
+   /*ATR_PRINTF("Connect the FPGA Fan Harness to J21.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
-   return Startup_FanCtrlTest(PROCESSING);
+   return Startup_FanCtrlTest(PROCESSING);*/// --> EC
+   return Startup_FanCtrlTest(IRC_NOT_DONE);
 }
 
 IRC_Status_t AutoTest_OutFanCtrl(void) {
 
-   ATR_PRINTF("Connect the FPGA Fan Harness to J22.\nPress ENTER to continue...");
+   /*ATR_PRINTF("Connect the FPGA Fan Harness to J22.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
-   return Startup_FanCtrlTest(OUTPUT);
+   return Startup_FanCtrlTest(OUTPUT);*///   --> EC
+   return Startup_FanCtrlTest(IRC_NOT_DONE);
 }
 
 /*
@@ -127,7 +129,8 @@ IRC_Status_t AutoTest_OutFanCtrl(void) {
  */
 IRC_Status_t AutoTest_IntFanCtrl(void) {
 
-   ATR_PRINTF("Connect the FPGA Fan Harness to J29.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the FPGA Fan Harness to J29.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the FPGA Fan Harness to J26.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    return Startup_FanCtrlTest(INTERNAL);
@@ -148,12 +151,14 @@ IRC_Status_t AutoTest_ExtFanCtrl(void) {
    // External fan initial speed is not 0
    Startup_SetExternalFanSpeed(0);
 
-   ATR_PRINTF("Connect the External Fan Harness to J9.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the External Fan Harness to J9.\nPress ENTER to continue...");   --> EC
+   ATR_PRINTF("Connect the External Fan Harness to J27.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    status1 = Startup_FanCtrlTest(EXTERNAL_1);
 
-   ATR_PRINTF("Connect the External Fan Harness to J10.\nPress ENTER to continue...");
+   //ATR_PRINTF("Connect the External Fan Harness to J10.\nPress ENTER to continue...");  --> EC
+   ATR_PRINTF("Connect the External Fan Harness to J29.\nPress ENTER to continue...");
    AutoTest_getUserNULL();
 
    status2 = Startup_FanCtrlTest(EXTERNAL_2);
@@ -203,7 +208,9 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
    {
 
       if (channelIndex != PC_SELFRESET && channelIndex != PC_BUFFER && channelIndex != PC_COOLER &&
-            channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON)
+            //channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON) --> EC
+            channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON &&
+            channelIndex != PC_SPARE2)
       {
          Power_TurnOn(channelIndex);
          ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
@@ -509,6 +516,8 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    if (XADC_measIdx != XADC_MEASUREMENT_EXT_INTF_IDX) {
       ATR_ERR("Invalid XADC Measurement Index.");
    }
+
+   // ajouter le test analog input ici (J15) --> EC
 
    PRINTF("\n");
 
