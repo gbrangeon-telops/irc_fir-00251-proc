@@ -26,9 +26,13 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 do  "$FIR251PROC\src\fir_00251_proc_acq_build.do"
 
 #CLINK receivers
-do D:\Telops\FIR-00251-Proc\src\clink\HDL\compil_clink_receiver.do
+do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
+
+#TODO Temporary
+do  "$FIR251PROC\src\FPA\isc0207A\HDL\compil_isc0207A.do"
+
 #ADC receiver interface
-do D:\telops\FIR-00251-Proc\src\QuadADC\HDL\build_adc_receiver.do
+do  "$FIR251PROC\src\quad_serdes\HDL\build_quad_receiver.do"
 
 #FPA hawkA
 do D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\compil_hawkA.do
@@ -38,10 +42,6 @@ do D:\Telops\FIR-00251-Proc\src\FPA\herculesD\hdl\compil_HerculesD.do
 acom  "$FIR251PROC\src\fir_00251_proc_herculesD.bde"
 #FPA isc0207A
 do D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\compil_isc0207A.do
-
-#TO-DO place before FPA section
-do D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\build_quad_receiver.do
-
 acom  "$FIR251PROC\src\fir_00251_proc_isc0207A.bde"
 #FPA isc0209A
 do D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\compil_isc0209A.do
