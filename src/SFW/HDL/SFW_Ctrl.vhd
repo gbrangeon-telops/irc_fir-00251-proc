@@ -47,8 +47,9 @@ entity SFW_Ctrl is
         WHEEL_STATE     : out STD_LOGIC_VECTOR(1 downto 0);
         POSITION_SETPOINT   : out STD_LOGIC_VECTOR(7 downto 0);
         RPM_MAX         : out STD_LOGIC_VECTOR(15 downto 0);
+        INDEX_MODE      : out STD_LOGIC;                   
         
-        HOME_LOCK     : IN STD_LOGIC;
+        HOME_LOCK       : IN STD_LOGIC;
         POSITION        : IN STD_LOGIC_VECTOR(15 downto 0);
         RPM             : IN STD_LOGIC_VECTOR(19 downto 0);
         ERROR_SPEED     : IN STD_LOGIC;   
@@ -92,17 +93,18 @@ architecture RTL of SFW_Ctrl is
     constant FW7_POSITION_ADDR          : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(28,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant CLEAR_ERR_ADDR             : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(32,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant VALID_PARAM_ADDR           : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(36,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-    constant WHEEL_STATE_ADDR                : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(40,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+    constant WHEEL_STATE_ADDR           : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(40,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant POSITION_SETPOINT_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(44,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant NB_ENCODER_CNT_ADDR        : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(48,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-    constant RPM_FACTOR_ADDR               : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(52,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+    constant RPM_FACTOR_ADDR            : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(52,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant RPM_MAX_ADDR               : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(56,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
 
-    constant HOME_LOCK_ADDR       : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(60,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+    constant HOME_LOCK_ADDR             : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(60,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant POSITION_ADDR              : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(64,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant RPM_ADDR                   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(68,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant ERROR_SPEED_ADDR           : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(72,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
     constant SPEED_PRECISION_BIT_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(76,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+    constant INDEX_MODE_ADDR            : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(80,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
 
    
    -- Signals
@@ -122,6 +124,7 @@ architecture RTL of SFW_Ctrl is
    signal rpm_max_o             : std_logic_vector(15 downto 0); -- The maximum speed before error flag is rised
    signal nb_encoder_counts_o : std_logic_vector(15 downto 0); -- The maximum speed before error flag is rised
    signal rpm_factor_o        : std_logic_vector(31 downto 0); -- The maximum speed before error flag is rised
+   signal index_mode_o        : std_logic;
 
  
     -- AXI4LITE signals
@@ -169,6 +172,7 @@ begin
     WHEEL_STATE        <= wheel_state_o;    
     POSITION_SETPOINT  <= position_setpoint_o;    
     RPM_MAX            <= rpm_max_o;
+    INDEX_MODE         <= index_mode_o;
     
     error_speed_i <= ERROR_SPEED;
     home_locked <= HOME_LOCK;
@@ -218,6 +222,7 @@ if rising_edge(MB_CLK) then
         nb_encoder_counts_o    <= std_logic_vector(to_unsigned(4096,NB_ENCODER_COUNTS'length));
         rpm_factor_o           <= std_logic_vector(to_unsigned(1464844,RPM_FACTOR'length)); -- default value for 100Mhz clock and 4096 counts
         rpm_max_o              <= std_logic_vector(to_unsigned(7000,rpm_max'length));
+        index_mode_o         <= '0';
         
     else
         clear_errors      <= '0';
@@ -256,6 +261,7 @@ if rising_edge(MB_CLK) then
                 when NB_ENCODER_CNT_ADDR    =>  nb_encoder_counts_o   <= AXIL_MOSI.WDATA(NB_ENCODER_COUNTS'range);
                 when RPM_FACTOR_ADDR        =>  rpm_factor_o          <= AXIL_MOSI.WDATA(RPM_FACTOR'range);
                 when RPM_MAX_ADDR           =>  rpm_max_o             <= AXIL_MOSI.WDATA(rpm_max'range);
+                when INDEX_MODE_ADDR        =>  index_mode_o          <= AXIL_MOSI.WDATA(0);
                 when others  =>   
             end case;                                                                                          
         end if;                                        

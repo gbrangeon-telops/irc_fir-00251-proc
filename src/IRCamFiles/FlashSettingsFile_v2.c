@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -142,6 +142,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* XADCRefVoltage1 = */ 0.000000F,
    /* XADCRefVoltage2 = */ 0.000000F,
    /* XADCRefVoltage3 = */ 0.000000F,
+   /* SFWOptoswitchPresent = */ 0,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -321,7 +322,8 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->XADCRefVoltage1, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->XADCRefVoltage2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->XADCRefVoltage3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 160; // Skip FREE space
+      memcpy(&hdr->SFWOptoswitchPresent, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 159; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -534,7 +536,8 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->XADCRefVoltage1, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->XADCRefVoltage2, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->XADCRefVoltage3, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 160); numBytes += 160; // FREE space
+      memcpy(&buffer[numBytes], &hdr->SFWOptoswitchPresent, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 159); numBytes += 159; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -696,6 +699,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("XADCRefVoltage1: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage1, 3));
    FPGA_PRINTF("XADCRefVoltage2: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage2, 3));
    FPGA_PRINTF("XADCRefVoltage3: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage3, 3));
+   FPGA_PRINTF("SFWOptoswitchPresent: %d\n", hdr->SFWOptoswitchPresent);
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

@@ -395,6 +395,11 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 2;
 
                case 2:
+                  // 2.2.x -> 2.3.x
+                  hdr->FileStructureMinorVersion = 3;
+                  hdr->SFWOptoswitchPresent = 0;
+
+               case 3:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

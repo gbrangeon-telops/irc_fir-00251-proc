@@ -5,4 +5,4 @@ asim -ses +access +r tb_sfw_top
 #transcript off
 do "$SFW_INTF_SIM\waveform.do"
 #transcript on
-run 250 ms
+run 200 ms

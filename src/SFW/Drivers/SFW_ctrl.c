@@ -41,13 +41,13 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
 
    pGCRegs->FWSpeedSetpoint = (uint16_t)roundf(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
 
-   AXI4L_write32(  0, pSFWCtrl->ADD + VALID_PARAM_ADDR);
+   AXI4L_write32( 0, pSFWCtrl->ADD + VALID_PARAM_ADDR);
 
    AXI4L_write32( 0, pSFWCtrl->ADD + CLEAR_ERR_ADDR);
 
    AXI4L_write32( FIXED_WHEEL, pSFWCtrl->ADD + WHEEL_STATE_ADDR);
 
-   AXI4L_write32(  0, pSFWCtrl->ADD + POSITIONSETPOINT_ADDR);
+   AXI4L_write32( 0, pSFWCtrl->ADD + POSITIONSETPOINT_ADDR);
 
    AXI4L_write32( flashSettings.FWEncoderCyclePerTurn, pSFWCtrl->ADD + NB_ENCODER_CNT_Addr);
 
@@ -106,6 +106,10 @@ IRC_Status_t SFW_CTRL_Init(gcRegistersData_t *pGCRegs, t_SfwCtrl *pSFWCtrl)
       SFW_SetExposureTimeArray(i,FWExposureTime[i]);
    }
 
+   //Set the Homing index method (Encoder or Optoswitch)
+   AXI4L_write32( flashSettings.SFWOptoswitchPresent , pSFWCtrl->ADD + INDEX_MODE_ADDR);
+
+   //Set config valid
    AXI4L_write32( 1 , pSFWCtrl->ADD + VALID_PARAM_ADDR);
 
 	return IRC_SUCCESS;

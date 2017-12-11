@@ -33,7 +33,8 @@ entity fw_decoder is
       LOCK     : out std_logic;                                            -- Goes low on reset, goes high once wheel is synced
       POS      : out std_logic_vector(15 downto 0);                        -- Absolute wheel position
       DIR      : out std_logic;
-      RPM_MEAS : out std_logic_vector(15+SPEED_PRECISION_BIT  downto 0)    -- wheel velocity in RPM (signed value)
+      RPM_MEAS : out std_logic_vector(15+SPEED_PRECISION_BIT  downto 0);    -- wheel velocity in RPM (signed value)
+      INDEX_MODE : in std_logic                                           -- 0 - Encoder index, 1- Optoswitch 
       );
 end entity fw_decoder;
 
@@ -56,12 +57,18 @@ architecture rtl of fw_decoder is
    -- Fix the previous and next phase value after a phase at ZERO
    signal NEXT_ZERO_PHASE : std_logic_vector(1 downto 0);
    signal PREV_ZERO_PHASE : std_logic_vector(1 downto 0);
+
    
    constant ENCODER_COUNTS_MAX_BIT : integer := 13; 
    constant ENCODER_COUNTS_MIN_BIT : integer := 8;
-
-   signal pos_i  : unsigned(ENCODER_COUNTS_MAX_BIT-1 downto 0);
    
+   type homing_mode_t is (Encoder, Optoswitch);
+   signal homing_mode : homing_mode_t :=  Encoder;
+   
+   
+   
+   
+   signal pos_i  : unsigned(ENCODER_COUNTS_MAX_BIT-1 downto 0);
    signal sresetn : std_logic;
    signal dir_i  : std_logic;
    signal rpm_i  : std_logic_vector(RPM_MEAS'range);
@@ -71,6 +78,7 @@ architecture rtl of fw_decoder is
    signal a_pipe : std_logic_vector(1 downto 0);
    signal b_pipe : std_logic_vector(1 downto 0);
    signal i_pipe : std_logic_vector(1 downto 0);
+   signal zeros_next_transition : std_logic := '0';
    
 begin
    
@@ -90,9 +98,13 @@ begin
       PHASE0 when ZERO_PHASE = PHASE1 else
       PHASE1 when ZERO_PHASE = PHASE2 else
       PHASE2 when ZERO_PHASE = PHASE3;
+      
+      
+   --Select the homing mode
+   homing_mode <=  Encoder when INDEX_MODE = '0' else Optoswitch;
    
    -- process to determine direction and position from quadrature channels
-   -- 4000 positions * 150Hz = 2.5KHz toggle rate max
+
    pos_dir : process(CLK)
       variable increment_pos : std_logic_vector(1 downto 0);  
    begin
@@ -103,30 +115,47 @@ begin
             enc_state   <= '0' & PHASE0;
             enc_nxstate <= '0' & PHASE0;
             lock_i <= '0';
+            zeros_next_transition <= '0';
          else
-            
-            if enc_state = ('1' & ZERO_PHASE) then
+            -- Check Movement direction
+--            if (enc_nxstate(1 downto 0) = ZERO_PHASE) then
+--               if enc_state(1 downto 0) = PREV_ZERO_PHASE then
+--                  dir_i <= '0';  
+--               elsif enc_state(1 downto 0) = NEXT_ZERO_PHASE then
+--                  dir_i <= '1';             
+--               end if;
+--            end if;
+--
+
+
+-- Homming in Encoder Mode
+            if enc_state = ('1' & ZERO_PHASE) and homing_mode = Encoder then
+               lock_i <= '1'; -- we are in sync once we reach the ZERO state
+               
                -- this is the zeroing state
                if enc_nxstate(1 downto 0) = NEXT_ZERO_PHASE then
-                  dir_i <= '0';
                   pos_i <= pos_i + to_unsigned(1,pos_i'length);   
                elsif enc_nxstate(1 downto 0) = PREV_ZERO_PHASE then
-                  dir_i <= '1';
                   pos_i <= unsigned(NB_ENCODER_COUNTS(pos_i'range)) - 1;  
-               end if;  
-                                         
-               lock_i <= '1'; -- we are in sync once we reach the ZERO state
-                  
-            elsif enc_nxstate = ('1' & ZERO_PHASE) then
-               -- this is the state before the zeroing state
-               if enc_state(1 downto 0) = PREV_ZERO_PHASE then
-                  dir_i <= '0';  
-               elsif enc_state(1 downto 0) = NEXT_ZERO_PHASE then
-                  dir_i <= '1';             
-               end if;      
+               end if;                         
                
-               pos_i <= (others => '0');   
-               
+              
+            elsif enc_nxstate = ('1' & ZERO_PHASE) and homing_mode = Encoder  then  
+               pos_i <= (others => '0');
+
+-- Homming in Optoswitch Mode
+               -- ADD a condition based on the type of index(Encoder or Optoswitch)  OK
+               -- IF using optoswitch  reset position on Index and lock the reset process
+               -- First next position phase is position 0
+               -- Then increment on each phase.
+               -- Reset position counter on the next phase transition after the index rising edge.
+            elsif enc_nxstate(2) = '1'  and homing_mode = Optoswitch then   
+                zeros_next_transition <= '1';   
+            
+            elsif zeros_next_transition = '1'  and enc_nxstate(1 downto 0) /= enc_state(1 downto 0) and homing_mode = Optoswitch then
+                pos_i <= (others => '0');
+                zeros_next_transition <= '0';
+                lock_i <= '1'; -- we are in sync once we reach the transition state
             else
             
                increment_pos := "00";
@@ -201,8 +230,14 @@ begin
          a_pipe(1) <= CHAN_B;
          b_pipe(0) <= b_pipe(1);
          b_pipe(1) <= CHAN_A;
-         i_pipe(0) <= i_pipe(1);
-         i_pipe(1) <= CHAN_I;
+         
+         if(homing_mode = Encoder) then
+            i_pipe(0) <= i_pipe(1);
+            i_pipe(1) <= CHAN_I;
+         elsif(homing_mode = Optoswitch) then
+            i_pipe(0) <= not i_pipe(1) and CHAN_I;
+            i_pipe(1) <= CHAN_I; 
+         end if;
          
       end if;
    end process pos_dir;

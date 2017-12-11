@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.2.0
+ * Generated from the flash settings file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      2
+#define FLASHSETTINGS_FILEMINORVERSION_V2      3
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -148,6 +148,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float XADCRefVoltage1;   /**< Reference voltage At pin 21 of the analog mux */
    float XADCRefVoltage2;   /**< Reference voltage At pin 20 of the analog mux */
    float XADCRefVoltage3;   /**< Reference voltage At pin 19 of the analog mux */
+   uint8_t SFWOptoswitchPresent;   /**< Presence or absence of the SFW optoswitch used for SFW homing method */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

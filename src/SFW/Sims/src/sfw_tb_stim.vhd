@@ -151,6 +151,7 @@ CONSTANT CLK_FREQ       : INTEGER := 100000000;
 constant RPM_FACTOR_VAL : unsigned(31 downto 0) := to_unsigned(1464843,32);
 constant ENCODER_COUNT_DURATION : INTEGER := CLK_FREQ/(SPEED_RPM/60 * NB_ENCODER_COUNT);
 CONSTANT COUNT_DURATION : TIME := ENCODER_COUNT_DURATION * clk100_per;
+CONSTANT DIRECTION : STD_LOGIC := '0';
 
 
 
@@ -196,6 +197,7 @@ constant POSITION_ADDR              : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_B
 constant RPM_ADDR                   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(68+SFWCTRL_BASE_ADDR_OFFSET,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
 constant ERROR_SPEED_ADDR           : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(72+SFWCTRL_BASE_ADDR_OFFSET,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
 constant SPEED_PRECISION_BIT_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(76+SFWCTRL_BASE_ADDR_OFFSET,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+constant INDEX_MODE_ADDR            : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(80+SFWCTRL_BASE_ADDR_OFFSET,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
 
 constant FW0_EXPTIME_ADDR          : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(0+SFWRAM_BASE_ADDR_OFFSET,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
 constant FW1_EXPTIME_ADDR          : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(4+SFWRAM_BASE_ADDR_OFFSET,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
@@ -216,12 +218,16 @@ signal exp_time_cmd : unsigned(31 downto 0);
 signal exp_time_indx : std_logic_vector(7 downto 0);
 signal exp_time_delay : time := 0 ns;
 
+signal index_mode_o : std_logic_vector(0 downto 0) := "1";
+
 begin
 -- Assign clock
 
 CLK100 <= clk100_o;
 CLK80 <= clk80_o;
 ARESETN <= rstn_i;
+
+
 
 CLK100_GEN: process(clk100_o)
    begin
@@ -315,6 +321,9 @@ begin
     write_axi_lite(clk100_o,std_logic_vector(to_unsigned(0,32-RPM_MAX_ADDR'length))         & RPM_MAX_ADDR      ,   std_logic_vector(to_unsigned(6500,32))         ,AXIL_MISO ,AXIL_MOSI);
     wait for 5 ns; 
     wait until rising_edge(clk100_o);
+    write_axi_lite(clk100_o,std_logic_vector(to_unsigned(0,32-INDEX_MODE_ADDR'length))         & INDEX_MODE_ADDR      ,   resize(index_mode_o,32)         ,AXIL_MISO ,AXIL_MOSI);
+    wait for 5 ns; 
+    wait until rising_edge(clk100_o);
     write_axi_lite(clk100_o,std_logic_vector(to_unsigned(0,32-VALID_PARAM_ADDR'length))    & VALID_PARAM_ADDR ,   std_logic_vector(to_unsigned(1,32))         ,AXIL_MISO ,AXIL_MOSI);
     wait for 5 ns; 
     wait until rising_edge(clk100_o); 
@@ -366,30 +375,45 @@ begin
     
     --start rotation process
     for j in 0 to sim_nb_turn loop
-        for i in 0 to (NB_ENCODER_COUNT-1) loop
-            if ( i = 0 ) then
-                CHAN_I <= '1';   
-            else
-                CHAN_I <= '0';
-            end if;
-            
-            if (phase = 0) then
-                CHAN_B <= '0';
-                CHAN_A <= '0';
-                phase := 1;
-            elsif (phase = 1) then
-                CHAN_B <= '0';
-                CHAN_A <= '1';
-                phase := 2;
-            elsif (phase = 2) then
-                CHAN_B <= '1';
-                CHAN_A <= '1';
-                phase := 3;
-            elsif (phase = 3) then
-                CHAN_B <= '1';
-                CHAN_A <= '0';
-                phase := 0;
-            end if;
+        for i in 0 to (NB_ENCODER_COUNT-1) loop           
+            IF(DIRECTION = '0') THEN   
+                if (phase = 0) then
+                    CHAN_B <= '0';
+                    CHAN_A <= '0';
+                    phase := 1;
+                elsif (phase = 1) then
+                    CHAN_B <= '0';
+                    CHAN_A <= '1';
+                    phase := 2;
+                elsif (phase = 2) then
+                    CHAN_B <= '1';
+                    CHAN_A <= '1';
+                    phase := 3;
+                elsif (phase = 3) then
+                    CHAN_B <= '1';
+                    CHAN_A <= '0';
+                    phase := 0;
+                end if;
+             ELSE
+                if (phase = 0) then 
+                    CHAN_B <= '0';
+                    CHAN_A <= '0';
+                    phase := 3;
+                elsif (phase = 1) then
+                    CHAN_B <= '0';
+                    CHAN_A <= '1';
+                    phase := 0;
+                elsif (phase = 2) then
+                    CHAN_B <= '1';
+                    CHAN_A <= '1';
+                    phase := 1;
+                elsif (phase = 3) then
+                    CHAN_B <= '1';
+                    CHAN_A <= '0';
+                    phase := 2;
+                end if; 
+             END IF;
+             
             
             --pause for the duration of a encoder step
             WAIT FOR COUNT_DURATION + ENCODER_INSTABILITY(i);
@@ -398,7 +422,41 @@ begin
     wait;    
 end process WHEEL_ROTATION_PROCESS;
 
-
+INDEX_ROTATION_PROCESS : process
+variable phase :integer := 0;
+begin
+    wait until rstn_i = '1';
+    wait for 1 ms;
+    
+    --start rotation process
+    if(index_mode_o = "0") then
+        for j in 0 to sim_nb_turn loop
+            for i in 0 to (NB_ENCODER_COUNT-1) loop
+                if ( i = 8 ) then
+                    CHAN_I <= '1';   
+                else
+                    CHAN_I <= '0';
+                end if;
+                --pause for the duration of a encoder step
+                WAIT FOR COUNT_DURATION + ENCODER_INSTABILITY(i);
+            end loop;
+         end loop;
+    else
+        for j in 0 to sim_nb_turn loop
+            for i in 0 to (NB_ENCODER_COUNT*8-1) loop
+                if ( i = 121 ) then
+                    CHAN_I <= '1';   
+                else
+                    CHAN_I <= '0';
+                end if;
+                --pause for the duration of a encoder step
+                WAIT FOR COUNT_DURATION/8 ;
+             end loop;
+        end loop;
+     end if;
+        
+    wait;    
+end process INDEX_ROTATION_PROCESS;
 
 FPA_EXPINFO_CTRL_PROCESS : process
 begin

@@ -36,9 +36,10 @@
 #define RPM_MAX_ADDR 				56
 #define HOME_LOCK_ADDR 				60
 #define POSITION_ADDR 				64
-#define RPM_ADDR 					68
+#define RPM_ADDR 					   68
 #define ERROR_SPEED_ADDR 			72
 #define SPEED_PRECISION_BIT_ADDR	76
+#define INDEX_MODE_ADDR          80
 
 #define FW_EXPOSURETIME_OFFSET		1024
 
@@ -66,6 +67,7 @@ struct s_SFW_CTRL_Struct {
 	uint32_t nb_encoder_cnt;
 	uint32_t rpm_factor;
 	uint32_t rpm_max;
+	uint32_t index_mode;
 	uint32_t Enable;
 };
 typedef struct s_SFW_CTRL_Struct t_SfwCtrl;
