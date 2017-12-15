@@ -62,7 +62,7 @@ architecture rtl of isc0207A_clks_gen_core is
          Clk_div   : out std_logic);
    end component;
    
-   type quad_clk_pipe_type is array (1 to 4) of std_logic_vector(15 downto 0);
+   type quad_clk_pipe_type is array (1 to 4) of std_logic_vector(31 downto 0);
    
    signal sreset                         : std_logic;
    signal quad_clk_iob                   : std_logic_vector(4 downto 1);
@@ -92,6 +92,8 @@ begin
    QUAD3_CLK <= quad_clk_iob(3);
    QUAD4_CLK <= quad_clk_iob(4);
    QUAD_CLK_COPY <= quad_clk_copy_i;
+   FPA_MCLK <= fpa_mclk_i;  
+   FPA_PCLK <= fpa_pclk_i;    -- pour le hawk, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo
    
    ADC_DESERIALIZER_RST <= adc_deserializer_rst_i;
    
@@ -129,20 +131,7 @@ begin
       Clock   => MCLK_SOURCE,     -- choix de 80MHz pour le FPA
       Reset   => sreset, 
       Clk_div => fpa_pclk_i   -- attention, c'est en realité un clock enable. 
-      );
-   
-   
-   --------------------------------------------------------
-   -- passage à travers des registres
-   --------------------------------------------------------    
-   U2C : process(MCLK_SOURCE)
-   begin
-      if rising_edge(MCLK_SOURCE) then
-         FPA_MCLK <= fpa_mclk_i;  
-         FPA_PCLK <= fpa_pclk_i;    -- pour le hawk, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo
-      end if;
-   end process;
-   
+      );   
    
    --------------------------------------------------------
    -- Genereteur clock des adcs quads
@@ -194,7 +183,7 @@ begin
          -- pipe de l'horloge des adcs
          for ii  in 1 to 4 loop
             quad_clk_pipe(ii)(0) <= (quad_clk_default and not disable_quad_clk_default_i) or (quad_clk_raw and disable_quad_clk_default_i);
-            quad_clk_pipe(ii)(15 downto 1) <= quad_clk_pipe(ii)(14 downto 0);
+            quad_clk_pipe(ii)(31 downto 1) <= quad_clk_pipe(ii)(30 downto 0);
          end loop;
          
          -- selection de l'horloge dephasagée pour chaque quad
