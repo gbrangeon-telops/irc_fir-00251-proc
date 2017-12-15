@@ -143,7 +143,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {2,2,2,2}, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {10, 10, 10, 10}, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
