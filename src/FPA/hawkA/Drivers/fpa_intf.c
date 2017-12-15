@@ -382,6 +382,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
                 
    // 
    elec_ofs_enabled  = 0;       // offset dynamique non actif sur Hawk
+   ptrA->elec_ofs_enabled = elec_ofs_enabled;
 
    // registreB : contrôle la sortie ou non de l'image du map d'offset 
    if (((uint32_t)gFpaDebugRegB != elec_ofs_map_image_enabled) && (init_done == 1))   
@@ -389,9 +390,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDebugRegB = (int32_t)elec_ofs_map_image_enabled;
    
    // registreC : contrôle le delai avant calcul d'offset
-   if (((uint32_t)gFpaDebugRegC != ptrA->elec_ofs_start_dly) && (init_done == 1))   
-     ptrA->elec_ofs_start_dly  = (uint32_t) gFpaDebugRegC;
-   gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly;
+   if (((uint32_t)gFpaDebugRegC != ptrA->elec_ofs_start_dly_sampclk) && (init_done == 1))   
+     ptrA->elec_ofs_start_dly_sampclk  = (uint32_t) gFpaDebugRegC;
+   gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly_sampclk;
    
    // valeurs par defaut
    ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) ((hh.pixnum_per_tap_per_mclk * hh.tap_number) * ((uint32_t)FPA_WIDTH_MIN/(hh.pixnum_per_tap_per_mclk * hh.tap_number)) / (2.0F * hh.tap_number)); // 16 echantillons durant la plus petite ligne de reset
@@ -402,6 +403,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elec_ofs_pix_faked_value_forced  =  0;
    ptrA->elec_ofs_offset_minus_pix_value  =  0;
    ptrA->elec_ofs_offset_null_forced      =  0;
+   ptrA->elec_ofs_second_lane_enabled     =  1;
     
   // sortie de la map d'offset
   if (elec_ofs_map_image_enabled == 1){       // pour sortir le map d'offset en image. Soit obtenir "signal_elec = estimé_offset_elec" à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
@@ -412,7 +414,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
   
   // desactivation de la correction de l'offset dynamique
-  if ((elec_ofs_enabled == 0) || (ptrA->fpa_diag_mode == 1)) {  // desactivation de la correction d'offset dynamique. Soit obtenir signal_elec =  gain_elec * signal_fpa + offset_elec " à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
+  if ((ptrA->elec_ofs_enabled == 0) || (ptrA->fpa_diag_mode == 1)) {  // desactivation de la correction d'offset dynamique. Soit obtenir signal_elec =  gain_elec * signal_fpa + offset_elec " à partir de "signal_elec =  gain_elec * signal_fpa + offset_elec - estimé_offset_elec + constante"
       ptrA->elec_ofs_offset_null_forced      =  1;                   //     etape 1: on force "estimé_offset_elec" à 0.
       ptrA->elec_ofs_add_const               =  0;                   //     etape 2: la quanité "constante"  vaut aussi 0. Au final on a bien ce qui est voulu.
   }
