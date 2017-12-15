@@ -71,7 +71,7 @@ package FPA_define is
    constant DEFINE_FPA_TEMP_TRIG_PERIOD_US            : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
    constant DEFINE_FPA_TEMP_RAW_MIN                   : integer   := 30720;      -- Minimum ADC value for isc0209A power-on : 0.960V de 2N2222 (soit 120K)  
    constant DEFINE_FPA_TEMP_RAW_MAX                   : integer   := 35200;      -- Maximum ADC value for isc0209A power-on : (to protect against ultra low temp). 1.1V 
-                                                      
+   
    constant PROG_FREE_RUNNING_TRIG                    : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ              : integer   := 100_000;    --  horloge de 100M en KHz
    constant DEFINE_FPA_80M_CLK_RATE_KHZ               : integer   := 80_000;     --  horloge de 80M en KHz
@@ -232,59 +232,61 @@ package FPA_define is
       reorder_column                 : std_logic;
       
       -- electrical offset param  
-      elec_ofs_offset_null_forced         : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
-      elec_ofs_pix_faked_value_forced     : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
-      elec_ofs_pix_faked_value            : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
-      elec_ofs_offset_minus_pix_value     : std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
-      elec_ofs_add_const                  : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
+      elec_ofs_enabled               : std_logic; 
+      elec_ofs_offset_null_forced    : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
+      elec_ofs_pix_faked_value_forced: std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
+      elec_ofs_pix_faked_value       : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      elec_ofs_offset_minus_pix_value: std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
+      elec_ofs_add_const             : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
       
-      elec_ofs_start_dly_sampclk          : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
-      elec_ofs_samp_num_per_ch            : unsigned(6 downto 0);
-      elec_ofs_samp_mean_numerator        : unsigned(22 downto 0);
-  
+      elec_ofs_start_dly_sampclk     : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
+      elec_ofs_samp_num_per_ch       : unsigned(6 downto 0);
+      elec_ofs_samp_mean_numerator   : unsigned(22 downto 0);
+      elec_ofs_second_lane_enabled   : std_logic;              -- à '1' si le calcul de l'offset se fait sur front montant et descendant de MCLK dans ce cas, les echantillons d'un même tap sont envoyés alternativement aux deux lanes. Sinon, tous les echantillons sont envoyés au 1er lane  
+      
    end record;    
    
    ---- Configuration par defaut
---   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
---   to_unsigned(100, 32),      --int_time                       
---   (others => '0'),           --int_indx                       
---   to_unsigned(100, 32),      --int_signal_high_time           
---   --comn                           
---   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(1000000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), '0'),
---   to_unsigned(0, 10),        --xstart                         
---   to_unsigned(0, 10),        --ystart                         
---   to_unsigned(640, 10),      --xsize                          
---   to_unsigned(512, 10),      --ysize                          
---   (others => '1'),           --gain                           
---   '0',                       --invert                         
---   '0',                       --revert                                              
---   "0110011",                 --det_code
---   '0',                       --skimming
---   to_unsigned(6, 8),         --real_mode_active_pixel_dly   
---   '1',                       --adc_quad2_en                 
---   '1',                       --chn_diversity_en             
---   to_unsigned(28897, 17),    --readout_pclk_cnt_max         
---   to_unsigned(112, 8),       --line_period_pclk             
---   to_unsigned(3, 4),         --active_line_start_num        
---   to_unsigned(258, 9),       --active_line_end_num
---   to_unsigned(258, 9),       --window_lsync_num
---   to_unsigned(4, 8),         --pix_samp_num_per_ch          
---   to_unsigned(225, 9),       --sof_posf_pclk                
---   to_unsigned(28864, 17),    --eof_posf_pclk                
---   to_unsigned(1, 8),         --sol_posl_pclk                
---   to_unsigned(80, 8),        --eol_posl_pclk                
---   to_unsigned(81, 8),        --eol_posl_pclk_p1             
---   to_unsigned(2, 4),         --hgood_samp_sum_num           
---   to_unsigned(1048576, 23),  --hgood_samp_mean_numerator    
---   to_unsigned(2, 4),         --vgood_samp_sum_num           
---   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
---   to_unsigned(3, 8),         --good_samp_first_pos_per_ch   
---   to_unsigned(4, 8),         --good_samp_last_pos_per_ch    
---   to_unsigned(80, 8),        --xsize_div_tapnum             
---   (to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(0, 14), to_unsigned(3730, 14)),           
---   to_unsigned(0, 4),          --adc_clk_phase
---   '0'
---   );
+   --   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
+   --   to_unsigned(100, 32),      --int_time                       
+   --   (others => '0'),           --int_indx                       
+   --   to_unsigned(100, 32),      --int_signal_high_time           
+   --   --comn                           
+   --   ('0', DEFINE_TELOPS_DIAG_DEGR, '0', '0', '0', MODE_INT_END_TO_TRIG_START, to_unsigned(1000000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), to_unsigned(800000, 32), '0'),
+   --   to_unsigned(0, 10),        --xstart                         
+   --   to_unsigned(0, 10),        --ystart                         
+   --   to_unsigned(640, 10),      --xsize                          
+   --   to_unsigned(512, 10),      --ysize                          
+   --   (others => '1'),           --gain                           
+   --   '0',                       --invert                         
+   --   '0',                       --revert                                              
+   --   "0110011",                 --det_code
+   --   '0',                       --skimming
+   --   to_unsigned(6, 8),         --real_mode_active_pixel_dly   
+   --   '1',                       --adc_quad2_en                 
+   --   '1',                       --chn_diversity_en             
+   --   to_unsigned(28897, 17),    --readout_pclk_cnt_max         
+   --   to_unsigned(112, 8),       --line_period_pclk             
+   --   to_unsigned(3, 4),         --active_line_start_num        
+   --   to_unsigned(258, 9),       --active_line_end_num
+   --   to_unsigned(258, 9),       --window_lsync_num
+   --   to_unsigned(4, 8),         --pix_samp_num_per_ch          
+   --   to_unsigned(225, 9),       --sof_posf_pclk                
+   --   to_unsigned(28864, 17),    --eof_posf_pclk                
+   --   to_unsigned(1, 8),         --sol_posl_pclk                
+   --   to_unsigned(80, 8),        --eol_posl_pclk                
+   --   to_unsigned(81, 8),        --eol_posl_pclk_p1             
+   --   to_unsigned(2, 4),         --hgood_samp_sum_num           
+   --   to_unsigned(1048576, 23),  --hgood_samp_mean_numerator    
+   --   to_unsigned(2, 4),         --vgood_samp_sum_num           
+   --   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
+   --   to_unsigned(3, 8),         --good_samp_first_pos_per_ch   
+   --   to_unsigned(4, 8),         --good_samp_last_pos_per_ch    
+   --   to_unsigned(80, 8),        --xsize_div_tapnum             
+   --   (to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(12812, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(3711, 14), to_unsigned(0, 14), to_unsigned(3730, 14)),           
+   --   to_unsigned(0, 4),          --adc_clk_phase
+   --   '0'
+   --   );
    
    
    ----------------------------------------------								
@@ -299,7 +301,7 @@ package FPA_define is
       rdy                 : std_logic;                     -- pulse signifiant que les parametres du header sont prêts
    end record;
    
-  ----------------------------------------------								
+   ----------------------------------------------								
    -- Type readout_info_type
    ----------------------------------------------
    -- aoi

@@ -239,15 +239,17 @@ package FPA_define is
       reorder_column                 : std_logic;               -- utilisé principalemet par les Sofradir pour contrer l'inversion des columns
       
       -- electrical offset param  
-      elec_ofs_offset_null_forced         : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
-      elec_ofs_pix_faked_value_forced     : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
-      elec_ofs_pix_faked_value            : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
-      elec_ofs_offset_minus_pix_value     : std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
-      elec_ofs_add_const                  : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
+      elec_ofs_enabled               : std_logic; 
+      elec_ofs_offset_null_forced    : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
+      elec_ofs_pix_faked_value_forced: std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
+      elec_ofs_pix_faked_value       : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      elec_ofs_offset_minus_pix_value: std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
+      elec_ofs_add_const             : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
       
-      elec_ofs_start_dly_sampclk          : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
-      elec_ofs_samp_num_per_ch            : unsigned(6 downto 0);
-      elec_ofs_samp_mean_numerator        : unsigned(22 downto 0);      
+      elec_ofs_start_dly_sampclk     : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
+      elec_ofs_samp_num_per_ch       : unsigned(6 downto 0);
+      elec_ofs_samp_mean_numerator   : unsigned(22 downto 0);
+      elec_ofs_second_lane_enabled   : std_logic;              -- à '1' si le calcul de l'offset se fait sur front montant et descendant de MCLK dans ce cas, les echantillons d'un même tap sont envoyés alternativement aux deux lanes. Sinon, tous les echantillons sont envoyés au 1er lane    
       
    end record;    
    
