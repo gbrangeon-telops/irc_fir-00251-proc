@@ -19,10 +19,8 @@
 #define TOLERANCE           0.0165f
 #define THERM_TOL           0.0048828125f       // 20 LSBs of a 12-bit ADC, VREF = 1V
 
-//#define COOLER_VOLTAGE_MAX    (24.0f * (1.0f + TOLERANCE))
-//#define COOLER_VOLTAGE_MIN  	(24.0f * (1.0f - TOLERANCE))  --> EC
-#define COOLER_VOLTAGE_MAX    (24.0f * (1.45f + TOLERANCE))
-#define COOLER_VOLTAGE_MIN    (24.0f * (1.50f - TOLERANCE))
+#define COOLER_VOLTAGE_MAX    (24.0f * (1.0f + TOLERANCE))
+#define COOLER_VOLTAGE_MIN  	(24.0f * (1.0f - TOLERANCE))
 								
 #define COOLER_CURRENT_MAX  	0
 #define COOLER_CURRENT_MIN  	0
@@ -30,8 +28,8 @@
 #define P24V_VOLTAGE_MAX    	(24.0f * (1.0f + TOLERANCE))
 #define P24V_VOLTAGE_MIN    	(24.0f * (1.0f - TOLERANCE))
 								
-#define P24V_CURRENT_MAX    	(0.870f * (1.0f + TOLERANCE))
-#define P24V_CURRENT_MIN    	(0.870f * (1.0f - TOLERANCE))
+#define P24V_CURRENT_MAX    	(1.5f * (1.0f + 0.18))
+#define P24V_CURRENT_MIN    	(0.5f * (1.0f - 0.18))
 								
 #define FPGA_IVCC_MAX       	(1.03f)
 #define FPGA_IVCC_MIN       	(0.97f)

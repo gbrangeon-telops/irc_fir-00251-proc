@@ -22,15 +22,7 @@
 
 enum automatedTestIDEnum {
 
-   // Memory tests
-   ATID_ProcessingCalibrationMemory = 0,
-   ATID_OutputBufferMemory,
-   ATID_FlashMemory,
-
-   // Power interface tests
-   ATID_FPGAFanControl,
-   ATID_OutputFanControl,
-   ATID_InternalFanControl,
+   ATID_InternalFanControl = 0,
    ATID_ExternalFanControl,
    ATID_PowerConnectorOnOff,
    ATID_CameraLEDColors,
@@ -70,6 +62,14 @@ enum automatedTestIDEnum {
    ATID_GIGEOutput,
    ATID_CamLinkOutput,
    ATID_SDIOutput,
+
+   // ADC tests
+   ATID_ADCReadout,
+
+   // Memory tests
+   ATID_ProcessingCalibrationMemory,
+   ATID_OutputBufferMemory,
+   ATID_FlashMemory,
 
    // Storage board interface tests
    // TBD

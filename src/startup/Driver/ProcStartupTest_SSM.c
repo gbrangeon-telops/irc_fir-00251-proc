@@ -108,7 +108,8 @@ void GPS_Process_TEST(t_GPS *GPS_Data) {
 
    GPS_NMEA_codes_t testValidate = GPS_NOT_DONE;
 
-   while (testValidate == GPS_NOT_DONE && !DebugTerminal_CommandIsEmpty(&GPS_Data->rxCircDataBuffer)) {
+   while (testValidate == GPS_NOT_DONE && !CBB_Empty(&GPS_Data->rxCircDataBuffer))
+   {
 
       // Get GPS UART actual byte
       CBB_Pop(&GPS_Data->rxCircDataBuffer, &byte);

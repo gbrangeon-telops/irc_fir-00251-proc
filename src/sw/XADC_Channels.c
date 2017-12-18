@@ -20,11 +20,8 @@
 #include "utils.h"
 #include "FlashSettings.h"
 
-// The current value for DCS_Cooler and DCS_Supply24V currents was computed using the following tests results:
-// I_load [A] = [0.0  , 0.2  , 0.5  , 0.8  , 1.0  , 1.2  , 1.5  , 1.8  , 2.0  , 2.2  , 2.5  , 2.8  , 3.0 ];
-// V_sens [V]= [0.124, 0.383, 0.763, 1.160, 1.425, 1.680, 2.071, 2.466, 2.733, 3.004, 3.415, 3.817, 4.098];
 #define XADC_CUR_OFFSET -0.0936084549572219f
-#define XADC_CUR_GAIN   12.6619557089536f
+#define XADC_CUR_GAIN   7.03f    //12.6619557089536f  --> EC
 
 // Temperature coefficients
 #define TempCoeff_A 0

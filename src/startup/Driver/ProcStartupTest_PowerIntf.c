@@ -188,8 +188,8 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
          "BUFFER",
          "FW",
          "EXPANSION",
-         "SPARE1",
-         "SPARE2",
+         //"SPARE1",
+         //"SPARE2",
          "SPARE3",
          "SELF RESET",
          "PUSH_BUTTON"

@@ -31,7 +31,7 @@
 
 extern t_Trig gTrig;
 extern t_GPS Gps_struct;
-
+static volatile uint8_t totalSentCount;
 
 struct GPRMCMsgStruct {
    uint32_t hour;
@@ -100,6 +100,7 @@ IRC_Status_t AutoTest_GPSSync(void) {
 
    uint64_t GPSTimer;
    uint64_t TrigTimer;
+   totalSentCount = 0;
 
    AutoTest_SaveGCRegisters();
 
@@ -127,7 +128,8 @@ IRC_Status_t AutoTest_GPSSync(void) {
    GC_SetAcquisitionStop(0);
    GC_SetAcquisitionStart(1);
 
-   while (!GC_AcquisitionStarted) {
+   while (!GC_AcquisitionStarted)
+   {
       AutoTest_RunMinimalStateMachines();
    }
 
@@ -154,7 +156,10 @@ IRC_Status_t AutoTest_GPSSync(void) {
          ATR_INF("Setting clock time to Wed May 24 07:13:49 2006\nSending GPRMC string...\n");
       }
 
-      XUartNs550_Send(&Gps_struct.uart.uart, (uint8_t *)NMEA_strings[i], NMEA_length[i]);
+      while(totalSentCount < NMEA_length[i])
+      {
+         totalSentCount += XUartNs550_Send(&Gps_struct.uart.uart, (uint8_t *)(NMEA_strings[i] + totalSentCount), (NMEA_length[i] - totalSentCount));
+      }
       GETTIME(&GPSTimer);
 
       while ((Gps_struct.rxCircDataBuffer.length < NMEA_length[i]) && (elapsed_time_us(GPSTimer) < GPS_TEST_TIMEOUT))
@@ -162,7 +167,10 @@ IRC_Status_t AutoTest_GPSSync(void) {
          AutoTest_RunMinimalStateMachines();
       }
 
-      if (elapsed_time_us(GPSTimer) > GPS_TEST_TIMEOUT) {
+      totalSentCount = 0;
+
+      if (elapsed_time_us(GPSTimer) > GPS_TEST_TIMEOUT)
+      {
          ATR_ERR("GPS UART Timeout.");
          testFailed = true;
 

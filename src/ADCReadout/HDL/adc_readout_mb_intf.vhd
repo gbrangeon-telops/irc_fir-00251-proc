@@ -22,12 +22,14 @@ entity adc_readout_mb_intf is
       ARESET            : in std_logic;
       
       CLK               : in std_logic;
-      MB_CLK            : in std_logic;     
+      MB_CLK            : in std_logic; 
+	  DATA_IN	        : in std_logic_vector(15 downto 0); -- average of 16 values in mV 
+	  DVAL_DATA			: in std_logic;
       
-      ADC_CFG        : out std_logic_vector(1 downto 0);
+      ADC_CFG        	: out std_logic_vector(1 downto 0);
       ADC_CALIB_R       : out std_logic_vector(31 downto 0);
-      ADC_CALIB_Q       : out std_logic_vector(31 downto 0);
-      
+      ADC_CALIB_Q		: out std_logic_vector(31 downto 0); 
+	  
       MB_MOSI           : in t_axi4_lite_mosi;
       MB_MISO           : out t_axi4_lite_miso
       );
@@ -77,7 +79,7 @@ architecture rtl of adc_readout_mb_intf is
    
    signal adc_calib_r_hold          : std_logic_vector(31 downto 0);
    signal adc_calib_q_hold          : std_logic_vector(31 downto 0);
-   signal adc_cfg_hold               : std_logic_vector(1 downto 0);
+   signal adc_cfg_hold               : std_logic_vector(1 downto 0);   
    
    attribute dont_touch : string; 
    attribute dont_touch of adc_calib_r_hold : signal is "true";
@@ -163,16 +165,18 @@ begin
       end if;
    end process; 
    slv_reg_rden <= axi_arready and MB_MOSI.ARVALID and (not axi_rvalid);
-   
+
    ---------------------------------------------------------------------------- 
    -- RD : données vers µBlaze                                       
    ---------------------------------------------------------------------------- 
    U5: process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
-         case axi_araddr(7 downto 0) is    
-            when others=>  axi_rdata <= (others =>'1');
-         end case;        
+				case axi_araddr(7 downto 0) is 
+					when X"00" =>  axi_rdata <= resize(DATA_IN, axi_rdata'length);
+            		when others=>  axi_rdata <= (others =>'1');
+         		end case;
+			
       end if;     
    end process;   
    

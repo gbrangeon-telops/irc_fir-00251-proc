@@ -25,6 +25,15 @@
 #define ADC_Q_OFFSET  0x08
 #define ADC_CFG_VALID 0x0C
 
+#define ADC_DATA_OUT 0x00
+
+#define ADC_Q_FIXP_FORMAT_M (uint32_t)15
+#define ADC_Q_FIXP_FORMAT_N (uint32_t)4
+#define ADC_R_FIXP_FORMAT_M (uint32_t)3
+#define ADC_R_FIXP_FORMAT_N (uint32_t)16
+
+
+
 enum adc_readout_cfg {
    ADC_IRIG_ONLY = 0,
    ADC_READOUT = 1,
@@ -33,11 +42,9 @@ enum adc_readout_cfg {
 
 typedef enum adc_readout_cfg adc_readout_cfg_t ;
 
-
-
 IRC_Status_t ADC_readout_init(flashSettings_t* fs);
 
 // convert flat value into a Qm.n fixed point value (encoded on m+n+s bits)
 uint32_t floatToFixedPoint(float val, uint32_t m, uint32_t n, bool s);
-														 
+
 #endif // __ADC_READOUT_H__

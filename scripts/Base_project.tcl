@@ -183,8 +183,8 @@ set_property generate_synth_checkpoint true [get_files  d:/Telops/fir-00251-Proc
 set_property generate_synth_checkpoint true [get_files  d:/Telops/fir-00251-Proc/IP/sp_ram_byte_w32_d64/sp_ram_byte_w32_d64.xci]
 set_property generate_synth_checkpoint true [get_files  d:/Telops/fir-00251-Proc/IP/afifo_w57d16/afifo_w57d16.xci]
 
-#Disable unused file
-
+#Disable webtalk
+config_webtalk -user off
 
 #Limit max fanout (see UG949 p143 for Fanout Guidelines table)
 set_property STEPS.SYNTH_DESIGN.ARGS.FANOUT_LIMIT 200 [get_runs synth_1]

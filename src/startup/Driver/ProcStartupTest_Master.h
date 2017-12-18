@@ -30,6 +30,7 @@
 #include "ProcStartupTest_TimeSync.h"
 #include "ProcStartupTest_VideoOut.h"
 #include "ProcStartupTest_XADC.h"
+#include "ProcStartupTest_ADC.h"
 
 // Type definitions
 

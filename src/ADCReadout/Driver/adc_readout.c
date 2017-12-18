@@ -1,5 +1,4 @@
 #include "adc_readout.h"
-
 #include "tel2000_param.h"
 #include "mb_axi4l_bridge.h"
 #include "utils.h"
@@ -9,30 +8,30 @@
 #include <time.h>
 #include <stdint.h>
 
-
-#define ADC_Q_FIXP_FORMAT_M (uint32_t)15
-#define ADC_Q_FIXP_FORMAT_N (uint32_t)4
-#define ADC_R_FIXP_FORMAT_M (uint32_t)3
-#define ADC_R_FIXP_FORMAT_N (uint32_t)16
-
 extern brd_rev_ver_t gBrdRevid;
+
+uint32_t N_ADC_BITS;
 
 // fonction appelée au chargement des flash settings
 IRC_Status_t ADC_readout_init(flashSettings_t* fs)
 {
    IRC_Status_t status = IRC_FAILURE;
    int32_t ri, qi;
-   float r, q;
-   uint32_t N_ADC_BITS = 12;
-   uint32_t adcReadoutcgf = 0;
+   float m, b, r, q;
+   N_ADC_BITS = 16;
+   uint32_t adcReadoutcgf = 1;
 
+#ifdef STARTUP
    // nominal values
-   float m = 1.0; // [counts/mV]
-   float b = 0.0f;  // [counts]
+   m = 1.0;                // dynamic range on N_ADC_BITS : |0 to 10V(16 bits)|-10V to 0(16 bits)|
+   b = 0.0f;               //                               |  0x0 to 0x7FFF  |  8000 to 0xFFFF  |
+#else
+   m = fs->ADCReadout_m;   // [counts/mV]
+   b = fs->ADCReadout_b;   // [counts]
+#endif
    
    if(gBrdRevid == BRD_REV_20x){
       adcReadoutcgf = ADC_AND_IRIG;
-      N_ADC_BITS = 16;
    }
    else if(gBrdRevid == BRD_REV_00x && fs->ADCReadoutEnabled)
    {
@@ -42,22 +41,15 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    else
    {
       adcReadoutcgf = ADC_IRIG_ONLY;
-      N_ADC_BITS = 16;
    }
 
-   m = fs->ADCReadout_m;
-   b = fs->ADCReadout_b;
 
    r = 1.0f/m;
-   q = b + (1<<(N_ADC_BITS-1)); // 2048 is the nominal offset, since the input of the ADC is offset by Vref/2
+   q = b + (1<<(N_ADC_BITS-1)); // the input of the ADC is offset by Vref/2
 
    // convert to S15Q16
    ri = floatToFixedPoint(r, ADC_R_FIXP_FORMAT_M, ADC_R_FIXP_FORMAT_N, true);
    qi = floatToFixedPoint(q, ADC_Q_FIXP_FORMAT_M, ADC_Q_FIXP_FORMAT_N, true);
-
-
-
-
 
 
    // configure r = 1/m and q = b
@@ -67,16 +59,6 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    // configure the switch
    AXI4L_write32(adcReadoutcgf, ADC_BASE_ADDR + ADC_ENABLE_OFFSET);
    AXI4L_write32(1, ADC_BASE_ADDR + ADC_CFG_VALID);
-
-   /*
-   PRINTF("ADC_READOUT: enabled = %d\n", adcReadoutEnabled);
-   PRINTF("ADC_READOUT: m (float) = " _PCF(3) "\n", _FFMT(fs->ADCReadout_m, 3));
-   PRINTF("ADC_READOUT: b (int16) = %d\n", fs->ADCReadout_b);
-   PRINTF("ADC_READOUT: r (float) = " _PCF(5) "\n", _FFMT(r, 5));
-   PRINTF("ADC_READOUT: q (float) = " _PCF(3) "\n", _FFMT(q, 3));
-   PRINTF("ADC_READOUT: r (fixed point) = %d\n", ri);
-   PRINTF("ADC_READOUT: q (fixed point) = %d\n", qi);
-   */
 
    status = IRC_SUCCESS;
 

@@ -290,7 +290,7 @@ static void AutoTest_RunAllTests(void) {
 
    autoTestID_t testIndex;
 
-   PRINTF("\n\n");
+   //PRINTF("\n\n");
    ATR_PRINTF("Use ATR BREAK to abort batch mode testing.\n");
 
    for (testIndex = 0; testIndex < ATID_Count; testIndex++) {
