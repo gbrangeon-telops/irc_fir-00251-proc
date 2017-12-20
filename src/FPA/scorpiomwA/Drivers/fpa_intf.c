@@ -425,10 +425,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //gFpaDebugRegC = (int32_t)ptrA->elec_ofs_start_dly_sampclk;
    
    // valeurs par defaut
-   ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (((hh.pixnum_per_tap_per_mclk * hh.tap_number) * (hh.itr_tri_min_usec/hh.mclk_period_usec)) / (2.0F * hh.tap_number) - 2.0F); // nombre d'échantillons dans la ligne de reset / (2* taps_number). Chaque tap comporte deux canaux . Pour plus de securité, on enleve 3 de ce nombre
+   ptrA->elec_ofs_samp_num_per_ch         = 4; //(uint32_t) (((hh.pixnum_per_tap_per_mclk * hh.tap_number) * (hh.itr_tri_min_usec/hh.mclk_period_usec)) / (2.0F * hh.tap_number) - 2.0F); // nombre d'échantillons dans la ligne de reset / (2* taps_number). Chaque tap comporte deux canaux . Pour plus de securité, on enleve 3 de ce nombre
    ptrA->elec_ofs_samp_num_per_ch         = (uint32_t) (2.0F*floorf((float)ptrA->elec_ofs_samp_num_per_ch/2.0F)); // doit être un nombre pair absolûment pour éviter que les zones (1:Ntaps) et (Ntaps+1: 2*Natps) se superposent
-   ptrA->elec_ofs_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elec_ofs_samp_num_per_ch);  
-   ptrA->elec_ofs_add_const               = (uint32_t) ISC0207_CONST_ELEC_OFFSET_VALUE;         // vaut "constante" dans le modèle décrit plus haut
+   ptrA->elec_ofs_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elec_ofs_samp_num_per_ch);
+   ptrA->elec_ofs_add_const               = (uint32_t) SCORPIOMWA_CONST_ELEC_OFFSET_VALUE;         // vaut "constante" dans le modèle décrit plus haut
    ptrA->elec_ofs_pix_faked_value         =  0; 
    ptrA->elec_ofs_pix_faked_value_forced  =  0;
    ptrA->elec_ofs_offset_minus_pix_value  =  0;
