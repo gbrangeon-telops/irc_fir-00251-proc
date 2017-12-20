@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Aug 09 11:12:36 2017" VIVADOVERSION="2013.4">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Mon Dec 18 14:02:06 2017" VIVADOVERSION="2013.4">
 
   <SYSTEMINFO ARCH="kintex7" DEVICE="7k160t" NAME="core_imp" PACKAGE="fbg676" SPEEDGRADE="-1"/>
 
@@ -124,7 +124,7 @@
         <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="intr"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_50" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
+    <PORT CLKFREQUENCY="50000000" DIR="O" NAME="clk_50" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out4"/>
       </CONNECTIONS>
@@ -134,22 +134,22 @@
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_160" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+    <PORT CLKFREQUENCY="160000000" DIR="O" NAME="clk_160" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_200" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out3">
+    <PORT CLKFREQUENCY="200000000" DIR="O" NAME="clk_200" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out3">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out3"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_20" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out5">
+    <PORT CLKFREQUENCY="20000000" DIR="O" NAME="clk_20" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out5">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out5"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_80" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+    <PORT CLKFREQUENCY="80000000" DIR="O" NAME="clk_80" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
       </CONNECTIONS>
@@ -1996,7 +1996,7 @@
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="intr" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="MCU_mdm_1_Interrupt &amp; oem_uart_ip2intc_irpt &amp; clink_uart_ip2intc_irpt &amp; xadc_wiz_1_ip2intc_irpt &amp; axi_timer_0_interrupt &amp; pleora_uart_ip2intc_irpt &amp; fpga_output_uart_ip2intc_irpt &amp; axi_usb_uart_ip2intc_irpt &amp; External_Ports_bulk_interrupt &amp; axi_quad_spi_0_ip2intc_irpt &amp; External_Ports_AEC_INTC &amp; axi_gps_uart_ip2intc_irpt &amp; fw_uart_ip2intc_irpt &amp; power_management_ip2intc_irpt &amp; axi_ndf_uart_ip2intc_irpt">
+        <PORT DIR="I" NAME="intr" SENSITIVITY="EDGE_RISING:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:EDGE_RISING:EDGE_RISING:EDGE_RISING:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="MCU_mdm_1_Interrupt &amp; oem_uart_ip2intc_irpt &amp; clink_uart_ip2intc_irpt &amp; xadc_wiz_1_ip2intc_irpt &amp; axi_timer_0_interrupt &amp; pleora_uart_ip2intc_irpt &amp; fpga_output_uart_ip2intc_irpt &amp; axi_usb_uart_ip2intc_irpt &amp; External_Ports_bulk_interrupt &amp; axi_quad_spi_0_ip2intc_irpt &amp; External_Ports_AEC_INTC &amp; axi_gps_uart_ip2intc_irpt &amp; fw_uart_ip2intc_irpt &amp; power_management_ip2intc_irpt &amp; axi_ndf_uart_ip2intc_irpt">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_mdm_1" PORT="Interrupt"/>
             <CONNECTION INSTANCE="oem_uart" PORT="ip2intc_irpt"/>
@@ -4638,7 +4638,7 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_mm2s_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axi_mm2s_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -4649,7 +4649,7 @@
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mm2s_err" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_mm2s_cmdsts_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axis_mm2s_cmdsts_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -4743,7 +4743,7 @@
         <PORT DIR="O" NAME="m_axis_mm2s_tlast" SIGIS="undef"/>
         <PORT DIR="O" NAME="m_axis_mm2s_tvalid" SIGIS="undef"/>
         <PORT DIR="I" NAME="m_axis_mm2s_tready" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_s2mm_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axi_s2mm_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -4754,7 +4754,7 @@
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s2mm_err" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_s2mm_cmdsts_awclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axis_s2mm_cmdsts_awclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -6350,7 +6350,7 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -6586,7 +6586,7 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -20161,7 +20161,7 @@
         <PARAMETER NAME="C_HIGHADDR" VALUE="0x44A9FFFF"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="ext_spi_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
+        <PORT CLKFREQUENCY="50000000" DIR="I" NAME="ext_spi_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out4"/>
           </CONNECTIONS>
@@ -22316,7 +22316,7 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="slowest_sync_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
+        <PORT CLKFREQUENCY="50000000" DIR="I" NAME="slowest_sync_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out4"/>
           </CONNECTIONS>

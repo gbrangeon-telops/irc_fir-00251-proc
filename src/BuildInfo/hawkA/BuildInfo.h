@@ -1,8 +1,8 @@
 #ifndef BUILDINFO_H
 #define BUILDINFO_H
 
-#define SVN_HARDWARE_REV      21220
-#define SVN_SOFTWARE_REV      21220
+#define SVN_HARDWARE_REV      -21220
+#define SVN_SOFTWARE_REV      -21221
 #define SVN_BOOTLOADER_REV    21220
 #define SVN_COMMON_REV        20950
 
