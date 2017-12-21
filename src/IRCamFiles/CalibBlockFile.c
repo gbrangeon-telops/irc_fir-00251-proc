@@ -161,6 +161,17 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr->FluxOffset = CalibBlock_BlockFileHeader_default.FluxOffset;
 
             case 1:
+               // 2.1.x -> 2.2.x
+               hdr->FluxSaturation = CalibBlock_BlockFileHeader_default.FluxSaturation;
+               hdr->LowExtrapolationFactor = CalibBlock_BlockFileHeader_default.LowExtrapolationFactor;
+               hdr->HighExtrapolationFactor = CalibBlock_BlockFileHeader_default.HighExtrapolationFactor;
+               hdr->LowValidTemperature = CalibBlock_BlockFileHeader_default.LowValidTemperature;
+               hdr->HighValidTemperature = CalibBlock_BlockFileHeader_default.HighValidTemperature;
+               hdr->FOVPosition = CalibBlock_BlockFileHeader_default.FOVPosition;
+               hdr->FocusPositionRaw = CalibBlock_BlockFileHeader_default.FocusPositionRaw;
+               hdr->ImageCorrectionFocusPositionRaw = CalibBlock_BlockFileHeader_default.ImageCorrectionFocusPositionRaw;
+
+            case 2:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBBLOCK_FILESUBMINORVERSION;
                break;
@@ -250,6 +261,10 @@ uint32_t CalibBlock_ParsePixelDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 1:
+               // 2.1.x -> 2.2.x
+               // Nothing to do
+
+            case 2:
                // Up to date, nothing to do
                break;
          }
@@ -333,6 +348,10 @@ uint32_t CalibBlock_ParseMaxTKDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 1:
+               // 2.1.x -> 2.2.x
+               // Nothing to do
+
+            case 2:
                // Up to date, nothing to do
                break;
          }
@@ -416,6 +435,10 @@ uint32_t CalibBlock_ParseLUTNLDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 1:
+               // 2.1.x -> 2.2.x
+               // Nothing to do
+
+            case 2:
                // Up to date, nothing to do
                break;
          }
@@ -499,6 +522,10 @@ uint32_t CalibBlock_ParseLUTRQDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 1:
+               // 2.1.x -> 2.2.x
+               // Nothing to do
+
+            case 2:
                // Up to date, nothing to do
                break;
          }

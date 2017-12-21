@@ -123,6 +123,12 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageC
                // Nothing to do
 
             case 1:
+               // 2.1.x -> 2.2.x
+               hdr->AcquisitionFrameRate = CalibImageCorrection_ImageCorrectionFileHeader_default.AcquisitionFrameRate;
+               hdr->FWMode = CalibImageCorrection_ImageCorrectionFileHeader_default.FWMode;
+               hdr->FocusPositionRaw = CalibImageCorrection_ImageCorrectionFileHeader_default.FocusPositionRaw;
+
+            case 2:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBIMAGECORRECTION_FILESUBMINORVERSION;
                break;
@@ -212,6 +218,10 @@ uint32_t CalibImageCorrection_ParseImageCorrectionDataHeader(int fd, fileInfo_t 
                // Nothing to do
 
             case 1:
+               // 2.1.x -> 2.2.x
+               // Nothing to do
+
+            case 2:
                // Up to date, nothing to do
                break;
          }

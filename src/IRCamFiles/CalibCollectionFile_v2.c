@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.1.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -59,6 +59,7 @@ CalibCollection_CollectionFileHeader_v2_t CalibCollection_CollectionFileHeader_v
    /* ReferencePOSIXTime = */ 0,
    /* FluxRatio01 = */ 0.000000F,
    /* FluxRatio12 = */ 0.000000F,
+   /* FOVPosition = */ 0,
    /* CollectionDataLength = */ 0,
    /* NumberOfBlocks = */ 0,
    /* CollectionDataCRC16 = */ 0,
@@ -142,7 +143,8 @@ uint32_t CalibCollection_ParseCollectionFileHeader_v2(uint8_t *buffer, uint32_t 
    memcpy(&hdr->ReferencePOSIXTime, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&hdr->FluxRatio01, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->FluxRatio12, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 248; // Skip FREE space
+   memcpy(&hdr->FOVPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 247; // Skip FREE space
    memcpy(&hdr->CollectionDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    numBytes += 3; // Skip FREE space
    memcpy(&hdr->NumberOfBlocks, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -231,7 +233,8 @@ uint32_t CalibCollection_WriteCollectionFileHeader_v2(CalibCollection_Collection
    memcpy(&buffer[numBytes], &hdr->ReferencePOSIXTime, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], &hdr->FluxRatio01, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->FluxRatio12, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 248); numBytes += 248; // FREE space
+   memcpy(&buffer[numBytes], &hdr->FOVPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 247); numBytes += 247; // FREE space
    memcpy(&buffer[numBytes], &hdr->CollectionDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
    memcpy(&buffer[numBytes], &hdr->NumberOfBlocks, sizeof(uint8_t)); numBytes += sizeof(uint8_t);

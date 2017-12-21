@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.1.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -82,6 +82,14 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* LowExtrapolationTemperature = */ -273.15F,
    /* HighExtrapolationTemperature = */ -273.15F,
    /* FluxOffset = */ 0.000000F,
+   /* FluxSaturation = */ 0.000000F,
+   /* LowExtrapolationFactor = */ 0.000000F,
+   /* HighExtrapolationFactor = */ 0.000000F,
+   /* LowValidTemperature = */ -273.15F,
+   /* HighValidTemperature = */ -273.15F,
+   /* FOVPosition = */ 0,
+   /* FocusPositionRaw = */ 0,
+   /* ImageCorrectionFocusPositionRaw = */ 0,
    /* PixelDataPresence = */ 0,
    /* MaxTKDataPresence = */ 0,
    /* LUTNLDataPresence = */ 0,
@@ -290,7 +298,16 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->LowExtrapolationTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->HighExtrapolationTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->FluxOffset, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-   numBytes += 174; // Skip FREE space
+   memcpy(&hdr->FluxSaturation, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LowExtrapolationFactor, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->HighExtrapolationFactor, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->LowValidTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->HighValidTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   numBytes += 3; // Skip FREE space
+   memcpy(&hdr->FOVPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->FocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memcpy(&hdr->ImageCorrectionFocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
+   numBytes += 142; // Skip FREE space
    memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -405,7 +422,16 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->LowExtrapolationTemperature, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->HighExtrapolationTemperature, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->FluxOffset, sizeof(float)); numBytes += sizeof(float);
-   memset(&buffer[numBytes], 0, 174); numBytes += 174; // FREE space
+   memcpy(&buffer[numBytes], &hdr->FluxSaturation, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LowExtrapolationFactor, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->HighExtrapolationFactor, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->LowValidTemperature, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->HighValidTemperature, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
+   memcpy(&buffer[numBytes], &hdr->FOVPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->FocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memcpy(&buffer[numBytes], &hdr->ImageCorrectionFocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
+   memset(&buffer[numBytes], 0, 142); numBytes += 142; // FREE space
    memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);

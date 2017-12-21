@@ -5,7 +5,7 @@
  * This file declares the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.1.0
+ * Generated from the calibration block file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBBLOCK_FILEMAJORVERSION_V2      2
-#define CALIBBLOCK_FILEMINORVERSION_V2      1
+#define CALIBBLOCK_FILEMINORVERSION_V2      2
 #define CALIBBLOCK_FILESUBMINORVERSION_V2   0
 
 #define CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2   512
@@ -76,7 +76,7 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    char FileDescription[65];   /**< File description */
    uint8_t DeviceDataFlowMajorVersion;   /**< Major version of the calibration data flow of the camera */
    uint8_t DeviceDataFlowMinorVersion;   /**< Minor version of the calibration data flow of the camera */
-   uint8_t SensorID;   /**< Sensor ID. */
+   uint8_t SensorID;   /**< Sensor ID */
    uint8_t CalibrationSource;   /**< Indicates how the calibration block has been generated */
    uint8_t CalibrationType;   /**< Calibration type */
    uint8_t IntegrationMode;   /**< Integration mode */
@@ -86,8 +86,8 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint16_t Height;   /**< Height of the image provided by the device in pixels */
    uint16_t OffsetX;   /**< Horizontal offset from the origin to the region of interest in pixels */
    uint16_t OffsetY;   /**< Vertical offset from the origin to the region of interest in pixels */
-   uint8_t ReverseX;   /**< Indicates whether the image is horizontally flipped. */
-   uint8_t ReverseY;   /**< Indicates whether the image is vertically flipped. */
+   uint8_t ReverseX;   /**< Indicates whether the image is horizontally flipped */
+   uint8_t ReverseY;   /**< Indicates whether the image is vertically flipped */
    uint32_t ExternalLensSerialNumber;   /**< Unique Telops 32-bit external lens serial number */
    char ExternalLensName[65];   /**< External Lens Name */
    uint32_t ManualFilterSerialNumber;   /**< Unique Telops 32-bit manual filter serial number */
@@ -109,17 +109,25 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    int32_t DeviceTemperatureSensor;   /**< Device Sensor Temperature during calibration */
    uint32_t SpectralResponsePOSIXTime;   /**< Camera spectral response file generation date and time */
    uint32_t ReferencePOSIXTime;   /**< Camera reference file generation date and time */
-   uint16_t FWFilterID;   /**< Filter wheel filter identification number. */
-   uint16_t NDFilterID;   /**< Neutral density filter identification number. */
-   uint16_t ManualFilterID;   /**< Manual filter identification number. */
-   uint16_t LensID;   /**< Lens identification number. */
-   float LowCut;   /**< Low wavelength at mid-height of the IBR integration start. */
-   float HighCut;   /**< High wavelength at mid-height of the IBR integration start. */
-   float LowReferenceTemperature;   /**< Lowest blackbody reference temperature used in calibration. */
-   float HighReferenceTemperature;   /**< Highest blackbody reference temperature used in calibration. */
-   float LowExtrapolationTemperature;   /**< Lowest calculated valid LUT temperature based on extrapolation. */
-   float HighExtrapolationTemperature;   /**< Highest calculated valid LUT temperature based on extrapolation. */
-   float FluxOffset;   /**< Calculated flux at 0K. */
+   uint16_t FWFilterID;   /**< Filter wheel filter identification number */
+   uint16_t NDFilterID;   /**< Neutral density filter identification number */
+   uint16_t ManualFilterID;   /**< Manual filter identification number */
+   uint16_t LensID;   /**< Lens identification number */
+   float LowCut;   /**< Low wavelength at mid-height of the IBR integration start */
+   float HighCut;   /**< High wavelength at mid-height of the IBR integration start */
+   float LowReferenceTemperature;   /**< Lowest blackbody reference temperature used in calibration */
+   float HighReferenceTemperature;   /**< Highest blackbody reference temperature used in calibration */
+   float LowExtrapolationTemperature;   /**< Lowest value of the radiometric temperature LUT */
+   float HighExtrapolationTemperature;   /**< Highest value of the radiometric temperature LUT */
+   float FluxOffset;   /**< Calculated flux at 0K */
+   float FluxSaturation;   /**< Measured flux at current saturation */
+   float LowExtrapolationFactor;   /**< Extrapolation factor for LUT lower limit */
+   float HighExtrapolationFactor;   /**< Extrapolation factor for LUT upper limit */
+   float LowValidTemperature;   /**< Lowest valid value of the calibrated radiometric temperature */
+   float HighValidTemperature;   /**< Highest valid value of the calibrated radiometric temperature */
+   uint8_t FOVPosition;   /**< Motorized FOV lens position */
+   int32_t FocusPositionRaw;   /**< Motorized focus lens encoder position */
+   int32_t ImageCorrectionFocusPositionRaw;   /**< Motorized focus lens encoder position to use for image correction */
    uint8_t PixelDataPresence;   /**< Indicates the presence of pixel data in calibration block */
    uint8_t MaxTKDataPresence;   /**< Indicates the presence of MaxTK data in calibration block */
    uint8_t LUTNLDataPresence;   /**< Indicates the presence of LUTNL data in calibration block */
@@ -142,31 +150,31 @@ struct CalibBlock_PixelDataHeader_v2Struct {
    float Offset_Median;   /**< Offset median */
    int8_t Offset_Exp;   /**< Offset exponent */
    uint8_t Offset_Nbits;   /**< Offset data filed bit width */
-   uint8_t Offset_Signed;   /**< Indicates whether the offset data field is signed. */
+   uint8_t Offset_Signed;   /**< Indicates whether the offset data field is signed */
    float Range_Off;   /**< Range offset */
    float Range_Median;   /**< Range median */
    int8_t Range_Exp;   /**< Range exponent */
    uint8_t Range_Nbits;   /**< Range data filed bit width */
-   uint8_t Range_Signed;   /**< Indicates whether the range data field is signed. */
+   uint8_t Range_Signed;   /**< Indicates whether the range data field is signed */
    float Kappa_Off;   /**< Kappa offset */
    float Kappa_Median;   /**< Kappa median */
    int8_t Kappa_Exp;   /**< Kappa exponent */
    uint8_t Kappa_Nbits;   /**< Kappa data filed bit width */
-   uint8_t Kappa_Signed;   /**< Indicates whether the kappa data field is signed. */
+   uint8_t Kappa_Signed;   /**< Indicates whether the kappa data field is signed */
    float Beta0_Off;   /**< Beta0 offset */
    float Beta0_Median;   /**< Beta0 median */
    int8_t Beta0_Exp;   /**< Beta0 exponent */
    uint8_t Beta0_Nbits;   /**< Beta0 data filed bit width */
-   uint8_t Beta0_Signed;   /**< Indicates whether the beta0 data field is signed. */
+   uint8_t Beta0_Signed;   /**< Indicates whether the beta0 data field is signed */
    float Alpha_Off;   /**< Alpha offset */
    float Alpha_Median;   /**< Alpha median */
    int8_t Alpha_Exp;   /**< Alpha exponent */
    uint8_t Alpha_Nbits;   /**< Alpha data filed bit width */
-   uint8_t Alpha_Signed;   /**< Indicates whether the alpha data field is signed. */
+   uint8_t Alpha_Signed;   /**< Indicates whether the alpha data field is signed */
    uint8_t LUTNLIndex_Nbits;   /**< LUTNLIndex data filed bit width */
-   uint8_t LUTNLIndex_Signed;   /**< Indicates whether the LUTNL index data field is signed. */
+   uint8_t LUTNLIndex_Signed;   /**< Indicates whether the LUTNL index data field is signed */
    uint8_t BadPixel_Nbits;   /**< Alpha data filed bit width */
-   uint8_t BadPixel_Signed;   /**< Indicates whether the bad pixel data field is signed. */
+   uint8_t BadPixel_Signed;   /**< Indicates whether the bad pixel data field is signed */
    uint32_t PixelDataLength;   /**< Pixel data length */
    uint16_t PixelDataCRC16;   /**< Pixel data CRC-16 */
    uint16_t DataHeaderCRC16;   /**< Data header CRC-16 */
@@ -230,8 +238,8 @@ struct CalibBlock_LUTNLDataHeader_v2Struct {
    int8_t B_Exp;   /**< B exponent */
    uint8_t M_Nbits;   /**< M data filed bit width */
    uint8_t B_Nbits;   /**< B data filed bit width */
-   uint8_t M_Signed;   /**< Indicates whether the M data field is signed. */
-   uint8_t B_Signed;   /**< Indicates whether the B data field is signed. */
+   uint8_t M_Signed;   /**< Indicates whether the M data field is signed */
+   uint8_t B_Signed;   /**< Indicates whether the B data field is signed */
    uint8_t NumberOfLUTNL;   /**< Number of non-linearity correction lookup tables in LUTNL data */
    uint32_t LUTNLDataLength;   /**< Non-linearity correction lookup table data length */
    uint16_t LUTNLDataCRC16;   /**< Non-linearity correction lookup table data CRC-16 */
@@ -271,8 +279,8 @@ struct CalibBlock_LUTRQDataHeader_v2Struct {
    uint8_t RadiometricQuantityType;   /**< Radiometric quantity type */
    uint8_t M_Nbits;   /**< M data filed bit width */
    uint8_t B_Nbits;   /**< B data filed bit width */
-   uint8_t M_Signed;   /**< Indicates whether the M data field is signed. */
-   uint8_t B_Signed;   /**< Data field is signed. */
+   uint8_t M_Signed;   /**< Indicates whether the M data field is signed */
+   uint8_t B_Signed;   /**< Data field is signed */
    uint32_t LUTRQDataLength;   /**< Radiometric quantity lookup table data length */
    uint16_t LUTRQDataCRC16;   /**< Radiometric quantity lookup table data CRC-16 */
    uint16_t DataHeaderCRC16;   /**< Data header CRC-16 */

@@ -5,7 +5,7 @@
  * This file declares the camera calibration collection file structure v2.
  *
  * Auto-generated calibration collection file library.
- * Generated from the calibration collection file structure definition XLS file version 2.1.0
+ * Generated from the calibration collection file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBCOLLECTION_FILEMAJORVERSION_V2      2
-#define CALIBCOLLECTION_FILEMINORVERSION_V2      1
+#define CALIBCOLLECTION_FILEMINORVERSION_V2      2
 #define CALIBCOLLECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V2   512
@@ -38,11 +38,11 @@ struct CalibCollection_CollectionFileHeader_v2Struct {
    uint8_t FileStructureSubMinorVersion;   /**< File structure SubMinor Version */
    uint32_t FileHeaderLength;   /**< File header length */
    uint32_t DeviceSerialNumber;   /**< Unique Telops 32-bit device serial number */
-   uint32_t POSIXTime;   /**< Collection file generation date and time. */
+   uint32_t POSIXTime;   /**< Collection file generation date and time */
    char FileDescription[65];   /**< File description */
    uint8_t DeviceDataFlowMajorVersion;   /**< Major version of the calibration data flow of the camera */
    uint8_t DeviceDataFlowMinorVersion;   /**< Minor version of the calibration data flow of the camera */
-   uint8_t SensorID;   /**< Sensor ID. */
+   uint8_t SensorID;   /**< Sensor ID */
    uint8_t CollectionType;   /**< Collection type */
    uint8_t CalibrationType;   /**< Calibration type */
    uint8_t IntegrationMode;   /**< Integration mode */
@@ -63,6 +63,7 @@ struct CalibCollection_CollectionFileHeader_v2Struct {
    uint32_t ReferencePOSIXTime;   /**< Camera reference file generation date and time */
    float FluxRatio01;   /**< Ratio de flux entre NDF0 et NDF1 */
    float FluxRatio12;   /**< Ratio de flux entre NDF1 et NDF2 */
+   uint8_t FOVPosition;   /**< Motorized FOV lens position */
    uint32_t CollectionDataLength;   /**< Collection data length */
    uint8_t NumberOfBlocks;   /**< Number of calibration blocks in collection file */
    uint16_t CollectionDataCRC16;   /**< Collection data CRC-16 */
