@@ -41,17 +41,12 @@ entity SFW_ACQUISITION_SM is
         RISING_POSITION         : in std_logic_vector(15 downto 0);   -- encoder position at when INTEGRATION rises
         FALLING_POSITION        : in std_logic_vector(15 downto 0);   -- encoder position at when INTEGRATION falls
         ACQ_FILTER_NUMBER       : in std_logic_vector(7 downto 0);    -- Number of the filter (if valid) after the integration is done
-        CURRENT_FILTER_NUMBER   : in std_logic_vector(7 downto 0);    -- Number of the filter in front of the lens
         NEXT_FILTER_NUMBER      : in std_logic_vector(7 downto 0);    -- Number of the next filter in front of the lens
         RPM                     : in  std_logic_vector(15+SPEED_PRECISION_BIT downto 0);
 
         SFW_HDR_MOSI            : out t_axi4_lite_mosi;
         SFW_HDR_MISO            : in t_axi4_lite_miso;
 
-        --------------------------------
-        -- Trigger
-        --------------------------------
-        SYNC_TRIG           : in std_logic;     -- Assert SYNC_TRIG when a new filter is valid in front of the lens
         FPA_IMG_INFO        : in  img_info_type;
         FPA_EXP_INFO        : out exp_info_type;
         --EXP_INFO_BUSY       :in std_logic;
@@ -103,23 +98,14 @@ architecture RTL of SFW_ACQUISITION_SM is
    signal enable                : std_logic := '0';
    signal valid_parameters      : std_logic := '0'; -- Tells if filter positions are valid
    signal fpa_exp_info_o        : exp_info_type;
-   
-   signal sfw_trig_d1        : std_logic;
-       
-   signal next_exp_time         : unsigned(31 downto 0);
-   signal current_exp_time      : unsigned(31 downto 0);
-   signal exp_time          : unsigned(31 downto 0);
-   signal exp_time_indx     : unsigned(RAM_BUS_WIDTH-1 downto 0);
+
    signal exp_ram_addr_i        : std_logic_vector(RAM_BUS_WIDTH-1 downto 0);
    signal next_exp_time_valid   : std_logic_vector(2 downto 0);
-   signal next_hdr_index        : std_logic_vector(7 downto 0);
    signal exp_feedbk        :std_logic;
-   signal sync_trig_i       : std_logic;
    signal exp_feedbk_sr : std_logic_vector(HDR_INSERT_CLK_DELAY-1 downto 0); -- exp_feedback shift register
-   signal sync_err_o : std_logic;
    signal fpa_img_info_i        : img_info_type;
    --HDR AXIL
-   type sfw_hder_write_state_t is (write_standby, wr_speed,wr_position,wr_enc_start,wr_enc_end, wait_end_feedfbk,wait_write_completed );
+   type sfw_hder_write_state_t is (write_standby, wr_speed, wr_position, wr_enc_start, wr_enc_end, wait_write_completed);
    signal write_state : sfw_hder_write_state_t := write_standby;   
    signal next_write_state : sfw_hder_write_state_t := write_standby;
    signal axil_mosi_i : t_axi4_lite_mosi;
@@ -136,10 +122,9 @@ begin
       SRESETN => sresetn
       );
    
-   sync_trig_i <= SYNC_TRIG;
    fpa_img_info_i <= FPA_IMG_INFO;
    
-   doube_sync_gen : double_sync port map( D => FPA_IMG_INFO.exp_feedbk, Q => exp_feedbk , RESET => sresetn , CLK => CLK );   
+   double_sync_gen : double_sync port map( D => fpa_img_info_i.exp_feedbk, Q => exp_feedbk , RESET => sresetn , CLK => CLK );   
    --------------------------
    -- input signal
    --------------------------
@@ -151,6 +136,8 @@ begin
    EXP_RAM_ADDR <= exp_ram_addr_i;
    enable <= '1' when valid_parameters = '1' and ( WHEEL_STATE = ROTATING_WHEEL) else '0';
    
+   SYNC_ERROR <= '0';
+   
 --------------------------
 -- Synchronous Exposure time management
 --------------------------
@@ -161,18 +148,14 @@ begin
             fpa_exp_info_o.exp_dval <= '0';
             fpa_exp_info_o.exp_indx <= (others => '0');
             fpa_exp_info_o.exp_time <= (others => '0');
-            next_hdr_index <= x"FF";
             
         else
             if(next_exp_time_valid(2) = '1') then -- next_exp_time updated with next filter exp_time
                fpa_exp_info_o.exp_time <= unsigned(EXP_RAM_DATA);
                fpa_exp_info_o.exp_indx <= NEXT_FILTER_NUMBER;
                fpa_exp_info_o.exp_dval <= '1';
-               
-               next_hdr_index <= NEXT_FILTER_NUMBER;
             else
                fpa_exp_info_o.exp_dval <= '0';
-               next_hdr_index <= next_hdr_index;
             end if;
         end if;
     end if; 
@@ -184,11 +167,8 @@ read_ram_process : process(CLK)
 begin
     if rising_edge(CLK) then
         if sresetn = '0' or enable = '0' then
-            next_exp_time <= ( others => '0');
-            current_exp_time <= unsigned(EXP_RAM_DATA);
-            exp_ram_addr_i <= std_logic_vector(CURRENT_FILTER_NUMBER(RAM_BUS_WIDTH-1 downto 0));
-            exp_time_indx <= ( others => '0');
-            next_exp_time_valid <= ( others => '0');
+            exp_ram_addr_i <= (others => '0');
+            next_exp_time_valid <= (others => '0');
         else
             next_exp_time_valid(2) <= next_exp_time_valid(1);
             next_exp_time_valid(1) <= next_exp_time_valid(0);
@@ -200,14 +180,6 @@ begin
             
             --READ RAM
             exp_ram_addr_i <= std_logic_vector(NEXT_FILTER_NUMBER(RAM_BUS_WIDTH-1 downto 0));
-            next_exp_time <= unsigned(EXP_RAM_DATA);
-            IF ( exp_time_indx(RAM_BUS_WIDTH-1 downto 0) /= unsigned(CURRENT_FILTER_NUMBER(RAM_BUS_WIDTH-1 downto 0))) then
-                exp_time_indx(RAM_BUS_WIDTH-1 downto 0) <= unsigned(CURRENT_FILTER_NUMBER(RAM_BUS_WIDTH-1 downto 0));
-                current_exp_time <= next_exp_time;
-            else
-                exp_time_indx <= exp_time_indx;
-                current_exp_time <= current_exp_time;                
-            end if;
             
         end if;
     end if; 
@@ -234,7 +206,6 @@ begin
         else
         
             exp_feedbk_sr(0) <= exp_feedbk;
-            --exp_feedbk_sr(0) <= FPA_IMG_INFO.exp_feedbk;
             for i in 1 to HDR_INSERT_CLK_DELAY-1 loop
                 exp_feedbk_sr(i) <= exp_feedbk_sr(i-1);        
             end loop;
@@ -246,16 +217,11 @@ begin
                     -- Check for the start of delayed integration then write Speed
                     if exp_feedbk_sr(HDR_INSERT_CLK_DELAY-1) = '1' then 
                         write_state <= wr_speed;
---                        if next_hdr_index = FPA_IMG_INFO.exp_info.exp_indx    then
-                            sync_err_o <= '0'; --hdr is in sync
---                        else
---                            sync_err_o <= '1'; --hdr is out of sync
---                        end if;
                     end if;
 
 
                 when wr_speed =>
-                    axil_mosi_i.awaddr <= x"0000" &  std_logic_vector(FPA_Img_Info.frame_id(7 downto 0)) &  std_logic_vector(resize(FWSpeedAdd32, 8));
+                    axil_mosi_i.awaddr <= x"0000" &  std_logic_vector(fpa_img_info_i.frame_id(7 downto 0)) &  std_logic_vector(resize(FWSpeedAdd32, 8));
                     axil_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(RPM(15+SPEED_PRECISION_BIT downto SPEED_PRECISION_BIT)),32), FWSpeedShift));
                     axil_mosi_i.wstrb <= FWSpeedBWE;
                     axil_mosi_i.awvalid <= '1';
@@ -266,7 +232,7 @@ begin
 
                
                 when wr_enc_start =>
-                    axil_mosi_i.awaddr <= x"0000" &  std_logic_vector(FPA_Img_Info.frame_id(7 downto 0)) &  std_logic_vector(resize(FWEncoderAtExposureStartAdd32, 8));
+                    axil_mosi_i.awaddr <= x"0000" &  std_logic_vector(fpa_img_info_i.frame_id(7 downto 0)) &  std_logic_vector(resize(FWEncoderAtExposureStartAdd32, 8));
                     axil_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(RISING_POSITION), 32), FWEncoderAtExposureStartShift));
                     axil_mosi_i.wstrb <= FWEncoderAtExposureStartBWE;
                     axil_mosi_i.awvalid <= '1';
@@ -276,8 +242,8 @@ begin
 
                                     
                 when wr_position =>
-                    if(exp_feedbk_sr(0)= '0') then -- wait for ACQ to be latched
-                        axil_mosi_i.awaddr <= x"0000" &  std_logic_vector(FPA_Img_Info.frame_id(7 downto 0)) &  std_logic_vector(resize(FWPositionAdd32, 8));
+                    if(exp_feedbk_sr(HDR_INSERT_CLK_DELAY-1)= '0') then -- wait for ACQ to be latched
+                        axil_mosi_i.awaddr <= x"0000" &  std_logic_vector(fpa_img_info_i.frame_id(7 downto 0)) &  std_logic_vector(resize(FWPositionAdd32, 8));
                         axil_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(ACQ_FILTER_NUMBER), 32), FWPositionShift));
                         axil_mosi_i.wstrb <= FWPositionBWE;
                         axil_mosi_i.awvalid <= '1';
@@ -288,13 +254,13 @@ begin
         
                 
                 when wr_enc_end =>
-                    axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(FPA_Img_Info.frame_id(7 downto 0)) &  std_logic_vector(resize(FWEncoderAtExposureEndAdd32, 8));
+                    axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(fpa_img_info_i.frame_id(7 downto 0)) &  std_logic_vector(resize(FWEncoderAtExposureEndAdd32, 8));
                     axil_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(FALLING_POSITION) ,32), FWEncoderAtExposureEndShift));
                     axil_mosi_i.wstrb <= FWEncoderAtExposureEndBWE;
                     axil_mosi_i.awvalid <= '1';
                     axil_mosi_i.wvalid <= '1';
                     write_state <= wait_write_completed;
-                    next_write_state <= wait_end_feedfbk;
+                    next_write_state <= write_standby;
                   
                     
                 when wait_write_completed =>
@@ -310,20 +276,12 @@ begin
                         axil_mosi_i.wstrb <= axil_mosi_i.wstrb;
                     end if;
                     
-
                     if axil_miso_i.bvalid = '1' then
                         write_state <= next_write_state;
                         --axil_mosi_i.bready <= '0';
                     else
                         write_state <= write_state;
                         --axil_mosi_i.bready <= '1';
-                    end if;
-                when wait_end_feedfbk =>
-                    if exp_feedbk_sr(HDR_INSERT_CLK_DELAY-1) = '0' then
-                        write_state <= write_standby;
-                        axil_mosi_i.awvalid <= '0';
-                        axil_mosi_i.wvalid <= '0';
-                        --axil_mosi_i.bready <= '0';
                     end if;
                     
                 when others =>
@@ -332,21 +290,7 @@ begin
             end case;
         end if;
     end if; 
-end process Header_gen_process;   
-
-
-error_process : process(CLK)
-begin
-    if rising_edge(CLK) then
-        if( sresetn = '0') then
-            SYNC_ERROR <= '0';
-        else
-            if(sync_err_o = '1') then -- never clear error so far.
-                SYNC_ERROR <= '1';
-            end if;
-        end if;
-    end if;
-end process error_process;
+end process Header_gen_process;
  
 end RTL;
 

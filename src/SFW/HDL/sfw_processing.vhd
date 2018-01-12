@@ -53,7 +53,6 @@ entity SFW_Processing is
       RISING_POSITION         : out std_logic_vector(15 downto 0);   -- encoder position at when INTEGRATION rises
       FALLING_POSITION        : out std_logic_vector(15 downto 0);   -- encoder position at when INTEGRATION falls
       ACQ_FILTER_NUMBER       : out std_logic_vector(7 downto 0);    -- Number of the filter (if valid) after the integration is done
-      CURRENT_FILTER_NUMBER   : out std_logic_vector(7 downto 0);    -- Number of the filter in front of the lens
       NEXT_FILTER_NUMBER      : out std_logic_vector(7 downto 0);    -- Number of the next filter in front of the lens
       --------------------------------
       -- Trigger
@@ -154,10 +153,7 @@ begin
    --------------------------
    -- SFW CONTROLLER
    --------------------------
-   
-   CURRENT_FILTER_NUMBER   <= std_logic_vector(resize(current_filter_number_i,CURRENT_FILTER_NUMBER'length))   when wheel_state_i = ROTATING_WHEEL
-                        else  position_setpoint_i;
-   NEXT_FILTER_NUMBER      <= std_logic_vector(resize(next_filter_number_i,NEXT_FILTER_NUMBER'length))         when wheel_state_i = ROTATING_WHEEL
+   NEXT_FILTER_NUMBER <= std_logic_vector(resize(next_filter_number_i,NEXT_FILTER_NUMBER'length)) when wheel_state_i = ROTATING_WHEEL
                         else  position_setpoint_i;
    
    integration_process : process(CLK)
@@ -190,7 +186,7 @@ begin
                   -- "and (not next_position_invalid or next_filter_ends)" has been added to the condition because valid_filter has a lentency of 1 clock cycle
                   --if valid_filter = '1' and valid_integration = '1' and (next_position_invalid = '0') then
                   if valid_filter = '1' and valid_integration = '1' then
-                     ACQ_FILTER_NUMBER <= std_logic_vector(resize(current_filter_number_i,CURRENT_FILTER_NUMBER'length));
+                     ACQ_FILTER_NUMBER <= std_logic_vector(resize(current_filter_number_i,ACQ_FILTER_NUMBER'length));
                   else
                      -- ACQ_FILTER_NUMBER must be set to 8 when the integration isn't done during a valid filter range
                      -- This will put the tag in the  image header : SFW "In Transition"
