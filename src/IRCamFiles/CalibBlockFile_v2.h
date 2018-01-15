@@ -88,6 +88,7 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint16_t OffsetY;   /**< Vertical offset from the origin to the region of interest in pixels */
    uint8_t ReverseX;   /**< Indicates whether the image is horizontally flipped */
    uint8_t ReverseY;   /**< Indicates whether the image is vertically flipped */
+   uint16_t ExternalLensFocalLength;   /**< Focal length of the external lens */
    uint32_t ExternalLensSerialNumber;   /**< Unique Telops 32-bit external lens serial number */
    char ExternalLensName[65];   /**< External Lens Name */
    uint32_t ManualFilterSerialNumber;   /**< Unique Telops 32-bit manual filter serial number */

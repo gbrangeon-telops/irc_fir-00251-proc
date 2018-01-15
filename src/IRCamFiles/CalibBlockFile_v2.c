@@ -50,6 +50,7 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* OffsetY = */ 0,
    /* ReverseX = */ 0,
    /* ReverseY = */ 0,
+   /* ExternalLensFocalLength = */ 0,
    /* ExternalLensSerialNumber = */ 0,
    /* ExternalLensName = */ "",
    /* ManualFilterSerialNumber = */ 0,
@@ -263,7 +264,7 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->OffsetY, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&hdr->ReverseX, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->ReverseY, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 2; // Skip FREE space
+   memcpy(&hdr->ExternalLensFocalLength, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&hdr->ExternalLensSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(hdr->ExternalLensName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ExternalLensName[64] = '\0';
@@ -389,7 +390,7 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->OffsetY, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&buffer[numBytes], &hdr->ReverseX, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->ReverseY, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+   memcpy(&buffer[numBytes], &hdr->ExternalLensFocalLength, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&buffer[numBytes], &hdr->ExternalLensSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], hdr->ExternalLensName, 64); numBytes += 64;
    memcpy(&buffer[numBytes], &hdr->ManualFilterSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);

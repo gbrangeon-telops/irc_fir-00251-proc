@@ -162,6 +162,7 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
 
             case 1:
                // 2.1.x -> 2.2.x
+               hdr->ExternalLensFocalLength = CalibBlock_BlockFileHeader_default.ExternalLensFocalLength;
                hdr->FluxSaturation = CalibBlock_BlockFileHeader_default.FluxSaturation;
                hdr->LowExtrapolationFactor = CalibBlock_BlockFileHeader_default.LowExtrapolationFactor;
                hdr->HighExtrapolationFactor = CalibBlock_BlockFileHeader_default.HighExtrapolationFactor;
