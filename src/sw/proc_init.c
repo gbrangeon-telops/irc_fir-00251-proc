@@ -1052,7 +1052,7 @@ IRC_Status_t Proc_FW_Init()
    SFW_CTRL_Init(&gcRegsData, &gSFW_Ctrl);
 
    //Check the filterwheel type(slow or fast)  and init the SFW mathematical model if needed
-   if(flashSettings.FWType == FW_SYNC)
+   if(flashSettings.FWPresent == 1 && flashSettings.FWType == FW_SYNC)
    {
       InitMathematicalModel(&gcRegsData);
    }

@@ -269,7 +269,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       }
 
       TDCFlagsSet(FWIsImplementedMask);
-      if(p_flashSettings->FWType == 1)
+      if(p_flashSettings->FWType == FW_SYNC)
       {
          TDCFlagsSet(FWSynchronouslyRotatingModeIsImplementedMask);
       }
