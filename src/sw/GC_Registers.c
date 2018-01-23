@@ -20,6 +20,7 @@
 #include "Trig_gen.h"
 #include "fan_ctrl.h"
 #include "Acquisition.h"
+#include "Actualization.h"
 #include "BufferManager.h"
 #include "BuildInfo.h"
 #include "EHDRI_Manager.h"
@@ -45,7 +46,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.1.0
+// Generated from XML camera definition file version 12.2.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -63,6 +64,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AcquisitionFrameRateMax = */ 1500.0F,
    /* AcquisitionFrameRateMaxFG = */ 0.0F,
    /* AcquisitionFrameRateMin = */ 0.1F,
+   /* AutofocusROI = */ 50.0F,
    /* DeviceClockFrequency = */ 0.0F,
    /* DeviceCurrent = */ 0.0F,
    /* DeviceDetectorElectricalRefOffset = */ 0.0F,
@@ -92,11 +94,29 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ExternalBlackBodyTemperature = */ 25.00F,
    /* ExternalFanSpeed = */ 0.0F,
    /* ExternalFanSpeedSetpoint = */ 50.0F,
+   /* HFOV = */ 0.0F,
+   /* ImageCorrectionFWAcquisitionFrameRate = */ ACT_DEFAULT_FPS,
+   /* ImageCorrectionFWAcquisitionFrameRateMax = */ 800.0F,
+   /* ImageCorrectionFWAcquisitionFrameRateMin = */ 0.1F,
    /* MemoryBufferSequenceDownloadBitRateMax = */ 20.0F,
    /* TriggerDelay = */ 0.0F,
+   /* VFOV = */ 0.0F,
+   /* VideoAGCFractionMax = */ 99.0F,
+   /* VideoAGCFractionMaxMin = */ 2.0F,
+   /* VideoAGCFractionMin = */ 1.0F,
+   /* VideoAGCFractionMinMax = */ 98.0F,
+   /* VideoAGCResponseTime = */ 0.100F,
    /* DeviceFirmwareModuleRevision = */ 0,
+   /* FOVPositionRaw = */ 0,
+   /* FOVPositionRawMax = */ 0,
+   /* FOVPositionRawMin = */ 0,
+   /* FOVPositionRawSetpoint = */ 0,
    /* FWPositionRaw = */ 0,
    /* FWPositionRawSetpoint = */ 0,
+   /* FocusPositionRaw = */ 0,
+   /* FocusPositionRawMax = */ 0,
+   /* FocusPositionRawMin = */ 0,
+   /* FocusPositionRawSetpoint = */ 0,
    /* GPSAltitude = */ 0,
    /* GPSLatitude = */ 0,
    /* GPSLongitude = */ 0,
@@ -109,6 +129,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AcquisitionStart = */ 0,
    /* AcquisitionStartAtStartup = */ 0,
    /* AcquisitionStop = */ 0,
+   /* Autofocus = */ 0,
+   /* AutofocusMode = */ AM_Off,
    /* AutomaticExternalFanSpeedMode = */ AEFSM_Off,
    /* AvailabilityFlags = */ 0,
    /* BadPixelReplacement = */ 0,
@@ -179,6 +201,9 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ExposureTimeSetToMax = */ 0,
    /* ExposureTimeSetToMin = */ 0,
    /* ExternalLensSerialNumber = */ 0,
+   /* FOVPosition = */ FOVP_FOVNotImplemented,
+   /* FOVPositionNumber = */ 0,
+   /* FOVPositionSetpoint = */ FOVPS_FOV1,
    /* FValSize = */ 0,
    /* FWFilterNumber = */ 0,
    /* FWMode = */ FWM_Fixed,
@@ -187,6 +212,10 @@ gcRegistersData_t gcRegsDataFactory = {
    /* FWSpeed = */ 0,
    /* FWSpeedMax = */ 5000,
    /* FWSpeedSetpoint = */ 0,
+   /* FocusFarFast = */ 0,
+   /* FocusFarSlow = */ 0,
+   /* FocusNearFast = */ 0,
+   /* FocusNearSlow = */ 0,
    /* GPSModeIndicator = */ GPSMI_NotAvailable,
    /* GPSNumberOfSatellitesInUse = */ 0,
    /* Height = */ FPA_HEIGHT_MAX,
@@ -196,6 +225,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ICUPosition = */ ICUP_ICUNotImplemented,
    /* ICUPositionSetpoint = */ ICUPS_Scene,
    /* ImageCorrection = */ 0,
+   /* ImageCorrectionBlockSelector = */ ICBS_AllBlocks,
+   /* ImageCorrectionFWMode = */ ICFWM_Fixed,
    /* ImageCorrectionMode = */ ICM_BlackBody,
    /* IntegrationMode = */ FPA_INTEGRATION_MODE,
    /* IsActiveFlags = */ 0,
@@ -217,7 +248,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferSequenceClearAll = */ 0,
    /* MemoryBufferSequenceCount = */ 0,
    /* MemoryBufferSequenceDefrag = */ 0,
-   /* MemoryBufferSequenceDownloadFrameCount = */ 0,
+   /* MemoryBufferSequenceDownloadFrameCount = */ 1,
    /* MemoryBufferSequenceDownloadFrameID = */ 0,
    /* MemoryBufferSequenceDownloadImageFrameID = */ 0,
    /* MemoryBufferSequenceDownloadMode = */ MBSDM_Off,
@@ -272,8 +303,11 @@ gcRegistersData_t gcRegsDataFactory = {
    /* TriggerSelector = */ TS_AcquisitionStart,
    /* TriggerSoftware = */ 0,
    /* TriggerSource = */ 0,
-   /* VideoAGC = */ 0,
+   /* VideoAGC = */ VAGC_Continuous,
    /* VideoBadPixelReplacement = */ 1,
+   /* VideoColorMap = */ VCM_Gray,
+   /* VideoColorMapMax = */ 65535,
+   /* VideoColorMapMin = */ 0,
    /* VideoEHDRIExposureIndex = */ VEHDRIEI_Exposure1,
    /* VideoFWPosition = */ VFWP_Filter1,
    /* VideoFreeze = */ 0,
@@ -281,6 +315,10 @@ gcRegistersData_t gcRegsDataFactory = {
    /* WidthInc = */ FPA_WIDTH_MULT,
    /* WidthMax = */ FPA_WIDTH_MAX,
    /* WidthMin = */ FPA_WIDTH_MIN,
+   /* ZoomInFast = */ 0,
+   /* ZoomInSlow = */ 0,
+   /* ZoomOutFast = */ 0,
+   /* ZoomOutSlow = */ 0,
    /* DeviceID = */ "TEL00000",
    /* DeviceManufacturerInfo = */ "Thermal Scientific IR Camera",
    /* DeviceModelName = */ "TS-IR",
@@ -373,6 +411,7 @@ void GC_Registers_Init()
    gcRegsDef[AcquisitionFrameRateMaxIdx].p_data = &gcRegsData.AcquisitionFrameRateMax;
    gcRegsDef[AcquisitionFrameRateMaxFGIdx].p_data = &gcRegsData.AcquisitionFrameRateMaxFG;
    gcRegsDef[AcquisitionFrameRateMinIdx].p_data = &gcRegsData.AcquisitionFrameRateMin;
+   gcRegsDef[AutofocusROIIdx].p_data = &gcRegsData.AutofocusROI;
    gcRegsDef[DeviceClockFrequencyIdx].p_data = &gcRegsData.DeviceClockFrequency;
    gcRegsDef[DeviceCurrentIdx].p_data = &gcRegsData.DeviceCurrent;
    gcRegsDef[DeviceDetectorElectricalRefOffsetIdx].p_data = &gcRegsData.DeviceDetectorElectricalRefOffset;
@@ -402,11 +441,29 @@ void GC_Registers_Init()
    gcRegsDef[ExternalBlackBodyTemperatureIdx].p_data = &gcRegsData.ExternalBlackBodyTemperature;
    gcRegsDef[ExternalFanSpeedIdx].p_data = &gcRegsData.ExternalFanSpeed;
    gcRegsDef[ExternalFanSpeedSetpointIdx].p_data = &gcRegsData.ExternalFanSpeedSetpoint;
+   gcRegsDef[HFOVIdx].p_data = &gcRegsData.HFOV;
+   gcRegsDef[ImageCorrectionFWAcquisitionFrameRateIdx].p_data = &gcRegsData.ImageCorrectionFWAcquisitionFrameRate;
+   gcRegsDef[ImageCorrectionFWAcquisitionFrameRateMaxIdx].p_data = &gcRegsData.ImageCorrectionFWAcquisitionFrameRateMax;
+   gcRegsDef[ImageCorrectionFWAcquisitionFrameRateMinIdx].p_data = &gcRegsData.ImageCorrectionFWAcquisitionFrameRateMin;
    gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadBitRateMax;
    gcRegsDef[TriggerDelayIdx].p_data = &gcRegsData.TriggerDelay;
+   gcRegsDef[VFOVIdx].p_data = &gcRegsData.VFOV;
+   gcRegsDef[VideoAGCFractionMaxIdx].p_data = &gcRegsData.VideoAGCFractionMax;
+   gcRegsDef[VideoAGCFractionMaxMinIdx].p_data = &gcRegsData.VideoAGCFractionMaxMin;
+   gcRegsDef[VideoAGCFractionMinIdx].p_data = &gcRegsData.VideoAGCFractionMin;
+   gcRegsDef[VideoAGCFractionMinMaxIdx].p_data = &gcRegsData.VideoAGCFractionMinMax;
+   gcRegsDef[VideoAGCResponseTimeIdx].p_data = &gcRegsData.VideoAGCResponseTime;
    gcRegsDef[DeviceFirmwareModuleRevisionIdx].p_data = &gcRegsData.DeviceFirmwareModuleRevision;
+   gcRegsDef[FOVPositionRawIdx].p_data = &gcRegsData.FOVPositionRaw;
+   gcRegsDef[FOVPositionRawMaxIdx].p_data = &gcRegsData.FOVPositionRawMax;
+   gcRegsDef[FOVPositionRawMinIdx].p_data = &gcRegsData.FOVPositionRawMin;
+   gcRegsDef[FOVPositionRawSetpointIdx].p_data = &gcRegsData.FOVPositionRawSetpoint;
    gcRegsDef[FWPositionRawIdx].p_data = &gcRegsData.FWPositionRaw;
    gcRegsDef[FWPositionRawSetpointIdx].p_data = &gcRegsData.FWPositionRawSetpoint;
+   gcRegsDef[FocusPositionRawIdx].p_data = &gcRegsData.FocusPositionRaw;
+   gcRegsDef[FocusPositionRawMaxIdx].p_data = &gcRegsData.FocusPositionRawMax;
+   gcRegsDef[FocusPositionRawMinIdx].p_data = &gcRegsData.FocusPositionRawMin;
+   gcRegsDef[FocusPositionRawSetpointIdx].p_data = &gcRegsData.FocusPositionRawSetpoint;
    gcRegsDef[GPSAltitudeIdx].p_data = &gcRegsData.GPSAltitude;
    gcRegsDef[GPSLatitudeIdx].p_data = &gcRegsData.GPSLatitude;
    gcRegsDef[GPSLongitudeIdx].p_data = &gcRegsData.GPSLongitude;
@@ -419,6 +476,8 @@ void GC_Registers_Init()
    gcRegsDef[AcquisitionStartIdx].p_data = &gcRegsData.AcquisitionStart;
    gcRegsDef[AcquisitionStartAtStartupIdx].p_data = &gcRegsData.AcquisitionStartAtStartup;
    gcRegsDef[AcquisitionStopIdx].p_data = &gcRegsData.AcquisitionStop;
+   gcRegsDef[AutofocusIdx].p_data = &gcRegsData.Autofocus;
+   gcRegsDef[AutofocusModeIdx].p_data = &gcRegsData.AutofocusMode;
    gcRegsDef[AutomaticExternalFanSpeedModeIdx].p_data = &gcRegsData.AutomaticExternalFanSpeedMode;
    gcRegsDef[AvailabilityFlagsIdx].p_data = &gcRegsData.AvailabilityFlags;
    gcRegsDef[BadPixelReplacementIdx].p_data = &gcRegsData.BadPixelReplacement;
@@ -489,6 +548,9 @@ void GC_Registers_Init()
    gcRegsDef[ExposureTimeSetToMaxIdx].p_data = &gcRegsData.ExposureTimeSetToMax;
    gcRegsDef[ExposureTimeSetToMinIdx].p_data = &gcRegsData.ExposureTimeSetToMin;
    gcRegsDef[ExternalLensSerialNumberIdx].p_data = &gcRegsData.ExternalLensSerialNumber;
+   gcRegsDef[FOVPositionIdx].p_data = &gcRegsData.FOVPosition;
+   gcRegsDef[FOVPositionNumberIdx].p_data = &gcRegsData.FOVPositionNumber;
+   gcRegsDef[FOVPositionSetpointIdx].p_data = &gcRegsData.FOVPositionSetpoint;
    gcRegsDef[FValSizeIdx].p_data = &gcRegsData.FValSize;
    gcRegsDef[FWFilterNumberIdx].p_data = &gcRegsData.FWFilterNumber;
    gcRegsDef[FWModeIdx].p_data = &gcRegsData.FWMode;
@@ -497,6 +559,10 @@ void GC_Registers_Init()
    gcRegsDef[FWSpeedIdx].p_data = &gcRegsData.FWSpeed;
    gcRegsDef[FWSpeedMaxIdx].p_data = &gcRegsData.FWSpeedMax;
    gcRegsDef[FWSpeedSetpointIdx].p_data = &gcRegsData.FWSpeedSetpoint;
+   gcRegsDef[FocusFarFastIdx].p_data = &gcRegsData.FocusFarFast;
+   gcRegsDef[FocusFarSlowIdx].p_data = &gcRegsData.FocusFarSlow;
+   gcRegsDef[FocusNearFastIdx].p_data = &gcRegsData.FocusNearFast;
+   gcRegsDef[FocusNearSlowIdx].p_data = &gcRegsData.FocusNearSlow;
    gcRegsDef[GPSModeIndicatorIdx].p_data = &gcRegsData.GPSModeIndicator;
    gcRegsDef[GPSNumberOfSatellitesInUseIdx].p_data = &gcRegsData.GPSNumberOfSatellitesInUse;
    gcRegsDef[HeightIdx].p_data = &gcRegsData.Height;
@@ -506,6 +572,8 @@ void GC_Registers_Init()
    gcRegsDef[ICUPositionIdx].p_data = &gcRegsData.ICUPosition;
    gcRegsDef[ICUPositionSetpointIdx].p_data = &gcRegsData.ICUPositionSetpoint;
    gcRegsDef[ImageCorrectionIdx].p_data = &gcRegsData.ImageCorrection;
+   gcRegsDef[ImageCorrectionBlockSelectorIdx].p_data = &gcRegsData.ImageCorrectionBlockSelector;
+   gcRegsDef[ImageCorrectionFWModeIdx].p_data = &gcRegsData.ImageCorrectionFWMode;
    gcRegsDef[ImageCorrectionModeIdx].p_data = &gcRegsData.ImageCorrectionMode;
    gcRegsDef[IntegrationModeIdx].p_data = &gcRegsData.IntegrationMode;
    gcRegsDef[IsActiveFlagsIdx].p_data = &gcRegsData.IsActiveFlags;
@@ -584,6 +652,9 @@ void GC_Registers_Init()
    gcRegsDef[TriggerSourceIdx].p_data = &gcRegsData.TriggerSource;
    gcRegsDef[VideoAGCIdx].p_data = &gcRegsData.VideoAGC;
    gcRegsDef[VideoBadPixelReplacementIdx].p_data = &gcRegsData.VideoBadPixelReplacement;
+   gcRegsDef[VideoColorMapIdx].p_data = &gcRegsData.VideoColorMap;
+   gcRegsDef[VideoColorMapMaxIdx].p_data = &gcRegsData.VideoColorMapMax;
+   gcRegsDef[VideoColorMapMinIdx].p_data = &gcRegsData.VideoColorMapMin;
    gcRegsDef[VideoEHDRIExposureIndexIdx].p_data = &gcRegsData.VideoEHDRIExposureIndex;
    gcRegsDef[VideoFWPositionIdx].p_data = &gcRegsData.VideoFWPosition;
    gcRegsDef[VideoFreezeIdx].p_data = &gcRegsData.VideoFreeze;
@@ -591,6 +662,10 @@ void GC_Registers_Init()
    gcRegsDef[WidthIncIdx].p_data = &gcRegsData.WidthInc;
    gcRegsDef[WidthMaxIdx].p_data = &gcRegsData.WidthMax;
    gcRegsDef[WidthMinIdx].p_data = &gcRegsData.WidthMin;
+   gcRegsDef[ZoomInFastIdx].p_data = &gcRegsData.ZoomInFast;
+   gcRegsDef[ZoomInSlowIdx].p_data = &gcRegsData.ZoomInSlow;
+   gcRegsDef[ZoomOutFastIdx].p_data = &gcRegsData.ZoomOutFast;
+   gcRegsDef[ZoomOutSlowIdx].p_data = &gcRegsData.ZoomOutSlow;
    gcRegsDef[DeviceIDIdx].p_data = &gcRegsData.DeviceID;
    gcRegsDef[DeviceManufacturerInfoIdx].p_data = &gcRegsData.DeviceManufacturerInfo;
    gcRegsDef[DeviceModelNameIdx].p_data = &gcRegsData.DeviceModelName;
@@ -621,7 +696,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[WidthIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[HeightIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionStartIdx], gcRegsData.DeviceNotReady);
-   SetRegLocked(&gcRegsDef[AcquisitionStopIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[AcquisitionStopIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
    SetRegLocked(&gcRegsDef[AcquisitionArmIdx], (GC_AcquisitionStarted || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[ExposureModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[ExposureTimeIdx], GC_ExposureTimeIsLocked);
@@ -633,16 +708,16 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[ExposureTime6Idx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime7Idx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime8Idx], GC_ExposureTimeIsLocked);
-   SetRegLocked(&gcRegsDef[ExposureTimeSetToMinIdx], GC_ExposureTimeIsLocked);
-   SetRegLocked(&gcRegsDef[ExposureTimeSetToMaxIdx], GC_ExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTimeSetToMinIdx], GC_EHDRIExposureTimeIsLocked);
+   SetRegLocked(&gcRegsDef[ExposureTimeSetToMaxIdx], GC_EHDRIExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionModeIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateModeIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[AECImageFractionIdx], GC_WaitingForImageCorrection);
-   SetRegLocked(&gcRegsDef[AECTargetWellFillingIdx], GC_WaitingForImageCorrection);
-   SetRegLocked(&gcRegsDef[AECResponseTimeIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection || GC_AutofocusIsActive));
+   SetRegLocked(&gcRegsDef[AECImageFractionIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
+   SetRegLocked(&gcRegsDef[AECTargetWellFillingIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
+   SetRegLocked(&gcRegsDef[AECResponseTimeIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
    SetRegLocked(&gcRegsDef[EHDRIModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMinIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[EHDRIExpectedTemperatureMaxIdx], (GC_EHDRISimpleSettingsAreLocked || GC_AcquisitionStarted));
@@ -656,11 +731,28 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForImageCorrection || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[ImageCorrectionModeIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[ImageCorrectionBlockSelectorIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[ImageCorrectionFWModeIdx], GC_WaitingForImageCorrection);
+   SetRegLocked(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateIdx], GC_WaitingForImageCorrection);
    SetRegLocked(&gcRegsDef[ImageCorrectionIdx], ((GC_WaitingForImageCorrection || ((GC_ExternalMemoryBufferIsImplemented == 0) && GC_MemoryBufferNotEmpty) || GC_AECPlusIsActive || GC_FWRotatingModeIsActive) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForImageCorrection || GC_AECPlusIsActive));
-   SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[NDFilterPositionSetpointIdx], ((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeNDFIsActive == 0)) || GC_WaitingForImageCorrection || GC_AECPlusIsActive || GC_AutofocusIsActive));
+   SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForImageCorrection || GC_AutofocusIsActive) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForImageCorrection || GC_AutofocusIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWSpeedSetpointIdx], GC_FWSynchronouslyRotatingModeIsActive);
+   SetRegLocked(&gcRegsDef[FOVPositionSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[ZoomInFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[ZoomInSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[ZoomOutSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[ZoomOutFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FOVPositionRawSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[AutofocusModeIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[AutofocusROIIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[AutofocusIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FocusNearFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FocusNearSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FocusFarSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FocusFarFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FocusPositionRawSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[ExternalLensSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ManualFilterSerialNumberIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ICUPositionSetpointIdx], GC_AcquisitionStarted);
@@ -690,7 +782,17 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx], (GC_AcquisitionStarted && (gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off)));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceClearAllIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[POSIXTimeIdx], ((gcRegsData.TimeSource != TS_InternalRealTimeClock) || GC_AcquisitionStarted));
-   SetRegLocked(&gcRegsDef[VideoBadPixelReplacementIdx], (gcRegsData.VideoAGC != VAGC_Off));
+   SetRegLocked(&gcRegsDef[VideoAGCIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoColorMapIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoColorMapMinIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoColorMapMaxIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoEHDRIExposureIndexIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoFWPositionIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoBadPixelReplacementIdx], ((gcRegsData.VideoAGC != VAGC_Off) || GC_AutofocusIsActive));
+   SetRegLocked(&gcRegsDef[VideoAGCFractionMinIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoAGCFractionMaxIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoAGCResponseTimeIdx], GC_AutofocusIsActive);
+   SetRegLocked(&gcRegsDef[VideoFreezeIdx], GC_AutofocusIsActive);
    SetRegLocked(&gcRegsDef[DeviceRegistersStreamingStartIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[DeviceRegistersStreamingEndIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[DeviceSerialPortSelectorIdx], GC_AcquisitionStarted);

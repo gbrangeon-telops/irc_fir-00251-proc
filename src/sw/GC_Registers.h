@@ -96,6 +96,7 @@
 #define AcquisitionStartTriggerIsActiveMask     0x00000001  /**< IsActiveFlags register bit mask for AcquisitionStartTriggerIsActive field */
 #define FlaggingTriggerIsActiveMask             0x00000002  /**< IsActiveFlags register bit mask for FlaggingTriggerIsActive field */
 #define GatingTriggerIsActiveMask               0x00000004  /**< IsActiveFlags register bit mask for GatingTriggerIsActive field */
+#define AutofocusIsActiveMask                   0x00000008  /**< IsActiveFlags register bit mask for AutofocusIsActive field */
 
 #define IsActiveFlagsSet(mask) BitMaskSet(gcRegsData.IsActiveFlags, mask)  /**< Set masked bits in IsActiveFlags register */
 #define IsActiveFlagsClr(mask) BitMaskClr(gcRegsData.IsActiveFlags, mask)  /**< Clear masked bits in IsActiveFlags register */
@@ -120,6 +121,9 @@
 #define ExternalMemoryBufferIsImplementedMask            0x00001000  /**< TDCFlags register bit mask for ExternalMemoryBufferIsImplemented field */
 #define ExternalZeroMeanBetaCorrectionIsImplementedMask  0x00002000  /**< TDCFlags register bit mask for ExternalZeroMeanBetaCorrectionIsImplemented field */
 #define ADCReadoutIsImplementedMask                      0x00004000  /**< TDCFlags register bit mask for ADCReadoutIsImplemented field */
+#define MotorizedFOVLensIsImplementedMask                0x00008000  /**< TDCFlags register bit mask for MotorizedFOVLensIsImplemented field */
+#define MotorizedFocusLensIsImplementedMask              0x00010000  /**< TDCFlags register bit mask for MotorizedFocusLensIsImplemented field */
+#define AutofocusIsImplementedMask                       0x00020000  /**< TDCFlags register bit mask for AutofocusIsImplemented field */
 #define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
 #define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
 
@@ -153,10 +157,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.1.0
+// Generated from XML camera definition file version 12.2.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 1) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -175,6 +179,7 @@ struct gcRegistersDataStruct {
    float AcquisitionFrameRateMax;
    float AcquisitionFrameRateMaxFG;
    float AcquisitionFrameRateMin;
+   float AutofocusROI;
    float DeviceClockFrequency;
    float DeviceCurrent;
    float DeviceDetectorElectricalRefOffset;
@@ -204,11 +209,29 @@ struct gcRegistersDataStruct {
    float ExternalBlackBodyTemperature;
    float ExternalFanSpeed;
    float ExternalFanSpeedSetpoint;
+   float HFOV;
+   float ImageCorrectionFWAcquisitionFrameRate;
+   float ImageCorrectionFWAcquisitionFrameRateMax;
+   float ImageCorrectionFWAcquisitionFrameRateMin;
    float MemoryBufferSequenceDownloadBitRateMax;
    float TriggerDelay;
+   float VFOV;
+   float VideoAGCFractionMax;
+   float VideoAGCFractionMaxMin;
+   float VideoAGCFractionMin;
+   float VideoAGCFractionMinMax;
+   float VideoAGCResponseTime;
    int32_t DeviceFirmwareModuleRevision;
+   int32_t FOVPositionRaw;
+   int32_t FOVPositionRawMax;
+   int32_t FOVPositionRawMin;
+   int32_t FOVPositionRawSetpoint;
    int32_t FWPositionRaw;
    int32_t FWPositionRawSetpoint;
+   int32_t FocusPositionRaw;
+   int32_t FocusPositionRawMax;
+   int32_t FocusPositionRawMin;
+   int32_t FocusPositionRawSetpoint;
    int32_t GPSAltitude;
    int32_t GPSLatitude;
    int32_t GPSLongitude;
@@ -221,6 +244,8 @@ struct gcRegistersDataStruct {
    uint32_t AcquisitionStart;
    uint32_t AcquisitionStartAtStartup;
    uint32_t AcquisitionStop;
+   uint32_t Autofocus;
+   uint32_t AutofocusMode;
    uint32_t AutomaticExternalFanSpeedMode;
    uint32_t AvailabilityFlags;
    uint32_t BadPixelReplacement;
@@ -291,6 +316,9 @@ struct gcRegistersDataStruct {
    uint32_t ExposureTimeSetToMax;
    uint32_t ExposureTimeSetToMin;
    uint32_t ExternalLensSerialNumber;
+   uint32_t FOVPosition;
+   uint32_t FOVPositionNumber;
+   uint32_t FOVPositionSetpoint;
    uint32_t FValSize;
    uint32_t FWFilterNumber;
    uint32_t FWMode;
@@ -299,6 +327,10 @@ struct gcRegistersDataStruct {
    uint32_t FWSpeed;
    uint32_t FWSpeedMax;
    uint32_t FWSpeedSetpoint;
+   uint32_t FocusFarFast;
+   uint32_t FocusFarSlow;
+   uint32_t FocusNearFast;
+   uint32_t FocusNearSlow;
    uint32_t GPSModeIndicator;
    uint32_t GPSNumberOfSatellitesInUse;
    uint32_t Height;
@@ -308,6 +340,8 @@ struct gcRegistersDataStruct {
    uint32_t ICUPosition;
    uint32_t ICUPositionSetpoint;
    uint32_t ImageCorrection;
+   uint32_t ImageCorrectionBlockSelector;
+   uint32_t ImageCorrectionFWMode;
    uint32_t ImageCorrectionMode;
    uint32_t IntegrationMode;
    uint32_t IsActiveFlags;
@@ -386,6 +420,9 @@ struct gcRegistersDataStruct {
    uint32_t TriggerSource;
    uint32_t VideoAGC;
    uint32_t VideoBadPixelReplacement;
+   uint32_t VideoColorMap;
+   uint32_t VideoColorMapMax;
+   uint32_t VideoColorMapMin;
    uint32_t VideoEHDRIExposureIndex;
    uint32_t VideoFWPosition;
    uint32_t VideoFreeze;
@@ -393,6 +430,10 @@ struct gcRegistersDataStruct {
    uint32_t WidthInc;
    uint32_t WidthMax;
    uint32_t WidthMin;
+   uint32_t ZoomInFast;
+   uint32_t ZoomInSlow;
+   uint32_t ZoomOutFast;
+   uint32_t ZoomOutSlow;
    char DeviceID[17];
    char DeviceManufacturerInfo[49];
    char DeviceModelName[33];
@@ -477,6 +518,13 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetMemoryBufferMOIActivation(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferMOIActivationIdx], val)
 #define GC_SetMemoryBufferSequenceCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceCountIdx], val)
 #define GC_SetMemoryBufferSequenceDownloadMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], val)
+#define GC_SetVideoAGC(val) GC_RegisterWriteUI32(&gcRegsDef[VideoAGCIdx], val)
+#define GC_SetVideoColorMap(val) GC_RegisterWriteUI32(&gcRegsDef[VideoColorMapIdx], val)
+#define GC_SetVideoColorMapMin(val) GC_RegisterWriteUI32(&gcRegsDef[VideoColorMapMinIdx], val)
+#define GC_SetVideoColorMapMax(val) GC_RegisterWriteUI32(&gcRegsDef[VideoColorMapMaxIdx], val)
+#define GC_SetVideoAGCFractionMin(val) GC_RegisterWriteFloat(&gcRegsDef[VideoAGCFractionMinIdx], val)
+#define GC_SetVideoAGCFractionMax(val) GC_RegisterWriteFloat(&gcRegsDef[VideoAGCFractionMaxIdx], val)
+#define GC_SetVideoAGCResponseTime(val) GC_RegisterWriteFloat(&gcRegsDef[VideoAGCResponseTimeIdx], val)
 #define GC_SetVideoFreeze(val) GC_RegisterWriteUI32(&gcRegsDef[VideoFreezeIdx], val)
 #define GC_SetSensorWidth(val) GC_RegisterWriteUI32(&gcRegsDef[SensorWidthIdx], val)
 #define GC_SetSensorHeight(val) GC_RegisterWriteUI32(&gcRegsDef[SensorHeightIdx], val)
@@ -494,6 +542,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetDeviceTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceTemperatureIdx], val)
 #define GC_SetDeviceVoltageSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceVoltageSelectorIdx], val)
 #define GC_SetDeviceVoltage(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceVoltageIdx], val)
+#define GC_SetIsActiveFlags(val) GC_RegisterWriteUI32(&gcRegsDef[IsActiveFlagsIdx], val)
 
 // Locked registers utility macros
 ////////////////////////////////////////////////////////////////////////////////
@@ -504,8 +553,9 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_AcquisitionStartTriggerIsActive IsActiveFlagsTst(AcquisitionStartTriggerIsActiveMask)
 #define GC_AcquisitionStartTriggerIsLocked ((gcRegsData.TriggerSelector == TS_AcquisitionStart) && (GC_FWSynchronouslyRotatingModeIsActive || GC_GatingTriggerIsActive))
 #define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
+#define GC_AutofocusIsActive IsActiveFlagsTst(AutofocusIsActiveMask)
 #define GC_CalibrationCollectionTypeFWIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW))
-#define GC_CalibrationCollectionTypeMultipointIsActive (gcRegsData.CalibrationCollectionActiveType >= CCAT_MultipointFixed)
+#define GC_CalibrationCollectionTypeMultipointIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFixed) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointEHDRI) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointNDF) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFOV))
 #define GC_CalibrationCollectionTypeNDFIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsNDF) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointNDF))
 #define GC_CalibrationIsActive ((gcRegsData.CalibrationMode != CM_Raw0) && (gcRegsData.CalibrationMode != CM_Raw))
 #define GC_DiscreteExposureTimeIsAvailable AvailabilityFlagsTst(DiscreteExposureTimeIsAvailableMask)
@@ -513,7 +563,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_EHDRIExposureTimeIsLocked (GC_ExposureTimeIsLocked || (GC_EHDRIIsActive && (GC_AcquisitionStarted || GC_EHDRIAdvancedSettingsAreLocked)))
 #define GC_EHDRIIsActive (gcRegsData.EHDRINumberOfExposures > 1)
 #define GC_EHDRISimpleSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Advanced)
-#define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection)
+#define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection || GC_AutofocusIsActive)
 #define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
 #define GC_FWAsynchronouslyRotatingModeIsActive (GC_FWAsynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_AsynchronouslyRotating))
 #define GC_FWAsynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWAsynchronouslyRotatingModeIsImplementedMask))

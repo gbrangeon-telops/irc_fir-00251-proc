@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.1.0
+// Generated from XML camera definition file version 12.2.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -40,6 +40,9 @@ void GC_AcquisitionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
 void GC_AcquisitionStartCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionStartAtStartupCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionStopCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_AutofocusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_AutofocusModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_AutofocusROICallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AutomaticExternalFanSpeedModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AvailabilityFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_BadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -145,6 +148,13 @@ void GC_ExternalBlackBodyTemperatureCallback(gcCallbackPhase_t phase, gcCallback
 void GC_ExternalFanSpeedCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExternalFanSpeedSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ExternalLensSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionRawCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionRawMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionRawMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FOVPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_FValSizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_FWFilterNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -155,6 +165,14 @@ void GC_FWPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
 void GC_FWSpeedCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_FWSpeedMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_FWSpeedSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusFarFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusFarSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusNearFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusNearSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusPositionRawCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusPositionRawMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusPositionRawMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_FocusPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_GPSAltitudeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_GPSLatitudeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_GPSLongitudeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -162,6 +180,7 @@ void GC_GPSModeIndicatorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
 void GC_GPSNumberOfSatellitesInUseCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_GevFirstURLCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_GevSecondURLCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_HFOVCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_HeightIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_HeightMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -169,6 +188,11 @@ void GC_HeightMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ICUPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ICUPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ImageCorrectionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionBlockSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionFWAcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionFWAcquisitionFrameRateMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionFWAcquisitionFrameRateMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ImageCorrectionFWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ImageCorrectionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -249,8 +273,17 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TriggerSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TriggerSoftwareCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TriggerSourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VFOVCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoAGCCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoAGCFractionMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoAGCFractionMaxMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoAGCFractionMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoAGCFractionMinMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoAGCResponseTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoBadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoColorMapCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoColorMapMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_VideoColorMapMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoEHDRIExposureIndexCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoFWPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoFreezeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -258,6 +291,10 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_WidthIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_WidthMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_WidthMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ZoomInFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ZoomInSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ZoomOutFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_ZoomOutSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 
 /* AUTO-CODE END */
 

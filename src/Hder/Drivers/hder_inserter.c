@@ -139,7 +139,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 12.1
+// Generated from the IRCam header definition XLS file version 12.2
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -217,6 +217,11 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write32((uint32_t)(pGCRegs->ManualFilterSerialNumber), a->ADD + A_BASE_HEADER + ManualFilterSerialNumberHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->SensorID), a->ADD + A_BASE_HEADER + SensorIDHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->PixelDataResolution), a->ADD + A_BASE_HEADER + PixelDataResolutionHdrAddr);
+   AXI4L_write16((uint16_t)(pGCRegs->HFOV * 10.0F), a->ADD + A_BASE_HEADER + HFOVHdrAddr);
+   AXI4L_write16((uint16_t)(pGCRegs->VFOV * 10.0F), a->ADD + A_BASE_HEADER + VFOVHdrAddr);
+   AXI4L_write16((uint16_t)(pGCRegs->FocusPositionRaw), a->ADD + A_BASE_HEADER + FocusPositionRawHdrAddr);
+   AXI4L_write16((uint16_t)(pGCRegs->FOVPositionRaw), a->ADD + A_BASE_HEADER + FOVPositionRawHdrAddr);
+   AXI4L_write8((uint8_t)(pGCRegs->FOVPosition), a->ADD + A_BASE_HEADER + FOVPositionHdrAddr);
    AXI4L_write8((uint8_t)(CALIBBLOCK_FILEMAJORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesMajorVersionHdrAddr);
    AXI4L_write8((uint8_t)(CALIBBLOCK_FILEMINORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesMinorVersionHdrAddr);
    AXI4L_write8((uint8_t)(CALIBBLOCK_FILESUBMINORVERSION), a->ADD + A_BASE_HEADER + DeviceCalibrationFilesSubMinorVersionHdrAddr);
