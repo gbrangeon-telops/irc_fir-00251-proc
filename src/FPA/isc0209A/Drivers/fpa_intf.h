@@ -68,7 +68,8 @@
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-#define FPA_DATA_RESOLUTION 14
+#define FPA_DATA_RESOLUTION            14
+#define FPA_PIXEL_PITCH                30E-6F
 
 #define FPA_INVALID_TEMP               -32768   // cC
 

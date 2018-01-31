@@ -76,7 +76,8 @@
 //#define FPA_MASTER_CLK_RATE_HZ         6666000   // fréquence de l'horloge du FPA
 //#define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ
 
-#define FPA_DATA_RESOLUTION 14
+#define FPA_DATA_RESOLUTION            14
+#define FPA_PIXEL_PITCH                16E-6F
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
