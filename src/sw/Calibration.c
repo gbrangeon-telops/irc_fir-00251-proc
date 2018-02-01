@@ -178,10 +178,12 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    if (((collectionFileHeader.CollectionType == CCT_TelopsFixed) && (collectionFileHeader.CalibrationType != CALT_TELOPS)) ||
          ((collectionFileHeader.CollectionType == CCT_TelopsFW) && (collectionFileHeader.CalibrationType != CALT_TELOPS)) ||
          ((collectionFileHeader.CollectionType == CCT_TelopsNDF) && (collectionFileHeader.CalibrationType != CALT_TELOPS)) ||
+         ((collectionFileHeader.CollectionType == CCT_TelopsFOV) && (collectionFileHeader.CalibrationType != CALT_TELOPS)) ||
          ((collectionFileHeader.CollectionType == CCT_MultipointFixed) && (collectionFileHeader.CalibrationType != CALT_MULTIPOINT)) ||
          ((collectionFileHeader.CollectionType == CCT_MultipointEHDRI) && (collectionFileHeader.CalibrationType != CALT_MULTIPOINT)) ||
          ((collectionFileHeader.CollectionType == CCT_MultipointFW) && (collectionFileHeader.CalibrationType != CALT_MULTIPOINT)) ||
-         ((collectionFileHeader.CollectionType == CCT_MultipointNDF) && (collectionFileHeader.CalibrationType != CALT_MULTIPOINT)))
+         ((collectionFileHeader.CollectionType == CCT_MultipointNDF) && (collectionFileHeader.CalibrationType != CALT_MULTIPOINT)) ||
+         ((collectionFileHeader.CollectionType == CCT_MultipointFOV) && (collectionFileHeader.CalibrationType != CALT_MULTIPOINT)))
    {
       CM_ERR("CollectionType does not match CalibrationType (CollectionType: %d, CalibrationType: %d).",
             collectionFileHeader.CollectionType, collectionFileHeader.CalibrationType);
@@ -199,6 +201,13 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       CM_ERR("Invalid CollectionType (NDFPresent = %d, CollectionType = %d).", flashSettings.NDFPresent, collectionFileHeader.CollectionType);
       error = 1;
    }
+
+   //TODO: flash settings
+   /*if ((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && ((collectionFileHeader.CollectionType == CCT_TelopsFOV) || (collectionFileHeader.CollectionType == CCT_MultipointFOV)))
+   {
+      CM_ERR("Invalid CollectionType (MotorizedLensType = %d, CollectionType = %d).", flashSettings.MotorizedLensType, collectionFileHeader.CollectionType);
+      error = 1;
+   }*/
 
    if (((collectionFileHeader.IntegrationMode != IM_IntegrateThenRead) || (!TDCFlagsTst(ITRIsImplementedMask))) &&
          ((collectionFileHeader.IntegrationMode != IM_IntegrateWhileRead) || (!TDCFlagsTst(IWRIsImplementedMask))))
@@ -259,6 +268,17 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
+   //TODO: flash settings
+   /*if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (collectionFileHeader.FOVPosition != FOVP_FOVNotImplemented)) ||
+         ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
+          (collectionFileHeader.FOVPosition >= flashSettings.FOVNumberOfPositions) &&
+          (collectionFileHeader.FOVPosition != FOVP_FOVInTransition)))
+   {
+      CM_ERR("Invalid field of view position (FOVPosition = %d, MotorizedLensType = %d, FOVNumberOfPositions = %d).",
+            collectionFileHeader.FOVPosition, flashSettings.MotorizedLensType, flashSettings.FOVNumberOfPositions);
+      error = 1;
+   }*/
+
    if ((collectionFileHeader.NumberOfBlocks < 1) || (collectionFileHeader.NumberOfBlocks > CALIB_MAX_NUM_OF_BLOCKS))
    {
       CM_ERR("Number of calibration blocks in collection (%d) must be between 1 and %d.", collectionFileHeader.NumberOfBlocks, CALIB_MAX_NUM_OF_BLOCKS);
@@ -292,6 +312,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    collectionInfo->ReverseY = collectionFileHeader.ReverseY;
    collectionInfo->FWPosition = collectionFileHeader.FWPosition;
    collectionInfo->NDFPosition = collectionFileHeader.NDFPosition;
+   collectionInfo->FOVPosition = collectionFileHeader.FOVPosition;
    collectionInfo->ExternalLensSerialNumber = collectionFileHeader.ExternalLensSerialNumber;
    collectionInfo->ManualFilterSerialNumber = collectionFileHeader.ManualFilterSerialNumber;
    collectionInfo->ReferencePOSIXTime = collectionFileHeader.ReferencePOSIXTime;
@@ -629,6 +650,12 @@ void Calibration_SM()
                   cmCurrentState = CMS_ERROR;
                }
 
+               if ((calibrationInfo.collection.FOVPosition != FOVP_FOVInTransition) && (headerData.blockFile.FOVPosition != calibrationInfo.collection.FOVPosition))
+               {
+                  CM_ERR("Block %d: Field of view position mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.FOVPosition, headerData.blockFile.FOVPosition);
+                  cmCurrentState = CMS_ERROR;
+               }
+
                if (headerData.blockFile.ReferencePOSIXTime != calibrationInfo.collection.ReferencePOSIXTime)
                {
                   CM_ERR("Block %d: Reference POSIX time mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.ReferencePOSIXTime, headerData.blockFile.ReferencePOSIXTime);
@@ -656,6 +683,17 @@ void Calibration_SM()
                cmCurrentState = CMS_ERROR;
             }
 
+            //TODO: flash settings
+            /*if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (headerData.blockFile.FOVPosition != FOVP_FOVNotImplemented)) ||
+                  ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
+                   (headerData.blockFile.FOVPosition >= flashSettings.FOVNumberOfPositions) &&
+                   (headerData.blockFile.FOVPosition != FOVP_FOVInTransition)))
+            {
+               CM_ERR("Block %d: Invalid field of view position (FOVPosition = %d, MotorizedLensType = %d, FOVNumberOfPositions = %d).",
+                     headerData.blockFile.POSIXTime, headerData.blockFile.FOVPosition, flashSettings.MotorizedLensType, flashSettings.FOVNumberOfPositions);
+               cmCurrentState = CMS_ERROR;
+            }*/
+
             if ((headerData.blockFile.LUTRQDataPresence) && ((headerData.blockFile.NumberOfLUTRQ < 1) || (headerData.blockFile.NumberOfLUTRQ > LUTRQI_MAX_NUM_OF_LUTRQ)))
             {
                CM_ERR("Number of radiometric LUT in block (%d) must be between 1 and %d (block POSIX time = %d).", headerData.blockFile.NumberOfLUTRQ, LUTRQI_MAX_NUM_OF_LUTRQ, headerData.blockFile.POSIXTime);
@@ -682,6 +720,7 @@ void Calibration_SM()
                   calibrationInfo.collection.ReverseY = headerData.blockFile.ReverseY;
                   calibrationInfo.collection.FWPosition = headerData.blockFile.FWPosition;
                   calibrationInfo.collection.NDFPosition = headerData.blockFile.NDFPosition;
+                  calibrationInfo.collection.FOVPosition = headerData.blockFile.FOVPosition;
                   calibrationInfo.collection.ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
                   calibrationInfo.collection.ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
                   calibrationInfo.collection.ReferencePOSIXTime = headerData.blockFile.ReferencePOSIXTime;
@@ -696,6 +735,7 @@ void Calibration_SM()
                calibrationInfo.blocks[blockIndex].AcquisitionFrameRate = headerData.blockFile.AcquisitionFrameRate;
                calibrationInfo.blocks[blockIndex].FWPosition = headerData.blockFile.FWPosition;
                calibrationInfo.blocks[blockIndex].NDFPosition = headerData.blockFile.NDFPosition;
+               calibrationInfo.blocks[blockIndex].FOVPosition = headerData.blockFile.FOVPosition;
                calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
                calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
                calibrationInfo.blocks[blockIndex].PixelDynamicRangeMin = headerData.blockFile.PixelDynamicRangeMin;
@@ -1296,6 +1336,11 @@ void Calibration_SM()
                AEC_UpdateAECPlusParameters();
             }
 
+            if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask))
+            {
+               GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], calibrationInfo.blocks[blockIndex].FOVPosition);
+            }
+
             // Update registers related to calibration control
             GC_CalibrationUpdateRegisters();
             GC_UpdateParameterLimits();
@@ -1482,6 +1527,31 @@ static IRC_Status_t Calibration_ValidateCollectionType()
                {
                   CM_ERR("More than one block for NDF position %d in NDF collection (Block indices: %d, %d).",
                         calibrationInfo.blocks[block_index].NDFPosition, block_index, block_index_2);
+                  return IRC_FAILURE;
+               }
+            }
+         }
+         break;
+
+      case CCT_MultipointFOV:
+      case CCT_TelopsFOV:
+         //TODO: flash settings
+         // Validate number of blocks
+         /*if (calibrationInfo.collection.NumberOfBlocks != flashSettings.FOVNumberOfPositions)
+         {
+            CM_ERR("Invalid FOV collection block count (%d Block(s), %d FOV(s)).",
+                  calibrationInfo.collection.NumberOfBlocks, flashSettings.FOVNumberOfPositions);
+            return IRC_FAILURE;
+         }*/
+         // All FOVPosition must be different
+         for (block_index = 1; block_index < calibrationInfo.collection.NumberOfBlocks; block_index++)
+         {
+            for (block_index_2 = 0; block_index_2 < block_index; block_index_2++)
+            {
+               if (calibrationInfo.blocks[block_index_2].FOVPosition == calibrationInfo.blocks[block_index].FOVPosition)
+               {
+                  CM_ERR("More than one block for FOV position %d in FOV collection (Block indices: %d, %d).",
+                        calibrationInfo.blocks[block_index].FOVPosition, block_index, block_index_2);
                   return IRC_FAILURE;
                }
             }

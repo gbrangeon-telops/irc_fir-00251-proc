@@ -394,6 +394,28 @@ void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs)
          }
          break;
 
+      case CCT_MultipointFOV:
+      case CCT_TelopsFOV:
+         if (blockLoadCmdFlag)
+         {
+            // Take block selector as selected mode
+            pA->calib_block_sel_mode = pGCRegs->CalibrationCollectionBlockSelector + CBSM_USER_SEL_0;
+         }
+         else
+         {
+            pA->calib_block_sel_mode = CBSM_USER_SEL_0;
+            // Find block corresponding to FOV Position Setpoint
+            for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
+            {
+               if (pGCRegs->FOVPositionSetpoint == calibrationInfo.blocks[blockIndex].FOVPosition)
+               {
+                  pA->calib_block_sel_mode = blockIndex + CBSM_USER_SEL_0;
+                  break;
+               }
+            }
+         }
+         break;
+
       case CCT_MultipointEHDRI:
          pA->calib_block_sel_mode = CBSM_EXPOSURE_TIME;
          break;

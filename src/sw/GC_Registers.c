@@ -818,11 +818,13 @@ void GC_CalibrationUpdateRegisters()
       {
          case CCT_MultipointFixed:
          case CCT_MultipointNDF:
+         case CCT_MultipointFOV:
             GC_RegisterWriteUI32(&gcRegsDef[ExposureModeIdx], EM_Timed);
             GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_Off);
             GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], 1);
          case CCT_TelopsFixed:
          case CCT_TelopsNDF:
+         case CCT_TelopsFOV:
             GC_RegisterWriteUI32(&gcRegsDef[FWModeIdx], FWM_Fixed);
             break;
 

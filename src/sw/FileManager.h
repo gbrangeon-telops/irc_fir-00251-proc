@@ -97,6 +97,7 @@ struct fileRecordStruct {
          uint32_t ExternalLensSerialNumber;
          uint8_t FWPosition;
          uint8_t NDFPosition;
+         uint8_t FOVPosition;
          uint8_t NumberOfBlocks;
          uint32_t BlockPOSIXTime[CALIB_MAX_NUM_OF_BLOCKS];
       } collection;                    /**< Collection file info */

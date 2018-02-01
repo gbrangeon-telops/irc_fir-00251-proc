@@ -130,6 +130,9 @@ struct calibBlockInfoStruct {
    uint32_t AcquisitionFrameRate;   /**< Acquisition rate (in millihertz) */
    uint8_t FWPosition;              /**< Filter wheel position */
    uint8_t NDFPosition;             /**< Neutral density filter position */
+   uint8_t FOVPosition;             /**< Motorized FOV lens position */
+   int32_t ImageCorrectionFocusPositionRaw;   /**< Motorized focus lens encoder position to use for image correction */
+   uint16_t ExternalLensFocalLength;   /**< Focal length of the external lens */
    uint32_t ExternalLensSerialNumber;  /**< Unique Telops 32-bit external lens serial number */
    uint32_t ManualFilterSerialNumber;  /**< Unique Telops 32-bit manual filter serial number */
    uint16_t PixelDynamicRangeMin;   /**< Minimum value of the dynamic range */
@@ -232,6 +235,7 @@ struct calibCollectionInfoStruct {
    uint8_t ReverseY;                   /**< Indicates whether the image is vertically flipped */
    uint8_t FWPosition;                 /**< Filter wheel position */
    uint8_t NDFPosition;                /**< Neutral density filter position */
+   uint8_t FOVPosition;                /**< Motorized FOV lens position */
    uint32_t ExternalLensSerialNumber;  /**< Unique Telops 32-bit external lens serial number */
    uint32_t ManualFilterSerialNumber;  /**< Unique Telops 32-bit manual filter serial number */
    uint32_t ReferencePOSIXTime;        /**< Camera reference file generation date and time */

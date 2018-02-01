@@ -1214,7 +1214,7 @@ void FM_SortFileList(fileList_t *fileList)
 int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount)
 {
    int retval = 0;
-   fileOrder_t tmpKeys[3];
+   fileOrder_t tmpKeys[FM_MAX_NUM_FILE_ORDER_KEY - 1];
    fileOrder_t key = FO_NONE;
 
    if (keyCount > 0)
@@ -1409,6 +1409,7 @@ IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file)
       file->info.collection.CalibrationType = collectionInfo.CalibrationType;
       file->info.collection.FWPosition = collectionInfo.FWPosition;
       file->info.collection.NDFPosition = collectionInfo.NDFPosition;
+      file->info.collection.FOVPosition = collectionInfo.FOVPosition;
       file->info.collection.ExternalLensSerialNumber = collectionInfo.ExternalLensSerialNumber;
       file->info.collection.NumberOfBlocks = collectionInfo.NumberOfBlocks;
 
