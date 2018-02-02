@@ -59,7 +59,7 @@ CalibCollection_CollectionFileHeader_v2_t CalibCollection_CollectionFileHeader_v
    /* ReferencePOSIXTime = */ 0,
    /* FluxRatio01 = */ 0.000000F,
    /* FluxRatio12 = */ 0.000000F,
-   /* FOVPosition = */ 0,
+   /* FOVPosition = */ 255,
    /* CollectionDataLength = */ 0,
    /* NumberOfBlocks = */ 0,
    /* CollectionDataCRC16 = */ 0,
