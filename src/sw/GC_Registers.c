@@ -1606,3 +1606,33 @@ void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort)
          break;
    }
 }
+
+/**
+ * Update HFOV and VFOV.
+ */
+void GC_UpdateFOV()
+{
+   float focalLen;
+   //extern float motorLensFocalLength;
+   extern t_HderInserter gHderInserter;
+
+   if (calibrationInfo.isValid)
+   {
+      //TODO: Copy focal length from motorized lens
+      // Find focal length
+      /*if (GC_CalibrationCollectionTypeFOVIsActive)
+         focalLen = motorLensFocalLength / 1000.0F;
+      else*/
+         focalLen = ((float)calibrationInfo.blocks[0].ExternalLensFocalLength) / 1000.0F;
+
+      // Compute FOVs
+      if (focalLen != 0.0F)
+      {
+         gcRegsData.HFOV = atanf( (float)gcRegsData.Width  * FPA_PIXEL_PITCH / (2.0F * focalLen) ) * 2.0F * 180.0F / (float)M_PI;  //in degrees
+         gcRegsData.VFOV = atanf( (float)gcRegsData.Height * FPA_PIXEL_PITCH / (2.0F * focalLen) ) * 2.0F * 180.0F / (float)M_PI;  //in degrees
+
+         // Update header
+         HDER_UpdateFOVHeader(&gHderInserter, &gcRegsData);
+      }
+   }
+}

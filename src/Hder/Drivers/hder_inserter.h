@@ -106,4 +106,7 @@ void HDER_UpdateAcquisitionFrameRateHeader(const t_HderInserter *a, const gcRegi
 // Pour update du champ BadPixelReplacement dans le header
 void HDER_UpdateBadPixelReplacementHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
 
+// Pour update des champs de FOV dans le header
+void HDER_UpdateFOVHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs);
+
 #endif // __HDER_INSERTER_H__

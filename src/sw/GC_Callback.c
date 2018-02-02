@@ -2509,7 +2509,7 @@ void GC_FOVPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      GC_UpdateFOV();
    }
 }
 
@@ -2529,7 +2529,7 @@ void GC_FOVPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      GC_UpdateFOV();
    }
 }
 
@@ -2987,6 +2987,8 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
+
+      GC_UpdateFOV();
 
       // Update Memory Buffer params
       GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
@@ -4667,6 +4669,8 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
 
+      GC_UpdateFOV();
+
       // Update Memory Buffer params
       GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
    }
@@ -4716,7 +4720,7 @@ void GC_ZoomInFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      GC_UpdateFOV();
    }
 }
 
@@ -4731,7 +4735,7 @@ void GC_ZoomInSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      GC_UpdateFOV();
    }
 }
 
@@ -4746,7 +4750,7 @@ void GC_ZoomOutFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      GC_UpdateFOV();
    }
 }
 
@@ -4761,7 +4765,7 @@ void GC_ZoomOutSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      GC_UpdateFOV();
    }
 }
 

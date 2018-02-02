@@ -441,3 +441,15 @@ void HDER_UpdateBadPixelReplacementHeader(const t_HderInserter *a, const gcRegis
 {
    AXI4L_write8((uint8_t)(pGCRegs->BadPixelReplacement), a->ADD + A_BASE_HEADER + BPRAppliedHdrAddr);
 }
+
+/**
+ * Update Image header HFOV and VFOV fields.
+ *
+ * @param a is a pointer to the header inserter structure.
+ * @param pGCRegs is a pointer to registers data.
+ */
+void HDER_UpdateFOVHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
+{
+   AXI4L_write16((uint16_t)(pGCRegs->HFOV * 10.0F), a->ADD + A_BASE_HEADER + HFOVHdrAddr);
+   AXI4L_write16((uint16_t)(pGCRegs->VFOV * 10.0F), a->ADD + A_BASE_HEADER + VFOVHdrAddr);
+}
