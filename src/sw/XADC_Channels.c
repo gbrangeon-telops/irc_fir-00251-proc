@@ -266,18 +266,17 @@ void xadcCalibrationUpdate(xadcChannel_t *xadcCh)
 
    if (xadcCh->isValid)
    {
-      //TODO ADD the code for the xadc calibration
       //Check if the Flash setting reference value are available( not equal 0)
       // REf 1 should be 0.9765625Volt and Ref 2 = 0.099940 Volts
       if(flashSettings.XADCRefVoltage1 != 0.0f && flashSettings.XADCRefVoltage2 != 0.0f){
-         //Process  the xadx gain offset calibration
+         //Process  the xadc gain offset calibration
 
          // m = (Ref1-Ref2) / (x1-x2)
          // b = Ref1 - (m * x1)
          gain = (flashSettings.XADCRefVoltage1 - flashSettings.XADCRefVoltage2 ) / (extAdcChannels[XEC_ADC_REF_1].raw.unipolar - extAdcChannels[XEC_ADC_REF_2].raw.unipolar);
          offset = flashSettings.XADCRefVoltage1 - (gain*extAdcChannels[XEC_ADC_REF_1].raw.unipolar);
 
-         //TODO TEMP Display new Gain offset
+         //Display new Gain offset
          if(firstpass)
          {
             firstpass = false;
@@ -290,10 +289,6 @@ void xadcCalibrationUpdate(xadcChannel_t *xadcCh)
             extAdcChannels[i].voltGain = gain;
             extAdcChannels[i].voltOffset = offset;
          }
-
-
-
       }
-
    }
 }
