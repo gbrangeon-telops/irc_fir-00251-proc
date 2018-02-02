@@ -94,7 +94,36 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
             case 1:
             default:
                // 1.1.x -> 2.0.x
-               memcpy(hdr, &hdr_v1, sizeof(*hdr));
+               memcpy(hdr->FileSignature, hdr_v1.FileSignature, 5);
+               hdr->DeviceSerialNumber = hdr_v1.DeviceSerialNumber;
+               hdr->POSIXTime = hdr_v1.POSIXTime;
+               memcpy(hdr->FileDescription, hdr_v1.FileDescription, 65);
+               hdr->DeviceDataFlowMajorVersion = hdr_v1.DeviceDataFlowMajorVersion;
+               hdr->DeviceDataFlowMinorVersion = hdr_v1.DeviceDataFlowMinorVersion;
+               hdr->SensorID = hdr_v1.SensorID;
+               hdr->CollectionType = hdr_v1.CollectionType;
+               hdr->CalibrationType = hdr_v1.CalibrationType;
+               hdr->IntegrationMode = hdr_v1.IntegrationMode;
+               hdr->SensorWellDepth = hdr_v1.SensorWellDepth;
+               hdr->PixelDataResolution = hdr_v1.PixelDataResolution;
+               hdr->Width = hdr_v1.Width;
+               hdr->Height = hdr_v1.Height;
+               hdr->OffsetX = hdr_v1.OffsetX;
+               hdr->OffsetY = hdr_v1.OffsetY;
+               hdr->ReverseX = hdr_v1.ReverseX;
+               hdr->ReverseY = hdr_v1.ReverseY;
+               hdr->FWPosition = hdr_v1.FWPosition;
+               hdr->NDFPosition = hdr_v1.NDFPosition;
+               hdr->ExternalLensSerialNumber = hdr_v1.ExternalLensSerialNumber;
+               memcpy(hdr->ExternalLensName, hdr_v1.ExternalLensName, 65);
+               hdr->ManualFilterSerialNumber = hdr_v1.ManualFilterSerialNumber;
+               memcpy(hdr->ManualFilterName, hdr_v1.ManualFilterName, 65);
+               hdr->ReferencePOSIXTime = hdr_v1.ReferencePOSIXTime;
+               hdr->FluxRatio01 = hdr_v1.FluxRatio01;
+               hdr->FluxRatio12 = hdr_v1.FluxRatio12;
+               hdr->CollectionDataLength = hdr_v1.CollectionFileDataLength;
+               hdr->NumberOfBlocks = hdr_v1.NumberOfBlocks;
+               hdr->CollectionDataCRC16 = hdr_v1.CollectionFileDataCRC16;
 
                hdr->FileStructureMajorVersion = 2;
                hdr->FileStructureMinorVersion = 0;
