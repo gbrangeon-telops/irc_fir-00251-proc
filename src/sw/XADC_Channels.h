@@ -89,9 +89,9 @@ enum DeviceVoltageCalibrationSelectorEnum {
 };
 
 enum thermistorModelEnum {
-   DC95 = 0, // Model Standard DC95F103V //TODO valider le numero de modele pour documentation
-   USX3431 = 1, // Model Calibrer NIST pour IRC1720
-   UNKNOWN = 2
+   MC65F103A = 0,    // Model Standard MC65F103A
+   USX3431 = 1,      // Model Calibrer NIST pour IRC1720
+   MOTORLENS = 2     // Use temperature feedback from motorized lens
 };
 typedef enum thermistorModelEnum thermistorModel_t;
 

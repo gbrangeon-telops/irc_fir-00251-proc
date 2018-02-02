@@ -46,6 +46,8 @@ const float Conv_Fact_USX3431[4][2] =
 
 
 void XADC_ThPhyConv(xadcChannel_t *xadcCh);
+void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh);
+void XADC_ThPhyConv_MotorLens(xadcChannel_t *xadcCh);
 void XADC_ThUpdated(xadcChannel_t *xadcCh);
 
 // Array for xadc calibration voltage reference
@@ -192,6 +194,22 @@ void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh)
    }
 }
 
+/*
+ * Copy temperature feedback from motorized lens to physical value.
+ * Voltage value from XADC is ignored.
+ *
+ * @param xadcCh is the pointer to the XADC channel data structure to use for conversion.
+ */
+void XADC_ThPhyConv_MotorLens(xadcChannel_t *xadcCh)
+{
+   //TODO: Copy temperature feedback from motorized lens
+   /*extern float motorLensTemperature;
+
+   if (xadcCh->p_physical != NULL)
+   {
+      *(xadcCh->p_physical) = motorLensTemperature;   // [°C]
+   }*/
+}
 
 void XADC_ThUpdated(xadcChannel_t *xadcCh)
 {
@@ -243,14 +261,15 @@ void xadcSetphyConverter(xadcChannel_t * xadcCh, thermistorModel_t ThermistorTyp
 {
    switch( ThermistorTypeId)
    {
-      case DC95:
+      case MC65F103A:
+      default:
          xadcCh->phyConverter = XADC_ThPhyConv;
          break;
       case USX3431:
          xadcCh->phyConverter = XADC_ThPhyConv_USX3431;
          break;
-      case UNKNOWN:
-      default:
+      case MOTORLENS:
+         xadcCh->phyConverter = XADC_ThPhyConv_MotorLens;
          break;
    }
 }
