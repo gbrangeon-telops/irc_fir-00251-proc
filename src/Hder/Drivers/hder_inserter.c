@@ -453,3 +453,26 @@ void HDER_UpdateFOVHeader(const t_HderInserter *a, const gcRegistersData_t *pGCR
    AXI4L_write16((uint16_t)(pGCRegs->HFOV * 10.0F), a->ADD + A_BASE_HEADER + HFOVHdrAddr);
    AXI4L_write16((uint16_t)(pGCRegs->VFOV * 10.0F), a->ADD + A_BASE_HEADER + VFOVHdrAddr);
 }
+
+/**
+ * Update Image header FocusPositionRaw field.
+ *
+ * @param a is a pointer to the header inserter structure.
+ * @param pGCRegs is a pointer to registers data.
+ */
+void HDER_UpdateFocusPositionRawHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
+{
+   AXI4L_write16((uint16_t)(pGCRegs->FocusPositionRaw), a->ADD + A_BASE_HEADER + FocusPositionRawHdrAddr);
+}
+
+/**
+ * Update Image header FOV Position fields.
+ *
+ * @param a is a pointer to the header inserter structure.
+ * @param pGCRegs is a pointer to registers data.
+ */
+void HDER_UpdateFOVPositionHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
+{
+   AXI4L_write16((uint16_t)(pGCRegs->FOVPositionRaw), a->ADD + A_BASE_HEADER + FOVPositionRawHdrAddr);
+   AXI4L_write8((uint8_t)(pGCRegs->FOVPosition), a->ADD + A_BASE_HEADER + FOVPositionHdrAddr);
+}
