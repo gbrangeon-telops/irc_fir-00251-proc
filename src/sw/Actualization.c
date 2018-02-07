@@ -1000,6 +1000,7 @@ IRC_Status_t Actualization_SM()
             currentDeltaBeta->info.exposureTime = gcRegsData.ExposureTime;
          currentDeltaBeta->info.AcquisitionFrameRate = gcRegsData.AcquisitionFrameRate;
          currentDeltaBeta->info.FWMode = gcRegsData.FWMode;
+         currentDeltaBeta->info.FocusPositionRaw = gcRegsData.FocusPositionRaw;
 
          sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR + 2 * frameSize * numExtraImages; // [bytes] the first image is skipped because it has a DL offset in some detectors
 
@@ -3083,6 +3084,7 @@ IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
          actFileHeader.ExposureTime = currentDeltaBeta->info.exposureTime;
          actFileHeader.AcquisitionFrameRate = (uint32_t)(currentDeltaBeta->info.AcquisitionFrameRate * 1000.0F);
          actFileHeader.FWMode = currentDeltaBeta->info.FWMode;
+         actFileHeader.FocusPositionRaw = currentDeltaBeta->info.FocusPositionRaw;
 
          // write file header
          numBytes = CalibImageCorrection_WriteImageCorrectionFileHeader(&actFileHeader, tmpFileDataBuffer, FM_TEMP_FILE_DATA_BUFFER_SIZE);

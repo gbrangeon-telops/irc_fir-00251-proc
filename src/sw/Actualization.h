@@ -219,6 +219,7 @@ typedef struct
    uint8_t IntegrationMode;
    float AcquisitionFrameRate;
    uint8_t FWMode;
+   int32_t FocusPositionRaw;
 } actualisationInfo_t;
 
 typedef struct
