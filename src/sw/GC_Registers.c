@@ -1616,7 +1616,7 @@ void GC_UpdateFOV()
    //extern float motorLensFocalLength;
    extern t_HderInserter gHderInserter;
 
-   //TODO: Copy focal length from motorized lens
+   //TODO: ODI Copy focal length from motorized lens
    // Find focal length
    /*if (GC_CalibrationCollectionTypeFOVIsActive)
       focalLen = motorLensFocalLength / 1000.0F;

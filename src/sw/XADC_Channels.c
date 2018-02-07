@@ -202,7 +202,7 @@ void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh)
  */
 void XADC_ThPhyConv_MotorLens(xadcChannel_t *xadcCh)
 {
-   //TODO: Copy temperature feedback from motorized lens
+   //TODO: ODI Copy temperature feedback from motorized lens
    /*extern float motorLensTemperature;
 
    if (xadcCh->p_physical != NULL)

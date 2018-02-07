@@ -710,6 +710,8 @@ IRC_Status_t Actualization_SM()
                gcRegsData.ExposureTime = FPA_DEFAULT_EXPOSURE;
             }
 
+            //TODO: ODI déplacer la lentille de focus si nécessaire
+
             GC_SetAcquisitionFrameRate(ACT_DEFAULT_FPS);
          }
 

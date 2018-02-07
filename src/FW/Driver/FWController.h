@@ -57,35 +57,7 @@
 #define FW_LIMIT_SWITCH_MSK               (uint8_t)4 /*< value of the IO configuration mask 5th input mcdc only */
 #define FW_LIMIT_SWITCH_FAULT_MSK         (uint8_t)2 /*< value of the IO configuration mask Fault pin */
 
-#define POR_GAIN_POSITION                 3
-#define FW_I_GAIN_POSITION                   9
-#define PP_GAIN_POSITION                  64
-#define PD_GAIN_POSITION                  2
-#define MAX_SPEED_POSITION                5000
 
-
-
-#define POR_GAIN_VELOCITY_FAST               11
-#define POR_GAIN_VELOCITY_SLOW               37
-//#define POR_GAIN_POSITION                    37
-
-
-#define I_GAIN_VELOCITY_FAST                 13
-#define I_GAIN_VELOCITY_SLOW                 11
-// #define I_GAIN_POSITION                      11
-
-
-#define PP_GAIN_VELOCITY_SLOW                5
-#define PP_GAIN_VELOCITY_FAST                5
-// #define PP_GAIN_POSITION                     5 
-
-
-#define PD_GAIN_VELOCITY_FAST                2
-#define PD_GAIN_VELOCITY_SLOW                2
-// #define PD_GAIN_POSITION                     2
-
-
-#define MAX_SPEED_VELOCITY                6000
 
 // SLOW FILTER WHEEL WITH 4 POSITONS AND A GEARBOX
 #define FW_INTERNAL_GEAR_RATIO (int)361
@@ -214,11 +186,6 @@ typedef enum
    FW_SYNC
 } FWType_t;
 
-#define FW_POR_GAIN_POSITION                 3 // 1..255
-#define FW_I_GAIN_POSITION                   9 // 1..255
-#define FW_PP_GAIN_POSITION                  64 // 1..255
-#define FW_PD_GAIN_POSITION                  2 // 1..255
-#define FW_MAX_SPEED_POSITION                5000 // [rpm]
 
 ////////////////////
 // External functions

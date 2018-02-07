@@ -202,7 +202,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   //TODO: flash settings
+   //TODO: ODI flash settings
    /*if ((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && ((collectionFileHeader.CollectionType == CCT_TelopsFOV) || (collectionFileHeader.CollectionType == CCT_MultipointFOV)))
    {
       CM_ERR("Invalid CollectionType (MotorizedLensType = %d, CollectionType = %d).", flashSettings.MotorizedLensType, collectionFileHeader.CollectionType);
@@ -268,7 +268,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   //TODO: flash settings
+   //TODO: ODI flash settings
    /*if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (collectionFileHeader.FOVPosition != FOVP_FOVNotImplemented)) ||
          ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
           (collectionFileHeader.FOVPosition >= flashSettings.FOVNumberOfPositions) &&
@@ -683,7 +683,7 @@ void Calibration_SM()
                cmCurrentState = CMS_ERROR;
             }
 
-            //TODO: flash settings
+            //TODO: ODI flash settings
             /*if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (headerData.blockFile.FOVPosition != FOVP_FOVNotImplemented)) ||
                   ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
                    (headerData.blockFile.FOVPosition >= flashSettings.FOVNumberOfPositions) &&
@@ -1542,7 +1542,7 @@ static IRC_Status_t Calibration_ValidateCollectionType()
 
       case CCT_MultipointFOV:
       case CCT_TelopsFOV:
-         //TODO: flash settings
+         //TODO: ODI flash settings
          // Validate number of blocks
          /*if (calibrationInfo.collection.NumberOfBlocks != flashSettings.FOVNumberOfPositions)
          {

@@ -111,7 +111,6 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"FS", DebugTerminalParseFS},
    {"DTO", DebugTerminalParseDTO},
    {"FWPID", DebugTerminalParseFWPID},
-  // {"FWC", DebugTerminalParseFWC}, //TODO
    {"CI", DebugTerminalParseCI},
 #ifdef STARTUP
    DT_STARTUP_CMDS

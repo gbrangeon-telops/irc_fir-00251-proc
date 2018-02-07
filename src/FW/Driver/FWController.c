@@ -94,14 +94,6 @@ IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
 
    FW_ResetTimers();
 
-   // TODO Replace with flash setting or completly removed...not needed anymore they are not writting yet...
-
-   FW_config[FW_Position_Pid].POR      = FW_POR_GAIN_POSITION;
-   FW_config[FW_Position_Pid].I_GAIN   = FW_I_GAIN_POSITION;
-   FW_config[FW_Position_Pid].PP       = FW_PP_GAIN_POSITION;
-   FW_config[FW_Position_Pid].PD       = FW_PD_GAIN_POSITION;
-   FW_config[FW_Position_Pid].maxVelocity = FW_MAX_SPEED_POSITION;
-
    FW_SetFWEncoderCountInOneTurn();
 
    FW_initialized = true;
