@@ -62,6 +62,8 @@ uint16_t SFW_GetCurrentHeightMax(){return SFW_CurrentHeightMax;};
  */
 void InitMathematicalModel(gcRegistersData_t *pGCRegs)
 {
+   float ExposureTimeBackup;
+
    SFW_INF("InitMathematicalModel");
    
    SFW_FiltersRadius = sqrtf(flashSettings.FWOpticalAxisPosX*flashSettings.FWOpticalAxisPosX + flashSettings.FWOpticalAxisPosY*flashSettings.FWOpticalAxisPosY );
@@ -81,6 +83,17 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
    SFW_PixelRadius_To_RealRadius = (flashSettings.FWCenterPixRadius-flashSettings.FWCornerPixRadius) / sqrtf((float)(FPA_WIDTH_MAX*FPA_WIDTH_MAX + FPA_HEIGHT_MAX*FPA_HEIGHT_MAX));
    SFW_INF("SFW_PixelRadius_To_RealRadius *1000 = %d",(int32_t)(SFW_PixelRadius_To_RealRadius*1000));
    
+   // Init SFW actualization limits with ETmin to have absolute max
+   ExposureTimeBackup = pGCRegs->ExposureTime;
+   pGCRegs->ExposureTime = FPA_MIN_EXPOSURE;
+
+   SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);
+   pGCRegs->ImageCorrectionFWAcquisitionFrameRateMin = ceilMultiple((float)(FW_VEL_THRESHOLD * flashSettings.FWNumberOfFilters) / 60.0F, 0.01F);
+   pGCRegs->ImageCorrectionFWAcquisitionFrameRateMax = floorMultiple(MIN(FPA_MaxFrameRate(pGCRegs), SFW_AcquisitionFrameRateMax), 0.01F);
+
+   pGCRegs->ExposureTime = ExposureTimeBackup;
+
+
    // Calculate new maximal values considering that all parameters has been changed
    // Need to be called at least once to set all global variables
    SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);

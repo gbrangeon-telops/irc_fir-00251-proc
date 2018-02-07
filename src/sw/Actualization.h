@@ -43,20 +43,14 @@
    #define ACT_TRC(fmt, ...)        DUMMY_PRINTF("Trace: " fmt "\n", ##__VA_ARGS__)
 #endif
 
-#ifndef ACT_VERBOSE
-   #define VERBOSE_IF(x) if (x)
-#else
-   #define VERBOSE_IF(x)
-#endif
-
 #define ACT_MAX_PIX_DATA_TO_PROCESS   128 // number of pixels to process in a single time shared pass. Must be even
 #define ACT_MAX_DATABLOCK_TO_WRITE    256 // for file IO
 
 #define ACT_ICU_TEMP_TOL              (float)0.25f // [°C]
 #define ACT_AEC_EXPTIME_TOL           (float)2.0f // [us] convergence criterion for AEC
 
-#define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)(5 * TIME_ONE_SECOND_US) // [us]
-#define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)(360 * TIME_ONE_SECOND_US) // [us]
+#define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)(6 * TIME_ONE_SECOND_US) // [us]
+#define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)(60 * TIME_ONE_SECOND_US) // [us]
 #define ACT_WAIT_FOR_ICU_TIMEOUT (uint32_t)(2 * gICU_ctrl.ICU_TransitionDuration * 1000) // [us]
 #define ACT_WAIT_FOR_AEC_TIMEOUT (uint32_t)(3 * TIME_ONE_SECOND_US) // [us]
 #define ACT_WAIT_FOR_SEQ_TIMEOUT (uint32_t)(10 * TIME_ONE_SECOND_US) // [us]
@@ -84,12 +78,15 @@
 		ACTION(ACT_TransitionICU)           /**< waiting during while ICU is in transition */ \
 		ACTION(ACT_WaitICU)                 /**< waiting phases for ICU measurements */ \
 		ACTION(ACT_StabilizeICU)            /**< ICU temperature stabilization phases */ \
+		ACTION(ACT_ConfigCamera)            /**< Configure camera for acquisition */ \
 		ACTION(ACT_StartAECAcquisition)     /**< choose a best exposure time in AEC mode*/ \
 		ACTION(ACT_StartAEC)                /**< once configure, start acquisition with AEC active*/ \
 		ACTION(ACT_StopAECAcquisition)      /**< stop acquisition after some time */ \
+		ACTION(ACT_WaitAcquisitionReady)    /**< wait for camera to be ready for acquisition */ \
 		ACTION(ACT_StartAcquisition)        /**< configure the buffer mode and trigger the buffered acquisition */ \
 		ACTION(ACT_WaitSequenceReady)       /**< wait for the buffered sequence to be ready */ \
-		ACTION(ACT_FinalizeSequence)        /**< stop acquisition and initialise variables for average computation */ \
+		ACTION(ACT_FinalizeSequence)        /**< stop acquisition */ \
+		ACTION(ACT_InitComputation)         /**< initialise variables for average computation */ \
 		ACTION(ACT_ComputeAveragedImage)    /**< the buffered sequence is accumulated (block-computation to yield some time to other processes)*/ \
 		ACTION(ACT_ComputeBlackBodyFCal)    /**< the scalar value FCalBB is computed from the temperature measurement */ \
 		ACTION(ACT_ComputeDeltaBeta)        /**< for each pixel, compute delta-beta (block-computation to yield some time to other processes) */ \
@@ -162,17 +159,25 @@ typedef enum {
 /**< a datatype for keeping a copy of the genicam register to get tampered with during this process */
 typedef struct {
    uint32_t CalibrationMode;
-   uint32_t SensorWellDepth;
-   uint32_t IntegrationMode;
    uint32_t ExposureAuto;
    uint32_t Width;
    uint32_t Height;
    float AcquisitionFrameRate;
    float ExposureTime;
+   float ExposureTime1;
+   float ExposureTime2;
+   float ExposureTime3;
+   float ExposureTime4;
+   float ExposureTime5;
+   float ExposureTime6;
+   float ExposureTime7;
+   float ExposureTime8;
    float AECImageFraction;
    float AECTargetWellFilling;
    float AECResponseTime;
+   uint32_t FWMode;
    uint32_t FWPositionSetpoint;
+   uint32_t NDFilterPositionSetpoint;
    uint32_t TestImageSelector;
    uint32_t EHDRINumberOfExposures;
    uint32_t MemoryBufferMOISource;
@@ -182,6 +187,8 @@ typedef struct {
    uint32_t MemoryBufferMode;
    uint32_t OffsetX;
    uint32_t OffsetY;
+   uint32_t BadPixelReplacement;
+   uint32_t TriggerModeAry[TriggerModeAryLen];
 } ACT_GCRegsBackup_t;
 
 typedef struct {
@@ -210,6 +217,8 @@ typedef struct
    uint8_t PixelDataResolution;
    uint8_t SensorWellDepth;
    uint8_t IntegrationMode;
+   float AcquisitionFrameRate;
+   uint8_t FWMode;
 } actualisationInfo_t;
 
 typedef struct
@@ -235,9 +244,6 @@ enum actualizationTypeEnum {
    ACT_ALL
 };
 
-#define ACT_TYPE_MODE_MASK (uint32_t)0x0001
-#define ACT_TYPE_DISCARD_MASK (uint32_t)0x0010
-
 typedef struct
 {
    bool useDebugData; // defaults to false
@@ -251,6 +257,14 @@ typedef struct
    bool forceDiscardOffset;
    uint32_t mode; // bit mask, default to 0
 } actDebugOptions_t;
+
+// actDebugOptions_t.mode switches
+#define ACT_MODE_DELTA_BETA_OFF 0x01 // go directly to bad pixel detection (if enabled)
+#define ACT_MODE_BP_OFF 0x02
+#define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
+#define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
+#define ACT_MODE_VERBOSE 0x10 // add some verbose
+#define ACT_MODE_DISCARD_OFFSET 0x20
 
 typedef struct
 {
@@ -277,27 +291,14 @@ typedef struct
    uint32_t length; // size of the arrays (number of pixels)
 } actBuffers_t;
 
-// actOptions_t.mode switches
-#define ACT_MODE_DELTA_BETA_OFF 0x01 // go directly to bad pixel detection (if enabled)
-#define ACT_MODE_BP_OFF 0x02
-#define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
-#define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
-#define ACT_MODE_VERBOSE 0x10 // add some verbose
-#define ACT_MODE_DISCARD_OFFSET 0x20
-
-extern bool gActAllowAcquisitionStart; /**< Allows acquisitions during the actualisation process (bypass the WaitingForCalibrationActualizationMask flag) */
-extern actDebugOptions_t gActDebugOptions;
-extern actParams_t gActualizationParams;
-extern int8_t gActualisationLoadBlockIdx;
-extern bool gStartBetaQuantization;
 
 void configureIcuParams(ICUParams_t* p);
 
 IRC_Status_t startActualization();
 void stopActualization();
 IRC_Status_t Actualization_SM();
-IRC_Status_t BadPixelDetection_SM();
-IRC_Status_t BetaQuantizer_SM(int blockIdx);
+IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx);
+IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx);
 
 bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);

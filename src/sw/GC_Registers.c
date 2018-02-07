@@ -884,17 +884,8 @@ void GC_UpdateParameterLimits()
    // Backup current ExposureTime
    float ExposureTimeBackup = gcRegsData.ExposureTime;
 
-   // Validate ExposureTimes of all calibration blocks
-   if (GC_CalibrationIsActive && (calibrationInfo.collection.CalibrationType == CALT_MULTIPOINT))
-   {
-      // Find max ExposureTime in calibration blocks
-      index = 0;
-      gcRegsData.ExposureTime = (float)calibrationInfo.blocks[index++].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
-      for (; index < calibrationInfo.collection.NumberOfBlocks; index++)
-         gcRegsData.ExposureTime = MAX(gcRegsData.ExposureTime, (float)calibrationInfo.blocks[index].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
-   }
    // Validate ExposureTimes of EHDRI module
-   else if (EHDRIIsActive)
+   if (EHDRIIsActive)
    {
       // Find max ExposureTime in EHDRI
       index = 0;
@@ -910,6 +901,15 @@ void GC_UpdateParameterLimits()
       gcRegsData.ExposureTime = FWExposureTime[index++];
       for (; index < flashSettings.FWNumberOfFilters; index++)
          gcRegsData.ExposureTime = MAX(gcRegsData.ExposureTime, FWExposureTime[index]);
+   }
+   // Validate ExposureTimes of all calibration blocks
+   else if (GC_CalibrationIsActive && (calibrationInfo.collection.CalibrationType == CALT_MULTIPOINT))
+   {
+      // Find max ExposureTime in calibration blocks
+      index = 0;
+      gcRegsData.ExposureTime = (float)calibrationInfo.blocks[index++].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
+      for (; index < calibrationInfo.collection.NumberOfBlocks; index++)
+         gcRegsData.ExposureTime = MAX(gcRegsData.ExposureTime, (float)calibrationInfo.blocks[index].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
    }
 
    // Calculate AcquisitionFrameRateMax with max ExposureTime found
@@ -1138,10 +1138,10 @@ IRC_Status_t GC_DeviceRegistersVerification()
       error = 1;
    }
 
-   if (TDCStatusTst(WaitingForCalibrationActualizationMask))
+   if (TDCStatusTst(WaitingForImageCorrectionMask))
    {
-      GC_ERR("Waiting for calibration actualization.");
-      GC_GenerateEventError(EECD_WaitingForCalibrationActualization);
+      GC_ERR("Waiting for image correction.");
+      GC_GenerateEventError(EECD_WaitingForImageCorrection);
       error = 1;
    }
 

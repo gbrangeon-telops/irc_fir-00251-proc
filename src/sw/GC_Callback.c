@@ -2609,6 +2609,9 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
       GC_UpdateAECPlusIsAvailable();
       CAL_UpdateVideo(&gCal, &gcRegsData);
+
+      if (gcRegsData.FWMode != FWM_Fixed)
+         gcRegsData.ImageCorrectionBlockSelector = ICBS_AllBlocks;   //No active block in these modes
    }
 }
 

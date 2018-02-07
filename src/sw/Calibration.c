@@ -1263,6 +1263,13 @@ void Calibration_SM()
             gcRegsData.CalibrationCollectionActivePOSIXTime = calibrationInfo.collection.POSIXTime;
             gcRegsData.CalibrationCollectionActiveType = calibrationInfo.collection.CollectionType;
 
+            // Update default actualization modes
+            if (calibrationInfo.collection.CollectionType == CCT_MultipointEHDRI)
+               gcRegsData.ImageCorrectionBlockSelector = ICBS_AllBlocks;   //No active block with this collection type
+
+            if ((calibrationInfo.collection.CollectionType != CCT_TelopsFW) && (calibrationInfo.collection.CollectionType != CCT_MultipointFW))
+               gcRegsData.ImageCorrectionFWMode = ICFWM_Fixed;   //Only mode available with these collection types
+
             // Update NDF position availability
             if (flashSettings.NDFPresent == 1)
             {
@@ -1848,21 +1855,27 @@ uint8_t CM_FileUsedByActualCalibration(fileRecord_t *file)
  * Determine the active calibration block
  *
  * @param calibration info structure
+ * @param block index found (0 if not found)
  *
- * @return 0-based index to address the "blocks" field of calibInfo
+ * @return true if block found.
+ * @return false if block not found.
  */
-uint8_t Calibration_GetActiveBlockIdx(const calibrationInfo_t* calibInfo)
+bool Calibration_GetActiveBlockIdx(const calibrationInfo_t* calibInfo, uint8_t* blockIdx)
 {
-   int i = calibInfo->collection.NumberOfBlocks - 1;
-   int idx = -1;
+   uint8_t i = calibInfo->collection.NumberOfBlocks - 1;
 
-   while (i >= 0 && idx < 0)
+   while (i >= 0)
    {
       if (calibInfo->blocks[i].POSIXTime == gcRegsData.CalibrationCollectionActiveBlockPOSIXTime)
-         idx = i;
+      {
+         *blockIdx = i;
+         return true;
+      }
 
       --i;
    }
 
-   return idx;
+   // return 0 if not found
+   *blockIdx = 0;
+   return false;
 }

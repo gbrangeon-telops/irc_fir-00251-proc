@@ -280,6 +280,6 @@ void Calibration_Reset();
 IRC_Status_t Calibration_LoadLUTRQ(uint8_t initLUTRQ);
 uint8_t CM_FileUsedByActualCalibration(fileRecord_t *file);
 
-uint8_t Calibration_GetActiveBlockIdx(const calibrationInfo_t* calibInfo);
+bool Calibration_GetActiveBlockIdx(const calibrationInfo_t* calibInfo, uint8_t* blockIdx);
 
 #endif // CALIBRATION_H

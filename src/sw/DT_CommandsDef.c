@@ -75,7 +75,6 @@ static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
-static IRC_Status_t DebugTerminalParseFWC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -554,6 +553,7 @@ IRC_Status_t DebugTerminalParsePOWER(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
 {
+   extern actDebugOptions_t gActDebugOptions;
    uint32_t cmd = 1000;
    uint32_t value;
    uint8_t argStr[11];
@@ -2003,106 +2003,6 @@ IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf)
    return IRC_SUCCESS;
 }
 
-IRC_Status_t DebugTerminalParseFWC(circByteBuffer_t *cbuf)
-{
-   uint8_t argStr[4], valueStr[6];
-   uint32_t arglen, valuelen;
-   uint32_t value;
-   bool setter = false;
-
-
-   // Read SET/GET
-   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-   if (arglen == 0)
-   {
-      DT_ERR("Invalid SET/GET value.");
-      return IRC_FAILURE;
-   }
-   argStr[arglen++] = '\0'; // Add string terminator
-
-   if (strcasecmp((char *)argStr, "SET") == 0)
-   {
-      setter = true;
-   }
-   else if (strcasecmp((char *)argStr, "GET") == 0)
-   {
-      setter = false;
-   }
-   else
-   {
-      DT_ERR("Unknown control param(SET or GET) value.");
-      return IRC_FAILURE;
-   }
-
-   // Read PID parameter
-   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
-   if (arglen == 0)
-   {
-      DT_ERR("Invalid parameter value.");
-      return IRC_FAILURE;
-   }
-   argStr[arglen++] = '\0'; // Add string terminator
-
-
-   // Read PID VALUE
-   valuelen = GetNextArg(cbuf, valueStr, 1);
-   if (ParseNumArg((char *)valueStr, valuelen, &value) != IRC_SUCCESS)
-   {
-      DT_ERR("Invalid value.");
-      return IRC_FAILURE;
-   }
-
-
-   // There is supposed to be no remaining bytes in the buffer
-   if (!DebugTerminal_CommandIsEmpty(cbuf))
-   {
-      DT_ERR("Unsupported command arguments");
-      return IRC_FAILURE;
-   }
-
-
-   if (strcasecmp((char *)argStr, "EN") == 0)
-   {
-      if(setter)
-      {
-
-      }
-      else
-      {
-         //ERROR
-      }
-   }
-   else if (strcasecmp((char *)argStr, "POS") == 0)
-   {
-      if(setter)
-      {
-            //ERROR
-      }
-      else
-      {
-
-      }
-   }
-   else if (strcasecmp((char *)argStr, "VEL") == 0)
-   {
-      if(setter)
-      {
-         //ERROR
-      }
-      else
-      {
-
-      }
-   }
-   else
-   {
-      DT_ERR("Unknown parameter value.");
-      return IRC_FAILURE;
-   }
-
-   return IRC_SUCCESS;
-}
-
 /**
  * Debug terminal Help command parser parser.
  * This parser is used to print debug terminal help.
@@ -2150,7 +2050,6 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Flash Settings:     FS");
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
-   //DT_PRINTF("  FW Control SET/GET Param:   FWC SET|GET EN|POS|VEL [value]"); //TODO
    DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
    DT_PRINTF("  Print help:         HLP");
 
