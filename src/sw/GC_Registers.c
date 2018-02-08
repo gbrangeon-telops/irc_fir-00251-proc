@@ -1621,7 +1621,7 @@ void GC_UpdateFOV()
 
    //TODO: ODI Copy focal length from motorized lens
    // Find focal length
-   /*if (GC_CalibrationCollectionTypeFOVIsActive)
+   /*if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask))
       focalLen = motorLensFocalLength / 1000.0F;
    else*/
       focalLen = ((float)calibrationInfo.blocks[0].ExternalLensFocalLength) / 1000.0F;
