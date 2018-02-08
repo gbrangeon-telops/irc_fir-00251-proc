@@ -442,6 +442,10 @@ IRC_Status_t Actualization_SM()
          // Backup registers value
          backupGCRegisters( &GCRegsBackup );
 
+         // Save the collection and current block index
+         savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
+         Calibration_GetActiveBlockIdx(&calibrationInfo, &savedCurrentBlockIdx);
+
          // If an acquisition has been started, stop it
          if ( TDCStatusTst(AcquisitionStartedMask) )
          {
@@ -472,10 +476,6 @@ IRC_Status_t Actualization_SM()
 
             if (icuCalibFileRec != 0)
             {
-               // save the collection and current block index
-               savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
-               savedCurrentBlockIdx = 0;
-
                // number of blocks to actualize
                actBlocks = 1;
                // block index to actualize
@@ -503,10 +503,6 @@ IRC_Status_t Actualization_SM()
             ACT_INF("Using external BB");
 
             usingICU = false;
-
-            // save the collection and current block index
-            savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
-            Calibration_GetActiveBlockIdx(&calibrationInfo, &savedCurrentBlockIdx);
 
             // number of blocks to actualize
             if (gcRegsData.ImageCorrectionBlockSelector == ICBS_AllBlocks)
