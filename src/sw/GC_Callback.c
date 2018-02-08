@@ -631,7 +631,7 @@ void GC_AutofocusROICallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      // After write
+      //TODO: ODI transmettre à Sightline et faire x2 dans le driver
    }
 }
 

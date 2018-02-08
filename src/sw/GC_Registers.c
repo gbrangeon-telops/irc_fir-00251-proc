@@ -44,6 +44,9 @@ float EHDRIExposureTime[EHDRI_IDX_NBR] = {FPA_EHDRI_EXP_0, FPA_EHDRI_EXP_1, FPA_
 float FWExposureTime[MAX_NUM_FILTER] = {FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE};
 float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
+//TODO: ODI déplacer dans driver Sightline
+#define AUTOFOCUS_ROI_DEFAULT    25.0F
+
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
 // Generated from XML camera definition file version 12.2.0
@@ -64,7 +67,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AcquisitionFrameRateMax = */ 1500.0F,
    /* AcquisitionFrameRateMaxFG = */ 0.0F,
    /* AcquisitionFrameRateMin = */ 0.1F,
-   /* AutofocusROI = */ 50.0F,
+   /* AutofocusROI = */ AUTOFOCUS_ROI_DEFAULT,
    /* DeviceClockFrequency = */ 0.0F,
    /* DeviceCurrent = */ 0.0F,
    /* DeviceDetectorElectricalRefOffset = */ 0.0F,
@@ -739,12 +742,12 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[FWModeIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_WaitingForImageCorrection || GC_AutofocusIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWPositionSetpointIdx], (((GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFWIsActive == 0)) || GC_AECPlusIsActive || GC_WaitingForImageCorrection || GC_AutofocusIsActive) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[FWSpeedSetpointIdx], GC_FWSynchronouslyRotatingModeIsActive);
-   SetRegLocked(&gcRegsDef[FOVPositionSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[ZoomInFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[ZoomInSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[ZoomOutSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[ZoomOutFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[FOVPositionRawSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[FOVPositionSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
+   SetRegLocked(&gcRegsDef[ZoomInFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
+   SetRegLocked(&gcRegsDef[ZoomInSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
+   SetRegLocked(&gcRegsDef[ZoomOutSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
+   SetRegLocked(&gcRegsDef[ZoomOutFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
+   SetRegLocked(&gcRegsDef[FOVPositionRawSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
    SetRegLocked(&gcRegsDef[AutofocusModeIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[AutofocusROIIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[AutofocusIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));

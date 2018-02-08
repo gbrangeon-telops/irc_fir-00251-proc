@@ -554,6 +554,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_AcquisitionStartTriggerIsLocked ((gcRegsData.TriggerSelector == TS_AcquisitionStart) && (GC_FWSynchronouslyRotatingModeIsActive || GC_GatingTriggerIsActive))
 #define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
 #define GC_AutofocusIsActive IsActiveFlagsTst(AutofocusIsActiveMask)
+#define GC_CalibrationCollectionTypeFOVIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFOV) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFOV))
 #define GC_CalibrationCollectionTypeFWIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW))
 #define GC_CalibrationCollectionTypeMultipointIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFixed) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointEHDRI) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointNDF) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFOV))
 #define GC_CalibrationCollectionTypeNDFIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsNDF) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointNDF))
