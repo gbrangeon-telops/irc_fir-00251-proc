@@ -62,6 +62,33 @@ enum fslImmediateEnum {
 typedef enum fslImmediateEnum fslImmediate_t;
 
 /**
+ * MotorizedLensType enumeration values
+ */
+enum MotorizedLensTypeEnum {
+   MLT_None = 0,
+   MLT_RPOpticalODEM660 = 1
+};
+
+/**
+ * MotorizedLensType enumeration values data type
+ */
+typedef enum MotorizedLensTypeEnum MotorizedLensType_t;
+
+/**
+ * AutofocusModuleType enumeration values
+ */
+enum AutofocusModuleTypeEnum {
+   AMT_None = 0,
+   AMT_SightlineSLA1500 = 1
+};
+
+/**
+ * AutofocusModuleType enumeration values data type
+ */
+typedef enum AutofocusModuleTypeEnum AutofocusModuleType_t;
+
+
+/**
  * Flash settings data type
  */
 typedef FlashSettings_FlashSettingsFileHeader_t flashSettings_t;

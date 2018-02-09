@@ -276,7 +276,6 @@ void xadcSetphyConverter(xadcChannel_t * xadcCh, thermistorModel_t ThermistorTyp
 
 void xadcCalibrationUpdate(xadcChannel_t *xadcCh)
 {
-   extern flashSettings_t flashSettings;
    float gain = 0.0F;
    float offset = 0.0F;
    uint8_t i = 0;

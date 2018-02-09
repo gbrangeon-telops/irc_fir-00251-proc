@@ -3,7 +3,7 @@
 #include "fpa_intf.h"
 //#include "wb_lowlevel.h"
 #include "utils.h"
-#include <math.h>		  
+#include <math.h>
 #include "GC_Registers.h"
 #include "FWController.h"
 #include "FlashSettings.h"
@@ -20,7 +20,6 @@ static uint16_t MaxWindowSizeY(float dX, float dY, float cornerPixelPositionRadi
 static void SplitUsedTheta(float maxTheta1, float maxTheta2, float* usedTheta1, float* usedTheta2);
 static void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius);
 
-extern flashSettings_t flashSettings;
 extern float FWExposureTime[MAX_NUM_FILTER];
 
 

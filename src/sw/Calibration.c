@@ -202,12 +202,11 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   //TODO: ODI flash settings
-   /*if ((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && ((collectionFileHeader.CollectionType == CCT_TelopsFOV) || (collectionFileHeader.CollectionType == CCT_MultipointFOV)))
+   if ((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && ((collectionFileHeader.CollectionType == CCT_TelopsFOV) || (collectionFileHeader.CollectionType == CCT_MultipointFOV)))
    {
       CM_ERR("Invalid CollectionType (MotorizedLensType = %d, CollectionType = %d).", flashSettings.MotorizedLensType, collectionFileHeader.CollectionType);
       error = 1;
-   }*/
+   }
 
    if (((collectionFileHeader.IntegrationMode != IM_IntegrateThenRead) || (!TDCFlagsTst(ITRIsImplementedMask))) &&
          ((collectionFileHeader.IntegrationMode != IM_IntegrateWhileRead) || (!TDCFlagsTst(IWRIsImplementedMask))))
@@ -268,8 +267,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   //TODO: ODI flash settings
-   /*if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (collectionFileHeader.FOVPosition != FOVP_FOVNotImplemented)) ||
+   if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (collectionFileHeader.FOVPosition != FOVP_FOVNotImplemented)) ||
          ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
           (collectionFileHeader.FOVPosition >= flashSettings.FOVNumberOfPositions) &&
           (collectionFileHeader.FOVPosition != FOVP_FOVInTransition)))
@@ -277,7 +275,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       CM_ERR("Invalid field of view position (FOVPosition = %d, MotorizedLensType = %d, FOVNumberOfPositions = %d).",
             collectionFileHeader.FOVPosition, flashSettings.MotorizedLensType, flashSettings.FOVNumberOfPositions);
       error = 1;
-   }*/
+   }
 
    if ((collectionFileHeader.NumberOfBlocks < 1) || (collectionFileHeader.NumberOfBlocks > CALIB_MAX_NUM_OF_BLOCKS))
    {
@@ -683,8 +681,7 @@ void Calibration_SM()
                cmCurrentState = CMS_ERROR;
             }
 
-            //TODO: ODI flash settings
-            /*if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (headerData.blockFile.FOVPosition != FOVP_FOVNotImplemented)) ||
+            if (((!TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && (headerData.blockFile.FOVPosition != FOVP_FOVNotImplemented)) ||
                   ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
                    (headerData.blockFile.FOVPosition >= flashSettings.FOVNumberOfPositions) &&
                    (headerData.blockFile.FOVPosition != FOVP_FOVInTransition)))
@@ -692,7 +689,7 @@ void Calibration_SM()
                CM_ERR("Block %d: Invalid field of view position (FOVPosition = %d, MotorizedLensType = %d, FOVNumberOfPositions = %d).",
                      headerData.blockFile.POSIXTime, headerData.blockFile.FOVPosition, flashSettings.MotorizedLensType, flashSettings.FOVNumberOfPositions);
                cmCurrentState = CMS_ERROR;
-            }*/
+            }
 
             if ((headerData.blockFile.LUTRQDataPresence) && ((headerData.blockFile.NumberOfLUTRQ < 1) || (headerData.blockFile.NumberOfLUTRQ > LUTRQI_MAX_NUM_OF_LUTRQ)))
             {
@@ -1542,14 +1539,13 @@ static IRC_Status_t Calibration_ValidateCollectionType()
 
       case CCT_MultipointFOV:
       case CCT_TelopsFOV:
-         //TODO: ODI flash settings
          // Validate number of blocks
-         /*if (calibrationInfo.collection.NumberOfBlocks != flashSettings.FOVNumberOfPositions)
+         if (calibrationInfo.collection.NumberOfBlocks != flashSettings.FOVNumberOfPositions)
          {
             CM_ERR("Invalid FOV collection block count (%d Block(s), %d FOV(s)).",
                   calibrationInfo.collection.NumberOfBlocks, flashSettings.FOVNumberOfPositions);
             return IRC_FAILURE;
-         }*/
+         }
          // All FOVPosition must be different
          for (block_index = 1; block_index < calibrationInfo.collection.NumberOfBlocks; block_index++)
          {

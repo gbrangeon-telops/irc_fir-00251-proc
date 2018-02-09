@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.3.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -143,6 +143,24 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* XADCRefVoltage2 = */ 0.000000F,
    /* XADCRefVoltage3 = */ 0.000000F,
    /* SFWOptoswitchPresent = */ 0,
+   /* MotorizedLensType = */ 0,
+   /* AutofocusModuleType = */ 0,
+   /* FOVNumberOfPositions = */ 0,
+   /* FOV1ToLensFOV = */ 255,
+   /* FOV2ToLensFOV = */ 255,
+   /* FOV3ToLensFOV = */ 255,
+   /* FOV4ToLensFOV = */ 255,
+   /* LensFOV1DeltaFocusPositionMin = */ 0,
+   /* LensFOV1DeltaFocusPositionMax = */ 0,
+   /* LensFOV2DeltaFocusPositionMin = */ 0,
+   /* LensFOV2DeltaFocusPositionMax = */ 0,
+   /* LensFOV3DeltaFocusPositionMin = */ 0,
+   /* LensFOV3DeltaFocusPositionMax = */ 0,
+   /* LensFOV4DeltaFocusPositionMin = */ 0,
+   /* LensFOV4DeltaFocusPositionMax = */ 0,
+   /* LensFOV5DeltaFocusPositionMin = */ 0,
+   /* LensFOV5DeltaFocusPositionMax = */ 0,
+   /* AcquisitionFrameRateMaxDivider = */ 1.0F,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -323,7 +341,25 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->XADCRefVoltage2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->XADCRefVoltage3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->SFWOptoswitchPresent, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 159; // Skip FREE space
+      memcpy(&hdr->MotorizedLensType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->AutofocusModuleType, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->FOVNumberOfPositions, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->FOV1ToLensFOV, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->FOV2ToLensFOV, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->FOV3ToLensFOV, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->FOV4ToLensFOV, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->LensFOV1DeltaFocusPositionMin, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV1DeltaFocusPositionMax, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV2DeltaFocusPositionMin, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV2DeltaFocusPositionMax, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV3DeltaFocusPositionMin, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV3DeltaFocusPositionMax, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV4DeltaFocusPositionMin, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV4DeltaFocusPositionMax, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV5DeltaFocusPositionMin, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->LensFOV5DeltaFocusPositionMax, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&hdr->AcquisitionFrameRateMaxDivider, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      numBytes += 128; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -537,7 +573,25 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->XADCRefVoltage2, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->XADCRefVoltage3, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->SFWOptoswitchPresent, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 159); numBytes += 159; // FREE space
+      memcpy(&buffer[numBytes], &hdr->MotorizedLensType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->AutofocusModuleType, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->FOVNumberOfPositions, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->FOV1ToLensFOV, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->FOV2ToLensFOV, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->FOV3ToLensFOV, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->FOV4ToLensFOV, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV1DeltaFocusPositionMin, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV1DeltaFocusPositionMax, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV2DeltaFocusPositionMin, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV2DeltaFocusPositionMax, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV3DeltaFocusPositionMin, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV3DeltaFocusPositionMax, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV4DeltaFocusPositionMin, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV4DeltaFocusPositionMax, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV5DeltaFocusPositionMin, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->LensFOV5DeltaFocusPositionMax, sizeof(int16_t)); numBytes += sizeof(int16_t);
+      memcpy(&buffer[numBytes], &hdr->AcquisitionFrameRateMaxDivider, sizeof(float)); numBytes += sizeof(float);
+      memset(&buffer[numBytes], 0, 128); numBytes += 128; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -700,6 +754,24 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("XADCRefVoltage2: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage2, 3));
    FPGA_PRINTF("XADCRefVoltage3: " _PCF(3) "\n", _FFMT(hdr->XADCRefVoltage3, 3));
    FPGA_PRINTF("SFWOptoswitchPresent: %d\n", hdr->SFWOptoswitchPresent);
+   FPGA_PRINTF("MotorizedLensType: %d\n", hdr->MotorizedLensType);
+   FPGA_PRINTF("AutofocusModuleType: %d\n", hdr->AutofocusModuleType);
+   FPGA_PRINTF("FOVNumberOfPositions: %d\n", hdr->FOVNumberOfPositions);
+   FPGA_PRINTF("FOV1ToLensFOV: %d\n", hdr->FOV1ToLensFOV);
+   FPGA_PRINTF("FOV2ToLensFOV: %d\n", hdr->FOV2ToLensFOV);
+   FPGA_PRINTF("FOV3ToLensFOV: %d\n", hdr->FOV3ToLensFOV);
+   FPGA_PRINTF("FOV4ToLensFOV: %d\n", hdr->FOV4ToLensFOV);
+   FPGA_PRINTF("LensFOV1DeltaFocusPositionMin: %d\n", hdr->LensFOV1DeltaFocusPositionMin);
+   FPGA_PRINTF("LensFOV1DeltaFocusPositionMax: %d\n", hdr->LensFOV1DeltaFocusPositionMax);
+   FPGA_PRINTF("LensFOV2DeltaFocusPositionMin: %d\n", hdr->LensFOV2DeltaFocusPositionMin);
+   FPGA_PRINTF("LensFOV2DeltaFocusPositionMax: %d\n", hdr->LensFOV2DeltaFocusPositionMax);
+   FPGA_PRINTF("LensFOV3DeltaFocusPositionMin: %d\n", hdr->LensFOV3DeltaFocusPositionMin);
+   FPGA_PRINTF("LensFOV3DeltaFocusPositionMax: %d\n", hdr->LensFOV3DeltaFocusPositionMax);
+   FPGA_PRINTF("LensFOV4DeltaFocusPositionMin: %d\n", hdr->LensFOV4DeltaFocusPositionMin);
+   FPGA_PRINTF("LensFOV4DeltaFocusPositionMax: %d\n", hdr->LensFOV4DeltaFocusPositionMax);
+   FPGA_PRINTF("LensFOV5DeltaFocusPositionMin: %d\n", hdr->LensFOV5DeltaFocusPositionMin);
+   FPGA_PRINTF("LensFOV5DeltaFocusPositionMax: %d\n", hdr->LensFOV5DeltaFocusPositionMax);
+   FPGA_PRINTF("AcquisitionFrameRateMaxDivider: " _PCF(3) "\n", _FFMT(hdr->AcquisitionFrameRateMaxDivider, 3));
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

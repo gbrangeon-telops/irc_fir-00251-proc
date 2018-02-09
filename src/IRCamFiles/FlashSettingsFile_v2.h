@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.3.0
+ * Generated from the flash settings file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      3
+#define FLASHSETTINGS_FILEMINORVERSION_V2      4
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -34,13 +34,13 @@
  * FlashSettingsFileHeader data structure.
  */
 struct FlashSettings_FlashSettingsFileHeader_v2Struct {
-   char FileSignature[5];   /**< File signature */
-   uint8_t FileStructureMajorVersion;   /**< File structure Major Version */
-   uint8_t FileStructureMinorVersion;   /**< File structure Minor Version */
-   uint8_t FileStructureSubMinorVersion;   /**< File structure SubMinor Version */
-   uint32_t FileHeaderLength;   /**< File header length */
-   uint32_t DeviceSerialNumber;   /**< Device serial number */
-   char DeviceModelName[21];   /**< Device model name */
+   char FileSignature[5];   /**< File signature. */
+   uint8_t FileStructureMajorVersion;   /**< File structure Major Version. */
+   uint8_t FileStructureMinorVersion;   /**< File structure Minor Version. */
+   uint8_t FileStructureSubMinorVersion;   /**< File structure SubMinor Version. */
+   uint32_t FileHeaderLength;   /**< File header length. */
+   uint32_t DeviceSerialNumber;   /**< Device serial number. */
+   char DeviceModelName[21];   /**< Device model name. */
    uint8_t SensorID;   /**< Sensor  ID. */
    uint8_t PixelDataResolution;   /**< Default pixel data resolution. */
    uint8_t ReverseX;   /**< Flip horizontally the image sent by the device. */
@@ -137,18 +137,36 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float AECPlusExposureTimeMin;   /**< Minimum exposure time when AEC+ is active. */
    float AECSaturatedCorrectionFactor;   /**< AEC correction factor when image is saturated. */
    float FWFramePeriodMinMargin;   /**< Minimum frame period margin. */
-   uint8_t InternalLensThType;   /**< Internal lens thermistor type */
-   uint8_t ExternalLensThType;   /**< External lens thermistor type */
-   uint8_t ICUThType;   /**< ICU  thermistor type */
-   uint8_t SFWThType;   /**< SFW thermistor type */
-   uint8_t CompressorThType;   /**< Compressor thermistor type */
-   uint8_t ColdfingerThType;   /**< ColdFinger lens thermistor type */
-   uint8_t SpareThType;   /**< Spare lens thermistor type */
-   uint8_t ExternalTempThType;   /**< External temperature thermistor type */
-   float XADCRefVoltage1;   /**< Reference voltage At pin 21 of the analog mux */
-   float XADCRefVoltage2;   /**< Reference voltage At pin 20 of the analog mux */
-   float XADCRefVoltage3;   /**< Reference voltage At pin 19 of the analog mux */
-   uint8_t SFWOptoswitchPresent;   /**< Presence or absence of the SFW optoswitch used for SFW homing method */
+   uint8_t InternalLensThType;   /**< Internal lens thermistor type. */
+   uint8_t ExternalLensThType;   /**< External lens thermistor type. */
+   uint8_t ICUThType;   /**< ICU  thermistor type. */
+   uint8_t SFWThType;   /**< SFW thermistor type. */
+   uint8_t CompressorThType;   /**< Compressor thermistor type. */
+   uint8_t ColdfingerThType;   /**< ColdFinger lens thermistor type. */
+   uint8_t SpareThType;   /**< Spare lens thermistor type. */
+   uint8_t ExternalTempThType;   /**< External temperature thermistor type. */
+   float XADCRefVoltage1;   /**< Reference voltage At pin 21 of the analog mux. */
+   float XADCRefVoltage2;   /**< Reference voltage At pin 20 of the analog mux. */
+   float XADCRefVoltage3;   /**< Reference voltage At pin 19 of the analog mux. */
+   uint8_t SFWOptoswitchPresent;   /**< Presence or absence of the SFW optoswitch used for SFW homing method. */
+   uint8_t MotorizedLensType;   /**< Type of the motorized lens. */
+   uint8_t AutofocusModuleType;   /**< Type of the autofocus module. */
+   uint8_t FOVNumberOfPositions;   /**< Number of user-defined FOV positions on the motorized lens. */
+   uint8_t FOV1ToLensFOV;   /**< Lens-defined FOV position corresponding to user-defined FOV1. */
+   uint8_t FOV2ToLensFOV;   /**< Lens-defined FOV position corresponding to user-defined FOV2. */
+   uint8_t FOV3ToLensFOV;   /**< Lens-defined FOV position corresponding to user-defined FOV3. */
+   uint8_t FOV4ToLensFOV;   /**< Lens-defined FOV position corresponding to user-defined FOV4. */
+   int16_t LensFOV1DeltaFocusPositionMin;   /**< Difference between minimal and nominal focus positions for lens-defined FOV1. */
+   int16_t LensFOV1DeltaFocusPositionMax;   /**< Difference between maximal and nominal focus positions for lens-defined FOV1. */
+   int16_t LensFOV2DeltaFocusPositionMin;   /**< Difference between minimal and nominal focus positions for lens-defined FOV2. */
+   int16_t LensFOV2DeltaFocusPositionMax;   /**< Difference between maximal and nominal focus positions for lens-defined FOV2. */
+   int16_t LensFOV3DeltaFocusPositionMin;   /**< Difference between minimal and nominal focus positions for lens-defined FOV3. */
+   int16_t LensFOV3DeltaFocusPositionMax;   /**< Difference between maximal and nominal focus positions for lens-defined FOV3. */
+   int16_t LensFOV4DeltaFocusPositionMin;   /**< Difference between minimal and nominal focus positions for lens-defined FOV4. */
+   int16_t LensFOV4DeltaFocusPositionMax;   /**< Difference between maximal and nominal focus positions for lens-defined FOV4. */
+   int16_t LensFOV5DeltaFocusPositionMin;   /**< Difference between minimal and nominal focus positions for lens-defined FOV5. */
+   int16_t LensFOV5DeltaFocusPositionMax;   /**< Difference between maximal and nominal focus positions for lens-defined FOV5. */
+   float AcquisitionFrameRateMaxDivider;   /**< Division factor to limit maximum acquisition frame rate. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

@@ -381,25 +381,47 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
 
                case 1:
                   // 2.1.x -> 2.2.x
-                  hdr->InternalLensThType = 0;
-                  hdr->ExternalLensThType = 0;
-                  hdr->ICUThType = 0;
-                  hdr->SFWThType = 0;
-                  hdr->CompressorThType = 0;
-                  hdr->ColdfingerThType = 0;
-                  hdr->SpareThType = 0;
-                  hdr->ExternalTempThType = 0;
-                  hdr->XADCRefVoltage1 = 0.0F;
-                  hdr->XADCRefVoltage2 = 0.0F;
-                  hdr->XADCRefVoltage3 = 0.0F;
+                  hdr->InternalLensThType = FlashSettings_FlashSettingsFileHeader_default.InternalLensThType;
+                  hdr->ExternalLensThType = FlashSettings_FlashSettingsFileHeader_default.ExternalLensThType;
+                  hdr->ICUThType = FlashSettings_FlashSettingsFileHeader_default.ICUThType;
+                  hdr->SFWThType = FlashSettings_FlashSettingsFileHeader_default.SFWThType;
+                  hdr->CompressorThType = FlashSettings_FlashSettingsFileHeader_default.CompressorThType;
+                  hdr->ColdfingerThType = FlashSettings_FlashSettingsFileHeader_default.ColdfingerThType;
+                  hdr->SpareThType = FlashSettings_FlashSettingsFileHeader_default.SpareThType;
+                  hdr->ExternalTempThType = FlashSettings_FlashSettingsFileHeader_default.ExternalTempThType;
+                  hdr->XADCRefVoltage1 = FlashSettings_FlashSettingsFileHeader_default.XADCRefVoltage1;
+                  hdr->XADCRefVoltage2 = FlashSettings_FlashSettingsFileHeader_default.XADCRefVoltage2;
+                  hdr->XADCRefVoltage3 = FlashSettings_FlashSettingsFileHeader_default.XADCRefVoltage3;
                   hdr->FileStructureMinorVersion = 2;
 
                case 2:
                   // 2.2.x -> 2.3.x
+                  hdr->SFWOptoswitchPresent = FlashSettings_FlashSettingsFileHeader_default.SFWOptoswitchPresent;
                   hdr->FileStructureMinorVersion = 3;
-                  hdr->SFWOptoswitchPresent = 0;
 
                case 3:
+                  // 2.3.x -> 2.4.x
+                  hdr->MotorizedLensType = FlashSettings_FlashSettingsFileHeader_default.MotorizedLensType;
+                  hdr->AutofocusModuleType = FlashSettings_FlashSettingsFileHeader_default.AutofocusModuleType;
+                  hdr->FOVNumberOfPositions = FlashSettings_FlashSettingsFileHeader_default.FOVNumberOfPositions;
+                  hdr->FOV1ToLensFOV = FlashSettings_FlashSettingsFileHeader_default.FOV1ToLensFOV;
+                  hdr->FOV2ToLensFOV = FlashSettings_FlashSettingsFileHeader_default.FOV2ToLensFOV;
+                  hdr->FOV3ToLensFOV = FlashSettings_FlashSettingsFileHeader_default.FOV3ToLensFOV;
+                  hdr->FOV4ToLensFOV = FlashSettings_FlashSettingsFileHeader_default.FOV4ToLensFOV;
+                  hdr->LensFOV1DeltaFocusPositionMin = FlashSettings_FlashSettingsFileHeader_default.LensFOV1DeltaFocusPositionMin;
+                  hdr->LensFOV1DeltaFocusPositionMax = FlashSettings_FlashSettingsFileHeader_default.LensFOV1DeltaFocusPositionMax;
+                  hdr->LensFOV2DeltaFocusPositionMin = FlashSettings_FlashSettingsFileHeader_default.LensFOV2DeltaFocusPositionMin;
+                  hdr->LensFOV2DeltaFocusPositionMax = FlashSettings_FlashSettingsFileHeader_default.LensFOV2DeltaFocusPositionMax;
+                  hdr->LensFOV3DeltaFocusPositionMin = FlashSettings_FlashSettingsFileHeader_default.LensFOV3DeltaFocusPositionMin;
+                  hdr->LensFOV3DeltaFocusPositionMax = FlashSettings_FlashSettingsFileHeader_default.LensFOV3DeltaFocusPositionMax;
+                  hdr->LensFOV4DeltaFocusPositionMin = FlashSettings_FlashSettingsFileHeader_default.LensFOV4DeltaFocusPositionMin;
+                  hdr->LensFOV4DeltaFocusPositionMax = FlashSettings_FlashSettingsFileHeader_default.LensFOV4DeltaFocusPositionMax;
+                  hdr->LensFOV5DeltaFocusPositionMin = FlashSettings_FlashSettingsFileHeader_default.LensFOV5DeltaFocusPositionMin;
+                  hdr->LensFOV5DeltaFocusPositionMax = FlashSettings_FlashSettingsFileHeader_default.LensFOV5DeltaFocusPositionMax;
+                  hdr->AcquisitionFrameRateMaxDivider = FlashSettings_FlashSettingsFileHeader_default.AcquisitionFrameRateMaxDivider;
+                  hdr->FileStructureMinorVersion = 4;
+
+               case 4:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

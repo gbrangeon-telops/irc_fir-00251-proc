@@ -6,6 +6,7 @@
 #include "GC_Registers.h"
 #include "mb_axi4l_bridge.h"
 #include "fpa_intf.h"
+#include "FlashSettings.h"
 #include "FWController.h"
 #include "exposure_time_ctrl.h"
 
@@ -27,7 +28,6 @@ uint16_t gSFW_precisionFactor;
 */
 extern t_SfwCtrl gSFW_Ctrl;
 extern gcRegistersData_t gcRegsData;
-extern flashSettings_t flashSettings;
 extern float FWExposureTime[MAX_NUM_FILTER];
 extern uint8_t FPA_StretchAcqTrig;
 

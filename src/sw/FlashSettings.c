@@ -350,7 +350,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
    ADC_readout_init(p_flashSettings);
 
-
    // Update Thermistor model type
    xadcSetphyConverter(&extAdcChannels[XEC_INTERNAL_LENS] , p_flashSettings->InternalLensThType);
    xadcSetphyConverter(&extAdcChannels[XEC_EXTERNAL_LENS] , p_flashSettings->ExternalLensThType);
@@ -360,6 +359,37 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    xadcSetphyConverter(&extAdcChannels[XEC_COLD_FINGER]   , p_flashSettings->ColdfingerThType);
    xadcSetphyConverter(&extAdcChannels[XEC_SPARE]         , p_flashSettings->SpareThType);
    xadcSetphyConverter(&extAdcChannels[XEC_EXT_THERMISTOR] ,p_flashSettings->ExternalTempThType);
+
+   // Update Motorized FOV
+   gcRegsData.FOVPositionNumber = p_flashSettings->FOVNumberOfPositions;
+   if ((p_flashSettings->MotorizedLensType == MLT_RPOpticalODEM660) && (p_flashSettings->FOVNumberOfPositions > 0))
+   {
+      TDCFlagsSet(MotorizedFOVLensIsImplementedMask);
+   }
+   else
+   {
+      TDCFlagsClr(MotorizedFOVLensIsImplementedMask);
+
+      if ((p_flashSettings->MotorizedLensType == MLT_RPOpticalODEM660) && (p_flashSettings->FOVNumberOfPositions == 0))
+      {
+         FS_ERR("FOVNumberOfPositions must be greater than 0 with MotorizedLensType RPOpticalODEM660.");
+      }
+   }
+
+   // Update Motorized Focus
+   if (p_flashSettings->MotorizedLensType == MLT_RPOpticalODEM660)
+      TDCFlagsSet(MotorizedFocusLensIsImplementedMask);
+   else
+      TDCFlagsClr(MotorizedFocusLensIsImplementedMask);
+
+   // Update Autofocus
+   if ((p_flashSettings->AutofocusModuleType != AMT_None) && TDCFlagsTst(MotorizedFocusLensIsImplementedMask))
+      TDCFlagsSet(AutofocusIsImplementedMask);
+   else
+      TDCFlagsClr(AutofocusIsImplementedMask);
+
+   //TODO ODI: Update RPOptical table with FOV[1..4]ToLensFOV and LensFOV[1..4]DeltaFocusPositionMin/Max
+
 
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))
