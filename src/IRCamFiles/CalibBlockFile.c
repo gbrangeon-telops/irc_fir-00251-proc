@@ -159,6 +159,7 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr->LowExtrapolationTemperature = CalibBlock_BlockFileHeader_default.LowExtrapolationTemperature;
                hdr->HighExtrapolationTemperature = CalibBlock_BlockFileHeader_default.HighExtrapolationTemperature;
                hdr->FluxOffset = CalibBlock_BlockFileHeader_default.FluxOffset;
+               hdr->FileStructureMinorVersion = 1;
 
             case 1:
                // 2.1.x -> 2.2.x
@@ -171,6 +172,7 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr->FOVPosition = CalibBlock_BlockFileHeader_default.FOVPosition;
                hdr->FocusPositionRaw = CalibBlock_BlockFileHeader_default.FocusPositionRaw;
                hdr->ImageCorrectionFocusPositionRaw = CalibBlock_BlockFileHeader_default.ImageCorrectionFocusPositionRaw;
+               hdr->FileStructureMinorVersion = 2;
 
             case 2:
                // Up to date, nothing to do

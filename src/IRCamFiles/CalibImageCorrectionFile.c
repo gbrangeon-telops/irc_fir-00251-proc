@@ -121,12 +121,14 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageC
             case 0:
                // 2.0.x -> 2.1.x
                // Nothing to do
+               hdr->FileStructureMinorVersion = 1;
 
             case 1:
                // 2.1.x -> 2.2.x
                hdr->AcquisitionFrameRate = CalibImageCorrection_ImageCorrectionFileHeader_default.AcquisitionFrameRate;
                hdr->FWMode = CalibImageCorrection_ImageCorrectionFileHeader_default.FWMode;
                hdr->FocusPositionRaw = CalibImageCorrection_ImageCorrectionFileHeader_default.FocusPositionRaw;
+               hdr->FileStructureMinorVersion = 2;
 
             case 2:
                // Up to date, nothing to do

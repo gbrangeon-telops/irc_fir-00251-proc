@@ -140,10 +140,12 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
             case 0:
                // 2.0.x -> 2.1.x
                // Nothing to do
+               hdr->FileStructureMinorVersion = 1;
 
             case 1:
                // 2.1.x -> 2.2.x
                hdr->FOVPosition = CalibCollection_CollectionFileHeader_default.FOVPosition;
+               hdr->FileStructureMinorVersion = 2;
 
             case 2:
                // Up to date, nothing to do
