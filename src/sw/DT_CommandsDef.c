@@ -1107,6 +1107,8 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
          gFlashDynamicValues.FileOrderKey2 = keys[1];
          gFlashDynamicValues.FileOrderKey3 = keys[2];
          gFlashDynamicValues.FileOrderKey4 = keys[3];
+         //TODO: ODI file order
+         //gFlashDynamicValues.FileOrderKey5 = keys[4];
          FlashDynamicValues_Update(&gFlashDynamicValues);
       }
       else if (fileList == &gFM_collections)
@@ -1115,6 +1117,8 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
          gFlashDynamicValues.CalibrationCollectionFileOrderKey2 = keys[1];
          gFlashDynamicValues.CalibrationCollectionFileOrderKey3 = keys[2];
          gFlashDynamicValues.CalibrationCollectionFileOrderKey4 = keys[3];
+         //TODO: ODI file order
+         //gFlashDynamicValues.CalibrationCollectionFileOrderKey5 = keys[4];
          FlashDynamicValues_Update(&gFlashDynamicValues);
       }
    }

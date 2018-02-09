@@ -629,9 +629,19 @@ void GC_AutofocusModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
  */
 void GC_AutofocusROICallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   extern flashDynamicValues_t gFlashDynamicValues;
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       //TODO: ODI transmettre à Sightline et faire x2 dans le driver
+
+      // Update AutofocusROI flash dynamic value
+      gFlashDynamicValues.AutofocusROI = gcRegsData.AutofocusROI;
+
+      if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
+      {
+         GC_ERR("Failed to update flash dynamic values.");
+      }
    }
 }
 

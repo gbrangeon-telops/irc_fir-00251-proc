@@ -144,6 +144,13 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader(int fd, FlashDynam
                hdr->FileStructureMinorVersion = 1;
                
             case 1:
+               // 2.1.x -> 2.2.x
+               hdr->FileOrderKey5 = FlashDynamicValues_FlashDynamicValuesFileHeader_default.FileOrderKey5;
+               hdr->CalibrationCollectionFileOrderKey5 = FlashDynamicValues_FlashDynamicValuesFileHeader_default.CalibrationCollectionFileOrderKey5;
+               hdr->AutofocusROI = FlashDynamicValues_FlashDynamicValuesFileHeader_default.AutofocusROI;
+               hdr->FileStructureMinorVersion = 2;
+
+            case 2:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = FLASHDYNAMICVALUES_FILESUBMINORVERSION;
                break;

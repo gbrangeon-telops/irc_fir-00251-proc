@@ -396,12 +396,16 @@ IRC_Status_t Proc_FM_Init()
    keys[1] = gFlashDynamicValues.FileOrderKey2;
    keys[2] = gFlashDynamicValues.FileOrderKey3;
    keys[3] = gFlashDynamicValues.FileOrderKey4;
+   //TODO: ODI file order
+   //keys[4] = gFlashDynamicValues.FileOrderKey5;
    FM_SetFileListKeys(&gFM_files, keys, 4);
 
    keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
    keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
    keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
    keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
+   //TODO: ODI file order
+   //keys[4] = gFlashDynamicValues.CalibrationCollectionFileOrderKey5;
    FM_SetFileListKeys(&gFM_collections, keys, 4);
 
    return IRC_SUCCESS;
@@ -460,6 +464,7 @@ IRC_Status_t Proc_GC_Init()
    {
       DeviceSerialPortFunctionAry[DSPS_USB] = DSPF_Disabled;
    }
+   gcRegsData.AutofocusROI = gFlashDynamicValues.AutofocusROI;
 
    // Initialize pointer array on ExposureTimeX registers
    pGcRegsDataExposureTimeX[0] = &gcRegsData.ExposureTime1;
