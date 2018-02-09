@@ -360,33 +360,42 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    xadcSetphyConverter(&extAdcChannels[XEC_SPARE]         , p_flashSettings->SpareThType);
    xadcSetphyConverter(&extAdcChannels[XEC_EXT_THERMISTOR] ,p_flashSettings->ExternalTempThType);
 
-   // Update Motorized FOV
+   // Update motorized FOV and focus
    gcRegsData.FOVPositionNumber = p_flashSettings->FOVNumberOfPositions;
-   if ((p_flashSettings->MotorizedLensType == MLT_RPOpticalODEM660) && (p_flashSettings->FOVNumberOfPositions > 0))
+   TDCFlagsClr(MotorizedFOVLensIsImplementedMask);
+   TDCFlagsClr(MotorizedFocusLensIsImplementedMask);
+   switch (p_flashSettings->MotorizedLensType)
    {
-      TDCFlagsSet(MotorizedFOVLensIsImplementedMask);
-   }
-   else
-   {
-      TDCFlagsClr(MotorizedFOVLensIsImplementedMask);
+      case MLT_RPOpticalODEM660:
+         if (p_flashSettings->FOVNumberOfPositions > 0)
+            TDCFlagsSet(MotorizedFOVLensIsImplementedMask);
+         else
+            FS_ERR("FOVNumberOfPositions must be greater than 0 with MotorizedLensType RPOpticalODEM660.");
+         TDCFlagsSet(MotorizedFocusLensIsImplementedMask);
+         break;
 
-      if ((p_flashSettings->MotorizedLensType == MLT_RPOpticalODEM660) && (p_flashSettings->FOVNumberOfPositions == 0))
+      case MLT_None:
+      default:
+         break;
+   }
+
+   // Update autofocus
+   TDCFlagsClr(AutofocusIsImplementedMask);
+   gcRegsData.AutofocusMode = AM_Off;
+   if (TDCFlagsTst(MotorizedFocusLensIsImplementedMask))
+   {
+      switch (p_flashSettings->AutofocusModuleType)
       {
-         FS_ERR("FOVNumberOfPositions must be greater than 0 with MotorizedLensType RPOpticalODEM660.");
+         case AMT_SightlineSLA1500:
+            TDCFlagsSet(AutofocusIsImplementedMask);
+            gcRegsData.AutofocusMode = AM_Once;
+            break;
+
+         case AMT_None:
+         default:
+            break;
       }
    }
-
-   // Update Motorized Focus
-   if (p_flashSettings->MotorizedLensType == MLT_RPOpticalODEM660)
-      TDCFlagsSet(MotorizedFocusLensIsImplementedMask);
-   else
-      TDCFlagsClr(MotorizedFocusLensIsImplementedMask);
-
-   // Update Autofocus
-   if ((p_flashSettings->AutofocusModuleType != AMT_None) && TDCFlagsTst(MotorizedFocusLensIsImplementedMask))
-      TDCFlagsSet(AutofocusIsImplementedMask);
-   else
-      TDCFlagsClr(AutofocusIsImplementedMask);
 
    //TODO ODI: Update RPOptical table with FOV[1..4]ToLensFOV and LensFOV[1..4]DeltaFocusPositionMin/Max
 
