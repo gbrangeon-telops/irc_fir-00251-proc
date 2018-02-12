@@ -398,7 +398,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    //TODO ODI: Update RPOptical table with FOV[1..4]ToLensFOV and LensFOV[1..4]DeltaFocusPositionMin/Max
-
+   //Update also gcRegsData.FOVPositionRawMin and gcRegsData.FOVPositionRawMax
 
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))

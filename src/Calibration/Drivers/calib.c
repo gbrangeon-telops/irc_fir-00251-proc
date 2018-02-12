@@ -325,6 +325,11 @@ void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs)
 {
    uint32_t blockIndex;
 
+
+   //TODO: ODI cette fonction doit être appelée lorsque FOVPosition est mis à jour (feedback lentille)
+
+
+
    if (!calibrationInfo.isValid)
    {
       pA->calib_block_sel_mode = CBSM_USER_SEL_0;
@@ -451,9 +456,14 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
          GC_SetFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
 
       // Update NDF position if necessary
-      if ((flashSettings.NDFPresent == 1) && (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition) &&
-            (pGCRegs->CalibrationMode != CM_Raw0) && (pGCRegs->CalibrationMode != CM_Raw))
+      if ((flashSettings.NDFPresent == 1) && GC_CalibrationIsActive &&
+            (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition))
          GC_SetNDFPositionSetpoint(pGCRegs->NDFilterPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition);
+
+      // Update FOV position if necessary
+      if ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && GC_CalibrationIsActive &&
+            (pGCRegs->FOVPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition))
+         GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition);
 
       // Update optical serial numbers with block values
       pGCRegs->ExternalLensSerialNumber = calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber;

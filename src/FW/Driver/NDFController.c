@@ -387,9 +387,9 @@ void NDF_ControllerProcess()
          prevPosition = gcRegsData.NDFilterPosition;
 
          // Change calibration block
-         if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) && // NDF Collection
-               (calibrationInfo.blocks[gCal.calib_block_sel_mode - CBSM_USER_SEL_0].NDFPosition != gcRegsData.NDFilterPositionSetpoint) && // Block NDF Position changed
-               ((gcRegsData.CalibrationMode != CM_Raw) && (gcRegsData.CalibrationMode != CM_Raw0))) // Not in RAW or RAW0
+         if (calibrationInfo.isValid && GC_CalibrationIsActive &&    // Not in RAW or RAW0
+               ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) && // NDF Collection
+               (calibrationInfo.blocks[gCal.calib_block_sel_mode - CBSM_USER_SEL_0].NDFPosition != gcRegsData.NDFilterPositionSetpoint))  // Block NDF Position changed
          {
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
          }
