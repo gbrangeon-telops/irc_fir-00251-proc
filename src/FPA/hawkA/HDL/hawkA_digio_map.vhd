@@ -214,11 +214,11 @@ begin
             
          else
             
-            prog_mclk_pipe(0) <= PROG_MCLK;
+            prog_mclk_pipe(0) <= PROG_MCLK and not PROG_CSN;
             prog_mclk_pipe(5 downto 1) <= prog_mclk_pipe(4 downto 0);
             prog_mclk_i <= prog_mclk_pipe(2);
             
-            fpa_rd_mclk_i <=  FPA_RD_MCLK;
+            fpa_rd_mclk_i <=  FPA_RD_MCLK and PROG_CSN;
             
             case fpa_digio_fsm is          
                

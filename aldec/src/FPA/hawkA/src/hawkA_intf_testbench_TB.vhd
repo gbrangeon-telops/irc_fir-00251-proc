@@ -5,6 +5,7 @@ use work.fpa_common_pkg.all;
 library ieee;
 use ieee.NUMERIC_STD.all;
 use ieee.std_logic_1164.all;
+use work.hawkA_intf_testbench_pkg.all;
 
 -- Add your library and packages declaration here ...
 
@@ -99,63 +100,88 @@ architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
    signal ACQ_TRIG_i                     : std_logic := '0';
    signal ACQ_TRIG_Last                  : std_logic := '0';
    
-   signal comn_fpa_diag_mode             : unsigned(31 downto 0);
-   signal comn_fpa_diag_type             : unsigned(31 downto 0);
-   signal comn_fpa_pwr_on                : unsigned(31 downto 0);
-   signal comn_fpa_trig_ctrl_mode        : unsigned(31 downto 0);
-   signal comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto 0);
-   signal comn_fpa_acq_trig_period_min   : unsigned(31 downto 0);
-   signal comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto 0);
-   signal comn_fpa_xtra_trig_period_min  : unsigned(31 downto 0);                                     
-   signal xstart                         : unsigned(31 downto 0);
-   signal ystart                         : unsigned(31 downto 0);
-   signal xsize                          : unsigned(31 downto 0);
-   signal ysize                          : unsigned(31 downto 0);
-   signal gain                           : unsigned(31 downto 0);
-   signal invert                         : unsigned(31 downto 0);
-   signal revert                         : unsigned(31 downto 0);
-   signal cbit_en                        : unsigned(31 downto 0);
-   signal dig_code                       : unsigned(31 downto 0);
-   signal jpos                           : unsigned(31 downto 0);
-   signal kpos                           : unsigned(31 downto 0);
-   signal lpos                           : unsigned(31 downto 0);
-   signal mpos                           : unsigned(31 downto 0);
-   signal wdr_len                        : unsigned(31 downto 0);
-   signal full_window                    : unsigned(31 downto 0);
-   signal real_mode_active_pixel_dly     : unsigned(31 downto 0);
-   signal adc_quad2_en                   : unsigned(31 downto 0);
-   signal chn_diversity_en               : unsigned(31 downto 0);           
-   signal line_period_pclk               : unsigned(31 downto 0);
-   signal readout_pclk_cnt_max           : unsigned(31 downto 0);
-   signal active_line_start_num          : unsigned(31 downto 0);
-   signal active_line_end_num            : unsigned(31 downto 0);
-   signal pix_samp_num_per_ch            : unsigned(31 downto 0);
-   signal sof_posf_pclk                  : unsigned(31 downto 0);
-   signal eof_posf_pclk                  : unsigned(31 downto 0);
-   signal sol_posl_pclk                  : unsigned(31 downto 0);
-   signal eol_posl_pclk                  : unsigned(31 downto 0);
-   signal eol_posl_pclk_p1               : unsigned(31 downto 0);      
-   signal good_samp_first_pos_per_ch     : unsigned(31 downto 0);
-   signal good_samp_last_pos_per_ch      : unsigned(31 downto 0);
-   signal hgood_samp_sum_num             : unsigned(31 downto 0);
-   signal hgood_samp_mean_numerator      : unsigned(31 downto 0);
-   signal vgood_samp_sum_num             : unsigned(31 downto 0);
-   signal vgood_samp_mean_numerator      : unsigned(31 downto 0);  
-   signal xsize_div_tapnum               : unsigned(31 downto 0);
-   signal vdac_value_1                   : unsigned(31 downto 0);
-   signal vdac_value_2                   : unsigned(31 downto 0); 
-   signal vdac_value_3                   : unsigned(31 downto 0); 
-   signal vdac_value_4                   : unsigned(31 downto 0); 
-   signal vdac_value_5                   : unsigned(31 downto 0); 
-   signal vdac_value_6                   : unsigned(31 downto 0); 
-   signal vdac_value_7                   : unsigned(31 downto 0); 
-   signal vdac_value_8                   : unsigned(31 downto 0); 
-   signal adc_clk_phase                  : unsigned(31 downto 0);
-   signal comn_fpa_stretch_acq_trig      : unsigned(31 downto 0);
-   
-   signal user_cfg_vector                : unsigned(53*32-1 downto 0);
+   --signal comn_fpa_diag_mode             : unsigned(31 downto 0);
+   --   signal comn_fpa_diag_type             : unsigned(31 downto 0);
+   --   signal comn_fpa_pwr_on                : unsigned(31 downto 0);
+   --   signal comn_fpa_trig_ctrl_mode        : unsigned(31 downto 0);
+   --   signal comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto 0);
+   --   signal comn_fpa_acq_trig_period_min   : unsigned(31 downto 0);
+   --   signal comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto 0);
+   --   signal comn_fpa_xtra_trig_period_min  : unsigned(31 downto 0);                                     
+   --   signal xstart                         : unsigned(31 downto 0);
+   --   signal ystart                         : unsigned(31 downto 0);
+   --   signal xsize                          : unsigned(31 downto 0);
+   --   signal ysize                          : unsigned(31 downto 0);
+   --   signal gain                           : unsigned(31 downto 0);
+   --   signal invert                         : unsigned(31 downto 0);
+   --   signal revert                         : unsigned(31 downto 0);
+   --   signal cbit_en                        : unsigned(31 downto 0);
+   --   signal dig_code                       : unsigned(31 downto 0);
+   --   signal jpos                           : unsigned(31 downto 0);
+   --   signal kpos                           : unsigned(31 downto 0);
+   --   signal lpos                           : unsigned(31 downto 0);
+   --   signal mpos                           : unsigned(31 downto 0);
+   --   signal wdr_len                        : unsigned(31 downto 0);
+   --   signal full_window                    : unsigned(31 downto 0);
+   --   signal real_mode_active_pixel_dly     : unsigned(31 downto 0);
+   --   signal adc_quad2_en                   : unsigned(31 downto 0);
+   --   signal chn_diversity_en               : unsigned(31 downto 0);           
+   --   signal line_period_pclk               : unsigned(31 downto 0);
+   --   signal readout_pclk_cnt_max           : unsigned(31 downto 0);
+   --   signal active_line_start_num          : unsigned(31 downto 0);
+   --   signal active_line_end_num            : unsigned(31 downto 0);
+   --   signal pix_samp_num_per_ch            : unsigned(31 downto 0);
+   --   signal sof_posf_pclk                  : unsigned(31 downto 0);
+   --   signal eof_posf_pclk                  : unsigned(31 downto 0);
+   --   signal sol_posl_pclk                  : unsigned(31 downto 0);
+   --   signal eol_posl_pclk                  : unsigned(31 downto 0);
+   --   signal eol_posl_pclk_p1               : unsigned(31 downto 0);      
+   --   signal good_samp_first_pos_per_ch     : unsigned(31 downto 0);
+   --   signal good_samp_last_pos_per_ch      : unsigned(31 downto 0);
+   --   signal hgood_samp_sum_num             : unsigned(31 downto 0);
+   --   signal hgood_samp_mean_numerator      : unsigned(31 downto 0);
+   --   signal vgood_samp_sum_num             : unsigned(31 downto 0);
+   --   signal vgood_samp_mean_numerator      : unsigned(31 downto 0);  
+   --   signal xsize_div_tapnum               : unsigned(31 downto 0);
+   --   signal vdac_value_1                   : unsigned(31 downto 0);
+   --   signal vdac_value_2                   : unsigned(31 downto 0); 
+   --   signal vdac_value_3                   : unsigned(31 downto 0); 
+   --   signal vdac_value_4                   : unsigned(31 downto 0); 
+   --   signal vdac_value_5                   : unsigned(31 downto 0); 
+   --   signal vdac_value_6                   : unsigned(31 downto 0); 
+   --   signal vdac_value_7                   : unsigned(31 downto 0); 
+   --   signal vdac_value_8                   : unsigned(31 downto 0); 
+   --   signal adc_clk_phase                  : unsigned(31 downto 0);
+   --   signal comn_fpa_stretch_acq_trig      : unsigned(31 downto 0);
+   --   
+   --   signal user_cfg_vector                : unsigned(53*32-1 downto 0);
    
    -- Add your code here ...
+   signal user_xsize1 : natural;
+   signal user_ysize1 : natural;
+   signal user_xsize2 : natural;
+   signal user_ysize2 : natural;
+   signal user_xsize3 : natural;
+   signal user_ysize3 : natural;
+   
+   
+   signal user_cfg_vector1              : unsigned(63*32-1 downto 0);
+   signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
+   signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
+   signal vdac_value_1                  : unsigned(31 downto  0);
+   signal vdac_value_2                  : unsigned(31 downto  0);
+   signal vdac_value_3                  : unsigned(31 downto  0);
+   signal vdac_value_4                  : unsigned(31 downto  0);
+   signal vdac_value_5                  : unsigned(31 downto  0);
+   signal vdac_value_6                  : unsigned(31 downto  0);
+   signal vdac_value_7                  : unsigned(31 downto  0);
+   signal vdac_value_8                  : unsigned(31 downto  0);
+   
+   signal dac_cfg_vector                : unsigned(8*32-1 downto 0);
+   
+   --   signal add                           : unsigned(31 downto 0) := (others => '0');
+   --   signal status                        : std_logic_vector(31 downto 0);
+   -- Add your code here _..
    
 begin
    
@@ -189,14 +215,10 @@ begin
    end process;
    
    -- clk
-   U4: process(ACQ_TRIG_i)
+   U4: process(ACQ_TRIG)
    begin
-      ACQ_TRIG_i <= not ACQ_TRIG_i after ACQ_TRIG_PERIOD/2; 
+      ACQ_TRIG <= not ACQ_TRIG after ACQ_TRIG_PERIOD/2; 
    end process;
-   ACQ_TRIG_last <= transport ACQ_TRIG_i after 1 us;
-   ACQ_TRIG <= ACQ_TRIG_i and not ACQ_TRIG_last;
-   
-   
    XTRA_TRIG <= '0';
    
    DOUT_MISO.TREADY <= '1';
@@ -209,138 +231,62 @@ begin
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
       --FPA_EXP_INFO.exp_time <= to_unsigned(10,FPA_EXP_INFO.exp_time'length);
-      FPA_EXP_INFO.exp_dval <= '1'; 
-      
+      FPA_EXP_INFO.exp_dval <= '1';
       wait;
    end process;
-   
    
    
    HDER_MISO.WREADY  <= '1';
    HDER_MISO.AWREADY <= '1';
    
-   comn_fpa_diag_mode              <=  (others =>'0');                                               
-   comn_fpa_diag_type              <=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
-   comn_fpa_pwr_on                 <=  (others =>'1');                                               
-   comn_fpa_trig_ctrl_mode         <=  resize(unsigned(MODE_INT_END_TO_TRIG_START),32);          
-   comn_fpa_acq_trig_ctrl_dly      <=  to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);            
-   comn_fpa_acq_trig_period_min    <=  to_unsigned(100, comn_fpa_acq_trig_period_min'length);        
-   comn_fpa_xtra_trig_ctrl_dly     <=  to_unsigned(600, comn_fpa_xtra_trig_ctrl_dly'length);         
-   comn_fpa_xtra_trig_period_min   <=  to_unsigned(100, comn_fpa_xtra_trig_period_min'length);       
    
+   process(MB_CLK)
+   begin
+      if rising_edge(MB_CLK) then 
+         
+         
+         fpa_softw_stat_i.fpa_roic     <= FPA_ROIC_HAWK;
+         fpa_softw_stat_i.fpa_output   <= OUTPUT_ANALOG;    
+         fpa_softw_stat_i.fpa_input    <= LVCMOS33;        
+         
+         -- cfg usager
+         user_xsize1 <= 640;
+         user_ysize1 <= 512;
+         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1); 
+         
+         user_xsize2 <= 320;
+         user_ysize2 <= 256;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2);
+         
+         user_xsize3 <= 64;
+         user_ysize3 <= 4;
+         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3);
+         
+         -- dac       
+         vdac_value_1               	<= to_unsigned(11630, 32); 
+         vdac_value_2               	<= to_unsigned(11630, 32); 
+         vdac_value_3               	<= to_unsigned(11630, 32);
+         vdac_value_4               	<= to_unsigned(11630, 32); 
+         vdac_value_5               	<= to_unsigned(11630, 32); 
+         vdac_value_6               	<= to_unsigned(11630, 32); 
+         vdac_value_7               	<= to_unsigned(11630, 32); 
+         vdac_value_8               	<= to_unsigned(11630, 32); 
+         
+         -- fleg dac
+         dac_cfg_vector <= vdac_value_1               
+         & vdac_value_2                   
+         & vdac_value_3                   
+         & vdac_value_4                   
+         & vdac_value_5                   
+         & vdac_value_6                   
+         & vdac_value_7                   
+         & vdac_value_8;       
+         
+         --
+         
+      end if;
+   end process;   
    
-   xstart                          <= to_unsigned(0, 32);  
-   ystart                          <= to_unsigned(0, 32);  
-   xsize                           <= to_unsigned(user_xsize, 32);  
-   ysize                           <= to_unsigned(user_ysize, 32);  
-   gain                            <= (others => '0');
-   invert                          <= (others => '0');
-   revert                          <= (others => '0');
-   cbit_en                         <= (others => '0');
-   dig_code                        <= (others => '0');
-   jpos                            <= to_unsigned(1185, 32);  
-   kpos                            <= to_unsigned(1184, 32);  
-   lpos                            <= to_unsigned(513, 32);  
-   mpos                            <= to_unsigned(512, 32);  
-   wdr_len                         <= to_unsigned(1344, 32); 
-   full_window                     <= (others => '0');
-   real_mode_active_pixel_dly      <= to_unsigned(6, 32);
-   adc_quad2_en                    <= (others => '1');
-   chn_diversity_en                <= (others => '0'); 
-   
-   line_period_pclk                <= to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
-   readout_pclk_cnt_max            <= to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize + 1) + 3, 32);   
-   active_line_start_num           <= to_unsigned(1, 32);
-   active_line_end_num             <= active_line_start_num + to_unsigned(user_ysize - 1, 32);
-   pix_samp_num_per_ch             <= to_unsigned(1, 32);
-   sof_posf_pclk                   <= to_unsigned(PAUSE_SIZE, 32);
-   eof_posf_pclk                   <= to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE) - 1, 32);
-   sol_posl_pclk                   <= to_unsigned(PAUSE_SIZE, 32);
-   eol_posl_pclk                   <= line_period_pclk - 1;
-   eol_posl_pclk_p1                <= eol_posl_pclk + 1;
-   
-   good_samp_first_pos_per_ch      <= to_unsigned(1, 32);
-   good_samp_last_pos_per_ch       <= to_unsigned(1, 32);   
-   hgood_samp_sum_num              <= to_unsigned(1, 32); 
-   hgood_samp_mean_numerator       <= to_unsigned(2**22/1, 32);
-   vgood_samp_sum_num              <= 1 + chn_diversity_en;
-   vgood_samp_mean_numerator       <= to_unsigned(2**22/1, 32);
-   
-   xsize_div_tapnum                <=  to_unsigned(user_xsize/TAP_NUM, 32);
-   vdac_value_1                    <=  (others => '0'); 
-   vdac_value_2                    <=  (others => '0'); 
-   vdac_value_3                    <=  (others => '0'); 
-   vdac_value_4                    <=  (others => '0'); 
-   vdac_value_5                    <=  (others => '0'); 
-   vdac_value_6                    <=  (others => '0'); 
-   vdac_value_7                    <=  (others => '0'); 
-   vdac_value_8                    <=  (others => '0'); 
-   adc_clk_phase                   <=  (others => '0'); 
-   comn_fpa_stretch_acq_trig       <=  (others => '0'); 
-   
-   
-   
-   user_cfg_vector <=  comn_fpa_diag_mode              
-   & comn_fpa_diag_type              
-   & comn_fpa_pwr_on                 
-   & comn_fpa_trig_ctrl_mode         
-   & comn_fpa_acq_trig_ctrl_dly      
-   & comn_fpa_acq_trig_period_min    
-   & comn_fpa_xtra_trig_ctrl_dly     
-   & comn_fpa_xtra_trig_period_min   
-   
-   & xstart                              
-   & ystart                              
-   & xsize                               
-   & ysize                               
-   & gain                                
-   & invert                              
-   & revert                              
-   & cbit_en                             
-   & dig_code                            
-   & jpos                                
-   & kpos                                
-   & lpos                                
-   & mpos                                
-   & wdr_len                             
-   & full_window                         
-   & real_mode_active_pixel_dly          
-   & adc_quad2_en                        
-   & chn_diversity_en                    
-   & readout_pclk_cnt_max                
-   & line_period_pclk                    
-   & active_line_start_num               
-   & active_line_end_num
-   & pix_samp_num_per_ch
-   & sof_posf_pclk                       
-   & eof_posf_pclk                       
-   & sol_posl_pclk                       
-   & eol_posl_pclk                       
-   & eol_posl_pclk_p1                    
-   & hgood_samp_sum_num                  
-   & hgood_samp_mean_numerator           
-   & vgood_samp_sum_num                  
-   & vgood_samp_mean_numerator           
-   & good_samp_first_pos_per_ch          
-   & good_samp_last_pos_per_ch           
-   & xsize_div_tapnum                                        
-   & vdac_value_1                       
-   & vdac_value_2
-   & vdac_value_3 
-   & vdac_value_4                       
-   & vdac_value_5                       
-   & vdac_value_6                       
-   & vdac_value_7                       
-   & vdac_value_8                        
-   & adc_clk_phase                       
-   & comn_fpa_stretch_acq_trig;      
-   
-   
-   fpa_softw_stat_i.fpa_roic <= FPA_ROIC_HAWK;
-   fpa_softw_stat_i.fpa_output <= OUTPUT_ANALOG;    
-   fpa_softw_stat_i.fpa_input <= LVTTL50;
-   
-   -- envoyer cfg
    ublaze_sim: process is
       
       variable start_pos : integer;
@@ -360,37 +306,59 @@ begin
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';
       
-      wait until areset = '0';
+      wait until areset = '0'; 
       
-      for ii in 0 to 52 loop 
+      wait for 500 ns;      
+      write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns;      
+      write_axi_lite (MB_CLK, resize(X"AE4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AE8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
+      wait for 500 ns;
+           
+      
+      for ii in 0 to 63-1 loop 
          wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector'length -1 - 32*ii;
+         start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector1(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop; 
-      
-      write_axi_lite (MB_CLK, resize(X"E0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns;      
-      write_axi_lite (MB_CLK, resize(X"E4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      write_axi_lite (MB_CLK, resize(X"E8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
       
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000404", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;
+      --wait for 10 ns;  
+      
+      wait for 30 ms;
+      
+      for ii in 0 to 63-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector2'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
+      
+      wait for 20 ms;
+      
+      for ii in 0 to 63-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector3'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;
+      
+      
       
       report "FCR written"; 
       
       report "END OF SIMULATION" 
       severity error;
-   end process ublaze_sim;
-   
-   
+   end process ublaze_sim;     
    
    -- Unit Under Test port map
    UUT : hawkA_intf_testbench

@@ -31,9 +31,15 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\sfifo_w10_d256\sfifo_w10_d256_funcsim.vhdl 
 acom D:\Telops\FIR-00251-Proc\IP\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_funcsim.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\afifo_w57d16\afifo_w57d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\hawkA_10MHz_mmcm\hawkA_10MHz_mmcm_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w96_d128\fwft_afifo_w96_d128_funcsim.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_funcsim.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_funcsim.vhdl
+
+acom d:\Telops\FIR-00251-Proc(FG)\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
 
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_id_reader.vhd
@@ -73,7 +79,11 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\fpa_temp_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\digio_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\flexV_dummy.vhd
 
+acom D:\Telops\FIR-00251-Proc(FG)\src\Quad_serdes\HDL\quad_data_sync.vhd
+
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawkA_intf_testbench.bde
+
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawka_intf_testbench_pkg.vhd
 
 acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawkA_intf_testbench_TB.vhd
 
@@ -111,7 +121,7 @@ asim -ses hawkA_intf_testbench_TB
 --wave UUT/U1/U19/*
 
 -- intf_sequencer
-wave UUT/U1/U2/*  
+--wave UUT/U1/U2/*  
 
 -- fpa_prog_controller
 --wave UUT/U1/U5/U2/* 
@@ -135,7 +145,10 @@ wave UUT/U1/U2/*
 --wave UUT/U1/U9/U7/*
 --wave UUT/U1/U9/U2/U1/* 
 --wave UUT/U1/U9/U18/*
---wave UUT/U1/*
+--wave UUT/U1/U19/*
+wave UUT/U1/U5/U2/*
+wave UUT/U1/U5/U2/U5/*
+wave UUT/U1/U5/U2/U1/*
 wave UUT/U1/*
 
-run 40 ms
+run 100 ms

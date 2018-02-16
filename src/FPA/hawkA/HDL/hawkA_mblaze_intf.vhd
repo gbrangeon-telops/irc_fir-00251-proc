@@ -337,7 +337,7 @@ begin
    end process; 
    
    ------------------------------------------------  
-   -- calcul des parametres de frame rate
+   -- delai
    -------------------------------------------------
    U4B: process (MB_CLK)
    begin

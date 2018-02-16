@@ -221,11 +221,11 @@ begin
                         dcr_mosi_i.data <= x"40";     -- registre WCR à programmer (voir manuel)
                         reg_en_latch <= WCR;
                         dcr_fsm <= first_dcr_wr;
-                     elsif DDR_MOSI.DVAL = '1' and DDR_ERR = '0'then 
+                     elsif DDR_MOSI.DVAL = '1' and DDR_ERR = '0' then 
                         dcr_mosi_i.data <= x"80";     -- registre DDR à programmer (voir manuel)
                         reg_en_latch <= DDR; 
                         dcr_fsm <= first_dcr_wr;
-                     elsif WDR_FIFO_EMPTY = '0' and WDR_ERR = '0'then 
+                     elsif WDR_FIFO_EMPTY = '0' and WDR_ERR = '0' then 
                         --if FPA_INTF_CFG.FPA_FULL_WINDOW = '1' then
                         dcr_mosi_i.data <= x"20";     -- registre WDR à programmer (voir manuel)  
                         --else
