@@ -49,7 +49,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.2.0
+// Generated from XML camera definition file version 12.2.1
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -700,7 +700,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[HeightIdx], ((GC_MemoryBufferNotEmpty || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionStartIdx], gcRegsData.DeviceNotReady);
    SetRegLocked(&gcRegsDef[AcquisitionStopIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
-   SetRegLocked(&gcRegsDef[AcquisitionArmIdx], (GC_AcquisitionStarted || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[AcquisitionArmIdx], ((GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[ExposureModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[ExposureTimeIdx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime1Idx], GC_EHDRIExposureTimeIsLocked);
@@ -731,7 +731,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence3Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EHDRIExposureOccurrence4Idx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[CalibrationModeIdx], GC_AcquisitionStarted);
-   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[CalibrationCollectionLoadIdx], (((gcRegsData.CalibrationCollectionActivePOSIXTime == gcRegsData.CalibrationCollectionPOSIXTime) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[CalibrationCollectionBlockLoadIdx], ((gcRegsData.CalibrationCollectionActiveBlockPOSIXTime == gcRegsData.CalibrationCollectionBlockPOSIXTime) || ((gcRegsData.CalibrationCollectionActivePOSIXTime != gcRegsData.CalibrationCollectionPOSIXTime) && (GC_AcquisitionStarted)) || (GC_FWFixedModeIsActive == 0) || (gcRegsData.CalibrationCollectionType == CCT_MultipointEHDRI) || GC_WaitingForImageCorrection || GC_AECPlusIsActive));
    SetRegLocked(&gcRegsDef[ImageCorrectionModeIdx], GC_WaitingForImageCorrection);
    SetRegLocked(&gcRegsDef[ImageCorrectionBlockSelectorIdx], GC_WaitingForImageCorrection);

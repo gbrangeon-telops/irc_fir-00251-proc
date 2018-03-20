@@ -67,6 +67,8 @@
 #define TDCStatusTst(mask) BitMaskTst(gcRegsData.TDCStatus, mask)  /**< Test if masked bits in TDCStatus register are all set */
 #define TDCStatusTstAny(mask) BitMaskTstAny(gcRegsData.TDCStatus, mask)  /**< Test if at least one of the masked bits in TDCStatus register is set */
 
+#define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
+
 /*
  * AvailabilityFlags register bit field definition
  */
@@ -157,10 +159,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.2.0
+// Generated from XML camera definition file version 12.2.1
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 1))
 #error "XML version mismatch."
 #endif
 
@@ -552,7 +554,6 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_AcquisitionFrameRateIsLocked ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForImageCorrection)
 #define GC_AcquisitionStartTriggerIsActive IsActiveFlagsTst(AcquisitionStartTriggerIsActiveMask)
 #define GC_AcquisitionStartTriggerIsLocked ((gcRegsData.TriggerSelector == TS_AcquisitionStart) && (GC_FWSynchronouslyRotatingModeIsActive || GC_GatingTriggerIsActive))
-#define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
 #define GC_AutofocusIsActive IsActiveFlagsTst(AutofocusIsActiveMask)
 #define GC_CalibrationCollectionTypeFOVIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFOV) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFOV))
 #define GC_CalibrationCollectionTypeFWIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW))
