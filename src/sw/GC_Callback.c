@@ -605,10 +605,13 @@ void GC_AutofocusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if ((flashSettings.AutofocusModuleType == AMT_SightlineSLA1500) && (gcRegsData.AutofocusMode == AM_Once))
+      if (!GC_AutofocusIsActive)
       {
-         //TODO: ODI start autofocus algo
-         //gcRegsData.FocusPositionRaw mis à jour à la fin de l'algo
+         if ((flashSettings.AutofocusModuleType == AMT_SightlineSLA1500) && (gcRegsData.AutofocusMode == AM_Once))
+         {
+            //TODO: ODI start autofocus algo
+            //gcRegsData.FocusPositionRaw mis à jour à la fin de l'algo
+         }
       }
    }
 }

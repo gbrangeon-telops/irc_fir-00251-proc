@@ -750,7 +750,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[FOVPositionRawSetpointIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection || (GC_CalibrationIsActive && (GC_CalibrationCollectionTypeFOVIsActive == 0))));
    SetRegLocked(&gcRegsDef[AutofocusModeIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[AutofocusROIIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
-   SetRegLocked(&gcRegsDef[AutofocusIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[AutofocusIdx], (GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[FocusNearFastIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[FocusNearSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[FocusFarSlowIdx], (GC_AutofocusIsActive || GC_WaitingForImageCorrection));
