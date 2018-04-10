@@ -29,6 +29,9 @@
 #include "tel2000_param.h"
 #include "gps.h"
 #include "FaulhaberProtocol.h"
+#include "RpOpticalProtocol.h"
+#include "SightlineSLAProtocol.h"
+#include "Autofocus.h"
 #include "xintc.h"
 #include "QSPIFlash.h"
 #include "FPA_intf.h"
@@ -112,6 +115,9 @@ releaseInfo_t gReleaseInfo;
 ledCtrl_t gLedCtrl;
 flashDynamicValues_t gFlashDynamicValues;
 brd_rev_ver_t gBrdRevid;
+rpCtrl_t theRpCtrl;
+slCtrl_t theSlCtrl;
+autofocusCtrl_t theAutoCtrl;
 
 
 /**
@@ -353,7 +359,7 @@ IRC_Status_t Proc_FM_Init()
          CB_Ctor(fmCmdQueueBuffer, FM_CMD_QUEUE_SIZE, sizeof(networkCommand_t));
 
    IRC_Status_t status;
-   fileOrder_t keys[4];
+   fileOrder_t keys[FM_MAX_NUM_FILE_ORDER_KEY];
 
    // Initialize file manager RX circular buffer
    if (CBB_Init(&fmRxCircBuffer, fmRxCircBufferBytes, FILE_CI_USART_RX_CIRC_BUFFER_SIZE) != IRC_SUCCESS)
@@ -396,17 +402,15 @@ IRC_Status_t Proc_FM_Init()
    keys[1] = gFlashDynamicValues.FileOrderKey2;
    keys[2] = gFlashDynamicValues.FileOrderKey3;
    keys[3] = gFlashDynamicValues.FileOrderKey4;
-   //TODO: ODI file order
-   //keys[4] = gFlashDynamicValues.FileOrderKey5;
-   FM_SetFileListKeys(&gFM_files, keys, 4);
+   keys[4] = gFlashDynamicValues.FileOrderKey5;
+   FM_SetFileListKeys(&gFM_files, keys, FM_MAX_NUM_FILE_ORDER_KEY);
 
    keys[0] = gFlashDynamicValues.CalibrationCollectionFileOrderKey1;
    keys[1] = gFlashDynamicValues.CalibrationCollectionFileOrderKey2;
    keys[2] = gFlashDynamicValues.CalibrationCollectionFileOrderKey3;
    keys[3] = gFlashDynamicValues.CalibrationCollectionFileOrderKey4;
-   //TODO: ODI file order
-   //keys[4] = gFlashDynamicValues.CalibrationCollectionFileOrderKey5;
-   FM_SetFileListKeys(&gFM_collections, keys, 4);
+   keys[4] = gFlashDynamicValues.CalibrationCollectionFileOrderKey5;
+   FM_SetFileListKeys(&gFM_collections, keys, FM_MAX_NUM_FILE_ORDER_KEY);
 
    return IRC_SUCCESS;
 }
@@ -791,6 +795,7 @@ IRC_Status_t Proc_Intc_Start()
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_GPS_UART_IP2INTC_IRPT_INTR);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FW_UART_IP2INTC_IRPT_INTR);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_LENS_UART_IP2INTC_IRPT_INTR);
    CircularUART_Enable(&gCircularUART_NTxMini);
    CircularUART_Enable(&gCircularUART_OutputFPGA);
    if (DeviceSerialPortFunctionAry[DSPS_CameraLink] != DSPF_Disabled) CircularUART_Enable(&gCircularUART_CameraLink);
@@ -874,9 +879,9 @@ IRC_Status_t Proc_GPS_Init()
  */
 IRC_Status_t Proc_FH_Init()
 {
-    IRC_Status_t status;
+   IRC_Status_t status;
 
-    status = FH_init(&gcRegsData,
+   status = FH_init(&gcRegsData,
           &gFWFaulhaberCtrl,
          XPAR_FW_UART_DEVICE_ID,
          &gProcIntc,
@@ -887,11 +892,74 @@ IRC_Status_t Proc_FH_Init()
      return IRC_FAILURE;
    }
 
-   status = FH_init(&gcRegsData,
-         &gNDFFaulhaberCtrl,
-        XPAR_AXI_NDF_UART_DEVICE_ID,
-        &gProcIntc,
-        XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
+   if (flashSettings.NDFPresent)
+   {
+      status = FH_init(&gcRegsData,
+            &gNDFFaulhaberCtrl,
+           XPAR_AXI_NDF_UART_DEVICE_ID,
+           &gProcIntc,
+           XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
+
+      if (status != IRC_SUCCESS)
+      {
+         return IRC_FAILURE;
+      }
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Initializes RP Optical control
+ *
+ * @return IRC_SUCCESS if successfully initialized.
+ * @return IRC_FAILURE if failed to initialize.
+ */
+IRC_Status_t Proc_RP_Init()
+{
+   IRC_Status_t status;
+
+   status = RPOpt_init(   &gcRegsData,
+                           &theRpCtrl,
+                           XPAR_AXI_LENS_UART_DEVICE_ID,
+                           &gProcIntc,
+                           XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_LENS_UART_IP2INTC_IRPT_INTR);
+
+   if (status != IRC_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
+   Power_TurnOn(PC_EXPANSION);         // ToDo ECL wait for result BIT before passing the test
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Initializes SightLine control
+ *
+ * @return IRC_SUCCESS if successfully initialized.
+ * @return IRC_FAILURE if failed to initialize.
+ */
+IRC_Status_t Proc_SL_Init()
+{
+   IRC_Status_t status;
+
+   if (flashSettings.AutofocusModuleType == AMT_SightlineSLA1500)
+   {
+      status = SL_init(      &gcRegsData,
+                           &theSlCtrl,
+                           XPAR_AXI_NDF_UART_DEVICE_ID,
+                           &gProcIntc,
+                           XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_NDF_UART_IP2INTC_IRPT_INTR);
+
+      if (status != IRC_SUCCESS)
+      {
+         return IRC_FAILURE;
+      }
+   }
+
+   status = Autofocus_init(&theAutoCtrl);
 
    if (status != IRC_SUCCESS)
    {

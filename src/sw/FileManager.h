@@ -47,7 +47,7 @@
 #define FM_UFFS_MOUNT_POINT_SIZE       5
 #define FM_LONG_FILENAME_SIZE          (FM_UFFS_MOUNT_POINT_SIZE + F1F2_FILE_NAME_SIZE + 1) /** mount point + filename + null char */
 
-#define FM_MAX_NUM_FILE_ORDER_KEY      4    /**< Maximum number of file order key */
+#define FM_MAX_NUM_FILE_ORDER_KEY      5    /**< Maximum number of file order key */
 
 #define GetFileID(fr) ((((uint64_t) fr->deviceSerialNumber) << 32) | (uint64_t) fr->posixTime)
 
@@ -122,6 +122,7 @@ enum fileOrderEnum {
    FO_FW_POSITION,      /**< Collection files are ordered by their FW position */
    FO_NDF_POSITION,     /**< Collection files are ordered by their ND filer position */
    FO_EXT_LENS_SERIAL,  /**< Collection files are ordered by their external lens serial number */
+   FO_FOV_POSITION,     /**< Collection files are ordered by their FOV position */
    FO_COUNT             /**< File order count */
 };
 

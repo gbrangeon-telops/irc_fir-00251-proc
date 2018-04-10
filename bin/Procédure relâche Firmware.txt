@@ -13,28 +13,31 @@
    Effectuer les mêmes étapes que pour le FPGA d'output.
    
 3.	FPGA processing
-   a. Clean et build du projet boot loader en release dans SDK (important de le faire avant celui du projet principal)
-   b. Clean et build du projet principal en release dans SDK
-   c. Exécuter le script fetchHwSwFiles.bat
-   d. Faire le commit de pre-release
-   e. Clean et build du projet principal en release dans SDK
-   f. Modifier le fichier FirmwareReleaseVersion.txt
-   g. Exécuter le script generateReleaseFile.bat
-   h. Vérifier que les informations contenues dans le fichier fir_00251_proc_[sensor]_release.txt concordent bien avec les
-      informations contenus dans les fichiers version.txt, BuildInfo.h, svnrevs.pl du FPGA d'output et svnrevs.pl du
-      FPGA de storage.
-   i. Exécuter le script generatePromFile.bat
-   j. Tester les release au besoin.
-   k. Faire le commit de release
-   l. Exécuter le script exportReleaseArchive.bat
-   m. Copier le répertoire de release dans le répertoire de firmware du département de production
-   n. Générer un fichier PDF pour chacun des fichier Excel de release.
-   
-4. Mettre à jour le fichier Release History.txt.
+   a. Faire les étapes suivantes pour tous les détecteurs à relâcher:
+      1. Clean et build du projet bootloader en release dans SDK (important de le faire avant celui du projet principal)
+      2. Clean et build du projet principal en release dans SDK
+      3. Exécuter le script fetchHwSwFiles.bat
+   b. Faire le commit de pre-release
+   c. Modifier le fichier FirmwareReleaseVersion.txt
+   d. Faire les étapes suivantes pour tous les détecteurs à relâcher:
+      1. Clean et build du projet principal en release dans SDK
+      2. Exécuter le script generateReleaseFile.bat
+      3. Vérifier que les informations contenues dans le fichier fir_00251_proc_[sensor]_release.txt concordent bien avec les
+         informations contenus dans les fichiers version.txt, BuildInfo.h, svnrevs.pl du FPGA d'output et svnrevs.pl du
+         FPGA de storage.
+      4. Exécuter le script generatePromFile.bat
+   e. Tester les release au besoin.
+   f. Faire le commit de release
+   g. Exécuter le script exportReleaseArchive.bat
+   h. Copier le répertoire de release dans le répertoire de firmware du département de production
 
-5. IMPORTANT! Créer un tag pour chacun des repository suivants avec la date et le nom de la release (aaaa-mm-jj - Release x.x.x.x):
+4. IMPORTANT! Créer un tag pour chacun des repository suivants avec la date et le nom de la release (aaaa-mm-jj - Release x.x.x.x):
    - FIR-00251-Common
    - FIR-00251-NTx-Mini
    - FIR-00251-Output
    - FIR-00251-Proc
    - FIR-00257-Storage
+   
+5. Mettre à jour la documentation de firmware du département de production:
+   - TEL-IRC-0044 - TS-IR Firmware Release History.xlsx
+   - TEL-IRC-0058 - TS-IR Firmware Qualification Plan.xlsx

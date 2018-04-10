@@ -33,6 +33,9 @@
 #include "irigb.h"
 #include "FWController.h"
 #include "NDFController.h"
+#include "RpOpticalProtocol.h"
+#include "SightlineSLAProtocol.h"
+#include "Autofocus.h"
 #include "icu.h"
 #include "TempMonitor.h"
 #include "DebugTerminal.h"
@@ -112,6 +115,9 @@ void disable_caches()
    extern ctrlIntf_t gCtrlIntf_FileManager;
    extern FH_ctrl_t gFWFaulhaberCtrl;
    extern FH_ctrl_t gNDFFaulhaberCtrl;
+   extern rpCtrl_t theRpCtrl;
+   extern slCtrl_t theSlCtrl;
+   extern autofocusCtrl_t theAutoCtrl;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
@@ -173,6 +179,8 @@ void disable_caches()
    BuiltInTest_Execute(BITID_InterruptControllerStartup);
    BuiltInTest_Execute(BITID_FirmwareReleaseInfoInitialization);
    BuiltInTest_Execute(BITID_DeviceKeyValidation);
+   BuiltInTest_Execute(BITID_MotorizedLensInitialization);
+   BuiltInTest_Execute(BITID_AutofocusModuleInitialization);
 
    Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 1);
 
@@ -257,5 +265,8 @@ void disable_caches()
       FH_ProtocolHandler(&gNDFFaulhaberCtrl);
       FH_ProtocolHandler(&gFWFaulhaberCtrl);
       GPS_Process(&Gps_struct);
+      RPopt_ProtocolHandler_SM(&theRpCtrl, &gcRegsData);
+      SightLine_ProtocolHandler_SM(&theSlCtrl);
+      Autofocus_SM(&theAutoCtrl, &theSlCtrl, &theRpCtrl);
    }
 }

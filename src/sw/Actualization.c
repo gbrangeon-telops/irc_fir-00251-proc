@@ -41,6 +41,7 @@
 #include "utils.h"
 #include "BuiltInTests.h"
 #include "Acquisition.h"
+#include "RpOpticalProtocol.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -136,8 +137,8 @@ static deltaBetaList_t deltaBetaDB;
 static void setActState(ACT_State_t* p_state, ACT_State_t next_state);
 static void setBpdState(BPD_State_t* p_state, BPD_State_t next_state);
 static void setBqState(BQ_State_t* p_state, BQ_State_t next_state);
-static void backupGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
-static void restoreGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
+static void ACT_backupGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
+static void ACT_restoreGCRegisters( ACT_GCRegsBackup_t* p_GCRegsBackup );
 static float applyLUT(uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float x );
 static float applyReverseLUT(uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float y_target, bool verbose );
 static LUTRQInfo_t* selectLUT(calibBlockInfo_t* blockInfo, uint8_t type);
@@ -369,6 +370,7 @@ IRC_Status_t Actualization_SM()
    extern float FWExposureTime[MAX_NUM_FILTER];
    extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
    extern t_calib gCal;
+   extern rpCtrl_t theRpCtrl;
 
    if (TimedOut(&age_timer))
    {
@@ -440,7 +442,7 @@ IRC_Status_t Actualization_SM()
          ACT_PRINTF("icuParams.Timeout2 = %d\n", icuParams.Timeout2);
 
          // Backup registers value
-         backupGCRegisters( &GCRegsBackup );
+         ACT_backupGCRegisters( &GCRegsBackup );
 
          // Save the collection and current block index
          savedCalibPosixTime = calibrationInfo.collection.POSIXTime;
@@ -706,9 +708,12 @@ IRC_Status_t Actualization_SM()
                gcRegsData.ExposureTime = FPA_DEFAULT_EXPOSURE;
             }
 
-            //TODO: ODI déplacer la lentille de focus si nécessaire
-
             GC_SetAcquisitionFrameRate(ACT_DEFAULT_FPS);
+
+            // Move the focus lens
+            if (TDCFlagsTst(MotorizedFocusLensIsImplementedMask))
+               goFastToFocus(&theRpCtrl, (uint16_t)(blockInfo->ImageCorrectionFocusPositionRaw));
+
          }
 
          StartTimer(&act_timer, ACT_WAIT_FOR_ACQ_TIMEOUT/1000);
@@ -717,7 +722,7 @@ IRC_Status_t Actualization_SM()
 
       case ACT_StartAECAcquisition:
          // Ensure that camera is ready to be armed
-         if (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask))
+         if (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask) && (gcRegsData.FOVPosition != FOVP_FOVInTransition))
          {
             ACT_INF( "Ready for AEC acquisition! (%dms)", (uint32_t) elapsed_time_us( tic_TotalDuration ) / 1000 );
 
@@ -1403,7 +1408,7 @@ IRC_Status_t Actualization_SM()
                BufferManager_SetBufferMode(&gBufManager, BM_WRITE, &gcRegsData);   // Make sure internal buffering is ON
 
             // Restore registers value
-            restoreGCRegisters( &GCRegsBackup );
+            ACT_restoreGCRegisters( &GCRegsBackup );
 
             // Reload original calibration data (will update the calibration at the same time)
             if (savedCalibPosixTime != 0)
@@ -1451,7 +1456,7 @@ IRC_Status_t Actualization_SM()
          BufferManager_SetBufferMode(&gBufManager, BM_WRITE, &gcRegsData);   // Make sure internal buffering is ON
 
       // Restore registers value
-      restoreGCRegisters( &GCRegsBackup );
+      ACT_restoreGCRegisters( &GCRegsBackup );
 
       ICU_scene(&gcRegsData, &gICU_ctrl);
 
@@ -2222,12 +2227,8 @@ void testMomentComputations()
  *  @param p_GCRegsBackup a pointer to the genicam registers subset
  *
  *  @return none
- *
- *  Note(s):
- *
  */
-
-static void backupGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
+static void ACT_backupGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
 {
    uint8_t i;
 
@@ -2274,11 +2275,8 @@ static void backupGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
  *  @param p_GCRegsBackup a pointer to the genicam registers subset
  *
  *  @return none
- *
- *  Note(s):
- *
  */
-static void restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
+static void ACT_restoreGCRegisters( ACT_GCRegsBackup_t *p_GCRegsBackup )
 {
    uint8_t i;
 

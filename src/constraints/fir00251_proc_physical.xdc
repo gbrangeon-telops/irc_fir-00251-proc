@@ -315,7 +315,6 @@ set_property IOSTANDARD LVCMOS33 [get_ports BUFFER_PRSNT_N]
 set_property IOSTANDARD LVCMOS33 [get_ports EXP_PRSNT_N]
 
 ################### FPGA COM ######################
-
 set_property PACKAGE_PIN AD10 [get_ports FPGA_TO_FPGA0]
 set_property PACKAGE_PIN AE10 [get_ports FPGA_TO_FPGA1]
 set_property PACKAGE_PIN V11 [get_ports FPGA_TO_FPGA2]
@@ -342,6 +341,12 @@ set_property PACKAGE_PIN H23 [get_ports OEM_TX_FROM_FPGA]
 set_property IOSTANDARD LVCMOS33 [get_ports OEM_RX_TO_FPGA]
 set_property IOSTANDARD LVCMOS33 [get_ports OEM_TX_FROM_FPGA]
 
+set_property PACKAGE_PIN AE25 [get_ports LENS_RX_TO_FPGA]
+set_property PACKAGE_PIN AE23 [get_ports LENS_TX_FROM_FPGA]
+set_property PACKAGE_PIN AF23 [get_ports SEL_LENS]
+set_property IOSTANDARD LVCMOS25 [get_ports LENS_RX_TO_FPGA]
+set_property IOSTANDARD LVCMOS25 [get_ports LENS_TX_FROM_FPGA]
+set_property IOSTANDARD LVCMOS25 [get_ports SEL_LENS]
 
 ################### Others  ###########################
 

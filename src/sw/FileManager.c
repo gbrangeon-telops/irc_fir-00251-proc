@@ -1038,6 +1038,8 @@ IRC_Status_t FM_Format()
       status =  IRC_FAILURE;
    }
 
+   FM_INF("File format done.");
+
    return status;
 }
 
@@ -1247,6 +1249,7 @@ int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileO
       case FO_FW_POSITION:
       case FO_NDF_POSITION:
       case FO_EXT_LENS_SERIAL:
+      case FO_FOV_POSITION:
          if ((file1->type == FT_TSCO) && (file2->type == FT_TSCO))
          {
             switch (key)
@@ -1264,22 +1267,33 @@ int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileO
                         case CCT_MultipointEHDRI:
                            tmpKeys[0] = FO_FW_POSITION;
                            tmpKeys[1] = FO_NDF_POSITION;
-                           tmpKeys[2] = FO_EXT_LENS_SERIAL;
-                           retval = FM_filecmp(file1, file2, tmpKeys, 3);
+                           tmpKeys[2] = FO_FOV_POSITION;
+                           tmpKeys[3] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 4);
                            break;
 
                         case CCT_TelopsFW:
                         case CCT_MultipointFW:
                            tmpKeys[0] = FO_NDF_POSITION;
-                           tmpKeys[1] = FO_EXT_LENS_SERIAL;
-                           retval = FM_filecmp(file1, file2, tmpKeys, 2);
+                           tmpKeys[1] = FO_FOV_POSITION;
+                           tmpKeys[2] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 3);
                            break;
 
                         case CCT_TelopsNDF:
                         case CCT_MultipointNDF:
                            tmpKeys[0] = FO_FW_POSITION;
-                           tmpKeys[1] = FO_EXT_LENS_SERIAL;
-                           retval = FM_filecmp(file1, file2, tmpKeys, 2);
+                           tmpKeys[1] = FO_FOV_POSITION;
+                           tmpKeys[2] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 3);
+                           break;
+
+                        case CCT_TelopsFOV:
+                        case CCT_MultipointFOV:
+                           tmpKeys[0] = FO_FW_POSITION;
+                           tmpKeys[1] = FO_NDF_POSITION;
+                           tmpKeys[2] = FO_EXT_LENS_SERIAL;
+                           retval = FM_filecmp(file1, file2, tmpKeys, 3);
                            break;
                      }
                   }
@@ -1295,6 +1309,10 @@ int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileO
 
                case FO_EXT_LENS_SERIAL:
                   retval = file1->info.collection.ExternalLensSerialNumber - file2->info.collection.ExternalLensSerialNumber;
+                  break;
+
+               case FO_FOV_POSITION:
+                  retval = file1->info.collection.FOVPosition - file2->info.collection.FOVPosition;
                   break;
 
                default:

@@ -19,6 +19,7 @@
 #include "hder_inserter.h"
 #include "utils.h"
 #include "FlashSettings.h"
+#include "RpOpticalProtocol.h"
 
 #define XADC_CUR_OFFSET -0.0936084549572219f
 #define XADC_CUR_GAIN   7.03f    //12.6619557089536f  --> EC
@@ -202,13 +203,12 @@ void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh)
  */
 void XADC_ThPhyConv_MotorLens(xadcChannel_t *xadcCh)
 {
-   //TODO: ODI Copy temperature feedback from motorized lens
-   /*extern float motorLensTemperature;
+   extern rpCtrl_t theRpCtrl;
 
    if (xadcCh->p_physical != NULL)
    {
-      *(xadcCh->p_physical) = motorLensTemperature;   // [°C]
-   }*/
+      *(xadcCh->p_physical) = (float)(theRpCtrl.currentResponseData.temperature);   // [°C]
+   }
 }
 
 void XADC_ThUpdated(xadcChannel_t *xadcCh)

@@ -325,11 +325,6 @@ void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs)
 {
    uint32_t blockIndex;
 
-
-   //TODO: ODI cette fonction doit être appelée lorsque FOVPosition est mis à jour (feedback lentille)
-
-
-
    if (!calibrationInfo.isValid)
    {
       pA->calib_block_sel_mode = CBSM_USER_SEL_0;
@@ -409,10 +404,10 @@ void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs)
          else
          {
             pA->calib_block_sel_mode = CBSM_USER_SEL_0;
-            // Find block corresponding to FOV Position Setpoint
+            // Find block corresponding to FOV Position
             for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
             {
-               if (pGCRegs->FOVPositionSetpoint == calibrationInfo.blocks[blockIndex].FOVPosition)
+               if (pGCRegs->FOVPosition == calibrationInfo.blocks[blockIndex].FOVPosition)
                {
                   pA->calib_block_sel_mode = blockIndex + CBSM_USER_SEL_0;
                   break;
@@ -462,7 +457,7 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
 
       // Update FOV position if necessary
       if ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && GC_CalibrationIsActive &&
-            (pGCRegs->FOVPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition))
+            (pGCRegs->FOVPosition != (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition))
          GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition);
 
       // Update optical serial numbers with block values

@@ -733,6 +733,7 @@ void Calibration_SM()
                calibrationInfo.blocks[blockIndex].FWPosition = headerData.blockFile.FWPosition;
                calibrationInfo.blocks[blockIndex].NDFPosition = headerData.blockFile.NDFPosition;
                calibrationInfo.blocks[blockIndex].FOVPosition = headerData.blockFile.FOVPosition;
+               calibrationInfo.blocks[blockIndex].ImageCorrectionFocusPositionRaw = headerData.blockFile.ImageCorrectionFocusPositionRaw;
                calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
                calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
                calibrationInfo.blocks[blockIndex].PixelDynamicRangeMin = headerData.blockFile.PixelDynamicRangeMin;
@@ -1340,9 +1341,11 @@ void Calibration_SM()
                AEC_UpdateAECPlusParameters();
             }
 
-            if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask))
+            if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask) &&
+                  ((calibrationInfo.collection.CollectionType == CCT_TelopsFOV) || (calibrationInfo.collection.CollectionType == CCT_MultipointFOV)))
             {
-               GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], calibrationInfo.blocks[blockIndex].FOVPosition);
+               gcRegsData.CalibrationCollectionBlockSelector = blockIndex;
+               blockLoadCmdFlag = true;
             }
 
             // Update registers related to calibration control

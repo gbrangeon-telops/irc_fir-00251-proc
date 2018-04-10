@@ -5,7 +5,6 @@
 #include "xil_io.h"
 #include "irc_status.h"
 #include "utils.h"
-#include "hder_inserter.h"
 #include "exposure_time_ctrl.h"
 #include "Calibration.h"
 #include <string.h>

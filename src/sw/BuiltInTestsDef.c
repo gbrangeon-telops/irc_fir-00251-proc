@@ -64,5 +64,7 @@ builtInTest_t builtInTests[BITID_Count] =
    {BITID_DeviceKeyValidation, "Device key validation", Proc_DeviceKeyValidation, BITR_Pending},
    {BITID_SensorInitialization, "", NULL, BITR_NotApplicable},
    {BITID_DeviceSerialPortsInitialization, "Initializing device serial ports", Proc_DeviceSerialPorts_Init, BITR_Pending},
-   {BITID_BoardRevisionValidation, "Check for HW board revision", Proc_BoardRevisionValidation, BITR_Pending}
+   {BITID_BoardRevisionValidation, "Check for HW board revision", Proc_BoardRevisionValidation, BITR_Pending},
+   {BITID_MotorizedLensInitialization, "Initializing RPOptical interface", Proc_RP_Init, BITR_Pending},
+   {BITID_AutofocusModuleInitialization, "Initializing SightLine interface", Proc_SL_Init, BITR_Pending}
 };

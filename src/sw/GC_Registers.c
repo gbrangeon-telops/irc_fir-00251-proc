@@ -16,11 +16,13 @@
 #include "GC_Registers.h"
 #include "GC_Callback.h"
 #include "GC_Events.h"
+#include "hder_inserter.h"
 #include "fpa_intf.h"
 #include "Trig_gen.h"
 #include "fan_ctrl.h"
 #include "Acquisition.h"
 #include "Actualization.h"
+#include "Autofocus.h"
 #include "BufferManager.h"
 #include "BuildInfo.h"
 #include "EHDRI_Manager.h"
@@ -44,8 +46,6 @@ float EHDRIExposureTime[EHDRI_IDX_NBR] = {FPA_EHDRI_EXP_0, FPA_EHDRI_EXP_1, FPA_
 float FWExposureTime[MAX_NUM_FILTER] = {FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE};
 float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
-//TODO: ODI déplacer dans driver Sightline
-#define AUTOFOCUS_ROI_DEFAULT    25.0F
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
@@ -1616,14 +1616,13 @@ void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort)
 void GC_UpdateFOV()
 {
    float focalLen;
-   //extern float motorLensFocalLength;
+   extern uint16_t gMotorLensFocalLength;
    extern t_HderInserter gHderInserter;
 
-   //TODO: ODI Copy focal length from motorized lens
    // Find focal length
-   /*if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask))
-      focalLen = motorLensFocalLength / 1000.0F;
-   else*/
+   if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask))
+      focalLen = ((float)gMotorLensFocalLength) / 1000.0F;
+   else
       focalLen = ((float)calibrationInfo.blocks[0].ExternalLensFocalLength) / 1000.0F;
 
    if (calibrationInfo.isValid && (focalLen != 0.0F))

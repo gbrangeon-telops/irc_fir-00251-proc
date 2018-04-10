@@ -79,13 +79,13 @@ IRC_Status_t NDF_ControllerInit(FH_ctrl_t* instance)
    IRC_Status_t status = IRC_SUCCESS;
    NDF_initialized = false;
 
-   if (flashSettings.NDFPresent)
-      FH_instance->fh_data.id = NDF_NODE_ID;
-
    if (instance)
       FH_instance = instance;
    else
       status = IRC_FAILURE;
+
+   if (flashSettings.NDFPresent)
+      FH_instance->fh_data.id = NDF_NODE_ID;
 
    NDF_ResetTimers();
 

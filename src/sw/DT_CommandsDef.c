@@ -42,6 +42,8 @@
 #include <time.h>
 #include <string.h>
 #include "FWController.h"
+#include "RpOpticalProtocol.h"
+#include  "Autofocus.h"
 
 #ifdef STARTUP
 #include "DT_CommandsDef_startup.h"
@@ -75,6 +77,8 @@ static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -112,6 +116,8 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"DTO", DebugTerminalParseDTO},
    {"FWPID", DebugTerminalParseFWPID},
    {"CI", DebugTerminalParseCI},
+   {"LT", DebugTerminalParseLT},
+   {"PLT", DebugTerminalParsePLT},
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -127,6 +133,8 @@ extern ctrlIntf_t gCtrlIntf_OEM;
 extern ctrlIntf_t gCtrlIntf_CameraLink;
 extern ctrlIntf_t gCtrlIntf_OutputFPGA;
 extern ctrlIntf_t gCtrlIntf_FileManager;
+extern rpCtrl_t theRpCtrl;
+extern autofocusCtrl_t theAutoCtrl;
 
 debugTerminalCtrlIntf_t gDebugTerminalCtrlIntfs[] =
 {
@@ -1010,7 +1018,8 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
          "CTYPE",
          "FW",
          "NDF",
-         "LENS"
+         "LENS",
+         "FOV"
    };
 
    // Read file list value
@@ -1107,8 +1116,7 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
          gFlashDynamicValues.FileOrderKey2 = keys[1];
          gFlashDynamicValues.FileOrderKey3 = keys[2];
          gFlashDynamicValues.FileOrderKey4 = keys[3];
-         //TODO: ODI file order
-         //gFlashDynamicValues.FileOrderKey5 = keys[4];
+         gFlashDynamicValues.FileOrderKey5 = keys[4];
          FlashDynamicValues_Update(&gFlashDynamicValues);
       }
       else if (fileList == &gFM_collections)
@@ -1117,8 +1125,7 @@ IRC_Status_t DebugTerminalParseFO(circByteBuffer_t *cbuf)
          gFlashDynamicValues.CalibrationCollectionFileOrderKey2 = keys[1];
          gFlashDynamicValues.CalibrationCollectionFileOrderKey3 = keys[2];
          gFlashDynamicValues.CalibrationCollectionFileOrderKey4 = keys[3];
-         //TODO: ODI file order
-         //gFlashDynamicValues.CalibrationCollectionFileOrderKey5 = keys[4];
+         gFlashDynamicValues.CalibrationCollectionFileOrderKey5 = keys[4];
          FlashDynamicValues_Update(&gFlashDynamicValues);
       }
    }
@@ -2007,6 +2014,142 @@ IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf)
 }
 
 /**
+ * Lens Table command parser.
+ * This parser is used to parse and validate Lens Table
+ * command arguments and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Lens Table command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf)
+{
+   extern lensTable_t lensLookUpTable;
+   uint8_t argStr[6];
+   uint32_t arglen;
+   uint32_t rowIndex, fieldIndex, value;
+
+   // Read row index
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if ((ParseNumArg((char *)argStr, arglen, &rowIndex) != IRC_SUCCESS) ||
+         (rowIndex >= RP_OPT_TABLE_LEN))
+   {
+      DT_ERR("Invalid rowIndex.");
+      return IRC_FAILURE;
+   }
+
+   // Read field index
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if ((ParseNumArg((char *)argStr, arglen, &fieldIndex) != IRC_SUCCESS) ||
+         (fieldIndex > 9))
+   {
+      DT_ERR("Invalid fieldIndex.");
+      return IRC_FAILURE;
+   }
+
+   // Read value
+   arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+   if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+   {
+      DT_ERR("Invalid value.");
+      return IRC_FAILURE;
+   }
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   // Apply value to lensLookUpTable
+   switch (fieldIndex)
+   {
+      case 0:
+         lensLookUpTable.zoom[rowIndex] = (uint16_t)value;
+         break;
+      case 3:
+         lensLookUpTable.focusAtTemp1[rowIndex] = (uint16_t)value;
+         break;
+      case 4:
+         lensLookUpTable.focusAtTemp2[rowIndex] = (uint16_t)value;
+         break;
+      case 5:
+         lensLookUpTable.focusAtTemp3[rowIndex] = (uint16_t)value;
+         break;
+      case 6:
+         lensLookUpTable.focusAtTemp4[rowIndex] = (uint16_t)value;
+         break;
+      case 7:
+         lensLookUpTable.focusAtTemp5[rowIndex] = (uint16_t)value;
+         break;
+      case 8:
+         lensLookUpTable.focusAtTemp6[rowIndex] = (uint16_t)value;
+         break;
+      case 9:
+         lensLookUpTable.focusAtTemp7[rowIndex] = (uint16_t)value;
+         break;
+      default:
+         DT_ERR("Unknown fieldIndex");
+         return IRC_FAILURE;
+   }
+
+   uint16_t addr = ZF_LOOK_UP_TABLE_ADDR + (rowIndex * 22) + (fieldIndex * 2);
+   uint8_t byte0, byte1;
+   uint8_t buf[2];
+   byte0 = (uint8_t)(value % 256);
+   byte1 = (uint8_t)(value / 256);
+   buf[0] = byte0;
+   buf[1] = byte1;
+
+   // Transmit to lens
+   if (flashSettings.MotorizedLensType == MLT_RPOpticalODEM660)
+   {
+      setAddress(&theRpCtrl, addr);       // toDo ECL Ajouter les valeurs -40deg et +80deg en extra
+      writeData(&theRpCtrl, 2, buf);
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Print Lens Table command parser.
+ * This parser is used to parse and validate Print Lens Table
+ * command arguments and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Print Lens Table command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf)
+{
+   extern lensTable_t lensLookUpTable;
+   uint32_t i;
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   DT_PRINTF("Lens look-up table");
+   DT_PRINTF("rowIndex\tzoom\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tDFocMin\tDFocMax\tfocLen",
+         (int8_t)FOCUS_TEMP_1, (int8_t)FOCUS_TEMP_2, (int8_t)FOCUS_TEMP_3, (int8_t)FOCUS_TEMP_4, (int8_t)FOCUS_TEMP_5, (int8_t)FOCUS_TEMP_6, (int8_t)FOCUS_TEMP_7);
+   for (i = 0; i < RP_OPT_TABLE_LEN; i++)
+   {
+      DT_PRINTF("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d", i, lensLookUpTable.zoom[i],
+            lensLookUpTable.focusAtTemp1[i], lensLookUpTable.focusAtTemp2[i], lensLookUpTable.focusAtTemp3[i], lensLookUpTable.focusAtTemp4[i],
+            lensLookUpTable.focusAtTemp5[i], lensLookUpTable.focusAtTemp6[i], lensLookUpTable.focusAtTemp7[i],
+            lensLookUpTable.deltaFocusMin[i], lensLookUpTable.deltaFocusMax[i], lensLookUpTable.focalLength[i]);
+   }
+
+   return IRC_SUCCESS;
+}
+
+/**
  * Debug terminal Help command parser parser.
  * This parser is used to print debug terminal help.
  *
@@ -2035,7 +2178,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST");
    DT_PRINTF("  List files:         LS [FILE|COL|BLOCK|NL|ICU|ACT]");
    DT_PRINTF("  Remove file:        RM filename");
-   DT_PRINTF("  File order:         FO FILE|COL|BLOCK|NL|ICU|ACT [NONE|POSIX|TYPE|NAME|CTYPE|FW|NDF|LENS]");
+   DT_PRINTF("  File order:         FO FILE|COL|BLOCK|NL|ICU|ACT [NONE|POSIX|TYPE|NAME|CTYPE|FW|NDF|LENS|FOV]");
    DT_PRINTF("  Set led state:      LED AUTO|ERR|WARN|STBY|WARNSTRM|STRM|BUSY|RDY");
    DT_PRINTF("  GPS status:         GPS [0|1]");
    DT_PRINTF("  Print version:      VER");
@@ -2054,6 +2197,8 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
    DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
+   DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
+   DT_PRINTF("  Print Lens Table:   PLT");
    DT_PRINTF("  Print help:         HLP");
 
    /*

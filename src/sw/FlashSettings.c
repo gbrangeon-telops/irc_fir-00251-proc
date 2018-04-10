@@ -30,6 +30,7 @@
 #include "DeviceKey.h"
 #include "FlashDynamicValues.h"
 #include "adc_readout.h"
+#include "RpOpticalProtocol.h"
 #include "XADC_Channels.h"
 #include <string.h>
 #include <float.h>
@@ -372,6 +373,8 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
          else
             FS_ERR("FOVNumberOfPositions must be greater than 0 with MotorizedLensType RPOpticalODEM660.");
          TDCFlagsSet(MotorizedFocusLensIsImplementedMask);
+         RPOpt_UpdateLensTableFromFlash();
+         RPOpt_CalcFOVPositionLimits(&gcRegsData);
          break;
 
       case MLT_None:
@@ -389,6 +392,9 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
          case AMT_SightlineSLA1500:
             TDCFlagsSet(AutofocusIsImplementedMask);
             gcRegsData.AutofocusMode = AM_Once;
+
+            if (TDCFlagsTst(NDFilterIsImplementedMask))
+               FS_ERR("NDF cannot be implemented with AutofocusModuleType SightlineSLA1500.");
             break;
 
          case AMT_None:
@@ -396,9 +402,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
             break;
       }
    }
-
-   //TODO ODI: Update RPOptical table with FOV[1..4]ToLensFOV and LensFOV[1..4]DeltaFocusPositionMin/Max
-   //Update also gcRegsData.FOVPositionRawMin and gcRegsData.FOVPositionRawMax
 
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))

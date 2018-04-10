@@ -25,6 +25,7 @@
 #include "GC_Callback.h"
 #include "GC_Registers.h"
 #include "GC_Events.h"
+#include "hder_inserter.h"
 #include "Calibration.h"
 #include "FileManager.h"
 #include "Trig_gen.h"
@@ -46,6 +47,8 @@
 #include "flagging.h"
 #include "gating.h"
 #include "BuiltInTests.h"
+#include "RpOpticalProtocol.h"
+#include "SightLineSLAProtocol.h"
 
 extern t_Trig gTrig;
 extern t_FpaIntf gFpaIntf;
@@ -59,6 +62,8 @@ extern t_HderInserter gHderInserter;
 extern t_FlagCfg gFlagging_ctrl;
 extern t_GatingCfg gGating_ctrl;
 extern bool gBufferStartDownloadTrigger;
+extern rpCtrl_t theRpCtrl;
+extern slCtrl_t theSlCtrl;
 
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 extern float FWExposureTime[MAX_NUM_FILTER];
@@ -603,15 +608,14 @@ void GC_AcquisitionStopCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
  */
 void GC_AutofocusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   extern bool autofocusLaunch;
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       if (!GC_AutofocusIsActive)
       {
          if ((flashSettings.AutofocusModuleType == AMT_SightlineSLA1500) && (gcRegsData.AutofocusMode == AM_Once))
-         {
-            //TODO: ODI start autofocus algo
-            //gcRegsData.FocusPositionRaw mis à jour à la fin de l'algo
-         }
+            autofocusLaunch = true;
       }
    }
 }
@@ -640,7 +644,8 @@ void GC_AutofocusROICallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI transmettre à Sightline et faire x2 dans le driver
+      uint8_t roi = (uint8_t)(gcRegsData.AutofocusROI);
+      setLensParams(&theSlCtrl, roi);
 
       // Update AutofocusROI flash dynamic value
       gFlashDynamicValues.AutofocusROI = gcRegsData.AutofocusROI;
@@ -2524,9 +2529,10 @@ void GC_FOVPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess
       // Limit setpoint to min/max
       gcRegsData.FOVPositionRawSetpoint = MIN( MAX(gcRegsData.FOVPositionRawSetpoint, gcRegsData.FOVPositionRawMin), gcRegsData.FOVPositionRawMax );
 
-      //TODO: ODI updater les registres FOV et focus à partir de la table RPOptical
-
-      //TODO: ODI transmettre nouveau setpoint à RPOptical
+      if ( goManuallyToZoomPos(&theRpCtrl, (uint16_t)(gcRegsData.FOVPositionRawSetpoint)) )
+      {
+         RPOpt_UpdateRegisters(&theRpCtrl, &gcRegsData);
+      }
    }
 }
 
@@ -2539,13 +2545,16 @@ void GC_FOVPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess
  */
 void GC_FOVPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   LensFOV_t LensFOV;
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI lire gcRegsData.FOVPositionRawSetpoint qui correspond au FOV dans la table RPOptical
-
-      //TODO: ODI updater les registres FOV et focus à partir de la table RPOptical
-
-      //TODO: ODI transmettre nouveau setpoint à RPOptical
+      LensFOV = RPOpt_ConvertUserFOVtoLensFOV((FOVPositionSetpoint_t)gcRegsData.FOVPositionSetpoint);
+      if ( RPOpt_SetLensFOV(&theRpCtrl, LensFOV) )
+      {
+         gcRegsData.FOVPositionRawSetpoint = (int32_t)RPOpt_ConvertLensFOVtoEncoder(LensFOV);
+         RPOpt_UpdateRegisters(&theRpCtrl, &gcRegsData);
+      }
    }
 }
 
@@ -2776,8 +2785,7 @@ void GC_FocusFarFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw - 100);
+      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw - FOCUS_FAST_STEP);
    }
 }
 
@@ -2792,8 +2800,7 @@ void GC_FocusFarSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw - 50);
+      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw - FOCUS_SLOW_STEP);
    }
 }
 
@@ -2808,8 +2815,7 @@ void GC_FocusNearFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw + 100);
+      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw + FOCUS_FAST_STEP);
    }
 }
 
@@ -2824,8 +2830,7 @@ void GC_FocusNearSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw + 50);
+      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw + FOCUS_SLOW_STEP);
    }
 }
 
@@ -2875,8 +2880,7 @@ void GC_FocusPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAcce
    {
       // Limit setpoint to min/max
       gcRegsData.FocusPositionRawSetpoint = MIN( MAX(gcRegsData.FocusPositionRawSetpoint, gcRegsData.FocusPositionRawMin), gcRegsData.FocusPositionRawMax );
-
-      //TODO: ODI transmettre nouveau setpoint à RPOptical
+      goFastToFocus(&theRpCtrl, (uint16_t)(gcRegsData.FocusPositionRawSetpoint));
    }
 }
 
@@ -4741,8 +4745,8 @@ void GC_ZoomInFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], gcRegsData.FOVPositionRaw + 100);
+      int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomInFast);
+      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
    }
 }
 
@@ -4757,8 +4761,8 @@ void GC_ZoomInSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], gcRegsData.FOVPositionRaw + 50);
+      int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomInSlow);
+      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
    }
 }
 
@@ -4773,8 +4777,8 @@ void GC_ZoomOutFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], gcRegsData.FOVPositionRaw - 100);
+      int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomOutFast);
+      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
    }
 }
 
@@ -4789,8 +4793,8 @@ void GC_ZoomOutSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      //TODO: ODI calculer l'incrément
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], gcRegsData.FOVPositionRaw - 50);
+      int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomOutSlow);
+      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
    }
 }
 

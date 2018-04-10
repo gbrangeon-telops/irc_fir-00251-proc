@@ -58,6 +58,8 @@
 // #define SREC_VERBOSE
 // #define TM_VERBOSE
 // #define XADC_VERBOSE
-
+// #define RP_VERBOSE
+// #define SL_VERBOSE
+// #define AUTO_VERBOSE
 
 #endif // VERBOSE_H

@@ -67,6 +67,8 @@ IRC_Status_t Proc_Intc_Init();
 IRC_Status_t Proc_Intc_Start();
 IRC_Status_t Proc_GPS_Init();
 IRC_Status_t Proc_FH_Init();
+IRC_Status_t Proc_RP_Init();
+IRC_Status_t Proc_SL_Init();
 IRC_Status_t Proc_ReleaseInfo_Init();
 IRC_Status_t Proc_Sensor_Init();
 IRC_Status_t Proc_FlashDynamicValues_Init();

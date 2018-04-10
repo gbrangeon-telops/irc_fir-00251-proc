@@ -1,3 +1,4 @@
+set firmwareArchive="F:\DisqueTELOPS\Production\IRCAM\Firmwares\Archive"
 set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%)"
 set paperworkTemplateDir=%scriptsDir%\paperwork\template
 set ntxminiFile=CommonTEL2000LibProject_xml_%xmlVersion%_%sensorWidth%x%sensorHeight%.exe
@@ -26,6 +27,7 @@ copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFile%
 %zip% a -r -tzip %paperworkTemplateDir%.zip %paperworkTemplateDir%\*.*
 
 move %paperworkTemplateDir%.zip %releaseDir%\Release_%firmwareVersion:.=_%.xlsx
+cscript.exe %scriptsDir%\xlsx2pdf.js %releaseDir%\Release_%firmwareVersion:.=_%.xlsx
 
 rem Generate firmware updater batch file
 echo @echo off> %fubatch%
@@ -60,3 +62,5 @@ echo.>> %fubatch%
 echo pause>> %fubatch%
 echo.>> %fubatch%
 echo :end>> %fubatch%
+
+rem move /-Y %releaseDir% %firmwareArchive%

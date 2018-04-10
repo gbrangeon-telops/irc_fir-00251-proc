@@ -71,7 +71,7 @@ entity bd_wrapper is
       UART_TO_FPGA : out t_uartns550_out;
       FPGA_TO_UART : in t_uartns550_in;
       OEM_UART_OUT : out t_uartns550_out;
-      OEM_UART_IN : in t_uartns550_in;
+      OEM_UART_IN : in t_uartns550_in; 
       PLEORA_UART_SOUT : out STD_LOGIC;
       PLEORA_UART_SIN : in STD_LOGIC;
       USB_TO_UART : in t_uartns550_in;
@@ -82,6 +82,8 @@ entity bd_wrapper is
       FW_UART_IN : in t_uartns550_in;
       NDF_UART_rxd : in STD_LOGIC;
       NDF_UART_txd : out STD_LOGIC;
+      LENS_UART_SOUT : out STD_LOGIC;
+      LENS_UART_SIN : in STD_LOGIC;
       
       LED_GPIO_tri_o : out STD_LOGIC_VECTOR ( 3 downto 0 );
       POWER_GPIO : inout STD_LOGIC_VECTOR ( 10 downto 0 );
@@ -679,6 +681,8 @@ architecture bd_wrapper of bd_wrapper is
     OEM_UART_rxrdyn : out STD_LOGIC;
     OEM_UART_txd : out STD_LOGIC;
     OEM_UART_txrdyn : out STD_LOGIC;
+    LENS_UART_SIN : in STD_LOGIC;
+    LENS_UART_SOUT : out STD_LOGIC;
     PLEORA_UART_SIN : in STD_LOGIC;
     PLEORA_UART_SOUT : out STD_LOGIC;
     RQC_LUT_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -1250,7 +1254,11 @@ begin
       
       --PLEORA UART WRAPPER
       PLEORA_UART_SIN 		=> PLEORA_UART_SIN,
-      PLEORA_UART_SOUT 		=> PLEORA_UART_SOUT,
+      PLEORA_UART_SOUT 		=> PLEORA_UART_SOUT, 
+      
+      --LENS UART WRAPPER
+      LENS_UART_SIN => LENS_UART_SIN,
+      LENS_UART_SOUT => LENS_UART_SOUT,
       
       --USB UART WRAPPER
       USB_UART_baudoutn 	=> UART_TO_USB.BAUDOUTN,
