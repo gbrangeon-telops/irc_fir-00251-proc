@@ -422,6 +422,13 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 4;
 
                case 4:
+                  // 2.4.x -> 2.5.x
+                  hdr->ExposureTimeOffset = FlashSettings_FlashSettingsFileHeader_default.ExposureTimeOffset;
+                  hdr->FWReferenceTemperatureGain = FlashSettings_FlashSettingsFileHeader_default.FWReferenceTemperatureGain;
+                  hdr->FWReferenceTemperatureOffset = FlashSettings_FlashSettingsFileHeader_default.FWReferenceTemperatureOffset;
+                  hdr->FileStructureMinorVersion = 5;
+
+               case 5:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;
