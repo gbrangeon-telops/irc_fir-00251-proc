@@ -12,10 +12,6 @@
 #include <stdio.h>
 
 
-////////// ***** Variables globales ***** //////////////
-uint8_t  metricRegion;        // % of the screen (0 to 100)
-
-
 const uint8_t crc8_Table[ ] =
 {
 0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31, 65,
