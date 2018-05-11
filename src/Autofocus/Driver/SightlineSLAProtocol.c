@@ -432,7 +432,6 @@ bool setLensParams(slCtrl_t* aCtrl, uint8_t aMetricRegion)
 
    aCtrl->serial_data.txBuffer[ind++] = chksum;
    aCtrl->serial_data.txDataCount += 15;
-   metricRegion = aMetricRegion;
    return true;
 }
 

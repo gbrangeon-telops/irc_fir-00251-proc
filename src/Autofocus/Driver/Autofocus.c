@@ -293,7 +293,7 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
       case initTelemetry:                    // Focus Stats (0x55 response ID) and ROI
       {
          setCoordReportMode(aSlCtrl, 1, 0x80, 0);
-         setLensParams(aSlCtrl, metricRegion);          // ToDo ECL à tester
+         setLensParams(aSlCtrl, 50);          // ToDo ECL à tester
          state = autoFocusInit;
          break;
       }
