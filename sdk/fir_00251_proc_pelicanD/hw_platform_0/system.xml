@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Feb 16 15:58:58 2018" VIVADOVERSION="2013.4">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Apr 27 12:09:20 2018" VIVADOVERSION="2013.4">
 
   <SYSTEMINFO ARCH="kintex7" DEVICE="7k160t" NAME="core_imp" PACKAGE="fbg676" SPEEDGRADE="-1"/>
 
@@ -119,12 +119,17 @@
         <CONNECTION INSTANCE="axi_gps_uart" PORT="sout"/>
       </CONNECTIONS>
     </PORT>
+    <PORT DIR="O" NAME="LENS_UART_SOUT" SIGIS="undef" SIGNAME="axi_lens_uart_sout">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="axi_lens_uart" PORT="sout"/>
+      </CONNECTIONS>
+    </PORT>
     <PORT DIR="I" NAME="bulk_interrupt" SENSITIVITY="EDGE_RISING" SIGIS="INTERRUPT" SIGNAME="External_Ports_bulk_interrupt">
       <CONNECTIONS>
         <CONNECTION INSTANCE="MCU_microblaze_1_axi_intc" PORT="intr"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="50000000" DIR="O" NAME="clk_50" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
+    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_50" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out4"/>
       </CONNECTIONS>
@@ -134,22 +139,22 @@
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out1"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="160000000" DIR="O" NAME="clk_160" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
+    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_160" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out2"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="200000000" DIR="O" NAME="clk_200" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out3">
+    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_200" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out3">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out3"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="20000000" DIR="O" NAME="clk_20" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out5">
+    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_20" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out5">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out5"/>
       </CONNECTIONS>
     </PORT>
-    <PORT CLKFREQUENCY="80000000" DIR="O" NAME="clk_80" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+    <PORT CLKFREQUENCY="100000000" DIR="O" NAME="clk_80" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
       <CONNECTIONS>
         <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
       </CONNECTIONS>
@@ -179,6 +184,11 @@
     <PORT DIR="I" NAME="PLEORA_UART_SIN" SIGIS="undef" SIGNAME="External_Ports_PLEORA_UART_SIN">
       <CONNECTIONS>
         <CONNECTION INSTANCE="pleora_uart" PORT="sin"/>
+      </CONNECTIONS>
+    </PORT>
+    <PORT DIR="I" NAME="LENS_UART_SIN" SIGIS="undef" SIGNAME="External_Ports_LENS_UART_SIN">
+      <CONNECTIONS>
+        <CONNECTION INSTANCE="axi_lens_uart" PORT="sin"/>
       </CONNECTIONS>
     </PORT>
     <PORT DIR="I" NAME="vn_in" SIGIS="undef" SIGNAME="External_Ports_vn_in">
@@ -683,16 +693,6 @@
     <PORT DIR="O" NAME="M_AXIS_USART_tlast" SIGIS="undef"/>
     <PORT DIR="I" NAME="M_AXIS_USART_tready" SIGIS="undef"/>
     <PORT DIR="O" NAME="M_AXIS_USART_tvalid" SIGIS="undef"/>
-    <PORT DIR="I" NAME="LENS_UART_SIN" SIGIS="undef" SIGNAME="External_Ports_LENS_UART_SIN">
-      <CONNECTIONS>
-        <CONNECTION INSTANCE="axi_lens_uart" PORT="sin"/>
-      </CONNECTIONS>
-    </PORT>
-    <PORT DIR="O" NAME="LENS_UART_SOUT" SIGIS="undef" SIGNAME="axi_lens_uart_sout">
-      <CONNECTIONS>
-        <CONNECTION INSTANCE="axi_lens_uart" PORT="sout"/>
-      </CONNECTIONS>
-    </PORT>
   </EXTERNALPORTS>
 
   <MODULES>
@@ -1812,7 +1812,6 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
       <MEMORYMAP>
-        <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x40410000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x40411FFF" INSTANCE="axi_lens_uart" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44AD0000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44AD1FFF" INSTANCE="M_BULK_AXI" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44A80000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44A80FFF" INSTANCE="TRIGGER_CTRL" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44A70000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44A70FFF" INSTANCE="SFW_CTRL" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
@@ -1849,13 +1848,13 @@
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x41C00000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x41C0FFFF" INSTANCE="axi_timer_0" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x44A90000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x44A9FFFF" INSTANCE="axi_quad_spi_0" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x4040E000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x4040FFFF" INSTANCE="axi_ndf_uart" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
+        <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x40410000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x40411FFF" INSTANCE="axi_lens_uart" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x40000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x4000FFFF" INSTANCE="axi_gpio_0" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="REGISTER"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x80000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0xBFFFFFFF" INSTANCE="MIG_Calibration_CAL_DDR_MIG" IS_DATA="TRUE" IS_INSTRUCTION="FALSE" MEMTYPE="MEMORY"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x50000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x5FFFFFFF" INSTANCE="MIG_Code_mig_7series_0" IS_DATA="FALSE" IS_INSTRUCTION="TRUE" MEMTYPE="MEMORY"/>
         <MEMRANGE BASENAME="C_BASEADDR" BASEVALUE="0x00000000" HIGHNAME="C_HIGHADDR" HIGHVALUE="0x00007FFF" INSTANCE="MCU_microblaze_1_local_memory_ilmb_bram_if_cntlr" IS_DATA="FALSE" IS_INSTRUCTION="TRUE" MEMTYPE="MEMORY"/>
       </MEMORYMAP>
       <PERIPHERALS>
-        <PERIPHERAL INSTANCE="axi_lens_uart"/>
         <PERIPHERAL INSTANCE="xadc_wiz_1"/>
         <PERIPHERAL INSTANCE="power_management"/>
         <PERIPHERAL INSTANCE="pleora_uart"/>
@@ -1872,6 +1871,7 @@
         <PERIPHERAL INSTANCE="axi_timer_0"/>
         <PERIPHERAL INSTANCE="axi_quad_spi_0"/>
         <PERIPHERAL INSTANCE="axi_ndf_uart"/>
+        <PERIPHERAL INSTANCE="axi_lens_uart"/>
         <PERIPHERAL INSTANCE="axi_gpio_0"/>
         <PERIPHERAL INSTANCE="MIG_Calibration_CAL_DDR_MIG"/>
         <PERIPHERAL INSTANCE="MCU_microblaze_1_local_memory_ilmb_bram_if_cntlr"/>
@@ -2008,7 +2008,7 @@
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_2_xbar" PORT="m_axi_rready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="intr" SENSITIVITY="EDGE_RISING:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:EDGE_RISING:EDGE_RISING:EDGE_RISING:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH:LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="MCU_mdm_1_Interrupt &amp; oem_uart_ip2intc_irpt &amp; clink_uart_ip2intc_irpt &amp; xadc_wiz_1_ip2intc_irpt &amp; axi_timer_0_interrupt &amp; pleora_uart_ip2intc_irpt &amp; fpga_output_uart_ip2intc_irpt &amp; axi_usb_uart_ip2intc_irpt &amp; External_Ports_bulk_interrupt &amp; axi_quad_spi_0_ip2intc_irpt &amp; External_Ports_AEC_INTC &amp; axi_gps_uart_ip2intc_irpt &amp; fw_uart_ip2intc_irpt &amp; power_management_ip2intc_irpt &amp; axi_ndf_uart_ip2intc_irpt &amp; axi_lens_uart_ip2intc_irpt">
+        <PORT DIR="I" NAME="intr" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT" SIGNAME="MCU_mdm_1_Interrupt &amp; oem_uart_ip2intc_irpt &amp; clink_uart_ip2intc_irpt &amp; xadc_wiz_1_ip2intc_irpt &amp; axi_timer_0_interrupt &amp; pleora_uart_ip2intc_irpt &amp; fpga_output_uart_ip2intc_irpt &amp; axi_usb_uart_ip2intc_irpt &amp; External_Ports_bulk_interrupt &amp; axi_quad_spi_0_ip2intc_irpt &amp; External_Ports_AEC_INTC &amp; axi_gps_uart_ip2intc_irpt &amp; fw_uart_ip2intc_irpt &amp; power_management_ip2intc_irpt &amp; axi_ndf_uart_ip2intc_irpt &amp; axi_lens_uart_ip2intc_irpt">
           <CONNECTIONS>
             <CONNECTION INSTANCE="MCU_mdm_1" PORT="Interrupt"/>
             <CONNECTION INSTANCE="oem_uart" PORT="ip2intc_irpt"/>
@@ -4651,7 +4651,7 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axi_mm2s_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_mm2s_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -4662,7 +4662,7 @@
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mm2s_err" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axis_mm2s_cmdsts_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_mm2s_cmdsts_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -4756,7 +4756,7 @@
         <PORT DIR="O" NAME="m_axis_mm2s_tlast" SIGIS="undef"/>
         <PORT DIR="O" NAME="m_axis_mm2s_tvalid" SIGIS="undef"/>
         <PORT DIR="I" NAME="m_axis_mm2s_tready" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axi_s2mm_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axi_s2mm_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -4767,7 +4767,7 @@
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="s2mm_err" SIGIS="undef"/>
-        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="m_axis_s2mm_cmdsts_awclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="m_axis_s2mm_cmdsts_awclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -5011,7 +5011,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_59"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_26"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -5439,7 +5439,7 @@
         <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_12"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_3"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -5755,7 +5755,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_24"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_6"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6153,7 +6153,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_25"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_7"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -6359,11 +6359,11 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_26"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_8"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -6595,11 +6595,11 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_27"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_cc_df_9"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="80000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="s_axi_aclk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out6">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out6"/>
           </CONNECTIONS>
@@ -8557,7 +8557,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="1"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_4"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_cc_1"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -8995,7 +8995,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="0"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_28"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_10"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -9375,7 +9375,7 @@
         <PARAMETER NAME="ACLK_ASYNC" VALUE="0"/>
         <PARAMETER NAME="SYNCHRONIZATION_STAGES" VALUE="3"/>
         <PARAMETER NAME="ACLK_RATIO" VALUE="1:2"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_29"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_us_11"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -13001,7 +13001,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_axi_uart16550_0_8"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_axi_lens_uart_1"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -13190,7 +13190,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_axi_ndf_uart_1"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_axi_ndf_uart_2"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -13392,7 +13392,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_60"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_27"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15263,7 +15263,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_62"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m00_data_fifo_29"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15499,7 +15499,7 @@
         <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_13"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_4"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15678,7 +15678,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m01_data_fifo_63"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m01_data_fifo_30"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -15917,7 +15917,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m11_data_fifo_64"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m11_data_fifo_31"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -16156,7 +16156,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_m12_data_fifo_65"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_m12_data_fifo_32"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -16395,7 +16395,7 @@
         <PARAMETER NAME="READ_FIFO_DEPTH" VALUE="512"/>
         <PARAMETER NAME="WRITE_FIFO_DELAY" VALUE="1"/>
         <PARAMETER NAME="READ_FIFO_DELAY" VALUE="1"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_61"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_s00_data_fifo_28"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -18646,7 +18646,7 @@
         <PARAMETER NAME="RUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="WUSER_WIDTH" VALUE="0"/>
         <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_14"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_auto_pc_5"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="BUS"/>
       </PARAMETERS>
       <PORTS>
@@ -20414,7 +20414,7 @@
         <PARAMETER NAME="C_HIGHADDR" VALUE="0x44A9FFFF"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="50000000" DIR="I" NAME="ext_spi_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="ext_spi_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out4"/>
           </CONNECTIONS>
@@ -20745,7 +20745,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_axi_usb_uart_2"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_axi_usb_uart_3"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -20926,7 +20926,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_clink_uart_3"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_clink_uart_4"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -21583,6 +21583,7 @@
             <CONNECTION INSTANCE="MIG_Code_axi_interconnect_0_s01_couplers_auto_us" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_gpio_0" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_gps_uart" PORT="s_axi_aclk"/>
+            <CONNECTION INSTANCE="axi_lens_uart" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_xbar" PORT="aclk"/>
             <CONNECTION INSTANCE="axi_peripheral_axi_interconnect_0_s00_couplers_s00_data_fifo" PORT="aclk"/>
@@ -21605,7 +21606,6 @@
             <CONNECTION INSTANCE="pleora_uart" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="power_management" PORT="s_axi_aclk"/>
             <CONNECTION INSTANCE="xadc_wiz_1" PORT="s_axi_aclk"/>
-            <CONNECTION INSTANCE="axi_lens_uart" PORT="s_axi_aclk"/>
           </CONNECTIONS>
         </PORT>
         <PORT CLKFREQUENCY="160000000" DIR="O" NAME="clk_out2" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out2">
@@ -21666,7 +21666,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_fpga_output_uart_4"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_fpga_output_uart_5"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -21847,7 +21847,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_fw_uart_5"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_fw_uart_6"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -22028,7 +22028,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_oem_uart_6"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_oem_uart_7"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -22209,7 +22209,7 @@
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ" VALUE="25000000"/>
         <PARAMETER NAME="C_EXTERNAL_XIN_CLK_HZ_d" VALUE="25"/>
         <PARAMETER NAME="C_S_AXI_ACLK_FREQ_HZ_d" VALUE="100"/>
-        <PARAMETER NAME="Component_Name" VALUE="core_pleora_uart_7"/>
+        <PARAMETER NAME="Component_Name" VALUE="core_pleora_uart_8"/>
         <PARAMETER NAME="BASE_USER" VALUE="1"/>
         <PARAMETER NAME="C_USE_MODEM_PORTS" VALUE="1"/>
         <PARAMETER NAME="C_USE_USER_PORTS" VALUE="1"/>
@@ -22570,7 +22570,7 @@
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
       </PARAMETERS>
       <PORTS>
-        <PORT CLKFREQUENCY="50000000" DIR="I" NAME="slowest_sync_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
+        <PORT CLKFREQUENCY="100000000" DIR="I" NAME="slowest_sync_clk" SIGIS="clk" SIGNAME="clk_wiz_1_clk_out4">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_1" PORT="clk_out4"/>
           </CONNECTIONS>
@@ -22656,6 +22656,7 @@
             <CONNECTION INSTANCE="MIG_Code_mig_7series_0" PORT="aresetn"/>
             <CONNECTION INSTANCE="axi_gpio_0" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_gps_uart" PORT="s_axi_aresetn"/>
+            <CONNECTION INSTANCE="axi_lens_uart" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_ndf_uart" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_quad_spi_0" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="axi_timer_0" PORT="s_axi_aresetn"/>
@@ -22667,7 +22668,6 @@
             <CONNECTION INSTANCE="pleora_uart" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="power_management" PORT="s_axi_aresetn"/>
             <CONNECTION INSTANCE="xadc_wiz_1" PORT="s_axi_aresetn"/>
-            <CONNECTION INSTANCE="axi_lens_uart" PORT="s_axi_aresetn"/>
           </CONNECTIONS>
         </PORT>
       </PORTS>
@@ -23093,8 +23093,8 @@
   <REPOSITORIES/>
 
   <FILES>
-    <FILE FULLNAME="fir_00251_proc_pelicanD.bit" TYPE="bit"/>
-    <FILE FULLNAME="fir_00251_proc_pelicanD_bd.bmm" TYPE="bmm"/>
+    <FILE FULLNAME="fir_00251_proc_scorpiomwA.bit" TYPE="bit"/>
+    <FILE FULLNAME="fir_00251_proc_scorpiomwA_bd.bmm" TYPE="bmm"/>
   </FILES>
 
 </EDKSYSTEM>
