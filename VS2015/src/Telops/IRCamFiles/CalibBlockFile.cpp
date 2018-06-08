@@ -43,9 +43,9 @@ bool CalibBlock_LoadCalibrationBlock(unsigned char *buffer, unsigned int bufferL
 			return false;
 		offset += calibration->m_PdHeader.DataHeaderLength;
 		//data processing
-		int pixelCount = calibration->m_BlockHeader.Width * calibration->m_BlockHeader.Height;
-		calibration->m_PdData = new CalibBlock_PixelData_t[pixelCount];
-		for (int i = 0; i < pixelCount; i++)
+		calibration->m_PdCount = calibration->m_BlockHeader.Width * calibration->m_BlockHeader.Height;
+		calibration->m_PdData = new CalibBlock_PixelData_t[calibration->m_PdCount];
+		for (int i = 0; i < calibration->m_PdCount; i++)
 		{
 			readSize = CalibBlock_ParsePixelData_v2((uint8_t*)buffer + offset, bufferLen - offset, &calibration->m_PdData[i]);
 			if (readSize == 0) //error reading section
@@ -60,27 +60,6 @@ bool CalibBlock_LoadCalibrationBlock(unsigned char *buffer, unsigned int bufferL
 			return false;
 		// #todo do data processing
 		offset += calibration->m_TkHeader.DataHeaderLength + calibration->m_TkHeader.MaxTKDataLength;
-		//data processing
-		//partially complete, must finish conversion from pixel data copy
-		//int TvsINTCount = calibration->m_TkHeader.TvsINT_FitOrder + 1;
-		//calibration->m_PdData = new CalibBlock_PixelData_t[pixelCount];
-		//for (int i = 0; i < pixelCount; i++)
-		//{
-		//	readSize = CalibBlock_ParsePixelData_v2((uint8_t*)buffer + offset, bufferLen - offset, &calibration->m_PdData[i]);
-		//	if (readSize == 0) //error reading section
-		//		return false;
-		//	offset += sizeof(uint64_t);
-		//}
-		////data processing
-		//int INTvsTCount = calibration->m_TkHeader.INTvsT_FitOrder + 1;
-		//calibration->m_PdData = new CalibBlock_PixelData_t[pixelCount];
-		//for (int i = 0; i < pixelCount; i++)
-		//{
-		//	readSize = CalibBlock_ParsePixelData_v2((uint8_t*)buffer + offset, bufferLen - offset, &calibration->m_PdData[i]);
-		//	if (readSize == 0) //error reading section
-		//		return false;
-		//	offset += sizeof(uint64_t);
-		//}
 	}
 	if (calibration->m_BlockHeader.LUTNLDataPresence) //only scan it the section is marked as present
 	{
@@ -89,13 +68,13 @@ bool CalibBlock_LoadCalibrationBlock(unsigned char *buffer, unsigned int bufferL
 			return false;
 		offset += calibration->m_NlHeader.DataHeaderLength;
 		//data processing
-		int listCount = calibration->m_NlHeader.NumberOfLUTNL;
-		calibration->m_NlData = new CalibBlock_LUTNLData_t*[listCount];
-		for (int i = 0; i < listCount; i++)
+		calibration->m_NlListCount = calibration->m_NlHeader.NumberOfLUTNL;
+		calibration->m_NlData = new CalibBlock_LUTNLData_t*[calibration->m_NlListCount];
+		for (int i = 0; i < calibration->m_NlListCount; i++)
 		{
-			int itemCount = calibration->m_NlHeader.LUT_Size;
-			calibration->m_NlData[i] = new CalibBlock_LUTNLData_t[itemCount];
-			for (int k = 0; k < itemCount; k++)
+			calibration->m_NlListSize = calibration->m_NlHeader.LUT_Size;
+			calibration->m_NlData[i] = new CalibBlock_LUTNLData_t[calibration->m_NlListSize];
+			for (int k = 0; k < calibration->m_NlListSize; k++)
 			{
 				readSize = CalibBlock_ParseLUTNLData_v2((uint8_t*)buffer + offset, bufferLen - offset, &calibration->m_NlData[i][k]);
 				if (readSize == 0) //error reading section
@@ -115,9 +94,9 @@ bool CalibBlock_LoadCalibrationBlock(unsigned char *buffer, unsigned int bufferL
 				return false;
 			offset += calibration->m_RqHeader[i].DataHeaderLength;
 			//data processing
-			int rqCount = calibration->m_RqHeader[i].LUT_Size;
-			calibration->m_RqData[i] = new CalibBlock_LUTRQData_t[calibration->m_RqHeader[i].LUT_Size];
-			for (int k = 0; k < rqCount; k++)
+			calibration->m_RqListSize = calibration->m_RqHeader[i].LUT_Size;
+			calibration->m_RqData[i] = new CalibBlock_LUTRQData_t[calibration->m_RqListSize];
+			for (int k = 0; k < calibration->m_RqListSize; k++)
 			{
 				readSize = CalibBlock_ParseLUTRQData_v2((uint8_t*)buffer + offset, bufferLen - offset, &calibration->m_RqData[i][k]);
 				if (readSize == 0) //error reading section
@@ -131,6 +110,39 @@ bool CalibBlock_LoadCalibrationBlock(unsigned char *buffer, unsigned int bufferL
 	else
 		return false;
 
+
+}
+
+void CalibBlock_DeleteCalibrationBlock(CalibBlockFile *calibration)
+{
+	if (calibration->m_PdData != NULL)
+	{
+		delete[] calibration->m_PdData;
+		calibration->m_PdData = NULL;
+	}
+
+	for (int i = 0; i < calibration->m_NlListCount; i++)
+	{
+		if (calibration->m_NlData[i] != NULL)
+		{
+			delete[] calibration->m_NlData[i];
+			calibration->m_NlData[i] = NULL;
+		}
+	}
+	if (calibration->m_NlData != NULL)
+	{
+		delete[] calibration->m_NlData;
+		calibration->m_NlData = NULL;
+	}
+
+	for (int i = 0; i < calibration->m_RqListCount; i++)
+	{
+		if (calibration->m_RqData[i] != NULL)
+		{
+			delete[] calibration->m_RqData[i];
+			calibration->m_RqData[i] = NULL;
+		}
+	}
 
 }
 

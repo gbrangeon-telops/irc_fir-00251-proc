@@ -148,24 +148,29 @@ uint32_t CalibBlock_ParseLUTRQDataHeader(uint8_t *buffer, uint32_t bufferLen, fi
 	{
 	public: 
 		fileInfo_t						m_FileInfo;
-		int								m_RqListCount;
 
 		CalibBlock_BlockFileHeader_t	m_BlockHeader;
 
+		int								m_PdCount;
 		CalibBlock_PixelDataHeader_t	m_PdHeader;
 		CalibBlock_PixelData_t			*m_PdData;
 
 		CalibBlock_MaxTKDataHeader_t	m_TkHeader;
 
+		int								m_NlListCount;
+		int								m_NlListSize;
 		CalibBlock_LUTNLDataHeader_t	m_NlHeader;
 		CalibBlock_LUTNLData_t			**m_NlData;
 
+		int								m_RqListCount;
+		int								m_RqListSize;
 		CalibBlock_LUTRQDataHeader_t	m_RqHeader[4];
 		CalibBlock_LUTRQData_t			*m_RqData[4];
 
 	} ;
 
 	bool CalibBlock_LoadCalibrationBlock(unsigned char *buffer, unsigned int bufferLen, CalibBlockFile *calibration);
+	void CalibBlock_DeleteCalibrationBlock(CalibBlockFile *calibration);
 
 
 #endif // CALIBBLOCKFILE_H

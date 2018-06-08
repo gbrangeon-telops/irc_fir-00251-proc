@@ -42,6 +42,8 @@ namespace CameraFileLibTests
 
 			Assert::IsTrue(CalibBlock_LoadCalibrationBlock((uint8_t*)buffer, length, &calibrationBlock));
 
+			CalibBlock_DeleteCalibrationBlock(&calibrationBlock);
+
 			inFile.close();
 		}
 		TEST_METHOD(LoadImageCorrectionFile)
