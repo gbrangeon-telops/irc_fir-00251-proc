@@ -16,9 +16,9 @@
 #ifndef CALIBBLOCKFILE_H
 #define CALIBBLOCKFILE_H
 
-#include "IRCamFiles.h"
-#include "CalibBlockFile_v1.h"
-#include "CalibBlockFile_v2.h"
+#include "IRCamFiles\IRCamFiles.h"
+#include "IRCamFiles\CalibBlockFile_v1.h"
+#include "IRCamFiles\CalibBlockFile_v2.h"
 #include "FileInfo.h"
 #include <stdint.h>
 
