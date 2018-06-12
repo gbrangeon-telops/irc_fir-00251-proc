@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.5.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.6.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -164,6 +164,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ExposureTimeOffset = */ 0,
    /* FWReferenceTemperatureGain = */ 0.0F,
    /* FWReferenceTemperatureOffset = */ 0.0F,
+   /* ClConfiguration = */ 2,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -365,7 +366,8 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ExposureTimeOffset, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
       memcpy(&hdr->FWReferenceTemperatureGain, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->FWReferenceTemperatureOffset, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 116; // Skip FREE space
+      memcpy(&hdr->ClConfiguration, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 115; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -600,7 +602,8 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ExposureTimeOffset, sizeof(int32_t)); numBytes += sizeof(int32_t);
       memcpy(&buffer[numBytes], &hdr->FWReferenceTemperatureGain, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->FWReferenceTemperatureOffset, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 116); numBytes += 116; // FREE space
+      memcpy(&buffer[numBytes], &hdr->ClConfiguration, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 115); numBytes += 115; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -784,6 +787,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ExposureTimeOffset: %d\n", hdr->ExposureTimeOffset);
    FPGA_PRINTF("FWReferenceTemperatureGain: " _PCF(3) "\n", _FFMT(hdr->FWReferenceTemperatureGain, 3));
    FPGA_PRINTF("FWReferenceTemperatureOffset: " _PCF(3) "\n", _FFMT(hdr->FWReferenceTemperatureOffset, 3));
+   FPGA_PRINTF("ClConfiguration: %d\n", hdr->ClConfiguration);
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 
