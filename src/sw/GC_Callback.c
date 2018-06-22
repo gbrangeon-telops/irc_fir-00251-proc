@@ -2046,27 +2046,9 @@ void GC_EventTelopsTimestampCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
  */
 void GC_ExposureAutoCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   float exposureTimeMin = FPA_MIN_EXPOSURE; // Default ExposureTimeMin value
-
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (GC_AECPlusIsActive)
-      {
-         // Default ExposureTimeMin value when AEC+ is active
-         exposureTimeMin = FPA_AECP_MIN_EXPOSURE;
-
-         if (flashSettings.AECPlusExposureTimeMin != 0.0F)
-         {
-            // Overwrite ExposureTimeMin value with the value specified in flash settings
-            exposureTimeMin = flashSettings.AECPlusExposureTimeMin;
-         }
-      }
-
-      // Update ExposureTimeMin value when needed
-      if (gcRegsData.ExposureTimeMin != exposureTimeMin)
-      {
-         GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], exposureTimeMin);
-      }
+      GC_UpdateExposureTimeMin();
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);

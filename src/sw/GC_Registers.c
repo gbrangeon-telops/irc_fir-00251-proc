@@ -1330,6 +1330,7 @@ void GC_UnlockCamera()
    {
       AvailabilityFlagsSet(ManufacturerTestImageIsAvailableMask);
    }
+   GC_UpdateExposureTimeMin();
 }
 
 void GC_SetMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)
@@ -1643,4 +1644,44 @@ void GC_UpdateFOV()
 
    // Update header
    HDER_UpdateFOVHeader(&gHderInserter, &gcRegsData);
+}
+
+/**
+ * Update ExposureTimeMin register according to active mode.
+ */
+void GC_UpdateExposureTimeMin()
+{
+   float exposureTimeMin;
+
+   // Always use default value when camera is unlocked
+   if (gGC_ProprietaryFeatureKeyIsValid)
+   {
+      exposureTimeMin = FPA_MIN_EXPOSURE;
+   }
+   else
+   {
+      // Use the most restrictive value (max)
+      exposureTimeMin = MAX(FPA_MIN_EXPOSURE, flashSettings.ExposureTimeMin);
+
+      // Compare with specific value when AEC+ is active
+      if (GC_AECPlusIsActive)
+      {
+         if (flashSettings.AECPlusExposureTimeMin != 0.0F)
+         {
+            // Use the most restrictive value (max)
+            exposureTimeMin = MAX(exposureTimeMin, flashSettings.AECPlusExposureTimeMin);
+         }
+         else
+         {
+            // Use the most restrictive value (max)
+            exposureTimeMin = MAX(exposureTimeMin, FPA_AECP_MIN_EXPOSURE);
+         }
+      }
+   }
+
+   // Update ExposureTimeMin value when needed
+   if (gcRegsData.ExposureTimeMin != exposureTimeMin)
+   {
+      GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], exposureTimeMin);
+   }
 }

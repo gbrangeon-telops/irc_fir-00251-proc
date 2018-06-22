@@ -381,7 +381,7 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_FORMAT:
-                     if (gGC_ProprietaryFeatureKeyIsValid == 1)
+                     if (gGC_ProprietaryFeatureKeyIsValid)
                      {
                         if (FM_Format() == IRC_SUCCESS)
                         {

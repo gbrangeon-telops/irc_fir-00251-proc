@@ -1227,7 +1227,7 @@ void Calibration_SM()
          }
 
          // Update CalibrationMode register
-         if ((gcRegsData.CalibrationMode == CM_Raw0) && (!gGC_ProprietaryFeatureKeyIsValid))
+         if ((gcRegsData.CalibrationMode == CM_Raw0) && (gGC_ProprietaryFeatureKeyIsValid == 0))
          {
             GC_SetCalibrationMode(CM_RT);
          }
@@ -1442,7 +1442,7 @@ void Calibration_Reset()
    GC_SetCalibrationMode(CM_Raw0);
 
    // Show Raw0 only in Telops mode
-   if (gGC_ProprietaryFeatureKeyIsValid == 1)
+   if (gGC_ProprietaryFeatureKeyIsValid)
    {
       AvailabilityFlagsSet(CalibrationIsAvailableMask);
    }

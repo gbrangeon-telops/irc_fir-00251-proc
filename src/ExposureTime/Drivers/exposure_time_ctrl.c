@@ -48,11 +48,7 @@
 //--------------------------------------------------------------------------
 void EXP_Init(t_ExposureTime *a, const gcRegistersData_t *GCRegs)
 {
-   a->EXP_Source     = VHD_MB_SOURCE;  // pour l'instant, source du temps d'integration = VHD_MB_SOURCE
-   a->EXP_Time_Min   = (uint32_t)((float)FPA_MIN_EXPOSURE * EXPOSURE_TIME_FACTOR); // plus tard, ce sera (uint32_t)((float)GCRegs.ExposureTimeMin * EXPOSURE_TIME_FACTOR)
-   a->EXP_Time_Max   = (uint32_t)((float)FPA_MAX_EXPOSURE * EXPOSURE_TIME_FACTOR); // plus tard, ce sera (uint32_t)((float)GCRegs.ExposureTimeMax * EXPOSURE_TIME_FACTOR)
-   a->EXP_Time       = (uint32_t)((float)FPA_DEFAULT_EXPOSURE * EXPOSURE_TIME_FACTOR);
-   WriteStruct(a);
+   EXP_SendConfigGC(a, GCRegs);
 }
 
 //--------------------------------------------------------------------------
@@ -72,9 +68,9 @@ void EXP_SendConfigGC(t_ExposureTime *a, const gcRegistersData_t *GCRegs)
    {
       a->EXP_Source     = VHD_EHDRI_SOURCE;  // GCRegs->EHDRINumberOfExposures != 1 active le EHDRI
    }
-   a->EXP_Time_Min   = (uint32_t)((float)FPA_MIN_EXPOSURE * EXPOSURE_TIME_FACTOR); // plus tard, ce sera (uint32_t)((float)GCRegs.ExposureTimeMin * EXPOSURE_TIME_FACTOR)
-   a->EXP_Time_Max   = (uint32_t)((float)FPA_MAX_EXPOSURE * EXPOSURE_TIME_FACTOR); // plus tard, ce sera (uint32_t)((float)GCRegs.ExposureTimeMax * EXPOSURE_TIME_FACTOR)
-   a->EXP_Time       = (uint32_t)((float)GCRegs->ExposureTime * EXPOSURE_TIME_FACTOR);
+   a->EXP_Time_Min   = (uint32_t)(GCRegs->ExposureTimeMin * EXPOSURE_TIME_FACTOR);
+   a->EXP_Time_Max   = (uint32_t)(GCRegs->ExposureTimeMax * EXPOSURE_TIME_FACTOR);
+   a->EXP_Time       = (uint32_t)(GCRegs->ExposureTime * EXPOSURE_TIME_FACTOR);
    WriteStruct(a);  
 }
 

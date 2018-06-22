@@ -445,7 +445,7 @@ void Power_SM()
                   case DPS_PowerOn:
                      gcRegsData.DevicePowerState = DPS_PowerOn;
                      gcRegsData.TestImageSelector = TIS_Off;
-                     if (gGC_ProprietaryFeatureKeyIsValid == 1)
+                     if (gGC_ProprietaryFeatureKeyIsValid)
                      {
                         AvailabilityFlagsSet(ManufacturerTestImageIsAvailableMask);
                      }

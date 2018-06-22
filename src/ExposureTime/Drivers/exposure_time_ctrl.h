@@ -25,11 +25,6 @@
 #include "xbasic_types.h"
 
 
-//#ifdef SIM
-//   #define FPA_MIN_EXPOSURE  0.2F      // en usec 
-//   #define FPA_MAX_EXPOSURE  1000000.0F    // en usec 
-//#endif
-
 #define EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ     CLK_100_FREQ_HZ  // horloge de reference des temps d'exposition
 #define EXPOSURE_TIME_FACTOR                 ((float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ / 1E+6F) // convertit us en coups d'horloge
 #define MAX_NUM_FILTER  8

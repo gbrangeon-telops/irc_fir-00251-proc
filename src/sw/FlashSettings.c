@@ -403,6 +403,9 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       }
    }
 
+   // Update ExposureTimeMin register
+   GC_UpdateExposureTimeMin();
+
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))
    {

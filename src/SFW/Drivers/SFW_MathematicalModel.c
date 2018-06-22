@@ -84,7 +84,7 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
    
    // Init SFW actualization limits with ETmin to have absolute max
    ExposureTimeBackup = pGCRegs->ExposureTime;
-   pGCRegs->ExposureTime = FPA_MIN_EXPOSURE;
+   pGCRegs->ExposureTime = pGCRegs->ExposureTimeMin;
 
    SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);
    pGCRegs->ImageCorrectionFWAcquisitionFrameRateMin = ceilMultiple((float)(FW_VEL_THRESHOLD * flashSettings.FWNumberOfFilters) / 60.0F, 0.01F);
