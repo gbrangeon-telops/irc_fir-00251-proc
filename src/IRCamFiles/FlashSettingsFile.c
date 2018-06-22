@@ -430,6 +430,7 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
 
                case 5:
                   // 2.5.x -> 2.6.x
+                  hdr->ExposureTimeMin = FlashSettings_FlashSettingsFileHeader_default.ExposureTimeMin;
                   hdr->ClConfiguration = FlashSettings_FlashSettingsFileHeader_default.ClConfiguration;
                   hdr->FileStructureMinorVersion = 6;
 

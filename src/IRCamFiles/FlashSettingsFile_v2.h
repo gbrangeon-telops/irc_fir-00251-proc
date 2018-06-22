@@ -170,6 +170,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    int32_t ExposureTimeOffset;   /**< Offset applied to the exposure time command to the FPA. */
    float FWReferenceTemperatureGain;   /**< Filter wheel reference temperature gain. */
    float FWReferenceTemperatureOffset;   /**< Filter wheel reference temperature offset. */
+   float ExposureTimeMin;   /**< Minimum exposure time to overwrite value from FPA driver. */
    uint8_t ClConfiguration;   /**< Camera link configuration. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
