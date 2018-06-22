@@ -2880,7 +2880,8 @@ void GC_FocusPositionRawSetpointCallback(gcCallbackPhase_t phase, gcCallbackAcce
    {
       // Limit setpoint to min/max
       gcRegsData.FocusPositionRawSetpoint = MIN( MAX(gcRegsData.FocusPositionRawSetpoint, gcRegsData.FocusPositionRawMin), gcRegsData.FocusPositionRawMax );
-      goFastToFocus(&theRpCtrl, (uint16_t)(gcRegsData.FocusPositionRawSetpoint));
+      //goFastToFocus(&theRpCtrl, (uint16_t)(gcRegsData.FocusPositionRawSetpoint));
+      goManuallyToPos(&theRpCtrl, theRpCtrl.currentResponseData.zoomEncValue, gcRegsData.FocusPositionRawSetpoint);
    }
 }
 

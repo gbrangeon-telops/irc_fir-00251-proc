@@ -81,8 +81,8 @@
 #define  ZOOM_OUT_FAST_M_2          (1.0F / ZOOM_IN_FAST_M_2)
 #define  ZOOM_OUT_FAST_B_2          0
 
-#define  FOCUS_ENCODER_MIN          0
-#define  FOCUS_ENCODER_MAX          17000
+#define  FOCUS_ENCODER_MIN          250
+#define  FOCUS_ENCODER_MAX          16750
 
 #define  FOCUS_SLOW_STEP            75
 #define  FOCUS_FAST_STEP            (5 * FOCUS_SLOW_STEP)

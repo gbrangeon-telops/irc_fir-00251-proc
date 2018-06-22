@@ -85,7 +85,7 @@ XStatus RPOpt_init(gcRegistersData_t* pGCRegs, rpCtrl_t* aCtrl, uint16_t uartDev
    // Reset RX FIFO
    UART_ResetRxFifo(&aCtrl->theUart);
 
-   XUartNs550_SetFifoThreshold(&aCtrl->theUart, XUN_FIFO_TRIGGER_14);
+   XUartNs550_SetFifoThreshold(&aCtrl->theUart, XUN_FIFO_TRIGGER_08);
 
    XUartNs550_Recv(  &aCtrl->theUart,
                      aCtrl->serial_data.rxBuffer,
@@ -104,7 +104,7 @@ XStatus RPOpt_init(gcRegistersData_t* pGCRegs, rpCtrl_t* aCtrl, uint16_t uartDev
 */
 void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
 {
-   //uint32_t firstRegister = 0;
+   uint32_t firstRegister = 0;
    rpParsingState_t state = aCtrl->rpParsingState;
    rpDataState_t dataState = aCtrl->rpDataState;
    unsigned char byte;
@@ -128,10 +128,10 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
       //firstRegister = XUartNs550_ReadReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET);
       //XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, 0);
 
-   if(aCtrl->parsingDone < 1)
+   /*if(aCtrl->parsingDone < 1)
    {
       CBB_Flush(&aCtrl->responses);
-   }
+   }*/
 
       while (CBB_Pop(&aCtrl->responses, &byte) == IRC_SUCCESS)
       {
@@ -153,6 +153,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                {
                     aCtrl->currentResponseData.command = byte;                // ToDo ECL transfer to global var
                     aCtrl->currentResponseData.checksum = 0x24 ^ byte;
+                    aCtrl->dataBuf[0] = byte;
                     state = getDataLength1;
                     RP_OPT_PRINTF("command:\n");
                     break;
@@ -164,6 +165,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                   aCtrl->currentResponseData.dataLength = (uint16_t)(byte);   // byte 0 : val % 256
                   aCtrl->currentResponseData.checksum = aCtrl->currentResponseData.checksum ^ byte;
                   state = getDataLength2;
+                  aCtrl->dataBuf[1] = byte;
                   RP_OPT_PRINTF("dataLength1:\n");
                   break;
                }
@@ -173,6 +175,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                   uint16_t temp = (uint16_t)(byte) * 256;                     // byte 1 : val /256
                   aCtrl->currentResponseData.dataLength += temp;
                   aCtrl->currentResponseData.checksum = aCtrl->currentResponseData.checksum ^ byte;
+                  aCtrl->dataBuf[2] = byte;
                   switch(aCtrl->currentResponseData.command)
                   {
                      case BIT:                     // built in tests response flags
@@ -212,9 +215,15 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                         break;
                      }
 
-                     default:                      // "End of Action"
+                     case ENDOFACTION:
                      {
                         state = getData;
+                        break;
+                     }
+
+                     default:
+                     {
+                        state = sync;
                      }
                   }
 
@@ -232,6 +241,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                      {
                         aCtrl->currentResponseData.zoomEncValue = (uint16_t)(byte);    // byte 0 : val % 256
                         dataState = getZoom2;
+                        aCtrl->dataBuf[3] = byte;
                         RP_OPT_PRINTF("getZoom1:\n");
                         break;
                      }
@@ -241,6 +251,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                         uint16_t temp = (uint16_t)(byte) * 256;                     // byte 1 : val / 256
                         aCtrl->currentResponseData.zoomEncValue += temp;
                         dataState = getFocus1;
+                        aCtrl->dataBuf[4] = byte;
                         RP_OPT_PRINTF("getZoom2:\n");
                         break;
                      }
@@ -249,6 +260,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                      {
                         aCtrl->currentResponseData.focusEncValue = (uint16_t)(byte);   // byte 0 : val % 256
                         dataState = getFocus2;
+                        aCtrl->dataBuf[5] = byte;
                         RP_OPT_PRINTF("getFocus1:\n");
                         break;
                      }
@@ -258,6 +270,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                         uint16_t temp = (uint16_t)(byte) * 256;                     // byte 1 : val /256
                         aCtrl->currentResponseData.focusEncValue += temp;
                         dataState = getTemp;
+                        aCtrl->dataBuf[6] = byte;
                         RP_OPT_PRINTF("getFocus2:\n");
                         break;
                      }
@@ -266,6 +279,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                      {
                         aCtrl->currentResponseData.temperature = (int8_t)byte;
                         RP_OPT_PRINTF("getTemp:\n");
+                        aCtrl->dataBuf[7] = byte;
                         dataState = getFov;
                         break;
                      }
@@ -274,6 +288,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                      {
                         RP_OPT_PRINTF("getFov:\n");
                         dataState = getZoom1;
+                        aCtrl->dataBuf[8] = byte;
                         state = getAck;
                         break;
                      }
@@ -376,6 +391,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                   {
                      RP_OPT_ERR("Operation not successful : %x", aCtrl->currentResponseData.command);
                   }
+                  aCtrl->dataBuf[9] = byte;
                   state = chksum;
                   break;
                }
@@ -389,14 +405,6 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                   if(aCtrl->currentResponseData.checksum == byte)
                   {
                      aCtrl->lastResponseData = aCtrl->currentResponseData;
-                     /*switch(temp)
-                     {
-                        case 41:
-                        {
-                           if(aCtrl->parsingDone > 0)
-                           {
-                              aCtrl->parsingDone -= 1;
-                           }*/
                      if(temp == 41)
                      {
                            // Update feedback registers if they have changed
@@ -424,43 +432,22 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                            }
                      }
 
-
-                           /*break;
-                        }
-
-                        case BIT:
-                        {
-                           aCtrl->initDone -= 1;
-                           break;
-                        }
-
-                        case READ:
-                        {
-                           if(aCtrl->parsingDone > 0)
-                           {
-                              aCtrl->parsingDone -= 1;
-                           }
-                           break;
-                        }
-
-                        default:
-                        {
-
-                        }
-                     }*/
-
                      RP_OPT_PRINTF("good chksum:\n");
                   }
                   else
                   {
                      aCtrl->currentResponseData = aCtrl->lastResponseData;
-                     RP_OPT_ERR("bad chksum, message ignored\n");
+                     RP_OPT_ERR("bad chksum\n");
+                     firstRegister = XUartNs550_ReadReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET);
+                     XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, 0);
+                     CBB_Pushn(&aCtrl->responses, 10, aCtrl->dataBuf);
+                     XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, firstRegister);
                   }
 
                   switch(temp)
                   {
-                     case TEMPERATURE:                         // temperature response
-                     case ENDOFACTION:                         // end of action response
+                     case TEMPERATURE:
+                     case ENDOFACTION:
                      {
                         if(aCtrl->parsingDone > 0)
                         {

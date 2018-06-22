@@ -40,8 +40,8 @@ XStatus Autofocus_init(autofocusCtrl_t *aCtrl)
    aCtrl->coeff = 300;
    aCtrl->action = 1;
    aCtrl->focusTarget = 5200;
-   aCtrl->focusMin = 4000;
-   aCtrl->focusMax = 8000;
+   aCtrl->focusMin = 0;
+   aCtrl->focusMax = 0;
    aCtrl->nPoints = 0;
    aCtrl->stepDirChange = false;
    aCtrl->focusMetricData.min = 0;
@@ -571,6 +571,14 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
 
       case moving:
       {
+         if(aCtrl->focusTarget > aCtrl->focusMax)
+         {
+            aCtrl->focusTarget = aCtrl->focusMax;
+         }
+         else if (aCtrl->focusTarget < aCtrl->focusMin)
+         {
+            aCtrl->focusTarget = aCtrl->focusMin;
+         }
          goFastToFocus(aRpCtrl, aCtrl->focusTarget);
          AUTO_PRINTF("FocusTarget : %d\n", aCtrl->focusTarget);
          GETTIME(&tic);
@@ -615,6 +623,7 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
             uint16_t ind = aCtrl->nPoints;
             aCtrl->focusValue[ind] = aCtrl->focusValue[ind-1];
             aCtrl->focusMetricData.focusMetric[ind] = aCtrl->focusMetricData.focusMetric[ind-1];
+            aCtrl->nPoints += 1;
             state = IdentBestFocus;
             GETTIME(&tic);
          }
@@ -756,7 +765,16 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
 
       case moveToBest:
       {
-         goFastToFocus(aRpCtrl, aCtrl->bestFocus);
+         if(aCtrl->bestFocus > aCtrl->focusMax)
+         {
+            aCtrl->bestFocus = aCtrl->focusMax;
+         }
+         else if (aCtrl->bestFocus < aCtrl->focusMin)
+         {
+            aCtrl->bestFocus = aCtrl->focusMin;
+         }
+         goManuallyToPos(aRpCtrl, aRpCtrl->currentResponseData.zoomEncValue, aCtrl->bestFocus);
+         AUTO_INF("----> BestFocus is :%d\n", aCtrl->bestFocus);
          aCtrl->nPoints = 0;
          aCtrl->focusMetricData.min = 0;
          aCtrl->focusMetricData.max = 0;
@@ -795,7 +813,7 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
             GC_SetVideoAGC(VAGC_Off);
             GC_SetVideoFreeze(0);
          }
-         else if(elapsed_time_us(tic) > (TIME_TEN_SECOND_US))
+         else if(elapsed_time_us(tic) > (TIME_ONE_MINUTE_US))
          {
             GETTIME(&tic);
             refreshTemperature(aRpCtrl);
