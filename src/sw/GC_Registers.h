@@ -513,8 +513,6 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetOffsetY(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetYIdx], val)
 #define GC_SetReverseX(val) GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], val)
 #define GC_SetReverseY(val) GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], val)
-#define GC_SetTriggerSelector(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerSelectorIdx], val)
-#define GC_SetTriggerMode(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerModeIdx], val)
 #define GC_SetMemoryBufferMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferModeIdx], val)
 #define GC_SetMemoryBufferLegacyMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferLegacyModeIdx], val)
 #define GC_SetMemoryBufferStatus(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferStatusIdx], val)

@@ -1151,6 +1151,12 @@ void GC_DeviceClockFrequencyCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
       // Before read
       gcRegsData.DeviceClockFrequency = DeviceClockFrequencyAry[gcRegsData.DeviceClockSelector];
    }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      DeviceClockFrequencyAry[gcRegsData.DeviceClockSelector] = gcRegsData.DeviceClockFrequency;
+   }
 }
 
 /**
