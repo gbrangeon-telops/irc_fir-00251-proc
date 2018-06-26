@@ -71,7 +71,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.2.1
+// Generated from XML camera definition file version 12.3.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -114,6 +114,7 @@ void GC_Callback_Init()
    gcRegsDef[CalibrationCollectionTypeIdx].callback =                   &GC_CalibrationCollectionTypeCallback;
    gcRegsDef[CalibrationModeIdx].callback =                             &GC_CalibrationModeCallback;
    gcRegsDef[CenterImageIdx].callback =                                 &GC_CenterImageCallback;
+   gcRegsDef[ClConfigurationIdx].callback =                             &GC_ClConfigurationCallback;
    gcRegsDef[DeviceBuiltInTestsResults1Idx].callback =                  &GC_DeviceBuiltInTestsResults1Callback;
    gcRegsDef[DeviceBuiltInTestsResults2Idx].callback =                  &GC_DeviceBuiltInTestsResults2Callback;
    gcRegsDef[DeviceBuiltInTestsResults3Idx].callback =                  &GC_DeviceBuiltInTestsResults3Callback;
@@ -1036,6 +1037,17 @@ void GC_CenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       // After write
       GC_ComputeImageLimits();   // must be called first
    }
+}
+
+/**
+ * ClConfiguration GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_ClConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
 }
 
 /**

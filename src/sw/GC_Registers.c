@@ -49,7 +49,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.2.1
+// Generated from XML camera definition file version 12.3.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -151,6 +151,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* CalibrationCollectionType = */ 0,
    /* CalibrationMode = */ CM_Raw0,
    /* CenterImage = */ 1,
+   /* ClConfiguration = */ CC_Full,
    /* DeviceBuiltInTestsResults1 = */ 0,
    /* DeviceBuiltInTestsResults2 = */ 0,
    /* DeviceBuiltInTestsResults3 = */ 0,
@@ -339,7 +340,7 @@ gcRegistersData_t gcRegsData;
 /**
  * DeviceClockFrequency data array
  */
-float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {FPA_CLOCK_FREQ_HZ, 10000000.0F, 50000000.0F};
+float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {0.0F, 0.0F, 0.0F};
 
 /**
  * DeviceTemperature data array
@@ -498,6 +499,7 @@ void GC_Registers_Init()
    gcRegsDef[CalibrationCollectionTypeIdx].p_data = &gcRegsData.CalibrationCollectionType;
    gcRegsDef[CalibrationModeIdx].p_data = &gcRegsData.CalibrationMode;
    gcRegsDef[CenterImageIdx].p_data = &gcRegsData.CenterImage;
+   gcRegsDef[ClConfigurationIdx].p_data = &gcRegsData.ClConfiguration;
    gcRegsDef[DeviceBuiltInTestsResults1Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults1;
    gcRegsDef[DeviceBuiltInTestsResults2Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults2;
    gcRegsDef[DeviceBuiltInTestsResults3Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults3;
@@ -803,6 +805,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[DeviceSerialPortFunctionIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EventSelectorIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[EventNotificationIdx], GC_AcquisitionStarted);
+   SetRegLocked(&gcRegsDef[ClConfigurationIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[DeviceRegistersCheckIdx], GC_AcquisitionStarted);
 /* AUTO-CODE REGLOCKED END */
 }

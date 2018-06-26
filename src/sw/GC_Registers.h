@@ -126,6 +126,7 @@
 #define MotorizedFOVLensIsImplementedMask                0x00008000  /**< TDCFlags register bit mask for MotorizedFOVLensIsImplemented field */
 #define MotorizedFocusLensIsImplementedMask              0x00010000  /**< TDCFlags register bit mask for MotorizedFocusLensIsImplemented field */
 #define AutofocusIsImplementedMask                       0x00020000  /**< TDCFlags register bit mask for AutofocusIsImplemented field */
+#define ClDualBaseIsImplementedMask                      0x00040000  /**< TDCFlags register bit mask for ClDualBaseIsImplementedMask field */
 #define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
 #define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
 
@@ -159,10 +160,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.2.1
+// Generated from XML camera definition file version 12.3.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 2) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 3) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -265,6 +266,7 @@ struct gcRegistersDataStruct {
    uint32_t CalibrationCollectionType;
    uint32_t CalibrationMode;
    uint32_t CenterImage;
+   uint32_t ClConfiguration;
    uint32_t DeviceBuiltInTestsResults1;
    uint32_t DeviceBuiltInTestsResults2;
    uint32_t DeviceBuiltInTestsResults3;
@@ -538,10 +540,13 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetEventTelops(val) GC_RegisterWriteUI32(&gcRegsDef[EventTelopsIdx], val)
 #define GC_SetEventTelopsTimestamp(val) GC_RegisterWriteUI32(&gcRegsDef[EventTelopsTimestampIdx], val)
 #define GC_SetEventTelopsCode(val) GC_RegisterWriteUI32(&gcRegsDef[EventTelopsCodeIdx], val)
+#define GC_SetClConfiguration(val) GC_RegisterWriteUI32(&gcRegsDef[ClConfigurationIdx], val)
 #define GC_SetDeviceFirmwareModuleSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceFirmwareModuleSelectorIdx], val)
 #define GC_SetDeviceFirmwareModuleRevision(val) GC_RegisterWriteI32(&gcRegsDef[DeviceFirmwareModuleRevisionIdx], val)
 #define GC_SetDeviceTemperatureSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceTemperatureSelectorIdx], val)
 #define GC_SetDeviceTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceTemperatureIdx], val)
+#define GC_SetDeviceClockSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceClockSelectorIdx], val)
+#define GC_SetDeviceClockFrequency(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceClockFrequencyIdx], val)
 #define GC_SetDeviceVoltageSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceVoltageSelectorIdx], val)
 #define GC_SetDeviceVoltage(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceVoltageIdx], val)
 #define GC_SetIsActiveFlags(val) GC_RegisterWriteUI32(&gcRegsDef[IsActiveFlagsIdx], val)
