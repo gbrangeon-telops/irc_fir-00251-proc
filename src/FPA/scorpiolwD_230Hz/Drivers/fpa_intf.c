@@ -528,7 +528,7 @@ void FPA_Fig2SpecificParams(Proxy_Fig2Param_t *ptrH, float exposureTime_usec, co
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead) 
    {
      // à implanter plus tard;
-      ptrH->TMCLK  = 1.0F/((float)FPA_MASTER_CLK_RATE_HZ);
+      ptrH->TMCLK  = 1.0F/((float)FPA_MCLK_RATE_HZ);
       ptrH->T2     = (exposureTime_usec*1E-6F)/ptrH->TMCLK;
       ptrH->T3     = kk.T3*(float)pGCRegs->Height + kk.T4*((float)pGCRegs->Height-1.0F);
       ptrH->T4     = 0.0F;
@@ -538,7 +538,7 @@ void FPA_Fig2SpecificParams(Proxy_Fig2Param_t *ptrH, float exposureTime_usec, co
    }
    else // ITR mode
    {      
-      ptrH->TMCLK  = 1.0F/((float)FPA_MASTER_CLK_RATE_HZ);
+      ptrH->TMCLK  = 1.0F/((float)FPA_MCLK_RATE_HZ);
       ptrH->T2     = (exposureTime_usec*1E-6F)/ptrH->TMCLK;
       ptrH->T3     = kk.T3*(float)pGCRegs->Height + kk.T4*((float)pGCRegs->Height-1.0F);
       ptrH->T4     = 1.0F; 
@@ -705,7 +705,7 @@ void FPA_SendStatic_SerialCmd(const t_FpaIntf *ptrA)
    CmdByte = 0x7A;                                               // adresse 0x102 : MC interne, locking range 2 (8-13MHz), Int Source External, CC1 used to start Integration, sampling Position4
    if ((uint32_t)MGLK_MASTER_CLOCK_IS_EXTERNAL == 1)
       CmdByte |= 0x01;
-   if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+   if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
    {
       // locking range 3 (10-20MHz)
       CmdByte |= 0x04;
@@ -719,7 +719,7 @@ void FPA_SendStatic_SerialCmd(const t_FpaIntf *ptrA)
    FPA_FillCmdCharTable(0x141, 0x01, 1, &Cmd, &CharIndex);        // adresse 0x141 : video2 on channelY, Video2 in 1st position in clink frame
    FPA_FillCmdCharTable(0x142, 0x02, 1, &Cmd, &CharIndex);        // adresse 0x142 : video3 on channelX, Video3 in 2nd position in clink frame
    FPA_FillCmdCharTable(0x143, 0x03, 1, &Cmd, &CharIndex);        // adresse 0x143 : video4 on channelY, Video4 in 2nd position in clink frame
-   if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+   if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
       FPA_FillCmdCharTable(0x1A1, 0x01, 1, &Cmd, &CharIndex);        // adresse 0x1A1 : functional Freq 20MHz, Unread diode not polarized, power optimization not used
    else
       FPA_FillCmdCharTable(0x1A1, 0x00, 1, &Cmd, &CharIndex);        // adresse 0x1A1 : functional Freq 10MHz, Unread diode not polarized, power optimization not used
@@ -748,7 +748,7 @@ void FPA_SendWindow_SerialCmd(const t_FpaIntf *ptrA)
    
    // adresse 0x1A1 Power Management pour le windowing
    CmdByte = 0x00;          // valeur par defaut
-   if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+   if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
       CmdByte = 0x01;
    if (ptrA->proxy_xsize == 640)
       CmdByte |= 0x04;

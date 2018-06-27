@@ -49,7 +49,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (HawkAIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (HawkAIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 
 #define FPA_MAX_GAIN       3
 #define FPA_NUMTAPS        4  // [taps]
@@ -72,17 +72,15 @@
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-//#define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
-//#define FPA_MASTER_CLK_RATE_HZ         6666000   // fréquence de l'horloge du FPA
-//#define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ
-
 #define FPA_DATA_RESOLUTION            14
 #define FPA_PIXEL_PITCH                16E-6F
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
-#define FPA_MCLK_RATE_HZ             10000000    // le master clock du FPA est à 10MHz
-#define FPA_CLOCK_FREQ_HZ            FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
+#define FPA_MCLK_RATE_HZ               10E+6F    // le master clock du FPA est à 10MHz
+
+#define FPA_PIX_THROUGHPUT             (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
+
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
 {					   

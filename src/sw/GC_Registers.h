@@ -630,5 +630,6 @@ void GC_SetExposureTimeRegisters(float exposureTime);
 void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort);
 void GC_UpdateFOV();
 void GC_UpdateExposureTimeMin();
+void GC_UpdateCameraLinkConfig();
 
 #endif // GC_REGISTERS_H

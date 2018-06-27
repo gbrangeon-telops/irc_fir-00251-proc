@@ -876,7 +876,7 @@ void GC_UpdateFpaPeriodMinMargin()
    else
       gFpaPeriodMinMargin = 0.0F;
 
-   FPGA_PRINTF("Update FPA frame period margin: " _PCF(1) "%%\n", _FFMT((gFpaPeriodMinMargin * 100.0F), 1));
+   GC_INF("Update FPA frame period margin: " _PCF(1) "%%", _FFMT((gFpaPeriodMinMargin * 100.0F), 1));
 }
 
 /**
@@ -888,7 +888,7 @@ void GC_UpdateParameterLimits()
    uint32_t frameImageCount;
    uint32_t index;
    // Backup current ExposureTime
-   float ExposureTimeBackup = gcRegsData.ExposureTime;
+   const float ExposureTimeBackup = gcRegsData.ExposureTime;
 
    // Validate ExposureTimes of EHDRI module
    if (EHDRIIsActive)
@@ -1322,7 +1322,7 @@ void GC_UpdateMemoryBufferSequencePreMOISizeLimits()
 void GC_UnlockCamera()
 {
    gGC_ProprietaryFeatureKeyIsValid = 1;
-   FPGA_PRINTF("Camera unlocked!!!\n");
+   GC_INF("Camera unlocked!!!");
 
    // Unlock features
    AvailabilityFlagsSet(CalibrationIsAvailableMask);
@@ -1586,7 +1586,7 @@ void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort)
 
    if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
    {
-      FPGA_PRINT("Error: Failed to update flash dynamic values.\n");
+      GC_ERR("Failed to update flash dynamic values.");
    }
 
    /*******************************************
@@ -1687,4 +1687,74 @@ void GC_UpdateExposureTimeMin()
    {
       GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], exposureTimeMin);
    }
+}
+
+/**
+ * Update Camera Link configuration registers.
+ */
+void GC_UpdateCameraLinkConfig()
+{
+   ClConfiguration_t clink_cfg;
+   float clink_out_clk;
+   // Backup current DeviceClockSelector
+   const uint32_t DeviceClockSelectorBackup = gcRegsData.DeviceClockSelector;
+
+   // Copy and validate requested config
+   clink_cfg = (ClConfiguration_t)flashSettings.ClConfiguration;
+   if ((clink_cfg != CC_Base) && (clink_cfg != CC_Full) && (clink_cfg != CC_DualBase))
+   {
+      // Overwrite to Full
+      clink_cfg = CC_Full;
+   }
+
+   // Find valid config and clock
+   if (FPA_PIX_THROUGHPUT < (1 * CLINK_OUT_CLK_SLOW))    // 1 pix per clk
+   {
+      // All configs are valid
+      // Use requested config and slow clock
+      clink_out_clk = CLINK_OUT_CLK_SLOW;
+   }
+   else if (FPA_PIX_THROUGHPUT < (1 * CLINK_OUT_CLK_FAST))    // 1 pix per clk
+   {
+      // All configs are valid except Base slow
+      // Use requested config and clock depends on config
+      if (clink_cfg == CC_Full)
+         clink_out_clk = CLINK_OUT_CLK_SLOW;
+      else
+         clink_out_clk = CLINK_OUT_CLK_FAST;
+   }
+   else if (FPA_PIX_THROUGHPUT < (4 * CLINK_OUT_CLK_SLOW))    // 4 pix per clk
+   {
+      // Only Full configs are valid
+      // Use Full and slow clock
+      clink_cfg = CC_Full;
+      clink_out_clk = CLINK_OUT_CLK_SLOW;
+   }
+   else
+   {
+      // Only Full config with fast clock is valid
+      clink_cfg = CC_Full;
+      clink_out_clk = CLINK_OUT_CLK_FAST;
+   }
+
+   if (clink_cfg != (ClConfiguration_t)flashSettings.ClConfiguration)
+      GC_ERR("Requested ClConfiguration (%d) is not possible. Forcing %d.", flashSettings.ClConfiguration, clink_cfg);
+
+
+   // Set camera link config and corresponding flags
+   GC_SetClConfiguration(clink_cfg);
+   TDCFlagsClr(ClBaseIsImplementedMask | ClFullIsImplementedMask | ClDualBaseIsImplementedMask);
+   if (clink_cfg == CC_Base)
+      TDCFlagsSet(ClBaseIsImplementedMask);
+   else if (clink_cfg == CC_DualBase)
+      TDCFlagsSet(ClDualBaseIsImplementedMask);
+   else
+      TDCFlagsSet(ClFullIsImplementedMask);
+
+   // Set camera link clock frequency
+   GC_SetDeviceClockSelector(DCS_CameraLink);
+   GC_SetDeviceClockFrequency(clink_out_clk);
+
+   // Restore DeviceClockSelector
+   GC_SetDeviceClockSelector(DeviceClockSelectorBackup);
 }

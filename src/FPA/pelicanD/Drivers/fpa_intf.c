@@ -321,7 +321,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // frame_period_min
    //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
-   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * (float)FPA_MASTER_CLK_RATE_HZ);
+   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * (float)FPA_MCLK_RATE_HZ);
    FPGA_PRINTF("scd_frame_period_min = %d x 12.5ns\n", ptrA->scd_frame_period_min);
    
    // mode diag scd
@@ -333,13 +333,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
                                       
    // valeurs converties en coups d'horloge du module FPA_INTF
    ptrA->scd_fig1_or_fig2_t4_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
-   ptrA->scd_fig1_or_fig2_t6_dly = (uint32_t)((hh.T6) * (float)FPA_MASTER_CLK_RATE_HZ); //horloge VHD à 80 MHz
-   ptrA->scd_fig1_or_fig2_t5_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_MASTER_CLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag   
-   ptrA->scd_fig4_t1_dly = (uint32_t)((kk.T1) * (float)FPA_MASTER_CLK_RATE_HZ);
-   ptrA->scd_fig4_t2_dly = (uint32_t)((kk.T2) * (float)FPA_MASTER_CLK_RATE_HZ); 
-   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_MASTER_CLK_RATE_HZ);                                    // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
-   ptrA->scd_fig4_t4_dly = (uint32_t)((kk.T4) * (float)FPA_MASTER_CLK_RATE_HZ);
-   ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_MASTER_CLK_RATE_HZ);  
+   ptrA->scd_fig1_or_fig2_t6_dly = (uint32_t)((hh.T6) * (float)FPA_MCLK_RATE_HZ); //horloge VHD à 80 MHz
+   ptrA->scd_fig1_or_fig2_t5_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_MCLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag   
+   ptrA->scd_fig4_t1_dly = (uint32_t)((kk.T1) * (float)FPA_MCLK_RATE_HZ);
+   ptrA->scd_fig4_t2_dly = (uint32_t)((kk.T2) * (float)FPA_MCLK_RATE_HZ); 
+   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_MCLK_RATE_HZ);                                    // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
+   ptrA->scd_fig4_t4_dly = (uint32_t)((kk.T4) * (float)FPA_MCLK_RATE_HZ);
+   ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_MCLK_RATE_HZ);  
    ptrA->scd_fig4_t6_dly = (uint32_t)FPA_SCD_HDER_EFF_LEN;                             // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
    ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  
    
@@ -532,7 +532,7 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
 
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)  // ODI 2016-04-28: IWR non validé. Si doit être supporté, vérifier la formule
    {
-      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MASTER_CLK_RATE_HZ);
+      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
       if (FPA_NUM_CH == 2)
          ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;  //13 bit resolution
       else
@@ -555,7 +555,7 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
    }
    else // ITR mode
    {      
-      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MASTER_CLK_RATE_HZ);
+      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
       if (FPA_NUM_CH == 2)
          ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;  //13 bit resolution
       else
@@ -687,7 +687,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirLR   = 0;  // 0 => left to right (default), 1 => right to left
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
-   int_time_default    = (uint32_t)((float)FPA_MIN_EXPOSURE *(float)FPA_MASTER_CLK_RATE_HZ*1E-6F);
+   int_time_default    = (uint32_t)((float)FPA_MIN_EXPOSURE *(float)FPA_MCLK_RATE_HZ*1E-6F);
    
    scd_gain = (uint8_t)(ptrA->scd_gain);
    

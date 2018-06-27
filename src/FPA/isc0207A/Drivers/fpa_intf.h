@@ -45,7 +45,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0207AIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Isc0207AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 
 #define FPA_MAX_GAIN       1
 #define FPA_NUMTAPS        16  // [taps]
@@ -72,8 +72,10 @@
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
-#define FPA_MCLK_RATE_HZ            5000000          // le master clock du FPA
-#define FPA_CLOCK_FREQ_HZ           FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
+#define FPA_MCLK_RATE_HZ               5E+6F          // le master clock du FPA
+
+#define FPA_PIX_THROUGHPUT             (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
+
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
 {   

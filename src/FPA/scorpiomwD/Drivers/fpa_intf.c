@@ -531,7 +531,7 @@ void FPA_Fig2SpecificParams(Proxy_Fig2Param_t *ptrH, float exposureTime_usec, co
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead) 
    {
       // à implanter plus tard;
-      //ptrH->TMCLK  = 1.0F/((float)FPA_MASTER_CLK_RATE_HZ);
+      //ptrH->TMCLK  = 1.0F/((float)FPA_MCLK_RATE_HZ);
       //ptrH->T2     = (exposureTime_usec*1E-6F)/ptrH->TMCLK;
       //ptrH->T3     = kk.T3*(float)pGCRegs->Height + kk.T4*((float)pGCRegs->Height-1.0F);
       //ptrH->T4     = 0.0F;
@@ -541,7 +541,7 @@ void FPA_Fig2SpecificParams(Proxy_Fig2Param_t *ptrH, float exposureTime_usec, co
    }
    else // ITR mode
    {      
-      ptrH->TMCLK  = 1.0F/((float)FPA_MASTER_CLK_RATE_HZ);
+      ptrH->TMCLK  = 1.0F/((float)FPA_MCLK_RATE_HZ);
       ptrH->T2     = (exposureTime_usec*1E-6F)/ptrH->TMCLK  + 3076.0F;     // int_signal_high_time
       ptrH->T3     = (float)pGCRegs->Height*((float)pGCRegs->Width/(float)FPA_NUMTAPS + 4.0F);  // 4 MCLK par ligne pour tenir compte de la descente de LVAL dans le Megalink
       ptrH->T4     = 1.0F;  // delai 1MCLK
@@ -726,7 +726,7 @@ void FPA_SendStatic_SerialCmd(const t_FpaIntf *ptrA)
    FPA_FillCmdCharTable(0x1C2, (uint16_t)VIDEO_VOLTAGE_MAX, 2, &Cmd, &CharIndex);
    
    
-   //if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+   //if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
    //   FPA_FillCmdCharTable(0x1A1, 0x01, 1, &Cmd, &CharIndex);        // adresse 0x1A1 : functional Freq 20MHz, Unread diode not polarized, power optimization not used
    //else
    //   FPA_FillCmdCharTable(0x1A1, 0x00, 1, &Cmd, &CharIndex);        // adresse 0x1A1 : functional Freq 10MHz, Unread diode not polarized, power optimization not used
@@ -755,7 +755,7 @@ void FPA_SendWindow_SerialCmd(const t_FpaIntf *ptrA)
       
    //// adresse 0x1A1 Power Management pour le windowing
 //   CmdByte = 0x00;          // valeur par defaut
-//   if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+//   if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
 //      CmdByte = 0x01;
 //   if (ptrA->proxy_xsize == 640)
 //      CmdByte |= 0x04;

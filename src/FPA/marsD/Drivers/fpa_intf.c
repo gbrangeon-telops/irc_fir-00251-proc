@@ -529,7 +529,7 @@ void FPA_Fig2SpecificParams(Proxy_Fig2Param_t *ptrH, float exposureTime_usec, co
    Proxy_Fig4Param_t kk;
    
    FPA_Fig4SpecificParams(&kk, pGCRegs);
-   ptrH->TMCLK  = 1.0F/((float)FPA_MASTER_CLK_RATE_HZ);
+   ptrH->TMCLK  = 1.0F/((float)FPA_MCLK_RATE_HZ);
    ptrH->T2     = (exposureTime_usec*1E-6F)/ptrH->TMCLK;
    ptrH->T3     = ((float)pGCRegs->Width/(float)FPA_NUMTAPS + kk.T4)*(float)pGCRegs->Height; // l'introduction de kk.T4 provient de la limitation du Megalink
    ptrH->T4     = 1.0F;
@@ -715,7 +715,7 @@ void FPA_SendStatic_SerialCmd(const t_FpaIntf *ptrA)
    FPA_FillCmdCharTable(0x143, 0x06, 1, &Cmd, &CharIndex);        // adresse 0x143 : video4 on channelX, Video4 in 4th position in clink frame
    FPA_FillCmdCharTable(0x1A0, 0xFF, 1, &Cmd, &CharIndex);        // à l'initialisation, mode pleine fenetre
 
-   //  if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+   //  if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
  //     FPA_FillCmdCharTable(0x1A1, 0x01, 1, &Cmd, &CharIndex);        // adresse 0x1A1 : functional Freq 20MHz, Unread diode not polarized, power optimization not used
  //  else
  //     FPA_FillCmdCharTable(0x1A1, 0x00, 1, &Cmd, &CharIndex);        // adresse 0x1A1 : functional Freq 10MHz, Unread diode not polarized, power optimization not used
@@ -750,7 +750,7 @@ void FPA_SendWindow_SerialCmd(const t_FpaIntf *ptrA)
 //
 //   // adresse 0x1A1 Power Management pour le windowing
 //   CmdByte = 0x00;          // valeur par defaut
-//   if ((float)FPA_MASTER_CLK_RATE_HZ == 20E+6F)
+//   if ((float)FPA_MCLK_RATE_HZ == 20E+6F)
 //      CmdByte = 0x01;
 //   if (ptrA->proxy_xsize == 640)
 //      CmdByte |= 0x04;

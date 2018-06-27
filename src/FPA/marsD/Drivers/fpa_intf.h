@@ -49,10 +49,11 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (MarsDIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (MarsDIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 
 #define FPA_MAX_GAIN       1
 #define FPA_NUMTAPS        4  // [taps]
+#define FPA_NUM_CH         1  // nombre de canaux de sorties  (1 ou 2)
 
 #define FPA_COOLER_TEMP_THRES    -17300
 #define FPA_DEFAULT_EXPOSURE     150.0F //[us]
@@ -73,8 +74,7 @@
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
-#define FPA_MASTER_CLK_RATE_HZ         6666666   // fréquence de l'horloge du FPA
-#define FPA_CLOCK_FREQ_HZ              FPA_MASTER_CLK_RATE_HZ
+#define FPA_MCLK_RATE_HZ               6666666F // fréquence de l'horloge du FPA
 
 #define FPA_DATA_RESOLUTION            14
 #define FPA_PIXEL_PITCH                30E-6F
@@ -82,6 +82,8 @@
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define MGLK_GPOL_VALUE_DEFAULT        800        // 800 mV comme valeur par defaut de GPOL
+
+#define FPA_PIX_THROUGHPUT             (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
