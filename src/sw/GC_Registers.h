@@ -459,6 +459,9 @@ extern gcRegistersData_t gcRegsDataFactory;
 
 extern gcRegistersData_t gcRegsData;
 
+#define gcSelectedRegListLen 13
+extern gcSelectedReg_t gcSelectedRegList[gcSelectedRegListLen];
+
 #define DeviceClockFrequencyAryLen 3
 extern float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen];
 

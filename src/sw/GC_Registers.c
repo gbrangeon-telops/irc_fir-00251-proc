@@ -338,6 +338,25 @@ gcRegistersData_t gcRegsDataFactory = {
 gcRegistersData_t gcRegsData;
 
 /**
+ * Selected registers list
+ */
+gcSelectedReg_t gcSelectedRegList[gcSelectedRegListLen] = {
+   {DeviceClockFrequencyIdx, DeviceClockSelectorIdx, 3},
+   {DeviceTemperatureIdx, DeviceTemperatureSelectorIdx, 13},
+   {DeviceVoltageIdx, DeviceVoltageSelectorIdx, 31},
+   {DeviceCurrentIdx, DeviceCurrentSelectorIdx, 2},
+   {DeviceSerialPortBaudRateIdx, DeviceSerialPortSelectorIdx, 3},
+   {DeviceSerialPortFunctionIdx, DeviceSerialPortSelectorIdx, 3},
+   {EventNotificationIdx, EventSelectorIdx, 33},
+   {DeviceFirmwareModuleRevisionIdx, DeviceFirmwareModuleSelectorIdx, 12},
+   {TriggerModeIdx, TriggerSelectorIdx, 3},
+   {TriggerSourceIdx, TriggerSelectorIdx, 3},
+   {TriggerActivationIdx, TriggerSelectorIdx, 3},
+   {TriggerDelayIdx, TriggerSelectorIdx, 3},
+   {TriggerFrameCountIdx, TriggerSelectorIdx, 3}
+};
+
+/**
  * DeviceClockFrequency data array
  */
 float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {0.0F, 0.0F, 0.0F};
