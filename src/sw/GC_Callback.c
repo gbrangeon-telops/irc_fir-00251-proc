@@ -1206,6 +1206,12 @@ void GC_DeviceCurrentCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       // Before read
       gcRegsData.DeviceCurrent = DeviceCurrentAry[gcRegsData.DeviceCurrentSelector];
    }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      DeviceCurrentAry[gcRegsData.DeviceCurrentSelector] = gcRegsData.DeviceCurrent;
+   }
 }
 
 /**
@@ -1319,6 +1325,12 @@ void GC_DeviceFirmwareModuleRevisionCallback(gcCallbackPhase_t phase, gcCallback
    {
       // Before read
       gcRegsData.DeviceFirmwareModuleRevision = DeviceFirmwareModuleRevisionAry[gcRegsData.DeviceFirmwareModuleSelector];
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      DeviceFirmwareModuleRevisionAry[gcRegsData.DeviceFirmwareModuleSelector] = gcRegsData.DeviceFirmwareModuleRevision;
    }
 }
 
@@ -1604,6 +1616,12 @@ void GC_DeviceSerialPortBaudRateCallback(gcCallbackPhase_t phase, gcCallbackAcce
       // Before read
       gcRegsData.DeviceSerialPortBaudRate = DeviceSerialPortBaudRateAry[gcRegsData.DeviceSerialPortSelector];
    }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      DeviceSerialPortBaudRateAry[gcRegsData.DeviceSerialPortSelector] = gcRegsData.DeviceSerialPortBaudRate;
+   }
 }
 
 /**
@@ -1664,6 +1682,12 @@ void GC_DeviceTemperatureCallback(gcCallbackPhase_t phase, gcCallbackAccess_t ac
       // Before read
       gcRegsData.DeviceTemperature = DeviceTemperatureAry[gcRegsData.DeviceTemperatureSelector];
    }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      DeviceTemperatureAry[gcRegsData.DeviceTemperatureSelector] = gcRegsData.DeviceTemperature;
+   }
 }
 
 /**
@@ -1712,6 +1736,12 @@ void GC_DeviceVoltageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
    {
       // Before read
       gcRegsData.DeviceVoltage = DeviceVoltageAry[gcRegsData.DeviceVoltageSelector];
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      DeviceVoltageAry[gcRegsData.DeviceVoltageSelector] = gcRegsData.DeviceVoltage;
    }
 }
 
