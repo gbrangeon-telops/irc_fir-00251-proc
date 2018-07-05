@@ -74,7 +74,7 @@
 
 #define FPA_MCLK_RATE_HZ               5E+6F          // le master clock du FPA
 
-#define FPA_PIX_THROUGHPUT             (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
+#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec]
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF

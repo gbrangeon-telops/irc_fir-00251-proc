@@ -91,7 +91,7 @@
 
 #define MGLK_GPOL_VALUE_DEFAULT        3900        //  valeur par defaut de GPOL en millivolts
 
-#define FPA_PIX_THROUGHPUT             (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
+#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF

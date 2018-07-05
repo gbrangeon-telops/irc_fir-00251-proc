@@ -1727,13 +1727,13 @@ void GC_UpdateCameraLinkConfig()
    }
 
    // Find valid config and clock
-   if (FPA_PIX_THROUGHPUT < (1 * CLINK_OUT_CLK_SLOW))    // 1 pix per clk
+   if (FPA_PIX_THROUGHPUT_PEAK < (1 * CLINK_OUT_CLK_SLOW))    // 1 pix per clk
    {
       // All configs are valid
       // Use requested config and slow clock
       clink_out_clk = CLINK_OUT_CLK_SLOW;
    }
-   else if (FPA_PIX_THROUGHPUT < (1 * CLINK_OUT_CLK_FAST))    // 1 pix per clk
+   else if (FPA_PIX_THROUGHPUT_PEAK < (1 * CLINK_OUT_CLK_FAST))    // 1 pix per clk
    {
       // All configs are valid except Base slow
       // Use requested config and clock depends on config
@@ -1742,7 +1742,7 @@ void GC_UpdateCameraLinkConfig()
       else
          clink_out_clk = CLINK_OUT_CLK_FAST;
    }
-   else if (FPA_PIX_THROUGHPUT < (4 * CLINK_OUT_CLK_SLOW))    // 4 pix per clk
+   else if (FPA_PIX_THROUGHPUT_PEAK < (4 * CLINK_OUT_CLK_SLOW))    // 4 pix per clk
    {
       // Only Full configs are valid
       // Use Full and slow clock

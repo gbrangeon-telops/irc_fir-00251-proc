@@ -74,7 +74,7 @@
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
-#define FPA_MCLK_RATE_HZ               6666666F // fréquence de l'horloge du FPA
+#define FPA_MCLK_RATE_HZ               6666666.0F // fréquence de l'horloge du FPA
 
 #define FPA_DATA_RESOLUTION            14
 #define FPA_PIXEL_PITCH                30E-6F
@@ -83,7 +83,7 @@
 
 #define MGLK_GPOL_VALUE_DEFAULT        800        // 800 mV comme valeur par defaut de GPOL
 
-#define FPA_PIX_THROUGHPUT             (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
+#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
