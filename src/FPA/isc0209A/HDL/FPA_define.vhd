@@ -53,7 +53,7 @@ package FPA_define is
    constant DEFINE_FPA_LINE_SYNC_MODE                 : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
    constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';      -- pas besoin de config particulière au demarrage du ISC0209 
    constant DEFINE_GENERATE_VPROCESSING_CHAIN         : std_logic := '0';      -- pour le isc0209, on peut ne fait plus de diversité de canaux doncn ne plus utiliser la chaine Vprocessing.
-   constant DEFINE_GENERATE_ELEC_OFFSET_CORR_CHAIN    : std_logic := '1';      -- pour le isc0209, on fait de la ccorrection d'offset
+   constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '0';      -- pour le isc0209, on ne fait aucune correction électronique
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -152,7 +152,20 @@ package FPA_define is
       xsize_div_tapnum               : unsigned(7 downto 0);
       ysize_div4_m1                  : unsigned(7 downto 0);
       lovh_mclk_source               : unsigned(15 downto 0);    -- lovh converti en coups d'hotloges mclk_source.Utilisé en mode diag 
-   end record;   
+   end record; 
+   
+   -- cfg des references pour correction electronique
+   type elcorr_ref_cfg_type is 
+   record
+      ref_enabled                    : std_logic;
+      null_forced                    : std_logic;
+      start_dly_sampclk              : unsigned(7 downto 0);
+      samp_num_per_ch                : unsigned(7 downto 0);
+      samp_mean_numerator            : unsigned(22 downto 0);
+      ref_value                      : unsigned(13 downto 0); -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
+   end record;
+   
+   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type;
    
    type fpa_intf_cfg_type is
    record     
@@ -231,18 +244,35 @@ package FPA_define is
       -- reorder_column
       reorder_column                 : std_logic;
       
-      -- electrical offset param  
-      elec_ofs_enabled               : std_logic; 
-      elec_ofs_offset_null_forced    : std_logic;              -- permet de forcer l'offset calculé/estimé à 0. 
-      elec_ofs_pix_faked_value_forced: std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
-      elec_ofs_pix_faked_value       : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
-      elec_ofs_offset_minus_pix_value: std_logic;              -- à '1', permet d'inverser l'opération (B-A au lieu de A-B)au niveau de l'opératuer de soustraction
-      elec_ofs_add_const             : unsigned(14 downto 0);  -- constante de reequilibrage de la plage dynamique une fois l'offset électronique enlevée
+      -- electrical analog chain correction   
+      elcorr_enabled                 : std_logic; 
       
-      elec_ofs_start_dly_sampclk     : unsigned(7 downto 0);   -- le delai de start doit etre en coup d'horlode d'adc (sample) puisque la notion de phase est importante
-      elec_ofs_samp_num_per_ch       : unsigned(6 downto 0);
-      elec_ofs_samp_mean_numerator   : unsigned(22 downto 0);
-      elec_ofs_second_lane_enabled   : std_logic;              -- à '1' si le calcul de l'offset se fait sur front montant et descendant de MCLK dans ce cas, les echantillons d'un même tap sont envoyés alternativement aux deux lanes. Sinon, tous les echantillons sont envoyés au 1er lane  
+      -- pixel data ctrl
+      elcorr_pix_faked_value_forced  : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
+      elcorr_pix_faked_value         : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      
+      -- refrence signal 
+      elcorr_ref_cfg                 : elcorr_ref_cfg_array_type;                                                                                                             
+      elcorr_ref_dac_id              : unsigned(3 downto 0);  -- l'id du dac qui doit etre programmé avec les tensions de references pour la correction de gain et offset 
+      
+      -- multiplier control 
+      elcorr_atemp_gain              : signed(17 downto 0);
+      
+      -- adder control
+      elcorr_atemp_ofs               : signed(17 downto 0);
+      
+      -- embedded switches control
+      elcorr_ref0_op_sel             : std_logic_vector(1 downto 0);
+      elcorr_ref1_op_sel             : std_logic_vector(1 downto 0);
+      elcorr_mult_op_sel             : std_logic_vector(1 downto 0);
+      elcorr_div_op_sel              : std_logic_vector(1 downto 0);
+      elcorr_add_op_sel              : std_logic_vector(1 downto 0);   
+      
+      -- mode de calcul continuel du gain   (à toutes les x sec)
+      elcorr_gain_cont_calc_mode     : std_logic;          
+      
+      -- gestion de la saturation basse et haute à la sortie du module fpa
+      sat_ctrl_en                    : std_logic;
       
    end record;    
    
@@ -326,7 +356,8 @@ package FPA_define is
       stop           : std_logic;                     -- divers flags synchronisables avec readout_info. Attention: après read_end, les misc flags ne servent à rien. Si besoin d'utilser des flags après rd_end alors utiliser les ADC_FLAG  
       dval           : std_logic;  
       samp_pulse     : std_logic;                     -- sampling pulse de frequence valant celle des adc
-      spare          : std_logic_vector(14 downto 0); -- pour utilisation future
+      ref_valid      : std_logic_vector(1 downto 0);  -- dit laquelle des deux references est en progression dans la chaine. Utile pour correction dynamqieu de  l'électronique
+      spare          : std_logic_vector(12 downto 0); -- pour utilisation future
    end record;
    
    -- readout_type

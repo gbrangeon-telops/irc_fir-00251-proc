@@ -195,6 +195,7 @@ begin
             user_cfg_i.adc_quad2_en  <= '1';     -- provient pas du µBlaze
             user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
             mb_ctrled_reset_i <= '0';
+            user_cfg_i.sat_ctrl_en <= '0';
             
          else                   
             
@@ -289,20 +290,8 @@ begin
                   when X"0CC" =>    user_cfg_i.adc_clk_phase(1)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(1)'length-1 downto 0));                                                                                                                                        
                   when X"0D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));
                   when X"0D4" =>    user_cfg_i.adc_clk_phase(3)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(3)'length-1 downto 0));
-                  when X"0D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); 
-                     
-                  -- electrical offset
-                  when X"0DC" =>    user_cfg_i.elec_ofs_enabled                <= data_i(0);
-                  when X"0E0" =>    user_cfg_i.elec_ofs_offset_null_forced     <= data_i(0);
-                  when X"0E4" =>    user_cfg_i.elec_ofs_pix_faked_value_forced <= data_i(0);
-                  when X"0E8" =>    user_cfg_i.elec_ofs_pix_faked_value        <= unsigned(data_i(user_cfg_i.elec_ofs_pix_faked_value'length-1 downto 0));
-                  when X"0EC" =>    user_cfg_i.elec_ofs_offset_minus_pix_value <= data_i(0);
-                  when X"0F0" =>    user_cfg_i.elec_ofs_add_const              <= unsigned(data_i(user_cfg_i.elec_ofs_add_const'length-1 downto 0)); 
-                  when X"0F4" =>    user_cfg_i.elec_ofs_start_dly_sampclk      <= unsigned(data_i(user_cfg_i.elec_ofs_start_dly_sampclk'length-1 downto 0)); 
-                  when X"0F8" =>    user_cfg_i.elec_ofs_samp_num_per_ch        <= unsigned(data_i(user_cfg_i.elec_ofs_samp_num_per_ch'length-1 downto 0));
-                  when X"0FC" =>    user_cfg_i.elec_ofs_samp_mean_numerator    <= unsigned(data_i(user_cfg_i.elec_ofs_samp_mean_numerator'length-1 downto 0)); 
-                  when X"100" =>    user_cfg_i.elec_ofs_second_lane_enabled    <= data_i(0); user_cfg_in_progress <= '0';                   
-                     
+                  when X"0D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); user_cfg_in_progress <= '0';
+                                         
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
