@@ -567,7 +567,7 @@ void Calibration_SM()
             if (headerData.blockFile.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
             {
                CM_ERR("Block %d: Wrong block DeviceSerialNumber TEL%05d. Device serial number is TEL%05d.",
-               headerData.blockFile.POSIXTime, headerData.blockFile.DeviceSerialNumber, flashSettings.DeviceSerialNumber);
+                     headerData.blockFile.POSIXTime, headerData.blockFile.DeviceSerialNumber, flashSettings.DeviceSerialNumber);
                cmCurrentState = CMS_ERROR;
             }
 
@@ -697,6 +697,15 @@ void Calibration_SM()
                cmCurrentState = CMS_ERROR;
             }
 
+            uint8_t fpa_pixel_pitch_um = (uint8_t)(FPA_PIXEL_PITCH * 1E+6F);
+
+            if (headerData.blockFile.SensorPixelPitch != fpa_pixel_pitch_um)
+            {
+               CM_ERR("Block %d: Wrong block SensorPixelPitch (%d um). FPA_PIXEL_PITCH is %d um.",
+                     headerData.blockFile.POSIXTime, headerData.blockFile.SensorPixelPitch, fpa_pixel_pitch_um);
+               cmCurrentState = CMS_ERROR;
+            }
+
             if (cmCurrentState != CMS_ERROR)
             {
                if (cmCalibrationFile->type == FT_TSBL)
@@ -734,6 +743,7 @@ void Calibration_SM()
                calibrationInfo.blocks[blockIndex].NDFPosition = headerData.blockFile.NDFPosition;
                calibrationInfo.blocks[blockIndex].FOVPosition = headerData.blockFile.FOVPosition;
                calibrationInfo.blocks[blockIndex].ImageCorrectionFocusPositionRaw = headerData.blockFile.ImageCorrectionFocusPositionRaw;
+               calibrationInfo.blocks[blockIndex].ExternalLensFocalLength = headerData.blockFile.ExternalLensFocalLength;
                calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber = headerData.blockFile.ExternalLensSerialNumber;
                calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber = headerData.blockFile.ManualFilterSerialNumber;
                calibrationInfo.blocks[blockIndex].PixelDynamicRangeMin = headerData.blockFile.PixelDynamicRangeMin;

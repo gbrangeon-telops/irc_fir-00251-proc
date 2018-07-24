@@ -148,6 +148,36 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
                hdr->FileStructureMinorVersion = 2;
 
             case 2:
+               // 2.2.x -> 2.3.x
+               hdr->ExtenderRingSerialNumber = CalibCollection_CollectionFileHeader_default.ExtenderRingSerialNumber;
+               memcpy(hdr->ExtenderRingName, CalibCollection_CollectionFileHeader_default.ExtenderRingName, 65);
+               hdr->Block1ImageShiftX = CalibCollection_CollectionFileHeader_default.Block1ImageShiftX;
+               hdr->Block1ImageShiftY = CalibCollection_CollectionFileHeader_default.Block1ImageShiftY;
+               hdr->Block1ImageRotation = CalibCollection_CollectionFileHeader_default.Block1ImageRotation;
+               hdr->Block2ImageShiftX = CalibCollection_CollectionFileHeader_default.Block2ImageShiftX;
+               hdr->Block2ImageShiftY = CalibCollection_CollectionFileHeader_default.Block2ImageShiftY;
+               hdr->Block2ImageRotation = CalibCollection_CollectionFileHeader_default.Block2ImageRotation;
+               hdr->Block3ImageShiftX = CalibCollection_CollectionFileHeader_default.Block3ImageShiftX;
+               hdr->Block3ImageShiftY = CalibCollection_CollectionFileHeader_default.Block3ImageShiftY;
+               hdr->Block3ImageRotation = CalibCollection_CollectionFileHeader_default.Block3ImageRotation;
+               hdr->Block4ImageShiftX = CalibCollection_CollectionFileHeader_default.Block4ImageShiftX;
+               hdr->Block4ImageShiftY = CalibCollection_CollectionFileHeader_default.Block4ImageShiftY;
+               hdr->Block4ImageRotation = CalibCollection_CollectionFileHeader_default.Block4ImageRotation;
+               hdr->Block5ImageShiftX = CalibCollection_CollectionFileHeader_default.Block5ImageShiftX;
+               hdr->Block5ImageShiftY = CalibCollection_CollectionFileHeader_default.Block5ImageShiftY;
+               hdr->Block5ImageRotation = CalibCollection_CollectionFileHeader_default.Block5ImageRotation;
+               hdr->Block6ImageShiftX = CalibCollection_CollectionFileHeader_default.Block6ImageShiftX;
+               hdr->Block6ImageShiftY = CalibCollection_CollectionFileHeader_default.Block6ImageShiftY;
+               hdr->Block6ImageRotation = CalibCollection_CollectionFileHeader_default.Block6ImageRotation;
+               hdr->Block7ImageShiftX = CalibCollection_CollectionFileHeader_default.Block7ImageShiftX;
+               hdr->Block7ImageShiftY = CalibCollection_CollectionFileHeader_default.Block7ImageShiftY;
+               hdr->Block7ImageRotation = CalibCollection_CollectionFileHeader_default.Block7ImageRotation;
+               hdr->Block8ImageShiftX = CalibCollection_CollectionFileHeader_default.Block8ImageShiftX;
+               hdr->Block8ImageShiftY = CalibCollection_CollectionFileHeader_default.Block8ImageShiftY;
+               hdr->Block8ImageRotation = CalibCollection_CollectionFileHeader_default.Block8ImageRotation;
+               hdr->FileStructureMinorVersion = 3;
+
+            case 3:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBCOLLECTION_FILESUBMINORVERSION;
                break;

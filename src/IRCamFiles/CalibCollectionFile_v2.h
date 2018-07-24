@@ -5,7 +5,7 @@
  * This file declares the camera calibration collection file structure v2.
  *
  * Auto-generated calibration collection file library.
- * Generated from the calibration collection file structure definition XLS file version 2.2.0
+ * Generated from the calibration collection file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBCOLLECTION_FILEMAJORVERSION_V2      2
-#define CALIBCOLLECTION_FILEMINORVERSION_V2      2
+#define CALIBCOLLECTION_FILEMINORVERSION_V2      3
 #define CALIBCOLLECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V2   512
@@ -64,6 +64,32 @@ struct CalibCollection_CollectionFileHeader_v2Struct {
    float FluxRatio01;   /**< Ratio de flux entre NDF0 et NDF1 */
    float FluxRatio12;   /**< Ratio de flux entre NDF1 et NDF2 */
    uint8_t FOVPosition;   /**< Motorized FOV lens position */
+   uint32_t ExtenderRingSerialNumber;   /**< Unique Telops 32-bit extender ring serial number */
+   char ExtenderRingName[65];   /**< Extender ring name */
+   int16_t Block1ImageShiftX;   /**< Block #1: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block1ImageShiftY;   /**< Block #1: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block1ImageRotation;   /**< Block #1: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block2ImageShiftX;   /**< Block #2: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block2ImageShiftY;   /**< Block #2: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block2ImageRotation;   /**< Block #2: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block3ImageShiftX;   /**< Block #3: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block3ImageShiftY;   /**< Block #3: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block3ImageRotation;   /**< Block #3: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block4ImageShiftX;   /**< Block #4: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block4ImageShiftY;   /**< Block #4: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block4ImageRotation;   /**< Block #4: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block5ImageShiftX;   /**< Block #5: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block5ImageShiftY;   /**< Block #5: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block5ImageRotation;   /**< Block #5: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block6ImageShiftX;   /**< Block #6: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block6ImageShiftY;   /**< Block #6: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block6ImageRotation;   /**< Block #6: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block7ImageShiftX;   /**< Block #7: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block7ImageShiftY;   /**< Block #7: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block7ImageRotation;   /**< Block #7: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
+   int16_t Block8ImageShiftX;   /**< Block #8: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block8ImageShiftY;   /**< Block #8: vertical (Y) shift that must be applied to the unflipped image to ensure co-registration of the sequence */
+   int16_t Block8ImageRotation;   /**< Block #8: clockwise rotation that must be applied to the unflipped image to ensure co-registration of the sequence* */
    uint32_t CollectionDataLength;   /**< Collection data length */
    uint8_t NumberOfBlocks;   /**< Number of calibration blocks in collection file */
    uint16_t CollectionDataCRC16;   /**< Collection data CRC-16 */

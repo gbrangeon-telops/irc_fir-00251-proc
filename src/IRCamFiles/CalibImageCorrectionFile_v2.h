@@ -5,7 +5,7 @@
  * This file declares the camera image correction calibration file structure v2.
  *
  * Auto-generated image correction calibration file library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBIMAGECORRECTION_FILEMAJORVERSION_V2      2
-#define CALIBIMAGECORRECTION_FILEMINORVERSION_V2      2
+#define CALIBIMAGECORRECTION_FILEMINORVERSION_V2      3
 #define CALIBIMAGECORRECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE_V2   512

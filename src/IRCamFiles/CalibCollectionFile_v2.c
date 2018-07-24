@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -60,6 +60,32 @@ CalibCollection_CollectionFileHeader_v2_t CalibCollection_CollectionFileHeader_v
    /* FluxRatio01 = */ 0.000000F,
    /* FluxRatio12 = */ 0.000000F,
    /* FOVPosition = */ 255,
+   /* ExtenderRingSerialNumber = */ 0,
+   /* ExtenderRingName = */ "",
+   /* Block1ImageShiftX = */ 0,
+   /* Block1ImageShiftY = */ 0,
+   /* Block1ImageRotation = */ 0,
+   /* Block2ImageShiftX = */ 0,
+   /* Block2ImageShiftY = */ 0,
+   /* Block2ImageRotation = */ 0,
+   /* Block3ImageShiftX = */ 0,
+   /* Block3ImageShiftY = */ 0,
+   /* Block3ImageRotation = */ 0,
+   /* Block4ImageShiftX = */ 0,
+   /* Block4ImageShiftY = */ 0,
+   /* Block4ImageRotation = */ 0,
+   /* Block5ImageShiftX = */ 0,
+   /* Block5ImageShiftY = */ 0,
+   /* Block5ImageRotation = */ 0,
+   /* Block6ImageShiftX = */ 0,
+   /* Block6ImageShiftY = */ 0,
+   /* Block6ImageRotation = */ 0,
+   /* Block7ImageShiftX = */ 0,
+   /* Block7ImageShiftY = */ 0,
+   /* Block7ImageRotation = */ 0,
+   /* Block8ImageShiftX = */ 0,
+   /* Block8ImageShiftY = */ 0,
+   /* Block8ImageRotation = */ 0,
    /* CollectionDataLength = */ 0,
    /* NumberOfBlocks = */ 0,
    /* CollectionDataCRC16 = */ 0,
@@ -144,7 +170,34 @@ uint32_t CalibCollection_ParseCollectionFileHeader_v2(uint8_t *buffer, uint32_t 
    memcpy(&hdr->FluxRatio01, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->FluxRatio12, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->FOVPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 247; // Skip FREE space
+   numBytes += 131; // Skip FREE space
+   memcpy(&hdr->ExtenderRingSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->ExtenderRingName, &buffer[numBytes], 64); numBytes += 64;
+   hdr->ExtenderRingName[64] = '\0';
+   memcpy(&hdr->Block1ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block1ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block1ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block2ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block2ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block2ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block3ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block3ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block3ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block4ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block4ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block4ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block5ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block5ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block5ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block6ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block6ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block6ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block7ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block7ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block7ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block8ImageShiftX, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block8ImageShiftY, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&hdr->Block8ImageRotation, &buffer[numBytes], sizeof(int16_t)); numBytes += sizeof(int16_t);
    memcpy(&hdr->CollectionDataLength, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    numBytes += 3; // Skip FREE space
    memcpy(&hdr->NumberOfBlocks, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -234,7 +287,33 @@ uint32_t CalibCollection_WriteCollectionFileHeader_v2(CalibCollection_Collection
    memcpy(&buffer[numBytes], &hdr->FluxRatio01, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->FluxRatio12, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->FOVPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 247); numBytes += 247; // FREE space
+   memset(&buffer[numBytes], 0, 131); numBytes += 131; // FREE space
+   memcpy(&buffer[numBytes], &hdr->ExtenderRingSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->ExtenderRingName, 64); numBytes += 64;
+   memcpy(&buffer[numBytes], &hdr->Block1ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block1ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block1ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block2ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block2ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block2ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block3ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block3ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block3ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block4ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block4ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block4ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block5ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block5ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block5ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block6ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block6ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block6ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block7ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block7ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block7ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block8ImageShiftX, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block8ImageShiftY, sizeof(int16_t)); numBytes += sizeof(int16_t);
+   memcpy(&buffer[numBytes], &hdr->Block8ImageRotation, sizeof(int16_t)); numBytes += sizeof(int16_t);
    memcpy(&buffer[numBytes], &hdr->CollectionDataLength, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
    memcpy(&buffer[numBytes], &hdr->NumberOfBlocks, sizeof(uint8_t)); numBytes += sizeof(uint8_t);

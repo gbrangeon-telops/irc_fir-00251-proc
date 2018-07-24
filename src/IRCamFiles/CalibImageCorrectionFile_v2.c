@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$

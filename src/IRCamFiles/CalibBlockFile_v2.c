@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -91,6 +91,22 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* FOVPosition = */ 255,
    /* FocusPositionRaw = */ 0,
    /* ImageCorrectionFocusPositionRaw = */ 0,
+   /* ExternalLensMagnification = */ 0.000000F,
+   /* SensorPixelPitch = */ 0,
+   /* CompensatedBlock = */ 0,
+   /* CalibrationReferenceSourceID = */ 0,
+   /* CalibrationReferenceSourceEmissivity = */ 1.000000F,
+   /* CalibrationReferenceSourceDistance = */ 0.000000F,
+   /* CalibrationChamberTemperature = */ 25.000000F,
+   /* CalibrationChamberRelativeHumidity = */ 0.000000F,
+   /* CalibrationChamberCO2MixingRatio = */ 0.000000F,
+   /* SSEParameter1 = */ 1.000000F,
+   /* SSEParameter2 = */ 0.000000F,
+   /* SSEParameter3 = */ 1.000000F,
+   /* SSEModel = */ 0,
+   /* ExtenderRingID = */ 0,
+   /* ExtenderRingSerialNumber = */ 0,
+   /* ExtenderRingName = */ "",
    /* PixelDataPresence = */ 0,
    /* MaxTKDataPresence = */ 0,
    /* LUTNLDataPresence = */ 0,
@@ -308,7 +324,25 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->FOVPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->FocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
    memcpy(&hdr->ImageCorrectionFocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
-   numBytes += 142; // Skip FREE space
+   memcpy(&hdr->ExternalLensMagnification, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->SensorPixelPitch, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CompensatedBlock, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&hdr->CalibrationReferenceSourceID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->CalibrationReferenceSourceEmissivity, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->CalibrationReferenceSourceDistance, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->CalibrationChamberTemperature, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->CalibrationChamberRelativeHumidity, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->CalibrationChamberCO2MixingRatio, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->SSEParameter1, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->SSEParameter2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->SSEParameter3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   memcpy(&hdr->SSEModel, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   numBytes += 1; // Skip FREE space
+   memcpy(&hdr->ExtenderRingID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&hdr->ExtenderRingSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(hdr->ExtenderRingName, &buffer[numBytes], 64); numBytes += 64;
+   hdr->ExtenderRingName[64] = '\0';
+   numBytes += 30; // Skip FREE space
    memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -432,7 +466,24 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->FOVPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->FocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
    memcpy(&buffer[numBytes], &hdr->ImageCorrectionFocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
-   memset(&buffer[numBytes], 0, 142); numBytes += 142; // FREE space
+   memcpy(&buffer[numBytes], &hdr->ExternalLensMagnification, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->SensorPixelPitch, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CompensatedBlock, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memcpy(&buffer[numBytes], &hdr->CalibrationReferenceSourceID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->CalibrationReferenceSourceEmissivity, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->CalibrationReferenceSourceDistance, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->CalibrationChamberTemperature, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->CalibrationChamberRelativeHumidity, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->CalibrationChamberCO2MixingRatio, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->SSEParameter1, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->SSEParameter2, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->SSEParameter3, sizeof(float)); numBytes += sizeof(float);
+   memcpy(&buffer[numBytes], &hdr->SSEModel, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->ExtenderRingID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+   memcpy(&buffer[numBytes], &hdr->ExtenderRingSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
+   memcpy(&buffer[numBytes], hdr->ExtenderRingName, 64); numBytes += 64;
+   memset(&buffer[numBytes], 0, 30); numBytes += 30; // FREE space
    memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);

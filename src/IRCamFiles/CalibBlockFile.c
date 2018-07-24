@@ -15,6 +15,7 @@
 
 #include "CalibBlockFile.h"
 #include "FileManager.h"
+#include "fpa_intf.h"
 #include <string.h>
 
 /**
@@ -175,6 +176,26 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr->FileStructureMinorVersion = 2;
 
             case 2:
+               // 2.2.x -> 2.3.x
+               hdr->ExternalLensMagnification = CalibBlock_BlockFileHeader_default.ExternalLensMagnification;
+               hdr->SensorPixelPitch = (uint8_t)(FPA_PIXEL_PITCH * 1E+6F); //CalibBlock_BlockFileHeader_default.SensorPixelPitch;
+               hdr->CompensatedBlock = CalibBlock_BlockFileHeader_default.CompensatedBlock;
+               hdr->CalibrationReferenceSourceID = CalibBlock_BlockFileHeader_default.CalibrationReferenceSourceID;
+               hdr->CalibrationReferenceSourceEmissivity = CalibBlock_BlockFileHeader_default.CalibrationReferenceSourceEmissivity;
+               hdr->CalibrationReferenceSourceDistance = CalibBlock_BlockFileHeader_default.CalibrationReferenceSourceDistance;
+               hdr->CalibrationChamberTemperature = CalibBlock_BlockFileHeader_default.CalibrationChamberTemperature;
+               hdr->CalibrationChamberRelativeHumidity = CalibBlock_BlockFileHeader_default.CalibrationChamberRelativeHumidity;
+               hdr->CalibrationChamberCO2MixingRatio = CalibBlock_BlockFileHeader_default.CalibrationChamberCO2MixingRatio;
+               hdr->SSEParameter1 = CalibBlock_BlockFileHeader_default.SSEParameter1;
+               hdr->SSEParameter2 = CalibBlock_BlockFileHeader_default.SSEParameter2;
+               hdr->SSEParameter3 = CalibBlock_BlockFileHeader_default.SSEParameter3;
+               hdr->SSEModel = CalibBlock_BlockFileHeader_default.SSEModel;
+               hdr->ExtenderRingID = CalibBlock_BlockFileHeader_default.ExtenderRingID;
+               hdr->ExtenderRingSerialNumber = CalibBlock_BlockFileHeader_default.ExtenderRingSerialNumber;
+               memcpy(hdr->ExtenderRingName, CalibBlock_BlockFileHeader_default.ExtenderRingName, 65);
+               hdr->FileStructureMinorVersion = 3;
+
+            case 3:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBBLOCK_FILESUBMINORVERSION;
                break;
@@ -268,6 +289,10 @@ uint32_t CalibBlock_ParsePixelDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 2:
+               // 2.2.x -> 2.3.x
+               // Nothing to do
+
+            case 3:
                // Up to date, nothing to do
                break;
          }
@@ -355,6 +380,10 @@ uint32_t CalibBlock_ParseMaxTKDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 2:
+               // 2.2.x -> 2.3.x
+               // Nothing to do
+
+            case 3:
                // Up to date, nothing to do
                break;
          }
@@ -442,6 +471,10 @@ uint32_t CalibBlock_ParseLUTNLDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 2:
+               // 2.2.x -> 2.3.x
+               // Nothing to do
+
+            case 3:
                // Up to date, nothing to do
                break;
          }
@@ -529,6 +562,10 @@ uint32_t CalibBlock_ParseLUTRQDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 2:
+               // 2.2.x -> 2.3.x
+               // Nothing to do
+
+            case 3:
                // Up to date, nothing to do
                break;
          }

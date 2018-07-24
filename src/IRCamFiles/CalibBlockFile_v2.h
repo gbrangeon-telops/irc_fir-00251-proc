@@ -5,7 +5,7 @@
  * This file declares the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.2.0
+ * Generated from the calibration block file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBBLOCK_FILEMAJORVERSION_V2      2
-#define CALIBBLOCK_FILEMINORVERSION_V2      2
+#define CALIBBLOCK_FILEMINORVERSION_V2      3
 #define CALIBBLOCK_FILESUBMINORVERSION_V2   0
 
 #define CALIBBLOCK_BLOCKFILEHEADER_SIZE_V2   512
@@ -129,6 +129,22 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint8_t FOVPosition;   /**< Motorized FOV lens position */
    int32_t FocusPositionRaw;   /**< Motorized focus lens encoder position */
    int32_t ImageCorrectionFocusPositionRaw;   /**< Motorized focus lens encoder position to use for image correction */
+   float ExternalLensMagnification;   /**< External lens magnification (for microscope objective) */
+   uint8_t SensorPixelPitch;   /**< Pixel pitch of the infrared sensor */
+   uint8_t CompensatedBlock;   /**< Logical flag indicating if the block is compensated for reference source and environment (chamber) contributions */
+   uint16_t CalibrationReferenceSourceID;   /**< Reference blackbody source identification number */
+   float CalibrationReferenceSourceEmissivity;   /**< Emissivity of the reference blackbody source */
+   float CalibrationReferenceSourceDistance;   /**< Distance between the reference blackbody surface and the external lens */
+   float CalibrationChamberTemperature;   /**< Temperature of the air mass between the reference blackbody surface and the external lens */
+   float CalibrationChamberRelativeHumidity;   /**< Relative humidity (RH) of the air mass between the reference blackbody surface and the external lens */
+   float CalibrationChamberCO2MixingRatio;   /**< CO2 mixing ratio of the air mass between the reference blackbody surface and the external lens */
+   float SSEParameter1;   /**< Parameter #1 of the SSE compensation */
+   float SSEParameter2;   /**< Parameter #2 of the SSE compensation */
+   float SSEParameter3;   /**< Parameter #3 of the SSE compensation */
+   uint8_t SSEModel;   /**< Model number of the SSE compensation */
+   uint16_t ExtenderRingID;   /**< Extender ring identification number */
+   uint32_t ExtenderRingSerialNumber;   /**< Unique Telops 32-bit extender ring serial number */
+   char ExtenderRingName[65];   /**< Extender ring name */
    uint8_t PixelDataPresence;   /**< Indicates the presence of pixel data in calibration block */
    uint8_t MaxTKDataPresence;   /**< Indicates the presence of MaxTK data in calibration block */
    uint8_t LUTNLDataPresence;   /**< Indicates the presence of LUTNL data in calibration block */
