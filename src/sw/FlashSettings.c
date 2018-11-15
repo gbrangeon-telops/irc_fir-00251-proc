@@ -13,6 +13,8 @@
  * (c) Copyright 2014 Telops Inc.
  */
 
+#include <string.h>
+#include <float.h>
 #include "FlashSettings.h"
 #include "uffs\uffs.h"
 #include "uffs\uffs_fd.h"
@@ -32,8 +34,7 @@
 #include "adc_readout.h"
 #include "RpOpticalProtocol.h"
 #include "XADC_Channels.h"
-#include <string.h>
-#include <float.h>
+#include "IRIGB.h"
 
 /**
  * Indicates whether flash settings have to be loaded immediately
@@ -349,7 +350,12 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    {
       TDCFlagsSet(ADCReadoutIsImplementedMask);
    }
+
    ADC_readout_init(p_flashSettings);
+
+   // Set IRIG HW delay
+   //TODO For now, the HW delay is hardcoded (p_flashSettings is unused). Eventually, the delay will have to be set in the flash setting.
+   IRIG_Initialize(p_flashSettings);
 
    // Update Thermistor model type
    xadcSetphyConverter(&extAdcChannels[XEC_INTERNAL_LENS] , p_flashSettings->InternalLensThType);

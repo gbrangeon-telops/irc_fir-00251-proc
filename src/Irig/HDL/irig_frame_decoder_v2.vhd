@@ -48,7 +48,9 @@ entity irig_frame_decoder_v2 is
       
       -- interface avec le µBlaze Inbterface
       IRIG_DATA        : out irig_data_type;
-      IRIG_PPS         : out std_logic      
+      IRIG_PPS         : out std_logic;
+	  DELAY   : in   std_logic_vector(15 downto 0)  
+	  
       );
 end irig_frame_decoder_v2;
 
@@ -85,14 +87,6 @@ architecture RTL of irig_frame_decoder_v2 is
    signal any_input_valid          : std_logic;
    signal irig_data_raw            : std_logic_vector(100 downto 0);
    signal status_available         : std_logic;
-   signal irig_reg_dval            : std_logic;
-   --   signal irig_seconds_reg         : std_logic_vector(15 downto 0);
-   --   signal irig_minutes_reg         : std_logic_vector(15 downto 0);
-   --   signal irig_hours_reg           : std_logic_vector(15 downto 0);
-   --   signal irig_dayofyear_reg       : std_logic_vector(15 downto 0);
-   --   signal irig_tenthsofsec_reg     : std_logic_vector(15 downto 0);
-   --   signal irig_year_reg            : std_logic_vector(15 downto 0);
-   signal irig_reg_dval_last       : std_logic;
    signal irig_dout_dval           : std_logic;
    signal irig_dout_sel            : std_logic_vector(3 downto 0);
    signal irig_dout                : std_logic_vector(15 downto 0);
@@ -111,14 +105,9 @@ architecture RTL of irig_frame_decoder_v2 is
    signal valid_irig_detected      : std_logic;
    signal idle_cnt                 : unsigned(2 downto 0);
    signal irig_data_i              : irig_data_type;
+   signal delay_i                  : std_logic_vector(15 downto 0);
    
    -- attribute dont_touch : string; 
-   --   -- attribute dont_touch of irig_seconds_reg     : signal is "true"; 
-   --   -- attribute dont_touch of irig_minutes_reg     : signal is "true";
-   --   -- attribute dont_touch of irig_hours_reg       : signal is "true";
-   --   -- attribute dont_touch of irig_dayofyear_reg   : signal is "true";
-   --   -- attribute dont_touch of irig_tenthsofsec_reg : signal is "true";
-   --   -- attribute dont_touch of irig_year_reg        : signal is "true"; 
    -- attribute dont_touch of irig_data_i          : signal is "true"; 
    -- attribute dont_touch of frm_received         : signal is "true";  
    -- attribute dont_touch of irig_dout            : signal is "true";
@@ -128,13 +117,14 @@ architecture RTL of irig_frame_decoder_v2 is
    
 begin 
    
+   delay_i <= DELAY;  
+   
    --------------------------------------------------
    -- sorties 
    --------------------------------------------------    
    -- signaux envoyés au ROIC
    IRIG_DATA <= irig_data_i;        
    IRIG_PPS <= irig_pps_out;   
-   
    -- statuts envoyés au module irig_controller   
    FRM_DEC_STATUS(6) <= '0';
    FRM_DEC_STATUS(5) <= pps_gen_err;
@@ -362,7 +352,7 @@ begin
                irig_data_i.dayofyear_reg(15 downto 0)   <=  resize(irig_data_raw(41 downto 40) & irig_data_raw(38 downto 35) & irig_data_raw(33 downto 30),16);   -- bit 44, 43, 42 et 34 non utilisés
                irig_data_i.tenthsofsec_reg(15 downto 0) <=  resize(irig_data_raw(48 downto 45),16);
                irig_data_i.year_reg(15 downto 0)        <=  resize(irig_data_raw(58 downto 55) & irig_data_raw(53 downto 50),16);   -- bit 54 non utilisé               
-               irig_data_i.time_dval <= not irig_reg_dval;                      -- passe à '1' à la reception d'une trame sur deux
+               irig_data_i.time_dval <= not irig_data_i.time_dval;                      -- passe à '1' à la reception d'une trame sur deux
             end if;
             
             -- registres des statuts
@@ -433,7 +423,7 @@ begin
                
                when wait_clk_channel_dly_st =>    -- il peut y avoir des delais sur le canal de clock. En effet l'ajout du passe-haut induit une avance de phase
                   cnt <= cnt + 1;                    
-                  if cnt >= PASSHIGH_FILTER_PHASE_SHIFT then 
+                  if cnt >= unsigned(delay_i) then 
                      pps_fsm <= gen_pps_st;
                   end if;                   
                
@@ -448,7 +438,7 @@ begin
                
             end case;                   
             
-            irig_pps_out <=  pps_i and not irig_reg_dval;  -- envoi du pps une fois sur 2 mais decalées par rapport à l'envoi des registres
+            irig_pps_out <=  pps_i and not irig_data_i.time_dval;  -- envoi du pps une fois sur 2 mais decalées par rapport à l'envoi des registres
             
          end if;
       end if;

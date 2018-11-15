@@ -1,27 +1,31 @@
 /* $Id: irig.cpp 12286 2013-01-25 19:24:16Z pdaraiche $ */
 
 /***************************** Include Files ********************************/
+
+#include <stdlib.h>
+#include <time.h>
 #include "IRIGB.h"      
 #include "GeniCam.h"
 #include "trig_gen.h"
 #include "tel2000_param.h"
 #include "mb_axi4l_bridge.h"
 #include "hder_inserter.h"
-#include <stdlib.h>
-#include <time.h>
+
+
 
 
 //************************** Constant Definitions ****************************/
-
+#define IRIG_HW_DELAY               750U
 
 #define AR_IRIG_REG1_ADD            0x00
 
 #define AR_IRIG_VALID_SOURCE   		0x18
 #define AR_IRIG_VALID_DATA 	     	0x1C
-#define AR_IRIG_PPC_LATE        	0x20
+#define AR_IRIG_PPC_LATE        	   0x20
 #define AR_IRIG_STATUS              0xF0
 
 #define AW_IRIG_ENABLE              0x00
+
 
 
 //#define IRIG_//PRINTF             //PRINTF       //define or undefine this to enable or disable IRIG realted //PRINTF
@@ -150,7 +154,22 @@ void IRIG_Read_Status(Status_Reg_t *pStatus_Reg)
    pStatus_Reg->PPC_Late     = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_PPC_LATE);
 } 
  
+
+
+//---------------------------------------------------------------------------------
+//  Fonction   Initialize IRIGB
+//---------------------------------------------------------------------------------
  
+void IRIG_Initialize(flashSettings_t *p_flashSettings)
+{
+   // For now, the HW delay is hardcoded.
+   AXI4L_write32(IRIG_HW_DELAY, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+   // TODO Eventually, the delay will have to be set in the flash setting.
+   //AXI4L_write32(p_flashSettings->IRIG_HW_DELAY, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+
+}
+
+
 //---------------------------------------------------------------------------------    
 //  Fonction   IRIG_Enable_Vhd                                                                                 
 //---------------------------------------------------------------------------------

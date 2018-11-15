@@ -35,7 +35,8 @@ entity irig_mb_intf is
       MB_MOSI           : in t_axi4_lite_mosi;
       MB_MISO           : out t_axi4_lite_miso;
       
-      MB_SPEED_ERR      : out std_logic
+      MB_SPEED_ERR      : out std_logic;
+	  DELAY             : out std_logic_vector(15 downto 0)
       );
 end irig_mb_intf;
 
@@ -77,9 +78,11 @@ architecture rtl of irig_mb_intf is
    signal irig_pps_sync             : std_logic;
    signal irig_valid_pps            : std_logic;
    signal irig_valid_source_i       : std_logic;
-   
+   signal delay_i                   : std_logic_vector(15 downto 0);
    
 begin
+   
+   DELAY <= delay_i;
    
    IRIG_ENABLE <= irig_en_i;
    MB_SPEED_ERR <= ppc_speed_err; --erreur grave
@@ -292,7 +295,8 @@ begin
          else			                    
             if slv_reg_wren = '1' and MB_MOSI.WSTRB =  "1111" then -- Master write, toutes les transcations à 32 bits !!! comme dans IRCDEV 					
                case axi_awaddr(7 downto 0) is 
-                  when X"00" =>  irig_en_i <= data_i(0);           -- permet de savoir si le irig est la source de temps à utiliser ou pas.                               
+                  when X"00" =>  irig_en_i <= data_i(0);           -- permet de savoir si le irig est la source de temps à utiliser ou pas.  
+				  when X"04" =>  delay_i <= data_i(15 downto 0);				  
                   when others => --do nothing                  
                end case;               
             end if;                      

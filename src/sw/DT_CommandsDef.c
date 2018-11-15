@@ -44,11 +44,13 @@
 #include "FWController.h"
 #include "RpOpticalProtocol.h"
 #include  "Autofocus.h"
+#include "IRIGB.h"
 
 #ifdef STARTUP
 #include "DT_CommandsDef_startup.h"
 #endif
 
+static IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
@@ -83,6 +85,7 @@ static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
 {
+   {"IRIG", DebugTerminalParseIRIG},
    {"RDM", DebugTerminalParseRDM},
    {"WRM", DebugTerminalParseWRM},
    {"FPA", DebugTerminalParseFPA},
@@ -146,6 +149,73 @@ debugTerminalCtrlIntf_t gDebugTerminalCtrlIntfs[] =
 };
 
 uint32_t gDebugTerminalCtrlIntfsCount = NUM_OF(gDebugTerminalCtrlIntfs);
+
+/**
+ * Debug terminal set IRIGB delay.
+ * This parser is used to parse and validate set IRIGB delay command arguments and to
+ * execute the command.
+ *
+ * @return IRC_SUCCESS when IRIGB set delay command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
+{
+
+
+   uint8_t argStr[12];
+   uint32_t arglen;
+   uint32_t cmd = 0;
+   int32_t iValue = 0;
+
+   // Check for FPA command argument presence
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      // Read FPA command argument
+      arglen = GetNextArg(cbuf, argStr, 4);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid FPA command argument.");
+         return IRC_FAILURE;
+      }
+      argStr[arglen++] = '\0'; // Add string terminator
+
+      if (strcasecmp((char *)argStr, "DLY") == 0)
+      {
+         cmd = 1;
+      }
+      else
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      // Read FPA command parameter value
+      arglen = GetNextArg(cbuf, argStr, 12);
+      switch (cmd)
+      {
+         case 1: // IRIG
+            if ((ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS) ||
+                  (iValue < -32768) || (iValue > 32767))
+            {
+               DT_ERR("Invalid int16 value.");
+               return IRC_FAILURE;
+            }
+            break;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      AXI4L_write32(iValue, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+   }
+
+
+   return IRC_SUCCESS;
+}
 
 /**
  * Debug terminal get FPA status command parser.
@@ -2167,6 +2237,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("Processing FPGA debug terminal commands:");
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
+   DT_PRINTF("  IRIG delay:         IRIG [DLY value]");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");

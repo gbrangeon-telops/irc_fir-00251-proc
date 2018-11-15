@@ -19,8 +19,9 @@
 #include "GC_Registers.h"  
 #include "IRC_status.h" 
 #include "GeniCam.h"
-
+#include "FlashSettings.h"
 /************************** Constant Definitions ****************************/
+#define AW_IRIG_DELAY               0x04
 
 
 /**************************** Type Definitions ******************************/
@@ -35,6 +36,7 @@ typedef struct
 
 /************************** Function Prototypes *****************************/
 
+void IRIG_Initialize(flashSettings_t *p_flashSettings);
 
 void IRIG_Processing(gcRegistersData_t *pGCRegs);
 
