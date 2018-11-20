@@ -291,10 +291,10 @@ begin
                   when X"0CC" =>    user_cfg_i.adc_clk_phase(1)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(1)'length-1 downto 0));                                                                                                                                        
                   when X"0D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));
                   when X"0D4" =>    user_cfg_i.adc_clk_phase(3)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(3)'length-1 downto 0));
-                  when X"0D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  when X"0D8" =>    user_cfg_i.adc_clk_phase(4)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(4)'length-1 downto 0)); 
                                          
                   --n badditional int_time_offset
-                  when X"104" =>    user_cfg_i.additional_fpa_int_time_offset    <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                  when X"0DC" =>    user_cfg_i.additional_fpa_int_time_offset    <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0)); user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

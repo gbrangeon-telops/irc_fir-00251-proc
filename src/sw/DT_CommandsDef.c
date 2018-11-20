@@ -235,6 +235,8 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    extern int32_t gFpaDebugRegB;
    extern int32_t gFpaDebugRegC;
    extern int32_t gFpaDebugRegD;
+   extern int32_t gFpaExposureTimeOffset;
+
    uint8_t argStr[12];
    uint32_t arglen;
    uint32_t cmd = 0;
@@ -266,21 +268,25 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       {
          cmd = 3;
       }
-      else if (strcasecmp((char *)argStr, "REGA") == 0)
+      else if (strcasecmp((char *)argStr, "ETOFF_us") == 0)
       {
          cmd = 4;
       }
-      else if (strcasecmp((char *)argStr, "REGB") == 0)
+      else if (strcasecmp((char *)argStr, "REGA") == 0)
       {
          cmd = 5;
       }
-      else if (strcasecmp((char *)argStr, "REGC") == 0)
+      else if (strcasecmp((char *)argStr, "REGB") == 0)
       {
          cmd = 6;
       }
-      else if (strcasecmp((char *)argStr, "REGD") == 0)
+      else if (strcasecmp((char *)argStr, "REGC") == 0)
       {
          cmd = 7;
+      }
+      else if (strcasecmp((char *)argStr, "REGD") == 0)
+      {
+         cmd = 8;
       }
       else
       {
@@ -301,10 +307,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             }
             break;
 
-         case 4: // REGA
-         case 5: // REGB
-         case 6: // REGC
-         case 7: // REGD
+         case 4: // ETOFF_us
+         case 5: // REGA
+         case 6: // REGB
+         case 7: // REGC
+         case 8: // REGD
             if (ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS)
             {
                DT_ERR("Invalid int32 value.");
@@ -344,21 +351,26 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             gFpaDetectorElectricalRefOffset = fValue;
             break;
 
-         case 4: // REGA
+         case 4: // ET_OFF_us
+            gFpaExposureTimeOffset = iValue;
+            break;
+
+         case 5: // REGD
+            gFpaDebugRegD = iValue;
+            break;
+
+         case 6: // REGA
             gFpaDebugRegA = iValue;
             break;
 
-         case 5: // REGB
+         case 7: // REGB
             gFpaDebugRegB = iValue;
             break;
 
-         case 6: // REGC
+         case 8: // REGC
             gFpaDebugRegC = iValue;
             break;
 
-         case 7: // REGD
-            gFpaDebugRegD = iValue;
-            break;
       }
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
@@ -372,6 +384,8 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA detector polarization voltage = %d mV", gFpaDetectorPolarizationVoltage);
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
    DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
+   DT_PRINTF("FPA detector exposure time offset =  %d us", gFpaExposureTimeOffset);
+
 
    DT_PRINTF("FPA debug register A = %d", gFpaDebugRegA);
    DT_PRINTF("FPA debug register B = %d", gFpaDebugRegB);
@@ -2238,7 +2252,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG delay:         IRIG [DLY value]");
-   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF value]");
+   DT_PRINTF("  FPA status:         FPA [POL|REF|V_OFF|ET_OFF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");

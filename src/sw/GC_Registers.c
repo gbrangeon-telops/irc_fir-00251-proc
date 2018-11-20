@@ -1673,17 +1673,30 @@ void GC_UpdateFOV()
  */
 void GC_UpdateExposureTimeMin()
 {
-   float exposureTimeMin;
+   float UserExposureTimeMin;
+   float CorrectedExposureTimeMin;
+   float exposureTimeOffset; // in us
+   extern int32_t gFpaExposureTimeOffset; //in 10^-8 s
+
+   exposureTimeOffset = (float)gFpaExposureTimeOffset/EXPOSURE_TIME_FACTOR;
+
+   // Here, we correct the minimum exposure time of the user interface in order to compensate the gFpaExposureTimeOffset (from flash setting)
+   //thus prevent sending a command to the FPA that is less than FPA_MIN_EXPOSURE.
+   CorrectedExposureTimeMin = FPA_MIN_EXPOSURE - exposureTimeOffset; // ("exposureTimeSendToFPA" = "UserDefineExposureTime" + exposureTimeOffset)
+
+   //CorrectedExposureTimeMin cannot be lesser than FPA_MIN_EXPOSURE, then CorrectedExposureTimeMin need to be discarded when exposureTimeOffset is positive.
+   CorrectedExposureTimeMin = MAX(CorrectedExposureTimeMin, FPA_MIN_EXPOSURE);
 
    // Always use default value when camera is unlocked
    if (gGC_ProprietaryFeatureKeyIsValid)
    {
-      exposureTimeMin = FPA_MIN_EXPOSURE;
+      UserExposureTimeMin = CorrectedExposureTimeMin;
    }
    else
    {
+
       // Use the most restrictive value (max)
-      exposureTimeMin = MAX(FPA_MIN_EXPOSURE, flashSettings.ExposureTimeMin);
+      UserExposureTimeMin = MAX(CorrectedExposureTimeMin, flashSettings.ExposureTimeMin);
 
       // Compare with specific value when AEC+ is active
       if (GC_AECPlusIsActive)
@@ -1691,20 +1704,20 @@ void GC_UpdateExposureTimeMin()
          if (flashSettings.AECPlusExposureTimeMin != 0.0F)
          {
             // Use the most restrictive value (max)
-            exposureTimeMin = MAX(exposureTimeMin, flashSettings.AECPlusExposureTimeMin);
+            UserExposureTimeMin = MAX(UserExposureTimeMin, flashSettings.AECPlusExposureTimeMin);
          }
          else
          {
             // Use the most restrictive value (max)
-            exposureTimeMin = MAX(exposureTimeMin, FPA_AECP_MIN_EXPOSURE);
+            UserExposureTimeMin = MAX(UserExposureTimeMin, FPA_AECP_MIN_EXPOSURE);
          }
       }
    }
 
    // Update ExposureTimeMin value when needed
-   if (gcRegsData.ExposureTimeMin != exposureTimeMin)
+   if (gcRegsData.ExposureTimeMin != UserExposureTimeMin)
    {
-      GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], exposureTimeMin);
+      GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], UserExposureTimeMin);
    }
 }
 
