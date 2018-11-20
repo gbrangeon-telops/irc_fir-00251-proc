@@ -154,7 +154,7 @@ typedef struct s_CalStatus t_CalStatus;
 
 /************************** Prototypes des fonctions *****************************/
 void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs);
-void CAL_UpdateDeltaF(const t_calib *pA);
+void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs);
 void CAL_UpdateCalibBlockSelMode(t_calib *pA, gcRegistersData_t *pGCRegs);
 void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs);

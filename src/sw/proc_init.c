@@ -73,6 +73,7 @@ t_FpaIntf gFpaIntf = FpaIntf_Ctor(TEL_PAR_TEL_FPA_CTRL_BASEADDR);
 int16_t gFpaDetectorPolarizationVoltage = 0;
 float gFpaDetectorElectricalTapsRef = 0.0F;
 float gFpaDetectorElectricalRefOffset = 0.0F;
+int32_t gFpaExposureTimeOffset = 0;
 int32_t gFpaDebugRegA = 0;
 int32_t gFpaDebugRegB = 0;
 int32_t gFpaDebugRegC = 0;

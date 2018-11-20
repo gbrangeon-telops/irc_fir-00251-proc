@@ -29,8 +29,6 @@
 #define EXPOSURE_TIME_FACTOR                 ((float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ / 1E+6F) // convertit us en coups d'horloge
 #define MAX_NUM_FILTER  8
 
-// sources du temps d'intégration
-enum expSrc_Enum {source_micro_blaze, source_filter_wheel};  
 
 // structure de configuration de exposure_time_ctrl
 struct s_ExposureTime

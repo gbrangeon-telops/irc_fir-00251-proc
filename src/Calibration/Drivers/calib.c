@@ -155,12 +155,15 @@ void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs)
 }
 
 
-void CAL_UpdateDeltaF(const t_calib *pA)
+void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
 {
    float DeltaF;
    uint32_t *p_DeltaF = (uint32_t *)(&DeltaF);
    uint32_t blockIndex;
    uint32_t DeltaF_RamAddr;
+   float FWReferenceTemperature;     //in Celsius
+
+   FWReferenceTemperature = (flashSettings.FWReferenceTemperatureGain * (float)pGCRegs->FWSpeed) + flashSettings.FWReferenceTemperatureOffset;
 
    for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
    {
@@ -169,8 +172,17 @@ void CAL_UpdateDeltaF(const t_calib *pA)
 
       if ((calibrationInfo.blocks[blockIndex].isValid) && (calibrationInfo.blocks[blockIndex].T0 != 0))
       {
-         DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / CC_TO_K(calibrationInfo.blocks[blockIndex].T0), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
-         CAL_DBG("calibrationInfo.blocks[%d].T0 = %dcC", blockIndex, calibrationInfo.blocks[blockIndex].T0);
+         if (flashSettings.FWPresent && (pGCRegs->FWMode == FWM_SynchronouslyRotating) && (flashSettings.FWReferenceTemperatureGain != 0.0F))
+         {
+            DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / C_TO_K(FWReferenceTemperature), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
+            CAL_DBG("FWReferenceTemperature = %dC", FWReferenceTemperature);
+         }
+         else
+         {
+            DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / CC_TO_K(calibrationInfo.blocks[blockIndex].T0), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
+            CAL_DBG("calibrationInfo.blocks[%d].T0 = %dcC", blockIndex, calibrationInfo.blocks[blockIndex].T0);
+         }
+
          CAL_DBG("DeviceTemperatureAry[DTS_InternalLens] = %dcC", C_TO_CC(DeviceTemperatureAry[DTS_InternalLens]));
          CAL_DBG("calibrationInfo.blocks[%d].Nu x 1000 = %d", blockIndex, (uint32_t)(calibrationInfo.blocks[blockIndex].Nu * 1000.0F));
       }
@@ -584,7 +596,7 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
    }
 
    // Make sure delta temp is valid
-   CAL_UpdateDeltaF(pA);
+   CAL_UpdateDeltaF(pA, pGCRegs);
 
    return IRC_SUCCESS;
 }

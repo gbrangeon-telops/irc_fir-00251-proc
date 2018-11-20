@@ -288,7 +288,9 @@ package FPA_define is
       
       -- gestion de la saturation basse et haute à la sortie du module fpa
       sat_ctrl_en                    : std_logic;
-      
+     
+      -- additional exposure time offset from driver C
+      additional_fpa_int_time_offset : signed(31 downto 0);  
    end record;    
    
    ---- Configuration par defaut

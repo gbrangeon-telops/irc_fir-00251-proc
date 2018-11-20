@@ -205,6 +205,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
+   extern int32_t gFpaExposureTimeOffset;
    extern t_FpaIntf gFpaIntf;
    extern bool gDisableFilterWheel;
    extern flashSettings_t flashSettings_default;
@@ -327,6 +328,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gFpaDetectorPolarizationVoltage = p_flashSettings->DetectorPolarizationVoltage;
    gFpaDetectorElectricalTapsRef = p_flashSettings->DetectorElectricalTapsRef;
    gFpaDetectorElectricalRefOffset = p_flashSettings->DetectorElectricalRefOffset;
+   gFpaExposureTimeOffset = p_flashSettings->ExposureTimeOffset;
 
    // Validate ExternalMemoryBufferPresent field
    if (XOR(p_flashSettings->ExternalMemoryBufferPresent, externalMemoryBufferDetected))

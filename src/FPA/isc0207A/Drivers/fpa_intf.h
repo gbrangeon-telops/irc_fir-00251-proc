@@ -132,10 +132,12 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  vdac_value[8];                    
    uint32_t  quad_clk_phase[4];               
      
+   // additional offset coming from flash settings
+   int32_t   additional_fpa_int_time_offset;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {10, 10, 10, 10}}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {10, 10, 10, 10},0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 

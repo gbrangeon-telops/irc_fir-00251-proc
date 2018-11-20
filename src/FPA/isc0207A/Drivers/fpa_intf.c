@@ -24,6 +24,7 @@
 #include "CRC.h"
 #include <math.h>
 #include <string.h>
+#include "exposure_time_ctrl.h"
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -247,6 +248,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    uint8_t FPA_proxim_is_flegx;
+   extern int32_t gFpaExposureTimeOffset;
    
    t_FpaStatus Stat;
 	
@@ -410,7 +412,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    gFpaDebugRegD = (int32_t)ptrA->quad_clk_phase[0];
    
-   WriteStruct(ptrA);   
+  // additional exposure time offset coming from flash 
+  ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ); 
+
+  WriteStruct(ptrA);   
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -441,6 +446,9 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+
+   extern int32_t gFpaExposureTimeOffset;
+
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
@@ -455,15 +463,15 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->lovh_mclk               = 0.0F;
    ptrH->fovh_line               = 0.0F;
    
-   ptrH->tsh_min_usec            = 9.0F;
-   ptrH->trst_min_usec           = 4.0F;
+   ptrH->tsh_min_usec            = 7.8F;
+   ptrH->trst_min_usec           = 0.2F;
    if ((uint32_t)FPA_MCLK_RATE_HZ == 5000000){
       ptrH->tsh_min_usec         = 7.8F;
       ptrH->trst_min_usec        = 0.2F;
    }
    
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
-   ptrH->int_time_offset_usec    = 0.8F;  // offset du temps d'integration
+   ptrH->int_time_offset_usec    = 0.8F + (float)gFpaExposureTimeOffset*(1E+6F/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);  // offset du temps d'integration
    
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
    
