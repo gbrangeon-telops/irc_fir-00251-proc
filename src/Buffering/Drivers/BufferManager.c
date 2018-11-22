@@ -25,6 +25,7 @@
 
 IRC_Status_t BufferManager_Init(t_bufferManager *pBufferCtrl, gcRegistersData_t *pGCRegs)
 {
+   uint64_t totalSpace = BM_TOTAL_SPACE_BYTES;
 
    pBufferCtrl->Buffer_base_addr = PROC_MEM_MEMORY_BUFFER_BASEADDR; //DDR Base ADDR + Buffer location offset
    pBufferCtrl->nbSequenceMax = 1;
@@ -47,9 +48,12 @@ IRC_Status_t BufferManager_Init(t_bufferManager *pBufferCtrl, gcRegistersData_t 
    pBufferCtrl->ConfigValid = 0;
    WriteStruct(pBufferCtrl);
 
+   // Initialize memory registers
+   pGCRegs->MemoryBufferTotalSpaceHigh = totalSpace >> 32;
+   pGCRegs->MemoryBufferTotalSpaceLow = totalSpace & 0x00000000FFFFFFFF;
+
    BUFFERING_DBG("Init");
    return IRC_SUCCESS;
-
 }
 
 void BufferManager_GetStatus(t_bufferStatus *pStat, const t_bufferManager *pBufferCtrl)

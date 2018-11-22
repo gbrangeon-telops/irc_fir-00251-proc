@@ -22,7 +22,7 @@ mkdir %releaseDir%\FIR-00251-NTx-Mini\
 copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFile% 
 
 %x_xilperl% %scriptsDir%\paperwork\generatePaperwork.pl -sensor %sensorName% ^
-   -v %firmwareVersion% -o %outputRevFile% -storage_revs %storageRevFile% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -t %paperworkTemplateDir%
+   -v %firmwareVersion% -o %outputRevFile% -storage_revs1 %storageRevFile1% -storage_revs2 %storageRevFile2% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -t %paperworkTemplateDir%
 
 %zip% a -r -tzip %paperworkTemplateDir%.zip %paperworkTemplateDir%\*.*
 

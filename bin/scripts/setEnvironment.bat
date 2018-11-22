@@ -21,7 +21,8 @@ set releaseFile=%binDir%\%baseName%_release.bin
 set releaseLogFile=%binDir%\%baseName%_release.txt
 set revFile=%binDir%\svnrevs.pl
 set outputRevFile=%outputDir%\bin\svnrevs.pl
-set storageRevFile=%storageDir%\bin\svnrevs.pl
+set storageRevFile1=%storageDir%\bin\svnrevs_16.pl
+set storageRevFile2=%storageDir%\bin\svnrevs_32.pl
 set versionFile=%binDir%\version.txt
 set sensorInfoFile=%projectDir%\bin\SensorInformation.txt
 

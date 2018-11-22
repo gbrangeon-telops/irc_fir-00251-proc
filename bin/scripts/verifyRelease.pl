@@ -15,13 +15,15 @@ sub read_file {
 use Getopt::Long;
 my $buildInfoFile;
 my $outputReleaseInfoFile;
-my $storageReleaseInfoFile;
+my $storageReleaseInfoFile1;
+my $storageReleaseInfoFile2;
 my $procReleaseInfoFile;
 my $releaseLogFile;
 
 GetOptions("bf=s" => \$buildInfoFile,
       "of=s" => \$outputReleaseInfoFile,
-      "sf=s" => \$storageReleaseInfoFile,
+      "sf1=s" => \$storageReleaseInfoFile1,
+	  "sf2=s" => \$storageReleaseInfoFile2,
       "pf=s" => \$procReleaseInfoFile,
       "rf=s" => \$releaseLogFile)
    or die("Error in command line arguments\n");
@@ -63,16 +65,27 @@ if ($error == 1)
 }
 
 # Parse storage release info file
-my $storageReleaseInfoFileStr = read_file($storageReleaseInfoFile);
-my $storageReleaseInfoHardware;
-my $storageReleaseInfoSoftware;
-my $storageReleaseInfoBootLoader;
-my $storageReleaseInfoCommon;
+my $storageReleaseInfoFileStr1 = read_file($storageReleaseInfoFile1);
+my $storageReleaseInfoHardware1;
+my $storageReleaseInfoSoftware1;
+my $storageReleaseInfoBootLoader1;
+my $storageReleaseInfoCommon1;
 
-if ($storageReleaseInfoFileStr =~ /rel_storage_hw_rev[^\n\r0-9]+(\d+)/) { $storageReleaseInfoHardware = $1; } else { $error = 1; }
-if ($storageReleaseInfoFileStr =~ /rel_storage_sw_rev[^\n\r0-9]+(\d+)/) { $storageReleaseInfoSoftware = $1; } else { $error = 1; }
-if ($storageReleaseInfoFileStr =~ /rel_storage_boot_rev[^\n\r0-9]+(\d+)/) { $storageReleaseInfoBootLoader = $1; } else { $error = 1; }
-if ($storageReleaseInfoFileStr =~ /rel_storage_common_rev[^\n\r0-9]+(\d+)/) { $storageReleaseInfoCommon = $1; } else { $error = 1; }
+my $storageReleaseInfoFileStr2 = read_file($storageReleaseInfoFile2);
+my $storageReleaseInfoHardware2;
+my $storageReleaseInfoSoftware2;
+my $storageReleaseInfoBootLoader2;
+my $storageReleaseInfoCommon2;
+
+if ($storageReleaseInfoFileStr1 =~ /rel_storage_hw_rev1[^\n\r0-9]+(\d+)/) { $storageReleaseInfoHardware1 = $1; } else { $error = 1; }
+if ($storageReleaseInfoFileStr1 =~ /rel_storage_sw_rev1[^\n\r0-9]+(\d+)/) { $storageReleaseInfoSoftware1 = $1; } else { $error = 1; }
+if ($storageReleaseInfoFileStr1 =~ /rel_storage_boot_rev1[^\n\r0-9]+(\d+)/) { $storageReleaseInfoBootLoader1 = $1; } else { $error = 1; }
+if ($storageReleaseInfoFileStr1 =~ /rel_storage_common_rev1[^\n\r0-9]+(\d+)/) { $storageReleaseInfoCommon1 = $1; } else { $error = 1; }
+
+if ($storageReleaseInfoFileStr2 =~ /rel_storage_hw_rev2[^\n\r0-9]+(\d+)/) { $storageReleaseInfoHardware2 = $1; } else { $error = 1; }
+if ($storageReleaseInfoFileStr2 =~ /rel_storage_sw_rev2[^\n\r0-9]+(\d+)/) { $storageReleaseInfoSoftware2 = $1; } else { $error = 1; }
+if ($storageReleaseInfoFileStr2 =~ /rel_storage_boot_rev2[^\n\r0-9]+(\d+)/) { $storageReleaseInfoBootLoader2 = $1; } else { $error = 1; }
+if ($storageReleaseInfoFileStr2 =~ /rel_storage_common_rev2[^\n\r0-9]+(\d+)/) { $storageReleaseInfoCommon2 = $1; } else { $error = 1; }
 
 if ($error == 1)
 {
@@ -107,10 +120,15 @@ my $releaseLogOutputHardware;
 my $releaseLogOutputSoftware;
 my $releaseLogOutputBootLoader;
 my $releaseLogOutputCommon;
-my $releaseLogStorageHardware;
-my $releaseLogStorageSoftware;
-my $releaseLogStorageBootLoader;
-my $releaseLogStorageCommon;
+my $releaseLogStorageHardware1;
+my $releaseLogStorageSoftware1;
+my $releaseLogStorageBootLoader1;
+my $releaseLogStorageCommon1;
+my $releaseLogStorageHardware2;
+my $releaseLogStorageSoftware2;
+my $releaseLogStorageBootLoader2;
+my $releaseLogStorageCommon2;
+
 
 if ($releaseLogFileStr =~ /Firmware release version[^\n\r0-9]+([\d\.]+)/) { $releaseLogVersion = $1; } else { $error = 1; }
 if ($releaseLogFileStr =~ /Processing FPGA hardware[^\n\r0-9]+(\d+)/) { $releaseLogProcHardware = $1; } else { $error = 1; }
@@ -121,10 +139,14 @@ if ($releaseLogFileStr =~ /Output FPGA hardware[^\n\r0-9]+(\d+)/) { $releaseLogO
 if ($releaseLogFileStr =~ /Output FPGA software[^\n\r0-9]+(\d+)/) { $releaseLogOutputSoftware = $1; } else { $error = 1; }
 if ($releaseLogFileStr =~ /Output FPGA boot loader[^\n\r0-9]+(\d+)/) { $releaseLogOutputBootLoader = $1; } else { $error = 1; }
 if ($releaseLogFileStr =~ /Output FPGA common[^\n\r0-9]+(\d+)/) { $releaseLogOutputCommon = $1; } else { $error = 1; }
-if ($releaseLogFileStr =~ /Storage FPGA hardware[^\n\r0-9]+(\d+)/) { $releaseLogStorageHardware = $1; } else { $error = 1; }
-if ($releaseLogFileStr =~ /Storage FPGA software[^\n\r0-9]+(\d+)/) { $releaseLogStorageSoftware = $1; } else { $error = 1; }
-if ($releaseLogFileStr =~ /Storage FPGA boot loader[^\n\r0-9]+(\d+)/) { $releaseLogStorageBootLoader = $1; } else { $error = 1; }
-if ($releaseLogFileStr =~ /Storage FPGA common[^\n\r0-9]+(\d+)/) { $releaseLogStorageCommon = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA hardware 16GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageHardware1 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA software 16GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageSoftware1 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA boot loader 16GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageBootLoader1 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA common repository 16GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageCommon1 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA hardware 32GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageHardware2 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA software 32GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageSoftware2 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA boot loader 32GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageBootLoader2 = $1; } else { $error = 1; }
+if ($releaseLogFileStr =~ /Storage FPGA common repository 32GB[^\n\r0-9]+(\d+)/) { $releaseLogStorageCommon2 = $1; } else { $error = 1; }
 
 if ($error == 1)
 {
@@ -157,12 +179,16 @@ if (($outputReleaseInfoHardware ne $releaseLogOutputHardware) ||
    die("Output FPGA relase info does not release log file\n");
 }
 
-if (($storageReleaseInfoHardware ne $releaseLogStorageHardware) ||
-   ($storageReleaseInfoSoftware ne $releaseLogStorageSoftware) || 
-   ($storageReleaseInfoBootLoader ne $releaseLogStorageBootLoader) || 
-   ($storageReleaseInfoCommon ne $releaseLogStorageCommon))
+if (($storageReleaseInfoHardware1 ne $releaseLogStorageHardware1) ||
+   ($storageReleaseInfoSoftware1 ne $releaseLogStorageSoftware1) || 
+   ($storageReleaseInfoBootLoader1 ne $releaseLogStorageBootLoader1) || 
+   ($storageReleaseInfoCommon1 ne $releaseLogStorageCommon1) ||
+   ($storageReleaseInfoHardware2 ne $releaseLogStorageHardware2) ||
+   ($storageReleaseInfoSoftware2 ne $releaseLogStorageSoftware2) || 
+   ($storageReleaseInfoBootLoader2 ne $releaseLogStorageBootLoader2) || 
+   ($storageReleaseInfoCommon2 ne $releaseLogStorageCommon2))
 {
-   die("Storage FPGA relase info does not release log file\n");
+   die("Storage FPGA relase info does not correspond to release log file\n");
 }
 
 print("$releaseLogVersion (Passed)\n");

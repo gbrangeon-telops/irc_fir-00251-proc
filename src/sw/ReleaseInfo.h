@@ -31,13 +31,13 @@
 /**
  * Release information length in bytes
  */
-#define RELEASEINFO_LENGTH             80
+#define RELEASEINFO_LENGTH             96
 
 /**
  * Release information structure version
  */
 #define RELEASEINFO_MAJOR_VERSION      2
-#define RELEASEINFO_MINOR_VERSION      1
+#define RELEASEINFO_MINOR_VERSION      2
 #define RELEASEINFO_SUBMINOR_VERSION   0
 
 /**
@@ -65,10 +65,15 @@ struct releaseInfoStruct {
    uint32_t releaseOutputFPGABootLoaderRevision;
    uint32_t releaseOutputCommonRevision;
 
-   uint32_t releaseStorageFPGAHardwareRevision;
-   uint32_t releaseStorageFPGASoftwareRevision;
-   uint32_t releaseStorageFPGABootLoaderRevision;
-   uint32_t releaseStorageCommonRevision;
+   uint32_t releaseStorageFPGAHardwareRevision1;
+   uint32_t releaseStorageFPGASoftwareRevision1;
+   uint32_t releaseStorageFPGABootLoaderRevision1;
+   uint32_t releaseStorageCommonRevision1;
+
+   uint32_t releaseStorageFPGAHardwareRevision2;
+   uint32_t releaseStorageFPGASoftwareRevision2;
+   uint32_t releaseStorageFPGABootLoaderRevision2;
+   uint32_t releaseStorageCommonRevision2;
 };
 
 /**

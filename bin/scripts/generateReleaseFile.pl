@@ -2,7 +2,7 @@
 
 # Release information version
 my $relInfoVersionMajor = 2;
-my $relInfoVersionMinor = 1;
+my $relInfoVersionMinor = 2;
 my $relInfoVersionSubMinor = 0;
 
 use Getopt::Long;
@@ -12,7 +12,8 @@ my $firmwareVersionSubMinor;
 my $firmwareVersionBuild;
 my $procRevFile;
 my $outputRevFile;
-my $storageRevFile;
+my $storageRevFile1;
+my $storageRevFile2;
 my $releaseFile;
 my $releaseLogFile;
 
@@ -22,7 +23,8 @@ GetOptions("fa=i" => \$firmwareVersionMajor,
       "fb=i" => \$firmwareVersionBuild,
       "p=s" => \$procRevFile,
       "o=s" => \$outputRevFile,
-	  "s=s" => \$storageRevFile,
+	  "s1=s" => \$storageRevFile1,
+	  "s2=s" => \$storageRevFile2,
       "release=s" => \$releasefile,
       "log=s" => \$releaseLogfile)
    or die("Error in command line arguments\n");
@@ -38,14 +40,20 @@ our $rel_out_hw_rev;
 our $rel_out_sw_rev;
 our $rel_out_boot_rev;
 our $rel_out_common_rev;
-our $rel_storage_hw_rev;
-our $rel_storage_sw_rev;
-our $rel_storage_boot_rev;
-our $rel_storage_common_rev;
+our $rel_storage_hw_rev1;
+our $rel_storage_sw_rev1;
+our $rel_storage_boot_rev1;
+our $rel_storage_common_rev1;
+our $rel_storage_hw_rev2;
+our $rel_storage_sw_rev2;
+our $rel_storage_boot_rev2;
+our $rel_storage_common_rev2;
+
 
 require $procRevFile;
 require $outputRevFile;
-require $storageRevFile;
+require $storageRevFile1;
+require $storageRevFile2;
 
 my $relInfolength = 0;
 
@@ -77,10 +85,15 @@ print $fh pack('I', $rel_out_hw_rev); $relInfolength += 4;
 print $fh pack('I', $rel_out_sw_rev); $relInfolength += 4;
 print $fh pack('I', $rel_out_boot_rev); $relInfolength += 4;
 print $fh pack('I', $rel_out_common_rev); $relInfolength += 4;
-print $fh pack('I', $rel_storage_hw_rev); $relInfolength += 4;
-print $fh pack('I', $rel_storage_sw_rev); $relInfolength += 4;
-print $fh pack('I', $rel_storage_boot_rev); $relInfolength += 4;
-print $fh pack('I', $rel_storage_common_rev); $relInfolength += 4;
+print $fh pack('I', $rel_storage_hw_rev1); $relInfolength += 4;
+print $fh pack('I', $rel_storage_sw_rev1); $relInfolength += 4;
+print $fh pack('I', $rel_storage_boot_rev1); $relInfolength += 4;
+print $fh pack('I', $rel_storage_common_rev1); $relInfolength += 4;
+print $fh pack('I', $rel_storage_hw_rev2); $relInfolength += 4;
+print $fh pack('I', $rel_storage_sw_rev2); $relInfolength += 4;
+print $fh pack('I', $rel_storage_boot_rev2); $relInfolength += 4;
+print $fh pack('I', $rel_storage_common_rev2); $relInfolength += 4;
+
 
 # Write release information length field
 seek($fh, 0, SEEK_SET);
@@ -106,9 +119,14 @@ print $lfh sprintf("Output FPGA software SVN revision: %d\n", $rel_out_sw_rev);
 print $lfh sprintf("Output FPGA boot loader SVN revision: %d\n", $rel_out_boot_rev);
 print $lfh sprintf("Output FPGA common repository SVN revision: %d\n", $rel_out_common_rev);
 
-print $lfh sprintf("Storage FPGA hardware SVN revision: %d\n", $rel_storage_hw_rev);
-print $lfh sprintf("Storage FPGA software SVN revision: %d\n", $rel_storage_sw_rev);
-print $lfh sprintf("Storage FPGA boot loader SVN revision: %d\n", $rel_storage_boot_rev);
-print $lfh sprintf("Storage FPGA common repository SVN revision: %d\n", $rel_storage_common_rev);
+print $lfh sprintf("Storage FPGA hardware 16GB SVN revision: %d\n", $rel_storage_hw_rev1);
+print $lfh sprintf("Storage FPGA software 16GB SVN revision: %d\n", $rel_storage_sw_rev1);
+print $lfh sprintf("Storage FPGA boot loader 16GB SVN revision: %d\n", $rel_storage_boot_rev1);
+print $lfh sprintf("Storage FPGA common repository 16GB SVN revision: %d\n", $rel_storage_common_rev1);
+
+print $lfh sprintf("Storage FPGA hardware 32GB SVN revision: %d\n", $rel_storage_hw_rev2);
+print $lfh sprintf("Storage FPGA software 32GB SVN revision: %d\n", $rel_storage_sw_rev2);
+print $lfh sprintf("Storage FPGA boot loader 32GB SVN revision: %d\n", $rel_storage_boot_rev2);
+print $lfh sprintf("Storage FPGA common repository 32GB SVN revision: %d\n", $rel_storage_common_rev2);
 
 close ($lfh);

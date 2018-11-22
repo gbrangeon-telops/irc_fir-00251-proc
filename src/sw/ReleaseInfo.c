@@ -13,6 +13,7 @@
  * (c) Copyright 2014 Telops Inc.
  */
 
+#include <stdbool.h>
 #include "ReleaseInfo.h"
 #include "FlashSettingsFile.h"
 #include "FlashDynamicValuesFile.h"
@@ -108,14 +109,23 @@ IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo
    p_flashData += sizeof(releaseInfo->releaseOutputCommonRevision);
 
    // Read storage FPGA release revision numbers fields
-   memcpy(&releaseInfo->releaseStorageFPGAHardwareRevision, p_flashData, sizeof(releaseInfo->releaseStorageFPGAHardwareRevision));
-   p_flashData += sizeof(releaseInfo->releaseStorageFPGAHardwareRevision);
-   memcpy(&releaseInfo->releaseStorageFPGASoftwareRevision, p_flashData, sizeof(releaseInfo->releaseStorageFPGASoftwareRevision));
-   p_flashData += sizeof(releaseInfo->releaseStorageFPGASoftwareRevision);
-   memcpy(&releaseInfo->releaseStorageFPGABootLoaderRevision, p_flashData, sizeof(releaseInfo->releaseStorageFPGABootLoaderRevision));
-   p_flashData += sizeof(releaseInfo->releaseStorageFPGABootLoaderRevision);
-   memcpy(&releaseInfo->releaseStorageCommonRevision, p_flashData, sizeof(releaseInfo->releaseStorageCommonRevision));
-   p_flashData += sizeof(releaseInfo->releaseStorageCommonRevision);
+   memcpy(&releaseInfo->releaseStorageFPGAHardwareRevision1, p_flashData, sizeof(releaseInfo->releaseStorageFPGAHardwareRevision1));
+   p_flashData += sizeof(releaseInfo->releaseStorageFPGAHardwareRevision1);
+   memcpy(&releaseInfo->releaseStorageFPGASoftwareRevision1, p_flashData, sizeof(releaseInfo->releaseStorageFPGASoftwareRevision1));
+   p_flashData += sizeof(releaseInfo->releaseStorageFPGASoftwareRevision1);
+   memcpy(&releaseInfo->releaseStorageFPGABootLoaderRevision1, p_flashData, sizeof(releaseInfo->releaseStorageFPGABootLoaderRevision1));
+   p_flashData += sizeof(releaseInfo->releaseStorageFPGABootLoaderRevision1);
+   memcpy(&releaseInfo->releaseStorageCommonRevision1, p_flashData, sizeof(releaseInfo->releaseStorageCommonRevision1));
+   p_flashData += sizeof(releaseInfo->releaseStorageCommonRevision1);
+
+   memcpy(&releaseInfo->releaseStorageFPGAHardwareRevision2, p_flashData, sizeof(releaseInfo->releaseStorageFPGAHardwareRevision2));
+   p_flashData += sizeof(releaseInfo->releaseStorageFPGAHardwareRevision2);
+   memcpy(&releaseInfo->releaseStorageFPGASoftwareRevision2, p_flashData, sizeof(releaseInfo->releaseStorageFPGASoftwareRevision2));
+   p_flashData += sizeof(releaseInfo->releaseStorageFPGASoftwareRevision2);
+   memcpy(&releaseInfo->releaseStorageFPGABootLoaderRevision2, p_flashData, sizeof(releaseInfo->releaseStorageFPGABootLoaderRevision2));
+   p_flashData += sizeof(releaseInfo->releaseStorageFPGABootLoaderRevision2);
+   memcpy(&releaseInfo->releaseStorageCommonRevision2, p_flashData, sizeof(releaseInfo->releaseStorageCommonRevision2));
+   p_flashData += sizeof(releaseInfo->releaseStorageCommonRevision2);
 
    releaseInfo->isValid = 1;
 
@@ -132,6 +142,20 @@ IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo
  */
 IRC_Status_t ReleaseInfo_Validate(releaseInfo_t *releaseInfo)
 {
+   bool f1, f2;
+
+   /* Verify first set of Storage SVN revision numbers */
+   f1 = DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGAHardwareRevision] == releaseInfo->releaseStorageFPGAHardwareRevision1 &&
+        DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGASoftwareRevision] == releaseInfo->releaseStorageFPGASoftwareRevision1 &&
+        DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGABootLoaderRevision] == releaseInfo->releaseStorageFPGABootLoaderRevision1 &&
+        DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGACommonRevision] == releaseInfo->releaseStorageCommonRevision1;
+
+   /* Verify second set of Storage SVN revision numbers */
+   f2 = DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGAHardwareRevision] == releaseInfo->releaseStorageFPGAHardwareRevision2 &&
+        DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGASoftwareRevision] == releaseInfo->releaseStorageFPGASoftwareRevision2 &&
+        DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGABootLoaderRevision] == releaseInfo->releaseStorageFPGABootLoaderRevision2 &&
+        DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGACommonRevision] == releaseInfo->releaseStorageCommonRevision2;
+
    if ((!releaseInfo->isValid) ||
          (DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGAHardwareRevision] != releaseInfo->releaseProcessingFPGAHardwareRevision) ||
          (DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGASoftwareRevision] != releaseInfo->releaseProcessingFPGASoftwareRevision) ||
@@ -141,11 +165,7 @@ IRC_Status_t ReleaseInfo_Validate(releaseInfo_t *releaseInfo)
          (DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGASoftwareRevision] != releaseInfo->releaseOutputFPGASoftwareRevision) ||
          (DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGABootLoaderRevision] != releaseInfo->releaseOutputFPGABootLoaderRevision) ||
          (DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGACommonRevision] != releaseInfo->releaseOutputCommonRevision) ||
-         (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask) &&
-               ((DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGAHardwareRevision] != releaseInfo->releaseStorageFPGAHardwareRevision) ||
-               (DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGASoftwareRevision] != releaseInfo->releaseStorageFPGASoftwareRevision) ||
-               (DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGABootLoaderRevision] != releaseInfo->releaseStorageFPGABootLoaderRevision) ||
-               (DeviceFirmwareModuleRevisionAry[DFMS_StorageFPGACommonRevision] != releaseInfo->releaseStorageCommonRevision))))
+         (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask) && !f1 && !f2))
    {
       return IRC_FAILURE;
    }

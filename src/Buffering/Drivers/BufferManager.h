@@ -19,6 +19,7 @@
 #include "IRC_Status.h"
 #include "mb_axi4l_bridge.h"
 #include "tel2000_param.h"
+#include "proc_memory.h"
 #include "verbose.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -69,6 +70,8 @@
 #define BT_START_IMG_OFFSET   0
 #define BT_MOI_IMG_OFFSET     1
 #define BT_END_IMG_OFFSET     2
+
+#define BM_TOTAL_SPACE_BYTES     ((uint64_t)(PROC_MEM_MEMORY_BUFFER_HIGHADDR - PROC_MEM_MEMORY_BUFFER_BASEADDR + 1))
 
 // Struct Definition
 /**
