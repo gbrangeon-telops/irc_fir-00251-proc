@@ -268,7 +268,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       {
          cmd = 3;
       }
-      else if (strcasecmp((char *)argStr, "ETOFF_us") == 0)
+      else if (strcasecmp((char *)argStr, "ETOFF") == 0)
       {
          cmd = 4;
       }
@@ -307,7 +307,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             }
             break;
 
-         case 4: // ETOFF_us
+         case 4: // ETOFF
          case 5: // REGA
          case 6: // REGB
          case 7: // REGC
@@ -351,24 +351,24 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             gFpaDetectorElectricalRefOffset = fValue;
             break;
 
-         case 4: // ET_OFF_us
+         case 4: // ETOFF
             gFpaExposureTimeOffset = iValue;
             break;
 
-         case 5: // REGD
-            gFpaDebugRegD = iValue;
-            break;
-
-         case 6: // REGA
+         case 5: // REGA
             gFpaDebugRegA = iValue;
             break;
 
-         case 7: // REGB
+         case 6: // REGB
             gFpaDebugRegB = iValue;
             break;
 
-         case 8: // REGC
+         case 7: // REGC
             gFpaDebugRegC = iValue;
+            break;
+			
+		case 8: // REGD
+            gFpaDebugRegD = iValue;
             break;
 
       }
@@ -384,7 +384,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA detector polarization voltage = %d mV", gFpaDetectorPolarizationVoltage);
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
    DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
-   DT_PRINTF("FPA detector exposure time offset =  %d us", gFpaExposureTimeOffset);
+   DT_PRINTF("FPA detector exposure time offset =  %d x 10^(-8) s", gFpaExposureTimeOffset);
 
 
    DT_PRINTF("FPA debug register A = %d", gFpaDebugRegA);
@@ -2252,7 +2252,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG delay:         IRIG [DLY value]");
-   DT_PRINTF("  FPA status:         FPA [POL|REF|V_OFF|ET_OFF value]");
+   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
