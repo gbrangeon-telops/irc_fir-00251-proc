@@ -75,6 +75,7 @@ static IRC_Status_t DebugTerminalParseDFW(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseKEY(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFWTEMP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
@@ -118,6 +119,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"FS", DebugTerminalParseFS},
    {"DTO", DebugTerminalParseDTO},
    {"FWPID", DebugTerminalParseFWPID},
+   {"FWTEMP", DebugTerminalParseFWTEMP},
    {"CI", DebugTerminalParseCI},
    {"LT", DebugTerminalParseLT},
    {"PLT", DebugTerminalParsePLT},
@@ -1815,6 +1817,68 @@ IRC_Status_t DebugTerminalParseGCP(circByteBuffer_t *cbuf)
 }
 
 /**
+ * Get/Set Filter wheel reference temperature coefficients command parser.
+ * This parser is used to parse and validate Get/Set Filter wheel reference temperature coefficients command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Get/Set Filter wheel reference temperature coefficients command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t DebugTerminalParseFWTEMP(circByteBuffer_t *cbuf)
+{
+   uint8_t argStr[10];
+   uint32_t arglen;
+   float fwTemp_m;
+   float fwTemp_b;
+
+   // Check for FWTEMP command argument presence
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      // Read FWTEMP command m argument
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if (ParseFloatNumDec((char *)argStr, arglen, &fwTemp_m) != IRC_SUCCESS)
+      {
+         DT_ERR("Invalid FWTEMP command m argument.");
+         return IRC_FAILURE;
+      }
+
+      // Read FWTEMP command b argument
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if (ParseFloatNumDec((char *)argStr, arglen, &fwTemp_b) != IRC_SUCCESS)
+      {
+         DT_ERR("Invalid FWTEMP command b argument.");
+         return IRC_FAILURE;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments.");
+         return IRC_FAILURE;
+      }
+
+      if (TDCFlagsTst(FWIsImplementedMask & FWSynchronouslyRotatingModeIsImplementedMask))
+      {
+         flashSettings.FWReferenceTemperatureGain = fwTemp_m;
+         flashSettings.FWReferenceTemperatureOffset = fwTemp_b;
+      }
+   }
+
+   if (!TDCFlagsTst(FWIsImplementedMask & FWSynchronouslyRotatingModeIsImplementedMask))
+   {
+      DT_ERR("Filter wheel is not implemented or not synchronously rotating.");
+      return IRC_FAILURE;
+   }
+
+   DT_PRINTF("FWTEMP: m = " _PCF(3) ", b = %d\n",  _FFMT(flashSettings.FWReferenceTemperatureGain, 3), _FFMT(flashSettings.FWReferenceTemperatureOffset, 3));
+
+   return IRC_SUCCESS;
+}
+
+
+/**
  * Get/Set ADC readout calibration command parser.
  * This parser is used to parse and validate Get/Set ADC readout calibration command arguments
  * and to execute the command.
@@ -2281,6 +2345,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Flash Settings:     FS");
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
+   DT_PRINTF("  FW Temperature Coeff. : FWTEMP [m b]");
    DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
