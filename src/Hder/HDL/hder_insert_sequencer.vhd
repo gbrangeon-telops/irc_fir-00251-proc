@@ -78,6 +78,18 @@ architecture rtl of hder_insert_sequencer is
             CLK    : in std_logic);
     end component;
     
+    component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+    
     component fwft_sfifo_w8_d16
         port(
             rst      : in std_logic;
@@ -248,13 +260,20 @@ begin
     ------------------------------------------------------------------
     --  synchro reset
     ------------------------------------------------------------------
-    U1 : sync_reset
+    U1A : sync_reset
     port map(
         ARESET => ARESET,
         CLK    => CLK,
         SRESET => sreset
         ); 
-    
+   
+   U1B : double_sync
+   port map(
+      CLK => CLK,
+      D   => IMG_INFO.EXP_FEEDBK,
+      Q   => exp_feedbk_sync,
+      RESET => sreset
+      );
     -------------------------------------------------------------------
     -- Ecriture de l'id du header dans un fifo
     -------------------------------------------------------------------   
@@ -264,11 +283,11 @@ begin
     begin          
         if rising_edge(CLK) then                   
             if sreset = '1' then 
-                exp_feedbk_sync <= '0';
+                --exp_feedbk_sync <= '0';
                 hder_id_fifo_wr <= '0';
                 exp_feedbk_sync_last <= '0';
             else            
-                exp_feedbk_sync <= IMG_INFO.EXP_FEEDBK; -- simple synchronisation de IMG_INFO.EXP_FEEDBK car il est sur FPA_INTF_CLK et dure plus qu'1 CLK.
+                --exp_feedbk_sync <= IMG_INFO.EXP_FEEDBK; -- simple synchronisation de IMG_INFO.EXP_FEEDBK car il est sur FPA_INTF_CLK et dure plus qu'1 CLK.
                 exp_feedbk_sync_last <= exp_feedbk_sync;
                 frame_id_sync <= std_logic_vector(IMG_INFO.FRAME_ID);
                 hder_id_fifo_wr <= exp_feedbk_sync  and not exp_feedbk_sync_last;

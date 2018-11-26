@@ -48,6 +48,18 @@ architecture rtl of flagging_SM is
          );
    end component;      
    
+   component gh_edge_det
+      port(
+         clk   : in STD_LOGIC;
+         rst   : in STD_LOGIC;
+         D     : in STD_LOGIC;
+         re    : out STD_LOGIC;
+         fe    : out STD_LOGIC;
+         sre   : out STD_LOGIC;
+         sfe   : out STD_LOGIC);
+   end component;
+   
+   
    signal sreset                    : std_logic; 
    signal soft_trig_i               : std_logic; 
    signal soft_trig_last            : std_logic; 
@@ -85,11 +97,16 @@ architecture rtl of flagging_SM is
    signal delay_proc_sreset            : std_logic := '1';
    signal flagging_proc_sreset         : std_logic := '1';
    
+   signal exp_feedbk_sync              : std_logic;
+   
 begin
    
-   img_info_i <= IMG_INFO;
+   --img_info_i <= IMG_INFO;
    flag_cfg_i <= FLAG_CFG;
-   
+ 
+
+   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => IMG_INFO.exp_feedbk, sre => exp_feedbk_sync, re => open, fe => open, sfe => open);      
+
    ----------------------------------------------------------------------------
    --  synchro reset
    ----------------------------------------------------------------------------
@@ -269,7 +286,7 @@ begin
    begin
       if rising_edge(CLK) then
          trig_last_i <= trig_i;
-         exp_feedbk_last <= IMG_INFO.exp_feedbk;
+         --exp_feedbk_last <= exp_feedbk_sync;
          
          flagging_proc_sreset <= sreset or wait_for_init_i or not FLAG_CFG.dval;
          
@@ -294,7 +311,7 @@ begin
                      frame_count <= (others => '0');
                   end if;
                   
-                  if (flag_enable_i = '1' and IMG_INFO.exp_feedbk = '1' and exp_feedbk_last = '0') then
+                  if (flag_enable_i = '1' and exp_feedbk_sync = '1') then
                      -- New frame
                      frame_count <= frame_count + 1;
                      
@@ -312,7 +329,7 @@ begin
                      frame_count <= (others => '0');
                   end if;
                   
-                  if (flag_enable_i = '1' and IMG_INFO.exp_feedbk = '1' and exp_feedbk_last = '0') then
+                  if (flag_enable_i = '1' and exp_feedbk_sync = '1') then
                      -- New frame
                      frame_count <= frame_count + 1;
                      
@@ -330,7 +347,7 @@ begin
                      frame_count <= (others => '0');
                   end if;
                   
-                  if (flag_enable_i = '1' and IMG_INFO.exp_feedbk = '1' and exp_feedbk_last = '0') then
+                  if (flag_enable_i = '1' and exp_feedbk_sync = '1') then
                      -- New frame
                      frame_count <= frame_count + 1;
                      
@@ -364,7 +381,7 @@ begin
             
             case writing_state is
                when WRITE_STANDBY =>
-                  if (IMG_INFO.exp_feedbk = '1' and exp_feedbk_last = '0' and flag_hder_enable = '1') then -- flagging activer
+                  if (exp_feedbk_sync = '1' and flag_hder_enable = '1') then -- flagging activer
                      -- New frame
                      axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(IMG_INFO.frame_id(7 downto 0)) &  std_logic_vector(resize(FrameFlagAdd32, 8));
                      if (flag_enable_i = '1') then
