@@ -1859,20 +1859,20 @@ static IRC_Status_t DebugTerminalParseFWTEMP(circByteBuffer_t *cbuf)
          return IRC_FAILURE;
       }
 
-      if (TDCFlagsTst(FWIsImplementedMask & FWSynchronouslyRotatingModeIsImplementedMask))
+      if (GC_FWSynchronouslyRotatingModeIsImplemented)
       {
          flashSettings.FWReferenceTemperatureGain = fwTemp_m;
          flashSettings.FWReferenceTemperatureOffset = fwTemp_b;
       }
    }
 
-   if (!TDCFlagsTst(FWIsImplementedMask & FWSynchronouslyRotatingModeIsImplementedMask))
+   if (!GC_FWSynchronouslyRotatingModeIsImplemented)
    {
-      DT_ERR("Filter wheel is not implemented or not synchronously rotating.");
+      DT_ERR("Filter wheel synchronously rotating mode is not implemented.");
       return IRC_FAILURE;
    }
 
-   DT_PRINTF("FWTEMP: m = " _PCF(3) ", b = %d\n",  _FFMT(flashSettings.FWReferenceTemperatureGain, 3), _FFMT(flashSettings.FWReferenceTemperatureOffset, 3));
+   DT_PRINTF("FW Reference Temperature : m = " _PCF(3) ", b = " _PCF(3) "\n",  _FFMT(flashSettings.FWReferenceTemperatureGain, 3), _FFMT(flashSettings.FWReferenceTemperatureOffset, 3));
 
    return IRC_SUCCESS;
 }
@@ -2345,7 +2345,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Flash Settings:     FS");
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
-   DT_PRINTF("  FW Temperature Coeff. : FWTEMP [m b]");
+   DT_PRINTF("  FW Reference Temp.: FWTEMP [m b]");
    DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
