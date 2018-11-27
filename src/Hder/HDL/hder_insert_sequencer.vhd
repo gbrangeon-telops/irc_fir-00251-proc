@@ -283,11 +283,9 @@ begin
     begin          
         if rising_edge(CLK) then                   
             if sreset = '1' then 
-                --exp_feedbk_sync <= '0';
                 hder_id_fifo_wr <= '0';
                 exp_feedbk_sync_last <= '0';
             else            
-                --exp_feedbk_sync <= IMG_INFO.EXP_FEEDBK; -- simple synchronisation de IMG_INFO.EXP_FEEDBK car il est sur FPA_INTF_CLK et dure plus qu'1 CLK.
                 exp_feedbk_sync_last <= exp_feedbk_sync;
                 frame_id_sync <= std_logic_vector(IMG_INFO.FRAME_ID);
                 hder_id_fifo_wr <= exp_feedbk_sync  and not exp_feedbk_sync_last;

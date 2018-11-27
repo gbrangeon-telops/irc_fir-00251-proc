@@ -73,7 +73,7 @@ architecture rtl of flagging_SM is
    signal mixed_trig_last_i         : std_logic; 
    signal flag_enable_i             : std_logic;
    signal flag_hder_enable          : std_logic;
-   signal exp_feedbk_last           : std_logic;  
+  
    
    signal clk_counter_rising        : unsigned(31 downto 0); 
    signal clk_counter_falling       : unsigned(31 downto 0); 
@@ -88,8 +88,6 @@ architecture rtl of flagging_SM is
    constant FLAGGED_VALUE     : unsigned(31 downto 0) := x"00000001";
    constant NOTFLAGGED_VALUE  : unsigned(31 downto 0) := x"00000000";
    
-   signal img_info_i                   : img_info_type;
-   signal flag_cfg_i                   : flag_cfg_type;
    signal hard_trig_i                  : std_logic;
    signal ublaze_soft_trig_i           : std_logic;
    signal initcfg_proc_sreset          : std_logic := '1';
@@ -97,15 +95,13 @@ architecture rtl of flagging_SM is
    signal delay_proc_sreset            : std_logic := '1';
    signal flagging_proc_sreset         : std_logic := '1';
    
-   signal exp_feedbk_sync              : std_logic;
+   signal exp_feedbk_sre              : std_logic;
    
 begin
    
-   --img_info_i <= IMG_INFO;
-   flag_cfg_i <= FLAG_CFG;
  
 
-   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => IMG_INFO.exp_feedbk, sre => exp_feedbk_sync, re => open, fe => open, sfe => open);      
+   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => IMG_INFO.exp_feedbk, sre => exp_feedbk_sre, re => open, fe => open, sfe => open);      
 
    ----------------------------------------------------------------------------
    --  synchro reset
@@ -151,8 +147,7 @@ begin
       if rising_edge(CLK) then
          
          soft_trig_proc_sreset <= sreset or not enable_softtrig_i;
-         
-         --
+
          if soft_trig_proc_sreset = '1' then
             soft_trig_i <= '0';
             soft_trig_last <= '0';
@@ -286,7 +281,6 @@ begin
    begin
       if rising_edge(CLK) then
          trig_last_i <= trig_i;
-         --exp_feedbk_last <= exp_feedbk_sync;
          
          flagging_proc_sreset <= sreset or wait_for_init_i or not FLAG_CFG.dval;
          
@@ -311,7 +305,7 @@ begin
                      frame_count <= (others => '0');
                   end if;
                   
-                  if (flag_enable_i = '1' and exp_feedbk_sync = '1') then
+                  if (flag_enable_i = '1' and exp_feedbk_sre = '1') then
                      -- New frame
                      frame_count <= frame_count + 1;
                      
@@ -329,7 +323,7 @@ begin
                      frame_count <= (others => '0');
                   end if;
                   
-                  if (flag_enable_i = '1' and exp_feedbk_sync = '1') then
+                  if (flag_enable_i = '1' and exp_feedbk_sre = '1') then
                      -- New frame
                      frame_count <= frame_count + 1;
                      
@@ -347,7 +341,7 @@ begin
                      frame_count <= (others => '0');
                   end if;
                   
-                  if (flag_enable_i = '1' and exp_feedbk_sync = '1') then
+                  if (flag_enable_i = '1' and exp_feedbk_sre = '1') then
                      -- New frame
                      frame_count <= frame_count + 1;
                      
@@ -381,7 +375,7 @@ begin
             
             case writing_state is
                when WRITE_STANDBY =>
-                  if (exp_feedbk_sync = '1' and flag_hder_enable = '1') then -- flagging activer
+                  if (exp_feedbk_sre = '1' and flag_hder_enable = '1') then -- flagging activer
                      -- New frame
                      axil_mosi_i.awaddr <= x"FFFF" &  std_logic_vector(IMG_INFO.frame_id(7 downto 0)) &  std_logic_vector(resize(FrameFlagAdd32, 8));
                      if (flag_enable_i = '1') then
