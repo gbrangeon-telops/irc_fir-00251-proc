@@ -57,6 +57,8 @@ ADC798x_Cnv   <= ADC_CSn_1 when ADC_SEL = "10" else '0';
 ADC798x_SDI   <= ADC_SDI_1 when ADC_SEL = "10" else '0';
     
 ADC_SDO_0 <= ADC747x_SDO when (ADC_SEL = "00" or ADC_SEL = "10") else '0';     
-ADC_SDO_1 <= ADC798x_SDO when ADC_SEL = "10" else '0';
+ADC_SDO_1 <= ADC798x_SDO when ADC_SEL = "10" else 
+             ADC747x_SDO when ADC_SEL = "01" else 
+             '0';
     
 end rtl;
