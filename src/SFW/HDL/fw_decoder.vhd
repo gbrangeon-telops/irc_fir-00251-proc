@@ -149,11 +149,18 @@ begin
                -- First next position phase is position 0
                -- Then increment on each phase.
                -- Reset position counter on the next phase transition after the index rising edge.
-            elsif enc_nxstate(2) = '1'  and homing_mode = Optoswitch then   
-                zeros_next_transition <= '1';   
+            elsif enc_nxstate(2) = '1' and enc_state(2) = '0' and dir_i = '0' and homing_mode = Optoswitch then   
+                zeros_next_transition <= '1';
+            
+            elsif enc_nxstate(2) = '0' and enc_state(2) = '1' and dir_i = '1' and homing_mode = Optoswitch then   
+                zeros_next_transition <= '1';
             
             elsif zeros_next_transition = '1'  and enc_nxstate(1 downto 0) /= enc_state(1 downto 0) and homing_mode = Optoswitch then
-                pos_i <= (others => '0');
+                if dir_i = '0' then
+                   pos_i <= (others => '0');
+                else
+                   pos_i <= unsigned(NB_ENCODER_COUNTS(pos_i'range)) - 1;
+                end if;
                 zeros_next_transition <= '0';
                 lock_i <= '1'; -- we are in sync once we reach the transition state
             else
@@ -230,14 +237,8 @@ begin
          a_pipe(1) <= CHAN_B;
          b_pipe(0) <= b_pipe(1);
          b_pipe(1) <= CHAN_A;
-         
-         if(homing_mode = Encoder) then
-            i_pipe(0) <= i_pipe(1);
-            i_pipe(1) <= CHAN_I;
-         elsif(homing_mode = Optoswitch) then
-            i_pipe(0) <= not i_pipe(1) and CHAN_I;
-            i_pipe(1) <= CHAN_I; 
-         end if;
+         i_pipe(0) <= i_pipe(1);
+         i_pipe(1) <= CHAN_I;
          
       end if;
    end process pos_dir;

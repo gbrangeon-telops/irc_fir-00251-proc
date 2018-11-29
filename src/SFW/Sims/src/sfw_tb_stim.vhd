@@ -444,7 +444,7 @@ begin
     else
         for j in 0 to sim_nb_turn loop
             for i in 0 to (NB_ENCODER_COUNT*8-1) loop
-                if ( i = 121 ) then
+                if ( i >= 121 and i <= 156 ) then     -- opto-switch signal stays high for more than one encoder count
                     CHAN_I <= '1';   
                 else
                     CHAN_I <= '0';
