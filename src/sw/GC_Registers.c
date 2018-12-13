@@ -1347,7 +1347,10 @@ void GC_UnlockCamera()
    AvailabilityFlagsSet(CalibrationIsAvailableMask);
    AvailabilityFlagsSet(Raw0IsAvailableMask);
    AvailabilityFlagsSet(ExternalFanControlIsAvailableMask);
-   TDCFlagsSet(FWAsynchronouslyRotatingModeIsImplementedMask);
+   if (flashSettings.FWPresent == 1 && flashSettings.FWType == FW_SYNC)
+   {
+      TDCFlagsSet(FWAsynchronouslyRotatingModeIsImplementedMask);
+   }
    if (gcRegsData.DevicePowerState == DPS_PowerOn)
    {
       AvailabilityFlagsSet(ManufacturerTestImageIsAvailableMask);
