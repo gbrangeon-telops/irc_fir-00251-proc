@@ -12,62 +12,15 @@
 #include "hder_inserter.h"
 
 
-
-
-//************************** Constant Definitions ****************************/
-#define IRIG_HW_DELAY               750U
-
-#define AR_IRIG_REG1_ADD            0x00
-
-#define AR_IRIG_VALID_SOURCE   		0x18
-#define AR_IRIG_VALID_DATA 	     	0x1C
-#define AR_IRIG_PPC_LATE        	   0x20
-#define AR_IRIG_STATUS              0xF0
-
-#define AW_IRIG_ENABLE              0x00
-
-
-
-//#define IRIG_//PRINTF             //PRINTF       //define or undefine this to enable or disable IRIG realted //PRINTF
-
-
-
-/**************************** Type Definitions ******************************/
-
-typedef struct
-{					   
-   uint8_t Valid_Source;                
-   uint8_t Valid_Data;
-   uint8_t PPC_Late;
-} Status_Reg_t;
-
-typedef struct
-{					   
-   uint32_t MilliSeconds;
-   uint32_t Seconds;
-   uint32_t Year;
-   Status_Reg_t Status;
-} IRIG_POSIXTime_t;
-
 //************************** Global variables ****************************/
 extern t_Trig gTrig;
 IRIG_POSIXTime_t IRIG_POSIXTime;
-IRIG_Global_Status_t IRIG_Global_Status;
 struct tm rTClock;
-   
-   
+
 //***************************** Private Functions prototypes**************/
-void IRIG_Read_Status(Status_Reg_t *pStatus_Reg);
-void IRIG_Enable_Vhd(gcRegistersData_t *pGCRegs); 
+void IRIG_Read_Status();
 void IRIG_Read_Time();
 uint16_t UnsignedBcd16ToDec(uint16_t unsignedBCD16);
-
-  
-
-//***************************** definition des fonctions*******************/
-
-
-
 
 
 //-------------------------------------------------------------------------    
@@ -78,83 +31,61 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
 {
    extern t_HderInserter gHderInserter;
    uint32_t POSIXSecAtNextPPS;
-   Status_Reg_t Status;
-  
   
    if(pGCRegs->TimeSource != TS_GPS)       // rien à faire si GPS présent
    {
-      // lecture du statut IRIG
-      IRIG_Read_Status(&Status); 
+      // Lecture du statut IRIG
+      IRIG_Read_Status();
           
-      if (Status.Valid_Source == 1)
+      if (IRIG_POSIXTime.Status.Valid_Source == 1)
       {
-         if (Status.Valid_Data == 1)
-         {
-            // lecture des données
-            IRIG_Read_Time();      
-            // on envoie les données au stamper             
-            if (IRIG_POSIXTime.Status.Valid_Data == 1)   
-            {
-               POSIXSecAtNextPPS = IRIG_POSIXTime.Seconds + 2;               
-               //Overwrite of RTC time by the GPS at the next PPS
-               TRIG_OverWritePOSIXNextPPS(POSIXSecAtNextPPS, IRIG_POSIXTime.MilliSeconds, &gTrig); 
-            }
-         }
-         // la source du PPS est IRIG  
          pGCRegs->TimeSource = TS_IRIGB;         // on specifie IRIG tant qu'une source valide est detectée
-         TRIG_PpsSrcSelect(TS_IRIGB, &gTrig);
+         AXI4L_write32(1, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Activation du module HW
 
-         // Update header
-         HDER_UpdateTimeSourceHeader(&gHderInserter, pGCRegs->TimeSource);
-      }
-      else if (pGCRegs->TimeSource == TS_IRIGB)
-      {
-         pGCRegs->TimeSource = TS_InternalRealTimeClock;
+         if (IRIG_POSIXTime.Status.Valid_Data == 1)  // Un POSIX time a été décodé et est prêt à être lue 
+         {
+            IRIG_Read_Time();  // Lecture du POSIX time
+            POSIXSecAtNextPPS = IRIG_POSIXTime.Seconds + 2;
+            TRIG_OverWritePOSIXNextPPS(POSIXSecAtNextPPS, IRIG_POSIXTime.MilliSeconds, &gTrig);
+         }
 
-         // Update header
-         HDER_UpdateTimeSourceHeader(&gHderInserter, pGCRegs->TimeSource);
-      }
-   } 
-   
-   // on signifie au vhd si le module IRIG est le Timsource ou pas
-   IRIG_Enable_Vhd(pGCRegs); 
-   
-   // on met à jour les statuts pour les modules externes à Irig
-   IRIG_Global_Status.Irig_Valid_Source = Status.Valid_Source;
-   
-   if (Status.Valid_Source == 1)
-   {
-      if ((2010 < IRIG_POSIXTime.Year) && (IRIG_POSIXTime.Year < 2100))     // c'est le domaine de definition de la donnée sur l'année qui valide le B126
-      {
-         IRIG_Global_Status.Irig_B122 = false;
-         IRIG_Global_Status.Irig_B126 = true;                                   
       }
       else
-      {      
-         IRIG_Global_Status.Irig_B122 = true;
-         IRIG_Global_Status.Irig_B126 = false; 
+      {
+         pGCRegs->TimeSource = TS_InternalRealTimeClock;  // Si IRIG et GPS ne sont pas détectés
+         AXI4L_write32(0, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
       }
+
+      // Update header
+      HDER_UpdateTimeSourceHeader(&gHderInserter, pGCRegs->TimeSource);
+      // La source du PPS est IRIG
+      TRIG_PpsSrcSelect(pGCRegs->TimeSource, &gTrig);
    }
    else
    {
-      IRIG_Global_Status.Irig_B122 = false;
-      IRIG_Global_Status.Irig_B126 = false; 
-   }   
-} 
-
-
+      AXI4L_write32(0, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
+   }
+}
 //---------------------------------------------------------------------------------    
 //  Fonction   IRIG_Read_Status                                                                                 
 //---------------------------------------------------------------------------------
-
-void IRIG_Read_Status(Status_Reg_t *pStatus_Reg)
+void IRIG_Read_Status()
 {
-   pStatus_Reg->Valid_Source = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);    
-   pStatus_Reg->Valid_Data   = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
-   pStatus_Reg->PPC_Late     = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_PPC_LATE);
-} 
- 
+   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
+   IRIG_POSIXTime.Status.Valid_Data     = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
+}
 
+//---------------------------------------------------------------------------------
+//  Fonction   IRIG_Read_Gobal_Status
+//---------------------------------------------------------------------------------
+void IRIG_Read_Global_Status()
+{
+   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
+   IRIG_POSIXTime.Status.Valid_Data    = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
+   IRIG_POSIXTime.Status.Global_Status  = AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_GLOBAL_STATUS);
+   IRIG_POSIXTime.Status.PPS_Delay      = AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_PPS_DELAY);
+   IRIG_POSIXTime.Status.MB_Speed_Error = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_MB_SPEED_ERR);
+} 
 
 //---------------------------------------------------------------------------------
 //  Fonction   Initialize IRIGB
@@ -162,29 +93,10 @@ void IRIG_Read_Status(Status_Reg_t *pStatus_Reg)
  
 void IRIG_Initialize(flashSettings_t *p_flashSettings)
 {
-   // For now, the HW delay is hardcoded.
    AXI4L_write32(IRIG_HW_DELAY, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
    // TODO Eventually, the delay will have to be set in the flash setting.
    //AXI4L_write32(p_flashSettings->IRIG_HW_DELAY, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
 
-}
-
-
-//---------------------------------------------------------------------------------    
-//  Fonction   IRIG_Enable_Vhd                                                                                 
-//---------------------------------------------------------------------------------
- 
-void IRIG_Enable_Vhd(gcRegistersData_t *pGCRegs)
-{
-
-   if(pGCRegs->TimeSource == TS_IRIGB)  
-   {
-      AXI4L_write32(1, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE);                                                                       
-   }
-   else
-   {
-      AXI4L_write32(0, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE);  
-   }
 }
  
  
@@ -230,8 +142,8 @@ void IRIG_Read_Time()
          default:
             break;
       }
-   }   
-    IRIG_Read_Status(&IRIG_POSIXTime.Status);     
+   }
+
     IRIG_POSIXTime.Seconds = mktime(&rTClock); 
     IRIG_POSIXTime.Year = rTClock.tm_year + 1900;                                 // reference = 2000   
 }

@@ -130,10 +130,13 @@ architecture RTL of irig_controller_v2 is
 begin
    
    --------------------------------------------------
-   -- statuts envoyés au PPC du ROIC                          
+   -- statuts envoyés au MB du ROIC                          
    --------------------------------------------------   
    
-   GLOBAL_STATUS(15 downto 3) <= (others => '0');
+   GLOBAL_STATUS(15 downto 3) <= (others => '0');   
+   
+   
+   
    GLOBAL_STATUS(2) <= design_warning_latch;
    GLOBAL_STATUS(1) <= valid_input;  --  permet de savoir si generateur IRIG B12x est connecté   
    GLOBAL_STATUS(0) <= '0';                       --  valide les données des registres, est generé dans le ROIC. Permet de savoir si les données sont valides
@@ -152,7 +155,7 @@ begin
    cond_done                <= SIG_COND_STAT(0);
    
    -- statuts du decodeur d'alphabet
-   alphab_sig_integrity_err <= ALPHAB_STAT(4);      -- soft error qui ne doit jamais se produire
+   alphab_sig_integrity_err <= ALPHAB_STAT(4);     -- soft error qui ne doit jamais se produire
    alphab_comparator_err    <= ALPHAB_STAT(3);     -- soft_error qui ne doit jamais se produire
    alphab_speed_err         <= ALPHAB_STAT(2);     -- soft_error qui ne doit jamais se produire
    alphab_decoder_success   <= ALPHAB_STAT(1);

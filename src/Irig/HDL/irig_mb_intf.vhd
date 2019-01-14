@@ -35,8 +35,7 @@ entity irig_mb_intf is
       MB_MOSI           : in t_axi4_lite_mosi;
       MB_MISO           : out t_axi4_lite_miso;
       
-      MB_SPEED_ERR      : out std_logic;
-	  DELAY             : out std_logic_vector(15 downto 0)
+	   DELAY             : out std_logic_vector(31 downto 0)
       );
 end irig_mb_intf;
 
@@ -50,6 +49,17 @@ architecture rtl of irig_mb_intf is
          SRESET : out std_logic := '1'
          );
    end component;        
+   
+   component gh_edge_det
+      port(
+         clk   : in STD_LOGIC;
+         rst   : in STD_LOGIC;
+         D     : in STD_LOGIC;
+         re    : out STD_LOGIC;
+         fe    : out STD_LOGIC;
+         sre   : out STD_LOGIC;
+         sfe   : out STD_LOGIC);
+   end component;
    
    signal sreset	                  : std_logic;
    signal axi_awaddr	               : std_logic_vector(31 downto 0);
@@ -69,23 +79,22 @@ architecture rtl of irig_mb_intf is
    signal irig_en_last              : std_logic;
    signal irig_data_latch           : irig_data_type;
    signal pps_acq_window_pipe       : std_logic_vector(7 downto 0);
-   signal ppc_speed_err             : std_logic;  
-   signal irig_reg_read_by_ppc      : std_logic;
-   signal ppc_read_irig_status      : std_logic;
-   signal ppc_on_time               : std_logic;
+   signal mb_speed_err_i            : std_logic;  
+   signal irig_reg_read_by_mb       : std_logic;
+   signal mb_read_irig_status       : std_logic;
+   signal mb_on_time                : std_logic;
    signal irig_data_rdy             : std_logic; 
    signal irig_data_rdy_last        : std_logic;
    signal irig_pps_sync             : std_logic;
    signal irig_valid_pps            : std_logic;
    signal irig_valid_source_i       : std_logic;
-   signal delay_i                   : std_logic_vector(15 downto 0);
-   
+   signal delay_i                   : std_logic_vector(31 downto 0) := x"000002EE";
+   signal time_dval_sre             : std_logic; 
 begin
    
    DELAY <= delay_i;
    
    IRIG_ENABLE <= irig_en_i;
-   MB_SPEED_ERR <= ppc_speed_err; --erreur grave
    
    -- I/O Connections assignments
    MB_MISO.AWREADY  <= axi_awready;
@@ -109,6 +118,8 @@ begin
       );
    
    
+   E1 : gh_edge_det port map(clk => MB_CLK, rst => sreset, D => IRIG_DATA.TIME_DVAL, sre => time_dval_sre, re => open, fe => open, sfe => open);      
+
    ----------------------------------------------------------------------------
    --  stockage des infos dans des registres 
    ----------------------------------------------------------------------------
@@ -117,20 +128,18 @@ begin
       if rising_edge(MB_CLK) then                         
          
          -- irig data  
-         if IRIG_DATA.TIME_DVAL = '1' then      
+         if time_dval_sre = '1' then      
             irig_data_latch  <= IRIG_DATA;                                        
+            irig_data_rdy <= '1';
+         end if;
+         
+         if irig_pps_sync = '1' or irig_valid_source = '0' then       
+            irig_data_rdy <= '0';
          end if;
          
          -- irig status
          if IRIG_DATA.STATUS_DVAL = '1' then  
             irig_data_latch.status_reg <= IRIG_DATA.STATUS_REG;
-         end if;
-         
-         -- irig_data_rdy flag
-         if irig_pps_sync = '1' or irig_valid_source = '0' then 
-            irig_data_rdy <= '0';
-         else
-            irig_data_rdy <= IRIG_DATA.TIME_DVAL;
          end if;
          
       end if;       
@@ -143,8 +152,8 @@ begin
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
-            ppc_speed_err <= '0'; 
-            ppc_on_time <= '1';
+            mb_speed_err_i <= '0'; 
+            mb_on_time <= '1';
             irig_data_rdy_last <= irig_data_rdy; 
             irig_en_last <= irig_en_i;
             irig_valid_source_i <= '0';
@@ -170,18 +179,18 @@ begin
                PPS_ACQ_WINDOW <= '1';                    -- si l'IRIG n'est pas activé alors PPS_ACQ_WINDOW = '1' pour ne rien changer à la logique existente
             end if;
             
-            -- watchdog sur la lenteur du PPC 
-            if irig_data_rdy_last = '0' and irig_data_rdy = '1' then              -- le flag  ppc_on_time est mis à '0' lorsque des données IRIG sont prête pour le PPC
-               ppc_on_time <= '0';
+            -- watchdog sur la lenteur du MB 
+            if irig_data_rdy_last = '0' and irig_data_rdy = '1' then              -- le flag  mb_on_time est mis à '0' lorsque des données IRIG sont prête pour le MB
+               mb_on_time <= '0';
             end if;
-            if irig_reg_read_by_ppc = '1' then                                     -- ce flag est à '1' lorsque le PPC a pu lire les données
-               ppc_on_time <= '1';
+            if irig_reg_read_by_mb = '1' then                                     -- ce flag est à '1' lorsque le MB a pu lire les données
+               mb_on_time <= '1';
             end if;            
-            if ppc_on_time = '0' and irig_valid_pps = '1' then 
-               ppc_speed_err <= '1';                  -- si le ppc n'a pas pu lire les données avant le passage de la PPS de synchro alors il est lent !!! Erreur grave!
+            if mb_on_time = '0' and irig_valid_pps = '1' then 
+               mb_speed_err_i <= '1';                  -- si le MB n'a pas pu lire les données avant le passage de la PPS de synchro alors il est lent !!! Erreur grave!
             end if;            
             if irig_en_last = '0' and irig_en_i = '1' then 
-               ppc_speed_err <='0';                    -- à remetre à '0' lorsqu'on est certain que le PPC est à l'ecoute. Il n'est pas à l'ecoute de IRIG au demarrage du système
+               mb_speed_err_i <='0';                    -- à remetre à '0' lorsqu'on est certain que le MB est à l'ecoute. Il n'est pas à l'ecoute de IRIG au demarrage du système
             end if;
             
             
@@ -234,7 +243,7 @@ begin
    begin
       if rising_edge(MB_CLK) then
          
-         irig_reg_read_by_ppc <= '0'; 
+         irig_reg_read_by_mb <= '0'; 
          
          case axi_araddr(7 downto 0) is    
             when X"00" =>  axi_rdata <= resize(irig_data_latch.seconds_reg, 32);
@@ -242,12 +251,13 @@ begin
             when X"08" =>  axi_rdata <= resize(irig_data_latch.hours_reg, 32);
             when X"0C" =>  axi_rdata <= resize(irig_data_latch.dayofyear_reg, 32);
             when X"10" =>  axi_rdata <= resize(irig_data_latch.tenthsofsec_reg, 32);
-            when X"14" =>  axi_rdata <= resize(irig_data_latch.year_reg, 32);          irig_reg_read_by_ppc <= '1'; -- ne pas deplacer  irig_reg_read_by_ppc de cette ligne  
+            when X"14" =>  axi_rdata <= resize(irig_data_latch.year_reg, 32);          irig_reg_read_by_mb <= '1'; -- ne pas deplacer  irig_reg_read_by_mb de cette ligne  
             when X"18" =>  axi_rdata <= resize('0' & irig_valid_source_i, 32);   
             when X"1C" =>  axi_rdata <= resize('0' & irig_data_rdy, 32); 
-            when X"20" =>  axi_rdata <= resize('0' & ppc_speed_err, 32);
-            
-            when X"F0" =>  axi_rdata <= resize(irig_data_latch.status_reg, 32);           
+            when X"20" =>  axi_rdata <= resize(irig_data_latch.status_reg, 32);
+            when X"24" =>  axi_rdata <= resize('0' & delay_i, 32);
+			when X"28" =>  axi_rdata <= resize('0' & mb_speed_err_i, 32);
+       
             when others=>  axi_rdata <= (others =>'1');
          end case;        
       end if;     
@@ -291,12 +301,13 @@ begin
    begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
-            irig_en_i <= '1'; -- fait express pour tester le tout sans MB. remettre à zero après integration des drivers            
+            irig_en_i <= '0';      
          else			                    
             if slv_reg_wren = '1' and MB_MOSI.WSTRB =  "1111" then -- Master write, toutes les transcations à 32 bits !!! comme dans IRCDEV 					
                case axi_awaddr(7 downto 0) is 
                   when X"00" =>  irig_en_i <= data_i(0);           -- permet de savoir si le irig est la source de temps à utiliser ou pas.  
-				  when X"04" =>  delay_i <= data_i(15 downto 0);				  
+                  when X"04" =>  delay_i <= data_i(31 downto 0);				  
+
                   when others => --do nothing                  
                end case;               
             end if;                      
@@ -305,7 +316,7 @@ begin
    end process;
    
    --------------------------------
-   -- WR  : WR feedback envoyé au PPC
+   -- WR  : WR feedback envoyé au MB
    --------------------------------
    U8: process (MB_CLK)
    begin

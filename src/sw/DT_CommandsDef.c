@@ -140,6 +140,7 @@ extern ctrlIntf_t gCtrlIntf_OutputFPGA;
 extern ctrlIntf_t gCtrlIntf_FileManager;
 extern rpCtrl_t theRpCtrl;
 extern autofocusCtrl_t theAutoCtrl;
+extern IRIG_POSIXTime_t IRIG_POSIXTime;
 
 debugTerminalCtrlIntf_t gDebugTerminalCtrlIntfs[] =
 {
@@ -163,20 +164,19 @@ uint32_t gDebugTerminalCtrlIntfsCount = NUM_OF(gDebugTerminalCtrlIntfs);
 IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
 {
 
-
    uint8_t argStr[12];
    uint32_t arglen;
    uint32_t cmd = 0;
-   int32_t iValue = 0;
+   uint32_t iValue = 0;
 
-   // Check for FPA command argument presence
+   // Check for IRIGB command argument presence
    if (!DebugTerminal_CommandIsEmpty(cbuf))
    {
-      // Read FPA command argument
+      // Read IRIGB command argument
       arglen = GetNextArg(cbuf, argStr, 4);
       if (arglen == 0)
       {
-         DT_ERR("Invalid FPA command argument.");
+         DT_ERR("Invalid IRIGB command argument.");
          return IRC_FAILURE;
       }
       argStr[arglen++] = '\0'; // Add string terminator
@@ -191,15 +191,14 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
          return IRC_FAILURE;
       }
 
-      // Read FPA command parameter value
+      // Read IRIGB command parameter value
       arglen = GetNextArg(cbuf, argStr, 12);
       switch (cmd)
       {
-         case 1: // IRIG
-            if ((ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS) ||
-                  (iValue < -32768) || (iValue > 32767))
+         case 1: // IRIGB
+            if ((ParseNumArg((char *)argStr, arglen, &iValue) != IRC_SUCCESS))
             {
-               DT_ERR("Invalid int16 value.");
+               DT_ERR("Invalid uint32 value.");
                return IRC_FAILURE;
             }
             break;
@@ -213,8 +212,14 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
       }
 
       AXI4L_write32(iValue, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
-   }
+      }
 
+
+   IRIG_Read_Global_Status();
+
+   DT_PRINTF("GLOBAL STATUS = 0x%08X", IRIG_POSIXTime.Status.Global_Status);
+   DT_PRINTF("MB SPEED ERROR = 0x%08X", IRIG_POSIXTime.Status.MB_Speed_Error);
+   DT_PRINTF("PPS DELAY = %d (number of 50ns clock cycle)", IRIG_POSIXTime.Status.PPS_Delay);
 
    return IRC_SUCCESS;
 }
@@ -2315,7 +2320,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("Processing FPGA debug terminal commands:");
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
-   DT_PRINTF("  IRIG delay:         IRIG [DLY value]");
+   DT_PRINTF("  IRIG status:        IRIG [DLY value]");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");

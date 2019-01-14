@@ -49,7 +49,7 @@ entity irig_frame_decoder_v2 is
       -- interface avec le µBlaze Inbterface
       IRIG_DATA        : out irig_data_type;
       IRIG_PPS         : out std_logic;
-	  DELAY   : in   std_logic_vector(15 downto 0)  
+	  DELAY   : in   std_logic_vector(31 downto 0)  
 	  
       );
 end irig_frame_decoder_v2;
@@ -105,7 +105,7 @@ architecture RTL of irig_frame_decoder_v2 is
    signal valid_irig_detected      : std_logic;
    signal idle_cnt                 : unsigned(2 downto 0);
    signal irig_data_i              : irig_data_type;
-   signal delay_i                  : std_logic_vector(15 downto 0);
+   signal delay_i                  : std_logic_vector(31 downto 0); 
    
    -- attribute dont_touch : string; 
    -- attribute dont_touch of irig_data_i          : signal is "true"; 
@@ -191,7 +191,7 @@ begin
                      frm_sync_fsm <= wait_ref_marker_st; 
                   end if;                  
                   frm_sync_lost <= BIT_MOSI.DVAL and frm_received;   -- après reception d'une trame, on s'attend à ce que le prochaine morpheme soit P0, sinon, il y a perte de synchroniséation
-                  status_available <= ALPHAB_REFPULSE;               -- ainsi les status sont mis à jour automatiquement à toutes les 10 ms si frm_sync_fsm ne fait rien. ainsi le PPC aura des mises à jous continuelles  
+                  status_available <= ALPHAB_REFPULSE;               -- ainsi les status sont mis à jour automatiquement à toutes les 10 ms si frm_sync_fsm ne fait rien. ainsi le MB aura des mises à jous continuelles  
                
                when wait_ref_marker_st =>
                   frm_received <= '0';        -- ce qui signifie qu'on a juste 10ms pour envoyer les données avant qu'une nouvelle trame ne commence
@@ -334,7 +334,7 @@ begin
    -- Extraction des données à toutes les secondes 
    --------------------------------------------------
    -- mais envoi 1 seconde sur 2 
-   -- Il est utilisé dans le ROIC pour aider le PPC à eviter d'interpreter des données en cours de changement
+   -- Il est utilisé dans le ROIC pour aider le MB à eviter d'interpreter des données en cours de changement
    
    U6 : process(CLK)
    begin          
@@ -425,6 +425,7 @@ begin
                   cnt <= cnt + 1;                    
                   if cnt >= unsigned(delay_i) then 
                      pps_fsm <= gen_pps_st;
+                     cnt <= (others => '0');
                   end if;                   
                
                when gen_pps_st => 
