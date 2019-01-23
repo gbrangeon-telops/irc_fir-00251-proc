@@ -73,7 +73,7 @@ IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo
          (releaseInfo->versionMinor != RELEASEINFO_MINOR_VERSION) ||
          (releaseInfo->versionSubMinor != RELEASEINFO_SUBMINOR_VERSION))
    {
-      RI_ERR("Wrong release information version (%d.%d.&d).",
+      RI_ERR("Wrong release information version (%d.%d.%d).",
             releaseInfo->versionMajor, releaseInfo->versionMinor, releaseInfo->versionSubMinor);
       return IRC_FAILURE;
    }
