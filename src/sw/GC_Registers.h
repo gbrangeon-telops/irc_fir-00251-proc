@@ -127,6 +127,7 @@
 #define MotorizedFocusLensIsImplementedMask              0x00010000  /**< TDCFlags register bit mask for MotorizedFocusLensIsImplemented field */
 #define AutofocusIsImplementedMask                       0x00020000  /**< TDCFlags register bit mask for AutofocusIsImplemented field */
 #define ClDualBaseIsImplementedMask                      0x00040000  /**< TDCFlags register bit mask for ClDualBaseIsImplementedMask field */
+#define SaveConfigurationIsImplementedMask               0x00080000  /**< TDCFlags register bit mask for SaveConfigurationIsImplementedMask field */
 #define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
 #define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
 
@@ -160,10 +161,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.3.0
+// Generated from XML camera definition file version 12.4.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 3) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -219,11 +220,6 @@ struct gcRegistersDataStruct {
    float MemoryBufferSequenceDownloadBitRateMax;
    float TriggerDelay;
    float VFOV;
-   float VideoAGCFractionMax;
-   float VideoAGCFractionMaxMin;
-   float VideoAGCFractionMin;
-   float VideoAGCFractionMinMax;
-   float VideoAGCResponseTime;
    int32_t DeviceFirmwareModuleRevision;
    int32_t FOVPositionRaw;
    int32_t FOVPositionRawMax;
@@ -349,6 +345,7 @@ struct gcRegistersDataStruct {
    uint32_t ImageCorrectionMode;
    uint32_t IntegrationMode;
    uint32_t IsActiveFlags;
+   uint32_t LoadSavedConfigurationAtStartup;
    uint32_t LockedCenterImage;
    uint32_t ManualFilterSerialNumber;
    uint32_t MemoryBufferAvailableFreeSpaceHigh;
@@ -406,6 +403,7 @@ struct gcRegistersDataStruct {
    uint32_t ProprietaryFeature;
    uint32_t ReverseX;
    uint32_t ReverseY;
+   uint32_t SaveConfiguration;
    uint32_t SensorHeight;
    uint32_t SensorID;
    uint32_t SensorWellDepth;
@@ -424,9 +422,6 @@ struct gcRegistersDataStruct {
    uint32_t TriggerSource;
    uint32_t VideoAGC;
    uint32_t VideoBadPixelReplacement;
-   uint32_t VideoColorMap;
-   uint32_t VideoColorMapMax;
-   uint32_t VideoColorMapMin;
    uint32_t VideoEHDRIExposureIndex;
    uint32_t VideoFWPosition;
    uint32_t VideoFreeze;
@@ -524,12 +519,6 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetMemoryBufferSequenceCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceCountIdx], val)
 #define GC_SetMemoryBufferSequenceDownloadMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], val)
 #define GC_SetVideoAGC(val) GC_RegisterWriteUI32(&gcRegsDef[VideoAGCIdx], val)
-#define GC_SetVideoColorMap(val) GC_RegisterWriteUI32(&gcRegsDef[VideoColorMapIdx], val)
-#define GC_SetVideoColorMapMin(val) GC_RegisterWriteUI32(&gcRegsDef[VideoColorMapMinIdx], val)
-#define GC_SetVideoColorMapMax(val) GC_RegisterWriteUI32(&gcRegsDef[VideoColorMapMaxIdx], val)
-#define GC_SetVideoAGCFractionMin(val) GC_RegisterWriteFloat(&gcRegsDef[VideoAGCFractionMinIdx], val)
-#define GC_SetVideoAGCFractionMax(val) GC_RegisterWriteFloat(&gcRegsDef[VideoAGCFractionMaxIdx], val)
-#define GC_SetVideoAGCResponseTime(val) GC_RegisterWriteFloat(&gcRegsDef[VideoAGCResponseTimeIdx], val)
 #define GC_SetVideoFreeze(val) GC_RegisterWriteUI32(&gcRegsDef[VideoFreezeIdx], val)
 #define GC_SetSensorWidth(val) GC_RegisterWriteUI32(&gcRegsDef[SensorWidthIdx], val)
 #define GC_SetSensorHeight(val) GC_RegisterWriteUI32(&gcRegsDef[SensorHeightIdx], val)

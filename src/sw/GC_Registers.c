@@ -49,7 +49,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.3.0
+// Generated from XML camera definition file version 12.4.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -104,11 +104,6 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferSequenceDownloadBitRateMax = */ 20.0F,
    /* TriggerDelay = */ 0.0F,
    /* VFOV = */ 0.0F,
-   /* VideoAGCFractionMax = */ 99.0F,
-   /* VideoAGCFractionMaxMin = */ 2.0F,
-   /* VideoAGCFractionMin = */ 1.0F,
-   /* VideoAGCFractionMinMax = */ 98.0F,
-   /* VideoAGCResponseTime = */ 0.100F,
    /* DeviceFirmwareModuleRevision = */ 0,
    /* FOVPositionRaw = */ 0,
    /* FOVPositionRawMax = */ 0,
@@ -234,6 +229,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ImageCorrectionMode = */ ICM_BlackBody,
    /* IntegrationMode = */ FPA_INTEGRATION_MODE,
    /* IsActiveFlags = */ 0,
+   /* LoadSavedConfigurationAtStartup = */ 0,
    /* LockedCenterImage = */ FPA_FORCE_CENTER,
    /* ManualFilterSerialNumber = */ 0,
    /* MemoryBufferAvailableFreeSpaceHigh = */ 0,
@@ -291,6 +287,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ProprietaryFeature = */ 0,
    /* ReverseX = */ FPA_FLIP_LR,
    /* ReverseY = */ FPA_FLIP_UD,
+   /* SaveConfiguration = */ 0,
    /* SensorHeight = */ FPA_HEIGHT_MAX,
    /* SensorID = */ 0,
    /* SensorWellDepth = */ FPA_SENSOR_WELL_DEPTH,
@@ -309,9 +306,6 @@ gcRegistersData_t gcRegsDataFactory = {
    /* TriggerSource = */ 0,
    /* VideoAGC = */ VAGC_Continuous,
    /* VideoBadPixelReplacement = */ 1,
-   /* VideoColorMap = */ VCM_Gray,
-   /* VideoColorMapMax = */ 65535,
-   /* VideoColorMapMin = */ 0,
    /* VideoEHDRIExposureIndex = */ VEHDRIEI_Exposure1,
    /* VideoFWPosition = */ VFWP_Filter1,
    /* VideoFreeze = */ 0,
@@ -471,11 +465,6 @@ void GC_Registers_Init()
    gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadBitRateMax;
    gcRegsDef[TriggerDelayIdx].p_data = &gcRegsData.TriggerDelay;
    gcRegsDef[VFOVIdx].p_data = &gcRegsData.VFOV;
-   gcRegsDef[VideoAGCFractionMaxIdx].p_data = &gcRegsData.VideoAGCFractionMax;
-   gcRegsDef[VideoAGCFractionMaxMinIdx].p_data = &gcRegsData.VideoAGCFractionMaxMin;
-   gcRegsDef[VideoAGCFractionMinIdx].p_data = &gcRegsData.VideoAGCFractionMin;
-   gcRegsDef[VideoAGCFractionMinMaxIdx].p_data = &gcRegsData.VideoAGCFractionMinMax;
-   gcRegsDef[VideoAGCResponseTimeIdx].p_data = &gcRegsData.VideoAGCResponseTime;
    gcRegsDef[DeviceFirmwareModuleRevisionIdx].p_data = &gcRegsData.DeviceFirmwareModuleRevision;
    gcRegsDef[FOVPositionRawIdx].p_data = &gcRegsData.FOVPositionRaw;
    gcRegsDef[FOVPositionRawMaxIdx].p_data = &gcRegsData.FOVPositionRawMax;
@@ -601,6 +590,7 @@ void GC_Registers_Init()
    gcRegsDef[ImageCorrectionModeIdx].p_data = &gcRegsData.ImageCorrectionMode;
    gcRegsDef[IntegrationModeIdx].p_data = &gcRegsData.IntegrationMode;
    gcRegsDef[IsActiveFlagsIdx].p_data = &gcRegsData.IsActiveFlags;
+   gcRegsDef[LoadSavedConfigurationAtStartupIdx].p_data = &gcRegsData.LoadSavedConfigurationAtStartup;
    gcRegsDef[LockedCenterImageIdx].p_data = &gcRegsData.LockedCenterImage;
    gcRegsDef[ManualFilterSerialNumberIdx].p_data = &gcRegsData.ManualFilterSerialNumber;
    gcRegsDef[MemoryBufferAvailableFreeSpaceHighIdx].p_data = &gcRegsData.MemoryBufferAvailableFreeSpaceHigh;
@@ -658,6 +648,7 @@ void GC_Registers_Init()
    gcRegsDef[ProprietaryFeatureIdx].p_data = &gcRegsData.ProprietaryFeature;
    gcRegsDef[ReverseXIdx].p_data = &gcRegsData.ReverseX;
    gcRegsDef[ReverseYIdx].p_data = &gcRegsData.ReverseY;
+   gcRegsDef[SaveConfigurationIdx].p_data = &gcRegsData.SaveConfiguration;
    gcRegsDef[SensorHeightIdx].p_data = &gcRegsData.SensorHeight;
    gcRegsDef[SensorIDIdx].p_data = &gcRegsData.SensorID;
    gcRegsDef[SensorWellDepthIdx].p_data = &gcRegsData.SensorWellDepth;
@@ -676,9 +667,6 @@ void GC_Registers_Init()
    gcRegsDef[TriggerSourceIdx].p_data = &gcRegsData.TriggerSource;
    gcRegsDef[VideoAGCIdx].p_data = &gcRegsData.VideoAGC;
    gcRegsDef[VideoBadPixelReplacementIdx].p_data = &gcRegsData.VideoBadPixelReplacement;
-   gcRegsDef[VideoColorMapIdx].p_data = &gcRegsData.VideoColorMap;
-   gcRegsDef[VideoColorMapMaxIdx].p_data = &gcRegsData.VideoColorMapMax;
-   gcRegsDef[VideoColorMapMinIdx].p_data = &gcRegsData.VideoColorMapMin;
    gcRegsDef[VideoEHDRIExposureIndexIdx].p_data = &gcRegsData.VideoEHDRIExposureIndex;
    gcRegsDef[VideoFWPositionIdx].p_data = &gcRegsData.VideoFWPosition;
    gcRegsDef[VideoFreezeIdx].p_data = &gcRegsData.VideoFreeze;
@@ -738,6 +726,8 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], GC_AcquisitionFrameRateIsLocked);
    SetRegLocked(&gcRegsDef[AcquisitionModeIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[AcquisitionFrameRateModeIdx], GC_AcquisitionStarted);
+   SetRegLocked(&gcRegsDef[LoadSavedConfigurationAtStartupIdx], (GC_WaitingForImageCorrection));
+   SetRegLocked(&gcRegsDef[SaveConfigurationIdx], (GC_WaitingForImageCorrection));
    SetRegLocked(&gcRegsDef[ExposureAutoIdx], ((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection || GC_AutofocusIsActive));
    SetRegLocked(&gcRegsDef[AECImageFractionIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
    SetRegLocked(&gcRegsDef[AECTargetWellFillingIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
@@ -807,15 +797,9 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceClearAllIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[POSIXTimeIdx], ((gcRegsData.TimeSource != TS_InternalRealTimeClock) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[VideoAGCIdx], GC_AutofocusIsActive);
-   SetRegLocked(&gcRegsDef[VideoColorMapIdx], GC_AutofocusIsActive);
-   SetRegLocked(&gcRegsDef[VideoColorMapMinIdx], GC_AutofocusIsActive);
-   SetRegLocked(&gcRegsDef[VideoColorMapMaxIdx], GC_AutofocusIsActive);
    SetRegLocked(&gcRegsDef[VideoEHDRIExposureIndexIdx], GC_AutofocusIsActive);
    SetRegLocked(&gcRegsDef[VideoFWPositionIdx], GC_AutofocusIsActive);
    SetRegLocked(&gcRegsDef[VideoBadPixelReplacementIdx], ((gcRegsData.VideoAGC != VAGC_Off) || GC_AutofocusIsActive));
-   SetRegLocked(&gcRegsDef[VideoAGCFractionMinIdx], GC_AutofocusIsActive);
-   SetRegLocked(&gcRegsDef[VideoAGCFractionMaxIdx], GC_AutofocusIsActive);
-   SetRegLocked(&gcRegsDef[VideoAGCResponseTimeIdx], GC_AutofocusIsActive);
    SetRegLocked(&gcRegsDef[VideoFreezeIdx], GC_AutofocusIsActive);
    SetRegLocked(&gcRegsDef[DeviceRegistersStreamingStartIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[DeviceRegistersStreamingEndIdx], (GC_WaitingForImageCorrection || GC_AcquisitionStarted));

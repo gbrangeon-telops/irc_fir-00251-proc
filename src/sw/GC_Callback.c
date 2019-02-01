@@ -71,7 +71,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.3.0
+// Generated from XML camera definition file version 12.4.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -251,6 +251,7 @@ void GC_Callback_Init()
    gcRegsDef[ImageCorrectionModeIdx].callback =                         &GC_ImageCorrectionModeCallback;
    gcRegsDef[IntegrationModeIdx].callback =                             &GC_IntegrationModeCallback;
    gcRegsDef[IsActiveFlagsIdx].callback =                               &GC_IsActiveFlagsCallback;
+   gcRegsDef[LoadSavedConfigurationAtStartupIdx].callback =             &GC_LoadSavedConfigurationAtStartupCallback;
    gcRegsDef[LockedCenterImageIdx].callback =                           &GC_LockedCenterImageCallback;
    gcRegsDef[ManualFilterSerialNumberIdx].callback =                    &GC_ManualFilterSerialNumberCallback;
    gcRegsDef[MemoryBufferAvailableFreeSpaceHighIdx].callback =          &GC_MemoryBufferAvailableFreeSpaceHighCallback;
@@ -311,6 +312,7 @@ void GC_Callback_Init()
    gcRegsDef[ProprietaryFeatureIdx].callback =                          &GC_ProprietaryFeatureCallback;
    gcRegsDef[ReverseXIdx].callback =                                    &GC_ReverseXCallback;
    gcRegsDef[ReverseYIdx].callback =                                    &GC_ReverseYCallback;
+   gcRegsDef[SaveConfigurationIdx].callback =                           &GC_SaveConfigurationCallback;
    gcRegsDef[SensorHeightIdx].callback =                                &GC_SensorHeightCallback;
    gcRegsDef[SensorIDIdx].callback =                                    &GC_SensorIDCallback;
    gcRegsDef[SensorWellDepthIdx].callback =                             &GC_SensorWellDepthCallback;
@@ -330,15 +332,7 @@ void GC_Callback_Init()
    gcRegsDef[TriggerSourceIdx].callback =                               &GC_TriggerSourceCallback;
    gcRegsDef[VFOVIdx].callback =                                        &GC_VFOVCallback;
    gcRegsDef[VideoAGCIdx].callback =                                    &GC_VideoAGCCallback;
-   gcRegsDef[VideoAGCFractionMaxIdx].callback =                         &GC_VideoAGCFractionMaxCallback;
-   gcRegsDef[VideoAGCFractionMaxMinIdx].callback =                      &GC_VideoAGCFractionMaxMinCallback;
-   gcRegsDef[VideoAGCFractionMinIdx].callback =                         &GC_VideoAGCFractionMinCallback;
-   gcRegsDef[VideoAGCFractionMinMaxIdx].callback =                      &GC_VideoAGCFractionMinMaxCallback;
-   gcRegsDef[VideoAGCResponseTimeIdx].callback =                        &GC_VideoAGCResponseTimeCallback;
    gcRegsDef[VideoBadPixelReplacementIdx].callback =                    &GC_VideoBadPixelReplacementCallback;
-   gcRegsDef[VideoColorMapIdx].callback =                               &GC_VideoColorMapCallback;
-   gcRegsDef[VideoColorMapMaxIdx].callback =                            &GC_VideoColorMapMaxCallback;
-   gcRegsDef[VideoColorMapMinIdx].callback =                            &GC_VideoColorMapMinCallback;
    gcRegsDef[VideoEHDRIExposureIndexIdx].callback =                     &GC_VideoEHDRIExposureIndexCallback;
    gcRegsDef[VideoFWPositionIdx].callback =                             &GC_VideoFWPositionCallback;
    gcRegsDef[VideoFreezeIdx].callback =                                 &GC_VideoFreezeCallback;
@@ -3221,6 +3215,26 @@ void GC_IsActiveFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 }
 
 /**
+ * LoadSavedConfigurationAtStartup GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_LoadSavedConfigurationAtStartupCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
  * LockedCenterImage GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -4210,6 +4224,26 @@ void GC_ReverseYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 }
 
 /**
+ * SaveConfiguration GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_SaveConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   {
+      // Before read
+   }
+
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+   }
+}
+
+/**
  * SensorHeight GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -4543,71 +4577,6 @@ void GC_VideoAGCCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 }
 
 /**
- * VideoAGCFractionMax GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoAGCFractionMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // Update VideoAGCFractionMinMax register
-      gcRegsData.VideoAGCFractionMinMax = gcRegsData.VideoAGCFractionMax - 1.0F;
-   }
-}
-
-/**
- * VideoAGCFractionMaxMin GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoAGCFractionMaxMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-}
-
-/**
- * VideoAGCFractionMin GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoAGCFractionMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // Update VideoAGCFractionMaxMin register
-      gcRegsData.VideoAGCFractionMaxMin = gcRegsData.VideoAGCFractionMin + 1.0F;
-   }
-}
-
-/**
- * VideoAGCFractionMinMax GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoAGCFractionMinMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-}
-
-/**
- * VideoAGCResponseTime GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoAGCResponseTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-}
-
-/**
  * VideoBadPixelReplacement GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -4621,39 +4590,6 @@ void GC_VideoBadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAcce
       // After write
       CAL_UpdateVideo(&gCal, &gcRegsData);
    }
-}
-
-/**
- * VideoColorMap GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoColorMapCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-}
-
-/**
- * VideoColorMapMax GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoColorMapMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-}
-
-/**
- * VideoColorMapMin GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoColorMapMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
 }
 
 /**
