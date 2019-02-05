@@ -5,7 +5,7 @@
  * This file defines camera image correction calibration file structure v2.
  *
  * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.6.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.7.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -166,6 +166,13 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* FWReferenceTemperatureOffset = */ 0.0F,
    /* ExposureTimeMin = */ 0.0F,
    /* ClConfiguration = */ 2,
+   /* SaveConfigurationEnabled = */ 0,
+   /* FPATemperatureConversionCoef0 = */ 623.10F,
+   /* FPATemperatureConversionCoef1 = */ -667.07F,
+   /* FPATemperatureConversionCoef2 = */ 137.86F,
+   /* FPATemperatureConversionCoef3 = */ 173.45F,
+   /* FPATemperatureConversionCoef4 = */ -170.50F,
+   /* FPATemperatureConversionCoef5 = */ 0.000000F,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -369,7 +376,15 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->FWReferenceTemperatureOffset, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->ExposureTimeMin, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->ClConfiguration, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 111; // Skip FREE space
+      memcpy(&hdr->SaveConfigurationEnabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 2; // Skip FREE space
+      memcpy(&hdr->FPATemperatureConversionCoef0, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->FPATemperatureConversionCoef1, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->FPATemperatureConversionCoef2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->FPATemperatureConversionCoef3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->FPATemperatureConversionCoef4, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      memcpy(&hdr->FPATemperatureConversionCoef5, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+      numBytes += 84; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -606,7 +621,15 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->FWReferenceTemperatureOffset, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->ExposureTimeMin, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->ClConfiguration, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 111); numBytes += 111; // FREE space
+      memcpy(&buffer[numBytes], &hdr->SaveConfigurationEnabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+      memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef0, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef1, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef2, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef3, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef4, sizeof(float)); numBytes += sizeof(float);
+      memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef5, sizeof(float)); numBytes += sizeof(float);
+      memset(&buffer[numBytes], 0, 84); numBytes += 84; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -792,6 +815,13 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("FWReferenceTemperatureOffset: " _PCF(3) "\n", _FFMT(hdr->FWReferenceTemperatureOffset, 3));
    FPGA_PRINTF("ExposureTimeMin: " _PCF(3) "\n", _FFMT(hdr->ExposureTimeMin, 3));
    FPGA_PRINTF("ClConfiguration: %d\n", hdr->ClConfiguration);
+   FPGA_PRINTF("SaveConfigurationEnabled: %d\n", hdr->SaveConfigurationEnabled);
+   FPGA_PRINTF("FPATemperatureConversionCoef0: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef0, 3));
+   FPGA_PRINTF("FPATemperatureConversionCoef1: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef1, 3));
+   FPGA_PRINTF("FPATemperatureConversionCoef2: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef2, 3));
+   FPGA_PRINTF("FPATemperatureConversionCoef3: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef3, 3));
+   FPGA_PRINTF("FPATemperatureConversionCoef4: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef4, 3));
+   FPGA_PRINTF("FPATemperatureConversionCoef5: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef5, 3));
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

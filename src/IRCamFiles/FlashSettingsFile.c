@@ -435,6 +435,17 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 6;
 
                case 6:
+                  // 2.6.x -> 2.7.x
+                  hdr->SaveConfigurationEnabled = FlashSettings_FlashSettingsFileHeader_default.SaveConfigurationEnabled;
+                  hdr->FPATemperatureConversionCoef0 = FlashSettings_FlashSettingsFileHeader_default.FPATemperatureConversionCoef0;
+                  hdr->FPATemperatureConversionCoef1 = FlashSettings_FlashSettingsFileHeader_default.FPATemperatureConversionCoef1;
+                  hdr->FPATemperatureConversionCoef2 = FlashSettings_FlashSettingsFileHeader_default.FPATemperatureConversionCoef2;
+                  hdr->FPATemperatureConversionCoef3 = FlashSettings_FlashSettingsFileHeader_default.FPATemperatureConversionCoef3;
+                  hdr->FPATemperatureConversionCoef4 = FlashSettings_FlashSettingsFileHeader_default.FPATemperatureConversionCoef4;
+                  hdr->FPATemperatureConversionCoef5 = FlashSettings_FlashSettingsFileHeader_default.FPATemperatureConversionCoef5;
+                  hdr->FileStructureMinorVersion = 7;
+
+               case 7:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

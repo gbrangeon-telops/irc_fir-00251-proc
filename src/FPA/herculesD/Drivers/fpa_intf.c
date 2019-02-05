@@ -19,6 +19,7 @@
 
 #include "GeniCam.h"
 #include "fpa_intf.h"
+#include "flashSettings.h"
 #include "utils.h"
 #include "IRC_status.h"
 #include <math.h>
@@ -382,11 +383,12 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    {
       diode_voltage = (float)(raw_temp & 0x0000FFFF) * 4.5776F * 1.0e-5F;
    
-      temperature  = 1655.2F * powf(diode_voltage,5);
-      temperature -= 6961.7F * powf(diode_voltage,4);
-      temperature += 11235.0F * powf(diode_voltage,3);
-      temperature -= 8844.0F * powf(diode_voltage,2);
-      temperature += (2941.5F * diode_voltage) + 77.3F;
+      temperature  = flashSettings.FPATemperatureConversionCoef5 * powf(diode_voltage,5);
+      temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+      temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
+      temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+      temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+      temperature += flashSettings.FPATemperatureConversionCoef0;
 
       return K_TO_CC(temperature); // Centi celsius
    }

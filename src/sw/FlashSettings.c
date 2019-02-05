@@ -417,6 +417,17 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    // Update Camera Link configuration registers
    GC_UpdateCameraLinkConfig();
 
+   // Update Save Configuration
+   if (p_flashSettings->SaveConfigurationEnabled)
+   {
+      TDCFlagsSet(SaveConfigurationIsImplementedMask);
+   }
+   else
+   {
+      TDCFlagsClr(SaveConfigurationIsImplementedMask);
+      GC_RegisterWriteUI32(&gcRegsDef[LoadSavedConfigurationAtStartupIdx], 0);
+   }
+
    // Update camera state if initialization is done
    if (!TDCStatusTst(WaitingForInitMask))
    {

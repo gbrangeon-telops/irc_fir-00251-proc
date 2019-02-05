@@ -19,6 +19,7 @@
 
 #include "GeniCam.h"
 #include "fpa_intf.h"
+#include "flashSettings.h"
 #include "utils.h"
 #include "IRC_status.h"
 #include "CRC.h"
@@ -416,10 +417,11 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    diode_voltage = (float)raw_temp*((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
 
 // courbe de conversion de Sofradir pour une polarisation de 25µA   
-   temperature  =  -302.64F * powf(diode_voltage,4);
-   temperature +=   687.45F * powf(diode_voltage,3);
-   temperature +=  -595.36F * powf(diode_voltage,2);
-   temperature += (-188.47F * diode_voltage) + 490.33F;
+   temperature  = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+   temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
+   temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+   temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+   temperature += flashSettings.FPATemperatureConversionCoef0;
 
    return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
 }       
