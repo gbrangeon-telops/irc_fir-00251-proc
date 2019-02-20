@@ -383,13 +383,25 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    {
       diode_voltage = (float)(raw_temp & 0x0000FFFF) * 4.5776F * 1.0e-5F;
    
+      // utilisation  des valeurs de flashsettings
       temperature  = flashSettings.FPATemperatureConversionCoef5 * powf(diode_voltage,5);
-      temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+	  temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
       temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
       temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
       temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
-      temperature += flashSettings.FPATemperatureConversionCoef0;
-
+      temperature += flashSettings.FPATemperatureConversionCoef0;  
+ 
+     // Si flashsettings non programmés alors on utilise les valeurs par defaut  
+     if ((flashSettings.FPATemperatureConversionCoef5 == 0) && (flashSettings.FPATemperatureConversionCoef4 == 0) && 
+         (flashSettings.FPATemperatureConversionCoef3 == 0) && (flashSettings.FPATemperatureConversionCoef2 == 0) &&
+	     (flashSettings.FPATemperatureConversionCoef1 == 0) && (flashSettings.FPATemperatureConversionCoef0 == 0)) {
+	 // courbe de conversion de SCD  
+        temperature  = 1655.2F * powf(diode_voltage,5);
+        temperature -= 6961.7F * powf(diode_voltage,4);
+        temperature += 11235.0F * powf(diode_voltage,3);
+        temperature -= 8844.0F * powf(diode_voltage,2);
+        temperature += (2941.5F * diode_voltage) + 77.3F;
+     }	
       return K_TO_CC(temperature); // Centi celsius
    }
 }       
