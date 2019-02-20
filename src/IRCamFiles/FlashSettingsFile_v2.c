@@ -167,12 +167,12 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ExposureTimeMin = */ 0.0F,
    /* ClConfiguration = */ 2,
    /* SaveConfigurationEnabled = */ 0,
-   /* FPATemperatureConversionCoef0 = */ 623.10F,
-   /* FPATemperatureConversionCoef1 = */ -667.07F,
-   /* FPATemperatureConversionCoef2 = */ 137.86F,
-   /* FPATemperatureConversionCoef3 = */ 173.45F,
-   /* FPATemperatureConversionCoef4 = */ -170.50F,
-   /* FPATemperatureConversionCoef5 = */ 0.000000F,
+   /* FPATemperatureConversionCoef0 = */ 0.0F,
+   /* FPATemperatureConversionCoef1 = */ 0.0F,
+   /* FPATemperatureConversionCoef2 = */ 0.0F,
+   /* FPATemperatureConversionCoef3 = */ 0.0F,
+   /* FPATemperatureConversionCoef4 = */ 0.0F,
+   /* FPATemperatureConversionCoef5 = */ 0.0F,
    /* FileHeaderCRC16 = */ 0,
 };
 
