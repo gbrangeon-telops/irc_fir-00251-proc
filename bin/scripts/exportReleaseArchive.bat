@@ -56,7 +56,7 @@ echo FIR-00251-NTx-Mini\%ntxminiFile%>> %fubatch%
 echo if not %%errorlevel%% == 0 goto end>> %fubatch%
 echo.>> %fubatch%
 echo %%fu_exe%% -p p FIR-00251-Proc\fir_00251_proc_%sensorName%.mcs>> %fubatch%
-echo %%fu_exe%% -p o FIR-00251-Output\fir_00251_output.mcs>> %fubatch%
+echo %%fu_exe%% -p o FIR-00251-Output\fir_00251_output_70.mcs>> %fubatch%
 echo %%fu_exe%% -p s FIR-00257-Storage\fir_00257_storage.mcs>> %fubatch%
 echo.>> %fubatch%
 echo pause>> %fubatch%
