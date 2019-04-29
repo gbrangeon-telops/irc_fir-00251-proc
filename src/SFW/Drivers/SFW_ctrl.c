@@ -10,7 +10,7 @@
 #include "FWController.h"
 #include "exposure_time_ctrl.h"
 
-#define SFW_BASE_CLOCK_FREQ_HZ   CLK_100_FREQ_HZ  // horloge de reference de la SFW
+#define SFW_BASE_CLOCK_FREQ_HZ   CLK_MB_FREQ_HZ  // horloge de reference de la SFW
 #define FILTER_DEFAULT_RANGE     125
 
 #define FIXED_WHEEL     0

@@ -6,24 +6,12 @@
 # It assume segment have been name in the Adresse editor to start with "TEL_*"
 # This could be done(in adress editor) by clicking on the segment in the cell column
 # and changing the name in the adress segment properties windows
-set designname [get_bd_designs]
-set comparison [string  compare $designname "core"]
-if  {$comparison != 0} { 
-   puts "Core.bd not open"
-   puts "Opening core.bd"
-   open_bd_design {D:/Telops/FIR-00251-Proc/xilinx/PelicanD/fir_00251_proc_pelicanD.srcs/sources_1/bd/core/core.bd}
-} else {
-   puts "Core is open"
-}
+
+open_bd_design [get_files *.bd]
 
 #Extract the clock information
 set clkName [get_property NAME [get_bd_ports -filter {TYPE == clk && DIR == O}]]
 set clkFreq [get_property CONFIG.FREQ_HZ [get_bd_ports -filter {TYPE == clk && DIR == O}]]
-
-#Extract the port information
-set DataName [get_property NAME [get_bd_addr_segs -filter {NAME =~ "TEL_*"}]]
-set DataAddr [get_property offset [get_bd_addr_segs -filter {NAME =~ "TEL_*"}]]
-set Datarange [get_property range [get_bd_addr_segs -filter {NAME =~ "TEL_*"}]]
 
 #open a file to write to
 set filename  "d:/telops/fir-00251-Proc/src/sw/tel2000_param.h"
@@ -59,22 +47,7 @@ foreach j $clkName {
    puts $fd1 "#define [string toupper [lindex $clkName $i]]_FREQ_HZ [lindex $clkFreq $i]"
    incr i
 }
-
-puts $fd1 "
-/**
- * AXI PORT declaration
- */"
-
-#enter a loop that write all the information
-set i 0
-foreach j $DataName {
-   puts $fd1 "/* Definitions for peripheral [lindex $DataName $i] */"
-   puts $fd1 "#define TEL_PAR_[lindex $DataName $i]_BASEADDR [lindex $DataAddr $i]"
-   set HighAddr [expr {[lindex $DataAddr $i] + [lindex $Datarange $i] - 1}]
-   puts $fd1 "#define TEL_PAR_[lindex $DataName $i]_HIGHADDR 0x[format %08X $HighAddr] \n"
-   incr i
-}
-
+puts $fd1 ""
 puts $fd1 "#endif // TEL2000_PARAM_H"
 
 #close file 

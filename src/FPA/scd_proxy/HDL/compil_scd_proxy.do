@@ -26,6 +26,7 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_fifo_writer.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_diag_data_gen.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_data_dispatcher.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_base_mode_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde 
 
 # sources scd_hw_driver
@@ -38,6 +39,8 @@ acom -incr -nowarn DAGGEN_0523 \
 # top level intf
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_mblaze_intf.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
+ D:\Telops\FIR-00251-Common\VHDL\Utilities\axis_32_to_64_wrap.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream32_fifo.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_io_interface.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \

@@ -1,11 +1,11 @@
 /**
  * @file CalibSpectralResponseFile_v2.c
- * Camera image correction calibration file structure v2 definition.
+ * Camera calibration spectral response file structure v2 definition.
  *
- * This file defines camera image correction calibration file structure v2.
+ * This file defines the camera calibration spectral response file structure v2.
  *
- * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.0.0
+ * Auto-generated calibration spectral response file library.
+ * Generated from the calibration spectral response file structure definition XLS file version 2.0.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$

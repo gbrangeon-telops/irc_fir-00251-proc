@@ -24,11 +24,21 @@ use IEEE.numeric_std.all;
 package hder_define is    	  
    
    
-   constant FAST_HDER_CLIENT_NUMBER          : natural := 7; -- les entités pouvant envoyer des fast headers sont : Fpa_intf, trig_gen, filterWheel, EHDRI, Calibration, flagging, ADC readout
-  -- constant ACTIVE_FAST_HDER_CLIENT_NUMBER   : natural := 2; --  07 fev2014: Pour la version alpha, les entités envoyant effectivement des fast headers sont : Fpa_intf, trig_gen.
-   constant ALEN                             : integer := 6; -- largeur du bus d'adresse des données fast du header; 
+   constant FAST_HDER_CLIENT_NUMBER          : natural := 7;  -- les entités pouvant envoyer des fast headers sont : Fpa_intf, trig_gen, filterWheel, EHDRI, Calibration, flagging, ADC readout
+   constant FAST_HDER_LEN_MIN                : natural := 128; -- taille du header en pixel en ne considérant pas le Zero padding
+   constant ALEN                             : integer := 6;  -- largeur du bus d'adresse des données fast du header; 
    constant FAST_HDER_EOF_CODE               : std_logic_vector(15 downto 0) := x"FFFF"; -- code de reconnaissance de fin d'envoi de trame header fast
-   constant ALEN_M1                          : integer := ALEN - 1; -- calcul   
+   
+   
+   ------------------------------------------------------
+   -- calculs                                            
+   ------------------------------------------------------
+   -- ne rien changer dans les calculs
+   constant ALEN_M1                          : integer := ALEN - 1;               
+   constant HDER_FIFO32_SIZE                 : integer := FAST_HDER_LEN_MIN/2; -- la profondeur minimale du fifo32 pour le header   
+   
+   
+   
    -----------------------------------------------------							
    -- parametres de config 
    -------------------------------------------------------

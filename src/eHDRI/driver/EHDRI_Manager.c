@@ -36,7 +36,7 @@ void EHDRI_Reset(t_EhdriManager *pEhdriCtrl, gcRegistersData_t *pGCRegs)
    pGCRegs->EHDRIExposureOccurrence3 = 25.0f;
    pGCRegs->EHDRIExposureOccurrence4 = 25.0f;
 
-   GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], 1);
+   GC_SetEHDRINumberOfExposures(1);
 
    EHDRI_SendConfig(pEhdriCtrl, pGCRegs);
 }
@@ -378,6 +378,7 @@ void EHDRI_GetUpdate(uint16_t *exp_occurrence, uint8_t *Q_idx, uint16_t *Q_max, 
 
    //Find the maximum occurrence
    *Q_max = 0;
+   *Q_idx = 0;
    for (i=0; i<nb_index; i++)
    {
       if (exp_occurrence[i] > *Q_max)

@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 22596 $
+--!   $Author: enofodjie $
+--!   $Date: 2018-12-04 12:05:46 -0500 (mar., 04 déc. 2018) $
+--!   $Id: edge_measure_stat.vhd 22596 2018-12-04 17:05:46Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/FPA/isc0207A/src/edge_measure_stat.vhd $
 ------------------------------------------------------------------
 
 

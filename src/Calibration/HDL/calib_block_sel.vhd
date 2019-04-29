@@ -77,7 +77,7 @@ architecture rtl of calib_block_sel is
    signal ndf_position_i            : std_logic_vector(calib_block_info_type.sel_value'range);
    signal cal_block_index_max_i     : cal_block_index_type;
    signal calib_block_array         : calib_block_array_type;
-   signal block_index_found        : cal_block_index_type;
+   signal block_index_found         : cal_block_index_type;
    signal calib_block_sel_mode_i    : calib_block_sel_mode_type;
    signal sel_state                 : sel_state_type;
    

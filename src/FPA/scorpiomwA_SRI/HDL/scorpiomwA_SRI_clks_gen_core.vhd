@@ -80,8 +80,8 @@ architecture rtl of scorpiomwA_SRI_clks_gen_core is
    attribute iob : string;
    attribute iob of quad_clk_iob: signal is "true";
    
-   attribute dont_touch : string;
-   attribute dont_touch of quad_clk_iob: signal is "true";
+   -- attribute dont_touch : string;
+   -- attribute dont_touch of quad_clk_iob: signal is "true";
    
 begin
    

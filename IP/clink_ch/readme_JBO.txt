@@ -1,1 +1,0 @@
-Cet IP existe pour des fin de simulation seulement afin de vérifier l'implementation de serdes_3ch (d:/Telops/fir-00251-Proc/src/clink/")

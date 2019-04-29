@@ -10,6 +10,7 @@
 #include "tel2000_param.h"
 #include "mb_axi4l_bridge.h"
 #include "hder_inserter.h"
+#include "xparameters.h"
 
 
 //************************** Global variables ****************************/
@@ -40,7 +41,7 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
       if (IRIG_POSIXTime.Status.Valid_Source == 1)
       {
          pGCRegs->TimeSource = TS_IRIGB;         // on specifie IRIG tant qu'une source valide est detectée
-         AXI4L_write32(1, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Activation du module HW
+         AXI4L_write32(1, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Activation du module HW
 
          if (IRIG_POSIXTime.Status.Valid_Data == 1)  // Un POSIX time a été décodé et est prêt à être lue 
          {
@@ -53,7 +54,7 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
       else
       {
          pGCRegs->TimeSource = TS_InternalRealTimeClock;  // Si IRIG et GPS ne sont pas détectés
-         AXI4L_write32(0, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
+         AXI4L_write32(0, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
       }
 
       // Update header
@@ -63,7 +64,7 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
    }
    else
    {
-      AXI4L_write32(0, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
+      AXI4L_write32(0, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
    }
 }
 //---------------------------------------------------------------------------------    
@@ -71,8 +72,8 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
 //---------------------------------------------------------------------------------
 void IRIG_Read_Status()
 {
-   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
-   IRIG_POSIXTime.Status.Valid_Data     = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
+   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
+   IRIG_POSIXTime.Status.Valid_Data     = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
 }
 
 //---------------------------------------------------------------------------------
@@ -80,11 +81,11 @@ void IRIG_Read_Status()
 //---------------------------------------------------------------------------------
 void IRIG_Read_Global_Status()
 {
-   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
-   IRIG_POSIXTime.Status.Valid_Data    = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
-   IRIG_POSIXTime.Status.Global_Status  = AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_GLOBAL_STATUS);
-   IRIG_POSIXTime.Status.PPS_Delay      = AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_PPS_DELAY);
-   IRIG_POSIXTime.Status.MB_Speed_Error = (uint8_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AR_IRIG_MB_SPEED_ERR);
+   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
+   IRIG_POSIXTime.Status.Valid_Data    = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
+   IRIG_POSIXTime.Status.Global_Status  = AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_GLOBAL_STATUS);
+   IRIG_POSIXTime.Status.PPS_Delay      = AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_PPS_DELAY);
+   IRIG_POSIXTime.Status.MB_Speed_Error = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_MB_SPEED_ERR);
 } 
 
 //---------------------------------------------------------------------------------
@@ -93,9 +94,9 @@ void IRIG_Read_Global_Status()
  
 void IRIG_Initialize(flashSettings_t *p_flashSettings)
 {
-   AXI4L_write32(IRIG_HW_DELAY, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+   AXI4L_write32(IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
    // TODO Eventually, the delay will have to be set in the flash setting.
-   //AXI4L_write32(p_flashSettings->IRIG_HW_DELAY, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+   //AXI4L_write32(p_flashSettings->IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
 
 }
  
@@ -116,7 +117,7 @@ void IRIG_Read_Time()
    for (reg_index = 1; reg_index <= 6; reg_index++) 
    {
       reg_add =   (uint8_t)AR_IRIG_REG1_ADD + 4*(reg_index - 1);
-      reg_data =  (uint16_t)AXI4L_read32(TEL_PAR_TEL_IRIG_CTRL_BASEADDR + reg_add);
+      reg_data =  (uint16_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + reg_add);
      
       switch (reg_index)
       {

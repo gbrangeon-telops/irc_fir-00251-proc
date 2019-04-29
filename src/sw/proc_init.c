@@ -56,39 +56,48 @@
 #include "GC_Callback.h"
 #include "XADC.h"
 #include "CtrlInterface.h"
-#include "UART_Utils.h"
 #include "NetworkInterface.h"
 #include "flagging.h"
 #include "gating.h"
 #include "DebugTerminal.h"
 #include "DeviceKey.h"
 #include "HwRevision.h"
+#include "GC_Store.h"
 #include <string.h>
 
 
 // Global variables
-t_Trig gTrig = Trig_Ctor(TEL_PAR_TEL_TRIGGER_CTRL_BASEADDR);
-t_ExposureTime gExposureTime = ExposureTime_Ctor(TEL_PAR_TEL_EXPTIM_CTRL_BASEADDR);
-t_FpaIntf gFpaIntf = FpaIntf_Ctor(TEL_PAR_TEL_FPA_CTRL_BASEADDR);
+t_Trig gTrig = Trig_Ctor(XPAR_TRIGGER_CTRL_BASEADDR);
+t_ExposureTime gExposureTime = ExposureTime_Ctor(XPAR_EXPTIME_CTRL_BASEADDR);
+t_FpaIntf gFpaIntf = FpaIntf_Ctor(XPAR_FPA_CTRL_BASEADDR);
 int16_t gFpaDetectorPolarizationVoltage = 0;
 float gFpaDetectorElectricalTapsRef = 0.0F;
 float gFpaDetectorElectricalRefOffset = 0.0F;
+uint16_t gFpaElCorrMeasAtStarvation; 
+uint16_t gFpaElCorrMeasAtSaturation; 
+uint16_t gFpaElCorrMeasAtReference1; 
+uint16_t gFpaElCorrMeasAtReference2;
+
 int32_t gFpaExposureTimeOffset = 0;
 int32_t gFpaDebugRegA = 0;
 int32_t gFpaDebugRegB = 0;
 int32_t gFpaDebugRegC = 0;
 int32_t gFpaDebugRegD = 0;
-t_HderInserter gHderInserter = HderInserter_Ctor(TEL_PAR_TEL_HEADER_CTRL_BASEADDR);
-t_fan gFan = FAN_Ctor(TEL_PAR_TEL_FAN_CTRL_BASEADDR);
-t_calib gCal = CAL_Config_Ctor(TEL_PAR_TEL_CAL_CTRL_BASEADDR);
-t_AEC gAEC_Ctrl = AEC_Intf_Ctor(TEL_PAR_TEL_AEC_CTRL_BASEADDR);
-ICU_config_t gICU_ctrl = ICU_config_Ctor(TEL_PAR_TEL_ICU_CTRL_BASEADDR);
-t_bufferManager gBufManager = Buffering_Intf_Ctor(TEL_PAR_TEL_BUFFERING_CTRL_BASEADDR);
-t_EhdriManager gEHDRIManager = Ehdri_Intf_Ctor(TEL_PAR_TEL_EHDRI_CTRL_BASEADDR);
-t_mgt gMGT = MGT_Ctor(TEL_PAR_TEL_MGT_CTRL_BASEADDR);
-t_FlagCfg gFlagging_ctrl = Flagging_config_Ctor(TEL_PAR_TEL_TRIGGER_CTRL_BASEADDR + FLAGGING_AXILITE_OFFSET);
-t_GatingCfg gGating_ctrl = Gating_config_Ctor(TEL_PAR_TEL_TRIGGER_CTRL_BASEADDR + GATING_AXILITE_OFFSET);
-t_SfwCtrl gSFW_Ctrl = sfw_Intf_Ctor(TEL_PAR_TEL_SFW_CTRL_BASEADDR);
+int32_t gFpaDebugRegE = 0;
+int32_t gFpaDebugRegF = 0;
+int32_t gFpaDebugRegG = 0;
+int32_t gFpaDebugRegH = 0;
+t_HderInserter gHderInserter = HderInserter_Ctor(XPAR_HEADER_CTRL_BASEADDR);
+t_fan gFan = FAN_Ctor(XPAR_FAN_CTRL_BASEADDR);
+t_calib gCal = CAL_Config_Ctor(XPAR_CALIBCONFIG_AXI_BASEADDR);
+t_AEC gAEC_Ctrl = AEC_Intf_Ctor(XPAR_AEC_CTRL_BASEADDR);
+ICU_config_t gICU_ctrl = ICU_config_Ctor(XPAR_M_ICU_AXI_BASEADDR);
+t_bufferManager gBufManager = Buffering_Intf_Ctor(XPAR_M_BUFFERING_CTRL_BASEADDR);
+t_EhdriManager gEHDRIManager = Ehdri_Intf_Ctor(XPAR_M_EHDRI_CTRL_BASEADDR);
+t_mgt gMGT = MGT_Ctor(XPAR_MGT_CTRL_BASEADDR);
+t_FlagCfg gFlagging_ctrl = Flagging_config_Ctor(XPAR_TRIGGER_CTRL_BASEADDR + FLAGGING_AXILITE_OFFSET);
+t_GatingCfg gGating_ctrl = Gating_config_Ctor(XPAR_TRIGGER_CTRL_BASEADDR + GATING_AXILITE_OFFSET);
+t_SfwCtrl gSFW_Ctrl = sfw_Intf_Ctor(XPAR_SFW_CTRL_BASEADDR);
 
 XIntc gProcIntc;
 t_GPS Gps_struct;
@@ -151,11 +160,16 @@ IRC_Status_t Proc_DeviceSerialPorts_Init()
    status = CircularUART_Init(&gCircularUART_USB,
          XPAR_AXI_USB_UART_DEVICE_ID,
          &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_USB_UART_IP2INTC_IRPT_INTR);
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_USB_UART_IP2INTC_IRPT_INTR,
+         NULL,
+         NULL,
+         Ns550);
+
    if (status == IRC_SUCCESS)
    {
       // Configure USB UART serial port
-      if (UART_Config(&gCircularUART_USB.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+
+      if (CircularUART_Config(&gCircularUART_USB, 115200, 8, 'N', 1) != IRC_SUCCESS)
       {
          retval = IRC_FAILURE;
       }
@@ -169,11 +183,15 @@ IRC_Status_t Proc_DeviceSerialPorts_Init()
    status = CircularUART_Init(&gCircularUART_CameraLink,
          XPAR_CLINK_UART_DEVICE_ID,
          &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_CLINK_UART_IP2INTC_IRPT_INTR);
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_CLINK_UART_IP2INTC_IRPT_INTR,
+         NULL,
+         NULL,
+         Ns550);
+
    if (status == IRC_SUCCESS)
    {
       // Configure Camera Link UART serial port
-      if (UART_Config(&gCircularUART_CameraLink.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      if (CircularUART_Config(&gCircularUART_CameraLink, 115200, 8, 'N', 1) != IRC_SUCCESS)
       {
          retval = IRC_FAILURE;
       }
@@ -187,11 +205,14 @@ IRC_Status_t Proc_DeviceSerialPorts_Init()
    status = CircularUART_Init(&gCircularUART_NTxMini,
          XPAR_PLEORA_UART_DEVICE_ID,
          &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR,
+         NULL,
+         NULL,
+         Ns550);
    if (status == IRC_SUCCESS)
    {
       // Configure NTx-Mini UART serial port
-      if (UART_Config(&gCircularUART_NTxMini.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      if (CircularUART_Config(&gCircularUART_NTxMini, 115200, 8, 'N', 1) != IRC_SUCCESS)
       {
          retval = IRC_FAILURE;
       }
@@ -206,11 +227,14 @@ IRC_Status_t Proc_DeviceSerialPorts_Init()
    status = CircularUART_Init(&gCircularUART_RS232,
          XPAR_OEM_UART_DEVICE_ID,
          &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR);
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_OEM_UART_IP2INTC_IRPT_INTR,
+         NULL,
+         NULL,
+         Ns550);
    if (status == IRC_SUCCESS)
    {
       // Configure RS-232 UART serial port
-      if (UART_Config(&gCircularUART_RS232.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      if (CircularUART_Config(&gCircularUART_RS232, 115200, 8, 'N', 1) != IRC_SUCCESS)
       {
          retval = IRC_FAILURE;
       }
@@ -224,11 +248,15 @@ IRC_Status_t Proc_DeviceSerialPorts_Init()
    status = CircularUART_Init(&gCircularUART_OutputFPGA,
          XPAR_FPGA_OUTPUT_UART_DEVICE_ID,
          &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR);
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_FPGA_OUTPUT_UART_IP2INTC_IRPT_INTR,
+         NULL,
+         NULL,
+         Ns550);
+
    if (status == IRC_SUCCESS)
    {
       // Configure Output FPGA UART serial port
-      if (UART_Config(&gCircularUART_OutputFPGA.uart, 115200, 8, 'N', 1) != IRC_SUCCESS)
+      if (CircularUART_Config(&gCircularUART_OutputFPGA, 115200, 8, 'N', 1) != IRC_SUCCESS)
       {
          retval = IRC_FAILURE;
       }
@@ -240,9 +268,9 @@ IRC_Status_t Proc_DeviceSerialPorts_Init()
 
    // Initialize USART serial port
    status = Usart_Init(&gUSART_NTxMiniBulk,
-         TEL_PAR_TEL_USART_CTRL_BASEADDR,
+         XPAR_M_BULK_AXI_BASEADDR,
          &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_BULK_INTERRUPT_0_INTR);
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_BULK_INTERRUPT_INTR);
    if (status != IRC_SUCCESS)
    {
       retval = IRC_FAILURE;
@@ -454,8 +482,21 @@ IRC_Status_t Proc_GC_Init()
    // Initialize GenICam registers callback function
    GC_Callback_Init();
 
-   // Initialize GenICam register data
+   // Initialize GenICam register data with default values
    gcRegsData = gcRegsDataFactory;
+
+   // Try to load saved GenIcam registers from the flash store
+   status = GC_Store_Load(&gQSPIFlash);
+   if (status == IRC_SUCCESS)
+   {
+      // Verify LoadSavedConfigurationAtStartup activation
+      if (gcRegsData.LoadSavedConfigurationAtStartup == 1) {}
+      else // Feature disabled: restore default values
+      {
+         GCS_INF("GC store disabled: restoring factory values");
+         gcRegsData = gcRegsDataFactory;
+      }
+   }
 
    // Initialize registers from flash dynamic values
    gcRegsData.PowerOnAtStartup = gFlashDynamicValues.PowerOnAtStartup;
@@ -486,7 +527,10 @@ IRC_Status_t Proc_GC_Init()
    gcRegsData.WidthMin = roundUp(FPA_WIDTH_MIN, gcRegsData.WidthInc);
    gcRegsData.HeightInc = lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT);
    gcRegsData.HeightMin = roundUp(FPA_HEIGHT_MIN, gcRegsData.HeightInc);
-   GC_ComputeImageLimits();   // must be called first
+   GC_UpdateImageLimits();   // must be called first
+
+   // Adjust FOV
+   GC_UpdateFOV();
 
    // Memory buffer GenICam registers initialization
    GC_MemoryBufferNumberOfImagesMaxCallback(GCCP_BEFORE, GCCA_READ);
@@ -614,8 +658,8 @@ IRC_Status_t Proc_GC_Init()
       // Connect RS-232 UART serial port to OEM GenICam control interface
       if (CtrlIntf_SetLink(&gCtrlIntf_OEM, CILT_CUART, &gCircularUART_RS232) != IRC_SUCCESS)
       {
-         return IRC_FAILURE;
-      }
+      return IRC_FAILURE;
+   }
    }
 
    /************************************************************************************
@@ -728,6 +772,12 @@ IRC_Status_t Proc_QSPIFlash_Init()
       return IRC_FAILURE;
    }
 
+   /*** Note: moved here for QSPI early access ***/
+   /*
+    * Enable the interrupt for the SPI driver instance.
+    */
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
+
    return IRC_SUCCESS;
 }
 
@@ -740,7 +790,7 @@ IRC_Status_t Proc_QSPIFlash_Init()
 IRC_Status_t Proc_Power_Init(powerCtrl_t *p_powerCtrl)
 {
    if (Power_Init(XPAR_POWER_MANAGEMENT_DEVICE_ID, &gProcIntc,
-         XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR) != IRC_SUCCESS)
+         XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
@@ -766,6 +816,18 @@ IRC_Status_t Proc_Intc_Init()
       return IRC_FAILURE;
    }
 
+   /*** Note: moved here for QSPI early access ***/
+   /*
+    * Start the interrupt controller such that interrupts are enabled for
+    * all devices that cause interrupts, specifies real mode so that only
+    * hardware interrupts are enabled.
+    */
+   status = XIntc_Start(&gProcIntc, XIN_REAL_MODE);
+   if (status != XST_SUCCESS)
+   {
+      return IRC_FAILURE;
+   }
+
    return IRC_SUCCESS;
 }
 
@@ -777,18 +839,19 @@ IRC_Status_t Proc_Intc_Init()
  */
 IRC_Status_t Proc_Intc_Start()
 {
-   XStatus status;
+   /* XStatus status; */
 
+   /*** Note: moved to Proc_Intc_Init() for QSPI early access ***/
    /*
     * Start the interrupt controller such that interrupts are enabled for
     * all devices that cause interrupts, specifies real mode so that only
     * hardware interrupts are enabled.
     */
-   status = XIntc_Start(&gProcIntc, XIN_REAL_MODE);
+   /* status = XIntc_Start(&gProcIntc, XIN_REAL_MODE);
    if (status != XST_SUCCESS)
    {
       return IRC_FAILURE;
-   }
+   }*/
 
    /*
     * Enable the interrupt for the UartNs550 driver instances.
@@ -808,22 +871,23 @@ IRC_Status_t Proc_Intc_Start()
     */
    Usart_Enable(&gUSART_NTxMiniBulk);
 
+   /*** Note: moved to Proc_QSPIFlash_Init() for QSPI early access ***/
    /*
     * Enable the interrupt for the SPI driver instance.
     */
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
+   /* XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR); */
 
    /*
     * Enable the interrupt for the AEC instance.
     */
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_0_INTR);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR);
 
    /*
     * Enable the interrupt for the power push button.
     */
 #ifndef STARTUP
    // Pushbutton interrupt is disabled for Startup tests
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
 #endif
 
    /*
@@ -1068,9 +1132,7 @@ IRC_Status_t Proc_FileSystem_Init()
 IRC_Status_t Proc_Fan_Init()
 {
    FAN_Init(&gFan);
-   FAN_SET_PWM1(&gFan, 100.0); // FPGA FAN
-   FAN_SET_PWM2(&gFan, 10.0); // Internal FAN
-   GC_SetExternalFanSpeed(); // External FAN
+   GC_UpdateExternalFanSpeed(); // External FAN
 
    return IRC_SUCCESS;
 }
@@ -1219,16 +1281,19 @@ IRC_Status_t Proc_XADC_Init()
  */
 IRC_Status_t Proc_BufferManager_Init()
 {
+   t_bufferStatus bufStat;
+   BufferManager_GetStatus(&gBufManager, &bufStat);
+   
    // Update ExternalMemoryBufferIsImplemented and owner of MemoryBuffer registers
-   if (BufferManager_DetectExternalMemoryBuffer())
+   if (bufStat.ext_buf_prsnt)
    {
-        TDCFlagsSet(ExternalMemoryBufferIsImplementedMask);
-        GC_SetMemoryBufferRegistersOwner(GCRO_Storage_FPGA);
+      TDCFlagsSet(ExternalMemoryBufferIsImplementedMask);
+      GC_UpdateMemoryBufferRegistersOwner(GCRO_Storage_FPGA);
    }
    else
    {
-        TDCFlagsClr(ExternalMemoryBufferIsImplementedMask);
-        GC_SetMemoryBufferRegistersOwner(GCRO_Processing_FPGA);
+      TDCFlagsClr(ExternalMemoryBufferIsImplementedMask);
+      GC_UpdateMemoryBufferRegistersOwner(GCRO_Processing_FPGA);
    }
 
    return BufferManager_Init(&gBufManager, &gcRegsData);

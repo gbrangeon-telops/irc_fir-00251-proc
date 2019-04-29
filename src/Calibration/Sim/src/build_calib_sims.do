@@ -6,11 +6,15 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 setenv COMMON_HDL "D:\Telops\Common_HDL"
 
 #IP
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w32_d16\fwft_sfifo_w32_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w192_d16\fwft_sfifo_w192_d16_funcsim.vhdl			  
+acom D:\Telops\FIR-00251-Proc\IP\160\calib_param_ram\calib_param_ram_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d16\t_axi4_stream64_afifo_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\axis_64_to_32\axis_64_to_32_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\ip_axis32_split_axis16\ip_axis32_split_axis16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\ip_axis16_combine_axis32\ip_axis16_combine_axis32_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\ip_axis32_merge_axis64\ip_axis32_merge_axis64_sim_netlist.vhdl
 
 #Common
-acom "$COMMON\VHDL\Utilities\axil32_to_native.vhd"
+do "$COMMON\compile_all_common.do"
 acom "$COMMON_HDL\Utilities\sync_resetn.vhd"
 acom "$COMMON_HDL\Utilities\sync_reset.vhd"
 acom "$COMMON_HDL\Utilities\double_sync.vhd"

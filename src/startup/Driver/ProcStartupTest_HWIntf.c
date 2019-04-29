@@ -20,9 +20,10 @@
 #include "GC_Registers.h"
 #include "GC_Callback.h"
 #include "mb_axi4l_bridge.h"
+#include "xparameters.h"
 
 #define STARTUP_HW_PROBE_OFFSET                          0xC00
-#define HARDWARE_SIG_PROBE_BASEADDR                      TEL_PAR_TEL_TRIGGER_CTRL_BASEADDR + STARTUP_HW_PROBE_OFFSET
+#define HARDWARE_SIG_PROBE_BASEADDR                      XPAR_TRIGGER_CTRL_BASEADDR + STARTUP_HW_PROBE_OFFSET
 #define HARDWARE_SIG_PROBE_RESET                         HARDWARE_SIG_PROBE_BASEADDR + 0x04
 #define HARDWARE_SIG_ENCA_MASK                           0x01
 #define HARDWARE_SIG_ENCB_MASK                           0x02
@@ -231,11 +232,6 @@ IRC_Status_t AutoTest_SWFIntf(void) {
       INDEX,
       SFW_SIG_COUNT
    };
-
-   /*
-    * SFW Signals data type
-    */
-   typedef enum SFWSignalsEnum sigIndex_t;
 
    /*
     * SFW Signal description data type

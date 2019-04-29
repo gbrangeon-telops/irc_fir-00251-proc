@@ -18,7 +18,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use IEEE.numeric_std.all; 
+use IEEE.numeric_std.all;
+use IEEE.math_real.all; 
 use work.fpa_common_pkg.all;
 use work.fpa_define.all;  
 
@@ -91,6 +92,7 @@ package Proxy_define is
    constant FPA_INT_TIME_MIN_FACTOR          : integer := integer((real(FPA_INT_TIME_MIN_NS)*real(FPA_INTF_CLK_RATE_HZ)/1_000_000_000.0));
    constant PROXY_LVAL_TIMEOUT_FACTOR        : integer := integer(MGLK_LVAL_TIMEOUT_MCLK*FPA_INTF_CLK_RATE_HZ/FPA_MCLK_RATE_HZ);
    constant PROXY_CLINK_CLK_1X_PERIOD_NS     : real    := 1_000_000_000.0/real(FPA_MCLK_RATE_HZ*(4/PROXY_CLINK_CHANNEL_NUM));
+   constant DEFINE_DIAG_DATA_CLK_FACTOR      : integer := integer(ceil(real(FPA_INTF_CLK_RATE_HZ / 1000) / real(DEFINE_DIAG_CLK_RATE_MAX_KHZ))); 
    
    -- pour convertir le temps d'integration en coups de 100MHz vers les coups de MCLK
    constant PROXY_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de PROXY_EXP_TIME_CONV_DENOMINATOR  

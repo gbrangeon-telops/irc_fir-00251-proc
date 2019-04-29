@@ -75,16 +75,16 @@ architecture rtl of isc0207A_dval_gen is
    signal data_o           : std_logic_vector(55 downto 0);
    signal active_pixel_dly : unsigned(FPA_INTF_CFG.FPA_ACTIVE_PIXEL_DLY'length-1 downto 0);
    
-   attribute dont_touch    : string;
-   attribute dont_touch of sync_flag : signal is "true"; 
-   attribute dont_touch of sample_cnt : signal is "true";
-   attribute dont_touch of dval_p : signal is "true";
-   attribute dont_touch of data_p : signal is "true";
-   attribute dont_touch of dval   : signal is "true";
-   attribute dont_touch of dval_o : signal is "true";
-   attribute dont_touch of fval_o : signal is "true";
-   attribute dont_touch of sof_o  : signal is "true";
-   attribute dont_touch of dout_o : signal is "true";
+   -- attribute dont_touch    : string;
+   -- attribute dont_touch of sync_flag : signal is "true"; 
+   -- attribute dont_touch of sample_cnt : signal is "true";
+   -- attribute dont_touch of dval_p : signal is "true";
+   -- attribute dont_touch of data_p : signal is "true";
+   -- attribute dont_touch of dval   : signal is "true";
+   -- attribute dont_touch of dval_o : signal is "true";
+   -- attribute dont_touch of fval_o : signal is "true";
+   -- attribute dont_touch of sof_o  : signal is "true";
+   -- attribute dont_touch of dout_o : signal is "true";
    
 begin
    

@@ -17,7 +17,6 @@
 #define __HDER_INSERTER_H__
 
 #include <stdint.h>
-#include "xbasic_types.h"  
 #include "GC_Registers.h"
 #include "IRC_status.h"
 

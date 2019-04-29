@@ -46,7 +46,7 @@
 #define COOLDOWN_SAMPLING_PERIOD_US             TIME_ONE_SECOND_US
 #define COOLDOWN_TEMP_TOLERANCE_CC              80
 
-#define COOLER_CURRENT_THRESHOLD_A              0.100F // 100 mA
+// ENO,  29 janv 2019:  COOLER_CURRENT_THRESHOLD_A provient désormais du module fpa. #define COOLER_CURRENT_THRESHOLD_A              0.100F // 100 mA
 
 #define TDCStatusAllowSensorAcquisitionArmMask        (WaitingForCoolerMask | WaitingForInitMask | WaitingForICUMask | WaitingForNDFilterMask | \
                                                       WaitingForFilterWheelMask | AcquisitionStartedMask | \

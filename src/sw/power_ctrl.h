@@ -88,7 +88,6 @@ enum powerChannelEnum {
    PC_SPARE2 = 7,
    PC_SPARE = 8,
    PC_SELFRESET = 9,
-   PC_PUSH_BUTTON = 10
 };
 
 /**
@@ -125,7 +124,7 @@ typedef enum pushButtonStateEnum pushButtonState_t;
 #define Power_TurnOn(channel) Power_SetChannelPowerState(channel, CPS_ON)
 #define Power_TurnOff(channel) Power_SetChannelPowerState(channel, CPS_OFF)
 
-IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t gpioIntrId);
+IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t IntrId);
 channelPowerState_t Power_GetChannelPowerState(powerChannel_t channel);
 pushButtonState_t Power_GetPushButtonState();
 channelPowerState_t Power_SetChannelPowerState(powerChannel_t channel, channelPowerState_t state);

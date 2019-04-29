@@ -121,8 +121,8 @@ architecture rtl of scd_mblaze_intf is
    --signal fpa_int_indx_last               : std_logic;
    --signal fpa_manuf_diag_mode_last        : std_logic;
    
-   -- attribute dont_touch                   : string;
-   -- attribute dont_touch of user_cfg_i     : signal is "true";
+   -- -- attribute dont_touch                   : string;
+   -- -- attribute dont_touch of user_cfg_i     : signal is "true";
    
    
    

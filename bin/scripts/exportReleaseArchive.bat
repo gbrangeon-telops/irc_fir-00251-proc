@@ -1,6 +1,5 @@
-set firmwareArchive="F:\DisqueTELOPS\Production\IRCAM\Firmwares\Archive"
 set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%)"
-set paperworkTemplateDir=%scriptsDir%\paperwork\template
+set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
 set ntxminiFile=CommonTEL2000LibProject_xml_%xmlVersion%_%sensorWidth%x%sensorHeight%.exe
 set fubatch=%releaseDir%\Release_%firmwareVersion:.=_%.bat
 
@@ -10,25 +9,28 @@ rd %releaseDir% /s /q
 
 rem Prepare firmware package
 mkdir %releaseDir%\FIR-00251-Proc\
-copy %binDir%\prom\*.* %releaseDir%\FIR-00251-Proc\
+copy %binDir%\prom\%baseName%_%fpgaSize%.* %releaseDir%\FIR-00251-Proc\
+if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00251-Output\
-copy %outputDir%\bin\prom\*.* %releaseDir%\FIR-00251-Output\
+copy %outputDir%\bin\prom\%outputBaseName%.* %releaseDir%\FIR-00251-Output\
+if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00257-Storage\
 copy %storageDir%\bin\prom\*.* %releaseDir%\FIR-00257-Storage\
+if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00251-NTx-Mini\
 copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFile% 
+if errorlevel 1 goto err
 
-%x_xilperl% %scriptsDir%\paperwork\generatePaperwork.pl -sensor %sensorName% ^
-   -v %firmwareVersion% -o %outputRevFile% -storage_revs1 %storageRevFile1% -storage_revs2 %storageRevFile2% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -t %paperworkTemplateDir%
+%x_xilperl% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.pl -sensor %sensorName% ^
+   -v %firmwareVersion% -o %outputRevFile% -storage_revs1 %storageRevFile1% -storage_revs2 %storageRevFile2% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -cal %calibFilesVersion% -t %paperworkTemplateDir%
 
 %zip% a -r -tzip %paperworkTemplateDir%.zip %paperworkTemplateDir%\*.*
 
 move %paperworkTemplateDir%.zip %releaseDir%\Release_%firmwareVersion:.=_%.xlsx
 cscript.exe %scriptsDir%\xlsx2pdf.js %releaseDir%\Release_%firmwareVersion:.=_%.xlsx
-
 rem Generate firmware updater batch file
 echo @echo off> %fubatch%
 echo.>> %fubatch%
@@ -55,12 +57,17 @@ echo.>> %fubatch%
 echo FIR-00251-NTx-Mini\%ntxminiFile%>> %fubatch%
 echo if not %%errorlevel%% == 0 goto end>> %fubatch%
 echo.>> %fubatch%
-echo %%fu_exe%% -p p FIR-00251-Proc\fir_00251_proc_%sensorName%.mcs>> %fubatch%
-echo %%fu_exe%% -p o FIR-00251-Output\fir_00251_output_70.mcs>> %fubatch%
+echo %%fu_exe%% -p p FIR-00251-Proc\fir_00251_proc_%sensorName%_%fpgaSize%.mcs>> %fubatch%
+echo %%fu_exe%% -p o FIR-00251-Output\%outputBaseName%.mcs>> %fubatch%
 echo %%fu_exe%% -p s FIR-00257-Storage\fir_00257_storage.mcs>> %fubatch%
 echo.>> %fubatch%
 echo pause>> %fubatch%
 echo.>> %fubatch%
 echo :end>> %fubatch%
+goto end
 
-rem move /-Y %releaseDir% %firmwareArchive%
+:err
+echo Copy failed!
+pause
+
+:end

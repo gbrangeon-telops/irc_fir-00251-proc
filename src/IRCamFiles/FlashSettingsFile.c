@@ -446,6 +446,14 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 7;
 
                case 7:
+                  // 2.7.x -> 2.8.x
+                  hdr->ElCorrMeasAtStarvation = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtStarvation;
+                  hdr->ElCorrMeasAtSaturation = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtSaturation;
+                  hdr->ElCorrMeasAtReference1 = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtReference1;
+                  hdr->ElCorrMeasAtReference2 = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtReference2;
+                  hdr->FileStructureMinorVersion = 8;
+
+               case 8:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

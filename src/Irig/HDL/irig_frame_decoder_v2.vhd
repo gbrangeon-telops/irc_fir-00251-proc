@@ -107,12 +107,12 @@ architecture RTL of irig_frame_decoder_v2 is
    signal irig_data_i              : irig_data_type;
    signal delay_i                  : std_logic_vector(31 downto 0); 
    
-   -- attribute dont_touch : string; 
-   -- attribute dont_touch of irig_data_i          : signal is "true"; 
-   -- attribute dont_touch of frm_received         : signal is "true";  
-   -- attribute dont_touch of irig_dout            : signal is "true";
-   -- attribute dont_touch of irig_dout_dval       : signal is "true";
-   -- attribute dont_touch of irig_dout_sel        : signal is "true";
+   -- -- attribute dont_touch : string; 
+   -- -- attribute dont_touch of irig_data_i          : signal is "true"; 
+   -- -- attribute dont_touch of frm_received         : signal is "true";  
+   -- -- attribute dont_touch of irig_dout            : signal is "true";
+   -- -- attribute dont_touch of irig_dout_dval       : signal is "true";
+   -- -- attribute dont_touch of irig_dout_sel        : signal is "true";
    
    
 begin 

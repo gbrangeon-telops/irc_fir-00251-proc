@@ -29,7 +29,7 @@
 
 
 // ADRESSE du registre des statuts
-#define AEC_BASE_ADDR TEL_PAR_TEL_AEC_CTRL_BASEADDR
+#define AEC_BASE_ADDR XPAR_AEC_CTRL_BASEADDR
 
 
 #define AEC_IMAGEFRACTION_OFFSET	      0x00
@@ -53,11 +53,11 @@
 #define AECP_DATAVALID_OFFSET          0x48
 
 /************************** Constant Definitions ****************************/
-#define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_0_INTR // TO CONFIRM
+#define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR // TO CONFIRM
 #define AEC_NB_BIN		128
 #define CORRECTION_FACTOR_MIN 0.1f
 #define CORRECTION_FACTOR_MAX 10.0f
-#define AEC_BASE_CLOCK_FREQ_HZ     CLK_160_FREQ_HZ
+#define AEC_BASE_CLOCK_FREQ_HZ     CLK_DATA_FREQ_HZ
 
 #define DEFAULT_PIXDYNRANGEMIN 0
 #define DEFAULT_PIXDYNRANGEMAX ((1 << FPA_DATA_RESOLUTION)-1)
@@ -106,26 +106,6 @@ typedef enum AEC_Mode_Enum AEC_Mode_t;
 #define AEC_Intf_Ctor(add) {sizeof(t_AEC)/4 - 2, add, 0, 0, 0, 0, 0}
 
 /************************** Function Prototypes *****************************/
-
-/***************************************************************************//**
-   Interrupt Initialisation of the AEC module.
-   
-   @return void
-   
-*******************************************************************************/
-#ifndef SIM
-   inline int32_t AEC_SetupInterruptSystem(XIntc * InterruptController);
-#endif
-
-/***************************************************************************//**
-   Interrupt Enable of the AEC module.
-   
-   @return void
-   
-*******************************************************************************/
-#ifndef SIM
-   inline void AEC_EnableInterrupt(XIntc * InterruptController);
-#endif
 
 /***************************************************************************//**
    Initializes the AEC module.
@@ -200,5 +180,7 @@ AEC_MSBPOS_t AEC_GetMsbPos();
 
 *******************************************************************************/
 void AEC_UpdateAECPlusParameters(void);
+
+
 
 #endif // __AEC_H__

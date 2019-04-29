@@ -6,24 +6,10 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
     
 # Compile Common Section
 do "$COMMON\compile_all_common.do"
-
-#MGT
-#do  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\compile_data_mgt_rtl.do"
-#do  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\compile_exp_mgt_rtl.do"
-#do  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\compile_video_mgt_rtl.do"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_cdc_sync_exdes.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_clock_module.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_gt_common_wrapper.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_support_reset_logic.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_cdc_sync_exdes.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_clock_module.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_gt_common_wrapper.vhd"
-#acom  "D:\Telops\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_support_reset_logic.vhd"
-acom  "$COMMON\VHDL\MGT\Hdl\mgt_block.bde"
-acom  "$COMMON\VHDL\MGT\Hdl\mgt_wrapper.bde"
-
-#Utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
+
+#MGT 
+do D:\Telops\FIR-00251-Proc\src\MGT\HDL\compil_mgt.do
 
 #EXP time
 do D:\Telops\FIR-00251-Proc\src\ExposureTime\hdl\compil_exposure_time.do
@@ -36,12 +22,6 @@ do D:\Telops\FIR-00251-Proc\src\Trig\hdl\compil_trig_gen.do
 
 #USB
 acom  "$FIR251PROC\src\usb\hdl\USB_CTRL.bde"
-
-#FPGA_COMM
-acom  "$FIR251PROC\src\fpga_comm\hdl\FPGA_COMM.bde"
-
-#FAN MANAGER
-#do "D:\Telops\FIR-00251-Common\VHDL\PWM_CTRL\hdl\compile_pwm.do"
 
 #IRIG
 do D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_compile.do
@@ -87,8 +67,6 @@ do D:\Telops\FIR-00251-Proc\src\SFW\HDL\build_SFW.do
 acom D:\Telops\FIR-00251-Proc\src\startup\HDL\Startup_HW_Test.vhd -relax
 
 #CORE
-#acom  "$FIR251PROC\xilinx\scorpiolwD\fir_00251_proc_scorpiolwD.srcs\sources_1\bd\core\hdl\core.vhd"
-#acom  "$FIR251PROC\xilinx\pelicanD\fir_00251_proc_pelicanD.srcs\sources_1\bd\core\hdl\core_wrapper.vhd"
 acom  "$FIR251PROC\src\BD\bd_wrapper.vhd" 
 
 #top

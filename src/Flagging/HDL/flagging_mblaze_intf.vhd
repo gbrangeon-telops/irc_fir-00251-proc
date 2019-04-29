@@ -41,23 +41,6 @@ architecture rtl of flagging_mblaze_intf is
          );
    end component;      
    
-   component double_sync
-      generic(
-         INIT_VALUE : BIT := '0');
-      port(
-         D     : in std_logic;
-         Q     : out std_logic;
-         RESET : in std_logic;
-         CLK   : in std_logic);
-   end component;   
-   
-   component double_sync_vector
-      port(
-         D     : in std_logic_vector;
-         Q     : out std_logic_vector;
-         CLK   : in std_logic);
-   end component;
-   
    signal sreset                    : std_logic; 
    
    signal axi_awaddr	               : std_logic_vector(31 downto 0);

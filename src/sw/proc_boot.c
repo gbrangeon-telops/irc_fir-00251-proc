@@ -17,7 +17,6 @@
 #include "utils.h"
 #include "printf_utils.h"
 #include "xuartns550_l.h"
-#include "xbasic_types.h"
 #include "xil_exception.h"
 #include "IRC_Status.h"
 #include "led_ctrl.h"
@@ -71,11 +70,13 @@ qspiFlash_t gQSPIFlash;
 /**
  * STDOUT definition
  */
-#if (defined(STDOUT_BASEADDRESS) || defined(STDIN_BASEADDRESS))
-#error STDIN and STDOUT must be set to "none" in the BSP.
+#if (!defined(STDOUT_BASEADDRESS) || !defined(STDIN_BASEADDRESS))
+#error STDIN and STDOUT must be set to "USB" in the BSP.
 #endif
-#define STDOUT_BASEADDRESS    XPAR_AXI_USB_UART_BASEADDR
-#define STDIN_BASEADDRESS     XPAR_AXI_USB_UART_BASEADDR
+
+
+
+
 
 /**
  * Standard outbyte function implementation

@@ -118,11 +118,11 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    
-   -- attribute dont_touch                         : string;
-   -- attribute dont_touch of acq_int_i            : signal is "true";
-   -- attribute dont_touch of fpa_int_i            : signal is "true";
-   -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   -- attribute dont_touch of int_indx_i           : signal is "true";
+   -- -- attribute dont_touch                         : string;
+   -- -- attribute dont_touch of acq_int_i            : signal is "true";
+   -- -- attribute dont_touch of fpa_int_i            : signal is "true";
+   -- -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
+   -- -- attribute dont_touch of int_indx_i           : signal is "true";
    
 begin
    

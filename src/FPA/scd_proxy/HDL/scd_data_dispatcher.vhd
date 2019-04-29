@@ -121,7 +121,7 @@ architecture rtl of scd_data_dispatcher is
    component fwft_sfifo_w28_d16
       port (
          clk       : in std_logic;
-         rst       : in std_logic;
+         srst       : in std_logic;
          din       : in std_logic_vector(27 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
@@ -136,7 +136,7 @@ architecture rtl of scd_data_dispatcher is
    component fwft_sfifo_w40_d16
       port (
          clk       : in std_logic;
-         rst       : in std_logic;
+         srst       : in std_logic;
          din       : in std_logic_vector(39 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
@@ -264,19 +264,19 @@ architecture rtl of scd_data_dispatcher is
    signal byte_19                      : std_logic_vector(7 downto 0);
    signal byte_20                      : std_logic_vector(7 downto 0);
    
-   -- attribute dont_touch                         : string;
-   -- attribute dont_touch of hder_mosi_i          : signal is "true";
-   -- attribute dont_touch of last_cmd_id          : signal is "true"; 
-   -- attribute dont_touch of fpa_int_time         : signal is "true"; 
-   -- attribute dont_touch of byte_18              : signal is "true";
-   -- attribute dont_touch of byte_19              : signal is "true";
-   -- attribute dont_touch of byte_20              : signal is "true";
-   -- attribute dont_touch of fpa_xsize            : signal is "true";
-   -- attribute dont_touch of fpa_ysize            : signal is "true";
-   -- attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
-   -- attribute dont_touch of fpa_temp_reg_dval    : signal is "true";
-   -- attribute dont_touch of fpa_temp_reg         : signal is "true";
-   -- attribute dont_touch of int_indx_i           : signal is "true";
+   -- -- attribute dont_touch                         : string;
+   -- -- attribute dont_touch of hder_mosi_i          : signal is "true";
+   -- -- attribute dont_touch of last_cmd_id          : signal is "true"; 
+   -- -- attribute dont_touch of fpa_int_time         : signal is "true"; 
+   -- -- attribute dont_touch of byte_18              : signal is "true";
+   -- -- attribute dont_touch of byte_19              : signal is "true";
+   -- -- attribute dont_touch of byte_20              : signal is "true";
+   -- -- attribute dont_touch of fpa_xsize            : signal is "true";
+   -- -- attribute dont_touch of fpa_ysize            : signal is "true";
+   -- -- attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
+   -- -- attribute dont_touch of fpa_temp_reg_dval    : signal is "true";
+   -- -- attribute dont_touch of fpa_temp_reg         : signal is "true";
+   -- -- attribute dont_touch of int_indx_i           : signal is "true";
    
    
 begin
@@ -482,7 +482,7 @@ begin
    --------------------------------------------------
    U6 : fwft_sfifo_w40_d16
    port map (
-      rst => ARESET,
+      srst => sreset,
       clk => CLK,
       din => fringe_fifo_din,
       wr_en => fringe_fifo_wr,
@@ -657,7 +657,7 @@ begin
             
             -- dispatching des données et header en mode DIAG et REEL (ou FPA)
             pix_dval_i <= pix_dval_temp;
-            pix_data_i <= pix1_data_temp & pix2_data_temp;
+            pix_data_i <= pix2_data_temp & pix1_data_temp;
             if real_data_mode = '1' then 
                pix_dval_temp <= fpa_fifo_rd and fpa_fifo_dval and not fpa_header and fpa_dval and acq_fringe;
                -- verify overflow on the number of bits corresponding to resolution

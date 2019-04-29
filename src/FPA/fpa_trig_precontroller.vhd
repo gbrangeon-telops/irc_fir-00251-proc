@@ -80,10 +80,10 @@ architecture RTL of fpa_trig_precontroller is
    signal acq_trig_last                : std_logic;
    signal xtra_trig_last               : std_logic; 
    
-   --attribute dont_touch                : string;
-   --attribute dont_touch of acq_trig_temp  : signal is "true";
-   --attribute dont_touch of xtra_trig_o : signal is "true";
-   --attribute dont_touch of fpa_readout_last  : signal is "true";
+   ---- attribute dont_touch                : string;
+   ---- attribute dont_touch of acq_trig_temp  : signal is "true";
+   ---- attribute dont_touch of xtra_trig_o : signal is "true";
+   ---- attribute dont_touch of fpa_readout_last  : signal is "true";
    
    
 begin

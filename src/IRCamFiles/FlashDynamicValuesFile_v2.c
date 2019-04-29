@@ -1,11 +1,11 @@
 /**
  * @file FlashDynamicValuesFile_v2.c
- * Camera image correction calibration file structure v2 definition.
+ * Camera flash dynamic values file structure v2 definition.
  *
- * This file defines camera image correction calibration file structure v2.
+ * This file defines the camera flash dynamic values file structure v2.
  *
- * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Auto-generated flash dynamic values file library.
+ * Generated from the flash dynamic values file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$

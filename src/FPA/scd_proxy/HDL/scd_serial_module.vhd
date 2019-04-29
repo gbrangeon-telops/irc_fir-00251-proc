@@ -85,7 +85,7 @@ architecture RTL of scd_serial_module is
    component sfifo_w8_d64
       PORT (
          clk            : in std_logic;
-         rst            : in std_logic;
+         srst            : in std_logic;
          din            : in std_logic_vector(7 downto 0);
          wr_en          : in std_logic;
          rd_en          : in std_logic;
@@ -184,14 +184,14 @@ architecture RTL of scd_serial_module is
    signal force_xtra_trig_mode    : std_logic;
    
    
-   -- attribute dont_touch           : string;
-   -- attribute dont_touch of resp_err             : signal is "true";
-   -- attribute dont_touch of resp_hder            : signal is "true";
-   -- attribute dont_touch of resp_payload         : signal is "true";
-   -- attribute dont_touch of resp_dcnt            : signal is "true";
-   -- attribute dont_touch of serial_cmd_failure   : signal is "true";
-   -- attribute dont_touch of resp_id              : signal is "true";
-   -- attribute dont_touch of failure_resp_data    : signal is "true";
+   -- -- attribute dont_touch           : string;
+   -- -- attribute dont_touch of resp_err             : signal is "true";
+   -- -- attribute dont_touch of resp_hder            : signal is "true";
+   -- -- attribute dont_touch of resp_payload         : signal is "true";
+   -- -- attribute dont_touch of resp_dcnt            : signal is "true";
+   -- -- attribute dont_touch of serial_cmd_failure   : signal is "true";
+   -- -- attribute dont_touch of resp_id              : signal is "true";
+   -- -- attribute dont_touch of failure_resp_data    : signal is "true";
 begin
    
    areset <= not ARESETN;
@@ -230,7 +230,7 @@ begin
    U1B : sfifo_w8_d64
    PORT MAP (
       clk => CLK,
-      rst => areset,
+      srst => sreset,
       din => cfg_fifo_din,
       wr_en => cfg_fifo_wr_en,
       rd_en => cfg_fifo_rd_en,

@@ -126,8 +126,8 @@ architecture rtl of isc0207_diag_data_gen is
    signal diag_quad_clk_last: std_logic;
    signal diag_done_last    : std_logic;
    
-   attribute dont_touch     : string;
-   attribute dont_touch of diag_fsm : signal is "true";
+   -- attribute dont_touch     : string;
+   -- attribute dont_touch of diag_fsm : signal is "true";
    
 begin
    

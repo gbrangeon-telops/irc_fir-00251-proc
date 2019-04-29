@@ -20,7 +20,7 @@
 
 #include "CircularByteBuffer.h"
 #include "GC_Registers.h"
-#include "xuartns550.h"
+#include "CircularUART.h"
 #include "usart.h"
 #include "verbose.h"
 
@@ -152,7 +152,7 @@ typedef struct FH_ctrl
    serial_chan_t buffers; // the serial channel buffers
    FH_data_t fh_data; // the current state of the device high-level state machine
 	union {
-      XUartNs550 uart;        /**< The UART link of the control interface */
+      circularUART_t uart;
       usart_t usart;          /**< The USART link of the control interface */
    } link; // 68 bytes
 } FH_ctrl_t; // 304 bytes

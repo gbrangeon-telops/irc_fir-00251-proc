@@ -31,7 +31,6 @@
 #include "BuiltInTests.h"
 #include "flagging.h"
 #include "gating.h"
-#include "BufferManager.h"
 #include "proc_init.h"
 #include "AEC.h"
 #include "Actualization.h"
@@ -99,12 +98,8 @@ bool actualisationAcqStartReady()
 void Acquisition_Stop()
 {
    extern t_Trig gTrig;
-   extern t_bufferManager gBufManager;
 
    TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
-
-   BufferManager_AcquisitionStop(&gBufManager, 1);
-
 
    TDCStatusSet(WaitingForArmMask);
 
@@ -124,9 +119,6 @@ void Acquisition_Arm()
    extern t_EhdriManager gEHDRIManager;
    extern t_FlagCfg gFlagging_ctrl;
    extern t_GatingCfg gGating_ctrl;
-   extern t_bufferManager gBufManager;
-
-   BufferManager_AcquisitionStop(&gBufManager, 0); // Clear the ACQ stop to resume recording REDMINE#8350
 
    TRIG_SendConfigGC(&gTrig, &gcRegsData);
 
@@ -191,9 +183,6 @@ void Acquisition_SM()
 {
    extern t_FpaIntf gFpaIntf;
    extern flashDynamicValues_t gFlashDynamicValues;
-   extern bool gBufferStartDownloadTrigger;
-   extern bool gBufferAcqStartedTrigger;
-   extern bool gBufferStopDownloadTrigger;
 
    static acquisitionState_t acquisitionState = ACQ_STOPPED;
    static uint8_t acquisitionStateTransition = 1;
@@ -223,9 +212,6 @@ void Acquisition_SM()
          {
             // Ignore Acquisition Stop command
             GC_SetAcquisitionStop(0);
-
-            // interrupt a buffer transfer, if any
-            gBufferStopDownloadTrigger = 1;
          }
 
          TDCStatusClr(AcquisitionStartedMask);
@@ -275,17 +261,10 @@ void Acquisition_SM()
          {
             if (gcRegsData.AcquisitionStart)
             {
-               gBufferAcqStartedTrigger = 1;
-               if ((gcRegsData.MemoryBufferMode == MBM_On) && (gcRegsData.MemoryBufferSequenceDownloadMode != MBSDM_Off))
-               {
-                  gBufferStartDownloadTrigger = 1;
+               if (BM_MemoryBufferRead)
                   GC_SetAcquisitionStart(0);
-               }
-               else
-               {
-                  // Arm camera before starting acquisition
+               else // Arm camera before starting acquisition
                   GC_SetAcquisitionArm(1);
-               }
             }
 
             if (gcRegsData.AcquisitionArm)
@@ -322,7 +301,6 @@ void Acquisition_SM()
       case ACQ_SENSOR_READY:
          if (gcRegsData.AcquisitionStart)
          {
-            gBufferAcqStartedTrigger = 1;
             GC_SetAcquisitionStart(0);
 
             // Update WaitingForValidParameters flag
@@ -360,9 +338,6 @@ void Acquisition_SM()
             Acquisition_Stop();
 
             acquisitionState = ACQ_STOPPED;
-
-            // interrupt a buffer transfer, if any
-            gBufferStopDownloadTrigger = 1;
          }
          else
          {
@@ -431,8 +406,9 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_COOLER_POWER_ON:
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);         
          if ((extAdcChannels[XEC_COOLER_CUR].isValid) &&
-               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) > COOLER_CURRENT_THRESHOLD_A))
+               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) >= (float)fpaStatus.cooler_on_curr_min_mA / 1000.0F))
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Passed;
             ACQ_INF("Cooler powered on in %dms.", elapsed_time_us(tic_timeout) / 1000);
@@ -605,8 +581,9 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_COOLER_POWER_OFF:
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if ((extAdcChannels[XEC_COOLER_CUR].isValid) &&
-               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) < COOLER_CURRENT_THRESHOLD_A))
+               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) <= (float)fpaStatus.cooler_off_curr_max_mA / 1000.0F))
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Passed;
             ACQ_INF("Cooler powered off in %dms.", elapsed_time_us(tic_timeout) / 1000);

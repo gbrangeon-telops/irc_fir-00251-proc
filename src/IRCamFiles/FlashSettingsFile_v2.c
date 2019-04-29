@@ -1,11 +1,11 @@
 /**
  * @file FlashSettingsFile_v2.c
- * Camera image correction calibration file structure v2 definition.
+ * Camera flash settings file structure v2 definition.
  *
- * This file defines camera image correction calibration file structure v2.
+ * This file defines the camera flash settings file structure v2.
  *
- * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.7.0
+ * Auto-generated flash settings file library.
+ * Generated from the flash settings file structure definition XLS file version 2.8.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -173,6 +173,10 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* FPATemperatureConversionCoef3 = */ 0.0F,
    /* FPATemperatureConversionCoef4 = */ 0.0F,
    /* FPATemperatureConversionCoef5 = */ 0.0F,
+   /* ElCorrMeasAtStarvation = */ 0,
+   /* ElCorrMeasAtSaturation = */ 0,
+   /* ElCorrMeasAtReference1 = */ 0,
+   /* ElCorrMeasAtReference2 = */ 0,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -384,7 +388,11 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->FPATemperatureConversionCoef3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->FPATemperatureConversionCoef4, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
       memcpy(&hdr->FPATemperatureConversionCoef5, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
-      numBytes += 84; // Skip FREE space
+      memcpy(&hdr->ElCorrMeasAtStarvation, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ElCorrMeasAtSaturation, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ElCorrMeasAtReference1, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->ElCorrMeasAtReference2, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      numBytes += 76; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -629,7 +637,11 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef3, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef4, sizeof(float)); numBytes += sizeof(float);
       memcpy(&buffer[numBytes], &hdr->FPATemperatureConversionCoef5, sizeof(float)); numBytes += sizeof(float);
-      memset(&buffer[numBytes], 0, 84); numBytes += 84; // FREE space
+      memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtStarvation, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtSaturation, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtReference1, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtReference2, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memset(&buffer[numBytes], 0, 76); numBytes += 76; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -822,6 +834,10 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("FPATemperatureConversionCoef3: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef3, 3));
    FPGA_PRINTF("FPATemperatureConversionCoef4: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef4, 3));
    FPGA_PRINTF("FPATemperatureConversionCoef5: " _PCF(3) "\n", _FFMT(hdr->FPATemperatureConversionCoef5, 3));
+   FPGA_PRINTF("ElCorrMeasAtStarvation: %d\n", hdr->ElCorrMeasAtStarvation);
+   FPGA_PRINTF("ElCorrMeasAtSaturation: %d\n", hdr->ElCorrMeasAtSaturation);
+   FPGA_PRINTF("ElCorrMeasAtReference1: %d\n", hdr->ElCorrMeasAtReference1);
+   FPGA_PRINTF("ElCorrMeasAtReference2: %d\n", hdr->ElCorrMeasAtReference2);
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

@@ -36,11 +36,14 @@ library work;
 use work.tel2000.all;
 
 entity AECPlus is
+    generic(
+    CAL_2CH : boolean := FALSE
+    );
 	 port(
 		 ARESETN : in STD_LOGIC;
 		 CLK : in STD_LOGIC;
        
-		 RX_MOSI : in T_AXI4_STREAM_MOSI16;
+		 RX_MOSI : in T_AXI4_STREAM_MOSI32;
 		 RX_MISO : in T_AXI4_STREAM_MISO;
        
 		 FILTER_NB : in STD_LOGIC_VECTOR(7 downto 0);
@@ -75,6 +78,9 @@ architecture AECPlus of AECPlus is
    signal exp_time_latched : std_logic_vector(31 downto 0);
    signal filter_nb_latched : std_logic_vector(7 downto 0);
    
+   signal pix_cnt_value : unsigned(7 downto 0);
+
+   
 begin
 
    sresetn_gen : sync_resetn
@@ -84,7 +90,18 @@ begin
       SRESETN => sresetn
       );
    
+   --Generate statement to chose if we count 1 or 2 pixel per transaction   
+   pix_value_inst_F : if(CAL_2CH = FALSE) generate
+   begin
+       pix_cnt_value <= to_unsigned(1,8);
+   end generate;
    
+   pix_value_inst_T : if(CAL_2CH = TRUE) generate
+   begin
+       pix_cnt_value <= to_unsigned(2,8);
+   end generate;
+  
+      
    sum_gen : process(CLK)
    begin
       if rising_edge(CLK) then
@@ -101,7 +118,7 @@ begin
             elsif filter_nb_latched /= NDF_InTransition then 
                if RX_MOSI.TVALID = '1' and RX_MISO.TREADY = '1' then
                   sum <= sum + unsigned(RX_MOSI.TDATA);
-                  nb_pixels_i <= nb_pixels_i + 1;
+                  nb_pixels_i <= nb_pixels_i + pix_cnt_value;
                   
                   if RX_MOSI.TLAST = '1' then
                      latch_data <= '1';

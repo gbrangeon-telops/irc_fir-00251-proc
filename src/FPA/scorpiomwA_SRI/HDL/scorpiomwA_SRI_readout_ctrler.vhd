@@ -94,13 +94,13 @@ architecture rtl of scorpiomwA_SRI_readout_ctrler is
   
    
    
-   --   attribute dont_touch : string;
-   --   attribute dont_touch of sof_pipe         : signal is "true"; 
-   --   attribute dont_touch of eof_pipe         : signal is "true";
-   --   attribute dont_touch of sol_pipe         : signal is "true"; 
-   --   attribute dont_touch of eol_pipe         : signal is "true";
-   --   attribute dont_touch of fval_pipe        : signal is "true"; 
-   --   attribute dont_touch of lval_pipe        : signal is "true";
+   --   -- attribute dont_touch : string;
+   --   -- attribute dont_touch of sof_pipe         : signal is "true"; 
+   --   -- attribute dont_touch of eof_pipe         : signal is "true";
+   --   -- attribute dont_touch of sol_pipe         : signal is "true"; 
+   --   -- attribute dont_touch of eol_pipe         : signal is "true";
+   --   -- attribute dont_touch of fval_pipe        : signal is "true"; 
+   --   -- attribute dont_touch of lval_pipe        : signal is "true";
    
 begin
    

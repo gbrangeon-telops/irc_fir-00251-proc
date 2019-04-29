@@ -124,6 +124,9 @@ architecture rtl of scd_diag_data_gen is
    signal clk_div_i         : std_logic;
    signal clk_div_last      : std_logic;
    signal hder_cnt          : unsigned(7 downto 0);
+   signal diag_clk_i        : std_logic;
+   signal diag_clk_last_i   : std_logic;
+   signal pix_samp_trig_i   : std_logic;
    
 begin
    
@@ -205,6 +208,36 @@ begin
       );
    
    --------------------------------------------------
+   -- clock divider
+   -------------------------------------------------- 
+   -- sampling clk enable
+   genA: if DEFINE_DIAG_DATA_CLK_FACTOR > 1 generate     
+      UCa: Clk_Divider
+      Generic map(
+         Factor => DEFINE_DIAG_DATA_CLK_FACTOR
+         )
+      Port map( 
+         Clock   => CLK, 
+         Reset   => sreset, 
+         Clk_div => diag_clk_i   -- attention, c'est en realité un clock enable.
+         );  
+      
+      -- sampling trig en mode diag
+      UCb : process(CLK)
+      begin
+         if rising_edge(CLK) then
+            diag_clk_last_i <= diag_clk_i;
+            pix_samp_trig_i <= not diag_clk_last_i and diag_clk_i;
+         end if;
+      end process;
+   end generate;
+   
+   genB: if DEFINE_DIAG_DATA_CLK_FACTOR <= 1 generate 
+      pix_samp_trig_i <= '1'; 
+   end generate;   
+   
+   
+   --------------------------------------------------
    -- CH1 data gen 
    --------------------------------------------------   
    U1: fpa_diag_line_gen
@@ -219,7 +252,7 @@ begin
       START_PULSE => diag_line_gen_en,
       FIRST_VALUE => ch1_first_value,
       INCR_VALUE => ch1_incr_value,
-      PIX_SAMP_TRIG => '0',
+      PIX_SAMP_TRIG => pix_samp_trig_i,
       DIAG_DATA => ch1_diag_data,
       DIAG_DVAL => ch1_diag_dval,
       DIAG_SOL => open,
@@ -242,7 +275,7 @@ begin
       START_PULSE => diag_line_gen_en,
       FIRST_VALUE => ch2_first_value,
       INCR_VALUE => ch2_incr_value,
-      PIX_SAMP_TRIG => '0',
+      PIX_SAMP_TRIG => pix_samp_trig_i,
       DIAG_DATA => ch2_diag_data,
       DIAG_DVAL => ch2_diag_dval,
       DIAG_SOL => open,
@@ -393,8 +426,8 @@ begin
                   end if;
                
                when wait_line_gen_end_st =>
-                  lval_i <= ch1_diag_dval;   -- on se branche sur le module generateur de données diag
-                  dval_i <= ch1_diag_dval;
+                  lval_i <= '1';   
+                  dval_i <= ch1_diag_dval; -- on se branche sur le module generateur de données diag
                   if revert_img = '1' then 
                      ch1_data_i <= not ch1_diag_data;     -- dégradé vers la gauche 
                      ch2_data_i <= not ch2_diag_data;     -- dégradé vers la gauche 
@@ -408,6 +441,7 @@ begin
                   end if;
                
                when line_pause_st =>
+                  lval_i <= '0';  
                   dly_cnt <= dly_cnt + 1;
                   if dly_cnt >= FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T4_DLY then
                      diag_fsm <=  start_line_gen_st;

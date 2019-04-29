@@ -16,7 +16,6 @@
 
 /***************************** Include Files ********************************/
 #include <stdint.h>
-#include "xbasic_types.h"  
 #include "GC_Registers.h"
 #include "IRC_status.h"
 #include "Calibration.h"

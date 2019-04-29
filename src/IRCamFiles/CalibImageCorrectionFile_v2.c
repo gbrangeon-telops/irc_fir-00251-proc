@@ -2,9 +2,9 @@
  * @file CalibImageCorrectionFile_v2.c
  * Camera image correction calibration file structure v2 definition.
  *
- * This file defines camera image correction calibration file structure v2.
+ * This file defines the camera image correction calibration file structure v2.
  *
- * Auto-generated Image Correction Calibration File library.
+ * Auto-generated image correction calibration file library.
  * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *

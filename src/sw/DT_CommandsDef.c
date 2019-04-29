@@ -43,8 +43,9 @@
 #include <string.h>
 #include "FWController.h"
 #include "RpOpticalProtocol.h"
-#include  "Autofocus.h"
+#include "Autofocus.h"
 #include "IRIGB.h"
+#include "GC_Store.h"
 
 #ifdef STARTUP
 #include "DT_CommandsDef_startup.h"
@@ -141,7 +142,7 @@ extern ctrlIntf_t gCtrlIntf_FileManager;
 extern rpCtrl_t theRpCtrl;
 extern autofocusCtrl_t theAutoCtrl;
 extern IRIG_POSIXTime_t IRIG_POSIXTime;
-
+extern qspiFlash_t gQSPIFlash;
 debugTerminalCtrlIntf_t gDebugTerminalCtrlIntfs[] =
 {
    {"PLEORA", &gCtrlIntf_NTxMini},
@@ -211,7 +212,7 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
          return IRC_FAILURE;
       }
 
-      AXI4L_write32(iValue, TEL_PAR_TEL_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+      AXI4L_write32(iValue, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
       }
 
 
@@ -238,10 +239,18 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
+   extern uint16_t gFpaElCorrMeasAtStarvation; 
+   extern uint16_t gFpaElCorrMeasAtSaturation; 
+   extern uint16_t gFpaElCorrMeasAtReference1; 
+   extern uint16_t gFpaElCorrMeasAtReference2;
    extern int32_t gFpaDebugRegA;
    extern int32_t gFpaDebugRegB;
    extern int32_t gFpaDebugRegC;
    extern int32_t gFpaDebugRegD;
+   extern int32_t gFpaDebugRegE;
+   extern int32_t gFpaDebugRegF;
+   extern int32_t gFpaDebugRegG;
+   extern int32_t gFpaDebugRegH;
    extern int32_t gFpaExposureTimeOffset;
 
    uint8_t argStr[12];
@@ -295,6 +304,38 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       {
          cmd = 8;
       }
+      else if (strcasecmp((char *)argStr, "REGE") == 0)
+      {
+         cmd = 9;
+      }
+      else if (strcasecmp((char *)argStr, "REGF") == 0)
+      {
+         cmd = 10;
+      }
+      else if (strcasecmp((char *)argStr, "REGG") == 0)
+      {
+         cmd = 11;
+      }
+      else if (strcasecmp((char *)argStr, "REGH") == 0)
+      {
+         cmd = 12;
+      }
+      else if (strcasecmp((char *)argStr, "STAR") == 0)
+      {
+         cmd = 13;
+      }
+      else if (strcasecmp((char *)argStr, "SATU") == 0)
+      {
+         cmd = 14;
+      }
+      else if (strcasecmp((char *)argStr, "REF1") == 0)
+      {
+         cmd = 15;
+      }
+      else if (strcasecmp((char *)argStr, "REF2") == 0)
+      {
+         cmd = 16;
+      }
       else
       {
          DT_ERR("Unsupported command arguments");
@@ -314,11 +355,16 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             }
             break;
 
-         case 4: // ETOFF
-         case 5: // REGA
-         case 6: // REGB
-         case 7: // REGC
-         case 8: // REGD
+         case  4: // ETOFF
+         case  5: // REGA
+         case  6: // REGB
+         case  7: // REGC
+         case  8: // REGD
+         case  9: // REGE
+         case 10: // REGF
+         case 11: // REGG
+         case 12: // REGH
+
             if (ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS)
             {
                DT_ERR("Invalid int32 value.");
@@ -334,6 +380,18 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
                return IRC_FAILURE;
             }
             break;
+            
+         case 13: // ELCORR STARVATION
+         case 14: // ELCORR SATURATION
+         case 15: // ELCORR REFERENCE1
+         case 16: // ELCORR REFERENCE2
+            if ((ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS) ||
+                  (iValue < 0) || (iValue > 65535))
+            {
+               DT_ERR("Invalid uint16 value.");
+               return IRC_FAILURE;
+            }
+            break;       
       }
 
       // There is supposed to be no remaining bytes in the buffer
@@ -374,10 +432,41 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             gFpaDebugRegC = iValue;
             break;
 			
-		case 8: // REGD
+		   case 8: // REGD
             gFpaDebugRegD = iValue;
             break;
+            
+         case 9: // REGE
+            gFpaDebugRegE = iValue;
+            break;
 
+         case 10: // REGF
+            gFpaDebugRegF = iValue;
+            break;
+
+         case 11: // REGG
+            gFpaDebugRegG = iValue;
+            break;
+			
+		   case 12: // REGH
+            gFpaDebugRegH = iValue;
+            break;
+            
+         case 13: // ELCORR STARVATION
+            gFpaElCorrMeasAtStarvation = iValue;
+            break;
+            
+         case 14: // ELCORR SATURATION
+            gFpaElCorrMeasAtSaturation = iValue;
+            break;
+         
+         case 15: // ELCORR REFERENCE1
+            gFpaElCorrMeasAtReference1 = iValue;
+            break;
+         
+         case 16: // ELCORR REFERENCE2
+            gFpaElCorrMeasAtReference2 = iValue;
+            break;            
       }
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
@@ -392,12 +481,6 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
    DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
    DT_PRINTF("FPA detector exposure time offset =  %d x 10^(-8) s", gFpaExposureTimeOffset);
-
-
-   DT_PRINTF("FPA debug register A = %d", gFpaDebugRegA);
-   DT_PRINTF("FPA debug register B = %d", gFpaDebugRegB);
-   DT_PRINTF("FPA debug register C = %d", gFpaDebugRegC);
-   DT_PRINTF("FPA debug register D = %d", gFpaDebugRegD);
 
    DT_PRINTF("fpa.adc_oper_freq_max_khz = %d", status.adc_oper_freq_max_khz);
    DT_PRINTF("fpa.adc_analog_channel_num = %d", status.adc_analog_channel_num);
@@ -423,8 +506,8 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 
    DT_PRINTF("fpa.adc_ddc_detect_process_done = %d", status.adc_ddc_detect_process_done);
    DT_PRINTF("fpa.adc_ddc_present = %d", status.adc_ddc_present);
-   DT_PRINTF("fpa.flex_detect_process_done = %d", status.flex_detect_process_done);
-   DT_PRINTF("fpa.flex_present = %d", status.flex_present);
+   DT_PRINTF("fpa.flex_flegx_detect_process_done = %d", status.flex_flegx_detect_process_done);
+   DT_PRINTF("fpa.flex_flegx_present = %d", status.flex_flegx_present);
    
    DT_PRINTF("fpa.id_cmd_in_error = 0x%08X", status.id_cmd_in_error);
 
@@ -439,9 +522,29 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.serdes_delay_ch2 = %d", status.fpa_serdes_delay[2]);
    DT_PRINTF("fpa.serdes_edges_ch3 = 0x%08X", status.fpa_serdes_edges[3]);
    DT_PRINTF("fpa.serdes_delay_ch3 = %d", status.fpa_serdes_delay[3]);
-
    DT_PRINTF("fpa.init_done = %d", status.fpa_init_done);
    DT_PRINTF("fpa.init_success = %d", status.fpa_init_success);
+   
+   DT_PRINTF("FPA debug register A = %d", gFpaDebugRegA);
+   DT_PRINTF("FPA debug register B = %d", gFpaDebugRegB);
+   DT_PRINTF("FPA debug register C = %d", gFpaDebugRegC);
+   DT_PRINTF("FPA debug register D = %d", gFpaDebugRegD);
+   DT_PRINTF("FPA debug register E = %d", gFpaDebugRegE);
+   DT_PRINTF("FPA debug register F = %d", gFpaDebugRegF);
+   DT_PRINTF("FPA debug register G = %d", gFpaDebugRegG);
+   DT_PRINTF("FPA debug register H = %d", gFpaDebugRegH);
+  
+   DT_PRINTF("FPA ElCorr Meas At Starvation = %d", gFpaElCorrMeasAtStarvation);
+   DT_PRINTF("FPA ElCorr Meas At Saturation = %d", gFpaElCorrMeasAtSaturation);
+   DT_PRINTF("FPA ElCorr Meas At Reference1 = %d", gFpaElCorrMeasAtReference1);
+   DT_PRINTF("FPA ElCorr Meas At Reference2 = %d", gFpaElCorrMeasAtReference2);
+   
+   DT_PRINTF("fpa.acq_trig_cnt     = %d", status.acq_trig_cnt);   
+   DT_PRINTF("fpa.acq_int_cnt      = %d", status.acq_int_cnt);
+   DT_PRINTF("fpa.acq_readout_cnt  = %d", status.acq_readout_cnt);
+   DT_PRINTF("fpa.fpa_readout_cnt  = %d", status.fpa_readout_cnt);     
+   DT_PRINTF("fpa.out_pix_cnt_min  = %d", status.out_pix_cnt_min);   
+   DT_PRINTF("fpa.out_pix_cnt_max  = %d", status.out_pix_cnt_max);   
 
    return IRC_SUCCESS;
 }
@@ -545,6 +648,8 @@ IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf)
    DT_PRINTF("trig_period_max[6] = %d", status.trig_period_max[6]);
    DT_PRINTF("trig_period_min[7] = %d", status.trig_period_min[7]);
    DT_PRINTF("trig_period_max[7] = %d", status.trig_period_max[7]);
+	DT_PRINTF("trig_delay_min = %d", status.trig_delay_min);
+	DT_PRINTF("trig_delay_max = %d", status.trig_delay_max);
 
    return IRC_SUCCESS;
 }
@@ -909,8 +1014,7 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
 
    BufferManager_GetStatus(&status, &gBufManager);
 
-   DT_PRINTF("buf.write_err      = 0b%s", dec2bin(status.write_err, 4));
-   DT_PRINTF("buf.read_err       = 0b%s", dec2bin(status.read_err, 4));
+   DT_PRINTF("buf.error          = 0x%08X", status.error);
    //DT_PRINTF("buf.mem_ready      = %d", status.mem_ready);   //TODO: de-comment when connected in hdl
    DT_PRINTF("buf.ext_buf_prsnt  = %d", status.ext_buf_prsnt);
 
@@ -2258,10 +2362,10 @@ IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf)
 
    // Transmit to lens
    if (flashSettings.MotorizedLensType == MLT_RPOpticalODEM660)
-   {
+      {
       setAddress(&theRpCtrl, addr);       // toDo ECL Ajouter les valeurs -40deg et +80deg en extra
       writeData(&theRpCtrl, 2, buf);
-   }
+      }
 
    return IRC_SUCCESS;
 }
@@ -2286,7 +2390,7 @@ IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf)
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
-   }
+      }
 
    DT_PRINTF("Lens look-up table");
    DT_PRINTF("rowIndex\tzoom\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tDFocMin\tDFocMax\tfocLen",
@@ -2321,7 +2425,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
-   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF value]");
+   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2 value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");

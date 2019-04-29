@@ -106,14 +106,14 @@ architecture rtl of scorpiomwA_SRI_mblaze_intf is
    signal exp_time_reg                 : unsigned(30 downto 0);
    signal fpa_init_done_i              : std_logic;
    --   
-   --   attribute dont_touch                         : string;
-   --   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
-   --   attribute dont_touch of user_cfg             : signal is "true";
-   --   attribute dont_touch of user_cfg_in_progress : signal is "true";
-   --   attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
-   --   attribute dont_touch of tri_min              : signal is "true";
-   --   attribute dont_touch of tri_int_part         : signal is "true";
-   --   attribute dont_touch of exp_time_reg         : signal is "true";
+   --   -- attribute dont_touch                         : string;
+   --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
+   --   -- attribute dont_touch of user_cfg             : signal is "true";
+   --   -- attribute dont_touch of user_cfg_in_progress : signal is "true";
+   --   -- attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
+   --   -- attribute dont_touch of tri_min              : signal is "true";
+   --   -- attribute dont_touch of tri_int_part         : signal is "true";
+   --   -- attribute dont_touch of exp_time_reg         : signal is "true";
    
 begin   
    

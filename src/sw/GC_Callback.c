@@ -49,6 +49,8 @@
 #include "BuiltInTests.h"
 #include "RpOpticalProtocol.h"
 #include "SightLineSLAProtocol.h"
+#include "GC_Store.h"
+#include "mgt_ctrl.h"
 
 extern t_Trig gTrig;
 extern t_FpaIntf gFpaIntf;
@@ -61,9 +63,10 @@ extern t_calib gCal;
 extern t_HderInserter gHderInserter;
 extern t_FlagCfg gFlagging_ctrl;
 extern t_GatingCfg gGating_ctrl;
-extern bool gBufferStartDownloadTrigger;
 extern rpCtrl_t theRpCtrl;
 extern slCtrl_t theSlCtrl;
+extern qspiFlash_t gQSPIFlash;
+extern t_mgt gMGT;
 
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 extern float FWExposureTime[MAX_NUM_FILTER];
@@ -71,7 +74,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.4.0
+// Generated from XML camera definition file version 12.5.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -333,8 +336,6 @@ void GC_Callback_Init()
    gcRegsDef[VFOVIdx].callback =                                        &GC_VFOVCallback;
    gcRegsDef[VideoAGCIdx].callback =                                    &GC_VideoAGCCallback;
    gcRegsDef[VideoBadPixelReplacementIdx].callback =                    &GC_VideoBadPixelReplacementCallback;
-   gcRegsDef[VideoEHDRIExposureIndexIdx].callback =                     &GC_VideoEHDRIExposureIndexCallback;
-   gcRegsDef[VideoFWPositionIdx].callback =                             &GC_VideoFWPositionCallback;
    gcRegsDef[VideoFreezeIdx].callback =                                 &GC_VideoFreezeCallback;
    gcRegsDef[WidthIdx].callback =                                       &GC_WidthCallback;
    gcRegsDef[WidthIncIdx].callback =                                    &GC_WidthIncCallback;
@@ -556,6 +557,14 @@ void GC_AcquisitionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
  */
 void GC_AcquisitionStartCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      if (gcRegsData.AcquisitionStart && !GC_ExternalMemoryBufferIsImplemented)
+      {
+         BufferManager_OnAcquisitionStart(&gBufManager, &gcRegsData);
+      }
+   }
 }
 
 /**
@@ -592,6 +601,14 @@ void GC_AcquisitionStartAtStartupCallback(gcCallbackPhase_t phase, gcCallbackAcc
  */
 void GC_AcquisitionStopCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // After write
+      if (gcRegsData.AcquisitionStop && !GC_ExternalMemoryBufferIsImplemented)
+      {
+         BufferManager_OnAcquisitionStop(&gBufManager, &gcRegsData);
+      }
+   }
 }
 
 /**
@@ -1007,7 +1024,7 @@ void GC_CalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
          else
          {
             // Update registers related to calibration control
-            GC_CalibrationUpdateRegisters();
+            GC_UpdateCalibrationRegisters();
             GC_UpdateParameterLimits();
             CAL_ApplyCalibBlockSelMode(&gCal, &gcRegsData);
             CAL_WriteBlockParam(&gCal, &gcRegsData);
@@ -1029,7 +1046,7 @@ void GC_CenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_ComputeImageLimits();   // must be called first
+      GC_UpdateImageLimits();   // must be called first
    }
 }
 
@@ -1646,7 +1663,7 @@ void GC_DeviceSerialPortFunctionCallback(gcCallbackPhase_t phase, gcCallbackAcce
       {
          // Device serial port function changed
          DeviceSerialPortFunctionAry[gcRegsData.DeviceSerialPortSelector] = gcRegsData.DeviceSerialPortFunction;
-         GC_SetDeviceSerialPortFunction(gcRegsData.DeviceSerialPortSelector);
+         GC_UpdateDeviceSerialPortFunction(gcRegsData.DeviceSerialPortSelector);
       }
    }
 }
@@ -2404,7 +2421,7 @@ void GC_ExposureTimeSetToMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
       {
          gcRegsData.ExposureTimeSetToMax = 0;
 
-         GC_SetExposureTimeRegisters(gcRegsData.ExposureTimeMax);
+         GC_UpdateExposureTimeRegisters(gcRegsData.ExposureTimeMax);
       }
    }
 }
@@ -2425,7 +2442,7 @@ void GC_ExposureTimeSetToMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
       {
          gcRegsData.ExposureTimeSetToMin = 0;
 
-         GC_SetExposureTimeRegisters(gcRegsData.ExposureTimeMin);
+         GC_UpdateExposureTimeRegisters(gcRegsData.ExposureTimeMin);
       }
    }
 }
@@ -2469,7 +2486,7 @@ void GC_ExternalFanSpeedSetpointCallback(gcCallbackPhase_t phase, gcCallbackAcce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_SetExternalFanSpeed();
+      GC_UpdateExternalFanSpeed();
    }
 }
 
@@ -2646,7 +2663,7 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
          // Make sure CenterImage is set when FW is synchronously rotating
          if (!gcRegsData.CenterImage)
          {
-            GC_RegisterWriteUI32(&gcRegsDef[CenterImageIdx], 1);
+            GC_SetCenterImage(1);
          }
 
          //Limit Parameter
@@ -2741,7 +2758,7 @@ void GC_FWPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
       if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsFW) || (calibrationInfo.collection.CollectionType == CCT_MultipointFW)))
          CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);   // Updates FWPositionSetpoint
       else
-         GC_SetFWPositionSetpoint(prevFWPositionSetpoint, gcRegsData.FWPositionSetpoint);
+         GC_UpdateFWPositionSetpoint(prevFWPositionSetpoint, gcRegsData.FWPositionSetpoint);
    }
 }
 
@@ -2809,7 +2826,7 @@ void GC_FocusFarFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw - FOCUS_FAST_STEP);
+      GC_SetFocusPositionRawSetpoint(gcRegsData.FocusPositionRaw - FOCUS_FAST_STEP);
    }
 }
 
@@ -2824,7 +2841,7 @@ void GC_FocusFarSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw - FOCUS_SLOW_STEP);
+      GC_SetFocusPositionRawSetpoint(gcRegsData.FocusPositionRaw - FOCUS_SLOW_STEP);
    }
 }
 
@@ -2839,7 +2856,7 @@ void GC_FocusNearFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw + FOCUS_FAST_STEP);
+      GC_SetFocusPositionRawSetpoint(gcRegsData.FocusPositionRaw + FOCUS_FAST_STEP);
    }
 }
 
@@ -2854,7 +2871,7 @@ void GC_FocusNearSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], gcRegsData.FocusPositionRaw + FOCUS_SLOW_STEP);
+      GC_SetFocusPositionRawSetpoint(gcRegsData.FocusPositionRaw + FOCUS_SLOW_STEP);
    }
 }
 
@@ -3029,7 +3046,7 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       // Remove 2 header lines (added for the NTx-Mini)
       gcRegsData.Height -= 2;
 
-      GC_ComputeImageLimits();   // must be called first
+      GC_UpdateImageLimits();   // must be called first
 
       SFW_CalculateMaximalValues(&gcRegsData, HEIGHT_CHANGED);
       GC_UpdateParameterLimits();
@@ -3041,7 +3058,8 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       GC_UpdateFOV();
 
       // Update Memory Buffer params
-      GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_UpdateSequenceMaxParameters(&gcRegsData);
    }
 }
 
@@ -3231,6 +3249,7 @@ void GC_LoadSavedConfigurationAtStartupCallback(gcCallbackPhase_t phase, gcCallb
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+      GC_Store_Save(&gQSPIFlash);
    }
 }
 
@@ -3265,10 +3284,6 @@ void GC_ManualFilterSerialNumberCallback(gcCallbackPhase_t phase, gcCallbackAcce
  */
 void GC_MemoryBufferAvailableFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3280,10 +3295,6 @@ void GC_MemoryBufferAvailableFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCa
  */
 void GC_MemoryBufferAvailableFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3295,10 +3306,6 @@ void GC_MemoryBufferAvailableFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCal
  */
 void GC_MemoryBufferFragmentedFreeSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3310,10 +3317,6 @@ void GC_MemoryBufferFragmentedFreeSpaceHighCallback(gcCallbackPhase_t phase, gcC
  */
 void GC_MemoryBufferFragmentedFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3325,14 +3328,12 @@ void GC_MemoryBufferFragmentedFreeSpaceLowCallback(gcCallbackPhase_t phase, gcCa
  */
 void GC_MemoryBufferLegacyModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
-
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+      // Cette mise-à-jour des paramètres max ne change rien en pratique dans HypIR/VTT puisque le registre est modifié au démarrage.
+      // C'est utile pour valider la différence de comportement dans MatLab.
+      BufferManager_UpdateSequenceMaxParameters(&gcRegsData);
    }
 }
 
@@ -3348,7 +3349,7 @@ void GC_MemoryBufferMOIActivationCallback(gcCallbackPhase_t phase, gcCallbackAcc
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      BufferManager_SetMoiConfig(&gBufManager);
+      BufferManager_HW_SetMoiConfig(&gBufManager);
    }
 }
 
@@ -3367,7 +3368,7 @@ void GC_MemoryBufferMOISoftwareCallback(gcCallbackPhase_t phase, gcCallbackAcces
       if ((gcRegsData.MemoryBufferMOISoftware == 1) &&
             (gcRegsData.MemoryBufferMOISource == MBMOIS_Software))
       {
-         BufferManager_SendSoftwareMoi(&gBufManager);
+         BufferManager_HW_SendSoftwareMoi(&gBufManager);
       }
    }
 }
@@ -3381,10 +3382,34 @@ void GC_MemoryBufferMOISoftwareCallback(gcCallbackPhase_t phase, gcCallbackAcces
  */
 void GC_MemoryBufferMOISourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   static uint32_t prevSource;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
+   {
+      // Before write
+      prevSource = gcRegsData.MemoryBufferMOISource;
+   }
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      BufferManager_SetMoiConfig(&gBufManager);
+      if(!GC_ExternalMemoryBufferIsImplemented && BM_MemoryBufferWrite && GC_AcquisitionStarted)
+      {
+         if((prevSource == MBMOIS_None) && (gcRegsData.MemoryBufferMOISource != MBMOIS_None))
+         {
+            BufferManager_HW_SetMoiConfig(&gBufManager); // Set MOI Config BEFORE AcquisitionStart
+            BufferManager_OnAcquisitionStart(&gBufManager, &gcRegsData);
+         }
+         else if((prevSource != MBMOIS_None) && (gcRegsData.MemoryBufferMOISource == MBMOIS_None))
+         {
+            BufferManager_OnAcquisitionStop(&gBufManager, &gcRegsData);
+            BufferManager_HW_SetMoiConfig(&gBufManager); // Set MOI Config AFTER AcquisitionStop
+         }
+      }
+
+      if (gcRegsData.MemoryBufferMOISource == MBMOIS_None)
+         MemoryBufferStatusSet(MemoryBufferHoldingMask);
+      else
+         MemoryBufferStatusClr(MemoryBufferHoldingMask);
    }
 }
 
@@ -3400,44 +3425,12 @@ void GC_MemoryBufferModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      BufferManager_SetMoiConfig(&gBufManager);
-      if(gcRegsData.MemoryBufferMode == MBM_Off)
-      {
-         if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
-         {
-            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_LIVE);
-         }
-         else
-         {
-            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
-            BufferManager_SetBufferMode(&gBufManager, BM_OFF,  &gcRegsData);
-         }
-      }
-      else if(gcRegsData.MemoryBufferMode == MBM_On && gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off)
-      {
-         if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
-         {
-            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_LIVE);
-         }
-         else
-         {
-            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_LIVE);
-            BufferManager_SetBufferMode(&gBufManager, BM_WRITE,  &gcRegsData);
-         }
-      }
-      else
-      {
-         if (TDCFlagsTst(ExternalMemoryBufferIsImplementedMask))
-         {
-            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_EXTERNAL_PLAYBACK);
-         }
-         else
-         {
-            BufferManager_SetSwitchConfig(&gBufManager, BM_SWITCH_INTERNAL_PLAYBACK);
-            BufferManager_SetBufferMode(&gBufManager, BM_READ,  &gcRegsData);
-         }
-      }
+      BufferManager_HW_SetSwitchConfig(&gBufManager);
 
+      if (gcRegsData.MemoryBufferMode == MBM_Off)
+         MemoryBufferStatusSet(MemoryBufferDeactivatedMask);
+      else
+         MemoryBufferStatusClr(MemoryBufferDeactivatedMask);
    }
 }
 
@@ -3450,11 +3443,7 @@ void GC_MemoryBufferModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acc
  */
 void GC_MemoryBufferNumberOfImagesMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-      gcRegsData.MemoryBufferNumberOfImagesMax = BufferManager_GetNbImageMax(&gBufManager, &gcRegsData);
-   }
+   // Obsolete register
 }
 
 /**
@@ -3469,10 +3458,8 @@ void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbac
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      //Limit Number of image
-      GC_UpdateMemoryBufferNumberOfSequenceLimits();
-      BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
-
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_NumberOfSequencesLimits(&gcRegsData);
    }
 }
 
@@ -3485,11 +3472,6 @@ void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbac
  */
 void GC_MemoryBufferNumberOfSequencesMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-      gcRegsData.MemoryBufferNumberOfSequencesMax = BufferManager_GetNumberOfSequenceMax();
-   }
 }
 
 /**
@@ -3504,6 +3486,10 @@ void GC_MemoryBufferSequenceClearCallback(gcCallbackPhase_t phase, gcCallbackAcc
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+      if (gcRegsData.MemoryBufferSequenceClear && !GC_ExternalMemoryBufferIsImplemented)
+      {
+         BufferManager_OnSequenceClearSelected(&gcRegsData);
+      }
    }
 }
 
@@ -3519,7 +3505,10 @@ void GC_MemoryBufferSequenceClearAllCallback(gcCallbackPhase_t phase, gcCallback
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      BufferManager_ClearSequence(&gBufManager, &gcRegsData);
+      if(gcRegsData.MemoryBufferSequenceClearAll && !GC_ExternalMemoryBufferIsImplemented)
+      {
+         BufferManager_OnSequenceClearAll(&gBufManager, &gcRegsData);
+      }
    }
 }
 
@@ -3546,6 +3535,10 @@ void GC_MemoryBufferSequenceDefragCallback(gcCallbackPhase_t phase, gcCallbackAc
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+      if(gcRegsData.MemoryBufferSequenceDefrag && !GC_ExternalMemoryBufferIsImplemented)
+      {
+         BufferManager_OnDefrag(&gBufManager, &gcRegsData);
+      }
    }
 }
 
@@ -3572,14 +3565,8 @@ void GC_MemoryBufferSequenceDownloadFrameCountCallback(gcCallbackPhase_t phase, 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      uint32_t sequenceFirstFrameId = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-      uint32_t sequenceFrameCount = BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-
-      if ((gcRegsData.MemoryBufferSequenceDownloadFrameID - sequenceFirstFrameId) + gcRegsData.MemoryBufferSequenceDownloadFrameCount > sequenceFrameCount)
-      {
-         // Adjust download frame ID
-         gcRegsData.MemoryBufferSequenceDownloadFrameID = (sequenceFrameCount - gcRegsData.MemoryBufferSequenceDownloadFrameCount) + sequenceFirstFrameId;
-      }
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_SequenceDownloadLimits(&gcRegsData);
    }
 }
 
@@ -3595,14 +3582,8 @@ void GC_MemoryBufferSequenceDownloadFrameIDCallback(gcCallbackPhase_t phase, gcC
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      uint32_t sequenceFirstFrameId = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-      uint32_t sequenceFrameCount = BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-
-      if ((gcRegsData.MemoryBufferSequenceDownloadFrameID - sequenceFirstFrameId) + gcRegsData.MemoryBufferSequenceDownloadFrameCount > sequenceFrameCount)
-      {
-         // Adjust download frame count
-         gcRegsData.MemoryBufferSequenceDownloadFrameCount = sequenceFrameCount - (gcRegsData.MemoryBufferSequenceDownloadFrameID - sequenceFirstFrameId);
-      }
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_SequenceDownloadLimits(&gcRegsData);
    }
 }
 
@@ -3618,7 +3599,14 @@ void GC_MemoryBufferSequenceDownloadImageFrameIDCallback(gcCallbackPhase_t phase
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      gBufferStartDownloadTrigger = 1;
+      if(!GC_ExternalMemoryBufferIsImplemented)
+      {
+         if(BufferManager_SequenceDownloadLimits(&gcRegsData))
+         {
+            if(BM_MemoryBufferImage)
+               BufferManager_OnAcquisitionStart(&gBufManager, &gcRegsData);
+         }
+      }
    }
 }
 
@@ -3634,7 +3622,12 @@ void GC_MemoryBufferSequenceDownloadModeCallback(gcCallbackPhase_t phase, gcCall
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
+      BufferManager_HW_SetSwitchConfig(&gBufManager);
+
+      if (gcRegsData.MemoryBufferSequenceDownloadMode != MBSDM_Off)
+         MGT_Send_MBSDM(&gMGT, 1);
+      else
+         MGT_Send_MBSDM(&gMGT, 0);
    }
 }
 
@@ -3647,11 +3640,6 @@ void GC_MemoryBufferSequenceDownloadModeCallback(gcCallbackPhase_t phase, gcCall
  */
 void GC_MemoryBufferSequenceFirstFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-      gcRegsData.MemoryBufferSequenceFirstFrameID = BufferManager_GetSequenceFirstFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-   }
 }
 
 /**
@@ -3663,10 +3651,6 @@ void GC_MemoryBufferSequenceFirstFrameIDCallback(gcCallbackPhase_t phase, gcCall
  */
 void GC_MemoryBufferSequenceHeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3678,11 +3662,6 @@ void GC_MemoryBufferSequenceHeightCallback(gcCallbackPhase_t phase, gcCallbackAc
  */
 void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-      gcRegsData.MemoryBufferSequenceMOIFrameID = BufferManager_GetSequenceMOIFrameId(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-   }
 }
 
 /**
@@ -3694,10 +3673,6 @@ void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallba
  */
 void GC_MemoryBufferSequenceOffsetXCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3709,10 +3684,6 @@ void GC_MemoryBufferSequenceOffsetXCallback(gcCallbackPhase_t phase, gcCallbackA
  */
 void GC_MemoryBufferSequenceOffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3727,8 +3698,8 @@ void GC_MemoryBufferSequencePreMOISizeCallback(gcCallbackPhase_t phase, gcCallba
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_UpdateMemoryBufferSequencePreMOISizeLimits();
-      BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_SequencePreMOISizeLimits(&gcRegsData);
    }
 }
 
@@ -3741,11 +3712,6 @@ void GC_MemoryBufferSequencePreMOISizeCallback(gcCallbackPhase_t phase, gcCallba
  */
 void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-      gcRegsData.MemoryBufferSequenceRecordedSize = BufferManager_GetSequenceLength(&gBufManager, gcRegsData.MemoryBufferSequenceSelector);
-   }
 }
 
 /**
@@ -3757,21 +3723,19 @@ void GC_MemoryBufferSequenceRecordedSizeCallback(gcCallbackPhase_t phase, gcCall
  */
 void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   static uint32_t prevMemoryBufferSequenceSelector;
+   static uint32_t prevSelector;
 
    if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
    {
-      // Before write
-      prevMemoryBufferSequenceSelector = gcRegsData.MemoryBufferSequenceSelector;
+      // Before Write
+      prevSelector = gcRegsData.MemoryBufferSequenceSelector;
    }
-
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      if (gcRegsData.MemoryBufferSequenceSelector != prevMemoryBufferSequenceSelector)
-      {
-         BufferManager_SetSequenceDownloadDefaultParams(&gBufManager, &gcRegsData);
-      }
+      // Call update function only when selector has changed because it resets download default frame IDs
+      if(gcRegsData.MemoryBufferSequenceSelector != prevSelector && !GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_UpdateSelectedSequenceParameters(&gcRegsData);
    }
 }
 
@@ -3787,9 +3751,8 @@ void GC_MemoryBufferSequenceSizeCallback(gcCallbackPhase_t phase, gcCallbackAcce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      // Limit the parameter value
-      GC_UpdateMemoryBufferSequenceSizeLimits();
-      BufferManager_SetSequenceParams(&gBufManager, &gcRegsData);
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_SequenceSizeLimits(&gcRegsData);
    }
 }
 
@@ -3802,10 +3765,6 @@ void GC_MemoryBufferSequenceSizeCallback(gcCallbackPhase_t phase, gcCallbackAcce
  */
 void GC_MemoryBufferSequenceSizeIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3817,13 +3776,6 @@ void GC_MemoryBufferSequenceSizeIncCallback(gcCallbackPhase_t phase, gcCallbackA
  */
 void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-
-      // Since MemoryBufferSequenceSize must be even, make sure MemoryBufferSequenceSizeMax is even too
-      gcRegsData.MemoryBufferSequenceSizeMax = roundDown(BufferManager_GetNbImageMax(&gBufManager, &gcRegsData), 2);
-   }
 }
 
 /**
@@ -3835,10 +3787,6 @@ void GC_MemoryBufferSequenceSizeMaxCallback(gcCallbackPhase_t phase, gcCallbackA
  */
 void GC_MemoryBufferSequenceSizeMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3850,10 +3798,6 @@ void GC_MemoryBufferSequenceSizeMinCallback(gcCallbackPhase_t phase, gcCallbackA
  */
 void GC_MemoryBufferSequenceWidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3865,10 +3809,6 @@ void GC_MemoryBufferSequenceWidthCallback(gcCallbackPhase_t phase, gcCallbackAcc
  */
 void GC_MemoryBufferStatusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3880,10 +3820,6 @@ void GC_MemoryBufferStatusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
  */
 void GC_MemoryBufferTotalSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3895,10 +3831,6 @@ void GC_MemoryBufferTotalSpaceHighCallback(gcCallbackPhase_t phase, gcCallbackAc
  */
 void GC_MemoryBufferTotalSpaceLowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
-   {
-      // Before read
-   }
 }
 
 /**
@@ -3915,7 +3847,7 @@ void GC_NDFilterArmedPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbac
       // After write
       if (gcRegsData.ExposureAuto == EA_ArmedNDFilter)
       {
-         GC_SetNDFPositionSetpoint(gcRegsData.NDFilterPositionSetpoint, gcRegsData.NDFilterArmedPositionSetpoint);
+         GC_UpdateNDFPositionSetpoint(gcRegsData.NDFilterPositionSetpoint, gcRegsData.NDFilterArmedPositionSetpoint);
       }
    }
 }
@@ -3990,7 +3922,7 @@ void GC_NDFilterPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAcce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_SetNDFPositionSetpoint(prevNDFPositionSetpoint, gcRegsData.NDFilterPositionSetpoint);
+      GC_UpdateNDFPositionSetpoint(prevNDFPositionSetpoint, gcRegsData.NDFilterPositionSetpoint);
    }
 }
 
@@ -4006,7 +3938,7 @@ void GC_OffsetXCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_ComputeImageLimits();   // must be called first
+      GC_UpdateImageLimits();   // must be called first
       //GC_UpdateParameterLimits();    // Offsets have no impact on ExpTime and AcqFrameRate
    }
 }
@@ -4056,7 +3988,7 @@ void GC_OffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_ComputeImageLimits();   // must be called first
+      GC_UpdateImageLimits();   // must be called first
       //GC_UpdateParameterLimits();    // Offsets have no impact on ExpTime and AcqFrameRate
    }
 }
@@ -4232,6 +4164,8 @@ void GC_ReverseYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
  */
 void GC_SaveConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   extern qspiFlash_t gQSPIFlash;
+
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
       // Before read
@@ -4240,6 +4174,7 @@ void GC_SaveConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t ac
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
+      GC_Store_Save(&gQSPIFlash);
    }
 }
 
@@ -4468,13 +4403,15 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
       // Update TriggerIsActive flags
       triggerIsActiveFlagMask = 0x00000001 << gcRegsData.TriggerSelector;
-      IsActiveFlagsClr(triggerIsActiveFlagMask);
+
       if (TriggerModeAry[gcRegsData.TriggerSelector] == TM_On)
       {
          IsActiveFlagsSet(triggerIsActiveFlagMask);
       }
-      // Share new value
-      GC_SetIsActiveFlags(gcRegsData.IsActiveFlags);
+      else
+      {
+         IsActiveFlagsClr(triggerIsActiveFlagMask);
+      }
 
       // Update AECPlusIsAvailableMask value
       GC_UpdateAECPlusIsAvailable();
@@ -4571,7 +4508,7 @@ void GC_VideoAGCCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       // After write
       if (gcRegsData.VideoAGC != VAGC_Off)
       {
-         GC_RegisterWriteUI32(&gcRegsDef[VideoBadPixelReplacementIdx], 1);
+         GC_SetVideoBadPixelReplacement(1);
       }
    }
 }
@@ -4584,38 +4521,6 @@ void GC_VideoAGCCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
  * @param access indicates whether the operation is read or write.
  */
 void GC_VideoBadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // After write
-      CAL_UpdateVideo(&gCal, &gcRegsData);
-   }
-}
-
-/**
- * VideoEHDRIExposureIndex GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoEHDRIExposureIndexCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
-{
-   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
-   {
-      // After write
-      CAL_UpdateVideo(&gCal, &gcRegsData);
-   }
-}
-
-/**
- * VideoFWPosition GenICam register callback function.
- * 
- * @param phase indicates whether the function is called before or
- *    after the read or write operation.
- * @param access indicates whether the operation is read or write.
- */
-void GC_VideoFWPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
@@ -4652,7 +4557,7 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_ComputeImageLimits();   // must be called first
+      GC_UpdateImageLimits();   // must be called first
 
       SFW_CalculateMaximalValues(&gcRegsData, WIDTH_CHANGED);
       GC_UpdateParameterLimits();
@@ -4664,7 +4569,8 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       GC_UpdateFOV();
 
       // Update Memory Buffer params
-      GC_MemoryBufferModeCallback(GCCP_AFTER, GCCA_WRITE);
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_UpdateSequenceMaxParameters(&gcRegsData);
    }
 }
 
@@ -4713,7 +4619,7 @@ void GC_ZoomInFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomInFast);
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
+      GC_SetFOVPositionRawSetpoint(newFOVPositionRawSetpoint);
    }
 }
 
@@ -4729,7 +4635,7 @@ void GC_ZoomInSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomInSlow);
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
+      GC_SetFOVPositionRawSetpoint(newFOVPositionRawSetpoint);
    }
 }
 
@@ -4745,7 +4651,7 @@ void GC_ZoomOutFastCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomOutFast);
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
+      GC_SetFOVPositionRawSetpoint(newFOVPositionRawSetpoint);
    }
 }
 
@@ -4761,7 +4667,7 @@ void GC_ZoomOutSlowCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       int32_t newFOVPositionRawSetpoint = RPOpt_CalcZoomNewSetpoint((uint16_t)gcRegsData.FOVPositionRaw, ZoomOutSlow);
-      GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], newFOVPositionRawSetpoint);
+      GC_SetFOVPositionRawSetpoint(newFOVPositionRawSetpoint);
    }
 }
 

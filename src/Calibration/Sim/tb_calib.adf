@@ -44,7 +44,7 @@ DESIGNS=VIRTEX4
 WindowVisible=0
 
 [HierarchyViewer]
-HierarchyInformation=calib_config|rtl|0 tb_calib_top|tb_calib_top|0
+HierarchyInformation=tb_calib_top|tb_calib_top|0 
 ShowHide=ShowTopLevel
 Selected=
 
@@ -59,6 +59,8 @@ Calibration=1
 /run_sim.do=-1
 /waveform.do=-1
 Calibration/..\..\..\HDL\calibration.bde=-1
+Calibration/..\..\..\HDL\calibration_common.bde=-1
+Calibration/..\..\..\HDL\calibration_core.bde=-1
 Calibration/..\..\..\HDL\calib_define.vhd=-1
 Calibration/..\..\..\HDL\calib_config.vhd=-1
 Calibration/..\..\..\HDL\calib_block_sel.vhd=-1
@@ -73,6 +75,8 @@ Calibration/..\..\..\HDL\compil_calibration.do=-1
 .\src\run_sim.do=Macro
 .\src\waveform.do=Macro
 .\..\HDL\calibration.bde=Block Diagram
+.\..\HDL\calibration_common.bde=Block Diagram
+.\..\HDL\calibration_core.bde=Block Diagram
 .\..\HDL\calib_define.vhd=VHDL Source Code
 .\..\HDL\calib_config.vhd=VHDL Source Code
 .\..\HDL\calib_block_sel.vhd=VHDL Source Code
@@ -84,4 +88,10 @@ Calibration/..\..\..\HDL\compil_calibration.do=-1
 
 [file_out:Calibration/..\..\..\HDL\calibration.bde]
 Calibration/..\..\compile\calibration.vhd=-1
+
+[file_out:Calibration/..\..\..\HDL\calibration_common.bde]
+Calibration/..\..\compile\calibration_common.vhd=-1
+
+[file_out:Calibration/..\..\..\HDL\calibration_core.bde]
+Calibration/..\..\compile\calibration_core.vhd=-1
 

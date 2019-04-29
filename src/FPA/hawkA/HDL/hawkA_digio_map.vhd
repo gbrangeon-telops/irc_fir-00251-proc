@@ -103,7 +103,7 @@ architecture rtl of hawkA_digio_map is
    signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
    
    attribute IOB : string;
-   attribute dont_touch : string;
+   -- attribute dont_touch : string;
    
    attribute IOB of fpa_on_iob   : signal is "TRUE";
    attribute IOB of ncs_iob      : signal is "TRUE";
@@ -115,20 +115,20 @@ architecture rtl of hawkA_digio_map is
    attribute IOB of dac_sd_iob   : signal is "TRUE";
    attribute IOB of dac_sclk_iob : signal is "TRUE";
    
-   attribute dont_touch of fpa_timer_cnt : signal is "TRUE";
-   attribute dont_touch of dac_timer_cnt : signal is "TRUE"; 
-   attribute dont_touch of fpa_powered_i : signal is "TRUE";
-   attribute dont_touch of dac_powered_i : signal is "TRUE";
-   attribute dont_touch of fpa_on_i      : signal is "TRUE";
-   attribute dont_touch of ncs_i         : signal is "TRUE";
-   attribute dont_touch of mdin_i        : signal is "TRUE";
-   attribute dont_touch of fdem_i        : signal is "TRUE";
-   attribute dont_touch of digen_i       : signal is "TRUE";
-   attribute dont_touch of mclk_i        : signal is "TRUE";
-   attribute dont_touch of dac_csn_i     : signal is "TRUE";
-   attribute dont_touch of dac_sd_i      : signal is "TRUE";
-   attribute dont_touch of dac_sclk_i    : signal is "TRUE";
-   attribute dont_touch of fsm_sreset    : signal is "TRUE";
+   -- attribute dont_touch of fpa_timer_cnt : signal is "TRUE";
+   -- attribute dont_touch of dac_timer_cnt : signal is "TRUE"; 
+   -- attribute dont_touch of fpa_powered_i : signal is "TRUE";
+   -- attribute dont_touch of dac_powered_i : signal is "TRUE";
+   -- attribute dont_touch of fpa_on_i      : signal is "TRUE";
+   -- attribute dont_touch of ncs_i         : signal is "TRUE";
+   -- attribute dont_touch of mdin_i        : signal is "TRUE";
+   -- attribute dont_touch of fdem_i        : signal is "TRUE";
+   -- attribute dont_touch of digen_i       : signal is "TRUE";
+   -- attribute dont_touch of mclk_i        : signal is "TRUE";
+   -- attribute dont_touch of dac_csn_i     : signal is "TRUE";
+   -- attribute dont_touch of dac_sd_i      : signal is "TRUE";
+   -- attribute dont_touch of dac_sclk_i    : signal is "TRUE";
+   -- attribute dont_touch of fsm_sreset    : signal is "TRUE";
    
 begin
    

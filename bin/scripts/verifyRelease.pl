@@ -168,7 +168,7 @@ if (($procReleaseInfoHardware ne $releaseLogProcHardware) ||
    ($procReleaseInfoBootLoader ne $releaseLogProcBootLoader) || 
    ($procReleaseInfoCommon ne $releaseLogProcCommon))
 {
-   die("Processing FPGA relase info does not match release log file\n");
+   die("Processing FPGA relase info does not release log file\n");
 }
 
 if (($outputReleaseInfoHardware ne $releaseLogOutputHardware) ||
@@ -176,7 +176,7 @@ if (($outputReleaseInfoHardware ne $releaseLogOutputHardware) ||
    ($outputReleaseInfoBootLoader ne $releaseLogOutputBootLoader) || 
    ($outputReleaseInfoCommon ne $releaseLogOutputCommon))
 {
-   die("Output FPGA relase info does not match release log file\n");
+   die("Output FPGA relase info does not release log file\n");
 }
 
 if (($storageReleaseInfoHardware1 ne $releaseLogStorageHardware1) ||
@@ -188,7 +188,7 @@ if (($storageReleaseInfoHardware1 ne $releaseLogStorageHardware1) ||
    ($storageReleaseInfoBootLoader2 ne $releaseLogStorageBootLoader2) || 
    ($storageReleaseInfoCommon2 ne $releaseLogStorageCommon2))
 {
-   die("Storage FPGA relase info does not match release log file\n");
+   die("Storage FPGA relase info does not correspond to release log file\n");
 }
 
 print("$releaseLogVersion (Passed)\n");
