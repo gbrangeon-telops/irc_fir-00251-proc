@@ -7,9 +7,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision$
--- $Author$
--- $LastChangedDate$
+-- $Revision: 22936 $
+-- $Author: enofodjie $
+-- $LastChangedDate: 2019-02-23 08:37:13 -0500 (sam., 23 fÃ©vr. 2019) $
 --
 -------------------------------------------------------------------------------
 --
@@ -548,27 +548,9 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    
    Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
    Stat->fpa_init_done                 = temp_init_done & Stat->prog_init_done;     // pour le scorpiomwA, la programmation de la configuration d'initialisation est un prérequis avant de faire quoi que ce soit.
-   
-   // verification des statuts en simulation
-   #ifdef SIM
-      PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
-      PRINTF("Stat->adc_analog_channel_num   = %d\n", Stat->adc_analog_channel_num);
-      PRINTF("Stat->adc_resolution           = %d\n", Stat->adc_resolution);
-      PRINTF("Stat->adc_brd_spare            = %d\n", Stat->adc_brd_spare);
-      PRINTF("Stat->ddc_fpa_roic             = %d\n", Stat->ddc_fpa_roic );
-      PRINTF("Stat->ddc_brd_spare            = %d\n", Stat->ddc_brd_spare);
-      PRINTF("Stat->flex_fpa_roic            = %d\n", Stat->flex_fpa_roic);
-      PRINTF("Stat->flex_fpa_input           = %d\n", Stat->flex_fpa_input);
-      PRINTF("Stat->flex_ch_diversity_num    = %d\n", Stat->flex_ch_diversity_num );
-      PRINTF("Stat->cooler_volt_min_mV       = %d\n", Stat->cooler_volt_min_mV);
-      PRINTF("Stat->cooler_volt_max_mV       = %d\n", Stat->cooler_volt_max_mV);
-      PRINTF("Stat->fpa_temp_raw             = %d\n", Stat->fpa_temp_raw);
-      PRINTF("Stat->global_done              = %d\n", Stat->global_done);
-      PRINTF("Stat->fpa_powered              = %d\n", Stat->fpa_powered);
-      PRINTF("Stat->cooler_powered           = %d\n", Stat->cooler_powered);
-      PRINTF("Stat->errors_latchs            = %d\n", Stat->errors_latchs);
-   #endif  
-   
+
+   Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
+   Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
 }
 
 

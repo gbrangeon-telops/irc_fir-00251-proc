@@ -9,6 +9,9 @@ get_files -all -of_objects [get_files  CH2_CLINK.xci]
 #Générer le bloc diagram
 write_bd_tcl -force -verbose "D:/Telops/FIR-00251-Proc/scripts/gen_bd_core.tcl"
 
+#Générer le fichier de debug (avec Synthesized Design ouvert)
+write_debug_probes "[get_property DIRECTORY [current_project]]/[current_project]_debug_nets.ltx" -force
+
 #execution du script de génération
 source -verbose gen_project.tcl
 

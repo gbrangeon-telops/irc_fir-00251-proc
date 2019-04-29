@@ -1,18 +1,18 @@
 /**
  * @file FlashDynamicValuesFile_v2.c
- * Camera image correction calibration file structure v2 definition.
+ * Camera flash dynamic values file structure v2 definition.
  *
- * This file defines camera image correction calibration file structure v2.
+ * This file defines the camera flash dynamic values file structure v2.
  *
- * Auto-generated Image Correction Calibration File library.
- * Generated from the image correction calibration file structure definition XLS file version 2.2.0
+ * Auto-generated flash dynamic values file library.
+ * Generated from the flash dynamic values file structure definition XLS file version 2.2.0
  * using generateIRCamFileCLib.m Matlab script.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23158 $
+ * $Author: elarouche $
+ * $Date: 2019-04-02 16:09:55 -0400 (mar., 02 avr. 2019) $
+ * $Id: FlashDynamicValuesFile_v2.c 23158 2019-04-02 20:09:55Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/FlashDynamicValuesFile_v2.c $
  *
  * (c) Copyright 2016 Telops Inc.
  */

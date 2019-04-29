@@ -16,10 +16,6 @@ use IEEE.numeric_std.all;
 use work.tel2000.all;
 
 entity pixel_saturation_repl is   
-   generic(
-      SATURATED_PIX_VALUE : unsigned(15 downto 0):= x"FFFF"
-      );
-   
    port(
       ARESETN         : in std_logic;
       CLK             : in std_logic;
@@ -71,8 +67,8 @@ begin
             
             if TX_MISO.TREADY = '1' then 
                TX_MOSI <= RX_MOSI;
-               if RX_MOSI.TUSER(1)= '1' then 
-                  TX_MOSI.TDATA <= std_logic_vector(SATURATED_PIX_VALUE);
+               if RX_MOSI.TUSER(TUSER_SATURATED_PIX_BIT)= '1' then 
+                  TX_MOSI.TDATA <= TAG_SATURATED_PIX;
                end if;
             end if;          
             

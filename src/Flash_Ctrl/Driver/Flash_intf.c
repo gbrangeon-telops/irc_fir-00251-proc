@@ -15,7 +15,7 @@ void FlashIntf_Init(FlashIntfStruct *FlashIntf)
 	// uint32_t Data = 0;
 
 	//Initialize
-   FlashIntf->BaseAddress = TEL_PAR_TEL_FLASH_INTF_BASEADDR;
+   FlashIntf->BaseAddress = XPAR_M_FLASHINTF_AXI_BASEADDR;
    
 	//Set direction
    FlashIntf_WriteReg(FlashIntf->BaseAddress, FLASH_INTF_CMD_TRI_OFFSET, 0xFFFFFFC0);

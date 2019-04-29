@@ -4,9 +4,9 @@
 --  File: param_fifo.vhd
 --  By: Olivier Dionne
 --
---  $Revision$
---  $Author$
---  $LastChangedDate$
+--  $Revision: 17698 $
+--  $Author: jboulet $
+--  $LastChangedDate: 2015-12-15 15:21:03 -0500 (mar., 15 déc. 2015) $
 --
 ---------------------------------------------------------------------------------------------------
 library IEEE;

@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 23147 $
+--!   $Author: elarouche $
+--!   $Date: 2019-04-01 14:32:59 -0400 (lun., 01 avr. 2019) $
+--!   $Id: calib_param_sequencer.vhd 23147 2019-04-01 18:32:59Z elarouche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Calibration/HDL/calib_param_sequencer.vhd $
 ------------------------------------------------------------------
 
 
@@ -44,68 +44,8 @@ entity calib_param_sequencer is
       DDR_ADDR_OFFSET             : out std_logic_vector(31 downto 0);  --in bytes
       DDR_READ_START              : out std_logic;
       
-      -- Saturation
-      SATURATION_THRESHOLD        : out std_logic_vector(31 downto 0); 
-      SATURATION_THRESHOLD_WR_EN  : out std_logic;
-      
-      -- NLC                      
-      NLC_LUT_PARAM               : out lut_param_type;
-      NLC_LUT_PARAM_WR_EN         : out std_logic;
-      
-      RANGE_OFS_FP32              : out std_logic_vector(31 downto 0);
-      RANGE_OFS_FP32_WR_EN        : out std_logic;
-      
-      POW2_OFFSET_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      POW2_OFFSET_EXP_FP32_WR_EN  : out std_logic;  
-      
-      POW2_RANGE_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      POW2_RANGE_EXP_FP32_WR_EN   : out std_logic;  
-      
-      NLC_POW2_M_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      NLC_POW2_M_EXP_FP32_WR_EN   : out std_logic;  
-      
-      NLC_POW2_B_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      NLC_POW2_B_EXP_FP32_WR_EN   : out std_logic;  
-      
-      -- FSU                      
-      DELTA_TEMP_FP32             : out std_logic_vector(31 downto 0);
-      DELTA_TEMP_FP32_WR_EN       : out std_logic;
-      
-      ALPHA_OFFSET_FP32           : out std_logic_vector(31 downto 0);
-      ALPHA_OFFSET_FP32_WR_EN     : out std_logic;
-      
-      POW2_ALPHA_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      POW2_ALPHA_EXP_FP32_WR_EN   : out std_logic;  
-      
-      POW2_BETA0_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      POW2_BETA0_EXP_FP32_WR_EN	 : out std_logic;  
-      
-      POW2_KAPPA_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      POW2_KAPPA_EXP_FP32_WR_EN	 : out std_logic;      
-      
-      -- FCC                      
-      NUC_MULT_FACTOR_FP32     	 : out std_logic_vector(31 downto 0);
-      NUC_MULT_FACTOR_FP32_WR_EN	 : out std_logic;
-      
-      -- RQC
-      RQC_LUT_PARAM               : out lut_param_type;
-      RQC_LUT_PARAM_WR_EN         : out std_logic;
-      
-      RQC_LUT_PAGE_ID             : out std_logic_vector(31 downto 0); --same as calib block index
-      RQC_LUT_PAGE_WR_EN          : out std_logic;   
-      
-      RQC_POW2_M_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      RQC_POW2_M_EXP_FP32_WR_EN   : out std_logic;  
-      
-      RQC_POW2_B_EXP_FP32			 : out std_logic_vector(31 downto 0);  
-      RQC_POW2_B_EXP_FP32_WR_EN   : out std_logic;  
-      
-      -- CFF                      
-      OFFSET_FP32                 : out std_logic_vector(31 downto 0);
-      OFFSET_FP32_WR_EN           : out std_logic;
-      
-      POW2_LSB_FP32               : out std_logic_vector(31 downto 0);
-      POW2_LSB_FP32_WR_EN         : out std_logic;
+      -- Calibration parameters
+      CALIB_PARAM                 : out calib_param_type;
       
       ERR                         : out std_logic
       
@@ -125,10 +65,20 @@ architecture rtl of calib_param_sequencer is
          );
    end component;
    
+   component double_sync
+   generic(
+      INIT_VALUE : BIT := '0');
+   port(
+      D : in STD_LOGIC;
+      Q : out STD_LOGIC;
+      RESET : in STD_LOGIC;
+      CLK : in STD_LOGIC);
+   end component;
+   
    subtype ram_info_index_type is unsigned(4 downto 0);  --Must hold RAM_INFO_LAST_INDEX
    
    -- Constant declarations
-   constant SATURATION_THRESHOLD_INDEX          : ram_info_index_type   := to_unsigned(0, ram_info_index_type'length);
+   constant SAT_THRESHOLD_INDEX                 : ram_info_index_type   := to_unsigned(0, ram_info_index_type'length);
    constant NLC_LUT_PARAM_X_MIN_INDEX           : ram_info_index_type   := to_unsigned(1, ram_info_index_type'length);
    constant NLC_LUT_PARAM_X_RANGE_INDEX         : ram_info_index_type   := to_unsigned(2, ram_info_index_type'length);
    constant NLC_LUT_PARAM_LUT_SIZE_INDEX        : ram_info_index_type   := to_unsigned(3, ram_info_index_type'length);
@@ -189,14 +139,24 @@ architecture rtl of calib_param_sequencer is
    
    
 begin
+  
    
-   extracted_info_valid_i <= EXTRACTED_INFO_VALID;
+   sync_extracted_info_valid : double_sync
+   port map(
+      D => EXTRACTED_INFO_VALID,
+      Q => extracted_info_valid_i,
+      RESET => '0',
+      CLK => CLK);
+      
    ram_block_offset_i <= unsigned(RAM_BLOCK_OFFSET);
    pixel_data_base_addr_i <= unsigned(PIXEL_DATA_BASE_ADDR);
    cal_block_index_max_i <= CAL_BLOCK_INDEX_MAX;
    
    U0: sync_resetn port map(ARESETN => ARESETN, SRESETN => sresetn, CLK => CLK);
    
+
+      
+      
    --------------------------------------------
    -- Read RAM process
    --------------------------------------------
@@ -283,157 +243,157 @@ begin
    U2: process(CLK)
    begin
       if rising_edge(CLK) then
-         -- Reset all WR_EN by default
-         SATURATION_THRESHOLD_WR_EN     <= '0';
-         DDR_READ_START                 <= '0';
-         NLC_LUT_PARAM_WR_EN            <= '0';
-         RANGE_OFS_FP32_WR_EN           <= '0';
-         POW2_OFFSET_EXP_FP32_WR_EN     <= '0';  
-         POW2_RANGE_EXP_FP32_WR_EN      <= '0';  
-         NLC_POW2_M_EXP_FP32_WR_EN      <= '0';  
-         NLC_POW2_B_EXP_FP32_WR_EN      <= '0';  
-         DELTA_TEMP_FP32_WR_EN          <= '0';
-         ALPHA_OFFSET_FP32_WR_EN        <= '0';
-         POW2_ALPHA_EXP_FP32_WR_EN      <= '0';  
-         POW2_BETA0_EXP_FP32_WR_EN	    <= '0';  
-         POW2_KAPPA_EXP_FP32_WR_EN	    <= '0';      
-         NUC_MULT_FACTOR_FP32_WR_EN	    <= '0';
-         RQC_LUT_PARAM_WR_EN            <= '0';
-         RQC_LUT_PAGE_WR_EN             <= '0';
-         RQC_POW2_M_EXP_FP32_WR_EN      <= '0';  
-         RQC_POW2_B_EXP_FP32_WR_EN      <= '0';  
-         OFFSET_FP32_WR_EN              <= '0';
-         POW2_LSB_FP32_WR_EN            <= '0';
+         -- Reset all wr_en by default
+         DDR_READ_START <= '0';
+         CALIB_PARAM.sat_threshold_wr_en            <= '0';
+         CALIB_PARAM.nlc_lut_param_wr_en            <= '0';
+         CALIB_PARAM.range_ofs_fp32_wr_en           <= '0';
+         CALIB_PARAM.pow2_offset_exp_fp32_wr_en     <= '0';
+         CALIB_PARAM.pow2_range_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.nlc_pow2_m_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.nlc_pow2_b_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.delta_temp_fp32_wr_en          <= '0';
+         CALIB_PARAM.alpha_offset_fp32_wr_en        <= '0';
+         CALIB_PARAM.pow2_alpha_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.pow2_beta0_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.pow2_kappa_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.nuc_mult_factor_fp32_wr_en     <= '0';
+         CALIB_PARAM.rqc_lut_param_wr_en            <= '0';
+         CALIB_PARAM.rqc_lut_page_wr_en             <= '0';
+         CALIB_PARAM.rqc_pow2_m_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.rqc_pow2_b_exp_fp32_wr_en      <= '0';
+         CALIB_PARAM.offset_fp32_wr_en              <= '0';
+         CALIB_PARAM.pow2_lsb_fp32_wr_en            <= '0';
          
-         -- Output corresponding param and its WR_EN
+         -- Output corresponding param and its wr_en
          if output_en = '1' then
             
             case ram_info_data_index is
-               when SATURATION_THRESHOLD_INDEX => 
-                  SATURATION_THRESHOLD <= ram_info;
-                  SATURATION_THRESHOLD_WR_EN <= '1';
+               when SAT_THRESHOLD_INDEX => 
+                  CALIB_PARAM.sat_threshold <= ram_info;
+                  CALIB_PARAM.sat_threshold_wr_en <= '1';
                   -- Update DDR_ADDR_OFFSET at the same time
                   DDR_ADDR_OFFSET <= std_logic_vector(ddr_addr_offset_i + pixel_data_base_addr_i);
                   DDR_READ_START <= '1';
                   
                when NLC_LUT_PARAM_X_MIN_INDEX => 
-                  NLC_LUT_PARAM.x_min <= ram_info;
-                  -- NLC_LUT_PARAM_WR_EN set once all NLC_LUT_PARAM is updated
+                  CALIB_PARAM.nlc_lut_param.x_min <= ram_info;
+                  -- nlc_lut_param_wr_en set once all nlc_lut_param is updated
                   
                when NLC_LUT_PARAM_X_RANGE_INDEX => 
-                  NLC_LUT_PARAM.x_range <= ram_info;
-                  -- NLC_LUT_PARAM_WR_EN set once all NLC_LUT_PARAM is updated
+                  CALIB_PARAM.nlc_lut_param.x_range <= ram_info;
+                  -- nlc_lut_param_wr_en set once all nlc_lut_param is updated
                   
                when NLC_LUT_PARAM_LUT_SIZE_INDEX => 
-                  NLC_LUT_PARAM.lut_size <= ram_info;
-                  -- NLC_LUT_PARAM_WR_EN set once all NLC_LUT_PARAM is updated
+                  CALIB_PARAM.nlc_lut_param.lut_size <= ram_info;
+                  -- nlc_lut_param_wr_en set once all nlc_lut_param is updated
                   
                when NLC_LUT_PARAM_LUT_START_ADD_INDEX => 
-                  NLC_LUT_PARAM.lut_start_add <= resize(unsigned(ram_info), NLC_LUT_PARAM.lut_start_add'length);
-                  -- NLC_LUT_PARAM_WR_EN set once all NLC_LUT_PARAM is updated
+                  CALIB_PARAM.nlc_lut_param.lut_start_add <= resize(unsigned(ram_info), CALIB_PARAM.nlc_lut_param.lut_start_add'length);
+                  -- nlc_lut_param_wr_en set once all nlc_lut_param is updated
                   
                when NLC_LUT_PARAM_LUT_END_ADD_INDEX => 
-                  NLC_LUT_PARAM.lut_end_add <= resize(unsigned(ram_info), NLC_LUT_PARAM.lut_end_add'length);
-                  -- NLC_LUT_PARAM_WR_EN set once all NLC_LUT_PARAM is updated
+                  CALIB_PARAM.nlc_lut_param.lut_end_add <= resize(unsigned(ram_info), CALIB_PARAM.nlc_lut_param.lut_end_add'length);
+                  -- nlc_lut_param_wr_en set once all nlc_lut_param is updated
                   
                when NLC_LUT_PARAM_LUT_FACTOR_INDEX => 
-                  NLC_LUT_PARAM.lut_factor <= ram_info;
-                  -- NLC_LUT_PARAM_WR_EN set once all NLC_LUT_PARAM is updated
+                  CALIB_PARAM.nlc_lut_param.lut_factor <= ram_info;
+                  -- nlc_lut_param_wr_en set once all nlc_lut_param is updated
                   
                when NLC_LUT_PARAM_LUT_FACTOR_INV_INDEX => 
-                  NLC_LUT_PARAM.lut_factor_inv <= ram_info;
-                  NLC_LUT_PARAM_WR_EN <= '1';
+                  CALIB_PARAM.nlc_lut_param.lut_factor_inv <= ram_info;
+                  CALIB_PARAM.nlc_lut_param_wr_en <= '1';
                   
                when RANGE_OFS_FP32_INDEX => 
-                  RANGE_OFS_FP32 <= ram_info;
-                  RANGE_OFS_FP32_WR_EN <= '1';
+                  CALIB_PARAM.range_ofs_fp32 <= ram_info;
+                  CALIB_PARAM.range_ofs_fp32_wr_en <= '1';
                   
                when POW2_OFFSET_EXP_FP32_INDEX => 
-                  POW2_OFFSET_EXP_FP32 <= ram_info;
-                  POW2_OFFSET_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.pow2_offset_exp_fp32 <= ram_info;
+                  CALIB_PARAM.pow2_offset_exp_fp32_wr_en <= '1';
                   
                when POW2_RANGE_EXP_FP32_INDEX => 
-                  POW2_RANGE_EXP_FP32 <= ram_info;
-                  POW2_RANGE_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.pow2_range_exp_fp32 <= ram_info;
+                  CALIB_PARAM.pow2_range_exp_fp32_wr_en <= '1';
                   
                when NLC_POW2_M_EXP_FP32_INDEX => 
-                  NLC_POW2_M_EXP_FP32 <= ram_info;
-                  NLC_POW2_M_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.nlc_pow2_m_exp_fp32 <= ram_info;
+                  CALIB_PARAM.nlc_pow2_m_exp_fp32_wr_en <= '1';
                   
                when NLC_POW2_B_EXP_FP32_INDEX => 
-                  NLC_POW2_B_EXP_FP32 <= ram_info;
-                  NLC_POW2_B_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.nlc_pow2_b_exp_fp32 <= ram_info;
+                  CALIB_PARAM.nlc_pow2_b_exp_fp32_wr_en <= '1';
                   
                when DELTA_TEMP_FP32_INDEX => 
-                  DELTA_TEMP_FP32 <= ram_info;
-                  DELTA_TEMP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.delta_temp_fp32 <= ram_info;
+                  CALIB_PARAM.delta_temp_fp32_wr_en <= '1';
                   
                when ALPHA_OFFSET_FP32_INDEX => 
-                  ALPHA_OFFSET_FP32 <= ram_info;
-                  ALPHA_OFFSET_FP32_WR_EN <= '1';
+                  CALIB_PARAM.alpha_offset_fp32 <= ram_info;
+                  CALIB_PARAM.alpha_offset_fp32_wr_en <= '1';
                   
                when POW2_ALPHA_EXP_FP32_INDEX => 
-                  POW2_ALPHA_EXP_FP32 <= ram_info;
-                  POW2_ALPHA_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.pow2_alpha_exp_fp32 <= ram_info;
+                  CALIB_PARAM.pow2_alpha_exp_fp32_wr_en <= '1';
                   
                when POW2_BETA0_EXP_FP32_INDEX => 
-                  POW2_BETA0_EXP_FP32 <= ram_info;
-                  POW2_BETA0_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.pow2_beta0_exp_fp32 <= ram_info;
+                  CALIB_PARAM.pow2_beta0_exp_fp32_wr_en <= '1';
                   
                when POW2_KAPPA_EXP_FP32_INDEX => 
-                  POW2_KAPPA_EXP_FP32 <= ram_info;
-                  POW2_KAPPA_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.pow2_kappa_exp_fp32 <= ram_info;
+                  CALIB_PARAM.pow2_kappa_exp_fp32_wr_en <= '1';
                   
                when NUC_MULT_FACTOR_FP32_INDEX => 
-                  NUC_MULT_FACTOR_FP32 <= ram_info;
-                  NUC_MULT_FACTOR_FP32_WR_EN <= '1';
+                  CALIB_PARAM.nuc_mult_factor_fp32 <= ram_info;
+                  CALIB_PARAM.nuc_mult_factor_fp32_wr_en <= '1';
                   
                when RQC_LUT_PARAM_X_MIN_INDEX => 
-                  RQC_LUT_PARAM.x_min <= ram_info;
-                  -- RQC_LUT_PARAM_WR_EN set once all RQC_LUT_PARAM is updated
+                  CALIB_PARAM.rqc_lut_param.x_min <= ram_info;
+                  -- rqc_lut_param_wr_en set once all rqc_lut_param is updated
                   
                when RQC_LUT_PARAM_X_RANGE_INDEX => 
-                  RQC_LUT_PARAM.x_range <= ram_info;
-                  -- RQC_LUT_PARAM_WR_EN set once all RQC_LUT_PARAM is updated
+                  CALIB_PARAM.rqc_lut_param.x_range <= ram_info;
+                  -- rqc_lut_param_wr_en set once all rqc_lut_param is updated
                   
                when RQC_LUT_PARAM_LUT_SIZE_INDEX => 
-                  RQC_LUT_PARAM.lut_size <= ram_info;
-                  -- RQC_LUT_PARAM_WR_EN set once all RQC_LUT_PARAM is updated
+                  CALIB_PARAM.rqc_lut_param.lut_size <= ram_info;
+                  -- rqc_lut_param_wr_en set once all rqc_lut_param is updated
                   
                when RQC_LUT_PARAM_LUT_START_ADD_INDEX => 
-                  RQC_LUT_PARAM.lut_start_add <= resize(unsigned(ram_info), RQC_LUT_PARAM.lut_start_add'length);
-                  -- RQC_LUT_PARAM_WR_EN set once all RQC_LUT_PARAM is updated
+                  CALIB_PARAM.rqc_lut_param.lut_start_add <= resize(unsigned(ram_info), CALIB_PARAM.rqc_lut_param.lut_start_add'length);
+                  -- rqc_lut_param_wr_en set once all rqc_lut_param is updated
                   
                when RQC_LUT_PARAM_LUT_END_ADD_INDEX => 
-                  RQC_LUT_PARAM.lut_end_add <= resize(unsigned(ram_info), RQC_LUT_PARAM.lut_end_add'length);
-                  -- RQC_LUT_PARAM_WR_EN set once all RQC_LUT_PARAM is updated
+                  CALIB_PARAM.rqc_lut_param.lut_end_add <= resize(unsigned(ram_info), CALIB_PARAM.rqc_lut_param.lut_end_add'length);
+                  -- rqc_lut_param_wr_en set once all rqc_lut_param is updated
                   
                when RQC_LUT_PARAM_LUT_FACTOR_INDEX => 
-                  RQC_LUT_PARAM.lut_factor <= ram_info;
-                  -- RQC_LUT_PARAM_WR_EN set once all RQC_LUT_PARAM is updated
+                  CALIB_PARAM.rqc_lut_param.lut_factor <= ram_info;
+                  -- rqc_lut_param_wr_en set once all rqc_lut_param is updated
                   
                when RQC_LUT_PARAM_LUT_FACTOR_INV_INDEX => 
-                  RQC_LUT_PARAM.lut_factor_inv <= ram_info;
-                  RQC_LUT_PARAM_WR_EN <= '1';
-                  -- Update RQC_LUT_PAGE_ID at the same time
-                  RQC_LUT_PAGE_ID <= std_logic_vector(resize(calib_block_index, RQC_LUT_PAGE_ID'length));
-                  RQC_LUT_PAGE_WR_EN <= '1';
+                  CALIB_PARAM.rqc_lut_param.lut_factor_inv <= ram_info;
+                  CALIB_PARAM.rqc_lut_param_wr_en <= '1';
+                  -- update rqc_lut_page at the same time
+                  CALIB_PARAM.rqc_lut_page <= std_logic_vector(resize(calib_block_index, CALIB_PARAM.rqc_lut_page'length));
+                  CALIB_PARAM.rqc_lut_page_wr_en <= '1';
                   
                when RQC_POW2_M_EXP_FP32_INDEX => 
-                  RQC_POW2_M_EXP_FP32 <= ram_info;
-                  RQC_POW2_M_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.rqc_pow2_m_exp_fp32 <= ram_info;
+                  CALIB_PARAM.rqc_pow2_m_exp_fp32_wr_en <= '1';
                   
                when RQC_POW2_B_EXP_FP32_INDEX => 
-                  RQC_POW2_B_EXP_FP32 <= ram_info;
-                  RQC_POW2_B_EXP_FP32_WR_EN <= '1';
+                  CALIB_PARAM.rqc_pow2_b_exp_fp32 <= ram_info;
+                  CALIB_PARAM.rqc_pow2_b_exp_fp32_wr_en <= '1';
                   
                when OFFSET_FP32_INDEX => 
-                  OFFSET_FP32 <= ram_info;
-                  OFFSET_FP32_WR_EN <= '1';
+                  CALIB_PARAM.offset_fp32 <= ram_info;
+                  CALIB_PARAM.offset_fp32_wr_en <= '1';
                   
                when POW2_LSB_FP32_INDEX => 
-                  POW2_LSB_FP32 <= ram_info;
-                  POW2_LSB_FP32_WR_EN <= '1';
+                  CALIB_PARAM.pow2_lsb_fp32 <= ram_info;
+                  CALIB_PARAM.pow2_lsb_fp32_wr_en <= '1';
                   
                when others => 
          

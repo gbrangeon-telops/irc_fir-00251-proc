@@ -3,11 +3,11 @@
 --!   @brief Microblaze for simulation in SystemC.
 --!   @details This entity contains the SystemC model of the Microblaze. 
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 12770 $
+--!   $Author: pdaraiche $
+--!   $Date: 2013-12-20 12:01:34 -0500 (ven., 20 déc. 2013) $
+--!   $Id: microblaze.vhd 12770 2013-12-20 17:01:34Z pdaraiche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/microblaze.vhd $
 ------------------------------------------------------------------
 
 --!   Use Standard library.

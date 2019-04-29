@@ -251,7 +251,7 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
       {
          aRpCtrl->readingDone = true;
          RPOpt_CalcFOVPositionLimits(&gcRegsData);
-         GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], gcRegsData.FOVPositionSetpoint);
+         GC_SetFOVPositionSetpoint(gcRegsData.FOVPositionSetpoint);
          state = waitForReady;
 
          break;
@@ -786,7 +786,6 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
 
          // Clear AutofocusIsActive and share new value
          IsActiveFlagsClr(AutofocusIsActiveMask);
-         GC_SetIsActiveFlags(gcRegsData.IsActiveFlags);
 
          // Restore registers value
          Autofocus_restoreGCRegisters( &GCRegsBackup );
@@ -804,7 +803,6 @@ void Autofocus_SM(autofocusCtrl_t* aCtrl, slCtrl_t* aSlCtrl, rpCtrl_t* aRpCtrl)
 
             // Set AutofocusIsActive and share new value
             IsActiveFlagsSet(AutofocusIsActiveMask);
-            GC_SetIsActiveFlags(gcRegsData.IsActiveFlags);
 
             // Backup registers value
             Autofocus_backupGCRegisters( &GCRegsBackup );

@@ -141,7 +141,7 @@ typedef struct s_FpaIntfConfig t_FpaIntf;
 struct s_FpaStatus    // 
 {
    // adc board (iddcas analogiques)
-   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
+   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253-XXX  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
    uint32_t  adc_resolution;           // statut du built_in test de la carte ADC
    uint32_t  adc_brd_spare;            // spare de statut pour la carte ADC
@@ -171,8 +171,9 @@ struct s_FpaStatus    //
    // pour le power management
    uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé
    uint32_t  adc_ddc_present;             // dit si une carte valide est détectée
-   uint32_t  flex_detect_process_done;    // dit si le  processus de détection du flex est achevé
-   uint32_t  flex_present;                // dit si une carte valide est détectée
+   uint32_t  flex_flegx_detect_process_done; // dit si le  processus de détection du flex est achevé
+   uint32_t  flex_flegx_present;             // dit si une carte valide est détectée
+   uint32_t  flegx_present;               // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
 
    uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 
@@ -185,6 +186,11 @@ struct s_FpaStatus    //
    // fpa init status
    uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
    uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
+   uint32_t  prog_init_done;              // -- monte à '1' lorsque la config d'initialisation est programmée dans le ROIC. Ce qui est intéressant pour les ROIC necessitant une config d'initialisation
+   
+   // cooler
+   uint32_t  cooler_on_curr_min_mA;       // seuil au dessus duquel considérer que le refroidisseur est allumé
+   uint32_t  cooler_off_curr_max_mA;      // seuil en dessous duquel considérer que le refroidisseur est eteint
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

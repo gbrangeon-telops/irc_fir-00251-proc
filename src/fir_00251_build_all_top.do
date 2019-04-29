@@ -9,16 +9,22 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 
 #Individual builds
 #-----------------
+#do  "$FIR251PROC\src\fir_00251_top_blackbirdD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_hawkA_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_herculesD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0207A_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_isc0207A_3k_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0209A_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_isc0804A_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_isc0804A_500Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_marsD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_pelicanD_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_pelicanD_150Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_230Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwA_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwD_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_suphawkA_build.do"
 
 #Collective builds (non-recursive)
 #---------------------------------
@@ -28,41 +34,56 @@ do  "$FIR251PROC\src\fir_00251_proc_acq_build.do"
 #CLINK receivers
 do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
 
-#TODO Temporary
-do  "$FIR251PROC\src\FPA\isc0207A\HDL\compil_isc0207A.do"
-
 #ADC receiver interface
 do  "$FIR251PROC\src\quad_serdes\HDL\build_quad_receiver.do"
 
+#FPA blackbirdD
+do "$FIR251PROC\src\FPA\blackbirdD\hdl\compil_blackbirdD.do"
+acom  "$FIR251PROC\src\fir_00251_proc_blackbirdD.bde"
 #FPA hawkA
-do D:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\compil_hawkA.do
+do "$FIR251PROC\src\FPA\hawkA\HDL\compil_hawkA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_hawkA.bde"
 #FPA herculesD
-do D:\Telops\FIR-00251-Proc\src\FPA\herculesD\hdl\compil_HerculesD.do
+do "$FIR251PROC\src\FPA\herculesD\hdl\compil_HerculesD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_herculesD.bde"
 #FPA isc0207A
-do D:\Telops\FIR-00251-Proc\src\FPA\isc0207A\HDL\compil_isc0207A.do
+do "$FIR251PROC\src\FPA\isc0207A\HDL\compil_isc0207A.do"
 acom  "$FIR251PROC\src\fir_00251_proc_isc0207A.bde"
+#FPA isc0207A_3k
+do  "$FIR251PROC\src\FPA\isc0207A_3k\HDL\compil_isc0207A_3k.do"
+acom  "$FIR251PROC\src\fir_00251_proc_isc0207A_3k.bde"
 #FPA isc0209A
-do D:\Telops\FIR-00251-Proc\src\FPA\isc0209A\HDL\compil_isc0209A.do
+do "$FIR251PROC\src\FPA\isc0209A\HDL\compil_isc0209A.do"
 acom  "$FIR251PROC\src\fir_00251_proc_isc0209A.bde"
+#FPA isc0804A
+do  "$FIR251PROC\src\FPA\isc0804A\HDL\compil_isc0804A.do"
+acom  "$FIR251PROC\src\fir_00251_proc_isc0804A.bde"
+#FPA isc0804A_500Hz
+do  "$FIR251PROC\src\FPA\isc0804A_500Hz\HDL\compil_isc0804A_500Hz.do"
+acom  "$FIR251PROC\src\fir_00251_proc_isc0804A_500Hz.bde"
 #FPA marsD
-do D:\Telops\FIR-00251-Proc\src\FPA\marsD\HDL\compil_marsD.do
+do "$FIR251PROC\src\FPA\marsD\HDL\compil_marsD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_marsD.bde"
 #FPA pelicanD
-do D:\Telops\FIR-00251-Proc\src\FPA\PelicanD\hdl\compil_pelicanD.do
+do "$FIR251PROC\src\FPA\PelicanD\hdl\compil_pelicanD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_pelicanD.bde"
+#FPA pelicanD_150Hz
+do "$FIR251PROC\src\FPA\PelicanD_150Hz\hdl\compil_pelicanD_150Hz.do"
+acom  "$FIR251PROC\src\fir_00251_proc_pelicanD_150Hz.bde"
 #FPA scorpiolwD
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do
+do "$FIR251PROC\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD.bde"
 #FPA scorpiolwD_230Hz
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiolwD_230Hz\HDL\compil_scorpiolwD_230Hz.do
+do "$FIR251PROC\src\FPA\scorpiolwD_230Hz\HDL\compil_scorpiolwD_230Hz.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD_230Hz.bde"
 #FPA scorpiomwA
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do
+do "$FIR251PROC\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwA.bde"
 #FPA scorpiomwD
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do
+do "$FIR251PROC\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwD.bde"
+#FPA suphawkA
+do "$FIR251PROC\src\FPA\suphawkA\HDL\compil_suphawkA.do"
+acom  "$FIR251PROC\src\fir_00251_proc_suphawkA.bde"
 
 #__END BUILD ALL PROC

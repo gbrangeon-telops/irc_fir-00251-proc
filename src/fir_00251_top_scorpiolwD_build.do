@@ -4,14 +4,15 @@ SetActiveLib -work
 
 setenv FIR251PROC "D:\Telops\FIR-00251-PROC"
 setenv COMMON "D:\Telops\FIR-00251-Common"
-    
+
+#Acquisition
 do  "$FIR251PROC\src\fir_00251_proc_acq_build.do"
 
 #CLINK receivers
-do D:\Telops\FIR-00251-Proc\src\clink\HDL\compil_clink_receiver.do
+do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
 
-#FPA scorpiolwD
-do D:\Telops\FIR-00251-Proc\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do
+#FPA
+do  "$FIR251PROC\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do"
 
 #TOP_LEVEL
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD.bde"

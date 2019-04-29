@@ -12,8 +12,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use work.FPA_Define.all; 
-use work.fpa_common_pkg.all;
+use work.FPA_Define.all;
 
 entity mglk_base_mode_ctrl is 
    port (
@@ -34,9 +33,7 @@ entity mglk_base_mode_ctrl is
       FPA_CH1_OUT_RST   : out std_logic;
       FPA_CH1_DOUT_CLK  : out std_logic;
       FPA_CH1_DOUT      : out std_logic_vector(27 downto 0);      
-      FPA_CH1_DOUT_DVAL : out std_logic; 
-      
-      FPA_CH2_CLK_SW    : out std_logic;
+      FPA_CH1_DOUT_DVAL : out std_logic;
       
       FPA_CH2_OUT_RST   : out std_logic;
       FPA_CH2_DOUT_CLK  : out std_logic;
@@ -59,8 +56,8 @@ architecture rtl of mglk_base_mode_ctrl is
          CLK : in std_logic);
    end component; 
    
-   type base_mode_fsm_type is (odd_data_st, even_data_st, idle, end_frame_st);
-   signal base_mode_fsm : base_mode_fsm_type;
+   type base_mode_fsm_type is (odd_data_st, even_data_st, idle);
+   signal base_mode_fsm       : base_mode_fsm_type;
    signal sreset              : std_logic;
    signal fval_p0             : std_logic;
    signal dval_p0             : std_logic;
@@ -77,30 +74,17 @@ begin
    -------------------------------------------------------------------------
    
    double_base_mode_gen: if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-      begin
+   begin
       
       FPA_CH1_DOUT_CLK  <= FPA_CH1_DIN_CLK;            
       FPA_CH1_DOUT      <= FPA_CH1_DIN;
       FPA_CH1_DOUT_DVAL <= FPA_CH1_DIN_DVAL;
+      FPA_CH1_OUT_RST   <= FPA_CH1_IN_RST or FPA_CH1_FIFO_FLUSH;
       
       FPA_CH2_DOUT_CLK  <= FPA_CH2_DIN_CLK;              
       FPA_CH2_DOUT      <= FPA_CH2_DIN;
       FPA_CH2_DOUT_DVAL <= FPA_CH2_DIN_DVAL;
-      FPA_CH2_CLK_SW    <= '0'; -- l'horloge du canal 2 est FPA_CH2_CLK
-      -- repartition des pixels
-      U2A: process(FPA_CH1_DIN_CLK) 
-      begin
-         if rising_edge(FPA_CH1_DIN_CLK) then 
-            FPA_CH1_OUT_RST   <= FPA_CH1_IN_RST or FPA_CH1_FIFO_FLUSH;         
-         end if;
-      end process;    
-      
-      U2B: process(FPA_CH2_DIN_CLK) 
-      begin
-         if rising_edge(FPA_CH2_DIN_CLK) then 
-            FPA_CH2_OUT_RST   <= FPA_CH2_IN_RST or FPA_CH2_FIFO_FLUSH;            
-         end if;
-      end process;
+      FPA_CH2_OUT_RST   <= FPA_CH2_IN_RST or FPA_CH2_FIFO_FLUSH;
       
    end generate;
    
@@ -111,17 +95,15 @@ begin
    -------------------------------------------------------------------------  
    
    simple_base_mode_gen: if PROXY_CLINK_CHANNEL_NUM = 1 generate	
-      begin
+   begin
       -- horloges et reset 
       FPA_CH1_DOUT_CLK  <= FPA_CH1_DIN_CLK;      
       FPA_CH1_OUT_RST   <= FPA_CH1_FIFO_FLUSH or FPA_CH1_IN_RST;
       FPA_CH2_DOUT_CLK  <= FPA_CH1_DIN_CLK;
       FPA_CH2_OUT_RST   <= FPA_CH1_FIFO_FLUSH or FPA_CH1_IN_RST;
-      FPA_CH2_CLK_SW    <= '0'; -- l'horloge du canal 2 est FPA_CH1_CLK
       
       -- sync reset
-      U1: sync_reset
-      port map( ARESET => ARESET, CLK => FPA_CH1_DIN_CLK, SRESET => sreset);
+      U1: sync_reset port map( ARESET => ARESET, CLK => FPA_CH1_DIN_CLK, SRESET => sreset);
       
       
       -- repartition des pixels

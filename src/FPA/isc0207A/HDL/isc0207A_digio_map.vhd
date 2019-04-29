@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 20019 $
+--!   $Rev: 21075 $
 --!   $Author: enofodjie $
---!   $Date: 2017-01-30 09:25:16 -0500 (lun., 30 janv. 2017) $
---!   $Id: isc0207A_digio_map.vhd 20019 2017-01-30 14:25:16Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2016-11-08%20Forrest%20Gump/src/FPA/isc0207A_3k/HDL/isc0207A_digio_map.vhd $
+--!   $Date: 2017-10-28 14:49:29 -0400 (sam., 28 oct. 2017) $
+--!   $Id: isc0207A_digio_map.vhd 21075 2017-10-28 18:49:29Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2018-09-04%20Forrest%20Gump%20Release/src/FPA/isc0207A/HDL/isc0207A_digio_map.vhd $
 ------------------------------------------------------------------
 
 library IEEE;
@@ -197,15 +197,16 @@ begin
    U12: process(MCLK_SOURCE)
    begin
       if rising_edge(MCLK_SOURCE) then
-         if fsm_sreset = '1' then
-            fpa_digio3_i    <= '0';            
-            fpa_digio2_i <= '0';
-            fpa_digio6_i   <= '0';
+         if fsm_sreset = '1' then                        
+            fpa_digio2_i    <= '0';
+            fpa_digio3_i    <= '0';
+            fpa_digio4_i    <= '0';
+            fpa_digio6_i    <= '0';
             fpa_digio7_i    <= '0';
-            synchro_err    <= '0'; 
-            digio_fsm      <=  idle;
-            timer_cnt      <=  0;
-            fpa_powered_i  <= '0';
+            synchro_err     <= '0'; 
+            digio_fsm       <=  idle;
+            timer_cnt       <=  0;
+            fpa_powered_i   <= '0';
             
          else
             

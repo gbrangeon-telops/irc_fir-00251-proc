@@ -4,11 +4,11 @@
  *
  * This file declares the GenICam registers data.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23304 $
+ * $Author: odionne $
+ * $Date: 2019-04-16 16:33:11 -0400 (mar., 16 avr. 2019) $
+ * $Id: GC_Registers.h 23304 2019-04-16 20:33:11Z odionne $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/GC_Registers.h $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -22,133 +22,8 @@
 #include "utils.h"
 #include <stdint.h>
 
-/*
- * Sensor code (based on firmware minor version number definition)
- */
-#define Isc0207ASensor     1
-#define HawkASensor        2
-#define HerculesDSensor    3
-#define PelicanDSensor     4
-#define MarsASensor        5
-#define JupiterASensor     6
-#define ScorpiolwDSensor   7
-#define MarsDSensor        8
-#define ScorpiomwDSensor   9
-// ScorpiolwD_230HzSensor is not defined since it's using ScorpiomwDSensor
-#define Isc0209ASensor     11
-#define ScorpiomwASensor   12
-
-/*
- * TDCStatus register bit field definition
- */
-#define WaitingForCoolerMask                    0x00000001  /**< TDCStatus register bit mask for WaitingForCooler field */
-#define WaitingForSensorMask                    0x00000002  /**< TDCStatus register bit mask for WaitingForSensor field */
-#define WaitingForInitMask                      0x00000004  /**< TDCStatus register bit mask for WaitingForInit field */
-// #define WaitingForCameraLinkMask                0x00000008  /**< TDCStatus register bit mask for WaitingForCameraLink field */
-#define WaitingForICUMask                       0x00000010  /**< TDCStatus register bit mask for WaitingForICU field */
-#define WaitingForNDFilterMask                  0x00000020  /**< TDCStatus register bit mask for WaitingForNDFilter field */
-#define WaitingForCalibrationInitMask           0x00000040  /**< TDCStatus register bit mask for WaitingForCalibrationInit field */
-#define WaitingForFilterWheelMask               0x00000080  /**< TDCStatus register bit mask for WaitingForFilterWheel field */
-#define WaitingForArmMask                       0x00000100  /**< TDCStatus register bit mask for WaitingForArm field */
-#define WaitingForValidParametersMask           0x00000200  /**< TDCStatus register bit mask for WaitingForValidParameters field */
-#define AcquisitionStartedMask                  0x00000400  /**< TDCStatus register bit mask for AcquisitionStarted field */
-// #define WaitingForSCDCmdAckMask                 0x00000800  /**< TDCStatus register bit mask for WaitingForSCDCmdAck field */
-#define WaitingForCalibrationDataMask           0x00001000  /**< TDCStatus register bit mask for WaitingForCalibrationData field */
-#define WaitingForImageCorrectionMask           0x00002000  /**< TDCStatus register bit mask for WaitingForImageCorrection field */
-#define WaitingForOutputFPGAMask                0x00004000  /**< TDCStatus register bit mask for WaitingForOutputFPGA field */
-#define WaitingForPowerMask                     0x00008000  /**< TDCStatus register bit mask for WaitingForPower field */
-#define WaitingForFlashSettingsInitMask         0x00010000  /**< TDCStatus register bit mask for WaitingForFlashSettingsInit field */
-
-#define TDC_STATUS_INIT                         (WaitingForCoolerMask | WaitingForInitMask | WaitingForCalibrationInitMask | WaitingForArmMask | \
-                                                WaitingForOutputFPGAMask | WaitingForFlashSettingsInitMask)
-
-#define TDCStatusSet(mask) BitMaskSet(gcRegsData.TDCStatus, mask)  /**< Set masked bits in TDCStatus register */
-#define TDCStatusClr(mask) BitMaskClr(gcRegsData.TDCStatus, mask)  /**< Clear masked bits in TDCStatus register */
-#define TDCStatusTst(mask) BitMaskTst(gcRegsData.TDCStatus, mask)  /**< Test if masked bits in TDCStatus register are all set */
-#define TDCStatusTstAny(mask) BitMaskTstAny(gcRegsData.TDCStatus, mask)  /**< Test if at least one of the masked bits in TDCStatus register is set */
-
 #define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
 
-/*
- * AvailabilityFlags register bit field definition
- */
-#define DiscreteExposureTimeIsAvailableMask     0x00000001  /**< AvailabilityFlags register bit mask for DiscreteExposureTimeIsAvailable field */
-#define CalibrationIsAvailableMask              0x00000002  /**< AvailabilityFlags register bit mask for CalibrationIsAvailable field */
-#define Raw0IsAvailableMask                     0x00000004  /**< AvailabilityFlags register bit mask for Raw0IsAvailable field */
-#define RawIsAvailableMask                      0x00000008  /**< AvailabilityFlags register bit mask for RawIsAvailable field */
-#define NUCIsAvailableMask                      0x00000010  /**< AvailabilityFlags register bit mask for NUCIsAvailable field */
-#define RTIsAvailableMask                       0x00000020  /**< AvailabilityFlags register bit mask for RTIsAvailable field */
-#define IBRIsAvailableMask                      0x00000040  /**< AvailabilityFlags register bit mask for IBRIsAvailable field */
-#define IBIIsAvailableMask                      0x00000080  /**< AvailabilityFlags register bit mask for CalibrationIsAvailable field */
-#define AECPlusIsAvailableMask                  0x00000100  /**< AvailabilityFlags register bit mask for AECPlusIsAvailable field */
-#define NDFilter1IsAvailableMask                0x00000200  /**< AvailabilityFlags register bit mask for NDFilter1IsAvailable field */
-#define NDFilter2IsAvailableMask                0x00000400  /**< AvailabilityFlags register bit mask for NDFilter2IsAvailable field */
-#define NDFilter3IsAvailableMask                0x00000800  /**< AvailabilityFlags register bit mask for NDFilter3IsAvailable field */
-#define ManufacturerTestImageIsAvailableMask    0x00001000  /**< AvailabilityFlags register bit mask for ManufacturerTestImageIsAvailable field */
-#define ExternalFanControlIsAvailableMask       0x00002000  /**< AvailabilityFlags register bit mask for ExternalFanControlIsAvailable field */
-
-#define AvailabilityFlagsSet(mask) BitMaskSet(gcRegsData.AvailabilityFlags, mask)  /**< Set masked bits in AvailabilityFlags register */
-#define AvailabilityFlagsClr(mask) BitMaskClr(gcRegsData.AvailabilityFlags, mask)  /**< Clear masked bits in AvailabilityFlags register */
-#define AvailabilityFlagsTst(mask) BitMaskTst(gcRegsData.AvailabilityFlags, mask)  /**< Test if masked bits in AvailabilityFlags register are all set */
-#define AvailabilityFlagsTstAny(mask) BitMaskTstAny(gcRegsData.AvailabilityFlags, mask)  /**< Test if at least one of the masked bits in AvailabilityFlags register is set */
-
-/*
- * IsActiveFlags register bit field definition
- */
-#define AcquisitionStartTriggerIsActiveMask     0x00000001  /**< IsActiveFlags register bit mask for AcquisitionStartTriggerIsActive field */
-#define FlaggingTriggerIsActiveMask             0x00000002  /**< IsActiveFlags register bit mask for FlaggingTriggerIsActive field */
-#define GatingTriggerIsActiveMask               0x00000004  /**< IsActiveFlags register bit mask for GatingTriggerIsActive field */
-#define AutofocusIsActiveMask                   0x00000008  /**< IsActiveFlags register bit mask for AutofocusIsActive field */
-
-#define IsActiveFlagsSet(mask) BitMaskSet(gcRegsData.IsActiveFlags, mask)  /**< Set masked bits in IsActiveFlags register */
-#define IsActiveFlagsClr(mask) BitMaskClr(gcRegsData.IsActiveFlags, mask)  /**< Clear masked bits in IsActiveFlags register */
-#define IsActiveFlagsTst(mask) BitMaskTst(gcRegsData.IsActiveFlags, mask)  /**< Test if masked bits in IsActiveFlags register are all set */
-#define IsActiveFlagsTstAny(mask) BitMaskTstAny(gcRegsData.IsActiveFlags, mask)  /**< Test if at least one of the masked bits in IsActiveFlags register is set */
-
-/*
- * TDCFlags register bit field definition
- */
-#define ITRIsImplementedMask                             0x00000001  /**< TDCFlags register bit mask for ITRIsImplemented field */
-#define IWRIsImplementedMask                             0x00000002  /**< TDCFlags register bit mask for IWRIsImplemented field */
-#define ClBaseIsImplementedMask                          0x00000004  /**< TDCFlags register bit mask for ClBaseIsImplemented field */
-#define ClFullIsImplementedMask                          0x00000008  /**< TDCFlags register bit mask for ClFullIsImplemented field */
-#define ImageCorrectionIsImplementedMask                 0x00000010  /**< TDCFlags register bit mask for ImageCorrectionIsImplemented field */
-#define HighGainSWDIsImplementedMask                     0x00000020  /**< TDCFlags register bit mask for HighGainSWDIsImplemented field */
-#define ICUIsImplementedMask                             0x00000040  /**< TDCFlags register bit mask for ICUIsImplemented field */
-#define NDFilterIsImplementedMask                        0x00000080  /**< TDCFlags register bit mask for NDFilterIsImplemented field */
-#define FWIsImplementedMask                              0x00000100  /**< TDCFlags register bit mask for FWIsImplemented field */
-#define FWAsynchronouslyRotatingModeIsImplementedMask    0x00000200  /**< TDCFlags register bit mask for FWAsynchronouslyRotatingModeIsImplemented field */
-#define FWSynchronouslyRotatingModeIsImplementedMask     0x00000400  /**< TDCFlags register bit mask for FWSynchronouslyRotatingModeIsImplemented field */
-#define AECPlusIsImplementedMask                         0x00000800  /**< TDCFlags register bit mask for AECPlusIsImplemented field */
-#define ExternalMemoryBufferIsImplementedMask            0x00001000  /**< TDCFlags register bit mask for ExternalMemoryBufferIsImplemented field */
-#define ExternalZeroMeanBetaCorrectionIsImplementedMask  0x00002000  /**< TDCFlags register bit mask for ExternalZeroMeanBetaCorrectionIsImplemented field */
-#define ADCReadoutIsImplementedMask                      0x00004000  /**< TDCFlags register bit mask for ADCReadoutIsImplemented field */
-#define MotorizedFOVLensIsImplementedMask                0x00008000  /**< TDCFlags register bit mask for MotorizedFOVLensIsImplemented field */
-#define MotorizedFocusLensIsImplementedMask              0x00010000  /**< TDCFlags register bit mask for MotorizedFocusLensIsImplemented field */
-#define AutofocusIsImplementedMask                       0x00020000  /**< TDCFlags register bit mask for AutofocusIsImplemented field */
-#define ClDualBaseIsImplementedMask                      0x00040000  /**< TDCFlags register bit mask for ClDualBaseIsImplementedMask field */
-#define SaveConfigurationIsImplementedMask               0x00080000  /**< TDCFlags register bit mask for SaveConfigurationIsImplementedMask field */
-#define SensorIsImplementedMask                          0xF8000000  /**< TDCFlags register bit mask for SensorIsImplemented field */
-#define SensorIsImplementedBitPos                        27          /**< TDCFlags register bit position for SensorIsImplemented field */
-
-#define SensorIsImplemented(sensorCode)   ((sensorCode << SensorIsImplementedBitPos) & SensorIsImplementedMask)
-
-#define Isc0207AIsImplemented          SensorIsImplemented(Isc0207ASensor)
-#define HawkAIsImplemented             SensorIsImplemented(HawkASensor)
-#define HerculesDIsImplemented         SensorIsImplemented(HerculesDSensor)
-#define PelicanDIsImplemented          SensorIsImplemented(PelicanDSensor)
-#define MarsAIsImplemented             SensorIsImplemented(MarsASensor)
-#define JupiterAIsImplemented          SensorIsImplemented(JupiterASensor)
-#define ScorpiolwDIsImplemented        SensorIsImplemented(ScorpiolwDSensor)
-#define MarsDIsImplemented             SensorIsImplemented(MarsDSensor)
-#define ScorpiomwDIsImplemented        SensorIsImplemented(ScorpiomwDSensor)
-#define Isc0209AIsImplemented          SensorIsImplemented(Isc0209ASensor)
-#define ScorpiomwAIsImplemented        SensorIsImplemented(ScorpiomwASensor)
-
-#define TDCFlagsSet(mask) BitMaskSet(gcRegsData.TDCFlags, mask)  /**< Set masked bits in TDCFlags register */
-#define TDCFlagsClr(mask) BitMaskClr(gcRegsData.TDCFlags, mask)  /**< Clear masked bits in TDCFlags register */
-#define TDCFlagsTst(mask) BitMaskTst(gcRegsData.TDCFlags, mask)  /**< Test if masked bits in TDCFlags register are all set */
-#define TDCFlagsTstAny(mask) BitMaskTstAny(gcRegsData.TDCFlags, mask)  /**< Test if at least one of the masked bits in TDCFlags register is set */
 
 // EHDRINumberOfExposures must be greater than one and filter wheel mode must be set to fixed to activate EHDRI
 #define EHDRIIsActive ((gcRegsData.EHDRINumberOfExposures > 1) && (gcRegsData.FWMode == FWM_Fixed))
@@ -156,15 +31,38 @@
 // EHDRINumberOfExposures must equal one and filter wheel mode must be set to synchronously rotating to activate filter wheel synchronously rotating mode
 #define FWSynchronoulyRotatingModeIsActive ((gcRegsData.EHDRINumberOfExposures == 1) && (gcRegsData.FWMode == FWM_SynchronouslyRotating))
 
+
+// AEC+ is available when;
+//  - EHDRI is not active.
+//  - FW rotating modes are not active.
+//  - Gating trigger is not active.
+//  - Valid collection is loaded.
+//  - Active collection type is TelopsNDF.
+//  - FW position is the one that is calibrated.
+//  - NDF positions are consecutive. Valid combinations are [NDfilter1 NDfilter2], [NDfilter2 NDfilter3] or
+//    [NDfilter1 NDfilter2 NDfilter3] but not [NDfilter1 NDfilter3]. So it must contain NDFilter2 and at least
+//    one of the two other positions.
+#define GC_AECPlusIsAvailable ( \
+   !GC_EHDRIIsActive && \
+   !GC_FWRotatingModeIsActive && \
+   !GC_GatingTriggerIsActive && \
+   (calibrationInfo.isValid == 1) && \
+   (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
+   ((gcRegsData.FWPositionSetpoint == calibrationInfo.collection.FWPosition) || (gcRegsData.CalibrationMode == CM_Raw) || (gcRegsData.CalibrationMode == CM_Raw0)) && \
+   (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))) \
+)
+#define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
+
 extern uint8_t gGC_RegistersStreaming;
 extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
+
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.4.0
+// Generated from XML camera definition file version 12.5.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 4) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 5) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -422,8 +320,6 @@ struct gcRegistersDataStruct {
    uint32_t TriggerSource;
    uint32_t VideoAGC;
    uint32_t VideoBadPixelReplacement;
-   uint32_t VideoEHDRIExposureIndex;
-   uint32_t VideoFWPosition;
    uint32_t VideoFreeze;
    uint32_t Width;
    uint32_t WidthInc;
@@ -498,30 +394,200 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 
 // Shared registers write macros
 ////////////////////////////////////////////////////////////////////////////////
-
 #define GC_SetWidth(val) GC_RegisterWriteUI32(&gcRegsDef[WidthIdx], val)
 #define GC_SetHeight(val) GC_RegisterWriteUI32(&gcRegsDef[HeightIdx], val + 2)
 #define GC_SetAcquisitionStart(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionStartIdx], val)
 #define GC_SetAcquisitionStop(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionStopIdx], val)
 #define GC_SetAcquisitionArm(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionArmIdx], val)
+#define GC_SetExposureMode(val) GC_RegisterWriteUI32(&gcRegsDef[ExposureModeIdx], val)
+#define GC_SetExposureTime(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], val)
+#define GC_SetExposureTime1(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime1Idx], val)
+#define GC_SetExposureTime2(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime2Idx], val)
+#define GC_SetExposureTime3(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime3Idx], val)
+#define GC_SetExposureTime4(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime4Idx], val)
+#define GC_SetExposureTime5(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime5Idx], val)
+#define GC_SetExposureTime6(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime6Idx], val)
+#define GC_SetExposureTime7(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime7Idx], val)
+#define GC_SetExposureTime8(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime8Idx], val)
+#define GC_SetExposureTimeSetToMin(val) GC_RegisterWriteUI32(&gcRegsDef[ExposureTimeSetToMinIdx], val)
+#define GC_SetExposureTimeSetToMax(val) GC_RegisterWriteUI32(&gcRegsDef[ExposureTimeSetToMaxIdx], val)
 #define GC_SetAcquisitionFrameRate(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateIdx], val)
+#define GC_SetAcquisitionFrameRateSetToMax(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionFrameRateSetToMaxIdx], val)
+#define GC_SetAcquisitionMode(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionModeIdx], val)
 #define GC_SetAcquisitionFrameRateMode(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionFrameRateModeIdx], val)
+#define GC_SetLoadSavedConfigurationAtStartup(val) GC_RegisterWriteUI32(&gcRegsDef[LoadSavedConfigurationAtStartupIdx], val)
+#define GC_SetSaveConfiguration(val) GC_RegisterWriteUI32(&gcRegsDef[SaveConfigurationIdx], val)
+#define GC_SetExposureAuto(val) GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], val)
+#define GC_SetAECImageFraction(val) GC_RegisterWriteFloat(&gcRegsDef[AECImageFractionIdx], val)
+#define GC_SetAECTargetWellFilling(val) GC_RegisterWriteFloat(&gcRegsDef[AECTargetWellFillingIdx], val)
+#define GC_SetAECResponseTime(val) GC_RegisterWriteFloat(&gcRegsDef[AECResponseTimeIdx], val)
+#define GC_SetAECPlusExtrapolationWeight(val) GC_RegisterWriteFloat(&gcRegsDef[AECPlusExtrapolationWeightIdx], val)
+#define GC_SetNDFilterArmedPositionSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[NDFilterArmedPositionSetpointIdx], val)
+#define GC_SetEHDRIMode(val) GC_RegisterWriteUI32(&gcRegsDef[EHDRIModeIdx], val)
+#define GC_SetEHDRIExpectedTemperatureMin(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExpectedTemperatureMinIdx], val)
+#define GC_SetEHDRIExpectedTemperatureMinMax(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExpectedTemperatureMinMaxIdx], val)
+#define GC_SetEHDRIExpectedTemperatureMax(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExpectedTemperatureMaxIdx], val)
+#define GC_SetEHDRIExpectedTemperatureMaxMin(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExpectedTemperatureMaxMinIdx], val)
+#define GC_SetEHDRINumberOfExposures(val) GC_RegisterWriteUI32(&gcRegsDef[EHDRINumberOfExposuresIdx], val)
+#define GC_SetEHDRIResetToDefault(val) GC_RegisterWriteUI32(&gcRegsDef[EHDRIResetToDefaultIdx], val)
+#define GC_SetEHDRIExposureOccurrence1(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExposureOccurrence1Idx], val)
+#define GC_SetEHDRIExposureOccurrence2(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExposureOccurrence2Idx], val)
+#define GC_SetEHDRIExposureOccurrence3(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExposureOccurrence3Idx], val)
+#define GC_SetEHDRIExposureOccurrence4(val) GC_RegisterWriteFloat(&gcRegsDef[EHDRIExposureOccurrence4Idx], val)
 #define GC_SetCalibrationMode(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationModeIdx], val)
+#define GC_SetCalibrationCollectionCount(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionCountIdx], val)
+#define GC_SetCalibrationCollectionSelector(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionSelectorIdx], val)
+#define GC_SetCalibrationCollectionPOSIXTime(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionPOSIXTimeIdx], val)
+#define GC_SetCalibrationCollectionType(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionTypeIdx], val)
+#define GC_SetCalibrationCollectionLoad(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionLoadIdx], val)
+#define GC_SetCalibrationCollectionBlockCount(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionBlockCountIdx], val)
+#define GC_SetCalibrationCollectionBlockSelector(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionBlockSelectorIdx], val)
+#define GC_SetCalibrationCollectionBlockPOSIXTime(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionBlockPOSIXTimeIdx], val)
+#define GC_SetCalibrationCollectionBlockLoad(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionBlockLoadIdx], val)
+#define GC_SetCalibrationCollectionActivePOSIXTime(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionActivePOSIXTimeIdx], val)
+#define GC_SetCalibrationCollectionActiveType(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionActiveTypeIdx], val)
+#define GC_SetCalibrationCollectionActiveBlockPOSIXTime(val) GC_RegisterWriteUI32(&gcRegsDef[CalibrationCollectionActiveBlockPOSIXTimeIdx], val)
+#define GC_SetImageCorrectionMode(val) GC_RegisterWriteUI32(&gcRegsDef[ImageCorrectionModeIdx], val)
+#define GC_SetImageCorrectionBlockSelector(val) GC_RegisterWriteUI32(&gcRegsDef[ImageCorrectionBlockSelectorIdx], val)
+#define GC_SetImageCorrectionFWMode(val) GC_RegisterWriteUI32(&gcRegsDef[ImageCorrectionFWModeIdx], val)
+#define GC_SetImageCorrectionFWAcquisitionFrameRate(val) GC_RegisterWriteFloat(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateIdx], val)
+#define GC_SetImageCorrection(val) GC_RegisterWriteUI32(&gcRegsDef[ImageCorrectionIdx], val)
+#define GC_SetNDFilterPositionSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[NDFilterPositionSetpointIdx], val)
+#define GC_SetNDFilterPosition(val) GC_RegisterWriteUI32(&gcRegsDef[NDFilterPositionIdx], val)
+#define GC_SetNDFilterNumber(val) GC_RegisterWriteUI32(&gcRegsDef[NDFilterNumberIdx], val)
+#define GC_SetNDFilterPositionRawSetpoint(val) GC_RegisterWriteI32(&gcRegsDef[NDFilterPositionRawSetpointIdx], val)
+#define GC_SetNDFilterPositionRaw(val) GC_RegisterWriteI32(&gcRegsDef[NDFilterPositionRawIdx], val)
+#define GC_SetFWMode(val) GC_RegisterWriteUI32(&gcRegsDef[FWModeIdx], val)
+#define GC_SetFWPositionSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[FWPositionSetpointIdx], val)
+#define GC_SetFWPosition(val) GC_RegisterWriteUI32(&gcRegsDef[FWPositionIdx], val)
+#define GC_SetFWFilterNumber(val) GC_RegisterWriteUI32(&gcRegsDef[FWFilterNumberIdx], val)
+#define GC_SetFWPositionRawSetpoint(val) GC_RegisterWriteI32(&gcRegsDef[FWPositionRawSetpointIdx], val)
+#define GC_SetFWPositionRaw(val) GC_RegisterWriteI32(&gcRegsDef[FWPositionRawIdx], val)
+#define GC_SetFWSpeedSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[FWSpeedSetpointIdx], val)
+#define GC_SetFWSpeed(val) GC_RegisterWriteUI32(&gcRegsDef[FWSpeedIdx], val)
+#define GC_SetFWSpeedMax(val) GC_RegisterWriteUI32(&gcRegsDef[FWSpeedMaxIdx], val)
+#define GC_SetFOVPositionSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], val)
+#define GC_SetFOVPosition(val) GC_RegisterWriteUI32(&gcRegsDef[FOVPositionIdx], val)
+#define GC_SetFOVPositionNumber(val) GC_RegisterWriteUI32(&gcRegsDef[FOVPositionNumberIdx], val)
+#define GC_SetZoomInFast(val) GC_RegisterWriteUI32(&gcRegsDef[ZoomInFastIdx], val)
+#define GC_SetZoomInSlow(val) GC_RegisterWriteUI32(&gcRegsDef[ZoomInSlowIdx], val)
+#define GC_SetZoomOutSlow(val) GC_RegisterWriteUI32(&gcRegsDef[ZoomOutSlowIdx], val)
+#define GC_SetZoomOutFast(val) GC_RegisterWriteUI32(&gcRegsDef[ZoomOutFastIdx], val)
+#define GC_SetHFOV(val) GC_RegisterWriteFloat(&gcRegsDef[HFOVIdx], val)
+#define GC_SetVFOV(val) GC_RegisterWriteFloat(&gcRegsDef[VFOVIdx], val)
+#define GC_SetFOVPositionRawSetpoint(val) GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawSetpointIdx], val)
+#define GC_SetFOVPositionRaw(val) GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawIdx], val)
+#define GC_SetFOVPositionRawMin(val) GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawMinIdx], val)
+#define GC_SetFOVPositionRawMax(val) GC_RegisterWriteI32(&gcRegsDef[FOVPositionRawMaxIdx], val)
+#define GC_SetAutofocusMode(val) GC_RegisterWriteUI32(&gcRegsDef[AutofocusModeIdx], val)
+#define GC_SetAutofocusROI(val) GC_RegisterWriteFloat(&gcRegsDef[AutofocusROIIdx], val)
+#define GC_SetAutofocus(val) GC_RegisterWriteUI32(&gcRegsDef[AutofocusIdx], val)
+#define GC_SetFocusNearFast(val) GC_RegisterWriteUI32(&gcRegsDef[FocusNearFastIdx], val)
+#define GC_SetFocusNearSlow(val) GC_RegisterWriteUI32(&gcRegsDef[FocusNearSlowIdx], val)
+#define GC_SetFocusFarSlow(val) GC_RegisterWriteUI32(&gcRegsDef[FocusFarSlowIdx], val)
+#define GC_SetFocusFarFast(val) GC_RegisterWriteUI32(&gcRegsDef[FocusFarFastIdx], val)
+#define GC_SetFocusPositionRawSetpoint(val) GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawSetpointIdx], val)
+#define GC_SetFocusPositionRaw(val) GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawIdx], val)
+#define GC_SetFocusPositionRawMin(val) GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawMinIdx], val)
+#define GC_SetFocusPositionRawMax(val) GC_RegisterWriteI32(&gcRegsDef[FocusPositionRawMaxIdx], val)
+#define GC_SetExternalLensSerialNumber(val) GC_RegisterWriteUI32(&gcRegsDef[ExternalLensSerialNumberIdx], val)
+#define GC_SetManualFilterSerialNumber(val) GC_RegisterWriteUI32(&gcRegsDef[ManualFilterSerialNumberIdx], val)
+#define GC_SetICUPositionSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[ICUPositionSetpointIdx], val)
+#define GC_SetICUPosition(val) GC_RegisterWriteUI32(&gcRegsDef[ICUPositionIdx], val)
+#define GC_SetCenterImage(val) GC_RegisterWriteUI32(&gcRegsDef[CenterImageIdx], val)
+#define GC_SetLockedCenterImage(val) GC_RegisterWriteUI32(&gcRegsDef[LockedCenterImageIdx], val)
 #define GC_SetOffsetX(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetXIdx], val)
 #define GC_SetOffsetY(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetYIdx], val)
 #define GC_SetReverseX(val) GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], val)
 #define GC_SetReverseY(val) GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], val)
+#define GC_SetPixelFormat(val) GC_RegisterWriteUI32(&gcRegsDef[PixelFormatIdx], val)
+#define GC_SetTestImageSelector(val) GC_RegisterWriteUI32(&gcRegsDef[TestImageSelectorIdx], val)
+#define GC_SetSensorWellDepth(val) GC_RegisterWriteUI32(&gcRegsDef[SensorWellDepthIdx], val)
+#define GC_SetIntegrationMode(val) GC_RegisterWriteUI32(&gcRegsDef[IntegrationModeIdx], val)
+#define GC_SetAcquisitionStartAtStartup(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionStartAtStartupIdx], val)
+#define GC_SetExternalBlackBodyTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[ExternalBlackBodyTemperatureIdx], val)
+#define GC_SetBadPixelReplacement(val) GC_RegisterWriteUI32(&gcRegsDef[BadPixelReplacementIdx], val)
+#define GC_SetTriggerSelector(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerSelectorIdx], val)
+#define GC_SetTriggerMode(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerModeIdx], val)
+#define GC_SetTriggerSoftware(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerSoftwareIdx], val)
+#define GC_SetTriggerSource(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerSourceIdx], val)
+#define GC_SetTriggerActivation(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerActivationIdx], val)
+#define GC_SetTriggerDelay(val) GC_RegisterWriteFloat(&gcRegsDef[TriggerDelayIdx], val)
+#define GC_SetTriggerFrameCount(val) GC_RegisterWriteUI32(&gcRegsDef[TriggerFrameCountIdx], val)
 #define GC_SetMemoryBufferMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferModeIdx], val)
 #define GC_SetMemoryBufferLegacyMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferLegacyModeIdx], val)
 #define GC_SetMemoryBufferStatus(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferStatusIdx], val)
+#define GC_SetMemoryBufferAvailableFreeSpaceHigh(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferAvailableFreeSpaceHighIdx], val)
+#define GC_SetMemoryBufferAvailableFreeSpaceLow(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferAvailableFreeSpaceLowIdx], val)
+#define GC_SetMemoryBufferFragmentedFreeSpaceHigh(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferFragmentedFreeSpaceHighIdx], val)
+#define GC_SetMemoryBufferFragmentedFreeSpaceLow(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferFragmentedFreeSpaceLowIdx], val)
+#define GC_SetMemoryBufferTotalSpaceHigh(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferTotalSpaceHighIdx], val)
+#define GC_SetMemoryBufferTotalSpaceLow(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferTotalSpaceLowIdx], val)
+#define GC_SetMemoryBufferNumberOfImagesMax(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfImagesMaxIdx], val)
+#define GC_SetMemoryBufferNumberOfSequencesMax(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx], val)
+#define GC_SetMemoryBufferNumberOfSequences(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], val)
+#define GC_SetMemoryBufferSequenceSize(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceSizeIdx], val)
+#define GC_SetMemoryBufferSequenceSizeMin(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceSizeMinIdx], val)
+#define GC_SetMemoryBufferSequenceSizeMax(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceSizeMaxIdx], val)
+#define GC_SetMemoryBufferSequenceSizeInc(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceSizeIncIdx], val)
+#define GC_SetMemoryBufferSequencePreMOISize(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], val)
 #define GC_SetMemoryBufferMOISource(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferMOISourceIdx], val)
 #define GC_SetMemoryBufferMOIActivation(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferMOIActivationIdx], val)
+#define GC_SetMemoryBufferMOISoftware(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferMOISoftwareIdx], val)
 #define GC_SetMemoryBufferSequenceCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceCountIdx], val)
+#define GC_SetMemoryBufferSequenceSelector(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceSelectorIdx], val)
+#define GC_SetMemoryBufferSequenceOffsetX(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceOffsetXIdx], val)
+#define GC_SetMemoryBufferSequenceOffsetY(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceOffsetYIdx], val)
+#define GC_SetMemoryBufferSequenceWidth(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceWidthIdx], val)
+#define GC_SetMemoryBufferSequenceHeight(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceHeightIdx], val)
+#define GC_SetMemoryBufferSequenceFirstFrameID(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx], val)
+#define GC_SetMemoryBufferSequenceMOIFrameID(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx], val)
+#define GC_SetMemoryBufferSequenceRecordedSize(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceRecordedSizeIdx], val)
+#define GC_SetMemoryBufferSequenceDownloadImageFrameID(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx], val)
+#define GC_SetMemoryBufferSequenceDownloadFrameID(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx], val)
+#define GC_SetMemoryBufferSequenceDownloadFrameCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx], val)
 #define GC_SetMemoryBufferSequenceDownloadMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], val)
+#define GC_SetMemoryBufferSequenceDownloadBitRateMax(val) GC_RegisterWriteFloat(&gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx], val)
+#define GC_SetMemoryBufferSequenceClear(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceClearIdx], val)
+#define GC_SetMemoryBufferSequenceClearAll(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceClearAllIdx], val)
+#define GC_SetMemoryBufferSequenceDefrag(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDefragIdx], val)
+#define GC_SetGPSLongitude(val) GC_RegisterWriteI32(&gcRegsDef[GPSLongitudeIdx], val)
+#define GC_SetGPSLatitude(val) GC_RegisterWriteI32(&gcRegsDef[GPSLatitudeIdx], val)
+#define GC_SetGPSAltitude(val) GC_RegisterWriteI32(&gcRegsDef[GPSAltitudeIdx], val)
+#define GC_SetGPSModeIndicator(val) GC_RegisterWriteUI32(&gcRegsDef[GPSModeIndicatorIdx], val)
+#define GC_SetGPSNumberOfSatellitesInUse(val) GC_RegisterWriteUI32(&gcRegsDef[GPSNumberOfSatellitesInUseIdx], val)
+#define GC_SetAutomaticExternalFanSpeedMode(val) GC_RegisterWriteUI32(&gcRegsDef[AutomaticExternalFanSpeedModeIdx], val)
+#define GC_SetExternalFanSpeedSetpoint(val) GC_RegisterWriteFloat(&gcRegsDef[ExternalFanSpeedSetpointIdx], val)
+#define GC_SetExternalFanSpeed(val) GC_RegisterWriteFloat(&gcRegsDef[ExternalFanSpeedIdx], val)
+#define GC_SetTimeSource(val) GC_RegisterWriteUI32(&gcRegsDef[TimeSourceIdx], val)
+#define GC_SetPOSIXTime(val) GC_RegisterWriteUI32(&gcRegsDef[POSIXTimeIdx], val)
+#define GC_SetSubSecondTime(val) GC_RegisterWriteUI32(&gcRegsDef[SubSecondTimeIdx], val)
 #define GC_SetVideoAGC(val) GC_RegisterWriteUI32(&gcRegsDef[VideoAGCIdx], val)
+#define GC_SetVideoBadPixelReplacement(val) GC_RegisterWriteUI32(&gcRegsDef[VideoBadPixelReplacementIdx], val)
 #define GC_SetVideoFreeze(val) GC_RegisterWriteUI32(&gcRegsDef[VideoFreezeIdx], val)
+#define GC_SetDeviceRegistersStreamingStart(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceRegistersStreamingStartIdx], val)
+#define GC_SetDeviceRegistersStreamingEnd(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceRegistersStreamingEndIdx], val)
+#define GC_SetDeviceSerialPortSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceSerialPortSelectorIdx], val)
+#define GC_SetDeviceSerialPortBaudRate(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceSerialPortBaudRateIdx], val)
+#define GC_SetDeviceSerialPortFunction(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceSerialPortFunctionIdx], val)
+#define GC_SetProprietaryFeature(val) GC_RegisterWriteUI32(&gcRegsDef[ProprietaryFeatureIdx], val)
+#define GC_SetDeviceSerialNumber(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceSerialNumberIdx], val)
+#define GC_SetSensorID(val) GC_RegisterWriteUI32(&gcRegsDef[SensorIDIdx], val)
 #define GC_SetSensorWidth(val) GC_RegisterWriteUI32(&gcRegsDef[SensorWidthIdx], val)
 #define GC_SetSensorHeight(val) GC_RegisterWriteUI32(&gcRegsDef[SensorHeightIdx], val)
+#define GC_SetWidthMax(val) GC_RegisterWriteUI32(&gcRegsDef[WidthMaxIdx], val)
+#define GC_SetHeightMax(val) GC_RegisterWriteUI32(&gcRegsDef[HeightMaxIdx], val)
+#define GC_SetWidthMin(val) GC_RegisterWriteUI32(&gcRegsDef[WidthMinIdx], val)
+#define GC_SetWidthInc(val) GC_RegisterWriteUI32(&gcRegsDef[WidthIncIdx], val)
+#define GC_SetHeightMin(val) GC_RegisterWriteUI32(&gcRegsDef[HeightMinIdx], val)
+#define GC_SetHeightInc(val) GC_RegisterWriteUI32(&gcRegsDef[HeightIncIdx], val)
+#define GC_SetOffsetXMin(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetXMinIdx], val)
+#define GC_SetOffsetXMax(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetXMaxIdx], val)
+#define GC_SetOffsetXInc(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetXIncIdx], val)
+#define GC_SetOffsetYMin(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetYMinIdx], val)
+#define GC_SetOffsetYMax(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetYMaxIdx], val)
+#define GC_SetOffsetYInc(val) GC_RegisterWriteUI32(&gcRegsDef[OffsetYIncIdx], val)
+#define GC_SetPixelDataResolution(val) GC_RegisterWriteUI32(&gcRegsDef[PixelDataResolutionIdx], val)
 #define GC_SetEventSelector(val) GC_RegisterWriteUI32(&gcRegsDef[EventSelectorIdx], val)
 #define GC_SetEventNotification(val) GC_RegisterWriteUI32(&gcRegsDef[EventNotificationIdx], val)
 #define GC_SetEventError(val) GC_RegisterWriteUI32(&gcRegsDef[EventErrorIdx], val)
@@ -531,15 +597,57 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetEventTelopsTimestamp(val) GC_RegisterWriteUI32(&gcRegsDef[EventTelopsTimestampIdx], val)
 #define GC_SetEventTelopsCode(val) GC_RegisterWriteUI32(&gcRegsDef[EventTelopsCodeIdx], val)
 #define GC_SetClConfiguration(val) GC_RegisterWriteUI32(&gcRegsDef[ClConfigurationIdx], val)
+#define GC_SetDeviceXMLMajorVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceXMLMajorVersionIdx], val)
+#define GC_SetDeviceXMLMinorVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceXMLMinorVersionIdx], val)
+#define GC_SetDeviceXMLSubMinorVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceXMLSubMinorVersionIdx], val)
+#define GC_SetDeviceFirmwareMajorVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceFirmwareMajorVersionIdx], val)
+#define GC_SetDeviceFirmwareMinorVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceFirmwareMinorVersionIdx], val)
+#define GC_SetDeviceFirmwareSubMinorVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceFirmwareSubMinorVersionIdx], val)
+#define GC_SetDeviceFirmwareBuildVersion(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceFirmwareBuildVersionIdx], val)
 #define GC_SetDeviceFirmwareModuleSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceFirmwareModuleSelectorIdx], val)
 #define GC_SetDeviceFirmwareModuleRevision(val) GC_RegisterWriteI32(&gcRegsDef[DeviceFirmwareModuleRevisionIdx], val)
 #define GC_SetDeviceTemperatureSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceTemperatureSelectorIdx], val)
 #define GC_SetDeviceTemperature(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceTemperatureIdx], val)
 #define GC_SetDeviceClockSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceClockSelectorIdx], val)
 #define GC_SetDeviceClockFrequency(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceClockFrequencyIdx], val)
+#define GC_SetDeviceRegistersCheck(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceRegistersCheckIdx], val)
+#define GC_SetDeviceRegistersValid(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceRegistersValidIdx], val)
+#define GC_SetDeviceNotReady(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceNotReadyIdx], val)
 #define GC_SetDeviceVoltageSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceVoltageSelectorIdx], val)
 #define GC_SetDeviceVoltage(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceVoltageIdx], val)
+#define GC_SetDeviceCurrentSelector(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceCurrentSelectorIdx], val)
+#define GC_SetDeviceCurrent(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceCurrentIdx], val)
+#define GC_SetDeviceRunningTime(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceRunningTimeIdx], val)
+#define GC_SetDeviceCoolerRunningTime(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceCoolerRunningTimeIdx], val)
+#define GC_SetDevicePowerOnCycles(val) GC_RegisterWriteUI32(&gcRegsDef[DevicePowerOnCyclesIdx], val)
+#define GC_SetDeviceCoolerPowerOnCycles(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceCoolerPowerOnCyclesIdx], val)
+#define GC_SetDeviceDetectorPolarizationVoltage(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceDetectorPolarizationVoltageIdx], val)
+#define GC_SetDeviceDetectorElectricalTapsRef(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceDetectorElectricalTapsRefIdx], val)
+#define GC_SetDeviceDetectorElectricalRefOffset(val) GC_RegisterWriteFloat(&gcRegsDef[DeviceDetectorElectricalRefOffsetIdx], val)
+#define GC_SetDeviceKeyValidationLow(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceKeyValidationLowIdx], val)
+#define GC_SetDeviceKeyValidationHigh(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceKeyValidationHighIdx], val)
+#define GC_SetTDCFlags(val) GC_RegisterWriteUI32(&gcRegsDef[TDCFlagsIdx], val)
+#define GC_SetTDCStatus(val) GC_RegisterWriteUI32(&gcRegsDef[TDCStatusIdx], val)
+#define GC_SetAvailabilityFlags(val) GC_RegisterWriteUI32(&gcRegsDef[AvailabilityFlagsIdx], val)
 #define GC_SetIsActiveFlags(val) GC_RegisterWriteUI32(&gcRegsDef[IsActiveFlagsIdx], val)
+#define GC_SetAcquisitionFrameRateMin(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateMinIdx], val)
+#define GC_SetAcquisitionFrameRateMax(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateMaxIdx], val)
+#define GC_SetImageCorrectionFWAcquisitionFrameRateMin(val) GC_RegisterWriteFloat(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateMinIdx], val)
+#define GC_SetImageCorrectionFWAcquisitionFrameRateMax(val) GC_RegisterWriteFloat(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateMaxIdx], val)
+#define GC_SetExposureTimeMin(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], val)
+#define GC_SetExposureTimeMax(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMaxIdx], val)
+#define GC_SetDeviceBuiltInTestsResults1(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults1Idx], val)
+#define GC_SetDeviceBuiltInTestsResults2(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults2Idx], val)
+#define GC_SetDeviceBuiltInTestsResults3(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults3Idx], val)
+#define GC_SetDeviceBuiltInTestsResults4(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults4Idx], val)
+#define GC_SetDeviceBuiltInTestsResults7(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults7Idx], val)
+#define GC_SetDeviceBuiltInTestsResults8(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceBuiltInTestsResults8Idx], val)
+#define GC_SetDeviceReset(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceResetIdx], val)
+#define GC_SetDevicePowerStateSetpoint(val) GC_RegisterWriteUI32(&gcRegsDef[DevicePowerStateSetpointIdx], val)
+#define GC_SetDevicePowerState(val) GC_RegisterWriteUI32(&gcRegsDef[DevicePowerStateIdx], val)
+#define GC_SetDeviceLedIndicatorState(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceLedIndicatorStateIdx], val)
+#define GC_SetStealthMode(val) GC_RegisterWriteUI32(&gcRegsDef[StealthModeIdx], val)
+#define GC_SetPowerOnAtStartup(val) GC_RegisterWriteUI32(&gcRegsDef[PowerOnAtStartupIdx], val)
 
 // Locked registers utility macros
 ////////////////////////////////////////////////////////////////////////////////
@@ -573,7 +681,15 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_FlaggingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Flagging) && GC_GatingTriggerIsActive)
 #define GC_GatingTriggerIsActive IsActiveFlagsTst(GatingTriggerIsActiveMask)
 #define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive || GC_AECPlusIsActive))
-#define GC_MemoryBufferNotEmpty (gcRegsData.MemoryBufferSequenceCount > 0)
+#define GC_MemoryBufferBusy (GC_MemoryBufferRecording || GC_MemoryBufferTransmitting || GC_MemoryBufferDefraging || GC_MemoryBufferUpdating)
+#define GC_MemoryBufferDefraging MemoryBufferStatusTst(MemoryBufferDefragingMask)
+#define GC_MemoryBufferNotEmpty (GC_MemoryBufferBusy || (gcRegsData.MemoryBufferSequenceCount > 0))
+#define GC_MemoryBufferNotEmptyLegacy ((gcRegsData.MemoryBufferLegacyMode == MBLM_On) && GC_MemoryBufferNotEmpty)
+#define GC_MemoryBufferProcessingData (GC_MemoryBufferUpdating || GC_MemoryBufferDefraging)
+#define GC_MemoryBufferRecording MemoryBufferStatusTst(MemoryBufferRecordingMask)
+#define GC_MemoryBufferTransmitting MemoryBufferStatusTst(MemoryBufferTransmittingMask)
+#define GC_MemoryBufferUpdating MemoryBufferStatusTst(MemoryBufferUpdatingMask)
+#define GC_MemoryBufferWritingProcess (GC_MemoryBufferRecording || GC_MemoryBufferUpdating)
 #define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForImageCorrection)
 #define GC_WaitingForImageCorrection TDCStatusTst(WaitingForImageCorrectionMask)
 
@@ -581,45 +697,24 @@ void GC_Registers_Init();
 
 /* AUTO-CODE END */
 
-// AEC+ is available when;
-//  - EHDRI is not active.
-//  - FW rotating modes are not active.
-//  - Gating trigger is not active.
-//  - Valid collection is loaded.
-//  - Active collection type is TelopsNDF.
-//  - FW position is the one that is calibrated.
-//  - NDF positions are consecutive. Valid combinations are [NDfilter1 NDfilter2], [NDfilter2 NDfilter3] or
-//    [NDfilter1 NDfilter2 NDfilter3] but not [NDfilter1 NDfilter3]. So it must contain NDFilter2 and at least
-//    one of the two other positions.
-#define GC_AECPlusIsAvailable ( \
-   !GC_EHDRIIsActive && \
-   !GC_FWRotatingModeIsActive && \
-   !GC_GatingTriggerIsActive && \
-   (calibrationInfo.isValid == 1) && \
-   (calibrationInfo.collection.CollectionType == CCT_TelopsNDF) && \
-   ((gcRegsData.FWPositionSetpoint == calibrationInfo.collection.FWPosition) || (gcRegsData.CalibrationMode == CM_Raw) || (gcRegsData.CalibrationMode == CM_Raw0)) && \
-   (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))) \
-)
-#define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
-
 void GC_UpdateLockedFlag();
-void GC_CalibrationUpdateRegisters();
+void GC_UpdateCalibrationRegisters();
 void GC_UpdateFpaPeriodMinMargin();
 void GC_UpdateParameterLimits();
 IRC_Status_t GC_DeviceRegistersVerification();
-void GC_ComputeImageLimits();
-void GC_SetExternalFanSpeed();
+void GC_UpdateImageLimits();
+void GC_UpdateExternalFanSpeed();
 void GC_UpdateMemoryBufferSequenceSizeLimits();
 void GC_UpdateMemoryBufferNumberOfSequenceLimits();
 void GC_UpdateMemoryBufferSequencePreMOISizeLimits();
 void GC_UnlockCamera();
-void GC_SetMemoryBufferRegistersOwner();
-void GC_SetFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPositionSetpoint);
-void GC_SetNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDFPositionSetpoint);
+void GC_UpdateMemoryBufferRegistersOwner();
+void GC_UpdateFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPositionSetpoint);
+void GC_UpdateNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDFPositionSetpoint);
 uint32_t GC_GetTimestamp();
 void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len);
-void GC_SetExposureTimeRegisters(float exposureTime);
-void GC_SetDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort);
+void GC_UpdateExposureTimeRegisters(float exposureTime);
+void GC_UpdateDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort);
 void GC_UpdateFOV();
 void GC_UpdateExposureTimeMin();
 void GC_UpdateCameraLinkConfig();

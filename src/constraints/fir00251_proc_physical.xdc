@@ -39,18 +39,11 @@ set_property PACKAGE_PIN D5 [get_ports AURORA_CLK_N1]
 
 set_property PACKAGE_PIN P1 [get_ports {DATA_UPLINK_N[0]}]
 set_property PACKAGE_PIN M1 [get_ports {DATA_UPLINK_N[1]}]
-#set_property LOC GTXE2_CHANNEL_X0Y1 [get_cells U7/U3/U0/gt_wrapper_i/data_mgt_multi_gt_i/gt1_data_mgt_i/gtxe2_i] # path non valid
 
-set_property PACKAGE_PIN K1 [get_ports {VIDEO_UPLINK_N[0]}]
-set_property PACKAGE_PIN H1 [get_ports {VIDEO_UPLINK_N[1]}]
-#set_property LOC GTXE2_CHANNEL_X0Y2 [get_cells U7/U4/U0/gt_wrapper_i/video_mgt_multi_gt_i/gt0_video_mgt_i/gtxe2_i] # path non valid
-#set_property LOC GTXE2_CHANNEL_X0Y3 [get_cells U7/U4/U0/gt_wrapper_i/video_mgt_multi_gt_i/gt1_video_mgt_i/gtxe2_i] # path non valid
 
 set_property PACKAGE_PIN F1 [get_ports {PROC_EXP_N[0]}]
 set_property PACKAGE_PIN D1 [get_ports {PROC_EXP_N[1]}]
 
-set_property LOC GTXE2_COMMON_X0Y0 [get_cells */ACQ/MGT/MGTS/DATA_COMMON/gtxe2_common_i]
-#set_property LOC GTXE2_COMMON_X0Y1 [get_cells U7/MGTS/U0/gt_wrapper_i/mgt_exp_brd_multi_gt_i/gtxe2_common_i] # path non valid
 
 ##################### GIGE #######################################
 set_property PACKAGE_PIN F25 [get_ports GIGE_BULK_TXD0]
@@ -371,18 +364,3 @@ set_property IOSTANDARD LVCMOS33 [get_ports DDR_POWERGOOD]
 
 set_property PACKAGE_PIN E22 [get_ports DEBUG_LED_N]
 set_property IOSTANDARD LVCMOS33 [get_ports DEBUG_LED_N]
-
-#set_property LOC BSCAN_X0Y1 [get_cells BD/core_wrapper_i/core_i/MCU/mdm_1/U0/Use_E2.BSCANE2_I]
-
-
-
-
-
-
-
-
-
-
-
-
-

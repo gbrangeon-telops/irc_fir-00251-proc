@@ -5,12 +5,11 @@
 --  Use: Decoding of Filter wheel quadrature signals into position, velocity and direction
 --  By: Olivier Bourgois
 --
---  $Revision$
---  $Author$
---  $LastChangedDate$
+--  $Revision: 22650 $
+--  $Author: pcouture $
+--  $LastChangedDate: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
 ---------------------------------------------------------------------------------------------------
 library ieee;
---library common_hdl;
 
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -98,7 +97,7 @@ begin
       PHASE0 when ZERO_PHASE = PHASE1 else
       PHASE1 when ZERO_PHASE = PHASE2 else
       PHASE2 when ZERO_PHASE = PHASE3;
-      
+   
       
    --Select the homing mode
    homing_mode <=  Encoder when INDEX_MODE = '0' else Optoswitch;
@@ -131,15 +130,15 @@ begin
 -- Homming in Encoder Mode
             if enc_state = ('1' & ZERO_PHASE) and homing_mode = Encoder then
                lock_i <= '1'; -- we are in sync once we reach the ZERO state
-               
+            
                -- this is the zeroing state
                if enc_nxstate(1 downto 0) = NEXT_ZERO_PHASE then
                   pos_i <= pos_i + to_unsigned(1,pos_i'length);   
                elsif enc_nxstate(1 downto 0) = PREV_ZERO_PHASE then
                   pos_i <= unsigned(NB_ENCODER_COUNTS(pos_i'range)) - 1;  
-               end if;                         
-               
-              
+               end if;  
+                                         
+                  
             elsif enc_nxstate = ('1' & ZERO_PHASE) and homing_mode = Encoder  then  
                pos_i <= (others => '0');
 
@@ -151,14 +150,14 @@ begin
                -- Reset position counter on the next phase transition after the index rising edge.
             elsif enc_nxstate(2) = '1' and enc_state(2) = '0' and dir_i = '0' and homing_mode = Optoswitch then   
                 zeros_next_transition <= '1';
-            
+               
             elsif enc_nxstate(2) = '0' and enc_state(2) = '1' and dir_i = '1' and homing_mode = Optoswitch then   
                 zeros_next_transition <= '1';
-            
+               
             elsif zeros_next_transition = '1'  and enc_nxstate(1 downto 0) /= enc_state(1 downto 0) and homing_mode = Optoswitch then
                 if dir_i = '0' then
                    pos_i <= (others => '0');
-                else
+            else
                    pos_i <= unsigned(NB_ENCODER_COUNTS(pos_i'range)) - 1;
                 end if;
                 zeros_next_transition <= '0';

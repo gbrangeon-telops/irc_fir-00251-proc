@@ -48,6 +48,9 @@ entity quad_data_sync is
 end quad_data_sync;
 
 architecture rtl of quad_data_sync is
+   
+   constant C_FIFO_RDY_DLY  : natural := 1000;
+   
    component double_sync is
       port(
          D : in std_logic;
@@ -65,7 +68,7 @@ architecture rtl of quad_data_sync is
          );
    end component;
    
-   component afifo_w72_d256 is
+   component afifo_w72_d16 is
       port (
          RST            : in std_logic;
          WR_CLK         : in std_logic;
@@ -78,16 +81,27 @@ architecture rtl of quad_data_sync is
          ALMOST_FULL    : out std_logic;
          OVERFLOW       : out std_logic;
          EMPTY          : out std_logic;
-         VALID          : out std_logic
+         VALID          : out std_logic;
+         WR_RST_BUSY    : out std_logic;
+         RD_RST_BUSY    : out std_logic
          );
    end component;
    
-   signal sreset           : std_ulogic;
-   signal dval_i, dval_out : std_ulogic;
-   signal data_i, data_o   : std_logic_vector(Q'length-1 downto 0) := (others => '0');
+   component sync_reset
+      port(
+         ARESET : in std_logic;
+         SRESET : out std_logic;
+         CLK    : in std_logic);
+   end component;
+   
+   signal sreset_clkout  : std_logic;
+   signal dval_i, dval_out : std_logic;
+   signal data_i, data_o   : std_logic_vector(Q'length-1 downto 0);
    signal sync_flag_i      : std_logic_vector(SYNC_FLAG'length-1 downto 0);
    
-   signal full_i, empty_i : std_ulogic;
+   signal full_i, empty_i  : std_logic;
+   signal dly_cnt          : natural range 0 to C_FIFO_RDY_DLY;
+   signal fifo_rdy         : std_logic;
    
    --   attribute keep : string;
    --   attribute keep of dval_out : signal is "true";
@@ -98,6 +112,16 @@ begin
    Q <= std_logic_vector(data_o);
    DVAL <= dval_out;
    
+   --------------------------------------------------
+   -- synchro reset 
+   --------------------------------------------------   
+   U1 : sync_reset
+   port map(
+      ARESET => ARESET,
+      CLK    => CLK_DOUT,
+      SRESET => sreset_clkout
+      ); 
+   
    sync_en : double_sync_vector  
    port map(
       D => SYNC_FLAG,
@@ -107,7 +131,7 @@ begin
    merge_proc : process(CLKD)
    begin
       if rising_edge(CLKD) then
-         if DVAL_IN = '1' then
+         if DVAL_IN = '1' and fifo_rdy = '1' then
             dval_i <= '1';
          else
             dval_i <= '0';
@@ -116,19 +140,38 @@ begin
       end if;
    end process;
    
-   fifo : afifo_w72_d256
+   rd_proc : process(CLK_DOUT)    -- permet de prolonger le delai d'inactivité sur les signaux de contrôle au delà du reset du fifo
+   begin
+      if rising_edge(CLK_DOUT) then
+         if sreset_clkout = '1' then
+            dly_cnt <= 0;
+            fifo_rdy <= '0'; 
+         else
+            if dly_cnt < C_FIFO_RDY_DLY then
+               dly_cnt <= dly_cnt + 1;
+            else
+               fifo_rdy <= '1';    
+            end if;   
+         end if;
+      end if;
+   end process;
+   
+   fifo : afifo_w72_d16
    port map(
       rst => ARESET,
       wr_clk => CLKD,
       rd_clk => CLK_DOUT,
       din => data_i,
       wr_en => dval_i,
-      rd_en => '1',
+      rd_en => fifo_rdy,
       dout => data_o,
       full => full_i,
       almost_full => open,
       overflow => open,
       empty => empty_i,
-      valid => dval_out);
+      valid => dval_out,
+      wr_rst_busy => open,  
+      rd_rst_busy => open      
+      );
    
 end rtl;

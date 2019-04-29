@@ -21,7 +21,8 @@ entity calib_config is
    
    port( 
       ARESETN                     : in std_logic;
-      CLK                         : in std_logic;
+      CLK_CAL                         : in std_logic;
+      CLK_DATA                         : in std_logic;
       
       -- µBlaze Intf              
       MB_CLK                      : in std_logic;       
@@ -32,14 +33,6 @@ entity calib_config is
       CALIB_RAM_BLOCK_OFFSET      : out std_logic_vector(7 downto 0);
       PIXEL_DATA_BASE_ADDR        : out std_logic_vector(31 downto 0);
       
-      -- AOI                      
-      AOI_PARAM                   : out aoi_param_type;
-      AOI_PARAM_DVAL              : out std_logic;
-      
-      -- Exposure time
-      EXPOSURE_TIME_MULT_FP32     : out std_logic_vector(31 downto 0);  
-      EXPOSURE_TIME_MULT_FP32_DVAL: out std_logic;  
-      
       -- Max block index value
       CAL_BLOCK_INDEX_MAX         : out cal_block_index_type;
       
@@ -48,23 +41,22 @@ entity calib_config is
       CALIB_BLOCK_INFO_DVAL       : out std_logic;
       CALIB_BLOCK_SEL_MODE        : out calib_block_sel_mode_type;
       
-      -- Switches and holes       
-      INPUT_SW                    : out std_logic_vector(1 downto 0); 
-      DATATYPE_SW                 : out std_logic_vector(1 downto 0);
-      OUTPUT_SW                   : out std_logic_vector(1 downto 0);
-      NLC_FALL                    : out std_logic;
-      RQC_FALL                    : out std_logic; 
-      FCC_FALL                    : out std_logic;
+      -- Calib data flow config       
+      CALIB_FLOW_CONFIG           : out calib_flow_config_type;
       
-      -- Video
-      VIDEO_EHDRI_INDEX     	    : out std_logic_vector(7 downto 0);
-      VIDEO_FWPOSITION_INDEX      : out std_logic_vector(7 downto 0);
-      VIDEO_SELECTOR 	          : out std_logic_vector(1 downto 0);
-      VIDEO_FREEZE_CMD            : out std_logic;
-      VIDEO_BPR_MODE          	 : out std_logic_vector(2 downto 0);
+      -- AOI                      
+      AOI_PARAM                   : out aoi_param_type;
+      AOI_PARAM_DVAL              : out std_logic;
+      
+      -- Exposure time
+      EXP_TIME_MULT_FP32          : out std_logic_vector(31 downto 0);  
+      EXP_TIME_MULT_FP32_DVAL     : out std_logic;
       
       -- BPR mode for calib data
-      CALIB_BPR_MODE          	 : out std_logic_vector(2 downto 0);
+      CALIB_BPR_MODE          	 : out bpr_mode_type;
+      
+      -- Video
+      VIDEO_BPR_MODE          	 : out bpr_mode_type;
       
       -- Flush Pipe               
       FLUSH_PIPE                  : out std_logic;
@@ -118,31 +110,24 @@ architecture rtl of calib_config is
    signal config_dval_i                : std_logic := '0';
    signal config_dval_sync             : std_logic := '0';
    signal aoi_param_i                  : aoi_param_type;
-   signal exposure_time_mult_fp32_i    : std_logic_vector(EXPOSURE_TIME_MULT_FP32'range);
+   signal exp_time_mult_fp32_i         : std_logic_vector(EXP_TIME_MULT_FP32'range);
    signal cal_block_index_max_i        : cal_block_index_type := CAL_BLOCK_INDEX_7;
    signal calib_block_sel_mode_i       : calib_block_sel_mode_type := CBSM_USER_SEL_0;
    signal calib_block_array            : calib_block_array_type := CALIB_BLOCK_ARRAY_TYPE_DEF;
    
-   signal input_sw_i                   : std_logic_vector(1 downto 0) := "11";
-   signal datatype_sw_i                : std_logic_vector(1 downto 0) := "11";
-   signal output_sw_i                  : std_logic_vector(1 downto 0) := "11";
-   signal nlc_fall_i                   : std_logic := '1';
-   signal rqc_fall_i                   : std_logic := '1';
-   signal fcc_fall_i                   : std_logic := '1';
+   signal calib_flow_config_i          : calib_flow_config_type;
    
-   signal video_ehdriindex_i           : std_logic_vector(7 downto 0) := x"05";
-   signal video_fwposition_i           : std_logic_vector(7 downto 0) := x"05";
-   signal video_selector_i             : std_logic_vector(7 downto 0) := x"00";
-   signal video_freeze_i               : std_logic := '0';
-   signal video_bpr_mode_i             : std_logic_vector(2 downto 0) := "001";   -- LAST_VALID_BPR_MODE by default
+   signal video_config_i               : video_config_type := ("00", x"05", x"00", '0');
+   signal video_bpr_mode_i             : bpr_mode_type := BPR_MODE_LAST_VALID;
    
-   signal calib_bpr_mode_i             : std_logic_vector(2 downto 0) := "000";   -- NO_REPL_BPR_MODE by default
+   signal calib_bpr_mode_i             : bpr_mode_type := BPR_MODE_NO_REPL;
    
    signal flush_pipe_i                 : std_logic := '1';
    signal flush_pipe_sync              : std_logic;
    signal reset_err_i                  : std_logic := '0';
    signal done_i                       : std_logic := '0';
-   signal done_sync                    : std_logic := '0';
+   signal done_sync_clkMB                    : std_logic := '0';
+   signal done_sync_clkCal                    : std_logic := '0';
    
    signal axi_awaddr	                  : std_logic_vector(31 downto 0);
    signal axi_awready	               : std_logic;
@@ -159,8 +144,10 @@ architecture rtl of calib_config is
    signal slv_reg_wren                 : std_logic;
    signal cfg_wr_data                  : std_logic_vector(31 downto 0);
    signal mb_cfg_done                  : std_logic := '0';     -- to have a rising edge at start-up
-   signal mb_cfg_done_sync             : std_logic;
-   signal mb_cfg_done_sync_last        : std_logic;
+   signal mb_cfg_done_sync_clkCal             : std_logic;
+   signal mb_cfg_done_sync_last_clkCal        : std_logic;
+   signal mb_cfg_done_sync_clkData             : std_logic;
+   signal mb_cfg_done_sync_last_clkData        : std_logic;
    signal calib_block_index            : std_logic_vector(2 downto 0);
    
 begin
@@ -172,60 +159,50 @@ begin
    U0: sync_reset port map(ARESET => areset, sreset => sreset, CLK => MB_CLK);
    
    --------------------------------------------
-   -- Output process sur CLK
+   -- Output process sur CLK_CAL
    --------------------------------------------
-   U1: process(CLK)
+   U1: process(CLK_CAL)
    begin
-      if rising_edge(CLK) then
-         done_i <= STAT.DONE;
+      if rising_edge(CLK_CAL) then
+         
          
          -- These outputs are updated only when the pipe is empty
-         if STAT.DONE = '1' then 
+         if done_sync_clkCal = '1' then 
             CALIB_RAM_BLOCK_OFFSET  <= calib_ram_block_offset_i;
             PIXEL_DATA_BASE_ADDR    <= pixel_data_base_addr_i;
             
-            AOI_PARAM         <= aoi_param_i;
-            AOI_PARAM_DVAL    <= config_dval_sync;
             
-            EXPOSURE_TIME_MULT_FP32       <= exposure_time_mult_fp32_i;
-            EXPOSURE_TIME_MULT_FP32_DVAL  <= config_dval_sync;
+            AOI_PARAM               <= aoi_param_i;
+            AOI_PARAM_DVAL          <= config_dval_sync;
             
-            INPUT_SW       <= input_sw_i;             
-            DATATYPE_SW    <= datatype_sw_i;         
-            OUTPUT_SW      <= output_sw_i;        
-            NLC_FALL       <= nlc_fall_i;         
-            RQC_FALL       <= rqc_fall_i;        
-            FCC_FALL       <= fcc_fall_i;
+            EXP_TIME_MULT_FP32      <= exp_time_mult_fp32_i;
+            EXP_TIME_MULT_FP32_DVAL <= config_dval_sync;
          end if;
          
-         mb_cfg_done_sync_last <= mb_cfg_done_sync;
+         mb_cfg_done_sync_last_clkCal <= mb_cfg_done_sync_clkCal;
          
          -- These outputs are updated everytime (when clk domain crossing is done)
-         if mb_cfg_done_sync = '1' and mb_cfg_done_sync_last = '0' then
-            VIDEO_EHDRI_INDEX       <= video_ehdriindex_i;
-            VIDEO_FWPOSITION_INDEX  <= video_fwposition_i;
-            VIDEO_SELECTOR          <= video_selector_i(1 downto 0);
-            VIDEO_FREEZE_CMD        <= video_freeze_i;
-            VIDEO_BPR_MODE          <= video_bpr_mode_i;
-            
-            CALIB_BPR_MODE    <= calib_bpr_mode_i;
+         if mb_cfg_done_sync_clkCal = '1' and mb_cfg_done_sync_last_clkCal = '0' then
             
             flush_pipe_sync   <= flush_pipe_i;
-            RESET_ERR         <= reset_err_i;
          end if;
       end if;
    end process;
    
    -- Clk domain crossing config signals
-   sync_dval   : double_sync port map(D => config_dval_i, Q => config_dval_sync, RESET => '0', CLK => CLK);
-   sync_done   : double_sync port map(D => done_i, Q => done_sync, RESET => '0', CLK => MB_CLK);
-   sync_mb_cfg : double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync, RESET => '0', CLK => CLK);
+   sync_dval   : double_sync port map(D => config_dval_i, Q => config_dval_sync, RESET => '0', CLK => CLK_CAL); 
    
+   sync_done_clkMB   : double_sync port map(D => done_i, Q => done_sync_clkMB, RESET => '0', CLK => MB_CLK);
+   sync_done_clkCal   : double_sync port map(D => done_i, Q => done_sync_clkCal, RESET => '0', CLK => CLK_CAL);  
+
+   
+   sync_mb_cfg_clkCal : double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync_clkCal, RESET => '0', CLK => CLK_CAL); 
+  
    -- make sure the flush_pipe pulse is >16 clock pulses wide as per Xilinx requirement for AXIS cores
    fpipe_stretch : gh_stretch
    generic map (stretch_count => 20)
    port map(
-      CLK => CLK,
+      CLK => CLK_CAL,
       rst => areset,
       D => flush_pipe_sync,
       Q => FLUSH_PIPE
@@ -238,7 +215,7 @@ begin
    begin
       if rising_edge(MB_CLK) then
          -- These outputs are updated only when the pipe is empty 
-         if done_sync = '1' then
+         if done_sync_clkMB = '1' then
             CAL_BLOCK_INDEX_MAX     <= cal_block_index_max_i;
             CALIB_BLOCK_INFO_ARRAY  <= calib_block_array;
             CALIB_BLOCK_INFO_DVAL   <= config_dval_i;
@@ -248,6 +225,39 @@ begin
    -- These outputs are updated everytime (without clk domain change)
    CALIB_BLOCK_SEL_MODE <= calib_block_sel_mode_i;
    
+   
+      --------------------------------------------
+   -- Output process sur CLK_DATA
+   --------------------------------------------
+  U2_2: process(CLK_DATA)
+   begin
+      if rising_edge(CLK_DATA) then
+         
+         done_i <= STAT.DONE;
+         
+         -- These outputs are updated only when the pipe is empty
+         if STAT.DONE = '1' then 
+            
+            CALIB_FLOW_CONFIG       <= calib_flow_config_i;
+
+         end if;
+         
+         mb_cfg_done_sync_last_clkData <= mb_cfg_done_sync_clkData;
+         
+         -- These outputs are updated everytime (when clk domain crossing is done)
+         if mb_cfg_done_sync_clkData = '1' and mb_cfg_done_sync_last_clkData = '0' then
+            CALIB_BPR_MODE    <= calib_bpr_mode_i;
+            VIDEO_BPR_MODE    <= video_bpr_mode_i;
+            RESET_ERR         <= reset_err_i;
+         end if;
+      end if;
+   end process;
+   
+    -- Clk domain crossing config signals
+   --sync_done_clkData   : double_sync port map(D => done_i, Q => done_sync_clkData, RESET => '0', CLK => MB_CLK);  
+   
+   sync_mb_cfg_clkData : double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync_clkData, RESET => '0', CLK => CLK_DATA);
+    
    -------------------------------------------------  
    -- liens axil                           
    -------------------------------------------------  
@@ -265,7 +275,7 @@ begin
    -- reception Config                                
    -------------------------------------------------   
    U3: process(MB_CLK)
-   variable idx : integer range 0 to 7;
+      variable idx : integer range 0 to 7;
    begin
       if rising_edge(MB_CLK) then
          
@@ -276,14 +286,14 @@ begin
             
             case axi_awaddr(7 downto 0) is             
                
-               -- elements de config                                                    
+               -- elements de config
                when X"00" => calib_ram_block_offset_i    <= cfg_wr_data(calib_ram_block_offset_i'range); config_dval_i <= '0';
                when X"04" => pixel_data_base_addr_i      <= cfg_wr_data(pixel_data_base_addr_i'range);
                when X"08" => aoi_param_i.width           <= unsigned(cfg_wr_data(aoi_param_i.width'range));
                when X"0C" => aoi_param_i.height          <= unsigned(cfg_wr_data(aoi_param_i.height'range));
                when X"10" => aoi_param_i.offsetx         <= unsigned(cfg_wr_data(aoi_param_i.offsetx'range));
                when X"14" => aoi_param_i.offsety         <= unsigned(cfg_wr_data(aoi_param_i.offsety'range)); 
-               when X"18" => exposure_time_mult_fp32_i   <= cfg_wr_data(exposure_time_mult_fp32_i'range);
+               when X"18" => exp_time_mult_fp32_i        <= cfg_wr_data(exp_time_mult_fp32_i'range);
                when X"1C" => cal_block_index_max_i       <= unsigned(cfg_wr_data(cal_block_index_max_i'range));
                when X"20" => calib_block_sel_mode_i      <= cfg_wr_data(calib_block_sel_mode_i'range);
                
@@ -298,23 +308,18 @@ begin
                when X"40" => calib_block_array(idx).hder_info.low_cut           <= cfg_wr_data(calib_hder_type.low_cut'range);
                when X"44" => calib_block_array(idx).hder_info.high_cut          <= cfg_wr_data(calib_hder_type.high_cut'range);
                
-               -- control des switches et des trous
-               when X"A4" => input_sw_i            <= cfg_wr_data(input_sw_i'range);
-               when X"A8" => datatype_sw_i         <= cfg_wr_data(datatype_sw_i'range);
-               when X"AC" => output_sw_i           <= cfg_wr_data(output_sw_i'range);
-               when X"B0" => nlc_fall_i            <= cfg_wr_data(0);
-               when X"B4" => rqc_fall_i            <= cfg_wr_data(0);
-               when X"B8" => fcc_fall_i            <= cfg_wr_data(0);
+               -- control du data flow
+               when X"A4" => calib_flow_config_i.input_sw            <= cfg_wr_data(calib_flow_config_i.input_sw'range);
+               when X"A8" => calib_flow_config_i.datatype_sw         <= cfg_wr_data(calib_flow_config_i.datatype_sw'range);
+               when X"AC" => calib_flow_config_i.output_sw           <= cfg_wr_data(calib_flow_config_i.output_sw'range);
+               when X"B0" => calib_flow_config_i.nlc_fall            <= cfg_wr_data(0);
+               when X"B4" => calib_flow_config_i.rqc_fall            <= cfg_wr_data(0);
+               when X"B8" => calib_flow_config_i.fcc_fall            <= cfg_wr_data(0);
+              
+               when X"CC" => video_bpr_mode_i                  <= cfg_wr_data(video_bpr_mode_i'range);
                
-               -- sdi
-               when X"BC" => video_ehdriindex_i       <= cfg_wr_data(video_ehdriindex_i'range);
-               when X"C0" => video_fwposition_i       <= cfg_wr_data(video_fwposition_i'range);
-               when X"C4" => video_selector_i         <= cfg_wr_data(video_selector_i'range);
-               when X"C8" => video_freeze_i     	   <= cfg_wr_data(0);
-               when X"CC" => video_bpr_mode_i         <= cfg_wr_data(video_bpr_mode_i'range);
-                  
                -- flush 
-               when X"D0" => flush_pipe_i          <= cfg_wr_data(0);                  
+               when X"D0" => flush_pipe_i          <= cfg_wr_data(0);
                
                -- reset errors
                when X"D4" => reset_err_i           <= cfg_wr_data(0);
@@ -324,7 +329,7 @@ begin
                
                when others =>
                
-            end case;     
+            end case;
          else
             mb_cfg_done <= '1';
          end if; 
@@ -340,7 +345,7 @@ begin
          
             case axi_araddr(7 downto 0) is             
                -- done                                                   
-               when X"E8" => axi_rdata <= resize('0'& STAT.DONE, axi_rdata'length);  -- done
+               when X"E8" => axi_rdata <= resize(STAT.DONE, axi_rdata'length);  -- done
    
                --erreurs
                when X"EC" => axi_rdata <= STAT.ERROR_REG(0);  -- 1e  registre des errreurs

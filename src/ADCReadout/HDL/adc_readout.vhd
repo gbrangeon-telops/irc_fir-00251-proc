@@ -3,10 +3,10 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
+--!   $Rev: 20830 $
+--!   $Author: odionne $
+--!   $Date: 2017-09-01 15:29:17 -0400 (ven., 01 sept. 2017) $
+--!   $Id: adc_readout.vhd 20830 2017-09-01 19:29:17Z odionne $
 --!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/trunk/src/ADCReadout/HDL/adc_readout_generic.vhd $
 ------------------------------------------------------------------
 

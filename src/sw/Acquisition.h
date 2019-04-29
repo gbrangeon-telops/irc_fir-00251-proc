@@ -4,11 +4,11 @@
  *  
  *  This file defines the acquisition module.
  *  
- *  $Rev$
- *  $Author$
- *  $Date$
- *  $Id$
- *  $URL$
+ *  $Rev: 22792 $
+ *  $Author: enofodjie $
+ *  $Date: 2019-01-29 14:11:55 -0500 (mar., 29 janv. 2019) $
+ *  $Id: Acquisition.h 22792 2019-01-29 19:11:55Z enofodjie $
+ *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/Acquisition.h $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -46,7 +46,7 @@
 #define COOLDOWN_SAMPLING_PERIOD_US             TIME_ONE_SECOND_US
 #define COOLDOWN_TEMP_TOLERANCE_CC              80
 
-#define COOLER_CURRENT_THRESHOLD_A              0.100F // 100 mA
+// ENO,  29 janv 2019:  COOLER_CURRENT_THRESHOLD_A provient désormais du module fpa. #define COOLER_CURRENT_THRESHOLD_A              0.100F // 100 mA
 
 #define TDCStatusAllowSensorAcquisitionArmMask        (WaitingForCoolerMask | WaitingForInitMask | WaitingForICUMask | WaitingForNDFilterMask | \
                                                       WaitingForFilterWheelMask | AcquisitionStartedMask | \

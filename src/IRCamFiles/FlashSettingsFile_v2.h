@@ -5,14 +5,14 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.7.0
+ * Generated from the flash settings file structure definition XLS file version 2.8.0
  * using generateIRCamFileCLib.m Matlab script.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23158 $
+ * $Author: elarouche $
+ * $Date: 2019-04-02 16:09:55 -0400 (mar., 02 avr. 2019) $
+ * $Id: FlashSettingsFile_v2.h 23158 2019-04-02 20:09:55Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/FlashSettingsFile_v2.h $
  *
  * (c) Copyright 2016 Telops Inc.
  */
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      7
+#define FLASHSETTINGS_FILEMINORVERSION_V2      8
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -173,12 +173,16 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    float ExposureTimeMin;   /**< Minimum exposure time to overwrite value from FPA driver. */
    uint8_t ClConfiguration;   /**< Camera link configuration. */
    uint8_t SaveConfigurationEnabled;   /**< Indicates whether the save configuration functionality is enabled. */
-   float FPATemperatureConversionCoef0;   /**< 0 order coefficient for FPA diode temperature conversion */
-   float FPATemperatureConversionCoef1;   /**< 1st order coefficient for FPA diode temperature conversion */
-   float FPATemperatureConversionCoef2;   /**< 2nd order coefficient for FPA diode temperature conversion */
-   float FPATemperatureConversionCoef3;   /**< 3rd order coefficient for FPA diode temperature conversion */
-   float FPATemperatureConversionCoef4;   /**< 4th order coefficient for FPA diode temperature conversion */
-   float FPATemperatureConversionCoef5;   /**< 5th order coefficient for FPA diode temperature conversion */
+   float FPATemperatureConversionCoef0;   /**< 0 order coefficient for FPA diode temperature conversion. */
+   float FPATemperatureConversionCoef1;   /**< 1st order coefficient for FPA diode temperature conversion. */
+   float FPATemperatureConversionCoef2;   /**< 2nd order coefficient for FPA diode temperature conversion. */
+   float FPATemperatureConversionCoef3;   /**< 3rd order coefficient for FPA diode temperature conversion. */
+   float FPATemperatureConversionCoef4;   /**< 4th order coefficient for FPA diode temperature conversion. */
+   float FPATemperatureConversionCoef5;   /**< 5th order coefficient for FPA diode temperature conversion. */
+   uint16_t ElCorrMeasAtStarvation;   /**< Starvation level in ADC counts of the central or near central pixel in raw0 mode. */
+   uint16_t ElCorrMeasAtSaturation;   /**< Saturation level in ADC counts of the central or near central pixel in raw0 mode. */
+   uint16_t ElCorrMeasAtReference1;   /**< 1st electronic reference in ADC counts measured at the central or near central pixel in raw0 mode (any electronic correction disabled). */
+   uint16_t ElCorrMeasAtReference2;   /**< 2nd electronic reference in ADC counts measured at the central or near central pixel in raw0 mode (any electronic correction disabled). */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

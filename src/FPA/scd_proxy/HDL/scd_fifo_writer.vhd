@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 16474 $
+--!   $Author: odionne $
+--!   $Date: 2015-07-21 15:55:26 -0400 (mar., 21 juil. 2015) $
+--!   $Id: scd_fifo_writer.vhd 16474 2015-07-21 19:55:26Z odionne $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scd_proxy/HDL/scd_fifo_writer.vhd $
 ------------------------------------------------------------------
 
 

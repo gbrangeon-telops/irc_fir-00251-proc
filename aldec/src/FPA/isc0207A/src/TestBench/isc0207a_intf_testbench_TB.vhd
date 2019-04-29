@@ -5,6 +5,7 @@ use work.fpa_common_pkg.all;
 library ieee;
 use ieee.NUMERIC_STD.all;
 use ieee.std_logic_1164.all;
+use work.isc0207a_intf_testbench_pkg.all;
 
 -- Add your library and packages declaration here ...
 
@@ -18,8 +19,7 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
          ACQ_TRIG : in STD_LOGIC;
          ARESET : in STD_LOGIC;
          CLK_100M : in STD_LOGIC;
-         CLK_80M : in STD_LOGIC;
-         DOUT_CLK : in STD_LOGIC;
+         DOUT_CLK : out STD_LOGIC;
          DOUT_MISO : in t_axi4_stream_miso;
          FPA_EXP_INFO : in exp_info_type;
          HDER_MISO : in t_axi4_lite_miso;
@@ -27,7 +27,7 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
          MB_MOSI : in t_axi4_lite_mosi;
          XTRA_TRIG : in STD_LOGIC;
          ADC_SYNC_FLAG : out STD_LOGIC;
-         DOUT_MOSI : out t_axi4_stream_mosi32;
+         DOUT_MOSI : out t_axi4_stream_mosi64;
          ERR_FOUND : out STD_LOGIC;
          FPA_DIGIO1 : out STD_LOGIC;
          FPA_DIGIO10 : out STD_LOGIC;
@@ -49,21 +49,52 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
          QUAD4_CLK : out STD_LOGIC );
    end component;
    
+   
+   --   constant C_USER_XSIZE1   : natural := 320;
+   --   constant C_USER_YSIZE1   : natural := 256;
+   --   
+   --   constant C_USER_XSIZE2   : natural := 128;
+   --   constant C_USER_YSIZE2   : natural := 64;
+   --   
+   --   
+   --   constant C_ELEC_OFS_ENABLED            : std_logic := '1';
+   --   constant C_ELEC_OFS_OFFSET_IMAGE_MAP   : std_logic := '0';
+   
    constant CLK_100M_PERIOD         : time := 10 ns;
-   constant CLK_80M_PERIOD          : time := 12.5 ns;
+   constant CLK_85M_PERIOD          : time := 11.765 ns;
    constant ACQ_TRIG_PERIOD         : time := 700 us;
-   constant DOUT_CLK_PERIOD         : time := 6.25 ns;
+   constant DOUT_CLK_PERIOD         : time := 11.765 ns;
+   
+   
+   --  constant USER_FIRST_LINE_NUM : integer := 1;
+   
+   --   constant PAUSE_SIZE     : integer := 0;
+   --   constant TAP_NUM        : integer := 16;  
+   --   constant TRIG_PERIOD    : time := 100 us;
+   
+   
+   --   constant C_ROIC_XSIZE1   : natural := MIN(C_USER_XSIZE1 + 64, 320);
+   --   constant C_ROIC_YSIZE1   : natural := C_USER_YSIZE1;
+   --   
+   --   constant C_ROIC_XSIZE2   : natural := MIN(C_USER_XSIZE2 + 64, 320);
+   --   constant C_ROIC_YSIZE2   : natural := C_USER_YSIZE2; 
    
    
    
-   constant xsize : natural := 320;
-   constant ysize : natural := 256;
+   --   constant STRETCH_LINE_LENGTH_MCLK : natural := 1;   
+   
+   
+   constant DAC_CFG_BASE_ADD : natural := to_integer(unsigned(x"D00"));
+   
+   
+   --   constant user_sol_posl_pclk : natural := ((C_ROIC_XSIZE1 - C_USER_XSIZE1)/2)/TAP_NUM + 1; 
+   
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
    signal ACQ_TRIG : STD_LOGIC := '0';
    signal ARESET : STD_LOGIC;
    signal CLK_100M : STD_LOGIC := '0';
-   signal CLK_80M : STD_LOGIC  := '0';
+   signal CLK_85M : STD_LOGIC  := '0';
    signal DOUT_CLK : STD_LOGIC := '0';
    signal DOUT_MISO : t_axi4_stream_miso;
    signal FPA_EXP_INFO : exp_info_type;
@@ -73,7 +104,7 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
    signal XTRA_TRIG : STD_LOGIC;
    -- Observed signals - signals mapped to the output ports of tested entity
    signal ADC_SYNC_FLAG : STD_LOGIC;
-   signal DOUT_MOSI : t_axi4_stream_mosi32;
+   signal DOUT_MOSI : t_axi4_stream_mosi64;
    signal ERR_FOUND : STD_LOGIC;
    signal FPA_DIGIO1 : STD_LOGIC;
    signal FPA_DIGIO10 : STD_LOGIC;
@@ -94,10 +125,99 @@ architecture TB_ARCHITECTURE of isc0207a_intf_testbench_tb is
    signal QUAD3_CLK : STD_LOGIC;
    signal QUAD4_CLK : STD_LOGIC;
    signal fpa_softw_stat_i               : fpa_firmw_stat_type;
-   signal user_cfg_i                     : fpa_intf_cfg_type;
-   signal add                            : unsigned(31 downto 0) := (others => '0');
-   signal status                         : std_logic_vector(31 downto 0);
-   -- Add your code here ...
+   
+   --  signal comn_fpa_diag_mode             : unsigned(31 downto  0);
+   --   signal comn_fpa_diag_type             : unsigned(31 downto  0);
+   --   signal comn_fpa_pwr_on                : unsigned(31 downto  0);
+   --   signal comn_fpa_trig_ctrl_mode        : unsigned(31 downto  0);
+   --   signal comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto  0);
+   --   signal comn_fpa_acq_trig_period_min   : unsigned(31 downto  0);
+   --   signal comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto  0);
+   --   signal comn_fpa_xtra_trig_period_min  : unsigned(31 downto  0);
+   --   signal comn_fpa_stretch_acq_trig      : unsigned(31 downto  0);
+   --   signal diag_ysize                     : unsigned(31 downto  0);                 
+   --   signal diag_xsize_div_tapnum          : unsigned(31 downto  0);
+   --   signal roic_xstart                    : unsigned(31 downto  0);                                         
+   --   signal roic_ystart                    : unsigned(31 downto  0);
+   --   signal roic_xsize                     : unsigned(31 downto  0);                                           
+   --   signal roic_ysize_div2_m1             : unsigned(31 downto  0);
+   --   signal gain                           : unsigned(31 downto  0);
+   --   signal internal_outr                  : unsigned(31 downto  0);
+   --   signal real_mode_active_pixel_dly     : unsigned(31 downto  0);
+   --   signal speedup_lsync                  : unsigned(31 downto  0);
+   --   signal speedup_sample_row             : unsigned(31 downto  0);
+   --   signal speedup_unused_area            : unsigned(31 downto  0);
+   --   signal raw_area_line_start_num        : unsigned(31 downto  0);
+   --   signal raw_area_line_end_num          : unsigned(31 downto  0);                           
+   --   signal raw_area_sof_posf_pclk         : unsigned(31 downto  0);
+   --   signal raw_area_eof_posf_pclk         : unsigned(31 downto  0);
+   --   signal raw_area_sol_posl_pclk         : unsigned(31 downto  0);
+   --   signal raw_area_eol_posl_pclk         : unsigned(31 downto  0);
+   --   signal raw_area_eol_posl_pclk_p1      : unsigned(31 downto  0);
+   --   signal raw_area_window_lsync_num      : unsigned(31 downto  0);
+   --   signal raw_area_line_period_pclk      : unsigned(31 downto  0);
+   --   signal raw_area_readout_pclk_cnt_max  : unsigned(31 downto  0);
+   --   signal user_area_line_start_num       : unsigned(31 downto  0);
+   --   signal user_area_line_end_num         : unsigned(31 downto  0);
+   --   signal user_area_sol_posl_pclk        : unsigned(31 downto  0);
+   --   signal user_area_eol_posl_pclk        : unsigned(31 downto  0);
+   --   signal user_area_eol_posl_pclk_p1     : unsigned(31 downto  0);
+   --   signal stretch_area_sol_posl_pclk     : unsigned(31 downto  0);
+   --   signal stretch_area_eol_posl_pclk     : unsigned(31 downto  0);
+   --   signal pix_samp_num_per_ch            : unsigned(31 downto  0);
+   --   signal hgood_samp_sum_num             : unsigned(31 downto  0);
+   --   signal hgood_samp_mean_numerator      : unsigned(31 downto  0);
+   --   signal vgood_samp_sum_num             : unsigned(31 downto  0);
+   --   signal vgood_samp_mean_numerator      : unsigned(31 downto  0);
+   --   signal good_samp_first_pos_per_ch     : unsigned(31 downto  0);
+   --   signal good_samp_last_pos_per_ch      : unsigned(31 downto  0);
+   --   signal adc_clk_phase_1                : unsigned(31 downto  0);
+   --   signal adc_clk_phase_2                : unsigned(31 downto  0);
+   --   signal adc_clk_phase_3                : unsigned(31 downto  0);
+   --   signal adc_clk_phase_4                : unsigned(31 downto  0); 
+   --   signal lsydel_mclk                    : unsigned(31 downto  0); 
+   --   signal boost_mode                     : unsigned(31 downto  0); 
+   --   signal speedup_lsydel                 : unsigned(31 downto  0);
+   --   signal adc_clk_pipe_sync_pos          : unsigned(31 downto  0);
+   --   signal elec_ofs_offset_null_forced    : unsigned(31 downto  0);   
+   --   signal elec_ofs_pix_faked_value_forced : unsigned(31 downto  0);  
+   --   signal elec_ofs_pix_faked_value        : unsigned(31 downto  0);  
+   --   signal elec_ofs_offset_minus_pix_value : unsigned(31 downto  0);  
+   --   signal elec_ofs_add_const              : unsigned(31 downto  0);  
+   --   signal elec_ofs_start_dly_sampclk      : unsigned(31 downto  0);  
+   --   signal elec_ofs_samp_num_per_ch        : unsigned(31 downto  0);  
+   --   signal elec_ofs_samp_mean_numerator    : unsigned(31 downto  0);
+   --   signal readout_plus_delay              : unsigned(31 downto  0);
+   --   signal tri_window_and_intmode_part     : unsigned(31 downto  0); 
+   --   signal int_time_offset                 : unsigned(31 downto  0);
+   --   signal tsh_min                         : unsigned(31 downto  0);
+   --   signal tsh_min_minus_int_time_offset   : unsigned(31 downto  0); 
+   
+   signal user_xsize1 : natural;
+   signal user_ysize1 : natural;
+   signal user_xsize2 : natural;
+   signal user_ysize2 : natural;
+   signal user_xsize3 : natural;
+   signal user_ysize3 : natural;
+   
+   
+   signal user_cfg_vector1              : unsigned(87*32-1 downto 0);
+   signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
+   signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
+   signal vdac_value_1                  : unsigned(31 downto  0);
+   signal vdac_value_2                  : unsigned(31 downto  0);
+   signal vdac_value_3                  : unsigned(31 downto  0);
+   signal vdac_value_4                  : unsigned(31 downto  0);
+   signal vdac_value_5                  : unsigned(31 downto  0);
+   signal vdac_value_6                  : unsigned(31 downto  0);
+   signal vdac_value_7                  : unsigned(31 downto  0);
+   signal vdac_value_8                  : unsigned(31 downto  0);
+   
+   signal dac_cfg_vector                : unsigned(8*32-1 downto 0);
+   
+   signal add                           : unsigned(31 downto 0) := (others => '0');
+   signal status                        : std_logic_vector(31 downto 0);
+   -- Add your code here _..
    
 begin
    
@@ -119,9 +239,9 @@ begin
    MB_CLK <= CLK_100M;
    
    -- clk
-   U2: process(CLK_80M)
+   U2: process(CLK_85M)
    begin
-      CLK_80M <= not CLK_80M after CLK_80M_PERIOD/2; 
+      CLK_85M <= not CLK_85M after CLK_85M_PERIOD/2; 
    end process;
    
    -- clk
@@ -142,7 +262,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(10, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(100, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -155,56 +275,63 @@ begin
    HDER_MISO.WREADY  <= '1';
    HDER_MISO.AWREADY <= '1';
    
-   user_cfg_i.COMN.FPA_DIAG_MODE <= '0';
-   user_cfg_i.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR;
-   user_cfg_i.COMN.fpa_pwr_on <= '1';
-   user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_INT_END_TO_TRIG_START;
-   user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(60000, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);
-   user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(10000, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
-   user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(60000, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
-   user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(10000, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);
    
-   
-   user_cfg_i.XSTART <= (others => '0');
-   user_cfg_i.YSTART <= (others => '0');
-   user_cfg_i.XSIZE  <= to_unsigned(xsize, user_cfg_i.XSIZE'length);
-   user_cfg_i.YSIZE  <= to_unsigned(ysize, user_cfg_i.YSIZE'length);
-   user_cfg_i.GAIN <= '0';  
-   user_cfg_i.INVERT <= '0';
-   user_cfg_i.REVERT <= '0';
-   user_cfg_i.ONCHIP_BIN_256 <= '0';
-   user_cfg_i.ONCHIP_BIN_128 <= '0';
-   user_cfg_i.PIX_SAMP_NUM_PER_CH <= to_unsigned(4, user_cfg_i.PIX_SAMP_NUM_PER_CH'length);
-   user_cfg_i.GOOD_SAMP_FIRST_POS_PER_CH <= to_unsigned(1, user_cfg_i.GOOD_SAMP_FIRST_POS_PER_CH'length); 
-   user_cfg_i.GOOD_SAMP_LAST_POS_PER_CH <= to_unsigned(4, user_cfg_i.GOOD_SAMP_LAST_POS_PER_CH'length);
-   user_cfg_i.GOOD_SAMP_SUM_NUM <= to_unsigned(4, user_cfg_i.GOOD_SAMP_SUM_NUM'length);
-   user_cfg_i.GOOD_SAMP_MEAN_NUMERATOR <= to_unsigned(1, user_cfg_i.GOOD_SAMP_MEAN_NUMERATOR'length);
-   user_cfg_i.GOOD_SAMP_MEAN_DIV_BIT_POS <= to_unsigned(2, user_cfg_i.GOOD_SAMP_MEAN_DIV_BIT_POS'length); -- log2(2) pour une division par 2
-   user_cfg_i.YSIZE_DIV2_M1 <= to_unsigned(ysize/2-1, user_cfg_i.YSIZE_DIV2_M1'length); 
-   user_cfg_i.IMG_SAMP_NUM <= to_unsigned(4*xsize*ysize, user_cfg_i.IMG_SAMP_NUM'length);
-   user_cfg_i.IMG_SAMP_NUM_PER_CH <= to_unsigned(4*xsize*ysize/16, user_cfg_i.IMG_SAMP_NUM_PER_CH'length);
-   user_cfg_i.FPA_ACTIVE_PIXEL_DLY <= to_unsigned(3, user_cfg_i.FPA_ACTIVE_PIXEL_DLY'length);  --
-   user_cfg_i.DIAG_ACTIVE_PIXEL_DLY <= to_unsigned(2, user_cfg_i.DIAG_ACTIVE_PIXEL_DLY'length);  -- ajutsé via simulation
-   user_cfg_i.SOF_SAMP_POS_START_PER_CH <= to_unsigned(1, user_cfg_i.SOF_SAMP_POS_START_PER_CH'length);
-   user_cfg_i.SOF_SAMP_POS_END_PER_CH <= to_unsigned(4, user_cfg_i.SOF_SAMP_POS_END_PER_CH'length);
-   user_cfg_i.EOF_SAMP_POS_START_PER_CH <= to_unsigned(4*xsize*ysize/16-4, user_cfg_i.EOF_SAMP_POS_START_PER_CH'length); 
-   user_cfg_i.EOF_SAMP_POS_END_PER_CH <= to_unsigned(4*xsize*ysize/16, user_cfg_i.EOF_SAMP_POS_END_PER_CH'length); 
-   user_cfg_i.DIAG_TIR <= to_unsigned(6, user_cfg_i.DIAG_TIR'length);
-   user_cfg_i.XSIZE_DIV_TAPNUM <= to_unsigned(xsize/16, user_cfg_i.XSIZE_DIV_TAPNUM'length);
-   
-   user_cfg_i.readout_plus_delay <= to_unsigned(20*(6 + xsize*ysize/32), user_cfg_i.readout_plus_delay'length);
-   user_cfg_i.tri_window_and_intmode_part <= to_unsigned(10, user_cfg_i.tri_window_and_intmode_part'length);
-   user_cfg_i.int_time_offset <= to_unsigned(80, user_cfg_i.int_time_offset'length);
-   user_cfg_i.tsh_min <= to_unsigned(780, user_cfg_i.tsh_min'length);
-   user_cfg_i.tsh_min_minus_int_time_offset <= to_unsigned(700, user_cfg_i.tsh_min_minus_int_time_offset'length);
-   user_cfg_i.adc_clk_phase <= to_unsigned(13, user_cfg_i.adc_clk_phase'length);
-   
+   process(MB_CLK)
+   begin
+      if rising_edge(MB_CLK) then 
+         
+         
+         fpa_softw_stat_i.fpa_roic     <= FPA_ROIC_ISC0207;
+         fpa_softw_stat_i.fpa_output   <= OUTPUT_ANALOG;    
+         fpa_softw_stat_i.fpa_input    <= LVTTL50;        
+         
+         -- cfg usager
+         user_xsize1 <= 320;
+         user_ysize1 <= 256;
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
+         
+         user_xsize2 <= 320;
+         user_ysize2 <= 256;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         
+--         user_xsize3 <= 320;
+--         user_ysize3 <= 256;
+--         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
+         
+         -- dac       
+         vdac_value_1               	<= to_unsigned(11630, 32); 
+         vdac_value_2               	<= to_unsigned(11630, 32); 
+         vdac_value_3               	<= to_unsigned(11630, 32);
+         vdac_value_4               	<= to_unsigned(11630, 32); 
+         vdac_value_5               	<= to_unsigned(11630, 32); 
+         vdac_value_6               	<= to_unsigned(11630, 32); 
+         vdac_value_7               	<= to_unsigned(11630, 32); 
+         vdac_value_8               	<= to_unsigned(11630, 32); 
+         
+         -- fleg dac
+         dac_cfg_vector <= vdac_value_1               
+         & vdac_value_2                   
+         & vdac_value_3                   
+         & vdac_value_4                   
+         & vdac_value_5                   
+         & vdac_value_6                   
+         & vdac_value_7                   
+         & vdac_value_8;       
+         
+         --
+         
+      end if;
+   end process;   
    
    fpa_softw_stat_i.fpa_roic <= FPA_ROIC_ISC0207;
    fpa_softw_stat_i.fpa_output <= OUTPUT_ANALOG;    
    fpa_softw_stat_i.fpa_input <= LVTTL50;
    
    ublaze_sim: process is
+      
+      variable start_pos : integer;
+      variable end_pos   : integer;
+      
    begin
       MB_MOSI.awaddr <= (others => '0');
       MB_MOSI.awprot <= (others => '0');
@@ -219,154 +346,74 @@ begin
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';
       
+      wait until areset = '0'; 
       
-      wait until areset = '0';
-      
-      wait until rising_edge(MB_CLK);
-      
-      write_axi_lite (MB_CLK, x"00000000", resize('0'&user_cfg_i.COMN.FPA_DIAG_MODE, 32), MB_MISO,  MB_MOSI);
+      wait for 500 ns;      
+      write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns;      
+      write_axi_lite (MB_CLK, resize(X"AE4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AE8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
+      wait for 500 ns;
       
-      write_axi_lite (MB_CLK,  x"00000004", resize('0'&user_cfg_i.COMN.FPA_DIAG_TYPE, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
+      for ii in 0 to 8-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := dac_cfg_vector'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(DAC_CFG_BASE_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;      
       
-      write_axi_lite (MB_CLK,  x"00000008", resize('0'&user_cfg_i.COMN.fpa_pwr_on, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
       
-      write_axi_lite (MB_CLK, x"0000000C", resize('0'&user_cfg_i.COMN.fpa_trig_ctrl_mode, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000010", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000014", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_period_min, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000018", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000001C", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_period_min, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;  
-      
-      write_axi_lite (MB_CLK, x"00000020", std_logic_vector(resize(user_cfg_i.XSTART, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000024", std_logic_vector(resize(user_cfg_i.YSTART, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000028", std_logic_vector(resize(user_cfg_i.XSIZE, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000002C", std_logic_vector(resize(user_cfg_i.YSIZE, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000030", resize('0'&user_cfg_i.GAIN, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000034", resize('0'&user_cfg_i.INVERT, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000038", resize('0'&user_cfg_i.REVERT, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000003C", resize('0'&user_cfg_i.ONCHIP_BIN_256, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000040", resize('0'&user_cfg_i.ONCHIP_BIN_128, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000044", std_logic_vector(resize(user_cfg_i.PIX_SAMP_NUM_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000048", std_logic_vector(resize(user_cfg_i.GOOD_SAMP_FIRST_POS_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000004C", std_logic_vector(resize(user_cfg_i.GOOD_SAMP_LAST_POS_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000050", std_logic_vector(resize(user_cfg_i.GOOD_SAMP_SUM_NUM, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000054", std_logic_vector(resize(user_cfg_i.GOOD_SAMP_MEAN_NUMERATOR, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000058", std_logic_vector(resize(user_cfg_i.GOOD_SAMP_MEAN_DIV_BIT_POS, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000005C", std_logic_vector(resize(user_cfg_i.YSIZE_DIV2_M1, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;  
-      
-      write_axi_lite (MB_CLK, x"00000060", std_logic_vector(resize(user_cfg_i.IMG_SAMP_NUM, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000064", std_logic_vector(resize(user_cfg_i.IMG_SAMP_NUM_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000068", std_logic_vector(resize(user_cfg_i.FPA_ACTIVE_PIXEL_DLY, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000006C", std_logic_vector(resize(user_cfg_i.DIAG_ACTIVE_PIXEL_DLY, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000070", std_logic_vector(resize(user_cfg_i.SOF_SAMP_POS_START_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000074", std_logic_vector(resize(user_cfg_i.SOF_SAMP_POS_END_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000078", std_logic_vector(resize(user_cfg_i.EOF_SAMP_POS_START_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"0000007C", std_logic_vector(resize(user_cfg_i.EOF_SAMP_POS_END_PER_CH, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000080", std_logic_vector(resize(user_cfg_i.DIAG_TIR, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000084", std_logic_vector(resize(user_cfg_i.XSIZE_DIV_TAPNUM, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, x"00000088", std_logic_vector(resize(user_cfg_i.readout_plus_delay, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"0000008C", std_logic_vector(resize(user_cfg_i.tri_window_and_intmode_part, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"00000090", std_logic_vector(resize(user_cfg_i.int_time_offset, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"00000094", std_logic_vector(resize(user_cfg_i.tsh_min, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"00000098", std_logic_vector(resize(user_cfg_i.tsh_min_minus_int_time_offset, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"0000009C", std_logic_vector(resize(user_cfg_i.adc_clk_phase, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, resize(X"E0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, resize(X"E4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
-      
-      write_axi_lite (MB_CLK, resize(X"E8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
-      wait for 30 ns; 
+      for ii in 0 to 87-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector1'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector1(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
       
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000404", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;
+      --wait for 10 ns; 
+      
+      wait for 500 us;
+      write_axi_lite (MB_CLK, x"00000AF0", std_logic_vector(to_unsigned(1, 32)), MB_MISO,  MB_MOSI);
+      wait for 50 ns;
+      write_axi_lite (MB_CLK, x"00000AF0", std_logic_vector(to_unsigned(0, 32)), MB_MISO,  MB_MOSI);
+      wait for 50 ns;
+      
+      
+      wait for 15 ms;
+      
+      for ii in 0 to 87-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector2'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
+      
+--      wait for 6 ms;
+--      
+--      for ii in 0 to 87-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector3'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop;
+--      
+      
       
       report "FCR written"; 
       
       report "END OF SIMULATION" 
       severity error;
-   end process ublaze_sim;
-   
-   
+   end process ublaze_sim;   
    
    -- Unit Under Test port map
    UUT : isc0207a_intf_testbench
@@ -374,7 +421,6 @@ begin
       ACQ_TRIG => ACQ_TRIG,
       ARESET => ARESET,
       CLK_100M => CLK_100M,
-      CLK_80M => CLK_80M,
       DOUT_CLK => DOUT_CLK,
       DOUT_MISO => DOUT_MISO,
       FPA_EXP_INFO => FPA_EXP_INFO,

@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 22828 $
+--!   $Author: enofodjie $
+--!   $Date: 2019-02-09 10:45:11 -0500 (sam., 09 févr. 2019) $
+--!   $Id: scd_prog_ctrler.vhd 22828 2019-02-09 15:45:11Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scd_proxy/HDL/scd_prog_ctrler.vhd $
 ------------------------------------------------------------------
 
 
@@ -118,11 +118,11 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    
-   -- attribute dont_touch                         : string;
-   -- attribute dont_touch of acq_int_i            : signal is "true";
-   -- attribute dont_touch of fpa_int_i            : signal is "true";
-   -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   -- attribute dont_touch of int_indx_i           : signal is "true";
+   -- -- attribute dont_touch                         : string;
+   -- -- attribute dont_touch of acq_int_i            : signal is "true";
+   -- -- attribute dont_touch of fpa_int_i            : signal is "true";
+   -- -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
+   -- -- attribute dont_touch of int_indx_i           : signal is "true";
    
 begin
    

@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author$
--- $LastChangedDate$
--- $Revision$ 
+-- $Author: odionne $
+-- $LastChangedDate: 2017-02-28 09:16:24 -0500 (mar., 28 févr. 2017) $
+-- $Revision: 20140 $ 
 -------------------------------------------------------------------------------
 --
 -- Description : Test bench for Calibration module
@@ -46,9 +46,16 @@ entity calib_tb_stim is
       FL_PIPE     : out std_logic;
       
       --------------------------------
+      -- Data
+      --------------------------------
+      TX_MOSI  : out t_axi4_stream_mosi64;
+      TX_MISO  : in t_axi4_stream_miso;
+      
+      --------------------------------
       -- MISC
       --------------------------------
       CLK160   : out std_logic;
+      CLK80    : out std_logic;
       CLK100   : out std_logic;
       ARESETN  : out std_logic
    );
@@ -60,10 +67,12 @@ architecture rtl of calib_tb_stim is
    
    -- CLK and RESET
    constant clk160_per : time := 6.25 ns;
+   constant clk80_per  : time := 12.5 ns;
    constant clk100_per : time := 10 ns;
    
    -- CLK and RESET
    signal clk160_o : std_logic := '0';
+   signal clk80_o  : std_logic := '0';
    signal clk100_o : std_logic := '0';
    signal rstn_i : std_logic := '0';
    
@@ -84,6 +93,7 @@ architecture rtl of calib_tb_stim is
 begin
    --! Assign clock
    CLK160 <= clk160_o;
+   CLK80 <= clk80_o;
    CLK100 <= clk100_o;
    ARESETN <= rstn_i;
 
@@ -91,6 +101,12 @@ begin
    CLK160_GEN: process(clk160_o)
    begin
       clk160_o <= not clk160_o after clk160_per/2;                          
+   end process;
+
+   --! Clock 80MHz generation                   
+   CLK80_GEN: process(clk80_o)
+   begin
+      clk80_o <= not clk80_o after clk80_per/2;                          
    end process;
    
    --! Clock 100MHz generation 
@@ -111,8 +127,8 @@ begin
    --! Fifo
    SYNC_MOSI.TVALID <= '1';
    SYNC_MOSI.TDATA <= (others => '0');
-   SYNC_MOSI.TSTRB <= (others => '0');
-   SYNC_MOSI.TKEEP <= (others => '0');
+   SYNC_MOSI.TSTRB <= (others => '1');
+   SYNC_MOSI.TKEEP <= (others => '1');
    SYNC_MOSI.TLAST <= sync_mosi_tlast;
    SYNC_MOSI.TID <= (others => '0');
    SYNC_MOSI.TDEST <= (others => '0');
@@ -373,5 +389,26 @@ begin
       fl_pipe_i <= '0';
 
    end process MB_PROCESS;
+   
+   
+   --! Data simulation
+   DATA_GEN : process
+   begin
+      
+      wait until rstn_i = '1';
+      wait for 1 us;
+   
+      ------------------------------------------
+      -- AXI Stream function signatures
+      ------------------------------------------
+      --procedure write_axis64 (signal Clk : in std_logic; Value : in std_logic_vector; tlast : in std_logic; signal miso : in  t_axi4_stream_miso; signal mosi : out t_axi4_stream_mosi64 );
+      
+      wait until rising_edge(clk80_o);
+      write_axis64(clk80_o, x"0003000200010000", '0', TX_MISO, TX_MOSI);
+      
+      wait until rising_edge(clk80_o);
+      write_axis64(clk80_o, x"0007000600050004", '1', TX_MISO, TX_MOSI);
+      
+   end process;
 
 end rtl;

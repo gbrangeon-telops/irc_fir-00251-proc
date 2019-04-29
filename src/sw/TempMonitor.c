@@ -4,11 +4,11 @@
  *  
  *  This file implements the temperature monitor module.
  *  
- *  $Rev$
- *  $Author$
- *  $Date$
- *  $Id$
- *  $URL$
+ *  $Rev: 17364 $
+ *  $Author: dalain $
+ *  $Date: 2015-11-10 13:08:39 -0500 (mar., 10 nov. 2015) $
+ *  $Id: TempMonitor.c 17364 2015-11-10 18:08:39Z dalain $
+ *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/TempMonitor.c $
  *
  * (c) Copyright 2014 Telops Inc.
  */

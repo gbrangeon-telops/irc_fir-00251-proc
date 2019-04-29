@@ -5,9 +5,9 @@
 -- Author   : PDA (TEL-1000), SSA (TEL-2000)
 -- Company  : Telops inc.
 --
--- $Revision$
--- $Author$
--- $LastChangedDate$
+-- $Revision: 22650 $
+-- $Author: pcouture $
+-- $LastChangedDate: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
 ------------------------------------------------------------------------------*/
 #ifndef FWCONTROLLER_H
 #define FWCONTROLLER_H
@@ -137,21 +137,22 @@ typedef enum
 
 typedef enum
 {
-   POSITION_HOMECMD_MODE = 0,
-   POSITION_HOMEACK_MODE,
-   POSITION_SET_1RPM,
+   POSITION_SET_1RPM = 0,
    POSITION_WAIT_SET_1RPM_ACK,
    POSITION_WAIT_SET_1RPM_NOTIFY,
    POSITION_SET_GAIN,
    POSITION_WAIT_SET_GAIN,
+   POSITION_ENABLEMOTOR_MODE,
+   POSITION_WAIT_ENABLEMOTOR_ACK,
+   POSITION_QUERY_POS_MODE,
+   POSITION_WAIT_QUERY_POS,
    POSITION_NEW_POS_MODE,
    POSITION_NEWPOS_ACK_MODE,
    POSITION_WAIT_MODE,
-   POSITION_CHECK_POS_MODE,
-   POSITION_INTEGRATION_MODE,
-   POSITION_READY_MODE,
-   POSITION_QUERY_POS_MODE,
-   POSITION_WAIT_QUERY_POS
+   POSITION_MOVE_DONE_MODE,
+   POSITION_DISABLEMOTOR_MODE,
+   POSITION_WAIT_DISABLEMOTOR_ACK,
+   POSITION_READY_MODE
 }  FW_positionMode_t;
 
 typedef enum

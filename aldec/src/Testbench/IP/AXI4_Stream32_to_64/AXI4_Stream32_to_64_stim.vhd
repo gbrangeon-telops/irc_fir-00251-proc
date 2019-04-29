@@ -3,11 +3,11 @@
 --!   @brief Simulation file for AXI4_Stream32_to_64 component.
 --!   @details This file test de AXI4_Stream32_to_64 component.
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 12881 $
+--!   $Author: pdaraiche $
+--!   $Date: 2014-01-17 15:09:18 -0500 (ven., 17 janv. 2014) $
+--!   $Id: AXI4_Stream32_to_64_stim.vhd 12881 2014-01-17 20:09:18Z pdaraiche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/IP/AXI4_Stream32_to_64/AXI4_Stream32_to_64_stim.vhd $
 ------------------------------------------------------------------
 
 library IEEE;

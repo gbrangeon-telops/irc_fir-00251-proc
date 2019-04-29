@@ -4,11 +4,11 @@
  *  
  *  These functions are a copy of the real ones and are used to simulates the microblaze.
  *  
- *  $Rev$
- *  $Author$
- *  $LastChangedDate$
- *  $Id$
- *  $URL$
+ *  $Rev: 13301 $
+ *  $Author: enofodjie $
+ *  $LastChangedDate: 2014-03-13 11:22:29 -0400 (jeu., 13 mars 2014) $
+ *  $Id: mb_axi4l_bridge_SC.h 13301 2014-03-13 15:22:29Z enofodjie $
+ *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/SystemC/mb_axi4l_bridge_SC.h $
  */
 #ifndef __MB_AXI4L_BRIDGE_SC_H__
 #define __MB_AXI4L_BRIDGE_SC_H__

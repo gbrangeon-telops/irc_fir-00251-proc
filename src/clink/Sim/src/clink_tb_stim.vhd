@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author$
--- $LastChangedDate$
--- $Revision$ 
+-- $Author: odionne $
+-- $LastChangedDate: 2016-04-19 15:45:35 -0400 (mar., 19 avr. 2016) $
+-- $Revision: 18581 $ 
 -------------------------------------------------------------------------------
 --
 -- Description : Test bench for Clink delay calibration module

@@ -4,11 +4,11 @@
  *
  * This file defines the device key module.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 18930 $
+ * $Author: odionne $
+ * $Date: 2016-06-23 17:17:03 -0400 (jeu., 23 juin 2016) $
+ * $Id: DeviceKey.h 18930 2016-06-23 21:17:03Z odionne $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/DeviceKey.h $
  *
  * (c) Copyright 2016 Telops Inc.
  */

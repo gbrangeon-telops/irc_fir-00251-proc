@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 22610 $
+--!   $Author: enofodjie $
+--!   $Date: 2018-12-05 14:43:02 -0500 (mer., 05 déc. 2018) $
+--!   $Id: scorpiomwA_SRI_prog_spi_feeder.vhd 22610 2018-12-05 19:43:02Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scorpiomwA_SRI/HDL/scorpiomwA_SRI_prog_spi_feeder.vhd $
 ------------------------------------------------------------------
 
 

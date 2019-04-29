@@ -189,7 +189,11 @@ struct s_FpaStatus    //
    // fpa init status
    uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
    uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA 
-   uint32_t  prog_init_done;               // prog_init_done à '1' si la config d'initialisation est envoyée dans le ROIC
+   uint32_t  prog_init_done;              // -- monte à '1' lorsque la config d'initialisation est programmée dans le ROIC. Ce qui est intéressant pour les ROIC necessitant une config d'initialisation
+   
+   // cooler
+   uint32_t  cooler_on_curr_min_mA;       // seuil au dessus duquel considérer que le refroidisseur est allumé
+   uint32_t  cooler_off_curr_max_mA;      // seuil en dessous duquel considérer que le refroidisseur est eteint
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

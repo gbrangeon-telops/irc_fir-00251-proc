@@ -1,0 +1,3 @@
+@echo off
+call D:\Telops\FIR-00251-Proc\bin\scripts\setEnvironment.bat pelicanD_150Hz 160
+call %scriptsDir%\generateBuildInfoFile.bat pelicanD_150Hz

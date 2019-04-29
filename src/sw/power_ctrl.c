@@ -4,11 +4,11 @@
  *
  * This file implements the camera power manager module.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23312 $
+ * $Author: elarouche $
+ * $Date: 2019-04-16 16:58:38 -0400 (mar., 16 avr. 2019) $
+ * $Id: power_ctrl.c 23312 2019-04-16 20:58:38Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/power_ctrl.c $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -19,10 +19,11 @@
 #include "XADC_channels.h"
 #include "Acquisition.h"
 #include "Calibration.h"
-#include "Buffermanager.h"
+#include "BufferManager.h"
 #include "Actualization.h"
 #include "BuiltInTests.h"
 #include "DeviceKey.h"
+#include "mb_axi4l_bridge.h"
 
 powerCtrl_t gPowerCtrl;
 
@@ -36,12 +37,12 @@ uint8_t gPowerOnIsAllowed = 1;
  *
  * @param gpioDeviceId is the power manager GPIO device ID that can be found in xparameters.h file.
  * @param intc is the pointer to the Interrupt controller instance.
- * @param gpioIntrId is the power manager GPIO interrupt ID that can be found in xparameters.h file.
+ * @param IntrId is the Flash Reset interrupt ID that can be found in xparameters.h file.
  *
  * @return IRC_SUCCESS if successfully initialized
  * @return IRC_FAILURE if failed to initialize.
  */
-IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t gpioIntrId)
+IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t IntrId)
 {
    XStatus status;
 
@@ -51,17 +52,14 @@ IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t gpioIntrI
       return IRC_FAILURE;
    }
 
-   XGpio_InterruptEnable(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT);
-   XGpio_InterruptGlobalEnable(&gPowerCtrl.GPIO);
-
-   status = XIntc_Connect(p_intc, gpioIntrId, (XInterruptHandler)Power_IntrHandler, &gPowerCtrl);
+   status = XIntc_Connect(p_intc, IntrId, (XInterruptHandler)Power_IntrHandler, &gPowerCtrl);
    if (status != XST_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
    // Set power management GPIO direction (0 for output, 1 for input)
-   XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, 0x00000400);
+   XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, 0x00000000);
 
    // Set power management GPIO initial value
    XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, POWER_BUFFER_MASK);
@@ -94,7 +92,7 @@ channelPowerState_t Power_GetChannelPowerState(powerChannel_t channel)
  */
 pushButtonState_t Power_GetPushButtonState()
 {
-   if (Power_GetChannelPowerState(PC_PUSH_BUTTON) == CPS_OFF)
+   if (AXI4L_read32(XPAR_FLASHRESET_0_BASEADDR) == CPS_OFF)
    {
       return PBS_PUSHED;
    }
@@ -352,7 +350,6 @@ void Power_ToggleDevicePowerState()
  */
 void Power_SM()
 {
-   extern t_bufferManager gBufManager;
    static uint8_t startup = 1;
 
    switch (gcRegsData.DevicePowerState)
@@ -403,7 +400,9 @@ void Power_SM()
                switch (Acquisition_GetPowerState())
                {
                   case DPS_PowerStandby:
-                     BufferManager_ClearSequence(&gBufManager, &gcRegsData);
+                     GC_SetMemoryBufferSequenceClearAll(1);
+                     GC_SetMemoryBufferSequenceDownloadMode(MBSDM_Off);
+                     GC_SetMemoryBufferMode(MBM_Off);
                      gcRegsData.DevicePowerState = DPS_PowerStandby;
                      if (gcRegsData.TestImageSelector == TIS_Off)
                      {
@@ -494,6 +493,4 @@ void Power_IntrHandler(powerCtrl_t *p_powerCtrl)
          PM_DBG("Button pushed.");
       }
    }
-
-   XGpio_InterruptClear(&p_powerCtrl->GPIO, PGPIOC_POWER_MANAGEMENT);
 }

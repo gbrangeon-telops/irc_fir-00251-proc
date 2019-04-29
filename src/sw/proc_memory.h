@@ -4,11 +4,11 @@
  *
  * This file defines processing FPGA DDR memory macros.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23157 $
+ * $Author: elarouche $
+ * $Date: 2019-04-02 16:06:10 -0400 (mar., 02 avr. 2019) $
+ * $Id: proc_memory.h 23157 2019-04-02 20:06:10Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/proc_memory.h $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -48,7 +48,7 @@
  * Internal memory buffer
  */
 #define PROC_MEM_MEMORY_BUFFER_BASEADDR      (PROC_MEM_DELTA_BETA_HIGHADDR + 1)
-#define PROC_MEM_MEMORY_BUFFER_SIZE          (XPAR_MIG_CALIBRATION_CAL_DDR_MIG_HIGHADDR + 1 - PROC_MEM_MEMORY_BUFFER_BASEADDR)
+#define PROC_MEM_MEMORY_BUFFER_SIZE          (XPAR_MIG_CALIBRATION_CAL_DDR_MIG_HIGHADDR - PROC_MEM_MEMORY_BUFFER_BASEADDR + 1)
 #define PROC_MEM_MEMORY_BUFFER_HIGHADDR      (PROC_MEM_MEMORY_BUFFER_BASEADDR + PROC_MEM_MEMORY_BUFFER_SIZE - 1)
 
 #endif // PROC_MEMORY_H

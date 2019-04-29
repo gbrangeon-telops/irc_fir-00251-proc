@@ -4,18 +4,17 @@
  *
  * This file implements GPS module.
  * 
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23147 $
+ * $Author: elarouche $
+ * $Date: 2019-04-01 14:32:59 -0400 (lun., 01 avr. 2019) $
+ * $Id: gps.c 23147 2019-04-01 18:32:59Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/GPS/driver/gps.c $
  *
  * (c) Copyright 2015 Telops Inc.
  */
 
 #include "GPS.h"
 #include "trig_gen.h"
-#include "UART_Utils.h"
 #include "hder_inserter.h"
 #include "GC_Events.h"
 #include <string.h>
@@ -159,21 +158,25 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data,
    status = CircularUART_Init(&GPS_Data->uart,
 		   uartDeviceId,
 		   intc,
-		   uartIntrId);
+		   uartIntrId,
+		   NULL,
+		   NULL,
+		   Ns550);
+
+
 	if (status != IRC_SUCCESS)
 	{
 	  return IRC_FAILURE;
 	}
 
-	if (UART_Config(&GPS_Data->uart.uart, 9600, 8, 'N', 1) != IRC_SUCCESS)
+	if (CircularUART_Config(&GPS_Data->uart, 9600, 8, 'N', 1) != IRC_SUCCESS)
 	{
 	  return IRC_FAILURE;
 	}
 
-	GPS_Data->uart.rxCircBuffer = &GPS_Data->rxCircDataBuffer;
-	GPS_Data->uart.txCircBuffer = NULL;
-	GPS_Data->uart.uart.Handler = GPS_UART_IntrHandler;
-	GPS_Data->uart.uart.CallBackRef = GPS_Data;
+CircularUART_SetCircularBuffers(&GPS_Data->uart, &GPS_Data->rxCircDataBuffer, NULL);
+
+	CircularUART_SetHandler(&GPS_Data->uart, GPS_UART_IntrHandler, GPS_Data);
 
    // Set ModeIndicator to "Data Not Valid"
 	GPS_Data->ModeIndicator = 'N';
@@ -191,7 +194,7 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data,
    GPS_Reset(GPS_Data);
 
    // Reset RX FIFO
-   UART_ResetRxFifo(&GPS_Data->uart.uart);
+   CircularUART_ResetFifo(&GPS_Data->uart);
 
    return IRC_SUCCESS;
 }
@@ -618,7 +621,7 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
    }
    
    // Gestion d'erreur du UART overflow : In our case, the overflow will almost never accure because of LL bus data throttling, so our best indicator is the FIFO FULL signal
-   if (XUartNs550_GetLineStatusReg(GPS_Data->uart.uart.BaseAddress) & XUN_LSR_OVERRUN_ERROR)
+    if (XUartNs550_GetLineStatusReg(GPS_Data->uart.uart.Ns550.BaseAddress) & XUN_LSR_OVERRUN_ERROR)
    {
       GPS_Reset(GPS_Data); // reset uart and data structure
       // Set the error flag and report genicam error once if it wasn't done yet

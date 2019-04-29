@@ -4,11 +4,11 @@
  *
  * This file defines the file information module interface.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 18925 $
+ * $Author: dalain $
+ * $Date: 2016-06-22 16:11:55 -0400 (mer., 22 juin 2016) $
+ * $Id: FileInfo.h 18925 2016-06-22 20:11:55Z dalain $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/FileInfo.h $
  *
  * (c) Copyright 2016 Telops Inc.
  */

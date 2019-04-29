@@ -3,17 +3,16 @@
  *
  * interface driver implementation.
  *
- * $Rev$
- * $Author$ ecloutier
- * $Date$   4 décembre 2017
- * $Id$
- * $URL$ .../FIR-00251-Proc/src/Zoom/RpOpticalProtocol.c
+ * $Rev: 23147 $
+ * $Author: elarouche $ ecloutier
+ * $Date: 2019-04-01 14:32:59 -0400 (lun., 01 avr. 2019) $   4 décembre 2017
+ * $Id: RpOpticalProtocol.c 23147 2019-04-01 18:32:59Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Zoom/Driver/RpOpticalProtocol.c $ .../FIR-00251-Proc/src/Zoom/RpOpticalProtocol.c
  *
  * (c) Copyright 2017 Telops Inc.
  */
 
 #include "RpOpticalProtocol.h"
-#include "UART_Utils.h"
 #include "xparameters.h"
 #include "FlashSettings.h"
 #include "hder_inserter.h"
@@ -64,30 +63,32 @@ XStatus RPOpt_init(gcRegistersData_t* pGCRegs, rpCtrl_t* aCtrl, uint16_t uartDev
    memset(aCtrl->serial_data.rxBuffer, 0, sizeof(aCtrl->serial_data.rxBuffer));
    memset(aCtrl->serial_data.txBuffer, 0, sizeof(aCtrl->serial_data.txBuffer));
 
-   status = UART_Init(  &aCtrl->theUart,
+   status = CircularUART_Init(  &aCtrl->theUart,
                         uartDeviceId,
                         intc,
                         uartIntrId,
                         RP_OPT_UART_IntrHandler,
-                        (void *)(aCtrl));
+                        (void *)(aCtrl),
+                        Ns550);
+
 
    if (status != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-   status = UART_Config(&aCtrl->theUart, RP_OPT_DEFAULT_BAULDRATE, RP_OPT_DATA_BITS, RP_OPT_PARITY, RP_OPT_STOP_BITS);
+   status = CircularUART_Config(&aCtrl->theUart, RP_OPT_DEFAULT_BAULDRATE, RP_OPT_DATA_BITS, RP_OPT_PARITY, RP_OPT_STOP_BITS);
    if (status != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
    // Reset RX FIFO
-   UART_ResetRxFifo(&aCtrl->theUart);
+   CircularUART_ResetFifo(&aCtrl->theUart);
 
-   XUartNs550_SetFifoThreshold(&aCtrl->theUart, XUN_FIFO_TRIGGER_08);
+   XUartNs550_SetFifoThreshold(&aCtrl->theUart.uart.Ns550, XUN_FIFO_TRIGGER_08);
 
-   XUartNs550_Recv(  &aCtrl->theUart,
+   XUartNs550_Recv(  &aCtrl->theUart.uart.Ns550,
                      aCtrl->serial_data.rxBuffer,
                      sizeof( aCtrl->serial_data.rxBuffer));
 
@@ -119,7 +120,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
       if(aCtrl->serial_data.txDataCount > 0)
       {
          aCtrl->serial_data.txBusy = 1;
-         XUartNs550_Send(&aCtrl->theUart, aCtrl->serial_data.txBuffer, aCtrl->serial_data.txDataCount);
+         XUartNs550_Send(&aCtrl->theUart.uart.Ns550, aCtrl->serial_data.txBuffer, aCtrl->serial_data.txDataCount);
       }
 
    }
@@ -438,10 +439,10 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                   {
                      aCtrl->currentResponseData = aCtrl->lastResponseData;
                      RP_OPT_ERR("bad chksum\n");
-                     firstRegister = XUartNs550_ReadReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET);
-                     XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, 0);
+                     firstRegister = XUartNs550_ReadReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET);
+                     XUartNs550_WriteReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, 0);
                      CBB_Pushn(&aCtrl->responses, 10, aCtrl->dataBuf);
-                     XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, firstRegister);
+                     XUartNs550_WriteReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, firstRegister);
                   }
 
                   switch(temp)
@@ -511,7 +512,7 @@ void RP_OPT_UART_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventDat
       case XUN_EVENT_RECV_DATA:                       // Data has been received.
       {
          // Listen for command on UART
-         n = XUartNs550_Recv(&theCtrl->theUart, theCtrl->serial_data.rxBuffer, sizeof(theCtrl->serial_data.rxBuffer));
+         n = XUartNs550_Recv(&theCtrl->theUart.uart.Ns550, theCtrl->serial_data.rxBuffer, sizeof(theCtrl->serial_data.rxBuffer));
 
          // CR_WARNING for some reason, n is always 0! thus we use EventData, which contains the actual number of bytes received
          n = EventData;

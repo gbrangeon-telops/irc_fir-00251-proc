@@ -239,10 +239,12 @@ begin
             readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
             
             -- naoi
-            readout_info_i.naoi.start        <= elec_ofs_start_i;
-            readout_info_i.naoi.stop         <= elec_ofs_end_i;
-            readout_info_i.naoi.dval         <= elec_ofs_fval_i;
-            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i;      
+            readout_info_i.naoi.start        <= elcorr_ref_start_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.stop         <= elcorr_ref_end_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.dval         <= elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;      
+            
+            readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);
             
          end if;
       end if;

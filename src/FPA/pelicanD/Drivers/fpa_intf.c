@@ -59,7 +59,7 @@
 
 // PelicanD Clink modes
 #define SCD_CLINK_1_CHN                   0x01   // mode clink 1 channel (base) tel que défini par scd
-#define SCD_CLINK_2_CHN                   0x00   // mode clink 2 channel (mediuem) tel que défini par scd
+#define SCD_CLINK_2_CHN                   0x00   // mode clink 2 channel (medium) tel que défini par scd
 
 // PelicanD Bias 
 #define SCD_BIAS_DEFAULT                  0x0C    // 100pA (default)                                     
@@ -238,7 +238,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
  void  FPA_PowerDown(const t_FpaIntf *ptrA)
 {
-  FPA_Reset(ptrA);   
+   FPA_Reset(ptrA);
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -286,10 +286,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);                      // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
    ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly);                          // 
    
-   #ifdef SIM
-      ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
-      ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min; 
-   #endif
+   if (ptrA->fpa_diag_mode == 1)
+   {
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car la diag_mode est plus lent que le détecteur 
+      ptrA->fpa_acq_trig_ctrl_dly     = 0; 
+   }
+   
+#ifdef SIM
+   ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min;
+#endif
    
    
    //  window
@@ -301,12 +307,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //  gain 
    ptrA->scd_gain = SCD_GAIN_0;
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
-   ptrA->scd_gain = SCD_GAIN_1;
+      ptrA->scd_gain = SCD_GAIN_1;
     
    // nombre de canaux de sorties     
    ptrA->scd_out_chn    = SCD_CLINK_2_CHN;           // nombre de canaux CLINK. Nous serons en full tout le temps car le vhd a été conçu ainsi 
    //if ((uint32_t)FPA_NUM_CH == 1)
-   //ptrA->scd_out_chn    = SCD_CLINK_1_CHN;
+      //ptrA->scd_out_chn    = SCD_CLINK_1_CHN;
                                            
    // bias 
    ptrA->scd_diode_bias = SCD_BIAS_DEFAULT;          // bias des photodiodes.  
@@ -334,14 +340,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
                                       
    // valeurs converties en coups d'horloge du module FPA_INTF
    ptrA->scd_fig1_or_fig2_t4_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
-   ptrA->scd_fig1_or_fig2_t6_dly = (uint32_t)((hh.T6) * (float)FPA_MCLK_RATE_HZ); //horloge VHD à 80 MHz
-   ptrA->scd_fig1_or_fig2_t5_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_MCLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag   
-   ptrA->scd_fig4_t1_dly = (uint32_t)((kk.T1) * (float)FPA_MCLK_RATE_HZ);
-   ptrA->scd_fig4_t2_dly = (uint32_t)((kk.T2) * (float)FPA_MCLK_RATE_HZ); 
-   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_MCLK_RATE_HZ);                                    // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
-   ptrA->scd_fig4_t4_dly = (uint32_t)((kk.T4) * (float)FPA_MCLK_RATE_HZ);
-   ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_MCLK_RATE_HZ);  
-   ptrA->scd_fig4_t6_dly = (uint32_t)FPA_SCD_HDER_EFF_LEN;                             // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
+   ptrA->scd_fig1_or_fig2_t6_dly = (uint32_t)((hh.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
+   ptrA->scd_fig1_or_fig2_t5_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag
+   ptrA->scd_fig4_t1_dly = (uint32_t)((kk.T1) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_fig4_t2_dly = (uint32_t)((kk.T2) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);   // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
+   ptrA->scd_fig4_t4_dly = (uint32_t)((kk.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_fig4_t6_dly = (uint32_t)FPA_SCD_HDER_EFF_LEN;                          // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
    ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  
    
    // Élargit le pulse de trig
@@ -385,23 +391,24 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    
       // utilisation  des valeurs de flashsettings
       temperature  = flashSettings.FPATemperatureConversionCoef5 * powf(diode_voltage,5);
-	  temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+      temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
       temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
       temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
       temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
       temperature += flashSettings.FPATemperatureConversionCoef0;  
  
-     // Si flashsettings non programmés alors on utilise les valeurs par defaut  
-     if ((flashSettings.FPATemperatureConversionCoef5 == 0) && (flashSettings.FPATemperatureConversionCoef4 == 0) && 
-         (flashSettings.FPATemperatureConversionCoef3 == 0) && (flashSettings.FPATemperatureConversionCoef2 == 0) &&
-	     (flashSettings.FPATemperatureConversionCoef1 == 0) && (flashSettings.FPATemperatureConversionCoef0 == 0)) {
-	 // courbe de conversion de SCD  
-        temperature  = 1655.2F * powf(diode_voltage,5);
-        temperature -= 6961.7F * powf(diode_voltage,4);
-        temperature += 11235.0F * powf(diode_voltage,3);
-        temperature -= 8844.0F * powf(diode_voltage,2);
-        temperature += (2941.5F * diode_voltage) + 77.3F;
-     }	
+      // Si flashsettings non programmés alors on utilise les valeurs par defaut
+      if ((flashSettings.FPATemperatureConversionCoef5 == 0) && (flashSettings.FPATemperatureConversionCoef4 == 0) &&
+            (flashSettings.FPATemperatureConversionCoef3 == 0) && (flashSettings.FPATemperatureConversionCoef2 == 0) &&
+            (flashSettings.FPATemperatureConversionCoef1 == 0) && (flashSettings.FPATemperatureConversionCoef0 == 0))
+      {
+         // courbe de conversion de SCD
+         temperature  = 1655.2F * powf(diode_voltage,5);
+         temperature -= 6961.7F * powf(diode_voltage,4);
+         temperature += 11235.0F * powf(diode_voltage,3);
+         temperature -= 8844.0F * powf(diode_voltage,2);
+         temperature += (2941.5F * diode_voltage) + 77.3F;
+      }
       return K_TO_CC(temperature); // Centi celsius
    }
 }     
@@ -416,9 +423,9 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    FPA_Fig1orFig2SpecificParams(&Scd_Fig1orFig2Param, (float)pGCRegs->ExposureTime, pGCRegs);
    period = Scd_Fig1orFig2Param.T0;      // selon scd : T0 = frame period
 
-   #ifdef SIM
-      PRINTF("FPA_Period_Min_usec = %f\n", 1e6F*period);      
-   #endif          
+#ifdef SIM
+   PRINTF("FPA_Period_Min_usec = %f\n", 1e6F*period);
+#endif
    MaxFrameRate = 1.0F / period;
 
    // ENO: 10 sept 2016: Apply margin 
@@ -484,8 +491,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->errors_latchs           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x3C);
    Stat->adc_ddc_detect_process_done   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x50);
    Stat->adc_ddc_present               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x54);
-   Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
-   Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
+   Stat->flex_flegx_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
+   Stat->flex_flegx_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
    Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
    Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
@@ -497,27 +504,11 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
    Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
+   Stat->flegx_present                 =(Stat->flex_flegx_present & Stat->adc_brd_spare);
    
-   // verification des statuts en simulation
-   #ifdef SIM
-      PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
-      PRINTF("Stat->adc_analog_channel_num   = %d\n", Stat->adc_analog_channel_num);
-      PRINTF("Stat->adc_resolution           = %d\n", Stat->adc_resolution);
-      PRINTF("Stat->adc_brd_spare            = %d\n", Stat->adc_brd_spare);
-      PRINTF("Stat->ddc_fpa_roic             = %d\n", Stat->ddc_fpa_roic );
-      PRINTF("Stat->ddc_brd_spare            = %d\n", Stat->ddc_brd_spare);
-      PRINTF("Stat->flex_fpa_roic            = %d\n", Stat->flex_fpa_roic);
-      PRINTF("Stat->flex_fpa_input           = %d\n", Stat->flex_fpa_input);
-      PRINTF("Stat->flex_ch_diversity_num    = %d\n", Stat->flex_ch_diversity_num );
-      PRINTF("Stat->cooler_volt_min_mV       = %d\n", Stat->cooler_volt_min_mV);
-      PRINTF("Stat->cooler_volt_max_mV       = %d\n", Stat->cooler_volt_max_mV);
-      PRINTF("Stat->fpa_temp_raw             = %d\n", Stat->fpa_temp_raw);
-      PRINTF("Stat->global_done              = %d\n", Stat->global_done);
-      PRINTF("Stat->fpa_powered              = %d\n", Stat->fpa_powered);
-      PRINTF("Stat->cooler_powered           = %d\n", Stat->cooler_powered);
-      PRINTF("Stat->errors_latchs            = %d\n", Stat->errors_latchs);
-   #endif  
-   
+   Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
+   Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
+   Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);  
 }
 
 
@@ -592,19 +583,19 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
    }
    
    // verification des calculs en simulation
-   #ifdef SIM
-      PRINTF("1e10 * ptrH->TFPP_CLK = %d\n", (uint32_t)(1e10*ptrH->TFPP_CLK));
-      PRINTF("1e10 * ptrH->T2 = %d\n", (uint32_t)(1e10*ptrH->T2));
-      PRINTF("1e10 * ptrH->T4 = %d\n", (uint32_t)(1e10*ptrH->T4));
-      PRINTF("1e10 * ptrH->T5min = %d\n", (uint32_t)(1e10*ptrH->T5min));
-      PRINTF("1e10 * ptrH->T6 = %d\n", (uint32_t)(1e10*ptrH->T6));
-      PRINTF("1e10 * ptrH->T7 = %d\n", (uint32_t)(1e10*ptrH->T7));
-      PRINTF("1e10 * ptrH->T8 = %d\n", (uint32_t)(1e10*ptrH->T8));
-      PRINTF("1e10 * ptrH->Tline_conv = %d\n", (uint32_t)(1e10*ptrH->Tline_conv));
-      PRINTF("1e10 * ptrH->T3 = %d\n", (uint32_t)(1e10*ptrH->T3));
-      PRINTF("1e10 * ptrH->T5 = %d\n", (uint32_t)(1e10*ptrH->T5));
-      PRINTF("1e10 * ptrH->T0 = %d\n", (uint32_t)(1e10*ptrH->T0));
-   #endif  
+#ifdef SIM
+   PRINTF("1e10 * ptrH->TFPP_CLK = %d\n", (uint32_t)(1e10*ptrH->TFPP_CLK));
+   PRINTF("1e10 * ptrH->T2 = %d\n", (uint32_t)(1e10*ptrH->T2));
+   PRINTF("1e10 * ptrH->T4 = %d\n", (uint32_t)(1e10*ptrH->T4));
+   PRINTF("1e10 * ptrH->T5min = %d\n", (uint32_t)(1e10*ptrH->T5min));
+   PRINTF("1e10 * ptrH->T6 = %d\n", (uint32_t)(1e10*ptrH->T6));
+   PRINTF("1e10 * ptrH->T7 = %d\n", (uint32_t)(1e10*ptrH->T7));
+   PRINTF("1e10 * ptrH->T8 = %d\n", (uint32_t)(1e10*ptrH->T8));
+   PRINTF("1e10 * ptrH->Tline_conv = %d\n", (uint32_t)(1e10*ptrH->Tline_conv));
+   PRINTF("1e10 * ptrH->T3 = %d\n", (uint32_t)(1e10*ptrH->T3));
+   PRINTF("1e10 * ptrH->T5 = %d\n", (uint32_t)(1e10*ptrH->T5));
+   PRINTF("1e10 * ptrH->T0 = %d\n", (uint32_t)(1e10*ptrH->T0));
+#endif
    
 }
 

@@ -56,6 +56,13 @@
 #define AW_FPA_OUTPUT_SW_TYPE             0xAE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
 #define AW_FPA_INPUT_SW_TYPE              0xAE8      // obligaoire pour les deteceteurs analogiques
 
+// identification des sources de données
+#define DATA_SOURCE_INSIDE_FPGA           0         // Provient du fichier fpa_common_pkg.vhd.
+#define DATA_SOURCE_OUTSIDE_FPGA          1         // Provient du fichier fpa_common_pkg.vhd.
+
+// adresse d'ecriture de la cfg des Dacs
+#define AW_DAC_CFG_BASE_ADD               0x0D00   
+
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                          0x18      // 0x18 -> FPA_ROIC_SCORPIO_MW . Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                   0x01      // 0x01 -> output analogique .provient du fichier fpa_common_pkg.vhd. La valeur 0x01 est celle de OUTPUT_ANALOG
@@ -107,7 +114,15 @@
 #define SCORPIOMWA_CONST_ELEC_OFFSET_VALUE 340            // aussi pour ne pas provoquer saturation au dela de (2^14 - 1) soit 16383
 
 
+#define TOTAL_DAC_NUM                     8
 
+struct s_ProximCfgConfig 
+{   
+   uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
+   uint32_t  spare1;                       
+   uint32_t  spare2;   
+};                                  
+typedef struct s_ProximCfgConfig ProximCfg_t;
   
 // structure interne pour les parametres du scorpiomw
 struct scorpiomw_param_s             //
@@ -144,16 +159,17 @@ typedef struct scorpiomw_param_s  scorpiomw_param_t;
 
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
-float gFpaPeriodMinMargin = 0.0F;
+float gFpaPeriodMinMargin = 0.0F; 
+ProximCfg_t ProximCfg = {{0, 0, 0, 0,  0, 0, 5096,2594}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
-
-
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
+void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 
 
 // configuration à l'allumage du détecteur
@@ -232,7 +248,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
-   
+   extern int32_t gFpaDebugRegE;
+   static uint8_t cfg_num = 0; 
+       
    // on bâtit les parametres specifiques du scorpiomw
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
    
@@ -255,6 +273,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // allumage du détecteur 
    ptrA->fpa_pwr_on   = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
+   // mode diag vrai et faked
+   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
+   if (ptrA->fpa_diag_mode == 1){
+      if ((int32_t)gFpaDebugRegE != 0)
+         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
+   }
+      
    // config d'initialisation du détecteur ou non
    ptrA->fpa_init_cfg =  init_cfg_in_progress;
    ptrA->fpa_init_cfg_received =  0;     // ENO 15 oct. 2016: valeur sans importance. Le module  mb_intf.vhd génère convenablement cette valeur.
@@ -358,38 +383,52 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;                                        
    
    // les DACs (1 à 8)
-   ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 1);      // VCC1 -> VDDA = 3300 mV
-   ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(3600.0F, 2);      // VCC2 -> VDDO = 3600 mV
-   ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV  // pour allumer la LED
-   ptrA->vdac_value[3]                     = FLEG_VccVoltage_To_DacWord(3300.0F, 4);      // VCC4 -> VDD  = 3300 mV
-   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
-   ptrA->vdac_value[5]                     = ptrA->gpol_code;                             // VCC6 -> GPOL
+   ProximCfg.vdac_value[0]                 = FLEG_VccVoltage_To_DacWord(3300.0F, 1);      // VCC1 -> VDDA = 3300 mV
+   ProximCfg.vdac_value[1]                 = FLEG_VccVoltage_To_DacWord(3600.0F, 2);      // VCC2 -> VDDO = 3600 mV
+   ProximCfg.vdac_value[2]                 = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV  // pour allumer la LED
+   ProximCfg.vdac_value[3]                 = FLEG_VccVoltage_To_DacWord(3300.0F, 4);      // VCC4 -> VDD  = 3300 mV
+   ProximCfg.vdac_value[4]                 = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
+   ProximCfg.vdac_value[5]                 = ptrA->gpol_code;                             // VCC6 -> GPOL
 
    
    // Reference of the tap (VCC7 ou DAC6)      
    if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
    {
       if ((gFpaDetectorElectricalTapsRef >= (float)SCORPIOMWA_TAPREF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)SCORPIOMWA_TAPREF_VOLTAGE_MAX_mV))
-         ptrA->vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 7);  // 
+         ProximCfg.vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 7);  // 
 	}                                                                                                       
-   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
+   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[6], 7);            
    gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;   
    
    // offset of the tap_reference (VCC8 ou DAC7)      
    if (gFpaDetectorElectricalRefOffset != actualElectricalRefOffset)
    {
       if ((gFpaDetectorElectricalRefOffset >= (float)SCORPIOMWA_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)SCORPIOMWA_REFOFS_VOLTAGE_MAX_mV))
-         ptrA->vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 8);  // 
+         ProximCfg.vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 8);  // 
 	}                                                                                                       
-   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[7], 8);            
+   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
    gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
    // adc_clk_phase
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_phase[0]) && (init_cfg_in_progress == 0)){
-      ptrA->adc_clk_phase[0] = (uint32_t)gFpaDebugRegD;
-      ptrA->adc_clk_phase[1] = (uint32_t)gFpaDebugRegD;
+   if (init_cfg_in_progress == 1){
+      ptrA->adc_clk_pipe_sel = 0;
+   }       
+   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_cfg_in_progress == 0)){
+      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
+      //need_rst_fpa_module = 1;
    }
-   gFpaDebugRegD = (int32_t)ptrA->adc_clk_phase[0];
+   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
+   
+   // adc clk source phase
+   if (init_cfg_in_progress == 1){
+      ptrA->adc_clk_source_phase = 1000; //179200;
+   }
+   
+   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_cfg_in_progress == 0)){
+      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
+      //need_rst_fpa_module = 1;
+   }
+    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;  
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
@@ -397,8 +436,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // reorder column
    ptrA->reorder_column = 0;
    if ((ptrA->fpa_diag_mode == 0)&&(ptrA->uprow_upcol == 0))  // en mode détecteur et avec uprow_upcol=0 le scorpioMW inverse les colonnes
-      ptrA->reorder_column = 1;
+      ptrA->reorder_column = 1; 
       
+  
+   // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
+   if (cfg_num == 255)  // protection contre depassement
+      cfg_num = 0;   
+   cfg_num++;
+   
+   ptrA->cfg_num  = (uint32_t)cfg_num;
+   
+   // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
+   FPA_SendProximCfg(&ProximCfg, ptrA);
+   
+   // envoi du reste de la config              
    WriteStruct(ptrA);
 }
 
@@ -533,8 +584,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 { 
    uint32_t temp_32b;
-   uint32_t temp_init_done;
-   
+
    Stat->adc_oper_freq_max_khz   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x00);    
    Stat->adc_analog_channel_num  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x04);   
    Stat->adc_resolution          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x08);   
@@ -553,8 +603,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->errors_latchs           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x3C);
    Stat->adc_ddc_detect_process_done   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x50);
    Stat->adc_ddc_present               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x54);
-   Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
-   Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
+   Stat->flex_flegx_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
+   Stat->flex_flegx_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
    Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
    Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
@@ -564,32 +614,13 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_serdes_edges[1]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x74);
    Stat->fpa_serdes_edges[2]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x78);
    Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
-   temp_init_done                      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
+   Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
-   
+   Stat->flegx_present                 =(Stat->flex_flegx_present & Stat->adc_brd_spare);
+    
    Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
-   Stat->fpa_init_done                 = temp_init_done & Stat->prog_init_done;     // pour le scorpiomwA, la programmation de la configuration d'initialisation est un prérequis avant de faire quoi que ce soit.
-   
-   // verification des statuts en simulation
-   #ifdef SIM
-      PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
-      PRINTF("Stat->adc_analog_channel_num   = %d\n", Stat->adc_analog_channel_num);
-      PRINTF("Stat->adc_resolution           = %d\n", Stat->adc_resolution);
-      PRINTF("Stat->adc_brd_spare            = %d\n", Stat->adc_brd_spare);
-      PRINTF("Stat->ddc_fpa_roic             = %d\n", Stat->ddc_fpa_roic );
-      PRINTF("Stat->ddc_brd_spare            = %d\n", Stat->ddc_brd_spare);
-      PRINTF("Stat->flex_fpa_roic            = %d\n", Stat->flex_fpa_roic);
-      PRINTF("Stat->flex_fpa_input           = %d\n", Stat->flex_fpa_input);
-      PRINTF("Stat->flex_ch_diversity_num    = %d\n", Stat->flex_ch_diversity_num );
-      PRINTF("Stat->cooler_volt_min_mV       = %d\n", Stat->cooler_volt_min_mV);
-      PRINTF("Stat->cooler_volt_max_mV       = %d\n", Stat->cooler_volt_max_mV);
-      PRINTF("Stat->fpa_temp_raw             = %d\n", Stat->fpa_temp_raw);
-      PRINTF("Stat->global_done              = %d\n", Stat->global_done);
-      PRINTF("Stat->fpa_powered              = %d\n", Stat->fpa_powered);
-      PRINTF("Stat->cooler_powered           = %d\n", Stat->cooler_powered);
-      PRINTF("Stat->errors_latchs            = %d\n", Stat->errors_latchs);
-   #endif  
-   
+   Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
+   Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
 }
 
 
@@ -670,4 +701,19 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
    VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
    
    return VccVoltage_mV;
+}
+  
+//------------------------------------------------
+// Envoi de la config des dacs et autres
+//-----------------------------------------------
+void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
+{
+   uint8_t ii = 0;
+   
+   // envoi comfig des Dacs
+   while(ii < TOTAL_DAC_NUM)
+   {
+      AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  // dans le vhd, division par 4 avant entrée dans ram
+      ii++;
+   }
 }

@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author$
--- $LastChangedDate$
--- $Revision$ 
+-- $Author: odionne $
+-- $LastChangedDate: 2017-04-10 16:00:05 -0400 (lun., 10 avr. 2017) $
+-- $Revision: 20321 $ 
 -------------------------------------------------------------------------------
 --
 -- Description : This file implement the axi_lite communication and interrupt gen to the micro blaze
@@ -102,7 +102,7 @@ architecture RTL of AEC_CUMSUM is
    signal tmi_dval_s    : std_logic;
    
    signal tmi_busy_s       : std_logic;
-   signal tmi_rddata_s     : std_logic_vector(20 downto 0);
+   signal tmi_rddata_s     : unsigned(20 downto 0);
    signal tmi_rddval_s     : std_logic;
    signal tmi_idle_s       : std_logic;
    signal tmi_error_s      : std_logic;
@@ -127,6 +127,27 @@ architecture RTL of AEC_CUMSUM is
    signal TMI_add_out         : unsigned( 9 downto 0);
    signal TMI_add_out_started : std_logic;
    signal TMI_add_max         : unsigned(12 downto 0) := (others => '1');
+   
+   attribute KEEP: string;
+   attribute KEEP of TMI_add : signal is "TRUE";
+   attribute KEEP of TMI_add_done : signal is "TRUE";
+   attribute KEEP of TMI_add_out : signal is "TRUE";
+   attribute KEEP of tmi_add_s : signal is "TRUE";
+   attribute KEEP of tmi_dval_s : signal is "TRUE";
+   attribute KEEP of tmi_busy_s : signal is "TRUE";
+   attribute KEEP of tmi_rddata_s : signal is "TRUE";
+   attribute KEEP of tmi_idle_s : signal is "TRUE";
+   attribute KEEP of tmi_error_s : signal is "TRUE";
+   
+   attribute KEEP of AEC_state : signal is "TRUE";
+   attribute KEEP of Cumsum_valid : signal is "TRUE";
+   attribute KEEP of cumsum_ready_s : signal is "TRUE";
+   attribute KEEP of CumSum_Acc : signal is "TRUE";
+   
+   attribute KEEP of image_fraction_s : signal is "TRUE";
+   attribute KEEP of lowerbin_id_s : signal is "TRUE";
+   attribute KEEP of lowercumsum_value : signal is "TRUE";
+   attribute KEEP of hist_nb_pix_s : signal is "TRUE";
    
 begin
    
@@ -303,7 +324,7 @@ begin
                   
                   -- Cumsum calculation
                   if tmi_rddval_s = '1' then
-                     CumSum_Acc(0)     <= CumSum_Acc(0) + unsigned(tmi_rddata_s);
+                     CumSum_Acc(0)     <= CumSum_Acc(0) + tmi_rddata_s;
                      CumSum_Acc(1)     <= CumSum_Acc(0); -- we shift the actual cum sum to the other register
                      if TMI_add_out_started = '1' then
                         -- TMI_add_out is started one cycle after to correspond to the bin id of what is already in CumSum_Acc(0)
@@ -344,7 +365,7 @@ begin
          TMI_MOSI_DVAL  <= tmi_dval_s;
          
          tmi_busy_s     <= TMI_MISO_BUSY;   
-         tmi_rddata_s   <= TMI_MISO_RD_DATA;       
+         tmi_rddata_s   <= unsigned(TMI_MISO_RD_DATA);
          tmi_rddval_s   <= TMI_MISO_RD_DVAL;
          tmi_idle_s     <= TMI_MISO_IDLE ;  
          tmi_error_s    <= TMI_MISO_ERROR;  

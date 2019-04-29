@@ -83,7 +83,7 @@ architecture RTL of mglk_serial_module is
    component sfifo_w8_d128
       PORT (
          clk            : in std_logic;
-         rst            : in std_logic;
+         srst            : in std_logic;
          din            : in std_logic_vector(7 downto 0);
          wr_en          : in std_logic;
          rd_en          : in std_logic;
@@ -190,17 +190,17 @@ architecture RTL of mglk_serial_module is
    signal hex_data_reg3           : std_logic_vector(3 downto 0);
    signal hex_data_reg4           : std_logic_vector(3 downto 0);   
    
-   -- attribute dont_touch           : string;
-   -- attribute dont_touch of resp_err             : signal is "true";
-   -- attribute dont_touch of resp_sof             : signal is "true";
-   -- attribute dont_touch of cmd_eof_latch        : signal is "true";
-   -- attribute dont_touch of resp_dcnt            : signal is "true";
-   -- attribute dont_touch of serial_cmd_failure   : signal is "true";
-   -- attribute dont_touch of resp_ack             : signal is "true";
-   -- attribute dont_touch of fpa_temp_reg         : signal is "true";
-   -- attribute dont_touch of sub_cmd_byte_cnt     : signal is "true"; 
-   -- attribute dont_touch of timeout_reached      : signal is "true";
-   ---- attribute dont_touch of failure_resp_data    : signal is "true";
+   -- -- attribute dont_touch           : string;
+   -- -- attribute dont_touch of resp_err             : signal is "true";
+   -- -- attribute dont_touch of resp_sof             : signal is "true";
+   -- -- attribute dont_touch of cmd_eof_latch        : signal is "true";
+   -- -- attribute dont_touch of resp_dcnt            : signal is "true";
+   -- -- attribute dont_touch of serial_cmd_failure   : signal is "true";
+   -- -- attribute dont_touch of resp_ack             : signal is "true";
+   -- -- attribute dont_touch of fpa_temp_reg         : signal is "true";
+   -- -- attribute dont_touch of sub_cmd_byte_cnt     : signal is "true"; 
+   -- -- attribute dont_touch of timeout_reached      : signal is "true";
+   ---- -- attribute dont_touch of failure_resp_data    : signal is "true";
 begin
    
    areset <= not ARESETN;
@@ -239,7 +239,7 @@ begin
    U1B : sfifo_w8_d128
    PORT MAP (
       clk => CLK,
-      rst => areset,
+      srst => sreset,
       din => cfg_fifo_din,
       wr_en => cfg_fifo_wr_en,
       rd_en => cfg_fifo_rd_en,
@@ -609,11 +609,11 @@ begin
       variable temp_lsb_id       : unsigned(7 downto 0);
       variable temp_msb_id       : unsigned(7 downto 0);
       variable temp_bytes_concat : std_logic_vector(15 downto 0);
-      -- attribute dont_touch : string;
-      -- attribute dont_touch of temp_lsb             : variable is "true";
-      -- attribute dont_touch of temp_msb             : variable is "true";
-      -- attribute dont_touch of temp_lsb_id          : variable is "true";
-      -- attribute dont_touch of temp_msb_id          : variable is "true";
+      -- -- attribute dont_touch : string;
+      -- -- attribute dont_touch of temp_lsb             : variable is "true";
+      -- -- attribute dont_touch of temp_msb             : variable is "true";
+      -- -- attribute dont_touch of temp_lsb_id          : variable is "true";
+      -- -- attribute dont_touch of temp_msb_id          : variable is "true";
       
    begin
       if rising_edge(CLK) then 

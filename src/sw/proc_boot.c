@@ -2,11 +2,11 @@
  *  @file proc_boot.c
  *  Processing FPGA boot loader main() function.
  *  
- *  $Rev$
- *  $Author$
- *  $LastChangedDate$
- *  $Id$
- *  $URL$
+ *  $Rev: 20830 $
+ *  $Author: odionne $
+ *  $LastChangedDate: 2017-09-01 15:29:17 -0400 (ven., 01 sept. 2017) $
+ *  $Id: proc_boot.c 20830 2017-09-01 19:29:17Z odionne $
+ *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/proc_boot.c $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -17,7 +17,6 @@
 #include "utils.h"
 #include "printf_utils.h"
 #include "xuartns550_l.h"
-#include "xbasic_types.h"
 #include "xil_exception.h"
 #include "IRC_Status.h"
 #include "led_ctrl.h"
@@ -71,11 +70,13 @@ qspiFlash_t gQSPIFlash;
 /**
  * STDOUT definition
  */
-#if (defined(STDOUT_BASEADDRESS) || defined(STDIN_BASEADDRESS))
-#error STDIN and STDOUT must be set to "none" in the BSP.
+#if (!defined(STDOUT_BASEADDRESS) || !defined(STDIN_BASEADDRESS))
+#error STDIN and STDOUT must be set to "USB" in the BSP.
 #endif
-#define STDOUT_BASEADDRESS    XPAR_AXI_USB_UART_BASEADDR
-#define STDIN_BASEADDRESS     XPAR_AXI_USB_UART_BASEADDR
+
+
+
+
 
 /**
  * Standard outbyte function implementation

@@ -43,7 +43,8 @@ package FPA_define is
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '1';
-   constant DEFINE_GENERATE_VPROCESSING_CHAIN     : std_logic := '1';      -- pour le scorpiomwA, on  peut utiliser la chaine Vprocessing. 
+   constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
+   constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.   
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := false;    -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s 
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 18_000;       -- 10_000 => MCLK = 10M, 15_000 => MCLK = 15M, 18_000 => MCLK = 18M, 
@@ -163,7 +164,7 @@ package FPA_define is
       -- common
       comn                           : fpa_comn_cfg_type;        -- partie commune (utilisée par les modules communs)
       
-       -- diag window
+      -- diag window
       diag                           : window_cfg_type; 
       
       -- window
@@ -238,55 +239,55 @@ package FPA_define is
    end record;    
    
    ---- Configuration par defaut
---   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
---   to_unsigned(100, 32),      --int_time                       
---   (others => '0'),           --int_indx                       
---   to_unsigned(3176, 32),     --int_signal_high_time           
---   --comn                           
---   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32),'0'),
---   to_unsigned(0, 11),        --xstart                         
---   to_unsigned(0, 11),        --ystart                         
---   to_unsigned(640, 11),      --xsize                          
---   to_unsigned(512, 11),      --ysize
---   
---   to_unsigned(0, 9),         --windcfg_part1                         
---   to_unsigned(511, 9),       --windcfg_part2                         
---   to_unsigned(0, 8),         --windcfg_part3                          
---   to_unsigned(159, 8),       --windcfg_part4
---   
---   '1',                       --uprow_upcol                         
---   '1',                       --sizea_sizeb 
---   
---   '1',                       --itr
---   
---   '0',                       --gain                           
---   
---   std_logic_vector(to_unsigned(671, 14)),      --det_code
---   to_unsigned(0, 8),         --real_mode_active_pixel_dly   
---   '1',                       --adc_quad2_en                 
---   '1',                       --chn_diversity_en             
---   to_unsigned(82081, 17),    --readout_pclk_cnt_max         
---   to_unsigned(160, 8),       --line_period_pclk             
---   to_unsigned(1, 4),         --active_line_start_num        
---   to_unsigned(512, 10),       --active_line_end_num
---   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
---   to_unsigned(1, 9),         --sof_posf_pclk                
---   to_unsigned(81920, 17),    --eof_posf_pclk                
---   to_unsigned(1, 8),         --sol_posl_pclk                
---   to_unsigned(160, 8),       --eol_posl_pclk                
---   to_unsigned(161, 8),       --eol_posl_pclk_p1             
---   to_unsigned(1, 4),         --hgood_samp_sum_num           
---   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
---   to_unsigned(2, 4),         --vgood_samp_sum_num           
---   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
---   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
---   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
---   to_unsigned(160, 8),       --xsize_div_tapnum             
---   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
---   (to_unsigned(1, 5),to_unsigned(1, 5)),
---   '0'
---   );
---   
+   --   constant FPA_INTF_CFG_DEFAULT : fpa_intf_cfg_type := (
+   --   to_unsigned(100, 32),      --int_time                       
+   --   (others => '0'),           --int_indx                       
+   --   to_unsigned(3176, 32),     --int_signal_high_time           
+   --   --comn                           
+   --   ('0', x"D2", '0', '0', '0', x"02", to_unsigned(10000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32), to_unsigned(8000000, 32),'0'),
+   --   to_unsigned(0, 11),        --xstart                         
+   --   to_unsigned(0, 11),        --ystart                         
+   --   to_unsigned(640, 11),      --xsize                          
+   --   to_unsigned(512, 11),      --ysize
+   --   
+   --   to_unsigned(0, 9),         --windcfg_part1                         
+   --   to_unsigned(511, 9),       --windcfg_part2                         
+   --   to_unsigned(0, 8),         --windcfg_part3                          
+   --   to_unsigned(159, 8),       --windcfg_part4
+   --   
+   --   '1',                       --uprow_upcol                         
+   --   '1',                       --sizea_sizeb 
+   --   
+   --   '1',                       --itr
+   --   
+   --   '0',                       --gain                           
+   --   
+   --   std_logic_vector(to_unsigned(671, 14)),      --det_code
+   --   to_unsigned(0, 8),         --real_mode_active_pixel_dly   
+   --   '1',                       --adc_quad2_en                 
+   --   '1',                       --chn_diversity_en             
+   --   to_unsigned(82081, 17),    --readout_pclk_cnt_max         
+   --   to_unsigned(160, 8),       --line_period_pclk             
+   --   to_unsigned(1, 4),         --active_line_start_num        
+   --   to_unsigned(512, 10),       --active_line_end_num
+   --   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --pix_samp_num_per_ch          
+   --   to_unsigned(1, 9),         --sof_posf_pclk                
+   --   to_unsigned(81920, 17),    --eof_posf_pclk                
+   --   to_unsigned(1, 8),         --sol_posl_pclk                
+   --   to_unsigned(160, 8),       --eol_posl_pclk                
+   --   to_unsigned(161, 8),       --eol_posl_pclk_p1             
+   --   to_unsigned(1, 4),         --hgood_samp_sum_num           
+   --   to_unsigned(2097152, 23),  --hgood_samp_mean_numerator    
+   --   to_unsigned(2, 4),         --vgood_samp_sum_num           
+   --   to_unsigned(1048576, 23),  --vgood_samp_mean_numerator    
+   --   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_first_pos_per_ch   
+   --   to_unsigned(DEFINE_ADC_QUAD_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, 8),         --good_samp_last_pos_per_ch    
+   --   to_unsigned(160, 8),       --xsize_div_tapnum             
+   --   (to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(100, 14), to_unsigned(0, 14), to_unsigned(100, 14)),           
+   --   (to_unsigned(1, 5),to_unsigned(1, 5)),
+   --   '0'
+   --   );
+   --   
    
    ----------------------------------------------								
    -- Type hder_param

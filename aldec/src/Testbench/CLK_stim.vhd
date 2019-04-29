@@ -3,11 +3,11 @@
 --!   @brief Clocks stimulus.
 --!   @details This files simulates the external clock for simulation. 
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 12770 $
+--!   $Author: pdaraiche $
+--!   $Date: 2013-12-20 12:01:34 -0500 (ven., 20 déc. 2013) $
+--!   $Id: CLK_stim.vhd 12770 2013-12-20 17:01:34Z pdaraiche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/CLK_stim.vhd $
 ------------------------------------------------------------------
 
 --! Call library IEEE for logic element

@@ -20,10 +20,10 @@ entity calib_status_gen is
    port(
       ARESET     : in std_logic;
       CLK        : in std_logic;
-      DINi_MOSI  : in t_axi4_stream_mosi16;
+      DINi_MOSI  : in t_axi4_stream_mosi64;
       DINi_MISO  : in t_axi4_stream_miso;
       DOUTi_MISO : in t_axi4_stream_miso;       
-      DOUTi_MOSI : in t_axi4_stream_mosi16;
+      DOUTi_MOSI : in t_axi4_stream_mosi64;
       NEW_IMG    : out std_logic;            -- pulse pour signifier l'entrée d'une nouvelle image dans la chaine
       STAT       : out calib_stat_type;
       RESET_ERR  : in std_logic;
@@ -41,8 +41,8 @@ architecture rtl of calib_status_gen is
    end component;
    
    signal sreset                   : std_logic;
-   signal dval_in                 : std_logic;
-   signal dval_out                : std_logic;
+   signal dval_in                  : std_logic;
+   signal dval_out                 : std_logic;
    signal data_count               : integer;
    signal done_i                   : std_logic;
    signal image_in_progress        : std_logic;
@@ -77,7 +77,7 @@ begin
             dval_in <= '0'; 
             dval_out <= '0';
             data_count <= 0;
-            done_i <= '1';  -- fait expres pour que la config puisse renter
+            done_i <= '1';  -- fait expres pour que la config puisse rentrer
             image_in_progress <= '0';
             image_in_progress_last <= '0';
             new_img_i <= '0';

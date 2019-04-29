@@ -3,11 +3,11 @@
 --!   @brief Package file for TEL-2000 projects.
 --!   @details This file contains the records and constants used in the project.
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 13511 $
+--!   $Author: pdaraiche $
+--!   $Date: 2014-04-24 11:31:28 -0400 (jeu., 24 avr. 2014) $
+--!   $Id: mgt_wrapper_stim.vhd 13511 2014-04-24 15:31:28Z pdaraiche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/IP/MGT_wrapper/mgt_wrapper_stim.vhd $
 ------------------------------------------------------------------
 
 library IEEE;

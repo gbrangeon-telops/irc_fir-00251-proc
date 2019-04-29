@@ -4,11 +4,11 @@
  *  
  *  This file defines the calibration actualization module.
  *  
- *  $Rev$
- *  $Author$
- *  $Date$
- *  $Id$
- *  $URL$
+ *  $Rev: 22650 $
+ *  $Author: pcouture $
+ *  $Date: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
+ *  $Id: Actualization.h 22650 2018-12-13 20:30:18Z pcouture $
+ *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/Actualization.h $
  *
  * (c) Copyright 2014 Telops Inc.
  */

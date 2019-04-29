@@ -18,7 +18,6 @@
 #include "printf_utils.h"
 #include "verbose.h"
 #include "xuartns550_l.h"
-#include "xbasic_types.h"
 #include "xil_exception.h"
 #include "xil_testmem.h"
 #include "IRC_Status.h"

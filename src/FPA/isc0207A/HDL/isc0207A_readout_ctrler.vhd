@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 23358 $
+--!   $Author: enofodjie $
+--!   $Date: 2019-04-22 09:21:28 -0400 (lun., 22 avr. 2019) $
+--!   $Id: isc0207A_readout_ctrler.vhd 23358 2019-04-22 13:21:28Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/isc0207A/HDL/isc0207A_readout_ctrler.vhd $
 ------------------------------------------------------------------
 
 
@@ -27,10 +27,11 @@ entity isc0207A_readout_ctrler is
       FPA_MCLK          : in std_logic;  -- 
       FPA_INTF_CFG      : in fpa_intf_cfg_type;      
       FPA_INT           : in std_logic;  -- 
-      FPA_INT_FDBK      : in std_logic;  -- 
+      --FPA_INT_FDBK      : in std_logic;  -- 
       
       
       QUAD_CLK_COPY     : in std_logic;
+      REF_VALID         : in std_logic_vector(1 downto 0);
       
       READOUT_INFO      : out readout_info_type;
       ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0)      
@@ -61,8 +62,8 @@ architecture rtl of isc0207A_readout_ctrler is
    signal adc_sync_flag_i      : std_logic_vector(ADC_SYNC_FLAG'LENGTH-1 downto 0);
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
-   signal fval_pclk_cnt        : unsigned(FPA_INTF_CFG.READOUT_PCLK_CNT_MAX'LENGTH-1 downto 0); 
-   signal lval_pclk_cnt        : unsigned(FPA_INTF_CFG.LINE_PERIOD_PCLK'LENGTH-1 downto 0);
+   signal fval_pclk_cnt        : unsigned(FPA_INTF_CFG.RAW_AREA.READOUT_PCLK_CNT_MAX'LENGTH-1 downto 0); 
+   signal lval_pclk_cnt        : unsigned(FPA_INTF_CFG.RAW_AREA.LINE_PERIOD_PCLK'LENGTH-1 downto 0);
    signal quad_clk_copy_i      : std_logic;
    signal quad_clk_copy_last   : std_logic;
    signal eol_pipe             : std_logic_vector(3 downto 0);
@@ -78,20 +79,20 @@ architecture rtl of isc0207A_readout_ctrler is
    signal active_line_en1      : std_logic;
    signal global_reset         : std_logic;
    signal lsync_pipe           : std_logic_vector(7 downto 0);
-   signal line_cnt             : unsigned(FPA_INTF_CFG.ACTIVE_LINE_END_NUM'LENGTH-1 downto 0);
+   signal line_cnt             : unsigned(FPA_INTF_CFG.RAW_AREA.WINDOW_LSYNC_NUM'LENGTH-1 downto 0);
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
-   signal fpa_int_fdbk_i       : std_logic;
+   --signal fpa_int_fdbk_i       : std_logic;
    
-   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
-   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
-   signal elec_ofs_end_i       : std_logic;
-   signal elec_ofs_start_i     : std_logic;
+   signal elcorr_ref_start_pipe  : std_logic_vector(15 downto 0);
+   signal elcorr_ref_end_pipe    : std_logic_vector(15 downto 0);
+   signal elcorr_ref_end_i       : std_logic;
+   signal elcorr_ref_start_i     : std_logic;
    signal readout_info_i       : readout_info_type;
    signal eof_pulse            : std_logic;
    signal eof_pulse_last       : std_logic;
-   signal elec_ofs_fval_i      : std_logic;
+   signal elcorr_ref_fval_i      : std_logic;
    
    
 begin
@@ -121,8 +122,8 @@ begin
          adc_sync_flag_i(15 downto 4)  <= (others => '0');    -- non utilisé
          adc_sync_flag_i(3)  <= readout_info_i.naoi.stop;
          adc_sync_flag_i(2)  <= readout_info_i.naoi.start;
-         adc_sync_flag_i(1)  <= sof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
-         adc_sync_flag_i(0)  <= sol_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(1)  <= readout_info_i.aoi.sof;                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(0)  <= readout_info_i.aoi.sol;               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
       end if;
    end process;   
    
@@ -135,11 +136,11 @@ begin
          if sreset = '1' then                  
             fpa_int_i <= FPA_INT;
             fpa_int_last <= fpa_int_i;
-            elec_ofs_start_pipe <= (others => '0');
-            elec_ofs_end_pipe <= (others => '0');
-            elec_ofs_start_i <= '0';
-            elec_ofs_fval_i <= '0';
-            elec_ofs_end_i <= '0';
+            elcorr_ref_start_pipe <= (others => '0');
+            elcorr_ref_end_pipe <= (others => '0');
+            elcorr_ref_start_i <= '0';
+            elcorr_ref_fval_i <= '0';
+            elcorr_ref_end_i <= '0';
             readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
             readout_info_i.naoi.samp_pulse <= '0';
@@ -162,25 +163,25 @@ begin
             
             fpa_mclk_last <= FPA_MCLK;             
             
-            -- elec_ofs_start_i dure 1 PCLK
+            -- elcorr_ref_start_i dure 1 PCLK
             eof_pulse <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);
             eof_pulse_last <= eof_pulse;
-            elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
-            if unsigned(elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
-               elec_ofs_start_i <= '1';
-               elec_ofs_fval_i  <= '1'; 
+            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
+            if unsigned(elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+               elcorr_ref_start_i <= '1';
+               elcorr_ref_fval_i  <= '1'; 
             else
-               elec_ofs_start_i <= '0';
+               elcorr_ref_start_i <= '0';
             end if;
             
-            -- elec_ofs_end_i dure 1 PCLK
-            elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
-            if unsigned(elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
-               elec_ofs_end_i <= '1';
+            -- elcorr_ref_end_i dure 1 PCLK
+            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
+            if unsigned(elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+               elcorr_ref_end_i <= '1';
             else
-               elec_ofs_end_i  <= '0';
-               if elec_ofs_end_i = '1' then 
-                  elec_ofs_fval_i <= '0';
+               elcorr_ref_end_i  <= '0';
+               if elcorr_ref_end_i = '1' then 
+                  elcorr_ref_fval_i <= '0';
                end if;
             end if;
             
@@ -196,12 +197,17 @@ begin
             readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
             readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
             
-            -- naoi
-            readout_info_i.naoi.start        <= elec_ofs_start_i;
-            readout_info_i.naoi.stop         <= elec_ofs_end_i;
-            readout_info_i.naoi.dval         <= elec_ofs_fval_i;
-            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i;      
+            -- naoi : ENO: 22 avril 2019: dans les flags importants du naoi, rajouter toujours DEFINE_GENERATE_ELCORR_CHAIN pour eviter des bugs de non sortie d'images
+            -- en clair ne jamais generer les signaux naoi si DEFINE_GENERATE_ELCORR_CHAIN = 0.
+            -- REF_VALID n'est pas generé si DEFINE_GENERATE_ELCORR_CHAIN = 0 donc initule de rajouter DEFINE_GENERATE_ELCORR_CHAIN 
+            readout_info_i.naoi.ref_valid(1) <= REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
+            readout_info_i.naoi.ref_valid(0) <= REF_VALID(0);        -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)
+            readout_info_i.naoi.start        <= elcorr_ref_start_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.stop         <= elcorr_ref_end_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.dval         <= elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;      
             
+            readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);    
             
          end if;
       end if;
@@ -268,7 +274,7 @@ begin
             lval_pclk_cnt <= (others => '0'); 
          end if;         
          
-         if lval_pclk_cnt = FPA_INTF_CFG.LINE_PERIOD_PCLK and pclk_fall = '1' then       -- periode du referentiel ligne
+         if lval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.LINE_PERIOD_PCLK and pclk_fall = '1' then       -- periode du referentiel ligne
             lval_pclk_cnt <= to_unsigned(1, lval_pclk_cnt'length);   
          end if;
          
@@ -286,35 +292,35 @@ begin
          -------------------------
          if fval_pclk_cnt = 1 then                                   -- fval
             fval_pipe(0) <= '1';
-         elsif fval_pclk_cnt = FPA_INTF_CFG.READOUT_PCLK_CNT_MAX then
+         elsif fval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.READOUT_PCLK_CNT_MAX then
             fval_pipe(0) <= '0';
          end if;
          
-         if lval_pclk_cnt = FPA_INTF_CFG.SOL_POSL_PCLK then          -- lval
+         if lval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.SOL_POSL_PCLK then          -- lval
             lval_pipe(0) <= '1';
-         elsif lval_pclk_cnt = FPA_INTF_CFG.EOL_POSL_PCLK_P1 then
+         elsif lval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.EOL_POSL_PCLK_P1 then
             lval_pipe(0) <= '0';
          end if;    
          
-         if lval_pclk_cnt = FPA_INTF_CFG.SOL_POSL_PCLK then          -- sol
+         if lval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.SOL_POSL_PCLK then          -- sol
             sol_pipe(0) <= '1';                                  
          else
             sol_pipe(0) <= '0';
          end if;
          
-         if lval_pclk_cnt = FPA_INTF_CFG.EOL_POSL_PCLK then         -- eol
+         if lval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.EOL_POSL_PCLK then         -- eol
             eol_pipe(0) <= '1';
          else
             eol_pipe(0) <= '0';
          end if;
          
-         if fval_pclk_cnt = FPA_INTF_CFG.SOF_POSF_PCLK then         -- sof
+         if fval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.SOF_POSF_PCLK then         -- sof
             sof_pipe(0) <= '1';
          else
             sof_pipe(0) <= '0';
          end if;
          
-         if fval_pclk_cnt = FPA_INTF_CFG.EOF_POSF_PCLK then         -- eof
+         if fval_pclk_cnt = FPA_INTF_CFG.RAW_AREA.EOF_POSF_PCLK then         -- eof
             eof_pipe(0) <= '1';
          else
             eof_pipe(0) <= '0';        
@@ -347,7 +353,7 @@ begin
          eof_pipe(2)    <= eof_pipe(1);
          rd_end_pipe(2) <= rd_end_pipe(1);
          line_cnt_pipe(2) <= line_cnt_pipe(1);
-         if  line_cnt_pipe(1) >= FPA_INTF_CFG.ACTIVE_LINE_START_NUM then 
+         if  line_cnt_pipe(1) >= FPA_INTF_CFG.USER_AREA.LINE_START_NUM then 
             active_line_en1 <= '1';
          else
             active_line_en1 <= '0';
@@ -364,7 +370,7 @@ begin
          eof_pipe(3)    <= eof_pipe(2);
          rd_end_pipe(3) <= rd_end_pipe(2);
          line_cnt_pipe(3) <= line_cnt_pipe(2);
-         if line_cnt_pipe(2) <= FPA_INTF_CFG.ACTIVE_LINE_END_NUM then  
+         if line_cnt_pipe(2) <= FPA_INTF_CFG.RAW_AREA.WINDOW_LSYNC_NUM then  
             dval_pipe(3)   <= active_line_en1 and lval_pipe(2); 
          else
             dval_pipe(3)   <= '0';

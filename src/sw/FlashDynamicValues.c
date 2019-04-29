@@ -4,10 +4,10 @@
  *
  * This file implements camera flash dynamic values module.
  * 
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
+ * $Rev: 20323 $
+ * $Author: odionne $
+ * $Date: 2017-04-11 12:45:56 -0400 (mar., 11 avr. 2017) $
+ * $Id: FlashDynamicValues.c 20323 2017-04-11 16:45:56Z odionne $
  * $URL$
  *
  * (c) Copyright 2014 Telops Inc.

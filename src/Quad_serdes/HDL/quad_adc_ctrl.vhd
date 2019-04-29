@@ -154,15 +154,15 @@ architecture quad_adc_ctrl of quad_adc_ctrl is
    
    signal readback_cfg_a1, readback_cfg_a2, readback_cfg_a3, readback_cfg_a4: std_logic_vector(7 downto 0) := (others => '0');
    
-   --   -- attribute dont_touch : string; 
-   --   -- attribute dont_touch of readback_cfg_a1 : signal is "true";  
-   --   -- attribute dont_touch of readback_cfg_a2 : signal is "true";  
-   --   -- attribute dont_touch of readback_cfg_a3 : signal is "true";  
-   --   -- attribute dont_touch of readback_cfg_a4 : signal is "true";  
-   --   -- attribute dont_touch of dval_rx : signal is "true";
-   --   -- attribute dont_touch of done_i : signal is "true";
-   --   -- attribute dont_touch of ptrn_on_i : signal is "true";
-   --   -- attribute dont_touch of sclk_i : signal is "true";
+   --   -- -- -- attribute dont_touch : string; 
+   --   -- -- -- attribute dont_touch of readback_cfg_a1 : signal is "true";  
+   --   -- -- -- attribute dont_touch of readback_cfg_a2 : signal is "true";  
+   --   -- -- -- attribute dont_touch of readback_cfg_a3 : signal is "true";  
+   --   -- -- -- attribute dont_touch of readback_cfg_a4 : signal is "true";  
+   --   -- -- -- attribute dont_touch of dval_rx : signal is "true";
+   --   -- -- -- attribute dont_touch of done_i : signal is "true";
+   --   -- -- -- attribute dont_touch of ptrn_on_i : signal is "true";
+   --   -- -- -- attribute dont_touch of sclk_i : signal is "true";
    
 begin
    

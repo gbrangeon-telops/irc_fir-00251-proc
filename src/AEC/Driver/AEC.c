@@ -45,21 +45,30 @@ bool AECPlusCheckForUnattenuation(gcRegistersData_t *pGCRegs, float PET);
 bool AECPlusCheckForAttenuation(gcRegistersData_t *pGCRegs, float PET);
 void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate);
 float computeTotalFlux(int N, int n, float totalCounts, float ET, float w);
+/***************************************************************************//**
+   Interrupt Initialisation of the AEC module.
 
-/*----------------------------------------------------- 
-FONCTION : AEC_SetupInterruptSystem
-------------------------------------------------------*/
-inline int32_t AEC_SetupInterruptSystem(XIntc * InterruptController)
+   @return void
+
+*******************************************************************************/
+static inline int32_t AEC_SetupInterruptSystem(XIntc * InterruptController)
 {
-return XIntc_Connect(InterruptController, AEC_INTR_ID, (XInterruptHandler)XAEC_InterruptHandler, InterruptController);
+#ifndef SIM
+   return XIntc_Connect(InterruptController, AEC_INTR_ID, (XInterruptHandler)XAEC_InterruptHandler, InterruptController);
+#endif
 }
 
-/*--------------------------------------------------------- 
-FONCTION : EnableAECInterrupt
----------------------------------------------------------*/
-inline void AEC_EnableInterrupt(XIntc * InterruptController)
+/***************************************************************************//**
+   Interrupt Enable of the AEC module.
+
+   @return void
+
+*******************************************************************************/
+static inline void AEC_EnableInterrupt(XIntc * InterruptController)
 {
+#ifndef SIM
   //XIntc_Enable(InterruptController, AEC_INTR_ID);
+#endif
 }
 
 
@@ -131,7 +140,7 @@ void AEC_UpdateMode(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    else if(pGCRegs->ExposureAuto == EA_ArmedNDFilter)
    {
       pAEC_CTRL->AEC_Mode = AEC_ON;
-      GC_SetNDFPositionSetpoint(gcRegsData.NDFilterPositionSetpoint, gcRegsData.NDFilterArmedPositionSetpoint);
+      GC_UpdateNDFPositionSetpoint(gcRegsData.NDFilterPositionSetpoint, gcRegsData.NDFilterArmedPositionSetpoint);
       AECArmed = true;
       StopTimer(&AECPlusArmedDelay);
    }
@@ -214,7 +223,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
    bool done = false;
 
-   const float binWidth = powf(2, FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
+   const float binWidth = powf(2.0F, (float)FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
    extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 #ifdef AEC_ENABLE_PROFILER
@@ -280,7 +289,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
          if (AECPlus_ExpTime != 0)
          {
-            GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], AECPlus_ExpTime);
+            GC_SetExposureTime(AECPlus_ExpTime);
             AECPlus_ExpTime = 0;
          }
 
@@ -394,7 +403,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       if ((AEC_Int_FWPosition == FWPOSITION_NOT_IMPLEMENTED) || (pGCRegs->FWMode == FWM_Fixed))
       {
          //Apply Exposure time
-         GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], PET);
+         GC_SetExposureTime(PET);
       }
       else
       {
@@ -420,7 +429,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    if(((pGCRegs->ExposureAuto != EA_ContinuousNDFilter) && (pGCRegs->ExposureAuto != EA_ArmedNDFilter)) || (!AECP_Int_Data_Valid) || (AECPlus_ExpTime != 0) || (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height)))
    {
       //Apply Exposure time
-      //GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], PET); // deja appliqué
+      //GC_SetExposureTime(PET); // deja appliqué
 
       if (TimedOut(&AECPlusDataPrintf))
       {
@@ -469,7 +478,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    {
       AEC_PRINTF("AECArmed = false\n");
       // Apply new ExposureAuto mode
-      GC_RegisterWriteUI32(&gcRegsDef[ExposureAutoIdx], EA_ContinuousNDFilter);
+      GC_SetExposureAuto(EA_ContinuousNDFilter);
       AECArmed = false;
    }
 
@@ -617,14 +626,14 @@ void AECPlusChangeFilter(gcRegistersData_t *pGCRegs, bool Attenuate)
 
    if(Attenuate)
    {
-      GC_RegisterWriteI32(&gcRegsDef[NDFilterPositionSetpointIdx], pGCRegs->NDFilterPositionSetpoint + 1); //Go to the next NDF Filter
+      GC_SetNDFilterPositionSetpoint(pGCRegs->NDFilterPositionSetpoint + 1); //Go to the next NDF Filter
 
       AECPlus_ExpTime *= FluxRatio[pGCRegs->NDFilterPositionSetpoint - 1];
    }
    else
    {
       //Go to the previous NDF Filter
-      GC_RegisterWriteI32(&gcRegsDef[NDFilterPositionSetpointIdx], pGCRegs->NDFilterPositionSetpoint - 1); //Go to the next NDF Filter
+      GC_SetNDFilterPositionSetpoint(pGCRegs->NDFilterPositionSetpoint - 1); //Go to the next NDF Filter
 
       AECPlus_ExpTime /= FluxRatio[pGCRegs->NDFilterPositionSetpoint];
    }

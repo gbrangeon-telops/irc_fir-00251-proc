@@ -4,11 +4,11 @@
  *
  * This file defines the IR camera header inserter driver module interface.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 22650 $
+ * $Author: pcouture $
+ * $Date: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
+ * $Id: hder_inserter.h 22650 2018-12-13 20:30:18Z pcouture $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Hder/Drivers/hder_inserter.h $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -17,7 +17,6 @@
 #define __HDER_INSERTER_H__
 
 #include <stdint.h>
-#include "xbasic_types.h"  
 #include "GC_Registers.h"
 #include "IRC_status.h"
 

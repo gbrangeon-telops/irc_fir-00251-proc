@@ -54,9 +54,9 @@ architecture RTL of sc_min_max_ctrl is
    signal meas_max_i          : unsigned(31 downto 0);
    signal rst_cnt             : unsigned(31 downto 0);
    
-   attribute dont_touch : string; 
-   attribute dont_touch of meas_min_i   : signal is "true";
-   attribute dont_touch of meas_max_i   : signal is "true"; 
+   -- attribute dont_touch : string; 
+   -- attribute dont_touch of meas_min_i   : signal is "true";
+   -- attribute dont_touch of meas_max_i   : signal is "true"; 
    
 begin
    

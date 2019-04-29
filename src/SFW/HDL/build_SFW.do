@@ -23,10 +23,7 @@ acom -incr -nowarn DAGGEN_0523 \
 acom -incr -nowarn DAGGEN_0523 \
 	"$COMMON\VHDL\Utilities\axil32_addr_demux4.vhd" \
 	"$COMMON\VHDL\Utilities\axil32_to_native.vhd"
-	
-#IP Source
-acom -incr -nowarn DAGGEN_0523 \
-	"$PROC\ip\sdp_ram_w32_d128\sdp_ram_w32_d128_funcsim.vhdl"
+
 
 #source SFW
 acom -nowarn DAGGEN_0523 "$SFW_INTF\fw_decoder.vhd" \

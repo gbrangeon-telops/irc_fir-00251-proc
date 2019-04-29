@@ -3,11 +3,11 @@
 --!   @brief Wrapper for the microblaze model.
 --!   @details This component map different AXI4Lite Port.
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 13049 $
+--!   $Author: pdaraiche $
+--!   $Date: 2014-02-10 09:57:29 -0500 (lun., 10 févr. 2014) $
+--!   $Id: mb_model_wrapper.vhd 13049 2014-02-10 14:57:29Z pdaraiche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/SystemC/mb_model_wrapper.vhd $
 ------------------------------------------------------------------
 
 --!   Use IEEE standard library.

@@ -4,11 +4,11 @@
  *
  * This file declares the GenICam registers callback functions.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 23236 $
+ * $Author: elarouche $
+ * $Date: 2019-04-10 15:08:01 -0400 (mer., 10 avr. 2019) $
+ * $Id: GC_Callback.h 23236 2019-04-10 19:08:01Z elarouche $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/GC_Callback.h $
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.4.0
+// Generated from XML camera definition file version 12.5.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -279,8 +279,6 @@ void GC_TriggerSourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 void GC_VFOVCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoAGCCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoBadPixelReplacementCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
-void GC_VideoEHDRIExposureIndexCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
-void GC_VideoFWPositionCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_VideoFreezeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_WidthIncCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

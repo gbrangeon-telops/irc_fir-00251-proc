@@ -16,7 +16,6 @@
 #define __FPA_INTF_H__
 
 #include <stdint.h>
-#include "xbasic_types.h"  
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
@@ -45,7 +44,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0207AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Isc0207AIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)
 
 #define FPA_MAX_GAIN       1
 #define FPA_NUMTAPS        16  // [taps]
@@ -64,17 +63,18 @@
 #define FPA_CAL_MAX_EXPOSURE  1000000.0F
 
 #define FPA_MIN_EXPOSURE               1.0F     // [us]
-#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
+#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend
 
 #define FPA_AECP_MIN_EXPOSURE          10.0F // [us] Minimum exposure time when AEC+ is active.
-#define FPA_DATA_RESOLUTION            14
+
+#define FPA_DATA_RESOLUTION 14
 #define FPA_PIXEL_PITCH                30E-6F
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define FPA_MCLK_RATE_HZ               5E+6F          // le master clock du FPA
 
-#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec]
+#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR) 
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
@@ -83,67 +83,107 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  ADD;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_diag_mode;                   //utilisé par le trig_controller.vhd            
-   uint32_t  fpa_diag_type;                   //utilisé par le generateur de données diag de Telops
-   uint32_t  fpa_pwr_on;                      //utilisé par le fpa_intf_sequencer.vhd            
-   uint32_t  fpa_trig_ctrl_mode;              //utilisé par le trig_controller.vhd    
-   uint32_t  fpa_acq_trig_ctrl_dly;           //utilisé par le trig_controller.vhd  
-   uint32_t  fpa_acq_trig_period_min;         //utilisé par le trig_controller.vhd
-   uint32_t  fpa_xtra_trig_ctrl_dly;          //utilisé par le trig_controller.vhd  
-   uint32_t  fpa_xtra_trig_period_min;        //utilisé par le trig_controller.vhd
-                                             
-   uint32_t  xstart;                         
-   uint32_t  ystart;                         
-   uint32_t  xsize;                          
-   uint32_t  ysize;                          
-   uint32_t  boost_mode;
-   uint32_t  internal_outr;
-   uint32_t  onchip_bin_256;                 
-   uint32_t  onchip_bin_128;                 
-   uint32_t  itr;                            
-   uint32_t  gain;                                 
-   uint32_t  skimming; 
+   uint32_t  fpa_diag_mode;
+   uint32_t  fpa_diag_type;                 //utilisé par le trig_controller.vhd            
+   uint32_t  fpa_pwr_on;                    //utilisé par le generateur de données diag de Telops
+   uint32_t  fpa_trig_ctrl_mode;            //utilisé par le fpa_intf_sequencer.vhd            
+   uint32_t  fpa_acq_trig_ctrl_dly;         //utilisé par le trig_controller.vhd    
+   uint32_t  fpa_acq_trig_period_min;       //utilisé par le trig_controller.vhd  
+   uint32_t  fpa_xtra_trig_ctrl_dly;        //utilisé par le trig_controller.vhd
+   uint32_t  fpa_xtra_trig_period_min;      //utilisé par le trig_controller.vhd  
+   uint32_t  fpa_stretch_acq_trig;          //utilisé par le trig_controller.vhd
+   uint32_t  diag_ysize;                        
+   uint32_t  diag_xsize_div_tapnum;             
+   uint32_t  roic_xstart;                       
+   uint32_t  roic_ystart;                       
+   uint32_t  roic_xsize;                      
+   uint32_t  roic_ysize_div2_m1;              
+   uint32_t  gain;                              
+   uint32_t  internal_outr;                     
+   uint32_t  real_mode_active_pixel_dly;        
+   uint32_t  speedup_lsync;                           
+   uint32_t  speedup_sample_row;              
+   uint32_t  speedup_unused_area;               
+   uint32_t  raw_area_line_start_num;                    
+   uint32_t  raw_area_line_end_num;             
+   uint32_t  raw_area_sof_posf_pclk;            
+   uint32_t  raw_area_eof_posf_pclk;               
+   uint32_t  raw_area_sol_posl_pclk;            
+   uint32_t  raw_area_eol_posl_pclk;            
+   uint32_t  raw_area_eol_posl_pclk_p1;         
+   uint32_t  raw_area_window_lsync_num;         
+   uint32_t  raw_area_line_period_pclk;         
+   uint32_t  raw_area_readout_pclk_cnt_max;     
+   uint32_t  user_area_line_start_num;          
+   uint32_t  user_area_line_end_num;            
+   uint32_t  user_area_sol_posl_pclk;           
+   uint32_t  user_area_eol_posl_pclk;           
+   uint32_t  user_area_eol_posl_pclk_p1;        
+   uint32_t  stretch_area_sol_posl_pclk;      
+   uint32_t  stretch_area_eol_posl_pclk;        
+   uint32_t  pix_samp_num_per_ch;               
+   uint32_t  hgood_samp_sum_num;                
+   uint32_t  hgood_samp_mean_numerator;        
+   uint32_t  vgood_samp_sum_num;                
+   uint32_t  vgood_samp_mean_numerator;         
+   uint32_t  good_samp_first_pos_per_ch;      
+   uint32_t  good_samp_last_pos_per_ch;
+
+   int32_t   adc_clk_source_phase;
+   uint32_t  adc_clk_pipe_sel;
+   uint32_t  spare1;
+
+   uint32_t  lsydel_mclk;                     
+   uint32_t  boost_mode;                      
+   uint32_t  speedup_lsydel;                  
+   uint32_t  adc_clk_pipe_sync_pos;
+
+   uint32_t  readout_plus_delay;                                                                                                                        
+   uint32_t  tri_window_and_intmode_part;                                                                                                               
+   uint32_t  int_time_offset;                                                                                                                           
+   uint32_t  tsh_min;                                                                                                                                   
+   uint32_t  tsh_min_minus_int_time_offset;  // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR.... 
+   uint32_t  elcorr_enabled;                       
+   uint32_t  elcorr_pix_faked_value_forced;        
+   uint32_t  elcorr_pix_faked_value;                                       
+   uint32_t  elcorr_ref_cfg_0_ref_enabled;        
+   uint32_t  elcorr_ref_cfg_0_null_forced;        
+   uint32_t  elcorr_ref_cfg_0_start_dly_sampclk;  
+   uint32_t  elcorr_ref_cfg_0_samp_num_per_ch;    
+   uint32_t  elcorr_ref_cfg_0_samp_mean_numerator;
+   uint32_t  elcorr_ref_cfg_0_ref_value;                                             
+   uint32_t  elcorr_ref_cfg_1_ref_enabled;        
+   uint32_t  elcorr_ref_cfg_1_null_forced;        
+   uint32_t  elcorr_ref_cfg_1_start_dly_sampclk;  
+   uint32_t  elcorr_ref_cfg_1_samp_num_per_ch;    
+   uint32_t  elcorr_ref_cfg_1_samp_mean_numerator;
+   uint32_t  elcorr_ref_cfg_1_ref_value;
+   uint32_t  elcorr_ref_dac_id;               
+   uint32_t  elcorr_atemp_gain;               
+   uint32_t  elcorr_atemp_ofs;                
+   uint32_t  elcorr_ref0_op_sel;           
+   uint32_t  elcorr_ref1_op_sel;              
+   uint32_t  elcorr_mult_op_sel;              
+   uint32_t  elcorr_div_op_sel;               
+   uint32_t  elcorr_add_op_sel;               
+   uint32_t  elcorr_gain_cont_calc_mode;                                         
+   uint32_t  sat_ctrl_en;                     
+   uint32_t  cfg_num;                         
+   uint32_t  dac_free_running_mode;           
+   uint32_t  roic_cst_output_mode;   
+   int32_t   additional_fpa_int_time_offset;// additional offset coming from flash settings
+   uint32_t  fpa_intf_data_source;
    
-   uint32_t  real_mode_active_pixel_dly;     
-   uint32_t  line_period_pclk;                        
-   uint32_t  readout_pclk_cnt_max;           
-   uint32_t  active_line_start_num;          
-   uint32_t  active_line_end_num;               
-   uint32_t  pix_samp_num_per_ch;            
-   uint32_t  sof_posf_pclk;                  
-   uint32_t  eof_posf_pclk;                  
-   uint32_t  sol_posl_pclk;                  
-   uint32_t  eol_posl_pclk;                  
-   uint32_t  eol_posl_pclk_p1;               
-   uint32_t  hgood_samp_sum_num;             
-   uint32_t  hgood_samp_mean_numerator;      
-   uint32_t  vgood_samp_sum_num;             
-   uint32_t  vgood_samp_mean_numerator;      
-   uint32_t  good_samp_first_pos_per_ch;     
-   uint32_t  good_samp_last_pos_per_ch;    
-   uint32_t  xsize_div_tapnum;               
-   uint32_t  ysize_div2_m1;                  
-   uint32_t  readout_plus_delay;             
-   uint32_t  tri_window_and_intmode_part;   // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR.... 
-   uint32_t  int_time_offset;                
-   uint32_t  tsh_min;                        
-   uint32_t  tsh_min_minus_int_time_offset;  
-                                             
-   uint32_t  vdac_value[8];                    
-   uint32_t  quad_clk_phase[4];               
-     
-   // additional offset coming from flash settings
-   int32_t   additional_fpa_int_time_offset;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, {10, 10, 10, 10},0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  100,1,0,  2, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
 {					            
    // adc board (iddcas analogiques)
-   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
+   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253-XXX  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
    uint32_t  adc_resolution;           // statut du built_in test de la carte ADC
    uint32_t  adc_brd_spare;            // spare de statut pour la carte ADC
@@ -173,8 +213,9 @@ struct s_FpaStatus    //
    // pour le power management
    uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé
    uint32_t  adc_ddc_present;             // dit si une carte valide est détectée
-   uint32_t  flex_detect_process_done;    // dit si le  processus de détection du flex est achevé
-   uint32_t  flex_present;                // dit si une carte valide est détectée
+   uint32_t  flex_flegx_detect_process_done; // dit si le  processus de détection du flex est achevé
+   uint32_t  flex_flegx_present;             // dit si une carte valide est détectée
+   uint32_t  flegx_present;               // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
 
    uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 
@@ -186,37 +227,12 @@ struct s_FpaStatus    //
 
    // fpa init status
    uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
-   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA 
+   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
+   uint32_t  prog_init_done;              // -- monte à '1' lorsque la config d'initialisation est programmée dans le ROIC. Ce qui est intéressant pour les ROIC necessitant une config d'initialisation
    
-   
-//   uint32_t fpa_trig_ctrl_mode;           
-//   uint32_t xsize;                        
-//   uint32_t ysize;                        
-//   uint32_t misc;                         
-//   uint32_t real_mode_active_pixel_dly;   
-//   uint32_t line_period_pclk;             
-//   uint32_t readout_pclk_cnt_max;         
-//   uint32_t active_line_start_num;        
-//   uint32_t active_line_end_num;          
-//   uint32_t pix_samp_num_per_ch;          
-//   uint32_t sof_posf_pclk;                
-//   uint32_t eof_posf_pclk;                
-//   uint32_t sol_posl_pclk;                
-//   uint32_t eol_posl_pclk;                
-//   uint32_t eol_posl_pclk_p1;             
-//   uint32_t hgood_samp_sum_num;           
-//   uint32_t hgood_samp_mean_numerator;    
-//   uint32_t vgood_samp_sum_num;           
-//   uint32_t vgood_samp_mean_numerator;    
-//   uint32_t good_samp_first_pos_per_ch;   
-//   uint32_t good_samp_last_pos_per_ch;    
-//   uint32_t xsize_div_tapnum;    
-//   uint32_t ysize_div2_m1;                
-//   uint32_t readout_plus_delay;           
-//   uint32_t tri_window_and_intmode_part;  
-//   uint32_t int_time_offset;              
-//   uint32_t tsh_min;                      
-//   uint32_t tsh_min_minus_int_time_offset;  
+   // cooler
+   uint32_t  cooler_on_curr_min_mA;       // seuil au dessus duquel considérer que le refroidisseur est allumé
+   uint32_t  cooler_off_curr_max_mA;      // seuil en dessous duquel considérer que le refroidisseur est eteint
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

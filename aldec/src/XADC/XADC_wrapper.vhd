@@ -3,11 +3,11 @@
 --!   @brief Wrapper for the XADC.
 --!   @details This component package the XADC Core.
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 13076 $
+--!   $Author: pdaraiche $
+--!   $Date: 2014-02-11 09:07:48 -0500 (mar., 11 févr. 2014) $
+--!   $Id: XADC_wrapper.vhd 13076 2014-02-11 14:07:48Z pdaraiche $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/XADC/XADC_wrapper.vhd $
 ------------------------------------------------------------------
 
 --!   Use IEEE standard library.

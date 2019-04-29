@@ -105,11 +105,15 @@ architecture RTL of hawkA_detector_ctrler is
    signal input_mosi     : t_ll_ext_mosi8; 
    signal sreset         : std_logic;
    signal cnt            : unsigned(7 downto 0);
-   signal done_i   : std_logic;
+   signal done_i         : std_logic;
    signal rqst_i         : std_logic;
    signal reg_rqst       : std_logic;
    signal spi_done_last  : std_logic;
    signal dcr_drem       : std_logic_vector(3 downto 0);
+   
+   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal actual_cfg_num      : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num_pending : std_logic;
    
    
 begin
@@ -166,7 +170,30 @@ begin
    -- Sync reset
    -------------------------------------------------- 
    U3: sync_reset
-   port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);    
+   port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);
+   
+   
+   --------------------------------------------------
+   --  cfg_num
+   --------------------------------------------------
+   -- ENO: 26 nov 2018: Pour eviter bugs , reprogrammer le ROIC, dès qu'une config est reçue du MB.
+   
+   U2C : process(CLK)
+   begin
+      if rising_edge(CLK) then 
+         
+         -- nouvelle config lorsque cfg_num change
+         new_cfg_num <= FPA_INTF_CFG.CFG_NUM;    
+         
+         -- detection du changement
+         if actual_cfg_num /= new_cfg_num then
+            new_cfg_num_pending <= '1';
+         else
+            new_cfg_num_pending <= '0';
+         end if;         
+         
+      end if;
+   end process;       
    
    
    --------------------------------------------------
@@ -184,7 +211,8 @@ begin
             rqst_i <= '0';
             dcr_mosi_i.support_busy <= '1';
             reg_rqst <= '0'; 
-            dcr_drem <= "1000"; -- DCR est un registre à 8 bits
+            dcr_drem <= "1000"; -- DCR est un registre à 8 bits 
+            actual_cfg_num <= not new_cfg_num;
          else                   
             -- demande de programmtion en provenance des registres
             reg_rqst <= MCR_MOSI.DVAL or WCR_MOSI.DVAL or DDR_MOSI.DVAL or not WDR_FIFO_EMPTY; 
@@ -201,7 +229,7 @@ begin
                      dcr_mosi_i.dval <= '0'; 
                      reg_en <= NONE; 
                      done_i <= '1';     -- done à '1' ssi aucune demande 
-                     if SPI_DONE = '1' and reg_rqst = '1' then 
+                     if SPI_DONE = '1' and (reg_rqst = '1' or new_cfg_num_pending = '1') then 
                         dcr_fsm <= dcr_rqst_st;
                      end if;
                   
@@ -294,6 +322,7 @@ begin
                   
                   when second_tnh_dly =>                 -- on observe le delai tNH du manuel
                      cnt <= cnt + 1;
+                     actual_cfg_num <= new_cfg_num;
                      if cnt =  HAWK_TNH_DLY then
                         dcr_fsm <= what_else_st;
                      end if;

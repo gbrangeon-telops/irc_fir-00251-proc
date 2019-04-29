@@ -39,6 +39,8 @@ acom -incr -nowarn DAGGEN_0523 \
 # top level intf
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\mglk_mblaze_intf.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
+ D:\Telops\FIR-00251-Common\VHDL\Utilities\axis_32_to_64_wrap.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream32_fifo.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\mglk_io_interface.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \

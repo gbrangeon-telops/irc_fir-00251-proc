@@ -5,11 +5,11 @@
  *  This file defines the functions that can be used by a transactor.
  *  A transctor is a channel between VHDL and c code
  *  
- *  $Rev$
- *  $Author$
- *  $LastChangedDate$
- *  $Id$
- *  $URL$
+ *  $Rev: 13301 $
+ *  $Author: enofodjie $
+ *  $LastChangedDate: 2014-03-13 11:22:29 -0400 (jeu., 13 mars 2014) $
+ *  $Id: mb_transactor.cpp 13301 2014-03-13 15:22:29Z enofodjie $
+ *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/SystemC/mb_transactor.cpp $
  */
 #include "mb_transactor.h"
 #include <systemc.h>

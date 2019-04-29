@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: adc_readout.h 22650 2018-12-13 20:30:18Z pcouture $ */
 /****************************************************************************/
 /**
 *
@@ -18,7 +18,7 @@
 
 #include <stdbool.h>
 
-#define ADC_BASE_ADDR TEL_PAR_TEL_ADC_READOUT_CTRL_BASEADDR
+#define ADC_BASE_ADDR XPAR_ADC_READOUT_CTRL_BASEADDR
 
 #define ADC_ENABLE_OFFSET 0x00
 #define ADC_R_OFFSET  0x04

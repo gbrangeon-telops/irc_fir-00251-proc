@@ -8,11 +8,11 @@
  * Generated from the image correction calibration file structure definition XLS file version 1.12.0
  * using generateIRCamFileCLib.m Matlab script.
  *
- * $Rev$
- * $Author$
- * $Date$
- * $Id$
- * $URL$
+ * $Rev: 20323 $
+ * $Author: odionne $
+ * $Date: 2017-04-11 12:45:56 -0400 (mar., 11 avr. 2017) $
+ * $Id: FlashSettingsFile_v1.c 20323 2017-04-11 16:45:56Z odionne $
+ * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/FlashSettingsFile_v1.c $
  *
  * (c) Copyright 2016 Telops Inc.
  */

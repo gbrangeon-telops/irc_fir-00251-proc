@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author$
--- $LastChangedDate$
--- $Revision$ 
+-- $Author: enofodjie $
+-- $LastChangedDate: 2016-09-09 14:36:43 -0400 (ven., 09 sept. 2016) $
+-- $Revision: 19153 $ 
 -------------------------------------------------------------------------------
 --
 -- Description : This file implement the axi_lite communication and interrupt gen to the micro blaze

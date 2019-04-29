@@ -4,11 +4,21 @@ rem Clean up
 del %elfFile%
 del %bootFile%
 del %bitFile%
-del %bmmFile%
+del %mmiFile%
 
 rem Fetch hw and sw files
-copy %sdkDir%\%baseName%\%config%\%baseName%.elf %elfFile%
-copy %sdkDir%\%baseName%_boot\%config%\%baseName%_boot.elf %bootFile%
-copy %sdkDir%\hw\%baseName%.bit %bitFile%
-copy %sdkDir%\hw\%baseName%_bd.bmm %bmmFile%
+copy %sdkDir%\%baseName%_%fpgaSize%\%config%\%baseName%_%fpgaSize%.elf %elfFile%
+if errorlevel 1 goto err
+copy %sdkDir%\%baseName%_boot_%fpgaSize%\%config%\%baseName%_boot_%fpgaSize%.elf %bootFile%
+if errorlevel 1 goto err
+copy %sdkDir%\hw_platform_%fpgaSize%\%baseName%.bit %bitFile%
+if errorlevel 1 goto err
+copy %sdkDir%\hw_platform_%fpgaSize%\%baseName%.mmi %mmiFile%
+if errorlevel 1 goto err
+goto end
 
+:err
+echo Copy failed!
+pause
+
+:end
