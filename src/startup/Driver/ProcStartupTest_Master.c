@@ -48,7 +48,7 @@ static IRC_Status_t AutoTest_Initialize(void) {
     * the referenced issue is solved. (Also remove #include "xparameters.h")
     ***********************************************************************************/
    extern XIntc gProcIntc;
-   XIntc_Disconnect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR);
+   XIntc_Disconnect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_0_INTR);
 
    // Turn OFF Output FPGA verbose
    AutoTest_OutputVerbose(false);

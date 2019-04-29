@@ -1,1 +1,0 @@
-set_property SEVERITY {warning} [get_drc_checks REQP-109]

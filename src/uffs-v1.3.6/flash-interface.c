@@ -476,7 +476,7 @@ static inline void WRITE_DATA_FAST_SPARE(uffs_Device *dev, const u8 *data, int l
 		u8 busy;
 		u64 *data64 = (u64*)data;
 		int len64 = len/8;
-		u64 *DRAM1 = (u64 *)XPAR_M_FLASHINTF_AXI_BASEADDR;  					// Memory base
+		u64 *DRAM1 = (u64 *)TEL_PAR_TEL_FLASH_INTF_BASEADDR;  					// Memory base
 
 		while(len64) {
 				*DRAM1 = *data64;
@@ -504,7 +504,7 @@ static inline void WRITE_DATA_FAST(uffs_Device *dev, const u8 *data, int len){
 		u8 busy;
 		u64 *data64 = (u64*)data;
 		int len64 = len/8;
-		u64 *DRAM1 = (u64 *)XPAR_M_FLASHINTF_AXI_BASEADDR;  					// Memory base
+		u64 *DRAM1 = (u64 *)TEL_PAR_TEL_FLASH_INTF_BASEADDR;  					// Memory base
 
 		while(len64) {
 				*DRAM1 = *data64;
@@ -544,7 +544,7 @@ static inline void READ_DATA_FAST_SPARE(uffs_Device *dev, u8 *data, int len){
 
 		u64 *data64 = (u64*)data;
 		int len64 = len/8;
-	    u64 *DRAM1 = (u64 *)XPAR_M_FLASHINTF_AXI_BASEADDR;  					// Memory base
+	    u64 *DRAM1 = (u64 *)TEL_PAR_TEL_FLASH_INTF_BASEADDR;  					// Memory base
 	    my_XGpio_DiscreteSet(&Gpio1, SM_COMMAND, 4);
     	my_XGpio_DiscreteClear(&Gpio1, SM_COMMAND, 4);
 
@@ -573,7 +573,7 @@ static inline void READ_DATA_FAST(uffs_Device *dev, u8 *data, int len){
 
 		u64 *data64 = (u64*)data;
 		int len64 = len/8;
-		u64 *DRAM1 = (u64 *)XPAR_M_FLASHINTF_AXI_BASEADDR;				// Memory base
+		u64 *DRAM1 = (u64 *)TEL_PAR_TEL_FLASH_INTF_BASEADDR;				// Memory base
 		my_XGpio_DiscreteSet(&Gpio1, SM_COMMAND, 1);
 		my_XGpio_DiscreteClear(&Gpio1, SM_COMMAND, 1);
 

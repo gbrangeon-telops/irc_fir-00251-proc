@@ -3,11 +3,11 @@
 --!   @brief Wrapper for the Interrupt Controller.
 --!   @details This component package the Interrupt Controller.
 --!
---!   $Rev: 13074 $
---!   $Author: pdaraiche $
---!   $Date: 2014-02-11 09:06:08 -0500 (mar., 11 févr. 2014) $
---!   $Id: INTC_wrapper.vhd 13074 2014-02-11 14:06:08Z pdaraiche $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/INTC/INTC_wrapper.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 --!   Use IEEE standard library.

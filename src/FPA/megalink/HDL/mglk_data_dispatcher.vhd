@@ -113,16 +113,14 @@ architecture rtl of mglk_data_dispatcher is
          valid    : out std_logic;
          full     : out std_logic;
          overflow : out std_logic;
-         empty    : out std_logic;
-         wr_rst_busy    : out std_logic;
-         rd_rst_busy    : out std_logic
+         empty    : out std_logic
          );
    end component;
    
    component fwft_sfifo_w28_d16
       port (
          clk       : in std_logic;
-         srst       : in std_logic;
+         rst       : in std_logic;
          din       : in std_logic_vector(27 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
@@ -137,7 +135,7 @@ architecture rtl of mglk_data_dispatcher is
    component fwft_sfifo_w40_d16
       port (
          clk       : in std_logic;
-         srst       : in std_logic;
+         rst       : in std_logic;
          din       : in std_logic_vector(39 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
@@ -249,14 +247,14 @@ architecture rtl of mglk_data_dispatcher is
    signal pix_count                    : unsigned(31 downto 0);
    signal proxy_int_time               : unsigned(23 downto 0);
    
-   -- -- attribute dont_touch                         : string;
-   -- -- attribute dont_touch of frame_start_id       : signal is "true";
-   -- -- attribute dont_touch of last_cmd_id          : signal is "true"; 
-   -- -- attribute dont_touch of fpa_int_time         : signal is "true"; 
-   -- -- attribute dont_touch of byte_18              : signal is "true";
-   -- -- attribute dont_touch of byte_19              : signal is "true";
-   -- -- attribute dont_touch of byte_20              : signal is "true";
-   -- -- attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
+   -- attribute dont_touch                         : string;
+   -- attribute dont_touch of frame_start_id       : signal is "true";
+   -- attribute dont_touch of last_cmd_id          : signal is "true"; 
+   -- attribute dont_touch of fpa_int_time         : signal is "true"; 
+   -- attribute dont_touch of byte_18              : signal is "true";
+   -- attribute dont_touch of byte_19              : signal is "true";
+   -- attribute dont_touch of byte_20              : signal is "true";
+   -- attribute dont_touch of fpa_int_time_100MHz  : signal is "true";
    
 begin
    
@@ -458,7 +456,7 @@ begin
    --------------------------------------------------
    U6 : fwft_sfifo_w40_d16
    port map (
-      srst => sreset,
+      rst => ARESET,
       clk => CLK,
       din => fringe_fifo_din,
       wr_en => fringe_fifo_wr,
@@ -627,10 +625,10 @@ begin
             -- dispatching des données et header en mode DIAG et REEL (ou FPA)
             if real_data_mode = '1' then 
                pix_dval_i <= fpa_fifo_rd and fpa_fifo_dval and fpa_dval and acq_fringe;
-               pix_data_i <= resize(fpa_pix2_data(15 downto 2),16) & resize(fpa_pix1_data(15 downto 2),16) ;--reverse_bit_func(fpa_pix1_data) & reverse_bit_func(fpa_pix2_data); -- inverser l'ordre des bits de Megalink             
+               pix_data_i <= resize(fpa_pix1_data(15 downto 2),16) & resize(fpa_pix2_data(15 downto 2),16) ;--reverse_bit_func(fpa_pix1_data) & reverse_bit_func(fpa_pix2_data); -- inverser l'ordre des bits de Megalink             
             else
                pix_dval_i <= diag_fifo_rd and diag_fifo_dval and diag_dval and acq_fringe;
-               pix_data_i <= diag_pix2_data & diag_pix1_data;
+               pix_data_i <= diag_pix1_data & diag_pix2_data;
             end if;
             
             -- le header en provenance du fpa doit sortir en tout temps pour aller vers l'extracteur de données. On mettra ainsi à jour les signes vitaux du détecteur (la température etc...) si possible

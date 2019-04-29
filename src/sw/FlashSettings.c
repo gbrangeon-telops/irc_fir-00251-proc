@@ -4,11 +4,11 @@
  *
  * This file defines camera flash settings structure.
  * 
- * $Rev: 23328 $
- * $Author: odionne $
- * $Date: 2019-04-17 13:06:31 -0400 (mer., 17 avr. 2019) $
- * $Id: FlashSettings.c 23328 2019-04-17 17:06:31Z odionne $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/FlashSettings.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -207,18 +207,9 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaExposureTimeOffset;
    extern t_FpaIntf gFpaIntf;
-   extern uint16_t gFpaElCorrMeasAtStarvation;
-   extern uint16_t gFpaElCorrMeasAtSaturation;
-   extern uint16_t gFpaElCorrMeasAtReference1;
-   extern uint16_t gFpaElCorrMeasAtReference2;
    extern bool gDisableFilterWheel;
    extern flashSettings_t flashSettings_default;
-   extern t_bufferManager gBufManager;
-   uint8_t externalMemoryBufferDetected;
-   t_bufferStatus bufStat;
-
-   BufferManager_GetStatus(&gBufManager, &bufStat);
-   externalMemoryBufferDetected = bufStat.ext_buf_prsnt;
+   uint8_t externalMemoryBufferDetected = BufferManager_DetectExternalMemoryBuffer();
 
    // Update device serial number
    gcRegsData.DeviceSerialNumber = p_flashSettings->DeviceSerialNumber;
@@ -240,13 +231,13 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    // Update reverse X/Y
    if (calibrationInfo.isValid)
    {
-      GC_SetReverseX(flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
-      GC_SetReverseY(flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
    }
    else
    {
-      GC_SetReverseX(flashSettings.ReverseX);
-      GC_SetReverseY(flashSettings.ReverseY);
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX);
+      GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY);
    }
 
    // Update ICU
@@ -306,11 +297,13 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gcRegsData.NDFilterNumber = p_flashSettings->NDFNumberOfFilters;
    if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters > 0))
    {
-      TDCFlagsSet(NDFilterIsImplementedMask | AECPlusIsImplementedMask);
+      TDCFlagsSet(NDFilterIsImplementedMask);
+      TDCFlagsSet(AECPlusIsImplementedMask);
    }
    else
    {
-      TDCFlagsClr(NDFilterIsImplementedMask | AECPlusIsImplementedMask);
+      TDCFlagsClr(NDFilterIsImplementedMask);
+      TDCFlagsClr(AECPlusIsImplementedMask);
 
       if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters == 0))
       {
@@ -319,7 +312,8 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    }
 
    // Update actualization
-   TDCFlagsClr(ImageCorrectionIsImplementedMask | ExternalZeroMeanBetaCorrectionIsImplementedMask);
+   TDCFlagsClr(ImageCorrectionIsImplementedMask);
+   TDCFlagsClr(ExternalZeroMeanBetaCorrectionIsImplementedMask);
    if (p_flashSettings->ImageCorrectionEnabled)
    {
       TDCFlagsSet(ImageCorrectionIsImplementedMask);
@@ -335,10 +329,6 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gFpaDetectorElectricalTapsRef = p_flashSettings->DetectorElectricalTapsRef;
    gFpaDetectorElectricalRefOffset = p_flashSettings->DetectorElectricalRefOffset;
    gFpaExposureTimeOffset = p_flashSettings->ExposureTimeOffset;
-   gFpaElCorrMeasAtStarvation = p_flashSettings->ElCorrMeasAtStarvation; 
-   gFpaElCorrMeasAtSaturation = p_flashSettings->ElCorrMeasAtSaturation;
-   gFpaElCorrMeasAtReference1 = p_flashSettings->ElCorrMeasAtReference1;
-   gFpaElCorrMeasAtReference2 = p_flashSettings->ElCorrMeasAtReference2;   
 
    // Validate ExternalMemoryBufferPresent field
    if (XOR(p_flashSettings->ExternalMemoryBufferPresent, externalMemoryBufferDetected))
@@ -366,6 +356,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    ADC_readout_init(p_flashSettings);
 
    // Set IRIG HW delay
+   //TODO For now, the HW delay is hardcoded (p_flashSettings is unused). Eventually, the delay will have to be set in the flash setting.
    IRIG_Initialize(p_flashSettings);
 
    // Update Thermistor model type
@@ -376,11 +367,12 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    xadcSetphyConverter(&extAdcChannels[XEC_COMPRESSOR]    , p_flashSettings->CompressorThType);
    xadcSetphyConverter(&extAdcChannels[XEC_COLD_FINGER]   , p_flashSettings->ColdfingerThType);
    xadcSetphyConverter(&extAdcChannels[XEC_SPARE]         , p_flashSettings->SpareThType);
-   xadcSetphyConverter(&extAdcChannels[XEC_EXT_THERMISTOR], p_flashSettings->ExternalTempThType);
+   xadcSetphyConverter(&extAdcChannels[XEC_EXT_THERMISTOR] ,p_flashSettings->ExternalTempThType);
 
    // Update motorized FOV and focus
    gcRegsData.FOVPositionNumber = p_flashSettings->FOVNumberOfPositions;
-   TDCFlagsClr(MotorizedFOVLensIsImplementedMask | MotorizedFocusLensIsImplementedMask);
+   TDCFlagsClr(MotorizedFOVLensIsImplementedMask);
+   TDCFlagsClr(MotorizedFocusLensIsImplementedMask);
    switch (p_flashSettings->MotorizedLensType)
    {
       case MLT_RPOpticalODEM660:
@@ -433,7 +425,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    else
    {
       TDCFlagsClr(SaveConfigurationIsImplementedMask);
-      GC_SetLoadSavedConfigurationAtStartup(0);
+      GC_RegisterWriteUI32(&gcRegsDef[LoadSavedConfigurationAtStartupIdx], 0);
    }
 
    // Update camera state if initialization is done
@@ -441,7 +433,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    {
       ICU_init(&gcRegsData, &gICU_ctrl);
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
-      GC_UpdateExternalFanSpeed();
+      GC_SetExternalFanSpeed();
    }
 
    return IRC_SUCCESS;

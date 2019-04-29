@@ -6,9 +6,6 @@ set FlashSettingsFile_h=%srcDir%\IRCamFiles\FlashSettingsFile_v%fsMajorVersion%.
 for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\FlashDynamicValuesFile.h -f TSDVFILES_VERSION') do  set fdvMajorVersion=%%i
 set FlashDynamicValuesFile_h=%srcDir%\IRCamFiles\FlashDynamicValuesFile_v%fdvMajorVersion%.h
 
-for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\IRCamFiles.h -f CALIBFILES_VERSION') do  set calMajorVersion=%%i
-set CalibCollectionFile_h=%srcDir%\IRCamFiles\CalibCollectionFile_v%calMajorVersion%.h
-
 set FirmwareVersionFile=%projectDir%\bin\FirmwareReleaseVersion.txt
 
 echo|set /p="set firmwareVersionMajor="> %versionFile%
@@ -62,19 +59,6 @@ echo|set /p="set flashDynamicValuesVersionSubMinor=">> %versionFile%
 %x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %FlashDynamicValuesFile_h% -f FLASHDYNAMICVALUES_FILESUBMINORVERSION_V%fdvMajorVersion%>> %versionFile%
 echo.>> %versionFile%
 echo set flashDynamicValuesVersion=%%flashDynamicValuesVersionMajor%%.%%flashDynamicValuesVersionMinor%%.%%flashDynamicValuesVersionSubMinor%%>> %versionFile%
-
-echo.>> %versionFile%
-
-echo|set /p="set calibFilesVersionMajor=">> %versionFile%
-%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %CalibCollectionFile_h% -f CALIBCOLLECTION_FILEMAJORVERSION_V%calMajorVersion%>> %versionFile%
-echo.>> %versionFile%
-echo|set /p="set calibFilesVersionMinor=">> %versionFile%
-%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %CalibCollectionFile_h% -f CALIBCOLLECTION_FILEMINORVERSION_V%calMajorVersion%>> %versionFile%
-echo.>> %versionFile%
-echo|set /p="set calibFilesVersionSubMinor=">> %versionFile%
-%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %CalibCollectionFile_h% -f CALIBCOLLECTION_FILESUBMINORVERSION_V%calMajorVersion%>> %versionFile%
-echo.>> %versionFile%
-echo set calibFilesVersion=%%calibFilesVersionMajor%%.%%calibFilesVersionMinor%%.%%calibFilesVersionSubMinor%%>> %versionFile%
 
 copy %versionFile% %versionFile:.txt=.bat%
 call %versionFile:.txt=.bat%

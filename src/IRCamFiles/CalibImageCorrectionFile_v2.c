@@ -2,17 +2,17 @@
  * @file CalibImageCorrectionFile_v2.c
  * Camera image correction calibration file structure v2 definition.
  *
- * This file defines the camera image correction calibration file structure v2.
+ * This file defines camera image correction calibration file structure v2.
  *
- * Auto-generated image correction calibration file library.
+ * Auto-generated Image Correction Calibration File library.
  * Generated from the image correction calibration file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
- * $Rev: 23158 $
- * $Author: elarouche $
- * $Date: 2019-04-02 16:09:55 -0400 (mar., 02 avr. 2019) $
- * $Id: CalibImageCorrectionFile_v2.c 23158 2019-04-02 20:09:55Z elarouche $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/CalibImageCorrectionFile_v2.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2016 Telops Inc.
  */

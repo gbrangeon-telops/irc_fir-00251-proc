@@ -4,11 +4,11 @@
  *  
  *  For SystemC, it defines that the main() function is a thread.
  *  
- *  $Rev: 12770 $
- *  $Author: pdaraiche $
- *  $LastChangedDate: 2013-12-20 12:01:34 -0500 (ven., 20 déc. 2013) $
- *  $Id: proc_ctrl.h 12770 2013-12-20 17:01:34Z pdaraiche $
- *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/SystemC/proc_ctrl.h $
+ *  $Rev$
+ *  $Author$
+ *  $LastChangedDate$
+ *  $Id$
+ *  $URL$
  */
 #ifndef __PROC_CTRL_H__
 #define __PROC_CTRL_H__

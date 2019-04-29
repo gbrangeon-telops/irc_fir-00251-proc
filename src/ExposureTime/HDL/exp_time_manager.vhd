@@ -44,19 +44,7 @@ architecture RTL of exp_time_manager is
          CLK    : in std_logic;
          SRESET : out std_logic := '1'
          );
-   end component;
-   
-   component double_sync is
-      generic(
-         INIT_VALUE : bit := '0'
-         );
-      port(
-         D     : in std_logic;
-         Q     : out std_logic := '0';
-         RESET : in std_logic;
-         CLK   : in std_logic
-         );
-   end component;
+   end component;        
    
    type exp_ctrl_sm_type is (idle, wait_mb_exp_st, wait_fw_exp_st, wait_ehdri_exp_st, check_exp_limit_st1, wait_fpa_st, wait_mb_new_cgf_st, check_exp_limit_st2); 
    
@@ -70,8 +58,8 @@ architecture RTL of exp_time_manager is
    signal exp_feedbk_sync_last    : std_logic;
    signal fpa_synchro_done        : std_logic;
    
-   -- -- -- attribute dont_touch                        : string;
-   -- -- -- attribute dont_touch of fpa_exp_info_latch  : signal is "true";
+   -- attribute dont_touch                        : string;
+   -- attribute dont_touch of fpa_exp_info_latch  : signal is "true";
    
 begin
    
@@ -83,20 +71,12 @@ begin
    ----------------------------------------------------------------------------
    --  synchro reset
    ----------------------------------------------------------------------------
-   U1A: sync_reset
+   U1: sync_reset
    port map(
       ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset
-      );
-   
-   U1B : double_sync
-   port map(
-      CLK => CLK,
-      D   => IMG_INFO.EXP_FEEDBK,
-      Q   => exp_feedbk_sync,
-      RESET => sreset
-      );
+      ); 
    
    ----------------------------------------------------------------------------
    --  gestion du temps d'intégration
@@ -115,13 +95,13 @@ begin
             exp_ctrl_sm <= idle;
             exp_ctrl_busy_i <= '1';
             fpa_exp_info_i.exp_dval <= '0';
-            --exp_feedbk_sync <= '0';
+            exp_feedbk_sync <= '0';
             exp_feedbk_sync_last <= '0';
             exp_source <= MB_SOURCE;
             fpa_synchro_done <= '0';
          else
             
-            --exp_feedbk_sync <= IMG_INFO.EXP_FEEDBK;    -- IMG_INFO est certaibnement sur l'horloge FPA_INTF_CLK. Une simple synchro est suffisante
+            exp_feedbk_sync <= IMG_INFO.EXP_FEEDBK;    -- IMG_INFO est certaibnement sur l'horloge FPA_INTF_CLK. Une simple synchro est suffisante
             exp_feedbk_sync_last <= exp_feedbk_sync;   --  
             
             fpa_synchro_done <= exp_feedbk_sync and not exp_feedbk_sync_last; -- la synchro du fpa est definie sur le rising edge de l'intégration. Ainsi le temps d'intégration envoyé sera appliqué sur l'image suivante

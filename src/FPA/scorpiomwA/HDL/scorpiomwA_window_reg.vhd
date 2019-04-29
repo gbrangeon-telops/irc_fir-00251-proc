@@ -76,9 +76,6 @@ architecture rtl of scorpiomwA_window_reg is
    signal dly_cnter           : unsigned(7 downto 0);
    signal error_i             : std_logic;
    signal fpa_error_i         : std_logic;
-   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal actual_cfg_num      : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal new_cfg_num_pending : std_logic;
    --0-signal 
    
 begin
@@ -99,26 +96,6 @@ begin
    U1 : sync_reset
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
    
-   --------------------------------------------------
-   --  cfg_num
-   --------------------------------------------------
-   -- ENO: 26 nov 2018: Pour eviter bugs , reprogrammer le ROIC, dès qu'une config est reçue du MB.    
-   U2C : process(CLK)
-   begin
-      if rising_edge(CLK) then 
-         
-         -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= FPA_INTF_CFG.CFG_NUM;    
-         
-         -- detection du changement
-         if actual_cfg_num /= new_cfg_num then
-            new_cfg_num_pending <= '1';
-         else
-            new_cfg_num_pending <= '0';
-         end if;         
-         
-      end if;
-   end process;       
    
    --------------------------------------------------
    --  bistream builder
@@ -174,7 +151,6 @@ begin
             sizea_sizeb_i <= FPA_INTF_CFG.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             actual_cfg(39) <= '1';   -- le bit 39 seul forcé à '1'. Cela suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             error_i <= '0';
-            actual_cfg_num <= not new_cfg_num;
             
          else    
             
@@ -190,7 +166,7 @@ begin
                   done_i <= '1'; 
                   rqst_i <= '0';
                   pause_cnt <= (others => '0');
-                  if new_cfg_pending = '1' or new_cfg_num_pending = '1'then
+                  if new_cfg_pending = '1' then
                      roic_cfg_fsm <= check_done_st;  
                   end if;   
                
@@ -256,7 +232,6 @@ begin
                
                when  pause_st =>
                   pause_cnt <= pause_cnt + 1;
-                  actual_cfg_num <= new_cfg_num;
                   if pause_cnt = 7 then   --  largenment le temps pour que new_cfg_pending retombe avant d'aller à idle
                      roic_cfg_fsm <= idle;
                   end if;

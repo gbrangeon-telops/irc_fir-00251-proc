@@ -5,7 +5,6 @@
 #Packages
 acom -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd \
- d:\Telops\FIR-00251-Common\VHDL\Utilities\dbus64_reorder.vhd \
  d:\Telops\FIR-00251-Common\VHDL\Utilities\dbus_reorder.vhd 
 
 #utilities

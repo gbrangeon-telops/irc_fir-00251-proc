@@ -55,17 +55,11 @@
 #define AW_FPA_OUTPUT_SW_TYPE             0xAE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
 #define AW_FPA_INPUT_SW_TYPE              0xAE8      // obligaoire pour les deteceteurs analogiques
 
-// adresse d'ecriture de la cfg des Dacs
-#define AW_DAC_CFG_BASE_ADD               0x0D00   
-
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                          0x13      // 0x13 -> hawkA . Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                   0x01      // 0x01 -> output analogique .provient du fichier fpa_common_pkg.vhd. La valeur 0x01 est celle de OUTPUT_ANALOG
 #define FPA_INPUT_TYPE                    0x04      // 0x04 -> input LVCMOS33 .provient du fichier fpa_common_pkg.vhd. La valeur 0x04 est celle de LVCMOS33
 
-// identification des sources de données
-#define DATA_SOURCE_INSIDE_FPGA           0         // Provient du fichier fpa_common_pkg.vhd.
-#define DATA_SOURCE_OUTSIDE_FPGA          1         // Provient du fichier fpa_common_pkg.vhd.
 
 // adresse d'écriture du régistre du reset des erreurs
 #define AW_RESET_ERR                      0xAEC
@@ -109,23 +103,10 @@
  
 #define FPA_XTRA_TRIG_FREQ_MAX_HZ         100           // ENO: 25 janv 2016: la programmation du dtecteur se fera à cette vitesse au max. Cela donnera assez de coups d'horloges pour les resets quelle que soit la config de fenetre
 
-#define HAWK_TAPREF_VOLTAGE_MIN_mV        2810           // valeur en provenance du fichier fpa_define
-#define HAWK_TAPREF_VOLTAGE_MAX_mV        6100           // valeur en provenance du fichier fpa_define
+#define HAWK_TAPREF_VOLTAGE_MIN_mV       2810           // valeur en provenance du fichier fpa_define
+#define HAWK_TAPREF_VOLTAGE_MAX_mV       6100           // valeur en provenance du fichier fpa_define
 
-#define HAWK_CONST_ELEC_OFFSET_VALUE      340            //correction d'offset non implantée sur Hawk
-
-#define TOTAL_DAC_NUM                     8
-
-
-
-
-struct s_ProximCfgConfig 
-{   
-   uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
-   uint32_t  spare1;                       
-   uint32_t  spare2;   
-};                                  
-typedef struct s_ProximCfgConfig ProximCfg_t;
+#define HAWK_CONST_ELEC_OFFSET_VALUE     340            //correction d'offset non implantée sur Hawk
 
 // structure interne pour les parametres du hawk
 struct hawk_param_s             // 
@@ -160,7 +141,6 @@ typedef struct hawk_param_s  hawk_param_t;
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint8_t init_done = 0;
-ProximCfg_t ProximCfg = {{0, 0, 0, 0,  0, 0, 0, 2200}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -169,7 +149,6 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 
 void FPA_SpecificParams(hawk_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
-void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -231,10 +210,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static int16_t actualPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
-   extern int32_t gFpaDebugRegE;
    float Nr, Nc, No, R, H, C, W;
-   static uint8_t cfg_num = 0; 
-   
    
    // on bâtit les parametres specifiques du hawk
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -253,13 +229,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade) {
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
-   }
-   
-   // mode diag vrai et faked
-   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
-   if (ptrA->fpa_diag_mode == 1){
-      if ((int32_t)gFpaDebugRegE != 0)
-         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
    
    // allumage du détecteur 
@@ -370,59 +339,38 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;                                        
    
    // les DACs (1 à 8)
-   ProximCfg.vdac_value[0]                 = FLEG_VccVoltage_To_DacWord(6000.0F, 1);          // DAC1 -> VDD à 6V
-   ProximCfg.vdac_value[1]                 = 0;
-   ProximCfg.vdac_value[2]                 = FLEG_VccVoltage_To_DacWord(5800.0F, 1);          // DAC2 -> PRV à 5.8V
-   ProximCfg.vdac_value[3]                 = 0;
-   ProximCfg.vdac_value[4]                 = 0;
-   ProximCfg.vdac_value[5]                 = 0;
-   ProximCfg.vdac_value[6]                 = 0;                                               //  VCC7 -> offset1  non tulisé sur le fleg        
+   ptrA->vdac_value[0]                     = 14995;          // DAC1 -> VDD à 6V
+   ptrA->vdac_value[1]                     = 0;
+   ptrA->vdac_value[2]                     = 14122;          // DAC2 -> PRV à 5.8V
+   ptrA->vdac_value[3]                     = 0;
+   ptrA->vdac_value[4]                     = 0;
+   ptrA->vdac_value[5]                     = 0;
+   ptrA->vdac_value[6]                     = 0;             //  VCC7 -> offset1  non tulisé sur le fleg
  
    // VCC8 ou DAC8
    if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
    {
       if ((gFpaDetectorElectricalTapsRef >= (float)HAWK_TAPREF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)HAWK_TAPREF_VOLTAGE_MAX_mV))
-         ProximCfg.vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 8);  // 
+         ptrA->vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 8);  // 
 	}                                                                                                       
-   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
+   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[7], 8);            
    gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;
     
-   // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
-   // adc clk source phase
-   if (init_done == 0){
-      ptrA->adc_clk_pipe_sel = 0;
-   }       
-   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1)){
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
-      //need_rst_fpa_module = 1;
-   }
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
+    
+   // pour securiser les livraisons d'avant l'entrée en vigueur des offsets dans les flash settings 
+   if (pGCRegs->DeviceSerialNumber == 4466)                  // pour IRC1511 
+      ptrA->vdac_value[7]                     = 1650;        // DAC8 -> VCC8 à 2.943V 
+   else if (pGCRegs->DeviceSerialNumber == 4467)             // pour IRC1512                                          // pour IRC1512 ou autres
+      ptrA->vdac_value[7]                     = 2200;        // DAC8 ->
    
-   // adc clk source phase
-   if (init_done == 0){         
-      ptrA->adc_clk_source_phase = 1000;
-   }
-   
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1)){
-      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
-      //need_rst_fpa_module = 1;
-   }
-    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;
+   // adc_clk_phase
+   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_phase) && (init_done == 1))
+      ptrA->adc_clk_phase = (uint32_t)gFpaDebugRegD;         // on dephase l'horloge des ADC
+   gFpaDebugRegD = (int32_t)ptrA->adc_clk_phase;
        
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
-   
-    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;
-   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
-   
-   // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
-   FPA_SendProximCfg(&ProximCfg, ptrA);
-   
-   // envoi du reste de la config 
+          
    WriteStruct(ptrA);
 }
 
@@ -576,8 +524,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->errors_latchs           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x3C);
    Stat->adc_ddc_detect_process_done   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x50);
    Stat->adc_ddc_present               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x54);
-   Stat->flex_flegx_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
-   Stat->flex_flegx_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
+   Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
+   Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
    Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
    Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
@@ -589,11 +537,27 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
    Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
-   Stat->flegx_present                 =(Stat->flex_flegx_present & Stat->adc_brd_spare);
    
-   Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
-   Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
-   Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
+   // verification des statuts en simulation
+   #ifdef SIM
+      PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
+      PRINTF("Stat->adc_analog_channel_num   = %d\n", Stat->adc_analog_channel_num);
+      PRINTF("Stat->adc_resolution           = %d\n", Stat->adc_resolution);
+      PRINTF("Stat->adc_brd_spare            = %d\n", Stat->adc_brd_spare);
+      PRINTF("Stat->ddc_fpa_roic             = %d\n", Stat->ddc_fpa_roic );
+      PRINTF("Stat->ddc_brd_spare            = %d\n", Stat->ddc_brd_spare);
+      PRINTF("Stat->flex_fpa_roic            = %d\n", Stat->flex_fpa_roic);
+      PRINTF("Stat->flex_fpa_input           = %d\n", Stat->flex_fpa_input);
+      PRINTF("Stat->flex_ch_diversity_num    = %d\n", Stat->flex_ch_diversity_num );
+      PRINTF("Stat->cooler_volt_min_mV       = %d\n", Stat->cooler_volt_min_mV);
+      PRINTF("Stat->cooler_volt_max_mV       = %d\n", Stat->cooler_volt_max_mV);
+      PRINTF("Stat->fpa_temp_raw             = %d\n", Stat->fpa_temp_raw);
+      PRINTF("Stat->global_done              = %d\n", Stat->global_done);
+      PRINTF("Stat->fpa_powered              = %d\n", Stat->fpa_powered);
+      PRINTF("Stat->cooler_powered           = %d\n", Stat->cooler_powered);
+      PRINTF("Stat->errors_latchs            = %d\n", Stat->errors_latchs);
+   #endif  
+   
 }
 
 
@@ -674,19 +638,4 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
    VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
    
    return VccVoltage_mV;
-}
-
-//------------------------------------------------
-// Envoi de la config des dacs et autres
-//-----------------------------------------------
-void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
-{
-   uint8_t ii = 0;
-   
-   // envoi comfig des Dacs
-   while(ii < TOTAL_DAC_NUM)
-   {
-      AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  // dans le vhd, division par 4 avant entrée dans ram
-      ii++;
-   }
 }

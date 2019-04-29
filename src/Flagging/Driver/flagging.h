@@ -30,7 +30,7 @@ struct s_FlagCfg
    
 typedef struct s_FlagCfg t_FlagCfg;
 
-#define FLAG_BASE_CLOCK_FREQ_HZ    CLK_MB_FREQ_HZ  // horloge de reference du flagging
+#define FLAG_BASE_CLOCK_FREQ_HZ    CLK_100_FREQ_HZ  // horloge de reference du flagging
 
 #define FLAGADDR_MODE            0x0
 #define FLAGADDR_DELAY           0x4

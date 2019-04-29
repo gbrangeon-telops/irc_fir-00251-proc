@@ -209,8 +209,6 @@ begin
             readout_info_i.naoi.dval         <= elec_ofs_fval_i;
             readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i; 
             
-            readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);
-            
          end if;
       end if;
    end process;  

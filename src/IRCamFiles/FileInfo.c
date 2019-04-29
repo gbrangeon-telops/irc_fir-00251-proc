@@ -4,11 +4,11 @@
  *
  * This file implements the file manager module.
  *
- * $Rev: 18969 $
- * $Author: dalain $
- * $Date: 2016-07-06 13:35:31 -0400 (mer., 06 juil. 2016) $
- * $Id: FileInfo.c 18969 2016-07-06 17:35:31Z dalain $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/FileInfo.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */

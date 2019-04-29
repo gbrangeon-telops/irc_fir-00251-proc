@@ -106,9 +106,9 @@ begin
                   TX_MOSI.TUSER   <= RX_MOSI.TUSER;
                   
                    if unsigned(RX_MOSI.TDATA) >=  resize(unsigned(THRESHOLD_MOSI.TDATA), RX_MOSI.TDATA'length) then 
-                      TX_MOSI.TUSER(TUSER_SATURATED_PIX_BIT)<= '1'; --pixel is saturated
+                      TX_MOSI.TUSER(1)<= '1'; --pixel is saturated
                    else
-                      TX_MOSI.TUSER(TUSER_SATURATED_PIX_BIT)<= '0'; --pixel is not saturated 
+                      TX_MOSI.TUSER(1)<= '0'; --pixel is not saturated 
                    end if;
                else
                   TX_MOSI.TVALID  <= '0';

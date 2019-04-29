@@ -6,18 +6,17 @@
  *
  * Author : SSA
  *
- * $Rev: 23147 $
- * $Author: elarouche $
- * $Date: 2019-04-01 14:32:59 -0400 (lun., 01 avr. 2019) $
- * $Id: FaulhaberProtocol.c 23147 2019-04-01 18:32:59Z elarouche $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
  * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2015-02-19%20-%20FW/src/sw/FileManager.h $
  *
  * (c) Copyright 2015 Telops Inc.
  */
 
 #include "FaulhaberProtocol.h"
-
-#include "CircularUART.h"
+#include "UART_Utils.h"
 #include "xparameters.h"
 
 #include <stdlib.h> // atoi()
@@ -90,8 +89,8 @@ void FH_parseResponse(FH_ctrl_t* chan)
    //if (state == FHRX_IDLE || state == FHRX_UNEXPECTED)
       //FH_TRX("FH: Rx: ");
 
-   ierRegister = XUartNs550_ReadReg(chan->link.uart.uart.Ns550.BaseAddress, XUN_IER_OFFSET);
-   XUartNs550_WriteReg(chan->link.uart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, 0);
+   ierRegister = XUartNs550_ReadReg(chan->link.uart.BaseAddress, XUN_IER_OFFSET);
+   XUartNs550_WriteReg(chan->link.uart.BaseAddress, XUN_IER_OFFSET, 0);
 
    unsigned char byte;
    while (CBB_Pop(&chan->fh_data.rxCircBuff, &byte) == IRC_SUCCESS)
@@ -337,7 +336,7 @@ void FH_parseResponse(FH_ctrl_t* chan)
    }*/
 
    // Reactivate UART interrupt
-   XUartNs550_WriteReg(chan->link.uart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, ierRegister);
+   XUartNs550_WriteReg(chan->link.uart.BaseAddress, XUN_IER_OFFSET, ierRegister);
 }
 
 /***************************************************************************//**
@@ -364,7 +363,7 @@ void FH_UART_IntrHandler(void *CallBackRef,
       case XUN_EVENT_RECV_TIMEOUT: // Data was received but stopped for 4 character periods.
       case XUN_EVENT_RECV_DATA: // Data has been received.
          // Listen for command on UART
-         n = XUartNs550_Recv(&FH_ctrl->link.uart.uart.Ns550, FH_ctrl->buffers.rxBuffer, sizeof(FH_ctrl->buffers.rxBuffer));
+         n = XUartNs550_Recv(&FH_ctrl->link.uart, FH_ctrl->buffers.rxBuffer, sizeof(FH_ctrl->buffers.rxBuffer));
 
          // CR_WARNING for some reason, n is always 0! thus we use EventData, which contains the actual number of bytes received
          n = EventData;
@@ -414,7 +413,6 @@ void FH_UART_IntrHandler(void *CallBackRef,
  ******************************************************************************/
 XStatus FH_init(gcRegistersData_t *pGCRegs, FH_ctrl_t *fh_data, uint16_t uartDeviceId, XIntc* intc, uint16_t uartIntrId)
 {
-
    XStatus status;
 
    FH_initData(&fh_data->fh_data);
@@ -422,37 +420,30 @@ XStatus FH_init(gcRegistersData_t *pGCRegs, FH_ctrl_t *fh_data, uint16_t uartDev
    memset(fh_data->buffers.rxBuffer, 0, sizeof(fh_data->buffers.rxBuffer));
    memset(fh_data->buffers.txBuffer, 0, sizeof(fh_data->buffers.txBuffer));
 
-
-
-
-status =  CircularUART_Init(&fh_data->link.uart,
+   status = UART_Init(&fh_data->link.uart,
          uartDeviceId,
          intc,
          uartIntrId,
          FH_UART_IntrHandler,
-         (void *)(fh_data),
-         Ns550); 
+         (void *)(fh_data));
 
    if (status != IRC_SUCCESS)
    {
      return IRC_FAILURE;
    }
 
-
-status = CircularUART_Config(&fh_data->link.uart, FH_BAUDRATE, FH_DATA_BITS, FH_PARITY, FH_STOP_BITS);
-
+   status = UART_Config(&fh_data->link.uart, FH_BAUDRATE, FH_DATA_BITS, FH_PARITY, FH_STOP_BITS);
    if (status != IRC_SUCCESS)
    {
      return IRC_FAILURE;
    }
 
    // Reset RX FIFO
-   CircularUART_ResetFifo(&fh_data->link.uart);
+   UART_ResetRxFifo(&fh_data->link.uart);
 
-   XUartNs550_SetFifoThreshold(&fh_data->link.uart.uart.Ns550, XUN_FIFO_TRIGGER_08);
+   XUartNs550_SetFifoThreshold(&fh_data->link.uart, XUN_FIFO_TRIGGER_08);
 
-
-   XUartNs550_Recv(&fh_data->link.uart.uart.Ns550,
+   XUartNs550_Recv(&fh_data->link.uart,
          fh_data->buffers.rxBuffer,
          sizeof(fh_data->buffers.rxBuffer));
 
@@ -682,7 +673,7 @@ uint32_t FH_sendPendingCmds(FH_ctrl_t* chan)
 	if (bytesSent > 0)
    {
       chan->buffers.txBusy = 1;
-      n = XUartNs550_Send(&chan->link.uart.uart.Ns550, chan->buffers.txBuffer, bytesSent);
+      n = XUartNs550_Send(&chan->link.uart, chan->buffers.txBuffer, bytesSent);
    }
 
 #ifdef FH_TX_VERBOSE

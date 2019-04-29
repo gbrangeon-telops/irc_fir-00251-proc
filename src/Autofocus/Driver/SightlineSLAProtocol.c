@@ -62,31 +62,30 @@ XStatus SL_init(gcRegistersData_t *pGCRegs, slCtrl_t *aCtrl, uint16_t uartDevice
    memset(aCtrl->serial_data.rxBuffer, 0, sizeof(aCtrl->serial_data.rxBuffer));
    memset(aCtrl->serial_data.txBuffer, 0, sizeof(aCtrl->serial_data.txBuffer));
 
-   status = CircularUART_Init(  &aCtrl->theUart,
+   status = UART_Init(  &aCtrl->theUart,
                         uartDeviceId,
                         intc,
                         uartIntrId,
                         SL_UART_IntrHandler,
-                        (void *)(aCtrl),
-                        Ns550);
+                        (void *)(aCtrl));
 
    if (status != IRC_SUCCESS)
    {
      return IRC_FAILURE;
    }
 
-   status = CircularUART_Config(&aCtrl->theUart, SL_DEFAULT_BAULDRATE, SL_DATA_BITS, SL_PARITY, SL_STOP_BITS);
+   status = UART_Config(&aCtrl->theUart, SL_DEFAULT_BAULDRATE, SL_DATA_BITS, SL_PARITY, SL_STOP_BITS);
    if (status != IRC_SUCCESS)
    {
      return IRC_FAILURE;
    }
 
    // Reset RX FIFO
-   CircularUART_ResetFifo(&aCtrl->theUart);
+   UART_ResetRxFifo(&aCtrl->theUart);
 
-   XUartNs550_SetFifoThreshold(&aCtrl->theUart.uart.Ns550, XUN_FIFO_TRIGGER_14);
+   XUartNs550_SetFifoThreshold(&aCtrl->theUart, XUN_FIFO_TRIGGER_14);
 
-   XUartNs550_Recv(  &aCtrl->theUart.uart.Ns550,
+   XUartNs550_Recv(  &aCtrl->theUart,
                      aCtrl->serial_data.rxBuffer,
                      sizeof( aCtrl->serial_data.rxBuffer));
 
@@ -114,7 +113,7 @@ void SL_UART_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData)
       case XUN_EVENT_RECV_DATA:                       // Data has been received.
       {
          // Listen for command on UART
-         n = XUartNs550_Recv(&theCtrl->theUart.uart.Ns550, theCtrl->serial_data.rxBuffer, sizeof(theCtrl->serial_data.rxBuffer));
+         n = XUartNs550_Recv(&theCtrl->theUart, theCtrl->serial_data.rxBuffer, sizeof(theCtrl->serial_data.rxBuffer));
 
          // CR_WARNING for some reason, n is always 0! thus we use EventData, which contains the actual number of bytes received
          n = EventData;
@@ -179,14 +178,14 @@ void SightLine_ProtocolHandler_SM(slCtrl_t* aCtrl)
          if(aCtrl->serial_data.txDataCount > 0)
          {
             aCtrl->serial_data.txBusy = 1;
-            XUartNs550_Send(&aCtrl->theUart.uart.Ns550, aCtrl->serial_data.txBuffer, aCtrl->serial_data.txDataCount);
+            XUartNs550_Send(&aCtrl->theUart, aCtrl->serial_data.txBuffer, aCtrl->serial_data.txDataCount);
          }
 
       }
 
       // deactivate uart interruptions
-      firstRegister = XUartNs550_ReadReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET);
-      XUartNs550_WriteReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, 0);
+      firstRegister = XUartNs550_ReadReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET);
+      XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, 0);
 
       if(aCtrl->parsingDone<1)               // if we don't expect any response so flush the buffer
       {
@@ -322,7 +321,7 @@ void SightLine_ProtocolHandler_SM(slCtrl_t* aCtrl)
       aCtrl->slParsingState = state;
 
       // Reactivate UART interrupt
-      XUartNs550_WriteReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, firstRegister);
+      XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, firstRegister);
 }
 
 /*

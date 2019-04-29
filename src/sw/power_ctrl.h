@@ -4,11 +4,11 @@
  *
  * This file defines the camera power manager module interface.
  *
- * $Rev: 22905 $
- * $Author: elarouche $
- * $Date: 2019-02-20 18:58:26 -0500 (mer., 20 févr. 2019) $
- * $Id: power_ctrl.h 22905 2019-02-20 23:58:26Z elarouche $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/power_ctrl.h $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -88,6 +88,7 @@ enum powerChannelEnum {
    PC_SPARE2 = 7,
    PC_SPARE = 8,
    PC_SELFRESET = 9,
+   PC_PUSH_BUTTON = 10
 };
 
 /**
@@ -124,7 +125,7 @@ typedef enum pushButtonStateEnum pushButtonState_t;
 #define Power_TurnOn(channel) Power_SetChannelPowerState(channel, CPS_ON)
 #define Power_TurnOff(channel) Power_SetChannelPowerState(channel, CPS_OFF)
 
-IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t IntrId);
+IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t gpioIntrId);
 channelPowerState_t Power_GetChannelPowerState(powerChannel_t channel);
 pushButtonState_t Power_GetPushButtonState();
 channelPowerState_t Power_SetChannelPowerState(powerChannel_t channel, channelPowerState_t state);

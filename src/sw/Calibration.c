@@ -4,11 +4,11 @@
  *
  * This file implements camera calibration module.
  * 
- * $Rev: 23328 $
- * $Author: odionne $
- * $Date: 2019-04-17 13:06:31 -0400 (mer., 17 avr. 2019) $
- * $Id: Calibration.c 23328 2019-04-17 17:06:31Z odionne $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/Calibration.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -26,15 +26,13 @@
 #include "tel2000_param.h"
 #include "proc_memory.h"
 #include "EHDRI_Manager.h"
-#include "mb_axi4l_bridge.h"
+#include "xil_io.h"
 #include "BuiltInTests.h"
 #include "FlashDynamicValues.h"
 
 extern t_calib gCal;
 extern int8_t gActualisationLoadBlockIdx;
 extern bool gStartBetaQuantization;
-
-static uint32_t CalibrationMode_backup;
 
 /**
  * Calibration block information
@@ -420,7 +418,6 @@ void Calibration_SM()
    static uint32_t lutNLCount;
    static uint8_t startup = 1;
    static deltabeta_t* deltaBetaDataAddr = NULL;
-   static bool once = false;
 
    extern flashDynamicValues_t gFlashDynamicValues;
    extern bool blockLoadCmdFlag;
@@ -1022,7 +1019,7 @@ void Calibration_SM()
 
             for (i = 0; i < (length / sizeof(uint32_t)); i++)
             {
-               AXI4L_write32(p_uint32[i], (XPAR_NLC_LUT_AXI_BASEADDR + (lutNLCount * NLC_LUT_PAGE_SIZE) + (dataOffset / sizeof(uint32_t)) + i));
+              Xil_Out32((uint32_t *)(TEL_PAR_TEL_NLC_LUT_BASEADDR + (lutNLCount * NLC_LUT_PAGE_SIZE) + (dataOffset / sizeof(uint32_t)) + i), p_uint32[i]);
             }
 
             // Compute CRC-16 value
@@ -1198,16 +1195,27 @@ void Calibration_SM()
          calibrationInfo.isValid = 1;
          builtInTests[BITID_CalibrationFilesLoading].result = BITR_Passed;
 
-         TDCStatusClr(WaitingForCalibrationInitMask | WaitingForCalibrationDataMask);
+         TDCStatusClr(WaitingForCalibrationInitMask);
+         TDCStatusClr(WaitingForCalibrationDataMask);
 
          // Update AvailabilityFlags register
-         AvailabilityFlagsSet(CalibrationIsAvailableMask | Raw0IsAvailableMask | RawIsAvailableMask |
-               NUCIsAvailableMask | RTIsAvailableMask | IBRIsAvailableMask | IBIIsAvailableMask);
+         AvailabilityFlagsSet(CalibrationIsAvailableMask);
 
-         if (gGC_ProprietaryFeatureKeyIsValid == 0)
+         if (gGC_ProprietaryFeatureKeyIsValid)
+         {
+            AvailabilityFlagsSet(Raw0IsAvailableMask);
+         }
+         else
          {
             AvailabilityFlagsClr(Raw0IsAvailableMask);
          }
+
+         AvailabilityFlagsSet(RawIsAvailableMask);
+         AvailabilityFlagsSet(NUCIsAvailableMask);
+
+         AvailabilityFlagsSet(RTIsAvailableMask);
+         AvailabilityFlagsSet(IBRIsAvailableMask);
+         AvailabilityFlagsSet(IBIIsAvailableMask);
 
          // Disable calibration mode if not all of the block have a corresponding LUTRQ data
          for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
@@ -1229,11 +1237,6 @@ void Calibration_SM()
          }
 
          // Update CalibrationMode register
-         if (!once) {
-            gcRegsData.CalibrationMode = CalibrationMode_backup;
-            once = true;
-         }
-
          if ((gcRegsData.CalibrationMode == CM_Raw0) && (gGC_ProprietaryFeatureKeyIsValid == 0))
          {
             GC_SetCalibrationMode(CM_RT);
@@ -1261,8 +1264,8 @@ void Calibration_SM()
             // gcRegsData.Height = calibrationInfo.collection.Height;
             // gcRegsData.OffsetX = calibrationInfo.collection.OffsetX;
             // gcRegsData.OffsetY = calibrationInfo.collection.OffsetY;
-            GC_SetReverseX(flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
-            GC_SetReverseY(flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
+            GC_RegisterWriteUI32(&gcRegsDef[ReverseXIdx], flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
+            GC_RegisterWriteUI32(&gcRegsDef[ReverseYIdx], flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
 
             // Update active calibration collection registers
             gcRegsData.CalibrationCollectionActivePOSIXTime = calibrationInfo.collection.POSIXTime;
@@ -1337,12 +1340,12 @@ void Calibration_SM()
 
             if (flashSettings.FWPresent == 1)
             {
-               GC_SetFWPositionSetpoint(calibrationInfo.blocks[blockIndex].FWPosition);
+               GC_RegisterWriteUI32(&gcRegsDef[FWPositionSetpointIdx], calibrationInfo.blocks[blockIndex].FWPosition);
             }
 
             if (flashSettings.NDFPresent == 1)
             {
-               GC_SetNDFilterPositionSetpoint(calibrationInfo.blocks[blockIndex].NDFPosition);
+               GC_RegisterWriteUI32(&gcRegsDef[NDFilterPositionSetpointIdx], calibrationInfo.blocks[blockIndex].NDFPosition);
 
                // Update AEC+ parameters coming from blocks and collection
                AEC_UpdateAECPlusParameters();
@@ -1356,7 +1359,7 @@ void Calibration_SM()
             }
 
             // Update registers related to calibration control
-            GC_UpdateCalibrationRegisters();
+            GC_CalibrationUpdateRegisters();
             GC_UpdateParameterLimits();
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
             GC_UpdateAECPlusIsAvailable();
@@ -1415,9 +1418,16 @@ static void Calibration_Init()
    TDCStatusSet(WaitingForCalibrationInitMask);
 
    // Update AvailabilityFlags register
-   AvailabilityFlagsClr(CalibrationIsAvailableMask | Raw0IsAvailableMask | RawIsAvailableMask |
-         NUCIsAvailableMask | RTIsAvailableMask | IBRIsAvailableMask | IBIIsAvailableMask |
-         NDFilter1IsAvailableMask | NDFilter2IsAvailableMask | NDFilter3IsAvailableMask);
+   AvailabilityFlagsClr(CalibrationIsAvailableMask);
+   AvailabilityFlagsClr(Raw0IsAvailableMask);
+   AvailabilityFlagsClr(RawIsAvailableMask);
+   AvailabilityFlagsClr(NUCIsAvailableMask);
+   AvailabilityFlagsClr(RTIsAvailableMask);
+   AvailabilityFlagsClr(IBRIsAvailableMask);
+   AvailabilityFlagsClr(IBIIsAvailableMask);
+   AvailabilityFlagsClr(NDFilter1IsAvailableMask);
+   AvailabilityFlagsClr(NDFilter2IsAvailableMask);
+   AvailabilityFlagsClr(NDFilter3IsAvailableMask);
 
    // Update active calibration collection registers
    gcRegsData.CalibrationCollectionActivePOSIXTime = 0;
@@ -1439,7 +1449,6 @@ void Calibration_Reset()
    AvailabilityFlagsSet(Raw0IsAvailableMask);
 
    // Update CalibrationMode register
-   CalibrationMode_backup = gcRegsData.CalibrationMode;
    GC_SetCalibrationMode(CM_Raw0);
 
    // Show Raw0 only in Telops mode
@@ -1815,7 +1824,7 @@ static IRC_Status_t Calibration_CopyLUTRQData(uint8_t *buffer, uint32_t buflen, 
 
    for (i = 0; i < buflen32; i++)
    {
-      AXI4L_write32(buffer32[i], (XPAR_RQC_LUT_AXI_BASEADDR + (lut_page * RQC_LUT_PAGE_SIZE) + offset32 + i));
+     Xil_Out32((uint32_t *)(TEL_PAR_TEL_RQC_LUT_BASEADDR + (lut_page * RQC_LUT_PAGE_SIZE) + offset32 + i), buffer32[i]);
    }
 
    return IRC_SUCCESS;

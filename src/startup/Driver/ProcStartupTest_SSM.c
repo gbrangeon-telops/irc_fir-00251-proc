@@ -14,7 +14,6 @@
  */
 
 #include "ProcStartupTest_SSM.h"
-#include "DebugTerminal.h"
 
 // External variables
 extern XSysMon xsm;

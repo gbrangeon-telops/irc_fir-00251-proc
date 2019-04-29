@@ -22,9 +22,10 @@
 #include "GC_Registers.h"
 #include "tel2000_param.h"
 #include <stdint.h>
+#include "xbasic_types.h"
 
 
-#define EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ     CLK_MB_FREQ_HZ  // horloge de reference des temps d'exposition
+#define EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ     CLK_100_FREQ_HZ  // horloge de reference des temps d'exposition
 #define EXPOSURE_TIME_FACTOR                 ((float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ / 1E+6F) // convertit us en coups d'horloge
 #define MAX_NUM_FILTER  8
 

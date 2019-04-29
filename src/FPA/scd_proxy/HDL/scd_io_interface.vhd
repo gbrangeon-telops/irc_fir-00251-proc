@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 18634 $
---!   $Author: enofodjie $
---!   $Date: 2016-04-27 10:55:25 -0400 (mer., 27 avr. 2016) $
---!   $Id: scd_io_interface.vhd 18634 2016-04-27 14:55:25Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scd_proxy/HDL/scd_io_interface.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 library IEEE;

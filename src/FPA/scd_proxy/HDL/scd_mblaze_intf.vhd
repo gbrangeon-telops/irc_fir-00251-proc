@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22828 $
---!   $Author: enofodjie $
---!   $Date: 2019-02-09 10:45:11 -0500 (sam., 09 févr. 2019) $
---!   $Id: scd_mblaze_intf.vhd 22828 2019-02-09 15:45:11Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scd_proxy/HDL/scd_mblaze_intf.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 library IEEE;
@@ -121,8 +121,8 @@ architecture rtl of scd_mblaze_intf is
    --signal fpa_int_indx_last               : std_logic;
    --signal fpa_manuf_diag_mode_last        : std_logic;
    
-   -- -- attribute dont_touch                   : string;
-   -- -- attribute dont_touch of user_cfg_i     : signal is "true";
+   -- attribute dont_touch                   : string;
+   -- attribute dont_touch of user_cfg_i     : signal is "true";
    
    
    

@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22668 $
---!   $Author: elarouche $
---!   $Date: 2018-12-18 12:13:33 -0500 (mar., 18 déc. 2018) $
---!   $Id: gating_mblaze_intf.vhd 22668 2018-12-18 17:13:33Z elarouche $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Gating/HDL/gating_mblaze_intf.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
@@ -44,6 +44,23 @@ architecture rtl of gating_mblaze_intf is
          SRESET : out std_logic := '1'
          );
    end component;      
+   
+   component double_sync
+      generic(
+         INIT_VALUE : BIT := '0');
+      port(
+         D     : in std_logic;
+         Q     : out std_logic;
+         RESET : in std_logic;
+         CLK   : in std_logic);
+   end component;   
+   
+   component double_sync_vector
+      port(
+         D     : in std_logic_vector;
+         Q     : out std_logic_vector;
+         CLK   : in std_logic);
+   end component;
    
    signal sreset                    : std_logic; 
    

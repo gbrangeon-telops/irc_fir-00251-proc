@@ -5,11 +5,11 @@
  *  This is the microblaze model for SystemC simulation.
  *  It contains a AXI4-Lite port
  *
- *  $Rev: 13049 $
- *  $Author: pdaraiche $
- *  $LastChangedDate: 2014-02-10 09:57:29 -0500 (lun., 10 févr. 2014) $
- *  $Id: mb_model.h 13049 2014-02-10 14:57:29Z pdaraiche $
- *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/SystemC/mb_model.h $
+ *  $Rev$
+ *  $Author$
+ *  $LastChangedDate$
+ *  $Id$
+ *  $URL$
  */
 #ifndef __mb_model_h__
 #define __mb_model_h__

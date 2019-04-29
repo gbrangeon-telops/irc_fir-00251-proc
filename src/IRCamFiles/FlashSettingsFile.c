@@ -4,11 +4,11 @@
  *
  * This file defines camera flash settings values structure.
  * 
- * $Rev: 23158 $
- * $Author: elarouche $
- * $Date: 2019-04-02 16:09:55 -0400 (mar., 02 avr. 2019) $
- * $Id: FlashSettingsFile.c 23158 2019-04-02 20:09:55Z elarouche $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/IRCamFiles/FlashSettingsFile.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -446,14 +446,6 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 7;
 
                case 7:
-                  // 2.7.x -> 2.8.x
-                  hdr->ElCorrMeasAtStarvation = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtStarvation;
-                  hdr->ElCorrMeasAtSaturation = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtSaturation;
-                  hdr->ElCorrMeasAtReference1 = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtReference1;
-                  hdr->ElCorrMeasAtReference2 = FlashSettings_FlashSettingsFileHeader_default.ElCorrMeasAtReference2;
-                  hdr->FileStructureMinorVersion = 8;
-
-               case 8:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

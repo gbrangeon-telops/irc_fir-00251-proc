@@ -43,10 +43,6 @@ entity trig_gen_mblaze_intf is
 	  
 	   SEQ_SOFTTRIG				  : out std_logic;
       
-      
-      TRIG_DELAY_MIN       : in STD_LOGIC_VECTOR(31 downto 0);
-      TRIG_DELAY_MAX       : in STD_LOGIC_VECTOR(31 downto 0);
-      
       TRIG_PERIOD_MIN           : in  array8_slv32;
       TRIG_PERIOD_MAX           : in  array8_slv32
       );
@@ -60,6 +56,23 @@ architecture rtl of trig_gen_mblaze_intf is
          SRESET : out std_logic := '1'
          );
    end component;      
+   
+   component double_sync
+      generic(
+         INIT_VALUE : BIT := '0');
+      port(
+         D     : in std_logic;
+         Q     : out std_logic;
+         RESET : in std_logic;
+         CLK   : in std_logic);
+   end component;   
+   
+   component double_sync_vector
+      port(
+         D     : in std_logic_vector;
+         Q     : out std_logic_vector;
+         CLK   : in std_logic);
+   end component;
    
    -- misc signals
    signal control_i                 : std_logic_vector(MB_MOSI.WDATA'length-1 downto 0);
@@ -255,9 +268,6 @@ begin
             when X"8C" => axi_rdata <= resize(TRIG_PERIOD_MIN(7),32);
             when X"90" => axi_rdata <= resize(TRIG_PERIOD_MAX(7),32);
             
-            when X"94" => axi_rdata <= resize(TRIG_DELAY_MIN,32);
-            when X"98" => axi_rdata <= resize(TRIG_DELAY_MAX,32);
-
             when others=> axi_rdata <= (others =>'1');
          end case;        
       end if;     
@@ -309,7 +319,7 @@ begin
             mb_time_subsec_i <= (others => '0');
             pps_source_i <= '0';
             seq_softtrig_i <= '0';
-         else
+         else		
 
             -- changement en live du HighTime des trigs
             if FPA_EXP_INFO.EXP_DVAL = '1' then 
@@ -334,7 +344,7 @@ begin
                   when X"34" => mb_time_subsec_i         <= data_i(23 downto 0);
                   when X"38" => mb_overwrite_i           <= data_i(0);   
                   when X"3C" => start_pps_permit_windw_i <= data_i(0); 
-
+                  
                   -- pps source
                   when X"E0" => pps_source_i             <= data_i(0); 
                   

@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author: odionne $
--- $LastChangedDate: 2017-04-27 09:29:29 -0400 (jeu., 27 avr. 2017) $
--- $Revision: 20363 $ 
+-- $Author$
+-- $LastChangedDate$
+-- $Revision$ 
 -------------------------------------------------------------------------------
 --
 -- Description : Test bench for ExpTime module

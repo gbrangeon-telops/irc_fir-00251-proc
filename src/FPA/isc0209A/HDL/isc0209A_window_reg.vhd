@@ -45,9 +45,6 @@ architecture rtl of isc0209A_window_reg is
    signal new_wind_reg        : std_logic_vector(31 downto 0);
    signal sreset              : std_logic;
    signal actual_wind_reg     : std_logic_vector(31 downto 0);
-   signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal actual_cfg_num      : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal new_cfg_num_pending : std_logic;
    
 begin
    
@@ -60,27 +57,6 @@ begin
    U1 : sync_reset
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
    
-   --------------------------------------------------
-   --  cfg_num
-   --------------------------------------------------
-   -- ENO: 26 nov 2018: Pour eviter bugs , reprogrammer le ROIC, dès qu'une config est reçue du MB.
-   
-   U2C : process(CLK)
-   begin
-      if rising_edge(CLK) then 
-         
-         -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= FPA_INTF_CFG.CFG_NUM;    
-         
-         -- detection du changement
-         if actual_cfg_num /= new_cfg_num then
-            new_cfg_num_pending <= '1';
-         else
-            new_cfg_num_pending <= '0';
-         end if;         
-         
-      end if;
-   end process;       
    
    --------------------------------------------------
    --  bistream builder
@@ -108,7 +84,6 @@ begin
             wind_rqst_i <= '0';
             window_cfg_fsm <= idle;
             actual_wind_reg(31) <= '0';   -- le bit 31 seul forcé à '0'  suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
-            actual_cfg_num <= not new_cfg_num;
             
          else    
             
@@ -117,7 +92,7 @@ begin
                
                when idle =>                -- en attente que le programmateur soit à l'écoute
                   wind_rqst_i <= '0';
-                  if actual_wind_reg /= new_wind_reg  or new_cfg_num_pending = '1'then
+                  if actual_wind_reg /= new_wind_reg then
                      window_cfg_fsm <= check_done_st; 
                   end if;
                
@@ -131,7 +106,6 @@ begin
                when rqst_st =>                                     
                   wind_rqst_i <= '1';
                   wind_reg_i <= new_wind_reg;
-                  actual_cfg_num <= new_cfg_num;
                   if WIND_DONE = '0'  then 
                      window_cfg_fsm <= wait_end_st;
                   end if;                  
@@ -153,6 +127,6 @@ begin
          end if;
       end if;
    end process;
-   
+    
    
 end rtl;

@@ -66,36 +66,27 @@ entity bd_wrapper is
       AXIL_ICU_MISO : in t_axi4_lite_miso; 
       EHDRI_CTRL_MOSI : out t_axi4_lite_mosi;
       EHDRI_CTRL_MISO : in t_axi4_lite_miso;
-	  
-      UART_CLINK_TX : out STD_LOGIC;
-      UART_CLINK_RX : in STD_LOGIC;
-	   
-      UART_OUTPUT_RX : in STD_LOGIC;
-      UART_OUTPUT_TX : out STD_LOGIC;
-	  
-      UART_OEM_RX : in STD_LOGIC;
-      UART_OEM_TX : out STD_LOGIC;
-      
-      UART_PLEORA_RX : in STD_LOGIC;
-      UART_PLEORA_TX : out STD_LOGIC;
-      
+      CLINK_UART_OUT : out t_uartns550_out;
+      CLINK_UART_IN : in t_uartns550_in;
+      UART_TO_FPGA : out t_uartns550_out;
+      FPGA_TO_UART : in t_uartns550_in;
+      OEM_UART_OUT : out t_uartns550_out;
+      OEM_UART_IN : in t_uartns550_in; 
+      PLEORA_UART_SOUT : out STD_LOGIC;
+      PLEORA_UART_SIN : in STD_LOGIC;
       USB_TO_UART : in t_uartns550_in;
       UART_TO_USB : out t_uartns550_out;
+      GPS_UART_SIN : in STD_LOGIC;
+      GPS_UART_SOUT : out STD_LOGIC;
+      FW_UART_OUT : out t_uartns550_out;
+      FW_UART_IN : in t_uartns550_in;
+      NDF_UART_rxd : in STD_LOGIC;
+      NDF_UART_txd : out STD_LOGIC;
       LENS_UART_SOUT : out STD_LOGIC;
       LENS_UART_SIN : in STD_LOGIC;
       
-      UART_GPS_RX : in STD_LOGIC;
-      UART_GPS_TX : out STD_LOGIC;
-      
-      UART_FW_RX : in STD_LOGIC;
-      UART_FW_TX : out STD_LOGIC;
- 
-      UART_NDF_RX : in STD_LOGIC;
-      UART_NDF_TX : out STD_LOGIC;
-      
       LED_GPIO_tri_o : out STD_LOGIC_VECTOR ( 3 downto 0 );
-      POWER_GPIO : inout STD_LOGIC_VECTOR ( 9 downto 0 );
-      BUTTON : in STD_LOGIC;
+      POWER_GPIO : inout STD_LOGIC_VECTOR ( 10 downto 0 );
       
       MUX_ADDR : out std_logic_vector(4 downto 0);
       
@@ -117,12 +108,11 @@ entity bd_wrapper is
       Code_mem_we_n : out STD_LOGIC;
       
       ARESETN : out STD_LOGIC;
-      clk_mb : out STD_LOGIC;
-      clk_cal : out STD_LOGIC;
-      clk_irig : out STD_LOGIC;
+      clk_100 : out STD_LOGIC;
+      clk_160 : out STD_LOGIC;
       clk_200 : out STD_LOGIC;
-      clk_mgt_init : out STD_LOGIC;
-      clk_data : out STD_LOGIC;
+      clk_50 : out STD_LOGIC;
+      clk_80 : out STD_LOGIC;
       ext_reset_in : in STD_LOGIC;
       vn_in : in STD_LOGIC;
       vp_in : in STD_LOGIC;
@@ -151,16 +141,17 @@ entity bd_wrapper is
       CAL_DDR_reset_n : out STD_LOGIC;
       CAL_DDR_we_n : out STD_LOGIC;
       
-      AXI4_STREAM_DATA_MOSI : out t_axi4_stream_mosi128;
+      AXI4_STREAM_DATA_MOSI : out t_axi4_stream_mosi64;
       AXI4_STREAM_DATA_MISO : in t_axi4_stream_miso;
       AXI4_STREAM_ADD_MOSI : in t_axi4_stream_mosi72;
       AXI4_STREAM_ADD_MISO : out t_axi4_stream_miso;
+      CALDDR_MM2S_ACLK :  in std_logic;
       
       
-      AXIS_BUF_S2MM_MOSI : in t_axi4_stream_mosi64;
+      AXIS_BUF_S2MM_MOSI : in t_axi4_stream_mosi32;
       AXIS_BUF_S2MM_MISO : out t_axi4_stream_miso;
       
-      AXIS_BUF_S2MM_CMD_MOSI : in t_axi4_stream_mosi_cmd32;
+      AXIS_BUF_S2MM_CMD_MOSI : in t_axi4_stream_mosi72;
       AXIS_BUF_S2MM_CMD_MISO : out t_axi4_stream_miso;
       
       AXIS_BUF_S2MM_STS_MOSI : out t_axi4_stream_mosi_status;
@@ -169,7 +160,7 @@ entity bd_wrapper is
       AXIS_BUF_MM2S_MOSI : out t_axi4_stream_mosi16;
       AXIS_BUF_MM2S_MISO : in t_axi4_stream_miso;
       
-      AXIS_BUF_MM2S_CMD_MOSI : in t_axi4_stream_mosi_cmd32;
+      AXIS_BUF_MM2S_CMD_MOSI : in t_axi4_stream_mosi72;
       AXIS_BUF_MM2S_CMD_MISO : out t_axi4_stream_miso;
       
       AXIS_BUF_MM2S_STS_MOSI : out t_axi4_stream_mosi_status;
@@ -179,7 +170,10 @@ entity bd_wrapper is
       AXIS_USART_RX_MISO : out t_axi4_stream_miso;
       
       AXIS_USART_TX_MOSI : out t_axi4_stream_mosi32;
-      AXIS_USART_TX_MISO : in t_axi4_stream_miso;		  	   
+      AXIS_USART_TX_MISO : in t_axi4_stream_miso;
+      
+      
+      CALDDR_S2MM_ACLK :  in std_logic;		  	   
       
       --QSPI
       qspi_io0_io : inout STD_LOGIC;
@@ -199,560 +193,610 @@ architecture bd_wrapper of bd_wrapper is
    
    component core_wrapper is
       port (
-         ADC_READOUT_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         ADC_READOUT_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         ADC_READOUT_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         ADC_READOUT_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         ADC_READOUT_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         ADC_READOUT_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         ADC_READOUT_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         ADC_READOUT_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         ADC_READOUT_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         ADC_READOUT_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         ADC_READOUT_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         AEC_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         AEC_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         AEC_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         AEC_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         AEC_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         AEC_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         AEC_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         AEC_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         AEC_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         AEC_INTC : in STD_LOGIC;
-         ARESETN : out STD_LOGIC_VECTOR ( 0 to 0 );
-         BUTTON : in STD_LOGIC;
-         CALIBCONFIG_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIBCONFIG_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         CALIBCONFIG_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIBCONFIG_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         CALIBCONFIG_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         CALIBCONFIG_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIBCONFIG_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         CALIBCONFIG_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIBCONFIG_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIBCONFIG_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         CALIBCONFIG_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIB_RAM_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         CALIB_RAM_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIB_RAM_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         CALIB_RAM_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         CALIB_RAM_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIB_RAM_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         CALIB_RAM_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         CALIB_RAM_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         CALIB_RAM_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         CALIB_RAM_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CAL_DDR_addr : out STD_LOGIC_VECTOR ( 14 downto 0 );
-         CAL_DDR_ba : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         CAL_DDR_cas_n : out STD_LOGIC;
-         CAL_DDR_ck_n : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CAL_DDR_ck_p : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CAL_DDR_cke : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CAL_DDR_cs_n : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CAL_DDR_dm : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         CAL_DDR_dq : inout STD_LOGIC_VECTOR ( 31 downto 0 );
-         CAL_DDR_dqs_n : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-         CAL_DDR_dqs_p : inout STD_LOGIC_VECTOR ( 3 downto 0 );
-         CAL_DDR_odt : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CAL_DDR_ras_n : out STD_LOGIC;
-         CAL_DDR_reset_n : out STD_LOGIC;
-         CAL_DDR_we_n : out STD_LOGIC;
-
-         CLINK_UART_rxd : in STD_LOGIC;
-         CLINK_UART_txd : out STD_LOGIC;
-         
-         CODE_DDR_addr : out STD_LOGIC_VECTOR ( 13 downto 0 );
-         CODE_DDR_ba : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         CODE_DDR_cas_n : out STD_LOGIC;
-         CODE_DDR_ck_n : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CODE_DDR_ck_p : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CODE_DDR_cke : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CODE_DDR_dm : out STD_LOGIC_VECTOR ( 1 downto 0 );
-         CODE_DDR_dq : inout STD_LOGIC_VECTOR ( 15 downto 0 );
-         CODE_DDR_dqs_n : inout STD_LOGIC_VECTOR ( 1 downto 0 );
-         CODE_DDR_dqs_p : inout STD_LOGIC_VECTOR ( 1 downto 0 );
-         CODE_DDR_odt : out STD_LOGIC_VECTOR ( 0 to 0 );
-         CODE_DDR_ras_n : out STD_LOGIC;
-         CODE_DDR_reset_n : out STD_LOGIC;
-         CODE_DDR_we_n : out STD_LOGIC;
-         EXPTIME_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         EXPTIME_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         EXPTIME_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         EXPTIME_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         EXPTIME_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         EXPTIME_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         EXPTIME_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         EXPTIME_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         EXPTIME_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         EXPTIME_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         EXPTIME_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         FAN_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         FAN_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         FAN_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         FAN_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         FAN_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         FAN_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         FAN_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         FAN_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FAN_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         FAN_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         FPA_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         FPA_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         FPA_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         FPA_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         FPA_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         FPA_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         FPA_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         FPA_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         FPA_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         FPA_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-
-         FPGA_UART_rxd : in STD_LOGIC;
-         FPGA_UART_txd : out STD_LOGIC;
-
- 
-         FW_UART_rxd : in STD_LOGIC;
-         FW_UART_txd : out STD_LOGIC;
-
-         GPS_UART_rxd : in STD_LOGIC;
-         GPS_UART_txd : out STD_LOGIC;
-         HEADER_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         HEADER_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         HEADER_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         HEADER_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         HEADER_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         HEADER_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         HEADER_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         HEADER_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         HEADER_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         HEADER_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         HEADER_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         IRIG_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         IRIG_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         IRIG_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         IRIG_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         IRIG_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         IRIG_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         IRIG_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         IRIG_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         IRIG_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         IRIG_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         MGT_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         MGT_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         MGT_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         MGT_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         MGT_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         MGT_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         MGT_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         MGT_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         MGT_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         MGT_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_AXIS_CALDDR_MM2S_STS_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_AXIS_CALDDR_MM2S_STS_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_AXIS_CALDDR_MM2S_STS_tlast : out STD_LOGIC;
-         M_AXIS_CALDDR_MM2S_STS_tready : in STD_LOGIC;
-         M_AXIS_CALDDR_MM2S_STS_tvalid : out STD_LOGIC;
-         M_AXIS_CALDDR_MM2S_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-         M_AXIS_CALDDR_MM2S_tkeep : out STD_LOGIC_VECTOR ( 15 downto 0 );
-         M_AXIS_CALDDR_MM2S_tlast : out STD_LOGIC;
-         M_AXIS_CALDDR_MM2S_tready : in STD_LOGIC;
-         M_AXIS_CALDDR_MM2S_tvalid : out STD_LOGIC;
-         M_AXIS_MM2S_BUF_tdata : out STD_LOGIC_VECTOR ( 15 downto 0 );
-         M_AXIS_MM2S_BUF_tkeep : out STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_AXIS_MM2S_BUF_tlast : out STD_LOGIC;
-         M_AXIS_MM2S_BUF_tready : in STD_LOGIC;
-         M_AXIS_MM2S_BUF_tvalid : out STD_LOGIC;
-         M_AXIS_MM2S_STS_BUF_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_AXIS_MM2S_STS_BUF_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_AXIS_MM2S_STS_BUF_tlast : out STD_LOGIC;
-         M_AXIS_MM2S_STS_BUF_tready : in STD_LOGIC;
-         M_AXIS_MM2S_STS_BUF_tvalid : out STD_LOGIC;
-         M_AXIS_S2MM_STS_BUF_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_AXIS_S2MM_STS_BUF_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_AXIS_S2MM_STS_BUF_tlast : out STD_LOGIC;
-         M_AXIS_S2MM_STS_BUF_tready : in STD_LOGIC;
-         M_AXIS_S2MM_STS_BUF_tvalid : out STD_LOGIC;
-         M_AXIS_USART_tdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_AXIS_USART_tlast : out STD_LOGIC;
-         M_AXIS_USART_tready : in STD_LOGIC;
-         M_AXIS_USART_tvalid : out STD_LOGIC;
-         M_BUFFERING_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUFFERING_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_BUFFERING_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUFFERING_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_BUFFERING_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_BUFFERING_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUFFERING_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_BUFFERING_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUFFERING_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUFFERING_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_BUFFERING_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUF_TABLE_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_BUF_TABLE_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUF_TABLE_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_BUF_TABLE_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_BUF_TABLE_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUF_TABLE_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_BUF_TABLE_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BUF_TABLE_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BUF_TABLE_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_BUF_TABLE_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BULK_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_BULK_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BULK_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_BULK_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_BULK_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BULK_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_BULK_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_BULK_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_BULK_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_BULK_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_EHDRI_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_EHDRI_CTRL_arburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_EHDRI_CTRL_arcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_arlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_EHDRI_CTRL_arlock : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_EHDRI_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_EHDRI_CTRL_arqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_arready : in STD_LOGIC;
-         M_EHDRI_CTRL_arregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_arsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_EHDRI_CTRL_arvalid : out STD_LOGIC;
-         M_EHDRI_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_EHDRI_CTRL_awburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_EHDRI_CTRL_awcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_awlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_EHDRI_CTRL_awlock : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_EHDRI_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_EHDRI_CTRL_awqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_awready : in STD_LOGIC;
-         M_EHDRI_CTRL_awregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_awsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_EHDRI_CTRL_awvalid : out STD_LOGIC;
-         M_EHDRI_CTRL_bready : out STD_LOGIC;
-         M_EHDRI_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_EHDRI_CTRL_bvalid : in STD_LOGIC;
-         M_EHDRI_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_EHDRI_CTRL_rlast : in STD_LOGIC;
-         M_EHDRI_CTRL_rready : out STD_LOGIC;
-         M_EHDRI_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_EHDRI_CTRL_rvalid : in STD_LOGIC;
-         M_EHDRI_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_EHDRI_CTRL_wlast : out STD_LOGIC;
-         M_EHDRI_CTRL_wready : in STD_LOGIC;
-         M_EHDRI_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_EHDRI_CTRL_wvalid : out STD_LOGIC;
-         M_FLASHINTF_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_FLASHINTF_AXI_arburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_FLASHINTF_AXI_arcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_arlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_FLASHINTF_AXI_arlock : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_FLASHINTF_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_FLASHINTF_AXI_arqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_arready : in STD_LOGIC;
-         M_FLASHINTF_AXI_arregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_arsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_FLASHINTF_AXI_arvalid : out STD_LOGIC;
-         M_FLASHINTF_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_FLASHINTF_AXI_awburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_FLASHINTF_AXI_awcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_awlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
-         M_FLASHINTF_AXI_awlock : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_FLASHINTF_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_FLASHINTF_AXI_awqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_awready : in STD_LOGIC;
-         M_FLASHINTF_AXI_awregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_awsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_FLASHINTF_AXI_awvalid : out STD_LOGIC;
-         M_FLASHINTF_AXI_bready : out STD_LOGIC;
-         M_FLASHINTF_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_FLASHINTF_AXI_bvalid : in STD_LOGIC;
-         M_FLASHINTF_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_FLASHINTF_AXI_rlast : in STD_LOGIC;
-         M_FLASHINTF_AXI_rready : out STD_LOGIC;
-         M_FLASHINTF_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_FLASHINTF_AXI_rvalid : in STD_LOGIC;
-         M_FLASHINTF_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_FLASHINTF_AXI_wlast : out STD_LOGIC;
-         M_FLASHINTF_AXI_wready : in STD_LOGIC;
-         M_FLASHINTF_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_FLASHINTF_AXI_wvalid : out STD_LOGIC;
-         M_ICU_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_ICU_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_ICU_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_ICU_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         M_ICU_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_ICU_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_ICU_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         M_ICU_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         M_ICU_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         M_ICU_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         M_ICU_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-
-         NDF_UART_rxd : in STD_LOGIC;
-         NDF_UART_txd : out STD_LOGIC;
-         
-         NLC_LUT_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         NLC_LUT_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         NLC_LUT_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         NLC_LUT_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         NLC_LUT_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         NLC_LUT_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         NLC_LUT_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         NLC_LUT_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         NLC_LUT_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         NLC_LUT_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         NLC_LUT_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         
-         OEM_UART_rxd : in STD_LOGIC;
-         OEM_UART_txd : out STD_LOGIC;
+    ADC_READOUT_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    ADC_READOUT_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    ADC_READOUT_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    ADC_READOUT_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    ADC_READOUT_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    ADC_READOUT_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    ADC_READOUT_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    ADC_READOUT_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    ADC_READOUT_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    ADC_READOUT_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    ADC_READOUT_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    AEC_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    AEC_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    AEC_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    AEC_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    AEC_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    AEC_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    AEC_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    AEC_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    AEC_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    AEC_INTC : in STD_LOGIC;
+    ARESETN : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIBCONFIG_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    CALIBCONFIG_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIBCONFIG_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    CALIBCONFIG_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    CALIBCONFIG_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIBCONFIG_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    CALIBCONFIG_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIBCONFIG_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIBCONFIG_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    CALIBCONFIG_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIB_RAM_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    CALIB_RAM_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIB_RAM_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    CALIB_RAM_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    CALIB_RAM_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIB_RAM_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    CALIB_RAM_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    CALIB_RAM_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    CALIB_RAM_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    CALIB_RAM_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CAL_DDR_addr : out STD_LOGIC_VECTOR ( 14 downto 0 );
+    CAL_DDR_ba : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    CAL_DDR_cas_n : out STD_LOGIC;
+    CAL_DDR_ck_n : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CAL_DDR_ck_p : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CAL_DDR_cke : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CAL_DDR_cs_n : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CAL_DDR_dm : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    CAL_DDR_dq : inout STD_LOGIC_VECTOR ( 31 downto 0 );
+    CAL_DDR_dqs_n : inout STD_LOGIC_VECTOR ( 3 downto 0 );
+    CAL_DDR_dqs_p : inout STD_LOGIC_VECTOR ( 3 downto 0 );
+    CAL_DDR_odt : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CAL_DDR_ras_n : out STD_LOGIC;
+    CAL_DDR_reset_n : out STD_LOGIC;
+    CAL_DDR_we_n : out STD_LOGIC;
+    CLINK_UART_baudoutn : out STD_LOGIC;
+    CLINK_UART_ctsn : in STD_LOGIC;
+    CLINK_UART_dcdn : in STD_LOGIC;
+    CLINK_UART_ddis : out STD_LOGIC;
+    CLINK_UART_dsrn : in STD_LOGIC;
+    CLINK_UART_dtrn : out STD_LOGIC;
+    CLINK_UART_out1n : out STD_LOGIC;
+    CLINK_UART_out2n : out STD_LOGIC;
+    CLINK_UART_ri : in STD_LOGIC;
+    CLINK_UART_rtsn : out STD_LOGIC;
+    CLINK_UART_rxd : in STD_LOGIC;
+    CLINK_UART_rxrdyn : out STD_LOGIC;
+    CLINK_UART_txd : out STD_LOGIC;
+    CLINK_UART_txrdyn : out STD_LOGIC;
+    CODE_DDR_addr : out STD_LOGIC_VECTOR ( 13 downto 0 );
+    CODE_DDR_ba : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    CODE_DDR_cas_n : out STD_LOGIC;
+    CODE_DDR_ck_n : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CODE_DDR_ck_p : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CODE_DDR_cke : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CODE_DDR_dm : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    CODE_DDR_dq : inout STD_LOGIC_VECTOR ( 15 downto 0 );
+    CODE_DDR_dqs_n : inout STD_LOGIC_VECTOR ( 1 downto 0 );
+    CODE_DDR_dqs_p : inout STD_LOGIC_VECTOR ( 1 downto 0 );
+    CODE_DDR_odt : out STD_LOGIC_VECTOR ( 0 to 0 );
+    CODE_DDR_ras_n : out STD_LOGIC;
+    CODE_DDR_reset_n : out STD_LOGIC;
+    CODE_DDR_we_n : out STD_LOGIC;
+    EXPTIME_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    EXPTIME_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    EXPTIME_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    EXPTIME_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    EXPTIME_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    EXPTIME_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    EXPTIME_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    EXPTIME_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    EXPTIME_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    EXPTIME_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    EXPTIME_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    FAN_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    FAN_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    FAN_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    FAN_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    FAN_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    FAN_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    FAN_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    FAN_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FAN_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    FAN_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    FPA_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    FPA_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    FPA_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    FPA_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    FPA_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    FPA_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    FPA_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    FPA_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    FPA_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    FPA_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    FPGA_UART_baudoutn : out STD_LOGIC;
+    FPGA_UART_ctsn : in STD_LOGIC;
+    FPGA_UART_dcdn : in STD_LOGIC;
+    FPGA_UART_ddis : out STD_LOGIC;
+    FPGA_UART_dsrn : in STD_LOGIC;
+    FPGA_UART_dtrn : out STD_LOGIC;
+    FPGA_UART_out1n : out STD_LOGIC;
+    FPGA_UART_out2n : out STD_LOGIC;
+    FPGA_UART_ri : in STD_LOGIC;
+    FPGA_UART_rtsn : out STD_LOGIC;
+    FPGA_UART_rxd : in STD_LOGIC;
+    FPGA_UART_rxrdyn : out STD_LOGIC;
+    FPGA_UART_txd : out STD_LOGIC;
+    FPGA_UART_txrdyn : out STD_LOGIC;
+    FW_UART_baudoutn : out STD_LOGIC;
+    FW_UART_ctsn : in STD_LOGIC;
+    FW_UART_dcdn : in STD_LOGIC;
+    FW_UART_ddis : out STD_LOGIC;
+    FW_UART_dsrn : in STD_LOGIC;
+    FW_UART_dtrn : out STD_LOGIC;
+    FW_UART_out1n : out STD_LOGIC;
+    FW_UART_out2n : out STD_LOGIC;
+    FW_UART_ri : in STD_LOGIC;
+    FW_UART_rtsn : out STD_LOGIC;
+    FW_UART_rxd : in STD_LOGIC;
+    FW_UART_rxrdyn : out STD_LOGIC;
+    FW_UART_txd : out STD_LOGIC;
+    FW_UART_txrdyn : out STD_LOGIC;
+    GPS_UART_SIN : in STD_LOGIC;
+    GPS_UART_SOUT : out STD_LOGIC;
+    HEADER_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    HEADER_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    HEADER_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    HEADER_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    HEADER_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    HEADER_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    HEADER_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    HEADER_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    HEADER_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    HEADER_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    HEADER_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    IRIG_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    IRIG_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    IRIG_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    IRIG_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    IRIG_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    IRIG_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    IRIG_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    IRIG_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    IRIG_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    IRIG_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    MGT_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    MGT_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    MGT_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    MGT_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    MGT_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    MGT_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    MGT_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    MGT_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    MGT_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    MGT_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_AXIS_CALDDR_MM2S_ACLK : in STD_LOGIC;
+    M_AXIS_CALDDR_MM2S_STS_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_AXIS_CALDDR_MM2S_STS_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_AXIS_CALDDR_MM2S_STS_tlast : out STD_LOGIC;
+    M_AXIS_CALDDR_MM2S_STS_tready : in STD_LOGIC;
+    M_AXIS_CALDDR_MM2S_STS_tvalid : out STD_LOGIC;
+    M_AXIS_CALDDR_MM2S_tdata : out STD_LOGIC_VECTOR ( 63 downto 0 );
+    M_AXIS_CALDDR_MM2S_tkeep : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_AXIS_CALDDR_MM2S_tlast : out STD_LOGIC;
+    M_AXIS_CALDDR_MM2S_tready : in STD_LOGIC;
+    M_AXIS_CALDDR_MM2S_tvalid : out STD_LOGIC;
+    M_AXIS_MM2S_BUF_tdata : out STD_LOGIC_VECTOR ( 15 downto 0 );
+    M_AXIS_MM2S_BUF_tkeep : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_AXIS_MM2S_BUF_tlast : out STD_LOGIC;
+    M_AXIS_MM2S_BUF_tready : in STD_LOGIC;
+    M_AXIS_MM2S_BUF_tvalid : out STD_LOGIC;
+    M_AXIS_MM2S_STS_BUF_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_AXIS_MM2S_STS_BUF_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_AXIS_MM2S_STS_BUF_tlast : out STD_LOGIC;
+    M_AXIS_MM2S_STS_BUF_tready : in STD_LOGIC;
+    M_AXIS_MM2S_STS_BUF_tvalid : out STD_LOGIC;
+    M_AXIS_S2MM_STS_BUF_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_AXIS_S2MM_STS_BUF_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_AXIS_S2MM_STS_BUF_tlast : out STD_LOGIC;
+    M_AXIS_S2MM_STS_BUF_tready : in STD_LOGIC;
+    M_AXIS_S2MM_STS_BUF_tvalid : out STD_LOGIC;
+    M_AXIS_USART_tdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_AXIS_USART_tlast : out STD_LOGIC;
+    M_AXIS_USART_tready : in STD_LOGIC;
+    M_AXIS_USART_tvalid : out STD_LOGIC;
+    M_BUFFERING_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUFFERING_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_BUFFERING_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUFFERING_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_BUFFERING_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_BUFFERING_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUFFERING_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_BUFFERING_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUFFERING_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUFFERING_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_BUFFERING_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUF_TABLE_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_BUF_TABLE_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUF_TABLE_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_BUF_TABLE_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_BUF_TABLE_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUF_TABLE_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_BUF_TABLE_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BUF_TABLE_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BUF_TABLE_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_BUF_TABLE_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BULK_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_BULK_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BULK_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_BULK_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_BULK_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BULK_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_BULK_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_BULK_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_BULK_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_BULK_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_EHDRI_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_EHDRI_CTRL_arburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_EHDRI_CTRL_arcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_arlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_EHDRI_CTRL_arlock : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_EHDRI_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_EHDRI_CTRL_arqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_arready : in STD_LOGIC;
+    M_EHDRI_CTRL_arregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_arsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_EHDRI_CTRL_arvalid : out STD_LOGIC;
+    M_EHDRI_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_EHDRI_CTRL_awburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_EHDRI_CTRL_awcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_awlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_EHDRI_CTRL_awlock : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_EHDRI_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_EHDRI_CTRL_awqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_awready : in STD_LOGIC;
+    M_EHDRI_CTRL_awregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_awsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_EHDRI_CTRL_awvalid : out STD_LOGIC;
+    M_EHDRI_CTRL_bready : out STD_LOGIC;
+    M_EHDRI_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_EHDRI_CTRL_bvalid : in STD_LOGIC;
+    M_EHDRI_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_EHDRI_CTRL_rlast : in STD_LOGIC;
+    M_EHDRI_CTRL_rready : out STD_LOGIC;
+    M_EHDRI_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_EHDRI_CTRL_rvalid : in STD_LOGIC;
+    M_EHDRI_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_EHDRI_CTRL_wlast : out STD_LOGIC;
+    M_EHDRI_CTRL_wready : in STD_LOGIC;
+    M_EHDRI_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_EHDRI_CTRL_wvalid : out STD_LOGIC;
+    M_FLASHINTF_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_FLASHINTF_AXI_arburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_FLASHINTF_AXI_arcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_arlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_FLASHINTF_AXI_arlock : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_FLASHINTF_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_FLASHINTF_AXI_arqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_arready : in STD_LOGIC;
+    M_FLASHINTF_AXI_arregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_arsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_FLASHINTF_AXI_arvalid : out STD_LOGIC;
+    M_FLASHINTF_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_FLASHINTF_AXI_awburst : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_FLASHINTF_AXI_awcache : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_awlen : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    M_FLASHINTF_AXI_awlock : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_FLASHINTF_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_FLASHINTF_AXI_awqos : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_awready : in STD_LOGIC;
+    M_FLASHINTF_AXI_awregion : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_awsize : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_FLASHINTF_AXI_awvalid : out STD_LOGIC;
+    M_FLASHINTF_AXI_bready : out STD_LOGIC;
+    M_FLASHINTF_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_FLASHINTF_AXI_bvalid : in STD_LOGIC;
+    M_FLASHINTF_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_FLASHINTF_AXI_rlast : in STD_LOGIC;
+    M_FLASHINTF_AXI_rready : out STD_LOGIC;
+    M_FLASHINTF_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_FLASHINTF_AXI_rvalid : in STD_LOGIC;
+    M_FLASHINTF_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_FLASHINTF_AXI_wlast : out STD_LOGIC;
+    M_FLASHINTF_AXI_wready : in STD_LOGIC;
+    M_FLASHINTF_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_FLASHINTF_AXI_wvalid : out STD_LOGIC;
+    M_ICU_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_ICU_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_ICU_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_ICU_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    M_ICU_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_ICU_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_ICU_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    M_ICU_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    M_ICU_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    M_ICU_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    M_ICU_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    NDF_UART_baudoutn : out STD_LOGIC;
+    NDF_UART_ctsn : in STD_LOGIC;
+    NDF_UART_dcdn : in STD_LOGIC;
+    NDF_UART_ddis : out STD_LOGIC;
+    NDF_UART_dsrn : in STD_LOGIC;
+    NDF_UART_dtrn : out STD_LOGIC;
+    NDF_UART_out1n : out STD_LOGIC;
+    NDF_UART_out2n : out STD_LOGIC;
+    NDF_UART_ri : in STD_LOGIC;
+    NDF_UART_rtsn : out STD_LOGIC;
+    NDF_UART_rxd : in STD_LOGIC;
+    NDF_UART_rxrdyn : out STD_LOGIC;
+    NDF_UART_txd : out STD_LOGIC;
+    NDF_UART_txrdyn : out STD_LOGIC;
+    NLC_LUT_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    NLC_LUT_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    NLC_LUT_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    NLC_LUT_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    NLC_LUT_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    NLC_LUT_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    NLC_LUT_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    NLC_LUT_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    NLC_LUT_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    NLC_LUT_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    NLC_LUT_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    OEM_UART_baudoutn : out STD_LOGIC;
+    OEM_UART_ctsn : in STD_LOGIC;
+    OEM_UART_dcdn : in STD_LOGIC;
+    OEM_UART_ddis : out STD_LOGIC;
+    OEM_UART_dsrn : in STD_LOGIC;
+    OEM_UART_dtrn : out STD_LOGIC;
+    OEM_UART_out1n : out STD_LOGIC;
+    OEM_UART_out2n : out STD_LOGIC;
+    OEM_UART_ri : in STD_LOGIC;
+    OEM_UART_rtsn : out STD_LOGIC;
+    OEM_UART_rxd : in STD_LOGIC;
+    OEM_UART_rxrdyn : out STD_LOGIC;
+    OEM_UART_txd : out STD_LOGIC;
+    OEM_UART_txrdyn : out STD_LOGIC;
     LENS_UART_SIN : in STD_LOGIC;
     LENS_UART_SOUT : out STD_LOGIC;
-         PLEORA_UART_SIN : in STD_LOGIC;
-	      PLEORA_UART_SOUT : out STD_LOGIC;
-         
-         RQC_LUT_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         RQC_LUT_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         RQC_LUT_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         RQC_LUT_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         RQC_LUT_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         RQC_LUT_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         RQC_LUT_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         RQC_LUT_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         RQC_LUT_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         RQC_LUT_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         RQC_LUT_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         SFW_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         SFW_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         SFW_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         SFW_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         SFW_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         SFW_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         SFW_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         SFW_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         SFW_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         SFW_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         SYS_CLK_0_clk_n : in STD_LOGIC;
-         SYS_CLK_0_clk_p : in STD_LOGIC;
-         SYS_CLK_1_clk_n : in STD_LOGIC;
-         SYS_CLK_1_clk_p : in STD_LOGIC;
-         S_AXIS_CALDDR_MM2S_CMD_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
-         S_AXIS_CALDDR_MM2S_CMD_tready : out STD_LOGIC;
-         S_AXIS_CALDDR_MM2S_CMD_tvalid : in STD_LOGIC;
-         S_AXIS_MM2S_CMD_BUF_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
-         S_AXIS_MM2S_CMD_BUF_tready : out STD_LOGIC;
-         S_AXIS_MM2S_CMD_BUF_tvalid : in STD_LOGIC;
-         S_AXIS_S2MM_BUF_tdata : in STD_LOGIC_VECTOR ( 63 downto 0 );
-         S_AXIS_S2MM_BUF_tkeep : in STD_LOGIC_VECTOR ( 7 downto 0 );
-         S_AXIS_S2MM_BUF_tlast : in STD_LOGIC;
-         S_AXIS_S2MM_BUF_tready : out STD_LOGIC;
-         S_AXIS_S2MM_BUF_tvalid : in STD_LOGIC;
-         S_AXIS_S2MM_CMD_BUF_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
-         S_AXIS_S2MM_CMD_BUF_tready : out STD_LOGIC;
-         S_AXIS_S2MM_CMD_BUF_tvalid : in STD_LOGIC;
-         S_AXIS_USART_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         S_AXIS_USART_tlast : in STD_LOGIC;
-         S_AXIS_USART_tready : out STD_LOGIC;
-         S_AXIS_USART_tvalid : in STD_LOGIC;
-         TRIGGER_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         TRIGGER_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         TRIGGER_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         TRIGGER_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         TRIGGER_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         TRIGGER_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-         TRIGGER_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
-         TRIGGER_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
-         TRIGGER_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
-         TRIGGER_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         TRIGGER_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
-         USB_UART_baudoutn : out STD_LOGIC;
-         USB_UART_ctsn : in STD_LOGIC;
-         USB_UART_dcdn : in STD_LOGIC;
-         USB_UART_ddis : out STD_LOGIC;
-         USB_UART_dsrn : in STD_LOGIC;
-         USB_UART_dtrn : out STD_LOGIC;
-         USB_UART_out1n : out STD_LOGIC;
-         USB_UART_out2n : out STD_LOGIC;
-         USB_UART_ri : in STD_LOGIC;
-         USB_UART_rtsn : out STD_LOGIC;
-         USB_UART_rxd : in STD_LOGIC;
-         USB_UART_rxrdyn : out STD_LOGIC;
-         USB_UART_txd : out STD_LOGIC;
-         USB_UART_txrdyn : out STD_LOGIC;
-         bulk_interrupt : in STD_LOGIC_VECTOR ( 0 to 0 );
-         clk_mb : out STD_LOGIC;
-         clk_cal : out STD_LOGIC;
-         clk_irig : out STD_LOGIC;
-         clk_200 : out STD_LOGIC;
-         clk_mgt_init : out STD_LOGIC;
-         clk_data : out STD_LOGIC;
-         led_gpio_tri_o : out STD_LOGIC_VECTOR ( 3 downto 0 );
-         mux_addr_tri_o : out STD_LOGIC_VECTOR ( 4 downto 0 );
-         power_gpio_tri_io : inout STD_LOGIC_VECTOR ( 9 downto 0 );
-         qspi_io0_io : inout STD_LOGIC;
-         qspi_io1_io : inout STD_LOGIC;
-         qspi_io2_io : inout STD_LOGIC;
-         qspi_io3_io : inout STD_LOGIC;
-         qspi_ss_io : inout STD_LOGIC_VECTOR ( 0 to 0 );
-         rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 3 downto 0 );
-         vn_in : in STD_LOGIC;
-         vp_in : in STD_LOGIC
-         );
+    PLEORA_UART_SIN : in STD_LOGIC;
+    PLEORA_UART_SOUT : out STD_LOGIC;
+    RQC_LUT_AXI_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    RQC_LUT_AXI_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    RQC_LUT_AXI_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    RQC_LUT_AXI_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    RQC_LUT_AXI_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    RQC_LUT_AXI_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    RQC_LUT_AXI_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    RQC_LUT_AXI_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    RQC_LUT_AXI_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    RQC_LUT_AXI_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    RQC_LUT_AXI_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    SFW_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    SFW_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    SFW_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    SFW_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    SFW_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    SFW_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    SFW_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    SFW_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    SFW_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    SFW_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    SYS_CLK_0_clk_n : in STD_LOGIC;
+    SYS_CLK_0_clk_p : in STD_LOGIC;
+    SYS_CLK_1_clk_n : in STD_LOGIC;
+    SYS_CLK_1_clk_p : in STD_LOGIC;
+    S_AXIS_CALDDR_MM2S_CMD_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
+    S_AXIS_CALDDR_MM2S_CMD_tready : out STD_LOGIC;
+    S_AXIS_CALDDR_MM2S_CMD_tvalid : in STD_LOGIC;
+    S_AXIS_MM2S_CMD_BUF_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
+    S_AXIS_MM2S_CMD_BUF_tready : out STD_LOGIC;
+    S_AXIS_MM2S_CMD_BUF_tvalid : in STD_LOGIC;
+    S_AXIS_S2MM_BUF_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    S_AXIS_S2MM_BUF_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    S_AXIS_S2MM_BUF_tlast : in STD_LOGIC;
+    S_AXIS_S2MM_BUF_tready : out STD_LOGIC;
+    S_AXIS_S2MM_BUF_tvalid : in STD_LOGIC;
+    S_AXIS_S2MM_CMD_BUF_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
+    S_AXIS_S2MM_CMD_BUF_tready : out STD_LOGIC;
+    S_AXIS_S2MM_CMD_BUF_tvalid : in STD_LOGIC;
+    S_AXIS_USART_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    S_AXIS_USART_tlast : in STD_LOGIC;
+    S_AXIS_USART_tready : out STD_LOGIC;
+    S_AXIS_USART_tvalid : in STD_LOGIC;
+    TRIGGER_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    TRIGGER_CTRL_arprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    TRIGGER_CTRL_arready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_arvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_awaddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    TRIGGER_CTRL_awprot : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    TRIGGER_CTRL_awready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_awvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_bready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_bresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    TRIGGER_CTRL_bvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_rdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    TRIGGER_CTRL_rready : out STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_rresp : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    TRIGGER_CTRL_rvalid : in STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_wdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
+    TRIGGER_CTRL_wready : in STD_LOGIC_VECTOR ( 0 to 0 );
+    TRIGGER_CTRL_wstrb : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    TRIGGER_CTRL_wvalid : out STD_LOGIC_VECTOR ( 0 to 0 );
+    USB_UART_baudoutn : out STD_LOGIC;
+    USB_UART_ctsn : in STD_LOGIC;
+    USB_UART_dcdn : in STD_LOGIC;
+    USB_UART_ddis : out STD_LOGIC;
+    USB_UART_dsrn : in STD_LOGIC;
+    USB_UART_dtrn : out STD_LOGIC;
+    USB_UART_out1n : out STD_LOGIC;
+    USB_UART_out2n : out STD_LOGIC;
+    USB_UART_ri : in STD_LOGIC;
+    USB_UART_rtsn : out STD_LOGIC;
+    USB_UART_rxd : in STD_LOGIC;
+    USB_UART_rxrdyn : out STD_LOGIC;
+    USB_UART_txd : out STD_LOGIC;
+    USB_UART_txrdyn : out STD_LOGIC;
+    bulk_interrupt : in STD_LOGIC_VECTOR ( 0 to 0 );
+    clk_100 : out STD_LOGIC;
+    clk_160 : out STD_LOGIC;
+    clk_20 : out STD_LOGIC;
+    clk_200 : out STD_LOGIC;
+    clk_50 : out STD_LOGIC;
+    clk_80 : out STD_LOGIC;
+    led_gpio_tri_o : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    mux_addr_tri_o : out STD_LOGIC_VECTOR ( 4 downto 0 );
+    power_gpio_tri_io : inout STD_LOGIC_VECTOR ( 10 downto 0 );
+    qspi_io0_io : inout STD_LOGIC;
+    qspi_io1_io : inout STD_LOGIC;
+    qspi_io2_io : inout STD_LOGIC;
+    qspi_io3_io : inout STD_LOGIC;
+    qspi_ss_io : inout STD_LOGIC_VECTOR ( 0 to 0 );
+    rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    vn_in : in STD_LOGIC;
+    vp_in : in STD_LOGIC
+    );
    end component;
    
    signal mux_add : std_logic_vector(4 downto 0);
@@ -1144,25 +1188,73 @@ begin
       M_BUFFERING_CTRL_rdata		         => BUFFERING_CTRL_MISO.RDATA, 
       M_BUFFERING_CTRL_rresp		         => BUFFERING_CTRL_MISO.RRESP,
       
-      --CLINK UART WRAPPER 
-	  CLINK_UART_rxd 			=>  UART_CLINK_RX,
-	  CLINK_UART_txd 			=>  UART_CLINK_TX,
-     
+      --CLINK UART WRAPPER
+      CLINK_UART_baudoutn 	=> CLINK_UART_OUT.BAUDOUTN,
+      CLINK_UART_ddis 		=> CLINK_UART_OUT.DDIS,
+      CLINK_UART_dtrn 		=> CLINK_UART_OUT.DTRN,
+      CLINK_UART_out1n 		=> CLINK_UART_OUT.OUT1N,
+      CLINK_UART_out2n 		=> CLINK_UART_OUT.OUT2N,
+      CLINK_UART_rtsn 		=> CLINK_UART_OUT.RTSN,
+      CLINK_UART_rxrdyn 		=> CLINK_UART_OUT.RXRDYN,
+      CLINK_UART_txd 			=> CLINK_UART_OUT.TXD,
+      CLINK_UART_txrdyn 		=> CLINK_UART_OUT.TXRDYN,
+      CLINK_UART_rxd 			=> CLINK_UART_IN.RXD,
+      CLINK_UART_ctsn 		=> CLINK_UART_IN.CTSN,
+      CLINK_UART_dcdn 		=> CLINK_UART_IN.DCDN,
+      CLINK_UART_dsrn 		=> CLINK_UART_IN.DSRN,
+      CLINK_UART_ri 			=> CLINK_UART_IN.RI,
+      
       --FPGA UART WRAPPER
-	  FPGA_UART_rxd 			=>  UART_OUTPUT_RX,
-	  FPGA_UART_txd 			=>  UART_OUTPUT_TX,
-	  
+      FPGA_UART_baudoutn 	    => UART_TO_FPGA.BAUDOUTN,
+      FPGA_UART_ddis 		    => UART_TO_FPGA.DDIS,
+      FPGA_UART_dtrn 		    => UART_TO_FPGA.DTRN,
+      FPGA_UART_out1n 		=> UART_TO_FPGA.OUT1N,
+      FPGA_UART_out2n 		=> UART_TO_FPGA.OUT2N,
+      FPGA_UART_rtsn 		    => UART_TO_FPGA.RTSN,
+      FPGA_UART_rxrdyn 		=> UART_TO_FPGA.RXRDYN,
+      FPGA_UART_txd 			=> UART_TO_FPGA.TXD,
+      FPGA_UART_txrdyn 		=> UART_TO_FPGA.TXRDYN,
+      FPGA_UART_rxd 			=> FPGA_TO_UART.RXD,
+      FPGA_UART_ctsn 		    => FPGA_TO_UART.CTSN,
+      FPGA_UART_dcdn 		    => FPGA_TO_UART.DCDN,
+      FPGA_UART_dsrn 		    => FPGA_TO_UART.DSRN,
+      FPGA_UART_ri 			=> FPGA_TO_UART.RI,
+      
       --OEM UART WRAPPER
- 	  OEM_UART_rxd 			=>  UART_OEM_RX,
-	  OEM_UART_txd 			=>  UART_OEM_TX,   
+      OEM_UART_baudoutn 	    => OEM_UART_OUT.BAUDOUTN,
+      OEM_UART_ddis 		    => OEM_UART_OUT.DDIS,
+      OEM_UART_dtrn 		    => OEM_UART_OUT.DTRN,
+      OEM_UART_out1n 		    => OEM_UART_OUT.OUT1N,
+      OEM_UART_out2n 		    => OEM_UART_OUT.OUT2N,
+      OEM_UART_rtsn 		    => OEM_UART_OUT.RTSN,
+      OEM_UART_rxrdyn 		=> OEM_UART_OUT.RXRDYN,
+      OEM_UART_txd 			=> OEM_UART_OUT.TXD,
+      OEM_UART_txrdyn 		=> OEM_UART_OUT.TXRDYN,
+      OEM_UART_rxd 			=> OEM_UART_IN.RXD,
+      OEM_UART_ctsn 		    => OEM_UART_IN.CTSN,
+      OEM_UART_dcdn 		    => OEM_UART_IN.DCDN,
+      OEM_UART_dsrn 		    => OEM_UART_IN.DSRN,
+      OEM_UART_ri 			=> OEM_UART_IN.RI,
       
       --FW UART WRAPPER
-  	  FW_UART_rxd 			=>  UART_FW_RX,
-	  FW_UART_txd 			=>  UART_FW_TX, 
+      FW_UART_baudoutn       => FW_UART_OUT.BAUDOUTN,
+      FW_UART_ddis           => FW_UART_OUT.DDIS,
+      FW_UART_dtrn           => FW_UART_OUT.DTRN,
+      FW_UART_out1n          => FW_UART_OUT.OUT1N,
+      FW_UART_out2n          => FW_UART_OUT.OUT2N,
+      FW_UART_rtsn           => FW_UART_OUT.RTSN,
+      FW_UART_rxrdyn         => FW_UART_OUT.RXRDYN,
+      FW_UART_txd            => FW_UART_OUT.TXD,
+      FW_UART_txrdyn         => FW_UART_OUT.TXRDYN,
+      FW_UART_rxd            => FW_UART_IN.RXD,
+      FW_UART_ctsn           => FW_UART_IN.CTSN,
+      FW_UART_dcdn           => FW_UART_IN.DCDN,
+      FW_UART_dsrn           => FW_UART_IN.DSRN,
+      FW_UART_ri             => FW_UART_IN.RI,
       
       --PLEORA UART WRAPPER
-  	  PLEORA_UART_SIN 			=>  UART_PLEORA_RX,
-	  PLEORA_UART_SOUT 			=>  UART_PLEORA_TX,
+      PLEORA_UART_SIN 		=> PLEORA_UART_SIN,
+      PLEORA_UART_SOUT 		=> PLEORA_UART_SOUT, 
       
       --LENS UART WRAPPER
       LENS_UART_SIN => LENS_UART_SIN,
@@ -1184,8 +1276,8 @@ begin
       USB_UART_dsrn 		=> USB_TO_UART.DSRN,
       USB_UART_ri 		=> USB_TO_UART.RI,
       
-  	  GPS_UART_rxd 			=>  UART_GPS_RX,
-	  GPS_UART_txd 			=>  UART_GPS_TX, 
+      GPS_UART_SIN => GPS_UART_SIN,
+      GPS_UART_SOUT => GPS_UART_SOUT,
       
       --Code Mem
       CODE_DDR_addr => Code_mem_addr,
@@ -1204,14 +1296,13 @@ begin
       CODE_DDR_we_n => Code_mem_we_n,
       
       aresetn(0)      => ARESETN,
-      clk_mb     => clk_mb,
-      clk_cal    => clk_cal,
-      clk_200     => clk_200,
-      clk_irig      => clk_irig,
-      clk_mgt_init  => clk_mgt_init,
-      clk_data    => clk_data,
+      clk_100     => clk_100,     
+      clk_160     => clk_160,     
+      clk_200     => clk_200,     
+      clk_50      => clk_50,      
+      clk_80      => clk_80,      
       
-      vn_in       => vn_in,
+      vn_in       => vn_in,       
       vp_in       => vp_in,
       LED_GPIO_tri_o => LED_GPIO_tri_o,
       
@@ -1222,7 +1313,6 @@ begin
       
       mux_addr_tri_o => MUX_ADDR,
       power_gpio_tri_io => POWER_GPIO,
-      BUTTON => BUTTON,
       rev_gpio_tri_i => REV_GPIO,
       
       M_BULK_AXI_araddr => BULK_AXI_MOSI.ARADDR,
@@ -1267,6 +1357,10 @@ begin
       M_AXIS_CALDDR_MM2S_tkeep => AXI4_STREAM_DATA_MOSI.TKEEP,
       M_AXIS_CALDDR_MM2S_tlast => AXI4_STREAM_DATA_MOSI.TLAST,
       M_AXIS_CALDDR_MM2S_tready => AXI4_STREAM_DATA_MISO.TREADY,
+      --AXI4_STREAM_DATA_MOSI.TSTRB
+      --AXI4_STREAM_DATA_MOSI.TID
+      --AXI4_STREAM_DATA_MOSI.TDEST
+      --AXI4_STREAM_DATA_MOSI.TUSER
       
       S_AXIS_CALDDR_MM2S_CMD_tdata => AXI4_STREAM_ADD_MOSI.TDATA,
       S_AXIS_CALDDR_MM2S_CMD_tvalid => AXI4_STREAM_ADD_MOSI.TVALID,
@@ -1277,6 +1371,7 @@ begin
       --    M_AXIS_CALDDR_MM2S_STS_tkeep => AXI4_STREAM_STATUS_MISO.TKEEP,
       --    M_AXIS_CALDDR_MM2S_STS_tlast => AXI4_STREAM_STATUS_MISO.TLAST,
       --    M_AXIS_CALDDR_MM2S_STS_tvalid => AXI4_STREAM_STATUS_MISO.TVALID,
+      M_AXIS_CALDDR_MM2S_ACLK => CALDDR_MM2S_ACLK,      
       
       
       --FLASHINTF
@@ -1368,18 +1463,18 @@ begin
       qspi_io3_io => qspi_io3_io,
       qspi_ss_io(0) => qspi_ss_io,
       
-      NDF_UART_rxd => UART_NDF_RX,
-      NDF_UART_txd => UART_NDF_TX,
+      NDF_UART_rxd => NDF_UART_rxd,
+      NDF_UART_txd => NDF_UART_txd,
+      
+      NDF_UART_ctsn => '1',
+      NDF_UART_dcdn => '1',
+      NDF_UART_dsrn => '1',
+      NDF_UART_ri=> '1',
       
       --aec intc
       AEC_INTC => AEC_INTC
-      );
+      );											
    
-   
-   AXI4_STREAM_DATA_MOSI.TSTRB   <= (others => '1');
-   AXI4_STREAM_DATA_MOSI.TID     <= (others => '0');
-   AXI4_STREAM_DATA_MOSI.TDEST   <= (others => '0');
-   AXI4_STREAM_DATA_MOSI.TUSER   <= (others => '0');
    
    
 end bd_wrapper;

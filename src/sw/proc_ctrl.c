@@ -4,11 +4,11 @@
  *  
  *  This file contains the main() function.
  *  
- *  $Rev: 23236 $
- *  $Author: elarouche $
- *  $LastChangedDate: 2019-04-10 15:08:01 -0400 (mer., 10 avr. 2019) $
- *  $Id: proc_ctrl.c 23236 2019-04-10 19:08:01Z elarouche $
- *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/proc_ctrl.c $
+ *  $Rev$
+ *  $Author$
+ *  $LastChangedDate$
+ *  $Id$
+ *  $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -26,7 +26,6 @@
 #include "FirmwareUpdater.h"
 #include "GC_Manager.h"
 #include "GC_Poller.h"
-#include "GC_Store.h"
 #include "Calibration.h"
 #include "FlashSettings.h"
 #include "Actualization.h"
@@ -52,9 +51,6 @@
 #include "verbose.h"
 
 #define DEVICE_RUNNING_TIME_REFRESH_PERIOD_US   TIME_ONE_MINUTE_US
-#define COOLER_CURRENT_THRESHOLD_A   0.1F
-
-static void apply_resolution(void);
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -122,7 +118,6 @@ void disable_caches()
    extern rpCtrl_t theRpCtrl;
    extern slCtrl_t theSlCtrl;
    extern autofocusCtrl_t theAutoCtrl;
-   extern qspiFlash_t gQSPIFlash;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
@@ -152,7 +147,6 @@ void disable_caches()
    WAIT_US(30);
 
    BuiltInTest_Execute(BITID_InterruptControllerInitialization);
-   BuiltInTest_Execute(BITID_QSPIFlashInerfaceInitialization);
    BuiltInTest_Execute(BITID_FileSystemInitialization);
    BuiltInTest_Execute(BITID_FlashDynamicValuesInitialization);
    BuiltInTest_Execute(BITID_DeviceSerialPortsInitialization);
@@ -165,6 +159,7 @@ void disable_caches()
    BuiltInTest_Execute(BITID_GenICamManagerInitialization);
    BuiltInTest_Execute(BITID_FlashSettingsManagerInitialization);
    BuiltInTest_Execute(BITID_FileManagerInitialization);
+   BuiltInTest_Execute(BITID_QSPIFlashInerfaceInitialization);
    BuiltInTest_Execute(BITID_FirmwareUpdaterInitialization);
    BuiltInTest_Execute(BITID_FANControllerInitialization);
    BuiltInTest_Execute(BITID_SensorControllerInitialization);
@@ -186,7 +181,6 @@ void disable_caches()
    BuiltInTest_Execute(BITID_DeviceKeyValidation);
    BuiltInTest_Execute(BITID_MotorizedLensInitialization);
    BuiltInTest_Execute(BITID_AutofocusModuleInitialization);
-
 
    Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 1);
 
@@ -243,7 +237,6 @@ void disable_caches()
 
       GC_Manager_SM();
       GC_Poller_SM();
-      GC_Store_SM(&gQSPIFlash);
       File_Manager_SM();
       Firmware_Updater_SM();
       Calibration_SM();
@@ -251,8 +244,7 @@ void disable_caches()
       XADC_SM();
       TempMonitor_SM();
       Acquisition_SM();
-      if (!GC_ExternalMemoryBufferIsImplemented)
-         BufferManager_SM();
+      BufferManager_SM();
       DebugTerminal_Process(&gDebugTerminal);
       Power_SM();
       Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 0);
@@ -276,20 +268,5 @@ void disable_caches()
       RPopt_ProtocolHandler_SM(&theRpCtrl, &gcRegsData);
       SightLine_ProtocolHandler_SM(&theSlCtrl);
       Autofocus_SM(&theAutoCtrl, &theSlCtrl, &theRpCtrl);
-      apply_resolution();
    }
 }
-
-static void apply_resolution(void)
-{
-   static bool once = false;
-
-   if (gcRegsData.LoadSavedConfigurationAtStartup == 1 &&
-         !TDCStatusTst(WaitingForOutputFPGAMask) && !once)
-   {
-      GC_SetWidth(gcRegsData.Width);
-      GC_SetHeight(gcRegsData.Height);
-      once = true;
-   }
-}
-

@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22828 $
---!   $Author: enofodjie $
---!   $Date: 2019-02-09 10:45:11 -0500 (sam., 09 févr. 2019) $
---!   $Id: scorpiomwA_SRI_mblaze_intf.vhd 22828 2019-02-09 15:45:11Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scorpiomwA_SRI/HDL/scorpiomwA_SRI_mblaze_intf.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
@@ -106,14 +106,14 @@ architecture rtl of scorpiomwA_SRI_mblaze_intf is
    signal exp_time_reg                 : unsigned(30 downto 0);
    signal fpa_init_done_i              : std_logic;
    --   
-   --   -- attribute dont_touch                         : string;
-   --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
-   --   -- attribute dont_touch of user_cfg             : signal is "true";
-   --   -- attribute dont_touch of user_cfg_in_progress : signal is "true";
-   --   -- attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
-   --   -- attribute dont_touch of tri_min              : signal is "true";
-   --   -- attribute dont_touch of tri_int_part         : signal is "true";
-   --   -- attribute dont_touch of exp_time_reg         : signal is "true";
+   --   attribute dont_touch                         : string;
+   --   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
+   --   attribute dont_touch of user_cfg             : signal is "true";
+   --   attribute dont_touch of user_cfg_in_progress : signal is "true";
+   --   attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
+   --   attribute dont_touch of tri_min              : signal is "true";
+   --   attribute dont_touch of tri_int_part         : signal is "true";
+   --   attribute dont_touch of exp_time_reg         : signal is "true";
    
 begin   
    

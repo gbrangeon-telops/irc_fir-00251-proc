@@ -30,9 +30,6 @@ package FPA_define is
    constant DEFINE_FPA_ROIC              : std_logic_vector(7 downto 0) := FPA_ROIC_HERCULES;  -- roic du détecteur. Cela veut dire que le vhd actuel peut contrôler in détecteur de ce type qque soit le cooler.
    constant DEFINE_FPA_OUTPUT            : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL; 
    constant DEFINE_FPA_INIT_CFG_NEEDED   : std_logic := '0';     -- pas besoin de config particulière au demarrage du Hercules
-   constant DEFINE_DIAG_CLK_RATE_MAX_KHZ : integer := 80_000;    -- vitesse max de l'horloge de sortie des pixels en mode diag (vitesse totale des sorties divisée par 2 canaux en mode diag 
-   constant PROXY_CLINK_CHANNEL_NUM      : integer := 2;         -- Number of channels in the Camera Link interface with the proxy
-   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;      -- CLINK IN est à 80MHz ns
    
    ----------------------------------------------
    -- FPA 

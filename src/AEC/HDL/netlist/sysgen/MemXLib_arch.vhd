@@ -60,8 +60,8 @@
 
 --
 -- $RCSfile: MemXLib_arch.vhd,v $
--- $Revision: 14388 $
--- $Date: 2014-12-03 10:17:50 -0500 (mer., 03 déc. 2014) $
+-- $Revision$
+-- $Date$
 --
 -- Revision:
 --      02/23/06  ACR  Original File. Clean up from MPEG4 xlib

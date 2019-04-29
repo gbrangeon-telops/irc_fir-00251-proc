@@ -4,11 +4,11 @@
  *
  * This file implements the file manager module.
  *
- * $Rev: 22650 $
- * $Author: pcouture $
- * $Date: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
- * $Id: FileManager.c 22650 2018-12-13 20:30:18Z pcouture $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/FileManager.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */

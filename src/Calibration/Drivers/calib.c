@@ -60,9 +60,15 @@
 #define AW_FCC_FALL        0xB8
 
 // Ctrl Video
+#define AW_VIDEO_EHDRIINDEX         0xBC
+#define AW_VIDEO_FWPOSITION         0xC0
+#define AW_VIDEO_SELECTOR_ENABLE    0xC4
+#define AW_VIDEO_FREEZE             0xC8
 #define AW_VIDEO_BPR_MODE           0xCC
+
 #define AW_CALIB_BPR_MODE           0xD8
 
+#define VIDEO_EHDRI_INDEX_DEFAULT   0x5   // Valeur pour EHDRI desactiver
 
 // CONTROLE des switches : definition generale 
 #define SW_TO_PATH0        0x00                            // switch dirigé vers son entree/sortie 0 (voir vhd des switch)
@@ -72,7 +78,9 @@
 #define FALL_OFF           0x00
 #define FALL_ON            0x01
 
-
+// CONTROLE du video selector(ehdri_index ou fwposition)
+#define SDI_VIDEOSELECTOR_EHDRI       0x01
+#define SDI_VIDEOSELECTOR_FWPOSITION  0x02
 
 
 // quelques definitions de types
@@ -108,7 +116,7 @@ void CAL_initCalBlockInfo(calibBlockHdrInfo_t* b, uint32_t n)
    for (i=0; i<n; ++i)
    {
       b->SIZE = sizeof(calibBlockHdrInfo_t)/4 - 2;
-      b->ADD = XPAR_CALIBCONFIG_AXI_BASEADDR + AW_BLOCK_OFFSET;
+      b->ADD = TEL_PAR_TEL_CAL_CTRL_BASEADDR + AW_BLOCK_OFFSET;
       b->sel_value = 0;
       b->POSIXTime = 0;
       b->offset_fp32 = 0;
@@ -138,6 +146,9 @@ void CAL_Init(t_calib *pA, const gcRegistersData_t *pGCRegs)
    // reset des erreurs
    CAL_resetErr(pA);
 
+   AXI4L_write32(VIDEO_EHDRI_INDEX_DEFAULT, pA->ADD + AW_VIDEO_EHDRIINDEX );
+   AXI4L_write32(0, pA->ADD + AW_VIDEO_SELECTOR_ENABLE );
+   AXI4L_write32(FALSE, pA->ADD + AW_VIDEO_FREEZE);
    AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_MODE);
 
    CAL_UpdateCalibBprMode(pA, pGCRegs);
@@ -157,7 +168,7 @@ void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
    for (blockIndex = 0; blockIndex < calibrationInfo.collection.NumberOfBlocks; blockIndex++)
    {
       // param addr = ram base addr + block offset + param offset (inside the block)
-      DeltaF_RamAddr = XPAR_CALIB_RAM_AXI_BASEADDR + (blockIndex * pA->calib_ram_block_offset * sizeof(uint32_t)) + DELTA_TEMP_PARAM_OFFSET;
+      DeltaF_RamAddr = TEL_PAR_TEL_CALIB_RAM_BASEADDR + (blockIndex * pA->calib_ram_block_offset * sizeof(uint32_t)) + DELTA_TEMP_PARAM_OFFSET;
 
       if ((calibrationInfo.blocks[blockIndex].isValid) && (calibrationInfo.blocks[blockIndex].T0 != 0))
       {
@@ -168,8 +179,8 @@ void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
          }
          else
          {
-         DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / CC_TO_K(calibrationInfo.blocks[blockIndex].T0), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
-         CAL_DBG("calibrationInfo.blocks[%d].T0 = %dcC", blockIndex, calibrationInfo.blocks[blockIndex].T0);
+            DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / CC_TO_K(calibrationInfo.blocks[blockIndex].T0), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
+            CAL_DBG("calibrationInfo.blocks[%d].T0 = %dcC", blockIndex, calibrationInfo.blocks[blockIndex].T0);
          }
 
          CAL_DBG("DeviceTemperatureAry[DTS_InternalLens] = %dcC", C_TO_CC(DeviceTemperatureAry[DTS_InternalLens]));
@@ -449,29 +460,26 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
 
       // Update FW position if necessary
       if (flashSettings.FWPresent == 1)
-         GC_UpdateFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
+         GC_SetFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
 
       // Update NDF position if necessary
       if ((flashSettings.NDFPresent == 1) && GC_CalibrationIsActive &&
             (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition))
-         GC_UpdateNDFPositionSetpoint(pGCRegs->NDFilterPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition);
+         GC_SetNDFPositionSetpoint(pGCRegs->NDFilterPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition);
 
       // Update FOV position if necessary
       if ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && GC_CalibrationIsActive &&
             (pGCRegs->FOVPosition != (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition))
-         GC_SetFOVPositionSetpoint((uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition);
+         GC_RegisterWriteUI32(&gcRegsDef[FOVPositionSetpointIdx], (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition);
 
       // Update optical serial numbers with block values
-      if (pGCRegs->LoadSavedConfigurationAtStartup == 0)
-      {
-         pGCRegs->ExternalLensSerialNumber = calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber;
-         pGCRegs->ManualFilterSerialNumber = calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber;
-      }
+      pGCRegs->ExternalLensSerialNumber = calibrationInfo.blocks[blockIndex].ExternalLensSerialNumber;
+      pGCRegs->ManualFilterSerialNumber = calibrationInfo.blocks[blockIndex].ManualFilterSerialNumber;
       HDER_UpdateOpticalSerialNumbersHeader(&gHderInserter, pGCRegs);
 
       // Update exposure time if necessary
       if (calibrationInfo.collection.CalibrationType == CALT_MULTIPOINT)
-         GC_SetExposureTime((float)calibrationInfo.blocks[blockIndex].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
+         GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], (float)calibrationInfo.blocks[blockIndex].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
 
       // Save calibration block POSIX time
       if (gFlashDynamicValues.CalibrationCollectionBlockPOSIXTimeAtStartup != calibrationInfo.blocks[blockIndex].POSIXTime)
@@ -537,7 +545,7 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
       p_blockInfo = &calibrationInfo.blocks[blockIndex];
 
       // Assign address corresponding to the right calibration block
-      blockRam.ADD = XPAR_CALIB_RAM_AXI_BASEADDR + (blockIndex * pA->calib_ram_block_offset * sizeof(uint32_t));
+      blockRam.ADD = TEL_PAR_TEL_CALIB_RAM_BASEADDR + (blockIndex * pA->calib_ram_block_offset * sizeof(uint32_t));
 
       blockRam.saturation_threshold    = (uint32_t)p_blockInfo->SaturationThreshold;
       LUT_BuildConfig(&blockRam.nlc_lut_param,
@@ -732,6 +740,22 @@ static void CAL_configSwitchesAndHoles(const t_calib *pA, cal_mode_t calib_mode,
 
 void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs)
 {
+   uint32_t video_selector = 0;
+
+   if (pGCRegs->FWMode == FWM_SynchronouslyRotating)
+   {
+      video_selector |= SDI_VIDEOSELECTOR_FWPOSITION;
+      AXI4L_write32(pGCRegs->VideoFWPosition, pA->ADD + AW_VIDEO_FWPOSITION );
+   }
+
+   if (pGCRegs->EHDRINumberOfExposures != 1)
+   {
+      video_selector |= SDI_VIDEOSELECTOR_EHDRI;
+      AXI4L_write32(pGCRegs->VideoEHDRIExposureIndex, pA->ADD + AW_VIDEO_EHDRIINDEX );
+   }
+
+   AXI4L_write32(video_selector, pA->ADD + AW_VIDEO_SELECTOR_ENABLE );
+   AXI4L_write32(pGCRegs->VideoFreeze, pA->ADD + AW_VIDEO_FREEZE);
    AXI4L_write32(pGCRegs->VideoBadPixelReplacement, pA->ADD + AW_VIDEO_BPR_MODE);
 }
 

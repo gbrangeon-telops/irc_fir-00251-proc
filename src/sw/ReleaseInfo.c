@@ -4,11 +4,11 @@
  *
  * This file implements firmware release information module.
  * 
- * $Rev: 22769 $
- * $Author: elarouche $
- * $Date: 2019-01-23 10:27:06 -0500 (mer., 23 janv. 2019) $
- * $Id: ReleaseInfo.c 22769 2019-01-23 15:27:06Z elarouche $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/sw/ReleaseInfo.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */

@@ -1,4 +1,4 @@
-/* $Id: ICU.h 23157 2019-04-02 20:06:10Z elarouche $ */
+/* $Id$ */
 /****************************************************************************/
 /**
 *
@@ -32,6 +32,8 @@
 #define ICU_INF(fmt, ...)        ICU_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
 // ADRESSE du registre des statuts
+#define ICU_BASE_ADDR TEL_PAR_TEL_ICU_CTRL_BASEADDR
+
 #define ICU_MODE_OFFSET					   0x00
 #define ICU_PULSE_WIDTH_OFFSET      	0x04
 #define ICU_PERIOD_OFFSET           	0x08
@@ -79,7 +81,7 @@ enum ICU_Mode_Enum
 #define ICU_DEFAULT_TRANSITION_DURATION    	(uint32_t)1000 // [ms]
 #define ICU_DEFAULT_MODE        			ICU_MODE_REPEAT
 #define ICU_DEFAULT_POLARITY    			ICU_POL_FORWARD
-#define ICU_CLK_PER_MS						((uint32_t)(CLK_MB_FREQ_HZ / 1000)) // [clock ticks in one ms]
+#define ICU_CLK_PER_MS						((uint32_t)(CLK_100_FREQ_HZ / 1000)) // [clock ticks in one ms]
 
 #define ICU_STATUS_REFRESH_RATE 10 // [ms]
 

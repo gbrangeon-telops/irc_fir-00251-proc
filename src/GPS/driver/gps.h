@@ -4,11 +4,11 @@
  *
  * This file declares the GPS module.
  *
- * $Rev: 18503 $
- * $Author: dalain $
- * $Date: 2016-04-08 14:46:14 -0400 (ven., 08 avr. 2016) $
- * $Id: gps.h 18503 2016-04-08 18:46:14Z dalain $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/GPS/driver/gps.h $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2015 Telops Inc.
  */

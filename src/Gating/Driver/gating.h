@@ -30,7 +30,7 @@ struct s_GatingCfg
    
 typedef struct s_GatingCfg t_GatingCfg;
 
-#define GATING_BASE_CLOCK_FREQ_HZ   CLK_MB_FREQ_HZ  // horloge de reference du gating
+#define GATING_BASE_CLOCK_FREQ_HZ   CLK_100_FREQ_HZ  // horloge de reference du gating
 
 #define GATING_ADDR_MODE            0x0
 #define GATING_ADDR_DELAY           0x4

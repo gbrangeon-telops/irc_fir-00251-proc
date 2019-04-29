@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author: odionne $
--- $LastChangedDate: 2017-09-01 15:29:17 -0400 (ven., 01 sept. 2017) $
--- $Revision: 20830 $
+-- $Author$
+-- $LastChangedDate$
+-- $Revision$
 -------------------------------------------------------------------------------
 --
 -- Description : This file implements the axi_lite communication for the ICU

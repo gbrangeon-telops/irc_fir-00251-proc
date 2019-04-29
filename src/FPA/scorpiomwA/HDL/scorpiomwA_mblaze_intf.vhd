@@ -107,16 +107,15 @@ architecture rtl of scorpiomwA_mblaze_intf is
    signal fpa_init_done_i              : std_logic;
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
-   signal dac_cfg_in_progress          : std_logic;
    --   
-   --   -- attribute dont_touch                         : string;
-   --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
-   --   -- attribute dont_touch of user_cfg             : signal is "true";
-   --   -- attribute dont_touch of user_cfg_in_progress : signal is "true";
-   --   -- attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
-   --   -- attribute dont_touch of tri_min              : signal is "true";
-   --   -- attribute dont_touch of tri_int_part         : signal is "true";
-   --   -- attribute dont_touch of exp_time_reg         : signal is "true";
+   --   attribute dont_touch                         : string;
+   --   attribute dont_touch of fpa_softw_stat_i     : signal is "true";
+   --   attribute dont_touch of user_cfg             : signal is "true";
+   --   attribute dont_touch of user_cfg_in_progress : signal is "true";
+   --   attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
+   --   attribute dont_touch of tri_min              : signal is "true";
+   --   attribute dont_touch of tri_int_part         : signal is "true";
+   --   attribute dont_touch of exp_time_reg         : signal is "true";
    
 begin   
    
@@ -211,7 +210,6 @@ begin
             ctrled_reset_i <= '1';
             reset_err_i <= '0';
             user_cfg_in_progress <= '1';                  -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
-            dac_cfg_in_progress <= '1'; 
             user_cfg_i.comn.fpa_init_cfg <= '0';               -- à '1' <=> dit que la config reçue est une config d'initialisation. À '0' sinon
             mb_ctrled_reset_i <= '0';
             user_cfg_i.sat_ctrl_en <= '0';
@@ -289,13 +287,18 @@ begin
                   when X"0A0" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0));                                                                                                                           
                   when X"0A4" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
                   when X"0A8" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0));                                                                                                                                     
-                  
-                  when X"0AC" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
-                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
-                  when X"0B4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
-                  when X"0B8" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);                     
-                  when X"0BC" =>    user_cfg_i.reorder_column                  <= data_i(0); 
-                  when X"0C0" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
+                  when X"0AC" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0));                                                                                                                                        
+                  when X"0B0" =>    user_cfg_i.vdac_value(2)                   <= unsigned(data_i(user_cfg_i.vdac_value(2)'length-1 downto 0));                                                                                                                                        
+                  when X"0B4" =>    user_cfg_i.vdac_value(3)                   <= unsigned(data_i(user_cfg_i.vdac_value(3)'length-1 downto 0));                                                                                                                                        
+                  when X"0B8" =>    user_cfg_i.vdac_value(4)                   <= unsigned(data_i(user_cfg_i.vdac_value(4)'length-1 downto 0));                                                                                                                                        
+                  when X"0BC" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));                                                                                                                                        
+                  when X"0C0" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));                                                                                                                                        
+                  when X"0C4" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));                                                                                                                                        
+                  when X"0C8" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0));                                                                                                                                        
+                  when X"0CC" =>    user_cfg_i.adc_clk_phase(1)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(1)'length-1 downto 0));
+                  when X"0D0" =>    user_cfg_i.adc_clk_phase(2)                <= unsigned(data_i(user_cfg_i.adc_clk_phase(2)'length-1 downto 0));                 
+                  when X"0D4" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
+                  when X"0D8" =>    user_cfg_i.reorder_column                  <= data_i(0); user_cfg_in_progress <= '0'; 
                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -307,18 +310,6 @@ begin
                      
                   -- pour un reset complet du module FPA
                   when X"AF0" =>   mb_ctrled_reset_i                           <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
-                     
-                     ----------------------------------------------------------------------------------------------------------------------------------------                  
-                     -- EN0 15 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
-                  ----------------------------------------------------------------------------------------------------------------------------------------
-                  when X"D00" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0)); dac_cfg_in_progress <= '1';                                                                                                                        
-                  when X"D04" =>    user_cfg_i.vdac_value(2)                   <= unsigned(data_i(user_cfg_i.vdac_value(2)'length-1 downto 0));                                                                                                                           
-                  when X"D08" =>    user_cfg_i.vdac_value(3)                   <= unsigned(data_i(user_cfg_i.vdac_value(3)'length-1 downto 0));                                                                                                                            
-                  when X"D0C" =>    user_cfg_i.vdac_value(4)                   <= unsigned(data_i(user_cfg_i.vdac_value(4)'length-1 downto 0));                                                                                                                            
-                  when X"D10" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));                                                                               
-                  when X"D14" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));                                  
-                  when X"D18" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));                                  
-                  when X"D1C" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); dac_cfg_in_progress <= '0';  ----             
                   
                   when others =>
                   
@@ -375,12 +366,15 @@ begin
          end if;
          
          -- user_cfg_rdy
-         user_cfg_rdy_pipe(0) <= not (user_cfg_in_progress or dac_cfg_in_progress);
+         user_cfg_rdy_pipe(0) <= not user_cfg_in_progress;
          user_cfg_rdy_pipe(7 downto 1) <= user_cfg_rdy_pipe(6 downto 0);
-         user_cfg_rdy <= not (user_cfg_in_progress or dac_cfg_in_progress) and user_cfg_rdy_pipe(7); 
+         user_cfg_rdy <= not user_cfg_in_progress and user_cfg_rdy_pipe(7);
          
       end if;
-   end process; 
+   end process;
+   
+   
+   
    
    ----------------------------------------------------------------------------
    -- CFG MB AXI RD : contrôle du flow

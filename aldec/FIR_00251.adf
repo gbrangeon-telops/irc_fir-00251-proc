@@ -40,12 +40,11 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\pelicanD_150Hz\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\pelicanD_150Hz\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\ADCReadout\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\ADCReadout\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\ADCReadout\HDL
 IMPL_TOOL=
 SYNTH_TOOL=
-CDebugWatchList=
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -87,19 +86,19 @@ SortInfo=u
 
 [Folders]
 Name3=Makefiles
-Directory3=d:\Telops\FIR-00251-Proc\aldec\
+Directory3=d:\telops\FIR-00251-Proc\aldec\
 Extension3=mak
 Name4=Memory
-Directory4=d:\Telops\FIR-00251-Proc\aldec\
+Directory4=d:\telops\FIR-00251-Proc\aldec\
 Extension4=mem;mif;hex
 Name5=Dll Libraries
-Directory5=d:\Telops\FIR-00251-Proc\aldec\
+Directory5=d:\telops\FIR-00251-Proc\aldec\
 Extension5=dll
 Name6=PDF
-Directory6=d:\Telops\FIR-00251-Proc\aldec\
+Directory6=d:\telops\FIR-00251-Proc\aldec\
 Extension6=pdf
 Name7=HTML
-Directory7=d:\Telops\FIR-00251-Proc\aldec\
+Directory7=d:\telops\FIR-00251-Proc\aldec\
 Extension7=
 
 [file_out:axis_lut/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_a32_d32.bde]
@@ -135,9 +134,6 @@ HeaderInserter\src/..\..\..\compile\hder_inserter.vhd=-1
 [file_out:ExposureTime\src/..\..\..\..\src\ExposureTime\HDL\exposure_time_ctrl.bde]
 ExposureTime\src/..\..\..\compile\exposure_time_ctrl.vhd=-1
 
-[file_out:Trig\src/trig_top_tb.bde]
-Trig\src/..\..\..\compile\trig_top_tb.vhd=-1
-
 [file_out:Trig\src/..\..\..\..\src\Trig\HDL\trig_gen.bde]
 Trig\src/..\..\..\compile\trig_gen.vhd=-1
 
@@ -149,9 +145,6 @@ Trig\src/..\..\..\compile\trig_stamper.vhd=-1
 
 [file_out:Clink_Receiver/..\..\..\src\clink\HDL\scd_clink_receiver_2ch.bde]
 Clink_Receiver/..\..\compile\scd_clink_receiver_2ch.vhd=-1
-
-[file_out:Clink_Receiver\src/Clink_receiver_tb.bde]
-Clink_Receiver\src/..\..\..\compile\Clink_receiver_tb.vhd=-1
 
 [file_out:Irig\SIM/..\..\..\..\src\Irig\Sim\Irig_GlobalTest.bde]
 Irig\SIM/..\..\..\compile\Irig_GlobalTest.vhd=-1
@@ -186,14 +179,8 @@ ADC_deserializer/..\..\compile\adc_receiver_1ch.vhd=-1
 [file_out:ADC_deserializer/..\..\..\src\QuadADC\HDL\adc_data_deserializer_8chn.bde]
 ADC_deserializer/..\..\compile\adc_data_deserializer_8chn.vhd=-1
 
-[file_out:Trig\src/trig_top_tb.bde]
-Trig\src/..\..\..\compile\trig_top_tb.vhd=-1
-
 [file_out:Clink_Receiver/..\..\..\src\clink\HDL\scd_clink_receiver_2ch.bde]
 Clink_Receiver/..\..\compile\scd_clink_receiver_2ch.vhd=-1
-
-[file_out:Clink_Receiver\src/Clink_receiver_tb.bde]
-Clink_Receiver\src/..\..\..\compile\Clink_receiver_tb.vhd=-1
 
 [file_out:Irig\SIM/..\..\..\..\src\Irig\Sim\Irig_GlobalTest.bde]
 Irig\SIM/..\..\..\compile\Irig_GlobalTest.vhd=-1
@@ -252,18 +239,6 @@ ADC_deserializer/..\..\compile\adc_data_deserializer_8chn.vhd=-1
 [file_out:ADC_deserializer/..\..\..\src\QuadADC\HDL\adc_data_deserializer.bde]
 ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
-
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde]
-FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_readout_ctrler.vhd=-1
-
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_clks_gen.vhd=-1
-
 [Groups]
 ADCReadout=1
 AEC=1
@@ -278,32 +253,26 @@ Flagging=1
 Flash_Ctrl=1
 FPA=1
 FPA\Common=1
-FPA\blackbirdD=1
 FPA\HawkA=1
 FPA\HerculesD=1
 FPA\isc0207A=1
-FPA\isc0207A_3k=1
 FPA\isc0209A=1
-FPA\isc0804A=1
-FPA\isc0804A\src=1
-FPA\isc0804A_500Hz=1
 FPA\MarsD=1
 FPA\Megalink=1
 FPA\PelicanD=1
-FPA\PelicanD_150Hz=1
 FPA\Scd_proxy=1
 FPA\ScorpiolwD=1
 FPA\ScorpiolwD_230Hz=1
 FPA\ScorpiomwA=1
 FPA\ScorpiomwD=1
-FPA\suphawkA=1
+FPGA_COMM=1
 Gating=1
 HeaderInserter=1
 ICU=1
 Irig=1
 LUT=1
 MGT=1
-Quad_serdes=1
+QuadADC=1
 SFW=1
 TEL2000=1
 Testbench=1
@@ -314,54 +283,97 @@ Testbench\IP\MGT_wrapper=1
 Testbench\IP\AXI4_Stream64_to_32=1
 Testbench\Proc_Only=1
 Testbench\SystemC=1
-Testbench\Proc_Out=1
 Trig=1
 USART=1
 USB=1
+AcqChain=1
+AcqChain\AcqChain=1
+AcqChain\src=1
+AcqChain\src\Exposure=1
+AcqChain\src\Hder=1
+AcqChain\src\PelicanD=1
+AcqChain\src\TestBench=1
+AcqChain\src\Trig=1
+AXI4=1
+calibration=1
+calibration\calibration=1
+calibration\src=1
+calibration\src\Driver=1
+calibration\src\HDL=1
+calibration\src\Misc=1
+Clink_Receiver=1
+Clink_Receiver\Clink_Receiver=1
+Clink_Receiver\src=1
+CLINK_UART=1
+ExposureTime\src=1
+ExposureTime\src\TestBench=1
+FPA\HawkA\hawkA=1
+FPA\HawkA\src=1
+FPA\HawkA\src\TestBench=1
+FPA\isc0207A\isc0207A=1
+FPA\isc0207A\src=1
+FPA\isc0207A\src\FPA_common=1
+FPA\isc0207A\src\TestBench=1
+FPA\isc0209A\isc0209A=1
+FPA\isc0209A\src=1
+FPA\isc0209A\src\TestBench=1
+FPA\PelicanD\src=1
+FPA\PelicanD\src\FPA_common=1
+FPA\PelicanD\src\TestBench=1
+FPA\ScorpiomwA\scorpiomwA=1
+FPA\ScorpiomwA\scorpiomwA\slp=1
+FPA\ScorpiomwA\src=1
+FPA\ScorpiomwA\src\TestBench=1
+HeaderInserter\src=1
+HeaderInserter\src\TestBench=1
+INTC=1
+Testbench\Proc_Out=1
+Trig\src=1
+Trig\src\TestBench=1
+XADC=1
+
+[file_out:Trig\src/trig_top_tb.bde]
+Trig\src/..\..\..\compile\trig_top_tb.vhd=-1
+
+[file_out:Clink_Receiver\src/Clink_receiver_tb.bde]
+Clink_Receiver\src/..\..\..\compile\Clink_receiver_tb.vhd=-1
 
 [Files]
 /..\..\src\fir_00251_proc_acq.bde=-1
-/..\..\src\fir_00251_proc_blackbirdD.bde=-1
 /..\..\src\fir_00251_proc_hawkA.bde=-1
 /..\..\src\fir_00251_proc_herculesD.bde=-1
 /..\..\src\fir_00251_proc_isc0207A.bde=-1
-/..\..\src\fir_00251_proc_isc0207A_3k.bde=-1
 /..\..\src\fir_00251_proc_isc0209A.bde=-1
-/..\..\src\fir_00251_proc_isc0804A.bde=-1
-/..\..\src\fir_00251_proc_isc0804A_500Hz.bde=-1
 /..\..\src\fir_00251_proc_marsD.bde=-1
 /..\..\src\fir_00251_proc_pelicanD.bde=-1
-/..\..\src\fir_00251_proc_pelicanD_150Hz.bde=-1
 /..\..\src\fir_00251_proc_scorpiolwD.bde=-1
 /..\..\src\fir_00251_proc_scorpiolwD_230Hz.bde=-1
 /..\..\src\fir_00251_proc_scorpiomwA.bde=-1
 /..\..\src\fir_00251_proc_scorpiomwD.bde=-1
 /..\..\src\fir_00251_proc_startup.bde=-1
-/..\..\src\fir_00251_proc_suphawkA.bde=-1
 /..\..\src\fir_00251_build_all_top.do=-1
 /..\..\src\fir_00251_proc_acq_build.do=-1
-/..\..\src\fir_00251_top_blackbirdD_build.do=-1
 /..\..\src\fir_00251_top_hawkA_build.do=-1
 /..\..\src\fir_00251_top_herculesD_build.do=-1
 /..\..\src\fir_00251_top_isc0207A_build.do=-1
-/..\..\src\fir_00251_top_isc0207A_3k_build.do=-1
 /..\..\src\fir_00251_top_isc0209A_build.do=-1
-/..\..\src\fir_00251_top_isc0804A_build.do=-1
-/..\..\src\fir_00251_top_isc0804A_500Hz_build.do=-1
 /..\..\src\fir_00251_top_marsD_build.do=-1
 /..\..\src\fir_00251_top_pelicanD_build.do=-1
-/..\..\src\fir_00251_top_pelicanD_150Hz_build.do=-1
 /..\..\src\fir_00251_top_scorpiolwD_build.do=-1
 /..\..\src\fir_00251_top_scorpiolwD_230Hz_build.do=-1
 /..\..\src\fir_00251_top_scorpiomwA_build.do=-1
 /..\..\src\fir_00251_top_scorpiomwD_build.do=-1
 /..\..\src\fir_00251_top_startup_build.do=-1
-/..\..\src\fir_00251_top_suphawkA_build.do=-1
+/..\..\..\FIR-00251-Common\VHDL\hdr_extractor\axis16_hder_extractor.vhd=-1
+/..\..\..\FIR-00251-Common\VHDL\hdr_extractor\hder_extractor.vhd=-1
+/clean_lib.bat=-1
+/mgt_block_dual.bde=-1
 ADCReadout/..\..\..\src\ADCReadout\HDL\adc_readout.vhd=-1
 ADCReadout/..\..\..\src\ADCReadout\HDL\adc_readout_mb_intf.vhd=-1
 ADCReadout/..\..\..\src\ADCReadout\HDL\adc_switch.vhd=-1
 ADCReadout/..\..\..\src\ADCReadout\HDL\adc_readout_top.bde=-1
 ADCReadout/..\..\..\src\ADCReadout\HDL\build_adc_readout.do=-1
+ADCReadout/..\..\..\src\ADCReadout\HDL\ad798x_driver.vhd=-1
 AEC/..\..\..\src\AEC\HDL\AEC.bde=-1
 AEC/..\..\..\src\AEC\HDL\build_AEC_intf.do=-1
 AEC/..\..\..\src\AEC\HDL\AEC_Ctrl.vhd=-1
@@ -379,17 +391,31 @@ AEC/..\..\..\src\AEC\HDL\netlist\sysgen\xlclockdriver_rd.vhd=-1
 AEC/..\..\..\src\AEC\HDL\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl=-1
 AEC/..\..\..\..\FIR-00251-Common\VHDL\Utilities\axis16_img_extractor.vhd=-1
 BD/..\..\..\src\BD\bd_wrapper.vhd=-1
-Buffering/buffering_fsm.vhd=-1
-Buffering/buffering_Ctrl.vhd=-1
-Buffering/Buffering.bde=-1
-Buffering/Buffering_wrapper.bde=-1
+BD/compile_axi_gpio_v2_0.do=-1
+BD/compile_axi_intc_v4_0.do=-1
+BD/compile_axi_protocol_converter_v2_1.do=-1
+BD/compile_axi_timer_v2_0.do=-1
+BD/compile_axi_uart16550_v2_0.do=-1
+BD/compile_blk_mem_gen_v8_1.do=-1
+BD/compile_core_auto_cc.do=-1
+BD/compile_core_auto_us.do=-1
+BD/compile_core_bd.do=-1
+BD/compile_core_xadc_wiz_1_0_axi_xadc.do=-1
+BD/compile_core_xbar.do=-1
+BD/compile_lmb_bram_if_cntlr_v4_0.do=-1
+BD/compile_lmb_v10_v3_0.do=-1
+BD/compile_mdm_v3_0.do=-1
+BD/compile_microblaze_v9_2.do=-1
+BD/compile_mig_series7_1_0.do=-1
+BD/compile_proc_sys_reset_v5_0.do=-1
 Buffering/..\..\..\..\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd=-1
+Buffering/..\..\..\src\Buffering\HDL\Buffering.bde=-1
+Buffering/..\..\..\src\Buffering\HDL\buffering_Ctrl.vhd=-1
+Buffering/..\..\..\src\Buffering\HDL\buffering_fsm.vhd=-1
 Buffering/..\..\..\src\Buffering\HDL\moi_source_selector.vhd=-1
 Buffering/..\..\..\src\Buffering\HDL\build_buffering_intf.do=-1
 Calib/..\..\..\..\FIR-00251-Common\VHDL\Calibration\calib_define.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\calibration.bde=-1
-Calib/..\..\..\src\Calibration\HDL\calibration_core.bde=-1
-Calib/..\..\..\src\Calibration\HDL\calibration_common.bde=-1
 Calib/..\..\..\src\Calibration\HDL\NLC.bde=-1
 Calib/..\..\..\src\Calibration\HDL\FSU.bde=-1
 Calib/..\..\..\src\Calibration\HDL\FCC.bde=-1
@@ -400,7 +426,6 @@ Calib/..\..\..\src\Calibration\HDL\calib_config.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\calib_block_sel.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\calib_fast_hder_gen.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\calib_param_sequencer.vhd=-1
-Calib/..\..\..\src\Calibration\HDL\ddr_aoi_add_gen.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\ddr_data_decoder.bde=-1
 Calib/..\..\..\src\Calibration\HDL\ddr_data_decoder_core.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\video_data_handler.bde=-1
@@ -409,6 +434,7 @@ Calib/..\..\..\src\Calibration\HDL\video_ehdri_SM.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\video_freeze_SM.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\video_freeze.bde=-1
 Calib/..\..\..\src\Calibration\HDL\video_ehdri_selector.vhd=-1
+Calib/..\..\..\src\Calibration\HDL\compil_calibration.do=-1
 Calib/..\..\..\src\Calibration\HDL\video_fwposition_SM.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\video_fwposition_selector.bde=-1
 Calib/..\..\..\..\FIR-00251-Common\VHDL\Utilities\axis8_hole.vhd=-1
@@ -416,8 +442,6 @@ Calib/..\..\..\src\Calibration\HDL\pixel_saturation_flag.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\param16_fifo.vhd=-1
 Calib/..\..\..\src\Calibration\HDL\param_fifo_block.bde=-1
 Calib/..\..\..\src\Calibration\HDL\param_lut_fifo.bde=-1
-Calib/..\..\..\src\Calibration\HDL\badpixel_replacer64.vhd=-1
-Calib/..\..\..\src\Calibration\HDL\compil_calibration.do=-1
 CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd=-1
 CLINK/..\..\..\src\clink\HDL\compil_clink_receiver.do=-1
 CLINK/..\..\..\src\clink\HDL\clink_receiver_2ch.bde=-1
@@ -447,6 +471,18 @@ ExposureTime/..\..\..\src\ExposureTime\HDL\exp_time_manager.vhd=-1
 ExposureTime/..\..\..\src\ExposureTime\HDL\exp_time_mb_intf.vhd=-1
 ExposureTime/..\..\..\src\ExposureTime\HDL\exposure_define.vhd=-1
 ExposureTime/..\..\..\src\ExposureTime\HDL\exposure_time_ctrl.bde=-1
+ExposureTime/bde.set=-1
+ExposureTime/compilation.order=-1
+ExposureTime/compile.cfg=-1
+ExposureTime/Edfmap.ini=-1
+ExposureTime/ExposureTime.adf=-1
+ExposureTime/exposuretime.wsp=-1
+ExposureTime/projlib.cfg=-1
+ExposureTime\src/exposure.dlm=-1
+ExposureTime\src/exposure_tb.cpp=-1
+ExposureTime\src/exposure_top_tb.bde=-1
+ExposureTime\src\TestBench/exposure_runtest.do=-1
+ExposureTime\src\TestBench/exposure_top_tb_TB.vhd=-1
 Flagging/..\..\..\src\Flagging\HDL\flag_define.vhd=-1
 Flagging/..\..\..\src\Flagging\HDL\flagging_mblaze_intf.vhd=-1
 Flagging/..\..\..\src\Flagging\HDL\flagging_SM.vhd=-1
@@ -496,38 +532,9 @@ FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_map.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_lsync_mode_mux.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_mem.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL_ext_sync_flow.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_quad_subtract.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_lsync_mode_dval_gen.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_fsync_mode_dval_gen.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clks_memory.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_ctrler.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clk_mem_ctrler.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_raw_area_gen.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_stretching_area_gen.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_user_area_gen.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_waste_area_gen.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_core.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem_input_ctler.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem_output_ctler.vhd=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fastrd_common.do=-1
-FPA\blackbirdD/..\..\..\..\src\FPA\blackbirdD\HDL\compil_blackbirdD.do=-1
-FPA\blackbirdD/..\..\..\..\src\FPA\blackbirdD\HDL\FPA_define.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\compil_hawkA.do=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\FPA_define.vhd=-1
-FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde=-1
-FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen_core.vhd=-1
-FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_mmcm.vhd=-1
+FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_detector_ctrler.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_dig_data_reg.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_digio_map.vhd=-1
@@ -541,6 +548,28 @@ FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_spi_tx_check.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_windowing_ctrl_reg.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_windowing_data_reg.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\proxy_define.vhd=-1
+FPA\HawkA/bde.set=-1
+FPA\HawkA/compilation.order=-1
+FPA\HawkA/compile.cfg=-1
+FPA\HawkA/Edfmap.ini=-1
+FPA\HawkA/hawkA.adf=-1
+FPA\HawkA/projlib.cfg=-1
+FPA\HawkA/stimulators.set=-1
+FPA\HawkA/synthesis.order=-1
+FPA\HawkA\hawkA/elaboration.log=-1
+FPA\HawkA\hawkA/hawkA.lib=-1
+FPA\HawkA\src/digio_dummy.vhd=-1
+FPA\HawkA\src/flexV_dummy.vhd=-1
+FPA\HawkA\src/fpa_temp_dummy.vhd=-1
+FPA\HawkA\src/hawkA_intf_testbench.bde=-1
+FPA\HawkA\src/hawka_intf_testbench_pkg.vhd=-1
+FPA\HawkA\src/hawkA_intf_testbench_TB.vhd=-1
+FPA\HawkA\src/hawkA_intf_testbench_TB_runtest.do=-1
+FPA\HawkA\src\TestBench/hawkA_dummy.vhd=-1
+FPA\HawkA\src\TestBench/hawka_hw_ctrl_tb_TB.vhd=-1
+FPA\HawkA\src\TestBench/hawka_hw_ctrl_tb_TB_runtest.do=-1
+FPA\HawkA\src\TestBench/hawka_readout_ctrler_TB.vhd=-1
+FPA\HawkA\src\TestBench/hawka_readout_ctrler_TB_runtest.do=-1
 FPA\HerculesD/..\..\..\..\src\FPA\herculesD\HDL\compil_HerculesD.do=-1
 FPA\HerculesD/..\..\..\..\src\FPA\herculesD\HDL\FPA_define.vhd=-1
 FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\compil_isc0207A.do=-1
@@ -558,30 +587,46 @@ FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_prog_ctrler.vhd=-1
 FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_spi_feeder.vhd=-1
 FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_sync_flag_gen.vhd=-1
 FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\proxy_define.vhd=-1
-FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_clks_gen_core.vhd=-1
-FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_clks_mmcm.vhd=-1
-FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_clks_gen.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\compil_isc0207A_3k.do=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\FPA_define.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_gen.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_gen_core.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_mmcm.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_digio_map.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_hw_driver.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_mblaze_intf.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_prog_ctrler.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\proxy_define.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_bitstream_gen.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_spi_feeder.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_intf.bde=-1
-FPA\isc0207A_3k/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\scorpiomwA\HDL\sc_high_duration.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\scorpiomwA\HDL\sc_min_max_ctrl.vhd=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde=-1
-FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_kernel.vhd=-1
+FPA\isc0207A/bde.set=-1
+FPA\isc0207A/compilation.order=-1
+FPA\isc0207A/compile.cfg=-1
+FPA\isc0207A/Edfmap.ini=-1
+FPA\isc0207A/isc0207A.adf=-1
+FPA\isc0207A/isc0207A.wsp=-1
+FPA\isc0207A/projlib.cfg=-1
+FPA\isc0207A/stimulators.set=-1
+FPA\isc0207A/synthesis.order=-1
+FPA\isc0207A\isc0207A/isc0207A.lib=-1
+FPA\isc0207A\src/brd_mux_dummy.vhd=-1
+FPA\isc0207A\src/brd_switch_dummy.vhd=-1
+FPA\isc0207A\src/detector_trace_define.vhd=-1
+FPA\isc0207A\src/digio_dummy.vhd=-1
+FPA\isc0207A\src/edge_distance_measure.bde=-1
+FPA\isc0207A\src/edge_measure_ref_clk.vhd=-1
+FPA\isc0207A\src/edge_measure_stat.vhd=-1
+FPA\isc0207A\src/flexV_dummy.vhd=-1
+FPA\isc0207A\src/fpa_isc0207_hw_driver_tb.bde=-1
+FPA\isc0207A\src/fpa_isc0207_intf_tb.bde=-1
+FPA\isc0207A\src/fpa_temp_dummy.vhd=-1
+FPA\isc0207A\src/isc0207A_dummy.vhd=-1
+FPA\isc0207A\src/isc0207A_intf_testbench.bde=-1
+FPA\isc0207A\src/monit_adc_dummy.vhd=-1
+FPA\isc0207A\src/re_distance_measure.vhd=-1
+FPA\isc0207A\src\TestBench/fpa_intf.cpp=-1
+FPA\isc0207A\src\TestBench/fpa_isc0207_hw_driver_tb_TB.vhd=-1
+FPA\isc0207A\src\TestBench/fpa_isc0207_hw_driver_tb_TB_runtest.do=-1
+FPA\isc0207A\src\TestBench/fpa_isc0207_intf_tb_TB.vhd=-1
+FPA\isc0207A\src\TestBench/fpa_isc0207_intf_tb_TB_runtest.do=-1
+FPA\isc0207A\src\TestBench/isc0207.dlm=-1
+FPA\isc0207A\src\TestBench/isc0207a_data_ctrl_TB.vhd=-1
+FPA\isc0207A\src\TestBench/isc0207a_data_ctrl_TB_runtest.do=-1
+FPA\isc0207A\src\TestBench/isc0207a_intf_testbench_TB.vhd=-1
+FPA\isc0207A\src\TestBench/isc0207a_intf_testbench_TB_runtest.do=-1
+FPA\isc0207A\src\TestBench/isc0207_tb.cpp=-1
+FPA\isc0207A\src\TestBench/isc_0207_copy_to_cpp.bat=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\compil_isc0209A.do=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\FPA_define.vhd=-1
+FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.vhd=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_digio_map.vhd=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_hw_driver.bde=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_intf.bde=-1
@@ -593,48 +638,30 @@ FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_prog_spi_feeder.vhd=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_readout_ctrler.vhd=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_window_reg.vhd=-1
 FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\proxy_define.vhd=-1
-FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde=-1
-FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen_core.vhd=-1
-FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_mmcm.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_readout_kernel.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_hw_driver.bde=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_intf.bde=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_prog_ctrler.bde=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\compil_isc0804A.do=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\FPA_define.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_bitstream_gen.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen_core.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_mmcm.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_digio_map.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_mblaze_intf.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_spi_feeder.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\proxy_define.vhd=-1
-FPA\isc0804A/..\..\..\..\IP\325\fwft_sfifo_w8_d64\fwft_sfifo_w8_d64_sim_netlist.vhdl=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_raw_area_gen.vhd=-1
-FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_readout_ctrler.bde=-1
-FPA\isc0804A/..\..\..\..\IP\325\fwft_sfifo_w40_d256\fwft_sfifo_w40_d256_sim_netlist.vhdl=-1
-FPA\isc0804A/..\..\..\..\IP\325\fwft_sfifo_w43_d256\fwft_sfifo_w43_d256_sim_netlist.vhdl=-1
-FPA\isc0804A/..\..\..\..\IP\325\fwft_sfifo_w43_d512\fwft_sfifo_w43_d512_sim_netlist.vhdl=-1
-FPA\isc0804A/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_faked_data_gen.vhd=-1
-FPA\isc0804A\src/quadpix_decoder.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\compil_isc0804A_500Hz.do=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\FPA_define.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_bitstream_gen.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen.bde=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen_core.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_mmcm.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_digio_map.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_elcorr_refs_ctrl.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_hw_driver.bde=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_intf.bde=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_mblaze_intf.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_prog_ctrler.bde=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_raw_area_gen.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_ctrler.bde=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_kernel.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_spi_feeder.vhd=-1
-FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\proxy_define.vhd=-1
+FPA\isc0209A/bde.set=-1
+FPA\isc0209A/compilation.order=-1
+FPA\isc0209A/compile.cfg=-1
+FPA\isc0209A/Edfmap.ini=-1
+FPA\isc0209A/isc0209A.adf=-1
+FPA\isc0209A/isc0209a.wsp=-1
+FPA\isc0209A/projlib.cfg=-1
+FPA\isc0209A\isc0209A/isc0209A.lib=-1
+FPA\isc0209A\src/brd_mux_dummy.vhd=-1
+FPA\isc0209A\src/brd_switch_dummy.vhd=-1
+FPA\isc0209A\src/detector_trace_define.vhd=-1
+FPA\isc0209A\src/digio_dummy.vhd=-1
+FPA\isc0209A\src/edge_distance_measure.bde=-1
+FPA\isc0209A\src/edge_measure_ref_clk.vhd=-1
+FPA\isc0209A\src/edge_measure_stat.vhd=-1
+FPA\isc0209A\src/flexV_dummy.vhd=-1
+FPA\isc0209A\src/fpa_temp_dummy.vhd=-1
+FPA\isc0209A\src/isc0209A_intf_testbench.bde=-1
+FPA\isc0209A\src/monit_adc_dummy.vhd=-1
+FPA\isc0209A\src/re_distance_measure.vhd=-1
+FPA\isc0209A\src/var_shift_reg_w16_d32.vhd=-1
+FPA\isc0209A\src\TestBench/isc0209A_dummy.vhd=-1
+FPA\isc0209A\src\TestBench/isc0209A_intf_testbench_TB.vhd=-1
+FPA\isc0209A\src\TestBench/isc0209A_intf_testbench_TB_runtest.do=-1
 FPA\MarsD/..\..\..\..\src\FPA\marsD\HDL\compil_marsD.do=-1
 FPA\MarsD/..\..\..\..\src\FPA\marsD\HDL\FPA_define.vhd=-1
 FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\compil_megalink.do=-1
@@ -652,11 +679,23 @@ FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\mglk_serial_module.vhd=-1
 FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\proxy_define.vhd=-1
 FPA\PelicanD/..\..\..\..\src\FPA\pelicanD\HDL\compil_PelicanD.do=-1
 FPA\PelicanD/..\..\..\..\src\FPA\pelicanD\HDL\FPA_define.vhd=-1
-FPA\PelicanD_150Hz/..\..\..\..\src\FPA\pelicanD_150Hz\HDL\compil_PelicanD_150Hz.do=-1
-FPA\PelicanD_150Hz/..\..\..\..\src\FPA\pelicanD_150Hz\HDL\FPA_define.vhd=-1
+FPA\PelicanD/bde.set=-1
+FPA\PelicanD/compilation.order=-1
+FPA\PelicanD/compile.cfg=-1
+FPA\PelicanD/Edfmap.ini=-1
+FPA\PelicanD/fsm.set=-1
+FPA\PelicanD/PelicanD.adf=-1
+FPA\PelicanD/PelicanD.wsp=-1
+FPA\PelicanD/projlib.cfg=-1
+FPA\PelicanD/stimulators.set=-1
+FPA\PelicanD/synthesis.order=-1
+FPA\PelicanD\src/PelicanD.dlm=-1
+FPA\PelicanD\src/PelicanD_tb.cpp=-1
+FPA\PelicanD\src/PelicanD_top_tb.bde=-1
+FPA\PelicanD\src\TestBench/pelicand_top_tb_TB.vhd=-1
+FPA\PelicanD\src\TestBench/pelicand_top_tb_TB_runtest.do=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\compil_scd_proxy.do=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\proxy_define.vhd=-1
-FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_base_mode_ctrl.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_dispatcher.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_diag_data_gen.vhd=-1
@@ -685,27 +724,30 @@ FPA\ScorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde=-1
 FPA\ScorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_spi_feeder.vhd=-1
 FPA\ScorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd=-1
 FPA\ScorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_window_reg.vhd=-1
+FPA\ScorpiomwA/bde.set=-1
+FPA\ScorpiomwA/compilation.order=-1
+FPA\ScorpiomwA/compile.cfg=-1
+FPA\ScorpiomwA/Edfmap.ini=-1
+FPA\ScorpiomwA/projlib.cfg=-1
+FPA\ScorpiomwA/scorpiomwA.adf=-1
+FPA\ScorpiomwA/scorpiomwA.wsp=-1
+FPA\ScorpiomwA/synthesis.order=-1
+FPA\ScorpiomwA\scorpiomwA/scorpiomwA.lib=-1
+FPA\ScorpiomwA\src/digio_dummy.vhd=-1
+FPA\ScorpiomwA\src/flexV_dummy.vhd=-1
+FPA\ScorpiomwA\src/fpa_temp_dummy.vhd=-1
+FPA\ScorpiomwA\src/scorpiomwA_hw_ctrl_tb.bde=-1
+FPA\ScorpiomwA\src/scorpiomwA_intf_testbench.bde=-1
+FPA\ScorpiomwA\src/scorpiomwA_intf_testbench_TB.vhd=-1
+FPA\ScorpiomwA\src/scorpiomwA_intf_testbench_TB_runtest.do=-1
+FPA\ScorpiomwA\src\TestBench/scorpiomwA_dummy.vhd=-1
+FPA\ScorpiomwA\src\TestBench/scorpiomwA_hw_ctrl_tb_TB.vhd=-1
+FPA\ScorpiomwA\src\TestBench/scorpiomwA_hw_ctrl_tb_TB_runtest.do=-1
+FPA\ScorpiomwA\src\TestBench/scorpiomwA_readout_ctrler_TB.vhd=-1
+FPA\ScorpiomwA\src\TestBench/scorpiomwA_readout_ctrler_TB_runtest.do=-1
 FPA\ScorpiomwD/..\..\..\..\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do=-1
 FPA\ScorpiomwD/..\..\..\..\src\FPA\scorpiomwD\HDL\FPA_define.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\FPA_define.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_clks_gen.bde=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_clks_gen_core.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_clks_mmcm.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_detector_ctrler.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_dig_data_reg.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_digio_map.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_hw_driver.bde=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_intf.bde=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_mblaze_intf.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_mux_ctrl_reg.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_prog_ctrler.bde=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_readout_ctrler.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_spi_tx_check.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_wdw_ctrl_reg.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_wdw_data_reg.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\proxy_define.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_elcorr_refs_ctrl.vhd=-1
-FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\compil_suphawkA.do=-1
+FPGA_COMM/..\..\..\src\fpga_comm\HDL\FPGA_COMM.bde=-1
 Gating/..\..\..\src\Gating\HDL\gating_compile.do=-1
 Gating/..\..\..\src\Gating\HDL\gating_define.vhd=-1
 Gating/..\..\..\src\Gating\HDL\gating_mblaze_intf.vhd=-1
@@ -718,6 +760,20 @@ HeaderInserter/..\..\..\src\Hder\HDL\hder_insert_mb_intf.vhd=-1
 HeaderInserter/..\..\..\src\Hder\HDL\hder_insert_sequencer.vhd=-1
 HeaderInserter/..\..\..\src\Hder\HDL\hder_inserter.bde=-1
 HeaderInserter/..\..\..\src\Hder\HDL\hder_reorder.vhd=-1
+HeaderInserter/bde.set=-1
+HeaderInserter/compilation.order=-1
+HeaderInserter/compile.cfg=-1
+HeaderInserter/Edfmap.ini=-1
+HeaderInserter/HeaderInserter.adf=-1
+HeaderInserter/HeaderInserter.wsp=-1
+HeaderInserter/projlib.cfg=-1
+HeaderInserter/stimulators.set=-1
+HeaderInserter/synthesis.order=-1
+HeaderInserter\src/hder_inserter.dlm=-1
+HeaderInserter\src/hder_inserter_tb.cpp=-1
+HeaderInserter\src/hder_inserter_top_tb.bde=-1
+HeaderInserter\src\TestBench/hder_inserter_top_tb_TB.vhd=-1
+HeaderInserter\src\TestBench/hder_inserter_top_tb_TB_runtest.do=-1
 ICU/..\..\..\src\ICU\HDL\ICU_toplevel.bde=-1
 ICU/..\..\..\src\ICU\HDL\ICU_Ctrl.vhd=-1
 ICU/..\..\..\src\ICU\HDL\ICU_SM.vhd=-1
@@ -734,6 +790,7 @@ Irig/..\..\..\src\Irig\HDL\irig_alphab_decoder_v2.bde=-1
 Irig/..\..\..\src\Irig\HDL\irig_alphab_detector_v2.vhd=-1
 Irig/..\..\..\src\Irig\HDL\irig_clock_detector_v2.vhd=-1
 Irig/..\..\..\src\Irig\HDL\irig_comparator_v2.vhd=-1
+Irig/..\..\..\src\Irig\HDL\irig_compile.do=-1
 Irig/..\..\..\src\Irig\HDL\irig_controller_v2.vhd=-1
 Irig/..\..\..\src\Irig\HDL\IRIG_define_v2.vhd=-1
 Irig/..\..\..\src\Irig\HDL\irig_frame_decoder_v2.vhd=-1
@@ -743,26 +800,37 @@ Irig/..\..\..\src\Irig\HDL\irig_signal_conditioner_v2.bde=-1
 Irig/..\..\..\src\Irig\HDL\irig_threshold_gen_v2.vhd=-1
 Irig/..\..\..\IP\mmcm_clk_20MHz\mmcm_clk_20MHz_funcsim.vhdl=-1
 Irig/..\..\..\src\Irig\HDL\ad747x_driver.vhd=-1
-Irig/..\..\..\src\Irig\HDL\irig_compile.do=-1
 LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_a32_d32.bde=-1
 LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_core_a32_d32.bde=-1
 LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_X_to_ADD.bde=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_data_mgt_rtl.do=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_exp_mgt_rtl.do=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_video_mgt_rtl.do=-1
 MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_mgt_wrapper.do=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_cdc_sync_exdes.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_clock_module.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_gt_common_wrapper.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_support_reset_logic.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_cdc_sync_exdes.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_clock_module.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_gt_common_wrapper.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_support_reset_logic.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_funcsim.vhdl=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream32_to_64\AXI4_Stream32_to_64_wrapper.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_wrapper.vhd=-1
 MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_ctrl.vhd=-1
-MGT/..\..\..\src\MGT\HDL\mgt_block.bde=-1
-MGT/..\..\..\src\MGT\HDL\mgt_wrapper.bde=-1
-MGT/..\..\..\src\MGT\HDL\mgt_stream_merger.vhd=-1
-MGT/..\..\..\src\MGT\HDL\compil_mgt.do=-1
-Quad_serdes/..\..\..\src\Quad_serdes\HDL\build_quad_receiver.do=-1
-Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_adc_ctrl.vhd=-1
-Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_deserializer.bde=-1
-Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_sync.vhd=-1
-Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde=-1
-Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd=-1
-Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde=-1
-Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\adc_pattern_validator_ctrler.vhd=-1
-Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde=-1
-Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\adc_serdes_clk_wrapper.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_block.bde=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_wrapper.bde=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_standard_cc_module.vhd=-1
+MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_standard_cc_module.vhd=-1
+QuadADC/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd=-1
+QuadADC/..\..\..\src\QuadADC\HDL\adc_clk7x_wrapper.vhd=-1
+QuadADC/..\..\..\src\QuadADC\HDL\adc_data_deserializer.bde=-1
+QuadADC/..\..\..\src\QuadADC\HDL\adc_data_deserializer_8chn.bde=-1
+QuadADC/..\..\..\src\QuadADC\HDL\adc_data_sync.vhd=-1
+QuadADC/..\..\..\src\QuadADC\HDL\adc_receiver_1ch.bde=-1
+QuadADC/..\..\..\src\QuadADC\HDL\build_adc_receiver.do=-1
+QuadADC/..\..\..\src\QuadADC\HDL\quad_adc_ctrl.vhd=-1
 SFW/..\..\..\src\SFW\HDL\build_SFW.do=-1
 SFW/..\..\..\src\SFW\HDL\fw_decoder.vhd=-1
 SFW/..\..\..\src\SFW\HDL\SFW.bde=-1
@@ -813,6 +881,7 @@ Testbench\SystemC/mb_transactor_if.h=-1
 Testbench\SystemC/proc_ctrl.h=-1
 Trig/..\..\..\src\Trig\HDL\compil_trig_gen.do=-1
 Trig/..\..\..\src\Trig\HDL\edge_detect.vhd=-1
+Trig/..\..\..\src\Trig\HDL\hightime_measure.vhd=-1
 Trig/..\..\..\src\Trig\HDL\progr_clk_div.vhd=-1
 Trig/..\..\..\src\Trig\HDL\trig_conditioner.vhd=-1
 Trig/..\..\..\src\Trig\HDL\trig_define.vhd=-1
@@ -823,7 +892,22 @@ Trig/..\..\..\src\Trig\HDL\trig_gen_mblaze_intf.vhd=-1
 Trig/..\..\..\src\Trig\HDL\trig_gen_status.vhd=-1
 Trig/..\..\..\src\Trig\HDL\trig_stamper.bde=-1
 Trig/..\..\..\src\Trig\HDL\trig_stamper_ctler.vhd=-1
+Trig/bde.set=-1
+Trig/compilation.order=-1
+Trig/compile.cfg=-1
+Trig/Edfmap.ini=-1
+Trig/fsm.set=-1
+Trig/projlib.cfg=-1
+Trig/stimulators.set=-1
+Trig/Trig.adf=-1
+Trig/trig.wsp=-1
+Trig\src/trig.dlm=-1
+Trig\src/trig_tb.cpp=-1
+Trig\src/trig_top_tb.bde=-1
+Trig\src\TestBench/trig_runtest.do=-1
+Trig\src\TestBench/trig_top_tb_TB.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\AXIS_TO_USART.vhd=-1
+USART/..\..\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\rx_counter.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\USART.bde=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\Usart_Ctrl.vhd=-1
@@ -831,52 +915,93 @@ USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_rx.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\USART_TO_AXIS.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_tx.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_mmcm_rst.vhd=-1
-USART/..\..\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=-1
 USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
+AcqChain/AcqChain.adf=-1
+AcqChain/AcqChain.wsp=-1
+AcqChain/bde.set=-1
+AcqChain/compilation.order=-1
+AcqChain/compile.cfg=-1
+AcqChain/Edfmap.ini=-1
+AcqChain/projlib.cfg=-1
+AcqChain/stimulators.set=-1
+AcqChain/synthesis.order=-1
+AcqChain\src/acq_chain.dlm=-1
+AcqChain\src/acq_chain_tb.bde=-1
+AcqChain\src/acq_chain_tb.cpp=-1
+AcqChain\src/efa_00254_dummy.vhd=-1
+AcqChain\src/pelicanD_core_dummy.vhd=-1
+AcqChain\src/PelicanD_dummy.bde=-1
+AcqChain\src\TestBench/acq_chain_tb_TB.vhd=-1
+AcqChain\src\TestBench/acq_chain_tb_TB_runtest.do=-1
+AXI4/AXI4_Stream32_to_64_wrapper.vhd=-1
+calibration/bde.set=-1
+calibration/calibration.adf=-1
+calibration/calibration.wsp=-1
+calibration/compilation.order=-1
+calibration/compile.cfg=-1
+calibration/Edfmap.ini=-1
+calibration/projlib.cfg=-1
+calibration/stimulators.set=-1
+calibration/synthesis.order=-1
+calibration\calibration/calibration.lib=-1
+calibration\calibration/elaboration.log=-1
+calibration\src/calibration.dlm=-1
+calibration\src/calibration_tb.cpp=-1
+calibration\src/calibration_tb.h=-1
+calibration\src/NLC_testbench.bde=-1
+Clink_Receiver/bde.set=-1
+Clink_Receiver/Clink_Receiver.adf=-1
+Clink_Receiver/Clink_Receiver.lib=-1
+Clink_Receiver/clink_receiver.wsp=-1
+Clink_Receiver/compilation.order=-1
+Clink_Receiver/compile.cfg=-1
+Clink_Receiver/Edfmap.ini=-1
+Clink_Receiver/elaboration.log=-1
+Clink_Receiver/projlib.cfg=-1
+Clink_Receiver/stimulators.set=-1
+Clink_Receiver/synthesis.order=-1
+Clink_Receiver\Clink_Receiver/Clink_Receiver.lib=-1
+Clink_Receiver\src/Clink_receiver_tb.bde=-1
+CLINK_UART/CLINK_UART_wrapper.vhd=-1
+INTC/INTC_wrapper.vhd=-1
+XADC/XADC_wrapper.vhd=-1
 
 [Files.Data]
 .\..\src\fir_00251_proc_acq.bde=Block Diagram
-.\..\src\fir_00251_proc_blackbirdD.bde=Block Diagram
 .\..\src\fir_00251_proc_hawkA.bde=Block Diagram
 .\..\src\fir_00251_proc_herculesD.bde=Block Diagram
 .\..\src\fir_00251_proc_isc0207A.bde=Block Diagram
-.\..\src\fir_00251_proc_isc0207A_3k.bde=Block Diagram
 .\..\src\fir_00251_proc_isc0209A.bde=Block Diagram
-.\..\src\fir_00251_proc_isc0804A.bde=Block Diagram
-.\..\src\fir_00251_proc_isc0804A_500Hz.bde=Block Diagram
 .\..\src\fir_00251_proc_marsD.bde=Block Diagram
 .\..\src\fir_00251_proc_pelicanD.bde=Block Diagram
-.\..\src\fir_00251_proc_pelicanD_150Hz.bde=Block Diagram
 .\..\src\fir_00251_proc_scorpiolwD.bde=Block Diagram
 .\..\src\fir_00251_proc_scorpiolwD_230Hz.bde=Block Diagram
 .\..\src\fir_00251_proc_scorpiomwA.bde=Block Diagram
 .\..\src\fir_00251_proc_scorpiomwD.bde=Block Diagram
 .\..\src\fir_00251_proc_startup.bde=Block Diagram
-.\..\src\fir_00251_proc_suphawkA.bde=Block Diagram
 .\..\src\fir_00251_build_all_top.do=Macro
 .\..\src\fir_00251_proc_acq_build.do=Macro
-.\..\src\fir_00251_top_blackbirdD_build.do=Macro
 .\..\src\fir_00251_top_hawkA_build.do=Macro
 .\..\src\fir_00251_top_herculesD_build.do=Macro
 .\..\src\fir_00251_top_isc0207A_build.do=Macro
-.\..\src\fir_00251_top_isc0207A_3k_build.do=Macro
 .\..\src\fir_00251_top_isc0209A_build.do=Macro
-.\..\src\fir_00251_top_isc0804A_build.do=Macro
-.\..\src\fir_00251_top_isc0804A_500Hz_build.do=Macro
 .\..\src\fir_00251_top_marsD_build.do=Macro
 .\..\src\fir_00251_top_pelicanD_build.do=Macro
-.\..\src\fir_00251_top_pelicanD_150Hz_build.do=Macro
 .\..\src\fir_00251_top_scorpiolwD_build.do=Macro
 .\..\src\fir_00251_top_scorpiolwD_230Hz_build.do=Macro
 .\..\src\fir_00251_top_scorpiomwA_build.do=Macro
 .\..\src\fir_00251_top_scorpiomwD_build.do=Macro
 .\..\src\fir_00251_top_startup_build.do=Macro
-.\..\src\fir_00251_top_suphawkA_build.do=Macro
+.\..\..\FIR-00251-Common\VHDL\hdr_extractor\axis16_hder_extractor.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\hdr_extractor\hder_extractor.vhd=VHDL Source Code
+.\src\clean_lib.bat=External File
+.\src\mgt_block_dual.bde=Block Diagram
 .\..\src\ADCReadout\HDL\adc_readout.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_readout_mb_intf.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_switch.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_readout_top.bde=Block Diagram
 .\..\src\ADCReadout\HDL\build_adc_readout.do=Macro
+.\..\src\ADCReadout\HDL\ad798x_driver.vhd=VHDL Source Code
 .\..\src\AEC\HDL\AEC.bde=Block Diagram
 .\..\src\AEC\HDL\build_AEC_intf.do=Macro
 .\..\src\AEC\HDL\AEC_Ctrl.vhd=VHDL Source Code
@@ -894,17 +1019,31 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\AEC\HDL\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\Utilities\axis16_img_extractor.vhd=VHDL Source Code
 .\..\src\BD\bd_wrapper.vhd=VHDL Source Code
-.\src\Buffering\buffering_fsm.vhd=VHDL Source Code
-.\src\Buffering\buffering_Ctrl.vhd=VHDL Source Code
-.\src\Buffering\Buffering.bde=Block Diagram
-.\src\Buffering\Buffering_wrapper.bde=Block Diagram
+.\src\BD\compile_axi_gpio_v2_0.do=Macro
+.\src\BD\compile_axi_intc_v4_0.do=Macro
+.\src\BD\compile_axi_protocol_converter_v2_1.do=Macro
+.\src\BD\compile_axi_timer_v2_0.do=Macro
+.\src\BD\compile_axi_uart16550_v2_0.do=Macro
+.\src\BD\compile_blk_mem_gen_v8_1.do=Macro
+.\src\BD\compile_core_auto_cc.do=Macro
+.\src\BD\compile_core_auto_us.do=Macro
+.\src\BD\compile_core_bd.do=Macro
+.\src\BD\compile_core_xadc_wiz_1_0_axi_xadc.do=Macro
+.\src\BD\compile_core_xbar.do=Macro
+.\src\BD\compile_lmb_bram_if_cntlr_v4_0.do=Macro
+.\src\BD\compile_lmb_v10_v3_0.do=Macro
+.\src\BD\compile_mdm_v3_0.do=Macro
+.\src\BD\compile_microblaze_v9_2.do=Macro
+.\src\BD\compile_mig_series7_1_0.do=Macro
+.\src\BD\compile_proc_sys_reset_v5_0.do=Macro
 .\..\..\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd=VHDL Source Code
+.\..\src\Buffering\HDL\Buffering.bde=Block Diagram
+.\..\src\Buffering\HDL\buffering_Ctrl.vhd=VHDL Source Code
+.\..\src\Buffering\HDL\buffering_fsm.vhd=VHDL Source Code
 .\..\src\Buffering\HDL\moi_source_selector.vhd=VHDL Source Code
 .\..\src\Buffering\HDL\build_buffering_intf.do=Macro
 .\..\..\FIR-00251-Common\VHDL\Calibration\calib_define.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\calibration.bde=Block Diagram
-.\..\src\Calibration\HDL\calibration_core.bde=Block Diagram
-.\..\src\Calibration\HDL\calibration_common.bde=Block Diagram
 .\..\src\Calibration\HDL\NLC.bde=Block Diagram
 .\..\src\Calibration\HDL\FSU.bde=Block Diagram
 .\..\src\Calibration\HDL\FCC.bde=Block Diagram
@@ -915,7 +1054,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Calibration\HDL\calib_block_sel.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\calib_fast_hder_gen.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\calib_param_sequencer.vhd=VHDL Source Code
-.\..\src\Calibration\HDL\ddr_aoi_add_gen.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\ddr_data_decoder.bde=Block Diagram
 .\..\src\Calibration\HDL\ddr_data_decoder_core.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\video_data_handler.bde=Block Diagram
@@ -924,6 +1062,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Calibration\HDL\video_freeze_SM.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\video_freeze.bde=Block Diagram
 .\..\src\Calibration\HDL\video_ehdri_selector.vhd=VHDL Source Code
+.\..\src\Calibration\HDL\compil_calibration.do=Macro
 .\..\src\Calibration\HDL\video_fwposition_SM.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\video_fwposition_selector.bde=Block Diagram
 .\..\..\FIR-00251-Common\VHDL\Utilities\axis8_hole.vhd=VHDL Source Code
@@ -931,8 +1070,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Calibration\HDL\param16_fifo.vhd=VHDL Source Code
 .\..\src\Calibration\HDL\param_fifo_block.bde=Block Diagram
 .\..\src\Calibration\HDL\param_lut_fifo.bde=Block Diagram
-.\..\src\Calibration\HDL\badpixel_replacer64.vhd=VHDL Source Code
-.\..\src\Calibration\HDL\compil_calibration.do=Macro
 .\..\..\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd=VHDL Source Code
 .\..\src\clink\HDL\compil_clink_receiver.do=Macro
 .\..\src\clink\HDL\clink_receiver_2ch.bde=Block Diagram
@@ -962,6 +1099,18 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\ExposureTime\HDL\exp_time_mb_intf.vhd=VHDL Source Code
 .\..\src\ExposureTime\HDL\exposure_define.vhd=VHDL Source Code
 .\..\src\ExposureTime\HDL\exposure_time_ctrl.bde=Block Diagram
+.\src\ExposureTime\bde.set=External File
+.\src\ExposureTime\compilation.order=External File
+.\src\ExposureTime\compile.cfg=External File
+.\src\ExposureTime\Edfmap.ini=External File
+.\src\ExposureTime\ExposureTime.adf=Active HDL design
+.\src\ExposureTime\exposuretime.wsp=External File
+.\src\ExposureTime\projlib.cfg=External File
+.\src\ExposureTime\src\exposure.dlm=C/C++ Configuration
+.\src\ExposureTime\src\exposure_tb.cpp=C++ Source Code
+.\src\ExposureTime\src\exposure_top_tb.bde=Block Diagram
+.\src\ExposureTime\src\TestBench\exposure_runtest.do=Macro
+.\src\ExposureTime\src\TestBench\exposure_top_tb_TB.vhd=VHDL Source Code
 .\..\src\Flagging\HDL\flag_define.vhd=VHDL Source Code
 .\..\src\Flagging\HDL\flagging_mblaze_intf.vhd=VHDL Source Code
 .\..\src\Flagging\HDL\flagging_SM.vhd=VHDL Source Code
@@ -1011,38 +1160,9 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_map.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_lsync_mode_mux.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do=Macro
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_mem.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL_ext_sync_flow.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_quad_subtract.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_lsync_mode_dval_gen.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_fsync_mode_dval_gen.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clks_memory.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_ctrler.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde=Block Diagram
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clk_mem_ctrler.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_raw_area_gen.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_stretching_area_gen.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_user_area_gen.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_waste_area_gen.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_core.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem_input_ctler.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem_output_ctler.vhd=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fastrd_common.do=Macro
-.\..\src\FPA\blackbirdD\HDL\compil_blackbirdD.do=Macro
-.\..\src\FPA\blackbirdD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\compil_hawkA.do=Macro
 .\..\src\FPA\hawkA\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde=Block Diagram
-.\..\src\FPA\hawkA\HDL\hawkA_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\hawkA\HDL\hawkA_clks_mmcm.vhd=VHDL Source Code
+.\..\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\hawkA_detector_ctrler.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\hawkA_dig_data_reg.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\hawkA_digio_map.vhd=VHDL Source Code
@@ -1056,6 +1176,28 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\hawkA\HDL\hawkA_windowing_ctrl_reg.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\hawkA_windowing_data_reg.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\proxy_define.vhd=VHDL Source Code
+.\src\FPA\HawkA\bde.set=External File
+.\src\FPA\HawkA\compilation.order=External File
+.\src\FPA\HawkA\compile.cfg=External File
+.\src\FPA\HawkA\Edfmap.ini=External File
+.\src\FPA\HawkA\hawkA.adf=Active HDL design
+.\src\FPA\HawkA\projlib.cfg=External File
+.\src\FPA\HawkA\stimulators.set=External File
+.\src\FPA\HawkA\synthesis.order=External File
+.\src\FPA\HawkA\hawkA\elaboration.log=Text File
+.\src\FPA\HawkA\hawkA\hawkA.lib=External File
+.\src\FPA\HawkA\src\digio_dummy.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\flexV_dummy.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\fpa_temp_dummy.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\hawkA_intf_testbench.bde=Block Diagram
+.\src\FPA\HawkA\src\hawka_intf_testbench_pkg.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\hawkA_intf_testbench_TB.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\hawkA_intf_testbench_TB_runtest.do=Macro
+.\src\FPA\HawkA\src\TestBench\hawkA_dummy.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\TestBench\hawka_hw_ctrl_tb_TB.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\TestBench\hawka_hw_ctrl_tb_TB_runtest.do=Macro
+.\src\FPA\HawkA\src\TestBench\hawka_readout_ctrler_TB.vhd=VHDL Source Code
+.\src\FPA\HawkA\src\TestBench\hawka_readout_ctrler_TB_runtest.do=Macro
 .\..\src\FPA\herculesD\HDL\compil_HerculesD.do=Macro
 .\..\src\FPA\herculesD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\isc0207A\HDL\compil_isc0207A.do=Macro
@@ -1073,29 +1215,46 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\isc0207A\HDL\isc0207A_spi_feeder.vhd=VHDL Source Code
 .\..\src\FPA\isc0207A\HDL\isc0207A_sync_flag_gen.vhd=VHDL Source Code
 .\..\src\FPA\isc0207A\HDL\proxy_define.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A\HDL\isc0207A_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A\HDL\isc0207A_clks_mmcm.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A\HDL\isc0207A_clks_gen.bde=Block Diagram
-.\..\src\FPA\isc0207A_3k\HDL\compil_isc0207A_3k.do=Macro
-.\..\src\FPA\isc0207A_3k\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_gen.bde=Block Diagram
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_mmcm.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_digio_map.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_hw_driver.bde=Block Diagram
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_mblaze_intf.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_prog_ctrler.bde=Block Diagram
-.\..\src\FPA\isc0207A_3k\HDL\proxy_define.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_bitstream_gen.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_spi_feeder.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_intf.bde=Block Diagram
-.\..\src\FPA\scorpiomwA\HDL\sc_high_duration.vhd=VHDL Source Code
-.\..\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde=Block Diagram
-.\..\src\FPA\scorpiomwA\HDL\sc_min_max_ctrl.vhd=VHDL Source Code
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde=Block Diagram
-.\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_kernel.vhd=VHDL Source Code
+.\src\FPA\isc0207A\bde.set=External File
+.\src\FPA\isc0207A\compilation.order=External File
+.\src\FPA\isc0207A\compile.cfg=External File
+.\src\FPA\isc0207A\Edfmap.ini=External File
+.\src\FPA\isc0207A\isc0207A.adf=Active HDL design
+.\src\FPA\isc0207A\isc0207A.wsp=External File
+.\src\FPA\isc0207A\projlib.cfg=External File
+.\src\FPA\isc0207A\stimulators.set=External File
+.\src\FPA\isc0207A\synthesis.order=External File
+.\src\FPA\isc0207A\isc0207A\isc0207A.lib=External File
+.\src\FPA\isc0207A\src\brd_mux_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\brd_switch_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\detector_trace_define.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\digio_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\edge_distance_measure.bde=Block Diagram
+.\src\FPA\isc0207A\src\edge_measure_ref_clk.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\edge_measure_stat.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\flexV_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\fpa_isc0207_hw_driver_tb.bde=Block Diagram
+.\src\FPA\isc0207A\src\fpa_isc0207_intf_tb.bde=Block Diagram
+.\src\FPA\isc0207A\src\fpa_temp_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\isc0207A_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\isc0207A_intf_testbench.bde=Block Diagram
+.\src\FPA\isc0207A\src\monit_adc_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\re_distance_measure.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\TestBench\fpa_intf.cpp=C++ Source Code
+.\src\FPA\isc0207A\src\TestBench\fpa_isc0207_hw_driver_tb_TB.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\TestBench\fpa_isc0207_hw_driver_tb_TB_runtest.do=Macro
+.\src\FPA\isc0207A\src\TestBench\fpa_isc0207_intf_tb_TB.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\TestBench\fpa_isc0207_intf_tb_TB_runtest.do=Macro
+.\src\FPA\isc0207A\src\TestBench\isc0207.dlm=C/C++ Configuration
+.\src\FPA\isc0207A\src\TestBench\isc0207a_data_ctrl_TB.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\TestBench\isc0207a_data_ctrl_TB_runtest.do=Macro
+.\src\FPA\isc0207A\src\TestBench\isc0207a_intf_testbench_TB.vhd=VHDL Source Code
+.\src\FPA\isc0207A\src\TestBench\isc0207a_intf_testbench_TB_runtest.do=Macro
+.\src\FPA\isc0207A\src\TestBench\isc0207_tb.cpp=C++ Source Code
+.\src\FPA\isc0207A\src\TestBench\isc_0207_copy_to_cpp.bat=External File
 .\..\src\FPA\isc0209A\HDL\compil_isc0209A.do=Macro
 .\..\src\FPA\isc0209A\HDL\FPA_define.vhd=VHDL Source Code
+.\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.vhd=VHDL Source Code
 .\..\src\FPA\isc0209A\HDL\isc0209A_digio_map.vhd=VHDL Source Code
 .\..\src\FPA\isc0209A\HDL\isc0209A_hw_driver.bde=Block Diagram
 .\..\src\FPA\isc0209A\HDL\isc0209A_intf.bde=Block Diagram
@@ -1107,48 +1266,30 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\isc0209A\HDL\isc0209A_readout_ctrler.vhd=VHDL Source Code
 .\..\src\FPA\isc0209A\HDL\isc0209A_window_reg.vhd=VHDL Source Code
 .\..\src\FPA\isc0209A\HDL\proxy_define.vhd=VHDL Source Code
-.\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde=Block Diagram
-.\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\isc0209A\HDL\isc0209A_clks_mmcm.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde=Block Diagram
-.\..\src\FPA\isc0804A\HDL\isc0804A_readout_kernel.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_hw_driver.bde=Block Diagram
-.\..\src\FPA\isc0804A\HDL\isc0804A_intf.bde=Block Diagram
-.\..\src\FPA\isc0804A\HDL\isc0804A_prog_ctrler.bde=Block Diagram
-.\..\src\FPA\isc0804A\HDL\compil_isc0804A.do=Macro
-.\..\src\FPA\isc0804A\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_bitstream_gen.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_clks_mmcm.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_digio_map.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_mblaze_intf.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_spi_feeder.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\proxy_define.vhd=VHDL Source Code
-.\..\IP\325\fwft_sfifo_w8_d64\fwft_sfifo_w8_d64_sim_netlist.vhdl=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_raw_area_gen.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A\HDL\isc0804A_readout_ctrler.bde=Block Diagram
-.\..\IP\325\fwft_sfifo_w40_d256\fwft_sfifo_w40_d256_sim_netlist.vhdl=VHDL Source Code
-.\..\IP\325\fwft_sfifo_w43_d256\fwft_sfifo_w43_d256_sim_netlist.vhdl=VHDL Source Code
-.\..\IP\325\fwft_sfifo_w43_d512\fwft_sfifo_w43_d512_sim_netlist.vhdl=VHDL Source Code
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_faked_data_gen.vhd=VHDL Source Code
-.\src\FPA\isc0804A\src\quadpix_decoder.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\compil_isc0804A_500Hz.do=Macro
-.\..\src\FPA\isc0804A_500Hz\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_bitstream_gen.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen.bde=Block Diagram
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_mmcm.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_digio_map.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_elcorr_refs_ctrl.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_hw_driver.bde=Block Diagram
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_intf.bde=Block Diagram
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_mblaze_intf.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_prog_ctrler.bde=Block Diagram
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_raw_area_gen.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_ctrler.bde=Block Diagram
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_kernel.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_spi_feeder.vhd=VHDL Source Code
-.\..\src\FPA\isc0804A_500Hz\HDL\proxy_define.vhd=VHDL Source Code
+.\src\FPA\isc0209A\bde.set=External File
+.\src\FPA\isc0209A\compilation.order=External File
+.\src\FPA\isc0209A\compile.cfg=External File
+.\src\FPA\isc0209A\Edfmap.ini=External File
+.\src\FPA\isc0209A\isc0209A.adf=Active HDL design
+.\src\FPA\isc0209A\isc0209a.wsp=External File
+.\src\FPA\isc0209A\projlib.cfg=External File
+.\src\FPA\isc0209A\isc0209A\isc0209A.lib=External File
+.\src\FPA\isc0209A\src\brd_mux_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\brd_switch_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\detector_trace_define.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\digio_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\edge_distance_measure.bde=Block Diagram
+.\src\FPA\isc0209A\src\edge_measure_ref_clk.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\edge_measure_stat.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\flexV_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\fpa_temp_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\isc0209A_intf_testbench.bde=Block Diagram
+.\src\FPA\isc0209A\src\monit_adc_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\re_distance_measure.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\var_shift_reg_w16_d32.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\TestBench\isc0209A_dummy.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\TestBench\isc0209A_intf_testbench_TB.vhd=VHDL Source Code
+.\src\FPA\isc0209A\src\TestBench\isc0209A_intf_testbench_TB_runtest.do=Macro
 .\..\src\FPA\marsD\HDL\compil_marsD.do=Macro
 .\..\src\FPA\marsD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\megalink\HDL\compil_megalink.do=Macro
@@ -1166,11 +1307,23 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\megalink\HDL\proxy_define.vhd=VHDL Source Code
 .\..\src\FPA\pelicanD\HDL\compil_PelicanD.do=Macro
 .\..\src\FPA\pelicanD\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\pelicanD_150Hz\HDL\compil_PelicanD_150Hz.do=Macro
-.\..\src\FPA\pelicanD_150Hz\HDL\FPA_define.vhd=VHDL Source Code
+.\src\FPA\PelicanD\bde.set=External File
+.\src\FPA\PelicanD\compilation.order=External File
+.\src\FPA\PelicanD\compile.cfg=External File
+.\src\FPA\PelicanD\Edfmap.ini=External File
+.\src\FPA\PelicanD\fsm.set=External File
+.\src\FPA\PelicanD\PelicanD.adf=Active HDL design
+.\src\FPA\PelicanD\PelicanD.wsp=External File
+.\src\FPA\PelicanD\projlib.cfg=External File
+.\src\FPA\PelicanD\stimulators.set=External File
+.\src\FPA\PelicanD\synthesis.order=External File
+.\src\FPA\PelicanD\src\PelicanD.dlm=C/C++ Configuration
+.\src\FPA\PelicanD\src\PelicanD_tb.cpp=C++ Source Code
+.\src\FPA\PelicanD\src\PelicanD_top_tb.bde=Block Diagram
+.\src\FPA\PelicanD\src\TestBench\pelicand_top_tb_TB.vhd=VHDL Source Code
+.\src\FPA\PelicanD\src\TestBench\pelicand_top_tb_TB_runtest.do=Macro
 .\..\src\FPA\scd_proxy\HDL\compil_scd_proxy.do=Macro
 .\..\src\FPA\scd_proxy\HDL\proxy_define.vhd=VHDL Source Code
-.\..\src\FPA\scd_proxy\HDL\scd_base_mode_ctrl.vhd=VHDL Source Code
 .\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde=Block Diagram
 .\..\src\FPA\scd_proxy\HDL\scd_data_dispatcher.vhd=VHDL Source Code
 .\..\src\FPA\scd_proxy\HDL\scd_diag_data_gen.vhd=VHDL Source Code
@@ -1199,27 +1352,30 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_spi_feeder.vhd=VHDL Source Code
 .\..\src\FPA\scorpiomwA\HDL\scorpiomwA_readout_ctrler.vhd=VHDL Source Code
 .\..\src\FPA\scorpiomwA\HDL\scorpiomwA_window_reg.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\bde.set=External File
+.\src\FPA\ScorpiomwA\compilation.order=External File
+.\src\FPA\ScorpiomwA\compile.cfg=External File
+.\src\FPA\ScorpiomwA\Edfmap.ini=External File
+.\src\FPA\ScorpiomwA\projlib.cfg=External File
+.\src\FPA\ScorpiomwA\scorpiomwA.adf=Active HDL design
+.\src\FPA\ScorpiomwA\scorpiomwA.wsp=External File
+.\src\FPA\ScorpiomwA\synthesis.order=External File
+.\src\FPA\ScorpiomwA\scorpiomwA\scorpiomwA.lib=External File
+.\src\FPA\ScorpiomwA\src\digio_dummy.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\flexV_dummy.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\fpa_temp_dummy.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\scorpiomwA_hw_ctrl_tb.bde=Block Diagram
+.\src\FPA\ScorpiomwA\src\scorpiomwA_intf_testbench.bde=Block Diagram
+.\src\FPA\ScorpiomwA\src\scorpiomwA_intf_testbench_TB.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\scorpiomwA_intf_testbench_TB_runtest.do=Macro
+.\src\FPA\ScorpiomwA\src\TestBench\scorpiomwA_dummy.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\TestBench\scorpiomwA_hw_ctrl_tb_TB.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\TestBench\scorpiomwA_hw_ctrl_tb_TB_runtest.do=Macro
+.\src\FPA\ScorpiomwA\src\TestBench\scorpiomwA_readout_ctrler_TB.vhd=VHDL Source Code
+.\src\FPA\ScorpiomwA\src\TestBench\scorpiomwA_readout_ctrler_TB_runtest.do=Macro
 .\..\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do=Macro
 .\..\src\FPA\scorpiomwD\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_clks_gen.bde=Block Diagram
-.\..\src\FPA\suphawkA\HDL\suphawkA_clks_gen_core.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_clks_mmcm.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_detector_ctrler.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_dig_data_reg.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_digio_map.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_hw_driver.bde=Block Diagram
-.\..\src\FPA\suphawkA\HDL\suphawkA_intf.bde=Block Diagram
-.\..\src\FPA\suphawkA\HDL\suphawkA_mblaze_intf.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_mux_ctrl_reg.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_prog_ctrler.bde=Block Diagram
-.\..\src\FPA\suphawkA\HDL\suphawkA_readout_ctrler.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_spi_tx_check.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_wdw_ctrl_reg.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_wdw_data_reg.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\proxy_define.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\suphawkA_elcorr_refs_ctrl.vhd=VHDL Source Code
-.\..\src\FPA\suphawkA\HDL\compil_suphawkA.do=Macro
+.\..\src\fpga_comm\HDL\FPGA_COMM.bde=Block Diagram
 .\..\src\Gating\HDL\gating_compile.do=Macro
 .\..\src\Gating\HDL\gating_define.vhd=VHDL Source Code
 .\..\src\Gating\HDL\gating_mblaze_intf.vhd=VHDL Source Code
@@ -1232,6 +1388,20 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Hder\HDL\hder_insert_sequencer.vhd=VHDL Source Code
 .\..\src\Hder\HDL\hder_inserter.bde=Block Diagram
 .\..\src\Hder\HDL\hder_reorder.vhd=VHDL Source Code
+.\src\HeaderInserter\bde.set=External File
+.\src\HeaderInserter\compilation.order=External File
+.\src\HeaderInserter\compile.cfg=External File
+.\src\HeaderInserter\Edfmap.ini=External File
+.\src\HeaderInserter\HeaderInserter.adf=Active HDL design
+.\src\HeaderInserter\HeaderInserter.wsp=External File
+.\src\HeaderInserter\projlib.cfg=External File
+.\src\HeaderInserter\stimulators.set=External File
+.\src\HeaderInserter\synthesis.order=External File
+.\src\HeaderInserter\src\hder_inserter.dlm=C/C++ Configuration
+.\src\HeaderInserter\src\hder_inserter_tb.cpp=C++ Source Code
+.\src\HeaderInserter\src\hder_inserter_top_tb.bde=Block Diagram
+.\src\HeaderInserter\src\TestBench\hder_inserter_top_tb_TB.vhd=VHDL Source Code
+.\src\HeaderInserter\src\TestBench\hder_inserter_top_tb_TB_runtest.do=Macro
 .\..\src\ICU\HDL\ICU_toplevel.bde=Block Diagram
 .\..\src\ICU\HDL\ICU_Ctrl.vhd=VHDL Source Code
 .\..\src\ICU\HDL\ICU_SM.vhd=VHDL Source Code
@@ -1248,6 +1418,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Irig\HDL\irig_alphab_detector_v2.vhd=VHDL Source Code
 .\..\src\Irig\HDL\irig_clock_detector_v2.vhd=VHDL Source Code
 .\..\src\Irig\HDL\irig_comparator_v2.vhd=VHDL Source Code
+.\..\src\Irig\HDL\irig_compile.do=Macro
 .\..\src\Irig\HDL\irig_controller_v2.vhd=VHDL Source Code
 .\..\src\Irig\HDL\IRIG_define_v2.vhd=VHDL Source Code
 .\..\src\Irig\HDL\irig_frame_decoder_v2.vhd=VHDL Source Code
@@ -1257,26 +1428,37 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Irig\HDL\irig_threshold_gen_v2.vhd=VHDL Source Code
 .\..\IP\mmcm_clk_20MHz\mmcm_clk_20MHz_funcsim.vhdl=VHDL Source Code
 .\..\src\Irig\HDL\ad747x_driver.vhd=VHDL Source Code
-.\..\src\Irig\HDL\irig_compile.do=Macro
 .\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_a32_d32.bde=Block Diagram
 .\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_core_a32_d32.bde=Block Diagram
 .\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_X_to_ADD.bde=Block Diagram
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_data_mgt_rtl.do=Macro
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_exp_mgt_rtl.do=Macro
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_video_mgt_rtl.do=Macro
 .\..\..\FIR-00251-Common\VHDL\MGT\Hdl\compile_mgt_wrapper.do=Macro
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_cdc_sync_exdes.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_clock_module.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_gt_common_wrapper.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_support_reset_logic.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_cdc_sync_exdes.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_clock_module.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_gt_common_wrapper.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_support_reset_logic.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_funcsim.vhdl=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream32_to_64\AXI4_Stream32_to_64_wrapper.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_wrapper.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_ctrl.vhd=VHDL Source Code
-.\..\src\MGT\HDL\mgt_block.bde=Block Diagram
-.\..\src\MGT\HDL\mgt_wrapper.bde=Block Diagram
-.\..\src\MGT\HDL\mgt_stream_merger.vhd=VHDL Source Code
-.\..\src\MGT\HDL\compil_mgt.do=Macro
-.\..\src\Quad_serdes\HDL\build_quad_receiver.do=Macro
-.\..\src\Quad_serdes\HDL\quad_adc_ctrl.vhd=VHDL Source Code
-.\..\src\Quad_serdes\HDL\quad_data_deserializer.bde=Block Diagram
-.\..\src\Quad_serdes\HDL\quad_data_sync.vhd=VHDL Source Code
-.\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde=Block Diagram
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_block.bde=Block Diagram
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_wrapper.bde=Block Diagram
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\data_mgt_standard_cc_module.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\MGT\Hdl\exp_mgt_standard_cc_module.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd=VHDL Source Code
-.\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde=Block Diagram
-.\..\..\FIR-00251-Common\VHDL\iserdes\adc\adc_pattern_validator_ctrler.vhd=VHDL Source Code
-.\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde=Block Diagram
-.\..\..\FIR-00251-Common\VHDL\iserdes\adc\adc_serdes_clk_wrapper.vhd=VHDL Source Code
+.\..\src\QuadADC\HDL\adc_clk7x_wrapper.vhd=VHDL Source Code
+.\..\src\QuadADC\HDL\adc_data_deserializer.bde=Block Diagram
+.\..\src\QuadADC\HDL\adc_data_deserializer_8chn.bde=Block Diagram
+.\..\src\QuadADC\HDL\adc_data_sync.vhd=VHDL Source Code
+.\..\src\QuadADC\HDL\adc_receiver_1ch.bde=Block Diagram
+.\..\src\QuadADC\HDL\build_adc_receiver.do=Macro
+.\..\src\QuadADC\HDL\quad_adc_ctrl.vhd=VHDL Source Code
 .\..\src\SFW\HDL\build_SFW.do=Macro
 .\..\src\SFW\HDL\fw_decoder.vhd=VHDL Source Code
 .\..\src\SFW\HDL\SFW.bde=Block Diagram
@@ -1300,7 +1482,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\src\Testbench\IP\AXI4_Stream32_to_64\AXI4_Stream32_to_64_wave.do=Macro
 .\src\Testbench\IP\AXI4_Stream32_to_64\AXI4_Stream32_to_64_tb.bde=Block Diagram
 .\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream32_to_64\AXI4_Stream32_to_64_funcsim.vhdl=VHDL Source Code
-.\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream32_to_64\AXI4_Stream32_to_64_wrapper.vhd=VHDL Source Code
 .\src\Testbench\IP\MGT_wrapper\mgt_wrapper_stim.vhd=VHDL Source Code
 .\src\Testbench\IP\MGT_wrapper\mgt_wrapper_runtest.do=Macro
 .\src\Testbench\IP\MGT_wrapper\mgt_wrapper_wave.do=Macro
@@ -1309,8 +1490,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\src\Testbench\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_stim.vhd=VHDL Source Code
 .\src\Testbench\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_tb.bde=Block Diagram
 .\src\Testbench\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_wave.do=Macro
-.\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_funcsim.vhdl=VHDL Source Code
-.\..\..\FIR-00251-Common\VHDL\IP\AXI4_Stream64_to_32\AXI4_Stream64_to_32_wrapper.vhd=VHDL Source Code
 .\src\Testbench\Proc_Only\Processing_tb.bde=Block Diagram
 .\src\Testbench\Proc_Only\Proc_Hercule_runtest.do=Macro
 .\src\Testbench\Proc_Only\Proc_Hercule_wave.do=Macro
@@ -1327,6 +1506,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\src\Testbench\SystemC\proc_ctrl.h=C++ Source Code
 .\..\src\Trig\HDL\compil_trig_gen.do=Macro
 .\..\src\Trig\HDL\edge_detect.vhd=VHDL Source Code
+.\..\src\Trig\HDL\hightime_measure.vhd=VHDL Source Code
 .\..\src\Trig\HDL\progr_clk_div.vhd=VHDL Source Code
 .\..\src\Trig\HDL\trig_conditioner.vhd=VHDL Source Code
 .\..\src\Trig\HDL\trig_define.vhd=VHDL Source Code
@@ -1337,7 +1517,22 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\Trig\HDL\trig_gen_status.vhd=VHDL Source Code
 .\..\src\Trig\HDL\trig_stamper.bde=Block Diagram
 .\..\src\Trig\HDL\trig_stamper_ctler.vhd=VHDL Source Code
+.\src\Trig\bde.set=External File
+.\src\Trig\compilation.order=External File
+.\src\Trig\compile.cfg=External File
+.\src\Trig\Edfmap.ini=External File
+.\src\Trig\fsm.set=External File
+.\src\Trig\projlib.cfg=External File
+.\src\Trig\stimulators.set=External File
+.\src\Trig\Trig.adf=Active HDL design
+.\src\Trig\trig.wsp=External File
+.\src\Trig\src\trig.dlm=C/C++ Configuration
+.\src\Trig\src\trig_tb.cpp=C++ Source Code
+.\src\Trig\src\trig_top_tb.bde=Block Diagram
+.\src\Trig\src\TestBench\trig_runtest.do=Macro
+.\src\Trig\src\TestBench\trig_top_tb_TB.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\AXIS_TO_USART.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=Macro
 .\..\..\FIR-00251-Common\VHDL\USART\rx_counter.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\USART.bde=Block Diagram
 .\..\..\FIR-00251-Common\VHDL\USART\Usart_Ctrl.vhd=VHDL Source Code
@@ -1345,14 +1540,59 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\FIR-00251-Common\VHDL\USART\USART_TO_AXIS.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\usart_tx.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\usart_mmcm_rst.vhd=VHDL Source Code
-.\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=Macro
 .\..\src\USB\hdl\USB_CTRL.bde=Block Diagram
+.\src\AcqChain\AcqChain.adf=Active HDL design
+.\src\AcqChain\AcqChain.wsp=External File
+.\src\AcqChain\bde.set=External File
+.\src\AcqChain\compilation.order=External File
+.\src\AcqChain\compile.cfg=External File
+.\src\AcqChain\Edfmap.ini=External File
+.\src\AcqChain\projlib.cfg=External File
+.\src\AcqChain\stimulators.set=External File
+.\src\AcqChain\synthesis.order=External File
+.\src\AcqChain\src\acq_chain.dlm=C/C++ Configuration
+.\src\AcqChain\src\acq_chain_tb.bde=Block Diagram
+.\src\AcqChain\src\acq_chain_tb.cpp=C++ Source Code
+.\src\AcqChain\src\efa_00254_dummy.vhd=VHDL Source Code
+.\src\AcqChain\src\pelicanD_core_dummy.vhd=VHDL Source Code
+.\src\AcqChain\src\PelicanD_dummy.bde=Block Diagram
+.\src\AcqChain\src\TestBench\acq_chain_tb_TB.vhd=VHDL Source Code
+.\src\AcqChain\src\TestBench\acq_chain_tb_TB_runtest.do=Macro
+.\src\AXI4\AXI4_Stream32_to_64_wrapper.vhd=VHDL Source Code
+.\src\calibration\bde.set=External File
+.\src\calibration\calibration.adf=Active HDL design
+.\src\calibration\calibration.wsp=External File
+.\src\calibration\compilation.order=External File
+.\src\calibration\compile.cfg=External File
+.\src\calibration\Edfmap.ini=External File
+.\src\calibration\projlib.cfg=External File
+.\src\calibration\stimulators.set=External File
+.\src\calibration\synthesis.order=External File
+.\src\calibration\calibration\calibration.lib=External File
+.\src\calibration\calibration\elaboration.log=Text File
+.\src\calibration\src\calibration.dlm=C/C++ Configuration
+.\src\calibration\src\calibration_tb.cpp=C++ Source Code
+.\src\calibration\src\calibration_tb.h=C++ Source Code
+.\src\calibration\src\NLC_testbench.bde=Block Diagram
+.\src\Clink_Receiver\bde.set=External File
+.\src\Clink_Receiver\Clink_Receiver.adf=Active HDL design
+.\src\Clink_Receiver\Clink_Receiver.lib=External File
+.\src\Clink_Receiver\clink_receiver.wsp=External File
+.\src\Clink_Receiver\compilation.order=External File
+.\src\Clink_Receiver\compile.cfg=External File
+.\src\Clink_Receiver\Edfmap.ini=External File
+.\src\Clink_Receiver\elaboration.log=Text File
+.\src\Clink_Receiver\projlib.cfg=External File
+.\src\Clink_Receiver\stimulators.set=External File
+.\src\Clink_Receiver\synthesis.order=External File
+.\src\Clink_Receiver\Clink_Receiver\Clink_Receiver.lib=External File
+.\src\Clink_Receiver\src\Clink_receiver_tb.bde=Block Diagram
+.\src\CLINK_UART\CLINK_UART_wrapper.vhd=VHDL Source Code
+.\src\INTC\INTC_wrapper.vhd=VHDL Source Code
+.\src\XADC\XADC_wrapper.vhd=VHDL Source Code
 
 [file_out:/..\..\src\fir_00251_proc_acq.bde]
 /..\compile\fir_00251_proc_acq.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_blackbirdD.bde]
-/..\compile\fir_00251_proc_blackbirdD.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_hawkA.bde]
 /..\compile\fir_00251_proc_hawkA.vhd=-1
@@ -1363,26 +1603,14 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 [file_out:/..\..\src\fir_00251_proc_isc0207A.bde]
 /..\compile\fir_00251_proc_isc0207A.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_isc0207A_3k.bde]
-/..\compile\fir_00251_proc_isc0207A_3k.vhd=-1
-
 [file_out:/..\..\src\fir_00251_proc_isc0209A.bde]
 /..\compile\fir_00251_proc_isc0209A.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_isc0804A.bde]
-/..\compile\fir_00251_proc_isc0804A.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_isc0804A_500Hz.bde]
-/..\compile\fir_00251_proc_isc0804A_500Hz.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_marsD.bde]
 /..\compile\fir_00251_proc_marsD.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_pelicanD.bde]
 /..\compile\fir_00251_proc_pelicanD.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_pelicanD_150Hz.bde]
-/..\compile\fir_00251_proc_pelicanD_150Hz.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_scorpiolwD.bde]
 /..\compile\fir_00251_proc_scorpiolwD.vhd=-1
@@ -1399,8 +1627,8 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 [file_out:/..\..\src\fir_00251_proc_startup.bde]
 /..\compile\fir_00251_proc_startup.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_suphawkA.bde]
-/..\compile\fir_00251_proc_suphawkA.vhd=-1
+[file_out:/mgt_block_dual.bde]
+/..\compile\mgt_block_dual.vhd=-1
 
 [file_out:ADCReadout/..\..\..\src\ADCReadout\HDL\adc_readout_top.bde]
 ADCReadout/..\..\compile\adc_readout_top.vhd=-1
@@ -1408,17 +1636,11 @@ ADCReadout/..\..\compile\adc_readout_top.vhd=-1
 [file_out:AEC/..\..\..\src\AEC\HDL\AEC.bde]
 AEC/..\..\compile\AEC.vhd=-1
 
-[file_out:Buffering/Buffering_wrapper.bde]
-Buffering/..\..\compile\Buffering_wrapper.vhd=-1
+[file_out:Buffering/..\..\..\src\Buffering\HDL\Buffering.bde]
+Buffering/..\..\compile\buffering.vhd=-1
 
 [file_out:Calib/..\..\..\src\Calibration\HDL\calibration.bde]
 Calib/..\..\compile\calibration.vhd=-1
-
-[file_out:Calib/..\..\..\src\Calibration\HDL\calibration_core.bde]
-Calib/..\..\compile\calibration_core.vhd=-1
-
-[file_out:Calib/..\..\..\src\Calibration\HDL\calibration_common.bde]
-Calib/..\..\compile\calibration_common.vhd=-1
 
 [file_out:Calib/..\..\..\src\Calibration\HDL\NLC.bde]
 Calib/..\..\compile\NLC.vhd=-1
@@ -1477,6 +1699,9 @@ EHDRI/..\..\compile\EHDRI_toplevel.vhd=-1
 [file_out:ExposureTime/..\..\..\src\ExposureTime\HDL\exposure_time_ctrl.bde]
 ExposureTime/..\..\compile\exposure_time_ctrl.vhd=-1
 
+[file_out:ExposureTime\src/exposure_top_tb.bde]
+ExposureTime\src/..\..\..\compile\exposure_top_tb.vhd=-1
+
 [file_out:Flagging/..\..\..\src\Flagging\HDL\flagging_top.bde]
 Flagging/..\..\compile\flagging_top.vhd=-1
 
@@ -1499,33 +1724,6 @@ FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde]
 FPA\Common/..\..\..\compile\uart_block_tel2000.vhd=-1
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
-FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde]
-FPA\Common/..\compile\afpa_elec_offset_proc.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clks_memory.bde]
-FPA\Common/..\..\..\compile\fastrd_clks_memory.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_ctrler.bde]
-FPA\Common/..\..\..\compile\fastrd_wdow_info_rate_ctrler.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde]
-FPA\Common/..\..\..\compile\fastrd_wdow_mem.vhd=-1
-
-[file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde]
-FPA\HawkA/..\..\..\compile\hawkA_clks_gen.vhd=-1
-
 [file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_hw_driver.bde]
 FPA\HawkA/..\..\..\compile\hawkA_hw_driver.vhd=-1
 
@@ -1534,6 +1732,9 @@ FPA\HawkA/..\..\..\compile\hawkA_intf.vhd=-1
 
 [file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_prog_ctrler.bde]
 FPA\HawkA/..\..\..\compile\hawkA_prog_ctrler.vhd=-1
+
+[file_out:FPA\HawkA\src/hawkA_intf_testbench.bde]
+FPA\HawkA\src/..\..\..\..\compile\hawkA_intf_testbench.vhd=-1
 
 [file_out:FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_data_ctrl.bde]
 FPA\isc0207A/..\..\..\compile\isc0207A_data_ctrl.vhd=-1
@@ -1544,29 +1745,17 @@ FPA\isc0207A/..\..\..\compile\isc0207A_hw_driver.vhd=-1
 [file_out:FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_intf.bde]
 FPA\isc0207A/..\..\..\compile\isc0207A_intf.vhd=-1
 
-[file_out:FPA\isc0207A/..\..\..\..\src\FPA\isc0207A\HDL\isc0207A_clks_gen.bde]
-FPA\isc0207A/..\..\..\compile\isc0207A_clks_gen.vhd=-1
+[file_out:FPA\isc0207A\src/edge_distance_measure.bde]
+FPA\isc0207A\src/..\..\..\..\compile\edge_distance_measure.vhd=-1
 
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_clks_gen.bde]
-FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_clks_gen.vhd=-1
+[file_out:FPA\isc0207A\src/fpa_isc0207_hw_driver_tb.bde]
+FPA\isc0207A\src/..\..\..\..\compile\fpa_isc0207_hw_driver_tb.vhd=-1
 
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_hw_driver.bde]
-FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_hw_driver.vhd=-1
+[file_out:FPA\isc0207A\src/fpa_isc0207_intf_tb.bde]
+FPA\isc0207A\src/..\..\..\..\compile\fpa_isc0207_intf_tb.vhd=-1
 
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_prog_ctrler.bde]
-FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_prog_ctrler.vhd=-1
-
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_intf.bde]
-FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_intf.vhd=-1
-
-[file_out:FPA\isc0207A_3k/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
-FPA\isc0207A_3k/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
-
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde]
-FPA\isc0207A_3k/..\..\..\compile\sc_high_low_duration.vhd=-1
-
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde]
-FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_readout_ctrler.vhd=-1
+[file_out:FPA\isc0207A\src/isc0207A_intf_testbench.bde]
+FPA\isc0207A\src/..\..\..\..\compile\isc0207A_intf_testbench.vhd=-1
 
 [file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_hw_driver.bde]
 FPA\isc0209A/..\..\..\compile\isc0209A_hw_driver.vhd=-1
@@ -1577,38 +1766,11 @@ FPA\isc0209A/..\..\..\compile\isc0209A_intf.vhd=-1
 [file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_prog_ctrler.bde]
 FPA\isc0209A/..\..\..\compile\isc0209A_prog_ctrler.vhd=-1
 
-[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde]
-FPA\isc0209A/..\..\..\compile\isc0209A_clks_gen.vhd=-1
+[file_out:FPA\isc0209A\src/edge_distance_measure.bde]
+FPA\isc0209A\src/..\..\..\..\compile\edge_distance_measure.vhd=-1
 
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_clks_gen.vhd=-1
-
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_hw_driver.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_hw_driver.vhd=-1
-
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_intf.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_intf.vhd=-1
-
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_prog_ctrler.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_prog_ctrler.vhd=-1
-
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_readout_ctrler.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_readout_ctrler.vhd=-1
-
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_clks_gen.vhd=-1
-
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_hw_driver.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_hw_driver.vhd=-1
-
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_intf.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_intf.vhd=-1
-
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_prog_ctrler.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_prog_ctrler.vhd=-1
-
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_ctrler.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_readout_ctrler.vhd=-1
+[file_out:FPA\isc0209A\src/isc0209A_intf_testbench.bde]
+FPA\isc0209A\src/..\..\..\..\compile\isc0209A_intf_testbench.vhd=-1
 
 [file_out:FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\mglk_data_ctrl.bde]
 FPA\Megalink/..\..\..\compile\mglk_data_ctrl.vhd=-1
@@ -1618,6 +1780,9 @@ FPA\Megalink/..\..\..\compile\mglk_hw_driver.vhd=-1
 
 [file_out:FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\mglk_intf.bde]
 FPA\Megalink/..\..\..\compile\mglk_intf.vhd=-1
+
+[file_out:FPA\PelicanD\src/PelicanD_top_tb.bde]
+FPA\PelicanD\src/..\..\..\..\compile\PelicanD_top_tb.vhd=-1
 
 [file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde]
 FPA\Scd_proxy/..\..\..\compile\scd_data_ctrl.vhd=-1
@@ -1640,23 +1805,23 @@ FPA\ScorpiomwA/..\..\..\compile\scorpiomwA_intf.vhd=-1
 [file_out:FPA\ScorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_prog_ctrler.bde]
 FPA\ScorpiomwA/..\..\..\compile\scorpiomwA_prog_ctrler.vhd=-1
 
-[file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_clks_gen.bde]
-FPA\suphawkA/..\..\..\compile\suphawkA_clks_gen.vhd=-1
+[file_out:FPA\ScorpiomwA\src/scorpiomwA_hw_ctrl_tb.bde]
+FPA\ScorpiomwA\src/..\..\..\..\compile\scorpiomwA_hw_ctrl_tb.vhd=-1
 
-[file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_hw_driver.bde]
-FPA\suphawkA/..\..\..\compile\suphawkA_hw_driver.vhd=-1
+[file_out:FPA\ScorpiomwA\src/scorpiomwA_intf_testbench.bde]
+FPA\ScorpiomwA\src/..\..\..\..\compile\scorpiomwA_intf_testbench.vhd=-1
 
-[file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_intf.bde]
-FPA\suphawkA/..\..\..\compile\suphawkA_intf.vhd=-1
-
-[file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_prog_ctrler.bde]
-FPA\suphawkA/..\..\..\compile\suphawkA_prog_ctrler.vhd=-1
+[file_out:FPGA_COMM/..\..\..\src\fpga_comm\HDL\FPGA_COMM.bde]
+FPGA_COMM/..\..\compile\FPGA_COMM.vhd=-1
 
 [file_out:Gating/..\..\..\src\Gating\HDL\gating_top.bde]
 Gating/..\..\compile\gating_top.vhd=-1
 
 [file_out:HeaderInserter/..\..\..\src\Hder\HDL\hder_inserter.bde]
 HeaderInserter/..\..\compile\hder_inserter.vhd=-1
+
+[file_out:HeaderInserter\src/hder_inserter_top_tb.bde]
+HeaderInserter\src/..\..\..\compile\hder_inserter_top_tb.vhd=-1
 
 [file_out:ICU/..\..\..\src\ICU\HDL\ICU_toplevel.bde]
 ICU/..\..\compile\ICU_toplevel.vhd=-1
@@ -1679,23 +1844,20 @@ LUT/..\..\compile\axis_lut_core_a32_d32.vhd=-1
 [file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_X_to_ADD.bde]
 LUT/..\..\compile\axis_lut_X_to_ADD.vhd=-1
 
-[file_out:MGT/..\..\..\src\MGT\HDL\mgt_block.bde]
+[file_out:MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_block.bde]
 MGT/..\..\compile\mgt_block.vhd=-1
 
-[file_out:MGT/..\..\..\src\MGT\HDL\mgt_wrapper.bde]
+[file_out:MGT/..\..\..\..\FIR-00251-Common\VHDL\MGT\Hdl\mgt_wrapper.bde]
 MGT/..\..\compile\mgt_wrapper.vhd=-1
 
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_deserializer.bde]
-Quad_serdes/..\..\compile\quad_data_deserializer.vhd=-1
+[file_out:QuadADC/..\..\..\src\QuadADC\HDL\adc_data_deserializer.bde]
+QuadADC/..\..\compile\adc_data_deserializer.vhd=-1
 
-[file_out:Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde]
-Quad_serdes/..\..\compile\quad_pattern_validator.vhd=-1
+[file_out:QuadADC/..\..\..\src\QuadADC\HDL\adc_data_deserializer_8chn.bde]
+QuadADC/..\..\compile\adc_data_deserializer_8chn.vhd=-1
 
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde]
-Quad_serdes/..\..\compile\afpa_data_deserializer_8chn.vhd=-1
-
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde]
-Quad_serdes/..\..\compile\afpa_data_deserializer_16chn.vhd=-1
+[file_out:QuadADC/..\..\..\src\QuadADC\HDL\adc_receiver_1ch.bde]
+QuadADC/..\..\compile\adc_receiver_1ch.vhd=-1
 
 [file_out:SFW/..\..\..\src\SFW\HDL\SFW.bde]
 SFW/..\..\compile\SFW.vhd=-1
@@ -1724,9 +1886,21 @@ Trig/..\..\compile\trig_gen_ctler.vhd=-1
 [file_out:Trig/..\..\..\src\Trig\HDL\trig_stamper.bde]
 Trig/..\..\compile\trig_stamper.vhd=-1
 
+[file_out:Trig\src/trig_top_tb.bde]
+Trig\src/..\..\..\compile\trig_top_tb.vhd=-1
+
 [file_out:USART/..\..\..\..\FIR-00251-Common\VHDL\USART\USART.bde]
 USART/..\..\compile\USART.vhd=-1
 
 [file_out:USB/..\..\..\src\USB\hdl\USB_CTRL.bde]
 USB/..\..\compile\USB_CTRL.vhd=-1
+
+[file_out:AcqChain\src/PelicanD_dummy.bde]
+AcqChain\src/..\..\..\compile\PelicanD_dummy.vhd=-1
+
+[file_out:calibration\src/NLC_testbench.bde]
+calibration\src/..\..\..\compile\NLC_testbench.vhd=-1
+
+[file_out:Clink_Receiver\src/Clink_receiver_tb.bde]
+Clink_Receiver\src/..\..\..\compile\Clink_receiver_tb.vhd=-1
 

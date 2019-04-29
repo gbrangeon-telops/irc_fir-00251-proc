@@ -4,11 +4,11 @@
  *
  * This file implements the IR camera header inserter driver module.
  *
- * $Rev: 23236 $
- * $Author: elarouche $
- * $Date: 2019-04-10 15:08:01 -0400 (mer., 10 avr. 2019) $
- * $Id: hder_inserter.c 23236 2019-04-10 19:08:01Z elarouche $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Hder/Drivers/hder_inserter.c $
+ * $Rev$
+ * $Author$
+ * $Date$
+ * $Id$
+ * $URL$
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -139,7 +139,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 12.5
+// Generated from the IRCam header definition XLS file version 12.4
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -171,7 +171,6 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(TriggerModeAry[TS_AcquisitionStart]), a->ADD + A_BASE_HEADER + TriggerModeHdrAddr);
    AXI4L_write8((uint8_t)(TriggerSourceAry[TS_AcquisitionStart]), a->ADD + A_BASE_HEADER + TriggerSourceHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->IntegrationMode), a->ADD + A_BASE_HEADER + IntegrationModeHdrAddr);
-   AXI4L_write8((uint8_t)(pGCRegs->EHDRINumberOfExposures), a->ADD + A_BASE_HEADER + EHDRINumberOfExposuresHdrAddr);
    AXI4L_write8((uint8_t)(1), a->ADD + A_BASE_HEADER + AveragingNumberHdrAddr);
    AXI4L_write16((int16_t)(0), a->ADD + A_BASE_HEADER + ADCReadoutHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->ExposureAuto), a->ADD + A_BASE_HEADER + ExposureAutoHdrAddr);

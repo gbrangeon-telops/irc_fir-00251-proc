@@ -5,9 +5,9 @@
 -- Author   : PDA (TEL-1000), SSA (TEL-2000)
 -- Company  : Telops inc.
 --
--- $Revision: 20830 $
--- $Author: odionne $
--- $LastChangedDate: 2017-09-01 15:29:17 -0400 (ven., 01 sept. 2017) $
+-- $Revision$
+-- $Author$
+-- $LastChangedDate$
 ------------------------------------------------------------------------------*/
 #ifndef NDFCONTROLLER_H
 #define NDFCONTROLLER_H

@@ -18,8 +18,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.math_real.all;
+use IEEE.numeric_std.all; 
 use work.fpa_common_pkg.all;
 use work.fpa_define.all;  
 
@@ -34,8 +33,8 @@ package Proxy_define is
    constant SCD_INT_TIME_MIN_US          : integer := 1; 
    constant SCD_MASTER_CLK_RATE_MHZ      : integer := 80;      --
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 3; -- pour le pelicanD, on doit laisser une image dès qu'on change le frameRate car le changement de framerate s'opere toujours en temps d'integration minimale pour ne pas planter mon code
-   --constant PROXY_CLINK_CHANNEL_NUM      : integer := DEFINE_FPA_CLINK_CHANNEL_NUM;     -- Number of channels in the Camera Link interface with the proxy 
-   --constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;  -- CLINK IN est à 80MHz ns pour les SCD
+   constant PROXY_CLINK_CHANNEL_NUM      : integer := 2;     -- Number of channels in the Camera Link interface with the proxy 
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;  -- CLINK IN est à 80MHz ns pour les SCD
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -111,7 +110,7 @@ package Proxy_define is
    constant SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de SCD_EXP_TIME_CONV_DENOMINATOR  
    constant SCD_EXP_TIME_CONV_DENOMINATOR  : integer := 2**SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
    constant SCD_EXP_TIME_CONV_NUMERATOR    : unsigned(SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned((4*(2**SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS))/5, SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     -- (80 x 2^26 )/100
-   constant DEFINE_DIAG_DATA_CLK_FACTOR    : integer := integer(ceil(real(FPA_INTF_CLK_RATE_MHZ * 1000) / real(DEFINE_DIAG_CLK_RATE_MAX_KHZ)));  
+   
    
    
    
@@ -121,8 +120,8 @@ package Proxy_define is
    -- scd integration
    type scd_int_cfg_type is
    record
-   scd_int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
-   scd_int_indx            : std_logic_vector(7 downto 0);
+      scd_int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
+      scd_int_indx            : std_logic_vector(7 downto 0);
    end record;
    
    -- scd operationnelle
@@ -173,7 +172,7 @@ package Proxy_define is
    type fpa_intf_cfg_type is
    record     
       cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
-      comn                 : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
+	   comn                 : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
       scd_op               : scd_op_cfg_type;     -- tout changement dans scd_op entraine la programmation du detecteur (commnde operationnelle)
       scd_int              : scd_int_cfg_type;    -- tout changement dans scd_int entraine la programmation du detecteur (commnde temps d'intégration)
       scd_diag             : scd_diag_cfg_type;   -- tout changement dans scd_diag entraine la programmation du detecteur (commnde PE Syntehtique)
@@ -207,21 +206,21 @@ package Proxy_define is
    ----------------------------------------------
    --function to_diag_data_ofs return diag_data_ofs_type;
    --function to_fpa_word_func(a:fpa_intf_cfg_type) return fpa_word_type;
-   
+
 end Proxy_define;
 
 package body Proxy_define is
    
    ---
    -- function to_diag_data_ofs return diag_data_ofs_type is
-   -- variable y  : diag_data_ofs_type;
-   -- variable ii : integer range 1 to 9;
-   
+      -- variable y  : diag_data_ofs_type;
+      -- variable ii : integer range 1 to 9;
+      
    -- begin
-   -- for ii in 1 to 9 loop    
-   -- y(ii) := (ii - 1)*DIAG_DATA_INC;
-   -- end loop;   
-   -- return y;                 
+      -- for ii in 1 to 9 loop    
+         -- y(ii) := (ii - 1)*DIAG_DATA_INC;
+      -- end loop;   
+      -- return y;                 
    -- end to_diag_data_ofs; 
    
 end package body Proxy_define; 

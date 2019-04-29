@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22650 $
---!   $Author: pcouture $
---!   $Date: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
---!   $Id: monit_adc_dummy.vhd 22650 2018-12-13 20:30:18Z pcouture $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/FPA/isc0209A/src/monit_adc_dummy.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 library IEEE;

@@ -5,9 +5,9 @@
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
--- $Author: odionne $
--- $LastChangedDate: 2017-03-22 10:04:58 -0400 (mer., 22 mars 2017) $
--- $Revision: 20205 $ 
+-- $Author$
+-- $LastChangedDate$
+-- $Revision$ 
 -------------------------------------------------------------------------------
 --
 -- Description : Test bench for Trig module

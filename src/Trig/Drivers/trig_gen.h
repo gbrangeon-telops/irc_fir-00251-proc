@@ -22,17 +22,18 @@
 #include "GC_Registers.h"
 #include "tel2000_param.h"
 #include <stdint.h>
+#include "xbasic_types.h"
 #include "fpa_intf.h"
 
 
-#define TRIG_BASE_CLOCK_FREQ_HZ    CLK_MB_FREQ_HZ  // horloge de reference des trigs
+#define TRIG_BASE_CLOCK_FREQ_HZ    CLK_100_FREQ_HZ  // horloge de reference des trigs
 
 
 // structure de configuration du trigger
 struct s_Trig
 {
    uint32_t SIZE;                     // Number of config elements, excluding SIZE and ADD.
-   uint32_t ADD;                      /**< register address */
+   uint32_t ADD;
 
    uint32_t TRIG_Mode;                // le mode de fonctionnement
    uint32_t TRIG_Period;              // la période du trig, en coups d'horloge
@@ -47,13 +48,11 @@ struct s_Trig
 typedef struct s_Trig t_Trig;
 
 // statuts provenant du vhd
-struct s_TrigStatus
+struct s_TrigStatus    //
 {
    uint32_t ctlr_status;
    uint32_t trig_period_min[8];
    uint32_t trig_period_max[8];
-   uint32_t trig_delay_min;       /**triger min time, */
-   uint32_t trig_delay_max;       /**triger max time, */
 };
 typedef struct s_TrigStatus t_TrigStatus;
 

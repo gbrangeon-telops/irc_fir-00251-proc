@@ -3,11 +3,11 @@
 --!   @brief : Reorder data of the Megalink Camera Link channels
 --!   @details
 --!
---!   $Rev: 23386 $
---!   $Author: odionne $
---!   $Date: 2019-04-25 15:01:20 -0400 (jeu., 25 avr. 2019) $
---!   $Id: mglk_clink_dout_ctrl.vhd 23386 2019-04-25 19:01:20Z odionne $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/clink/HDL/mglk_clink_dout_ctrl.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
@@ -57,7 +57,7 @@ begin
    
    ch0_reset_sync : sync_reset port map(CLK => CH0_CLK, ARESET => CH0_ARESET, SRESET => ch0_sreset);
    CH1_RESET : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-   begin
+      begin
       ch1_reset_sync : sync_reset port map(CLK => CH1_CLK, ARESET => CH1_ARESET, SRESET => ch1_sreset);
    end generate;
    
@@ -68,7 +68,7 @@ begin
    ch0_fval  <= CH0_DIN(6);
    
    CH1_INPUTS : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-   begin
+      begin
       ch1_din_i <= CH1_DIN;
       ch1_fval  <= CH1_DIN(6);
    end generate;
@@ -92,7 +92,7 @@ begin
    end process;
    
    CH1_ENABLE : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-   begin
+      begin
       process(CH1_CLK)
       begin
          if rising_edge(CH1_CLK) then
@@ -117,7 +117,7 @@ begin
    end generate;
    
    CH1_DISABLE : if PROXY_CLINK_CHANNEL_NUM = 1 generate	
-   begin
+      begin
       g_output_en <= ch0_output_en;
    end generate;
    
@@ -165,7 +165,7 @@ begin
    end process;
    
    CH1_OUTPUT : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-   begin
+      begin
       process(CH1_CLK)
       begin
          if rising_edge(CH1_CLK) then

@@ -13,7 +13,10 @@ acom  "D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd"
 acom "$COMMON_HDL\Utilities\SYNC_RESET.vhd"
 acom "$COMMON\Utilities\axil32_to_native.vhd"
 
-#source EHDRI
+#IP
+--acom "$PROC\IP\ehdri_index_mem\ehdri_index_mem_funcsim.vhdl"
+
+#source Buffering
 acom "$EHDRI_INTF\ehdri_ctrl.vhd"
 acom "$EHDRI_INTF\ehdri_SM.vhd"
 

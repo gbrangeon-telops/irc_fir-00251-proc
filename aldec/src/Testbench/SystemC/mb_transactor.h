@@ -4,11 +4,11 @@
  *  
  *  Defines the class mb_transactor.
  *  
- *  $Rev: 13301 $
- *  $Author: enofodjie $
- *  $LastChangedDate: 2014-03-13 11:22:29 -0400 (jeu., 13 mars 2014) $
- *  $Id: mb_transactor.h 13301 2014-03-13 15:22:29Z enofodjie $
- *  $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/Testbench/SystemC/mb_transactor.h $
+ *  $Rev$
+ *  $Author$
+ *  $LastChangedDate$
+ *  $Id$
+ *  $URL$
  */
 #ifndef __MB_TRANSACTOR_H__
 #define __MB_TRANSACTOR_H__

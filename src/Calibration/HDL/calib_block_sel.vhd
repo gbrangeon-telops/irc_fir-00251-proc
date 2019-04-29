@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 20044 $
---!   $Author: odionne $
---!   $Date: 2017-02-02 12:41:50 -0500 (jeu., 02 févr. 2017) $
---!   $Id: calib_block_sel.vhd 20044 2017-02-02 17:41:50Z odionne $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Calibration/HDL/calib_block_sel.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
@@ -77,7 +77,7 @@ architecture rtl of calib_block_sel is
    signal ndf_position_i            : std_logic_vector(calib_block_info_type.sel_value'range);
    signal cal_block_index_max_i     : cal_block_index_type;
    signal calib_block_array         : calib_block_array_type;
-   signal block_index_found         : cal_block_index_type;
+   signal block_index_found        : cal_block_index_type;
    signal calib_block_sel_mode_i    : calib_block_sel_mode_type;
    signal sel_state                 : sel_state_type;
    

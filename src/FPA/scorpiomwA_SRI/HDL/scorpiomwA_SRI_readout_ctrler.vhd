@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22828 $
---!   $Author: enofodjie $
---!   $Date: 2019-02-09 10:45:11 -0500 (sam., 09 févr. 2019) $
---!   $Id: scorpiomwA_SRI_readout_ctrler.vhd 22828 2019-02-09 15:45:11Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scorpiomwA_SRI/HDL/scorpiomwA_SRI_readout_ctrler.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
@@ -94,13 +94,13 @@ architecture rtl of scorpiomwA_SRI_readout_ctrler is
   
    
    
-   --   -- attribute dont_touch : string;
-   --   -- attribute dont_touch of sof_pipe         : signal is "true"; 
-   --   -- attribute dont_touch of eof_pipe         : signal is "true";
-   --   -- attribute dont_touch of sol_pipe         : signal is "true"; 
-   --   -- attribute dont_touch of eol_pipe         : signal is "true";
-   --   -- attribute dont_touch of fval_pipe        : signal is "true"; 
-   --   -- attribute dont_touch of lval_pipe        : signal is "true";
+   --   attribute dont_touch : string;
+   --   attribute dont_touch of sof_pipe         : signal is "true"; 
+   --   attribute dont_touch of eof_pipe         : signal is "true";
+   --   attribute dont_touch of sol_pipe         : signal is "true"; 
+   --   attribute dont_touch of eol_pipe         : signal is "true";
+   --   attribute dont_touch of fval_pipe        : signal is "true"; 
+   --   attribute dont_touch of lval_pipe        : signal is "true";
    
 begin
    

@@ -16,9 +16,24 @@ acom -nowarn DAGGEN_0523 "$COMMON_HDL\Utilities\SYNC_RESET.vhd" \
  "$COMMON_HDL\Utilities\double_sync_vector.vhd" \
  "$COMMON_HDL\Utilities\sync_resetn.vhd"
 
+#common-251
+acom -relax "$COMMON\VHDL\hdr_extractor\hder_extractor.vhd"
+acom "$COMMON\VHDL\Utilities\axis16_img_extractor.vhd"
 
 #source Histogram
-acom "$PROC\IP\160\histogram_axis_tmi_4pix_0\histogram_axis_tmi_4pix_0_stub.vhdl"
+acom -nowarn DAGGEN_0523 \
+ #"$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl" \
+ #"$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_c_addsub_v12_0_0\histogram_axis_tmi_c_addsub_v12_0_0_funcsim.vhdl" \
+ #"$AEC_INTF\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_c_counter_binary_v12_0_0\histogram_axis_tmi_c_counter_binary_v12_0_0_funcsim.vhdl" \
+ "$AEC_INTF\netlist\sysgen\conv_pkg.vhd" \
+ "$AEC_INTF\netlist\sysgen\srl17e.vhd" \
+ "$AEC_INTF\netlist\sysgen\single_reg_w_init.vhd" \
+ "$AEC_INTF\netlist\sysgen\synth_reg_w_init.vhd" \
+ "$AEC_INTF\netlist\sysgen\synth_reg_reg.vhd" \
+ "$AEC_INTF\netlist\sysgen\synth_reg.vhd" \
+ "$AEC_INTF\netlist\sysgen\xlclockdriver_rd.vhd" \
+ "$AEC_INTF\netlist\sysgen\histogram_axis_tmi_entity_declarations.vhd" \
+ "$AEC_INTF\netlist\sysgen\histogram_axis_tmi.vhd"
 
 #source AEC
 acom -nowarn DAGGEN_0523 "$AEC_INTF\AEC_CUMSUM.vhd" \

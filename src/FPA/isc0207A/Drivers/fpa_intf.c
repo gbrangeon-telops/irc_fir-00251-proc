@@ -7,9 +7,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision: 22281 $
+-- $Revision: 20186 $
 -- $Author: enofodjie $
--- $LastChangedDate: 2018-09-27 21:10:58 -0400 (jeu., 27 sept. 2018) $
+-- $LastChangedDate: 2017-03-15 03:40:34 -0400 (mer., 15 mars 2017) $
 --
 -------------------------------------------------------------------------------
 --
@@ -61,9 +61,6 @@
 #define AW_FPA_OUTPUT_SW_TYPE             0xAE4      // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
 #define AW_FPA_INPUT_SW_TYPE              0xAE8      // obligaoire pour les deteceteurs analogiques
 
-// adresse d'ecriture de la cfg des Dacs
-#define AW_DAC_CFG_BASE_ADD               0x0D00
-
 // adresse d'ecriture signifiant la fin de la commande serielle pour le vhd
 #define AW_SERIAL_CFG_END_ADD             (0x0FFC | AW_SERIAL_CFG_SWITCH_ADD)   
 
@@ -71,10 +68,6 @@
 #define FPA_ROIC                          0x12      // 0x12 -> 0207 . Provient du fichier fpa_common_pkg.vhd.
 #define FPA_OUTPUT_TYPE                   0x01      // 0x01 -> output analogique .provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
 #define FPA_INPUT_TYPE                    0x03      // 0x03 -> input LVTTL50 .provient du fichier fpa_common_pkg.vhd. La valeur 0x03 est celle de LVTTL50
-
-// identification des sources de données
-#define DATA_SOURCE_INSIDE_FPGA           0         // Provient du fichier fpa_common_pkg.vhd.
-#define DATA_SOURCE_OUTSIDE_FPGA          1         // Provient du fichier fpa_common_pkg.vhd.
 
 
 // adresse d'écriture du régistre du reset des erreurs
@@ -95,7 +88,27 @@
 #define VHD_CLK_80M_RATE_HZ                80000000
 
 // horloge des ADCs
+//#ifdef FPA_MCLK_RATE_HZ == 5000000
+//#define ADC_SAMPLING_RATE_HZ 10000000    //
+//#elif FPA_MCLK_RATE_HZ == 6500000
+//   #define ADC_SAMPLING_RATE_HZ 39000000    //
+//#elif  FPA_MCLK_RATE_HZ == 6600000
+//   #define ADC_SAMPLING_RATE_HZ 39600000    //
+//#elif  FPA_MCLK_RATE_HZ == 7100000
+//   #define ADC_SAMPLING_RATE_HZ 28400000    //
+//#elif  FPA_MCLK_RATE_HZ == 7500000
+//   #define ADC_SAMPLING_RATE_HZ 30000000    //
+//#elif  FPA_MCLK_RATE_HZ == 8000000
+//#define ADC_SAMPLING_RATE_HZ 16000000    //
+//#elif  FPA_MCLK_RATE_HZ == 8500000
+//   #define ADC_SAMPLING_RATE_HZ 34000000    //
+//#elif  FPA_MCLK_RATE_HZ == 9000000
+//#define ADC_SAMPLING_RATE_HZ 18000000
+//#elif  FPA_MCLK_RATE_HZ == 9500000
+// #define ADC_SAMPLING_RATE_HZ 19000000
+//#elif  FPA_MCLK_RATE_HZ == 10000000
 #define ADC_SAMPLING_RATE_HZ  (2*FPA_MCLK_RATE_HZ)
+//#endif
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
@@ -120,46 +133,13 @@
 #define ISC0207_REFOFS_VOLTAGE_MIN_mV     502
 #define ISC0207_REFOFS_VOLTAGE_MAX_mV     5300
 
-#define TOTAL_DAC_NUM                     8            // 8 dac au total
-#define ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK  0     // largeur de la zone d'exclusion/etirement du fast windowing 
-#define ROIC_UNUSED_AREA_CLK_RATE_HZ     (2*FPA_MCLK_RATE_HZ)
+#define ISC0207_CONST_ELEC_OFFSET_VALUE   8120            //correction d'offset (non implantée sur 0207)
 
-// Electrical correction : references
-#define ELCORR_REF0_VALUE_mV              1800        
-#define ELCORR_REF1_VALUE_mV              4100
-#define ELCORR_REF_DAC_ID                 4                   // position (entre 1 et 8) du dac dédié aux references 
-#define ELCORR_REF_MAXIMUM_SAMP           120                 // le nombre de sample au max supporté par le vhd
-
-// Electrical correction : embedded switches control
-#define ELCORR_SW_TO_PATH1                0x01
-#define ELCORR_SW_TO_PATH2                0x02
-#define ELCORR_SW_TO_NORMAL_OP            0x03 
-
-#define ELCORR_CONT_MODE_OFFSETX_MIN      FPA_WIDTH_MAX // pour le ISC0207, cela revient à ne jamais etre en mode continuel pour le gain électronique puisque le flex comprend toujours la pin OUTR reliée au detecteur. Ce qui n'Est pas le cas du 0804
-
-// Electrical correction : valeurs mesurées avant correction 
-#define ELCORR_MEASURED_ADCCNT_AT_STARVATION     425          // @ centered pix (320, 256)
-#define ELCORR_MEASURED_ADCCNT_AT_SATURATION     16210        // @ centered pix (320, 256)
-#define ELCORR_MEASURED_ADCCNT_FOR_REF0          12200        // @ centered pix (320, 256)
-#define ELCORR_MEASURED_ADCCNT_FOR_REF1          458          // @ centered pix (320, 256)
-
-// Electrical correction : valeurs cibles (desirées) apres correction
-#define ELCORR_TARGET_ADCCNT_AT_STARVATION       500
-#define ELCORR_TARGET_ADCCNT_AT_SATURATION       16000 
-
-
-struct s_ProximCfgConfig 
-{   
-   uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
-   uint32_t  spare1;                       
-   uint32_t  spare2;   
-};                                  
-typedef struct s_ProximCfgConfig ProximCfg_t;
 
 // structure interne pour les parametres du 0207
 struct isc0207_param_s             // 
 {					   
-   float mclk_period_usec;
+   float mclk_period_usec;                       
    float tap_number;
    float pixnum_per_tap_per_mclk;
    float fpa_delay_mclk;
@@ -171,11 +151,6 @@ struct isc0207_param_s             //
    float trst_min_usec;
    float itr_tri_min_usec;
    float int_time_offset_usec;
-   
-   float roic_xsize; 
-   float roic_ysize; 
-   float roic_xstart;
-   float roic_ystart;
    
    float readout_mclk;
    float readout_usec;
@@ -190,35 +165,31 @@ struct isc0207_param_s             //
    float tri_min_usec;
    float frame_period_min_usec;
    float frame_rate_max_hz;
-   float unused_area_clock_factor;
-   float adc_sync_dly_mclk;
-   float line_stretch_mclk;
 
    float pclk_rate_hz;
 };
 typedef struct isc0207_param_s  isc0207_param_t;
 
+
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
-//uint32_t accelerationReg = 1;
-uint32_t speedup_unused_area = 0;        // les speed_up n'ont que deux valeurs : 0 ou 1
 uint8_t init_done = 0;
-ProximCfg_t ProximCfg = {{12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPosition);
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
-void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
+
+
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
-{  
+{   
    init_done = 0;
    FPA_Reset(ptrA);
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
@@ -271,29 +242,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    isc0207_param_t hh;   
    uint32_t test_pattern_dly;
    extern int16_t gFpaDetectorPolarizationVoltage;
-   static int16_t presentPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
-   extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
-   extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe 
-   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
-   extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
-   extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
-   extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
-   static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   uint32_t elcorr_reg;
-   t_FpaStatus Stat;
-   static uint8_t cfg_num = 0;
-   uint32_t elcorr_enabled = 1;
-   uint32_t elcorr_gain_corr_enabled = 0;
-   float elcorr_comp_duration_usec;                 // la duree en usec disponible pour la prise des references
-   float elcorr_atemp_gain;
-   float elcorr_atemp_ofs;
+   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
+   static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+   static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   uint8_t FPA_proxim_is_flegx;
    extern int32_t gFpaExposureTimeOffset;
-
+   
+   t_FpaStatus Stat;
 	
+   // on lit le statut 
    FPA_GetStatus(&Stat, ptrA);
+	FPA_proxim_is_flegx = (uint8_t)(Stat.adc_brd_spare & 0x01);    // on sait quelle electronique de proximité est présente (FlegX eou Flex)
 
    // on bâtit les parametres specifiques du 0207
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -313,30 +275,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
    }
-    
-   // Élargit le pulse de trig au besoin
-   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
-   // mode diag vrai et faked
-   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
-   if (ptrA->fpa_diag_mode == 1){
-      if ((int32_t)gFpaDebugRegE != 0)
-         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
-   }
-    
    // allumage du détecteur 
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
-   ptrA->fpa_acq_trig_ctrl_dly     = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_acq_trig_period_min   = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_xtra_trig_period_min  = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_xtra_trig_ctrl_dly    = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
+   ptrA->fpa_acq_trig_ctrl_dly     = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculé dans le vhd à partir du temps d'integration
+   ptrA->fpa_acq_trig_period_min   = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculé dans le vhd à partir du temps d'integration
+   ptrA->fpa_xtra_trig_period_min  = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculé dans le vhd à partir du temps d'integration
+   ptrA->fpa_xtra_trig_ctrl_dly    = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculé dans le vhd à partir du temps d'integration
    
    // parametres envoyés au VHD pour calculer fpa_acq_trig_ctrl_dly, fpa_acq_trig_period_min, fpa_xtra_trig_period_min, fpa_xtra_trig_ctrl_dly
    ptrA->readout_plus_delay            =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F);  // (readout_time + delay -vhd_delay) converti en coups de 100MHz
-   ptrA->tri_window_and_intmode_part   =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tri_window_and_intmode_part_usec*1e-6F);        //   tri_window_and_intmode_part_usec converti en coups de 100MHz
+   ptrA->tri_window_and_intmode_part   =  (int32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tri_window_and_intmode_part_usec*1e-6F);        //   tri_window_and_intmode_part_usec converti en coups de 100MHz
    ptrA->int_time_offset               =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.int_time_offset_usec*1e-6F);
    ptrA->tsh_min                       =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tsh_min_usec*1e-6F);
    ptrA->tsh_min_minus_int_time_offset =  (ptrA->tsh_min - ptrA->int_time_offset);
@@ -347,18 +299,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    {   
       test_pattern_dly  = (uint32_t)pGCRegs->Height * (uint32_t)TEST_PATTERN_LINE_DLY;    // delay total en coups de 10 ns sur une image de patron de tests 
 	   ptrA->readout_plus_delay         =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F) + test_pattern_dly;  // (readout_time + delay -vhd_delay) converti en coups de 100MHz + test_pattern_dly qui est deja en coups de 10 ns
-   }
-      
-   // configuration envoyée donc au ROIC du FPA
-   ptrA->roic_xsize   = (uint32_t)hh.roic_xsize;
-   ptrA->roic_xstart  = (uint32_t)hh.roic_xstart;
-   ptrA->roic_ystart  = (uint32_t)hh.roic_ystart;
-   ptrA->roic_ysize_div2_m1 = (uint32_t)hh.roic_ysize/2 - 1;
-   
-   // diag window param   
-   ptrA->diag_ysize             = (uint32_t)pGCRegs->Height;
-   ptrA->diag_xsize_div_tapnum  = (uint32_t)pGCRegs->Width/(uint32_t)FPA_NUMTAPS;
-   
+   }   
+   // fenetrage
+   ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
+   ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
+   ptrA->xsize     = (uint32_t)pGCRegs->Width;
+   ptrA->ysize     = (uint32_t)pGCRegs->Height;
+    
    //  gain 
    ptrA->gain = FPA_GAIN_1;	//Low gain
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
@@ -366,280 +313,110 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       
    // misc
    ptrA->internal_outr = 0;
+
    ptrA->boost_mode = 0;
+   if (gFpaDebugRegB == 1)
+      ptrA->boost_mode = 1;
    
-   // delai LsyDel
-   ptrA->lsydel_mclk = 2;           // LSYDEL en MCLK, obtenu par test live de dissimulation des bandes en sous-fenetrage sur M3K
+   // onchip binning
+   ptrA->onchip_bin_256 = 0;
+   ptrA->onchip_bin_128 = 0;
+   
+   //itr
+   ptrA->itr = 1;
+   //skimming
+   ptrA->skimming = 0;
    
    // ajustement de delais de la chaine
-   if (init_done == 0)
-     gFpaDebugRegF  = (int32_t)(10 - 2*ptrA->lsydel_mclk);    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
-   ptrA->real_mode_active_pixel_dly  = gFpaDebugRegF;
-      
-   // accélerateurs 
-   ptrA->speedup_lsydel          = 0;
-   ptrA->speedup_sample_row      = 0;
-   ptrA->speedup_lsync           = 0;
-   ptrA->speedup_unused_area     = speedup_unused_area;
-  
-   // raw area
-   ptrA->raw_area_line_start_num       = 1;
-   ptrA->raw_area_line_end_num         = (uint32_t)hh.roic_ysize + ptrA->raw_area_line_start_num - 1;
-   ptrA->raw_area_line_period_pclk     = ((uint32_t)hh.roic_xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk; 
-   ptrA->raw_area_sof_posf_pclk        = ptrA->raw_area_line_period_pclk * (ptrA->raw_area_line_start_num - 1) + 1;                 
-   ptrA->raw_area_eof_posf_pclk        = ptrA->raw_area_line_end_num * ptrA->raw_area_line_period_pclk - hh.lovh_mclk*hh.pixnum_per_tap_per_mclk;                 
-   ptrA->raw_area_sol_posl_pclk        = 1;                 
-   ptrA->raw_area_eol_posl_pclk        = ((uint32_t)hh.roic_xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk;                 
-   ptrA->raw_area_eol_posl_pclk_p1     = ptrA->raw_area_eol_posl_pclk + 1;
-   ptrA->raw_area_readout_pclk_cnt_max = ptrA->raw_area_line_period_pclk * ((uint32_t)hh.roic_ysize + hh.fovh_line + ptrA->raw_area_line_start_num - 1) + 1;
-   ptrA->raw_area_window_lsync_num     = (uint32_t)hh.roic_ysize;     // même si pas LSYNC pas envoyé au ROIC en mode ZDT, Le VHD le genere
-
-   // user area
-   ptrA->user_area_line_start_num      = ptrA->raw_area_line_start_num; 
-   ptrA->user_area_line_end_num        = (uint32_t)pGCRegs->Height + ptrA->user_area_line_start_num - 1;     
-   ptrA->user_area_sol_posl_pclk       = (((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2)/FPA_NUMTAPS + 1;
-   ptrA->user_area_eol_posl_pclk       = ptrA->user_area_sol_posl_pclk + ((uint32_t)pGCRegs->Width/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk - 1;         
-   ptrA->user_area_eol_posl_pclk_p1    = ptrA->user_area_eol_posl_pclk + 1;
+   //if (FPA_proxim_is_flegx == 1)
+   //   ptrA->real_mode_active_pixel_dly = 11;       // valeur pour le fleGX
+   //else
+   //   ptrA->real_mode_active_pixel_dly = 11;       //(uint32_t)gFpaDebugRegA;
    
-   // stretching area
-   ptrA->stretch_area_sol_posl_pclk    = ptrA->user_area_eol_posl_pclk_p1;
-   ptrA->stretch_area_eol_posl_pclk    = ptrA->stretch_area_sol_posl_pclk + hh.pixnum_per_tap_per_mclk *(uint32_t)hh.line_stretch_mclk - 1;
-
-   // si ptrA->stretch_area_eol_posl_pclk < ptrA->stretch_area_sol_posl_pclk (ie largeur de zone nulle) alors le vhd comprend qu'il n'y a pas de zone d'étirement
-
-
+   if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_done == 1))   
+      ptrA->real_mode_active_pixel_dly  = (uint32_t) gFpaDebugRegA;
+   gFpaDebugRegA = (int32_t)ptrA->real_mode_active_pixel_dly;  
+   
+   //
+   ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * (ptrA->ysize + hh.fovh_line) + 1;                    //
+   
+   ptrA->active_line_start_num             = 1;                    // pour le isc0207A, numero de la première ligne active
+   ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le isc0207A, numero de la derniere ligne active
+   
    // nombre d'échantillons par canal  de carte ADC
-   ptrA->pix_samp_num_per_ch           = (uint32_t)((float)ADC_SAMPLING_RATE_HZ/(hh.pclk_rate_hz));
+   ptrA->pix_samp_num_per_ch               = (uint32_t)(((float)ADC_SAMPLING_RATE_HZ)/(hh.pclk_rate_hz));
    
+   // identificateurs de trames
+   ptrA->sof_posf_pclk                     = ptrA->line_period_pclk * (ptrA->active_line_start_num - 1) + 1;
+   ptrA->eof_posf_pclk                     = ptrA->active_line_end_num * ptrA->line_period_pclk - hh.lovh_mclk*hh.pixnum_per_tap_per_mclk;
+   ptrA->sol_posl_pclk                     = 1;
+   ptrA->eol_posl_pclk                     = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk;
+   ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
+
    // echantillons choisis
-   ptrA->good_samp_first_pos_per_ch    = ptrA->pix_samp_num_per_ch;     // position premier echantillon
-   ptrA->good_samp_last_pos_per_ch     = ptrA->pix_samp_num_per_ch;     // position dernier echantillon
-   ptrA->hgood_samp_sum_num            = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
-   ptrA->hgood_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
-   ptrA->vgood_samp_sum_num            = 1;
-   ptrA->vgood_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);                              
+   ptrA->good_samp_first_pos_per_ch        = ptrA->pix_samp_num_per_ch;     // position premier echantillon
+   ptrA->good_samp_last_pos_per_ch         = ptrA->pix_samp_num_per_ch;     // position dernier echantillon
+   ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
+   ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
+   ptrA->vgood_samp_sum_num                = 1;
+   ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);    
+   
+   // calculs
+   ptrA->ysize_div2_m1 = ptrA->ysize/2 - 1;
+   ptrA->xsize_div_tapnum = ptrA->xsize/FPA_NUMTAPS;
    
    // les DACs (1 à 8)
-   ProximCfg.vdac_value[0]             = FLEG_VccVoltage_To_DacWord(5500.0F, 1);           // DAC1 -> VPOS_OUT à 5.5V
-   ProximCfg.vdac_value[1]             = FLEG_VccVoltage_To_DacWord(5500.0F, 2);           // DAC2 -> VPOS     à 5.5V
-   ProximCfg.vdac_value[2]             = FLEG_VccVoltage_To_DacWord(5500.0F, 3);           // DAC3 -> VPOS_UC  à 5.5V
-   ProximCfg.vdac_value[4]             = FLEG_VccVoltage_To_DacWord(2050.0F, 5);           // DAC5 -> VOS      à 1.95V   (ajustable)
-   ProximCfg.vdac_value[7]             = FLEG_VccVoltage_To_DacWord(5500.0F, 8);           // DAC8 -> VPD      à 5.5V
+   ptrA->vdac_value[0]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 1);           // DAC1 -> VPOS_OUT à 5.5V
+   ptrA->vdac_value[1]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 2);           // DAC2 -> VPOS     à 5.5V
+   ptrA->vdac_value[2]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 3);           // DAC3 -> VPOS_UC  à 5.5V
+   //ptrA->vdac_value[3]                     = FLEG_VccVoltage_To_DacWord(3000.0F, 4);           // DAC4 -> VOUTREF  à 3.0V   (ajustable)
+   ptrA->vdac_value[4]                     = FLEG_VccVoltage_To_DacWord(2050.0F, 5);           // DAC5 -> VOS      à 1.95V   (ajustable)
+   //ptrA->vdac_value[5]                     = FLEG_VccVoltage_To_DacWord(4250.0F, 6);           // DAC6 -> VDETCOM  à 4.25V  (ajustable)
+   //ptrA->vdac_value[6]                     = FLEG_VccVoltage_To_DacWord( 500.0F, 7);           // DAC7 -> INREF    à 501 mV (ajustable)
+   ptrA->vdac_value[7]                     = FLEG_VccVoltage_To_DacWord(5500.0F, 8);           // DAC8 -> VPD      à 5.5V
    
    // Reference of the tap (VCC4)      
-   if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
+   if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
    {
       if ((gFpaDetectorElectricalTapsRef >= (float)ISC0207_REF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)ISC0207_REF_VOLTAGE_MAX_mV))
-         ProximCfg.vdac_value[3] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 4);  //
+         ptrA->vdac_value[3] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 4);  //
    }                                                                                                       
-   presentElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[3], 4);          
-   gFpaDetectorElectricalTapsRef = presentElectricalTapsRef;
+   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[3], 4);          
+   gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;
    
    // VdetCom Voltage (VCC6)
-   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
+   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
    {
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)ISC0207_VDETCOM_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)ISC0207_VDETCOM_VOLTAGE_MAX_mV))
-         ProximCfg.vdac_value[5] = (int32_t) FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // vdetCom change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+         ptrA->vdac_value[5] = (int32_t) FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // vdetCom change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
    }
-   presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[5], 6));
-   gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                    
+   actualPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[5], 6));
+   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                    
    
    // offset of the tap_reference (VCC7)      
-   if (gFpaDetectorElectricalRefOffset != presentElectricalRefOffset)
+   if (gFpaDetectorElectricalRefOffset != actualElectricalRefOffset)
    {
       if ((gFpaDetectorElectricalRefOffset >= (float)ISC0207_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)ISC0207_REFOFS_VOLTAGE_MAX_mV))
-         ProximCfg.vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 7);  // 
+         ptrA->vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 7);  // 
 	}                                                                                                       
-   presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[6], 7);            
-   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
+   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ptrA->vdac_value[6], 7);            
+   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
    
-   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1))
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;
+   // phase de l'horloge des quads
+   if ((gFpaDebugRegD != (int32_t) ptrA->quad_clk_phase[0]) && (init_done == 1))
+   {
+      ptrA->quad_clk_phase[0] = (uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[1] = (uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[2] = (uint32_t)gFpaDebugRegD;
+      ptrA->quad_clk_phase[3] = (uint32_t)gFpaDebugRegD;
+   }
+   gFpaDebugRegD = (int32_t)ptrA->quad_clk_phase[0];
+   
+  // additional exposure time offset coming from flash 
+  ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ); 
 
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1))
-      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
-    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;
-   
-   // autres    
-   ptrA->boost_mode              = 0;   // n'est plus utilisé                
-   ptrA->adc_clk_pipe_sync_pos   = 2;   // n'est plus utilisé
-   
-   // correction electronique // registreA : // pour le ISC0207, on ne peut corriger que l'offset électronique puisque le flex/flegx comprend toujours la pin OUTR reliée au detecteur. Ce qui n'Est pas le cas du 0804
-   if (init_done == 0){
-      if (Stat.flegx_present == 1)
-         gFpaDebugRegA = 5;
-      else
-         gFpaDebugRegA = 5;
-   }
-   
-   elcorr_reg = (uint32_t)gFpaDebugRegA;
-   
-   if (ptrA->fpa_diag_mode == 1)
-      elcorr_reg = 0;
-	  
-   if ((elcorr_reg == 7) && (Stat.flegx_present == 1)){         // pixeldata avec correction du gain et offset electroniques
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 1;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_NORMAL_OP;  // pas necessaire
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->sat_ctrl_en             = 1;
-   }
-    
-   else if ((elcorr_reg == 6) && (Stat.flegx_present == 1)){    // voutref data avec correction du gain et offset electroniques
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 1;
-      ptrA->roic_cst_output_mode    = 1;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->sat_ctrl_en             = 1;                      
-   }
-   
-   else if (elcorr_reg == 5){    // pixeldata avec correction de l'offset électronique seulement
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 0;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_NORMAL_OP;     
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_PATH1;         
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_PATH1;         
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_PATH1;         
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_NORMAL_OP;     
-      ptrA->sat_ctrl_en             = 1;                            
-   }
- 
-   else if ((elcorr_reg == 3) && (Stat.flegx_present == 1)){    // image map de la difference des references
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 0;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_PATH1;    
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_PATH1;    
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_PATH2;    
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_PATH1;    
-      ptrA->sat_ctrl_en             = 0;                       
-   }                                                         
-    
-   else if ((elcorr_reg == 2)&& (Stat.flegx_present == 1)){   // image map de la reference 2 (1 dans le vhd)
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 0;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_PATH1; // pas necessaire
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_PATH2;                  
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_PATH1;                  
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_PATH2;                  
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_PATH1;                  
-      ptrA->sat_ctrl_en             = 0;                                     
-   }
-    
-   else if (elcorr_reg == 1){    // image map de la reference 1 (0 dans le vhd)
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 0;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_PATH2;                    
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_PATH1;  // pas necessaire 
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_PATH1;                    
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_PATH1;                    
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_PATH1;                    
-      ptrA->sat_ctrl_en             = 0;                                     
-   }
-
-   else if (elcorr_reg == 0){    // desactivation de toute correction electronique
-      elcorr_enabled                = 0;
-      elcorr_gain_corr_enabled      = 0;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_PATH1;                    
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_PATH2; // pas necessaire  
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_PATH1;                    
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_PATH1;                    
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_PATH1;                        
-      ptrA->sat_ctrl_en             = 0;                                             
-   } 
-  
-   // Electronic chain correction parameters
-   if (elcorr_gain_corr_enabled == 1){
-      elcorr_atemp_gain = (((float)ELCORR_TARGET_ADCCNT_AT_SATURATION - (float)ELCORR_TARGET_ADCCNT_AT_STARVATION) * ((float)ELCORR_MEASURED_ADCCNT_FOR_REF0 - (float)ELCORR_MEASURED_ADCCNT_FOR_REF1)/((float)ELCORR_MEASURED_ADCCNT_AT_SATURATION - (float)ELCORR_MEASURED_ADCCNT_AT_STARVATION));
-      elcorr_atemp_ofs  = (float)ELCORR_TARGET_ADCCNT_AT_SATURATION - elcorr_atemp_gain * ((float)ELCORR_MEASURED_ADCCNT_AT_SATURATION - (float)ELCORR_MEASURED_ADCCNT_FOR_REF0)/((float)ELCORR_MEASURED_ADCCNT_FOR_REF0 - (float)ELCORR_MEASURED_ADCCNT_FOR_REF1);
-   }
-   else {
-      elcorr_atemp_gain = 1.0F;
-      elcorr_atemp_ofs  = (float)ELCORR_TARGET_ADCCNT_AT_STARVATION -  ((float)ELCORR_MEASURED_ADCCNT_AT_STARVATION - (float)ELCORR_MEASURED_ADCCNT_FOR_REF0);
-   }  
-  
-   // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = hh.itr_tri_min_usec;
-   
-   ptrA->elcorr_enabled                       = elcorr_enabled;
-   ptrA->elcorr_pix_faked_value_forced        = 0;              
-   ptrA->elcorr_pix_faked_value               = 0;                        
-   
-   // reference 0:                                              
-   ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               
-   ptrA->elcorr_ref_cfg_0_null_forced         = 0;              
-   ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 2;        
-   ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
-   ptrA->elcorr_ref_cfg_0_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_0_samp_num_per_ch - (ptrA->elcorr_ref_cfg_0_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
-   ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
-   ptrA->elcorr_ref_cfg_0_samp_mean_numerator = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_0_samp_num_per_ch);     
-   ptrA->elcorr_ref_cfg_0_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF0_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //      
-    
-   // reference 1: 
-   ptrA->elcorr_ref_cfg_1_ref_enabled         = Stat.flegx_present;  // on active la reference 2 ssi on est rn présence d'un fleG            
-   ptrA->elcorr_ref_cfg_1_null_forced         = 0;              
-   ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = 2;        
-   ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
-   ptrA->elcorr_ref_cfg_1_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_1_samp_num_per_ch - (ptrA->elcorr_ref_cfg_1_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
-   ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
-   ptrA->elcorr_ref_cfg_1_samp_mean_numerator = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_1_samp_num_per_ch);     
-   ptrA->elcorr_ref_cfg_1_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF1_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //
-   
-   ptrA->elcorr_ref_dac_id                    = (uint32_t)ELCORR_REF_DAC_ID;  //       
-   ptrA->elcorr_atemp_gain                    = (int32_t)elcorr_atemp_gain;      
-   ptrA->elcorr_atemp_ofs                     = (int32_t)elcorr_atemp_ofs;
-   
-   // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
-   if (cfg_num == 255)  // protection contre depassement
-      cfg_num = 0;   
-   cfg_num++;
-   
-   ptrA->cfg_num  = (uint32_t)cfg_num;
-   
-   ptrA->elcorr_gain_cont_calc_mode = 0;
-   if ((((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2 >= (uint32_t)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
-      ||((elcorr_gain_corr_enabled == 1) && (ptrA->roic_cst_output_mode == 1)))
-      ptrA->elcorr_gain_cont_calc_mode = 1;
-   
-   ptrA->dac_free_running_mode = ptrA->elcorr_gain_cont_calc_mode;
-   
-   // desactivation en mode patron de tests
-   if (ptrA->fpa_diag_mode == 1){
-      ptrA->elcorr_enabled = 0;
-      ptrA->elcorr_gain_cont_calc_mode = 0;
-	   ptrA->dac_free_running_mode = 0;
-	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
-	   ptrA->elcorr_ref_cfg_1_ref_enabled = 0;	  
-   }
-   
-   // additional exposure time offset coming from flash 
-   ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
- 
-   // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
-   FPA_SendProximCfg(&ProximCfg, ptrA);
-   
-   WriteStruct(ptrA);   
+  WriteStruct(ptrA);   
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -682,68 +459,44 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
-   
+
    extern int32_t gFpaExposureTimeOffset;
 
-
-   // on ne fait jamais de fast windowing avec le M2K
-   speedup_unused_area           = 0;
-   
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 2.0F;
    ptrH->fpa_delay_mclk          = 6.0F;   // FPA: delai de sortie des pixels après integration
    
-   ptrH->vhd_delay_mclk          = 2.55F;
+   ptrH->vhd_delay_mclk          = 6.0F;   // estimation des differerents delais accumulés par le vhd
+   if ((uint32_t)FPA_MCLK_RATE_HZ == 5000000) 
+      ptrH->vhd_delay_mclk       = 2.55F;
       
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 0.0F;
    ptrH->fovh_line               = 0.0F;
-  
+   
    ptrH->tsh_min_usec            = 7.8F;
    ptrH->trst_min_usec           = 0.2F;
+   if ((uint32_t)FPA_MCLK_RATE_HZ == 5000000){
+      ptrH->tsh_min_usec         = 7.8F;
+      ptrH->trst_min_usec        = 0.2F;
+   }
    
-   ptrH->line_stretch_mclk       = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
-   if ((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX)
-    ptrH->line_stretch_mclk      = 0.0;
-
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
    ptrH->int_time_offset_usec    = 0.8F + (float)gFpaExposureTimeOffset*(1E+6F/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);  // offset du temps d'integration
    
-   ptrH->adc_sync_dly_mclk       = 0.0F;
-   
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
-    
    
-   /*--------------------- CALCULS-------------------------------------------------------------
-      Attention aux modifs en dessous de cette ligne! Y bien réfléchir avant de les faire
-   -----------------------------------------------------------------------------------------  */
    
-   // fast windowing
-   ptrH->unused_area_clock_factor =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
-   
-   // fenetre qui sera demandée au ROIC du FPA
-   ptrH->roic_xsize     = (float)pGCRegs->Width;
-   ptrH->roic_ysize     = (float)pGCRegs->Height;
-   ptrH->roic_xstart    = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage
-   ptrH->roic_ystart    = ((float)FPA_HEIGHT_MAX - ptrH->roic_ysize)/2.0F;         // à cause du centrage
-      
    // readout time
-   //readout part1 (zone en slow_clock)
-   ptrH->readout_mclk         = ((float)pGCRegs->Width /(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
-   
-   //readout part2 (zone à rejeter en fast clock)
-   ptrH->readout_mclk         = ptrH->readout_mclk + (1.0F/ptrH->unused_area_clock_factor)*((ptrH->roic_xsize - (float)pGCRegs->Width)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
-
-   //readout part5 (coût du synchronisateur)
-   ptrH->readout_mclk         = ptrH->readout_mclk + ptrH->adc_sync_dly_mclk*(float)pGCRegs->Height;
+   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
    ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
    ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
    ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec;
+   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
    
    // fsync_high_min
    ptrH->fsync_high_min_usec  = ptrH->trst_min_usec + 0.6F;
@@ -858,8 +611,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->errors_latchs           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x3C);
    Stat->adc_ddc_detect_process_done   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x50);
    Stat->adc_ddc_present               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x54);
-   Stat->flex_flegx_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
-   Stat->flex_flegx_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
+   Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
+   Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
    Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
    Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
@@ -871,11 +624,56 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
    Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
-   Stat->flegx_present                 =(Stat->flex_flegx_present & Stat->adc_brd_spare);
    
-   Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
-   Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
-   Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
+   //  Stat->fpa_trig_ctrl_mode            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
+   //  Stat->xsize                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x94);
+   //  Stat->ysize                         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x98);
+   //  Stat->misc                          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x9C);
+   //  Stat->real_mode_active_pixel_dly    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA0);
+   //  Stat->line_period_pclk              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);
+   //  Stat->readout_pclk_cnt_max          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
+   //  Stat->active_line_start_num         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xAC);
+   //  Stat->active_line_end_num           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB0);
+   //  Stat->pix_samp_num_per_ch           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB4);
+   //  Stat->sof_posf_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);
+   //  Stat->eof_posf_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
+   //  Stat->sol_posl_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
+   //  Stat->eol_posl_pclk                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC4);
+   //  Stat->eol_posl_pclk_p1              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC8);
+   //  Stat->hgood_samp_sum_num            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xCC);
+   //  Stat->hgood_samp_mean_numerator     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD0);
+   //  Stat->vgood_samp_sum_num            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD4);
+   //  Stat->vgood_samp_mean_numerator     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xD8);
+   //  Stat->good_samp_first_pos_per_ch    = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xDC);
+   //  Stat->good_samp_last_pos_per_ch     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE0);
+   //  Stat->xsize_div_tapnum              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE4);
+   //  Stat->ysize_div2_m1                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xE8);
+   //  Stat->readout_plus_delay            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xEC);
+   //  Stat->tri_window_and_intmode_part   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xF0);
+   //  Stat->int_time_offset               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xF4);
+   //  Stat->tsh_min                       = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xF8);
+   //  Stat->tsh_min_minus_int_time_offset = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xFC);
+   
+   // verification des statuts en simulation
+   #ifdef SIM
+      PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
+      PRINTF("Stat->adc_analog_channel_num   = %d\n", Stat->adc_analog_channel_num);
+      PRINTF("Stat->adc_resolution           = %d\n", Stat->adc_resolution);
+      PRINTF("Stat->adc_brd_spare            = %d\n", Stat->adc_brd_spare);
+      PRINTF("Stat->ddc_fpa_roic             = %d\n", Stat->ddc_fpa_roic );
+      PRINTF("Stat->ddc_brd_spare            = %d\n", Stat->ddc_brd_spare);
+      PRINTF("Stat->flex_fpa_roic            = %d\n", Stat->flex_fpa_roic);
+      PRINTF("Stat->flex_fpa_input           = %d\n", Stat->flex_fpa_input);
+      PRINTF("Stat->flex_ch_diversity_num    = %d\n", Stat->flex_ch_diversity_num );
+      PRINTF("Stat->cooler_volt_min_mV       = %d\n", Stat->cooler_volt_min_mV);
+      PRINTF("Stat->cooler_volt_max_mV       = %d\n", Stat->cooler_volt_max_mV);
+      PRINTF("Stat->fpa_temp_raw             = %d\n", Stat->fpa_temp_raw);
+      PRINTF("Stat->global_done              = %d\n", Stat->global_done);
+      PRINTF("Stat->fpa_powered              = %d\n", Stat->fpa_powered);
+      PRINTF("Stat->cooler_powered           = %d\n", Stat->cooler_powered);
+      PRINTF("Stat->errors_latchs            = %d\n", Stat->errors_latchs);
+   #endif  
+   
 }
 
 
@@ -956,19 +754,4 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
    VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
    
    return VccVoltage_mV;
-}
-
-//------------------------------------------------
-// Envoi de la config des dacs et autres
-//-----------------------------------------------
-void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
-{
-   uint8_t ii = 0;
-
-   // envoi comfig des Dacs
-   while(ii < TOTAL_DAC_NUM)
-   {
-      AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  
-      ii++;
-   }
 }

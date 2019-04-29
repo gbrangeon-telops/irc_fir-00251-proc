@@ -3,11 +3,11 @@
  *
  * interface driver implementation.
  *
- * $Rev: 23147 $
- * $Author: elarouche $ ecloutier
- * $Date: 2019-04-01 14:32:59 -0400 (lun., 01 avr. 2019) $   4 décembre 2017
- * $Id: RpOpticalProtocol.h 23147 2019-04-01 18:32:59Z elarouche $
- * $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/Zoom/Driver/RpOpticalProtocol.h $ .../FIR-00251-Proc/src/Zoom/RpOpticalProtocol.h
+ * $Rev$
+ * $Author$ ecloutier
+ * $Date$   4 décembre 2017
+ * $Id$
+ * $URL$ .../FIR-00251-Proc/src/Zoom/RpOpticalProtocol.h
  *
  * (c) Copyright 2014 Telops Inc.
  */
@@ -21,7 +21,6 @@
 #include "IRC_status.h"
 #include "verbose.h"
 #include "Xintc.h"
-#include "CircularUART.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -162,7 +161,7 @@ typedef struct
    uint8_t           dataBuf[22];
    uint8_t           dataCount;
    uint8_t           builtInTest;         // Error flags from a Bit Response
-   circularUART_t    theUart;
+   XUartNs550        theUart;
    circByteBuffer_t  responses;
    uint8_t           rawBytes[64];        // raw bytes (circBuffer_t responses) received from the UART interrupt handler
 }rpCtrl_t;

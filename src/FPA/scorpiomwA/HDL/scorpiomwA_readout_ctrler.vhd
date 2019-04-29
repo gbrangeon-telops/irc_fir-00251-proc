@@ -103,13 +103,13 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    
    
-   --   -- attribute dont_touch : string;
-   --   -- attribute dont_touch of sof_pipe         : signal is "true"; 
-   --   -- attribute dont_touch of eof_pipe         : signal is "true";
-   --   -- attribute dont_touch of sol_pipe         : signal is "true"; 
-   --   -- attribute dont_touch of eol_pipe         : signal is "true";
-   --   -- attribute dont_touch of fval_pipe        : signal is "true"; 
-   --   -- attribute dont_touch of lval_pipe        : signal is "true";
+   --   attribute dont_touch : string;
+   --   attribute dont_touch of sof_pipe         : signal is "true"; 
+   --   attribute dont_touch of eof_pipe         : signal is "true";
+   --   attribute dont_touch of sol_pipe         : signal is "true"; 
+   --   attribute dont_touch of eol_pipe         : signal is "true";
+   --   attribute dont_touch of fval_pipe        : signal is "true"; 
+   --   attribute dont_touch of lval_pipe        : signal is "true";
    
 begin
    
@@ -221,9 +221,7 @@ begin
             readout_info_i.naoi.start        <= elec_ofs_start_i;
             readout_info_i.naoi.stop         <= elec_ofs_end_i;
             readout_info_i.naoi.dval         <= elec_ofs_fval_i;
-            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i;
-            
-            readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elec_ofs_fval_i;      
             
          end if;
       end if;

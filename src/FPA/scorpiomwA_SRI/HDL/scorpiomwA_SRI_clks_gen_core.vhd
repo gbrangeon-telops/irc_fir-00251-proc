@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22828 $
---!   $Author: enofodjie $
---!   $Date: 2019-02-09 10:45:11 -0500 (sam., 09 févr. 2019) $
---!   $Id: scorpiomwA_SRI_clks_gen_core.vhd 22828 2019-02-09 15:45:11Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/scorpiomwA_SRI/HDL/scorpiomwA_SRI_clks_gen_core.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
@@ -80,8 +80,8 @@ architecture rtl of scorpiomwA_SRI_clks_gen_core is
    attribute iob : string;
    attribute iob of quad_clk_iob: signal is "true";
    
-   -- attribute dont_touch : string;
-   -- attribute dont_touch of quad_clk_iob: signal is "true";
+   attribute dont_touch : string;
+   attribute dont_touch of quad_clk_iob: signal is "true";
    
 begin
    

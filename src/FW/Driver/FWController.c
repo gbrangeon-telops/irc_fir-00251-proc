@@ -6,9 +6,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision: 22650 $
--- $Author: pcouture $
--- $LastChangedDate: 2018-12-13 15:30:18 -0500 (jeu., 13 déc. 2018) $
+-- $Revision$
+-- $Author$
+-- $LastChangedDate$
 --
 -------------------------------------------------------------------------------
 --
@@ -410,7 +410,7 @@ void FW_ControllerProcess()
    if (prevPosition != gcRegsData.FWPosition)
    {
       HDER_UpdateFWPositionHeader(&gHderInserter, gcRegsData.FWPosition);
-         prevPosition = gcRegsData.FWPosition;
+      prevPosition = gcRegsData.FWPosition;
 
       FW_INF("Updating FWPosition in header (%d)", gcRegsData.FWPosition);
    }
@@ -943,30 +943,30 @@ static bool FWVelocityMode(bool reset, bool newTarget )
 
             if (FH_readValue(FH_instance, &value))
             {
-               StopTimer(&FW_commTimer);
-               FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
+                  StopTimer(&FW_commTimer);
+                  FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
-               FW_INF("Current Velocity : %d", value);
-               if( (value > ( currentTarget - FW_VEL_THRESHOLD)) && (value < ( currentTarget + FW_VEL_THRESHOLD)))
-               {
-                  FW_INF("Target Velocity Reached\n");
-
-                  if ((FW_RequestedTarget < FW_VEL_THRESHOLD) && (lastTarget > FW_VEL_THRESHOLD))
+                  FW_INF("Current Velocity : %d", value);
+                  if( (value > ( currentTarget - FW_VEL_THRESHOLD)) && (value < ( currentTarget + FW_VEL_THRESHOLD)))
                   {
-                     velMode = VELOCITY_SET_GAIN; // Fast to Slow, apply PID settings after speed changed
-                     FW_PRINTF("VELOCITY_SET_GAIN\n");
+                     FW_INF("Target Velocity Reached\n");
+
+                     if ((FW_RequestedTarget < FW_VEL_THRESHOLD) && (lastTarget > FW_VEL_THRESHOLD))
+                     {
+                        velMode = VELOCITY_SET_GAIN; // Fast to Slow, apply PID settings after speed changed
+                        FW_PRINTF("VELOCITY_SET_GAIN\n");
+                     }
+                     else
+                     {
+                        velMode = VELOCITY_READY_MODE; // Slow to Fast, Fast to Fast or Slow to Slow: don't need PID settings changes or PID settings changes already applied
+                        FW_PRINTF("VELOCITY_READY_MODE\n");
+                     }
                   }
                   else
                   {
-                     velMode = VELOCITY_READY_MODE; // Slow to Fast, Fast to Fast or Slow to Slow: don't need PID settings changes or PID settings changes already applied
-                     FW_PRINTF("VELOCITY_READY_MODE\n");
+                     velMode = VELOCITY_PAUSE_QUERY_MODE;
+                     StartTimer(&FW_commTimer, FAULHABER_VELOCITY_QUERY_PAUSE);
                   }
-               }
-               else
-               {
-                  velMode = VELOCITY_PAUSE_QUERY_MODE;
-                  StartTimer(&FW_commTimer, FAULHABER_VELOCITY_QUERY_PAUSE);
-               }
 
             }
             else if (TimedOut(&FW_commTimer))
@@ -1015,7 +1015,7 @@ static bool FWVelocityMode(bool reset, bool newTarget )
  */
 static bool FWPositionMode(bool reset, bool newTarget)
 {
-   static FW_positionMode_t posMode = POSITION_SET_GAIN;
+   static FW_positionMode_t posMode = POSITION_HOMECMD_MODE;
    bool ready = false;
    int32_t newSetpoint, correctionMove;
    uint32_t maxTolerance;
@@ -1047,17 +1047,9 @@ static bool FWPositionMode(bool reset, bool newTarget)
       {
          if (posMode == POSITION_READY_MODE)
          {
-            if (flashSettings.FWType == FW_SYNC)
-            {
-               verifyPos = false;
-               posMode = POSITION_QUERY_POS_MODE;
-               FW_PRINTF("POSITION_QUERY_POS_MODE\n");
-            }
-            else
-            {
-               posMode = POSITION_ENABLEMOTOR_MODE;
-               FW_PRINTF("POSITION_ENABLEMOTOR_MODE\n");
-            }
+            verifyPos = false;
+            posMode = POSITION_QUERY_POS_MODE;
+            FW_PRINTF("POSITION_QUERY_POS_MODE\n");
          }
       }
 
@@ -1092,10 +1084,10 @@ static bool FWPositionMode(bool reset, bool newTarget)
          else if (TimedOut(&FW_commTimer))
          {
             FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
-            FW_ERR("Time out while in POSITION_WAIT_SET_1RPM_ACK");
+            FW_ERR("Time out while in POSITION_WAIT_SET_0RPM_ACK");
             StopTimer(&FW_commTimer);
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+            posMode = POSITION_READY_MODE;
+            FW_PRINTF("POSITION_READY_MODE\n");
          }
          break;
 
@@ -1113,9 +1105,9 @@ static bool FWPositionMode(bool reset, bool newTarget)
          else if (TimedOut(&FW_commTimer))
          {
             FW_SetErrors(FW_ERR_FAULHABER_VEL_TIMEOUT);
-            FW_ERR("Timeout in POSITION_WAIT_SET_1RPM_NOTIFY (velocity = 1 not reached within the timeout period).");
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+            FW_ERR("Timeout in POSITION_WAIT_SET_0RPM (velocity = 0 not reached within the timeout period).");
+            posMode = POSITION_READY_MODE;
+            FW_PRINTF("POSITION_READY_MODE\n");
          }
          break;
       }
@@ -1139,57 +1131,19 @@ static bool FWPositionMode(bool reset, bool newTarget)
             StopTimer(&FW_commTimer);
             FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
-            if (flashSettings.FWType == FW_SYNC)
-            {
-               verifyPos = false;
-               posMode = POSITION_QUERY_POS_MODE;
-               FW_PRINTF("POSITION_QUERY_POS_MODE\n");
-            }
-            else
-            {
-               posMode = POSITION_ENABLEMOTOR_MODE;
-               FW_PRINTF("POSITION_ENABLEMOTOR_MODE\n");
-            }
+            verifyPos = false;
+            posMode = POSITION_QUERY_POS_MODE;
+            FW_PRINTF("POSITION_QUERY_POS_MODE\n");
          }
          else if (TimedOut(&FW_commTimer))
          {
             FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
             FW_PRINTF("FW: Timeout during POSITION_WAIT_SET_GAIN (no ACK).\n");
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+            posMode = POSITION_READY_MODE;
+            FW_PRINTF("POSITION_READY_MODE\n");
             StopTimer(&FW_commTimer);
          }
 
-         break;
-
-      case POSITION_ENABLEMOTOR_MODE:
-         StopTimer(&FW_commTimer);
-         if (setEnableDrive(FH_instance, true))
-         {
-            StartTimer(&FW_commTimer, FH_REQUEST_TIMEOUT);
-            posMode = POSITION_WAIT_ENABLEMOTOR_ACK;
-         }
-         break;
-
-      case POSITION_WAIT_ENABLEMOTOR_ACK:
-         numAck = FH_readAcks(FH_instance);
-         FH_clearAcks(FH_instance, numAck);
-
-         if (FH_numExpectedAcks(FH_instance) == 0)
-         {
-            StopTimer(&FW_commTimer);
-            verifyPos = false;
-            FW_PRINTF("POSITION_QUERY_POS_MODE\n");
-            posMode = POSITION_QUERY_POS_MODE;
-         }
-         else if (TimedOut(&FW_commTimer))
-         {
-            FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
-            FW_ERR("Time out while in POSITION_WAIT_ENABLEMOTOR_ACK");
-            StopTimer(&FW_commTimer);
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
-         }
          break;
 
    case POSITION_QUERY_POS_MODE:
@@ -1262,16 +1216,16 @@ static bool FWPositionMode(bool reset, bool newTarget)
                   }
                   else
                   {
-                     posMode = POSITION_MOVE_DONE_MODE;
-                     FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+                     posMode = POSITION_READY_MODE;
+                     FW_PRINTF("POSITION_READY_MODE\n");
                   }
                }
                else
                {
                   if (backlashMode == false)
                   {
-                     posMode = POSITION_MOVE_DONE_MODE;
-                     FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+                     posMode = POSITION_READY_MODE;
+                     FW_PRINTF("POSITION_READY_MODE\n");
                   }
                   else
                   {
@@ -1293,16 +1247,16 @@ static bool FWPositionMode(bool reset, bool newTarget)
          {
             FW_SetErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
             FW_ERR("Timeout in POSITION_NEW_POS_MODE (requested value not returned).");
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+            posMode = POSITION_READY_MODE;
+            FW_PRINTF("POSITION_READY_MODE\n");
          }
       }
       else if (TimedOut(&FW_commTimer))
       {
          FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
          FW_ERR("Timeout during POSITION_WAIT_QUERY_POS (no ACK).");
-         posMode = POSITION_MOVE_DONE_MODE;
-         FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+         posMode = POSITION_READY_MODE;
+         FW_PRINTF("POSITION_READY_MODE\n");
          StopTimer(&FW_commTimer);
       }
 
@@ -1358,8 +1312,8 @@ static bool FWPositionMode(bool reset, bool newTarget)
             FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
             FW_ERR("Time out while in POSITION_NEWPOS_ACK_MODE");
             StopTimer(&FW_commTimer);
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
+            posMode = POSITION_READY_MODE;
+            FW_PRINTF("POSITION_READY_MODE\n");
          }
 
          break;
@@ -1378,54 +1332,10 @@ static bool FWPositionMode(bool reset, bool newTarget)
          {
             FW_SetErrors(FW_ERR_FAULHABER_POS_TIMEOUT);
             FW_ERR("Timeout in POSITION_WAIT_MODE (position not reached within the timeout period).");
-            posMode = POSITION_MOVE_DONE_MODE;
-            FW_PRINTF("POSITION_MOVE_DONE_MODE\n");
-         }
-
-         break;
-
-      case POSITION_MOVE_DONE_MODE:
-         if (flashSettings.FWType == FW_SYNC)
-         {
-            // Motor always enabled
             posMode = POSITION_READY_MODE;
             FW_PRINTF("POSITION_READY_MODE\n");
          }
-         else
-         {
-            // Disable motor
-            posMode = POSITION_DISABLEMOTOR_MODE;
-            FW_PRINTF("POSITION_DISABLEMOTOR_MODE\n");
-         }
-         break;
 
-      case POSITION_DISABLEMOTOR_MODE:
-         StopTimer(&FW_commTimer);
-         if (setEnableDrive(FH_instance, false))
-         {
-            StartTimer(&FW_commTimer, FH_REQUEST_TIMEOUT);
-            posMode = POSITION_WAIT_DISABLEMOTOR_ACK;
-         }
-         break;
-
-      case POSITION_WAIT_DISABLEMOTOR_ACK:
-         numAck = FH_readAcks(FH_instance);
-         FH_clearAcks(FH_instance, numAck);
-
-         if (FH_numExpectedAcks(FH_instance) == 0)
-         {
-            StopTimer(&FW_commTimer);
-            FW_PRINTF("POSITION_READY_MODE\n");
-            posMode = POSITION_READY_MODE;
-         }
-         else if (TimedOut(&FW_commTimer))
-         {
-            FW_SetErrors(FW_ERR_FAULHABERCOMM_TIMEOUT);
-            FW_ERR("Time out while in POSITION_WAIT_DISABLEMOTOR_ACK");
-            StopTimer(&FW_commTimer);
-            posMode = POSITION_READY_MODE;
-            FW_PRINTF("POSITION_READY_MODE\n");
-         }
          break;
 
       case POSITION_READY_MODE:
@@ -1472,7 +1382,7 @@ uint8_t FW_getFilterIndex(int32_t counts)
 
    for (i=0; i<FW_numberOfFilters; ++i)
    {
-         dist = FW_positionsLUT[i] - counts;
+      dist = FW_positionsLUT[i] - counts;
 
       if (dist > FW_COUNTS_IN_ONE_TURN/2)
          dist = dist - FW_COUNTS_IN_ONE_TURN;

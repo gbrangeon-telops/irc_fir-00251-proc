@@ -52,8 +52,7 @@ package FPA_define is
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE          : boolean   := false;    -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_LINE_SYNC_MODE                 : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
    constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';      -- pas besoin de config particulière au demarrage du ISC0209 
-   constant DEFINE_GENERATE_HPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
-   constant DEFINE_GENERATE_VPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.   
+   constant DEFINE_GENERATE_VPROCESSING_CHAIN         : std_logic := '0';      -- pour le isc0209, on peut ne fait plus de diversité de canaux doncn ne plus utiliser la chaine Vprocessing.
    constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '0';      -- pour le isc0209, on ne fait aucune correction électronique
    
    -- quelques caractéristiques du FPA
@@ -239,9 +238,8 @@ package FPA_define is
       -- les valeurs Vdac
       vdac_value                     : fleg_vdac_value_type;     -- calculé dans le MB pour dac(1) à dac(8)  -- dac6 -> VOS pour le skimming
       
-      -- adc clk_phase                    
-      adc_clk_source_phase           : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs 
-      adc_clk_pipe_sel               : unsigned(7 downto 0);
+      -- adc clk_phase
+      adc_clk_phase                  : unsigned(4 downto 0);     -- dit en coup de adc_clk, de combien déphaser l'horloge des ADCs
       
       -- reorder_column
       reorder_column                 : std_logic;
@@ -275,8 +273,6 @@ package FPA_define is
       
       -- gestion de la saturation basse et haute à la sortie du module fpa
       sat_ctrl_en                    : std_logic;
-      
-      cfg_num                        : unsigned(7 downto 0); 
       
    end record;    
    
@@ -369,7 +365,6 @@ package FPA_define is
    record
       aoi            : aoi_readout_info_type;        
       naoi           : non_aoi_readout_info_type;
-      samp_pulse     : std_logic; 
    end record;
    
    

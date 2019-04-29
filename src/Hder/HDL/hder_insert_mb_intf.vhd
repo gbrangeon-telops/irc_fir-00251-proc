@@ -154,7 +154,7 @@ begin
    
    areset <= not ARESETN;
    
-   --ERR <= error_found;
+   ERR <= error_found;
    
    -- mapping statuts 
    flagging_hder_ovfl   <=  STATUS(11);
@@ -320,7 +320,7 @@ begin
                   
                   hdr_rx_mosi.awvalid <= '0';
                   hdr_rx_mosi.wvalid <= '0';
-                  if axi_wstrb = "1111" then  -- c'Est obligatoire d'envoyer les données sur 32 bits
+                  if axi_wstrb = "1111" then  -- c'Est obligatoir d'envoyer les données sur 32 bits
                      case axi_awaddr(7 downto 0) is 
                         -- elements de config
                         when X"00" => 
@@ -417,7 +417,7 @@ begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then       
             ERR <= '0';
-            --din_ovfl_sync  <= '0';
+            din_ovfl_sync  <= '0';
             --fw_hder_ovfl_sync  <= '0';
             --trig_hder_ovfl_sync  <= '0';
             --fpa_hder_ovfl_sync  <= '0';

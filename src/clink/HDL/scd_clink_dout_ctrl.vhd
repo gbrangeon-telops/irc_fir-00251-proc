@@ -3,19 +3,17 @@
 --!   @brief : Reorder data of the SCD Camera Link channels
 --!   @details
 --!
---!   $Rev: 23386 $
---!   $Author: odionne $
---!   $Date: 2019-04-25 15:01:20 -0400 (jeu., 25 avr. 2019) $
---!   $Id: scd_clink_dout_ctrl.vhd 23386 2019-04-25 19:01:20Z odionne $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/clink/HDL/scd_clink_dout_ctrl.vhd $
+--!   $Rev$
+--!   $Author$
+--!   $Date$
+--!   $Id$
+--!   $URL$
 ------------------------------------------------------------------
 
 
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.proxy_define.all;
-use work.fpa_define.all;
 
 entity scd_clink_dout_ctrl is
    port(
@@ -56,10 +54,7 @@ architecture rtl of scd_clink_dout_ctrl is
 begin
    
    ch0_reset_sync : sync_reset port map(CLK => CH0_CLK, ARESET => CH0_ARESET, SRESET => ch0_sreset);
-   CH1_RESET : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-   begin
-      ch1_reset_sync : sync_reset port map(CLK => CH1_CLK, ARESET => CH1_ARESET, SRESET => ch1_sreset);
-   end generate;
+   ch1_reset_sync : sync_reset port map(CLK => CH1_CLK, ARESET => CH1_ARESET, SRESET => ch1_sreset);
    
    -------------------
    -- Input signals --
@@ -67,11 +62,8 @@ begin
    ch0_din_i <= CH0_DIN;
    ch0_fval  <= CH0_DIN(6);
    
-   CH1_INPUTS : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
-   begin
-      ch1_din_i <= CH1_DIN;
-      ch1_fval  <= CH1_DIN(6);
-   end generate;
+   ch1_din_i <= CH1_DIN;
+   ch1_fval  <= CH1_DIN(6);
    
    
    -----------------------------
@@ -91,35 +83,26 @@ begin
       end if;
    end process;
    
-   CH1_ENABLE : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
+   CH1_ENABLE : process(CH1_CLK)
    begin
-      process(CH1_CLK)
-      begin
-         if rising_edge(CH1_CLK) then
-            if ch1_sreset = '1' then
-               ch1_output_en <= '0';
-            else
-               -- Output is enabled/disabled only when FVAL is low to make sure frames are complete
-               if ch1_fval = '0' then
-                  ch1_output_en <= CH1_DVAL_IN;
-               end if;
+      if rising_edge(CH1_CLK) then
+         if ch1_sreset = '1' then
+            ch1_output_en <= '0';
+         else
+            -- Output is enabled/disabled only when FVAL is low to make sure frames are complete
+            if ch1_fval = '0' then
+               ch1_output_en <= CH1_DVAL_IN;
             end if;
          end if;
-      end process;
+      end if;
+   end process;
    
-      Usync: process(CH0_CLK)
-      begin
-         if rising_edge(CH0_CLK) then
-            g_output_en <= ch0_output_en and ch1_output_en;
-         end if;
-      end process;
-   
-   end generate;
-   
-   CH1_DISABLE : if PROXY_CLINK_CHANNEL_NUM = 1 generate	
+   Usync: process(CH0_CLK)
    begin
-      g_output_en <= ch0_output_en;
-   end generate;
+      if rising_edge(CH0_CLK) then
+         g_output_en <= ch0_output_en and ch1_output_en;
+      end if;
+   end process;
    
    ----------------------
    -- Output processes --
@@ -163,47 +146,44 @@ begin
       end if;
    end process;
    
-   CH1_OUTPUT : if PROXY_CLINK_CHANNEL_NUM = 2 generate	
+   CH1_OUTPUT : process(CH1_CLK)
    begin
-      process(CH1_CLK)
-      begin
-         if rising_edge(CH1_CLK) then
-            CH1_DOUT(0)  <=  ch1_din_i(24); --Video2(8)  
-            CH1_DOUT(1)  <=  ch1_din_i(20); --Video2(9)         
-            CH1_DOUT(2)  <=  ch1_din_i(16); --Video2(10)        
-            CH1_DOUT(3)  <=  ch1_din_i(12); --Video2(11)        
-            CH1_DOUT(4)  <=  ch1_din_i(8); --Video2(12)        
-            CH1_DOUT(5)  <=  ch1_din_i(23); --Video2(15)        
-            CH1_DOUT(6)  <=  ch1_din_i(4); --Video2(13)        
-            CH1_DOUT(7)  <=  '0'; --Spare             
-            CH1_DOUT(8)  <=  '0'; --Spare             
-            CH1_DOUT(9)  <=  '0'; --Spare             
-            CH1_DOUT(10) <=  '0'; --Spare             
-            CH1_DOUT(11) <=  '0'; --Spare             
-            CH1_DOUT(12) <=  '0'; --Spare             
-            CH1_DOUT(13) <=  '0'; --Spare             
-            CH1_DOUT(14) <=  '0'; --Spare             
-            CH1_DOUT(15) <=  '0'; --Spare             
-            CH1_DOUT(16) <=  '0'; --Spare             
-            CH1_DOUT(17) <=  '0'; --Spare             
-            CH1_DOUT(18) <=  '0'; --Spare             
-            CH1_DOUT(19) <=  '0'; --Spare             
-            CH1_DOUT(20) <=  '0'; --Spare             
-            CH1_DOUT(21) <=  '0'; --Spare             
-            CH1_DOUT(22) <=  '0'; --Spare
-            -- Enable/disable only the control signals
-            if g_output_en = '1' then
-               CH1_DOUT(23) <=  ch1_din_i(3); --Spare/Header   
-               CH1_DOUT(24) <=  ch1_din_i(10); --Lval           
-               CH1_DOUT(25) <=  ch1_din_i(6); --Fval           
-               CH1_DOUT(26) <=  ch1_din_i(2); --Dval
-            else
-               CH1_DOUT(26 downto 23) <= (others => '0');
-            end if;
-            CH1_DOUT(27) <=  ch1_din_i(27); --Video2(14)
+      if rising_edge(CH1_CLK) then
+         CH1_DOUT(0)  <=  ch1_din_i(24); --Video2(8)  
+         CH1_DOUT(1)  <=  ch1_din_i(20); --Video2(9)         
+         CH1_DOUT(2)  <=  ch1_din_i(16); --Video2(10)        
+         CH1_DOUT(3)  <=  ch1_din_i(12); --Video2(11)        
+         CH1_DOUT(4)  <=  ch1_din_i(8); --Video2(12)        
+         CH1_DOUT(5)  <=  ch1_din_i(23); --Video2(15)        
+         CH1_DOUT(6)  <=  ch1_din_i(4); --Video2(13)        
+         CH1_DOUT(7)  <=  '0'; --Spare             
+         CH1_DOUT(8)  <=  '0'; --Spare             
+         CH1_DOUT(9)  <=  '0'; --Spare             
+         CH1_DOUT(10) <=  '0'; --Spare             
+         CH1_DOUT(11) <=  '0'; --Spare             
+         CH1_DOUT(12) <=  '0'; --Spare             
+         CH1_DOUT(13) <=  '0'; --Spare             
+         CH1_DOUT(14) <=  '0'; --Spare             
+         CH1_DOUT(15) <=  '0'; --Spare             
+         CH1_DOUT(16) <=  '0'; --Spare             
+         CH1_DOUT(17) <=  '0'; --Spare             
+         CH1_DOUT(18) <=  '0'; --Spare             
+         CH1_DOUT(19) <=  '0'; --Spare             
+         CH1_DOUT(20) <=  '0'; --Spare             
+         CH1_DOUT(21) <=  '0'; --Spare             
+         CH1_DOUT(22) <=  '0'; --Spare
+         -- Enable/disable only the control signals
+         if g_output_en = '1' then
+            CH1_DOUT(23) <=  ch1_din_i(3); --Spare/Header   
+            CH1_DOUT(24) <=  ch1_din_i(10); --Lval           
+            CH1_DOUT(25) <=  ch1_din_i(6); --Fval           
+            CH1_DOUT(26) <=  ch1_din_i(2); --Dval
+         else
+            CH1_DOUT(26 downto 23) <= (others => '0');
          end if;
-      end process;
-   end generate;
+         CH1_DOUT(27) <=  ch1_din_i(27); --Video2(14)
+      end if;
+   end process;
    
    
 end rtl;

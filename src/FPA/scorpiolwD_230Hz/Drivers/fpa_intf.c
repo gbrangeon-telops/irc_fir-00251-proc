@@ -288,17 +288,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    
-   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(((hh.T0)* (hh.TMCLK) - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   if (ptrA->fpa_diag_mode == 0)  
+   {
+      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;    
+      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)(((hh.T0)* (hh.TMCLK) - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   }
+   else    // en mode diag utiliser MODE_INT_END_TO_TRIG_START pour que le mode diag ne soit pas plus rapide que le mode réel 
+   {   
+	   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)(((hh.T0)* (hh.TMCLK) - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // hh.T0 est la periode avec temps d'intégration nul
+   }
    ptrA->fpa_acq_trig_period_min   = (uint32_t)(0.8F*(hh.T0)* (hh.TMCLK)* (float)FPA_VHD_INTF_CLK_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)MGLK_XTRA_TRIG_FREQ_MAX_HZ);                      // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
    ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly);
-      
-   if (ptrA->fpa_diag_mode == 1)
-   {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car la diag_mode est plus lent que le détecteur 
-      ptrA->fpa_acq_trig_ctrl_dly     = 0; 
-   }
    
    #ifdef SIM
       ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
@@ -463,8 +465,8 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->errors_latchs           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x3C);
    Stat->adc_ddc_detect_process_done   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x50);
    Stat->adc_ddc_present               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x54);
-   Stat->flex_flegx_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
-   Stat->flex_flegx_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
+   Stat->flex_detect_process_done      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x58);
+   Stat->flex_present                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x5C);
    Stat->id_cmd_in_error               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x60);
    Stat->fpa_serdes_done               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x64);
    Stat->fpa_serdes_success            = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x68);
@@ -476,11 +478,27 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->fpa_serdes_edges[3]           = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x7C);
    Stat->fpa_init_done                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x80);
    Stat->fpa_init_success              = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x84);
-   Stat->flegx_present                 =(Stat->flex_flegx_present & Stat->adc_brd_spare);
    
-   Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
-   Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
-   Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90); 
+   // verification des statuts en simulation
+   #ifdef SIM
+      PRINTF("Stat->adc_oper_freq_max_khz    = %d\n", Stat->adc_oper_freq_max_khz);
+      PRINTF("Stat->adc_analog_channel_num   = %d\n", Stat->adc_analog_channel_num);
+      PRINTF("Stat->adc_resolution           = %d\n", Stat->adc_resolution);
+      PRINTF("Stat->adc_brd_spare            = %d\n", Stat->adc_brd_spare);
+      PRINTF("Stat->ddc_fpa_roic             = %d\n", Stat->ddc_fpa_roic );
+      PRINTF("Stat->ddc_brd_spare            = %d\n", Stat->ddc_brd_spare);
+      PRINTF("Stat->flex_fpa_roic            = %d\n", Stat->flex_fpa_roic);
+      PRINTF("Stat->flex_fpa_input           = %d\n", Stat->flex_fpa_input);
+      PRINTF("Stat->flex_ch_diversity_num    = %d\n", Stat->flex_ch_diversity_num );
+      PRINTF("Stat->cooler_volt_min_mV       = %d\n", Stat->cooler_volt_min_mV);
+      PRINTF("Stat->cooler_volt_max_mV       = %d\n", Stat->cooler_volt_max_mV);
+      PRINTF("Stat->fpa_temp_raw             = %d\n", Stat->fpa_temp_raw);
+      PRINTF("Stat->global_done              = %d\n", Stat->global_done);
+      PRINTF("Stat->fpa_powered              = %d\n", Stat->fpa_powered);
+      PRINTF("Stat->cooler_powered           = %d\n", Stat->cooler_powered);
+      PRINTF("Stat->errors_latchs            = %d\n", Stat->errors_latchs);
+   #endif  
+   
 }
 
 
