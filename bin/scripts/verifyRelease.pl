@@ -19,28 +19,31 @@ my $storageReleaseInfoFile1;
 my $storageReleaseInfoFile2;
 my $procReleaseInfoFile;
 my $releaseLogFile;
+my $fpgaSize;
 
 GetOptions("bf=s" => \$buildInfoFile,
       "of=s" => \$outputReleaseInfoFile,
       "sf1=s" => \$storageReleaseInfoFile1,
-	  "sf2=s" => \$storageReleaseInfoFile2,
+      "sf2=s" => \$storageReleaseInfoFile2,
       "pf=s" => \$procReleaseInfoFile,
-      "rf=s" => \$releaseLogFile)
+      "rf=s" => \$releaseLogFile,
+      "size=s" => \$fpgaSize)
    or die("Error in command line arguments\n");
 
 my $error = 0;
 
 # Parse build info file
 my $buildInfoFileStr = read_file($buildInfoFile);
+my $buildInfoFileSubstr = substr($buildInfoFileStr, index($buildInfoFileStr, $fpgaSize));
 my $buildInfoHardware;
 my $buildInfoSoftware;
 my $buildInfoBootLoader;
 my $buildInfoCommon;
 
-if ($buildInfoFileStr =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $buildInfoHardware = $1; } else { $error = 1; }
-if ($buildInfoFileStr =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $buildInfoSoftware = $1; } else { $error = 1; }
-if ($buildInfoFileStr =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $buildInfoBootLoader = $1; } else { $error = 1; }
-if ($buildInfoFileStr =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $buildInfoCommon = $1; } else { $error = 1; }
+if ($buildInfoFileSubstr =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $buildInfoHardware = $1; } else { $error = 1; }
+if ($buildInfoFileSubstr =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $buildInfoSoftware = $1; } else { $error = 1; }
+if ($buildInfoFileSubstr =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $buildInfoBootLoader = $1; } else { $error = 1; }
+if ($buildInfoFileSubstr =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $buildInfoCommon = $1; } else { $error = 1; }
 
 if ($error == 1)
 {
