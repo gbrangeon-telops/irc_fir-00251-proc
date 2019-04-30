@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 11229
+ FREEID 11246
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -21,7 +21,7 @@ HEADER
   PAGECOUNT="2"
   TITLE="isc0207A_hw_driver"
  }
- SYMBOL "#default" "afpa_hw_driver_ctrler" "afpa_hw_driver_ctrler"
+ SYMBOL "work" "afpa_hw_driver_ctrler" "afpa_hw_driver_ctrler"
  {
   HEADER
   {
@@ -29,7 +29,7 @@ HEADER
    {
     #CUSTOM_NAME=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1502730637"
+    #MODIFIED="1556562244"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5eb496db-854f-4907-be0b-2093188aec3c"
    }
   }
@@ -38,7 +38,7 @@ HEADER
    PAGEHEADER
    {
     RECT (0,0,400,560)
-    FREEID 115
+    FREEID 116
    }
    
    BODY
@@ -49,7 +49,7 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (20,18,380,537)
+     AREA (20,16,380,537)
     }
     TEXT  15, 0, 0
     {
@@ -226,6 +226,14 @@ HEADER
      MARGINS (1,1)
      PARENT 112
      ORIENTATION 2
+    }
+    TEXT  115, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (138,450,375,474)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 114
     }
     PIN  14, 0, 0
     {
@@ -596,6 +604,22 @@ HEADER
      LINE  2, 0, 0
      {
       POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  114, 0, 0
+    {
+     COORD (400,460)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="HW_CFG_IN_PROGRESS"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
      }
     }
    }
@@ -4371,7 +4395,7 @@ PAGE ""
     #COMPONENT="afpa_hw_driver_ctrler"
     #CUSTOM_NAME=""
     #IMPL="rtl"
-    #LIBRARY="#default"
+    #LIBRARY="work"
     #NO_CONF="1"
     #REFERENCE="U4"
     #SYMBOL="afpa_hw_driver_ctrler"
@@ -5842,7 +5866,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  11212, 0, 0
+  TEXT  11229, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5853,7 +5877,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  11213, 0, 0
+  TEXT  11230, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5864,7 +5888,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  11214, 0, 0
+  TEXT  11231, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5874,7 +5898,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  11215, 0, 0
+  TEXT  11232, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5886,7 +5910,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  11216, 0, 0
+  TEXT  11233, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5899,7 +5923,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  11217, 0, 0
+  TEXT  11234, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5909,7 +5933,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  11218, 0, 0
+  TEXT  11235, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5921,7 +5945,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  11219, 0, 0
+  TEXT  11236, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5931,7 +5955,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  11220, 0, 0
+  TEXT  11237, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5942,7 +5966,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  11221, 0, 0
+  GROUP  11238, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1620,3201,2001)
@@ -5954,7 +5978,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  11222, 0, 0
+  GROUP  11239, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1820,3201,1821)
@@ -5966,7 +5990,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  11223, 0, 0
+  GROUP  11240, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1760,3201,1761)
@@ -5978,7 +6002,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  11224, 0, 0
+  GROUP  11241, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1880,3201,1881)
@@ -5990,7 +6014,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  11225, 0, 0
+  GROUP  11242, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1940,3201,1941)
@@ -6002,7 +6026,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  11226, 0, 0
+  GROUP  11243, 0, 0
   {
    PAGEALIGN 10
    RECT (2500,1620,2501,1761)
@@ -6013,7 +6037,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  11227, 0, 0
+  GROUP  11244, 0, 0
   {
    PAGEALIGN 10
    RECT (2500,1760,2501,2001)
@@ -6024,7 +6048,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  11228, 0, 0
+  BMPPICT  11245, 0, 0
   {
    PAGEALIGN 10
    RECT (2340,1680,2479,1725)

@@ -396,7 +396,7 @@ begin
          if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 
             exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
          else
-            --exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
          end if; 
          int_signal_high_time_i <= exp_time_pipe(4)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
                 

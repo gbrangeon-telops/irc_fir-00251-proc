@@ -3,10 +3,10 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 23353 $
---!   $Author: enofodjie $
---!   $Date: 2019-04-20 22:02:50 -0400 (sam., 20 avr. 2019) $
---!   $Id: isc0207A_elcorr_refs_ctrl.vhd 23353 2019-04-21 02:02:50Z enofodjie $
+--!   $Rev: 23409 $
+--!   $Author: elarouche $
+--!   $Date: 2019-04-29 11:34:38 -0400 (lun., 29 avr. 2019) $
+--!   $Id: isc0207A_elcorr_refs_ctrl.vhd 23409 2019-04-29 15:34:38Z elarouche $
 --!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/src/FPA/isc0207A/HDL/isc0207A_elcorr_refs_ctrl.vhd $
 ------------------------------------------------------------------
 
@@ -33,7 +33,9 @@ entity isc0207A_elcorr_refs_ctrl is
       REF_VALID         : out std_logic_vector(1 downto 0);
       REF_FEEDBK        : in std_logic_vector(1 downto 0);
       
-      DONE              : out std_logic      
+      HW_CFG_IN_PROGRESS: in std_logic;
+      
+      PROG_TRIG         : out std_logic      
       );
    
 end isc0207A_elcorr_refs_ctrl;
@@ -47,6 +49,14 @@ architecture rtl of isc0207A_elcorr_refs_ctrl is
          ARESET : in std_logic;
          SRESET : out std_logic;
          CLK    : in std_logic);
+   end component;
+   
+   component double_sync_vector is
+      port(
+         D     : in std_logic_vector;
+         Q     : out std_logic_vector;
+         CLK   : in std_logic
+         );
    end component;
    
    component Clk_Divider is
@@ -75,26 +85,37 @@ architecture rtl of isc0207A_elcorr_refs_ctrl is
    signal sec_counter               : integer range -5 to G_REF_CHANGE_PERIOD_SEC + 2;
    signal prog_event_pulse          : std_logic;
    signal actual_cfg_num            : unsigned(USER_CFG_IN.CFG_NUM'LENGTH-1 downto 0);
-   signal done_i                    : std_logic;
+   signal prog_trig_i               : std_logic;
    signal areset_i                  : std_logic;
-   signal elcorr_init_done_i        : std_logic;
+   signal ref_feedbk_i              : std_logic_vector(1 downto 0);
+   -- signal elcorr_init_done_i        : std_logic;
    
 begin
    
    USER_CFG_OUT <= user_cfg_o;
    REF_VALID <= ref_valid_i;
-   DONE <= done_i;   
+   PROG_TRIG <= prog_trig_i;   
    
    areset_i <= ARESET or FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1A : sync_reset
    port map(
       ARESET => areset_i,
       CLK    => CLK,
       SRESET => sreset
       ); 
+   
+   --------------------------------------------------
+   -- synchro feedback 
+   --------------------------------------------------    
+   U1B : double_sync_vector
+   port map(
+      CLK => CLK,
+      D   => REF_FEEDBK,
+      Q   => ref_feedbk_i
+      );
    
    --------------------------------------------------------
    -- cadence des changements de reference pour l'elcorr
@@ -164,9 +185,9 @@ begin
             elcorr_ref_value_reg <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id); -- pour une bonne initialisation et evitrer ainsi des bugs
             ctrl_fsm <= idle;
             ref_valid_i <= (others => '0');
-            actual_cfg_num <= (others => '0');
-            done_i <= USER_CFG_IN.COMN.FPA_DIAG_MODE;    -- necessaire pour que le mode diag fonctionne
-            elcorr_init_done_i <= '0';
+            actual_cfg_num <= not USER_CFG_IN.CFG_NUM;
+            prog_trig_i <= '0'; 
+            -- elcorr_init_done_i <= '0';
             
          else
             
@@ -177,7 +198,7 @@ begin
             case ctrl_fsm is
                
                when idle =>
-                  done_i <= elcorr_init_done_i;
+                  prog_trig_i <= '0';
                   if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then  
                      ctrl_fsm <= slct_ref_st;
                   end if;
@@ -198,7 +219,6 @@ begin
                   end if;
                
                when change_ref_st =>      -- on demande une programmation du dac des ref avec la valeur de ref correspondant à l'id actif 
-                  done_i <= USER_CFG_IN.DAC_FREE_RUNNING_MODE and elcorr_init_done_i;
                   elcorr_ref_value_reg <= USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE;
                   ref_valid_i <= "00"; -- plus aucune reference n'est valide puisqu'on s'apprête à reprogrammer les dacs
                   ctrl_fsm <= wait_done_st;
@@ -223,10 +243,11 @@ begin
                   ctrl_fsm <= wait_fdbk_st;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  if REF_FEEDBK(ref_id) = '1' then
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.DAC_FREE_RUNNING_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
+                  if ref_feedbk_i(ref_id) = '1' then
+                     prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
                      if ref_id = 0 then
                         ctrl_fsm <= idle;
-                        elcorr_init_done_i <= '1';
                      else
                         ctrl_fsm <= default_ref_st;  
                      end if;
