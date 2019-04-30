@@ -38,8 +38,6 @@ package FPA_define is
    constant MGLK_LVAL_TIMEOUT_MCLK        : integer   := 6;     -- ENO 19 nov 2015: pour corriger bug du Megalink avec son fval qui ne tombe jamais. Si le lval reste à '0' durant 6 MCLK, on suppose que l'image est terminée.  
    constant PROXY_CLINK_CHANNEL_NUM       : integer   := 2;     -- Number of channels in the Camera Link interface with the Megalink
    constant DEFINE_FPA_INIT_CFG_NEEDED    : std_logic := '0';   -- pas besoin de config particulière au demarrage du ScorpiomwD
-   constant DEFINE_DIAG_CLK_RATE_MAX_KHZ  : integer    := integer(NUMBER_TAPS * (FPA_MCLK_RATE_HZ/1000) / 2);    -- vitesse max de l'horloge de sortie des pixels en mode diag (vitesse totale des sorties divisée par 2 canaux en mode diag 
-
    
    --------------------------------------------
    --  modes diag
@@ -53,6 +51,7 @@ package FPA_define is
    -- FPA : Nombre d'ADCs sur le FPA
    -------------------------------------------- 
    constant NUMBER_TAPS                   : natural := 4;
+   constant DEFINE_DIAG_CLK_RATE_MAX_KHZ  : integer := integer(NUMBER_TAPS * (FPA_MCLK_RATE_HZ/1000) / 2);    -- vitesse max de l'horloge de sortie des pixels en mode diag (vitesse totale des sorties divisée par 2 canaux en mode diag 
    
    ----------------------------------------------
    -- FPA 
