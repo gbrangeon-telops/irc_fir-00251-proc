@@ -29,7 +29,7 @@ entity hawkA_windowing_data_reg is
    port(
       ARESET        : in std_logic;
       CLK           : in std_logic;
-      FPA_INTF_CFG  : in fpa_intf_cfg_type;
+      USER_CFG      : in fpa_intf_cfg_type;
       TX_MISO       : in t_ll_ext_miso;
       TX_MOSI       : out t_ll_ext_mosi8;
       TX_DREM       : out std_logic_vector(3 downto 0);
@@ -142,11 +142,11 @@ begin
    --------------------------------------------------
    -- Etape 0: determiner les positions j, k, l, m et autres
    -------------------------------------------------- 
-   j_pos <= unsigned(FPA_INTF_CFG.JPOS(15 downto 0));              
-   k_pos <= unsigned(FPA_INTF_CFG.KPOS(15 downto 0));
-   l_pos <= unsigned(FPA_INTF_CFG.LPOS(15 downto 0));
-   m_pos <= unsigned(FPA_INTF_CFG.MPOS(15 downto 0));
-   wdr_len <= unsigned(FPA_INTF_CFG.WDR_LEN(15 downto 0));--to_unsigned(16,wdr_len'length); --
+   j_pos <= unsigned(USER_CFG.JPOS(15 downto 0));              
+   k_pos <= unsigned(USER_CFG.KPOS(15 downto 0));
+   l_pos <= unsigned(USER_CFG.LPOS(15 downto 0));
+   m_pos <= unsigned(USER_CFG.MPOS(15 downto 0));
+   wdr_len <= unsigned(USER_CFG.WDR_LEN(15 downto 0));--to_unsigned(16,wdr_len'length); --
    
    
    --------------------------------------------------
@@ -369,7 +369,7 @@ begin
                   when idle =>
                      sub_frame_sm_busy <= '0';
                      tx_drem_i <= "1000"; -- la taille de WDR en mode full vaut 1344 et c'est un multiple de 8                
-                     --if FPA_INTF_CFG.FPA_FULL_WINDOW = '1' or FPA_INTF_CFG.FPA_WDR_IGNORE_NULL = '1' then 
+                     --if USER_CFG.FPA_FULL_WINDOW = '1' or USER_CFG.FPA_WDR_IGNORE_NULL = '1' then 
                      tx_mosi_i <= fifo_tx_mosi;                        
                      --else
                      --   tx_mosi_i <= fifo_tx_mosi;

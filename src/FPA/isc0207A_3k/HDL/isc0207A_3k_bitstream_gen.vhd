@@ -62,7 +62,7 @@ architecture rtl of isc0207A_3k_bitstream_gen is
    signal spi_data_i          : std_logic_vector(63 downto 0);
    signal new_roic_cfg        : std_logic_vector(63 downto 0) := (others => '0');
    signal sreset              : std_logic;
-   signal actual_roic_cfg     : std_logic_vector(63 downto 0);
+   signal present_roic_cfg     : std_logic_vector(63 downto 0);
    signal roic_cfg_changed    : std_logic_vector(7 downto 0);
    signal new_roic_cfg_pending: std_logic;
    signal done_i              : std_logic;
@@ -76,13 +76,13 @@ architecture rtl of isc0207A_3k_bitstream_gen is
    signal mclk_falling_edge   : std_logic;
    
    signal new_aoi_cfg         : area_cfg_type;
-   signal actual_aoi_cfg      : area_cfg_type;
+   signal present_aoi_cfg      : area_cfg_type;
    signal aoi_cfg_changed     : std_logic_vector(1 downto 0);
    signal new_aoi_cfg_pending : std_logic;
    signal new_cfg_pending     : std_logic; 
    
    signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal actual_cfg_num      : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num      : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
    
@@ -185,7 +185,7 @@ begin
          -- detection du changement
          for ii in 0 to C_FPA_BITSTREAM_BYTE_NUM_M1 loop
             roic_cfg_changed(ii) <= '0';
-            if actual_roic_cfg(8*ii + 7 downto 8*ii) /= new_roic_cfg(8*ii + 7 downto 8*ii) then
+            if present_roic_cfg(8*ii + 7 downto 8*ii) /= new_roic_cfg(8*ii + 7 downto 8*ii) then
                roic_cfg_changed(ii) <= '1';
             end if;
          end loop;
@@ -213,12 +213,12 @@ begin
          new_aoi_cfg.eol_posl_pclk <= USER_CFG.USER_AREA.EOL_POSL_PCLK;
          
          -- detection du changement
-         if actual_aoi_cfg.sol_posl_pclk /= new_aoi_cfg.sol_posl_pclk then
+         if present_aoi_cfg.sol_posl_pclk /= new_aoi_cfg.sol_posl_pclk then
             aoi_cfg_changed(0) <= '1';
          else
             aoi_cfg_changed(0) <= '0';
          end if;
-         if actual_aoi_cfg.eol_posl_pclk /= new_aoi_cfg.eol_posl_pclk then
+         if present_aoi_cfg.eol_posl_pclk /= new_aoi_cfg.eol_posl_pclk then
             aoi_cfg_changed(1) <= '1';
          else
             aoi_cfg_changed(1) <= '0';
@@ -248,7 +248,7 @@ begin
          new_cfg_num <= USER_CFG.CFG_NUM;    
          
          -- detection du changement
-         if actual_cfg_num /= new_cfg_num then
+         if present_cfg_num /= new_cfg_num then
             new_cfg_num_pending <= '1';
          else
             new_cfg_num_pending <= '0';
@@ -314,7 +314,7 @@ begin
             done_i <= '0'; 
             rqst_i <= '0';
             cfg_fsm <= idle;
-            actual_roic_cfg(57) <= '0';   -- le bit 57 seul forcé à '0'  suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
+            present_roic_cfg(57) <= '0';   -- le bit 57 seul forcé à '0'  suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             new_cfg_pending <= '0';
             
          else    
@@ -362,15 +362,15 @@ begin
                   end if;  
                
                when update_roic_st =>
-                  actual_roic_cfg <= spi_data_i;
+                  present_roic_cfg <= spi_data_i;
                   cfg_fsm <= update_aoi_st;
                
                when update_aoi_st =>
-                  actual_aoi_cfg <= new_aoi_cfg;
+                  present_aoi_cfg <= new_aoi_cfg;
                   cfg_fsm <= update_cfg_num_st;
                
                when update_cfg_num_st =>
-                  actual_cfg_num <= new_cfg_num;
+                  present_cfg_num <= new_cfg_num;
                   cfg_fsm <= pause_st;
                
                when  pause_st =>

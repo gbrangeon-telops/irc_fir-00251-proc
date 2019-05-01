@@ -33,7 +33,7 @@ entity hawkA_dig_data_reg is
    port(
       ARESET       : in std_logic;
       CLK          : in std_logic;
-      FPA_INTF_CFG : in fpa_intf_cfg_type;
+      USER_CFG     : in fpa_intf_cfg_type;
       TX_MISO      : in t_ll_ext_miso;
       TX_MOSI      : out t_ll_ext_mosi8;
       TX_DREM      : out std_logic_vector(3 downto 0);
@@ -92,8 +92,8 @@ begin
             err_i <= '0'; 
          else 
             --valeur de dig lors des tests du fabricant = x"0138" pour HAWK_MW et x"0116" pour HAWK_LW  
-            ddr_reg(1) <= std_logic_vector(FPA_INTF_CFG.DIG_CODE(15 downto 8));--x"01";   -- (15 dwonto 8)->MSB 
-            ddr_reg(2) <= std_logic_vector(FPA_INTF_CFG.DIG_CODE(7 downto 0)); --x"38";   -- (7 dwonto 0) 
+            ddr_reg(1) <= std_logic_vector(USER_CFG.DIG_CODE(15 downto 8));--x"01";   -- (15 dwonto 8)->MSB 
+            ddr_reg(2) <= std_logic_vector(USER_CFG.DIG_CODE(7 downto 0)); --x"38";   -- (7 dwonto 0) 
             if unsigned(ddr_reg(1)(7 downto 1)) /= 0 then  --erreur defini dans le manuel de l'usager de Hawk
                err_i <= '1';
             end if;

@@ -39,7 +39,7 @@ entity hawkA_windowing_ctrl_reg is
    port(
       ARESET       : in std_logic;
       CLK          : in std_logic;
-      FPA_INTF_CFG : in fpa_intf_cfg_type;
+      USER_CFG     : in fpa_intf_cfg_type;
       TX_MISO      : in t_ll_ext_miso;
       TX_MOSI      : out t_ll_ext_mosi8;
       TX_DREM      : out std_logic_vector(3 downto 0);

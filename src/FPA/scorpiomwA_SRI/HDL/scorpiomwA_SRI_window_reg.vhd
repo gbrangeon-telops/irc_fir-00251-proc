@@ -63,7 +63,7 @@ architecture rtl of scorpiomwA_SRI_window_reg is
    signal spi_data_i          : std_logic_vector(39 downto 0);
    signal new_cfg             : std_logic_vector(39 downto 0);
    signal sreset              : std_logic;
-   signal actual_cfg          : std_logic_vector(39 downto 0);
+   signal present_cfg          : std_logic_vector(39 downto 0);
    signal cfg_changed         : std_logic_vector(4 downto 0);
    signal new_cfg_pending     : std_logic;
    signal done_i              : std_logic;
@@ -121,7 +121,7 @@ begin
          -- detection du changement
          for ii in 0 to 4 loop
             cfg_changed(ii) <= '0';
-            if actual_cfg(8*ii + 7 downto 8*ii) /= new_cfg(8*ii + 7 downto 8*ii) then
+            if present_cfg(8*ii + 7 downto 8*ii) /= new_cfg(8*ii + 7 downto 8*ii) then
                cfg_changed(ii) <= '1';
             end if;
          end loop;
@@ -149,7 +149,7 @@ begin
             itr_i <= FPA_INTF_CFG.ITR;                  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             uprow_upcol_i <= FPA_INTF_CFG.UPROW_UPCOL;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             sizea_sizeb_i <= FPA_INTF_CFG.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
-            actual_cfg(39) <= '1';   -- le bit 39 seul forcé à '1'. Cela suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
+            present_cfg(39) <= '1';   -- le bit 39 seul forcé à '1'. Cela suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             error_i <= '0';
             
          else    
@@ -227,7 +227,7 @@ begin
                   roic_cfg_fsm <= update_reg_st;   --même si error_i arrive on met quand même à jour la conmfig pour sortir de cet état sinon risque de planter la camera
                
                when update_reg_st =>
-                  actual_cfg <= "000" & itr_i & uprow_upcol_i & sizea_sizeb_i & spi_data_i(33 downto 0);
+                  present_cfg <= "000" & itr_i & uprow_upcol_i & sizea_sizeb_i & spi_data_i(33 downto 0);
                   roic_cfg_fsm <= pause_st; 
                
                when  pause_st =>

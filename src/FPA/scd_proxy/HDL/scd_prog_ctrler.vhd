@@ -93,7 +93,7 @@ architecture rtl of scd_prog_ctrler is
    signal fpa_new_cfg_pending       : std_logic;
    signal user_cfg_in_progress_i    : std_logic;
    signal new_cfg                   : fpa_intf_cfg_type;
-   signal actual_cfg                : fpa_intf_cfg_type;
+   signal present_cfg                : fpa_intf_cfg_type;
    signal fpa_intf_cfg_i            : fpa_intf_cfg_type;
    signal fpa_ser_cfg_to_update     : fpa_intf_cfg_type;
    signal serial_en_i               : std_logic;
@@ -215,28 +215,28 @@ begin
             case new_cfg_pending_fsm is			  
                
                when check_cfg_st1 =>
-                  if new_cfg.scd_op /= actual_cfg.scd_op then
+                  if new_cfg.scd_op /= present_cfg.scd_op then
                      new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                
                when check_cfg_st2 =>
-                  if new_cfg.scd_int /= actual_cfg.scd_int then
+                  if new_cfg.scd_int /= present_cfg.scd_int then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;  
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_diag /= actual_cfg.scd_diag then
+                  if new_cfg.scd_diag /= present_cfg.scd_diag then
                      new_cfg_pending_fsm <= new_diag_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;
                   end if;
                
                when check_cfg_st4 =>
-                  if new_cfg.scd_temp /= actual_cfg.scd_temp then
+                  if new_cfg.scd_temp /= present_cfg.scd_temp then
                      new_cfg_pending_fsm <= new_temp_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st1;
@@ -432,9 +432,9 @@ begin
             cfg_updater_fsm <=  idle;
             cfg_updater_done <= '0';           
             proxy_static_done <= '0';
-            actual_cfg.scd_op.scd_xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
-            actual_cfg.scd_temp.scd_temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
-            actual_cfg.scd_diag.scd_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset
+            present_cfg.scd_op.scd_xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
+            present_cfg.scd_temp.scd_temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
+            present_cfg.scd_diag.scd_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset
             
          else                       
             
@@ -501,24 +501,24 @@ begin
                   fpa_intf_cfg_i.scd_op <= fpa_ser_cfg_to_update.scd_op;
                   fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;
                   fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_CHANNEL_NUM;
-                  actual_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
-                  actual_cfg.scd_int.scd_int_time <= to_unsigned(SCD_OP_INT_TIME_DEFAULT_FACTOR, actual_cfg.scd_int.scd_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
+                  present_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
+                  present_cfg.scd_int.scd_int_time <= to_unsigned(SCD_OP_INT_TIME_DEFAULT_FACTOR, present_cfg.scd_int.scd_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
                   proxy_static_done <= '1';
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_int <= fpa_ser_cfg_to_update.scd_int;
-                  actual_cfg.scd_int <= fpa_ser_cfg_to_update.scd_int;  
+                  present_cfg.scd_int <= fpa_ser_cfg_to_update.scd_int;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_diag_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_diag <= fpa_ser_cfg_to_update.scd_diag;
-                  actual_cfg.scd_diag <= fpa_ser_cfg_to_update.scd_diag;  
+                  present_cfg.scd_diag <= fpa_ser_cfg_to_update.scd_diag;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_temp_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_temp <= fpa_ser_cfg_to_update.scd_temp;
-                  actual_cfg.scd_temp <= fpa_ser_cfg_to_update.scd_temp; 
+                  present_cfg.scd_temp <= fpa_ser_cfg_to_update.scd_temp; 
                   cfg_updater_fsm <= pause_st1;   
                
                when pause_st1 =>                                -- fait expres pour donner du temps à new_cfg_pending de tomber

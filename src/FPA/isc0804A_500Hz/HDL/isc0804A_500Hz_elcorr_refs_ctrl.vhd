@@ -84,7 +84,7 @@ architecture rtl of isc0804A_500Hz_elcorr_refs_ctrl is
    signal prog_timer_pulse          : std_logic;
    signal sec_counter               : integer range -5 to G_REF_CHANGE_PERIOD_SEC + 2;
    signal prog_event_pulse          : std_logic;
-   signal actual_cfg_num            : unsigned(USER_CFG_IN.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num            : unsigned(USER_CFG_IN.CFG_NUM'LENGTH-1 downto 0);
    signal prog_trig_i               : std_logic;
    signal areset_i                  : std_logic;
    signal ref_feedbk_i              : std_logic_vector(1 downto 0);
@@ -163,7 +163,7 @@ begin
             end if;
             
             -- mode evenementiel : pulse de pog dès qu'une nouvelle cmd rentre (ce qui n'arrive qu'en mode non acquisition). On profite pour calculer le gain
-            if USER_CFG_IN.CFG_NUM /= actual_cfg_num then 
+            if USER_CFG_IN.CFG_NUM /= present_cfg_num then 
                prog_event_pulse <= '1';
             else
                prog_event_pulse <= '0';
@@ -185,7 +185,7 @@ begin
             elcorr_ref_value_reg <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id); -- pour une bonne initialisation et evitrer ainsi des bugs
             ctrl_fsm <= idle;
             ref_valid_i <= (others => '0');
-            actual_cfg_num <= not USER_CFG_IN.CFG_NUM;
+            present_cfg_num <= not USER_CFG_IN.CFG_NUM;
             prog_trig_i <= '0'; 
             -- elcorr_init_done_i <= '0';
             
@@ -256,7 +256,7 @@ begin
                
                when default_ref_st =>          -- on remet la reference par defaut (ref_id = 0)
                   ref_id <= 0;
-                  actual_cfg_num <= USER_CFG_IN.CFG_NUM; 
+                  present_cfg_num <= USER_CFG_IN.CFG_NUM; 
                   ctrl_fsm <= check_value_st;                  
                
                when others =>

@@ -105,7 +105,7 @@ architecture RTL of suphawkA_detector_ctrler is
    signal dcr_drem       : std_logic_vector(3 downto 0);
    
    signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal actual_cfg_num      : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
    
@@ -174,7 +174,7 @@ begin
          new_cfg_num <= USER_CFG.CFG_NUM;    
          
          -- detection du changement
-         if actual_cfg_num /= new_cfg_num then
+         if present_cfg_num /= new_cfg_num then
             new_cfg_num_pending <= '1';
          else
             new_cfg_num_pending <= '0';
@@ -200,7 +200,7 @@ begin
             dcr_mosi_i.support_busy <= '1';
             reg_rqst <= '0'; 
             dcr_drem <= "1000"; -- DCR est un registre à 8 bits 
-            actual_cfg_num <= not new_cfg_num;
+            present_cfg_num <= not new_cfg_num;
          else                   
             -- demande de programmtion en provenance des registres
             reg_rqst <= MCR_MOSI.DVAL or DDR_MOSI.DVAL or WDR_MOSI.DVAL; 
@@ -298,7 +298,7 @@ begin
                   
                   when second_pause_st =>                 -- on observe le delai tNH du manuel
                      cnt <= cnt + 1;
-                     actual_cfg_num <= new_cfg_num;
+                     present_cfg_num <= new_cfg_num;
                      if cnt =  C_SUPHAWK_TNH_DLY then
                         dcr_fsm <= what_else_st;
                      end if;

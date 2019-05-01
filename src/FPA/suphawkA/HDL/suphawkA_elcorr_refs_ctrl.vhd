@@ -74,7 +74,7 @@ architecture rtl of suphawkA_elcorr_refs_ctrl is
    signal prog_timer_pulse          : std_logic;
    signal sec_counter               : integer range -5 to G_REF_CHANGE_PERIOD_SEC + 2;
    signal prog_event_pulse          : std_logic;
-   signal actual_cfg_num            : unsigned(USER_CFG_IN.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num            : unsigned(USER_CFG_IN.CFG_NUM'LENGTH-1 downto 0);
    signal done_i                    : std_logic;
    signal areset_i                  : std_logic;
    signal nominal_prv_is_active     : std_logic;
@@ -144,7 +144,7 @@ begin
             end if;
             
             -- mode evenementiel : pulse de pog dès qu'une nouvelle cmd rentre (ce qui n'arrive qu'en mode non acquisition). On profite pour calculer le gain
-            if USER_CFG_IN.CFG_NUM /= actual_cfg_num then 
+            if USER_CFG_IN.CFG_NUM /= present_cfg_num then 
                prog_event_pulse <= '1';
             else
                prog_event_pulse <= '0';
@@ -169,7 +169,7 @@ begin
             reference_value_i <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id); -- pour une bonne initialisation et eviter ainsi des bugs
             ctrl_fsm <= idle;
             ref_valid_i <= (others => '0');
-            actual_cfg_num <= (others => '0');
+            present_cfg_num <= (others => '0');
             done_i <= USER_CFG_IN.COMN.FPA_DIAG_MODE;    -- necessaire pour que le mode diag fonctionne
             nominal_prv_is_active <= '1';
             elcorr_init_done_i <= '0';
@@ -259,7 +259,7 @@ begin
                   end if;
                
                when default_ref_st =>          -- on remet la valeur d'origine de PRV après exploitation du DAC y afférant
-                  actual_cfg_num <= USER_CFG_IN.CFG_NUM; 
+                  present_cfg_num <= USER_CFG_IN.CFG_NUM; 
                   ctrl_fsm <= nominal_value_st;
                
                when nominal_value_st =>      -- on initialise le registre de reference à la valeur nominale de PRV

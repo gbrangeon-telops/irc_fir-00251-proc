@@ -241,12 +241,12 @@ begin
             -- naoi : ENO: 22 avril 2019: dans les flags importants du naoi, rajouter toujours DEFINE_GENERATE_ELCORR_CHAIN pour eviter des bugs de non sortie d'images
             -- en clair ne jamais generer les signaux naoi si DEFINE_GENERATE_ELCORR_CHAIN = 0.
             -- REF_VALID n'est pas generé si DEFINE_GENERATE_ELCORR_CHAIN = 0 donc initule de rajouter DEFINE_GENERATE_ELCORR_CHAIN 
-            readout_info_i.naoi.ref_valid(1) <= REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
-            readout_info_i.naoi.ref_valid(0) <= REF_VALID(0);        -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)
-            readout_info_i.naoi.start        <= elcorr_ref_start_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.stop         <= elcorr_ref_end_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.dval         <= elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;        
+            readout_info_i.naoi.ref_valid(1) <= '0';        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
+            readout_info_i.naoi.ref_valid(0) <= '0';        -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)
+            readout_info_i.naoi.start        <= '0';
+            readout_info_i.naoi.stop         <= '0';
+            readout_info_i.naoi.dval         <= '0';
+            readout_info_i.naoi.samp_pulse   <= '0';        
             
             readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);
             

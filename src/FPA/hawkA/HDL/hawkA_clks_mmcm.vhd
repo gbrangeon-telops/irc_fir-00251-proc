@@ -80,7 +80,7 @@ architecture rtl of hawkA_clks_mmcm is
    signal sreset              : std_logic;
    signal mmcm_rdy_i          : std_logic;
    signal new_cfg_pending     : std_logic;
-   signal actual_adc_clk_phase: std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
+   signal present_adc_clk_phase: std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
    signal phase_cnt_i         : unsigned(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
    signal pause_cnt           : unsigned(25 downto 0);
    signal cfg_in_progress_i   : std_logic;
@@ -113,14 +113,14 @@ begin
             new_cfg_pending <= '0';
             cfg_in_progress_i <= '0';
             mmcm_locked_i <= '0';
-            actual_adc_clk_phase <= (others => '0');
+            present_adc_clk_phase <= (others => '0');
             mmcm_rst_i <= '1';
             
          else                      
             
             mmcm_locked_i <= not cfg_in_progress_i; 
             
-            if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= actual_adc_clk_phase then 
+            if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= present_adc_clk_phase then 
                new_cfg_pending <= '1';
             else
                new_cfg_pending <= '0';
@@ -191,7 +191,7 @@ begin
                   end if;               
                
                when update_cfg_st =>       -- mise à jour de la cfg
-                  actual_adc_clk_phase <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
+                  present_adc_clk_phase <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
                   pause_cnt <= pause_cnt + 1;
                   if pause_cnt(3) = '1' then 
                      cfg_sm <= idle; 

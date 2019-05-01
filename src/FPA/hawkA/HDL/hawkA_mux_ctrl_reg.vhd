@@ -39,7 +39,7 @@ entity hawkA_mux_ctrl_reg is
    port(
       ARESET        : in std_logic;
       CLK           : in std_logic;
-      FPA_INTF_CFG  : in fpa_intf_cfg_type;
+      USER_CFG      : in fpa_intf_cfg_type;
       TX_MISO       : in t_ll_ext_miso;
       TX_MOSI       : out t_ll_ext_mosi8;
       TX_DREM       : out std_logic_vector(3 downto 0); 
@@ -100,8 +100,8 @@ begin
             
             window_change_last <= WINDOW_CHANGE;         
             
-            mcr_reg(0) <= FPA_INTF_CFG.INVERT;    -- invert  ligne 1 to 512 OU ligne 512 to 1        
-            mcr_reg(1) <= FPA_INTF_CFG.REVERT;    -- revert  colonne 1 to 640 OU colonne 640 to 1 
+            mcr_reg(0) <= USER_CFG.INVERT;    -- invert  ligne 1 to 512 OU ligne 512 to 1        
+            mcr_reg(1) <= USER_CFG.REVERT;    -- revert  colonne 1 to 640 OU colonne 640 to 1 
             
             if YSIZE_MAX  = 512 then                      -- frame Ysize
                mcr_reg(2) <= '1'; 
@@ -115,10 +115,10 @@ begin
                mcr_reg(3) <= '0';   
             end if; 
             
-            mcr_reg(4) <= FPA_INTF_CFG.GAIN(0);       -- LSB gain
-            mcr_reg(5) <= FPA_INTF_CFG.GAIN(1);       -- MSB gain
+            mcr_reg(4) <= USER_CFG.GAIN(0);       -- LSB gain
+            mcr_reg(5) <= USER_CFG.GAIN(1);       -- MSB gain
             mcr_reg(6) <= '0';                            -- reserved (set low)
-            mcr_reg(7) <= FPA_INTF_CFG.CBIT_EN;       -- CBIT (enabled pour l'instant)  
+            mcr_reg(7) <= USER_CFG.CBIT_EN;       -- CBIT (enabled pour l'instant)  
             
          end if;  
       end if;
@@ -132,7 +132,7 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then 
-            mcr_reg_last <= (others => '0');      -- permet d'envoyer la config par defaut se trouvant sur FPA_INTF_CFG
+            mcr_reg_last <= (others => '0');      -- permet d'envoyer la config par defaut se trouvant sur USER_CFG
             mcr_fsm <= idle;
             tx_mosi_i.dval <= '0'; 
             tx_mosi_i.support_busy <= '1'; 

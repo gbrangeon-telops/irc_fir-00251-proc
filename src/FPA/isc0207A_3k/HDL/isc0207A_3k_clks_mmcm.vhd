@@ -126,7 +126,7 @@ architecture rtl of isc0207A_3k_clks_mmcm is
    signal clk_rdy_i           : std_logic;
    signal aresetn             : std_logic;
    signal new_cfg_pending     : std_logic;
-   signal actual_adc_clk_phase: std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
+   signal present_adc_clk_phase: std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
    signal pause_cnt           : unsigned(3 downto 0);
    signal cfg_in_progress_i   : std_logic;
    
@@ -192,13 +192,13 @@ begin
                new_cfg_pending <= '0';
                cfg_in_progress_i <= '0';
                mmcm_locked_i <= '0';
-               actual_adc_clk_phase <= (others => '0');
+               present_adc_clk_phase <= (others => '0');
                
             else                      
                
                mmcm_locked_i <= clk_rdy_i; 
                
-               if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= actual_adc_clk_phase then 
+               if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= present_adc_clk_phase then 
                   new_cfg_pending <= '1';
                else
                   new_cfg_pending <= '0';
@@ -268,7 +268,7 @@ begin
                      end if;
                   
                   when update_cfg_st =>
-                     actual_adc_clk_phase <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
+                     present_adc_clk_phase <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
                      pause_cnt <= pause_cnt + 1;
                      if pause_cnt(3) = '1' then 
                         cfg_sm <= idle; 

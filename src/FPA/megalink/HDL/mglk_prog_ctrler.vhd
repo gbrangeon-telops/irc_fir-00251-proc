@@ -106,7 +106,7 @@ architecture rtl of mglk_prog_ctrler is
    signal fpa_new_cfg_pending       : std_logic;
    signal user_cfg_in_progress_i    : std_logic;
    signal new_cfg                   : fpa_intf_cfg_type;
-   signal actual_cfg                : fpa_intf_cfg_type;
+   signal present_cfg                : fpa_intf_cfg_type;
    signal fpa_intf_cfg_i            : fpa_intf_cfg_type;
    signal serial_en_i               : std_logic;
    signal fpa_ser_cfg_latch         : fpa_intf_cfg_type;
@@ -253,14 +253,14 @@ begin
             case new_cfg_pending_fsm is			  
                
                when check_cfg_st1 =>
-                  if new_cfg.proxy_static /= actual_cfg.proxy_static then
+                  if new_cfg.proxy_static /= present_cfg.proxy_static then
                      new_cfg_pending_fsm <= new_static_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                
                when check_cfg_st2 =>
-                  if new_cfg.proxy_op /= actual_cfg.proxy_op then
+                  if new_cfg.proxy_op /= present_cfg.proxy_op then
                      new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;
@@ -270,7 +270,7 @@ begin
                   if MGLK_INT_SIGNAL_IS_EXTERNAL = '1' then
                      new_cfg_pending_fsm <= check_cfg_st4;
                   else                     
-                     if new_cfg.proxy_int /= actual_cfg.proxy_int then
+                     if new_cfg.proxy_int /= present_cfg.proxy_int then
                         new_cfg_pending_fsm <= new_int_cfg_st;					 
                      else
                         new_cfg_pending_fsm <= check_cfg_st4;  
@@ -278,21 +278,21 @@ begin
                   end if;
                
                when check_cfg_st4 =>
-                  if new_cfg.proxy_temp /= actual_cfg.proxy_temp then
+                  if new_cfg.proxy_temp /= present_cfg.proxy_temp then
                      new_cfg_pending_fsm <= new_temp_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st5;
                   end if;		
                
                when check_cfg_st5 =>
-                  if new_cfg.proxy_windw /= actual_cfg.proxy_windw then
+                  if new_cfg.proxy_windw /= present_cfg.proxy_windw then
                      new_cfg_pending_fsm <= new_windw_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st6;
                   end if;		
                
                when check_cfg_st6 =>
-                  if new_cfg.proxy_diag /= actual_cfg.proxy_diag then
+                  if new_cfg.proxy_diag /= present_cfg.proxy_diag then
                      new_cfg_pending_fsm <= new_diag_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st1;
@@ -532,11 +532,11 @@ begin
             cfg_updater_fsm <=  idle;
             cfg_updater_done <= '0';           
             proxy_static_done <= '0';
-            actual_cfg.proxy_op.proxy_gpol_mv <= (others => '0'); -- force la reprogrammation après un reset de power management   
-            actual_cfg.proxy_int.proxy_int_time <= (others => '0');  
-            actual_cfg.proxy_diag.proxy_test_pattern_activ <= '0'; 
-            actual_cfg.proxy_windw.proxy_xsize <= (others => '0');
-            actual_cfg.proxy_static.proxy_static_cmd_num <= (others => '0');
+            present_cfg.proxy_op.proxy_gpol_mv <= (others => '0'); -- force la reprogrammation après un reset de power management   
+            present_cfg.proxy_int.proxy_int_time <= (others => '0');  
+            present_cfg.proxy_diag.proxy_test_pattern_activ <= '0'; 
+            present_cfg.proxy_windw.proxy_xsize <= (others => '0');
+            present_cfg.proxy_static.proxy_static_cmd_num <= (others => '0');
             
          else                                  
             
@@ -615,35 +615,35 @@ begin
                
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_op <= fpa_ser_cfg_to_update.proxy_op;
-                  actual_cfg.proxy_op <= fpa_ser_cfg_to_update.proxy_op;
+                  present_cfg.proxy_op <= fpa_ser_cfg_to_update.proxy_op;
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_int <= fpa_ser_cfg_to_update.proxy_int;
-                  actual_cfg.proxy_int <= fpa_ser_cfg_to_update.proxy_int;  
+                  present_cfg.proxy_int <= fpa_ser_cfg_to_update.proxy_int;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_diag_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_diag <= fpa_ser_cfg_to_update.proxy_diag;
-                  actual_cfg.proxy_diag <= fpa_ser_cfg_to_update.proxy_diag;  
+                  present_cfg.proxy_diag <= fpa_ser_cfg_to_update.proxy_diag;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_windw_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_windw <= fpa_ser_cfg_to_update.proxy_windw;
                   fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.proxy_windw.proxy_ysize;
                   fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.proxy_windw.proxy_xsize / PROXY_CLINK_CHANNEL_NUM;
-                  actual_cfg.proxy_windw <= fpa_ser_cfg_to_update.proxy_windw;  
+                  present_cfg.proxy_windw <= fpa_ser_cfg_to_update.proxy_windw;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_static_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_static <= fpa_ser_cfg_to_update.proxy_static;
-                  actual_cfg.proxy_static <= fpa_ser_cfg_to_update.proxy_static;
+                  present_cfg.proxy_static <= fpa_ser_cfg_to_update.proxy_static;
                   proxy_static_done <= '1';     -- assure que le proxy est configurée avec la config statique. C'est important pour être certain par exemple qu'on est en mode Clibnk double base et non base.
                   cfg_updater_fsm <= pause_st1;
                
                when output_temp_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.proxy_temp <= fpa_ser_cfg_to_update.proxy_temp;
-                  actual_cfg.proxy_temp <= fpa_ser_cfg_to_update.proxy_temp; 
+                  present_cfg.proxy_temp <= fpa_ser_cfg_to_update.proxy_temp; 
                   cfg_updater_fsm <= pause_st1;   
                
                when pause_st1 =>                                -- fait expres pour donner du temps à new_cfg_pending de tomber
@@ -658,7 +658,7 @@ begin
             -- en mode full externe, le temps d'integration ci-dessous, surclasse tout temps d'integration 
             if MGLK_INT_SIGNAL_IS_EXTERNAL = '1' then 
                fpa_intf_cfg_i.proxy_int <= fpa_int_latch;
-               actual_cfg.proxy_int <= fpa_int_latch;
+               present_cfg.proxy_int <= fpa_int_latch;
             end if; 
             
          end if;

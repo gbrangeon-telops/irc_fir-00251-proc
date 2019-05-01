@@ -44,7 +44,7 @@ architecture rtl of isc0209A_mode_reg is
    signal mode_reg_i          : std_logic_vector(31 downto 0);
    signal new_mode_reg        : std_logic_vector(31 downto 0);
    signal sreset              : std_logic;
-   signal actual_mode_reg     : std_logic_vector(31 downto 0);
+   signal present_mode_reg     : std_logic_vector(31 downto 0);
    signal global_reset_i      : std_logic;
    
 begin
@@ -94,7 +94,7 @@ begin
          if sreset = '1' then
             mode_rqst_i <= '0';
             mode_cfg_fsm <= idle;
-            actual_mode_reg(31) <= '0';   -- le bit 31 seul forcé à '0'  suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
+            present_mode_reg(31) <= '0';   -- le bit 31 seul forcé à '0'  suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             global_reset_i <= '1';
          else    
             
@@ -103,7 +103,7 @@ begin
                
                when idle =>                -- en attente que le programmateur soit à l'écoute
                   mode_rqst_i <= '0';
-                  if actual_mode_reg /= new_mode_reg then
+                  if present_mode_reg /= new_mode_reg then
                      mode_cfg_fsm <= check_done_st; 
                   end if;
                
@@ -128,7 +128,7 @@ begin
                   end if;  
                
                when update_reg_st =>
-                  actual_mode_reg <= mode_reg_i;
+                  present_mode_reg <= mode_reg_i;
                   global_reset_i <= '0';               -- ainsi une seconde reprogrammation aura lieu mais cette fois avec global reste à '0'
                   mode_cfg_fsm <= idle;                  
                
