@@ -453,8 +453,8 @@ begin
             
             -- ADC_FLAGS
             -- flags temps reel enovoyés vers le synchronisateur d'adc pour time stamping des données ADC
-            adc_time_stamp.naoi_start        <= elcorr_ref_start_i;
-            adc_time_stamp.naoi_stop         <= elcorr_ref_end_i;
+            adc_time_stamp.naoi_start        <= elcorr_ref_start_i and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            adc_time_stamp.naoi_stop         <= elcorr_ref_end_iand elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
             adc_time_stamp.aoi_sof           <= WDOW_FIFO_DATA.USER.SOF and window_fifo_rd_i;
             adc_time_stamp.aoi_sol           <= WDOW_FIFO_DATA.USER.SOL and window_fifo_rd_i;
             
