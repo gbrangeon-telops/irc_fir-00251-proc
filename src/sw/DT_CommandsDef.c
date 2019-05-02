@@ -1012,10 +1012,10 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
       return IRC_FAILURE;
    }
 
-   BufferManager_GetStatus(&status, &gBufManager);
+   BufferManager_GetStatus(&gBufManager, &status);
 
    DT_PRINTF("buf.error          = 0x%08X", status.error);
-   //DT_PRINTF("buf.mem_ready      = %d", status.mem_ready);   //TODO: de-comment when connected in hdl
+   DT_PRINTF("buf.mem_ready      = %d", status.mem_ready);
    DT_PRINTF("buf.ext_buf_prsnt  = %d", status.ext_buf_prsnt);
 
    return IRC_SUCCESS;
@@ -2160,7 +2160,7 @@ static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf)
    }
 
    DeviceSerialPortFunctionAry[port] = DSPF_Terminal;
-   GC_SetDeviceSerialPortFunction(port);
+   GC_UpdateDeviceSerialPortFunction(port);
 
    DT_PRINTF("Debug terminal output set to %s.", argStr);
 
@@ -2362,10 +2362,10 @@ IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf)
 
    // Transmit to lens
    if (flashSettings.MotorizedLensType == MLT_RPOpticalODEM660)
-      {
+   {
       setAddress(&theRpCtrl, addr);       // toDo ECL Ajouter les valeurs -40deg et +80deg en extra
       writeData(&theRpCtrl, 2, buf);
-      }
+   }
 
    return IRC_SUCCESS;
 }
@@ -2390,7 +2390,7 @@ IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf)
    {
       DT_ERR("Unsupported command arguments");
       return IRC_FAILURE;
-      }
+   }
 
    DT_PRINTF("Lens look-up table");
    DT_PRINTF("rowIndex\tzoom\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tfoc%d\tDFocMin\tDFocMax\tfocLen",
