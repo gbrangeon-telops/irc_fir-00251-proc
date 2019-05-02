@@ -20,7 +20,6 @@
 #define __FPA_INTF_H__
 
 #include <stdint.h>
-#include "xbasic_types.h"  
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
@@ -110,8 +109,8 @@
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
-{					   
-   uint32_t  SIZE;                       
+{
+   uint32_t  SIZE;
    uint32_t  ADD;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
@@ -161,9 +160,9 @@ typedef struct s_FpaIntfConfig t_FpaIntf;
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
-{					            
+{
    // adc board (iddcas analogiques)
-   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253-XXX  (lié à l'ID)
+   uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
    uint32_t  adc_resolution;           // statut du built_in test de la carte ADC
    uint32_t  adc_brd_spare;            // spare de statut pour la carte ADC
