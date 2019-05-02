@@ -81,19 +81,20 @@ IRC_Status_t AEC_Init(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    XIntc * InterruptController = &gProcIntc;
 
    pAEC_CTRL->AEC_Mode = AEC_OFF;
-
    pAEC_CTRL->AEC_ImageFraction = (uint32_t)  (pGCRegs->SensorWidth * pGCRegs->SensorHeight * 0.5f); // 50% of the pixel by default
-
    pAEC_CTRL->AEC_MSB_Pos = AEC_GetMsbPos();
-
    pAEC_CTRL->AEC_clearmem = 1;
-
    pAEC_CTRL->AEC_NB_Bin = AEC_NB_BIN;
+   pAEC_CTRL->AEC_NewConfigFlag = 0;
 
    memset(AEC_TimeStamps_d1, 0, sizeof(AEC_TimeStamps_d1));
 
    //Write Struct to AEC
    WriteStruct(pAEC_CTRL);
+
+   // Toggle new config flag to AEC
+   AXI4L_write32(1, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
+   AXI4L_write32(0, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
 
    //REgister Interrupt and start intc process
    AEC_SetupInterruptSystem(InterruptController);
@@ -153,6 +154,9 @@ void AEC_UpdateMode(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    pAEC_CTRL->AEC_clearmem = 0;
    AXI4L_write32(pAEC_CTRL->AEC_clearmem, pAEC_CTRL->ADD + AEC_CLEARMEM_OFFSET);
 
+   // Toggle new config to AEC
+   AXI4L_write32(1, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
+   AXI4L_write32(0, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
 }
 
 /*--------------------------------------------------------- 
@@ -162,6 +166,11 @@ void AEC_UpdateImageFraction(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
 {
    pAEC_CTRL->AEC_ImageFraction =(uint32_t) ( pGCRegs->Height * pGCRegs->Width * (pGCRegs->AECImageFraction / 100.0f)); // IMAGE FRaction between 0 and 100
    AXI4L_write32(pAEC_CTRL->AEC_ImageFraction, pAEC_CTRL->ADD + AEC_IMAGEFRACTION_OFFSET);
+
+   // Toggle new config flag to AEC
+   AXI4L_write32(1, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
+   AXI4L_write32(0, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
+
 }
 
 /*--------------------------------------------------------- 

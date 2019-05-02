@@ -36,7 +36,9 @@ entity AEC_CUMSUM is
       IMAGE_FRACTION       : in std_logic_vector(23 downto 0); -- in pixel
       NB_BIN               : in std_logic_vector(15 downto 0);
       AEC_MODE             : in std_logic_vector(1 downto 0);
+      MSB_POS              : in std_logic_vector(1 downto 0);
       AEC_CTRL_CLEARMEM    : in std_logic;
+      NEW_CONFIG           : in std_logic;
       
       CUMSUM_ERROR         : out std_logic;
       
@@ -45,7 +47,8 @@ entity AEC_CUMSUM is
       -------------------------------- 
       HIST_RDY       : in std_logic;   
       HIST_CLEARMEM  : out std_logic;
-      AEC_RESET      : out std_logic;   
+      AEC_RESET      : out std_logic;
+      HIST_MSB_POS   : out std_logic_vector(1 downto 0);
       
       --------------------------------
       -- TMI INTERFACE
@@ -79,6 +82,18 @@ architecture RTL of AEC_CUMSUM is
          CLK                    : in std_logic);
    end component;
    
+   component double_sync
+      generic(
+         INIT_VALUE : bit := '0'
+     );
+      port(
+         D : in STD_LOGIC;
+         Q : out STD_LOGIC := '0';
+         RESET : in STD_LOGIC;
+         CLK : in STD_LOGIC
+      );
+   end component;
+   
    constant HistRegLen        : integer := 2;
    
    type AECState_type   is (RESET, IDLE, PROC_CUMSUM, DONE, HIST_RESET);
@@ -86,6 +101,7 @@ architecture RTL of AEC_CUMSUM is
    
    signal sreset         : std_logic;
    signal aec_sm_reset   : std_logic := '1';
+   signal new_config_s   : std_logic;
    
    -- Internal Histogram Ports 
    signal H_ready             : std_logic;
@@ -109,12 +125,16 @@ architecture RTL of AEC_CUMSUM is
    
    
    -- INTERNAL ctrl intf signal
+   signal aec_ctrl_clearmem_s    : std_logic;
    signal image_fraction_s       : unsigned(23 downto 0);
    signal image_fraction_fbck_s  : unsigned(23 downto 0);   --feedback
    signal lowerbin_id_s          : unsigned(9 downto 0);
    signal lowercumsum_value      : unsigned(23 downto 0);
    signal uppercumsum_value      : unsigned(23 downto 0);
    signal hist_nb_pix_s          : unsigned(23 downto 0);
+   signal aec_mode_s             : std_logic_vector(1 downto 0);
+   signal nb_bin_s               : std_logic_vector(15 downto 0);
+   signal msb_pos_s              : std_logic_vector(1 downto 0);
    
    
    -- Internal AEC status - DATA
@@ -155,11 +175,18 @@ begin
    -- CLK DATA
    ----------------------------------------
    sreset_data_gen : sync_reset
-   port map(
+   port map( 
       ARESET => ARESET,
       CLK    => CLK_DATA,
       SRESET => sreset
       );
+      
+   U0 : double_sync port map (D => AEC_CTRL_CLEARMEM, Q => aec_ctrl_clearmem_s, 
+                              RESET => sreset, CLK => CLK_DATA);
+   U1 : double_sync port map (D => NEW_CONFIG, Q => new_config_s, 
+                              RESET => sreset, CLK => CLK_DATA);
+
+
    
    ----------------------------------------
    -- TMI ASSIGNATION
@@ -173,6 +200,7 @@ begin
    H_ready        <= HIST_RDY;
    HIST_CLEARMEM  <= H_clearmem;
    AEC_RESET      <= AEC_reseti;
+   HIST_MSB_POS   <= msb_pos_s;
    
    ------------------------------
    -- CTRL Intf assignation
@@ -186,12 +214,33 @@ begin
    NB_PIXEL             <= std_logic_vector(resize(hist_nb_pix_s, NB_PIXEL'length));    
    
    
+   inreg_proc : process(CLK_DATA)
+   begin
+    if rising_edge(CLK_DATA) then
+        if sreset = '1' then
+            aec_mode_s <= "00";
+            image_fraction_s  <= (others => '1');
+            nb_bin_s <= (others => '0'); 
+            msb_pos_s <= (others => '0');
+        else
+            if new_config_s = '1' then
+                aec_mode_s <= AEC_MODE;
+                if AEC_state = IDLE then
+                    image_fraction_s  <= unsigned(IMAGE_FRACTION);
+                    nb_bin_s <= NB_BIN;
+                    msb_pos_s <= MSB_POS; 
+                end if;
+            end if;
+        end if;
+    end if;
+   end process;   
+   
    AEC_SM : process(CLK_DATA)
    begin
       if rising_edge(CLK_DATA) then
          
          ----------------
-         if sreset = '1' or AEC_mode = "00" then
+         if (sreset = '1' or aec_mode_s = "00") then
             aec_sm_reset <= '1';
          else
             aec_sm_reset <= '0';
@@ -244,7 +293,7 @@ begin
                   
                
                when DONE => -- GEN interrupt and wait for clear mem
-                  if AEC_CTRL_CLEARMEM = '1' then
+                  if aec_ctrl_clearmem_s = '1' then
                      cumsum_ready_s   <= '0';
                      H_clearmem <= '1';
                      AEC_state   <= HIST_RESET;
@@ -278,7 +327,6 @@ begin
             lowercumsum_value <= (others => '0');
             uppercumsum_value <= (others => '0');
             hist_nb_pix_s     <= (others => '0');
-            image_fraction_s  <= (others => '1');
             image_fraction_fbck_s <= (others => '1');
             TMI_add_max       <= (others => '1');
             if_maxfound       <= '0';
@@ -292,14 +340,13 @@ begin
             -- Check if we are processing an histogram
             if AEC_state = IDLE then
                
-               image_fraction_s  <= unsigned(IMAGE_FRACTION);
                if_maxfound       <= '0';
                Cumsum_valid      <= '0';
                CumSum_Acc        <= (others => (others => '0'));
                
                tmi_dval_s        <= '0';
                tmi_add_s         <= (others => '0');
-               TMI_add_max       <= unsigned(NB_BIN(TMI_add_max'range)) - 1;
+               TMI_add_max       <= unsigned(nb_bin_s(TMI_add_max'range)) - 1;
                TMI_add           <= (others => '0');
                TMI_add_done      <= '0';
                TMI_add_out       <= (others => '0');
@@ -308,7 +355,7 @@ begin
                
                
             elsif AEC_state = PROC_CUMSUM then
-               if (AEC_mode(0) = '1' and Cumsum_valid ='0' and tmi_busy_s = '0' )then -- AEC IS ON and processing result is not valid yet
+               if (aec_mode_s(0) = '1' and Cumsum_valid ='0' and tmi_busy_s = '0' )then -- AEC IS ON and processing result is not valid yet
                   -- Generate TMI adress
                   if tmi_busy_s = '0' then
                      tmi_dval_s   <= '0';

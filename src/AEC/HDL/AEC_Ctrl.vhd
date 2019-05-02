@@ -48,12 +48,12 @@ entity AEC_Ctrl is
       MSB_POS        : out std_logic_vector(1 downto 0);
       NB_BIN         : out std_logic_vector(15 downto 0);
       CLEAR_MEM     : out std_logic;
-      AEC_MODE      : out std_logic_vector(1 downto 0);  -- "00" off, "01" on, "1X" futur use   
-
-      
+      AEC_MODE      : out std_logic_vector(1 downto 0);  -- "00" off, "01" on, "1X" futur use
+      NEW_CONFIG     : out std_logic;
+         
 
       --------------------------------
-      -- PowerPC Interface
+      -- MB Interface
       -------------------------------- 
       AXI4_LITE_MOSI : in t_axi4_lite_mosi;
       AXI4_LITE_MISO : out t_axi4_lite_miso;   
@@ -62,9 +62,10 @@ entity AEC_Ctrl is
       --------------------------------
       -- MISC
       --------------------------------   
-      ARESETN         : in  std_logic;
-      CLK_CTRL       : in  std_logic;
-      CLK_DATA       : in  std_logic
+      ARESETN       : in  std_logic;
+      CLK_CTRL      : in  std_logic;
+      CLK_DATA      : in  std_logic;
+      CLK_CAL       : in  std_logic
       );
 end AEC_Ctrl;
 
@@ -83,20 +84,21 @@ architecture RTL of AEC_Ctrl is
    constant NB_BIN_ADDR               : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(8,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
    constant MSB_POS_ADDR              : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(12,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
    constant CLEARMEM_ADDR             : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(16,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant HIST_UPPERCUMSUM_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(20,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant HIST_LOWERBIN_ID_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(24,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant HIST_LOWERCUMSUM_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(28,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant HIST_EXPOSURETIME_ADDR    : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(32,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant HIST_TIMESTAMP_ADDR       : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(36,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant HIST_NB_PIXEL_ADDR        : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(40,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant CUMSUM_ERROR_ADDR         : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(44,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant IMAGE_FRACTION_FBCK_ADDR  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(48,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant IMAGE_FWPOSITION_ADDR  	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(52,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant AECPLUS_EXPTIME_ADDR  	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(56,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant AECPLUS_SUMCNT_MSB_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(60,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant AECPLUS_SUMCNT_LSB_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(64,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant AECPLUS_NBPIXELS_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(68,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
-   constant AECPLUS_DATAVALID_ADDR 	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(72,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant NEW_CONFIG_FLAG_ADDR      : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(20,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant HIST_UPPERCUMSUM_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(24,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant HIST_LOWERBIN_ID_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(28,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant HIST_LOWERCUMSUM_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(32,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant HIST_EXPOSURETIME_ADDR    : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(36,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant HIST_TIMESTAMP_ADDR       : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(40,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant HIST_NB_PIXEL_ADDR        : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(44,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant CUMSUM_ERROR_ADDR         : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(48,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant IMAGE_FRACTION_FBCK_ADDR  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(52,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant IMAGE_FWPOSITION_ADDR  	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(56,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_EXPTIME_ADDR  	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(60,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_SUMCNT_MSB_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(64,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_SUMCNT_LSB_ADDR   : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(68,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_NBPIXELS_ADDR     : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(72,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
+   constant AECPLUS_DATAVALID_ADDR 	  : std_logic_vector(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) := std_logic_vector(to_unsigned(76,ADDR_LSB + OPT_MEM_ADDR_BITS + 1));
    
    ----------------------------   
    -- Component Declaration
@@ -113,14 +115,6 @@ architecture RTL of AEC_Ctrl is
 		);
    end component;
    
-   component double_sync_vector
-	port(
-		D : in STD_LOGIC_vector;
-		Q : out STD_LOGIC_vector;
-		CLK : in STD_LOGIC
-		);
-   end component;
-   
    component sync_resetn is
       port(
          ARESETN : in STD_LOGIC;
@@ -129,28 +123,26 @@ architecture RTL of AEC_Ctrl is
          );
    end component;
    
+   component gh_stretch is 
+     GENERIC (stretch_count: integer :=1023);
+     port(
+         CLK : in STD_LOGIC;
+         rst : in STD_LOGIC;
+         D : in STD_LOGIC;
+         Q : out STD_LOGIC
+     );
+   end component;
    
    signal sresetn      : std_logic;
    signal sreset        :std_logic;
    
-   
-   --! User Input Register Declarations
-   signal cumsum_error_i         : std_logic_vector(0 downto 0); --! 
-   signal h_lowercumsum_i   : std_logic_vector(23 downto 0); --! h_lowercumsum_reg
-   signal h_uppercumsum_i   : std_logic_vector(23 downto 0); --! h_uppercumsum_reg
-   signal h_lowerbin_id_i   : std_logic_vector(15 downto 0); --! h_lowerbin_id_reg
-   signal h_imagefraction_fbck_i   : std_logic_vector(23 downto 0); --! h_imagefraction_fbck_reg
-   signal h_timestamp_i     : std_logic_vector(31 downto 0); --! h_timestamp_reg
-   signal h_exptime_i       : std_logic_vector(31 downto 0); --! h_exptime_reg
-   signal h_img_nb_pix_i    : std_logic_vector(23 downto 0); --! h_exptime_reg
-   signal h_fwposition_i    : std_logic_vector(7 downto 0); --! h_fwposition_reg
-
    --! User Output Register Declarations
    signal ImageFraction_o  : std_logic_vector(23 downto 0); 
    signal msb_pos_o        : std_logic_vector(1 downto 0); 
    signal nb_bin_o         : std_logic_vector(15 downto 0);   
    signal clear_mem_o      : std_logic;
    signal aec_mode_o       : std_logic_vector(1 downto 0);
+   signal new_config_o     : std_logic;
 
     
    -- AXI4LITE signals
@@ -170,38 +162,31 @@ architecture RTL of AEC_Ctrl is
    signal slv_reg_wren : std_logic;
    signal reg_data_out : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
    
-   signal exptime_aecplus_i : std_logic_vector(31 downto 0);
-   signal sumcnt_aecplus_i : std_logic_vector(41 downto 0);
-   signal nbpixels_aecplus_i : std_logic_vector(31 downto 0);
+   signal cumsum_ready_i : std_logic;
+   
+   signal aecplus_dval_s : std_logic;
    signal aecplus_dval_i : std_logic;
    
 begin
   
    sreset <= not  sresetn;
-   INTERRUPT <= CUMSUM_READY;
+   INTERRUPT <= cumsum_ready_i;
 
-   -- enter your statements here --
-   U0A : sync_resetn port map(ARESETN => ARESETN, SRESETN => sresetn, CLK => CLK_CTRL);   
-   U1B : double_sync_vector port map(D => LOWERCUMSUM, Q => h_lowercumsum_i ,  CLK => CLK_CTRL);   
-   U1C : double_sync_vector port map(D => UPPERCUMSUM, Q => h_uppercumsum_i,   CLK => CLK_CTRL);
-   U1D : double_sync_vector port map(D => LOWERBINID,  Q => h_lowerbin_id_i ,  CLK => CLK_CTRL);
-   U1N : double_sync_vector port map(D => IMAGE_FRACTION_FBCK, Q => h_imagefraction_fbck_i ,  CLK => CLK_CTRL);
-   U1E : double_sync_vector port map(D => H_TIMESTAMP,   Q => h_timestamp_i,  CLK => CLK_CTRL); 
-   U1F : double_sync_vector port map(D => H_EXPTIME,     Q => h_exptime_i ,   CLK => CLK_CTRL);
-   U1L : double_sync_vector port map(D => H_NB_PIXEL,     Q => h_img_nb_pix_i ,   CLK => CLK_CTRL);
-   U1M : double_sync_vector port map(D => CUMSUM_ERROR,   Q => cumsum_error_i ,   CLK => CLK_CTRL);
-   U1P : double_sync_vector port map(D => H_FWPOSITION,   Q => h_fwposition_i ,   CLK => CLK_CTRL);
-   
-   U1G : double_sync_vector port map(D => ImageFraction_o,  Q => IMAGE_FRACTION, CLK => CLK_DATA);
-   U1H : double_sync_vector port map(D => msb_pos_o,        Q => MSB_POS,        CLK => CLK_DATA); 
-   U1I : double_sync_vector port map(D => nb_bin_o,         Q => NB_BIN ,        CLK => CLK_DATA);
-   U1J : double_sync port map(D => clear_mem_o,   Q => CLEAR_MEM , RESET => sreset,  CLK => CLK_DATA);
-   U1K : double_sync_vector port map(D => aec_mode_o,   Q => AEC_MODE ,  CLK => CLK_DATA); 
- 
-   U1Q : double_sync_vector port map(D => EXP_TIME_AECPLUS,   Q => exptime_aecplus_i,  CLK => CLK_DATA); 
-   U1R : double_sync_vector port map(D => SUM_CNT_AECPLUS,   Q => sumcnt_aecplus_i,  CLK => CLK_DATA); 
-   U1S : double_sync_vector port map(D => NB_PIXELS_AECPLUS,   Q => nbpixels_aecplus_i,  CLK => CLK_DATA); 
-   U1T : double_sync port map(D => DATA_VALID_AECPLUS,   Q => aecplus_dval_i, RESET => sreset, CLK => CLK_DATA); 
+   -- Input synchronization
+   U0 : sync_resetn port map(ARESETN => ARESETN, SRESETN => sresetn, CLK => CLK_CTRL);
+   U1A : double_sync port map(D => CUMSUM_READY, Q => cumsum_ready_i, RESET => sreset, CLK => CLK_CTRL);   
+   U1B : gh_stretch  generic map (stretch_count => 4) 
+                     port map(CLK => CLK_CAL, rst => sreset, D => DATA_VALID_AECPLUS, Q => aecplus_dval_s);
+   U1C : double_sync port map(D => aecplus_dval_s, Q => aecplus_dval_i, RESET => sreset, CLK => CLK_CTRL); 
+  
+   -- Output registers
+   IMAGE_FRACTION <= ImageFraction_o;
+   MSB_POS <= msb_pos_o;
+   NB_BIN <= nb_bin_o;
+   CLEAR_MEM <= clear_mem_o;
+   AEC_MODE <= aec_mode_o;
+   U1D : gh_stretch  generic map (stretch_count => 3) 
+                     port map(CLK => CLK_CTRL, rst => sreset, D => new_config_o, Q => NEW_CONFIG);
 
    -- I/O Connections assignments
    AXI4_LITE_MISO.AWREADY  <= axi_awready;
@@ -265,6 +250,7 @@ begin
                   when NB_BIN_ADDR           =>  nb_bin_o         <= AXI4_LITE_MOSI.WDATA(nb_bin_o'length-1 downto 0); 
                   when MSB_POS_ADDR          =>  msb_pos_o        <= AXI4_LITE_MOSI.WDATA(msb_pos_o'length-1 downto 0);
                   when AECMODE_ADDR          =>  aec_mode_o       <= AXI4_LITE_MOSI.WDATA(aec_mode_o'length-1 downto 0);
+                  when NEW_CONFIG_FLAG_ADDR  =>  new_config_o     <= AXI4_LITE_MOSI.WDATA(0);
                   when others  =>                  
                end case;                                                                                          
             end if;                                        
@@ -335,19 +321,19 @@ begin
    begin
       if rising_edge(CLK_CTRL) then         
          case axi_araddr(ADDR_LSB + OPT_MEM_ADDR_BITS downto 0) is
-            when  HIST_LOWERCUMSUM_ADDR     => reg_data_out <= std_logic_vector(resize(h_lowercumsum_i     , reg_data_out'length));                  
-            when  HIST_UPPERCUMSUM_ADDR     => reg_data_out <= std_logic_vector(resize(h_uppercumsum_i , reg_data_out'length));           
-            when  HIST_LOWERBIN_ID_ADDR     => reg_data_out <= std_logic_vector(resize(h_lowerbin_id_i     , reg_data_out'length));       
-            when  HIST_TIMESTAMP_ADDR       => reg_data_out <= std_logic_vector(resize(h_timestamp_i, reg_data_out'length));    
-            when  HIST_EXPOSURETIME_ADDR    => reg_data_out <= std_logic_vector(resize(h_exptime_i, reg_data_out'length));
-            when  HIST_NB_PIXEL_ADDR        => reg_data_out <= std_logic_vector(resize(h_img_nb_pix_i, reg_data_out'length));
-            when  CUMSUM_ERROR_ADDR         => reg_data_out <= std_logic_vector(resize(cumsum_error_i, reg_data_out'length));
-            when  IMAGE_FRACTION_FBCK_ADDR  => reg_data_out <= std_logic_vector(resize(h_imagefraction_fbck_i     , reg_data_out'length));
-            when  IMAGE_FWPOSITION_ADDR     => reg_data_out <= std_logic_vector(resize(h_fwposition_i     , reg_data_out'length));
-            when  AECPLUS_EXPTIME_ADDR      => reg_data_out <= std_logic_vector(resize(exptime_aecplus_i     , reg_data_out'length));
-            when  AECPLUS_SUMCNT_MSB_ADDR   => reg_data_out <= std_logic_vector(resize(sumcnt_aecplus_i(41 downto 32), reg_data_out'length));
-            when  AECPLUS_SUMCNT_LSB_ADDR   => reg_data_out <= std_logic_vector(resize(sumcnt_aecplus_i(31 downto 0), reg_data_out'length));
-            when  AECPLUS_NBPIXELS_ADDR     => reg_data_out <= std_logic_vector(resize(nbpixels_aecplus_i, reg_data_out'length));
+            when  HIST_LOWERCUMSUM_ADDR     => reg_data_out <= std_logic_vector(resize(LOWERCUMSUM, reg_data_out'length));                  
+            when  HIST_UPPERCUMSUM_ADDR     => reg_data_out <= std_logic_vector(resize(UPPERCUMSUM, reg_data_out'length));           
+            when  HIST_LOWERBIN_ID_ADDR     => reg_data_out <= std_logic_vector(resize(LOWERBINID, reg_data_out'length));       
+            when  HIST_TIMESTAMP_ADDR       => reg_data_out <= std_logic_vector(resize(H_TIMESTAMP, reg_data_out'length));    
+            when  HIST_EXPOSURETIME_ADDR    => reg_data_out <= std_logic_vector(resize(H_EXPTIME, reg_data_out'length));
+            when  HIST_NB_PIXEL_ADDR        => reg_data_out <= std_logic_vector(resize(H_NB_PIXEL, reg_data_out'length));
+            when  CUMSUM_ERROR_ADDR         => reg_data_out <= std_logic_vector(resize(CUMSUM_ERROR, reg_data_out'length));
+            when  IMAGE_FRACTION_FBCK_ADDR  => reg_data_out <= std_logic_vector(resize(IMAGE_FRACTION_FBCK, reg_data_out'length));
+            when  IMAGE_FWPOSITION_ADDR     => reg_data_out <= std_logic_vector(resize(H_FWPOSITION, reg_data_out'length));
+            when  AECPLUS_EXPTIME_ADDR      => reg_data_out <= std_logic_vector(resize(EXP_TIME_AECPLUS, reg_data_out'length));
+            when  AECPLUS_SUMCNT_MSB_ADDR   => reg_data_out <= std_logic_vector(resize(SUM_CNT_AECPLUS(41 downto 32), reg_data_out'length));
+            when  AECPLUS_SUMCNT_LSB_ADDR   => reg_data_out <= std_logic_vector(resize(SUM_CNT_AECPLUS(31 downto 0), reg_data_out'length));
+            when  AECPLUS_NBPIXELS_ADDR     => reg_data_out <= std_logic_vector(resize(NB_PIXELS_AECPLUS, reg_data_out'length));
             when  AECPLUS_DATAVALID_ADDR    => reg_data_out <= x"0000000" & "000" & aecplus_dval_i;
             when others                     => reg_data_out <= (others => '0');
          end case;        

@@ -37,20 +37,21 @@
 #define AEC_NBBIN_OFFSET        	      0x08
 #define AEC_MSB_POS_OFFSET         	   0x0C
 #define AEC_CLEARMEM_OFFSET			   0x10
-#define AEC_UPPERCUMSUM_OFFSET 		   0x14
-#define AEC_LOWERBINID_OFFSET		      0x18
-#define AEC_LOWERCUMSUM_OFFSET 		   0x1C
-#define AEC_EXPOSURETIME_OFFSET		   0x20
-#define AEC_TIMESTAMP_OFFSET       	   0x24
-#define AEC_NB_PIXEL_OFFSET			   0x28
-#define AEC_CUMSUM_ERR_OFFSET		      0x2C
-#define AEC_IMAGEFRACTION_FBCK_OFFSET  0x30
-#define AEC_FWPOSITION_OFFSET          0x34
-#define AECP_EXPTIME_OFFSET            0x38
-#define AECP_SUMCNT_MSB_OFFSET         0x3C
-#define AECP_SUMCNT_LSB_OFFSET         0x40
-#define AECP_NBPIXELS_OFFSET           0x44
-#define AECP_DATAVALID_OFFSET          0x48
+#define AEC_NEW_CONFIG_FLAG_OFFSET     0x14
+#define AEC_UPPERCUMSUM_OFFSET 		   0x18
+#define AEC_LOWERBINID_OFFSET		      0x1C
+#define AEC_LOWERCUMSUM_OFFSET 		   0x20
+#define AEC_EXPOSURETIME_OFFSET		   0x24
+#define AEC_TIMESTAMP_OFFSET       	   0x28
+#define AEC_NB_PIXEL_OFFSET			   0x2C
+#define AEC_CUMSUM_ERR_OFFSET		      0x30
+#define AEC_IMAGEFRACTION_FBCK_OFFSET  0x34
+#define AEC_FWPOSITION_OFFSET          0x38
+#define AECP_EXPTIME_OFFSET            0x3C
+#define AECP_SUMCNT_MSB_OFFSET         0x40
+#define AECP_SUMCNT_LSB_OFFSET         0x44
+#define AECP_NBPIXELS_OFFSET           0x48
+#define AECP_DATAVALID_OFFSET          0x5C
 
 /************************** Constant Definitions ****************************/
 #define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR // TO CONFIRM
@@ -67,14 +68,15 @@
 // structure de configuration de AEC
 struct s_AEC
 {
-   uint32_t SIZE;                     // Number of config elements, excluding SIZE and ADD.
+   uint32_t SIZE;                // Number of config elements, excluding SIZE and ADD.
    uint32_t ADD;
 
-   uint32_t AEC_Mode;               // le mode de fonctionnement
-   uint32_t AEC_ImageFraction;      // le nombe de pixel a trouver
-   uint32_t AEC_NB_Bin;				//NB bin de l'histogram
-   uint32_t AEC_MSB_Pos;			//Nb de bit de l'image raw0 (13bits = 0, 14bits=1, 15bits =2, 16 bits= 3)
-   uint32_t AEC_clearmem;			//Histogram Clear mem signal
+   uint32_t AEC_Mode;            // le mode de fonctionnement
+   uint32_t AEC_ImageFraction;   // le nombe de pixel a trouver
+   uint32_t AEC_NB_Bin;				// NB bin de l'histogram
+   uint32_t AEC_MSB_Pos;			// Nb de bit de l'image raw0 (13bits = 0, 14bits=1, 15bits =2, 16 bits= 3)
+   uint32_t AEC_clearmem;			// Histogram Clear mem signal
+   uint32_t AEC_NewConfigFlag;   // new config flag
   };
 typedef struct s_AEC t_AEC;
 
