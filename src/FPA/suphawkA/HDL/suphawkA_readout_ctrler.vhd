@@ -129,10 +129,10 @@ begin
    begin
       if rising_edge(CLK) then 
          adc_sync_flag_i(15 downto 4)  <= (others => '0');    -- non utilisé
-         adc_sync_flag_i(3)  <= readout_info_i.naoi.stop;
-         adc_sync_flag_i(2)  <= readout_info_i.naoi.start;
-         adc_sync_flag_i(1)  <= sof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
-         adc_sync_flag_i(0)  <= sol_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(3)  <= readout_info_i.naoi.stop and readout_info_i.naoi.dval;
+         adc_sync_flag_i(2)  <= readout_info_i.naoi.start and readout_info_i.naoi.dval;
+         adc_sync_flag_i(1)  <= readout_info_i.aoi.sof and readout_info_i.aoi.dval;                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(0)  <= readout_info_i.aoi.sol and readout_info_i.aoi.dval;               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
       end if;
    end process;   
    
@@ -263,12 +263,12 @@ begin
             readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
             
             -- naoi
-            readout_info_i.naoi.ref_valid(1) <= ref_valid_i(1);         -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
-            readout_info_i.naoi.ref_valid(0) <= ref_valid_i(0);         -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)            
-            readout_info_i.naoi.start        <= elcorr_start_i;         -- start du naoi correspond au debut de la ligne de reset pour un superhawk
-            readout_info_i.naoi.stop         <= elcorr_end_i;           -- end du naoi correspond à la fin de la ligne de reset pour un superhawk
-            readout_info_i.naoi.dval         <= elcorr_fval_i;
-            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elcorr_fval_i;
+            readout_info_i.naoi.ref_valid(1) <= ref_valid_i(1) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
+            readout_info_i.naoi.ref_valid(0) <= ref_valid_i(0) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)            
+            readout_info_i.naoi.start        <= elcorr_start_i and DEFINE_GENERATE_ELCORR_CHAIN;         -- start du naoi correspond au debut de la ligne de reset pour un superhawk
+            readout_info_i.naoi.stop         <= elcorr_end_i and DEFINE_GENERATE_ELCORR_CHAIN;           -- end du naoi correspond à la fin de la ligne de reset pour un superhawk
+            readout_info_i.naoi.dval         <= elcorr_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elcorr_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
             
             readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);
             

@@ -33,7 +33,9 @@ entity suphawkA_elcorr_refs_ctrl is
       REF_VALID         : out std_logic_vector(1 downto 0);
       REF_FEEDBK        : in std_logic_vector(1 downto 0);
       
-      DONE              : out std_logic      
+      HW_CFG_IN_PROGRESS: in std_logic;
+      
+      PROG_TRIG         : out std_logic      
       );
    
 end suphawkA_elcorr_refs_ctrl;
@@ -47,6 +49,13 @@ architecture rtl of suphawkA_elcorr_refs_ctrl is
          ARESET : in std_logic;
          SRESET : out std_logic;
          CLK    : in std_logic);
+   end component;
+   
+   component double_sync_vector is
+      port(
+         D     : in std_logic_vector;
+         Q     : out std_logic_vector;
+         CLK   : in std_logic);
    end component;
    
    component Clk_Divider is
@@ -79,13 +88,14 @@ architecture rtl of suphawkA_elcorr_refs_ctrl is
    signal areset_i                  : std_logic;
    signal nominal_prv_is_active     : std_logic;
    signal updated_ref               : std_logic_vector(1 downto 0);
-   signal elcorr_init_done_i        : std_logic;
+   signal ref_feedbk_i              : std_logic_vector(1 downto 0);
+   signal prog_trig_i               : std_logic;
    
 begin
    
    USER_CFG_OUT <= user_cfg_o;
    REF_VALID <= ref_valid_i;
-   DONE <= done_i;   
+   PROG_TRIG <= prog_trig_i;   
    
    areset_i <= ARESET or FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
    --------------------------------------------------
@@ -97,6 +107,16 @@ begin
       CLK    => CLK,
       SRESET => sreset
       ); 
+   
+   --------------------------------------------------
+   -- synchro feedback 
+   --------------------------------------------------    
+   U1B : double_sync_vector
+   port map(
+      CLK => CLK,
+      D   => REF_FEEDBK,
+      Q   => ref_feedbk_i
+      );
    
    --------------------------------------------------------
    -- cadence des changements de reference pour l'elcorr
@@ -157,7 +177,7 @@ begin
    --------------------------------------------------------
    -- changements de reference
    -------------------------------------------------------- 
-   -- il fut savoir que pour le suphawk, la refrence utilisée pour le calcul electronique est PRV. 
+   -- il faut savoir que pour le suphawk, la reference utilisée pour le calcul electronique est PRV. 
    -- Hypothèse: PRV est en dehors de la plage dynamique des taps. Par conséquent inutilisable en mode continue, ni pour le calcul d'offset, ni pour le gain.
    -- Dans pareille situation, on ne peut l'exploiter qu'en mode événementiel (lors d'un changement de config par exemple) car en mode continu, les images seraient affectées.
    
@@ -165,14 +185,14 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then
-            user_cfg_o <= USER_CFG_IN;                                         -- pour une bonne initialisation et eviter ainsi des bugs
-            reference_value_i <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id); -- pour une bonne initialisation et eviter ainsi des bugs
+            user_cfg_o <= USER_CFG_IN;                                        -- pour une bonne initialisation et eviter ainsi des bugs
+            reference_value_i <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id);   -- pour une bonne initialisation et eviter ainsi des bugs
             ctrl_fsm <= idle;
             ref_valid_i <= (others => '0');
-            present_cfg_num <= (others => '0');
-            done_i <= USER_CFG_IN.COMN.FPA_DIAG_MODE;    -- necessaire pour que le mode diag fonctionne
+            present_cfg_num <= not USER_CFG_IN.CFG_NUM;
+            done_i <= USER_CFG_IN.COMN.FPA_DIAG_MODE;                         -- necessaire pour que le mode diag fonctionne
             nominal_prv_is_active <= '1';
-            elcorr_init_done_i <= '0';
+            prog_trig_i <= '0';
             
          else
             
@@ -183,7 +203,6 @@ begin
             case ctrl_fsm is
                
                when idle =>
-                  done_i <= elcorr_init_done_i;
                   updated_ref <= (others => '0');
                   ref_valid_i <= (others => '0');
                   if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_ENABLED = '1' then   -- prog_timer_pulse est generé ssi on est en mode continuel
@@ -191,15 +210,11 @@ begin
                   end if;
                
                when check_ref0_st =>  -- on verifie que la valeur en cours du dac de reference n'est pas celle désirée      
-                  if USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' and USER_CFG_IN.ELCORR_REF_CFG(0).REF_VALUE /= FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) then
+                  if USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' and USER_CFG_IN.ELCORR_REF_CFG(0).REF_VALUE /= FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) and ref_valid_i(0) = '0' then
                      ref_id <= 0;                     
                      ctrl_fsm <= elcorr_value_st;
                   else
                      ctrl_fsm <= check_ref1_st;
-                  end if;
-                  if elcorr_init_done_i = '0' then
-                     ref_id <= 0;                     
-                     ctrl_fsm <= elcorr_value_st;
                   end if;
                
                when check_ref1_st =>   -- on verifie que la valeur en cours du dac de reference n'est pas celle désirée     
@@ -217,7 +232,6 @@ begin
                   ctrl_fsm <= change_ref_st;
                
                when change_ref_st =>      -- on demande une programmation du dac des ref avec la valeur de ref correspondant à l'id actif 
-                  done_i <= '0';
                   ref_valid_i <= "00";    -- plus aucune reference n'est valide puisqu'on s'apprête à reprogrammer les dacs
                   ctrl_fsm <= wait_done_st;
                
@@ -238,11 +252,6 @@ begin
                
                when ref_valid_st =>       -- on diffuse l'info de la validité de la reference
                   ref_valid_i(ref_id) <= not nominal_prv_is_active;
-<<<<<<< .working
-                  elcorr_init_done_i <= '1';
-=======
-                  elcorr_init_done <= '1';
->>>>>>> .merge-right.r23408
                   if nominal_prv_is_active = '0' then 
                      ctrl_fsm <= wait_fdbk_st;
                   else
@@ -250,7 +259,9 @@ begin
                   end if;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  if REF_FEEDBK(ref_id) = '1' then
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not ref_feedbk_i(ref_id);
+                  if ref_feedbk_i(ref_id) = '1' then
+                     prog_trig_i <= '0';
                      if updated_ref(0) = '1' and updated_ref(1) = '1' then  -- toutes les references sont programmées et au moins un calcul est fait
                         ctrl_fsm <= default_ref_st;  
                      else
@@ -258,13 +269,14 @@ begin
                      end if;
                   end if;
                
-               when default_ref_st =>          -- on remet la valeur d'origine de PRV après exploitation du DAC y afférant
+               when default_ref_st =>          -- on remet la valeur d'origine de PRV après utilisation du DAC y afférant
                   present_cfg_num <= USER_CFG_IN.CFG_NUM; 
                   ctrl_fsm <= nominal_value_st;
                
                when nominal_value_st =>      -- on initialise le registre de reference à la valeur nominale de PRV
                   reference_value_i <= USER_CFG_IN.PRV_DAC_NOMINAL_VALUE;
-                  nominal_prv_is_active <= '1';                  
+                  nominal_prv_is_active <= '1';
+                  ref_valid_i <= "00";
                   ctrl_fsm <= change_ref_st;
                
                when others =>

@@ -282,7 +282,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;    
+   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
+   if (ptrA->fpa_diag_mode == 1) 
+      ptrA->fpa_trig_ctrl_mode  = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
+      
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.frame_period_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_acq_trig_period_min   = (uint32_t)((hh.frame_period_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
    ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)FPA_XTRA_TRIG_FREQ_MAX_HZ); //(uint32_t)(0.8F*(hh.frame_period_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
@@ -326,7 +329,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    {
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)SUPHAWK_DIG_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SUPHAWK_DIG_VOLTAGE_MAX_mV))
          ptrA->dig_code = (uint32_t)MAX((0.000639F + (float)gFpaDetectorPolarizationVoltage/1000.0F)/0.005344F, 1.0F);  // dig_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
-	}                                                                                                       // ENO 28 janv 2016 le else est important pour eviter des erreurs de detPOl
+	}                                                                                                       
    actualPolarizationVoltage = (int16_t)roundf(1000.0F*(0.005344F*(float)ptrA->dig_code -  0.000639F));             // DIGREF = -0.0055 x DDR + 2.8183   converti en mV
    gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
     
@@ -337,7 +340,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // quad2    
    ptrA->adc_quad2_en = 1;                          
-   ptrA->chn_diversity_en = 0;                      // ENO : 07 nov 2017 : plus besoin de la diversité de canal dans un suphawk
+   ptrA->chn_diversity_en = 0;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
    
    //
    ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + hh.lovh_mclk;

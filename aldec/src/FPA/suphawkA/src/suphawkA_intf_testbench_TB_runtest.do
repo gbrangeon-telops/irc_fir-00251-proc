@@ -25,7 +25,7 @@ acom d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
 --acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
@@ -152,10 +152,10 @@ asim -ses suphawkA_intf_testbench_TB
 --wave UUT/U1/U9/U18/*
 --wave UUT/U1/U19/*
 wave UUT/U1/* 
-wave UUT/U15/*
+--wave UUT/U15/*
 --wave UUT/U1/U5/U21/*
 --wave UUT/U1/U5/U5/*
 
---wave UUT/U1/*
-
-run 500 ms
+wave UUT/U1/U9/*
+-- wave UUT/U1/U9/U18/* 
+run 200 ms

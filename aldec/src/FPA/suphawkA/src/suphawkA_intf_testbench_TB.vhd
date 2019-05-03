@@ -166,7 +166,7 @@ architecture TB_ARCHITECTURE of suphawkA_intf_testbench_tb is
    signal user_ysize3 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(75*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(76*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
@@ -253,11 +253,11 @@ begin
          -- cfg usager
          user_xsize1 <= 1280;
          user_ysize1 <= 1024;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
---         user_xsize2 <= 320;
---         user_ysize2 <= 256;
---         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         user_xsize2 <= 320;
+         user_ysize2 <= 256;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
 --         
 --         user_xsize3 <= 64;
 --         user_ysize3 <= 4;
@@ -327,7 +327,7 @@ begin
       end loop;
       
       
-      for ii in 0 to 75-1 loop 
+      for ii in 0 to 76-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -342,15 +342,15 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
---      wait for 30 ms;
---      
---      for ii in 0 to 74-1 loop 
---         wait until rising_edge(MB_CLK);      
---         start_pos := user_cfg_vector2'length -1 - 32*ii;
---         end_pos   := start_pos - 31;
---         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
---         wait for 30 ns;
---      end loop; 
+      wait for 100 ms;
+      
+      for ii in 0 to 76-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector2'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
 --      
 --      wait for 20 ms;
 --      

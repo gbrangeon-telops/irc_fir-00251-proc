@@ -115,8 +115,9 @@ package body suphawkA_intf_testbench_pkg is
       variable elcorr_cont_calc_mode                : unsigned(31 downto 0);
       variable roic_cst_output_mode                 : unsigned(31 downto 0);
       variable cfg_num                              : unsigned(31 downto 0);
+      variable fpa_intf_data_source                 : unsigned(31 downto 0) := (others => '0');
       
-      variable y                                    : unsigned(75*32-1 downto 0);
+      variable y                                    : unsigned(76*32-1 downto 0);
       
    begin
       comn_fpa_diag_mode             :=  (others => diag_mode);                                               
@@ -146,6 +147,9 @@ package body suphawkA_intf_testbench_pkg is
       prv_dac_nominal_value          := to_unsigned(1234, 32);  
       real_mode_active_pixel_dly     := to_unsigned(6, 32);
       adc_quad2_en                   := (others => '1');
+--      if comn_fpa_diag_mode = 1 then
+--         adc_quad2_en  := (others => '0');  
+--      end if;
       chn_diversity_en               := (others => '0'); 
       
       line_period_pclk               := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
@@ -178,11 +182,11 @@ package body suphawkA_intf_testbench_pkg is
       adc_clk_source_phase           :=  to_unsigned(10, 32);
       adc_clk_pipe_sel               :=  to_unsigned(3, 32);
       comn_fpa_stretch_acq_trig      :=  to_unsigned(0, 32);
-                                     
+      
       spare1                         :=  to_unsigned(0, 32);
       spare2                         :=  to_unsigned(0, 32);
-                                     
-           -- Electronic chain correction                    
+      
+      -- Electronic chain correction                    
       -- valeurs par defaut (mode normal)                                                                                                                                               
       elcorr_enabled                       := (others => C_ELCORR_ENABLED);
       if (diag_mode = '1') then 
@@ -325,7 +329,8 @@ package body suphawkA_intf_testbench_pkg is
       & sat_ctrl_en          
       & elcorr_cont_calc_mode
       & roic_cst_output_mode
-      & cfg_num;  
+      & cfg_num
+      & fpa_intf_data_source;  
       
       return y;
    end to_intf_cfg;

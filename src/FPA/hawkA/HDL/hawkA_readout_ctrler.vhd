@@ -144,11 +144,11 @@ begin
             sync_flag_fsm <= idle;
             fdem_i <= '0';
             fpa_int_fdbk_last <= fpa_int_fdbk_i;
-            elec_ofs_start_pipe <= (others => '0');
-            elec_ofs_end_pipe <= (others => '0');
-            elec_ofs_start_i <= '0';
-            elec_ofs_fval_i <= '0';
-            elec_ofs_end_i <= '0';
+--            elec_ofs_start_pipe <= (others => '0');
+--            elec_ofs_end_pipe <= (others => '0');
+--            elec_ofs_start_i <= '0';
+--            elec_ofs_fval_i <= '0';
+--            elec_ofs_end_i <= '0';
             readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
             readout_info_i.naoi.samp_pulse <= '0';
@@ -204,27 +204,27 @@ begin
                
             end case;            
             
-            -- elec_ofs_start_i dure 1 PCLK
-            eof_pulse <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);
-            eof_pulse_last <= eof_pulse;
-            elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
-            if unsigned(elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
-               elec_ofs_start_i <= '1';
-               elec_ofs_fval_i  <= '1'; 
-            else
-               elec_ofs_start_i <= '0';
-            end if;
-            
-            -- elec_ofs_end_i dure 1 PCLK
-            elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
-            if unsigned(elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
-               elec_ofs_end_i <= '1';
-            else
-               elec_ofs_end_i  <= '0';
-               if elec_ofs_end_i = '1' then 
-                  elec_ofs_fval_i <= '0';
-               end if;
-            end if;
+--            -- elec_ofs_start_i dure 1 PCLK
+--            eof_pulse <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);
+--            eof_pulse_last <= eof_pulse;
+--            elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
+--            if unsigned(elec_ofs_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+--               elec_ofs_start_i <= '1';
+--               elec_ofs_fval_i  <= '1'; 
+--            else
+--               elec_ofs_start_i <= '0';
+--            end if;
+--            
+--            -- elec_ofs_end_i dure 1 PCLK
+--            elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elec_ofs_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
+--            if unsigned(elec_ofs_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
+--               elec_ofs_end_i <= '1';
+--            else
+--               elec_ofs_end_i  <= '0';
+--               if elec_ofs_end_i = '1' then 
+--                  elec_ofs_fval_i <= '0';
+--               end if;
+--            end if;
             
             -- READOUT_INFO
             -- aoi
