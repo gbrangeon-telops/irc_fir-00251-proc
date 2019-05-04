@@ -297,9 +297,9 @@ package FPA_define is
       -- electrical analog chain correction   
       elcorr_enabled                      : std_logic; 
       
-      -- pixel data ctrl
-      elcorr_pix_faked_value_forced       : std_logic;              -- permet de forcer la valeur des pixels (données des ADCs) à la valeur du registre "fpa_faked_pixel_value"
-      elcorr_pix_faked_value              : unsigned(14 downto 0);  -- la valeur des pixels est remplacée par celle contenue dans ce registre lorsque elec_ofs_pixel_faked_value_forced = '1'
+      -- spares
+      elcorr_spare1                       : std_logic;              
+      elcorr_spare2                       : unsigned(14 downto 0);
       
       -- refrence signal 
       elcorr_ref_cfg                      : elcorr_ref_cfg_array_type;                                                                                                             

@@ -743,8 +743,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    elcorr_comp_duration_usec                  = hh.reset_time_usec - ((float)FPA_WIDTH_MAX/(hh.pixnum_per_tap_per_mclk*hh.tap_number) + hh.lovh_mclk)*hh.mclk_period_usec;                            
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
-   ptrA->elcorr_pix_faked_value_forced        = 0;              
-   ptrA->elcorr_pix_faked_value               = 0;                     
+   ptrA->elcorr_spare1                        = 0;              
+   ptrA->elcorr_spare2                        = 0;                     
                                                   
    // vhd reference 0:                                               
    ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               

@@ -144,8 +144,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  tsh_min;                                                                                                                                   
    uint32_t  tsh_min_minus_int_time_offset;  // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR.... 
    uint32_t  elcorr_enabled;                       
-   uint32_t  elcorr_pix_faked_value_forced;        
-   uint32_t  elcorr_pix_faked_value;                                       
+   uint32_t  elcorr_spare1;        
+   uint32_t  elcorr_spare2;                                       
    uint32_t  elcorr_ref_cfg_0_ref_enabled;        
    uint32_t  elcorr_ref_cfg_0_ref_cont_meas_mode;        
    uint32_t  elcorr_ref_cfg_0_start_dly_sampclk;  

@@ -583,8 +583,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    elcorr_comp_duration_usec                  = hh.itr_tri_min_usec;
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
-   ptrA->elcorr_pix_faked_value_forced        = 0;              
-   ptrA->elcorr_pix_faked_value               = 0;                        
+   ptrA->elcorr_spare1                        = 0;              
+   ptrA->elcorr_spare2                        = 0;                        
    
    // reference 0:                                              
    ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               

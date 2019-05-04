@@ -174,8 +174,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    //electrical gain and offset correction
    // champ 53
    uint32_t  elcorr_enabled;                        
-   uint32_t  elcorr_pix_faked_value_forced;         
-   uint32_t  elcorr_pix_faked_value;                
+   uint32_t  elcorr_spare1;         
+   uint32_t  elcorr_spare2;                
                                            
    uint32_t  elcorr_ref_cfg_0_ref_enabled;
    uint32_t  elcorr_ref_cfg_0_ref_cont_meas_mode;

@@ -311,8 +311,8 @@ begin
                      --
                   -- electrical correction
                   when X"0E4" =>    user_cfg_i.elcorr_enabled                        <= data_i(0);
-                  when X"0E8" =>    user_cfg_i.elcorr_pix_faked_value_forced         <= data_i(0);
-                  when X"0EC" =>    user_cfg_i.elcorr_pix_faked_value                <= unsigned(data_i(user_cfg_i.elcorr_pix_faked_value'length-1 downto 0));
+                  when X"0E8" =>    user_cfg_i.elcorr_spare1                         <= data_i(0);
+                  when X"0EC" =>    user_cfg_i.elcorr_spare2                         <= unsigned(data_i(user_cfg_i.elcorr_spare2'length-1 downto 0));
                   
                   when X"0F0" =>    user_cfg_i.elcorr_ref_cfg(0).ref_enabled         <= data_i(0);
                   when X"0F4" =>    user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode  <= data_i(0);
