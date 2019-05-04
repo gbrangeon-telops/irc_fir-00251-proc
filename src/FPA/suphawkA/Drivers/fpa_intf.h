@@ -141,13 +141,13 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  elcorr_pix_faked_value_forced;        
    uint32_t  elcorr_pix_faked_value;                                                            
    uint32_t  elcorr_ref_cfg_0_ref_enabled;        
-   uint32_t  elcorr_ref_cfg_0_null_forced;        
+   uint32_t  elcorr_ref_cfg_0_ref_cont_meas_mode;        
    uint32_t  elcorr_ref_cfg_0_start_dly_sampclk;  
    uint32_t  elcorr_ref_cfg_0_samp_num_per_ch;    
    uint32_t  elcorr_ref_cfg_0_samp_mean_numerator;
    uint32_t  elcorr_ref_cfg_0_ref_value;                                                   
    uint32_t  elcorr_ref_cfg_1_ref_enabled;          
-   uint32_t  elcorr_ref_cfg_1_null_forced;          
+   uint32_t  elcorr_ref_cfg_1_ref_cont_meas_mode;          
    uint32_t  elcorr_ref_cfg_1_start_dly_sampclk;    
    uint32_t  elcorr_ref_cfg_1_samp_num_per_ch;      
    uint32_t  elcorr_ref_cfg_1_samp_mean_numerator;  

@@ -161,7 +161,7 @@ package FPA_define is
    type elcorr_ref_cfg_type is 
    record
       ref_enabled                    : std_logic;
-      null_forced                    : std_logic;
+      ref_cont_meas_mode             : std_logic;
       start_dly_sampclk              : unsigned(7 downto 0);
       samp_num_per_ch                : unsigned(7 downto 0);
       samp_mean_numerator            : unsigned(22 downto 0);

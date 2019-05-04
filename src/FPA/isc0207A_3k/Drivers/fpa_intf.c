@@ -671,7 +671,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // vhd reference 0:                                              
    ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               
-   ptrA->elcorr_ref_cfg_0_null_forced         = 0;              
+   ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode  = 0;              
    ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 2;        
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_0_samp_num_per_ch - (ptrA->elcorr_ref_cfg_0_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
@@ -681,7 +681,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     
    // vhd reference 1: 
    ptrA->elcorr_ref_cfg_1_ref_enabled         = 0;  // on n'active pas la reference la reference 2 que si on a un fleGX avec un OUTR deconnecté        
-   ptrA->elcorr_ref_cfg_1_null_forced         = 0;              
+   ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode  = 0;              
    ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = 2;        
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_1_samp_num_per_ch - (ptrA->elcorr_ref_cfg_1_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge

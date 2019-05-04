@@ -304,14 +304,14 @@ begin
                when X"0D8" =>    user_cfg_i.elcorr_pix_faked_value                <= unsigned(data_i(user_cfg_i.elcorr_pix_faked_value'length-1 downto 0));
                
                when X"0DC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_enabled         <= data_i(0);
-               when X"0E0" =>    user_cfg_i.elcorr_ref_cfg(0).null_forced         <= data_i(0);
+               when X"0E0" =>    user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode  <= data_i(0);
                when X"0E4" =>    user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk'length-1 downto 0)); 
                when X"0E8" =>    user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch'length-1 downto 0)); 
                when X"0EC" =>    user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator 'length-1 downto 0));
                when X"0F0" =>    user_cfg_i.elcorr_ref_cfg(0).ref_value           <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).ref_value'length-1 downto 0));
                
                when X"0F4" =>    user_cfg_i.elcorr_ref_cfg(1).ref_enabled         <= data_i(0);
-               when X"0F8" =>    user_cfg_i.elcorr_ref_cfg(1).null_forced         <= data_i(0);
+               when X"0F8" =>    user_cfg_i.elcorr_ref_cfg(1).ref_cont_meas_mode  <= data_i(0);
                when X"0FC" =>    user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk'length-1 downto 0)); 
                when X"100" =>    user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch'length-1 downto 0)); 
                when X"104" =>    user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator 'length-1 downto 0));
