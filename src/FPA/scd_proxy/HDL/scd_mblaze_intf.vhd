@@ -522,7 +522,7 @@ begin
                         when X"10" =>    mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly       <= unsigned(data_i(mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0)); 						
                         when X"14" =>    mb_struct_cfg.comn.fpa_spare                   <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
                         when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
-                        when X"1C" =>    mb_struct_cfg.comn.fpa_xtra_trig_period_min    <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_period_min'length-1 downto 0));                                      
+                        when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
                         when X"20" =>    mb_struct_cfg.scd_op.scd_xstart                <= unsigned(data_i(mb_struct_cfg.scd_op.scd_xstart'length-1 downto 0));                                
                         when X"24" =>    mb_struct_cfg.scd_op.scd_ystart                <= unsigned(data_i(mb_struct_cfg.scd_op.scd_ystart'length-1 downto 0));                        
                         when X"28" =>    mb_struct_cfg.scd_op.scd_xsize                 <= unsigned(data_i(mb_struct_cfg.scd_op.scd_xsize'length-1 downto 0));                              

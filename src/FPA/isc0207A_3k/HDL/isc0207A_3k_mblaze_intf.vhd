@@ -218,7 +218,7 @@ begin
             user_cfg_i.comn.fpa_acq_trig_ctrl_dly    <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
             user_cfg_i.comn.fpa_spare                <=  (others => '0');
             user_cfg_i.comn.fpa_xtra_trig_ctrl_dly   <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
-            user_cfg_i.comn.fpa_xtra_trig_period_min <=  user_cfg_i.comn.fpa_xtra_trig_ctrl_dly  ;      --  pas utilisé en mode MODE_INT_END_TO_TRIG_START avec les détecteurs analogiques. Donc n,importe quelle valeur fera l'affaire
+            user_cfg_i.comn.fpa_trig_ctrl_timeout_dly <=  user_cfg_i.comn.fpa_xtra_trig_ctrl_dly  ;      --  pas utilisé en mode MODE_INT_END_TO_TRIG_START avec les détecteurs analogiques. Donc n,importe quelle valeur fera l'affaire
             
             -- diag    
             user_cfg_i.diag.ysize_div4_m1      <=  resize(user_cfg_i.roic.ysize_div4_m1, user_cfg_i.diag.ysize_div4_m1'length); 
@@ -235,7 +235,7 @@ begin
                   when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
                   when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
                   when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
-                  when X"01C" =>    user_cfg_i.comn.fpa_xtra_trig_period_min   <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_period_min'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
+                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
                   when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                      
                   -- diag

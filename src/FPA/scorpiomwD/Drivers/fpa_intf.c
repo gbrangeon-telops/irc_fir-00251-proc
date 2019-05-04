@@ -296,7 +296,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(((hh.mode_int_end_to_trig_start_dly_mclk)* (hh.TMCLK) - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ);  
    ptrA->fpa_spare                 = 0;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)MGLK_XTRA_TRIG_FREQ_MAX_HZ);                      // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
-   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly); 
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly); 
       
    if (ptrA->fpa_diag_mode == 1)
    {
@@ -305,8 +305,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
       
    #ifdef SIM
-   ptrA->fpa_xtra_trig_period_min  = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_xtra_trig_period_min; 
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly; 
    #endif
    
    // valeurs converties en coups d'horloge du module FPA_INTF

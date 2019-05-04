@@ -230,7 +230,7 @@ begin
                when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
                when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
                when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
-               when X"01C" =>    user_cfg_i.comn.fpa_xtra_trig_period_min   <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_period_min'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
+               when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
                when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                   
                -- diag

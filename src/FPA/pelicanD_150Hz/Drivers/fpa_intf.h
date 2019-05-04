@@ -121,7 +121,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_acq_trig_ctrl_dly;      // utilisé par le trig_controller.vhd  
    uint32_t  fpa_spare;                  // utilisé par le trig_controller.vhd
    uint32_t  fpa_xtra_trig_ctrl_dly;     // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_xtra_trig_period_min;   // utilisé par le trig_controller.vhd
+   uint32_t  fpa_trig_ctrl_timeout_dly;   // utilisé par le trig_controller.vhd
    
    // partie scd cmd operationnelle (tout changement dans cette partie entraine la reprogrammation du détecteur)
    uint32_t  scd_xstart;                
