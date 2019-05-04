@@ -6,60 +6,56 @@ EXEC_P, HAS_SYMS
 start address 0x00000000
 
 Program Header:
-    LOAD off    0x00000094 vaddr 0x00000000 paddr 0x00000000 align 2**2
+    LOAD off    0x00000074 vaddr 0x00000000 paddr 0x00000000 align 2**2
          filesz 0x00000028 memsz 0x00000028 flags r-x
-    LOAD off    0x000000bc vaddr 0x00000050 paddr 0x00000050 align 2**2
-         filesz 0x0000689c memsz 0x000068a0 flags rwx
-    LOAD off    0x00006958 vaddr 0x000068f0 paddr 0x000068f0 align 2**2
-         filesz 0x00000228 memsz 0x00000c68 flags rw-
+    LOAD off    0x0000009c vaddr 0x00000050 paddr 0x00000050 align 2**2
+         filesz 0x000069c8 memsz 0x00007408 flags rwx
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .vectors.reset 00000008  00000000  00000000  00000094  2**2
+  0 .vectors.reset 00000008  00000000  00000000  00000074  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .vectors.sw_exception 00000008  00000008  00000008  0000009c  2**2
+  1 .vectors.sw_exception 00000008  00000008  00000008  0000007c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .vectors.interrupt 00000008  00000010  00000010  000000a4  2**2
+  2 .vectors.interrupt 00000008  00000010  00000010  00000084  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  3 .vectors.hw_exception 00000008  00000020  00000020  000000b4  2**2
+  3 .vectors.hw_exception 00000008  00000020  00000020  00000094  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  4 .text         00005eb4  00000050  00000050  000000bc  2**2
+  4 .text         00005e50  00000050  00000050  0000009c  2**2
                   CONTENTS, ALLOC, LOAD, CODE
-  5 .init         0000003c  00005f04  00005f04  00005f70  2**2
+  5 .init         0000003c  00005ea0  00005ea0  00005eec  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  6 .fini         00000020  00005f40  00005f40  00005fac  2**2
+  6 .fini         00000020  00005edc  00005edc  00005f28  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  7 .ctors        00000008  00005f60  00005f60  00005fcc  2**2
+  7 .ctors        00000008  00005efc  00005efc  00005f48  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .dtors        00000008  00005f68  00005f68  00005fd4  2**2
+  8 .dtors        00000008  00005f04  00005f04  00005f50  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .rodata       0000097c  00005f70  00005f70  00005fdc  2**2
+  9 .rodata       000008e4  00005f0c  00005f0c  00005f58  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
- 10 .sdata2       00000004  000068ec  000068ec  00006958  2**0
-                  ALLOC
- 11 .data         00000228  000068f0  000068f0  00006958  2**2
+ 10 .data         00000228  000067f0  000067f0  0000683c  2**2
                   CONTENTS, ALLOC, LOAD, DATA
- 12 .bss          00000540  00006b18  00006b18  00006b80  2**2
+ 11 .bss          00000540  00006a18  00006a18  00006a64  2**2
                   ALLOC
- 13 .heap         00000100  00007058  00007058  00006b80  2**0
+ 12 .heap         00000100  00006f58  00006f58  00006a64  2**0
                   ALLOC
- 14 .stack        00000400  00007158  00007158  00006b80  2**0
+ 13 .stack        00000400  00007058  00007058  00006a64  2**0
                   ALLOC
- 15 .debug_frame  00000864  00000000  00000000  00006b80  2**2
+ 14 .debug_frame  00000894  00000000  00000000  00006a64  2**2
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_info   00006993  00000000  00000000  000073e4  2**0
+ 15 .debug_info   00006a72  00000000  00000000  000072f8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_abbrev 00001cfb  00000000  00000000  0000dd77  2**0
+ 16 .debug_abbrev 00001d87  00000000  00000000  0000dd6a  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_loc    00005904  00000000  00000000  0000fa72  2**0
+ 17 .debug_loc    0000593a  00000000  00000000  0000faf1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_aranges 00000350  00000000  00000000  00015378  2**3
+ 18 .debug_aranges 00000370  00000000  00000000  00015430  2**3
                   CONTENTS, READONLY, DEBUGGING
- 20 .debug_line   00004bdc  00000000  00000000  000156c8  2**0
+ 19 .debug_line   00004c5e  00000000  00000000  000157a0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 21 .debug_str    0000129d  00000000  00000000  0001a2a4  2**0
+ 20 .debug_str    000012bd  00000000  00000000  0001a3fe  2**0
                   CONTENTS, READONLY, DEBUGGING
- 22 .debug_ranges 000004b8  00000000  00000000  0001b541  2**0
+ 21 .debug_ranges 000004b8  00000000  00000000  0001b6bb  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00000000 l    d  .vectors.reset	00000000 .vectors.reset
@@ -67,16 +63,15 @@ SYMBOL TABLE:
 00000010 l    d  .vectors.interrupt	00000000 .vectors.interrupt
 00000020 l    d  .vectors.hw_exception	00000000 .vectors.hw_exception
 00000050 l    d  .text	00000000 .text
-00005f04 l    d  .init	00000000 .init
-00005f40 l    d  .fini	00000000 .fini
-00005f60 l    d  .ctors	00000000 .ctors
-00005f68 l    d  .dtors	00000000 .dtors
-00005f70 l    d  .rodata	00000000 .rodata
-000068ec l    d  .sdata2	00000000 .sdata2
-000068f0 l    d  .data	00000000 .data
-00006b18 l    d  .bss	00000000 .bss
-00007058 l    d  .heap	00000000 .heap
-00007158 l    d  .stack	00000000 .stack
+00005ea0 l    d  .init	00000000 .init
+00005edc l    d  .fini	00000000 .fini
+00005efc l    d  .ctors	00000000 .ctors
+00005f04 l    d  .dtors	00000000 .dtors
+00005f0c l    d  .rodata	00000000 .rodata
+000067f0 l    d  .data	00000000 .data
+00006a18 l    d  .bss	00000000 .bss
+00006f58 l    d  .heap	00000000 .heap
+00007058 l    d  .stack	00000000 .stack
 00000000 l    d  .debug_frame	00000000 .debug_frame
 00000000 l    d  .debug_info	00000000 .debug_info
 00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
@@ -85,28 +80,28 @@ SYMBOL TABLE:
 00000000 l    d  .debug_line	00000000 .debug_line
 00000000 l    d  .debug_str	00000000 .debug_str
 00000000 l    d  .debug_ranges	00000000 .debug_ranges
-00000000 l    df *ABS*	00000000 d:/xilinx/sdk/2016.3/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/5.2.0/../../../../microblaze-xilinx-elf/lib/m/le/crt0.o
+00000000 l    df *ABS*	00000000 c:/xilinx/sdk/2016.3/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/5.2.0/../../../../microblaze-xilinx-elf/lib/m/le/crt0.o
 00000008 l       .vectors.sw_exception	00000000 _vector_sw_exception
 00000010 l       .vectors.interrupt	00000000 _vector_interrupt
 00000020 l       .vectors.hw_exception	00000000 _vector_hw_exception
-00000000 l    df *ABS*	00000000 d:/xilinx/sdk/2016.3/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/5.2.0/m/le/crtbegin.o
-00005f60 l     O .ctors	00000000 __CTOR_LIST__
-00005f68 l     O .dtors	00000000 __DTOR_LIST__
+00000000 l    df *ABS*	00000000 c:/xilinx/sdk/2016.3/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/5.2.0/m/le/crtbegin.o
+00005efc l     O .ctors	00000000 __CTOR_LIST__
+00005f04 l     O .dtors	00000000 __DTOR_LIST__
 00000084 l       .text	00000000 deregister_tm_clones
 000000d4 l       .text	00000000 register_tm_clones
 000001b0 l       .text	00000000 __do_global_dtors_aux
-00006b18 l     O .bss	00000001 completed.4827
-00006b1c l     O .bss	00000004 dtor_idx.4829
+00006a18 l     O .bss	00000001 completed.4827
+00006a1c l     O .bss	00000004 dtor_idx.4829
 0000028c l       .text	00000000 frame_dummy
-00006b20 l     O .bss	00000018 object.4839
+00006a20 l     O .bss	00000018 object.4839
 00000000 l    df *ABS*	00000000 xintc.o
 000008c0 l     F .text	00000050 StubHandler
 00000000 l    df *ABS*	00000000 xspi.o
 00001920 l     F .text	00000034 StubStatusHandler
 00000000 l    df *ABS*	00000000 xspi_options.o
-00006334 l     O .rodata	00000028 OptionsTable
+00006238 l     O .rodata	00000028 OptionsTable
 00000000 l    df *ABS*	00000000 hw_exception_handler.o
-00006988 l       .data	00000000 mb_sp_save_r3
+00006890 l       .data	00000000 mb_sp_save_r3
 00002b48 l       .text	00000000 ex_handler_not_sp_violation
 00002b44 l       .text	00000000 ex_handler_sp_violation
 00002b80 l       .text	00000000 handle_other_ex
@@ -114,198 +109,199 @@ SYMBOL TABLE:
 00002b9c l       .text	00000000 handle_other_ex_tail
 00002c08 l       .text	00000000 ex_handler_done
 00000000 l    df *ABS*	00000000 xil_assert.o
-00006b38 l     O .bss	00000004 Xil_AssertCallbackRoutine
+00006a38 l     O .bss	00000004 Xil_AssertCallbackRoutine
 00000000 l    df *ABS*	00000000 xil_exception.o
-00002d34 l     F .text	00000008 Xil_ExceptionNullHandler
+00002d7c l     F .text	00000008 Xil_ExceptionNullHandler
 00000000 l    df *ABS*	00000000 xil_printf.o
-00002e1c l     F .text	00000074 getnum
-00002e90 l     F .text	00000058 padding.part.0
-00002ee8 l     F .text	00000200 outnum
-00000000 l    df *ABS*	00000000 d:/xilinx/sdk/2016.3/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/5.2.0/m/le/crtend.o
-00005f64 l     O .ctors	00000000 __CTOR_END__
-00004ab8 l       .text	00000000 __do_global_ctors_aux
+00002e64 l     F .text	00000074 getnum
+00002ed8 l     F .text	00000058 padding.part.0
+00002f30 l     F .text	00000200 outnum
+00000000 l    df *ABS*	00000000 c:/xilinx/sdk/2016.3/gnu/microblaze/nt/bin/../lib/gcc/microblaze-xilinx-elf/5.2.0/m/le/crtend.o
+00005f00 l     O .ctors	00000000 __CTOR_END__
+00004b00 l       .text	00000000 __do_global_ctors_aux
 00000000 l    df *ABS*	00000000 ./src/Common/Led_ctrl.o
-00006b3c l     O .bss	00000008 tic.4602
+00006a3c l     O .bss	00000008 tic.4759
 00000000 l    df *ABS*	00000000 ./src/proc_boot.o
-00006cfc l     O .bss	00000004 state.4912
-00006b50 l     O .bss	00000004 lbuflen.4916
-00006b54 l     O .bss	00000050 lbuffer.4915
-00006ba8 l     O .bss	00000100 flashData.4914
-00006b4c l     O .bss	00000004 srecLineIndex.4917
-00006cac l     O .bss	00000050 vectorSection.4919
-00006ca8 l     O .bss	00000004 qspiFlashPageIndex.4913
-00006ba4 l     O .bss	00000004 progress.4918
+00006bfc l     O .bss	00000004 state.5059
+00006a50 l     O .bss	00000004 lbuflen.5063
+00006a54 l     O .bss	00000050 lbuffer.5062
+00006aa8 l     O .bss	00000100 flashData.5061
+00006a4c l     O .bss	00000004 srecLineIndex.5064
+00006bac l     O .bss	00000050 vectorSection.5066
+00006ba8 l     O .bss	00000004 qspiFlashPageIndex.5060
+00006aa4 l     O .bss	00000004 progress.5065
 00000000 l    df *ABS*	00000000 lib_a-ctype_.o
-000065d0 l     O .rodata	00000180 _ctype_b
+000064d4 l     O .rodata	00000180 _ctype_b
 00000000 l    df *ABS*	00000000 lib_a-impure.o
-00006a1c l     O .data	000000f0 impure_data
+00006924 l     O .data	000000f0 impure_data
 00000000 l    df *ABS*	00000000 
 00000000 l       *UND*	00000000 EventNotificationAry
-00006b18 l       .data	00000000 __sdata_start
-000068f0 l       .sdata2	00000000 __sbss2_end
+00006a18 l       .data	00000000 __sdata_start
+000067f0 l       .data	00000000 __sbss2_end
+00000000 l       *UND*	00000000 gcSelectedRegList
 00000000 l       *UND*	00000000 gcRegsData
 00000400 l       *ABS*	00000000 _STACK_SIZE
 00000100 l       *ABS*	00000000 _HEAP_SIZE
 00000000 l       *UND*	00000000 GC_UpdateLockedFlag
-000068f0 l       .sdata2	00000000 __sdata2_start
-00007558 l       .stack	00000000 _end
+000067f0 l       .data	00000000 __sdata2_start
+00007458 l       .stack	00000000 _end
 00000000 l       *UND*	00000000 builtInTests
 00000000 l       *UND*	00000000 GC_GetTimestamp
-00005084 g     F .text	000000b4 SREC_GetNextLine
-00004e50 g     F .text	00000234 QSPIFlash_Read
-00005f60 g       .ctors	00000000 ___CTORS_LIST___
-000056a4 g     F .text	000000b4 elapsed_time_us
-00004c0c g     F .text	00000094 Led_ToggleDebugLedState
+000050cc g     F .text	000000b4 SREC_GetNextLine
+00004e98 g     F .text	00000234 QSPIFlash_Read
+00005efc g       .ctors	00000000 ___CTORS_LIST___
+000056ec g     F .text	000000b4 elapsed_time_us
+00002ce8 g     F .text	00000048 print
+00004c54 g     F .text	00000094 Led_ToggleDebugLedState
 0000281c g     F .text	00000140 XSpi_SetOptions
-000069cc g     O .data	00000008 MB_InterruptVectorTable
-00002ce8 g     F .text	00000034 Xil_Assert
-00004b08 g     F .text	00000074 Checksum8Hex
-00003538 g       .text	00000000 microblaze_disable_interrupts
-00002d3c g     F .text	00000008 Xil_ExceptionInit
+000068d4 g     O .data	00000008 MB_InterruptVectorTable
+00002d30 g     F .text	00000034 Xil_Assert
+00004b50 g     F .text	00000074 Checksum8Hex
+00003580 g       .text	00000000 microblaze_disable_interrupts
+00002d84 g     F .text	00000008 Xil_ExceptionInit
 000007d0 g     F .text	0000003c XGpio_LookupConfig
-00006b18 g       .data	00000000 __sbss_start
+00006a18 g       .data	00000000 __sbss_start
 000016dc g     F .text	0000001c XIntc_LowLevelInterruptHandler
-0000349c g     F .text	00000088 XUartNs550_SetBaud
-0000354c g       .text	00000000 microblaze_enable_exceptions
-00006fd4 g     O .bss	00000080 XIntc_BitPosMask
-000055cc g     F .text	000000d8 usleep
+000034e4 g     F .text	00000088 XUartNs550_SetBaud
+00003594 g       .text	00000000 microblaze_enable_exceptions
+00006ed4 g     O .bss	00000080 XIntc_BitPosMask
+00005614 g     F .text	000000d8 usleep
 000004f4 g     F .text	00000100 XGpio_GetDataDirection
-00004b7c g     F .text	00000090 Led_Init
+00004bc4 g     F .text	00000090 Led_Init
 00001070 g     F .text	000000d4 XIntc_Acknowledge
-000068f0 g     O .data	00000098 XIntc_ConfigTable
-00006d00 g     O .bss	00000030 gLedCtrl
-00004428 g     F .text	0000019c memcpy
-00006b18 g     O .data	00000000 .hidden __TMC_END__
+000067f0 g     O .data	000000a0 XIntc_ConfigTable
+00006c00 g     O .bss	00000030 gLedCtrl
+00004470 g     F .text	0000019c memcpy
+00006a18 g     O .data	00000000 .hidden __TMC_END__
 000017dc g     F .text	00000144 XIntc_RegisterFastHandler
-00005f6c g     O .dtors	00000000 .hidden __DTOR_END__
+00005f08 g     O .dtors	00000000 .hidden __DTOR_END__
 00001bd8 g     F .text	00000180 XSpi_CfgInitialize
-000068ec g       .rodata	00000000 __rodata_end
+000067f0 g       .rodata	00000000 __rodata_end
 00001588 g     F .text	00000154 XIntc_DeviceInterruptHandler
-0000425c g     F .text	000000a8 .hidden __udivsi3
+000042a4 g     F .text	000000a8 .hidden __udivsi3
 00000b08 g     F .text	00000108 XIntc_Start
 000022a0 g     F .text	000000a0 XSpi_GetSlaveSelect
-00005920 g     F .text	00000414 ProcBoot_SM
-00006b44 g     O .bss	00000004 timerClockFreq
+00005968 g     F .text	000003d0 ProcBoot_SM
+00006a44 g     O .bss	00000004 timerClockFreq
 000002f4 g     F .text	00000000 _crtinit
 0000295c g     F .text	00000114 XSpi_GetOptions
-00007158 g       .heap	00000000 _heap_end
-00006858 g     O .rodata	00000004 _global_impure_ptr
-00007058 g       .bss	00000000 __bss_end
-000036e8 g     F .text	00000b74 .hidden __udivdi3
-00006b18 g       .data	00000000 __tbss_start
+00007058 g       .heap	00000000 _heap_end
+0000675c g     O .rodata	00000004 _global_impure_ptr
+00006f58 g       .bss	00000000 __bss_end
+00003730 g     F .text	00000b74 .hidden __udivdi3
+00006a18 g       .data	00000000 __tbss_start
 0000080c g     F .text	000000b4 XGpio_Initialize
-000069d8 g     O .data	00000002 XTmrCtr_Offsets
+000068e0 g     O .data	00000002 XTmrCtr_Offsets
 00001b04 g     F .text	000000d4 XSpi_Reset
 0000218c g     F .text	00000114 XSpi_SetSlaveSelect
 0000150c g     F .text	00000020 XIntc_VoidInterruptHandler
-00002d9c g     F .text	00000038 Xil_ExceptionRegisterHandler
-00005f04 g       .init	00000000 __init
-000069d4 g     O .data	00000004 Xil_AssertWait
-00007058 g       .heap	00000000 _heap_start
-00006b18 g       .data	00000000 __sbss_end
+00002de4 g     F .text	00000038 Xil_ExceptionRegisterHandler
+00005ea0 g       .init	00000000 __init
+000068dc g     O .data	00000004 Xil_AssertWait
+00006f58 g       .heap	00000000 _heap_start
+00006a18 g       .data	00000000 __sbss_end
 000003a4 g     F .text	0000006c XGpio_CfgInitialize
 00001d58 g     F .text	00000434 XSpi_Transfer
 00002a70 g     F .text	00000028 XSpi_LookupConfig
-00002d2c g     F .text	00000008 XNullHandler
+00002d74 g     F .text	00000008 XNullHandler
 00002cd4 g     F .text	00000014 microblaze_register_handler
-000030e8 g     F .text	0000037c xil_printf
-00004304 g     F .text	000000bc .hidden __umodsi3
-00003524 g       .text	00000000 microblaze_disable_exceptions
+00003130 g     F .text	0000037c xil_printf
+0000434c g     F .text	000000bc .hidden __umodsi3
+0000356c g       .text	00000000 microblaze_disable_exceptions
 00000000  w      *UND*	00000000 __sf_fake_stderr
-00003464 g     F .text	0000001c XUartNs550_SendByte
+000034ac g     F .text	0000001c XUartNs550_SendByte
 00000000  w      *UND*	00000000 __deregister_frame_info
 00000000  w      *UND*	00000000 _ITM_registerTMCloneTable
-00005f60 g       .ctors	00000000 __CTOR_LIST__
+00005efc g       .ctors	00000000 __CTOR_LIST__
 00001954 g     F .text	000000e4 XSpi_Start
-000068f0 g       .sdata2	00000000 __sbss2_start
-000054d8 g     F .text	00000090 Timer_Init
+000067f0 g       .data	00000000 __sbss2_start
+00005520 g     F .text	00000090 Timer_Init
 000023f8 g     F .text	000003d4 XSpi_InterruptHandler
-00004870 g     F .text	00000234 __call_exitprocs
+000048b8 g     F .text	00000234 __call_exitprocs
 00000000 g     F .vectors.reset	00000000 _start
 00001368 g     F .text	000001a4 XIntc_SetNormalIntrMode
-00005f70 g       .rodata	00000000 __rodata_start
-00006b18 g       *ABS*	00000000 _SDA_BASE_
-00002d70 g     F .text	0000002c Xil_ExceptionDisable
-00006b48 g     O .bss	00000004 timerBaseAddress
-00006b18 g       .data	00000000 __data_end
-00004aa4  w    F .text	00000000 _exception_handler
+00005f0c g       .rodata	00000000 __rodata_start
+00006a18 g       *ABS*	00000000 _SDA_BASE_
+00002db8 g     F .text	0000002c Xil_ExceptionDisable
+00006a48 g     O .bss	00000004 timerBaseAddress
+00006a18 g       .data	00000000 __data_end
+00004aec  w    F .text	00000000 _exception_handler
 00000410 g     F .text	000000e4 XGpio_SetDataDirection
 000027cc g     F .text	00000050 XSpi_Abort
-00006b10 g     O .data	00000008 gProgress
-000058f4 g     F .text	0000002c outbyte
+0000593c g     F .text	0000002c outbyte
 00000000  w      *UND*	00000000 _ITM_deregisterTMCloneTable
 00000db0 g     F .text	00000104 XIntc_Disconnect
-00006d30 g     O .bss	00000014 gIntc
+00006c30 g     O .bss	00000014 gIntc
 00002340 g     F .text	000000b8 XSpi_SetStatusHandler
 00000000  w      *UND*	00000000 __sf_fake_stdin
 00002a98 g     F .text	00000094 XSpi_Initialize
-00006b18 g       .bss	00000000 __bss_start
-00006b18 g       .data	00000000 __tdata_start
-00006b18 g       .data	00000000 __tdata_end
-000045c4 g     F .text	000001fc memset
-00005d34 g     F .text	000001d0 main
-00006d44 g     O .bss	00000290 gQSPIFlash
+00006a18 g       .bss	00000000 __bss_start
+00006a18 g       .data	00000000 __tdata_start
+00006a18 g       .data	00000000 __tdata_end
+0000460c g     F .text	000001fc memset
+00005d38 g     F .text	00000168 main
+00006c44 g     O .bss	00000290 gQSPIFlash
 00000050 g     F .text	00000000 _start1
-00007158 g       .stack	00000000 _stack_end
-00007054 g     O .bss	00000004 Xil_AssertStatus
+00007058 g       .stack	00000000 _stack_end
+00006f54 g     O .bss	00000004 Xil_AssertStatus
 0000116c g     F .text	000001fc XIntc_ConnectFastHandler
-00006b18 g       .data	00000000 __sdata_end
-00005f68 g       .ctors	00000000 __CTOR_END__
-00005f68 g       .dtors	00000000 ___DTORS_LIST___
+00006a18 g       .data	00000000 __sdata_end
+00005f04 g       .ctors	00000000 __CTOR_END__
+00005f04 g       .dtors	00000000 ___DTORS_LIST___
 000006f0 g     F .text	000000e0 XGpio_DiscreteWrite
-00005f68 g       .dtors	00000000 __DTOR_LIST__
-00004ca0 g     F .text	0000009c QSPIFlash_Handler
-000055bc g     F .text	00000010 Timer_GetCountsPerSecond
-000064d0 g     O .rodata	00000100 .hidden __clz_tab
+00005f04 g       .dtors	00000000 __DTOR_LIST__
+00004ce8 g     F .text	0000009c QSPIFlash_Handler
+00005604 g     F .text	00000010 Timer_GetCountsPerSecond
+000063d4 g     O .rodata	00000100 .hidden __clz_tab
 00001a38 g     F .text	000000cc XSpi_Stop
 0000152c g     F .text	0000005c XIntc_InterruptHandler
-00005f40 g       .fini	00000000 __fini
+00005edc g       .fini	00000000 __fini
 000005f4 g     F .text	000000fc XGpio_DiscreteRead
-00006b0c g     O .data	00000004 _impure_ptr
-00003480 g     F .text	0000001c XUartNs550_RecvByte
-000068f0 g       .sdata2	00000000 __sdata2_end
+00006a14 g     O .data	00000004 _impure_ptr
+000034c8 g     F .text	0000001c XUartNs550_RecvByte
+000067f0 g       .data	00000000 __sdata2_end
 00001720 g     F .text	000000bc XIntc_RegisterHandler
 00002c30 g       .text	00000000 _interrupt_handler
 00000ca0 g     F .text	00000110 XIntc_Connect
 00000eb4 g     F .text	000000dc XIntc_Enable
-00004d3c g     F .text	00000114 QSPIFlash_Init
-00005f68 g       .ctors	00000000 ___CTORS_END___
-00007558 g       .stack	00000000 __stack
+00004d84 g     F .text	00000114 QSPIFlash_Init
+00005f04 g       .ctors	00000000 ___CTORS_END___
+00007458 g       .stack	00000000 __stack
 00000f90 g     F .text	000000e0 XIntc_Disable
-00002dd4 g     F .text	00000048 Xil_ExceptionRemoveHandler
-000054b0 g     F .text	00000028 Stack_ConfigStackViolationException
-00002d44 g     F .text	0000002c Xil_ExceptionEnable
-000069fc g     O .data	0000001c XSpi_ConfigTable
-00007058 g       .heap	00000000 _heap
-000043c0 g     F .text	00000068 exit
+00002e1c g     F .text	00000048 Xil_ExceptionRemoveHandler
+000054f8 g     F .text	00000028 Stack_ConfigStackViolationException
+00002d8c g     F .text	0000002c Xil_ExceptionEnable
+00006904 g     O .data	0000001c XSpi_ConfigTable
+00006f58 g       .heap	00000000 _heap
+00004408 g     F .text	00000068 exit
 00002b2c g     F .text	00000000 _hw_exception_handler
-00003560 g       .text	00000000 microblaze_enable_interrupts
-00006a18 g     O .data	00000004 __ctype_ptr__
+000035a8 g       .text	00000000 microblaze_enable_interrupts
+00006920 g     O .data	00000004 __ctype_ptr__
 00000910 g     F .text	000001f8 XIntc_Initialize
-00006b18 g       .data	00000000 __tbss_end
+00006a18 g       .data	00000000 __tbss_end
 00000000  w      *UND*	00000000 __sf_fake_stdout
-00006750 g     O .rodata	00000101 _ctype_
-0000698c g       .data	00000000 MB_ExceptionVectorTable
-00004ab0 g       .text	00000000 _program_init
-00005138 g     F .text	00000378 SREC_ParseLine
+00006654 g     O .rodata	00000101 _ctype_
+00006894 g       .data	00000000 MB_ExceptionVectorTable
+00004af8 g       .text	00000000 _program_init
+00005180 g     F .text	00000378 SREC_ParseLine
 00000080 g     F .text	00000000 _exit
-00003574 g     F .text	00000174 .hidden __muldi3
-000047c0 g     F .text	000000b0 strlen
-00005568 g     F .text	00000054 Timer_GetTime
-00007558 g       .stack	00000000 _stack
-00002d1c g     F .text	00000010 Xil_AssertSetCallback
-000068f0 g       .data	00000000 __data_start
+000035bc g     F .text	00000174 .hidden __muldi3
+00004808 g     F .text	000000b0 strlen
+000055b0 g     F .text	00000054 Timer_GetTime
+00007458 g       .stack	00000000 _stack
+00002d64 g     F .text	00000010 Xil_AssertSetCallback
+000067f0 g       .data	00000000 __data_start
 00000000  w      *UND*	00000000 _Jv_RegisterClasses
-00005758 g     F .text	000000e8 Hex2Byte
-00004aa8 g       .text	00000000 _program_clean
-00005840 g     F .text	000000b4 Hex2Bytes
-000068f0 g       *ABS*	00000000 _SDA2_BASE_
+000057a0 g     F .text	000000e8 Hex2Byte
+00004af0 g       .text	00000000 _program_clean
+00005888 g     F .text	000000b4 Hex2Bytes
+000067f0 g       *ABS*	00000000 _SDA2_BASE_
 00000000  w      *UND*	00000000 __register_frame_info
 000016f8 g     F .text	00000028 XIntc_SetIntrSvcOption
 00000c10 g     F .text	00000090 XIntc_Stop
 00001144 g     F .text	00000028 XIntc_LookupConfig
 00000000  w      *UND*	00000000 free
-000069dc g     O .data	00000020 XGpio_ConfigTable
+000068e4 g     O .data	00000020 XGpio_ConfigTable
 00002c30 g       .text	000000a4 __interrupt_handler
 
 
