@@ -242,11 +242,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    uint32_t Cmin, Cmax, Rmin, Rmax;
    extern int16_t gFpaDetectorPolarizationVoltage;
-   static int16_t actualPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   static int16_t presentPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
-   static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
-   static float actualElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+   static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
    extern int32_t gFpaDebugRegE;
    static uint8_t cfg_num = 0; 
@@ -336,13 +336,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
       
     // GPOL voltage 
-   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
+   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
    {
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV))
          ptrA->gpol_code = (int32_t) FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // gpol_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
    }
-   actualPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
-   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;                        
+   presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
+   gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                        
    
    // ajustement de delais de la chaine 
    if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_cfg_in_progress == 0))   
@@ -392,22 +392,22 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    
    // Reference of the tap (VCC7 ou DAC6)      
-   if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
+   if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
    {
       if ((gFpaDetectorElectricalTapsRef >= (float)SCORPIOMWA_TAPREF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)SCORPIOMWA_TAPREF_VOLTAGE_MAX_mV))
          ProximCfg.vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 7);  // 
 	}                                                                                                       
-   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[6], 7);            
-   gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;   
+   presentElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[6], 7);            
+   gFpaDetectorElectricalTapsRef = presentElectricalTapsRef;   
    
    // offset of the tap_reference (VCC8 ou DAC7)      
-   if (gFpaDetectorElectricalRefOffset != actualElectricalRefOffset)
+   if (gFpaDetectorElectricalRefOffset != presentElectricalRefOffset)
    {
       if ((gFpaDetectorElectricalRefOffset >= (float)SCORPIOMWA_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)SCORPIOMWA_REFOFS_VOLTAGE_MAX_mV))
          ProximCfg.vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 8);  // 
 	}                                                                                                       
-   actualElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
-   gFpaDetectorElectricalRefOffset = actualElectricalRefOffset;
+   presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
+   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
    // adc_clk_phase
    if (init_cfg_in_progress == 1){
@@ -555,7 +555,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    scorpiomw_param_t hh;
    float periodMinWithNullExposure_usec;
-   float actualPeriod_sec;
+   float presentPeriod_sec;
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
    
@@ -565,9 +565,9 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure_usec = hh.frame_period_usec;
-   actualPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
+   presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
    
-   max_exposure_usec = (actualPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);

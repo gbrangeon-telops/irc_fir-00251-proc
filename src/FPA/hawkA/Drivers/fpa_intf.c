@@ -228,8 +228,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    hawk_param_t hh;
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern float gFpaDetectorElectricalTapsRef;
-   static int16_t actualPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   static float actualElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
+   static int16_t presentPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
    extern int32_t gFpaDebugRegE;
    float Nr, Nc, No, R, H, C, W;
@@ -324,13 +324,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->full_window = 0;
       
    // DIG voltage
-   if (gFpaDetectorPolarizationVoltage != actualPolarizationVoltage)
+   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)
    {
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)HAWK_DIG_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)HAWK_DIG_VOLTAGE_MAX_mV))
          ptrA->dig_code = (uint32_t)MAX((2.8183F - (float)gFpaDetectorPolarizationVoltage/1000.0F)/0.0055F, 1.0F);  // dig_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
 	}                                                                                                       // ENO 28 janv 2016 le else est important pour eviter des erreurs de detPOl
-   actualPolarizationVoltage = (int16_t)roundf(1000.0F*(-0.0055F*(float)ptrA->dig_code +  2.8183F));             // DIGREF = -0.0055 x DDR + 2.8183   converti en mV
-   gFpaDetectorPolarizationVoltage = actualPolarizationVoltage;
+   presentPolarizationVoltage = (int16_t)roundf(1000.0F*(-0.0055F*(float)ptrA->dig_code +  2.8183F));             // DIGREF = -0.0055 x DDR + 2.8183   converti en mV
+   gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;
     
    // ajustement de delais de la chaine
    if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_done == 1))   
@@ -379,13 +379,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[6]                 = 0;                                               //  VCC7 -> offset1  non tulisé sur le fleg        
  
    // VCC8 ou DAC8
-   if (gFpaDetectorElectricalTapsRef != actualElectricalTapsRef)
+   if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
    {
       if ((gFpaDetectorElectricalTapsRef >= (float)HAWK_TAPREF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= (float)HAWK_TAPREF_VOLTAGE_MAX_mV))
          ProximCfg.vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef, 8);  // 
 	}                                                                                                       
-   actualElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
-   gFpaDetectorElectricalTapsRef = actualElectricalTapsRef;
+   presentElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
+   gFpaDetectorElectricalTapsRef = presentElectricalTapsRef;
     
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    // adc clk source phase
@@ -528,7 +528,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    hawk_param_t hh;
    float periodMinWithNullExposure_usec;
-   float actualPeriod_sec;
+   float presentPeriod_sec;
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
    
@@ -538,9 +538,9 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure_usec = hh.frame_period_usec;
-   actualPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
+   presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
    
-   max_exposure_usec = (actualPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);

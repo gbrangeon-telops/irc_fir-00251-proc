@@ -417,7 +417,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    float maxExposure_us, periodMinWithNullExposure;
-   float actualPeriod, fpaAcquisitionFrameRate;
+   float presentPeriod, fpaAcquisitionFrameRate;
    Proxy_Fig2Param_t hh;
       
    // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
@@ -426,9 +426,9 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_Fig2SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure = hh.T0*hh.TMCLK;
-   actualPeriod = 1.0F / fpaAcquisitionFrameRate;                // periode avec le frame rate actuel
+   presentPeriod = 1.0F / fpaAcquisitionFrameRate;                // periode avec le frame rate actuel
    
-   maxExposure_us = (actualPeriod - periodMinWithNullExposure)*1e6F;
+   maxExposure_us = (presentPeriod - periodMinWithNullExposure)*1e6F;
    
    // Round exposure time
    maxExposure_us = floorMultiple(maxExposure_us, 0.1);
