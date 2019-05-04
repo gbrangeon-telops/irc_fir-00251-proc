@@ -37,8 +37,11 @@
 #endif
 
 // Mode d'operation choisi pour le contrôleur de trig 
-#define MODE_READOUT_END_TO_TRIG_START    0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
-#define MODE_INT_END_TO_TRIG_START        0x02      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du IWR et ITR
+#define MODE_READOUT_END_TO_TRIG_START     0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
+#define MODE_TRIG_START_TO_TRIG_START      0x01      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR et surtout IWR
+#define MODE_INT_END_TO_TRIG_START         0x02      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du IWR et ITR
+#define MODE_ITR_TRIG_START_TO_TRIG_START  0x03      // delai pris en compte = periode entre le trig actuel et le prochain. Une fois ce delai observé, on s'assure que le readout est terminé avant de considerer le prochain trig.
+#define MODE_ITR_INT_END_TO_TRIG_START     0x04      // delai pris en compte = duree entre la fin de l'integration actuelle et le prochain trig. Une fois ce delai observé, on s'assure que le readout est terminé avant de considerer le prochain trig.
 
 // Gains definis par Selex  
 #define FPA_GAIN_0                        0x00      // gros puits
@@ -110,8 +113,8 @@
 #define TOTAL_DAC_NUM                     8
 
 // Electrical correction : references
-#define ELCORR_REF0_VALUE_mV              2227                // ref0 au milieu de la plage dynamique
-#define ELCORR_REF1_VALUE_mV              1200
+#define ELCORR_REF1_VALUE_mV              2227                // ref0 au milieu de la plage dynamique
+#define ELCORR_REF2_VALUE_mV              1200
 #define ELCORR_REF_DAC_ID                 6                   // position (entre 1 et 8) du dac dédié aux references 
 #define ELCORR_REF_MAXIMUM_SAMP           120                 // le nombre de sample au max supporté par le vhd
 
@@ -120,15 +123,30 @@
 #define ELCORR_SW_TO_PATH2                0x02
 #define ELCORR_SW_TO_NORMAL_OP            0x03 
 
-// Electrical correction : valeurs mesurées avant correction 
-#define ELCORR_MEASURED_ADCCNT_AT_STARVATION     1300         // @ centered pix (640, 512)
-#define ELCORR_MEASURED_ADCCNT_AT_SATURATION     15500        // @ centered pix (640, 512)
-#define ELCORR_MEASURED_ADCCNT_FOR_REF0          8000         // @ centered pix (640, 512)
-#define ELCORR_MEASURED_ADCCNT_FOR_REF1          475          // @ centered pix (640, 512)
+#define ELCORR_CONT_MODE_OFFSETX_MIN      640
+
+// Electrical correction : valeurs par defaut si aucune mesure dispo dans les flashsettings
+#define ELCORR_DEFAULT_STARVATION_DL      1300        // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_SATURATION_DL      15500       // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_REFERENCE1_DL      7800        // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_REFERENCE2_DL      475         // @ centered pix (640, 512)
+
+// Electrical correction : limites des valeurs en provenance de la flash
+#define ELCORR_STARVATION_MIN_DL          100
+#define ELCORR_STARVATION_MAX_DL          1500
+
+#define ELCORR_SATURATION_MIN_DL          14000
+#define ELCORR_SATURATION_MAX_DL          16300
+
+#define ELCORR_REFERENCE1_MIN_DL          50
+#define ELCORR_REFERENCE1_MAX_DL          16300
+
+#define ELCORR_REFERENCE2_MIN_DL          50
+#define ELCORR_REFERENCE2_MAX_DL          16300
 
 // Electrical correction : valeurs cibles (desirées) apres correction
-#define ELCORR_TARGET_ADCCNT_AT_STARVATION       500
-#define ELCORR_TARGET_ADCCNT_AT_SATURATION       15200
+#define ELCORR_TARGET_STARVATION_DL       650         // @ centered pix (640, 512)
+#define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (640, 512)
 
 
 struct s_ProximCfgConfig 
@@ -171,7 +189,7 @@ typedef struct suphawk_param_s  suphawk_param_t;
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
-uint8_t init_done = 0;
+uint8_t sw_init_done = 0;
 ProximCfg_t ProximCfg = {{ 7137, 0, 7137, 4387,  0,  10129, 0, 0}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // Prototypes fonctions internes
@@ -187,14 +205,14 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {   
-   init_done = 0;
+   sw_init_done = 0;
    FPA_Reset(ptrA);
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
-   init_done = 1;
+   sw_init_done = 1;
 }
  
 //--------------------------------------------------------------------------
@@ -238,18 +256,35 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
    suphawk_param_t hh;
    extern int16_t gFpaDetectorPolarizationVoltage;
+   static int16_t presentPolarizationVoltage = 700;       //  700 mV comme valeur par defaut pour GPOL
    extern float gFpaDetectorElectricalTapsRef;
-   static int16_t presentPolarizationVoltage = 10;   // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
-   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
-   extern int32_t gFpaDebugRegE;
-   static uint8_t cfg_num = 0;
+   // extern float gFpaDetectorElectricalRefOffset;
+   extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
+   extern int32_t gFpaDebugRegB;                         // reservé
+   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
+   extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
+   extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
+   extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
+   extern int32_t gFpaDebugRegG;                         // reservé permit_lsydel_clk_rate_beyond_2x pour contrôler le clock rate dans la zone LSYLDEL
+   // extern int32_t gFpaDebugRegH;                         // non utilisé
    uint32_t elcorr_reg;
+   static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+   static uint16_t presentElCorrMeasAtStarvation;
+   static uint16_t presentElCorrMeasAtSaturation;
+   static uint16_t presentElCorrMeasAtReference1;
+   static uint16_t presentElCorrMeasAtReference2;
+
+   extern uint16_t gFpaElCorrMeasAtStarvation;
+   extern uint16_t gFpaElCorrMeasAtSaturation;
+   extern uint16_t gFpaElCorrMeasAtReference1;
+   extern uint16_t gFpaElCorrMeasAtReference2;
+
    uint32_t elcorr_enabled = 1;
    uint32_t elcorr_gain_corr_enabled = 0;
    float elcorr_comp_duration_usec;                 // la duree en usec disponible pour la prise des references
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
+   static uint8_t cfg_num = 0;
    
    
    // on bâtit les parametres specifiques du suphawk
@@ -289,7 +324,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.frame_period_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_spare              = 0;
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)FPA_XTRA_TRIG_FREQ_MAX_HZ); //(uint32_t)(0.8F*(hh.frame_period_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;                         // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;                         // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
 
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
@@ -322,21 +357,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->active_subwindow = 1;
       
    // DIG voltage
-   if (init_done == 0)
-      ptrA->dig_code = 0x00D0;
-   
-   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)
-   {
+   if (sw_init_done == 0)
+      ptrA->dig_code = 0x00D0;   
+   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage){
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)SUPHAWK_DIG_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SUPHAWK_DIG_VOLTAGE_MAX_mV))
          ptrA->dig_code = (uint32_t)MAX((0.000639F + (float)gFpaDetectorPolarizationVoltage/1000.0F)/0.005344F, 1.0F);  // dig_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
 	}                                                                                                       
    presentPolarizationVoltage = (int16_t)roundf(1000.0F*(0.005344F*(float)ptrA->dig_code -  0.000639F));             // DIGREF = -0.0055 x DDR + 2.8183   converti en mV
    gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;
     
-   // ajustement de delais de la chaine
-   if (((uint32_t)gFpaDebugRegB != ptrA->real_mode_active_pixel_dly) && (init_done == 1))   
-      ptrA->real_mode_active_pixel_dly  = (uint32_t) gFpaDebugRegB;
-   gFpaDebugRegB = (int32_t)ptrA->real_mode_active_pixel_dly;
+   // Registre F : ajustement des delais de la chaine
+   if (sw_init_done == 0)
+      gFpaDebugRegF = 8;     
+   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // quad2    
    ptrA->adc_quad2_en = 1;                          
@@ -360,8 +393,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
    // echantillons choisis
-   ptrA->good_samp_first_pos_per_ch       = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position premier echantillon
-   ptrA->good_samp_last_pos_per_ch        = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2017: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
+   ptrA->good_samp_first_pos_per_ch        = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position premier echantillon
+   ptrA->good_samp_last_pos_per_ch         = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2017: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                = 1 + ptrA->chn_diversity_en;
@@ -382,7 +415,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->prv_dac_nominal_value = ProximCfg.vdac_value[5];
    
    // TAPREF : VCC7 ou DAC7
-   if (init_done == 0)
+   if (sw_init_done == 0)
       ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(1550.0F, 7);
       
    if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
@@ -394,26 +427,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorElectricalTapsRef = presentElectricalTapsRef;
     
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
-   // adc clk source phase
-   if (init_done == 0){
-      ptrA->adc_clk_pipe_sel = 0;
-   }       
-   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1)){
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
-      //need_rst_fpa_module = 1;
-   }
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
+   if (sw_init_done == 0)
+      gFpaDebugRegC = 3;       
+   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
    
    // adc clk source phase
-   if (init_done == 0){         
-      ptrA->adc_clk_source_phase = 1000;
-   }
-   
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1)){
-      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
-      //need_rst_fpa_module = 1;
-   }
-    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;
+   if (sw_init_done == 0)         
+      gFpaDebugRegD = 140;
+   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
        
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
@@ -425,8 +446,48 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    ptrA->cfg_num  = (uint32_t)cfg_num;
    
+   /*----------------------------------------------------                         
+    ELCORR : definition parametres                                                
+   ------------------------------------------------------*/ 
+   
+   // starvation
+   if (sw_init_done == 0)
+      presentElCorrMeasAtStarvation = (uint16_t)ELCORR_DEFAULT_STARVATION_DL;      
+   if (gFpaElCorrMeasAtStarvation != presentElCorrMeasAtStarvation){
+      if ((gFpaElCorrMeasAtStarvation >= (uint16_t)ELCORR_STARVATION_MIN_DL) && (gFpaElCorrMeasAtStarvation <= (uint16_t)ELCORR_STARVATION_MAX_DL))
+         presentElCorrMeasAtStarvation = gFpaElCorrMeasAtStarvation;  // 
+   }
+   gFpaElCorrMeasAtStarvation = presentElCorrMeasAtStarvation;
+   
+   // saturation
+   if (sw_init_done == 0)
+      presentElCorrMeasAtSaturation = (uint16_t)ELCORR_DEFAULT_SATURATION_DL;      
+   if (gFpaElCorrMeasAtSaturation != presentElCorrMeasAtSaturation){
+      if ((gFpaElCorrMeasAtSaturation >= (uint16_t)ELCORR_SATURATION_MIN_DL) && (gFpaElCorrMeasAtSaturation <= (uint16_t)ELCORR_SATURATION_MAX_DL))
+         presentElCorrMeasAtSaturation = gFpaElCorrMeasAtSaturation;  // 
+   }
+   gFpaElCorrMeasAtSaturation = presentElCorrMeasAtSaturation;
+   
+   // reference1
+   if (sw_init_done == 0)
+      presentElCorrMeasAtReference1 = (uint16_t)ELCORR_DEFAULT_REFERENCE1_DL;      
+   if (gFpaElCorrMeasAtReference1 != presentElCorrMeasAtReference1){
+      if ((gFpaElCorrMeasAtReference1 >= (uint16_t)ELCORR_REFERENCE1_MIN_DL) && (gFpaElCorrMeasAtReference1 <= (uint16_t)ELCORR_REFERENCE1_MAX_DL))
+         presentElCorrMeasAtReference1 = gFpaElCorrMeasAtReference1;  // 
+   }
+   gFpaElCorrMeasAtReference1 = presentElCorrMeasAtReference1;
+   
+   // reference2
+   if (sw_init_done == 0)
+      presentElCorrMeasAtReference2 = (uint16_t)ELCORR_DEFAULT_REFERENCE2_DL;      
+   if (gFpaElCorrMeasAtReference2 != presentElCorrMeasAtReference2){
+      if ((gFpaElCorrMeasAtReference2 >= (uint16_t)ELCORR_REFERENCE2_MIN_DL) && (gFpaElCorrMeasAtReference2 <= (uint16_t)ELCORR_REFERENCE2_MAX_DL))
+         presentElCorrMeasAtReference2 = gFpaElCorrMeasAtReference2;  // 
+   }
+   gFpaElCorrMeasAtReference2 = presentElCorrMeasAtReference2;
+   
    // correction electronique // registreA :
-   if (init_done == 0)
+   if (sw_init_done == 0)
       gFpaDebugRegA = 7;
    elcorr_reg = (uint32_t)gFpaDebugRegA;
    
@@ -526,13 +587,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
   
    // Electronic chain correction parameters
    if (elcorr_gain_corr_enabled == 1){
-      elcorr_atemp_gain = (((float)ELCORR_TARGET_ADCCNT_AT_SATURATION - (float)ELCORR_TARGET_ADCCNT_AT_STARVATION) * ((float)ELCORR_MEASURED_ADCCNT_FOR_REF0 - (float)ELCORR_MEASURED_ADCCNT_FOR_REF1)/((float)ELCORR_MEASURED_ADCCNT_AT_SATURATION - (float)ELCORR_MEASURED_ADCCNT_AT_STARVATION));
-      elcorr_atemp_ofs  = (float)ELCORR_TARGET_ADCCNT_AT_SATURATION - elcorr_atemp_gain * ((float)ELCORR_MEASURED_ADCCNT_AT_SATURATION - (float)ELCORR_MEASURED_ADCCNT_FOR_REF0)/((float)ELCORR_MEASURED_ADCCNT_FOR_REF0 - (float)ELCORR_MEASURED_ADCCNT_FOR_REF1);
+      elcorr_atemp_gain = (((float)ELCORR_TARGET_SATURATION_DL - (float)ELCORR_TARGET_STARVATION_DL) * ((float)presentElCorrMeasAtReference1 - (float)presentElCorrMeasAtReference2)/((float)presentElCorrMeasAtSaturation - (float)presentElCorrMeasAtStarvation));
+      elcorr_atemp_ofs  = (float)ELCORR_TARGET_SATURATION_DL - elcorr_atemp_gain * ((float)presentElCorrMeasAtSaturation - (float)presentElCorrMeasAtReference1)/((float)presentElCorrMeasAtReference1 - (float)presentElCorrMeasAtReference2);
    }
    else {
       elcorr_atemp_gain = 1.0F;
-      elcorr_atemp_ofs  = (float)ELCORR_TARGET_ADCCNT_AT_STARVATION -  ((float)ELCORR_MEASURED_ADCCNT_AT_STARVATION - (float)ELCORR_MEASURED_ADCCNT_FOR_REF0);
-   }  
+      elcorr_atemp_ofs  = (float)ELCORR_TARGET_STARVATION_DL -  ((float)presentElCorrMeasAtStarvation - (float)presentElCorrMeasAtReference1);
+   }   
   
    // valeurs par defaut (mode normal)                                                                                                                                               
    elcorr_comp_duration_usec                  = ((float)FPA_WIDTH_MAX/(hh.pixnum_per_tap_per_mclk*hh.tap_number) + hh.lovh_mclk)*hh.mclk_period_usec;  // le calcul se fait sur laligne de reset                          
@@ -541,7 +602,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_spare1                        = 0;              
    ptrA->elcorr_spare2                        = 0;                     
                                                   
-   // reference 0:                                              
+   // vhd reference 0:                                              
    ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               
    ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode  = 0;              
    ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 6; //2;        
@@ -549,9 +610,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_0_samp_num_per_ch - (ptrA->elcorr_ref_cfg_0_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_0_samp_mean_numerator = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_0_samp_num_per_ch);     
-   ptrA->elcorr_ref_cfg_0_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF0_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //      
+   ptrA->elcorr_ref_cfg_0_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF1_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //      
     
-   // reference 1: 
+   // vhd reference 1: 
    ptrA->elcorr_ref_cfg_1_ref_enabled         = 1;              
    ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode  = 0;              
    ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = 6; //2;        
@@ -559,16 +620,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_1_samp_num_per_ch - (ptrA->elcorr_ref_cfg_1_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_1_samp_mean_numerator = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_1_samp_num_per_ch);     
-   ptrA->elcorr_ref_cfg_1_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF1_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //
+   ptrA->elcorr_ref_cfg_1_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF2_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //
    
    ptrA->elcorr_ref_dac_id                    = (uint32_t)ELCORR_REF_DAC_ID;  //       
    ptrA->elcorr_atemp_gain                    = (int32_t)elcorr_atemp_gain;      
    ptrA->elcorr_atemp_ofs                     = (int32_t)elcorr_atemp_ofs;
    
-   if (ptrA->roic_cst_output_mode == 1)
+   if (ptrA->roic_cst_output_mode == 1){
+      ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode = 1;    
       ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
-   
-   
+   }   
+      
    // desactivation en mode patron de tests
    if (ptrA->fpa_diag_mode == 1){
       ptrA->elcorr_enabled = 0;
@@ -614,11 +676,11 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_delay_mclk          = 165.0F;   // FPA: delai reglémentaire de 165 MCLK à la fin d'une image en ITR + 1 MCL en debut d'image
-   ptrH->vhd_delay_mclk          = 2.0F;     // estimation des differerents delais accumulés par le vhd
+   ptrH->vhd_delay_mclk          = 5.0F;     // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 3.0F;
    ptrH->fovh_line               = 0.0F;
-   ptrH->int_time_offset_mclk    = 0.0F;   // aucun offset sur le temps d'integration
+   ptrH->int_time_offset_mclk    = 0.0F;     // aucun offset sur le temps d'integration
       
    // readout time
    ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
@@ -731,6 +793,13 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
    Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
    Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);
+   
+   Stat->acq_trig_cnt                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x94);
+   Stat->acq_int_cnt                   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x98);
+   Stat->fpa_readout_cnt               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x9C);        
+   Stat->acq_readout_cnt               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA0);  
+   Stat->out_pix_cnt_min               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);  
+   Stat->out_pix_cnt_max               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
 }
 
 

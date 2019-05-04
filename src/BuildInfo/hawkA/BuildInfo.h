@@ -3,10 +3,10 @@
 
 #ifdef ARCH_FPGA_160
 
-#define SVN_HARDWARE_REV      22752
-#define SVN_SOFTWARE_REV      22752
-#define SVN_BOOTLOADER_REV    22752
-#define SVN_COMMON_REV        -23104
+#define SVN_HARDWARE_REV      23419
+#define SVN_SOFTWARE_REV      23419
+#define SVN_BOOTLOADER_REV    23419
+#define SVN_COMMON_REV        23461
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -14,7 +14,7 @@
 #warning Uncommitted changes detected.
 #endif
 
-#define HARDWARE_MISMATCH (0)
+#define HARDWARE_MISMATCH (1)
 
 #if HARDWARE_MISMATCH
 #error D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_hawkA\hw_platform_160\system.hdf does not match D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_hawkA\fir_00251_proc_hawkA_160.hdf
@@ -22,10 +22,10 @@
 
 #elif defined(ARCH_FPGA_325)
 
-#define SVN_HARDWARE_REV      20508
-#define SVN_SOFTWARE_REV      20508
-#define SVN_BOOTLOADER_REV    20508
-#define SVN_COMMON_REV        -23104
+#define SVN_HARDWARE_REV      23419
+#define SVN_SOFTWARE_REV      23419
+#define SVN_BOOTLOADER_REV    23419
+#define SVN_COMMON_REV        23461
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -33,7 +33,7 @@
 #warning Uncommitted changes detected.
 #endif
 
-#define HARDWARE_MISMATCH (0)
+#define HARDWARE_MISMATCH (1)
 
 #if HARDWARE_MISMATCH
 #error D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_hawkA\hw_platform_325\system.hdf does not match D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_hawkA\fir_00251_proc_hawkA_325.hdf

@@ -189,6 +189,14 @@ struct s_FpaStatus    //
    // cooler
    uint32_t  cooler_on_curr_min_mA;       // seuil au dessus duquel considérer que le refroidisseur est allumé
    uint32_t  cooler_off_curr_max_mA;      // seuil en dessous duquel considérer que le refroidisseur est eteint
+   
+   // watchdog
+   uint32_t  acq_trig_cnt;    
+   uint32_t  acq_int_cnt;     
+   uint32_t  fpa_readout_cnt; 
+   uint32_t  acq_readout_cnt; 
+   uint32_t  out_pix_cnt_min; 
+   uint32_t  out_pix_cnt_max;
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  
