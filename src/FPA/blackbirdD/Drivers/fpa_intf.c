@@ -286,7 +286,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs (il est sur l'horloge de 100MHz)
    ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX(hh.T4 - VHD_PIXEL_PIPE_DLY_SEC, 0.0F) * FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->fpa_acq_trig_period_min   = (uint32_t)(hh.T5 * FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->fpa_spare                 = 0;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)(FPA_VHD_INTF_CLK_RATE_HZ / SCD_XTRA_TRIG_FREQ_MAX_HZ);   // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
    ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.8F * (float)ptrA->fpa_xtra_trig_ctrl_dly);
    

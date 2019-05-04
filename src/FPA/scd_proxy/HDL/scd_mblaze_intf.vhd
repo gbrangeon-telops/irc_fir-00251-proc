@@ -238,7 +238,7 @@ begin
                      elsif mb_struct_cfg.cmd_to_update_id = SCD_DIAG_CMD_ID then
                         user_cfg_i.scd_diag <= mb_struct_cfg.scd_diag;
                      end if;
-                     --user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min;
+                     --user_cfg_i.comn.fpa_spare <= mb_struct_cfg.comn.fpa_spare;
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
                
@@ -256,7 +256,7 @@ begin
                   if exp_struct_cfg_valid = '1' then
                      user_cfg_i.scd_int.scd_int_time <= scd_exp_time_i;
                      user_cfg_i.scd_int.scd_int_indx <= exp_indx_i;
-                     --user_cfg_i.comn.fpa_acq_trig_period_min <= mb_struct_cfg.comn.fpa_acq_trig_period_min; 
+                     --user_cfg_i.comn.fpa_spare <= mb_struct_cfg.comn.fpa_spare; 
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
@@ -520,7 +520,7 @@ begin
                         when X"08" =>    mb_struct_cfg.comn.fpa_pwr_on                  <= data_i(0);						
                         when X"0C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_mode          <= data_i(mb_struct_cfg.comn.fpa_trig_ctrl_mode'length-1 downto 0);
                         when X"10" =>    mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly       <= unsigned(data_i(mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0)); 						
-                        when X"14" =>    mb_struct_cfg.comn.fpa_acq_trig_period_min     <= unsigned(data_i(mb_struct_cfg.comn.fpa_acq_trig_period_min'length-1 downto 0));                                    
+                        when X"14" =>    mb_struct_cfg.comn.fpa_spare                   <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
                         when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
                         when X"1C" =>    mb_struct_cfg.comn.fpa_xtra_trig_period_min    <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_period_min'length-1 downto 0));                                      
                         when X"20" =>    mb_struct_cfg.scd_op.scd_xstart                <= unsigned(data_i(mb_struct_cfg.scd_op.scd_xstart'length-1 downto 0));                                

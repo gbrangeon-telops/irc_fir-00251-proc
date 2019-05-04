@@ -287,9 +287,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_acq_trig_period_min   = (uint32_t)(0.5F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);   // periode min avec int_time = 0. Le Vhd y ajoutera le int_time reel
+   ptrA->fpa_spare              = 0;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
-   ptrA->fpa_xtra_trig_period_min  = ptrA->fpa_acq_trig_period_min;
+   ptrA->fpa_xtra_trig_period_min  = (uint32_t)(0.5F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
    
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;

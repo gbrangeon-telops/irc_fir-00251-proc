@@ -115,7 +115,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_pwr_on;                 // utilisé par le fpa_intf_sequencer.vhd            
    uint32_t  fpa_trig_ctrl_mode;         // utilisé par le trig_controller.vhd    
    uint32_t  fpa_acq_trig_ctrl_dly;      // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_acq_trig_period_min;    // utilisé par le trig_controller.vhd
+   uint32_t  fpa_spare;                  // utilisé par le trig_controller.vhd
    uint32_t  fpa_xtra_trig_ctrl_dly;     // utilisé par le trig_controller.vhd  
    uint32_t  fpa_xtra_trig_period_min;   // utilisé par le trig_controller.vhd
    

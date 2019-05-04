@@ -364,11 +364,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
    ptrA->fpa_acq_trig_ctrl_dly     = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_acq_trig_period_min   = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
+   ptrA->fpa_spare                 = 0;   
    ptrA->fpa_xtra_trig_period_min  = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
    ptrA->fpa_xtra_trig_ctrl_dly    = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
    
-   // parametres envoyés au VHD pour calculer fpa_acq_trig_ctrl_dly, fpa_acq_trig_period_min, fpa_xtra_trig_period_min, fpa_xtra_trig_ctrl_dly
+   // parametres envoyés au VHD pour calculer fpa_acq_trig_ctrl_dly, fpa_xtra_trig_period_min, fpa_xtra_trig_ctrl_dly
    ptrA->readout_plus_delay            =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F);  // (readout_time + delay -vhd_delay) converti en coups de 100MHz
    ptrA->tri_window_and_intmode_part   =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tri_window_and_intmode_part_usec*1e-6F);        //   tri_window_and_intmode_part_usec converti en coups de 100MHz
    ptrA->int_time_offset               =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.int_time_offset_usec*1e-6F);

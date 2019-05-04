@@ -389,9 +389,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    }
-   ptrA->fpa_acq_trig_period_min      = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);   // n'est plus utilisé
+   ptrA->fpa_spare                    = 0;   // n'est plus utilisé
    ptrA->fpa_xtra_trig_ctrl_dly       = ptrA->fpa_acq_trig_ctrl_dly;                                                   //
-   ptrA->fpa_xtra_trig_period_min     = ptrA->fpa_acq_trig_period_min;  
+   ptrA->fpa_xtra_trig_period_min     = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  
     
    // diag window param   
    ptrA->diag_ysize             = (uint32_t)pGCRegs->Height;
