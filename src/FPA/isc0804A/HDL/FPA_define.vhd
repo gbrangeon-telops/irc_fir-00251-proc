@@ -318,8 +318,8 @@ package FPA_define is
       elcorr_div_op_sel                   : std_logic_vector(1 downto 0);
       elcorr_add_op_sel                   : std_logic_vector(1 downto 0);   
       
-      -- mode de calcul continuel du gain   (à toutes les x sec)
-      elcorr_gain_cont_calc_mode          : std_logic;          
+      -- spare
+      elcorr_spare3                       : std_logic;          
       
       -- gestion de la saturation basse et haute à la sortie du module fpa
       sat_ctrl_en                         : std_logic;
@@ -337,7 +337,7 @@ package FPA_define is
       cfg_num                             : unsigned(7 downto 0);
       
       -- dac free running mode 
-      dac_free_running_mode               : std_logic;
+      elcorr_spare4                       : std_logic;
       
       -- activation de l'horloge lsydel à plus que 2xMCLK
       permit_lsydel_clk_rate_beyond_2x    : std_logic;

@@ -207,9 +207,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  roic_test_row_en;
    uint32_t  roic_cst_output_mode;
    
-   uint32_t  elcorr_gain_cont_calc_mode;
+   uint32_t  elcorr_spare;
    uint32_t  cfg_num;
-   uint32_t  dac_free_running_mode;
+   uint32_t  elcorr_spare4;
    uint32_t  fpa_intf_data_source;
    uint32_t  permit_lsydel_clk_rate_beyond_2x;
 };                                  

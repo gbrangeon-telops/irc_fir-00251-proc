@@ -617,18 +617,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    ptrA->cfg_num  = (uint32_t)cfg_num;
    
-   ptrA->elcorr_gain_cont_calc_mode = 0;
    if ((((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2 >= (uint32_t)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
       ||((elcorr_gain_corr_enabled == 1) && (ptrA->roic_cst_output_mode == 1)))
-      ptrA->elcorr_gain_cont_calc_mode = 1;
-   
-   ptrA->dac_free_running_mode = ptrA->elcorr_gain_cont_calc_mode;
+      ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
    
    // desactivation en mode patron de tests
    if (ptrA->fpa_diag_mode == 1){
       ptrA->elcorr_enabled = 0;
-      ptrA->elcorr_gain_cont_calc_mode = 0;
-	   ptrA->dac_free_running_mode = 0;
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
 	   ptrA->elcorr_ref_cfg_1_ref_enabled = 0;	  
    }

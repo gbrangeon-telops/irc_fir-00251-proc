@@ -156,7 +156,7 @@ begin
             
             -- mode continuel : pulse de prog de type timer
             if sec_counter > G_REF_CHANGE_PERIOD_SEC then
-               prog_timer_pulse <= USER_CFG_IN.ELCORR_CONT_CALC_MODE;
+               prog_timer_pulse <= USER_CFG_IN.ELCORR_REF_CFG(0).REF_CONT_MEAS_MODE or USER_CFG_IN.ELCORR_REF_CFG(1).REF_CONT_MEAS_MODE;
                sec_counter <= 0;
             else
                prog_timer_pulse <= '0';
@@ -259,7 +259,7 @@ begin
                   end if;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not ref_feedbk_i(ref_id);
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id);
                   if ref_feedbk_i(ref_id) = '1' then
                      prog_trig_i <= '0';
                      if updated_ref(0) = '1' and updated_ref(1) = '1' then  -- toutes les references sont programmées et au moins un calcul est fait

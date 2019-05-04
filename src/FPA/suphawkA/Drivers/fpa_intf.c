@@ -565,15 +565,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_atemp_gain                    = (int32_t)elcorr_atemp_gain;      
    ptrA->elcorr_atemp_ofs                     = (int32_t)elcorr_atemp_ofs;
    
-   ptrA->elcorr_cont_calc_mode = 0;
    if (ptrA->roic_cst_output_mode == 1)
-      ptrA->elcorr_cont_calc_mode = 1;
+      ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
    
    
    // desactivation en mode patron de tests
    if (ptrA->fpa_diag_mode == 1){
       ptrA->elcorr_enabled = 0;
-      ptrA->elcorr_cont_calc_mode = 0;
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
 	   ptrA->elcorr_ref_cfg_1_ref_enabled = 0;	  
    }

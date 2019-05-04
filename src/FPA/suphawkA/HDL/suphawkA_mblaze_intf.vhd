@@ -300,7 +300,7 @@ begin
                   when X"118" =>    user_cfg_i.elcorr_add_op_sel               <= data_i(user_cfg_i.elcorr_add_op_sel'length-1 downto 0);
                   
                   when X"11C" =>    user_cfg_i.sat_ctrl_en                     <= data_i(0);              
-                  when X"120" =>    user_cfg_i.elcorr_cont_calc_mode           <= data_i(0);
+                  when X"120" =>    user_cfg_i.elcorr_spare3                   <= data_i(0);
                   
                   when X"124" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);
                   

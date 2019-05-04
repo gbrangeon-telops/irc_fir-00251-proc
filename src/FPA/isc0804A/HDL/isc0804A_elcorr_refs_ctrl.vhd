@@ -155,7 +155,7 @@ begin
             
             -- mode continuel : pulse de prog de type timer
             if sec_counter > G_REF_CHANGE_PERIOD_SEC then
-               prog_timer_pulse <= USER_CFG_IN.ELCORR_GAIN_CONT_CALC_MODE;
+               prog_timer_pulse <= USER_CFG_IN.ELCORR_REF_CFG(0).REF_CONT_MEAS_MODE or USER_CFG_IN.ELCORR_REF_CFG(1).REF_CONT_MEAS_MODE;
                sec_counter <= 0;
             else
                prog_timer_pulse <= '0';
@@ -243,7 +243,7 @@ begin
                   ctrl_fsm <= wait_fdbk_st;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.DAC_FREE_RUNNING_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
                   if ref_feedbk_i(ref_id) = '1' then
                      prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
                      if ref_id = 0 then

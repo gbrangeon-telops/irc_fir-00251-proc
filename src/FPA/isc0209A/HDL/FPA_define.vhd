@@ -271,7 +271,7 @@ package FPA_define is
       elcorr_add_op_sel              : std_logic_vector(1 downto 0);   
       
       -- mode de calcul continuel du gain   (à toutes les x sec)
-      elcorr_gain_cont_calc_mode     : std_logic;          
+      elcorr_spare3                  : std_logic;          
       
       -- gestion de la saturation basse et haute à la sortie du module fpa
       sat_ctrl_en                    : std_logic;

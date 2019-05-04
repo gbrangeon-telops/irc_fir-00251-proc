@@ -279,8 +279,8 @@ package FPA_define is
       elcorr_div_op_sel                   : std_logic_vector(1 downto 0);
       elcorr_add_op_sel                   : std_logic_vector(1 downto 0);   
       
-      -- mode de calcul continuel (à toutes les x sec)
-      elcorr_cont_calc_mode               : std_logic;          
+      -- spare3
+      elcorr_spare3                       : std_logic;          
       
       -- gestion de la saturation basse et haute à la sortie du module fpa
       sat_ctrl_en                         : std_logic;

@@ -331,10 +331,10 @@ begin
                when X"130" =>    user_cfg_i.roic_dbg_reg                    <= data_i(user_cfg_i.roic_dbg_reg'length-1 downto 0); 
                when X"134" =>    user_cfg_i.roic_test_row_en                <= data_i(0);
                when X"138" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);             
-               when X"13C" =>    user_cfg_i.elcorr_gain_cont_calc_mode      <= data_i(0);  
+               when X"13C" =>    user_cfg_i.elcorr_spare3                   <= data_i(0);  
                
                when X"140" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
-               when X"144" =>    user_cfg_i.dac_free_running_mode           <= data_i(0);
+               when X"144" =>    user_cfg_i.elcorr_spare4                   <= data_i(0);
                when X"148" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
                
                -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation

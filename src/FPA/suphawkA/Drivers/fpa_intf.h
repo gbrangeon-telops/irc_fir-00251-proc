@@ -161,7 +161,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  elcorr_div_op_sel;      
    uint32_t  elcorr_add_op_sel;         
    uint32_t  sat_ctrl_en;          
-   uint32_t  elcorr_cont_calc_mode;
+   uint32_t  elcorr_spare3             ;
    uint32_t  roic_cst_output_mode;
    uint32_t  cfg_num;
    uint32_t  fpa_intf_data_source;
