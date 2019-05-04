@@ -114,7 +114,9 @@ architecture rtl of scd_data_dispatcher is
          valid    : out std_logic;
          full     : out std_logic;
          overflow : out std_logic;
-         empty    : out std_logic
+         empty    : out std_logic;
+         wr_rst_busy    : out std_logic;
+         rd_rst_busy    : out std_logic
          );
    end component;
    
@@ -420,7 +422,9 @@ begin
       valid  => fpa_ch1_fifo_dval,
       full => open,
       overflow => fpa_ch1_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    --------------------------------------------------
@@ -438,7 +442,9 @@ begin
       valid  => fpa_ch2_fifo_dval,
       full => open,
       overflow => fpa_ch2_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    -------------------------------------------------
@@ -456,7 +462,9 @@ begin
       valid  => diag_ch1_fifo_dval,                  
       full => open,                                  
       overflow => diag_ch1_fifo_ovfl,                
-      empty => open                                  
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open                                  
       );                                             
    
    --------------------------------------------------
@@ -474,7 +482,9 @@ begin
       valid  => diag_ch2_fifo_dval,
       full => open,
       overflow => diag_ch2_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    --------------------------------------------------

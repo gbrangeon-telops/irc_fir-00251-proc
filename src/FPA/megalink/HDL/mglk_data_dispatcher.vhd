@@ -122,7 +122,7 @@ architecture rtl of mglk_data_dispatcher is
    component fwft_sfifo_w28_d16
       port (
          clk       : in std_logic;
-         srst       : in std_logic;
+         srst      : in std_logic;
          din       : in std_logic_vector(27 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
@@ -137,7 +137,7 @@ architecture rtl of mglk_data_dispatcher is
    component fwft_sfifo_w40_d16
       port (
          clk       : in std_logic;
-         srst       : in std_logic;
+         srst      : in std_logic;
          din       : in std_logic_vector(39 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
@@ -396,7 +396,9 @@ begin
       valid  => fpa_ch1_fifo_dval,
       full => open,
       overflow => fpa_ch1_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    --------------------------------------------------
@@ -414,7 +416,9 @@ begin
       valid  => fpa_ch2_fifo_dval,
       full => open,
       overflow => fpa_ch2_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    -------------------------------------------------
@@ -432,7 +436,9 @@ begin
       valid  => diag_ch1_fifo_dval,                  
       full => open,                                  
       overflow => diag_ch1_fifo_ovfl,                
-      empty => open                                  
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open                                  
       );                                             
    
    --------------------------------------------------
@@ -450,7 +456,9 @@ begin
       valid  => diag_ch2_fifo_dval,
       full => open,
       overflow => diag_ch2_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    --------------------------------------------------

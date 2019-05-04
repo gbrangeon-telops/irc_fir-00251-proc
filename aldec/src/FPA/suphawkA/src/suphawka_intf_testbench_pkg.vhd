@@ -123,11 +123,11 @@ package body suphawkA_intf_testbench_pkg is
       comn_fpa_diag_mode             :=  (others => diag_mode);                                               
       comn_fpa_diag_type             :=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                :=  (others =>'1');                                               
-      comn_fpa_trig_ctrl_mode        :=  resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);          
-      comn_fpa_acq_trig_ctrl_dly     :=  to_unsigned(1700, comn_fpa_acq_trig_ctrl_dly'length);            
-      comn_fpa_acq_trig_period_min   :=  to_unsigned(7200, comn_fpa_acq_trig_period_min'length);        
-      comn_fpa_xtra_trig_ctrl_dly    :=  to_unsigned(1700, comn_fpa_xtra_trig_ctrl_dly'length);         
-      comn_fpa_xtra_trig_period_min  :=  to_unsigned(7200, comn_fpa_xtra_trig_period_min'length);       
+      comn_fpa_trig_ctrl_mode        :=  resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);          
+      comn_fpa_acq_trig_ctrl_dly     :=  to_unsigned(100, comn_fpa_acq_trig_ctrl_dly'length);            
+      comn_fpa_acq_trig_period_min   :=  to_unsigned(100000, comn_fpa_acq_trig_period_min'length);        
+      comn_fpa_xtra_trig_ctrl_dly    :=  to_unsigned(100, comn_fpa_xtra_trig_ctrl_dly'length);         
+      comn_fpa_xtra_trig_period_min  :=  to_unsigned(100000, comn_fpa_xtra_trig_period_min'length);       
       
       
       xstart                         := to_unsigned(0, 32);  
@@ -213,7 +213,7 @@ package body suphawkA_intf_testbench_pkg is
       elcorr_ref_dac_id                    := to_unsigned(5, 32);  --       
       elcorr_atemp_gain                    := to_unsigned(1, 32);          
       elcorr_atemp_ofs                     := to_unsigned(540, 32);                     
-      sat_ctrl_en                          := (others => '0');                        
+      sat_ctrl_en                          := (others => '1');                        
       
       elcorr_ref0_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
       elcorr_ref1_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
