@@ -1274,7 +1274,7 @@ void GC_UpdateImageLimits()
 void GC_UpdateExternalFanSpeed()
 {
    extern t_fan gFan;
-   FAN_SET_PWM3(&gFan, gcRegsData.ExternalFanSpeedSetpoint);
+   FAN_SET_PWM1(&gFan, gcRegsData.ExternalFanSpeedSetpoint);
    gcRegsData.ExternalFanSpeed = gcRegsData.ExternalFanSpeedSetpoint;
 }
 
