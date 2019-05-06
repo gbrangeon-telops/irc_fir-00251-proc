@@ -116,14 +116,14 @@ architecture rtl of scd_diag_data_gen is
    signal ch2_diag_dval     : std_logic;
    signal diag_done_i       : std_logic;
    signal dly_cnt           : unsigned(15 downto 0);
-   signal data_cnt          : unsigned(15 downto 0);
+   signal hder_dcnt         : unsigned(15 downto 0);
    signal line_cnt          : unsigned(15 downto 0);
    signal fpa_int_i         : std_logic;
    signal fpa_int_last      : std_logic;
    signal revert_img        : std_logic;
    signal clk_div_i         : std_logic;
    signal clk_div_last      : std_logic;
-   signal hder_cnt          : unsigned(7 downto 0);
+   signal hder_data_id      : unsigned(7 downto 0);
    signal diag_clk_i        : std_logic;
    signal diag_clk_last_i   : std_logic;
    signal pix_samp_trig_i   : std_logic;
@@ -321,8 +321,8 @@ begin
                
                when idle =>
                   dly_cnt <= (others => '0');
-                  data_cnt <= to_unsigned(1, data_cnt'length);
-                  hder_cnt <= (others => '0');
+                  hder_dcnt <= to_unsigned(1, hder_dcnt'length);
+                  hder_data_id <= (others => '0');
                   line_cnt <= (others => '0');
                   dval_i <= '0';
                   lval_i <= '0';
@@ -364,25 +364,25 @@ begin
                   lval_i <= '1';
                   dval_i <= '1';
                   hder_i <= '1';
-                  data_cnt <= data_cnt + 1;
-                  hder_cnt <= hder_cnt + 1;
+                  hder_dcnt <= hder_dcnt + 1;
+                  hder_data_id <= hder_data_id + 1;
                   ch1_data_i <= (others => '0');
                   ch2_data_i <= (others => '0');                  
-                  if data_cnt > FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T6_DLY then
+                  if hder_dcnt > FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T6_DLY then
                      hder_i <= '0';                     
                   end if;
-                  if data_cnt > FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T3_DLY then
+                  if hder_dcnt > FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T3_DLY then
                      lval_i <= '0';
                      dval_i <= '0';
                   end if;
-                  if data_cnt = FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T5_DLY then
+                  if hder_dcnt = FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T5_DLY then
                      diag_fsm <=  start_line_gen_st;
                   else
                      
                   end if;
                   
                   
-                  case to_integer(hder_cnt) is
+                  case to_integer(hder_data_id) is
                      when 0 =>   -- Byte 0
                         ch1_data_i(7 downto 0) <=  x"FF"; -- frame_start_id  <= fpa_hder_data(0);  -- Frame Start 
                      
@@ -412,7 +412,8 @@ begin
                      
                      when others =>
                         ch1_data_i <= (others => '0');
-                     ch2_data_i <= (others => '0');
+                        ch2_data_i <= (others => '0');
+                     
                   end case;
                
                when start_line_gen_st =>
