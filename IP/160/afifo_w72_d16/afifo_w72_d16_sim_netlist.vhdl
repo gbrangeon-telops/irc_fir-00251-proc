@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Sat Apr 20 19:33:50 2019
+-- Date        : Sat May 04 12:02:30 2019
 -- Host        : TELOPS228 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/160/afifo_w72_d16/afifo_w72_d16_sim_netlist.vhdl
+--               d:/Telops/fir-00251-Proc/IP/160/afifo_w72_d16/afifo_w72_d16_sim_netlist.vhdl
 -- Design      : afifo_w72_d16
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.

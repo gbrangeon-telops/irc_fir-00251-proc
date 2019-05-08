@@ -41,8 +41,8 @@ REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
 fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -252,9 +252,6 @@ ADC_deserializer/..\..\compile\adc_data_deserializer_8chn.vhd=-1
 [file_out:ADC_deserializer/..\..\..\src\QuadADC\HDL\adc_data_deserializer.bde]
 ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
-
 [Groups]
 ADCReadout=1
 AEC=1
@@ -313,6 +310,8 @@ USB=1
 [file_out:/..\..\src\fir_00251_proc_startup.bde]
 /..\compile\fir_00251_proc_startup.vhd=-1
 
+[file_out:/..\..\src\fir_00251_proc_startup.bde]
+/..\compile\fir_00251_proc_startup.vhd=-1
 
 [Files]
 /..\..\src\fir_00251_proc_acq.bde=-1
@@ -1352,30 +1351,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\FIR-00251-Common\VHDL\USART\usart_mmcm_rst.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=Macro
 .\..\src\USB\hdl\USB_CTRL.bde=Block Diagram
-.\compile\afpa_data_ctrl_16chn.vhd=VHDL Source Code
-.\compile\afpa_elec_ref_proc.vhd=VHDL Source Code
-.\compile\afpa_analog_chain_corr.vhd=VHDL Source Code
-.\compile\afpa_real_data_gen.vhd=VHDL Source Code
-.\compile\afpa_dval_gen.vhd=VHDL Source Code
-.\compile\afpa_hsample_proc.vhd=VHDL Source Code
-.\compile\afpa_vsample_proc.vhd=VHDL Source Code
-.\compile\afpa_data_ctrl.vhd=VHDL Source Code
-.\compile\afpa_services.vhd=VHDL Source Code
-.\compile\fleG_prog_ctrler.vhd=VHDL Source Code
-.\compile\fastrd_clks_memory.vhd=VHDL Source Code
-.\compile\fastrd_wdow_info_rate_ctrler.vhd=VHDL Source Code
-.\compile\fastrd_wdow_mem.vhd=VHDL Source Code
-.\compile\sc_high_low_duration.vhd=VHDL Source Code
-.\compile\isc0804A_500Hz_clks_gen.vhd=VHDL Source Code
-.\compile\isc0804A_500Hz_readout_ctrler.vhd=VHDL Source Code
-.\compile\isc0804A_500Hz_prog_ctrler.vhd=VHDL Source Code
-.\compile\isc0804A_500Hz_hw_driver.vhd=VHDL Source Code
-.\compile\isc0804A_500Hz_intf.vhd=VHDL Source Code
-.\compile\isc0804A_clks_gen.vhd=VHDL Source Code
-.\compile\isc0804A_readout_ctrler.vhd=VHDL Source Code
-.\compile\isc0804A_prog_ctrler.vhd=VHDL Source Code
-.\compile\isc0804A_hw_driver.vhd=VHDL Source Code
-.\compile\isc0804A_intf.vhd=VHDL Source Code
 
 [file_out:/..\..\src\fir_00251_proc_acq.bde]
 /..\compile\fir_00251_proc_acq.vhd=-1
@@ -1513,24 +1488,50 @@ Flagging/..\..\compile\flagging_top.vhd=-1
 Flash_Ctrl/..\..\compile\Flash_intf.vhd=-1
 Flash_Ctrl/SFW=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
+FPA\Common/..\..\..\compile\afpa_services.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
+FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde]
+FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde]
 FPA\Common/..\..\..\compile\uart_block_tel2000.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
+FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
+FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
+FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde]
 FPA\Common/..\compile\afpa_elec_offset_proc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clks_memory.bde]
+FPA\Common/..\..\..\compile\fastrd_clks_memory.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_ctrler.bde]
+FPA\Common/..\..\..\compile\fastrd_wdow_info_rate_ctrler.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde]
+FPA\Common/..\..\..\compile\fastrd_wdow_mem.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde]
+FPA\Common/..\..\..\compile\afpa_analog_chain_corr.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde]
+FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
 
 [file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde]
 FPA\HawkA/..\..\..\compile\hawkA_clks_gen.vhd=-1
@@ -1571,6 +1572,8 @@ FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_intf.vhd=-1
 [file_out:FPA\isc0207A_3k/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
 FPA\isc0207A_3k/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
 
+[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde]
+FPA\isc0207A_3k/..\..\..\compile\sc_high_low_duration.vhd=-1
 
 [file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde]
 FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_readout_ctrler.vhd=-1
@@ -1587,15 +1590,35 @@ FPA\isc0209A/..\..\..\compile\isc0209A_prog_ctrler.vhd=-1
 [file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde]
 FPA\isc0209A/..\..\..\compile\isc0209A_clks_gen.vhd=-1
 
+[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde]
+FPA\isc0804A/..\..\..\compile\isc0804A_clks_gen.vhd=-1
 
+[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_hw_driver.bde]
+FPA\isc0804A/..\..\..\compile\isc0804A_hw_driver.vhd=-1
 
+[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_intf.bde]
+FPA\isc0804A/..\..\..\compile\isc0804A_intf.vhd=-1
 
+[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_prog_ctrler.bde]
+FPA\isc0804A/..\..\..\compile\isc0804A_prog_ctrler.vhd=-1
 
+[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_readout_ctrler.bde]
+FPA\isc0804A/..\..\..\compile\isc0804A_readout_ctrler.vhd=-1
 
+[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen.bde]
+FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_clks_gen.vhd=-1
 
+[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_hw_driver.bde]
+FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_hw_driver.vhd=-1
 
+[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_intf.bde]
+FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_intf.vhd=-1
 
+[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_prog_ctrler.bde]
+FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_prog_ctrler.vhd=-1
 
+[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_ctrler.bde]
+FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_readout_ctrler.vhd=-1
 
 [file_out:FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\mglk_data_ctrl.bde]
 FPA\Megalink/..\..\..\compile\mglk_data_ctrl.vhd=-1
@@ -1717,51 +1740,3 @@ USART/..\..\compile\USART.vhd=-1
 [file_out:USB/..\..\..\src\USB\hdl\USB_CTRL.bde]
 USB/..\..\compile\USB_CTRL.vhd=-1
 
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_clks_gen.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_clks_gen.vhd=-1
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_ctrler.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_readout_ctrler.vhd=-1
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_prog_ctrler.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_prog_ctrler.vhd=-1
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_hw_driver.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_hw_driver.vhd=-1
-[file_out:FPA\isc0804A_500Hz/..\..\..\..\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_intf.bde]
-FPA\isc0804A_500Hz/..\..\..\compile\isc0804A_500Hz_intf.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde]
-FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde]
-FPA\Common/..\..\..\compile\afpa_analog_chain_corr.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
-FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
-FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
-FPA\Common/..\..\..\compile\afpa_services.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde]
-FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_clks_memory.bde]
-FPA\Common/..\..\..\compile\fastrd_clks_memory.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_info_rate_ctrler.bde]
-FPA\Common/..\..\..\compile\fastrd_wdow_info_rate_ctrler.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde]
-FPA\Common/..\..\..\compile\fastrd_wdow_mem.vhd=-1
-[file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde]
-FPA\isc0207A_3k/..\..\..\compile\sc_high_low_duration.vhd=-1
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_clks_gen.vhd=-1
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_readout_ctrler.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_readout_ctrler.vhd=-1
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_prog_ctrler.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_prog_ctrler.vhd=-1
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_hw_driver.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_hw_driver.vhd=-1
-[file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_intf.bde]
-FPA\isc0804A/..\..\..\compile\isc0804A_intf.vhd=-1
