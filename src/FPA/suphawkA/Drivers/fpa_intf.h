@@ -63,13 +63,13 @@
 #define FPA_EHDRI_EXP_2    2250.0F
 #define FPA_EHDRI_EXP_3    11000.0F 
 
-#define FPA_CAL_MIN_EXPOSURE  0.2F
-#define FPA_CAL_MAX_EXPOSURE  1000000.0F
-
 #define FPA_MCLK_RATE_HZ               10E+6F    // le master clock du FPA
 
 #define FPA_MIN_EXPOSURE               (float)(1E6F/(float)FPA_MCLK_RATE_HZ)    // [us] 1 coup d'horloge en µsec
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
+
+#define FPA_CAL_MIN_EXPOSURE           FPA_MIN_EXPOSURE
+#define FPA_CAL_MAX_EXPOSURE           FPA_MAX_EXPOSURE
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 

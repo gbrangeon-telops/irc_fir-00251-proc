@@ -130,7 +130,7 @@ channelPowerState_t Power_SetChannelPowerState(powerChannel_t channel, channelPo
 
       FPA_GetStatus(&fpaStatus, &gFpaIntf);
 
-      if ((fpaStatus.adc_ddc_detect_process_done == 1) &&
+      if ((fpaStatus.fpa_init_done == 1) &&
             (fpaStatus.adc_ddc_present == 1) &&
             (extAdcChannels[XEC_COOLER_SENSE].isValid))
       {

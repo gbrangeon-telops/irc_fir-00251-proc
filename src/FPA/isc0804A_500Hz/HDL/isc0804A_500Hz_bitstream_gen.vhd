@@ -53,14 +53,6 @@ architecture rtl of isc0804A_500Hz_bitstream_gen is
          CLK    : in std_logic);
    end component;
    
-   component double_sync_vector is       -- ENO : 10 oct 2017: necessaire pour ce module
-      port(
-         D : in std_logic_vector;
-         Q : out std_logic_vector;
-         CLK : in std_logic
-         );
-   end component;
-   
    type reset_fsm_type  is (assert_rst_st, desassert_rst_st, done_st);  
    type cfg_fsm_type is (idle, check_done_st, rqst_st, check_init_st, send_roic_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_roic_st, update_cfg_num_st, update_aoi_st, pause_st);
    
@@ -88,7 +80,7 @@ architecture rtl of isc0804A_500Hz_bitstream_gen is
    signal aoi_cfg_changed     : std_logic_vector(1 downto 0);
    signal new_aoi_cfg_pending : std_logic;
    signal new_cfg_pending     : std_logic;
-   signal boost_mode_i        : std_logic_vector(USER_CFG.BOOST_MODE'length-1 downto 0);
+   -- signal boost_mode_i        : std_logic_vector(USER_CFG.BOOST_MODE'length-1 downto 0);
    
    signal im                  : std_logic_vector(2 downto 0);
    signal bp                  : std_logic_vector(1 downto 0);
@@ -123,15 +115,6 @@ begin
       CLK    => CLK,
       SRESET => sreset
       ); 
-   
-   --------------------------------------------------
-   -- synchro  
-   --------------------------------------------------
-   sync_en : double_sync_vector  
-   port map(
-      D => USER_CFG.BOOST_MODE,
-      Q => boost_mode_i,
-      CLK => CLK); 
    
    --------------------------------------------------
    --  bistream builder

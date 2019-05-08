@@ -190,6 +190,7 @@ typedef struct suphawk_param_s  suphawk_param_t;
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint8_t sw_init_done = 0;
+t_FpaStatus gStat;                        // devient une variable globale
 ProximCfg_t ProximCfg = {{ 7137, 0, 7137, 4387,  0,  10129, 0, 0}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // Prototypes fonctions internes
@@ -358,7 +359,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       
    // DIG voltage
    if (sw_init_done == 0)
-      ptrA->dig_code = 0x00D0;   
+      ptrA->dig_code = 0x00D3;   
    if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage){
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)SUPHAWK_DIG_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SUPHAWK_DIG_VOLTAGE_MAX_mV))
          ptrA->dig_code = (uint32_t)MAX((0.000639F + (float)gFpaDetectorPolarizationVoltage/1000.0F)/0.005344F, 1.0F);  // dig_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
@@ -488,7 +489,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // correction electronique // registreA :
    if (sw_init_done == 0)
-      gFpaDebugRegA = 7;
+      gFpaDebugRegA = 0;
    elcorr_reg = (uint32_t)gFpaDebugRegA;
    
    if (ptrA->fpa_diag_mode == 1)
@@ -655,15 +656,18 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    float temperature;
    //float TempCoeff[2];
    
-   raw_temp = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_TEMPERATURE);  // lit le registre de temperature (fort probablement pas le présent mais le passé) 
-   raw_temp = (raw_temp & 0x0000FFFF);
+   FPA_GetStatus(&gStat, ptrA);
 
-   diode_voltage_mV = (float)raw_temp*((float)FPA_TEMP_READER_FULL_SCALE_mV)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
+   diode_voltage_mV = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
    
-   // courbe de conversion selon Selex 
-   temperature  =  -0.00014440F * powf(diode_voltage_mV,2) - 0.27652F * diode_voltage_mV + 524.0F;
-  
-   return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius  
+   if (gStat.fpa_init_done == 0){   
+      return FPA_INVALID_TEMP;
+   }
+   else{ 
+      // courbe de conversion selon Selex 
+      temperature  =  -0.00014440F * powf(diode_voltage_mV,2) - 0.27652F * diode_voltage_mV + 524.0F;
+      return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
+   }   
 }       
 
 //--------------------------------------------------------------------------                                                                            

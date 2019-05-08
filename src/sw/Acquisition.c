@@ -352,7 +352,7 @@ void Acquisition_SM()
 
       case ACQ_WAITING_FOR_ADC_DDC_PRESENCE:
          FPA_GetStatus(&fpaStatus, &gFpaIntf);
-         if (fpaStatus.adc_ddc_detect_process_done == 1)
+         if (fpaStatus.fpa_init_done == 1)
          {
             if (elapsed_time_us(tic_delay) >= WAITING_FOR_ADC_DDC_SENSOR_DELAY_US) // la carte ADC requiert un peu de temps pour démarrer
             {
