@@ -462,6 +462,7 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_SENSOR_COOLDOWN:
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if (( uint32_t) elapsed_time_us(tic_cooldownSampling) > COOLDOWN_SAMPLING_PERIOD_US)
          {
             sensorTemp = FPA_GetTemperature(&gFpaIntf);
