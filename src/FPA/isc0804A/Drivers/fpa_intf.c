@@ -804,35 +804,41 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
 
    diode_voltage = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F) / (powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES) * (float)FPA_TEMP_READER_GAIN);
 
-   // utilisation  des valeurs de flashsettings
-   temperature = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
-   temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
-   temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
-   temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
-   temperature += flashSettings.FPATemperatureConversionCoef0;
-
-   // Si flashsettings non programmés alors on utilise les valeurs par defaut
-   if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
-       (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
-       (flashSettings.FPATemperatureConversionCoef0 == 0)) {
-
-      // courbe de conversion de 2N2222 avec une polarisation de 100µA (coeff de Sofradir)
-      temperature  =  -170.50F * powf(diode_voltage,4);
-      temperature +=   173.45F * powf(diode_voltage,3);
-      temperature +=   137.86F * powf(diode_voltage,2);
-      temperature += (-667.07F * diode_voltage) + 623.1F - 0.5F;  // 625 remplacé par 623.1- 0.5 en guise de calibration de la diode
-
-      // courbe de conversion de D670 avec une polarisation de 10µA
-      if ((gStat.hw_init_done == 1) && (flegx_present == 0)){
-         temperature  =  -426.6946F * powf(diode_voltage,4);
-         temperature +=  1089.8000F * powf(diode_voltage,3);
-         temperature += -1082.8000F * powf(diode_voltage,2);
-         temperature += (  50.8778F * diode_voltage) + 461.5899F;
-      }
+   
+   if (gStat.fpa_init_done == 0){   
+      return FPA_INVALID_TEMP;
    }
-   return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
-}       
-
+   else{   
+      // utilisation  des valeurs de flashsettings
+      temperature = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+      temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
+      temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+      temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+      temperature += flashSettings.FPATemperatureConversionCoef0;
+      
+      // Si flashsettings non programmés alors on utilise les valeurs par defaut
+      if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef0 == 0)) {
+      
+         // courbe de conversion de 2N2222 avec une polarisation de 100µA (coeff de Sofradir)
+         temperature  =  -170.50F * powf(diode_voltage,4);
+         temperature +=   173.45F * powf(diode_voltage,3);
+         temperature +=   137.86F * powf(diode_voltage,2);
+         temperature += (-667.07F * diode_voltage) + 623.1F - 0.5F;  // 625 remplacé par 623.1- 0.5 en guise de calibration de la diode
+      
+         // courbe de conversion de D670 avec une polarisation de 10µA sur carte EFa-00291 qui est un fleX
+         if (flegx_present == 0){
+            temperature  =  -426.6946F * powf(diode_voltage,4);
+            temperature +=  1089.8000F * powf(diode_voltage,3);
+            temperature += -1082.8000F * powf(diode_voltage,2);
+            temperature += (  50.8778F * diode_voltage) + 461.5899F;
+         }
+      }
+      
+      return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
+   }
+}
 //--------------------------------------------------------------------------                                                                            
 // Pour avoir les parametres propres au isc0804 avec une config 
 //--------------------------------------------------------------------------
