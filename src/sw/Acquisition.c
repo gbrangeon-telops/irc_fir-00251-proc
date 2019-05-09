@@ -504,7 +504,7 @@ void Acquisition_SM()
                   GETTIME(&tic_cooldownStability);
                }
 
-               // Check if sensor cooldown is done
+               // Check if sensor cooldown is done 
                if ((fpaStatus.fpa_powered == 1) || (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
                {
                   builtInTests[BITID_Cooldown].result = BITR_Passed;
