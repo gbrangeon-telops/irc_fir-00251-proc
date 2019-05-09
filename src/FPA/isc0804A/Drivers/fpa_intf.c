@@ -235,6 +235,7 @@ float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
 ProximCfg_t ProximCfg = {{4518, 4518, 4518, 1046,  5738, 6075, 8507, 4518}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+uint8_t flegx_present = 0;
 
 // definition et activation des accelerateurs
 uint8_t speedup_lsydel         = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
@@ -339,10 +340,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    static uint8_t cfg_num = 0; 
    static uint8_t roic_dbg_reg_unlocked = 0; 
    // uint8_t need_rst_fpa_module = 0;
-   uint8_t flegx_present;
+   // uint8_t flegx_present;
    
    
-   flegx_present = (uint8_t)(gStat.adc_brd_spare & 0x01);
+   // flegx_present = (uint8_t)(gStat.adc_brd_spare & 0x01);
    
    // on bâtit les parametres specifiques du 0804
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -795,17 +796,17 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
    float diode_voltage;
    float temperature;
    // t_FpaStatus Stat;
-   uint8_t flegx_present;
+   // uint8_t flegx_present;
   
 	
    FPA_GetStatus(&gStat, ptrA);
-   flegx_present = (uint8_t)(gStat.adc_brd_spare & 0x01);
+   // flegx_present = (uint8_t)(gStat.adc_brd_spare & 0x01);
    
 
    diode_voltage = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F) / (powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES) * (float)FPA_TEMP_READER_GAIN);
 
    
-   if (gStat.fpa_init_done == 0){   
+   if ((gStat.hw_init_done == 0) || (sw_init_done == 0)) {
       return FPA_INVALID_TEMP;
    }
    else{   
@@ -1041,10 +1042,15 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
    Stat->out_pix_cnt_min               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);  
    Stat->out_pix_cnt_max               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
    
+   // savoir si on a un flex (LN2) ou un fleGX (TS-IR)
+   flegx_present = (uint8_t)(gStat.adc_brd_spare & 0x01);
+   
    // generation de fpa_init_done et fpa_init_success
    Stat->fpa_init_success = (Stat->hw_init_success & sw_init_success);
    Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done);
-   
+   if ((Stat->hw_init_done == 1) && (flegx_present == 0))                              //cas particulier du LN2
+       Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done & Stat->fpa_powered);  // dans le cas particulier du LN2, fpa_init_done = 1 si en plus on arrive à allumer le detecteur(cela suppose azote Ok) 
+       
    // profiter pour mettre à jour la variable globale (interne au driver) de statut  
    gStat = *Stat;
   
