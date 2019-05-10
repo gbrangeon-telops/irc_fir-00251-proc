@@ -1017,6 +1017,7 @@ IRC_Status_t DebugTerminalParseBUF(circByteBuffer_t *cbuf)
    DT_PRINTF("buf.error          = 0x%08X", status.error);
    DT_PRINTF("buf.mem_ready      = %d", status.mem_ready);
    DT_PRINTF("buf.ext_buf_prsnt  = %d", status.ext_buf_prsnt);
+   DT_PRINTF("buf.status         = 0x%08X", gcRegsData.MemoryBufferStatus);
 
    return IRC_SUCCESS;
 }
