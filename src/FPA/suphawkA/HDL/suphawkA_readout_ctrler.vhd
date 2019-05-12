@@ -35,6 +35,7 @@ entity suphawkA_readout_ctrler is
       FPA_RD_MCLK       : out std_logic;         
       READOUT_INFO      : out readout_info_type;
       ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0);
+      READOUT_AOI_FVAL  : out std_logic;
       
       REF_VALID         : in std_logic_vector(1 downto 0)
       );  
@@ -111,6 +112,7 @@ begin
    ADC_SYNC_FLAG <= adc_sync_flag_i;    -- non utilisé  
    READOUT_INFO  <= readout_info_i;      
    FPA_FDEM <= fdem_i;
+   READOUT_AOI_FVAL <= readout_info_i.aoi.fval;
    
    --------------------------------------------------
    -- synchro reset 

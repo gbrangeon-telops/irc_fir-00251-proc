@@ -21,7 +21,7 @@ package suphawkA_intf_testbench_pkg is
    
    constant PAUSE_SIZE                 : integer := 3;
    constant TAP_NUM                    : integer := 8;
-   constant C_ELCORR_ENABLED           : std_logic := '1';
+   constant C_ELCORR_ENABLED           : std_logic := '0';
    constant C_elcorr_ref0_image_map_enabled : std_logic := '0';
    constant C_elcorr_ref1_image_map_enabled : std_logic := '0';
    constant ELCORR_REF_DAC_ID          : integer := 5;
@@ -113,7 +113,7 @@ package body suphawkA_intf_testbench_pkg is
       variable elcorr_add_op_sel                    : unsigned(31 downto 0);
       variable sat_ctrl_en                          : unsigned(31 downto 0);
       variable elcorr_cont_calc_mode                : unsigned(31 downto 0);
-      variable roic_cst_output_mode                 : unsigned(31 downto 0);
+      variable roic_cst_output_mode                 : unsigned(31 downto 0) := (others => '0');
       variable cfg_num                              : unsigned(31 downto 0);
       variable fpa_intf_data_source                 : unsigned(31 downto 0) := (others => '0');
       
@@ -123,12 +123,7 @@ package body suphawkA_intf_testbench_pkg is
       comn_fpa_diag_mode             :=  (others => diag_mode);                                               
       comn_fpa_diag_type             :=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                :=  (others =>'1');                                               
-      comn_fpa_trig_ctrl_mode        :=  resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);          
-      comn_fpa_acq_trig_ctrl_dly     :=  to_unsigned(100, comn_fpa_acq_trig_ctrl_dly'length);            
-      comn_fpa_acq_trig_period_min   :=  to_unsigned(100000, comn_fpa_acq_trig_period_min'length);        
-      comn_fpa_xtra_trig_ctrl_dly    :=  to_unsigned(100, comn_fpa_xtra_trig_ctrl_dly'length);         
-      comn_fpa_xtra_trig_period_min  :=  to_unsigned(100000, comn_fpa_xtra_trig_period_min'length);       
-      
+      comn_fpa_trig_ctrl_mode        :=  resize(unsigned(MODE_INT_END_TO_TRIG_START),32);          
       
       xstart                         := to_unsigned(0, 32);  
       ystart                         := to_unsigned(0, 32);  
@@ -139,21 +134,26 @@ package body suphawkA_intf_testbench_pkg is
       revert                         := (others => '0');
       cbit_en                        := (others => '0');
       dig_code                       := (others => '0');
-      colstart                       := to_unsigned(user_xsize/2, 32);  
-      colstop                        := to_unsigned(user_ysize/2, 32);  
-      rowstart                       := to_unsigned(513, 32);  
-      rowstop                        := to_unsigned(512, 32);  
+      
+      
+      colstart                       := xstart/TAP_NUM;  
+      colstop                        := colstart + xsize/TAP_NUM - 1;  
+      rowstart                       := ystart;  
+      rowstop                        := rowstart + ysize - 1;  
+      
+      
+      
       active_subwindow               := to_unsigned(0, 32); 
       prv_dac_nominal_value          := to_unsigned(1234, 32);  
       real_mode_active_pixel_dly     := to_unsigned(6, 32);
       adc_quad2_en                   := (others => '1');
---      if comn_fpa_diag_mode = 1 then
---         adc_quad2_en  := (others => '0');  
---      end if;
+      --      if comn_fpa_diag_mode = 1 then
+      --         adc_quad2_en  := (others => '0');  
+      --      end if;
       chn_diversity_en               := (others => '0'); 
       
       line_period_pclk               := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
-      readout_pclk_cnt_max           := to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize + 1) + 3, 32);   
+      readout_pclk_cnt_max           := to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + 164, 32);   
       active_line_start_num          := to_unsigned(1, 32);
       
       if user_ysize > 1 then 
@@ -251,7 +251,16 @@ package body suphawkA_intf_testbench_pkg is
       
       elcorr_cont_calc_mode := (others => '0');
       
-      cfg_num  := to_unsigned(send_id, cfg_num'length);                       
+      cfg_num  := to_unsigned(send_id, cfg_num'length);
+      
+      
+      comn_fpa_acq_trig_ctrl_dly     :=  to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_acq_trig_ctrl_dly'length);            
+      comn_fpa_acq_trig_period_min   :=  to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_acq_trig_period_min'length);        
+      comn_fpa_xtra_trig_ctrl_dly    :=  to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_xtra_trig_ctrl_dly'length);         
+      comn_fpa_xtra_trig_period_min  :=  to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_xtra_trig_period_min'length);       
+      
+      
+      
       
       -- cfg usager
       y :=  comn_fpa_diag_mode              

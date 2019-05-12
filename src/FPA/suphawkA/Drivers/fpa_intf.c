@@ -113,7 +113,7 @@
 #define TOTAL_DAC_NUM                     8
 
 // Electrical correction : references
-#define ELCORR_REF1_VALUE_mV              2227                // ref0 au milieu de la plage dynamique
+#define ELCORR_REF1_VALUE_mV              2227                // ref1 au milieu de la plage dynamique
 #define ELCORR_REF2_VALUE_mV              1200
 #define ELCORR_REF_DAC_ID                 6                   // position (entre 1 et 8) du dac dédié aux references 
 #define ELCORR_REF_MAXIMUM_SAMP           120                 // le nombre de sample au max supporté par le vhd
@@ -164,7 +164,7 @@ struct suphawk_param_s             //
    float mclk_period_usec;                       
    float tap_number;
    float pixnum_per_tap_per_mclk;
-   float fpa_delay_mclk;
+   float fpa_rst_dly_mclk;
    float vhd_delay_mclk;
    float delay_mclk;
    float lovh_mclk;
@@ -257,7 +257,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 { 
    suphawk_param_t hh;
    extern int16_t gFpaDetectorPolarizationVoltage;
-   static int16_t presentPolarizationVoltage = 700;       //  700 mV comme valeur par defaut pour GPOL
+   static int16_t presentPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
    extern float gFpaDetectorElectricalTapsRef;
    // extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
@@ -377,8 +377,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->chn_diversity_en = 0;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
    
    //
-   ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + hh.lovh_mclk;
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*(ptrA->ysize + hh.fovh_line) + 3;                              // ligne de reset du suphawk prise en compte
+   ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + (uint32_t)(hh.lovh_mclk * hh.pixnum_per_tap_per_mclk);
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*ptrA->ysize + (uint32_t)(hh.fpa_rst_dly_mclk * hh.pixnum_per_tap_per_mclk);                              // ligne de reset du suphawk prise en compte
    
    ptrA->active_line_start_num             = 1;                    // pour le suphawk, numero de la première ligne active
    ptrA->active_line_end_num               = ptrA->ysize;          // pour le suphawk, numero de la derniere ligne active
@@ -417,7 +417,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // TAPREF : VCC7 ou DAC7
    if (sw_init_done == 0)
-      ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(1550.0F, 7);
+      ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(1374.0F, 7);
       
    if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
    {
@@ -434,7 +434,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc clk source phase
    if (sw_init_done == 0)         
-      gFpaDebugRegD = 140;
+      gFpaDebugRegD = 680;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
        
    // Élargit le pulse de trig
@@ -597,7 +597,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }   
   
    // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = ((float)FPA_WIDTH_MAX/(hh.pixnum_per_tap_per_mclk*hh.tap_number) + hh.lovh_mclk)*hh.mclk_period_usec;  // le calcul se fait sur laligne de reset                          
+   elcorr_comp_duration_usec                  = hh.fpa_rst_dly_mclk * hh.mclk_period_usec;  // le calcul se fait sur laligne de reset                          
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
    ptrA->elcorr_spare1                        = 0;              
@@ -679,9 +679,9 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
-   ptrH->fpa_delay_mclk          = 165.0F;   // FPA: delai reglémentaire de 165 MCLK à la fin d'une image en ITR + 1 MCL en debut d'image
+   ptrH->fpa_rst_dly_mclk        = 165.0F;   // FPA: delai reglémentaire de 165 MCLK à la fin d'une image en ITR + 1 MCL en debut d'image
    ptrH->vhd_delay_mclk          = 5.0F;     // estimation des differerents delais accumulés par le vhd
-   ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
+   ptrH->delay_mclk              = ptrH->fpa_rst_dly_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 3.0F;
    ptrH->fovh_line               = 1.0F;
    ptrH->int_time_offset_mclk    = 0.0F;     // aucun offset sur le temps d'integration
@@ -692,7 +692,7 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
    
    // delay
    ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->fpa_delay_usec       = ptrH->fpa_rst_dly_mclk * ptrH->mclk_period_usec;
    ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
    
    // 

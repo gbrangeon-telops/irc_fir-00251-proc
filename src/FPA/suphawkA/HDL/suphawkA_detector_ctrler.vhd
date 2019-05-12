@@ -245,7 +245,8 @@ begin
                         dcr_fsm <= first_dcr_wr;
                      else                                -- aucun registre à programmer.  new_cfg_num_pending est à '1'
                         dcr_fsm <= second_pause_st;      -- il faut feindre programmer un registre et on retourne à idle. Cela permet de faire de la correction electronique en mode evenementiel par exemple.
-                     end if; 
+                     end if;
+                     dcr_mosi_i.data(3) <= ACTIVE_SUBWDW;
                   
                   when first_dcr_wr =>          -- ecrire d'abord le DCR pour activer le registre choisi
                      reg_en <= DCR;
