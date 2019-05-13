@@ -35,6 +35,7 @@ entity hawkA_readout_ctrler is
       FPA_FDEM          : out std_logic;
       FPA_RD_MCLK       : out std_logic;         
       READOUT_INFO      : out readout_info_type;
+      READOUT_AOI_FVAL  : out std_logic;
       ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0) 
       );  
 end hawkA_readout_ctrler;
@@ -108,7 +109,8 @@ begin
    FPA_RD_MCLK <= rd_mclk_i;              
    ADC_SYNC_FLAG <= adc_sync_flag_i;    -- non utilisé  
    READOUT_INFO  <= readout_info_i;      
-   FPA_FDEM <= fdem_i;
+   FPA_FDEM <= fdem_i; 
+   READOUT_AOI_FVAL <= readout_info_i.aoi.fval;
    
    --------------------------------------------------
    -- synchro reset 
