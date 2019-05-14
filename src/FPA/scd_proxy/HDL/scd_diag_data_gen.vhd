@@ -330,11 +330,11 @@ begin
                   diag_line_gen_en <= '0'; 
                   if DIAG_MODE_EN = '1' then 
                      if FPA_INTF_CFG.SCD_OP.SCD_INT_MODE = SCD_IWR then 
-                        if fpa_int_last = '0' and fpa_int_i = '1' then   -- en mode IWR, il faut attendre la fin de l'integration avant le delay T6
+                        if fpa_int_last = '0' and fpa_int_i = '1' then   -- en mode IWR, il faut attendre le début de l'integration avant le delay T6
                            diag_fsm <=  fig1_or_fig2_T6_dly_st;              -- les nomenclatures des delais sont identiques sur les figures 1 et 2.
                         end if;
                      else
-                        if fpa_int_last = '1' and fpa_int_i = '0' then   -- en mode ITR, il faut voir le debut de l'integration avant le delay T6
+                        if fpa_int_last = '1' and fpa_int_i = '0' then   -- en mode ITR, il faut voir la fin de l'integration avant le delay T6
                            diag_fsm <=  fig1_or_fig2_T6_dly_st;              -- les nomenclatures des delais sont identiques sur les figures 1 et 2.
                         end if;
                      end if;

@@ -97,8 +97,6 @@
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 #define FPA_MCLK_RATE_HZ               80E+6F   // fréquence de l'horloge du SCD Proxy
 
-#define FPA_SCD_HDER_EFF_LEN           128      // le nombre de pixels actifs/effectifs du header
-
 #define FPA_DATA_RESOLUTION            13
 #define FPA_PIXEL_PITCH                15E-6F
 

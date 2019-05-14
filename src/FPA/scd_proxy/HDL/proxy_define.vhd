@@ -121,8 +121,8 @@ package Proxy_define is
    -- scd integration
    type scd_int_cfg_type is
    record
-   scd_int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
-   scd_int_indx            : std_logic_vector(7 downto 0);
+      scd_int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
+      scd_int_indx            : std_logic_vector(7 downto 0);
    end record;
    
    -- scd operationnelle
@@ -207,21 +207,21 @@ package Proxy_define is
    ----------------------------------------------
    --function to_diag_data_ofs return diag_data_ofs_type;
    --function to_fpa_word_func(a:fpa_intf_cfg_type) return fpa_word_type;
-   
+
 end Proxy_define;
 
 package body Proxy_define is
    
    ---
    -- function to_diag_data_ofs return diag_data_ofs_type is
-   -- variable y  : diag_data_ofs_type;
-   -- variable ii : integer range 1 to 9;
-   
+      -- variable y  : diag_data_ofs_type;
+      -- variable ii : integer range 1 to 9;
+      
    -- begin
-   -- for ii in 1 to 9 loop    
-   -- y(ii) := (ii - 1)*DIAG_DATA_INC;
-   -- end loop;   
-   -- return y;                 
+      -- for ii in 1 to 9 loop    
+         -- y(ii) := (ii - 1)*DIAG_DATA_INC;
+      -- end loop;   
+      -- return y;                 
    -- end to_diag_data_ofs; 
    
 end package body Proxy_define; 

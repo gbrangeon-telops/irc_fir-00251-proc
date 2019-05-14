@@ -51,11 +51,11 @@
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
-#define FPA_NUM_CH         2  // nombre de canaux de sorties  (1 ou 2)
+#define FPA_NUM_CH         1  // nombre de canaux de sorties  (1 ou 2)
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (PelicanDIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (PelicanD_150HzIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 
 #define FPA_EVEN_TO_ODD_DELAY 4     // CLK
 #define FPA_ODD_TO_EVEN_DELAY 144   // CLK
@@ -96,8 +96,6 @@
 
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
 #define FPA_MCLK_RATE_HZ               80E+6F   // fréquence de l'horloge du SCD Proxy
-
-#define FPA_SCD_HDER_EFF_LEN           128      // le nombre de pixels actifs/effectifs du header
 
 #define FPA_DATA_RESOLUTION            13
 #define FPA_PIXEL_PITCH                15E-6F

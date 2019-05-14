@@ -288,14 +288,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    if (ptrA->fpa_diag_mode == 1)
    {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car la diag_mode est plus lent que le détecteur 
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car le diag_mode est plus lent que le détecteur 
       ptrA->fpa_acq_trig_ctrl_dly     = 0; 
    }
    
-   #ifdef SIM
-      ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
-      ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly; 
-   #endif
+#ifdef SIM
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;
+#endif
    
    
    //  window
@@ -339,16 +339,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->scd_bit_pattern = SCD_PE_TEST1;
                                       
    // valeurs converties en coups d'horloge du module FPA_INTF
+   // valeurs utilisées en mode patron de test seulement
    ptrA->scd_fig1_or_fig2_t4_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
    ptrA->scd_fig1_or_fig2_t6_dly = (uint32_t)((hh.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
    ptrA->scd_fig1_or_fig2_t5_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag
    ptrA->scd_fig4_t1_dly = (uint32_t)((kk.T1) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
    ptrA->scd_fig4_t2_dly = (uint32_t)((kk.T2) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);   // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
+   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
    ptrA->scd_fig4_t4_dly = (uint32_t)((kk.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
    ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t6_dly = (uint32_t)FPA_SCD_HDER_EFF_LEN;                          // directement en coups d'horloges (fait expres pour faciliter la génération de la bonne taille de pixels)
-   ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  
+   ptrA->scd_fig4_t6_dly = (uint32_t)((kk.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  // Les test patterns sont générés sur 2 channels, peu importe FPA_NUM_CH.
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
@@ -411,7 +412,7 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
       }
       return K_TO_CC(temperature); // Centi celsius
    }
-}     
+}
 
 //--------------------------------------------------------------------------                                                                            
 // Pour avoir le frameRateMax avec une config donnée
@@ -625,13 +626,13 @@ void FPA_Fig4SpecificParams(Scd_Fig4Param_t *ptrK, const gcRegistersData_t *pGCR
       ptrK->T1 = ptrK->T2;
    else
       ptrK->T1 = hh.Tline_conv + 2e-6F;
-   ptrK->T3  = 1280.0F * hh.TFPP_CLK; // resultat du calcul non  utilisé finalement
+   ptrK->T3  = 1280.0F * hh.TFPP_CLK;
    ptrK->T4  = 8.0F * hh.TFPP_CLK;
-   ptrK->T6  = 128.0F * hh.TFPP_CLK;  // resultat du calcul non  utilisé finalement
-   if (FPA_NUM_CH == 1)  
-      ptrK->T5 = 140e-6F;
-   else
-      ptrK->T5 = 90e-6F;
+   ptrK->T6  = 128.0F * hh.TFPP_CLK;
+
+   // Ces timings sont utilisés pour la génération des test patterns seulement.
+   // Les test patterns sont générés sur 2 channels, peu importe FPA_NUM_CH.
+   // Pour les pauses, on utilise le plus long.   ptrK->T5  = 140e-6F;   // plus long 1 ou 2ch
 }
 
 

@@ -143,8 +143,8 @@ begin
                      FPA_CH1_DOUT_DVAL <= '0';
                      FPA_CH2_DOUT_DVAL <= '0';
                      if dval_p1 = '1' then 
-                        FPA_CH1_DOUT <= din_p1;
-                        FPA_CH1_DOUT_DVAL <= '1';
+                        -- pix1 in CH1
+                        FPA_CH1_DOUT <= din_p1;    -- DVAL set at next state;
                         base_mode_fsm <= even_data_st;             
                      end if;
                      if FPA_CH1_FIFO_FLUSH = '1' then
@@ -155,7 +155,31 @@ begin
                      FPA_CH1_DOUT_DVAL <= '0';
                      FPA_CH2_DOUT_DVAL <= '0';
                      if dval_p1 = '1' then
-                        FPA_CH2_DOUT <= din_p1;
+                        -- part of pix2 in CH1
+                        FPA_CH1_DOUT(15) <= din_p1(0);
+                        FPA_CH1_DOUT(16) <= din_p1(27);
+                        FPA_CH1_DOUT(17) <= din_p1(5);
+                        FPA_CH1_DOUT(18) <= din_p1(1);
+                        FPA_CH1_DOUT(19) <= din_p1(2);
+                        FPA_CH1_DOUT(20) <= din_p1(3);
+                        FPA_CH1_DOUT(21) <= din_p1(4);
+                        FPA_CH1_DOUT(22) <= din_p1(6);
+                        -- part of pix2 in CH2
+                        FPA_CH2_DOUT(0) <= din_p1(7);
+                        FPA_CH2_DOUT(1) <= din_p1(8);
+                        FPA_CH2_DOUT(2) <= din_p1(9);
+                        FPA_CH2_DOUT(3) <= din_p1(12);
+                        FPA_CH2_DOUT(4) <= din_p1(13);
+                        FPA_CH2_DOUT(5) <= din_p1(11);
+                        FPA_CH2_DOUT(6) <= din_p1(14);
+                        FPA_CH2_DOUT(22 downto 7) <= (others => '0');
+                        FPA_CH2_DOUT(23) <= din_p1(23);
+                        FPA_CH2_DOUT(24) <= din_p1(24);
+                        FPA_CH2_DOUT(25) <= din_p1(25);
+                        FPA_CH2_DOUT(26) <= din_p1(26);
+                        FPA_CH2_DOUT(27) <= din_p1(10);
+                        -- DVALs
+                        FPA_CH1_DOUT_DVAL <= '1';
                         FPA_CH2_DOUT_DVAL <= '1';					 
                         base_mode_fsm <= odd_data_st;
                      end if;
