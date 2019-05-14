@@ -48,7 +48,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (SuperhawkAIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (SuphawkAIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 
 #define FPA_MAX_GAIN       3
 #define FPA_NUMTAPS        8  // [taps]
