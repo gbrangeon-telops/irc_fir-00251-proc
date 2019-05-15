@@ -3392,17 +3392,23 @@ void GC_MemoryBufferMOISourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      if(!GC_ExternalMemoryBufferIsImplemented && BM_MemoryBufferWrite && GC_AcquisitionStarted)
+      if(!GC_ExternalMemoryBufferIsImplemented && (gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off) && GC_AcquisitionStarted)
+      {
+         if((prevSource != MBMOIS_None) && (gcRegsData.MemoryBufferMOISource == MBMOIS_None))
+         {
+            BufferManager_OnAcquisitionStop(&gBufManager, &gcRegsData);
+         }
+      }
+
+      // Set MOI Config AFTER AcquisitionStop
+      // Set MOI Config BEFORE AcquisitionStart
+      BufferManager_HW_SetMoiConfig(&gBufManager);
+
+      if(!GC_ExternalMemoryBufferIsImplemented && (gcRegsData.MemoryBufferSequenceDownloadMode == MBSDM_Off) && GC_AcquisitionStarted)
       {
          if((prevSource == MBMOIS_None) && (gcRegsData.MemoryBufferMOISource != MBMOIS_None))
          {
-            BufferManager_HW_SetMoiConfig(&gBufManager); // Set MOI Config BEFORE AcquisitionStart
             BufferManager_OnAcquisitionStart(&gBufManager, &gcRegsData);
-         }
-         else if((prevSource != MBMOIS_None) && (gcRegsData.MemoryBufferMOISource == MBMOIS_None))
-         {
-            BufferManager_OnAcquisitionStop(&gBufManager, &gcRegsData);
-            BufferManager_HW_SetMoiConfig(&gBufManager); // Set MOI Config AFTER AcquisitionStop
          }
       }
 
