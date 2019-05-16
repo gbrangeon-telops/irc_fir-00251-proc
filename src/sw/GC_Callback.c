@@ -3389,6 +3389,7 @@ void GC_MemoryBufferMOISourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_
       // Before write
       prevSource = gcRegsData.MemoryBufferMOISource;
    }
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
