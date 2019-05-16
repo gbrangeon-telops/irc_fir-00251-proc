@@ -49,7 +49,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.5.0
+// Generated from XML camera definition file version 12.5.1
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
