@@ -57,9 +57,9 @@ create_proc_sw scorpiolwD
 build_proc_sw scorpiolwD 160
 #build_proc_sw scorpiolwD 325
 
-create_proc_sw scorpiolwD_230hz
-build_proc_sw scorpiolwD_230hz 160
-#build_proc_sw scorpiolwD_230hz 325
+create_proc_sw scorpiolwD_230Hz
+build_proc_sw scorpiolwD_230Hz 160
+#build_proc_sw scorpiolwD_230Hz 325
 
 #create_proc_sw startup
 #build_proc_sw startup 160
