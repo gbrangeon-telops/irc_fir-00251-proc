@@ -3,8 +3,8 @@
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
 -- Date        : Fri May 17 14:56:39 2019
 -- Host        : TELOPS258-7 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/325/t_axi4_stream16_afifo_d16/t_axi4_stream16_afifo_d16_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim -rename_top t_axi4_stream16_afifo_d16 -prefix
+--               t_axi4_stream16_afifo_d16_ t_axi4_stream16_afifo_d16_sim_netlist.vhdl
 -- Design      : t_axi4_stream16_afifo_d16
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -26,8 +26,6 @@ entity t_axi4_stream16_afifo_d16_blk_mem_gen_prim_wrapper is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_blk_mem_gen_prim_wrapper : entity is "blk_mem_gen_prim_wrapper";
 end t_axi4_stream16_afifo_d16_blk_mem_gen_prim_wrapper;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_blk_mem_gen_prim_wrapper is
@@ -293,8 +291,6 @@ entity t_axi4_stream16_afifo_d16_compare is
     comp1 : out STD_LOGIC;
     v1_reg : in STD_LOGIC_VECTOR ( 4 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_compare : entity is "compare";
 end t_axi4_stream16_afifo_d16_compare;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_compare is
@@ -551,8 +547,6 @@ entity t_axi4_stream16_afifo_d16_rd_bin_cntr is
     E : in STD_LOGIC_VECTOR ( 0 to 0 );
     m_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_rd_bin_cntr : entity is "rd_bin_cntr";
 end t_axi4_stream16_afifo_d16_rd_bin_cntr;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_rd_bin_cntr is
@@ -930,8 +924,6 @@ entity t_axi4_stream16_afifo_d16_rd_fwft is
     m_axis_tready : in STD_LOGIC;
     ram_empty_fb_i_reg : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_rd_fwft : entity is "rd_fwft";
 end t_axi4_stream16_afifo_d16_rd_fwft;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_rd_fwft is
@@ -1200,8 +1192,6 @@ entity t_axi4_stream16_afifo_d16_synchronizer_ff is
     \out\ : in STD_LOGIC;
     s_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_synchronizer_ff : entity is "synchronizer_ff";
 end t_axi4_stream16_afifo_d16_synchronizer_ff;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_synchronizer_ff is
@@ -3282,8 +3272,6 @@ entity t_axi4_stream16_afifo_d16_wr_bin_cntr is
     E : in STD_LOGIC_VECTOR ( 0 to 0 );
     s_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_wr_bin_cntr : entity is "wr_bin_cntr";
 end t_axi4_stream16_afifo_d16_wr_bin_cntr;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_wr_bin_cntr is
@@ -3870,8 +3858,6 @@ entity t_axi4_stream16_afifo_d16_wr_handshaking_flags is
     ram_full_fb_i_reg : in STD_LOGIC;
     s_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_wr_handshaking_flags : entity is "wr_handshaking_flags";
 end t_axi4_stream16_afifo_d16_wr_handshaking_flags;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_wr_handshaking_flags is
@@ -3904,8 +3890,6 @@ entity t_axi4_stream16_afifo_d16_blk_mem_gen_prim_width is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_blk_mem_gen_prim_width : entity is "blk_mem_gen_prim_width";
 end t_axi4_stream16_afifo_d16_blk_mem_gen_prim_width;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_blk_mem_gen_prim_width is
@@ -3940,8 +3924,6 @@ entity t_axi4_stream16_afifo_d16_clk_x_pntrs is
     m_aclk : in STD_LOGIC;
     \out\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_clk_x_pntrs : entity is "clk_x_pntrs";
 end t_axi4_stream16_afifo_d16_clk_x_pntrs;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_clk_x_pntrs is
@@ -4758,8 +4740,6 @@ entity t_axi4_stream16_afifo_d16_rd_status_flags_as is
     m_axis_tready : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC_VECTOR ( 1 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_rd_status_flags_as : entity is "rd_status_flags_as";
 end t_axi4_stream16_afifo_d16_rd_status_flags_as;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_rd_status_flags_as is
@@ -4840,8 +4820,6 @@ entity t_axi4_stream16_afifo_d16_reset_blk_ramfifo is
     s_aresetn : in STD_LOGIC;
     E : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_reset_blk_ramfifo : entity is "reset_blk_ramfifo";
 end t_axi4_stream16_afifo_d16_reset_blk_ramfifo;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_reset_blk_ramfifo is
@@ -5437,8 +5415,6 @@ entity t_axi4_stream16_afifo_d16_wr_status_flags_as is
     s_axis_tvalid : in STD_LOGIC;
     \grstd1.grst_full.grst_f.rst_d3_reg\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_wr_status_flags_as : entity is "wr_status_flags_as";
 end t_axi4_stream16_afifo_d16_wr_status_flags_as;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_wr_status_flags_as is
@@ -5529,8 +5505,6 @@ entity t_axi4_stream16_afifo_d16_blk_mem_gen_generic_cstr is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
 end t_axi4_stream16_afifo_d16_blk_mem_gen_generic_cstr;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_blk_mem_gen_generic_cstr is
@@ -5570,8 +5544,6 @@ entity t_axi4_stream16_afifo_d16_rd_logic is
     \Q_reg_reg[0]_0\ : in STD_LOGIC;
     m_axis_tready : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_rd_logic : entity is "rd_logic";
 end t_axi4_stream16_afifo_d16_rd_logic;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_rd_logic is
@@ -5638,8 +5610,6 @@ entity t_axi4_stream16_afifo_d16_wr_logic is
     RD_PNTR_WR : in STD_LOGIC_VECTOR ( 9 downto 0 );
     \grstd1.grst_full.grst_f.rst_d3_reg\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_wr_logic : entity is "wr_logic";
 end t_axi4_stream16_afifo_d16_wr_logic;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_wr_logic is
@@ -5694,8 +5664,6 @@ entity t_axi4_stream16_afifo_d16_blk_mem_gen_top is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_blk_mem_gen_top : entity is "blk_mem_gen_top";
 end t_axi4_stream16_afifo_d16_blk_mem_gen_top;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_blk_mem_gen_top is
@@ -5729,8 +5697,6 @@ entity t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4_synth is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4_synth : entity is "blk_mem_gen_v8_3_4_synth";
 end t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4_synth;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4_synth is
@@ -5764,8 +5730,6 @@ entity t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4 is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4 : entity is "blk_mem_gen_v8_3_4";
 end t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_blk_mem_gen_v8_3_4 is
@@ -5799,8 +5763,6 @@ entity t_axi4_stream16_afifo_d16_memory is
     \gc0.count_d1_reg[9]\ : in STD_LOGIC_VECTOR ( 9 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_memory : entity is "memory";
 end t_axi4_stream16_afifo_d16_memory;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_memory is
@@ -5836,8 +5798,6 @@ entity t_axi4_stream16_afifo_d16_fifo_generator_ramfifo is
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 );
     s_aresetn : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_fifo_generator_ramfifo : entity is "fifo_generator_ramfifo";
 end t_axi4_stream16_afifo_d16_fifo_generator_ramfifo;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_fifo_generator_ramfifo is
@@ -5958,8 +5918,6 @@ entity t_axi4_stream16_afifo_d16_fifo_generator_top is
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 );
     s_aresetn : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_fifo_generator_top : entity is "fifo_generator_top";
 end t_axi4_stream16_afifo_d16_fifo_generator_top;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_fifo_generator_top is
@@ -5997,8 +5955,6 @@ entity t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2_synth is
     DIADI : in STD_LOGIC_VECTOR ( 28 downto 0 );
     s_aresetn : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2_synth : entity is "fifo_generator_v13_1_2_synth";
 end t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2_synth;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2_synth is
@@ -6660,8 +6616,6 @@ entity t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2 is
   attribute C_WR_PNTR_WIDTH_WRCH of t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2 : entity is 4;
   attribute C_WR_RESPONSE_LATENCY : integer;
   attribute C_WR_RESPONSE_LATENCY of t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2 : entity is 1;
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2 : entity is "fifo_generator_v13_1_2";
 end t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2;
 
 architecture STRUCTURE of t_axi4_stream16_afifo_d16_fifo_generator_v13_1_2 is
