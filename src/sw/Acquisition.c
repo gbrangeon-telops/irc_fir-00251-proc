@@ -505,7 +505,7 @@ void Acquisition_SM()
                }
 
                // Check if sensor cooldown is done 
-               if ((fpaStatus.fpa_powered == 1) || (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
+               if ((sensorTemp < cooldownTempTarget) || (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
                {
                   builtInTests[BITID_Cooldown].result = BITR_Passed;
                   ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
@@ -521,7 +521,7 @@ void Acquisition_SM()
 
       case ACQ_WAITING_FOR_FPA_INIT:
          FPA_GetStatus(&fpaStatus, &gFpaIntf);
-         if (fpaStatus.fpa_init_done == 1)
+         if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
          {
             if (fpaStatus.fpa_init_success == 1)
             {

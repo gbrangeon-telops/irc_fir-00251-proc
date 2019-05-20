@@ -806,10 +806,10 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
    diode_voltage = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F) / (powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES) * (float)FPA_TEMP_READER_GAIN);
 
    
-   if ((gStat.hw_init_done == 0) || (sw_init_done == 0)) {
-      return FPA_INVALID_TEMP;
-   }
-   else{   
+//   if ((gStat.hw_init_done == 0) || (sw_init_done == 0)) {
+//      return FPA_INVALID_TEMP;
+//   }
+//   else{   
       // utilisation  des valeurs de flashsettings
       temperature = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
       temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
@@ -838,7 +838,7 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
       }
       
       return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
-   }
+//   }
 }
 //--------------------------------------------------------------------------                                                                            
 // Pour avoir les parametres propres au isc0804 avec une config 
@@ -1048,9 +1048,9 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
    // generation de fpa_init_done et fpa_init_success
    Stat->fpa_init_success = (Stat->hw_init_success & sw_init_success);
    Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done);
-   if ((Stat->hw_init_done == 1) && (flegx_present == 0))                              //cas particulier du LN2
-       Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done & Stat->fpa_powered);  // dans le cas particulier du LN2, fpa_init_done = 1 si en plus on arrive à allumer le detecteur(cela suppose azote Ok) 
-       
+//   if ((Stat->hw_init_done == 1) && (flegx_present == 0))                              //cas particulier du LN2
+//       Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done & Stat->fpa_powered);  // dans le cas particulier du LN2, fpa_init_done = 1 si en plus on arrive à allumer le detecteur(cela suppose azote Ok) 
+//       
    // profiter pour mettre à jour la variable globale (interne au driver) de statut  
    gStat = *Stat;
   
