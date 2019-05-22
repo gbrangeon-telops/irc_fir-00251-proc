@@ -278,9 +278,9 @@ begin
                      end if;                     
                   
                   when second_dcr_wr =>                   -- envoi du second dcr
-                     reg_en <= DCR;                     
-                     dcr_mosi_i.data(3) <= ACTIVE_SUBWDW;                 
-                     dcr_mosi_i.data(7 downto 4) <= (others => '0');
+                     reg_en <= DCR;                             
+                     dcr_mosi_i.data(7 downto 0) <= (others => '0');
+                     dcr_mosi_i.data(3) <= ACTIVE_SUBWDW; 
                      dcr_mosi_i.sof <= '0';  
                      dcr_mosi_i.eof <= '1';              -- permet de desactiver NCS (revient à HIGH)
                      dcr_mosi_i.dval <= '1';

@@ -264,16 +264,16 @@ begin
                   when X"0A8" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0)); 
                   
                   when X"0AC" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
-                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
+                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel_divsty0        <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel_divsty0'length-1 downto 0));
                   when X"0B4" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0); 
                   
-                  when X"0B8" =>    user_cfg_i.spare1                          <= data_i(user_cfg_i.spare1'length-1 downto 0);
+                  when X"0B8" =>    user_cfg_i.adc_clk_pipe_sel_divsty1        <= data_i(user_cfg_i.adc_clk_pipe_sel_divsty1'length-1 downto 0);
                   when X"0BC" =>    user_cfg_i.spare2                          <= data_i(user_cfg_i.spare2'length-1 downto 0);
                      
                   -- electrical correction
-                  when X"0C0" =>    user_cfg_i.elcorr_enabled                        <= data_i(0);
-                  when X"0C4" =>    user_cfg_i.elcorr_spare1                         <= data_i(0);
-                  when X"0C8" =>    user_cfg_i.elcorr_spare2                         <= unsigned(data_i(user_cfg_i.elcorr_spare2'length-1 downto 0));
+                  when X"0C0" =>    user_cfg_i.elcorr_enabled                  <= data_i(0);
+                  when X"0C4" =>    user_cfg_i.elcorr_spare1                   <= data_i(0);
+                  when X"0C8" =>    user_cfg_i.elcorr_spare2                   <= unsigned(data_i(user_cfg_i.elcorr_spare2'length-1 downto 0));
                   
                   when X"0CC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_enabled         <= data_i(0);
                   when X"0D0" =>    user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode  <= data_i(0);

@@ -128,6 +128,7 @@ begin
             trig_prectrl_sm <= init_st;
             fpa_readout_last <= '0';
             xtra_img_cnt <= (others => '0');
+            acq_trig_temp <= '0';
             
          else
             

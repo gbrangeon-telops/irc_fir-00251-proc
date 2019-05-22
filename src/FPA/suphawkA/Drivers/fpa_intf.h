@@ -36,13 +36,13 @@
 #define FPA_SUBWINDOW_HEIGHT_MAX (FPA_HEIGHT_MAX - FPA_HEIGHT_MULT)
 
 #define FPA_OFFSETX_MIN    0
-#define FPA_OFFSETX_MULT   4
+#define FPA_OFFSETX_MULT   8
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_OFFSETX_MULT)
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   1
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_OFFSETY_MULT)
 
-#define FPA_FORCE_CENTER   0
+#define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
 
@@ -133,9 +133,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  good_samp_last_pos_per_ch;       
    uint32_t  xsize_div_tapnum;                                            
    uint32_t  adc_clk_source_phase;            
-   uint32_t  adc_clk_pipe_sel;                
+   uint32_t  adc_clk_pipe_sel_divsty0;                
    uint32_t  fpa_stretch_acq_trig;                                                   
-   uint32_t  spare1;                          
+   uint32_t  adc_clk_pipe_sel_divsty1;                          
    uint32_t  spare2;                          
    uint32_t  elcorr_enabled;                       
    uint32_t  elcorr_spare1;        

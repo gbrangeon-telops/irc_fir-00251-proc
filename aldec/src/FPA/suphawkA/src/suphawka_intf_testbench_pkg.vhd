@@ -84,9 +84,9 @@ package body suphawkA_intf_testbench_pkg is
       variable good_samp_last_pos_per_ch            : unsigned(31 downto 0);  
       variable xsize_div_tapnum                     : unsigned(31 downto 0);
       variable adc_clk_source_phase                 : unsigned(31 downto 0);
-      variable adc_clk_pipe_sel                     : unsigned(31 downto 0); 
+      variable adc_clk_pipe_sel_divsty0                     : unsigned(31 downto 0); 
       variable comn_fpa_stretch_acq_trig            : unsigned(31 downto 0); 
-      variable spare1                               : unsigned(31 downto 0); 
+      variable adc_clk_pipe_sel_divsty1                               : unsigned(31 downto 0); 
       variable spare2                               : unsigned(31 downto 0); 
       variable elcorr_enabled                       : unsigned(31 downto 0); 
       variable elcorr_pix_faked_value_forced        : unsigned(31 downto 0); 
@@ -150,7 +150,7 @@ package body suphawkA_intf_testbench_pkg is
       --      if comn_fpa_diag_mode = 1 then
       --         adc_quad2_en  := (others => '0');  
       --      end if;
-      chn_diversity_en               := (others => '0'); 
+      chn_diversity_en               := to_unsigned(1, 32); 
       
       line_period_pclk               := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
       readout_pclk_cnt_max           := to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + 164, 32);   
@@ -160,7 +160,7 @@ package body suphawkA_intf_testbench_pkg is
          active_line_end_num         := active_line_start_num + to_unsigned(user_ysize - 1, 32);
       end if;
       
-      pix_samp_num_per_ch            := to_unsigned(1, 32);
+      pix_samp_num_per_ch            := to_unsigned(4, 32);
       sof_posf_pclk                  := to_unsigned(PAUSE_SIZE, 32);
       
       if user_ysize > 1 then 
@@ -171,19 +171,19 @@ package body suphawkA_intf_testbench_pkg is
       eol_posl_pclk                  := line_period_pclk - 1;
       eol_posl_pclk_p1               := eol_posl_pclk + 1;
       
-      good_samp_first_pos_per_ch     := to_unsigned(1, 32);
-      good_samp_last_pos_per_ch      := to_unsigned(1, 32);   
-      hgood_samp_sum_num             := to_unsigned(1, 32); 
-      hgood_samp_mean_numerator      := to_unsigned(2**22/1, 32);
+      good_samp_first_pos_per_ch     := to_unsigned(3, 32);
+      good_samp_last_pos_per_ch      := to_unsigned(4, 32);   
+      hgood_samp_sum_num             := to_unsigned(2, 32); 
+      hgood_samp_mean_numerator      := to_unsigned(2**22/2, 32);
       vgood_samp_sum_num             := 1 + chn_diversity_en;
       vgood_samp_mean_numerator      := to_unsigned(2**22/1, 32);      
       xsize_div_tapnum               := to_unsigned(user_xsize/TAP_NUM, 32);
       
-      adc_clk_source_phase           :=  to_unsigned(10, 32);
-      adc_clk_pipe_sel               :=  to_unsigned(3, 32);
+      adc_clk_source_phase           :=  to_unsigned(70*send_id, 32);
+      adc_clk_pipe_sel_divsty0       :=  to_unsigned(3, 32);
       comn_fpa_stretch_acq_trig      :=  to_unsigned(0, 32);
       
-      spare1                         :=  to_unsigned(0, 32);
+      adc_clk_pipe_sel_divsty1       :=  to_unsigned(2, 32);
       spare2                         :=  to_unsigned(0, 32);
       
       -- Electronic chain correction                    
@@ -308,9 +308,9 @@ package body suphawkA_intf_testbench_pkg is
       & good_samp_last_pos_per_ch           
       & xsize_div_tapnum                                                              
       & adc_clk_source_phase                       
-      & adc_clk_pipe_sel
+      & adc_clk_pipe_sel_divsty0
       & comn_fpa_stretch_acq_trig
-      & spare1
+      & adc_clk_pipe_sel_divsty1
       & spare2
       & elcorr_enabled                        
       & elcorr_pix_faked_value_forced         

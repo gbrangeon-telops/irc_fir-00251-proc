@@ -163,6 +163,7 @@ begin
             eof_pulse <= '0';
             eof_pulse_last <= '0';
             ref_valid_i <= (others => '0');
+            fpa_int_fdbk_i <= FPA_INT_FDBK; 
             
          else           
             
@@ -291,6 +292,7 @@ begin
             lsync_pipe <=  (others =>'0');
             rd_mclk_i <= '0';
             flags_reset <= '1';
+            sol_pipe_pclk <=  (others =>'0');
             
          else  
             

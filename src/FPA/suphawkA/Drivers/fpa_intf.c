@@ -84,8 +84,8 @@
 
 // horloges du module FPA
 #define VHD_CLK_100M_RATE_HZ              100000000
-#define VHD_CLK_80M_RATE_HZ                80000000
-#define ADC_SAMPLING_RATE_HZ              FPA_MCLK_RATE_HZ    // les ADC  roulent à FPA_MCLK_RATE_HZ
+#define ADC_CLK_SOURCE_RATE_HZ            80000000
+#define ADC_SAMPLING_RATE_HZ              (4 * FPA_MCLK_RATE_HZ)    // les ADC  roulent à FPA_MCLK_RATE_HZ
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
@@ -262,11 +262,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
    extern int32_t gFpaDebugRegB;                         // reservé
-   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
+   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel_divsty0 pour ajustemnt grossier phase adc_clk
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   extern int32_t gFpaDebugRegG;                         // reservé permit_lsydel_clk_rate_beyond_2x pour contrôler le clock rate dans la zone LSYLDEL
+   extern int32_t gFpaDebugRegG;                         // non utilisé
    // extern int32_t gFpaDebugRegH;                         // non utilisé
    uint32_t elcorr_reg;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
@@ -286,10 +286,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
    static uint8_t cfg_num = 0;
+   uint8_t need_rst_fpa_module;
    
    
    // on bâtit les parametres specifiques du suphawk
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
+   
+   need_rst_fpa_module = 0;
    
    // diag mode and diagType
    ptrA->fpa_diag_mode = 0;                 // par defaut
@@ -330,6 +333,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
    ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
+   if ((uint8_t)FPA_FORCE_CENTER == 1){
+      ptrA->xstart = ((uint32_t)FPA_WIDTH_MAX - (uint32_t)pGCRegs->Width)/2;
+      ptrA->ystart = ((uint32_t)FPA_HEIGHT_MAX - (uint32_t)pGCRegs->Height)/2;
+   }
+   
    ptrA->xsize     = (uint32_t)pGCRegs->Width;
    ptrA->ysize     = (uint32_t)pGCRegs->Height;
     
@@ -342,10 +350,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->invert = 0;
    ptrA->revert = 0; 
    
+
    // formule implantée pour le mode normal (revert = 0, Invert = 0)  -- TODO SUPHAWK : à valider !!
-   ptrA->colstart = (uint32_t)pGCRegs->OffsetX / (uint32_t)FPA_NUMTAPS;
+   ptrA->colstart =  ptrA->xstart / (uint32_t)FPA_NUMTAPS;
    ptrA->colstop  =  ptrA->colstart  + (uint32_t)pGCRegs->Width / (uint32_t)FPA_NUMTAPS - 1;
-   ptrA->rowstart = (uint32_t)pGCRegs->OffsetY;
+   ptrA->rowstart =  ptrA->ystart;
    ptrA->rowstop  =  ptrA->rowstart  + (uint32_t)pGCRegs->Height - 1;
    
    // CBIT 
@@ -365,20 +374,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ptrA->dig_code = (uint32_t)MAX((0.000639F + (float)gFpaDetectorPolarizationVoltage/1000.0F)/0.005344F, 1.0F);  // dig_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
 	}                                                                                                       
    presentPolarizationVoltage = (int16_t)roundf(1000.0F*(0.005344F*(float)ptrA->dig_code -  0.000639F));             // DIGREF = -0.0055 x DDR + 2.8183   converti en mV
-   gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;
-    
-   // Registre F : ajustement des delais de la chaine
-   if (sw_init_done == 0)
-      gFpaDebugRegF = 5;
-   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
+   gFpaDetectorPolarizationVoltage = presentPolarizationVoltage; 
    
    // quad2    
    ptrA->adc_quad2_en = 1;                          
-   ptrA->chn_diversity_en = 0;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
-   
+   ptrA->chn_diversity_en = 1;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
+     
    //
    ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + (uint32_t)(hh.lovh_mclk * hh.pixnum_per_tap_per_mclk);
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk*ptrA->ysize + (uint32_t)(hh.fpa_rst_dly_mclk * hh.pixnum_per_tap_per_mclk);                              // ligne de reset du suphawk prise en compte
+   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * ptrA->ysize + (uint32_t)(hh.fpa_rst_dly_mclk * hh.pixnum_per_tap_per_mclk);                              // ligne de reset du suphawk prise en compte
    
    ptrA->active_line_start_num             = 1;                    // pour le suphawk, numero de la première ligne active
    ptrA->active_line_end_num               = ptrA->ysize;          // pour le suphawk, numero de la derniere ligne active
@@ -394,7 +398,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
    // echantillons choisis
-   ptrA->good_samp_first_pos_per_ch        = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position premier echantillon
+   ptrA->good_samp_first_pos_per_ch        = MAX((uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ - 1, 1);     // position premier echantillon
    ptrA->good_samp_last_pos_per_ch         = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2017: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
@@ -413,11 +417,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[5]                 = FLEG_VccVoltage_To_DacWord(3500.0F, 6);   // PRV
    ProximCfg.vdac_value[7]                 = 0;                                                      
    
-   ptrA->prv_dac_nominal_value = ProximCfg.vdac_value[5];
+   ptrA->prv_dac_nominal_value = ProximCfg.vdac_value[5]; 
+   
+   // Registre F : ajustement des delais de la chaine
+   if (sw_init_done == 0){
+      gFpaDebugRegF = 5;
+      if (ptrA->hgood_samp_sum_num > 1)
+         gFpaDebugRegF = 3;
+   }   
+   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;
    
    // TAPREF : VCC7 ou DAC7
    if (sw_init_done == 0)
-      ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(1374.0F, 7);
+      ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(2700.0F, 7);
       
    if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
    {
@@ -429,12 +441,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    if (sw_init_done == 0)
-      gFpaDebugRegC = 3;       
-   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
+      gFpaDebugRegC = 3;
+   if (ptrA->adc_clk_pipe_sel_divsty0 != (uint32_t)gFpaDebugRegC)
+      need_rst_fpa_module = 1;
+   ptrA->adc_clk_pipe_sel_divsty0 = (uint32_t)gFpaDebugRegC;                                              
+   
+   ptrA->adc_clk_pipe_sel_divsty1 = ptrA->adc_clk_pipe_sel_divsty0;
+   // ptrA->adc_clk_pipe_sel_divsty1 = (ptrA->adc_clk_pipe_sel_divsty0 - 1) % ((uint32_t)ADC_CLK_SOURCE_RATE_HZ/(uint32_t)ADC_SAMPLING_RATE_HZ);
    
    // adc clk source phase
    if (sw_init_done == 0)         
       gFpaDebugRegD = 680;
+   if (ptrA->adc_clk_source_phase != (uint32_t)gFpaDebugRegD)
+      need_rst_fpa_module = 1;   
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
        
    // Élargit le pulse de trig
@@ -638,12 +657,22 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
 	   ptrA->elcorr_ref_cfg_1_ref_enabled = 0;	  
    }
+   
+   ptrA->roic_cst_output_mode = (uint32_t)gFpaDebugRegB;
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
    
    // envoi du reste de la config 
    WriteStruct(ptrA);
+   
+   // reset du module vhd. Il va demarrer alors avec la config precedemment envoyée
+   if (need_rst_fpa_module == 1){
+      need_rst_fpa_module = 0;
+      FPA_Reset(ptrA);
+      FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+      FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
+   }
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -679,11 +708,11 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
-   ptrH->fpa_rst_dly_mclk        = 165.0F;   // FPA: delai reglémentaire de 165 MCLK à la fin d'une image en ITR + 1 MCL en debut d'image
+   ptrH->fpa_rst_dly_mclk        = 165.0F;   // FPA: delai reglémentaire de 652 MCLK à la fin d'une image en ITR + 3 MCL en debut d'image
    ptrH->vhd_delay_mclk          = 5.0F;     // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_rst_dly_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 3.0F;
-   ptrH->fovh_line               = 1.0F;
+   ptrH->fovh_line               = 0.0F;
    ptrH->int_time_offset_mclk    = 0.0F;     // aucun offset sur le temps d'integration
       
    // readout time

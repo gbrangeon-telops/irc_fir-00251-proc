@@ -271,7 +271,7 @@ begin
                when passthru_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
                   ncs_i <= PROG_CSN;
                   fd_mdin_i <= (FPA_FDEM and PROG_CSN) or (PROG_SD and not PROG_CSN);
-                  digen_i <= FPA_INT and not FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE; -- sans integration, le Superhawk sortira l'image dela tension dereset des puits. 
+                  digen_i <= FPA_INT and not FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE; -- sans integration, le Superhawk sortira l'image de la tension de reset des puits. 
                   mclk_i <= prog_mclk_i or fpa_rd_mclk_i;  -- les deux clks sont disjoints        
                
                when others =>

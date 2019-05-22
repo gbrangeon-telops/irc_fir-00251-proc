@@ -108,6 +108,8 @@ begin
             
          else
             
+            active_subwindow_i <= USER_CFG.ACTIVE_SUBWINDOW;
+            
             case wdr_fsm is
                
                when pause_st1 =>           -- en revenant de sreset, permet de donner du temps pour le batisseur de registre MCR
@@ -128,7 +130,7 @@ begin
                
                when rqst_and_send => 
                   tx_mosi_i.dval <= '1';          -- demande d'envoi, meme si le downstream_busy est à '1'
-                  active_subwindow_i <= USER_CFG.ACTIVE_SUBWINDOW;
+                  
                   -- sof
                   if byte_cnt = 5 then
                      tx_mosi_i.sof <= '1';
