@@ -159,8 +159,6 @@ static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calib
 static void advanceDeltaBetaAge(uint32_t increment_s);
 
 // function for detecting bad pixels in the updated Beta parameter before computing its optimal quantization
-static uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose) __attribute__ ((unused));
-static uint32_t cleanBetaDistributionNew(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose) __attribute__ ((unused));
 static IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose) __attribute__ ((unused));
 static float nth_element_f(const float* input, float minval, float* buffer, int N, int r);
 static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r);
@@ -3890,75 +3888,6 @@ deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo
    return findSuitableDeltaBetaForBlock(calibInfo, blockIdx, false);
 }
 
-uint32_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* finalStats, bool verbose)
-{
-   const float thresh = invnormcdf(1-p_FA); //
-   const float bp_code = infinityf();
-   const int maxIter = 100;
-
-   if (verbose)
-   {
-      ACT_INF("cleanBetaDistribution: p_FA = " _PCF(6), _FFMT(p_FA,6));
-      ACT_INF("cleanBetaDistribution: thresh = " _PCF(4), _FFMT(thresh,4));
-   }
-
-   statistics_t stats;
-   int i;
-   int niter;
-   float data_thresh; // threshold scaled on the actual data
-
-   uint32_t nbp, prev_nbp;
-   float lowerThreshold, higherThreshold; // thresholds centered about the average value
-
-   prev_nbp = 1;
-   nbp = 0;
-   niter = 0;
-   while (prev_nbp != nbp && niter < maxIter)
-   {
-      resetStats(&stats);
-      prev_nbp = nbp;
-
-      // calculer std de x, sans inclure les bad pixels (inf). Compter le nombre de bad pixels.
-      for (i=0; i<N; ++i)
-      {
-         float val = beta[i];
-         if (!isinf(val))
-            updateStats(&stats, val);
-      }
-
-      // calculer le nouveau seuil
-      data_thresh = thresh * sqrtf(stats.var);
-
-      // etiquetter les pixels hors limite, i.e. abs(x-moy) > thresh * std_x
-      lowerThreshold = stats.mu - data_thresh;
-      higherThreshold = stats.mu + data_thresh;
-
-      nbp = 0;
-      for (i=0; i<N; ++i)
-      {
-         float val = beta[i];
-         if (val < lowerThreshold || val > higherThreshold)
-         {
-            beta[i] = bp_code;
-            ++nbp;
-         }
-      }
-      if (verbose)
-      {
-         ACT_INF("std = " _PCF(2) ", mu = " _PCF(2), _FFMT(sqrtf(stats.var),2), _FFMT(stats.mu,2));
-         ACT_INF("min = " _PCF(2) ", max = " _PCF(2), _FFMT(stats.min,2), _FFMT(stats.max,2));
-         ACT_INF("Lower threshold = " _PCF(2) ", higher threshold = " _PCF(2), _FFMT(lowerThreshold, 2), _FFMT(higherThreshold, 2));
-         ACT_INF("Iteration %d, number of BP %d", niter, nbp);
-      }
-      ++niter;
-   }
-
-   if (finalStats != NULL)
-      memcpy(finalStats, &stats, sizeof(statistics_t));
-
-   return nbp;
-}
-
 uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose)
 {
    const float bp_code = infinityf(); // bad pixels are replaced by inf
@@ -4005,43 +3934,10 @@ uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, stati
    return nbp;
 }
 
-uint32_t cleanBetaDistributionNew(float* beta, int N, float p_FA, statistics_t* stats, bool verbose)
-{
-   const float thresh = invnormcdf(1-p_FA); //
-   const int maxIter = 100;
-
-   int niter;
-   uint32_t nbp, prev_nbp;
-
-   if (verbose)
-   {
-      ACT_INF("cleanBetaDistribution: p_FA = " _PCF(6), _FFMT(p_FA,6));
-      ACT_INF("cleanBetaDistribution: thresh = " _PCF(4), _FFMT(thresh,4));
-   }
-
-   prev_nbp = 1;
-   nbp = 0;
-   niter = 0;
-   while (prev_nbp != nbp && niter < maxIter)
-   {
-      prev_nbp = nbp;
-
-      nbp = cleanBetaDistributionIterate(beta, N, thresh, stats, verbose);
-
-      if (verbose)
-      {
-         ACT_INF("Iteration %d, number of BP %d", niter, nbp);
-      }
-      ++niter;
-   }
-
-   return nbp;
-}
-
-IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose)
+IRC_Status_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose)
 {
    const float thresh = invnormcdf(1-p_FA);
-   const int maxIter = 15;
+   const int maxIter = 100;
 
    static uint32_t prev_nbp = 0;
    static uint8_t niter = 0;
@@ -4136,6 +4032,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
    static BQ_State_t state = BQ_Idle;
 
    uint64_t t0; // for RT benchmarking
+   static uint64_t tic; // used for cleanDistribution benchmarking
    static uint64_t tic_TotalDuration; // used for benchmarking the total time
    static uint64_t tic_RT_Duration; // used for benchmarking the actual time taken for building the statistics
 
@@ -4208,6 +4105,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
 
          if (ctxtIsDone(&blockContext))
          {
+            tic = tic_RT_Duration;
             setBqState(&state, BQ_CleanDistribution);
          }
       }
@@ -4218,18 +4116,14 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
          IRC_Status_t cleanDistribStatus;
          GETTIME(&t0);
 
-         numBadPixels = cleanBetaDistribution(betaArray, numPixels, p_FA, &beta_stats, gActDebugOptions.verbose);
-         //cleanDistribStatus = cleanBetaDistribution2(betaArray, numPixels, p_FA, &beta_stats, &numBadPixels, gActDebugOptions.verbose);
-
+         cleanDistribStatus = cleanBetaDistribution(betaArray, numPixels, p_FA, &beta_stats, &numBadPixels, gActDebugOptions.verbose);
          tic_RT_Duration += elapsed_time_us(t0);
 
-         if (1 || cleanDistribStatus == IRC_DONE)
+         if (cleanDistribStatus == IRC_DONE)
          {
-               ACT_INF("%d bad pixels after cleaning distribution", numBadPixels);
-               ACT_INF("cleanBetaDistribution took %d ms", (uint32_t)elapsed_time_us(t0)/1000);
-
+            ACT_INF("%d bad pixels after cleaning distribution", numBadPixels);
+            ACT_INF("cleanBetaDistribution took %d ms", (uint32_t)(tic_RT_Duration-tic)/1000);
             ctxtInit(&blockContext, 0, numPixels, ACT_MAX_PIX_DATA_TO_PROCESS);
-
             setBqState(&state, BQ_QuantizeBeta);
          }
       }
