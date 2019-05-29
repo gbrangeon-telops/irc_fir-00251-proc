@@ -159,7 +159,8 @@ static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calib
 static void advanceDeltaBetaAge(uint32_t increment_s);
 
 // function for detecting bad pixels in the updated Beta parameter before computing its optimal quantization
-static IRC_Status_t cleanBetaDistribution2(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose) __attribute__ ((unused));
+static IRC_Status_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose);
+static uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose);
 static float nth_element_f(const float* input, float minval, float* buffer, int N, int r);
 static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r);
 static uint32_t countBadPixels(const uint64_t* pixelData, int N);
@@ -3888,7 +3889,7 @@ deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo
    return findSuitableDeltaBetaForBlock(calibInfo, blockIdx, false);
 }
 
-uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose)
+static uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, statistics_t* stats, bool verbose)
 {
    const float bp_code = infinityf(); // bad pixels are replaced by inf
 
@@ -3934,7 +3935,7 @@ uint32_t cleanBetaDistributionIterate(float* beta, int N, float threshold, stati
    return nbp;
 }
 
-IRC_Status_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose)
+static IRC_Status_t cleanBetaDistribution(float* beta, int N, float p_FA, statistics_t* stats, uint32_t* numBadPixels, bool verbose)
 {
    const float thresh = invnormcdf(1-p_FA);
    const int maxIter = 100;
