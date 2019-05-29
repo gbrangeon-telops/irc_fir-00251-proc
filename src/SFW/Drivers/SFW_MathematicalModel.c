@@ -87,8 +87,8 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
    pGCRegs->ExposureTime = pGCRegs->ExposureTimeMin;
 
    SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);
-   pGCRegs->ImageCorrectionFWAcquisitionFrameRateMin = ceilMultiple((float)(FW_VEL_THRESHOLD * flashSettings.FWNumberOfFilters) / 60.0F, 0.01F);
-   pGCRegs->ImageCorrectionFWAcquisitionFrameRateMax = floorMultiple(MIN(FPA_MaxFrameRate(pGCRegs), SFW_AcquisitionFrameRateMax), 0.01F);
+   pGCRegs->ImageCorrectionFWAcquisitionFrameRateMin = ceilMultiple((float)(FW_VEL_THRESHOLD * flashSettings.FWNumberOfFilters) / 60.0F, 0.01);
+   pGCRegs->ImageCorrectionFWAcquisitionFrameRateMax = floorMultiple(MIN(FPA_MaxFrameRate(pGCRegs), SFW_AcquisitionFrameRateMax), 0.01);
 
    pGCRegs->ExposureTime = ExposureTimeBackup;
 

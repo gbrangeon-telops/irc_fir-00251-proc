@@ -1637,8 +1637,8 @@ void GC_UpdateFOV()
       gcRegsData.VFOV = atanf( (float)gcRegsData.Height * FPA_PIXEL_PITCH / (2.0F * focalLen) ) * 2.0F * 180.0F / (float)M_PI;  //in degrees
 
       // Round values
-      gcRegsData.HFOV = roundMultiple(gcRegsData.HFOV, 0.1F);
-      gcRegsData.VFOV = roundMultiple(gcRegsData.VFOV, 0.1F);
+      gcRegsData.HFOV = roundMultiple(gcRegsData.HFOV, 0.1);
+      gcRegsData.VFOV = roundMultiple(gcRegsData.VFOV, 0.1);
    }
    else
    {
