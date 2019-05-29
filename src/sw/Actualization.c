@@ -190,7 +190,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
   *
   *--------------------------------------------------------------------------------
   */
-void setActState( ACT_State_t *p_state, ACT_State_t next_state )
+static void setActState( ACT_State_t *p_state, ACT_State_t next_state )
 {
    int num_states = NUM_OF(ACT_State_str);
    *p_state = next_state;
@@ -2325,7 +2325,7 @@ float applyLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float x )
   *         2b    xi = ( i * XRange / Size ) + XMin
   *
   */
-float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float y_target, bool verbose )
+static float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float y_target, bool verbose )
 {
    int32_t i;
    float m=1, bi=0, x, xi, binf;
@@ -2427,7 +2427,7 @@ float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float y_tar
   *
   *   Note(s):
   */
-void unpackLUTData( uint32_t LUTData, LUTRQInfo_t *p_LUTInfo, float *p_m, float *p_b, bool verbose )
+static void unpackLUTData( uint32_t LUTData, LUTRQInfo_t *p_LUTInfo, float *p_m, float *p_b, bool verbose )
 {
    int32_t raw;
 
@@ -2497,7 +2497,7 @@ void unpackLUTData( uint32_t LUTData, LUTRQInfo_t *p_LUTInfo, float *p_m, float 
   *         delta_beta = ( FCal - FCalBB ) * Alpha
   *
   */
-void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, float* deltaBetaOut, float* alphaOut)
+static void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, float* deltaBetaOut, float* alphaOut)
 {
    static const uint64_t alpha_mask = CALIBBLOCK_PIXELDATA_ALPHA_MASK;
    float alpha, delta_beta;
@@ -2569,7 +2569,7 @@ void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha
 #endif
 }
 
-bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut)
+static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut)
 {
    static const int16_t minRawData = -CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS; //-2^10
    static const int16_t maxRawData = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
@@ -2758,7 +2758,7 @@ uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_
   *         raw_corr_beta = raw_current_beta + raw_delta_beta
   *
   */
-uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_CalData, int16_t deltaBeta, int8_t expBitShift)
+static uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_CalData, int16_t deltaBeta, int8_t expBitShift)
 {
    static const int32_t minRawData = -CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS; //-2^10
    static const int32_t maxRawData = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
@@ -2856,7 +2856,7 @@ uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_Ca
   *
   *   @return a pointer to the file record of the ICU block we need to load.
   */
-fileRecord_t* findIcuReferenceBlock()
+static fileRecord_t* findIcuReferenceBlock()
 {
    int n = gFM_icuBlocks.count;
    int i = 0;
@@ -2906,7 +2906,7 @@ fileRecord_t* findIcuReferenceBlock()
   *
   *   @return IRC_DONE or IRC_Failure or IRC_NOT_DONE when it is not finished
   */
-IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
+static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
 {
    static ACT_Write_State_t state = FWR_IDLE;
    static uint32_t dataOffset = 0; // used for data write
@@ -3267,7 +3267,7 @@ static void defineActualizationFilename(char* buf, uint8_t length, uint32_t time
   *
   *   @return A pointer to LUTRQInfo_t, null if not found
   */
-LUTRQInfo_t* selectLUT(calibBlockInfo_t* blockInfo, uint8_t type)
+static LUTRQInfo_t* selectLUT(calibBlockInfo_t* blockInfo, uint8_t type)
 {
    LUTRQInfo_t* info = NULL;
    int i=0;
@@ -3493,7 +3493,7 @@ static bool validateBuffers(uint32_t* coadd_buffer, uint32_t nCoadd, uint16_t* s
    return all_good_coadd && all_good_seq;
 }
 
-bool isBadPixel(uint64_t* pixelData)
+static bool isBadPixel(uint64_t* pixelData)
 {
    return !BitTst(*pixelData, CALIBBLOCK_PIXELDATA_BADPIXEL_SHIFT);
 }
@@ -3502,7 +3502,7 @@ bool isBadPixel(uint64_t* pixelData)
  * Find a valid delta beta data that matches the current block.
  * Order of precedence : xbb->icu->none
  */
-deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool verbose)
+static deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool verbose)
 {
    int i, idx_xbb, idx_icu, idx;
 
@@ -3575,7 +3575,7 @@ deltabeta_t* findSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo, u
 
 /* find the valid delta beta data that exactly matches the current block.
  */
-deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx)
+static deltabeta_t* findMatchingDeltaBetaForBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx)
 {
    int i, idx;
    const calibBlockInfo_t* blockInfo;
@@ -3636,7 +3636,7 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
          deltaBetaDB.deltaBeta[i]->valid = 0;
 }
 
-IRC_Status_t deleteExternalActualizationFiles()
+static IRC_Status_t deleteExternalActualizationFiles()
 {
    IRC_Status_t status = IRC_SUCCESS;
    int i;
@@ -3688,7 +3688,7 @@ IRC_Status_t deleteExternalActualizationFiles()
    return status;
 }
 
-fileRecord_t* findActualizationFile(uint32_t ref_posixtime)
+static fileRecord_t* findActualizationFile(uint32_t ref_posixtime)
 {
    int i;
    int fd;
@@ -3760,7 +3760,7 @@ void ACT_listActualizationData()
    PRINTF("\n");
 }
 
-bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool actTypeICU, deltabeta_t** newDataOut)
+static bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool actTypeICU, deltabeta_t** newDataOut)
 {
    int i;
    deltabeta_t* newData;
@@ -3835,7 +3835,7 @@ bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, uint8_
    return deltaBetaDB.count == MAX_DELTA_BETA_SIZE;
 }
 
-void initDeltaBetaData(deltabeta_t* data)
+static void initDeltaBetaData(deltabeta_t* data)
 {
    memset(data->deltaBeta, 0, MAX_PIXEL_COUNT * sizeof(float));
    data->valid = 0;
@@ -3977,7 +3977,7 @@ static IRC_Status_t cleanBetaDistribution(float* beta, int N, float p_FA, statis
    return status;
 }
 
-float nth_element_f(const float* input, float minval, float* buffer, int N, int r)
+static float nth_element_f(const float* input, float minval, float* buffer, int N, int r)
 {
    int i;
    union {
@@ -3998,7 +3998,7 @@ float nth_element_f(const float* input, float minval, float* buffer, int N, int 
    return p.f;
 }
 
-uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r)
+static uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r)
 {
    uint32_t p;
    int i;
@@ -4012,7 +4012,7 @@ uint32_t nth_element_i(const uint32_t* input, uint32_t* buffer, int N, int r)
    return p;
 }
 
-uint32_t countBadPixels(const uint64_t* pixelData, int N)
+static uint32_t countBadPixels(const uint64_t* pixelData, int N)
 {
    int i;
    int bp = 0;
@@ -4229,7 +4229,7 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
    return rtnStatus;
 }
 
-float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
+static float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
 {
    int16_t raw_beta;
    uint64_t calData;
@@ -4257,7 +4257,7 @@ float decodeBeta(const uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
    return beta;
 }
 
-bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
+static bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockInfo)
 {
    const float qstep = exp2f(blockInfo->pixelData.Beta0_Exp);
 
@@ -4331,7 +4331,7 @@ bool encodeBeta(float value, uint32_t* p_CalData, const calibBlockInfo_t* blockI
    return isNewBadPixel;
 }
 
-bool findImageForBlock(uint8_t blockIdx, uint32_t* seqOffset, uint32_t frameSize, uint32_t nbImg)
+static bool findImageForBlock(uint8_t blockIdx, uint32_t* seqOffset, uint32_t frameSize, uint32_t nbImg)
 {
    uint32_t i;
    bool found = false;  //default
