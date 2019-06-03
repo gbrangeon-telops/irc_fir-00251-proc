@@ -39,6 +39,7 @@
 
 // Mode d'operation choisi pour le contrôleur de trig 
 #define MODE_READOUT_END_TO_TRIG_START    0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
+#define MODE_TRIG_START_TO_TRIG_START     0x01
 #define MODE_INT_END_TO_TRIG_START        0x02      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du IWR et ITR
 
 // Gains definis par Indigo  
@@ -139,6 +140,7 @@ struct isc0209_param_s             //
    float lovh_mclk;
    float fovh_line;
    float int_time_offset_mclk;   
+   float fsync_width_min_usec;
    
    // parametres calculés
    float readout_mclk;   
@@ -270,11 +272,22 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
-   ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_spare              = 0;
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)(0.8F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;                          // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+   {
+      ptrA->fpa_trig_ctrl_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
+      ptrA->fpa_spare                  = 0;
+      ptrA->fpa_trig_ctrl_timeout_dly  = (uint32_t)(0.8F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
+      ptrA->fpa_xtra_trig_ctrl_dly     = ptrA->fpa_trig_ctrl_timeout_dly;                          // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
+   }
+   else
+   {
+      ptrA->fpa_trig_ctrl_mode         = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)( (hh.frame_period_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //frame period min calculée avec ET=0
+      ptrA->fpa_spare                  = 0;
+      ptrA->fpa_trig_ctrl_timeout_dly  = ptrA->fpa_acq_trig_ctrl_dly;
+      ptrA->fpa_xtra_trig_ctrl_dly     = ptrA->fpa_acq_trig_ctrl_dly;
+   }
 
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
@@ -310,7 +323,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->skimming_en = 0;                          
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 13;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = 12;                             // ajuster via chipscope
    
    // quad2    
    ptrA->adc_quad2_en = 0;                                            // ENO : 14 aout 2017 : plus besoin de la diversité de canal dans un iSC0209
@@ -340,7 +353,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                =  1 + ptrA->chn_diversity_en;
-   ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);                              
+   ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);    // moyenne
+   //ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS));                             // somme
       
    // calculs
    ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;                                        
@@ -468,9 +482,14 @@ void FPA_SpecificParams(isc0209_param_t *ptrH, float exposureTime_usec, const gc
    // 
    ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec;
    ptrH->int_signal_high_time_usec = MAX(exposureTime_usec - ptrH->int_time_offset_usec, 0.0F);
+
+   ptrH->fsync_width_min_usec = 11.8;
       
    // calcul de la periode minimale
-   ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+      ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;
+   else
+      ptrH->frame_period_usec = MAX(exposureTime_usec + ptrH->fsync_width_min_usec, ptrH->delay_usec + ptrH->readout_usec);
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
@@ -518,7 +537,10 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    periodMinWithNullExposure_usec = hh.frame_period_usec;
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
    
-   max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+      max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   else
+      max_exposure_usec = (presentPeriod_sec*1e6F - hh.fsync_width_min_usec);
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);

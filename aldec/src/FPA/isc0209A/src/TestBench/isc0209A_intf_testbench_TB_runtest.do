@@ -159,8 +159,8 @@ asim -ses isc0209A_intf_testbench_TB
 
 #wave UUT/U1/U9/U18/*                                                                      l
 #wave UUT/U1/U9/U1/U1/g0/U1/*
-wave UUT/U1/U9/U7/*
 wave UUT/U1/*
+wave UUT/U1/U9/*
 
 --run 20 us
-run 20 ms
+run 30 ms

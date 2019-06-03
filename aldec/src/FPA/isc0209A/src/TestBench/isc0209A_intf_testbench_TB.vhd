@@ -50,16 +50,15 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_80M_PERIOD          : time := 12.5 ns;
-   constant ACQ_TRIG_PERIOD         : time := 700 us;
+   constant ACQ_TRIG_PERIOD         : time := 3 ms;
    constant DOUT_CLK_PERIOD         : time := 12.5 ns;
    
-   
+   constant EXP_TIME_US    : integer := 2000;
    
    constant PAUSE_SIZE     : integer := 16; 
    constant TAP_NUM        : integer := 4;  
    constant xsize : natural := 320;
    constant ysize : natural := 256; 
-   constant TRIG_PERIOD : time := 100 us;
    
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
@@ -145,11 +144,13 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(1000, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned((EXP_TIME_US * 100), FPA_EXP_INFO.exp_time'length);     -- convert µs to 10ns (100MHz)
       FPA_EXP_INFO.exp_indx <= x"05";
-      --FPA_EXP_INFO.exp_dval <='0';
-      --wait for 300 ns;
-      --FPA_EXP_INFO.exp_time <= to_unsigned(10,FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_dval <= '1';
+      wait for 15 ms;
+      FPA_EXP_INFO.exp_dval <= '0';
+      wait until rising_edge(MB_CLK);
+      FPA_EXP_INFO.exp_time <= to_unsigned((6 * 100), FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_dval <= '1';
       wait;
    end process;
@@ -162,14 +163,14 @@ begin
    process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
-         user_cfg_i.COMN.FPA_DIAG_MODE <= '1';
+         user_cfg_i.COMN.FPA_DIAG_MODE <= '0';
          user_cfg_i.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR;
          user_cfg_i.COMN.fpa_pwr_on <= '1';
-         user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_READOUT_END_TO_TRIG_START;
-         user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(100, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);
-         user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(100, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
-         user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(10, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
-         user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(100, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);  
+         user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_TRIG_START_TO_TRIG_START;--MODE_READOUT_END_TO_TRIG_START;
+         user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);    -- delay + readout (full window)
+         user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(289130, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
+         user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
+         user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(289130, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);  
          user_cfg_i.XSTART <= (others => '0');
          user_cfg_i.YSTART <= (others => '0');
          user_cfg_i.XSIZE  <= to_unsigned(xsize, user_cfg_i.XSIZE'length);
@@ -213,20 +214,7 @@ begin
          user_cfg_i.vdac_value(5)               		<= to_unsigned(11630, user_cfg_i.vdac_value(5)'length); 
          user_cfg_i.vdac_value(6)               		<= to_unsigned(11630, user_cfg_i.vdac_value(6)'length); 
          user_cfg_i.vdac_value(7)               		<= to_unsigned(11630, user_cfg_i.vdac_value(7)'length); 
-         user_cfg_i.vdac_value(8)               		<= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);      
-         
-         -- valeurs par defaut
-         user_cfg_i.elec_ofs_offset_null_forced        <= '0';  
-         user_cfg_i.elec_ofs_pix_faked_value_forced    <= '0';
-         user_cfg_i.elec_ofs_pix_faked_value           <= (others =>'0');
-         user_cfg_i.elec_ofs_offset_minus_pix_value    <= '0';
-         
-         user_cfg_i.elec_ofs_add_const                 <= to_unsigned(600, user_cfg_i.elec_ofs_add_const'length);
-         user_cfg_i.elec_ofs_start_dly_sampclk         <= to_unsigned(5, user_cfg_i.elec_ofs_start_dly_sampclk'length);
-         user_cfg_i.elec_ofs_samp_num_per_ch           <= to_unsigned(60,user_cfg_i.elec_ofs_samp_num_per_ch'length);
-         if user_cfg_i.elec_ofs_samp_num_per_ch > 0 then 
-            user_cfg_i.elec_ofs_samp_mean_numerator       <= to_unsigned(2**21/to_integer(user_cfg_i.elec_ofs_samp_num_per_ch), user_cfg_i.elec_ofs_samp_mean_numerator'length);
-         end if;
+         user_cfg_i.vdac_value(8)               		<= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);
       end if;
    end process;
    
@@ -356,23 +344,6 @@ begin
       write_axi_lite (MB_CLK, x"000000B8", std_logic_vector(resize(user_cfg_i.adc_clk_phase, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
       write_axi_lite (MB_CLK, x"000000BC", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_stretch_acq_trig, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      
-      write_axi_lite (MB_CLK, x"000000C0", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_offset_null_forced, 32)), MB_MISO,  MB_MOSI);                          
-      wait for 30 ns;                                                                                                                                         
-      write_axi_lite (MB_CLK, x"000000C4", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_pix_faked_value_forced, 32)), MB_MISO,  MB_MOSI);                            
-      wait for 30 ns;                                                                                                                                         
-      write_axi_lite (MB_CLK, x"000000C8", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_pix_faked_value, 32)), MB_MISO,  MB_MOSI);                                                          
-      wait for 30 ns;                                                                                                                                                      
-      write_axi_lite (MB_CLK, x"000000CC", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_offset_minus_pix_value, 32)), MB_MISO,  MB_MOSI);                                  
-      wait for 30 ns;                                                                                                                                            
-      write_axi_lite (MB_CLK, x"000000D0", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_add_const, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000D4", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_start_dly_sampclk, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000D8", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_samp_num_per_ch, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000DC", std_logic_vector(resize('0'&user_cfg_i.elec_ofs_samp_mean_numerator, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;            
       
       write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);

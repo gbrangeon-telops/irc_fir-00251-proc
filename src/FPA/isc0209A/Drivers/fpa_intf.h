@@ -19,7 +19,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0209A__ADC_10MHz"
+#define FPA_DEVICE_MODEL_NAME    "ISC0209A"
 
 #define FPA_WIDTH_MIN      128    //
 #define FPA_WIDTH_MAX      320

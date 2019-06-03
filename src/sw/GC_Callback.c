@@ -3219,6 +3219,11 @@ void GC_ImageCorrectionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
  */
 void GC_IntegrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      // Update AcquisitionFrameRate and ExposureTime limits
+      GC_UpdateParameterLimits();
+   }
 }
 
 /**

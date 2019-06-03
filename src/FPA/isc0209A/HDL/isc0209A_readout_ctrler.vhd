@@ -51,7 +51,23 @@ architecture rtl of isc0209A_readout_ctrler is
          ARESET : in std_logic;
          SRESET : out std_logic;
          CLK : in std_logic);
-   end component; 
+   end component;
+   
+   COMPONENT fwft_sfifo_w1_d16
+      PORT (
+         clk : IN STD_LOGIC;
+         rst : IN STD_LOGIC;
+         din : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+         wr_en : IN STD_LOGIC;
+         rd_en : IN STD_LOGIC;
+         dout : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+         full : OUT STD_LOGIC;
+         almost_full : OUT STD_LOGIC;
+         overflow : OUT STD_LOGIC;
+         empty : OUT STD_LOGIC;
+         valid : OUT STD_LOGIC
+      );
+   END COMPONENT;
    
    signal sreset               : std_logic;
    
@@ -87,6 +103,9 @@ architecture rtl of isc0209A_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
    signal fpa_int_fdbk_i       : std_logic;
    signal fpa_int_i            : std_logic;
+   signal fpa_int_fe_fifo_wr   : std_logic;
+   signal fpa_int_fe_fifo_rd   : std_logic;
+   signal fpa_int_fe_fifo_dval : std_logic;
    
 --   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
 --   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
@@ -199,6 +218,8 @@ begin
             readout_fsm <= idle;
             readout_in_progress <= '0';
             lsync_pipe <=  (others =>'0');
+            fpa_int_fe_fifo_wr <= '0';
+            fpa_int_fe_fifo_rd <= '0';
             -- pragma translate_off
             lsync_cnt <=  (others => '0');
             -- pragma translate_on
@@ -213,6 +234,8 @@ begin
             
             lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0);           
             
+            fpa_int_fe_fifo_wr <= fpa_int_last and not fpa_int_i; -- fin de la consigne d'integration
+            
             -- contrôleur
             case readout_fsm is           
                
@@ -220,11 +243,14 @@ begin
                   readout_in_progress <= '0';
                   lsync_cnt <=  (others => '0');
                   lsync_pipe(0) <= '0';
-                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin de la consigne d'integration
+                  fpa_int_fe_fifo_rd <= '0';
+                  if fpa_int_fe_fifo_dval = '1' then
+                     fpa_int_fe_fifo_rd <= '1';
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
                when wait_mclk_fe_st => 
+                  fpa_int_fe_fifo_rd <= '0';
                   if pclk_fall = '1' then  -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
                   end if;                           
@@ -250,7 +276,25 @@ begin
             
          end if;
       end if;
-   end process;  
+   end process;
+   
+   --------------------------------------------------
+   -- fifo fwft pour falling edge du signal d'intégration
+   --------------------------------------------------
+   U3B : fwft_sfifo_w1_d16
+   PORT MAP (
+      clk => CLK,
+      rst => sreset,
+      din => (others => '0'),    -- not used
+      wr_en => fpa_int_fe_fifo_wr,
+      rd_en => fpa_int_fe_fifo_rd,
+      dout => open,              -- not used
+      full => open,
+      almost_full => open,
+      overflow => open,
+      empty => open,
+      valid => fpa_int_fe_fifo_dval
+   );
    
    --------------------------------------------------
    -- referentiel image et referentiel ligne
