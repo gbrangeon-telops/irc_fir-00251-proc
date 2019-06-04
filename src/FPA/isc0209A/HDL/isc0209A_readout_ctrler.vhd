@@ -56,7 +56,7 @@ architecture rtl of isc0209A_readout_ctrler is
    COMPONENT fwft_sfifo_w1_d16
       PORT (
          clk : IN STD_LOGIC;
-         rst : IN STD_LOGIC;
+         srst : IN STD_LOGIC;
          din : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
          wr_en : IN STD_LOGIC;
          rd_en : IN STD_LOGIC;
@@ -284,7 +284,7 @@ begin
    U3B : fwft_sfifo_w1_d16
    PORT MAP (
       clk => CLK,
-      rst => sreset,
+      srst => sreset,
       din => (others => '0'),    -- not used
       wr_en => fpa_int_fe_fifo_wr,
       rd_en => fpa_int_fe_fifo_rd,
