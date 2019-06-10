@@ -323,7 +323,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->skimming_en = 0;                          
    
    // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 12;                             // ajuster via chipscope
+   ptrA->real_mode_active_pixel_dly = 13;                             // ajuster via chipscope
    
    // quad2    
    ptrA->adc_quad2_en = 0;                                            // ENO : 14 aout 2017 : plus besoin de la diversité de canal dans un iSC0209
