@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.8.0
+ * Generated from the flash settings file structure definition XLS file version 2.9.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      8
+#define FLASHSETTINGS_FILEMINORVERSION_V2      9
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -183,6 +183,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint16_t ElCorrMeasAtSaturation;   /**< Saturation level in ADC counts of the central or near central pixel in raw0 mode. */
    uint16_t ElCorrMeasAtReference1;   /**< 1st electronic reference in ADC counts measured at the central or near central pixel in raw0 mode (any electronic correction disabled). */
    uint16_t ElCorrMeasAtReference2;   /**< 2nd electronic reference in ADC counts measured at the central or near central pixel in raw0 mode (any electronic correction disabled). */
+   uint8_t FpaScdDiodeBiasEnum;   /**< Enumeration corresponding to the diode bias current of the SCD detectors. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

@@ -19,6 +19,7 @@
 #include "FlashSettings.h"
 #include "GC_Registers.h"
 #include "Actualization.h"
+#include "GPS.h"
 #include "string.h"
 #include "uffs\uffs.h"
 #include "uffs\uffs_fd.h"
@@ -57,6 +58,9 @@ static void Calibration_Init();
 static IRC_Status_t Calibration_ValidateCollectionType();
 static IRC_Status_t Calibration_LoadBlockLUTRQ(uint32_t blockIndex, uint32_t lutRQIndex);
 static IRC_Status_t Calibration_CopyLUTRQData(uint8_t *buffer, uint32_t buflen, uint32_t offset, uint8_t lut_page);
+static void disableGPSInterrupts(void);
+static void enableGPSInterrupts(void);
+
 
 
 /**
@@ -421,6 +425,7 @@ void Calibration_SM()
    static uint8_t startup = 1;
    static deltabeta_t* deltaBetaDataAddr = NULL;
    static bool once = false;
+   static bool gpsDisabled;
 
    extern flashDynamicValues_t gFlashDynamicValues;
    extern bool blockLoadCmdFlag;
@@ -479,6 +484,12 @@ void Calibration_SM()
          break;
 
       case CMS_IDLE:
+         if (gpsDisabled)
+         {
+            enableGPSInterrupts();
+            gpsDisabled = false;
+         }
+
          if (cmLoadCalibration)
          {
             cmLoadCalibration = 0;
@@ -498,12 +509,16 @@ void Calibration_SM()
             if (cmCalibrationFile->type == FT_TSCO)
             {
                cmCurrentState = CMS_LOAD_COLLECTION_FILE;
+               disableGPSInterrupts();
+               gpsDisabled = true;
             }
             else if (cmCalibrationFile->type == FT_TSBL)
             {
                calibrationInfo.collection.NumberOfBlocks = 1;
                blockFiles[0] = cmCalibrationFile;
                cmCurrentState = CMS_OPEN_BLOCK_FILE;
+               disableGPSInterrupts();
+               gpsDisabled = true;
             }
             else
             {
@@ -1878,4 +1893,16 @@ bool Calibration_GetActiveBlockIdx(const calibrationInfo_t* calibInfo, uint8_t* 
    // return 0 if not found
    *blockIdx = 0;
    return false;
+}
+
+static void disableGPSInterrupts(void)
+{
+   extern t_GPS Gps_struct;
+   XIntc_Disable(Gps_struct.uart.intc, Gps_struct.uart.uartIntrId);
+}
+
+static void enableGPSInterrupts(void)
+{
+   extern t_GPS Gps_struct;
+   XIntc_Enable(Gps_struct.uart.intc, Gps_struct.uart.uartIntrId);
 }

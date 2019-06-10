@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.8.0
+ * Generated from the flash settings file structure definition XLS file version 2.9.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -177,6 +177,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ElCorrMeasAtSaturation = */ 0,
    /* ElCorrMeasAtReference1 = */ 0,
    /* ElCorrMeasAtReference2 = */ 0,
+   /* FpaScdDiodeBiasEnum = */ 255,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -392,7 +393,8 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ElCorrMeasAtSaturation, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->ElCorrMeasAtReference1, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->ElCorrMeasAtReference2, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-      numBytes += 76; // Skip FREE space
+      memcpy(&hdr->FpaScdDiodeBiasEnum, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 75; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -641,7 +643,8 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtSaturation, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtReference1, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtReference2, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
-      memset(&buffer[numBytes], 0, 76); numBytes += 76; // FREE space
+      memcpy(&buffer[numBytes], &hdr->FpaScdDiodeBiasEnum, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 75); numBytes += 75; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -838,6 +841,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ElCorrMeasAtSaturation: %d\n", hdr->ElCorrMeasAtSaturation);
    FPGA_PRINTF("ElCorrMeasAtReference1: %d\n", hdr->ElCorrMeasAtReference1);
    FPGA_PRINTF("ElCorrMeasAtReference2: %d\n", hdr->ElCorrMeasAtReference2);
+   FPGA_PRINTF("FpaScdDiodeBiasEnum: %d\n", hdr->FpaScdDiodeBiasEnum);
    FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
 }
 

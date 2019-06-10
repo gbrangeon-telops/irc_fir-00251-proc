@@ -236,6 +236,7 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 {
    extern t_FpaIntf gFpaIntf;
+   extern uint8_t gFpaScdDiodeBiasEnum;
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
@@ -336,6 +337,10 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
       {
          cmd = 16;
       }
+      else if (strcasecmp((char *)argStr, "BIAS") == 0)
+      {
+         cmd = 17;
+      }
       else
       {
          DT_ERR("Unsupported command arguments");
@@ -391,7 +396,16 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
                DT_ERR("Invalid uint16 value.");
                return IRC_FAILURE;
             }
-            break;       
+            break;
+
+         case 17: // BIAS
+            if ((ParseSignedNumDec((char *)argStr, arglen, &iValue) != IRC_SUCCESS) ||
+                  (iValue < 0) || (iValue > 255))
+            {
+                  DT_ERR("Invalid uint8 value.");
+                  return IRC_FAILURE;
+            }
+            break;
       }
 
       // There is supposed to be no remaining bytes in the buffer
@@ -466,7 +480,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
          
          case 16: // ELCORR REFERENCE2
             gFpaElCorrMeasAtReference2 = iValue;
-            break;            
+            break;
+
+         case 17: // BIAS
+            gFpaScdDiodeBiasEnum = (uint8_t)iValue;
+            break;
       }
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
@@ -476,6 +494,8 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA model name = " FPA_DEVICE_MODEL_NAME);
 
    DT_PRINTF("FPA temperature = %dcC", FPA_GetTemperature(&gFpaIntf));
+
+   DT_PRINTF("FPA SCD diode bias current enum = %d", gFpaScdDiodeBiasEnum);
 
    DT_PRINTF("FPA detector polarization voltage = %d mV", gFpaDetectorPolarizationVoltage);
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
@@ -1436,7 +1456,6 @@ IRC_Status_t DebugTerminalParseLED(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
 {
    extern t_GPS Gps_struct;
-   extern struct tm rTClock;
    extern t_Trig gTrig;
    uint8_t argStr[2];
    uint32_t arglen;
@@ -1486,8 +1505,8 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
          {
             DT_PRINTF("PPS: OK");
          }
-         DT_PRINTF("UTC Time:  %02d:%02d:%02d  %02d/%02d/%4d", rTClock.tm_hour, rTClock.tm_min, rTClock.tm_sec,
-               rTClock.tm_mon + 1, rTClock.tm_mday, rTClock.tm_year + 1900);
+         DT_PRINTF("UTC Time:  %02d:%02d:%02d  %02d/%02d/%4d", Gps_struct.rTClock.tm_hour, Gps_struct.rTClock.tm_min, Gps_struct.rTClock.tm_sec,
+               Gps_struct.rTClock.tm_mon + 1, Gps_struct.rTClock.tm_mday, Gps_struct.rTClock.tm_year + 1900);
          DT_PRINTF("Latitude:  %d?\%d'%d\" %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
          DT_PRINTF("Longitude: %d?\%d'%d\" %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
          DT_PRINTF("Altitude:  %d,%d m", Gps_struct.Altitude, Gps_struct.Altitude_frac);
@@ -2426,7 +2445,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Read memory:        RDM address [c|u8|u16|u32|s8|s16|s32 length]");
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
-   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2 value]");
+   DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2 value][BIAS value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");

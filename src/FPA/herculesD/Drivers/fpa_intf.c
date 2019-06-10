@@ -61,8 +61,18 @@
 #define SCD_CLINK_1_CHN                   0x01   // mode clink 1 channel (base) tel que défini par scd
 #define SCD_CLINK_2_CHN                   0x00   // mode clink 2 channel (medium) tel que défini par scd
 
-// HerculesD Bias 
-#define SCD_BIAS_DEFAULT                  0x0C    // 100pA (default)                                     
+// HerculesD Bias
+static const uint8_t Scd_DiodeBiasValues[] = {
+      0x0A,    // 1pA
+      0x0B,    // 10pA
+      0x0C,    // 100pA
+      0x02,    // 300pA
+      0x03,    // 1nA
+      0x04,    // 3nA
+      0x0D     // 10nA
+};
+#define SCD_BIAS_DEFAULT_IDX              2     // 100pA (default)
+#define SCD_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues) / sizeof(Scd_DiodeBiasValues[0]))
 
 // HerculesD Pixel resolution 
 #define SCD_PIX_RESOLUTION_15BITS         0x00    // 15 bits selon SCD
@@ -249,6 +259,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    Scd_Fig1orFig2Param_t hh;
    Scd_Fig4Param_t kk;
    float fpaAcquisitionFrameRate;
+   extern uint8_t gFpaScdDiodeBiasEnum;
    
    //-----------------------------------------                                           
    // bâtir les configurations
@@ -315,8 +326,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       //ptrA->scd_out_chn    = SCD_CLINK_1_CHN;
                                            
    // bias 
-   ptrA->scd_diode_bias = SCD_BIAS_DEFAULT;          // bias des photodiodes.  
-    
+   if (gFpaScdDiodeBiasEnum >= SCD_BIAS_VALUES_NUM)
+      gFpaScdDiodeBiasEnum = SCD_BIAS_DEFAULT_IDX;    // corrige une valeur invalide
+   ptrA->scd_diode_bias = Scd_DiodeBiasValues[gFpaScdDiodeBiasEnum];
+
    // integration modes
    ptrA->scd_int_mode = SCD_IWR_MODE;
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 

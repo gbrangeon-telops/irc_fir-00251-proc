@@ -454,6 +454,11 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 8;
 
                case 8:
+                  // 2.8.x -> 2.9.x
+                  hdr->FpaScdDiodeBiasEnum = FlashSettings_FlashSettingsFileHeader_default.FpaScdDiodeBiasEnum;
+                  hdr->FileStructureMinorVersion = 9;
+
+               case 9:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

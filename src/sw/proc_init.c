@@ -70,6 +70,7 @@
 t_Trig gTrig = Trig_Ctor(XPAR_TRIGGER_CTRL_BASEADDR);
 t_ExposureTime gExposureTime = ExposureTime_Ctor(XPAR_EXPTIME_CTRL_BASEADDR);
 t_FpaIntf gFpaIntf = FpaIntf_Ctor(XPAR_FPA_CTRL_BASEADDR);
+uint8_t gFpaScdDiodeBiasEnum = 0xFF;   //Undefined value, default will be used
 int16_t gFpaDetectorPolarizationVoltage = 0;
 float gFpaDetectorElectricalTapsRef = 0.0F;
 float gFpaDetectorElectricalRefOffset = 0.0F;
