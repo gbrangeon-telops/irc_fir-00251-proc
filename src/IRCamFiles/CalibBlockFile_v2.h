@@ -103,7 +103,7 @@ struct CalibBlock_BlockFileHeader_v2Struct {
    uint16_t PixelDynamicRangeMax;   /**< Maximum value of the dynamic range */
    uint16_t SaturationThreshold;   /**< Threshold at which a pixel is considered to be saturated */
    uint32_t BlockBadPixelCount;   /**< Bad pixel count computed during calibration block generation */
-   float MaximumTotalFlux;   /**< Maximum total flux supported  */
+   float MaximumTotalFlux;   /**< Maximum total flux supported considering sensor width and height (MaxFluxCurrentSaturation x SensorWidth x SensorHeight) */
    float NUCMultFactor;   /**< Multiplier Factor for NUC */
    int32_t T0;   /**< Internal lens temperature during calibration */
    float Nu;   /**< Thermal compensation exponent */
