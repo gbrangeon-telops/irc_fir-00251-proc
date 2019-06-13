@@ -325,9 +325,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // ajustement de delais de la chaine
    ptrA->real_mode_active_pixel_dly = 13;                             // ajuster via chipscope
    
-   // quad2    
+   // quad2
+#if DEFINE_HSI
+   ptrA->adc_quad2_en = 1;
+   ptrA->chn_diversity_en = 1;
+#else
    ptrA->adc_quad2_en = 0;                                            // ENO : 14 aout 2017 : plus besoin de la diversité de canal dans un iSC0209
    ptrA->chn_diversity_en = 0;                                        // ENO : 14 aout 2017 : plus besoin de la diversité de canal dans un iSC0209
+#endif
    
    //
    ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
@@ -353,8 +358,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                =  1 + ptrA->chn_diversity_en;
+#if DEFINE_HSI
+   ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS));                             // somme
+#else
    ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);    // moyenne
-   //ptrA->vgood_samp_mean_numerator         = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS));                             // somme
+#endif
       
    // calculs
    ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;                                        

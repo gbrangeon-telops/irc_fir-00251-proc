@@ -19,7 +19,17 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
+
+#define DEFINE_HSI (0)  // Special define for HSI project:
+                        //    - IWR is implemented
+                        //    - channel diversity (sum) is enabled
+
+
+#if DEFINE_HSI
+#define FPA_DEVICE_MODEL_NAME    "ISC0209A__IWR+CH_DIV"
+#else
 #define FPA_DEVICE_MODEL_NAME    "ISC0209A"
+#endif
 
 #define FPA_WIDTH_MIN      128    //
 #define FPA_WIDTH_MAX      320
@@ -44,7 +54,11 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)  // HawkAIsImplemented conservé temporairement
+#if DEFINE_HSI
+#define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
+#else
+#define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
+#endif
 
 #define FPA_MAX_GAIN       3
 #define FPA_NUMTAPS        4  // [taps]
