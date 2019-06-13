@@ -41,7 +41,7 @@ cd $current_path
 
 proc build_proc_sw {detector size} {
 set current_path [exec pwd]
-#Swicth directory
+#Switch directory
 cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
 
 #Set workspace
