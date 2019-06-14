@@ -29,7 +29,8 @@ use unisim.vcomponents.all;
 
 entity quad_adc_ctrl is
    generic(
-      SCLK_DIV : integer := 4
+      SCLK_DIV : integer := 4;
+      SADC_SERVICES : std_logic := '0'
       );
    port(
       CLK : in std_logic;
@@ -115,7 +116,8 @@ architecture quad_adc_ctrl of quad_adc_ctrl is
    
    constant SOFTWARE_RST_REG_DATA : std_logic_vector(7 downto 0) := x"FF";
    constant POWERDOWN_REG_DATA : std_logic_vector(7 downto 0) := '0' & '0' & '0' & "00000"; -- duty cycle stab. on, random off, offset binary, normal operation
-   constant OUTPUT_MODE_REG_DATA : std_logic_vector(7 downto 0) := "110" & '0' & '0' & "101"; -- 2.1 mA LVDS / no internal termination / outputs enabled / 1-lane, 14 bits serialization
+   constant OUTPUT_MODE_REG_DATA       : std_logic_vector(7 downto 0) := "110" & '0' & '0' & "101"; -- 2.1 mA LVDS / no internal termination / outputs enabled / 1-lane, 14 bits serialization
+   constant OUTPUT_MODE_REG_DATA_SADC  : std_logic_vector(7 downto 0) := "111" & '1' & '0' & "101"; -- 1.75 mA LVDS (3.5 mA because the internal terminason is ON)/ internal termination / outputs enabled / 1-lane, 14 bits serialization
    
    constant SOFTWARE_RST_REG_ADDR : std_logic_vector(6 downto 0) := "000" & x"0";
    constant POWERDOWN_REG_ADDR : std_logic_vector(6 downto 0) := "000" & x"1";
@@ -149,7 +151,7 @@ architecture quad_adc_ctrl of quad_adc_ctrl is
    signal rw_n : std_ulogic;
    
    signal config_addr : addr_ary := (SOFTWARE_RST_REG_ADDR, POWERDOWN_REG_ADDR, OUTPUT_MODE_REG_ADDR, TEST_PATTERN_MSB_REG_ADDR, TEST_PATTERN_LSB_REG_ADDR);
-   signal config_data : data_ary := (SOFTWARE_RST_REG_DATA, POWERDOWN_REG_DATA, OUTPUT_MODE_REG_DATA, (others => '0'), (others => '0'));
+   signal config_data : data_ary := (SOFTWARE_RST_REG_DATA, POWERDOWN_REG_DATA, (others => '0'), (others => '0'), (others => '0'));
    signal config_data_readback_reg : data_ary := ((others => '0'), (others => '0'), (others => '0'), (others => '0'), (others => '0'));
    
    signal readback_cfg_a1, readback_cfg_a2, readback_cfg_a3, readback_cfg_a4: std_logic_vector(7 downto 0) := (others => '0');
@@ -215,6 +217,7 @@ begin
       end if;
    end process;
    
+   config_data(2) <= OUTPUT_MODE_REG_DATA_SADC when SADC_SERVICES = '1' else OUTPUT_MODE_REG_DATA;
    config_data(3)(7 downto 6) <= TEST_PATTERN_ON when enable_test_pattern = '1' else TEST_PATTERN_OFF;
    config_data(3)(5 downto 0) <= std_logic_vector(test_pattern_hold(13 downto 8));
    config_data(4) <= std_logic_vector(test_pattern_hold(7 downto 0));
