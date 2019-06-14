@@ -20,12 +20,13 @@
 #include "IRC_status.h"
 
 
-#define DEFINE_HSI (0)  // Special define for HSI project:
-                        //    - IWR is implemented
-                        //    - channel diversity (sum) is enabled
-
-
-#if DEFINE_HSI
+/************************************************************************/
+// If needed, the DEFINE_HSI should be added to the SDK project symbols.
+// This define enables the functionalities required for HSI project:
+//    - IWR is implemented
+//    - channel diversity (sum) is enabled
+/************************************************************************/
+#ifdef DEFINE_HSI
 #define FPA_DEVICE_MODEL_NAME    "ISC0209A__SMARTADC_HSI"
 #else
 #define FPA_DEVICE_MODEL_NAME    "ISC0209A"
@@ -54,7 +55,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#if DEFINE_HSI
+#ifdef DEFINE_HSI
 #define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #else
 #define FPA_TDC_FLAGS            (Isc0209AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)

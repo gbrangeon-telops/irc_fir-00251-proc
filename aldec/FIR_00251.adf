@@ -40,9 +40,9 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL
+fileopenfolder=D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src
+fileopenfolder=D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src
+fileopenfolder=D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -252,6 +252,12 @@ ADC_deserializer/..\..\compile\adc_data_deserializer_8chn.vhd=-1
 [file_out:ADC_deserializer/..\..\..\src\QuadADC\HDL\adc_data_deserializer.bde]
 ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 
+[file_out:/..\..\src\fir_00251_proc_startup.bde]
+/..\compile\fir_00251_proc_startup.vhd=-1
+
+[file_out:/..\..\src\fir_00251_proc_startup.bde]
+/..\compile\fir_00251_proc_startup.vhd=-1
+
 [Groups]
 ADCReadout=1
 AEC=1
@@ -306,12 +312,6 @@ Testbench\Proc_Out=1
 Trig=1
 USART=1
 USB=1
-
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
 
 [Files]
 /..\..\src\fir_00251_proc_acq.bde=-1
@@ -461,6 +461,7 @@ FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_selector.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_sum.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde=-1
+FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_ctrl.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat_gen.vhd=-1
@@ -473,11 +474,13 @@ FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\monitoring_adc_ctrl.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler.vhd=-1
+FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler_sadc.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ad5648_driver.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_mode_dval_gen.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_chn_diversity_ctrler.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde=-1
+FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_diag_data_gen.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_flow_mux.vhd=-1
@@ -496,7 +499,6 @@ FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_lsync_mode_mux.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do=-1
-FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_mem.vhd=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL_ext_sync_flow.vhd=-1
@@ -981,6 +983,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_selector.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_sample_sum.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde=Block Diagram
+.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_ctrl.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\dfpa_hardw_stat_gen.vhd=VHDL Source Code
@@ -993,11 +996,13 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\monitoring_adc_ctrl.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler.vhd=VHDL Source Code
+.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\spi_mux_ctler_sadc.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ad5648_driver.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_mode_dval_gen.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_chn_diversity_ctrler.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde=Block Diagram
+.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_diag_data_gen.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_flow_mux.vhd=VHDL Source Code
@@ -1016,7 +1021,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_lsync_mode_mux.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do=Macro
-.\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_mem.vhd=VHDL Source Code
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL_ext_sync_flow.vhd=VHDL Source Code
@@ -1351,7 +1355,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\FIR-00251-Common\VHDL\USART\usart_mmcm_rst.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=Macro
 .\..\src\USB\hdl\USB_CTRL.bde=Block Diagram
-.\compile\suphawkA_hw_driver.vhd=VHDL Source Code
 
 [file_out:/..\..\src\fir_00251_proc_acq.bde]
 /..\compile\fir_00251_proc_acq.vhd=-1
@@ -1492,8 +1495,14 @@ Flash_Ctrl/SFW=-1
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
 FPA\Common/..\..\..\compile\afpa_services.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde]
+FPA\Common/..\..\..\compile\afpa_services_sadc.vhd=-1
+
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
 FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
+
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
 FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
@@ -1512,9 +1521,6 @@ FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
 FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde]
 FPA\Common/..\compile\afpa_elec_offset_proc.vhd=-1
@@ -1654,6 +1660,8 @@ FPA\ScorpiomwA/..\..\..\compile\scorpiomwA_prog_ctrler.vhd=-1
 [file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_clks_gen.bde]
 FPA\suphawkA/..\..\..\compile\suphawkA_clks_gen.vhd=-1
 
+[file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_hw_driver.bde]
+FPA\suphawkA/..\..\..\compile\suphawkA_hw_driver.vhd=-1
 
 [file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_intf.bde]
 FPA\suphawkA/..\..\..\compile\suphawkA_intf.vhd=-1
@@ -1739,5 +1747,3 @@ USART/..\..\compile\USART.vhd=-1
 [file_out:USB/..\..\..\src\USB\hdl\USB_CTRL.bde]
 USB/..\..\compile\USB_CTRL.vhd=-1
 
-[file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_hw_driver.bde]
-FPA\suphawkA/..\..\..\compile\suphawkA_hw_driver.vhd=-1
