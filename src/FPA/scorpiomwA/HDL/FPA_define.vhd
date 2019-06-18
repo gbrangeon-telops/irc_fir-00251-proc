@@ -46,7 +46,7 @@ package FPA_define is
    constant DEFINE_GENERATE_INT_FDBK_MODULE       : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START
    constant DEFINE_FPA_INT_FDBK_DLY               : natural   := 3076;     -- pour isc0209A, le fedback commence en même temps que la consigne (fpa_int) mais les deux signaux n'ont pas la même durée (DEFINE_FPA_INT_TIME_OFFSET_nS les differencie)
    
-   constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- à '1' permet de generer la chaine de traitement pour le quad 2. Ce qui est utile en diversité de canal
+   constant DEFINE_GENERATE_QUAD2_CHAIN           : std_logic := '0';      -- à '1' permet de generer la chaine de traitement pour le quad 2. Ce qui est utile en diversité de canal
    
    constant DEFINE_FPA_PROG_INT_TIME              : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images post configuration du detecteur 
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 1000 + 3076;      -- en coups d'horloge FPA, c'est le temps d'integration utilisé pour les images xtra trig

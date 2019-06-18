@@ -50,7 +50,7 @@ package FPA_define is
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';      -- pas besoin de config particulière au demarrage des Hawks
    constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.
-   constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- à '1' permet de generer la chaine de traitement pour le quad 2. Ce qui est utile en diversité de canal
+   constant DEFINE_GENERATE_QUAD2_CHAIN           : std_logic := '0';      -- à '1' permet de generer la chaine de traitement pour le quad 2. Ce qui est utile en diversité de canal
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- on ne fait aucune correction électronique
    

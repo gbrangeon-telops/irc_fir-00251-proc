@@ -49,7 +49,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '1';
    constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.
-   constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';
+   -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 5_500.0; -- 12_125.0; --11_880.0; -- 11_111.0;    
