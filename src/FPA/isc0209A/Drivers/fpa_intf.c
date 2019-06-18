@@ -17,12 +17,14 @@
 --
 ------------------------------------------------------------------------------*/
 
-#include "GeniCam.h"
 #include "fpa_intf.h"
+#ifndef DEFINE_HSI
+	#include "GeniCam.h"
+	#include "IRC_status.h"
+	#include "CRC.h"
+#endif
 #include "flashSettings.h"
 #include "utils.h"
-#include "IRC_status.h"
-#include "CRC.h"
 #include <math.h>
 #include <string.h>
 

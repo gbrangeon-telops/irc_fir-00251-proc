@@ -17,8 +17,10 @@
 
 #include <stdint.h>
 #include "GC_Registers.h"
-#include "IRC_status.h"
 
+#ifndef DEFINE_HSI
+	#include "IRC_status.h"
+#endif
 
 /************************************************************************/
 // If needed, the DEFINE_HSI should be added to the SDK project symbols.
