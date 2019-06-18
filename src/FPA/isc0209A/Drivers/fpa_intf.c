@@ -239,9 +239,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     //extern float gFpaDetectorElectricalTapsRef;
     extern float gFpaDetectorElectricalRefOffset;
     //static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
-    static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-    extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
-    extern int32_t gFpaDebugRegE;
+    static float presentElectricalRefOffset = 0;        // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
+    extern int32_t gFpaDebugRegA;                       // reservé ELCORR pour correction électronique (gain et/ou offset)
+    extern int32_t gFpaDebugRegB;                       // reservé
+    extern int32_t gFpaDebugRegC;                       // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
+    extern int32_t gFpaDebugRegD;                       // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
+    extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
+    extern int32_t gFpaDebugRegF;                       // reservé real_mode_active_pixel_dly pour ajustement du début AOI
+    extern int32_t gFpaDebugRegG;                       // non utilisé
     static uint8_t cfg_num = 0; 
 
    // on bâtit les parametres specifiques du isc0209
@@ -263,7 +268,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
    }
    
-   // mode diag vrai et faked
+   // gFpaDebugRegE: mode diag vrai et faked
    ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
    if (ptrA->fpa_diag_mode == 1){
       if ((int32_t)gFpaDebugRegE != 0)
@@ -324,8 +329,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // skimming                     
    ptrA->skimming_en = 0;                          
    
-   // ajustement de delais de la chaine
-   ptrA->real_mode_active_pixel_dly = 13;                             // ajuster via chipscope
+   // Registre F : ajustement des delais de la chaine
+   if (init_done == 0)
+      gFpaDebugRegF = 13; 
+   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;   
    
    // quad2
 #ifdef DEFINE_HSI
@@ -389,28 +396,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;    
    
    
-   // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
-   // adc clk source phase
-   if (init_done == 0){
-      ptrA->adc_clk_pipe_sel = 0;
-   }       
-   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1)){
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
-      //need_rst_fpa_module = 1;
-   }
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
-   
-   // adc clk source phase
-   if (init_done == 0){         
-      ptrA->adc_clk_source_phase = 1000; //179200;
-   }
-   
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1)){
-      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
-      //need_rst_fpa_module = 1;
-   }
-    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;
-   
+   // gFpaDebugRegC dephasage grossier des adc_clk 
+   if (init_done == 0)
+      gFpaDebugRegC = 0;
+   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
+ 
+   // gFpaDebugRegD dephasage fin des adc_clk 
+   if (init_done == 0)         
+      gFpaDebugRegD = 1000;
+   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
+      
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    

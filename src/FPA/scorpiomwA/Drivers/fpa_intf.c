@@ -247,8 +247,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalRefOffset;
    static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegD;
-   extern int32_t gFpaDebugRegE;
+   extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
+   extern int32_t gFpaDebugRegB;                         // reservé
+   extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
+   extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
+   extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
+   extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
+   extern int32_t gFpaDebugRegG;                         // non utilisé
    static uint8_t cfg_num = 0; 
        
    // on bâtit les parametres specifiques du scorpiomw
@@ -273,7 +278,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // allumage du détecteur 
    ptrA->fpa_pwr_on   = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
-   // mode diag vrai et faked
+   // gFpaDebugRegE :  mode diag vrai et faked
    ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
    if (ptrA->fpa_diag_mode == 1){
       if ((int32_t)gFpaDebugRegE != 0)
@@ -344,14 +349,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
    gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                        
    
-   // ajustement de delais de la chaine 
-   if (((uint32_t)gFpaDebugRegA != ptrA->real_mode_active_pixel_dly) && (init_cfg_in_progress == 0))   
-      ptrA->real_mode_active_pixel_dly  = (uint32_t) gFpaDebugRegA;
-   gFpaDebugRegA = (int32_t)ptrA->real_mode_active_pixel_dly;  
-   
+   // Registre F : ajustement des delais de la chaine
+   if (init_cfg_in_progress == 1)
+      gFpaDebugRegF = 3; 
+   ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
+      
    // quad2
    ptrA->adc_quad2_en = 0;   //
-
    ptrA->chn_diversity_en = ptrA->adc_quad2_en;                      // 
    
    //
@@ -409,26 +413,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
-   // adc_clk_phase
-   if (init_cfg_in_progress == 1){
-      ptrA->adc_clk_pipe_sel = 0;
-   }       
-   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_cfg_in_progress == 0)){
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
-      //need_rst_fpa_module = 1;
-   }
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
-   
-   // adc clk source phase
-   if (init_cfg_in_progress == 1){
-      ptrA->adc_clk_source_phase = 1000; //179200;
-   }
-   
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_cfg_in_progress == 0)){
-      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
-      //need_rst_fpa_module = 1;
-   }
-    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;  
+   // gFpaDebugRegC dephasage grossier des adc_clk 
+   if (init_cfg_in_progress == 1)
+      gFpaDebugRegC = 0;
+   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
+ 
+   // gFpaDebugRegD dephasage fin des adc_clk 
+   if (init_cfg_in_progress == 1)         
+      gFpaDebugRegD = 680;
+   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;  
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
