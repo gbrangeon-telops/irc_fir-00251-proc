@@ -489,7 +489,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 //   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
    if (sw_init_done == 0){
-      gFpaDebugRegC = 1;
+      gFpaDebugRegC = 2;
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // 
          gFpaDebugRegC = 1;
    }       
@@ -497,7 +497,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc clk source phase
    if (sw_init_done == 0){         
-      gFpaDebugRegD = 132000;                //  132000
+      gFpaDebugRegD = 24000;                //  132000
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas particulier des systèmes avec Flex 264
          gFpaDebugRegD = 132000; 
    }

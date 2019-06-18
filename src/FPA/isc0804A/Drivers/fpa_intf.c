@@ -97,7 +97,7 @@
 
 // horloges des zones FASTRD
 #define FAST_CLK_FACTOR                       2  // facteur multiplicatif de l'horloge détecteur
-#define ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ    (2.666*FPA_MCLK_RATE_HZ)                  // horloge rapide de la zone en question lorsqu,on active le fastwd
+#define ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ    (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)                  // horloge rapide de la zone en question lorsqu,on active le fastwd
 #define ROIC_SAMPLE_ROW_FAST_CLK_RATE_HZ     (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)    // horloge rapide de la zone en question lorsqu,on active le fastwd
 #define ROIC_LSYNC_FAST_CLK_RATE_HZ          (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)    // horloge rapide de la zone en question lorsqu,on active le fastwd
 #define ROIC_REMAINING_LOVH_FAST_CLK_RATE_HZ (FAST_CLK_FACTOR*FPA_MCLK_RATE_HZ)    // horloge rapide de la zone en question lorsqu,on active le fastwd
@@ -239,7 +239,7 @@ uint8_t flegx_present = 0;
 
 // definition et activation des accelerateurs
 uint8_t speedup_lsydel         = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
-uint8_t speedup_sample_row     = 0; 
+uint8_t speedup_sample_row     = 1; 
 uint8_t speedup_lsync          = 0;
 uint8_t speedup_remaining_lovh = 0;
 uint8_t speedup_unused_area    = 1;  
