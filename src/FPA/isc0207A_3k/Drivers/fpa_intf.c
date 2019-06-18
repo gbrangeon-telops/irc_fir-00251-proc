@@ -710,6 +710,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;	  
    }
+   
+   // additional exposure time offset coming from flash 
+   ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
+
  
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);

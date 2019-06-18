@@ -545,7 +545,7 @@ begin
                         when X"6C" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly'length-1 downto 0));
                         when X"70" =>    mb_struct_cfg.scd_misc.scd_xsize_div2          <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div2'length-1 downto 0));
                         when X"74" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
-                        
+                           
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
                         when X"78" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
@@ -559,7 +559,7 @@ begin
                         when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                         when X"E4" =>    fpa_softw_stat_i.fpa_output <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
                            
-                        -- pour effacer erreurs latchées
+                        -- pour effacer erreurfpa_init_dones latchées
                         when X"EC" =>    reset_err_i <= data_i(0);
                            
                         -- pour un reset complet du module FPA
@@ -567,12 +567,21 @@ begin
                         --fpa_softw_stat_i.dval <='0' permet de ne pas rallumer automatiquement la carte DDC après un reset controllé.
                         when others => --do nothing
                         
-                     end case;
+                     end case;                     
+                     
                   end if;
                end if;
             else
                mb_ser_cfg_dval <= '0';
             end if;
+            
+            -- pragma translate_off
+            fpa_softw_stat_i.fpa_roic <= FPA_ROIC_PELICAND;
+            fpa_softw_stat_i.fpa_output <= OUTPUT_DIGITAL;
+            fpa_softw_stat_i.dval <= '1';
+            -- pragma translate_on
+            
+            
          end if;
       end if;
    end process;   
