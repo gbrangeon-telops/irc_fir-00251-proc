@@ -66,7 +66,7 @@ architecture TB_ARCHITECTURE of pelicand_top_tb_tB is
          FPA_EXP_INFO   : in exp_info_type;
          
          -- sortie pixels                 
-         DOUT_MOSI      : out t_axi4_stream_mosi32;
+         DOUT_MOSI      : out t_axi4_stream_mosi64;
          DOUT_MISO      : in t_axi4_stream_miso;
          
          --infos vers les modules externes
@@ -130,7 +130,7 @@ architecture TB_ARCHITECTURE of pelicand_top_tb_tB is
    signal FSYNC_P       : std_logic;
    signal SER_TC_N      : std_logic;
    signal SER_TC_P      : std_logic;
-   signal DOUT_MOSI     : t_axi4_stream_mosi32;
+   signal DOUT_MOSI     : t_axi4_stream_mosi64;
    signal HDER_MOSI     : t_axi4_lite_mosi;
    signal IMAGE_INFO    : img_info_type;
    
@@ -183,7 +183,7 @@ begin
    
    -- temps d'intégration
    FPA_EXP_INFO.exp_time <= to_unsigned(20, FPA_EXP_INFO.exp_time'length);
-   FPA_EXP_INFO.exp_indx <= '0';
+   FPA_EXP_INFO.exp_indx <= (others =>'0');
    FPA_EXP_INFO.exp_dval <= '1';
    
    -- HDER_MISO
