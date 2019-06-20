@@ -21,7 +21,6 @@
 #include "IRC_status.h"
 #include "verbose.h"
 #include "Xintc.h"
-#include "CircularUART.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -162,7 +161,7 @@ typedef struct
    uint8_t           dataBuf[22];
    uint8_t           dataCount;
    uint8_t           builtInTest;         // Error flags from a Bit Response
-   circularUART_t    theUart;
+   XUartNs550        theUart;
    circByteBuffer_t  responses;
    uint8_t           rawBytes[64];        // raw bytes (circBuffer_t responses) received from the UART interrupt handler
 }rpCtrl_t;

@@ -13,6 +13,7 @@
  */
 
 #include "RpOpticalProtocol.h"
+#include "UART_Utils.h"
 #include "xparameters.h"
 #include "FlashSettings.h"
 #include "hder_inserter.h"
@@ -63,32 +64,30 @@ XStatus RPOpt_init(gcRegistersData_t* pGCRegs, rpCtrl_t* aCtrl, uint16_t uartDev
    memset(aCtrl->serial_data.rxBuffer, 0, sizeof(aCtrl->serial_data.rxBuffer));
    memset(aCtrl->serial_data.txBuffer, 0, sizeof(aCtrl->serial_data.txBuffer));
 
-   status = CircularUART_Init(  &aCtrl->theUart,
+   status = UART_Init(  &aCtrl->theUart,
                         uartDeviceId,
                         intc,
                         uartIntrId,
                         RP_OPT_UART_IntrHandler,
-                        (void *)(aCtrl),
-                        Ns550);
-
+                        (void *)(aCtrl));
 
    if (status != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-   status = CircularUART_Config(&aCtrl->theUart, RP_OPT_DEFAULT_BAULDRATE, RP_OPT_DATA_BITS, RP_OPT_PARITY, RP_OPT_STOP_BITS);
+   status = UART_Config(&aCtrl->theUart, RP_OPT_DEFAULT_BAULDRATE, RP_OPT_DATA_BITS, RP_OPT_PARITY, RP_OPT_STOP_BITS);
    if (status != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
    // Reset RX FIFO
-   CircularUART_ResetFifo(&aCtrl->theUart);
+   UART_ResetRxFifo(&aCtrl->theUart);
 
-   XUartNs550_SetFifoThreshold(&aCtrl->theUart.uart.Ns550, XUN_FIFO_TRIGGER_08);
+   XUartNs550_SetFifoThreshold(&aCtrl->theUart, XUN_FIFO_TRIGGER_08);
 
-   XUartNs550_Recv(  &aCtrl->theUart.uart.Ns550,
+   XUartNs550_Recv(  &aCtrl->theUart,
                      aCtrl->serial_data.rxBuffer,
                      sizeof( aCtrl->serial_data.rxBuffer));
 
@@ -120,7 +119,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
       if(aCtrl->serial_data.txDataCount > 0)
       {
          aCtrl->serial_data.txBusy = 1;
-         XUartNs550_Send(&aCtrl->theUart.uart.Ns550, aCtrl->serial_data.txBuffer, aCtrl->serial_data.txDataCount);
+         XUartNs550_Send(&aCtrl->theUart, aCtrl->serial_data.txBuffer, aCtrl->serial_data.txDataCount);
       }
 
    }
@@ -439,10 +438,10 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                   {
                      aCtrl->currentResponseData = aCtrl->lastResponseData;
                      RP_OPT_ERR("bad chksum\n");
-                     firstRegister = XUartNs550_ReadReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET);
-                     XUartNs550_WriteReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, 0);
+                     firstRegister = XUartNs550_ReadReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET);
+                     XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, 0);
                      CBB_Pushn(&aCtrl->responses, 10, aCtrl->dataBuf);
-                     XUartNs550_WriteReg(aCtrl->theUart.uart.Ns550.BaseAddress, XUN_IER_OFFSET, firstRegister);
+                     XUartNs550_WriteReg(aCtrl->theUart.BaseAddress, XUN_IER_OFFSET, firstRegister);
                   }
 
                   switch(temp)
@@ -512,7 +511,7 @@ void RP_OPT_UART_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventDat
       case XUN_EVENT_RECV_DATA:                       // Data has been received.
       {
          // Listen for command on UART
-         n = XUartNs550_Recv(&theCtrl->theUart.uart.Ns550, theCtrl->serial_data.rxBuffer, sizeof(theCtrl->serial_data.rxBuffer));
+         n = XUartNs550_Recv(&theCtrl->theUart, theCtrl->serial_data.rxBuffer, sizeof(theCtrl->serial_data.rxBuffer));
 
          // CR_WARNING for some reason, n is always 0! thus we use EventData, which contains the actual number of bytes received
          n = EventData;

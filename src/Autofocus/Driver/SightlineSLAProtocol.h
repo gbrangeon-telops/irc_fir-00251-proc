@@ -14,7 +14,6 @@
 #include "IRC_status.h"
 #include "verbose.h"
 #include "Xintc.h"
-#include "CircularUART.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -70,7 +69,7 @@ typedef struct
    slParsingState_t  slParsingState;
    slResponse_t      lastResponseData;
    float             currentMetricData;
-   circularUART_t        theUart;
+   XUartNs550        theUart;
    circByteBuffer_t  responses;
    uint8_t           rawBytes[64];        // raw bytes (circBuffer_t responses) received from the UART interrupt handler
 }slCtrl_t;
