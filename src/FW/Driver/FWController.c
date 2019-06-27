@@ -59,7 +59,6 @@ static bool FWIdleMode(bool reset);
 static bool FWVelocityMode(bool reset, bool newTarget);
 static bool FWPositionMode(bool reset, bool newTarget);
 static bool FWErrorMode(bool reset);
-static void FW_initPositionLUT();
 
 static timerData_t FW_modeChangeTimer;
 static timerData_t FW_commTimer;
@@ -94,8 +93,6 @@ IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
 
    FW_ResetTimers();
 
-   FW_SetFWEncoderCountInOneTurn();
-
    FW_initialized = true;
 
 
@@ -103,7 +100,7 @@ IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
    return status;
 }
 
-static void FW_initPositionLUT()
+void FW_initPositionLUT()
 {
    int i;
    int fraction;
@@ -491,9 +488,6 @@ static bool FWInitialisationMode(bool reset)
    {
       case INIT_TIMEOUTSETUP_MODE:
          StartTimer(&FW_modeChangeTimer, FAULHABER_INIT_TIMEOUT);
-
-         //Init LUT Position
-         FW_initPositionLUT();
 
          //Init FW_Config parameter only at first boot. Do not override FW_config when we reset for Debug terminal or an FW issue
          if(gFWConfigInit == true)

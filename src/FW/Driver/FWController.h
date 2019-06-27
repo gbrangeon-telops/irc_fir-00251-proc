@@ -197,8 +197,8 @@ void FW_ControllerProcess();
 bool IsFWControllerReady();
 FW_ControllerMode_t getFWControllerMode();
 bool IsFWHomingValid();
-
 IRC_Status_t FWControllerInit(FH_ctrl_t* instance);
+void FW_initPositionLUT();
 
 ////////////////////
 // External Variable

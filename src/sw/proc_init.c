@@ -1185,6 +1185,13 @@ IRC_Status_t Proc_MGT_Init()
  */
 IRC_Status_t Proc_FW_Init()
 {
+
+
+   FW_SetFWEncoderCountInOneTurn(&gSFW_Ctrl);
+
+   //Init LUT Position
+   FW_initPositionLUT(&gSFW_Ctrl);
+
    // Initialize the SFW Module even if not used
    SFW_CTRL_Init(&gcRegsData, &gSFW_Ctrl);
 
@@ -1198,7 +1205,8 @@ IRC_Status_t Proc_FW_Init()
       SFW_Disable();
    }
 
-	return FWControllerInit(&gFWFaulhaberCtrl);}
+	return FWControllerInit(&gFWFaulhaberCtrl);
+}
 
 /**
  * Initializes neutral density filter controller.
