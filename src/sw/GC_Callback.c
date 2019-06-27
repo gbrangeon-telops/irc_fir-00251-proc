@@ -1029,6 +1029,7 @@ void GC_CalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
             CAL_ApplyCalibBlockSelMode(&gCal, &gcRegsData);
             CAL_WriteBlockParam(&gCal, &gcRegsData);
             Calibration_LoadLUTRQ(0);
+			GC_UpdateAECPlusIsAvailable();
          }
       }
    }
@@ -2759,6 +2760,8 @@ void GC_FWPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
          CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);   // Updates FWPositionSetpoint
       else
          GC_UpdateFWPositionSetpoint(prevFWPositionSetpoint, gcRegsData.FWPositionSetpoint);
+	 
+	  GC_UpdateAECPlusIsAvailable();
    }
 }
 
