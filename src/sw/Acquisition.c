@@ -35,6 +35,8 @@
 #include "AEC.h"
 #include "Actualization.h"
 #include <stdbool.h> // bool
+#include <float.h>
+#include <stdint.h>
 
 static uint8_t gAcquisitionTurnOn = 0;
 static uint8_t gAcquisitionTurnOff = 0;
@@ -204,6 +206,11 @@ void Acquisition_SM()
    int16_t sensorTemp;
    int16_t cooldownTempTarget;
    t_FpaStatus fpaStatus;
+   uint32_t cooler_volt__mV;
+   static uint32_t cooler_volt_min_mV_latch = UINT32_MAX;
+   static uint32_t cooler_volt_max_mV_latch = 0;
+   static float cooler_on_curr_min_A_latch = FLT_MAX;
+   static float cooler_off_curr_max_A_latch = 0.0F;
 
    switch (acquisitionState)
    {
@@ -352,25 +359,20 @@ void Acquisition_SM()
 
       case ACQ_WAITING_FOR_ADC_DDC_PRESENCE:
          FPA_GetStatus(&fpaStatus, &gFpaIntf);
-         if (fpaStatus.fpa_init_done == 1)
+         // Wait for valid cooler voltage requirements
+         if (fpaStatus.cooler_volt_max_mV > fpaStatus.cooler_volt_min_mV)
          {
-            if (elapsed_time_us(tic_delay) >= WAITING_FOR_ADC_DDC_SENSOR_DELAY_US) // la carte ADC requiert un peu de temps pour démarrer
-            {
-               if (fpaStatus.adc_ddc_present == 1)
-               {
-                  builtInTests[BITID_SensorControllerDetection].result = BITR_Passed;
-                  ACQ_INF("ADC or DDC detected in %dms.", elapsed_time_us(tic_timeout) / 1000);
-                  GETTIME(&tic_timeout);
-                  ACQ_INF("Waiting for cooler voltage to be available...");
-                  acquisitionState = ACQ_WAITING_FOR_COOLER_VOLTAGE;
-               }
-               else
-               {
-                  builtInTests[BITID_SensorControllerDetection].result = BITR_Failed;
-                  ACQ_ERR("No ADC or DDC detected.");
-                  acquisitionState = ACQ_POWER_RESET;
-               }
-            }
+            // Make a copy of cooler requirements (when FPA is reconfigured cooler requirements are invalid so we latch valid values)
+            cooler_volt_min_mV_latch = fpaStatus.cooler_volt_min_mV;
+            cooler_volt_max_mV_latch = fpaStatus.cooler_volt_max_mV;
+            cooler_on_curr_min_A_latch = (float)fpaStatus.cooler_on_curr_min_mA / 1000.0F;
+            cooler_off_curr_max_A_latch = (float)fpaStatus.cooler_off_curr_max_mA / 1000.0F;
+
+            builtInTests[BITID_SensorControllerDetection].result = BITR_Passed;
+            ACQ_INF("ADC or DDC detected in %dms.", elapsed_time_us(tic_timeout) / 1000);
+            GETTIME(&tic_timeout);
+            ACQ_INF("Waiting for cooler voltage to be available...");
+            acquisitionState = ACQ_WAITING_FOR_COOLER_VOLTAGE;
          }
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_ADC_DDC_PRESENCE_TIMEOUT_US)
          {
@@ -383,9 +385,14 @@ void Acquisition_SM()
       case ACQ_WAITING_FOR_COOLER_VOLTAGE:
          if (extAdcChannels[XEC_COOLER_SENSE].isValid)
          {
-            // Turn on the cooler
-            if (Power_TurnOn(PC_COOLER) == CPS_ON)
+            cooler_volt__mV = (uint32_t)(*(extAdcChannels[XEC_COOLER_SENSE].p_physical) * 1000.0F);
+
+            if ((cooler_volt__mV >= cooler_volt_min_mV_latch) && (cooler_volt__mV <= cooler_volt_max_mV_latch))
             {
+               builtInTests[BITID_CoolerVoltageVerification].result = BITR_Passed;
+
+               // Turn on the cooler
+               Power_TurnOn(PC_COOLER);
                ACQ_INF("Cooler voltage available in %dms.", elapsed_time_us(tic_timeout) / 1000);
                extAdcChannels[XEC_COOLER_CUR].isValid = 0;
                GETTIME(&tic_timeout);
@@ -394,7 +401,10 @@ void Acquisition_SM()
             }
             else
             {
-               ACQ_ERR("Cooler cannot be turned on.");
+               builtInTests[BITID_CoolerVoltageVerification].result = BITR_Failed;
+
+               ACQ_ERR("Cooler supply voltage is %dmV (min = %dmV, max = %dmV).",
+                     cooler_volt__mV, cooler_volt_min_mV_latch, cooler_volt_max_mV_latch);
                acquisitionState = ACQ_POWER_RESET;
             }
          }
@@ -406,9 +416,8 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_COOLER_POWER_ON:
-         FPA_GetStatus(&fpaStatus, &gFpaIntf);         
          if ((extAdcChannels[XEC_COOLER_CUR].isValid) &&
-               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) >= (float)fpaStatus.cooler_on_curr_min_mA / 1000.0F))
+               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) >= cooler_on_curr_min_A_latch))
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Passed;
             ACQ_INF("Cooler powered on in %dms.", elapsed_time_us(tic_timeout) / 1000);
@@ -428,7 +437,8 @@ void Acquisition_SM()
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_POWER_ON_TIMEOUT_US)
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Failed;
-            ACQ_ERR("Cooler power on timeout.");
+            ACQ_ERR("Cooler power on timeout. Cooler current is " _PCF(3) "A (isValid = %d, min = " _PCF(3) "A).",
+                  _FFMT(*(extAdcChannels[XEC_COOLER_CUR].p_physical), 3), extAdcChannels[XEC_COOLER_CUR].isValid, _FFMT(cooler_on_curr_min_A_latch, 3));
             acquisitionState = ACQ_POWER_RESET;
          }
          break;
@@ -462,7 +472,6 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_SENSOR_COOLDOWN:
-         FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if (( uint32_t) elapsed_time_us(tic_cooldownSampling) > COOLDOWN_SAMPLING_PERIOD_US)
          {
             sensorTemp = FPA_GetTemperature(&gFpaIntf);
@@ -582,9 +591,8 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_COOLER_POWER_OFF:
-         FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if ((extAdcChannels[XEC_COOLER_CUR].isValid) &&
-               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) <= (float)fpaStatus.cooler_off_curr_max_mA / 1000.0F))
+               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) <= cooler_off_curr_max_A_latch))
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Passed;
             ACQ_INF("Cooler powered off in %dms.", elapsed_time_us(tic_timeout) / 1000);
@@ -594,11 +602,18 @@ void Acquisition_SM()
             builtInTests[BITID_SensorControllerInitialization].result = BITR_Passed;
             gAcquisitionPowerState = DPS_PowerStandby;
             acquisitionState = ACQ_STOPPED;
+
+            // Reset cooler requirement latches
+            cooler_volt_min_mV_latch = UINT32_MAX;
+            cooler_volt_max_mV_latch = 0;
+            cooler_on_curr_min_A_latch = FLT_MAX;
+            cooler_off_curr_max_A_latch = 0.0F;
          }
          else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_POWER_OFF_TIMEOUT_US)
          {
             builtInTests[BITID_CoolerCurrentVerification].result = BITR_Failed;
-            ACQ_ERR("Waiting for cooler power off timeout.");
+            ACQ_ERR("Cooler power off timeout. Cooler current is " _PCF(3) "A (isValid = %d, max = " _PCF(3) "A).",
+                  _FFMT(*(extAdcChannels[XEC_COOLER_CUR].p_physical), 3), extAdcChannels[XEC_COOLER_CUR].isValid, _FFMT(cooler_off_curr_max_A_latch, 3));
             acquisitionState = ACQ_POWER_RESET;
          }
          break;
@@ -620,6 +635,12 @@ void Acquisition_SM()
          FPA_Init(&fpaStatus, &gFpaIntf, &gcRegsData);
          gAcquisitionPowerState = DPS_PowerStandby;
          acquisitionState = ACQ_STOPPED;
+
+         // Reset cooler requirement latches
+         cooler_volt_min_mV_latch = UINT32_MAX;
+         cooler_volt_max_mV_latch = 0;
+         cooler_on_curr_min_A_latch = FLT_MAX;
+         cooler_off_curr_max_A_latch = 0.0F;
          break;
    }
 

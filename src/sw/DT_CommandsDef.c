@@ -516,6 +516,8 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 
    DT_PRINTF("fpa.cooler_volt_min_mV = %d", status.cooler_volt_min_mV);
    DT_PRINTF("fpa.cooler_volt_max_mV = %d", status.cooler_volt_max_mV);
+   DT_PRINTF("fpa.cooler_on_curr_min_mA = %d", status.cooler_on_curr_min_mA);
+   DT_PRINTF("fpa.cooler_off_curr_max_mA = %d", status.cooler_off_curr_max_mA);
    DT_PRINTF("fpa.fpa_temp_raw = %d", status.fpa_temp_raw);
 
    DT_PRINTF("fpa.global_done = %d", status.global_done);
@@ -544,6 +546,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.serdes_delay_ch3 = %d", status.fpa_serdes_delay[3]);
    DT_PRINTF("fpa.init_done = %d", status.fpa_init_done);
    DT_PRINTF("fpa.init_success = %d", status.fpa_init_success);
+   DT_PRINTF("prog_init_done = %d", status.prog_init_done);
    
    DT_PRINTF("FPA debug register A = %d", gFpaDebugRegA);
    DT_PRINTF("FPA debug register B = %d", gFpaDebugRegB);
