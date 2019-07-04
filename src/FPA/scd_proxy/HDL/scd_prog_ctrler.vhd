@@ -142,7 +142,7 @@ begin
    RST_CLINK_N <= reset_clink_n;
    
    
-   FPA_DRIVER_STAT(17 downto 16) <= (others => '0');
+   FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err;
    FPA_DRIVER_STAT(7) <= '0'; 
    FPA_DRIVER_STAT(6) <= '0'; 
