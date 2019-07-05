@@ -401,6 +401,7 @@ begin
             --proxy_static_done <= '0';
             update_cfg_i <= '0';
             enable_prog_trig <= '0';
+            id_cmd_in_err <= (others => '1'); -- fait express car cette commande id n'existe pas pour le Megalink
          else                       
             
             fpa_driver_done_last <= fpa_driver_done;  
