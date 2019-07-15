@@ -35,9 +35,6 @@ lappend detector_list {marsD160}
 lappend detector_list {pelicanD160}
 #lappend detector_list {pelicanD325}
 
-lappend detector_list {pelicanD_150Hz160}
-#lappend detector_list {pelicanD_150Hz325}
-
 lappend detector_list {scorpiolwD160}
 #lappend detector_list {scorpiolwD325}
 

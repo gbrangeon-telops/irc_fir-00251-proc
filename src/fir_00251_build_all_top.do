@@ -19,7 +19,6 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #do  "$FIR251PROC\src\fir_00251_top_isc0804A_500Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_marsD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_pelicanD_build.do"
-#do  "$FIR251PROC\src\fir_00251_top_pelicanD_150Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_230Hz_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwA_build.do"
@@ -38,8 +37,8 @@ do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
 do  "$FIR251PROC\src\quad_serdes\HDL\build_quad_receiver.do"
 
 #FPA blackbirdD
-do "$FIR251PROC\src\FPA\blackbirdD\hdl\compil_blackbirdD.do"
-acom  "$FIR251PROC\src\fir_00251_proc_blackbirdD.bde"
+#do "$FIR251PROC\src\FPA\blackbirdD\hdl\compil_blackbirdD.do"
+#acom  "$FIR251PROC\src\fir_00251_proc_blackbirdD.bde"
 #FPA hawkA
 do "$FIR251PROC\src\FPA\hawkA\HDL\compil_hawkA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_hawkA.bde"
@@ -67,9 +66,6 @@ acom  "$FIR251PROC\src\fir_00251_proc_marsD.bde"
 #FPA pelicanD
 do "$FIR251PROC\src\FPA\PelicanD\hdl\compil_pelicanD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_pelicanD.bde"
-#FPA pelicanD_150Hz
-do "$FIR251PROC\src\FPA\PelicanD_150Hz\hdl\compil_pelicanD_150Hz.do"
-acom  "$FIR251PROC\src\fir_00251_proc_pelicanD_150Hz.bde"
 #FPA scorpiolwD
 do "$FIR251PROC\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD.bde"

@@ -41,10 +41,6 @@ create_proc_sw pelicanD
 build_proc_sw pelicanD 160
 #build_proc_sw pelicanD 325
 
-create_proc_sw pelicanD_150Hz
-build_proc_sw pelicanD_150Hz 160
-#build_proc_sw pelicanD_150Hz 325
-
 create_proc_sw scorpiomwD
 build_proc_sw scorpiomwD 160
 #build_proc_sw scorpiomwD 325
