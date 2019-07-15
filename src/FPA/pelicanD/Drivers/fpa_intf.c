@@ -265,7 +265,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // bâtir les configurations
    
    // on appelle les fonctions pour bâtir les parametres specifiques du pelicanD
-   FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nulle car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
+   FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
    FPA_Fig4SpecificParams(&kk, pGCRegs);
    
    // diag mode and diagType
@@ -555,14 +555,18 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
    // se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD
 
    // Update on 2016-04-28 with spec D1K3008-RevA.1 from SCD
-
+   
+   uint8_t PELICAND_1CH_EMULATOR = 0;
+   if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)         // 2019-07-15 ODI: emulateur 1 channel des que le diviseur > 1 (valeur par défaut)
+      PELICAND_1CH_EMULATOR = 1;
+   
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)  // ODI 2016-04-28: IWR non validé. Si doit être supporté, vérifier la formule
    {
       ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
-      if (FPA_NUM_CH == 2)
-         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;  //13 bit resolution
+      if (PELICAND_1CH_EMULATOR)
+         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;      // ENO 24 juin 2019 : on emule un PelicanD 1 canal
       else
-         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;
+         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;       //13 bit resolution
 
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 1E-6F;
@@ -582,10 +586,10 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
    else // ITR mode
    {      
       ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
-      if (FPA_NUM_CH == 2)
-         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;  //13 bit resolution
+      if (PELICAND_1CH_EMULATOR)
+         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;       // ENO 24 juin 2019 : on emule un PelicanD 1 canal
       else
-         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;
+         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;        //13 bit resolution
 
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 1E-6F;
