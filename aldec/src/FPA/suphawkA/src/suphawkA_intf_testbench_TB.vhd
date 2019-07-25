@@ -256,19 +256,19 @@ begin
          -- cfg usager
          user_xsize1 <= 1280;
          user_ysize1 <= 1024;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 0); 
+         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
          
          user_xsize2 <= 1280;
          user_ysize2 <= 1024;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 1);
-         
-         user_xsize3 <= 1280;
-         user_ysize3 <= 1024;
-         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 2);
-         
-         user_xsize4 <= 1280;
-         user_ysize4 <= 1024;
-         user_cfg_vector4 <= to_intf_cfg('0', user_xsize4, user_ysize4, 3);
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 0);
+--         
+--         user_xsize3 <= 1280;
+--         user_ysize3 <= 1024;
+--         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 2);
+--         
+--         user_xsize4 <= 1280;
+--         user_ysize4 <= 1024;
+--         user_cfg_vector4 <= to_intf_cfg('0', user_xsize4, user_ysize4, 3);
          
          -- dac       
          vdac_value_1               	<= to_unsigned(11630, 32); 
@@ -359,25 +359,25 @@ begin
          wait for 30 ns;
       end loop; 
       --      
-      wait for 100 ms;
+--      wait for 100 ms;
+--      
+--      for ii in 0 to 76-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector3'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop;
+--      
+--      wait for 100 ms;
       
-      for ii in 0 to 76-1 loop 
-         wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector3'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop;
-      
-      wait for 100 ms;
-      
-      for ii in 0 to 76-1 loop 
-         wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector4'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector4(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop;
+--      for ii in 0 to 76-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector4'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector4(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop;
       
       report "FCR written"; 
       

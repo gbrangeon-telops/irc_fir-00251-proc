@@ -19,21 +19,21 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "SUPHAWKA_10MHz"
+#define FPA_DEVICE_MODEL_NAME    "SUPHAWKA 10MHz WITH CHN DIVERSITY"
 
-#define FPA_suphawk_VERTICAL_FLIP   1        // 1 pour une inversion verticale de l'image (Line 512 to 1)
+#define FPA_SUPHAWK_VERTICAL_FLIP   0        // 1 pour une inversion verticale de l'image (Line 512 to 1)
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      1280
 #define FPA_WIDTH_MULT     8
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
-#define FPA_SUBWINDOW_WIDTH_MAX (FPA_WIDTH_MAX - FPA_WIDTH_MULT)
+// #define FPA_SUBWINDOW_WIDTH_MAX (FPA_WIDTH_MAX - FPA_WIDTH_MULT)
 
 #define FPA_HEIGHT_MIN     1
 #define FPA_HEIGHT_MAX     1024
 #define FPA_HEIGHT_MULT    1
 #define FPA_HEIGHT_INC     FPA_HEIGHT_MULT
-#define FPA_SUBWINDOW_HEIGHT_MAX (FPA_HEIGHT_MAX - FPA_HEIGHT_MULT)
+// #define FPA_SUBWINDOW_HEIGHT_MAX (FPA_HEIGHT_MAX - FPA_HEIGHT_MULT)
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   8
@@ -50,7 +50,7 @@
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (SuphawkAIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 
-#define FPA_MAX_GAIN       3
+#define FPA_MAX_GAIN       1
 #define FPA_NUMTAPS        8  // [taps]
 
 #define FPA_COOLER_TEMP_THRES    -15000   //[cC] 
@@ -65,7 +65,7 @@
 
 #define FPA_MCLK_RATE_HZ               10E+6F    // le master clock du FPA
 
-#define FPA_MIN_EXPOSURE               0.2    // [us] 2 coups d'horloge en µsec
+#define FPA_MIN_EXPOSURE               0.2F    // [us] 2 coups d'horloge en µsec
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
 
 #define FPA_CAL_MIN_EXPOSURE           FPA_MIN_EXPOSURE
@@ -133,9 +133,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  good_samp_last_pos_per_ch;       
    uint32_t  xsize_div_tapnum;                                            
    uint32_t  adc_clk_source_phase;            
-   uint32_t  adc_clk_pipe_sel_divsty0;                
+   uint32_t  adc_clk_pipe_sel;                
    uint32_t  fpa_stretch_acq_trig;                                                   
-   uint32_t  adc_clk_pipe_sel_divsty1;                          
+   uint32_t  spare1;                          
    uint32_t  spare2;                          
    uint32_t  elcorr_enabled;                       
    uint32_t  elcorr_spare1;        
@@ -161,14 +161,16 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  elcorr_div_op_sel;      
    uint32_t  elcorr_add_op_sel;         
    uint32_t  sat_ctrl_en;          
-   uint32_t  elcorr_spare3             ;
+   uint32_t  elcorr_spare3;
    uint32_t  roic_cst_output_mode;
    uint32_t  cfg_num;
    uint32_t  fpa_intf_data_source;
+   int32_t   additional_fpa_int_time_offset;// additional offset coming from flash settings
+
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // statuts provenant du vhd

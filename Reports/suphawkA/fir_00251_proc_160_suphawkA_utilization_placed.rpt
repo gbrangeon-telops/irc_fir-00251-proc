@@ -137,19 +137,19 @@ Table of Contents
 | PHASER_REF                  |    3 |     3 |         8 |  37.50 |
 | OUT_FIFO                    |   11 |    11 |        32 |  34.38 |
 | IN_FIFO                     |    6 |     6 |        32 |  18.75 |
-| IDELAYCTRL                  |    3 |     0 |         8 |  37.50 |
-| IBUFDS                      |   11 |    11 |       384 |   2.86 |
+| IDELAYCTRL                  |    4 |     0 |         8 |  50.00 |
+| IBUFDS                      |   20 |    20 |       384 |   5.21 |
 | GTXE2_COMMON                |    2 |     0 |         2 | 100.00 |
 | GTXE2_CHANNEL               |    4 |     4 |         8 |  50.00 |
 | PHASER_OUT/PHASER_OUT_PHY   |   11 |    11 |        32 |  34.38 |
 |   PHASER_OUT_PHY only       |   11 |    11 |           |        |
 | PHASER_IN/PHASER_IN_PHY     |    6 |     6 |        32 |  18.75 |
 |   PHASER_IN_PHY only        |    6 |     6 |           |        |
-| IDELAYE2/IDELAYE2_FINEDELAY |   56 |    56 |       400 |  14.00 |
-|   IDELAYE2 only             |   56 |    56 |           |        |
+| IDELAYE2/IDELAYE2_FINEDELAY |   64 |    64 |       400 |  16.00 |
+|   IDELAYE2 only             |   64 |    64 |           |        |
 | ODELAYE2/ODELAYE2_FINEDELAY |    0 |     0 |       150 |   0.00 |
 | IBUFDS_GTE2                 |    2 |     2 |         4 |  50.00 |
-| ILOGIC                      |   71 |    71 |       400 |  17.75 |
+| ILOGIC                      |   87 |    87 |       400 |  21.75 |
 |   IFF_Register              |    7 |     7 |           |        |
 |   ISERDES                   |   64 |    64 |           |        |
 | OLOGIC                      |  131 |   131 |       400 |  32.75 |
@@ -163,17 +163,17 @@ Table of Contents
 6. Clocking
 -----------
 
-+------------+------+-------+-----------+-------+
-|  Site Type | Used | Fixed | Available | Util% |
-+------------+------+-------+-----------+-------+
-| BUFGCTRL   |   23 |     0 |        32 | 71.88 |
-| BUFIO      |    0 |     0 |        32 |  0.00 |
-| MMCME2_ADV |    7 |     2 |         8 | 87.50 |
-| PLLE2_ADV  |    2 |     2 |         8 | 25.00 |
-| BUFMRCE    |    0 |     0 |        16 |  0.00 |
-| BUFHCE     |    2 |     0 |       120 |  1.67 |
-| BUFR       |    1 |     0 |        32 |  3.13 |
-+------------+------+-------+-----------+-------+
++------------+------+-------+-----------+--------+
+|  Site Type | Used | Fixed | Available |  Util% |
++------------+------+-------+-----------+--------+
+| BUFGCTRL   |   26 |     0 |        32 |  81.25 |
+| BUFIO      |    0 |     0 |        32 |   0.00 |
+| MMCME2_ADV |    8 |     2 |         8 | 100.00 |
+| PLLE2_ADV  |    2 |     2 |         8 |  25.00 |
+| BUFMRCE    |    0 |     0 |        16 |   0.00 |
+| BUFHCE     |    2 |     0 |       120 |   1.67 |
+| BUFR       |    1 |     0 |        32 |   3.13 |
++------------+------+-------+-----------+--------+
 
 
 7. Specific Feature
@@ -219,12 +219,14 @@ Table of Contents
 | DSP48E1                  |    221 |    Block Arithmetic |
 | RAMB36E1                 |    219 |        Block Memory |
 | OBUF                     |    109 |                  IO |
+| RAMB18E1                 |    110 |        Block Memory |
+| DSP48E1                  |    108 |    Block Arithmetic |
 | OSERDESE2                |    106 |                  IO |
 | RAMB18E1                 |     98 |        Block Memory |
 | IBUF                     |     88 |                  IO |
+| ISERDESE2                |     80 |                  IO |
 | OBUFT                    |     69 |                  IO |
-| ISERDESE2                |     64 |                  IO |
-| IDELAYE2                 |     56 |                  IO |
+| IDELAYE2                 |     64 |                  IO |
 | SRLC16E                  |     44 |  Distributed Memory |
 | RAMD64E                  |     32 |  Distributed Memory |
 | OBUFT_DCIEN              |     32 |                  IO |
@@ -235,21 +237,20 @@ Table of Contents
 | ODDR                     |     14 |                  IO |
 | PHASER_OUT_PHY           |     11 |                  IO |
 | OUT_FIFO                 |     11 |                  IO |
-| IBUFDS                   |     11 |                  IO |
 | OBUFTDS_DCIEN            |      8 |                  IO |
+| MMCME2_ADV               |      8 |               Clock |
 | INV                      |      8 |                 LUT |
 | IBUFDS_IBUFDISABLE_INT   |      8 |                  IO |
-| MMCME2_ADV               |      7 |               Clock |
 | PHASER_IN_PHY            |      6 |                  IO |
 | IN_FIFO                  |      6 |                  IO |
 | OBUFTDS                  |      4 |                  IO |
 | OBUFDS                   |      4 |                  IO |
+| IDELAYCTRL               |      4 |                  IO |
 | IBUFDS_INTERMDISABLE_INT |      4 |                  IO |
 | GTXE2_CHANNEL            |      4 |                  IO |
 | AND2B1L                  |      4 |              Others |
 | PHY_CONTROL              |      3 |                  IO |
 | PHASER_REF               |      3 |                  IO |
-| IDELAYCTRL               |      3 |                  IO |
 | PLLE2_ADV                |      2 |               Clock |
 | IBUFDS_GTE2              |      2 |                  IO |
 | GTXE2_COMMON             |      2 |                  IO |
@@ -289,15 +290,16 @@ Table of Contents
 | ip_fp32_axis_add             |    7 |
 | ip_axis_fp32tofi32           |    7 |
 | ip_fp32_axis_divide          |    4 |
-| fwft_sfifo_w32_d256          |    4 |
+| fwft_sfifo_w72_d16           |    4 |
+| fwft_sfifo_w16_d256          |    4 |
+| fwft_afifo_w96_d128          |    4 |
+| afifo_w72_d16                |    4 |
 | fwft_sfifo_wr66_rd66_d512    |    3 |
 | fwft_sfifo_w3_d16            |    3 |
-| var_shift_reg_w16_d32        |    2 |
 | t_axi4_stream32_afifo_d512   |    2 |
+| serdes_clkin_10_0_MHz_mmcm   |    2 |
 | ip_fp32_axis_greaterThan     |    2 |
 | ip_axis16_reg                |    2 |
-| fwft_sfifo_w76_d16           |    2 |
-| fwft_sfifo_w72_d16           |    2 |
 | fwft_sfifo_w192_d16          |    2 |
 | fwft_sfifo_w16_d256          |    2 |
 | fwft_afifo_wr68_rd34_d512    |    2 |
@@ -315,7 +317,6 @@ Table of Contents
 | t_axi4_stream32_sfifo_d2048  |    1 |
 | t_axi4_stream16_sfifo_d16    |    1 |
 | suphawkA_10_0_MHz_mmcm       |    1 |
-| serdes_clkin_10_0_MHz_mmcm   |    1 |
 | sdp_ram_w32_d128             |    1 |
 | ip_fp32_axis_sqroot          |    1 |
 | ip_blk_mem_gen_w32_d8192     |    1 |

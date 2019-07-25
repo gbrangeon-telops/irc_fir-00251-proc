@@ -130,8 +130,8 @@ architecture rtl of suphawkA_clks_gen_core is
    signal quad_clk_pipe                  : std_logic_vector(63 downto 0);
    --signal quad_clk_sel                   : std_logic;
    signal cfg_in_progress_i              : std_logic;
-   signal adc_clk_pipe_sel_divsty0       : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY0'LENGTH-1 downto 0);
-   signal adc_clk_pipe_sel_divsty1       : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY1'LENGTH-1 downto 0);
+   signal adc_clk_pipe_sel               : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL'LENGTH-1 downto 0);
+   -- signal adc_clk_pipe_sel_divsty1       : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY1'LENGTH-1 downto 0);
    signal idle_cnt                       : unsigned(C_DLY_BIT_POS downto 0);
    
    signal fifo_wr_en                     : std_logic;
@@ -304,15 +304,15 @@ begin
    --------------------------------------------------------    
    sync_divsty0 : double_sync_vector  
    port map(
-      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY0),
-      Q => adc_clk_pipe_sel_divsty0,
+      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL),
+      Q => adc_clk_pipe_sel,
       CLK => MCLK_SOURCE); 
    
-   sync_divsty1 : double_sync_vector  
-   port map(
-      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY1),
-      Q => adc_clk_pipe_sel_divsty1,
-      CLK => MCLK_SOURCE);
+   --   sync_divsty1 : double_sync_vector  
+   --   port map(
+   --      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY1),
+   --      Q => adc_clk_pipe_sel_divsty1,
+   --      CLK => MCLK_SOURCE);
    
    U4C : process(MCLK_SOURCE)
    begin
@@ -323,8 +323,8 @@ begin
          quad_clk_pipe(31 downto 1) <= quad_clk_pipe(30 downto 0);
          
          -- selection de l'horloge dephasagée pour chaque quad dans le domaine mclk_source 
-         fifo_din(1) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel_divsty1)));
-         fifo_din(0) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel_divsty0)));
+         fifo_din(1) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel)));
+         fifo_din(0) <= quad_clk_pipe(to_integer(unsigned(adc_clk_pipe_sel)));
       end if;
    end process; 
    
@@ -348,8 +348,7 @@ begin
       valid    => fifo_dout_dval,
       wr_rst_busy => open,  
       rd_rst_busy => open
-      );
-   
+      );    
    
    U4D : process(ADC_CLK_SOURCE)
    begin
@@ -358,12 +357,11 @@ begin
          -- for kk in 1 to 4 loop
          --   quad_clk_iob(kk) <= fifo_dout(0); 
          -- end loop;
-         quad_clk_iob(4) <= fifo_dout(1);  -- horloge quad4 = quad3
-         quad_clk_iob(3) <= fifo_dout(1);  -- horloge quad3 = quad1 + dephasage
+         quad_clk_iob(4) <= fifo_dout(0);  -- horloge quad4 = quad3
+         quad_clk_iob(3) <= fifo_dout(0);  -- horloge quad3 = quad1 + dephasage
          quad_clk_iob(2) <= fifo_dout(0);  -- horloge quad2 = quad1
          quad_clk_iob(1) <= fifo_dout(0);  -- horloge quad1        
       end if;
-   end process;
-   
+   end process;    
    
 end rtl;

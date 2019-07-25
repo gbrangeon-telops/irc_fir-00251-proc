@@ -146,11 +146,14 @@ package body suphawkA_intf_testbench_pkg is
       active_subwindow               := to_unsigned(0, 32); 
       prv_dac_nominal_value          := to_unsigned(1234, 32);  
       real_mode_active_pixel_dly     := to_unsigned(6, 32);
-      adc_quad2_en                   := (others => '1');
-      --      if comn_fpa_diag_mode = 1 then
-      --         adc_quad2_en  := (others => '0');  
-      --      end if;
-      chn_diversity_en               := to_unsigned(1, 32); 
+      adc_quad2_en                   := (others => '1');  
+      chn_diversity_en               := adc_quad2_en;
+      
+--      if comn_fpa_diag_mode = 1 then
+--         adc_quad2_en  := (others => '0');
+--         chn_diversity_en := adc_quad2_en;
+--      end if;
+    
       
       line_period_pclk               := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
       readout_pclk_cnt_max           := to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + 164, 32);   
@@ -160,7 +163,7 @@ package body suphawkA_intf_testbench_pkg is
          active_line_end_num         := active_line_start_num + to_unsigned(user_ysize - 1, 32);
       end if;
       
-      pix_samp_num_per_ch            := to_unsigned(4, 32);
+      pix_samp_num_per_ch            := to_unsigned(1, 32);
       sof_posf_pclk                  := to_unsigned(PAUSE_SIZE, 32);
       
       if user_ysize > 1 then 
@@ -171,15 +174,15 @@ package body suphawkA_intf_testbench_pkg is
       eol_posl_pclk                  := line_period_pclk - 1;
       eol_posl_pclk_p1               := eol_posl_pclk + 1;
       
-      good_samp_first_pos_per_ch     := to_unsigned(3, 32);
-      good_samp_last_pos_per_ch      := to_unsigned(4, 32);   
-      hgood_samp_sum_num             := to_unsigned(2, 32); 
-      hgood_samp_mean_numerator      := to_unsigned(2**22/2, 32);
+      good_samp_first_pos_per_ch     := to_unsigned(1, 32);
+      good_samp_last_pos_per_ch      := to_unsigned(1, 32);   
+      hgood_samp_sum_num             := to_unsigned(1, 32); 
+      hgood_samp_mean_numerator      := to_unsigned(1**22/2, 32);
       vgood_samp_sum_num             := 1 + chn_diversity_en;
       vgood_samp_mean_numerator      := to_unsigned(2**22/1, 32);      
       xsize_div_tapnum               := to_unsigned(user_xsize/TAP_NUM, 32);
       
-      adc_clk_source_phase           :=  to_unsigned(70*send_id, 32);
+      adc_clk_source_phase           :=  to_unsigned(70, 32);
       adc_clk_pipe_sel_divsty0       :=  to_unsigned(3, 32);
       comn_fpa_stretch_acq_trig      :=  to_unsigned(0, 32);
       

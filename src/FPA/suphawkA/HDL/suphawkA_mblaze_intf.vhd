@@ -58,8 +58,8 @@ architecture rtl of suphawkA_mblaze_intf is
          CLK : in std_logic);
    end component;
    
-   type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(7 downto 0);
-   type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
+   type exp_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
+   type exp_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
    signal exp_time_pipe                : exp_time_pipe_type; 
    signal sreset_mb_clk                : std_logic;
@@ -104,6 +104,7 @@ architecture rtl of suphawkA_mblaze_intf is
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
    signal dac_cfg_in_progress          : std_logic;
+   signal abs_additional_int_time_offset_i : integer;
    
    --   -- -- -- attribute dont_touch                         : string;
    --   -- -- -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -188,6 +189,7 @@ begin
             -- pragma translate_on
             user_cfg_i.ysize <= to_unsigned(640, user_cfg_i.ysize'length);
             user_cfg_i.sat_ctrl_en <= '0';
+            user_cfg_i.additional_fpa_int_time_offset(31) <= '0';
             
          else                   
             
@@ -264,10 +266,10 @@ begin
                   when X"0A8" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0)); 
                   
                   when X"0AC" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
-                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel_divsty0        <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel_divsty0'length-1 downto 0));
+                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
                   when X"0B4" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0); 
                   
-                  when X"0B8" =>    user_cfg_i.adc_clk_pipe_sel_divsty1        <= data_i(user_cfg_i.adc_clk_pipe_sel_divsty1'length-1 downto 0);
+                  when X"0B8" =>    user_cfg_i.spare1                          <= data_i(user_cfg_i.spare1'length-1 downto 0);
                   when X"0BC" =>    user_cfg_i.spare2                          <= data_i(user_cfg_i.spare2'length-1 downto 0);
                      
                   -- electrical correction
@@ -305,7 +307,9 @@ begin
                   when X"124" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);
                   
                   when X"128" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));                    
-                  when X"12C" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
+                  when X"12C" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); 
+                  
+                  when X"130" =>    user_cfg_i.additional_fpa_int_time_offset  <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0)); user_cfg_in_progress <= '0'; 
                   
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -318,7 +322,7 @@ begin
                   -- pour un reset complet du module FPA
                   when X"AF0" =>   mb_ctrled_reset_i                           <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                      
-                  ----------------------------------------------------------------------------------------------------------------------------------------                  
+                     ----------------------------------------------------------------------------------------------------------------------------------------                  
                      -- EN0 14 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
                   ----------------------------------------------------------------------------------------------------------------------------------------
                   when X"D00" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0)); dac_cfg_in_progress <= '1';                                                                                                                        
@@ -348,20 +352,28 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
+         abs_additional_int_time_offset_i <= to_integer(abs(user_cfg_i.additional_fpa_int_time_offset));
+         
          -- pipe pour le calcul du temps d'integration en mclk
          exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
          int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- int_signal_high_time est parfaitement synchrosnié avec in_time_i
-         
+         if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 
+            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+         else
+            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+         end if; 
+         int_signal_high_time_i <= exp_time_pipe(4)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+                
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
          exp_indx_pipe(1) <= exp_indx_pipe(0); 
          exp_indx_pipe(2) <= exp_indx_pipe(1); 
          exp_indx_pipe(3) <= exp_indx_pipe(2); 
-         int_indx_i       <= exp_indx_pipe(3);
+         exp_indx_pipe(4) <= exp_indx_pipe(3);
+         int_indx_i       <= exp_indx_pipe(4);
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
@@ -370,7 +382,8 @@ begin
          exp_dval_pipe(3) <= exp_dval_pipe(2);
          exp_dval_pipe(4) <= exp_dval_pipe(3);
          exp_dval_pipe(5) <= exp_dval_pipe(4);
-         int_dval_i       <= exp_dval_pipe(5);         
+         exp_dval_pipe(6) <= exp_dval_pipe(5);
+         int_dval_i       <= exp_dval_pipe(6);          
          
       end if;
    end process; 

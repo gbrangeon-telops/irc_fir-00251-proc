@@ -31,7 +31,7 @@ acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_n
 --acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\160\sfifo_w10_d256\sfifo_w10_d256_sim_netlist.vhdl 
+-- acom D:\Telops\FIR-00251-Proc\IP\160\sfifo_w10_d256\sfifo_w10_d256_sim_netlist.vhdl 
 acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\suphawkA_10_0_MHz_mmcm\suphawkA_10_0_MHz_mmcm_sim_netlist.vhdl
@@ -143,7 +143,7 @@ asim -ses suphawkA_intf_testbench_TB
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U21/U6/*
 
-wave UUT/U1/U9/*
+#wave UUT/U1/U9/*
 --wave UUT/U1/U9/U22/*  OK
 --wave UUT/U1/U9/U23/*  OK
 
@@ -167,14 +167,17 @@ wave UUT/U1/U9/*
 
 #wave UUT/U1/U26/*
 
-wave UUT/U1/U5/*
-wave UUT/U1/U5/U1/*
-wave UUT/U1/U5/U2/*
-wave UUT/U1/U5/U3/*
-wave UUT/U1/U5/U4/*
-wave UUT/U1/U5/U5/*
+#wave UUT/U1/U5/*
+#wave UUT/U1/U5/U1/*
+#wave UUT/U1/U5/U2/*
+#wave UUT/U1/U5/U3/*
+#wave UUT/U1/U5/U4/*
+#wave UUT/U1/U5/U5/*
 
 
+wave UUT/U1/U9/* 
+wave UUT/U1/U19/*
+wave UUT/U1/U17/*
 wave UUT/U1/*
 
-run 500 ms
+run 250 ms

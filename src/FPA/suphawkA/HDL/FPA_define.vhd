@@ -48,18 +48,18 @@ package FPA_define is
    constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;     -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';      -- pas besoin de config particulière au demarrage des suphawks
-   constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '1';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
-   constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '1';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.
+   constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
+   constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '1';      -- diversité de canaux
    constant DEFINE_GENERATE_QUAD2_CHAIN           : std_logic := '1';      -- à '1' permet de generer la chaine de traitement pour le quad 2 puisqu'il faut 8 canaux
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- on fait de la correction électronique
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 300_000;  -- en usec, le delai de stabilisation (analog setup)
-
+   
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le superHawk, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
-   constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;            -- pour le suphawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 7;            -- pour le suphawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;        -- not used
    constant DEFINE_XSIZE_MAX                      : integer   := 1280;          -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 1024;          -- dimension en Y maximale  
@@ -76,8 +76,8 @@ package FPA_define is
    constant DEFINE_FPA_80M_CLK_RATE_KHZ           : integer   := 80_000;     --  horloge de 80M en KHz
    
    -- quelques caractéristiques de la carte ADC requise
-   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := 4*DEFINE_FPA_MCLK_RATE_KHZ;       -- 
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := 4*DEFINE_FPA_MCLK_RATE_KHZ;       --
+   constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       -- 
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       --
    constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;    -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
    constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
    
@@ -241,8 +241,8 @@ package FPA_define is
       good_samp_first_pos_per_ch          : unsigned(7 downto 0);    -- position du premier bon echantillon 
       good_samp_last_pos_per_ch           : unsigned(7 downto 0);    -- position du dernier bon echantillon 
       xsize_div_tapnum                    : unsigned(7 downto 0);
-                                         
-      adc_clk_pipe_sel_divsty1            : std_logic_vector(7 downto 0);
+      
+      spare1                              : std_logic_vector(7 downto 0);
       spare2                              : std_logic_vector(1 downto 0);
       
       -- les valeurs Vdac
@@ -250,7 +250,7 @@ package FPA_define is
       
       -- adc clk_phase                    
       adc_clk_source_phase                : unsigned(31 downto 0);     -- dit de combien déphaser l'horloge des ADCs 
-      adc_clk_pipe_sel_divsty0            : unsigned(7 downto 0);
+      adc_clk_pipe_sel                    : unsigned(7 downto 0);
       
       -- reorder_column                   
       reorder_column                      : std_logic;
@@ -289,6 +289,9 @@ package FPA_define is
       roic_cst_output_mode                : std_logic;
       
       cfg_num                             : unsigned(7 downto 0);
+      
+      -- additional exposure time offset from driver C
+      additional_fpa_int_time_offset      : signed(31 downto 0); 
       
    end record; 
    

@@ -490,16 +490,22 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    if (sw_init_done == 0){
       gFpaDebugRegC = 2;
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // 
+      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0)){  // 
          gFpaDebugRegC = 1;
+         if (pGCRegs->DeviceSerialNumber == 2862)                    // ENO : 19 juin 2019, Cas particulier de TEL-2862 , un M3K avec refroidisseur lineaire qui a necessité une carte 253 spéciale
+            gFpaDebugRegC = 2;
+      }
    }       
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
    
    // adc clk source phase
    if (sw_init_done == 0){         
       gFpaDebugRegD = 24000;                //  132000
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas particulier des systèmes avec Flex 264
-         gFpaDebugRegD = 132000; 
+      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0)){  // cas particulier des systèmes avec Flex 264
+         gFpaDebugRegD = 132000;
+         if (pGCRegs->DeviceSerialNumber == 2862)                    // ENO : 19 juin 2019, Cas particulier de TEL-2862 , un M3K avec refroidisseur lineaire qui a necessité une carte 253 spéciale
+            gFpaDebugRegD = 228000;
+      }   
    }
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
       

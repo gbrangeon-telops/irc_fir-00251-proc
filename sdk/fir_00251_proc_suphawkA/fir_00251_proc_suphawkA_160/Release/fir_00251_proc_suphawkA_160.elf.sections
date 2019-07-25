@@ -6,22 +6,22 @@ EXEC_P, HAS_SYMS
 start address 0x00000000
 
 Program Header:
-    LOAD off    0x00000094 vaddr 0x00000000 paddr 0x00000000 align 2**2
+    LOAD off    0x000000b4 vaddr 0x00000000 paddr 0x00000000 align 2**2
          filesz 0x00000028 memsz 0x00000028 flags r-x
-    LOAD off    0x000000bc vaddr 0x00000050 paddr 0x00000050 align 2**0
+    LOAD off    0x000000dc vaddr 0x00000050 paddr 0x00000050 align 2**0
          filesz 0x00000000 memsz 0x00001400 flags rw-
     LOAD off    0x000000bc vaddr 0xc0000000 paddr 0xc0000000 align 2**2
          filesz 0x000c3b84 memsz 0x0b8ec5e8 flags rwx
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .vectors.reset 00000008  00000000  00000000  00000094  2**2
+  0 .vectors.reset 00000008  00000000  00000000  000000b4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .vectors.sw_exception 00000008  00000008  00000008  0000009c  2**2
+  1 .vectors.sw_exception 00000008  00000008  00000008  000000bc  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .vectors.interrupt 00000008  00000010  00000010  000000a4  2**2
+  2 .vectors.interrupt 00000008  00000010  00000010  000000c4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  3 .vectors.hw_exception 00000008  00000020  00000020  000000b4  2**2
+  3 .vectors.hw_exception 00000008  00000020  00000020  000000d4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   4 .text         000acd24  c0000000  c0000000  000000bc  2**2
                   CONTENTS, ALLOC, LOAD, CODE
@@ -43,7 +43,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  13 .noinit       0b7cc900  c011fce8  c011fce8  000c3c40  2**2
                   ALLOC
- 14 .heap         00000400  00000050  00000050  000000bc  2**0
+ 15 .stack        00002000  00000450  00000450  000000dc  2**0
                   ALLOC
  15 .stack        00001000  00000450  00000450  000000bc  2**0
                   ALLOC
@@ -2021,7 +2021,7 @@ c00acd88 g       .ctors	00000000 ___CTORS_END___
 c00acbec g     F .text	000000b0 Proc_BufferManager_Init
 c003b254 g     F .text	0000005c TRIG_ChangeFrameRate
 c00542cc g     F .text	00000070 BufferManager_WaitMemReady
-00001450 g       .stack	00000000 __stack
+00002450 g       .stack	00000000 __stack
 c001d5f8 g     F .text	00000164 ceilf
 c0048354 g     F .text	0000007c HDER_UpdateGPSHeader
 c010e310 g     O .bss	0000001c IRIG_POSIXTime
@@ -2204,7 +2204,7 @@ c0108dc1 g     O .bss	00000001 gActBPMapAvailable
 c0035a40 g     F .text	00000020 uffs_MakeSum16
 c006127c g     F .text	00000030 roundMultiple
 c000b86c g     F .text	00000090 .hidden __gedf2
-00001450 g       .stack	00000000 _stack
+00002450 g       .stack	00000000 _stack
 c002e294 g     F .text	0000011c uffs_format
 c0115460 g     O .bss	00000004 AECP_Int_SumExpTime
 c002da40 g     F .text	000001b4 uffs_tell

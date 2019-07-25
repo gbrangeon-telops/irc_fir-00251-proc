@@ -31,7 +31,7 @@
 #define FPA_HEIGHT_INC     FPA_HEIGHT_MULT
 
 #define FPA_OFFSETX_MIN    0
-#define FPA_OFFSETX_MULT   32  //dont care since OffsetX is always 0
+#define FPA_OFFSETX_MULT   32 
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   4
