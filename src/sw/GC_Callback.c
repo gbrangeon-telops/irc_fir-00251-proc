@@ -3953,7 +3953,7 @@ void GC_OffsetXCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_UpdateImageLimits();   // must be called first
+      //GC_UpdateImageLimits();   // Offsets have no impact on Offsets
       //GC_UpdateParameterLimits();    // Offsets have no impact on ExpTime and AcqFrameRate
    }
 }
@@ -4003,7 +4003,7 @@ void GC_OffsetYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_UpdateImageLimits();   // must be called first
+      //GC_UpdateImageLimits();   // Offsets have no impact on Offsets
       //GC_UpdateParameterLimits();    // Offsets have no impact on ExpTime and AcqFrameRate
    }
 }

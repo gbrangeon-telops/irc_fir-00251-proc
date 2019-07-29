@@ -1272,10 +1272,10 @@ void Calibration_SM()
             gcRegsData.IntegrationMode = calibrationInfo.collection.IntegrationMode;
             gcRegsData.SensorWellDepth = calibrationInfo.collection.SensorWellDepth;
             gcRegsData.PixelDataResolution = calibrationInfo.collection.PixelDataResolution;
-            // gcRegsData.Width = calibrationInfo.collection.Width;
-            // gcRegsData.Height = calibrationInfo.collection.Height;
-            // gcRegsData.OffsetX = calibrationInfo.collection.OffsetX;
-            // gcRegsData.OffsetY = calibrationInfo.collection.OffsetY;
+            // GC_SetWidth(calibrationInfo.collection.Width);
+            // GC_SetHeight(calibrationInfo.collection.Height);
+            // GC_SetOffsetX(calibrationInfo.collection.OffsetX);
+            // GC_SetOffsetY(calibrationInfo.collection.OffsetY);
             GC_SetReverseX(flashSettings.ReverseX ^ calibrationInfo.collection.ReverseX);
             GC_SetReverseY(flashSettings.ReverseY ^ calibrationInfo.collection.ReverseY);
 

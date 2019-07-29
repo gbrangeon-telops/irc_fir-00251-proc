@@ -1220,14 +1220,15 @@ void GC_UpdateImageLimits()
    if (gcRegsData.CenterImage)
    {
       // Offset X limits
-      gcRegsData.OffsetX = (FPA_WIDTH_MAX - gcRegsData.Width) / 2;
+      GC_SetOffsetX((FPA_WIDTH_MAX - gcRegsData.Width) / 2);
       gcRegsData.OffsetXMin = gcRegsData.OffsetX;
       gcRegsData.OffsetXMax = gcRegsData.OffsetX;
 
       // Offset Y limits
-      gcRegsData.OffsetY = (FPA_HEIGHT_MAX - gcRegsData.Height) / 2;
 #ifdef FPA_OFFSETY_MULT_CORR
-      gcRegsData.OffsetY = roundDown(gcRegsData.OffsetY, FPA_OFFSETY_MULT_CORR);
+      GC_SetOffsetY(roundDown((FPA_HEIGHT_MAX - gcRegsData.Height) / 2, FPA_OFFSETY_MULT_CORR));
+#else
+      GC_SetOffsetY((FPA_HEIGHT_MAX - gcRegsData.Height) / 2);
 #endif
       gcRegsData.OffsetYMin = gcRegsData.OffsetY;
       gcRegsData.OffsetYMax = gcRegsData.OffsetY;
@@ -1248,7 +1249,8 @@ void GC_UpdateImageLimits()
 #else
       gcRegsData.OffsetXMax = FPA_WIDTH_MAX - gcRegsData.Width;
 #endif
-      gcRegsData.OffsetX = MIN(gcRegsData.OffsetX, gcRegsData.OffsetXMax);
+      if (gcRegsData.OffsetX > gcRegsData.OffsetXMax)
+         GC_SetOffsetX(gcRegsData.OffsetXMax);
 
       // Offset Y limits
       gcRegsData.OffsetYMin = FPA_OFFSETY_MIN;
@@ -1264,7 +1266,8 @@ void GC_UpdateImageLimits()
 #else
       gcRegsData.OffsetYMax = FPA_HEIGHT_MAX - gcRegsData.Height;
 #endif
-      gcRegsData.OffsetY = MIN(gcRegsData.OffsetY, gcRegsData.OffsetYMax);
+      if (gcRegsData.OffsetY > gcRegsData.OffsetYMax)
+         GC_SetOffsetY(gcRegsData.OffsetYMax);
    }
 }
 
