@@ -99,7 +99,7 @@
 #define FLEG_DAC_REF_GAIN                 2.0           // gain de référence du DAC
 
 
-#define VHD_PIXEL_PIPE_DLY_SEC            300E-9        // delai max du pipe des pixels
+#define VHD_PIXEL_PIPE_DLY_SEC            900E-9        // delai max du pipe des pixels
 
 #define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
 
@@ -712,7 +712,7 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_rst_dly_mclk        = 165.0F;   // FPA: delai reglémentaire de 165 MCLK à la fin d'une image en ITR + 1 MCL en debut d'image
-   ptrH->vhd_delay_mclk          = 5.0F;     // estimation des differerents delais accumulés par le vhd
+   ptrH->vhd_delay_mclk          = 12.0F;     // estimation des differerents delais accumulés par le vhd
    ptrH->delay_mclk              = ptrH->fpa_rst_dly_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 3.0F;
    ptrH->fovh_line               = 0.0F;
