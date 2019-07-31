@@ -291,6 +291,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaExposureTimeOffset;
    
    
+
    // on bâtit les parametres specifiques du suphawk
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
    
@@ -707,6 +708,8 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+   extern int32_t gFpaExposureTimeOffset;
+
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
@@ -716,22 +719,22 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->delay_mclk              = ptrH->fpa_rst_dly_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 3.0F;
    ptrH->fovh_line               = 0.0F;
-   ptrH->int_time_offset_mclk    = 0.0F;     // aucun offset sur le temps d'integration
+   ptrH->int_time_offset_mclk    = fabs((float)gFpaExposureTimeOffset * (float)FPA_MCLK_RATE_HZ / (float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ); // eventuel offset en provenance de la calibration via flash. La valeur absolue permet de le considerer comme un delai supplémetaire dans le pire ds cas
       
    // readout time
-   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
-   ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;
+   ptrH->readout_mclk            = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
+   ptrH->readout_usec            = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
-   ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->fpa_delay_usec       = ptrH->fpa_rst_dly_mclk * ptrH->mclk_period_usec;
-   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
+   ptrH->vhd_delay_usec          = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->fpa_delay_usec          = ptrH->fpa_rst_dly_mclk * ptrH->mclk_period_usec;
+   ptrH->delay_usec              = ptrH->delay_mclk * ptrH->mclk_period_usec; 
    
    // 
-   ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec; ; 
+   ptrH->int_time_offset_usec    = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec;
       
    // calcul de la periode minimale
-   ptrH->frame_period_usec = (exposureTime_usec + ptrH->int_time_offset_usec) + ptrH->delay_usec + ptrH->readout_usec;
+   ptrH->frame_period_usec = exposureTime_usec + ptrH->int_time_offset_usec + ptrH->delay_usec + ptrH->readout_usec;
    
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
