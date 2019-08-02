@@ -111,28 +111,56 @@ static uffs_FlashOps g_my_nand_ops = {
 	nand_check_erased_block, // CheckErasedBlock();
 };
 
+enum nandModelEnum {
+   MT29F16G08AJADAWP = 0,
+   MT29F4G08ABADAWP = 1,
+   NAND_UNDEFINED
+};
+typedef enum nandModelEnum nandModel_t;
+
+nandModel_t g_my_nand_model = NAND_UNDEFINED;
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 // MT29F16G08AJADAWP NAND definitions
 //
+#define MT29F16G08AJADAWP_ID0 0x2C
+#define MT29F16G08AJADAWP_ID1 0xD3
+#define MT29F16G08AJADAWP_ID2 0xD1
+#define MT29F16G08AJADAWP_ID3 0x95
+#define MT29F16G08AJADAWP_ID4 0xDA
+#define MT29F16G08AJADAWP_TOTAL_BLOCKS 8192  // total block on one 8gb chip select
+                                             // one partition can not span on 2 chip
+                                             // with NR_PARTITION 2, each partition has TOTAL_BLOCKS 8192
 
-#define TOTAL_BLOCKS    8192		// total block on one 8gb chip select
-#define PAGE_DATA_SIZE  2048		// page size
-#define PAGE_SPARE_SIZE 64			// spare size
-#define PAGES_PER_BLOCK 64			// nb page per block
-#define ADDRESS_SHIFT_PAGE	6		//shift block address to insert page address
-#define PAGE_SIZE		(PAGE_DATA_SIZE + PAGE_SPARE_SIZE)
+/////////////////////////////////////////////////////////////////////////////////
+//
+// MT29F4G08ABADAWP NAND definitions
+//
+#define MT29F4G08ABADAWP_ID0 0x2C
+#define MT29F4G08ABADAWP_ID1 0xDC
+#define MT29F4G08ABADAWP_ID2 0x90
+#define MT29F4G08ABADAWP_ID3 0x95
+#define MT29F4G08ABADAWP_ID4 0xD6
+#define MT29F4G08ABADAWP_TOTAL_BLOCKS  4096  // total block on chip
+
+#define PAGE_DATA_SIZE  2048     // page size
+#define PAGE_SPARE_SIZE 64       // spare size
+#define PAGES_PER_BLOCK 64       // nb page per block
+#define ADDRESS_SHIFT_PAGE 6     //shift block address to insert page address
+#define PAGE_SIZE    (PAGE_DATA_SIZE + PAGE_SPARE_SIZE)
 #define BLOCK_DATA_SIZE (PAGE_DATA_SIZE * PAGES_PER_BLOCK)
 
-// using more than 1 partition consume much more memory ????
+
+// For model MT29F16G08AJADAWP:
+//    NR_PARTITION 1 permits to use only 8Gb
+//    NR_PARTITION 2 permits to use the whole 16Gb (not tested)
+//    using more than 1 partition consume much more memory ????
+// For model MT29F4G08ABADAWP:
+//    NR_PARTITION 1 permits to use the whole 4Gb
+//    To use NR_PARTITION 2, MT29F4G08ABADAWP_TOTAL_BLOCKS has to be reduced to 2048
 #define NR_PARTITION	1								/* total partitions max 2 for cs0 & cs1 */
 
-#if NR_PARTITION == 1
-#define PAR_1_BLOCKS	TOTAL_BLOCKS					/* all cs0 */
-#else
-#define PAR_1_BLOCKS	TOTAL_BLOCKS
-#define PAR_2_BLOCKS	TOTAL_BLOCKS
-#endif
 
 struct my_nand_chip g_nand_chip_1 = {0};
 #if NR_PARTITION > 1
@@ -147,9 +175,9 @@ static uffs_Device demo_device_2 = {0};
 #endif
 
 static uffs_MountTable demo_mount_table[] = {
-	{ &demo_device_1,  0, PAR_1_BLOCKS - 1, "/cs0/" },
+	{ &demo_device_1,  0, 0/*configured later*/, "/cs0/" },
 #if NR_PARTITION > 1
-	{ &demo_device_2,  0, PAR_2_BLOCKS - 1, "/cs1/" },
+	{ &demo_device_2,  0, 0/*configured later*/, "/cs1/" },
 #endif
 	{ NULL, 0, 0, NULL }
 };
@@ -171,7 +199,10 @@ static void setup_flash_storage(struct uffs_StorageAttrSt *attr)
 	memset(attr, 0, sizeof(struct uffs_StorageAttrSt));
 
 	// setup NAND flash attributes.
-	attr->total_blocks = TOTAL_BLOCKS;			/* total blocks */
+	if (g_my_nand_model == MT29F4G08ABADAWP)
+	   attr->total_blocks = MT29F4G08ABADAWP_TOTAL_BLOCKS;   /* total blocks */
+	else     //MT29F16G08AJADAWP
+	   attr->total_blocks = MT29F16G08AJADAWP_TOTAL_BLOCKS;  /* total blocks */
 	attr->page_data_size = PAGE_DATA_SIZE;		/* page data size */
 	attr->pages_per_block = PAGES_PER_BLOCK;	/* pages per block */
 	attr->spare_size = PAGE_SPARE_SIZE;		  	/* page spare size */
@@ -628,6 +659,9 @@ static inline int PARSE_STATUS(u8 v){
 static int nand_readid(uffs_Device *dev) {
 	int ret;
 	u8 deviceid[4];
+
+	g_my_nand_model = NAND_UNDEFINED;   //reset nand model found
+
 	CHIP_CLR_NCS(dev);
 	CHIP_SET_CLE(dev);
 	WRITE_COMMAND(dev, NAND_CMD_RESET);
@@ -654,15 +688,30 @@ static int nand_readid(uffs_Device *dev) {
 
 	CHIP_SET_NCS(dev);
 	MSG("nand_readid b1:%02x, b2:%02x, b3:%02x, b4:%02x\n", deviceid[0], deviceid[1], deviceid[2], deviceid[3]);
-	if ((deviceid[0] == 0x2c) && (deviceid[1] == 0xd3) && (deviceid[2] == 0xd1) && (deviceid[3] == 0x95)) // don't check this one, it may be 0x5a or 0xda && (b5 == 0x5a))
-		return 0;
-	else
-		return 1;
+   if ((deviceid[0] == MT29F16G08AJADAWP_ID0) &&
+         (deviceid[1] == MT29F16G08AJADAWP_ID1) &&
+         (deviceid[2] == MT29F16G08AJADAWP_ID2) &&
+         (deviceid[3] == MT29F16G08AJADAWP_ID3)) // don't check last one, it may be 0x5a or 0xda
+   {
+      g_my_nand_model = MT29F16G08AJADAWP;
+      print("MT29F16G08AJADAWP NAND Flash detected\n\r");
+      return 0;
+   }
+   else if ((deviceid[0] == MT29F4G08ABADAWP_ID0) &&
+         (deviceid[1] == MT29F4G08ABADAWP_ID1) &&
+         (deviceid[2] == MT29F4G08ABADAWP_ID2) &&
+         (deviceid[3] == MT29F4G08ABADAWP_ID3)) // don't check last one, it may be 0x56 or 0xd6
+   {
+      g_my_nand_model = MT29F4G08ABADAWP;
+      print("MT29F4G08ABADAWP NAND Flash detected\n\r");
+      return 0;
+   }
+   else
+      return 1;
 }
 
 // force HW Ecc calculation
-static void nand_set_features(uffs_Device *dev, u8 address) {
-	u8 data[] = {0x08, 0,0,0};
+static void nand_set_features(uffs_Device *dev, u8 address, const u8 *data) {
 	CHIP_CLR_NCS(dev);
 	CHIP_SET_CLE(dev);
 	WRITE_COMMAND(dev, NAND_CMD_SET_FEATURES);
@@ -682,7 +731,7 @@ static void nand_set_features(uffs_Device *dev, u8 address) {
 }
 
 // read HW Ecc calculation feature
-static int nand_get_features(uffs_Device *dev, u8 address) {
+static int nand_get_features(uffs_Device *dev, u8 address, const u8 *verif_data) {
 	u8 data[4];
 	CHIP_CLR_NCS(dev);
 	CHIP_SET_CLE(dev);
@@ -697,7 +746,7 @@ static int nand_get_features(uffs_Device *dev, u8 address) {
 	READ_DATA(dev, data, 4);
 	CHIP_SET_NCS(dev);
 	MSG("Feature: addr:%02x %02x,%02x,%02x,%02x\n",address, data[0], data[1], data[2], data[3]);
-	if (data[0] == 0x08)
+	if ((data[0] == verif_data[0]) && (data[1] == verif_data[1]) && (data[2] == verif_data[2]) && (data[3] == verif_data[3]))
 		return 0;
 	else
 		return 1;
@@ -1222,10 +1271,11 @@ static int nand_release_flash(uffs_Device *dev)
 }
 
 #ifndef PERFORMANCE_LOW
-/* static alloc the memory for each partition */
-static int static_buffer_par1[UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, PAR_1_BLOCKS) / sizeof(int)];
+/* static alloc the memory for each partition
+ * memory is allocated for the biggest number of TOTAL_BLOCKS for all models*/
+static int static_buffer_par1[UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, MT29F16G08AJADAWP_TOTAL_BLOCKS) / sizeof(int)];
 #if NR_PARTITION > 1
-static int static_buffer_par2[UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, PAR_2_BLOCKS) / sizeof(int)];
+static int static_buffer_par2[UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, MT29F16G08AJADAWP_TOTAL_BLOCKS) / sizeof(int)];
 #endif
 
 #if 0 // not used
@@ -1267,10 +1317,16 @@ static int my_init_filesystem(void)
 	/* setup nand storage attributes */
 	setup_flash_storage(&g_my_flash_storage);
 
-	/* setup memory allocator */
-	uffs_MemSetupStaticAllocator(&demo_device_1.mem, static_buffer_par1, sizeof(static_buffer_par1));
+   /* Configure end_block */
+   demo_mount_table[0].end_block = g_my_flash_storage.total_blocks - 1;
 #if NR_PARTITION > 1
-	uffs_MemSetupStaticAllocator(&demo_device_2.mem, static_buffer_par2, sizeof(static_buffer_par2));
+   demo_mount_table[1].end_block = g_my_flash_storage.total_blocks - 1;
+#endif
+
+	/* setup memory allocator */
+	uffs_MemSetupStaticAllocator(&demo_device_1.mem, static_buffer_par1, UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, g_my_flash_storage.total_blocks));
+#if NR_PARTITION > 1
+	uffs_MemSetupStaticAllocator(&demo_device_2.mem, static_buffer_par2, UFFS_STATIC_BUFF_SIZE(PAGES_PER_BLOCK, PAGE_SIZE, g_my_flash_storage.total_blocks));
 #endif
 
 	/* register mount table */
@@ -1442,16 +1498,19 @@ void nand_low_format()
 	dev.attr = &g_my_flash_storage;					// NAND flash attributes
 	dev.ops = &g_my_nand_ops;						// NAND driver
 	dev.dev_num = 1;
-	for (block = 0; block < TOTAL_BLOCKS; block++){
+	for (block = 0; block < g_my_flash_storage.total_blocks; block++){
 		if ((block != 100) && (block != 101) && (block != 4196) && (block != 4197)) {
 			nand_erase_block(&dev, block);
 		}
 	}
-	dev.dev_num = 2;
-	for (block = 0; block < TOTAL_BLOCKS; block++){
-		if ((block != 100) && (block != 101) && (block != 4196) && (block != 4197)) {
-			nand_erase_block(&dev, block);
-		}
+	if (g_my_nand_model == MT29F16G08AJADAWP)    //only this model has 2 CS
+	{
+      dev.dev_num = 2;
+      for (block = 0; block < g_my_flash_storage.total_blocks; block++){
+         if ((block != 100) && (block != 101) && (block != 4196) && (block != 4197)) {
+            nand_erase_block(&dev, block);
+         }
+      }
 	}
 }
 #endif
@@ -1462,7 +1521,8 @@ void nand_low_format()
 // ret: 0 succes, != 0 failed.
 int uffs_main(int iStep)
 {
-	int ret = 0;
+	const u8 features_data[] = {0x08,0,0,0};
+   int ret = 0;
 	switch (iStep){
 	case 0:
 		FlashIntf_Init(&Flash_Interface);
@@ -1471,13 +1531,14 @@ int uffs_main(int iStep)
 		dev.dev_num = 1;
 		ret = nand_readid(&dev);
 		if (ret) {
-			print("ERROR Nand ID failed\n\r");
+			print("ERROR NAND ID failed\n\r");
 			break;
 		}
-		nand_set_features(&dev, 0x90);
-		ret = nand_get_features(&dev, 0x90);
+		// Set features of Array Operation Mode
+		nand_set_features(&dev, 0x90, features_data);
+		ret = nand_get_features(&dev, 0x90, features_data);
 		if (ret) {
-			print("ERROR Set features HW Ecc failed\n\r");
+			print("ERROR Set features HW ECC failed\n\r");
 			break;
 		}
 #ifdef LOW_FORMAT
