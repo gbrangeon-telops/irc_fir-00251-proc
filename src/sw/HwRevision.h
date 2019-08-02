@@ -39,6 +39,7 @@
 enum brd_rev_ver {
    BRD_REV_00x = 0,
    BRD_REV_20x = 1,
+   BRD_REV_30x = 2,
    BRD_REV_UNKNOWN
 };
 

@@ -48,10 +48,14 @@ IRC_Status_t Get_board_hw_revision(uint16_t gpioDeviceId, brd_rev_ver_t* brd_rev
          *(brd_rev_id) = BRD_REV_20x;
          HWR_INF("\nHW Board Revision is 20x");
          break;
+      case 2:
+         *(brd_rev_id) = BRD_REV_30x;
+         HWR_INF("\nHW Board Revision is 30x");
+         break;
       default:
          *(brd_rev_id) = BRD_REV_UNKNOWN;
          HWR_INF("\nHW Board Revision is Unknown");
-         break;
+         return IRC_FAILURE;
    }
 
    return IRC_SUCCESS;

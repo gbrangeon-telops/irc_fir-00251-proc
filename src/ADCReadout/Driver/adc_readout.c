@@ -30,17 +30,21 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    b = fs->ADCReadout_b;   // [counts]
 #endif
    
-   if(gBrdRevid == BRD_REV_20x){
-      adcReadoutcgf = ADC_AND_IRIG;
-   }
-   else if(gBrdRevid == BRD_REV_00x && fs->ADCReadoutEnabled)
+   if (gBrdRevid == BRD_REV_00x)
    {
-      adcReadoutcgf = ADC_READOUT;
-      N_ADC_BITS = 12;
+      if (fs->ADCReadoutEnabled)
+      {
+         adcReadoutcgf = ADC_READOUT;
+         N_ADC_BITS = 12;
+      }
+      else
+      {
+         adcReadoutcgf = ADC_IRIG_ONLY;
+      }
    }
    else
    {
-      adcReadoutcgf = ADC_IRIG_ONLY;
+      adcReadoutcgf = ADC_AND_IRIG;
    }
 
 
