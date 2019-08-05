@@ -500,7 +500,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA detector polarization voltage = %d mV", gFpaDetectorPolarizationVoltage);
    DT_PRINTF("FPA detector taps reference voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalTapsRef, 3));
    DT_PRINTF("FPA detector offset voltage = " _PCF(3) " mV", _FFMT(gFpaDetectorElectricalRefOffset, 3));
-   DT_PRINTF("FPA detector exposure time offset =  %d x 10^(-8) s", gFpaExposureTimeOffset);
+   DT_PRINTF("FPA detector exposure time offset =  %de-8 s", gFpaExposureTimeOffset);
 
    DT_PRINTF("fpa.adc_oper_freq_max_khz = %d", status.adc_oper_freq_max_khz);
    DT_PRINTF("fpa.adc_analog_channel_num = %d", status.adc_analog_channel_num);

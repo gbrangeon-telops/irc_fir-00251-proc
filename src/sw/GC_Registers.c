@@ -1661,7 +1661,7 @@ void GC_UpdateExposureTimeMin()
    float UserExposureTimeMin;
    float CorrectedExposureTimeMin;
    float exposureTimeOffset; // in us
-   extern int32_t gFpaExposureTimeOffset; //in 10^-8 s
+   extern int32_t gFpaExposureTimeOffset; //in 1e-8 s
 
    exposureTimeOffset = (float)gFpaExposureTimeOffset/EXPOSURE_TIME_FACTOR;
 

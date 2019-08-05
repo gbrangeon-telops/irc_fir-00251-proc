@@ -25,6 +25,7 @@
 #include "CRC.h"
 #include <math.h>
 #include <string.h>
+#include "exposure_time_ctrl.h"
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -318,9 +319,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // static uint8_t roic_dbg_reg_unlocked = 0;
    // uint8_t need_rst_fpa_module = 0;
    // uint8_t flegx_present;  
-	
-   
-   
+   extern int32_t gFpaExposureTimeOffset;
    
    
    //if ((gStat.hw_init_done == 1) && (sw_init_done == 1))
