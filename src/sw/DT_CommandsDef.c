@@ -1150,7 +1150,7 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
       spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
       spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
 
-      DT_PRINTF("Space used = %d / %d (free = %d / %d)", spaceUsed, spaceTotal, spaceFree, spaceTotal);
+      DT_PRINTF("Space in bytes: used = %d, free = %d, total = %d", spaceUsed, spaceFree, spaceTotal);
    }
 
    return IRC_SUCCESS;
