@@ -59,10 +59,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.5.1
+// Generated from XML camera definition file version 12.6.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 5) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 6) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -81,6 +81,8 @@ struct gcRegistersDataStruct {
    float AcquisitionFrameRateMax;
    float AcquisitionFrameRateMaxFG;
    float AcquisitionFrameRateMin;
+   float AcquisitionFrameRateUnrestrictedMax;
+   float AcquisitionFrameRateUnrestrictedMin;
    float AutofocusROI;
    float DeviceClockFrequency;
    float DeviceCurrent;
@@ -161,6 +163,7 @@ struct gcRegistersDataStruct {
    uint32_t CalibrationMode;
    uint32_t CenterImage;
    uint32_t ClConfiguration;
+   uint32_t DetectorMode;
    uint32_t DeviceBuiltInTestsResults1;
    uint32_t DeviceBuiltInTestsResults2;
    uint32_t DeviceBuiltInTestsResults3;
@@ -399,6 +402,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetAcquisitionStart(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionStartIdx], val)
 #define GC_SetAcquisitionStop(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionStopIdx], val)
 #define GC_SetAcquisitionArm(val) GC_RegisterWriteUI32(&gcRegsDef[AcquisitionArmIdx], val)
+#define GC_SetDetectorMode(val) GC_RegisterWriteUI32(&gcRegsDef[DetectorModeIdx], val)
 #define GC_SetExposureMode(val) GC_RegisterWriteUI32(&gcRegsDef[ExposureModeIdx], val)
 #define GC_SetExposureTime(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], val)
 #define GC_SetExposureTime1(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTime1Idx], val)
@@ -632,6 +636,8 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetIsActiveFlags(val) GC_RegisterWriteUI32(&gcRegsDef[IsActiveFlagsIdx], val)
 #define GC_SetAcquisitionFrameRateMin(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateMinIdx], val)
 #define GC_SetAcquisitionFrameRateMax(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateMaxIdx], val)
+#define GC_SetAcquisitionFrameRateUnrestrictedMin(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateUnrestrictedMinIdx], val)
+#define GC_SetAcquisitionFrameRateUnrestrictedMax(val) GC_RegisterWriteFloat(&gcRegsDef[AcquisitionFrameRateUnrestrictedMaxIdx], val)
 #define GC_SetImageCorrectionFWAcquisitionFrameRateMin(val) GC_RegisterWriteFloat(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateMinIdx], val)
 #define GC_SetImageCorrectionFWAcquisitionFrameRateMax(val) GC_RegisterWriteFloat(&gcRegsDef[ImageCorrectionFWAcquisitionFrameRateMaxIdx], val)
 #define GC_SetExposureTimeMin(val) GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeMinIdx], val)
@@ -681,15 +687,11 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_FlaggingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Flagging) && GC_GatingTriggerIsActive)
 #define GC_GatingTriggerIsActive IsActiveFlagsTst(GatingTriggerIsActiveMask)
 #define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive || GC_AECPlusIsActive))
-#define GC_MemoryBufferBusy (GC_MemoryBufferRecording || GC_MemoryBufferTransmitting || GC_MemoryBufferDefraging || GC_MemoryBufferUpdating)
-#define GC_MemoryBufferDefraging MemoryBufferStatusTst(MemoryBufferDefragingMask)
+#define GC_MemoryBufferBusy ((gcRegsData.MemoryBufferStatus == MBS_Recording) || (gcRegsData.MemoryBufferStatus == MBS_Updating) || (gcRegsData.MemoryBufferStatus == MBS_Transmitting) || (gcRegsData.MemoryBufferStatus == MBS_Defraging))
 #define GC_MemoryBufferNotEmpty (GC_MemoryBufferBusy || (gcRegsData.MemoryBufferSequenceCount > 0))
 #define GC_MemoryBufferNotEmptyLegacy ((gcRegsData.MemoryBufferLegacyMode == MBLM_On) && GC_MemoryBufferNotEmpty)
-#define GC_MemoryBufferProcessingData (GC_MemoryBufferUpdating || GC_MemoryBufferDefraging)
-#define GC_MemoryBufferRecording MemoryBufferStatusTst(MemoryBufferRecordingMask)
-#define GC_MemoryBufferTransmitting MemoryBufferStatusTst(MemoryBufferTransmittingMask)
-#define GC_MemoryBufferUpdating MemoryBufferStatusTst(MemoryBufferUpdatingMask)
-#define GC_MemoryBufferWritingProcess (GC_MemoryBufferRecording || GC_MemoryBufferUpdating)
+#define GC_MemoryBufferProcessingData ((gcRegsData.MemoryBufferStatus == MBS_Updating) || (gcRegsData.MemoryBufferStatus == MBS_Defraging))
+#define GC_MemoryBufferWritingProcess ((gcRegsData.MemoryBufferStatus == MBS_Recording) || (gcRegsData.MemoryBufferStatus == MBS_Updating))
 #define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForImageCorrection)
 #define GC_WaitingForImageCorrection TDCStatusTst(WaitingForImageCorrectionMask)
 

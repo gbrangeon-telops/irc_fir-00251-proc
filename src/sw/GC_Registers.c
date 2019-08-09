@@ -39,6 +39,9 @@
 
 #define SVN_REVISIONS_INIT {SVN_HARDWARE_REV, SVN_SOFTWARE_REV, SVN_BOOTLOADER_REV, SVN_COMMON_REV, 0, 0, 0, 0, 0, 0, 0, 0}
 
+#define DEFAULT_FRAME_RATE_MIN   0.1F
+#define DEFAULT_FRAME_RATE_MAX   1500.0F
+
 uint8_t gGC_RegistersStreaming = 0;
 uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
@@ -49,7 +52,7 @@ float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.5.1
+// Generated from XML camera definition file version 12.6.0
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -64,9 +67,11 @@ gcRegistersData_t gcRegsDataFactory = {
    /* AECResponseTime = */ 100.0F,
    /* AECTargetWellFilling = */ 60.0F,
    /* AcquisitionFrameRate = */ FPA_DEFAULT_FRAME_RATE,
-   /* AcquisitionFrameRateMax = */ 1500.0F,
+   /* AcquisitionFrameRateMax = */ DEFAULT_FRAME_RATE_MAX,
    /* AcquisitionFrameRateMaxFG = */ 0.0F,
-   /* AcquisitionFrameRateMin = */ 0.1F,
+   /* AcquisitionFrameRateMin = */ DEFAULT_FRAME_RATE_MIN,
+   /* AcquisitionFrameRateUnrestrictedMax = */ DEFAULT_FRAME_RATE_MAX,
+   /* AcquisitionFrameRateUnrestrictedMin = */ DEFAULT_FRAME_RATE_MIN,
    /* AutofocusROI = */ AUTOFOCUS_ROI_DEFAULT,
    /* DeviceClockFrequency = */ 0.0F,
    /* DeviceCurrent = */ 0.0F,
@@ -99,8 +104,8 @@ gcRegistersData_t gcRegsDataFactory = {
    /* ExternalFanSpeedSetpoint = */ 50.0F,
    /* HFOV = */ 0.0F,
    /* ImageCorrectionFWAcquisitionFrameRate = */ ACT_DEFAULT_FPS,
-   /* ImageCorrectionFWAcquisitionFrameRateMax = */ 800.0F,
-   /* ImageCorrectionFWAcquisitionFrameRateMin = */ 0.1F,
+   /* ImageCorrectionFWAcquisitionFrameRateMax = */ DEFAULT_FRAME_RATE_MAX,
+   /* ImageCorrectionFWAcquisitionFrameRateMin = */ DEFAULT_FRAME_RATE_MIN,
    /* MemoryBufferSequenceDownloadBitRateMax = */ 20.0F,
    /* TriggerDelay = */ 0.0F,
    /* VFOV = */ 0.0F,
@@ -147,6 +152,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* CalibrationMode = */ CM_Raw0,
    /* CenterImage = */ 1,
    /* ClConfiguration = */ CC_Full,
+   /* DetectorMode = */ DM_Normal,
    /* DeviceBuiltInTestsResults1 = */ 0,
    /* DeviceBuiltInTestsResults2 = */ 0,
    /* DeviceBuiltInTestsResults3 = */ 0,
@@ -265,7 +271,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferSequenceSizeMax = */ 0,
    /* MemoryBufferSequenceSizeMin = */ 0,
    /* MemoryBufferSequenceWidth = */ 0,
-   /* MemoryBufferStatus = */ MEMORY_BUFFER_STATUS_INIT,
+   /* MemoryBufferStatus = */ MBS_Deactivated,
    /* MemoryBufferTotalSpaceHigh = */ 0,
    /* MemoryBufferTotalSpaceLow = */ 0,
    /* NDFilterArmedPositionSetpoint = */ NDFAPS_NDFilter1,
@@ -426,6 +432,8 @@ void GC_Registers_Init()
    gcRegsDef[AcquisitionFrameRateMaxIdx].p_data = &gcRegsData.AcquisitionFrameRateMax;
    gcRegsDef[AcquisitionFrameRateMaxFGIdx].p_data = &gcRegsData.AcquisitionFrameRateMaxFG;
    gcRegsDef[AcquisitionFrameRateMinIdx].p_data = &gcRegsData.AcquisitionFrameRateMin;
+   gcRegsDef[AcquisitionFrameRateUnrestrictedMaxIdx].p_data = &gcRegsData.AcquisitionFrameRateUnrestrictedMax;
+   gcRegsDef[AcquisitionFrameRateUnrestrictedMinIdx].p_data = &gcRegsData.AcquisitionFrameRateUnrestrictedMin;
    gcRegsDef[AutofocusROIIdx].p_data = &gcRegsData.AutofocusROI;
    gcRegsDef[DeviceClockFrequencyIdx].p_data = &gcRegsData.DeviceClockFrequency;
    gcRegsDef[DeviceCurrentIdx].p_data = &gcRegsData.DeviceCurrent;
@@ -506,6 +514,7 @@ void GC_Registers_Init()
    gcRegsDef[CalibrationModeIdx].p_data = &gcRegsData.CalibrationMode;
    gcRegsDef[CenterImageIdx].p_data = &gcRegsData.CenterImage;
    gcRegsDef[ClConfigurationIdx].p_data = &gcRegsData.ClConfiguration;
+   gcRegsDef[DetectorModeIdx].p_data = &gcRegsData.DetectorMode;
    gcRegsDef[DeviceBuiltInTestsResults1Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults1;
    gcRegsDef[DeviceBuiltInTestsResults2Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults2;
    gcRegsDef[DeviceBuiltInTestsResults3Idx].p_data = &gcRegsData.DeviceBuiltInTestsResults3;
@@ -706,6 +715,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[AcquisitionStartIdx], (GC_MemoryBufferProcessingData || gcRegsData.DeviceNotReady));
    SetRegLocked(&gcRegsDef[AcquisitionStopIdx], (GC_WaitingForImageCorrection || GC_AutofocusIsActive));
    SetRegLocked(&gcRegsDef[AcquisitionArmIdx], ((GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
+   SetRegLocked(&gcRegsDef[DetectorModeIdx], GC_AcquisitionStarted);
    SetRegLocked(&gcRegsDef[ExposureModeIdx], (((GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection) || GC_AcquisitionStarted));
    SetRegLocked(&gcRegsDef[ExposureTimeIdx], GC_ExposureTimeIsLocked);
    SetRegLocked(&gcRegsDef[ExposureTime1Idx], GC_EHDRIExposureTimeIsLocked);
@@ -784,7 +794,7 @@ void GC_UpdateLockedFlag()
    SetRegLocked(&gcRegsDef[MemoryBufferSequencePreMOISizeIdx], (GC_MemoryBufferWritingProcess || (gcRegsData.MemoryBufferSequenceSizeMax == 0)));
    SetRegLocked(&gcRegsDef[MemoryBufferMOISourceIdx], GC_WaitingForImageCorrection);
    SetRegLocked(&gcRegsDef[MemoryBufferMOIActivationIdx], GC_MemoryBufferBusy);
-   SetRegLocked(&gcRegsDef[MemoryBufferMOISoftwareIdx], (GC_MemoryBufferRecording == 0));
+   SetRegLocked(&gcRegsDef[MemoryBufferMOISoftwareIdx], (gcRegsData.MemoryBufferStatus != MBS_Recording));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceSelectorIdx], GC_MemoryBufferBusy);
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx], ((gcRegsData.MemoryBufferSequenceDownloadMode != MBSDM_Image) || (gcRegsData.MemoryBufferSequenceRecordedSize == 0)));
    SetRegLocked(&gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx], ((gcRegsData.MemoryBufferSequenceDownloadMode != MBSDM_Sequence) || (gcRegsData.MemoryBufferSequenceRecordedSize == 0)));
@@ -919,19 +929,22 @@ void GC_UpdateParameterLimits()
    }
 
    // Calculate AcquisitionFrameRateMax with max ExposureTime found
-   if (TDCStatusTst(AcquisitionStartedMask))
-   {
-      frameImageCount = MAX(gcRegsData.FValSize / (gcRegsData.Height + 2), 1);
-      gcRegsData.AcquisitionFrameRateMax = MIN(FPA_MaxFrameRate(&gcRegsData), gcRegsData.AcquisitionFrameRateMaxFG * frameImageCount);
-   }
-   else
-   {
-      gcRegsData.AcquisitionFrameRateMax = FPA_MaxFrameRate(&gcRegsData);
-   }
+   gcRegsData.AcquisitionFrameRateMax = FPA_MaxFrameRate(&gcRegsData);
 
+   // Limit AcquisitionFrameRateMax in synchronous mode
    if (FWSynchronoulyRotatingModeIsActive)
    {
       gcRegsData.AcquisitionFrameRateMax = MIN(gcRegsData.AcquisitionFrameRateMax, SFW_GetAcquisitionFrameRateMax());
+   }
+
+   // Return AcquisitionFrameRateMax without jumboframe limitation
+   gcRegsData.AcquisitionFrameRateUnrestrictedMax = gcRegsData.AcquisitionFrameRateMax;
+
+   // Limit AcquisitionFrameRateMax with jumboframe
+   if (TDCStatusTst(AcquisitionStartedMask))
+   {
+      frameImageCount = MAX(gcRegsData.FValSize / (gcRegsData.Height + 2), 1);
+      gcRegsData.AcquisitionFrameRateMax = MIN(gcRegsData.AcquisitionFrameRateMax, gcRegsData.AcquisitionFrameRateMaxFG * frameImageCount);
    }
 
    // Validate current AcquisitionFrameRate

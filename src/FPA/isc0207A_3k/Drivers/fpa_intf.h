@@ -44,7 +44,8 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0207A_3kIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Isc0207A_3kIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | \
+                                 HighGainSWDIsImplementedMask | BurstModeIsImplementedMask)
 
 #define FPA_MAX_GAIN       1
 #define FPA_NUMTAPS        16  // [taps]

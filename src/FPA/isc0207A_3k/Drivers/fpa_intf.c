@@ -765,11 +765,6 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
-  
-  extern int32_t gFpaDebugRegH;                      //utilisé pour le burst mode
-  uint8_t burst_Mode = 0;
-
-  
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
@@ -785,11 +780,9 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->tsh_min_usec            = 7.8F;
    ptrH->trst_min_usec           = 0.2F;
    
-   burst_Mode = (uint8_t)gFpaDebugRegH;
-   
    ptrH->line_stretch_mclk       = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
-   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) || (burst_Mode == 1))
-    ptrH->line_stretch_mclk      = 0.0;
+   if ((pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) || (pGCRegs->DetectorMode == DM_Burst))
+      ptrH->line_stretch_mclk      = 0.0;
 
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
    ptrH->int_time_offset_usec    = 0.8F;  // offset du temps d'integration
@@ -808,7 +801,7 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    
    // fenetre qui sera demandée au ROIC du FPA 
    ptrH->roic_xsize     = MIN((float)pGCRegs->Width + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX);   
-   if (burst_Mode ==  1)
+   if (pGCRegs->DetectorMode == DM_Burst)
       ptrH->roic_xsize     = (float)pGCRegs->Width; 
    ptrH->roic_ysize     = (float)pGCRegs->Height;
    ptrH->roic_xstart    = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage

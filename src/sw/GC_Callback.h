@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.5.1
+// Generated from XML camera definition file version 12.6.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -36,6 +36,8 @@ void GC_AcquisitionFrameRateMaxFGCallback(gcCallbackPhase_t phase, gcCallbackAcc
 void GC_AcquisitionFrameRateMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionFrameRateModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionFrameRateSetToMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_AcquisitionFrameRateUnrestrictedMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_AcquisitionFrameRateUnrestrictedMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionStartCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_AcquisitionStartAtStartupCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
@@ -61,6 +63,7 @@ void GC_CalibrationCollectionTypeCallback(gcCallbackPhase_t phase, gcCallbackAcc
 void GC_CalibrationModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_CenterImageCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_ClConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_DetectorModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_DeviceBuiltInTestsResults3Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
