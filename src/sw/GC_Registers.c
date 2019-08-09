@@ -928,8 +928,9 @@ void GC_UpdateParameterLimits()
          gcRegsData.ExposureTime = MAX(gcRegsData.ExposureTime, (float)calibrationInfo.blocks[index].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US);
    }
 
-   // Calculate AcquisitionFrameRateMax with max ExposureTime found
+   // Calculate AcquisitionFrameRateMax/Min with max ExposureTime found
    gcRegsData.AcquisitionFrameRateMax = FPA_MaxFrameRate(&gcRegsData);
+   gcRegsData.AcquisitionFrameRateMin = DEFAULT_FRAME_RATE_MIN;
 
    // Limit AcquisitionFrameRateMax in synchronous mode
    if (FWSynchronoulyRotatingModeIsActive)
@@ -937,20 +938,26 @@ void GC_UpdateParameterLimits()
       gcRegsData.AcquisitionFrameRateMax = MIN(gcRegsData.AcquisitionFrameRateMax, SFW_GetAcquisitionFrameRateMax());
    }
 
-   // Return AcquisitionFrameRateMax without jumboframe limitation
+   // Return AcquisitionFrameRateMax/Min without jumboframe limitation
    gcRegsData.AcquisitionFrameRateUnrestrictedMax = gcRegsData.AcquisitionFrameRateMax;
+   gcRegsData.AcquisitionFrameRateUnrestrictedMin = gcRegsData.AcquisitionFrameRateMin;
 
-   // Limit AcquisitionFrameRateMax with jumboframe
+   // Limit AcquisitionFrameRateMax/Min with jumboframe
    if (TDCStatusTst(AcquisitionStartedMask))
    {
       frameImageCount = MAX(gcRegsData.FValSize / (gcRegsData.Height + 2), 1);
       gcRegsData.AcquisitionFrameRateMax = MIN(gcRegsData.AcquisitionFrameRateMax, gcRegsData.AcquisitionFrameRateMaxFG * frameImageCount);
+      gcRegsData.AcquisitionFrameRateMin = MAX(gcRegsData.AcquisitionFrameRateMin, gcRegsData.AcquisitionFrameRateMaxFG * (frameImageCount-1));
    }
 
    // Validate current AcquisitionFrameRate
    if (gcRegsData.AcquisitionFrameRate > gcRegsData.AcquisitionFrameRateMax)
    {
       GC_SetAcquisitionFrameRate(gcRegsData.AcquisitionFrameRateMax);
+   }
+   if (gcRegsData.AcquisitionFrameRate < gcRegsData.AcquisitionFrameRateMin)
+   {
+      GC_SetAcquisitionFrameRate(gcRegsData.AcquisitionFrameRateMin);
    }
 
    // Restore current ExposureTime
@@ -967,7 +974,7 @@ void GC_UpdateParameterLimits()
    // Validate current ExposureTime
    if (gcRegsData.ExposureTime > gcRegsData.ExposureTimeMax)
    {
-      gcRegsData.ExposureTime = gcRegsData.ExposureTimeMax;
+      GC_SetExposureTime(gcRegsData.ExposureTimeMax);
    }
 }
 
@@ -1716,6 +1723,11 @@ void GC_UpdateExposureTimeMin()
    if (gcRegsData.ExposureTimeMin != UserExposureTimeMin)
    {
       GC_SetExposureTimeMin(UserExposureTimeMin);
+   }
+
+   if (gcRegsData.ExposureTime < gcRegsData.ExposureTimeMin)
+   {
+      GC_SetExposureTime(gcRegsData.ExposureTimeMin);
    }
 }
 
