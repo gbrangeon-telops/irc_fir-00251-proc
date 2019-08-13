@@ -139,6 +139,7 @@ void File_Manager_SM()
    static uint32_t fileIndex;
    static uint32_t fileSize;
    static uint16_t fileCRC16;
+   static long spaceTotal, spaceUsed, spaceFree;
    extern char gFI_FileSignature[][5];
    IRC_Status_t status;
    fileRecord_t *file;
@@ -398,6 +399,27 @@ void File_Manager_SM()
                         FM_ERR("Camera needs to be unlocked in order to format File system.");
                         F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      }
+                     break;
+
+                  case F1F2_CMD_FILE_USED_SPACE_REQ:
+                     spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
+                     F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                     fmResponse.f1f2.cmd = F1F2_CMD_FILE_USED_SPACE_RSP;
+                     fmResponse.f1f2.payload.fileSpace.space = spaceUsed;
+                     break;
+
+                  case F1F2_CMD_FILE_FREE_SPACE_REQ:
+                     spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+                     F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                     fmResponse.f1f2.cmd = F1F2_CMD_FILE_FREE_SPACE_RSP;
+                     fmResponse.f1f2.payload.fileSpace.space = spaceFree;
+                     break;
+
+                  case F1F2_CMD_FILE_TOTAL_SPACE_REQ:
+                     spaceTotal = uffs_space_total(FM_UFFS_MOUNT_POINT);
+                     F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                     fmResponse.f1f2.cmd = F1F2_CMD_FILE_TOTAL_SPACE_RSP;
+                     fmResponse.f1f2.payload.fileSpace.space = spaceTotal;
                      break;
 
                   case F1F2_CMD_PING:
