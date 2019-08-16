@@ -100,6 +100,7 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
    uint64_t tic;
    uint32_t i;
    fileRecord_t *p_file;
+   char filelongname[FM_LONG_FILENAME_SIZE];
 
    if (gDisableFlashDynamicValuesUpdate != 0)
    {
@@ -139,6 +140,9 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       if (uffs_write(fd, tmpFileDataBuffer, FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE) != FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
       {
          FM_ERR("File write failed.");
+         uffs_close(fd);
+         sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, FDV_TMP_FILENAME);
+         uffs_remove(filelongname);
          return IRC_FAILURE;
       }
 
