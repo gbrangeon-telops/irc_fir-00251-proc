@@ -715,6 +715,8 @@ long uffs_space_used(const char *mount_point)
 	}
 	uffs_GlobalFsLockUnlock();
 
+	/* Compensate for reserved blocks */
+	ret += (dev->cfg.reserved_free_blocks-1) * dev->attr->page_data_size * dev->attr->pages_per_block;
 	return ret;
 }
 
@@ -731,6 +733,8 @@ long uffs_space_free(const char *mount_point)
 	}
 	uffs_GlobalFsLockUnlock();
 
+   /* Compensate for reserved blocks */
+   ret -= (dev->cfg.reserved_free_blocks-1) * dev->attr->page_data_size * dev->attr->pages_per_block;
 	return ret;
 }
 
