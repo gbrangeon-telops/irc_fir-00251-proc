@@ -205,6 +205,9 @@ IRC_Status_t FlashDynamicValues_Update(flashDynamicValues_t *p_flashDynamicValue
       if (uffs_write(fd, tmpFileDataBuffer, FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE) != FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
       {
          FM_ERR("Initial file write failed.");
+         uffs_close(fd);
+         sprintf(filelongname, "%s%s", FM_UFFS_MOUNT_POINT, FDV_FILENAME);
+         uffs_remove(filelongname);
          return IRC_FAILURE;
       }
 
