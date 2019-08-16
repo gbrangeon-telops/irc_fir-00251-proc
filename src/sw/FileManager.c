@@ -282,8 +282,18 @@ void File_Manager_SM()
 
                               if (status == IRC_SUCCESS)
                               {
-                                 gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
-                                 F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                                 if (uffs_space_free(FM_UFFS_MOUNT_POINT) > FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
+                                 {
+                                    gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
+                                    F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                                 }
+                                 else
+                                 {
+                                    FM_ERR("Filesystem full.");
+                                    F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                                    file = FM_GetFileRecord(fileIndex);
+                                    FM_RemoveFile(file);
+                                 }
                               }
                               else
                               {
