@@ -289,6 +289,8 @@ void File_Manager_SM()
                               {
                                  FM_ERR("File write request failed.");
                                  F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                                 file = FM_GetFileRecord(fileIndex);
+                                 FM_RemoveFile(file);
                               }
                            }
                            else
@@ -753,6 +755,7 @@ IRC_Status_t FM_WriteDataToFile(uint8_t *data, const char *filename, uint32_t of
    if (uffs_write(fd, data, length) != length)
    {
       FM_ERR("File write failed.");
+      uffs_close(fd);
       return IRC_FAILURE;
    }
 
