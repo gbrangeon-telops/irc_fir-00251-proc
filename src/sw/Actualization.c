@@ -2916,6 +2916,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
    static fileRecord_t* actualization_file;
    static int fd = -1;
    static char shortFileName[48];
+   static char longFileName[FM_LONG_FILENAME_SIZE];
    static context_t blockContext; // information structure for block processing
    static float deltaBetaLSB;
    static CalibImageCorrection_ImageCorrectionFileHeader_t actFileHeader;
@@ -2978,6 +2979,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       ACT_PRINTF("FWR_INIT_IO\n");
 
       defineActualizationFilename(shortFileName, sizeof(shortFileName), privateActualisationPosixTime, currentDeltaBeta);
+      sprintf(longFileName, "%s%s", FM_UFFS_MOUNT_POINT, shortFileName);
 
       ACT_PRINTF("Will write to file : %s\n", shortFileName);
 
@@ -3050,6 +3052,8 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       if (uffs_write(fd, tmpFileDataBuffer, numBytes) != CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE)
       {
          ACT_ERR("Error writing file header to file %s.", shortFileName);
+         uffs_close(fd);
+         uffs_remove(longFileName);
          error = true;
          break;
       }
@@ -3144,6 +3148,8 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       if (uffs_write(fd, tmpFileDataBuffer, numBytes) != CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE)
       {
          ACT_ERR("Error writing data header to file %s.", shortFileName);
+         uffs_close(fd);
+         uffs_remove(longFileName);
          error = true;
          break;
       }
@@ -3173,6 +3179,8 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       if (uffs_write(fd, dataAddr, numBytes) != numBytes)
       {
          ACT_ERR("Error writing data to file %s.", shortFileName);
+         uffs_close(fd);
+         uffs_remove(longFileName);
          error = true;
          break;
       }
