@@ -3239,8 +3239,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
          ACT_ERR("File close failed.");
       }
 
-      // return DONE even in case of failure to write the file, otherwise the beta correction is not applied
-      retVal = IRC_DONE;
+      retVal = IRC_FAILURE;
    }
 
    return retVal;
