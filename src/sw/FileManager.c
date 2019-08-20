@@ -18,14 +18,19 @@
 #include "GC_Registers.h"
 #include "CRC.h"
 #include "uffs\uffs.h"
+#include "uffs\uffs_core.h"
+#include "uffs\uffs_device.h"
 #include "uffs\uffs_fd.h"
+#include "uffs\uffs_mtb.h"
 #include "FirmwareUpdater.h"
 #include "SREC.h"
 #include "IntelHEX.h"
 #include "Calibration.h"
+#include "CalibImageCorrectionFile.h"
 #include "FlashDynamicValues.h"
 #include "FlashSettings.h"
 #include <string.h> // For memcpy and strcmp
+#include <math.h>
 
 
 /**
@@ -282,7 +287,21 @@ void File_Manager_SM()
 
                               if (status == IRC_SUCCESS)
                               {
-                                 if (uffs_space_free(FM_UFFS_MOUNT_POINT) >= FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
+                                 long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+                                 uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+                                 long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
+                                 uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+                                 long tsdvLen, tsicLen;
+
+                                 /* Reserve space for a flash dynamic values file and
+                                  * one actualization file, rounded up to UFFS's
+                                  * block granularity.
+                                  */
+                                 tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
+                                 tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
+                                        CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
+                                        numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
+                                 if (spaceFree >= tsdvLen + tsicLen)
                                  {
                                     gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                     F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
