@@ -416,7 +416,10 @@ IRC_Status_t Actualization_SM()
             if (spaceFree < CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
                             CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
                             numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE)
+            {
                ACT_ERR("Filesystem has not enough space for actualization process.");
+               error = true;
+            }
             else
                setActState(&state, ACT_Start);
          }
