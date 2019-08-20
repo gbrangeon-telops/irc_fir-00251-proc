@@ -21,7 +21,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.MATH_REAL.all;
 use work.fpa_common_pkg.all; 
-use work.fleg_brd_define.all; 
+use work.fleg_brd_define.all;
+use work.fastrd2_define.all;
 
 package FPA_define is    
    
@@ -56,9 +57,22 @@ package FPA_define is
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 300_000;  -- en usec, le delai de stabilisation (analog setup)
    
    
+   -- definition les differentes horloges MCLK
+   constant DEFINE_FPA_MCLK_NUM                   : integer   := 3;
+   constant DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ      : integer   := 10_000;   -- vitesse nominale            
+   constant DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ     : integer   :=  5_000;   -- DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ/2;  -- vitesse d'opération dans la zone de bande laterale
+   constant DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ    : integer   := 20_000;   -- vitesse d'opération dans la zone interligne pour compenser le SIDEBAND_MCLK_RATE_KHZ
+   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := 80_000;   -- choisi judicieusement en fonction du ppcm des horloges
+   
+   -- generation des infos d'horloge
+   -- position 0     -> clk ayant le clk rate nominal 
+   -- position 7 à 1 -> les autres horloges
+   -- mettre 0 comme valeur aux positions non utilisées 
+   constant DEFINE_FPA_MCLK_INFO                  : fpa_clk_info_type := gen_fpa_mclk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ, DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ, DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ));
+   
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
-   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le superHawk, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
+   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ;       -- pour le superHawk, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 7;            -- pour le suphawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;        -- not used
    constant DEFINE_XSIZE_MAX                      : integer   := 1280;          -- dimension en X maximale
@@ -78,8 +92,8 @@ package FPA_define is
    -- quelques caractéristiques de la carte ADC requise
    constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       -- 
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       --
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;    -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
-   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ;    -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
+   
    
    -- limites imposées aux tensions VDAC deduites de celles de FP_VCC1 à FP_VCC8 du Fleg 
    -- provient du script F:\Bibliotheque\Electronique\PCB\EFP-00266-001 (Generic Flex Board TEL-2000)\Documentation\calcul_LT3042.m
@@ -129,16 +143,7 @@ package FPA_define is
    --constant DEFINE_FPA_PROG_END_PAUSE_FACTOR      : integer := DEFINE_FPA_PROG_END_PAUSE_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR;
    constant DEFINE_ELCORR_REF_DAC_SETUP_FACTOR    : integer := integer(real(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ)*real(DEFINE_ELCORR_REF_DAC_SETUP_US/1000));
    
-   ---------------------------------------------------------------------------------								
-   -- Configuration
-   ---------------------------------------------------------------------------------  
-   -- misc                    
-   type misc_cfg_type is
-   record
-      tir                        : unsigned(7 downto 0);
-      xsize_div_tapnum           : unsigned(7 downto 0);
-   end record;
-   
+  
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------ 
@@ -292,6 +297,12 @@ package FPA_define is
       
       -- additional exposure time offset from driver C
       additional_fpa_int_time_offset      : signed(31 downto 0); 
+      
+      
+       raw_area                            : area_cfg_type; -- zone brute 
+      user_area                           : area_cfg_type; -- zone AOI demandée par l'usager
+      stretch_area                        : area_cfg_type; -- zone d'étirement accolée à user_area, dans laquelle aucune accélération d'horloge n'est acceptée. ce, pour éviter des problèmes de perturbation dus au pipe de ligne du isc0804A
+
       
    end record; 
    

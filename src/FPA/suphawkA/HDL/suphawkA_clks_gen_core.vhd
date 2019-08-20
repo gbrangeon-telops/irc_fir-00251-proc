@@ -17,25 +17,20 @@ use IEEE.numeric_std.all;
 use ieee.math_real.all;
 use work.fpa_common_pkg.all;
 use work.FPA_define.all;
+use work.fastrd2_define.all;
 
 entity suphawkA_clks_gen_core is
    port(
       ARESET                 : in std_logic;
       
       MCLK_SOURCE            : in std_logic;  -- ne s'interrompt pas lors de la reconfig      
-      ADC_CLK_SOURCE         : in std_logic;  -- ne s'interrompt pas lors de la reconfig 
-      
+      ADC_CLK_SOURCE         : in std_logic;  -- ne s'interrompt pas lors de la reconfig       
       
       
       FPA_INTF_CFG           : in fpa_intf_cfg_type;      
       
       -- horloge standard
-      FPA_MCLK               : out std_logic;
-      FPA_PCLK               : out std_logic;  -- pour le suphawk, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo
-      
-      -- horloge rapide
-      FPA_FAST_MCLK          : out std_logic;  -- 
-      FPA_FAST_PCLK          : out std_logic;  -- 
+      RAW_FPA_CLK            : out fpa_clk_info_type;
       
       QUAD_CLK_COPY          : out std_logic;  -- quad_clk utilisé par le readout_ctrler
       QUAD_CLK_ENABLED       : out std_logic;
@@ -116,8 +111,8 @@ architecture rtl of suphawkA_clks_gen_core is
    signal sreset_adc_clk_source          : std_logic;
    signal quad_clk_iob                   : std_logic_vector(4 downto 1);
    
-   signal fpa_mclk_i                     : std_logic := '0';
-   signal fpa_pclk_i                     : std_logic := '0';
+   signal fpa_mclk_i                     : std_logic_vector(DEFINE_FPA_MCLK_NUM-1 downto 0) := (others => '0');
+   signal fpa_pclk_i                     : std_logic_vector(DEFINE_FPA_MCLK_NUM-1 downto 0) := (others => '0');
    
    signal fpa_fast_mclk_i                : std_logic := '0';
    signal fpa_fast_pclk_i                : std_logic := '0';
@@ -163,10 +158,12 @@ begin
    -- ENO: 07 juin 2017: le passage à travers les registres associant les outputs ports  dans un porcess crée des problèmes en simulation.
    -- Eviter d'utiliser directement des outputs ports sans des process 
    
-   FPA_MCLK <= fpa_mclk_i;      -- le not permet un alignement des edges de MCLK et PCLK
-   FPA_PCLK <= fpa_pclk_i;             -- pour le suphawk, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo 
-   FPA_FAST_MCLK <= fpa_fast_mclk_i;    -- horloge ultrarapide pour le fast windowing
-   FPA_FAST_PCLK <= fpa_fast_pclk_i;    -- horloge ultrarapide pour le fast windowing
+   outG: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
+      begin
+      RAW_FPA_CLK.MCLK(kk).clk <= fpa_mclk_i(kk);
+      RAW_FPA_CLK.PCLK(kk).clk <= fpa_mclk_i(kk);  -- pour le superHawk, pclk et mclk sont identiques
+   end generate;
+   
    QUAD_CLK_ENABLED <= quad_clk_enabled_i;
    
    -----------------------------------------------------
@@ -181,30 +178,36 @@ begin
       ARESET => ARESET, SRESET => sreset_adc_clk_source, CLK => ADC_CLK_SOURCE);
    
    --------------------------------------------------------
-   -- Slow Master_clock statique
+   -- Master_clock group
    -------------------------------------------------------- 
-   U2A: Clk_Divider
-   Generic map(
-      Factor=> DEFINE_FPA_MCLK_RATE_FACTOR
-      )
-   Port map( 
-      Clock   => MCLK_SOURCE,    
-      Reset   => sreset_mclk_source, 
-      Clk_div => fpa_mclk_i   -- attention, c'est en realité un clock enable. 
-      );
+   MGen: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
+      begin
+      UMkk: Clk_Divider
+      Generic map(
+         Factor=> DEFINE_FPA_MCLK_INFO.MCLK_RATE_FACTOR(kk)
+         )
+      Port map( 
+         Clock   => MCLK_SOURCE,    
+         Reset   => sreset_mclk_source, 
+         Clk_div => fpa_mclk_i(kk)   -- attention, c'est en realité un clock enable. 
+         );
+   end generate;
    
    --------------------------------------------------------
-   -- Slow Pixel_clock statique
+   -- pixel_clock group
    -------------------------------------------------------- 
-   U2B: Clk_Divider
-   Generic map(
-      Factor=> DEFINE_FPA_PCLK_RATE_FACTOR
-      )
-   Port map( 
-      Clock   => MCLK_SOURCE,     
-      Reset   => sreset_mclk_source, 
-      Clk_div => fpa_pclk_i   -- attention, c'est en realité un clock enable. 
-      );
+   PGen: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
+      begin
+      UPkk: Clk_Divider
+      Generic map(
+         Factor=> DEFINE_FPA_MCLK_INFO.PCLK_RATE_FACTOR(kk)
+         )
+      Port map( 
+         Clock   => MCLK_SOURCE,    
+         Reset   => sreset_mclk_source, 
+         Clk_div => fpa_pclk_i(kk)   -- attention, c'est en realité un clock enable. 
+         );
+   end generate;   
    
    --------------------------------------------------------
    -- quad_clock_copy 
@@ -227,7 +230,7 @@ begin
             idle_cnt <= (others => '0');
             fifo_wr_en <= '0';
             quad_clk_enabled_i <= '0';
-            fpa_mclk_last <= fpa_mclk_i;
+            fpa_mclk_last <= fpa_mclk_i(0);
             fpa_mclk_re <= '0';
             
          else
@@ -236,8 +239,8 @@ begin
             quad_clk_copy_i <= quad_clk_from_mclk_source;
             
             -- mclk_re
-            fpa_mclk_last <= fpa_mclk_i;
-            fpa_mclk_re <= not fpa_mclk_last and fpa_mclk_i;
+            fpa_mclk_last <= fpa_mclk_i(0);
+            fpa_mclk_re <= not fpa_mclk_last and fpa_mclk_i(0);
             
             case sync_fsm is
                
@@ -263,41 +266,12 @@ begin
                
                when others =>
                
-            end case;
+            end case;             
             
-            
-         end if;
-         
+         end if;         
          
       end if;
    end process;   
-   
-   --   --------------------------------------------------------
-   --   --  Fast Master_clock statique
-   --   -------------------------------------------------------- 
-   --   U2C: Clk_Divider
-   --   Generic map(
-   --      Factor=> DEFINE_FPA_FAST_MCLK_RATE_FACTOR
-   --      )
-   --   Port map( 
-   --      Clock   => MCLK_SOURCE,     
-   --      Reset   => sreset_mclk_source, 
-   --      Clk_div => fpa_fast_mclk_i   -- attention, c'est en realité un clock enable. 
-   --      );
-   
-   --   --------------------------------------------------------
-   --   --  Fast Pixel_clock statique
-   --   -------------------------------------------------------- 
-   --   U2D: Clk_Divider
-   --   Generic map(
-   --      Factor=> DEFINE_FPA_FAST_PCLK_RATE_FACTOR
-   --      )
-   --   Port map( 
-   --      Clock   => MCLK_SOURCE,     
-   --      Reset   => sreset_mclk_source, 
-   --      Clk_div => fpa_fast_pclk_i   -- attention, c'est en realité un clock enable. 
-   --      );
-   
    
    --------------------------------------------------------
    --  dephasage grossier des quad clock
@@ -307,12 +281,6 @@ begin
       D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL),
       Q => adc_clk_pipe_sel,
       CLK => MCLK_SOURCE); 
-   
-   --   sync_divsty1 : double_sync_vector  
-   --   port map(
-   --      D => std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY1),
-   --      Q => adc_clk_pipe_sel_divsty1,
-   --      CLK => MCLK_SOURCE);
    
    U4C : process(MCLK_SOURCE)
    begin
@@ -358,7 +326,7 @@ begin
          --   quad_clk_iob(kk) <= fifo_dout(0); 
          -- end loop;
          quad_clk_iob(4) <= fifo_dout(0);  -- horloge quad4 = quad3
-         quad_clk_iob(3) <= fifo_dout(0);  -- horloge quad3 = quad1 + dephasage
+         quad_clk_iob(3) <= fifo_dout(0);  -- horloge quad3 = quad1
          quad_clk_iob(2) <= fifo_dout(0);  -- horloge quad2 = quad1
          quad_clk_iob(1) <= fifo_dout(0);  -- horloge quad1        
       end if;
