@@ -282,7 +282,7 @@ void File_Manager_SM()
 
                               if (status == IRC_SUCCESS)
                               {
-                                 if (uffs_space_free(FM_UFFS_MOUNT_POINT) > FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
+                                 if (uffs_space_free(FM_UFFS_MOUNT_POINT) >= FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
                                  {
                                     gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                     F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
