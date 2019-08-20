@@ -22,6 +22,7 @@
 #include "flashSettings.h"
 #include "fpa_intf.h"
 #include "CalibImageCorrectionFile.h"
+#include "FlashDynamicValues.h"
 #include "hder_inserter.h"
 #include "IRCamHeader.h"
 #include "CalibBlockFile.h"
@@ -3223,6 +3224,14 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       if (uffs_close(fd) == -1)
       {
          ACT_ERR("File close failed.");
+         error = true;
+         break;
+      }
+
+      if (uffs_space_free(FM_UFFS_MOUNT_POINT) < FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE)
+      {
+         ACT_ERR("Filesystem full.");
+         uffs_remove(longFileName);
          error = true;
          break;
       }
