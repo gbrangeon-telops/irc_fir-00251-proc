@@ -69,7 +69,7 @@ package FPA_define is
    -- position 0     -> clk ayant le clk rate nominal 
    -- position 7 à 1 -> les autres horloges
    -- mettre 0 comme valeur aux positions non utilisées 
-   constant DEFINE_FPA_MCLK_INFO                  : fpa_clk_info_type := gen_fpa_mclk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ, DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ, DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ));
+   constant DEFINE_FPA_CLK_INFO                   : fpa_clk_info_type := gen_fpa_clk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ, DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ, DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ));
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 

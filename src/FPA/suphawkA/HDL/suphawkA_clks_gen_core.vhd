@@ -184,7 +184,7 @@ begin
       begin
       UMkk: Clk_Divider
       Generic map(
-         Factor=> DEFINE_FPA_MCLK_INFO.MCLK_RATE_FACTOR(kk)
+         Factor=> DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(kk)
          )
       Port map( 
          Clock   => MCLK_SOURCE,    
@@ -200,7 +200,7 @@ begin
       begin
       UPkk: Clk_Divider
       Generic map(
-         Factor=> DEFINE_FPA_MCLK_INFO.PCLK_RATE_FACTOR(kk)
+         Factor=> DEFINE_FPA_CLK_INFO.PCLK_RATE_FACTOR(kk)
          )
       Port map( 
          Clock   => MCLK_SOURCE,    
