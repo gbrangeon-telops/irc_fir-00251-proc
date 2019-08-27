@@ -32,7 +32,7 @@ entity suphawkA_clks_gen_core is
       -- horloge standard
       RAW_FPA_CLK            : out fpa_clk_info_type;
       
-      QUAD_CLK_COPY          : out std_logic;  -- quad_clk utilisé par le readout_ctrler
+      ADC_REF_CLK            : out std_logic;  -- quad_clk utilisé par le readout_ctrler
       QUAD_CLK_ENABLED       : out std_logic;
       
       QUAD1_CLK              : out std_logic;
@@ -121,7 +121,7 @@ architecture rtl of suphawkA_clks_gen_core is
    signal quad_clk_from_mclk_source      : std_logic := '0';
    --signal quad_clk_from_adc_clk_source   : std_logic := '0';
    signal quad_clk_enabled_i             : std_logic := '0';
-   signal quad_clk_copy_i                : std_logic := '0';
+   signal adc_ref_clk_i                : std_logic := '0';
    signal quad_clk_pipe                  : std_logic_vector(63 downto 0);
    --signal quad_clk_sel                   : std_logic;
    signal cfg_in_progress_i              : std_logic;
@@ -153,7 +153,7 @@ begin
    QUAD2_CLK <= quad_clk_iob(2);
    QUAD3_CLK <= quad_clk_iob(3);
    QUAD4_CLK <= quad_clk_iob(4);
-   QUAD_CLK_COPY <= quad_clk_copy_i;
+   ADC_REF_CLK <= adc_ref_clk_i;
    
    -- ENO: 07 juin 2017: le passage à travers les registres associant les outputs ports  dans un porcess crée des problèmes en simulation.
    -- Eviter d'utiliser directement des outputs ports sans des process 
@@ -193,21 +193,21 @@ begin
          );
    end generate;
    
-   --------------------------------------------------------
-   -- pixel_clock group
-   -------------------------------------------------------- 
-   PGen: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
-      begin
-      UPkk: Clk_Divider
-      Generic map(
-         Factor=> DEFINE_FPA_CLK_INFO.PCLK_RATE_FACTOR(kk)
-         )
-      Port map( 
-         Clock   => MCLK_SOURCE,    
-         Reset   => sreset_mclk_source, 
-         Clk_div => fpa_pclk_i(kk)   -- attention, c'est en realité un clock enable. 
-         );
-   end generate;   
+--   --------------------------------------------------------
+--   -- pixel_clock group
+--   -------------------------------------------------------- 
+--   PGen: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
+--      begin
+--      UPkk: Clk_Divider
+--      Generic map(
+--         Factor=> DEFINE_FPA_CLK_INFO.PCLK_RATE_FACTOR(kk)
+--         )
+--      Port map( 
+--         Clock   => MCLK_SOURCE,    
+--         Reset   => sreset_mclk_source, 
+--         Clk_div => fpa_pclk_i(kk)   -- attention, c'est en realité un clock enable. 
+--         );
+--   end generate;   
    
    --------------------------------------------------------
    -- quad_clock_copy 
@@ -236,7 +236,7 @@ begin
          else
             
             -- quad_clk_copy
-            quad_clk_copy_i <= quad_clk_from_mclk_source;
+            adc_ref_clk_i <= quad_clk_from_mclk_source;
             
             -- mclk_re
             fpa_mclk_last <= fpa_mclk_i(0);
