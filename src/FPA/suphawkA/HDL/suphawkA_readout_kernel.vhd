@@ -32,7 +32,7 @@ entity suphawkA_readout_kernel is
       
       -- fifos des horloges traitées et contrôlées      
       CLK_FIFO_EMPTY    : in std_logic;
-      CLK_FIFO_EN       : out std_logic;
+      CLK_FIFO_RD       : out std_logic;
       CLK_FIFO_DATA     : in fpa_clk_base_info_type;
       CLK_FIFO_DVAL     : in std_logic;
       
@@ -43,7 +43,7 @@ entity suphawkA_readout_kernel is
       ELCORR_REF_VALID  : in std_logic_vector(1 downto 0);      
       
       AREA_FIFO_EMPTY   : in std_logic;
-      AREA_FIFO_EN      : out std_logic;
+      AREA_FIFO_RD      : out std_logic;
       AREA_FIFO_DATA    : in area_info_type;
       AREA_FIFO_DVAL    : in std_logic;
       
@@ -128,8 +128,8 @@ begin
    ---------------------------------------------------
    --  outputs maps
    -------------------------------------------------- 
-   CLK_FIFO_EN       <= fifo_rd_i;
-   AREA_FIFO_EN      <= fifo_rd_i;
+   CLK_FIFO_RD       <= fifo_rd_i;
+   AREA_FIFO_RD      <= fifo_rd_i;
    START_GEN         <= start_gen_i;
    RST_GEN           <= rst_gen_i;
    

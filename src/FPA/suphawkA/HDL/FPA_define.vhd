@@ -144,7 +144,7 @@ package FPA_define is
    --constant DEFINE_FPA_PROG_END_PAUSE_FACTOR      : integer := DEFINE_FPA_PROG_END_PAUSE_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR;
    constant DEFINE_ELCORR_REF_DAC_SETUP_FACTOR    : integer := integer(real(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ)*real(DEFINE_ELCORR_REF_DAC_SETUP_US/1000));
    
-  
+   
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------ 
@@ -192,7 +192,7 @@ package FPA_define is
       -- diag window                     
       diag                                : window_cfg_type; 
       
-      -- window, gain                    
+      -- misc param
       xstart                              : unsigned(10 downto 0); 
       ystart                              : unsigned(10 downto 0);
       xsize                               : unsigned(10 downto 0);
@@ -201,14 +201,12 @@ package FPA_define is
       invert                              : std_logic; 
       revert                              : std_logic;   
       cbit_en                             : std_logic;
-      dig_code                            : unsigned(15 downto 0);
-      
+      dig_code                            : unsigned(15 downto 0);      
       colstart                            : unsigned(8 downto 0); 
       colstop                             : unsigned(8 downto 0);
       rowstart                            : unsigned(10 downto 0);
       rowstop                             : unsigned(10 downto 0);      
-      active_subwindow                    : std_logic;            
-      
+      active_subwindow                    : std_logic;     
       prv_dac_nominal_value               : unsigned(13 downto 0);     -- valeur de PRV en mot DAC
       
       -- delai 
@@ -218,23 +216,10 @@ package FPA_define is
       adc_quad2_en                        : std_logic; -- à '1' si les données du quad2 doivent êre prises en compte par la chaine
       chn_diversity_en                    : std_logic; -- dit quoi faire avec les données du quad2. '1' si ces données sont des repliques du quad1 => chn diversity. '0' si ces données doient être considérées comme des des données de taps 5, 6, 7, 8 d'un détrecteur 8 taps.
       
-      -- pour les referentiels de trame et de lignes
-      readout_pclk_cnt_max                : unsigned(18 downto 0);    --  pour suphawk: readout_pclk_cnt_max = taille en pclk de l'image incluant les pauses, les lignes non valides etc.. = (XSIZE/TAP_NUM + LOVH)* (YSIZE + FOVH) + 1  (un dernier PCLK pur finir)
-      line_period_pclk                    : unsigned(7 downto 0);     --  pour suphawk: nombre de pclk =  (XSIZE/TAP_NUM + LOVH)
-      
-      -- ligne active = ligne excluant les portions/pixels non valides     
-      active_line_start_num               : unsigned(3 downto 0);     --  pour suphawk: le numero de la premiere ligne active. Il vaut 1
-      active_line_end_num                 : unsigned(10 downto 0);    --  pour suphawk: le numero de la derniere ligne active. Il vaut Ysize
-      
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch                 : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
       
-      -- delimiteurs de trames et de lignes
-      sof_posf_pclk                       : unsigned(8 downto 0);     --  pour suphawk: 
-      eof_posf_pclk                       : unsigned(18 downto 0);    --  pour suphawk:
-      sol_posl_pclk                       : unsigned(7 downto 0);     --  pour suphawk:
-      eol_posl_pclk                       : unsigned(7 downto 0);     --  pour suphawk:
-      eol_posl_pclk_p1                    : unsigned(7 downto 0);     --  pour suphawk: eol_posl_pclk + 1
+      
       
       -- calculs pour diversité des canaux
       hgood_samp_sum_num                  : unsigned(3 downto 0);    --  nombre d'échantillons horizontaux par pixel et par canal 
@@ -297,14 +282,13 @@ package FPA_define is
       cfg_num                             : unsigned(7 downto 0);
       
       -- additional exposure time offset from driver C
-      additional_fpa_int_time_offset      : signed(31 downto 0); 
+      additional_fpa_int_time_offset      : signed(31 downto 0);
+      spare3                              : std_logic_vector(1 downto 0);
       
-      
-       raw_area                            : area_cfg_type; -- zone brute 
+      raw_area                            : area_cfg_type; -- zone brute 
       user_area                           : area_cfg_type; -- zone AOI demandée par l'usager
-      stretch_area                        : area_cfg_type; -- zone d'étirement accolée à user_area, dans laquelle aucune accélération d'horloge n'est acceptée. ce, pour éviter des problèmes de perturbation dus au pipe de ligne du isc0804A
-
-      
+      clk_area_b                          : area_cfg_type; -- zone d'horloge d'ID = 1. clk_area_a est reservé implicitement pour ID 0 
+      clk_area_c                          : area_cfg_type; -- zone d'horloge d'ID = 2. retenir que ID 0 est par defaut 
    end record; 
    
    ----------------------------------
