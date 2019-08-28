@@ -38,26 +38,25 @@ entity suphawkA_readout_kernel is
       
       -- info adc
       ADC_REF_CLK       : in std_logic;
-      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0); -- ENO : 05 oct 2017: divers flags à synchroniser sur donnnées ADC même si READOUT_INFO est absent. Utile par exemple pour calculer offset dynamique
       
       -- elcorr ref
       ELCORR_REF_VALID  : in std_logic_vector(1 downto 0);      
       
+      AREA_FIFO_EMPTY   : in std_logic;
+      AREA_FIFO_EN      : out std_logic;
+      AREA_FIFO_DATA    : in area_info_type;
+      AREA_FIFO_DVAL    : in std_logic;
+      
       -- outputs
-      FPA_MCLK          : out std_logic;
       FPA_FDEM          : out std_logic;
       FPA_RD_MCLK       : out std_logic;         
       READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0);
-      READOUT_AOI_FVAL  : out std_logic;         
+      READOUT_AOI_FVAL  : out std_logic;
+      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0); -- ENO : 05 oct 2017: divers flags à synchroniser sur donnnées ADC même si READOUT_INFO est absent. Utile par exemple pour calculer offset dynamique
       
-      AREA_FIFO_EMPTY   : in std_logic;
-      AREA_FIFO_EN      : out std_logic;
-      AREA_FIFO_DATA    : in window_info_type;
-      AREA_FIFO_DVAL    : in std_logic;
-      
-      RST_AREA_GEN      : out std_logic;
-      RAW_WINDOW        : out raw_area_type
+      ERR               : out std_logic;
+      RST_GEN           : out std_logic;
+      RAW_AREA          : out area_type
       
       );
 end suphawkA_readout_kernel;
@@ -83,82 +82,131 @@ architecture rtl of suphawkA_readout_kernel is
          Clk_div   : out std_logic);
    end component;
    
-   type ctrl_fsm_type is (idle, chck_lsydel_speed_st, speedup_lsydel_clk_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, mclk_pause_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, default_clk_st, RST_AREA_GEN_st);   
+   type ctrl_fsm_type is (idle, wait_flows_st, sync_flow_st, adc_sync_st, rst_gen_st);   
    type adc_time_stamp_type is
    record
       naoi_stop  : std_logic;
       naoi_start : std_logic;  
       aoi_sof    : std_logic;  
       aoi_sol    : std_logic;     
-   end record;  
+   end record;
+   
+   signal ctrl_fsm               : ctrl_fsm_type;
+   signal sreset                 : std_logic;
+   signal fdem_i                 : std_logic;
+   signal fpa_rd_mclk_i          : std_logic;
+   signal fpa_rd_mclk_last       : std_logic;
+   signal fifo_rd_i              : std_logic;
+   signal data_sync_err          : std_logic;
+   signal line_pclk_cnt_last     : unsigned(AREA_FIFO_DATA.RAW.LINE_PCLK_CNT'LENGTH-1 downto 0);
+   signal raw_area_i             : area_type;
+   signal adc_ref_fe_pipe        : std_logic_vector(63 downto 0) := (others => '0');
+   signal err_i                  : std_logic;
+   signal start_gen_i            : std_logic;
+   signal readout_info_valid     : std_logic;
+   signal fpa_int_i              : std_logic;
+   signal fpa_int_last           : std_logic;
+   signal rst_gen_i              : std_logic;
+   signal rst_cnt_i              : unsigned(7 downto 0);
+   
+   signal elcorr_ref_start_pipe  : std_logic_vector(15 downto 0);
+   signal elcorr_ref_end_pipe    : std_logic_vector(15 downto 0);
+   signal elcorr_ref_end_i       : std_logic;
+   signal elcorr_ref_start_i     : std_logic;
+   signal readout_info_i         : readout_info_type;
+   signal eof_pulse              : std_logic;
+   signal eof_pulse_last         : std_logic;
+   signal elcorr_ref_fval_i      : std_logic;
+   signal elcorr_ref_valid_i     : std_logic_vector(1 downto 0);
+   signal adc_ref_clk_i          : std_logic;
+   signal adc_ref_clk_last       : std_logic;
+   signal adc_sync_flag_i        : std_logic_vector(ADC_SYNC_FLAG'LENGTH-1 downto 0);
+   signal raw_area_rd_end        : std_logic;
    
 begin    
    
-   ----------------  ----------------------------------
+   ---------------------------------------------------
+   --  outputs maps
+   -------------------------------------------------- 
+   CLK_FIFO_EN       <= fifo_rd_i;
+   AREA_FIFO_EN      <= fifo_rd_i;
+   START_GEN         <= start_gen_i;
+   RST_GEN           <= rst_gen_i;
+   
+   FPA_FDEM          <= fdem_i;
+   FPA_RD_MCLK       <= fpa_rd_mclk_i;
+   READOUT_INFO      <= readout_info_i;
+   ADC_SYNC_FLAG     <= adc_sync_flag_i;
+   READOUT_AOI_FVAL  <= readout_info_i.aoi.fval;
+   RAW_AREA          <= raw_area_i;
+   
+   
+   
+   ---------------------------------------------------
    --  lecture des fifos et synchronisation
    --------------------------------------------------
    U3: process(CLK)
-      variable inc : unsigned(1 downto 0);
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then            
             ctrl_fsm <= idle;
             fdem_i <= '0';
-            
+            fifo_rd_i <= '0';
+            readout_info_valid <= '0';
+            rst_gen_i <= '1';
          else  
             
             fpa_int_i <= FPA_INT;            
-            fpa_int_last <= fpa_int_i;
+            fpa_int_last <= fpa_int_i; 
             
             -----------------------------------------------------------------
-            -- activation des flows de synchronisation                       
+            -- activation des flows area et clk                      
             -----------------------------------------------------------------
             case ctrl_fsm is
                
                when idle => 
                   fdem_i <= '0';
+                  fifo_rd_i <= '0';
+                  readout_info_valid <= '0';
+                  rst_gen_i <= '0';
+                  start_gen_i <= fpa_int_i;
+                  rst_cnt_i <= (others => '0'); 
                   if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
                      ctrl_fsm <= wait_flows_st;
                   end if; 
                
                when wait_flows_st =>
+                  start_gen_i <= '0';
                   if AREA_FIFO_DVAL = '1' and CLK_FIFO_DVAL = '1' then
-                     ctrl_fsm <= sync_flow_st;  
+                     ctrl_fsm <= sync_flow_st;
+                     readout_info_valid <= '1';
                   end if;
                
                when sync_flow_st =>  -- ne pas changer l'ordre des étapes 1 et 2 car en cas de simulatneité la condition 2 doit prevaloir 
-                  fifo_rd_i <= '1';
-                  if AREA_FIFO_DATA.RAW.IMMINENT_CLK_CHANGE = '1' then      -- voir changement d'horloge
+                  fifo_rd_i <= '1';                  
+                  
+                  if AREA_FIFO_DATA.RAW.IMMINENT_AOI = '1' then      -- voir changement d'horloge
                      if adc_ref_fe_pipe(0) = '0' then                                     -- ETAPE 1 : si on n'est pas synchro déjà alors on s'en va se synchroniser sur adc_ref_fe_pipe(x)
                         fifo_rd_i <= '0';
                         ctrl_fsm  <= adc_sync_st;
                      else                                                                                -- sinon, c'est qu'on est déjà synchro avec adc_ref_fe_pipe(x), alors on ne fait rien de particulier
                      end if;
-                     if AREA_FIFO_DATA.USER.DVAL = '1'  then                              -- ETAPE 2 : ne faire aucune resynchronisation dans la zone AOI même si un changement d'horloge est imminent puisque les changements dans la zone AOI se font en multiple entier de la periode nominale.
-                        ctrl_fsm <= sync_flow_st;
-                     end if;  
                   end if;
                   
-                  if AREA_FIFO_DATA.RAW.RD_END = '1' and CLK_FIFO_DATA.EOF = '1' then     -- ETAPE 3 : détecter la fin d'une trame
-                     ctrl_fsm <= default_clk_st;
+                  if AREA_FIFO_DATA.RAW.RD_END = '1' and CLK_FIFO_DATA.EOF = '1' then     -- ETAPE 2 : détecter la fin d'une trame
+                     ctrl_fsm <= rst_gen_st;                          -- pour un suphawk, pas besoin d'envoyer de clock apres le reset des puits
                      fifo_rd_i <= '0';
+                     readout_info_valid <= '0';
                   end if;
                
                when adc_sync_st =>      
-                  if adc_ref_fe_pipe(0) = '1' then   -- la valeur de x de adc_ref_fe_pipe (x) vient de la simulation en vue de reduire les delais
+                  if adc_ref_fe_pipe(0) = '1' then                    -- la valeur de x de adc_ref_fe_pipe (x) vient de la simulation en vue de reduire les delais
                      ctrl_fsm <= sync_flow_st;
                      fifo_rd_i <= '1'; 
                   end if;
                
-               when default_clk_st =>
-                  fifo_rd_i <= '0';                       -- tous les fifos sont arrêtés
-                  if SLOW_MCLK_RAW = '0' and slow_mclk_raw_last = '1' then -- on s'assure qu'il n y a pas de pulse "tronqué" 
-                     slow_mclk_raw_en_i <= '1';
-                     ctrl_fsm <= rst_gen_st;
-                  end if;
-               
                when rst_gen_st =>    --                  
-                  rst_gen <= '1';                          -- le upstream subit un reset de 16 CLK
+                  rst_gen_i <= '1';                                      -- le upstream subit un reset de 16 CLK
                   rst_cnt_i <= rst_cnt_i + 1;
                   if rst_cnt_i(4) = '1' then
                      ctrl_fsm <= idle;
@@ -171,7 +219,7 @@ begin
             --------------------------------------------------------------
             -- misc
             --------------------------------------------------------------           
-            err_i <= '0';  -- erreur qui ne doit jamais arriver
+            err_i <= data_sync_err;  -- erreur qui ne doit jamais arriver
             
          end if;
       end if;
@@ -184,16 +232,24 @@ begin
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
-            elcorr_ref_fval_i <= '0';
             elcorr_ref_start_pipe <= (others => '0');
             elcorr_ref_end_pipe <= (others => '0');
             elcorr_ref_start_i <= '0';
+            elcorr_ref_fval_i <= '0';
             elcorr_ref_end_i <= '0';
-            
-            -- pragma translate_off                
-            readout_info_i.aoi.samp_pulse <= '0';
+            readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
             readout_info_i.naoi.samp_pulse <= '0';
+            readout_info_i.naoi.start <= '0';
+            readout_info_i.naoi.stop <= '0';
+            fpa_int_i <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;
+            eof_pulse <= '0';
+            eof_pulse_last <= '0';
+            elcorr_ref_valid_i <= (others => '0');
+            raw_area_rd_end <= '0';
+            
+            -- pragma translate_off                
             adc_ref_clk_last <= '0';          
             adc_ref_clk_i <= '0';
             line_pclk_cnt_last <= (others => '0');
@@ -204,100 +260,84 @@ begin
          else 
             
             -- pragma translate_off 
-            raw_window_i <= AREA_FIFO_DATA.RAW;
+            raw_area_i <= AREA_FIFO_DATA.RAW;
             -- pragma translate_on
             
             line_pclk_cnt_last <= AREA_FIFO_DATA.RAW.LINE_PCLK_CNT;
             if AREA_FIFO_DATA.RAW.LINE_PCLK_CNT /= line_pclk_cnt_last then
-               data_sync_err <= (slow_clk_fifo_rd_i and not slow_pclk_sof) or (fifo_rd_i and not fast_pclk_sof);
+               data_sync_err <= (fifo_rd_i and not CLK_FIFO_DATA.SOF);  -- SuperHawk: les changements de LINE_PCLK_CNT se font toujours sur le SOF d'un MCLK 
             end if;
             
             -- Clocks 
-            fpa_mclk_i <= (slow_mclk and slow_clk_fifo_rd_i) or (fast_mclk and fifo_rd_i) or (SLOW_MCLK_RAW and slow_mclk_raw_en_i) or (FAST_MCLK_RAW and fast_mclk_raw_en_i) or (fast_lsydel_clk and fast_lsydel_clk_en_i); 
-             
-            fpa_mclk_last <= fpa_mclk_i;
-            
-            if fpa_int_i = '1' then 
-               imminent_well_rst_i <= '0';
-            else
-               if AREA_FIFO_DATA.RAW.EOF = '1' and window_fifo_rd_i = '1' then 
-                  imminent_well_rst_i <= '1';
-               end if;
-            end if;
-            
-            -- LSYNC
-            last_lsync_pipe(C_LSYNC_PIPE_LEN-1 downto 0) <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2 downto 0) & (AREA_FIFO_DATA.RAW.LSYNC and window_fifo_rd_i and imminent_well_rst_i); 
-            last_lsync_i <= last_lsync_pipe(C_LSYNC_PIPE_LEN-2);
-            
-            fpa_lsync_i <= (AREA_FIFO_DATA.RAW.LSYNC and window_fifo_rd_i and not imminent_well_rst_i) or last_lsync_i;         
-            
-            -- 
-            read_end_last <= readout_info_i.aoi.read_end;
+            fpa_rd_mclk_i <=  CLK_FIFO_DATA.CLK and fifo_rd_i;            
+            fpa_rd_mclk_last <= fpa_rd_mclk_i;
             
             -- elcorr_ref_start_i dure 1 PCLK             
-            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not read_end_last and readout_info_i.aoi.read_end); 
-            if unsigned(elcorr_ref_start_pipe) /= 0 then
-               elcorr_ref_start_i <= '1';
+            elcorr_ref_start_i <= readout_info_i.aoi.read_end;
+            if readout_info_i.aoi.read_end = '1' then 
                elcorr_ref_fval_i  <= '1'; 
-            else
-               elcorr_ref_start_i <= '0';
             end if;
             
             -- elcorr_ref_end_i dure 1 PCLK
-            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
-            if unsigned(elcorr_ref_end_pipe) /= 0 then
-               elcorr_ref_end_i <= '1';
-            else
-               elcorr_ref_end_i  <= '0';
-               if elcorr_ref_end_i = '1' then 
-                  elcorr_ref_fval_i <= '0';
-               end if;
+            elcorr_ref_end_i <= raw_area_rd_end;
+            if elcorr_ref_end_i = '1' and raw_area_rd_end = '0' then 
+               elcorr_ref_fval_i <= '0';
             end if;
             
+            -- elcorr calculé uniquement avec les données de la ligne de reset
+            if elcorr_ref_start_i = '1' then
+               elcorr_ref_valid_i <= ELCORR_REF_VALID;
+            elsif raw_area_rd_end = '1' then
+               elcorr_ref_valid_i <= (others => '0');
+            end if;
+            
+            
+            raw_area_rd_end <= AREA_FIFO_DATA.RAW.RD_END and fifo_rd_i;
+            
+            -- aoi
+            readout_info_i.aoi.sof           <= AREA_FIFO_DATA.USER.SOF and fifo_rd_i;
+            readout_info_i.aoi.eof           <= AREA_FIFO_DATA.USER.EOF and fifo_rd_i;
+            readout_info_i.aoi.sol           <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
+            readout_info_i.aoi.eol           <= AREA_FIFO_DATA.USER.EOL and fifo_rd_i;
+            readout_info_i.aoi.fval          <= AREA_FIFO_DATA.USER.FVAL and readout_info_valid;                -- pas de fifo_rd_i  sur fval sinon pb.
+            readout_info_i.aoi.lval          <= AREA_FIFO_DATA.USER.LVAL and fifo_rd_i;
+            readout_info_i.aoi.dval          <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
+            readout_info_i.aoi.read_end      <= AREA_FIFO_DATA.USER.RD_END and fifo_rd_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
+            readout_info_i.aoi.samp_pulse    <= adc_ref_fe_pipe(0) and AREA_FIFO_DATA.USER.FVAL and readout_info_valid;
+                        
+            -- naoi
+            readout_info_i.naoi.ref_valid(1) <= elcorr_ref_valid_i(1) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
+            readout_info_i.naoi.ref_valid(0) <= elcorr_ref_valid_i(0) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)            
+            readout_info_i.naoi.start        <= elcorr_ref_start_i and DEFINE_GENERATE_ELCORR_CHAIN;         -- start du naoi correspond au debut de la ligne de reset pour un superhawk
+            readout_info_i.naoi.stop         <= elcorr_ref_end_i and DEFINE_GENERATE_ELCORR_CHAIN;           -- end du naoi correspond à la fin de la ligne de reset pour un superhawk
+            readout_info_i.naoi.dval         <= elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            readout_info_i.naoi.samp_pulse   <= adc_ref_fe_pipe(0) and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
+            
+            readout_info_i.samp_pulse         <= adc_ref_fe_pipe(0);             
+            
             -- samp_pulse_i 
-            adc_ref_clk_i <= QUAD_CLK_COPY;
+            adc_ref_clk_i <= ADC_REF_CLK;
             adc_ref_clk_last <= adc_ref_clk_i;
             adc_ref_fe_pipe(0) <= adc_ref_clk_last and not adc_ref_clk_i;
             adc_ref_fe_pipe(15 downto 1) <= adc_ref_fe_pipe(14 downto 0);
-            
-            -- definition de read_end à la fin de RAW.FVAL et non USER.FVAL
-            raw_fval_i    <= AREA_FIFO_DATA.RAW.FVAL;
-            raw_fval_last <= raw_fval_i;         
-            
-            -- READOUT_INFO
-            -- aoi
-            readout_info_i.aoi.sof           <= AREA_FIFO_DATA.USER.SOF and window_fifo_rd_i;
-            readout_info_i.aoi.eof           <= AREA_FIFO_DATA.USER.EOF and window_fifo_rd_i;
-            readout_info_i.aoi.sol           <= AREA_FIFO_DATA.USER.SOL and window_fifo_rd_i;
-            readout_info_i.aoi.eol           <= AREA_FIFO_DATA.USER.EOL and window_fifo_rd_i;
-            readout_info_i.aoi.fval          <= AREA_FIFO_DATA.USER.FVAL and readout_info_valid;                -- pas de window_fifo_rd_i  sur fval sinon pb.
-            readout_info_i.aoi.lval          <= AREA_FIFO_DATA.USER.LVAL and window_fifo_rd_i;
-            readout_info_i.aoi.dval          <= AREA_FIFO_DATA.USER.DVAL and window_fifo_rd_i;
-            readout_info_i.aoi.read_end      <= raw_fval_last and not raw_fval_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
-            readout_info_i.aoi.samp_pulse    <= adc_ref_fe_pipe(0) and AREA_FIFO_DATA.USER.FVAL and readout_info_valid;
-            
-            -- naoi (contenu aussi dans readout_info)
-            readout_info_i.naoi.ref_valid(1) <= REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
-            readout_info_i.naoi.ref_valid(0) <= REF_VALID(0);        -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)
-            readout_info_i.naoi.start        <= elcorr_ref_start_i;  -- start global de zone naoi
-            readout_info_i.naoi.stop         <= elcorr_ref_end_i;    -- end global de zone naoi
-            readout_info_i.naoi.dval         <= elcorr_ref_fval_i;
-            readout_info_i.naoi.samp_pulse   <= adc_ref_fe_pipe(0) and elcorr_ref_fval_i;
-            
-            readout_info_i.samp_pulse        <= adc_ref_fe_pipe(0);
-            
-            -- ADC_FLAGS
-            -- flags temps reel enovoyés vers le synchronisateur d'adc pour time stamping des données ADC
-            adc_time_stamp.naoi_start        <= elcorr_ref_start_i;
-            adc_time_stamp.naoi_stop         <= elcorr_ref_end_i;
-            adc_time_stamp.aoi_sof           <= AREA_FIFO_DATA.USER.SOF and window_fifo_rd_i;
-            adc_time_stamp.aoi_sol           <= AREA_FIFO_DATA.USER.SOL and window_fifo_rd_i;
-            
-            -- well rst
-            well_rst_start_i <= last_lsync_i;
+            --            
             
          end if; 
       end if;
-   end process;    
+   end process;
+   
+   --------------------------------------------------
+   -- definition sync_flag
+   --------------------------------------------------
+   Ud: process(CLK)
+   begin
+      if rising_edge(CLK) then 
+         adc_sync_flag_i(15 downto 4)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(3)  <= readout_info_i.naoi.stop and readout_info_i.naoi.dval;
+         adc_sync_flag_i(2)  <= readout_info_i.naoi.start and readout_info_i.naoi.dval;
+         adc_sync_flag_i(1)  <= readout_info_i.aoi.sof and readout_info_i.aoi.dval;                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+         adc_sync_flag_i(0)  <= readout_info_i.aoi.sol and readout_info_i.aoi.dval;               -- line_flag (doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   
+      end if;
+   end process;
    
 end rtl;
