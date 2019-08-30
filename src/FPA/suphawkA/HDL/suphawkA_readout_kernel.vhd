@@ -140,7 +140,15 @@ begin
    READOUT_AOI_FVAL  <= readout_info_i.aoi.fval;
    RAW_AREA          <= raw_area_i;
    
-   
+   --------------------------------------------------
+   -- synchro reset 
+   --------------------------------------------------   
+   U1: sync_reset
+   port map(
+      ARESET => ARESET,
+      CLK    => CLK,
+      SRESET => sreset
+      ); 
    
    ---------------------------------------------------
    --  lecture des fifos et synchronisation
@@ -154,6 +162,7 @@ begin
             fifo_rd_i <= '0';
             readout_info_valid <= '0';
             rst_gen_i <= '1';
+            start_gen_i <= '0';
          else  
             
             fpa_int_i <= FPA_INT;            
@@ -169,7 +178,8 @@ begin
                   fifo_rd_i <= '0';
                   readout_info_valid <= '0';
                   rst_gen_i <= '0';
-                  start_gen_i <= fpa_int_i;
+                  -- start_gen_i <= fpa_int_i;
+                  start_gen_i <= not start_gen_i;                  
                   rst_cnt_i <= (others => '0'); 
                   if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
                      ctrl_fsm <= wait_flows_st;
@@ -304,7 +314,7 @@ begin
             readout_info_i.aoi.dval          <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
             readout_info_i.aoi.read_end      <= AREA_FIFO_DATA.USER.RD_END and fifo_rd_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
             readout_info_i.aoi.samp_pulse    <= adc_ref_fe_pipe(0) and AREA_FIFO_DATA.USER.FVAL and readout_info_valid;
-                        
+            
             -- naoi
             readout_info_i.naoi.ref_valid(1) <= elcorr_ref_valid_i(1) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
             readout_info_i.naoi.ref_valid(0) <= elcorr_ref_valid_i(0) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)            
