@@ -409,14 +409,16 @@ IRC_Status_t Actualization_SM()
 
          if (gStartActualization && cameraReady && calibrationInfo.isValid)
          {
-            long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
             uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+            long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+            long spaceAct = (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
+                             CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
+                             numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE)
+                            * gFM_icuBlocks.count;
 
             gStartActualization = 0;
             savedCalibPosixTime = 0;
-            if (spaceFree < CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
-                            CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
-                            numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE)
+            if (spaceFree < spaceAct)
             {
                ACT_ERR("Filesystem has not enough space for actualization process.");
                error = true;
