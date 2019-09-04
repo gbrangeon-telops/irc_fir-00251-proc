@@ -31,6 +31,7 @@ entity suphawkA_clks_gen_core is
       
       -- horloge standard
       RAW_FPA_CLK            : out fpa_clk_info_type;
+      FPA_MCLK               : out std_logic;
       
       ADC_REF_CLK            : out std_logic;  -- quad_clk utilisé par le readout_ctrler
       QUAD_CLK_ENABLED       : out std_logic;
@@ -149,11 +150,12 @@ architecture rtl of suphawkA_clks_gen_core is
    
 begin
    
-   QUAD1_CLK <= quad_clk_iob(1);
-   QUAD2_CLK <= quad_clk_iob(2);
-   QUAD3_CLK <= quad_clk_iob(3);
-   QUAD4_CLK <= quad_clk_iob(4);
+   QUAD1_CLK   <= quad_clk_iob(1);
+   QUAD2_CLK   <= quad_clk_iob(2);
+   QUAD3_CLK   <= quad_clk_iob(3);
+   QUAD4_CLK   <= quad_clk_iob(4);
    ADC_REF_CLK <= adc_ref_clk_i;
+   FPA_MCLK    <= fpa_mclk_i(0);    -- horloge à frequence nominale occupe toujours l'indice 0
    
    -- ENO: 07 juin 2017: le passage à travers les registres associant les outputs ports  dans un porcess crée des problèmes en simulation.
    -- Eviter d'utiliser directement des outputs ports sans des process 

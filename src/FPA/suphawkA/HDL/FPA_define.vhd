@@ -288,7 +288,12 @@ package FPA_define is
       raw_area                            : area_cfg_type; -- zone brute 
       user_area                           : area_cfg_type; -- zone AOI demandée par l'usager
       clk_area_b                          : area_cfg_type; -- zone d'horloge d'ID = 1. clk_area_a est reservé implicitement pour ID 0 
-      clk_area_c                          : area_cfg_type; -- zone d'horloge d'ID = 2. retenir que ID 0 est par defaut 
+      clk_area_c                          : area_cfg_type; -- zone d'horloge d'ID = 2. retenir que ID 0 est par defaut
+      
+      roic_rst_time_mclk                  : unsigned(9 downto 0);  -- duree du reset du puits du superhawk en mclk
+      sideband_cancel_en                  : std_logic;
+      sideband_cancel_pos                 : unsigned(3 downto 0);
+      
    end record; 
    
    ----------------------------------

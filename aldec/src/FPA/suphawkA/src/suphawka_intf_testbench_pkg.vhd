@@ -138,8 +138,11 @@ package body suphawkA_intf_testbench_pkg is
       variable clk_area_c_eol_posl_pclk            : unsigned(31 downto 0);
       variable clk_area_c_spare                    : unsigned(31 downto 0);
       variable clk_area_c_clk_id                   : unsigned(31 downto 0);
+      variable roic_rst_time_mclk                  : unsigned(31 downto 0);
+      variable sideband_cancel_en                  : unsigned(31 downto 0);
+      variable sideband_cancel_pos                 : unsigned(31 downto 0);
       
-      variable y                                   : unsigned(98*32-1 downto 0);
+      variable y                                   : unsigned(101*32-1 downto 0);
       
    begin
       comn_fpa_diag_mode             :=  (others => diag_mode);                                               
@@ -177,7 +180,7 @@ package body suphawkA_intf_testbench_pkg is
       end if;
       raw_area_sof_posf_pclk         := to_unsigned(PAUSE_SIZE + 1, 32);      
       if user_ysize > 1 then 
-         raw_area_eof_posf_pclk      := to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE) - 1, 32);
+         raw_area_eof_posf_pclk      := to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE), 32);
       end if;      
       raw_area_sol_posl_pclk         := to_unsigned(PAUSE_SIZE + 1, 32);
       raw_area_eol_posl_pclk         := raw_area_line_period_pclk;
@@ -281,7 +284,7 @@ package body suphawkA_intf_testbench_pkg is
       clk_area_b_clk_id             := to_unsigned(1, 32);
       
       -- clk_area_c
-      clk_area_c_line_start_num     := user_area_line_start_num;   
+      clk_area_c_line_start_num     := (others => '0');   
       clk_area_c_line_end_num       := user_area_line_end_num;
       clk_area_c_sol_posl_pclk      := to_unsigned(1, 32);     
       clk_area_c_eol_posl_pclk      := to_unsigned(3, 32);
@@ -289,7 +292,12 @@ package body suphawkA_intf_testbench_pkg is
       
       raw_area_lsync_start_posl_pclk := to_unsigned(1, 32);
       raw_area_lsync_end_posl_pclk   := to_unsigned(1, 32);
-      raw_area_lsync_num            := raw_area_line_end_num;
+      raw_area_lsync_num             := raw_area_line_end_num;
+      
+      roic_rst_time_mclk             := to_unsigned(10, 32);
+      
+      sideband_cancel_en             := to_unsigned(1, 32);
+      sideband_cancel_pos            := to_unsigned(0, 32);
       
       -- cfg usager
       y :=  comn_fpa_diag_mode              
@@ -389,8 +397,10 @@ package body suphawkA_intf_testbench_pkg is
       & clk_area_c_sol_posl_pclk          
       & clk_area_c_eol_posl_pclk          
       & clk_area_c_spare                  
-      & clk_area_c_clk_id;  
-      
+      & clk_area_c_clk_id
+      & roic_rst_time_mclk
+      & sideband_cancel_en  
+      & sideband_cancel_pos;
       return y;
    end to_intf_cfg;
    

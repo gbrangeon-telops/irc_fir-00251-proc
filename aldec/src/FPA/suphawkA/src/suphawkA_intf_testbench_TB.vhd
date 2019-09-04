@@ -168,7 +168,7 @@ architecture TB_ARCHITECTURE of suphawkA_intf_testbench_tb is
    signal user_ysize4 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(98*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(101*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector4              : unsigned(user_cfg_vector1'length-1 downto 0);
@@ -334,7 +334,7 @@ begin
       end loop;
       
       
-      for ii in 0 to 98-1 loop 
+      for ii in 0 to 101-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -351,7 +351,7 @@ begin
       
       wait for 100 ms;
       
-      for ii in 0 to 98-1 loop 
+      for ii in 0 to 101-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;

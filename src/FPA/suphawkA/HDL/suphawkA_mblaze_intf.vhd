@@ -339,8 +339,14 @@ begin
                   when X"178" =>    user_cfg_i.clk_area_c.sol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_c.sol_posl_pclk'length-1 downto 0));                                
                   when X"17C" =>    user_cfg_i.clk_area_c.eol_posl_pclk                <= unsigned(data_i(user_cfg_i.clk_area_c.eol_posl_pclk'length-1 downto 0));
                   when X"180" =>    user_cfg_i.clk_area_c.spare                        <= unsigned(data_i(user_cfg_i.clk_area_c.spare'length-1 downto 0)); 
-                  when X"184" =>    user_cfg_i.clk_area_c.clk_id                       <= unsigned(data_i(user_cfg_i.clk_area_b.clk_id'length-1 downto 0)); user_cfg_in_progress <= '0';
-                     
+                  when X"184" =>    user_cfg_i.clk_area_c.clk_id                       <= unsigned(data_i(user_cfg_i.clk_area_b.clk_id'length-1 downto 0));
+                  
+                  -- others
+                  when X"188" =>    user_cfg_i.roic_rst_time_mclk                      <= unsigned(data_i(user_cfg_i.roic_rst_time_mclk'length-1 downto 0));
+                  when X"18C" =>    user_cfg_i.sideband_cancel_en                      <= data_i(0); 
+                  when X"190" =>    user_cfg_i.sideband_cancel_pos                     <= unsigned(data_i(user_cfg_i.sideband_cancel_pos'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  
+                  
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
