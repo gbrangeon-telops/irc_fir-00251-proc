@@ -47,6 +47,7 @@ package FPA_define is
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;       
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '1';
+   constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait pas que la correctioon de l'offset mais aussi du gain
    constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.
    -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';

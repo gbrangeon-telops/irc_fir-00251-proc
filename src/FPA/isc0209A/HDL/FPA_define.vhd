@@ -55,6 +55,7 @@ package FPA_define is
    constant DEFINE_GENERATE_HPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.   
    constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '0';      -- pour le isc0209, on ne fait aucune correction électronique
+   constant DEFINE_GENERATE_ELCORR_GAIN               : std_logic := '0';      -- on ne fait aucune correction de gain
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 

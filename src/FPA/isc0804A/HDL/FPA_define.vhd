@@ -49,6 +49,7 @@ package FPA_define is
    constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '1';
+   constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait pas que la correctioon de l'offset mais aussi du gain
    -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- n'a aucune importance pour un 16 taps
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
    
@@ -62,7 +63,7 @@ package FPA_define is
    constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real      := 2.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 3.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 
    --
    constant DEFINE_FPA_FAST_LSYDEL_CLK_RATE_KHZ   : real      := 2.666*DEFINE_FPA_MCLK_RATE_KHZ;
-      
+   
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;           -- pour le isc0804A, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant DEFINE_XSIZE_MAX                      : integer   := 640;        -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 512;        -- dimension en Y maximale  
