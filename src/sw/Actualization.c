@@ -681,11 +681,11 @@ IRC_Status_t Actualization_SM()
 
          ACT_INF("Configuring camera for block index %d", blockIdx);
 
-            // Prepare acquisition -> full width
-            GC_SetWidth(gcRegsData.SensorWidth);
-            GC_SetHeight(gcRegsData.SensorHeight);
-            GC_SetOffsetX(0);
-            GC_SetOffsetY(0);
+         // Prepare acquisition -> full width
+         GC_SetWidth(gcRegsData.SensorWidth);
+         GC_SetHeight(gcRegsData.SensorHeight);
+         GC_SetOffsetX(0);
+         GC_SetOffsetY(0);
 
          if (gActDebugOptions.useDebugData)
             GC_SetCalibrationMode(CM_Raw0);
@@ -696,13 +696,13 @@ IRC_Status_t Actualization_SM()
          GC_SetExposureAuto(EA_Off);
          GC_SetEHDRINumberOfExposures(1);
 
-            if (usingICU)
-            {
+         if (usingICU)
+         {
             // set the starting point for the exposure time (from ICU block)
             gcRegsData.ExposureTime = (float)blockInfo->ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
             GC_SetAcquisitionFrameRate(MAX(ACT_DEFAULT_FPS, (float)blockInfo->AcquisitionFrameRate/1000.0F));
-            }
-            else
+         }
+         else
          {
             if (actSyncFW)
             {
@@ -729,7 +729,7 @@ IRC_Status_t Actualization_SM()
 
          }
 
-            StartTimer(&act_timer, ACT_WAIT_FOR_ACQ_TIMEOUT/1000);
+         StartTimer(&act_timer, ACT_WAIT_FOR_ACQ_TIMEOUT/1000);
          setActState(&state, ACT_StartAECAcquisition);
          break;
 
@@ -789,7 +789,7 @@ IRC_Status_t Actualization_SM()
             if (actSyncFW)
                StartTimer(&act_timer, flashSettings.FWNumberOfFilters * ACT_WAIT_FOR_AEC_TIMEOUT/1000);
             else
-            StartTimer(&act_timer, 4*ACT_WAIT_FOR_AEC_TIMEOUT/1000);
+               StartTimer(&act_timer, 4*ACT_WAIT_FOR_AEC_TIMEOUT/1000);
 
             setActState(&state, ACT_StopAECAcquisition);
          }
@@ -847,7 +847,7 @@ IRC_Status_t Actualization_SM()
             }
             else
             {
-            StartTimer(&act_timer, 1000);
+               StartTimer(&act_timer, 1000);
                setActState(&state, ACT_StartAcquisition);
             }
          }
@@ -969,10 +969,10 @@ IRC_Status_t Actualization_SM()
 
          ACT_INF("Computing data for block index %d", blockIdx);
 
-               GETTIME(&tic_AvgDuration);
-               tic_RT_Duration = 0;
+         GETTIME(&tic_AvgDuration);
+         tic_RT_Duration = 0;
 
-               if (gActDebugOptions.useDebugData)
+         if (gActDebugOptions.useDebugData)
             coaddData.NCoadd = 16;
          else
             coaddData.NCoadd = gActualizationParams.deltaBetaNCoadd;
@@ -981,12 +981,12 @@ IRC_Status_t Actualization_SM()
 
          allocateDeltaBetaForCurrentBlock(&calibrationInfo, blockIdx, usingICU, &currentDeltaBeta);
          if (currentDeltaBeta == NULL)
-               {
+         {
             ACT_ERR("No active calibration block found.");
             GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
             error = true;
             break;
-               }
+         }
 
          currentDeltaBeta->info.internalLensTemperature = C_TO_K(DeviceTemperatureAry[DTS_InternalLens]);
          if (actSyncFW)
@@ -1001,10 +1001,10 @@ IRC_Status_t Actualization_SM()
 
          // Move sequence start to the first image corresponding to the block index
          if (findImageForBlock(blockIdx, &sequenceOffset, 2 * frameSize, gcRegsData.MemoryBufferSequenceSize - numExtraImages) == false)
-               {
+         {
             ACT_ERR("No images found for block index %d", blockIdx);
             error = true;
-               }
+         }
 
          dataOffset = 0; // position of the pointer for running average [bytes]
          pixelOffset = imageDataOffset; // offset of the current computing block within a frame [pixels]
@@ -1020,7 +1020,7 @@ IRC_Status_t Actualization_SM()
             test_data.FcalBB_test = (float)expectedSum / (currentDeltaBeta->info.exposureTime * blockInfo->NUCMultFactor * coaddData.NCoadd) - test_data.deltaBeta_test / test_data.alpha_test;
             test_data.TcalBB_test = applyLUT(lutAddr, &blockInfo->lutRQData[0], sqrtf(test_data.FcalBB_test));
             validateBuffers(mu_buffer, frameSize, seq_buffer, gcRegsData.MemoryBufferSequenceSize);
-            }
+         }
 
          setActState(&state, ACT_ComputeAveragedImage);
          break;
@@ -1070,7 +1070,7 @@ IRC_Status_t Actualization_SM()
          if (actSyncFW)
             dataOffset += 2 * frameSize * flashSettings.FWNumberOfFilters;
          else
-         dataOffset += 2 * frameSize;
+            dataOffset += 2 * frameSize;
 
          coaddData.numProcessedPixels += ACT_MAX_PIX_DATA_TO_PROCESS;
          if (coaddData.numProcessedPixels % numPixels == 0)
@@ -1108,45 +1108,45 @@ IRC_Status_t Actualization_SM()
       break;
 
       case ACT_ComputeBlackBodyFCal:
+      {
+         uint32_t i50; // index of the median element
+         float medianFCal; // estimated from image (median of image)
+         float Tmin, Tmax; // range of the LUTRQ
+         uint32_t lutAddr;
+
+         if (usingICU)
          {
-            uint32_t i50; // index of the median element
-            float medianFCal; // estimated from image (median of image)
-            float Tmin, Tmax; // range of the LUTRQ
-            uint32_t lutAddr;
+            T_BB = C_TO_K(ICUTemp);
+            ACT_INF( "T_BB (ICU) is " _PCF(3) " K", _FFMT(T_BB,3));
+         }
+         else
+         {
+            T_BB = C_TO_K(gcRegsData.ExternalBlackBodyTemperature);
+            ACT_INF( "T_BB (ext BB) is " _PCF(3) " K", _FFMT(T_BB,3));
+         }
 
-            if (usingICU)
-            {
-               T_BB = C_TO_K(ICUTemp);
-               ACT_INF( "T_BB (ICU) is " _PCF(3) " K", _FFMT(T_BB,3));
-            }
-            else
-            {
-               T_BB = C_TO_K(gcRegsData.ExternalBlackBodyTemperature);
-               ACT_INF( "T_BB (ext BB) is " _PCF(3) " K", _FFMT(T_BB,3));
-            }
+         if (gActDebugOptions.useDebugData)
+            T_BB = test_data.TcalBB_test;
 
-            if (gActDebugOptions.useDebugData)
-               T_BB = test_data.TcalBB_test;
+         currentDeltaBeta->info.referenceTemperature = T_BB; // [K]
 
-            currentDeltaBeta->info.referenceTemperature = T_BB; // [K]
-
-            // Compute FCal scale according to exposure time. We apply it to FCalBB to save on floating point operations
+         // Compute FCal scale according to exposure time. We apply it to FCalBB to save on floating point operations
          scaleFCal = currentDeltaBeta->info.exposureTime * blockInfo->NUCMultFactor * coaddData.NCoadd; // CR_WARNING exposure time is assumed to be in µs
 
-            // Compute sqrt(FCalBB)
-            // find the index of the LUT which has the ICU type
-            LUTRQInfo_t* lutInfo = selectLUT(blockInfo, RQT_RT);
+         // Compute sqrt(FCalBB)
+         // find the index of the LUT which has the ICU type
+         LUTRQInfo_t* lutInfo = selectLUT(blockInfo, RQT_RT);
          lutAddr = XPAR_RQC_LUT_AXI_BASEADDR + (blockIdx * RQC_LUT_PAGE_SIZE);
-            if (lutInfo == NULL)
-            {
-               ACT_ERR("Could not find a valid LUT RQT_RT in the %s block.", usingICU?"reference":"calibration");
-               GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
-               error = true;
-               break;
-            }
+         if (lutInfo == NULL)
+         {
+            ACT_ERR("Could not find a valid LUT RQT_RT in the %s block.", usingICU?"reference":"calibration");
+            GC_GenerateEventError(EECD_ImageCorrectionInvalidReferenceBlock);
+            error = true;
+            break;
+         }
 
-            Tmin = applyLUT(lutAddr, lutInfo, lutInfo->LUT_Xmin);
-            Tmax = applyLUT(lutAddr, lutInfo, lutInfo->LUT_Xmin+lutInfo->LUT_Xrange);
+         Tmin = applyLUT(lutAddr, lutInfo, lutInfo->LUT_Xmin);
+         Tmax = applyLUT(lutAddr, lutInfo, lutInfo->LUT_Xmin+lutInfo->LUT_Xrange);
 
          ACT_PRINTF( "Tmin = " _PCF(3) " K, Tmax = " _PCF(3) " K\n", _FFMT(Tmin,3), _FFMT(Tmax,3) );
 
@@ -1178,7 +1178,7 @@ IRC_Status_t Actualization_SM()
             FCalBB = medianFCal;
          }
          else
-            {
+         {
             FCalBB = applyReverseLUT(lutAddr, lutInfo, T_BB, gActDebugOptions.verbose); // is a sqrt
 
             // Compute FCalBB = sqrt(FCalBB)^ 2
@@ -1187,7 +1187,7 @@ IRC_Status_t Actualization_SM()
             ACT_INF( "Using FCal from T_BB");
 
             FCalBB *= scaleFCal;    // this saves a bunch of floating point operations later
-            }
+         }
 
          ACT_PRINTF( "FCal = " _PCF(4) "\n", _FFMT(FCalBB/scaleFCal,4));
          ACT_INF( "Computing FCal done (%dms)", (uint32_t) elapsed_time_us( tic_TotalDuration ) / 1000 );
@@ -1195,13 +1195,13 @@ IRC_Status_t Actualization_SM()
          // Compute Alpha LSB
          Alpha_LSB = exp2f( (float) blockInfo->pixelData.Alpha_Exp );
 
-            tic_RT_Duration = 0;
+         tic_RT_Duration = 0;
 
-            ctxtInit(&blockContext, 0, numPixels, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
+         ctxtInit(&blockContext, 0, numPixels, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
 
          setActState(&state, ACT_ComputeDeltaBeta);
-         }
-         break;
+      }
+      break;
 
       case ACT_ComputeDeltaBeta:
       {
@@ -1429,7 +1429,7 @@ IRC_Status_t Actualization_SM()
 
       // Invalidate only the current delta beta
       if (currentDeltaBeta != NULL)
-      currentDeltaBeta->valid = 0;
+         currentDeltaBeta->valid = 0;
 
       // Restore registers value
       ACT_restoreGCRegisters( &GCRegsBackup );
@@ -1528,7 +1528,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
          //ctxtInit(&blockContext, imageDataOffset, frameSize, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
 
-            sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR;
+         sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR;
 
          // if debug mode is ON, the first few images are used as buffers for intermediate results
          if (gActDebugOptions.clearBufferAfterCompletion == false)
@@ -1562,7 +1562,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
          StartTimer(&bpd_timer, 1000);
 
          // trouver le deltaBeta ICU
-            currentDeltaBeta = findMatchingDeltaBetaForBlock(&calibrationInfo, blockIdx);
+         currentDeltaBeta = findMatchingDeltaBetaForBlock(&calibrationInfo, blockIdx);
          if (currentDeltaBeta != NULL && currentDeltaBeta->valid)
          {
             ctxtInit(&blockContext, 0, numPixels, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
@@ -1651,7 +1651,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
             // prepare next processing context
             ctxtInit(&blockContext, imageDataOffset, frameSize, 100*ACT_MAX_PIX_DATA_TO_PROCESS);
 
-               ACT_INF( "BPD_UpdateBeta took " _PCF(2) " s", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
+            ACT_INF( "BPD_UpdateBeta took " _PCF(2) " s", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
 
             setBpdState(&state, BPD_StartAcquisition);
          }
@@ -1692,7 +1692,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
          numFramesToSkip = ceilf(5 * flashSettings.BPAECResponseTime/1000.0f * frameRate);
          sequenceOffset += numFramesToSkip * frameSize * 2;
 
-            if (gActDebugOptions.verbose)
+         if (gActDebugOptions.verbose)
          {
             ACT_INF( "BPD Frame rate : " _PCF(2) " Hz", _FFMT(frameRate, 2));
             ACT_INF( "BPD using %d frames for AEC transient", numFramesToSkip);
@@ -2059,10 +2059,10 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
          {
             gActBPMapAvailable = true;
 
-               ACT_INF( "bad pixel map duration (real-time) : " _PCF(2) " s", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
-               ACT_INF( "Bad pixel detection took (real-time) " _PCF(2) " us/px", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
-               ACT_INF( "Bad pixel detection took " _PCF(2) " s", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
-               ACT_INF( "number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOutliers);
+            ACT_INF( "bad pixel map duration (real-time) : " _PCF(2) " s", _FFMT((float)tic_RT_Duration / ((float)TIME_ONE_SECOND_US), 2) );
+            ACT_INF( "Bad pixel detection took (real-time) " _PCF(2) " us/px", _FFMT((float) (elapsed_time_us( tic_TotalDuration )) / ((float)frameSize * gActualizationParams.BPNumSamples), 2) );
+            ACT_INF( "Bad pixel detection took " _PCF(2) " s", _FFMT((float) (elapsed_time_us( tic_TotalDuration)) / ((float)TIME_ONE_SECOND_US), 2) );
+            ACT_INF( "number of bad pixels found : %d (%d noisy, %d flickers, %d outliers)", numberOfBadPixels, numberOfNoisy, numberOfFlickers, numberOfOutliers);
 
             if (gActDebugOptions.clearBufferAfterCompletion == false)
                setBpdState(&state, BPD_DebugState);
