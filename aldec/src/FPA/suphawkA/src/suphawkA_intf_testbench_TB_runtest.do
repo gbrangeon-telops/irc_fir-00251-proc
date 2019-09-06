@@ -123,7 +123,11 @@ asim -ses suphawkA_intf_testbench_TB
 #wave UUT/U1/U26/*  
 
 #-- raw area
---wave UUT/U1/U5/U5/U4/*
+-- wave UUT/U1/U5/U5/U4/* 
+-- wave UUT/U1/U5/U5/U7/*
+wave UUT/U1/U5/U5/U6/U1/*
+wave UUT/U1/U5/U5/U6/U7/*
+
 #
 #-- user area
 -- wave UUT/U1/U5/U5/U2/*
@@ -146,7 +150,7 @@ asim -ses suphawkA_intf_testbench_TB
 #wave UUT/U1/U5/U5/U7/*
 
 #readout kernel
-wave UUT/U1/U5/U5/U5/*
+ wave UUT/U1/U5/U5/U5/*
 
 -- intf_sequencer
 --wave UUT/U1/U2/*  
@@ -160,7 +164,7 @@ wave UUT/U1/U5/U5/U5/*
 
 --wave UUT/U14/U1/* 
 --wave UUT/U14/U11/*
---wave UUT/TRACE_ERR*
+--wave UUT/TRACE_ERR*                                                                                                    -
  
 -- flex brd_id_reader
 --wave UUT/U1/U21/U6/U2/*
@@ -203,4 +207,4 @@ wave UUT/U1/U5/U5/U5/*
 #wave UUT/U1/U17/*
 #wave UUT/U1/*
 
-run 200 ms
+run 11 ms
