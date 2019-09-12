@@ -291,16 +291,17 @@ void File_Manager_SM()
                                  uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
                                  long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
                                  uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
-                                 long tsdvLen, tsicLen;
+                                 long tsfsLen, tsdvLen, tsicLen;
 
-                                 /* Reserve space for a flash dynamic values file and
+                                 /* Reserve space for flash settings, flash dynamic values and
                                   * actualization files, rounded up to UFFS's block granularity.
                                   */
+                                 tsfsLen = ceil((double) FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE / blkSize) * blkSize;
                                  tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
                                  tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
                                                           CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
                                                           numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
-                                 if (spaceFree >= tsdvLen + tsicLen * gFM_icuBlocks.count)
+                                 if (spaceFree >= tsfsLen + tsdvLen + tsicLen * gFM_icuBlocks.count)
                                  {
                                     gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                     F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
