@@ -287,7 +287,7 @@ void File_Manager_SM()
 
                               if (status == IRC_SUCCESS)
                               {
-                                 long spaceFree = flash_space_free();
+                                 long spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
                                  uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
                                  long tsdvLen, tsicLen;
 
@@ -430,14 +430,14 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_USED_SPACE_REQ:
-                     spaceUsed = flash_space_used();
+                     spaceUsed = flash_space_used(FM_UFFS_MOUNT_POINT);
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_USED_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceUsed;
                      break;
 
                   case F1F2_CMD_FILE_FREE_SPACE_REQ:
-                     spaceFree = flash_space_free();
+                     spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_FREE_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceFree;
@@ -1518,11 +1518,11 @@ void FM_ClearFileDB()
 /**
  * Return NAND flash used space, corrected for reserved blocks
  **/
-long flash_space_used(void)
+long flash_space_used(const char *mount_point)
 {
    uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-   long spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
+   long spaceUsed = uffs_space_used(mount_point);
 
    /* Compensate for reserved blocks */
    spaceUsed += (dev->cfg.reserved_free_blocks-1) * blkSize;
@@ -1532,11 +1532,11 @@ long flash_space_used(void)
 /**
  * Return NAND flash free space, corrected for reserved blocks
  **/
-long flash_space_free(void)
+long flash_space_free(const char *mount_point)
 {
    uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-   long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+   long spaceFree = uffs_space_free(mount_point);
 
    /* Compensate for reserved blocks */
    spaceFree -= (dev->cfg.reserved_free_blocks-1) * blkSize;
