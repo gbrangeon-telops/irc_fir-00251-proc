@@ -294,14 +294,13 @@ void File_Manager_SM()
                                  long tsdvLen, tsicLen;
 
                                  /* Reserve space for a flash dynamic values file and
-                                  * one actualization file, rounded up to UFFS's
-                                  * block granularity.
+                                  * actualization files, rounded up to UFFS's block granularity.
                                   */
                                  tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
                                  tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
-                                        CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
-                                        numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
-                                 if (spaceFree >= tsdvLen + tsicLen)
+                                                          CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
+                                                          numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
+                                 if (spaceFree >= tsdvLen + tsicLen * gFM_icuBlocks.count)
                                  {
                                     gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                     F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
