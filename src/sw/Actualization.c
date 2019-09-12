@@ -246,6 +246,9 @@ static void setBqState(BQ_State_t* p_state, BQ_State_t next_state)
   */
 IRC_Status_t startActualization()
 {
+   uint32_t numDataToProcess;
+   long spaceFree, spaceAct;
+
    builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Pending;
 
    if ( TDCFlagsTst(ImageCorrectionIsImplementedMask) == 0 )
@@ -267,6 +270,19 @@ IRC_Status_t startActualization()
    {
       builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
       ACT_ERR("Could not perform image correction because there are recorded sequences in buffer memory.");
+      return IRC_FAILURE;
+   }
+
+   /* Check space availability for an actualization file */
+   numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+   spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+   spaceAct = CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
+              CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
+              numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE;
+   if (spaceFree < spaceAct)
+   {
+      builtInTests[BITID_ActualizationDataAcquisition].result = BITR_Failed;
+      ACT_ERR("Filesystem has not enough space for actualization process.");
       return IRC_FAILURE;
    }
 
@@ -409,22 +425,9 @@ IRC_Status_t Actualization_SM()
 
          if (gStartActualization && cameraReady && calibrationInfo.isValid)
          {
-            uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
-            long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
-            long spaceAct = (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
-                             CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
-                             numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE)
-                            * gFM_icuBlocks.count;
-
             gStartActualization = 0;
             savedCalibPosixTime = 0;
-            if (spaceFree < spaceAct)
-            {
-               ACT_ERR("Filesystem has not enough space for actualization process.");
-               error = true;
-            }
-            else
-               setActState(&state, ACT_Start);
+            setActState(&state, ACT_Start);
          }
       }
       break;
