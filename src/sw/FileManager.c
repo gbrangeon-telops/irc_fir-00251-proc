@@ -288,6 +288,8 @@ void File_Manager_SM()
                               if (status == IRC_SUCCESS)
                               {
                                  long spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
+                                 uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+                                 long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
                                  uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
                                  long tsdvLen, tsicLen;
 
