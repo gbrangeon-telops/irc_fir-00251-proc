@@ -92,6 +92,8 @@ uint8_t tmpFileDataBuffer[FM_TEMP_FILE_DATA_BUFFER_SIZE];
 void FM_ClearFileDB();
 int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
 static IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file);
+static long flash_space_used(void);
+static long flash_space_free(void);
 
 /**
  * Initializes the file manager.
@@ -287,9 +289,7 @@ void File_Manager_SM()
 
                               if (status == IRC_SUCCESS)
                               {
-                                 long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
-                                 uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
-                                 long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
+                                 long spaceFree = flash_space_free();
                                  uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
                                  long tsdvLen, tsicLen;
 
@@ -432,14 +432,14 @@ void File_Manager_SM()
                      break;
 
                   case F1F2_CMD_FILE_USED_SPACE_REQ:
-                     spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
+                     spaceUsed = flash_space_used();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_USED_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceUsed;
                      break;
 
                   case F1F2_CMD_FILE_FREE_SPACE_REQ:
-                     spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+                     spaceFree = flash_space_free();
                      F1F2_BuildResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                      fmResponse.f1f2.cmd = F1F2_CMD_FILE_FREE_SPACE_RSP;
                      fmResponse.f1f2.payload.fileSpace.space = spaceFree;
@@ -1515,4 +1515,32 @@ void FM_ClearFileDB()
 
    // Clear file database
    memset(gFM_fileDB, 0, sizeof(gFM_fileDB));
+}
+
+/**
+ * Return NAND flash used space, corrected for reserved blocks
+ **/
+static long flash_space_used(void)
+{
+   uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+   long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
+   long spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
+
+   /* Compensate for reserved blocks */
+   spaceUsed += (dev->cfg.reserved_free_blocks-1) * blkSize;
+   return spaceUsed;
+}
+
+/**
+ * Return NAND flash free space, corrected for reserved blocks
+ **/
+static long flash_space_free(void)
+{
+   uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+   long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
+   long spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+
+   /* Compensate for reserved blocks */
+   spaceFree -= (dev->cfg.reserved_free_blocks-1) * blkSize;
+   return spaceFree;
 }
