@@ -1147,8 +1147,8 @@ IRC_Status_t DebugTerminalParseLS(circByteBuffer_t *cbuf)
    if ((fileList == NULL) || (fileList == &gFM_files))
    {
       spaceTotal = uffs_space_total(FM_UFFS_MOUNT_POINT);
-      spaceUsed = uffs_space_used(FM_UFFS_MOUNT_POINT);
-      spaceFree = uffs_space_free(FM_UFFS_MOUNT_POINT);
+      spaceUsed = flash_space_used(FM_UFFS_MOUNT_POINT);
+      spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
 
       DT_PRINTF("Space in bytes: used = %d, free = %d, total = %d", spaceUsed, spaceFree, spaceTotal);
    }

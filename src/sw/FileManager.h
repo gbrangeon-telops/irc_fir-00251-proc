@@ -184,6 +184,8 @@ void FM_SortFileList(fileList_t *fileList);
 fileRecord_t *FM_FindFilePOSIXTimeInList(uint32_t posixTime, const fileList_t *fileList);
 fileRecord_t *FM_FindFileNameInList(const char *filename, const fileList_t *fileList);
 fileRecord_t *FM_GetFileRecord(uint32_t fileIndex);
+long flash_space_used(void);
+long flash_space_free(void);
 
 #endif // FILE_MANAGER_H
 

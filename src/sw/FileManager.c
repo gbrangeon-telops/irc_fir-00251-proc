@@ -92,8 +92,6 @@ uint8_t tmpFileDataBuffer[FM_TEMP_FILE_DATA_BUFFER_SIZE];
 void FM_ClearFileDB();
 int FM_filecmp(const fileRecord_t *file1, const fileRecord_t *file2, const fileOrder_t *keys, uint32_t keyCount);
 static IRC_Status_t FM_FillCollectionInfo(fileRecord_t *file);
-static long flash_space_used(void);
-static long flash_space_free(void);
 
 /**
  * Initializes the file manager.
@@ -1520,7 +1518,7 @@ void FM_ClearFileDB()
 /**
  * Return NAND flash used space, corrected for reserved blocks
  **/
-static long flash_space_used(void)
+long flash_space_used(void)
 {
    uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
@@ -1534,7 +1532,7 @@ static long flash_space_used(void)
 /**
  * Return NAND flash free space, corrected for reserved blocks
  **/
-static long flash_space_free(void)
+long flash_space_free(void)
 {
    uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
