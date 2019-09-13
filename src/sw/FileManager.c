@@ -313,7 +313,7 @@ void File_Manager_SM()
                                     tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
                                                              CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
                                                              numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
-                                    if (spaceFree >= tsfsLen + tsdvLen + tsicLen * gFM_icuBlocks.count)
+                                    if (spaceFree >= tsfsLen + tsdvLen + tsicLen * MAX(gFM_icuBlocks.count,1))
                                     {
                                        gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                        F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
