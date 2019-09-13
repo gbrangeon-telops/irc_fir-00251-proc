@@ -287,31 +287,44 @@ void File_Manager_SM()
 
                               if (status == IRC_SUCCESS)
                               {
-                                 long spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
-                                 uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
-                                 long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
-                                 uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
-                                 long tsfsLen, tsdvLen, tsicLen;
+                                 fileInfo_t fileInfo;
 
-                                 /* Reserve space for flash settings, flash dynamic values and
-                                  * actualization files, rounded up to UFFS's block granularity.
-                                  */
-                                 tsfsLen = ceil((double) FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE / blkSize) * blkSize;
-                                 tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
-                                 tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
-                                                          CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
-                                                          numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
-                                 if (spaceFree >= tsfsLen + tsdvLen + tsicLen * gFM_icuBlocks.count)
+                                 /* Check if file is a type with reserved space */
+                                 FI_GetFileInfo(gFM_files.item[fileIndex]->name, &fileInfo);
+                                 if (fileInfo.type == FT_TSFS || fileInfo.type == FT_TSDV ||
+                                     fileInfo.type == FT_TSIC)
                                  {
                                     gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
                                     F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
                                  }
                                  else
                                  {
-                                    FM_ERR("Filesystem full.");
-                                    F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
-                                    file = FM_GetFileRecord(fileIndex);
-                                    FM_RemoveFile(file);
+                                    long spaceFree = flash_space_free(FM_UFFS_MOUNT_POINT);
+                                    uffs_Device *dev = uffs_GetDeviceFromMountPoint(FM_UFFS_MOUNT_POINT);
+                                    long blkSize = dev->attr->page_data_size * dev->attr->pages_per_block;
+                                    uint32_t numDataToProcess = gcRegsData.SensorWidth * gcRegsData.SensorHeight;
+                                    long tsfsLen, tsdvLen, tsicLen;
+
+                                    /* Reserve space for flash settings, flash dynamic values and
+                                     * actualization files, rounded up to UFFS's block granularity.
+                                     */
+                                    tsfsLen = ceil((double) FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE / blkSize) * blkSize;
+                                    tsdvLen = ceil((double) FLASHDYNAMICVALUES_FLASHDYNAMICVALUESFILEHEADER_SIZE / blkSize) * blkSize;
+                                    tsicLen = ceil((double) (CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE +
+                                                             CALIBIMAGECORRECTION_IMAGECORRECTIONDATAHEADER_SIZE +
+                                                             numDataToProcess * CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_SIZE) / blkSize) * blkSize;
+                                    if (spaceFree >= tsfsLen + tsdvLen + tsicLen * gFM_icuBlocks.count)
+                                    {
+                                       gFM_files.item[fileIndex]->size = FM_GetFileSize(gFM_files.item[fileIndex]->name);
+                                       F1F2_BuildACKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                                    }
+                                    else
+                                    {
+                                       FM_ERR("Filesystem full.");
+                                       F1F2_BuildNAKResponse(&fmRequest.f1f2, &fmResponse.f1f2);
+                                       file = FM_GetFileRecord(fileIndex);
+                                       FM_RemoveFile(file);
+                                    }
                                  }
                               }
                               else
