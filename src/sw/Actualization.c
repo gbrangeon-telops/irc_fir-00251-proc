@@ -3920,7 +3920,7 @@ deltabeta_t* ACT_getSuitableDeltaBetaForBlock(const calibrationInfo_t* calibInfo
    return findSuitableDeltaBetaForBlock(calibInfo, blockIdx, false);
 }
 
-IRC_Status_t cleanBetaDistribution_SM(float* beta, int numPixels, statistics_t* stats, uint32_t* numBadPixels)
+static IRC_Status_t cleanBetaDistribution_SM(float* beta, int numPixels, statistics_t* stats, uint32_t* numBadPixels)
 {
    const int maxIter = 100;
    const float bp_code = infinityf(); // bad pixels are replaced by inf
