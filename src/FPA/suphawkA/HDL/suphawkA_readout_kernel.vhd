@@ -212,7 +212,7 @@ begin
                      else                                                                                -- sinon, c'est qu'on est déjà synchro avec adc_ref_fe_pipe(x), alors on ne fait rien de particulier
                      end if;
                   end if;                  
-                  if AREA_FIFO_DATA.RAW.RD_END = '1' and CLK_FIFO_DATA.EOF = '1' then     -- ETAPE 2 : détecter la fin d'une trame AOI
+                  if AREA_FIFO_DATA.USER.RD_END = '1' and CLK_FIFO_DATA.EOF = '1' then     -- ETAPE 2 : détecter la fin d'une trame AOI
                      ctrl_fsm <= raw_clk_sync_st1;                          -- on s'en va se synchroniser sur l'horloge libre pour debuter le reset des puits et des generateurs
                      fifo_rd_i <= '0';
                      readout_info_valid <= '0';
@@ -344,29 +344,33 @@ begin
             -- aoi
             readout_info_i.aoi.sof           <= AREA_FIFO_DATA.USER.SOF and fifo_rd_i;
             readout_info_i.aoi.eof           <= AREA_FIFO_DATA.USER.EOF and fifo_rd_i;
-            readout_info_i.aoi.sol           <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
             readout_info_i.aoi.eol           <= AREA_FIFO_DATA.USER.EOL and fifo_rd_i;
             readout_info_i.aoi.fval          <= AREA_FIFO_DATA.USER.FVAL and readout_info_valid;                -- pas de fifo_rd_i  sur fval sinon pb.
             readout_info_i.aoi.lval          <= AREA_FIFO_DATA.USER.LVAL and fifo_rd_i;
             if FPA_INTF_CFG.SIDEBAND_CANCEL_EN = '1' then
                readout_info_i.aoi.dval       <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i and sideband_cancel_pipe(to_integer(FPA_INTF_CFG.SIDEBAND_CANCEL_POS));
+               readout_info_i.aoi.sol        <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i and sideband_cancel_pipe(to_integer(FPA_INTF_CFG.SIDEBAND_CANCEL_POS));
             else
                readout_info_i.aoi.dval       <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
+               readout_info_i.aoi.sol        <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
             end if;
             readout_info_i.aoi.read_end      <= AREA_FIFO_DATA.USER.RD_END and fifo_rd_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
             readout_info_i.aoi.samp_pulse    <= adc_ref_fe_pipe(0) and AREA_FIFO_DATA.USER.FVAL and readout_info_valid;
             
             -- naoi
-            readout_info_i.naoi.ref_valid(1) <= elcorr_ref_valid_i(1) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
-            readout_info_i.naoi.ref_valid(0) <= elcorr_ref_valid_i(0) and DEFINE_GENERATE_ELCORR_CHAIN;         -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)            
-            readout_info_i.naoi.start        <= elcorr_ref_start_i and DEFINE_GENERATE_ELCORR_CHAIN;         -- start du naoi correspond au debut de la ligne de reset pour un superhawk
-            readout_info_i.naoi.stop         <= elcorr_ref_end_i and DEFINE_GENERATE_ELCORR_CHAIN;           -- end du naoi correspond à la fin de la ligne de reset pour un superhawk
-            readout_info_i.naoi.dval         <= elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.samp_pulse   <= adc_ref_fe_pipe(0) and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            
+            if DEFINE_GENERATE_ELCORR_CHAIN = '1' then
+               readout_info_i.naoi.ref_valid(1) <= elcorr_ref_valid_i(1);         -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
+               readout_info_i.naoi.ref_valid(0) <= elcorr_ref_valid_i(0);         -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)            
+               readout_info_i.naoi.start        <= elcorr_ref_start_i;         -- start du naoi correspond au debut de la ligne de reset pour un superhawk
+               readout_info_i.naoi.stop         <= elcorr_ref_end_i;           -- end du naoi correspond à la fin de la ligne de reset pour un superhawk
+               readout_info_i.naoi.dval         <= elcorr_ref_fval_i;
+               readout_info_i.naoi.samp_pulse   <= adc_ref_fe_pipe(0) and elcorr_ref_fval_i;
+            else
+               readout_info_i.naoi              <= ('0', '0', '0', '0', (others => '0'), (others => '0'));
+            end if;
             readout_info_i.samp_pulse        <= adc_ref_fe_pipe(0);             
             
-            -- samp_pulse_i 
+            -- adc_ref_clk pipe 
             adc_ref_clk_i <= ADC_REF_CLK;
             adc_ref_clk_last <= adc_ref_clk_i;
             adc_ref_fe_pipe(0) <= adc_ref_clk_last and not adc_ref_clk_i;
