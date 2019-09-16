@@ -866,6 +866,10 @@ void Calibration_SM()
             crc16 = CRC16(crc16, (void *) PROC_MEM_PIXEL_DATA_BASEADDR + (blockIndex * CM_CALIB_BLOCK_PIXEL_DATA_SIZE) + dataOffset, length);
 
             dataOffset += length;
+
+            if (dataOffset % (dataLength/4) == 0)  // print each 25%
+               CM_INF( "Loading pixel data...");
+
             if (dataOffset == dataLength)
             {
                // Test pixel data CRC-16

@@ -43,7 +43,7 @@
    #define ACT_TRC(fmt, ...)        DUMMY_PRINTF("Trace: " fmt "\n", ##__VA_ARGS__)
 #endif
 
-#define ACT_MAX_PIX_DATA_TO_PROCESS   128 // number of pixels to process in a single time shared pass. Must be even
+#define ACT_MAX_PIX_DATA_TO_PROCESS   8192 // number of pixels to process in a single time shared pass. Must be even
 #define ACT_MAX_DATABLOCK_TO_WRITE    256 // for file IO
 
 #define ACT_ICU_TEMP_TOL              (float)0.25f // [°C]
@@ -155,6 +155,12 @@ typedef enum {
    FWR_DATA,
    FWR_CLOSEFILE
 } ACT_Write_State_t;
+
+typedef enum {
+   CBD_IDLE = 0,
+   CBD_ITERATE,
+   CBD_FINALIZE_ITERATION
+} CBD_State_t;
 
 /**< a datatype for keeping a copy of the genicam register to get tampered with during this process */
 typedef struct {
