@@ -27,14 +27,8 @@ entity suphawkA_readout_kernel is
       
       FPA_INTF_CFG      : in fpa_intf_cfg_type; 
       
-      -- horloges brutes et libres
-      RAW_FPA_CLK       : in fpa_clk_info_type;
-      
-      -- fifos des horloges traitées et contrôlées      
-      CLK_FIFO_EMPTY    : in std_logic;
-      CLK_FIFO_RD       : out std_logic;
-      CLK_FIFO_DATA     : in fpa_clk_base_info_type;
-      CLK_FIFO_DVAL     : in std_logic;
+      -- horloge brute et non contrôlée
+      FPA_RST_MCLK      : in std_logic;
       
       -- info adc
       ADC_REF_CLK       : in std_logic;
@@ -73,16 +67,7 @@ architecture rtl of suphawkA_readout_kernel is
          CLK : in std_logic);
    end component;
    
-   component Clk_Divider is
-      Generic(	
-         Factor : integer := 2);		
-      Port ( 
-         Clock     : in std_logic;
-         Reset     : in std_logic;		
-         Clk_div   : out std_logic);
-   end component;
-   
-   type ctrl_fsm_type is (idle, wait_flows_st, sync_flow_st, adc_sync_st, raw_clk_sync_st1, raw_clk_sync_st2, roic_rst_st);   
+   type ctrl_fsm_type is (idle, fdem_gen_st, wait_flows_st, sync_flow_st, adc_sync_st, raw_clk_sync_st1, raw_clk_sync_st2, roic_rst_st);   
    type adc_time_stamp_type is
    record
       naoi_stop  : std_logic;
@@ -121,19 +106,21 @@ architecture rtl of suphawkA_readout_kernel is
    signal adc_ref_clk_i             : std_logic;
    signal adc_ref_clk_last          : std_logic;
    signal adc_sync_flag_i           : std_logic_vector(ADC_SYNC_FLAG'LENGTH-1 downto 0);
-   signal raw_mclk_i                : std_logic;
-   signal raw_mclk_last             : std_logic;
+   signal rst_mclk_i                : std_logic;
+   signal rst_mclk_last             : std_logic;
    signal roic_rst_in_progress      : std_logic;
    signal roic_rst_in_progress_last : std_logic;
    signal img_rd_end                : std_logic; 
    signal sideband_cancel_pipe      : std_logic_vector(7 downto 0);
+   signal fdem_cnt                  : integer range 0 to DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(DEFINE_FPA_LINEPAUSE_MCLK_ID);
+   signal half_fdem_cnt             : integer range 0 to DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(DEFINE_FPA_LINEPAUSE_MCLK_ID);
+   signal readout_start             : std_logic;
    
 begin    
    
    ---------------------------------------------------
    --  outputs maps
    -------------------------------------------------- 
-   CLK_FIFO_RD       <= fifo_rd_i;
    AREA_FIFO_RD      <= fifo_rd_i;
    START_GEN         <= start_gen_i;
    RST_GEN           <= rst_gen_i;
@@ -171,17 +158,34 @@ begin
             roic_rst_in_progress <= '0';
             fpa_int_i <= FPA_INT;            
             fpa_int_last <= fpa_int_i;
+            fdem_cnt <= 0;
+            readout_start <= '0';
             
          else  
             
+            -- fpa_int
             fpa_int_i <= FPA_INT;            
             fpa_int_last <= fpa_int_i;
             
-            raw_mclk_i <= RAW_FPA_CLK.MCLK(0).CLK;  -- horloge brute et non contrôlée
-            raw_mclk_last <= raw_mclk_i;
+            -- rst_clk
+            rst_mclk_i <= FPA_RST_MCLK;  -- horloge de reset
+            rst_mclk_last <= rst_mclk_i; 
+            
+            -- generation de fdem_i et readout_start
+            if fdem_cnt > 0 then
+               fdem_cnt <= fdem_cnt - 1;
+            end if;
+            
+            if fdem_cnt = half_fdem_cnt then
+               readout_start <= fdem_i;
+            end if;
+            if AREA_FIFO_DATA.RAW.LINE_PCLK_CNT = 2 and fifo_rd_i = '1' then  -- on eteint les signaux apres le premier coup d'horloge
+               fdem_i <= '0';
+               readout_start <= '0';
+            end if;
             
             -----------------------------------------------------------------
-            -- activation des flows area et clk                      
+            -- activation des area et clk flows                       
             -----------------------------------------------------------------
             case ctrl_fsm is
                
@@ -198,41 +202,49 @@ begin
                
                when wait_flows_st =>
                   start_gen_i <= '0';
-                  if AREA_FIFO_DVAL = '1' and CLK_FIFO_DVAL = '1' then
-                     ctrl_fsm <= sync_flow_st;
-                     readout_info_valid <= '1';
+                  if AREA_FIFO_DVAL = '1' and adc_ref_fe_pipe(0) = '1' then      -- on s'assure qu'on va generer les signaux de readout avant de lancer fdem
+                     ctrl_fsm <= fdem_gen_st;
+                     fdem_cnt <= DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(to_integer(AREA_FIFO_DATA.CLK_INFO.CLK_ID)); -- la 1ere donnée pointant son nez hors du fifo est forcement une de linepause
+                     fdem_i <= '1';
                   end if;
+                  half_fdem_cnt <= DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(to_integer(AREA_FIFO_DATA.CLK_INFO.CLK_ID))/2;
+               
+               when fdem_gen_st =>
+                  if readout_start = '1' then
+                     ctrl_fsm <= sync_flow_st;       -- on se synchronise toujours pour assurer la repetabilité frame to frame                   
+                     readout_info_valid <= '1';
+                  end if;                
                
                when sync_flow_st =>  -- ne pas changer l'ordre des étapes 1 et 2 car en cas de simulatneité la condition 2 doit prevaloir 
                   fifo_rd_i <= '1';           
                   if AREA_FIFO_DATA.RAW.IMMINENT_AOI = '1' then      -- entree en zone AOI toujours synchronisée sur ADC_REF_CLK
-                     if adc_ref_fe_pipe(0) = '0' then                                     -- ETAPE 1 : si on n'est pas synchro déjà alors on s'en va se synchroniser sur adc_ref_fe_pipe(x)
+                     if adc_ref_fe_pipe(8) = '0' then                                     -- ETAPE 1 : si on n'est pas synchro déjà alors on s'en va se synchroniser sur adc_ref_fe_pipe(x)
                         fifo_rd_i <= '0';
                         ctrl_fsm  <= adc_sync_st;
                      else                                                                                -- sinon, c'est qu'on est déjà synchro avec adc_ref_fe_pipe(x), alors on ne fait rien de particulier
                      end if;
                   end if;                  
-                  if AREA_FIFO_DATA.USER.RD_END = '1' and CLK_FIFO_DATA.EOF = '1' then     -- ETAPE 2 : détecter la fin d'une trame AOI
+                  if AREA_FIFO_DATA.USER.RD_END = '1' and AREA_FIFO_DATA.CLK_INFO.EOF = '1' then     -- ETAPE 2 : détecter la fin d'une trame AOI
                      ctrl_fsm <= raw_clk_sync_st1;                          -- on s'en va se synchroniser sur l'horloge libre pour debuter le reset des puits et des generateurs
                      fifo_rd_i <= '0';
                      readout_info_valid <= '0';
                   end if;
                
                when adc_sync_st =>      
-                  if adc_ref_fe_pipe(0) = '1' then                    -- la valeur de x de adc_ref_fe_pipe (x) vient de la simulation en vue de reduire les delais
+                  if adc_ref_fe_pipe(8) = '1' then                    -- la valeur de x de adc_ref_fe_pipe (x) vient de la simulation en vue de reduire les delais
                      ctrl_fsm <= sync_flow_st;
                      fifo_rd_i <= '1'; 
                   end if;
                
                when raw_clk_sync_st1 =>    --
-                  if raw_mclk_last = '1' and raw_mclk_i = '0' then                    
+                  if rst_mclk_last = '1' and rst_mclk_i = '0' then                    
                      roic_rst_in_progress <= '1';
                      rst_gen_i <= '1';
                      ctrl_fsm <= roic_rst_st;
                   end if;                  
                
                when roic_rst_st =>
-                  if raw_mclk_last = '0' and raw_mclk_i = '1' then  
+                  if rst_mclk_last = '0' and rst_mclk_i = '1' then  
                      rst_cnt_i <= rst_cnt_i + 1;
                   end if;
                   if rst_cnt_i(2) = '1' then   -- ainsi le upstream aurait subi un reset de 4 mclk en même temps que le reset des puits
@@ -243,7 +255,7 @@ begin
                   end if;
                
                when raw_clk_sync_st2 =>
-                  if raw_mclk_last = '1' and raw_mclk_i = '0' then                    
+                  if rst_mclk_last = '1' and rst_mclk_i = '0' then                    
                      roic_rst_in_progress <= '0';
                      ctrl_fsm <= idle;
                   end if; 
@@ -301,25 +313,20 @@ begin
             -- pragma translate_on
             
             -- misc signals--------------------------------------
-            if raw_mclk_last = '0' and raw_mclk_i = '1' then
+            if rst_mclk_last = '0' and rst_mclk_i = '1' then
                roic_rst_in_progress_last <= roic_rst_in_progress;
             end if;                                                              
             
-            img_rd_end <= roic_rst_in_progress_last and not roic_rst_in_progress;
-            
-            if adc_ref_clk_last = '0' and adc_ref_clk_i = '1' then
-               sideband_cancel_pipe(0) <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
-               sideband_cancel_pipe(7 downto 1) <= sideband_cancel_pipe(6 downto 0);
-            end if;            
+            img_rd_end <= roic_rst_in_progress_last and not roic_rst_in_progress;         
             
             line_pclk_cnt_last <= AREA_FIFO_DATA.RAW.LINE_PCLK_CNT;
             if AREA_FIFO_DATA.RAW.LINE_PCLK_CNT /= line_pclk_cnt_last then
-               data_sync_err <= (fifo_rd_i and not CLK_FIFO_DATA.SOF);  -- SuperHawk: les changements de LINE_PCLK_CNT se font toujours sur le SOF d'un MCLK 
+               data_sync_err <= (fifo_rd_i and not AREA_FIFO_DATA.CLK_INFO.SOF);  -- SuperHawk: les changements de LINE_PCLK_CNT se font toujours sur le SOF d'un MCLK 
             end if;
             ---------------------------------------------------
             
             -- Clocks 
-            fpa_rd_mclk_i <=  (CLK_FIFO_DATA.CLK and fifo_rd_i) or (roic_rst_in_progress and raw_mclk_i);            
+            fpa_rd_mclk_i <=  (AREA_FIFO_DATA.CLK_INFO.CLK and fifo_rd_i) or (roic_rst_in_progress and rst_mclk_i);            
             fpa_rd_mclk_last <= fpa_rd_mclk_i;
             
             -- elcorr_ref_start_i dure 1 PCLK             
@@ -347,12 +354,14 @@ begin
             readout_info_i.aoi.eol           <= AREA_FIFO_DATA.USER.EOL and fifo_rd_i;
             readout_info_i.aoi.fval          <= AREA_FIFO_DATA.USER.FVAL and readout_info_valid;                -- pas de fifo_rd_i  sur fval sinon pb.
             readout_info_i.aoi.lval          <= AREA_FIFO_DATA.USER.LVAL and fifo_rd_i;
+            readout_info_i.aoi.dval          <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
+            readout_info_i.aoi.sol           <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
             if FPA_INTF_CFG.SIDEBAND_CANCEL_EN = '1' then
-               readout_info_i.aoi.dval       <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i and sideband_cancel_pipe(to_integer(FPA_INTF_CFG.SIDEBAND_CANCEL_POS));
-               readout_info_i.aoi.sol        <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i and sideband_cancel_pipe(to_integer(FPA_INTF_CFG.SIDEBAND_CANCEL_POS));
-            else
-               readout_info_i.aoi.dval       <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
-               readout_info_i.aoi.sol        <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
+               if AREA_FIFO_DATA.USER.SOL = '1' and  AREA_FIFO_DATA.CLK_INFO.CLK = '1' then            -- on invalide la donnee se trouvant dans la zone de la bande laterale
+                  readout_info_i.aoi.dval       <= '0';
+                  readout_info_i.aoi.sol        <= '0';
+                  readout_info_i.aoi.lval       <= '0';
+               end if;                  
             end if;
             readout_info_i.aoi.read_end      <= AREA_FIFO_DATA.USER.RD_END and fifo_rd_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
             readout_info_i.aoi.samp_pulse    <= adc_ref_fe_pipe(0) and AREA_FIFO_DATA.USER.FVAL and readout_info_valid;

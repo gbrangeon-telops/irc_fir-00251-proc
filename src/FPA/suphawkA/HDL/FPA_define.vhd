@@ -59,8 +59,12 @@ package FPA_define is
    
    
    -- definition les differentes horloges MCLK
-   constant DEFINE_FPA_MCLK_NUM                   : integer   := 3;
    constant DEFINE_FPA_NOMINAL_MCLK_ID            : integer   := 0;        -- l'horloge nominale doit toujours occuper l'ID 0
+   constant DEFINE_FPA_SIDEBAND_MCLK_ID           : integer   := 1;        -- 
+   constant DEFINE_FPA_LINEPAUSE_MCLK_ID          : integer   := 2;        -- 
+   
+   constant DEFINE_FPA_MCLK_NUM                   : integer   := 3;
+   
    constant DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ      : integer   := 10_000;   -- vitesse nominale            
    constant DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ     : integer   :=  5_000;   -- DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ/2;  -- vitesse d'opération dans la zone de bande laterale
    constant DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ    : integer   := 16_666;   -- vitesse d'opération dans la zone interligne pour compenser le SIDEBAND_MCLK_RATE_KHZ
@@ -70,7 +74,7 @@ package FPA_define is
    -- position 0     -> clk ayant le clk rate nominal 
    -- position 7 à 1 -> les autres horloges
    -- mettre 0 comme valeur aux positions non utilisées 
-   constant DEFINE_FPA_CLK_INFO                   : fpa_clk_info_type := gen_fpa_clk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ, DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ, DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ));
+   constant DEFINE_FPA_CLK_INFO                   : fpa_clk_info_type := gen_fpa_clk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ, DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ, DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ)); -- mettre 0 comme valeur aux positions non utilisées 
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 

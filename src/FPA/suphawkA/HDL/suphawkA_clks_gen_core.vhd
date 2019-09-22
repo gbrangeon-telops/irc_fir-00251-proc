@@ -26,12 +26,10 @@ entity suphawkA_clks_gen_core is
       MCLK_SOURCE            : in std_logic;  -- ne s'interrompt pas lors de la reconfig      
       ADC_CLK_SOURCE         : in std_logic;  -- ne s'interrompt pas lors de la reconfig       
       
-      
       FPA_INTF_CFG           : in fpa_intf_cfg_type;      
       
       -- horloge standard
-      RAW_FPA_CLK            : out fpa_clk_info_type;
-      FPA_MCLK               : out std_logic;
+      FPA_INT_MCLK           : out std_logic;
       
       ADC_REF_CLK            : out std_logic;  -- quad_clk utilisé par le readout_ctrler
       QUAD_CLK_ENABLED       : out std_logic;
@@ -110,24 +108,15 @@ architecture rtl of suphawkA_clks_gen_core is
    
    signal sreset_mclk_source             : std_logic;
    signal sreset_adc_clk_source          : std_logic;
-   signal quad_clk_iob                   : std_logic_vector(4 downto 1);
-   
-   signal fpa_mclk_i                     : std_logic_vector(DEFINE_FPA_MCLK_NUM-1 downto 0) := (others => '0');
-   signal fpa_pclk_i                     : std_logic_vector(DEFINE_FPA_MCLK_NUM-1 downto 0) := (others => '0');
-   
-   signal fpa_fast_mclk_i                : std_logic := '0';
-   signal fpa_fast_pclk_i                : std_logic := '0';
-   
+   signal quad_clk_iob                   : std_logic_vector(4 downto 1);   
+   signal fpa_int_mclk_i                     : std_logic;  
    signal quad_clk_raw                   : std_logic := '0';
    signal quad_clk_from_mclk_source      : std_logic := '0';
-   --signal quad_clk_from_adc_clk_source   : std_logic := '0';
    signal quad_clk_enabled_i             : std_logic := '0';
-   signal adc_ref_clk_i                : std_logic := '0';
+   signal adc_ref_clk_i                  : std_logic := '0';
    signal quad_clk_pipe                  : std_logic_vector(63 downto 0);
-   --signal quad_clk_sel                   : std_logic;
    signal cfg_in_progress_i              : std_logic;
    signal adc_clk_pipe_sel               : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL'LENGTH-1 downto 0);
-   -- signal adc_clk_pipe_sel_divsty1       : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL_DIVSTY1'LENGTH-1 downto 0);
    signal idle_cnt                       : unsigned(C_DLY_BIT_POS downto 0);
    
    signal fifo_wr_en                     : std_logic;
@@ -135,8 +124,8 @@ architecture rtl of suphawkA_clks_gen_core is
    signal fifo_dout                      : std_logic_vector(7 downto 0);
    signal fifo_dout_dval                 : std_logic;
    
-   signal fpa_mclk_last                  : std_logic;
-   signal fpa_mclk_re                    : std_logic;
+   signal fpa_int_mclk_last                  : std_logic;
+   signal fpa_int_mclk_re                    : std_logic;
    
    
    attribute equivalent_register_removal : string;
@@ -145,26 +134,17 @@ architecture rtl of suphawkA_clks_gen_core is
    attribute iob : string;
    attribute iob of quad_clk_iob: signal is "true";
    
-   -- attribute dont_touch : string;
-   -- attribute dont_touch of quad_clk_iob: signal is "true";
-   
 begin
    
-   QUAD1_CLK   <= quad_clk_iob(1);
-   QUAD2_CLK   <= quad_clk_iob(2);
-   QUAD3_CLK   <= quad_clk_iob(3);
-   QUAD4_CLK   <= quad_clk_iob(4);
-   ADC_REF_CLK <= adc_ref_clk_i;
-   FPA_MCLK    <= fpa_mclk_i(0);    -- horloge à frequence nominale occupe toujours l'indice 0
+   QUAD1_CLK    <= quad_clk_iob(1);
+   QUAD2_CLK    <= quad_clk_iob(2);
+   QUAD3_CLK    <= quad_clk_iob(3);
+   QUAD4_CLK    <= quad_clk_iob(4);
+   ADC_REF_CLK  <= adc_ref_clk_i;
+   FPA_INT_MCLK <= fpa_int_mclk_i;    -- horloge à frequence nominale occupe toujours l'indice 0
    
    -- ENO: 07 juin 2017: le passage à travers les registres associant les outputs ports  dans un porcess crée des problèmes en simulation.
    -- Eviter d'utiliser directement des outputs ports sans des process 
-   
-   outG: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
-      begin
-      RAW_FPA_CLK.MCLK(kk).clk <= fpa_mclk_i(kk);
-      RAW_FPA_CLK.PCLK(kk).clk <= fpa_mclk_i(kk);  -- pour le superHawk, pclk et mclk sont identiques
-   end generate;
    
    QUAD_CLK_ENABLED <= quad_clk_enabled_i;
    
@@ -179,37 +159,18 @@ begin
    Port map(		
       ARESET => ARESET, SRESET => sreset_adc_clk_source, CLK => ADC_CLK_SOURCE);
    
-   --------------------------------------------------------
-   -- Master_clock group
-   -------------------------------------------------------- 
-   MGen: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
-      begin
-      UMkk: Clk_Divider
-      Generic map(
-         Factor=> DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(kk)
-         )
-      Port map( 
-         Clock   => MCLK_SOURCE,    
-         Reset   => sreset_mclk_source, 
-         Clk_div => fpa_mclk_i(kk)   -- attention, c'est en realité un clock enable. 
-         );
-   end generate;
-   
---   --------------------------------------------------------
---   -- pixel_clock group
---   -------------------------------------------------------- 
---   PGen: for kk in 0 to DEFINE_FPA_MCLK_NUM-1 generate
---      begin
---      UPkk: Clk_Divider
---      Generic map(
---         Factor=> DEFINE_FPA_CLK_INFO.PCLK_RATE_FACTOR(kk)
---         )
---      Port map( 
---         Clock   => MCLK_SOURCE,    
---         Reset   => sreset_mclk_source, 
---         Clk_div => fpa_pclk_i(kk)   -- attention, c'est en realité un clock enable. 
---         );
---   end generate;   
+   --   --------------------------------------------------------
+   --   -- Master_clock nominal
+   --   -------------------------------------------------------- 
+   UM0: Clk_Divider
+   Generic map(
+      Factor=> DEFINE_FPA_CLK_INFO.MCLK_RATE_FACTOR(DEFINE_FPA_NOMINAL_MCLK_ID)
+      )
+   Port map( 
+      Clock   => MCLK_SOURCE,    
+      Reset   => sreset_mclk_source, 
+      Clk_div => fpa_int_mclk_i   -- attention, c'est en realité un clock enable. 
+      ); 
    
    --------------------------------------------------------
    -- quad_clock_copy 
@@ -232,8 +193,8 @@ begin
             idle_cnt <= (others => '0');
             fifo_wr_en <= '0';
             quad_clk_enabled_i <= '0';
-            fpa_mclk_last <= fpa_mclk_i(0);
-            fpa_mclk_re <= '0';
+            fpa_int_mclk_last <= fpa_int_mclk_i;
+            fpa_int_mclk_re <= '0';
             
          else
             
@@ -241,13 +202,13 @@ begin
             adc_ref_clk_i <= quad_clk_from_mclk_source;
             
             -- mclk_re
-            fpa_mclk_last <= fpa_mclk_i(0);
-            fpa_mclk_re <= not fpa_mclk_last and fpa_mclk_i(0);
+            fpa_int_mclk_last <= fpa_int_mclk_i;
+            fpa_int_mclk_re <= not fpa_int_mclk_last and fpa_int_mclk_i;
             
             case sync_fsm is
                
                when idle =>
-                  if fpa_mclk_re = '1' then 
+                  if fpa_int_mclk_re = '1' then 
                      idle_cnt <= idle_cnt + 1;
                   end if;
                   if idle_cnt(6) = '1' then
@@ -256,7 +217,7 @@ begin
                
                when done_st =>
                   fifo_wr_en <= '1';
-                  if fpa_mclk_re = '1' then 
+                  if fpa_int_mclk_re = '1' then 
                      idle_cnt <= idle_cnt + 1;
                   end if;
                   if idle_cnt(C_DLY_BIT_POS) = '1' then
