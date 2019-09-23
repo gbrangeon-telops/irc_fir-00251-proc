@@ -124,6 +124,7 @@ begin
    AREA_FIFO_RD      <= fifo_rd_i;
    START_GEN         <= start_gen_i;
    RST_GEN           <= rst_gen_i;
+   ERR               <= err_i;
    
    FPA_FDEM          <= fdem_i;
    FPA_RD_MCLK       <= fpa_rd_mclk_i;
@@ -351,13 +352,13 @@ begin
             -- aoi
             readout_info_i.aoi.sof           <= AREA_FIFO_DATA.USER.SOF and fifo_rd_i;
             readout_info_i.aoi.eof           <= AREA_FIFO_DATA.USER.EOF and fifo_rd_i;
+            readout_info_i.aoi.sol           <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
             readout_info_i.aoi.eol           <= AREA_FIFO_DATA.USER.EOL and fifo_rd_i;
             readout_info_i.aoi.fval          <= AREA_FIFO_DATA.USER.FVAL and readout_info_valid;                -- pas de fifo_rd_i  sur fval sinon pb.
             readout_info_i.aoi.lval          <= AREA_FIFO_DATA.USER.LVAL and fifo_rd_i;
             readout_info_i.aoi.dval          <= AREA_FIFO_DATA.USER.DVAL and fifo_rd_i;
-            readout_info_i.aoi.sol           <= AREA_FIFO_DATA.USER.SOL and fifo_rd_i;
             if FPA_INTF_CFG.SIDEBAND_CANCEL_EN = '1' then
-               if AREA_FIFO_DATA.USER.SOL = '1' and  AREA_FIFO_DATA.CLK_INFO.CLK = '1' then            -- on invalide la donnee se trouvant dans la zone de la bande laterale
+               if (AREA_FIFO_DATA.CLK_INFO.CLK_ID = DEFINE_FPA_SIDEBAND_MCLK_ID) and  (AREA_FIFO_DATA.CLK_INFO.CLK = '1') then            -- on invalide la donnee se trouvant dans la zone de la bande laterale
                   readout_info_i.aoi.dval       <= '0';
                   readout_info_i.aoi.sol        <= '0';
                   readout_info_i.aoi.lval       <= '0';
