@@ -105,7 +105,7 @@ typedef enum powerChannelEnum powerChannel_t;
 #define POWER_SPARE2_MASK        (1L << PC_SPARE2)
 #define POWER_SPARE_MASK         (1L << PC_SPARE)
 #define POWER_SELFRESET_MASK     (1L << PC_SELFRESET)
-#define POWER_PUSH_BUTTON_MASK   (1L << PC_PUSH_BUTTON)
+//#define POWER_PUSH_BUTTON_MASK   (1L << PC_PUSH_BUTTON)
 
 /**
  * Push button state
