@@ -158,7 +158,18 @@ IRC_Status_t AutoTest_GPSSync(void) {
 
       while(totalSentCount < NMEA_length[i])
       {
-         totalSentCount += XUartNs550_Send(&Gps_struct.uart.uart, (uint8_t *)(NMEA_strings[i] + totalSentCount), (NMEA_length[i] - totalSentCount));
+         if (Gps_struct.uart.uartType == Ns550)
+         {
+            totalSentCount += XUartNs550_Send(&Gps_struct.uart.uart.Ns550,
+                              (uint8_t *)(NMEA_strings[i] + totalSentCount), (NMEA_length[i] - totalSentCount));
+         }
+         if (Gps_struct.uart.uartType == Lite)
+         {
+            totalSentCount += XUartLite_Send(&Gps_struct.uart.uart.Lite,
+                              (uint8_t *)(NMEA_strings[i] + totalSentCount), (NMEA_length[i] - totalSentCount));
+         }
+
+         //totalSentCount += XUartNs550_Send(&Gps_struct.uart.uart, (uint8_t *)(NMEA_strings[i] + totalSentCount), (NMEA_length[i] - totalSentCount));
       }
       GETTIME(&GPSTimer);
 

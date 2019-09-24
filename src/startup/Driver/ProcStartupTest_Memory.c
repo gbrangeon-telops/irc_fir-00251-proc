@@ -60,7 +60,7 @@ IRC_Status_t AutoTest_ProcCalibMem(void) {
 
    GC_Poller_Start();
    CBB_Flush(gCtrlIntf_NTxMini.rxCircBuffer);
-   UART_ResetRxFifo(&((circularUART_t *)gCtrlIntf_NTxMini.p_link)->uart);
+   CircularUART_ResetFifo((circularUART_t *)gCtrlIntf_NTxMini.p_link);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
 
    return testResult;
@@ -114,7 +114,7 @@ IRC_Status_t AutoTest_OBufMem(void) {
    // Re-enable disabled modules
    GC_Poller_Start();
    CBB_Flush(gCtrlIntf_NTxMini.rxCircBuffer);
-   UART_ResetRxFifo(&((circularUART_t *)gCtrlIntf_NTxMini.p_link)->uart);
+   CircularUART_ResetFifo((circularUART_t *)gCtrlIntf_NTxMini.p_link);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
 
    return testResult;
@@ -253,7 +253,7 @@ IRC_Status_t AutoTest_FlashMem(void) {
 
    GC_Poller_Start();
    CBB_Flush(gCtrlIntf_NTxMini.rxCircBuffer);
-   UART_ResetRxFifo(&((circularUART_t *)gCtrlIntf_NTxMini.p_link)->uart);
+   CircularUART_ResetFifo((circularUART_t *)gCtrlIntf_NTxMini.p_link);
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_PLEORA_UART_IP2INTC_IRPT_INTR);
 
    return IRC_SUCCESS;

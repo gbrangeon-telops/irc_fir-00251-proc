@@ -517,6 +517,7 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
 {
    uint32_t PpsTimeOut;
    uint32_t PpsSource;
+   uint32_t status = 0;
    extern t_HderInserter gHderInserter;
    extern t_Trig gTrig;
 
@@ -601,7 +602,11 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
    }
 
    // Gestion d'erreur du UART overflow : In our case, the overflow will almost never accure because of LL bus data throttling, so our best indicator is the FIFO FULL signal
-   if (XUartNs550_GetLineStatusReg(GPS_Data->uart.uart.BaseAddress) & XUN_LSR_OVERRUN_ERROR)
+   if (GPS_Data->uart.uartType == Ns550)
+      status = XUartNs550_GetLineStatusReg(GPS_Data->uart.uart.Ns550.BaseAddress);
+   if (GPS_Data->uart.uartType == Lite)
+      status =  XUartLite_GetStatusReg(GPS_Data->uart.uart.Lite.RegBaseAddress);
+   if (status & XUN_LSR_OVERRUN_ERROR)
    {
       GPS_Reset(GPS_Data); // reset uart and data structure
       // Set the error flag and report genicam error once if it wasn't done yet

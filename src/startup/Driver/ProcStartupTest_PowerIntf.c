@@ -192,7 +192,7 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
          //"SPARE2",
          "SPARE3",
          "SELF RESET",
-         "PUSH_BUTTON"
+         //"PUSH_BUTTON"
    };
 
    PRINTF("\n");
@@ -204,13 +204,12 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
 
    AutoTest_getUserNULL();
 
-   for (channelIndex = PC_PLEORA; channelIndex <= PC_PUSH_BUTTON; channelIndex++)
+   for (channelIndex = PC_PLEORA; channelIndex <= PC_SELFRESET; channelIndex++)
    {
 
       if (channelIndex != PC_SELFRESET && channelIndex != PC_BUFFER && channelIndex != PC_COOLER &&
             //channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON) --> EC
-            channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON &&
-            channelIndex != PC_SPARE2)
+            channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_SPARE2)
       {
          Power_TurnOn(channelIndex);
          ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
@@ -344,9 +343,9 @@ IRC_Status_t AutoTest_PwrBtnInt(void) {
    uint64_t pwr_tic;
 
    // Replace the Power button handler with a test handler
-   XIntc_Disconnect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
-   XIntc_Connect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR, (XInterruptHandler)Power_IntrHandler_Test, &gPowerCtrl);
-   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+   XIntc_Disconnect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
+   XIntc_Connect(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR, (XInterruptHandler)Power_IntrHandler_Test, &gPowerCtrl);
+   XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
 
    ATR_PRINTF("Connect the Power Button to J8.\nPress ENTER to continue...");
    GC_Poller_Stop();
@@ -366,7 +365,7 @@ IRC_Status_t AutoTest_PwrBtnInt(void) {
    if (!PwrBtn_intr)
    {
       ATR_ERR("No interrupt detected");
-      XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+      XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
       return IRC_FAILURE;
    }
 
@@ -380,11 +379,11 @@ IRC_Status_t AutoTest_PwrBtnInt(void) {
    if (PwrBtn_intr)
    {
       ATR_ERR("No interrupt detected");
-      XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+      XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
       return IRC_FAILURE;
    }
 
-   XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_POWER_MANAGEMENT_IP2INTC_IRPT_INTR);
+   XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
    GC_Poller_Start();
 
    return IRC_SUCCESS;
@@ -595,7 +594,7 @@ static void Startup_SetInternalFanSpeed(unsigned int speed) {
 static void Startup_SetExternalFanSpeed(unsigned int speed) {
 
    gcRegsData.ExternalFanSpeedSetpoint = (float)speed;
-   GC_SetExternalFanSpeed();
+   GC_UpdateExternalFanSpeed();
 
    return;
 }
