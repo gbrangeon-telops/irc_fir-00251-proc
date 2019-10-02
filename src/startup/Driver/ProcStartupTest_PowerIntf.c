@@ -30,7 +30,6 @@
 #define MAX_INTR_DELAY_US                                8 * ONE_SECOND_US
 #define XADC_DEVICE_ADDR                                 XPAR_SYSMON_0_DEVICE_ID
 #define FAN_CTRL_DBG_CMD_LENGTH                          10
-#define NUM_FAN_TESTS                                    5
 #define ALL_GPIO_INTR_MASK                               0
 
 extern t_fan gFan;
@@ -50,8 +49,6 @@ typedef void (*FanCtrlFunc_t)(unsigned int speed);
  * Fan Tests Index enumeration
  */
 enum testFanIndexEnum {
-   PROCESSING,
-   OUTPUT,
    INTERNAL,
    EXTERNAL_1,
    EXTERNAL_2
@@ -77,8 +74,6 @@ typedef struct testFanStruct testFan_t;
 
 static bool PwrBtn_intr = false;
 
-static void Startup_SetOutputFanSpeed(unsigned int speed);
-static void Startup_SetProcFanSpeed(unsigned int speed);
 static void Startup_SetInternalFanSpeed(unsigned int speed);
 static void Startup_SetExternalFanSpeed(unsigned int speed);
 static IRC_Status_t Startup_FanCtrlTest(testFanIndex_t fanIndex);
@@ -86,39 +81,12 @@ static IRC_Status_t Startup_FanCtrlTest(testFanIndex_t fanIndex);
 /*
  * Fan test reference table
  */
-static testFan_t testFanCtrl_Table[NUM_FAN_TESTS] = {
-      { "Processing FPGA", Startup_SetProcFanSpeed },
-      { "Output FPGA", Startup_SetOutputFanSpeed },
+static testFan_t testFanCtrl_Table[] = {
       { "Internal", Startup_SetInternalFanSpeed },
       { "External 1", Startup_SetExternalFanSpeed },
       { "External 2", Startup_SetExternalFanSpeed },
 };
 
-
-/*
- * Starts the FPGA fans at 100% speed, then slows to 25%, then stops.
- * Queries the user for correct fan operation at each step.
- *
- * @return IRC_SUCCESS if FPGA fan operation successfully controlled
- * @return IRC_FAILURE otherwise
- */
-IRC_Status_t AutoTest_FPGAFanCtrl(void) {
-
-   /*ATR_PRINTF("Connect the FPGA Fan Harness to J21.\nPress ENTER to continue...");
-   AutoTest_getUserNULL();
-
-   return Startup_FanCtrlTest(PROCESSING);*/// --> EC
-   return Startup_FanCtrlTest(IRC_NOT_DONE);
-}
-
-IRC_Status_t AutoTest_OutFanCtrl(void) {
-
-   /*ATR_PRINTF("Connect the FPGA Fan Harness to J22.\nPress ENTER to continue...");
-   AutoTest_getUserNULL();
-
-   return Startup_FanCtrlTest(OUTPUT);*///   --> EC
-   return Startup_FanCtrlTest(IRC_NOT_DONE);
-}
 
 /*
  * Starts the internal fan at 100% speed, then slows to 25%, then stops.
@@ -523,57 +491,6 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    return (invalidValue) ? IRC_FAILURE : IRC_SUCCESS;
 }
 
-/*
- * Sends a command through the Debug Terminal to the Output FPGA to set fan
- * speed to the specified value.
- *
- * @return void
- */
-static void Startup_SetOutputFanSpeed(unsigned int speed) {
-
-   networkCommand_t dtRequest;
-   debugTerminal_t *debugTerminal = &gDebugTerminal;
-
-   // SFS is the Output Buffer Memory Test command
-   char debugTerminalCMD[FAN_CTRL_DBG_CMD_LENGTH] = {0};
-
-   if (speed < 0 || speed > 100) {
-      DT_ERR("Invalid Output FPGA Fan Speed.");
-      return;
-   }
-
-   sprintf(debugTerminalCMD, "SFS %u", speed);
-
-   F1F2_CommandClear(&dtRequest.f1f2);
-   dtRequest.f1f2.isNetwork = 1;
-   dtRequest.f1f2.srcAddr = debugTerminal->port.netIntf->address;
-   dtRequest.f1f2.srcPort = debugTerminal->port.port;
-   dtRequest.f1f2.destAddr = NIA_OUTPUT_FPGA;
-   dtRequest.f1f2.destPort = NIP_DEBUG_TERMINAL;
-   dtRequest.f1f2.cmd = F1F2_CMD_DEBUG_CMD;
-
-   snprintf(dtRequest.f1f2.payload.debug.text, F1F2_MAX_DEBUG_DATA_SIZE + 1, debugTerminalCMD);
-
-   dtRequest.port = &debugTerminal->port;
-
-   if (NetIntf_EnqueueCmd(debugTerminal->port.netIntf, &dtRequest) != IRC_SUCCESS)
-      DT_ERR("Failed to push debug CMD command in network interface command queue");
-
-   return;
-}
-
-/**
- * Sets the Processing FPGA Fan Speed
- *
- * @param speed is the target FPGA Fan speed
- */
-static void Startup_SetProcFanSpeed(unsigned int speed) {
-
-   FAN_SET_PWM1(&gFan, (float)speed);
-
-   return;
-}
-
 /**
  * Sets the Internal Fan Speed
  *
@@ -581,7 +498,7 @@ static void Startup_SetProcFanSpeed(unsigned int speed) {
  */
 static void Startup_SetInternalFanSpeed(unsigned int speed) {
 
-   FAN_SET_PWM2(&gFan, (float)speed);
+   // Fan is now always 100%
 
    return;
 }
@@ -620,25 +537,21 @@ static IRC_Status_t Startup_FanCtrlTest(testFanIndex_t fanIndex) {
       testFailed = true;
    }
 
-   testFanCtrl_Table[fanIndex].ctrlFunc(25);
-   ATR_PRINTF("Does the %s fan run at 25%% speed? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
-   if (!AutoTest_getUserYN())
+   if (fanIndex != INTERNAL)
    {
-      testFailed = true;
-   }
+      testFanCtrl_Table[fanIndex].ctrlFunc(25);
+      ATR_PRINTF("Does the %s fan run at 25%% speed? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
+      if (!AutoTest_getUserYN())
+      {
+         testFailed = true;
+      }
 
-   testFanCtrl_Table[fanIndex].ctrlFunc(0);
-   ATR_PRINTF("Has the %s fan completely stopped? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
-   if (!AutoTest_getUserYN())
-   {
-      testFailed = true;
-   }
-
-   if (fanIndex == PROCESSING || fanIndex == OUTPUT) {
-      testFanCtrl_Table[fanIndex].ctrlFunc(100);
-   }
-   else {
       testFanCtrl_Table[fanIndex].ctrlFunc(0);
+      ATR_PRINTF("Has the %s fan completely stopped? (Y/N) ", testFanCtrl_Table[fanIndex].desc);
+      if (!AutoTest_getUserYN())
+      {
+         testFailed = true;
+      }
    }
 
    return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;

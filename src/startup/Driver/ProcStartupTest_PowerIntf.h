@@ -19,8 +19,6 @@
 #include "ProcStartupTest_utils.h"
 #include "power_ctrl.h"
 
-IRC_Status_t AutoTest_FPGAFanCtrl(void);
-IRC_Status_t AutoTest_OutFanCtrl(void);
 IRC_Status_t AutoTest_IntFanCtrl(void);
 IRC_Status_t AutoTest_ExtFanCtrl(void);
 IRC_Status_t AutoTest_PwrConnectOnOff(void);
