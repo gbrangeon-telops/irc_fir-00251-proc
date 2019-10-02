@@ -233,7 +233,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    bool done = false;
 
    const float binWidth = powf(2.0F, (float)FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
-   extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
+   extern gcRegister_t* pGcRegsDefExposureTimeX[MAX_NUM_FILTER];
 
 #ifdef AEC_ENABLE_PROFILER
    static statistics_t aec_stats;
@@ -418,7 +418,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       {
          SFW_SetExposureTimeArray(AEC_Int_FWPosition, PET);
          FWExposureTime[AEC_Int_FWPosition] = PET;
-         *pGcRegsDataExposureTimeX[AEC_Int_FWPosition] = PET;
+         GC_RegisterWriteFloat(pGcRegsDefExposureTimeX[AEC_Int_FWPosition], PET);
       }
    }
 

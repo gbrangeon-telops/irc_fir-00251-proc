@@ -385,7 +385,7 @@ IRC_Status_t Actualization_SM()
    const uint32_t age_increment = 10; // [s]
 
    extern float FWExposureTime[MAX_NUM_FILTER];
-   extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
+   extern gcRegister_t* pGcRegsDefExposureTimeX[MAX_NUM_FILTER];
    extern t_calib gCal;
    extern rpCtrl_t theRpCtrl;
 
@@ -732,7 +732,7 @@ IRC_Status_t Actualization_SM()
 
          }
 
-         StartTimer(&act_timer, ACT_WAIT_FOR_ACQ_TIMEOUT/1000);
+         StartTimer(&act_timer, ACT_WAIT_FOR_CAMERA_RDY_TIMEOUT/1000);
          setActState(&state, ACT_StartAECAcquisition);
          break;
 
@@ -845,7 +845,7 @@ IRC_Status_t Actualization_SM()
                // Set FW speed as close as possible to the value requested by user
                GC_SetAcquisitionFrameRate(gcRegsData.ImageCorrectionFWAcquisitionFrameRate);
 
-               StartTimer(&act_timer, ACT_WAIT_FOR_ACQ_TIMEOUT/1000);
+               StartTimer(&act_timer, ACT_WAIT_FOR_CAMERA_RDY_TIMEOUT/1000);
                setActState(&state, ACT_WaitAcquisitionReady);
             }
             else
@@ -993,7 +993,7 @@ IRC_Status_t Actualization_SM()
 
          currentDeltaBeta->info.internalLensTemperature = C_TO_K(DeviceTemperatureAry[DTS_InternalLens]);
          if (actSyncFW)
-            currentDeltaBeta->info.exposureTime = *pGcRegsDataExposureTimeX[blockIdx];
+            currentDeltaBeta->info.exposureTime = *((float*)pGcRegsDefExposureTimeX[blockIdx]->p_data);
          else
             currentDeltaBeta->info.exposureTime = gcRegsData.ExposureTime;
          currentDeltaBeta->info.AcquisitionFrameRate = gcRegsData.AcquisitionFrameRate;

@@ -147,14 +147,14 @@ void SFW_UpdateFilterRanges(float deltaTheta1, float deltaTheta2)
          pos -= flashSettings.FWEncoderCyclePerTurn; // if so, wrap the value
 
       val = (uint32_t)pos << 16;
-      SFW_INF("SFW_UpdateFilterRanges Filter[%d] -- Max Pos2=%d",i, pos);
+      SFW_INF("SFW_UpdateFilterRanges Filter[%d] -- Max Pos=%d",i, pos);
 
       pos = (uint16_t)counts - gSFW_deltaFilterBegin;
 
       if(pos >= flashSettings.FWEncoderCyclePerTurn)   //Verify if pos exceeds encoder values
          pos += flashSettings.FWEncoderCyclePerTurn; // if so, wrap the value
       val |= (uint32_t)pos;
-      SFW_INF("SFW_UpdateFilterRanges Filter[%d] -- Min Pos2=%d",i, pos);
+      SFW_INF("SFW_UpdateFilterRanges Filter[%d] -- Min Pos=%d",i, pos);
 
       AXI4L_write32(val, gSFW_Ctrl.ADD + FW_POSITION_0_ADDR + 4 * i);
    }

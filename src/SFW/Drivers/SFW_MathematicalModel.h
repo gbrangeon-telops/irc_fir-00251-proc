@@ -19,21 +19,14 @@ typedef enum {
 
 
 void InitMathematicalModel(gcRegistersData_t *pGCRegs);
-void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameterEnum changedParameter);
-float SFW_GetAcquisitionFrameRateMax();
-float SFW_GetExposureTimeMax();
 
-// Getters of the calculated maximal values
-//float SFW_GetAcquisitionFrameRateMax();
+void SFW_FrameRateChanged(gcRegistersData_t *pGCRegs);
+void SFW_ExposureTimeChanged(gcRegistersData_t *pGCRegs);
+void SFW_AllChanged(gcRegistersData_t *pGCRegs);
+void SFW_HeightChanged(gcRegistersData_t *pGCRegs);
+void SFW_WidthChanged(gcRegistersData_t *pGCRegs);
+
+void SFW_LimitExposureTime(gcRegistersData_t * pGCRegs);
 float SFW_GetMaxExposureTime(gcRegistersData_t *pGCRegs);
-float SFW_GetExposureTimeMax();
-uint16_t SFW_GetCurrentWidthMax();
-uint16_t SFW_GetCurrentHeightMax();
-
-// Getters of filter max position deltas
-//uint16_t SFW_GetDeltaFilterBegin();
-//uint16_t SFW_GetDeltaFilterEnd();
-
-void SFW_LimitParameter(gcRegistersData_t * pGCRegs);
 
 #endif //SFW_MATHEMATICALMODEL_H__

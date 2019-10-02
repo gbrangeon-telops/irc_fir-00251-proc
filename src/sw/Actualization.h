@@ -49,6 +49,12 @@
 #define ACT_ICU_TEMP_TOL              (float)0.25f // [°C]
 #define ACT_AEC_EXPTIME_TOL           (float)2.0f // [us] convergence criterion for AEC
 
+/*
+ Here, ACT_WAIT_FOR_CAMERA_RDY_TIMEOUT is dimensioned to give enough time for the filter wheel to change position one time and after that reach synchronous speed steady state from 0 RPM to setpoint. We consider that :
+- Reaching a position setpoint can take up to 2 commands of 5.2s each.
+- Reaching a speed setpoint can take up to 50s (worst case is from 0 RPM to 6000 RPM).  
+*/
+#define ACT_WAIT_FOR_CAMERA_RDY_TIMEOUT (uint32_t)(61 * TIME_ONE_SECOND_US) // [us]
 #define ACT_WAIT_FOR_ACQ_TIMEOUT (uint32_t)(6 * TIME_ONE_SECOND_US) // [us]
 #define ACT_WAIT_FOR_DATA_TIMEOUT (uint32_t)(60 * TIME_ONE_SECOND_US) // [us]
 #define ACT_WAIT_FOR_ICU_TIMEOUT (uint32_t)(2 * gICU_ctrl.ICU_TransitionDuration * 1000) // [us]

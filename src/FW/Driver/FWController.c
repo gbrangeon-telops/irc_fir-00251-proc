@@ -38,12 +38,8 @@
 */
 static uint32_t             FW_errors = 0;
 static bool                 FW_Reset = false;
-static bool                 FW_Ready = false;
 static bool                 FW_HomingValid = false;
 static int32_t              FW_RequestedTarget;
-static bool                 FW_ModeRequest = false;
-static FW_ControllerMode_t   FW_NewMode;
-static int32_t              FW_NewTarget;
 static FW_ControllerMode_t  FW_currentMode = FW_STARTUP_MODE;
 static int32_t FW_currentRawPosition = 1000000;
 
@@ -71,6 +67,9 @@ static bool FW_initialized = false;
 
 FW_config_t FW_config[FW_Config_table_size];
 
+static FWCommand_t FW_CmdQueueBuffer[FW_CMD_QUEUE_SIZE];
+static circBuffer_t FW_CmdQueue =
+      CB_Ctor(FW_CmdQueueBuffer, FW_CMD_QUEUE_SIZE, sizeof(FWCommand_t));
 
 
 IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
@@ -92,10 +91,7 @@ IRC_Status_t FWControllerInit(FH_ctrl_t* instance)
    }
 
    FW_ResetTimers();
-
    FW_initialized = true;
-
-
 
    return status;
 }
@@ -155,8 +151,6 @@ void FWControllerReset()
 {
    FW_errors = 0;
    FW_Reset = true;
-   FW_Ready = false;
-   FW_ModeRequest = false;
    //FaulhaberUtilitiesReset();
    FW_ResetTimers();
 }
@@ -180,14 +174,28 @@ void FW_ResetTimers()
  */
 void ChangeFWControllerMode(FW_ControllerMode_t newMode, int32_t target)
 {
+   FWCommand_t cmd;
+
    if (((newMode != FW_VELOCITY_MODE) && (newMode != FW_POSITION_MODE)) ||  // New mode not in velocity or position
          ((gcRegsData.FWMode != FWM_Fixed) && (newMode == FW_VELOCITY_MODE)) ||
          ((gcRegsData.FWMode == FWM_Fixed) && (newMode == FW_POSITION_MODE)))
    {
-      FW_NewMode = newMode;
-      FW_NewTarget = target;
-      FW_ModeRequest = true;
-      FW_Ready = false;
+
+      //Safety check
+      if ((newMode == FW_VELOCITY_MODE) && (target > (int32_t)flashSettings.FWSpeedMax))
+      {
+         FW_SetErrors(FW_ERR_FAULHABER_SPEED_SETPOINT);
+         newMode = FW_ERROR_MODE;
+      }
+
+      cmd.mode = newMode;
+      cmd.target = target;
+
+      if (!CB_Empty(&FW_CmdQueue))
+      {
+         CB_Flush(&FW_CmdQueue);
+      }
+      CB_Push(&FW_CmdQueue, &cmd);
    }
 
 }
@@ -210,7 +218,7 @@ void FW_ControllerProcess()
    bool modeChanged = false;
    bool targetChanged = false;
    static int numRetryErrorMode = 0;
-
+   FWCommand_t cmd;
 
    static uint32_t prevPosition = 100000000;
 
@@ -225,21 +233,28 @@ void FW_ControllerProcess()
       // allow the current setpoint be applied immediately at the end of the homing sequence
       FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &newTarget);
       numRetryErrorMode = 0;
+      CB_Flush(&FW_CmdQueue);
    }
-   if (FW_ModeRequest && !FW_newModeAvailable)
+
+   if (CB_Empty(&FW_CmdQueue) && modeReady)
    {
-      FW_newModeAvailable = true;
-      newMode = FW_NewMode;
-      newTarget = FW_NewTarget;
-      FW_ModeRequest = false;
+      TDCStatusClr(WaitingForFilterWheelMask);
    }
+   else
+   {
+      TDCStatusSet(WaitingForFilterWheelMask);
    
+      if (!CB_Empty(&FW_CmdQueue) && !FW_newModeAvailable && modeReady)
+      {
+         CB_Pop(&FW_CmdQueue, &cmd);
+         newTarget = cmd.target;
+         newMode = cmd.mode;
+         FW_newModeAvailable = true;
+      }
+   }
    //UPDATE the GCSpeed register
    if(flashSettings.FWType == FW_SYNC )
       gcRegsData.FWSpeed = SFW_Get_RPM();
-
-
-
 
    //////////////////////////////////////////////////////////////////////////////////
    // Change state conditions state machine
@@ -347,21 +362,18 @@ void FW_ControllerProcess()
    {
       case FW_STARTUP_MODE:
          FH_consumeResponses(FH_instance);
-         FW_Ready = false;
          gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
          break;
 
       case FW_INIT_MODE:
          modeReady = FWInitialisationMode(modeChanged);
-         FW_Ready = false;
          gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
          break;
 
       case FW_IDLE_MODE:
          modeReady = FWIdleMode(modeChanged);
-         FW_Ready = modeReady && !FW_ModeRequest & !FW_newModeAvailable;
          numRetryErrorMode = 0;
          gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
@@ -369,7 +381,6 @@ void FW_ControllerProcess()
 
       case FW_VELOCITY_MODE:
          modeReady = FWVelocityMode(modeChanged, targetChanged);
-         FW_Ready = modeReady && !FW_ModeRequest;
          gcRegsData.FWPosition = FWP_FilterWheelInTransition;
 
          break;
@@ -377,31 +388,23 @@ void FW_ControllerProcess()
       case FW_POSITION_MODE:
          modeReady = FWPositionMode(modeChanged, targetChanged);
          FW_HomingValid = modeReady;
-         FW_Ready = modeReady && !FW_ModeRequest;
          //gcRegsData.FWPosition is updated in FWPositionMode()
 
          break;
 
       case FW_ERROR_MODE:
          modeReady = FWErrorMode(modeChanged);
-         FW_Ready = modeReady;
          gcRegsData.FWPosition = FWP_FilterWheelInTransition;
          break;
 
       case FW_DISABLED_MODE:
          gcRegsData.FWPosition = FWP_FilterWheelNotImplemented;
-         FW_Ready = false;
          modeReady = true;
          break;
 
       default:
          break;
    }
-
-   if (!modeReady)
-      TDCStatusSet(WaitingForFilterWheelMask);
-   else
-      TDCStatusClr(WaitingForFilterWheelMask);
 
    // transmit the new position upon a change
    if (prevPosition != gcRegsData.FWPosition)
@@ -416,19 +419,6 @@ void FW_ControllerProcess()
 
    // handle commands in the pipe
    FH_sendPendingCmds(FH_instance);
-}
-
-/*
- * Name         : IsFWControllerReady
- *
- * Synopsis     : uint32_t IsFWControllerReady()
- * Description  : Check if the FW is ready to accept a new command
- * 
- * Returns      : bool : false -> not ready, true -> Ready
- */
-bool IsFWControllerReady()
-{
-   return FW_Ready;
 }
 
 /*
@@ -1239,12 +1229,12 @@ static bool FWPositionMode(bool reset, bool newTarget)
                   if (correctionMove < 0)
                   {
                      // Position is over target (filter center), so use filter end as tolerance
-                     maxTolerance = (uint32_t)(SFW_POS_TOLERANCE_MARGIN * (float)gSFW_deltaFilterEnd);
+                     maxTolerance = (uint32_t)gSFW_deltaFilterEnd;
                   }
                   else
                   {
                      // Position is under target (filter center), so use filter begin as tolerance
-                     maxTolerance = (uint32_t)(SFW_POS_TOLERANCE_MARGIN * (float)gSFW_deltaFilterBegin);
+                     maxTolerance = (uint32_t)gSFW_deltaFilterBegin;
                   }
 
                   // Requery move if tolerance is exceeded
@@ -1505,6 +1495,9 @@ static bool FWErrorMode(bool reset)
 
    if (FW_GetErrors(FW_ERR_FAULHABER_HOME_TIMEOUT))
       GC_GenerateEventError(EECD_FilterWheelHomingError);
+
+   if (FW_GetErrors(FW_ERR_FAULHABER_SPEED_SETPOINT))
+      GC_GenerateEventError(EECD_FilterWheelInvalidSpeedSetpoint);
 
    if (FW_GetErrors(FW_ERR_ALL))
    {
@@ -1785,12 +1778,12 @@ void FW_SetFWEncoderCountInOneTurn()
 
 void FW_CalculateSpeedSetpoint(gcRegistersData_t *pGCRegs)
 {
-   pGCRegs->FWSpeedSetpoint = (uint32_t) floorf(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
-   if (pGCRegs->FWSpeedSetpoint == 0)
-   {
-      pGCRegs->FWSpeedSetpoint = 1;
-   }
+   uint32_t FWSpeedSetpoint;
    
+   FWSpeedSetpoint = (uint32_t) floorf(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
+   FWSpeedSetpoint = MIN(MAX(FWSpeedSetpoint, 1), pGCRegs->FWSpeedMax);
+   GC_SetFWSpeedSetpoint(FWSpeedSetpoint);
+
    pGCRegs->AcquisitionFrameRate = (float) pGCRegs->FWSpeedSetpoint*flashSettings.FWNumberOfFilters/60.0f;
 }
 

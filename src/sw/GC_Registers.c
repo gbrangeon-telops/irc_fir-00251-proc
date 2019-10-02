@@ -47,8 +47,10 @@ uint8_t gGC_ProprietaryFeatureKeyIsValid = 0;
 
 float EHDRIExposureTime[EHDRI_IDX_NBR] = {FPA_EHDRI_EXP_0, FPA_EHDRI_EXP_1, FPA_EHDRI_EXP_2, FPA_EHDRI_EXP_3};
 float FWExposureTime[MAX_NUM_FILTER] = {FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE, FPA_DEFAULT_EXPOSURE};
-float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
+gcRegister_t* pGcRegsDefExposureTimeX[MAX_NUM_FILTER];
 
+extern float SFW_AcquisitionFrameRateMax;
+extern float SFW_ExposureTimeMax;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
@@ -854,7 +856,7 @@ void GC_UpdateCalibrationRegisters()
                FWExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
                SFW_SetExposureTimeArray(i, FWExposureTime[i]);
             }
-            GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime));
+            GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), true);
          case CCT_TelopsFW:
             break;
 
@@ -866,7 +868,7 @@ void GC_UpdateCalibrationRegisters()
             GC_SetEHDRIMode(EHDRIM_Advanced);
             for (i = 0; i < calibrationInfo.collection.NumberOfBlocks; i++)
                EHDRIExposureTime[i] = (float)calibrationInfo.blocks[i].ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
-            GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime));
+            GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime), true);
             GC_SetEHDRINumberOfExposures(calibrationInfo.collection.NumberOfBlocks);
             break;
       }
@@ -934,7 +936,7 @@ void GC_UpdateParameterLimits()
    // Limit AcquisitionFrameRateMax in synchronous mode
    if (FWSynchronoulyRotatingModeIsActive)
    {
-      gcRegsData.AcquisitionFrameRateMax = MIN(gcRegsData.AcquisitionFrameRateMax, SFW_GetAcquisitionFrameRateMax());
+      gcRegsData.AcquisitionFrameRateMax = MIN(gcRegsData.AcquisitionFrameRateMax, SFW_AcquisitionFrameRateMax);
    }
 
    // Return AcquisitionFrameRateMax without jumboframe limitation
@@ -961,7 +963,8 @@ void GC_UpdateParameterLimits()
 
    if (FWSynchronoulyRotatingModeIsActive)
    {
-      gcRegsData.ExposureTimeMax = MIN(gcRegsData.ExposureTimeMax, SFW_GetExposureTimeMax());
+      gcRegsData.ExposureTimeMax = MIN(gcRegsData.ExposureTimeMax, SFW_ExposureTimeMax);
+      SFW_LimitExposureTime(&gcRegsData);
    }
 
    // Validate current ExposureTime
@@ -1042,11 +1045,11 @@ IRC_Status_t GC_DeviceRegistersVerification()
 
    if (FWSynchronoulyRotatingModeIsActive)
    {
-      for (idx = 0; idx < NUM_OF(pGcRegsDataExposureTimeX); idx++)
+      for (idx = 0; idx < NUM_OF(pGcRegsDefExposureTimeX); idx++)
       {
-         if ((*pGcRegsDataExposureTimeX[idx] > gcRegsData.ExposureTimeMax) || (*pGcRegsDataExposureTimeX[idx] < gcRegsData.ExposureTimeMin))
+         if ((*((float*)pGcRegsDefExposureTimeX[idx]->p_data) > gcRegsData.ExposureTimeMax) || (*((float*)pGcRegsDefExposureTimeX[idx]->p_data) < gcRegsData.ExposureTimeMin))
          {
-            GC_ERR("Invalid exposure time %d (" _PCF(1) "us).", idx, _FFMT(*pGcRegsDataExposureTimeX[idx], 1));
+            GC_ERR("Invalid exposure time %d (" _PCF(1) "us).", idx, _FFMT(*((float*)pGcRegsDefExposureTimeX[idx]->p_data), 1));
             GC_GenerateEventError(EECD_InvalidExposure);
             error = 1;
             break;
@@ -1057,9 +1060,9 @@ IRC_Status_t GC_DeviceRegistersVerification()
    {
       for (idx = 0; idx < gcRegsData.EHDRINumberOfExposures; idx++)
       {
-         if ((*pGcRegsDataExposureTimeX[idx] > gcRegsData.ExposureTimeMax) || (*pGcRegsDataExposureTimeX[idx] < gcRegsData.ExposureTimeMin))
+         if ((*((float*)pGcRegsDefExposureTimeX[idx]->p_data) > gcRegsData.ExposureTimeMax) || (*((float*)pGcRegsDefExposureTimeX[idx]->p_data) < gcRegsData.ExposureTimeMin))
          {
-            GC_ERR("Invalid exposure time %d (" _PCF(1) "us).", idx, _FFMT(*pGcRegsDataExposureTimeX[idx], 1));
+            GC_ERR("Invalid exposure time %d (" _PCF(1) "us).", idx, _FFMT(*((float*)pGcRegsDefExposureTimeX[idx]->p_data), 1));
             GC_GenerateEventError(EECD_InvalidExposure);
             error = 1;
             break;
@@ -1455,20 +1458,28 @@ uint32_t GC_GetTimestamp()
  * @param p_src is a pointer on the data to copy.
  * @param len is the number of elements to update.
  */
-void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len)
+void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len, bool GcRegsDataOnly)
 {
    uint32_t idx;
 
    // Verify length
-   if (len > NUM_OF(pGcRegsDataExposureTimeX))
+   if (len > NUM_OF(pGcRegsDefExposureTimeX))
       return;
 
    // Copy data in the referenced registers
    for (idx = 0; idx < len; idx++)
-      *pGcRegsDataExposureTimeX[idx] = p_src[idx];
+   {
+      if (GcRegsDataOnly)
+      {
+         *((float*)pGcRegsDefExposureTimeX[idx]->p_data) = p_src[idx];
 }
+      else
+      {
+         GC_RegisterWriteFloat(pGcRegsDefExposureTimeX[idx], p_src[idx]);
+      }
+   }
 
-
+}
 /**
  * Update exposure time register(s) depending on activated features.
  *
@@ -1482,28 +1493,19 @@ void GC_UpdateExposureTimeRegisters(float exposureTime)
    {
       for (expIdx = 0; expIdx < EHDRI_IDX_NBR; expIdx++)
       {
-         EHDRIExposureTime[expIdx] = exposureTime;
-         *pGcRegsDataExposureTimeX[expIdx] = EHDRIExposureTime[expIdx];
+         GC_RegisterWriteFloat(pGcRegsDefExposureTimeX[expIdx], exposureTime);
       }
-
-      GC_UpdateParameterLimits();
    }
    else if (FWSynchronoulyRotatingModeIsActive)
    {
       for (expIdx = 0; expIdx < MAX_NUM_FILTER; expIdx++)
       {
-         FWExposureTime[expIdx] = exposureTime;
-         *pGcRegsDataExposureTimeX[expIdx] = FWExposureTime[expIdx];
-         SFW_SetExposureTimeArray(expIdx, FWExposureTime[expIdx]);
+         GC_RegisterWriteFloat(pGcRegsDefExposureTimeX[expIdx], exposureTime);
       }
-
-      SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
-      GC_UpdateParameterLimits();
-      SFW_LimitParameter(&gcRegsData);
    }
    else
    {
-      GC_SetExposureTime(exposureTime);
+      GC_RegisterWriteFloat(&gcRegsDef[ExposureTimeIdx], exposureTime);
    }
 }
 

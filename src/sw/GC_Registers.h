@@ -714,7 +714,7 @@ void GC_UpdateMemoryBufferRegistersOwner();
 void GC_UpdateFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPositionSetpoint);
 void GC_UpdateNDFPositionSetpoint(uint32_t prevNDFPositionSetpoint, uint32_t newNDFPositionSetpoint);
 uint32_t GC_GetTimestamp();
-void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len);
+void GC_UpdateExposureTimeXRegisters(float* p_src, uint32_t len, bool GcRegsDataOnly);
 void GC_UpdateExposureTimeRegisters(float exposureTime);
 void GC_UpdateDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort);
 void GC_UpdateFOV();

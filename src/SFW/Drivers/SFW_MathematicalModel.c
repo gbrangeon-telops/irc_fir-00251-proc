@@ -10,23 +10,19 @@
 #include "SFW_ctrl.h"
 #include "exposure_time_ctrl.h"
 
-
-
 #define SFW_EXPOSUREMAX_MARGING     (flashSettings.FWExposureTimeMaxMargin / 100.0F)
 
 static void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, float* maxTheta1, float* maxTheta2);
-static uint16_t MaxWindowSizeX(float dX, float dY, float cornerPixelPositionRadius, float usedTheta1, float usedTheta2);
-static uint16_t MaxWindowSizeY(float dX, float dY, float cornerPixelPositionRadius, float usedTheta1, float usedTheta2);
-static void SplitUsedTheta(float maxTheta1, float maxTheta2, float* usedTheta1, float* usedTheta2);
 static void ConvertSizeToDeltaAndTarget(uint16_t width, uint16_t height, SFW_ChangedParameterEnum changedParameter, float* dX, float* dY, float* cornerPixelPositionRadius);
+
+static void SFW_CalculFilterRange(gcRegistersData_t *pGCRegs, SFW_ChangedParameterEnum changedParameter);
+static void SFW_CalculExposureTimeMax(gcRegistersData_t *pGCRegs);
+static void SFW_CalculAcquisitionFrameRateMax(gcRegistersData_t *pGCRegs);
 
 extern float FWExposureTime[MAX_NUM_FILTER];
 
-
 float SFW_AcquisitionFrameRateMax;
 float SFW_ExposureTimeMax;
-uint16_t SFW_CurrentWidthMax;
-uint16_t SFW_CurrentHeightMax;
 
 static float SFW_FiltersRadius;
 static float SFW_OpticalAxisTheta;
@@ -37,22 +33,11 @@ static float SFW_PixelRadius_To_RealRadius;
 static float SFW_CurrentParameters_MaxTheta1;
 static float SFW_CurrentParameters_MaxTheta2;
 static float SFW_CurrentParameters_Target;
-static float SFW_CurrentParameters_UsedTheta;
 static float SFW_RPM_uSec_Max;
 static float SFW_dX;
 static float SFW_dY;
-static float SFW_maxExposureTime;
-static float SFW_lastMaxExposureTime;
-
-//static uint16_t SFW_DeltaFilterBegin;
-//static uint16_t SFW_DeltaFilterEnd;
-
-uint16_t SFW_GetCurrentWidthMax(){return SFW_CurrentWidthMax;};
-uint16_t SFW_GetCurrentHeightMax(){return SFW_CurrentHeightMax;};
-//uint16_t SFW_GetDeltaFilterBegin(){return SFW_DeltaFilterBegin;};
-//uint16_t SFW_GetDeltaFilterEnd(){return SFW_DeltaFilterEnd;};
-
-
+static float SFW_GreatestFWExposureTime_i;
+static float SFW_lastGreatestFWExposureTime_i;
 
 /*
  * Calculate the values of various parameters
@@ -86,7 +71,7 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
    ExposureTimeBackup = pGCRegs->ExposureTime;
    pGCRegs->ExposureTime = pGCRegs->ExposureTimeMin;
 
-   SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);
+   SFW_AllChanged(pGCRegs);
    pGCRegs->ImageCorrectionFWAcquisitionFrameRateMin = ceilMultiple((float)(FW_VEL_THRESHOLD * flashSettings.FWNumberOfFilters) / 60.0F, 0.01);
    pGCRegs->ImageCorrectionFWAcquisitionFrameRateMax = floorMultiple(MIN(FPA_MaxFrameRate(pGCRegs), SFW_AcquisitionFrameRateMax), 0.01);
 
@@ -95,7 +80,7 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
 
    // Calculate new maximal values considering that all parameters has been changed
    // Need to be called at least once to set all global variables
-   SFW_CalculateMaximalValues(pGCRegs, ALL_CHANGED);
+   SFW_AllChanged(pGCRegs);
 
    if(pGCRegs->FWSpeedSetpoint != 0)
       SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / (float)pGCRegs->FWSpeedSetpoint);
@@ -103,40 +88,40 @@ void InitMathematicalModel(gcRegistersData_t *pGCRegs)
       SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
 }
 
-float SFW_GetAcquisitionFrameRateMax()
+/*
+ * Calculate the maximum acquisition frame rate allowed when the filter wheel is spinning.
+ */
+void SFW_CalculAcquisitionFrameRateMax(gcRegistersData_t *pGCRegs)
 {
-   return SFW_AcquisitionFrameRateMax;
-}
+   //SFW_INF("CalculAcquisitionFrameRateMax");
 
-float SFW_GetExposureTimeMax()
-{
-   return SFW_ExposureTimeMax;
+   SFW_AcquisitionFrameRateMax = floorf(SFW_RPM_uSec_Max / SFW_GreatestFWExposureTime_i)*flashSettings.FWNumberOfFilters/60.0f;
+   SFW_AcquisitionFrameRateMax = MIN(SFW_AcquisitionFrameRateMax, pGCRegs->FWSpeedMax*flashSettings.FWNumberOfFilters/60.0f);
+   SFW_INF("SFW_AcquisitionFrameRateMax = %d\n", (uint32_t) (SFW_AcquisitionFrameRateMax * 10));
 }
 
 /*
- * Calculate the maximal values that can be set in GenICam registers :
- * Width, Height, ExposureTime and AcquisitionFrameRate
- *
- * changedParameter must indicate which register has changed since the last callback of this function
+ * Calculate the maximum exposure time allowed with the filter wheel rotating.
  */
-
-void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameterEnum changedParameter)
+void SFW_CalculExposureTimeMax(gcRegistersData_t *pGCRegs)
 {
-   float usedTheta1, usedTheta2;
-   float maxTheta1, maxTheta2;
-   uint16_t tempWidthMax = 0;
-   uint16_t tempHeightMax = 0;
-   float temp_dX, temp_dY;
-   float tempCornerPixelPositionRadius;
+   //SFW_INF("CalculExposureTimeMax");
 
-   if(flashSettings.FWType != FW_SYNC || flashSettings.FWPresent != 1)
-      return;
+   if(pGCRegs->FWSpeedSetpoint != 0)
+      SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / (float)pGCRegs->FWSpeedSetpoint); //Temps max ou le filtre est devant le detecteur
+   else
+      SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
 
-   SFW_INF("CalculateMaximalValues");
+   SFW_ExposureTimeMax = MIN(SFW_ExposureTimeMax , FPA_MaxExposureTime(pGCRegs)); //Min entre Temps ou le filtre est devant et Temps du FPA qui tient compte du temps d'exposition+readout possible selon le framerate
+}
 
-   // If the window size changed, recalculate the max angles
-   if(changedParameter == WIDTH_CHANGED || changedParameter == HEIGHT_CHANGED || changedParameter == ALL_CHANGED)
+/*
+ * Calculate the maximum valid angle allowed with the filter wheel rotating.
+ */
+void SFW_CalculFilterRange(gcRegistersData_t *pGCRegs, SFW_ChangedParameterEnum changedParameter)
    {
+   //SFW_INF("CalculFilterRange");
+
       ConvertSizeToDeltaAndTarget(pGCRegs->Width, pGCRegs->Height, changedParameter, &SFW_dX, &SFW_dY, &SFW_CurrentParameters_Target);
       SFW_INF("Width = %d, Height = %d, SFW_dX = %d, SFW_dY=%d, SFW_CurrentParameters_Target=%d\n",pGCRegs->Width,pGCRegs->Height,(int32_t)(SFW_dX*1000.0f) ,(int32_t)(SFW_dY*1000.0f),(int32_t)(SFW_CurrentParameters_Target*1000.0f));
 
@@ -146,104 +131,115 @@ void SFW_CalculateMaximalValues(gcRegistersData_t *pGCRegs, SFW_ChangedParameter
 	   SFW_UpdateFilterRanges(SFW_CurrentParameters_MaxTheta1-SFW_OpticalAxisTheta, SFW_OpticalAxisTheta-SFW_CurrentParameters_MaxTheta2);
 
 	   SFW_RPM_uSec_Max = (SFW_CurrentParameters_MaxTheta1 - SFW_CurrentParameters_MaxTheta2) * 60.0f / 2.0f / (float)M_PI / 0.000001f  * SFW_EXPOSUREMAX_MARGING;
-      //SFW_INF("MaxTheta1 = %d, MaxTheta2 = %d, SFW_RPM_uSec_Max = %d\n",(int32_t) (SFW_CurrentParameters_MaxTheta1 *1000.0f),(int32_t) (SFW_CurrentParameters_MaxTheta2 *1000.0f),(int32_t) (SFW_RPM_uSec_Max * 1e6f)  );
    }
 
-   if ((pGCRegs->FWMode != FWM_SynchronouslyRotating) && (changedParameter != ALL_CHANGED))
+/*
+ * Update the maximal values that can be set in GenICam registers when the width has changed.
+ */
+void SFW_WidthChanged(gcRegistersData_t *pGCRegs)
+{
+   float SFW_ExposureTimeMax_temp;
+
+   if(flashSettings.FWType != FW_SYNC || flashSettings.FWPresent != 1)
       return;
 
-   // If a parameter, other than the exposure time, changed, set the new maximum exposure time
-   if(changedParameter != EXPOSURE_TIME_CHANGED)
-   {
-      float SFW_ExposureTimeMax_temp = SFW_ExposureTimeMax;
+   //SFW_INF("WidthChanged");
 
-      if(pGCRegs->FWSpeedSetpoint != 0)
-         SFW_ExposureTimeMax = floorf(SFW_RPM_uSec_Max / (float)pGCRegs->FWSpeedSetpoint); //Temps max ou le filtre est devant le detecteur
-      else
-         SFW_ExposureTimeMax = pGCRegs->ExposureTimeMax;
+   SFW_CalculFilterRange(pGCRegs, WIDTH_CHANGED);
 
-      SFW_ExposureTimeMax = MIN(SFW_ExposureTimeMax , FPA_MaxExposureTime(pGCRegs)); //Min entre Temps ou le filtre est devant et Temps du FPA qui tient compte du temps d'exposition+readout possible selon le framerate
+   if (pGCRegs->FWMode != FWM_SynchronouslyRotating)
+      return;
 
-      // if width or height changed, limit the acquisition frame rate only
-      if (((changedParameter == WIDTH_CHANGED) || (changedParameter == HEIGHT_CHANGED)) && (SFW_ExposureTimeMax_temp > SFW_ExposureTimeMax) && (SFW_maxExposureTime > SFW_ExposureTimeMax))
+   SFW_ExposureTimeMax_temp = SFW_ExposureTimeMax;
+   SFW_CalculExposureTimeMax(pGCRegs);
+
+   SFW_GreatestFWExposureTime_i = SFW_GetMaxExposureTime(pGCRegs);
+   if ((SFW_ExposureTimeMax_temp > SFW_ExposureTimeMax) && (SFW_GreatestFWExposureTime_i > SFW_ExposureTimeMax))
       {
          SFW_ExposureTimeMax = SFW_ExposureTimeMax_temp;
       }
 
+   SFW_CalculAcquisitionFrameRateMax(pGCRegs);
    }
 
-   if(changedParameter == EXPOSURE_TIME_CHANGED || changedParameter == ALL_CHANGED)
+/*
+ * Update the maximal values that can be set in GenICam registers when the height has changed.
+ */
+void SFW_HeightChanged(gcRegistersData_t *pGCRegs)
    {
-      SFW_maxExposureTime = SFW_GetMaxExposureTime(pGCRegs);
+   float SFW_ExposureTimeMax_temp;
 
-      // If an exposure time change but the maximum is the same, return
-      // The max parameters are still valid
-      if(SFW_maxExposureTime==SFW_lastMaxExposureTime && changedParameter == EXPOSURE_TIME_CHANGED)
+   if(flashSettings.FWType != FW_SYNC || flashSettings.FWPresent != 1)
          return;
 
-      SFW_lastMaxExposureTime = SFW_maxExposureTime;
-   }
+   //SFW_INF("HeightChanged");
 
-   // If a parameter, other than the frame rate, changed, set the new maximum frame rate
-   if(changedParameter != FRAME_RATE_CHANGED)
+   SFW_CalculFilterRange(pGCRegs, HEIGHT_CHANGED);
+
+   if (pGCRegs->FWMode != FWM_SynchronouslyRotating)
+      return;
+
+   SFW_ExposureTimeMax_temp = SFW_ExposureTimeMax;
+   SFW_CalculExposureTimeMax(pGCRegs);
+
+   SFW_GreatestFWExposureTime_i = SFW_GetMaxExposureTime(pGCRegs);
+   if ((SFW_ExposureTimeMax_temp > SFW_ExposureTimeMax) && (SFW_GreatestFWExposureTime_i > SFW_ExposureTimeMax))
    {
-      SFW_AcquisitionFrameRateMax = floorf(SFW_RPM_uSec_Max / SFW_maxExposureTime)*flashSettings.FWNumberOfFilters/60.0f;
-      SFW_AcquisitionFrameRateMax = MIN(SFW_AcquisitionFrameRateMax, pGCRegs->FWSpeedMax*flashSettings.FWNumberOfFilters/60.0f);
-      SFW_INF("SFW_AcquisitionFrameRateMax = %d\n", (uint32_t) (SFW_AcquisitionFrameRateMax * 10));
+        SFW_ExposureTimeMax = SFW_ExposureTimeMax_temp;
+   }
+   SFW_CalculAcquisitionFrameRateMax(pGCRegs);
    }
 
-   if(changedParameter == EXPOSURE_TIME_CHANGED || changedParameter == FRAME_RATE_CHANGED || changedParameter == ALL_CHANGED)
+/*
+ * Update all maximal values that can be set in GenICam registers (Width, Height, ExposureTime and AcquisitionFrameRate).
+ */
+void SFW_AllChanged(gcRegistersData_t *pGCRegs)
    {
-      SFW_CurrentParameters_UsedTheta = (float)pGCRegs->FWSpeedSetpoint / 60.0f * 2.0f * (float)M_PI * SFW_maxExposureTime * 0.000001f;
+   if((flashSettings.FWType != FW_SYNC) || (flashSettings.FWPresent != 1))
+      return;
+
+   //SFW_INF("AllChanged");
+
+   SFW_CalculFilterRange(pGCRegs, ALL_CHANGED);
+   SFW_CalculExposureTimeMax(pGCRegs);
+
+   SFW_GreatestFWExposureTime_i = SFW_GetMaxExposureTime(pGCRegs);
+   SFW_lastGreatestFWExposureTime_i = SFW_GreatestFWExposureTime_i;
+
+   SFW_CalculAcquisitionFrameRateMax(pGCRegs);
    }
 
-   SplitUsedTheta(SFW_CurrentParameters_MaxTheta1, SFW_CurrentParameters_MaxTheta2, &usedTheta1, &usedTheta2);
-
-   // If only the width changed, no need to calculate the maximum width again
-   if(changedParameter != WIDTH_CHANGED)
+/*
+ * Update the maximal values that can be set in GenICam registers when the exposure time has changed.
+ */
+void SFW_ExposureTimeChanged(gcRegistersData_t *pGCRegs)
    {
-      tempWidthMax = MaxWindowSizeX(SFW_dX, SFW_dY, SFW_CurrentParameters_Target, usedTheta1, usedTheta2);
-   }
+   if((flashSettings.FWType != FW_SYNC) || (flashSettings.FWPresent != 1) || (pGCRegs->FWMode != FWM_SynchronouslyRotating))
+      return;
 
-   // If only the height changed, no need to calculate the maximum height again
-   if(changedParameter != HEIGHT_CHANGED)
-   {
-      tempHeightMax = MaxWindowSizeY(SFW_dX, SFW_dY, SFW_CurrentParameters_Target, usedTheta1, usedTheta2);
-   }
+   //SFW_INF("ExposureTimeChanged");
 
-   // Do the algo for the width an other time because the ratio of thetas isn't accurate
-   if(changedParameter != WIDTH_CHANGED)
-   {
-      // Height is unchanged so keep using SFW_dY
-      // Width is changed so recalculate dX and Target;
-      ConvertSizeToDeltaAndTarget(tempWidthMax, pGCRegs->Height, WIDTH_CHANGED, &temp_dX, &temp_dY, &tempCornerPixelPositionRadius);
+   SFW_GreatestFWExposureTime_i = SFW_GetMaxExposureTime(pGCRegs);
 
-      // Find maximal angles with the new width
-      BeamIntersect(temp_dX, SFW_dY, tempCornerPixelPositionRadius, &maxTheta1, &maxTheta2);
+   if(SFW_GreatestFWExposureTime_i==SFW_lastGreatestFWExposureTime_i)
+      return;
 
-      SplitUsedTheta(maxTheta1, maxTheta2, &usedTheta1, &usedTheta2);
-
-      SFW_CurrentWidthMax = MaxWindowSizeX(temp_dX, SFW_dY, tempCornerPixelPositionRadius, usedTheta1, usedTheta2);
-
-   }
-
-   // Do the algo for the height an other time because the ratio of thetas isn't accurate
-   if(changedParameter != HEIGHT_CHANGED)
-   {
-      // Width is unchanged so keep using SFW_dY
-      // Height is changed so recalculate dY and Target;
-      ConvertSizeToDeltaAndTarget(pGCRegs->Width, tempHeightMax, HEIGHT_CHANGED, &temp_dX, &temp_dY, &tempCornerPixelPositionRadius);
-
-      // Find maximal angles with the new height
-      BeamIntersect(SFW_dX, temp_dY, tempCornerPixelPositionRadius, &maxTheta1, &maxTheta2);
-
-      SplitUsedTheta(maxTheta1, maxTheta2, &usedTheta1, &usedTheta2);
-
-
-      SFW_CurrentHeightMax = MaxWindowSizeY(SFW_dX, temp_dY, tempCornerPixelPositionRadius, usedTheta1, usedTheta2);
-
-   }
+   SFW_lastGreatestFWExposureTime_i = SFW_GreatestFWExposureTime_i;
+   SFW_CalculAcquisitionFrameRateMax(pGCRegs);
 }
+
+/*
+ * Update the maximal values that can be set in GenICam registers when the acquisition frame rate has changed.
+ */
+void SFW_FrameRateChanged(gcRegistersData_t *pGCRegs)
+{
+   if((flashSettings.FWType != FW_SYNC) || (flashSettings.FWPresent != 1) || (pGCRegs->FWMode != FWM_SynchronouslyRotating))
+      return;
+
+   //SFW_INF("FrameRateChanged");
+   SFW_CalculExposureTimeMax(pGCRegs);
+
+   }
 
 /*
  * Find the angle needed for a defined beam corner to intersect with the filter edge
@@ -272,71 +268,6 @@ void BeamIntersect(float dX, float dY, float cornerPixelPositionRadius, float* m
 
 }
 
-/*
- * Calculate the maximal window width for these input parameters
- */
-
-uint16_t MaxWindowSizeX(float dX, float dY, float cornerPixelPositionRadius, float usedTheta1, float usedTheta2)
-{
-   float dX_a, tempValue;
-   uint16_t Xmax_1, Xmax_2;
-
-   tempValue = SFW_FiltersRadius*sinf(usedTheta1) - (SFW_Oy + dY);
-   dX_a =   SFW_FiltersRadius*cosf(usedTheta1) - SFW_Ox - sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue);
-   Xmax_1 = (uint16_t)floorf(dX_a/flashSettings.FWCornerPixDistX*FPA_WIDTH_MAX);
-
-   tempValue = SFW_FiltersRadius*sinf(usedTheta2) - (SFW_Oy - dY);
-   dX_a =   -(SFW_FiltersRadius*cosf(usedTheta2) - SFW_Ox + sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue));
-   Xmax_2 = (uint16_t)floorf(dX_a/flashSettings.FWCornerPixDistX*FPA_WIDTH_MAX);
-
-   // return the minimal value between Xmax_1, Xmax_2 and FPA_WIDTH_MAX
-   if(FPA_WIDTH_MAX < Xmax_1 && FPA_WIDTH_MAX < Xmax_2)
-      return FPA_WIDTH_MAX;
-
-   if(Xmax_1 < Xmax_2)
-      return Xmax_1;
-   else
-      return Xmax_2;
-}
-
-/*
- * Calculate the maximal window height for these input parameters
- */
-
-uint16_t MaxWindowSizeY(float dX, float dY, float cornerPixelPositionRadius, float usedTheta1, float usedTheta2)
-{
-   float dY_a, tempValue;
-   uint16_t Ymax_1, Ymax_2;
-
-   tempValue = SFW_FiltersRadius*cosf(usedTheta1) - (SFW_Ox + dX);
-   dY_a =   SFW_FiltersRadius*sinf(usedTheta1) - SFW_Oy + sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue);
-   Ymax_1 = (uint16_t)floorf(dY_a/flashSettings.FWCornerPixDistY*FPA_HEIGHT_MAX);
-
-   tempValue = SFW_FiltersRadius*cosf(usedTheta2) - (SFW_Ox - dX);
-   dY_a =   -(SFW_FiltersRadius*sinf(usedTheta2) - SFW_Oy - sqrtf(cornerPixelPositionRadius*cornerPixelPositionRadius - tempValue*tempValue));
-   Ymax_2 = (uint16_t)floorf(dY_a/flashSettings.FWCornerPixDistY*FPA_HEIGHT_MAX);
-
-   // return the minimal value between Ymax_1, Ymax_2 and FPA_HEIGHT_MAX
-   if(FPA_HEIGHT_MAX < Ymax_1 && FPA_HEIGHT_MAX < Ymax_2)
-      return FPA_HEIGHT_MAX;
-
-   if(Ymax_1 < Ymax_2)
-      return Ymax_1;
-   else
-      return Ymax_2;
-}
-
-/*
- * Convert usedTheta in 2 new angles with same proportions than the maximal angles
- * The exact proportion isn't known and the use of the current proportion is a good approximation
- * Nevertheless, 2 iterations of the algorithm for the maximal size is needed for a better accuracy
- */
-
-void SplitUsedTheta(float maxTheta1, float maxTheta2, float* usedTheta1, float* usedTheta2)
-{
-   *usedTheta1 = (SFW_CurrentParameters_UsedTheta)/(maxTheta1-maxTheta2)*(maxTheta1-SFW_OpticalAxisTheta) + SFW_OpticalAxisTheta;
-   *usedTheta2 = (SFW_CurrentParameters_UsedTheta)/(maxTheta1-maxTheta2)*(maxTheta2-SFW_OpticalAxisTheta) + SFW_OpticalAxisTheta;
-}
 
 /*
  * Calculate dX and dY by doing an linear interpolation between 0 and maximal pixels
@@ -364,85 +295,32 @@ float SFW_GetMaxExposureTime(gcRegistersData_t *pGCRegs)
 
    if(pGCRegs->FWMode == FWM_Fixed)
    {
-      /*
-      if(pGCRegs->EHDRINumberOfExposures > 1)
-      {
-         for(i=0; i<pGCRegs->EHDRINumberOfExposures; i++) // Max of the EHDRI values of 1 spectral filter
-         {
-            maxValue = MAX(GETEHDRIEXPOSURE(pGCRegs->SFWPositionSetpoint,i), maxValue);
-         }
-      }
-
-      else
-      {
-         maxValue = GETEHDRIEXPOSURE(pGCRegs->SFWPositionSetpoint,0); // The value of the spactral filter
-      }
-      */
       maxValue = pGCRegs->ExposureTime;
    }
    else // if ROTATING
    {
-//      if(pGCRegs->EHDRINumberOfExposures > 1)
-//      {
-//         for(i=0; i<SFW_FILTER_NB; i++) // Max of EHDRI values of all spectral filters
-//            for(j=0; j<pGCRegs->EHDRINumberOfExposures; j++)
-//               maxValue = MAX(GETEHDRIEXPOSURE(i,j), maxValue);
-//      }
-//      else
-//      {
-//         for(i=0; i<SFW_FILTER_NB; i++)
-//            maxValue = MAX(GETEHDRIEXPOSURE(i,0), maxValue); // Max values of all spectral filters
-//      }
       for(i=0; i<flashSettings.FWNumberOfFilters; i++)
       {
          maxValue = MAX(maxValue, FWExposureTime[i]);
       }
    }
-
-
    return maxValue;
 }
 
-void SFW_LimitParameter(gcRegistersData_t * pGCRegs)
+void SFW_LimitExposureTime(gcRegistersData_t * pGCRegs)
 {
-   float acqFrMaxTemp;
+   uint32_t i; // Filter index
 
-   if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
+      for(i=0; i<NUM_OF(FWExposureTime); i++)
    {
-      acqFrMaxTemp = MIN(pGCRegs->AcquisitionFrameRateMax, SFW_GetAcquisitionFrameRateMax());
-
-      if( acqFrMaxTemp != pGCRegs->AcquisitionFrameRateMax)
+            if(FWExposureTime[i] > pGCRegs->ExposureTimeMax)
       {
-         pGCRegs->AcquisitionFrameRateMax = acqFrMaxTemp;
-
-         if ( pGCRegs->AcquisitionFrameRate > pGCRegs->AcquisitionFrameRateMax && !TDCStatusTst(AcquisitionStartedMask)) // TODO le check empêche de changer live un parametre?
-         {
-            pGCRegs->AcquisitionFrameRate = pGCRegs->AcquisitionFrameRateMax;
-
-            pGCRegs->FWSpeedSetpoint = (int16_t) floorf(pGCRegs->AcquisitionFrameRate*60.0f/flashSettings.FWNumberOfFilters);
-            // limit speed to 1 RPM (minimum for the controller)
-            pGCRegs->FWSpeedSetpoint = MIN(MAX(pGCRegs->FWSpeedSetpoint, 1),pGCRegs->FWSpeedMax);
-            // Recalcul the corresponding frame rate
-            pGCRegs->AcquisitionFrameRate = pGCRegs->FWSpeedSetpoint*flashSettings.FWNumberOfFilters/60.0f;
-            ChangeFWControllerMode(FW_VELOCITY_MODE, pGCRegs->FWSpeedSetpoint);
+               SFW_INF("UPDATE EXPOSURE TIME: (%d) before(x100) = %d ",i, (uint32_t) FWExposureTime[i] * 100);
+               FWExposureTime[i] = pGCRegs->ExposureTimeMax;
+               SFW_SetExposureTimeArray(i, FWExposureTime[i]);
+               SFW_INF(" After(x100) = %d \n",(uint32_t) FWExposureTime[i] *100);
          }
       }
-
-      if(SFW_GetExposureTimeMax() != pGCRegs->ExposureTimeMax) // If the maximum exposure time value of a rotating wheel is different than the exposuretime max then
-      {
-         uint32_t sfw; //,hdri;
-         pGCRegs->ExposureTimeMax = SFW_GetExposureTimeMax();
-         for(sfw=0; sfw<NUM_OF(FWExposureTime); sfw++)
-         {
-               if(FWExposureTime[sfw]> pGCRegs->ExposureTimeMax)
-               {
-                  SFW_INF("UPDATE EXPOSURE TIME: (%d) before(x100) = %d ",sfw, (uint32_t) FWExposureTime[sfw] * 100);
-                  FWExposureTime[sfw] = pGCRegs->ExposureTimeMax;
-                  SFW_SetExposureTimeArray(sfw, FWExposureTime[sfw]);
-                  SFW_INF(" After(x100) = %d \n",(uint32_t) FWExposureTime[sfw] *100);
+      GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), true);
                }
-         }
-         GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime));
-      }
-   }
-}
+

@@ -57,7 +57,7 @@
 #define FW_LIMIT_SWITCH_MSK               (uint8_t)4 /*< value of the IO configuration mask 5th input mcdc only */
 #define FW_LIMIT_SWITCH_FAULT_MSK         (uint8_t)2 /*< value of the IO configuration mask Fault pin */
 
-
+#define FW_CMD_QUEUE_SIZE           1
 
 // SLOW FILTER WHEEL WITH 4 POSITONS AND A GEARBOX
 #define FW_INTERNAL_GEAR_RATIO (int)361
@@ -82,6 +82,7 @@
 #define FW_ERR_FAULHABER_VEL_TIMEOUT         0x00000080
 #define FW_ERR_FAULHABER_PROFILE_TIMEOUT     0x00000100
 #define FW_ERR_FAULHABER_CONTR_ERROR         0x00000200
+#define FW_ERR_FAULHABER_SPEED_SETPOINT      0x00000400
 #define FW_ERR_ALL                           0xFFFFFFFF
 
 typedef enum
@@ -186,6 +187,12 @@ typedef enum
    FW_FIX = 0,
    FW_SYNC
 } FWType_t;
+
+struct FWCommandStruct {
+   FW_ControllerMode_t mode;
+   int32_t target;
+};
+typedef struct FWCommandStruct FWCommand_t;
 
 
 ////////////////////

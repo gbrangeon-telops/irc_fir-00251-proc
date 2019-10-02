@@ -475,8 +475,7 @@ IRC_Status_t Proc_FU_Init()
 IRC_Status_t Proc_GC_Init()
 {
    IRC_Status_t status;
-   extern float* pGcRegsDataExposureTimeX[MAX_NUM_FILTER];
-
+   extern gcRegister_t* pGcRegsDefExposureTimeX[MAX_NUM_FILTER];
    // Initialize GenICam registers data pointer
    GC_Registers_Init();
 
@@ -514,14 +513,14 @@ IRC_Status_t Proc_GC_Init()
    gcRegsData.AutofocusROI = gFlashDynamicValues.AutofocusROI;
 
    // Initialize pointer array on ExposureTimeX registers
-   pGcRegsDataExposureTimeX[0] = &gcRegsData.ExposureTime1;
-   pGcRegsDataExposureTimeX[1] = &gcRegsData.ExposureTime2;
-   pGcRegsDataExposureTimeX[2] = &gcRegsData.ExposureTime3;
-   pGcRegsDataExposureTimeX[3] = &gcRegsData.ExposureTime4;
-   pGcRegsDataExposureTimeX[4] = &gcRegsData.ExposureTime5;
-   pGcRegsDataExposureTimeX[5] = &gcRegsData.ExposureTime6;
-   pGcRegsDataExposureTimeX[6] = &gcRegsData.ExposureTime7;
-   pGcRegsDataExposureTimeX[7] = &gcRegsData.ExposureTime8;
+   pGcRegsDefExposureTimeX[0] = &gcRegsDef[ExposureTime1Idx];
+   pGcRegsDefExposureTimeX[1] = &gcRegsDef[ExposureTime2Idx];
+   pGcRegsDefExposureTimeX[2] = &gcRegsDef[ExposureTime3Idx];
+   pGcRegsDefExposureTimeX[3] = &gcRegsDef[ExposureTime4Idx];
+   pGcRegsDefExposureTimeX[4] = &gcRegsDef[ExposureTime5Idx];
+   pGcRegsDefExposureTimeX[5] = &gcRegsDef[ExposureTime6Idx];
+   pGcRegsDefExposureTimeX[6] = &gcRegsDef[ExposureTime7Idx];
+   pGcRegsDefExposureTimeX[7] = &gcRegsDef[ExposureTime8Idx];
 
    // Initialize image size limits
    gcRegsData.WidthInc = lcm(FPA_WIDTH_MULT, 2 * FPA_OFFSETX_MULT);

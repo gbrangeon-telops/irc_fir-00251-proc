@@ -433,18 +433,13 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
    {
       // After write
 
-      // Update AcquisitionFrameRate and ExposureTime limits
-      GC_UpdateParameterLimits();
-
-      if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
+      if(FWSynchronoulyRotatingModeIsActive)
       {
          FW_CalculateSpeedSetpoint(&gcRegsData);
-         GC_FWSpeedSetpointCallback(GCCP_AFTER, GCCA_WRITE);
-         SFW_CalculateMaximalValues(&gcRegsData, FRAME_RATE_CHANGED);
-         SFW_LimitParameter(&gcRegsData);
+         SFW_FrameRateChanged(&gcRegsData);
       }
-
-
+      // Update AcquisitionFrameRate and ExposureTime limits
+      GC_UpdateParameterLimits();
       if (!gGC_RegistersStreaming && ((gcRegsData.AcquisitionFrameRate > gcRegsData.AcquisitionFrameRateMax) || (gcRegsData.AcquisitionFrameRate < gcRegsData.AcquisitionFrameRateMin)))
       {
          GC_GenerateEventError(EECD_InvalidFrameRate);
@@ -523,14 +518,8 @@ void GC_AcquisitionFrameRateSetToMaxCallback(gcCallbackPhase_t phase, gcCallback
       {
          gcRegsData.AcquisitionFrameRateSetToMax = 0;
 
-         // Update AcquisitionFrameRateMax
+         SFW_FrameRateChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-
-         if (gcRegsData.FWMode == FWM_SynchronouslyRotating)
-         {
-            SFW_CalculateMaximalValues(&gcRegsData, FRAME_RATE_CHANGED);
-            SFW_LimitParameter(&gcRegsData);
-         }
 
          if ( gcRegsData.AcquisitionFrameRate != gcRegsData.AcquisitionFrameRateMax )
          {
@@ -1966,12 +1955,11 @@ void GC_EHDRINumberOfExposuresCallback(gcCallbackPhase_t phase, gcCallbackAccess
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      GC_UpdateParameterLimits();
       if (EHDRIIsActive)
       {
-         GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime));
-         //GC_UpdateParameterLimits(); //Redundant
+         GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime), true);
       }
+      GC_UpdateParameterLimits();
       CAL_UpdateVideo(&gCal, &gcRegsData);
       GC_UpdateAECPlusIsAvailable();
    }
@@ -1990,11 +1978,6 @@ void GC_EHDRIResetToDefaultCallback(gcCallbackPhase_t phase, gcCallbackAccess_t 
    {
       // After write
       EHDRI_Reset(&gEHDRIManager, &gcRegsData);
-
-      if (EHDRIIsActive)
-      {
-         GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime));
-      }
    }
 }
 
@@ -2158,9 +2141,8 @@ void GC_ExposureAutoCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       if (gcRegsData.ExposureAuto == EA_Off)
       {
          // Update Frame Rate limit with the actual exposure times
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2228,9 +2210,8 @@ void GC_ExposureTime1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
          FWExposureTime[0] = gcRegsData.ExposureTime1;
          SFW_SetExposureTimeArray(0, FWExposureTime[0]);
 
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2258,9 +2239,9 @@ void GC_ExposureTime2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
          FWExposureTime[1] = gcRegsData.ExposureTime2;
          SFW_SetExposureTimeArray(1, FWExposureTime[1]);
 
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
+
       }
    }
 }
@@ -2288,9 +2269,8 @@ void GC_ExposureTime3Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
          FWExposureTime[2] = gcRegsData.ExposureTime3;
          SFW_SetExposureTimeArray(2, FWExposureTime[2]);
 
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2317,10 +2297,8 @@ void GC_ExposureTime4Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       {
          FWExposureTime[3] = gcRegsData.ExposureTime4;
          SFW_SetExposureTimeArray(3, FWExposureTime[3]);
-
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2342,10 +2320,8 @@ void GC_ExposureTime5Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       {
          FWExposureTime[4] = gcRegsData.ExposureTime5;
          SFW_SetExposureTimeArray(4, FWExposureTime[4]);
-
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2368,9 +2344,8 @@ void GC_ExposureTime6Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
          FWExposureTime[5] = gcRegsData.ExposureTime6;
          SFW_SetExposureTimeArray(5, FWExposureTime[5]);
 
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2392,10 +2367,8 @@ void GC_ExposureTime7Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       {
          FWExposureTime[6] = gcRegsData.ExposureTime7;
          SFW_SetExposureTimeArray(6, FWExposureTime[6]);
-
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2417,10 +2390,8 @@ void GC_ExposureTime8Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       {
          FWExposureTime[7] = gcRegsData.ExposureTime8;
          SFW_SetExposureTimeArray(7, FWExposureTime[7]);
-
-         SFW_CalculateMaximalValues(&gcRegsData, EXPOSURE_TIME_CHANGED);
+         SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
-         SFW_LimitParameter(&gcRegsData);
       }
    }
 }
@@ -2678,14 +2649,7 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    {
       GC_UpdateFpaPeriodMinMargin();   // must be called first
 
-      GC_UpdateParameterLimits();
-
       CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
-      if (FWSynchronoulyRotatingModeIsActive)
-      {
-         GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime));
-      }
-
       if(flashSettings.FWType == FW_SYNC)
          SFW_UpdateSFWMode(gcRegsData.FWMode);
 
@@ -2708,13 +2672,12 @@ void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
             GC_SetCenterImage(1);
          }
 
-         //Limit Parameter
-         FW_CalculateSpeedSetpoint(&gcRegsData);
-         SFW_CalculateMaximalValues(&gcRegsData, ALL_CHANGED);
-         SFW_LimitParameter(&gcRegsData);
+         GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), true);         FW_CalculateSpeedSetpoint(&gcRegsData);
+         SFW_AllChanged(&gcRegsData);
          ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint); // TODO should we set something always valid?
       }
 
+      GC_UpdateParameterLimits();
       GC_UpdateAECPlusIsAvailable();
       CAL_UpdateVideo(&gCal, &gcRegsData);
 
@@ -3092,9 +3055,8 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
       GC_UpdateImageLimits();   // must be called first
 
-      SFW_CalculateMaximalValues(&gcRegsData, HEIGHT_CHANGED);
+      SFW_HeightChanged(&gcRegsData);
       GC_UpdateParameterLimits();
-      SFW_LimitParameter(&gcRegsData);
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);
@@ -4623,9 +4585,8 @@ void GC_WidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       // After write
       GC_UpdateImageLimits();   // must be called first
 
-      SFW_CalculateMaximalValues(&gcRegsData, WIDTH_CHANGED);
+      SFW_WidthChanged(&gcRegsData);
       GC_UpdateParameterLimits();
-      SFW_LimitParameter(&gcRegsData);
 
       AEC_UpdateImageFraction(&gcRegsData, &gAEC_Ctrl);
       AEC_UpdateMode(&gcRegsData, &gAEC_Ctrl);

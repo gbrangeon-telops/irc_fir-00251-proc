@@ -16,7 +16,7 @@
 #define SFW_ERR(fmt, ...)          FPGA_PRINTF("SFW: Error: " fmt "\n", ##__VA_ARGS__)
 #define SFW_INF(fmt, ...)          SFW_PRINTF("Info: " fmt "\n", ##__VA_ARGS__)
 
-#define SFW_BRAM_SIZE           128
+#define SFW_BRAM_SIZE               128
 
 //SFW CTRL ADDRESS MAP
 #define FW_POSITION_0_ADDR 			0
@@ -36,19 +36,18 @@
 #define RPM_MAX_ADDR 				56
 #define HOME_LOCK_ADDR 				60
 #define POSITION_ADDR 				64
-#define RPM_ADDR 					   68
+#define RPM_ADDR 				    68
 #define ERROR_SPEED_ADDR 			72
 #define SPEED_PRECISION_BIT_ADDR	76
-#define INDEX_MODE_ADDR          80
+#define INDEX_MODE_ADDR             80
 
 #define FW_EXPOSURETIME_OFFSET		1024
 
-#define SFW_POS_TOLERANCE_MARGIN       0.5F
-#define SFW_MAX_SPEED_MARGIN           500
-#define SFW_FILTER_NB                  8
+#define SFW_MAX_SPEED_MARGIN        500
+#define SFW_FILTER_NB               8
 
-#define FWPOSITION_IN_TRANSITION          8
-#define FWPOSITION_NOT_IMPLEMENTED        9
+#define FWPOSITION_IN_TRANSITION    8
+#define FWPOSITION_NOT_IMPLEMENTED  9
 
 
 // Struct Definition
