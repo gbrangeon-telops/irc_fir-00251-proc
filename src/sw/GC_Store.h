@@ -70,9 +70,10 @@ typedef enum
 
 
 /* Prototypes */
-IRC_Status_t GC_Store_Save(qspiFlash_t *qspiFlash);
+IRC_Status_t GC_Store_Save(void);
 IRC_Status_t GC_Store_Load(qspiFlash_t *qspiFlash);
-IRC_Status_t GC_Store_Erase(qspiFlash_t *qspiFlash);
+IRC_Status_t GC_Store_Erase(void);
 void GC_Store_SM(qspiFlash_t *qspiFlash);
+IRC_Status_t GC_Restore_Data_Factory(gcRegistersData_t *pGCRegs);
 
 #endif

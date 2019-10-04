@@ -49,7 +49,7 @@ static bool cmd_erase; /* Erase command flag */
 static bool cmd_save;  /* Save command flag */
 
 
-IRC_Status_t GC_Store_Erase(qspiFlash_t *qspiFlash)
+IRC_Status_t GC_Store_Erase(void)
 {
    cmd_erase = true;
    GCS_INF("GC store erase started.");
@@ -57,10 +57,32 @@ IRC_Status_t GC_Store_Erase(qspiFlash_t *qspiFlash)
 }
 
 
-IRC_Status_t GC_Store_Save(qspiFlash_t *qspiFlash)
+IRC_Status_t GC_Store_Save(void)
 {
    cmd_save = true;
    GCS_INF("GC store save started.");
+   return IRC_SUCCESS;
+}
+
+
+IRC_Status_t GC_Restore_Data_Factory(gcRegistersData_t *pGCRegs)
+{
+
+   *pGCRegs = gcRegsDataFactory;
+   memcpy(DeviceClockFrequencyAry, DeviceClockFrequencyAryFactory, sizeof(DeviceClockFrequencyAry));
+   memcpy(DeviceTemperatureAry, DeviceTemperatureAryFactory, sizeof(DeviceTemperatureAry));
+   memcpy(DeviceVoltageAry, DeviceVoltageAryFactory, sizeof(DeviceVoltageAry));
+   memcpy(DeviceCurrentAry, DeviceCurrentAryFactory, sizeof(DeviceCurrentAry));
+   memcpy(DeviceSerialPortBaudRateAry, DeviceSerialPortBaudRateAryFactory, sizeof(DeviceSerialPortBaudRateAry));
+   memcpy(DeviceSerialPortFunctionAry, DeviceSerialPortFunctionAryFactory, sizeof(DeviceSerialPortFunctionAry));
+   memcpy(EventNotificationAry, EventNotificationAryFactory, sizeof(EventNotificationAry));
+   memcpy(DeviceFirmwareModuleRevisionAry, DeviceFirmwareModuleRevisionAryFactory, sizeof(DeviceFirmwareModuleRevisionAry));
+   memcpy(TriggerModeAry, TriggerModeAryFactory, sizeof(TriggerModeAry));
+   memcpy(TriggerSourceAry, TriggerSourceAryFactory, sizeof(TriggerSourceAry));
+   memcpy(TriggerActivationAry, TriggerActivationAryFactory, sizeof(TriggerActivationAry));
+   memcpy(TriggerDelayAry, TriggerDelayAryFactory, sizeof(TriggerDelayAry));
+   memcpy(TriggerFrameCountAry, TriggerFrameCountAryFactory, sizeof(TriggerFrameCountAry));
+
    return IRC_SUCCESS;
 }
 

@@ -3260,7 +3260,7 @@ void GC_LoadSavedConfigurationAtStartupCallback(gcCallbackPhase_t phase, gcCallb
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_Store_Save(&gQSPIFlash);
+      GC_Store_Save();
    }
 }
 
@@ -4190,7 +4190,6 @@ void GC_ReverseYCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
  */
 void GC_SaveConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   extern qspiFlash_t gQSPIFlash;
 
    if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
    {
@@ -4200,7 +4199,7 @@ void GC_SaveConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t ac
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // After write
-      GC_Store_Save(&gQSPIFlash);
+      GC_Store_Save();
    }
 }
 

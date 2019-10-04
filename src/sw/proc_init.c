@@ -483,7 +483,7 @@ IRC_Status_t Proc_GC_Init()
    GC_Callback_Init();
 
    // Initialize GenICam register data with default values
-   gcRegsData = gcRegsDataFactory;
+   GC_Restore_Data_Factory(&gcRegsData);
 
    // Try to load saved GenIcam registers from the flash store
    status = GC_Store_Load(&gQSPIFlash);
@@ -494,7 +494,7 @@ IRC_Status_t Proc_GC_Init()
       else // Feature disabled: restore default values
       {
          GCS_INF("GC store disabled: restoring factory values");
-         gcRegsData = gcRegsDataFactory;
+         GC_Restore_Data_Factory(&gcRegsData);
       }
    }
 
