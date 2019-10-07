@@ -35,6 +35,7 @@
 #include "RpOpticalProtocol.h"
 #include "XADC_Channels.h"
 #include "IRIGB.h"
+#include "GC_Store.h"
 
 /**
  * Indicates whether flash settings have to be loaded immediately
@@ -435,7 +436,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    else
    {
       TDCFlagsClr(SaveConfigurationIsImplementedMask);
-      GC_SetLoadSavedConfigurationAtStartup(0);
+      GC_Restore_Data_Factory(&gcRegsData);
    }
 
    // Update camera state if initialization is done
