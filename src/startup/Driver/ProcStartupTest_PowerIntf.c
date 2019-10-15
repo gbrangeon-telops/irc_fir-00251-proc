@@ -581,8 +581,6 @@ void Power_IntrHandler_Test(powerCtrl_t *p_powerCtrl) {
       }
    }
 
-   XGpio_InterruptClear(&p_powerCtrl->GPIO, PGPIOC_POWER_MANAGEMENT);
-
    return;
 
 }
