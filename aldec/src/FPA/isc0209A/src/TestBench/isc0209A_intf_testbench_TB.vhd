@@ -18,7 +18,6 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
          ACQ_TRIG : in STD_LOGIC;
          ARESET : in STD_LOGIC;
          CLK_100M : in STD_LOGIC;
-         DOUT_CLK : in STD_LOGIC;
          DOUT_MISO : in t_axi4_stream_miso;
          FPA_EXP_INFO : in exp_info_type;
          HDER_MISO : in t_axi4_lite_miso;
@@ -26,7 +25,8 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
          MB_MOSI : in t_axi4_lite_mosi;
          XTRA_TRIG : in STD_LOGIC;
          ADC_SYNC_FLAG : out STD_LOGIC;
-         DOUT_MOSI : out t_axi4_stream_mosi32;
+         DOUT_CLK : out STD_LOGIC;
+         DOUT_MOSI : out t_axi4_stream_mosi64;
          ERR_FOUND : out STD_LOGIC;
          FPA_DIGIO1 : out STD_LOGIC;
          FPA_DIGIO10 : out STD_LOGIC;
@@ -49,9 +49,7 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
    end component;
    
    constant CLK_100M_PERIOD         : time := 10 ns;
-   constant CLK_80M_PERIOD          : time := 12.5 ns;
    constant ACQ_TRIG_PERIOD         : time := 3 ms;
-   constant DOUT_CLK_PERIOD         : time := 12.5 ns;
    
    constant EXP_TIME_US    : integer := 2000;
    
@@ -65,7 +63,6 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
    signal ACQ_TRIG : STD_LOGIC := '0';
    signal ARESET : STD_LOGIC;
    signal CLK_100M : STD_LOGIC := '0';
-   signal CLK_80M : STD_LOGIC  := '0';
    signal DOUT_CLK : STD_LOGIC := '0';
    signal DOUT_MISO : t_axi4_stream_miso;
    signal FPA_EXP_INFO : exp_info_type;
@@ -75,7 +72,7 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
    signal XTRA_TRIG : STD_LOGIC;
    -- Observed signals - signals mapped to the output ports of tested entity
    signal ADC_SYNC_FLAG : STD_LOGIC;
-   signal DOUT_MOSI : t_axi4_stream_mosi32;
+   signal DOUT_MOSI : t_axi4_stream_mosi64;
    signal ERR_FOUND : STD_LOGIC;
    signal FPA_DIGIO1 : STD_LOGIC;
    signal FPA_DIGIO10 : STD_LOGIC;
@@ -121,18 +118,6 @@ begin
    MB_CLK <= CLK_100M;
    
    -- clk
-   U2: process(CLK_80M)
-   begin
-      CLK_80M <= not CLK_80M after CLK_80M_PERIOD/2; 
-   end process;
-   
-   -- clk
-   U3: process(DOUT_CLK)
-   begin
-      DOUT_CLK <= not DOUT_CLK after DOUT_CLK_PERIOD/2; 
-   end process;
-   
-   -- clk
    U4: process(ACQ_TRIG)
    begin
       ACQ_TRIG <= not ACQ_TRIG after ACQ_TRIG_PERIOD/2; 
@@ -168,9 +153,9 @@ begin
          user_cfg_i.COMN.fpa_pwr_on <= '1';
          user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_TRIG_START_TO_TRIG_START;--MODE_READOUT_END_TO_TRIG_START;
          user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);    -- delay + readout (full window)
-         user_cfg_i.COMN.fpa_acq_trig_period_min <= to_unsigned(289130, user_cfg_i.COMN.fpa_acq_trig_period_min'length);
+         user_cfg_i.COMN.fpa_spare <= (others => '0');
          user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
-         user_cfg_i.COMN.fpa_xtra_trig_period_min <= to_unsigned(289130, user_cfg_i.COMN.fpa_xtra_trig_period_min'length);  
+         user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly'length);  
          user_cfg_i.XSTART <= (others => '0');
          user_cfg_i.YSTART <= (others => '0');
          user_cfg_i.XSIZE  <= to_unsigned(xsize, user_cfg_i.XSIZE'length);
@@ -206,7 +191,14 @@ begin
          user_cfg_i.vgood_samp_mean_numerator   		<= to_unsigned(2**21, user_cfg_i.vgood_samp_mean_numerator'length); 
          user_cfg_i.good_samp_first_pos_per_ch  		<= to_unsigned(1, user_cfg_i.good_samp_first_pos_per_ch'length); 
          user_cfg_i.good_samp_last_pos_per_ch   		<= to_unsigned(1, user_cfg_i.good_samp_last_pos_per_ch'length); 
-         user_cfg_i.xsize_div_tapnum            		<= to_unsigned(xsize/4, user_cfg_i.xsize_div_tapnum'length); 
+         user_cfg_i.xsize_div_tapnum            		<= to_unsigned(xsize/4, user_cfg_i.xsize_div_tapnum'length);
+         
+         user_cfg_i.adc_clk_source_phase              <= to_unsigned(1000, user_cfg_i.adc_clk_source_phase'length);
+         user_cfg_i.adc_clk_pipe_sel          		   <= to_unsigned(3, user_cfg_i.adc_clk_pipe_sel'length);
+         user_cfg_i.cfg_num          		            <= to_unsigned(1, user_cfg_i.cfg_num'length);
+         user_cfg_i.comn.fpa_stretch_acq_trig         <= '0';
+         user_cfg_i.comn.fpa_intf_data_source         <= '0';
+      
          user_cfg_i.vdac_value(1)               		<= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
          user_cfg_i.vdac_value(2)               		<= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 
          user_cfg_i.vdac_value(3)               		<= to_unsigned(11630, user_cfg_i.vdac_value(3)'length);
@@ -254,11 +246,11 @@ begin
       wait for 30 ns;      
       write_axi_lite (MB_CLK, x"00000010", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"00000014", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_period_min, 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"00000014", std_logic_vector(resize(user_cfg_i.COMN.fpa_spare, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
       write_axi_lite (MB_CLK, x"00000018", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"0000001C", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_period_min, 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"0000001C", std_logic_vector(resize(user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;        
       write_axi_lite (MB_CLK, x"00000020", std_logic_vector(resize(user_cfg_i.XSTART, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
@@ -325,26 +317,33 @@ begin
       wait for 30 ns;
       write_axi_lite (MB_CLK, x"00000094", std_logic_vector(resize(user_cfg_i.xsize_div_tapnum, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"00000098", std_logic_vector(resize(user_cfg_i.vdac_value(1), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"00000098", std_logic_vector(resize(user_cfg_i.adc_clk_source_phase, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"0000009C", std_logic_vector(resize(user_cfg_i.vdac_value(2), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"0000009C", std_logic_vector(resize(user_cfg_i.adc_clk_pipe_sel, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000A0", std_logic_vector(resize(user_cfg_i.vdac_value(3), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"000000A0", std_logic_vector(resize(user_cfg_i.cfg_num, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000A4", std_logic_vector(resize(user_cfg_i.vdac_value(4), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"000000A4", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_stretch_acq_trig, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000A8", std_logic_vector(resize(user_cfg_i.vdac_value(5), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"000000A8", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_intf_data_source, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      
+      write_axi_lite (MB_CLK, x"00000D00", std_logic_vector(resize(user_cfg_i.vdac_value(1), 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000D04", std_logic_vector(resize(user_cfg_i.vdac_value(2), 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000D08", std_logic_vector(resize(user_cfg_i.vdac_value(3), 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000D0C", std_logic_vector(resize(user_cfg_i.vdac_value(4), 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000D10", std_logic_vector(resize(user_cfg_i.vdac_value(5), 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"000000AC", std_logic_vector(resize(user_cfg_i.vdac_value(6), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"00000D14", std_logic_vector(resize(user_cfg_i.vdac_value(6), 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000B0", std_logic_vector(resize(user_cfg_i.vdac_value(7), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"00000D18", std_logic_vector(resize(user_cfg_i.vdac_value(7), 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000B4", std_logic_vector(resize(user_cfg_i.vdac_value(8), 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"00000D1C", std_logic_vector(resize(user_cfg_i.vdac_value(8), 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000B8", std_logic_vector(resize(user_cfg_i.adc_clk_phase, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;
-      write_axi_lite (MB_CLK, x"000000BC", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_stretch_acq_trig, 32)), MB_MISO,  MB_MOSI);
-      wait for 30 ns;            
       
       write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
