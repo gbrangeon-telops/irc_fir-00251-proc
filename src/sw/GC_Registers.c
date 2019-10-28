@@ -54,7 +54,7 @@ extern float SFW_ExposureTimeMax;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.6.0
+// Generated from XML camera definition file version 12.6.255
 // using generateGenICamCLib.m Matlab script.
 
 // GenICam global variables definition
@@ -258,8 +258,10 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferSequenceDefrag = */ 0,
    /* MemoryBufferSequenceDownloadFrameCount = */ 1,
    /* MemoryBufferSequenceDownloadFrameID = */ 0,
+   /* MemoryBufferSequenceDownloadFrameImageCount = */ 1,
    /* MemoryBufferSequenceDownloadImageFrameID = */ 0,
    /* MemoryBufferSequenceDownloadMode = */ MBSDM_Off,
+   /* MemoryBufferSequenceDownloadSuggestedFrameImageCount = */ 1,
    /* MemoryBufferSequenceFirstFrameID = */ 0,
    /* MemoryBufferSequenceHeight = */ 0,
    /* MemoryBufferSequenceMOIFrameID = */ 0,
@@ -632,8 +634,10 @@ void GC_Registers_Init()
    gcRegsDef[MemoryBufferSequenceDefragIdx].p_data = &gcRegsData.MemoryBufferSequenceDefrag;
    gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadFrameCount;
    gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadFrameID;
+   gcRegsDef[MemoryBufferSequenceDownloadFrameImageCountIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadFrameImageCount;
    gcRegsDef[MemoryBufferSequenceDownloadImageFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadImageFrameID;
    gcRegsDef[MemoryBufferSequenceDownloadModeIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadMode;
+   gcRegsDef[MemoryBufferSequenceDownloadSuggestedFrameImageCountIdx].p_data = &gcRegsData.MemoryBufferSequenceDownloadSuggestedFrameImageCount;
    gcRegsDef[MemoryBufferSequenceFirstFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceFirstFrameID;
    gcRegsDef[MemoryBufferSequenceHeightIdx].p_data = &gcRegsData.MemoryBufferSequenceHeight;
    gcRegsDef[MemoryBufferSequenceMOIFrameIDIdx].p_data = &gcRegsData.MemoryBufferSequenceMOIFrameID;
@@ -1403,6 +1407,7 @@ void GC_UpdateMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)
    gcRegsDef[MemoryBufferSequenceDownloadFrameIDIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferSequenceDownloadSuggestedFrameImageCountIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceClearIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceDefragIdx].owner = regOwner;

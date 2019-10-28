@@ -59,10 +59,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.6.0
+// Generated from XML camera definition file version 12.6.255
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 6) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 6) || (GC_XMLSUBMINORVERSION != 255))
 #error "XML version mismatch."
 #endif
 
@@ -267,8 +267,10 @@ struct gcRegistersDataStruct {
    uint32_t MemoryBufferSequenceDefrag;
    uint32_t MemoryBufferSequenceDownloadFrameCount;
    uint32_t MemoryBufferSequenceDownloadFrameID;
+   uint32_t MemoryBufferSequenceDownloadFrameImageCount;
    uint32_t MemoryBufferSequenceDownloadImageFrameID;
    uint32_t MemoryBufferSequenceDownloadMode;
+   uint32_t MemoryBufferSequenceDownloadSuggestedFrameImageCount;
    uint32_t MemoryBufferSequenceFirstFrameID;
    uint32_t MemoryBufferSequenceHeight;
    uint32_t MemoryBufferSequenceMOIFrameID;
@@ -581,6 +583,8 @@ extern const uint32_t TriggerFrameCountAryFactory[TriggerFrameCountAryLen];
 #define GC_SetMemoryBufferSequenceDownloadFrameCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadFrameCountIdx], val)
 #define GC_SetMemoryBufferSequenceDownloadMode(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadModeIdx], val)
 #define GC_SetMemoryBufferSequenceDownloadBitRateMax(val) GC_RegisterWriteFloat(&gcRegsDef[MemoryBufferSequenceDownloadBitRateMaxIdx], val)
+#define GC_SetMemoryBufferSequenceDownloadSuggestedFrameImageCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadSuggestedFrameImageCountIdx], val)
+#define GC_SetMemoryBufferSequenceDownloadFrameImageCount(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDownloadFrameImageCountIdx], val)
 #define GC_SetMemoryBufferSequenceClear(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceClearIdx], val)
 #define GC_SetMemoryBufferSequenceClearAll(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceClearAllIdx], val)
 #define GC_SetMemoryBufferSequenceDefrag(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceDefragIdx], val)

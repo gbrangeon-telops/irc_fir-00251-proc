@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.6.0
+// Generated from XML camera definition file version 12.6.255
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -222,8 +222,10 @@ void GC_MemoryBufferSequenceDefragCallback(gcCallbackPhase_t phase, gcCallbackAc
 void GC_MemoryBufferSequenceDownloadBitRateMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadFrameCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceDownloadFrameImageCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadImageFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceDownloadModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_MemoryBufferSequenceDownloadSuggestedFrameImageCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceFirstFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceHeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_MemoryBufferSequenceMOIFrameIDCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
