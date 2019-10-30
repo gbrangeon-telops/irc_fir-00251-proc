@@ -284,7 +284,7 @@ static void apply_resolution(void)
 {
    static bool once = false;
 
-   if (gcRegsData.LoadSavedConfigurationAtStartup == 1 &&
+   if (gcRegsData.LoadSavedConfigurationAtStartup &&
          !TDCStatusTst(WaitingForOutputFPGAMask) && !once)
    {
       GC_SetWidth(gcRegsData.Width);

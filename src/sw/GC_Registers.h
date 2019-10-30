@@ -360,71 +360,42 @@ extern gcSelectedReg_t gcSelectedRegList[gcSelectedRegListLen];
 
 #define DeviceClockFrequencyAryLen 3
 extern float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen];
-extern const float DeviceClockFrequencyAryFactory[DeviceClockFrequencyAryLen];
 
 #define DeviceTemperatureAryLen 13
 extern float DeviceTemperatureAry[DeviceTemperatureAryLen];
-extern const float DeviceTemperatureAryFactory[DeviceTemperatureAryLen];
 
 #define DeviceVoltageAryLen 31
 extern float DeviceVoltageAry[DeviceVoltageAryLen];
-extern const float DeviceVoltageAryFactory[DeviceVoltageAryLen];
 
 #define DeviceCurrentAryLen 2
 extern float DeviceCurrentAry[DeviceCurrentAryLen];
-extern const float DeviceCurrentAryFactory[DeviceCurrentAryLen];
 
 #define DeviceSerialPortBaudRateAryLen 3
 extern uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen];
-extern const uint32_t DeviceSerialPortBaudRateAryFactory[DeviceSerialPortBaudRateAryLen];
 
 #define DeviceSerialPortFunctionAryLen 3
 extern uint32_t DeviceSerialPortFunctionAry[DeviceSerialPortFunctionAryLen];
-extern const uint32_t DeviceSerialPortFunctionAryFactory[DeviceSerialPortFunctionAryLen];
 
 #define EventNotificationAryLen 33
 extern uint32_t EventNotificationAry[EventNotificationAryLen];
-extern const uint32_t EventNotificationAryFactory[EventNotificationAryLen];
 
 #define DeviceFirmwareModuleRevisionAryLen 12
 extern int32_t DeviceFirmwareModuleRevisionAry[DeviceFirmwareModuleRevisionAryLen];
-extern const int32_t DeviceFirmwareModuleRevisionAryFactory[DeviceFirmwareModuleRevisionAryLen];
 
 #define TriggerModeAryLen 3
 extern uint32_t TriggerModeAry[TriggerModeAryLen];
-extern const uint32_t TriggerModeAryFactory[TriggerModeAryLen];
 
 #define TriggerSourceAryLen 3
 extern uint32_t TriggerSourceAry[TriggerSourceAryLen];
-extern const uint32_t TriggerSourceAryFactory[TriggerSourceAryLen];
 
 #define TriggerActivationAryLen 3
 extern uint32_t TriggerActivationAry[TriggerActivationAryLen];
-extern const uint32_t TriggerActivationAryFactory[TriggerActivationAryLen];
 
 #define TriggerDelayAryLen 3
 extern float TriggerDelayAry[TriggerDelayAryLen];
-extern const float TriggerDelayAryFactory[TriggerDelayAryLen];
 
 #define TriggerFrameCountAryLen 3
 extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
-extern const uint32_t TriggerFrameCountAryFactory[TriggerFrameCountAryLen];
-
-#define DeviceClockFrequencyAryFactoryValues {0.0F, 0.0F, 0.0F}
-#define DeviceTemperatureAryFactoryValues {0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F}
-#define DeviceVoltageAryFactoryValues {0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F}
-#define DeviceCurrentAryFactoryValues {0.0F, 0.0F}
-#define DeviceSerialPortBaudRateAryFactoryValues {DSPBR_Baud115200, DSPBR_Baud115200, DSPBR_Baud115200}
-#define DeviceSerialPortFunctionAryFactoryValues {DSPF_Control, DSPF_Control, DSPF_Terminal}
-#define EventNotificationAryFactoryValues {0, 0, EN_On, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, EN_On}
-#define TriggerModeAryFactoryValues {TM_Off, TM_Off, TM_Off}
-#define TriggerSourceAryFactoryValues {TS_Software, TS_Software, TS_Software}
-#define TriggerActivationAryFactoryValues {TA_RisingEdge, TA_RisingEdge, TA_LevelHigh}
-#define TriggerDelayAryFactoryValues {0.0F, 0.0F, 0.0F};
-#define TriggerFrameCountAryFactoryValues {1, 1, 1};
-
-
-
 
 // Shared registers write macros
 ////////////////////////////////////////////////////////////////////////////////
@@ -729,6 +700,7 @@ extern const uint32_t TriggerFrameCountAryFactory[TriggerFrameCountAryLen];
 #define GC_WaitingForImageCorrection TDCStatusTst(WaitingForImageCorrectionMask)
 
 void GC_Registers_Init();
+void GC_RestoreDataFactory();
 
 /* AUTO-CODE END */
 

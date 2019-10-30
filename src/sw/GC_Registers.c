@@ -361,43 +361,44 @@ gcSelectedReg_t gcSelectedRegList[gcSelectedRegListLen] = {
 /**
  * DeviceClockFrequency data array
  */
-float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = DeviceClockFrequencyAryFactoryValues;
-const float DeviceClockFrequencyAryFactory[DeviceClockFrequencyAryLen] = DeviceClockFrequencyAryFactoryValues;
+float DeviceClockFrequencyAry[DeviceClockFrequencyAryLen] = {0.0F, 0.0F, 0.0F};
+const float DeviceClockFrequencyAryFactory[DeviceClockFrequencyAryLen] = {0.0F, 0.0F, 0.0F};
 
 /**
  * DeviceTemperature data array
  */
-float DeviceTemperatureAry[DeviceTemperatureAryLen] = DeviceTemperatureAryFactoryValues;
-const float DeviceTemperatureAryFactory[DeviceTemperatureAryLen] = DeviceClockFrequencyAryFactoryValues;
+float DeviceTemperatureAry[DeviceTemperatureAryLen] = {0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
+const float DeviceTemperatureAryFactory[DeviceTemperatureAryLen] = {0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
 
 /**
  * DeviceVoltage data array
  */
-float DeviceVoltageAry[DeviceVoltageAryLen] = DeviceVoltageAryFactoryValues;
-const float DeviceVoltageAryFactory[DeviceVoltageAryLen] = DeviceVoltageAryFactoryValues;
+float DeviceVoltageAry[DeviceVoltageAryLen] = {0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
+const float DeviceVoltageAryFactory[DeviceVoltageAryLen] = {0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
+
 /**
  * DeviceCurrent data array
  */
-float DeviceCurrentAry[DeviceCurrentAryLen] = DeviceCurrentAryFactoryValues;
-const float DeviceCurrentAryFactory[DeviceCurrentAryLen] = DeviceCurrentAryFactoryValues;
+float DeviceCurrentAry[DeviceCurrentAryLen] = {0.0F, 0.0F};
+const float DeviceCurrentAryFactory[DeviceCurrentAryLen] = {0.0F, 0.0F};
 
 /**
  * DeviceSerialPortBaudRate data array
  */
-uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen] = DeviceSerialPortBaudRateAryFactoryValues;
-const uint32_t DeviceSerialPortBaudRateAryFactory[DeviceSerialPortBaudRateAryLen] = DeviceSerialPortBaudRateAryFactoryValues;
+uint32_t DeviceSerialPortBaudRateAry[DeviceSerialPortBaudRateAryLen] = {DSPBR_Baud115200, DSPBR_Baud115200, DSPBR_Baud115200};
+const uint32_t DeviceSerialPortBaudRateAryFactory[DeviceSerialPortBaudRateAryLen] = {DSPBR_Baud115200, DSPBR_Baud115200, DSPBR_Baud115200};
 
 /**
  * DeviceSerialPortFunction data array
  */
-uint32_t DeviceSerialPortFunctionAry[DeviceSerialPortFunctionAryLen] = DeviceSerialPortFunctionAryFactoryValues;
-const uint32_t DeviceSerialPortFunctionAryFactory[DeviceSerialPortFunctionAryLen] = DeviceSerialPortFunctionAryFactoryValues;
+uint32_t DeviceSerialPortFunctionAry[DeviceSerialPortFunctionAryLen] = {DSPF_Control, DSPF_Control, DSPF_Terminal};
+const uint32_t DeviceSerialPortFunctionAryFactory[DeviceSerialPortFunctionAryLen] = {DSPF_Control, DSPF_Control, DSPF_Terminal};
 
 /**
  * EventNotification data array
  */
-uint32_t EventNotificationAry[EventNotificationAryLen] = EventNotificationAryFactoryValues;
-const uint32_t EventNotificationAryFactory[EventNotificationAryLen] = EventNotificationAryFactoryValues;
+uint32_t EventNotificationAry[EventNotificationAryLen] = {0, 0, EN_On, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, EN_On};
+const uint32_t EventNotificationAryFactory[EventNotificationAryLen] = {0, 0, EN_On, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, EN_On};
 
 /**
  * DeviceFirmwareModuleRevision data array
@@ -408,32 +409,32 @@ const int32_t DeviceFirmwareModuleRevisionAryFactory[DeviceFirmwareModuleRevisio
 /**
  * TriggerMode data array
  */
-uint32_t TriggerModeAry[TriggerModeAryLen] = TriggerModeAryFactoryValues;
-const uint32_t TriggerModeAryFactory[TriggerModeAryLen] = TriggerModeAryFactoryValues;
+uint32_t TriggerModeAry[TriggerModeAryLen] = {TM_Off, TM_Off, TM_Off};
+const uint32_t TriggerModeAryFactory[TriggerModeAryLen] = {TM_Off, TM_Off, TM_Off};
 
 /**
  * TriggerSource data array
  */
-uint32_t TriggerSourceAry[TriggerSourceAryLen] = TriggerSourceAryFactoryValues;
-const uint32_t TriggerSourceAryFactory[TriggerSourceAryLen] = TriggerSourceAryFactoryValues;
+uint32_t TriggerSourceAry[TriggerSourceAryLen] = {TS_Software, TS_Software, TS_Software};
+const uint32_t TriggerSourceAryFactory[TriggerSourceAryLen] = {TS_Software, TS_Software, TS_Software};
 
 /**
  * TriggerActivation data array
  */
-uint32_t TriggerActivationAry[TriggerActivationAryLen] = TriggerActivationAryFactoryValues;
-const uint32_t TriggerActivationAryFactory[TriggerActivationAryLen] = TriggerActivationAryFactoryValues;
+uint32_t TriggerActivationAry[TriggerActivationAryLen] = {TA_RisingEdge, TA_RisingEdge, TA_LevelHigh};
+const uint32_t TriggerActivationAryFactory[TriggerActivationAryLen] = {TA_RisingEdge, TA_RisingEdge, TA_LevelHigh};
 
 /**
  * TriggerDelay data array
  */
-float TriggerDelayAry[TriggerDelayAryLen] = TriggerDelayAryFactoryValues;
-const float TriggerDelayAryFactory[TriggerDelayAryLen] = TriggerDelayAryFactoryValues;
+float TriggerDelayAry[TriggerDelayAryLen] = {0.0F, 0.0F, 0.0F};
+const float TriggerDelayAryFactory[TriggerDelayAryLen] = {0.0F, 0.0F, 0.0F};
 
 /**
  * TriggerFrameCount data array
  */
-uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen] = TriggerFrameCountAryFactoryValues;
-const uint32_t TriggerFrameCountAryFactory[TriggerFrameCountAryLen] = TriggerFrameCountAryFactoryValues;
+uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen] = {1, 1, 1};
+const uint32_t TriggerFrameCountAryFactory[TriggerFrameCountAryLen] = {1, 1, 1};
 
 /**
  * GenICam registers data pointer initialization.
@@ -708,6 +709,27 @@ void GC_Registers_Init()
    gcRegsDef[DeviceVersionIdx].p_data = &gcRegsData.DeviceVersion;
    gcRegsDef[GevFirstURLIdx].p_data = &gcRegsData.GevFirstURL;
    gcRegsDef[GevSecondURLIdx].p_data = &gcRegsData.GevSecondURL;
+}
+
+/**
+ * Restore GenICam registers data factory values.
+ */
+void GC_RestoreDataFactory()
+{
+   gcRegsData = gcRegsDataFactory;
+   memcpy(DeviceClockFrequencyAry, DeviceClockFrequencyAryFactory, sizeof(DeviceClockFrequencyAry));
+   memcpy(DeviceTemperatureAry, DeviceTemperatureAryFactory, sizeof(DeviceTemperatureAry));
+   memcpy(DeviceVoltageAry, DeviceVoltageAryFactory, sizeof(DeviceVoltageAry));
+   memcpy(DeviceCurrentAry, DeviceCurrentAryFactory, sizeof(DeviceCurrentAry));
+   memcpy(DeviceSerialPortBaudRateAry, DeviceSerialPortBaudRateAryFactory, sizeof(DeviceSerialPortBaudRateAry));
+   memcpy(DeviceSerialPortFunctionAry, DeviceSerialPortFunctionAryFactory, sizeof(DeviceSerialPortFunctionAry));
+   memcpy(EventNotificationAry, EventNotificationAryFactory, sizeof(EventNotificationAry));
+   memcpy(DeviceFirmwareModuleRevisionAry, DeviceFirmwareModuleRevisionAryFactory, sizeof(DeviceFirmwareModuleRevisionAry));
+   memcpy(TriggerModeAry, TriggerModeAryFactory, sizeof(TriggerModeAry));
+   memcpy(TriggerSourceAry, TriggerSourceAryFactory, sizeof(TriggerSourceAry));
+   memcpy(TriggerActivationAry, TriggerActivationAryFactory, sizeof(TriggerActivationAry));
+   memcpy(TriggerDelayAry, TriggerDelayAryFactory, sizeof(TriggerDelayAry));
+   memcpy(TriggerFrameCountAry, TriggerFrameCountAryFactory, sizeof(TriggerFrameCountAry));
 }
 
 /* AUTO-CODE END */

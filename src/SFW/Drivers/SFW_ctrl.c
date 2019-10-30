@@ -27,7 +27,6 @@ uint16_t gSFW_precisionFactor;
 * Extern variables
 */
 extern t_SfwCtrl gSFW_Ctrl;
-extern gcRegistersData_t gcRegsData;
 extern float FWExposureTime[MAX_NUM_FILTER];
 extern uint8_t FPA_StretchAcqTrig;
 
