@@ -139,7 +139,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 12.6
+// Generated from the IRCam header definition XLS file version 12.7
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -234,6 +234,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write8((uint8_t)(pGCRegs->DeviceFirmwareBuildVersion), a->ADD + A_BASE_HEADER + DeviceFirmwareBuildVersionHdrAddr);
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + ImageCorrectionPOSIXTimeHdrAddr);
    AXI4L_write32((uint32_t)(pGCRegs->DeviceSerialNumber), a->ADD + A_BASE_HEADER + DeviceSerialNumberHdrAddr);
+   AXI4L_write32((uint32_t)(pGCRegs->CalibrationCollectionActivePOSIXTime), a->ADD + A_BASE_HEADER + CalibrationCollectionPOSIXTimeHdrAddr);
 
 /* AUTO-CODE END */
 }
