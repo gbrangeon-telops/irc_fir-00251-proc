@@ -373,8 +373,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // ajustement de delais de la chaine
    if (init_done == 0)
-     gFpaDebugRegF  = (int32_t)(10 - 2*ptrA->lsydel_mclk);    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
-   ptrA->real_mode_active_pixel_dly  = gFpaDebugRegF;
+     gFpaDebugRegF  = 13;         // ENO: 05 nov 2019: valeur ajustée sur M2K avec fleGX
+   ptrA->real_mode_active_pixel_dly  = (uint32_t)gFpaDebugRegF;
       
    // accélerateurs 
    ptrA->speedup_lsydel          = 0;
@@ -453,13 +453,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[6], 7);            
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
-   if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1))
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;
+   if (init_done == 0)
+      gFpaDebugRegC = 3;
+   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;      // ENO: 05 nov 2019: valeur ajustée sur M2K avec fleGX
 
-   if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1))
-      ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
-    gFpaDebugRegD = (int32_t)ptrA->adc_clk_source_phase;
+   if (init_done == 0)
+      gFpaDebugRegD = 200;
+   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;   // ENO: 05 nov 2019: valeur ajustée sur M2K avec fleGX
    
    // autres    
    ptrA->boost_mode              = 0;   // n'est plus utilisé                
