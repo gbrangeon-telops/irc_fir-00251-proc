@@ -1834,3 +1834,65 @@ void GC_UpdateCameraLinkConfig()
    // Restore DeviceClockSelector
    GC_SetDeviceClockSelector(DeviceClockSelectorBackup);
 }
+
+
+/**
+ * This function set the height when downloading a sequence from the memory buffer. A download can be configured :
+ * 1. with the jumbo frame feature i.e. configuring a frame height matching the
+ *    MemoryBufferSequenceDownloadSuggestedFrameImageCount
+ * 2. without the jumbo frame feature i.e. configuring a frame height matching
+ *    a MemoryBufferSequenceDownloadSuggestedFrameImageCount = 1 (to maintain backwards compatibility)
+ */
+
+void GC_UpdateJumboFrameHeight(gcRegistersData_t *pGCRegs, bool heightChanged)
+{
+   static bool suggestedJumboFrameHeightIsValid = false;
+   static uint32_t NTxMiniHeight = 0;
+   uint32_t suggestedJumboFrameHeight = 0;
+
+   suggestedJumboFrameHeight = pGCRegs->MemoryBufferSequenceDownloadSuggestedFrameImageCount*(pGCRegs->MemoryBufferSequenceHeight + 2) - 2 ;
+
+   if (pGCRegs->MemoryBufferSequenceDownloadSuggestedFrameImageCount > 1)
+   {
+         GC_SetHeightInc(1);
+         GC_SetHeightMax(MAX(suggestedJumboFrameHeight, FPA_HEIGHT_MAX));
+   }
+   else
+   {
+        GC_SetHeightInc(FPA_HEIGHT_INC);
+        GC_SetHeightMax(FPA_HEIGHT_MAX);
+   }
+
+
+   if (!suggestedJumboFrameHeightIsValid || heightChanged) // heightChanged is only true when this function is called from GC_HeightCallback()
+     NTxMiniHeight = pGCRegs->Height;
+
+   if((pGCRegs->MemoryBufferSequenceDownloadSuggestedFrameImageCount > 1) && (NTxMiniHeight == suggestedJumboFrameHeight))
+   {
+     if (!suggestedJumboFrameHeightIsValid)
+     {
+       suggestedJumboFrameHeightIsValid = true;
+
+       GC_SetMemoryBufferSequenceDownloadFrameImageCount(pGCRegs->MemoryBufferSequenceDownloadSuggestedFrameImageCount); // Configure the frame image count in the output FPGA
+       NTxMiniHeight = pGCRegs->Height; // Backup user define height
+       pGCRegs->Height = pGCRegs->MemoryBufferSequenceHeight;
+
+       if (!heightChanged) // No need to broadcast if this function is called in GC_HeightCallback()
+          GC_BroadcastRegisterWrite(&gcRegsDef[HeightIdx]); // Broadcast the sequence height. There is now a mismatch between the user defined height and the actual camera height
+     }
+   }
+   else
+   {
+     if (suggestedJumboFrameHeightIsValid)
+     {
+       suggestedJumboFrameHeightIsValid = false;
+       GC_SetMemoryBufferSequenceDownloadFrameImageCount(1);
+
+       if (!heightChanged) // No need to restore the user define height if this function is called in GC_HeightCallback()
+       {
+          pGCRegs->Height =  MIN(NTxMiniHeight, pGCRegs->HeightMax);
+          GC_BroadcastRegisterWrite(&gcRegsDef[HeightIdx]);
+       }
+     }
+   }
+}

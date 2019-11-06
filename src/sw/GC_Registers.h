@@ -725,5 +725,6 @@ void GC_UpdateDeviceSerialPortFunction(DeviceSerialPortSelector_t updatedPort);
 void GC_UpdateFOV();
 void GC_UpdateExposureTimeMin();
 void GC_UpdateCameraLinkConfig();
+void GC_UpdateJumboFrameHeight(gcRegistersData_t *pGCRegs, bool heightChanged);
 
 #endif // GC_REGISTERS_H

@@ -37,7 +37,7 @@
 #define FPA_HEIGHT_MIN     2
 #define FPA_HEIGHT_MAX     512
 #define FPA_HEIGHT_MULT    2
-#define FPA_HEIGHT_INC     FPA_HEIGHT_MULT
+#define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   2

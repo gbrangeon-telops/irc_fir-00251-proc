@@ -2954,6 +2954,7 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
    {
       // Remove 2 header lines (added for the NTx-Mini)
       gcRegsData.Height -= 2;
+      GC_UpdateJumboFrameHeight(&gcRegsData, true); // must be called first (may change height)
 
       GC_UpdateImageLimits();   // must be called first
 
@@ -3388,6 +3389,7 @@ void GC_MemoryBufferSequenceClearCallback(gcCallbackPhase_t phase, gcCallbackAcc
       if (gcRegsData.MemoryBufferSequenceClear && !GC_ExternalMemoryBufferIsImplemented)
       {
          BufferManager_OnSequenceClearSelected(&gcRegsData);
+         BufferManager_UpdateSuggestedFrameImageCount(&gcRegsData);
       }
    }
 }
@@ -3435,6 +3437,7 @@ void GC_MemoryBufferSequenceDefragCallback(gcCallbackPhase_t phase, gcCallbackAc
       if(gcRegsData.MemoryBufferSequenceDefrag && !GC_ExternalMemoryBufferIsImplemented)
       {
          BufferManager_OnDefrag(&gBufManager, &gcRegsData);
+         BufferManager_UpdateSuggestedFrameImageCount(&gcRegsData);
       }
    }
 }
@@ -3462,7 +3465,11 @@ void GC_MemoryBufferSequenceDownloadFrameCountCallback(gcCallbackPhase_t phase, 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       if(!GC_ExternalMemoryBufferIsImplemented)
+      {
          BufferManager_SequenceDownloadLimits(&gcRegsData);
+         BufferManager_UpdateSuggestedFrameImageCount(&gcRegsData);
+      }
+
    }
 }
 
@@ -3478,7 +3485,10 @@ void GC_MemoryBufferSequenceDownloadFrameIDCallback(gcCallbackPhase_t phase, gcC
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       if(!GC_ExternalMemoryBufferIsImplemented)
+      {
          BufferManager_SequenceDownloadLimits(&gcRegsData);
+         BufferManager_UpdateSuggestedFrameImageCount(&gcRegsData);
+      }
    }
 }
 
@@ -3532,6 +3542,10 @@ void GC_MemoryBufferSequenceDownloadModeCallback(gcCallbackPhase_t phase, gcCall
          MGT_Send_MBSDM(&gMGT, 1);
       else
          MGT_Send_MBSDM(&gMGT, 0);
+
+      if(!GC_ExternalMemoryBufferIsImplemented)
+         BufferManager_UpdateSuggestedFrameImageCount(&gcRegsData);
+
    }
 }
 
@@ -3544,6 +3558,10 @@ void GC_MemoryBufferSequenceDownloadModeCallback(gcCallbackPhase_t phase, gcCall
  */
 void GC_MemoryBufferSequenceDownloadSuggestedFrameImageCountCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
+   {
+      GC_UpdateJumboFrameHeight(&gcRegsData, false);
+   }
 }
 
 /**
@@ -3647,7 +3665,11 @@ void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallback
    {
       // Call update function only when selector has changed because it resets download default frame IDs
       if(gcRegsData.MemoryBufferSequenceSelector != prevMemoryBufferSequenceSelector && !GC_ExternalMemoryBufferIsImplemented)
+      {
          BufferManager_UpdateSelectedSequenceParameters(&gcRegsData);
+         BufferManager_UpdateSuggestedFrameImageCount(&gcRegsData);
+      }
+
    }
 }
 
