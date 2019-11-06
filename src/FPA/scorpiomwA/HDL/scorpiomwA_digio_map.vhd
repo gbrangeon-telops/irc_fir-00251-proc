@@ -29,6 +29,7 @@ entity scorpiomwA_digio_map is
       PROG_EN        : in std_logic;
       PROG_CSN       : in std_logic;  
       PROG_SD        : in std_logic;
+      PROG_SCLK      : in std_logic;
       
       DAC_CSN        : in std_logic;  
       DAC_SCLK       : in std_logic;
@@ -510,7 +511,7 @@ begin
                   prog_data_i <= PROG_SD;
                   sizea_sizeb_i <= SIZEA_SIZEB;
                   int_i <= FPA_INT;
-                  mclk_i <= mclk_reg;  --
+                  mclk_i <= (mclk_reg and PROG_CSN) or (PROG_SCLK and not PROG_CSN);  --
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
                   error_i <= error_iob; -- error_filt;

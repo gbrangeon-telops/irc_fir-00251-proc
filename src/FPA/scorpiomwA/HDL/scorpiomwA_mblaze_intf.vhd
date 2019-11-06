@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 24393 $
+--!   $Author: enofodjie $
+--!   $Date: 2019-10-29 12:58:00 -0400 (mar., 29 oct. 2019) $
+--!   $Id: scorpiomwA_mblaze_intf.vhd 24393 2019-10-29 16:58:00Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-09-23%20-%20scorpiomwA%20Derisk%2020MHz/src/FPA/scorpiomwA/HDL/scorpiomwA_mblaze_intf.vhd $
 ------------------------------------------------------------------
 
 
@@ -37,21 +37,19 @@ entity scorpiomwA_mblaze_intf is
       CTRLED_RESET          : out std_logic;
       
       FPA_DRIVER_STAT       : in std_logic_vector(31 downto 0);
-      DIAG_MODE_ONLY        : in std_logic;
       
       USER_CFG              : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;
       
-      FPA_SOFTW_STAT        : out fpa_firmw_stat_type
-      
+      FPA_SOFTW_STAT        : out fpa_firmw_stat_type      
       );
 end scorpiomwA_mblaze_intf; 
 
 architecture rtl of scorpiomwA_mblaze_intf is  
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26  : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
-   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;
-   constant C_DIAG_LOVH_MCLK                          : natural := 0;
+   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
+   constant C_DIAG_LOVH_MCLK                          : natural := 1;
    
    component sync_reset
       port(
@@ -60,11 +58,11 @@ architecture rtl of scorpiomwA_mblaze_intf is
          CLK : in std_logic);
    end component;
    
-   type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(7 downto 0);
-   type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
+   type exp_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
+   type exp_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
-   signal exp_time_pipe                : exp_time_pipe_type; 
-   --signal sreset_mb_clk                : std_logic;
+   signal exp_time_pipe                : exp_time_pipe_type := ((others => '0'), (others => '0'), (others => '0'), (others => '0'), (others => '0')); 
+   signal sreset_mb_clk                : std_logic;
    signal axi_awaddr	                  : std_logic_vector(31 downto 0);
    signal axi_awready	               : std_logic;
    signal axi_wready	                  : std_logic;
@@ -82,10 +80,9 @@ architecture rtl of scorpiomwA_mblaze_intf is
    signal stat_rd_dval                 : std_logic;
    signal slv_reg_rden                 : std_logic;
    signal slv_reg_wren                 : std_logic;
-   signal fpa_intf_cfg_i               : fpa_intf_cfg_type;
-   signal user_init_cfg_i               : fpa_intf_cfg_type;
+   signal fpa_intf_cfg_i               : fpa_intf_cfg_type; 
    signal data_i                       : std_logic_vector(31 downto 0);
-   signal permit_inttime_change        : std_logic;
+   --signal permit_inttime_change        : std_logic;
    signal update_cfg                   : std_logic;
    signal user_cfg_in_progress         : std_logic := '0';
    signal user_cfg_i                   : fpa_intf_cfg_type;
@@ -104,27 +101,27 @@ architecture rtl of scorpiomwA_mblaze_intf is
    --signal tri_min                      : integer;
    --signal tri_int_part                 : integer;
    signal exp_time_reg                 : unsigned(30 downto 0);
-   signal fpa_init_done_i              : std_logic;
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
    signal dac_cfg_in_progress          : std_logic;
-   --   
-   --   -- attribute dont_touch                         : string;
-   --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
-   --   -- attribute dont_touch of user_cfg             : signal is "true";
-   --   -- attribute dont_touch of user_cfg_in_progress : signal is "true";
-   --   -- attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
-   --   -- attribute dont_touch of tri_min              : signal is "true";
-   --   -- attribute dont_touch of tri_int_part         : signal is "true";
-   --   -- attribute dont_touch of exp_time_reg         : signal is "true";
+   signal abs_additional_int_time_offset_i : integer := 0;
+   
+   --   -- -- -- attribute dont_touch                         : string;
+   --   -- -- -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
+   --   -- -- -- attribute dont_touch of user_cfg_i             : signal is "true";
+   --   -- -- -- attribute dont_touch of user_cfg_in_progress : signal is "true";
+   --   -- -- -- attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
+   --   -- -- -- attribute dont_touch of tri_min              : signal is "true";
+   --   -- -- -- attribute dont_touch of tri_int_part         : signal is "true";
+   --   -- -- -- attribute dont_touch of exp_time_reg         : signal is "true";
    
 begin   
+   
    
    CTRLED_RESET <= ctrled_reset_i;
    RESET_ERR <= reset_err_i;
    FPA_SOFTW_STAT <= fpa_softw_stat_i;
-   COOLER_STAT.COOLER_ON <= '1'; 
-   --FPA_INIT_CFG_RECEIVED <= user_init_cfg_i.comn.fpa_init_cfg_received;
+   COOLER_STAT.COOLER_ON <= '1';     
    
    --------------------------------------------------
    -- Sync reset
@@ -132,46 +129,19 @@ begin
    U1 : sync_reset
    port map(ARESET => ARESET, CLK => MB_CLK, SRESET => sreset); 
    
-   ------------------------------------------------  
-   -- sortie de la config                              
-   -------------------------------------------------  
+   --   ------------------------------------------------  
+   --   -- sortie de la config                              
+   --   -------------------------------------------------  
    U2: process(MB_CLK)
    begin
-      if rising_edge(MB_CLK) then
+      if rising_edge(MB_CLK) then  
+         --permit_inttime_change <= FPA_DRIVER_STAT(7);
+         update_cfg <= user_cfg_rdy; --permit_inttime_change and  user_cfg_rdy;
          
-         -- pragma translate_off
-         if sreset = '1' then 
-            fpa_intf_cfg_i.int_signal_high_time <= to_unsigned(30, 32);
-            fpa_intf_cfg_i.int_time <= to_unsigned(30, 32);
+         if update_cfg = '1' then -- la config au complet 
+            USER_CFG <= user_cfg_i;  
+            valid_cfg_received <= '1';         
          end if;
-         -- pragma translate_on         
-         
-         fpa_init_done_i <= FPA_DRIVER_STAT(17);
-         
-         -- permit_inttime_change <= FPA_DRIVER_STAT(7);
-         update_cfg <= user_cfg_rdy;         
-         
-         -- on enregistre la config d'initilaisation du FPA
-         if user_cfg_i.comn.fpa_init_cfg = '1' and user_cfg_rdy = '1' then 
-            user_init_cfg_i <= user_cfg_i; 
-            user_init_cfg_i.comn.fpa_init_cfg_received <= '1';           
-         end if;                          
-         
-         if mb_ctrled_reset_i = '1' then      -- RAZ à chaque reset du module. Ainsi, on est certain qu'on programmera le détecteur avec une config d'initialisation à chaque allumage
-            user_init_cfg_i.comn.fpa_init_cfg_received <= '0';
-         end if; 
-         
-         -- configuration     
-         if update_cfg = '1' then 
-            if fpa_init_done_i = '0' and  DIAG_MODE_ONLY = '0' then -- tant qu'en mode détecteur, l'initialisation n'est pas terminée, la config de l,usager n'est pas utilisée                
-               USER_CFG <= user_init_cfg_i;     
-            else
-               USER_CFG <= user_cfg_i;
-               USER_CFG.COMN.FPA_INIT_CFG_RECEIVED <= user_init_cfg_i.comn.fpa_init_cfg_received;    -- ENO: 15 oct 2016: ainsi le contrOleur hw principal n'eteindra pas le détecteur lorsqu'on delaisse le FPA_INIT_CFG
-            end if;
-            valid_cfg_received <= '1';
-         end if;
-         
       end if;  
    end process;   
    
@@ -210,15 +180,19 @@ begin
          if sreset = '1' then
             ctrled_reset_i <= '1';
             reset_err_i <= '0';
-            user_cfg_in_progress <= '1';                  -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre         
+            user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre  
             dac_cfg_in_progress <= '1'; 
-            user_cfg_i.comn.fpa_init_cfg <= '0';               -- à '1' <=> dit que la config reçue est une config d'initialisation. À '0' sinon
+            user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
             mb_ctrled_reset_i <= '0';
             user_cfg_i.sat_ctrl_en <= '0';
+            user_cfg_i.additional_fpa_int_time_offset <= (others => '0');
+            -- pragma translate_off
+            user_cfg_i.ysize <= to_unsigned(DEFINE_YSIZE_MAX, user_cfg_i.ysize'length);
+            -- pragma translate_on
             
          else                   
             
-            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;            
+            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;               
             
             -- temps d'exposition  en mclk
             if int_dval_i = '1' then
@@ -239,7 +213,7 @@ begin
             user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
             
-            -- reception de la config
+            -- reste de la config
             if slv_reg_wren = '1' then  
                case axi_awaddr(11 downto 0) is             
                   
@@ -296,7 +270,7 @@ begin
                   when X"0B8" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);                     
                   when X"0BC" =>    user_cfg_i.reorder_column                  <= data_i(0); 
                   when X"0C0" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
-                  
+                     
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
@@ -318,7 +292,7 @@ begin
                   when X"D10" =>    user_cfg_i.vdac_value(5)                   <= unsigned(data_i(user_cfg_i.vdac_value(5)'length-1 downto 0));                                                                               
                   when X"D14" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));                                  
                   when X"D18" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));                                  
-                  when X"D1C" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); dac_cfg_in_progress <= '0';  ----             
+                  when X"D1C" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); dac_cfg_in_progress <= '0';  ----
                   
                   when others =>
                   
@@ -336,20 +310,28 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
+         abs_additional_int_time_offset_i <= to_integer(abs(user_cfg_i.additional_fpa_int_time_offset));
+         
          -- pipe pour le calcul du temps d'integration en mclk
          exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
          int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+         if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 
+            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+         else
+            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+         end if; 
+         int_signal_high_time_i <= exp_time_pipe(4)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
          
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
          exp_indx_pipe(1) <= exp_indx_pipe(0); 
          exp_indx_pipe(2) <= exp_indx_pipe(1); 
          exp_indx_pipe(3) <= exp_indx_pipe(2); 
-         int_indx_i       <= exp_indx_pipe(3);
+         exp_indx_pipe(4) <= exp_indx_pipe(3);
+         int_indx_i       <= exp_indx_pipe(4);
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
@@ -358,13 +340,14 @@ begin
          exp_dval_pipe(3) <= exp_dval_pipe(2);
          exp_dval_pipe(4) <= exp_dval_pipe(3);
          exp_dval_pipe(5) <= exp_dval_pipe(4);
-         int_dval_i       <= exp_dval_pipe(5);         
+         exp_dval_pipe(6) <= exp_dval_pipe(5);
+         int_dval_i       <= exp_dval_pipe(6);          
          
       end if;
    end process; 
    
    ------------------------------------------------  
-   -- calcul des parametres de frame rate
+   -- delai
    -------------------------------------------------
    U4B: process (MB_CLK)
    begin
@@ -380,7 +363,7 @@ begin
          user_cfg_rdy <= not (user_cfg_in_progress or dac_cfg_in_progress) and user_cfg_rdy_pipe(7); 
          
       end if;
-   end process; 
+   end process;
    
    ----------------------------------------------------------------------------
    -- CFG MB AXI RD : contrôle du flow

@@ -221,6 +221,6 @@ wave UUT/U1/U5/U5/U5/*
 #wave UUT/U1/U9/* 
 #wave UUT/U1/U19/*
 #wave UUT/U1/U17/*
-#wave UUT/U1/*
+wave UUT/U1/*
 
-run 7 ms
+run 200 ms

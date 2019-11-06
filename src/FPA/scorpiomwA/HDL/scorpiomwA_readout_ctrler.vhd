@@ -205,7 +205,7 @@ begin
    end process;    
    
    --------------------------------------------------
-   -- generation acq_int_o
+   -- generation fpa_active_int_i
    --------------------------------------------------
    Uo: process(CLK)
       
@@ -275,8 +275,11 @@ begin
          if sreset = '1' then            
             readout_fsm <= idle;
             readout_in_progress <= '0';
+            fpa_data_valid_last <= fpa_data_valid_i;
             
          else  
+            
+            fpa_data_valid_last <= fpa_data_valid_i;
             
             -- contrôleur
             case readout_fsm is           
