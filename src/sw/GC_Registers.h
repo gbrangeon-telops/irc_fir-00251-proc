@@ -261,6 +261,7 @@ struct gcRegistersDataStruct {
    uint32_t MemoryBufferNumberOfImagesMax;
    uint32_t MemoryBufferNumberOfSequences;
    uint32_t MemoryBufferNumberOfSequencesMax;
+   uint32_t MemoryBufferNumberOfSequencesMin;
    uint32_t MemoryBufferSequenceClear;
    uint32_t MemoryBufferSequenceClearAll;
    uint32_t MemoryBufferSequenceCount;
@@ -530,6 +531,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetMemoryBufferTotalSpaceHigh(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferTotalSpaceHighIdx], val)
 #define GC_SetMemoryBufferTotalSpaceLow(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferTotalSpaceLowIdx], val)
 #define GC_SetMemoryBufferNumberOfImagesMax(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfImagesMaxIdx], val)
+#define GC_SetMemoryBufferNumberOfSequencesMin(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfSequencesMinIdx], val)
 #define GC_SetMemoryBufferNumberOfSequencesMax(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx], val)
 #define GC_SetMemoryBufferNumberOfSequences(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferNumberOfSequencesIdx], val)
 #define GC_SetMemoryBufferSequenceSize(val) GC_RegisterWriteUI32(&gcRegsDef[MemoryBufferSequenceSizeIdx], val)

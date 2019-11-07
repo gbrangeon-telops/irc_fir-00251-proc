@@ -252,6 +252,7 @@ gcRegistersData_t gcRegsDataFactory = {
    /* MemoryBufferNumberOfImagesMax = */ 0,
    /* MemoryBufferNumberOfSequences = */ 1,
    /* MemoryBufferNumberOfSequencesMax = */ 0,
+   /* MemoryBufferNumberOfSequencesMin = */ 0,
    /* MemoryBufferSequenceClear = */ 0,
    /* MemoryBufferSequenceClearAll = */ 0,
    /* MemoryBufferSequenceCount = */ 0,
@@ -629,6 +630,7 @@ void GC_Registers_Init()
    gcRegsDef[MemoryBufferNumberOfImagesMaxIdx].p_data = &gcRegsData.MemoryBufferNumberOfImagesMax;
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequences;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequencesMax;
+   gcRegsDef[MemoryBufferNumberOfSequencesMinIdx].p_data = &gcRegsData.MemoryBufferNumberOfSequencesMin;
    gcRegsDef[MemoryBufferSequenceClearIdx].p_data = &gcRegsData.MemoryBufferSequenceClear;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].p_data = &gcRegsData.MemoryBufferSequenceClearAll;
    gcRegsDef[MemoryBufferSequenceCountIdx].p_data = &gcRegsData.MemoryBufferSequenceCount;

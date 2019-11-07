@@ -272,6 +272,7 @@ void GC_Callback_Init()
    gcRegsDef[MemoryBufferNumberOfImagesMaxIdx].callback =                        &GC_MemoryBufferNumberOfImagesMaxCallback;
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].callback =                        &GC_MemoryBufferNumberOfSequencesCallback;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].callback =                     &GC_MemoryBufferNumberOfSequencesMaxCallback;
+   gcRegsDef[MemoryBufferNumberOfSequencesMinIdx].callback =                     &GC_MemoryBufferNumberOfSequencesMinCallback;
    gcRegsDef[MemoryBufferSequenceClearIdx].callback =                            &GC_MemoryBufferSequenceClearCallback;
    gcRegsDef[MemoryBufferSequenceClearAllIdx].callback =                         &GC_MemoryBufferSequenceClearAllCallback;
    gcRegsDef[MemoryBufferSequenceCountIdx].callback =                            &GC_MemoryBufferSequenceCountCallback;
@@ -3372,6 +3373,17 @@ void GC_MemoryBufferNumberOfSequencesCallback(gcCallbackPhase_t phase, gcCallbac
  * @param access indicates whether the operation is read or write.
  */
 void GC_MemoryBufferNumberOfSequencesMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+}
+
+/**
+ * MemoryBufferNumberOfSequencesMin GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_MemoryBufferNumberOfSequencesMinCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
 }
 
