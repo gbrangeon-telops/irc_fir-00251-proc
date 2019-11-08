@@ -151,6 +151,10 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader(int fd, FlashDynam
                hdr->FileStructureMinorVersion = 2;
 
             case 2:
+               // 2.2.x -> 2.3.x
+               hdr->DetectorMode = DM_Normal;
+
+            case 3:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = FLASHDYNAMICVALUES_FILESUBMINORVERSION;
                break;

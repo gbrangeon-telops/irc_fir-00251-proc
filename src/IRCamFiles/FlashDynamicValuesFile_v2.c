@@ -5,7 +5,7 @@
  * This file defines the camera flash dynamic values file structure v2.
  *
  * Auto-generated flash dynamic values file library.
- * Generated from the flash dynamic values file structure definition XLS file version 2.2.0
+ * Generated from the flash dynamic values file structure definition XLS file version 2.3.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -58,6 +58,7 @@ FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t FlashDynamicValues_FlashDyn
    /* DeviceSerialPortFunctionRS232 = */ 1,
    /* FileOrderKey5 = */ 0,
    /* CalibrationCollectionFileOrderKey5 = */ 0,
+   /* DetectorMode = */ 0,
    /* AutofocusROI = */ 50.0F,
    /* FileHeaderCRC16 = */ 0,
 };
@@ -135,7 +136,7 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader_v2(uint8_t *buffer
    memcpy(&hdr->DeviceSerialPortFunctionRS232, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->FileOrderKey5, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->CalibrationCollectionFileOrderKey5, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 1; // Skip FREE space
+   memcpy(&hdr->DetectorMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->AutofocusROI, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    numBytes += 438; // Skip FREE space
    memcpy(&hdr->FileHeaderCRC16, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
@@ -215,7 +216,7 @@ uint32_t FlashDynamicValues_WriteFlashDynamicValuesFileHeader_v2(FlashDynamicVal
    memcpy(&buffer[numBytes], &hdr->DeviceSerialPortFunctionRS232, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->FileOrderKey5, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->CalibrationCollectionFileOrderKey5, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->DetectorMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->AutofocusROI, sizeof(float)); numBytes += sizeof(float);
    memset(&buffer[numBytes], 0, 438); numBytes += 438; // FREE space
 

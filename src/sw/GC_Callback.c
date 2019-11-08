@@ -1063,10 +1063,20 @@ void GC_ClConfigurationCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
  */
 void GC_DetectorModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+   extern flashDynamicValues_t gFlashDynamicValues;
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // Update AcquisitionFrameRate and ExposureTime limits
       GC_UpdateParameterLimits();
+
+      // Update DetectorMode flash dynamic value
+      gFlashDynamicValues.DetectorMode = gcRegsData.DetectorMode;
+
+      if (FlashDynamicValues_Update(&gFlashDynamicValues) != IRC_SUCCESS)
+      {
+         GC_ERR("Failed to update flash dynamic values.");
+      }
    }
 }
 

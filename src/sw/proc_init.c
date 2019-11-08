@@ -510,6 +510,7 @@ IRC_Status_t Proc_GC_Init()
       DeviceSerialPortFunctionAry[DSPS_USB] = DSPF_Disabled;
    }
    gcRegsData.AutofocusROI = gFlashDynamicValues.AutofocusROI;
+   gcRegsData.DetectorMode = gFlashDynamicValues.DetectorMode;
 
    // Initialize pointer array on ExposureTimeX registers
    pGcRegsDefExposureTimeX[0] = &gcRegsDef[ExposureTime1Idx];
