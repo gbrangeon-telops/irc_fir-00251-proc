@@ -152,7 +152,8 @@ uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader(int fd, FlashDynam
 
             case 2:
                // 2.2.x -> 2.3.x
-               hdr->DetectorMode = DM_Normal;
+               hdr->DetectorMode = FlashDynamicValues_FlashDynamicValuesFileHeader_default.DetectorMode;
+               hdr->FileStructureMinorVersion = 3;
 
             case 3:
                // Up to date, nothing to do
