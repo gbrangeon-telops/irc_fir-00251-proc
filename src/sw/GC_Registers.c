@@ -1411,6 +1411,7 @@ void GC_UpdateMemoryBufferRegistersOwner(gcRegistersOwner_t regOwner)
    gcRegsDef[MemoryBufferTotalSpaceLowIdx].owner = regOwner;
    gcRegsDef[MemoryBufferNumberOfImagesMaxIdx].owner = regOwner;
    gcRegsDef[MemoryBufferNumberOfSequencesMaxIdx].owner = regOwner;
+   gcRegsDef[MemoryBufferNumberOfSequencesMinIdx].owner = regOwner;
    gcRegsDef[MemoryBufferNumberOfSequencesIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceSizeIdx].owner = regOwner;
    gcRegsDef[MemoryBufferSequenceSizeMinIdx].owner = regOwner;
