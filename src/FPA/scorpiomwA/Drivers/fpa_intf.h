@@ -86,64 +86,64 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  ADD;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_diag_mode;              // utilisé par le trig_controller.vhd            
-   uint32_t  fpa_diag_type;              // utilisé par le generateur de données diag de Telops
-   uint32_t  fpa_pwr_on;                 // utilisé par le fpa_intf_sequencer.vhd            
-   uint32_t  fpa_init_cfg;               // utilisé par le fpa_intf_sequencer.vhd. à '1' lorsque la config en transit en est une d'initialisation (ie à programmer dans le ROIC du détecteur dès le bootup).
-   uint32_t  fpa_init_cfg_received;      // utilisé par le fpa_intf_sequencer.vhd. La valeur envoyée par le piloteC n'a aucune importance. La véritable valeur est déterminée par le mb_intf.vhd  
-   uint32_t  fpa_trig_ctrl_mode;         // utilisé par le trig_controller.vhd    
-   uint32_t  fpa_acq_trig_ctrl_dly;      // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_spare;                  // utilisé par le trig_controller.vhd
-   uint32_t  fpa_xtra_trig_ctrl_dly;     // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_trig_ctrl_timeout_dly;   // utilisé par le trig_controller.vhd
+   uint32_t   fpa_diag_mode;              
+   uint32_t   fpa_diag_type;              
+   uint32_t   fpa_pwr_on;                 
+   uint32_t   fpa_init_cfg;               
+   uint32_t   fpa_init_cfg_received;      
+   uint32_t   fpa_trig_ctrl_mode;         
+   uint32_t   fpa_acq_trig_ctrl_dly;      
+   uint32_t   fpa_spare;                  
+   uint32_t   fpa_xtra_trig_ctrl_dly;     
+   uint32_t   fpa_trig_ctrl_timeout_dly;  
+                                              
+   // partie                                  
+   uint32_t   xstart;                          
+   uint32_t   ystart;                          
+   uint32_t   xsize;                           
+   uint32_t   ysize;                           
+   uint32_t   windcfg_part1;                   
+   uint32_t   windcfg_part2;                   
+   uint32_t   windcfg_part3;                   
+   uint32_t   windcfg_part4;                   
+   uint32_t   uprow_upcol;                     
+   uint32_t   sizea_sizeb;                     
    
-   // partie propre au scorpiomw
-   uint32_t  xstart;       
-   uint32_t  ystart;       
-   uint32_t  xsize;        
-   uint32_t  ysize;        
-   uint32_t  windcfg_part1;
-   uint32_t  windcfg_part2;
-   uint32_t  windcfg_part3;
-   uint32_t  windcfg_part4;
-   uint32_t  uprow_upcol;  
-   uint32_t  sizea_sizeb;  
-   
-   uint32_t  itr;          
-   uint32_t  gain;
-    int32_t  gpol_code;
-   uint32_t  real_mode_active_pixel_dly;
-   uint32_t  adc_quad2_en;
-   uint32_t  chn_diversity_en;  
-   uint32_t  line_period_pclk;
-   uint32_t  readout_pclk_cnt_max;
-      
-   uint32_t  active_line_start_num;
-   uint32_t  active_line_end_num;                   
-   uint32_t  pix_samp_num_per_ch;
-   uint32_t  sof_posf_pclk;
-   uint32_t  eof_posf_pclk;   
-   uint32_t  sol_posl_pclk;          
-   uint32_t  eol_posl_pclk;  
-   uint32_t  eol_posl_pclk_p1;    
-   uint32_t  hgood_samp_sum_num;          
-   uint32_t  hgood_samp_mean_numerator;                
-   uint32_t  vgood_samp_sum_num;                
-   uint32_t  vgood_samp_mean_numerator;                
-   uint32_t  good_samp_first_pos_per_ch;                
-   uint32_t  good_samp_last_pos_per_ch;           
-   uint32_t  xsize_div_tapnum;                
-   
-   uint32_t  adc_clk_source_phase;           
-   uint32_t  adc_clk_pipe_sel;               
-   uint32_t  cfg_num;                        
-   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd 
-   uint32_t  reorder_column;
-   uint32_t  fpa_intf_data_source;
+   uint32_t   itr;                             
+   uint32_t   gain;                            
+    int32_t   gpol_code;                       
+   uint32_t   real_mode_active_pixel_dly;      
+   uint32_t   adc_quad2_en;                    
+   uint32_t   chn_diversity_en;                
+   uint32_t   line_period_pclk;                
+   uint32_t   readout_pclk_cnt_max;            
+   uint32_t   active_line_start_num;           
+   uint32_t   active_line_end_num;             
+   uint32_t   pix_samp_num_per_ch;             
+   uint32_t   sof_posf_pclk;                   
+   uint32_t   eof_posf_pclk;                   
+   uint32_t   sol_posl_pclk;                   
+   uint32_t   eol_posl_pclk;                   
+   uint32_t   eol_posl_pclk_p1;                
+   uint32_t   hgood_samp_sum_num;              
+   uint32_t   hgood_samp_mean_numerator;       
+   uint32_t   vgood_samp_sum_num;              
+   uint32_t   vgood_samp_mean_numerator;       
+   uint32_t   good_samp_first_pos_per_ch;      
+   uint32_t   good_samp_last_pos_per_ch;       
+   uint32_t   xsize_div_tapnum;                
+   uint32_t   adc_clk_source_phase;                                  
+   uint32_t   adc_clk_pipe_sel;                
+                        
+   uint32_t   cfg_num;                         
+   uint32_t   fpa_stretch_acq_trig;       
+   uint32_t   reorder_column;                  
+   uint32_t   fpa_intf_data_source;       
+    int32_t   additional_fpa_int_time_offset;     
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
  
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0,0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
                                                                                                 //ENO 11 mai 2016:  ne pas changer le 671, ce n'est pas en mV mais en cnt DAC qui donneront 700 mV
 // statuts provenant du vhd
 struct s_FpaStatus    // 

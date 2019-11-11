@@ -269,7 +269,8 @@ begin
                   when X"0B4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
                   when X"0B8" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);                     
                   when X"0BC" =>    user_cfg_i.reorder_column                  <= data_i(0); 
-                  when X"0C0" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
+                  when X"0C0" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); 
+                  when X"0C4" =>    user_cfg_i.additional_fpa_int_time_offset  <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0)); user_cfg_in_progress <= '0';           
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

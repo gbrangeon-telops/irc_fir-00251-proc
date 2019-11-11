@@ -25,6 +25,7 @@
 #include "CRC.h"
 #include <math.h>
 #include <string.h>
+#include "exposure_time_ctrl.h"
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -160,8 +161,8 @@ typedef struct scorpiomw_param_s  scorpiomw_param_t;
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F; 
-ProximCfg_t ProximCfg = {{0, 0, 0, 0,  0, 0, 5096,2594}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
-
+ProximCfg_t ProximCfg = {{0, 0, 0, 0,  0, 0, 5096, 2594}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+uint8_t sw_init_done = 0;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -172,9 +173,6 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 
 
-// configuration à l'allumage du détecteur
-gcRegistersData_t InitGCRegs;           // structure comportant la config d'initialisation du détecteur
-uint8_t init_cfg_in_progress = 0;           // permet de signaler la configuration d'initialisation du détecteur
 
 
 //--------------------------------------------------------------------------
@@ -182,20 +180,15 @@ uint8_t init_cfg_in_progress = 0;           // permet de signaler la configurati
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {   
-   init_cfg_in_progress = 1;                                                // la config qui s'en vient en est une d'initialisation du détecteur. Le VHD la stocke et programmera le dtecteur avec à l'allumage avant de faire quoi que ce soit
-   InitGCRegs = *pGCRegs;
-   InitGCRegs.TestImageSelector = 0;
-   InitGCRegs.OffsetX = 0;
-   InitGCRegs.OffsetY = 0;
-   InitGCRegs.Width   = 640;
-   InitGCRegs.Height  = 512;
+   // sw_init_done = 0;                                               
    FPA_Reset(ptrA);
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
    FPA_GetTemperature(ptrA);                                                // demande de lecture
-   FPA_SendConfigGC(ptrA, &InitGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
+   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour. placé en dernier lieu afin que la config d'initialisation soit latchée avant allumage du détecteur
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
-   init_cfg_in_progress = 0;                                                // fin de l'initialisation
+   FPA_GetTemperature(ptrA); 
+   sw_init_done = 1;                                              
 }
  
 //--------------------------------------------------------------------------
@@ -255,7 +248,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                         // non utilisé
    static uint8_t cfg_num = 0; 
-       
+   extern int32_t gFpaExposureTimeOffset;
+   
    // on bâtit les parametres specifiques du scorpiomw
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //
    
@@ -284,11 +278,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       if ((int32_t)gFpaDebugRegE != 0)
          ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
-      
-   // config d'initialisation du détecteur ou non
-   ptrA->fpa_init_cfg =  init_cfg_in_progress;
-   ptrA->fpa_init_cfg_received =  0;     // ENO 15 oct. 2016: valeur sans importance. Le module  mb_intf.vhd génère convenablement cette valeur.
-   
+         
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
@@ -304,8 +294,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // direction de lecture
    ptrA->uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
-   if (init_cfg_in_progress == 1)
-        ptrA->uprow_upcol = 1;
    
    // calculé specialement pour le ScorpioMW
    Cmin  = (uint32_t)pGCRegs->OffsetX/4;
@@ -334,23 +322,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 
-   if (init_cfg_in_progress == 1)
-      ptrA->itr = 1;     // toujours en mode itr
        
    //  gain 
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
       
-    // GPOL voltage 
-   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)      // gFpaDetectorPolarizationVoltage est en milliVolt
-   {
-      if ((gFpaDetectorPolarizationVoltage >= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV))
-         ptrA->gpol_code = (int32_t) FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // gpol_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+   // GPOL voltage 
+   if (sw_init_done == 0){
+      ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord(700.0F, 6);
+      ptrA->gpol_code = (int32_t)ProximCfg.vdac_value[5];
+   }      
+   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage){      // gFpaDetectorPolarizationVoltage est en milliVolt
+      if ((gFpaDetectorPolarizationVoltage >= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV)){
+         ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // gpol_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+         ptrA->gpol_code = (int32_t)ProximCfg.vdac_value[5];
+      }   
    }
    presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
    gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                        
    
    // Registre F : ajustement des delais de la chaine
-   if (init_cfg_in_progress == 1)
+   if (sw_init_done == 0)
       gFpaDebugRegF = 3; 
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
       
@@ -394,7 +385,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[4]                 = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
    ProximCfg.vdac_value[5]                 = ptrA->gpol_code;                             // VCC6 -> GPOL
 
-   
    // Reference of the tap (VCC7 ou DAC6)      
    if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
    {
@@ -414,12 +404,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
    // gFpaDebugRegC dephasage grossier des adc_clk 
-   if (init_cfg_in_progress == 1)
+   if (sw_init_done == 0)
       gFpaDebugRegC = 0;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
  
    // gFpaDebugRegD dephasage fin des adc_clk 
-   if (init_cfg_in_progress == 1)         
+   if (sw_init_done == 0)         
       gFpaDebugRegD = 680;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;  
    
@@ -431,13 +421,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if ((ptrA->fpa_diag_mode == 0)&&(ptrA->uprow_upcol == 0))  // en mode détecteur et avec uprow_upcol=0 le scorpioMW inverse les colonnes
       ptrA->reorder_column = 1; 
       
-  
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    if (cfg_num == 255)  // protection contre depassement
       cfg_num = 0;   
    cfg_num++;
    
    ptrA->cfg_num  = (uint32_t)cfg_num;
+   
+   // additional exposure time offset coming from flash 
+   ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
    
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);

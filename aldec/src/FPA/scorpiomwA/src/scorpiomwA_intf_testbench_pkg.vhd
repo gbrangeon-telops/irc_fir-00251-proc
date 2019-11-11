@@ -82,11 +82,12 @@ package body scorpiomwA_intf_testbench_pkg is
       variable adc_clk_source_phase                                : unsigned(31 downto 0);                  
       variable adc_clk_pipe_sel                                    : unsigned(31 downto 0);                  
       variable cfg_num                                             : unsigned(31 downto 0);                                            
-      variable comn_fpa_stretch_acq_trig                           : unsigned(31 downto 0);                                            
+      variable comn_fpa_stretch_acq_trig                           : unsigned(31 downto 0) := (others => '0');                                            
       variable reorder_column                                      : unsigned(31 downto 0);                 
-      variable comn_fpa_intf_data_source                           : unsigned(31 downto 0);                 
+      variable comn_fpa_intf_data_source                           : unsigned(31 downto 0) := (others => '0'); 
+      variable additional_fpa_int_time_offset                      : unsigned(31 downto 0) := (others => '0');
       
-      variable y                                                   : unsigned(49*32-1 downto 0);
+      variable y                                                   : unsigned(50*32-1 downto 0);
       
    begin
       comn_fpa_diag_mode               :=  (others => diag_mode);                                               
@@ -205,7 +206,8 @@ package body scorpiomwA_intf_testbench_pkg is
       & cfg_num                         
       & comn_fpa_stretch_acq_trig       
       & reorder_column                  
-      & comn_fpa_intf_data_source;
+      & comn_fpa_intf_data_source
+      & additional_fpa_int_time_offset;
       
       return y;
    end to_intf_cfg;

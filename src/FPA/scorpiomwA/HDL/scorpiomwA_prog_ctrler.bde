@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 13399
+ FREEID 13660
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -27,11 +27,12 @@ HEADER
     #GENERIC0="OUTPUT_MSB_FIRST:BOOLEAN:=false"
     #GENERIC1="DATA_TO_CS_DLY:NATURAL range 1 to 31:=1"
     #GENERIC2="CS_TO_DATA_DLY:NATURAL range 1 to 31:=1"
+    #GENERIC3="SCLK0_FREE_RUNNING:BOOLEAN:=false"
     #HDL_ENTRIES=
 "library STD,IEEE,WORK;\n"+
 "use STD.STANDARD.all,ieee.std_logic_1164.all,work.fpa_common_pkg.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1436089668"
+    #MODIFIED="1573115016"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="16ab8094-e3d8-4d3e-b908-59f6b8678306"
    }
   }
@@ -168,7 +169,7 @@ HEADER
      {
       #DIRECTION="OUT"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="RX_MISO"
       #NUMBER="0"
       #SIDE="left"
@@ -220,7 +221,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #NAME="RX_MOSI"
       #NUMBER="0"
       #SIDE="left"
@@ -1066,8 +1067,9 @@ PAGE ""
     #COMPONENT="LL8_ext_to_spi_tx"
     #CUSTOM_NAME=""
     #GENERIC0="OUTPUT_MSB_FIRST : BOOLEAN := true"
-    #GENERIC1="DATA_TO_CS_DLY : NATURAL range 1 to 31 := 2"
+    #GENERIC1="SCLK0_FREE_RUNNING : BOOLEAN := true"
     #GENERIC2="CS_TO_DATA_DLY : NATURAL range 1 to 31 := 1"
+    #GENERIC3="DATA_TO_CS_DLY : NATURAL range 1 to 31 := 5"
     #LIBRARY="#default"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -1076,7 +1078,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="16ab8094-e3d8-4d3e-b908-59f6b8678306"
    }
    COORD (2360,920)
-   VERTEXES ( (2,11812), (10,11796), (4,11798), (14,11800), (20,11802), (22,11817), (12,11806), (16,11808), (6,11897), (8,13180), (18,13221) )
+   VERTEXES ( (2,11812), (4,11798), (6,11897), (8,13180), (10,11796), (12,11806), (14,11800), (16,11808), (18,13221), (20,11802), (22,11817) )
   }
   TEXT  10115, 0, 0
   {
@@ -1096,7 +1098,7 @@ PAGE ""
   TEXT  10117, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (2320,1240,2719,1339)
+   RECT (2320,1240,2755,1372)
    PARENT 10114
   }
   NET WIRE  10147, 0, 0
@@ -1446,7 +1448,6 @@ PAGE ""
   }
   NET BUS  11859, 0, 0
   NET WIRE  11864, 0, 0
-  NET WIRE  11869, 0, 0
   VTX  11897, 0, 0
   {
    COORD (2300,980)
@@ -1750,11 +1751,6 @@ PAGE ""
   VTX  12895, 0, 0
   {
    COORD (940,1100)
-  }
-  WIRE  12896, 0, 0
-  {
-   NET 11869
-   VTX 12894, 12895
   }
   NET WIRE  12931, 0, 0
   NET WIRE  12935, 0, 0
@@ -2060,13 +2056,22 @@ PAGE ""
   {
    LABEL "SignalAssignments_1"
    TEXT 
-"   U5: process (CLK)\n"+
+"   U5A: process (CLK)\n"+
 "   begin\n"+
 "      if rising_edge(CLK) then\n"+
 "         sclk_counter <= sclk_counter + 1;\n"+
 "         sclk_i <= sclk_counter(3);\n"+
 "       end if;\n"+
-"   end process;      \n"+
+"   end process;\n"+
+"   \n"+
+"   \n"+
+"   U5B: process (CLK)\n"+
+"   begin\n"+
+"      if rising_edge(CLK) then\n"+
+"\n"+
+"       end if;\n"+
+"   end process; \n"+
+"\n"+
 "\n"+
 "\n"+
 "\n"+
@@ -2132,6 +2137,90 @@ PAGE ""
    MARGINS (1,1)
    PARENT 13223
   }
+  TEXT  13586, 0, 0
+  {
+   OUTLINE 0,1, (255,0,0)
+   TEXT 
+"DATA_TO_CS_DLY à 5 donne le temps à au signal ERROR, le cas echeant, \n"+
+"d'être sorti sur l'holroge lente  "
+   RECT (2120,1420,3123,1488)
+   MARGINS (1,1)
+   COLOR (255,0,0)
+   FONT (12,0,0,400,0,0,0,"Arial")
+  }
+  INSTANCE  13607, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="SPI_EN"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (1240,1180)
+   VERTEXES ( (2,13612) )
+  }
+  TEXT  13608, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1292,1163,1395,1198)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 13607
+  }
+  VTX  13612, 0, 0
+  {
+   COORD (1240,1180)
+  }
+  VTX  13613, 0, 0
+  {
+   COORD (1200,1100)
+  }
+  VTX  13615, 0, 0
+  {
+   COORD (1200,1180)
+  }
+  WIRE  13616, 0, 0
+  {
+   NET 13638
+   VTX 13612, 13615
+  }
+  WIRE  13617, 0, 0
+  {
+   NET 13638
+   VTX 13615, 13613
+  }
+  WIRE  13618, 0, 0
+  {
+   NET 13638
+   VTX 12894, 13613
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13619, 0, 0
+  {
+   NET 13638
+   VTX 13613, 12895
+  }
+  NET WIRE  13638, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="spi_en_i"
+   }
+  }
+  TEXT  13639, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1275,1070,1366,1099)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13618
+  }
  }
  
 }
@@ -2157,7 +2246,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  13382, 0, 0
+  TEXT  13643, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2168,7 +2257,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13383, 0, 0
+  TEXT  13644, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -2179,7 +2268,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  13384, 0, 0
+  TEXT  13645, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -2189,7 +2278,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13385, 0, 0
+  TEXT  13646, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2201,7 +2290,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  13386, 0, 0
+  TEXT  13647, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -2214,7 +2303,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  13387, 0, 0
+  TEXT  13648, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -2224,7 +2313,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13388, 0, 0
+  TEXT  13649, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2236,7 +2325,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  13389, 0, 0
+  TEXT  13650, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -2246,7 +2335,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13390, 0, 0
+  TEXT  13651, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -2257,7 +2346,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  13391, 0, 0
+  GROUP  13652, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1620,3201,2001)
@@ -2269,7 +2358,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13392, 0, 0
+  GROUP  13653, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1820,3201,1821)
@@ -2281,7 +2370,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13393, 0, 0
+  GROUP  13654, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1760,3201,1761)
@@ -2293,7 +2382,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13394, 0, 0
+  GROUP  13655, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1880,3201,1881)
@@ -2305,7 +2394,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13395, 0, 0
+  GROUP  13656, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1940,3201,1941)
@@ -2317,7 +2406,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13396, 0, 0
+  GROUP  13657, 0, 0
   {
    PAGEALIGN 10
    RECT (2500,1620,2501,1761)
@@ -2328,7 +2417,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  13397, 0, 0
+  GROUP  13658, 0, 0
   {
    PAGEALIGN 10
    RECT (2500,1760,2501,2001)
@@ -2339,7 +2428,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  13398, 0, 0
+  BMPPICT  13659, 0, 0
   {
    PAGEALIGN 10
    RECT (2340,1680,2479,1725)

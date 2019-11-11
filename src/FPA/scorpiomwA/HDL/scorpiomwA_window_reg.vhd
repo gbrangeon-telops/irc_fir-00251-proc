@@ -43,7 +43,6 @@ entity scorpiomwA_window_reg is
       RQST           : out std_logic;
       EN             : in std_logic
       
-      
       );
 end scorpiomwA_window_reg;
 
@@ -73,7 +72,7 @@ architecture rtl of scorpiomwA_window_reg is
    signal uprow_upcol_i       : std_logic;
    signal sizea_sizeb_i       : std_logic;
    signal itr_i               : std_logic;
-   signal dly_cnter           : unsigned(7 downto 0);
+   signal reprog_cnt          : unsigned(3 downto 0);
    signal error_i             : std_logic;
    signal fpa_error_i         : std_logic;
    signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
@@ -171,7 +170,7 @@ begin
             roic_cfg_fsm <= idle;
             itr_i <= FPA_INTF_CFG.ITR;                  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             uprow_upcol_i <= FPA_INTF_CFG.UPROW_UPCOL;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
-            sizea_sizeb_i <= FPA_INTF_CFG.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
+            sizea_sizeb_i <= '1';                       -- FPA_INTF_CFG.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             present_cfg(39) <= '1';   -- le bit 39 seul forcé à '1'. Cela suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             error_i <= '0';
             present_cfg_num <= not new_cfg_num;
@@ -190,6 +189,7 @@ begin
                   done_i <= '1'; 
                   rqst_i <= '0';
                   pause_cnt <= (others => '0');
+                  reprog_cnt <= (others => '0');
                   if new_cfg_pending = '1' or new_cfg_num_pending = '1'then
                      roic_cfg_fsm <= check_done_st;  
                   end if;   
@@ -212,18 +212,7 @@ begin
                   uprow_upcol_i <= new_cfg(35);
                   sizea_sizeb_i <= new_cfg(34); 
                   spi_data_i <= "000000" & new_cfg(33 downto 0);   -- assigné un clk plus tôt                   
-                  roic_cfg_fsm <= check_init_st;
-               
-               when check_init_st =>                   
-                  if FPA_INTF_CFG.COMN.FPA_INIT_CFG = '1' then 
-                     if sizea_sizeb_i = '1' then     -- s'il s'agit d'une config d'initialisation du ScorpiomwA en pleine fenetre, alors ne pas activer la programmation spi
-                        roic_cfg_fsm <= update_reg_st;
-                     else
-                        roic_cfg_fsm <= send_cfg_st;
-                     end if;
-                  else
-                     roic_cfg_fsm <= send_cfg_st;
-                  end if;
+                  roic_cfg_fsm <= send_cfg_st;
                
                when send_cfg_st =>                   
                   spi_en_i <= '1';
@@ -233,22 +222,30 @@ begin
                
                when wait_end_st =>
                   spi_en_i <= '0';
+                  pause_cnt <= (others => '0');
                   if SPI_DONE = '1' then
                      roic_cfg_fsm <= wait_err_st;
                   end if;  
                
                when wait_err_st =>
                   pause_cnt <= pause_cnt + 1;
-                  if pause_cnt = 255 then       -- delai largement suffisant pour que ERROR soit généré
+                  if fpa_error_i = '1' then 
+                     error_i <= '1';                   -- ne doit jamais arriver
+                  end if;  
+                  if pause_cnt = 255 then              -- delai largement suffisant pour que ERROR soit généré
                      roic_cfg_fsm <= check_roic_err_st;
                   end if;                  
                
-               when check_roic_err_st =>
-                  pause_cnt <= (others => '0');
-                  if fpa_error_i = '1' then 
-                     error_i <= '1';         -- ne doit jamais arriver
-                  end if;                   
-                  roic_cfg_fsm <= update_reg_st;   --même si error_i arrive on met quand même à jour la conmfig pour sortir de cet état sinon risque de planter la camera
+               when check_roic_err_st =>                   
+                  if error_i = '1' then
+                     reprog_cnt <= reprog_cnt + 1;
+                     roic_cfg_fsm <= cfg_io_st;   -- si erreur on renvoie la config        
+                  else
+                     roic_cfg_fsm <= update_reg_st; 
+                  end if;                       
+                  if reprog_cnt(2) = '1' then
+                     roic_cfg_fsm <= update_reg_st;
+                  end if;              
                
                when update_reg_st =>
                   present_cfg <= "000" & itr_i & uprow_upcol_i & sizea_sizeb_i & spi_data_i(33 downto 0);

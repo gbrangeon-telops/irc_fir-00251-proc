@@ -59,8 +59,6 @@ entity scorpiomwA_digio_map is
       FPA_DIGIO10    : out std_logic;
       FPA_DIGIO11    : in std_logic;
       FPA_DIGIO12    : in std_logic;
-      --PROG_INIT_DONE : in std_logic;
-      --FPA_INIT_CFG_RECEIVED : in std_logic;
       
       FPA_DVALID_ERR : out std_logic
       
@@ -70,8 +68,8 @@ end scorpiomwA_digio_map;
 
 architecture rtl of scorpiomwA_digio_map is
    
-constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
-constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEFINE_FLEG_DAC_PWR_WAIT_FACTOR;
+   constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
+   constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEFINE_FLEG_DAC_PWR_WAIT_FACTOR;
    
    component sync_reset
       port(
@@ -93,8 +91,11 @@ constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEF
    
    type fpa_digio_fsm_type   is (idle, wait_mclk_st, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, passthru_st, fpa_pwred_st);
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
-   type serclr_fsm_type is (idle, wait_spi_csn_st, signal_length_st); 
+   type serclr_fsm_type is (idle, wait_spi_csn_st, signal_length_st, wait_end_st); 
    type dval_en_fsm_type is (idle, dval_en_st);
+   type mclk_fsm_type is (run_st, stop_st1, stop_st2, wait_st);
+   
+   signal mclk_fsm         : mclk_fsm_type;
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
    signal dval_en_fsm      : dval_en_fsm_type;
@@ -147,10 +148,11 @@ constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEF
    signal dval_length_cnt     : unsigned(26 downto 0);
    signal int_last            : std_logic;
    signal data_valid_iob_last : std_logic;
-   signal fpa_dvalid_err_i    : std_logic;
+   signal fpa_dvalid_err_i    : std_logic := '0';
+   signal prog_sclk_last      : std_logic;
    
-   attribute IOB           : string;
-   attribute keep    : string;
+   attribute IOB              : string;
+   attribute keep             : string;
    
    attribute IOB of fpa_on_iob         : signal is "TRUE";
    attribute IOB of prog_data_iob      : signal is "TRUE";
@@ -162,18 +164,6 @@ constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEF
    attribute IOB of dac_sd_iob         : signal is "TRUE";
    attribute IOB of dac_sclk_iob       : signal is "TRUE";
    attribute IOB of serclr_iob         : signal is "TRUE";
-   
-   --attribute keep of fpa_on_i      : signal is "TRUE";
---   attribute keep of prog_data_i   : signal is "TRUE";
---   attribute keep of sizea_sizeb_i : signal is "TRUE";
---   attribute keep of int_i         : signal is "TRUE";
---   attribute keep of mclk_i        : signal is "TRUE";
---   attribute keep of dac_csn_i     : signal is "TRUE";
---   attribute keep of dac_sd_i      : signal is "TRUE";
---   attribute keep of dac_sclk_i    : signal is "TRUE";
---   attribute keep of error_i       : signal is "TRUE";
---   attribute keep of data_valid_i  : signal is "TRUE";
---   attribute keep of serclr_i      : signal is "TRUE";
    
 begin   
    
@@ -220,31 +210,7 @@ begin
          fpa_on_i <= not ARESET and FPA_PWR;
          fsm_sreset <= sreset or not FPA_PWR; 
       end if;   
-   end process;  
-   
-   --------------------------------------------------
-   -- fpa_datavalid est filtré avant d'être utilisé
-   -------------------------------------------------- 
-   --   Uf0 : signal_filter
-   --   generic map(
-   --      SCAN_WINDOW_LEN => 6)
-   --   port map(
-   --      CLK => MCLK_SOURCE,
-   --      SIG_IN => data_valid_iob,
-   --      SIG_OUT => data_valid_filt
-   --      );  
-   
-   --------------------------------------------------
-   -- fpa_error est filtré avant d'être utilisé
-   -------------------------------------------------- 
-   --   Uf1 : signal_filter
-   --   generic map(
-   --      SCAN_WINDOW_LEN => 6)
-   --   port map(
-   --      CLK => MCLK_SOURCE,
-   --      SIG_IN => error_iob,
-   --      SIG_OUT => error_filt
-   --      );    
+   end process;    
    
    --------------------------------------------------------- 
    -- registres dans iob
@@ -286,32 +252,38 @@ begin
             serclr_fsm <= idle; 
             prog_csn_last <= '1';
             serclr_i <= '0';
+            prog_sclk_last <= PROG_SCLK;
             
          else
             
-            prog_csn_last <= PROG_CSN;             
+            prog_csn_last <= PROG_CSN;
+            prog_sclk_last <= PROG_SCLK;
             
             case serclr_fsm is          
                
                -- idle
                when idle =>
                   serclr_i <= '0';
-                  cnter <= 1;
                   if fpa_powered_i = '1' then 
                      serclr_fsm <= wait_spi_csn_st;
                   end if;
                   
                -- detecter la tombée de PROG_CSN et lancer la generation de serclr_i
                when wait_spi_csn_st =>
-                  if PROG_CSN = '0' and prog_csn_last = '1' then 
+                  if PROG_CSN = '0' and prog_sclk_last = '0' and PROG_SCLK = '1' then 
                      serclr_i <= '1'; 
                      serclr_fsm <= signal_length_st;
                   end if; 
                
                when signal_length_st =>
-                  cnter <=  cnter + 1;
-                  if cnter = C_FPA_MCLK_RATE_FACTOR_M1 then
-                     serclr_fsm <= idle; 
+                  if prog_sclk_last = '0' and PROG_SCLK = '1' then
+                     serclr_i <= '0'; 
+                     serclr_fsm <= wait_end_st;
+                  end if;
+               
+               when wait_end_st =>
+                  if PROG_CSN = '1' then 
+                     serclr_fsm <= idle;  
                   end if;
                
                when others =>
@@ -322,105 +294,57 @@ begin
       end if;
    end process; 
    
-   
    --------------------------------------------------------- 
-   -- decalage de l'horloge                                
-   --------------------------------------------------------- 
-   -- pour synchro parfaite avec les données allant vers le detecteur
-   MCLK10M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 10_000 generate   
-      --begin                                             
-      U10M :  process(MCLK_SOURCE)
-      begin  
-         if rising_edge(MCLK_SOURCE) then 
-            mclk_pipe(0) <= FPA_MCLK;
-            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0);
-            mclk_reg <= mclk_pipe(0);                          -- ajusté via simulation
-         end if;
-      end process;
-   end generate;
-   
-   ----
-   MCLK15M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 15_000 generate   
-      --begin                                             
-      U15M :  process(MCLK_SOURCE)
-      begin  
-         if rising_edge(MCLK_SOURCE) then 
-            mclk_pipe(0) <= FPA_MCLK;
-            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0);
-            mclk_reg <= mclk_pipe(0);                           -- ajusté via simulation
-         end if;
-      end process;         
-   end generate;
-   
-   ---------
-   MCLK18M_Gen : if DEFINE_FPA_MCLK_RATE_KHZ = 18_000 generate                                              
-      --begin                                             
-      U18M :  process(MCLK_SOURCE)
-      begin  
-         if rising_edge(MCLK_SOURCE) then 
-            mclk_pipe(0) <= FPA_MCLK;
-            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0);   
-            mclk_reg <= mclk_pipe(0);                          -- ajusté via simulation
-         end if;
-      end process;
-   end generate; 
-   
-   
-   --------------------------------------------------------- 
-   -- validation de data_valid                             
+   -- ajustement de phase de l'horloge                                
    ---------------------------------------------------------
-   -- data_valid doit être défini ssi il y a eu integration vers le détecteur
-   Udv: process(MCLK_SOURCE)
-   begin
+   -- pour alogner l'horloge sur les signaux d'integration
+   -- de plus, on stope l'horloge sans troncature à l'immibnence d'une programmation de detecteur car cette derniere vient avec son horloge propre qui est moins rapide
+   U18M :  process(MCLK_SOURCE)
+   begin  
       if rising_edge(MCLK_SOURCE) then
-         if fsm_sreset = '1' then        -- fsm_sreset vaut '1' si sreset ou détecteur non allumé.
-            dval_en_fsm <= idle; 
-            dval_en <= '0';
-            int_last <= '0';
-            data_valid_iob_last <= '0';
-            fpa_dvalid_err_i <= '0';
-            dval_length_cnt <= (others => '0');
+         if sreset = '1' then 
+            mclk_fsm <= run_st;
+            mclk_pipe <= (others => '1');
+            mclk_reg <= '0';
             
          else
             
-            int_last <= int_i;
-            data_valid_iob_last <= data_valid_iob;
+            mclk_pipe(0) <= FPA_MCLK;
+            mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0); 
+            mclk_reg <= mclk_pipe(0);   -- ajusté via simulation  
             
-            -- cas où aucune image n'est renvoyée suite à une integration
-            if dval_en = '1' then 
-               dval_length_cnt <= dval_length_cnt + 1;               
-            else
-               dval_length_cnt <= (others => '0');
-            end if;            
-            if dval_length_cnt =  72_000_000 then  -- à notre frequence de FPA_MCLK, aucune image ne dure 1sec. Si cela arrivaitr. Alors c'est une erreur qui aura des conséquences graves
-               fpa_dvalid_err_i <= '1';
-            end if;             
-            
-            -- dval_en generation
-            case dval_en_fsm is          
+            case mclk_fsm is 
                
-               -- idle
-               when idle =>
-                  dval_en <= '0';
-                  if int_last = '1' and int_i = '0' then 
-                     dval_en_fsm <= dval_en_st;
+               when run_st =>                  
+                  if PROG_EN = '1' then 
+                     mclk_fsm <= stop_st1;
                   end if;
-                  
-               -- data_valid a un sens si integration effectuée
-               when dval_en_st =>
-                  dval_en <= '1'; 
-                  if data_valid_iob_last = '1' and data_valid_iob = '0' then   -- ainsi, si dval_en reste indéfiniment à '1', cela signifie qu'une image n'a pas été renvoyée par le détecteur, suite à une intégration. C'est grave!
-                     dval_en_fsm <= idle;
+               
+               when stop_st1 =>
+                  if mclk_reg = '0' then                          -- pour un arret sans troncature de mclk
+                     mclk_reg <= '0';
+                     mclk_fsm <= stop_st2;
+                  end if;       
+               
+               when stop_st2 =>
+                  mclk_reg <= '0';
+                  if PROG_CSN = '0' then 
+                     mclk_fsm <= wait_st;
+                  end if;
+               
+               when wait_st =>
+                  mclk_reg <= '0';
+                  if PROG_CSN = '1' and mclk_pipe(0) = '0' then  -- pour une reprise sans troncature de mclk
+                     mclk_fsm <= run_st; 
                   end if;
                
                when others =>
                
-            end case;           
+            end case;
             
-         end if;  
+         end if;
       end if;
-   end process; 
-   
+   end process;  
    
    --------------------------------------------------------- 
    -- fsm fpa digio                                 
@@ -499,7 +423,7 @@ begin
                      fpa_digio_fsm <= wait_mclk_st;
                   end if;                   
                   mclk_i <= mclk_reg;      -- horloge requise
-                  
+               
                when wait_mclk_st =>                  
                   if mclk_reg = '0'  then  -- si cela se produit, on est certain que le gestionnaire de trig est bloqué. Quitter rapidement pour ne pas manquer la communication
                      fpa_digio_fsm <= passthru_st;
@@ -514,11 +438,8 @@ begin
                   mclk_i <= (mclk_reg and PROG_CSN) or (PROG_SCLK and not PROG_CSN);  --
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
-                  error_i <= error_iob; -- error_filt;
-                  data_valid_i <= data_valid_iob and dval_en; --data_valid_filt;              
-                  -- pragma translate_off
-                  data_valid_i <= data_valid_iob and dval_en;
-                  -- pragma translate_on                 
+                  error_i <= error_iob and PROG_CSN; -- le signal d'erreur est considéré uniqument à la fin de la communicaio spi
+                  data_valid_i <= data_valid_iob; --
                
                when others =>
                
