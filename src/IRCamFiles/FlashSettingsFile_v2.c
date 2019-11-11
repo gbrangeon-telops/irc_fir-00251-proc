@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.9.0
+ * Generated from the flash settings file structure definition XLS file version 2.9.1
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -114,7 +114,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* MaximumTotalFlux = */ FLT_MAX,
    /* FluxRatio01 = */ 1.0F,
    /* FluxRatio12 = */ 1.0F,
-   /* AECPlusExpTimeMargin = */ 0.2F,
+   /* AECPlusExpTimeMargin = */ 0.600000F,
    /* AECPlusFluxMargin = */ 0.9F,
    /* BPOutlierThreshold = */ 3.306613F,
    /* BPAECImageFraction = */ 50.000000F,
