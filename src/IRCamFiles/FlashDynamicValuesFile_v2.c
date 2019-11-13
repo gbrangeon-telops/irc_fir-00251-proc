@@ -226,3 +226,45 @@ uint32_t FlashDynamicValues_WriteFlashDynamicValuesFileHeader_v2(FlashDynamicVal
    return numBytes;
 }
 
+/**
+ * FlashDynamicValuesFileHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void FlashDynamicValues_PrintFlashDynamicValuesFileHeader_v2(FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("FileSignature: %s\n", hdr->FileSignature);
+   FPGA_PRINTF("FileStructureMajorVersion: %d\n", hdr->FileStructureMajorVersion);
+   FPGA_PRINTF("FileStructureMinorVersion: %d\n", hdr->FileStructureMinorVersion);
+   FPGA_PRINTF("FileStructureSubMinorVersion: %d\n", hdr->FileStructureSubMinorVersion);
+   FPGA_PRINTF("FileHeaderLength: %d bytes\n", hdr->FileHeaderLength);
+   FPGA_PRINTF("DeviceSerialNumber: %d\n", hdr->DeviceSerialNumber);
+   FPGA_PRINTF("POSIXTime: %d s\n", hdr->POSIXTime);
+   FPGA_PRINTF("DevicePowerOnCycles: %d\n", hdr->DevicePowerOnCycles);
+   FPGA_PRINTF("DeviceCoolerPowerOnCycles: %d\n", hdr->DeviceCoolerPowerOnCycles);
+   FPGA_PRINTF("DeviceRunningTime: %d s\n", hdr->DeviceRunningTime);
+   FPGA_PRINTF("DeviceCoolerRunningTime: %d s\n", hdr->DeviceCoolerRunningTime);
+   FPGA_PRINTF("PowerOnAtStartup: %d\n", hdr->PowerOnAtStartup);
+   FPGA_PRINTF("AcquisitionStartAtStartup: %d\n", hdr->AcquisitionStartAtStartup);
+   FPGA_PRINTF("StealthMode: %d\n", hdr->StealthMode);
+   FPGA_PRINTF("BadPixelReplacement: %d\n", hdr->BadPixelReplacement);
+   FPGA_PRINTF("CalibrationCollectionPOSIXTimeAtStartup: %d s\n", hdr->CalibrationCollectionPOSIXTimeAtStartup);
+   FPGA_PRINTF("CalibrationCollectionBlockPOSIXTimeAtStartup: %d s\n", hdr->CalibrationCollectionBlockPOSIXTimeAtStartup);
+   FPGA_PRINTF("DeviceKeyValidationLow: %d\n", hdr->DeviceKeyValidationLow);
+   FPGA_PRINTF("DeviceKeyValidationHigh: %d\n", hdr->DeviceKeyValidationHigh);
+   FPGA_PRINTF("FileOrderKey1: %d\n", hdr->FileOrderKey1);
+   FPGA_PRINTF("FileOrderKey2: %d\n", hdr->FileOrderKey2);
+   FPGA_PRINTF("FileOrderKey3: %d\n", hdr->FileOrderKey3);
+   FPGA_PRINTF("FileOrderKey4: %d\n", hdr->FileOrderKey4);
+   FPGA_PRINTF("CalibrationCollectionFileOrderKey1: %d\n", hdr->CalibrationCollectionFileOrderKey1);
+   FPGA_PRINTF("CalibrationCollectionFileOrderKey2: %d\n", hdr->CalibrationCollectionFileOrderKey2);
+   FPGA_PRINTF("CalibrationCollectionFileOrderKey3: %d\n", hdr->CalibrationCollectionFileOrderKey3);
+   FPGA_PRINTF("CalibrationCollectionFileOrderKey4: %d\n", hdr->CalibrationCollectionFileOrderKey4);
+   FPGA_PRINTF("DeviceSerialPortFunctionRS232: %d\n", hdr->DeviceSerialPortFunctionRS232);
+   FPGA_PRINTF("FileOrderKey5: %d\n", hdr->FileOrderKey5);
+   FPGA_PRINTF("CalibrationCollectionFileOrderKey5: %d\n", hdr->CalibrationCollectionFileOrderKey5);
+   FPGA_PRINTF("DetectorMode: %d\n", hdr->DetectorMode);
+   FPGA_PRINTF("AutofocusROI: " _PCF(3) " %\n", _FFMT(hdr->AutofocusROI, 3));
+   FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
+}
+

@@ -38,6 +38,7 @@
 
 // Calibration collection function versioning
 #define CalibCollection_WriteCollectionFileHeader  VER_FUN(CalibCollection_WriteCollectionFileHeader, TSCOFILES_VERSION)
+#define CalibCollection_PrintCollectionFileHeader  VER_FUN(CalibCollection_PrintCollectionFileHeader, TSCOFILES_VERSION)
 
 #define CALIB_MAX_NUM_OF_BLOCKS              8
 

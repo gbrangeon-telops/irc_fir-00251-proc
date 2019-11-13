@@ -323,18 +323,23 @@ typedef struct CalibBlock_LUTRQData_v2Struct CalibBlock_LUTRQData_v2_t;
 
 uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_BlockFileHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr);
 uint32_t CalibBlock_ParsePixelDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_PixelDataHeader_v2_t *hdr);
 uint32_t CalibBlock_WritePixelDataHeader_v2(CalibBlock_PixelDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibBlock_PrintPixelDataHeader_v2(CalibBlock_PixelDataHeader_v2_t *hdr);
 uint32_t CalibBlock_ParsePixelData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_PixelData_v2_t *data);
 uint32_t CalibBlock_WritePixelData_v2(CalibBlock_PixelData_v2_t *data, uint8_t *buffer, uint32_t buflen);
 uint32_t CalibBlock_ParseMaxTKDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_MaxTKDataHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteMaxTKDataHeader_v2(CalibBlock_MaxTKDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibBlock_PrintMaxTKDataHeader_v2(CalibBlock_MaxTKDataHeader_v2_t *hdr);
 uint32_t CalibBlock_ParseLUTNLDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_LUTNLDataHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteLUTNLDataHeader_v2(CalibBlock_LUTNLDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibBlock_PrintLUTNLDataHeader_v2(CalibBlock_LUTNLDataHeader_v2_t *hdr);
 uint32_t CalibBlock_ParseLUTNLData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_LUTNLData_v2_t *data);
 uint32_t CalibBlock_WriteLUTNLData_v2(CalibBlock_LUTNLData_v2_t *data, uint8_t *buffer, uint32_t buflen);
 uint32_t CalibBlock_ParseLUTRQDataHeader_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_LUTRQDataHeader_v2_t *hdr);
 uint32_t CalibBlock_WriteLUTRQDataHeader_v2(CalibBlock_LUTRQDataHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibBlock_PrintLUTRQDataHeader_v2(CalibBlock_LUTRQDataHeader_v2_t *hdr);
 uint32_t CalibBlock_ParseLUTRQData_v2(uint8_t *buffer, uint32_t buflen, CalibBlock_LUTRQData_v2_t *data);
 uint32_t CalibBlock_WriteLUTRQData_v2(CalibBlock_LUTRQData_v2_t *data, uint8_t *buffer, uint32_t buflen);
 

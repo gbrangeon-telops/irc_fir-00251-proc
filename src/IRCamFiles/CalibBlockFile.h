@@ -119,12 +119,17 @@ typedef enum calibrationTypeEnum calibrationType_t;
 
 // Calibration block function versioning
 #define CalibBlock_WriteBlockFileHeader      VER_FUN(CalibBlock_WriteBlockFileHeader, TSBLFILES_VERSION)
+#define CalibBlock_PrintBlockFileHeader      VER_FUN(CalibBlock_PrintBlockFileHeader, TSBLFILES_VERSION)
 #define CalibBlock_WritePixelDataHeader      VER_FUN(CalibBlock_WritePixelDataHeader, TSBLFILES_VERSION)
+#define CalibBlock_PrintPixelDataHeader      VER_FUN(CalibBlock_PrintPixelDataHeader, TSBLFILES_VERSION)
 #define CalibBlock_WritePixelData            VER_FUN(CalibBlock_WritePixelData, TSBLFILES_VERSION)
 #define CalibBlock_WriteMaxTKDataHeader      VER_FUN(CalibBlock_WriteMaxTKDataHeader, TSBLFILES_VERSION)
+#define CalibBlock_PrintMaxTKDataHeader      VER_FUN(CalibBlock_PrintMaxTKDataHeader, TSBLFILES_VERSION)
 #define CalibBlock_WriteLUTNLDataHeader      VER_FUN(CalibBlock_WriteLUTNLDataHeader, TSBLFILES_VERSION)
+#define CalibBlock_PrintLUTNLDataHeader      VER_FUN(CalibBlock_PrintLUTNLDataHeader, TSBLFILES_VERSION)
 #define CalibBlock_WriteLUTNLData            VER_FUN(CalibBlock_WriteLUTNLData, TSBLFILES_VERSION)
 #define CalibBlock_WriteLUTRQDataHeader      VER_FUN(CalibBlock_WriteLUTRQDataHeader, TSBLFILES_VERSION)
+#define CalibBlock_PrintLUTRQDataHeader      VER_FUN(CalibBlock_PrintLUTRQDataHeader, TSBLFILES_VERSION)
 #define CalibBlock_WriteLUTRQData            VER_FUN(CalibBlock_WriteLUTRQData, TSBLFILES_VERSION)
 
 uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *hdr, fileInfo_t *fileInfo);

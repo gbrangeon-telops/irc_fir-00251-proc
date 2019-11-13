@@ -74,5 +74,6 @@ typedef struct FlashDynamicValues_FlashDynamicValuesFileHeader_v2Struct FlashDyn
 
 uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader_v2(uint8_t *buffer, uint32_t buflen, FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t *hdr);
 uint32_t FlashDynamicValues_WriteFlashDynamicValuesFileHeader_v2(FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void FlashDynamicValues_PrintFlashDynamicValuesFileHeader_v2(FlashDynamicValues_FlashDynamicValuesFileHeader_v2_t *hdr);
 
 #endif // FLASHDYNAMICVALUESFILE_V2_H

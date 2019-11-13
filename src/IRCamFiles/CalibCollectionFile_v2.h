@@ -103,5 +103,6 @@ typedef struct CalibCollection_CollectionFileHeader_v2Struct CalibCollection_Col
 
 uint32_t CalibCollection_ParseCollectionFileHeader_v2(uint8_t *buffer, uint32_t buflen, CalibCollection_CollectionFileHeader_v2_t *hdr);
 uint32_t CalibCollection_WriteCollectionFileHeader_v2(CalibCollection_CollectionFileHeader_v2_t *hdr, uint8_t *buffer, uint32_t buflen);
+void CalibCollection_PrintCollectionFileHeader_v2(CalibCollection_CollectionFileHeader_v2_t *hdr);
 
 #endif // CALIBCOLLECTIONFILE_V2_H

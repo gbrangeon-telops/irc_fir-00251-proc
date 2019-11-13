@@ -325,3 +325,74 @@ uint32_t CalibCollection_WriteCollectionFileHeader_v2(CalibCollection_Collection
    return numBytes;
 }
 
+/**
+ * CollectionFileHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void CalibCollection_PrintCollectionFileHeader_v2(CalibCollection_CollectionFileHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("FileSignature: %s\n", hdr->FileSignature);
+   FPGA_PRINTF("FileStructureMajorVersion: %d\n", hdr->FileStructureMajorVersion);
+   FPGA_PRINTF("FileStructureMinorVersion: %d\n", hdr->FileStructureMinorVersion);
+   FPGA_PRINTF("FileStructureSubMinorVersion: %d\n", hdr->FileStructureSubMinorVersion);
+   FPGA_PRINTF("FileHeaderLength: %d bytes\n", hdr->FileHeaderLength);
+   FPGA_PRINTF("DeviceSerialNumber: %d\n", hdr->DeviceSerialNumber);
+   FPGA_PRINTF("POSIXTime: %d s\n", hdr->POSIXTime);
+   FPGA_PRINTF("FileDescription: %s\n", hdr->FileDescription);
+   FPGA_PRINTF("DeviceDataFlowMajorVersion: %d\n", hdr->DeviceDataFlowMajorVersion);
+   FPGA_PRINTF("DeviceDataFlowMinorVersion: %d\n", hdr->DeviceDataFlowMinorVersion);
+   FPGA_PRINTF("SensorID: %d\n", hdr->SensorID);
+   FPGA_PRINTF("CollectionType: %d enum\n", hdr->CollectionType);
+   FPGA_PRINTF("CalibrationType: %d enum\n", hdr->CalibrationType);
+   FPGA_PRINTF("IntegrationMode: %d enum\n", hdr->IntegrationMode);
+   FPGA_PRINTF("SensorWellDepth: %d enum\n", hdr->SensorWellDepth);
+   FPGA_PRINTF("PixelDataResolution: %d bits\n", hdr->PixelDataResolution);
+   FPGA_PRINTF("Width: %d pixels\n", hdr->Width);
+   FPGA_PRINTF("Height: %d pixels\n", hdr->Height);
+   FPGA_PRINTF("OffsetX: %d pixels\n", hdr->OffsetX);
+   FPGA_PRINTF("OffsetY: %d pixels\n", hdr->OffsetY);
+   FPGA_PRINTF("ReverseX: %d 0 / 1\n", hdr->ReverseX);
+   FPGA_PRINTF("ReverseY: %d 0 / 1\n", hdr->ReverseY);
+   FPGA_PRINTF("FWPosition: %d enum\n", hdr->FWPosition);
+   FPGA_PRINTF("NDFPosition: %d enum\n", hdr->NDFPosition);
+   FPGA_PRINTF("ExternalLensSerialNumber: %d\n", hdr->ExternalLensSerialNumber);
+   FPGA_PRINTF("ExternalLensName: %s\n", hdr->ExternalLensName);
+   FPGA_PRINTF("ManualFilterSerialNumber: %d\n", hdr->ManualFilterSerialNumber);
+   FPGA_PRINTF("ManualFilterName: %s\n", hdr->ManualFilterName);
+   FPGA_PRINTF("ReferencePOSIXTime: %d s\n", hdr->ReferencePOSIXTime);
+   FPGA_PRINTF("FluxRatio01: " _PCF(3) "\n", _FFMT(hdr->FluxRatio01, 3));
+   FPGA_PRINTF("FluxRatio12: " _PCF(3) "\n", _FFMT(hdr->FluxRatio12, 3));
+   FPGA_PRINTF("FOVPosition: %d enum\n", hdr->FOVPosition);
+   FPGA_PRINTF("ExtenderRingSerialNumber: %d\n", hdr->ExtenderRingSerialNumber);
+   FPGA_PRINTF("ExtenderRingName: %s\n", hdr->ExtenderRingName);
+   FPGA_PRINTF("Block1ImageShiftX: %d 0.01 px\n", hdr->Block1ImageShiftX);
+   FPGA_PRINTF("Block1ImageShiftY: %d 0.01 px\n", hdr->Block1ImageShiftY);
+   FPGA_PRINTF("Block1ImageRotation: %d 0.01 deg\n", hdr->Block1ImageRotation);
+   FPGA_PRINTF("Block2ImageShiftX: %d 0.01 px\n", hdr->Block2ImageShiftX);
+   FPGA_PRINTF("Block2ImageShiftY: %d 0.01 px\n", hdr->Block2ImageShiftY);
+   FPGA_PRINTF("Block2ImageRotation: %d 0.01 deg\n", hdr->Block2ImageRotation);
+   FPGA_PRINTF("Block3ImageShiftX: %d 0.01 px\n", hdr->Block3ImageShiftX);
+   FPGA_PRINTF("Block3ImageShiftY: %d 0.01 px\n", hdr->Block3ImageShiftY);
+   FPGA_PRINTF("Block3ImageRotation: %d 0.01 deg\n", hdr->Block3ImageRotation);
+   FPGA_PRINTF("Block4ImageShiftX: %d 0.01 px\n", hdr->Block4ImageShiftX);
+   FPGA_PRINTF("Block4ImageShiftY: %d 0.01 px\n", hdr->Block4ImageShiftY);
+   FPGA_PRINTF("Block4ImageRotation: %d 0.01 deg\n", hdr->Block4ImageRotation);
+   FPGA_PRINTF("Block5ImageShiftX: %d 0.01 px\n", hdr->Block5ImageShiftX);
+   FPGA_PRINTF("Block5ImageShiftY: %d 0.01 px\n", hdr->Block5ImageShiftY);
+   FPGA_PRINTF("Block5ImageRotation: %d 0.01 deg\n", hdr->Block5ImageRotation);
+   FPGA_PRINTF("Block6ImageShiftX: %d 0.01 px\n", hdr->Block6ImageShiftX);
+   FPGA_PRINTF("Block6ImageShiftY: %d 0.01 px\n", hdr->Block6ImageShiftY);
+   FPGA_PRINTF("Block6ImageRotation: %d 0.01 deg\n", hdr->Block6ImageRotation);
+   FPGA_PRINTF("Block7ImageShiftX: %d 0.01 px\n", hdr->Block7ImageShiftX);
+   FPGA_PRINTF("Block7ImageShiftY: %d 0.01 px\n", hdr->Block7ImageShiftY);
+   FPGA_PRINTF("Block7ImageRotation: %d 0.01 deg\n", hdr->Block7ImageRotation);
+   FPGA_PRINTF("Block8ImageShiftX: %d 0.01 px\n", hdr->Block8ImageShiftX);
+   FPGA_PRINTF("Block8ImageShiftY: %d 0.01 px\n", hdr->Block8ImageShiftY);
+   FPGA_PRINTF("Block8ImageRotation: %d 0.01 deg\n", hdr->Block8ImageRotation);
+   FPGA_PRINTF("CollectionDataLength: %d bytes\n", hdr->CollectionDataLength);
+   FPGA_PRINTF("NumberOfBlocks: %d\n", hdr->NumberOfBlocks);
+   FPGA_PRINTF("CollectionDataCRC16: %d\n", hdr->CollectionDataCRC16);
+   FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
+}
+

@@ -48,7 +48,10 @@
 
 // Calibration image correction function versioning
 #define CalibImageCorrection_WriteImageCorrectionFileHeader    VER_FUN(CalibImageCorrection_WriteImageCorrectionFileHeader, TSICFILES_VERSION)
+#define CalibImageCorrection_PrintImageCorrectionFileHeader    VER_FUN(CalibImageCorrection_PrintImageCorrectionFileHeader, TSICFILES_VERSION)
 #define CalibImageCorrection_WriteImageCorrectionDataHeader    VER_FUN(CalibImageCorrection_WriteImageCorrectionDataHeader, TSICFILES_VERSION)
+#define CalibImageCorrection_PrintImageCorrectionDataHeader    VER_FUN(CalibImageCorrection_PrintImageCorrectionDataHeader, TSICFILES_VERSION)
+#define CalibImageCorrection_WriteImageCorrectionData          VER_FUN(CalibImageCorrection_WriteImageCorrectionData, TSICFILES_VERSION)
 
 uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageCorrection_ImageCorrectionFileHeader_t *hdr, fileInfo_t *fileInfo);
 uint32_t CalibImageCorrection_ParseImageCorrectionDataHeader(int fd, fileInfo_t *fileInfo, CalibImageCorrection_ImageCorrectionDataHeader_t *hdr);

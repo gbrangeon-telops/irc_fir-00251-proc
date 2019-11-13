@@ -224,6 +224,39 @@ uint32_t CalibImageCorrection_WriteImageCorrectionFileHeader_v2(CalibImageCorrec
 }
 
 /**
+ * ImageCorrectionFileHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void CalibImageCorrection_PrintImageCorrectionFileHeader_v2(CalibImageCorrection_ImageCorrectionFileHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("FileSignature: %s\n", hdr->FileSignature);
+   FPGA_PRINTF("FileStructureMajorVersion: %d\n", hdr->FileStructureMajorVersion);
+   FPGA_PRINTF("FileStructureMinorVersion: %d\n", hdr->FileStructureMinorVersion);
+   FPGA_PRINTF("FileStructureSubMinorVersion: %d\n", hdr->FileStructureSubMinorVersion);
+   FPGA_PRINTF("FileHeaderLength: %d bytes\n", hdr->FileHeaderLength);
+   FPGA_PRINTF("DeviceSerialNumber: %d\n", hdr->DeviceSerialNumber);
+   FPGA_PRINTF("POSIXTime: %d s\n", hdr->POSIXTime);
+   FPGA_PRINTF("FileDescription: %s\n", hdr->FileDescription);
+   FPGA_PRINTF("DeviceDataFlowMajorVersion: %d\n", hdr->DeviceDataFlowMajorVersion);
+   FPGA_PRINTF("DeviceDataFlowMinorVersion: %d\n", hdr->DeviceDataFlowMinorVersion);
+   FPGA_PRINTF("SensorID: %d\n", hdr->SensorID);
+   FPGA_PRINTF("ImageCorrectionType: %d\n", hdr->ImageCorrectionType);
+   FPGA_PRINTF("Width: %d pixels\n", hdr->Width);
+   FPGA_PRINTF("Height: %d pixels\n", hdr->Height);
+   FPGA_PRINTF("OffsetX: %d pixels\n", hdr->OffsetX);
+   FPGA_PRINTF("OffsetY: %d pixels\n", hdr->OffsetY);
+   FPGA_PRINTF("ReferencePOSIXTime: %d s\n", hdr->ReferencePOSIXTime);
+   FPGA_PRINTF("TemperatureInternalLens: " _PCF(3) " K\n", _FFMT(hdr->TemperatureInternalLens, 3));
+   FPGA_PRINTF("TemperatureReference: " _PCF(3) " K\n", _FFMT(hdr->TemperatureReference, 3));
+   FPGA_PRINTF("ExposureTime: " _PCF(3) " us\n", _FFMT(hdr->ExposureTime, 3));
+   FPGA_PRINTF("AcquisitionFrameRate: %d mHz\n", hdr->AcquisitionFrameRate);
+   FPGA_PRINTF("FWMode: %d enum\n", hdr->FWMode);
+   FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
+   FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
+}
+
+/**
  * ImageCorrectionDataHeader parser.
  *
  * @param buffer is the byte buffer to parse.
@@ -307,6 +340,24 @@ uint32_t CalibImageCorrection_WriteImageCorrectionDataHeader_v2(CalibImageCorrec
    memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
+}
+
+/**
+ * ImageCorrectionDataHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void CalibImageCorrection_PrintImageCorrectionDataHeader_v2(CalibImageCorrection_ImageCorrectionDataHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("DataHeaderLength: %d bytes\n", hdr->DataHeaderLength);
+   FPGA_PRINTF("Beta0_Off: " _PCF(3) "\n", _FFMT(hdr->Beta0_Off, 3));
+   FPGA_PRINTF("Beta0_Median: " _PCF(3) "\n", _FFMT(hdr->Beta0_Median, 3));
+   FPGA_PRINTF("Beta0_Exp: %d\n", hdr->Beta0_Exp);
+   FPGA_PRINTF("Beta0_Nbits: %d bits\n", hdr->Beta0_Nbits);
+   FPGA_PRINTF("Beta0_Signed: %d 0 / 1\n", hdr->Beta0_Signed);
+   FPGA_PRINTF("ImageCorrectionDataLength: %d bytes\n", hdr->ImageCorrectionDataLength);
+   FPGA_PRINTF("ImageCorrectionDataCRC16: %d\n", hdr->ImageCorrectionDataCRC16);
+   FPGA_PRINTF("DataHeaderCRC16: %d\n", hdr->DataHeaderCRC16);
 }
 
 /**

@@ -214,6 +214,35 @@ uint32_t CalibSpectralResponse_WriteSpectralResponseFileHeader_v2(CalibSpectralR
 }
 
 /**
+ * SpectralResponseFileHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void CalibSpectralResponse_PrintSpectralResponseFileHeader_v2(CalibSpectralResponse_SpectralResponseFileHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("FileSignature: %s\n", hdr->FileSignature);
+   FPGA_PRINTF("FileStructureMajorVersion: %d\n", hdr->FileStructureMajorVersion);
+   FPGA_PRINTF("FileStructureMinorVersion: %d\n", hdr->FileStructureMinorVersion);
+   FPGA_PRINTF("FileStructureSubMinorVersion: %d\n", hdr->FileStructureSubMinorVersion);
+   FPGA_PRINTF("FileHeaderLength: %d bytes\n", hdr->FileHeaderLength);
+   FPGA_PRINTF("DeviceSerialNumber: %d\n", hdr->DeviceSerialNumber);
+   FPGA_PRINTF("POSIXTime: %d s\n", hdr->POSIXTime);
+   FPGA_PRINTF("FileDescription: %s\n", hdr->FileDescription);
+   FPGA_PRINTF("SensorID: %d\n", hdr->SensorID);
+   FPGA_PRINTF("ExternalLensSerialNumber: %d\n", hdr->ExternalLensSerialNumber);
+   FPGA_PRINTF("ManualFilterSerialNumber: %d\n", hdr->ManualFilterSerialNumber);
+   FPGA_PRINTF("FWPosition: %d enum\n", hdr->FWPosition);
+   FPGA_PRINTF("NDFPosition: %d enum\n", hdr->NDFPosition);
+   FPGA_PRINTF("FWFilterID: %d\n", hdr->FWFilterID);
+   FPGA_PRINTF("NDFilterID: %d\n", hdr->NDFilterID);
+   FPGA_PRINTF("ManualFilterID: %d\n", hdr->ManualFilterID);
+   FPGA_PRINTF("LensID: %d\n", hdr->LensID);
+   FPGA_PRINTF("LowCut: " _PCF(3) " um\n", _FFMT(hdr->LowCut, 3));
+   FPGA_PRINTF("HighCut: " _PCF(3) " um\n", _FFMT(hdr->HighCut, 3));
+   FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
+}
+
+/**
  * SpectralResponseDataHeader parser.
  *
  * @param buffer is the byte buffer to parse.
@@ -305,6 +334,28 @@ uint32_t CalibSpectralResponse_WriteSpectralResponseDataHeader_v2(CalibSpectralR
    memcpy(&buffer[numBytes], &hdr->DataHeaderCRC16, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 
    return numBytes;
+}
+
+/**
+ * SpectralResponseDataHeader printer.
+ *
+ * @param hdr is the pointer to the header structure to print.
+ */
+void CalibSpectralResponse_PrintSpectralResponseDataHeader_v2(CalibSpectralResponse_SpectralResponseDataHeader_v2_t *hdr)
+{
+   FPGA_PRINTF("DataHeaderLength: %d bytes\n", hdr->DataHeaderLength);
+   FPGA_PRINTF("SpectralResponseCurveSize: %d unit\n", hdr->SpectralResponseCurveSize);
+   FPGA_PRINTF("Lambda_Exp: %d\n", hdr->Lambda_Exp);
+   FPGA_PRINTF("SR_Exp: %d\n", hdr->SR_Exp);
+   FPGA_PRINTF("Lambda_Off: " _PCF(3) "\n", _FFMT(hdr->Lambda_Off, 3));
+   FPGA_PRINTF("SR_Off: " _PCF(3) "\n", _FFMT(hdr->SR_Off, 3));
+   FPGA_PRINTF("Lambda_Nbits: %d bits\n", hdr->Lambda_Nbits);
+   FPGA_PRINTF("SR_Nbits: %d bits\n", hdr->SR_Nbits);
+   FPGA_PRINTF("Lambda_Signed: %d 0 / 1\n", hdr->Lambda_Signed);
+   FPGA_PRINTF("SR_Signed: %d 0 / 1\n", hdr->SR_Signed);
+   FPGA_PRINTF("SpectralResponseDataLength: %d bytes\n", hdr->SpectralResponseDataLength);
+   FPGA_PRINTF("SpectralResponseDataCRC16: %d\n", hdr->SpectralResponseDataCRC16);
+   FPGA_PRINTF("DataHeaderCRC16: %d\n", hdr->DataHeaderCRC16);
 }
 
 /**

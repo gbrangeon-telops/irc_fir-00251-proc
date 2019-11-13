@@ -38,6 +38,7 @@
 
 // Flash dynamic values function versioning
 #define FlashDynamicValues_WriteFlashDynamicValuesFileHeader  VER_FUN(FlashDynamicValues_WriteFlashDynamicValuesFileHeader, TSDVFILES_VERSION)
+#define FlashDynamicValues_PrintFlashDynamicValuesFileHeader  VER_FUN(FlashDynamicValues_PrintFlashDynamicValuesFileHeader, TSDVFILES_VERSION)
 
 
 uint32_t FlashDynamicValues_ParseFlashDynamicValuesFileHeader(int fd, FlashDynamicValues_FlashDynamicValuesFileHeader_t *hdr, fileInfo_t *fileInfo);
