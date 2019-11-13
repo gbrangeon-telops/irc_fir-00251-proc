@@ -79,6 +79,7 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFWTEMP(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDFDVU(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFDV(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf);
@@ -118,6 +119,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"ADC", DebugTerminalParseADC},
    {"DFDVU", DebugTerminalParseDFDVU},
    {"FS", DebugTerminalParseFS},
+   {"FDV", DebugTerminalParseFDV},
    {"DTO", DebugTerminalParseDTO},
    {"FWPID", DebugTerminalParseFWPID},
    {"FWTEMP", DebugTerminalParseFWTEMP},
@@ -2132,6 +2134,33 @@ static IRC_Status_t DebugTerminalParseFS(circByteBuffer_t *cbuf)
 }
 
 /**
+ * Flash Dynamic Values command parser.
+ * This parser is used to parse and validate Flash Dynamic Values command arguments
+ * and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Flash Dynamic Values command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t DebugTerminalParseFDV(circByteBuffer_t *cbuf)
+{
+   extern flashDynamicValues_t gFlashDynamicValues;
+
+   // There is supposed to be no remaining bytes in the buffer
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      DT_ERR("Unsupported command arguments");
+      return IRC_FAILURE;
+   }
+
+   // Print flash dynamic values
+   FlashDynamicValues_PrintFlashDynamicValuesFileHeader(&gFlashDynamicValues);
+
+   return IRC_SUCCESS;
+}
+
+/**
  * Debug Terminal Output command parser.
  * This parser is used to parse and validate Debug Terminal Output command arguments
  * and to execute the command.
@@ -2475,6 +2504,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Set GCP state:      GCP [0|1]");
    DT_PRINTF("  ADC calibration:    ADC [m b]");
    DT_PRINTF("  Flash Settings:     FS");
+   DT_PRINTF("  Flash Dynamic Val.: FDV");
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");
    DT_PRINTF("  FW PID Settings:    FWPID POS|SLOW|FAST POR|INT|PP|PD|SP value");
    DT_PRINTF("  FW Reference Temp.: FWTEMP [m b]");
