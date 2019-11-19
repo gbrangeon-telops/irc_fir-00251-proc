@@ -1858,7 +1858,7 @@ void GC_UpdateJumboFrameHeight(gcRegistersData_t *pGCRegs, bool heightChanged)
    if (pGCRegs->MemoryBufferSequenceDownloadSuggestedFrameImageCount > 1)
    {
          GC_SetHeightInc(1);
-         GC_SetHeightMax(MAX(suggestedJumboFrameHeight, FPA_HEIGHT_MAX));
+         GC_SetHeightMax(MAX(MAX(suggestedJumboFrameHeight, NTxMiniHeight), FPA_HEIGHT_MAX));
    }
    else
    {
