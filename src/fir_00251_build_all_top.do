@@ -23,6 +23,7 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiolwD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwA_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwD_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_startup_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_suphawkA_build.do"
 
 #Collective builds (non-recursive)
@@ -48,6 +49,8 @@ acom  "$FIR251PROC\src\fir_00251_proc_herculesD.bde"
 #FPA isc0207A
 do "$FIR251PROC\src\FPA\isc0207A\HDL\compil_isc0207A.do"
 acom  "$FIR251PROC\src\fir_00251_proc_isc0207A.bde"
+#startup
+#acom  "$FIR251PROC\src\fir_00251_proc_startup.bde"
 #FPA isc0207A_3k
 do  "$FIR251PROC\src\FPA\isc0207A_3k\HDL\compil_isc0207A_3k.do"
 acom  "$FIR251PROC\src\fir_00251_proc_isc0207A_3k.bde"
