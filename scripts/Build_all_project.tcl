@@ -50,8 +50,8 @@ lappend detector_list {scorpiomwD160}
 # lappend detector_list {startup160}
 # lappend detector_list {startup325}
 
-#lappend detector_list {suphawkA160}
-lappend detector_list {suphawkA325}
+lappend detector_list {suphawkA160}
+#lappend detector_list {suphawkA325}
 
 
 #DO NOT MODIFY BEYOND THIS POINT
