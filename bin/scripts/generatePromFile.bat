@@ -35,4 +35,5 @@ IF [%fpgaSize%]==[160] (
 if errorlevel 1 (
 	echo PROM file generation failed!
 	pause
+   exit
 )

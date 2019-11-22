@@ -12,4 +12,5 @@ del %releaseLogFile%
 if errorlevel 1 (
 	echo Release file generation failed!
 	pause
+   exit
 )

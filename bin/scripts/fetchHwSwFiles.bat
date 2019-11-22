@@ -20,5 +20,6 @@ goto end
 :err
 echo Copy failed!
 pause
+exit
 
 :end
