@@ -1736,23 +1736,22 @@ void GC_UpdateExposureTimeMin()
    }
    else
    {
-
       // Use the most restrictive value (max)
       UserExposureTimeMin = MAX(CorrectedExposureTimeMin, flashSettings.ExposureTimeMin);
+   }
 
-      // Compare with specific value when AEC+ is active
-      if (GC_AECPlusIsActive)
+   // Compare with specific value when AEC+ is active
+   if (GC_AECPlusIsActive)
+   {
+      if (flashSettings.AECPlusExposureTimeMin != 0.0F)
       {
-         if (flashSettings.AECPlusExposureTimeMin != 0.0F)
-         {
-            // Use the most restrictive value (max)
-            UserExposureTimeMin = MAX(UserExposureTimeMin, flashSettings.AECPlusExposureTimeMin);
-         }
-         else
-         {
-            // Use the most restrictive value (max)
-            UserExposureTimeMin = MAX(UserExposureTimeMin, FPA_AECP_MIN_EXPOSURE);
-         }
+         // Use the most restrictive value (max)
+         UserExposureTimeMin = MAX(UserExposureTimeMin, flashSettings.AECPlusExposureTimeMin);
+      }
+      else
+      {
+         // Use the most restrictive value (max)
+         UserExposureTimeMin = MAX(UserExposureTimeMin, FPA_AECP_MIN_EXPOSURE);
       }
    }
 
