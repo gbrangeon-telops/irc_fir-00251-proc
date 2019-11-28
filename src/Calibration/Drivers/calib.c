@@ -448,16 +448,17 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
       pGCRegs->CalibrationCollectionActiveBlockPOSIXTime = calibrationInfo.blocks[blockIndex].POSIXTime;
 
       // Update FW position if necessary
-      if (flashSettings.FWPresent == 1)
+      if ((flashSettings.FWPresent == 1) &&
+            (pGCRegs->FWPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition))
          GC_UpdateFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
 
       // Update NDF position if necessary
-      if ((flashSettings.NDFPresent == 1) && GC_CalibrationIsActive &&
+      if ((flashSettings.NDFPresent == 1) &&
             (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition))
          GC_UpdateNDFPositionSetpoint(pGCRegs->NDFilterPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition);
 
       // Update FOV position if necessary
-      if ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) && GC_CalibrationIsActive &&
+      if ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
             (pGCRegs->FOVPosition != (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition))
          GC_SetFOVPositionSetpoint((uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition);
 

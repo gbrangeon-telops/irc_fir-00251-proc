@@ -35,7 +35,7 @@
 #include <stdlib.h>
 
 /*
- * Global variables (only for FW controller)
+ * Global variables (only for NDF controller)
  */
 static uint32_t             NDF_errors = 0;
 static bool                 NDF_Reset = false;
@@ -132,7 +132,7 @@ static void NDF_initPositionLUT()
 /*
  * Name         : NDF_ControllerReset
  *
- * Synopsis     : void FWControllerReset()
+ * Synopsis     : void NDF_ControllerReset()
  * Description  : Reset and variables initialisation
  * 
  */
@@ -154,13 +154,13 @@ void NDF_ResetTimers()
 }
 
 /*
- * Name         : ChangeFWControllerMode
+ * Name         : ChangeNDFControllerMode
  *
- * Synopsis     : void ChangeFWControllerMode(FWControllerModes_t newMode, int32_t target)
- * Arguments    : FWControllerModes_t  newMode : mode to change to
+ * Synopsis     : void ChangeNDFControllerMode(NDF_ControllerMode_t newMode, int32_t target)
+ * Arguments    : NDF_ControllerMode_t  newMode : mode to change to
  *                int32_t  target : position or velocity target
  *
- * Description  : Change the mode of the FW controller with a target in position or velocity
+ * Description  : Change the mode of the NDF controller with a target in position or velocity
  * 
  */
 void ChangeNDFControllerMode(NDF_ControllerMode_t newMode, int32_t target)
@@ -172,10 +172,10 @@ void ChangeNDFControllerMode(NDF_ControllerMode_t newMode, int32_t target)
 }
 
 /*
- * Name         : FWControllerProcess
+ * Name         : NDF_ControllerProcess
  *
- * Synopsis     : void FWControllerProcess()
- * Description  : High-level state machine for the filter wheel
+ * Synopsis     : void NDF_ControllerProcess()
+ * Description  : High-level state machine for the NDF
  * 
  */
 void NDF_ControllerProcess()
@@ -387,9 +387,9 @@ void NDF_ControllerProcess()
          prevPosition = gcRegsData.NDFilterPosition;
 
          // Change calibration block
-         if (calibrationInfo.isValid && GC_CalibrationIsActive &&    // Not in RAW or RAW0
+         if (calibrationInfo.isValid &&
                ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) && // NDF Collection
-               (calibrationInfo.blocks[gCal.calib_block_sel_mode - CBSM_USER_SEL_0].NDFPosition != gcRegsData.NDFilterPositionSetpoint))  // Block NDF Position changed
+               (gcRegsData.NDFilterPosition != NDFP_NDFilterInTransition))
          {
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
          }
@@ -412,7 +412,7 @@ void NDF_ControllerProcess()
  * Name         : IsNDFControllerReady
  *
  * Synopsis     : uint32_t IsNDFControllerReady()
- * Description  : Check if the FW is ready to accept a new command
+ * Description  : Check if the NDF is ready to accept a new command
  * 
  * Returns      : bool : false -> not ready, true -> Ready
  */
@@ -422,12 +422,12 @@ bool IsNDFControllerReady()
 }
 
 /*
- * Name         : getFWControllerModes
+ * Name         : getNDFControllerMode
  *
- * Synopsis     : FWControllerModes_t getFWControllerModes()
- * Description  : Return the current mode of FW
+ * Synopsis     : NDF_ControllerMode_t getNDFControllerMode()
+ * Description  : Return the current mode of NDF
  * 
- * Returns      : FWControllerModes_t : state of the Controller
+ * Returns      : NDF_ControllerMode_t : state of the Controller
  */
 NDF_ControllerMode_t getNDFControllerMode()
 {
@@ -435,9 +435,9 @@ NDF_ControllerMode_t getNDFControllerMode()
 }
 
 /*
- * Name         : IsFWHomingValid
+ * Name         : IsNDFHomingValid
  *
- * Synopsis     : bool IsFWHomingValid()
+ * Synopsis     : bool IsNDFHomingValid()
  * Description  : Return NDF_HomingValid;
  * 
  * Returns      : bool : false -> homing is not valid, true homing is valid
@@ -451,9 +451,9 @@ bool IsNDFHomingValid()
  * Internal mode functions
  */
 /*
- * Name         : FWInitialisationMode
+ * Name         : NDF_InitialisationMode
  *
- * Synopsis     : bool FWInitialisationMode(bool reset)
+ * Synopsis     : bool NDF_InitialisationMode(bool reset)
  * Arguments    : bool  reset : signal to reset state machine
  *
  * Description  : Clear fault and error
@@ -818,9 +818,9 @@ static bool NDF_InitialisationMode(bool reset)
 }
 
 /*
- * Name         : FWIdleMode
+ * Name         : NDF_IdleMode
  *
- * Synopsis     : bool FWIdleMode(bool reset)
+ * Synopsis     : bool NDF_IdleMode(bool reset)
  * Arguments    : bool  reset : signal to reset the state machine
  *
  * Description  : Stop the wheel and wait until stopped.
@@ -853,9 +853,9 @@ static bool NDF_IdleMode(bool reset)
 
 
 /*
- * Name         : NDFilterPositionMode
+ * Name         : NDF_PositionMode
  *
- * Synopsis     : bool NDFilterPositionMode(bool reset, bool newTarget)
+ * Synopsis     : bool NDF_PositionMode(bool reset, bool newTarget)
  * Arguments    : bool  reset : signal to reset state machine (from Rotating to Position)
  *                bool  newTarget : false -> no new position target, true -> new position target
  *
