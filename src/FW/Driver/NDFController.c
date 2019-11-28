@@ -387,8 +387,7 @@ void NDF_ControllerProcess()
          prevPosition = gcRegsData.NDFilterPosition;
 
          // Change calibration block
-         if (calibrationInfo.isValid &&
-               ((calibrationInfo.collection.CollectionType == CCT_TelopsNDF) || (calibrationInfo.collection.CollectionType == CCT_MultipointNDF)) && // NDF Collection
+         if (calibrationInfo.isValid && GC_CalibrationCollectionTypeNDFIsActive &&
                (gcRegsData.NDFilterPosition != NDFP_NDFilterInTransition))
          {
             CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);

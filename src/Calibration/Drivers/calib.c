@@ -168,8 +168,8 @@ void CAL_UpdateDeltaF(const t_calib *pA, const gcRegistersData_t *pGCRegs)
          }
          else
          {
-         DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / CC_TO_K(calibrationInfo.blocks[blockIndex].T0), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
-         CAL_DBG("calibrationInfo.blocks[%d].T0 = %dcC", blockIndex, calibrationInfo.blocks[blockIndex].T0);
+            DeltaF = powf(C_TO_K(DeviceTemperatureAry[DTS_InternalLens]) / CC_TO_K(calibrationInfo.blocks[blockIndex].T0), calibrationInfo.blocks[blockIndex].Nu) - 1.0F;
+            CAL_DBG("calibrationInfo.blocks[%d].T0 = %dcC", blockIndex, calibrationInfo.blocks[blockIndex].T0);
          }
 
          CAL_DBG("DeviceTemperatureAry[DTS_InternalLens] = %dcC", C_TO_CC(DeviceTemperatureAry[DTS_InternalLens]));
@@ -230,7 +230,7 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
    }
 
    CAL_INF("CalibrationMode = %d", pGCRegs->CalibrationMode);
-   CAL_INF("calib_mode = %d", (uint32_t)calib_mode);
+   CAL_DBG("calib_mode = %d", (uint32_t)calib_mode);
 
    pA->width = pGCRegs->Width;
    pA->height = pGCRegs->Height;
@@ -448,17 +448,20 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
       pGCRegs->CalibrationCollectionActiveBlockPOSIXTime = calibrationInfo.blocks[blockIndex].POSIXTime;
 
       // Update FW position if necessary
-      if ((flashSettings.FWPresent == 1) &&
+      if (flashSettings.FWPresent &&
+            (GC_CalibrationIsActive || GC_CalibrationCollectionTypeFWIsActive) &&
             (pGCRegs->FWPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition))
          GC_UpdateFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
 
       // Update NDF position if necessary
-      if ((flashSettings.NDFPresent == 1) &&
+      if (flashSettings.NDFPresent &&
+            (GC_CalibrationIsActive || GC_CalibrationCollectionTypeNDFIsActive) &&
             (pGCRegs->NDFilterPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition))
          GC_UpdateNDFPositionSetpoint(pGCRegs->NDFilterPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].NDFPosition);
 
       // Update FOV position if necessary
-      if ((TDCFlagsTst(MotorizedFOVLensIsImplementedMask)) &&
+      if (TDCFlagsTst(MotorizedFOVLensIsImplementedMask) &&
+            (GC_CalibrationIsActive || GC_CalibrationCollectionTypeFOVIsActive) &&
             (pGCRegs->FOVPosition != (uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition))
          GC_SetFOVPositionSetpoint((uint32_t)calibrationInfo.blocks[blockIndex].FOVPosition);
 
@@ -577,7 +580,7 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
          blockRam.pow2_lsb_fp32           = 1.0F;
       }
 
-      CAL_INF("CAL_WriteBlockParam of block[%d]", blockIndex);
+      CAL_DBG("CAL_WriteBlockParam of block[%d]", blockIndex);
       CAL_DBG("pow2_kappa_exp_fp32 x 1000000 = %d", (uint32_t)(blockRam.pow2_kappa_exp_fp32 * 1000000.0F));
       CAL_DBG("offset_fp32 x 1000 = %d", (int32_t)(blockRam.offset_fp32 * 1000.0F));
       CAL_DBG("pow2_lsb_fp32 x 1000000 = %d", (int32_t)(blockRam.pow2_lsb_fp32 * 1000000.0F));

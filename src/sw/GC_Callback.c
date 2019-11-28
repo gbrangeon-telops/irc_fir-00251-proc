@@ -2681,7 +2681,7 @@ void GC_FWPositionSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t a
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (calibrationInfo.isValid && ((calibrationInfo.collection.CollectionType == CCT_TelopsFW) || (calibrationInfo.collection.CollectionType == CCT_MultipointFW)))
+      if (calibrationInfo.isValid && GC_CalibrationCollectionTypeFWIsActive)
          CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);   // Updates FWPositionSetpoint
       else
          GC_UpdateFWPositionSetpoint(prevFWPositionSetpoint, gcRegsData.FWPositionSetpoint);

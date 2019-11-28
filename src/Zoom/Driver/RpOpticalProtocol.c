@@ -424,8 +424,7 @@ void RPopt_ProtocolHandler_SM(rpCtrl_t* aCtrl, gcRegistersData_t* pGCRegs)
                               if (pGCRegs->FOVPosition != pGCRegs->FOVPositionSetpoint)
                                  RP_OPT_ERR("FOVPosition (%d) does not match FOVPositionSetpoint (%d).", pGCRegs->FOVPosition, pGCRegs->FOVPositionSetpoint);
 
-                              if (calibrationInfo.isValid &&
-                                    ((calibrationInfo.collection.CollectionType == CCT_TelopsFOV) || (calibrationInfo.collection.CollectionType == CCT_MultipointFOV)))
+                              if (calibrationInfo.isValid && GC_CalibrationCollectionTypeFOVIsActive)
                               {
                                  CAL_UpdateCalibBlockSelMode(&gCal, pGCRegs);
                               }
