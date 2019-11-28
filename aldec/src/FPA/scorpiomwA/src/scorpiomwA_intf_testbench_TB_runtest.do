@@ -152,6 +152,7 @@ wave UUT/U1/U26/*
 --wave UUT/U1/U9/U18/*
 wave UUT/U1/*
 wave UUT/U1/U5/U5/*
+wave UUT/U1/U7/U4/*
 --wave UUT/U1/U5/U2/U6/*
 
 run 50 ms

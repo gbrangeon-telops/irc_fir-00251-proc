@@ -110,13 +110,46 @@ pushButtonState_t Power_GetPushButtonState()
  */
 channelPowerState_t Power_SetChannelPowerState(powerChannel_t channel, channelPowerState_t state)
 {
+   extern t_FpaIntf gFpaIntf;
    uint32_t mask = 1 << channel;
    uint32_t regValue;
+
+   t_FpaStatus fpaStatus;
+   uint32_t cooler_volt__mV;
 
    if ((channel == PC_BUFFER) && (state == CPS_OFF))
    {
       // Cannot turn off external memory buffer board
       state = CPS_ON;
+   }
+
+   if ((channel == PC_COOLER) && (state == CPS_ON))
+   {
+      // Cooler voltage verification
+      state = CPS_OFF;
+
+      FPA_GetStatus(&fpaStatus, &gFpaIntf);
+
+      if ((fpaStatus.adc_ddc_detect_process_done == 1) &&
+            (fpaStatus.adc_ddc_present == 1) &&
+            (extAdcChannels[XEC_COOLER_SENSE].isValid))
+      {
+         cooler_volt__mV = (uint32_t)(*(extAdcChannels[XEC_COOLER_SENSE].p_physical) * 1000.0F);
+
+         PM_DBG("Cooler supply voltage is %dmV (min = %dmV, max = %dmV).",
+               cooler_volt__mV, fpaStatus.cooler_volt_min_mV, fpaStatus.cooler_volt_max_mV);
+
+         if ((cooler_volt__mV >= fpaStatus.cooler_volt_min_mV) &&
+               (cooler_volt__mV <= fpaStatus.cooler_volt_max_mV))
+         {
+            builtInTests[BITID_CoolerVoltageVerification].result = BITR_Passed;
+            state = CPS_ON;
+         }
+         else
+         {
+            builtInTests[BITID_CoolerVoltageVerification].result = BITR_Failed;
+         }
+      }
    }
 
    regValue = XGpio_DiscreteRead(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT);

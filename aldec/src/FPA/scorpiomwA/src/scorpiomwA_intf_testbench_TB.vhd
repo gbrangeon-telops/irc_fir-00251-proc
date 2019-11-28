@@ -173,7 +173,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(100, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(20, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -197,12 +197,12 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVCMOS33;        
          
          -- cfg usager
-         user_xsize1 <= 640;
-         user_ysize1 <= 512;
+         user_xsize1 <= 64;
+         user_ysize1 <= 4;
          user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 64;
-         user_ysize2 <= 4;
+         user_xsize2 <= 320;
+         user_ysize2 <= 256;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 0);
          --         
          --         user_xsize3 <= 1280;

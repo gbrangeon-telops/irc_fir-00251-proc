@@ -129,7 +129,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned((EXP_TIME_US * 100), FPA_EXP_INFO.exp_time'length);     -- convert µs to 10ns (100MHz)
+      FPA_EXP_INFO.exp_time <= to_unsigned(510, FPA_EXP_INFO.exp_time'length);     -- convert µs to 10ns (100MHz)
       FPA_EXP_INFO.exp_indx <= x"05";
       FPA_EXP_INFO.exp_dval <= '1';
       wait for 15 ms;

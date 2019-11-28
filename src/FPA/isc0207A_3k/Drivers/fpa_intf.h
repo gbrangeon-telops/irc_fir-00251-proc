@@ -19,7 +19,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0207A_3K_8.3MHz"
+#define FPA_DEVICE_MODEL_NAME    "ISC0207A_3K_8.3MHz SVN_TRUNK"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      320
@@ -75,12 +75,14 @@
 
 #define FPA_MCLK_RATE_HZ            8333375          // le master clock du FPA
 #define FPA_CLOCK_FREQ_HZ           FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
-#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR) 
+#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR)
+
+#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
-{
-   uint32_t  SIZE;
+{   
+   uint32_t  SIZE;                       
    uint32_t  ADD;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
@@ -181,7 +183,7 @@ typedef struct s_FpaIntfConfig t_FpaIntf;
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
-{
+{					            
    // fpa init status (ne provient pas du vhd)
    uint32_t  fpa_init_done;            // donne l'état de l'initialisation du module FPA (hw + sw)
    uint32_t  fpa_init_success;         // donne le résultat de l'initialisation du module FPA (hw + sw) 

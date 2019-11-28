@@ -32,6 +32,7 @@
 #define ACQ_DBG(fmt, ...)        ACQ_PRINTF("Debug: " fmt "\n", ##__VA_ARGS__)
 
 #define WAITING_FOR_SENSOR_DELAY_US             (2 * TIME_ONE_SECOND_US)
+#define WAITING_FOR_ADC_DDC_SENSOR_DELAY_US     (10 * TIME_ONE_SECOND_US) // waiting delay before validating the ADC board presence, because it takes some time to initialize
 
 #define WAITING_FOR_ADC_DDC_PRESENCE_TIMEOUT_US (30 * TIME_ONE_SECOND_US)
 #define WAITING_FOR_COOLER_VOLTAGE_TIMEOUT_US   (30 * TIME_ONE_SECOND_US)

@@ -7,9 +7,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision: 23409 $
--- $Author: elarouche $
--- $LastChangedDate: 2019-04-29 11:34:38 -0400 (lun., 29 avr. 2019) $
+-- $Revision: 23777 $
+-- $Author: enofodjie $
+-- $LastChangedDate: 2019-06-21 06:39:32 -0400 (ven., 21 juin 2019) $
 --
 -------------------------------------------------------------------------------
 --
@@ -488,26 +488,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 //   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
    
    if (sw_init_done == 0){
-      gFpaDebugRegC = 2;
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0)){  // 
-         gFpaDebugRegC = 1;
-         if (pGCRegs->DeviceSerialNumber == 2862)                    // ENO : 19 juin 2019, Cas particulier de TEL-2862 , un M3K avec refroidisseur lineaire qui a necessité une carte 253 spéciale
-            gFpaDebugRegC = 2;
-      }
+      gFpaDebugRegC = 2;                   //  ajustement fait avec IRC1843 qui utilise un FLEGX
+      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // 
+         gFpaDebugRegC = 2;                //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
    }       
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
    
    // adc clk source phase
    if (sw_init_done == 0){         
-      gFpaDebugRegD = 24000;                //  132000
-      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0)){  // cas particulier des systèmes avec Flex 264
-         gFpaDebugRegD = 132000;
-         if (pGCRegs->DeviceSerialNumber == 2862)                    // ENO : 19 juin 2019, Cas particulier de TEL-2862 , un M3K avec refroidisseur lineaire qui a necessité une carte 253 spéciale
-            gFpaDebugRegD = 228000;
-      }   
+      gFpaDebugRegD = 24000;                //  ajustement fait avec IRC1843 qui utilise un FLEGX
+      if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas particulier des systèmes avec Flex 264
+         gFpaDebugRegD = 144000;            //  ajustement fait avec IRC1405 refurbished qui utilise un FLEX264
    }
-   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
-      
+   ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;    
    // autres    
    ptrA->boost_mode              = 0;                    
    ptrA->adc_clk_pipe_sync_pos   = 2;   // obtenu par simulation
@@ -715,11 +708,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;	  
    }
-   
+ 
    // additional exposure time offset coming from flash 
    ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
 
- 
+   
+   FPA_PRINTF("RegC Present Value = %d", gFpaDebugRegC);
+   FPA_PRINTF("RegD Present Value = %d", gFpaDebugRegD);
+   
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
    
@@ -739,25 +735,31 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
    FPA_GetStatus(&gStat, ptrA);
 
    diode_voltage = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F) / (powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES) * (float)FPA_TEMP_READER_GAIN);
-
-   // utilisation  des valeurs de flashsettings
-   temperature = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
-   temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
-   temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
-   temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
-   temperature += flashSettings.FPATemperatureConversionCoef0;
-
-   // Si flashsettings non programmés alors on utilise les valeurs par defaut
-   if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
-       (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
-       (flashSettings.FPATemperatureConversionCoef0 == 0)) {
-	   // courbe de conversion de Sofradir pour une polarisation de 100µA
-	   temperature  =  -170.50F * powf(diode_voltage,4);
-	   temperature +=   173.45F * powf(diode_voltage,3);
-	   temperature +=   137.86F * powf(diode_voltage,2);
-	   temperature += (-667.07F * diode_voltage) + 623.1F;  // 625 remplacé par 623 en guise de calibration de la diode
+   
+   if ((gStat.hw_init_done == 0) || (sw_init_done == 0)) {
+      return FPA_INVALID_TEMP;
    }
-   return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
+   else{ 
+      // utilisation  des valeurs de flashsettings
+      temperature = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+      temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
+      temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+      temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+      temperature += flashSettings.FPATemperatureConversionCoef0;
+   
+      // Si flashsettings non programmés alors on utilise les valeurs par defaut
+      if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef0 == 0)) {
+   	   // courbe de conversion de Sofradir pour une polarisation de 100µA
+   	   temperature  =  -170.50F * powf(diode_voltage,4);
+   	   temperature +=   173.45F * powf(diode_voltage,3);
+   	   temperature +=   137.86F * powf(diode_voltage,2);
+   	   temperature += (-667.07F * diode_voltage) + 623.1F;  // 625 remplacé par 623 en guise de calibration de la diode
+      }
+      return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
+   
+   }
 }       
 
 //--------------------------------------------------------------------------                                                                            
@@ -782,7 +784,7 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    
    ptrH->line_stretch_mclk       = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
    if ((pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) || (pGCRegs->DetectorMode == DM_Burst))
-      ptrH->line_stretch_mclk      = 0.0;
+    ptrH->line_stretch_mclk      = 0.0;
 
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
    ptrH->int_time_offset_usec    = 0.8F;  // offset du temps d'integration
@@ -799,8 +801,8 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    // fast windowing
    ptrH->unused_area_clock_factor =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
    
-   // fenetre qui sera demandée au ROIC du FPA 
-   ptrH->roic_xsize     = MIN((float)pGCRegs->Width + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX);   
+   // fenetre qui sera demandée au ROIC du FPA
+   ptrH->roic_xsize     = MIN((float)pGCRegs->Width + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX);
    if (pGCRegs->DetectorMode == DM_Burst)
       ptrH->roic_xsize     = (float)pGCRegs->Width; 
    ptrH->roic_ysize     = (float)pGCRegs->Height;
