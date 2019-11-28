@@ -231,29 +231,29 @@ uint32_t CalibImageCorrection_WriteImageCorrectionFileHeader_v2(CalibImageCorrec
 void CalibImageCorrection_PrintImageCorrectionFileHeader_v2(CalibImageCorrection_ImageCorrectionFileHeader_v2_t *hdr)
 {
    FPGA_PRINTF("FileSignature: %s\n", hdr->FileSignature);
-   FPGA_PRINTF("FileStructureMajorVersion: %d\n", hdr->FileStructureMajorVersion);
-   FPGA_PRINTF("FileStructureMinorVersion: %d\n", hdr->FileStructureMinorVersion);
-   FPGA_PRINTF("FileStructureSubMinorVersion: %d\n", hdr->FileStructureSubMinorVersion);
-   FPGA_PRINTF("FileHeaderLength: %d bytes\n", hdr->FileHeaderLength);
-   FPGA_PRINTF("DeviceSerialNumber: %d\n", hdr->DeviceSerialNumber);
-   FPGA_PRINTF("POSIXTime: %d s\n", hdr->POSIXTime);
+   FPGA_PRINTF("FileStructureMajorVersion: %u\n", hdr->FileStructureMajorVersion);
+   FPGA_PRINTF("FileStructureMinorVersion: %u\n", hdr->FileStructureMinorVersion);
+   FPGA_PRINTF("FileStructureSubMinorVersion: %u\n", hdr->FileStructureSubMinorVersion);
+   FPGA_PRINTF("FileHeaderLength: %u bytes\n", hdr->FileHeaderLength);
+   FPGA_PRINTF("DeviceSerialNumber: %u\n", hdr->DeviceSerialNumber);
+   FPGA_PRINTF("POSIXTime: %u s\n", hdr->POSIXTime);
    FPGA_PRINTF("FileDescription: %s\n", hdr->FileDescription);
-   FPGA_PRINTF("DeviceDataFlowMajorVersion: %d\n", hdr->DeviceDataFlowMajorVersion);
-   FPGA_PRINTF("DeviceDataFlowMinorVersion: %d\n", hdr->DeviceDataFlowMinorVersion);
-   FPGA_PRINTF("SensorID: %d\n", hdr->SensorID);
-   FPGA_PRINTF("ImageCorrectionType: %d\n", hdr->ImageCorrectionType);
-   FPGA_PRINTF("Width: %d pixels\n", hdr->Width);
-   FPGA_PRINTF("Height: %d pixels\n", hdr->Height);
-   FPGA_PRINTF("OffsetX: %d pixels\n", hdr->OffsetX);
-   FPGA_PRINTF("OffsetY: %d pixels\n", hdr->OffsetY);
-   FPGA_PRINTF("ReferencePOSIXTime: %d s\n", hdr->ReferencePOSIXTime);
+   FPGA_PRINTF("DeviceDataFlowMajorVersion: %u\n", hdr->DeviceDataFlowMajorVersion);
+   FPGA_PRINTF("DeviceDataFlowMinorVersion: %u\n", hdr->DeviceDataFlowMinorVersion);
+   FPGA_PRINTF("SensorID: %u\n", hdr->SensorID);
+   FPGA_PRINTF("ImageCorrectionType: %u\n", hdr->ImageCorrectionType);
+   FPGA_PRINTF("Width: %u pixels\n", hdr->Width);
+   FPGA_PRINTF("Height: %u pixels\n", hdr->Height);
+   FPGA_PRINTF("OffsetX: %u pixels\n", hdr->OffsetX);
+   FPGA_PRINTF("OffsetY: %u pixels\n", hdr->OffsetY);
+   FPGA_PRINTF("ReferencePOSIXTime: %u s\n", hdr->ReferencePOSIXTime);
    FPGA_PRINTF("TemperatureInternalLens: " _PCF(3) " K\n", _FFMT(hdr->TemperatureInternalLens, 3));
    FPGA_PRINTF("TemperatureReference: " _PCF(3) " K\n", _FFMT(hdr->TemperatureReference, 3));
    FPGA_PRINTF("ExposureTime: " _PCF(3) " us\n", _FFMT(hdr->ExposureTime, 3));
-   FPGA_PRINTF("AcquisitionFrameRate: %d mHz\n", hdr->AcquisitionFrameRate);
-   FPGA_PRINTF("FWMode: %d enum\n", hdr->FWMode);
+   FPGA_PRINTF("AcquisitionFrameRate: %u mHz\n", hdr->AcquisitionFrameRate);
+   FPGA_PRINTF("FWMode: %u enum\n", hdr->FWMode);
    FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
-   FPGA_PRINTF("FileHeaderCRC16: %d\n", hdr->FileHeaderCRC16);
+   FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);
 }
 
 /**
@@ -349,15 +349,15 @@ uint32_t CalibImageCorrection_WriteImageCorrectionDataHeader_v2(CalibImageCorrec
  */
 void CalibImageCorrection_PrintImageCorrectionDataHeader_v2(CalibImageCorrection_ImageCorrectionDataHeader_v2_t *hdr)
 {
-   FPGA_PRINTF("DataHeaderLength: %d bytes\n", hdr->DataHeaderLength);
+   FPGA_PRINTF("DataHeaderLength: %u bytes\n", hdr->DataHeaderLength);
    FPGA_PRINTF("Beta0_Off: " _PCF(3) "\n", _FFMT(hdr->Beta0_Off, 3));
    FPGA_PRINTF("Beta0_Median: " _PCF(3) "\n", _FFMT(hdr->Beta0_Median, 3));
    FPGA_PRINTF("Beta0_Exp: %d\n", hdr->Beta0_Exp);
-   FPGA_PRINTF("Beta0_Nbits: %d bits\n", hdr->Beta0_Nbits);
-   FPGA_PRINTF("Beta0_Signed: %d 0 / 1\n", hdr->Beta0_Signed);
-   FPGA_PRINTF("ImageCorrectionDataLength: %d bytes\n", hdr->ImageCorrectionDataLength);
-   FPGA_PRINTF("ImageCorrectionDataCRC16: %d\n", hdr->ImageCorrectionDataCRC16);
-   FPGA_PRINTF("DataHeaderCRC16: %d\n", hdr->DataHeaderCRC16);
+   FPGA_PRINTF("Beta0_Nbits: %u bits\n", hdr->Beta0_Nbits);
+   FPGA_PRINTF("Beta0_Signed: %u 0 / 1\n", hdr->Beta0_Signed);
+   FPGA_PRINTF("ImageCorrectionDataLength: %u bytes\n", hdr->ImageCorrectionDataLength);
+   FPGA_PRINTF("ImageCorrectionDataCRC16: %u\n", hdr->ImageCorrectionDataCRC16);
+   FPGA_PRINTF("DataHeaderCRC16: %u\n", hdr->DataHeaderCRC16);
 }
 
 /**
