@@ -1,8 +1,8 @@
 Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
-| Date             : Thu Nov 21 19:25:13 2019
-| Host             : TELOPS212 running 64-bit Service Pack 1  (build 7601)
+| Date             : Thu Nov 28 14:15:58 2019
+| Host             : TELOPS228 running 64-bit Service Pack 1  (build 7601)
 | Command          : report_power -file d:/Telops/fir-00251-Proc/Reports/scorpiomwD/fir_00251_proc_160_scorpiomwD_power.rpt
 | Design           : fir_00251_proc_scorpiomwD
 | Device           : xc7k160tfbg676-1
@@ -30,8 +30,8 @@ Table of Contents
 ----------
 
 +--------------------------+-------+
-| Total On-Chip Power (W)  | 4.869 |
-| Dynamic (W)              | 4.708 |
+| Total On-Chip Power (W)  | 4.867 |
+| Dynamic (W)              | 4.706 |
 | Device Static (W)        | 0.161 |
 | Total Off-Chip Power (W) | 0.927 |
 | Effective TJA (C/W)      | 1.9   |
@@ -50,16 +50,16 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.413 |       75 |       --- |             --- |
-| Slice Logic              |     0.224 |   219189 |       --- |             --- |
-|   LUT as Logic           |     0.174 |    67006 |    101400 |           66.08 |
-|   Register               |     0.023 |   105782 |    202800 |           52.16 |
+| Clocks                   |     0.416 |       75 |       --- |             --- |
+| Slice Logic              |     0.224 |   219191 |       --- |             --- |
+|   LUT as Logic           |     0.174 |    67000 |    101400 |           66.07 |
+|   Register               |     0.023 |   105783 |    202800 |           52.16 |
 |   CARRY4                 |     0.018 |     4549 |     25350 |           17.94 |
-|   LUT as Shift Register  |     0.006 |     3561 |     35000 |           10.17 |
+|   LUT as Shift Register  |     0.006 |     3549 |     35000 |           10.14 |
 |   LUT as Distributed RAM |     0.004 |     2308 |     35000 |            6.59 |
 |   F7/F8 Muxes            |    <0.001 |      449 |    101400 |            0.44 |
 |   Others                 |    <0.001 |    17462 |       --- |             --- |
-| Signals                  |     0.281 |   160335 |       --- |             --- |
+| Signals                  |     0.276 |   160344 |       --- |             --- |
 | Block RAM                |     0.284 |      256 |       325 |           78.77 |
 | MMCM                     |     0.734 |        7 |         8 |           87.50 |
 | PLL                      |     0.185 |        2 |         8 |           25.00 |
@@ -69,7 +69,7 @@ Table of Contents
 | PHASER                   |     0.385 |       40 |       --- |             --- |
 | XADC                     |     0.002 |        1 |       --- |             --- |
 | Static Power             |     0.161 |          |           |                 |
-| Total                    |     4.869 |          |           |                 |
+| Total                    |     4.867 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -79,7 +79,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     1.519 |       1.456 |      0.064 |
+| Vccint    |       1.000 |     1.517 |       1.454 |      0.064 |
 | Vccaux    |       1.800 |     0.909 |       0.890 |      0.019 |
 | Vcco33    |       3.300 |     0.005 |       0.004 |      0.001 |
 | Vcco25    |       2.500 |     0.054 |       0.053 |      0.001 |
@@ -221,10 +221,10 @@ Table of Contents
 +---------------------------------------------------------------------------------------------------------------------+-----------+
 | Name                                                                                                                | Power (W) |
 +---------------------------------------------------------------------------------------------------------------------+-----------+
-| fir_00251_proc_scorpiomwD                                                                                           |     4.708 |
-|   ACQ                                                                                                               |     4.194 |
-|     BD                                                                                                              |     2.183 |
-|       core_wrapper_i                                                                                                |     2.183 |
+| fir_00251_proc_scorpiomwD                                                                                           |     4.706 |
+|   ACQ                                                                                                               |     4.193 |
+|     BD                                                                                                              |     2.182 |
+|       core_wrapper_i                                                                                                |     2.182 |
 |         core_i                                                                                                      |     2.160 |
 |           FlashReset_0                                                                                              |    <0.001 |
 |             U0                                                                                                      |    <0.001 |
@@ -1584,24 +1584,24 @@ Table of Contents
 |                         ramloop[9].ram.r                                                                            |    <0.001 |
 |                           prim_noinit.ram                                                                           |    <0.001 |
 |           MIG_Calibration                                                                                           |     1.172 |
-|             CAL_DDR_MIG                                                                                             |     1.043 |
-|               u_core_CAL_DDR_MIG_0_mig                                                                              |     1.043 |
+|             CAL_DDR_MIG                                                                                             |     1.044 |
+|               u_core_CAL_DDR_MIG_0_mig                                                                              |     1.044 |
 |                 temp_mon_enabled.u_tempmon                                                                          |    <0.001 |
 |                 u_ddr3_clk_ibuf                                                                                     |     0.007 |
 |                 u_ddr3_infrastructure                                                                               |     0.188 |
-|                 u_iodelay_ctrl                                                                                      |     0.001 |
-|                 u_memc_ui_top_axi                                                                                   |     0.846 |
-|                   mem_intfc0                                                                                        |     0.826 |
+|                 u_iodelay_ctrl                                                                                      |     0.002 |
+|                 u_memc_ui_top_axi                                                                                   |     0.847 |
+|                   mem_intfc0                                                                                        |     0.827 |
 |                     ddr_phy_top0                                                                                    |     0.822 |
-|                       u_ddr_calib_top                                                                               |     0.028 |
+|                       u_ddr_calib_top                                                                               |     0.029 |
 |                         ddr_phy_prbs_rdlvl_gen.u_ddr_phy_prbs_rdlvl                                                 |     0.004 |
 |                         ddr_phy_rdlvl_gen.u_ddr_phy_rdlvl                                                           |     0.004 |
 |                         ddr_phy_tempmon_0                                                                           |    <0.001 |
 |                         dqsfind_calib_right.u_ddr_phy_dqs_found_cal                                                 |     0.001 |
 |                         mb_wrlvl_inst.u_ddr_phy_ck_addr_cmd_delay                                                   |    <0.001 |
 |                         mb_wrlvl_inst.u_ddr_phy_wrlvl                                                               |     0.003 |
-|                         u_ddr_phy_init                                                                              |     0.010 |
-|                         u_ddr_phy_wrcal                                                                             |     0.003 |
+|                         u_ddr_phy_init                                                                              |     0.011 |
+|                         u_ddr_phy_wrcal                                                                             |     0.002 |
 |                         u_ddr_prbs_gen                                                                              |     0.001 |
 |                       u_ddr_mc_phy_wrapper                                                                          |     0.793 |
 |                         gen_dq_iobuf_HP.gen_dq_iobuf[0].u_iobuf_dq                                                  |     0.009 |
@@ -2233,10 +2233,10 @@ Table of Contents
 |                                 c1                                                                                  |    <0.001 |
 |                               wpntr                                                                                 |    <0.001 |
 |                             gntv_or_sync_fifo.mem                                                                   |     0.009 |
-|                               gbm.gbmg.gbmga.ngecc.bmg                                                              |     0.008 |
-|                                 inst_blk_mem_gen                                                                    |     0.008 |
-|                                   gnbram.gnativebmg.native_blk_mem_gen                                              |     0.008 |
-|                                     valid.cstr                                                                      |     0.008 |
+|                               gbm.gbmg.gbmga.ngecc.bmg                                                              |     0.009 |
+|                                 inst_blk_mem_gen                                                                    |     0.009 |
+|                                   gnbram.gnativebmg.native_blk_mem_gen                                              |     0.009 |
+|                                     valid.cstr                                                                      |     0.009 |
 |                                       ramloop[0].ram.r                                                              |     0.002 |
 |                                         prim_noinit.ram                                                             |     0.002 |
 |                                       ramloop[1].ram.r                                                              |     0.002 |
@@ -2302,7 +2302,7 @@ Table of Contents
 |                                 c0                                                                                  |    <0.001 |
 |                                 c1                                                                                  |    <0.001 |
 |                               wpntr                                                                                 |    <0.001 |
-|                             gntv_or_sync_fifo.mem                                                                   |     0.008 |
+|                             gntv_or_sync_fifo.mem                                                                   |     0.007 |
 |                               gbm.gbmg.gbmga.ngecc.bmg                                                              |     0.007 |
 |                                 inst_blk_mem_gen                                                                    |     0.007 |
 |                                   gnbram.gnativebmg.native_blk_mem_gen                                              |     0.007 |
@@ -2334,12 +2334,12 @@ Table of Contents
 |                           ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].wrst_inst                                  |    <0.001 |
 |                           ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].rrst_inst                                  |    <0.001 |
 |                           ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst                                  |    <0.001 |
-|               s00_couplers                                                                                          |     0.022 |
+|               s00_couplers                                                                                          |     0.023 |
 |                 auto_pc                                                                                             |     0.000 |
 |                   inst                                                                                              |     0.000 |
-|                 auto_us_cc_df                                                                                       |     0.022 |
-|                   inst                                                                                              |     0.022 |
-|                     gen_upsizer.gen_full_upsizer.axi_upsizer_inst                                                   |     0.022 |
+|                 auto_us_cc_df                                                                                       |     0.023 |
+|                   inst                                                                                              |     0.023 |
+|                     gen_upsizer.gen_full_upsizer.axi_upsizer_inst                                                   |     0.023 |
 |                       USE_READ.gen_pktfifo_r_upsizer.pktfifo_read_data_inst                                         |     0.015 |
 |                         dw_fifogen_ar                                                                               |     0.001 |
 |                           inst_fifo_gen                                                                             |     0.001 |
@@ -2582,10 +2582,10 @@ Table of Contents
 |                                   ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].wrst_inst                          |    <0.001 |
 |                                   ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].rrst_inst                          |    <0.001 |
 |                                   ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst                          |    <0.001 |
-|                         dw_fifogen_rresp                                                                            |     0.001 |
-|                           inst_fifo_gen                                                                             |     0.001 |
-|                             gconvfifo.rf                                                                            |     0.001 |
-|                               grf.rf                                                                                |     0.001 |
+|                         dw_fifogen_rresp                                                                            |    <0.001 |
+|                           inst_fifo_gen                                                                             |    <0.001 |
+|                             gconvfifo.rf                                                                            |    <0.001 |
+|                               grf.rf                                                                                |    <0.001 |
 |                                 gntv_or_sync_fifo.gcx.clkx                                                          |    <0.001 |
 |                                   gnxpm_cdc.gsync_stage[1].rd_stg_inst                                              |    <0.001 |
 |                                   gnxpm_cdc.gsync_stage[1].wr_stg_inst                                              |    <0.001 |
@@ -2678,7 +2678,7 @@ Table of Contents
 |                                 ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].wrst_inst                            |    <0.001 |
 |                                 ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].rrst_inst                            |    <0.001 |
 |                                 ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst                            |    <0.001 |
-|                       USE_WRITE.gen_pktfifo_w_upsizer.pktfifo_write_data_inst                                       |     0.005 |
+|                       USE_WRITE.gen_pktfifo_w_upsizer.pktfifo_write_data_inst                                       |     0.004 |
 |                         dw_fifogen_aw                                                                               |     0.001 |
 |                           inst_fifo_gen                                                                             |     0.001 |
 |                             gaxi_full_lite.gwrite_ch.gwach2.axi_wach                                                |     0.001 |
@@ -2910,8 +2910,8 @@ Table of Contents
 |                         gen_srls[0].gen_rep[0].srl_nx1                                                              |    <0.001 |
 |                     gen_slave_slots[3].gen_si_read.si_transactor_ar                                                 |    <0.001 |
 |                     splitter_aw_mi                                                                                  |    <0.001 |
-|           MIG_Code                                                                                                  |     0.670 |
-|             axi_interconnect_0                                                                                      |     0.015 |
+|           MIG_Code                                                                                                  |     0.669 |
+|             axi_interconnect_0                                                                                      |     0.014 |
 |               m00_couplers                                                                                          |     0.007 |
 |                 auto_cc                                                                                             |     0.007 |
 |                   inst                                                                                              |     0.007 |
@@ -3044,7 +3044,7 @@ Table of Contents
 |                             gntv_or_sync_fifo.gl0.wr                                                                |    <0.001 |
 |                               gwas.wsts                                                                             |    <0.001 |
 |                               wpntr                                                                                 |    <0.001 |
-|                             gntv_or_sync_fifo.mem                                                                   |     0.002 |
+|                             gntv_or_sync_fifo.mem                                                                   |     0.001 |
 |                               gdm.dm_gen.dm                                                                         |     0.001 |
 |                                 RAM_reg_0_15_0_5                                                                    |    <0.001 |
 |                                 RAM_reg_0_15_102_107                                                                |    <0.001 |
@@ -3216,16 +3216,16 @@ Table of Contents
 |               ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/mem_reg_0_15_6_11                   |    <0.001 |
 |               ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/mem_reg_0_15_72_77                  |    <0.001 |
 |               ddr_byte_lane_D.ddr_byte_lane_D/of_pre_fifo_gen.u_ddr_of_pre_fifo/mem_reg_0_15_78_79                  |    <0.001 |
-|               u_core_mig_7series_0_0_mig                                                                            |     0.653 |
+|               u_core_mig_7series_0_0_mig                                                                            |     0.652 |
 |                 temp_mon_enabled.u_tempmon                                                                          |    <0.001 |
 |                 u_ddr3_clk_ibuf                                                                                     |     0.007 |
 |                 u_ddr3_infrastructure                                                                               |     0.188 |
-|                 u_iodelay_ctrl                                                                                      |     0.002 |
-|                 u_memc_ui_top_axi                                                                                   |     0.455 |
-|                   mem_intfc0                                                                                        |     0.447 |
-|                     ddr_phy_top0                                                                                    |     0.441 |
+|                 u_iodelay_ctrl                                                                                      |     0.003 |
+|                 u_memc_ui_top_axi                                                                                   |     0.454 |
+|                   mem_intfc0                                                                                        |     0.446 |
+|                     ddr_phy_top0                                                                                    |     0.440 |
 |                       u_ddr_calib_top                                                                               |     0.025 |
-|                         ddr_phy_prbs_rdlvl_gen.u_ddr_phy_prbs_rdlvl                                                 |     0.005 |
+|                         ddr_phy_prbs_rdlvl_gen.u_ddr_phy_prbs_rdlvl                                                 |     0.004 |
 |                         ddr_phy_rdlvl_gen.u_ddr_phy_rdlvl                                                           |     0.005 |
 |                         ddr_phy_tempmon_0                                                                           |     0.001 |
 |                         dqsfind_calib_left.u_ddr_phy_dqs_found_cal_hr                                               |    <0.001 |
@@ -3280,13 +3280,13 @@ Table of Contents
 |                             ddr_byte_lane_C.ddr_byte_lane_C                                                         |     0.020 |
 |                               ddr_byte_group_io                                                                     |    <0.001 |
 |                               of_pre_fifo_gen.u_ddr_of_pre_fifo                                                     |    <0.001 |
-|                             ddr_byte_lane_D.ddr_byte_lane_D                                                         |     0.055 |
+|                             ddr_byte_lane_D.ddr_byte_lane_D                                                         |     0.054 |
 |                               ddr_byte_group_io                                                                     |     0.031 |
 |                               dq_gen_40.if_post_fifo_gen.u_ddr_if_post_fifo                                         |    <0.001 |
 |                               of_pre_fifo_gen.u_ddr_of_pre_fifo                                                     |    <0.001 |
 |                     mc0                                                                                             |     0.006 |
 |                       bank_mach0                                                                                    |     0.004 |
-|                         arb_mux0                                                                                    |     0.001 |
+|                         arb_mux0                                                                                    |    <0.001 |
 |                           arb_row_col0                                                                              |    <0.001 |
 |                             col_arb0                                                                                |    <0.001 |
 |                             config_arb0                                                                             |    <0.001 |
@@ -3941,7 +3941,7 @@ Table of Contents
 |         U4A                                                                                                         |    <0.001 |
 |         U4B                                                                                                         |    <0.001 |
 |         U4C                                                                                                         |    <0.001 |
-|     CALIB                                                                                                           |     0.752 |
+|     CALIB                                                                                                           |     0.750 |
 |       U1                                                                                                            |    <0.001 |
 |         U1                                                                                                          |    <0.001 |
 |       U10                                                                                                           |    <0.001 |
@@ -4249,7 +4249,7 @@ Table of Contents
 |                                 prim_init.ram                                                                       |     0.003 |
 |                   mux                                                                                               |    <0.001 |
 |                   relational                                                                                        |    <0.001 |
-|                 histogramstate                                                                                      |     0.001 |
+|                 histogramstate                                                                                      |    <0.001 |
 |                   clrmem_cntr                                                                                       |    <0.001 |
 |                     comp0.core_instance0                                                                            |    <0.001 |
 |                       U0                                                                                            |    <0.001 |
@@ -4297,8 +4297,8 @@ Table of Contents
 |         U1                                                                                                          |    <0.001 |
 |       U7                                                                                                            |    <0.001 |
 |         U1                                                                                                          |    <0.001 |
-|       gen_cal_1ch.CORE                                                                                              |     0.689 |
-|         U1                                                                                                          |     0.035 |
+|       gen_cal_1ch.CORE                                                                                              |     0.686 |
+|         U1                                                                                                          |     0.034 |
 |           U1                                                                                                        |     0.008 |
 |             U1                                                                                                      |     0.008 |
 |               U0                                                                                                    |     0.008 |
@@ -4481,16 +4481,16 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                     MULT                                                                                            |     0.004 |
 |                       MULT_GEN_VARIANT.FIX_MULT                                                                     |     0.004 |
-|                         MULT                                                                                        |     0.004 |
-|                           gDSP.gDSP_only.iDSP                                                                       |     0.004 |
+|                         MULT                                                                                        |     0.003 |
+|                           gDSP.gDSP_only.iDSP                                                                       |     0.003 |
 |                             use_prim.has_zero_detect.zd_a1b2.multi_dsp_output.zd_delay0                             |    <0.001 |
 |                         OP_REG.MANT_DEL                                                                             |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                         OP_REG.ZERO_DET_DEL                                                                         |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                     OP                                                                                              |    <0.001 |
-|                     R_AND_R                                                                                         |     0.001 |
-|                       LOGIC.R_AND_R                                                                                 |     0.001 |
+|                     R_AND_R                                                                                         |     0.002 |
+|                       LOGIC.R_AND_R                                                                                 |     0.002 |
 |                         EXP_ADD.ADD                                                                                 |    <0.001 |
 |                         EXP_INC_DELAY                                                                               |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -5029,7 +5029,7 @@ Table of Contents
 |                       ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst                                      |    <0.001 |
 |                       ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst                                      |    <0.001 |
 |                       ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst                                      |    <0.001 |
-|         U2                                                                                                          |     0.111 |
+|         U2                                                                                                          |     0.110 |
 |           U1                                                                                                        |     0.006 |
 |             U1                                                                                                      |     0.006 |
 |               U0                                                                                                    |     0.006 |
@@ -5674,7 +5674,7 @@ Table of Contents
 |                         merged_sub_mux.STRUCT_ADD                                                                   |    <0.001 |
 |                         merged_sub_mux.mux_DELAY                                                                    |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
-|                       DSP48E1_BODY.NORM_RND                                                                         |     0.001 |
+|                       DSP48E1_BODY.NORM_RND                                                                         |    <0.001 |
 |                         FULL_USAGE_DSP.LOD                                                                          |    <0.001 |
 |                           DIST_DELAY                                                                                |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -5812,10 +5812,10 @@ Table of Contents
 |                         ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst                                    |    <0.001 |
 |                         ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst                                    |    <0.001 |
 |                         ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst                                    |    <0.001 |
-|           U22                                                                                                       |     0.008 |
-|             U1                                                                                                      |     0.008 |
-|               U0                                                                                                    |     0.008 |
-|                 i_synth                                                                                             |     0.008 |
+|           U22                                                                                                       |     0.009 |
+|             U1                                                                                                      |     0.009 |
+|               U0                                                                                                    |     0.009 |
+|                 i_synth                                                                                             |     0.009 |
 |                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |    <0.001 |
 |                     fifo0                                                                                           |    <0.001 |
 |                   MULT.OP                                                                                           |     0.007 |
@@ -5853,10 +5853,10 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       STATE_UP_DELAY                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                     MULT                                                                                            |     0.004 |
-|                       MULT_GEN_VARIANT.FIX_MULT                                                                     |     0.004 |
-|                         MULT                                                                                        |     0.003 |
-|                           gDSP.gDSP_only.iDSP                                                                       |     0.003 |
+|                     MULT                                                                                            |     0.005 |
+|                       MULT_GEN_VARIANT.FIX_MULT                                                                     |     0.005 |
+|                         MULT                                                                                        |     0.004 |
+|                           gDSP.gDSP_only.iDSP                                                                       |     0.004 |
 |                             use_prim.has_zero_detect.zd_a1b2.multi_dsp_output.zd_delay0                             |    <0.001 |
 |                         OP_REG.MANT_DEL                                                                             |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -6028,10 +6028,10 @@ Table of Contents
 |                   need_user_delay.user_pipe                                                                         |    <0.001 |
 |                     i_pipe                                                                                          |    <0.001 |
 |           U3                                                                                                        |     0.034 |
-|             U1                                                                                                      |     0.034 |
-|               U0                                                                                                    |     0.034 |
-|                 i_synth                                                                                             |     0.034 |
-|                   DIV_OP.SPD.OP                                                                                     |     0.032 |
+|             U1                                                                                                      |     0.033 |
+|               U0                                                                                                    |     0.033 |
+|                 i_synth                                                                                             |     0.033 |
+|                   DIV_OP.SPD.OP                                                                                     |     0.031 |
 |                     EXP                                                                                             |    <0.001 |
 |                       COND_DET_A                                                                                    |    <0.001 |
 |                         EXP_DET_LUT.EXP_ALL_ONE_DEL                                                                 |    <0.001 |
@@ -6073,14 +6073,14 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       STATE_UP_DELAY                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                     MANT_DIV                                                                                        |     0.030 |
+|                     MANT_DIV                                                                                        |     0.029 |
 |                       RT[0].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[0].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[10].ADDSUB                                                                                 |    <0.001 |
+|                       RT[10].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -6092,7 +6092,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[11].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[12].ADDSUB                                                                                 |     0.001 |
+|                       RT[12].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -6104,19 +6104,19 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[13].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[14].ADDSUB                                                                                 |     0.001 |
+|                       RT[14].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[14].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[15].ADDSUB                                                                                 |    <0.001 |
+|                       RT[15].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[15].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[16].ADDSUB                                                                                 |     0.001 |
+|                       RT[16].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -6154,7 +6154,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[20].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[21].ADDSUB                                                                                 |    <0.001 |
+|                       RT[21].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -6194,19 +6194,19 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       RT[2].Q_DEL                                                                                   |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[3].ADDSUB                                                                                  |     0.001 |
+|                       RT[3].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[3].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[4].ADDSUB                                                                                  |     0.001 |
+|                       RT[4].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[4].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[5].ADDSUB                                                                                  |     0.001 |
+|                       RT[5].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -6218,7 +6218,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[6].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[7].ADDSUB                                                                                  |     0.001 |
+|                       RT[7].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -6618,7 +6618,7 @@ Table of Contents
 |           U0                                                                                                        |    <0.001 |
 |         U24                                                                                                         |    <0.001 |
 |           U0                                                                                                        |    <0.001 |
-|         U25                                                                                                         |    <0.001 |
+|         U25                                                                                                         |     0.001 |
 |           U0                                                                                                        |    <0.001 |
 |         U26                                                                                                         |    <0.001 |
 |         U27                                                                                                         |    <0.001 |
@@ -6869,7 +6869,7 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       B_IP_DELAY                                                                                    |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       DSP48E1_BODY.ALIGN_ADD                                                                        |    <0.001 |
+|                       DSP48E1_BODY.ALIGN_ADD                                                                        |     0.001 |
 |                         CIN_DELAY                                                                                   |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                         DSP2                                                                                        |    <0.001 |
@@ -6890,7 +6890,7 @@ Table of Contents
 |                           CARRY_ZERO_DET                                                                            |    <0.001 |
 |                         Z_14_LZD_DELAY                                                                              |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
-|                       DSP48E1_BODY.EXP                                                                              |     0.001 |
+|                       DSP48E1_BODY.EXP                                                                              |     0.002 |
 |                         A_EXP_DELAY                                                                                 |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                         A_SIGN_DELAY                                                                                |    <0.001 |
@@ -6980,7 +6980,7 @@ Table of Contents
 |                 i_synth                                                                                             |     0.008 |
 |                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |     0.001 |
 |                     fifo0                                                                                           |     0.001 |
-|                   MULT.OP                                                                                           |     0.006 |
+|                   MULT.OP                                                                                           |     0.007 |
 |                     EXP                                                                                             |    <0.001 |
 |                       COND_DET_A                                                                                    |    <0.001 |
 |                         EXP_DET_LUT.EXP_ALL_ONE_DEL                                                                 |    <0.001 |
@@ -7025,8 +7025,8 @@ Table of Contents
 |                         OP_REG.ZERO_DET_DEL                                                                         |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                     OP                                                                                              |    <0.001 |
-|                     R_AND_R                                                                                         |     0.001 |
-|                       LOGIC.R_AND_R                                                                                 |     0.001 |
+|                     R_AND_R                                                                                         |     0.002 |
+|                       LOGIC.R_AND_R                                                                                 |     0.002 |
 |                         EXP_ADD.ADD                                                                                 |    <0.001 |
 |                         EXP_INC_DELAY                                                                               |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -7201,7 +7201,7 @@ Table of Contents
 |                               valid.cstr                                                                            |     0.001 |
 |                                 ramloop[0].ram.r                                                                    |     0.001 |
 |                                   prim_noinit.ram                                                                   |     0.001 |
-|           U15                                                                                                       |     0.101 |
+|           U15                                                                                                       |     0.102 |
 |             U1                                                                                                      |     0.025 |
 |               U1                                                                                                    |    <0.001 |
 |                 sync_reset_inst                                                                                     |    <0.001 |
@@ -7823,7 +7823,7 @@ Table of Contents
 |                     U1                                                                                              |     0.005 |
 |                       U0                                                                                            |     0.005 |
 |                         i_synth                                                                                     |     0.005 |
-|                           FIX_TO_FLT_OP.SPD.OP                                                                      |     0.003 |
+|                           FIX_TO_FLT_OP.SPD.OP                                                                      |     0.004 |
 |                             EXP                                                                                     |    <0.001 |
 |                               EXP_MOD_DEL                                                                           |    <0.001 |
 |                                 i_pipe                                                                              |    <0.001 |
@@ -7941,10 +7941,10 @@ Table of Contents
 |                           need_combiner.use_2to1.skid_buffer_combiner                                               |    <0.001 |
 |                           need_user_delay.user_pipe                                                                 |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
-|                   U12                                                                                               |     0.001 |
-|                     U1                                                                                              |     0.001 |
-|                       U0                                                                                            |     0.001 |
-|                         i_synth                                                                                     |     0.001 |
+|                   U12                                                                                               |     0.002 |
+|                     U1                                                                                              |     0.002 |
+|                       U0                                                                                            |     0.002 |
+|                         i_synth                                                                                     |     0.002 |
 |                           FIX_TO_FLT_OP.SPD.OP                                                                      |    <0.001 |
 |                             EXP                                                                                     |    <0.001 |
 |                               EXP_MOD_DEL                                                                           |    <0.001 |
@@ -8520,8 +8520,8 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                         MULT                                                                                        |     0.004 |
 |                           MULT_GEN_VARIANT.FIX_MULT                                                                 |     0.004 |
-|                             MULT                                                                                    |     0.003 |
-|                               gDSP.gDSP_only.iDSP                                                                   |     0.003 |
+|                             MULT                                                                                    |     0.004 |
+|                               gDSP.gDSP_only.iDSP                                                                   |     0.004 |
 |                                 use_prim.has_zero_detect.zd_a1b2.multi_dsp_output.zd_delay0                         |    <0.001 |
 |                             OP_REG.MANT_DEL                                                                         |    <0.001 |
 |                               i_pipe                                                                                |    <0.001 |
@@ -8557,8 +8557,8 @@ Table of Contents
 |                 U1                                                                                                  |     0.008 |
 |                   U0                                                                                                |     0.008 |
 |                     i_synth                                                                                         |     0.008 |
-|                       HAS_OUTPUT_FIFO.i_output_fifo                                                                 |     0.001 |
-|                         fifo0                                                                                       |     0.001 |
+|                       HAS_OUTPUT_FIFO.i_output_fifo                                                                 |    <0.001 |
+|                         fifo0                                                                                       |    <0.001 |
 |                       MULT.OP                                                                                       |     0.006 |
 |                         EXP                                                                                         |    <0.001 |
 |                           COND_DET_A                                                                                |    <0.001 |
@@ -8596,8 +8596,8 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                         MULT                                                                                        |     0.004 |
 |                           MULT_GEN_VARIANT.FIX_MULT                                                                 |     0.004 |
-|                             MULT                                                                                    |     0.003 |
-|                               gDSP.gDSP_only.iDSP                                                                   |     0.003 |
+|                             MULT                                                                                    |     0.004 |
+|                               gDSP.gDSP_only.iDSP                                                                   |     0.004 |
 |                                 use_prim.has_zero_detect.zd_a1b2.multi_dsp_output.zd_delay0                         |    <0.001 |
 |                             OP_REG.MANT_DEL                                                                         |    <0.001 |
 |                               i_pipe                                                                                |    <0.001 |
@@ -8629,10 +8629,10 @@ Table of Contents
 |                       need_combiner.use_2to1.skid_buffer_combiner                                                   |    <0.001 |
 |                       need_user_delay.user_pipe                                                                     |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|               U9                                                                                                    |     0.004 |
-|                 U1                                                                                                  |     0.004 |
-|                   U0                                                                                                |     0.004 |
-|                     i_synth                                                                                         |     0.004 |
+|               U9                                                                                                    |     0.005 |
+|                 U1                                                                                                  |     0.005 |
+|                   U0                                                                                                |     0.005 |
+|                     i_synth                                                                                         |     0.005 |
 |                       FIX_TO_FLT_OP.SPD.OP                                                                          |     0.003 |
 |                         EXP                                                                                         |    <0.001 |
 |                           EXP_MOD_DEL                                                                               |    <0.001 |
@@ -9058,8 +9058,8 @@ Table of Contents
 |                         OP_REG.ZERO_DET_DEL                                                                         |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                     OP                                                                                              |    <0.001 |
-|                     R_AND_R                                                                                         |     0.002 |
-|                       LOGIC.R_AND_R                                                                                 |     0.002 |
+|                     R_AND_R                                                                                         |     0.001 |
+|                       LOGIC.R_AND_R                                                                                 |     0.001 |
 |                         EXP_ADD.ADD                                                                                 |    <0.001 |
 |                         EXP_INC_DELAY                                                                               |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -9205,7 +9205,7 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       STATE_UP_DELAY                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                     MANT_DIV                                                                                        |     0.029 |
+|                     MANT_DIV                                                                                        |     0.028 |
 |                       RT[0].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
@@ -9218,7 +9218,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[10].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[11].ADDSUB                                                                                 |     0.001 |
+|                       RT[11].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -9236,19 +9236,19 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[13].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[14].ADDSUB                                                                                 |     0.001 |
+|                       RT[14].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[14].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[15].ADDSUB                                                                                 |    <0.001 |
+|                       RT[15].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[15].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[16].ADDSUB                                                                                 |     0.001 |
+|                       RT[16].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -9280,7 +9280,7 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       RT[1].Q_DEL                                                                                   |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[20].ADDSUB                                                                                 |     0.001 |
+|                       RT[20].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -9292,7 +9292,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[21].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[22].ADDSUB                                                                                 |    <0.001 |
+|                       RT[22].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -9326,13 +9326,13 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       RT[2].Q_DEL                                                                                   |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[3].ADDSUB                                                                                  |     0.001 |
+|                       RT[3].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[3].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[4].ADDSUB                                                                                  |     0.001 |
+|                       RT[4].ADDSUB                                                                                  |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -9385,8 +9385,8 @@ Table of Contents
 |                           i_pipe                                                                                    |    <0.001 |
 |                       RND_BIT_GEN                                                                                   |    <0.001 |
 |                         NORM_1_OR_0.STRUCT_REQ.GENERAL.RND1                                                         |    <0.001 |
-|                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |     0.002 |
-|                     fifo0                                                                                           |     0.002 |
+|                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |     0.001 |
+|                     fifo0                                                                                           |     0.001 |
 |                   i_nd_to_rdy                                                                                       |    <0.001 |
 |                   need_combiner.use_2to1.skid_buffer_combiner                                                       |    <0.001 |
 |                   need_user_delay.user_pipe                                                                         |    <0.001 |
@@ -9512,7 +9512,7 @@ Table of Contents
 |                         merged_sub_mux.STRUCT_ADD                                                                   |    <0.001 |
 |                         merged_sub_mux.mux_DELAY                                                                    |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
-|                       DSP48E1_BODY.NORM_RND                                                                         |     0.001 |
+|                       DSP48E1_BODY.NORM_RND                                                                         |     0.002 |
 |                         FULL_USAGE_DSP.LOD                                                                          |    <0.001 |
 |                           DIST_DELAY                                                                                |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -9542,7 +9542,7 @@ Table of Contents
 |                   need_combiner.use_2to1.skid_buffer_combiner                                                       |     0.001 |
 |                   need_user_delay.user_pipe                                                                         |    <0.001 |
 |                     i_pipe                                                                                          |    <0.001 |
-|           U7                                                                                                        |     0.007 |
+|           U7                                                                                                        |     0.006 |
 |             U1                                                                                                      |     0.006 |
 |               U0                                                                                                    |     0.006 |
 |                 i_synth                                                                                             |     0.006 |
@@ -10111,7 +10111,7 @@ Table of Contents
 |         U39                                                                                                         |    <0.001 |
 |           U0                                                                                                        |    <0.001 |
 |           U1                                                                                                        |    <0.001 |
-|         U4                                                                                                          |     0.189 |
+|         U4                                                                                                          |     0.188 |
 |           U1                                                                                                        |     0.002 |
 |             U1                                                                                                      |    <0.001 |
 |               U1                                                                                                    |    <0.001 |
@@ -11238,10 +11238,10 @@ Table of Contents
 |                                 ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst                            |    <0.001 |
 |                                 ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst                            |    <0.001 |
 |                                 ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst                            |    <0.001 |
-|                   U3                                                                                                |     0.006 |
-|                     U1                                                                                              |     0.006 |
-|                       U0                                                                                            |     0.006 |
-|                         i_synth                                                                                     |     0.006 |
+|                   U3                                                                                                |     0.005 |
+|                     U1                                                                                              |     0.005 |
+|                       U0                                                                                            |     0.005 |
+|                         i_synth                                                                                     |     0.005 |
 |                           FLT_TO_FIX_OP.SPD.OP                                                                      |     0.004 |
 |                             ALIGN_DIST_DEL                                                                          |    <0.001 |
 |                               DEL                                                                                   |    <0.001 |
@@ -11692,8 +11692,8 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                         MULT                                                                                        |     0.004 |
 |                           MULT_GEN_VARIANT.FIX_MULT                                                                 |     0.004 |
-|                             MULT                                                                                    |     0.003 |
-|                               gDSP.gDSP_only.iDSP                                                                   |     0.003 |
+|                             MULT                                                                                    |     0.004 |
+|                               gDSP.gDSP_only.iDSP                                                                   |     0.004 |
 |                                 use_prim.has_zero_detect.zd_a1b2.multi_dsp_output.zd_delay0                         |    <0.001 |
 |                             OP_REG.MANT_DEL                                                                         |    <0.001 |
 |                               i_pipe                                                                                |    <0.001 |
@@ -11801,10 +11801,10 @@ Table of Contents
 |                       need_combiner.use_2to1.skid_buffer_combiner                                                   |    <0.001 |
 |                       need_user_delay.user_pipe                                                                     |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|               U9                                                                                                    |     0.004 |
-|                 U1                                                                                                  |     0.004 |
-|                   U0                                                                                                |     0.004 |
-|                     i_synth                                                                                         |     0.004 |
+|               U9                                                                                                    |     0.005 |
+|                 U1                                                                                                  |     0.005 |
+|                   U0                                                                                                |     0.005 |
+|                     i_synth                                                                                         |     0.005 |
 |                       FIX_TO_FLT_OP.SPD.OP                                                                          |     0.003 |
 |                         EXP                                                                                         |    <0.001 |
 |                           EXP_MOD_DEL                                                                               |    <0.001 |
@@ -12076,7 +12076,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[16].Q_DEL                                                                                  |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[17].ADDSUB                                                                                 |    <0.001 |
+|                       RT[17].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -12088,7 +12088,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[18].Q_DEL                                                                                  |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[19].ADDSUB                                                                                 |     0.001 |
+|                       RT[19].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -12436,16 +12436,16 @@ Table of Contents
 |                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |    <0.001 |
 |                     fifo0                                                                                           |    <0.001 |
 |                   i_nd_to_rdy                                                                                       |    <0.001 |
-|                   need_combiner.use_2to1.skid_buffer_combiner                                                       |    <0.001 |
+|                   need_combiner.use_2to1.skid_buffer_combiner                                                       |     0.001 |
 |                   need_user_delay.user_pipe                                                                         |    <0.001 |
 |                     i_pipe                                                                                          |    <0.001 |
-|           U7                                                                                                        |     0.009 |
-|             U1                                                                                                      |     0.009 |
-|               U0                                                                                                    |     0.009 |
-|                 i_synth                                                                                             |     0.009 |
+|           U7                                                                                                        |     0.008 |
+|             U1                                                                                                      |     0.008 |
+|               U0                                                                                                    |     0.008 |
+|                 i_synth                                                                                             |     0.008 |
 |                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |    <0.001 |
 |                     fifo0                                                                                           |    <0.001 |
-|                   MULT.OP                                                                                           |     0.007 |
+|                   MULT.OP                                                                                           |     0.006 |
 |                     EXP                                                                                             |    <0.001 |
 |                       COND_DET_A                                                                                    |    <0.001 |
 |                         EXP_DET_LUT.EXP_ALL_ONE_DEL                                                                 |    <0.001 |
@@ -12486,8 +12486,8 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                     MULT                                                                                            |     0.004 |
 |                       MULT_GEN_VARIANT.FIX_MULT                                                                     |     0.004 |
-|                         MULT                                                                                        |     0.004 |
-|                           gDSP.gDSP_only.iDSP                                                                       |     0.004 |
+|                         MULT                                                                                        |     0.003 |
+|                           gDSP.gDSP_only.iDSP                                                                       |     0.003 |
 |                             use_prim.has_zero_detect.zd_a1b2.multi_dsp_output.zd_delay0                             |    <0.001 |
 |                         OP_REG.MANT_DEL                                                                             |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -12640,7 +12640,7 @@ Table of Contents
 |                 i_synth                                                                                             |     0.008 |
 |                   HAS_OUTPUT_FIFO.i_output_fifo                                                                     |    <0.001 |
 |                     fifo0                                                                                           |    <0.001 |
-|                   MULT.OP                                                                                           |     0.007 |
+|                   MULT.OP                                                                                           |     0.006 |
 |                     EXP                                                                                             |    <0.001 |
 |                       COND_DET_A                                                                                    |    <0.001 |
 |                         EXP_DET_LUT.EXP_ALL_ONE_DEL                                                                 |    <0.001 |
@@ -12860,12 +12860,12 @@ Table of Contents
 |                               valid.cstr                                                                            |     0.001 |
 |                                 ramloop[0].ram.r                                                                    |     0.001 |
 |                                   prim_noinit.ram                                                                   |     0.001 |
-|         U49                                                                                                         |     0.002 |
-|           sgen_d64.t_axi4_stream32_sfifo_d64_inst                                                                   |     0.002 |
-|             U0                                                                                                      |     0.002 |
-|               inst_fifo_gen                                                                                         |     0.002 |
-|                 gaxis_fifo.gaxisf.axisf                                                                             |     0.002 |
-|                   grf.rf                                                                                            |     0.002 |
+|         U49                                                                                                         |     0.001 |
+|           sgen_d64.t_axi4_stream32_sfifo_d64_inst                                                                   |     0.001 |
+|             U0                                                                                                      |     0.001 |
+|               inst_fifo_gen                                                                                         |     0.001 |
+|                 gaxis_fifo.gaxisf.axisf                                                                             |     0.001 |
+|                   grf.rf                                                                                            |     0.001 |
 |                     gntv_or_sync_fifo.gl0.rd                                                                        |    <0.001 |
 |                       gr1.gr1_int.rfwft                                                                             |    <0.001 |
 |                       grss.rsts                                                                                     |    <0.001 |
@@ -13066,7 +13066,7 @@ Table of Contents
 |                           CARRY_ZERO_DET                                                                            |    <0.001 |
 |                         Z_14_LZD_DELAY                                                                              |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
-|                       DSP48E1_BODY.EXP                                                                              |     0.002 |
+|                       DSP48E1_BODY.EXP                                                                              |     0.001 |
 |                         A_EXP_DELAY                                                                                 |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
 |                         A_SIGN_DELAY                                                                                |    <0.001 |
@@ -13150,11 +13150,11 @@ Table of Contents
 |                   need_combiner.use_2to1.skid_buffer_combiner                                                       |     0.001 |
 |                   need_user_delay.user_pipe                                                                         |    <0.001 |
 |                     i_pipe                                                                                          |    <0.001 |
-|           U9                                                                                                        |     0.035 |
-|             U1                                                                                                      |     0.035 |
-|               U0                                                                                                    |     0.035 |
-|                 i_synth                                                                                             |     0.035 |
-|                   DIV_OP.SPD.OP                                                                                     |     0.033 |
+|           U9                                                                                                        |     0.034 |
+|             U1                                                                                                      |     0.034 |
+|               U0                                                                                                    |     0.034 |
+|                 i_synth                                                                                             |     0.034 |
+|                   DIV_OP.SPD.OP                                                                                     |     0.032 |
 |                     EXP                                                                                             |    <0.001 |
 |                       COND_DET_A                                                                                    |    <0.001 |
 |                         EXP_DET_LUT.EXP_ALL_ONE_DEL                                                                 |    <0.001 |
@@ -13209,7 +13209,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[10].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[11].ADDSUB                                                                                 |    <0.001 |
+|                       RT[11].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13221,19 +13221,19 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[12].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[13].ADDSUB                                                                                 |     0.001 |
+|                       RT[13].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[13].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[14].ADDSUB                                                                                 |     0.001 |
+|                       RT[14].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[14].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[15].ADDSUB                                                                                 |    <0.001 |
+|                       RT[15].ADDSUB                                                                                 |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13257,7 +13257,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[18].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[19].ADDSUB                                                                                 |     0.001 |
+|                       RT[19].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13271,13 +13271,13 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       RT[1].Q_DEL                                                                                   |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[20].ADDSUB                                                                                 |     0.001 |
+|                       RT[20].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[20].MANT_DEL                                                                               |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[21].ADDSUB                                                                                 |     0.001 |
+|                       RT[21].ADDSUB                                                                                 |    <0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13317,7 +13317,7 @@ Table of Contents
 |                         i_pipe                                                                                      |    <0.001 |
 |                       RT[2].Q_DEL                                                                                   |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[3].ADDSUB                                                                                  |    <0.001 |
+|                       RT[3].ADDSUB                                                                                  |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13335,7 +13335,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[5].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[6].ADDSUB                                                                                  |    <0.001 |
+|                       RT[6].ADDSUB                                                                                  |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13347,7 +13347,7 @@ Table of Contents
 |                             i_pipe                                                                                  |    <0.001 |
 |                       RT[7].MANT_DEL                                                                                |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                       RT[8].ADDSUB                                                                                  |    <0.001 |
+|                       RT[8].ADDSUB                                                                                  |     0.001 |
 |                         ADDSUB                                                                                      |    <0.001 |
 |                           Q_DEL                                                                                     |    <0.001 |
 |                             i_pipe                                                                                  |    <0.001 |
@@ -13362,7 +13362,7 @@ Table of Contents
 |                     OP                                                                                              |    <0.001 |
 |                       DIV_BY_ZERO_REG.REG                                                                           |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
-|                     ROUND                                                                                           |    <0.001 |
+|                     ROUND                                                                                           |     0.001 |
 |                       EXP_ADD.ADD                                                                                   |    <0.001 |
 |                       EXP_IN_DELAY.EXP_IN_DEL                                                                       |    <0.001 |
 |                         i_pipe                                                                                      |    <0.001 |
@@ -13437,7 +13437,7 @@ Table of Contents
 |                       i_pipe                                                                                        |    <0.001 |
 |                     STATE_UP_DELAY                                                                                  |    <0.001 |
 |                       i_pipe                                                                                        |    <0.001 |
-|                   MANT_DIV                                                                                          |     0.036 |
+|                   MANT_DIV                                                                                          |     0.035 |
 |                     RT[0].ADDSUB                                                                                    |    <0.001 |
 |                       ADDSUB                                                                                        |    <0.001 |
 |                         Q_DEL                                                                                       |    <0.001 |
@@ -13468,7 +13468,7 @@ Table of Contents
 |                           i_pipe                                                                                    |    <0.001 |
 |                     RT[13].MANT_DEL                                                                                 |    <0.001 |
 |                       i_pipe                                                                                        |    <0.001 |
-|                     RT[14].ADDSUB                                                                                   |     0.001 |
+|                     RT[14].ADDSUB                                                                                   |    <0.001 |
 |                       ADDSUB                                                                                        |    <0.001 |
 |                         Q_DEL                                                                                       |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -13550,7 +13550,7 @@ Table of Contents
 |                           i_pipe                                                                                    |    <0.001 |
 |                     RT[25].Q_DEL                                                                                    |    <0.001 |
 |                       i_pipe                                                                                        |    <0.001 |
-|                     RT[2].ADDSUB                                                                                    |    <0.001 |
+|                     RT[2].ADDSUB                                                                                    |     0.001 |
 |                       ADDSUB                                                                                        |    <0.001 |
 |                         Q_DEL                                                                                       |    <0.001 |
 |                           i_pipe                                                                                    |    <0.001 |
@@ -13810,7 +13810,7 @@ Table of Contents
 |                     ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst                                        |    <0.001 |
 |                     ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].rrst_inst                                        |    <0.001 |
 |                     ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst                                        |    <0.001 |
-|     EHDRI                                                                                                           |     0.001 |
+|     EHDRI                                                                                                           |     0.002 |
 |       U1                                                                                                            |    <0.001 |
 |         U0                                                                                                          |    <0.001 |
 |           inst_blk_mem_gen                                                                                          |    <0.001 |
@@ -14917,8 +14917,8 @@ Table of Contents
 |                     ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst                                        |    <0.001 |
 |                     ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].rrst_inst                                        |    <0.001 |
 |                     ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst                                        |    <0.001 |
-|               gaxi_full_lite.gwrite_ch.gwdch2.axi_wdch                                                              |     0.001 |
-|                 grf.rf                                                                                              |     0.001 |
+|               gaxi_full_lite.gwrite_ch.gwdch2.axi_wdch                                                              |    <0.001 |
+|                 grf.rf                                                                                              |    <0.001 |
 |                   gntv_or_sync_fifo.gcx.clkx                                                                        |    <0.001 |
 |                     gnxpm_cdc.gsync_stage[1].rd_stg_inst                                                            |    <0.001 |
 |                     gnxpm_cdc.gsync_stage[1].wr_stg_inst                                                            |    <0.001 |
@@ -15007,7 +15007,7 @@ Table of Contents
 |         U0A                                                                                                         |    <0.001 |
 |       U2                                                                                                            |     0.001 |
 |         U0A                                                                                                         |    <0.001 |
-|     IRIG                                                                                                            |     0.001 |
+|     IRIG                                                                                                            |     0.002 |
 |       U1                                                                                                            |    <0.001 |
 |         U1                                                                                                          |    <0.001 |
 |           U0                                                                                                        |    <0.001 |
@@ -15047,7 +15047,7 @@ Table of Contents
 |       U7                                                                                                            |    <0.001 |
 |         U1                                                                                                          |    <0.001 |
 |         U2                                                                                                          |    <0.001 |
-|     MGT                                                                                                             |     1.059 |
+|     MGT                                                                                                             |     1.060 |
 |       EXP_OUT_FIFO                                                                                                  |     0.003 |
 |         agen_d16.t_axi4_stream64_afifo_d16_inst                                                                     |     0.003 |
 |           U0                                                                                                        |     0.003 |
@@ -15109,8 +15109,8 @@ Table of Contents
 |           pll_sync                                                                                                  |    <0.001 |
 |           stream_merger_mbsdm_sync                                                                                  |    <0.001 |
 |           sync_resetn_inst                                                                                          |    <0.001 |
-|         DATA                                                                                                        |     0.522 |
-|           U0                                                                                                        |     0.522 |
+|         DATA                                                                                                        |     0.523 |
+|           U0                                                                                                        |     0.523 |
 |             axi_to_ll_pdu_i                                                                                         |    <0.001 |
 |             core_reset_logic_i                                                                                      |    <0.001 |
 |               link_reset_cdc_sync                                                                                   |    <0.001 |
@@ -15139,7 +15139,7 @@ Table of Contents
 |                 stage_1_rx_ll_deframer_i                                                                            |    <0.001 |
 |                 stage_2_valid_data_counter_i                                                                        |    <0.001 |
 |                 stage_3_storage_count_control_i                                                                     |    <0.001 |
-|             data_mgt_tx_ll_i                                                                                        |     0.001 |
+|             data_mgt_tx_ll_i                                                                                        |     0.002 |
 |               tx_ll_control_i                                                                                       |    <0.001 |
 |               tx_ll_datapath_i                                                                                      |     0.001 |
 |             gt_reset_cdc_sync                                                                                       |    <0.001 |
@@ -15520,7 +15520,7 @@ Table of Contents
 |           U3C                                                                                                       |    <0.001 |
 |           U3D                                                                                                       |    <0.001 |
 |           U3E                                                                                                       |    <0.001 |
-|         FSM                                                                                                         |     0.008 |
+|         FSM                                                                                                         |     0.009 |
 |           WL_sync                                                                                                   |    <0.001 |
 |           inst_sync_reset                                                                                           |    <0.001 |
 |         U11                                                                                                         |    <0.001 |
@@ -15750,8 +15750,8 @@ Table of Contents
 |           U1                                                                                                        |    <0.001 |
 |         U2                                                                                                          |    <0.001 |
 |           U1                                                                                                        |    <0.001 |
-|   FPA                                                                                                               |     0.141 |
-|     U1                                                                                                              |    <0.001 |
+|   FPA                                                                                                               |     0.140 |
+|     U1                                                                                                              |     0.001 |
 |       U1A                                                                                                           |    <0.001 |
 |       U1B                                                                                                           |    <0.001 |
 |       U1C                                                                                                           |    <0.001 |
