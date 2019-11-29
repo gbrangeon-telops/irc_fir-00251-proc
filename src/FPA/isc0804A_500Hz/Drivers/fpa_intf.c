@@ -508,9 +508,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    // adc clk source phase
    if (init_done == 0){
-      ptrA->adc_clk_pipe_sel = 0;
+      ptrA->adc_clk_pipe_sel = 1;
       if ((Stat.flex_flegx_detect_process_done == 1) && (Stat.flex_flegx_present == 1) && (flegx_present == 0))  // cas du LN2
-         ptrA->adc_clk_pipe_sel = 0;
+         ptrA->adc_clk_pipe_sel = 1;
    }       
    if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1)){
       ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
