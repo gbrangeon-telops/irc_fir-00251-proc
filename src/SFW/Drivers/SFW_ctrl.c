@@ -203,7 +203,7 @@ void SFW_UpdateSFWMode(FWMode_t Mode)
 {
    FPA_StretchAcqTrig = 0;
    
-   if(flashSettings.FWType == FW_SYNC)
+   if(flashSettings.FWPresent == 1 && flashSettings.FWType == FW_SYNC)
    {
       //Clear valid Param to change the wheel mode
       SFW_Disable();
