@@ -18,7 +18,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0804A__11.1MHz"
+#define FPA_DEVICE_MODEL_NAME    "ISC0804A__11.1MHz SVN_TRUNK"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
@@ -223,8 +223,8 @@ struct s_FpaStatus    //
 {
    // fpa init status (ne provient pas du vhd)
    uint32_t  fpa_init_done;            // donne l'état de l'initialisation du module FPA (hw + sw)
-   uint32_t  fpa_init_success;         // donne le résultat de l'initialisation du module FPA (hw + sw)
-
+   uint32_t  fpa_init_success;         // donne le résultat de l'initialisation du module FPA (hw + sw) 
+   
    // adc board (iddcas analogiques)
    uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
@@ -256,8 +256,9 @@ struct s_FpaStatus    //
    // pour le power management
    uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé
    uint32_t  adc_ddc_present;             // dit si une carte valide est détectée
-   uint32_t  flex_flegx_detect_process_done;    // dit si le  processus de détection du flex est achevé
-   uint32_t  flex_flegx_present;                // dit si une carte valide est détectée
+   uint32_t  flex_flegx_detect_process_done; // dit si le  processus de détection du flex est achevé
+   uint32_t  flex_flegx_present;          // dit si une carte valide est détectée
+   uint32_t  flegx_present;               // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
 
    uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 
@@ -282,7 +283,6 @@ struct s_FpaStatus    //
    uint32_t  acq_readout_cnt; 
    uint32_t  out_pix_cnt_min; 
    uint32_t  out_pix_cnt_max; 
-   
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  
