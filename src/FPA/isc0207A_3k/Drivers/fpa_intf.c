@@ -160,8 +160,18 @@
 
 // Electrical correction : valeurs cibles (desirées) apres correction
 #define ELCORR_TARGET_STARVATION_DL       650         // @ centered pix (160, 128)
-#define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (160, 128) 
+#define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (160, 128)
 
+// Electrical correction : les differents modes
+#define ELCORR_MODE_OFF                            0
+#define ELCORR_MODE_REF1_IMG                       1
+#define ELCORR_MODE_REF2_IMG                       2
+#define ELCORR_MODE_DIFF_REF_IMG                   3
+#define ELCORR_MODE_OFFSET_CORR                    5
+#define ELCORR_MODE_ROIC_OUTPUT_CST_IMG            6
+#define ELCORR_MODE_OFFSET_AND_GAIN_CORR           7
+#define ELCORR_MODE_FREE_WHEELING_CORR             9
+#define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19
 
 struct s_ProximCfgConfig 
 {   
@@ -316,17 +326,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
    static uint8_t cfg_num = 0; 
-   // static uint8_t roic_dbg_reg_unlocked = 0;
-   // uint8_t need_rst_fpa_module = 0;
-   // uint8_t flegx_present;  
    extern int32_t gFpaExposureTimeOffset;
    
    
    //if ((gStat.hw_init_done == 1) && (sw_init_done == 1))
    //   FPA_GetStatus(&gStat, ptrA);    // n'appeler dans FPA_SendConfigGC que sous condition pour eviter une boucle infinie avec FPA_GetStatus qui l'appelle egalement 
 
-   
-   // flegx_present = (uint8_t)(Stat.adc_brd_spare & 0x01);
 
    // on bâtit les parametres specifiques du 0207
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul . Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -478,15 +483,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[5], 6));
    gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                    
    
-   // offset of the tap_reference (VCC7) (ne sert plus)     
-//   if (gFpaDetectorElectricalRefOffset != presentElectricalRefOffset)
-//   {
-//      if ((gFpaDetectorElectricalRefOffset >= (float)ISC0207_REFOFS_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalRefOffset <= (float)ISC0207_REFOFS_VOLTAGE_MAX_mV))
-//         ProximCfg.vdac_value[6] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 7);  // 
-//	}                                                                                                       
-//   presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[6], 7);            
-//   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;
-   
+   // adc clk source phase   
    if (sw_init_done == 0){
       gFpaDebugRegC = 2;                   //  ajustement fait avec IRC1843 qui utilise un FLEGX
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // 
@@ -494,7 +491,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }       
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
    
-   // adc clk source phase
+   // adc clk source phase (suite)
    if (sw_init_done == 0){         
       gFpaDebugRegD = 24000;                //  ajustement fait avec IRC1843 qui utilise un FLEGX
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas particulier des systèmes avec Flex 264
@@ -548,18 +545,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
      
   // correction electronique // registreA :
    if (sw_init_done == 0){
-      if (gStat.flegx_present == 1)
-         gFpaDebugRegA = 5;               // l'utilisation de OUTR sur l l'électronique de proximité oblige à ne utiliser que la correction d'offset (donc la valeur 5)
-      else
-         gFpaDebugRegA = 5;               // l'utilisation de OUTR sur l l'électronique de proximité oblige à ne utiliser que la correction d'offset (donc la valeur 5)
-   }
-   
+      gFpaDebugRegA = (int32_t)ELCORR_MODE_OFFSET_CORR;               // l'utilisation de OUTR sur l'électronique de proximité (FleX ou FLEGX) oblige à ne utiliser que la correction d'offset (donc la valeur 5)
+
    elcorr_reg = (uint32_t)gFpaDebugRegA;
    
    if (ptrA->fpa_diag_mode == 1)
       elcorr_reg = 0;
 	  
-   if ((elcorr_reg == 7) && (gStat.flegx_present == 1)){         // pixeldata avec correction du gain et offset electroniques.  N'est possible qu'avec un FLEGX avec OUTR debranché 
+   if ((elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR) && (gStat.flegx_present == 1)){         // pixeldata avec correction du gain et offset electroniques.  N'est possible qu'avec un FLEGX avec OUTR debranché 
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -572,7 +565,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;
    }
     
-   else if ((elcorr_reg == 6) && (gStat.flegx_present == 1)){      // voutref data avec correction du gain et offset electroniques. N'est possible qu'avec un FLEGX avec OUTR debranché 
+   else if ((elcorr_reg == (uint32_t)ELCORR_MODE_ROIC_OUTPUT_CST_IMG) && (gStat.flegx_present == 1)){      // voutref data avec correction du gain et offset electroniques. N'est possible qu'avec un FLEGX avec OUTR debranché 
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 1;
@@ -585,7 +578,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                      
    }
    
-   else if (elcorr_reg == 5){                                     // pixeldata avec correction de l'offset électronique seulement
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_CORR){                                    // pixeldata avec correction de l'offset électronique seulement
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -598,7 +591,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                            
    }
  
-   else if ((elcorr_reg == 3) && (gStat.flegx_present == 1)){      // image map de la difference des references
+   else if ((elcorr_reg == (uint32_t)ELCORR_MODE_DIFF_REF_IMG) && (gStat.flegx_present == 1)){  // image map de la difference des references
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -611,7 +604,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                       
    }                                                         
     
-   else if ((elcorr_reg == 2)&& (gStat.flegx_present == 1)){   // image map de la reference 2 (1 dans le vhd)
+   else if ((elcorr_reg == (uint32_t)ELCORR_MODE_REF2_IMG)&& (gStat.flegx_present == 1)){   // image map de la reference 2 (1 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -624,7 +617,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
     
-   else if (elcorr_reg == 1){    // image map de la reference 1 (0 dans le vhd)
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_REF1_IMG){                                   // image map de la reference 1 (0 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -637,7 +630,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
 
-   else if (elcorr_reg == 0){    // desactivation de toute correction electronique
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFF){                                        // desactivation de toute correction electronique
       elcorr_enabled                = 0;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -736,7 +729,7 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
 
    diode_voltage = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F) / (powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES) * (float)FPA_TEMP_READER_GAIN);
    
-   if ((gStat.hw_init_done == 0) || (sw_init_done == 0)) {
+   if (gStat.fpa_init_done == 0) {
       return FPA_INVALID_TEMP;
    }
    else{ 
