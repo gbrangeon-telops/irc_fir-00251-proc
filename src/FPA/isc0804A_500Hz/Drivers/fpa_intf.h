@@ -18,7 +18,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0804A_500Hz_v2"
+#define FPA_DEVICE_MODEL_NAME    "ISC0804A_500Hz  SVN_TRUNK"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
@@ -31,7 +31,7 @@
 #define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
-#define FPA_OFFSETX_MULT   32  //dont care since OffsetX is always 0
+#define FPA_OFFSETX_MULT   32 
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   4
@@ -59,20 +59,20 @@
 #define FPA_EHDRI_EXP_3    200.0F  // Saturation à 28
 
 #define FPA_CAL_MIN_EXPOSURE   1.0F
-#define FPA_CAL_MAX_EXPOSURE   1000000.0F
+#define FPA_CAL_MAX_EXPOSURE  1000000.0F
 
 #define FPA_MCLK_RATE_HZ       5500000          //5500000     //11100000          //11880000          //5000000    //11100000          // le master clock du FPA
 #define FPA_CLOCK_FREQ_HZ      FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
 
 #define FPA_MIN_EXPOSURE       (float)(3E6F/(float)FPA_MCLK_RATE_HZ)        //0.527F //0.271F     // 0.6F //0.271F     // [us]
-#define FPA_MAX_EXPOSURE       1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
+#define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 
 
-#define FPA_AECP_MIN_EXPOSURE  FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
+#define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-#define FPA_DATA_RESOLUTION    14
+#define FPA_DATA_RESOLUTION 14
 #define FPA_PIXEL_PITCH                25E-6F
 
-#define FPA_INVALID_TEMP       -32768   // cC
+#define FPA_INVALID_TEMP               -32768   // cC
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec] , one pixel per mclk edges (DDR) 
 
 // structure de config envoyée au vhd 
@@ -207,11 +207,10 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  roic_test_row_en;
    uint32_t  roic_cst_output_mode;
    
-   uint32_t  elcorr_spare3;
+   uint32_t  elcorr_spare;
    uint32_t  cfg_num;
    uint32_t  elcorr_spare4;
    uint32_t  fpa_intf_data_source;
-   
    
 };                                  
 typedef struct s_FpaIntfConfig t_FpaIntf;
@@ -253,8 +252,8 @@ struct s_FpaStatus    //
    // pour le power management
    uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé
    uint32_t  adc_ddc_present;             // dit si une carte valide est détectée
-   uint32_t  flex_flegx_detect_process_done;    // dit si le  processus de détection du flex est achevé
-   uint32_t  flex_flegx_present;                // dit si une carte valide est détectée
+   uint32_t  flex_flegx_detect_process_done; // dit si le  processus de détection du flex est achevé
+   uint32_t  flex_flegx_present;          // dit si une carte valide est détectée
 
    uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 

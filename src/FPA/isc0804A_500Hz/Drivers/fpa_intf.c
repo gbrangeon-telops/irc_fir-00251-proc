@@ -40,7 +40,7 @@
 
 
 // Periode minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define XTRA_TRIG_FREQ_MAX_HZ             10        // soit une frequence de 10Hz         
+#define XTRA_TRIG_FREQ_MAX_HZ              10        // soit une frequence de 10Hz         
   
 // Mode d'operation choisi pour le contrôleur de trig 
 #define MODE_READOUT_END_TO_TRIG_START     0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
@@ -169,6 +169,17 @@
 // Electrical correction : valeurs cibles (desirées) apres correction
 #define ELCORR_TARGET_STARVATION_DL       650         // @ centered pix (320, 256)
 #define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (320, 256)
+
+// Electrical correction : les differents modes
+#define ELCORR_MODE_OFF                            0
+#define ELCORR_MODE_REF1_IMG                       1
+#define ELCORR_MODE_REF2_IMG                       2
+#define ELCORR_MODE_DIFF_REF_IMG                   3
+#define ELCORR_MODE_OFFSET_CORR                    5
+#define ELCORR_MODE_ROIC_OUTPUT_CST_IMG            6
+#define ELCORR_MODE_OFFSET_AND_GAIN_CORR           7
+#define ELCORR_MODE_FREE_WHEELING_CORR             9
+#define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19
 
 struct s_ProximCfgConfig 
 {   
@@ -461,9 +472,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->vgood_samp_mean_numerator     = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/(float)ptrA->vgood_samp_sum_num);                              
    
    // les Alimentations
-   ProximCfg.vdac_value[0]                 = FLEG_VccVoltage_To_DacWord(3600.0F, 1);           // VCC1 -> VPOS_OUT à 3.6V
-   ProximCfg.vdac_value[1]                 = FLEG_VccVoltage_To_DacWord(3600.0F, 2);           // VCC2 -> VPOS     à 3.6V
-   ProximCfg.vdac_value[7]                 = FLEG_VccVoltage_To_DacWord(3600.0F, 8);           // VCC8 -> VPD      à 3.6V
+   ProximCfg.vdac_value[0]             = FLEG_VccVoltage_To_DacWord(3600.0F, 1);           // VCC1 -> VPOS_OUT à 3.6V
+   ProximCfg.vdac_value[1]             = FLEG_VccVoltage_To_DacWord(3600.0F, 2);           // VCC2 -> VPOS     à 3.6V
+   ProximCfg.vdac_value[7]             = FLEG_VccVoltage_To_DacWord(3600.0F, 8);           // VCC8 -> VPD      à 3.6V
    
    // VOUTREF (VCC5)  : il est à la valeur de la reference 1 soit ELCORR_REF1_VALUE_mV
    //if (init_done == 0) 
@@ -484,7 +495,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    presentElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[5], 6);
    gFpaDetectorElectricalTapsRef = presentElectricalTapsRef;
-   
+
 
    // Registre F : ajustement des delais de la chaine
    if (init_done == 0){
@@ -513,17 +524,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ptrA->adc_clk_pipe_sel = 1;
    }       
    if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1)){
-      ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                         
+   ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
       need_rst_fpa_module = 1;
    }
    gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
    
    // adc clk source phase
    if (init_done == 0){         
-      ptrA->adc_clk_source_phase = 348480; //179200;
+      ptrA->adc_clk_source_phase = 354000; //179200;
       if ((Stat.flex_flegx_detect_process_done == 1) && (Stat.flex_flegx_present == 1) && (flegx_present == 0))  // cas du LN2
-         ptrA->adc_clk_source_phase = 230400; 
-   }   
+         ptrA->adc_clk_source_phase = 354000; 
+   }
    if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1)){
       ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;
       need_rst_fpa_module = 1;
@@ -591,27 +602,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // ELCORR : activation via registreA
    if (init_done == 0)
-      gFpaDebugRegA = 7;
+      gFpaDebugRegA = (int32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR;
    elcorr_reg = (uint32_t)gFpaDebugRegA;
    
    if (ptrA->fpa_diag_mode == 1)
-      elcorr_reg = 0;      
+      elcorr_reg = (uint32_t)ELCORR_MODE_OFF;      
    
-  if (elcorr_reg == 19){            // pixeldata avec correction du gain et offset electroniques en mode continuel puis ref dans l'image
-      elcorr_enabled                = 1;
-      elcorr_gain_corr_enabled      = 1;
-      ptrA->roic_cst_output_mode    = 0;
-      
-      ptrA->elcorr_ref0_op_sel      = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->elcorr_ref1_op_sel      = ELCORR_SW_TO_NORMAL_OP;  // pas necessaire
-      ptrA->elcorr_mult_op_sel      = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->elcorr_div_op_sel       = ELCORR_SW_TO_NORMAL_OP; 
-      ptrA->elcorr_add_op_sel       = ELCORR_SW_TO_NORMAL_OP;
-      ptrA->sat_ctrl_en             = 1;
-      ptrA->real_mode_active_pixel_dly = 4;    //    on envoie la reference remuante dans l'image
-   }
-   
-   else if (elcorr_reg == 17){            // pixeldata avec correction du gain et offset electroniques puis ref dans l'image
+   if (elcorr_reg == (uint32_t)ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR){         // pixeldata avec correction du gain et offset electroniques en mode continuel puis ref dans l'image
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -625,7 +622,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->real_mode_active_pixel_dly = 4;    //    on envoie la reference remuante dans l'image
    }
       
-   else if (elcorr_reg == 9){            // pixeldata avec correction du gain et offset electroniques en mode continuel
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_FREE_WHEELING_CORR){             // pixeldata avec correction du gain et offset electroniques en mode continuel
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -638,7 +635,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;
    }
   
-   else if (elcorr_reg == 7){         // pixeldata avec correction du gain et offset electroniques
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR){           // pixeldata avec correction du gain et offset electroniques
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -651,7 +648,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;
    }
     
-   else if (elcorr_reg == 6){    // voutref data avec correction du gain et offset electroniques
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_ROIC_OUTPUT_CST_IMG){            // voutref data avec correction du gain et offset electroniques
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 1;
@@ -664,7 +661,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                      
    }
    
-   else if (elcorr_reg == 5){    // pixeldata avec correction de l'offset électronique seulement
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_CORR){                    // pixeldata avec correction de l'offset électronique seulement
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -677,7 +674,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                            
    }
  
-   else if (elcorr_reg == 3){    // image map de la difference des references
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_DIFF_REF_IMG){                   // image map de la difference des references
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -690,7 +687,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                       
    }                                                         
     
-   else if (elcorr_reg == 2){   // image map de la reference 2 (1 dans le vhd)
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_REF2_IMG){                       // image map de la reference 2 (1 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -703,7 +700,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
     
-   else if (elcorr_reg == 1){    // image map de la reference 1 (0 dans le vhd)
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_REF1_IMG){                       // image map de la reference 1 (0 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -716,7 +713,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
 
-   else if (elcorr_reg == 0){    // desactivation de toute correction electronique
+   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFF){                            // desactivation de toute correction electronique
       elcorr_enabled                = 0;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -772,9 +769,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // mode continuel   
    if ((((float)hh.roic_xsize - (float)pGCRegs->Width)/2 >= (float)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
-      ||((elcorr_gain_corr_enabled == 1) && ((ptrA->roic_cst_output_mode == 1)|| (elcorr_reg == 9) || (elcorr_reg == 19))))
+      ||((elcorr_gain_corr_enabled == 1) && ((ptrA->roic_cst_output_mode == 1)|| (elcorr_reg == (uint32_t)ELCORR_MODE_FREE_WHEELING_CORR) || (elcorr_reg == ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR))))
       ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
-   
+     
    // desactivation en mode patron de tests
    if (ptrA->fpa_diag_mode == 1){
       ptrA->elcorr_enabled = 0;
@@ -787,12 +784,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       cfg_num = 0;   
    cfg_num++;   
    ptrA->cfg_num  = (uint32_t)cfg_num;
-   
+      
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
     
    // envoi du reste de la config 
-   WriteStruct(ptrA);
+   WriteStruct(ptrA);   
    
    // reset fpa module (suite à l'envoi des registres c et d
    if (need_rst_fpa_module == 1){
@@ -802,9 +799,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_GetTemperature(ptrA); 
       FPA_SendProximCfg(&ProximCfg, ptrA);
       WriteStruct(ptrA);
-   }  
+}
    need_rst_fpa_module = 0;
-   
+
    // fin de l'initialisation. Mis ici pour supporter aussi le LN2 
    if (Stat.flex_flegx_detect_process_done == 1)
       init_done = 1; 
@@ -819,42 +816,42 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    float temperature;
    t_FpaStatus Stat;
    uint8_t flegx_present;
-  
-	
+
+
    FPA_GetStatus(&Stat, ptrA);
    flegx_present = (uint8_t)(Stat.adc_brd_spare & 0x01);
    
 
    diode_voltage = (float)Stat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV/1000.0F) / (powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES) * (float)FPA_TEMP_READER_GAIN);
 
-   // utilisation  des valeurs de flashsettings
-   temperature = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
-   temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
-   temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
-   temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
-   temperature += flashSettings.FPATemperatureConversionCoef0;
-
-   // Si flashsettings non programmés alors on utilise les valeurs par defaut
-   if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
-       (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
-       (flashSettings.FPATemperatureConversionCoef0 == 0)) {
+      // utilisation  des valeurs de flashsettings
+      temperature  = flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+      temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
+      temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+      temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+      temperature += flashSettings.FPATemperatureConversionCoef0;
+   
+      // Si flashsettings non programmés alors on utilise les valeurs par defaut
+      if ((flashSettings.FPATemperatureConversionCoef4 == 0) && (flashSettings.FPATemperatureConversionCoef3 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef0 == 0)) {
 
       // courbe de conversion de 2N2222 avec une polarisation de 100µA (coeff de Sofradir)
-      temperature  =  -170.50F * powf(diode_voltage,4);
-      temperature +=   173.45F * powf(diode_voltage,3);
-      temperature +=   137.86F * powf(diode_voltage,2);
-      temperature += (-667.07F * diode_voltage) + 623.1F - 0.5F;  // 625 remplacé par 623.1- 0.5 en guise de calibration de la diode
-
+   	   temperature  =  -170.50F * powf(diode_voltage,4);
+   	   temperature +=   173.45F * powf(diode_voltage,3);
+   	   temperature +=   137.86F * powf(diode_voltage,2);
+         temperature += (-667.07F * diode_voltage) + 623.1F - 0.5F;  // 625 remplacé par 623.1- 0.5 en guise de calibration de la diode
+   
       // courbe de conversion de D670 avec une polarisation de 10µA
       if ((Stat.flex_flegx_detect_process_done == 1) && (Stat.flex_flegx_present == 1) && (flegx_present == 0)){
-         temperature  =  -426.6946F * powf(diode_voltage,4);
-         temperature +=  1089.8000F * powf(diode_voltage,3);
-         temperature += -1082.8000F * powf(diode_voltage,2);
-         temperature += (  50.8778F * diode_voltage) + 461.5899F;
-      }
-   }
-   return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
-}       
+            temperature  =  -426.6946F * powf(diode_voltage,4);
+            temperature +=  1089.8000F * powf(diode_voltage,3);
+            temperature += -1082.8000F * powf(diode_voltage,2);
+            temperature += (  50.8778F * diode_voltage) + 461.5899F;
+         }
+      }      
+      return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
+   }     
 
 //--------------------------------------------------------------------------                                                                            
 // Pour avoir les parametres propres au isc0804 avec une config 
@@ -1049,14 +1046,14 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
    Stat->prog_init_done                = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x88);
    Stat->cooler_on_curr_min_mA         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x8C);
    Stat->cooler_off_curr_max_mA        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x90);   
-                       
+                 
    Stat->acq_trig_cnt                  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x94);
    Stat->acq_int_cnt                   = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x98);
    Stat->fpa_readout_cnt               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x9C);        
    Stat->acq_readout_cnt               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA0);  
    Stat->out_pix_cnt_min               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA4);  
-   Stat->out_pix_cnt_max               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);
-}
+   Stat->out_pix_cnt_max               = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xA8);    
+   }  
 
 
 //////////////////////////////////////////////////////////////////////////////                                                                          
