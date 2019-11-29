@@ -176,28 +176,30 @@ void ChangeFWControllerMode(FW_ControllerMode_t newMode, int32_t target)
 {
    FWCommand_t cmd;
 
-   if (((newMode != FW_VELOCITY_MODE) && (newMode != FW_POSITION_MODE)) ||  // New mode not in velocity or position
-         ((gcRegsData.FWMode != FWM_Fixed) && (newMode == FW_VELOCITY_MODE)) ||
-         ((gcRegsData.FWMode == FWM_Fixed) && (newMode == FW_POSITION_MODE)))
+   if (flashSettings.FWPresent)
    {
-
-      //Safety check
-      if ((newMode == FW_VELOCITY_MODE) && (target > (int32_t)flashSettings.FWSpeedMax))
+      if (((newMode != FW_VELOCITY_MODE) && (newMode != FW_POSITION_MODE)) ||  // New mode not in velocity or position
+            ((gcRegsData.FWMode != FWM_Fixed) && (newMode == FW_VELOCITY_MODE)) ||
+            ((gcRegsData.FWMode == FWM_Fixed) && (newMode == FW_POSITION_MODE)))
       {
-         FW_SetErrors(FW_ERR_FAULHABER_SPEED_SETPOINT);
-         newMode = FW_ERROR_MODE;
-      }
 
-      cmd.mode = newMode;
-      cmd.target = target;
+         //Safety check
+         if ((newMode == FW_VELOCITY_MODE) && (target > (int32_t)flashSettings.FWSpeedMax))
+         {
+            FW_SetErrors(FW_ERR_FAULHABER_SPEED_SETPOINT);
+            newMode = FW_ERROR_MODE;
+         }
 
-      if (!CB_Empty(&FW_CmdQueue))
-      {
-         CB_Flush(&FW_CmdQueue);
+         cmd.mode = newMode;
+         cmd.target = target;
+
+         if (!CB_Empty(&FW_CmdQueue))
+         {
+            CB_Flush(&FW_CmdQueue);
+         }
+         CB_Push(&FW_CmdQueue, &cmd);
       }
-      CB_Push(&FW_CmdQueue, &cmd);
    }
-
 }
 
 /*
