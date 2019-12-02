@@ -111,7 +111,7 @@ architecture rtl of calib_param_sequencer is
    constant RAM_INFO_LAST_INDEX                 : ram_info_index_type   := POW2_LSB_FP32_INDEX;
    
    constant RAM_INFO_READ_LATENCY : ram_info_index_type := to_unsigned(2, ram_info_index_type'length);   --Read latency is 2 clock cycles
-   constant DDR_BLOCK_OFFSET : unsigned(23 downto 0) := to_unsigned(IMG_WIDTH_MAX * IMG_HEIGHT_MAX * 8, 24);   --PIXEL DATA is 8 bytes/pixel
+   constant DDR_BLOCK_OFFSET : unsigned(31 downto 0) := to_unsigned(IMG_WIDTH_MAX * IMG_HEIGHT_MAX * 8, 32);   --PIXEL DATA is 8 bytes/pixel
    
    type read_state_type is (STANDBY, VERIFY_INDEX, READ_RAM);
    
