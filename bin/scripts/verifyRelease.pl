@@ -13,41 +13,94 @@ sub read_file {
 }
 
 use Getopt::Long;
-my $buildInfoFile;
+my $procBuildInfoFile;
+my $outputBuildInfoFile;
+my $storageBuildInfoFile;
 my $outputReleaseInfoFile;
 my $storageReleaseInfoFile1;
 my $storageReleaseInfoFile2;
 my $procReleaseInfoFile;
 my $releaseLogFile;
 my $fpgaSize;
+my $outputFpgaSize;
 
-GetOptions("bf=s" => \$buildInfoFile,
+GetOptions("pbf=s" => \$procBuildInfoFile,
+      "obf=s" => \$outputBuildInfoFile,
+      "sbf=s" => \$storageBuildInfoFile,
       "of=s" => \$outputReleaseInfoFile,
       "sf1=s" => \$storageReleaseInfoFile1,
       "sf2=s" => \$storageReleaseInfoFile2,
       "pf=s" => \$procReleaseInfoFile,
       "rf=s" => \$releaseLogFile,
-      "size=s" => \$fpgaSize)
+      "size=s" => \$fpgaSize,
+      "osize=s" => \$outputFpgaSize)
    or die("Error in command line arguments\n");
 
 my $error = 0;
 
-# Parse build info file
-my $buildInfoFileStr = read_file($buildInfoFile);
-my $buildInfoFileSubstr = substr($buildInfoFileStr, index($buildInfoFileStr, $fpgaSize));
-my $buildInfoHardware;
-my $buildInfoSoftware;
-my $buildInfoBootLoader;
-my $buildInfoCommon;
+# Parse proc build info file
+my $procBuildInfoFileStr = read_file($procBuildInfoFile);
+my $procBuildInfoFileSubstr = substr($procBuildInfoFileStr, index($procBuildInfoFileStr, $fpgaSize));
+my $procBuildInfoHardware;
+my $procBuildInfoSoftware;
+my $procBuildInfoBootLoader;
+my $procBuildInfoCommon;
 
-if ($buildInfoFileSubstr =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $buildInfoHardware = $1; } else { $error = 1; }
-if ($buildInfoFileSubstr =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $buildInfoSoftware = $1; } else { $error = 1; }
-if ($buildInfoFileSubstr =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $buildInfoBootLoader = $1; } else { $error = 1; }
-if ($buildInfoFileSubstr =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $buildInfoCommon = $1; } else { $error = 1; }
+if ($procBuildInfoFileSubstr =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $procBuildInfoHardware = $1; } else { $error = 1; }
+if ($procBuildInfoFileSubstr =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $procBuildInfoSoftware = $1; } else { $error = 1; }
+if ($procBuildInfoFileSubstr =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $procBuildInfoBootLoader = $1; } else { $error = 1; }
+if ($procBuildInfoFileSubstr =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $procBuildInfoCommon = $1; } else { $error = 1; }
 
 if ($error == 1)
 {
-   die("Cannot parse build info file\n");
+   die("Cannot parse proc build info file\n");
+}
+
+# Parse output build info file
+my $outputBuildInfoFileStr = read_file($outputBuildInfoFile);
+my $outputBuildInfoFileSubstr = substr($outputBuildInfoFileStr, index($outputBuildInfoFileStr, $outputFpgaSize));
+my $outputBuildInfoHardware;
+my $outputBuildInfoSoftware;
+my $outputBuildInfoBootLoader;
+my $outputBuildInfoCommon;
+
+if ($outputBuildInfoFileSubstr =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $outputBuildInfoHardware = $1; } else { $error = 1; }
+if ($outputBuildInfoFileSubstr =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $outputBuildInfoSoftware = $1; } else { $error = 1; }
+if ($outputBuildInfoFileSubstr =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $outputBuildInfoBootLoader = $1; } else { $error = 1; }
+if ($outputBuildInfoFileSubstr =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $outputBuildInfoCommon = $1; } else { $error = 1; }
+
+if ($error == 1)
+{
+   die("Cannot parse output build info file\n");
+}
+
+# Parse storage build info file
+my $storageBuildInfoFileStr = read_file($storageBuildInfoFile);
+my $storageBuildInfoFileSubstr1 = substr($storageBuildInfoFileStr, index($storageBuildInfoFileStr, 16));
+my $storageBuildInfoHardware1;
+my $storageBuildInfoSoftware1;
+my $storageBuildInfoBootLoader1;
+my $storageBuildInfoCommon1;
+
+if ($storageBuildInfoFileSubstr1 =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoHardware1 = $1; } else { $error = 1; }
+if ($storageBuildInfoFileSubstr1 =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoSoftware1 = $1; } else { $error = 1; }
+if ($storageBuildInfoFileSubstr1 =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoBootLoader1 = $1; } else { $error = 1; }
+if ($storageBuildInfoFileSubstr1 =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoCommon1 = $1; } else { $error = 1; }
+
+my $storageBuildInfoFileSubstr2 = substr($storageBuildInfoFileStr, index($storageBuildInfoFileStr, 32));
+my $storageBuildInfoHardware2;
+my $storageBuildInfoSoftware2;
+my $storageBuildInfoBootLoader2;
+my $storageBuildInfoCommon2;
+
+if ($storageBuildInfoFileSubstr2 =~ /SVN_HARDWARE_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoHardware2 = $1; } else { $error = 1; }
+if ($storageBuildInfoFileSubstr2 =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoSoftware2 = $1; } else { $error = 1; }
+if ($storageBuildInfoFileSubstr2 =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoBootLoader2 = $1; } else { $error = 1; }
+if ($storageBuildInfoFileSubstr2 =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoCommon2 = $1; } else { $error = 1; }
+
+if ($error == 1)
+{
+   die("Cannot parse storage build info file\n");
 }
 
 # Parse output release info file
@@ -156,32 +209,56 @@ if ($error == 1)
    die("Cannot parse release log file\n");
 }
 
-# Verify proc relase info file
-if (($procReleaseInfoHardware ne $buildInfoHardware) ||
-   ($procReleaseInfoSoftware ne $buildInfoSoftware) || 
-   ($procReleaseInfoBootLoader ne $buildInfoBootLoader) || 
-   ($procReleaseInfoCommon ne $buildInfoCommon))
+# Verify proc build info file
+if (($procReleaseInfoHardware ne $procBuildInfoHardware) ||
+   ($procReleaseInfoSoftware ne $procBuildInfoSoftware) || 
+   ($procReleaseInfoBootLoader ne $procBuildInfoBootLoader) || 
+   ($procReleaseInfoCommon ne $procBuildInfoCommon))
 {
-   die("Processing FPGA relase info does not match build info\n");
+   die("Processing FPGA release info does not match build info\n");
 }
 
-# Verify relase log file
+# Verify proc release log file
 if (($procReleaseInfoHardware ne $releaseLogProcHardware) ||
    ($procReleaseInfoSoftware ne $releaseLogProcSoftware) || 
    ($procReleaseInfoBootLoader ne $releaseLogProcBootLoader) || 
    ($procReleaseInfoCommon ne $releaseLogProcCommon))
 {
-   die("Processing FPGA relase info does not release log file\n");
+   die("Processing FPGA release info does not match release log file\n");
 }
 
+# Verify output build info file
+if (($outputReleaseInfoHardware ne $outputBuildInfoHardware) ||
+   ($outputReleaseInfoSoftware ne $outputBuildInfoSoftware) || 
+   ($outputReleaseInfoBootLoader ne $outputBuildInfoBootLoader) || 
+   ($outputReleaseInfoCommon ne $outputBuildInfoCommon))
+{
+   die("Output FPGA release info does not match build info\n");
+}
+
+# Verify output release log file
 if (($outputReleaseInfoHardware ne $releaseLogOutputHardware) ||
    ($outputReleaseInfoSoftware ne $releaseLogOutputSoftware) || 
    ($outputReleaseInfoBootLoader ne $releaseLogOutputBootLoader) || 
    ($outputReleaseInfoCommon ne $releaseLogOutputCommon))
 {
-   die("Output FPGA relase info does not release log file\n");
+   die("Output FPGA release info does not match release log file\n");
 }
 
+# Verify storage build info file
+if (($storageReleaseInfoHardware1 ne $storageBuildInfoHardware1) ||
+   ($storageReleaseInfoSoftware1 ne $storageBuildInfoSoftware1) || 
+   ($storageReleaseInfoBootLoader1 ne $storageBuildInfoBootLoader1) || 
+   ($storageReleaseInfoCommon1 ne $storageBuildInfoCommon1) ||
+   ($storageReleaseInfoHardware2 ne $storageBuildInfoHardware2) ||
+   ($storageReleaseInfoSoftware2 ne $storageBuildInfoSoftware2) || 
+   ($storageReleaseInfoBootLoader2 ne $storageBuildInfoBootLoader2) || 
+   ($storageReleaseInfoCommon2 ne $storageBuildInfoCommon2))
+{
+   die("Storage FPGA release info does not match build info\n");
+}
+
+# Verify storage release log file
 if (($storageReleaseInfoHardware1 ne $releaseLogStorageHardware1) ||
    ($storageReleaseInfoSoftware1 ne $releaseLogStorageSoftware1) || 
    ($storageReleaseInfoBootLoader1 ne $releaseLogStorageBootLoader1) || 
@@ -191,7 +268,7 @@ if (($storageReleaseInfoHardware1 ne $releaseLogStorageHardware1) ||
    ($storageReleaseInfoBootLoader2 ne $releaseLogStorageBootLoader2) || 
    ($storageReleaseInfoCommon2 ne $releaseLogStorageCommon2))
 {
-   die("Storage FPGA relase info does not correspond to release log file\n");
+   die("Storage FPGA release info does not match release log file\n");
 }
 
 print("$releaseLogVersion (Passed)\n");

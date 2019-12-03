@@ -4,7 +4,7 @@ call D:\Telops\FIR-00251-Proc\bin\scripts\setEnvironment.bat %sensorName% 160
 rem Clean up
 del %buildInfoFile%
 
-echo #ifndef BUILDINFO_H> %buildInfoFile%
+echo #ifndef BUILDINFO_H>> %buildInfoFile%
 echo #define BUILDINFO_H>> %buildInfoFile%
 echo.>> %buildInfoFile%
 

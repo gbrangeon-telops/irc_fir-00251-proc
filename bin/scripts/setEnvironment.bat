@@ -24,15 +24,18 @@ set releaseLogFile=%binDir%\%baseName%_%fpgaSize%_release.txt
 set revFile=%binDir%\svnrevs_%fpgaSize%.pl
 
 if "%fpgaSize%" == "160" (
-	set outputRevFile=%outputDir%\bin\svnrevs_70.pl
-	set outputBaseName=fir_00251_output_70
+   set outputFpgaSize="70"
 ) else (
-	set outputRevFile=%outputDir%\bin\svnrevs_160.pl
-	set outputBaseName=fir_00251_output_160
+   set outputFpgaSize="160"
 )
+set outputRevFile=%outputDir%\bin\svnrevs_%outputFpgaSize%.pl
+set outputBaseName=fir_00251_output_%outputFpgaSize%
+set outputBuildInfoFile=%outputDir%\src\BuildInfo\BuildInfo.h
 
 set storageRevFile1=%storageDir%\bin\svnrevs_16.pl
 set storageRevFile2=%storageDir%\bin\svnrevs_32.pl
+set storageBuildInfoFile=%storageDir%\src\BuildInfo\BuildInfo.h
+
 set versionFile=%binDir%\version.txt
 set sensorInfoFile=%projectDir%\bin\SensorInformation.txt
 
