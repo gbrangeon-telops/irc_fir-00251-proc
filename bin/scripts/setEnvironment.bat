@@ -13,10 +13,8 @@ set storageDir=D:\Telops\FIR-00257-Storage
 set ntxminiDir=F:\Production\IRCAM\Firmwares\FIR-00251-NTx-Mini\Archives
 
 set elfFile=%binDir%\%baseName%_%fpgaSize%.elf
-set srecFile=%binDir%\%baseName%_%fpgaSize%.srec
 set bootFile=%binDir%\%baseName%_boot_%fpgaSize%.elf
-set bitFile=%binDir%\%baseName%_%fpgaSize%.bit
-set mmiFile=%binDir%\%baseName%_%fpgaSize%.mmi
+set hwFile=%sdkDir%\%baseName%_%fpgaSize%.hdf
 
 set buildInfoFile=%srcDir%\BuildInfo\%sensorName%\BuildInfo.h
 set releaseFile=%binDir%\%baseName%_%fpgaSize%_release.bin

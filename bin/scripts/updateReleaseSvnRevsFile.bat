@@ -2,7 +2,7 @@ rem Clean up
 del %revFile%
 
 echo our $rel_proc_hw_rev = $WCREV$;> %revFile%
-%svn_subwcrev% %bitFile% %revFile% %revFile%
+%svn_subwcrev% %hwFile% %revFile% %revFile%
 
 echo our $rel_proc_sw_rev = $WCREV$;>> %revFile%
 %svn_subwcrev% %elfFile% %revFile% %revFile%
