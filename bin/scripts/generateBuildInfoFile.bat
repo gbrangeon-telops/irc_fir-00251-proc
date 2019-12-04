@@ -50,7 +50,6 @@ echo.>> %buildInfoFile%
 echo #elif defined(ARCH_FPGA_325)>> %buildInfoFile%
 echo.>> %buildInfoFile%
 rem switch ENV variable
-@echo off
 call D:\Telops\FIR-00251-Proc\bin\scripts\setEnvironment.bat %sensorName% 325
 
 rem Get hardware revision
