@@ -57,6 +57,7 @@ if exist D:\Xilinx\SDK\2016.3\*.* set xDir=D:\Xilinx
 
 set x_mb-objcopy=%xDir%\SDK\2016.3\gnu\microblaze\nt\bin\mb-objcopy.exe
 set x_updatemem=%xDir%\SDK\2016.3\bin\updatemem.bat
+set x_xsct=%xDir%\SDK\2016.3\bin\xsct.bat
 set x_xilperl=%xDir%\Vivado\2016.3\ids_lite\ISE\bin\nt64\xilperl.exe
 
 set xDir=C:\Xilinx

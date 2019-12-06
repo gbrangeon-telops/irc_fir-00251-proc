@@ -39,7 +39,7 @@ configapp -app fir_00251_proc_${detector}_325 build-config release
 cd $current_path
 }
 
-proc build_proc_sw {detector size} {
+proc build_proc_sw {detector size {compile_boot 1}} {
 set current_path [exec pwd]
 #Switch directory
 cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
@@ -47,17 +47,21 @@ cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
 #Set workspace
 setws -switch "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/"
 
-#Configure in release mode
-configapp -app fir_00251_proc_${detector}_boot_$size build-config release
+#Configure in release mode and clean projects
+if {$compile_boot == 1} {
+   configapp -app fir_00251_proc_${detector}_boot_$size build-config release
+   projects -clean -type app -name fir_00251_proc_${detector}_boot_$size
+}
 configapp -app fir_00251_proc_${detector}_$size build-config release
-
-#Clean projects
-projects -clean -type app -name fir_00251_proc_${detector}_boot_$size
 projects -clean -type app -name fir_00251_proc_${detector}_$size
 
-#Build projects
+#Build standalone_bsp
 projects -build -type bsp -name standalone_bsp_$size
-projects -build -type app -name fir_00251_proc_${detector}_boot_$size
+
+#Build projects
+if {$compile_boot == 1} {
+   projects -build -type app -name fir_00251_proc_${detector}_boot_$size
+}
 projects -build -type app -name fir_00251_proc_${detector}_$size
 
 #Return to initial path
