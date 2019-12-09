@@ -22,7 +22,7 @@ if errorlevel 1 (
 	exit
 )
 rem Clean up
-del %binDir%\scripts\%fpgaSize%\updatemem*
+del %cd%\updatemem*
 
 rem Generate SREC image file
 %x_mb-objcopy% -O srec --srec-forceS3 --srec-len=16 %elfFile% %binDir%\tempS3_%fpgaSize%.srec
