@@ -544,7 +544,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
   
      
   // correction electronique // registreA :
-   if (sw_init_done == 0){
+   if (sw_init_done == 0)
       gFpaDebugRegA = (int32_t)ELCORR_MODE_OFFSET_CORR;               // l'utilisation de OUTR sur l'électronique de proximité (FleX ou FLEGX) oblige à ne utiliser que la correction d'offset (donc la valeur 5)
 
    elcorr_reg = (uint32_t)gFpaDebugRegA;
