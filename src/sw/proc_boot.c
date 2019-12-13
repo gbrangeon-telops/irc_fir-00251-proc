@@ -67,13 +67,6 @@ ledCtrl_t gLedCtrl;
 XIntc gIntc;
 qspiFlash_t gQSPIFlash;
 
-/**
- * STDOUT definition
- */
-#if (!defined(STDOUT_BASEADDRESS) || !defined(STDIN_BASEADDRESS))
-#error STDIN and STDOUT must be set to "USB" in the BSP.
-#endif
-
 
 
 
@@ -83,7 +76,7 @@ qspiFlash_t gQSPIFlash;
  */
 void outbyte(char c)
 {
-   XUartNs550_SendByte(STDOUT_BASEADDRESS, c);
+   XUartNs550_SendByte(XPAR_AXI_USB_UART_BASEADDR, c);
 }
 
 /*--------------------------------------------------------------------------------------*/
@@ -100,8 +93,8 @@ int main()
    //Timer_Test(300);
 
    WAIT_US(30);
-   XUartNs550_SetBaud(STDOUT_BASEADDRESS, XPAR_XUARTNS550_CLOCK_HZ, 115200);
-   XUartNs550_SetLineControlReg(STDOUT_BASEADDRESS, XUN_LCR_8_DATA_BITS);
+   XUartNs550_SetBaud(XPAR_AXI_USB_UART_BASEADDR, XPAR_XUARTNS550_CLOCK_HZ, 115200);
+   XUartNs550_SetLineControlReg(XPAR_AXI_USB_UART_BASEADDR, XUN_LCR_8_DATA_BITS);
    PRINTF("Boot loader starting...\n");
 
    // Initialize LED
@@ -159,8 +152,8 @@ int main()
 
    do {
 
-      if (XUartNs550_IsReceiveData(STDIN_BASEADDRESS)) {
-         userAns = XUartNs550_ReadReg(STDIN_BASEADDRESS, XUN_RBR_OFFSET);
+      if (XUartNs550_IsReceiveData(XPAR_AXI_USB_UART_BASEADDR)) {
+         userAns = XUartNs550_ReadReg(XPAR_AXI_USB_UART_BASEADDR, XUN_RBR_OFFSET);
       }
 
       if (elapsed_time_us(msg_refresh_tic) > STARTUP_MSG_REFRESH_TMR) {

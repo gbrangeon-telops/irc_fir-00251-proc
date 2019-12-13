@@ -15,14 +15,6 @@ createhw -name hw_platform_325 -hwspec fir_00251_proc_${detector}_325.hdf
 createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1
 createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1
 
-#Configure BSP projects
-configbsp -bsp standalone_bsp_160 stdin axi_usb_uart
-configbsp -bsp standalone_bsp_160 stdout axi_usb_uart
-updatemss -mss standalone_bsp_160/system.mss
-configbsp -bsp standalone_bsp_325 stdin axi_usb_uart
-configbsp -bsp standalone_bsp_325 stdout axi_usb_uart
-updatemss -mss standalone_bsp_325/system.mss
-
 #Import projects
 importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
 importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"

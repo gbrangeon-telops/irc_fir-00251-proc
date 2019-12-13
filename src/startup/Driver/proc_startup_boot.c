@@ -83,8 +83,8 @@ int main()
    //Timer_Test(300);
 
    WAIT_US(30);
-   XUartNs550_SetBaud(STDOUT_BASEADDRESS, XPAR_XUARTNS550_CLOCK_HZ, 115200);
-   XUartNs550_SetLineControlReg(STDOUT_BASEADDRESS, XUN_LCR_8_DATA_BITS);
+   XUartNs550_SetBaud(XPAR_AXI_USB_UART_BASEADDR, XPAR_XUARTNS550_CLOCK_HZ, 115200);
+   XUartNs550_SetLineControlReg(XPAR_AXI_USB_UART_BASEADDR, XUN_LCR_8_DATA_BITS);
    FPGA_PRINT("Boot loader starting...\n");
 
    // Initialize LED
@@ -143,8 +143,8 @@ int main()
 
    do {
 
-      if (XUartNs550_IsReceiveData(STDIN_BASEADDRESS)) {
-         userAns = XUartNs550_ReadReg(STDIN_BASEADDRESS, XUN_RBR_OFFSET);
+      if (XUartNs550_IsReceiveData(XPAR_AXI_USB_UART_BASEADDR)) {
+         userAns = XUartNs550_ReadReg(XPAR_AXI_USB_UART_BASEADDR, XUN_RBR_OFFSET);
       }
 
       if (elapsed_time_us(msg_refresh_tic) > STARTUP_MSG_REFRESH_TIMER) {
