@@ -14,11 +14,11 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="xilinx.gnu.mb.exe.debug.164636421" name="Debug" parent="xilinx.gnu.mb.exe.debug">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="xilinx.gnu.mb.exe.debug.164636421" name="Debug" parent="xilinx.gnu.mb.exe.debug" postannouncebuildStep="Generate Elf sections" postbuildStep="mb-objdump -x ${ProjDirPath}/${ConfigName}/${BuildArtifactFilePrefix}${BuildArtifactFileName} &gt; ${ProjDirPath}/${ConfigName}/${BuildArtifactFilePrefix}${BuildArtifactFileName}.sections">
 					<folderInfo id="xilinx.gnu.mb.exe.debug.164636421." name="/" resourcePath="">
 						<toolChain id="xilinx.gnu.mb.exe.debug.toolchain.2122916539" name="Xilinx MicroBlaze GNU Toolchain" superClass="xilinx.gnu.mb.exe.debug.toolchain">
 							<targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.mb" id="xilinx.mb.target.gnu.base.debug.79683847" isAbstract="false" name="Debug Platform" superClass="xilinx.mb.target.gnu.base.debug"/>
-							<builder buildPath="${workspace_loc:/fir_00251_proc_startup_boot}/Debug" enableAutoBuild="false" id="xilinx.gnu.mb.toolchain.builder.debug.1758842771" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" stopOnErr="false" superClass="xilinx.gnu.mb.toolchain.builder.debug"/>
+							<builder buildPath="${workspace_loc:/fir_00251_proc_startup_boot_160}/Debug" enableAutoBuild="false" id="xilinx.gnu.mb.toolchain.builder.debug.1758842771" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" stopOnErr="false" superClass="xilinx.gnu.mb.toolchain.builder.debug"/>
 							<tool id="xilinx.gnu.mb.c.toolchain.assembler.debug.102179137" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.debug">
 								<option id="xilinx.gnu.mb.assembler.usele.852873965" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.assembler.usele" value="true" valueType="boolean"/>
 								<inputType id="xilinx.gnu.assembler.input.1742120903" superClass="xilinx.gnu.assembler.input"/>
@@ -143,11 +143,11 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="xilinx.gnu.mb.exe.release.601687942" name="Release" parent="xilinx.gnu.mb.exe.release">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="xilinx.gnu.mb.exe.release.601687942" name="Release" parent="xilinx.gnu.mb.exe.release" postannouncebuildStep="Generate Elf sections" postbuildStep="mb-objdump -x ${ProjDirPath}/${ConfigName}/${BuildArtifactFilePrefix}${BuildArtifactFileName} &gt; ${ProjDirPath}/${ConfigName}/${BuildArtifactFilePrefix}${BuildArtifactFileName}.sections">
 					<folderInfo id="xilinx.gnu.mb.exe.release.601687942." name="/" resourcePath="">
 						<toolChain id="xilinx.gnu.mb.exe.release.toolchain.750776528" name="Xilinx MicroBlaze GNU Toolchain" superClass="xilinx.gnu.mb.exe.release.toolchain">
 							<targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.mb" id="xilinx.mb.target.gnu.base.release.1749688036" isAbstract="false" name="Debug Platform" superClass="xilinx.mb.target.gnu.base.release"/>
-							<builder buildPath="${workspace_loc:/fir_00251_proc_startup_boot}/Release" enableAutoBuild="false" id="xilinx.gnu.mb.toolchain.builder.release.706412112" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" stopOnErr="false" superClass="xilinx.gnu.mb.toolchain.builder.release"/>
+							<builder buildPath="${workspace_loc:/fir_00251_proc_startup_boot_160}/Release" enableAutoBuild="false" id="xilinx.gnu.mb.toolchain.builder.release.706412112" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" stopOnErr="false" superClass="xilinx.gnu.mb.toolchain.builder.release"/>
 							<tool id="xilinx.gnu.mb.c.toolchain.assembler.release.584862658" name="MicroBlaze gcc assembler" superClass="xilinx.gnu.mb.c.toolchain.assembler.release">
 								<option id="xilinx.gnu.mb.assembler.usele.340964175" name="Produce little endian code (-mlittle-endian)" superClass="xilinx.gnu.mb.assembler.usele" value="true" valueType="boolean"/>
 								<inputType id="xilinx.gnu.assembler.input.1870314784" superClass="xilinx.gnu.assembler.input"/>
@@ -259,14 +259,14 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="fir_00251_proc_startup_boot.xilinx.gnu.mb.exe.877744824" name="Xilinx MicroBlaze Executable" projectType="xilinx.gnu.mb.exe"/>
+		<project id="fir_00251_proc_startup_boot_160.xilinx.gnu.mb.exe.877744824" name="Xilinx MicroBlaze Executable" projectType="xilinx.gnu.mb.exe"/>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/fir_00251_proc_startup_boot"/>
+			<resource resourceType="PROJECT" workspacePath="/fir_00251_proc_startup_boot_160"/>
 		</configuration>
 		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/fir_00251_proc_startup_boot"/>
+			<resource resourceType="PROJECT" workspacePath="/fir_00251_proc_startup_boot_160"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
@@ -284,17 +284,4 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.MBGCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-		<buildTargets>
-			<target name="fir_00251_proc_startup_boot.elf" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>make</buildCommand>
-				<buildArguments>-k</buildArguments>
-				<buildTarget>fir_00251_proc_startup_boot.elf</buildTarget>
-				<stopOnError>false</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
-				<runAllBuilders>false</runAllBuilders>
-			</target>
-		</buildTargets>
-	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>
