@@ -1,41 +1,37 @@
-1.	FPGA output
-   a. Clean et build du projet principal en release dans SDK
-   b. Exécuter le script fetchHwSwFiles.bat
-   c. Faire le commit de pre-release
-   d. Clean et build du projet principal en release dans SDK
-   e. Exécuter le script updateReleaseSvnRevsFile.bat
-   f. Exécuter le script verifyRelease.bat et s'assurer qu'il retourne "Passed".
-   g. Exécuter le script generatePromFile.bat
-   h. Faire le commit de release
+Note: Il est préférable que les builds hardware soient dans un commit préalable.
 
-2.	FPGA storage
-   Effectuer les mêmes étapes que pour le FPGA d'output.
-   
-3.	FPGA processing
-   a. Modifier le fichier FirmwareReleaseVersion.txt
-   b. Faire les étapes suivantes pour tous les détecteurs à relâcher:
-      1. Clean et build du projet bootloader en release dans SDK (important de le faire avant celui du projet principal)
-      2. Clean et build du projet principal en release dans SDK
-      3. Exécuter le script fetchHwSwFiles.bat
-   c. Faire le commit de pre-release
-   d. Faire les étapes suivantes pour tous les détecteurs à relâcher:
-      1. Clean et build du projet principal en release dans SDK
-      2. Exécuter le script generateReleaseFile.bat
-      3. Exécuter le script verifyRelease.bat et s'assurer qu'il retourne "Passed".
-      4. Exécuter le script generatePromFile.bat
-   e. Tester les release au besoin.
-   f. Faire le commit de release
-   g. Exécuter le script exportReleaseArchive.bat
-   h. Copier le répertoire de release dans le répertoire de firmware du département de production
-
-4. IMPORTANT! Créer un tag pour chacun des repository suivants avec la date et le nom de la release (aaaa-mm-jj - Release x.x.x.x):
+1. Faire un clean-up et un update à la bonne révision des repos suivants:
    - FIR-00251-Common
    - FIR-00251-NTx-Mini
    - FIR-00251-Output
    - FIR-00251-Proc
    - FIR-00257-Storage
    
-5. Mettre à jour la documentation de firmware du département de production:
+2. Modifier le fichier FIR-00251-Proc\bin\FirmwareReleaseVersion.txt
+
+3. Remplir le fichier FIR-00251-Proc\bin\FirmwareReleaseList.txt avec les détecteurs à relâcher
+
+4. Si l'Output est déjà sur une révision de release, passer à l'étape suivante. 
+   Sinon, pour relâcher l'Output:
+   a. Exécuter le script FIR-00251-Output\bin\scripts\FirmwareReleaseScript.bat
+   b. S'assurer que le script s'est exécuté en entier: la fenêtre de commandes se ferme, le fichier
+      de log s'ouvre et se termine par "END Firmware release..."
+      
+5. Si le Storage est déjà sur une révision de release, passer à l'étape suivante. 
+   Sinon, pour relâcher le Storage:
+   a. Exécuter le script FIR-00257-Storage\bin\scripts\FirmwareReleaseScript.bat
+   b. S'assurer que le script s'est exécuté en entier: la fenêtre de commandes se ferme, le fichier
+      de log s'ouvre et se termine par "END Firmware release..."
+
+6. Pour relâcher le Proc:
+   a. Exécuter le script FIR-00251-Proc\bin\FirmwareReleaseScript.bat
+   b. S'assurer que le script s'est exécuté en entier: la fenêtre de commandes se ferme, le fichier
+      de log s'ouvre et se termine par "END Firmware release..."
+
+7. Copier le contenu de FIR-00251-Proc\bin\ReleasedFirmwares dans le répertoire de 
+   firmware du département de production
+
+8. Mettre à jour la documentation de firmware du département de production:
    - TEL-IRC-0044 - TS-IR Firmware Release History.xlsx
    - TEL-IRC-0045 - TS-IR Firmware Roadmap.vsd
    - TEL-IRC-0058 - TS-IR Firmware Qualification Plan.xlsx

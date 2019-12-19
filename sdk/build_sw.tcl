@@ -16,5 +16,3 @@ if {$create_project == 1} {
 
 #Build project
 build_proc_sw $detector $size $compile_boot
-
-puts "$detector $size built"

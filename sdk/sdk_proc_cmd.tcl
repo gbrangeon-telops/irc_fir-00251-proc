@@ -21,6 +21,9 @@ importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_0025
 importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
 importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
 
+#Clean projects
+projects -clean
+
 #Configure in release mode
 configapp -app fir_00251_proc_${detector}_boot_160 build-config release
 configapp -app fir_00251_proc_${detector}_160 build-config release
