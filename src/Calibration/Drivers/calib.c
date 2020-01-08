@@ -449,8 +449,7 @@ void CAL_ApplyCalibBlockSelMode(const t_calib *pA, gcRegistersData_t *pGCRegs)
 
       // Update FW position if necessary
       if (flashSettings.FWPresent &&
-            (GC_CalibrationIsActive || GC_CalibrationCollectionTypeFWIsActive) &&
-            (pGCRegs->FWPositionSetpoint != (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition))
+            (GC_CalibrationIsActive || GC_CalibrationCollectionTypeFWIsActive))
          GC_UpdateFWPositionSetpoint(pGCRegs->FWPositionSetpoint, (uint32_t)calibrationInfo.blocks[blockIndex].FWPosition);
 
       // Update NDF position if necessary
