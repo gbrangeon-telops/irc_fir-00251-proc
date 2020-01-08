@@ -486,7 +486,7 @@ void FPA_SpecificParams(hawk_param_t *ptrH, float exposureTime_usec, const gcReg
    ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
    
    // 
-   ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec; ; 
+   ptrH->int_time_offset_usec  = ptrH->int_time_offset_mclk * ptrH->mclk_period_usec; 
       
    // calcul de la periode minimale
    ptrH->frame_period_usec = (exposureTime_usec + ptrH->int_time_offset_usec) + ptrH->delay_usec + ptrH->readout_usec;

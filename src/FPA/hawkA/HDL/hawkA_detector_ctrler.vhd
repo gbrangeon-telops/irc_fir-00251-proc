@@ -232,12 +232,14 @@ begin
                      if SPI_DONE = '1' and (reg_rqst = '1' or new_cfg_num_pending = '1') then 
                         dcr_fsm <= dcr_rqst_st;
                      end if;
-                  
+                     cnt <= (others => '0');
+
                   when dcr_rqst_st =>  -- demande pour programmer le fpa. Cela perfmet d'arreter les integrations
                      rqst_i <= '1'; 
                      if EN = '1' then
                         dcr_fsm <= check_st;
-                        rqst_i <= '0'; 
+                        rqst_i <= '0';
+                        done_i <= '0';
                      end if;
                   
                   when check_st =>     -- recherche des registres ayant fait la demande de programmation
@@ -261,7 +263,9 @@ begin
                         --end if;                        
                         reg_en_latch <= WDR;
                         dcr_fsm <= first_dcr_wr;
-                     end if; 
+                     else                                -- aucun registre à programmer.  new_cfg_num_pending est à '1'
+                        dcr_fsm <= second_tnh_dly;      -- il faut feindre programmer un registre et on retourne à idle. Cela permet de faire de la correction electronique en mode evenementiel par exemple.
+                     end if;
                   
                   when first_dcr_wr =>          -- ecrire d'abord le DCR pour activer le registre choisi
                      reg_en <= DCR;
@@ -269,7 +273,6 @@ begin
                      dcr_mosi_i.eof <= '1';       -- permet de desactiver NCS (revient à HIGH)
                      dcr_mosi_i.dval <= '1';
                      dcr_fsm <=  wait_first_dcr_wr_end;
-                     done_i <= '0'; 
                   
                   when wait_first_dcr_wr_end =>   
                      dcr_mosi_i.sof <= '0'; 
