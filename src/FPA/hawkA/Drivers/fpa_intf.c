@@ -297,7 +297,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    Nc = (float)FPA_WIDTH_MAX;
    No = (float)FPA_NUMTAPS;
    
-   // ENO   20 avril 2016 : la formule de Selex semble ne pas marcher. Celle ci-dessous a établie par moi-meme et marche très bien.
+   // ENO   20 avril 2016 : la formule de Selex semble ne pas marcher. Celle ci-dessous a été établie par moi-meme et marche très bien.
    // à la formule de la doc qui est 
    R = (float)pGCRegs->OffsetY + 1.0F;        //  frame pixel row start index  
    H = (float)pGCRegs->Height;                //  frame height in pixels 

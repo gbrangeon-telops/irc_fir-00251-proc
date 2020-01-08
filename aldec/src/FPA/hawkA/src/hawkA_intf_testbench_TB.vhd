@@ -28,7 +28,7 @@ architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
          MB_MOSI : in t_axi4_lite_mosi;
          XTRA_TRIG : in STD_LOGIC;
          ADC_SYNC_FLAG : out STD_LOGIC;
-         DOUT_MOSI : out t_axi4_stream_mosi32;
+         DOUT_MOSI : out t_axi4_stream_mosi64;
          ERR_FOUND : out STD_LOGIC;
          FPA_DIGIO1 : out STD_LOGIC;
          FPA_DIGIO10 : out STD_LOGIC;
@@ -53,7 +53,8 @@ architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
    constant ACQ_TRIG_PERIOD         : time := 700 us;
    constant DOUT_CLK_PERIOD         : time := 6.25 ns;
    constant PAUSE_SIZE              : integer := 8;
-   constant TAP_NUM                 : integer := 4;
+   constant TAP_NUM                 : integer := 4; 
+   constant DAC_CFG_BASE_ADD        : natural := to_integer(unsigned(x"D00"));
    
    
    constant user_xsize : natural := 640;
@@ -73,7 +74,7 @@ architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
    signal XTRA_TRIG : STD_LOGIC;
    -- Observed signals - signals mapped to the output ports of tested entity
    signal ADC_SYNC_FLAG : STD_LOGIC;
-   signal DOUT_MOSI : t_axi4_stream_mosi32;
+   signal DOUT_MOSI : t_axi4_stream_mosi64;
    signal ERR_FOUND : STD_LOGIC;
    signal FPA_DIGIO1 : STD_LOGIC;
    signal FPA_DIGIO10 : STD_LOGIC;
@@ -165,7 +166,7 @@ architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
    signal user_ysize3 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(63*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(48*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
@@ -252,15 +253,15 @@ begin
          -- cfg usager
          user_xsize1 <= 640;
          user_ysize1 <= 512;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1); 
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 320;
-         user_ysize2 <= 256;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2);
+         user_xsize2 <= 640;
+         user_ysize2 <= 512;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          
          user_xsize3 <= 64;
-         user_ysize3 <= 4;
-         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3);
+         user_ysize3 <= 64;
+         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
          
          -- dac       
          vdac_value_1               	<= to_unsigned(11630, 32); 
@@ -315,9 +316,17 @@ begin
       wait for 30 ns; 
       write_axi_lite (MB_CLK, resize(X"AE8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
       wait for 500 ns;
-           
       
-      for ii in 0 to 63-1 loop 
+      for ii in 0 to 8-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := dac_cfg_vector'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(DAC_CFG_BASE_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;
+      
+      
+      for ii in 0 to 48-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -328,13 +337,13 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000404", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;
+      -- wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns;  
+      -- wait for 10 ns;  
       
-      wait for 30 ms;
+      wait for 50 ms;
       
-      for ii in 0 to 63-1 loop 
+      for ii in 0 to 48-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -342,9 +351,9 @@ begin
          wait for 30 ns;
       end loop; 
       
-      wait for 20 ms;
+      wait for 50 ms;
       
-      for ii in 0 to 63-1 loop 
+      for ii in 0 to 48-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;
          end_pos   := start_pos - 31;
