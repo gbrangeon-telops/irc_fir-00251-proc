@@ -232,8 +232,7 @@ begin
                      if SPI_DONE = '1' and (reg_rqst = '1' or new_cfg_num_pending = '1') then 
                         dcr_fsm <= dcr_rqst_st;
                      end if;
-                     cnt <= (others => '0');
-
+                     
                   when dcr_rqst_st =>  -- demande pour programmer le fpa. Cela perfmet d'arreter les integrations
                      rqst_i <= '1'; 
                      if EN = '1' then
@@ -256,16 +255,14 @@ begin
                         reg_en_latch <= DDR; 
                         dcr_fsm <= first_dcr_wr;
                      elsif WDR_FIFO_EMPTY = '0' and WDR_ERR = '0' then 
-                        --if USER_CFG.FPA_FULL_WINDOW = '1' then
-                        dcr_mosi_i.data <= x"20";     -- registre WDR à programmer (voir manuel)  
-                        --else
-                        --   dcr_mosi_i.data <= x"20";     -- registre WDR à programmer (voir manuel)   
-                        --end if;                        
+                        dcr_mosi_i.data <= x"20";     -- registre WDR à programmer (voir manuel)                         
                         reg_en_latch <= WDR;
                         dcr_fsm <= first_dcr_wr;
                      else                                -- aucun registre à programmer.  new_cfg_num_pending est à '1'
                         dcr_fsm <= second_tnh_dly;      -- il faut feindre programmer un registre et on retourne à idle. Cela permet de faire de la correction electronique en mode evenementiel par exemple.
                      end if;
+                     dcr_mosi_i.data(3) <= not USER_CFG.FULL_WINDOW;
+                     cnt <= (others => '0');
                   
                   when first_dcr_wr =>          -- ecrire d'abord le DCR pour activer le registre choisi
                      reg_en <= DCR;
@@ -297,16 +294,9 @@ begin
                      end if;                     
                   
                   when second_dcr_wr =>                  -- envoyer le registre DCR specifiant 
-                     reg_en <= DCR;
-                     if USER_CFG.FULL_WINDOW = '1' then 
-                        dcr_mosi_i.data <= x"00";           -- active mode ITR (voir manuel)
-                     else
-                        if reg_en_latch = WDR then
-                           dcr_mosi_i.data <= x"08";
-                        else
-                           dcr_mosi_i.data <= x"00";
-                        end if;
-                     end if;
+                     reg_en <= DCR; 
+                     dcr_mosi_i.data <= x"00";           -- active mode ITR (voir manuel)
+                     dcr_mosi_i.data(3) <= not USER_CFG.FULL_WINDOW;
                      dcr_mosi_i.sof <= '0';  
                      dcr_mosi_i.eof <= '1';              -- permet de desactiver NCS (revient à HIGH)
                      dcr_mosi_i.dval <= '1';
