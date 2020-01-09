@@ -19,7 +19,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "HAWKA__ADC_10MHz"
+#define FPA_DEVICE_MODEL_NAME    "HAWKA SVN TRUNK"
 
 #define FPA_HAWK_VERTICAL_FLIP   1        // 1 pour une inversion verticale de l'image (Line 512 to 1)
 
