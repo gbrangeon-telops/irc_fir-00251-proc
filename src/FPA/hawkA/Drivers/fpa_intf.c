@@ -302,7 +302,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    R = (float)pGCRegs->OffsetY + 1.0F;        //  frame pixel row start index  
    H = (float)pGCRegs->Height;                //  frame height in pixels 
    C = (float)pGCRegs->OffsetX + 1.0F;        //  frame pixel column start index 
-   W = (float)pGCRegs->Width;                 //  frame width in pixels                 
+   W = (float)pGCRegs->Width;                 //  frame width in pixels 
    
    // nous avons fait un ajustement (patch de soustraction de 1 et 4 sur la formule de R et C)pour tenir compte des decalages de sous-fenetres observés par PTR lors des tests du Hawk.
    // Toutefois, cela crée un autre problème sur les fenetres pleines. Nous avons donc effectué un second patch qui se matérialise par les IF qu'on retrouve sur a->FPA_Mpos et a->FPA_Kpos
@@ -377,7 +377,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // les DACs (1 à 8)
    ProximCfg.vdac_value[0]                 = FLEG_VccVoltage_To_DacWord(6000.0F, 1);          // DAC1 -> VDD à 6V
    ProximCfg.vdac_value[1]                 = 0;
-   ProximCfg.vdac_value[2]                 = FLEG_VccVoltage_To_DacWord(5800.0F, 1);          // DAC2 -> PRV à 5.8V
+   ProximCfg.vdac_value[2]                 = FLEG_VccVoltage_To_DacWord(5800.0F, 3);          // DAC2 -> PRV à 5.8V
    ProximCfg.vdac_value[3]                 = 0;
    ProximCfg.vdac_value[4]                 = 0;
    ProximCfg.vdac_value[5]                 = 0;
@@ -410,7 +410,63 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       cfg_num = 0;   
    cfg_num++;
    
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num  = (uint32_t)cfg_num;  
+   
+   
+   FPA_PRINTF("pGCRegs->OffsetX = %d", (uint32_t)pGCRegs->OffsetX);
+   FPA_PRINTF("pGCRegs->OffsetY = %d", (uint32_t)pGCRegs->OffsetY);
+   FPA_PRINTF("pGCRegs->Width = %d", (uint32_t)pGCRegs->Width);
+   FPA_PRINTF("pGCRegs->Height = %d", (uint32_t)pGCRegs->Height);
+   
+   FPA_PRINTF(" fpa_diag_mode                  =  %d", (uint32_t)ptrA->fpa_diag_mode                );  
+   FPA_PRINTF(" fpa_diag_type                  =  %d", (uint32_t)ptrA->fpa_diag_type                );  
+   FPA_PRINTF(" fpa_pwr_on                     =  %d", (uint32_t)ptrA->fpa_pwr_on                   );  
+   FPA_PRINTF(" fpa_trig_ctrl_mode             =  %d", (uint32_t)ptrA->fpa_trig_ctrl_mode           );  
+   FPA_PRINTF(" fpa_acq_trig_ctrl_dly          =  %d", (uint32_t)ptrA->fpa_acq_trig_ctrl_dly        );  
+   FPA_PRINTF(" fpa_spare                      =  %d", (uint32_t)ptrA->fpa_spare                    );  
+   FPA_PRINTF(" fpa_xtra_trig_ctrl_dly         =  %d", (uint32_t)ptrA->fpa_xtra_trig_ctrl_dly       );  
+   FPA_PRINTF(" fpa_trig_ctrl_timeout_dly      =  %d", (uint32_t)ptrA->fpa_trig_ctrl_timeout_dly    );                                      
+   FPA_PRINTF(" xstart                         =  %d", (uint32_t)ptrA->xstart                       );  
+   FPA_PRINTF(" ystart                         =  %d", (uint32_t)ptrA->ystart                       );  
+   FPA_PRINTF(" xsize                          =  %d", (uint32_t)ptrA->xsize                        );  
+   FPA_PRINTF(" ysize                          =  %d", (uint32_t)ptrA->ysize                        );  
+   FPA_PRINTF(" gain                           =  %d", (uint32_t)ptrA->gain                         );  
+   FPA_PRINTF(" invert                         =  %d", (uint32_t)ptrA->invert                       );  
+   FPA_PRINTF(" revert                         =  %d", (uint32_t)ptrA->revert                       );  
+   FPA_PRINTF(" cbit_en                        =  %d", (uint32_t)ptrA->cbit_en                      );  
+   FPA_PRINTF(" dig_code                       =  %d", (uint32_t)ptrA->dig_code                     );  
+   FPA_PRINTF(" jpos                           =  %d", (uint32_t)ptrA->jpos                         );  
+   FPA_PRINTF(" kpos                           =  %d", (uint32_t)ptrA->kpos                         );  
+   FPA_PRINTF(" lpos                           =  %d", (uint32_t)ptrA->lpos                         );  
+   FPA_PRINTF(" mpos                           =  %d", (uint32_t)ptrA->mpos                         );  
+   FPA_PRINTF(" wdr_len                        =  %d", (uint32_t)ptrA->wdr_len                      );  
+   FPA_PRINTF(" full_window                    =  %d", (uint32_t)ptrA->full_window                  );  
+   FPA_PRINTF(" real_mode_active_pixel_dly     =  %d", (uint32_t)ptrA->real_mode_active_pixel_dly   );  
+   FPA_PRINTF(" adc_quad2_en                   =  %d", (uint32_t)ptrA->adc_quad2_en                 );  
+   FPA_PRINTF(" chn_diversity_en               =  %d", (uint32_t)ptrA->chn_diversity_en             );  
+   FPA_PRINTF(" readout_pclk_cnt_max           =  %d", (uint32_t)ptrA->readout_pclk_cnt_max         );  
+   FPA_PRINTF(" line_period_pclk               =  %d", (uint32_t)ptrA->line_period_pclk             );  
+   FPA_PRINTF(" active_line_start_num          =  %d", (uint32_t)ptrA->active_line_start_num        );  
+   FPA_PRINTF(" active_line_end_num            =  %d", (uint32_t)ptrA->active_line_end_num          );  
+   FPA_PRINTF(" pix_samp_num_per_ch            =  %d", (uint32_t)ptrA->pix_samp_num_per_ch          );  
+   FPA_PRINTF(" sof_posf_pclk                  =  %d", (uint32_t)ptrA->sof_posf_pclk                );  
+   FPA_PRINTF(" eof_posf_pclk                  =  %d", (uint32_t)ptrA->eof_posf_pclk                );  
+   FPA_PRINTF(" sol_posl_pclk                  =  %d", (uint32_t)ptrA->sol_posl_pclk                );  
+   FPA_PRINTF(" eol_posl_pclk                  =  %d", (uint32_t)ptrA->eol_posl_pclk                );  
+   FPA_PRINTF(" eol_posl_pclk_p1               =  %d", (uint32_t)ptrA->eol_posl_pclk_p1             );  
+   FPA_PRINTF(" hgood_samp_sum_num             =  %d", (uint32_t)ptrA->hgood_samp_sum_num           );  
+   FPA_PRINTF(" hgood_samp_mean_numerator      =  %d", (uint32_t)ptrA->hgood_samp_mean_numerator    );  
+   FPA_PRINTF(" vgood_samp_sum_num             =  %d", (uint32_t)ptrA->vgood_samp_sum_num           );  
+   FPA_PRINTF(" vgood_samp_mean_numerator      =  %d", (uint32_t)ptrA->vgood_samp_mean_numerator    );  
+   FPA_PRINTF(" hgood_samp_first_pos_per_ch    =  %d", (uint32_t)ptrA->hgood_samp_first_pos_per_ch  );  
+   FPA_PRINTF(" hgood_samp_last_pos_per_ch     =  %d", (uint32_t)ptrA->hgood_samp_last_pos_per_ch   );  
+   FPA_PRINTF(" xsize_div_tapnum               =  %d", (uint32_t)ptrA->xsize_div_tapnum             );                 
+   FPA_PRINTF(" adc_clk_source_phase           =  %d", (uint32_t)ptrA->adc_clk_source_phase         );  
+   FPA_PRINTF(" adc_clk_pipe_sel               =  %d", (uint32_t)ptrA->adc_clk_pipe_sel             );  
+   FPA_PRINTF(" cfg_num                        =  %d", (uint32_t)ptrA->cfg_num                      );  
+   FPA_PRINTF(" fpa_stretch_acq_trig           =  %d", (uint32_t)ptrA->fpa_stretch_acq_trig         );  
+   FPA_PRINTF(" fpa_intf_data_source           =  %d", (uint32_t)ptrA->fpa_intf_data_source         ); 
+   
    
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
