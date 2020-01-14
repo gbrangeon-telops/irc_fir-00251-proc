@@ -883,12 +883,31 @@ IRC_Status_t Actualization_SM()
             ACT_PRINTF( "AcquisitionFrameRate = %d fps\n", (uint32_t) gcRegsData.AcquisitionFrameRate );
 
             // configurer le buffering pour deltaBetaNCoadd images
-            ACT_PRINTF( "MemoryBufferSequenceSizeMax = %d\n", BM_HW_GetLocalBufferSequenceSizeMax(&gcRegsData) );
 
-            //intBufSeqSize = gActualizationParams.numFrames;
-            intBufSeqSize = gActualizationParams.deltaBetaNCoadd + numExtraImages; // + 1 because the first image is offset most of the time
+            uint32_t nbImageMax = BM_HW_GetLocalBufferSequenceSizeMax(&gcRegsData);
+            ACT_PRINTF( "MemoryBufferSequenceSizeMax = %d\n", nbImageMax );
+
+            uint32_t nbImageM = 1;
+            uint32_t nbImageB = numExtraImages; // + 1 because the first image is offset most of the time
+
+            // Calculate total number of images
+            if (actSyncFW)
+               nbImageM = flashSettings.FWNumberOfFilters;
+
             if (gActDebugOptions.clearBufferAfterCompletion == 0)
-               intBufSeqSize += ACT_NUM_DEBUG_FRAMES;
+               nbImageB += ACT_NUM_DEBUG_FRAMES;
+
+            intBufSeqSize = (nbImageM * gActualizationParams.deltaBetaNCoadd) + nbImageB;
+
+            // Verify internal buffer is big enough
+            if (gcRegsData.MemoryBufferSequenceSize > nbImageMax)
+            {
+               // Re-calculate deltaBetaNCoadd and total number of images < nbImageMax
+               gActualizationParams.deltaBetaNCoadd = (nbImageMax - nbImageB) / nbImageM;    // Integer division
+               intBufSeqSize = (nbImageM * gActualizationParams.deltaBetaNCoadd) + nbImageB;
+
+               ACT_ERR("Not enough memory: NCoadd limited to %d", gActualizationParams.deltaBetaNCoadd);
+            }
 
             gcRegsData.MemoryBufferMOISource = MBMOIS_AcquisitionStarted;
             BufferManager_HW_SetMoiConfig(&gBufManager);
@@ -3650,9 +3669,15 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
       break;
 
    case ACT_CURRENT:
-      ACT_INF("Invalidating active image correction data");
       current = ACT_getActiveDeltaBeta();
-      current->valid = 0;
+      if (current != NULL)
+      {
+         current->valid = 0;
+         ACT_INF("Invalidating active image correction data");
+      }
+      else
+         ACT_ERR("Active image correction not found");
+
       break;
 
    default:

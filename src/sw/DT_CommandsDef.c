@@ -851,12 +851,12 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
             if (value == 0)
             {
                ACT_invalidateActualizations(ACT_CURRENT);
-               DT_PRINTF("all actualizations were invalidated");
+               DT_PRINTF("current actualization was invalidated");
             }
             else
             {
                ACT_invalidateActualizations(ACT_ALL);
-               DT_PRINTF("current actualization was invalidated");
+               DT_PRINTF("all actualizations were invalidated");
             }
 
             // reload the calibration to unapply the actualization
