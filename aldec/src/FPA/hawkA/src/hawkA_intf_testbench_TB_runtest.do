@@ -23,23 +23,24 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_define.
 acom d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd
 
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
---acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
-#acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\sfifo_w10_d256\sfifo_w10_d256_sim_netlist.vhdl 
-acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\sfifo_w10_d256\sfifo_w10_d256_sim_netlist.vhdl 
+acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream16_sfifo_d256\t_axi4_stream16_sfifo_d256_sim_netlist.vhdl
 
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d1024\fwft_sfifo_w3_d1024_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d1024\fwft_sfifo_w8_d1024_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d1024\fwft_sfifo_w3_d1024_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w8_d1024\fwft_sfifo_w8_d1024_sim_netlist.vhdl
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd
 
 
@@ -47,7 +48,7 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d3
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w71_d256\fwft_sfifo_w71_d256_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w71_d256\fwft_sfifo_w71_d256_sim_netlist.vhdl
 
 acom D:\Telops\FIR-00251-Proc\IP\160\hawkA_10MHz_mmcm\hawkA_10MHz_mmcm_sim_netlist.vhdl
 
@@ -99,6 +100,10 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawka_intf_testbench_pkg.v
 acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawkA_intf_testbench_TB.vhd
 
 asim -ses hawkA_intf_testbench_TB 
+
+
+wave UUT/U1/U5/U2/U1/* 
+--wave UUT/U1/U5/*
 
 -- wave UUT/U1/U2/* 
 
@@ -159,7 +164,9 @@ asim -ses hawkA_intf_testbench_TB
 --wave UUT/U1/U19/*
 wave UUT/U1/U5/U2/*
 wave UUT/U1/U5/U2/U5/*
-wave UUT/U1/U5/U2/U1/*
+#wave UUT/U1/U5/U2/U5/*
+#wave UUT/U1/U5/U2/U1/*
+--wave UUT/U1/U19/*
 wave UUT/U1/*
 
 run 200 ms

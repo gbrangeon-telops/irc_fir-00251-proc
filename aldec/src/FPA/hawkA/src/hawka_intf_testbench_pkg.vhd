@@ -79,16 +79,20 @@ package body hawkA_intf_testbench_pkg is
       variable adc_clk_pipe_sel                 : unsigned(31 downto 0); 
       variable cfg_num                          : unsigned(31 downto 0); 
       variable comn_fpa_stretch_acq_trig        : unsigned(31 downto 0); 
-      variable comn_fpa_intf_data_source        : unsigned(31 downto 0); 
+      variable comn_fpa_intf_data_source        : unsigned(31 downto 0);
+      variable cbit_pipe_dly                    : unsigned(31 downto 0);
       
-      variable y                                : unsigned(48*32-1 downto 0);
+      variable y                                : unsigned(49*32-1 downto 0);
       
    begin
       comn_fpa_diag_mode             :=  (others =>diag_mode);                                               
       comn_fpa_diag_type             :=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                :=  (others =>'1');                                               
-      comn_fpa_trig_ctrl_mode        :=  resize(unsigned(MODE_INT_END_TO_TRIG_START),32);          
-      comn_fpa_acq_trig_ctrl_dly     :=  to_unsigned(862000, comn_fpa_acq_trig_ctrl_dly'length);            
+      comn_fpa_trig_ctrl_mode        :=  resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
+      comn_fpa_acq_trig_ctrl_dly     :=  to_unsigned(862000, comn_fpa_acq_trig_ctrl_dly'length);
+      if send_id = 2 then
+         comn_fpa_acq_trig_ctrl_dly  :=  to_unsigned(15663, comn_fpa_acq_trig_ctrl_dly'length);   
+      end if;
       comn_fpa_spare                 :=  to_unsigned(100, comn_fpa_spare'length);        
       comn_fpa_xtra_trig_ctrl_dly    :=  to_unsigned(862000, comn_fpa_xtra_trig_ctrl_dly'length);         
       comn_fpa_trig_ctrl_timeout_dly :=  to_unsigned(862000, comn_fpa_trig_ctrl_timeout_dly'length);  
@@ -101,13 +105,13 @@ package body hawkA_intf_testbench_pkg is
       revert                         := (others => '0');
       cbit_en                        := (others => '0');
       dig_code                       := (others => '0');
-      jpos                           := to_unsigned(user_xsize/2, 32);  
-      kpos                           := to_unsigned(user_ysize/2, 32);  
-      lpos                           := to_unsigned(513, 32);  
-      mpos                           := to_unsigned(512, 32);  
+      jpos                           := to_unsigned(1257, 32);  
+      kpos                           := to_unsigned(1112, 32);  
+      lpos                           := to_unsigned(737, 32);  
+      mpos                           := to_unsigned(288, 32);  
       wdr_len                        := to_unsigned(1344, 32); 
-      full_window                    := (others => '0');
-      real_mode_active_pixel_dly     := to_unsigned(6, 32);
+      full_window                    := (others => '1');
+      real_mode_active_pixel_dly     := to_unsigned(3, 32);
       adc_quad2_en                   := (others => '0');
       chn_diversity_en               := (others => '0'); 
       
@@ -145,8 +149,10 @@ package body hawkA_intf_testbench_pkg is
       
       cfg_num                        := to_unsigned(send_id, 32);
       comn_fpa_stretch_acq_trig      := to_unsigned(0, 32); 
-      comn_fpa_intf_data_source      := to_unsigned(0, 32); 
-             
+      comn_fpa_intf_data_source      := to_unsigned(0, 32);
+      
+      cbit_pipe_dly                  := to_unsigned(3, 32);
+      
       
       -- cfg usager
       y :=  comn_fpa_diag_mode 
@@ -196,7 +202,8 @@ package body hawkA_intf_testbench_pkg is
       & adc_clk_pipe_sel                 
       & cfg_num                          
       & comn_fpa_stretch_acq_trig        
-      & comn_fpa_intf_data_source;        
+      & comn_fpa_intf_data_source
+      & cbit_pipe_dly;        
       
       return y;
    end to_intf_cfg;

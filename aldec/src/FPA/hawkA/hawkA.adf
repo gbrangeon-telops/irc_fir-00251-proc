@@ -26,7 +26,7 @@ REFRESH_FLOW=1
 FAMILY=Xilinx VIRTEX4
 IMPL_TOOL=
 SYNTH_TOOL=
-fileopenfolder=D:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src
+fileopenfolder=D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -76,17 +76,15 @@ Tests=1
 [file_out:/scorpiomwA_intf.bde]
 /..\compile\scorpiomwA_intf.vhd=-1
 
-[file_out:/..\..\..\..\..\src\FPA\hawkA\HDL\hawkA_prog_ctrler.bde]
-/..\compile\hawkA_prog_ctrler.vhd=-1
+[file_out:/hawka_hw_ctrl_tb.bde]
+/..\compile\hawka_hw_ctrl_tb.vhd=-1
 
-[file_out:/..\..\..\..\..\src\FPA\hawkA\HDL\hawkA_hw_driver.bde]
-/..\compile\hawkA_hw_driver.vhd=-1
+[file_out:/scorpiomwA_intf.bde]
+/..\compile\scorpiomwA_intf.vhd=-1
 
-[file_out:/..\..\..\..\..\src\FPA\hawkA\HDL\hawkA_intf.bde]
-/..\compile\hawkA_intf.vhd=-1
 
-[file_out:Tests/..\hawkA_intf_testbench.bde]
-Tests/..\..\compile\hawkA_intf_testbench.vhd=-1
+
+
 
 [Files]
 /..\..\..\..\..\src\FPA\hawkA\HDL\compil_hawkA.do=-1
@@ -114,6 +112,7 @@ Tests/..\..\compile\hawkA_intf_testbench.vhd=-1
 /..\..\..\..\..\src\FPA\hawkA\HDL\hawkA_spi_tx_check.vhd=-1
 /..\..\..\..\..\src\FPA\hawkA\HDL\proxy_define.vhd=-1
 /scorpiomwA_intf.bde=-1
+/..\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd=-1
 Tests/..\digio_dummy.vhd=-1
 Tests/..\flexV_dummy.vhd=-1
 Tests/..\fpa_temp_dummy.vhd=-1
@@ -123,31 +122,32 @@ Tests/..\hawkA_intf_testbench_TB_runtest.do=-1
 Tests/..\hawka_intf_testbench_pkg.vhd=-1
 
 [Files.Data]
-.\src\FPA\hawkA\HDL\compil_hawkA.do=Macro
-.\src\FPA\hawkA\HDL\FPA_define.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_detector_ctrler.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_diag_data_gen.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_dig_data_reg.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_dval_gen.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_mux_ctrl_reg.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_readout_ctrler.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_sync_flag_gen.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_windowing_ctrl_reg.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_windowing_data_reg.vhd=VHDL Source Code
-.\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=VHDL Source Code
-.\..\Common_HDL\Utilities\sync_reset.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\compil_hawkA.do=Macro
+.\..\..\..\..\src\FPA\hawkA\HDL\FPA_define.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_detector_ctrler.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_diag_data_gen.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_dig_data_reg.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_dval_gen.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_mux_ctrl_reg.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_readout_ctrler.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_sync_flag_gen.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_windowing_ctrl_reg.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_windowing_data_reg.vhd=VHDL Source Code
+.\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=VHDL Source Code
+.\..\..\..\..\..\Common_HDL\Utilities\sync_reset.vhd=VHDL Source Code
 .\src\hawka_hw_ctrl_tb.bde=Block Diagram
-.\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_mode_dval_gen.vhd=VHDL Source Code
-.\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hw_driver_ctrler.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_hw_driver.bde=Block Diagram
-.\src\FPA\hawkA\HDL\hawkA_intf.bde=Block Diagram
-.\src\FPA\hawkA\HDL\hawkA_prog_ctrler.bde=Block Diagram
-.\src\FPA\hawkA\HDL\hawkA_digio_map.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_mblaze_intf.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\hawkA_spi_tx_check.vhd=VHDL Source Code
-.\src\FPA\hawkA\HDL\proxy_define.vhd=VHDL Source Code
+.\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_mode_dval_gen.vhd=VHDL Source Code
+.\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hw_driver_ctrler.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_hw_driver.bde=Block Diagram
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_intf.bde=Block Diagram
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_prog_ctrler.bde=Block Diagram
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_digio_map.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_mblaze_intf.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\hawkA_spi_tx_check.vhd=VHDL Source Code
+.\..\..\..\..\src\FPA\hawkA\HDL\proxy_define.vhd=VHDL Source Code
 .\src\scorpiomwA_intf.bde=Block Diagram
+.\..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd=VHDL Source Code
 .\src\digio_dummy.vhd=VHDL Source Code
 .\src\flexV_dummy.vhd=VHDL Source Code
 .\src\fpa_temp_dummy.vhd=VHDL Source Code
@@ -159,16 +159,6 @@ Tests/..\hawka_intf_testbench_pkg.vhd=-1
 .\compile\hawkA_hw_driver.vhd=VHDL Source Code
 .\compile\hawkA_intf.vhd=VHDL Source Code
 .\compile\hawkA_intf_testbench.vhd=VHDL Source Code
-
-[file_out:/hawka_hw_ctrl_tb.bde]
-/..\compile\hawka_hw_ctrl_tb.vhd=-1
-
-
-
-
-[file_out:/scorpiomwA_intf.bde]
-/..\compile\scorpiomwA_intf.vhd=-1
-
 
 [file_out:/..\..\..\..\..\src\FPA\hawkA\HDL\hawkA_prog_ctrler.bde]
 /..\compile\hawkA_prog_ctrler.vhd=-1

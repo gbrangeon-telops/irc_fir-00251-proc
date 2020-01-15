@@ -166,7 +166,7 @@ architecture TB_ARCHITECTURE of hawkA_intf_testbench_tb is
    signal user_ysize3 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(48*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(49*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
@@ -253,14 +253,14 @@ begin
          -- cfg usager
          user_xsize1 <= 640;
          user_ysize1 <= 512;
-         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
+         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 640;
-         user_ysize2 <= 512;
+         user_xsize2 <= 64;
+         user_ysize2 <= 64;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          
-         user_xsize3 <= 64;
-         user_ysize3 <= 64;
+         user_xsize3 <= 320;
+         user_ysize3 <= 256;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
          
          -- dac       
@@ -326,7 +326,7 @@ begin
       end loop;
       
       
-      for ii in 0 to 48-1 loop 
+      for ii in 0 to 49-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -343,7 +343,7 @@ begin
       
       wait for 50 ms;
       
-      for ii in 0 to 48-1 loop 
+      for ii in 0 to 49-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -353,7 +353,7 @@ begin
       
       wait for 50 ms;
       
-      for ii in 0 to 48-1 loop 
+      for ii in 0 to 49-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;
          end_pos   := start_pos - 31;
