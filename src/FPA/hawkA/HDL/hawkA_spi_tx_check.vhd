@@ -23,7 +23,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all; 
 --library Common_HDL;
-use fpa_common_pkg.all;
+use work.fpa_common_pkg.all;
 use work.tel2000.all;
 
 entity hawkA_spi_tx_check is
