@@ -71,7 +71,7 @@
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-#define FPA_DATA_RESOLUTION            14
+#define FPA_DATA_RESOLUTION 14
 #define FPA_PIXEL_PITCH                16E-6F
 
 #define FPA_INVALID_TEMP               -32768   // cC
@@ -84,8 +84,8 @@
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
-{
-   uint32_t  SIZE;
+{					   
+   uint32_t  SIZE;                       
    uint32_t  ADD;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
@@ -133,17 +133,19 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  vgood_samp_mean_numerator;    
    uint32_t  hgood_samp_first_pos_per_ch;
    uint32_t  hgood_samp_last_pos_per_ch;
-   uint32_t  xsize_div_tapnum; 
+   uint32_t  xsize_div_tapnum;             
    
    uint32_t  adc_clk_source_phase;           
    uint32_t  adc_clk_pipe_sel;               
    uint32_t  cfg_num;                        
    uint32_t  fpa_stretch_acq_trig; // utilisé par le trig_precontroller.vhd 
    uint32_t  fpa_intf_data_source;
+   uint32_t  cbit_pipe_dly;
+   
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x0065, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x0065, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0}
 
 
 // statuts provenant du vhd

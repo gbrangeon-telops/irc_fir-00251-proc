@@ -25,6 +25,9 @@ entity hawkA_digio_map is
       
       PROG_EN       : in std_logic;    
       FPA_INT       : in std_logic;
+      READOUT_INFO  : in readout_info_type;
+      
+      FPA_INTF_CFG  : in fpa_intf_cfg_type;
       
       PROG_CSN      : in std_logic;  
       PROG_MCLK     : in std_logic;
@@ -53,7 +56,13 @@ entity hawkA_digio_map is
       FPA_DIGIO9    : out std_logic;
       FPA_DIGIO10   : out std_logic;
       FPA_DIGIO11   : in std_logic;
-      FPA_DIGIO12   : in std_logic
+      FPA_DIGIO12   : in std_logic;
+      
+      
+      DCR_OUT       : out std_logic_vector(7 downto 0);
+      MCR_OUT       : out std_logic_vector(7 downto 0); 
+      DDR_OUT       : out std_logic_vector(15 downto 0); 
+      BIT_OUT       : out std_logic_vector(15 downto 0) 
       );
 end hawkA_digio_map;
 
@@ -102,6 +111,14 @@ architecture rtl of hawkA_digio_map is
    signal prog_mclk_i      : std_logic;
    signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
    
+   signal sync_iob         : std_logic;
+   signal mclk_last        : std_logic;
+   signal bit_cnt          : unsigned(5 downto 0);
+   signal cbit_in_progress : std_logic;
+   signal cbit_rdy_last    : std_logic;
+   signal rst_line_pipe    : std_logic_vector(63 downto 0);
+   signal fpa_reg_out      : std_logic_vector(1 to 48);
+   
    attribute IOB : string;
    -- attribute dont_touch : string;
    
@@ -114,6 +131,7 @@ architecture rtl of hawkA_digio_map is
    attribute IOB of dac_csn_iob  : signal is "TRUE";
    attribute IOB of dac_sd_iob   : signal is "TRUE";
    attribute IOB of dac_sclk_iob : signal is "TRUE";
+   attribute IOB of sync_iob     : signal is "TRUE";
    
    -- attribute dont_touch of fpa_timer_cnt : signal is "TRUE";
    -- attribute dont_touch of dac_timer_cnt : signal is "TRUE"; 
@@ -188,7 +206,11 @@ begin
          -- contrôle DAC
          dac_csn_iob <= dac_csn_i;
          dac_sd_iob <= dac_sd_i;
-         dac_sclk_iob <= dac_sclk_i;         
+         dac_sclk_iob <= dac_sclk_i; 
+         
+         -- input SYNC
+         sync_iob <= FPA_DIGIO12;
+         
       end if;   
    end process;  
    
@@ -330,6 +352,55 @@ begin
             
          end if;  
       end if;
-   end process;  
+   end process;
+   
+   --------------------------------------------------
+   -- capture et decodage de SYNC
+   -------------------------------------------------- 
+   U3 : process(MCLK_SOURCE)
+   begin
+      if rising_edge(MCLK_SOURCE) then
+         if sreset = '1' then 
+            mclk_last <= mclk_i; 
+            bit_cnt <= (others => '0');
+            cbit_in_progress <= '0';            
+         else                                   
+            
+            -- pour detection front montant 
+            mclk_last <= mclk_i;
+            
+            -- reset_line pipe
+            rst_line_pipe(63 downto 0) <= rst_line_pipe(62 downto 0) & (READOUT_INFO.AOI.LVAL and not READOUT_INFO.AOI.DVAL);   -- laligne de reset est active lorsque LVAL est à '1' et que DVAL = '0' 
+            
+            -- registre de stockage
+            if  rst_line_pipe(to_integer(FPA_INTF_CFG.CBIT_PIPE_DLY)) = '1' then  
+               if  mclk_last = '1' and mclk_i = '0' and bit_cnt <= 48 then   -- les données se capturent sur le front descendant de mclk puisqu'elles sortent sur son front montant.
+                  fpa_reg_out(48) <= sync_iob;
+                  fpa_reg_out(1 to 47) <= fpa_reg_out(2 to 48);
+                  bit_cnt <=  bit_cnt + 1;
+                  cbit_in_progress <= '1';
+               end if;  
+            else
+               bit_cnt <= (others => '0'); 
+               cbit_in_progress <= '0';
+            end if;     
+            
+            -- decodage
+            if  unsigned(rst_line_pipe) = 0 then
+               for ii in 0 to 7 loop                                                          
+                  DCR_OUT(ii) <= fpa_reg_out(8-ii);                                                     -- DCR_OUT <= fpa_reg_out(1 to 8); 
+                  MCR_OUT(ii) <= fpa_reg_out(16-ii);                                                    -- MCR_OUT <= fpa_reg_out(9 to 16);
+               end loop;                                                                                 
+               for ii in 0 to 15 loop                                                                                                  
+                  DDR_OUT(ii) <= fpa_reg_out(32-ii);                                                   -- DDR_OUT <= fpa_reg_out(17 to 32); 
+                  BIT_OUT(ii) <= fpa_reg_out(48-ii);                                                   -- BIT_OUT <= fpa_reg_out(33 to 48); 
+               end loop;
+            end if;
+            
+         end if;         
+      end if;
+      
+      
+   end process;
    
 end rtl;

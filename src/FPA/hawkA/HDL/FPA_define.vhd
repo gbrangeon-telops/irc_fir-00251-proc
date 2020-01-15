@@ -284,6 +284,8 @@ package FPA_define is
       
       cfg_num                        : unsigned(7 downto 0);
       
+      cbit_pipe_dly                  : unsigned(3 downto 0);
+      
    end record; 
    
    -- Configuration par defaut

@@ -92,14 +92,15 @@ architecture rtl of hawkA_readout_ctrler is
    signal fpa_int_fdbk_i       : std_logic;
    signal fpa_int_i            : std_logic;
    
---   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
---   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
---   signal elec_ofs_end_i       : std_logic;
---   signal elec_ofs_start_i     : std_logic;
+   --   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
+   --   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
+   --   signal elec_ofs_end_i       : std_logic;
+   --   signal elec_ofs_start_i     : std_logic;
    signal readout_info_i       : readout_info_type;
    signal eof_pulse            : std_logic;
    signal eof_pulse_last       : std_logic;
---   signal elec_ofs_fval_i      : std_logic;
+   signal img_in_progress      : std_logic;
+   --   signal elec_ofs_fval_i      : std_logic;
    
 begin
    
@@ -110,7 +111,7 @@ begin
    ADC_SYNC_FLAG <= adc_sync_flag_i;    -- non utilisé  
    READOUT_INFO  <= readout_info_i;      
    FPA_FDEM <= fdem_i; 
-   READOUT_AOI_FVAL <= readout_info_i.aoi.fval;
+   READOUT_AOI_FVAL <= img_in_progress; -- readout_info_i.aoi.fval;
    
    --------------------------------------------------
    -- synchro reset 
@@ -155,6 +156,7 @@ begin
             fpa_int_last <= fpa_int_i;
             eof_pulse <= '0';
             eof_pulse_last <= '0';
+            img_in_progress <= '0'; 
             
          else           
             
@@ -169,7 +171,15 @@ begin
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
             
-            fpa_mclk_last <= FPA_MCLK;             
+            fpa_mclk_last <= FPA_MCLK;
+            
+            if fpa_int_last = '0' and fpa_int_i = '1' then 
+               img_in_progress <= '1';
+            elsif  rd_end_pipe(0) = '1' then
+               img_in_progress <= '0'; 
+            end if;
+            
+            
             
             -- contrôleur
             case sync_flag_fsm is           
@@ -200,7 +210,7 @@ begin
                when others =>
                
             end case;            
-                       
+            
             -- READOUT_INFO
             -- aoi
             readout_info_i.aoi.sof           <= sof_pipe(C_PIPE_POS); 

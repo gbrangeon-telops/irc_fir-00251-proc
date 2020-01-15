@@ -118,6 +118,7 @@ architecture RTL of hawkA_windowing_data_reg is
    signal m_pos_change        : std_logic;
    signal wdr_change          : std_logic; 
    signal tx_mosi_i           : t_ll_ext_mosi8;
+   signal tx_miso_i           : t_ll_ext_miso;
    signal sub_frame_sm_busy   : std_logic;
    signal tx_drem_i           : std_logic_vector(3 downto 0);
    
@@ -126,11 +127,10 @@ begin
    --------------------------------------------------
    -- Outputs map
    -------------------------------------------------- 
-   TX_MOSI  <= tx_mosi_i;   
-   fifo_tx_miso.busy <= TX_MISO.BUSY or sub_frame_sm_busy;
-   fifo_tx_miso.afull <= TX_MISO.AFULL; 
-   ERR <= err_i;
-   TX_DREM <= tx_drem_i;
+   TX_MOSI   <= tx_mosi_i;
+   tx_miso_i <= TX_MISO;
+   ERR       <= err_i;
+   TX_DREM   <= "1000"; -- la taille de WDR en mode full vaut 1344 et c'est un multiple de 8
    
    --------------------------------------------------
    -- Sync reset
@@ -340,8 +340,8 @@ begin
       CLK_RX     => CLK,
       FULL       => open,
       WR_ERR     => fifo_wr_err,
-      TX_LL_MOSI => fifo_tx_mosi,
-      TX_LL_MISO => fifo_tx_miso,
+      TX_LL_MOSI => tx_mosi_i,
+      TX_LL_MISO => tx_miso_i,
       CLK_TX     => CLK,
       EMPTY      => FIFO_EMPTY,
       ARESET     => ARESET ); 
@@ -352,55 +352,55 @@ begin
    --------------------------------------------------   
    --  ENO 12 nov 2011: Suite à la nouvelle doc de Selex, en sous-fenetrage, WDR a une taille de 1344 bits + 7 bits NULL (voir page 61 du manuel)
    -- 
-   U5: process(CLK)
-   begin
-      if rising_edge(CLK) then
-         if sreset = '1' then
-            tx_mosi_i.support_busy <= '1'; 
-            tx_mosi_i.dval <= '0';
-            sub_frame_sm <= idle; 
-            sub_frame_sm_busy <= '1';
-         else                           
-            
-            if  TX_MISO.BUSY = '0' then 
-               
-               case sub_frame_sm is
-                  
-                  when idle =>
-                     sub_frame_sm_busy <= '0';
-                     tx_drem_i <= "1000"; -- la taille de WDR en mode full vaut 1344 et c'est un multiple de 8                
-                     --if USER_CFG.FPA_FULL_WINDOW = '1' or USER_CFG.FPA_WDR_IGNORE_NULL = '1' then 
-                     tx_mosi_i <= fifo_tx_mosi;                        
-                     --else
-                     --   tx_mosi_i <= fifo_tx_mosi;
-                     --   tx_mosi_i.eof <= '0';   -- eof est ainsi elimniné  
-                     --   if fifo_tx_mosi.eof = '1' and fifo_tx_mosi.dval = '1' then
-                     --      sub_frame_sm <= null_st; 
-                     --      sub_frame_sm_busy <= '1';
-                     --   end if;
-                     --end if;     
-                  
-                  when null_st =>
-                     tx_mosi_i.eof <= '1'; 
-                     tx_mosi_i.dval <= '1'; 
-                     tx_mosi_i.data <= (others => '0');
-                     sub_frame_sm <= done_st;
-                     tx_drem_i <= "0111"; -- envoi des 7 NULL selon le manuel 
-                  
-                  when done_st =>
-                     tx_mosi_i.eof <= '0'; 
-                     tx_mosi_i.dval <= '0'; 
-                     sub_frame_sm <= idle;                      
-                  
-                  when others =>
-                  
-               end case;
-               
-            end if;              
-         end if;                        
-      end if;
-      
-   end process;
+--   U5: process(CLK)
+--   begin
+--      if rising_edge(CLK) then
+--         if sreset = '1' then
+--            tx_mosi_i.support_busy <= '1'; 
+--            tx_mosi_i.dval <= '0';
+--            sub_frame_sm <= idle; 
+--            sub_frame_sm_busy <= '1';
+--         else                           
+--            
+--            if  TX_MISO.BUSY = '0' then 
+--               
+--               case sub_frame_sm is
+--                  
+--                  when idle =>
+--                     sub_frame_sm_busy <= '0';
+--                     tx_drem_i <= "1000"; -- la taille de WDR en mode full vaut 1344 et c'est un multiple de 8                
+--                     --if USER_CFG.FPA_FULL_WINDOW = '1' or USER_CFG.FPA_WDR_IGNORE_NULL = '1' then 
+--                     tx_mosi_i <= fifo_tx_mosi;                        
+--                     --else
+--                     --   tx_mosi_i <= fifo_tx_mosi;
+--                     --   tx_mosi_i.eof <= '0';   -- eof est ainsi elimniné  
+--                     --   if fifo_tx_mosi.eof = '1' and fifo_tx_mosi.dval = '1' then
+--                     --      sub_frame_sm <= null_st; 
+--                     --      sub_frame_sm_busy <= '1';
+--                     --   end if;
+--                     --end if;     
+--                  
+--                  when null_st =>
+--                     tx_mosi_i.eof <= '1'; 
+--                     tx_mosi_i.dval <= '1'; 
+--                     tx_mosi_i.data <= (others => '0');
+--                     sub_frame_sm <= done_st;
+--                     tx_drem_i <= "0111"; -- envoi des 7 NULL selon le manuel 
+--                  
+--                  when done_st =>
+--                     tx_mosi_i.eof <= '0'; 
+--                     tx_mosi_i.dval <= '0'; 
+--                     sub_frame_sm <= idle;                      
+--                  
+--                  when others =>
+--                  
+--               end case;
+--               
+--            end if;              
+--         end if;                        
+--      end if;
+--      
+--   end process;
    
    
    

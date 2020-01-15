@@ -164,8 +164,7 @@ begin
    RQST <= rqst_i; 
    DONE <= done_i;
    
-   
-   
+    
    --------------------------------------------------
    -- Sync reset
    -------------------------------------------------- 
@@ -215,7 +214,7 @@ begin
             present_cfg_num <= not new_cfg_num;
          else                   
             -- demande de programmtion en provenance des registres
-            reg_rqst <= MCR_MOSI.DVAL or WCR_MOSI.DVAL or DDR_MOSI.DVAL or not WDR_FIFO_EMPTY; 
+            reg_rqst <= MCR_MOSI.DVAL or WCR_MOSI.DVAL or DDR_MOSI.DVAL or WDR_MOSI.DVAL; 
             
             -- pour detecter la remontée de SPI_DONE
             spi_done_last <= SPI_DONE;
@@ -254,11 +253,12 @@ begin
                         dcr_mosi_i.data <= x"80";     -- registre DDR à programmer (voir manuel)
                         reg_en_latch <= DDR; 
                         dcr_fsm <= first_dcr_wr;
-                     elsif WDR_FIFO_EMPTY = '0' and WDR_ERR = '0' then 
+                     elsif WDR_MOSI.DVAL = '1' and WDR_ERR = '0' then 
                         dcr_mosi_i.data <= x"20";     -- registre WDR à programmer (voir manuel)                         
                         reg_en_latch <= WDR;
                         dcr_fsm <= first_dcr_wr;
                      else                                -- aucun registre à programmer.  new_cfg_num_pending est à '1'
+                        reg_en_latch <= NONE;
                         dcr_fsm <= second_tnh_dly;      -- il faut feindre programmer un registre et on retourne à idle. Cela permet de faire de la correction electronique en mode evenementiel par exemple.
                      end if;
                      dcr_mosi_i.data(3) <= not USER_CFG.FULL_WINDOW;
