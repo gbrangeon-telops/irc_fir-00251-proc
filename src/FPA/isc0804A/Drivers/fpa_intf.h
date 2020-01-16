@@ -282,7 +282,11 @@ struct s_FpaStatus    //
    uint32_t  fpa_readout_cnt; 
    uint32_t  acq_readout_cnt; 
    uint32_t  out_pix_cnt_min; 
-   uint32_t  out_pix_cnt_max; 
+   uint32_t  out_pix_cnt_max;
+   uint32_t  trig_to_int_delay_min;
+   uint32_t  trig_to_int_delay_max;
+   uint32_t  int_to_int_delay_min;
+   uint32_t  int_to_int_delay_max;
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  

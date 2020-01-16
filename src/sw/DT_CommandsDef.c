@@ -564,12 +564,16 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA ElCorr Meas At Reference1 = %d", gFpaElCorrMeasAtReference1);
    DT_PRINTF("FPA ElCorr Meas At Reference2 = %d", gFpaElCorrMeasAtReference2);
    
-   DT_PRINTF("fpa.acq_trig_cnt     = %d", status.acq_trig_cnt);   
+   DT_PRINTF("fpa.acq_trig_cnt     = %d", status.acq_trig_cnt);
    DT_PRINTF("fpa.acq_int_cnt      = %d", status.acq_int_cnt);
    DT_PRINTF("fpa.acq_readout_cnt  = %d", status.acq_readout_cnt);
-   DT_PRINTF("fpa.fpa_readout_cnt  = %d", status.fpa_readout_cnt);     
-   DT_PRINTF("fpa.out_pix_cnt_min  = %d", status.out_pix_cnt_min);   
-   DT_PRINTF("fpa.out_pix_cnt_max  = %d", status.out_pix_cnt_max);   
+   DT_PRINTF("fpa.fpa_readout_cnt  = %d", status.fpa_readout_cnt);
+   DT_PRINTF("fpa.out_pix_cnt_min  = %d", status.out_pix_cnt_min);
+   DT_PRINTF("fpa.out_pix_cnt_max  = %d", status.out_pix_cnt_max);
+   DT_PRINTF("fpa.trig_to_int_delay_min = %d", status.trig_to_int_delay_min);
+   DT_PRINTF("fpa.trig_to_int_delay_max = %d", status.trig_to_int_delay_max);
+   DT_PRINTF("fpa.int_to_int_delay_min  = %d", status.int_to_int_delay_min);
+   DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
 
    return IRC_SUCCESS;
 }
