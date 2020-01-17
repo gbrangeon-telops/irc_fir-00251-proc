@@ -24,7 +24,7 @@ use work.Proxy_define.all;
 entity fpa_trig_precontroller is
    port(
       ARESET           : in std_logic;
-      CLK_100M         : in std_logic;
+      CLK              : in std_logic;
       
       -- configuration
       FPA_INTF_CFG      : in fpa_intf_cfg_type;
@@ -57,6 +57,18 @@ architecture RTL of fpa_trig_precontroller is
          );
    end component;
    
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
    component gh_stretch 
       generic (stretch_count: integer := 3072);
       port(
@@ -70,11 +82,14 @@ architecture RTL of fpa_trig_precontroller is
    type trig_prectrl_sm_type is (idle, init_st, wait_xtra_img_st, prim_xtra_st, second_xtra_st);
    signal trig_prectrl_sm              : trig_prectrl_sm_type;
    signal sreset                       : std_logic;
+   signal acq_trig_in_i                : std_logic; 
+   signal xtra_trig_in_i               : std_logic;
    signal acq_trig_temp                : std_logic;
    signal acq_trig_stretch             : std_logic;
    signal acq_trig_o                   : std_logic;
    signal xtra_trig_o                  : std_logic;
    signal done                         : std_logic;
+   signal fpa_readout_i                : std_logic;
    signal fpa_readout_last             : std_logic;
    signal xtra_img_cnt                 : unsigned(7 downto 0);
    signal acq_trig_last                : std_logic;
@@ -98,29 +113,53 @@ begin
    U0 : gh_stretch 
    generic map (stretch_count => 3072)   -- sur demande de MDA, acq_trig étiré de 30 usec pour supporter instabilité de la roue à filtres en mode synchrone uniquement et ce, pour les SCD 
    port map(
-      CLK  => CLK_100M,
+      CLK  => CLK,
       rst  => sreset,
       D    => acq_trig_temp,
       Q    => acq_trig_stretch
       );
    
    --------------------------------------------------
-   -- synchro reset 
+   -- synchro 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1A : sync_reset
    port map(
       ARESET => ARESET,
-      CLK    => CLK_100M,
+      CLK    => CLK,
       SRESET => sreset
-      ); 
+      );
+   
+   U1B : double_sync
+   port map(
+      CLK => CLK,
+      D   => FPA_READOUT,
+      Q   => fpa_readout_i,
+      RESET => sreset
+      );
+   
+   U1C : double_sync
+   port map(
+      CLK => CLK,
+      D   => ACQ_TRIG_IN,
+      Q   => acq_trig_in_i,
+      RESET => sreset
+      );
+   
+   U1D : double_sync
+   port map(
+      CLK => CLK,
+      D   => XTRA_TRIG_IN,
+      Q   => xtra_trig_in_i,
+      RESET => sreset
+      );
    
    --------------------------------------------------
    -- fsm de contrôle/filtrage des trigs 
    -------------------------------------------------- 
    -- et de suivi du mode d'integration
-   U2: process(CLK_100M)
+   U2: process(CLK)
    begin
-      if rising_edge(CLK_100M) then 
+      if rising_edge(CLK) then 
          if sreset = '1' then 
             acq_trig_o <= '0';
             xtra_trig_o <= '0';
@@ -141,23 +180,23 @@ begin
             
             
             -- pour detection front de FPA_readout
-            fpa_readout_last <= FPA_READOUT;
+            fpa_readout_last <= fpa_readout_i;
             
             -- séquenceur
             case trig_prectrl_sm is 
                
                -- etat init_st : oin envoie les trigs tels qu,on les reçoit et on attend que l'idDCA soit fonctionnel.
                when init_st =>
-                  acq_trig_temp <= ACQ_TRIG_IN;
-                  xtra_trig_o <= XTRA_TRIG_IN;
-                  if FPA_READOUT = '1' and FPA_INTF_CFG.COMN.FPA_DIAG_MODE = '0' and PRIM_XTRA_TRIG_ACTIVE = '0' then -- donc l'IDDCA est actif et on veut se synchroniser sur le prochain PRIM_XTRA_TRIG_ACTIVE = '1'
+                  acq_trig_temp <= acq_trig_in_i;
+                  xtra_trig_o <= xtra_trig_in_i;
+                  if fpa_readout_i = '1' and FPA_INTF_CFG.COMN.FPA_DIAG_MODE = '0' and PRIM_XTRA_TRIG_ACTIVE = '0' then -- donc l'IDDCA est actif et on veut se synchroniser sur le prochain PRIM_XTRA_TRIG_ACTIVE = '1'
                      trig_prectrl_sm <= idle;
                   end if;                   
                   
                -- etat idle
                when idle => 
-                  acq_trig_temp <= ACQ_TRIG_IN;
-                  xtra_trig_o <= XTRA_TRIG_IN;
+                  acq_trig_temp <= acq_trig_in_i;
+                  xtra_trig_o <= xtra_trig_in_i;
                   done <= '1'; 
                   xtra_img_cnt <= (others => '0');
                   if PRIM_XTRA_TRIG_ACTIVE = '1' then
@@ -170,18 +209,18 @@ begin
                when prim_xtra_st => 
                   xtra_trig_o <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
                   acq_trig_temp <= '0';
-                  if fpa_readout_last = '1' and  FPA_READOUT = '0' then --! fin du readout.
+                  if fpa_readout_last = '1' and  fpa_readout_i = '0' then --! fin du readout.
                      trig_prectrl_sm <= wait_xtra_img_st;
                   end if;
                
                when wait_xtra_img_st =>  -- je m'assure qu'au moins une image est passée en xtraTrig puis j'attends PRIM_XTRA_TRIG_ACTIVE = '0'              
-                  if PRIM_XTRA_TRIG_ACTIVE = '0' and (fpa_readout_last = '1' and  FPA_READOUT = '0') then 
+                  if PRIM_XTRA_TRIG_ACTIVE = '0' and (fpa_readout_last = '1' and  fpa_readout_i = '0') then 
                      trig_prectrl_sm <= second_xtra_st;                        
                   end if;                     
                   
                -- second_xtra_st.
                when second_xtra_st => 
-                  if fpa_readout_last = '1' and  FPA_READOUT = '0' then --! fin du readout.
+                  if fpa_readout_last = '1' and  fpa_readout_i = '0' then --! fin du readout.
                      xtra_img_cnt <= xtra_img_cnt + 1;
                   end if;
                   if xtra_img_cnt >= FPA_XTRA_IMAGE_NUM_TO_SKIP then
