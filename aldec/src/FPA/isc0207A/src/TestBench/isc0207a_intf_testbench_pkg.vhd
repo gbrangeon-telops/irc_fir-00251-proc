@@ -150,9 +150,9 @@ package body isc0207a_intf_testbench_pkg is
       comn_fpa_stretch_acq_trig     := (others =>'0');       
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
       diag_xsize_div_tapnum         := to_unsigned(user_xsize/TAP_NUM, 32);
-
+      
       roic_xsize                 := to_unsigned(user_xsize, 32);
-
+      
       if roic_ysize > 2 then 
          roic_ysize_div2_m1            := to_unsigned(to_integer(roic_ysize/2) - 1, 32);
       end if;
@@ -163,7 +163,7 @@ package body isc0207a_intf_testbench_pkg is
       internal_outr                 := (others => '0');
       --ref_chn_en                    := (others => '0');
       --itr                           := (others => '0');            
-      real_mode_active_pixel_dly    := to_unsigned(0, 32);   
+      real_mode_active_pixel_dly    := to_unsigned(13, 32);   
       speedup_lsydel                := (others =>'0');
       speedup_lsync                 := (others =>'0');            
       speedup_sample_row            := (others =>'0');         
@@ -196,8 +196,13 @@ package body isc0207a_intf_testbench_pkg is
       good_samp_first_pos_per_ch    := pix_samp_num_per_ch;
       good_samp_last_pos_per_ch     := pix_samp_num_per_ch; 
       
-      adc_clk_source_phase           := to_unsigned(100, 32);
-      adc_clk_pipe_sel               := to_unsigned(1, 32);
+      adc_clk_source_phase          := to_unsigned(200, 32);
+      adc_clk_pipe_sel              := to_unsigned(3, 32);
+      if send_id = 3 then 
+         adc_clk_source_phase       := to_unsigned(300, 32);
+         adc_clk_pipe_sel           := to_unsigned(4, 32);  
+      end if;
+      
       spare1                         := to_unsigned(1, 32);
       
       lsydel_mclk                   := to_unsigned(2,32);

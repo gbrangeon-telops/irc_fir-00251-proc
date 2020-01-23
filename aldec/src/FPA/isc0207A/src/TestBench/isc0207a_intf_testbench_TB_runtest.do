@@ -184,19 +184,21 @@ asim -ses isc0207a_intf_testbench_TB
 #wave UUT/U1/U5/U5/U2/*
 #wave UUT/U1/U5/U5/U1/*
 #wave UUT/U1/U5/U5/U2/*
-wave UUT/U1/U5/U5/*
+--wave UUT/U1/U5/U5/*
 #wave UUT/U1/U5/U2/U1/*
 
-#wave UUT/U1/U26/U1/*
-wave UUT/U1/U5/U21/*
+wave UUT/U1/U26/U1/*
+wave UUT/U1/U26/U2/*
 
+--wave UUT/U1/U5/U21/*
+wave UUT/U1/U5/*
 
 --wave UUT/U1/U9/ID_A/U1/U23/* 
 --wave UUT/U1/U9/ID_A/U5/*
 --wave UUT/U1/U9/ID_A/U23/*
 
 --wave UUT/U1/U9/ID_A/U1/U1/*
-wave UUT/U1/U9/ID_A/U1/U1/*
+--wave UUT/U1/U9/ID_A/U1/U1/*
 
 #wave UUT/U1/U9/U18/* 
 #wave UUT/U1/U5/U4/* 
@@ -206,4 +208,4 @@ wave UUT/U1/*
 --wave UUT/U25/*
 
 --run 20 us
-run 50 ms
+run 25 ms
