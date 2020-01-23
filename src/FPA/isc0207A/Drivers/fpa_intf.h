@@ -76,6 +76,8 @@
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR) 
 
+#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
 {
