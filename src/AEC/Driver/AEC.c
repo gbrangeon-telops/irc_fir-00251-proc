@@ -269,7 +269,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    gAEC_Data_Ready = false;
 
    // Start wait time for AEC
-   if (AECArmed && (AECPlusArmedDelay.enabled == false))
+   if (GC_AECPlusIsActive && AECArmed && (AECPlusArmedDelay.enabled == false))
    {
       StartTimer(&AECPlusArmedDelay, ((uint32_t)gcRegsData.AECResponseTime) * 5);
    }
@@ -277,18 +277,27 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    AEC_Int_FWPosition = AXI4L_read32(AEC_BASE_ADDR + AEC_FWPOSITION_OFFSET);
 
    if (AEC_Int_FWPosition != FWPOSITION_IN_TRANSITION) {
+
+      // Read Data
+      AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
+      AEC_Int_lowerbinId         = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERBINID_OFFSET);
+      AEC_Int_lowercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERCUMSUM_OFFSET);
+      AEC_Int_uppercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_UPPERCUMSUM_OFFSET);
+      AEC_Int_errors             = (bool) AXI4L_read32(AEC_BASE_ADDR + AEC_CUMSUM_ERR_OFFSET);
+      AEC_Int_imagefraction_fbck = AXI4L_read32(AEC_BASE_ADDR + AEC_IMAGEFRACTION_FBCK_OFFSET);
+      AEC_Int_timeStamp          = AXI4L_read32(AEC_BASE_ADDR + AEC_TIMESTAMP_OFFSET);
+
+      //Clear MEM
+      AEC_ClearMem(pAEC_CTRL);
+
       if ((AEC_Int_FWPosition == FWPOSITION_NOT_IMPLEMENTED) || (pGCRegs->FWMode == FWM_Fixed))
       {
          AEC_Int_FWPosition = 0;    // on utilise l'index 0 lorsque sans roue a filtre
       }
 
-      // Read AEC_Int_timeStamp
-      AEC_Int_timeStamp          = AXI4L_read32(AEC_BASE_ADDR + AEC_TIMESTAMP_OFFSET);
-
       if (AEC_TimeStamps_d1[AEC_Int_FWPosition] == 0) // Condition where filter was changed but haven't reached setpoint in AEC+
       {
          AEC_TimeStamps_d1[AEC_Int_FWPosition] = AEC_Int_timeStamp;
-         AEC_ClearMem(pAEC_CTRL);
          AEC_PRINTF("AEC_TimeStamps_d1[AEC_Int_FWPosition] == 0\n");
          return;
       }
@@ -303,28 +312,22 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
          }
 
          AEC_TimeStamps_d1[AEC_Int_FWPosition] = AEC_Int_timeStamp;
-         AEC_ClearMem(pAEC_CTRL);
          AEC_PRINTF("AECPlus_ExpTime != 0\n");
          return;
       }
 
-      // Read Data
-      AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
-      AEC_Int_lowerbinId         = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERBINID_OFFSET);
-      AEC_Int_lowercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERCUMSUM_OFFSET);
-      AEC_Int_uppercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_UPPERCUMSUM_OFFSET);
-      AEC_Int_errors             = (bool) AXI4L_read32(AEC_BASE_ADDR + AEC_CUMSUM_ERR_OFFSET);
-      AEC_Int_imagefraction_fbck = AXI4L_read32(AEC_BASE_ADDR + AEC_IMAGEFRACTION_FBCK_OFFSET);
-
-      AECP_Int_Data_Valid = AXI4L_read32(AEC_BASE_ADDR + AECP_DATAVALID_OFFSET);
-      if(AECP_Int_Data_Valid)
+      if (GC_AECPlusIsActive)
       {
-         // Read Data
-         AECP_Int_Sum_Cnts       = AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_MSB_OFFSET);
-         AECP_Int_Sum_Cnts       = (AECP_Int_Sum_Cnts << 32);
-         AECP_Int_Sum_Cnts       |= AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_LSB_OFFSET);
-         AECP_Int_SumExpTime     = ((float)AXI4L_read32(AEC_BASE_ADDR + AECP_EXPTIME_OFFSET) / 100);
-         AECP_Int_NbPixels       = AXI4L_read32(AEC_BASE_ADDR + AECP_NBPIXELS_OFFSET);
+         AECP_Int_Data_Valid = AXI4L_read32(AEC_BASE_ADDR + AECP_DATAVALID_OFFSET);
+         if(AECP_Int_Data_Valid)
+         {
+           // Read Data
+           AECP_Int_Sum_Cnts       = AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_MSB_OFFSET);
+           AECP_Int_Sum_Cnts       = (AECP_Int_Sum_Cnts << 32);
+           AECP_Int_Sum_Cnts       |= AXI4L_read32(AEC_BASE_ADDR + AECP_SUMCNT_LSB_OFFSET);
+           AECP_Int_SumExpTime     = ((float)AXI4L_read32(AEC_BASE_ADDR + AECP_EXPTIME_OFFSET) / 100);
+           AECP_Int_NbPixels       = AXI4L_read32(AEC_BASE_ADDR + AECP_NBPIXELS_OFFSET);
+         }
       }
 
       if(calibrationInfo.isValid == false)
@@ -422,8 +425,6 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       }
    }
 
-   //Clear MEM
-   AEC_ClearMem(pAEC_CTRL);
 
 #ifdef AEC_ENABLE_PROFILER
    updateStats(&aec_stats, elapsed_time_us(profiler));
@@ -434,61 +435,65 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    // AEC+ Calculus
    //********************
 
-   // Check if we are in the mode AECPlusContinuous, if AEC+ data is valid or if filter command have already been sent
-   if(((pGCRegs->ExposureAuto != EA_ContinuousNDFilter) && (pGCRegs->ExposureAuto != EA_ArmedNDFilter)) || (!AECP_Int_Data_Valid) || (AECPlus_ExpTime != 0) || (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height)))
+   if (GC_AECPlusIsActive)
    {
-      //Apply Exposure time
-      //GC_SetExposureTime(PET); // deja appliqué
+	   // Check if we are in the mode AECPlusContinuous, if AEC+ data is valid or if filter command have already been sent
+	   if((!AECP_Int_Data_Valid) || (AECPlus_ExpTime != 0) || (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height)))
+	   {
+	      //Apply Exposure time
+	      //GC_SetExposureTime(PET); // deja appliqué
 
-      if (TimedOut(&AECPlusDataPrintf))
-      {
-         if (!AECP_Int_Data_Valid)
-            AEC_PRINTF("!AECP_Int_Data_Valid\n");
+	      if (TimedOut(&AECPlusDataPrintf))
+	      {
+	         if (!AECP_Int_Data_Valid)
+	            AEC_PRINTF("!AECP_Int_Data_Valid\n");
 
-         if (AECPlus_ExpTime != 0)
-            AEC_PRINTF("AECPlus_ExpTime != 0\n");
+	         if (AECPlus_ExpTime != 0)
+	            AEC_PRINTF("AECPlus_ExpTime != 0\n");
 
-         if (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height))
-            AEC_PRINTF("AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height\n");
+	         if (AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height))
+	            AEC_PRINTF("AECP_Int_NbPixels != (pGCRegs->Width * pGCRegs->Height\n");
 
-         StartTimer(&AECPlusDataPrintf, 1000);
-      }
-      done = true;
-   }
+	         StartTimer(&AECPlusDataPrintf, 1000);
+	      }
+	      done = true;
+	   }
 
-   if (!done && AECArmed && !TimedOut(&AECPlusArmedDelay))
-   {
-      AEC_PRINTF("!TimedOut(&AECPlusArmedDelay\n");
-      done = true;
-   }
+	   if (!done && AECArmed && !TimedOut(&AECPlusArmedDelay))
+	   {
+	      AEC_PRINTF("!TimedOut(&AECPlusArmedDelay\n");
+	      done = true;
+	   }
 
-   // Check if we have a NDF higher than the current filter
-   if (!done && pGCRegs->NDFilterPositionSetpoint < MaxNDFPosition)
-   {
-      // if we changed the ND filter, no need to check for other option.
-      if (AECPlusCheckForAttenuation(pGCRegs, PET))
-      {
-         AECPlusChangeFilter(pGCRegs, true);
-         done = true;
-      }
-   }
+	   // Check if we have a NDF higher than the current filter
+	   if (!done && pGCRegs->NDFilterPositionSetpoint < MaxNDFPosition)
+	   {
+	      // if we changed the ND filter, no need to check for other option.
+	      if (AECPlusCheckForAttenuation(pGCRegs, PET))
+	      {
+	         AECPlusChangeFilter(pGCRegs, true);
+	         done = true;
+	      }
+	   }
 
-   //Check if we have a NDF lower than the current filter
-   if (!done && pGCRegs->NDFilterPositionSetpoint > MinNDFPosition)
-   {
-      if(AECPlusCheckForUnattenuation(pGCRegs, PET))
-      {
-         AECPlusChangeFilter(pGCRegs, false);
-         done = true;
-      }
-   }
+	   //Check if we have a NDF lower than the current filter
+	   if (!done && pGCRegs->NDFilterPositionSetpoint > MinNDFPosition)
+	   {
+	      if(AECPlusCheckForUnattenuation(pGCRegs, PET))
+	      {
+	         AECPlusChangeFilter(pGCRegs, false);
+	         done = true;
+	      }
+	   }
 
-   if (!done && AECArmed) // quand on atteint ce point, le mode ARM est triggé et l'AEC+ peut commencer à suivre la scène
-   {
-      AEC_PRINTF("AECArmed = false\n");
-      // Apply new ExposureAuto mode
-      GC_SetExposureAuto(EA_ContinuousNDFilter);
-      AECArmed = false;
+	   if (!done && AECArmed) // quand on atteint ce point, le mode ARM est triggé et l'AEC+ peut commencer à suivre la scène
+	   {
+	      AEC_PRINTF("AECArmed = false\n");
+	      // Apply new ExposureAuto mode
+	      GC_SetExposureAuto(EA_ContinuousNDFilter);
+	      AECArmed = false;
+	   }
+
    }
 
 #ifdef AEC_ENABLE_PROFILER
