@@ -850,10 +850,10 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->tri_window_part_usec = ptrH->fsync_high_min_usec - ptrH->delay_usec - ptrH->readout_usec;
    
    // T_ri window part couplé au mode ITR ou IWR
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // ITR
+   // if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // ITR
       ptrH->tri_window_and_intmode_part_usec = MAX(ptrH->tri_window_part_usec, ptrH->itr_tri_min_usec);  // seulement ITR supporté pour le moment
-   else                                                  // IWR
-      ptrH->tri_window_and_intmode_part_usec = ptrH->tri_window_part_usec;
+   // else                                                  // IWR
+   //   ptrH->tri_window_and_intmode_part_usec = ptrH->tri_window_part_usec;
    
    // T_ri
    ptrH->tri_min_usec = MAX(ptrH->tri_int_part_usec , ptrH->tri_window_and_intmode_part_usec); 
