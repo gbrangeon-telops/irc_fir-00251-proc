@@ -142,10 +142,10 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  adc_clk_pipe_sync_pos;
 
    uint32_t  readout_plus_delay;                                                                                                                        
-   uint32_t  tri_window_and_intmode_part;                                                                                                               
-   uint32_t  int_time_offset;                                                                                                                           
-   uint32_t  tsh_min;                                                                                                                                   
-   uint32_t  tsh_min_minus_int_time_offset;  // attention en IWR ce chiffre peut etre negatif, mais jamais en ITR et puisque je ne supporte que ITR.... 
+   uint32_t  spare2;                                                                                                               
+   int32_t   int_time_offset_mclk;                                                                                                                           
+   int32_t   tri_min_window_part;
+   int32_t   tsh_min_minus_int_time_offset;  // attention en IWR ce chiffre peut etre negatif
    uint32_t  elcorr_enabled;                       
    uint32_t  elcorr_spare1;        
    uint32_t  elcorr_spare2;                                       
@@ -174,7 +174,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  cfg_num;                         
    uint32_t  elcorr_spare4;           
    uint32_t  roic_cst_output_mode;
-   int32_t   additional_fpa_int_time_offset;// additional offset coming from flash settings
+   int32_t   spare3;// additional offset coming from flash settings
    uint32_t  fpa_intf_data_source;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;

@@ -103,12 +103,12 @@ architecture rtl of isc0207A_3k_mblaze_intf is
    signal user_cfg_rdy_pipe            : std_logic_vector(7 downto 0) := (others => '0');
    signal user_cfg_rdy                 : std_logic := '0';
    signal tri_min                      : integer;
-   signal tri_int_part                 : integer;
+   signal tri_min_int_part             : integer;
    signal exp_time_reg                 : unsigned(30 downto 0);
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
    signal dac_cfg_in_progress          : std_logic;
-   signal abs_additional_int_time_offset_i : integer;
+   signal abs_int_time_offset_mclk_i   : integer := 0;
    --   
    --   -- attribute dont_touch                         : string;
    --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -116,7 +116,7 @@ architecture rtl of isc0207A_3k_mblaze_intf is
    --   -- attribute dont_touch of user_cfg_in_progress : signal is "true";
    --   -- attribute dont_touch of fpa_intf_cfg_i       : signal is "true";
    --   -- attribute dont_touch of tri_min              : signal is "true";
-   --   -- attribute dont_touch of tri_int_part         : signal is "true";
+   --   -- attribute dont_touch of tri_min_int_part         : signal is "true";
    --   -- attribute dont_touch of exp_time_reg         : signal is "true";
    
 begin   
@@ -198,7 +198,7 @@ begin
             user_cfg_i.adc_quad2_en  <= '1';     -- provient pas du µBlaze
             user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
             mb_ctrled_reset_i <= '0';
-            user_cfg_i.additional_fpa_int_time_offset(31) <= '0';
+            --user_cfg_i.int_time_offset_mclk(31) <= '0';
             
          else                   
             
@@ -214,12 +214,9 @@ begin
             -- 
             user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);  -- 
             
-            -- veritable calcul des delais : seul fpa_acq_trig_ctrl_dly et fpa_xtra_trig_ctrl_dly sont importants pour le mode MODE_INT_END_TO_TRIG_START des detecteurs analogiques
+            -- veritable calcul des delais : valide pour le mode MODE_INT_END_TO_TRIG_START uniquement
             user_cfg_i.comn.fpa_acq_trig_ctrl_dly    <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
-            user_cfg_i.comn.fpa_spare                <=  (others => '0');
-            user_cfg_i.comn.fpa_xtra_trig_ctrl_dly   <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
-            user_cfg_i.comn.fpa_trig_ctrl_timeout_dly <=  user_cfg_i.comn.fpa_xtra_trig_ctrl_dly  ;      --  pas utilisé en mode MODE_INT_END_TO_TRIG_START avec les détecteurs analogiques. Donc n,importe quelle valeur fera l'affaire
-            
+                        
             -- diag    
             user_cfg_i.diag.ysize_div4_m1      <=  resize(user_cfg_i.roic.ysize_div4_m1, user_cfg_i.diag.ysize_div4_m1'length); 
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
@@ -232,10 +229,10 @@ begin
                   when X"004" =>    user_cfg_i.comn.fpa_diag_type              <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
                   when X"008" =>    user_cfg_i.comn.fpa_pwr_on                 <= data_i(0);						
                   when X"00C" =>    user_cfg_i.comn.fpa_trig_ctrl_mode         <= data_i(user_cfg_i.comn.fpa_trig_ctrl_mode'length-1 downto 0);                                                                        
-                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
-                  when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
-                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
-                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
+                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));     -- ici la valeur que contient le registre est insensée	
+                  when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));                 -- ENO: 29 janv 2020: valeur correcte provient desormais du driverC                                                             
+                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));    -- ENO: 29 janv 2020: valeur correcte provient desormais du driverC  				                                                  
+                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0)); -- ENO: 29 janv 2020: valeur correcte provient desormais du driverC  			                                                     
                   when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                      
                   -- diag
@@ -303,10 +300,10 @@ begin
                      
                   -- propres au ISC0207A                                                                                                                                       
                   when X"0D0" =>    user_cfg_i.readout_plus_delay              <= unsigned(data_i(user_cfg_i.readout_plus_delay'length-1 downto 0));                                                                                                      
-                  when X"0D4" =>    user_cfg_i.tri_window_and_intmode_part     <= unsigned(data_i(user_cfg_i.tri_window_and_intmode_part'length-1 downto 0));                                                                                             
-                  when X"0D8" =>    user_cfg_i.int_time_offset                 <= unsigned(data_i(user_cfg_i.int_time_offset'length-1 downto 0));                                                             
-                  when X"0DC" =>    user_cfg_i.tsh_min                         <= unsigned(data_i(user_cfg_i.tsh_min'length-1 downto 0));                       
-                  when X"0E0" =>    user_cfg_i.tsh_min_minus_int_time_offset   <= unsigned(data_i(user_cfg_i.tsh_min_minus_int_time_offset'length-1 downto 0)); 
+                  when X"0D4" =>    user_cfg_i.tri_min_window_part             <= signed(data_i(user_cfg_i.tri_min_window_part'length-1 downto 0));                                                                                             
+                  when X"0D8" =>    user_cfg_i.int_time_offset_mclk            <= signed(data_i(user_cfg_i.int_time_offset_mclk'length-1 downto 0));                                                             
+                  when X"0DC" =>    user_cfg_i.spare2                          <= signed(data_i(user_cfg_i.spare2'length-1 downto 0));                       
+                  when X"0E0" =>    user_cfg_i.tsh_min_minus_int_time_offset   <= signed(data_i(user_cfg_i.tsh_min_minus_int_time_offset'length-1 downto 0)); 
                      
                      --
                   -- electrical correction
@@ -342,9 +339,9 @@ begin
                   when X"148" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
                   when X"14C" =>    user_cfg_i.elcorr_spare4                   <= data_i(0); 
                   when X"150" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);                  
-                  when X"154" =>    user_cfg_i.additional_fpa_int_time_offset  <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0));                   
+                  when X"154" =>    user_cfg_i.spare3                          <= signed(data_i(user_cfg_i.spare3'length-1 downto 0));                   
                   when X"158" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
-                  
+                     
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
@@ -384,7 +381,11 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
-         abs_additional_int_time_offset_i <= to_integer(abs(user_cfg_i.additional_fpa_int_time_offset));
+         abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));
+         
+         -- pragma translate_off
+         abs_int_time_offset_mclk_i <= 0;
+         -- pragma translate_on
          
          -- pipe pour le calcul du temps d'integration en mclk
          exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
@@ -392,13 +393,19 @@ begin
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
          int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 
-            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+         
+         if user_cfg_i.int_time_offset_mclk(user_cfg_i.int_time_offset_mclk'length-1) = '0' then 
+            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
          else
-            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
          end if; 
-         int_signal_high_time_i <= exp_time_pipe(4)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
-                
+         
+         if exp_time_pipe(4)(exp_time_pipe(4)'length - 1) = '1' then
+            int_signal_high_time_i <= to_unsigned(1, int_signal_high_time_i'length);
+         else
+            int_signal_high_time_i <= exp_time_pipe(4)(int_signal_high_time_i'length-1 downto 0); -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) >= 1). 
+         end if;
+         
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
          exp_indx_pipe(1) <= exp_indx_pipe(0); 
@@ -431,18 +438,18 @@ begin
             exp_time_reg <= FPA_EXP_INFO.EXP_TIME(exp_time_reg'length-1 downto 0);
          end if;
          
-         -- calcul de tri_int_part             
-         tri_int_part <= to_integer(user_cfg_i.tsh_min_minus_int_time_offset) - to_integer(exp_time_reg);
+         -- calcul de tri_min_int_part             
+         tri_min_int_part <= to_integer(user_cfg_i.tsh_min_minus_int_time_offset) - to_integer(exp_time_reg);
          
          -- calcul final du tri_min
-         if tri_int_part > to_integer(user_cfg_i.tri_window_and_intmode_part) then
-            tri_min <= tri_int_part;
+         if tri_min_int_part > to_integer(user_cfg_i.tri_min_window_part) then
+            tri_min <= tri_min_int_part;
          else      
-            tri_min <= to_integer(user_cfg_i.tri_window_and_intmode_part); 
+            tri_min <= to_integer(user_cfg_i.tri_min_window_part); 
          end if;
          
          -- pragma translate_off
-         tri_min <= 0;
+         -- tri_min <= 0;
          -- pragma translate_on          
          
          -- user_cfg_rdy

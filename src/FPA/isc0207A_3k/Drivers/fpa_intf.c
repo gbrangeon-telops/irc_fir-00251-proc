@@ -210,8 +210,7 @@ struct isc0207_param_s             //
    float fsync_high_min_usec;
    float fsync_low_usec;
    float tri_int_part_usec;
-   float tri_window_part_usec;
-   float tri_window_and_intmode_part_usec;
+   float tri_min_window_part_usec;
    float tri_min_usec;
    float frame_period_min_usec;
    float frame_rate_max_hz;
@@ -232,7 +231,8 @@ uint32_t sw_init_success = 0;
 ProximCfg_t ProximCfg = {{12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // definition et activation des accelerateurs
-uint8_t speedup_unused_area    = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
+uint8_t speedup_unused_area = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
+uint8_t itr_mode_enabled;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -308,7 +308,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    // extern int32_t gFpaDebugRegG;                      // non utilisé
    // extern int32_t gFpaDebugRegH;                      // non utilisé
-   uint32_t elcorr_reg;
+   uint32_t elcorr_config_mode;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
    static uint16_t presentElCorrMeasAtSaturation;
@@ -326,8 +326,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float elcorr_atemp_gain;
    float elcorr_atemp_ofs;
    static uint8_t cfg_num = 0; 
-   extern int32_t gFpaExposureTimeOffset;
-   
+
    
    //if ((gStat.hw_init_done == 1) && (sw_init_done == 1))
    //   FPA_GetStatus(&gStat, ptrA);    // n'appeler dans FPA_SendConfigGC que sous condition pour eviter une boucle infinie avec FPA_GetStatus qui l'appelle egalement 
@@ -369,15 +368,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
    ptrA->fpa_acq_trig_ctrl_dly     = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
    ptrA->fpa_spare                 = 0;   
-   ptrA->fpa_trig_ctrl_timeout_dly = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_xtra_trig_ctrl_dly    = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec)*1e-6F);   // ENO: 29 janv 2020: pour isc0207 en mode MODE_INT_END_TO_TRIG_START, la duree du timeout est fixée à celle d'une trame
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
    
    // parametres envoyés au VHD pour calculer fpa_acq_trig_ctrl_dly, fpa_trig_ctrl_timeout_dly, fpa_xtra_trig_ctrl_dly
    ptrA->readout_plus_delay            =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F);  // (readout_time + delay -vhd_delay) converti en coups de 100MHz
-   ptrA->tri_window_and_intmode_part   =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tri_window_and_intmode_part_usec*1e-6F);        //   tri_window_and_intmode_part_usec converti en coups de 100MHz
-   ptrA->int_time_offset               =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.int_time_offset_usec*1e-6F);
-   ptrA->tsh_min                       =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tsh_min_usec*1e-6F);
-   ptrA->tsh_min_minus_int_time_offset =  (ptrA->tsh_min - ptrA->int_time_offset);
+   ptrA->tri_min_window_part           =  (int32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tri_min_window_part_usec*1e-6F);        //   tri_min_window_part_usec converti en coups de 100MHz
+   ptrA->int_time_offset_mclk          =  (int32_t)((float)FPA_MCLK_RATE_HZ * hh.int_time_offset_usec*1e-6F);
+   ptrA->spare2                        =  0;
+   ptrA->tsh_min_minus_int_time_offset =  (int32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.tsh_min_usec - hh.int_time_offset_usec)*1e-6F);    // premisse pour calcul de tri_min_int_part dans le vhd
    
    // ENO 22 sept 2015 : patch temporaire pour tenir compte des delais du patron de tests.
    // Conséquence: le patron de tests sera plus lent que le detecteur mais il ne plantera plus la camera
@@ -415,7 +414,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // accélerateurs 
-   // speedup_unused_area a été déjà assigné dans FPA_SpecificParams qui est déjà appelé au debut de la fonction FPA_SendConfigGC
+   //  a été déjà assigné dans FPA_SpecificParams qui est déjà appelé au debut de la fonction FPA_SendConfigGC
    ptrA->speedup_lsydel          = 0;
    ptrA->speedup_sample_row      = 0;
    ptrA->speedup_lsync           = 0;
@@ -504,8 +503,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    /*----------------------------------------------------                         
     ELCORR : definition parametres                                                
-   ------------------------------------------------------*/ 
-   
+   ------------------------------------------------------*/  
    // starvation
    if (sw_init_done == 0)
       presentElCorrMeasAtStarvation = (uint16_t)ELCORR_DEFAULT_STARVATION_DL;      
@@ -547,12 +545,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (sw_init_done == 0)
       gFpaDebugRegA = (int32_t)ELCORR_MODE_OFFSET_CORR;               // l'utilisation de OUTR sur l'électronique de proximité (FleX ou FLEGX) oblige à ne utiliser que la correction d'offset (donc la valeur 5)
 
-   elcorr_reg = (uint32_t)gFpaDebugRegA;
+   elcorr_config_mode = (uint32_t)gFpaDebugRegA;
    
    if (ptrA->fpa_diag_mode == 1)
-      elcorr_reg = 0;
+      elcorr_config_mode = 0;
 	  
-   if ((elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR) && (gStat.flegx_present == 1)){         // pixeldata avec correction du gain et offset electroniques.  N'est possible qu'avec un FLEGX avec OUTR debranché 
+   if ((elcorr_config_mode == (uint32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR) && (gStat.flegx_present == 1)){         // pixeldata avec correction du gain et offset electroniques.  N'est possible qu'avec un FLEGX avec OUTR debranché 
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -565,7 +563,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;
    }
     
-   else if ((elcorr_reg == (uint32_t)ELCORR_MODE_ROIC_OUTPUT_CST_IMG) && (gStat.flegx_present == 1)){      // voutref data avec correction du gain et offset electroniques. N'est possible qu'avec un FLEGX avec OUTR debranché 
+   else if ((elcorr_config_mode == (uint32_t)ELCORR_MODE_ROIC_OUTPUT_CST_IMG) && (gStat.flegx_present == 1)){      // voutref data avec correction du gain et offset electroniques. N'est possible qu'avec un FLEGX avec OUTR debranché 
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 1;
@@ -578,7 +576,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                      
    }
    
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_CORR){                                    // pixeldata avec correction de l'offset électronique seulement
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_OFFSET_CORR){                                    // pixeldata avec correction de l'offset électronique seulement
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -591,7 +589,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                            
    }
  
-   else if ((elcorr_reg == (uint32_t)ELCORR_MODE_DIFF_REF_IMG) && (gStat.flegx_present == 1)){  // image map de la difference des references
+   else if ((elcorr_config_mode == (uint32_t)ELCORR_MODE_DIFF_REF_IMG) && (gStat.flegx_present == 1)){  // image map de la difference des references
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -604,7 +602,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                       
    }                                                         
     
-   else if ((elcorr_reg == (uint32_t)ELCORR_MODE_REF2_IMG)&& (gStat.flegx_present == 1)){   // image map de la reference 2 (1 dans le vhd)
+   else if ((elcorr_config_mode == (uint32_t)ELCORR_MODE_REF2_IMG)&& (gStat.flegx_present == 1)){   // image map de la reference 2 (1 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -617,7 +615,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
     
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_REF1_IMG){                                   // image map de la reference 1 (0 dans le vhd)
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_REF1_IMG){                                   // image map de la reference 1 (0 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -630,7 +628,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
 
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFF){                                        // desactivation de toute correction electronique
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_OFF){                                        // desactivation de toute correction electronique
       elcorr_enabled                = 0;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -654,14 +652,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    } 
   
    // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = hh.itr_tri_min_usec;
+   elcorr_comp_duration_usec                  = hh->fpa_delay_mclk * hh->mclk_period_usec; // hh.itr_tri_min_usec;
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
    ptrA->elcorr_spare1                        = 0;              
    ptrA->elcorr_spare2                        = 0;                        
    
    // vhd reference 0:                                              
-   ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               
+   ptrA->elcorr_ref_cfg_0_ref_enabled         = ptrA->elcorr_enabled;               
    ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode  = 0;              
    ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 2;        
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
@@ -701,10 +699,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;
 	   ptrA->elcorr_ref_cfg_0_ref_enabled = 0;	  
    }
- 
-   // additional exposure time offset coming from flash 
-   ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
-
    
    FPA_PRINTF("RegC Present Value = %d", gFpaDebugRegC);
    FPA_PRINTF("RegD Present Value = %d", gFpaDebugRegD);
@@ -760,6 +754,10 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+
+   extern int32_t gFpaExposureTimeOffset;
+   extern int32_t gFpaDebugRegH;
+
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
@@ -776,27 +774,37 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->trst_min_usec           = 0.2F;
    
    ptrH->line_stretch_mclk       = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
-   if ((pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) || (pGCRegs->DetectorMode == DM_Burst))
-    ptrH->line_stretch_mclk      = 0.0;
 
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
-   ptrH->int_time_offset_usec    = 0.8F;  // offset du temps d'integration
+   ptrH->int_time_offset_usec    = 0.8F + ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;  // offset total du temps d'integration
    
    ptrH->adc_sync_dly_mclk       = 0.0F;
    
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
-    
    
+   // valeurs par defaut
+   speedup_unused_area = 1;        
+   itr_mode_enabled    = 1;        // ITR
+      
+      
    /*--------------------- CALCULS-------------------------------------------------------------
       Attention aux modifs en dessous de cette ligne! Y bien réfléchir avant de les faire
    -----------------------------------------------------------------------------------------  */
+   
+   if ((pGCRegs->IntegrationMode == IM_IntegrateWhileRead) || (gFpaDebugRegH != 0))
+      itr_mode_enabled = 0;
+   
+   if ((pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) || (pGCRegs->DetectorMode == DM_Burst) || (itr_mode_enabled == 0)){
+      ptrH->line_stretch_mclk  = 0.0;
+      speedup_unused_area = 0;
+   }
    
    // fast windowing
    ptrH->unused_area_clock_factor =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
    
    // fenetre qui sera demandée au ROIC du FPA
    ptrH->roic_xsize     = MIN((float)pGCRegs->Width + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX);
-   if (pGCRegs->DetectorMode == DM_Burst)
+   if ((pGCRegs->DetectorMode == DM_Burst) || (itr_mode_enabled == 0))
       ptrH->roic_xsize     = (float)pGCRegs->Width; 
    ptrH->roic_ysize     = (float)pGCRegs->Height;
    ptrH->roic_xstart    = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage
@@ -828,16 +836,16 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->tri_int_part_usec    = ptrH->tsh_min_usec - ptrH->fsync_low_usec;
    
    // T_ri window part
-   ptrH->tri_window_part_usec = ptrH->fsync_high_min_usec - ptrH->delay_usec - ptrH->readout_usec;
+   ptrH->tri_min_window_part_usec = ptrH->fsync_high_min_usec - ptrH->delay_usec - ptrH->readout_usec;
    
-   // T_ri window part couplé au mode ITR ou IWR
-   //if (pGCRegs->IntegrationMode == 0) // ITR
-   ptrH->tri_window_and_intmode_part_usec = MAX(ptrH->tri_window_part_usec, ptrH->itr_tri_min_usec);  // seulement ITR supporté pour le moment
-   //else                               // IWR
-   //   ptrH->tri_window_and_intmode_part_usec = ptrH->tri_window_part_usec;
+   //T_ri window part couplé au mode ITR ou IWR
+   if (itr_mode_enabled == 1) // ITR
+      ptrH->tri_min_window_part_usec = MAX(ptrH->tri_min_window_part_usec, ptrH->itr_tri_min_usec);  // seulement ITR supporté pour le moment
+   else                       // IWR
+      ptrH->tri_min_window_part_usec = ptrH->tri_min_window_part_usec;
    
    // T_ri
-   ptrH->tri_min_usec = MAX(ptrH->tri_int_part_usec , ptrH->tri_window_and_intmode_part_usec); 
+   ptrH->tri_min_usec = MAX(ptrH->tri_int_part_usec , ptrH->tri_min_window_part_usec);
       
    // calcul de la periode minimale
    ptrH->frame_period_min_usec = ptrH->fsync_low_usec + ptrH->delay_usec + ptrH->readout_usec + ptrH->tri_min_usec;
@@ -880,9 +888,9 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    max_fsync_low_usec__plus__tri_min_usec = frame_period_usec - (hh.readout_usec + hh.delay_usec);
    
    // determinons le tri induite par la fenetre  choisie et le mode
-   tri_part1_usec = hh.tri_window_and_intmode_part_usec; 
+   tri_part1_usec = hh.tri_min_window_part_usec;
    
-   // rappel  : tri_min_usec = max(tri_window_and_intmode_part_usec, tri_int_part_usec)
+   // rappel  : tri_min_usec = max(tri_min_window_part_usec, tri_int_part_usec)
    //d'où tri_min_usec = max(tri_part1_usec, tri_int_part_usec)
    
    // 1er cas : tri_min_usec = tri_part1_usec <=> tri_int_part_usec < tri_part1_usec  <=> fsync_low > tsh_min_usec - tri_part1_usec

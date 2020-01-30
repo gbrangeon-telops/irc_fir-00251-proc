@@ -53,7 +53,7 @@ package FPA_define is
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 8_333.375;   --
    constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real      := 2.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 
    
-   constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 800; 
+   constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 0;        -- ENO: 26 janv 2020. Provient desormais du driverC 
    
    -- integration, offset d'integration,  feedback
    constant DEFINE_GENERATE_INT_FDBK_MODULE       : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START
@@ -407,13 +407,13 @@ package FPA_define is
       
       -- parametres propres à ISC0207A 
       readout_plus_delay                  : unsigned(15 downto 0);
-      tri_window_and_intmode_part         : unsigned(17 downto 0);   -- suppose que le mode IWR n'Est pas supporté. Sinon cette variable doit être signed
-      int_time_offset                     : unsigned(7 downto 0);
-      tsh_min                             : unsigned(15 downto 0);
-      tsh_min_minus_int_time_offset       : unsigned(15 downto 0);
+      tri_min_window_part                 : signed(17 downto 0);   
+      int_time_offset_mclk                : signed(7 downto 0);
+      spare2                              : signed(15 downto 0);
+      tsh_min_minus_int_time_offset       : signed(15 downto 0);
       
       -- additional exposure time offset from driver C
-      additional_fpa_int_time_offset      : signed(31 downto 0);  
+      spare3                              : signed(31 downto 0);  
       
    end record;     
    

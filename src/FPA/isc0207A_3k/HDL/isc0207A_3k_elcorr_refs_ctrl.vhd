@@ -22,20 +22,21 @@ entity isc0207A_3k_elcorr_refs_ctrl is
       );   
    
    port( 		 
-      ARESET            : in std_logic;
-      CLK               : in std_logic;
-      
-      USER_CFG_IN       : in fpa_intf_cfg_type;
-      USER_CFG_OUT      : out fpa_intf_cfg_type;
-      
-      FPA_INTF_CFG      : in fpa_intf_cfg_type;
-      
-      REF_VALID         : out std_logic_vector(1 downto 0);
-      REF_FEEDBK        : in std_logic_vector(1 downto 0);
-      
-      HW_CFG_IN_PROGRESS: in std_logic;
-      
-      PROG_TRIG         : out std_logic      
+      ARESET             : in std_logic;
+      CLK                : in std_logic;
+                         
+      USER_CFG_IN        : in fpa_intf_cfg_type;
+      USER_CFG_OUT       : out fpa_intf_cfg_type;
+                         
+      FPA_INTF_CFG       : in fpa_intf_cfg_type;
+                         
+      REF_VALID          : out std_logic_vector(1 downto 0);
+      REF_FEEDBK         : in std_logic_vector(1 downto 0);
+                         
+      HW_CFG_IN_PROGRESS : in std_logic;
+      IMG_IN_PROGRESS    : in std_logic;
+                         
+      PROG_TRIG          : out std_logic      
       );
    
 end isc0207A_3k_elcorr_refs_ctrl;
@@ -243,7 +244,7 @@ begin
                   ctrl_fsm <= wait_fdbk_st;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not IMG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
                   if ref_feedbk_i(ref_id) = '1' then
                      prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
                      if ref_id = 0 then

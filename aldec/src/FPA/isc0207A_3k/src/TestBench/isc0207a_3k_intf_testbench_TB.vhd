@@ -62,7 +62,7 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
-   constant ACQ_TRIG_PERIOD         : time := 700 us;
+   constant ACQ_TRIG_PERIOD         : time := 10.000 us;
    constant DOUT_CLK_PERIOD         : time := 11.765 ns;
    
    
@@ -201,7 +201,7 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
    signal user_ysize3 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(86*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(87*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
@@ -262,7 +262,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(100, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(30000, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -365,7 +365,7 @@ begin
       end loop;      
       
       
-      for ii in 0 to 86-1 loop 
+      for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -387,9 +387,9 @@ begin
       wait for 50 ns;
       
       
-      wait for 6 ms;
+      wait for 20 ms;
       
-      for ii in 0 to 86-1 loop 
+      for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -397,9 +397,9 @@ begin
          wait for 30 ns;
       end loop; 
       
-      wait for 6 ms;
+      wait for 20 ms;
       
-      for ii in 0 to 86-1 loop 
+      for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;
          end_pos   := start_pos - 31;

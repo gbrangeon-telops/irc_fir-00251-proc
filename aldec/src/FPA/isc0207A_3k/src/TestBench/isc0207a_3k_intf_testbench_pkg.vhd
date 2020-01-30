@@ -23,7 +23,7 @@ package isc0207a_3k_intf_testbench_pkg is
    constant TAP_NUM                    : integer := 16;
    constant USER_FIRST_LINE_NUM        : integer := 1;
    constant STRETCH_LINE_LENGTH_MCLK   : integer := 1;
-   constant C_ELCORR_ENABLED         : std_logic := '1';
+   constant C_ELCORR_ENABLED         : std_logic := '0';
    
    constant C_elcorr_ref0_image_map_enabled : std_logic := '0';
    constant C_elcorr_ref1_image_map_enabled : std_logic := '0';
@@ -89,21 +89,21 @@ package body isc0207a_3k_intf_testbench_pkg is
       variable vgood_samp_mean_numerator      : unsigned(31 downto  0);
       variable good_samp_first_pos_per_ch     : unsigned(31 downto  0);
       variable good_samp_last_pos_per_ch      : unsigned(31 downto  0);
-      variable adc_clk_source_phase                : unsigned(31 downto  0);
-      variable adc_clk_pipe_sel                : unsigned(31 downto  0);
-      variable spare1                : unsigned(31 downto  0);
+      variable adc_clk_source_phase           : unsigned(31 downto  0);
+      variable adc_clk_pipe_sel               : unsigned(31 downto  0);
+      variable spare1                         : unsigned(31 downto  0);
       variable lsydel_mclk                    : unsigned(31 downto  0); 
       variable boost_mode                     : unsigned(31 downto  0); 
       variable speedup_lsydel                 : unsigned(31 downto  0);
       variable adc_clk_pipe_sync_pos          : unsigned(31 downto  0);      
-      variable readout_plus_delay              : unsigned(31 downto  0);
-      variable tri_window_and_intmode_part     : unsigned(31 downto  0); 
-      variable int_time_offset                 : unsigned(31 downto  0);
-      variable tsh_min                         : unsigned(31 downto  0);
-      variable tsh_min_minus_int_time_offset   : unsigned(31 downto  0);      
-      variable elcorr_enabled                  : unsigned(31 downto  0);      
-      variable elcorr_pix_faked_value_forced   : unsigned(31 downto  0);      
-      variable elcorr_pix_faked_value          : unsigned(31 downto  0);                                    
+      variable readout_plus_delay             : unsigned(31 downto  0);
+      variable tri_min_window_part            : signed(31 downto  0); 
+      variable int_time_offset_mclk           : signed(31 downto  0);
+      variable spare2                         : signed(31 downto  0);
+      variable tsh_min_minus_int_time_offset  : signed(31 downto  0);      
+      variable elcorr_enabled                 : unsigned(31 downto  0);      
+      variable elcorr_pix_faked_value_forced  : unsigned(31 downto  0);      
+      variable elcorr_pix_faked_value         : unsigned(31 downto  0);                                    
       variable elcorr_ref_cfg_0_ref_enabled         : unsigned(31 downto  0);  
       variable elcorr_ref_cfg_0_null_forced         : unsigned(31 downto  0);  
       variable elcorr_ref_cfg_0_start_dly_sampclk   : unsigned(31 downto  0);  
@@ -129,9 +129,10 @@ package body isc0207a_3k_intf_testbench_pkg is
       variable cfg_num                                 : unsigned(31 downto  0);  
       variable dac_free_running_mode                   : unsigned(31 downto  0);  
       variable roic_cst_output_mode                    : unsigned(31 downto  0);
+      variable spare3                                  : unsigned(31 downto  0);
       variable fpa_intf_data_source                    : unsigned(31 downto  0);
       
-      variable y                               : unsigned(86*32-1 downto 0); 
+      variable y                               : unsigned(87*32-1 downto 0); 
       
       variable user_sol_posl_pclk              : unsigned(31 downto  0);
       variable roic_ysize                      : unsigned(31 downto  0);       -- pas utilisé dans la config
@@ -142,10 +143,13 @@ package body isc0207a_3k_intf_testbench_pkg is
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
       comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(30388, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_acq_trig_period_min  := to_unsigned(30388, comn_fpa_acq_trig_period_min'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(30388, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_period_min := to_unsigned(30388, comn_fpa_xtra_trig_period_min'length);        
+      if comn_fpa_diag_mode > 0 then
+         comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);  
+      end if;
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_period_min  := to_unsigned(0, comn_fpa_acq_trig_period_min'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(0, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_period_min := to_unsigned(0, comn_fpa_xtra_trig_period_min'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');       
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
       diag_xsize_div_tapnum         := to_unsigned(user_xsize/TAP_NUM, 32);
@@ -171,7 +175,7 @@ package body isc0207a_3k_intf_testbench_pkg is
       speedup_lsydel                := (others =>'0');
       speedup_lsync                 := (others =>'0');            
       speedup_sample_row            := (others =>'0');         
-      speedup_unused_area           := (others =>'1');   
+      speedup_unused_area           := (others =>'0');   
       raw_area_line_start_num            := to_unsigned(USER_FIRST_LINE_NUM, 32); 
       raw_area_line_end_num              := to_unsigned(to_integer(roic_ysize) + to_integer(raw_area_line_start_num) - 1, 32);
       raw_area_window_lsync_num          := to_unsigned(to_integer(roic_ysize), 32);
@@ -202,15 +206,15 @@ package body isc0207a_3k_intf_testbench_pkg is
       adc_clk_pipe_sel               := to_unsigned(1, 32);
       spare1                         := to_unsigned(1, 32);
       
-      lsydel_mclk                   := to_unsigned(0,32);
-      boost_mode                    := to_unsigned(0,32);
-      adc_clk_pipe_sync_pos         := to_unsigned(2,32);
+      lsydel_mclk                       := to_unsigned(0,32);
+      boost_mode                        := to_unsigned(0,32);
+      adc_clk_pipe_sync_pos             := to_unsigned(2,32);
       
-      readout_plus_delay                := to_unsigned(33388, readout_plus_delay'length);          
-      tri_window_and_intmode_part       := to_unsigned(33388, tri_window_and_intmode_part'length); 
-      int_time_offset                   := to_unsigned(33388, int_time_offset'length);             
-      tsh_min                           := to_unsigned(780, tsh_min'length);                       
-      tsh_min_minus_int_time_offset     := to_unsigned(700, tsh_min_minus_int_time_offset'length); 
+      readout_plus_delay                := to_unsigned(30820, readout_plus_delay'length);          
+      tri_min_window_part               := to_signed(-30740, tri_min_window_part'length); 
+      int_time_offset_mclk              := to_signed(6, int_time_offset_mclk'length);             
+      spare2                            := to_signed(0, spare2'length);                       
+      tsh_min_minus_int_time_offset     := to_signed(700, tsh_min_minus_int_time_offset'length); 
       
       -- valeurs par defaut
       -- Electronic chain correction                    
@@ -223,17 +227,17 @@ package body isc0207a_3k_intf_testbench_pkg is
       elcorr_pix_faked_value_forced        := (others => '0');              
       elcorr_pix_faked_value               := (others => '0');                     
       
-      elcorr_ref_cfg_0_ref_enabled         := to_unsigned(1, 32);               
+      elcorr_ref_cfg_0_ref_enabled         := (others => C_ELCORR_ENABLED);               
       elcorr_ref_cfg_0_null_forced         := (others => '0');              
       elcorr_ref_cfg_0_start_dly_sampclk   := to_unsigned(2, 32);        
-      elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(20, 32);
+      elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(8, 32);
       elcorr_ref_cfg_0_samp_mean_numerator := to_unsigned(2**21/20, 32);     
       elcorr_ref_cfg_0_ref_value           := to_unsigned(2000, 32);  --      
       
-      elcorr_ref_cfg_1_ref_enabled         := to_unsigned(1, 32);          
+      elcorr_ref_cfg_1_ref_enabled         := (others => C_ELCORR_ENABLED);          
       elcorr_ref_cfg_1_null_forced         := (others => '0');             
       elcorr_ref_cfg_1_start_dly_sampclk   := to_unsigned(2, 32);          
-      elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(20, 32);         
+      elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(8, 32);         
       elcorr_ref_cfg_1_samp_mean_numerator := to_unsigned(2**21/20, 32);      
       elcorr_ref_cfg_1_ref_value           := to_unsigned(4000, 32);  --   
       
@@ -340,10 +344,10 @@ package body isc0207a_3k_intf_testbench_pkg is
       & speedup_lsydel                 
       & adc_clk_pipe_sync_pos
       & readout_plus_delay             
-      & tri_window_and_intmode_part    
-      & int_time_offset                
-      & tsh_min                        
-      & tsh_min_minus_int_time_offset
+      & unsigned(tri_min_window_part)    
+      & unsigned(int_time_offset_mclk)                
+      & unsigned(spare2)                        
+      & unsigned(tsh_min_minus_int_time_offset)
       & elcorr_enabled
       & elcorr_pix_faked_value_forced
       & elcorr_pix_faked_value 
@@ -372,10 +376,126 @@ package body isc0207a_3k_intf_testbench_pkg is
       & cfg_num                                 
       & dac_free_running_mode                   
       & roic_cst_output_mode
+      & spare3
       & fpa_intf_data_source;
       
-                                
+      
       return y;
    end to_intf_cfg;
    
 end package body isc0207a_3k_intf_testbench_pkg;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

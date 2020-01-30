@@ -19,50 +19,51 @@ use work.fpa_common_pkg.all;
 entity isc0207A_3k_readout_kernel is
    port(
       
-      ARESET         : in std_logic;
-      CLK            : in std_logic;
+      ARESET          : in std_logic;
+      CLK             : in std_logic;
       
-      FPA_INT        : in std_logic;
-      START_GEN      : out std_logic; 
+      FPA_INT         : in std_logic;
+      START_GEN       : out std_logic; 
       
-      FPA_INTF_CFG   : in fpa_intf_cfg_type; 
+      FPA_INTF_CFG    : in fpa_intf_cfg_type; 
       
       -- horloges brutes
-      SLOW_MCLK_RAW  : in std_logic;
-      SLOW_PCLK_RAW  : in std_logic;
-      FAST_MCLK_RAW  : in std_logic;
-      FAST_PCLK_RAW  : in std_logic;
+      SLOW_MCLK_RAW   : in std_logic;
+      SLOW_PCLK_RAW   : in std_logic;
+      FAST_MCLK_RAW   : in std_logic;
+      FAST_PCLK_RAW   : in std_logic;
       
       -- fifos des horloges traitées      
       FAST_CLK_EN    : out std_logic;
-      FAST_CLK_DATA  : in std_logic_vector(7 downto 0);
-      FAST_CLK_DVAL  : in std_logic;
+      FAST_CLK_DATA   : in std_logic_vector(7 downto 0);
+      FAST_CLK_DVAL   : in std_logic;
       
-      CLK_FIFO_RDY   : in std_logic;    -- à '1' lorsque le fifo de l'horloge la plus lente est prête. Donc tous les fifoos sont prêts
+      CLK_FIFO_RDY    : in std_logic;    -- à '1' lorsque le fifo de l'horloge la plus lente est prête. Donc tous les fifoos sont prêts
       
-      SLOW_CLK_EN    : out std_logic;
-      SLOW_CLK_DATA  : in std_logic_vector(7 downto 0);
-      SLOW_CLK_DVAL  : in std_logic;
+      SLOW_CLK_EN     : out std_logic;
+      SLOW_CLK_DATA   : in std_logic_vector(7 downto 0);
+      SLOW_CLK_DVAL   : in std_logic;
       
-      QUAD_CLK_COPY  : in std_logic;
-      ADC_SYNC_FLAG  : out std_logic_vector(15 downto 0); -- ENO : 05 oct 2017: divers flags à synchroniser sur donnnées ADC même si READOUT_INFO est absent. Utile par exemple pour calculer offset dynamique
+      QUAD_CLK_COPY   : in std_logic;
+      ADC_SYNC_FLAG   : out std_logic_vector(15 downto 0); -- ENO : 05 oct 2017: divers flags à synchroniser sur donnnées ADC même si READOUT_INFO est absent. Utile par exemple pour calculer offset dynamique
       
-      FPA_MCLK       : out std_logic;
-      FPA_PCLK       : out std_logic;
-      READOUT_INFO   : out readout_info_type;
+      FPA_MCLK        : out std_logic;
+      FPA_PCLK        : out std_logic;
+      READOUT_INFO    : out readout_info_type;
       
-      ERR            : out std_logic;
+      ERR             : out std_logic;
       
-      WDOW_FIFO_EMPTY: in std_logic;
-      WDOW_FIFO_RDY  : in std_logic;
-      WDOW_FIFO_EN   : out std_logic;
-      WDOW_FIFO_DATA : in window_info_type;
-      WDOW_FIFO_DVAL : in std_logic;
+      WDOW_FIFO_EMPTY : in std_logic;
+      WDOW_FIFO_RDY   : in std_logic;
+      WDOW_FIFO_EN    : out std_logic;
+      WDOW_FIFO_DATA  : in window_info_type;
+      WDOW_FIFO_DVAL  : in std_logic;
       
-      RST_WDOW_GEN   : out std_logic;
-      RAW_WINDOW     : out raw_area_type;
+      RST_WDOW_GEN    : out std_logic;
+      RAW_WINDOW      : out raw_area_type;
       
-      REF_VALID      : in std_logic_vector(1 downto 0)
+      REF_VALID       : in std_logic_vector(1 downto 0);
+      IMG_IN_PROGRESS : out std_logic 
       
       );
 end isc0207A_3k_readout_kernel;
@@ -76,9 +77,25 @@ architecture rtl of isc0207A_3k_readout_kernel is
          ARESET : in std_logic;
          SRESET : out std_logic;
          CLK : in std_logic);
-   end component; 
+   end component;
    
-   type ctrl_fsm_type is (idle, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
+   component fwft_sfifo_w3_d16
+      port (
+         clk         : in std_logic;
+         srst        : in std_logic;
+         din         : in std_logic_vector(2 downto 0);
+         wr_en       : in std_logic;
+         rd_en       : in std_logic;
+         dout        : out std_logic_vector(2 downto 0);
+         full        : out std_logic;
+         almost_full : out std_logic;
+         overflow    : out std_logic;
+         empty       : out std_logic;
+         valid       : out std_logic
+         );
+   end component;
+   
+   type ctrl_fsm_type is (idle, wait_int_fe_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
    type adc_time_stamp_type is
    record
       naoi_stop  : std_logic;
@@ -139,12 +156,21 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal quad_clk_fe_pipe    : std_logic_vector(15 downto 0) := (others => '0');
    --signal active_window_last  : std_logic;
    signal elcorr_ref_fval_i     : std_logic;
-   signal rst_cnt_i           : unsigned(4 downto 0);
-   signal rst_wdow_gen_i      : std_logic;
-   signal elcorr_ref_enabled  : std_logic;
-   signal fpa_mclk_fe         : std_logic;
-   signal read_end_last       : std_logic;
-   signal adc_time_stamp      : adc_time_stamp_type;
+   signal rst_cnt_i             : unsigned(4 downto 0);
+   signal rst_wdow_gen_i        : std_logic;
+   signal elcorr_ref_enabled    : std_logic;
+   signal fpa_mclk_fe           : std_logic;
+   signal read_end_last         : std_logic;
+   signal read_start_last       : std_logic;
+   signal adc_time_stamp        : adc_time_stamp_type;
+   signal int_fifo_rd           : std_logic;
+   signal int_fifo_din          : std_logic_vector(2 downto 0);
+   signal int_fifo_wr           : std_logic;
+   signal int_fifo_dval         : std_logic;
+   signal int_fifo_dout         : std_logic_vector(2 downto 0);
+   signal img_in_progress_i     : std_logic;
+   
+   
    
 begin
    
@@ -169,6 +195,7 @@ begin
    WDOW_FIFO_EN <= window_fifo_rd_i;
    START_GEN <= start_gen_i;
    ERR <= err_i;
+   IMG_IN_PROGRESS <= img_in_progress_i;
    
    -- pragma translate_off
    RAW_WINDOW <= raw_window_i;
@@ -201,10 +228,28 @@ begin
    fast_pclk_eof <= FAST_CLK_DATA(1); 
    fast_pclk     <= FAST_CLK_DATA(0);
    
+   --------------------------------------------------
+   -- fifo fwft pour edges du signal d'intégration
+   --------------------------------------------------   
+   U3A : fwft_sfifo_w3_d16
+   port map (
+      clk         => CLK,
+      srst        => sreset,
+      din         => int_fifo_din,    -- not used
+      wr_en       => int_fifo_wr,
+      rd_en       => int_fifo_rd,
+      dout        => int_fifo_dout,   -- not used
+      full        => open,
+      almost_full => open,
+      overflow    => open,
+      empty       => open,
+      valid       => int_fifo_dval
+      );
+   
    ----------------  ----------------------------------
    --  lecture des fifos et synchronisation
    --------------------------------------------------
-   U3: process(CLK)
+   U3B: process(CLK)
       variable inc : unsigned(1 downto 0);
    begin
       if rising_edge(CLK) then 
@@ -222,12 +267,19 @@ begin
             rst_wdow_gen_i <= '1';
             fast_mclk_raw_en_i <= '0';
             elcorr_ref_enabled <= '0';
+            int_fifo_wr <= '0';
+            int_fifo_rd <= '0';
+            img_in_progress_i <= '0'; 
             
          else  
             
             --inc := '0'& fpa_mclk_re;
             fpa_int_i <= FPA_INT;
-            fpa_int_last <= fpa_int_i; 
+            fpa_int_last <= fpa_int_i;
+            
+            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
+            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
+            int_fifo_wr <= fpa_int_last xor fpa_int_i;          -- on ecrit les edges dans le fifo
             
             slow_mclk_raw_last <= SLOW_MCLK_RAW;            
             fast_mclk_raw_last <= FAST_MCLK_RAW;
@@ -246,17 +298,26 @@ begin
                   rst_wdow_gen_i <= '0';
                   slow_clk_fifo_rd_i <= '0';
                   fast_clk_fifo_rd_i <= '0';
-                  mclk_pause_cnt <= 1;                  
-                  if fpa_int_last = '0' and fpa_int_i = '1' then 
+                  mclk_pause_cnt <= 1;
+                  img_in_progress_i <= '0';                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
+                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
                      start_gen_i <= '1';
+                     int_fifo_rd <= '1';
+                     img_in_progress_i <= '1';
+                     ctrl_fsm <= wait_int_fe_st;
                   end if;                               
-                  if (fpa_int_last = '1' and fpa_int_i = '0')  and start_gen_i = '1' then        -- ENO: 20 juin 2017 : le mode diag n'est pas à double cadence puisque MCLK n'est pas utilisé dans le generateur diag. Ainsi, même en mode diag, le détecteur roule sans interruption.
-                     ctrl_fsm <= lsydel_dly_st;
-                  end if;
                   rst_cnt_i <= (others => '0'); 
-                  pause_cnt <= (others => '0');
+                  pause_cnt <= (others => '0');                 
+               
+               when wait_int_fe_st =>
+                  int_fifo_rd <= '0';
+                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then  -- front tombant de int_signal, il est quasiment en temps reel.
+                     ctrl_fsm <= lsydel_dly_st;
+                     int_fifo_rd <= '1';                     
+                  end if;               
                
                when lsydel_dly_st =>
+                  int_fifo_rd <= '0';
                   start_gen_i <= '0';
                   if fpa_mclk_re = '1' then
                      pause_cnt <= pause_cnt + 1;
@@ -335,10 +396,10 @@ begin
                      ctrl_fsm <= rst_wdow_gen_st;
                   end if;
                
-               when rst_wdow_gen_st =>    --                  
-                  rst_wdow_gen_i <= '1';                          -- le upstream subit un reset de 16 CLK
+               when rst_wdow_gen_st =>    -- 
+                  rst_wdow_gen_i <= '1';                          -- le upstream subit un reset 
                   rst_cnt_i <= rst_cnt_i + 1;
-                  if rst_cnt_i(4) = '1' then
+                  if rst_cnt_i(3) = '1' then
                      ctrl_fsm <= idle;
                   end if;
                
@@ -387,6 +448,8 @@ begin
             data_sync_err <= '0';
             quad_clk_fe_pipe <= (others => '0');
             -- pragma translate_on
+            read_start_last <= '0';
+            read_end_last <= '0';
             
          else 
             
@@ -398,9 +461,10 @@ begin
             
             -- 
             read_end_last <= readout_info_i.aoi.read_end;
+            read_start_last <= readout_info_i.aoi.sof;
             
             -- elcorr_ref_start_i dure 1 PCLK             
-            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not read_end_last and readout_info_i.aoi.read_end); 
+            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (fpa_int_last and not fpa_int_i); -- Attention! le falling de Int = debut de elc_ofs.
             if unsigned(elcorr_ref_start_pipe) /= 0 then
                elcorr_ref_start_i <= '1';
                elcorr_ref_fval_i  <= '1'; 
@@ -409,7 +473,7 @@ begin
             end if;
             
             -- elcorr_ref_end_i dure 1 PCLK
-            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
+            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not read_start_last and readout_info_i.aoi.sof); -- Attention! le sof  = fin de elc_ofs.
             if unsigned(elcorr_ref_end_pipe) /= 0 then
                elcorr_ref_end_i <= '1';
             else
