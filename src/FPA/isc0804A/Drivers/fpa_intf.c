@@ -26,6 +26,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include "exposure_time_ctrl.h"
 
 #ifdef SIM
    #include "proc_ctrl.h" // Contains the class SC_MODULE for SystemC simulation
@@ -210,6 +211,14 @@ struct isc0804_param_s             //
    float lovh_mclk;
    float fovh_line;
    float int_time_offset_usec;
+   float fsync_low_usec;
+   float t_shrst_min_mclk;   
+   float t_ucsh_min_usec;    
+   float t_intsmpl_min_usec;
+   float tri_min_int_part_usec;
+   float tri_min_window_part_usec;
+   float tri_min_usec;
+   float fsync_high_min_usec;
    
    // fenetre du ROIC
    float roic_xsize; 
@@ -229,30 +238,30 @@ struct isc0804_param_s             //
    float readout_usec;
    float frame_period_min_usec;
    float frame_rate_max_hz;
-   float mode_int_end_to_trig_start_dly_usec;              
-   float mode_readout_end_to_trig_start_dly_usec;
+   // float mode_int_end_to_trig_start_dly_usec;              
+   // float mode_readout_end_to_trig_start_dly_usec;
    float mode_trig_start_to_trig_start_dly_usec;
    float adc_sync_dly_mclk;
    float line_stretch_mclk;
-   float frame_period_coef;   // pour limitation artificielle du frame rate
-  
+   float frame_period_coef;   // pour limitation artificielle du frame rate  
 };
 typedef struct isc0804_param_s  isc0804_param_t;
 
 // Global variables
 t_FpaStatus gStat;                        // devient une variable globale
 uint8_t FPA_StretchAcqTrig = 0;
+uint8_t itr_mode_enabled;
 float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
 ProximCfg_t ProximCfg = {{4518, 4518, 4518, 1046,  5738, 6075, 8507, 4518}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // definition et activation des accelerateurs
-uint8_t speedup_lsydel         = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
-uint8_t speedup_sample_row     = 1; 
-uint8_t speedup_lsync          = 0;
-uint8_t speedup_remaining_lovh = 0;
-uint8_t speedup_unused_area    = 1;  
+uint8_t speedup_lsydel;      // les speed_up n'ont que deux valeurs : 0 ou 1
+uint8_t speedup_sample_row; 
+uint8_t speedup_lsync;
+uint8_t speedup_remaining_lovh;
+uint8_t speedup_unused_area;  
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -356,6 +365,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // need_rst_fpa_module = 0;
    
+   ptrA->itr_mode_enabled = itr_mode_enabled;
+   ptrA->int_time_offset_mclk = (int32_t)((float)FPA_MCLK_RATE_HZ * hh.int_time_offset_usec*1e-6F);
+   
    // diag mode and diagType
    ptrA->fpa_diag_mode = 0;                 // par defaut
    ptrA->fpa_diag_type = 0;                 // par defaut   
@@ -386,23 +398,21 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   if (ptrA->fpa_diag_mode == 1) {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START; // pour ne pas bousculer le generateur de patron
-      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);   
+   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;   //  En ITR, il faut itr_trig_start_to_trig_start sinon si c'etait trig_start_to_trig_start uniquement, en trig_externe on pourrait passer dangereusement en IWR sans s'en rendre compte
+   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+   if (itr_mode_enabled == 0){                                                      // IWR 
+      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_TRIG_START_TO_TRIG_START;     
+   }      
+   if (TDCStatusTst(WaitingForImageCorrectionMask) == 1){      // lorsqu'une actualisation est en cours, on passe en MODE_ITR_TRIG_START_TO_TRIG_START pour que le throughput_ctrl ajuste le throughput à celle de l'actualisation
+      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;
    }
-   else {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;
-	   if (TDCStatusTst(WaitingForImageCorrectionMask) == 1)      // lorsqu'une actualisation est en cours, on passe en MODE_ITR_INT_END_TO_TRIG_START pour que le throughput_ctrl ajuste le throughput à celle de l'actualisation
-         ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
-      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
-   }
-   ptrA->fpa_spare                    = 0;
-   ptrA->fpa_xtra_trig_ctrl_dly       = ptrA->fpa_acq_trig_ctrl_dly;                                                   //
-   ptrA->fpa_trig_ctrl_timeout_dly    = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  
+   ptrA->fpa_spare                 = 0;
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;                                                   //
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
     
    // diag window param   
-   ptrA->diag_ysize             = (uint32_t)pGCRegs->Height;
-   ptrA->diag_xsize_div_tapnum  = (uint32_t)pGCRegs->Width/(uint32_t)FPA_NUMTAPS;
+   ptrA->diag_ysize            = (uint32_t)pGCRegs->Height;
+   ptrA->diag_xsize_div_tapnum = (uint32_t)pGCRegs->Width/(uint32_t)FPA_NUMTAPS;
    
    // Roic window param                                    
    ptrA->roic_ystart   = (uint32_t)hh.roic_ystart;                    
@@ -827,25 +837,62 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
 // Pour avoir les parametres propres au isc0804 avec une config 
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
-{
+{                                                                                                          
+   extern int32_t gFpaExposureTimeOffset;
+   extern int32_t gFpaDebugRegH;
+   
+   // mode ITR ou non
+   itr_mode_enabled = 1;       
+   if ((pGCRegs->IntegrationMode == IM_IntegrateWhileRead) || (gFpaDebugRegH != 0))
+      itr_mode_enabled = 0;
+
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;   
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 2.0F;
    ptrH->reset_time_usec         = 7.0F; 
-   ptrH->int_time_offset_usec    = 0.3F;   
+   ptrH->int_time_offset_usec    = -0.3F + ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;   
    ptrH->fovh_line               = 1.0F;     // ligne de tests du ISC0804
    ptrH->lovh_mclk               = 1.0F;     // duree du lsync + line pause;
    ptrH->lsydel_mclk             = 144.0F;
    ptrH->vhd_delay_mclk          = 7.0F;
    ptrH->adc_sync_dly_mclk       = 0.0625F;  // le coût par ligne de lecture du synchronisateur en coup de MCLK
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
+   ptrH->line_stretch_mclk       = (float)ISC0804_FASTWINDOW_STRECTHING_AREA_MCLK;
+   ptrH->t_shrst_min_mclk        = 78.0F;    // TSHRST dans la doc
+   ptrH->t_ucsh_min_usec         = 3.0F;     // TUCSH dans la doc
+   ptrH->t_intsmpl_min_usec      = ptrH->t_shrst_min_mclk * ptrH->mclk_period_usec + ptrH->t_ucsh_min_usec + 33.0F * ptrH->mclk_period_usec;
    
+   // les speedups 
+   speedup_lsydel         = 1;     
+   speedup_sample_row     = 1; 
+   speedup_lsync          = 0;
+   speedup_remaining_lovh = 0;
+   speedup_unused_area    = 1; 
    
+   if (itr_mode_enabled == 0){
+      speedup_lsydel         = 0;   
+      speedup_sample_row     = 0; 
+      speedup_lsync          = 0;
+      speedup_remaining_lovh = 0;
+      speedup_unused_area    = 0; 
+   }
+   
+   // coût du synchronisateur 
+   if ((speedup_lsydel == 0) && (speedup_sample_row == 0) && (speedup_lsync == 0) && (speedup_remaining_lovh == 0) && (speedup_unused_area == 0))
+      ptrH->adc_sync_dly_mclk = 0.0F;
+      
+    
    /*--------------------- CALCULS-------------------------------------------------------------
       Attention aux modifs en dessous de cette ligne! Y bien réfléchir avant de les faire
-   -----------------------------------------------------------------------------------------  */
+   -----------------------------------------------------------------------------------------  */ 
    
+   if (pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX)
+       speedup_unused_area = 0;                  
+       
+   if (speedup_unused_area == 0)
+       ptrH->line_stretch_mclk = 0.0;
+      
    // fast windowing
    ptrH->lsydel_clock_factor         =  MAX(1.0F, ((float)ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_lsydel);
    ptrH->sample_row_clock_factor     =  MAX(1.0F, ((float)ROIC_SAMPLE_ROW_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_sample_row);
@@ -854,25 +901,14 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->unused_area_clock_factor    =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
    ptrH->roic_xsize                  = (float)FPA_WIDTH_MAX;
    // fenetre qui sera demandée au ROIC du FPA
-//   if ((uint8_t)FPA_FORCE_CENTER == 1)
+   //   if ((uint8_t)FPA_FORCE_CENTER == 1)
       ptrH->roic_xstart = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage
-//   else
-// ptrH->roic_xstart    = (ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)*floorf(pGCRegs->OffsetX/(ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)); // on prend le multiple de 32 immediatement inférieur à OffsetX    
+   //   else
+   // ptrH->roic_xstart    = (ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)*floorf(pGCRegs->OffsetX/(ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)); // on prend le multiple de 32 immediatement inférieur à OffsetX    
    
    ptrH->roic_ystart    = (uint32_t)pGCRegs->OffsetY;
    ptrH->roic_ysize     = (float)pGCRegs->Height;
       
-   // revision conditionnelle des parametres
-   if ((float)pGCRegs->Width < (float)FPA_WIDTH_MAX) {
-      if (speedup_unused_area == 1)
-         ptrH->line_stretch_mclk = (float)ISC0804_FASTWINDOW_STRECTHING_AREA_MCLK;
-      else       
-         ptrH->line_stretch_mclk = 0.0F;
-   }
-   else {
-      ptrH->line_stretch_mclk = 0.0F;
-   }
-                
    // readout time
    // readout part 1 (zone usager)
    ptrH->readout_mclk  = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*pGCRegs->Height;
@@ -892,28 +928,47 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
    // readout part 5 (coût du synchronisateur)
    ptrH->readout_mclk  =  ptrH->readout_mclk + ptrH->adc_sync_dly_mclk*pGCRegs->Height;
    
-   
+   // readout en usec
    ptrH->readout_usec   = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
    ptrH->lsydel_usec         = (ptrH->lsydel_mclk/ptrH->lsydel_clock_factor) * ptrH->mclk_period_usec;   //
-   ptrH->fpa_delay_usec      = ptrH->lsydel_usec + ptrH->reset_time_usec + ptrH->int_time_offset_usec;
+   ptrH->fpa_delay_usec      = ptrH->lsydel_usec + abs(ptrH->int_time_offset_usec);
    ptrH->vhd_delay_usec      = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->delay_usec          = ptrH->fpa_delay_usec + ptrH->vhd_delay_usec; 
+   ptrH->delay_usec          = ptrH->fpa_delay_usec + ptrH->vhd_delay_usec;
    
-   if (exposureTime_usec - ptrH->int_time_offset_usec >= 1.0F*ptrH->mclk_period_usec)
-      ptrH->int_signal_high_time_usec = exposureTime_usec - ptrH->int_time_offset_usec;
-   else
-      ptrH->int_signal_high_time_usec = 1.0F*ptrH->mclk_period_usec;   // ne doit jamais arriver
-      
-   //calcul de la periode minimale
-   ptrH->frame_period_min_usec = ptrH->int_signal_high_time_usec + ptrH->delay_usec + ptrH->readout_usec;
+   // FsyncHighMin
+   ptrH->fsync_high_min_usec = ptrH->lsydel_usec;     // valeur en ITR totalement influençable via speedupsi necessaire
+   if (itr_mode_enabled == 0)
+      ptrH->fsync_high_min_usec  = 10.0F + 33.0F * (ptrH->mclk_period_usec/ptrH->lsydel_clock_factor); // valeur en IWR partiellement influencée par speedup
 
+   // FsyncLow
+   if (exposureTime_usec + ptrH->int_time_offset_usec >= 1.0F * ptrH->mclk_period_usec)
+      ptrH->fsync_low_usec = exposureTime_usec + ptrH->int_time_offset_usec;
+   else
+      ptrH->fsync_low_usec = 0.0F;  // 1.0F * ptrH->mclk_period_usec;   // ne doit jamais arriver     
+
+   
+   // T_ri
+   ptrH->tri_min_usec = ptrH->reset_time_usec;    // Tri du 0804 en ITR est selon le chronogramme de la doc, le temps de reset
+   
+   if (itr_mode_enabled == 0){    // IWR
+      // T_ri int part
+      ptrH->tri_min_int_part_usec = ptrH->t_intsmpl_min_usec - ptrH->fsync_low_usec;  // t_intsmpl_min_usec dans la doc du detecteur est l'équivalent de TSH_min des ISC0207. C'est le temps de SH (Sample and Hold)
+      // T_ri window part
+      ptrH->tri_min_window_part_usec = ptrH->fsync_high_min_usec - ptrH->delay_usec - ptrH->readout_usec;
+      // tri_min
+      ptrH->tri_min_usec = MAX(ptrH->tri_min_int_part_usec , ptrH->tri_min_window_part_usec);
+   }
+   
+   // calcul de la periode minimale
+   ptrH->frame_period_min_usec = ptrH->fsync_low_usec + ptrH->delay_usec + ptrH->readout_usec + ptrH->tri_min_usec; 
+           
    //autres calculs
-   ptrH->frame_period_coef = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
-   ptrH->mode_int_end_to_trig_start_dly_usec     = ptrH->frame_period_min_usec - ptrH->int_signal_high_time_usec - ptrH->vhd_delay_usec;  // utilisé en mode int_end_trig_start. % pour le isc0804, ptrH.reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
-   ptrH->mode_readout_end_to_trig_start_dly_usec = 0.3;
-   ptrH->mode_trig_start_to_trig_start_dly_usec  = (ptrH->frame_period_coef*ptrH->frame_period_min_usec - ptrH->int_time_offset_usec - 2.0F*ptrH->vhd_delay_usec);  // on se donne des marges supplémentaires 
+   ptrH->int_signal_high_time_usec = ptrH->fsync_low_usec; 
+   // ptrH->mode_int_end_to_trig_start_dly_usec     = ptrH->frame_period_min_usec - ptrH->int_signal_high_time_usec - ptrH->vhd_delay_usec;  // utilisé en mode int_end_trig_start. % pour le isc0804, ptrH.reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
+   // ptrH->mode_readout_end_to_trig_start_dly_usec = 0.3F;
+   ptrH->mode_trig_start_to_trig_start_dly_usec  = (ptrH->frame_period_coef*ptrH->frame_period_min_usec - 1.0F*ptrH->vhd_delay_usec);  // on se donne des marges supplémentaires
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_min_usec*1e-6);
@@ -950,26 +1005,69 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    isc0804_param_t hh;
-   float periodMinWithNullExposure_usec;
-   float presentPeriod_sec;
+   float fsync_high_min_usec, fsync_low_max_usec;
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
+   float tri_part1_usec, tri_min_usec;
+   float max_fsync_low_usec__plus__tri_min_usec;
+   float max_fsync_low_usec, frame_period_usec;
    
+  
    // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
    
+   /*----------------------------------------------------------- 
+                     ITR mode (default mode)                                    
+   ------------------------------------------------------------*/
    // ENO: 10 sept 2016: tout reste inchangé
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
-   periodMinWithNullExposure_usec = hh.frame_period_min_usec;
-   presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // on cherche les parametres du roic
+   FPA_SpecificParams(&hh, -hh.int_time_offset_usec, pGCRegs); // on à determiner fsyncHigh. Puisque FsyncLow = exposureTime + int_time_offset, on l'obtient lorsque fsynclow = 0, ie lorsque exposureTime = -int_time_offset; 
+   fsync_high_min_usec = hh.frame_period_min_usec;
+   frame_period_usec = (1.0F/fpaAcquisitionFrameRate)*1e6F; // periode avec le frame rate actuel.
+   fsync_low_max_usec = (frame_period_usec - fsync_high_min_usec);
+   max_exposure_usec = fsync_low_max_usec - hh.int_time_offset_usec;
    
-   max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
-
-   // Round exposure time
-   max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
-     
+   /*----------------------------------------------------------- 
+                     IWR mode
+   ------------------------------------------------------------*/
+   if (itr_mode_enabled == 0){
+      
+      // cherchons les parametres specifiques
+      FPA_SpecificParams(&hh, 0.0F, pGCRegs);
+      
+      // cherchons la periode associée au frame rate donné
+      frame_period_usec  =  1e6F/fpaAcquisitionFrameRate;
+                                                          
+      // calculons  max_fsync_low_usec + tri_min_usec pour la periode ainsi calculée                                                   
+      max_fsync_low_usec__plus__tri_min_usec = frame_period_usec - (hh.readout_usec + hh.delay_usec);
+      
+      // determinons le tri induite par la fenetre  choisie et le mode
+      tri_part1_usec = hh.tri_min_window_part_usec;
+      
+      // rappel  : tri_min_usec = max(tri_min_window_part_usec, tri_int_part_usec)
+      //d'où tri_min_usec = max(tri_part1_usec, tri_int_part_usec)
+      
+      // 1er cas : tri_min_usec = tri_part1_usec <=> tri_int_part_usec < tri_part1_usec  <=> fsync_low > t_intsmpl_min_usec - tri_part1_usec
+      // dans ce cas, 
+      tri_min_usec = tri_part1_usec;
+      max_fsync_low_usec = max_fsync_low_usec__plus__tri_min_usec - tri_min_usec;
+      
+      // voyons si l'hypothese de debut est incorrecte (verification a posteriori)
+      // le cas echeant, c'est le 2e cas qui prevaut
+      // 2e cas : tri_min_usec = tri_int_part_usec <=> tri_int_part_usec > tri_part1_usec  <=> fsync_low < t_intsmpl_min_usec - tri_part1_usec
+      // dans ce cas,
+      if (max_fsync_low_usec <= hh.t_intsmpl_min_usec - tri_part1_usec)
+        max_fsync_low_usec = hh.t_intsmpl_min_usec - tri_part1_usec;  // la valeur max de fync_low selon l'hypothese fsync_low < t_intsmpl_min_usec - tri_part1_usec
+      
+      // dans tous les cas         
+      max_exposure_usec = max_fsync_low_usec - hh.int_time_offset_usec;
+   }
+   
    // Limit exposure time
    max_exposure_usec = MIN(MAX(max_exposure_usec, pGCRegs->ExposureTimeMin), FPA_MAX_EXPOSURE);
+   
+   // Round exposure time
+   max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
    
    return max_exposure_usec;
 }

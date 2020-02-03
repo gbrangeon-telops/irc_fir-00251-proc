@@ -58,8 +58,8 @@ architecture rtl of isc0804A_mblaze_intf is
          CLK : in std_logic);
    end component;
    
-   type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(7 downto 0);
-   type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
+   type exp_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
+   type exp_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
    signal exp_time_pipe                : exp_time_pipe_type; 
    signal axi_awaddr	                  : std_logic_vector(31 downto 0);
@@ -103,6 +103,7 @@ architecture rtl of isc0804A_mblaze_intf is
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
    signal dac_cfg_in_progress          : std_logic;
+   signal abs_int_time_offset_mclk_i   : integer := 0;
    --   
    --   -- attribute dont_touch                         : string;
    --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -198,7 +199,7 @@ begin
             user_cfg_i.adc_quad2_en  <= '1';     -- provient pas du µBlaze 
             user_cfg_i.reorder_column  <= '0';   -- provient pas du µBlaze
             user_cfg_i.gain <= '0';   -- provient pas du µBlaze 
-            user_cfg_i.itr <= '1';   -- provient pas du µBlaze
+            -- user_cfg_i.itr <= '1';   -- provient pas du µBlaze
             user_cfg_i.diag.lovh_mclk_source <= to_unsigned(DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- 1MCLK de lovh converti en mclk_source
             mb_ctrled_reset_i <= '0';
             
@@ -336,8 +337,12 @@ begin
                   when X"140" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
                   when X"144" =>    user_cfg_i.elcorr_spare4                   <= data_i(0);
                   when X"148" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0);
-                  when X"14C" =>    user_cfg_i.permit_lsydel_clk_rate_beyond_2x<= data_i(0); user_cfg_in_progress <= '0';
+                  when X"14C" =>    user_cfg_i.permit_lsydel_clk_rate_beyond_2x<= data_i(0); 
                   
+                  when X"150" =>    user_cfg_i.spare2                          <= unsigned(data_i(user_cfg_i.spare2'length-1 downto 0));
+                  when X"154" =>    user_cfg_i.int_time_offset_mclk            <= signed(data_i(user_cfg_i.int_time_offset_mclk'length-1 downto 0));
+                  when X"158" =>    user_cfg_i.itr_mode_enabled                <= data_i(0); user_cfg_in_progress <= '0';
+                     
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
@@ -377,23 +382,38 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
+         abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));
+         
+         -- pragma translate_off
+         abs_int_time_offset_mclk_i <= 0;
+         -- pragma translate_on
+         
          -- pipe pour le calcul du temps d'integration en mclk
-         exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length);
+         exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
          int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         if exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR then
-            int_signal_high_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0) - DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+         
+         if user_cfg_i.int_time_offset_mclk(user_cfg_i.int_time_offset_mclk'length-1) = '0' then 
+            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
          else
+            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
+         end if; 
+         
+         if exp_time_pipe(4)(exp_time_pipe(4)'length - 1) = '1' then
             int_signal_high_time_i <= to_unsigned(1, int_signal_high_time_i'length);
+         else
+            int_signal_high_time_i <= exp_time_pipe(4)(int_signal_high_time_i'length-1 downto 0); -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) >= 1). 
          end if;
+         
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
          exp_indx_pipe(1) <= exp_indx_pipe(0); 
          exp_indx_pipe(2) <= exp_indx_pipe(1); 
          exp_indx_pipe(3) <= exp_indx_pipe(2); 
-         int_indx_i       <= exp_indx_pipe(3);
+         exp_indx_pipe(4) <= exp_indx_pipe(3);
+         int_indx_i       <= exp_indx_pipe(4);
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
@@ -402,7 +422,8 @@ begin
          exp_dval_pipe(3) <= exp_dval_pipe(2);
          exp_dval_pipe(4) <= exp_dval_pipe(3);
          exp_dval_pipe(5) <= exp_dval_pipe(4);
-         int_dval_i       <= exp_dval_pipe(5);         
+         exp_dval_pipe(6) <= exp_dval_pipe(5);
+         int_dval_i       <= exp_dval_pipe(6);                 
          
       end if;
    end process; 

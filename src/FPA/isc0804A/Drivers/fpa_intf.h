@@ -212,11 +212,15 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  elcorr_spare4;
    uint32_t  fpa_intf_data_source;
    uint32_t  permit_lsydel_clk_rate_beyond_2x;
+                                                                                                                        
+   uint32_t  spare2;                                                                                                               
+   int32_t   int_time_offset_mclk;                                                                                                                           
+   uint32_t  itr_mode_enabled;
 };                                  
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
 // ENO :ATTENTION , Vérifier valeur de DET dans le constructeur
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  306888,1,0,  0, 0x17, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,823269205, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  306888,1,0,  0, 0x17, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,823269205, 0, 0, 0, 0, 0, 0, 0, 0,0,0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 
