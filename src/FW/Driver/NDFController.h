@@ -42,10 +42,10 @@
 
 #define NDF_DEFAULT_FILTER_WIDTH   (uint32_t)50 /*< Default maximum distance in counts from the calibrated position before exiting the IN_TRANSITION state */
 
-#define NDF_HOMING_SPEED                 (int32_t)20 /*< speed at which we search for mechanical stops [rpm] */
-#define NDF_HOMING_TOL                   (uint32_t)5 // counts
-#define NDF_HOMING_MAX_PEAK_CURRENT       (uint32_t)100 // [mA]
-#define NDF_HOMING_MAX_CONT_CURRENT       (uint32_t)100 // [mA]
+#define NDF_HOMING_SPEED                  (int32_t)20 /*< speed at which we search for mechanical stops [rpm] */
+#define NDF_HOMING_TOL                    (uint32_t)5 // counts
+#define NDF_HOMING_MAX_PEAK_CURRENT       (uint32_t)500 // [mA]
+#define NDF_HOMING_MAX_CONT_CURRENT       (uint32_t)200 // [mA]
 #define NDF_MAX_PEAK_CURRENT              (uint32_t)3000 // [mA]
 #define NDF_MAX_CONT_CURRENT              (uint32_t)2300 // [mA]
 
