@@ -297,8 +297,8 @@ begin
    --------------------------------------------------------- 
    -- ajustement de phase de l'horloge                                
    ---------------------------------------------------------
-   -- pour alogner l'horloge sur les signaux d'integration
-   -- de plus, on stope l'horloge sans troncature à l'immibnence d'une programmation de detecteur car cette derniere vient avec son horloge propre qui est moins rapide
+   -- pour alonger l'horloge sur les signaux d'integration
+   -- de plus, on stoppe l'horloge sans troncature à l'imminence d'une programmation de detecteur car cette derniere vient avec son horloge propre qui est moins rapide
    U18M :  process(MCLK_SOURCE)
    begin  
       if rising_edge(MCLK_SOURCE) then
