@@ -339,7 +339,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    extern int32_t gFpaDebugRegG;                         // reservé permit_lsydel_clk_rate_beyond_2x pour contrôler le clock rate dans la zone LSYLDEL
    // extern int32_t gFpaDebugRegH;                      // non utilisé
-   uint32_t elcorr_reg;
+   uint32_t elcorr_config_mode;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
    static uint16_t presentElCorrMeasAtSaturation;
@@ -398,11 +398,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;   //  En ITR, il faut itr_trig_start_to_trig_start sinon si c'etait trig_start_to_trig_start uniquement, en trig_externe on pourrait passer dangereusement en IWR sans s'en rendre compte
-   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
-   if (itr_mode_enabled == 0){                                                      // IWR 
-      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_TRIG_START_TO_TRIG_START;     
-   }      
+   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+   ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); // mode_trig_start_to_trig_start_dly_usec tient compte de Tri et donc du mode d'integration. Donc impossible de passer en IWR accidentellement en trig externe par exemple si c'est ITR qui est demandé.
    if (TDCStatusTst(WaitingForImageCorrectionMask) == 1){      // lorsqu'une actualisation est en cours, on passe en MODE_ITR_TRIG_START_TO_TRIG_START pour que le throughput_ctrl ajuste le throughput à celle de l'actualisation
       ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;
    }
@@ -600,12 +597,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // ELCORR : activation via registreA
    if (sw_init_done == 0)
       gFpaDebugRegA = (int32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR;
-   elcorr_reg = (uint32_t)gFpaDebugRegA;
+   elcorr_config_mode = (uint32_t)gFpaDebugRegA;
    
    if (ptrA->fpa_diag_mode == 1)
-      elcorr_reg = (uint32_t)ELCORR_MODE_OFF;      
+      elcorr_config_mode = (uint32_t)ELCORR_MODE_OFF;      
    
-   if (elcorr_reg == (uint32_t)ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR){         // pixeldata avec correction du gain et offset electroniques en mode continuel puis ref dans l'image
+   if (elcorr_config_mode == (uint32_t)ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR){         // pixeldata avec correction du gain et offset electroniques en mode continuel puis ref dans l'image
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -619,7 +616,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->real_mode_active_pixel_dly = 4;    //    on envoie la reference remuante dans l'image
    }
       
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_FREE_WHEELING_CORR){             // pixeldata avec correction du gain et offset electroniques en mode continuel
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_FREE_WHEELING_CORR){             // pixeldata avec correction du gain et offset electroniques en mode continuel
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -632,7 +629,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;
    }
   
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR){           // pixeldata avec correction du gain et offset electroniques
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_OFFSET_AND_GAIN_CORR){           // pixeldata avec correction du gain et offset electroniques
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 0;
@@ -645,7 +642,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;
    }
     
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_ROIC_OUTPUT_CST_IMG){            // voutref data avec correction du gain et offset electroniques
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_ROIC_OUTPUT_CST_IMG){            // voutref data avec correction du gain et offset electroniques
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 1;
       ptrA->roic_cst_output_mode    = 1;
@@ -658,7 +655,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                      
    }
    
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFFSET_CORR){                    // pixeldata avec correction de l'offset électronique seulement
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_OFFSET_CORR){                    // pixeldata avec correction de l'offset électronique seulement
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -671,7 +668,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 1;                            
    }
  
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_DIFF_REF_IMG){                   // image map de la difference des references
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_DIFF_REF_IMG){                   // image map de la difference des references
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -684,7 +681,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                       
    }                                                         
     
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_REF2_IMG){                       // image map de la reference 2 (1 dans le vhd)
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_REF2_IMG){                       // image map de la reference 2 (1 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -697,7 +694,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
     
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_REF1_IMG){                       // image map de la reference 1 (0 dans le vhd)
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_REF1_IMG){                       // image map de la reference 1 (0 dans le vhd)
       elcorr_enabled                = 1;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -710,7 +707,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->sat_ctrl_en             = 0;                                     
    }
 
-   else if (elcorr_reg == (uint32_t)ELCORR_MODE_OFF){                            // desactivation de toute correction electronique
+   else if (elcorr_config_mode == (uint32_t)ELCORR_MODE_OFF){                            // desactivation de toute correction electronique
       elcorr_enabled                = 0;
       elcorr_gain_corr_enabled      = 0;
       ptrA->roic_cst_output_mode    = 0;
@@ -734,7 +731,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }  
   
    // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = hh.reset_time_usec - ((float)FPA_WIDTH_MAX/(hh.pixnum_per_tap_per_mclk*hh.tap_number) + hh.lovh_mclk)*hh.mclk_period_usec;                            
+   elcorr_comp_duration_usec                  = hh.lsydel_usec/2.0F; // elcorr se fait dans la zone lsydel. De plus, on considere juste la moitié de cette zone pour s'assurer d'avoir assez d'echantillons 
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
    ptrA->elcorr_spare1                        = 0;              
@@ -766,7 +763,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // mode continuel   
    if ((((float)hh.roic_xsize - (float)pGCRegs->Width)/2 >= (float)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
-      ||((elcorr_gain_corr_enabled == 1) && ((ptrA->roic_cst_output_mode == 1)|| (elcorr_reg == (uint32_t)ELCORR_MODE_FREE_WHEELING_CORR) || (elcorr_reg == ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR))))
+      ||((elcorr_gain_corr_enabled == 1) && ((ptrA->roic_cst_output_mode == 1)|| (elcorr_config_mode == (uint32_t)ELCORR_MODE_FREE_WHEELING_CORR) || (elcorr_config_mode == ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR))))
       ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
      
    // desactivation en mode patron de tests
@@ -786,7 +783,102 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    FPA_SendProximCfg(&ProximCfg, ptrA);
     
    // envoi du reste de la config 
-   WriteStruct(ptrA);   
+   WriteStruct(ptrA);
+   
+   //   affichage
+   
+   FPA_PRINTF("pGCRegs->OffsetX = %d", (uint32_t)pGCRegs->OffsetX);
+   FPA_PRINTF("pGCRegs->OffsetY = %d", (uint32_t)pGCRegs->OffsetY);
+   FPA_PRINTF("pGCRegs->Width = %d", (uint32_t)pGCRegs->Width);
+   FPA_PRINTF("pGCRegs->Height = %d", (uint32_t)pGCRegs->Height);
+   
+   FPA_PRINTF(" 1e3 * fpa_diag_mode                        =  %d", (int32_t)(1e3F * ptrA->fpa_diag_mode                       ) );  
+   FPA_PRINTF("   1 * fpa_diag_type                        =  %d", (int32_t)(   1 * ptrA->fpa_diag_type                       ) );  
+   FPA_PRINTF("   1 * fpa_pwr_on                           =  %d", (int32_t)(   1 * ptrA->fpa_pwr_on                          ) );  
+   FPA_PRINTF(" 1e3 * fpa_trig_ctrl_mode                   =  %d", (int32_t)(1e3F * ptrA->fpa_trig_ctrl_mode                  ) );  
+   FPA_PRINTF(" 1e3 * fpa_acq_trig_ctrl_dly                =  %d", (int32_t)(1e3F * ptrA->fpa_acq_trig_ctrl_dly               ) );  
+   FPA_PRINTF(" 1e3 * fpa_spare                            =  %d", (int32_t)(1e3F * ptrA->fpa_spare                           ) );  
+   FPA_PRINTF(" 1e3 * fpa_xtra_trig_ctrl_dly               =  %d", (int32_t)(1e3F * ptrA->fpa_xtra_trig_ctrl_dly              ) );  
+   FPA_PRINTF(" 1e3 * fpa_trig_ctrl_timeout_dly            =  %d", (int32_t)(1e3F * ptrA->fpa_trig_ctrl_timeout_dly           ) );                                      
+   FPA_PRINTF(" 1e3 * fpa_stretch_acq_trig                 =  %d", (int32_t)(1e3F * ptrA->fpa_stretch_acq_trig                ) );  
+   FPA_PRINTF(" 1e3 * diag_ysize                           =  %d", (int32_t)(1e3F * ptrA->diag_ysize                          ) );  
+   FPA_PRINTF(" 1e3 * diag_xsize_div_tapnum                =  %d", (int32_t)(1e3F * ptrA->diag_xsize_div_tapnum               ) );  
+   FPA_PRINTF(" 1e3 * roic_ystart                          =  %d", (int32_t)(1e3F * ptrA->roic_ystart                         ) );  
+   FPA_PRINTF(" 1e3 * roic_ysize_div4_m1                   =  %d", (int32_t)(1e3F * ptrA->roic_ysize_div4_m1                  ) );  
+   FPA_PRINTF(" 1e3 * vdet_code                            =  %d", (int32_t)(1e3F * ptrA->vdet_code                           ) );  
+   FPA_PRINTF(" 1e3 * ref_mode_en                          =  %d", (int32_t)(1e3F * ptrA->ref_mode_en                         ) );  
+   FPA_PRINTF(" 1e3 * ref_chn_en                           =  %d", (int32_t)(1e3F * ptrA->ref_chn_en                          ) );  
+   FPA_PRINTF(" 1e3 * clamping_level                       =  %d", (int32_t)(1e3F * ptrA->clamping_level                      ) );  
+   FPA_PRINTF(" 1e3 * real_mode_active_pixel_dly           =  %d", (int32_t)(1e3F * ptrA->real_mode_active_pixel_dly          ) );  
+   FPA_PRINTF(" 1e3 * speedup_lsync                        =  %d", (int32_t)(1e3F * ptrA->speedup_lsync                       ) );  
+   FPA_PRINTF(" 1e3 * speedup_sample_row                   =  %d", (int32_t)(1e3F * ptrA->speedup_sample_row                  ) );  
+   FPA_PRINTF(" 1e3 * speedup_unused_area                  =  %d", (int32_t)(1e3F * ptrA->speedup_unused_area                 ) );  
+   FPA_PRINTF(" 1e3 * raw_area_line_start_num              =  %d", (int32_t)(1e3F * ptrA->raw_area_line_start_num             ) );  
+   FPA_PRINTF(" 1e3 * raw_area_line_end_num                =  %d", (int32_t)(1e3F * ptrA->raw_area_line_end_num               ) );  
+   FPA_PRINTF(" 1e3 * raw_area_sof_posf_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_sof_posf_pclk              ) );  
+   FPA_PRINTF(" 1e3 * raw_area_eof_posf_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_eof_posf_pclk              ) );  
+   FPA_PRINTF(" 1e3 * raw_area_sol_posl_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_sol_posl_pclk              ) );  
+   FPA_PRINTF(" 1e3 * raw_area_eol_posl_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_eol_posl_pclk              ) );  
+   FPA_PRINTF(" 1e3 * raw_area_eol_posl_pclk_p1            =  %d", (int32_t)(1e3F * ptrA->raw_area_eol_posl_pclk_p1           ) );  
+   FPA_PRINTF(" 1e3 * raw_area_window_lsync_num            =  %d", (int32_t)(1e3F * ptrA->raw_area_window_lsync_num           ) );  
+   FPA_PRINTF(" 1e3 * raw_area_line_period_pclk            =  %d", (int32_t)(1e3F * ptrA->raw_area_line_period_pclk           ) );  
+   FPA_PRINTF(" 1e3 * raw_area_readout_pclk_cnt_max        =  %d", (int32_t)(1e3F * ptrA->raw_area_readout_pclk_cnt_max       ) );  
+   FPA_PRINTF(" 1e3 * user_area_line_start_num             =  %d", (int32_t)(1e3F * ptrA->user_area_line_start_num            ) );  
+   FPA_PRINTF(" 1e3 * user_area_line_end_num               =  %d", (int32_t)(1e3F * ptrA->user_area_line_end_num              ) );  
+   FPA_PRINTF(" 1e3 * user_area_sol_posl_pclk              =  %d", (int32_t)(1e3F * ptrA->user_area_sol_posl_pclk             ) );  
+   FPA_PRINTF(" 1e3 * user_area_eol_posl_pclk              =  %d", (int32_t)(1e3F * ptrA->user_area_eol_posl_pclk             ) );  
+   FPA_PRINTF(" 1e3 * user_area_eol_posl_pclk_p1           =  %d", (int32_t)(1e3F * ptrA->user_area_eol_posl_pclk_p1          ) );  
+   FPA_PRINTF(" 1e3 * stretch_area_sol_posl_pclk           =  %d", (int32_t)(1e3F * ptrA->stretch_area_sol_posl_pclk          ) );  
+   FPA_PRINTF(" 1e3 * stretch_area_eol_posl_pclk           =  %d", (int32_t)(1e3F * ptrA->stretch_area_eol_posl_pclk          ) );  
+   FPA_PRINTF(" 1e3 * pix_samp_num_per_ch                  =  %d", (int32_t)(1e3F * ptrA->pix_samp_num_per_ch                 ) );  
+   FPA_PRINTF(" 1e3 * hgood_samp_sum_num                   =  %d", (int32_t)(1e3F * ptrA->hgood_samp_sum_num                  ) );  
+   FPA_PRINTF(" 1e3 * hgood_samp_mean_numerator            =  %d", (int32_t)(1e3F * ptrA->hgood_samp_mean_numerator           ) );  
+   FPA_PRINTF(" 1e3 * vgood_samp_sum_num                   =  %d", (int32_t)(1e3F * ptrA->vgood_samp_sum_num                  ) );  
+   FPA_PRINTF(" 1e3 * vgood_samp_mean_numerator            =  %d", (int32_t)(1e3F * ptrA->vgood_samp_mean_numerator           ) );
+   FPA_PRINTF(" 1e3 * good_samp_first_pos_per_ch           =  %d", (int32_t)(1e3F * ptrA->good_samp_first_pos_per_ch          ) );
+   FPA_PRINTF(" 1e3 * good_samp_last_pos_per_ch            =  %d", (int32_t)(1e3F * ptrA->good_samp_last_pos_per_ch           ) );
+   FPA_PRINTF(" 1e3 * adc_clk_source_phase                 =  %d", (int32_t)(1e3F * ptrA->adc_clk_source_phase                ) );  
+   FPA_PRINTF(" 1e3 * adc_clk_pipe_sel                     =  %d", (int32_t)(1e3F * ptrA->adc_clk_pipe_sel                    ) );  
+   FPA_PRINTF(" 1e3 * lsydel_mclk                          =  %d", (int32_t)(1e3F * ptrA->lsydel_mclk                         ) );  
+   FPA_PRINTF(" 1e3 * boost_mode                           =  %d", (int32_t)(1e3F * ptrA->boost_mode                          ) );  
+   FPA_PRINTF(" 1e3 * speedup_lsydel                       =  %d", (int32_t)(1e3F * ptrA->speedup_lsydel                      ) );                                      
+   FPA_PRINTF(" 1e3 * fastrd_sync_pos                      =  %d", (int32_t)(1e3F * ptrA->fastrd_sync_pos                     ) );  
+   FPA_PRINTF(" 1e3 * elcorr_enabled                       =  %d", (int32_t)(1e3F * ptrA->elcorr_enabled                      ) );  
+   FPA_PRINTF(" 1e3 * elcorr_spare1                        =  %d", (int32_t)(1e3F * ptrA->elcorr_spare1                       ) );  
+   FPA_PRINTF(" 1e3 * elcorr_spare2                        =  %d", (int32_t)(1e3F * ptrA->elcorr_spare2                       ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_ref_enabled         =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_ref_enabled        ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_ref_cont_meas_mode  =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_start_dly_sampclk   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_start_dly_sampclk  ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_samp_num_per_ch     =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_samp_num_per_ch    ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_samp_mean_numerator =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_samp_mean_numerator) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_ref_value           =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_ref_value          ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_ref_enabled         =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_ref_enabled        ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_ref_cont_meas_mode  =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_start_dly_sampclk   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_start_dly_sampclk  ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_samp_num_per_ch     =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_samp_num_per_ch    ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_samp_mean_numerator =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_samp_mean_numerator) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_ref_value           =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_ref_value          ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref_dac_id                    =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_dac_id                   ) );  
+   FPA_PRINTF(" 1e3 * elcorr_atemp_gain                    =  %d", (int32_t)(1e3F * ptrA->elcorr_atemp_gain                   ) );  
+   FPA_PRINTF(" 1e3 * elcorr_atemp_ofs                     =  %d", (int32_t)(1e3F * ptrA->elcorr_atemp_ofs                    ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref0_op_sel                   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref0_op_sel                  ) );  
+   FPA_PRINTF(" 1e3 * elcorr_ref1_op_sel                   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref1_op_sel                  ) );  
+   FPA_PRINTF(" 1e3 * elcorr_mult_op_sel                   =  %d", (int32_t)(1e3F * ptrA->elcorr_mult_op_sel                  ) );  
+   FPA_PRINTF(" 1e3 * elcorr_div_op_sel                    =  %d", (int32_t)(1e3F * ptrA->elcorr_div_op_sel                   ) );  
+   FPA_PRINTF(" 1e3 * elcorr_add_op_sel                    =  %d", (int32_t)(1e3F * ptrA->elcorr_add_op_sel                   ) );  
+   FPA_PRINTF(" 1e3 * sat_ctrl_en                          =  %d", (int32_t)(1e3F * ptrA->sat_ctrl_en                         ) );  
+   FPA_PRINTF(" 1e3 * roic_dbg_reg                         =  %d", (int32_t)(1e3F * ptrA->roic_dbg_reg                        ) );  
+   FPA_PRINTF(" 1e3 * roic_test_row_en                     =  %d", (int32_t)(1e3F * ptrA->roic_test_row_en                    ) );  
+   FPA_PRINTF(" 1e3 * roic_cst_output_mode                 =  %d", (int32_t)(1e3F * ptrA->roic_cst_output_mode                ) );  
+   FPA_PRINTF(" 1e3 * elcorr_spare                         =  %d", (int32_t)(1e3F * ptrA->elcorr_spare                        ) );  
+   FPA_PRINTF(" 1e3 * cfg_num                              =  %d", (int32_t)(1e3F * ptrA->cfg_num                             ) );  
+   FPA_PRINTF(" 1e3 * elcorr_spare4                        =  %d", (int32_t)(1e3F * ptrA->elcorr_spare4                       ) );  
+   FPA_PRINTF(" 1e3 * fpa_intf_data_source                 =  %d", (int32_t)(1e3F * ptrA->fpa_intf_data_source                ) );  
+   FPA_PRINTF(" 1e3 * permit_lsydel_clk_rate_beyond_2x     =  %d", (int32_t)(1e3F * ptrA->permit_lsydel_clk_rate_beyond_2x    ) );  
+   FPA_PRINTF(" 1e3 * spare2                               =  %d", (int32_t)(1e3F * ptrA->spare2                              ) );  
+   FPA_PRINTF(" 1e3 * int_time_offset_mclk                 =  %d", (int32_t)(1e3F * ptrA->int_time_offset_mclk                ) ); 
+   FPA_PRINTF(" 1e3 * itr_mode_enabled                     =  %d", (int32_t)(1e3F * ptrA->itr_mode_enabled                    ) );    
+   
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -965,6 +1057,7 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->frame_period_min_usec = ptrH->fsync_low_usec + ptrH->delay_usec + ptrH->readout_usec + ptrH->tri_min_usec; 
            
    //autres calculs
+   ptrH->frame_period_coef = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
    ptrH->int_signal_high_time_usec = ptrH->fsync_low_usec; 
    // ptrH->mode_int_end_to_trig_start_dly_usec     = ptrH->frame_period_min_usec - ptrH->int_signal_high_time_usec - ptrH->vhd_delay_usec;  // utilisé en mode int_end_trig_start. % pour le isc0804, ptrH.reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
    // ptrH->mode_readout_end_to_trig_start_dly_usec = 0.3F;
@@ -972,7 +1065,8 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_min_usec*1e-6);
-}
+    
+}                                                                           
  
 //--------------------------------------------------------------------------                                                                            
 // Pour avoir le frameRateMax avec une config donnée
@@ -1235,5 +1329,4 @@ void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
       AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  // dans le vhd, division par 4 avant entrée dans ram
       ii++;
    }
-}
-
+}                    

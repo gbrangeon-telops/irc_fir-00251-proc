@@ -18,7 +18,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0804A__11.1MHz SVN_TRUNK"
+#define FPA_DEVICE_MODEL_NAME    "ISC0804A__11.1MHz SVN_TRUNK IWR"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
@@ -74,6 +74,8 @@
 #define FPA_MCLK_RATE_HZ            11100000          //5500000     //11100000          //11880000          //5000000    //11100000          // le master clock du FPA
 #define FPA_CLOCK_FREQ_HZ           FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec] , one pixel per mclk edges (DDR) 
+
+#define FPA_PRINTF(fmt, ...)  FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF

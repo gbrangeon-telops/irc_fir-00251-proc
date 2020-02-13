@@ -128,24 +128,36 @@ package body isc0804A_intf_testbench_pkg is
       variable cfg_num                              : unsigned(31 downto  0) := (others => '0');
       variable dac_free_running_mode                : unsigned(31 downto  0);
       variable fpa_intf_data_source                 : unsigned(31 downto  0) := (others => '0');
-      variable permit_lsydel_clk_rate_beyond_2x     : unsigned(31 downto  0) := (others => '1');
+      variable permit_lsydel_clk_rate_beyond_2x     : unsigned(31 downto  0) := (others => '0');
+      
+      variable spare2                               : unsigned(31 downto  0);
+      variable int_time_offset_mclk                 : unsigned(31 downto 0);
+      variable itr_mode_enabled                     : unsigned(31 downto  0);
       
       
       variable roic_xsize : natural            := 640;
       variable roic_ysize : natural            := user_ysize;                             -- pas utilisé dans la config
       variable user_sol_posl_pclk : natural    := ((roic_xsize - user_xsize)/2)/TAP_NUM + 1;
       
-      variable y                               : unsigned(84*32-1 downto 0);
+      variable y                               : unsigned(87*32-1 downto 0);
       
-   begin
+   begin 
+      
+      
+      itr_mode_enabled              := (others => '1');
+      
       comn_fpa_diag_mode            := (others => diag_mode);
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
-      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(100000, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_acq_trig_period_min  := to_unsigned(100000, comn_fpa_acq_trig_period_min'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(100000, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_period_min := to_unsigned(100000, comn_fpa_xtra_trig_period_min'length);        
+      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
+      if (diag_mode = '1') then 
+         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
+      end if;   
+      
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(99642, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_period_min  := to_unsigned(99642, comn_fpa_acq_trig_period_min'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(99642, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_period_min := to_unsigned(99642, comn_fpa_xtra_trig_period_min'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
@@ -160,11 +172,11 @@ package body isc0804A_intf_testbench_pkg is
       ref_chn_en                    := (others => '0');
       clamping_level                := (others => '0'); 
       
-      real_mode_active_pixel_dly    := to_unsigned(5, 32);   
+      real_mode_active_pixel_dly    := to_unsigned(8, 32);   
       
       speedup_lsydel                := (others =>'1');
       speedup_lsync                 := (others =>'0');            
-      speedup_sample_row            := (others =>'0');         
+      speedup_sample_row            := (others =>'1');         
       speedup_unused_area           := (others =>'1'); 
       
       raw_area_line_start_num            := to_unsigned(USER_FIRST_LINE_NUM, 32); 
@@ -220,27 +232,27 @@ package body isc0804A_intf_testbench_pkg is
       
       elcorr_ref_cfg_0_ref_enabled         := to_unsigned(1, 32);               
       elcorr_ref_cfg_0_null_forced         := (others => '0');              
-      elcorr_ref_cfg_0_start_dly_sampclk   := to_unsigned(2, 32);        
-      elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(20, 32);
-      elcorr_ref_cfg_0_samp_mean_numerator := to_unsigned(2**21/20, 32);     
-      elcorr_ref_cfg_0_ref_value           := to_unsigned(2000, 32);  --      
+      elcorr_ref_cfg_0_start_dly_sampclk   := to_unsigned(6, 32);        
+      elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(120, 32);
+      elcorr_ref_cfg_0_samp_mean_numerator := to_unsigned(17476, 32);     
+      elcorr_ref_cfg_0_ref_value           := to_unsigned(5829, 32);  --      
       
       elcorr_ref_cfg_1_ref_enabled         := to_unsigned(1, 32);          
       elcorr_ref_cfg_1_null_forced         := (others => '0');             
-      elcorr_ref_cfg_1_start_dly_sampclk   := to_unsigned(2, 32);          
-      elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(20, 32);         
-      elcorr_ref_cfg_1_samp_mean_numerator := to_unsigned(2**21/20, 32);      
-      elcorr_ref_cfg_1_ref_value           := to_unsigned(4000, 32);  --   
+      elcorr_ref_cfg_1_start_dly_sampclk   := to_unsigned(6, 32);          
+      elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(120, 32);         
+      elcorr_ref_cfg_1_samp_mean_numerator := to_unsigned(17476, 32);      
+      elcorr_ref_cfg_1_ref_value           := to_unsigned(2359, 32);  --   
       
       elcorr_ref_dac_id                    := to_unsigned(5, 32);  --       
-      elcorr_atemp_gain                    := to_unsigned(1, 32);          
-      elcorr_atemp_ofs                     := to_unsigned(540, 32);                     
-      sat_ctrl_en                          := (others => '0');                        
+      elcorr_atemp_gain                    := to_unsigned(7918, 32);          
+      elcorr_atemp_ofs                     := to_unsigned(7676, 32);                     
+      sat_ctrl_en                          := (others => '1');                        
       
       elcorr_ref0_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
       elcorr_ref1_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
-      elcorr_mult_op_sel                   := resize(ELCORR_SW_TO_PATH1, 32);
-      elcorr_div_op_sel                    := resize(ELCORR_SW_TO_PATH1, 32); 
+      elcorr_mult_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
+      elcorr_div_op_sel                    := resize(ELCORR_SW_TO_NORMAL_OP, 32); 
       elcorr_add_op_sel                    := resize(ELCORR_SW_TO_NORMAL_OP, 32);  
       
       -- sortie de la reference0
@@ -284,6 +296,9 @@ package body isc0804A_intf_testbench_pkg is
          dac_free_running_mode  := (others => '1');
          elcorr_gain_cont_calc_mode := (others => '1');
       end if; 
+      
+      int_time_offset_mclk := unsigned(to_signed(-3, 32));
+      
       
       -- cfg usager
       y :=  comn_fpa_diag_mode              
@@ -369,7 +384,10 @@ package body isc0804A_intf_testbench_pkg is
       & cfg_num                    
       & dac_free_running_mode
       & fpa_intf_data_source
-      & permit_lsydel_clk_rate_beyond_2x;
+      & permit_lsydel_clk_rate_beyond_2x
+      & spare2              
+      & int_time_offset_mclk
+      & itr_mode_enabled;     
       
       return y;
    end to_intf_cfg;

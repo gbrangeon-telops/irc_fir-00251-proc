@@ -22,8 +22,8 @@
 
 #elif defined(ARCH_FPGA_325)
 
-#define SVN_HARDWARE_REV      24841
-#define SVN_SOFTWARE_REV      24859
+#define SVN_HARDWARE_REV      -24841
+#define SVN_SOFTWARE_REV      -24860
 #define SVN_BOOTLOADER_REV    24859
 #define SVN_COMMON_REV        24839
 

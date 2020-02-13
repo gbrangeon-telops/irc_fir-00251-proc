@@ -384,10 +384,6 @@ begin
          
          abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));
          
-         -- pragma translate_off
-         abs_int_time_offset_mclk_i <= 0;
-         -- pragma translate_on
-         
          -- pipe pour le calcul du temps d'integration en mclk
          exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          

@@ -40,6 +40,7 @@ d:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\isc0804A_elcorr_refs_ctrl.vhd \
 D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_throughput_ctrl.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\isc0804A_readout_ctrler.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\isc0804A_prog_ctrler.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\isc0804A_hw_prog.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\isc0804A_hw_driver.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\isc0804A_intf.bde
  

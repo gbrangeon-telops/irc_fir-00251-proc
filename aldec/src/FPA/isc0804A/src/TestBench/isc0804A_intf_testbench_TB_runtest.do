@@ -34,21 +34,22 @@ acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d1024\t_axi4_stream64
 acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d2048\t_axi4_stream64_sfifo_d2048_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d16384_lim\t_axi4_stream64_sfifo_d16384_lim_sim_netlist.vhdl
 
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
+
+--acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w62_d16\fwft_afifo_w62_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d128\fwft_afifo_w72_d128_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w1_d16\fwft_sfifo_w1_d16_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w1_d16\fwft_sfifo_w1_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d256\fwft_sfifo_w3_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w64_d256\fwft_sfifo_w64_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d64\fwft_sfifo_w8_d64_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d64\fwft_sfifo_w8_d64_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream32_afifo_d512\t_axi4_stream32_afifo_d512_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w43_d512\fwft_sfifo_w43_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
@@ -56,7 +57,34 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_n
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d128\fwft_afifo_w72_d128_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d256\afifo_w72_d256_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d256\afifo_w72_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\afpa_single_div_ip\afpa_single_div_ip_sim_netlist.vhdl
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w80_d256\fwft_sfifo_w80_d256_sim_netlist.vhdl 
+
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
+
+--acom D:\Telops\FIR-00251-Proc\IP\325\var_shift_reg_w16_d32\var_shift_reg_w16_d32_sim_netlist.vhdl
+
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_6_4_MHz_mmcm\isc0207A_3k_6_4_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_6_6_MHz_mmcm\isc0207A_3k_6_6_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_7_1_MHz_mmcm\isc0207A_3k_7_1_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_7_5_MHz_mmcm\isc0207A_3k_7_5_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_8_0_MHz_mmcm\isc0207A_3k_8_0_MHz_mmcm_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_8_3_MHz_mmcm\isc0207A_3k_8_3_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_8_4_MHz_mmcm\isc0207A_3k_8_4_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_8_5_MHz_mmcm\isc0207A_3k_8_5_MHz_mmcm_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_9_0_MHz_mmcm\isc0207A_3k_9_0_MHz_mmcm_sim_netlist.vhdl
+
+--acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_9_5_MHz_mmcm\isc0207A_3k_9_5_MHz_mmcm_sim_netlist.vhdl
+-- acom D:\Telops\FIR-00251-Proc\IP\325\isc0207A_3k_10_0_MHz_mmcm\isc0207A_3k_10_0_MHz_mmcm_sim_netlist.vhdl
+-- acom D:\Telops\FIR-00251-Proc\IP\325\serdes_isc0207A_3k_5_0_MHz_mmcm\serdes_isc0207A_3k_5_0_MHz_mmcm_sim_netlist.vhdl 
+
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d128\fwft_afifo_w72_d128_sim_netlist.vhdl
+--acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d256\afifo_w72_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\afpa_single_div_ip\afpa_single_div_ip_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
@@ -209,7 +237,7 @@ asim -ses isc0804A_intf_testbench_TB
 --wave UUT/U1/U5/U4/*
 
 --wave UUT/U1/*
-wave UUT/U1/U9/ID_A/U1/U1/*
+--wave UUT/U1/U4/*
 
 --wave UUT/U1/U9/U1/g0/U5/*
 --wave UUT/U1/U9/U1/g0/U1/*
@@ -224,14 +252,17 @@ wave UUT/U1/U9/ID_A/U1/U1/*
 
 --wave UUT/U1/U9/U11/*
 --wave UUT/U1/U9/U12/U3/*
-wave UUT/U1/U5/U21/*
-wave UUT/U1/U5/U5/U5/*
+wave UUT/U1/U5/U2/*
+wave UUT/U1/U5/U2/U21/*
+wave UUT/U1/U5/*
 
 
-wave UUT/U1/U9/U18/*
+wave UUT/U1/U9/U2/U4/U2/*
+wave UUT/U1/U9/U2/U4/U2/UB/*
+wave UUT/U1/U9/U1/*
 --wave UUT/U1/U9/U18/U1/*
 
 wave UUT/U1/*
---run 100 us
-run 60 ms  
+run 100 ms
+--run 30 ms  
 --9.1 ms
