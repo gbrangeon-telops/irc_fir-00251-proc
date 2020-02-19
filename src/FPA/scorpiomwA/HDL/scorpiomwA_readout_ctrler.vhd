@@ -27,7 +27,8 @@ entity scorpiomwA_readout_ctrler is
       FPA_MCLK          : in std_logic;  -- 
       FPA_INTF_CFG      : in fpa_intf_cfg_type;      
       FPA_INT           : in std_logic;  -- requis pour ScorpioMW puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
-      FPA_INT_FDBK      : in std_logic;  -- requis pour ScorpioMW puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration      
+      FPA_INT_FDBK      : in std_logic;  -- requis pour ScorpioMW puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
+      ACQ_INT           : in std_logic;  -- requis pour determiner ACQ_FRINGE
       
       QUAD_CLK_COPY     : in std_logic;
       
@@ -56,8 +57,23 @@ architecture rtl of scorpiomwA_readout_ctrler is
          CLK : in std_logic);
    end component; 
    
-   signal sreset               : std_logic;
+   component fwft_sfifo_w3_d16
+      port (
+         clk         : in std_logic;
+         srst        : in std_logic;
+         din         : in std_logic_vector(2 downto 0);
+         wr_en       : in std_logic;
+         rd_en       : in std_logic;
+         dout        : out std_logic_vector(2 downto 0);
+         full        : out std_logic;
+         almost_full : out std_logic;
+         overflow    : out std_logic;
+         empty       : out std_logic;
+         valid       : out std_logic
+         );
+   end component;
    
+   signal sreset               : std_logic;
    signal readout_fsm          : readout_fsm_type;
    signal active_int_fsm       : active_int_fsm_type;
    signal fpa_int_last         : std_logic;
@@ -92,24 +108,11 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal fpa_int_i            : std_logic;
    signal fpa_active_int_i     : std_logic;
    signal fpa_mclk_rising_edge : std_logic;
-   signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR; 
+   signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR;
    
---   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
---   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
---   signal elec_ofs_end_i       : std_logic;
---   signal elec_ofs_start_i     : std_logic;
+   signal acq_data_i           : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
---   signal elec_ofs_fval_i      : std_logic;
    
-   
-   
-   --   -- attribute dont_touch : string;
-   --   -- attribute dont_touch of sof_pipe         : signal is "true"; 
-   --   -- attribute dont_touch of eof_pipe         : signal is "true";
-   --   -- attribute dont_touch of sol_pipe         : signal is "true"; 
-   --   -- attribute dont_touch of eol_pipe         : signal is "true";
-   --   -- attribute dont_touch of fval_pipe        : signal is "true"; 
-   --   -- attribute dont_touch of lval_pipe        : signal is "true";
    
 begin
    
@@ -179,7 +182,7 @@ begin
             fpa_mclk_last <= FPA_MCLK;  
             
             fpa_mclk_rising_edge <= not fpa_mclk_last and FPA_MCLK;
-                        
+            
             -- READOUT_INFO
             -- aoi
             readout_info_i.aoi.sof           <= sof_pipe(C_PIPE_POS); 
@@ -190,7 +193,8 @@ begin
             readout_info_i.aoi.lval          <= lval_pipe(C_PIPE_POS);
             readout_info_i.aoi.dval          <= dval_pipe(C_PIPE_POS);
             readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
-            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS);
+            readout_info_i.aoi.spare(0)      <= acq_data_i;
             
             -- naoi
             readout_info_i.naoi.start        <= '0';
@@ -202,12 +206,12 @@ begin
             
          end if;
       end if;
-   end process;    
+   end process;
    
    --------------------------------------------------
    -- generation fpa_active_int_i
    --------------------------------------------------
-   Uo: process(CLK)
+   UoB: process(CLK)
       
       variable mclk_cnt_inc : std_logic_vector(1 downto 0);
       
@@ -217,6 +221,7 @@ begin
             active_int_fsm <= idle;
             fpa_active_int_i <= '0'; 
             mclk_cnt_inc :=  (others => '0');
+            acq_data_i <= '0';
             
          else  
             
@@ -228,7 +233,8 @@ begin
                when idle =>   
                   fpa_active_int_i <= '0';
                   mclk_cnt <= 0;
-                  if fpa_int_last = '0' and fpa_int_i = '1' then 
+                  if fpa_int_last = '0' and fpa_int_i = '1' then   --  ENO: 19 fev 2020: puisqu'en IWR ou ITR, le front montant du signal est toujours bien distinct des autres signaux, scorpiomwA n'a donc pas besoin de fifo pour stocker le front montant de l'integration  
+                     acq_data_i <= ACQ_INT;                        -- ce signal conditionnera l'envoi ou non dans la chaine, de l'image associée
                      active_int_fsm <= active_int_st;
                   end if;
                
