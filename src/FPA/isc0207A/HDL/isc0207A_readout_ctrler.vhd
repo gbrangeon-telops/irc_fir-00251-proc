@@ -27,7 +27,7 @@ entity isc0207A_readout_ctrler is
       FPA_MCLK          : in std_logic;  -- 
       FPA_INTF_CFG      : in fpa_intf_cfg_type;      
       FPA_INT           : in std_logic;  -- 
-      --FPA_INT_FDBK      : in std_logic;  -- 
+      ACQ_INT           : in std_logic;  -- requis pour determiner ACQ_FRINGE
       
       
       QUAD_CLK_COPY     : in std_logic;
@@ -44,7 +44,7 @@ architecture rtl of isc0207A_readout_ctrler is
    constant C_FLAG_PIPE_LEN : integer := DEFINE_ADC_QUAD_CLK_FACTOR;
    constant C_PIPE_POS      : integer := 3;
    
-   type readout_fsm_type is (idle, readout_st, wait_mclk_fe_st, wait_readout_end_st);
+   type readout_fsm_type is (idle, wait_int_fe_st, readout_st, wait_mclk_fe_st, wait_readout_end_st);
    type line_cnt_pipe_type is array (0 to 3) of unsigned(10 downto 0);
    component sync_reset
       port(
@@ -83,7 +83,7 @@ architecture rtl of isc0207A_readout_ctrler is
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
-   --signal fpa_int_fdbk_i       : std_logic;
+   signal acq_data_i           : std_logic;                       -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    
    signal elcorr_ref_start_pipe  : std_logic_vector(15 downto 0);
    signal elcorr_ref_end_pipe    : std_logic_vector(15 downto 0);
@@ -195,7 +195,8 @@ begin
             readout_info_i.aoi.lval          <= lval_pipe(C_PIPE_POS);
             readout_info_i.aoi.dval          <= dval_pipe(C_PIPE_POS);
             readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
-            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS);
+            readout_info_i.aoi.spare(0)      <= acq_data_i;
             
             -- naoi : ENO: 22 avril 2019: dans les flags importants du naoi, rajouter toujours DEFINE_GENERATE_ELCORR_CHAIN pour eviter des bugs de non sortie d'images
             -- en clair ne jamais generer les signaux naoi si DEFINE_GENERATE_ELCORR_CHAIN = 0.
@@ -223,6 +224,7 @@ begin
          if sreset = '1' then            
             readout_fsm <= idle;
             readout_in_progress <= '0';
+            acq_data_i <= '0';
             
          else  
             
@@ -231,7 +233,13 @@ begin
                
                when idle =>   
                   readout_in_progress <= '0';
-                  if fpa_int_i = '0' and fpa_int_last = '1' then -- debut readout image = fin de l'integration
+                  if fpa_int_last = '0' and fpa_int_i = '1' then                -- debut d'une integration
+                     acq_data_i <= ACQ_INT; 
+                     readout_fsm <= wait_int_fe_st;
+                  end if;
+               
+               when wait_int_fe_st =>    
+                  if fpa_int_i = '0' and fpa_int_last = '1' then                -- debut readout image = fin de l'integration
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                

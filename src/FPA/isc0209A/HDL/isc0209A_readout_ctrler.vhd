@@ -27,6 +27,7 @@ entity isc0209A_readout_ctrler is
       FPA_MCLK          : in std_logic;  -- 
       FPA_INTF_CFG      : in fpa_intf_cfg_type;      
       FPA_INT           : in std_logic;  -- requis pour ISC0209A puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
+      ACQ_INT           : in std_logic;  -- requis pour determiner ACQ_FRINGE
       FPA_INT_FDBK      : in std_logic;  -- requis pour ISC0209A puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
       
       QUAD_CLK_COPY     : in std_logic;
@@ -66,7 +67,7 @@ architecture rtl of isc0209A_readout_ctrler is
          overflow : OUT STD_LOGIC;
          empty : OUT STD_LOGIC;
          valid : OUT STD_LOGIC
-      );
+         );
    END COMPONENT;
    
    signal sreset               : std_logic;
@@ -106,15 +107,13 @@ architecture rtl of isc0209A_readout_ctrler is
    signal fpa_int_fe_fifo_wr   : std_logic;
    signal fpa_int_fe_fifo_rd   : std_logic;
    signal fpa_int_fe_fifo_dval : std_logic;
-   
---   signal elec_ofs_start_pipe  : std_logic_vector(15 downto 0);
---   signal elec_ofs_end_pipe    : std_logic_vector(15 downto 0);
---   signal elec_ofs_end_i       : std_logic;
---   signal elec_ofs_start_i     : std_logic;
+   signal acq_data_i           : std_logic_vector(0 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
+   signal acq_data_o           : std_logic_vector(0 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
    signal eof_pulse            : std_logic;
    signal eof_pulse_last       : std_logic;
---   signal elec_ofs_fval_i      : std_logic;
+   signal acq_int_pipe         : std_logic_vector(7 downto 0);
+   signal acq_data_latch       : std_logic;
    
 begin
    
@@ -193,7 +192,8 @@ begin
             readout_info_i.aoi.lval          <= lval_pipe(C_PIPE_POS);
             readout_info_i.aoi.dval          <= dval_pipe(C_PIPE_POS);
             readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
-            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS); 
+            readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS);
+            readout_info_i.aoi.spare(0)      <= acq_data_latch;
             
             -- naoi
             readout_info_i.naoi.start        <= '0';
@@ -222,7 +222,10 @@ begin
             fpa_int_fe_fifo_rd <= '0';
             -- pragma translate_off
             lsync_cnt <=  (others => '0');
-            -- pragma translate_on
+            -- pragma translate_on 
+            acq_data_latch <= '0';
+            acq_int_pipe <= (others => '0');
+            acq_data_i <= (others => '0');
             
          else  
             
@@ -235,6 +238,8 @@ begin
             lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0);           
             
             fpa_int_fe_fifo_wr <= fpa_int_last and not fpa_int_i; -- fin de la consigne d'integration
+            acq_int_pipe(7 downto 0) <= acq_int_pipe(6 downto 0) & ACQ_INT; -- pipe pour decaler ACQ_INT afin qu'il soit valide suffisamment longtemps après la tombée de fpa_int_i;
+            acq_data_i(0) <= acq_int_pipe(7);
             
             -- contrôleur
             case readout_fsm is           
@@ -246,6 +251,7 @@ begin
                   fpa_int_fe_fifo_rd <= '0';
                   if fpa_int_fe_fifo_dval = '1' then
                      fpa_int_fe_fifo_rd <= '1';
+                     acq_data_latch <= acq_data_o(0);
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
@@ -281,20 +287,20 @@ begin
    --------------------------------------------------
    -- fifo fwft pour falling edge du signal d'intégration
    --------------------------------------------------
-   U3B : fwft_sfifo_w1_d16
+   Uf : fwft_sfifo_w1_d16
    PORT MAP (
       clk => CLK,
       srst => sreset,
-      din => (others => '0'),    -- not used
+      din => acq_data_i,
       wr_en => fpa_int_fe_fifo_wr,
       rd_en => fpa_int_fe_fifo_rd,
-      dout => open,              -- not used
+      dout => acq_data_o, 
       full => open,
       almost_full => open,
       overflow => open,
       empty => open,
       valid => fpa_int_fe_fifo_dval
-   );
+      );
    
    --------------------------------------------------
    -- referentiel image et referentiel ligne
