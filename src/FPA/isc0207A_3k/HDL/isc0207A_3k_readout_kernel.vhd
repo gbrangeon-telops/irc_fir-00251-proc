@@ -23,7 +23,9 @@ entity isc0207A_3k_readout_kernel is
       CLK             : in std_logic;
       
       FPA_INT         : in std_logic;
-      START_GEN       : out std_logic; 
+      START_GEN       : out std_logic;
+      ACQ_INT         : in std_logic;  -- requis pour determiner ACQ_FRINGE
+
       
       FPA_INTF_CFG    : in fpa_intf_cfg_type; 
       
@@ -153,7 +155,7 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal elcorr_ref_end_pipe   : std_logic_vector(15 downto 0);
    signal elcorr_ref_end_i      : std_logic;
    signal elcorr_ref_start_i    : std_logic;
-   signal quad_clk_fe_pipe    : std_logic_vector(15 downto 0) := (others => '0');
+   signal quad_clk_fe_pipe      : std_logic_vector(15 downto 0) := (others => '0');
    --signal active_window_last  : std_logic;
    signal elcorr_ref_fval_i     : std_logic;
    signal rst_cnt_i             : unsigned(4 downto 0);
@@ -169,6 +171,7 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal int_fifo_dval         : std_logic;
    signal int_fifo_dout         : std_logic_vector(2 downto 0);
    signal img_in_progress_i     : std_logic;
+   signal acq_data_o            : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    
    
    
@@ -270,6 +273,7 @@ begin
             int_fifo_wr <= '0';
             int_fifo_rd <= '0';
             img_in_progress_i <= '0'; 
+            acq_data_o <= '0';
             
          else  
             
@@ -277,6 +281,7 @@ begin
             fpa_int_i <= FPA_INT;
             fpa_int_last <= fpa_int_i;
             
+            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
             int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
             int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
             int_fifo_wr <= fpa_int_last xor fpa_int_i;          -- on ecrit les edges dans le fifo
@@ -304,6 +309,7 @@ begin
                      start_gen_i <= '1';
                      int_fifo_rd <= '1';
                      img_in_progress_i <= '1';
+                     acq_data_o <= int_fifo_dout(2);
                      ctrl_fsm <= wait_int_fe_st;
                   end if;                               
                   rst_cnt_i <= (others => '0'); 
@@ -504,6 +510,7 @@ begin
             readout_info_i.aoi.dval          <= WDOW_FIFO_DATA.USER.DVAL and window_fifo_rd_i;
             readout_info_i.aoi.read_end      <= raw_fval_last and not raw_fval_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
             readout_info_i.aoi.samp_pulse    <= quad_clk_fe_pipe(0) and WDOW_FIFO_DATA.USER.FVAL and readout_info_valid;
+            readout_info_i.aoi.spare(0)      <= acq_data_o;
             
             -- naoi (contenu aussi dans readout_info)
             readout_info_i.naoi.ref_valid(1) <= REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)

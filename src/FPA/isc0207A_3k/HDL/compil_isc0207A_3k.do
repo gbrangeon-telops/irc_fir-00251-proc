@@ -35,6 +35,7 @@ d:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_spi_feeder.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_kernel.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_prog_ctrler.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_hw_prog.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_hw_driver.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0207A_3k\HDL\isc0207A_3k_intf.bde
  

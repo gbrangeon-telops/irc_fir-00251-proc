@@ -23,7 +23,9 @@ entity isc0804A_500Hz_readout_kernel is
       CLK            : in std_logic;
       
       FPA_INT        : in std_logic;
-      START_GEN      : out std_logic; 
+      START_GEN      : out std_logic;
+      ACQ_INT        : in std_logic;  -- requis pour determiner ACQ_FRINGE
+
       
       FPA_INTF_CFG   : in fpa_intf_cfg_type; 
       
@@ -154,6 +156,7 @@ architecture rtl of isc0804A_500Hz_readout_kernel is
    signal last_lsync_pipe     : std_logic_vector(15 downto 0) := (others => '0');
    signal imminent_well_rst_i : std_logic;
    signal last_lsync_i        : std_logic;
+   signal acq_data_i          : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    
 begin
    
@@ -233,6 +236,7 @@ begin
             rst_wdow_gen_i <= '1';
             fast_mclk_raw_en_i <= '0';
             elcorr_ref_enabled <= '0';
+            acq_data_i <= '0';
             
          else  
             
@@ -260,6 +264,7 @@ begin
                   mclk_pause_cnt <= 1;                  
                   if fpa_int_last = '0' and fpa_int_i = '1' then 
                      start_gen_i <= '1';                                  -- un latch requis
+                     acq_data_i <= ACQ_INT;                               -- acq_data_i latché
                   end if;                               
                   if (fpa_int_last = '1' and fpa_int_i = '0')  and start_gen_i = '1' then        -- ENO: 20 juin 2017 : le mode diag n'est pas à double cadence puisque MCLK n'est pas utilisé dans le generateur diag. Ainsi, même en mode diag, le détecteur roule sans interruption.
                      ctrl_fsm <= chck_lsydel_speed_st;                                               -- start_gen_i permet de s'assurer qu'on qa bien vu le front montant de L,integration. Sinon on peut avoir râté le FM et voir le FD ce qui cause un bug.
@@ -487,6 +492,7 @@ begin
             readout_info_i.aoi.dval          <= WDOW_FIFO_DATA.USER.DVAL and window_fifo_rd_i;
             readout_info_i.aoi.read_end      <= raw_fval_last and not raw_fval_i;                               -- raw_fval_i pour etre certain d'avoir détecté la fin de la fenetre raw. Sinon, l'offset dynamique pourrait se calculer durant le passage de l'horloge rapide. Et ce sera la catastrophe.
             readout_info_i.aoi.samp_pulse    <= quad_clk_fe_pipe(0) and WDOW_FIFO_DATA.USER.FVAL and readout_info_valid;
+            readout_info_i.aoi.spare(0)      <= acq_data_i;
             
             -- naoi (contenu aussi dans readout_info)
             readout_info_i.naoi.ref_valid(1) <= REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
