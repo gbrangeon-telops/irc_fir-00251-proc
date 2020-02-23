@@ -363,8 +363,7 @@ begin
          write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(DAC_CFG_BASE_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop;      
-      
-      
+          
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
@@ -387,7 +386,7 @@ begin
       wait for 50 ns;
       
       
-      wait for 20 ms;
+      wait for 8 ms;
       
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -397,7 +396,7 @@ begin
          wait for 30 ns;
       end loop; 
       
-      wait for 20 ms;
+      wait for 8 ms;
       
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      

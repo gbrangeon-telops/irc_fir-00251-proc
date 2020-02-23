@@ -7,7 +7,7 @@
 --!   $Author: enofodjie $
 --!   $Date: 2017-10-31 10:26:08 -0400 (mar., 31 oct. 2017) $
 --!   $Id: var_shift_reg_w16_d32.vhd 21083 2017-10-31 14:26:08Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-04-15%20FGR%20Defrag/aldec/src/FPA/isc0207A_3k/src/var_shift_reg_w16_d32.vhd $
+--!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-03-12%20-%202.7.x.100%20Bugfix/aldec/src/FPA/isc0207A_3k/src/var_shift_reg_w16_d32.vhd $
 ------------------------------------------------------------------
 
 

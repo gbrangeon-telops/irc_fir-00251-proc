@@ -45,7 +45,7 @@ begin
                m_axis_dout_tdata  <=  std_logic_vector(resize(signed(s_axis_dividend_tdata), 40));
             end if;
          end if;
-         m_axis_dout_tvalid <= s_axis_divisor_tvalid and s_axis_dividend_tvalid;
+         m_axis_dout_tvalid <= s_axis_dividend_tvalid;
          m_axis_dout_tuser  <= s_axis_dividend_tuser;
          m_axis_dout_tlast <= s_axis_dividend_tlast;
          
