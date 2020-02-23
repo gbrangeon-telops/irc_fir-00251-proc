@@ -238,10 +238,10 @@ begin
    port map (
       clk         => CLK,
       srst        => sreset,
-      din         => int_fifo_din,    -- not used
+      din         => int_fifo_din,   
       wr_en       => int_fifo_wr,
       rd_en       => int_fifo_rd,
-      dout        => int_fifo_dout,   -- not used
+      dout        => int_fifo_dout,  
       full        => open,
       almost_full => open,
       overflow    => open,
