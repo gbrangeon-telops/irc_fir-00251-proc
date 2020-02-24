@@ -281,7 +281,6 @@ typedef struct
 
 typedef struct
 {
-   uint32_t numFrames; // number of recorded frames (minus the extra frames for debugging)
    uint32_t BPNumSamples;
    uint32_t deltaBetaNCoadd;
    float flickerThreshold; // threshold for flicker identification

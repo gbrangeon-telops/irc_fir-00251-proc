@@ -425,6 +425,7 @@ IRC_Status_t Actualization_SM()
 
          if (gStartActualization && cameraReady && calibrationInfo.isValid)
          {
+            ACT_resetParams(&gActualizationParams);
             gStartActualization = 0;
             savedCalibPosixTime = 0;
             setActState(&state, ACT_Start);
@@ -1537,8 +1538,6 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
    case BPD_Idle:
       if (gStartBadPixelDetection)
       {
-         ACT_resetParams(&gActualizationParams);
-
          gStartBadPixelDetection = false;
          gActBPMapAvailable = false;
 
@@ -1694,13 +1693,13 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
          GC_SetOffsetX(0);
          GC_SetOffsetY(0);
 
-         frameRate = 1000.0F * gActualizationParams.numFrames / gActualizationParams.duration;
+         frameRate = 1000.0F * gActualizationParams.BPNumSamples / gActualizationParams.duration;
          if (frameRate > gcRegsData.AcquisitionFrameRateMax)
          {
             ACT_ERR("Required frame rate of bad pixel identification is invalid (" _PCF(2) " > " _PCF(2) "). The recording duration will be adjusted accordingly.",
                   _FFMT(frameRate, 2), _FFMT(gcRegsData.AcquisitionFrameRateMax, 2));
             frameRate = gcRegsData.AcquisitionFrameRateMax;
-            gActualizationParams.duration = gActualizationParams.numFrames / frameRate * 1000;
+            gActualizationParams.duration = gActualizationParams.BPNumSamples / frameRate * 1000;
          }
          GC_SetAcquisitionFrameRate(frameRate);
 
@@ -1726,7 +1725,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
          // configurer le buffering pour coaddData.NCoadd images
          // always using the internal buffer
-         intBufSeqSize = gActualizationParams.numFrames + numFramesToSkip;
+         intBufSeqSize = gActualizationParams.BPNumSamples + numFramesToSkip;
          if (gActDebugOptions.clearBufferAfterCompletion == 0)
             intBufSeqSize += ACT_NUM_DEBUG_FRAMES;
 
@@ -3444,13 +3443,6 @@ void ACT_resetParams(actParams_t* p)
    p->duration = flashSettings.BPDuration;
    p->flickersNCoadd = flashSettings.BPNCoadd;
    p->BPNumSamples = flashSettings.BPNumSamples;
-   if (p->badPixelsDetection)
-      p->numFrames = MAX(p->deltaBetaNCoadd, MAX(p->flickersNCoadd, p->BPNumSamples));
-   else
-      p->numFrames = p->deltaBetaNCoadd;
-
-   p->numFrames = flashSettings.BPNumSamples;
-
    p->deltaBetaDiscardOffset = flashSettings.ImageCorrectionDiscardOffset;
 }
 
@@ -3469,7 +3461,6 @@ void ACT_resetParams(actParams_t* p)
 static void ACT_init()
 {
    ACT_resetDebugOptions();
-   ACT_resetParams(&gActualizationParams);
 
    //memset(deltaBetaDB.deltaBeta, 0, MAX_DELTA_BETA_SIZE * sizeof(deltabeta_t*));
    deltaBetaDB.count = 0;
