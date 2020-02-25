@@ -112,6 +112,11 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    signal acq_data_i           : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
+   signal int_fifo_rd          : std_logic;
+   signal int_fifo_din         : std_logic_vector(2 downto 0);
+   signal int_fifo_wr          : std_logic;
+   signal int_fifo_dval        : std_logic;
+   signal int_fifo_dout        : std_logic_vector(2 downto 0);
    
    
 begin
@@ -135,6 +140,24 @@ begin
       CLK    => CLK,
       SRESET => sreset
       );
+   
+   --------------------------------------------------
+   -- fifo fwft pour edge de l'intégration
+   --------------------------------------------------
+   Ue : fwft_sfifo_w3_d16
+   port map (
+      clk         => CLK,
+      srst        => sreset,
+      din         => int_fifo_din,    
+      wr_en       => int_fifo_wr,
+      rd_en       => int_fifo_rd,
+      dout        => int_fifo_dout,   
+      full        => open,
+      almost_full => open,
+      overflow    => open,
+      empty       => open,
+      valid       => int_fifo_dval
+      ); 
    
    --------------------------------------------------
    -- definition sync_flag
@@ -222,10 +245,17 @@ begin
             fpa_active_int_i <= '0'; 
             mclk_cnt_inc :=  (others => '0');
             acq_data_i <= '0';
+            int_fifo_wr <= '0';
+            int_fifo_rd <= '0';
             
          else  
             
             mclk_cnt_inc := '0' & fpa_mclk_rising_edge;
+            
+            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
+            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
+            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
+            int_fifo_wr     <= (fpa_int_last xor fpa_int_i);    -- on ecrit les edges dans le fifo 
             
             -- contrôleur
             case active_int_fsm is           
@@ -233,24 +263,28 @@ begin
                when idle =>   
                   fpa_active_int_i <= '0';
                   mclk_cnt <= 0;
-                  if fpa_int_last = '0' and fpa_int_i = '1' then   --  ENO: 19 fev 2020: puisqu'en IWR ou ITR, le front montant du signal est toujours bien distinct des autres signaux, scorpiomwA n'a donc pas besoin de fifo pour stocker le front montant de l'integration  
-                     acq_data_i <= ACQ_INT;                        -- ce signal conditionnera l'envoi ou non dans la chaine, de l'image associée
+                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                     int_fifo_rd <= '1'; 
+                     acq_data_i <= int_fifo_dout(2);
                      active_int_fsm <= active_int_st;
-                  end if;
+                  end if; 
                
                when active_int_st =>
+                  int_fifo_rd <= '0';
                   mclk_cnt <= mclk_cnt + to_integer(unsigned(mclk_cnt_inc));
                   if mclk_cnt >= C_FPA_WELL_RESET_TIME_FACTOR then 
                      fpa_active_int_i <= '1';
                      active_int_fsm <= wait_int_end_st;        
                   end if;
                
-               when wait_int_end_st =>
-                  if fpa_int_last = '1' and fpa_int_i = '0' then
-                     active_int_fsm <= wait_mclk_st1;  
+               when wait_int_end_st =>                  
+                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then       -- front tombant de int_signal
+                     int_fifo_rd <= '1';
+                     active_int_fsm <= wait_mclk_st1;
                   end if;
                
-               when wait_mclk_st1 =>                -- on rallonge au delà de FPA_INT
+               when wait_mclk_st1 =>                -- on rallonge au delà de FPA_INT 
+                  int_fifo_rd <= '0';
                   if fpa_mclk_rising_edge = '1' then 
                      active_int_fsm <= wait_mclk_st2; 
                   end if;

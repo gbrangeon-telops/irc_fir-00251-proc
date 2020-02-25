@@ -57,6 +57,22 @@ architecture rtl of hawkA_readout_ctrler is
          CLK : in std_logic);
    end component; 
    
+   component fwft_sfifo_w3_d16
+      port (
+         clk         : in std_logic;
+         srst        : in std_logic;
+         din         : in std_logic_vector(2 downto 0);
+         wr_en       : in std_logic;
+         rd_en       : in std_logic;
+         dout        : out std_logic_vector(2 downto 0);
+         full        : out std_logic;
+         almost_full : out std_logic;
+         overflow    : out std_logic;
+         empty       : out std_logic;
+         valid       : out std_logic
+         );
+   end component;
+   
    signal sreset               : std_logic;
    
    signal sync_flag_fsm        : sync_flag_fsm_type;
@@ -97,7 +113,11 @@ architecture rtl of hawkA_readout_ctrler is
    signal eof_pulse            : std_logic;
    signal eof_pulse_last       : std_logic;
    signal img_in_progress      : std_logic;
-   --   signal elec_ofs_fval_i      : std_logic;
+   signal int_fifo_rd          : std_logic;
+   signal int_fifo_din         : std_logic_vector(2 downto 0);
+   signal int_fifo_wr          : std_logic;
+   signal int_fifo_dval        : std_logic;
+   signal int_fifo_dout        : std_logic_vector(2 downto 0);
    
 begin
    
@@ -118,6 +138,24 @@ begin
       ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset
+      );
+   
+   --------------------------------------------------
+   -- fifo fwft pour edge de l'intégration
+   --------------------------------------------------
+   Ue : fwft_sfifo_w3_d16
+   port map (
+      clk         => CLK,
+      srst        => sreset,
+      din         => int_fifo_din,    
+      wr_en       => int_fifo_wr,
+      rd_en       => int_fifo_rd,
+      dout        => int_fifo_dout,   
+      full        => open,
+      almost_full => open,
+      overflow    => open,
+      empty       => open,
+      valid       => int_fifo_dval
       );
    
    --------------------------------------------------
@@ -170,13 +208,11 @@ begin
             
             fpa_mclk_last <= FPA_MCLK;
             
-            if fpa_int_last = '0' and fpa_int_i = '1' then 
+            if int_fifo_dout(1) = '1' and int_fifo_rd = '1' then 
                img_in_progress <= '1';
             elsif  rd_end_pipe(0) = '1' then
                img_in_progress <= '0'; 
-            end if;
-            
-            
+            end if; 
             
             -- contrôleur
             case sync_flag_fsm is           
@@ -250,9 +286,10 @@ begin
             lsync_pipe <= (others =>'0');
             rd_mclk_i <= '0';
             acq_data_i <= '0';
- 
-         else  
+            int_fifo_wr <= '0';
+            int_fifo_rd <= '0';
             
+         else            
             
             if pclk_fall = '1' then
                sol_pipe_pclk(0) <= sol_pipe(0);
@@ -261,24 +298,33 @@ begin
             
             lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0); 
             
-            rd_mclk_i <= FPA_MCLK and readout_in_progress; 
+            rd_mclk_i <= FPA_MCLK and readout_in_progress;
+            
+            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
+            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
+            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
+            int_fifo_wr     <= (fpa_int_last xor fpa_int_i);    -- on ecrit les edges dans le fifo
             
             -- contrôleur
             case readout_fsm is           
                
                when idle =>   
                   readout_in_progress <= '0';
-                  if fpa_int_last = '0' and fpa_int_i = '1' then -- debut d'une integration
-                     acq_data_i <= ACQ_INT; 
+                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                     int_fifo_rd <= '1'; 
+                     acq_data_i <= int_fifo_dout(2);
                      readout_fsm <= wait_int_fe_st;
                   end if;
                
                when wait_int_fe_st =>
-                  if fpa_int_last = '1' and fpa_int_i = '0' then -- fin d'une integration
+                  int_fifo_rd <= '0';
+                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then  -- front tombant de int_signal
+                     int_fifo_rd <= '1';
                      readout_fsm <= wait_mclk_fe_st1;
                   end if;
                
                when wait_mclk_fe_st1 => 
+                  int_fifo_rd <= '0';
                   if pclk_fall = '1' then  -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
                   end if;                           
