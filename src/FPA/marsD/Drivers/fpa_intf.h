@@ -201,7 +201,8 @@ struct s_FpaStatus    //
    uint32_t  trig_to_int_delay_min;
    uint32_t  trig_to_int_delay_max;
    uint32_t  int_to_int_delay_min;
-   uint32_t  int_to_int_delay_max;
+   uint32_t  int_to_int_delay_max; 
+   uint32_t  fast_hder_cnt; 
 };
 typedef struct s_FpaStatus t_FpaStatus;
 																						  
