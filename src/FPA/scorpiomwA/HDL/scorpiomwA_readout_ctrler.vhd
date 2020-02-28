@@ -263,7 +263,7 @@ begin
                when idle =>   
                   fpa_active_int_i <= '0';
                   mclk_cnt <= 0;
-                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' and readout_in_progress = '0' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
                      int_fifo_rd <= '1'; 
                      acq_data_i <= int_fifo_dout(2);
                      active_int_fsm <= active_int_st;
