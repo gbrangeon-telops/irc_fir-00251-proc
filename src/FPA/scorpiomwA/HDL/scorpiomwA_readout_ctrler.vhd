@@ -35,7 +35,7 @@ entity scorpiomwA_readout_ctrler is
       FPA_DATA_VALID    : in std_logic;         
       READOUT_INFO      : out readout_info_type;
       ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0);
-      FPA_ACTIVE_INT    : out std_logic
+      FPA_INACTIVE_INT  : out std_logic
       
       );  
 end scorpiomwA_readout_ctrler;
@@ -45,9 +45,9 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    constant C_FLAG_PIPE_LEN : integer := DEFINE_ADC_QUAD_CLK_FACTOR;
    constant C_PIPE_POS      : integer := 3;   
-   constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR; --  donne une incertitude de 1.5 MCL sur le début réel de l'integration
+   constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR - 1; --  donne une incertitude de 1.5 MCL sur le début réel de l'integration
    
-   type active_int_fsm_type is (idle, active_int_st, wait_int_end_st, wait_mclk_st1, wait_mclk_st2);
+   type int_reset_fsm_type is (idle, active_rst_st, wait_int_end_st);
    type readout_fsm_type is (idle, readout_st, wait_mclk_fe_st, wait_readout_end_st);
    type line_cnt_pipe_type is array (0 to 3) of unsigned(10 downto 0);
    component sync_reset
@@ -75,7 +75,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    
    signal sreset               : std_logic;
    signal readout_fsm          : readout_fsm_type;
-   signal active_int_fsm       : active_int_fsm_type;
+   signal int_reset_fsm       : int_reset_fsm_type;
    signal fpa_int_last         : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
@@ -106,7 +106,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal fpa_data_valid_last  : std_logic;
    signal fpa_int_fdbk_i       : std_logic;
    signal fpa_int_i            : std_logic;
-   signal fpa_active_int_i     : std_logic;
+   signal fpa_inactive_int_i   : std_logic;
    signal fpa_mclk_rising_edge : std_logic;
    signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR;
    
@@ -129,7 +129,7 @@ begin
    
    fpa_data_valid_i <= FPA_DATA_VALID;
    
-   FPA_ACTIVE_INT <= fpa_active_int_i;
+   FPA_INACTIVE_INT <= fpa_inactive_int_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -140,24 +140,6 @@ begin
       CLK    => CLK,
       SRESET => sreset
       );
-   
-   --------------------------------------------------
-   -- fifo fwft pour edge de l'intégration
-   --------------------------------------------------
-   Ue : fwft_sfifo_w3_d16
-   port map (
-      clk         => CLK,
-      srst        => sreset,
-      din         => int_fifo_din,    
-      wr_en       => int_fifo_wr,
-      rd_en       => int_fifo_rd,
-      dout        => int_fifo_dout,   
-      full        => open,
-      almost_full => open,
-      overflow    => open,
-      empty       => open,
-      valid       => int_fifo_dval
-      ); 
    
    --------------------------------------------------
    -- definition sync_flag
@@ -232,7 +214,7 @@ begin
    end process;
    
    --------------------------------------------------
-   -- generation fpa_active_int_i
+   -- generation fpa_inactive_int_i
    --------------------------------------------------
    UoB: process(CLK)
       
@@ -241,59 +223,35 @@ begin
    begin
       if rising_edge(CLK) then
          if sreset = '1' then            
-            active_int_fsm <= idle;
-            fpa_active_int_i <= '0'; 
+            int_reset_fsm <= idle;
+            fpa_inactive_int_i <= '1'; 
             mclk_cnt_inc :=  (others => '0');
-            acq_data_i <= '0';
-            int_fifo_wr <= '0';
-            int_fifo_rd <= '0';
             
          else  
             
             mclk_cnt_inc := '0' & fpa_mclk_rising_edge;
             
-            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
-            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
-            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
-            int_fifo_wr     <= (fpa_int_last xor fpa_int_i);    -- on ecrit les edges dans le fifo 
-            
             -- contrôleur
-            case active_int_fsm is           
+            case int_reset_fsm is           
                
                when idle =>   
-                  fpa_active_int_i <= '0';
+                  fpa_inactive_int_i <= '1';
                   mclk_cnt <= 0;
-                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' and readout_in_progress = '0' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
-                     int_fifo_rd <= '1'; 
-                     acq_data_i <= int_fifo_dout(2);
-                     active_int_fsm <= active_int_st;
+                  if FPA_INT = '1' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                     int_reset_fsm <= active_rst_st;
                   end if; 
                
-               when active_int_st =>
-                  int_fifo_rd <= '0';
+               when active_rst_st =>
                   mclk_cnt <= mclk_cnt + to_integer(unsigned(mclk_cnt_inc));
                   if mclk_cnt >= C_FPA_WELL_RESET_TIME_FACTOR then 
-                     fpa_active_int_i <= '1';
-                     active_int_fsm <= wait_int_end_st;        
+                     fpa_inactive_int_i <= '0';
+                     int_reset_fsm <= wait_int_end_st;        
                   end if;
                
-               when wait_int_end_st =>                  
-                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then       -- front tombant de int_signal
-                     int_fifo_rd <= '1';
-                     active_int_fsm <= wait_mclk_st1;
+               when wait_int_end_st =>  -- on s'assure que l'integration est terminée 
+                  if FPA_INT = '0' then  
+                     int_reset_fsm <= idle;
                   end if;
-               
-               when wait_mclk_st1 =>                -- on rallonge au delà de FPA_INT 
-                  int_fifo_rd <= '0';
-                  if fpa_mclk_rising_edge = '1' then 
-                     active_int_fsm <= wait_mclk_st2; 
-                  end if;
-               
-               when wait_mclk_st2 =>                -- on rallonge au delà de FPA_INT
-                  if fpa_mclk_rising_edge = '1' then 
-                     active_int_fsm <= idle; 
-                  end if;
-                  
                
                when others =>
                
@@ -306,6 +264,24 @@ begin
    end process;    
    
    --------------------------------------------------
+   -- fifo fwft pour edge de l'intégration
+   --------------------------------------------------
+   Ue : fwft_sfifo_w3_d16
+   port map (
+      clk         => CLK,
+      srst        => sreset,
+      din         => int_fifo_din,    
+      wr_en       => int_fifo_wr,
+      rd_en       => int_fifo_rd,
+      dout        => int_fifo_dout,   
+      full        => open,
+      almost_full => open,
+      overflow    => open,
+      empty       => open,
+      valid       => int_fifo_dval
+      );
+   
+   --------------------------------------------------
    -- generation de readout_in_progress
    --------------------------------------------------
    U3: process(CLK)
@@ -315,11 +291,19 @@ begin
          if sreset = '1' then            
             readout_fsm <= idle;
             readout_in_progress <= '0';
-            fpa_data_valid_last <= fpa_data_valid_i;
+            fpa_data_valid_last <= fpa_data_valid_i; 
+            int_fifo_wr <= '0';
+            int_fifo_rd <= '0';
+            acq_data_i <= '0';
             
          else  
             
+            
+            int_fifo_din(0) <= ACQ_INT;                         -- acq_int rentre dans le fifo
+            int_fifo_wr     <= not fpa_int_last and fpa_int_i;  -- on ecrit uniquement sur le front montant 
+            
             fpa_data_valid_last <= fpa_data_valid_i;
+            
             
             -- contrôleur
             case readout_fsm is           
@@ -327,10 +311,13 @@ begin
                when idle =>   
                   readout_in_progress <= '0';
                   if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- debut d'une image
+                     int_fifo_rd <= int_fifo_dval; 
+                     acq_data_i <= int_fifo_dout(0);
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
                when wait_mclk_fe_st => 
+                  int_fifo_rd <= '0';
                   if pclk_rise = '1' then                                      -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
                   end if;                           
