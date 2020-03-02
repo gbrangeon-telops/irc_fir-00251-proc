@@ -237,7 +237,7 @@ begin
                when idle =>   
                   fpa_inactive_int_i <= '1';
                   mclk_cnt <= 0;
-                  if FPA_INT = '1' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                  if FPA_INT = '1' then        
                      int_reset_fsm <= active_rst_st;
                   end if; 
                
