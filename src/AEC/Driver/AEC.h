@@ -31,7 +31,6 @@
 // ADRESSE du registre des statuts
 #define AEC_BASE_ADDR XPAR_AEC_CTRL_BASEADDR
 
-
 #define AEC_IMAGEFRACTION_OFFSET	      0x00
 #define AEC_MODE_OFFSET       		   0x04
 #define AEC_NBBIN_OFFSET        	      0x08
@@ -51,7 +50,7 @@
 #define AECP_SUMCNT_MSB_OFFSET         0x40
 #define AECP_SUMCNT_LSB_OFFSET         0x44
 #define AECP_NBPIXELS_OFFSET           0x48
-#define AECP_DATAVALID_OFFSET          0x5C
+#define AECP_DATAVALID_OFFSET          0x4C
 
 /************************** Constant Definitions ****************************/
 #define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR // TO CONFIRM
