@@ -60,6 +60,8 @@ entity scorpiomwA_digio_map is
       FPA_DIGIO11    : in std_logic;
       FPA_DIGIO12    : in std_logic;
       
+     TRUE_FPA_INT_FDBK  : out std_logic;
+      
       FPA_DVALID_ERR : out std_logic
       
       );
@@ -173,6 +175,8 @@ begin
    --------------------------------------------------------   
    FPA_POWERED <= fpa_powered_i;
    DAC_POWERED <= dac_powered_i;
+   
+   TRUE_FPA_INT_FDBK <= int_i;
    
    FPA_ON      <= fpa_on_iob;
    

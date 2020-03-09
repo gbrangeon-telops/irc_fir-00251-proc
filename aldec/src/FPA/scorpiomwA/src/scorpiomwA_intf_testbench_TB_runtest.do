@@ -94,7 +94,7 @@ acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\scorpiomwA\src\scorpiomwA_intf_test
 
 asim -ses scorpiomwA_intf_testbench_TB 
 
-wave UUT/U1/U26/* 
+-- wave UUT/U1/U26/* 
 
 -- spi_mux_ctrl
 --wave UUT/U1/U21/U1/* 
@@ -143,16 +143,18 @@ wave UUT/U1/U26/*
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U21/U6/*
 
---wave UUT/U1/U9/U1/*
+
 --wave UUT/U1/U9/U22/*  OK
 --wave UUT/U1/U9/U23/*  OK
 
 --wave UUT/U1/U9/U7/*
 --wave UUT/U1/U9/U2/U1/* 
 --wave UUT/U1/U9/U18/*
+
+wave UUT/U1/U5/U5/* 
+wave UUT/U1/U9/U18/*
 wave UUT/U1/*
-wave UUT/U1/U5/U5/*
-wave UUT/U1/U7/U4/*
+
 --wave UUT/U1/U5/U2/U6/*
 
-run 50 ms
+run 400 ms

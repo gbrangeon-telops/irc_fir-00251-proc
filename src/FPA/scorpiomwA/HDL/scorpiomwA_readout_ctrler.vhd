@@ -20,22 +20,25 @@ use work.fpa_common_pkg.all;
 
 entity scorpiomwA_readout_ctrler is
    port (
-      ARESET            : in std_logic;
-      CLK               : in std_logic; 
+      ARESET             : in std_logic;
+      CLK                : in std_logic; 
       
-      FPA_PCLK          : in std_logic;  -- FPA_PCLK est l'horloge des pixels. Il peut valoir soit 1xMCLK (par ex. Hawk) ou 2xMCLK (par ex. Indigo).    
-      FPA_MCLK          : in std_logic;  -- 
-      FPA_INTF_CFG      : in fpa_intf_cfg_type;      
-      FPA_INT           : in std_logic;  -- requis pour ScorpioMW puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
-      FPA_INT_FDBK      : in std_logic;  -- requis pour ScorpioMW puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
-      ACQ_INT           : in std_logic;  -- requis pour determiner ACQ_FRINGE
+      FPA_PCLK           : in std_logic;  -- FPA_PCLK est l'horloge des pixels. Il peut valoir soit 1xMCLK (par ex. Hawk) ou 2xMCLK (par ex. Indigo).    
+      FPA_MCLK           : in std_logic;  -- 
+      FPA_INTF_CFG       : in fpa_intf_cfg_type;      
+      FPA_INT            : in std_logic;  -- requis pour ScorpioMW puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
+      FPA_INT_FDBK       : in std_logic;  -- requis pour ScorpioMW puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
+      ACQ_INT            : in std_logic;  -- requis pour determiner ACQ_DATA
       
-      QUAD_CLK_COPY     : in std_logic;
+      QUAD_CLK_COPY      : in std_logic;
+      ACQ_MODE           : in std_logic;
+      ACQ_MODE_FIRST_INT : in std_logic;
+      NACQ_MODE_FIRST_INT: in std_logic;
       
-      FPA_DATA_VALID    : in std_logic;         
-      READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0);
-      FPA_INACTIVE_INT  : out std_logic
+      FPA_DATA_VALID     : in std_logic;         
+      READOUT_INFO       : out readout_info_type;
+      ADC_SYNC_FLAG      : out std_logic_vector(15 downto 0);
+      FPA_INACTIVE_INT   : out std_logic
       
       );  
 end scorpiomwA_readout_ctrler;
@@ -104,7 +107,6 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    signal fpa_data_valid_i     : std_logic;
    signal fpa_data_valid_last  : std_logic;
-   signal fpa_int_fdbk_i       : std_logic;
    signal fpa_int_i            : std_logic;
    signal fpa_inactive_int_i   : std_logic;
    signal fpa_mclk_rising_edge : std_logic;
@@ -113,10 +115,17 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal acq_data_i           : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
    signal int_fifo_rd          : std_logic;
-   signal int_fifo_din         : std_logic_vector(2 downto 0);
+   signal int_fifo_din         : std_logic_vector(2 downto 0) := (others => '0'); -- non utilisé
    signal int_fifo_wr          : std_logic;
    signal int_fifo_dval        : std_logic;
    signal int_fifo_dout        : std_logic_vector(2 downto 0);
+   
+   signal true_fpa_int_i       : std_logic;
+   signal true_fpa_int_last    : std_logic;
+   signal true_fpa_int_re      : std_logic;
+   signal itr_int_fifo_wr      : std_logic;
+   signal iwr_int_fifo_wr1     : std_logic;
+   signal iwr_int_fifo_wr2     : std_logic;
    
    
 begin
@@ -162,8 +171,6 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then            
-            --fpa_int_fdbk_i <= FPA_INT_FDBK;            
-            --fpa_int_fdbk_last <= fpa_int_fdbk_i;
             readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
             readout_info_i.naoi.samp_pulse <= '0';
@@ -173,9 +180,6 @@ begin
             fpa_int_last <= fpa_int_i;
             
          else           
-            
-            --fpa_int_fdbk_i <= FPA_INT_FDBK;            
-            --fpa_int_fdbk_last <= fpa_int_fdbk_i;
             
             fpa_int_i <= FPA_INT;            
             fpa_int_last <= fpa_int_i;            
@@ -258,8 +262,7 @@ begin
             end case;
             
          end if;
-         
-         
+
       end if;
    end process;    
    
@@ -296,11 +299,24 @@ begin
             int_fifo_rd <= '0';
             acq_data_i <= '0';
             
+            true_fpa_int_i    <= '0';
+            true_fpa_int_last <= '0'; 
+            true_fpa_int_re   <= '0'; 
+            itr_int_fifo_wr  <= '0';
+            iwr_int_fifo_wr1 <= '0';
+            iwr_int_fifo_wr2 <= '0';
+            
          else  
             
+            true_fpa_int_i    <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
+            true_fpa_int_last <= true_fpa_int_i;
+            true_fpa_int_re   <= (not true_fpa_int_last and true_fpa_int_i);
             
-            int_fifo_din(0) <= ACQ_INT;                         -- acq_int rentre dans le fifo
-            int_fifo_wr     <= not fpa_int_last and fpa_int_i;  -- on ecrit uniquement sur le front montant 
+            itr_int_fifo_wr   <= true_fpa_int_re and ACQ_MODE and FPA_INTF_CFG.ITR;                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
+            iwr_int_fifo_wr1  <= true_fpa_int_re and ACQ_MODE and not ACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
+            iwr_int_fifo_wr2  <= true_fpa_int_re and NACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
+            
+            int_fifo_wr <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;
             
             fpa_data_valid_last <= fpa_data_valid_i;
             
@@ -312,7 +328,7 @@ begin
                   readout_in_progress <= '0';
                   if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- debut d'une image
                      int_fifo_rd <= int_fifo_dval; 
-                     acq_data_i <= int_fifo_dout(0);
+                     acq_data_i <= int_fifo_dval;
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                

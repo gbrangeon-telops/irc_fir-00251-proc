@@ -93,7 +93,20 @@ package body scorpiomwA_intf_testbench_pkg is
       comn_fpa_diag_mode               :=  (others => diag_mode);                                               
       comn_fpa_diag_type               :=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                  :=  (others =>'1');                                               
-      comn_fpa_trig_ctrl_mode          :=  resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);          
+      comn_fpa_trig_ctrl_mode          :=  resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
+      comn_fpa_acq_trig_ctrl_dly       :=  to_unsigned(480000, comn_fpa_acq_trig_ctrl_dly'length);            
+      comn_fpa_trig_ctrl_timeout_dly   :=  to_unsigned(800000, comn_fpa_trig_ctrl_timeout_dly'length);        
+      comn_fpa_xtra_trig_ctrl_dly      :=  to_unsigned(480000, comn_fpa_xtra_trig_ctrl_dly'length);
+      
+      itr                              := (others => '1');      
+      if send_id = 3 then 
+         itr := (others => '0');   
+      end if;
+      
+      if diag_mode = '1' or itr(0) = '1' then
+         comn_fpa_trig_ctrl_mode       :=  resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
+         comn_fpa_acq_trig_ctrl_dly    :=  to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length); 
+      end if;
       
       xstart                           := to_unsigned(0, 32);  
       ystart                           := to_unsigned(0, 32);  
@@ -108,7 +121,7 @@ package body scorpiomwA_intf_testbench_pkg is
       
       uprow_upcol                      := (others => '0');
       sizea_sizeb                      := (others => '0');
-      itr                              := (others => '1');
+      
       gain                             := (others => '0');
       
       gpol_code                        := to_unsigned(2, gpol_code'length);
@@ -149,10 +162,6 @@ package body scorpiomwA_intf_testbench_pkg is
       
       cfg_num  := to_unsigned(send_id, cfg_num'length);
       
-      
-      comn_fpa_acq_trig_ctrl_dly      :=  to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);            
-      comn_fpa_trig_ctrl_timeout_dly  :=  to_unsigned(188_000, comn_fpa_trig_ctrl_timeout_dly'length);        
-      comn_fpa_xtra_trig_ctrl_dly     :=  to_unsigned(0, comn_fpa_xtra_trig_ctrl_dly'length);         
       -- comn_fpa_xtra_trig_period_min  :=  to_unsigned(10*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_xtra_trig_period_min'length);       
       
       

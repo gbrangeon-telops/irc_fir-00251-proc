@@ -50,7 +50,7 @@ architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_80M_PERIOD          : time := 12.5 ns;
-   constant ACQ_TRIG_PERIOD         : time := 700 us;
+   constant ACQ_TRIG_PERIOD         : time := 500 us;
    constant DOUT_CLK_PERIOD         : time := 6.25 ns;   
    
    constant DAC_CFG_BASE_ADD       : natural := to_integer(unsigned(x"D00"));
@@ -173,7 +173,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(20, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(450000, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -197,17 +197,17 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVCMOS33;        
          
          -- cfg usager
-         user_xsize1 <= 64;
-         user_ysize1 <= 4;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
+         user_xsize1 <= 640;
+         user_ysize1 <= 512;
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 320;
-         user_ysize2 <= 256;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 0);
+         user_xsize2 <= 640;
+         user_ysize2 <= 512;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          --         
-         --         user_xsize3 <= 1280;
-         --         user_ysize3 <= 1024;
-         --         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 2);
+         user_xsize3 <= 640;
+         user_ysize3 <= 512;
+         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3); -- iwr
          --         
          --         user_xsize4 <= 1280;
          --         user_ysize4 <= 1024;
@@ -292,7 +292,7 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
-      wait for 30 ms;
+      wait for 100 ms;
       
       for ii in 0 to 50-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -302,17 +302,25 @@ begin
          wait for 30 ns;
       end loop; 
       --      
-      --      wait for 100 ms;
+      wait for 100 ms;
+      
+      for ii in 0 to 50-1 loop                     -- iwr mode
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector3'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;
       --      
-      --      for ii in 0 to 96-1 loop 
-      --         wait until rising_edge(MB_CLK);      
-      --         start_pos := user_cfg_vector3'length -1 - 32*ii;
-      --         end_pos   := start_pos - 31;
-      --         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-      --         wait for 30 ns;
-      --      end loop;
-      --      
-      --      wait for 100 ms;
+      wait for 100 ms;
+      
+      for ii in 0 to 50-1 loop                     -- retour en itr
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector2'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
       
       --      for ii in 0 to 94-1 loop 
       --         wait until rising_edge(MB_CLK);      
