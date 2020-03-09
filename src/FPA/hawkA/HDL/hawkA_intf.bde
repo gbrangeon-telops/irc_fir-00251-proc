@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 39661
+ FREEID 39696
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -4824,7 +4824,7 @@ HEADER
    }
   }
  }
- SYMBOL "#default" "hawkA_hw_driver" "hawkA_hw_driver"
+ SYMBOL "work" "hawkA_hw_driver" "hawkA_hw_driver"
  {
   HEADER
   {
@@ -4833,7 +4833,7 @@ HEADER
     #CUSTOM_NAME=""
     #DESCRIPTION=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1580139250"
+    #MODIFIED="1583631738"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="2927853b-9e6e-4ed7-892c-8c76d7b9df8b"
    }
   }
@@ -4842,7 +4842,7 @@ HEADER
    PAGEHEADER
    {
     RECT (0,-20,440,700)
-    FREEID 179
+    FREEID 181
    }
    
    BODY
@@ -4853,7 +4853,7 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (20,-10,420,685)
+     AREA (20,-11,420,685)
      FILL (0,(255,207,156),0)
     }
     TEXT  3, 0, 0
@@ -5148,6 +5148,15 @@ HEADER
      ALIGN 6
      MARGINS (1,1)
      PARENT 177
+    }
+    TEXT  180, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (191,510,415,534)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 179
+     ORIENTATION 2
     }
     PIN  2, 0, 0
     {
@@ -5807,6 +5816,24 @@ HEADER
       #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_INT_FDBK"
       #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  179, 0, 0
+    {
+     COORD (440,520)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TRIG_CTLER_STAT(7:0)"
+      #NUMBER="0"
+      #SIDE="right"
      }
      LINE  2, 0, 0
      {
@@ -7631,13 +7658,13 @@ PAGE ""
     #COMPONENT="hawkA_hw_driver"
     #CUSTOM_NAME=""
     #IMPL="sch"
-    #LIBRARY="#default"
+    #LIBRARY="work"
     #REFERENCE="U5"
     #SYMBOL="hawkA_hw_driver"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="2927853b-9e6e-4ed7-892c-8c76d7b9df8b"
    }
    COORD (2640,520)
-   VERTEXES ( (2,31628), (14,32905), (38,33136), (44,33153), (50,33138), (56,33140), (62,31642), (68,33142), (80,31646), (92,33144), (94,31650), (98,31652), (100,34155), (102,36265), (104,31658), (108,34157), (110,33146), (131,26353), (133,33157), (135,34159), (137,32944), (139,33190), (141,34161), (143,34163), (145,34165), (147,34167), (149,34169), (155,34171), (157,34173), (159,34175), (161,33399), (169,33322), (171,37136), (173,35240), (175,35453), (177,37123) )
+   VERTEXES ( (2,31628), (14,32905), (38,33136), (44,33153), (50,33138), (56,33140), (62,31642), (68,33142), (80,31646), (92,33144), (94,31650), (98,31652), (100,34155), (102,36265), (104,31658), (108,34157), (110,33146), (131,26353), (133,33157), (135,34159), (137,32944), (139,33190), (141,34161), (143,34163), (145,34165), (147,34167), (149,34169), (155,34171), (157,34173), (159,34175), (161,33399), (169,33322), (171,37136), (173,35240), (175,35453), (177,37123), (179,39670) )
   }
   TEXT  14985, 0, 0
   {
@@ -15120,6 +15147,31 @@ PAGE ""
     #NAMED="1"
    }
   }
+  TEXT  39666, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (3076,1010,3345,1039)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 39672
+  }
+  VTX  39670, 0, 0
+  {
+   COORD (3080,1040)
+  }
+  VTX  39671, 0, 0
+  {
+   COORD (3280,1040)
+  }
+  BUS  39672, 0, 0
+  {
+   NET 509
+   VTX 39670, 39671
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
  }
  
 }
@@ -15145,7 +15197,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  39638, 0, 0
+  TEXT  39673, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -15156,7 +15208,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  39639, 0, 0
+  TEXT  39674, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -15167,7 +15219,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  39640, 0, 0
+  TEXT  39675, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -15177,7 +15229,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  39641, 0, 0
+  TEXT  39676, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -15189,27 +15241,27 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  LINE  39642, 0, 0
+  LINE  39677, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,4080), (5200,4080) )
    FILL (1,(0,0,0),0)
   }
-  LINE  39643, 0, 0
+  LINE  39678, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,4080), (4660,4200) )
   }
-  LINE  39644, 0, 0
+  LINE  39679, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (5200,4200), (5200,3960), (4220,3960), (4220,4200), (5200,4200) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  39645, 0, 0
+  TEXT  39680, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -15224,20 +15276,20 @@ PAGE ""
    VAR
    MULTILINE
   }
-  LINE  39646, 0, 0
+  LINE  39681, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4660,3960), (4660,4080) )
   }
-  LINE  39647, 0, 0
+  LINE  39682, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (5200,3960), (5200,3840), (4660,3840), (4660,3960), (5200,3960) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  39648, 0, 0
+  TEXT  39683, 0, 0
   {
    PAGEALIGN 10
    TEXT "$FIRMWARE"
@@ -15248,7 +15300,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  39649, 0, 0
+  TEXT  39684, 0, 0
   {
    PAGEALIGN 10
    TEXT "$AUTHOR"
@@ -15259,7 +15311,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  39650, 0, 0
+  TEXT  39685, 0, 0
   {
    PAGEALIGN 10
    TEXT "$PROJECT"
@@ -15270,7 +15322,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  TEXT  39651, 0, 0
+  TEXT  39686, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -15281,7 +15333,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  39652, 0, 0
+  TEXT  39687, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -15292,20 +15344,20 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  39653, 0, 0
+  LINE  39688, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,3960), (4380,4080) )
   }
-  LINE  39654, 0, 0
+  LINE  39689, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4220,4080), (4660,4080) )
    FILL (1,(0,0,0),0)
   }
-  TEXT  39655, 0, 0
+  TEXT  39690, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -15316,7 +15368,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  TEXT  39656, 0, 0
+  TEXT  39691, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -15327,19 +15379,19 @@ PAGE ""
    COLOR (0,0,0)
    FONT (11,0,0,400,0,0,0,"Arial")
   }
-  LINE  39657, 0, 0
+  LINE  39692, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4380,4080), (4380,4200) )
   }
-  LINE  39658, 0, 0
+  LINE  39693, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 0,1, (128,128,128)
    POINTS ( (4780,4080), (4780,4200) )
   }
-  TEXT  39659, 0, 0
+  TEXT  39694, 0, 0
   {
    PAGEALIGN 10
    TEXT "$REVISION"
@@ -15350,7 +15402,7 @@ PAGE ""
    FONT (11,0,0,400,0,0,0,"Arial")
    UPDATE 0
   }
-  BMPPICT  39660, 0, 0
+  BMPPICT  39695, 0, 0
   {
    PAGEALIGN 10
    RECT (4740,3860,5120,3955)
