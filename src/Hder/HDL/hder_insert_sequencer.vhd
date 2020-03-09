@@ -459,7 +459,7 @@ begin
                   wstrb_buff <= fast_hder_client_in(num).mosi.wstrb;
                   if (fast_hder_client_in(num).mosi.awvalid and fast_hder_client_in(num).mosi.wvalid) = '1' then                     
                      fast_hder_client_out(num).miso_bvalid <= '1';
-                     fast_hder_client_out(num).fifo_rd <= '1';     -- on raffraichit le fifo fwft pour le prochain passage
+                     fast_hder_client_out(num).fifo_rd <= '1';     -- on rafraichit le fifo fwft pour le prochain passage
                      fast_hder_reorder_sm <= ram_wr_st;
                   end if;
                   
