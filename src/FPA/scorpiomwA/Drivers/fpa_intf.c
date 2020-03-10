@@ -342,7 +342,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 3; 
+      gFpaDebugRegF = 0; 
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
       
    // quad2
