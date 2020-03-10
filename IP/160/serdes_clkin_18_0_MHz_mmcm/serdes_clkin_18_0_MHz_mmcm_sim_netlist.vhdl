@@ -3,8 +3,8 @@
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
 -- Date        : Wed Nov 06 06:28:58 2019
 -- Host        : TELOPS228 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/160/serdes_clkin_18_0_MHz_mmcm/serdes_clkin_18_0_MHz_mmcm_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim -rename_top serdes_clkin_18_0_MHz_mmcm -prefix
+--               serdes_clkin_18_0_MHz_mmcm_ serdes_clkin_18_0_MHz_mmcm_sim_netlist.vhdl
 -- Design      : serdes_clkin_18_0_MHz_mmcm
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -22,8 +22,6 @@ entity serdes_clkin_18_0_MHz_mmcm_serdes_clkin_18_0_MHz_mmcm_clk_wiz is
     locked : out STD_LOGIC;
     clk_in : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of serdes_clkin_18_0_MHz_mmcm_serdes_clkin_18_0_MHz_mmcm_clk_wiz : entity is "serdes_clkin_18_0_MHz_mmcm_clk_wiz";
 end serdes_clkin_18_0_MHz_mmcm_serdes_clkin_18_0_MHz_mmcm_clk_wiz;
 
 architecture STRUCTURE of serdes_clkin_18_0_MHz_mmcm_serdes_clkin_18_0_MHz_mmcm_clk_wiz is
