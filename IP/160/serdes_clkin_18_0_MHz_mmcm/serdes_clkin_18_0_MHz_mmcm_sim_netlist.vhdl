@@ -1,8 +1,8 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Wed Nov 06 06:28:58 2019
--- Host        : TELOPS228 running 64-bit Service Pack 1  (build 7601)
+-- Date        : Tue Feb 25 16:41:38 2020
+-- Host        : TELOPS258-7 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim -rename_top serdes_clkin_18_0_MHz_mmcm -prefix
 --               serdes_clkin_18_0_MHz_mmcm_ serdes_clkin_18_0_MHz_mmcm_sim_netlist.vhdl
 -- Design      : serdes_clkin_18_0_MHz_mmcm

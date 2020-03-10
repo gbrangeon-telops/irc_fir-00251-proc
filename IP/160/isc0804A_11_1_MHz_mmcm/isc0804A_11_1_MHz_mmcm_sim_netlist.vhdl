@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Wed Apr 10 16:09:43 2019
+-- Date        : Tue Feb 25 16:40:32 2020
 -- Host        : TELOPS258-7 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim -rename_top isc0804A_11_1_MHz_mmcm -prefix
---               isc0804A_11_1_MHz_mmcm_ isc0804A_11_1_MHz_mmcm_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               D:/Telops/FIR-00251-Proc/IP/160/isc0804A_11_1_MHz_mmcm/isc0804A_11_1_MHz_mmcm_sim_netlist.vhdl
 -- Design      : isc0804A_11_1_MHz_mmcm
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -22,6 +22,8 @@ entity isc0804A_11_1_MHz_mmcm_isc0804A_11_1_MHz_mmcm_clk_wiz is
     locked : out STD_LOGIC;
     clk_in : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of isc0804A_11_1_MHz_mmcm_isc0804A_11_1_MHz_mmcm_clk_wiz : entity is "isc0804A_11_1_MHz_mmcm_clk_wiz";
 end isc0804A_11_1_MHz_mmcm_isc0804A_11_1_MHz_mmcm_clk_wiz;
 
 architecture STRUCTURE of isc0804A_11_1_MHz_mmcm_isc0804A_11_1_MHz_mmcm_clk_wiz is
