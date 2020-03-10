@@ -1,34 +1,456 @@
-Active-HDL 9.3.2744.sp1.09.4995  2020-01-15 15:05:27
+Active-HDL 9.3.2744.sp1.09.4995  2020-02-24 22:23:06
 
 Elaboration top modules:
-Architecture                  rtl(hawkA_mblaze_intf)
+Architecture                  TB_ARCHITECTURE(hawkA_intf_testbench_tb)
 
 
-----------------------------------------------------------------------------------------------------------
-Entity            | Architecture | Library | Info | Compiler Version                | Compilation Options
-----------------------------------------------------------------------------------------------------------
-hawkA_mblaze_intf | rtl          | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
-sync_reset        | rtl          | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
-----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Entity                                                                | Architecture         | Library | Info | Compiler Version                | Compilation Options
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+hawkA_intf_testbench_tb                                               | TB_ARCHITECTURE      | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_intf_testbench                                                  | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_intf                                                            | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+flexV_dummy                                                           | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+Clk_Divider                                                           | rtu                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+brd_mux_dummy                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+brd_switch_dummy                                                      | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+monit_adc_dummy                                                       | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_temp_dummy                                                        | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+digio_dummy                                                           | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_trig_controller                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_digio_map                                                       | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_intf_sequencer                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_services                                                         | afpa_services        | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+frm_in_progress_gen                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_trig_precontroller                                                | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_clks_gen                                                        | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_mblaze_intf                                                     | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_hw_driver                                                       | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_status_gen                                                        | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_watchdog_module                                                   | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_fifo                                                  | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_data_ctrl                                                        | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+sync_reset                                                            | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+double_sync                                                           | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fd                                                                    | fd_v                 | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fdre                                                                  | fdre_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+spi_mux_ctler                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+quad_adc_ctrl                                                         | quad_adc_ctrl        | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+adc_brd_switch_ctrl                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+monitoring_adc_ctrl                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+adc_brd_id_reader                                                     | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+flex_brd_id_reader                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+reset_extension                                                       | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_services_ctrl                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+bufr                                                                  | bufr_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+spi_tx                                                                | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+spi_rx                                                                | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+LL8_ext_to_spi_tx                                                     | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16                                                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_fifo_generator_v13_1_2                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+gnd                                                                   | gnd_v                | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+vcc                                                                   | vcc_v                | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fwft_sfifo_w3_d16_fifo_generator_v13_1_2_synth                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_fifo_generator_top                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_fifo_generator_ramfifo                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_rd_logic                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_wr_logic                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_memory                                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_rd_fwft                                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_rd_status_flags_ss                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_rd_bin_cntr                                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+lut5                                                                  | lut5_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+lut4                                                                  | lut4_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fdse                                                                  | fdse_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+lut3                                                                  | lut3_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+lut1                                                                  | lut1_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+lut2                                                                  | lut2_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fwft_sfifo_w3_d16_wr_handshaking_flags                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_wr_status_flags_ss                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_wr_bin_cntr                                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+lut6                                                                  | lut6_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fwft_sfifo_w3_d16_blk_mem_gen_v8_3_4                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_blk_mem_gen_v8_3_4_synth                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_blk_mem_gen_top                                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_blk_mem_gen_generic_cstr                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_blk_mem_gen_prim_width                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w3_d16_blk_mem_gen_prim_wrapper                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+ramb18e1                                                              | ramb18e1_v           | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+rb18_internal_vhdl                                                    | rb18_internal_vhdl_v | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+signal_filter                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+ads1118_driver                                                        | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+brd_id_reader                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+gh_stretch                                                            | a                    | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_clks_gen_core                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_clks_mmcm                                                       | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+double_sync_vector                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256                                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_fifo_generator_v13_1_2                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_fifo_generator_v13_1_2_synth                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_fifo_generator_top                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_fifo_generator_ramfifo                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_clk_x_pntrs                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_rd_logic                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_wr_logic                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_memory                                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_reset_blk_ramfifo                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w8_d256_synchronizer_ff__parameterized0\                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w8_d256_synchronizer_ff__parameterized1\                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w8_d256_synchronizer_ff__parameterized2\                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w8_d256_synchronizer_ff__parameterized3\                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fdce                                                                  | fdce_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fwft_afifo_w8_d256_rd_fwft                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_rd_status_flags_as                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_rd_bin_cntr                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fdpe                                                                  | fdpe_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+fwft_afifo_w8_d256_wr_status_flags_as                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_wr_handshaking_flags                               | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_wr_bin_cntr                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_blk_mem_gen_v8_3_4                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_blk_mem_gen_v8_3_4_synth                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_blk_mem_gen_top                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_blk_mem_gen_generic_cstr                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_blk_mem_gen_prim_width                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_blk_mem_gen_prim_wrapper                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_0                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_1                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_2                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_3                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_4                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_5                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_6                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_7                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_8                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_9                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_10                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_11                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_12                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_13                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_14                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_15                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_16                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_17                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_18                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_19                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_20                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_21                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w8_d256_synchronizer_ff_22                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_10MHz_mmcm                                                      | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_10MHz_mmcm_hawkA_10MHz_mmcm_clk_wiz                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+bufg                                                                  | bufg_v               | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+mmcme2_adv                                                            | mmcme2_adv_v         | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+afpa_int_signal_gen                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_prog_ctrler                                                     | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fleG_prog_ctrler                                                      | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_hw_driver_ctrler                                                 | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_readout_ctrler                                                  | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_detector_ctrler                                                 | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_mux_ctrl_reg                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_windowing_ctrl_reg                                              | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_dig_data_reg                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_windowing_data_reg                                              | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+concat_1_to_8                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+LL8_ext_fifo8                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_fifo_generator_v13_1_2                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_fifo_generator_v13_1_2_synth               | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_fifo_generator_top                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_fifo_generator_ramfifo                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_rd_logic                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_wr_logic                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_memory                                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_reset_blk_ramfifo                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_dc_ss_fwft                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_rd_fwft                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_rd_status_flags_ss                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_rd_bin_cntr                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_updn_cntr                                  | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+carry4                                                                | carry4_v             | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+t_axi4_stream16_sfifo_d256_wr_handshaking_flags                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_wr_status_flags_ss                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_wr_bin_cntr                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_blk_mem_gen_v8_3_4                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_blk_mem_gen_v8_3_4_synth                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_blk_mem_gen_top                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_blk_mem_gen_generic_cstr                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_blk_mem_gen_prim_width                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_blk_mem_gen_prim_wrapper                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_0                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_1                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_2                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_3                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_4                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_5                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_6                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_7                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_8                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream16_sfifo_d256_synchronizer_ff_9                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+ad5648_driver                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -relax -O3
+fleg_prog_ctler_kernel                                                | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fleG_dac_spi_feeder                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+edge_counter                                                          | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_data_cnt_min_max                                                  | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+trig_delay                                                            | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+trig_period                                                           | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_data_cnt                                                          | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_min_max_ctrl                                                      | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+delay_measurement                                                     | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+min_max_ctrl                                                          | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+gh_edge_det                                                           | a                    | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+period_duration                                                       | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_fifo_generator_v13_1_2                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_fifo_generator_v13_1_2_synth               | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_fifo_generator_top                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_fifo_generator_ramfifo                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_clk_x_pntrs                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_rd_logic                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_wr_logic                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_memory                                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_reset_blk_ramfifo                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\t_axi4_stream64_afifo_d512_synchronizer_ff__parameterized0\          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\t_axi4_stream64_afifo_d512_synchronizer_ff__parameterized1\          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\t_axi4_stream64_afifo_d512_synchronizer_ff__parameterized2\          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\t_axi4_stream64_afifo_d512_synchronizer_ff__parameterized3\          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_rd_fwft                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_rd_status_flags_as                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_rd_bin_cntr                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_compare_24                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_compare_25                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_wr_status_flags_as                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_wr_bin_cntr                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_compare                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_compare_23                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_blk_mem_gen_v8_3_4                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_blk_mem_gen_v8_3_4_synth                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_blk_mem_gen_top                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_blk_mem_gen_generic_cstr                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_blk_mem_gen_prim_width                     | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\t_axi4_stream64_afifo_d512_blk_mem_gen_prim_width__parameterized0\   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_blk_mem_gen_prim_wrapper                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\t_axi4_stream64_afifo_d512_blk_mem_gen_prim_wrapper__parameterized0\ | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+ramb36e1                                                              | ramb36e1_v           | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+rb36_internal_vhdl                                                    | rb36_internal_vhdl_v | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+t_axi4_stream64_afifo_d512_synchronizer_ff                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_0                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_1                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_2                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_3                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_4                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_5                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_6                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_7                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_8                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_9                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_10                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_11                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_12                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_13                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_14                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_15                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_16                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_17                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_18                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_19                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_20                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_21                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+t_axi4_stream64_afifo_d512_synchronizer_ff_22                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_data_ctrl_map                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_chn_diversity_ctrler                                             | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_data_dispatcher                                                  | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_dval_gen                                                         | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_saturation_ctrl                                                  | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_vsample_proc                                                     | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_analog_chain_corr                                                | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_hsample_proc                                                     | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16                                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_fifo_generator_v13_1_2                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_fifo_generator_v13_1_2_synth                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_fifo_generator_top                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_fifo_generator_ramfifo                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_rd_logic                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_wr_logic                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_memory                                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_rd_fwft                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_rd_status_flags_ss                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_rd_bin_cntr                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_wr_handshaking_flags                               | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_wr_status_flags_ss                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_wr_bin_cntr                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_blk_mem_gen_v8_3_4                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_blk_mem_gen_v8_3_4_synth                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_blk_mem_gen_top                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_blk_mem_gen_generic_cstr                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_blk_mem_gen_prim_width                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_sfifo_w76_d16_blk_mem_gen_prim_width__parameterized0\           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w76_d16_blk_mem_gen_prim_wrapper                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_sfifo_w76_d16_blk_mem_gen_prim_wrapper__parameterized0\         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128                                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16                                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_fifo_generator_v13_1_2                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_fifo_generator_v13_1_2_synth                      | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_fifo_generator_top                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_fifo_generator_ramfifo                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_clk_x_pntrs                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_rd_logic                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_wr_logic                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_memory                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_reset_blk_ramfifo                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w96_d128_synchronizer_ff__parameterized0\                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w96_d128_synchronizer_ff__parameterized1\                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w96_d128_synchronizer_ff__parameterized2\                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w96_d128_synchronizer_ff__parameterized3\                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_rd_fwft                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_rd_status_flags_as                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_rd_bin_cntr                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_wr_status_flags_as                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_wr_handshaking_flags                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_wr_bin_cntr                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_blk_mem_gen_v8_3_4                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_blk_mem_gen_v8_3_4_synth                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_blk_mem_gen_top                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_blk_mem_gen_generic_cstr                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_blk_mem_gen_prim_width                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w96_d128_blk_mem_gen_prim_width__parameterized0\          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_blk_mem_gen_prim_wrapper                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+\fwft_afifo_w96_d128_blk_mem_gen_prim_wrapper__parameterized0\        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_0                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_1                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_2                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_3                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_4                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_5                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_6                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_7                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_8                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_9                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_10                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_11                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_12                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_13                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_14                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_15                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_16                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_17                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_18                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_19                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_20                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_21                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_afifo_w96_d128_synchronizer_ff_22                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_fifo_generator_v13_1_2                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_fifo_generator_v13_1_2_synth                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_fifo_generator_top                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_fifo_generator_ramfifo                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_rd_logic                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_wr_logic                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_memory                                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_rd_fwft                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_rd_status_flags_ss                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_rd_bin_cntr                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_wr_handshaking_flags                               | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_wr_status_flags_ss                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_wr_bin_cntr                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_blk_mem_gen_v8_3_4                                 | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_blk_mem_gen_v8_3_4_synth                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_blk_mem_gen_top                                    | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_blk_mem_gen_generic_cstr                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_blk_mem_gen_prim_width                             | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w72_d16_blk_mem_gen_prim_wrapper                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_real_data_gen                                                    | sch                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_flow_mux                                                         | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_diag_data_gen                                                    | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_line_sync_mode_dval_gen                                          | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+var_shift_reg_w16_d32                                                 | sim                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256                                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256                                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_fifo_generator_v13_1_2                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_fifo_generator_v13_1_2_synth                      | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_fifo_generator_top                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_fifo_generator_ramfifo                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_rd_logic                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_wr_logic                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_memory                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_dc_ss_fwft                                        | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_rd_fwft                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_rd_status_flags_ss                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_rd_bin_cntr                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_updn_cntr                                         | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_wr_handshaking_flags                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_wr_pf_ss                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_wr_status_flags_ss                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_wr_bin_cntr                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_blk_mem_gen_v8_3_4                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_blk_mem_gen_v8_3_4_synth                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_blk_mem_gen_top                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_blk_mem_gen_generic_cstr                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_blk_mem_gen_prim_width                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w16_d256_blk_mem_gen_prim_wrapper                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_fifo_generator_v13_1_2                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_fifo_generator_v13_1_2_synth                      | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_fifo_generator_top                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_fifo_generator_ramfifo                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_rd_logic                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_wr_logic                                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_memory                                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_rd_fwft                                           | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_rd_status_flags_ss                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_rd_bin_cntr                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_wr_handshaking_flags                              | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_wr_status_flags_ss                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_wr_bin_cntr                                       | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_blk_mem_gen_v8_3_4                                | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_blk_mem_gen_v8_3_4_synth                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_blk_mem_gen_top                                   | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_blk_mem_gen_generic_cstr                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_blk_mem_gen_prim_width                            | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fwft_sfifo_w32_d256_blk_mem_gen_prim_wrapper                          | structure            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_diag_line_gen                                                     | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_low_saturation                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_high_saturation                                                  | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_sample_sum                                                       | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_sample_mean                                                      | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_sample_counter                                                   | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+afpa_sample_selector                                                  | rtl                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------------------
-VHDL Package                     | Library | Info | Compiler Version                | Compilation Options
-----------------------------------------------------------------------------------------------------------
-standard                         | std     |      |                                 | 
-TEXTIO                           | std     |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
-std_logic_1164                   | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
-NUMERIC_STD                      | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
-TEL2000                          | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
-MATH_REAL                        | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
-fleg_brd_define                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
-fpa_common_pkg                   | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
-FPA_define                       | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
-----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+VHDL Package                                                                                 | Library | Info | Compiler Version                | Compilation Options
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+standard                                                                                     | std     |      |                                 | 
+TEXTIO                                                                                       | std     |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
+std_logic_1164                                                                               | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
+NUMERIC_STD                                                                                  | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
+MATH_REAL                                                                                    | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+TEL2000                                                                                      | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fleg_brd_define                                                                              | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_serdes_define                                                                            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+fpa_common_pkg                                                                               | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+std_logic_arith                                                                              | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+STD_LOGIC_UNSIGNED                                                                           | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+FPA_define                                                                                   | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+adc_brd_define                                                                               | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+std_logic_misc                                                                               | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) |  -2008
+trig_define                                                                                  | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+VITAL_Timing                                                                                 | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+VCOMPONENTS                                                                                  | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+Proxy_define                                                                                 | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+hawkA_intf_testbench_pkg                                                                     | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+STD_LOGIC_SIGNED                                                                             | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+STD_LOGIC_TEXTIO                                                                             | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+min_max_define                                                                               | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+img_header_define                                                                            | hawka   |      | 9.3.2744.sp1.09.4995  (Windows) | -O3
+VITAL_Primitives                                                                             | ieee    |      | 9.3.2744.sp1.09.4995  (Windows) | 
+VPKG                                                                                         | unisim  |      | 9.3.2744.4995  (Windows)        | -vendor xilinx -93
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------------------
-Library                          | Comment
-----------------------------------------------------------------------------------------------------------
-hawka                            | None
-ieee                             | Standard IEEE packages library
-std                              | Standard VHDL library
-----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Library                                                                                      | Comment
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+hawka                                                                                        | None
+ieee                                                                                         | Standard IEEE packages library
+std                                                                                          | Standard VHDL library
+unisim                                                                                       | XILINX VIVADO 2013.3, UNISIM VHDL LIBRARY
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
