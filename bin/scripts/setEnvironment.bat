@@ -22,9 +22,9 @@ set releaseLogFile=%binDir%\%baseName%_%fpgaSize%_release.txt
 set revFile=%binDir%\svnrevs_%fpgaSize%.pl
 
 if "%fpgaSize%" == "160" (
-   set outputFpgaSize="70"
+   set outputFpgaSize=70
 ) else (
-   set outputFpgaSize="160"
+   set outputFpgaSize=160
 )
 set outputRevFile=%outputDir%\bin\svnrevs_%outputFpgaSize%.pl
 set outputBaseName=fir_00251_output_%outputFpgaSize%
