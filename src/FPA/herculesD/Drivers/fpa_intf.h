@@ -55,6 +55,7 @@
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (HerculesDIsImplemented | ITRIsImplementedMask)
+#define FPA_TDC_FLAGS2           0
 
 #define FPA_EVEN_TO_ODD_DELAY 4     // CLK
 #define FPA_ODD_TO_EVEN_DELAY 144   // CLK

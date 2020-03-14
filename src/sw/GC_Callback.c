@@ -74,7 +74,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.7.1
+// Generated from XML camera definition file version 12.8.0
 // using updateGenICamCallback.m Matlab script.
 
 /**
@@ -329,6 +329,7 @@ void GC_Callback_Init()
    gcRegsDef[StealthModeIdx].callback =                                          &GC_StealthModeCallback;
    gcRegsDef[SubSecondTimeIdx].callback =                                        &GC_SubSecondTimeCallback;
    gcRegsDef[TDCFlagsIdx].callback =                                             &GC_TDCFlagsCallback;
+   gcRegsDef[TDCFlags2Idx].callback =                                            &GC_TDCFlags2Callback;
    gcRegsDef[TDCStatusIdx].callback =                                            &GC_TDCStatusCallback;
    gcRegsDef[TestImageSelectorIdx].callback =                                    &GC_TestImageSelectorCallback;
    gcRegsDef[TimeSourceIdx].callback =                                           &GC_TimeSourceCallback;
@@ -432,7 +433,7 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if(FWSynchronoulyRotatingModeIsActive)
+      if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FW_CalculateSpeedSetpoint(&gcRegsData);
          SFW_FrameRateChanged(&gcRegsData);
@@ -1911,7 +1912,7 @@ void GC_EHDRINumberOfExposuresCallback(gcCallbackPhase_t phase, gcCallbackAccess
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (EHDRIIsActive)
+      if (GC_EHDRIIsActive)
       {
          GC_UpdateExposureTimeXRegisters(EHDRIExposureTime, NUM_OF(EHDRIExposureTime), true);
       }
@@ -2115,7 +2116,7 @@ void GC_ExposureTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (!FWSynchronoulyRotatingModeIsActive && !EHDRIIsActive)
+      if (!GC_FWSynchronouslyRotatingModeIsActive && !GC_EHDRIIsActive)
       {
          // Update ExposureTime and FrameRate limits
          GC_UpdateParameterLimits();
@@ -2143,12 +2144,12 @@ void GC_ExposureTime1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (EHDRIIsActive)
+      if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[0] = gcRegsData.ExposureTime1;
          GC_UpdateParameterLimits();
       }
-      else if (FWSynchronoulyRotatingModeIsActive)
+      else if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[0] = gcRegsData.ExposureTime1;
          SFW_SetExposureTimeArray(0, FWExposureTime[0]);
@@ -2170,12 +2171,12 @@ void GC_ExposureTime2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (EHDRIIsActive)
+      if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[1] = gcRegsData.ExposureTime2;
          GC_UpdateParameterLimits();
       }
-      else if (FWSynchronoulyRotatingModeIsActive)
+      else if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[1] = gcRegsData.ExposureTime2;
          SFW_SetExposureTimeArray(1, FWExposureTime[1]);
@@ -2198,12 +2199,12 @@ void GC_ExposureTime3Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (EHDRIIsActive)
+      if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[2] = gcRegsData.ExposureTime3;
          GC_UpdateParameterLimits();
       }
-      else if (FWSynchronoulyRotatingModeIsActive)
+      else if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[2] = gcRegsData.ExposureTime3;
          SFW_SetExposureTimeArray(2, FWExposureTime[2]);
@@ -2225,12 +2226,12 @@ void GC_ExposureTime4Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (EHDRIIsActive)
+      if (GC_EHDRIIsActive)
       {
          EHDRIExposureTime[3] = gcRegsData.ExposureTime4;
          GC_UpdateParameterLimits();
       }
-      else if (FWSynchronoulyRotatingModeIsActive)
+      else if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[3] = gcRegsData.ExposureTime4;
          SFW_SetExposureTimeArray(3, FWExposureTime[3]);
@@ -2251,7 +2252,7 @@ void GC_ExposureTime5Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (FWSynchronoulyRotatingModeIsActive)
+      if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[4] = gcRegsData.ExposureTime5;
          SFW_SetExposureTimeArray(4, FWExposureTime[4]);
@@ -2272,7 +2273,7 @@ void GC_ExposureTime6Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (FWSynchronoulyRotatingModeIsActive)
+      if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[5] = gcRegsData.ExposureTime6;
          SFW_SetExposureTimeArray(5, FWExposureTime[5]);
@@ -2294,7 +2295,7 @@ void GC_ExposureTime7Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (FWSynchronoulyRotatingModeIsActive)
+      if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[6] = gcRegsData.ExposureTime7;
          SFW_SetExposureTimeArray(6, FWExposureTime[6]);
@@ -2315,7 +2316,7 @@ void GC_ExposureTime8Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
 {
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if (FWSynchronoulyRotatingModeIsActive)
+      if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          FWExposureTime[7] = gcRegsData.ExposureTime8;
          SFW_SetExposureTimeArray(7, FWExposureTime[7]);
@@ -2569,45 +2570,60 @@ void GC_FWFilterNumberCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acces
 void GC_FWModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
    int32_t counts;
+   static uint32_t prevFWMode;
+
+   if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
+   {
+      prevFWMode = gcRegsData.FWMode;
+   }
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      GC_UpdateFpaPeriodMinMargin();   // must be called first
-
-      CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
-      SFW_UpdateSFWMode(gcRegsData.FWMode);
-
-      if( gcRegsData.FWMode == FWM_Fixed)
+      // Exclude invalid modes
+      if (((gcRegsData.FWMode == FWM_SynchronouslyRotating) && !GC_FWSynchronouslyRotatingModeIsImplemented) ||
+            ((gcRegsData.FWMode == FWM_AsynchronouslyRotating) && !GC_FWAsynchronouslyRotatingModeIsImplemented))
       {
-         if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts))
+         gcRegsData.FWMode = prevFWMode;
+      }
+      else
+      {
+         GC_UpdateFpaPeriodMinMargin();   // must be called first
+
+         CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
+         SFW_UpdateSFWMode(gcRegsData.FWMode);
+
+         if( gcRegsData.FWMode == FWM_Fixed)
          {
-            ChangeFWControllerMode(FW_POSITION_MODE, counts);
+            if (FW_getFilterPosition(gcRegsData.FWPositionSetpoint, &counts))
+            {
+               ChangeFWControllerMode(FW_POSITION_MODE, counts);
+            }
          }
-      }
-      else if(gcRegsData.FWMode == FWM_AsynchronouslyRotating )
-      {
-         ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint);
-      }
-      else if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
-      {
-         // Make sure CenterImage is set when FW is synchronously rotating
-         if (!gcRegsData.CenterImage)
+         else if(gcRegsData.FWMode == FWM_AsynchronouslyRotating )
          {
-            GC_SetCenterImage(1);
+            ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint);
+         }
+         else if(gcRegsData.FWMode == FWM_SynchronouslyRotating)
+         {
+            // Make sure CenterImage is set when FW is synchronously rotating
+            if (!gcRegsData.CenterImage)
+            {
+               GC_SetCenterImage(1);
+            }
+
+            GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), true);
+            FW_CalculateSpeedSetpoint(&gcRegsData);
+            SFW_AllChanged(&gcRegsData);
+            ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint); // TODO should we set something always valid?
          }
 
-         GC_UpdateExposureTimeXRegisters(FWExposureTime, NUM_OF(FWExposureTime), true);
-         FW_CalculateSpeedSetpoint(&gcRegsData);
-         SFW_AllChanged(&gcRegsData);
-         ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint); // TODO should we set something always valid?
+         GC_UpdateParameterLimits();
+         GC_UpdateAECPlusIsAvailable();
+         CAL_UpdateVideo(&gCal, &gcRegsData);
+
+         if (gcRegsData.FWMode != FWM_Fixed)
+            gcRegsData.ImageCorrectionBlockSelector = ICBS_AllBlocks;   //No active block in these modes
       }
-
-      GC_UpdateParameterLimits();
-      GC_UpdateAECPlusIsAvailable();
-      CAL_UpdateVideo(&gCal, &gcRegsData);
-
-      if (gcRegsData.FWMode != FWM_Fixed)
-         gcRegsData.ImageCorrectionBlockSelector = ICBS_AllBlocks;   //No active block in these modes
    }
 }
 
@@ -2721,16 +2737,16 @@ void GC_FWSpeedMaxCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
  */
 void GC_FWSpeedSetpointCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
-   static uint32_t prevFWSpeedSetpoint = 0;
+   static uint32_t prevFWSpeedSetpoint;
 
-   if ((phase == GCCP_BEFORE) && (access == GCCA_READ))
+   if ((phase == GCCP_BEFORE) && (access == GCCA_WRITE))
    {
       prevFWSpeedSetpoint = gcRegsData.FWSpeedSetpoint;
    }
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
-      if(gcRegsData.FWSpeedSetpoint <= gcRegsData.FWSpeedMax)
+      if ((gcRegsData.FWSpeedSetpoint <= gcRegsData.FWSpeedMax) && GC_FWRotatingModeIsActive)
       {
          ChangeFWControllerMode(FW_VELOCITY_MODE, gcRegsData.FWSpeedSetpoint);
       }
@@ -3683,6 +3699,7 @@ void GC_MemoryBufferSequenceSelectorCallback(gcCallbackPhase_t phase, gcCallback
    {
       prevMemoryBufferSequenceSelector = gcRegsData.MemoryBufferSequenceSelector;
    }
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       // Call update function only when selector has changed because it resets download default frame IDs
@@ -4224,6 +4241,17 @@ void GC_TDCFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 }
 
 /**
+ * TDCFlags2 GenICam register callback function.
+ * 
+ * @param phase indicates whether the function is called before or
+ *    after the read or write operation.
+ * @param access indicates whether the operation is read or write.
+ */
+void GC_TDCFlags2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
+{
+}
+
+/**
  * TDCStatus GenICam register callback function.
  * 
  * @param phase indicates whether the function is called before or
@@ -4338,7 +4366,6 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
       // Update TriggerIsActive flags
       triggerIsActiveFlagMask = 0x00000001 << gcRegsData.TriggerSelector;
-
       if (TriggerModeAry[gcRegsData.TriggerSelector] == TM_On)
       {
          IsActiveFlagsSet(triggerIsActiveFlagMask);
@@ -4347,6 +4374,8 @@ void GC_TriggerModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
       {
          IsActiveFlagsClr(triggerIsActiveFlagMask);
       }
+      // Share new flags value
+      GC_SetIsActiveFlags(gcRegsData.IsActiveFlags);
 
       // Update AECPlusIsAvailableMask value
       GC_UpdateAECPlusIsAvailable();

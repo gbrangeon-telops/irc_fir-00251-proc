@@ -215,7 +215,7 @@ IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf)
       }
 
       AXI4L_write32(iValue, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
-      }
+   }
 
 
    IRIG_Read_Global_Status();
@@ -2064,11 +2064,11 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
       if (TDCFlagsTst(ADCReadoutIsImplementedMask))
       {
          flashSettings.ADCReadout_m = adc_m;
-         flashSettings.ADCReadout_b = adc_b;
+         flashSettings.ADCReadout_b = (int16_t)adc_b;
 
-         if (ADC_readout_init(&flashSettings) != IRC_SUCCESS)
+         if (ADC_readout_init() != IRC_SUCCESS)
          {
-            DT_ERR("Failed to update ADC calibration.");
+            DT_ERR("Failed to update ADC Readout calibration.");
             return IRC_FAILURE;
          }
       }
@@ -2076,11 +2076,11 @@ static IRC_Status_t DebugTerminalParseADC(circByteBuffer_t *cbuf)
 
    if (!TDCFlagsTst(ADCReadoutIsImplementedMask))
    {
-      DT_ERR("ADC readout is disabled.");
+      DT_ERR("ADC Readout is disabled.");
       return IRC_FAILURE;
    }
 
-   DT_PRINTF("ADC: enabled = %d, m = " _PCF(6) ", b = %d\n", flashSettings.ADCReadoutEnabled, _FFMT(flashSettings.ADCReadout_m, 6), flashSettings.ADCReadout_b);
+   DT_PRINTF("ADC Readout: m = " _PCF(6) ", b = %d\n", _FFMT(flashSettings.ADCReadout_m, 6), flashSettings.ADCReadout_b);
 
    return IRC_SUCCESS;
 }
@@ -2507,7 +2507,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Device key:         KEY [RENEW]");
    DT_PRINTF("  Get Stack Level:    STACK");
    DT_PRINTF("  Set GCP state:      GCP [0|1]");
-   DT_PRINTF("  ADC calibration:    ADC [m b]");
+   DT_PRINTF("  ADC Readout:        ADC [m b]");
    DT_PRINTF("  Flash Settings:     FS");
    DT_PRINTF("  Flash Dynamic Val.: FDV");
    DT_PRINTF("  Debug Term. Output: DTO CLINK|OEM|USB");

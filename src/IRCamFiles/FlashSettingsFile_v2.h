@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.9.1
+ * Generated from the flash settings file structure definition XLS file version 2.10.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,8 +23,8 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      9
-#define FLASHSETTINGS_FILESUBMINORVERSION_V2   1
+#define FLASHSETTINGS_FILEMINORVERSION_V2      10
+#define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_CHUNKSIZE_V2   512
@@ -184,6 +184,16 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint16_t ElCorrMeasAtReference1;   /**< 1st electronic reference in ADC counts measured at the central or near central pixel in raw0 mode (any electronic correction disabled). */
    uint16_t ElCorrMeasAtReference2;   /**< 2nd electronic reference in ADC counts measured at the central or near central pixel in raw0 mode (any electronic correction disabled). */
    uint8_t FpaScdDiodeBiasEnum;   /**< Enumeration corresponding to the diode bias current of the SCD detectors. */
+   uint8_t EHDRIDisabled;   /**< Disables the EHDRI functionality. */
+   uint8_t BufferingDisabled;   /**< Disables the buffering functionality. */
+   uint8_t AdvTrigDisabled;   /**< Disables the advanced trigger functionalities (sequence and delay). */
+   uint8_t FlaggingDisabled;   /**< Disables the flagging functionalities. */
+   uint8_t GatingDisabled;   /**< Disables the gating functionalities */
+   uint8_t ADCReadoutDisabled;   /**< Disables the ADC readout functionality. */
+   uint8_t IRIGBDisabled;   /**< Disables the IRIGB functionality. */
+   uint8_t GPSDisabled;   /**< Disables the GPS functionality. */
+   uint8_t SFWDisabled;   /**< Disables the synchronously rotating filter wheel functionality. */
+   uint8_t SDIDisabled;   /**< Disables the SDI functionality. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

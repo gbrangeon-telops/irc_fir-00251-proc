@@ -459,6 +459,20 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 9;
 
                case 9:
+                  // 2.9.x -> 2.10.x
+                  hdr->EHDRIDisabled = FlashSettings_FlashSettingsFileHeader_default.EHDRIDisabled;
+                  hdr->BufferingDisabled = FlashSettings_FlashSettingsFileHeader_default.BufferingDisabled;
+                  hdr->AdvTrigDisabled = FlashSettings_FlashSettingsFileHeader_default.AdvTrigDisabled;
+                  hdr->FlaggingDisabled = FlashSettings_FlashSettingsFileHeader_default.FlaggingDisabled;
+                  hdr->GatingDisabled = FlashSettings_FlashSettingsFileHeader_default.GatingDisabled;
+                  hdr->ADCReadoutDisabled = FlashSettings_FlashSettingsFileHeader_default.ADCReadoutDisabled;
+                  hdr->IRIGBDisabled = FlashSettings_FlashSettingsFileHeader_default.IRIGBDisabled;
+                  hdr->GPSDisabled = FlashSettings_FlashSettingsFileHeader_default.GPSDisabled;
+                  hdr->SFWDisabled = FlashSettings_FlashSettingsFileHeader_default.SFWDisabled;
+                  hdr->SDIDisabled = FlashSettings_FlashSettingsFileHeader_default.SDIDisabled;
+                  hdr->FileStructureMinorVersion = 10;
+
+               case 10:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

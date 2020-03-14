@@ -45,7 +45,7 @@ void EHDRI_SendConfig(t_EhdriManager *a, gcRegistersData_t *pGCRegs)
 {
    uint16_t i;
 
-   if (EHDRIIsActive)
+   if (GC_EHDRIIsActive)
    {
       a->Enable = TRUE;
 

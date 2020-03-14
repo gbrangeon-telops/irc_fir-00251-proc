@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.7.1
+// Generated from XML camera definition file version 12.8.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
@@ -272,6 +272,7 @@ void GC_SensorWidthCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_StealthModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_SubSecondTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TDCFlagsCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
+void GC_TDCFlags2Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TDCStatusCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TestImageSelectorCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);
 void GC_TimeSourceCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access);

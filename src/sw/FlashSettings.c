@@ -217,6 +217,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    extern t_bufferManager gBufManager;
    uint8_t externalMemoryBufferDetected;
    t_bufferStatus bufStat;
+   uint8_t i;
 
    BufferManager_GetStatus(&gBufManager, &bufStat);
    externalMemoryBufferDetected = bufStat.ext_buf_prsnt;
@@ -265,6 +266,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    // Update FW
    p_flashSettings->FWPresent &= ~gDisableFilterWheel;
    gcRegsData.FWFilterNumber = p_flashSettings->FWNumberOfFilters;
+   TDCFlagsClr(FWIsImplementedMask | FWSynchronouslyRotatingModeIsImplementedMask);
    if (p_flashSettings->FWPresent && (p_flashSettings->FWNumberOfFilters > 0))
    {
       // Validate default fixed filter wheel PID settings
@@ -282,41 +284,31 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       }
 
       TDCFlagsSet(FWIsImplementedMask);
-      if(p_flashSettings->FWType == FW_SYNC)
+      if (p_flashSettings->FWType == FW_SYNC)
       {
-         TDCFlagsSet(FWSynchronouslyRotatingModeIsImplementedMask);
-      }
-      else
-      {
-         TDCFlagsClr(FWSynchronouslyRotatingModeIsImplementedMask);
+         if (p_flashSettings->SFWDisabled)
+            GC_SetFWMode(FWM_Fixed);   // stop SFW
+         else
+            TDCFlagsSet(FWSynchronouslyRotatingModeIsImplementedMask);
       }
    }
-   else
+   else if (p_flashSettings->FWPresent && (p_flashSettings->FWNumberOfFilters == 0))
    {
-      TDCFlagsClr(FWIsImplementedMask);
-
-      if (p_flashSettings->FWPresent && (p_flashSettings->FWNumberOfFilters == 0))
-      {
-         FS_ERR("FWNumberOfFilters must be greater than 0 when FWPresent is set.");
-      }
+      FS_ERR("FWNumberOfFilters must be greater than 0 when FWPresent is set.");
    }
 
    gcRegsData.FWSpeedMax = p_flashSettings->FWSpeedMax;
 
    // Update NDF
    gcRegsData.NDFilterNumber = p_flashSettings->NDFNumberOfFilters;
+   TDCFlagsClr(NDFilterIsImplementedMask | AECPlusIsImplementedMask);
    if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters > 0))
    {
       TDCFlagsSet(NDFilterIsImplementedMask | AECPlusIsImplementedMask);
    }
-   else
+   else if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters == 0))
    {
-      TDCFlagsClr(NDFilterIsImplementedMask | AECPlusIsImplementedMask);
-
-      if (p_flashSettings->NDFPresent && (p_flashSettings->NDFNumberOfFilters == 0))
-      {
-         FS_ERR("NDFNumberOfFilters must be greater than 0 when NDFPresent is set.");
-      }
+      FS_ERR("NDFNumberOfFilters must be greater than 0 when NDFPresent is set.");
    }
 
    // Update actualization
@@ -358,17 +350,15 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       BuiltInTest_Execute(BITID_DeviceKeyValidation);
    }
 
-   // Update ADC readout calibration
-   TDCFlagsClr(ADCReadoutIsImplementedMask);
-   if (p_flashSettings->ADCReadoutEnabled)
-   {
-      TDCFlagsSet(ADCReadoutIsImplementedMask);
-   }
+   // Update ADC readout
+   ADC_readout_init();
 
-   ADC_readout_init(p_flashSettings);
-
-   // Set IRIG HW delay
-   IRIG_Initialize(p_flashSettings);
+   // Update IRIGB
+   if (p_flashSettings->IRIGBDisabled)
+      TDCFlagsClr(IRIGBIsImplementedMask);
+   else
+      TDCFlagsSet(IRIGBIsImplementedMask);
+   IRIG_Initialize();
 
    // Update Thermistor model type
    xadcSetphyConverter(&extAdcChannels[XEC_INTERNAL_LENS] , p_flashSettings->InternalLensThType);
@@ -421,6 +411,77 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       }
    }
 
+   // Update EHDRI
+   if (p_flashSettings->EHDRIDisabled)
+   {
+      TDCFlagsClr(EHDRIIsImplementedMask);
+      GC_SetEHDRINumberOfExposures(1);    // disable EHDRI
+   }
+   else
+      TDCFlagsSet(EHDRIIsImplementedMask);
+
+   // Update Memory Buffer
+   if (p_flashSettings->BufferingDisabled)
+   {
+      TDCFlagsClr(MemoryBufferIsImplementedMask);
+      if (!externalMemoryBufferDetected)
+      {
+         GC_SetMemoryBufferSequenceClearAll(1);
+         GC_SetMemoryBufferSequenceDownloadMode(MBSDM_Off);
+         GC_SetMemoryBufferMode(MBM_Off);    // disable Memory Buffer
+      }
+   }
+   else
+      TDCFlagsSet(MemoryBufferIsImplementedMask);
+
+   // Update Advanced Trigger
+   if (p_flashSettings->AdvTrigDisabled)
+   {
+      TDCFlagsClr(AdvancedTriggerIsImplementedMask);
+      for (i = 0; i < TriggerDelayAryLen; i++)
+         TriggerDelayAry[i] = 0.0F;    // reset all delays
+      for (i = 0; i < TriggerFrameCountAryLen; i++)
+         TriggerFrameCountAry[i] = 1;  // reset all frame counts
+   }
+   else
+      TDCFlagsSet(AdvancedTriggerIsImplementedMask);
+
+   // Update Flagging
+   if (p_flashSettings->FlaggingDisabled)
+   {
+      TDCFlagsClr(FlaggingIsImplementedMask);
+      TriggerModeAry[TS_Flagging] = TM_Off;    // disable Flagging
+   }
+   else
+      TDCFlagsSet(FlaggingIsImplementedMask);
+
+   // Update Gating
+   if (p_flashSettings->GatingDisabled)
+   {
+      TDCFlagsClr(GatingIsImplementedMask);
+      TriggerModeAry[TS_Gating] = TM_Off;    // disable Gating
+   }
+   else
+      TDCFlagsSet(GatingIsImplementedMask);
+
+   // Update GPS
+   if (p_flashSettings->GPSDisabled)
+      TDCFlags2Clr(GPSIsImplementedMask);
+   else
+      TDCFlags2Set(GPSIsImplementedMask);
+
+   // Update Video Output
+   if (p_flashSettings->SDIDisabled)
+   {
+      GC_SetVideoFreeze(1);
+      TDCFlags2Clr(VideoOutputIsImplementedMask);
+   }
+   else
+   {
+      GC_SetVideoFreeze(0);
+      TDCFlags2Set(VideoOutputIsImplementedMask);
+   }
+
    // Update ExposureTimeMin register
    GC_UpdateExposureTimeMin();
 
@@ -446,6 +507,10 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
       GC_UpdateExternalFanSpeed();
    }
+
+   // Share new TDCFlags and TDCFlags2 values
+   GC_SetTDCFlags(gcRegsData.TDCFlags);
+   GC_SetTDCFlags2(gcRegsData.TDCFlags2);
 
    return IRC_SUCCESS;
 }

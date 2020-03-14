@@ -42,7 +42,7 @@ enum adc_readout_cfg {
 
 typedef enum adc_readout_cfg adc_readout_cfg_t ;
 
-IRC_Status_t ADC_readout_init(flashSettings_t* fs);
+IRC_Status_t ADC_readout_init();
 
 // convert flat value into a Qm.n fixed point value (encoded on m+n+s bits)
 uint32_t floatToFixedPoint(float val, uint32_t m, uint32_t n, bool s);

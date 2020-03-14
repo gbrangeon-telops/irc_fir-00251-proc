@@ -24,14 +24,6 @@
 
 #define GC_AcquisitionStarted TDCStatusTst(AcquisitionStartedMask)
 
-
-// EHDRINumberOfExposures must be greater than one and filter wheel mode must be set to fixed to activate EHDRI
-#define EHDRIIsActive ((gcRegsData.EHDRINumberOfExposures > 1) && (gcRegsData.FWMode == FWM_Fixed))
-
-// EHDRINumberOfExposures must equal one and filter wheel mode must be set to synchronously rotating to activate filter wheel synchronously rotating mode
-#define FWSynchronoulyRotatingModeIsActive ((gcRegsData.EHDRINumberOfExposures == 1) && (gcRegsData.FWMode == FWM_SynchronouslyRotating))
-
-
 // AEC+ is available when;
 //  - EHDRI is not active.
 //  - FW rotating modes are not active.
@@ -51,7 +43,7 @@
    (((gcRegsData.FWPositionSetpoint == calibrationInfo.collection.FWPosition) || (gcRegsData.CalibrationMode == CM_Raw) || (gcRegsData.CalibrationMode == CM_Raw0)) ||  !GC_FWIsImplemented) && \
    (AvailabilityFlagsTst(NDFilter2IsAvailableMask) && (AvailabilityFlagsTst(NDFilter1IsAvailableMask) || AvailabilityFlagsTst(NDFilter3IsAvailableMask))) \
 )
-#define GC_UpdateAECPlusIsAvailable() AvailabilityFlagsClr(AECPlusIsAvailableMask); if (GC_AECPlusIsAvailable) AvailabilityFlagsSet(AECPlusIsAvailableMask)
+#define GC_UpdateAECPlusIsAvailable() (GC_AECPlusIsAvailable ? AvailabilityFlagsSet(AECPlusIsAvailableMask) : AvailabilityFlagsClr(AECPlusIsAvailableMask))
 
 extern uint8_t gGC_RegistersStreaming;
 extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
@@ -59,10 +51,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 12.7.1
+// Generated from XML camera definition file version 12.8.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 7) || (GC_XMLSUBMINORVERSION != 1))
+#if ((GC_XMLMAJORVERSION != 12) || (GC_XMLMINORVERSION != 8) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 
@@ -315,6 +307,7 @@ struct gcRegistersDataStruct {
    uint32_t StealthMode;
    uint32_t SubSecondTime;
    uint32_t TDCFlags;
+   uint32_t TDCFlags2;
    uint32_t TDCStatus;
    uint32_t TestImageSelector;
    uint32_t TimeSource;
@@ -637,6 +630,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_SetDeviceKeyValidationLow(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceKeyValidationLowIdx], val)
 #define GC_SetDeviceKeyValidationHigh(val) GC_RegisterWriteUI32(&gcRegsDef[DeviceKeyValidationHighIdx], val)
 #define GC_SetTDCFlags(val) GC_RegisterWriteUI32(&gcRegsDef[TDCFlagsIdx], val)
+#define GC_SetTDCFlags2(val) GC_RegisterWriteUI32(&gcRegsDef[TDCFlags2Idx], val)
 #define GC_SetTDCStatus(val) GC_RegisterWriteUI32(&gcRegsDef[TDCStatusIdx], val)
 #define GC_SetAvailabilityFlags(val) GC_RegisterWriteUI32(&gcRegsDef[AvailabilityFlagsIdx], val)
 #define GC_SetIsActiveFlags(val) GC_RegisterWriteUI32(&gcRegsDef[IsActiveFlagsIdx], val)
@@ -669,6 +663,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_AcquisitionFrameRateIsLocked ((GC_AcquisitionStarted && (gcRegsData.AcquisitionFrameRateMode == AFRM_FixedLocked)) || GC_WaitingForImageCorrection)
 #define GC_AcquisitionStartTriggerIsActive IsActiveFlagsTst(AcquisitionStartTriggerIsActiveMask)
 #define GC_AcquisitionStartTriggerIsLocked ((gcRegsData.TriggerSelector == TS_AcquisitionStart) && (GC_FWSynchronouslyRotatingModeIsActive || GC_GatingTriggerIsActive))
+#define GC_AdvancedTriggerIsImplemented TDCFlagsTst(AdvancedTriggerIsImplementedMask)
 #define GC_AutofocusIsActive IsActiveFlagsTst(AutofocusIsActiveMask)
 #define GC_CalibrationCollectionTypeFOVIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFOV) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFOV))
 #define GC_CalibrationCollectionTypeFWIsActive ((gcRegsData.CalibrationCollectionActiveType == CCAT_TelopsFW) || (gcRegsData.CalibrationCollectionActiveType == CCAT_MultipointFW))
@@ -679,6 +674,7 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_EHDRIAdvancedSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Simple)
 #define GC_EHDRIExposureTimeIsLocked (GC_ExposureTimeIsLocked || (GC_EHDRIIsActive && (GC_AcquisitionStarted || GC_EHDRIAdvancedSettingsAreLocked)))
 #define GC_EHDRIIsActive (gcRegsData.EHDRINumberOfExposures > 1)
+#define GC_EHDRIIsImplemented TDCFlagsTst(EHDRIIsImplementedMask)
 #define GC_EHDRISimpleSettingsAreLocked (gcRegsData.EHDRIMode == EHDRIM_Advanced)
 #define GC_ExposureTimeIsLocked (GC_AECIsActive || GC_AECPlusIsActive || GC_DiscreteExposureTimeIsAvailable || (GC_CalibrationIsActive && GC_CalibrationCollectionTypeMultipointIsActive) || GC_WaitingForImageCorrection || GC_AutofocusIsActive)
 #define GC_ExternalMemoryBufferIsImplemented TDCFlagsTst(ExternalMemoryBufferIsImplementedMask)
@@ -689,16 +685,20 @@ extern uint32_t TriggerFrameCountAry[TriggerFrameCountAryLen];
 #define GC_FWRotatingModeIsActive (GC_FWAsynchronouslyRotatingModeIsActive || GC_FWSynchronouslyRotatingModeIsActive)
 #define GC_FWSynchronouslyRotatingModeIsActive (GC_FWSynchronouslyRotatingModeIsImplemented && (gcRegsData.FWMode == FWM_SynchronouslyRotating))
 #define GC_FWSynchronouslyRotatingModeIsImplemented (GC_FWIsImplemented && TDCFlagsTst(FWSynchronouslyRotatingModeIsImplementedMask))
+#define GC_FlaggingIsImplemented TDCFlagsTst(FlaggingIsImplementedMask)
 #define GC_FlaggingTriggerIsActive IsActiveFlagsTst(FlaggingTriggerIsActiveMask)
-#define GC_FlaggingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Flagging) && GC_GatingTriggerIsActive)
+#define GC_FlaggingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Flagging) && (GC_GatingTriggerIsActive || (GC_FlaggingIsImplemented == 0)))
+#define GC_GatingIsImplemented TDCFlagsTst(GatingIsImplementedMask)
 #define GC_GatingTriggerIsActive IsActiveFlagsTst(GatingTriggerIsActiveMask)
-#define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive || GC_AECPlusIsActive))
+#define GC_GatingTriggerIsLocked ((gcRegsData.TriggerSelector == TS_Gating) && (GC_FWRotatingModeIsActive || GC_AcquisitionStartTriggerIsActive || GC_FlaggingTriggerIsActive || GC_AECPlusIsActive || (GC_GatingIsImplemented == 0)))
 #define GC_MemoryBufferBusy ((gcRegsData.MemoryBufferStatus == MBS_Recording) || (gcRegsData.MemoryBufferStatus == MBS_Updating) || (gcRegsData.MemoryBufferStatus == MBS_Transmitting) || (gcRegsData.MemoryBufferStatus == MBS_Defraging))
+#define GC_MemoryBufferIsImplemented TDCFlagsTst(MemoryBufferIsImplementedMask)
 #define GC_MemoryBufferNotEmpty (GC_MemoryBufferBusy || (gcRegsData.MemoryBufferSequenceCount > 0))
 #define GC_MemoryBufferNotEmptyLegacy ((gcRegsData.MemoryBufferLegacyMode == MBLM_On) && GC_MemoryBufferNotEmpty)
 #define GC_MemoryBufferProcessingData ((gcRegsData.MemoryBufferStatus == MBS_Updating) || (gcRegsData.MemoryBufferStatus == MBS_Defraging))
 #define GC_MemoryBufferWritingProcess ((gcRegsData.MemoryBufferStatus == MBS_Recording) || (gcRegsData.MemoryBufferStatus == MBS_Updating))
 #define GC_OffsetIsLocked (gcRegsData.CenterImage || GC_WaitingForImageCorrection)
+#define GC_VideoOutputIsImplemented TDCFlags2Tst(VideoOutputIsImplementedMask)
 #define GC_WaitingForImageCorrection TDCStatusTst(WaitingForImageCorrectionMask)
 
 void GC_Registers_Init();
@@ -713,9 +713,6 @@ void GC_UpdateParameterLimits();
 IRC_Status_t GC_DeviceRegistersVerification();
 void GC_UpdateImageLimits();
 void GC_UpdateExternalFanSpeed();
-void GC_UpdateMemoryBufferSequenceSizeLimits();
-void GC_UpdateMemoryBufferNumberOfSequenceLimits();
-void GC_UpdateMemoryBufferSequencePreMOISizeLimits();
 void GC_UnlockCamera();
 void GC_UpdateMemoryBufferRegistersOwner();
 void GC_UpdateFWPositionSetpoint(uint32_t prevFWPositionSetpoint, uint32_t newFWPositionSetpoint);

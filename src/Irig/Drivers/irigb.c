@@ -72,8 +72,13 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
 //---------------------------------------------------------------------------------
 void IRIG_Read_Status()
 {
+   if (flashSettings.IRIGBDisabled){
+      IRIG_POSIXTime.Status.Valid_Source   = 0;
+      IRIG_POSIXTime.Status.Valid_Data     = 0;
+   } else {
    IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
    IRIG_POSIXTime.Status.Valid_Data     = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
+   }
 }
 
 //---------------------------------------------------------------------------------
@@ -81,22 +86,30 @@ void IRIG_Read_Status()
 //---------------------------------------------------------------------------------
 void IRIG_Read_Global_Status()
 {
-   IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
-   IRIG_POSIXTime.Status.Valid_Data    = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
-   IRIG_POSIXTime.Status.Global_Status  = AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_GLOBAL_STATUS);
-   IRIG_POSIXTime.Status.PPS_Delay      = AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_PPS_DELAY);
-   IRIG_POSIXTime.Status.MB_Speed_Error = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_MB_SPEED_ERR);
+   if (flashSettings.IRIGBDisabled){
+      IRIG_POSIXTime.Status.Valid_Source   = 0;
+      IRIG_POSIXTime.Status.Valid_Data    = 0;
+      IRIG_POSIXTime.Status.Global_Status  = 0;
+      IRIG_POSIXTime.Status.PPS_Delay      = 0;
+      IRIG_POSIXTime.Status.MB_Speed_Error = 0;
+   } else {
+      IRIG_POSIXTime.Status.Valid_Source   = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_SOURCE);
+      IRIG_POSIXTime.Status.Valid_Data    = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_VALID_DATA);
+      IRIG_POSIXTime.Status.Global_Status  = AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_GLOBAL_STATUS);
+      IRIG_POSIXTime.Status.PPS_Delay      = AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_PPS_DELAY);
+      IRIG_POSIXTime.Status.MB_Speed_Error = (uint8_t)AXI4L_read32(XPAR_IRIG_CTRL_BASEADDR + AR_IRIG_MB_SPEED_ERR);
+   }
 } 
 
 //---------------------------------------------------------------------------------
 //  Fonction   Initialize IRIGB
 //---------------------------------------------------------------------------------
  
-void IRIG_Initialize(flashSettings_t *p_flashSettings)
+void IRIG_Initialize()
 {
    AXI4L_write32(IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
    // TODO Eventually, the delay will have to be set in the flash setting.
-   //AXI4L_write32(p_flashSettings->IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+   //AXI4L_write32(flashSettings.IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
 
 }
  

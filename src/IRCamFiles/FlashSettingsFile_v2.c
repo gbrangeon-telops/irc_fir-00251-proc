@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.9.1
+ * Generated from the flash settings file structure definition XLS file version 2.10.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -178,6 +178,16 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ElCorrMeasAtReference1 = */ 0,
    /* ElCorrMeasAtReference2 = */ 0,
    /* FpaScdDiodeBiasEnum = */ 255,
+   /* EHDRIDisabled = */ 0,
+   /* BufferingDisabled = */ 0,
+   /* AdvTrigDisabled = */ 0,
+   /* FlaggingDisabled = */ 0,
+   /* GatingDisabled = */ 0,
+   /* ADCReadoutDisabled = */ 0,
+   /* IRIGBDisabled = */ 0,
+   /* GPSDisabled = */ 0,
+   /* SFWDisabled = */ 0,
+   /* SDIDisabled = */ 0,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -394,7 +404,17 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ElCorrMeasAtReference1, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->ElCorrMeasAtReference2, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->FpaScdDiodeBiasEnum, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 75; // Skip FREE space
+      memcpy(&hdr->EHDRIDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->BufferingDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->AdvTrigDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->FlaggingDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->GatingDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->ADCReadoutDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->IRIGBDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->GPSDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->SFWDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&hdr->SDIDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 65; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -644,7 +664,17 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtReference1, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->ElCorrMeasAtReference2, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->FpaScdDiodeBiasEnum, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 75); numBytes += 75; // FREE space
+      memcpy(&buffer[numBytes], &hdr->EHDRIDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->BufferingDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->AdvTrigDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->FlaggingDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->GatingDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->ADCReadoutDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->IRIGBDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->GPSDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->SFWDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memcpy(&buffer[numBytes], &hdr->SDIDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 65); numBytes += 65; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -842,6 +872,16 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ElCorrMeasAtReference1: %u counts\n", hdr->ElCorrMeasAtReference1);
    FPGA_PRINTF("ElCorrMeasAtReference2: %u counts\n", hdr->ElCorrMeasAtReference2);
    FPGA_PRINTF("FpaScdDiodeBiasEnum: %u\n", hdr->FpaScdDiodeBiasEnum);
+   FPGA_PRINTF("EHDRIDisabled: %u\n", hdr->EHDRIDisabled);
+   FPGA_PRINTF("BufferingDisabled: %u\n", hdr->BufferingDisabled);
+   FPGA_PRINTF("AdvTrigDisabled: %u\n", hdr->AdvTrigDisabled);
+   FPGA_PRINTF("FlaggingDisabled: %u\n", hdr->FlaggingDisabled);
+   FPGA_PRINTF("GatingDisabled: %u\n", hdr->GatingDisabled);
+   FPGA_PRINTF("ADCReadoutDisabled: %u\n", hdr->ADCReadoutDisabled);
+   FPGA_PRINTF("IRIGBDisabled: %u\n", hdr->IRIGBDisabled);
+   FPGA_PRINTF("GPSDisabled: %u\n", hdr->GPSDisabled);
+   FPGA_PRINTF("SFWDisabled: %u\n", hdr->SFWDisabled);
+   FPGA_PRINTF("SDIDisabled: %u\n", hdr->SDIDisabled);
    FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);
 }
 

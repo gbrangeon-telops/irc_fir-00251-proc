@@ -50,6 +50,7 @@
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (ScorpiomwDIsImplemented | ITRIsImplementedMask)
+#define FPA_TDC_FLAGS2           0
 #define FPA_NB_PIX_CLK     1
 
 

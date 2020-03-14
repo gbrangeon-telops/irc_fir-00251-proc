@@ -41,7 +41,7 @@ IRC_Status_t DeviceKey_Validate(flashSettings_t *p_flashSettings, flashDynamicVa
 
    deviceKeyValidation = hash_64(deviceKey, (uint64_t) 0xFFFFFFFFFFFFFFFF);
 
-   DK_DBG("Device key: 0x%08X%08X", flashSettings.DeviceKeyHigh, flashSettings.DeviceKeyLow);
+   DK_DBG("Device key: 0x%08X%08X", p_flashSettings->DeviceKeyHigh, p_flashSettings->DeviceKeyLow);
    DK_DBG("Device key validation: 0x%08X%08X", p_deviceKeyValidation32[DK_KEY_DWORD_HIGH], p_deviceKeyValidation32[DK_KEY_DWORD_LOW]);
    DK_DBG("Device key TSDV validation: 0x%08X%08X", p_flashDynamicValues->DeviceKeyValidationHigh, p_flashDynamicValues->DeviceKeyValidationLow);
 

@@ -55,7 +55,7 @@ typedef struct
 
 /************************** Function Prototypes *****************************/
 
-void IRIG_Initialize(flashSettings_t *p_flashSettings);
+void IRIG_Initialize();
 void IRIG_Read_Global_Status();
 void IRIG_Processing(gcRegistersData_t *pGCRegs);
 

@@ -10,43 +10,46 @@
 
 extern brd_rev_ver_t gBrdRevid;
 
-uint32_t N_ADC_BITS;
 
 // fonction appelée au chargement des flash settings
-IRC_Status_t ADC_readout_init(flashSettings_t* fs)
+IRC_Status_t ADC_readout_init()
 {
-   IRC_Status_t status = IRC_FAILURE;
    int32_t ri, qi;
    float m, b, r, q;
-   N_ADC_BITS = 16;
-   uint32_t adcReadoutcgf = 1;
+   uint32_t N_ADC_BITS = 16;
+   uint32_t adcReadoutcgf;
 
 #ifdef STARTUP
    // nominal values
    m = 1.0;                // dynamic range on N_ADC_BITS : |0 to 10V(16 bits)|-10V to 0(16 bits)|
    b = 0.0f;               //                               |  0x0 to 0x7FFF  |  8000 to 0xFFFF  |
 #else
-   m = fs->ADCReadout_m;   // [counts/mV]
-   b = fs->ADCReadout_b;   // [counts]
+   m = flashSettings.ADCReadout_m;   // [counts/mV]
+   b = (float)flashSettings.ADCReadout_b;   // [counts]
 #endif
    
-   if (gBrdRevid == BRD_REV_00x)
+   if (flashSettings.ADCReadoutDisabled ||
+         (gBrdRevid == BRD_REV_00x && !flashSettings.ADCReadoutEnabled))
    {
-      if (fs->ADCReadoutEnabled)
+      TDCFlagsClr(ADCReadoutIsImplementedMask);
+      adcReadoutcgf = ADC_IRIG_ONLY;
+   }
+   else
+   {
+      TDCFlagsSet(ADCReadoutIsImplementedMask);
+
+      if (gBrdRevid == BRD_REV_00x)
       {
          adcReadoutcgf = ADC_READOUT;
          N_ADC_BITS = 12;
       }
       else
       {
-         adcReadoutcgf = ADC_IRIG_ONLY;
+         adcReadoutcgf = ADC_AND_IRIG;
       }
    }
-   else
-   {
-      adcReadoutcgf = ADC_AND_IRIG;
-   }
-
+   // Share new flags value
+   GC_SetTDCFlags(gcRegsData.TDCFlags);
 
    r = 1.0f/m;
    q = b + (1<<(N_ADC_BITS-1)); // the input of the ADC is offset by Vref/2
@@ -64,9 +67,7 @@ IRC_Status_t ADC_readout_init(flashSettings_t* fs)
    AXI4L_write32(adcReadoutcgf, ADC_BASE_ADDR + ADC_ENABLE_OFFSET);
    AXI4L_write32(1, ADC_BASE_ADDR + ADC_CFG_VALID);
 
-   status = IRC_SUCCESS;
-
-   return status;
+   return IRC_SUCCESS;
 }
 
 uint32_t floatToFixedPoint(float val, uint32_t m, uint32_t n, bool s)

@@ -533,7 +533,6 @@ IRC_Status_t Proc_GC_Init()
    GC_UpdateFOV();
 
    // Memory buffer GenICam registers initialization
-   GC_MemoryBufferNumberOfImagesMaxCallback(GCCP_BEFORE, GCCA_READ);
    GC_MemoryBufferNumberOfSequencesMaxCallback(GCCP_BEFORE, GCCA_READ);
    GC_MemoryBufferSequenceSizeMaxCallback(GCCP_BEFORE, GCCA_READ);
    gcRegsData.MemoryBufferNumberOfSequences = gcRegsData.MemoryBufferNumberOfSequencesMax;
@@ -1303,6 +1302,8 @@ IRC_Status_t Proc_BufferManager_Init()
       TDCFlagsClr(ExternalMemoryBufferIsImplementedMask);
       GC_UpdateMemoryBufferRegistersOwner(GCRO_Processing_FPGA);
    }
+   // Share new flags value
+   GC_SetTDCFlags(gcRegsData.TDCFlags);
 
    return BufferManager_Init(&gBufManager, &gcRegsData);
 }
