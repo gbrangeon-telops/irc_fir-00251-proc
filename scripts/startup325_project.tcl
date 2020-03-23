@@ -31,11 +31,14 @@ add_files [concat \
 
 # Add Specific IP file
 
-#Add specific constraint files
+# Add specific constraint files
 add_files -fileset constrs_1 [glob -nocomplain $root_dir/src/constraints/isc0207A/*specific*.xdc]
 
 # Add Fir-00251-Proc project file
 source $script_dir/Base_project.tcl
+
+# Disable encryption for Start-up project
+set_property is_enabled false [get_files -of [get_filesets { constrs_1}] *encrypt*.xdc]
 
 #Set top level design
 set_property top $top_lvl [current_fileset]

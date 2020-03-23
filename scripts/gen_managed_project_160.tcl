@@ -35,6 +35,9 @@ source $script_dir/gen_bd_core_${FPGA_SIZE}.tcl
 validate_bd_design
 save_bd_design
 
+#Create the BD wrapper
+make_wrapper -files [get_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd] -top
+
 #extract BD clock
 source $script_dir/tel_xparam_extract.tcl
 

@@ -8,7 +8,7 @@ REM Set environment variables
 call D:\Telops\FIR-00251-Proc\bin\scripts\setEnvironment.bat %sensorName% %fpgaSize%
 
 REM Build main project
-cmd /c %x_xsct% %projectDir%\sdk\build_sw.tcl %sensorName% %fpgaSize% 0 0
+cmd /c %x_xsct% %projectDir%\sdk\build_sw.tcl %sensorName% %fpgaSize% 0 "main_only"
 if not exist %sdkDir%\%baseName%_%fpgaSize%\Release\%baseName%_%fpgaSize%.elf (
    echo Build project failed!
    pause

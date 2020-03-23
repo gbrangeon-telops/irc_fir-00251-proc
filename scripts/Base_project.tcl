@@ -90,17 +90,21 @@ add_files [concat \
 ]
 
 
-#Read de common Block Design
+#Read Block Design
 read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd
-
-#Create the bd wrapper
-make_wrapper -files [get_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd] -top
 add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/hdl/core_wrapper.vhd
+
+#Associate bootloader file to microblaze
+set boot_file $root_dir/sdk/$top_lvl/${top_lvl}_boot_${FPGA_SIZE}/Release/${top_lvl}_boot_${FPGA_SIZE}.elf
+add_files $boot_file
+set_property SCOPED_TO_REF core [get_files $boot_file]
+set_property SCOPED_TO_CELLS {MCU/microblaze_1} [get_files $boot_file]
 
 #Add constraint files
 add_files -fileset constrs_1  [concat \
    [glob -nocomplain $constr_dir/*.xdc] \
    [glob -nocomplain $constr_dir/$sensor/*.xdc] \
+   [glob -nocomplain $constr_dir/_encryption/*${FPGA_SIZE}*.xdc] \
 ]
 
 # make sure the files are in correct precedence order (as per UG903 recommendation)

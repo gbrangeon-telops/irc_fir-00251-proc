@@ -1,13 +1,22 @@
 Pour un build à neuf :
 
-1. dans vivado => "source D:/telops/FIR-00251-Proc/scripts/gen_managed_projet.tcl" (génère le projet des cores IP)
+1. Vivado => "source D:/Telops/FIR-00251-Proc/scripts/gen_managed_projet_FPGA_SIZE.tcl" (génère le projet des IP).
 
-2. Window=>Sources, Select all, Generate Output Products (ip source) (génère les sources pour les cores)
+2. Dans la fenêtre Sources, sélectionner tous les IP et faire Generate Output Products (génère les sources pour les IP).
 
-3. compilation des sources dans aldec (génère les sources des .bde)
+3. Dans la fenêtre Sources, sélectionner le core (Block Designs) et faire Generate Output Products (génère les sources pour le Block Design).
 
-4. dans vivado => "source D:/telops/FIR-00251-Proc/scripts/DETECTEUR_project.tcl" (créée rempli le dossier D:/telops/FIR-00251-Proc/xilinx/DETECTEUR/)
+4. Aldec => compilation des sources en exécutant le .do (génère les .vhd à partir des .bde).
 
-5. vivado => generate bitstream
+5. Vivado => "source D:/Telops/FIR-00251-Proc/scripts/DETECTEUR_project.tcl" (génère le projet DETECTEUR).
 
-6. optionnellement, remplacer les étapes 4 et 5 par "source D:/telops/FIR-00251-Proc/scripts/Build_all_project.tcl" 
+6. Dans le menu File > Export > Export Hardware faire Export to D:/Telops/FIR-00251-Proc/sdk/fir_00251_proc_DETECTEUR en laissant Include bitstream décoché.
+   Renommer le .hdf généré en ajoutant le suffixe _FPGA_SIZE.
+
+7. SDK => Ouvrir un workspace dans D:/Telops/FIR-00251-Proc/sdk/fir_00251_proc_DETECTEUR.
+
+8. Ouvrir la XSCT Console et faire "source D:/Telops/FIR-00251-Proc/sdk/fir_00251_proc_DETECTEUR/build_DETECTEUR_project.tcl" (génère et compile les projets)
+
+9. Vivado => Generate Bitstream et File > Export > Export Bitstream File à D:/Telops/FIR-00251-Proc/sdk/fir_00251_proc_DETECTEUR/fir_00251_proc_DETECTEUR.bit
+
+10. Générer le .mcs avec le script D:/Telops/FIR-00251-Proc/bin/DETECTEUR/scripts/FPGA_SIZE/generatePromFile.bat

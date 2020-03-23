@@ -13,7 +13,7 @@ set storageDir=D:\Telops\FIR-00257-Storage
 set ntxminiDir=F:\Production\IRCAM\Firmwares\FIR-00251-NTx-Mini\Archives
 
 set elfFile=%binDir%\%baseName%_%fpgaSize%.elf
-set bootFile=%binDir%\%baseName%_boot_%fpgaSize%.elf
+set bootFile=%sdkDir%\%baseName%_boot_%fpgaSize%\Release\%baseName%_boot_%fpgaSize%.elf
 set hwFile=%sdkDir%\%baseName%_%fpgaSize%.hdf
 
 set buildInfoFile=%srcDir%\BuildInfo\%sensorName%\BuildInfo.h
@@ -56,7 +56,6 @@ if exist D:\Xilinx\SDK\2016.3\*.* set xDir=D:\Xilinx
 @echo Xilinx directory: %xDir%
 
 set x_mb-objcopy=%xDir%\SDK\2016.3\gnu\microblaze\nt\bin\mb-objcopy.exe
-set x_updatemem=%xDir%\SDK\2016.3\bin\updatemem.bat
 set x_xsct=%xDir%\SDK\2016.3\bin\xsct.bat
 set x_xilperl=%xDir%\Vivado\2016.3\ids_lite\ISE\bin\nt64\xilperl.exe
 

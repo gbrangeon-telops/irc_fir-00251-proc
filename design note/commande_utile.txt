@@ -18,9 +18,6 @@ source -verbose gen_project.tcl
 #Ajout du code elf au bitfile
 update_mem -meminfo arg [-data arg] -bit arg [-proc arg] -out arg [-force] [-quiet] [-verbose]
 
-#Ecrire le fichier bmm back annoter avec les localisations des BRAM
-write_bmm "d:/Telops/FIR-00251-Proc/sdk/hw/fir_00251_top_bd.bmm"
-
 #Rapporte les nets avec les fanouts les plus élevés
 report_high_fanout_nets -timing -load_types -max_nets 25
 report_high_fanout_nets -histogram

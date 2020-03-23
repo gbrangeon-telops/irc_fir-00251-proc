@@ -27,14 +27,24 @@ proc build_tsir_project {{release 0}} {
       set_property target_constrs_file [get_files -of [get_filesets { constrs_1}] *release_target.xdc] [current_fileset -constrset]
 	}
    
+   #export hardware to sdk
+   generate_target all [get_files $base_dir/IP/${FPGA_SIZE}/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd]
+   write_hwdef -force -file $base_dir/sdk/${top_lvl}/fir_00251_proc_${sensor}_${FPGA_SIZE}.hdf
+   
+   #create and build bootloader
+   exec xsct $base_dir/sdk/build_sw.tcl ${sensor} ${FPGA_SIZE} 1 "boot_only"
+   if {[file exists $base_dir/sdk/$top_lvl/${top_lvl}_boot_${FPGA_SIZE}/Release/${top_lvl}_boot_${FPGA_SIZE}.elf] == 0} {
+      return -code error "Build bootloader failed ${sensor} ${FPGA_SIZE}"
+   }
+   
 	#generate bitstream
 	launch_runs impl_1 -to_step write_bitstream
 	
 	#wait for run end
 	wait_on_run impl_1
 	
-	#Export hardware for sdk
-	file copy -force $base_dir/xilinx/${sensor}/${proj_name}.runs/impl_1/${top_lvl}.sysdef $base_dir/sdk/${top_lvl}/fir_00251_proc_${sensor}_${FPGA_SIZE}.hdf
+	#Export bitstream
+	file copy -force $base_dir/xilinx/${sensor}/${proj_name}.runs/impl_1/${top_lvl}.bit $base_dir/sdk/${top_lvl}/fir_00251_proc_${sensor}_${FPGA_SIZE}.bit
 	exec $base_dir/scripts/updateHwSvnRev.bat ${sensor} ${FPGA_SIZE}
 	
 	#open implemented design
