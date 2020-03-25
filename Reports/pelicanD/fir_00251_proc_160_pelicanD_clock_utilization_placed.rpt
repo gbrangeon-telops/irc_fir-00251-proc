@@ -1,8 +1,8 @@
 Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
-| Date         : Mon Jan 27 19:34:33 2020
-| Host         : TELOPSV running 64-bit major release  (build 9200)
+| Date         : Tue Mar 24 23:34:41 2020
+| Host         : TELOPS212 running 64-bit Service Pack 1  (build 7601)
 | Command      : report_clock_utilization -file d:/Telops/fir-00251-Proc/Reports/pelicanD/fir_00251_proc_160_pelicanD_clock_utilization_placed.rpt
 | Design       : fir_00251_proc_pelicanD
 | Device       : 7k160t-fbg676
@@ -79,16 +79,16 @@ Table of Contents
 +-----------+-----------+-----------------+------------+----------------+--------------+------+-------------------+-------------------+-------------+-----------------+--------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
 | Global Id | Source Id | Driver Type/Pin | Constraint | Site           | Clock Region | Root | Clock Delay Group | Load Clock Region | Clock Loads | Non-Clock Loads | Clock Period | Clock                                                                                 | Driver Pin                                                                                                                    | Net                                                                                                                             |
 +-----------+-----------+-----------------+------------+----------------+--------------+------+-------------------+-------------------+-------------+-----------------+--------------+---------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
-| g0        | src0      | BUFG/O          | None       | BUFGCTRL_X0Y7  | n/a          |      |                   |                 8 |       47402 |               0 |        5.882 | clk_cal                                                                               | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clkout1_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                                            |
-| g1        | src1      | BUFG/O          | None       | BUFGCTRL_X0Y16 | n/a          |      |                   |                10 |       29962 |               0 |       10.000 | clk_mb                                                                                | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout1_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                                            |
-| g2        | src2      | BUFG/O          | None       | BUFGCTRL_X0Y0  | n/a          |      |                   |                 6 |       10344 |               0 |       10.000 | MIG_CAL_UI_CLK                                                                        | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/u_bufg_clkdiv0/O      | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK                     |
+| g0        | src0      | BUFG/O          | None       | BUFGCTRL_X0Y7  | n/a          |      |                   |                 7 |       47402 |               0 |        5.882 | clk_cal                                                                               | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clkout1_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                                            |
+| g1        | src1      | BUFG/O          | None       | BUFGCTRL_X0Y16 | n/a          |      |                   |                10 |       29978 |               0 |       10.000 | clk_mb                                                                                | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout1_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                                            |
+| g2        | src2      | BUFG/O          | None       | BUFGCTRL_X0Y0  | n/a          |      |                   |                 5 |       10344 |               0 |       10.000 | MIG_CAL_UI_CLK                                                                        | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/u_bufg_clkdiv0/O      | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK                     |
 | g3        | src0      | BUFG/O          | None       | BUFGCTRL_X0Y8  | n/a          |      |                   |                10 |        9830 |               0 |       11.765 | clk_data                                                                              | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clkout2_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                                            |
 | g4        | src3      | BUFG/O          | None       | BUFGCTRL_X0Y17 | n/a          |      |                   |                 3 |        5633 |               0 |       10.000 | MIG_CODE_UI_CLK                                                                       | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/u_bufg_clkdiv0/O         | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk                     |
 | g5        | src4      | BUFG/O          | None       | BUFGCTRL_X0Y1  | n/a          |      |                   |                 3 |        1858 |               0 |       12.500 | PROXY_DCLK_OUT_clink_serdes_clk_wrapper                                               | CLINK/U14/clkout1_buf/O                                                                                                       | CLINK/U14/PROXY_DCLK_OUT                                                                                                        |
-| g6        | src5      | BUFG/O          | None       | BUFGCTRL_X0Y2  | n/a          |      |                   |                 3 |        1807 |               0 |       12.500 | PROXY_DCLK_OUT_clink_serdes_clk_wrapper_1                                             | CLINK/ch1_enabled.U1/clkout1_buf/O                                                                                            | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                                                                                             |
+| g6        | src5      | BUFG/O          | None       | BUFGCTRL_X0Y2  | n/a          |      |                   |                 2 |        1807 |               0 |       12.500 | PROXY_DCLK_OUT_clink_serdes_clk_wrapper_1                                             | CLINK/ch1_enabled.U1/clkout1_buf/O                                                                                            | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                                                                                             |
 | g7        | src6      | BUFG/O          | None       | BUFGCTRL_X0Y18 | n/a          |      |                   |                 2 |        1618 |               0 |       10.000 | ACQ/MGT/MGTS/EXP/U0/gt_wrapper_i/exp_mgt_multi_gt_i/gt0_exp_mgt_i/gtxe2_i/TXOUTCLK    | ACQ/MGT/MGTS/EXP_CLOCK/user_clk_buf_i/O                                                                                       | ACQ/MGT/MGTS/EXP_CLOCK/USER_CLK                                                                                                 |
 | g8        | src7      | BUFG/O          | None       | BUFGCTRL_X0Y19 | n/a          |      |                   |                 1 |        1298 |               0 |       10.000 | ACQ/MGT/MGTS/DATA/U0/gt_wrapper_i/data_mgt_multi_gt_i/gt0_data_mgt_i/gtxe2_i/TXOUTCLK | ACQ/MGT/MGTS/DATA_CLOCK/user_clk_buf_i/O                                                                                      | ACQ/MGT/MGTS/DATA_CLOCK/USER_CLK                                                                                                |
-| g9        | src1      | BUFG/O          | None       | BUFGCTRL_X0Y20 | n/a          |      |                   |                 4 |        1025 |               0 |       50.000 | clk_irig                                                                              | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout4_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                                            |
+| g9        | src1      | BUFG/O          | None       | BUFGCTRL_X0Y20 | n/a          |      |                   |                 3 |        1025 |               0 |       50.000 | clk_irig                                                                              | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout4_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                                            |
 | g10       | src1      | BUFG/O          | None       | BUFGCTRL_X0Y21 | n/a          |      |                   |                 5 |         864 |               0 |       20.000 | clk_mgt_init                                                                          | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout3_buf/O                                                                     | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                                            |
 | g11       | src8      | BUFG/O          | None       | BUFGCTRL_X0Y9  | n/a          |      |                   |                 3 |         349 |               0 |       60.000 | usart_clk                                                                             | ACQ/BULK_USART/U11/inst/clkout1_buf/O                                                                                         | ACQ/BULK_USART/U11/inst/CLK0                                                                                                    |
 | g12       | src9      | BUFG/O          | None       | BUFGCTRL_X0Y23 | n/a          |      |                   |                 3 |         304 |               0 |       33.333 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/Use_E2.BSCAN_I/Use_E2.BSCANE2_I/DRCK        | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Using_FPGA.Native/O                                     | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                                                |
@@ -165,7 +165,7 @@ Table of Contents
 | 7        | PHASER_OUT_PHY/OCLKDELAYED | PHASER_OUT_PHY_X0Y16 | PHASER_OUT_PHY_X0Y16/PHASER_OUT_PHY | X0Y4         |           2 |               0 |        2.500 | oserdes_clk_7  | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/phaser_out/OCLKDELAYED    | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_A.ddr_byte_lane_A/oserdes_clk_delayed    |
 | 8        | PHASER_OUT_PHY/OCLKDELAYED | PHASER_OUT_PHY_X0Y19 | PHASER_OUT_PHY_X0Y19/PHASER_OUT_PHY | X0Y4         |           2 |               0 |        2.500 | oserdes_clk_10 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/phaser_out/OCLKDELAYED    | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_memc_ui_top_axi/mem_intfc0/ddr_phy_top0/u_ddr_mc_phy_wrapper/u_ddr_mc_phy/ddr_phy_4lanes_0.u_ddr_phy_4lanes/ddr_byte_lane_D.ddr_byte_lane_D/oserdes_clk_delayed    |
 | 9        | PLLE2_ADV/CLKOUT1          | PLLE2_ADV_X0Y4       | PLLE2_ADV_X0Y4/PLLE2_ADV            | X0Y4         |           1 |               6 |        2.500 | mem_refclk_1   | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/plle2_i/CLKOUT1                                                                                                                                   | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/mem_refclk                                                                                                                                     |
-| 10       | FDRE/Q                     | None                 | SLICE_X80Y173/AFF                   | X1Y3         |           1 |               0 |              |                | ACQ/U2/U4/BUF_CTRL/regWrite_reg/Q                                                                                                                                                                                                                      | ACQ/U2/U4/BUF_CTRL/regWrite                                                                                                                                                                                                                         |
+| 10       | FDRE/Q                     | None                 | SLICE_X77Y189/AFF                   | X1Y3         |           1 |               0 |              |                | ACQ/U2/U4/BUF_CTRL/regWrite_reg/Q                                                                                                                                                                                                                      | ACQ/U2/U4/BUF_CTRL/regWrite                                                                                                                                                                                                                         |
 +----------+----------------------------+----------------------+-------------------------------------+--------------+-------------+-----------------+--------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 * Local Clocks in this context represents only clocks driven by non-global buffers
 ** Clock Loads column represents the clock pin loads (pin count)
@@ -180,16 +180,16 @@ Table of Contents
 +-------------------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+-------+-------+------+-------+------+-------+------+-------+------+-------+
 | Clock Region Name | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail | Used  | Avail | Used | Avail | Used | Avail | Used | Avail | Used | Avail |
 +-------------------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+-------+-------+------+-------+------+-------+------+-------+------+-------+
-| X0Y0              |    5 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    0 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 | 13790 |  2800 | 5477 |   850 |    1 |    60 |   29 |    30 |   21 |    60 |
-| X1Y0              |    5 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 | 13729 |  2700 | 6186 |   950 |    4 |    80 |   29 |    40 |   25 |    60 |
-| X0Y1              |   10 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    7 |    50 |    0 |    50 | 12447 |  2800 | 4301 |   850 |    0 |    60 |   26 |    30 |   12 |    60 |
-| X1Y1              |    5 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 | 11860 |  2700 | 4990 |   950 |   11 |    80 |   22 |    40 |   15 |    60 |
-| X0Y2              |   10 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    5 |    50 |    0 |    50 |  8336 |  2200 | 3120 |   850 |    5 |    60 |   17 |    30 |    0 |    60 |
-| X1Y2              |    7 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    8 |    50 | 10009 |  2700 | 2979 |   950 |    6 |    80 |   28 |    40 |    0 |    60 |
-| X0Y3              |   10 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 |  8929 |  2200 | 3423 |   850 |    6 |    60 |   13 |    30 |    4 |    60 |
-| X1Y3              |    8 |    12 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    2 |     4 |    0 |     1 |    0 |     0 |    0 |     0 |  8898 |  2150 | 3517 |   800 |    0 |    50 |   16 |    25 |    7 |    60 |
-| X0Y4              |    8 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    4 |    50 |  9271 |  2800 | 2447 |   850 |    0 |    60 |   11 |    30 |    0 |    60 |
-| X1Y4              |    7 |    12 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    2 |     4 |    0 |     0 |    0 |     0 |    0 |     0 |  8299 |  2300 | 3172 |   850 |    0 |    60 |   22 |    30 |    5 |    60 |
+| X0Y0              |    5 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    0 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 | 13244 |  2800 | 5449 |   850 |    0 |    60 |   30 |    30 |   22 |    60 |
+| X1Y0              |    5 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 | 12373 |  2700 | 5711 |   950 |    4 |    80 |   28 |    40 |   23 |    60 |
+| X0Y1              |   10 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    7 |    50 |    0 |    50 | 12365 |  2800 | 4628 |   850 |    2 |    60 |   27 |    30 |   16 |    60 |
+| X1Y1              |    5 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 | 12196 |  2700 | 4808 |   950 |    6 |    80 |   27 |    40 |   12 |    60 |
+| X0Y2              |    9 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    5 |    50 |    0 |    50 |  8584 |  2200 | 3265 |   850 |    4 |    60 |   22 |    30 |    0 |    60 |
+| X1Y2              |    6 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    8 |    50 |  9799 |  2700 | 3241 |   950 |   10 |    80 |   25 |    40 |    0 |    60 |
+| X0Y3              |    8 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    0 |    50 |  8934 |  2200 | 3456 |   850 |    5 |    60 |    9 |    30 |    4 |    60 |
+| X1Y3              |    8 |    12 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    2 |     4 |    0 |     1 |    0 |     0 |    0 |     0 |  8913 |  2150 | 3601 |   800 |    0 |    50 |   14 |    25 |    7 |    60 |
+| X0Y4              |    8 |    12 |    0 |     4 |    0 |     2 |    0 |     4 |    1 |     1 |    0 |     1 |    0 |     0 |    0 |     0 |    0 |    50 |    4 |    50 |  9442 |  2800 | 2640 |   850 |    0 |    60 |    9 |    30 |    0 |    60 |
+| X1Y4              |    7 |    12 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    0 |     0 |    2 |     4 |    0 |     0 |    0 |     0 |    0 |     0 |  9734 |  2300 | 3669 |   850 |    0 |    60 |   22 |    30 |    5 |    60 |
 +-------------------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+------+-------+-------+-------+------+-------+------+-------+------+-------+------+-------+
 * Global Clock column represents track count; while other columns represents cell counts
 
@@ -201,8 +201,8 @@ Table of Contents
 |    | X0 | X1 |
 +----+----+----+
 | Y4 |  8 |  7 |
-| Y3 | 10 |  8 |
-| Y2 | 10 |  7 |
+| Y3 |  8 |  8 |
+| Y2 |  9 |  6 |
 | Y1 | 10 |  5 |
 | Y0 |  5 |  5 |
 +----+----+----+
@@ -214,11 +214,11 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF    | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                  |
 +-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |       14700 |               0 | 13475 |   1173 |   30 |  21 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1 |
-| g1        | n/a   | BUFG/O          | None       |          10 |               0 |    10 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1 |
-| g3        | n/a   | BUFG/O          | None       |          32 |               0 |    32 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2 |
-| g5        | n/a   | BUFG/O          | None       |         203 |               0 |   203 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT                             |
-| g6        | n/a   | BUFG/O          | None       |          70 |               0 |    70 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                  |
+| g0        | n/a   | BUFG/O          | None       |       14416 |               0 | 13135 |   1229 |   30 |  22 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1 |
+| g1        | n/a   | BUFG/O          | None       |          27 |               0 |    27 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1 |
+| g3        | n/a   | BUFG/O          | None       |          18 |               0 |    18 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2 |
+| g5        | n/a   | BUFG/O          | None       |          30 |               0 |    30 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT                             |
+| g6        | n/a   | BUFG/O          | None       |          34 |               0 |    34 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                  |
 +-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+------------------------------------------------------+
 * Clock Loads column represents the clock pin loads (pin count)
 ** Non-Clock Loads column represents the non-clock pin loads (pin count)
@@ -231,9 +231,9 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF    | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                         |
 +-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |       15049 |               0 | 13684 |   1298 |   33 |  25 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1        |
-| g1        | n/a   | BUFG/O          | None       |           9 |               0 |     9 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1        |
-| g3        | n/a   | BUFG/O          | None       |          36 |               0 |    36 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2        |
+| g0        | n/a   | BUFG/O          | None       |       13544 |               0 | 12342 |   1140 |   32 |  23 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1        |
+| g1        | n/a   | BUFG/O          | None       |           5 |               0 |     5 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1        |
+| g3        | n/a   | BUFG/O          | None       |          26 |               0 |    26 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2        |
 | g25       | n/a   | BUFG/O          | None       |           1 |               0 |     0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_IN_clink_serdes_clk_wrapper |
 | g26       | n/a   | BUFG/O          | None       |           1 |               0 |     0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | CLINK/ch1_enabled.U1/clkfbout_buf_clink_serdes_clk_wrapper  |
 +-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------+
@@ -248,12 +248,12 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                         |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |        6226 |               0 | 5713 |    474 |   26 |  12 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
-| g1        | n/a   | BUFG/O          | None       |        3176 |               0 | 3155 |      2 |   16 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
-| g2        | n/a   | BUFG/O          | None       |          96 |               0 |   96 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
-| g3        | n/a   | BUFG/O          | None       |         107 |               0 |  107 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
-| g5        | n/a   | BUFG/O          | None       |        1654 |               0 | 1646 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT                                                                                    |
-| g6        | n/a   | BUFG/O          | None       |        1736 |               0 | 1730 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                                                                         |
+| g0        | n/a   | BUFG/O          | None       |        7351 |               0 | 6545 |    760 |   28 |  16 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
+| g1        | n/a   | BUFG/O          | None       |        2233 |               0 | 2210 |      2 |   19 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
+| g2        | n/a   | BUFG/O          | None       |           6 |               0 |    6 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
+| g3        | n/a   | BUFG/O          | None       |          26 |               0 |   26 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
+| g5        | n/a   | BUFG/O          | None       |        1820 |               0 | 1812 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT                                                                                    |
+| g6        | n/a   | BUFG/O          | None       |        1773 |               0 | 1766 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                                                                         |
 | g15       | n/a   | BUFG/O          | None       |           4 |               0 |    0 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT_MULT7                                                                              |
 | g16       | n/a   | BUFG/O          | None       |           3 |               0 |    0 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT_MULT7                                                                   |
 | g19       | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out2                                                        |
@@ -267,15 +267,15 @@ Table of Contents
 10. Cell Type Counts per Global Clock: Region X1Y1
 --------------------------------------------------
 
-+-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------+
-| Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                              |
-+-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |        9432 |               0 | 8504 |    876 |   28 |  15 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                             |
-| g1        | n/a   | BUFG/O          | None       |         141 |               0 |  133 |      0 |    5 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                             |
-| g2        | n/a   | BUFG/O          | None       |        3353 |               0 | 3156 |    172 |   10 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK      |
-| g3        | n/a   | BUFG/O          | None       |          69 |               0 |   67 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                             |
-| g17       | n/a   | BUFH/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/pll_clk3 |
-+-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------+
++-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------+
+| Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF    | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                              |
++-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------+
+| g0        | n/a   | BUFG/O          | None       |       10788 |               0 | 10000 |    733 |   32 |  12 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                             |
+| g1        | n/a   | BUFG/O          | None       |         201 |               0 |   191 |      0 |    9 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                             |
+| g2        | n/a   | BUFG/O          | None       |        1947 |               0 |  1918 |     15 |    3 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK      |
+| g3        | n/a   | BUFG/O          | None       |          88 |               0 |    87 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                             |
+| g17       | n/a   | BUFH/O          | None       |           1 |               0 |     0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/pll_clk3 |
++-----------+-------+-----------------+------------+-------------+-----------------+-------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------+
 * Clock Loads column represents the clock pin loads (pin count)
 ** Non-Clock Loads column represents the non-clock pin loads (pin count)
 *** Columns FF, LUTRAM, RAMB through 'Hard IP' represents load cell counts
@@ -287,14 +287,13 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                         |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |        1047 |               0 |  989 |     42 |   15 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
-| g1        | n/a   | BUFG/O          | None       |        6205 |               0 | 6177 |      2 |   19 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
-| g2        | n/a   | BUFG/O          | None       |          50 |               0 |   50 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
-| g3        | n/a   | BUFG/O          | None       |         732 |               0 |  726 |      0 |    3 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
-| g5        | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT                                                                                    |
-| g6        | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | CLINK/ch1_enabled.U1/PROXY_DCLK_OUT                                                                         |
-| g9        | n/a   | BUFG/O          | None       |         390 |               0 |  390 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                        |
-| g10       | n/a   | BUFG/O          | None       |           4 |               0 |    4 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
+| g0        | n/a   | BUFG/O          | None       |         796 |               0 |  774 |      1 |   19 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
+| g1        | n/a   | BUFG/O          | None       |        6143 |               0 | 6104 |     14 |   20 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
+| g2        | n/a   | BUFG/O          | None       |         139 |               0 |  139 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
+| g3        | n/a   | BUFG/O          | None       |         965 |               0 |  961 |      0 |    4 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
+| g5        | n/a   | BUFG/O          | None       |           8 |               0 |    7 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | CLINK/U14/PROXY_DCLK_OUT                                                                                    |
+| g9        | n/a   | BUFG/O          | None       |         570 |               0 |  570 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                        |
+| g10       | n/a   | BUFG/O          | None       |          29 |               0 |   29 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
 | g23       | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | CLINK/U14/PROXY_DCLK_IN_clink_serdes_clk_wrapper                                                            |
 | g24       | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | CLINK/U14/clkfbout_buf_clink_serdes_clk_wrapper                                                             |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
@@ -309,11 +308,10 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+---------------------------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                                             |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+---------------------------------------------------------------------------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |         536 |               0 |  531 |      0 |    3 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                                            |
-| g1        | n/a   | BUFG/O          | None       |         601 |               0 |  588 |      0 |   10 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                                            |
-| g2        | n/a   | BUFG/O          | None       |        6444 |               0 | 6255 |    116 |   19 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK                     |
-| g3        | n/a   | BUFG/O          | None       |        2913 |               0 | 2596 |    294 |   20 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                                            |
-| g9        | n/a   | BUFG/O          | None       |          24 |               0 |   24 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                                            |
+| g0        | n/a   | BUFG/O          | None       |         182 |               0 |  177 |      0 |    2 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                                            |
+| g1        | n/a   | BUFG/O          | None       |         500 |               0 |  477 |      8 |   11 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                                            |
+| g2        | n/a   | BUFG/O          | None       |        7915 |               0 | 7559 |    273 |   25 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK                     |
+| g3        | n/a   | BUFG/O          | None       |        1774 |               0 | 1571 |    183 |   17 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                                            |
 | g13       | n/a   | BUFG/O          | None       |          16 |               0 |   15 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_iodelay_ctrl/clk_ref_200.u_bufg_clk_ref_n_0 |
 | g22       | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BULK_USART/U11/inst/clkfbout_buf_usart_mmcm                                                                                 |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+---------------------------------------------------------------------------------------------------------------------------------+
@@ -328,15 +326,13 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                         |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |          30 |               0 |   22 |      0 |    8 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
-| g1        | n/a   | BUFG/O          | None       |        6651 |               0 | 6527 |     95 |   19 |   4 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
-| g2        | n/a   | BUFG/O          | None       |           2 |               0 |    2 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
-| g3        | n/a   | BUFG/O          | None       |        1492 |               0 | 1480 |      0 |    6 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
-| g4        | n/a   | BUFG/O          | None       |           2 |               0 |    1 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk |
-| g9        | n/a   | BUFG/O          | None       |         555 |               0 |  539 |     16 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                        |
-| g10       | n/a   | BUFG/O          | None       |         256 |               0 |  256 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
-| g11       | n/a   | BUFG/O          | None       |          31 |               0 |   31 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BULK_USART/U11/inst/CLK0                                                                                |
-| g12       | n/a   | BUFG/O          | None       |          78 |               0 |   71 |      7 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                            |
+| g1        | n/a   | BUFG/O          | None       |        6493 |               0 | 6417 |     48 |   12 |   4 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
+| g3        | n/a   | BUFG/O          | None       |        2006 |               0 | 1988 |      0 |    7 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
+| g4        | n/a   | BUFG/O          | None       |           3 |               0 |    2 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk |
+| g9        | n/a   | BUFG/O          | None       |         294 |               0 |  278 |     16 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                        |
+| g10       | n/a   | BUFG/O          | None       |         231 |               0 |  231 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
+| g11       | n/a   | BUFG/O          | None       |           1 |               0 |    1 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BULK_USART/U11/inst/CLK0                                                                                |
+| g12       | n/a   | BUFG/O          | None       |          21 |               0 |   17 |      4 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                            |
 | g20       | n/a   | BUFG/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkfbout_buf_core_clk_wiz_0_0                                   |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 * Clock Loads column represents the clock pin loads (pin count)
@@ -350,13 +346,13 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                         |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
-| g0        | n/a   | BUFG/O          | None       |         251 |               0 |  247 |      0 |    4 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
-| g1        | n/a   | BUFG/O          | None       |        3101 |               0 | 3057 |     38 |    5 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
-| g2        | n/a   | BUFG/O          | None       |         119 |               0 |  119 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
-| g3        | n/a   | BUFG/O          | None       |        3727 |               0 | 3634 |     71 |   14 |   7 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
-| g7        | n/a   | BUFG/O          | None       |         237 |               0 |  236 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/MGT/MGTS/EXP_CLOCK/USER_CLK                                                                             |
+| g0        | n/a   | BUFG/O          | None       |         194 |               0 |  192 |      0 |    2 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1                                                        |
+| g1        | n/a   | BUFG/O          | None       |        2583 |               0 | 2541 |     38 |    3 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
+| g2        | n/a   | BUFG/O          | None       |          57 |               0 |   56 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK |
+| g3        | n/a   | BUFG/O          | None       |        4485 |               0 | 4281 |    182 |   14 |   7 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
+| g7        | n/a   | BUFG/O          | None       |         134 |               0 |  133 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/MGT/MGTS/EXP_CLOCK/USER_CLK                                                                             |
 | g8        | n/a   | BUFG/O          | None       |        1292 |               0 | 1267 |     21 |    2 |   0 |  2 |    0 |   0 |       0 | ACQ/MGT/MGTS/DATA_CLOCK/USER_CLK                                                                            |
-| g9        | n/a   | BUFG/O          | None       |          53 |               0 |   53 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                        |
+| g9        | n/a   | BUFG/O          | None       |         158 |               0 |  158 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4                                                        |
 | g10       | n/a   | BUFG/O          | None       |         288 |               0 |  284 |      1 |    0 |   0 |  2 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 * Clock Loads column represents the clock pin loads (pin count)
@@ -370,12 +366,12 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                                          |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------------------+
-| g1        | n/a   | BUFG/O          | None       |        4445 |               0 | 4220 |    214 |   11 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                                         |
-| g3        | n/a   | BUFG/O          | None       |          35 |               0 |   35 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                                         |
-| g4        | n/a   | BUFG/O          | None       |        4848 |               0 | 4668 |    150 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk                  |
-| g10       | n/a   | BUFG/O          | None       |          33 |               0 |   32 |      1 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                                         |
-| g11       | n/a   | BUFG/O          | None       |         251 |               0 |  250 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BULK_USART/U11/inst/CLK0                                                                                                 |
-| g12       | n/a   | BUFG/O          | None       |          90 |               0 |   51 |     39 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                                             |
+| g1        | n/a   | BUFG/O          | None       |        4004 |               0 | 3758 |    237 |    9 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                                         |
+| g3        | n/a   | BUFG/O          | None       |          82 |               0 |   82 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                                         |
+| g4        | n/a   | BUFG/O          | None       |        5430 |               0 | 5250 |    150 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk                  |
+| g10       | n/a   | BUFG/O          | None       |          32 |               0 |   31 |      1 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                                         |
+| g11       | n/a   | BUFG/O          | None       |         220 |               0 |  219 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BULK_USART/U11/inst/CLK0                                                                                                 |
+| g12       | n/a   | BUFG/O          | None       |         114 |               0 |   87 |     27 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                                             |
 | g14       | n/a   | BUFG/O          | None       |          16 |               0 |   15 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_iodelay_ctrl/clk_ref_200.u_bufg_clk_ref_n_0 |
 | g18       | n/a   | BUFH/O          | None       |           1 |               0 |    0 |      0 |    0 |   0 |  0 |    1 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/pll_clk3                |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+------------------------------------------------------------------------------------------------------------------------------+
@@ -390,13 +386,13 @@ Table of Contents
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 | Global Id | Track | Driver Type/Pin | Constraint | Clock Loads | Non-Clock Loads | FF   | LUTRAM | RAMB | DSP | GT | MMCM | PLL | Hard IP | Net                                                                                                         |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
-| g1        | n/a   | BUFG/O          | None       |        5424 |               0 | 5286 |    112 |   21 |   5 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
-| g3        | n/a   | BUFG/O          | None       |         640 |               0 |  638 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
-| g4        | n/a   | BUFG/O          | None       |         631 |               0 |  631 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk |
-| g7        | n/a   | BUFG/O          | None       |        1375 |               0 | 1287 |     84 |    1 |   0 |  2 |    0 |   0 |       0 | ACQ/MGT/MGTS/EXP_CLOCK/USER_CLK                                                                             |
-| g10       | n/a   | BUFG/O          | None       |         281 |               0 |  278 |      0 |    0 |   0 |  2 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
-| g11       | n/a   | BUFG/O          | None       |          67 |               0 |   66 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BULK_USART/U11/inst/CLK0                                                                                |
-| g12       | n/a   | BUFG/O          | None       |         136 |               0 |  113 |     23 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                            |
+| g1        | n/a   | BUFG/O          | None       |        7590 |               0 | 7448 |    116 |   21 |   5 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1                                                        |
+| g3        | n/a   | BUFG/O          | None       |         313 |               0 |  311 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out2                                                        |
+| g4        | n/a   | BUFG/O          | None       |          48 |               0 |   48 |      0 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MIG_Code/mig_7series_0/u_core_mig_7series_0_0_mig/u_ddr3_infrastructure/ui_clk |
+| g7        | n/a   | BUFG/O          | None       |        1478 |               0 | 1390 |     84 |    1 |   0 |  2 |    0 |   0 |       0 | ACQ/MGT/MGTS/EXP_CLOCK/USER_CLK                                                                             |
+| g10       | n/a   | BUFG/O          | None       |         282 |               0 |  279 |      0 |    0 |   0 |  2 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3                                                        |
+| g11       | n/a   | BUFG/O          | None       |         128 |               0 |  127 |      0 |    1 |   0 |  0 |    0 |   0 |       0 | ACQ/BULK_USART/U11/inst/CLK0                                                                                |
+| g12       | n/a   | BUFG/O          | None       |         169 |               0 |  131 |     38 |    0 |   0 |  0 |    0 |   0 |       0 | ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31                            |
 +-----------+-------+-----------------+------------+-------------+-----------------+------+--------+------+-----+----+------+-----+---------+-------------------------------------------------------------------------------------------------------------+
 * Clock Loads column represents the clock pin loads (pin count)
 ** Non-Clock Loads column represents the non-clock pin loads (pin count)
@@ -421,10 +417,10 @@ Table of Contents
 |    | X0     | X1     |
 +----+--------+--------+
 | Y4 |      0 |      0 |
-| Y3 |     30 |    251 |
-| Y2 |   1047 |    536 |
-| Y1 |   6226 |   9432 |
-| Y0 |  14700 |  15049 |
+| Y3 |      0 |    194 |
+| Y2 |    796 |    182 |
+| Y1 |   7351 |  10788 |
+| Y0 |  14416 |  13544 |
 +----+--------+--------+
 
 
@@ -434,7 +430,7 @@ Table of Contents
 +-----------+-----------------+-------------------+--------+-------------+---------------+----------+-------------+----------+----------------+----------+------------------------------------------------------+
 | Global Id | Driver Type/Pin | Driver Region (D) | Clock  | Period (ns) | Waveform (ns) | Root (R) | Slice Loads | IO Loads | Clocking Loads | GT Loads | Net                                                  |
 +-----------+-----------------+-------------------+--------+-------------+---------------+----------+-------------+----------+----------------+----------+------------------------------------------------------+
-| g1        | BUFG/O          | n/a               | clk_mb |      10.000 | {0.000 5.000} |          |       29762 |        0 |              1 |        0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1 |
+| g1        | BUFG/O          | n/a               | clk_mb |      10.000 | {0.000 5.000} |          |       29778 |        0 |              1 |        0 | ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out1 |
 +-----------+-----------------+-------------------+--------+-------------+---------------+----------+-------------+----------+----------------+----------+------------------------------------------------------+
 * Slice Loads column represents load cell count of all cell types other than IO, GT and clock resources
 ** IO Loads column represents load cell count of IO types
@@ -445,11 +441,11 @@ Table of Contents
 +----+-------+-------+
 |    | X0    | X1    |
 +----+-------+-------+
-| Y4 |  4445 |  5424 |
-| Y3 |  6651 |  3101 |
-| Y2 |  6205 |   601 |
-| Y1 |  3176 |   141 |
-| Y0 |    10 |     9 |
+| Y4 |  4004 |  7590 |
+| Y3 |  6493 |  2583 |
+| Y2 |  6143 |   500 |
+| Y1 |  2233 |   201 |
+| Y0 |    27 |     5 |
 +----+-------+-------+
 
 
@@ -467,15 +463,15 @@ Table of Contents
 **** GT Loads column represents load cell count of GT types
 
 
-+----+-----+-------+
-|    | X0  | X1    |
-+----+-----+-------+
-| Y4 |   0 |     0 |
-| Y3 |   2 |   119 |
-| Y2 |  50 |  6444 |
-| Y1 |  96 |  3353 |
-| Y0 |   0 |     0 |
-+----+-----+-------+
++----+------+-------+
+|    | X0   | X1    |
++----+------+-------+
+| Y4 |    0 |     0 |
+| Y3 |    0 |    57 |
+| Y2 |  139 |  7915 |
+| Y1 |    6 |  1947 |
+| Y0 |    0 |     0 |
++----+------+-------+
 
 
 20. Load Cell Placement Summary for Global Clock g3
@@ -495,11 +491,11 @@ Table of Contents
 +----+-------+-------+
 |    | X0    | X1    |
 +----+-------+-------+
-| Y4 |    35 |   640 |
-| Y3 |  1492 |  3727 |
-| Y2 |   732 |  2913 |
-| Y1 |   107 |    69 |
-| Y0 |    32 |    36 |
+| Y4 |    82 |   313 |
+| Y3 |  2006 |  4485 |
+| Y2 |   965 |  1774 |
+| Y1 |    26 |    88 |
+| Y0 |    18 |    26 |
 +----+-------+-------+
 
 
@@ -517,15 +513,15 @@ Table of Contents
 **** GT Loads column represents load cell count of GT types
 
 
-+----+-------+------+
-|    | X0    | X1   |
-+----+-------+------+
-| Y4 |  4848 |  631 |
-| Y3 |     2 |    0 |
-| Y2 |     0 |    0 |
-| Y1 |     0 |    0 |
-| Y0 |     0 |    0 |
-+----+-------+------+
++----+-------+-----+
+|    | X0    | X1  |
++----+-------+-----+
+| Y4 |  5430 |  48 |
+| Y3 |     3 |   0 |
+| Y2 |     0 |   0 |
+| Y1 |     0 |   0 |
+| Y0 |     0 |   0 |
++----+-------+-----+
 
 
 22. Load Cell Placement Summary for Global Clock g5
@@ -547,9 +543,9 @@ Table of Contents
 +----+-------+----+
 | Y4 |     0 |  0 |
 | Y3 |     0 |  0 |
-| Y2 |     1 |  0 |
-| Y1 |  1654 |  0 |
-| Y0 |   203 |  0 |
+| Y2 |     8 |  0 |
+| Y1 |  1820 |  0 |
+| Y0 |    30 |  0 |
 +----+-------+----+
 
 
@@ -572,9 +568,9 @@ Table of Contents
 +----+-------+----+
 | Y4 |     0 |  0 |
 | Y3 |     0 |  0 |
-| Y2 |     1 |  0 |
-| Y1 |  1736 |  0 |
-| Y0 |    70 |  0 |
+| Y2 |     0 |  0 |
+| Y1 |  1773 |  0 |
+| Y0 |    34 |  0 |
 +----+-------+----+
 
 
@@ -595,8 +591,8 @@ Table of Contents
 +----+----+-------+
 |    | X0 | X1    |
 +----+----+-------+
-| Y4 |  0 |  1375 |
-| Y3 |  0 |   237 |
+| Y4 |  0 |  1478 |
+| Y3 |  0 |   134 |
 | Y2 |  0 |     0 |
 | Y1 |  0 |     0 |
 | Y0 |  0 |     0 |
@@ -642,15 +638,15 @@ Table of Contents
 **** GT Loads column represents load cell count of GT types
 
 
-+----+------+-----+
-|    | X0   | X1  |
-+----+------+-----+
-| Y4 |    0 |   0 |
-| Y3 |  555 |  53 |
-| Y2 |  390 |  24 |
-| Y1 |    0 |   0 |
-| Y0 |    0 |   0 |
-+----+------+-----+
++----+------+------+
+|    | X0   | X1   |
++----+------+------+
+| Y4 |    0 |    0 |
+| Y3 |  294 |  158 |
+| Y2 |  570 |    0 |
+| Y1 |    0 |    0 |
+| Y0 |    0 |    0 |
++----+------+------+
 
 
 27. Load Cell Placement Summary for Global Clock g10
@@ -670,9 +666,9 @@ Table of Contents
 +----+------+------+
 |    | X0   | X1   |
 +----+------+------+
-| Y4 |   33 |  281 |
-| Y3 |  256 |  288 |
-| Y2 |    4 |    0 |
+| Y4 |   32 |  282 |
+| Y3 |  231 |  288 |
+| Y2 |   29 |    0 |
 | Y1 |    0 |    0 |
 | Y0 |    0 |    0 |
 +----+------+------+
@@ -692,15 +688,15 @@ Table of Contents
 **** GT Loads column represents load cell count of GT types
 
 
-+----+------+-----+
-|    | X0   | X1  |
-+----+------+-----+
-| Y4 |  251 |  67 |
-| Y3 |   31 |   0 |
-| Y2 |    0 |   0 |
-| Y1 |    0 |   0 |
-| Y0 |    0 |   0 |
-+----+------+-----+
++----+------+------+
+|    | X0   | X1   |
++----+------+------+
+| Y4 |  220 |  128 |
+| Y3 |    1 |    0 |
+| Y2 |    0 |    0 |
+| Y1 |    0 |    0 |
+| Y0 |    0 |    0 |
++----+------+------+
 
 
 29. Load Cell Placement Summary for Global Clock g12
@@ -717,15 +713,15 @@ Table of Contents
 **** GT Loads column represents load cell count of GT types
 
 
-+----+-----+------+
-|    | X0  | X1   |
-+----+-----+------+
-| Y4 |  90 |  136 |
-| Y3 |  78 |    0 |
-| Y2 |   0 |    0 |
-| Y1 |   0 |    0 |
-| Y0 |   0 |    0 |
-+----+-----+------+
++----+------+------+
+|    | X0   | X1   |
++----+------+------+
+| Y4 |  114 |  169 |
+| Y3 |   21 |    0 |
+| Y2 |    0 |    0 |
+| Y1 |    0 |    0 |
+| Y0 |    0 |    0 |
++----+------+------+
 
 
 30. Load Cell Placement Summary for Global Clock g13
@@ -1134,7 +1130,7 @@ resize_pblock [get_pblocks {CLKAG_CLINK/ch1_enabled.U1/PROXY_DCLK_OUT_MULT7}] -a
 #startgroup
 create_pblock {CLKAG_CLINK/ch1_enabled.U1/PROXY_DCLK_OUT}
 add_cells_to_pblock [get_pblocks  {CLKAG_CLINK/ch1_enabled.U1/PROXY_DCLK_OUT}] [get_cells -filter { PRIMITIVE_GROUP != I/O && IS_PRIMITIVE==1 && PRIMITIVE_LEVEL !=INTERNAL } -of_object [get_pins -filter {DIRECTION==IN} -of_objects [get_nets -hierarchical -filter {PARENT=="CLINK/ch1_enabled.U1/PROXY_DCLK_OUT"}]]]
-resize_pblock [get_pblocks {CLKAG_CLINK/ch1_enabled.U1/PROXY_DCLK_OUT}] -add {CLOCKREGION_X0Y0:CLOCKREGION_X0Y0 CLOCKREGION_X0Y1:CLOCKREGION_X0Y1 CLOCKREGION_X0Y2:CLOCKREGION_X0Y2}
+resize_pblock [get_pblocks {CLKAG_CLINK/ch1_enabled.U1/PROXY_DCLK_OUT}] -add {CLOCKREGION_X0Y0:CLOCKREGION_X0Y0 CLOCKREGION_X0Y1:CLOCKREGION_X0Y1}
 #endgroup
 
 # Clock net "CLINK/U14/PROXY_DCLK_OUT_MULT7" driven by instance "CLINK/U14/clkout2_buf" located at site "BUFGCTRL_X0Y5"
@@ -1183,14 +1179,14 @@ resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/cl
 #startgroup
 create_pblock {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1}
 add_cells_to_pblock [get_pblocks  {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1}] [get_cells -filter { PRIMITIVE_GROUP != I/O && IS_PRIMITIVE==1 && PRIMITIVE_LEVEL !=INTERNAL } -of_object [get_pins -filter {DIRECTION==IN} -of_objects [get_nets -hierarchical -filter {PARENT=="ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1"}]]]
-resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1}] -add {CLOCKREGION_X0Y0:CLOCKREGION_X0Y0 CLOCKREGION_X0Y1:CLOCKREGION_X0Y1 CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X0Y3:CLOCKREGION_X0Y3 CLOCKREGION_X1Y0:CLOCKREGION_X1Y0 CLOCKREGION_X1Y1:CLOCKREGION_X1Y1 CLOCKREGION_X1Y2:CLOCKREGION_X1Y2 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
+resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_1/inst/clk_out1}] -add {CLOCKREGION_X0Y0:CLOCKREGION_X0Y0 CLOCKREGION_X0Y1:CLOCKREGION_X0Y1 CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X1Y0:CLOCKREGION_X1Y0 CLOCKREGION_X1Y1:CLOCKREGION_X1Y1 CLOCKREGION_X1Y2:CLOCKREGION_X1Y2 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
 #endgroup
 
 # Clock net "ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4" driven by instance "ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout4_buf" located at site "BUFGCTRL_X0Y20"
 #startgroup
 create_pblock {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4}
 add_cells_to_pblock [get_pblocks  {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4}] [get_cells -filter { PRIMITIVE_GROUP != I/O && IS_PRIMITIVE==1 && PRIMITIVE_LEVEL !=INTERNAL } -of_object [get_pins -filter {DIRECTION==IN} -of_objects [get_nets -hierarchical -filter {PARENT=="ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4"}]]]
-resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4}] -add {CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X0Y3:CLOCKREGION_X0Y3 CLOCKREGION_X1Y2:CLOCKREGION_X1Y2 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
+resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out4}] -add {CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X0Y3:CLOCKREGION_X0Y3 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
 #endgroup
 
 # Clock net "ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clk_out3" driven by instance "ACQ/BD/core_wrapper_i/core_i/clk_wiz_0/inst/clkout3_buf" located at site "BUFGCTRL_X0Y21"
@@ -1239,7 +1235,7 @@ resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/C
 #startgroup
 create_pblock {CLKAG_ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK}
 add_cells_to_pblock [get_pblocks  {CLKAG_ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK}] [get_cells -filter { PRIMITIVE_GROUP != I/O && IS_PRIMITIVE==1 && PRIMITIVE_LEVEL !=INTERNAL && NAME!=ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/gen_ui_extra_clocks.mmcm_i} -of_object [get_pins -filter {DIRECTION==IN} -of_objects [get_nets -hierarchical -filter {PARENT=="ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK"}]]]
-resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK}] -add {CLOCKREGION_X0Y1:CLOCKREGION_X0Y1 CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X0Y3:CLOCKREGION_X0Y3 CLOCKREGION_X1Y1:CLOCKREGION_X1Y1 CLOCKREGION_X1Y2:CLOCKREGION_X1Y2 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
+resize_pblock [get_pblocks {CLKAG_ACQ/BD/core_wrapper_i/core_i/MIG_Calibration/CAL_DDR_MIG/u_core_CAL_DDR_MIG_0_mig/u_ddr3_infrastructure/CLK}] -add {CLOCKREGION_X0Y1:CLOCKREGION_X0Y1 CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X1Y1:CLOCKREGION_X1Y1 CLOCKREGION_X1Y2:CLOCKREGION_X1Y2 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
 #endgroup
 
 # Clock net "ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Dbg_Clk_31" driven by instance "ACQ/BD/core_wrapper_i/core_i/MCU/mdm_1/U0/No_Dbg_Reg_Access.BUFG_DRCK/Using_FPGA.Native" located at site "BUFGCTRL_X0Y23"
