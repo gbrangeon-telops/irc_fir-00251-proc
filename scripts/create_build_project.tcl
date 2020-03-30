@@ -45,7 +45,6 @@ proc build_tsir_project {{release 0}} {
 	
 	#Export bitstream
 	file copy -force $base_dir/xilinx/${sensor}/${proj_name}.runs/impl_1/${top_lvl}.bit $base_dir/sdk/${top_lvl}/fir_00251_proc_${sensor}_${FPGA_SIZE}.bit
-	exec $base_dir/scripts/updateHwSvnRev.bat ${sensor} ${FPGA_SIZE}
 	
 	#open implemented design
 	open_run impl_1
