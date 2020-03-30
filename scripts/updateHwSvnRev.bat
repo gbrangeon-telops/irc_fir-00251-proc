@@ -2,6 +2,7 @@
 
 set sensorName=%1
 set FPGA_SIZE=%2
+set encrypt_key_name=%3
 
 set procDir=D:\Telops\FIR-00251-Proc
 set commonDir=D:\Telops\FIR-00251-Common
@@ -17,8 +18,12 @@ set hwRevFile=%procDir%\sdk\fir_00251_proc_%sensorName%\fir_00251_proc_%sensorNa
 REM Delete old revision file
 del %hwRevFile%
 
-echo * indicates local modifications>> %hwRevFile%
+echo This bitstream was generated using encryption key: %encrypt_key_name%>> %hwRevFile%
 echo.>> %hwRevFile%
+
+echo -------------------------------------------------->> %hwRevFile%
+echo HW SVN revisions (* indicates local modifications)>> %hwRevFile%
+echo -------------------------------------------------->> %hwRevFile%
 
 REM Proc repo
 echo %procDir% $WCREV$$WCMODS?*:$>> %hwRevFile%
