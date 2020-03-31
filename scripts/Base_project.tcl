@@ -132,6 +132,3 @@ set_property STEPS.SYNTH_DESIGN.ARGS.FANOUT_LIMIT 200 [get_runs synth_1]
 set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED true [get_runs impl_1]
 set_property STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE Default [get_runs impl_1]
 
-#Add post write_bitstream script
-set_property STEPS.WRITE_BITSTREAM.TCL.POST $script_dir/write_bit_post.tcl [get_runs impl_1]
-
