@@ -180,6 +180,7 @@ package Proxy_define is
       proxy_static         : proxy_static_cfg_type; -- tout changement dans proxy_temp entraine la programmation du detecteur (commnde temperature read)
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+	  int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
    end record;
    
    ----------------------------------------------								
