@@ -10,13 +10,14 @@
 
 extern brd_rev_ver_t gBrdRevid;
 
+uint32_t N_ADC_BITS; //used in startup
 
 // fonction appelée au chargement des flash settings
 IRC_Status_t ADC_readout_init()
 {
    int32_t ri, qi;
    float m, b, r, q;
-   uint32_t N_ADC_BITS = 16;
+   N_ADC_BITS = 16;
    uint32_t adcReadoutcgf;
 
 #ifdef STARTUP
