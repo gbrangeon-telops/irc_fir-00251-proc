@@ -1,0 +1,9 @@
+Procédure pour modifier le contenu du fichier Excel de release.
+1. Exécuter le script exportReleaseArchive.bat pour un FPGA 160.
+2. Ouvrir le fichier Release_x_x_x_x.xlsx généré, effectuer les changements voulus dans Excel et sauvegarder.
+3. Changer l'extension du fichier modifié Release_x_x_x_x.xlsx en .zip.
+4. Extraire les fichiers du .zip dans paperwork_160\template en remplaçant les fichiers actuels.
+5. Modifier le script paperwork_160\generatePaperwork.pl (et exportReleaseArchive.bat si nécessaire) pour 
+   refléter les modifications au fichier paperwork_160\template\xl\sharedStrings.xml.
+6. Appliquer toutes les modifications de paperwork_160 à paperwork_325.
+7. Faire un commit de TOUS les fichiers modifiés.
