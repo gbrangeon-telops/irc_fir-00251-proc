@@ -1,11 +1,24 @@
-set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%)"
+rem Parse HW Rev file
+set hwRevFile=%sdkDir%\fir_00251_proc_%sensorName%_%fpgaSize%_hw_svn_rev.txt
+for /f "tokens=2 delims=:" %%G in ('findstr /c:"encryption key" %hwRevFile%') do (
+   set temp_encrypt_key_name=%%G
+   goto continue
+)
+:continue
+rem Remove spaces
+set encrypt_key_name=%temp_encrypt_key_name: =%
+
+rem Set variables
+set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_key_name% key)"
 set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
 set ntxminiFile=CommonTEL2000LibProject_xml_%xmlVersion%_%sensorWidth%x%sensorHeight%.exe
 set fubatch=%releaseDir%\Release_%firmwareVersion:.=_%.bat
 
 rem Clean up
 del %paperworkTemplateDir%.zip
-rd %releaseDir% /s /q
+for /f "delims=" %%G in ('dir /b /a:d %binDir% ^| findstr "Release_"') do (
+   rd "%binDir%\%%G" /s /q
+)
 
 rem Prepare firmware package
 mkdir %releaseDir%\FIR-00251-Proc\
@@ -24,13 +37,14 @@ mkdir %releaseDir%\FIR-00251-NTx-Mini\
 copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFile% 
 if errorlevel 1 goto err
 
-%x_xilperl% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.pl -sensor %sensorName% ^
+%x_xilperl% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.pl -sensor %sensorName% -key %encrypt_key_name% ^
    -v %firmwareVersion% -o %outputRevFile% -storage_revs1 %storageRevFile1% -storage_revs2 %storageRevFile2% -p %revFile% -x %xmlVersion% -fs %flashSettingsVersion% -fdv %flashDynamicValuesVersion% -cal %calibFilesVersion% -t %paperworkTemplateDir%
 
 %zip% a -r -tzip %paperworkTemplateDir%.zip %paperworkTemplateDir%\*.*
 
 move %paperworkTemplateDir%.zip %releaseDir%\Release_%firmwareVersion:.=_%.xlsx
 cscript.exe %scriptsDir%\xlsx2pdf.js %releaseDir%\Release_%firmwareVersion:.=_%.xlsx
+
 rem Generate firmware updater batch file
 echo @echo off> %fubatch%
 echo.>> %fubatch%
