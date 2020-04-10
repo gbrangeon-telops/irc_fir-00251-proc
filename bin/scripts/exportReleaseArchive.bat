@@ -13,12 +13,38 @@ set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_k
 set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
 set ntxminiFile=CommonTEL2000LibProject_xml_%xmlVersion%_%sensorWidth%x%sensorHeight%.exe
 set fubatch=%releaseDir%\Release_%firmwareVersion:.=_%.bat
+set cfiFile=%binDir%\prom\%baseName%_%fpgaSize%.cfi
 
 rem Clean up
 del %paperworkTemplateDir%.zip
 for /f "delims=" %%G in ('dir /b /a:d %binDir% ^| findstr "Release_"') do (
    rd "%binDir%\%%G" /s /q
 )
+
+rem Verify encryption consistency
+set cfiFileLineFound=0
+for /f "delims=" %%G in ('findstr /c:"%baseName%_%fpgaSize%.bit" %cfiFile%') do (
+   set cfiFileLine=%%G
+   set cfiFileLineFound=1
+)
+if %cfiFileLineFound%==1 (
+   if %cfiFileLine:~-9%==ENCRYPTED (
+      if not %encrypt_key_name%==NONE (
+         echo Bitstream encrypted with %encrypt_key_name% key
+         goto consistent
+      )
+   ) else (
+      if %encrypt_key_name%==NONE (
+         echo Bitstream unencrypted
+         goto consistent
+      )
+   )
+)
+:inconsistent
+echo hwRevFile and cfiFile are not consistent!
+pause
+exit
+:consistent
 
 rem Prepare firmware package
 mkdir %releaseDir%\FIR-00251-Proc\
