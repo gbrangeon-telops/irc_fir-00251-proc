@@ -181,6 +181,7 @@ package Proxy_define is
       scd_misc             : scd_misc_cfg_type;   -- les changements dans scd_misc ne font pas programmer le detecteur
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
    end record;    
    
    ----------------------------------------------								
