@@ -9,7 +9,11 @@ rem Remove spaces
 set encrypt_key_name=%temp_encrypt_key_name: =%
 
 rem Set variables
-set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_key_name% key)"
+if %sensorName%==startup (
+   set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%_%fpgaSize%, %encrypt_key_name% key)"
+) else (
+   set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_key_name% key)"
+)
 set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
 set ntxminiFile=CommonTEL2000LibProject_xml_%xmlVersion%_%sensorWidth%x%sensorHeight%.exe
 set fubatch=%releaseDir%\Release_%firmwareVersion:.=_%.bat
