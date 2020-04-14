@@ -10,7 +10,7 @@ set binDir=%projectDir%\bin\%baseName%
 set scriptsDir=%projectDir%\bin\scripts
 set outputDir=D:\Telops\FIR-00251-Output
 set storageDir=D:\Telops\FIR-00257-Storage
-set ntxminiDir=F:\Production\IRCAM\Firmwares\FIR-00251-NTx-Mini\Archives
+set ntxminiDir=\\STARK\DisqueTELOPS\Production\IRCAM\Firmwares\FIR-00251-NTx-Mini\Archives
 
 set elfFile=%binDir%\%baseName%_%fpgaSize%.elf
 set bootFile=%sdkDir%\%baseName%_boot_%fpgaSize%\Release\%baseName%_boot_%fpgaSize%.elf
