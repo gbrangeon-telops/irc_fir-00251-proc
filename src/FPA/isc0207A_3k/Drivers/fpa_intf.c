@@ -652,7 +652,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    } 
   
    // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = hh->fpa_delay_mclk * hh->mclk_period_usec; // hh.itr_tri_min_usec;
+   elcorr_comp_duration_usec                  = hh.fpa_delay_mclk * hh.mclk_period_usec; // hh.itr_tri_min_usec;
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
    ptrA->elcorr_spare1                        = 0;              
