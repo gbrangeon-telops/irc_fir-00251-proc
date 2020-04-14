@@ -644,13 +644,14 @@ void FPA_Fig4SpecificParams(Scd_Fig4Param_t *ptrK, const gcRegistersData_t *pGCR
       ptrK->T1 = ptrK->T2;
    else
       ptrK->T1 = hh.Tline_conv + 2e-6F;
-   ptrK->T3  = 1280.0F * hh.TFPP_CLK;
-   ptrK->T4  = 8.0F * hh.TFPP_CLK;
-   ptrK->T6  = 128.0F * hh.TFPP_CLK;
 
    // Ces timings sont utilisés pour la génération des test patterns seulement.
    // Les test patterns sont générés sur 2 channels, peu importe FPA_NUM_CH.
-   // Pour les pauses, on utilise le plus long.   ptrK->T5  = 140e-6F;   // plus long 1 ou 2ch
+   // Pour les pauses, on utilise le plus long.
+   ptrK->T3  = 1280.0F * hh.TFPP_CLK;
+   ptrK->T4  = 8.0F * hh.TFPP_CLK;
+   ptrK->T6  = 128.0F * hh.TFPP_CLK;
+   ptrK->T5  = 140e-6F;   // plus long 1 ou 2ch
 }
 
 
