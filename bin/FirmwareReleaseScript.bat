@@ -20,10 +20,10 @@ echo BEGIN Firmware release %firmwareReleaseVersion%>> %FirmwareReleaseLogFile%
 echo *****************************************>> %FirmwareReleaseLogFile%
 echo.>> %FirmwareReleaseLogFile%
 
-REM Create and build projects for pre-release
-for /F "skip=3 tokens=1-2 eol=# delims=," %%G in (%FirmwareReleaseListFile%) do (
-   call D:\Telops\FIR-00251-Proc\bin\scripts\FirmwareReleaseScript_step1.bat %%G %%H %FirmwareReleaseLogFile%
-)
+REM REM Create and build projects for pre-release
+REM for /F "skip=3 tokens=1-2 eol=# delims=," %%G in (%FirmwareReleaseListFile%) do (
+   REM call D:\Telops\FIR-00251-Proc\bin\scripts\FirmwareReleaseScript_step1.bat %%G %%H %FirmwareReleaseLogFile%
+REM )
 
 REM Commit pre-release
 set preReleaseMessage=Pre-release %firmwareReleaseVersion%
