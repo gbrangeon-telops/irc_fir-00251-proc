@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 8094
+ FREEID 9072
  VARIABLES
  {
   #ARCHITECTURE="scd_hw_driver"
@@ -11,8 +11,10 @@ HEADER
   #DEFAULT_RANGE0="<range<name=\"fpa_driver_stat\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE1="<range<name=\"frame_id\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE2="<range<name=\"int_indx\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE3="<range<name=\"ser_cfg_add\"><left=\"10\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE4="<range<name=\"ser_cfg_data\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE3="<range<name=\"int_time\"><left=\"23\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE4="<range<name=\"ser_cfg_add\"><left=\"10\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE5="<range<name=\"ser_cfg_data\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE6="<range<name=\"trig_ctler_stat\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #ENTITY="scd_hw_driver"
   #LANGUAGE="VHDL"
   AUTHOR="Unknown"
@@ -556,7 +558,7 @@ HEADER
    }
   }
  }
- SYMBOL "#default" "scd_prog_ctrler" "scd_prog_ctrler"
+ SYMBOL "work" "scd_prog_ctrler" "scd_prog_ctrler"
  {
   HEADER
   {
@@ -564,7 +566,7 @@ HEADER
    {
     #CUSTOM_NAME=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1476659959"
+    #MODIFIED="1586207100"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ee3cbd0b-1944-42b5-b498-e82781c0abbc"
    }
   }
@@ -573,7 +575,7 @@ HEADER
    PAGEHEADER
    {
     RECT (0,-40,420,860)
-    FREEID 473
+    FREEID 476
    }
    
    BODY
@@ -584,7 +586,7 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (20,-21,400,857)
+     AREA (20,-22,400,856)
     }
     TEXT  3, 0, 0
     {
@@ -815,6 +817,15 @@ HEADER
      ALIGN 4
      MARGINS (1,1)
      PARENT 470
+     ORIENTATION 2
+    }
+    TEXT  473, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,590,165,614)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 472
      ORIENTATION 2
     }
     PIN  2, 0, 0
@@ -1356,6 +1367,24 @@ HEADER
       POINTS ( (0,0), (20,0) )
      }
     }
+    PIN  472, 0, 0
+    {
+     COORD (0,600)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="INT_TIME(23:0)"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
    }
   }
  }
@@ -1367,7 +1396,7 @@ HEADER
    {
     #CUSTOM_NAME=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1430168129"
+    #MODIFIED="1586207117"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="22985728-886c-49a4-a0bd-5fecbfcb4e7a"
    }
   }
@@ -1375,8 +1404,8 @@ HEADER
   {
    PAGEHEADER
    {
-    RECT (-40,-40,380,520)
-    FREEID 169
+    RECT (-40,-40,380,580)
+    FREEID 175
    }
    
    BODY
@@ -1387,7 +1416,7 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (-20,-33,360,504)
+     AREA (-20,-33,360,564)
     }
     TEXT  9, 0, 0
     {
@@ -1612,13 +1641,29 @@ HEADER
      MARGINS (1,1)
      PARENT 165
     }
-    TEXT  168, 0, 0
+    TEXT  170, 0, 0
     {
      TEXT "$#NAME"
-     RECT (102,430,355,454)
+     RECT (-15,490,81,514)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 169
+    }
+    TEXT  172, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (238,470,355,494)
      ALIGN 6
      MARGINS (1,1)
-     PARENT 167
+     PARENT 171
+    }
+    TEXT  174, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-15,530,209,554)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 173
     }
     PIN  8, 0, 0
     {
@@ -2077,7 +2122,7 @@ HEADER
       #DIRECTION="OUT"
       #LABEL="Record Out"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
+      #MDA_RECORD_TOKEN="RECORD"
       #MODIFIED=""
       #NAME="FPA_TEMP_STAT"
       #NUMBER="10"
@@ -2127,20 +2172,53 @@ HEADER
       POINTS ( (0,0), (20,0) )
      }
     }
-    PIN  167, 0, 0
+    PIN  169, 0, 0
     {
-     COORD (380,440)
+     COORD (-40,500)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="READOUT"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  171, 0, 0
+    {
+     COORD (380,480)
      VARIABLES
      {
       #DIRECTION="OUT"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="PRIM_XTRA_TRIG_ACTIVE"
+      #NAME="PROG_TRIG"
       #NUMBER="0"
      }
      LINE  2, 0, 0
      {
       POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  173, 0, 0
+    {
+     COORD (-40,540)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="TRIG_CTLER_STAT(7:0)"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
      }
     }
    }
@@ -2728,14 +2806,14 @@ PAGE ""
     #COMPONENT="scd_prog_ctrler"
     #CUSTOM_NAME=""
     #IMPL="rtl"
-    #LIBRARY="#default"
+    #LIBRARY="work"
     #NO_CONF="1"
     #REFERENCE="U1"
     #SYMBOL="scd_prog_ctrler"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ee3cbd0b-1944-42b5-b498-e82781c0abbc"
    }
    COORD (1680,300)
-   VERTEXES ( (2,2041), (8,2046), (92,2484), (212,1375), (218,1373), (224,1371), (230,1369), (350,1353), (356,1355), (392,1357), (398,1360), (404,1358), (416,1364), (436,3128), (438,1591), (442,1600), (444,7236), (446,7243), (448,7229), (455,1626), (458,3289), (460,3615), (462,7884), (464,7250), (466,7552), (468,7568), (470,7735), (422,8057) )
+   VERTEXES ( (2,2041), (8,2046), (92,8696), (212,1375), (218,1373), (224,1371), (230,1369), (350,1353), (356,1355), (392,1357), (398,8687), (404,8689), (416,1364), (422,8057), (436,3128), (438,1591), (442,8808), (444,7236), (446,7243), (448,7229), (455,1626), (458,3289), (460,3615), (462,7884), (464,7250), (466,7552), (468,7568), (470,7735), (472,8754) )
   }
   TEXT  43, 0, 0
   {
@@ -2777,12 +2855,12 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="22985728-886c-49a4-a0bd-5fecbfcb4e7a"
    }
    COORD (1720,1420)
-   VERTEXES ( (8,7549), (62,7237), (68,7230), (82,7547), (90,3248), (92,3253), (94,2870), (96,2872), (98,7244), (100,2874), (102,2878), (104,2876), (106,2880), (108,2882), (112,7251), (115,5285), (120,5287), (125,5283), (130,5289), (135,5279), (140,5291), (145,5277), (150,5281), (155,5275), (160,5786), (162,7553), (165,7569), (167,7780) )
+   VERTEXES ( (8,7549), (62,7237), (68,7230), (82,7547), (90,8485), (92,8487), (94,2870), (96,2872), (98,7244), (100,2874), (102,2878), (104,2876), (106,2880), (108,2882), (112,7251), (115,5285), (120,5287), (125,5283), (130,5289), (135,5279), (140,5291), (145,5277), (150,5281), (155,5275), (160,5786), (162,7553), (165,7569), (169,8823), (171,9037), (173,9052) )
   }
   TEXT  168, 0, 0
   {
    TEXT "$#COMPONENT"
-   RECT (1700,1940,1947,1975)
+   RECT (1700,2000,1947,2035)
    MARGINS (1,1)
    PARENT 167
   }
@@ -2831,14 +2909,14 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="fpa_intf_cfg_type"
    }
-   COORD (1680,540)
+   COORD (1620,540)
    ORIENTATION 2
-   VERTEXES ( (2,2485) )
+   VERTEXES ( (2,8695) )
   }
   TEXT  204, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (1407,524,1624,559)
+   RECT (1347,524,1564,559)
    ALIGN 2
    MARGINS (1,1)
    COLOR (0,0,192)
@@ -2848,7 +2926,9 @@ PAGE ""
   {
    VARIABLES
    {
+    #MDA_RECORD_TOKEN="RECORD"
     #NAME="FPA_INTF_CFG"
+    #VHDL_TYPE="fpa_intf_cfg_type"
     FPA_INTF_CFG_TYPE=""
     RECORD=""
    }
@@ -2872,7 +2952,7 @@ PAGE ""
   TEXT  321, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (1275,904,1625,939)
+   RECT (1290,900,1640,935)
    ALIGN 2
    MARGINS (1,1)
    COLOR (0,0,192)
@@ -3080,7 +3160,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
    COORD (1680,760)
-   VERTEXES ( (2,1361) )
+   VERTEXES ( (2,8688) )
   }
   TEXT  746, 0, 0
   {
@@ -3103,7 +3183,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
    COORD (1680,780)
-   VERTEXES ( (2,1359) )
+   VERTEXES ( (2,8690) )
   }
   TEXT  749, 0, 0
   {
@@ -3114,8 +3194,6 @@ PAGE ""
    COLOR (0,0,192)
    PARENT 747
   }
-  NET WIRE  750, 0, 0
-  NET WIRE  752, 0, 0
   NET WIRE  754, 0, 0
   NET BUS  779, 0, 0
   NET WIRE  1017, 0, 0
@@ -3144,22 +3222,6 @@ PAGE ""
   VTX  1357, 0, 0
   {
    COORD (1680,700)
-  }
-  VTX  1358, 0, 0
-  {
-   COORD (1680,780)
-  }
-  VTX  1359, 0, 0
-  {
-   COORD (1680,780)
-  }
-  VTX  1360, 0, 0
-  {
-   COORD (1680,760)
-  }
-  VTX  1361, 0, 0
-  {
-   COORD (1680,760)
   }
   VTX  1364, 0, 0
   {
@@ -3215,16 +3277,6 @@ PAGE ""
   {
    NET 1025
    VTX 1356, 1357
-  }
-  WIRE  1402, 0, 0
-  {
-   NET 752
-   VTX 1358, 1359
-  }
-  WIRE  1403, 0, 0
-  {
-   NET 750
-   VTX 1360, 1361
   }
   WIRE  1405, 0, 0
   {
@@ -3298,37 +3350,25 @@ PAGE ""
     #SYMBOL="Input"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
-   COORD (1680,600)
-   VERTEXES ( (2,1599) )
+   COORD (1600,600)
+   VERTEXES ( (2,8809) )
   }
   TEXT  1594, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (1484,583,1629,618)
+   RECT (1404,583,1549,618)
    ALIGN 6
    MARGINS (1,1)
    PARENT 1593
   }
   NET WIRE  1598, 0, 0
-  VTX  1599, 0, 0
-  {
-   COORD (1680,600)
-  }
-  VTX  1600, 0, 0
-  {
-   COORD (1680,600)
-  }
-  WIRE  1601, 0, 0
-  {
-   NET 1598
-   VTX 1599, 1600
-  }
   INSTANCE  1619, 0, 0
   {
    VARIABLES
    {
     #COMPONENT="BusOutput"
     #CUSTOM_NAME=""
+    #DOWNTO="1"
     #LIBRARY="#terminals"
     #REFERENCE="FRAME_ID(31:0)"
     #SYMBOL="BusOutput"
@@ -3396,7 +3436,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="7dcc81a3-0065-4e24-a09d-8e0ad8aa5ef6"
    }
    COORD (740,1540)
-   VERTEXES ( (4,2871), (6,2851), (8,2873), (10,2902), (14,3388), (16,3369), (18,2875), (31,2877), (33,3378), (35,3208), (37,3202), (39,2879), (41,2881), (43,2883), (45,2908), (47,2913), (2,7977) )
+   VERTEXES ( (6,2851), (10,2902), (14,3388), (16,3369), (33,3378), (35,3208), (37,3202), (45,2908), (47,2913), (2,7977), (43,2883), (41,2881), (39,2879), (31,2877), (18,2875), (8,2873), (4,2871) )
   }
   TEXT  1978, 0, 0
   {
@@ -3478,23 +3518,6 @@ PAGE ""
    ALIGN 9
    MARGINS (1,1)
    PARENT 2904
-  }
-  VTX  2484, 0, 0
-  {
-   COORD (1680,540)
-  }
-  VTX  2485, 0, 0
-  {
-   COORD (1680,540)
-  }
-  RECORD  2486, 0, 0
-  {
-   NET 205
-   VTX 2484, 2485
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   NET WIRE  2487, 0, 0
   {
@@ -3805,70 +3828,6 @@ PAGE ""
    VTX 3210, 3208
   }
   NET WIRE  3213, 0, 0
-  VTX  3248, 0, 0
-  {
-   COORD (1680,1620)
-  }
-  VTX  3249, 0, 0
-  {
-   COORD (1540,1620)
-  }
-  WIRE  3251, 0, 0
-  {
-   NET 3252
-   VTX 3248, 3249
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
-  NET WIRE  3252, 0, 0
-  {
-   VARIABLES
-   {
-    #NAME="ACQ_TRIG"
-   }
-  }
-  VTX  3253, 0, 0
-  {
-   COORD (1680,1640)
-  }
-  VTX  3254, 0, 0
-  {
-   COORD (1540,1640)
-  }
-  WIRE  3256, 0, 0
-  {
-   NET 3257
-   VTX 3253, 3254
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
-  NET WIRE  3257, 0, 0
-  {
-   VARIABLES
-   {
-    #NAME="XTRA_TRIG"
-   }
-  }
-  TEXT  3258, 0, 0
-  {
-   TEXT "$#NAME"
-   RECT (1549,1590,1671,1619)
-   ALIGN 9
-   MARGINS (1,1)
-   PARENT 3251
-  }
-  TEXT  3262, 0, 0
-  {
-   TEXT "$#NAME"
-   RECT (1544,1610,1676,1639)
-   ALIGN 9
-   MARGINS (1,1)
-   PARENT 3256
-  }
   NET WIRE  3287, 0, 0
   INSTANCE  3288, 0, 0
   {
@@ -3882,7 +3841,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
    COORD (1260,940)
-   VERTEXES ( (4,3290), (2,3292), (6,3297) )
+   VERTEXES ( (2,3292), (6,3297), (4,3290) )
   }
   VTX  3289, 0, 0
   {
@@ -4191,7 +4150,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="45b0e879-c839-4971-9b63-d974ff15a6a3"
    }
    COORD (2300,1580)
-   VERTEXES ( (2,5309), (4,5276), (6,5274), (8,5272), (10,5384), (12,5278), (14,5280), (16,5282), (18,5284), (20,5286), (22,5288), (26,5290), (28,5292) )
+   VERTEXES ( (2,5309), (6,5274), (8,5272), (10,5384), (28,5292), (26,5290), (22,5288), (20,5286), (18,5284), (16,5282), (14,5280), (12,5278), (4,5276) )
    PINPROP 14,"#PIN_COMMENT",""
    PINPROP 14,"#PIN_STATE","0"
    PINPROP 12,"#PIN_COMMENT",""
@@ -4919,55 +4878,24 @@ PAGE ""
     #COMPONENT="Output"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="PRIM_XTRA_TRIG_ACTIVE"
+    #REFERENCE="PROG_TRIG"
     #SYMBOL="Output"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
-   COORD (1680,2020)
+   COORD (1680,2100)
    ORIENTATION 2
-   VERTEXES ( (2,7781) )
+   VERTEXES ( (2,9038) )
   }
   TEXT  7772, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (1256,2003,1628,2038)
+   RECT (1454,2083,1628,2118)
    ALIGN 6
    MARGINS (1,1)
    PARENT 7771
    ORIENTATION 2
   }
   NET WIRE  7776, 0, 0
-  VTX  7780, 0, 0
-  {
-   COORD (2100,1860)
-  }
-  VTX  7781, 0, 0
-  {
-   COORD (1680,2020)
-  }
-  VTX  7782, 0, 0
-  {
-   COORD (2200,1860)
-  }
-  WIRE  7783, 0, 0
-  {
-   NET 7776
-   VTX 7780, 7782
-  }
-  VTX  7784, 0, 0
-  {
-   COORD (2200,2020)
-  }
-  WIRE  7785, 0, 0
-  {
-   NET 7776
-   VTX 7782, 7784
-  }
-  WIRE  7786, 0, 0
-  {
-   NET 7776
-   VTX 7784, 7781
-  }
   NET BUS  7875, 0, 0
   {
    VARIABLES
@@ -5117,6 +5045,287 @@ PAGE ""
    NET 779
    VTX 8057, 8058
   }
+  NET WIRE  8268, 0, 0
+  NET WIRE  8272, 0, 0
+  TEXT  8459, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1459,1591,1581,1620)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 8488
+  }
+  TEXT  8461, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1454,1611,1586,1640)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 8489
+  }
+  VTX  8484, 0, 0
+  {
+   COORD (1540,1620)
+  }
+  VTX  8485, 0, 0
+  {
+   COORD (1680,1620)
+  }
+  VTX  8486, 0, 0
+  {
+   COORD (1540,1640)
+  }
+  VTX  8487, 0, 0
+  {
+   COORD (1680,1640)
+  }
+  WIRE  8488, 0, 0
+  {
+   NET 8693
+   VTX 8484, 8485
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  8489, 0, 0
+  {
+   NET 8694
+   VTX 8486, 8487
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  8687, 0, 0
+  {
+   COORD (1680,760)
+  }
+  VTX  8688, 0, 0
+  {
+   COORD (1680,760)
+  }
+  VTX  8689, 0, 0
+  {
+   COORD (1680,780)
+  }
+  VTX  8690, 0, 0
+  {
+   COORD (1680,780)
+  }
+  WIRE  8691, 0, 0
+  {
+   NET 8268
+   VTX 8687, 8688
+  }
+  WIRE  8692, 0, 0
+  {
+   NET 8272
+   VTX 8689, 8690
+  }
+  NET WIRE  8693, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #NAME="ACQ_TRIG"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  NET WIRE  8694, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #NAME="XTRA_TRIG"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  VTX  8695, 0, 0
+  {
+   COORD (1620,540)
+  }
+  VTX  8696, 0, 0
+  {
+   COORD (1680,540)
+  }
+  RECORD  8697, 0, 0
+  {
+   NET 205
+   VTX 8695, 8696
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET BUS  8736, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #NAME="INT_TIME(23:0)"
+   }
+  }
+  INSTANCE  8737, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #LIBRARY="#terminals"
+    #REFERENCE="INT_TIME(23:0)"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (1680,900)
+   ORIENTATION 4
+   VERTEXES ( (2,8755) )
+  }
+  TEXT  8738, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1419,882,1628,917)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 8737
+   ORIENTATION 4
+  }
+  VTX  8754, 0, 0
+  {
+   COORD (1680,900)
+  }
+  VTX  8755, 0, 0
+  {
+   COORD (1680,900)
+  }
+  BUS  8756, 0, 0
+  {
+   NET 8736
+   VTX 8754, 8755
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  8808, 0, 0
+  {
+   COORD (1680,600)
+  }
+  VTX  8809, 0, 0
+  {
+   COORD (1600,600)
+  }
+  WIRE  8810, 0, 0
+  {
+   NET 1598
+   VTX 8808, 8809
+  }
+  NET WIRE  8818, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #NAME="READOUT"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  TEXT  8819, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1502,1890,1619,1919)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 8825
+  }
+  VTX  8823, 0, 0
+  {
+   COORD (1680,1920)
+  }
+  VTX  8824, 0, 0
+  {
+   COORD (1520,1920)
+  }
+  WIRE  8825, 0, 0
+  {
+   NET 8818
+   VTX 8823, 8824
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  8979, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="TRIG_CTLER_STAT(7:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (1680,1960)
+   ORIENTATION 3
+   VERTEXES ( (2,9053) )
+  }
+  TEXT  8980, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1293,1942,1629,1977)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 8979
+   ORIENTATION 3
+  }
+  VTX  9037, 0, 0
+  {
+   COORD (2100,1900)
+  }
+  VTX  9038, 0, 0
+  {
+   COORD (1680,2100)
+  }
+  VTX  9039, 0, 0
+  {
+   COORD (2120,1900)
+  }
+  WIRE  9040, 0, 0
+  {
+   NET 7776
+   VTX 9037, 9039
+  }
+  VTX  9041, 0, 0
+  {
+   COORD (2120,2100)
+  }
+  WIRE  9042, 0, 0
+  {
+   NET 7776
+   VTX 9039, 9041
+  }
+  WIRE  9043, 0, 0
+  {
+   NET 7776
+   VTX 9041, 9038
+  }
+  NET BUS  9048, 0, 0
+  VTX  9052, 0, 0
+  {
+   COORD (1680,1960)
+  }
+  VTX  9053, 0, 0
+  {
+   COORD (1680,1960)
+  }
+  BUS  9054, 0, 0
+  {
+   NET 9048
+   VTX 9052, 9053
+  }
  }
  
 }
@@ -5142,7 +5351,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  8077, 0, 0
+  TEXT  9055, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5153,7 +5362,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  8078, 0, 0
+  TEXT  9056, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5164,7 +5373,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  8079, 0, 0
+  TEXT  9057, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5174,7 +5383,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  8080, 0, 0
+  TEXT  9058, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5186,7 +5395,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  8081, 0, 0
+  TEXT  9059, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5199,7 +5408,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  8082, 0, 0
+  TEXT  9060, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5209,7 +5418,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  8083, 0, 0
+  TEXT  9061, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5221,7 +5430,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  8084, 0, 0
+  TEXT  9062, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5231,7 +5440,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  8085, 0, 0
+  TEXT  9063, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5242,7 +5451,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  8086, 0, 0
+  GROUP  9064, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2820,4201,3201)
@@ -5254,7 +5463,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  8087, 0, 0
+  GROUP  9065, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3020,4201,3021)
@@ -5266,7 +5475,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  8088, 0, 0
+  GROUP  9066, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2960,4201,2961)
@@ -5278,7 +5487,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  8089, 0, 0
+  GROUP  9067, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3080,4201,3081)
@@ -5290,7 +5499,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  8090, 0, 0
+  GROUP  9068, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3140,4201,3141)
@@ -5302,7 +5511,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  8091, 0, 0
+  GROUP  9069, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2820,3501,2961)
@@ -5313,7 +5522,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  8092, 0, 0
+  GROUP  9070, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2960,3501,3201)
@@ -5324,7 +5533,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  8093, 0, 0
+  BMPPICT  9071, 0, 0
   {
    PAGEALIGN 10
    RECT (3340,2880,3479,2925)

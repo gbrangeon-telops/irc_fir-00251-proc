@@ -35,6 +35,7 @@ entity scd_serial_module is
       -- TRIG de synchro
       ACQ_TRIG              : in std_logic;
       XTRA_TRIG             : in std_logic;
+      PROG_TRIG             : out std_logic;
       
       -- interface avec la RAM
       RAM_WR                : out std_logic;
@@ -47,6 +48,7 @@ entity scd_serial_module is
       
       -- temperature du détecteur
       FPA_TEMP_STAT         : out fpa_temp_stat_type;
+      TRIG_CTLER_STAT       : in std_logic_vector(7 downto 0);
       
       -- lien TX avec le uart block
       TX_AFULL              : in std_logic;
@@ -59,7 +61,9 @@ entity scd_serial_module is
       RX_DVAL               : in std_logic;
       RX_RD_EN              : out std_logic;      
       RX_ERR                : in std_logic;
-      PRIM_XTRA_TRIG_ACTIVE : out std_logic
+      
+      READOUT               : in std_logic
+      
       
       );
 end scd_serial_module;
@@ -80,6 +84,18 @@ architecture RTL of scd_serial_module is
       Port ( Clock   : in std_logic;
          Reset       : in std_logic;		
          Clk_div     : out std_logic);
+   end component;
+   
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
    end component;
    
    component sfifo_w8_d64
@@ -117,15 +133,17 @@ architecture RTL of scd_serial_module is
    --------------------------------------
    
    type prog_seq_fsm_type is (idle, cpy_cfg_st, wait_end_cpy_cfg_st, send_cfg_st, wait_end_send_cfg_st, wait_proxy_resp_st, cmd_fail_mgmt_st);
-   type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st, cpy_cfg_wr_st, init_send_st, send_cfg_rd_st, 
-   latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st, wait_temp_trig_st);  
+   type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st, cpy_cfg_wr_st, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
+   latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
    type cmd_resp_fsm_type is (wait_resp_hder_st, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
    type com_data_array_type  is array (0 to SCD_LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
-   
+   type prog_trig_fsm_type is (idle, check_prog_img_st);
+
    signal prog_seq_fsm            : prog_seq_fsm_type;
    signal cfg_mgmt_fsm            : cfg_mgmt_fsm_type;
    signal cmd_resp_fsm            : cmd_resp_fsm_type;
+   signal prog_trig_fsm           : prog_trig_fsm_type;
    signal resp_data               : com_data_array_type;
    signal areset                  : std_logic;
    signal sreset                  : std_logic;
@@ -176,13 +194,19 @@ architecture RTL of scd_serial_module is
    signal tx_dval_i               : std_logic;
    signal rx_rd_en_i              : std_logic;
    signal proxy_rdy_i             : std_logic;
-   signal temp_trig               : std_logic;
-   signal temp_trig_last          : std_logic;
    signal resp_err                : std_logic_vector(7 downto 0);
    signal failure_resp_data       : failure_resp_data_type;
    signal fpa_temp_error          : std_logic;
-   signal force_xtra_trig_mode    : std_logic;
-   
+   signal force_prog_trig_mode    : std_logic;
+   signal prog_trig_i             : std_logic;
+   signal readout_i               : std_logic;
+   signal readout_last            : std_logic;
+   signal img_cnt                 : natural range 0 to (FPA_XTRA_IMAGE_NUM_TO_SKIP + 1);
+   signal prog_trig_done          : std_logic; 
+   signal prog_trig_done_last     : std_logic;
+   signal prog_trig_start         : std_logic;
+   signal prog_trig_start_last    : std_logic; 
+   signal acq_mode                : std_logic;
    
    -- -- attribute dont_touch           : string;
    -- -- attribute dont_touch of resp_err             : signal is "true";
@@ -193,6 +217,8 @@ architecture RTL of scd_serial_module is
    -- -- attribute dont_touch of resp_id              : signal is "true";
    -- -- attribute dont_touch of failure_resp_data    : signal is "true";
 begin
+   
+   acq_mode <= TRIG_CTLER_STAT(4);
    
    areset <= not ARESETN;
    SERIAL_FATAL_ERR <= serial_fatal_err_i;
@@ -213,6 +239,8 @@ begin
    FPA_TEMP_STAT.TEMP_DVAL <= fpa_temp_reg_dval;
    FPA_TEMP_STAT.FPA_PWR_ON_TEMP_REACHED <= '1'; -- fait expres pour le scd car il n'allume le detecteur que lorsque la temperature est ok. 
    
+   PROG_TRIG <= prog_trig_i;
+   
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
@@ -221,13 +249,23 @@ begin
       ARESET => areset,
       CLK    => CLK,
       SRESET => sreset
-      );    
+      );
    
+   --------------------------------------------------
+   -- synchro readout 
+   --------------------------------------------------    
+   U1B : double_sync
+   port map(
+      CLK => CLK,
+      D   => READOUT,
+      Q   => readout_i,
+      RESET => sreset
+      );
    
    --------------------------------------------------
    -- fifo de stockage temporaire du copieur
    --------------------------------------------------   
-   U1B : sfifo_w8_d64
+   U1C : sfifo_w8_d64
    PORT MAP (
       clk => CLK,
       srst => sreset,
@@ -363,18 +401,22 @@ begin
             cfg_fifo_wr_en <= '0';
             tx_dval_i <= '0';
             proxy_rdy_i <= '0';
-            temp_trig_last <= '0';
-            force_xtra_trig_mode <= '0';
-            PRIM_XTRA_TRIG_ACTIVE <= '0';
+            force_prog_trig_mode <= '0';   
+            prog_trig_start <= '0';
+            prog_trig_done_last <= '0';
             -- pragma translate_off
             tx_data_i <= (others => '0');
-            -- pragma translate_on
+            -- pragma translate_on  
+
          else             
+            
             trig_i  <= XTRA_TRIG or ACQ_TRIG; 
             trig_last  <= trig_i;            
             trig_rising  <= trig_i and not trig_last;
             uart_tbaud_clk_en_last <= uart_tbaud_clk_en;
-            temp_trig_last <= temp_trig;
+            
+            prog_trig_done_last <= prog_trig_done;
+            
             --fsm de contrôle            
             case  cfg_mgmt_fsm is 
                
@@ -390,8 +432,9 @@ begin
                   cfg_fifo_rd_en <= '0';
                   uart_tbaud_cnt <= (others => '0');
                   cfg_fifo_wr_en <= '0';
-                  force_xtra_trig_mode <= '0';
-                  PRIM_XTRA_TRIG_ACTIVE <= '0';
+                  force_prog_trig_mode <= '0';
+                  prog_trig_start <= '0';
+                  
                   if cpy_cfg_en = '1' then
                      cpy_cfg_done <= '0';
                      cfg_mgmt_fsm <= cpy_cfg_rd_st;
@@ -450,23 +493,29 @@ begin
                   tx_dval_i <= '0';
                   cfg_byte_cnt <= (others => '0'); 
                   ram_rd_add_i <= to_unsigned(SCD_CMD_SECUR_RAM_BASE_ADD, ram_rd_add_i'length); -- zone securisée sera en lecture
-                  --if unsigned(SERIAL_BASE_ADD) = to_unsigned(SCD_TEMP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length)  then  
-                  --   cfg_mgmt_fsm <= wait_temp_trig_st; 
-                  --else                                                 -- sinon on attend un trig pour lancer la programmation (suggestion de PDA pour avoir une chance de voir la config appliqée au prochain trig)
+                  
                   if unsigned(SERIAL_BASE_ADD) = to_unsigned(SCD_OP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
-                     force_xtra_trig_mode <= '1'; 
+                     force_prog_trig_mode <= '1';
+					      cfg_mgmt_fsm <= prog_trig_start_st; 
+                  else
+                     cfg_mgmt_fsm <= send_cfg_rd_st;   
                   end if;
-                  -- finalement, pas besoin de trig de synchro pour configurer le edtecteur. 
-                  -- ainsi Si c'est le temps d'integration EHDRI, pas de delai car il est déja synchro sur montée du signal d'integration. l
-                  --if trig_rising = '1' then     
-                  cfg_mgmt_fsm <= send_cfg_rd_st;
-                  --end if;
-                  --end if;
+
+		       when prog_trig_start_st =>
+			      prog_trig_start <= '1';
+			      if prog_trig_done = '0' then 
+			         prog_trig_start <= '0';
+			         cfg_mgmt_fsm <= prog_trig_end_st;			   
+			      end if;
                
-               when  wait_temp_trig_st =>
-                  --if temp_trig = '1' and temp_trig_last = '0' then  -- les lectures de temps sont espacées de 1 sec au moins pour ne pas inonder le proxy
-                  cfg_mgmt_fsm <= send_cfg_rd_st;
-                  --end if;
+			   when prog_trig_end_st =>
+               if prog_trig_done = '1' then
+				      if force_prog_trig_mode = '1' then
+				         cfg_mgmt_fsm <= send_cfg_rd_st;
+					   else
+					      cfg_mgmt_fsm <= idle;
+					   end if;
+				   end if;
                
                when send_cfg_rd_st =>          -- on lit un byte dans la zone sécurisée
                   ram_wr_i <= '0';     
@@ -503,7 +552,6 @@ begin
                when wait_tx_fifo_empty_st =>                  
                   if TX_EMPTY = '1' then 
                      cfg_mgmt_fsm <= uart_pause_st;
-                     PRIM_XTRA_TRIG_ACTIVE <= force_xtra_trig_mode;  -- ici on force le mode Xtra_trig
                   end if;
                
                when uart_pause_st =>                  
@@ -523,20 +571,25 @@ begin
                      if timeout_cnt = 5_000_000 then   -- donne 50 ms sec au proxy pour donner une réponse                     
                         cfg_mgmt_fsm <= timeout_mgmt_st;
                      end if; 
-                     -- pragma translate_off
-                     if timeout_cnt = 50_000 then                      
-                        cfg_mgmt_fsm <= timeout_mgmt_st;
-                     end if;
+                     -- pragma translate_off                     
+                        cfg_mgmt_fsm <= cmd_resp_mgmt_st;
                      -- pragma translate_on
                   end if;
                
                when cmd_resp_mgmt_st => 
                   if proxy_serial_err = '1' then
-                     serial_cmd_failure  <= '1';                    
+                     serial_cmd_failure  <= '1';
+                     cfg_mgmt_fsm <= idle;                    
                   else
-                     proxy_rdy_i <= '1';
+                     proxy_rdy_i <= '1';   
+                     if force_prog_trig_mode = '1' then
+					         force_prog_trig_mode <= '0';
+						      cfg_mgmt_fsm <= prog_trig_start_st;
+                     else
+                        cfg_mgmt_fsm <= idle; 
+                     end if;              
                   end if;
-                  cfg_mgmt_fsm <= idle;
+                 
                
                when timeout_mgmt_st =>
                   serial_cmd_failure  <= '1';
@@ -550,6 +603,7 @@ begin
       end if;
    end process;   
    
+
    --------------------------------------------------
    -- Generateur pour uart_tbaud_clk_pulse
    -------------------------------------------------- 
@@ -557,17 +611,53 @@ begin
    Generic map(Factor=> SCD_SERIAL_TX_CLK_FACTOR)
    Port map( Clock => CLK, Reset => sreset, Clk_div => uart_tbaud_clk_en);
    
-   --------------------------------------------------
-   -- Generateur pour temp_trig
-   -------------------------------------------------- 
-   U5: Clk_Divider   -- horloge de periode 1 sec pour lancer la lecture de temperature
-   Generic map(Factor=> SCD_TEMP_TRIG_PERIOD_FACTOR
-      -- pragma translate_off
-      /100_000
-      -- pragma translate_on
-      )
-   Port map( Clock => CLK, Reset => sreset, Clk_div => temp_trig);
-   
+   --------------------------------------------------  
+   -- Gestion des prog_trigs                             
+   --------------------------------------------------  
+   U5 : process(CLK)
+   begin
+      if rising_edge(CLK) then 
+         if sreset = '1' then 
+            prog_trig_done <= '1';
+            prog_trig_i <= '0';
+            prog_trig_start_last <= '0';
+            prog_trig_fsm <= idle;
+            img_cnt <= 0;
+            readout_last <= '0';
+         else             
+            
+            
+            prog_trig_start_last <= prog_trig_start;
+            readout_last <= readout_i;      
+            
+            case  prog_trig_fsm is 
+               
+               when idle =>  
+                  img_cnt <= 0;
+                  prog_trig_done <= '1';
+                  prog_trig_i <= '0';  
+                  
+                  if prog_trig_start = '1' then
+                     prog_trig_fsm <= check_prog_img_st;
+                     prog_trig_i <= '1';
+                  end if;
+                  
+               when check_prog_img_st =>                     
+                  prog_trig_done <= '0';
+                  if readout_last = '1' and readout_i = '0' and acq_mode = '0' then 
+                     img_cnt <= img_cnt + 1;
+                  end if;
+                  if img_cnt >= FPA_XTRA_IMAGE_NUM_TO_SKIP then                        
+                     prog_trig_fsm <= idle;    
+                  end if; 
+                  
+               when others =>
+               
+            end case;
+            
+         end if;
+      end if;
+   end process;      
    --------------------------------------------------  
    -- Gestion des erreurs                                 
    --------------------------------------------------

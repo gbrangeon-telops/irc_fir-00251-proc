@@ -54,6 +54,7 @@ entity scd_prog_ctrler is
       FPA_DRIVER_STAT      : out std_logic_vector(31 downto 0);
       FRAME_ID             : out std_logic_vector(31 downto 0); --  synchronisé avec ACQ_INT
       INT_INDX             : out std_logic_vector(7 downto 0);
+      INT_TIME             : out std_logic_vector(23 downto 0);
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic
@@ -104,7 +105,8 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_int_feedbk_last     : std_logic;
    signal acq_frame                 : std_logic;
    signal user_cfg_in_progress_last : std_logic;
-   signal int_indx_i                : std_logic_vector(7 downto 0);
+   signal int_indx_i                : std_logic_vector(7 downto 0); 
+   signal int_time_i                : std_logic_vector(23 downto 0);
    signal new_cfg_id                : std_logic_vector(7 downto 0);
    signal serial_base_add_i         : std_logic_vector(7 downto 0);
    signal cfg_ram_base_add          : unsigned(7 downto 0);
@@ -117,15 +119,16 @@ architecture rtl of scd_prog_ctrler is
    signal cfg_updater_done          : std_logic;
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
+   signal need_prog_rqst            : std_logic;
    
    -- -- attribute dont_touch                         : string;
    -- -- attribute dont_touch of acq_int_i            : signal is "true";
    -- -- attribute dont_touch of fpa_int_i            : signal is "true";
    -- -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   -- -- attribute dont_touch of int_indx_i           : signal is "true";
+   -- -- attribute dont_touch of int_indx_i           : signal is "true"; 
    
 begin
-   
+                      
    
    -------------------------------------------------
    -- mappings                                                   
@@ -140,8 +143,9 @@ begin
    PROXY_TRIG <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_driver_output 
    FPA_INTF_CFG <= fpa_intf_cfg_i;  -- sortie de la config
    RST_CLINK_N <= reset_clink_n;
+   INT_TIME <= int_time_i;
    
-   
+                  
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err;
    FPA_DRIVER_STAT(7) <= '0'; 
@@ -194,6 +198,7 @@ begin
             user_cfg_in_progress_i <= '0';
             user_cfg_in_progress_last <= '0';
             new_cfg_pending_fsm <= check_cfg_st1;
+			need_prog_rqst <= '0'; 
             
          else 
             
@@ -202,8 +207,8 @@ begin
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
-            new_cfg.scd_op <= USER_CFG.SCD_OP;   
-            new_cfg.scd_int <= USER_CFG.SCD_INT;  
+            new_cfg.scd_op   <= USER_CFG.SCD_OP;   
+            new_cfg.scd_int  <= USER_CFG.SCD_INT;  
             new_cfg.scd_diag <= USER_CFG.SCD_DIAG; 
             new_cfg.scd_temp <= USER_CFG.SCD_TEMP; 
             new_cfg.scd_misc <= USER_CFG.SCD_MISC; 
@@ -245,11 +250,12 @@ begin
                when new_op_cfg_st =>
                   new_cfg_id <= SCD_OP_CMD_ID(7 downto 0);     -- les 7 derniers bits suffisent largement
                   cfg_ram_base_add <= to_unsigned(SCD_OP_CMD_RAM_BASE_ADD, 8);
+				  need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
@@ -257,11 +263,12 @@ begin
                   new_cfg_id <= SCD_INT_CMD_ID(7 downto 0);
                   cfg_ram_base_add <= to_unsigned(SCD_INT_CMD_RAM_BASE_ADD, 8);
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  if user_cfg_in_progress_i = '1' then 
+                  need_prog_rqst <= '0'; 				    -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
+				  if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
@@ -269,11 +276,12 @@ begin
                   new_cfg_id <= SCD_DIAG_CMD_ID(7 downto 0);
                   cfg_ram_base_add <= to_unsigned(SCD_DIAG_CMD_RAM_BASE_ADD, 8);
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  if user_cfg_in_progress_i = '1' then 
+                  need_prog_rqst <= '1'; 				    -- diag_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs 
+				  if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
@@ -281,11 +289,12 @@ begin
                   new_cfg_id <= SCD_TEMP_CMD_ID(7 downto 0);
                   cfg_ram_base_add <= to_unsigned(SCD_TEMP_CMD_RAM_BASE_ADD, 8);
                   fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  if user_cfg_in_progress_i = '1' then 
+                  need_prog_rqst <= '0'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
+				  if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
@@ -341,10 +350,14 @@ begin
                   update_cfg_i <= '0';
                   fpa_driver_seq_err <= '0';
                   if SERIAL_DONE = '1' and fpa_new_cfg_pending = '1' and PROXY_POWERED = '1' then  -- ne jamais ajouter PROXY_RDY dans les conditions
-                     driver_seq_fsm <= fpa_prog_rqst_st;
+                     if need_prog_rqst = '1' then
+					    driver_seq_fsm <= fpa_prog_rqst_st;
+					 else
+					    driver_seq_fsm <= fpa_prog_en_st;
+					 end if;
                   end if;               
                
-               when fpa_prog_rqst_st =>              -- demande pour programmer le fpa
+               when fpa_prog_rqst_st =>              -- demande pour programmer le fpa. Elle se soldera par l'arrêt du contrôleur de trig
                   fpa_driver_rqst <= '1'; 
                   if FPA_DRIVER_EN = '1' then
                      driver_seq_fsm <= fpa_prog_en_st;                     
@@ -379,11 +392,6 @@ begin
                when wait_fpa_prog_end_st =>  -- attente de la fin de la programmation      
                   if SERIAL_DONE = '1' then 
                      driver_seq_fsm <= check_fpa_ser_fatal_err_st;
-                     -- else -- abandon seulement si on passe en mode diag
-                     --if READOUT = '0' and (USER_CFG.COMN.FPA_DIAG_MODE = '1' or DIAG_MODE_ONLY = '1') then  -- si on n'arrive pas à clôturer la prog, C'est qu'il y a un problème. On peut toujors revenir en mode diag si souhaité. 
-                     --   driver_seq_fsm <= idle; 
-                     --   serial_abort_i <= '1';
-                     --end if;  
                   end if;
                
                when check_fpa_ser_fatal_err_st =>      -- après plusieurs essais de programmation le module serial sortira une erreur fatale                      
@@ -440,8 +448,7 @@ begin
             
             -- ENO 14 juillet 2016: requis pour supporter instabilités de la roue à filtre. Mettre à jour même si détecteur n'est pas reprogrammé
             fpa_intf_cfg_i.comn.fpa_stretch_acq_trig <= USER_CFG.comn.fpa_stretch_acq_trig;
-            
-            
+   
             case  cfg_updater_fsm is 
                
                when idle =>
@@ -502,12 +509,13 @@ begin
                   fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;
                   fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_CHANNEL_NUM;
                   present_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
-                  present_cfg.scd_int.scd_int_time <= to_unsigned(SCD_OP_INT_TIME_DEFAULT_FACTOR, present_cfg.scd_int.scd_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
+                  -- present_cfg.scd_int.scd_int_time <= to_unsigned(SCD_OP_INT_TIME_DEFAULT_FACTOR, present_cfg.scd_int.scd_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
                   proxy_static_done <= '1';
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_int <= fpa_ser_cfg_to_update.scd_int;
+				  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.scd_int.scd_int_time, 32);
                   present_cfg.scd_int <= fpa_ser_cfg_to_update.scd_int;  
                   cfg_updater_fsm <= pause_st1;
                
@@ -551,7 +559,7 @@ begin
             frame_id_i <= (others => '0');
             acq_frame <= '0';
             int_indx_i <= (others => '0');
-            
+            int_time_i <= (others => '0');
          else
             
             proxy_int_feedbk_i <= PROXY_INT_FBK;
@@ -568,6 +576,7 @@ begin
                   if ACQ_TRIG = '1' then    -- ACQ_TRIG uniquement car ne jamais envoyer acq_int_i en mode XTRA_TRIG
                      frame_id_i <= frame_id_i + 1;
                      int_indx_i <= fpa_intf_cfg_i.scd_int.scd_int_indx;
+                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.scd_int.scd_int_time);
                      acq_frame <= '1';
                      if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
                         int_gen_fsm <= diag_int_dly_st;
@@ -576,12 +585,13 @@ begin
                      end if;
                   elsif XTRA_TRIG = '1' then    -- 
                      --frame_id_i <= frame_id_i + 1; -- on ne change pas d'ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
-                     int_indx_i <= fpa_intf_cfg_i.scd_int.scd_int_indx;
+                     int_indx_i <= fpa_intf_cfg_i.scd_int.scd_int_indx; 
+                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.scd_int.scd_int_time);
                      acq_frame <= '0';
                      if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
                         int_gen_fsm <= diag_int_dly_st;
                      else
-                        int_gen_fsm <= check_fpa_st;
+                        int_gen_fsm <= check_fpa_st; 
                      end if;
                   end if;
                
@@ -614,11 +624,14 @@ begin
                   else
                      acq_int_i <= acq_frame and PROXY_RDY; 
                   end if;
-                  if cnt >= fpa_intf_cfg_i.scd_int.scd_int_time then    -- 
+                  
+                  
+                  if cnt >= fpa_intf_cfg_i.scd_int.diag_int_time then    -- 
                      int_gen_fsm <= idle;
                   else                        
                      cnt <= cnt + 1;                
-                  end if;            
+                  end if;
+
                
                when others =>
                

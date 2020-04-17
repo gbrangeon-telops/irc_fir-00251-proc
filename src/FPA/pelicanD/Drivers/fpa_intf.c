@@ -38,20 +38,29 @@
  
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define SCD_XTRA_TRIG_FREQ_MAX_HZ         44     // soit une frequence de 44 Hz         
+#define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS
   
 // Parametres de la commande serielle du PelicanD
 #define SCD_LONGEST_CMD_BYTES_NUM         32      // longueur en bytes de la plus longue commande serielle du PelicanD
 #define SCD_CMD_OVERHEAD_BYTES_NUM        6       // longueur des bytes autres que ceux des données
 
 // Mode d'operation choisi pour le contrôleur de trig 
-#define MODE_READOUT_END_TO_TRIG_START    0x00    // provient du fichier fpa_common_pkg.vhd. Ce mode est choisi car plus simple pour le PelicanD
-#define MODE_TRIG_START_TO_TRIG_START     0x01
-#define MODE_INT_END_TO_TRIG_START        0x02
+#define MODE_READOUT_END_TO_TRIG_START     0x00    // provient du fichier fpa_common_pkg.vhd. Ce mode est choisi car plus simple pour le PelicanD
+#define MODE_TRIG_START_TO_TRIG_START      0x01
+#define MODE_INT_END_TO_TRIG_START         0x02
+#define MODE_ITR_TRIG_START_TO_TRIG_START  0x03    
+#define MODE_ITR_INT_END_TO_TRIG_START     0x04
+#define MODE_ALL_END_TO_TRIG_START         0x05
+
+
 
 // PelicanD integration modes definies par SCD  
 #define SCD_ITR_MODE                      0x00    // valeur provenant du manuel de SCD
 #define SCD_IWR_MODE                      0x01    // valeur provenant du manuel de SCD
+
+// PelicanD mode of operation define by SCD
+#define SCD_BOOST_MODE                      0x00    // valeur provenant du manuel de SCD
+#define SCD_NORMAL_MODE                     0x01    // valeur provenant du manuel de SCD
 
 // PelicanD gains definis par SCD  
 #define SCD_GAIN_0                        0x00   // plus gros puits
@@ -134,7 +143,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 #define VHD_INVALID_TEMP   0xFFFFFFFF
-#define VHD_PIXEL_PIPE_DLY_SEC           5E-7F     // estimation des differerents delais accumulés par le vhd
+#define VHD_ITR_PIPE_DLY_SEC             500E-9F     // estimation des differerents delais accumulés par le vhd
+#define VHD_IWR_PIPE_DLY_SEC             250E-9F     // estimation des differerents delais accumulés par le vhd
+
 
 // structure interne pour les parametres des figure1 et 2 ( se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD) 
 struct Scd_Fig1orFig2Param_s             // 
@@ -142,6 +153,9 @@ struct Scd_Fig1orFig2Param_s             //
    float TFPP_CLK;                       
    float Trelax;
    float Tline_conv;
+   float Tframe_init;
+   float T_lc2int;
+   float T_iwr_delay;
    float T0;
    float T1;
    float T2;
@@ -260,6 +274,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    Scd_Fig4Param_t kk;
    float fpaAcquisitionFrameRate;
    extern uint8_t gFpaScdDiodeBiasEnum;
+   static uint8_t cfg_num = 0;
    
    //-----------------------------------------                                           
    // bâtir les configurations
@@ -291,11 +306,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs (il est sur l'horolge de 100MHz)
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le PelicanD en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
-   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T3 + hh.T5 + hh.T6 - (float)VHD_PIXEL_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ); 
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
+   {
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le PelicanD en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
+      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T3 + hh.T5 + hh.T6 - (float)VHD_ITR_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ); 
+   }
+   else
+   {
+      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ALL_END_TO_TRIG_START; // ENO : 30 mars 2020 : T5 is referenced to the end of integration or readout depending which is the longest. Thus the recommended mode is MODE_ALL_END_TO_TRIG_START
+      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.T5 - (float)VHD_IWR_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   }
+
    ptrA->fpa_spare                 = 0;   //
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);                      // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)(0.8F *(float)ptrA->fpa_xtra_trig_ctrl_dly);                          // 
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ); // PCO : 26 mars 2020: Define the smallest period allowed by the fpa_trig_controller for xtra_trig generation (max xtra_trig frequency is set to 12 Hz). Also define the frequency when prog_trig is held high.
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly); //  PCO : 26 mars 2020 : This delay must be greater than the max value scd_frame_period_min (90 ms). This is necessary when the fpa_trig_controller receive a trig and no integration follow.
    
    if (ptrA->fpa_diag_mode == 1)
    {
@@ -334,7 +358,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_int_mode = SCD_IWR_MODE;
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
       ptrA->scd_int_mode = SCD_ITR_MODE; 
-    
+
+   //Mode of operation
+   ptrA->scd_boost_mode = SCD_NORMAL_MODE;
+
    // Resolution des pixels (13, 14 ou 15 bits)
    ptrA->scd_pix_res = SCD_PIX_RESOLUTION_13BITS;    // resolution pour l'instant figée à 13 bits   
     
@@ -366,7 +393,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
-   
+
+   // Changement de cfg_num dès qu'une nouvelle cfg est envoyée au vhd. Permet de forcer la reprogramation du proxy à chaque fois que cette fonction est appelée.
+   if (cfg_num == 255)  // protection contre depassement
+      cfg_num = 0;
+   cfg_num++;
+   ptrA->cfg_num = (uint32_t)cfg_num;
+
    //-----------------------------------------                                           
    // Envoyer commande synthetique
    ptrA->proxy_cmd_to_update_id = SCD_DIAG_CMD_ID;
@@ -472,6 +505,8 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    
    maxExposure_us = maxExposure_us/1.001F;    // cette division tient du fait que dans la formule de T0, le temps d'exposition intervient avec un facteur 1 + 0.1/100
    
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)
+      maxExposure_us += (hh.T3 + hh.T6)*1e6F;
    // Round exposure time
    maxExposure_us = floorMultiple(maxExposure_us, 0.1);
    
@@ -556,31 +591,38 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
 //-------------------------------------------------------
 void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
-   // ATTENTION!! ne pas changer l'ordre des calculs des parametres
-   // se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD
-
-   // Update on 2016-04-28 with spec D1K3008-RevA.1 from SCD
+   // Se reporter au document d1k3008-rev1 et d1k3004-rev0 de SCD
    
    uint8_t PELICAND_1CH_EMULATOR = 0;
    if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)         // 2019-07-15 ODI: emulateur 1 channel des que le diviseur > 1 (valeur par défaut)
       PELICAND_1CH_EMULATOR = 1;
    
-   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)  // ODI 2016-04-28: IWR non validé. Si doit être supporté, vérifier la formule
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)
    {
       ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
       if (PELICAND_1CH_EMULATOR)
          ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;      // ENO 24 juin 2019 : on emule un PelicanD 1 canal
       else
-         ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;       //13 bit resolution
+         ptrH->Tline_conv = 814.0F * ptrH->TFPP_CLK;       // PCO 31 mars 2020 : La doc spécifie 804.0F, mais cela fait planter le proxy.
 
+      ptrH->Tframe_init = 2128.0F * ptrH->TFPP_CLK;
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 1E-6F;
-      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv);
-      ptrH->Trelax    = 10E-6F;
-      ptrH->T6        = ptrH->Tline_conv + ptrH->Trelax;        // worst case
-      ptrH->T8        = 250E-6F;
-      ptrH->T3        = (2128.0F * ptrH->TFPP_CLK) + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F)) + 60E-6F;
+      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv) + 8.88E-6F;
+      ptrH->Trelax    = 5E-6F;
+      ptrH->T_lc2int  = 5E-6F;
+      ptrH->T_iwr_delay = ptrH->T_lc2int + ptrH->Trelax;
 
+      ptrH->T6 = 5.4E-6F + 10E-6F; // normal mode, worst case
+
+      ptrH->T8        = 250E-6F; // worst case
+      ptrH->T3        = ptrH->Tframe_init + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 3.0F)) + ptrH->T_iwr_delay;
+
+      // Use the longest between integration and readout times
+      if (ptrH->T2 > (ptrH->T3 + ptrH->T6))
+         // T0 = T2 + T4 + T5  and  T5 = T5min + 0.1%T0
+         ptrH->T0        = (ptrH->T2 + ptrH->T4 + ptrH->T5min) / (99.9F / 100.0F);
+      else
       // T0 = T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
       ptrH->T0        = (ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
       ptrH->T0        = MIN(ptrH->T0, 90E-3F); // don't forget that T0 must be < 90msec
@@ -596,13 +638,14 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
       else
          ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;        //13 bit resolution
 
+      ptrH->Tframe_init = 2128.0F * ptrH->TFPP_CLK;
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 1E-6F;
       ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv);
       ptrH->Trelax    = 10E-6F;
       ptrH->T6        = ptrH->Trelax;
       ptrH->T8        = 250E-6F;
-      ptrH->T3        = (2128.0F * ptrH->TFPP_CLK) + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F));
+      ptrH->T3        = ptrH->Tframe_init + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F));
 
       // T0 = T2 + T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
       ptrH->T0        = (ptrH->T2 + ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
@@ -701,7 +744,7 @@ void FPA_ReadTemperature_StructCmd(const t_FpaIntf *ptrA)
 //------------------------------------------------------
 void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 {
-   uint32_t int_time_default;
+   uint32_t vhd_int_time;
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
    uint8_t scd_gain;
@@ -715,7 +758,9 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirLR   = 0;  // 0 => left to right (default), 1 => right to left
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
-   int_time_default    = (uint32_t)((float)FPA_MIN_EXPOSURE *(float)FPA_MCLK_RATE_HZ*1E-6F);
+   vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
+   vhd_int_time     = (uint32_t)MIN(MAX((float)vhd_int_time, (FPA_MIN_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F)), (FPA_MAX_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F));  // protection
+
    
    scd_gain = (uint8_t)(ptrA->scd_gain);
    
@@ -725,9 +770,9 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Header       =  0xAA;
    Cmd.ID           =  0x8002;
    Cmd.DataLength   =  21;
-   Cmd.Data[0]      =  int_time_default & 0xFF;             //integration time lsb
-   Cmd.Data[1]      = (int_time_default >> 8) & 0xFF;
-   Cmd.Data[2]      = (int_time_default >> 16) & 0xFF;      //integration time msb
+   Cmd.Data[0]      =  vhd_int_time & 0xFF;             //integration time lsb
+   Cmd.Data[1]      = (vhd_int_time >> 8) & 0xFF;
+   Cmd.Data[2]      = (vhd_int_time >> 16) & 0xFF;      //integration time msb
                     
    Cmd.Data[3]      =  0;                                   // reserved
    Cmd.Data[4]      =  0;                                   // reserved
@@ -753,7 +798,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
                          
    Cmd.Data[18]     = (((ptrA->scd_out_chn) & 0x01) << 7) + ((DisplayMode & 0x0F) << 3) + ((FSyncMode & 0x01) << 2) + ((ReadDirLR & 0x01) << 1) + (ReadDirUP & 0x01);
    Cmd.Data[19]     = scd_int_mode;
-   Cmd.Data[20]     = (ptrA->scd_pix_res) & 0x03;
+   Cmd.Data[20]     = ((ptrA->scd_boost_mode & 0x01) << 6) + (ptrA->scd_pix_res & 0x03);
    
    Cmd.SerialCmdRamBaseAdd = (uint8_t)AW_SERIAL_OP_CMD_RAM_BASE_ADD; // adresse à laquelle envoyer la commande en RAM
    // on batit les packets de bytes

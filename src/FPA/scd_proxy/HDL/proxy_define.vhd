@@ -29,11 +29,11 @@ package Proxy_define is
    -- PROJET: definition
    --------------------------------------------   
    constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY_SCD;
-   constant PROG_FREE_RUNNING_TRIG       : std_logic := '1';   -- cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
+   constant PROG_FREE_RUNNING_TRIG       : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
    constant FPA_INTF_CLK_RATE_MHZ        : integer := 100;     --  FPA_INTF_CLK_RATE en MHz
    constant SCD_INT_TIME_MIN_US          : integer := 1; 
    constant SCD_MASTER_CLK_RATE_MHZ      : integer := 80;      --
-   constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 3; -- pour le pelicanD, on doit laisser une image dès qu'on change le frameRate car le changement de framerate s'opere toujours en temps d'integration minimale pour ne pas planter mon code
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
    --constant PROXY_CLINK_CHANNEL_NUM      : integer := DEFINE_FPA_CLINK_CHANNEL_NUM;     -- Number of channels in the Camera Link interface with the proxy 
    --constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;  -- CLINK IN est à 80MHz ns pour les SCD
    --------------------------------------------
@@ -122,6 +122,7 @@ package Proxy_define is
    type scd_int_cfg_type is
    record
       scd_int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
+      diag_int_time           : unsigned(24 downto 0);  --! temps d'integration en coups de 100Mhz
       scd_int_indx            : std_logic_vector(7 downto 0);
    end record;
    
@@ -136,8 +137,10 @@ package Proxy_define is
       scd_out_chn             : std_logic;
       scd_diode_bias          : std_logic_vector(3 downto 0);
       scd_int_mode            : std_logic_vector(7 downto 0);
+      scd_boost_mode          : std_logic;
       scd_pix_res             : std_logic_vector(1 downto 0);
-      scd_frame_period_min    : unsigned(23 downto 0);     
+      scd_frame_period_min    : unsigned(23 downto 0); 
+      cfg_num                 : unsigned(7 downto 0);      
    end record;
    
    -- scd video synthetic

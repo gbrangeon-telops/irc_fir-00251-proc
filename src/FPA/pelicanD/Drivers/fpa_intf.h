@@ -55,7 +55,8 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (PelicanDIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (PelicanDIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS2           0
 #define FPA_TDC_FLAGS2           0
 
 #define FPA_EVEN_TO_ODD_DELAY 4     // CLK
@@ -78,7 +79,7 @@
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]
 #else
    #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]
-   #define FPA_DEFAULT_FRAME_RATE   44.0F //[Hz]
+   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]
 #endif
 
 // TODO Update EHDRI default exposure times.
@@ -105,6 +106,9 @@
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
+#define XTRA_TRIG_MODE_DELAY                    100000  // us
+
+
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
@@ -130,7 +134,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  scd_gain;                 
    uint32_t  scd_out_chn;              
    uint32_t  scd_diode_bias;                           
-   uint32_t  scd_int_mode;             
+   uint32_t  scd_int_mode;
+   uint32_t  scd_boost_mode;
    uint32_t  scd_pix_res;              
    uint32_t  scd_frame_period_min;         
    
@@ -148,6 +153,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  scd_fig1_or_fig2_t5_dly;
    uint32_t  scd_fig1_or_fig2_t4_dly;
    uint32_t  scd_xsize_div2;
+   uint32_t  cfg_num;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
    uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd

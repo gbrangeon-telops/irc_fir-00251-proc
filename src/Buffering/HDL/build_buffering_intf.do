@@ -8,6 +8,7 @@ setenv PROC "D:\Telops\FIR-00251-Proc"
 
 # Package
 acom "D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd"
+acom "D:\Telops\FIR-00251-Common\VHDL\Calibration\calib_define.vhd"
 
 #common_hdl
 acom \
@@ -36,9 +37,12 @@ acom \
  "$COMMON\VHDL\Buffering\axis64_img_sof.vhd" \
  "$COMMON\VHDL\Utilities\axis16_merge_axis64.vhd"
 acom -relax "$COMMON\VHDL\Buffering\buffering_Ctrl.vhd"
+acom -relax "$COMMON\VHDL\hdr_extractor\axis64_hder_extractor.vhd"	 
 
 #source Buffering
-acom "$BUF_INTF\moi_source_selector.vhd"
+acom "$BUF_INTF\moi_source_selector.vhd" 
+acom "$BUF_INTF\moi_flag_gen.vhd" 
+acom "$BUF_INTF\moi_handler.bde" 
 
 #Top
 acom "$COMMON\VHDL\Buffering\buffering.bde"

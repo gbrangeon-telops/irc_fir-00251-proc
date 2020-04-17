@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 69282
+ FREEID 69930
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -71,7 +71,7 @@ HEADER
 "library IEEE,WORK;\n"+
 "use ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1554150469"
+    #MODIFIED="1586886342"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="7a04798d-05ac-44da-93b7-fde9218fe3dc"
    }
   }
@@ -79,8 +79,8 @@ HEADER
   {
    PAGEHEADER
    {
-    RECT (0,0,480,860)
-    FREEID 64
+    RECT (0,-20,480,1000)
+    FREEID 79
    }
    
    BODY
@@ -91,28 +91,20 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (20,0,460,860)
+     AREA (20,-1,460,978)
     }
     TEXT  3, 0, 0
     {
      TEXT "$#NAME"
-     RECT (25,810,118,834)
+     RECT (25,930,118,954)
      ALIGN 4
      MARGINS (1,1)
      PARENT 2
     }
-    TEXT  5, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (281,630,455,654)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 4
-    }
     TEXT  7, 0, 0
     {
      TEXT "$#NAME"
-     RECT (25,730,128,754)
+     RECT (25,850,128,874)
      ALIGN 4
      MARGINS (1,1)
      PARENT 6
@@ -129,7 +121,7 @@ HEADER
     TEXT  11, 0, 0
     {
      TEXT "$#NAME"
-     RECT (25,770,104,794)
+     RECT (25,890,104,914)
      ALIGN 4
      MARGINS (1,1)
      PARENT 10
@@ -353,9 +345,33 @@ HEADER
      PARENT 62
      ORIENTATION 2
     }
+    TEXT  71, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (20,708,317,732)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 70
+    }
+    TEXT  75, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,750,355,774)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 74
+    }
+    TEXT  77, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (280,610,455,634)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 76
+    }
     PIN  2, 0, 0
     {
-     COORD (0,820)
+     COORD (0,940)
      VARIABLES
      {
       #DIRECTION="IN"
@@ -364,34 +380,15 @@ HEADER
       #NAME="ARESETN"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
      }
      LINE  2, 0, 0
      {
       POINTS ( (0,0), (20,0) )
      }
     }
-    PIN  4, 0, 0
-    {
-     COORD (480,640)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="MOI_TO_EXT_BUF"
-      #NUMBER="0"
-      #SIDE="right"
-      #VHDL_TYPE="STD_LOGIC"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (-20,0), (0,0) )
-     }
-    }
     PIN  6, 0, 0
     {
-     COORD (0,740)
+     COORD (0,860)
      VARIABLES
      {
       #DIRECTION="IN"
@@ -400,7 +397,6 @@ HEADER
       #NAME="CLK_DATA"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
      }
      LINE  2, 0, 0
      {
@@ -418,7 +414,7 @@ HEADER
       #NAME="AXIL_BUF_TABLE_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_LITE_MISO"
+      #VHDL_TYPE="t_axi4_lite_miso"
      }
      LINE  2, 0, 0
      {
@@ -427,7 +423,7 @@ HEADER
     }
     PIN  10, 0, 0
     {
-     COORD (0,780)
+     COORD (0,900)
      VARIABLES
      {
       #DIRECTION="IN"
@@ -436,7 +432,6 @@ HEADER
       #NAME="CLK_MB"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
      }
      LINE  2, 0, 0
      {
@@ -454,7 +449,7 @@ HEADER
       #NAME="AXIL_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_LITE_MISO"
+      #VHDL_TYPE="t_axi4_lite_miso"
      }
      LINE  2, 0, 0
      {
@@ -472,7 +467,6 @@ HEADER
       #NAME="EXTERNAL_MOI"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
      }
      LINE  2, 0, 0
      {
@@ -490,7 +484,7 @@ HEADER
       #NAME="EXP_BUF_IN_MISO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -508,7 +502,6 @@ HEADER
       #NAME="EXT_BUF_PRSNT_N"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
      }
      LINE  2, 0, 0
      {
@@ -526,7 +519,7 @@ HEADER
       #NAME="EXP_BUF_OUT_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI64"
+      #VHDL_TYPE="t_axi4_stream_mosi64"
      }
      LINE  2, 0, 0
      {
@@ -544,7 +537,6 @@ HEADER
       #NAME="WATER_LEVEL"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
      }
      LINE  2, 0, 0
      {
@@ -562,7 +554,7 @@ HEADER
       #NAME="MM2S_CMD_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI_CMD32"
+      #VHDL_TYPE="t_axi4_stream_mosi_cmd32"
      }
      LINE  2, 0, 0
      {
@@ -580,7 +572,7 @@ HEADER
       #NAME="AXIL_BUF_TABLE_MOSI"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+      #VHDL_TYPE="t_axi4_lite_mosi"
      }
      LINE  2, 0, 0
      {
@@ -598,7 +590,7 @@ HEADER
       #NAME="MM2S_DATA_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -616,7 +608,7 @@ HEADER
       #NAME="AXIL_MOSI"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_LITE_MOSI"
+      #VHDL_TYPE="t_axi4_lite_mosi"
      }
      LINE  2, 0, 0
      {
@@ -634,7 +626,7 @@ HEADER
       #NAME="MM2S_STS_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -652,7 +644,7 @@ HEADER
       #NAME="EXP_BUF_IN_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI64"
+      #VHDL_TYPE="t_axi4_stream_mosi64"
      }
      LINE  2, 0, 0
      {
@@ -670,7 +662,7 @@ HEADER
       #NAME="RX_CAL_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -688,7 +680,7 @@ HEADER
       #NAME="EXP_BUF_OUT_MISO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -706,7 +698,7 @@ HEADER
       #NAME="S2MM_CMD_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI_CMD32"
+      #VHDL_TYPE="t_axi4_stream_mosi_cmd32"
      }
      LINE  2, 0, 0
      {
@@ -724,7 +716,7 @@ HEADER
       #NAME="MM2S_CMD_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -742,7 +734,7 @@ HEADER
       #NAME="S2MM_DATA_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI64"
+      #VHDL_TYPE="t_axi4_stream_mosi64"
      }
      LINE  2, 0, 0
      {
@@ -760,7 +752,7 @@ HEADER
       #NAME="MM2S_DATA_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI16"
+      #VHDL_TYPE="t_axi4_stream_mosi16"
      }
      LINE  2, 0, 0
      {
@@ -778,7 +770,7 @@ HEADER
       #NAME="S2MM_STS_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -796,7 +788,7 @@ HEADER
       #NAME="MM2S_STS_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI_STATUS"
+      #VHDL_TYPE="t_axi4_stream_mosi_status"
      }
      LINE  2, 0, 0
      {
@@ -814,7 +806,7 @@ HEADER
       #NAME="TX_MGT_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI64"
+      #VHDL_TYPE="t_axi4_stream_mosi64"
      }
      LINE  2, 0, 0
      {
@@ -832,7 +824,7 @@ HEADER
       #NAME="RX_CAL_MOSI"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI64"
+      #VHDL_TYPE="t_axi4_stream_mosi64"
      }
      LINE  2, 0, 0
      {
@@ -850,7 +842,7 @@ HEADER
       #NAME="S2MM_CMD_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -868,7 +860,7 @@ HEADER
       #NAME="S2MM_DATA_MISO"
       #NUMBER="0"
       #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
      }
      LINE  2, 0, 0
      {
@@ -886,7 +878,7 @@ HEADER
       #NAME="S2MM_STS_MOSI"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI_STATUS"
+      #VHDL_TYPE="t_axi4_stream_mosi_status"
      }
      LINE  2, 0, 0
      {
@@ -904,7 +896,58 @@ HEADER
       #NAME="TX_MGT_MISO"
       #NUMBER="0"
       #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+      #VHDL_TYPE="t_axi4_stream_miso"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  70, 0, 0
+    {
+     COORD (0,720)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="EXTERNAL_SEQ_WRITE_DONE"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  74, 0, 0
+    {
+     COORD (0,760)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="BUFFERING_FLAG_UPDATE_DONE"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  76, 0, 0
+    {
+     COORD (480,620)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="BUFFERING_FLAG"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="buffering_flag_type"
      }
      LINE  2, 0, 0
      {
@@ -11487,7 +11530,7 @@ HEADER
 "library IEEE,WORK;\n"+
 "use ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1491917331"
+    #MODIFIED="1586882351"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ac9434f3-afce-47bb-a675-14e185c659e0"
    }
   }
@@ -11496,7 +11539,7 @@ HEADER
    PAGEHEADER
    {
     RECT (0,-100,380,680)
-    FREEID 56
+    FREEID 65
    }
    
    BODY
@@ -11670,6 +11713,22 @@ HEADER
      ALIGN 4
      MARGINS (1,1)
      PARENT 54
+    }
+    TEXT  61, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,570,200,594)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 60
+    }
+    TEXT  63, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,530,355,554)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 62
     }
     PIN  4, 0, 0
     {
@@ -12005,6 +12064,41 @@ HEADER
      LINE  2, 0, 0
      {
       POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  60, 0, 0
+    {
+     COORD (0,580)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="BUFFERING_FLAG"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="BUFFERING_FLAG_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  62, 0, 0
+    {
+     COORD (380,540)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="BUFFERING_FLAG_UPDATE_DONE"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
      }
     }
    }
@@ -13722,7 +13816,8 @@ PAGE ""
 "use IEEE.numeric_std.all;\n"+
 "\n"+
 "library work;\n"+
-"use work.TEL2000.all;"
+"use work.TEL2000.all;\n"+
+"use work.bufferingdefine.all;"
    RECT (220,220,760,520)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(239,235,255),0)
@@ -14029,6 +14124,7 @@ PAGE ""
    {
     #COMPONENT="exposure_time_ctrl"
     #CUSTOM_NAME=""
+    #IMPL="sch"
     #LIBRARY="#default"
     #REFERENCE="EXP_CTRL"
     #SYMBOL="exposure_time_ctrl"
@@ -14232,6 +14328,7 @@ PAGE ""
     #COMPONENT="trig_gen"
     #CUSTOM_NAME=""
     #GENERIC0="TRIG_MEASURE_GEN : boolean := TRIG_MEASURE_GEN"
+    #IMPL="trig_gen"
     #LIBRARY="work"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -14240,7 +14337,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="ac9434f3-afce-47bb-a675-14e185c659e0"
    }
    COORD (1800,2420)
-   VERTEXES ( (4,48313), (6,48311), (8,48319), (14,48333), (20,48331), (22,48329), (24,48315), (28,48306), (30,48335), (32,48321), (34,48303), (36,48308), (38,48324), (44,48301), (46,48309), (48,48318), (50,48325), (52,48328), (54,48832) )
+   VERTEXES ( (4,48313), (6,48311), (8,48319), (14,48333), (16,69503), (20,48331), (22,48329), (24,48315), (28,48306), (30,48335), (32,48321), (34,48303), (36,48308), (38,48324), (44,48301), (46,48309), (48,48318), (50,48325), (52,48328), (54,48832), (60,69866), (62,69868) )
   }
   TEXT  12668, 0, 0
   {
@@ -15960,18 +16057,18 @@ PAGE ""
   TEXT  40834, 0, 0
   {
    TEXT "$#NAME"
-   RECT (5762,2991,5844,3020)
+   RECT (5776,3111,5858,3140)
    ALIGN 9
    MARGINS (1,1)
-   PARENT 69176
+   PARENT 69805
   }
   TEXT  40843, 0, 0
   {
    TEXT "$#NAME"
-   RECT (5764,2951,5843,2980)
+   RECT (5779,3071,5858,3100)
    ALIGN 9
    MARGINS (1,1)
-   PARENT 69173
+   PARENT 69804
   }
   NET RECORD  40888, 0, 0
   {
@@ -16634,25 +16731,26 @@ PAGE ""
   {
    VARIABLES
    {
-    #COMPONENT="Output"
+    #COMPONENT="Input"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
     #REFERENCE="FPGA_TO_FPGA5"
-    #SYMBOL="Output"
+    #SYMBOL="Input"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
-   COORD (6480,2840)
-   VERTEXES ( (2,69219) )
+   COORD (5740,2920)
+   ORIENTATION 3
+   VERTEXES ( (2,69641) )
   }
   TEXT  45058, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (6532,2823,6782,2858)
-   ALIGN 4
+   RECT (5439,2902,5689,2937)
+   ALIGN 6
    MARGINS (1,1)
    PARENT 45057
+   ORIENTATION 4
   }
-  NET WIRE  45062, 0, 0
   INSTANCE  45108, 0, 0
   {
    VARIABLES
@@ -19692,10 +19790,10 @@ PAGE ""
   TEXT  50172, 0, 0
   {
    TEXT "$#NAME"
-   RECT (5756,2911,5848,2940)
+   RECT (5772,3031,5864,3060)
    ALIGN 9
    MARGINS (1,1)
-   PARENT 69170
+   PARENT 69803
   }
   TEXT  50179, 0, 0
   {
@@ -27623,18 +27721,19 @@ PAGE ""
    {
     #COMPONENT="Buffering_wrapper"
     #CUSTOM_NAME=""
+    #IMPL="buffering_wrapper"
     #LIBRARY="work"
     #REFERENCE="U2"
     #SYMBOL="Buffering_wrapper"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="7a04798d-05ac-44da-93b7-fde9218fe3dc"
    }
    COORD (5880,2200)
-   VERTEXES ( (54,69121), (36,69124), (30,69127), (12,69130), (26,69136), (8,69139), (58,69142), (56,69145), (48,69148), (28,69151), (42,69154), (32,69157), (22,69160), (14,69163), (18,69166), (6,69169), (10,69172), (2,69175), (52,69178), (62,69181), (20,69187), (38,69190), (34,69193), (16,69196), (44,69202), (40,69205), (60,69208), (46,69211), (24,69214), (50,69217), (4,69220) )
+   VERTEXES ( (2,69802), (6,69798), (8,69139), (10,69800), (12,69130), (14,69163), (16,69196), (18,69166), (20,69187), (22,69160), (24,69214), (26,69136), (28,69151), (30,69127), (32,69157), (34,69193), (36,69124), (38,69190), (40,69205), (42,69154), (44,69202), (46,69211), (48,69148), (50,69217), (52,69178), (54,69121), (56,69145), (58,69142), (60,69208), (62,69181), (70,69640), (76,69811), (74,69910) )
   }
   TEXT  69096, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (5880,2164,5919,2199)
+   RECT (5880,2144,5919,2179)
    ALIGN 8
    MARGINS (1,1)
    PARENT 69095
@@ -27642,7 +27741,7 @@ PAGE ""
   TEXT  69100, 0, 0
   {
    TEXT "$#COMPONENT"
-   RECT (5880,3060,6119,3095)
+   RECT (5900,3180,6139,3215)
    MARGINS (1,1)
    PARENT 69095
   }
@@ -27893,57 +27992,6 @@ PAGE ""
    NET 44563
    VTX 69165, 69166
   }
-  VTX  69168, 0, 0
-  {
-   COORD (5740,2940)
-  }
-  VTX  69169, 0, 0
-  {
-   COORD (5880,2940)
-  }
-  WIRE  69170, 0, 0
-  {
-   NET 68655
-   VTX 69168, 69169
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
-  VTX  69171, 0, 0
-  {
-   COORD (5740,2980)
-  }
-  VTX  69172, 0, 0
-  {
-   COORD (5880,2980)
-  }
-  WIRE  69173, 0, 0
-  {
-   NET 68637
-   VTX 69171, 69172
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
-  VTX  69174, 0, 0
-  {
-   COORD (5740,3020)
-  }
-  VTX  69175, 0, 0
-  {
-   COORD (5880,3020)
-  }
-  WIRE  69176, 0, 0
-  {
-   NET 9738
-   VTX 69174, 69175
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
   VTX  69177, 0, 0
   {
    COORD (7460,2240)
@@ -28148,19 +28196,6 @@ PAGE ""
     #NAMED="1"
    }
   }
-  VTX  69219, 0, 0
-  {
-   COORD (6480,2840)
-  }
-  VTX  69220, 0, 0
-  {
-   COORD (6360,2840)
-  }
-  WIRE  69221, 0, 0
-  {
-   NET 45062
-   VTX 69219, 69220
-  }
   INSTANCE  69256, 0, 0
   {
    VARIABLES
@@ -28191,6 +28226,220 @@ PAGE ""
    MARGINS (1,1)
    PARENT 69256
   }
+  VTX  69503, 0, 0
+  {
+   COORD (2180,2580)
+  }
+  VTX  69504, 0, 0
+  {
+   COORD (2320,2580)
+  }
+  WIRE  69506, 0, 0
+  {
+   NET 69507
+   VTX 69503, 69504
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  69507, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="PPS_SYNC"
+   }
+  }
+  TEXT  69513, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2186,2550,2315,2579)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 69506
+  }
+  NET WIRE  69636, 0, 0
+  VTX  69640, 0, 0
+  {
+   COORD (5880,2920)
+  }
+  VTX  69641, 0, 0
+  {
+   COORD (5740,2920)
+  }
+  WIRE  69642, 0, 0
+  {
+   NET 69636
+   VTX 69640, 69641
+  }
+  VTX  69797, 0, 0
+  {
+   COORD (5760,3060)
+  }
+  VTX  69798, 0, 0
+  {
+   COORD (5880,3060)
+  }
+  VTX  69799, 0, 0
+  {
+   COORD (5760,3100)
+  }
+  VTX  69800, 0, 0
+  {
+   COORD (5880,3100)
+  }
+  VTX  69801, 0, 0
+  {
+   COORD (5760,3140)
+  }
+  VTX  69802, 0, 0
+  {
+   COORD (5880,3140)
+  }
+  WIRE  69803, 0, 0
+  {
+   NET 68655
+   VTX 69797, 69798
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  69804, 0, 0
+  {
+   NET 68637
+   VTX 69799, 69800
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  69805, 0, 0
+  {
+   NET 9738
+   VTX 69801, 69802
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  69810, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="BUFFERING_FLAG_UPDATE_DONE"
+   }
+  }
+  VTX  69811, 0, 0
+  {
+   COORD (6360,2820)
+  }
+  VTX  69812, 0, 0
+  {
+   COORD (6500,2820)
+  }
+  NET RECORD  69813, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="BUFFERING_FLAG"
+    #VHDL_TYPE="buffering_flag_type"
+    BUFFERING_FLAG_TYPE=""
+    RECORD=""
+   }
+  }
+  RECORD  69814, 0, 0
+  {
+   NET 69813
+   VTX 69811, 69812
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  69815, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (6373,2791,6588,2820)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 69814
+  }
+  TEXT  69819, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5478,2931,5883,2960)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 69912
+  }
+  TEXT  69837, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1573,2971,1788,3000)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 69867
+  }
+  TEXT  69838, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2178,2931,2583,2960)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 69870
+  }
+  VTX  69865, 0, 0
+  {
+   COORD (1520,3000)
+  }
+  VTX  69866, 0, 0
+  {
+   COORD (1800,3000)
+  }
+  RECORD  69867, 0, 0
+  {
+   NET 69813
+   VTX 69865, 69866
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  69868, 0, 0
+  {
+   COORD (2180,2960)
+  }
+  VTX  69869, 0, 0
+  {
+   COORD (2480,2960)
+  }
+  WIRE  69870, 0, 0
+  {
+   NET 69810
+   VTX 69868, 69869
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  69910, 0, 0
+  {
+   COORD (5880,2960)
+  }
+  VTX  69911, 0, 0
+  {
+   COORD (5720,2960)
+  }
+  WIRE  69912, 0, 0
+  {
+   NET 69810
+   VTX 69910, 69911
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
  }
  
 }
@@ -28216,7 +28465,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  69265, 0, 0
+  TEXT  69913, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -28227,7 +28476,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  69266, 0, 0
+  TEXT  69914, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -28238,7 +28487,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  69267, 0, 0
+  TEXT  69915, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -28248,7 +28497,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  69268, 0, 0
+  TEXT  69916, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -28260,7 +28509,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  69269, 0, 0
+  TEXT  69917, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -28273,7 +28522,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  69270, 0, 0
+  TEXT  69918, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -28283,7 +28532,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  69271, 0, 0
+  TEXT  69919, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -28295,7 +28544,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  69272, 0, 0
+  TEXT  69920, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -28305,7 +28554,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  69273, 0, 0
+  TEXT  69921, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -28316,7 +28565,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  69274, 0, 0
+  GROUP  69922, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8220,9401,8601)
@@ -28328,7 +28577,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  69275, 0, 0
+  GROUP  69923, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8420,9401,8421)
@@ -28340,7 +28589,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  69276, 0, 0
+  GROUP  69924, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8360,9401,8361)
@@ -28352,7 +28601,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  69277, 0, 0
+  GROUP  69925, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8480,9401,8481)
@@ -28364,7 +28613,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  69278, 0, 0
+  GROUP  69926, 0, 0
   {
    PAGEALIGN 10
    RECT (8520,8540,9401,8541)
@@ -28376,7 +28625,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  69279, 0, 0
+  GROUP  69927, 0, 0
   {
    PAGEALIGN 10
    RECT (8700,8220,8701,8361)
@@ -28387,7 +28636,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  69280, 0, 0
+  GROUP  69928, 0, 0
   {
    PAGEALIGN 10
    RECT (8700,8360,8701,8601)
@@ -28398,7 +28647,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  69281, 0, 0
+  BMPPICT  69929, 0, 0
   {
    PAGEALIGN 10
    RECT (8540,8280,8679,8325)

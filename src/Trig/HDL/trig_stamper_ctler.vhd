@@ -17,7 +17,7 @@ use IEEE.numeric_std.all;
 use work.trig_define.all;
 use work.tel2000.all;
 use work.img_header_define.all;
-
+use work.BufferingDefine.all;
 
 entity trig_stamper_ctler is
    port(
@@ -32,7 +32,11 @@ entity trig_stamper_ctler is
       FPA_IMG_INFO            : in img_info_type; 
       
       -- External trigger
-      EXT_TRIG                : in std_logic;
+      EXT_TRIG                : in std_logic;  
+      
+      -- Buffering  
+      BUFFERING_FLAG          : in buffering_flag_type;
+      BUFFERING_FLAG_UPDATE_DONE : out std_logic; 
       
       -- New time from MB
       MB_TIME_SEC             : in std_logic_vector(31 downto 0); -- New PowerPC POSIXTime 
@@ -75,8 +79,10 @@ architecture RTL of trig_stamper_ctler is
    end component;
    
    type fast_hder_sm_type is (idle, send_hder_st);
-   
-   signal fast_hder_sm              : fast_hder_sm_type;
+   signal fast_hder_sm              : fast_hder_sm_type; 
+   type   buffering_flag_update_sm_type is (idle_st, moi_check_st);
+   signal buffering_flag_update_sm  : buffering_flag_update_sm_type;
+
    signal sreset                    : std_logic;
    signal seconds_cnt               : unsigned(31 downto 0);
    signal subseconds_cnt            : unsigned(23 downto 0);
@@ -100,7 +106,11 @@ architecture RTL of trig_stamper_ctler is
    signal hcnt                      : unsigned(7 downto 0);
    signal hder_link_rdy             : std_logic;
    signal frame_id                  : std_logic_vector(31 downto 0);
-   
+   signal buffering_flag_val_i      : std_logic_vector(BUFFERING_FLAG.val'range);
+   signal buffering_flag_val_sync   : std_logic_vector(BUFFERING_FLAG.val'range);
+   signal buffering_flag_update_done_i : std_logic;
+   signal buffering_dval_re         : std_logic;
+
 begin      
    
    HDER_MOSI <= hder_mosi_i;   
@@ -110,12 +120,17 @@ begin
    exposure_feedbk <= FPA_IMG_INFO.EXP_FEEDBK;
    hder_link_rdy <= HDER_MISO.WREADY and HDER_MISO.AWREADY;
    
+   
+   BUFFERING_FLAG_UPDATE_DONE <= buffering_flag_update_done_i;
+
+   
    -- Detect various rising edges   
    E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => CLK_10M, sre => clk_10M_re, re => open, fe => open, sfe => open);      
    E2 : gh_edge_det port map(clk => CLK, rst => sreset, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
    E3 : gh_edge_det port map(clk => CLK, rst => sreset, D => exposure_feedbk, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
    E4 : gh_edge_det port map(clk => CLK, rst => sreset, D => PPS_sync_i, sre => pps_re, re => open, fe => open, sfe => open); 
    E5 : gh_edge_det port map(clk => CLK, rst => sreset, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
+   E6 : gh_edge_det port map(clk => CLK, rst => sreset, D => BUFFERING_FLAG.dval, sre => buffering_dval_re, re => open, fe => open, sfe => open); 
    
    -----------------------------------------------------
    -- Synchronisation reset
@@ -188,8 +203,9 @@ begin
          if exposure_feedbk_re = '1' then
             time_stamp_i.Seconds <= seconds_cnt;    
             time_stamp_i.SubSeconds <= subseconds_cnt;
-            img_time_stamp_rdy <= '1';
             frame_id <= std_logic_vector(FPA_IMG_INFO.FRAME_ID);
+            buffering_flag_val_i <= buffering_flag_val_sync; 
+            img_time_stamp_rdy <= '1';
          else
             img_time_stamp_rdy <= '0'; 
          end if;
@@ -204,7 +220,7 @@ begin
          
       end if;      
    end process;                                                         
-   
+
    ---------------------------------------------------------------------
    -- Process for PPS Time-out
    ---------------------------------------------------------------------
@@ -266,13 +282,21 @@ begin
                
                when send_hder_st =>
                   if hder_link_rdy = '1' then 
-                     if hcnt = 1 then    -- Posix Time seconds
+                     if hcnt = 1 then    -- Buffering Flag  
+                        hder_mosi_i.awaddr <= x"0000" & frame_id(7 downto 0) & resize(BufferingFlagAdd32, 8);--
+                        hder_mosi_i.awvalid <= '1';
+                        hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(buffering_flag_val_i), 32), BufferingFlagShift));
+                        hder_mosi_i.wvalid <= '1';
+                        hder_mosi_i.wstrb <= BufferingFlagBWE; 
+                        
+                     elsif hcnt = 2 then -- Posix Time seconds
                         hder_mosi_i.awaddr <= x"0000" & frame_id(7 downto 0) & resize(POSIXTimeAdd32, 8);--
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(time_stamp_i.Seconds);
                         hder_mosi_i.wvalid <= '1';
-                        hder_mosi_i.wstrb <= POSIXTimeBWE;                        
-                     elsif hcnt = 2 then -- Posix Time Subseconds et x"FFFF" pour signaler la fin
+                        hder_mosi_i.wstrb <= POSIXTimeBWE;
+
+                     elsif hcnt = 3 then -- Posix Time Subseconds et x"FFFF" pour signaler la fin
                         hder_mosi_i.awaddr <= x"FFFF" & frame_id(7 downto 0) & resize(SubSecondTimeAdd32, 8);--
                         hder_mosi_i.awvalid <= '1';
                         hder_mosi_i.wdata <= std_logic_vector(resize(time_stamp_i.SubSeconds, 32));
@@ -293,5 +317,55 @@ begin
          end if;       
       end if;		  
    end process;
+
+   ---------------------------------------------------------------------
+   -- Process to handle buffering flag update
+   ---------------------------------------------------------------------
+   U6: process(CLK)
+   begin
+      if rising_edge(CLK) then
+      
+         if sreset = '1' then  
+            
+            buffering_flag_update_sm <= idle_st;
+            buffering_flag_val_sync <= NONE_FLAG;
+            buffering_flag_update_done_i <= '1'; 
+            
+         else  
+           
+            case buffering_flag_update_sm is
+            
+               when idle_st => 
+               
+                  buffering_flag_update_done_i <= '1';
+                  if buffering_dval_re = '1' then  
+                     buffering_flag_update_done_i <= '0';
+                     buffering_flag_val_sync <= BUFFERING_FLAG.val;
+                     buffering_flag_update_sm <= moi_check_st;
+                  end if;
+                  
+               when moi_check_st => 
+               
+                  
+                     
+                     if buffering_dval_re = '1' then 
+                        buffering_flag_update_sm <= idle_st; 
+                     elsif BUFFERING_FLAG.dval = '0' then
+                        if buffering_flag_val_sync = MOI_FLAG then
+                           if img_time_stamp_rdy = '1' then 
+                              buffering_flag_update_sm <= idle_st;   
+                           end if;
+                        else 
+                           buffering_flag_update_sm <= idle_st;
+                        end if;
+                     end if;     
+
+               when others =>
+            
+            end case;
+         end if;
+      end if;		  
+   end process;
+   
    
 end RTL;

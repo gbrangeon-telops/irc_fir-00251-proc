@@ -35,11 +35,13 @@ entity scd_data_dispatcher is
    port(
       
       ARESET            : in std_logic;
-      CLK               : in std_logic;
+      CLK               : in std_logic; 
       
       ACQ_INT           : in std_logic;  -- ACQ_INT et FRAME_ID sont parfaitement synchdonisés
+      FPA_INT           : in std_logic;
       FRAME_ID          : in std_logic_vector(31 downto 0);
       INT_INDX          : in std_logic_vector(7 downto 0);
+      INT_TIME          : in std_logic_vector(23 downto 0);
       
       FPA_INTF_CFG      : in fpa_intf_cfg_type;
       
@@ -77,8 +79,9 @@ entity scd_data_dispatcher is
       FIFO_ERR          : out std_logic;
       SPEED_ERR         : out std_logic;
       CFG_MISMATCH      : out std_logic;
-      DONE              : out std_logic
+      DONE              : out std_logic; 
       
+      TRIG_CTLER_STAT   : in std_logic_vector(7 downto 0)  
       --FPA_TEMP_STAT     : out fpa_temp_stat_type      
       );
 end scd_data_dispatcher;
@@ -135,14 +138,14 @@ architecture rtl of scd_data_dispatcher is
          );
    end component;
    
-   component fwft_sfifo_w40_d16
+   component fwft_sfifo_w64_d16
       port (
          clk       : in std_logic;
          srst       : in std_logic;
-         din       : in std_logic_vector(39 downto 0);
+         din       : in std_logic_vector(63 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
-         dout      : out std_logic_vector(39 downto 0);
+         dout      : out std_logic_vector(63 downto 0);
          valid     : out std_logic;
          full      : out std_logic;
          overflow  : out std_logic;
@@ -150,22 +153,35 @@ architecture rtl of scd_data_dispatcher is
          );
    end component;
    
+   component fwft_sfifo_w3_d16
+      port (
+         clk         : in std_logic;
+         srst        : in std_logic;
+         din         : in std_logic_vector(2 downto 0);
+         wr_en       : in std_logic;
+         rd_en       : in std_logic;
+         dout        : out std_logic_vector(2 downto 0);
+         full        : out std_logic;
+         almost_full : out std_logic;
+         overflow    : out std_logic;
+         empty       : out std_logic;
+         valid       : out std_logic
+         );
+   end component;   
    
    type mode_fsm_type is (idle, wait_fpa_fval_st, wait_diag_fval_st);
-   type fast_hder_sm_type is (idle, send_hder_st);                   
+   type fast_hder_sm_type is (idle, send_hder_st, wait_acq_hder_st);                   
    type pix_out_sm_type is (idle, send_pix_st); 
-   type acq_fringe_fsm_type is (init_st, idle, wait_fpa_fval_st, wait_diag_fval_st);
+   type frame_fsm_type is (init_st, idle, wait_fpa_fval_st, wait_diag_fval_st);
    type byte_array is array (0 to 3) of std_logic_vector(7 downto 0);
    
    signal mode_fsm                     : mode_fsm_type;
    signal fast_hder_sm                 : fast_hder_sm_type;
    signal pix_out_sm                   : pix_out_sm_type;
-   signal acq_fringe_fsm               : acq_fringe_fsm_type;
+   signal frame_fsm                    : frame_fsm_type;
    signal sreset                       : std_logic;
    signal real_data_mode               : std_logic;
    signal diag_mode_en_i               : std_logic;
-   signal fpa_hder_data                : byte_array;
-   signal img_cnt                      : unsigned(31 downto 0);
    signal fpa_fifo_dval                : std_logic;
    signal diag_fifo_dval               : std_logic;
    signal fpa_ch1_fifo_dval            : std_logic;
@@ -179,8 +195,9 @@ architecture rtl of scd_data_dispatcher is
    signal fpa_header                   : std_logic;
    signal fpa_lval                     : std_logic;
    signal fpa_dval                     : std_logic;
-   signal acq_fringe_last              : std_logic;
+   signal acq_hder_last                : std_logic;
    signal fpa_fval                     : std_logic;
+   signal fpa_fval_last                : std_logic;
    signal diag_pix1_data               : std_logic_vector(15 downto 0);
    signal diag_ch1_fifo_dout           : std_logic_vector(27 downto 0);
    signal diag_pix2_data               : std_logic_vector(15 downto 0);
@@ -188,7 +205,6 @@ architecture rtl of scd_data_dispatcher is
    signal diag_header                  : std_logic;
    signal diag_lval                    : std_logic;
    signal diag_dval                    : std_logic;
-   --signal diag_fval_last               : std_logic;
    signal diag_fval                    : std_logic;
    signal fpa_ch2_header               : std_logic;
    signal fpa_ch2_lval                 : std_logic;
@@ -199,18 +215,17 @@ architecture rtl of scd_data_dispatcher is
    signal diag_fifo_rd                 : std_logic;
    signal diag_ch1_fifo_ovfl           : std_logic;
    signal diag_ch2_fifo_ovfl           : std_logic;
-   signal fringe_fifo_din              : std_logic_vector(39 downto 0);
-   signal fringe_fifo_wr               : std_logic;
-   signal fringe_fifo_rd               : std_logic;
-   signal fringe_fifo_dout             : std_logic_vector(39 downto 0);
-   signal fringe_fifo_dval             : std_logic;
-   signal fringe_fifo_ovfl             : std_logic;
+   signal acq_hder_fifo_din            : std_logic_vector(63 downto 0);
+   signal acq_hder_fifo_wr             : std_logic;
+   signal acq_hder_fifo_rd             : std_logic;
+   signal acq_hder_fifo_dout           : std_logic_vector(63 downto 0);
+   signal acq_hder_fifo_dval           : std_logic;
+   signal acq_hder_fifo_ovfl           : std_logic;
    signal acq_int_last                 : std_logic;
    signal acq_eof                      : std_logic;
    signal readout_i                    : std_logic;
-   signal acq_fringe                   : std_logic;
+   signal acq_hder                     : std_logic;
    signal frame_id_i                   : std_logic_vector(31 downto 0);
-   signal fpa_hder_dval                : std_logic;
    signal fpa_acq_eof                  : std_logic;
    signal diag_img_dval                : std_logic;
    signal diag_hder_dval               : std_logic;
@@ -265,6 +280,30 @@ architecture rtl of scd_data_dispatcher is
    signal byte_18                      : std_logic_vector(7 downto 0);
    signal byte_19                      : std_logic_vector(7 downto 0);
    signal byte_20                      : std_logic_vector(7 downto 0);
+   signal readout_last                 : std_logic;
+   
+   signal int_fifo_rd                  : std_logic;
+   signal int_fifo_din                 : std_logic_vector(2 downto 0) := (others => '0'); -- non utilisé
+   signal int_fifo_wr                  : std_logic;
+   signal int_fifo_dval                : std_logic;
+   signal int_fifo_dval_last           : std_logic;
+   signal int_fifo_dout                : std_logic_vector(2 downto 0);
+
+   signal true_fpa_int_i               : std_logic;
+   signal true_fpa_int_last            : std_logic;
+   signal true_fpa_int_re              : std_logic;
+   signal itr_int_fifo_wr              : std_logic;
+   signal iwr_int_fifo_wr1             : std_logic;
+   signal iwr_int_fifo_wr2             : std_logic;
+   
+   signal int_time_i                   : unsigned(23 downto 0);
+   constant HDR_SEND_CLK_DELAY         : integer := 6;
+   signal exp_dval_pipe                : std_logic_vector(HDR_SEND_CLK_DELAY -1 downto 0) := (others => '0');
+   signal int_time_100MHz_dval         : std_logic;
+   
+   signal acq_mode_first_int           : std_logic; 
+   signal nacq_mode_first_int          : std_logic;
+   signal acq_mode                     : std_logic;
    
    -- -- attribute dont_touch                         : string;
    -- -- attribute dont_touch of hder_mosi_i          : signal is "true";
@@ -282,13 +321,13 @@ architecture rtl of scd_data_dispatcher is
    
    
 begin
-   
+
    HDER_MOSI <= hder_mosi_i;
    PIX_MOSI <= pix_mosi_i;
    DISPATCH_INFO <= dispatch_info_i;
    
    READOUT <= readout_i;
-   DIAG_MODE_EN <= diag_mode_en_i;
+   DIAG_MODE_EN <= diag_mode_en_i; 
    hder_link_rdy <= HDER_MISO.WREADY and HDER_MISO.AWREADY;
    pix_link_rdy <= PIX_MISO.TREADY;
    
@@ -300,6 +339,9 @@ begin
    -- lecture des fifos DIAG           
    diag_fifo_rd <= diag_ch1_fifo_dval and diag_ch2_fifo_dval; -- lecture synchronisée des 2 fifos tout le temps. (ssi les donn diag_ch1_fifo_dval ='1' ET  diag_ch2_fifo_dval ='1')        
    
+   acq_mode_first_int <= TRIG_CTLER_STAT(5);
+   acq_mode <= TRIG_CTLER_STAT(4);
+   nacq_mode_first_int <= TRIG_CTLER_STAT(1);
    
    ------------------------------------------------------
    -- decodage données sortant du fifo en mode fpa
@@ -490,22 +532,41 @@ begin
    --------------------------------------------------
    -- fifo fwft pour acq fringe et l'index de intTime
    --------------------------------------------------
-   U6 : fwft_sfifo_w40_d16
+   U6 : fwft_sfifo_w64_d16
    port map (
       srst => sreset,
       clk => CLK,
-      din => fringe_fifo_din,
-      wr_en => fringe_fifo_wr,
-      rd_en => fringe_fifo_rd,
-      dout => fringe_fifo_dout,
-      valid  => fringe_fifo_dval,
+      din => acq_hder_fifo_din,
+      wr_en => acq_hder_fifo_wr,
+      rd_en => acq_hder_fifo_rd,
+      dout => acq_hder_fifo_dout,
+      valid  => acq_hder_fifo_dval,
       full => open,
-      overflow => fringe_fifo_ovfl,
+      overflow => acq_hder_fifo_ovfl,
       empty => open
       );
    
+      
+   --------------------------------------------------
+   -- fifo fwft pour edge de l'intégration
+   --------------------------------------------------
+   Ue : fwft_sfifo_w3_d16
+   port map (
+      clk         => CLK,
+      srst        => sreset,
+      din         => int_fifo_din,    
+      wr_en       => int_fifo_wr,
+      rd_en       => int_fifo_rd,
+      dout        => int_fifo_dout,   
+      full        => open,
+      almost_full => open,
+      overflow    => open,
+      empty       => open,
+      valid       => int_fifo_dval
+      );
+      
    -------------------------------------------------------------------
-   -- generation de acq_fringe et stockage dans un fifo fwft  
+   -- generation de acq_hder et stockage dans un fifo fwft  
    -------------------------------------------------------------------   
    -- il faut ecrire dans un fifo fwft le FRAME_ID, que lorsque l'image est prise avec ACQ_TRIG (image à envoyer dans la chaine) 
    -- a) Fifo vide pendant qu'une image rentre dans le présent module => image à ne pas envoyer dans la chaine
@@ -514,77 +575,103 @@ begin
    begin          
       if rising_edge(CLK) then         
          if sreset = '1' then 
-            acq_fringe_fsm <= init_st;
-            fringe_fifo_wr <= '0';
-            fringe_fifo_rd <= '0';
-            acq_fringe <= '0';
+            frame_fsm <= init_st;
+            acq_hder_fifo_wr <= '0';
+            acq_hder_fifo_rd <= '0';
+            acq_hder <= '0';
             readout_i <= '0';
             acq_finge_assump_err <= '0';
+            
+            int_fifo_wr <= '0';
+            int_fifo_rd <= '0';
+            true_fpa_int_i    <= '0';
+            true_fpa_int_last <= '0'; 
+            true_fpa_int_re   <= '0'; 
+            itr_int_fifo_wr  <= '0';
+            iwr_int_fifo_wr1 <= '0';
+            iwr_int_fifo_wr2 <= '0';
             
          else         
             
             acq_int_last <= ACQ_INT;
             
             -- ecriture de FRAME_ID dans le acq fringe fifo
-            if ACQ_INT = '1' and acq_int_last = '0' then
-               fringe_fifo_din <= INT_INDX & FRAME_ID; -- le frame_id est écrit dans le fifo que s'il s'agit d'une image à envoyer dans la chaine
-               fringe_fifo_wr <= '1';
-            else
-               fringe_fifo_wr <= '0';
-            end if;
+            acq_hder_fifo_din <= INT_INDX & INT_TIME & FRAME_ID; -- le frame_id est écrit dans le fifo que s'il s'agit d'une image à envoyer dans la chaine
+            acq_hder_fifo_wr <= not acq_int_last and ACQ_INT;
             
-            -- generation de acq_fringe et readout_i
+            -- ecriture du data fifo
+            true_fpa_int_i    <= FPA_INT;                                      -- and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
+            true_fpa_int_last <= true_fpa_int_i;
+            true_fpa_int_re   <= (not true_fpa_int_last and true_fpa_int_i);
             
-            case acq_fringe_fsm is 
+            itr_int_fifo_wr   <= true_fpa_int_re and acq_mode and not FPA_INTF_CFG.scd_op.scd_int_mode(0);                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
+            iwr_int_fifo_wr1  <= true_fpa_int_re and acq_mode and not acq_mode_first_int and FPA_INTF_CFG.scd_op.scd_int_mode(0);  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
+            iwr_int_fifo_wr2  <= true_fpa_int_re and nacq_mode_first_int and FPA_INTF_CFG.scd_op.scd_int_mode(0);              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
+            
+            int_fifo_wr <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;
+            
+            
+            -- generation de acq_hder et readout_i
+            
+            case frame_fsm is 
                
                when init_st => -- cet état est celui d'une verification des conditions initiales pour que la fsm marche comme prévu
-                  if fringe_fifo_dval = '0' then 
+                  if acq_hder_fifo_dval = '0' then 
                      if fpa_fval = '0' and  diag_fval = '0' then 
-                        acq_fringe_fsm <= idle;
+                        frame_fsm <= idle;
                      end if;
                   else                     
                      acq_finge_assump_err <= '1'; -- erreur grave s'il y a déjà qque chose dans le fifo juste après un reset
                   end if;
                
                when idle =>
-                  fringe_fifo_rd <= '0';
+                  acq_hder_fifo_rd <= '0';
+                  int_fifo_rd <= '0';
                   readout_i <= '0';
-                  acq_fringe <= fringe_fifo_dval; -- ACQ_INT de l'image k vient toujours avant le readout de l'image k. Ainsi le fifo contiendra une donnée avant le readout si l'image est à envoyer dans la chaine. Sinon, c'est une XTRA_FRINGE 
-                  if fringe_fifo_dval = '1' then  
-                     frame_id_i <= fringe_fifo_dout(FRAME_ID'length-1 downto 0);
-                     int_indx_i <= fringe_fifo_dout(FRAME_ID'length+7 downto FRAME_ID'length);
+                  acq_hder <= acq_hder_fifo_dval; -- ACQ_INT de l'image k vient toujours avant le readout de l'image k. Ainsi le fifo contiendra une donnée avant le readout si l'image est à envoyer dans la chaine. 
+                  if acq_hder_fifo_dval = '1' then  
+                     frame_id_i <= acq_hder_fifo_dout(31 downto 0);
+                     int_time_i <= unsigned(acq_hder_fifo_dout(55 downto 32));
+                     int_indx_i <= acq_hder_fifo_dout(63 downto 56);
                   else
                      frame_id_i <= FRAME_ID; -- id farfelue d'une extra_fringe provenant du module hw_driver (de toute façon, non envoyée dans la chaine)
                      --int_indx_i <= INT_INDX; -- pour eviter bug de index
                   end if;
+                  
                   if real_data_mode = '1' then 
-                     if fpa_fval = '1' then     -- en quittant idle, frame_id_i et acq_fringe sont implicitement latchés, donc pas besoin de latchs explicites
-                        acq_fringe_fsm <= wait_fpa_fval_st;
-                        fringe_fifo_rd <= '1'; -- mis à jour de la sortie du fwft pour le prochain frame
-                        readout_i <= '1'; -- signal de readout, à sortir même en mode xtra_trig
+                     if fpa_fval = '1' then     -- en quittant idle, frame_id_i et acq_hder sont implicitement latchés, donc pas besoin de latchs explicites
+                        frame_fsm <= wait_fpa_fval_st;
+                        acq_hder_fifo_rd <= int_fifo_dval; -- mis à jour de la sortie du fwft pour le prochain frame
+                        readout_i <= '1'; -- signal de readout, à sortir même en mode xtra_trig 
                      end if;
                   else
                      if diag_fval = '1' then
-                        acq_fringe_fsm <= wait_diag_fval_st;
-                        fringe_fifo_rd <= '1'; -- mis à jour de la sortie du fwft pour le prochain frame
+                        frame_fsm <= wait_diag_fval_st;
+                        acq_hder_fifo_rd <= int_fifo_dval; -- mis à jour de la sortie du fwft pour le prochain frame
                         readout_i <= '1'; -- signal de readout, à sortir même en mode xtra_trig
                      end if;
                   end if;
                
                when wait_fpa_fval_st =>
-                  fringe_fifo_rd <= '0';
+                  acq_hder_fifo_rd <= '0';
                   if fpa_fval = '0' then
                      readout_i <= '0';
-                     acq_fringe <= '0';
-                     acq_fringe_fsm <= idle;
+                     if acq_hder = '1' and int_fifo_dval = '1' then
+                        acq_hder <= '0';
+                        int_fifo_rd <= '1';
+                     end if;
+                     frame_fsm <= idle;
                   end if;
                
                when wait_diag_fval_st =>
-                  fringe_fifo_rd <= '0';
+                  acq_hder_fifo_rd <= '0';
                   if diag_fval = '0' then
-                     readout_i <= '0';
-                     acq_fringe <= '0';
-                     acq_fringe_fsm <= idle;
+                     readout_i <= '0'; 
+                     if acq_hder = '1' and int_fifo_dval = '1' then
+                        acq_hder <= '0';
+                        int_fifo_rd <= '1';
+                     end if;
+                     frame_fsm <= idle;
                   end if;              
                
                when others =>
@@ -594,7 +681,7 @@ begin
          end if;         
       end if;
    end process;
-   
+ 
    -------------------------------------------------------------------
    -- gestion des differents modes
    -------------------------------------------------------------------  
@@ -647,12 +734,10 @@ begin
    begin          
       if rising_edge(CLK) then 
          if sreset = '1' then 
-            fpa_hder_dval <= '0';
             fpa_acq_eof <= '0'; 
             diag_img_dval <= '0';
             diag_hder_dval <= '0';
             diag_acq_eof <= '0';
-            acq_fringe_last <= '0';
             fpa_hder_assump_err <= '0';
             diag_acq_eof <= '0';
             fpa_acq_eof <= '0';
@@ -660,7 +745,8 @@ begin
             
          else             
             
-            acq_fringe_last <= acq_fringe;
+            int_fifo_dval_last <= int_fifo_dval;
+            
             fpa_hder_assump_err <= '0';
             fpa_pix_res_bit_shift := to_integer(unsigned(FPA_INTF_CFG.scd_op.scd_pix_res));
             fpa_pix_max <= x"7FFF" srl fpa_pix_res_bit_shift;
@@ -669,7 +755,7 @@ begin
             pix_dval_i <= pix_dval_temp;
             pix_data_i <= pix2_data_temp & pix1_data_temp;
             if real_data_mode = '1' then 
-               pix_dval_temp <= fpa_fifo_rd and fpa_fifo_dval and not fpa_header and fpa_dval and acq_fringe;
+               pix_dval_temp <= fpa_fifo_rd and fpa_fifo_dval and not fpa_header and fpa_dval and int_fifo_dval;
                -- verify overflow on the number of bits corresponding to resolution
                if unsigned(fpa_pix1_data) > fpa_pix_max then
                   pix1_data_temp <= std_logic_vector(fpa_pix_max);
@@ -682,114 +768,20 @@ begin
                   pix2_data_temp <= fpa_pix2_data;
                end if;
             else
-               pix_dval_temp <= diag_fifo_rd and diag_fifo_dval and not diag_header and diag_dval and acq_fringe;
+               pix_dval_temp <= diag_fifo_rd and diag_fifo_dval and not diag_header and diag_dval and int_fifo_dval;
                pix1_data_temp <= diag_pix1_data;
                pix2_data_temp <= diag_pix2_data;
             end if;
-            
-            -- le header en provenance du fpa doit sortir en tout temps pour aller vers l'extracteur de données. On mettra ainsi à jour les signes vitaux du détecteur (la température etc...) si possible
-            -- le hder ne sport pas identique sur les deux canaux
-            fpa_hder_data(0) <= fpa_pix1_data(7 downto 0);               
-            fpa_hder_data(1) <= fpa_pix1_data(15 downto 8);
-            fpa_hder_data(2) <= fpa_pix2_data(7 downto 0);
-            fpa_hder_data(3) <= fpa_pix2_data(15 downto 8);
-            fpa_hder_dval <= fpa_fifo_rd and fpa_fifo_dval and fpa_header and fpa_dval and acq_fringe;          
-            
+                   
             -- generation de EOF (pas forcement synchro sur la derniere donnee mais ce n'est pas grave)
-            fpa_acq_eof <= (acq_fringe_last and not acq_fringe) and real_data_mode;   -- generé seulement en mode non xtratrig
-            diag_acq_eof <= (acq_fringe_last and not acq_fringe) and not real_data_mode; -- generé seulement en mode non xtratrig
+            fpa_acq_eof <= (int_fifo_dval_last and not int_fifo_dval) and real_data_mode;   -- generé seulement en mode non xtratrig
+            diag_acq_eof <= (int_fifo_dval_last and not int_fifo_dval) and not real_data_mode; -- generé seulement en mode non xtratrig
             acq_eof <= fpa_acq_eof or diag_acq_eof;
             
          end if;
       end if;
    end process;
-   
-   -------------------------------------------------------------------
-   -- fpa header extractor (juste en mode réel)
-   -------------------------------------------------------------------   
-   U10: process(CLK)
-   begin          
-      if rising_edge(CLK) then         
-         
-         fpa_temp_reg_dval <= '0';
-         fpa_int_time_assump_err <= '0';
-         fpa_gain_assump_err <= '0';
-         fpa_mode_assump_err <= '0';
-         int_time_mismatch <= '0';
-         ysize_mismatch <= '0';
-         xsize_mismatch <= '0';
-         gain_mismatch <= '0';
-         fpa_temp_i.temp_dval <= '0';
-         
-         if fpa_header = '1' then       
-            
-            if fpa_hder_dval = '1' then
-               hder_cnt <= hder_cnt + 1;
-               
-               case to_integer(hder_cnt) is
-                  when 0 =>   -- Byte 0
-                     frame_start_id  <= fpa_hder_data(0);  -- Frame Start 
-                  
-                  when 4 =>   --  Byte[16 to 19]
-                     last_cmd_id     <= fpa_hder_data(1) & fpa_hder_data(0); -- last successful command ID / failure ID
-                     byte_18         <= fpa_hder_data(2);
-                     byte_19         <= fpa_hder_data(3);
-                  
-                  when 5 =>   -- byte 20
-                     byte_20         <= fpa_hder_data(0);
-                  
-                  when 6 =>   -- Byte[26:24]
-                     fpa_int_time(23 downto 0) <= unsigned(fpa_hder_data(2)) & unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0));    -- temps d'integration
-                  
-                  when 8 =>   -- Byte[33:32] Byte[35:34]
-                     fpa_ysize <= resize((unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0))), fpa_ysize'length);
-                     fpa_xsize <= resize((unsigned(fpa_hder_data(3)) & unsigned(fpa_hder_data(2))), fpa_xsize'length);              
-                  
-                  when 11 => -- Byte[47..46]
-                     fpa_temp_pos <= unsigned(fpa_hder_data(3)) &  unsigned(fpa_hder_data(2));                -- fpa_temp_pos
-                  
-                  when 12 => -- Byte[49..48]
-                     fpa_temp_neg <= unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0));                 -- fpa_temp_neg                      
-                  
-                  when 13 =>
-                     fpa_temp_reg <= std_logic_vector(fpa_temp_pos - fpa_temp_neg);                           -- température Raw
-                     fpa_temp_reg_dval <= '1';
-                  
-                  when 60 =>  -- on fait les checks à 60 (ie proche de la fin)
-                     if fpa_int_time /= FPA_INTF_CFG.SCD_INT.SCD_INT_TIME(23 downto 0) then
-                        int_time_mismatch <= '1';
-                     end if;
-                     if fpa_ysize /= FPA_INTF_CFG.SCD_OP.SCD_YSIZE then
-                        ysize_mismatch <= '1';
-                     end if;
-                     if fpa_xsize /= FPA_INTF_CFG.SCD_OP.SCD_XSIZE then
-                        xsize_mismatch <= '1';
-                     end if; 
-                     
-                  
-                  when others => 
-                     
-                  
-               end case;
-            end if;
-            
-         else
-            hder_cnt <= (others => '0');            
-         end if;       
-         
-         -- latch de la température du détecteur
-         if fpa_temp_reg_dval = '1' then  
-            fpa_temp_i.temp_data <= resize(fpa_temp_reg, 32);
-            fpa_temp_i.temp_dval <= '1';
-         end if;
-         -- pragma translate_off
-         fpa_temp_i.fpa_pwr_on_temp_reached <= '1';
-         -- pragma translate_on
-         
-      end if;
-      
-   end process; 
-   
+ 
    -------------------------------------------------------------------
    -- Sorties des données
    -------------------------------------------------------------------   
@@ -800,8 +792,10 @@ begin
             fast_hder_sm <= idle;
             pix_out_sm <= idle;
             diag_header_last <= diag_header;
-            fpa_header_last <= fpa_header;
-            hder_mosi_i.awvalid <= '0';
+            fpa_header_last <= fpa_header;          
+            acq_hder_last <= '0';
+            
+            hder_mosi_i.awvalid <= '0';                
             hder_mosi_i.wvalid <= '0';
             hder_mosi_i.wstrb <= (others => '0');
             hder_mosi_i.awprot <= (others => '0');
@@ -832,8 +826,17 @@ begin
             acq_eof_pipe <= (others => '0');
             acq_eof_i <= '0';
             dispatch_info_i.exp_feedbk <= '0';
-            dispatch_info_i.exp_info.exp_dval <= '0';
+            dispatch_info_i.exp_info.exp_dval <= '0'; 
+            
+            exp_dval_pipe <= (others => '0');
          else            
+            
+            acq_hder_last <= acq_hder;
+            
+            exp_dval_pipe(0) <= acq_hder and not acq_hder_last;
+            for i in 1 to HDR_SEND_CLK_DELAY-1 loop
+                exp_dval_pipe(i) <= exp_dval_pipe(i-1);        
+            end loop;
             
             -- pipe de eof : fait pour tenir compte des delais dans le module.
             acq_eof_pipe(0) <= acq_eof;      
@@ -844,21 +847,21 @@ begin
             -- construction des données hder fast
             diag_header_last <= diag_header;
             fpa_header_last <= fpa_header;            
-            fpa_int_time_100MHz <= to_unsigned((to_integer(fpa_int_time)*10)/8, 32); -- fpa_int_time est en coups de 80MHz et fpa_int_time_100MHz doit être en coups de 100MHz
+            fpa_int_time_100MHz <= to_unsigned((to_integer(int_time_i)*10)/8, 32); -- fpa_int_time est en coups de 80MHz et fpa_int_time_100MHz doit être en coups de 100MHz
             diag_int_time_100MHz <= to_unsigned(to_integer(FPA_INTF_CFG.SCD_INT.SCD_INT_TIME*10)/8, 32); -- FPA_INTF_CFG.SCD_INT.SCD_INT_TIME*10)/8;
             
             if real_data_mode = '1' then -- en mode réel 
-               hder_param.exp_time <= fpa_int_time_100MHz; -- en attendant que le lien CLINK_In soit fiable 100%, utiliser diag_int_time_100MHz
+               hder_param.exp_time <= fpa_int_time_100MHz; 
                hder_param.frame_id <= unsigned(frame_id_i);
                hder_param.sensor_temp_raw <= (others => '0');
                hder_param.exp_index <= unsigned(int_indx_i);
-               hder_param.rdy <= fpa_header_last and not fpa_header;
+               hder_param.rdy <= exp_dval_pipe(HDR_SEND_CLK_DELAY-1);
             else                        -- en mode diag  
                hder_param.exp_time <= diag_int_time_100MHz;
                hder_param.frame_id <= unsigned(frame_id_i);
                hder_param.sensor_temp_raw <= (others => '0'); -- temp_raw non necessaire pour les iddcas numeriques
                hder_param.exp_index <= unsigned(int_indx_i);
-               hder_param.rdy <= diag_header_last and not diag_header;
+               hder_param.rdy <= exp_dval_pipe(HDR_SEND_CLK_DELAY-1);
             end if;
             
             --  generation des données de l'image info (exp_feedbk et frame_id proviennent de hw_driver pour eviter d'ajouter un clk supplementaire dans le présent module)
@@ -881,7 +884,7 @@ begin
                   pix_mosi_i.tkeep  <= pix_mosi_temp.tkeep;
                   pix_mosi_i.tlast <= '0';
                   pix_mosi_i.tuser <= (others => '0');                     
-                  if acq_fringe = '1' then
+                  if int_fifo_dval = '1' then
                      pix_out_sm <= send_pix_st;                     
                   end if;
                
@@ -914,7 +917,7 @@ begin
                   hder_mosi_i.wstrb <= (others => '0');
                   hcnt <= to_unsigned(1, hcnt'length);
                   dispatch_info_i.exp_info.exp_dval <= '0';
-                  if hder_param.rdy = '1' and acq_fringe = '1' then
+                  if hder_param.rdy = '1' and acq_hder = '1' then
                      fast_hder_sm <= send_hder_st;                     
                   end if;
                
@@ -941,14 +944,22 @@ begin
                         hder_mosi_i.wdata <= std_logic_vector(shift_left(resize(unsigned(hder_param.sensor_temp_raw), 32), SensorTemperatureRawShift)); --resize(hder_param.sensor_temp_raw, 32);
                         hder_mosi_i.wvalid <= '1';
                         hder_mosi_i.wstrb <= SensorTemperatureRawBWE;
-                        fast_hder_sm <= idle;
+                        fast_hder_sm <= wait_acq_hder_st;
                         
                      end if;
                      
                      
                      hcnt <= hcnt + 1;
                   end if;
+                  
+               when wait_acq_hder_st =>  
                
+                  hder_mosi_i.awvalid <= '0';
+                  hder_mosi_i.wvalid <= '0';
+                  hder_mosi_i.wstrb <= (others => '0');
+                  if acq_hder = '0' then
+                     fast_hder_sm <= idle;
+                  end if;
                when others =>
                
             end case;               
@@ -984,7 +995,7 @@ begin
             CFG_MISMATCH <= int_time_mismatch or  ysize_mismatch or ysize_mismatch or xsize_mismatch or gain_mismatch;
             
             -- errer de fifo
-            FIFO_ERR <= fpa_ch1_fifo_ovfl_sync or fpa_ch2_fifo_ovfl_sync or diag_ch1_fifo_ovfl or diag_ch2_fifo_ovfl or fringe_fifo_ovfl;
+            FIFO_ERR <= fpa_ch1_fifo_ovfl_sync or fpa_ch2_fifo_ovfl_sync or diag_ch1_fifo_ovfl or diag_ch2_fifo_ovfl or acq_hder_fifo_ovfl;
             
             -- done
             DONE <= (not fpa_fval and real_data_mode) or (not diag_fval and not real_data_mode); 

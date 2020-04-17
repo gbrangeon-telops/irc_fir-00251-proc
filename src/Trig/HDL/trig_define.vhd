@@ -41,6 +41,7 @@ package trig_define is
    constant TRIGSEQ_HARDWARE     : std_logic := '0';
    constant TRIGSEQ_SOFTWARE     : std_logic := '1';
    
+
    -------------------------------------------------------							
    -- parametres de config du trigger reçus du µblaze
    -------------------------------------------------------

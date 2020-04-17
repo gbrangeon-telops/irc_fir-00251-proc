@@ -213,10 +213,13 @@ void TRIG_GetStatus(const t_Trig *a, t_TrigStatus *Stat)
 void TRIG_ChangeFrameRate(t_Trig *a, t_FpaIntf *b, const gcRegistersData_t *pGCRegs)
 {
 	#ifdef SCD_PROXY
-		FPA_SendConfigGC(b, pGCRegs);  // requis pour les SCD (à rendre plus robuste plus tard en ajoutant le temps d'integration dans la cmd operationnelle)
-		FPA_GetTemperature(b);         // donne un delai supplémentaire pour la programmation du détecteur avant changement du frame rate
-		FPA_SendConfigGC(b, pGCRegs);  // donne un delai supplémentaire pour la programmation du détecteur avant changement du frame rate
-	#endif
+      TRIG_ChangeAcqWindow(a, TRIG_ExtraTrig, pGCRegs);
+      WAIT_US(XTRA_TRIG_MODE_DELAY);
+      FPA_SendConfigGC(b, pGCRegs);
+      WAIT_US(250000);
+      if(!TDCStatusTst(WaitingForArmMask))
+         TRIG_ChangeAcqWindow(a, TRIG_Normal, pGCRegs);
+    #endif
 	
 	a->TRIG_Period = (uint32_t) ( (float) TRIG_BASE_CLOCK_FREQ_HZ / pGCRegs->AcquisitionFrameRate );
 	AXI4L_write32(a->TRIG_Period, a->ADD + A_PERIOD);

@@ -98,8 +98,17 @@ bool actualisationAcqStartReady()
 void Acquisition_Stop()
 {
    extern t_Trig gTrig;
+   extern t_FpaIntf gFpaIntf;
+
 
    TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
+
+   #ifdef SCD_PROXY
+      WAIT_US(XTRA_TRIG_MODE_DELAY);
+      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+   #endif
+
+   GC_SetAcquisitionStop(0);
 
    TDCStatusSet(WaitingForArmMask);
 
@@ -316,10 +325,7 @@ void Acquisition_SM()
 
          if (gcRegsData.AcquisitionStop)
          {
-            GC_SetAcquisitionStop(0);
-
             Acquisition_Stop();
-
             acquisitionState = ACQ_STOPPED;
          }
          break;
@@ -333,10 +339,7 @@ void Acquisition_SM()
 
          if (gcRegsData.AcquisitionStop)
          {
-            GC_SetAcquisitionStop(0);
-
             Acquisition_Stop();
-
             acquisitionState = ACQ_STOPPED;
          }
          else

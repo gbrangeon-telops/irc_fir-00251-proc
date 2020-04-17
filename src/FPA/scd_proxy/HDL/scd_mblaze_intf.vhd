@@ -255,8 +255,8 @@ begin
                   ser_cfg_dval_i <= exp_ser_cfg_dval;
                   if exp_struct_cfg_valid = '1' then
                      user_cfg_i.scd_int.scd_int_time <= scd_exp_time_i;
+                     user_cfg_i.scd_int.diag_int_time <= exp_time_i;
                      user_cfg_i.scd_int.scd_int_indx <= exp_indx_i;
-                     --user_cfg_i.comn.fpa_spare <= mb_struct_cfg.comn.fpa_spare; 
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
@@ -531,23 +531,25 @@ begin
                         when X"34" =>    mb_struct_cfg.scd_op.scd_out_chn               <= data_i(0); 
                         when X"38" =>    mb_struct_cfg.scd_op.scd_diode_bias            <= data_i(mb_struct_cfg.scd_op.scd_diode_bias'length-1 downto 0);                        
                         when X"3C" =>    mb_struct_cfg.scd_op.scd_int_mode              <= data_i(mb_struct_cfg.scd_op.scd_int_mode'length-1 downto 0);                        
-                        when X"40" =>    mb_struct_cfg.scd_op.scd_pix_res               <= data_i(mb_struct_cfg.scd_op.scd_pix_res'length-1 downto 0); 
-                        when X"44" =>    mb_struct_cfg.scd_op.scd_frame_period_min      <= unsigned(data_i(mb_struct_cfg.scd_op.scd_frame_period_min'length-1 downto 0));                         
-                        when X"48" =>    mb_struct_cfg.scd_diag.scd_bit_pattern         <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0);                         
-                        when X"4C" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t6_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t6_dly'length-1 downto 0));                       
-                        when X"50" =>    mb_struct_cfg.scd_misc.scd_fig4_t1_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t1_dly'length-1 downto 0));                       
-                        when X"54" =>    mb_struct_cfg.scd_misc.scd_fig4_t2_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t2_dly'length-1 downto 0));                        
-                        when X"58" =>    mb_struct_cfg.scd_misc.scd_fig4_t6_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t6_dly'length-1 downto 0));                        
-                        when X"5C" =>    mb_struct_cfg.scd_misc.scd_fig4_t3_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t3_dly'length-1 downto 0));                         
-                        when X"60" =>    mb_struct_cfg.scd_misc.scd_fig4_t5_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t5_dly'length-1 downto 0));
-                        when X"64" =>    mb_struct_cfg.scd_misc.scd_fig4_t4_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t4_dly'length-1 downto 0));                            
-                        when X"68" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly'length-1 downto 0));
-                        when X"6C" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly'length-1 downto 0));
-                        when X"70" =>    mb_struct_cfg.scd_misc.scd_xsize_div2          <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div2'length-1 downto 0));
-                        when X"74" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
+                        when X"40" =>    mb_struct_cfg.scd_op.scd_boost_mode            <= data_i(0);                        
+                        when X"44" =>    mb_struct_cfg.scd_op.scd_pix_res               <= data_i(mb_struct_cfg.scd_op.scd_pix_res'length-1 downto 0); 
+                        when X"48" =>    mb_struct_cfg.scd_op.scd_frame_period_min      <= unsigned(data_i(mb_struct_cfg.scd_op.scd_frame_period_min'length-1 downto 0));                         
+                        when X"4C" =>    mb_struct_cfg.scd_diag.scd_bit_pattern         <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0);                         
+                        when X"50" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t6_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t6_dly'length-1 downto 0));                       
+                        when X"54" =>    mb_struct_cfg.scd_misc.scd_fig4_t1_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t1_dly'length-1 downto 0));                       
+                        when X"58" =>    mb_struct_cfg.scd_misc.scd_fig4_t2_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t2_dly'length-1 downto 0));                        
+                        when X"5C" =>    mb_struct_cfg.scd_misc.scd_fig4_t6_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t6_dly'length-1 downto 0));                        
+                        when X"60" =>    mb_struct_cfg.scd_misc.scd_fig4_t3_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t3_dly'length-1 downto 0));                         
+                        when X"64" =>    mb_struct_cfg.scd_misc.scd_fig4_t5_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t5_dly'length-1 downto 0));
+                        when X"68" =>    mb_struct_cfg.scd_misc.scd_fig4_t4_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t4_dly'length-1 downto 0));                            
+                        when X"6C" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly'length-1 downto 0));
+                        when X"70" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly'length-1 downto 0));
+                        when X"74" =>    mb_struct_cfg.scd_misc.scd_xsize_div2          <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div2'length-1 downto 0));
+                        when X"78" =>    mb_struct_cfg.scd_op.cfg_num                   <= unsigned(data_i(mb_struct_cfg.scd_op.cfg_num'length-1 downto 0));
+                        when X"7C" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
                            
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"78" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
+                        when X"80" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
                         -- mode diag manufacturier 
                         when X"B0" =>    mb_struct_cfg.scd_diag.scd_bit_pattern <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   
