@@ -613,9 +613,9 @@ void GC_AcquisitionStopCallback(gcCallbackPhase_t phase, gcCallbackAccess_t acce
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       if (gcRegsData.AcquisitionStop && !GC_ExternalMemoryBufferIsImplemented)
-      {
          BufferManager_OnAcquisitionStop(&gBufManager, &gcRegsData);
-      }
+
+      BufferManager_HW_MoiHandlerConfig(&gBufManager, 1);
    }
 }
 

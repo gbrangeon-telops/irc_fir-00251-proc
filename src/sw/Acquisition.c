@@ -128,6 +128,7 @@ void Acquisition_Arm()
    extern t_EhdriManager gEHDRIManager;
    extern t_FlagCfg gFlagging_ctrl;
    extern t_GatingCfg gGating_ctrl;
+   extern t_bufferManager gBufManager;
 
    TRIG_SendConfigGC(&gTrig, &gcRegsData);
 
@@ -147,6 +148,8 @@ void Acquisition_Arm()
    GATING_SendConfigGC(&gGating_ctrl, &gcRegsData);
 
    AEC_Arm();
+
+   BufferManager_HW_MoiHandlerConfig(&gBufManager, 0);
 
    TDCStatusClr(WaitingForArmMask);
 

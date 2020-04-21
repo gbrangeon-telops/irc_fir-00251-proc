@@ -128,14 +128,18 @@ begin
          
             flag_status_sm <= idle_st;
             buffering_flag_new.val <= NONE_FLAG;
-            reset_o <= '0';
-         else
+            reset_o <= '0';   
+            
+         else  
+            
             case flag_status_sm is
             
                when idle_st =>  
                
-                  if  update_done = '1' then
-                     reset_o <= '0';
+                  if update_done = '1' then
+                  
+                     reset_o <= '0'; 
+                     
                      if  ACQ_STOP = '1' or BUFFER_MODE /= BUF_WR_SEQ then
                         buffering_flag_new.val <= NONE_FLAG;
                      elsif MOI_SIGNAL = '1'  then
@@ -147,17 +151,18 @@ begin
                   
                   end if;
                
-               when wait_moi_flag_update_st =>       
+               when wait_moi_flag_update_st => 
+               
                   if seq_write_done_re = '1'  or ACQ_STOP = '1' or BUFFER_MODE /= BUF_WR_SEQ then
                      reset_o <= '1';
                      flag_status_sm <= idle_st; 
-
                   elsif update_done = '1' and update_done_last = '0' then 
                      buffering_flag_new.val <= POST_MOI_FLAG;
                      flag_status_sm <= seq_write_end_st;
                   end if;
                
-               when seq_write_end_st =>
+               when seq_write_end_st => 
+               
                   if seq_write_done_re = '1' or ACQ_STOP = '1' or BUFFER_MODE /= BUF_WR_SEQ then
                      flag_status_sm <= idle_st;
                   end if;
@@ -175,17 +180,18 @@ begin
    U6 : process(CLK)
    begin
      if rising_edge(CLK) then
-        if sreset = '1' then     
+        if sreset = '1' then 
+           
             flag_update_sm <= idle_st;
             buffering_flag_new.dval <= '0';
             buffering_flag_old.val <= NONE_FLAG;
             buffering_flag_old.dval <= '0';
-            update_done <= '1';                 
+            update_done <= '1'; 
+            
         else     
            
             update_done_last <= update_done;
             buffering_flag_old.val <= buffering_flag_new.val;
-            
             
             case flag_update_sm is
              
@@ -210,15 +216,14 @@ begin
                     end if;
                     
 
-               when reset_st =>
+               when reset_st =>  
+               
                   buffering_flag_new.dval <= '1';
                   if buffering_flag_update_done_re = '1' then
                      buffering_flag_new.dval <= '0';
                      flag_update_sm <= idle_st; 
                   end if;
                     
-                  
-               
                when others =>
                  
              end case;
