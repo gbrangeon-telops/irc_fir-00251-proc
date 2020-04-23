@@ -105,7 +105,7 @@
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
-#define XTRA_TRIG_MODE_DELAY                    100000  // us
+#define XTRA_TRIG_MODE_DELAY                    250000  // us
 
 
 // structure de config envoyée au vhd 

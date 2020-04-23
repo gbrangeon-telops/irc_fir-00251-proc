@@ -39,7 +39,12 @@
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
 #define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS
+
+//  PCO 23 avril 2020 : Correction par rapport à la doc de SCD (d1k3008-rev1).
+#define T0_CORR                           -40.0E-6 //  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
+#define T_lINE_CONV_CORR                  12.0     //  Nécessaire pour ne pas faire planter le proxy (voir redmine 14065 pour justifications).
   
+
 // Parametres de la commande serielle du PelicanD
 #define SCD_LONGEST_CMD_BYTES_NUM         32      // longueur en bytes de la plus longue commande serielle du PelicanD
 #define SCD_CMD_OVERHEAD_BYTES_NUM        6       // longueur des bytes autres que ceux des données
@@ -106,6 +111,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                0x0400  // adresse de base 
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
+#define AR_FPA_INT_TIME                   0x00C0  // adresse temps d'intégration
 
 // adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_BIT_PATTERN_ADD        0xB0
@@ -492,7 +498,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    float maxExposure_us, periodMinWithNullExposure;
    float operatingPeriod, fpaAcquisitionFrameRate;
    Scd_Fig1orFig2Param_t hh;
-   
+
    // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
 
@@ -506,7 +512,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    maxExposure_us = maxExposure_us/1.001F;    // cette division tient du fait que dans la formule de T0, le temps d'exposition intervient avec un facteur 1 + 0.1/100
    
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)
-      maxExposure_us += (hh.T3 + hh.T6)*1e6F;
+      maxExposure_us += (hh.T3 + hh.T6 + T0_CORR)*1e6F;
    // Round exposure time
    maxExposure_us = floorMultiple(maxExposure_us, 0.1);
    
@@ -603,17 +609,17 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
       if (PELICAND_1CH_EMULATOR)
          ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;      // ENO 24 juin 2019 : on emule un PelicanD 1 canal
       else
-         ptrH->Tline_conv = 814.0F * ptrH->TFPP_CLK;       // PCO 31 mars 2020 : La doc spécifie 804.0F, mais cela fait planter le proxy.
+         ptrH->Tline_conv = (804.0F + T_lINE_CONV_CORR) * ptrH->TFPP_CLK;       //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
 
       ptrH->Tframe_init = 2128.0F * ptrH->TFPP_CLK;
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 1E-6F;
-      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv) + 8.88E-6F;
+      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv) + 8.88E-6;
       ptrH->Trelax    = 5E-6F;
       ptrH->T_lc2int  = 5E-6F;
       ptrH->T_iwr_delay = ptrH->T_lc2int + ptrH->Trelax;
 
-      ptrH->T6 = 5.4E-6F + 10E-6F; // normal mode, worst case
+      ptrH->T6 = 5.4E-6F + (ptrH->Tframe_init + ptrH->T_iwr_delay); //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
 
       ptrH->T8        = 250E-6F; // worst case
       ptrH->T3        = ptrH->Tframe_init + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 3.0F)) + ptrH->T_iwr_delay;
@@ -625,6 +631,8 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
       else
       // T0 = T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
       ptrH->T0        = (ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
+
+      ptrH->T0        = ptrH->T0 + T0_CORR;    //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
       ptrH->T0        = MIN(ptrH->T0, 90E-3F); // don't forget that T0 must be < 90msec
 
       ptrH->T5        = ptrH->T5min + (ptrH->T0 * 0.1F / 100.0F);
@@ -758,7 +766,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirLR   = 0;  // 0 => left to right (default), 1 => right to left
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
-   vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
+   vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
    vhd_int_time     = (uint32_t)MIN(MAX((float)vhd_int_time, (FPA_MIN_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F)), (FPA_MAX_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F));  // protection
 
    
