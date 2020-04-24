@@ -41,8 +41,8 @@
 #define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS
 
 //  PCO 23 avril 2020 : Correction par rapport à la doc de SCD (d1k3008-rev1).
-#define T0_CORR                           -40.0E-6 //  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
-#define T_lINE_CONV_CORR                  12.0     //  Nécessaire pour ne pas faire planter le proxy (voir redmine 14065 pour justifications).
+#define T0_CORR                           -40.0E-6F // [s],  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
+#define T_lINE_CONV_CORR                  12.0F     // [TFPP clks], Nécessaire pour ne pas faire planter le proxy (voir redmine 14065 pour justifications).
   
 
 // Parametres de la commande serielle du PelicanD
