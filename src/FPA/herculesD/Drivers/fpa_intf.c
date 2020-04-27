@@ -108,6 +108,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                0x0400  // adresse de base 
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
+#define AR_FPA_INT_TIME                   0x00C0  // adresse temps d'intégration
 
 // adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_BIT_PATTERN_ADD        0xB0
@@ -598,6 +599,8 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
          ptrH->Tline_conv = 2676.0F * ptrH->TFPP_CLK;
          ptrH->T5min      = 200E-6F;
       }
+      
+      ptrH->Tframe_init = 2340.0F * ptrH->TFPP_CLK;
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 500E-9F;
       ptrH->T6        = ptrH->Tline_conv + 2E-6F;
@@ -605,7 +608,7 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
          ptrH->T6 += ptrH->T2;
       ptrH->T7        = 250E-6F;
       ptrH->T8        = 120E-6F;
-      ptrH->T3        = (2340.0F * ptrH->TFPP_CLK) + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F));
+      ptrH->T3        = ptrH->Tframe_init + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 4.0F));
 
       // T0 = T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
       ptrH->T0        = (ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
@@ -740,7 +743,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirLR   = 0;  // 0 => left to right (default), 1 => right to left
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
-   vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
+   vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
    vhd_int_time     = (uint32_t)MIN(MAX((float)vhd_int_time, (FPA_MIN_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F)), (FPA_MAX_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F));  // protection
    
    scd_gain = (uint8_t)(ptrA->scd_gain);

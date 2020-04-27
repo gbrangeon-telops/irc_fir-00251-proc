@@ -614,7 +614,7 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
       ptrH->Tframe_init = 2128.0F * ptrH->TFPP_CLK;
       ptrH->T2        = exposureTime_usec * 1E-6F;
       ptrH->T4        = 1E-6F;
-      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv) + 8.88E-6;
+      ptrH->T5min     = (6448.0F * ptrH->TFPP_CLK) + (2 * ptrH->Tline_conv) + 8.88E-6F;
       ptrH->Trelax    = 5E-6F;
       ptrH->T_lc2int  = 5E-6F;
       ptrH->T_iwr_delay = ptrH->T_lc2int + ptrH->Trelax;
