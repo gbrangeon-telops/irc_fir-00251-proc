@@ -782,7 +782,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
                          
    Cmd.Data[18]     = (((ptrA->scd_out_chn) & 0x01) << 7) + ((DisplayMode & 0x0F) << 3) + ((FSyncMode & 0x01) << 2) + ((ReadDirLR & 0x01) << 1) + (ReadDirUP & 0x01);
    Cmd.Data[19]     = scd_int_mode;
-   Cmd.Data[20]     = ((ptrA->scd_boost_mode & 0x01) << 6) + (ptrA->scd_pix_res & 0x03);
+   Cmd.Data[20]     = ((ptrA->scd_boost_mode & 0x01) << 5) + (ptrA->scd_pix_res & 0x03);
    
    Cmd.SerialCmdRamBaseAdd = (uint8_t)AW_SERIAL_OP_CMD_RAM_BASE_ADD; // adresse à laquelle envoyer la commande en RAM
    // on batit les packets de bytes
