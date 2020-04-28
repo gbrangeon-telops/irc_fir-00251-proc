@@ -366,7 +366,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->scd_int_mode = SCD_ITR_MODE; 
 
    //Mode of operation
-   ptrA->scd_boost_mode = SCD_NORMAL_MODE;
+   ptrA->scd_boost_mode = SCD_BOOST_MODE;
 
    // Resolution des pixels (13, 14 ou 15 bits)
    ptrA->scd_pix_res = SCD_PIX_RESOLUTION_13BITS;    // resolution pour l'instant figée à 13 bits   
