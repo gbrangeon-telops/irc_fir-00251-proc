@@ -423,7 +423,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[0]             = FLEG_VccVoltage_To_DacWord(5500.0F, 1);           // DAC1 -> VPOS_OUT à 5.5V
    ProximCfg.vdac_value[1]             = FLEG_VccVoltage_To_DacWord(5500.0F, 2);           // DAC2 -> VPOS     à 5.5V
    ProximCfg.vdac_value[2]             = FLEG_VccVoltage_To_DacWord(5500.0F, 3);           // DAC3 -> VPOS_UC  à 5.5V
-   ProximCfg.vdac_value[4]             = FLEG_VccVoltage_To_DacWord(2050.0F, 5);           // DAC5 -> VOS      à 1.95V   (ajustable)
+   ProximCfg.vdac_value[4]             = FLEG_VccVoltage_To_DacWord(2050.0F, 5);           // DAC5 -> VOS      à 2.05V   (ajustable)
    ProximCfg.vdac_value[7]             = FLEG_VccVoltage_To_DacWord(5500.0F, 8);           // DAC8 -> VPD      à 5.5V
    
    // Reference of the tap (VCC4)      
