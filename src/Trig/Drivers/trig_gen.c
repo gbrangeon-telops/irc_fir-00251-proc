@@ -216,7 +216,7 @@ void TRIG_ChangeFrameRate(t_Trig *a, t_FpaIntf *b, const gcRegistersData_t *pGCR
       TRIG_ChangeAcqWindow(a, TRIG_ExtraTrig, pGCRegs);
       WAIT_US(XTRA_TRIG_MODE_DELAY);
       FPA_SendConfigGC(b, pGCRegs);
-      WAIT_US(250000);
+      WAIT_US(XTRA_TRIG_MODE_DELAY);
       if(!TDCStatusTst(WaitingForArmMask))
          TRIG_ChangeAcqWindow(a, TRIG_Normal, pGCRegs);
     #endif

@@ -95,7 +95,10 @@ enum acquisitionStateEnum {
    ACQ_WAITING_FOR_GLOBAL_DONE,        /**< Waiting for global done signal */
    ACQ_WAITING_FOR_COOLER_POWER_OFF,   /**< Waiting for cooler to be powered OFF */
 
-   ACQ_POWER_RESET                     /**< Reset acquisition power state */
+   ACQ_POWER_RESET,                     /**< Reset acquisition power state */
+
+   ACQ_WAIT_TRIG_MODE_TRANSITION
+
 };
 
 /**

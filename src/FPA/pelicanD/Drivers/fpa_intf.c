@@ -38,7 +38,7 @@
  
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS
+#define SCD_XTRA_TRIG_FREQ_MAX_HZ         44
 
 //  PCO 23 avril 2020 : Correction par rapport à la doc de SCD (d1k3008-rev1).
 #define T0_CORR                           -40.0E-6F // [s],  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
@@ -324,9 +324,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
 
    ptrA->fpa_spare                 = 0;   //
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ); // PCO : 26 mars 2020: Define the smallest period allowed by the fpa_trig_controller for xtra_trig generation (max xtra_trig frequency is set to 12 Hz). Also define the frequency when prog_trig is held high.
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly); //  PCO : 26 mars 2020 : This delay must be greater than the max value scd_frame_period_min (90 ms). This is necessary when the fpa_trig_controller receive a trig and no integration follow.
-   
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
    if (ptrA->fpa_diag_mode == 1)
    {
       ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car le diag_mode est plus lent que le détecteur 

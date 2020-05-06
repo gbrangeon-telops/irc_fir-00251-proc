@@ -92,28 +92,6 @@ bool actualisationAcqStartReady()
          (gActDebugOptions.bypassChecks == true);
 }
 
-/**
- * Stop acquisition.
- */
-void Acquisition_Stop()
-{
-   extern t_Trig gTrig;
-   extern t_FpaIntf gFpaIntf;
-
-
-   TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
-
-   #ifdef SCD_PROXY
-      WAIT_US(XTRA_TRIG_MODE_DELAY);
-      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
-   #endif
-
-   GC_SetAcquisitionStop(0);
-
-   TDCStatusSet(WaitingForArmMask);
-
-   PRINT("Acquisition stopped!\n");
-}
 
 /**
  * Arm detector.
@@ -195,6 +173,8 @@ void Acquisition_SM()
 {
    extern t_FpaIntf gFpaIntf;
    extern flashDynamicValues_t gFlashDynamicValues;
+   extern t_Trig gTrig;
+   extern t_FpaIntf gFpaIntf;
 
    static acquisitionState_t acquisitionState = ACQ_STOPPED;
    static uint8_t acquisitionStateTransition = 1;
@@ -211,6 +191,8 @@ void Acquisition_SM()
    static uint64_t tic_cooldownStart;
    static int16_t min_temp;
    static int16_t max_temp;
+
+   static timerData_t trig_mode_transition_timer;
 
    acquisitionState_t prevAcquisitionState = acquisitionState;
    int16_t sensorTemp;
@@ -326,11 +308,6 @@ void Acquisition_SM()
             }
          }
 
-         if (gcRegsData.AcquisitionStop)
-         {
-            Acquisition_Stop();
-            acquisitionState = ACQ_STOPPED;
-         }
          break;
 
       case ACQ_STARTED:
@@ -342,8 +319,17 @@ void Acquisition_SM()
 
          if (gcRegsData.AcquisitionStop)
          {
-            Acquisition_Stop();
-            acquisitionState = ACQ_STOPPED;
+
+            TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
+
+            #ifdef SCD_PROXY
+               StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
+            #else
+               StartTimer(&trig_mode_transition_timer, 0.0F);
+            #endif
+
+            acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
+
          }
          else
          {
@@ -356,6 +342,26 @@ void Acquisition_SM()
          }
          break;
 
+
+      case ACQ_WAIT_TRIG_MODE_TRANSITION:
+
+
+         if (TimedOut(&trig_mode_transition_timer))
+         {
+            StopTimer(&trig_mode_transition_timer);
+
+            #ifdef SCD_PROXY
+               FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+            #endif
+
+            GC_SetAcquisitionStop(0);
+            TDCStatusSet(WaitingForArmMask);
+            PRINT("Acquisition stopped!\n");
+            acquisitionState = ACQ_STOPPED;
+         }
+
+
+         break;
       case ACQ_WAITING_FOR_ADC_DDC_PRESENCE:
          FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if (fpaStatus.adc_ddc_detect_process_done == 1)

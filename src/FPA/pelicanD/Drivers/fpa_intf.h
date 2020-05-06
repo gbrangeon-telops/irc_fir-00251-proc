@@ -78,7 +78,7 @@
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]
 #else
    #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]
-   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]
+   #define FPA_DEFAULT_FRAME_RATE   44.0F //[Hz]
 #endif
 
 // TODO Update EHDRI default exposure times.
@@ -105,7 +105,7 @@
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
-#define XTRA_TRIG_MODE_DELAY                    250000  // us
+#define XTRA_TRIG_MODE_DELAY           50000  // us
 
 
 // structure de config envoyée au vhd 
