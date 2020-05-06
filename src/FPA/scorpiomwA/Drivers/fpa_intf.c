@@ -316,9 +316,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
    
    //  windowing
-   ptrA->sizea_sizeb = 0;           // 0 --> toujours en mode windowing
-   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
-      ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
+   ptrA->sizea_sizeb = 0;           // 0 --> toujours en mode windowing 2020-05-06 ODI: pour conservation de la calibration en sous-fenêtre
+   //if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+      //ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
 
    //  itr
    ptrA->itr = 1;     // toujours en mode itr 
