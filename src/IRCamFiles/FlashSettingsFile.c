@@ -465,8 +465,8 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->AdvTrigDisabled = FlashSettings_FlashSettingsFileHeader_default.AdvTrigDisabled;
                   hdr->FlaggingDisabled = FlashSettings_FlashSettingsFileHeader_default.FlaggingDisabled;
                   hdr->GatingDisabled = FlashSettings_FlashSettingsFileHeader_default.GatingDisabled;
-                  hdr->ADCReadoutDisabled = FlashSettings_FlashSettingsFileHeader_default.ADCReadoutDisabled;
-                  hdr->IRIGBDisabled = FlashSettings_FlashSettingsFileHeader_default.IRIGBDisabled;
+                  hdr->ADCReadoutDisabled = (hdr->ADCReadoutEnabled) ? 0 : 1; //FlashSettings_FlashSettingsFileHeader_default.ADCReadoutDisabled;
+                  hdr->IRIGBDisabled = (hdr->ADCReadoutEnabled) ? 1 : 0; //FlashSettings_FlashSettingsFileHeader_default.IRIGBDisabled;
                   hdr->GPSDisabled = FlashSettings_FlashSettingsFileHeader_default.GPSDisabled;
                   hdr->SFWDisabled = FlashSettings_FlashSettingsFileHeader_default.SFWDisabled;
                   hdr->SDIDisabled = FlashSettings_FlashSettingsFileHeader_default.SDIDisabled;
