@@ -38,7 +38,7 @@
  
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS          
+#define SCD_XTRA_TRIG_FREQ_MAX_HZ         44          
   
 // Parametres de la commande serielle du HerculesD
 #define SCD_LONGEST_CMD_BYTES_NUM         32      // longueur en bytes de la plus longue commande serielle du HerculesD
@@ -309,10 +309,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le Hercules en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
    ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T3 + hh.T5 + hh.T6 - (float)VHD_ITR_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ); 
    ptrA->fpa_spare                 = 0;
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ); // PCO : 26 mars 2020: Define the smallest period allowed by the fpa_trig_controller for xtra_trig generation (max xtra_trig frequency is set to 12 Hz). Also define the frequency when prog_trig is held high.
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly); //  PCO : 26 mars 2020 : This delay must be greater than the max value scd_frame_period_min (90 ms). This is necessary when the fpa_trig_controller receive a trig and no integration follow.
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ); 
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly); 
    
-
    if (ptrA->fpa_diag_mode == 1)
    {
       ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car le diag_mode est plus lent que le détecteur 
