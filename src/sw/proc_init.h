@@ -38,7 +38,7 @@
 
 #define GPS_UART_RX_CIRC_BUFFER_SIZE         512
 
-#define NI_CMD_QUEUE_SIZE           14
+#define NI_CMD_QUEUE_SIZE           22
 #define GCM_CMD_QUEUE_SIZE          1
 #define GCP_CMD_QUEUE_SIZE          1
 #define CLINK_CI_CMD_QUEUE_SIZE     1
