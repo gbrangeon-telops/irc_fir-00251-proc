@@ -80,6 +80,16 @@ architecture rtl of scorpiomwA_window_reg is
    signal new_cfg_num_pending : std_logic;
    --0-signal 
    
+   attribute KEEP : string;
+   attribute KEEP of new_cfg_num : signal is "TRUE";
+   attribute KEEP of present_cfg_num : signal is "TRUE";
+   attribute KEEP of new_cfg_num_pending : signal is "TRUE";
+   attribute KEEP of new_cfg : signal is "TRUE";
+   attribute KEEP of present_cfg : signal is "TRUE";
+   attribute KEEP of new_cfg_pending : signal is "TRUE";
+   attribute KEEP of roic_cfg_fsm : signal is "TRUE";
+   attribute KEEP of fpa_error_i : signal is "TRUE";
+   
 begin
    
    SPI_EN <= spi_en_i;
