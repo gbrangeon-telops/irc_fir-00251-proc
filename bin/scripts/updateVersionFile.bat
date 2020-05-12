@@ -1,9 +1,9 @@
 set GenICam_h=%commonDir%\Software\GenICam.h
 
-for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\FlashSettingsFile.h -f TSFSFILES_VERSION') do  set fsMajorVersion=%%i
+for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\IRCamFiles.h -f TSFSFILES_VERSION') do  set fsMajorVersion=%%i
 set FlashSettingsFile_h=%srcDir%\IRCamFiles\FlashSettingsFile_v%fsMajorVersion%.h
 
-for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\FlashDynamicValuesFile.h -f TSDVFILES_VERSION') do  set fdvMajorVersion=%%i
+for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\IRCamFiles.h -f TSDVFILES_VERSION') do  set fdvMajorVersion=%%i
 set FlashDynamicValuesFile_h=%srcDir%\IRCamFiles\FlashDynamicValuesFile_v%fdvMajorVersion%.h
 
 for /f %%i in ('%x_xilperl% %scriptsDir%\fetchNumericValue.pl -if %srcDir%\IRCamFiles\IRCamFiles.h -f CALIBFILES_VERSION') do  set calMajorVersion=%%i
