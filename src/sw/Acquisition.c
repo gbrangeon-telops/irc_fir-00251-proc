@@ -92,15 +92,10 @@ bool actualisationAcqStartReady()
          (gActDebugOptions.bypassChecks == true);
 }
 
-/**
- * Change the trig controller mode to extra trig.
- */
-void Acquisition_SetXtraTrigAcqWindow(timerData_t* timer, const gcRegistersData_t *pGCRegs)
-{
-   extern t_Trig gTrig;
 
+void Acquisition_SetTrigModeTransitionTimer(timerData_t* timer)
+{
    #ifdef SCD_PROXY
-      TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, pGCRegs); // PelicanD require to be in xtra_trig mode before generating a prog_trig (call of FPA_SendConfigGC())
       StartTimer(timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F); // PelicanD require 50 ms delay before generating a prog_trig
    #else
       StartTimer(timer, 0.0F);
@@ -115,15 +110,21 @@ void Acquisition_UpdateFrameRate(timerData_t* timer, const gcRegistersData_t *pG
    extern t_Trig gTrig;
    extern t_FpaIntf gFpaIntf;
 
-   #ifdef SCD_PROXY
-      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
-   #endif
+   if (gFrameRateChanged)
+   {
+      gFrameRateChanged = 0;
 
-   TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
+      #ifdef SCD_PROXY
+         FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+      #endif
 
-   #ifdef SCD_PROXY
-      TRIG_ChangeAcqWindow(&gTrig, TRIG_Normal, &gcRegsData);
-   #endif
+      TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
+
+      #ifdef SCD_PROXY
+         if(TDCStatusTst(AcquisitionStartedMask))
+            TRIG_ChangeAcqWindow(&gTrig, TRIG_Normal, &gcRegsData);
+      #endif
+   }
 }
 
 /**
@@ -345,14 +346,15 @@ void Acquisition_SM()
 
             if (AllowAcquisitionStart() || actualisationAcqStartReady())
             {
+               Acquisition_UpdateFrameRate(&trig_mode_transition_timer, &gcRegsData);
                Acquisition_Start();
-               gFrameRateChanged = 0;
                acquisitionState = ACQ_STARTED;
             }
          }
          if (gcRegsData.AcquisitionStop)
          {
-            Acquisition_SetXtraTrigAcqWindow(&trig_mode_transition_timer, &gcRegsData);
+            TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
+            Acquisition_SetTrigModeTransitionTimer(&trig_mode_transition_timer);
             acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
          }
          break;
@@ -366,7 +368,8 @@ void Acquisition_SM()
 
          if (gcRegsData.AcquisitionStop)
          {
-            Acquisition_SetXtraTrigAcqWindow(&trig_mode_transition_timer, &gcRegsData); // Required for PelicanD
+            TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
+            Acquisition_SetTrigModeTransitionTimer(&trig_mode_transition_timer);
             acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
          }
          else
@@ -375,7 +378,11 @@ void Acquisition_SM()
 
             if(gFrameRateChanged)
             {
-               Acquisition_SetXtraTrigAcqWindow(&trig_mode_transition_timer, &gcRegsData); // Required for PelicanD
+               #ifdef SCD_PROXY
+                  TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
+               #endif
+
+               Acquisition_SetTrigModeTransitionTimer(&trig_mode_transition_timer);
                acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
             }
 
@@ -398,9 +405,8 @@ void Acquisition_SM()
                Acquisition_Stop();
                acquisitionState = ACQ_STOPPED;
             }
-            else if (gFrameRateChanged)
+            else
             {
-               gFrameRateChanged = 0;
                Acquisition_UpdateFrameRate(&trig_mode_transition_timer, &gcRegsData);
                acquisitionState = ACQ_STARTED;
             }
