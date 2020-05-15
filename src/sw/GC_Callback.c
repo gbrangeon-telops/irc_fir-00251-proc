@@ -67,10 +67,9 @@ extern rpCtrl_t theRpCtrl;
 extern slCtrl_t theSlCtrl;
 extern qspiFlash_t gQSPIFlash;
 extern t_mgt gMGT;
-
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 extern float FWExposureTime[MAX_NUM_FILTER];
-
+extern uint8_t gFrameRateChanged;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
@@ -446,7 +445,7 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
       }
       else
       {
-         TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
+         gFrameRateChanged = 1;
          EXP_SendConfigGC(&gExposureTime, &gcRegsData);
          HDER_UpdateAcquisitionFrameRateHeader(&gHderInserter, &gcRegsData);
       }

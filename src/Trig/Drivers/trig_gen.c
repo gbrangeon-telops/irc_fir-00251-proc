@@ -212,15 +212,6 @@ void TRIG_GetStatus(const t_Trig *a, t_TrigStatus *Stat)
 //--------------------------------------------------------------------------
 void TRIG_ChangeFrameRate(t_Trig *a, t_FpaIntf *b, const gcRegistersData_t *pGCRegs)
 {
-	#ifdef SCD_PROXY
-      TRIG_ChangeAcqWindow(a, TRIG_ExtraTrig, pGCRegs);
-      WAIT_US(XTRA_TRIG_MODE_DELAY);
-      FPA_SendConfigGC(b, pGCRegs);
-      WAIT_US(XTRA_TRIG_MODE_DELAY);
-      if(!TDCStatusTst(WaitingForArmMask))
-         TRIG_ChangeAcqWindow(a, TRIG_Normal, pGCRegs);
-    #endif
-	
 	a->TRIG_Period = (uint32_t) ( (float) TRIG_BASE_CLOCK_FREQ_HZ / pGCRegs->AcquisitionFrameRate );
 	AXI4L_write32(a->TRIG_Period, a->ADD + A_PERIOD);
 	TRIG_Start(a);

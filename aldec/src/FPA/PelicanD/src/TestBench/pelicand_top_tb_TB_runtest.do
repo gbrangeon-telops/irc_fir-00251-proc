@@ -10,7 +10,7 @@ acom D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w28_d16\fwft_afifo_w28_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d16\fwft_sfifo_w32_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w64_d16\fwft_sfifo_w64_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w41_d16\fwft_sfifo_w41_d16_sim_netlist.vhdl
+--acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w41_d16\fwft_sfifo_w41_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w40_d16\fwft_sfifo_w40_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\tdp_ram_w8_d2048\tdp_ram_w8_d2048_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_sfifo_d2048\t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
@@ -22,8 +22,9 @@ acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64_no_output_reg\sfifo_w8_d64_no_
 acom "D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl"
 acom "D:\Telops\FIR-00251-Proc\IP\160\ip_axis_32_to_64\ip_axis_32_to_64_sim_netlist.vhdl"
 do D:\Telops\FIR-00251-Proc\src\FPA\PelicanD\hdl\compil_PelicanD.do
-acom "D:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src\TestBench\pelicand_testbench_pkg.vhd"	   
+acom "D:\Telops\FIR-00251-Proc\aldec\src\FPA\PelicanD\src\TestBench\pelicand_testbench_pkg.vhd"	 
 
+acom "D:\Telops\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd"
 do "D:\Telops\FIR-00251-Proc\src\Trig\HDL\compil_trig_gen.do"
 #runexe "d:/telops/fir-00251-Proc/src/copy_to_cpp.bat"
 #adel mb_model

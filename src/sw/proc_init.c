@@ -130,6 +130,7 @@ rpCtrl_t theRpCtrl;
 slCtrl_t theSlCtrl;
 autofocusCtrl_t theAutoCtrl;
 
+uint8_t gFrameRateChanged = 0;
 
 /**
  * Initializes network interface
