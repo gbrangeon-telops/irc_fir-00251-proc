@@ -193,6 +193,7 @@ struct isc0207_param_s             //
    float unused_area_clock_factor;
    float adc_sync_dly_mclk;
    float line_stretch_mclk;
+   float frame_period_coef;   // pour limitation artificielle du frame rate
 
    float pclk_rate_hz;
 };
@@ -275,7 +276,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
-   extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe 
+   //extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe
    extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
@@ -861,6 +862,9 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    // calcul de la periode minimale
    ptrH->frame_period_min_usec = ptrH->fsync_low_usec + ptrH->delay_usec + ptrH->readout_usec + ptrH->tri_min_usec;
    
+   //autres calculs
+   ptrH->frame_period_coef = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
+
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_min_usec*1e-6);
 }
@@ -870,13 +874,21 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
 //--------------------------------------------------------------------------
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
-   float MaxFrameRate; 
+   float MaxFrameRate, MaxFrameRate_limit;
    isc0207_param_t hh;
    
-   FPA_SpecificParams(&hh,(float)pGCRegs->ExposureTime, pGCRegs);
-   MaxFrameRate = floorMultiple(hh.frame_rate_max_hz, 0.01);
+   // Find max frame rate limit at null exposure time
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs);
+   MaxFrameRate_limit = hh.frame_rate_max_hz / hh.frame_period_coef;
 
-   return MaxFrameRate;                          
+   // Find max frame rate at current exposure time and limit the result
+   FPA_SpecificParams(&hh,(float)pGCRegs->ExposureTime, pGCRegs);
+   MaxFrameRate = MIN(hh.frame_rate_max_hz, MaxFrameRate_limit);
+
+   // Round maximum frame rate
+   MaxFrameRate = floorMultiple(MaxFrameRate, 0.01);
+
+   return MaxFrameRate;
 }
 
 //--------------------------------------------------------------------------                                                                            
