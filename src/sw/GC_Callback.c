@@ -458,7 +458,6 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
                TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
             }
          #else
-            gFrameRateChangePostponed = 0;
             TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
          #endif
 

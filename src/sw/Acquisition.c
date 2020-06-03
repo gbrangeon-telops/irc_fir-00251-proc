@@ -250,7 +250,9 @@ void Acquisition_SM()
    static int16_t min_temp;
    static int16_t max_temp;
 
+#ifdef SCD_PROXY
    static timerData_t trig_mode_transition_timer;
+#endif
 
    acquisitionState_t prevAcquisitionState = acquisitionState;
    int16_t sensorTemp;
