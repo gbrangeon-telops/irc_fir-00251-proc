@@ -103,6 +103,20 @@ architecture RTL of trig_gen_ctler_core is
          );
    end component;
    
+   attribute KEEP : string;
+   attribute KEEP of raw_pulse_i : signal is "TRUE";
+   attribute KEEP of internal_pulse_cntraz_i : signal is "TRUE";
+   attribute KEEP of internal_pulse_period_i : signal is "TRUE";
+   attribute KEEP of fpa_trig_param_i : signal is "TRUE";
+   attribute KEEP of integration_detect : signal is "TRUE";
+   attribute KEEP of mode_sm : signal is "TRUE";
+   attribute KEEP of CONFIG : signal is "TRUE";
+   attribute KEEP of fpa_trig_done : signal is "TRUE";
+   attribute KEEP of run : signal is "TRUE";
+   attribute KEEP of seq_delay_enable_i : signal is "TRUE";
+   attribute KEEP of INTERNAL_PULSE : signal is "TRUE";
+   attribute KEEP of seq_trig_i : signal is "TRUE";
+   attribute KEEP of seq_enable_i : signal is "TRUE";
    
 begin 
    -----------------------------------------------------
