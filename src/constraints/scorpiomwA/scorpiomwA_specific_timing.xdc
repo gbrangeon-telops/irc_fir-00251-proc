@@ -1,7 +1,7 @@
 ## Timing Constraints Section
 
 # Primary clocks
-create_clock -period 55.555 name CH0_CLK [get_ports CH0_CLK_P]
+create_clock -period 55.555 -name CH0_CLK [get_ports CH0_CLK_P]
 
 # Virtual clocks
 
