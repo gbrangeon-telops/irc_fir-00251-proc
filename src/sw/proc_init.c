@@ -130,7 +130,9 @@ rpCtrl_t theRpCtrl;
 slCtrl_t theSlCtrl;
 autofocusCtrl_t theAutoCtrl;
 
-uint8_t gFrameRateChanged = 0;
+#ifdef SCD_PROXY
+   uint8_t gFrameRateChangePostponed = 0;
+#endif
 
 /**
  * Initializes network interface

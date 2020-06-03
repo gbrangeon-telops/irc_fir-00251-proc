@@ -176,7 +176,11 @@ uint16_t SFW_GetEncoderPosition()
 
 void SFW_SetExposureTimeArray(uint8_t ExpId, float Exptime)
 {
-   AXI4L_write32( (uint32_t) (Exptime * EXPOSURE_TIME_FACTOR) , gSFW_Ctrl.ADD + FW_EXPOSURETIME_OFFSET + 4 * ExpId);
+   #ifdef SCD_PROXY
+      extern uint8_t gFrameRateChangePostponed;
+      if (!gFrameRateChangePostponed) // We need to delay the ET update to prevent invalid proxy config.
+   #endif
+         AXI4L_write32( (uint32_t) (Exptime * EXPOSURE_TIME_FACTOR) , gSFW_Ctrl.ADD + FW_EXPOSURETIME_OFFSET + 4 * ExpId);
 }
 
 void SFW_Disable()

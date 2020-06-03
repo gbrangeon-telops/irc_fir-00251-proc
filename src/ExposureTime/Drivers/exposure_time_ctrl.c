@@ -55,7 +55,8 @@ void EXP_Init(t_ExposureTime *a, const gcRegistersData_t *GCRegs)
 //  Envoi de la configuration
 //--------------------------------------------------------------------------
 void EXP_SendConfigGC(t_ExposureTime *a, const gcRegistersData_t *GCRegs)
-{     
+{
+
    if (GCRegs->FWMode == FWM_SynchronouslyRotating)
    {
       a->EXP_Source     = VHD_FW_SOURCE;  // Filter Wheel sync mode
@@ -71,6 +72,11 @@ void EXP_SendConfigGC(t_ExposureTime *a, const gcRegistersData_t *GCRegs)
    a->EXP_Time_Min   = (uint32_t)(GCRegs->ExposureTimeMin * EXPOSURE_TIME_FACTOR);
    a->EXP_Time_Max   = (uint32_t)(GCRegs->ExposureTimeMax * EXPOSURE_TIME_FACTOR);
    a->EXP_Time       = (uint32_t)(GCRegs->ExposureTime * EXPOSURE_TIME_FACTOR);
-   WriteStruct(a);  
+
+   #ifdef SCD_PROXY
+      extern uint8_t gFrameRateChangePostponed;
+      if (!gFrameRateChangePostponed) // We need to delayed the ET update to prevent invalid proxy config.
+   #endif
+         WriteStruct(a);
 }
 

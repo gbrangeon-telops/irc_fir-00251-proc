@@ -38,7 +38,7 @@
  
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define SCD_XTRA_TRIG_FREQ_MAX_HZ         44
+#define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS
 
 //  PCO 23 avril 2020 : Correction par rapport à la doc de SCD (d1k3008-rev1).
 #define T0_CORR                           -40.0E-6F // [s],  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
@@ -145,8 +145,6 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_PE_IO_TEST1    2
 #define SCD_PE_IO_TEST2    3
 #define SCD_PE_TEST1       4
-
-#define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 #define VHD_INVALID_TEMP   0xFFFFFFFF
 #define VHD_ITR_PIPE_DLY_SEC             500E-9F     // estimation des differerents delais accumulés par le vhd

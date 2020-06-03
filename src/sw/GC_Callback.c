@@ -69,7 +69,10 @@ extern qspiFlash_t gQSPIFlash;
 extern t_mgt gMGT;
 extern float EHDRIExposureTime[EHDRI_IDX_NBR];
 extern float FWExposureTime[MAX_NUM_FILTER];
-extern uint8_t gFrameRateChanged;
+
+#ifdef SCD_PROXY
+   extern uint8_t gFrameRateChangePostponed;
+#endif
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
@@ -445,7 +448,20 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
       }
       else
       {
-         gFrameRateChanged = 1;
+         #ifdef SCD_PROXY
+            // We postpone the frame rate change in order to observe the required delay (see acquisition_SM).
+            // For FR change during acquisition, ETx change and header update are also postpone after the FR change.
+            gFrameRateChangePostponed = 1;
+            if (!GC_AcquisitionStarted)
+            {
+               gFrameRateChangePostponed = 0;
+               TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
+            }
+         #else
+            gFrameRateChangePostponed = 0;
+            TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
+         #endif
+
          EXP_SendConfigGC(&gExposureTime, &gcRegsData);
          HDER_UpdateAcquisitionFrameRateHeader(&gHderInserter, &gcRegsData);
       }
@@ -2113,6 +2129,7 @@ void GC_ExposureModeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
  */
 void GC_ExposureTimeCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 {
+
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
       if (!GC_FWSynchronouslyRotatingModeIsActive && !GC_EHDRIIsActive)
@@ -2152,7 +2169,6 @@ void GC_ExposureTime1Callback(gcCallbackPhase_t phase, gcCallbackAccess_t access
       {
          FWExposureTime[0] = gcRegsData.ExposureTime1;
          SFW_SetExposureTimeArray(0, FWExposureTime[0]);
-
          SFW_ExposureTimeChanged(&gcRegsData);
          GC_UpdateParameterLimits();
       }
@@ -2978,6 +2994,7 @@ void GC_HeightCallback(gcCallbackPhase_t phase, gcCallbackAccess_t access)
 
    if ((phase == GCCP_AFTER) && (access == GCCA_WRITE))
    {
+
       // Remove 2 header lines (added for the NTx-Mini)
       gcRegsData.Height -= 2;
       GC_UpdateJumboFrameHeight(&gcRegsData, true); // must be called first (may change height)

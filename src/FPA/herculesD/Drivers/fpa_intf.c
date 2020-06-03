@@ -38,7 +38,7 @@
  
 
 // Peride minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
-#define SCD_XTRA_TRIG_FREQ_MAX_HZ         44          
+#define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS          
   
 // Parametres de la commande serielle du HerculesD
 #define SCD_LONGEST_CMD_BYTES_NUM         32      // longueur en bytes de la plus longue commande serielle du HerculesD
@@ -143,7 +143,6 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_PE_IO_TEST2    3
 #define SCD_PE_TEST1       4
 
-#define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 #define VHD_INVALID_TEMP   0xFFFFFFFF
 

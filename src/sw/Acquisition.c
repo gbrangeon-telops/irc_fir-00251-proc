@@ -34,13 +34,19 @@
 #include "proc_init.h"
 #include "AEC.h"
 #include "Actualization.h"
+#include "SFW_ctrl.h"
 #include <stdbool.h> // bool
 
 static uint8_t gAcquisitionTurnOn = 0;
 static uint8_t gAcquisitionTurnOff = 0;
 static DevicePowerState_t gAcquisitionPowerState = DPS_PowerStandby;
 
-extern uint8_t gFrameRateChanged;
+bool actualisationAcqStartReady();
+void Acquisition_Arm();
+void Acquisition_Start();
+void SCD_UpdatePostponedExposureTimeChange();
+void SCD_SetRelaxMode();
+
 /**
  * Set acquisition module power state setpoint.
  *
@@ -90,51 +96,6 @@ bool actualisationAcqStartReady()
    return (gActAllowAcquisitionStart &&
          (gcRegsData.TDCStatus & ~WaitingForImageCorrectionMask) == 0) ||
          (gActDebugOptions.bypassChecks == true);
-}
-
-
-void Acquisition_SetTrigModeTransitionTimer(timerData_t* timer)
-{
-   #ifdef SCD_PROXY
-      StartTimer(timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F); // PelicanD require 50 ms delay before generating a prog_trig
-   #else
-      StartTimer(timer, 0.0F);
-   #endif
-}
-
-/**
- * Update frame rate.
- */
-void Acquisition_UpdateFrameRate(timerData_t* timer, const gcRegistersData_t *pGCRegs)
-{
-   extern t_Trig gTrig;
-   extern t_FpaIntf gFpaIntf;
-
-   if (gFrameRateChanged)
-   {
-      gFrameRateChanged = 0;
-
-      #ifdef SCD_PROXY
-         FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
-      #endif
-
-      TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
-
-      #ifdef SCD_PROXY
-         if(TDCStatusTst(AcquisitionStartedMask))
-            TRIG_ChangeAcqWindow(&gTrig, TRIG_Normal, &gcRegsData);
-      #endif
-   }
-}
-
-/**
- * Stop acquisition.
- */
-void Acquisition_Stop()
-{
-   GC_SetAcquisitionStop(0);
-   TDCStatusSet(WaitingForArmMask);
-   PRINT("Acquisition stopped!\n");
 }
 
 /**
@@ -194,6 +155,54 @@ void Acquisition_Start()
    PRINT("Acquisition started!\n");
 }
 
+
+/**
+ * Update exposure time.
+ */
+void SCD_UpdatePostponedExposureTimeChange()
+{
+   #ifdef SCD_PROXY
+      extern t_ExposureTime gExposureTime;
+      extern float FWExposureTime[MAX_NUM_FILTER];
+      uint8_t i;
+
+      // When gFrameRateChangePostponed = 1, new ETx isn't send immediately to the VHD (This measure was needed to prevent sending an invalid config to SCD proxy).
+      if (!GC_FWSynchronouslyRotatingModeIsActive)
+      {
+         EXP_SendConfigGC(&gExposureTime, &gcRegsData);
+      }
+      else
+      {
+         for (i = 0; i < NUM_OF(FWExposureTime); i++)
+         {
+            SFW_SetExposureTimeArray(i, FWExposureTime[i]);
+         }
+      }
+   #endif
+}
+
+/**
+ * Configure SCD proxy with FRmin to make valid all combination of ET, Height.
+ */
+void SCD_SetRelaxMode()
+{
+   /* This function should only be called when acquisition is stopped and we are in xtra trig mode after the XTRA_TRIG_MODE_DELAY has elapsed.
+    * The call of FPA_SendConfigGC() is also used to generate the prog trig necessary to get the last frame in IWR (This is required when current trig frequency is << SCD_XTRA_TRIG_FREQ_MAX_HZ).
+   */
+
+   #ifdef SCD_PROXY
+
+      float frameRateBackup;
+      extern t_FpaIntf gFpaIntf;
+
+      frameRateBackup = gcRegsData.AcquisitionFrameRate;
+      gcRegsData.AcquisitionFrameRate = SCD_MIN_OPER_FPS;
+      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+      gcRegsData.AcquisitionFrameRate = frameRateBackup;
+
+   #endif
+}
+
 /**
  * Acquisition state machine.
  
@@ -219,6 +228,11 @@ void Acquisition_SM()
    extern flashDynamicValues_t gFlashDynamicValues;
    extern t_Trig gTrig;
    extern t_FpaIntf gFpaIntf;
+
+   #ifdef SCD_PROXY
+      extern uint8_t gFrameRateChangePostponed;
+      extern t_HderInserter gHderInserter;
+   #endif
 
    static acquisitionState_t acquisitionState = ACQ_STOPPED;
    static uint8_t acquisitionStateTransition = 1;
@@ -346,7 +360,6 @@ void Acquisition_SM()
 
             if (AllowAcquisitionStart() || actualisationAcqStartReady())
             {
-               Acquisition_UpdateFrameRate(&trig_mode_transition_timer, &gcRegsData);
                Acquisition_Start();
                acquisitionState = ACQ_STARTED;
             }
@@ -354,8 +367,17 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
-            Acquisition_SetTrigModeTransitionTimer(&trig_mode_transition_timer);
-            acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
+
+            #ifdef SCD_PROXY
+               StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
+               acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
+            #else
+               GC_SetAcquisitionStop(0);
+               TDCStatusSet(WaitingForArmMask);
+               PRINT("Acquisition stopped!\n");
+               acquisitionState = ACQ_STOPPED;
+            #endif
+
          }
          break;
 
@@ -369,52 +391,70 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
-            Acquisition_SetTrigModeTransitionTimer(&trig_mode_transition_timer);
-            acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
+
+            #ifdef SCD_PROXY
+               StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
+               acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
+            #else
+               GC_SetAcquisitionStop(0);
+               TDCStatusSet(WaitingForArmMask);
+               PRINT("Acquisition stopped!\n");
+               acquisitionState = ACQ_STOPPED;
+            #endif
          }
          else
          {
             TDCStatusSet(AcquisitionStartedMask);
 
-            if(gFrameRateChanged)
-            {
-               #ifdef SCD_PROXY
-                  TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
-               #endif
-
-               Acquisition_SetTrigModeTransitionTimer(&trig_mode_transition_timer);
-               acquisitionState = ACQ_WAIT_TRIG_MODE_TRANSITION;
-            }
-
             if (acquisitionStateTransition == 1)
             {
                GC_UpdateParameterLimits();
             }
+
+            #ifdef SCD_PROXY
+               if(gFrameRateChangePostponed)
+               {
+                  TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
+                  StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
+                  acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
+               }
+            #endif
          }
          break;
 
 
-      case ACQ_WAIT_TRIG_MODE_TRANSITION:
+      case ACQ_WAIT_SCD_TRIG_MODE_TRANSITION:
 
-         if(TimedOut(&trig_mode_transition_timer))
-         {
-            StopTimer(&trig_mode_transition_timer);
-
-            if (gcRegsData.AcquisitionStop)
+         #ifdef SCD_PROXY
+            /* PelicanD & HerculeD : after setting the xtra_trig mode, it is required to observe a delay of
+             * at least 1/SCD_XTRA_TRIG_FREQ_MAX_HZ ms before generating a prog_trig.
+             * Otherwise the detector VHD module may crash unexpectedly.
+            */
+            if(TimedOut(&trig_mode_transition_timer))
             {
-               Acquisition_Stop();
-               acquisitionState = ACQ_STOPPED;
+               StopTimer(&trig_mode_transition_timer);
+
+               if (gcRegsData.AcquisitionStop)
+               {
+                  SCD_SetRelaxMode(); // Make valid all ET or Height values and generate the prog trig.
+                  GC_SetAcquisitionStop(0);
+                  TDCStatusSet(WaitingForArmMask);
+                  PRINT("Acquisition stopped!\n");
+                  acquisitionState = ACQ_STOPPED;
+               }
+               else
+               {
+                  //Frame rate was changed during acquisition.
+                  FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+                  gFrameRateChangePostponed = 0;
+                  SCD_UpdatePostponedExposureTimeChange();
+                  HDER_UpdateAcquisitionFrameRateHeader(&gHderInserter, &gcRegsData); // This action was postpone earlier in GC_AcquisitionFrameRateCallback().
+                  TRIG_ChangeFrameRate(&gTrig, &gFpaIntf, &gcRegsData);
+                  TRIG_ChangeAcqWindow(&gTrig, TRIG_Normal, &gcRegsData);
+                  acquisitionState = ACQ_STARTED;
+               }
             }
-            else
-            {
-               Acquisition_UpdateFrameRate(&trig_mode_transition_timer, &gcRegsData);
-               acquisitionState = ACQ_STARTED;
-            }
-
-
-         }
-
-
+         #endif
          break;
       case ACQ_WAITING_FOR_ADC_DDC_PRESENCE:
          FPA_GetStatus(&fpaStatus, &gFpaIntf);
@@ -697,3 +737,4 @@ void Acquisition_SM()
       acquisitionStateTransition = 0;
    }
 }
+

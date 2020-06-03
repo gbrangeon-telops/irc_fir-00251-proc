@@ -420,7 +420,11 @@ void HDER_UpdateReverseYHeader(const t_HderInserter *a, const gcRegistersData_t 
  */
 void HDER_UpdateAcquisitionFrameRateHeader(const t_HderInserter *a, const gcRegistersData_t *pGCRegs)
 {
-   AXI4L_write32((uint32_t)(pGCRegs->AcquisitionFrameRate * 1000.0F), a->ADD + A_BASE_HEADER + AcquisitionFrameRateHdrAddr);
+      #ifdef SCD_PROXY
+         extern uint8_t gFrameRateChangePostponed;
+         if (!gFrameRateChangePostponed)
+      #endif
+            AXI4L_write32((uint32_t)(pGCRegs->AcquisitionFrameRate * 1000.0F), a->ADD + A_BASE_HEADER + AcquisitionFrameRateHdrAddr);
 } 
 
 /**

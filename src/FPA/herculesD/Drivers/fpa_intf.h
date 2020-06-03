@@ -77,7 +77,7 @@
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]
 #else
    #define FPA_DEFAULT_EXPOSURE     1000.0F //[us]
-   #define FPA_DEFAULT_FRAME_RATE   44.0F //[Hz]
+   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]
 #endif
 
 // TODO Update EHDRI default exposure times.
@@ -103,7 +103,9 @@
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
-#define XTRA_TRIG_MODE_DELAY            50000  // us
+#define XTRA_TRIG_MODE_DELAY            100000  // us
+
+#define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet
