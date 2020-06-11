@@ -937,13 +937,15 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
       ptrH->int_signal_high_time_usec = 1.0F*ptrH->mclk_period_usec;   // ne doit jamais arriver
       
    //calcul de la periode minimale
+   ptrH->frame_period_coef = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
    ptrH->frame_period_min_usec = ptrH->int_signal_high_time_usec + ptrH->delay_usec + ptrH->readout_usec;
+   ptrH->frame_period_min_usec = ptrH->frame_period_coef * ptrH->frame_period_min_usec;
 
    //autres calculs
-   ptrH->frame_period_coef = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
+   
    ptrH->mode_int_end_to_trig_start_dly_usec     = ptrH->frame_period_min_usec - ptrH->int_signal_high_time_usec - ptrH->vhd_delay_usec;  // utilisé en mode int_end_trig_start. % pour le isc0804, ptrH.reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
    ptrH->mode_readout_end_to_trig_start_dly_usec = 0.3;
-   ptrH->mode_trig_start_to_trig_start_dly_usec  = (ptrH->frame_period_coef*ptrH->frame_period_min_usec - ptrH->int_time_offset_usec - 2.0F*ptrH->vhd_delay_usec);  // on se donne des marges supplémentaires 
+   ptrH->mode_trig_start_to_trig_start_dly_usec  = (ptrH->frame_period_min_usec - ptrH->int_time_offset_usec - 2.0F*ptrH->vhd_delay_usec);  // on se donne des marges supplémentaires 
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_min_usec*1e-6);
