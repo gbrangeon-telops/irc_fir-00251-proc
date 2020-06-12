@@ -193,7 +193,6 @@ struct isc0207_param_s             //
    float unused_area_clock_factor;
    float adc_sync_dly_mclk;
    float line_stretch_mclk;
-   float frame_period_coef;   // pour limitation artificielle du frame rate
 
    float pclk_rate_hz;
 };
@@ -778,12 +777,13 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    
    extern int32_t gFpaExposureTimeOffset;
 
+   const float fpa_mclk_divider = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
 
    // on ne fait jamais de fast windowing avec le M2K
    speedup_unused_area           = 0;
    
    // parametres statiques
-   ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
+   ptrH->mclk_period_usec        = 1e6F/((float)FPA_MCLK_RATE_HZ / fpa_mclk_divider);
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 2.0F;
    ptrH->fpa_delay_mclk          = 6.0F;   // FPA: delai de sortie des pixels après integration
@@ -799,7 +799,7 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    
    ptrH->line_stretch_mclk       = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
    if ((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX)
-    ptrH->line_stretch_mclk      = 0.0;
+      ptrH->line_stretch_mclk      = 0.0;
 
    ptrH->itr_tri_min_usec        = 2.0F; // limite inférieure de tri pour le mode ITR . Imposée par les tests de POFIMI
    ptrH->int_time_offset_usec    = 0.8F + (float)gFpaExposureTimeOffset*(1E+6F/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);  // offset du temps d'integration
@@ -862,9 +862,6 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    // calcul de la periode minimale
    ptrH->frame_period_min_usec = ptrH->fsync_low_usec + ptrH->delay_usec + ptrH->readout_usec + ptrH->tri_min_usec;
    
-   //autres calculs
-   ptrH->frame_period_coef = MAX(1.0F, (float)flashSettings.AcquisitionFrameRateMaxDivider);   // protection contre les valeurs accidentelles negatives ou nulles
-
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_min_usec*1e-6);
 }
@@ -874,19 +871,11 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
 //--------------------------------------------------------------------------
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
-   float MaxFrameRate, MaxFrameRate_limit;
+   float MaxFrameRate;
    isc0207_param_t hh;
    
-   // Find max frame rate limit at null exposure time
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs);
-   MaxFrameRate_limit = hh.frame_rate_max_hz / hh.frame_period_coef;
-
-   // Find max frame rate at current exposure time and limit the result
    FPA_SpecificParams(&hh,(float)pGCRegs->ExposureTime, pGCRegs);
-   MaxFrameRate = MIN(hh.frame_rate_max_hz, MaxFrameRate_limit);
-
-   // Round maximum frame rate
-   MaxFrameRate = floorMultiple(MaxFrameRate, 0.01);
+   MaxFrameRate = floorMultiple(hh.frame_rate_max_hz, 0.01);
 
    return MaxFrameRate;
 }
