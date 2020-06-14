@@ -143,9 +143,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  adc_clk_pipe_sync_pos;
 
    uint32_t  readout_plus_delay;                                                                                                                        
-   uint32_t  spare2;                                                                                                               
+   uint32_t  tri_min_window_part;                                                                                                               
    int32_t   int_time_offset_mclk;                                                                                                                           
-   int32_t   tri_min_window_part;
+   int32_t   spare2;
    int32_t   tsh_min_minus_int_time_offset;  // attention en IWR ce chiffre peut etre negatif
    uint32_t  elcorr_enabled;                       
    uint32_t  elcorr_spare1;        
@@ -250,7 +250,7 @@ struct s_FpaStatus    //
    uint32_t  trig_to_int_delay_min;
    uint32_t  trig_to_int_delay_max;
    uint32_t  int_to_int_delay_min;
-   uint32_t  int_to_int_delay_max; 
+   uint32_t  int_to_int_delay_max;
    uint32_t  fast_hder_cnt; 
    
 };
