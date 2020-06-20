@@ -17,8 +17,8 @@ lappend detector_list {herculesD160}
 lappend detector_list {isc0207A160}
 #lappend detector_list {isc0207A325}
 
-#lappend detector_list {isc0207A_3k160}
-lappend detector_list {isc0207A_3k325}
+lappend detector_list {isc0207A_3k160}
+#lappend detector_list {isc0207A_3k325}
 
 lappend detector_list {isc0209A160}
 #lappend detector_list {isc0209A325}
