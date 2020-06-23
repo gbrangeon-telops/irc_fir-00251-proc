@@ -181,110 +181,126 @@ begin
    end process;
    
    --------------------------------------------------------
-   -- changements de reference
+   -- M3K en node correction effset uniquement
    -------------------------------------------------------- 
    U3: process(CLK)
    begin
-      if rising_edge(CLK) then 
-         if sreset = '1' then
-            --elcorr_ref_dac_id <= to_integer(USER_CFG_IN.ELCORR_REF_DAC_ID);   -- pour une bonne initialisation et evitrer ainsi des bugs
-            user_cfg_o <= USER_CFG_IN;                                         -- pour une bonne initialisation et evitrer ainsi des bugs
-            elcorr_ref_value_reg <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id); -- pour une bonne initialisation et evitrer ainsi des bugs
-            ctrl_fsm <= idle;
-            ref_valid_i <= (others => '0');
-            present_cfg_num <= not USER_CFG_IN.CFG_NUM;
-            prog_trig_i <= '0'; 
-            -- elcorr_init_done_i <= '0'; 
-            done_i <= '0';
-            rqst_i <= '0';
-            
-         else
-            
-            elcorr_ref_dac_id <= to_integer(FPA_INTF_CFG.ELCORR_REF_DAC_ID);            
-            user_cfg_o <= USER_CFG_IN;
-            user_cfg_o.vdac_value(elcorr_ref_dac_id) <= elcorr_ref_value_reg;
-            
-            case ctrl_fsm is
-               
-               when idle =>
-                  prog_trig_i <= '0';
-                  done_i <= '1';
-                  rqst_i <= '0';
-                  if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then  
-                     ctrl_fsm <= slct_ref_st;
-                  end if;
-               
-               when slct_ref_st =>
-                  if USER_CFG_IN.ELCORR_REF_CFG(1).REF_ENABLED = '1' then
-                     ref_id <= 1;
-                  else
-                     ref_id <= 0;       -- si REF1 n'est pas activée, alors on se contente de REF0 uniqument
-                  end if;                                     
-                  ctrl_fsm <= check_value_st;
-               
-               when check_value_st =>     -- s'assurer que la valeur à changer n'est pas déjà celle qui a cours dans le dac
-                  if USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE = FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) and ref_valid_i(ref_id) = '1' then
-                     ctrl_fsm <= idle;
-                  else
-                     ctrl_fsm <= change_ref_st;
-                  end if;
-               
-               when change_ref_st =>      -- on demande une programmation du dac des ref avec la valeur de ref correspondant à l'id actif 
-                  elcorr_ref_value_reg <= USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE;
-                  ref_valid_i <= "00"; -- plus aucune reference n'est valide puisqu'on s'apprête à reprogrammer les dacs
-                  ctrl_fsm <= wait_done_st;
-               
-               when wait_done_st =>       -- on attend que la programmation soit terminée
-                  pause_cnt <= 0;
-                  if FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) = elcorr_ref_value_reg then
-                     ctrl_fsm <= pause_st;
-                  end if;
-               
-               when pause_st =>           -- on donne du temps à la sortie du dac programmé de se stabiliser
-                  pause_cnt <= pause_cnt + 1;
-                  if pause_cnt > DEFINE_ELCORR_REF_DAC_SETUP_FACTOR then   -- soit environ 50% du temps de validité d'une vref. Les mesures à l,oscillo revelent que la stabilisation s'obtient apres 250 ms 
-                     ctrl_fsm <= rqst_st;
-                  end if;
-                  -- pragma translate_off
-                  ctrl_fsm <= rqst_st;
-                  -- pragma translate_on
-               
-               when rqst_st =>           -- on fait une demande 
-                  rqst_i <= '1';         -- permet d'arreter le trig controller
-                  if EN = '1' then
-                     done_i <= '0';
-                     ctrl_fsm <= ref_valid_st;  
-                  end if;
-               
-               when ref_valid_st =>            -- on diffuse l'info de la validité de la reference 
-                  rqst_i <= '0';                  
-                  ref_valid_i(ref_id) <= '1';
-                  ctrl_fsm <= wait_fdbk_st;             
-               
-               when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  prog_trig_i <= not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
-                  if ref_feedbk_i(ref_id) = '1' then
-                     prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
-                     done_i <= '1';        -- on lâche le done pour que les autres clients puisque avoir acces au lien
-                     if ref_id = 0 then
-                        ctrl_fsm <= idle;
-                     else
-                        ctrl_fsm <= default_ref_st;  
-                     end if;
-                     ref_valid_i(1) <= '0';    -- ainsi les changements de niveau affecteront juste une image si impact il y a 
-                  end if;
-               
-               when default_ref_st =>          -- on remet la reference par defaut (ref_id = 0)
-                  ref_id <= 0;
-                  present_cfg_num <= USER_CFG_IN.CFG_NUM; 
-                  ctrl_fsm <= check_value_st;                  
-               
-               when others =>
-               
-            end case;        
-            
-         end if;
+      if rising_edge(CLK) then                                                      
+         prog_trig_i <= '0'; 
+         done_i <= '1';
+         rqst_i <= '0';             
+         user_cfg_o <= USER_CFG_IN;
+         ref_valid_i <= '0' & USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED;                   
       end if;  
    end process;
+   
+   --   --------------------------------------------------------
+   --   -- changements de reference
+   --   -------------------------------------------------------- 
+   --   U3: process(CLK)
+   --   begin
+   --      if rising_edge(CLK) then 
+   --         if sreset = '1' then
+   --            --elcorr_ref_dac_id <= to_integer(USER_CFG_IN.ELCORR_REF_DAC_ID);   -- pour une bonne initialisation et evitrer ainsi des bugs
+   --            user_cfg_o <= USER_CFG_IN;                                         -- pour une bonne initialisation et evitrer ainsi des bugs
+   --            elcorr_ref_value_reg <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id); -- pour une bonne initialisation et evitrer ainsi des bugs
+   --            ctrl_fsm <= idle;
+   --            ref_valid_i <= (others => '0');
+   --            present_cfg_num <= not USER_CFG_IN.CFG_NUM;
+   --            prog_trig_i <= '0'; 
+   --            -- elcorr_init_done_i <= '0'; 
+   --            done_i <= '0';
+   --            rqst_i <= '0';
+   --            
+   --         else
+   --            
+   --            elcorr_ref_dac_id <= to_integer(FPA_INTF_CFG.ELCORR_REF_DAC_ID);            
+   --            user_cfg_o <= USER_CFG_IN;
+   --            if USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then
+   --               user_cfg_o.vdac_value(elcorr_ref_dac_id) <= elcorr_ref_value_reg;
+   --            end if;
+   --            
+   --            case ctrl_fsm is
+   --               
+   --               when idle =>
+   --                  prog_trig_i <= '0';
+   --                  done_i <= '1';
+   --                  rqst_i <= '0';
+   --                  if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then  
+   --                     ctrl_fsm <= slct_ref_st;
+   --                  end if;
+   --               
+   --               when slct_ref_st =>
+   --                  if USER_CFG_IN.ELCORR_REF_CFG(1).REF_ENABLED = '1' then
+   --                     ref_id <= 1;
+   --                  else
+   --                     ref_id <= 0;       -- si REF1 n'est pas activée, alors on se contente de REF0 uniqument
+   --                  end if;                                     
+   --                  ctrl_fsm <= check_value_st;
+   --               
+   --               when check_value_st =>     -- s'assurer que la valeur à changer n'est pas déjà celle qui a cours dans le dac
+   --                  if USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE = FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) and ref_valid_i(ref_id) = '1' then
+   --                     ctrl_fsm <= idle;
+   --                  else
+   --                     ctrl_fsm <= change_ref_st;
+   --                  end if;
+   --               
+   --               when change_ref_st =>      -- on demande une programmation du dac des ref avec la valeur de ref correspondant à l'id actif 
+   --                  elcorr_ref_value_reg <= USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE;
+   --                  ref_valid_i <= "00"; -- plus aucune reference n'est valide puisqu'on s'apprête à reprogrammer les dacs
+   --                  ctrl_fsm <= wait_done_st;
+   --               
+   --               when wait_done_st =>       -- on attend que la programmation soit terminée
+   --                  pause_cnt <= 0;
+   --                  if FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) = elcorr_ref_value_reg then
+   --                     ctrl_fsm <= pause_st;
+   --                  end if;
+   --               
+   --               when pause_st =>           -- on donne du temps à la sortie du dac programmé de se stabiliser
+   --                  pause_cnt <= pause_cnt + 1;
+   --                  if pause_cnt > DEFINE_ELCORR_REF_DAC_SETUP_FACTOR then   -- soit environ 50% du temps de validité d'une vref. Les mesures à l,oscillo revelent que la stabilisation s'obtient apres 250 ms 
+   --                     ctrl_fsm <= rqst_st;
+   --                  end if;
+   --                  -- pragma translate_off
+   --                  ctrl_fsm <= rqst_st;
+   --                  -- pragma translate_on
+   --               
+   --               when rqst_st =>           -- on fait une demande 
+   --                  rqst_i <= '1';         -- permet d'arreter le trig controller
+   --                  if EN = '1' then
+   --                     done_i <= '0';
+   --                     ctrl_fsm <= ref_valid_st;  
+   --                  end if;
+   --               
+   --               when ref_valid_st =>            -- on diffuse l'info de la validité de la reference 
+   --                  rqst_i <= '0';                  
+   --                  ref_valid_i(ref_id) <= '1';
+   --                  ctrl_fsm <= wait_fdbk_st;             
+   --               
+   --               when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
+   --                  prog_trig_i <= not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
+   --                  if ref_feedbk_i(ref_id) = '1' then
+   --                     prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
+   --                     done_i <= '1';        -- on lâche le done pour que les autres clients puisque avoir acces au lien
+   --                     if ref_id = 0 then
+   --                        ctrl_fsm <= idle;
+   --                     else
+   --                        ctrl_fsm <= default_ref_st;  
+   --                     end if;
+   --                     ref_valid_i(1) <= '0';    -- ainsi les changements de niveau affecteront juste une image si impact il y a 
+   --                  end if;
+   --               
+   --               when default_ref_st =>          -- on remet la reference par defaut (ref_id = 0)
+   --                  ref_id <= 0;
+   --                  present_cfg_num <= USER_CFG_IN.CFG_NUM; 
+   --                  ctrl_fsm <= check_value_st;                  
+   --               
+   --               when others =>
+   --               
+   --            end case;        
+   --            
+   --         end if;
+   --      end if;  
+   --   end process;
    
 end rtl;

@@ -81,7 +81,7 @@ architecture rtl of isc0207A_3k_readout_kernel is
          CLK : in std_logic);
    end component;
    
-   component fwft_sfifo_w3_d16
+   component fwft_sfifo_w3_d256
       port (
          clk         : in std_logic;
          srst        : in std_logic;
@@ -234,7 +234,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour edges du signal d'intégration
    --------------------------------------------------   
-   U3A : fwft_sfifo_w3_d16
+   U3A : fwft_sfifo_w3_d256
    port map (
       clk         => CLK,
       srst        => sreset,
@@ -278,7 +278,7 @@ begin
          else  
             
             --inc := '0'& fpa_mclk_re;
-            fpa_int_i <= FPA_INT;
+            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
             fpa_int_last <= fpa_int_i;
             
             int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
@@ -405,7 +405,7 @@ begin
                when rst_wdow_gen_st =>    -- 
                   rst_wdow_gen_i <= '1';                          -- le upstream subit un reset 
                   rst_cnt_i <= rst_cnt_i + 1;
-                  if rst_cnt_i(3) = '1' then
+                  if rst_cnt_i(4) = '1' then
                      ctrl_fsm <= idle;
                   end if;
                
@@ -470,7 +470,7 @@ begin
             read_start_last <= readout_info_i.aoi.sof;
             
             -- elcorr_ref_start_i dure 1 PCLK             
-            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (fpa_int_last and not fpa_int_i); -- Attention! le falling de Int = debut de elc_ofs.
+            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (read_end_last and not readout_info_i.aoi.read_end); -- Attention! le rd_end = debut de elc_ofs.
             if unsigned(elcorr_ref_start_pipe) /= 0 then
                elcorr_ref_start_i <= '1';
                elcorr_ref_fval_i  <= '1'; 

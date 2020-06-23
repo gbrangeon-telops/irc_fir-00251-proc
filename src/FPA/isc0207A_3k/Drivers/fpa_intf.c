@@ -228,7 +228,7 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
-ProximCfg_t ProximCfg = {{12812, 12812, 12812, 8271, 8440, 12663, 5062, 12812}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
+ProximCfg_t ProximCfg = {{12812, 12812, 12812, 8372, 8440, 12663, 5062, 12812}, 0, 0};   // les valeurs d'initisalisation des dacs sont les 8 premiers chiffres
 
 // definition et activation des accelerateurs
 uint8_t speedup_unused_area = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
@@ -406,11 +406,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->boost_mode = 0;
    
    // delai LsyDel
-   ptrA->lsydel_mclk = 2;           // LSYDEL en MCLK, obtenu par test live de dissimulation des bandes en sous-fenetrage sur M3K
+   ptrA->lsydel_mclk = 4;           // LSYDEL en MCLK, obtenu par test live de dissimulation des bandes en sous-fenetrage sur M3K
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF =  10 - 2*ptrA->lsydel_mclk;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
+      gFpaDebugRegF = 1; // 10 - 2*ptrA->lsydel_mclk;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // accélerateurs 
@@ -652,7 +652,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    } 
   
    // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = hh.fpa_delay_mclk * hh.mclk_period_usec; // hh.itr_tri_min_usec;
+   elcorr_comp_duration_usec                  = hh.tsh_min_usec/2.0F; // ENO 21 juin 2020 : pour isc0207, la valeur de lsydel_mclk détermine la largeur de la zone de sampling de la reference 1
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
    ptrA->elcorr_spare1                        = 0;              
@@ -661,7 +661,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // vhd reference 0:                                              
    ptrA->elcorr_ref_cfg_0_ref_enabled         = ptrA->elcorr_enabled;               
    ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode  = 0;              
-   ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 2;        
+   ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 4;        
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_0_samp_num_per_ch - (ptrA->elcorr_ref_cfg_0_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
@@ -671,7 +671,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // vhd reference 1: 
    ptrA->elcorr_ref_cfg_1_ref_enabled         = 0;  // on n'active pas la reference la reference 2 que si on a un fleGX avec un OUTR deconnecté        
    ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode  = 0;              
-   ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = 2;        
+   ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = 4;        
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_1_samp_num_per_ch - (ptrA->elcorr_ref_cfg_1_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
