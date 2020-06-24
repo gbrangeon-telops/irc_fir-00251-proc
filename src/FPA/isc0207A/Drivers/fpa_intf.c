@@ -920,6 +920,9 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    // dans tous les cas         
    max_exposure_usec = max_fsync_low_usec - hh.int_time_offset_usec;
    
+   // Round exposure time
+   max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
+   
    // Limit exposure time
    max_exposure_usec = MIN(MAX(max_exposure_usec, pGCRegs->ExposureTimeMin), FPA_MAX_EXPOSURE);
    
