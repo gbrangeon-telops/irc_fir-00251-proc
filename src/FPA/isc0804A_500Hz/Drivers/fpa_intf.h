@@ -43,7 +43,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0804A_500HzIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask)
+#define FPA_TDC_FLAGS            (Isc0804A_500HzIsImplemented | ITRIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
 #define FPA_MAX_GAIN       0
@@ -63,7 +63,6 @@
 #define FPA_CAL_MAX_EXPOSURE  1000000.0F
 
 #define FPA_MCLK_RATE_HZ       5500000          //5500000     //11100000          //11880000          //5000000    //11100000          // le master clock du FPA
-#define FPA_CLOCK_FREQ_HZ      FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
 
 #define FPA_MIN_EXPOSURE       (float)(3E6F/(float)FPA_MCLK_RATE_HZ)        //0.527F //0.271F     // 0.6F //0.271F     // [us]
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détyecteurs analogiques car le convertisseur vhd de temps d'exposition en depend 

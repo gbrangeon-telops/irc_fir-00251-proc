@@ -43,7 +43,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0804AIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask)
+#define FPA_TDC_FLAGS            (Isc0804AIsImplemented | ITRIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
 #define FPA_MAX_GAIN       0
@@ -73,7 +73,7 @@
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define FPA_MCLK_RATE_HZ            11100000          //5500000     //11100000          //11880000          //5000000    //11100000          // le master clock du FPA
-#define FPA_CLOCK_FREQ_HZ           FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
+
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec] , one pixel per mclk edges (DDR) 
 
 #define FPA_PRINTF(fmt, ...)  FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)

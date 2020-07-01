@@ -33,10 +33,10 @@
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   32
-#define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_OFFSETX_MULT)
+#define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   2
-#define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_OFFSETY_MULT)
+#define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
@@ -44,7 +44,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0207AIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Isc0207AIsImplemented | ITRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
 #define FPA_MAX_GAIN       1

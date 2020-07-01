@@ -33,10 +33,10 @@
 
 #define FPA_OFFSETX_MIN    0
 #define FPA_OFFSETX_MULT   32
-#define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_OFFSETX_MULT)
+#define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   2
-#define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_OFFSETY_MULT)
+#define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
@@ -44,7 +44,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Isc0207A_3kIsImplemented | ITRIsImplementedMask | ClFullIsImplementedMask | \
+#define FPA_TDC_FLAGS            (Isc0207A_3kIsImplemented | ITRIsImplementedMask | \
                                  HighGainSWDIsImplementedMask | BurstModeIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
@@ -75,7 +75,7 @@
 #define FPA_INVALID_TEMP               -32768   // cC
 
 #define FPA_MCLK_RATE_HZ            8333375          // le master clock du FPA
-#define FPA_CLOCK_FREQ_HZ           FPA_MCLK_RATE_HZ  // utilisé dans GC_registers.c
+
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F) // [pix/sec] , one pixel per mclk edges (DDR)
 
 #define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
