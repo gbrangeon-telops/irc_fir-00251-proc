@@ -157,7 +157,7 @@ proc write_mig_file_core_CAL_DDR_MIG_0 { str_mig_prj_filepath } {
    puts $mig_prj_file {        <MMCMClkOut2>1</MMCMClkOut2>}
    puts $mig_prj_file {        <MMCMClkOut3>1</MMCMClkOut3>}
    puts $mig_prj_file {        <MMCMClkOut4>1</MMCMClkOut4>}
-   puts $mig_prj_file {        <DataWidth>32</DataWidth>}
+   puts $mig_prj_file {        <DataWidth>64</DataWidth>}
    puts $mig_prj_file {        <DeepMemory>1</DeepMemory>}
    puts $mig_prj_file {        <DataMask>1</DataMask>}
    puts $mig_prj_file {        <ECC>Disabled</ECC>}
@@ -169,80 +169,124 @@ proc write_mig_file_core_CAL_DDR_MIG_0 { str_mig_prj_filepath } {
    puts $mig_prj_file {        <ColAddress>10</ColAddress>}
    puts $mig_prj_file {        <BankAddress>3</BankAddress>}
    puts $mig_prj_file {        <MemoryVoltage>1.5V</MemoryVoltage>}
-   puts $mig_prj_file {        <C0_MEM_SIZE>1073741824</C0_MEM_SIZE>}
+   puts $mig_prj_file {        <C0_MEM_SIZE>2147483648</C0_MEM_SIZE>}
    puts $mig_prj_file {        <UserMemoryAddressMap>BANK_ROW_COLUMN</UserMemoryAddressMap>}
    puts $mig_prj_file {        <PinSelection>}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC8" slew="SLOW" name="ddr3_addr[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y7" slew="SLOW" name="ddr3_addr[10]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="W10" slew="SLOW" name="ddr3_addr[11]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="W9" slew="SLOW" name="ddr3_addr[12]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V8" slew="SLOW" name="ddr3_addr[13]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V7" slew="SLOW" name="ddr3_addr[14]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD8" slew="SLOW" name="ddr3_addr[1]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA8" slew="SLOW" name="ddr3_addr[2]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA7" slew="SLOW" name="ddr3_addr[3]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AE7" slew="SLOW" name="ddr3_addr[4]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AF7" slew="SLOW" name="ddr3_addr[5]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V9" slew="SLOW" name="ddr3_addr[6]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y11" slew="SLOW" name="ddr3_addr[7]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y10" slew="SLOW" name="ddr3_addr[8]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y8" slew="SLOW" name="ddr3_addr[9]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC12" slew="SLOW" name="ddr3_ba[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AB12" slew="SLOW" name="ddr3_ba[1]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA12" slew="SLOW" name="ddr3_ba[2]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y13" slew="SLOW" name="ddr3_cas_n" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15" PADName="AB9" slew="SLOW" name="ddr3_ck_n[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15" PADName="AA9" slew="SLOW" name="ddr3_ck_p[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC7" slew="SLOW" name="ddr3_cke[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD13" slew="SLOW" name="ddr3_cs_n[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V4" slew="SLOW" name="ddr3_dm[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA2" slew="SLOW" name="ddr3_dm[1]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD5" slew="SLOW" name="ddr3_dm[2]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AF3" slew="SLOW" name="ddr3_dm[3]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U5" slew="SLOW" name="ddr3_dq[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V2" slew="SLOW" name="ddr3_dq[10]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V1" slew="SLOW" name="ddr3_dq[11]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y1" slew="SLOW" name="ddr3_dq[12]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W1" slew="SLOW" name="ddr3_dq[13]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC2" slew="SLOW" name="ddr3_dq[14]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB2" slew="SLOW" name="ddr3_dq[15]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB4" slew="SLOW" name="ddr3_dq[16]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA4" slew="SLOW" name="ddr3_dq[17]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC3" slew="SLOW" name="ddr3_dq[18]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC4" slew="SLOW" name="ddr3_dq[19]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U6" slew="SLOW" name="ddr3_dq[1]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC6" slew="SLOW" name="ddr3_dq[20]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB6" slew="SLOW" name="ddr3_dq[21]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y5" slew="SLOW" name="ddr3_dq[22]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y6" slew="SLOW" name="ddr3_dq[23]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF2" slew="SLOW" name="ddr3_dq[24]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD4" slew="SLOW" name="ddr3_dq[25]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD1" slew="SLOW" name="ddr3_dq[26]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE1" slew="SLOW" name="ddr3_dq[27]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE3" slew="SLOW" name="ddr3_dq[28]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE2" slew="SLOW" name="ddr3_dq[29]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U2" slew="SLOW" name="ddr3_dq[2]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE6" slew="SLOW" name="ddr3_dq[30]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE5" slew="SLOW" name="ddr3_dq[31]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U1" slew="SLOW" name="ddr3_dq[3]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V3" slew="SLOW" name="ddr3_dq[4]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W3" slew="SLOW" name="ddr3_dq[5]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U7" slew="SLOW" name="ddr3_dq[6]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V6" slew="SLOW" name="ddr3_dq[7]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y3" slew="SLOW" name="ddr3_dq[8]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y2" slew="SLOW" name="ddr3_dq[9]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="W5" slew="SLOW" name="ddr3_dqs_n[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AC1" slew="SLOW" name="ddr3_dqs_n[1]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AB5" slew="SLOW" name="ddr3_dqs_n[2]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AF4" slew="SLOW" name="ddr3_dqs_n[3]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="W6" slew="SLOW" name="ddr3_dqs_p[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AB1" slew="SLOW" name="ddr3_dqs_p[1]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AA5" slew="SLOW" name="ddr3_dqs_p[2]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AF5" slew="SLOW" name="ddr3_dqs_p[3]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AB10" slew="SLOW" name="ddr3_odt[0]" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC9" slew="SLOW" name="ddr3_ras_n" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="LVCMOS15" PADName="AD9" slew="SLOW" name="ddr3_reset_n" IN_TERM="" />}
-   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y12" slew="SLOW" name="ddr3_we_n" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC8" SLEW="" name="ddr3_addr[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y7" SLEW="" name="ddr3_addr[10]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="W10" SLEW="" name="ddr3_addr[11]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="W9" SLEW="" name="ddr3_addr[12]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V8" SLEW="" name="ddr3_addr[13]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V7" SLEW="" name="ddr3_addr[14]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD8" SLEW="" name="ddr3_addr[1]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA8" SLEW="" name="ddr3_addr[2]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA7" SLEW="" name="ddr3_addr[3]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AE7" SLEW="" name="ddr3_addr[4]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AF7" SLEW="" name="ddr3_addr[5]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V9" SLEW="" name="ddr3_addr[6]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y11" SLEW="" name="ddr3_addr[7]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y10" SLEW="" name="ddr3_addr[8]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y8" SLEW="" name="ddr3_addr[9]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC12" SLEW="" name="ddr3_ba[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AB12" SLEW="" name="ddr3_ba[1]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA12" SLEW="" name="ddr3_ba[2]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y13" SLEW="" name="ddr3_cas_n" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15" PADName="AB9" SLEW="" name="ddr3_ck_n[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15" PADName="AA9" SLEW="" name="ddr3_ck_p[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC7" SLEW="" name="ddr3_cke[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD13" SLEW="" name="ddr3_cs_n[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V4" SLEW="" name="ddr3_dm[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AA2" SLEW="" name="ddr3_dm[1]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD5" SLEW="" name="ddr3_dm[2]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AF3" SLEW="" name="ddr3_dm[3]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AD16" SLEW="" name="ddr3_dm[4]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AB16" SLEW="" name="ddr3_dm[5]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AB20" SLEW="" name="ddr3_dm[6]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="V14" SLEW="" name="ddr3_dm[7]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U5" SLEW="" name="ddr3_dq[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V2" SLEW="" name="ddr3_dq[10]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V1" SLEW="" name="ddr3_dq[11]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y1" SLEW="" name="ddr3_dq[12]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W1" SLEW="" name="ddr3_dq[13]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC2" SLEW="" name="ddr3_dq[14]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB2" SLEW="" name="ddr3_dq[15]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB4" SLEW="" name="ddr3_dq[16]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA4" SLEW="" name="ddr3_dq[17]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC3" SLEW="" name="ddr3_dq[18]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC4" SLEW="" name="ddr3_dq[19]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U6" SLEW="" name="ddr3_dq[1]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC6" SLEW="" name="ddr3_dq[20]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB6" SLEW="" name="ddr3_dq[21]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y5" SLEW="" name="ddr3_dq[22]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y6" SLEW="" name="ddr3_dq[23]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF2" SLEW="" name="ddr3_dq[24]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD4" SLEW="" name="ddr3_dq[25]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD1" SLEW="" name="ddr3_dq[26]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE1" SLEW="" name="ddr3_dq[27]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE3" SLEW="" name="ddr3_dq[28]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE2" SLEW="" name="ddr3_dq[29]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U2" SLEW="" name="ddr3_dq[2]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE6" SLEW="" name="ddr3_dq[30]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE5" SLEW="" name="ddr3_dq[31]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF17" SLEW="" name="ddr3_dq[32]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE17" SLEW="" name="ddr3_dq[33]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF14" SLEW="" name="ddr3_dq[34]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF15" SLEW="" name="ddr3_dq[35]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD15" SLEW="" name="ddr3_dq[36]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AE15" SLEW="" name="ddr3_dq[37]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF19" SLEW="" name="ddr3_dq[38]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AF20" SLEW="" name="ddr3_dq[39]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U1" SLEW="" name="ddr3_dq[3]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA14" SLEW="" name="ddr3_dq[40]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA15" SLEW="" name="ddr3_dq[41]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC14" SLEW="" name="ddr3_dq[42]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD14" SLEW="" name="ddr3_dq[43]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB15" SLEW="" name="ddr3_dq[44]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB14" SLEW="" name="ddr3_dq[45]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA18" SLEW="" name="ddr3_dq[46]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA17" SLEW="" name="ddr3_dq[47]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD18" SLEW="" name="ddr3_dq[48]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC18" SLEW="" name="ddr3_dq[49]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V3" SLEW="" name="ddr3_dq[4]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC17" SLEW="" name="ddr3_dq[50]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AB17" SLEW="" name="ddr3_dq[51]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA20" SLEW="" name="ddr3_dq[52]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AA19" SLEW="" name="ddr3_dq[53]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AD19" SLEW="" name="ddr3_dq[54]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="AC19" SLEW="" name="ddr3_dq[55]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W14" SLEW="" name="ddr3_dq[56]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y17" SLEW="" name="ddr3_dq[57]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V17" SLEW="" name="ddr3_dq[58]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V16" SLEW="" name="ddr3_dq[59]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W3" SLEW="" name="ddr3_dq[5]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W15" SLEW="" name="ddr3_dq[60]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="W16" SLEW="" name="ddr3_dq[61]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V18" SLEW="" name="ddr3_dq[62]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V19" SLEW="" name="ddr3_dq[63]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="U7" SLEW="" name="ddr3_dq[6]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="V6" SLEW="" name="ddr3_dq[7]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y3" SLEW="" name="ddr3_dq[8]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15_T_DCI" PADName="Y2" SLEW="" name="ddr3_dq[9]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="W5" SLEW="" name="ddr3_dqs_n[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AC1" SLEW="" name="ddr3_dqs_n[1]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AB5" SLEW="" name="ddr3_dqs_n[2]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AF4" SLEW="" name="ddr3_dqs_n[3]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AF18" SLEW="" name="ddr3_dqs_n[4]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="Y16" SLEW="" name="ddr3_dqs_n[5]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AE20" SLEW="" name="ddr3_dqs_n[6]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="W19" SLEW="" name="ddr3_dqs_n[7]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="W6" SLEW="" name="ddr3_dqs_p[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AB1" SLEW="" name="ddr3_dqs_p[1]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AA5" SLEW="" name="ddr3_dqs_p[2]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AF5" SLEW="" name="ddr3_dqs_p[3]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AE18" SLEW="" name="ddr3_dqs_p[4]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="Y15" SLEW="" name="ddr3_dqs_p[5]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="AD20" SLEW="" name="ddr3_dqs_p[6]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="DIFF_SSTL15_T_DCI" PADName="W18" SLEW="" name="ddr3_dqs_p[7]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AB10" SLEW="" name="ddr3_odt[0]" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="AC9" SLEW="" name="ddr3_ras_n" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="LVCMOS15" PADName="AD9" SLEW="" name="ddr3_reset_n" IN_TERM="" />}
+   puts $mig_prj_file {            <Pin VCCAUX_IO="" IOSTANDARD="SSTL15" PADName="Y12" SLEW="" name="ddr3_we_n" IN_TERM="" />}
    puts $mig_prj_file {        </PinSelection>}
    puts $mig_prj_file {        <System_Clock>}
    puts $mig_prj_file {            <Pin PADName="AB11/AC11(CC_P/N)" Bank="33" name="sys_clk_p/n" />}
@@ -278,7 +322,7 @@ proc write_mig_file_core_CAL_DDR_MIG_0 { str_mig_prj_filepath } {
    puts $mig_prj_file {        <PortInterface>AXI</PortInterface>}
    puts $mig_prj_file {        <AXIParameters>}
    puts $mig_prj_file {            <C0_C_RD_WR_ARB_ALGORITHM>RD_PRI_REG</C0_C_RD_WR_ARB_ALGORITHM>}
-   puts $mig_prj_file {            <C0_S_AXI_ADDR_WIDTH>30</C0_S_AXI_ADDR_WIDTH>}
+   puts $mig_prj_file {            <C0_S_AXI_ADDR_WIDTH>31</C0_S_AXI_ADDR_WIDTH>}
    puts $mig_prj_file {            <C0_S_AXI_DATA_WIDTH>256</C0_S_AXI_DATA_WIDTH>}
    puts $mig_prj_file {            <C0_S_AXI_ID_WIDTH>2</C0_S_AXI_ID_WIDTH>}
    puts $mig_prj_file {            <C0_S_AXI_SUPPORTS_NARROW_BURST>0</C0_S_AXI_SUPPORTS_NARROW_BURST>}
@@ -916,6 +960,61 @@ CONFIG.STRATEGY {2} \
   connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins PERIPHERAL_ARESETN] [get_bd_pins CAL_DDR_MIG/aresetn] [get_bd_pins axi_datamover_ddrcal/m_axi_mm2s_aresetn] [get_bd_pins axi_datamover_ddrcal/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_buffer/m_axi_mm2s_aresetn] [get_bd_pins axi_dm_buffer/m_axi_s2mm_aresetn] [get_bd_pins axi_dm_buffer/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_buffer/m_axis_s2mm_cmdsts_aresetn] [get_bd_pins axi_interconnect_ddrcal/M00_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S00_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S01_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S02_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S03_ARESETN]
   connect_bd_net -net xadc_wiz_1_temp_out [get_bd_pins device_temp_i] [get_bd_pins CAL_DDR_MIG/device_temp_i]
 
+  # Perform GUI Layout
+  regenerate_bd_layout -hierarchy [get_bd_cells /MIG_Calibration] -layout_string {
+   guistr: "# # String gsaved with Nlview 6.6.5b  2016-09-06 bk=1.3687 VDI=39 GEI=35 GUI=JA:1.6
+#  -string -flagsOSRD
+preplace port S_AXIS_S2MM_BUF -pg 1 -y 440 -defaultsOSRD
+preplace port M_AXIS_MM2S_BUF -pg 1 -y 560 -defaultsOSRD
+preplace port S_AXIS_S2MM_CMD_BUF -pg 1 -y 460 -defaultsOSRD
+preplace port SYS_CLK -pg 1 -y 960 -defaultsOSRD
+preplace port S_AXIS_CAL_MM2S_CMD -pg 1 -y 740 -defaultsOSRD
+preplace port M_AXIS_CALDDR_MM2S -pg 1 -y 790 -defaultsOSRD
+preplace port M_AXIS_S2MM_STS_BUF -pg 1 -y 520 -defaultsOSRD
+preplace port M_AXIS_MM2S_STS_BUF -pg 1 -y 540 -defaultsOSRD
+preplace port CLK_DATA -pg 1 -y 320 -defaultsOSRD
+preplace port M_AXIS_CALDDR_MM2S_STS -pg 1 -y 770 -defaultsOSRD
+preplace port DDR3 -pg 1 -y 920 -defaultsOSRD
+preplace port CLK_MB -pg 1 -y 200 -defaultsOSRD
+preplace port S_AXI_DP -pg 1 -y 80 -defaultsOSRD
+preplace port S_AXIS_MM2S_CMD_BUF -pg 1 -y 480 -defaultsOSRD
+preplace port CLK_CAL -pg 1 -y 280 -defaultsOSRD
+preplace portBus sys_rst -pg 1 -y 1000 -defaultsOSRD
+preplace portBus PERIPHERAL_ARESETN -pg 1 -y 220 -defaultsOSRD
+preplace portBus device_temp_i -pg 1 -y 980 -defaultsOSRD
+preplace portBus INTERCONNECT_ARESETN -pg 1 -y 180 -defaultsOSRD
+preplace inst axi_interconnect_ddrcal -pg 1 -lvl 1 -y 230 -defaultsOSRD
+preplace inst CAL_DDR_MIG -pg 1 -lvl 2 -y 980 -defaultsOSRD
+preplace inst axi_dm_buffer -pg 1 -lvl 2 -y 540 -defaultsOSRD
+preplace inst axi_datamover_ddrcal -pg 1 -lvl 2 -y 780 -defaultsOSRD
+preplace netloc S_AXI_1 1 0 1 NJ
+preplace netloc Conn1 1 0 2 NJ 740 NJ
+preplace netloc Conn2 1 2 1 NJ
+preplace netloc Conn3 1 2 1 NJ
+preplace netloc mig_7series_0_DDR3 1 2 1 NJ
+preplace netloc ACLK_1 1 0 1 NJ
+preplace netloc SYS_CLK_1 1 0 2 NJ 960 NJ
+preplace netloc axi_dm_buffer_M_AXI_MM2S 1 0 3 -60 10 NJ 10 670
+preplace netloc xadc_wiz_1_temp_out 1 0 2 NJ 980 NJ
+preplace netloc S02_ACLK_1 1 0 2 -50 500 280
+preplace netloc ARESETN_1 1 0 1 NJ
+preplace netloc Conn7 1 0 2 NJ 480 NJ
+preplace netloc axi_interconnect_ddrcal_M00_AXI 1 1 1 260
+preplace netloc Conn8 1 0 2 NJ 460 NJ
+preplace netloc Conn10 1 2 1 NJ
+preplace netloc axi_dm_buffer_M_AXI_S2MM 1 0 3 -20 20 NJ 20 660
+preplace netloc Conn9 1 0 2 NJ 440 NJ
+preplace netloc Conn11 1 2 1 NJ
+preplace netloc m_axi_mm2s_aclk_1 1 0 2 -60 760 280
+preplace netloc ext_reset_in_1 1 0 2 NJ 1000 NJ
+preplace netloc Conn12 1 2 1 NJ
+preplace netloc proc_sys_reset_1_interconnect_aresetn 1 0 2 -40 520 270
+preplace netloc CAL_DDR_MIG_ui_clk 1 0 3 -20 870 NJ 870 660
+preplace netloc axi_datamover_0_M_AXI_MM2S 1 0 3 -30 690 NJ 690 660
+levelinfo -pg 1 -80 130 480 710 -top 0 -bot 1790
+",
+}
+
   # Restore current instance
   current_bd_instance $oldCurInst
 }
@@ -1453,11 +1552,11 @@ CONFIG.CLKOUT4_REQUESTED_OUT_FREQ {20} \
 CONFIG.CLKOUT4_USED {true} \
 CONFIG.CLKOUT5_JITTER {151.652} \
 CONFIG.CLKOUT5_PHASE_ERROR {114.212} \
-CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {80} \
+CONFIG.CLKOUT5_REQUESTED_OUT_FREQ {100.000} \
 CONFIG.CLKOUT5_USED {false} \
 CONFIG.CLKOUT6_JITTER {151.652} \
 CONFIG.CLKOUT6_PHASE_ERROR {114.212} \
-CONFIG.CLKOUT6_REQUESTED_OUT_FREQ {80.000} \
+CONFIG.CLKOUT6_REQUESTED_OUT_FREQ {100.000} \
 CONFIG.CLKOUT6_USED {false} \
 CONFIG.DIFF_CLK_IN2_BOARD_INTERFACE {Custom} \
 CONFIG.MMCM_CLKFBOUT_MULT_F {10.000} \
