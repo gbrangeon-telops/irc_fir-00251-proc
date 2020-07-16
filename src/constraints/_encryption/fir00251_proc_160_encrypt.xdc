@@ -1,6 +1,6 @@
 ## Bitstream Encryption Constraints Section
 
-set_property BITSTREAM.ENCRYPTION.ENCRYPT No [current_design]
+set_property BITSTREAM.ENCRYPTION.ENCRYPT Yes [current_design]
 set_property BITSTREAM.ENCRYPTION.ENCRYPTKEYSELECT efuse [current_design]
 
 # Use the keyfile for the IRCAM product line (cameras and modules) or the electronic kits (stand-alone boards)
