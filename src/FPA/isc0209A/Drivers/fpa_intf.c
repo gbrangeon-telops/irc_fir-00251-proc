@@ -388,9 +388,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ProximCfg.vdac_value[7] = (uint32_t) FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalRefOffset, 8);  // 
 	}                                                                                                       
    presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
-   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset;    
-   
-   
+   gFpaDetectorElectricalRefOffset = presentElectricalRefOffset; 
+ 
+   // reference des taps = VOUTREF (VCC5). Elle ne peut ëtre changée ni via debug terminal, ni via matlab
+   gFpaDetectorElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4], 5);             // affichange dans le debug terminal uniquement. Tout changement est impossible.
+     
    // gFpaDebugRegC dephasage grossier des adc_clk 
    if (init_done == 0)
       gFpaDebugRegC = 3;
