@@ -231,7 +231,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     isc0209_param_t hh;
     extern int16_t gFpaDetectorPolarizationVoltage;
     static int16_t presentPolarizationVoltage = 150;
-    //extern float gFpaDetectorElectricalTapsRef;
+    extern float gFpaDetectorElectricalTapsRef;
     extern float gFpaDetectorElectricalRefOffset;
     //static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
     static float presentElectricalRefOffset = 0;        // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
@@ -390,8 +390,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    presentElectricalRefOffset = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[7], 8);            
    gFpaDetectorElectricalRefOffset = presentElectricalRefOffset; 
  
-   // reference des taps = VOUTREF (VCC5). Elle ne peut ëtre changée ni via debug terminal, ni via matlab
-   gFpaDetectorElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4], 5);             // affichange dans le debug terminal uniquement. Tout changement est impossible.
+   // reference des taps = VOUTREF (VCC5). Elle ne peut être changée ni via debug terminal, ni via matlab
+   gFpaDetectorElectricalTapsRef = (float) FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4], 5);             // affichage dans le debug terminal uniquement. Tout changement est impossible.
      
    // gFpaDebugRegC dephasage grossier des adc_clk 
    if (init_done == 0)
