@@ -60,7 +60,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
          CLK : in std_logic);
    end component; 
    
-   component fwft_sfifo_w3_d16
+   component fwft_sfifo_w3_d256
       port (
          clk         : in std_logic;
          srst        : in std_logic;
@@ -79,7 +79,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal sreset               : std_logic;
    signal readout_fsm          : readout_fsm_type;
    signal int_reset_fsm       : int_reset_fsm_type;
-   signal fpa_int_last         : std_logic;
+   -- signal fpa_int_last         : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
@@ -107,7 +107,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    signal fpa_data_valid_i     : std_logic;
    signal fpa_data_valid_last  : std_logic;
-   signal fpa_int_i            : std_logic;
+   --signal fpa_int_i            : std_logic;
    signal fpa_inactive_int_i   : std_logic;
    signal fpa_mclk_rising_edge : std_logic;
    signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR;
@@ -176,13 +176,13 @@ begin
             readout_info_i.naoi.samp_pulse <= '0';
             readout_info_i.naoi.start <= '0';
             readout_info_i.naoi.stop <= '0';
-            fpa_int_i <= FPA_INT;            
-            fpa_int_last <= fpa_int_i;
+            -- fpa_int_i <= FPA_INT;            
+            -- fpa_int_last <= fpa_int_i;
             
          else           
             
-            fpa_int_i <= FPA_INT;            
-            fpa_int_last <= fpa_int_i;            
+            -- fpa_int_i <= FPA_INT;            
+            -- fpa_int_last <= fpa_int_i;            
             
             fpa_pclk_last <= FPA_PCLK;
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
@@ -269,7 +269,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour edge de l'intégration
    --------------------------------------------------
-   Ue : fwft_sfifo_w3_d16
+   Ue : fwft_sfifo_w3_d256
    port map (
       clk         => CLK,
       srst        => sreset,

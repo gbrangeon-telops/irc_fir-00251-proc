@@ -53,7 +53,7 @@ architecture rtl of isc0207A_readout_ctrler is
          CLK : in std_logic);
    end component;
    
-   component fwft_sfifo_w3_d16
+   component fwft_sfifo_w3_d256
       port (
          clk         : in std_logic;
          srst        : in std_logic;
@@ -138,7 +138,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour edge de l'intégration
    --------------------------------------------------
-   Ue : fwft_sfifo_w3_d16
+   Ue : fwft_sfifo_w3_d256
    port map (
       clk         => CLK,
       srst        => sreset,
@@ -186,14 +186,14 @@ begin
             readout_info_i.naoi.samp_pulse <= '0';
             readout_info_i.naoi.start <= '0';
             readout_info_i.naoi.stop <= '0';
-            fpa_int_i <= FPA_INT;            
+            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;           
             fpa_int_last <= fpa_int_i;
             eof_pulse <= '0';
             eof_pulse_last <= '0';
             
          else           
             
-            fpa_int_i <= FPA_INT;
+            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;;
             fpa_int_last <= fpa_int_i;
             
             fpa_pclk_last <= FPA_PCLK;

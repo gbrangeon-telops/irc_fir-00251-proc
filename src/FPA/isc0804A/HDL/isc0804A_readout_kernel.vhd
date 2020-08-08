@@ -94,7 +94,7 @@ architecture rtl of isc0804A_readout_kernel is
          Clk_div   : out std_logic);
    end component;
    
-   component fwft_sfifo_w3_d16
+   component fwft_sfifo_w3_d256
       port (
          clk         : in std_logic;
          srst        : in std_logic;
@@ -272,7 +272,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour edges du signal d'intégration
    --------------------------------------------------   
-   U3A : fwft_sfifo_w3_d16
+   U3A : fwft_sfifo_w3_d256
    port map (
       clk         => CLK,
       srst        => sreset,
@@ -320,7 +320,7 @@ begin
          else  
             
             --inc := '0'& fpa_mclk_re;
-            fpa_int_i <= FPA_INT;
+            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
             fpa_int_last <= fpa_int_i;                       
             
             int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
