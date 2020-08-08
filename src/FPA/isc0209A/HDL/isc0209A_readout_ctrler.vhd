@@ -54,21 +54,21 @@ architecture rtl of isc0209A_readout_ctrler is
          CLK : in std_logic);
    end component;
    
-   COMPONENT fwft_sfifo_w1_d16
-      PORT (
-         clk : IN STD_LOGIC;
-         srst : IN STD_LOGIC;
-         din : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-         wr_en : IN STD_LOGIC;
-         rd_en : IN STD_LOGIC;
-         dout : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
-         full : OUT STD_LOGIC;
-         almost_full : OUT STD_LOGIC;
-         overflow : OUT STD_LOGIC;
-         empty : OUT STD_LOGIC;
-         valid : OUT STD_LOGIC
+   component fwft_sfifo_w3_d256
+      port (
+         clk         : in std_logic;
+         srst        : in std_logic;
+         din         : in std_logic_vector(2 downto 0);
+         wr_en       : in std_logic;
+         rd_en       : in std_logic;
+         dout        : out std_logic_vector(2 downto 0);
+         full        : out std_logic;
+         almost_full : out std_logic;
+         overflow    : out std_logic;
+         empty       : out std_logic;
+         valid       : out std_logic
          );
-   END COMPONENT;
+   end component;
    
    signal sreset               : std_logic;
    
@@ -107,8 +107,8 @@ architecture rtl of isc0209A_readout_ctrler is
    signal fpa_int_fe_fifo_wr   : std_logic;
    signal fpa_int_fe_fifo_rd   : std_logic;
    signal fpa_int_fe_fifo_dval : std_logic;
-   signal acq_data_i           : std_logic_vector(0 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
-   signal acq_data_o           : std_logic_vector(0 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
+   signal acq_data_i           : std_logic_vector(2 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
+   signal acq_data_o           : std_logic_vector(2 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
    signal eof_pulse            : std_logic;
    signal eof_pulse_last       : std_logic;
@@ -172,7 +172,7 @@ begin
             fpa_int_fdbk_i <= FPA_INT_FDBK;            
             fpa_int_fdbk_last <= fpa_int_fdbk_i;
             
-            fpa_int_i <= FPA_INT;            
+            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
             fpa_int_last <= fpa_int_i;
             
             
@@ -287,7 +287,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour falling edge du signal d'intégration
    --------------------------------------------------
-   Uf : fwft_sfifo_w1_d16
+   Uf : fwft_sfifo_w3_d256
    PORT MAP (
       clk => CLK,
       srst => sreset,
