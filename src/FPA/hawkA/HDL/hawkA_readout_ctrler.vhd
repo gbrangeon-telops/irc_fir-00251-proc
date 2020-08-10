@@ -57,7 +57,7 @@ architecture rtl of hawkA_readout_ctrler is
          CLK : in std_logic);
    end component; 
    
-   component fwft_sfifo_w3_d256
+   component fwft_sfifo_w3_d16
       port (
          clk         : in std_logic;
          srst        : in std_logic;
@@ -77,9 +77,11 @@ architecture rtl of hawkA_readout_ctrler is
    
    signal sync_flag_fsm        : sync_flag_fsm_type;
    signal readout_fsm          : readout_fsm_type;
-   signal fpa_int_last         : std_logic;
+   --signal fpa_int_last         : std_logic;
+   signal acq_int_last         : std_logic;
+   signal xtra_int_last        : std_logic;
    signal fpa_pclk_last        : std_logic;
-   -- signal fpa_int_fdbk_last    : std_logic;
+   signal fpa_int_fdbk_last    : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
    signal fval_pclk_cnt        : unsigned(FPA_INTF_CFG.READOUT_PCLK_CNT_MAX'LENGTH-1 downto 0); 
@@ -106,8 +108,10 @@ architecture rtl of hawkA_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    signal rd_mclk_i            : std_logic;
    signal line_cnt_pipe        : line_cnt_pipe_type;
-   -- signal fpa_int_fdbk_i       : std_logic;
+   signal xtra_int_i           : std_logic;
+   signal acq_int_i            : std_logic;
    signal fpa_int_i            : std_logic;
+   signal fpa_int_last         : std_logic;
    signal acq_data_i           : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
    signal eof_pulse            : std_logic;
@@ -118,6 +122,7 @@ architecture rtl of hawkA_readout_ctrler is
    signal int_fifo_wr          : std_logic;
    signal int_fifo_dval        : std_logic;
    signal int_fifo_dout        : std_logic_vector(2 downto 0);
+   
    
 begin
    
@@ -143,7 +148,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour edge de l'intégration
    --------------------------------------------------
-   Ue : fwft_sfifo_w3_d256
+   Ue : fwft_sfifo_w3_d16
    port map (
       clk         => CLK,
       srst        => sreset,
@@ -181,24 +186,27 @@ begin
          if sreset = '1' then            
             sync_flag_fsm <= idle;
             fdem_i <= '0';
-            -- fpa_int_fdbk_last <= fpa_int_fdbk_i;
             readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
             readout_info_i.naoi.samp_pulse <= '0';
             readout_info_i.naoi.start <= '0';
             readout_info_i.naoi.stop <= '0';
+            xtra_int_i <= FPA_INT and not ACQ_INT;            
+            xtra_int_last <= xtra_int_i;
+            acq_int_i <= ACQ_INT;            
+            acq_int_last <= acq_int_i;
             fpa_int_i <= FPA_INT;            
             fpa_int_last <= fpa_int_i;
             eof_pulse <= '0';
             eof_pulse_last <= '0';
-            img_in_progress <= '0'; 
             
          else           
             
-            -- fpa_int_fdbk_i <= FPA_INT_FDBK;            
-            -- fpa_int_fdbk_last <= fpa_int_fdbk_i;
-            
-            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
+            xtra_int_i <= FPA_INT and not ACQ_INT;            
+            xtra_int_last <= xtra_int_i;
+            acq_int_i <= ACQ_INT;            
+            acq_int_last <= acq_int_i;
+            fpa_int_i <= FPA_INT;            
             fpa_int_last <= fpa_int_i;
             
             
@@ -207,12 +215,6 @@ begin
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
             
             fpa_mclk_last <= FPA_MCLK;
-            
-            if int_fifo_dout(1) = '1' and int_fifo_rd = '1' then 
-               img_in_progress <= '1';
-            elsif  rd_end_pipe(0) = '1' then
-               img_in_progress <= '0'; 
-            end if; 
             
             -- contrôleur
             case sync_flag_fsm is           
@@ -288,6 +290,8 @@ begin
             acq_data_i <= '0';
             int_fifo_wr <= '0';
             int_fifo_rd <= '0';
+            int_fifo_din <= (others => '0');
+            img_in_progress <= '0';
             
          else            
             
@@ -300,26 +304,34 @@ begin
             
             rd_mclk_i <= FPA_MCLK and readout_in_progress;
             
-            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
-            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
-            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
-            int_fifo_wr     <= (fpa_int_last xor fpa_int_i);    -- on ecrit les edges dans le fifo
+            int_fifo_din(1) <= not acq_int_last and acq_int_i;  -- front montant acq_int
+            int_fifo_din(0) <= acq_int_last and not acq_int_i;  -- front descendant
+            int_fifo_wr     <= (acq_int_last xor acq_int_i);    -- on ecrit les edges dans le fifo
             
             -- contrôleur
             case readout_fsm is           
                
                when idle =>   
                   readout_in_progress <= '0';
-                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                  img_in_progress <= '0';
+                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de acq_int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
                      int_fifo_rd <= '1'; 
-                     acq_data_i <= int_fifo_dout(2);
+                     acq_data_i <= '1';
+                     img_in_progress <= '1';
+                     readout_fsm <= wait_int_fe_st;
+                  elsif xtra_int_last = '0' and xtra_int_i = '1' then     --front montant d'un xtra_int
+                     int_fifo_rd <= '0'; 
+                     acq_data_i <= '0';
+                     img_in_progress <= '1';
                      readout_fsm <= wait_int_fe_st;
                   end if;
                
                when wait_int_fe_st =>
                   int_fifo_rd <= '0';
-                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then  -- front tombant de int_signal
+                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then  -- front tombant de acq_int_signal
                      int_fifo_rd <= '1';
+                     readout_fsm <= wait_mclk_fe_st1;
+                  elsif xtra_int_last = '1' and xtra_int_i = '0' then    -- front tombant xtra_int
                      readout_fsm <= wait_mclk_fe_st1;
                   end if;
                
