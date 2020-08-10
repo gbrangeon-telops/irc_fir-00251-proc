@@ -34,7 +34,8 @@ entity isc0209A_readout_ctrler is
       
       FPA_LSYNC         : out std_logic;         
       READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0) 
+      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0);
+      IMG_IN_PROGRESS   : out std_logic
       );  
 end isc0209A_readout_ctrler;
 
@@ -54,28 +55,26 @@ architecture rtl of isc0209A_readout_ctrler is
          CLK : in std_logic);
    end component;
    
-   component fwft_sfifo_w3_d256
-      port (
-         clk         : in std_logic;
-         srst        : in std_logic;
-         din         : in std_logic_vector(2 downto 0);
-         wr_en       : in std_logic;
-         rd_en       : in std_logic;
-         dout        : out std_logic_vector(2 downto 0);
-         full        : out std_logic;
-         almost_full : out std_logic;
-         overflow    : out std_logic;
-         empty       : out std_logic;
-         valid       : out std_logic
+   COMPONENT fwft_sfifo_w1_d16
+      PORT (
+         clk : IN STD_LOGIC;
+         srst : IN STD_LOGIC;
+         din : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+         wr_en : IN STD_LOGIC;
+         rd_en : IN STD_LOGIC;
+         dout : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+         full : OUT STD_LOGIC;
+         almost_full : OUT STD_LOGIC;
+         overflow : OUT STD_LOGIC;
+         empty : OUT STD_LOGIC;
+         valid : OUT STD_LOGIC
          );
-   end component;
+   END COMPONENT;
    
    signal sreset               : std_logic;
    
    signal sync_flag_fsm        : sync_flag_fsm_type;
    signal readout_fsm          : readout_fsm_type;
-   signal fpa_int_last         : std_logic;
-   signal fpa_int_fdbk_last    : std_logic;
    signal fpa_pclk_last        : std_logic;
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
@@ -102,20 +101,22 @@ architecture rtl of isc0209A_readout_ctrler is
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
-   signal fpa_int_fdbk_i       : std_logic;
-   signal fpa_int_i            : std_logic;
-   signal fpa_int_fe_fifo_wr   : std_logic;
-   signal fpa_int_fe_fifo_rd   : std_logic;
-   signal fpa_int_fe_fifo_dval : std_logic;
-   signal acq_data_i           : std_logic_vector(2 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
-   signal acq_data_o           : std_logic_vector(2 downto 0);  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
+   signal acq_int_fifo_wr      : std_logic;
+   signal acq_int_fifo_rd      : std_logic;
+   signal acq_int_fifo_dval    : std_logic;
    signal readout_info_i       : readout_info_type;
    signal eof_pulse            : std_logic;
    signal eof_pulse_last       : std_logic;
    signal acq_int_pipe         : std_logic_vector(7 downto 0);
-   signal acq_data_latch       : std_logic;
+   signal acq_data_i           : std_logic;
+   signal xtra_int_i           : std_logic;
+   signal acq_int_i            : std_logic;
+   signal xtra_int_last        : std_logic;
+   signal acq_int_last         : std_logic;
+   signal img_in_progress_i    : std_logic;
+   signal acq_int_fifo_din     : std_logic_vector(0 downto 0) := (others => '1');
    
-begin
+begin                                     
    
    --------------------------------------------------
    -- Outputs map
@@ -123,6 +124,7 @@ begin
    FPA_LSYNC <= lsync_pipe(6);                        -- pipe(6) choisi apres simulation pour avoir 1 clk de delai avec FPA_MCLK (meme delai  que le signal d'integration). Ainsi le dodule io_interface aura juste à decaler l'horloge FPA_MCLK de 2 clk et tout sera ok
    ADC_SYNC_FLAG <= adc_sync_flag_i;    -- non utilisé  
    READOUT_INFO  <= readout_info_i;
+   IMG_IN_PROGRESS <= img_in_progress_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -155,25 +157,15 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then 
-            fpa_int_fdbk_i <= FPA_INT_FDBK;            
-            fpa_int_fdbk_last <= fpa_int_fdbk_i;
             readout_info_i.aoi.dval <= '0';
             readout_info_i.naoi.dval <= '0';
             readout_info_i.naoi.samp_pulse <= '0';
             readout_info_i.naoi.start <= '0';
             readout_info_i.naoi.stop <= '0';
-            fpa_int_i <= FPA_INT;            
-            fpa_int_last <= fpa_int_i;
             eof_pulse <= '0';
             eof_pulse_last <= '0';
             
          else           
-            
-            fpa_int_fdbk_i <= FPA_INT_FDBK;            
-            fpa_int_fdbk_last <= fpa_int_fdbk_i;
-            
-            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
-            fpa_int_last <= fpa_int_i;
             
             
             fpa_pclk_last <= FPA_PCLK;
@@ -193,7 +185,7 @@ begin
             readout_info_i.aoi.dval          <= dval_pipe(C_PIPE_POS);
             readout_info_i.aoi.read_end      <= rd_end_pipe(C_PIPE_POS);
             readout_info_i.aoi.samp_pulse    <= samp_pulse_pipe(C_PIPE_POS);
-            readout_info_i.aoi.spare(0)      <= acq_data_latch;
+            readout_info_i.aoi.spare(0)      <= acq_data_i;
             
             -- naoi
             readout_info_i.naoi.start        <= '0';
@@ -218,14 +210,17 @@ begin
             readout_fsm <= idle;
             readout_in_progress <= '0';
             lsync_pipe <=  (others =>'0');
-            fpa_int_fe_fifo_wr <= '0';
-            fpa_int_fe_fifo_rd <= '0';
+            acq_int_fifo_wr <= '0';
+            acq_int_fifo_rd <= '0';
             -- pragma translate_off
             lsync_cnt <=  (others => '0');
             -- pragma translate_on 
-            acq_data_latch <= '0';
-            acq_int_pipe <= (others => '0');
-            acq_data_i <= (others => '0');
+            acq_data_i <= '0';
+            xtra_int_i <= FPA_INT and not ACQ_INT;            
+            xtra_int_last <= xtra_int_i;
+            acq_int_i <= ACQ_INT;            
+            acq_int_last <= acq_int_i;
+            img_in_progress_i <= '0';
             
          else  
             
@@ -235,11 +230,14 @@ begin
                sol_pipe_pclk(1) <= sol_pipe_pclk(0);
             end if;
             
-            lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0);           
+            lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0);
             
-            fpa_int_fe_fifo_wr <= fpa_int_last and not fpa_int_i; -- fin de la consigne d'integration
-            acq_int_pipe(7 downto 0) <= acq_int_pipe(6 downto 0) & ACQ_INT; -- pipe pour decaler ACQ_INT afin qu'il soit valide suffisamment longtemps après la tombée de fpa_int_i;
-            acq_data_i(0) <= acq_int_pipe(7);
+            xtra_int_i <= FPA_INT and not ACQ_INT;            
+            xtra_int_last <= xtra_int_i;
+            acq_int_i <= ACQ_INT;            
+            acq_int_last <= acq_int_i;
+            
+            acq_int_fifo_wr <= acq_int_last and not acq_int_i; -- fin de la consigne de acq_int
             
             -- contrôleur
             case readout_fsm is           
@@ -248,15 +246,21 @@ begin
                   readout_in_progress <= '0';
                   lsync_cnt <=  (others => '0');
                   lsync_pipe(0) <= '0';
-                  fpa_int_fe_fifo_rd <= '0';
-                  if fpa_int_fe_fifo_dval = '1' then
-                     fpa_int_fe_fifo_rd <= '1';
-                     acq_data_latch <= acq_data_o(0);
+                  img_in_progress_i <= '0';
+                  if acq_int_fifo_dval = '1' then
+                     acq_int_fifo_rd <= '1';
+                     acq_data_i <= '1';
+                     img_in_progress_i <= '1';
                      readout_fsm <= wait_mclk_fe_st;
+                  elsif xtra_int_last = '1' and xtra_int_i = '0' then
+                     acq_int_fifo_rd <= '0';
+                     acq_data_i <= '0';
+                     img_in_progress_i <= '1';
+                     readout_fsm <= wait_mclk_fe_st;                     
                   end if;
                
                when wait_mclk_fe_st => 
-                  fpa_int_fe_fifo_rd <= '0';
+                  acq_int_fifo_rd <= '0';
                   if pclk_fall = '1' then  -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
                   end if;                           
@@ -287,19 +291,19 @@ begin
    --------------------------------------------------
    -- fifo fwft pour falling edge du signal d'intégration
    --------------------------------------------------
-   Uf : fwft_sfifo_w3_d256
+   Uf : fwft_sfifo_w1_d16
    PORT MAP (
       clk => CLK,
       srst => sreset,
-      din => acq_data_i,
-      wr_en => fpa_int_fe_fifo_wr,
-      rd_en => fpa_int_fe_fifo_rd,
-      dout => acq_data_o, 
+      din => acq_int_fifo_din,
+      wr_en => acq_int_fifo_wr,
+      rd_en => acq_int_fifo_rd,
+      dout => open, 
       full => open,
       almost_full => open,
       overflow => open,
       empty => open,
-      valid => fpa_int_fe_fifo_dval
+      valid => acq_int_fifo_dval
       );
    
    --------------------------------------------------
