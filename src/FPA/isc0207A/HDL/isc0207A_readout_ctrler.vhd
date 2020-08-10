@@ -34,7 +34,8 @@ entity isc0207A_readout_ctrler is
       REF_VALID         : in std_logic_vector(1 downto 0);
       
       READOUT_INFO      : out readout_info_type;
-      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0)      
+      ADC_SYNC_FLAG     : out std_logic_vector(15 downto 0);
+      IMG_IN_PROGRESS   : out std_logic    
       );  
 end isc0207A_readout_ctrler;
 
@@ -53,7 +54,7 @@ architecture rtl of isc0207A_readout_ctrler is
          CLK : in std_logic);
    end component;
    
-   component fwft_sfifo_w3_d256
+   component fwft_sfifo_w3_d16
       port (
          clk         : in std_logic;
          srst        : in std_logic;
@@ -72,9 +73,11 @@ architecture rtl of isc0207A_readout_ctrler is
    signal sreset               : std_logic;
    
    signal readout_fsm          : readout_fsm_type;
-   signal fpa_int_i            : std_logic;
-   signal fpa_int_last         : std_logic;
+   signal acq_int_last         : std_logic;
+   signal xtra_int_last        : std_logic;
    signal fpa_pclk_last        : std_logic;
+   signal xtra_int_i           : std_logic;
+   signal acq_int_i            : std_logic;
    signal adc_sync_flag_i      : std_logic_vector(ADC_SYNC_FLAG'LENGTH-1 downto 0);
    signal pclk_fall            : std_logic;
    signal pclk_rise            : std_logic;
@@ -115,6 +118,7 @@ architecture rtl of isc0207A_readout_ctrler is
    signal int_fifo_wr            : std_logic;
    signal int_fifo_dval          : std_logic;
    signal int_fifo_dout          : std_logic_vector(2 downto 0);
+   signal img_in_progress_i      : std_logic;
    
    
 begin
@@ -122,8 +126,9 @@ begin
    --------------------------------------------------
    -- Outputs map
    --------------------------------------------------  
-   ADC_SYNC_FLAG <= adc_sync_flag_i;        -- 
-   READOUT_INFO  <= readout_info_i; 
+   ADC_SYNC_FLAG   <= adc_sync_flag_i;        -- 
+   READOUT_INFO    <= readout_info_i; 
+   IMG_IN_PROGRESS <= img_in_progress_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -138,7 +143,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour edge de l'intégration
    --------------------------------------------------
-   Ue : fwft_sfifo_w3_d256
+   Ue : fwft_sfifo_w3_d16
    port map (
       clk         => CLK,
       srst        => sreset,
@@ -174,8 +179,6 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then                  
-            fpa_int_i <= FPA_INT;
-            fpa_int_last <= fpa_int_i;
             elcorr_ref_start_pipe <= (others => '0');
             elcorr_ref_end_pipe <= (others => '0');
             elcorr_ref_start_i <= '0';
@@ -186,15 +189,10 @@ begin
             readout_info_i.naoi.samp_pulse <= '0';
             readout_info_i.naoi.start <= '0';
             readout_info_i.naoi.stop <= '0';
-            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;           
-            fpa_int_last <= fpa_int_i;
             eof_pulse <= '0';
             eof_pulse_last <= '0';
             
          else           
-            
-            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;;
-            fpa_int_last <= fpa_int_i;
             
             fpa_pclk_last <= FPA_PCLK;
             
@@ -202,28 +200,6 @@ begin
             pclk_fall <= fpa_pclk_last and not FPA_PCLK;
             
             fpa_mclk_last <= FPA_MCLK;             
-            
-            -- elcorr_ref_start_i dure 1 PCLK
-            eof_pulse <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);
-            eof_pulse_last <= eof_pulse;
-            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (eof_pulse_last and not eof_pulse); 
-            if unsigned(elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
-               elcorr_ref_start_i <= '1';
-               elcorr_ref_fval_i  <= '1'; 
-            else
-               elcorr_ref_start_i <= '0';
-            end if;
-            
-            -- elcorr_ref_end_i dure 1 PCLK
-            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
-            if unsigned(elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0)) /= 0 then
-               elcorr_ref_end_i <= '1';
-            else
-               elcorr_ref_end_i  <= '0';
-               if elcorr_ref_end_i = '1' then 
-                  elcorr_ref_fval_i <= '0';
-               end if;
-            end if;
             
             -- READOUT_INFO
             -- aoi
@@ -243,10 +219,10 @@ begin
             -- REF_VALID n'est pas generé si DEFINE_GENERATE_ELCORR_CHAIN = 0 donc initule de rajouter DEFINE_GENERATE_ELCORR_CHAIN 
             readout_info_i.naoi.ref_valid(1) <= REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
             readout_info_i.naoi.ref_valid(0) <= REF_VALID(0);        -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)
-            readout_info_i.naoi.start        <= elcorr_ref_start_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.stop         <= elcorr_ref_end_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.dval         <= elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
-            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i) and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;      
+            readout_info_i.naoi.start        <= '0';
+            readout_info_i.naoi.stop         <= '0';
+            readout_info_i.naoi.dval         <= '0';
+            readout_info_i.naoi.samp_pulse   <= '0';     
             
             readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);    
             
@@ -267,30 +243,48 @@ begin
             acq_data_i <= '0';
             int_fifo_wr <= '0';
             int_fifo_rd <= '0';
+            xtra_int_i <= FPA_INT and not ACQ_INT;            
+            xtra_int_last <= xtra_int_i;
+            acq_int_i <= ACQ_INT;            
+            acq_int_last <= acq_int_i;
+            int_fifo_din <= (others => '0');
+            img_in_progress_i <= '0';
             
          else  
             
+            xtra_int_i <= FPA_INT and not ACQ_INT;            
+            xtra_int_last <= xtra_int_i;
+            acq_int_i <= ACQ_INT;            
+            acq_int_last <= acq_int_i;
             
-            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
-            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
-            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
-            int_fifo_wr     <= (fpa_int_last xor fpa_int_i);          -- on ecrit les edges dans le fifo
+            int_fifo_din(1) <= not acq_int_last and acq_int_i;  -- front montant
+            int_fifo_din(0) <= acq_int_last and not acq_int_i;  -- front descendant
+            int_fifo_wr     <= (acq_int_last xor acq_int_i);    -- on ecrit les edges dans le fifo
             
             -- contrôleur
             case readout_fsm is           
                
                when idle =>   
                   readout_in_progress <= '0';
-                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then        -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
+                  img_in_progress_i <= '0';
+                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
                      int_fifo_rd <= '1'; 
-                     acq_data_i <= int_fifo_dout(2);
+                     acq_data_i <= '1';
+                     img_in_progress_i <= '1';
+                     readout_fsm <= wait_int_fe_st;
+                  elsif xtra_int_last = '0' and xtra_int_i = '1' then     -- front montant d'un xtra_int
+                     int_fifo_rd <= '0'; 
+                     acq_data_i <= '0';
+                     img_in_progress_i <= '1';
                      readout_fsm <= wait_int_fe_st;
                   end if; 
                
                when wait_int_fe_st =>    
                   int_fifo_rd <= '0';
-                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then       -- front tombant de int_signal
+                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then       -- front tombant de acq_int_signal
                      int_fifo_rd <= '1';
+                     readout_fsm <= wait_mclk_fe_st;
+                  elsif xtra_int_last = '1' and xtra_int_i = '0' then          -- front tombant xtra_int
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
