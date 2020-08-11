@@ -63,6 +63,11 @@
 #define AW_VIDEO_BPR_MODE           0xCC
 #define AW_CALIB_BPR_MODE           0xD8
 
+// Lut switch control
+#define AW_CALIB_LUT_SWITCH         0xDC
+#define CALIB_NLC_LUT_SWITCH_MASK   0x00000001
+#define CALIB_RQC_LUT_SWITCH_MASK   0x00000002
+
 
 // CONTROLE des switches : definition generale 
 #define SW_TO_PATH0        0x00                            // switch dirigé vers son entree/sortie 0 (voir vhd des switch)
@@ -741,4 +746,54 @@ void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs)
 void CAL_UpdateCalibBprMode(const t_calib *pA, const gcRegistersData_t *pGCRegs)
 {
    AXI4L_write32(pGCRegs->BadPixelReplacement, pA->ADD + AW_CALIB_BPR_MODE);
+}
+
+/*
+ * Configure LUT switch for NLC calibration
+ * LUT_SWITCH_TO_AXI_LITE = switch configure to read BRAM from axi-lite (register write to 1)
+ * LUT_SWITCH_TO_FPGA = switch configure to read BRAM from FPGA (register write to 0)
+ */
+void CAL_ConfigureNlcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMode)
+{
+   u32 value = AXI4L_read32(pA->ADD + AW_CALIB_LUT_SWITCH);
+
+   if(switchMode == LUT_SWITCH_TO_AXI_LITE)
+   {
+      // axi-lite switch mode
+      // set bit
+      value |= CALIB_NLC_LUT_SWITCH_MASK;
+   }else
+   {
+      // fpga switch mode
+      // clear bit
+      value &= ~CALIB_NLC_LUT_SWITCH_MASK;
+   }
+
+   // write register
+   AXI4L_write32(value, pA->ADD + AW_CALIB_LUT_SWITCH);
+}
+
+/*
+ * Configure LUT switch for RQC calibration
+ * LUT_SWITCH_TO_AXI_LITE = switch configure to read BRAM from axi-lite (register write to 1)
+ * LUT_SWITCH_TO_FPGA = switch configure to read BRAM from FPGA (register write to 0)
+ */
+void CAL_ConfigureRqcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMode)
+{
+   u32 value = AXI4L_read32(pA->ADD + AW_CALIB_LUT_SWITCH);
+
+   if(switchMode == LUT_SWITCH_TO_AXI_LITE)
+   {
+      // axi-lite switch mode
+      // set bit
+      value |= CALIB_RQC_LUT_SWITCH_MASK;
+   }else
+   {
+      // fpga switch mode
+      // clear bit
+      value &= ~CALIB_RQC_LUT_SWITCH_MASK;
+   }
+
+   // write register
+   AXI4L_write32(value, pA->ADD + AW_CALIB_LUT_SWITCH);
 }

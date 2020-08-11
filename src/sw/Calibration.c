@@ -1452,6 +1452,10 @@ static void Calibration_Init()
    // Update registers related to calibration control
    GC_UpdateParameterLimits();
    CAL_UpdateCalibBlockSelMode(&gCal, &gcRegsData);
+
+   // default LUT switch is configure to read from FPGA
+   CAL_ConfigureNlcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
+   CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
 }
 
 /**

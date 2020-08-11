@@ -66,6 +66,16 @@ enum calibBlockSelModeEnum
 typedef enum calibBlockSelModeEnum calibBlockSelMode_t;
 
 /**
+ * Calibration switch value
+ */
+enum calibLutSwitchValue
+{
+   LUT_SWITCH_TO_FPGA = 0,
+   LUT_SWITCH_TO_AXI_LITE = 1
+};
+typedef enum calibLutSwitchValue calibLutSwitchMode_t;
+
+/**
  * Calibration block info stored in the RAM.
  */
 struct calibBlockRamInfoStruct
@@ -161,5 +171,7 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
 void CAL_GetStatus(t_CalStatus *Stat, const t_calib *pA);
 void CAL_UpdateVideo(const t_calib *pA, const gcRegistersData_t *pGCRegs);
 void CAL_UpdateCalibBprMode(const t_calib *pA, const gcRegistersData_t *pGCRegs);
- 
+void CAL_ConfigureNlcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMode);
+void CAL_ConfigureRqcLutSwitch(const t_calib *pA, calibLutSwitchMode_t switchMode);
+
 #endif // __calib_H__
