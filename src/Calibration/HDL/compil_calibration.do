@@ -17,6 +17,7 @@ acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\CFF.bde 
 
 acom -nowarn DAGGEN_0523 \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\LUT_native_switch.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\axil_channels_ctrl.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\lut_axil_absolute_add.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_config.vhd \
@@ -31,7 +32,8 @@ acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\pixel_saturation_repl.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\pixel_bpr_flag.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Utilities\pixel_bad_repl.vhd \
- D:\Telops\FIR-00251-Common\VHDL\Math\axis_fi32tou32.vhd
+ D:\Telops\FIR-00251-Common\VHDL\Math\axis_fi32tou32.vhd  
+ 
 
 
 acom -nowarn DAGGEN_0523 \

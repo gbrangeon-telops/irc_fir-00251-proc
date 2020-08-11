@@ -41,6 +41,10 @@ entity calib_config is
       CALIB_BLOCK_INFO_DVAL       : out std_logic;
       CALIB_BLOCK_SEL_MODE        : out calib_block_sel_mode_type;
       
+	  -- Calib LUT switch
+	  NLC_LUT_SWITCH              : out std_logic;
+	  RQC_LUT_SWITCH              : out std_logic;
+	  
       -- Calib data flow config       
       CALIB_FLOW_CONFIG           : out calib_flow_config_type;
       
@@ -122,6 +126,8 @@ architecture rtl of calib_config is
    
    signal calib_bpr_mode_i             : bpr_mode_type := BPR_MODE_NO_REPL;
    
+   signal lut_switch_reg               : std_logic_vector(1 downto 0) := (others => '0');
+   
    signal flush_pipe_i                 : std_logic := '1';
    signal flush_pipe_sync              : std_logic;
    signal reset_err_i                  : std_logic := '0';
@@ -197,7 +203,11 @@ begin
 
    
    sync_mb_cfg_clkCal : double_sync port map(D => mb_cfg_done, Q => mb_cfg_done_sync_clkCal, RESET => '0', CLK => CLK_CAL); 
-  
+   
+   -- clock domain crossing for lut switch signal
+	sync_nlc_lut_switch_clkCal : double_sync port map(D => lut_switch_reg(0), Q => NLC_LUT_SWITCH, RESET => '0', CLK => CLK_CAL);
+	sync_rqc_lut_switch_clkCal : double_sync port map(D => lut_switch_reg(1), Q => RQC_LUT_SWITCH, RESET => '0', CLK => CLK_CAL);
+   
    -- make sure the flush_pipe pulse is >16 clock pulses wide as per Xilinx requirement for AXIS cores
    fpipe_stretch : gh_stretch
    generic map (stretch_count => 20)
@@ -326,7 +336,10 @@ begin
                
                -- BPR mode for calib data
                when X"D8" => calib_bpr_mode_i      <= cfg_wr_data(calib_bpr_mode_i'range);
-               
+			   
+			   -- configure calib LUT switch
+			   when X"DC" => lut_switch_reg <= cfg_wr_data(lut_switch_reg'range);
+			   
                when others =>
                
             end case;
