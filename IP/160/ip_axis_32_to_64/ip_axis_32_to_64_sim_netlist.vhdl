@@ -1,11 +1,11 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Tue Feb 25 16:37:58 2020
--- Host        : TELOPS258-7 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/160/ip_axis_32_to_64/ip_axis_32_to_64_sim_netlist.vhdl
--- Design      : ip_axis_32_to_64
+-- Date        : Thu Aug 13 10:40:35 2020
+-- Host        : TELOPS250 running 64-bit Service Pack 1  (build 7601)
+-- Command     : write_vhdl -force -mode funcsim -rename_top ip_axis_32_to_64 -prefix
+--               ip_axis_32_to_64_ ip_axis32_merge_axis64_sim_netlist.vhdl
+-- Design      : ip_axis32_merge_axis64
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xc7k160tfbg676-1
@@ -37,8 +37,6 @@ entity ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axisc_upsizer is
     s_axis_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
     s_axis_tuser : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axisc_upsizer : entity is "axis_dwidth_converter_v1_1_9_axisc_upsizer";
 end ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axisc_upsizer;
 
 architecture STRUCTURE of ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axisc_upsizer is
@@ -2071,8 +2069,6 @@ entity ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axis_dwidth_converter is
   attribute G_TASK_SEVERITY_INFO of ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axis_dwidth_converter : entity is 0;
   attribute G_TASK_SEVERITY_WARNING : integer;
   attribute G_TASK_SEVERITY_WARNING of ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axis_dwidth_converter : entity is 1;
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axis_dwidth_converter : entity is "axis_dwidth_converter_v1_1_9_axis_dwidth_converter";
   attribute P_AXIS_SIGNAL_SET : string;
   attribute P_AXIS_SIGNAL_SET of ip_axis_32_to_64_axis_dwidth_converter_v1_1_9_axis_dwidth_converter : entity is "32'b00000000000000000000000011111111";
   attribute P_D1_REG_CONFIG : integer;
@@ -2170,7 +2166,7 @@ entity ip_axis_32_to_64 is
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of ip_axis_32_to_64 : entity is true;
   attribute CHECK_LICENSE_TYPE : string;
-  attribute CHECK_LICENSE_TYPE of ip_axis_32_to_64 : entity is "ip_axis_32_to_64,axis_dwidth_converter_v1_1_9_axis_dwidth_converter,{}";
+  attribute CHECK_LICENSE_TYPE of ip_axis_32_to_64 : entity is "ip_axis32_merge_axis64,axis_dwidth_converter_v1_1_9_axis_dwidth_converter,{}";
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of ip_axis_32_to_64 : entity is "yes";
   attribute X_CORE_INFO : string;

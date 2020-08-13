@@ -1,8 +1,8 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Tue Feb 25 16:24:39 2020
--- Host        : TELOPS258-7 running 64-bit Service Pack 1  (build 7601)
+-- Date        : Thu Aug 13 10:52:58 2020
+-- Host        : TELOPS250 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/serdes_clkin_22_2_MHz_mmcm/serdes_clkin_22_2_MHz_mmcm_sim_netlist.vhdl
 -- Design      : serdes_clkin_22_2_MHz_mmcm

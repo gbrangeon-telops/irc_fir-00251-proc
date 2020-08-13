@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Fri Feb 14 11:54:05 2020
+-- Date        : Thu Aug 13 10:55:04 2020
 -- Host        : TELOPS250 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim -rename_top tdp_ram_w8_d2048 -prefix
---               tdp_ram_w8_d2048_ tdp_ram_w8_d2048_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               D:/Telops/FIR-00251-Proc/IP/160/tdp_ram_w8_d2048/tdp_ram_w8_d2048_sim_netlist.vhdl
 -- Design      : tdp_ram_w8_d2048
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -31,6 +31,8 @@ entity tdp_ram_w8_d2048_blk_mem_gen_prim_wrapper is
     wea : in STD_LOGIC_VECTOR ( 0 to 0 );
     web : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_prim_wrapper : entity is "blk_mem_gen_prim_wrapper";
 end tdp_ram_w8_d2048_blk_mem_gen_prim_wrapper;
 
 architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_prim_wrapper is
@@ -204,6 +206,8 @@ entity tdp_ram_w8_d2048_blk_mem_gen_prim_width is
     wea : in STD_LOGIC_VECTOR ( 0 to 0 );
     web : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_prim_width : entity is "blk_mem_gen_prim_width";
 end tdp_ram_w8_d2048_blk_mem_gen_prim_width;
 
 architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_prim_width is
@@ -247,6 +251,8 @@ entity tdp_ram_w8_d2048_blk_mem_gen_generic_cstr is
     wea : in STD_LOGIC_VECTOR ( 0 to 0 );
     web : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
 end tdp_ram_w8_d2048_blk_mem_gen_generic_cstr;
 
 architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_generic_cstr is
@@ -290,6 +296,8 @@ entity tdp_ram_w8_d2048_blk_mem_gen_top is
     wea : in STD_LOGIC_VECTOR ( 0 to 0 );
     web : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_top : entity is "blk_mem_gen_top";
 end tdp_ram_w8_d2048_blk_mem_gen_top;
 
 architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_top is
@@ -333,6 +341,8 @@ entity tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth is
     wea : in STD_LOGIC_VECTOR ( 0 to 0 );
     web : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth : entity is "blk_mem_gen_v8_3_4_synth";
 end tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth;
 
 architecture STRUCTURE of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4_synth is
@@ -571,6 +581,8 @@ entity tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 is
   attribute C_WRITE_WIDTH_B of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is 8;
   attribute C_XDEVICEFAMILY : string;
   attribute C_XDEVICEFAMILY of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "kintex7";
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "blk_mem_gen_v8_3_4";
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of tdp_ram_w8_d2048_blk_mem_gen_v8_3_4 : entity is "yes";
 end tdp_ram_w8_d2048_blk_mem_gen_v8_3_4;

@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Fri Feb 14 11:47:48 2020
+-- Date        : Thu Aug 13 10:57:40 2020
 -- Host        : TELOPS250 running 64-bit Service Pack 1  (build 7601)
--- Command     : write_vhdl -force -mode funcsim -rename_top sfifo_w8_d64_no_output_reg -prefix
---               sfifo_w8_d64_no_output_reg_ sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               D:/Telops/FIR-00251-Proc/IP/160/sfifo_w8_d64_no_output_reg/sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
 -- Design      : sfifo_w8_d64_no_output_reg
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -25,6 +25,8 @@ entity sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_wrapper is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_wrapper : entity is "blk_mem_gen_prim_wrapper";
 end sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_wrapper;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_wrapper is
@@ -242,6 +244,8 @@ entity sfifo_w8_d64_no_output_reg_rd_bin_cntr is
     E : in STD_LOGIC_VECTOR ( 0 to 0 );
     clk : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_rd_bin_cntr : entity is "rd_bin_cntr";
 end sfifo_w8_d64_no_output_reg_rd_bin_cntr;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_rd_bin_cntr is
@@ -529,6 +533,8 @@ entity sfifo_w8_d64_no_output_reg_rd_handshaking_flags is
     ram_empty_i_reg : in STD_LOGIC;
     clk : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_rd_handshaking_flags : entity is "rd_handshaking_flags";
 end sfifo_w8_d64_no_output_reg_rd_handshaking_flags;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_rd_handshaking_flags is
@@ -563,6 +569,8 @@ entity sfifo_w8_d64_no_output_reg_rd_status_flags_ss is
     \ram_empty_i0__3\ : in STD_LOGIC;
     rd_en : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_rd_status_flags_ss : entity is "rd_status_flags_ss";
 end sfifo_w8_d64_no_output_reg_rd_status_flags_ss;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_rd_status_flags_ss is
@@ -668,6 +676,8 @@ entity sfifo_w8_d64_no_output_reg_wr_bin_cntr is
     srst : in STD_LOGIC;
     clk : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_wr_bin_cntr : entity is "wr_bin_cntr";
 end sfifo_w8_d64_no_output_reg_wr_bin_cntr;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_wr_bin_cntr is
@@ -1198,6 +1208,8 @@ entity sfifo_w8_d64_no_output_reg_wr_handshaking_flags is
     ram_full_fb_i_reg : in STD_LOGIC;
     clk : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_wr_handshaking_flags : entity is "wr_handshaking_flags";
 end sfifo_w8_d64_no_output_reg_wr_handshaking_flags;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_wr_handshaking_flags is
@@ -1231,6 +1243,8 @@ entity sfifo_w8_d64_no_output_reg_wr_status_flags_ss is
     ram_empty_fb_i_reg_0 : in STD_LOGIC;
     wr_en : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_wr_status_flags_ss : entity is "wr_status_flags_ss";
 end sfifo_w8_d64_no_output_reg_wr_status_flags_ss;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_wr_status_flags_ss is
@@ -1333,6 +1347,8 @@ entity sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_width is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_width : entity is "blk_mem_gen_prim_width";
 end sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_width;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_blk_mem_gen_prim_width is
@@ -1369,6 +1385,8 @@ entity sfifo_w8_d64_no_output_reg_rd_logic is
     \ram_empty_i0__3\ : in STD_LOGIC;
     rd_en : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_rd_logic : entity is "rd_logic";
 end sfifo_w8_d64_no_output_reg_rd_logic;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_rd_logic is
@@ -1429,6 +1447,8 @@ entity sfifo_w8_d64_no_output_reg_wr_logic is
     \gc1.count_d1_reg[5]\ : in STD_LOGIC_VECTOR ( 5 downto 0 );
     \gc1.count_reg[5]\ : in STD_LOGIC_VECTOR ( 5 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_wr_logic : entity is "wr_logic";
 end sfifo_w8_d64_no_output_reg_wr_logic;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_wr_logic is
@@ -1496,6 +1516,8 @@ entity sfifo_w8_d64_no_output_reg_blk_mem_gen_generic_cstr is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
 end sfifo_w8_d64_no_output_reg_blk_mem_gen_generic_cstr;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_blk_mem_gen_generic_cstr is
@@ -1527,6 +1549,8 @@ entity sfifo_w8_d64_no_output_reg_blk_mem_gen_top is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_blk_mem_gen_top : entity is "blk_mem_gen_top";
 end sfifo_w8_d64_no_output_reg_blk_mem_gen_top;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_blk_mem_gen_top is
@@ -1558,6 +1582,8 @@ entity sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4_synth is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4_synth : entity is "blk_mem_gen_v8_3_4_synth";
 end sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4_synth;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4_synth is
@@ -1589,6 +1615,8 @@ entity sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4 is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4 : entity is "blk_mem_gen_v8_3_4";
 end sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_blk_mem_gen_v8_3_4 is
@@ -1620,6 +1648,8 @@ entity sfifo_w8_d64_no_output_reg_memory is
     Q : in STD_LOGIC_VECTOR ( 5 downto 0 );
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_memory : entity is "memory";
 end sfifo_w8_d64_no_output_reg_memory;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_memory is
@@ -1655,6 +1685,8 @@ entity sfifo_w8_d64_no_output_reg_fifo_generator_ramfifo is
     srst : in STD_LOGIC;
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_fifo_generator_ramfifo : entity is "fifo_generator_ramfifo";
 end sfifo_w8_d64_no_output_reg_fifo_generator_ramfifo;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_fifo_generator_ramfifo is
@@ -1736,6 +1768,8 @@ entity sfifo_w8_d64_no_output_reg_fifo_generator_top is
     srst : in STD_LOGIC;
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_fifo_generator_top : entity is "fifo_generator_top";
 end sfifo_w8_d64_no_output_reg_fifo_generator_top;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_fifo_generator_top is
@@ -1775,6 +1809,8 @@ entity sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2_synth is
     srst : in STD_LOGIC;
     din : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2_synth : entity is "fifo_generator_v13_1_2_synth";
 end sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2_synth;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2_synth is
@@ -2437,6 +2473,8 @@ entity sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2 is
   attribute C_WR_PNTR_WIDTH_WRCH of sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2 : entity is 4;
   attribute C_WR_RESPONSE_LATENCY : integer;
   attribute C_WR_RESPONSE_LATENCY of sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2 : entity is 1;
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2 : entity is "fifo_generator_v13_1_2";
 end sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2;
 
 architecture STRUCTURE of sfifo_w8_d64_no_output_reg_fifo_generator_v13_1_2 is

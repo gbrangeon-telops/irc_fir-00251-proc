@@ -1392,17 +1392,28 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\compile\gating_top.vhd=VHDL Source Code
 .\compile\SFW.vhd=VHDL Source Code
 .\compile\fir_00251_proc_acq.vhd=VHDL Source Code
-.\compile\clink_signals_validator.vhd=VHDL Source Code
-.\compile\clink_delay_validator.vhd=VHDL Source Code
-.\compile\clink_calibration.vhd=VHDL Source Code
-.\compile\clink_dout_ctrl.vhd=VHDL Source Code
-.\compile\clink_receiver_2ch.vhd=VHDL Source Code
-.\compile\uart_block_tel2000.vhd=VHDL Source Code
 .\compile\fpa_watchdog_module.vhd=VHDL Source Code
-.\compile\scd_data_ctrl.vhd=VHDL Source Code
-.\compile\scd_hw_driver.vhd=VHDL Source Code
-.\compile\scd_proxy_intf.vhd=VHDL Source Code
-.\compile\fir_00251_proc_pelicanD.vhd=VHDL Source Code
+.\compile\afpa_elec_ref_proc.vhd=VHDL Source Code
+.\compile\afpa_analog_chain_corr.vhd=VHDL Source Code
+.\compile\afpa_real_data_gen.vhd=VHDL Source Code
+.\compile\afpa_dval_gen.vhd=VHDL Source Code
+.\compile\afpa_hsample_proc.vhd=VHDL Source Code
+.\compile\afpa_vsample_proc.vhd=VHDL Source Code
+.\compile\afpa_data_ctrl.vhd=VHDL Source Code
+.\compile\afpa_data_ctrl_16chn.vhd=VHDL Source Code
+.\compile\afpa_services.vhd=VHDL Source Code
+.\compile\afpa_services_sadc.vhd=VHDL Source Code
+.\compile\fleG_prog_ctrler.vhd=VHDL Source Code
+.\compile\isc0209A_clks_gen.vhd=VHDL Source Code
+.\compile\isc0209A_prog_ctrler.vhd=VHDL Source Code
+.\compile\isc0209A_hw_driver.vhd=VHDL Source Code
+.\compile\isc0209A_intf.vhd=VHDL Source Code
+.\compile\clink_calibration.vhd=VHDL Source Code
+.\compile\quad_pattern_validator.vhd=VHDL Source Code
+.\compile\quad_data_deserializer.vhd=VHDL Source Code
+.\compile\afpa_data_deserializer_8chn.vhd=VHDL Source Code
+.\compile\afpa_data_deserializer_16chn.vhd=VHDL Source Code
+.\compile\fir_00251_proc_isc0209A.vhd=VHDL Source Code
 
 
 [file_out:/..\..\src\fir_00251_proc_blackbirdD.bde]
@@ -1420,8 +1431,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 [file_out:/..\..\src\fir_00251_proc_isc0207A_3k.bde]
 /..\compile\fir_00251_proc_isc0207A_3k.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_isc0209A.bde]
-/..\compile\fir_00251_proc_isc0209A.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_isc0804A.bde]
 /..\compile\fir_00251_proc_isc0804A.vhd=-1
@@ -1432,6 +1441,8 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 [file_out:/..\..\src\fir_00251_proc_marsD.bde]
 /..\compile\fir_00251_proc_marsD.vhd=-1
 
+[file_out:/..\..\src\fir_00251_proc_pelicanD.bde]
+/..\compile\fir_00251_proc_pelicanD.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_scorpiolwD.bde]
 /..\compile\fir_00251_proc_scorpiolwD.vhd=-1
@@ -1479,6 +1490,18 @@ Calib/..\..\compile\video_fwposition_Selector.vhd=-1
 
 
 
+[file_out:CLINK/..\..\..\src\clink\HDL\clink_receiver_2ch.bde]
+CLINK/..\..\compile\clink_receiver_2ch.vhd=-1
+
+[file_out:CLINK/..\..\..\src\clink\HDL\clink_dout_ctrl.bde]
+CLINK/..\..\compile\clink_dout_ctrl.vhd=-1
+
+
+[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde]
+CLINK/..\..\compile\clink_delay_validator.vhd=-1
+
+[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde]
+CLINK/..\..\compile\clink_signals_validator.vhd=-1
 
 
 
@@ -1488,33 +1511,13 @@ Calib/..\..\compile\video_fwposition_Selector.vhd=-1
 
 
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
-FPA\Common/..\..\..\compile\afpa_services.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde]
-FPA\Common/..\..\..\compile\afpa_services_sadc.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
-FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
-
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde]
-FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
 
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde]
+FPA\Common/..\..\..\compile\uart_block_tel2000.vhd=-1
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
-FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
+
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde]
 FPA\Common/..\compile\afpa_elec_offset_proc.vhd=-1
@@ -1528,11 +1531,7 @@ FPA\Common/..\..\..\compile\fastrd_wdow_info_rate_ctrler.vhd=-1
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde]
 FPA\Common/..\..\..\compile\fastrd_wdow_mem.vhd=-1
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde]
-FPA\Common/..\..\..\compile\afpa_analog_chain_corr.vhd=-1
 
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde]
-FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
 
 
 [file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde]
@@ -1580,17 +1579,9 @@ FPA\isc0207A_3k/..\..\..\compile\sc_high_low_duration.vhd=-1
 [file_out:FPA\isc0207A_3k/..\..\..\..\src\FPA\isc0207A_3k\HDL\isc0207A_3k_readout_ctrler.bde]
 FPA\isc0207A_3k/..\..\..\compile\isc0207A_3k_readout_ctrler.vhd=-1
 
-[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_hw_driver.bde]
-FPA\isc0209A/..\..\..\compile\isc0209A_hw_driver.vhd=-1
 
-[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_intf.bde]
-FPA\isc0209A/..\..\..\compile\isc0209A_intf.vhd=-1
 
-[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_prog_ctrler.bde]
-FPA\isc0209A/..\..\..\compile\isc0209A_prog_ctrler.vhd=-1
 
-[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde]
-FPA\isc0209A/..\..\..\compile\isc0209A_clks_gen.vhd=-1
 
 [file_out:FPA\isc0804A/..\..\..\..\src\FPA\isc0804A\HDL\isc0804A_clks_gen.bde]
 FPA\isc0804A/..\..\..\compile\isc0804A_clks_gen.vhd=-1
@@ -1631,8 +1622,14 @@ FPA\Megalink/..\..\..\compile\mglk_hw_driver.vhd=-1
 [file_out:FPA\Megalink/..\..\..\..\src\FPA\megalink\HDL\mglk_intf.bde]
 FPA\Megalink/..\..\..\compile\mglk_intf.vhd=-1
 
+[file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde]
+FPA\Scd_proxy/..\..\..\compile\scd_data_ctrl.vhd=-1
 
+[file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_hw_driver.bde]
+FPA\Scd_proxy/..\..\..\compile\scd_hw_driver.vhd=-1
 
+[file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_proxy_intf.bde]
+FPA\Scd_proxy/..\..\..\compile\scd_proxy_intf.vhd=-1
 
 [file_out:FPA\ScorpiomwA/..\..\..\..\src\FPA\scorpiomwA\HDL\scorpiomwA_clks_gen.bde]
 FPA\ScorpiomwA/..\..\..\compile\scorpiomwA_clks_gen.vhd=-1
@@ -1669,17 +1666,9 @@ FPA\suphawkA/..\..\..\compile\suphawkA_prog_ctrler.vhd=-1
 
 
 
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_deserializer.bde]
-Quad_serdes/..\..\compile\quad_data_deserializer.vhd=-1
 
-[file_out:Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde]
-Quad_serdes/..\..\compile\quad_pattern_validator.vhd=-1
 
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde]
-Quad_serdes/..\..\compile\afpa_data_deserializer_8chn.vhd=-1
 
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde]
-Quad_serdes/..\..\compile\afpa_data_deserializer_16chn.vhd=-1
 
 
 [file_out:Testbench\IP\data_mgt/data_mgt_tb.bde]
@@ -1704,8 +1693,6 @@ Testbench\Proc_Only/..\..\..\compile\Processing_tb.vhd=-1
 
 [file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_X_to_ADD.bde]
 LUT/..\..\compile\axis_lut_X_to_ADD.vhd=-1
-[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_core_a32_d32.bde]
-LUT/..\..\compile\axis_lut_core_a32_d32.vhd=-1
 [file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_a32_d32.bde]
 LUT/..\..\compile\axis_lut_a32_d32.vhd=-1
 [file_out:MGT/..\..\..\src\MGT\HDL\mgt_block.bde]
@@ -1779,25 +1766,49 @@ Gating/..\..\compile\gating_top.vhd=-1
 SFW/..\..\compile\SFW.vhd=-1
 [file_out:/..\..\src\fir_00251_proc_acq.bde]
 /..\compile\fir_00251_proc_acq.vhd=-1
-[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde]
-CLINK/..\..\compile\clink_signals_validator.vhd=-1
-[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde]
-CLINK/..\..\compile\clink_delay_validator.vhd=-1
-[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
-CLINK/..\..\compile\clink_calibration.vhd=-1
-[file_out:CLINK/..\..\..\src\clink\HDL\clink_dout_ctrl.bde]
-CLINK/..\..\compile\clink_dout_ctrl.vhd=-1
-[file_out:CLINK/..\..\..\src\clink\HDL\clink_receiver_2ch.bde]
-CLINK/..\..\compile\clink_receiver_2ch.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde]
-FPA\Common/..\..\..\compile\uart_block_tel2000.vhd=-1
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde]
 FPA\Common/..\..\..\compile\fpa_watchdog_module.vhd=-1
-[file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde]
-FPA\Scd_proxy/..\..\..\compile\scd_data_ctrl.vhd=-1
-[file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_hw_driver.bde]
-FPA\Scd_proxy/..\..\..\compile\scd_hw_driver.vhd=-1
-[file_out:FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_proxy_intf.bde]
-FPA\Scd_proxy/..\..\..\compile\scd_proxy_intf.vhd=-1
-[file_out:/..\..\src\fir_00251_proc_pelicanD.bde]
-/..\compile\fir_00251_proc_pelicanD.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde]
+FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde]
+FPA\Common/..\..\..\compile\afpa_analog_chain_corr.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
+FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
+FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
+FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
+FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
+FPA\Common/..\..\..\compile\afpa_services.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde]
+FPA\Common/..\..\..\compile\afpa_services_sadc.vhd=-1
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde]
+FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
+[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_clks_gen.bde]
+FPA\isc0209A/..\..\..\compile\isc0209A_clks_gen.vhd=-1
+[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_prog_ctrler.bde]
+FPA\isc0209A/..\..\..\compile\isc0209A_prog_ctrler.vhd=-1
+[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_hw_driver.bde]
+FPA\isc0209A/..\..\..\compile\isc0209A_hw_driver.vhd=-1
+[file_out:FPA\isc0209A/..\..\..\..\src\FPA\isc0209A\HDL\isc0209A_intf.bde]
+FPA\isc0209A/..\..\..\compile\isc0209A_intf.vhd=-1
+[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
+CLINK/..\..\compile\clink_calibration.vhd=-1
+[file_out:Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde]
+Quad_serdes/..\..\compile\quad_pattern_validator.vhd=-1
+[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_deserializer.bde]
+Quad_serdes/..\..\compile\quad_data_deserializer.vhd=-1
+[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde]
+Quad_serdes/..\..\compile\afpa_data_deserializer_8chn.vhd=-1
+[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde]
+Quad_serdes/..\..\compile\afpa_data_deserializer_16chn.vhd=-1
+[file_out:/..\..\src\fir_00251_proc_isc0209A.bde]
+/..\compile\fir_00251_proc_isc0209A.vhd=-1
+[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_core_a32_d32.bde]
+LUT/..\..\compile\axis_lut_core_a32_d32.vhd=-1
