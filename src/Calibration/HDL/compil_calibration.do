@@ -17,7 +17,6 @@ acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\CFF.bde 
 
 acom -nowarn DAGGEN_0523 \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\LUT_native_switch.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\axil_channels_ctrl.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\lut_axil_absolute_add.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_config.vhd \

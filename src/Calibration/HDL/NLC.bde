@@ -2,14 +2,14 @@ SCHM0104
 
 HEADER
 {
- FREEID 37776
+ FREEID 37811
  VARIABLES
  {
   #ARCHITECTURE="sch"
   #BLOCKTABLE_FILE="#table.bde"
   #BLOCKTABLE_INCLUDED="1"
   #DEFAULT_RANGE0="<range<name=\"err\"><left=\"37\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE1="<range<name=\"nlc_lut_err\"><left=\"40\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE1="<range<name=\"nlc_lut_err\"><left=\"32\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE2="<range<name=\"pow2_b_exp_fp32\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE3="<range<name=\"pow2_m_exp_fp32\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE4="<range<name=\"pow2_offset_exp_fp32\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
@@ -720,7 +720,7 @@ HEADER
 "library IEEE,WORK;\n"+
 "use ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1596825854"
+    #MODIFIED="1598986224"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="9e4e3850-0fb4-4f48-9be2-0b22ac9febf4"
    }
   }
@@ -894,7 +894,7 @@ HEADER
       #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="ERR(40:0)"
+      #NAME="ERR(32:0)"
       #NUMBER="0"
       #SIDE="left"
      }
@@ -4278,7 +4278,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="9e4e3850-0fb4-4f48-9be2-0b22ac9febf4"
    }
    COORD (4200,1340)
-   VERTEXES ( (2,37042), (6,37044), (18,37050), (12,37048), (30,37058), (28,37628), (40,37634), (42,37640), (20,37644), (26,37681), (8,37692), (46,37736), (44,37739) )
+   VERTEXES ( (2,37042), (6,37044), (8,37692), (12,37048), (18,37050), (20,37644), (26,37681), (28,37628), (30,37058), (40,37634), (42,37640), (44,37739), (46,37736) )
   }
   TEXT  8579, 0, 0
   {
@@ -8103,15 +8103,6 @@ PAGE ""
    PARENT 31903
   }
   NET WIRE  31908, 0, 0
-  NET BUS  32090, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="1"
-    #MDA_RECORD_TOKEN="OTHER"
-    #NAME="nlc_lut_err(40:0)"
-   }
-  }
   TEXT  32091, 0, 0
   {
    TEXT "$#NAME"
@@ -8950,7 +8941,7 @@ PAGE ""
   }
   BUS  37693, 0, 0
   {
-   NET 32090
+   NET 37776
    VTX 37691, 37692
    VARIABLES
    {
@@ -8991,6 +8982,15 @@ PAGE ""
     #NAMED="1"
    }
   }
+  NET BUS  37776, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="nlc_lut_err(32:0)"
+   }
+  }
  }
  
 }
@@ -9016,7 +9016,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  37759, 0, 0
+  TEXT  37794, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -9027,7 +9027,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  37760, 0, 0
+  TEXT  37795, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -9038,7 +9038,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  37761, 0, 0
+  TEXT  37796, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -9048,7 +9048,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  37762, 0, 0
+  TEXT  37797, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -9060,7 +9060,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  37763, 0, 0
+  TEXT  37798, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -9073,7 +9073,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  37764, 0, 0
+  TEXT  37799, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -9083,7 +9083,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  37765, 0, 0
+  TEXT  37800, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -9095,7 +9095,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  37766, 0, 0
+  TEXT  37801, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -9105,7 +9105,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  37767, 0, 0
+  TEXT  37802, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -9116,7 +9116,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  37768, 0, 0
+  GROUP  37803, 0, 0
   {
    PAGEALIGN 10
    RECT (7920,3820,8801,4201)
@@ -9128,7 +9128,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  37769, 0, 0
+  GROUP  37804, 0, 0
   {
    PAGEALIGN 10
    RECT (7920,4020,8801,4021)
@@ -9140,7 +9140,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  37770, 0, 0
+  GROUP  37805, 0, 0
   {
    PAGEALIGN 10
    RECT (7920,3960,8801,3961)
@@ -9152,7 +9152,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  37771, 0, 0
+  GROUP  37806, 0, 0
   {
    PAGEALIGN 10
    RECT (7920,4080,8801,4081)
@@ -9164,7 +9164,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  37772, 0, 0
+  GROUP  37807, 0, 0
   {
    PAGEALIGN 10
    RECT (7920,4140,8801,4141)
@@ -9176,7 +9176,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  37773, 0, 0
+  GROUP  37808, 0, 0
   {
    PAGEALIGN 10
    RECT (8100,3820,8101,3961)
@@ -9187,7 +9187,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  37774, 0, 0
+  GROUP  37809, 0, 0
   {
    PAGEALIGN 10
    RECT (8100,3960,8101,4201)
@@ -9198,7 +9198,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  37775, 0, 0
+  BMPPICT  37810, 0, 0
   {
    PAGEALIGN 10
    RECT (7940,3880,8079,3925)

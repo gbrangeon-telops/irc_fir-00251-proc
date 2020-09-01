@@ -990,6 +990,9 @@ IRC_Status_t Actualization_SM()
          // Info on the block being actualized (re-assigned if blockIdx has changed)
          blockInfo = &calibrationInfo.blocks[blockIdx];
 
+         // configure RQC LUT switch to MB read
+        CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_AXI_LITE);
+
          ACT_INF("Computing data for block index %d", blockIdx);
 
          GETTIME(&tic_AvgDuration);
@@ -1044,6 +1047,9 @@ IRC_Status_t Actualization_SM()
             test_data.TcalBB_test = applyLUT(lutAddr, &blockInfo->lutRQData[0], sqrtf(test_data.FcalBB_test));
             validateBuffers(mu_buffer, frameSize, seq_buffer, gcRegsData.MemoryBufferSequenceSize);
          }
+
+         // configure RQC LUT switch to FPGA
+         CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
 
          setActState(&state, ACT_ComputeAveragedImage);
          break;
@@ -1137,6 +1143,9 @@ IRC_Status_t Actualization_SM()
          float Tmin, Tmax; // range of the LUTRQ
          uint32_t lutAddr;
 
+         // configure RQC LUT switch to MB
+         CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_AXI_LITE);
+
          if (usingICU)
          {
             T_BB = C_TO_K(ICUTemp);
@@ -1222,7 +1231,12 @@ IRC_Status_t Actualization_SM()
 
          ctxtInit(&blockContext, 0, numPixels, ACT_MAX_PIX_DATA_TO_PROCESS);
 
+         // configure RQC LUT switch to FPGA
+         CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
+
          setActState(&state, ACT_ComputeDeltaBeta);
+
+
       }
       break;
 
