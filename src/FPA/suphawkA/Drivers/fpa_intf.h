@@ -19,7 +19,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "SUPHAWKA 10MHz WITH TOFFSET"
+#define FPA_DEVICE_MODEL_NAME    "SUPHAWKA 10MHz"
 
 #define FPA_SUPHAWK_VERTICAL_FLIP   0        // 1 pour une inversion verticale de l'image (Line 512 to 1)
 

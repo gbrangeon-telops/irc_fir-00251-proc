@@ -35,6 +35,8 @@ entity suphawkA_elcorr_refs_ctrl is
       
       HW_CFG_IN_PROGRESS: in std_logic;
       
+      FPA_INT           : in std_logic;
+      
       PROG_TRIG         : out std_logic      
       );
    
@@ -42,7 +44,14 @@ end suphawkA_elcorr_refs_ctrl;
 
 architecture rtl of suphawkA_elcorr_refs_ctrl is
    
+   constant C_SATURATION_EXP_TIME_uS         : integer    := 50_000
+   -- pragma translate_off
+   /10_000
+   -- pragma translate_on
+   ;
+   
    constant C_ONE_SEC_FACTOR : integer := 1000*integer(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ);
+   constant C_SATURATION_EXP_TIME_FACTOR     : integer    := integer((C_SATURATION_EXP_TIME_uS* DEFINE_FPA_MCLK_RATE_KHZ)/1_000);
    
    component sync_reset
       port(
@@ -67,7 +76,7 @@ architecture rtl of suphawkA_elcorr_refs_ctrl is
          Clk_div   : out std_logic);
    end component;
    
-   type ctrl_fsm_type is (idle, check_ref0_st, check_ref1_st, elcorr_value_st, change_ref_st, wait_done_st, pause_st, ref_valid_st, wait_fdbk_st, nominal_value_st, default_ref_st); 
+   type ctrl_fsm_type is (idle, slct_ref_st, check_value_st, change_ref_st, wait_done_st, pause_st, ref_valid_st, wait_fdbk_st, default_ref_st);    
    
    signal ctrl_fsm                  : ctrl_fsm_type;
    signal sreset                    : std_logic;
@@ -86,10 +95,13 @@ architecture rtl of suphawkA_elcorr_refs_ctrl is
    signal present_cfg_num            : unsigned(USER_CFG_IN.CFG_NUM'LENGTH-1 downto 0);
    signal done_i                    : std_logic;
    signal areset_i                  : std_logic;
-   signal nominal_prv_is_active     : std_logic;
+   -- signal nominal_prv_is_active     : std_logic;
    signal updated_ref               : std_logic_vector(1 downto 0);
    signal ref_feedbk_i              : std_logic_vector(1 downto 0);
    signal prog_trig_i               : std_logic;
+   signal int_num                   : unsigned(1 downto 0);
+   signal fpa_saturation_en         : std_logic;
+   signal fpa_int_last              : std_logic;
    
 begin
    
@@ -178,7 +190,7 @@ begin
    -- changements de reference
    -------------------------------------------------------- 
    -- il faut savoir que pour le suphawk, la reference utilisée pour le calcul electronique est PRV. 
-   -- Hypothèse: PRV est en dehors de la plage dynamique des taps. Par conséquent inutilisable en mode continue, ni pour le calcul d'offset, ni pour le gain.
+   -- Les faits: PRV est en dehors de la plage dynamique des taps. Par conséquent inutilisable en mode continue, ni pour le calcul d'offset, ni pour le gain.
    -- Dans pareille situation, on ne peut l'exploiter qu'en mode événementiel (lors d'un changement de config par exemple) car en mode continu, les images seraient affectées.
    
    U3: process(CLK)
@@ -186,52 +198,59 @@ begin
       if rising_edge(CLK) then 
          if sreset = '1' then
             user_cfg_o <= USER_CFG_IN;                                        -- pour une bonne initialisation et eviter ainsi des bugs
+            user_cfg_o.comn.fpa_prog_trig_int_time <= to_unsigned(DEFINE_FPA_PROG_INT_TIME, 32);  -- valeur par defaut
+            user_cfg_o.comn.fpa_xtra_trig_int_time <= to_unsigned(DEFINE_FPA_XTRA_TRIG_INT_TIME, 32);  -- valeur par defaut
             reference_value_i <= USER_CFG_IN.VDAC_VALUE(elcorr_ref_dac_id);   -- pour une bonne initialisation et eviter ainsi des bugs
             ctrl_fsm <= idle;
             ref_valid_i <= (others => '0');
             present_cfg_num <= not USER_CFG_IN.CFG_NUM;
             done_i <= USER_CFG_IN.COMN.FPA_DIAG_MODE;                         -- necessaire pour que le mode diag fonctionne
-            nominal_prv_is_active <= '1';
+            -- nominal_prv_is_active <= '1';
             prog_trig_i <= '0';
+            int_num <= (others => '0');
+            fpa_saturation_en <= '0';
             
          else
+            
+            fpa_int_last <= FPA_INT; 
             
             elcorr_ref_dac_id <= to_integer(FPA_INTF_CFG.ELCORR_REF_DAC_ID);            
             user_cfg_o <= USER_CFG_IN;
             user_cfg_o.vdac_value(elcorr_ref_dac_id) <= reference_value_i;
             
+            --            if fpa_saturation_en = '1' then
+            --               user_cfg_o.comn.fpa_prog_trig_int_time <= to_unsigned(C_SATURATION_EXP_TIME_FACTOR, 32);
+            --               user_cfg_o.comn.fpa_xtra_trig_int_time <= to_unsigned(C_SATURATION_EXP_TIME_FACTOR, 32);
+            --            else
+            user_cfg_o.comn.fpa_prog_trig_int_time <= to_unsigned(DEFINE_FPA_PROG_INT_TIME, 32);  -- valeur par defaut
+            user_cfg_o.comn.fpa_xtra_trig_int_time <= to_unsigned(DEFINE_FPA_XTRA_TRIG_INT_TIME, 32);  -- valeur par defaut
+            --            end if;
+            
             case ctrl_fsm is
                
                when idle =>
-                  updated_ref <= (others => '0');
-                  ref_valid_i <= (others => '0');
-                  if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_ENABLED = '1' then   -- prog_timer_pulse est generé ssi on est en mode continuel
-                     ctrl_fsm <= check_ref0_st;
+                  prog_trig_i <= '0';
+                  if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then  
+                     ctrl_fsm <= slct_ref_st;
                   end if;
                
-               when check_ref0_st =>  -- on verifie que la valeur en cours du dac de reference n'est pas celle désirée      
-                  if USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' and USER_CFG_IN.ELCORR_REF_CFG(0).REF_VALUE /= FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) and ref_valid_i(0) = '0' then
-                     ref_id <= 0;                     
-                     ctrl_fsm <= elcorr_value_st;
-                  else
-                     ctrl_fsm <= check_ref1_st;
-                  end if;
-               
-               when check_ref1_st =>   -- on verifie que la valeur en cours du dac de reference n'est pas celle désirée     
-                  if USER_CFG_IN.ELCORR_REF_CFG(1).REF_ENABLED = '1' and USER_CFG_IN.ELCORR_REF_CFG(1).REF_VALUE /= FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) then
+               when slct_ref_st =>
+                  if USER_CFG_IN.ELCORR_REF_CFG(1).REF_ENABLED = '1' then
                      ref_id <= 1;
-                     ctrl_fsm <= elcorr_value_st;
                   else
+                     ref_id <= 0;       -- si REF1 n'est pas activée, alors on se contente de REF0 uniqument
+                  end if;
+                  ctrl_fsm <= check_value_st;
+               
+               when check_value_st =>     -- s'assurer que la valeur à changer n'est pas déjà celle qui a cours dans le dac
+                  if USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE = FPA_INTF_CFG.VDAC_VALUE(elcorr_ref_dac_id) and ref_valid_i(ref_id) = '1' then
                      ctrl_fsm <= idle;
+                  else
+                     ctrl_fsm <= change_ref_st;
                   end if;           
                
-               when elcorr_value_st =>    -- on initialise le registre de reference à la valeur imposée par elcorr
-                  reference_value_i <= USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE;
-                  nominal_prv_is_active <= '0';
-                  updated_ref(ref_id) <= '1';
-                  ctrl_fsm <= change_ref_st;
-               
                when change_ref_st =>      -- on demande une programmation du dac des ref avec la valeur de ref correspondant à l'id actif 
+                  reference_value_i <= USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_VALUE;
                   ref_valid_i <= "00";    -- plus aucune reference n'est valide puisqu'on s'apprête à reprogrammer les dacs
                   ctrl_fsm <= wait_done_st;
                
@@ -243,7 +262,7 @@ begin
                
                when pause_st =>           -- on donne du temps à la sortie du dac programmé de se stabiliser
                   pause_cnt <= pause_cnt + 1;
-                  if pause_cnt > DEFINE_ELCORR_REF_DAC_SETUP_FACTOR then   -- Les mesures à l,oscillo revelent que la stabilisation s'obtient apres 250 ms 
+                  if pause_cnt > DEFINE_ELCORR_REF_DAC_SETUP_FACTOR then   -- soit environ 50% du temps de validité d'une vref. Les mesures à l,oscillo revelent que la stabilisation s'obtient apres 250 ms 
                      ctrl_fsm <= ref_valid_st;
                   end if;
                   -- pragma translate_off
@@ -251,33 +270,25 @@ begin
                   -- pragma translate_on
                
                when ref_valid_st =>       -- on diffuse l'info de la validité de la reference
-                  ref_valid_i(ref_id) <= not nominal_prv_is_active;
-                  if nominal_prv_is_active = '0' then 
+                  ref_valid_i(ref_id) <= '1';
                      ctrl_fsm <= wait_fdbk_st;
-                  else
-                     ctrl_fsm <= idle;
-                  end if;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id);
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
                   if ref_feedbk_i(ref_id) = '1' then
-                     prog_trig_i <= '0';
-                     if updated_ref(0) = '1' and updated_ref(1) = '1' then  -- toutes les references sont programmées et au moins un calcul est fait
-                        ctrl_fsm <= default_ref_st;  
+                     prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
+                     if ref_id = 0 then
+                        ctrl_fsm <= idle;
                      else
-                        ctrl_fsm <= check_ref0_st;  
+                        ctrl_fsm <= default_ref_st;  
                      end if;
+                     ref_valid_i(1) <= '0';    -- ainsi les changements de niveau affecteront juste une image si impact il y a 
                   end if;
                
-               when default_ref_st =>          -- on remet la valeur d'origine de PRV après utilisation du DAC y afférant
+               when default_ref_st =>          -- on remet la reference par defaut (ref_id = 0)
+                  ref_id <= 0;
                   present_cfg_num <= USER_CFG_IN.CFG_NUM; 
-                  ctrl_fsm <= nominal_value_st;
-               
-               when nominal_value_st =>      -- on initialise le registre de reference à la valeur nominale de PRV
-                  reference_value_i <= USER_CFG_IN.PRV_DAC_NOMINAL_VALUE;
-                  nominal_prv_is_active <= '1';
-                  ref_valid_i <= "00";
-                  ctrl_fsm <= change_ref_st;
+                  ctrl_fsm <= check_value_st;                  
                
                when others =>
                

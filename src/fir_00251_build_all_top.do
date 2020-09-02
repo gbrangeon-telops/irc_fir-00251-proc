@@ -82,7 +82,7 @@ acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwA.bde"
 do "$FIR251PROC\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwD.bde"
 #FPA suphawkA
-#do "$FIR251PROC\src\FPA\suphawkA\HDL\compil_suphawkA.do"
-#acom  "$FIR251PROC\src\fir_00251_proc_suphawkA.bde"
+do "$FIR251PROC\src\FPA\suphawkA\HDL\compil_suphawkA.do"
+acom  "$FIR251PROC\src\fir_00251_proc_suphawkA.bde"
 
 #__END BUILD ALL PROC

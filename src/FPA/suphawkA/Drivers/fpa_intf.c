@@ -113,11 +113,15 @@
 
 #define TOTAL_DAC_NUM                     8
 
+// tension PRV à utiliser pour le supHawk
+#define SUPHAWK_PRV_VOLTAGE_VALUE_mV      3900
+
 // Electrical correction : references
-#define ELCORR_REF1_VALUE_mV              2227                // ref1 au milieu de la plage dynamique
-#define ELCORR_REF2_VALUE_mV              1200
+#define ELCORR_REF1_VALUE_mV              SUPHAWK_PRV_VOLTAGE_VALUE_mV                //
+#define ELCORR_REF2_VALUE_mV              3575
 #define ELCORR_REF_DAC_ID                 6                   // position (entre 1 et 8) du dac dédié aux references 
 #define ELCORR_REF_MAXIMUM_SAMP           120                 // le nombre de sample au max supporté par le vhd
+#define ELCORR_REF_MAXIMUM_DLY            250                 // le delai max supporté par le vhd
 
 // Electrical correction : embedded switches control
 #define ELCORR_SW_TO_PATH1                0x01
@@ -127,10 +131,10 @@
 #define ELCORR_CONT_MODE_OFFSETX_MIN      640
 
 // Electrical correction : valeurs par defaut si aucune mesure dispo dans les flashsettings
-#define ELCORR_DEFAULT_STARVATION_DL      1300        // @ centered pix (640, 512)
-#define ELCORR_DEFAULT_SATURATION_DL      15500       // @ centered pix (640, 512)
-#define ELCORR_DEFAULT_REFERENCE1_DL      7800        // @ centered pix (640, 512)
-#define ELCORR_DEFAULT_REFERENCE2_DL      475         // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_STARVATION_DL      440        // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_SATURATION_DL      15700      // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_REFERENCE1_DL      642        // @ centered pix (640, 512)
+#define ELCORR_DEFAULT_REFERENCE2_DL      2897       // @ centered pix (640, 512)
 
 // Electrical correction : limites des valeurs en provenance de la flash
 #define ELCORR_STARVATION_MIN_DL          100
@@ -207,7 +211,7 @@ void FPA_SpecificParams(suphawk_param_t *ptrH, float exposureTime_usec, const gc
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {   
-   sw_init_done = 0;
+   // sw_init_done = 0;                                                     // ENO: 11-sept 2019: ligne en commentaire pour que plusieurs appels de FPA_init ne créent des bugs de flashsettings.
    FPA_Reset(ptrA);
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides Mglk Detector
@@ -262,13 +266,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalTapsRef;
    // extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
-   extern int32_t gFpaDebugRegB;                         // reservé
+   extern int32_t gFpaDebugRegB;                         // reservé mode sortie constante (on sort le niveau de PRV)
    extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   extern int32_t gFpaDebugRegG;                         // non utilisé
-   extern int32_t gFpaDebugRegH;                         // non utilisé
+   //extern int32_t gFpaDebugRegG;                         // non utilisé
+   //extern int32_t gFpaDebugRegH;                         // non utilisé
    uint32_t elcorr_reg;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
@@ -336,30 +340,23 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
    ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
-//   if ((uint8_t)FPA_FORCE_CENTER == 1){
-//      ptrA->xstart = ((uint32_t)FPA_WIDTH_MAX - (uint32_t)pGCRegs->Width)/2;
-//      ptrA->ystart = ((uint32_t)FPA_HEIGHT_MAX - (uint32_t)pGCRegs->Height)/2;
-//   }
-   
    ptrA->xsize     = (uint32_t)pGCRegs->Width;
    ptrA->ysize     = (uint32_t)pGCRegs->Height;
     
    //  gain 
-   ptrA->gain = FPA_GAIN_0;   	//Low gain        -- TODO SUPHAWK : à valider !!
+   ptrA->gain = FPA_GAIN_0;   //Low gain
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
-      ptrA->gain = FPA_GAIN_1;	//High gain
+      ptrA->gain = FPA_GAIN_1;   //High gain
       
    // direction de readout
-   ptrA->invert = gFpaDebugRegH & 0x0001;
-   ptrA->revert = (gFpaDebugRegH >> 1) & 0x0001; 
+   ptrA->invert = 0;
+   ptrA->revert = 0; 
    
-   // formule implantée pour le mode normal (revert = 0, Invert = 0)  -- TODO SUPHAWK : à valider !!
+   // formule implantée pour le mode normal (revert = 0, Invert = 0) 
    ptrA->colstart =  ptrA->xstart / (uint32_t)FPA_NUMTAPS;
    ptrA->colstop  =  ptrA->colstart  + (uint32_t)pGCRegs->Width / (uint32_t)FPA_NUMTAPS - 1;
    ptrA->rowstart =  ptrA->ystart;
    ptrA->rowstop  =  ptrA->rowstart  + (uint32_t)pGCRegs->Height - 1;
-   
-   // gFpaDebugRegH  =  (int32_t)(ptrA->xstart / (uint32_t)FPA_NUMTAPS);
    
    // CBIT 
    ptrA->cbit_en = 1;                    
@@ -382,7 +379,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // quad2    
    ptrA->adc_quad2_en = 1;                          
-   ptrA->chn_diversity_en = 1;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
+   ptrA->chn_diversity_en = 0;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
      
    //
    ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + (uint32_t)(hh.lovh_mclk * hh.pixnum_per_tap_per_mclk);
@@ -418,7 +415,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[2]                 = FLEG_VccVoltage_To_DacWord(4200.0F, 3);   // VDDPIX
    ProximCfg.vdac_value[3]                 = FLEG_VccVoltage_To_DacWord(1800.0F, 4);   // VDD
    ProximCfg.vdac_value[4]                 = 0;
-   ProximCfg.vdac_value[5]                 = FLEG_VccVoltage_To_DacWord(3900.0F, 6);   // PRV
+   ProximCfg.vdac_value[5]                 = FLEG_VccVoltage_To_DacWord((float)SUPHAWK_PRV_VOLTAGE_VALUE_mV, 6);   // PRV
    ProximCfg.vdac_value[7]                 = 0;                                                      
    
    ptrA->prv_dac_nominal_value = ProximCfg.vdac_value[5]; 
@@ -433,7 +430,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // TAPREF : VCC7 ou DAC7
    if (sw_init_done == 0)
-      ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(2980.0F, 7);
+      ProximCfg.vdac_value[6] = FLEG_VccVoltage_To_DacWord(1493.0F, 7); // FLEG_VccVoltage_To_DacWord(2980.0F, 7);
       
    if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
    {
@@ -452,7 +449,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc clk source phase
    if (sw_init_done == 0)         
-      gFpaDebugRegD = 680;
+      gFpaDebugRegD = 400;
    if (ptrA->adc_clk_source_phase != (uint32_t)gFpaDebugRegD)
       need_rst_fpa_module = 1;   
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
@@ -617,7 +614,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }   
   
    // valeurs par defaut (mode normal)                                                                                                                                               
-   elcorr_comp_duration_usec                  = hh.fpa_rst_dly_mclk * hh.mclk_period_usec;  // le calcul se fait sur laligne de reset                          
+   elcorr_comp_duration_usec                  = (hh.fpa_rst_dly_mclk - 60.0F) * hh.mclk_period_usec;  // le calcul se fait sur la ligne de reset                          
    
    ptrA->elcorr_enabled                       = elcorr_enabled;
    ptrA->elcorr_spare1                        = 0;              
@@ -626,20 +623,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // vhd reference 0:                                              
    ptrA->elcorr_ref_cfg_0_ref_enabled         = 1;               
    ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode  = 0;              
-   ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = 6; //2;        
+   ptrA->elcorr_ref_cfg_0_start_dly_sampclk   = (uint32_t)MIN(40, (uint32_t)ELCORR_REF_MAXIMUM_DLY); //2;  on s'éloigne du debut de la ligne de reset car peu instabilité en focntion de ExposureTime       
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_0_samp_num_per_ch - (ptrA->elcorr_ref_cfg_0_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
-   ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
+   ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, (uint32_t)ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_0_samp_mean_numerator = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_0_samp_num_per_ch);     
    ptrA->elcorr_ref_cfg_0_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF1_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //      
     
    // vhd reference 1: 
    ptrA->elcorr_ref_cfg_1_ref_enabled         = 1;              
    ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode  = 0;              
-   ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = 6; //2;        
+   ptrA->elcorr_ref_cfg_1_start_dly_sampclk   = (uint32_t)MIN(40, (uint32_t)ELCORR_REF_MAXIMUM_DLY); //2;        
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)(hh.pixnum_per_tap_per_mclk * elcorr_comp_duration_usec / hh.mclk_period_usec); // nombre brut d'échantillons par tap 
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     =  ptrA->elcorr_ref_cfg_1_samp_num_per_ch - (ptrA->elcorr_ref_cfg_1_start_dly_sampclk + 2.0F); // on eneleve le delai de ce chiffre et aussi 2.0 pour avoir de la marge
-   ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
+   ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, (uint32_t)ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_1_samp_mean_numerator = (uint32_t)(powf(2.0F, (float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_1_samp_num_per_ch);     
    ptrA->elcorr_ref_cfg_1_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF2_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //
    
@@ -684,7 +681,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 {
-   uint32_t raw_temp;
    float diode_voltage_mV;
    float temperature;
    //float TempCoeff[2];

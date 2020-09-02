@@ -22,7 +22,6 @@ use IEEE.numeric_std.all;
 use IEEE.MATH_REAL.all;
 use work.fpa_common_pkg.all; 
 use work.fleg_brd_define.all;
-use work.fastrd2_define.all;
 
 package FPA_define is    
    
@@ -45,41 +44,23 @@ package FPA_define is
    constant DEFINE_FPA_INT_FDBK_DLY               : natural   := 0;        -- pour superhawk, le fedback commence en même temps que la consigne (fpa_int) mais les deux signaux n'ont pas la même durée (DEFINE_FPA_INT_TIME_OFFSET_nS les differencie)
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 0;        -- int_time offset de 0 nsec 
    
-   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
-   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 2;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
+   constant DEFINE_FPA_PROG_INT_TIME              : natural   := 4;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
+   constant DEFINE_FPA_XTRA_TRIG_INT_TIME         : natural   := 4;        -- en coups d'horloge FPA, c'est le temps d'integration utilisé piour les images post configuration du detecteur 
    constant DEFINE_FPA_SYNC_FLAG_VALID_ON_FE      : boolean   := false;     -- utilisé dans le module afpa_real_mode_dval_gen pour savoir si le sync_flag valid sur RE ou FE. False = valid sur RE.
    constant DEFINE_FPA_INIT_CFG_NEEDED            : std_logic := '0';      -- pas besoin de config particulière au demarrage des suphawks
    constant DEFINE_GENERATE_HPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
-   constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '1';      -- diversité de canaux
+   constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- diversité de canaux
    constant DEFINE_GENERATE_QUAD2_CHAIN           : std_logic := '1';      -- à '1' permet de generer la chaine de traitement pour le quad 2 puisqu'il faut 8 canaux
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
-   constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- on fait de la correction électronique
-   constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait pas la correctioon du gain
+   constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '1';      -- on fait de la correction électronique
+   constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait aucune correction de gain, mais juste l'offset au besoin
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 300_000;  -- en usec, le delai de stabilisation (analog setup)
    
    
-   -- definition les differentes horloges MCLK
-   constant DEFINE_FPA_NOMINAL_MCLK_ID            : integer   := 0;        -- l'horloge nominale doit toujours occuper l'ID 0
-   constant DEFINE_FPA_SIDEBAND_MCLK_ID           : integer   := 1;        -- 
-   constant DEFINE_FPA_LINEPAUSE_MCLK_ID          : integer   := 2;        -- 
-   
-   constant DEFINE_FPA_MCLK_NUM                   : integer   := 3;
-   
-   constant DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ      : integer   := 10_000;   -- vitesse nominale            
-   constant DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ     : integer   :=  5_000;   -- DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ/2;  -- vitesse d'opération dans la zone de bande laterale
-   constant DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ    : integer   := 16_666;   -- vitesse d'opération dans la zone interligne pour compenser le SIDEBAND_MCLK_RATE_KHZ
-   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := 100_000;   -- choisi judicieusement en fonction du ppcm des horloges
-   
-   -- generation des infos d'horloge
-   -- position 0     -> clk ayant le clk rate nominal 
-   -- position 7 à 1 -> les autres horloges
-   -- mettre 0 comme valeur aux positions non utilisées 
-   constant DEFINE_FPA_CLK_INFO                   : fpa_clk_info_type := gen_fpa_clk_info_func(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_KHZ, DEFINE_FPA_SIDEBAND_MCLK_RATE_KHZ, DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ)); -- mettre 0 comme valeur aux positions non utilisées 
-   
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
-   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ;       -- pour le superHawk, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
-   constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 7;            -- pour le suphawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
+   constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le superHawk, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
+   constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 2;            -- pour le suphawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;        -- not used
    constant DEFINE_XSIZE_MAX                      : integer   := 1280;          -- dimension en X maximale
    constant DEFINE_YSIZE_MAX                      : integer   := 1024;          -- dimension en Y maximale  
@@ -98,8 +79,8 @@ package FPA_define is
    -- quelques caractéristiques de la carte ADC requise
    constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       -- 
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       --
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ;    -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
-   
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;    -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
+   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
    
    -- limites imposées aux tensions VDAC deduites de celles de FP_VCC1 à FP_VCC8 du Fleg 
    -- provient du script F:\Bibliotheque\Electronique\PCB\EFP-00266-001 (Generic Flex Board TEL-2000)\Documentation\calcul_LT3042.m
@@ -149,6 +130,15 @@ package FPA_define is
    --constant DEFINE_FPA_PROG_END_PAUSE_FACTOR      : integer := DEFINE_FPA_PROG_END_PAUSE_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR;
    constant DEFINE_ELCORR_REF_DAC_SETUP_FACTOR    : integer := integer(real(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ)*real(DEFINE_ELCORR_REF_DAC_SETUP_US/1000));
    
+   ---------------------------------------------------------------------------------								
+   -- Configuration
+   ---------------------------------------------------------------------------------  
+   -- misc                    
+   type misc_cfg_type is
+   record
+      tir                        : unsigned(7 downto 0);
+      xsize_div_tapnum           : unsigned(7 downto 0);
+   end record;
    
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
@@ -197,7 +187,7 @@ package FPA_define is
       -- diag window                     
       diag                                : window_cfg_type; 
       
-      -- misc param
+      -- window, gain                    
       xstart                              : unsigned(10 downto 0); 
       ystart                              : unsigned(10 downto 0);
       xsize                               : unsigned(10 downto 0);
@@ -207,11 +197,13 @@ package FPA_define is
       revert                              : std_logic;   
       cbit_en                             : std_logic;
       dig_code                            : unsigned(15 downto 0);      
+      
       colstart                            : unsigned(8 downto 0); 
       colstop                             : unsigned(8 downto 0);
       rowstart                            : unsigned(10 downto 0);
       rowstop                             : unsigned(10 downto 0);      
       active_subwindow                    : std_logic;     
+      
       prv_dac_nominal_value               : unsigned(13 downto 0);     -- valeur de PRV en mot DAC
       
       -- delai 
@@ -221,10 +213,23 @@ package FPA_define is
       adc_quad2_en                        : std_logic; -- à '1' si les données du quad2 doivent êre prises en compte par la chaine
       chn_diversity_en                    : std_logic; -- dit quoi faire avec les données du quad2. '1' si ces données sont des repliques du quad1 => chn diversity. '0' si ces données doient être considérées comme des des données de taps 5, 6, 7, 8 d'un détrecteur 8 taps.
       
+      -- pour les referentiels de trame et de lignes
+      readout_pclk_cnt_max                : unsigned(18 downto 0);    --  pour suphawk: readout_pclk_cnt_max = taille en pclk de l'image incluant les pauses, les lignes non valides etc.. = (XSIZE/TAP_NUM + LOVH)* (YSIZE + FOVH) + 1  (un dernier PCLK pur finir)
+      line_period_pclk                    : unsigned(7 downto 0);     --  pour suphawk: nombre de pclk =  (XSIZE/TAP_NUM + LOVH)
+      
+      -- ligne active = ligne excluant les portions/pixels non valides     
+      active_line_start_num               : unsigned(3 downto 0);     --  pour suphawk: le numero de la premiere ligne active. Il vaut 1
+      active_line_end_num                 : unsigned(10 downto 0);    --  pour suphawk: le numero de la derniere ligne active. Il vaut Ysize
+      
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch                 : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
       
-      
+      -- delimiteurs de trames et de lignes
+      sof_posf_pclk                       : unsigned(8 downto 0);     --  pour suphawk: 
+      eof_posf_pclk                       : unsigned(18 downto 0);    --  pour suphawk:
+      sol_posl_pclk                       : unsigned(7 downto 0);     --  pour suphawk:
+      eol_posl_pclk                       : unsigned(7 downto 0);     --  pour suphawk:
+      eol_posl_pclk_p1                    : unsigned(7 downto 0);     --  pour suphawk: eol_posl_pclk + 1
       
       -- calculs pour diversité des canaux
       hgood_samp_sum_num                  : unsigned(3 downto 0);    --  nombre d'échantillons horizontaux par pixel et par canal 
@@ -288,16 +293,6 @@ package FPA_define is
       
       -- additional exposure time offset from driver C
       additional_fpa_int_time_offset      : signed(31 downto 0);
-      spare3                              : std_logic_vector(1 downto 0);
-      
-      raw_area                            : area_cfg_type; -- zone brute 
-      user_area                           : area_cfg_type; -- zone AOI demandée par l'usager
-      clk_area_b                          : area_cfg_type; -- zone d'horloge d'ID = 1. clk_area_a est reservé implicitement pour ID 0 
-      clk_area_c                          : area_cfg_type; -- zone d'horloge d'ID = 2. retenir que ID 0 est par defaut
-      
-      roic_rst_time_mclk                  : unsigned(9 downto 0);  -- duree du reset du puits du superhawk en mclk
-      sideband_cancel_en                  : std_logic;
-      sideband_cancel_pos                 : unsigned(3 downto 0);
       
    end record; 
    
