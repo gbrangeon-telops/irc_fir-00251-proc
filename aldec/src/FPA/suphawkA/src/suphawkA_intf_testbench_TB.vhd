@@ -52,13 +52,10 @@ architecture TB_ARCHITECTURE of suphawkA_intf_testbench_tb is
    constant CLK_80M_PERIOD          : time := 12.5 ns;
    constant ACQ_TRIG_PERIOD         : time := 700 us;
    constant DOUT_CLK_PERIOD         : time := 10 ns;
-   constant PAUSE_SIZE              : integer := 3;
-   constant TAP_NUM                 : integer := 8;
    
-   constant DAC_CFG_BASE_ADD       : natural := to_integer(unsigned(x"D00"));
-   
-   constant user_xsize : natural := 640;
-   constant user_ysize : natural := 512;
+   constant DAC_CFG_BASE_ADD        : natural := to_integer(unsigned(x"D00"));
+   constant DAC_CFG_VECTOR_SIZE     : natural := 8;
+
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
    signal ACQ_TRIG : STD_LOGIC := '0';
@@ -100,62 +97,7 @@ architecture TB_ARCHITECTURE of suphawkA_intf_testbench_tb is
    signal status                         : std_logic_vector(31 downto 0);
    signal ACQ_TRIG_i                     : std_logic := '0';
    signal ACQ_TRIG_Last                  : std_logic := '0';
-   
-   --signal comn_fpa_diag_mode             : unsigned(31 downto 0);
-   --   signal comn_fpa_diag_type             : unsigned(31 downto 0);
-   --   signal comn_fpa_pwr_on                : unsigned(31 downto 0);
-   --   signal comn_fpa_trig_ctrl_mode        : unsigned(31 downto 0);
-   --   signal comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto 0);
-   --   signal comn_fpa_acq_trig_period_min   : unsigned(31 downto 0);
-   --   signal comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto 0);
-   --   signal comn_fpa_xtra_trig_period_min  : unsigned(31 downto 0);                                     
-   --   signal xstart                         : unsigned(31 downto 0);
-   --   signal ystart                         : unsigned(31 downto 0);
-   --   signal xsize                          : unsigned(31 downto 0);
-   --   signal ysize                          : unsigned(31 downto 0);
-   --   signal gain                           : unsigned(31 downto 0);
-   --   signal invert                         : unsigned(31 downto 0);
-   --   signal revert                         : unsigned(31 downto 0);
-   --   signal cbit_en                        : unsigned(31 downto 0);
-   --   signal dig_code                       : unsigned(31 downto 0);
-   --   signal jpos                           : unsigned(31 downto 0);
-   --   signal kpos                           : unsigned(31 downto 0);
-   --   signal lpos                           : unsigned(31 downto 0);
-   --   signal mpos                           : unsigned(31 downto 0);
-   --   signal wdr_len                        : unsigned(31 downto 0);
-   --   signal full_window                    : unsigned(31 downto 0);
-   --   signal real_mode_active_pixel_dly     : unsigned(31 downto 0);
-   --   signal adc_quad2_en                   : unsigned(31 downto 0);
-   --   signal chn_diversity_en               : unsigned(31 downto 0);           
-   --   signal line_period_pclk               : unsigned(31 downto 0);
-   --   signal readout_pclk_cnt_max           : unsigned(31 downto 0);
-   --   signal active_line_start_num          : unsigned(31 downto 0);
-   --   signal active_line_end_num            : unsigned(31 downto 0);
-   --   signal pix_samp_num_per_ch            : unsigned(31 downto 0);
-   --   signal sof_posf_pclk                  : unsigned(31 downto 0);
-   --   signal eof_posf_pclk                  : unsigned(31 downto 0);
-   --   signal sol_posl_pclk                  : unsigned(31 downto 0);
-   --   signal eol_posl_pclk                  : unsigned(31 downto 0);
-   --   signal eol_posl_pclk_p1               : unsigned(31 downto 0);      
-   --   signal good_samp_first_pos_per_ch     : unsigned(31 downto 0);
-   --   signal good_samp_last_pos_per_ch      : unsigned(31 downto 0);
-   --   signal hgood_samp_sum_num             : unsigned(31 downto 0);
-   --   signal hgood_samp_mean_numerator      : unsigned(31 downto 0);
-   --   signal vgood_samp_sum_num             : unsigned(31 downto 0);
-   --   signal vgood_samp_mean_numerator      : unsigned(31 downto 0);  
-   --   signal xsize_div_tapnum               : unsigned(31 downto 0);
-   --   signal vdac_value_1                   : unsigned(31 downto 0);
-   --   signal vdac_value_2                   : unsigned(31 downto 0); 
-   --   signal vdac_value_3                   : unsigned(31 downto 0); 
-   --   signal vdac_value_4                   : unsigned(31 downto 0); 
-   --   signal vdac_value_5                   : unsigned(31 downto 0); 
-   --   signal vdac_value_6                   : unsigned(31 downto 0); 
-   --   signal vdac_value_7                   : unsigned(31 downto 0); 
-   --   signal vdac_value_8                   : unsigned(31 downto 0); 
-   --   signal adc_clk_phase                  : unsigned(31 downto 0);
-   --   signal comn_fpa_stretch_acq_trig      : unsigned(31 downto 0);
-   --   
-   --   signal user_cfg_vector                : unsigned(53*32-1 downto 0);
+
    
    -- Add your code here ...
    signal user_xsize1 : natural;
@@ -168,10 +110,10 @@ architecture TB_ARCHITECTURE of suphawkA_intf_testbench_tb is
    signal user_ysize4 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(101*32-1 downto 0);
-   signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
-   signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
-   signal user_cfg_vector4              : unsigned(user_cfg_vector1'length-1 downto 0);
+   signal user_cfg_vector1              : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
+   signal user_cfg_vector2              : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
+   signal user_cfg_vector3              : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
+   signal user_cfg_vector4              : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
    signal vdac_value_2                  : unsigned(31 downto  0);
    signal vdac_value_3                  : unsigned(31 downto  0);
@@ -181,11 +123,7 @@ architecture TB_ARCHITECTURE of suphawkA_intf_testbench_tb is
    signal vdac_value_7                  : unsigned(31 downto  0);
    signal vdac_value_8                  : unsigned(31 downto  0);
    
-   signal dac_cfg_vector                : unsigned(8*32-1 downto 0);
-   
-   --   signal add                           : unsigned(31 downto 0) := (others => '0');
-   --   signal status                        : std_logic_vector(31 downto 0);
-   -- Add your code here _..
+   signal dac_cfg_vector                : unsigned(DAC_CFG_VECTOR_SIZE*32-1 downto 0);
    
 begin
    
@@ -325,7 +263,7 @@ begin
       wait for 500 ns;
       
       
-      for ii in 0 to 8-1 loop 
+      for ii in 0 to DAC_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := dac_cfg_vector'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -334,7 +272,7 @@ begin
       end loop;
       
       
-      for ii in 0 to 101-1 loop 
+      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -351,7 +289,7 @@ begin
       
       wait for 100 ms;
       
-      for ii in 0 to 101-1 loop 
+      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -361,7 +299,7 @@ begin
       --      
 --      wait for 100 ms;
 --      
---      for ii in 0 to 96-1 loop 
+--      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
 --         wait until rising_edge(MB_CLK);      
 --         start_pos := user_cfg_vector3'length -1 - 32*ii;
 --         end_pos   := start_pos - 31;
@@ -371,7 +309,7 @@ begin
 --      
 --      wait for 100 ms;
       
---      for ii in 0 to 94-1 loop 
+--      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
 --         wait until rising_edge(MB_CLK);      
 --         start_pos := user_cfg_vector4'length -1 - 32*ii;
 --         end_pos   := start_pos - 31;
