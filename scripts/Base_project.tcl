@@ -61,6 +61,7 @@ add_files [concat \
    [glob -nocomplain $common251_dir/signal_stat/*.vhd] \
    [glob -nocomplain $common251_dir/USART/*.vhd] \
    [glob -nocomplain $common251_dir/Utilities/*.vhd] \
+   [glob -nocomplain $common251_dir/Lut/*.vhd] \
 ]
 
 #ADD STAND ALONE COMMON HDL SOURCE
