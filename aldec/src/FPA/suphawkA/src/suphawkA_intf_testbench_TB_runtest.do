@@ -58,7 +58,6 @@ acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\suphawkA\src\suphawkA_intf_testbenc
 
 asim -ses suphawkA_intf_testbench_TB 
 
--- wave UUT/U1/U2/* 
 
 -- spi_mux_ctrl
 --wave UUT/U1/U21/U1/* 
@@ -89,18 +88,9 @@ asim -ses suphawkA_intf_testbench_TB
 #-- clks
 #wave UUT/U1/U26/*  
 
-#readout ctrler
-wave UUT/U1/U5/U5/*
 
 -- intf_sequencer
---wave UUT/U1/U2/*  
-
--- fpa_prog_controller
---wave UUT/U1/U5/U2/* 
-
-
--- module FPA
---wave UUT/U1/* 
+--wave UUT/U1/U2/* 
 
 --wave UUT/U14/U1/* 
 --wave UUT/U14/U11/*
@@ -110,41 +100,25 @@ wave UUT/U1/U5/U5/*
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U21/U6/*
 
-#wave UUT/U1/U9/*
+wave UUT/U1/U9/*
 --wave UUT/U1/U9/U22/*  OK
 --wave UUT/U1/U9/U23/*  OK
-
 --wave UUT/U1/U9/U7/*
 --wave UUT/U1/U9/U2/U1/U1/* 
 --wave UUT/U1/U9/U18/*
+
 --wave UUT/U1/U19/*
---wave UUT/U1/* 
+
 --wave UUT/U15/*
---wave UUT/U1/U5/U21/*
---wave UUT/U1/U5/U5/*
-#wave UUT/U1/U21/*
 
-#wave UUT/U1/U21/U1/*
-#wave UUT/U1/U21/U2/*
-#wave UUT/U1/U21/U3/*
-#wave UUT/U1/U21/U4/*
-#wave UUT/U1/U21/U5/*
-#wave UUT/U1/U21/U6/*
-#wave UUT/U1/U21/U8/*
-
-#wave UUT/U1/U26/*
-
+#hw driver
 #wave UUT/U1/U5/*
 #wave UUT/U1/U5/U1/*
 #wave UUT/U1/U5/U2/*
 #wave UUT/U1/U5/U3/*
 #wave UUT/U1/U5/U4/*
-#wave UUT/U1/U5/U5/U6/*
+#wave UUT/U1/U5/U5/*
 
-
-#wave UUT/U1/U9/* 
-#wave UUT/U1/U19/*
-#wave UUT/U1/U17/*
 wave UUT/U1/*
 
 run 200 ms
