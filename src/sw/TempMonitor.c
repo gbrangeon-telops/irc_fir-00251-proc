@@ -85,7 +85,7 @@ void TempMonitor_SM()
                HDER_UpdateTemperaturesHeader(&gHderInserter, DTS_Sensor);
 
                // Validate sensor temperature
-               if (((DeviceTemperatureAry[DTS_Sensor] < -210.0F) || (DeviceTemperatureAry[DTS_Sensor] > 50.0F)) && !TDCStatusTst(WaitingForCoolerMask))
+               if (((DeviceTemperatureAry[DTS_Sensor] < -220.0F) || (DeviceTemperatureAry[DTS_Sensor] > 50.0F)) && !TDCStatusTst(WaitingForCoolerMask))
                {
                   TM_ERR("Cooler temperature is not valid (%dcC).", C_TO_CC(DeviceTemperatureAry[DTS_Sensor]));
                   GC_GenerateEventError(EECD_InvalidCoolerTemperature);
