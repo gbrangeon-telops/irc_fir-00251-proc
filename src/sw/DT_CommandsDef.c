@@ -1517,8 +1517,8 @@ IRC_Status_t DebugTerminalParseGPS(circByteBuffer_t *cbuf)
          }
          DT_PRINTF("UTC Time:  %02d:%02d:%02d  %02d/%02d/%4d", Gps_struct.rTClock.tm_hour, Gps_struct.rTClock.tm_min, Gps_struct.rTClock.tm_sec,
                Gps_struct.rTClock.tm_mon + 1, Gps_struct.rTClock.tm_mday, Gps_struct.rTClock.tm_year + 1900);
-         DT_PRINTF("Latitude:  %d?%d.%04d' %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
-         DT_PRINTF("Longitude: %d?%d.%04d' %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
+         DT_PRINTF("Latitude:  %dd%d.%04d' %C", Gps_struct.Latitude.degrees, Gps_struct.Latitude.minutes, Gps_struct.Latitude.frac_minutes, Gps_struct.Latitude.Hemisphere);
+         DT_PRINTF("Longitude: %dd%d.%04d' %C", Gps_struct.Longitude.degrees, Gps_struct.Longitude.minutes, Gps_struct.Longitude.frac_minutes, Gps_struct.Longitude.Hemisphere);
          DT_PRINTF("Altitude:  %d,%d m", Gps_struct.Altitude, Gps_struct.Altitude_frac);
          break;
 
