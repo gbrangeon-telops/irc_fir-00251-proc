@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 57296
+ FREEID 57353
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -26,10 +26,10 @@ HEADER
   #DEFAULT_RANGE22="<range<name=\"code_mem_dqs_n\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE23="<range<name=\"code_mem_dqs_p\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE24="<range<name=\"code_mem_odt\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE25="<range<name=\"data_downlink_n\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE26="<range<name=\"data_downlink_p\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE27="<range<name=\"data_uplink_n\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE28="<range<name=\"data_uplink_p\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE25="<range<name=\"data_downlink_n\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE26="<range<name=\"data_downlink_p\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE27="<range<name=\"data_uplink_n\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE28="<range<name=\"data_uplink_p\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE29="<range<name=\"exp_proc_n\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE3="<range<name=\"cal_ddr_ck_p\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE30="<range<name=\"exp_proc_p\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
@@ -38,10 +38,10 @@ HEADER
   #DEFAULT_RANGE33="<range<name=\"r_acbus\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE34="<range<name=\"r_adbus\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE35="<range<name=\"rev_gpio\"><left=\"3\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE36="<range<name=\"video_downlink_n\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE37="<range<name=\"video_downlink_p\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE38="<range<name=\"video_uplink_n\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE39="<range<name=\"video_uplink_p\"><left=\"0\"><direction=\"to\"><right=\"1\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE36="<range<name=\"video_downlink_n\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE37="<range<name=\"video_downlink_p\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE38="<range<name=\"video_uplink_n\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE39="<range<name=\"video_uplink_p\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE4="<range<name=\"cal_ddr_cke\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE40="<range<name=\"xadc_mux\"><left=\"4\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE5="<range<name=\"cal_ddr_cs_n\"><left=\"0\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
@@ -650,7 +650,7 @@ HEADER
 "library IEEE,WORK;\n"+
 "use ieee.std_logic_1164.all,work.TEL2000.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1587393812"
+    #MODIFIED="1600097267"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="9fc522b8-ab95-4525-b038-682b367e4719"
    }
   }
@@ -3709,10 +3709,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="IN"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="DATA_DOWNLINK_N(0:1)"
+      #NAME="DATA_DOWNLINK_N(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -3743,10 +3743,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="IN"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="DATA_DOWNLINK_P(0:1)"
+      #NAME="DATA_DOWNLINK_P(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -3933,10 +3933,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="OUT"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="DATA_UPLINK_N(0:1)"
+      #NAME="DATA_UPLINK_N(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -3968,10 +3968,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="OUT"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="DATA_UPLINK_P(0:1)"
+      #NAME="DATA_UPLINK_P(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -3985,10 +3985,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="IN"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="VIDEO_DOWNLINK_N(0:1)"
+      #NAME="VIDEO_DOWNLINK_N(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -4020,10 +4020,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="IN"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="VIDEO_DOWNLINK_P(0:1)"
+      #NAME="VIDEO_DOWNLINK_P(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -4125,10 +4125,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="OUT"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="VIDEO_UPLINK_N(0:1)"
+      #NAME="VIDEO_UPLINK_N(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -4142,10 +4142,10 @@ HEADER
      VARIABLES
      {
       #DIRECTION="OUT"
-      #DOWNTO="0"
+      #DOWNTO="1"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="VIDEO_UPLINK_P(0:1)"
+      #NAME="VIDEO_UPLINK_P(0:0)"
       #NUMBER="0"
      }
      LINE  2, 0, 0
@@ -7807,7 +7807,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="9fc522b8-ab95-4525-b038-682b367e4719"
    }
    COORD (5060,1280)
-   VERTEXES ( (2,55957), (4,56256), (6,55959), (8,55960), (10,55963), (12,55964), (14,55967), (16,55968), (18,55971), (20,55972), (22,55975), (24,56259), (26,55977), (30,55979), (32,56262), (34,55981), (38,55983), (40,55984), (42,55987), (44,55988), (46,56295), (48,55990), (50,55993), (52,55994), (54,55997), (56,55998), (58,56001), (60,56002), (62,56005), (64,56006), (66,56009), (68,56010), (70,56013), (72,56014), (74,56017), (76,56018), (78,56021), (80,56022), (82,56025), (84,56026), (86,56029), (88,56030), (90,56033), (92,56034), (94,56037), (96,56038), (98,56041), (100,56042), (102,56045), (104,56046), (106,56049), (108,56050), (110,56053), (112,56054), (114,56057), (116,56058), (118,56061), (120,56062), (122,56065), (124,56066), (128,56070), (132,56074), (136,56078), (140,56082), (142,56085), (144,56086), (146,56089), (148,56090), (150,56093), (152,56094), (154,56097), (156,56098), (158,56101), (160,56102), (162,56105), (164,56106), (166,56109), (168,56110), (170,56113), (172,56114), (174,56116), (176,56118), (178,56121), (180,56122), (182,56125), (184,56126), (186,56129), (188,56130), (190,56133), (192,56134), (194,56137), (196,56138), (198,56141), (200,56142), (202,56145), (204,56146), (206,56149), (208,56150), (210,56153), (212,56154), (214,56157), (216,56158), (218,56161), (220,56162), (222,56165), (224,56166), (226,56658), (228,56168), (230,56171), (232,56172), (234,56175), (236,56176), (238,56267), (240,56178), (242,56272), (244,56180), (246,56268), (248,56182), (250,56852), (252,56661), (254,56854), (256,56264), (258,56270), (260,56274), (262,56188), (264,56190), (266,56192), (268,56194), (270,56196), (272,56198), (274,56200), (276,56202), (278,56204), (280,56206), (282,56208), (284,56210), (286,56212), (288,56214), (290,56216), (292,56218), (294,56220), (296,56222), (298,56224), (300,56226), (302,56228), (304,56230), (306,56232), (308,56234), (310,56236), (312,56238), (314,56240), (316,56242), (318,56244), (320,56246), (322,56248), (324,56250), (326,56252), (328,56254), (330,56276), (332,56278), (334,56856), (338,56833), (340,56862), (342,56864), (344,56868), (346,56870), (348,56872), (352,56922), (354,57134), (356,57030), (358,57031), (360,57033), (336,57276) )
+   VERTEXES ( (2,55957), (4,56256), (6,55959), (8,55960), (10,55963), (12,55964), (14,55967), (16,55968), (18,55971), (20,55972), (22,55975), (24,56259), (26,55977), (30,55979), (32,56262), (34,55981), (38,55983), (40,55984), (42,55987), (44,55988), (46,56295), (48,55990), (50,55993), (52,55994), (54,55997), (56,55998), (58,56001), (60,56002), (62,56005), (64,56006), (66,56009), (68,56010), (70,56013), (72,56014), (74,56017), (76,56018), (78,56021), (80,56022), (82,56025), (84,56026), (86,56029), (88,56030), (90,56033), (92,56034), (94,56037), (96,56038), (98,56041), (100,56042), (102,56045), (104,56046), (106,56049), (108,56050), (110,56053), (112,56054), (114,56057), (116,56058), (118,56061), (120,56062), (122,56065), (124,56066), (128,56070), (132,56074), (136,56078), (140,56082), (142,56085), (144,56086), (146,56089), (148,56090), (150,56093), (152,56094), (154,56097), (156,56098), (158,56101), (160,56102), (162,56105), (164,56106), (166,56109), (168,56110), (170,56113), (172,56114), (174,56116), (176,56118), (178,56121), (180,56122), (182,56125), (184,56126), (186,56129), (188,56130), (190,56133), (192,56134), (194,56137), (196,56138), (198,56141), (200,56142), (202,56145), (204,56146), (206,56149), (208,56150), (210,56153), (212,56154), (214,56157), (216,56158), (218,56161), (220,56162), (222,56165), (224,56166), (226,56658), (228,56168), (230,56171), (232,56172), (234,56175), (236,56176), (238,56267), (240,56178), (242,56272), (244,56180), (246,56268), (248,56182), (250,56852), (252,56661), (254,56854), (256,56264), (258,56270), (260,56274), (262,56188), (264,56190), (266,56192), (268,56194), (270,56196), (272,56198), (274,56200), (276,56202), (278,56204), (280,56206), (282,56208), (284,56210), (286,56212), (288,56214), (290,56216), (292,56218), (294,56220), (296,56222), (298,56224), (300,56226), (302,56228), (304,56230), (306,56232), (308,56234), (310,56236), (312,56238), (314,56240), (316,56242), (318,56244), (320,56246), (322,56248), (324,56250), (326,56252), (328,56254), (330,56276), (332,56278), (334,56856), (336,57276), (338,56833), (340,56862), (342,56864), (344,56868), (346,56870), (348,56872), (352,56922), (354,57134), (356,57030), (358,57031), (360,57033) )
    PINPROP 242,"#PIN_COMMENT",""
    PINPROP 242,"#PIN_STATE","0"
    PINPROP 260,"#PIN_COMMENT",""
@@ -8872,30 +8872,12 @@ PAGE ""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
   }
-  NET BUS  52244, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="DATA_DOWNLINK_N(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
   NET BUS  52246, 0, 0
   {
    VARIABLES
    {
     #DOWNTO="1"
     #NAME="Code_mem_ba(2:0)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
-  NET BUS  52248, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="DATA_DOWNLINK_P(0:1)"
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
   }
@@ -8962,42 +8944,6 @@ PAGE ""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
   }
-  NET BUS  52264, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="DATA_UPLINK_N(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
-  NET BUS  52266, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="DATA_UPLINK_P(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
-  NET BUS  52268, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="VIDEO_DOWNLINK_N(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
-  NET BUS  52270, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="VIDEO_DOWNLINK_P(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
   NET BUS  52272, 0, 0
   {
    VARIABLES
@@ -9013,24 +8959,6 @@ PAGE ""
    {
     #DOWNTO="0"
     #NAME="PROC_EXP_P(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
-  NET BUS  52276, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="VIDEO_UPLINK_N(0:1)"
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
-  NET BUS  52278, 0, 0
-  {
-   VARIABLES
-   {
-    #DOWNTO="0"
-    #NAME="VIDEO_UPLINK_P(0:1)"
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
   }
@@ -11420,12 +11348,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusInput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="DATA_DOWNLINK_N(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="DATA_DOWNLINK_N(0:0)"
     #SYMBOL="BusInput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (4980,3500)
@@ -11468,12 +11395,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusInput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="DATA_DOWNLINK_P(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="DATA_DOWNLINK_P(0:0)"
     #SYMBOL="BusInput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (4980,3540)
@@ -11660,12 +11586,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusOutput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="DATA_UPLINK_N(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="DATA_UPLINK_N(0:0)"
     #SYMBOL="BusOutput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (5700,3740)
@@ -11684,12 +11609,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusOutput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="DATA_UPLINK_P(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="DATA_UPLINK_P(0:0)"
     #SYMBOL="BusOutput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (5700,3780)
@@ -11708,12 +11632,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusInput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="VIDEO_DOWNLINK_N(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="VIDEO_DOWNLINK_N(0:0)"
     #SYMBOL="BusInput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (4980,4180)
@@ -11732,12 +11655,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusInput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="VIDEO_DOWNLINK_P(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="VIDEO_DOWNLINK_P(0:0)"
     #SYMBOL="BusInput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (4980,4220)
@@ -11804,12 +11726,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusOutput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="VIDEO_UPLINK_N(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="VIDEO_UPLINK_N(0:0)"
     #SYMBOL="BusOutput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (5700,4060)
@@ -11828,12 +11749,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusOutput"
-    #CUSTOM_NAME=""
     #DOWNTO="0"
     #LIBRARY="#terminals"
-    #REFERENCE="VIDEO_UPLINK_P(0:1)"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="VIDEO_UPLINK_P(0:0)"
     #SYMBOL="BusOutput"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (5700,4100)
@@ -14984,12 +14904,8 @@ PAGE ""
   }
   BUS  56406, 0, 0
   {
-   NET 52244
+   NET 57296
    VTX 56160, 56161
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56407, 0, 0
   {
@@ -15002,12 +14918,8 @@ PAGE ""
   }
   BUS  56408, 0, 0
   {
-   NET 52248
+   NET 57301
    VTX 56164, 56165
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56409, 0, 0
   {
@@ -15074,21 +14986,13 @@ PAGE ""
   }
   BUS  56416, 0, 0
   {
-   NET 52264
+   NET 57306
    VTX 56180, 56181
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56417, 0, 0
   {
-   NET 52266
+   NET 57311
    VTX 56182, 56183
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56420, 0, 0
   {
@@ -15110,21 +15014,13 @@ PAGE ""
   }
   BUS  56422, 0, 0
   {
-   NET 52276
+   NET 57316
    VTX 56192, 56193
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56423, 0, 0
   {
-   NET 52278
+   NET 57321
    VTX 56194, 56195
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56424, 0, 0
   {
@@ -15959,21 +15855,13 @@ PAGE ""
   }
   BUS  56858, 0, 0
   {
-   NET 52268
+   NET 57326
    VTX 56852, 56853
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   BUS  56859, 0, 0
   {
-   NET 52270
+   NET 57331
    VTX 56854, 56855
-   VARIABLES
-   {
-    #NAMED="1"
-   }
   }
   WIRE  56860, 0, 0
   {
@@ -16227,6 +16115,14 @@ PAGE ""
    NET 57272
    VTX 57276, 57277
   }
+  NET BUS  57296, 0, 0
+  NET BUS  57301, 0, 0
+  NET BUS  57306, 0, 0
+  NET BUS  57311, 0, 0
+  NET BUS  57316, 0, 0
+  NET BUS  57321, 0, 0
+  NET BUS  57326, 0, 0
+  NET BUS  57331, 0, 0
  }
  
 }
@@ -16252,7 +16148,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  57279, 0, 0
+  TEXT  57336, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16263,7 +16159,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57280, 0, 0
+  TEXT  57337, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -16274,7 +16170,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  57281, 0, 0
+  TEXT  57338, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -16284,7 +16180,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57282, 0, 0
+  TEXT  57339, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16296,7 +16192,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  57283, 0, 0
+  TEXT  57340, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -16309,7 +16205,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  57284, 0, 0
+  TEXT  57341, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -16319,7 +16215,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57285, 0, 0
+  TEXT  57342, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16331,7 +16227,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  57286, 0, 0
+  TEXT  57343, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -16341,7 +16237,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57287, 0, 0
+  TEXT  57344, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -16352,7 +16248,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  57288, 0, 0
+  GROUP  57345, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6220,8601,6601)
@@ -16364,7 +16260,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57289, 0, 0
+  GROUP  57346, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6420,8601,6421)
@@ -16376,7 +16272,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57290, 0, 0
+  GROUP  57347, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6360,8601,6361)
@@ -16388,7 +16284,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57291, 0, 0
+  GROUP  57348, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6480,8601,6481)
@@ -16400,7 +16296,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57292, 0, 0
+  GROUP  57349, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6540,8601,6541)
@@ -16412,7 +16308,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57293, 0, 0
+  GROUP  57350, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6220,7901,6361)
@@ -16423,7 +16319,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  57294, 0, 0
+  GROUP  57351, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6360,7901,6601)
@@ -16434,7 +16330,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  57295, 0, 0
+  BMPPICT  57352, 0, 0
   {
    PAGEALIGN 10
    RECT (7740,6280,7879,6325)

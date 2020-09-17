@@ -55,7 +55,7 @@ add_files [concat \
    [glob -nocomplain $common251_dir/Fifo/*.vhd] \
    [glob -nocomplain $common251_dir/hdr_extractor/*.vhd] \
    [glob -nocomplain $common251_dir/Math/*.vhd] \
-   [glob -nocomplain $common251_dir/MGT/hdl/*.vhd] \
+   [glob -nocomplain $common251_dir/MGT/hdl/*.{vhd,v}] \
    [glob -nocomplain $common251_dir/PWM_CTRL/HDL/*.vhd] \
    [glob -nocomplain $common251_dir/Ram/*.vhd] \
    [glob -nocomplain $common251_dir/signal_stat/*.vhd] \
