@@ -10,7 +10,7 @@
 --  $LastChangedDate:
 -------------------------------------------------------------------------------
 --
--- Description : Modifier par JBO de AD747x ï¿½ AD7980
+-- Description : Modifier par JBO de AD747x à AD7980
 -- Support le mode 3 Wire CS avec Busy
 
 -------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ end ad798x_driver;
 architecture RTL of ad798x_driver is
 
    constant NB_BIT_CLK_CNT  : integer := log2(ADC_SCLK_FACTOR)-1;
-   constant NBIT_TO_ACQ     : integer := ADC_NBITS+1; -- nombre de bits total ï¿½ acquerir lors d'une acquisition incluant le busy signal(BUSY_INDICATOR)
+   constant NBIT_TO_ACQ     : integer := ADC_NBITS+1; -- nombre de bits total à acquerir lors d'une acquisition incluant le busy signal(BUSY_INDICATOR)
    constant NBIT_TO_ACQ_P_1 : integer := NBIT_TO_ACQ + 1;
    constant DEBUG_VALUE     : std_logic_vector(15 downto 0) := x"AAAA";
 
@@ -131,7 +131,7 @@ begin
                 else
                     sclk_i <= '0';
                 end if;
-            else                              -- etat de SCLK aprï¿½s abaissement de CS_N
+            else                              -- etat de SCLK après abaissement de CS_N
                 sclk_i <= master_clk_i;
             end if;
         end if;
@@ -157,7 +157,7 @@ end process;
    --------------------------------------------------
    -- master_clk generation
    --------------------------------------------------
-   --  horloge principale divisï¿½e par un facteur puissance de 2
+   --  horloge principale divisàe par un facteur puissance de 2
    U2 : process(CLK)
    begin
       if rising_edge(CLK) then
@@ -171,10 +171,10 @@ end process;
             master_clk_i_last <= master_clk_i;
 
             -- adc clk edge detection
-            if FIRST_CLK_EDGE_IS_FE then                    -- si premiere transition d'horloge lorsque cs_n abaissï¿½e doit etre Falling edge
-               master_clk_acq_edge <= not master_clk_i_last and master_clk_i;   -- alors les donnï¿½es sont ï¿½ acquerir sur le rising_edge
+            if FIRST_CLK_EDGE_IS_FE then                    -- si premiere transition d'horloge lorsque cs_n abaissé doit etre Falling edge
+               master_clk_acq_edge <= not master_clk_i_last and master_clk_i;   -- alors les données sont à acquerir sur le rising_edge
             else
-               master_clk_acq_edge <= master_clk_i_last and not master_clk_i;   -- alors les donnï¿½es sont ï¿½ acquerir sur le falling_edge
+               master_clk_acq_edge <= master_clk_i_last and not master_clk_i;   -- alors les données sont à acquerir sur le falling_edge
             end if;
 
          end if;
