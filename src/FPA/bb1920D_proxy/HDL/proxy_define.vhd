@@ -31,11 +31,11 @@ package Proxy_define is
    constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY_BB1920D;
    constant PROG_FREE_RUNNING_TRIG       : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
    constant FPA_INTF_CLK_RATE_MHZ        : integer := 100;     --  FPA_INTF_CLK_RATE en MHz
-   constant BB1920D_INT_TIME_MIN_US          : integer := 1; 
-   constant BB1920D_MASTER_CLK_RATE_MHZ      : integer := 80;      --
+   constant INT_TIME_MIN_US              : integer := 1; 
+   constant MASTER_CLK_RATE_MHZ          : integer := 70;      --
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
-   --constant PROXY_CLINK_CHANNEL_NUM      : integer := DEFINE_FPA_CLINK_CHANNEL_NUM;     -- Number of channels in the Camera Link interface with the proxy 
-   --constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;  -- CLINK IN est à 80MHz ns pour les BB1920D
+
+   
    --------------------------------------------
    --  modes diag
    --------------------------------------------
