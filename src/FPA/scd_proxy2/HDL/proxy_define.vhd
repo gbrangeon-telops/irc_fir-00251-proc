@@ -21,7 +21,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.math_real.all;
 use work.fpa_common_pkg.all;
---use work.fpa_define.all;  
+use work.fpa_define.all;  
 
 package Proxy_define is
    
@@ -137,8 +137,8 @@ package Proxy_define is
       out_chn             : std_logic;
       diode_bias          : std_logic_vector(3 downto 0);
       int_mode            : std_logic_vector(7 downto 0);
-      boost_mode          : std_logic;
-      pix_res             : std_logic_vector(1 downto 0);
+      spare1              : std_logic;
+      spare2              : std_logic_vector(1 downto 0);
       frame_period_min    : unsigned(23 downto 0); 
       cfg_num                 : unsigned(7 downto 0);      
    end record;
@@ -199,33 +199,11 @@ package Proxy_define is
       rdy                 : std_logic;                     -- pulse signifiant que les parametres du header sont prêts
    end record;
    
-   
-   ----------------------------------------------								
-   -- Type diag_data_ofs_type
-   ----------------------------------------------
-   --type diag_data_ofs_type is array (1 to 9) of natural range 0 to ((2**16)*9)/XSIZE_MAX; -- (1 to 9) pour accommoder 4 ou 8 taps
-   
-   
-   ----------------------------------------------
-   -- quues fontions                                    
-   ----------------------------------------------
-   --function to_diag_data_ofs return diag_data_ofs_type;
-   --function to_fpa_word_func(a:fpa_intf_cfg_type) return fpa_word_type;
 
 end Proxy_define;
 
 package body Proxy_define is
    
-   ---
-   -- function to_diag_data_ofs return diag_data_ofs_type is
-      -- variable y  : diag_data_ofs_type;
-      -- variable ii : integer range 1 to 9;
-      
-   -- begin
-      -- for ii in 1 to 9 loop    
-         -- y(ii) := (ii - 1)*DIAG_DATA_INC;
-      -- end loop;   
-      -- return y;                 
-   -- end to_diag_data_ofs; 
+
    
 end package body Proxy_define; 

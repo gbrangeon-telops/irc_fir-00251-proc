@@ -3,7 +3,7 @@
 #clearlibrary 	
 
 #packages
-acom -incr -nowarn DAGGEN_0523 d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\proxy_define.vhd
+acom -incr -nowarn DAGGEN_0523 d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\proxy_define.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
