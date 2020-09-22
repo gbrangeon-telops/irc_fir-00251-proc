@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : bb1920D_prog_ctrler
+--!   @file : scd_proxy2_prog_ctrler
 --!   @brief
 --!   @details
 --!
@@ -18,7 +18,7 @@ use work.fpa_define.all;
 use work.Proxy_define.all;
 use work.tel2000.all;
 
-entity bb1920D_prog_ctrler is
+entity scd_proxy2_prog_ctrler is
    port(
       ARESET               : in std_logic;
       CLK                  : in std_logic;
@@ -59,9 +59,9 @@ entity bb1920D_prog_ctrler is
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic
       );                 
-end bb1920D_prog_ctrler;
+end scd_proxy2_prog_ctrler;
 
-architecture rtl of bb1920D_prog_ctrler is
+architecture rtl of scd_proxy2_prog_ctrler is
    
    
    
@@ -140,7 +140,7 @@ begin
    FRAME_ID <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT
    ACQ_INT <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
    FPA_INT <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
-   PROXY_TRIG <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module bb1920D_driver_output 
+   PROXY_TRIG <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_proxy2_driver_output 
    FPA_INTF_CFG <= fpa_intf_cfg_i;  -- sortie de la config
    RST_CLINK_N <= reset_clink_n;
    INT_TIME <= int_time_i;
@@ -207,11 +207,11 @@ begin
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
-            new_cfg.bb1920D_op   <= USER_CFG.BB1920D_OP;   
-            new_cfg.bb1920D_int  <= USER_CFG.BB1920D_INT;  
-            new_cfg.bb1920D_diag <= USER_CFG.BB1920D_DIAG; 
-            new_cfg.bb1920D_temp <= USER_CFG.BB1920D_TEMP; 
-            new_cfg.bb1920D_misc <= USER_CFG.BB1920D_MISC; 
+            new_cfg.scd_proxy2_op   <= USER_CFG.BB1920D_OP;   
+            new_cfg.scd_proxy2_int  <= USER_CFG.BB1920D_INT;  
+            new_cfg.scd_proxy2_diag <= USER_CFG.BB1920D_DIAG; 
+            new_cfg.scd_proxy2_temp <= USER_CFG.BB1920D_TEMP; 
+            new_cfg.scd_proxy2_misc <= USER_CFG.BB1920D_MISC; 
             
             --fpa_new_cfg_pending <= not user_cfg_in_progress_i; 
             
@@ -220,28 +220,28 @@ begin
             case new_cfg_pending_fsm is			  
                
                when check_cfg_st1 =>
-                  if new_cfg.bb1920D_op /= present_cfg.bb1920D_op then
+                  if new_cfg.scd_proxy2_op /= present_cfg.scd_proxy2_op then
                      new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                
                when check_cfg_st2 =>
-                  if new_cfg.bb1920D_int /= present_cfg.bb1920D_int then
+                  if new_cfg.scd_proxy2_int /= present_cfg.scd_proxy2_int then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;  
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.bb1920D_diag /= present_cfg.bb1920D_diag then
+                  if new_cfg.scd_proxy2_diag /= present_cfg.scd_proxy2_diag then
                      new_cfg_pending_fsm <= new_diag_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;
                   end if;
                
                when check_cfg_st4 =>
-                  if new_cfg.bb1920D_temp /= present_cfg.bb1920D_temp then
+                  if new_cfg.scd_proxy2_temp /= present_cfg.scd_proxy2_temp then
                      new_cfg_pending_fsm <= new_temp_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st1;
@@ -440,9 +440,9 @@ begin
             cfg_updater_fsm <=  idle;
             cfg_updater_done <= '0';           
             proxy_static_done <= '0';
-            present_cfg.bb1920D_op.bb1920D_xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
-            present_cfg.bb1920D_temp.bb1920D_temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
-            present_cfg.bb1920D_diag.bb1920D_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset
+            present_cfg.scd_proxy2_op.scd_proxy2_xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
+            present_cfg.scd_proxy2_temp.scd_proxy2_temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
+            present_cfg.scd_proxy2_diag.scd_proxy2_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset
             
          else                       
             
@@ -479,7 +479,7 @@ begin
                      cfg_updater_fsm <= check_cfg_st3; 
                   else
                      --if ACQ_TRIG = '1' or XTRA_TRIG = '1' then  -- la config est normalement valide au prochain trig. 
-                     cfg_updater_fsm <= check_cfg_st1;    -- Si tel n'est pas le cas, pas grave car les parametres mportants du header (Xsize, Ysize, intime etc) proviennent du header de l'image bb1920D
+                     cfg_updater_fsm <= check_cfg_st1;    -- Si tel n'est pas le cas, pas grave car les parametres mportants du header (Xsize, Ysize, intime etc) proviennent du header de l'image scd_proxy2
                      --end if;
                   end if;
                
@@ -505,33 +505,33 @@ begin
                   end if;                 
                
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
-                  fpa_intf_cfg_i.bb1920D_op <= fpa_ser_cfg_to_update.bb1920D_op;
-                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.bb1920D_op.bb1920D_ysize;
-                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.bb1920D_op.bb1920D_xsize / PROXY_CLINK_CHANNEL_NUM;
-                  present_cfg.bb1920D_op <= fpa_ser_cfg_to_update.bb1920D_op;
-                  -- present_cfg.bb1920D_int.bb1920D_int_time <= to_unsigned(BB1920D_OP_INT_TIME_DEFAULT_FACTOR, present_cfg.bb1920D_int.bb1920D_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
+                  fpa_intf_cfg_i.scd_proxy2_op <= fpa_ser_cfg_to_update.scd_proxy2_op;
+                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_proxy2_op.scd_proxy2_ysize;
+                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_proxy2_op.scd_proxy2_xsize / PROXY_CLINK_CHANNEL_NUM;
+                  present_cfg.scd_proxy2_op <= fpa_ser_cfg_to_update.scd_proxy2_op;
+                  -- present_cfg.scd_proxy2_int.scd_proxy2_int_time <= to_unsigned(BB1920D_OP_INT_TIME_DEFAULT_FACTOR, present_cfg.scd_proxy2_int.scd_proxy2_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
                   proxy_static_done <= '1';
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
-                  fpa_intf_cfg_i.bb1920D_int <= fpa_ser_cfg_to_update.bb1920D_int;
-				  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.bb1920D_int.bb1920D_int_time, 32);
-                  present_cfg.bb1920D_int <= fpa_ser_cfg_to_update.bb1920D_int;  
+                  fpa_intf_cfg_i.scd_proxy2_int <= fpa_ser_cfg_to_update.scd_proxy2_int;
+				  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.scd_proxy2_int.scd_proxy2_int_time, 32);
+                  present_cfg.scd_proxy2_int <= fpa_ser_cfg_to_update.scd_proxy2_int;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_diag_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
-                  fpa_intf_cfg_i.bb1920D_diag <= fpa_ser_cfg_to_update.bb1920D_diag;
-                  present_cfg.bb1920D_diag <= fpa_ser_cfg_to_update.bb1920D_diag;  
+                  fpa_intf_cfg_i.scd_proxy2_diag <= fpa_ser_cfg_to_update.scd_proxy2_diag;
+                  present_cfg.scd_proxy2_diag <= fpa_ser_cfg_to_update.scd_proxy2_diag;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_temp_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
-                  fpa_intf_cfg_i.bb1920D_temp <= fpa_ser_cfg_to_update.bb1920D_temp;
-                  present_cfg.bb1920D_temp <= fpa_ser_cfg_to_update.bb1920D_temp; 
+                  fpa_intf_cfg_i.scd_proxy2_temp <= fpa_ser_cfg_to_update.scd_proxy2_temp;
+                  present_cfg.scd_proxy2_temp <= fpa_ser_cfg_to_update.scd_proxy2_temp; 
                   cfg_updater_fsm <= pause_st1;   
                
                when pause_st1 =>                                -- fait expres pour donner du temps à new_cfg_pending de tomber
                   fpa_intf_cfg_i.comn <= fpa_ser_cfg_to_update.comn;
-                  fpa_intf_cfg_i.bb1920D_misc <= fpa_ser_cfg_to_update.bb1920D_misc;
+                  fpa_intf_cfg_i.scd_proxy2_misc <= fpa_ser_cfg_to_update.scd_proxy2_misc;
                   cfg_updater_fsm <= idle;
                
                when others =>
@@ -575,8 +575,8 @@ begin
                   fpa_int_i <= '0';
                   if ACQ_TRIG = '1' then    -- ACQ_TRIG uniquement car ne jamais envoyer acq_int_i en mode XTRA_TRIG
                      frame_id_i <= frame_id_i + 1;
-                     int_indx_i <= fpa_intf_cfg_i.bb1920D_int.bb1920D_int_indx;
-                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.bb1920D_int.bb1920D_int_time);
+                     int_indx_i <= fpa_intf_cfg_i.scd_proxy2_int.scd_proxy2_int_indx;
+                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.scd_proxy2_int.scd_proxy2_int_time);
                      acq_frame <= '1';
                      if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
                         int_gen_fsm <= diag_int_dly_st;
@@ -585,8 +585,8 @@ begin
                      end if;
                   elsif XTRA_TRIG = '1' then    -- 
                      --frame_id_i <= frame_id_i + 1; -- on ne change pas d'ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
-                     int_indx_i <= fpa_intf_cfg_i.bb1920D_int.bb1920D_int_indx; 
-                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.bb1920D_int.bb1920D_int_time);
+                     int_indx_i <= fpa_intf_cfg_i.scd_proxy2_int.scd_proxy2_int_indx; 
+                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.scd_proxy2_int.scd_proxy2_int_time);
                      acq_frame <= '0';
                      if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
                         int_gen_fsm <= diag_int_dly_st;
@@ -607,7 +607,7 @@ begin
                   end if;
                
                when diag_int_dly_st => 
-                  if cnt >= fpa_intf_cfg_i.bb1920D_misc.bb1920D_fig1_or_fig2_t4_dly then    -- FPA_INTF_CFG.fpa_fig1_or_fig2_t4_dly est le delai T4 sur les figures 1 et 2 du document Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD
+                  if cnt >= fpa_intf_cfg_i.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t4_dly then    -- FPA_INTF_CFG.fpa_fig1_or_fig2_t4_dly est le delai T4 sur les figures 1 et 2 du document Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD
                      int_gen_fsm <= diag_exp_rst_cnt_st;
                   else                        
                      cnt <= cnt + 1;                
@@ -626,7 +626,7 @@ begin
                   end if;
                   
                   
-                  if cnt >= fpa_intf_cfg_i.bb1920D_int.diag_int_time then    -- 
+                  if cnt >= fpa_intf_cfg_i.scd_proxy2_int.diag_int_time then    -- 
                      int_gen_fsm <= idle;
                   else                        
                      cnt <= cnt + 1;                

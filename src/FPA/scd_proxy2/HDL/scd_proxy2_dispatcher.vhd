@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
 --
--- Title       : bb1920D_data_dispatcher
+-- Title       : scd_proxy2_data_dispatcher
 -- Design      : 
 -- Author      : 
 -- Company     : 
 --
 -------------------------------------------------------------------------------
 --
--- File        : d:\Telops\FIR-00180-IRC\src\FPA\BB1920D_Hercules\src\bb1920D_data_dispatcher.vhd
+-- File        : d:\Telops\FIR-00180-IRC\src\FPA\BB1920D_Hercules\src\scd_proxy2_data_dispatcher.vhd
 -- Generated   : Mon Jan 10 13:16:11 2011
 -- From        : interface description file
 -- By          : Itf2Vhdl ver. 1.22
@@ -29,7 +29,7 @@ use work.tel2000.all;
 use work.img_header_define.all;
 
 
-entity bb1920D_data_dispatcher is
+entity scd_proxy2_data_dispatcher is
    
    
    port(
@@ -84,9 +84,9 @@ entity bb1920D_data_dispatcher is
       TRIG_CTLER_STAT   : in std_logic_vector(7 downto 0)  
       --FPA_TEMP_STAT     : out fpa_temp_stat_type      
       );
-end bb1920D_data_dispatcher;
+end scd_proxy2_data_dispatcher;
 
-architecture rtl of bb1920D_data_dispatcher is
+architecture rtl of scd_proxy2_data_dispatcher is
    
    
    component sync_reset
@@ -604,9 +604,9 @@ begin
             true_fpa_int_last <= true_fpa_int_i;
             true_fpa_int_re   <= (not true_fpa_int_last and true_fpa_int_i);
             
-            itr_int_fifo_wr   <= true_fpa_int_re and acq_mode and not FPA_INTF_CFG.bb1920D_op.bb1920D_int_mode(0);                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
-            iwr_int_fifo_wr1  <= true_fpa_int_re and acq_mode and not acq_mode_first_int and FPA_INTF_CFG.bb1920D_op.bb1920D_int_mode(0);  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
-            iwr_int_fifo_wr2  <= true_fpa_int_re and nacq_mode_first_int and FPA_INTF_CFG.bb1920D_op.bb1920D_int_mode(0);              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
+            itr_int_fifo_wr   <= true_fpa_int_re and acq_mode and not FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_int_mode(0);                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
+            iwr_int_fifo_wr1  <= true_fpa_int_re and acq_mode and not acq_mode_first_int and FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_int_mode(0);  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
+            iwr_int_fifo_wr2  <= true_fpa_int_re and nacq_mode_first_int and FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_int_mode(0);              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
             
             int_fifo_wr <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;
             
@@ -748,7 +748,7 @@ begin
             int_fifo_dval_last <= int_fifo_dval;
             
             fpa_hder_assump_err <= '0';
-            fpa_pix_res_bit_shift := to_integer(unsigned(FPA_INTF_CFG.bb1920D_op.bb1920D_pix_res));
+            fpa_pix_res_bit_shift := to_integer(unsigned(FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_pix_res));
             fpa_pix_max <= x"7FFF" srl fpa_pix_res_bit_shift;
             
             -- dispatching des données et header en mode DIAG et REEL (ou FPA)
@@ -989,7 +989,7 @@ begin
             
             -- erreur sur mes hypothèses (erreurs à ne jamais avoir)
             --FPA_ASSUMP_ERR <= fpa_hder_assump_err or fpa_int_time_assump_err or fpa_gain_assump_err or fpa_mode_assump_err or acq_finge_assump_err; 
-            FPA_ASSUMP_ERR <= '0'; -- tant que le lien CLINK_IN ne sera pas fiable 100%, les données du header BB1920D sont pas fiables. Donc aucune erreur à generer.
+            FPA_ASSUMP_ERR <= '0'; -- tant que le lien CLINK_IN ne sera pas fiable 100%, les données du header SCD_PROXY2 sont pas fiables. Donc aucune erreur à generer.
             
             -- difference de config
             CFG_MISMATCH <= int_time_mismatch or  ysize_mismatch or ysize_mismatch or xsize_mismatch or gain_mismatch;

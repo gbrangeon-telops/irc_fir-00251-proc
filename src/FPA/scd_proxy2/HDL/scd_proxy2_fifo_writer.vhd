@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : bb1920D_DOUT_DVALiter
+--!   @file : scd_proxy2_DOUT_DVALiter
 --!   @brief
 --!   @details
 --!
@@ -19,7 +19,7 @@ use work.fpa_define.all;
 use work.Proxy_define.all;
 
 
-entity bb1920D_fifo_writer is
+entity scd_proxy2_fifo_writer is
    port (
       ARESET           : in std_logic;
       CLK              : in std_logic;
@@ -38,10 +38,10 @@ entity bb1920D_fifo_writer is
       FPA_FIFO_FLUSH   : out std_logic
       
       );  
-end bb1920D_fifo_writer;
+end scd_proxy2_fifo_writer;
 
 
-architecture rtl of bb1920D_fifo_writer is
+architecture rtl of scd_proxy2_fifo_writer is
    
    component sync_reset
       port(

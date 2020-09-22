@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : bb1920D_io_interface
+--!   @file : scd_proxy2_io_intf
 --!   @brief
 --!   @details
 --!
@@ -22,7 +22,7 @@ library IEEE;
 use IEEE.vital_timing.all;
 -- synopsys translate_on 
 
-entity bb1920D_io_interface is
+entity scd_proxy2_io_intf is
    port(
       
       CLK_100M      : in std_logic;
@@ -72,9 +72,9 @@ entity bb1920D_io_interface is
       FSYNC_P       : out std_logic    
       
       );
-end bb1920D_io_interface;
+end scd_proxy2_io_intf;
 
-architecture bb1920D_io_interface of bb1920D_io_interface is
+architecture scd_proxy2_io_intf of scd_proxy2_io_intf is
    
    component sync_reset
       port (
@@ -120,10 +120,10 @@ architecture bb1920D_io_interface of bb1920D_io_interface is
    end component;
    
    type proxy_trig_fsm_type is (idle, trig_on_st);
-   type bb1920D_io_intf_fsm_type is (idle, init_st, proxy_pwred_st);
+   type scd_proxy2_io_intf_fsm_type is (idle, init_st, proxy_pwred_st);
    
    signal proxy_trig_fsm     : proxy_trig_fsm_type;
-   signal bb1920D_io_intf_fsm    : bb1920D_io_intf_fsm_type;
+   signal scd_proxy2_io_intf_fsm    : scd_proxy2_io_intf_fsm_type;
    signal sreset             : std_logic;
    signal int_fbk_i          : std_logic;
    signal proxy_trig_i       : std_logic;
@@ -263,11 +263,11 @@ begin
             proxy_powered_o <= '0';
             output_disabled <= '1';
             proxy_int_feedbk_o <= '0';
-            bb1920D_io_intf_fsm <=  init_st;
+            scd_proxy2_io_intf_fsm <=  init_st;
          else
             
             
-            case bb1920D_io_intf_fsm is 
+            case scd_proxy2_io_intf_fsm is 
                
                -- init_st
                when init_st =>
@@ -275,7 +275,7 @@ begin
                   output_disabled <= '1';
                   proxy_int_feedbk_o <= '0';
                   timer_cnt <= (others => '0');
-                  bb1920D_io_intf_fsm <= idle;
+                  scd_proxy2_io_intf_fsm <= idle;
                   
                -- attente du signal d'allumage du proxy
                when idle =>
@@ -286,21 +286,21 @@ begin
                      timer_cnt <= (others => '0');
                   end if;                  
                   if timer_cnt = BB1920D_POWER_WAIT_FACTOR then   -- delai d'au moins 1 sec pour que le proxy soit prêt à recevoir les commandes
-                     bb1920D_io_intf_fsm <=  proxy_pwred_st;
+                     scd_proxy2_io_intf_fsm <=  proxy_pwred_st;
                   end if;                  
                   -- pragma translate_off
                   if PROXY_PWR = '1' then
-                     bb1920D_io_intf_fsm <=  proxy_pwred_st;
+                     scd_proxy2_io_intf_fsm <=  proxy_pwred_st;
                   end if;
                   -- pragma translate_on
                   
                -- proxy est pret à recevoir des contrôles 
                when proxy_pwred_st =>                    
                   output_disabled <= '0';
-                  proxy_powered_o <= '1';  -- pour le bb1920D, le signal de proxy powered est envoyé  BB1920D_POWER_WAIT usec après l'allumage du proxy
+                  proxy_powered_o <= '1';  -- pour le scd_proxy2, le signal de proxy powered est envoyé  BB1920D_POWER_WAIT usec après l'allumage du proxy
                   proxy_int_feedbk_o <= int_fbk_i;
                   if PROXY_PWR = '0' then
-                     bb1920D_io_intf_fsm <= init_st;
+                     scd_proxy2_io_intf_fsm <= init_st;
                   end if;   
                
                when others =>
@@ -311,4 +311,4 @@ begin
       end if;
    end process;  
    
-end bb1920D_io_interface;
+end scd_proxy2_io_intf;

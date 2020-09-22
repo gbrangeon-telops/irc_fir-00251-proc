@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
 --
--- Title       : bb1920D_diag_data_gen
+-- Title       : scd_proxy2_diag_gen
 -- Design      : 
 -- Author      : 
 -- Company     : 
 --
 -------------------------------------------------------------------------------
 --
--- File        : d:\Telops\FIR-00180-IRC\src\FPA\BB1920D_Hercules\src\bb1920D_diag_data_gen.vhd
+-- File        : d:\Telops\FIR-00180-IRC\src\FPA\BB1920D_Hercules\src\scd_proxy2_diag_gen.vhd
 -- Generated   : Mon Jan 10 13:16:11 2011
 -- From        : interface description file
 -- By          : Itf2Vhdl ver. 1.22
@@ -27,7 +27,7 @@ use work.Proxy_define.all;
 use work.fpa_common_pkg.all;
 
 
-entity bb1920D_diag_data_gen is
+entity scd_proxy2_diag_gen is
    
    port(
       
@@ -47,10 +47,10 @@ entity bb1920D_diag_data_gen is
       DIAG_FRAME   : out std_logic
       
       );
-end bb1920D_diag_data_gen;
+end scd_proxy2_diag_gen;
 
 
-architecture rtl of bb1920D_diag_data_gen is
+architecture rtl of scd_proxy2_diag_gen is
    
    constant spare : std_logic := 'Z';
    

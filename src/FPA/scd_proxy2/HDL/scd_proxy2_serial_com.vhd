@@ -1,5 +1,5 @@
 ------------------------------------------------------------------
---!   @file : bb1920D_serial_module
+--!   @file : scd_proxy2_serial_com
 --!   @brief
 --!   @details
 --!
@@ -19,7 +19,7 @@ use work.FPA_define.all;
 use work.Proxy_define.all;
 use work.fpa_common_pkg.all;
 
-entity bb1920D_serial_module is
+entity scd_proxy2_serial_com is
    port(
       ARESETN               : in std_logic;
       CLK                   : in std_logic;
@@ -66,9 +66,9 @@ entity bb1920D_serial_module is
       
       
       );
-end bb1920D_serial_module;
+end scd_proxy2_serial_com;
 
-architecture RTL of bb1920D_serial_module is  
+architecture RTL of scd_proxy2_serial_com is  
    
    constant RST_ERROR_EN : std_logic := '1';     -- mis à titre de debogage. Permet de contrôler le reset des erreurs critiques 
    
@@ -237,7 +237,7 @@ begin
    
    FPA_TEMP_STAT.TEMP_DATA <= std_logic_vector(resize(fpa_temp_reg, FPA_TEMP_STAT.TEMP_DATA'LENGTH));
    FPA_TEMP_STAT.TEMP_DVAL <= fpa_temp_reg_dval;
-   FPA_TEMP_STAT.FPA_PWR_ON_TEMP_REACHED <= '1'; -- fait expres pour le bb1920D car il n'allume le detecteur que lorsque la temperature est ok. 
+   FPA_TEMP_STAT.FPA_PWR_ON_TEMP_REACHED <= '1'; -- fait expres pour le scd_proxy2 car il n'allume le detecteur que lorsque la temperature est ok. 
    
    PROG_TRIG <= prog_trig_i;
    
@@ -477,9 +477,9 @@ begin
                      ram_wr_data_i <= cfg_fifo_dout;
                      cfg_byte_cnt <= cfg_byte_cnt + 1;                     
                      if cfg_byte_cnt    = 3 then               -- 3 car cfg_byte_cnt commence à 0
-                        cfg_payload(7 downto 0) <= cfg_fifo_dout;  -- payload de la config selon BB1920D
+                        cfg_payload(7 downto 0) <= cfg_fifo_dout;  -- payload de la config selon SCD_PROXY2
                      elsif cfg_byte_cnt = 4 then
-                        cfg_payload(15 downto 8) <= cfg_fifo_dout; -- payload de la config selon BB1920D
+                        cfg_payload(15 downto 8) <= cfg_fifo_dout; -- payload de la config selon SCD_PROXY2
                         cfg_byte_total <=  (unsigned(cfg_fifo_dout) & unsigned(cfg_payload(7 downto 0))) + BB1920D_CMD_OVERHEAD_BYTES_NUM; -- nombre de bytes total de la config                        
                      end if;
                   end if;

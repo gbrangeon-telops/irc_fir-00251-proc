@@ -21,14 +21,14 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.math_real.all;
 use work.fpa_common_pkg.all;
-use work.fpa_define.all;  
+--use work.fpa_define.all;  
 
 package Proxy_define is
    
    --------------------------------------------
    -- PROJET: definition
    --------------------------------------------   
-   constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY_BB1920D;
+   constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY2_SCD;
    constant PROG_FREE_RUNNING_TRIG       : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
    constant FPA_INTF_CLK_RATE_MHZ        : integer := 100;     --  FPA_INTF_CLK_RATE en MHz
    constant INT_TIME_MIN_US              : integer := 1; 
@@ -66,7 +66,7 @@ package Proxy_define is
    
    -- commandes
    constant CMD_OVERHEAD_BYTES_NUM   : integer := 6; -- nombre de bytes de l'overhead (header, CommandID, length, Checksum)
-   constant LONGEST_CMD_BYTES_NUM    : integer := 32; -- longueur maximale en byte de la config d'un bb1920D (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
+   constant LONGEST_CMD_BYTES_NUM    : integer := 32; -- longueur maximale en byte de la config d'un scd_proxy2 (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
    constant SERIAL_BAUD_RATE         : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
    constant COM_RESP_HDER            : std_logic_vector(7 downto 0)  := x"55";
    constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
@@ -118,7 +118,7 @@ package Proxy_define is
    ---------------------------------------------------------------------------------								
    -- Configuration regroupant les éléments vraiment propres au détecteur
    ---------------------------------------------------------------------------------
-   -- bb1920D integration
+   -- scd_proxy2 integration
    type int_cfg_type is
    record
       int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
@@ -126,7 +126,7 @@ package Proxy_define is
       int_indx            : std_logic_vector(7 downto 0);
    end record;
    
-   -- bb1920D operationnelle
+   -- scd_proxy2 operationnelle
    type op_cfg_type is
    record  
       xstart              : unsigned(10 downto 0); 
@@ -143,19 +143,19 @@ package Proxy_define is
       cfg_num                 : unsigned(7 downto 0);      
    end record;
    
-   -- bb1920D video synthetic
+   -- scd_proxy2 video synthetic
    type diag_cfg_type is
    record
       bit_pattern         : std_logic_vector(2 downto 0);   
    end record;
    
-   -- bb1920D temperature
+   -- scd_proxy2 temperature
    type temp_cfg_type is
    record
       temp_read_num       : unsigned(7 downto 0);
    end record; 
    
-   -- bb1920D misc                 --  quelques valeurs propres au PelicanD (-- se reporter aux figures 1 et 2 et 4 des pages 13, 15 et 19 du doument Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD)                                
+   -- scd_proxy2 misc                 --  quelques valeurs propres au PelicanD (-- se reporter aux figures 1 et 2 et 4 des pages 13, 15 et 19 du doument Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD)                                
    type misc_cfg_type is
    record
       fig1_or_fig2_t6_dly : unsigned(15 downto 0);
