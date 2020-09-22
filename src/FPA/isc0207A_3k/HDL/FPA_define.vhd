@@ -98,7 +98,7 @@ package FPA_define is
    (    0, 16383),     -- limites du DAC4 pour le isc0207A_3k     VOUTREF
    (    0, 16383),     -- limites du DAC5 pour le isc0207A_3k     VOS
    (    0, 16383),     -- limites du DAC6 pour le isc0207A_3k     VDETCOM
-   (	  0, 16210),     -- limites du DAC7 pour le isc0207A_3k     inref
+   (    0, 16210),     -- limites du DAC7 pour le isc0207A_3k     inref
    (11939, 13685));    -- limites du DAC8 pour le isc0207A_3k     VPD
    
    --------------------------------------------

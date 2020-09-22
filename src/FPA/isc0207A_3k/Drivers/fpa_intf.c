@@ -113,7 +113,7 @@
 
 #define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
 
-#define ISC0207_REF_VOLTAGE_MIN_mV        1700
+#define ISC0207_REF_VOLTAGE_MIN_mV         700
 #define ISC0207_REF_VOLTAGE_MAX_mV        4500
 
 #define ISC0207_VDETCOM_VOLTAGE_MIN_mV    1700

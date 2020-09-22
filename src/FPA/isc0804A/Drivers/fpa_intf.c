@@ -122,7 +122,7 @@
 
 #define GOOD_SAMP_MEAN_DIV_BIT_POS        21            // ne pas changer meme si le detecteur change.
 
-#define ISC0804_TAPREF_VOLTAGE_MIN_mV     1500
+#define ISC0804_TAPREF_VOLTAGE_MIN_mV     700
 #define ISC0804_TAPREF_VOLTAGE_MAX_mV     3300
 
 #define ISC0804_DET_BIAS_VOLTAGE_MIN_mV   -475          // 
