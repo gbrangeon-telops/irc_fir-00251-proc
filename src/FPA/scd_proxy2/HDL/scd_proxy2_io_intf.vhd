@@ -243,7 +243,7 @@ begin
                
                when trig_on_st => 
                   cnt <= cnt + 1;
-                  if cnt = BB1920D_FSYNC_HIGH_TIME_FACTOR then
+                  if cnt = FSYNC_HIGH_TIME_FACTOR then
                      proxy_trig_fsm <= idle; 
                   end if;
                
@@ -285,7 +285,7 @@ begin
                   else
                      timer_cnt <= (others => '0');
                   end if;                  
-                  if timer_cnt = BB1920D_POWER_WAIT_FACTOR then   -- delai d'au moins 1 sec pour que le proxy soit prêt à recevoir les commandes
+                  if timer_cnt = POWER_WAIT_FACTOR then   -- delai d'au moins 1 sec pour que le proxy soit prêt à recevoir les commandes
                      scd_proxy2_io_intf_fsm <=  proxy_pwred_st;
                   end if;                  
                   -- pragma translate_off
@@ -297,7 +297,7 @@ begin
                -- proxy est pret à recevoir des contrôles 
                when proxy_pwred_st =>                    
                   output_disabled <= '0';
-                  proxy_powered_o <= '1';  -- pour le scd_proxy2, le signal de proxy powered est envoyé  BB1920D_POWER_WAIT usec après l'allumage du proxy
+                  proxy_powered_o <= '1';  -- pour le scd_proxy2, le signal de proxy powered est envoyé  SCD_PROXY2_POWER_WAIT usec après l'allumage du proxy
                   proxy_int_feedbk_o <= int_fbk_i;
                   if PROXY_PWR = '0' then
                      scd_proxy2_io_intf_fsm <= init_st;

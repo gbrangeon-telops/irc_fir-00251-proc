@@ -52,8 +52,8 @@ architecture rtl of scd_proxy2_mblaze_intf is
    
    constant MB_SOURCE  : std_logic_vector(1 downto 0)   :=  "00";
    constant EXP_SOURCE : std_logic_vector(1 downto 0)   :=  "01";   
-   constant BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_23  : natural := BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 23; --pour un total de 24 bits pour le temps d'integration de scd_proxy2
-   constant BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;
+   constant EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_23  : natural := EXP_TIME_CONV_DENOMINATOR_BIT_POS + 23; --pour un total de 24 bits pour le temps d'integration de scd_proxy2
+   constant EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;
    component sync_reset
       port (
          ARESET : in std_logic;
@@ -114,9 +114,9 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal mb_struct_cfg_valid             : std_logic;
    signal reset_err_i                     : std_logic;
    signal fpa_int_time_last               : unsigned(exp_time_i'range);
-   signal scd_proxy2_exp_time_i                  : unsigned(user_cfg_i.scd_proxy2_int.scd_proxy2_int_time'range);
-   signal scd_proxy2_exp_time_temp1              : unsigned(exp_time_i'length + BB1920D_EXP_TIME_CONV_NUMERATOR'length - 1 downto 0);
-   signal scd_proxy2_exp_time_temp2              : unsigned(user_cfg_i.scd_proxy2_int.scd_proxy2_int_time'range);
+   signal scd_proxy2_exp_time_i                  : unsigned(user_cfg_i.int.int_time'range);
+   signal scd_proxy2_exp_time_temp1              : unsigned(exp_time_i'length + EXP_TIME_CONV_NUMERATOR'length - 1 downto 0);
+   signal scd_proxy2_exp_time_temp2              : unsigned(user_cfg_i.int.int_time'range);
    signal ctrled_reset_i                  : std_logic;
    --signal fpa_int_indx_last               : std_logic;
    --signal fpa_manuf_diag_mode_last        : std_logic;
@@ -231,12 +231,12 @@ begin
                   ser_cfg_dval_i <= mb_ser_cfg_dval;
                   if mb_cfg_serial_in_progress = '0' and mb_cfg_serial_in_progress_last = '1' then -- fin de la comm serielle  
                      user_cfg_i.comn     <= mb_struct_cfg.comn;   -- partie structurale envoyée en fin de com serielle
-                     user_cfg_i.scd_proxy2_misc <= mb_struct_cfg.scd_proxy2_misc;
-                     user_cfg_i.scd_proxy2_temp <= mb_struct_cfg.scd_proxy2_temp;
-                     if mb_struct_cfg.cmd_to_update_id = BB1920D_OP_CMD_ID then
-                        user_cfg_i.scd_proxy2_op   <= mb_struct_cfg.scd_proxy2_op;
-                     elsif mb_struct_cfg.cmd_to_update_id = BB1920D_DIAG_CMD_ID then
-                        user_cfg_i.scd_proxy2_diag <= mb_struct_cfg.scd_proxy2_diag;
+                     user_cfg_i.misc <= mb_struct_cfg.misc;
+                     user_cfg_i.temp <= mb_struct_cfg.temp;
+                     if mb_struct_cfg.cmd_to_update_id = OP_CMD_ID then
+                        user_cfg_i.op   <= mb_struct_cfg.op;
+                     elsif mb_struct_cfg.cmd_to_update_id = DIAG_CMD_ID then
+                        user_cfg_i.diag <= mb_struct_cfg.diag;
                      end if;
                      --user_cfg_i.comn.fpa_spare <= mb_struct_cfg.comn.fpa_spare;
                      cfg_arbit_fsm <= cfg_end_pause_st; 
@@ -254,9 +254,9 @@ begin
                   ser_cfg_data_i <= exp_ser_cfg_data; 
                   ser_cfg_dval_i <= exp_ser_cfg_dval;
                   if exp_struct_cfg_valid = '1' then
-                     user_cfg_i.scd_proxy2_int.scd_proxy2_int_time <= scd_proxy2_exp_time_i;
-                     user_cfg_i.scd_proxy2_int.diag_int_time <= exp_time_i;
-                     user_cfg_i.scd_proxy2_int.scd_proxy2_int_indx <= exp_indx_i;
+                     user_cfg_i.int.int_time <= scd_proxy2_exp_time_i;
+                     user_cfg_i.int.diag_int_time <= exp_time_i;
+                     user_cfg_i.int.int_indx <= exp_indx_i;
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
@@ -328,17 +328,17 @@ begin
                
                when serial_exp_cfg_st => -- sur autorisation de l'arbitreur, on envoie la partie serielle                  
                   exp_ser_cfg_dval <= '1'; 
-                  exp_ser_cfg_add <= std_logic_vector(resize((byte_cnt - 1 + BB1920D_INT_CMD_RAM_BASE_ADD), exp_ser_cfg_add'length)); -- pour que premiere adresse impérativement 0
+                  exp_ser_cfg_add <= std_logic_vector(resize((byte_cnt - 1 + INT_CMD_RAM_BASE_ADD), exp_ser_cfg_add'length)); -- pour que premiere adresse impérativement 0
                   byte_cnt <= byte_cnt + 1;
                   exp_checksum <= exp_checksum + unsigned(exp_ser_cfg_data); -- somme sur 8 bits donc implicitement modulo 256. certes decalé mais les zeros entre byte8 et byte12 permettent à la valeur d'etre prête avant l'envoi
-                  if    byte_cnt = 1  then exp_ser_cfg_data <= BB1920D_CMD_HDER;                       -- scd_proxy2 exp_time CMD Header
-                  elsif byte_cnt = 2  then exp_ser_cfg_data <= BB1920D_INT_CMD_ID(7 downto 0);         -- scd_proxy2 exp_time CMD ID                 
-                  elsif byte_cnt = 3  then exp_ser_cfg_data <= BB1920D_INT_CMD_ID(15 downto 8);        -- scd_proxy2 exp_time CMD ID                  
-                  elsif byte_cnt = 4  then exp_ser_cfg_data <= BB1920D_INT_CMD_DLEN(7 downto 0);       -- scd_proxy2 exp_time data length                  
-                  elsif byte_cnt = 5  then exp_ser_cfg_data <= BB1920D_INT_CMD_DLEN(15 downto 8);      -- scd_proxy2 exp_time data length 
-                  elsif byte_cnt = 6  then exp_ser_cfg_data <= std_logic_vector(scd_proxy2_exp_time_i(7 downto 0));             -- exp_time en coups de 80MHz       
-                  elsif byte_cnt = 7  then exp_ser_cfg_data <= std_logic_vector(scd_proxy2_exp_time_i(15 downto 8));            -- exp_time en coups de 80MHz  
-                  elsif byte_cnt = 8  then exp_ser_cfg_data <= std_logic_vector(scd_proxy2_exp_time_i(23 downto 16));           -- exp_time en coups de 80MHz  
+                  if    byte_cnt = 1  then exp_ser_cfg_data <= CMD_HDER;                       -- scd_proxy2 exp_time CMD Header
+                  elsif byte_cnt = 2  then exp_ser_cfg_data <= INT_CMD_ID(7 downto 0);         -- scd_proxy2 exp_time CMD ID                 
+                  elsif byte_cnt = 3  then exp_ser_cfg_data <= INT_CMD_ID(15 downto 8);        -- scd_proxy2 exp_time CMD ID                  
+                  elsif byte_cnt = 4  then exp_ser_cfg_data <= INT_CMD_DLEN(7 downto 0);       -- scd_proxy2 exp_time data length                  
+                  elsif byte_cnt = 5  then exp_ser_cfg_data <= INT_CMD_DLEN(15 downto 8);      -- scd_proxy2 exp_time data length 
+                  elsif byte_cnt = 6  then exp_ser_cfg_data <= std_logic_vector(exp_time_i(7 downto 0));             -- exp_time en coups de 80MHz       
+                  elsif byte_cnt = 7  then exp_ser_cfg_data <= std_logic_vector(exp_time_i(15 downto 8));            -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 8  then exp_ser_cfg_data <= std_logic_vector(exp_time_i(23 downto 16));           -- exp_time en coups de 80MHz  
                   elsif byte_cnt = 12 then                                                         -- checksum 
                      exp_ser_cfg_data <= std_logic_vector(unsigned(not std_logic_vector(exp_checksum)) + 1); -- le fait qu'il y ait des zeros entre byte8 et byte12 donne le temps au cheksum d'etre prêt avant le byte 12 
                      exp_cfg_gen_fsm <= struct_exp_cfg_st; 
@@ -377,9 +377,9 @@ begin
    U3B: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
-         scd_proxy2_exp_time_temp1 <= exp_time_i * BB1920D_EXP_TIME_CONV_NUMERATOR;
-         scd_proxy2_exp_time_temp2 <= scd_proxy2_exp_time_temp1((BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_23) downto BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS);  -- soit une division par BB1920D_EXP_TIME_CONV_DENOMINATOR
-         if scd_proxy2_exp_time_temp1(BB1920D_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1) = '1' then  -- pour l'operation d'arrondi
+         scd_proxy2_exp_time_temp1 <= exp_time_i * EXP_TIME_CONV_NUMERATOR;
+         scd_proxy2_exp_time_temp2 <= scd_proxy2_exp_time_temp1((EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_23) downto EXP_TIME_CONV_DENOMINATOR_BIT_POS);  -- soit une division par BB1920D_EXP_TIME_CONV_DENOMINATOR
+         if scd_proxy2_exp_time_temp1(EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1) = '1' then  -- pour l'operation d'arrondi
             scd_proxy2_exp_time_i <= scd_proxy2_exp_time_temp2 + 1;
          else
             scd_proxy2_exp_time_i <= scd_proxy2_exp_time_temp2;
@@ -523,39 +523,39 @@ begin
                         when X"14" =>    mb_struct_cfg.comn.fpa_spare                   <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
                         when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
                         when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
-                        when X"20" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_xstart                <= unsigned(data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_xstart'length-1 downto 0));                                
-                        when X"24" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_ystart                <= unsigned(data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_ystart'length-1 downto 0));                        
-                        when X"28" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_xsize                 <= unsigned(data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_xsize'length-1 downto 0));                              
-                        when X"2C" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_ysize                 <= unsigned(data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_ysize'length-1 downto 0));                                
-                        when X"30" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_gain                  <= data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_gain'length-1 downto 0);                                                     
-                        when X"34" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_out_chn               <= data_i(0); 
-                        when X"38" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_diode_bias            <= data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_diode_bias'length-1 downto 0);                        
-                        when X"3C" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_int_mode              <= data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_int_mode'length-1 downto 0);                        
-                        when X"40" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_boost_mode            <= data_i(0);                        
-                        when X"44" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_pix_res               <= data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_pix_res'length-1 downto 0); 
-                        when X"48" =>    mb_struct_cfg.scd_proxy2_op.scd_proxy2_frame_period_min      <= unsigned(data_i(mb_struct_cfg.scd_proxy2_op.scd_proxy2_frame_period_min'length-1 downto 0));                         
-                        when X"4C" =>    mb_struct_cfg.scd_proxy2_diag.scd_proxy2_bit_pattern         <= data_i(mb_struct_cfg.scd_proxy2_diag.scd_proxy2_bit_pattern'length-1 downto 0);                         
-                        when X"50" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t6_dly <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t6_dly'length-1 downto 0));                       
-                        when X"54" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t1_dly         <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t1_dly'length-1 downto 0));                       
-                        when X"58" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t2_dly         <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t2_dly'length-1 downto 0));                        
-                        when X"5C" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t6_dly         <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t6_dly'length-1 downto 0));                        
-                        when X"60" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t3_dly         <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t3_dly'length-1 downto 0));                         
-                        when X"64" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t5_dly         <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t5_dly'length-1 downto 0));
-                        when X"68" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t4_dly         <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig4_t4_dly'length-1 downto 0));                            
-                        when X"6C" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t5_dly <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t5_dly'length-1 downto 0));
-                        when X"70" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t4_dly <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_fig1_or_fig2_t4_dly'length-1 downto 0));
-                        when X"74" =>    mb_struct_cfg.scd_proxy2_misc.scd_proxy2_xsize_div2          <= unsigned(data_i(mb_struct_cfg.scd_proxy2_misc.scd_proxy2_xsize_div2'length-1 downto 0));
-                        when X"78" =>    mb_struct_cfg.scd_proxy2_op.cfg_num                   <= unsigned(data_i(mb_struct_cfg.scd_proxy2_op.cfg_num'length-1 downto 0));
+                        when X"20" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
+                        when X"24" =>    mb_struct_cfg.op.ystart                        <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));                        
+                        when X"28" =>    mb_struct_cfg.op.xsize                         <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0));                              
+                        when X"2C" =>    mb_struct_cfg.op.ysize                         <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));                                
+                        when X"30" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0);                                                     
+                        when X"34" =>    mb_struct_cfg.op.out_chn                       <= data_i(0); 
+                        when X"38" =>    mb_struct_cfg.op.diode_bias                    <= data_i(mb_struct_cfg.op.diode_bias'length-1 downto 0);                        
+                        when X"3C" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
+                        when X"40" =>    mb_struct_cfg.op.spare1                        <= data_i(0);                        
+                        when X"44" =>    mb_struct_cfg.op.spare2                        <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 
+                        when X"48" =>    mb_struct_cfg.op.frame_period_min              <= unsigned(data_i(mb_struct_cfg.op.frame_period_min'length-1 downto 0));                         
+                        when X"4C" =>    mb_struct_cfg.diag.bit_pattern                 <= data_i(mb_struct_cfg.diag.bit_pattern'length-1 downto 0);                         
+                        when X"50" =>    mb_struct_cfg.misc.fig1_or_fig2_t6_dly         <= unsigned(data_i(mb_struct_cfg.misc.fig1_or_fig2_t6_dly'length-1 downto 0));                       
+                        when X"54" =>    mb_struct_cfg.misc.fig4_t1_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t1_dly'length-1 downto 0));                       
+                        when X"58" =>    mb_struct_cfg.misc.fig4_t2_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t2_dly'length-1 downto 0));                        
+                        when X"5C" =>    mb_struct_cfg.misc.fig4_t6_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t6_dly'length-1 downto 0));                        
+                        when X"60" =>    mb_struct_cfg.misc.fig4_t3_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t3_dly'length-1 downto 0));                         
+                        when X"64" =>    mb_struct_cfg.misc.fig4_t5_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t5_dly'length-1 downto 0));
+                        when X"68" =>    mb_struct_cfg.misc.fig4_t4_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t4_dly'length-1 downto 0));                            
+                        when X"6C" =>    mb_struct_cfg.misc.fig1_or_fig2_t5_dly         <= unsigned(data_i(mb_struct_cfg.misc.fig1_or_fig2_t5_dly'length-1 downto 0));
+                        when X"70" =>    mb_struct_cfg.misc.fig1_or_fig2_t4_dly         <= unsigned(data_i(mb_struct_cfg.misc.fig1_or_fig2_t4_dly'length-1 downto 0));
+                        when X"74" =>    mb_struct_cfg.misc.xsize_div2                  <= unsigned(data_i(mb_struct_cfg.misc.xsize_div2'length-1 downto 0));
+                        when X"78" =>    mb_struct_cfg.op.cfg_num                       <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));
                         when X"7C" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
                            
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
                         when X"80" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
                         -- mode diag manufacturier 
-                        when X"B0" =>    mb_struct_cfg.scd_proxy2_diag.scd_proxy2_bit_pattern <= data_i(mb_struct_cfg.scd_proxy2_diag.scd_proxy2_bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   
+                        when X"B0" =>    mb_struct_cfg.diag.bit_pattern <= data_i(mb_struct_cfg.diag.bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   
                            
                         -- trig lecture de temperatur(le changement de numero est vu comme un changement de config impliquant la repogrammation)
-                        when X"D0" =>    mb_struct_cfg.scd_proxy2_temp.scd_proxy2_temp_read_num <= unsigned(data_i(mb_struct_cfg.scd_proxy2_temp.scd_proxy2_temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
+                        when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
                            
                         -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                         when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

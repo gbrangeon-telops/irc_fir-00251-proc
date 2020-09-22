@@ -65,7 +65,7 @@ architecture rtl of scd_proxy2_fifo_writer is
    signal fval_p           : std_logic;
    signal lval_p           : std_logic;
    signal dval_p           : std_logic;
-   signal dcnt             : unsigned(FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T3_DLY'length downto 0);
+   signal dcnt             : unsigned(FPA_INTF_CFG.MISC.FIG4_T3_DLY'length downto 0);
    signal flush_fifo       : std_logic;
    signal count            : unsigned(7 downto 0);
    signal readout_sync     : std_logic;
@@ -186,7 +186,7 @@ begin
                   --if fval_p = '1' and lval_p ='1' and dval_p = '1' then  
                   --   dcnt <= dcnt + 1;                                  
                   --end if;
-                  --if dcnt = FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T3_DLY then   -- fin des 640 pixels du header (critère du compteur plus certain que tout autre) 
+                  --if dcnt = FPA_INTF_CFG.SCD_PROXY2_MISC.SCD_PROXY2_FIG4_T3_DLY then   -- fin des 640 pixels du header (critère du compteur plus certain que tout autre) 
                   --   writer_fsm <= wr_img_st;
                   --end if;
                   if lval_p = '0' and dval_p = '0' then

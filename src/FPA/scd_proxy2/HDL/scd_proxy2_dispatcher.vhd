@@ -7,7 +7,7 @@
 --
 -------------------------------------------------------------------------------
 --
--- File        : d:\Telops\FIR-00180-IRC\src\FPA\BB1920D_Hercules\src\scd_proxy2_data_dispatcher.vhd
+-- File        : d:\Telops\FIR-00180-IRC\src\FPA\SCD_PROXY2_Hercules\src\scd_proxy2_data_dispatcher.vhd
 -- Generated   : Mon Jan 10 13:16:11 2011
 -- From        : interface description file
 -- By          : Itf2Vhdl ver. 1.22
@@ -29,7 +29,7 @@ use work.tel2000.all;
 use work.img_header_define.all;
 
 
-entity scd_proxy2_data_dispatcher is
+entity scd_proxy2_dispatcher is
    
    
    port(
@@ -84,9 +84,9 @@ entity scd_proxy2_data_dispatcher is
       TRIG_CTLER_STAT   : in std_logic_vector(7 downto 0)  
       --FPA_TEMP_STAT     : out fpa_temp_stat_type      
       );
-end scd_proxy2_data_dispatcher;
+end scd_proxy2_dispatcher;
 
-architecture rtl of scd_proxy2_data_dispatcher is
+architecture rtl of scd_proxy2_dispatcher is
    
    
    component sync_reset
@@ -248,15 +248,15 @@ architecture rtl of scd_proxy2_data_dispatcher is
    signal xsize_mismatch               : std_logic;
    signal ysize_mismatch               : std_logic;
    signal gain_mismatch                : std_logic;
-   signal fpa_int_time                 : unsigned(FPA_INTF_CFG.BB1920D_INT.BB1920D_INT_TIME 'LENGTH-1 downto 0);
+   signal fpa_int_time                 : unsigned(FPA_INTF_CFG.INT.INT_TIME 'LENGTH-1 downto 0);
    signal fpa_temp_pos                 : unsigned(15 downto 0);
    signal fpa_temp_neg                 : unsigned(15 downto 0);
-   signal fpa_ysize                    : unsigned(FPA_INTF_CFG.BB1920D_OP.BB1920D_YSIZE'LENGTH-1 downto 0);
-   signal fpa_xsize                    : unsigned(FPA_INTF_CFG.BB1920D_OP.BB1920D_XSIZE'LENGTH-1 downto 0);
+   signal fpa_ysize                    : unsigned(FPA_INTF_CFG.OP.YSIZE'LENGTH-1 downto 0);
+   signal fpa_xsize                    : unsigned(FPA_INTF_CFG.OP.XSIZE'LENGTH-1 downto 0);
    signal fpa_temp_reg                 : std_logic_vector(15 downto 0);
-   signal fpa_gain                     : std_logic_vector(FPA_INTF_CFG.BB1920D_OP.BB1920D_GAIN'LENGTH-1 downto 0);
+   signal fpa_gain                     : std_logic_vector(FPA_INTF_CFG.OP.GAIN'LENGTH-1 downto 0);
    signal fpa_temp_i                   : fpa_temp_stat_type;
-   signal fpa_int_mode                 : std_logic_vector(BB1920D_ITR'range);
+   signal fpa_int_mode                 : std_logic_vector(ITR'range);
    signal diag_header_last             : std_logic;
    signal fpa_header_last              : std_logic;
    signal hder_mosi_i                  : t_axi4_lite_mosi;
@@ -604,9 +604,9 @@ begin
             true_fpa_int_last <= true_fpa_int_i;
             true_fpa_int_re   <= (not true_fpa_int_last and true_fpa_int_i);
             
-            itr_int_fifo_wr   <= true_fpa_int_re and acq_mode and not FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_int_mode(0);                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
-            iwr_int_fifo_wr1  <= true_fpa_int_re and acq_mode and not acq_mode_first_int and FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_int_mode(0);  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
-            iwr_int_fifo_wr2  <= true_fpa_int_re and nacq_mode_first_int and FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_int_mode(0);              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
+            itr_int_fifo_wr   <= true_fpa_int_re and acq_mode and not FPA_INTF_CFG.op.int_mode(0);                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
+            iwr_int_fifo_wr1  <= true_fpa_int_re and acq_mode and not acq_mode_first_int and FPA_INTF_CFG.op.int_mode(0);  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
+            iwr_int_fifo_wr2  <= true_fpa_int_re and nacq_mode_first_int and FPA_INTF_CFG.op.int_mode(0);              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
             
             int_fifo_wr <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;
             
@@ -748,8 +748,8 @@ begin
             int_fifo_dval_last <= int_fifo_dval;
             
             fpa_hder_assump_err <= '0';
-            fpa_pix_res_bit_shift := to_integer(unsigned(FPA_INTF_CFG.scd_proxy2_op.scd_proxy2_pix_res));
-            fpa_pix_max <= x"7FFF" srl fpa_pix_res_bit_shift;
+--            fpa_pix_res_bit_shift := to_integer(unsigned(FPA_INTF_CFG.op.pix_res));
+--            fpa_pix_max <= x"7FFF" srl fpa_pix_res_bit_shift;
             
             -- dispatching des données et header en mode DIAG et REEL (ou FPA)
             pix_dval_i <= pix_dval_temp;
@@ -848,7 +848,7 @@ begin
             diag_header_last <= diag_header;
             fpa_header_last <= fpa_header;            
             fpa_int_time_100MHz <= to_unsigned((to_integer(int_time_i)*10)/8, 32); -- fpa_int_time est en coups de 80MHz et fpa_int_time_100MHz doit être en coups de 100MHz
-            diag_int_time_100MHz <= to_unsigned(to_integer(FPA_INTF_CFG.BB1920D_INT.BB1920D_INT_TIME*10)/8, 32); -- FPA_INTF_CFG.BB1920D_INT.BB1920D_INT_TIME*10)/8;
+            diag_int_time_100MHz <= to_unsigned(to_integer(FPA_INTF_CFG.INT.INT_TIME*10)/8, 32); -- FPA_INTF_CFG.INT.INT_TIME*10)/8;
             
             if real_data_mode = '1' then -- en mode réel 
                hder_param.exp_time <= fpa_int_time_100MHz; 

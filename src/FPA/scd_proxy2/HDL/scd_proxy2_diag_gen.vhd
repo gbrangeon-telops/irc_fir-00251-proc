@@ -7,7 +7,7 @@
 --
 -------------------------------------------------------------------------------
 --
--- File        : d:\Telops\FIR-00180-IRC\src\FPA\BB1920D_Hercules\src\scd_proxy2_diag_gen.vhd
+-- File        : d:\Telops\FIR-00180-IRC\src\FPA\SCD_PROXY2_Hercules\src\scd_proxy2_diag_gen.vhd
 -- Generated   : Mon Jan 10 13:16:11 2011
 -- From        : interface description file
 -- By          : Itf2Vhdl ver. 1.22
@@ -329,7 +329,7 @@ begin
                   fval_i <= '0';
                   diag_line_gen_en <= '0'; 
                   if DIAG_MODE_EN = '1' then 
-                     if FPA_INTF_CFG.BB1920D_OP.BB1920D_INT_MODE = BB1920D_IWR then 
+                     if FPA_INTF_CFG.OP.INT_MODE = IWR then 
                         if fpa_int_last = '0' and fpa_int_i = '1' then   -- en mode IWR, le delay T6 est appliqué à partir du debut de l'integration
                            diag_fsm <=  fig1_or_fig2_T6_dly_st;              -- les nomenclatures des delais sont identiques sur les figures 1 et 2.
                         end if;
@@ -341,7 +341,7 @@ begin
                   end if;
                
                when fig1_or_fig2_T6_dly_st =>    -- figure 1 ou 2 : delay T6,
-                  if dly_cnt >= FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG1_OR_FIG2_T6_DLY then 
+                  if dly_cnt >= FPA_INTF_CFG.MISC.FIG1_OR_FIG2_T6_DLY then 
                      diag_fsm <=  fval_on_st;                   
                   else
                      dly_cnt <= dly_cnt + 1; 
@@ -353,7 +353,7 @@ begin
                   dly_cnt <= (others => '0');
                
                when fig4_T2_dly_st =>    -- figure 4 : pause T2
-                  if dly_cnt = FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T2_DLY then 
+                  if dly_cnt = FPA_INTF_CFG.MISC.FIG4_T2_DLY then 
                      diag_fsm <=  hder_st;
                      
                   else
@@ -368,14 +368,14 @@ begin
                   hder_data_id <= hder_data_id + 1;
                   ch1_data_i <= (others => '0');
                   ch2_data_i <= (others => '0');                  
-                  if hder_dcnt > FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T6_DLY then
+                  if hder_dcnt > FPA_INTF_CFG.MISC.FIG4_T6_DLY then
                      hder_i <= '0';                     
                   end if;
-                  if hder_dcnt > FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T3_DLY then
+                  if hder_dcnt > FPA_INTF_CFG.MISC.FIG4_T3_DLY then
                      lval_i <= '0';
                      dval_i <= '0';
                   end if;
-                  if hder_dcnt = FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T5_DLY then
+                  if hder_dcnt = FPA_INTF_CFG.MISC.FIG4_T5_DLY then
                      diag_fsm <=  start_line_gen_st;
                   else
                      
@@ -395,13 +395,13 @@ begin
                         ch1_data_i(7 downto 0)  <= x"20";  -- byte_20          <= fpa_hder_data(0);
                      
                      when 6 =>   -- Byte[26:24]
-                        ch1_data_i(7 downto 0)  <= std_logic_vector(FPA_INTF_CFG.BB1920D_INT.BB1920D_INT_TIME(7 downto 0));  --fpa_int_time(23 downto 0) <= unsigned(fpa_hder_data(2)) & unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0));    -- temps d'integration
-                        ch1_data_i(15 downto 8) <= std_logic_vector(FPA_INTF_CFG.BB1920D_INT.BB1920D_INT_TIME(15 downto 8));
-                        ch2_data_i(7 downto 0)  <= std_logic_vector(FPA_INTF_CFG.BB1920D_INT.BB1920D_INT_TIME(23 downto 16));
+                        ch1_data_i(7 downto 0)  <= std_logic_vector(FPA_INTF_CFG.INT.INT_TIME(7 downto 0));  --fpa_int_time(23 downto 0) <= unsigned(fpa_hder_data(2)) & unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0));    -- temps d'integration
+                        ch1_data_i(15 downto 8) <= std_logic_vector(FPA_INTF_CFG.INT.INT_TIME(15 downto 8));
+                        ch2_data_i(7 downto 0)  <= std_logic_vector(FPA_INTF_CFG.INT.INT_TIME(23 downto 16));
                      
                      when 8 =>   -- Byte[33:32] Byte[35:34]
-                        ch1_data_i <= std_logic_vector(resize(FPA_INTF_CFG.BB1920D_OP.BB1920D_YSIZE,16));--fpa_ysize <= resize((unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0))), fpa_ysize'length);
-                        ch2_data_i <= std_logic_vector(resize(FPA_INTF_CFG.BB1920D_OP.BB1920D_XSIZE,16));--fpa_xsize <= resize((unsigned(fpa_hder_data(3)) & unsigned(fpa_hder_data(2))), fpa_xsize'length);              
+                        ch1_data_i <= std_logic_vector(resize(FPA_INTF_CFG.OP.YSIZE,16));--fpa_ysize <= resize((unsigned(fpa_hder_data(1)) & unsigned(fpa_hder_data(0))), fpa_ysize'length);
+                        ch2_data_i <= std_logic_vector(resize(FPA_INTF_CFG.OP.XSIZE,16));--fpa_xsize <= resize((unsigned(fpa_hder_data(3)) & unsigned(fpa_hder_data(2))), fpa_xsize'length);              
                      
                      when 11 => -- Byte[47..46]
                         ch2_data_i <= x"ABCD";--fpa_temp_pos <= unsigned(fpa_hder_data(3)) &  unsigned(fpa_hder_data(2));                -- fpa_temp_pos
@@ -418,7 +418,7 @@ begin
                
                when start_line_gen_st =>
                   diag_line_gen_en <= '1';   -- on active le module généateur des données diag
-                  line_size_i <= std_logic_vector(resize(FPA_INTF_CFG.BB1920D_MISC.BB1920D_XSIZE_DIV2, line_size_i'length)); 
+                  line_size_i <= std_logic_vector(resize(FPA_INTF_CFG.MISC.XSIZE_DIV2, line_size_i'length)); 
                   dly_cnt <= (others => '0');
                   if diag_done_i = '0' then
                      diag_line_gen_en <= '0';
@@ -444,10 +444,10 @@ begin
                when line_pause_st =>
                   lval_i <= '0';  
                   dly_cnt <= dly_cnt + 1;
-                  if dly_cnt >= FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG4_T4_DLY then
+                  if dly_cnt >= FPA_INTF_CFG.MISC.FIG4_T4_DLY then
                      diag_fsm <=  start_line_gen_st;
                   end if;
-                  if line_cnt >= FPA_INTF_CFG.BB1920D_OP.BB1920D_YSIZE then
+                  if line_cnt >= FPA_INTF_CFG.OP.YSIZE then
                      diag_fsm <=  rst_cnt_st;
                   end if;
                
@@ -457,7 +457,7 @@ begin
                
                when fig1_or_fig2_T5_dly_st =>
                   dly_cnt <= dly_cnt + 1;                                                                             
-                  if dly_cnt = FPA_INTF_CFG.BB1920D_MISC.BB1920D_FIG1_OR_FIG2_T5_DLY then
+                  if dly_cnt = FPA_INTF_CFG.MISC.FIG1_OR_FIG2_T5_DLY then
                      diag_fsm <= idle; 
                   end if;
                

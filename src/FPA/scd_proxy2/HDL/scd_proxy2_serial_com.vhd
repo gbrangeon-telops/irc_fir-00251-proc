@@ -136,7 +136,7 @@ architecture RTL of scd_proxy2_serial_com is
    type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st, cpy_cfg_wr_st, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
    type cmd_resp_fsm_type is (wait_resp_hder_st, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
-   type com_data_array_type  is array (0 to BB1920D_LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
+   type com_data_array_type  is array (0 to LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
 
@@ -173,8 +173,8 @@ architecture RTL of scd_proxy2_serial_com is
    signal cmd_resp_done           : std_logic;
    signal cmd_resp_done_last      : std_logic;
    signal proxy_serial_err        : std_logic;
-   signal resp_hder               : std_logic_vector(BB1920D_COM_RESP_HDER'range);
-   signal resp_id                 : std_logic_vector(BB1920D_COM_RESP_FAILURE_ID'range);
+   signal resp_hder               : std_logic_vector(COM_RESP_HDER'range);
+   signal resp_id                 : std_logic_vector(COM_RESP_FAILURE_ID'range);
    signal resp_payload            : std_logic_vector(15 downto 0);
    signal cfg_fifo_ovfl           : std_logic;
    signal cfg_fifo_rd_en          : std_logic;
@@ -455,7 +455,7 @@ begin
                   ram_rd_i <= '1';
                   cfg_byte_cnt <= cfg_byte_cnt + 1;
                   ram_rd_add_i <= resize(unsigned(SERIAL_BASE_ADD), ram_rd_add_i'length) + cfg_byte_cnt(ram_rd_add_i'length-1 downto 0);
-                  if ram_rd_add_i(7 downto 0) = BB1920D_LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
+                  if ram_rd_add_i(7 downto 0) = LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
                      cfg_mgmt_fsm <= init_cpy_wr_st;
                      ram_rd_i <= '0';
                   end if;
@@ -465,7 +465,7 @@ begin
                when init_cpy_wr_st =>     -- zone securisée en ecriture
                   cfg_fifo_wr_en <= '0';
                   cfg_byte_cnt <= (others => '0');
-                  ram_wr_add_i <= to_unsigned(BB1920D_CMD_SECUR_RAM_BASE_ADD, ram_wr_add_i'length); -- zone securisée sera en ecriture
+                  ram_wr_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram_wr_add_i'length); -- zone securisée sera en ecriture
                   cfg_mgmt_fsm <= cpy_cfg_wr_st;
                
                when cpy_cfg_wr_st =>  -- la config est copiee  du fifo vers la zone securisée B  
@@ -480,7 +480,7 @@ begin
                         cfg_payload(7 downto 0) <= cfg_fifo_dout;  -- payload de la config selon SCD_PROXY2
                      elsif cfg_byte_cnt = 4 then
                         cfg_payload(15 downto 8) <= cfg_fifo_dout; -- payload de la config selon SCD_PROXY2
-                        cfg_byte_total <=  (unsigned(cfg_fifo_dout) & unsigned(cfg_payload(7 downto 0))) + BB1920D_CMD_OVERHEAD_BYTES_NUM; -- nombre de bytes total de la config                        
+                        cfg_byte_total <=  (unsigned(cfg_fifo_dout) & unsigned(cfg_payload(7 downto 0))) + CMD_OVERHEAD_BYTES_NUM; -- nombre de bytes total de la config                        
                      end if;
                   end if;
                   if cfg_fifo_empty = '1' then
@@ -492,9 +492,9 @@ begin
                when init_send_st =>            
                   tx_dval_i <= '0';
                   cfg_byte_cnt <= (others => '0'); 
-                  ram_rd_add_i <= to_unsigned(BB1920D_CMD_SECUR_RAM_BASE_ADD, ram_rd_add_i'length); -- zone securisée sera en lecture
+                  ram_rd_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram_rd_add_i'length); -- zone securisée sera en lecture
                   
-                  if unsigned(SERIAL_BASE_ADD) = to_unsigned(BB1920D_OP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
+                  if unsigned(SERIAL_BASE_ADD) = to_unsigned(OP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
                      force_prog_trig_mode <= '1';
 					      cfg_mgmt_fsm <= prog_trig_start_st; 
                   else
@@ -608,7 +608,7 @@ begin
    -- Generateur pour uart_tbaud_clk_pulse
    -------------------------------------------------- 
    U4: Clk_Divider
-   Generic map(Factor=> BB1920D_SERIAL_TX_CLK_FACTOR)
+   Generic map(Factor=> SERIAL_TX_CLK_FACTOR)
    Port map( Clock => CLK, Reset => sreset, Clk_div => uart_tbaud_clk_en);
    
    --------------------------------------------------  
@@ -695,7 +695,7 @@ begin
                      failure_resp_data(kk) <= (others => '0');
                   end loop;
                   if RX_DVAL = '1' then                       
-                     if  RX_DATA = BB1920D_COM_RESP_HDER then
+                     if  RX_DATA = COM_RESP_HDER then
                         cmd_resp_fsm <= decode_byte_st;
                         resp_hder <= RX_DATA;
                         rx_data_cnt <= to_unsigned(2, rx_data_cnt'length);
@@ -716,7 +716,7 @@ begin
                         resp_payload(7 downto 0) <= RX_DATA;
                      elsif rx_data_cnt = 5 then                      -- payload
                         resp_payload(15 downto 8) <= RX_DATA;
-                        rx_data_total <=  (unsigned(RX_DATA) & unsigned(resp_payload(7 downto 0))) + BB1920D_CMD_OVERHEAD_BYTES_NUM;
+                        rx_data_total <=  (unsigned(RX_DATA) & unsigned(resp_payload(7 downto 0))) + CMD_OVERHEAD_BYTES_NUM;
                         resp_dcnt <= (others => '0');
                      elsif rx_data_cnt = rx_data_total then        -- checksum                                               
                         cmd_resp_fsm <= check_resp_st;
@@ -733,15 +733,15 @@ begin
                
                when check_resp_st =>   -- recherche du type de reponse reçue
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
-                  if resp_hder = BB1920D_COM_RESP_HDER then 
-                     if resp_id = BB1920D_COM_RESP_FAILURE_ID then
+                  if resp_hder = COM_RESP_HDER then 
+                     if resp_id = COM_RESP_FAILURE_ID then
                         proxy_serial_err <= '1';
                         resp_err(1) <= '1';
                         for kk in 0 to 3 loop
                            failure_resp_data(kk) <= resp_data(kk);
                         end loop;
                         cmd_resp_fsm <= wait_resp_hder_st;
-                     elsif resp_id = BB1920D_TEMP_CMD_ID then
+                     elsif resp_id = TEMP_CMD_ID then
                         proxy_serial_err <= '0'; 
                         cmd_resp_fsm <= fpa_temp_resp_st;
                      else
