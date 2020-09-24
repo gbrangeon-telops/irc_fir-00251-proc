@@ -1082,8 +1082,8 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
 // VccPosition   : position du LDO . Attention! VccPosition = FLEG_VCC_POSITION où FLEG_VCC_POSITION est la position sur le FLEG (il va de 1 à 8) 
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition)
 {  
-  float Rs, Rd, RL, Is, DacVoltage_Volt;
-  uint32_t DacWord;
+   float Rs, Rd, RL, Is, DacVoltage_Volt, DacWordTemp;
+   uint32_t DacWord;
    
    if ((VccPosition == 1) || (VccPosition == 2) || (VccPosition == 3) || (VccPosition == 8)){   // les canaux VCC1, VCC2, VCC3 et VCC8 sont identiques à VCC1
       Rs = 24.9e3F;    // sur EFA-00266-001, vaut R42
@@ -1101,8 +1101,8 @@ uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccP
    DacVoltage_Volt =  ((1.0F + RL/Rd)*VccVoltage_mV/1000.0F - (Rs + RL + RL/Rd*Rs)*Is)/(RL/Rd);
             
    // deduction du bitstream du DAC
-   DacWord = (uint32_t)(powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS)*DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN));
-   DacWord = (uint32_t) MAX(MIN(DacWord, 16383), 0);
+   DacWordTemp = powf(2.0F, (float)FLEG_DAC_RESOLUTION_BITS) * DacVoltage_Volt/((float)FLEG_DAC_REF_VOLTAGE_V*(float)FLEG_DAC_REF_GAIN);
+   DacWord = (uint32_t) MAX(MIN(roundf(DacWordTemp), 16383.0F), 0.0F);
    
    return DacWord;
 }
@@ -1137,17 +1137,17 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
    //calculs de la tension du LDO en volt
    VccVoltage_mV = 1000.0F * (DacVoltage_Volt * (RL/Rd) + (Rs + RL + RL/Rd*Rs)*Is)/(1.0F + RL/Rd);
    
-   return VccVoltage_mV;
+   return roundf(VccVoltage_mV);
 }
 
 //------------------------------------------------
-// Envoi de la config des dacs et autres
+// Envoi de la config des dacs
 //-----------------------------------------------
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
 {
    uint8_t ii = 0;
    
-   // envoi comfig des Dacs
+   // envoi config des Dacs
    while(ii < TOTAL_DAC_NUM)
    {
       AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  // dans le vhd, division par 4 avant entrée dans ram
