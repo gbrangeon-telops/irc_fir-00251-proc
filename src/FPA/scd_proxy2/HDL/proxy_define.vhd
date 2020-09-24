@@ -34,7 +34,7 @@ package Proxy_define is
    constant INT_TIME_MIN_US              : integer := 1; 
    constant MASTER_CLK_RATE_MHZ          : integer := 70;      --
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
-
+   constant DEFINE_FPA_100M_CLK_RATE_KHZ : integer := 100_000;
    
    --------------------------------------------
    --  modes diag
@@ -199,11 +199,11 @@ package Proxy_define is
       rdy                 : std_logic;                     -- pulse signifiant que les parametres du header sont prêts
    end record;
    
-
+   
 end Proxy_define;
 
 package body Proxy_define is
    
-
+   
    
 end package body Proxy_define; 
