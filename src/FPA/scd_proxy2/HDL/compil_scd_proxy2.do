@@ -3,7 +3,15 @@
 #clearlibrary 	
 
 #packages
-acom -incr -nowarn DAGGEN_0523 d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\proxy_define.vhd
+acom -nowarn DAGGEN_0523 -incr \
+ d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd \
+ D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\FPA_define.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\proxy_define.vhd \
+ d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd \
+ d:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
+ 
+
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
@@ -34,24 +42,32 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_status_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_map.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_min_max_ctrl.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\edge_counter.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_mux.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_dispatcher.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_diag_data_gen.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_flow_mux.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\frm_in_progress_gen.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt_min_max.bde \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde
 
 # sources scd_proxy2_data_ctrl 
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_fifo_writer.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_diag_gen.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_dispatcher.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_data_ctrl.bde
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_real_data.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_bridge.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_line_mux.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_dval_gen.bde \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_data_ctrl.bde
 
 # sources scd_proxy2_hw_driver
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\dfpa_cfg_dpram.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_prog_ctrler.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_serial_module.vhd \
+
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_hw_driver.bde
 
 # top level intf

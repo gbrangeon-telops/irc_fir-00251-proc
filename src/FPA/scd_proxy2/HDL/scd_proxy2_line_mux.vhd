@@ -148,7 +148,7 @@ begin
       overflow => quad1_fifo_ovfl,
       empty => open
       ); 
-    
+   
    --------------------------------------------------
    -- fifo fwft line2_quad_DATA 
    -------------------------------------------------- 
@@ -165,7 +165,6 @@ begin
       overflow => quad2_fifo_ovfl,
       empty => open
       );
-   
    
    --------------------------------------------------
    -- multiplexage
@@ -195,7 +194,9 @@ begin
             case line_mux_fsm is 
                
                when quad1_out_st =>                     
-                  dout_mosi_i <= quad1_dout_mosi;           -- line1           
+                  dout_mosi_i <= quad1_dout_mosi;           -- line1 
+                  dout_mosi_i.eof <= quad1_dout_mosi.eof and not MUX_ENABLED;     -- si la diversité des canaux n'est activée alors qu'on est en mode 8 canaux, c'est qu'on est en mode 8 taps (jupiter  par exemple). Dans ce cas,  pas de eof supplémentaire. Le eof proviendra des quad2
+                  dout_mosi_i.eol <= quad1_dout_mosi.eol and not MUX_ENABLED;
                   quad1_fifo_rd_en <= quad1_fifo_dval;  
                   if MUX_ENABLED = '1' then                  -- provient du MB
                      if quad1_fifo_dval = '1' and quad1_dout_mosi.eol = '1' then   
@@ -204,7 +205,9 @@ begin
                   end if;
                
                when quad2_out_st =>
-                  dout_mosi_i <= quad2_dout_mosi;         -- line2  
+                  dout_mosi_i      <= quad2_dout_mosi;         -- line2
+                  dout_mosi_i.sof  <= '0';
+                  dout_mosi_i.sol  <= '0';
                   quad2_fifo_rd_en <= quad2_fifo_dval; 
                   if quad2_fifo_dval = '1' and quad2_dout_mosi.eol = '1' then   
                      line_mux_fsm <= quad1_out_st;                        

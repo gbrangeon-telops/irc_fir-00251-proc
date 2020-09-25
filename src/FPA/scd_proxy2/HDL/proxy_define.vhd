@@ -36,6 +36,19 @@ package Proxy_define is
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
    constant DEFINE_FPA_100M_CLK_RATE_KHZ : integer := 100_000;
    
+   ----------------------------------------------
+   -- calculs 
+   ---------------------------------------------- 
+   -- attention aux modifs à apporter aux lignes des calculs
+   constant DEFINE_DIAG_DATA_INC         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
+   constant DEFINE_FPA_TAP_NUMBER        : integer :=  PROXY_CLINK_CHANNEL_NUM;
+   constant DEFINE_DIAG_CLK_RATE_MAX_KHZ : integer := DEFINE_FPA_MCLK_RATE_KHZ;    		   -- vitesse max de l'horloge de sortie des pixels en mode diag 
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 1_000_000.0/real(DEFINE_FPA_MCLK_RATE_KHZ);      	-- CLINK IN est à 70 MHz ns 
+   constant DEFINE_FPA_PCLK_RATE_KHZ     : integer := DEFINE_FPA_MCLK_RATE_KHZ;
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ : integer := DEFINE_FPA_MCLK_RATE_KHZ; 
+   constant DEFINE_ADC_QUAD_CLK_FACTOR   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
+   
+   
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -97,7 +110,16 @@ package Proxy_define is
    -- quelques constantes 
    constant SERIAL_CFG_END_ADD           : std_logic_vector(7 downto 0) := x"FC"; -- adresse de fin d'envoi de la config serielle
    constant SERIAL_CFG_COPIER_START_DLY  : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM
-   constant SERIAL_CFG_COPIER_END_DLY    : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM
+   constant SERIAL_CFG_COPIER_END_DLY    : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM 
+   
+      --------------------------------------------
+   --  modes diag
+   --------------------------------------------
+   -- D comme diag 
+   constant DEFINE_TELOPS_DIAG_CNST               : std_logic_vector(7 downto 0):= x"D1";  -- mode diag constant
+   constant DEFINE_TELOPS_DIAG_DEGR               : std_logic_vector(7 downto 0):= x"D2";  -- mode diag degradé pour la prod
+   constant DEFINE_TELOPS_DIAG_DEGR_DYN           : std_logic_vector(7 downto 0):= x"D3";  -- mode diag degradé dynamique pour FAU
+   
    
    ----------------------------------------------
    -- Calculs 
@@ -140,13 +162,16 @@ package Proxy_define is
       spare1              : std_logic;
       spare2              : std_logic_vector(1 downto 0);
       frame_period_min    : unsigned(23 downto 0); 
-      cfg_num                 : unsigned(7 downto 0);      
+      cfg_num             : unsigned(7 downto 0);      
    end record;
    
    -- scd_proxy2 video synthetic
    type diag_cfg_type is
    record
-      bit_pattern         : std_logic_vector(2 downto 0);   
+      bit_pattern         : std_logic_vector(2 downto 0);
+      ysize               : unsigned(10 downto 0);
+      xsize_div_tapnum    : unsigned(10 downto 0);
+      lovh_mclk_source    : unsigned(15 downto 0);
    end record;
    
    -- scd_proxy2 temperature
@@ -155,36 +180,28 @@ package Proxy_define is
       temp_read_num       : unsigned(7 downto 0);
    end record; 
    
-   -- scd_proxy2 misc                 --  quelques valeurs propres au PelicanD (-- se reporter aux figures 1 et 2 et 4 des pages 13, 15 et 19 du doument Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD)                                
-   type misc_cfg_type is
-   record
-      fig1_or_fig2_t6_dly : unsigned(15 downto 0);
-      fig4_t1_dly         : unsigned(15 downto 0);
-      fig4_t2_dly         : unsigned(15 downto 0);
-      fig4_t6_dly         : unsigned(15 downto 0);
-      fig4_t3_dly         : unsigned(15 downto 0);
-      fig4_t5_dly         : unsigned(15 downto 0);
-      fig4_t4_dly         : unsigned(15 downto 0);
-      fig1_or_fig2_t5_dly : unsigned(15 downto 0);
-      fig1_or_fig2_t4_dly : unsigned(15 downto 0);
-      xsize_div2          : unsigned(9 downto 0);
-   end record;
-   
+     
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------
    type fpa_intf_cfg_type is
-   record     
-      cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
+   record 
+      
+      cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet id permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
       comn                 : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
+      
+      -- les cmds proxy et fpa
       op                   : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
       int                  : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
-      diag                 : diag_cfg_type;   -- tout changement dans diag entraine la programmation du detecteur (commnde PE Syntehtique)
       temp                 : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
-      misc                 : misc_cfg_type;   -- les changements dans misc ne font pas programmer le detecteur
+      
+      --- cmg telops
+      itr                  : std_logic;
+      diag                 : diag_cfg_type;   -- 
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
+      real_mode_active_pixel_dly : unsigned(15 downto 0);
    end record;    
    
    ----------------------------------------------								
