@@ -66,7 +66,7 @@ architecture RTL of ad798x_driver is
    signal sclk_i   								: std_logic;
    signal div_clk_cnt						   : unsigned(NB_BIT_CLK_CNT downto 0);
 
-   signal adc_conv_i 					         	: std_logic;
+   signal adc_conv_i				         	: std_logic;
    signal acq_window   			            : std_logic;
 
    signal data_register							: std_logic_vector(NBIT_TO_ACQ-1 downto 0);
@@ -207,8 +207,10 @@ begin
                 when conv_st =>  --Envoie du signal de conversion
                     busy_i <= '1';
                     acq_window <= '1';
-                    adc_conv_i <= '0';
-                    if(ADC_SDO = '0') then
+                    if ADC_SDO = '1' then
+                        adc_conv_i <= '0';   
+                    end if;
+                    if (adc_conv_i = '0' and ADC_SDO = '0') then
                         acq_fsm <= acq_st;
                     end if;
 
