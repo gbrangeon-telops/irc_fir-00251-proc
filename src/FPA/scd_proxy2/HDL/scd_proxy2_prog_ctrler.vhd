@@ -74,9 +74,9 @@ architecture rtl of scd_proxy2_prog_ctrler is
    
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, wait_trig_st, check_cfg_st, pause_st1, pause_st2, 
-   output_op_cfg_st, output_int_cfg_st, output_diag_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, wait_updater_rdy_st, wait_updater_run_st);
+   output_op_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, wait_updater_rdy_st, wait_updater_run_st);
    type int_gen_fsm_type is (idle, diag_int_dly_st, check_fpa_st, diag_exp_rst_cnt_st, diag_exp_int_gen_st, diag_int_gen_st);
-   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st, new_diag_cfg_st);
+   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
    signal cfg_updater_fsm           : driver_seq_fsm_type;
@@ -208,8 +208,7 @@ begin
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
             new_cfg.op   <= USER_CFG.OP;   
-            new_cfg.int  <= USER_CFG.INT;  
-            new_cfg.diag <= USER_CFG.DIAG; 
+            new_cfg.int  <= USER_CFG.INT;   
             new_cfg.temp <= USER_CFG.TEMP; 
             new_cfg.misc <= USER_CFG.MISC; 
             
@@ -234,13 +233,6 @@ begin
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.diag /= present_cfg.diag then
-                     new_cfg_pending_fsm <= new_diag_cfg_st;					 
-                  else
-                     new_cfg_pending_fsm <= check_cfg_st4;
-                  end if;
-               
-               when check_cfg_st4 =>
                   if new_cfg.temp /= present_cfg.temp then
                      new_cfg_pending_fsm <= new_temp_cfg_st;					 
                   else
@@ -264,19 +256,6 @@ begin
                   cfg_ram_base_add <= to_unsigned(INT_CMD_RAM_BASE_ADD, 8);
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				    -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
-				  if user_cfg_in_progress_i = '1' then 
-                     fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
-                  else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                     new_cfg_pending_fsm <= wait_prog_end_st;
-                  end if;
-               
-               when new_diag_cfg_st =>
-                  new_cfg_id <= DIAG_CMD_ID(7 downto 0);
-                  cfg_ram_base_add <= to_unsigned(DIAG_CMD_RAM_BASE_ADD, 8);
-                  fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  need_prog_rqst <= '1'; 				    -- diag_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs 
 				  if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
@@ -442,7 +421,6 @@ begin
             proxy_static_done <= '0';
             present_cfg.op.xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
             present_cfg.temp.temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
-            present_cfg.diag.bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset
             
          else                       
             
@@ -498,11 +476,7 @@ begin
                   end if;
                
                when check_cfg_st3 =>                            -- cet état est crée juste pour ameliorer timing
-                  if cfg_id_i = DIAG_CMD_ID(7 downto 0) then
-                     cfg_updater_fsm <= output_diag_cfg_st; 
-                  else    -- cfg_id_i = TEMP_CMD_ID(7 downto 0)
-                     cfg_updater_fsm <= output_temp_cfg_st;
-                  end if;                 
+                  cfg_updater_fsm <= output_temp_cfg_st;                
                
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.op <= fpa_ser_cfg_to_update.op;
@@ -517,11 +491,6 @@ begin
                   fpa_intf_cfg_i.int <= fpa_ser_cfg_to_update.int;
 				  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.int.int_time, 32);
                   present_cfg.int <= fpa_ser_cfg_to_update.int;  
-                  cfg_updater_fsm <= pause_st1;
-               
-               when output_diag_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
-                  fpa_intf_cfg_i.diag <= fpa_ser_cfg_to_update.diag;
-                  present_cfg.diag <= fpa_ser_cfg_to_update.diag;  
                   cfg_updater_fsm <= pause_st1;
                
                when output_temp_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
