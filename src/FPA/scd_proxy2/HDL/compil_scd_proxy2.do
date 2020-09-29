@@ -67,7 +67,6 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\dfpa_cfg_dpram.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_prog_ctrler.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_serial_module.vhd \
-
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_hw_driver.bde
 
 # top level intf

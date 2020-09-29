@@ -237,7 +237,7 @@ begin
             dout_o(59)           <= din_pipe_i(4).sof;            -- aoi_sof
             dout_o(60)           <= din_pipe_i(4).eof;            -- aoi_eof 
             dout_o(61)           <= din_pipe_i(4).dval;           -- aoi_dval    (nouvel ajout) 
-            dout_o(62)           <= acq_data_i;                   -- requis pour savoir si image à rejeter ou nom
+            dout_o(62)           <= acq_data_i;                   -- requis pour savoir si image à rejeter ou non
             dout_o(76 downto 63) <= (others => '0');              -- aoi_spares  (nouvel ajout)                                                                                
             
             dout_o(77)           <= '0';                          -- naoi_dval    

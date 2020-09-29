@@ -112,7 +112,7 @@ package Proxy_define is
    constant SERIAL_CFG_COPIER_START_DLY  : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM
    constant SERIAL_CFG_COPIER_END_DLY    : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM 
    
-      --------------------------------------------
+   --------------------------------------------
    --  modes diag
    --------------------------------------------
    -- D comme diag 
@@ -143,32 +143,51 @@ package Proxy_define is
    -- scd_proxy2 integration
    type int_cfg_type is
    record
-      int_time            : unsigned(23 downto 0);  --! temps d'integration en coups de 80Mhz
-      diag_int_time           : unsigned(24 downto 0);  --! temps d'integration en coups de 100Mhz
-      int_indx            : std_logic_vector(7 downto 0);
+      int_time         : unsigned(23 downto 0);            -- temps d'integration en coups de 70 MHz
+      int_dly          : unsigned(19 downto 0);            -- delay avant debut de integration. Delai entre Fsync et le debut du signal d'integration
+      int_indx         : std_logic_vector(7 downto 0);                    
+      frame_dly		  : unsigned(19 downto 0);        	  -- delay entre Fsync et le debut du readout. frame_dly = a*int + frame_dly_cst 
    end record;
    
    -- scd_proxy2 operationnelle
    type op_cfg_type is
    record  
-      xstart              : unsigned(10 downto 0); 
-      ystart              : unsigned(10 downto 0);
-      xsize               : unsigned(10 downto 0);
-      ysize               : unsigned(10 downto 0);
-      gain                : std_logic_vector(7 downto 0);
-      out_chn             : std_logic;
-      diode_bias          : std_logic_vector(3 downto 0);
-      int_mode            : std_logic_vector(7 downto 0);
-      spare1              : std_logic;
-      spare2              : std_logic_vector(1 downto 0);
-      frame_period_min    : unsigned(23 downto 0); 
-      cfg_num             : unsigned(7 downto 0);      
+      -- window
+      xstart           : unsigned(10 downto 0); 
+      ystart           : unsigned(10 downto 0);
+      xsize            : unsigned(10 downto 0);
+      ysize            : unsigned(10 downto 0);
+      
+      -- seq time
+      frame_time       : unsigned(19 downto 0);        	-- frame time en coups de 10 MHz
+      
+      -- gain et mode
+      gain             : std_logic_vector(7 downto 0); 	-- op_mode de bb1920
+      int_mode         : std_logic_vector(7 downto 0);   -- itr ou iwr
+      test_mode		  : std_logic_vector(7 downto 0);   -- vid_if_bit_en de bb1920. C'est le test pattern mode
+      
+      -- bias et saturation
+      det_vbias        : std_logic_vector(3 downto 0);	-- mtx_vdet de bb1920
+      det_ibias        : std_logic_vector(3 downto 0); 	-- mtx_idet de bb1920
+      det_vsat         : std_logic_vector(3 downto 0);	-- mtx_intg_low de bb1920
+      
+      -- misc
+      binning          : std_logic_vector(1 downto 0);	  
+      output_chn       : std_logic_vector(1 downto 0); 	-- video_rate de bb1920      
+      
+      -- spares
+      spare1			  : std_logic_vector(1 downto 0);
+      spare2			  : std_logic_vector(1 downto 0);
+      spare3			  : std_logic_vector(1 downto 0);
+      spare4			  : std_logic_vector(1 downto 0);
+      
+      cfg_num          : unsigned(7 downto 0);      
+      
    end record;
    
-   -- scd_proxy2 video synthetic
+   -- scd_proxy2 diag
    type diag_cfg_type is
    record
-      bit_pattern         : std_logic_vector(2 downto 0);
       ysize               : unsigned(10 downto 0);
       xsize_div_tapnum    : unsigned(10 downto 0);
       lovh_mclk_source    : unsigned(15 downto 0);
@@ -180,7 +199,7 @@ package Proxy_define is
       temp_read_num       : unsigned(7 downto 0);
    end record; 
    
-     
+   
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
    ------------------------------------------------
@@ -195,9 +214,10 @@ package Proxy_define is
       int                  : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
       temp                 : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
       
-      --- cmg telops
+      --- cmd telops
       itr                  : std_logic;
       diag                 : diag_cfg_type;   -- 
+      frame_dly_cst        : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = a*int + frame_dly_cst
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.

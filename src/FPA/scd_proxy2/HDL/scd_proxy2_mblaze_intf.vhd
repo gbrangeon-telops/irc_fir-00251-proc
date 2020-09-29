@@ -128,13 +128,13 @@ architecture rtl of scd_proxy2_mblaze_intf is
    
 begin
    
-   CTRLED_RESET <= ctrled_reset_i;
-   RESET_ERR <= reset_err_i;
-   ERR <= mb_serial_assump_err;
-   USER_CFG <= user_cfg_i;
-   USER_CFG_IN_PROGRESS <= user_cfg_in_progress_i;
-   FPA_SOFTW_STAT <= fpa_softw_stat_i;
-   COOLER_STAT.COOLER_ON <= '1';   -- pour le SCD_PROXY2, on peut se le permettre car le proxy n'allumera le détecteur que si la température du FPA est bonne.
+   CTRLED_RESET            <= ctrled_reset_i;
+   RESET_ERR               <= reset_err_i;
+   ERR                     <= mb_serial_assump_err;
+   USER_CFG                <= user_cfg_i;
+   USER_CFG_IN_PROGRESS    <= user_cfg_in_progress_i;
+   FPA_SOFTW_STAT          <= fpa_softw_stat_i;
+   COOLER_STAT.COOLER_ON   <= '1';   -- pour le SCD_PROXY2, on peut se le permettre car le proxy n'allumera le détecteur que si la température du FPA est bonne.
    
    -- I/O Connections assignments
    MB_MISO.AWREADY     <= axi_awready;
@@ -231,7 +231,6 @@ begin
                   ser_cfg_dval_i <= mb_ser_cfg_dval;
                   if mb_cfg_serial_in_progress = '0' and mb_cfg_serial_in_progress_last = '1' then -- fin de la comm serielle  
                      user_cfg_i.comn     <= mb_struct_cfg.comn;   -- partie structurale envoyée en fin de com serielle
-                     user_cfg_i.misc <= mb_struct_cfg.misc;
                      user_cfg_i.temp <= mb_struct_cfg.temp;
                      if mb_struct_cfg.cmd_to_update_id = OP_CMD_ID then
                         user_cfg_i.op   <= mb_struct_cfg.op;
@@ -255,7 +254,6 @@ begin
                   ser_cfg_dval_i <= exp_ser_cfg_dval;
                   if exp_struct_cfg_valid = '1' then
                      user_cfg_i.int.int_time <= scd_proxy2_exp_time_i;
-                     user_cfg_i.int.diag_int_time <= exp_time_i;
                      user_cfg_i.int.int_indx <= exp_indx_i;
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
@@ -514,7 +512,7 @@ begin
                      
                      case axi_awaddr(7 downto 0) is 
                         
-                        -- elements de config                                                                                                  
+                        -- comn                                                                                                  
                         when X"00" =>    mb_struct_cfg.comn.fpa_diag_mode               <= data_i(0); mb_cfg_rqst <= '1';                       
                         when X"04" =>    mb_struct_cfg.comn.fpa_diag_type               <= data_i(mb_struct_cfg.comn.fpa_diag_type'length-1 downto 0); 
                         when X"08" =>    mb_struct_cfg.comn.fpa_pwr_on                  <= data_i(0);						
@@ -523,24 +521,28 @@ begin
                         when X"14" =>    mb_struct_cfg.comn.fpa_spare                   <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
                         when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
                         when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
+                        
+                        -- op
                         when X"20" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
                         when X"24" =>    mb_struct_cfg.op.ystart                        <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));                        
                         when X"28" =>    mb_struct_cfg.op.xsize                         <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0));                              
                         when X"2C" =>    mb_struct_cfg.op.ysize                         <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));                                
-                        when X"30" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0);                                                     
-                        when X"34" =>    mb_struct_cfg.op.out_chn                       <= data_i(0); 
-                        when X"38" =>    mb_struct_cfg.op.diode_bias                    <= data_i(mb_struct_cfg.op.diode_bias'length-1 downto 0);                        
-                        when X"3C" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
-                        when X"40" =>    mb_struct_cfg.op.spare1                        <= data_i(0);                        
-                        when X"44" =>    mb_struct_cfg.op.spare2                        <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 
-                        when X"48" =>    mb_struct_cfg.op.frame_period_min              <= unsigned(data_i(mb_struct_cfg.op.frame_period_min'length-1 downto 0));                         
-                        when X"4C" =>    mb_struct_cfg.diag.bit_pattern                 <= data_i(mb_struct_cfg.diag.bit_pattern'length-1 downto 0);                         
-                        when X"50" =>    mb_struct_cfg.misc.fig1_or_fig2_t6_dly         <= unsigned(data_i(mb_struct_cfg.misc.fig1_or_fig2_t6_dly'length-1 downto 0));                       
-                        when X"54" =>    mb_struct_cfg.misc.fig4_t1_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t1_dly'length-1 downto 0));                       
-                        when X"58" =>    mb_struct_cfg.misc.fig4_t2_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t2_dly'length-1 downto 0));                        
-                        when X"5C" =>    mb_struct_cfg.misc.fig4_t6_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t6_dly'length-1 downto 0));                        
-                        when X"60" =>    mb_struct_cfg.misc.fig4_t3_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t3_dly'length-1 downto 0));                         
-                        when X"64" =>    mb_struct_cfg.misc.fig4_t5_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t5_dly'length-1 downto 0));
+                        when X"30" =>    mb_struct_cfg.op.frame_time                    <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0));                                                     
+                        when X"34" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0); 
+                        when X"38" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
+                        when X"3C" =>    mb_struct_cfg.op.test_mode	                   <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);                        
+                        when X"40" =>    mb_struct_cfg.op.det_vbias                     <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);                         
+                        when X"44" =>    mb_struct_cfg.op.det_ibias                     <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0); 
+                        when X"48" =>    mb_struct_cfg.op.det_vsat                      <= data_i(mb_struct_cfg.op.det_vsat'length-1 downto 0);                         
+                        when X"4C" =>    mb_struct_cfg.op.binning                       <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);      
+                        when X"50" =>    mb_struct_cfg.op.output_chn                    <= data_i(mb_struct_cfg.op.output_chn'length-1 downto 0);   
+                        when X"54" =>    mb_struct_cfg.op.spare1		                   <= data_i(mb_struct_cfg.op.spare1'length-1 downto 0); 		 
+                        when X"58" =>    mb_struct_cfg.op.spare2		                   <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 		 
+                        when X"5C" =>    mb_struct_cfg.op.spare3		                   <= data_i(mb_struct_cfg.op.spare3'length-1 downto 0); 		 
+                        when X"60" =>    mb_struct_cfg.op.spare4                        <= data_i(mb_struct_cfg.op.spare4'length-1 downto 0);       
+                        when X"64" =>    mb_struct_cfg.op.cfg_num                       <= data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0);                               
+
+                             
                         when X"68" =>    mb_struct_cfg.misc.fig4_t4_dly                 <= unsigned(data_i(mb_struct_cfg.misc.fig4_t4_dly'length-1 downto 0));                            
                         when X"6C" =>    mb_struct_cfg.misc.fig1_or_fig2_t5_dly         <= unsigned(data_i(mb_struct_cfg.misc.fig1_or_fig2_t5_dly'length-1 downto 0));
                         when X"70" =>    mb_struct_cfg.misc.fig1_or_fig2_t4_dly         <= unsigned(data_i(mb_struct_cfg.misc.fig1_or_fig2_t4_dly'length-1 downto 0));
@@ -554,14 +556,14 @@ begin
                         -- mode diag manufacturier 
                         when X"B0" =>    mb_struct_cfg.diag.bit_pattern <= data_i(mb_struct_cfg.diag.bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   
                            
-                        -- trig lecture de temperatur(le changement de numero est vu comme un changement de config impliquant la repogrammation)
+                        -- trig lecture de temperature(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
                            
                         -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                         when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                         when X"E4" =>    fpa_softw_stat_i.fpa_output <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
                            
-                        -- pour effacer erreurfpa_init_dones latchées
+                        -- pour effacer erreurs latchées
                         when X"EC" =>    reset_err_i <= data_i(0);
                            
                         -- pour un reset complet du module FPA
@@ -608,4 +610,4 @@ begin
       end if;
    end process;
    
-end rtl;
+end rtl;       
