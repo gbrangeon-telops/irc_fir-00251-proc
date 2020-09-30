@@ -28,27 +28,42 @@ package Proxy_define is
    --------------------------------------------
    -- PROJET: definition
    --------------------------------------------   
-   constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY2_SCD;
-   constant PROG_FREE_RUNNING_TRIG       : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
-   constant FPA_INTF_CLK_RATE_MHZ        : integer := 100;     --  FPA_INTF_CLK_RATE en MHz
-   constant INT_TIME_MIN_US              : integer := 1; 
-   constant MASTER_CLK_RATE_MHZ          : integer := 70;      --
-   constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
-   constant DEFINE_FPA_100M_CLK_RATE_KHZ : integer := 100_000;
-   constant DEFINE_FPA_INTCLK_RATE_KHZ            : integer   := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
-
+   constant DEFINE_PROXY                          : std_logic_vector(2 downto 0) := PROXY2_SCD;
+   constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur   constant INT_TIME_MIN_US                       : integer := 1; 
+   constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : integer := 10_000;  -- l'horloge d'integration
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer := 70_000;    -- c'est l'horloge à partir de laquelle est produite celle des quads.
+   constant DEFINE_FPA_MCLK_SOURCE_RATE_KHZ       : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ; 
+   constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer := 100_000;
+   
+   
+   constant FSYNC_HIGH_TIME_US                    : integer := 5;     -- duree de FSYNC en usec
+   constant POWER_WAIT_US                         : integer := 2_000_000;  -- duree d'attente après allumage en usec. selon la doc, le proxy prend 1 sec. Pour plus de securité, j'en mets 2
+   constant TEMP_TRIG_PERIOD_US                   : integer := 1_000_000;  -- le trig de lecture de la temperature a une periode de 1sec pour ne pas submerger le proxy
+                                                  
+   -- commandes                                   
+   constant CMD_OVERHEAD_BYTES_NUM                : integer := 6; -- nombre de bytes de l'overhead (header, CommandID, length, Checksum)
+   constant LONGEST_CMD_BYTES_NUM                 : integer := 32; -- longueur maximale en byte de la config d'un scd_proxy2 (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
+   constant SERIAL_BAUD_RATE                      : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
+ 
    
    ----------------------------------------------
    -- calculs 
    ---------------------------------------------- 
    -- attention aux modifs à apporter aux lignes des calculs
-   constant DEFINE_DIAG_DATA_INC         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
-   constant DEFINE_FPA_TAP_NUMBER        : integer :=  PROXY_CLINK_CHANNEL_NUM;
-   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 1_000_000.0/real(DEFINE_FPA_MCLK_RATE_KHZ);      	-- CLINK IN est à 70 MHz ns 
-   constant DEFINE_FPA_PCLK_RATE_KHZ     : integer := DEFINE_FPA_MCLK_RATE_KHZ;
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ : integer := DEFINE_FPA_MCLK_RATE_KHZ; 
-   constant DEFINE_ADC_QUAD_CLK_FACTOR   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
-   
+   constant DEFINE_DIAG_DATA_INC                         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
+   constant DEFINE_FPA_TAP_NUMBER                        : integer :=  PROXY_CHANNEL_LINK_NUM;
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS                 : real    := 1_000_000.0/real(DEFINE_FPA_MCLK_RATE_KHZ);      	-- CLINK IN est à 70 MHz ns 
+   constant DEFINE_FPA_PCLK_RATE_KHZ                     : integer := DEFINE_FPA_MCLK_RATE_KHZ;
+   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ                 : integer := DEFINE_FPA_MCLK_RATE_KHZ; 
+   constant DEFINE_ADC_QUAD_CLK_FACTOR                   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
+   constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR  
+   constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR         : integer := 2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
+   constant DEFINE_FPA_EXP_TIME_CONV_NUMERATOR           : unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned(integer(real(DEFINE_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     --
+   constant FSYNC_HIGH_TIME_FACTOR                       : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*FSYNC_HIGH_TIME_US)/1000);
+   constant POWER_WAIT_FACTOR                            : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*POWER_WAIT_US)/1000);
+   constant SERIAL_TX_CLK_FACTOR                         : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*1E3)/SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
+   constant TEMP_TRIG_PERIOD_FACTOR                      : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*TEMP_TRIG_PERIOD_US)/1000);
    
    --------------------------------------------
    --  modes diag
@@ -74,14 +89,8 @@ package Proxy_define is
    constant PIX_RES_14B              : std_logic_vector(1 downto 0) := "01";
    constant PIX_RES_13B              : std_logic_vector(1 downto 0) := "10";
    constant FPA_INT_FBK_AVAILABLE        : std_logic := '1';
-   constant FSYNC_HIGH_TIME_US       : integer := 5;     -- duree de FSYNC en usec
-   constant POWER_WAIT_US            : integer := 2_000_000;  -- duree d'attente après allumage en usec. selon la doc, le proxy prend 1 sec. Pour plus de securité, j'en mets 2
-   constant TEMP_TRIG_PERIOD_US      : integer := 1_000_000;  -- le trig de lecture de la temperature a une periode de 1sec pour ne pas submerger le proxy
    
-   -- commandes
-   constant CMD_OVERHEAD_BYTES_NUM   : integer := 6; -- nombre de bytes de l'overhead (header, CommandID, length, Checksum)
-   constant LONGEST_CMD_BYTES_NUM    : integer := 32; -- longueur maximale en byte de la config d'un scd_proxy2 (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
-   constant SERIAL_BAUD_RATE         : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
+   -- cmd
    constant COM_RESP_HDER            : std_logic_vector(7 downto 0)  := x"55";
    constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
    constant CMD_HDER                 : std_logic_vector(7 downto 0)  := x"AA";
@@ -119,22 +128,6 @@ package Proxy_define is
    constant DEFINE_TELOPS_DIAG_CNST               : std_logic_vector(7 downto 0):= x"D1";  -- mode diag constant
    constant DEFINE_TELOPS_DIAG_DEGR               : std_logic_vector(7 downto 0):= x"D2";  -- mode diag degradé pour la prod
    constant DEFINE_TELOPS_DIAG_DEGR_DYN           : std_logic_vector(7 downto 0):= x"D3";  -- mode diag degradé dynamique pour FAU
-   
-   
-   ----------------------------------------------
-   -- Calculs 
-   ---------------------------------------------- 
-   constant FSYNC_HIGH_TIME_FACTOR     : integer := integer(FPA_INTF_CLK_RATE_MHZ*FSYNC_HIGH_TIME_US);
-   constant POWER_WAIT_FACTOR          : integer := integer(FPA_INTF_CLK_RATE_MHZ*POWER_WAIT_US);
-   constant SERIAL_TX_CLK_FACTOR       : integer := integer((FPA_INTF_CLK_RATE_MHZ*1E6)/SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
-   constant OP_INT_TIME_DEFAULT_FACTOR : integer := integer(real(MASTER_CLK_RATE_MHZ)*(0.5*real(INT_TIME_MIN_US))); --
-   constant TEMP_TRIG_PERIOD_FACTOR    : integer := integer(FPA_INTF_CLK_RATE_MHZ*TEMP_TRIG_PERIOD_US);
-   
-   constant EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de EXP_TIME_CONV_DENOMINATOR  
-   constant EXP_TIME_CONV_DENOMINATOR  : integer := 2**EXP_TIME_CONV_DENOMINATOR_BIT_POS;
-   constant EXP_TIME_CONV_NUMERATOR    : unsigned(EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned((4*(2**EXP_TIME_CONV_DENOMINATOR_BIT_POS))/5, EXP_TIME_CONV_DENOMINATOR_BIT_POS);     -- (80 x 2^26 )/100
-    
-   
    
    ---------------------------------------------------------------------------------								
    -- Configuration regroupant les éléments vraiment propres au détecteur
@@ -219,8 +212,9 @@ package Proxy_define is
       frame_dly_cst        : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = a*int + frame_dly_cst
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
-      int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
-      real_mode_active_pixel_dly : unsigned(15 downto 0);
+      int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
+      real_mode_active_pixel_dly     : unsigned(15 downto 0);
+      additional_fpa_int_time_offset : signed(31 downto 0);
    end record;    
    
    ----------------------------------------------								
