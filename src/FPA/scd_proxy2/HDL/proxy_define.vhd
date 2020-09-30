@@ -198,23 +198,27 @@ package Proxy_define is
    type fpa_intf_cfg_type is
    record 
       
-      cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet id permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
-      comn                 : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
+      cmd_to_update_id               : std_logic_vector(15 downto 0); -- cet id permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
+      comn                           : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
       
       -- les cmds proxy et fpa
-      op                   : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
-      int                  : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
-      temp                 : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
+      op                             : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
+      int                            : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
+      temp                           : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
       
       --- cmd telops
-      itr                  : std_logic;
-      diag                 : diag_cfg_type;   -- 
-      frame_dly_cst        : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = a*int + frame_dly_cst
-      fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
-      fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      diag                           : diag_cfg_type;   -- 
+      frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = a*int + frame_dly_cst
+      additional_fpa_int_time_offset : signed(31 downto 0);
+      itr                            : std_logic;
       int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       real_mode_active_pixel_dly     : unsigned(15 downto 0);
-      additional_fpa_int_time_offset : signed(31 downto 0);
+      
+      -- ne provient pas du MB
+      fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      
+      
    end record;    
    
    ----------------------------------------------								

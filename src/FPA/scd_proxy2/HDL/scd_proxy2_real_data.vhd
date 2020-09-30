@@ -229,23 +229,23 @@ begin
             -- les sorties
             --------------------------------------------------------
             dout_dval_o          <= din_pipe_i(4).dval or (fval_last and not dout_fval_o);           -- wr_en des fifos en ava. On ecrit aussi la tombée de fval pour que le système en avl le remarque  
-            dout_fval_o          <= fval_pipe(4);                 -- fval          
-            dout_o(55 downto 0)  <= din_pipe_i(4).data;           -- données écrites en aval           
-            dout_o(56)           <= din_pipe_i(4).sol ;           -- aoi_sol                              
-            dout_o(57)           <= din_pipe_i(4).eol;            -- aoi_eol       
-            dout_o(58)           <= fval_pipe(4);         
-            dout_o(59)           <= din_pipe_i(4).sof;            -- aoi_sof
-            dout_o(60)           <= din_pipe_i(4).eof;            -- aoi_eof 
-            dout_o(61)           <= din_pipe_i(4).dval;           -- aoi_dval    (nouvel ajout) 
-            dout_o(62)           <= acq_data_i;                   -- requis pour savoir si image à rejeter ou non
-            dout_o(76 downto 63) <= (others => '0');              -- aoi_spares  (nouvel ajout)                                                                                
+            dout_fval_o          <= fval_pipe(4);                                   -- fval          
+            dout_o(55 downto 0)  <= din_pipe_i(4).data;                             -- données écrites en aval           
+            dout_o(56)           <= din_pipe_i(4).sol ;                             -- aoi_sol                              
+            dout_o(57)           <= din_pipe_i(4).eol;                              -- aoi_eol       
+            dout_o(58)           <= fval_pipe(4);                                   
+            dout_o(59)           <= din_pipe_i(4).sof;                              -- aoi_sof
+            dout_o(60)           <= din_pipe_i(4).eof;                              -- aoi_eof 
+            dout_o(61)           <= din_pipe_i(4).dval and lval_pipe(4);            -- aoi_dval    (nouvel ajout) 
+            dout_o(62)           <= acq_data_i;                                     -- requis pour savoir si image à rejeter ou non
+            dout_o(76 downto 63) <= (others => '0');                                -- aoi_spares  (nouvel ajout)                                                                                
             
-            dout_o(77)           <= '0';                          -- naoi_dval    
-            dout_o(78)           <= '0';                          -- naoi_start
-            dout_o(79)           <= '0';                          -- naoi_stop            
-            dout_o(81 downto 80) <= (others => '0');              -- naoi_ref_valid
-            dout_o(94 downto 82) <= (others => '0');              -- naoi_spares
-            dout_o(95)           <= '0';                          -- non utilisé
+            dout_o(77)           <= '0';                                            -- naoi_dval    
+            dout_o(78)           <= '0';                                            -- naoi_start
+            dout_o(79)           <= '0';                                            -- naoi_stop            
+            dout_o(81 downto 80) <= (others => '0');                                -- naoi_ref_valid
+            dout_o(94 downto 82) <= (others => '0');                                -- naoi_spares
+            dout_o(95)           <= '0';                                            -- non utilisé
             
             -----------------------------------------------
             -- RAZ
