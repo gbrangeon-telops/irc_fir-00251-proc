@@ -52,6 +52,7 @@ package FPA_define is
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 5_000.0;   --
    constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real      := 2.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : real      := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
    
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := 800; 
    

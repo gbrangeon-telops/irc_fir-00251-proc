@@ -40,6 +40,7 @@ package FPA_define is
    constant DEFINE_FPA_PIX_PER_MCLK_PER_TAP       : natural   := 1;        -- 1 pixels par coup d'horloge pour le scorpioMW
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 18_000;       -- 10_000 => MCLK = 10M, 15_000 => MCLK = 15M, 18_000 => MCLK = 18M, 
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : integer   := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
    
    -- integration, offset d'integration,  feddeback
    constant DEFINE_FPA_INT_TIME_OFFSET_nS         : natural   := integer(real(3076)*real(1_000_000)/real(DEFINE_FPA_MCLK_RATE_KHZ));     --  3076 MCLK en ns et en fonction de la frequence d'horloge detecteur

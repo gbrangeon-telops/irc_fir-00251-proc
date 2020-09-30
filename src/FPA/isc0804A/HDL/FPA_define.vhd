@@ -54,6 +54,7 @@ package FPA_define is
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 11_111.0; -- 12_125.0; --11_880.0; -- 11_111.0;    
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : real      := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
    
    -- integration, offset d'integration,  feedback
    constant DEFINE_GENERATE_INT_FDBK_MODULE       : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START

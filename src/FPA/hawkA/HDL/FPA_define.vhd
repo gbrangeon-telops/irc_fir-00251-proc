@@ -58,6 +58,7 @@ package FPA_define is
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 10_000.0;       -- pour le hawk, c'est fixé à 510 MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : real      := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration 
    
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 3;            -- pour le Hawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;        -- not used

@@ -35,6 +35,8 @@ package Proxy_define is
    constant MASTER_CLK_RATE_MHZ          : integer := 70;      --
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
    constant DEFINE_FPA_100M_CLK_RATE_KHZ : integer := 100_000;
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : integer   := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
+
    
    ----------------------------------------------
    -- calculs 
@@ -42,7 +44,6 @@ package Proxy_define is
    -- attention aux modifs à apporter aux lignes des calculs
    constant DEFINE_DIAG_DATA_INC         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
    constant DEFINE_FPA_TAP_NUMBER        : integer :=  PROXY_CLINK_CHANNEL_NUM;
-   constant DEFINE_DIAG_CLK_RATE_MAX_KHZ : integer := DEFINE_FPA_MCLK_RATE_KHZ;    		   -- vitesse max de l'horloge de sortie des pixels en mode diag 
    constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 1_000_000.0/real(DEFINE_FPA_MCLK_RATE_KHZ);      	-- CLINK IN est à 70 MHz ns 
    constant DEFINE_FPA_PCLK_RATE_KHZ     : integer := DEFINE_FPA_MCLK_RATE_KHZ;
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ : integer := DEFINE_FPA_MCLK_RATE_KHZ; 
@@ -101,7 +102,6 @@ package Proxy_define is
    -- partition de la ram de cfg serielle (la partie d'ecriture reservée à la config serielle a une plage d'adresse < 255)
    constant OP_CMD_RAM_BASE_ADD      : integer  := 0;    -- adresse de base où est logée la commande operationnelle en ram
    constant INT_CMD_RAM_BASE_ADD     : integer  := 64;   -- adresse de base où est logée la commande du temps d'integration en ram
-   constant DIAG_CMD_RAM_BASE_ADD    : integer  := 128;
    constant TEMP_CMD_RAM_BASE_ADD    : integer  := 192;
    
    -- adresse de base de la zone securisée
@@ -133,8 +133,7 @@ package Proxy_define is
    constant EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de EXP_TIME_CONV_DENOMINATOR  
    constant EXP_TIME_CONV_DENOMINATOR  : integer := 2**EXP_TIME_CONV_DENOMINATOR_BIT_POS;
    constant EXP_TIME_CONV_NUMERATOR    : unsigned(EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned((4*(2**EXP_TIME_CONV_DENOMINATOR_BIT_POS))/5, EXP_TIME_CONV_DENOMINATOR_BIT_POS);     -- (80 x 2^26 )/100
-   constant DEFINE_DIAG_DATA_CLK_FACTOR    : integer := integer(ceil(real(FPA_INTF_CLK_RATE_MHZ * 1000) / real(DEFINE_DIAG_CLK_RATE_MAX_KHZ)));  
-   
+    
    
    
    ---------------------------------------------------------------------------------								

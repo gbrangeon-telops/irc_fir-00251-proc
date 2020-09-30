@@ -60,6 +60,8 @@ package FPA_define is
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
    constant DEFINE_FPA_MCLK_RATE_KHZ              : integer   := 10_000;       -- pour le superHawk, c'est fixé à 5MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
+   constant DEFINE_FPA_INTCLK_RATE_KHZ            : integer   := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
+
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP     : integer   := 2;            -- pour le suphawk, on doit laisser 3 images dès qu'on reprogramme le détecteur
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer   := DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP;        -- not used
    constant DEFINE_XSIZE_MAX                      : integer   := 1280;          -- dimension en X maximale
