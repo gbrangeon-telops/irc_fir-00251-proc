@@ -258,13 +258,14 @@ begin
                         when X"6C" =>    mb_struct_cfg.diag.ysize                       <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));
                         when X"70" =>    mb_struct_cfg.diag.xsize_div_tapnum            <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));
                         when X"74" =>    mb_struct_cfg.diag.lovh_mclk_source            <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
-                        when X"78" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
+                        when X"78" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0));
                         when X"7C" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
                         when X"80" =>    mb_struct_cfg.itr                              <= data_i(0);
-                        
-                     
+                        when X"84" =>    mb_struct_cfg.int_time                         <= unsigned(data_i(mb_struct_cfg.int_time'length-1 downto 0));
+                        when X"88" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
+                                             
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"80" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
+                        when X"8C" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
                         -- trig lecture de temperature(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
