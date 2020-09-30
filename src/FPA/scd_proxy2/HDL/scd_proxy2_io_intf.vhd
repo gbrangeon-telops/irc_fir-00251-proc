@@ -25,7 +25,7 @@ use IEEE.vital_timing.all;
 entity scd_proxy2_io_intf is
    port(
       
-      CLK_100M      : in std_logic;
+      CLK           : in std_logic;
       ARESET        : in std_logic;     
       
       -- hw_driver side
@@ -141,7 +141,7 @@ begin
    
    -- Sync reset 
    U1 : sync_reset
-   port map(ARESET => ARESET, CLK => CLK_100M, SRESET => sreset); 
+   port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
    
    -- sortie du trig vers proxy
    proxy_trig_i <= PROXY_TRIG;
@@ -210,9 +210,9 @@ begin
       );
    
    -- gestion de l'allumage du proxy (process indépendant)   
-   U10: process(CLK_100M)
+   U10: process(CLK)
    begin
-      if rising_edge(CLK_100M) then
+      if rising_edge(CLK) then
          if sreset = '1' then
             DET_FPA_ON <= '0';
          else
@@ -222,9 +222,9 @@ begin
    end process;               
    
    -- generation du proxy trig avec durée specifiée   
-   U11: process(CLK_100M)
+   U11: process(CLK)
    begin
-      if rising_edge(CLK_100M) then
+      if rising_edge(CLK) then
          if sreset = '1' then
             proxy_trig_o <= '0';
             cnt <=  (others => '0');
@@ -255,9 +255,9 @@ begin
    end process;    
    
    -- gestion du signal RDY
-   U12: process(CLK_100M)
+   U12: process(CLK)
    begin
-      if rising_edge(CLK_100M) then
+      if rising_edge(CLK) then
          if sreset = '1' then
             timer_cnt <= (others => '0');
             proxy_powered_o <= '0';

@@ -209,8 +209,7 @@ begin
             -- config entrante synchronisé sur l'horloge local
             new_cfg.op   <= USER_CFG.OP;   
             new_cfg.int  <= USER_CFG.INT;   
-            new_cfg.temp <= USER_CFG.TEMP; 
-            new_cfg.misc <= USER_CFG.MISC; 
+            new_cfg.temp <= USER_CFG.TEMP;  
             
             --fpa_new_cfg_pending <= not user_cfg_in_progress_i; 
             
@@ -481,7 +480,7 @@ begin
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.op <= fpa_ser_cfg_to_update.op;
                   fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.op.ysize;
-                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.op.xsize / PROXY_CLINK_CHANNEL_NUM;
+                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.op.xsize / PROXY_CHANNEL_LINK_NUM;
                   present_cfg.op <= fpa_ser_cfg_to_update.op;
                   -- present_cfg.int.int_time <= to_unsigned(OP_INT_TIME_DEFAULT_FACTOR, present_cfg.int.int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
                   proxy_static_done <= '1';
@@ -500,7 +499,6 @@ begin
                
                when pause_st1 =>                                -- fait expres pour donner du temps à new_cfg_pending de tomber
                   fpa_intf_cfg_i.comn <= fpa_ser_cfg_to_update.comn;
-                  fpa_intf_cfg_i.misc <= fpa_ser_cfg_to_update.misc;
                   cfg_updater_fsm <= idle;
                
                when others =>
@@ -576,7 +574,7 @@ begin
                   end if;
                
                when diag_int_dly_st => 
-                  if cnt >= fpa_intf_cfg_i.misc.fig1_or_fig2_t4_dly then    -- FPA_INTF_CFG.fpa_fig1_or_fig2_t4_dly est le delai T4 sur les figures 1 et 2 du document Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD
+                  if cnt >= 0  then    -- FPA_INTF_CFG.fpa_fig1_or_fig2_t4_dly est le delai T4 sur les figures 1 et 2 du document Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD
                      int_gen_fsm <= diag_exp_rst_cnt_st;
                   else                        
                      cnt <= cnt + 1;                
@@ -592,10 +590,9 @@ begin
                      acq_int_i <= acq_frame;  
                   else
                      acq_int_i <= acq_frame and PROXY_RDY; 
-                  end if;
+                  end if;                  
                   
-                  
-                  if cnt >= fpa_intf_cfg_i.int.diag_int_time then    -- 
+                  if cnt >= fpa_intf_cfg_i.int.int_time then    -- 
                      int_gen_fsm <= idle;
                   else                        
                      cnt <= cnt + 1;                

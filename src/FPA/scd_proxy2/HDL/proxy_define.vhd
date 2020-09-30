@@ -64,7 +64,7 @@ package Proxy_define is
    constant POWER_WAIT_FACTOR                            : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*POWER_WAIT_US)/1000);
    constant SERIAL_TX_CLK_FACTOR                         : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*1E3)/SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
    constant TEMP_TRIG_PERIOD_FACTOR                      : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*TEMP_TRIG_PERIOD_US)/1000);
-   
+   constant DEFINE_FPA_MCLK_SOURCE_RATE_HZ               : integer := 1000*DEFINE_FPA_MCLK_SOURCE_RATE_KHZ; 
    --------------------------------------------
    --  modes diag
    --------------------------------------------

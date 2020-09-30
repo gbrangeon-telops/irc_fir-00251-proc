@@ -56,6 +56,7 @@ acom -incr -nowarn DAGGEN_0523 \
 
 # sources scd_proxy2_data_ctrl 
 acom -incr -nowarn DAGGEN_0523 \
+ d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_real_data.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_bridge.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_line_mux.vhd \
@@ -65,15 +66,14 @@ acom -incr -nowarn DAGGEN_0523 \
 # sources scd_proxy2_hw_driver
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\dfpa_cfg_dpram.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_prog_ctrler.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_serial_module.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_hw_driver.bde
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_prog_ctrler.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_serial_com.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_hw_driver.bde
 
 # top level intf
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_mblaze_intf.vhd \
- D:\Telops\FIR-00251-Common\VHDL\Utilities\axis_32_to_64_wrap.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mblaze_intf.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_clocks.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_io_interface.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
- d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2_proxy\HDL\scd_proxy2_proxy_intf.bde
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_io_intf.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_intf.bde
