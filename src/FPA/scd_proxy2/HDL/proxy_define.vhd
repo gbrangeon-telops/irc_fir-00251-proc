@@ -139,6 +139,7 @@ package Proxy_define is
       int_dly          : unsigned(19 downto 0);            -- delay avant debut de integration. Delai entre Fsync et le debut du signal d'integration
       int_indx         : std_logic_vector(7 downto 0);                    
       frame_dly		  : unsigned(19 downto 0);        	  -- delay entre Fsync et le debut du readout. frame_dly = a*int + frame_dly_cst 
+      int_dval         : std_logic;
    end record;
    
    -- scd_proxy2 operationnelle
@@ -208,12 +209,13 @@ package Proxy_define is
       
       --- cmd telops
       diag                           : diag_cfg_type;   -- 
-      frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = a*int + frame_dly_cst
+      frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = int + frame_dly_cst
+      int_dly_cst                    : unsigned(19 downto 0);   -- valeur constante en provenance du MB pour le compte de int_dly
       additional_fpa_int_time_offset : signed(31 downto 0);
       itr                            : std_logic;
       int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       real_mode_active_pixel_dly     : unsigned(15 downto 0);
-      
+            
       -- ne provient pas du MB
       fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
