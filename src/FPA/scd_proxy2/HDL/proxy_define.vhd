@@ -95,19 +95,6 @@ package Proxy_define is
    constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
    constant CMD_HDER                 : std_logic_vector(7 downto 0)  := x"AA";
    
-   -- serial int time cmd
-   constant INT_CMD_ID               : std_logic_vector(15 downto 0) := x"8001";
-   constant INT_CMD_DLEN             : std_logic_vector(15 downto 0) := x"0006";
-   
-   -- serial operational cmd
-   constant OP_CMD_ID                : std_logic_vector(15 downto 0) := x"8002";
-   
-   -- serial diag cmd                                                        
-   constant DIAG_CMD_ID              : std_logic_vector(15 downto 0) := x"8004";
-   
-   -- serial temperature read cmd
-   constant TEMP_CMD_ID              : std_logic_vector(15 downto 0) := x"8021";
-   
    -- partition de la ram de cfg serielle (la partie d'ecriture reservée à la config serielle a une plage d'adresse < 255)
    constant OP_CMD_RAM_BASE_ADD      : integer  := 0;    -- adresse de base où est logée la commande operationnelle en ram
    constant INT_CMD_RAM_BASE_ADD     : integer  := 64;   -- adresse de base où est logée la commande du temps d'integration en ram
@@ -207,7 +194,7 @@ package Proxy_define is
       int                            : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
       temp                           : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
       
-      --- cmd telops
+      --- misc
       diag                           : diag_cfg_type;   -- 
       frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = int + frame_dly_cst
       int_dly_cst                    : unsigned(19 downto 0);   -- valeur constante en provenance du MB pour le compte de int_dly
@@ -215,11 +202,16 @@ package Proxy_define is
       itr                            : std_logic;
       int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       real_mode_active_pixel_dly     : unsigned(15 downto 0);
-            
-      -- ne provient pas du MB
+      
+      cmd_hder                       : std_logic_vector(7 downto 0);
+      int_cmd_id                     : std_logic_vector(15 downto 0);
+      int_cmd_dlen                   : std_logic_vector(15 downto 0);
+      int_cmd_offs_add               : std_logic_vector(7 downto 0);    
       fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       
+      op_cmd_id                      : std_logic_vector(15 downto 0);
+      temp_cmd_id                    : std_logic_vector(15 downto 0);      
       
    end record;    
    

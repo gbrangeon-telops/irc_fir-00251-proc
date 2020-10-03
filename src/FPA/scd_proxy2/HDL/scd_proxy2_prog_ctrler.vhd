@@ -128,7 +128,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    -- -- attribute dont_touch of int_indx_i           : signal is "true"; 
    
 begin
-                      
+   
    
    -------------------------------------------------
    -- mappings                                                   
@@ -145,7 +145,7 @@ begin
    RST_CLINK_N <= reset_clink_n;
    INT_TIME <= int_time_i;
    
-                  
+   
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err;
    FPA_DRIVER_STAT(7) <= '0'; 
@@ -198,7 +198,7 @@ begin
             user_cfg_in_progress_i <= '0';
             user_cfg_in_progress_last <= '0';
             new_cfg_pending_fsm <= check_cfg_st1;
-			need_prog_rqst <= '0'; 
+            need_prog_rqst <= '0'; 
             
          else 
             
@@ -239,40 +239,40 @@ begin
                   end if;				  
                
                when new_op_cfg_st =>
-                  new_cfg_id <= OP_CMD_ID(7 downto 0);     -- les 7 derniers bits suffisent largement
+                  new_cfg_id <= USER_CFG.OP_CMD_ID(7 downto 0);     -- les 7 derniers bits suffisent largement
                   cfg_ram_base_add <= to_unsigned(OP_CMD_RAM_BASE_ADD, 8);
-				  need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
+                  need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
                when new_int_cfg_st =>
-                  new_cfg_id <= INT_CMD_ID(7 downto 0);
+                  new_cfg_id <= USER_CFG.INT_CMD_ID(7 downto 0);
                   cfg_ram_base_add <= to_unsigned(INT_CMD_RAM_BASE_ADD, 8);
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				    -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
-				  if user_cfg_in_progress_i = '1' then 
+                  if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
                when new_temp_cfg_st =>
-                  new_cfg_id <= TEMP_CMD_ID(7 downto 0);
+                  new_cfg_id <= USER_CFG.TEMP_CMD_ID(7 downto 0);
                   cfg_ram_base_add <= to_unsigned(TEMP_CMD_RAM_BASE_ADD, 8);
                   fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
-				  if user_cfg_in_progress_i = '1' then 
+                  if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
@@ -329,10 +329,10 @@ begin
                   fpa_driver_seq_err <= '0';
                   if SERIAL_DONE = '1' and fpa_new_cfg_pending = '1' and PROXY_POWERED = '1' then  -- ne jamais ajouter PROXY_RDY dans les conditions
                      if need_prog_rqst = '1' then
-					    driver_seq_fsm <= fpa_prog_rqst_st;
-					 else
-					    driver_seq_fsm <= fpa_prog_en_st;
-					 end if;
+                        driver_seq_fsm <= fpa_prog_rqst_st;
+                     else
+                        driver_seq_fsm <= fpa_prog_en_st;
+                     end if;
                   end if;               
                
                when fpa_prog_rqst_st =>              -- demande pour programmer le fpa. Elle se soldera par l'arrêt du contrôleur de trig
@@ -425,7 +425,7 @@ begin
             
             -- ENO 14 juillet 2016: requis pour supporter instabilités de la roue à filtre. Mettre à jour même si détecteur n'est pas reprogrammé
             fpa_intf_cfg_i.comn.fpa_stretch_acq_trig <= USER_CFG.comn.fpa_stretch_acq_trig;
-   
+            
             case  cfg_updater_fsm is 
                
                when idle =>
@@ -452,7 +452,7 @@ begin
                
                when wait_trig_st =>
                   cfg_updater_done <= '0';
-                  if cfg_id_i = TEMP_CMD_ID(7 downto 0) then -- pas besoin de trig poour lea temperature. Ainsi on l'aura même en mode trig externe
+                  if cfg_id_i = USER_CFG.TEMP_CMD_ID(7 downto 0) then -- pas besoin de trig poour lea temperature. Ainsi on l'aura même en mode trig externe
                      cfg_updater_fsm <= check_cfg_st3; 
                   else
                      --if ACQ_TRIG = '1' or XTRA_TRIG = '1' then  -- la config est normalement valide au prochain trig. 
@@ -461,14 +461,14 @@ begin
                   end if;
                
                when check_cfg_st1 =>                           -- cet état est crée juste pour ameliorer timing
-                  if cfg_id_i = OP_CMD_ID(7 downto 0) then
+                  if cfg_id_i = USER_CFG.OP_CMD_ID(7 downto 0) then
                      cfg_updater_fsm <= output_op_cfg_st;
                   else
                      cfg_updater_fsm <= check_cfg_st2;
                   end if;
                
                when check_cfg_st2 =>                           -- cet état est crée juste pour ameliorer timing
-                  if cfg_id_i = INT_CMD_ID(7 downto 0) then
+                  if cfg_id_i = USER_CFG.INT_CMD_ID(7 downto 0) then
                      cfg_updater_fsm <= output_int_cfg_st;
                   else
                      cfg_updater_fsm <= check_cfg_st3;
@@ -479,8 +479,6 @@ begin
                
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.op <= fpa_ser_cfg_to_update.op;
-                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.op.ysize;
-                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.op.xsize / PROXY_CHANNEL_LINK_NUM;
                   present_cfg.op <= fpa_ser_cfg_to_update.op;
                   -- present_cfg.int.int_time <= to_unsigned(OP_INT_TIME_DEFAULT_FACTOR, present_cfg.int.int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
                   proxy_static_done <= '1';
@@ -488,7 +486,7 @@ begin
                
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.int <= fpa_ser_cfg_to_update.int;
-				  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.int.int_time, 32);
+                  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.int.int_time, 32);
                   present_cfg.int <= fpa_ser_cfg_to_update.int;  
                   cfg_updater_fsm <= pause_st1;
                
@@ -597,7 +595,7 @@ begin
                   else                        
                      cnt <= cnt + 1;                
                   end if;
-
+                  
                
                when others =>
                

@@ -107,12 +107,14 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal exp_ser_cfg_data                : std_logic_vector(7 downto 0);
    signal exp_ser_cfg_dval                : std_logic;
    signal exp_struct_cfg_valid            : std_logic;
-   -- signal exp_time_i                      : unsigned(USER_CFG.INT.INT_TIME'LENGTH-1 downto 0); -- en coups d'horloge de 100Mhz. Comme scd_proxy2_exp_time_i tient sur 24 bits alors (2^24-1)*12.5/10 tiendra sur 25 bits
    signal exp_indx_i                      : std_logic_vector(7 downto 0);
    signal exp_checksum                    : unsigned(7 downto 0);
    signal int_signal_high_time_i          : unsigned(31 downto 0);
    signal int_indx_pipe                   : int_indx_pipe_type;
    signal int_dval_pipe                   : std_logic_vector(7 downto 0) := (others => '0');
+   signal at_least_one_mb_cfg_received    : std_logic;
+   signal mb_ctrled_reset_i               : std_logic;
+   signal valid_cfg_received              : std_logic;
    
    
    
@@ -233,7 +235,6 @@ begin
                         when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
                         when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
                         when X"20" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
-                        when X"20" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
                            
                         -- op
                         when X"24" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
@@ -263,12 +264,19 @@ begin
                         when X"80" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
                         when X"84" =>    mb_struct_cfg.itr                              <= data_i(0);
                         when X"88" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
-                        when X"8C" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
-                           
-                           
-                           
+                        
+                        when X"8C" =>    mb_struct_cfg.cmd_hder                         <= data_i(mb_struct_cfg.cmd_hder'length-1 downto 0);
+                        when X"90" =>    mb_struct_cfg.int_cmd_id                       <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);
+                        when X"94" =>    mb_struct_cfg.int_cmd_dlen                     <= data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0);
+                        when X"98" =>    mb_struct_cfg.int_cmd_offs_add                 <= data_i(mb_struct_cfg.int_cmd_offs_add'length-1 downto 0);
+                        when X"9C" =>    mb_struct_cfg.fpa_serdes_lval_num              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
+                        when X"A0" =>    mb_struct_cfg.fpa_serdes_lval_len              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
+                        
+                        when X"A4" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
+                        when X"A8" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);
+                        
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"90" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
+                        when X"AC" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                            
                         -- trig lecture de temperature(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
@@ -359,7 +367,7 @@ begin
                   elsif byte_cnt = 3  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_id(15 downto 8);        -- scd_proxy2 exp_time CMD ID                  
                   elsif byte_cnt = 4  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_dlen(7 downto 0);       -- scd_proxy2 exp_time data length                  
                   elsif byte_cnt = 5  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_dlen(15 downto 8);      -- scd_proxy2 exp_time data length 
-                  elsif byte_cnt = 6  then exp_ser_cfg_data <= mb_struct_cfg.int_ofs_add(7 downto 0);        -- scd_proxy2 exp_time offset add 
+                  elsif byte_cnt = 6  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_offs_add(7 downto 0);        -- scd_proxy2 exp_time offset add 
                      
                      -- frame_dly
                   elsif byte_cnt = 6  then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.frame_dly(7 downto 0));             -- exp_time en coups de 80MHz       
@@ -372,9 +380,9 @@ begin
                   elsif byte_cnt = 11 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_cfg_latch.int_dly(19 downto 16)); 
                      
                      -- int_time   
-                  elsif byte_cnt = 12  then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_time(7 downto 0));             -- exp_time en coups de 80MHz       
-                  elsif byte_cnt = 13  then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_time(15 downto 8));            -- exp_time en coups de 80MHz  
-                  elsif byte_cnt = 14  then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_cfg_latch.int_time(19 downto 16));           -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 12 then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_time(7 downto 0));             -- exp_time en coups de 80MHz       
+                  elsif byte_cnt = 13 then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_time(15 downto 8));            -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 14 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_cfg_latch.int_time(19 downto 16));           -- exp_time en coups de 80MHz  
                   elsif byte_cnt = 18 then                                                         -- checksum 
                      exp_ser_cfg_data <= std_logic_vector(unsigned(not std_logic_vector(exp_checksum)) + 1); -- le fait qu'il y ait des zeros entre byte8 et byte12 donne le temps au cheksum d'etre prêt avant le byte 12 
                      exp_cfg_gen_fsm <= struct_exp_cfg_st; 
@@ -457,7 +465,8 @@ begin
                   user_cfg_int <= user_cfg_i.int;       -- sauvegarde du présent temps d'exposition
                   if mb_cfg_serial_in_progress = '0' and mb_cfg_serial_in_progress_last = '1' then -- fin de la comm serielle  
                      user_cfg_i  <= mb_struct_cfg;       -- partie structurale envoyée en fin de com serielle
-                     user_cfg_i.int  <= user_cfg_int;  -- ainsi, on préserve le temps d'exposition
+                     user_cfg_i.int  <= user_cfg_int;    -- ainsi, on préserve le temps d'exposition
+                     user_cfg_i.int_time  <= user_cfg_int.int_time;
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
                
@@ -474,6 +483,7 @@ begin
                   ser_cfg_dval_i <= exp_ser_cfg_dval;
                   if exp_struct_cfg_valid = '1' then
                      user_cfg_i.int <= exp_cfg_latch; -- partie structurale envoyée en fin de com serielle
+                     user_cfg_i.int_time  <= user_cfg_int.int_time;
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;

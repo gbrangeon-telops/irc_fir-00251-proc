@@ -24,6 +24,8 @@ entity scd_proxy2_serial_com is
       ARESETN               : in std_logic;
       CLK                   : in std_logic;
       
+      USER_CFG              : fpa_intf_cfg_type;
+      
       -- interface avec le contrôleur
       SERIAL_BASE_ADD       : in std_logic_vector(7 downto 0);
       SERIAL_FATAL_ERR      : out std_logic;
@@ -741,7 +743,7 @@ begin
                            failure_resp_data(kk) <= resp_data(kk);
                         end loop;
                         cmd_resp_fsm <= wait_resp_hder_st;
-                     elsif resp_id = TEMP_CMD_ID then
+                     elsif resp_id = USER_CFG.TEMP_CMD_ID then
                         proxy_serial_err <= '0'; 
                         cmd_resp_fsm <= fpa_temp_resp_st;
                      else
