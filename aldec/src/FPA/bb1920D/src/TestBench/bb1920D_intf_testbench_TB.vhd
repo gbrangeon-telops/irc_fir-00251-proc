@@ -5,16 +5,16 @@ use work.fpa_common_pkg.all;
 library ieee;
 use ieee.NUMERIC_STD.all;
 use ieee.std_logic_1164.all;
-use work.isc0804A_intf_testbench_pkg.all;
+use work.BB1920D_intf_testbench_pkg.all;
 
 -- Add your library and packages declaration here ...
 
-entity isc0804A_intf_testbench_tb is
-end isc0804A_intf_testbench_tb;
+entity BB1920D_intf_testbench_tb is
+end BB1920D_intf_testbench_tb;
 
-architecture TB_ARCHITECTURE of isc0804A_intf_testbench_tb is
+architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    -- Component declaration of the tested unit
-   component isc0804A_intf_testbench
+   component BB1920D_intf_testbench
       port(
          ACQ_TRIG : in STD_LOGIC;
          ARESET : in STD_LOGIC;
@@ -417,7 +417,7 @@ begin
    end process ublaze_sim;   
    
    -- Unit Under Test port map
-   UUT : isc0804A_intf_testbench
+   UUT : BB1920D_intf_testbench
    port map (
       ACQ_TRIG => ACQ_TRIG,
       ARESET => ARESET,
@@ -457,11 +457,11 @@ begin
    
 end TB_ARCHITECTURE;
 
-configuration TESTBENCH_FOR_isc0804A_intf_testbench of isc0804A_intf_testbench_tb is
+configuration TESTBENCH_FOR_BB1920D_intf_testbench of BB1920D_intf_testbench_tb is
    for TB_ARCHITECTURE
-      for UUT : isc0804A_intf_testbench
-         use entity work.isc0804A_intf_testbench(sch);
+      for UUT : BB1920D_intf_testbench
+         use entity work.BB1920D_intf_testbench(sch);
       end for;
    end for;
-end TESTBENCH_FOR_isc0804A_intf_testbench;
+end TESTBENCH_FOR_BB1920D_intf_testbench;
 
