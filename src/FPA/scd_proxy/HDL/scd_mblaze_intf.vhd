@@ -381,11 +381,11 @@ begin
    --    erreur = max(abs(int_time_80MHz_appr - int_time_80MHz)) < 0.5
    
    
-   sgen_pelican_or_hercule : if (DEFINE_FPA_ROIC /= FPA_ROIC_BLACKBIRD1280) generate
+   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
    begin  
       scd_exp_time_numerator_i <= SCD_EXP_TIME_CONV_NUMERATOR;
    end generate;
-   sgen_bb1280 : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280) generate
+   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
    begin  
       scd_exp_time_numerator_i <= unsigned(FPA_INTF_CFG.scd_frame_res.scd_exp_time_conv_numerator);
    end generate;

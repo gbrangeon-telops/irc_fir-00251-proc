@@ -31,7 +31,7 @@ use work.img_header_define.all;
 
 entity scd_data_dispatcher is
    port(
-      
+  
       ARESET            : in std_logic;
       CLK               : in std_logic; 
       
@@ -197,7 +197,7 @@ architecture rtl of scd_data_dispatcher is
    signal mode_fsm                     : mode_fsm_type;
    signal fast_hder_sm                 : fast_hder_sm_type;
    signal pix_out_sm                   : pix_out_sm_type;
-   signal frame_fsm                    : frame_fsm_type;
+   signal frame_fsm                    : frame_fsm_type;      
    signal sreset                       : std_logic;
    signal real_data_mode               : std_logic;
    signal diag_mode_en_i               : std_logic;
@@ -334,40 +334,40 @@ architecture rtl of scd_data_dispatcher is
    signal fpa_trig_pipe                : std_logic_vector(1 downto 0); 
    signal int_fifo_wr_source_i         : std_logic;
       
-  attribute keep                                   : string;
-  attribute keep of mode_fsm                 : signal is "true";
-  attribute keep of fast_hder_sm                : signal is "true";
-  attribute keep of pix_out_sm                    : signal is "true";
-  attribute keep of frame_fsm            : signal is "true"; 
-  attribute keep of acq_hder_fifo_wr                      : signal is "true";
-  attribute keep of acq_hder_fifo_rd                      : signal is "true";
-  attribute keep of acq_hder_fifo_dval                    : signal is "true";                       
-  attribute keep of int_fifo_wr                      : signal is "true";
-  attribute keep of int_fifo_rd                      : signal is "true";
-  attribute keep of int_fifo_dval                    : signal is "true";    
-  attribute keep of diag_ch1_fifo_dval                      : signal is "true";
-  attribute keep of diag_ch2_fifo_dval                      : signal is "true";
-  attribute keep of diag_ch3_fifo_dval                    : signal is "true";  
-  attribute keep of diag_fifo_rd                    : signal is "true";  
-  attribute keep of diag_fifo_dval                    : signal is "true";
-  attribute keep of fpa_fifo_dval                    : signal is "true";
-  attribute keep of fpa_fifo_rd                    : signal is "true";
-  attribute keep of hder_link_rdy                    : signal is "true";
-  attribute keep of diag_mode_en_i                    : signal is "true";
-  attribute keep of readout_i                    : signal is "true";
-  attribute keep of acq_mode                    : signal is "true";
-  attribute keep of acq_mode_first_int                    : signal is "true";
-  attribute keep of nacq_mode_first_int                    : signal is "true"; 
-  attribute keep of diag_header                    : signal is "true";
-  attribute keep of diag_fval                   : signal is "true";
-  attribute keep of diag_lval                   : signal is "true";  
-  attribute keep of diag_dval                   : signal is "true";
-  attribute keep of fpa_header                    : signal is "true";
-  attribute keep of fpa_fval                   : signal is "true";
-  attribute keep of fpa_lval                   : signal is "true";  
-  attribute keep of fpa_dval                   : signal is "true";  
-  attribute keep of int_fifo_wr_source_i                   : signal is "true";
-  attribute keep of pix_mosi_i                   : signal is "true";
+--  attribute keep                                   : string;
+--  attribute keep of mode_fsm                       : signal is "true";
+--  attribute keep of fast_hder_sm                   : signal is "true";
+--  attribute keep of pix_out_sm                     : signal is "true";
+--  attribute keep of frame_fsm                      : signal is "true"; 
+--  attribute keep of acq_hder_fifo_wr               : signal is "true";
+--  attribute keep of acq_hder_fifo_rd               : signal is "true";
+--  attribute keep of acq_hder_fifo_dval             : signal is "true";                       
+--  attribute keep of int_fifo_wr                    : signal is "true";
+--  attribute keep of int_fifo_rd                    : signal is "true";
+--  attribute keep of int_fifo_dval                  : signal is "true";    
+--  attribute keep of diag_ch1_fifo_dval             : signal is "true";
+--  attribute keep of diag_ch2_fifo_dval             : signal is "true";
+--  attribute keep of diag_ch3_fifo_dval             : signal is "true";  
+--  attribute keep of diag_fifo_rd                   : signal is "true";  
+--  attribute keep of diag_fifo_dval                 : signal is "true";
+--  attribute keep of fpa_fifo_dval                  : signal is "true";
+--  attribute keep of fpa_fifo_rd                    : signal is "true";
+--  attribute keep of hder_link_rdy                  : signal is "true";
+--  attribute keep of diag_mode_en_i                 : signal is "true";
+--  attribute keep of readout_i                      : signal is "true";
+--  attribute keep of acq_mode                       : signal is "true";
+--  attribute keep of acq_mode_first_int             : signal is "true";
+--  attribute keep of nacq_mode_first_int            : signal is "true"; 
+--  attribute keep of diag_header                    : signal is "true";
+--  attribute keep of diag_fval                      : signal is "true";
+--  attribute keep of diag_lval                      : signal is "true";  
+--  attribute keep of diag_dval                      : signal is "true";
+--  attribute keep of fpa_header                     : signal is "true";
+--  attribute keep of fpa_fval                       : signal is "true";
+--  attribute keep of fpa_lval                       : signal is "true";  
+--  attribute keep of fpa_dval                       : signal is "true";  
+--  attribute keep of int_fifo_wr_source_i           : signal is "true";
+--  attribute keep of pix_mosi_i                     : signal is "true";
   
  
 begin
@@ -561,8 +561,17 @@ begin
    U1B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => fpa_ch2_fifo_ovfl, CLK => CLK, Q => fpa_ch2_fifo_ovfl_sync);
    U1C: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => fpa_ch3_fifo_ovfl, CLK => CLK, Q => fpa_ch3_fifo_ovfl_sync);
    
-   sgen_pelican_or_hercule : if (DEFINE_FPA_ROIC /= FPA_ROIC_BLACKBIRD1280) generate
+   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
    begin  
+
+      diag_ch3_fifo_dout <= (others => '0');
+      diag_ch3_fifo_dval <= '1';
+      diag_ch3_fifo_ovfl <= '0'; 
+      
+      fpa_ch3_fifo_dout <= (others => '0');
+      fpa_ch3_fifo_dval <= '1';  
+      fpa_ch3_fifo_ovfl <= '0'; 
+      
       pix_mosi32.tvalid <= pix_mosi_i.tvalid;
       pix_mosi32.tdata  <= pix_mosi_i.tdata(31 downto 0);
       pix_mosi32.tstrb  <= pix_mosi_i.tstrb(3 downto 0);
@@ -588,8 +597,48 @@ begin
       int_fifo_wr_source_i <= FPA_INT;
       
    end generate;
-   sgen_bb1280 : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280) generate
-   begin  
+   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
+   begin 
+      
+      --------------------------------------------------
+      -- fifo fwft FPA_CH3_DATA 
+      -------------------------------------------------- 
+      U3C : fwft_afifo_w28_d16
+      port map (
+         rst => FPA_CH3_RST,
+         wr_clk => FPA_CH3_CLK,
+         rd_clk => CLK,
+         din => FPA_CH3_DATA,
+         wr_en => FPA_CH3_DVAL,
+         rd_en => fpa_fifo_rd,
+         dout => fpa_ch3_fifo_dout,
+         valid  => fpa_ch3_fifo_dval,
+         full => open,
+         overflow => fpa_ch3_fifo_ovfl,
+         empty => open,
+         wr_rst_busy => open,
+         rd_rst_busy => open
+      );
+      --------------------------------------------------
+      -- fifo fwft DIAG_CH3_DATA 
+      --------------------------------------------------
+      U4C : fwft_afifo_w28_d16
+      port map (
+         rst => ARESET,
+         wr_clk => FPA_DIAG_CLK, 
+         rd_clk => CLK, 
+         din => DIAG_CH3_DATA,
+         wr_en => DIAG_CH3_DVAL,
+         rd_en => diag_fifo_rd,
+         dout => diag_ch3_fifo_dout,
+         valid  => diag_ch3_fifo_dval,
+         full => open,
+         overflow => diag_ch3_fifo_ovfl,
+         empty => open,
+         wr_rst_busy => open,
+         rd_rst_busy => open
+      );
+      
       PIX_MOSI      <= pix_mosi_i;
       pix_link_rdy  <= PIX_MISO.TREADY; 
       
@@ -649,26 +698,6 @@ begin
       wr_rst_busy => open,
       rd_rst_busy => open
       );
-
-   --------------------------------------------------
-   -- fifo fwft FPA_CH3_DATA 
-   -------------------------------------------------- 
-   U3C : fwft_afifo_w28_d16
-   port map (
-      rst => FPA_CH3_RST,
-      wr_clk => FPA_CH3_CLK,
-      rd_clk => CLK,
-      din => FPA_CH3_DATA,
-      wr_en => FPA_CH3_DVAL,
-      rd_en => fpa_fifo_rd,
-      dout => fpa_ch3_fifo_dout,
-      valid  => fpa_ch3_fifo_dval,
-      full => open,
-      overflow => fpa_ch3_fifo_ovfl,
-      empty => open,
-      wr_rst_busy => open,
-      rd_rst_busy => open
-      );
       
    -------------------------------------------------
    -- fifo fwft DIAG_CH0_DATA 
@@ -705,26 +734,6 @@ begin
       valid  => diag_ch2_fifo_dval,
       full => open,
       overflow => diag_ch2_fifo_ovfl,
-      empty => open,
-      wr_rst_busy => open,
-      rd_rst_busy => open
-      );
-
-   --------------------------------------------------
-   -- fifo fwft DIAG_CH3_DATA 
-   --------------------------------------------------
-   U4C : fwft_afifo_w28_d16
-   port map (
-      rst => ARESET,
-      wr_clk => FPA_DIAG_CLK, 
-      rd_clk => CLK, 
-      din => DIAG_CH3_DATA,
-      wr_en => DIAG_CH3_DVAL,
-      rd_en => diag_fifo_rd,
-      dout => diag_ch3_fifo_dout,
-      valid  => diag_ch3_fifo_dval,
-      full => open,
-      overflow => diag_ch3_fifo_ovfl,
       empty => open,
       wr_rst_busy => open,
       rd_rst_busy => open

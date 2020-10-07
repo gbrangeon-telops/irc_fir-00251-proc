@@ -330,52 +330,66 @@ begin
       DIAG_SOL => open,
       DIAG_EOL => open,   
       DIAG_DONE => open
-      );   
-   --------------------------------------------------
-   -- Pixel 2 data gen 
-   --------------------------------------------------   
-   U3: fpa_diag_line_gen
-   generic map(
-      ANALOG_IDDCA => false,      
-      SAMP_NUM_PER_PIX => 1
-      )
-   port map(
-      CLK => CLK,
-      ARESET => ARESET,
-      LINE_SIZE => line_size_i,
-      START_PULSE => diag_line_gen_en,
-      FIRST_VALUE => pix2_first_value,
-      INCR_VALUE => incr_value,
-      PIX_SAMP_TRIG => pix_samp_trig_i,
-      DIAG_DATA => pix2_diag_data,
-      DIAG_DVAL => pix2_diag_dval,
-      DIAG_SOL => open,
-      DIAG_EOL => open,    
-      DIAG_DONE => open
-      );
+      ); 
+      
+   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
+   begin  
+      pix2_diag_data <= (others => '0');
+      pix2_diag_dval <= '0';
+      pix3_diag_data <= (others => '0');
+      pix3_diag_dval <= '0';
+   end generate;
    
-   --------------------------------------------------
-   -- Pixel 3 data gen 
-   --------------------------------------------------   
-   U4: fpa_diag_line_gen
-   generic map(
-      ANALOG_IDDCA => false,      
-      SAMP_NUM_PER_PIX => 1
-      )
-   port map(
-      CLK => CLK,
-      ARESET => ARESET,
-      LINE_SIZE => line_size_i,
-      START_PULSE => diag_line_gen_en,
-      FIRST_VALUE => pix3_first_value,
-      INCR_VALUE => incr_value,
-      PIX_SAMP_TRIG => pix_samp_trig_i,
-      DIAG_DATA => pix3_diag_data,
-      DIAG_DVAL => pix3_diag_dval,
-      DIAG_SOL => open,
-      DIAG_EOL => open,   
-      DIAG_DONE => open
-      );    
+   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
+   begin 
+      --------------------------------------------------
+      -- Pixel 2 data gen 
+      --------------------------------------------------   
+      U3: fpa_diag_line_gen
+      generic map(
+         ANALOG_IDDCA => false,      
+         SAMP_NUM_PER_PIX => 1
+         )
+      port map(
+         CLK => CLK,
+         ARESET => ARESET,
+         LINE_SIZE => line_size_i,
+         START_PULSE => diag_line_gen_en,
+         FIRST_VALUE => pix2_first_value,
+         INCR_VALUE => incr_value,
+         PIX_SAMP_TRIG => pix_samp_trig_i,
+         DIAG_DATA => pix2_diag_data,
+         DIAG_DVAL => pix2_diag_dval,
+         DIAG_SOL => open,
+         DIAG_EOL => open,    
+         DIAG_DONE => open
+         );
+      
+      --------------------------------------------------
+      -- Pixel 3 data gen 
+      --------------------------------------------------   
+      U4: fpa_diag_line_gen
+      generic map(
+         ANALOG_IDDCA => false,      
+         SAMP_NUM_PER_PIX => 1
+         )
+      port map(
+         CLK => CLK,
+         ARESET => ARESET,
+         LINE_SIZE => line_size_i,
+         START_PULSE => diag_line_gen_en,
+         FIRST_VALUE => pix3_first_value,
+         INCR_VALUE => incr_value,
+         PIX_SAMP_TRIG => pix_samp_trig_i,
+         DIAG_DATA => pix3_diag_data,
+         DIAG_DVAL => pix3_diag_dval,
+         DIAG_SOL => open,
+         DIAG_EOL => open,   
+         DIAG_DONE => open
+         );
+   end generate;   
+   
+    
    -------------------------------------------------------------------
    -- generation des données du mode diag   
    -------------------------------------------------------------------   
@@ -430,7 +444,7 @@ begin
                   fval_i <= '0';
                   diag_line_gen_en <= '0'; 
                   if DIAG_MODE_EN = '1' then 
-                     if DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280  then -- BB1280 only
+                     if IsBlackbird1280D = '1'  then -- BB1280 only
                         if fpa_trig_last = '0' and fpa_trig_i = '1' then   
                            diag_fsm <=  x_to_readout_start_dly_st;              
                         end if;
@@ -482,19 +496,11 @@ begin
                      diag_fsm <=  start_line_gen_st;
                   end if;
                   
-                  if DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280  then -- BB1280
-                     pix0_data_i <= (others => '0');
-                     pix1_data_i <= (others => '0');
-                     pix2_data_i <= (others => '0');
-                     pix3_data_i <= (others => '0');
-                  else -- Pelican/Hercule
-                     pix0_data_i <= (others => '0');
-                     pix1_data_i <= (others => '0'); 
-                     pix2_data_i <= (others => spare);
-                     pix3_data_i <= (others => spare);
+                  pix0_data_i <= (others => '0');
+                  pix1_data_i <= (others => '0');
+                  pix2_data_i <= (others => '0');
+                  pix3_data_i <= (others => '0');
 
-                  end if;
-                  
                when start_line_gen_st =>
                   diag_line_gen_en <= '1';   -- on active le module généateur des données diag
                   line_size_i <= std_logic_vector(resize(FPA_INTF_CFG.SCD_MISC.scd_xsize_div_per_pixel_num, line_size_i'length)); 

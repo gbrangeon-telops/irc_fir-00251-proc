@@ -55,8 +55,6 @@ package blackbird1280D_testbench_pkg is
    
    constant NB_PARAM_CFG              : integer := 33; 
    
-
-   
    type sim_cfg_type is
    record 
       framerate             : real range 1.0 to 10000.0;

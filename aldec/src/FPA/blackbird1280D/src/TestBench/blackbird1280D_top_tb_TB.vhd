@@ -193,8 +193,8 @@ begin
 
       -- Generation de la config initiale
       sim_cfg_i.framerate <= 2000.0; 
-      sim_cfg_i.height <= 256; -- heigth/2
-      sim_cfg_i.width <= 160; -- width/4
+      sim_cfg_i.height <= 4; -- heigth/2
+      sim_cfg_i.width <= 16; -- width/4
       sim_cfg_i.offsety <= 0;
       sim_cfg_i.offsetx <= 0;
       sim_cfg_i.exp_time <= 18; -- 0.5 us

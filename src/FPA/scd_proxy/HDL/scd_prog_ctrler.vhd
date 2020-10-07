@@ -140,13 +140,13 @@ architecture rtl of scd_prog_ctrler is
 begin
                       
    
-   sgen_pelican_or_hercule : if (DEFINE_FPA_ROIC /= FPA_ROIC_BLACKBIRD1280) generate
+   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
    begin  
       init_check_cfg_st    <= check_cfg_st2;
       init_cfg_updater_st  <= check_cfg_st2;
       proxy_static_done    <= proxy_op_cfg_done;
    end generate;
-   sgen_bb1280 : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280) generate
+   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
    begin  
       init_check_cfg_st    <= check_cfg_st1;
       init_cfg_updater_st  <= check_cfg_st1;
