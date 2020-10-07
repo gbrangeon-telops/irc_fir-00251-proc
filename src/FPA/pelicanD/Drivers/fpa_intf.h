@@ -7,9 +7,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision: 12286 $
--- $Author: pdaraiche $
--- $LastChangedDate: 2013-01-25 14:24:16 -0500 (ven., 25 janv. 2013) $
+-- $Revision: 25610 $
+-- $Author: pcouture $
+-- $LastChangedDate: 2020-09-03 14:53:36 -0400 (jeu., 03 sept. 2020) $
 --
 -------------------------------------------------------------------------------
 --
@@ -51,7 +51,8 @@
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
-#define FPA_NUM_CH         2  // nombre de canaux de sorties  (1 ou 2)
+#define FPA_NUM_CH         2  // nombre de canaux de sorties  (1,2 ou 3)
+#define FPA_CLINK_PIX_NUM  2
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
@@ -143,16 +144,17 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  scd_bit_pattern;       
        
    // partie misc   (quelques parametres utilisés en mode diag Telops pour simuler le detecteur et en extra_trig . Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  scd_fig1_or_fig2_t6_dly;        
-   uint32_t  scd_fig4_t1_dly;               
-   uint32_t  scd_fig4_t2_dly;               
-   uint32_t  scd_fig4_t6_dly;               
-   uint32_t  scd_fig4_t3_dly;               
-   uint32_t  scd_fig4_t5_dly;               
-   uint32_t  scd_fig4_t4_dly;        
-   uint32_t  scd_fig1_or_fig2_t5_dly;
-   uint32_t  scd_fig1_or_fig2_t4_dly;
-   uint32_t  scd_xsize_div2;
+
+   uint32_t  scd_x_to_readout_start_dly;              // Pelican/Hercule : delay T6 on fig 1 or 3(d1k3008-rev1), BB1280 : FR_DLY (section 3.2.4.3.2 in D15F002 REV2 )
+   uint32_t  scd_fsync_re_to_fval_re_dly;             // Pelican/Hercule : delay T1 on fig 5 (d1k3008-rev1)
+   uint32_t  scd_fval_re_to_dval_re_dly;              // Pelican/Hercule : delay T2 on fig 5 (d1k3008-rev1)
+   uint32_t  scd_hdr_high_duration;                   // Pelican/Hercule : delay T6 on fig 5 (d1k3008-rev1)
+   uint32_t  scd_lval_high_duration;                  // Pelican/Hercule : delay T3 on fig 5 (d1k3008-rev1)
+   uint32_t  scd_hdr_start_to_lval_re_dly;            // Pelican/Hercule : delay T5 on fig 5 (d1k3008-rev1)
+   uint32_t  scd_lval_pause_dly;                      // Pelican/Hercule : delay T4 on fig 5 (d1k3008-rev1)
+   uint32_t  scd_x_to_next_fsync_re_dly;              // Pelican/Hercule : delay T5 on fig 1 & 3 (d1k3008-rev1)
+   uint32_t  scd_fsync_re_to_intg_start_dly;          // Pelican/Hercule : delay T4 on fig 1 & 3 (d1k3008-rev1)
+   uint32_t  scd_xsize_div_per_pixel_num;             // Pelican/Hercule = clink base (pixel_num = 2), BB1280 = clink full (pixel_num = 4)
    uint32_t  cfg_num;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
@@ -235,7 +237,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -246,6 +248,9 @@ void FPA_ClearErr(const t_FpaIntf *ptrA);
 
 //pour configurer le bloc FPA_interface et le lancer
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
+
+//pour configurer la résolution de frame
+void FPA_SetFrameResolution(t_FpaIntf *ptrA);// Not used (needed for BB1280)
 
 //pour calculer le frame rate max se rappportant à une configuration donnée
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs);

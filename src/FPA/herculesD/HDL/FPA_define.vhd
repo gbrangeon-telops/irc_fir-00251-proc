@@ -31,8 +31,13 @@ package FPA_define is
    constant DEFINE_FPA_OUTPUT            : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL; 
    constant DEFINE_FPA_INIT_CFG_NEEDED   : std_logic := '0';     -- pas besoin de config particulière au demarrage du Hercules
    constant DEFINE_DIAG_CLK_RATE_MAX_KHZ : integer := 80_000;    -- vitesse max de l'horloge de sortie des pixels en mode diag (vitesse totale des sorties divisée par 2 canaux en mode diag 
-   constant PROXY_CLINK_CHANNEL_NUM      : integer := 2;         -- Number of channels in the Camera Link interface with the proxy
-   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;      -- CLINK IN est à 80MHz ns
+   constant PROXY_CLINK_PIXEL_NUM        : integer := 2; -- Number of pixels on proxy clink interface   
+   constant PROXY_CLINK_CHANNEL_NUM      : integer := 2;         -- Number of channels on proxy clink interface
+   constant SCD_FSYNC_HIGH_TIME_US       : integer := 5;     -- duree de FSYNC en usec
+   constant SCD_GAIN_0                   : std_logic_vector(7 downto 0) := x"00";
+   constant SCD_GAIN_1                   : std_logic_vector(7 downto 0) := x"02";
+   constant FPA_INT_FBK_AVAILABLE        : std_logic := '1';
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;      -- CLINK IN est à 80MHz ns 
    
    ----------------------------------------------
    -- FPA 

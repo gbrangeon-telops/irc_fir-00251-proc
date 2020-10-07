@@ -65,7 +65,6 @@ architecture rtl of scd_fifo_writer is
    signal fval_p           : std_logic;
    signal lval_p           : std_logic;
    signal dval_p           : std_logic;
-   signal dcnt             : unsigned(FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T3_DLY'length downto 0);
    signal flush_fifo       : std_logic;
    signal count            : unsigned(7 downto 0);
    signal readout_sync     : std_logic;
@@ -118,7 +117,6 @@ begin
             fval_p <= '0';
             lval_p <= '0';
             dval_p <= '0';
-            dcnt <= (others => '0');
             flush_fifo <= '0';
             
             
@@ -157,7 +155,6 @@ begin
                when idle =>
                   dval_o <= '0';
                   fval_o <= '0';
-                  dcnt <= (others => '0');
                   flush_fifo <= '0';
                   count <= (others => '0');
                   if fval = '1' and lval = '1' and dval = '1' then
@@ -169,7 +166,6 @@ begin
                   fval_o <= fval_p;				  
                   if fval_p = '1' and lval_p ='1' and dval_p = '1' then 
                      dval_o <= hder_p;        -- on ecrit juste les 128 coups d'horloge du header effectif.  
-                     dcnt <= dcnt + 1;
                      if hder_p = '0' then  -- fin du header effectif selon la figure 4 du document Communication protocol appendix A5 (SPEC. NO: DPS3008)
                         dval_o <= '1';     -- ecrit pour faire tomber le header_valid en aval et ainsi permettre l'envoi du header rapidement.
                         dout_o(23) <='0';  -- hder tombe à '0';
@@ -183,12 +179,6 @@ begin
                
                when wait_hder_end_st =>
                   dval_o <= '0';
-                  --if fval_p = '1' and lval_p ='1' and dval_p = '1' then  
-                  --   dcnt <= dcnt + 1;                                  
-                  --end if;
-                  --if dcnt = FPA_INTF_CFG.SCD_MISC.SCD_FIG4_T3_DLY then   -- fin des 640 pixels du header (critère du compteur plus certain que tout autre) 
-                  --   writer_fsm <= wr_img_st;
-                  --end if;
                   if lval_p = '0' and dval_p = '0' then
                      writer_fsm <= wr_img_st;
                   end if;

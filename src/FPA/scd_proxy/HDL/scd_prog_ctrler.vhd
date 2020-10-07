@@ -15,7 +15,8 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.fpa_define.all;
-use work.Proxy_define.all;
+use work.Proxy_define.all; 
+use work.fpa_common_pkg.all;
 use work.tel2000.all;
 
 entity scd_prog_ctrler is
@@ -45,7 +46,7 @@ entity scd_prog_ctrler is
       SERIAL_ABORT         : out std_logic;   --
       SERIAL_DONE          : in std_logic;
       SERIAL_FATAL_ERR     : in std_logic;
-      SERIAL_BASE_ADD      : out std_logic_vector(7 downto 0);
+      SERIAL_BASE_ADD      : out std_logic_vector(8 downto 0);
       
       RAM_ERR              : in std_logic;
       
@@ -54,7 +55,7 @@ entity scd_prog_ctrler is
       FPA_DRIVER_STAT      : out std_logic_vector(31 downto 0);
       FRAME_ID             : out std_logic_vector(31 downto 0); --  synchronisé avec ACQ_INT
       INT_INDX             : out std_logic_vector(7 downto 0);
-      INT_TIME             : out std_logic_vector(23 downto 0);
+      INT_TIME             : out std_logic_vector(24 downto 0);
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic
@@ -74,14 +75,16 @@ architecture rtl of scd_prog_ctrler is
    
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, wait_trig_st, check_cfg_st, pause_st1, pause_st2, 
-   output_op_cfg_st, output_int_cfg_st, output_diag_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, wait_updater_rdy_st, wait_updater_run_st);
+   output_op_cfg_st, output_int_cfg_st, output_diag_cfg_st, output_temp_cfg_st, output_frame_res_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, wait_updater_rdy_st, wait_updater_run_st);
    type int_gen_fsm_type is (idle, diag_int_dly_st, check_fpa_st, diag_exp_rst_cnt_st, diag_exp_int_gen_st, diag_int_gen_st);
-   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st, new_diag_cfg_st);
+   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, check_cfg_st5, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st, new_diag_cfg_st, new_frame_res_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
    signal cfg_updater_fsm           : driver_seq_fsm_type;
+   signal init_cfg_updater_st       : driver_seq_fsm_type;
    signal int_gen_fsm               : int_gen_fsm_type;
    signal new_cfg_pending_fsm       : new_cfg_pending_fsm_type;
+   signal init_check_cfg_st         : new_cfg_pending_fsm_type;
    signal frame_id_i                : unsigned(31 downto 0);
    signal acq_int_i                 : std_logic;
    signal fpa_int_i                 : std_logic;
@@ -94,22 +97,21 @@ architecture rtl of scd_prog_ctrler is
    signal fpa_new_cfg_pending       : std_logic;
    signal user_cfg_in_progress_i    : std_logic;
    signal new_cfg                   : fpa_intf_cfg_type;
-   signal present_cfg                : fpa_intf_cfg_type;
+   signal present_cfg               : fpa_intf_cfg_type;
    signal fpa_intf_cfg_i            : fpa_intf_cfg_type;
    signal fpa_ser_cfg_to_update     : fpa_intf_cfg_type;
    signal serial_en_i               : std_logic;
    signal fpa_ser_cfg_latch         : fpa_intf_cfg_type;
-   --signal fpa_err_check_done        : std_logic;
    signal cnt                       : unsigned(31 downto 0);
    signal proxy_int_feedbk_i        : std_logic;
    signal proxy_int_feedbk_last     : std_logic;
    signal acq_frame                 : std_logic;
    signal user_cfg_in_progress_last : std_logic;
    signal int_indx_i                : std_logic_vector(7 downto 0); 
-   signal int_time_i                : std_logic_vector(23 downto 0);
+   signal int_time_i                : std_logic_vector(FPA_INTF_CFG.SCD_INT.SCD_INT_TIME'LENGTH-1 downto 0);
    signal new_cfg_id                : std_logic_vector(7 downto 0);
-   signal serial_base_add_i         : std_logic_vector(7 downto 0);
-   signal cfg_ram_base_add          : unsigned(7 downto 0);
+   signal serial_base_add_i         : std_logic_vector(SERIAL_BASE_ADD'length-1 downto 0);
+   signal cfg_ram_base_add          : unsigned(SERIAL_BASE_ADD'length-1 downto 0);
    signal serial_id_i               : std_logic_vector(7 downto 0);
    signal cfg_id_i                  : std_logic_vector(7 downto 0);
    signal fpa_driver_done_last      : std_logic;
@@ -118,17 +120,38 @@ architecture rtl of scd_prog_ctrler is
    signal update_cfg_i              : std_logic;
    signal cfg_updater_done          : std_logic;
    signal proxy_static_done         : std_logic;
+   signal proxy_op_cfg_done         : std_logic;
+   signal proxy_frame_res_cfg_done  : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
    
-   -- -- attribute dont_touch                         : string;
-   -- -- attribute dont_touch of acq_int_i            : signal is "true";
-   -- -- attribute dont_touch of fpa_int_i            : signal is "true";
-   -- -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   -- -- attribute dont_touch of int_indx_i           : signal is "true"; 
    
+
+--   attribute keep                                   : string;
+--   attribute keep of driver_seq_fsm                 : signal is "true";
+--   attribute keep of cfg_updater_fsm                : signal is "true";
+--   attribute keep of int_gen_fsm                    : signal is "true";
+--   attribute keep of new_cfg_pending_fsm            : signal is "true"; 
+--   attribute keep of acq_int_i                      : signal is "true";
+--   attribute keep of fpa_int_i                      : signal is "true";
+--   attribute keep of fpa_powered                    : signal is "true";                       
+--   attribute keep of fpa_intf_cfg_i                 : signal is "true";   
+--   attribute keep of reset_clink_n                  : signal is "true"; 
 begin
                       
+   
+   sgen_pelican_or_hercule : if (DEFINE_FPA_ROIC /= FPA_ROIC_BLACKBIRD1280) generate
+   begin  
+      init_check_cfg_st    <= check_cfg_st2;
+      init_cfg_updater_st  <= check_cfg_st2;
+      proxy_static_done    <= proxy_op_cfg_done;
+   end generate;
+   sgen_bb1280 : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280) generate
+   begin  
+      init_check_cfg_st    <= check_cfg_st1;
+      init_cfg_updater_st  <= check_cfg_st1;
+      proxy_static_done    <= proxy_frame_res_cfg_done and proxy_op_cfg_done;
+   end generate;
    
    -------------------------------------------------
    -- mappings                                                   
@@ -197,8 +220,8 @@ begin
             fpa_new_cfg_pending <= '0';
             user_cfg_in_progress_i <= '0';
             user_cfg_in_progress_last <= '0';
-            new_cfg_pending_fsm <= check_cfg_st1;
-			need_prog_rqst <= '0'; 
+            new_cfg_pending_fsm <= init_check_cfg_st;
+			   need_prog_rqst <= '0'; 
             
          else 
             
@@ -207,101 +230,120 @@ begin
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
-            new_cfg.scd_op   <= USER_CFG.SCD_OP;   
-            new_cfg.scd_int  <= USER_CFG.SCD_INT;  
-            new_cfg.scd_diag <= USER_CFG.SCD_DIAG; 
-            new_cfg.scd_temp <= USER_CFG.SCD_TEMP; 
-            new_cfg.scd_misc <= USER_CFG.SCD_MISC; 
-            
-            --fpa_new_cfg_pending <= not user_cfg_in_progress_i; 
-            
+            new_cfg.scd_op        <= USER_CFG.SCD_OP;   
+            new_cfg.scd_int       <= USER_CFG.SCD_INT;  
+            new_cfg.scd_diag      <= USER_CFG.SCD_DIAG; 
+            new_cfg.scd_frame_res <= USER_CFG.SCD_FRAME_RES;
+            new_cfg.scd_temp      <= USER_CFG.SCD_TEMP; 
+            new_cfg.scd_misc      <= USER_CFG.SCD_MISC; 
+           
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
             case new_cfg_pending_fsm is			  
                
                when check_cfg_st1 =>
-                  if new_cfg.scd_op /= present_cfg.scd_op then
-                     new_cfg_pending_fsm <= new_op_cfg_st;					 
+                  if new_cfg.scd_frame_res /= present_cfg.scd_frame_res then
+                     new_cfg_pending_fsm <= new_frame_res_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                
                when check_cfg_st2 =>
-                  if new_cfg.scd_int /= present_cfg.scd_int then
-                     new_cfg_pending_fsm <= new_int_cfg_st;					 
+                  if new_cfg.scd_op /= present_cfg.scd_op then
+                     new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
-                     new_cfg_pending_fsm <= check_cfg_st3;  
+                     new_cfg_pending_fsm <= check_cfg_st3;
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_diag /= present_cfg.scd_diag then
-                     new_cfg_pending_fsm <= new_diag_cfg_st;					 
+                  if new_cfg.scd_int /= present_cfg.scd_int then
+                     new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
-                     new_cfg_pending_fsm <= check_cfg_st4;
+                     new_cfg_pending_fsm <= check_cfg_st4;  
                   end if;
                
                when check_cfg_st4 =>
+                  if new_cfg.scd_diag /= present_cfg.scd_diag then
+                     new_cfg_pending_fsm <= new_diag_cfg_st;					 
+                  else
+                     new_cfg_pending_fsm <= check_cfg_st5;
+                  end if;
+               
+               when check_cfg_st5 =>
                   if new_cfg.scd_temp /= present_cfg.scd_temp then
                      new_cfg_pending_fsm <= new_temp_cfg_st;					 
                   else
-                     new_cfg_pending_fsm <= check_cfg_st1;
-                  end if;				  
-               
+                     new_cfg_pending_fsm <= init_check_cfg_st;
+                  end if;
+
                when new_op_cfg_st =>
                   new_cfg_id <= SCD_OP_CMD_ID(7 downto 0);     -- les 7 derniers bits suffisent largement
-                  cfg_ram_base_add <= to_unsigned(SCD_OP_CMD_RAM_BASE_ADD, 8);
-				  need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
+                  cfg_ram_base_add <= to_unsigned(SCD_OP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length);
+				      need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= init_check_cfg_st;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				         fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
                when new_int_cfg_st =>
                   new_cfg_id <= SCD_INT_CMD_ID(7 downto 0);
-                  cfg_ram_base_add <= to_unsigned(SCD_INT_CMD_RAM_BASE_ADD, 8);
+                  cfg_ram_base_add <= to_unsigned(SCD_INT_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length);
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				    -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
-				  if user_cfg_in_progress_i = '1' then 
+				      if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= init_check_cfg_st;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				         fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
                when new_diag_cfg_st =>
                   new_cfg_id <= SCD_DIAG_CMD_ID(7 downto 0);
-                  cfg_ram_base_add <= to_unsigned(SCD_DIAG_CMD_RAM_BASE_ADD, 8);
+                  cfg_ram_base_add <= to_unsigned(SCD_DIAG_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length);
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '1'; 				    -- diag_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs 
-				  if user_cfg_in_progress_i = '1' then 
+				      if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= init_check_cfg_st;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				         fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
-               
+
                when new_temp_cfg_st =>
                   new_cfg_id <= SCD_TEMP_CMD_ID(7 downto 0);
-                  cfg_ram_base_add <= to_unsigned(SCD_TEMP_CMD_RAM_BASE_ADD, 8);
+                  cfg_ram_base_add <= to_unsigned(SCD_TEMP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length);
                   fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  need_prog_rqst <= '0'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
-				  if user_cfg_in_progress_i = '1' then 
+                  need_prog_rqst <= '1'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
+				      if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= init_check_cfg_st;
                   else
-				     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+				         fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
+               when new_frame_res_cfg_st =>
+                  new_cfg_id <= SCD_FRAME_RES_CMD_ID(7 downto 0);
+                  cfg_ram_base_add <= to_unsigned(SCD_FRAME_RES_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length);
+                  fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                  need_prog_rqst <= '1'; 				         -- frame_res_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs 
+				      if user_cfg_in_progress_i = '1' then 
+                     fpa_new_cfg_pending <= '0';
+                     new_cfg_pending_fsm <= init_check_cfg_st;
+                  else
+				         fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     new_cfg_pending_fsm <= wait_prog_end_st;
+                  end if;
+                  
                when wait_prog_end_st =>
                   if fpa_driver_done_last = '0' and fpa_driver_done = '1' then
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= init_check_cfg_st;
                   end if;
                
                when others =>
@@ -351,10 +393,10 @@ begin
                   fpa_driver_seq_err <= '0';
                   if SERIAL_DONE = '1' and fpa_new_cfg_pending = '1' and PROXY_POWERED = '1' then  -- ne jamais ajouter PROXY_RDY dans les conditions
                      if need_prog_rqst = '1' then
-					    driver_seq_fsm <= fpa_prog_rqst_st;
-					 else
-					    driver_seq_fsm <= fpa_prog_en_st;
-					 end if;
+					         driver_seq_fsm <= fpa_prog_rqst_st;
+   					   else
+   					      driver_seq_fsm <= fpa_prog_en_st;
+   					   end if;
                   end if;               
                
                when fpa_prog_rqst_st =>              -- demande pour programmer le fpa. Elle se soldera par l'arrêt du contrôleur de trig
@@ -439,10 +481,11 @@ begin
          if sreset = '1' then 
             cfg_updater_fsm <=  idle;
             cfg_updater_done <= '0';           
-            proxy_static_done <= '0';
+            proxy_op_cfg_done <= '0';
+            proxy_frame_res_cfg_done <= '0';
             present_cfg.scd_op.scd_xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
             present_cfg.scd_temp.scd_temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
-            present_cfg.scd_diag.scd_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset
+            present_cfg.scd_diag.scd_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset                   
             
          else                       
             
@@ -476,46 +519,51 @@ begin
                when wait_trig_st =>
                   cfg_updater_done <= '0';
                   if cfg_id_i = SCD_TEMP_CMD_ID(7 downto 0) then -- pas besoin de trig poour lea temperature. Ainsi on l'aura même en mode trig externe
-                     cfg_updater_fsm <= check_cfg_st3; 
+                     cfg_updater_fsm <= check_cfg_st4; 
                   else
-                     --if ACQ_TRIG = '1' or XTRA_TRIG = '1' then  -- la config est normalement valide au prochain trig. 
-                     cfg_updater_fsm <= check_cfg_st1;    -- Si tel n'est pas le cas, pas grave car les parametres mportants du header (Xsize, Ysize, intime etc) proviennent du header de l'image scd
-                     --end if;
+                     cfg_updater_fsm <= init_cfg_updater_st;    -- Si tel n'est pas le cas, pas grave car les parametres mportants du header (Xsize, Ysize, intime etc) proviennent du header de l'image scd
                   end if;
                
-               when check_cfg_st1 =>                           -- cet état est crée juste pour ameliorer timing
-                  if cfg_id_i = SCD_OP_CMD_ID(7 downto 0) then
-                     cfg_updater_fsm <= output_op_cfg_st;
-                  else
+               when check_cfg_st1 =>                            -- cet état est crée juste pour ameliorer timing
+                  if cfg_id_i = SCD_FRAME_RES_CMD_ID(7 downto 0) then
+                     cfg_updater_fsm <= output_frame_res_cfg_st; 
+                  else    
                      cfg_updater_fsm <= check_cfg_st2;
                   end if;
-               
+                  
                when check_cfg_st2 =>                           -- cet état est crée juste pour ameliorer timing
-                  if cfg_id_i = SCD_INT_CMD_ID(7 downto 0) then
-                     cfg_updater_fsm <= output_int_cfg_st;
+                  if cfg_id_i = SCD_OP_CMD_ID(7 downto 0) then
+                     cfg_updater_fsm <= output_op_cfg_st;
                   else
                      cfg_updater_fsm <= check_cfg_st3;
                   end if;
                
-               when check_cfg_st3 =>                            -- cet état est crée juste pour ameliorer timing
+               when check_cfg_st3 =>                           -- cet état est crée juste pour ameliorer timing
+                  if cfg_id_i = SCD_INT_CMD_ID(7 downto 0) then
+                     cfg_updater_fsm <= output_int_cfg_st;
+                  else
+                     cfg_updater_fsm <= check_cfg_st4;
+                  end if;
+               
+               when check_cfg_st4 =>                            -- cet état est crée juste pour ameliorer timing
                   if cfg_id_i = SCD_DIAG_CMD_ID(7 downto 0) then
                      cfg_updater_fsm <= output_diag_cfg_st; 
                   else    -- cfg_id_i = SCD_TEMP_CMD_ID(7 downto 0)
                      cfg_updater_fsm <= output_temp_cfg_st;
                   end if;                 
-               
+                  
+                  
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_op <= fpa_ser_cfg_to_update.scd_op;
                   fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;
-                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_CHANNEL_NUM;
+                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_PIXEL_NUM;
                   present_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
-                  -- present_cfg.scd_int.scd_int_time <= to_unsigned(SCD_OP_INT_TIME_DEFAULT_FACTOR, present_cfg.scd_int.scd_int_time'length);  --temps d'inegration dans la partie serielle de la cmd op. Cela provoquera la reprogrammation du detecteur avec le bon temps d'intégration
-                  proxy_static_done <= '1';
+                  proxy_op_cfg_done <= '1';
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_int <= fpa_ser_cfg_to_update.scd_int;
-				  fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.scd_int.scd_int_time, 32);
+				      fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.scd_int.scd_int_time, 32);
                   present_cfg.scd_int <= fpa_ser_cfg_to_update.scd_int;  
                   cfg_updater_fsm <= pause_st1;
                
@@ -524,6 +572,12 @@ begin
                   present_cfg.scd_diag <= fpa_ser_cfg_to_update.scd_diag;  
                   cfg_updater_fsm <= pause_st1;
                
+               when output_frame_res_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
+                  fpa_intf_cfg_i.scd_frame_res <= fpa_ser_cfg_to_update.scd_frame_res;
+                  present_cfg.scd_frame_res <= fpa_ser_cfg_to_update.scd_frame_res;
+                  proxy_frame_res_cfg_done <= '1';
+                  cfg_updater_fsm <= pause_st1;
+                  
                when output_temp_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_temp <= fpa_ser_cfg_to_update.scd_temp;
                   present_cfg.scd_temp <= fpa_ser_cfg_to_update.scd_temp; 
@@ -553,7 +607,8 @@ begin
       if rising_edge(CLK) then 
          if sreset = '1' then 
             int_gen_fsm <= idle;
-            acq_int_i <= '0'; 
+            acq_int_i <= '0';
+            fpa_int_i <= '0';
             proxy_int_feedbk_i <= '0';
             proxy_int_feedbk_last <= '0';
             frame_id_i <= (others => '0');
@@ -607,7 +662,7 @@ begin
                   end if;
                
                when diag_int_dly_st => 
-                  if cnt >= fpa_intf_cfg_i.scd_misc.scd_fig1_or_fig2_t4_dly then    -- FPA_INTF_CFG.fpa_fig1_or_fig2_t4_dly est le delai T4 sur les figures 1 et 2 du document Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD
+                  if cnt >= fpa_intf_cfg_i.scd_misc.scd_fsync_re_to_intg_start_dly then  
                      int_gen_fsm <= diag_exp_rst_cnt_st;
                   else                        
                      cnt <= cnt + 1;                
@@ -625,8 +680,7 @@ begin
                      acq_int_i <= acq_frame and PROXY_RDY; 
                   end if;
                   
-                  
-                  if cnt >= fpa_intf_cfg_i.scd_int.diag_int_time then    -- 
+                  if cnt >= fpa_intf_cfg_i.scd_int.scd_int_time then    -- 
                      int_gen_fsm <= idle;
                   else                        
                      cnt <= cnt + 1;                

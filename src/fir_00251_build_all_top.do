@@ -9,7 +9,7 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 
 #Individual builds
 #-----------------
-#do  "$FIR251PROC\src\fir_00251_top_blackbirdD_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_blackbird1280D_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_hawkA_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_herculesD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0207A_build.do"
@@ -37,9 +37,9 @@ do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
 #ADC receiver interface
 do  "$FIR251PROC\src\quad_serdes\HDL\build_quad_receiver.do"
 
-#FPA blackbirdD
-#do "$FIR251PROC\src\FPA\blackbirdD\hdl\compil_blackbirdD.do"
-#acom  "$FIR251PROC\src\fir_00251_proc_blackbirdD.bde"
+#FPA blackbird1280D
+do "$FIR251PROC\src\FPA\blackbird1280D\hdl\compil_blackbird1280D.do"
+acom  "$FIR251PROC\src\fir_00251_proc_blackbird1280D.bde"
 #FPA hawkA
 do "$FIR251PROC\src\FPA\hawkA\HDL\compil_hawkA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_hawkA.bde"

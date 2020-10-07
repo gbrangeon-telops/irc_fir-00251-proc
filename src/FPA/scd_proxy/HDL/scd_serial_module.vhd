@@ -25,7 +25,7 @@ entity scd_serial_module is
       CLK                   : in std_logic;
       
       -- interface avec le contrôleur
-      SERIAL_BASE_ADD       : in std_logic_vector(7 downto 0);
+      SERIAL_BASE_ADD       : in std_logic_vector(8 downto 0);
       SERIAL_FATAL_ERR      : out std_logic;
       SERIAL_DONE           : out std_logic;
       SERIAL_EN             : in std_logic;

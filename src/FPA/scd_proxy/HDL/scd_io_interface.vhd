@@ -31,7 +31,7 @@ entity scd_io_interface is
       -- hw_driver side
       PROXY_PWR     : in std_logic;
       PROXY_TRIG    : in std_logic;
-      PROXY_POWERED     : out std_logic;
+      PROXY_POWERED : out std_logic;
       DET_FPA_ON    : out std_logic;
       PROXY_TX      : in std_logic;
       PROXY_RX      : out std_logic;
@@ -289,7 +289,7 @@ begin
                      scd_io_intf_fsm <=  proxy_pwred_st;
                   end if;                  
                   -- pragma translate_off
-                  if PROXY_PWR = '1' then
+                  if timer_cnt = 1000 then
                      scd_io_intf_fsm <=  proxy_pwred_st;
                   end if;
                   -- pragma translate_on

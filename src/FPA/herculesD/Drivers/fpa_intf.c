@@ -41,7 +41,7 @@
 #define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS          
   
 // Parametres de la commande serielle du HerculesD
-#define SCD_LONGEST_CMD_BYTES_NUM         32      // longueur en bytes de la plus longue commande serielle du HerculesD
+#define SCD_LONGEST_CMD_BYTES_NUM         33      // longueur en bytes de la plus longue commande serielle du HerculesD
 #define SCD_CMD_OVERHEAD_BYTES_NUM        6       // longueur des bytes autres que ceux des données
 
 // Mode d'operation choisi pour le contrôleur de trig 
@@ -91,13 +91,14 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_PIX_RESOLUTION_13BITS         0x02    // 13 bits selon SCD
 
 // adresse de base pour l'aiguilleur de config dans le vhd.
-#define AW_SERIAL_CFG_SWITCH_ADD          0x0400  // l'aiguilleur enverra la config en ram
+#define AW_SERIAL_CFG_SWITCH_ADD          0x0800  // l'aiguilleur enverra la config en ram
 
 //partition dans la ram Vhd des config (mappées sur FPA_define)
 #define AW_SERIAL_OP_CMD_RAM_BASE_ADD     0       // adresse de base en ram pour la cmd opertaionnelle
 #define AW_SERIAL_INT_CMD_RAM_BASE_ADD    64      // adresse de base en ram pour la cmd int_time (la commande est implémentée uniquement dans le vhd)
 #define AW_SERIAL_DIAG_CMD_RAM_BASE_ADD   128     // adresse de base en ram pour la cmd diag de scd
 #define AW_SERIAL_TEMP_CMD_RAM_BASE_ADD   192     // adresse de base en ram pour la cmd read temperature
+#define AW_SERIAL_FRAME_RES_CMD_RAM_BASE_ADD   256     // Only use for BB1280
 
 // les ID des commandes
 #define SCD_INT_CMD_ID                    0x8001
@@ -187,7 +188,7 @@ struct Command_s             //
    uint16_t ID;
    uint16_t DataLength;
    uint8_t  Data[SCD_LONGEST_CMD_BYTES_NUM - SCD_CMD_OVERHEAD_BYTES_NUM];
-   uint8_t  SerialCmdRamBaseAdd;  // ajouté pour enviyé la commande à la bonne adresse dans la RAm
+   uint16_t  SerialCmdRamBaseAdd;  // ajouté pour envoyer la commande à la bonne adresse dans la RAm
    // cheksum est calculé seulement lors de l'envoi 
 };
 typedef struct Command_s Command_t;
@@ -196,7 +197,7 @@ typedef struct Command_s Command_t;
 struct ScdPacketTx_s             // 
 {					   
    uint8_t  ScdPacketTotalBytesNum;
-   uint8_t  SerialCmdRamBaseAdd;
+   uint16_t  SerialCmdRamBaseAdd;
    uint8_t  ScdPacketArrayTx[SCD_LONGEST_CMD_BYTES_NUM];
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
@@ -217,6 +218,11 @@ void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 
+// Global variables (Only used for BB1280)
+uint32_t gSCD_frame_dly = 0;
+uint32_t gSCD_intg_dly  = 0;
+uint32_t gSCD_frame_res = 0;
+
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
 //--------------------------------------------------------------------------
@@ -229,7 +235,11 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
 }
- 
+
+void FPA_SetFrameResolution(t_FpaIntf *ptrA)// TODO : A supprimer après le debug de BB1280
+{
+}
+
 //--------------------------------------------------------------------------
 // pour reset des registres d'erreurs
 //--------------------------------------------------------------------------
@@ -367,19 +377,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
       ptrA->scd_bit_pattern = SCD_PE_TEST1;
-                                      
+   
    // valeurs converties en coups d'horloge du module FPA_INTF
    // valeurs utilisées en mode patron de test seulement
-   ptrA->scd_fig1_or_fig2_t4_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
-   ptrA->scd_fig1_or_fig2_t6_dly = (uint32_t)((hh.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
-   ptrA->scd_fig1_or_fig2_t5_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag
-   ptrA->scd_fig4_t1_dly = (uint32_t)((kk.T1) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t2_dly = (uint32_t)((kk.T2) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t3_dly = (uint32_t)((kk.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t4_dly = (uint32_t)((kk.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t5_dly = (uint32_t)((kk.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fig4_t6_dly = (uint32_t)((kk.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_xsize_div2  =  ptrA->scd_xsize/2;  // Les test patterns sont générés sur 2 channels, peu importe FPA_NUM_CH.
+   ptrA->scd_fsync_re_to_intg_start_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
+   ptrA->scd_x_to_readout_start_dly = (uint32_t)((hh.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
+   ptrA->scd_x_to_next_fsync_re_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag
+   ptrA->scd_fsync_re_to_fval_re_dly = (uint32_t)((kk.T1) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_fval_re_to_dval_re_dly = (uint32_t)((kk.T2) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_lval_high_duration = (uint32_t)((kk.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_lval_pause_dly = (uint32_t)((kk.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_hdr_start_to_lval_re_dly = (uint32_t)((kk.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_hdr_high_duration = (uint32_t)((kk.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->scd_xsize_div_per_pixel_num  =  ptrA->scd_xsize/FPA_CLINK_PIX_NUM;  // Les test patterns sont générés sur 2 channels, peu importe FPA_NUM_CH.
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
@@ -805,7 +815,7 @@ void FPA_SendSyntheticVideo_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.ID                  = 0x8004;
    Cmd.DataLength          = 16;
    Cmd.Data[0]             = ptrA->scd_bit_pattern;
-   Cmd.SerialCmdRamBaseAdd = (uint8_t)AW_SERIAL_DIAG_CMD_RAM_BASE_ADD;
+   Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_DIAG_CMD_RAM_BASE_ADD;
    for(ii = 1; ii < Cmd.DataLength; ii++)
       Cmd.Data[ii] = 0;
    
@@ -832,7 +842,7 @@ void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Data[0]      =  0;
    for(ii = 1; ii < Cmd.DataLength; ii++)
       Cmd.Data[ii] = 0;   
-   Cmd.SerialCmdRamBaseAdd = (uint8_t)AW_SERIAL_TEMP_CMD_RAM_BASE_ADD;
+   Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_TEMP_CMD_RAM_BASE_ADD;
    // on batit les packets de bytes
    FPA_BuildCmdPacket(&ScdPacketTx, &Cmd);
    

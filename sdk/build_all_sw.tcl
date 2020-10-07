@@ -1,9 +1,9 @@
 source "D:/Telops/FIR-00251-Proc/sdk/sdk_proc_cmd.tcl"
 
 
-#create_proc_sw blackbirdD
-#build_proc_sw blackbirdD 325
-#build_proc_sw blackbirdD 160
+create_proc_sw blackbird1280D
+build_proc_sw blackbird1280D 325
+#build_proc_sw blackbird1280D 160
 
 create_proc_sw hawkA
 build_proc_sw hawkA 160

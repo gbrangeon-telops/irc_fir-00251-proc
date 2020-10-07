@@ -488,6 +488,19 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
             gFpaScdDiodeBiasEnum = (uint8_t)iValue;
             break;
       }
+
+      #ifdef SCD_PROXY // A supprimer après le debug de BB1280
+         extern uint32_t gSCD_frame_dly;
+         extern uint32_t gSCD_intg_dly;
+         extern uint32_t gSCD_frame_res;
+         gSCD_frame_dly = (uint32_t)gFpaDebugRegA;
+         gSCD_intg_dly  = (uint32_t)gFpaDebugRegB;
+         gSCD_frame_res = (uint32_t)gFpaDebugRegC;
+         GC_UpdateParameterLimits();
+         if(cmd == 7)
+            FPA_SetFrameResolution(&gFpaIntf);
+      #endif
+
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
 

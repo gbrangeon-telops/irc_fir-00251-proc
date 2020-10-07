@@ -35,6 +35,7 @@ entity scd_mblaze_intf is
       
       USER_CFG_IN_PROGRESS : out std_logic;
       USER_CFG             : out fpa_intf_cfg_type;
+      FPA_INTF_CFG         : in fpa_intf_cfg_type;
       COOLER_STAT          : out fpa_cooler_stat_type;
       
       SER_CFG_DATA         : out std_logic_vector(7 downto 0);
@@ -114,18 +115,23 @@ architecture rtl of scd_mblaze_intf is
    signal mb_struct_cfg_valid             : std_logic;
    signal reset_err_i                     : std_logic;
    signal fpa_int_time_last               : unsigned(exp_time_i'range);
-   signal scd_exp_time_i                  : unsigned(user_cfg_i.scd_int.scd_int_time'range);
+   signal scd_exp_time_i                  : unsigned(23 downto 0);
    signal scd_exp_time_temp1              : unsigned(exp_time_i'length + SCD_EXP_TIME_CONV_NUMERATOR'length - 1 downto 0);
-   signal scd_exp_time_temp2              : unsigned(user_cfg_i.scd_int.scd_int_time'range);
+   signal scd_exp_time_temp2              : unsigned(23 downto 0);
    signal ctrled_reset_i                  : std_logic;
-   --signal fpa_int_indx_last               : std_logic;
-   --signal fpa_manuf_diag_mode_last        : std_logic;
+   signal scd_exp_time_numerator_i        : unsigned(SCD_EXP_TIME_CONV_NUMERATOR'length - 1 downto 0);
    
-   -- -- attribute dont_touch                   : string;
-   -- -- attribute dont_touch of user_cfg_i     : signal is "true";
+      
    
-   
-   
+--  attribute keep                                     : string;
+--  attribute keep of cfg_arbit_fsm                    : signal is "true";
+--  attribute keep of exp_cfg_gen_fsm                  : signal is "true";
+--  attribute keep of user_cfg_in_progress_i           : signal is "true";
+--  attribute keep of exp_cfg_en                       : signal is "true";
+--  attribute keep of mb_ser_cfg_dval                  : signal is "true";
+--  attribute keep of scd_exp_time_i                   : signal is "true";
+--  attribute keep of exp_time_i                       : signal is "true";
+
 begin
    
    CTRLED_RESET <= ctrled_reset_i;
@@ -226,19 +232,19 @@ begin
                   end if;
                
                when mb_cfg_st =>  -- la config du MB est envoyée                   
-                  ser_cfg_add_i <= mb_ser_cfg_add; 
+                  ser_cfg_add_i  <= mb_ser_cfg_add; 
                   ser_cfg_data_i <= mb_ser_cfg_data; 
                   ser_cfg_dval_i <= mb_ser_cfg_dval;
                   if mb_cfg_serial_in_progress = '0' and mb_cfg_serial_in_progress_last = '1' then -- fin de la comm serielle  
-                     user_cfg_i.comn     <= mb_struct_cfg.comn;   -- partie structurale envoyée en fin de com serielle
-                     user_cfg_i.scd_misc <= mb_struct_cfg.scd_misc;
-                     user_cfg_i.scd_temp <= mb_struct_cfg.scd_temp;
+                     user_cfg_i.comn          <= mb_struct_cfg.comn;   -- partie structurale envoyée en fin de com serielle
+                     user_cfg_i.scd_misc      <= mb_struct_cfg.scd_misc;
+                     user_cfg_i.scd_frame_res <= mb_struct_cfg.scd_frame_res;
+                     user_cfg_i.scd_temp      <= mb_struct_cfg.scd_temp;
                      if mb_struct_cfg.cmd_to_update_id = SCD_OP_CMD_ID then
-                        user_cfg_i.scd_op   <= mb_struct_cfg.scd_op;
+                        user_cfg_i.scd_op     <= mb_struct_cfg.scd_op;
                      elsif mb_struct_cfg.cmd_to_update_id = SCD_DIAG_CMD_ID then
-                        user_cfg_i.scd_diag <= mb_struct_cfg.scd_diag;
+                        user_cfg_i.scd_diag   <= mb_struct_cfg.scd_diag;
                      end if;
-                     --user_cfg_i.comn.fpa_spare <= mb_struct_cfg.comn.fpa_spare;
                      cfg_arbit_fsm <= cfg_end_pause_st; 
                   end if;
                
@@ -254,8 +260,8 @@ begin
                   ser_cfg_data_i <= exp_ser_cfg_data; 
                   ser_cfg_dval_i <= exp_ser_cfg_dval;
                   if exp_struct_cfg_valid = '1' then
-                     user_cfg_i.scd_int.scd_int_time <= scd_exp_time_i;
-                     user_cfg_i.scd_int.diag_int_time <= exp_time_i;
+                     user_cfg_i.scd_int.scd_int_time <= exp_time_i;
+                     user_cfg_i.int_time <= resize(exp_time_i,user_cfg_i.int_time'length);
                      user_cfg_i.scd_int.scd_int_indx <= exp_indx_i;
                   elsif exp_cfg_done = '1' then 
                      cfg_arbit_fsm <= cfg_end_pause_st; 
@@ -374,10 +380,21 @@ begin
    --    end 
    --    erreur = max(abs(int_time_80MHz_appr - int_time_80MHz)) < 0.5
    
+   
+   sgen_pelican_or_hercule : if (DEFINE_FPA_ROIC /= FPA_ROIC_BLACKBIRD1280) generate
+   begin  
+      scd_exp_time_numerator_i <= SCD_EXP_TIME_CONV_NUMERATOR;
+   end generate;
+   sgen_bb1280 : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1280) generate
+   begin  
+      scd_exp_time_numerator_i <= unsigned(FPA_INTF_CFG.scd_frame_res.scd_exp_time_conv_numerator);
+   end generate;
+   
+   
    U3B: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
-         scd_exp_time_temp1 <= exp_time_i * SCD_EXP_TIME_CONV_NUMERATOR;
+         scd_exp_time_temp1 <= exp_time_i * scd_exp_time_numerator_i; 
          scd_exp_time_temp2 <= scd_exp_time_temp1((SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_23) downto SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS);  -- soit une division par SCD_EXP_TIME_CONV_DENOMINATOR
          if scd_exp_time_temp1(SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1) = '1' then  -- pour l'operation d'arrondi
             scd_exp_time_i <= scd_exp_time_temp2 + 1;
@@ -385,9 +402,8 @@ begin
             scd_exp_time_i <= scd_exp_time_temp2;
          end if;       
       end if;
-   end process;
-   
-   
+   end process; 
+
    ----------------------------------------------------------------------------
    -- CFG MB AXI RD : contrôle du flow
    ---------------------------------------------------------------------------- 
@@ -495,10 +511,10 @@ begin
             
             if slv_reg_wren = '1' then 				
                
-               if  axi_awaddr(10) = '1' then   -- données de configuration serielle, envoyées dans la ram du hw_driver
+               if  axi_awaddr(11) = '1' then   -- données de configuration serielle, envoyées dans la ram du hw_driver
                   mb_cfg_rqst <= '0'; -- fait expres. Ainsi demande non traitée par l'arbitre avant le debut de la partie serielle est perdue. En principe par design, n'arrivera jamais.
                   mb_cfg_serial_in_progress <= '1'; 
-                  mb_ser_cfg_add <= std_logic_vector(resize(axi_awaddr(9 downto 2),mb_ser_cfg_add'length));  -- Cela suppose que l'adresse du mB varie par pas de 4 
+                  mb_ser_cfg_add <= std_logic_vector(resize(axi_awaddr(10 downto 2),mb_ser_cfg_add'length));  -- Cela suppose que l'adresse du mB varie par pas de 4 
                   mb_ser_cfg_data <= data_i(7 downto 0); -- pour la partie serielle de la config, seule la partie (7 downto 0) est valide (voir le driver C)                  
                   mb_ser_cfg_dval <= '1';
                   if axi_awaddr(7 downto 0) = SERIAL_CFG_END_ADD then  -- adresse de fin de commande serielle
@@ -535,22 +551,25 @@ begin
                         when X"44" =>    mb_struct_cfg.scd_op.scd_pix_res               <= data_i(mb_struct_cfg.scd_op.scd_pix_res'length-1 downto 0); 
                         when X"48" =>    mb_struct_cfg.scd_op.scd_frame_period_min      <= unsigned(data_i(mb_struct_cfg.scd_op.scd_frame_period_min'length-1 downto 0));                         
                         when X"4C" =>    mb_struct_cfg.scd_diag.scd_bit_pattern         <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0);                         
-                        when X"50" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t6_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t6_dly'length-1 downto 0));                       
-                        when X"54" =>    mb_struct_cfg.scd_misc.scd_fig4_t1_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t1_dly'length-1 downto 0));                       
-                        when X"58" =>    mb_struct_cfg.scd_misc.scd_fig4_t2_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t2_dly'length-1 downto 0));                        
-                        when X"5C" =>    mb_struct_cfg.scd_misc.scd_fig4_t6_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t6_dly'length-1 downto 0));                        
-                        when X"60" =>    mb_struct_cfg.scd_misc.scd_fig4_t3_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t3_dly'length-1 downto 0));                         
-                        when X"64" =>    mb_struct_cfg.scd_misc.scd_fig4_t5_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t5_dly'length-1 downto 0));
-                        when X"68" =>    mb_struct_cfg.scd_misc.scd_fig4_t4_dly         <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig4_t4_dly'length-1 downto 0));                            
-                        when X"6C" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t5_dly'length-1 downto 0));
-                        when X"70" =>    mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fig1_or_fig2_t4_dly'length-1 downto 0));
-                        when X"74" =>    mb_struct_cfg.scd_misc.scd_xsize_div2          <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div2'length-1 downto 0));
+                        when X"50" =>    mb_struct_cfg.scd_misc.scd_x_to_readout_start_dly               <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_x_to_readout_start_dly'length-1 downto 0));                       
+                        when X"54" =>    mb_struct_cfg.scd_misc.scd_fsync_re_to_fval_re_dly              <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fsync_re_to_fval_re_dly'length-1 downto 0));                       
+                        when X"58" =>    mb_struct_cfg.scd_misc.scd_fval_re_to_dval_re_dly               <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fval_re_to_dval_re_dly'length-1 downto 0));                        
+                        when X"5C" =>    mb_struct_cfg.scd_misc.scd_hdr_high_duration                    <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_hdr_high_duration'length-1 downto 0));                        
+                        when X"60" =>    mb_struct_cfg.scd_misc.scd_lval_high_duration                   <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_lval_high_duration'length-1 downto 0));                         
+                        when X"64" =>    mb_struct_cfg.scd_misc.scd_hdr_start_to_lval_re_dly             <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_hdr_start_to_lval_re_dly'length-1 downto 0));
+                        when X"68" =>    mb_struct_cfg.scd_misc.scd_lval_pause_dly                       <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_lval_pause_dly'length-1 downto 0));                            
+                        when X"6C" =>    mb_struct_cfg.scd_misc.scd_x_to_next_fsync_re_dly               <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_x_to_next_fsync_re_dly'length-1 downto 0));
+                        when X"70" =>    mb_struct_cfg.scd_misc.scd_fsync_re_to_intg_start_dly           <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fsync_re_to_intg_start_dly'length-1 downto 0));
+                        when X"74" =>    mb_struct_cfg.scd_misc.scd_xsize_div_per_pixel_num              <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div_per_pixel_num'length-1 downto 0));
                         when X"78" =>    mb_struct_cfg.scd_op.cfg_num                   <= unsigned(data_i(mb_struct_cfg.scd_op.cfg_num'length-1 downto 0));
                         when X"7C" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
                            
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
                         when X"80" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
-                           
+                        
+                        -- BB1280 only : frame resolution configuration 
+                        when X"A0" =>    mb_struct_cfg.scd_frame_res.scd_exp_time_conv_numerator <= data_i(mb_struct_cfg.scd_frame_res.scd_exp_time_conv_numerator'length-1 downto 0); mb_cfg_rqst <= '1';                    
+
                         -- mode diag manufacturier 
                         when X"B0" =>    mb_struct_cfg.scd_diag.scd_bit_pattern <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   
                            
@@ -561,7 +580,7 @@ begin
                         when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                         when X"E4" =>    fpa_softw_stat_i.fpa_output <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
                            
-                        -- pour effacer erreurfpa_init_dones latchées
+                        -- pour effacer erreur fpa_init_dones latchées
                         when X"EC" =>    reset_err_i <= data_i(0);
                            
                         -- pour un reset complet du module FPA
@@ -576,13 +595,6 @@ begin
             else
                mb_ser_cfg_dval <= '0';
             end if;
-            
-            -- pragma translate_off
-            fpa_softw_stat_i.fpa_roic <= FPA_ROIC_PELICAND;
-            fpa_softw_stat_i.fpa_output <= OUTPUT_DIGITAL;
-            fpa_softw_stat_i.dval <= '1';
-            -- pragma translate_on
-            
             
          end if;
       end if;
