@@ -144,14 +144,14 @@ architecture rtl of scd_data_dispatcher is
          );
    end component;
    
-   component fwft_sfifo_w76_d16
+   component fwft_sfifo_w65_d16
       port (
          clk       : in std_logic;
          srst      : in std_logic;
-         din       : in std_logic_vector(75 downto 0);
+         din       : in std_logic_vector(64 downto 0);
          wr_en     : in std_logic;
          rd_en     : in std_logic;
-         dout      : out std_logic_vector(75 downto 0);
+         dout      : out std_logic_vector(64 downto 0);
          valid     : out std_logic;
          full      : out std_logic;
          overflow  : out std_logic;
@@ -243,10 +243,10 @@ architecture rtl of scd_data_dispatcher is
    signal diag_ch1_fifo_ovfl           : std_logic;
    signal diag_ch2_fifo_ovfl           : std_logic;
    signal diag_ch3_fifo_ovfl           : std_logic;
-   signal acq_hder_fifo_din            : std_logic_vector(75 downto 0);
+   signal acq_hder_fifo_din            : std_logic_vector(64 downto 0);
    signal acq_hder_fifo_wr             : std_logic;
    signal acq_hder_fifo_rd             : std_logic;
-   signal acq_hder_fifo_dout           : std_logic_vector(75 downto 0);
+   signal acq_hder_fifo_dout           : std_logic_vector(64 downto 0);
    signal acq_hder_fifo_dval           : std_logic;
    signal acq_hder_fifo_ovfl           : std_logic;
    signal acq_int_last                 : std_logic;
@@ -742,7 +742,7 @@ begin
    --------------------------------------------------
    -- fifo fwft pour acq fringe et l'index de intTime
    --------------------------------------------------
-   U5 : fwft_sfifo_w76_d16
+   U5 : fwft_sfifo_w65_d16
    port map (
       srst => sreset,
       clk => CLK,
@@ -806,7 +806,7 @@ begin
             acq_int_last <= ACQ_INT;
             
             -- ecriture de FRAME_ID dans le acq fringe fifo
-            acq_hder_fifo_din <= "00000000000" & INT_INDX & INT_TIME & FRAME_ID; -- le frame_id est écrit dans le fifo que s'il s'agit d'une image à envoyer dans la chaine
+            acq_hder_fifo_din <= INT_INDX & INT_TIME & FRAME_ID; -- le frame_id est écrit dans le fifo que s'il s'agit d'une image à envoyer dans la chaine
             acq_hder_fifo_wr <= not acq_int_last and ACQ_INT;
             
             -- ecriture du data fifo
