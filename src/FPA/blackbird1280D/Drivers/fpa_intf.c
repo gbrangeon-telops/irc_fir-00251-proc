@@ -288,7 +288,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------                                                                            
 //pour configuer le bloc vhd FPA_interface et le lancer
 //--------------------------------------------------------------------------
-void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs) // IWR only (ITR is not supported).
+void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    Scd_Param_t hh;
    float fpaAcquisitionFrameRate;
@@ -298,30 +298,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs) // IWR 
    
 
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // Specific parameters are independent of exposure time.
-
-   // ---------------  Operation mode configuration (test pattern or real data mode) ----------------------------
-   ptrA->fpa_diag_mode = 0;                 // default value => 0 : Test pattern deactivated (data coming from SCD proxy)
-   ptrA->fpa_diag_type = 0;                 // default value => 0 : Telops static shade (dégradé linéaire)
-   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade)
-   {  
-      ptrA->fpa_diag_mode = 1;
-      ptrA->fpa_diag_type = TELOPS_DIAG_DEGR;
-   }   
-   else if (pGCRegs->TestImageSelector == TIS_TelopsConstantValue1)      // mode diagnostique avec valeur constante
-   {   
-      ptrA->fpa_diag_mode = 1;
-      ptrA->fpa_diag_type = TELOPS_DIAG_CNST;
-   }
-   else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade)
-   {
-      ptrA->fpa_diag_mode = 1;
-      ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;   
-   }
-   ptrA->scd_bit_pattern = SCD_PE_NORM_OUTPUT; // SCD test pattern mode is deactivated by default.
-   if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
-         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
-         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
-      ptrA->scd_bit_pattern = SCD_FPA_TEST1; // column counter (source = FPP)
 
    ptrA->scd_xstart           = pGCRegs->OffsetX;        // Image horizontal offset
    ptrA->scd_ystart           = pGCRegs->OffsetY;        // Image vertical offset
@@ -334,11 +310,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs) // IWR 
    ptrA->scd_diode_bias       = Scd_DiodeBiasValues[gFpaScdDiodeBiasEnum];
    ptrA->scd_boost_mode       = OP_CMD_BOOST_MODE;       // Mode of operation
    ptrA->scd_pix_res          = SCD_PIX_RESOLUTION_13BITS;
-   ptrA->scd_gain             = MEDIUM_GAIN_IWR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
-   ptrA->scd_int_mode         = SCD_IWR_MODE;            // Not used in operational command (but used in FPA VHDL module).
    ptrA->fpa_pwr_on           = 1;                       // Allumage du détecteur (Le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies)
    ptrA->fpa_spare            = 0;
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig; // Élargit le pulse de trig
+
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      ptrA->scd_gain             = MEDIUM_GAIN_IWR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
+      ptrA->scd_int_mode         = SCD_IWR_MODE;            // Not used in operational command (but used in FPA VHDL module).
+   }
+   else{
+      ptrA->scd_gain             = MEDIUM_GAIN_ITR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
+      ptrA->scd_int_mode         = SCD_ITR_MODE;            // Not used in operational command (but used in FPA VHDL module).
+   }
 
    // Frame time calculation : define the maximum trig frequency allowed by proxy for this set of operational parameters.
    fpaAcquisitionFrameRate    = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
@@ -366,6 +349,33 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs) // IWR 
    diag_corr_factor = hh.fig8_t3 - diag_lval_high_duration;
    ptrA->scd_lval_pause_dly = (uint32_t)((hh.fig8_t4 + diag_corr_factor) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // We add a delay to account for time difference between test pattern clock (100 MHz) and real data clock (80 MHz).
    
+   // ---------------  Operation mode configuration (test pattern or real data mode) ----------------------------
+   ptrA->fpa_diag_mode = 0;                 // default value => 0 : Test pattern deactivated (data coming from SCD proxy)
+   ptrA->fpa_diag_type = 0;                 // default value => 0 : Telops static shade (dégradé linéaire)
+   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade)
+   {
+      ptrA->fpa_diag_mode = 1;
+      ptrA->fpa_diag_type = TELOPS_DIAG_DEGR;
+      ptrA->scd_int_mode  = SCD_IWR_MODE; // Test pattern only available in IWR.
+   }
+   else if (pGCRegs->TestImageSelector == TIS_TelopsConstantValue1)      // mode diagnostique avec valeur constante
+   {
+      ptrA->fpa_diag_mode = 1;
+      ptrA->fpa_diag_type = TELOPS_DIAG_CNST;
+      ptrA->scd_int_mode  = SCD_IWR_MODE; // Test pattern only available in IWR.
+   }
+   else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade)
+   {
+      ptrA->fpa_diag_mode = 1;
+      ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
+      ptrA->scd_int_mode  = SCD_IWR_MODE; // Test pattern only available in IWR.
+   }
+   ptrA->scd_bit_pattern = SCD_PE_NORM_OUTPUT; // SCD test pattern mode is deactivated by default.
+   if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
+      ptrA->scd_bit_pattern = SCD_FPA_TEST1; // column counter (source = FPP)
+
    // Changement de cfg_num dès qu'une nouvelle cfg est envoyée au vhd. Permet de forcer la reprogramation du proxy à chaque fois que cette fonction est appelée.
    if (cfg_num == 255)  // protection contre depassement
       cfg_num = 0;
@@ -474,9 +484,16 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
    
-   Ta = (hh.fr_dly + hh.ro_iwr) - hh.intg_dly;
-   if (Ta > 0)
-      maxExposure_us = maxExposure_us + Ta*1E6F;
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      Ta = (hh.fr_dly + hh.ro_iwr) - hh.intg_dly;
+      if (Ta > 0)
+         maxExposure_us = maxExposure_us + Ta*1E6F;
+   }
+   else{
+      Ta = hh.fr_dly - hh.intg_dly;
+      if (Ta > 0)
+         maxExposure_us = maxExposure_us + Ta*1E6F;
+   }
 
    maxExposure_us = floorMultiple(maxExposure_us, 0.1);
    maxExposure_us = MIN(MAX(maxExposure_us, pGCRegs->ExposureTimeMin),FPA_MAX_EXPOSURE);
@@ -577,8 +594,20 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
    }
    ptrH->int_eg_rlx       = 17.2E-6F*corr_factor;
    ptrH->ro_iwr           = ptrH->ro_itr + ptrH->m*(ptrH->int_eg_rlx + MAX(ptrH->adc_conv, ptrH->frame_resolution));
-   ptrH->x_to_next_fsync  = 315.0E-6F*corr_factor; // Delay between the end of integration or readout (whichever one happening last) and the next fsync
-   ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->ro_iwr, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
+
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      ptrH->x_to_next_fsync  = 315.0E-6F*corr_factor; // Delay between the end of integration or readout (whichever one happening last) and the next fsync
+      ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->ro_iwr, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
+   }
+   else{
+      ptrH->x_to_next_fsync  = 190.0E-6F*corr_factor; // Delay between the end of readout and the next fsync
+      // Here, we assume that the proxy manage the FR_DLY internally in function of the exposure time.
+      // Thus, there is no need to send an operational command to adjust FR_DLY when the exposure time change during acquisition.
+      if ((ptrH->intg_dly + ptrH->exposure_time - ptrH->fr_dly) > 0)
+         ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->ro_itr + ptrH->x_to_next_fsync;
+      else
+         ptrH->frame_period_min = ptrH->fr_dly+ ptrH->ro_itr + ptrH->x_to_next_fsync;
+   }
 
    // Camera Link output timing -> calcul based on figure 8 (D15F0002 REV3)
    ptrH->fig8_t1 = ptrH->fr_dly + ptrH->Tframe_init;
