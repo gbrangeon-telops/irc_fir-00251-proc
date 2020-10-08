@@ -28,6 +28,7 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\clink\HDL\scd_clink_dout_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\clink\HDL\mglk_clink_dout_ctrl.vhd \
  d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_dout_ctrl.bde \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_receiver_2ch.bde
+ d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_receiver_2ch.bde \
+ d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_receiver.bde
 
 #__END BUILD CLINK
