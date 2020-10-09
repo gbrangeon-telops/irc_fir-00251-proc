@@ -63,14 +63,18 @@ begin
       if rising_edge(CLK) then
          if sreset = '1' then 
             TX_MOSI.TVALID <= '0';
-         else
-            
+         else  
+
             if TX_MISO.TREADY = '1' then 
                TX_MOSI <= RX_MOSI;
-               if RX_MOSI.TUSER(TUSER_SATURATED_PIX_BIT)= '1' then 
+               if RX_MOSI.TUSER(TUSER_SATURATED_PIX_BIT) = '1' then 
                   TX_MOSI.TDATA <= TAG_SATURATED_PIX;
+               elsif RX_MOSI.TUSER(TUSER_UCR_PIX_BIT) = '1' then
+                  TX_MOSI.TDATA <= TAG_UCR_PIX;
+               elsif RX_MOSI.TUSER(TUSER_OCR_PIX_BIT) = '1' then
+                  TX_MOSI.TDATA <= TAG_OCR_PIX;
                end if;
-            end if;          
+            end if;
             
          end if; 
       end if; 

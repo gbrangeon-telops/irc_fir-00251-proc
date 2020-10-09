@@ -40,9 +40,9 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\clink\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\clink\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\clink\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\suphawkA\HDL
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -252,15 +252,6 @@ ADC_deserializer/..\..\compile\adc_data_deserializer_8chn.vhd=-1
 [file_out:ADC_deserializer/..\..\..\src\QuadADC\HDL\adc_data_deserializer.bde]
 ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_blackbirdD.bde]
-/..\compile\fir_00251_proc_blackbirdD.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
-
-[file_out:/..\..\src\fir_00251_proc_startup.bde]
-/..\compile\fir_00251_proc_startup.vhd=-1
-
 [Groups]
 ADCReadout=1
 AEC=1
@@ -275,7 +266,7 @@ Flagging=1
 Flash_Ctrl=1
 FPA=1
 FPA\Common=1
-FPA\Blackbird1280=1
+FPA\blackbirdD=1
 FPA\HawkA=1
 FPA\HerculesD=1
 FPA\isc0207A=1
@@ -317,7 +308,7 @@ USB=1
 
 [Files]
 /..\..\src\fir_00251_proc_acq.bde=-1
-/..\..\src\fir_00251_proc_blackbird1280D.bde=-1
+/..\..\src\fir_00251_proc_blackbirdD.bde=-1
 /..\..\src\fir_00251_proc_hawkA.bde=-1
 /..\..\src\fir_00251_proc_herculesD.bde=-1
 /..\..\src\fir_00251_proc_isc0207A.bde=-1
@@ -335,7 +326,7 @@ USB=1
 /..\..\src\fir_00251_proc_suphawkA.bde=-1
 /..\..\src\fir_00251_build_all_top.do=-1
 /..\..\src\fir_00251_proc_acq_build.do=-1
-/..\..\src\fir_00251_top_blackbird1280D_build.do=-1
+/..\..\src\fir_00251_top_blackbirdD_build.do=-1
 /..\..\src\fir_00251_top_hawkA_build.do=-1
 /..\..\src\fir_00251_top_herculesD_build.do=-1
 /..\..\src\fir_00251_top_isc0207A_build.do=-1
@@ -417,7 +408,6 @@ Calib/..\..\..\src\Calibration\HDL\compil_calibration.do=-1
 CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd=-1
 CLINK/..\..\..\src\clink\HDL\compil_clink_receiver.do=-1
 CLINK/..\..\..\src\clink\HDL\clink_receiver_2ch.bde=-1
-CLINK/..\..\..\src\clink\HDL\clink_receiver.bde=-1
 CLINK/..\..\..\src\clink\HDL\clink_dout_ctrl.bde=-1
 CLINK/..\..\..\src\clink\HDL\mglk_clink_dout_ctrl.vhd=-1
 CLINK/..\..\..\src\clink\HDL\scd_clink_dout_ctrl.vhd=-1
@@ -523,8 +513,8 @@ FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\comp
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde=-1
 FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde=-1
-FPA\Blackbird1280/..\..\..\..\src\FPA\blackbird1280D\HDL\FPA_define.vhd=-1
-FPA\Blackbird1280/..\..\..\..\src\FPA\blackbird1280D\HDL\compil_blackbird1280D.do=-1
+FPA\blackbirdD/..\..\..\..\src\FPA\blackbirdD\HDL\compil_blackbirdD.do=-1
+FPA\blackbirdD/..\..\..\..\src\FPA\blackbirdD\HDL\FPA_define.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\compil_hawkA.do=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\FPA_define.vhd=-1
 FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde=-1
@@ -659,6 +649,7 @@ FPA\PelicanD/..\..\..\..\src\FPA\pelicanD\HDL\compil_PelicanD.do=-1
 FPA\PelicanD/..\..\..\..\src\FPA\pelicanD\HDL\FPA_define.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\compil_scd_proxy.do=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\proxy_define.vhd=-1
+FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_base_mode_ctrl.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_data_dispatcher.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_diag_data_gen.vhd=-1
@@ -669,6 +660,7 @@ FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_mblaze_intf.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_prog_ctrler.vhd=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_proxy_intf.bde=-1
 FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_serial_module.vhd=-1
+FPA\Scd_proxy/..\..\..\..\src\FPA\scd_proxy\HDL\scd_int_mode_ctrl.vhd=-1
 FPA\ScorpiolwD/..\..\..\..\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do=-1
 FPA\ScorpiolwD/..\..\..\..\src\FPA\scorpiolwD\HDL\FPA_define.vhd=-1
 FPA\ScorpiolwD_230Hz/..\..\..\..\src\FPA\scorpiolwD_230Hz\HDL\compil_scorpiolwD_230Hz.do=-1
@@ -838,7 +830,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 
 [Files.Data]
 .\..\src\fir_00251_proc_acq.bde=Block Diagram
-.\..\src\fir_00251_proc_blackbird1280D.bde=Block Diagram
+.\..\src\fir_00251_proc_blackbirdD.bde=Block Diagram
 .\..\src\fir_00251_proc_hawkA.bde=Block Diagram
 .\..\src\fir_00251_proc_herculesD.bde=Block Diagram
 .\..\src\fir_00251_proc_isc0207A.bde=Block Diagram
@@ -856,7 +848,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\fir_00251_proc_suphawkA.bde=Block Diagram
 .\..\src\fir_00251_build_all_top.do=Macro
 .\..\src\fir_00251_proc_acq_build.do=Macro
-.\..\src\fir_00251_top_blackbird1280D_build.do=Macro
+.\..\src\fir_00251_top_blackbirdD_build.do=Macro
 .\..\src\fir_00251_top_hawkA_build.do=Macro
 .\..\src\fir_00251_top_herculesD_build.do=Macro
 .\..\src\fir_00251_top_isc0207A_build.do=Macro
@@ -938,7 +930,6 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd=VHDL Source Code
 .\..\src\clink\HDL\compil_clink_receiver.do=Macro
 .\..\src\clink\HDL\clink_receiver_2ch.bde=Block Diagram
-.\..\src\clink\HDL\clink_receiver.bde=Block Diagram
 .\..\src\clink\HDL\clink_dout_ctrl.bde=Block Diagram
 .\..\src\clink\HDL\mglk_clink_dout_ctrl.vhd=VHDL Source Code
 .\..\src\clink\HDL\scd_clink_dout_ctrl.vhd=VHDL Source Code
@@ -1044,8 +1035,8 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde=Block Diagram
 .\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde=Block Diagram
-.\..\src\FPA\blackbird1280D\HDL\FPA_define.vhd=VHDL Source Code
-.\..\src\FPA\blackbird1280D\HDL\compil_blackbird1280D.do=Macro
+.\..\src\FPA\blackbirdD\HDL\compil_blackbirdD.do=Macro
+.\..\src\FPA\blackbirdD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\compil_hawkA.do=Macro
 .\..\src\FPA\hawkA\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde=Block Diagram
@@ -1179,6 +1170,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\pelicanD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\scd_proxy\HDL\compil_scd_proxy.do=Macro
 .\..\src\FPA\scd_proxy\HDL\proxy_define.vhd=VHDL Source Code
+.\..\src\FPA\scd_proxy\HDL\scd_base_mode_ctrl.vhd=VHDL Source Code
 .\..\src\FPA\scd_proxy\HDL\scd_data_ctrl.bde=Block Diagram
 .\..\src\FPA\scd_proxy\HDL\scd_data_dispatcher.vhd=VHDL Source Code
 .\..\src\FPA\scd_proxy\HDL\scd_diag_data_gen.vhd=VHDL Source Code
@@ -1189,6 +1181,7 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 .\..\src\FPA\scd_proxy\HDL\scd_prog_ctrler.vhd=VHDL Source Code
 .\..\src\FPA\scd_proxy\HDL\scd_proxy_intf.bde=Block Diagram
 .\..\src\FPA\scd_proxy\HDL\scd_serial_module.vhd=VHDL Source Code
+.\..\src\FPA\scd_proxy\HDL\scd_int_mode_ctrl.vhd=VHDL Source Code
 .\..\src\FPA\scorpiolwD\HDL\compil_scorpiolwD.do=Macro
 .\..\src\FPA\scorpiolwD\HDL\FPA_define.vhd=VHDL Source Code
 .\..\src\FPA\scorpiolwD_230Hz\HDL\compil_scorpiolwD_230Hz.do=Macro
@@ -1359,8 +1352,8 @@ USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
 [file_out:/..\..\src\fir_00251_proc_acq.bde]
 /..\compile\fir_00251_proc_acq.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_blackbird1280D.bde]
-/..\compile\fir_00251_proc_blackbird1280D.vhd=-1
+[file_out:/..\..\src\fir_00251_proc_blackbirdD.bde]
+/..\compile\fir_00251_proc_blackbirdD.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_hawkA.bde]
 /..\compile\fir_00251_proc_hawkA.vhd=-1
@@ -1469,9 +1462,6 @@ Calib/..\..\compile\param_lut_fifo.vhd=-1
 
 [file_out:CLINK/..\..\..\src\clink\HDL\clink_receiver_2ch.bde]
 CLINK/..\..\compile\clink_receiver_2ch.vhd=-1
-
-[file_out:CLINK/..\..\..\src\clink\HDL\clink_receiver.bde]
-CLINK/..\..\compile\clink_receiver.vhd=-1
 
 [file_out:CLINK/..\..\..\src\clink\HDL\clink_dout_ctrl.bde]
 CLINK/..\..\compile\clink_dout_ctrl.vhd=-1
