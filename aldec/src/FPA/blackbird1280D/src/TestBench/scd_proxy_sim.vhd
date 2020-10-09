@@ -34,7 +34,11 @@ entity scd_proxy_sim is
    port(
       
       ARESET       : in std_logic;
-      CLK          : in std_logic;
+      CLK          : in std_logic;  
+      
+      INT_FBK_N    : out std_logic;
+      INT_FBK_P    : out std_logic;
+      
       FPA_INTF_CFG : fpa_intf_cfg_type;  
       TRIG_CONFIG  :  in TRIG_CFG_TYPE;
       
@@ -79,12 +83,35 @@ end component;
    signal areset_i            : std_logic; 
    signal acq_trig_i          : std_logic;
    signal cnt                 : integer := 0;
+   signal cnt_i               : unsigned(31 downto 0);
    type trig_sm_type   is (idle, trig_gen);
    signal trig_sm          : trig_sm_type := idle;
    signal trig_period         : integer := integer((1.0/real(1000))*real(FPA_INTF_CLK_RATE_MHZ)*1000000.0);
    signal trig_duration       : integer := 3;
    
+   type delay_sm_type   is (idle, wait_intg_start, wait_intg_duration, gen_pulse);
+   signal delay_sm          : delay_sm_type := idle;
+   signal fsync_cnt         : unsigned(31 downto 0);
+   signal fpa_int_i         : std_logic;
+   signal fsync_last        : std_logic;
+
+
+   
 begin  
+  
+   
+   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
+   begin  
+      INT_FBK_N <= not fpa_int_i;
+      INT_FBK_P <= fpa_int_i;
+   end generate;
+   
+   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
+   begin 
+      INT_FBK_N <= '1';
+      INT_FBK_P <= '0';
+   end generate;   
+   
    
   areset_i <= not RST_CLINK_N or ARESET;
   ACQ_TRIG <= acq_trig_i;
@@ -99,7 +126,7 @@ begin
       CLK => CLK,
       FPA_INTF_CFG => FPA_INTF_CFG, 
       DIAG_MODE_EN => '1',    
-      FPA_INT => '0',
+      FPA_INT => fpa_int_i,
       FPA_TRIG => FSYNC,
       CH1_DATA => CH1_DATA,
       CH2_DATA => CH2_DATA,   
@@ -109,8 +136,8 @@ begin
       DIAG_FRAME => open  
       );   
  
-
-   -- Trigger generator
+   
+       -- Trigger generator
    U2: process(CLK)
    begin
       if rising_edge(CLK) then
@@ -151,6 +178,83 @@ begin
          
       end if;
       
-   end process; 
+   end process;
+    ----------------------------------------------------------
+   -- Simulation du délai entre la montée de FSYNC et le début de l'intégration (délai T4)
+   ---------------------------------------------------------- 
+   U3: process(CLK)
+   begin
+      if rising_edge(CLK) then
+         
+         if areset_i = '1' then 
+            fsync_last <= '0'; 
+            delay_sm <= idle;
+            cnt_i <= (others => '0');
+            fsync_cnt <= (others => '0');
+            fpa_int_i <= '0';
+         else 
+            
+            fsync_last <= FSYNC;
+            
+            case delay_sm  is
+               
+               
+               
+               
+               when idle => 
+                                                            
+                  fpa_int_i <= '0';
+               
+                  if FSYNC = '1' and fsync_last = '0' then 
+                     fsync_cnt <= fsync_cnt + 1;
+                     
+                     if NO_FIRST_READOUT = false then
+                        delay_sm <= wait_intg_start;
+                     else   
+                        if fsync_cnt > 1 then
+                           delay_sm <= wait_intg_start;
+                        else   
+                           delay_sm <= idle;
+                        end if;   
+                     end if;
+                     
+                  end if;
+
+               when wait_intg_start  => 
+               
+                  cnt_i <= cnt_i + 1;
+               
+                  if cnt_i > FPA_INTF_CFG.scd_misc.scd_fsync_re_to_intg_start_dly then 
+                     delay_sm <= gen_pulse; 
+                     fpa_int_i <= '1'; 
+                     cnt_i <= (others => '0');
+                  end if; 
+
+               when gen_pulse  =>
+               
+                  cnt_i <= cnt_i + 1;
+               
+                  if cnt_i > 3 then 
+                     delay_sm <= wait_intg_duration; 
+                     cnt_i <= (others => '0');
+                  end if;
+               
+              when wait_intg_duration  => 
+               
+                  cnt_i <= cnt_i + 1;
+               
+                  if cnt_i > FPA_INTF_CFG.scd_int.scd_int_time - 3 then 
+                     delay_sm <= idle; 
+                     fpa_int_i <= '0'; 
+                     cnt_i <= (others => '0');
+                  end if; 
+               when others =>
+            
+            end case;
+            
+         end if; 
+               
+      end if;
+   end process;
 
 end rtl;

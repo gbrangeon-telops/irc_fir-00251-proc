@@ -10,7 +10,7 @@ acom D:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w28_d16\fwft_afifo_w28_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d16\fwft_sfifo_w32_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w64_d16\fwft_sfifo_w64_d16_sim_netlist.vhdl
-acom "D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w65_d16\fwft_sfifo_w65_d16_sim_netlist.vhdl"
+acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w65_d16\fwft_sfifo_w65_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w40_d16\fwft_sfifo_w40_d16_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\tdp_ram_w8_d2048\tdp_ram_w8_d2048_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_sfifo_d2048\t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
@@ -21,6 +21,10 @@ acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64\sfifo_w8_d64_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\IP\160\sfifo_w8_d64_no_output_reg\sfifo_w8_d64_no_output_reg_sim_netlist.vhdl
 acom "D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl"
 acom "D:\Telops\FIR-00251-Proc\IP\160\ip_axis_32_to_64\ip_axis_32_to_64_sim_netlist.vhdl"
+acom "D:\Telops\FIR-00251-Common\VHDL\Utilities\axis_32_to_64_wrap.vhd"
+
+
+
 acom "D:\Telops\FIR-00251-Common\VHDL\Buffering\BufferingDefine.vhd"
 do "D:\Telops\FIR-00251-Proc\src\Trig\HDL\compil_trig_gen.do"
 
@@ -102,6 +106,9 @@ add wave -noreg -logic {}
 
 
 add wave -named_row "--------------------- All others signals-----------------------"
+
+add wave -named_row "---------------------Sim diag data -----------------------"
+add wave UUT/U3/U1/*
 
 add wave -named_row "---------------------Fifo out -----------------------"
 add wave UUT/U8/*

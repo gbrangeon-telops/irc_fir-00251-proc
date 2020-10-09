@@ -382,7 +382,7 @@ begin
       -- 6. FPA_SendConfigGC() (Lors de la configuration pendant l'init, le mode de patron test est activé)      
       -- 6.1 Envoi de la commande synthétique 
       sim_cfg_i.cmd_to_update_id <= SCD_DIAG_CMD_ID; 
-      --sim_cfg_i.test_ptrn_on <= '0';
+      sim_cfg_i.test_ptrn_on <= '0';
       sim_cfg_i.cfg_num <= x"02";
       wait for 30 ns;
       fpa_intf_cfg_i <= mediumGainIWR_SpecificParams(sim_cfg_i);
@@ -469,7 +469,7 @@ begin
       -- 6. FPA_SendConfigGC() (Lors de la configuration pendant l'init, le mode de patron test est activé)      
       -- 6.1 Envoi de la commande synthétique 
       sim_cfg_i.cmd_to_update_id <= SCD_DIAG_CMD_ID; 
-      --sim_cfg_i.test_ptrn_on <= '0';
+      sim_cfg_i.test_ptrn_on <= '0';
       sim_cfg_i.cfg_num <= x"03";
       wait for 30 ns;
       fpa_intf_cfg_i <= mediumGainIWR_SpecificParams(sim_cfg_i);
