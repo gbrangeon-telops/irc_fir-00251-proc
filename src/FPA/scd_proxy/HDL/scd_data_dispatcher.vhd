@@ -199,6 +199,7 @@ architecture rtl of scd_data_dispatcher is
    signal pix_out_sm                   : pix_out_sm_type;
    signal frame_fsm                    : frame_fsm_type;      
    signal sreset                       : std_logic;
+   signal sresetn                      : std_logic;
    signal real_data_mode               : std_logic;
    signal diag_mode_en_i               : std_logic;
    signal fpa_fifo_dval                : std_logic;
@@ -324,7 +325,7 @@ architecture rtl of scd_data_dispatcher is
    signal iwr_int_fifo_wr2             : std_logic;
    
    signal int_time_i                   : unsigned(FPA_INTF_CFG.SCD_INT.SCD_INT_TIME 'LENGTH-1 downto 0);
-   constant HDR_SEND_CLK_DELAY         : integer := 10;
+   constant HDR_SEND_CLK_DELAY         : integer := 6;
    signal exp_dval_pipe                : std_logic_vector(HDR_SEND_CLK_DELAY -1 downto 0) := (others => '0');
    signal int_time_100MHz_dval         : std_logic;
    
@@ -554,6 +555,7 @@ begin
       SRESET => sreset
       );
    
+   sresetn <= not sreset;
    --------------------------------------------------
    -- double sync 
    --------------------------------------------------   
@@ -584,7 +586,7 @@ begin
       
       U2 : axis_32_to_64_wrap
       port map (
-      ARESETN => ARESET,
+      ARESETN => sresetn,
       CLK     => CLK,
       RX_MOSI => pix_mosi32,      
       RX_MISO => pix_miso32,       
