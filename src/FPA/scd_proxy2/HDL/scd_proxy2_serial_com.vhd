@@ -21,32 +21,39 @@ use work.fpa_common_pkg.all;
 
 entity scd_proxy2_serial_com is
    port(
-      ARESETN               : in std_logic;
-      CLK                   : in std_logic;
+      ARESET                 : in std_logic;
+      CLK                    : in std_logic;
       
-      USER_CFG              : fpa_intf_cfg_type;
+      USER_CFG               : fpa_intf_cfg_type;
       
       -- interface avec le contrôleur
-      SERIAL_BASE_ADD       : in std_logic_vector(7 downto 0);
-      SERIAL_FATAL_ERR      : out std_logic;
-      SERIAL_DONE           : out std_logic;
-      SERIAL_EN             : in std_logic;
-      SERIAL_ABORT          : in std_logic;
-      PROXY_RDY             : out std_logic;
+      SERIAL_BASE_ADD        : in std_logic_vector(7 downto 0);
+      SERIAL_FATAL_ERR       : out std_logic;
+      SERIAL_DONE            : out std_logic;
+      SERIAL_EN              : in std_logic;
+      SERIAL_ABORT           : in std_logic;
+      PROXY_RDY              : out std_logic;
       
       -- TRIG de synchro
-      ACQ_TRIG              : in std_logic;
-      XTRA_TRIG             : in std_logic;
-      PROG_TRIG             : out std_logic;
+      ACQ_TRIG               : in std_logic;
+      XTRA_TRIG              : in std_logic;
+      PROG_TRIG              : out std_logic;
       
-      -- interface avec la RAM
-      RAM_WR                : out std_logic;
-      RAM_WR_ADD            : out std_logic_vector(10 downto 0);      
-      RAM_WR_DATA           : out std_logic_vector(7 downto 0);
-      RAM_RD                : out std_logic;
-      RAM_RD_ADD            : out std_logic_vector(10 downto 0);
-      RAM_RD_DATA           : in std_logic_vector(7 downto 0);
-      RAM_RD_DVAL           : in std_logic;
+      -- interface avec la RAM1 : ram de la config MB et de la config Int
+      RAM1_RD                : out std_logic;
+      RAM1_RD_ADD            : out std_logic_vector(10 downto 0);
+      RAM1_RD_DATA           : in std_logic_vector(7 downto 0);
+      RAM1_RD_DVAL           : in std_logic;
+      
+      
+      -- interface avec la RAM2 : ram de securisation de la cfg à envoyer au proxy
+      RAM2_WR                : out std_logic;
+      RAM2_WR_ADD            : out std_logic_vector(10 downto 0);      
+      RAM2_WR_DATA           : out std_logic_vector(7 downto 0);
+      RAM2_RD                : out std_logic;
+      RAM2_RD_ADD            : out std_logic_vector(10 downto 0);
+      RAM2_RD_DATA           : in std_logic_vector(7 downto 0);
+      RAM2_RD_DVAL           : in std_logic;
       
       -- temperature du détecteur
       FPA_TEMP_STAT         : out fpa_temp_stat_type;
@@ -141,13 +148,12 @@ architecture RTL of scd_proxy2_serial_com is
    type com_data_array_type  is array (0 to LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
-
+   
    signal prog_seq_fsm            : prog_seq_fsm_type;
    signal cfg_mgmt_fsm            : cfg_mgmt_fsm_type;
    signal cmd_resp_fsm            : cmd_resp_fsm_type;
    signal prog_trig_fsm           : prog_trig_fsm_type;
    signal resp_data               : com_data_array_type;
-   signal areset                  : std_logic;
    signal sreset                  : std_logic;
    signal serial_fatal_err_i      : std_logic;
    signal serial_done_i           : std_logic;
@@ -157,11 +163,13 @@ architecture RTL of scd_proxy2_serial_com is
    signal cpy_cfg_done            : std_logic;
    signal send_cfg_done           : std_logic;
    signal serial_cmd_failure      : std_logic;
-   signal ram_wr_i                : std_logic;
-   signal ram_wr_add_i            : unsigned(RAM_WR_ADD'range);
-   signal ram_wr_data_i           : std_logic_vector(RAM_WR_DATA'range);
-   signal ram_rd_i                : std_logic;
-   signal ram_rd_add_i            : unsigned(RAM_RD_ADD'range);
+   signal ram2_wr_i               : std_logic;
+   signal ram2_wr_add_i           : unsigned(RAM2_WR_ADD'range);
+   signal ram2_wr_data_i          : std_logic_vector(RAM2_WR_DATA'range);
+   signal ram1_rd_i               : std_logic;
+   signal ram1_rd_add_i           : unsigned(RAM1_RD_ADD'range);
+   signal ram2_rd_i               : std_logic;
+   signal ram2_rd_add_i           : unsigned(RAM2_RD_ADD'range);
    signal timeout_cnt             : unsigned(23 downto 0);
    signal cfg_byte_total          : unsigned(15 downto 0);
    signal cfg_byte_cnt            : unsigned(15 downto 0);
@@ -221,17 +229,21 @@ architecture RTL of scd_proxy2_serial_com is
 begin
    
    acq_mode <= TRIG_CTLER_STAT(4);
-   
-   areset <= not ARESETN;
+
    SERIAL_FATAL_ERR <= serial_fatal_err_i;
    SERIAL_DONE <= serial_done_i;
    PROXY_RDY <= proxy_rdy_i;
    
-   RAM_WR <= ram_wr_i;   
-   RAM_WR_ADD <= std_logic_vector(ram_wr_add_i);
-   RAM_WR_DATA <= ram_wr_data_i;
-   RAM_RD <= ram_rd_i;     
-   RAM_RD_ADD <= std_logic_vector(ram_rd_add_i);  
+   RAM1_RD <= ram1_rd_i;                           
+   RAM1_RD_ADD <= std_logic_vector(ram1_rd_add_i); 
+   
+   
+   RAM2_WR <= ram2_wr_i;   
+   RAM2_WR_ADD <= std_logic_vector(ram2_wr_add_i);
+   RAM2_WR_DATA <= ram2_wr_data_i;
+   
+   RAM2_RD <= ram2_rd_i;     
+   RAM2_RD_ADD <= std_logic_vector(ram2_rd_add_i);  
    
    TX_DVAL <= tx_dval_i;
    TX_DATA <= tx_data_i;
@@ -248,7 +260,7 @@ begin
    --------------------------------------------------   
    U1A : sync_reset
    port map(
-      ARESET => areset,
+      ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset
       );
@@ -390,8 +402,9 @@ begin
             cfg_mgmt_fsm <=  idle;
             cpy_cfg_done <= '0';
             send_cfg_done <= '0';
-            ram_wr_i <= '0';
-            ram_rd_i <= '0';
+            ram2_wr_i <= '0';
+            ram1_rd_i <= '0';
+            ram2_rd_i <= '0';
             trig_i <= '0';
             trig_last <= '0';
             trig_rising <= '0';
@@ -409,7 +422,7 @@ begin
             -- pragma translate_off
             tx_data_i <= (others => '0');
             -- pragma translate_on  
-
+            
          else             
             
             trig_i  <= XTRA_TRIG or ACQ_TRIG; 
@@ -426,8 +439,9 @@ begin
                   cpy_cfg_done <= '1';
                   send_cfg_done <= '1';
                   tx_dval_i <= '0';
-                  ram_wr_i <= '0';
-                  ram_rd_i <= '0';
+                  ram2_wr_i <= '0';
+                  ram1_rd_i <= '0';
+                  ram2_rd_i <= '0';
                   timeout_cnt <= (others => '0');
                   cfg_byte_cnt <= (others => '0');                  
                   cfg_payload <= (others => '0');
@@ -453,30 +467,29 @@ begin
                   
                -- partie copy de la config vers une zone securisée             
                when cpy_cfg_rd_st =>   -- la config est copiee de la zone A vers un fifo (avant de partir en zone sécurisée)                       
-                  ram_wr_i <= '0';     -- ram en mode lecture
-                  ram_rd_i <= '1';
+                  ram1_rd_i <= '1';
                   cfg_byte_cnt <= cfg_byte_cnt + 1;
-                  ram_rd_add_i <= resize(unsigned(SERIAL_BASE_ADD), ram_rd_add_i'length) + cfg_byte_cnt(ram_rd_add_i'length-1 downto 0);
-                  if ram_rd_add_i(7 downto 0) = LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
+                  ram1_rd_add_i <= resize(unsigned(SERIAL_BASE_ADD), ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);
+                  if ram1_rd_add_i(7 downto 0) = LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
                      cfg_mgmt_fsm <= init_cpy_wr_st;
-                     ram_rd_i <= '0';
+                     ram1_rd_i <= '0';
                   end if;
-                  cfg_fifo_wr_en <= RAM_RD_DVAL; 
-                  cfg_fifo_din <= RAM_RD_DATA;
+                  cfg_fifo_wr_en <= RAM1_RD_DVAL; 
+                  cfg_fifo_din <= RAM1_RD_DATA;
                
                when init_cpy_wr_st =>     -- zone securisée en ecriture
                   cfg_fifo_wr_en <= '0';
                   cfg_byte_cnt <= (others => '0');
-                  ram_wr_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram_wr_add_i'length); -- zone securisée sera en ecriture
+                  ram2_wr_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram2_wr_add_i'length); -- zone securisée sera en ecriture
                   cfg_mgmt_fsm <= cpy_cfg_wr_st;
                
                when cpy_cfg_wr_st =>  -- la config est copiee  du fifo vers la zone securisée B  
                   cfg_fifo_rd_en <= '1';                                      -- on peut commencer la lecture les yeux fermées car le fifo contient déjà des données quand on arrive ici     
                   if cfg_fifo_dval = '1' then
-                     ram_rd_i <= '0';
-                     ram_wr_i <= '1';                                         -- ram en mode ecriture  
-                     ram_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
-                     ram_wr_data_i <= cfg_fifo_dout;
+                     ram2_rd_i <= '0';
+                     ram2_wr_i <= '1';                                         -- ram en mode ecriture  
+                     ram2_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
+                     ram2_wr_data_i <= cfg_fifo_dout;
                      cfg_byte_cnt <= cfg_byte_cnt + 1;                     
                      if cfg_byte_cnt    = 3 then               -- 3 car cfg_byte_cnt commence à 0
                         cfg_payload(7 downto 0) <= cfg_fifo_dout;  -- payload de la config selon SCD_PROXY2
@@ -494,41 +507,41 @@ begin
                when init_send_st =>            
                   tx_dval_i <= '0';
                   cfg_byte_cnt <= (others => '0'); 
-                  ram_rd_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram_rd_add_i'length); -- zone securisée sera en lecture
+                  ram2_rd_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram2_rd_add_i'length); -- zone securisée sera en lecture
                   
                   if unsigned(SERIAL_BASE_ADD) = to_unsigned(OP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
                      force_prog_trig_mode <= '1';
-					      cfg_mgmt_fsm <= prog_trig_start_st; 
+                     cfg_mgmt_fsm <= prog_trig_start_st; 
                   else
                      cfg_mgmt_fsm <= send_cfg_rd_st;   
                   end if;
-
-		       when prog_trig_start_st =>
-			      prog_trig_start <= '1';
-			      if prog_trig_done = '0' then 
-			         prog_trig_start <= '0';
-			         cfg_mgmt_fsm <= prog_trig_end_st;			   
-			      end if;
                
-			   when prog_trig_end_st =>
-               if prog_trig_done = '1' then
-				      if force_prog_trig_mode = '1' then
-				         cfg_mgmt_fsm <= send_cfg_rd_st;
-					   else
-					      cfg_mgmt_fsm <= idle;
-					   end if;
-				   end if;
+               when prog_trig_start_st =>
+                  prog_trig_start <= '1';
+                  if prog_trig_done = '0' then 
+                     prog_trig_start <= '0';
+                     cfg_mgmt_fsm <= prog_trig_end_st;			   
+                  end if;
+               
+               when prog_trig_end_st =>
+                  if prog_trig_done = '1' then
+                     if force_prog_trig_mode = '1' then
+                        cfg_mgmt_fsm <= send_cfg_rd_st;
+                     else
+                        cfg_mgmt_fsm <= idle;
+                     end if;
+                  end if;
                
                when send_cfg_rd_st =>          -- on lit un byte dans la zone sécurisée
-                  ram_wr_i <= '0';     
-                  ram_rd_i <= '1';
+                  ram2_wr_i <= '0';     
+                  ram2_rd_i <= '1';
                   tx_dval_i <= '0';
                   cfg_mgmt_fsm <= latch_data_st;
                
                when latch_data_st =>          -- on latche le byte lu
-                  ram_rd_i <= '0';                  
-                  if RAM_RD_DVAL = '1' then
-                     cfg_byte <= RAM_RD_DATA;
+                  ram2_rd_i <= '0';                  
+                  if RAM2_RD_DVAL = '1' then
+                     cfg_byte <= RAM2_RD_DATA;
                      cfg_byte_cnt  <= cfg_byte_cnt + 1;
                      cfg_mgmt_fsm <= send_cfg_out_st;                     
                   end if;
@@ -548,7 +561,7 @@ begin
                      cmd_resp_en <= '1';
                   else
                      cfg_mgmt_fsm <= send_cfg_rd_st;
-                     ram_rd_add_i <= ram_rd_add_i + 1;  -- mis ici expres (incr pour la prochaine lecture)
+                     ram2_rd_add_i <= ram2_rd_add_i + 1;  -- mis ici expres (incr pour la prochaine lecture)
                   end if;                  
                
                when wait_tx_fifo_empty_st =>                  
@@ -574,7 +587,7 @@ begin
                         cfg_mgmt_fsm <= timeout_mgmt_st;
                      end if; 
                      -- pragma translate_off                     
-                        cfg_mgmt_fsm <= cmd_resp_mgmt_st;
+                     cfg_mgmt_fsm <= cmd_resp_mgmt_st;
                      -- pragma translate_on
                   end if;
                
@@ -585,13 +598,13 @@ begin
                   else
                      proxy_rdy_i <= '1';   
                      if force_prog_trig_mode = '1' then
-					         force_prog_trig_mode <= '0';
-						      cfg_mgmt_fsm <= prog_trig_start_st;
+                        force_prog_trig_mode <= '0';
+                        cfg_mgmt_fsm <= prog_trig_start_st;
                      else
                         cfg_mgmt_fsm <= idle; 
                      end if;              
                   end if;
-                 
+                  
                
                when timeout_mgmt_st =>
                   serial_cmd_failure  <= '1';
@@ -605,7 +618,7 @@ begin
       end if;
    end process;   
    
-
+   
    --------------------------------------------------
    -- Generateur pour uart_tbaud_clk_pulse
    -------------------------------------------------- 
@@ -643,7 +656,7 @@ begin
                      prog_trig_fsm <= check_prog_img_st;
                      prog_trig_i <= '1';
                   end if;
-                  
+               
                when check_prog_img_st =>                     
                   prog_trig_done <= '0';
                   if readout_last = '1' and readout_i = '0' and acq_mode = '0' then 
@@ -652,7 +665,7 @@ begin
                   if img_cnt >= FPA_XTRA_IMAGE_NUM_TO_SKIP then                        
                      prog_trig_fsm <= idle;    
                   end if; 
-                  
+               
                when others =>
                
             end case;

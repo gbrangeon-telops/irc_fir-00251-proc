@@ -13,6 +13,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;           
 use IEEE.numeric_std.ALL;
+use IEEE.std_logic_misc.all;
 use work.fpa_common_pkg.all;
 use work.FPA_define.all;
 use work.Proxy_define.all;
@@ -37,9 +38,8 @@ entity scd_proxy2_mblaze_intf is
       USER_CFG             : out fpa_intf_cfg_type;
       COOLER_STAT          : out fpa_cooler_stat_type;
       
-      SER_CFG_DATA         : out std_logic_vector(7 downto 0);
-      SER_CFG_ADD          : out std_logic_vector(10 downto 0);
-      SER_CFG_DVAL         : out std_logic;
+      MB_SER_CFG           : out t_axi4_stream_mosi16;
+      EXP_SER_CFG          : out t_axi4_stream_mosi16;
       
       FPA_SOFTW_STAT       : out fpa_firmw_stat_type;
       
@@ -50,8 +50,8 @@ end scd_proxy2_mblaze_intf;
 
 architecture rtl of scd_proxy2_mblaze_intf is
    
-   constant MB_SOURCE  : std_logic_vector(1 downto 0)   :=  "00";
-   constant EXP_SOURCE : std_logic_vector(1 downto 0)   :=  "01";   
+   constant C_MB_SOURCE  : std_logic_vector(1 downto 0)   :=  "00";
+   constant C_EXP_SOURCE : std_logic_vector(1 downto 0)   :=  "01";   
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26    : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1     : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
    constant C_DIAG_LOVH_MCLK                            : natural := 8; 
@@ -64,14 +64,12 @@ architecture rtl of scd_proxy2_mblaze_intf is
          );
    end component;     
    
-   type cfg_arbit_fsm_type is (idle, cfg_begin_pause_st, check_mb_serial_st, exp_cfg_st, mb_cfg_st, cfg_end_pause_st, wait_exp_done_st);
-   type exp_cfg_gen_fsm_type is (idle, wait_conv_st, wait_arbiter_st, serial_exp_cfg_st, struct_exp_cfg_st);
+   type exp_cfg_gen_fsm_type is (idle, wait_int_dval_st, wait_mb_cfg_st, serial_exp_cfg_st, pause_st);
    
    type int_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
    type int_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
    signal int_time_pipe                   : int_time_pipe_type; 
-   signal cfg_arbit_fsm                   : cfg_arbit_fsm_type;
    signal exp_cfg_gen_fsm                 : exp_cfg_gen_fsm_type;
    signal sreset                          : std_logic;
    signal axi_awaddr	                     : std_logic_vector(31 downto 0);
@@ -85,55 +83,46 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal axi_rresp	                     : std_logic_vector(1 downto 0);
    signal axi_rvalid	                     : std_logic;
    signal axi_wstrb                       : std_logic_vector(3 downto 0);   
-   signal ser_cfg_dval_i                  : std_logic;
-   signal ser_cfg_data_i                  : std_logic_vector(7 downto 0);
-   signal mb_ser_cfg_data                 : std_logic_vector(7 downto 0);
-   signal ser_cfg_add_i                   : std_logic_vector(SER_CFG_ADD'range);
-   signal mb_ser_cfg_add                  : std_logic_vector(SER_CFG_ADD'range);
    signal exp_cfg_en                      : std_logic;
    signal user_cfg_in_progress_i          : std_logic;
    signal dly_cnt                         : unsigned(4 downto 0);
    signal mb_serial_assump_err            : std_logic;
-   signal mb_cfg_rqst                     : std_logic;
-   signal cfg_source                      : std_logic_vector(MB_SOURCE'range);
-   signal exp_cfg_rqst                    : std_logic;
-   signal mb_cfg_serial_in_progress       : std_logic;
-   signal mb_cfg_serial_in_progress_last  : std_logic;
+   signal mb_cfg_in_progress              : std_logic;
    signal mb_ser_cfg_dval                 : std_logic;
+   signal mb_ser_cfg_data                 : std_logic_vector(7 downto 0);
+   signal mb_ser_cfg_add                  : std_logic_vector(7 downto 0);
    signal mb_struct_cfg                   : fpa_intf_cfg_type;
    signal user_cfg_i                      : fpa_intf_cfg_type;
    signal exp_cfg_done                    : std_logic;
-   signal exp_ser_cfg_add                 : std_logic_vector(SER_CFG_ADD'range);
+   signal exp_ser_cfg_add                 : std_logic_vector(7 downto 0);
    signal exp_ser_cfg_data                : std_logic_vector(7 downto 0);
    signal exp_ser_cfg_dval                : std_logic;
-   signal exp_struct_cfg_valid            : std_logic;
    signal exp_indx_i                      : std_logic_vector(7 downto 0);
    signal exp_checksum                    : unsigned(7 downto 0);
    signal int_signal_high_time_i          : unsigned(31 downto 0);
    signal int_indx_pipe                   : int_indx_pipe_type;
    signal int_dval_pipe                   : std_logic_vector(7 downto 0) := (others => '0');
    signal at_least_one_mb_cfg_received    : std_logic;
+   signal at_least_one_exp_cfg_received   : std_logic;
    signal mb_ctrled_reset_i               : std_logic;
    signal valid_cfg_received              : std_logic;
-   
-   
+   signal user_cfg_rdy_pipe               : std_logic_vector(7 downto 0) := (others => '0');
+   signal user_cfg_rdy                    : std_logic := '0';
    
    signal byte_cnt                        : unsigned(7 downto 0);
-   signal idle_cnt                        : unsigned(7 downto 0);
    signal exp_cfg_in_progress             : std_logic;
    signal slv_reg_rden                    : std_logic;
    signal slv_reg_wren                    : std_logic;
    signal data_i                          : std_logic_vector(31 downto 0);
    signal fpa_softw_stat_i                : fpa_firmw_stat_type;
-   signal mb_struct_cfg_valid             : std_logic;
    signal reset_err_i                     : std_logic;
-   --signal fpa_int_time_last               : unsigned(exp_time_i'range);
    signal ctrled_reset_i                  : std_logic;
    signal abs_additional_int_time_offset_i : integer := 0; 
    
    signal int_cfg_i                       : int_cfg_type;
-   signal exp_cfg_latch                   : int_cfg_type;
+   signal exp_struct_cfg                  : int_cfg_type;
    signal user_cfg_int                    : int_cfg_type;
+   signal checksum_base_add               : unsigned(exp_ser_cfg_add'length-1 downto 0);
    
    
 begin
@@ -157,9 +146,11 @@ begin
    MB_MISO.RVALID      <= axi_rvalid; 
    
    -- ecriture dans la ram de hw_driver   
-   SER_CFG_DATA  <= ser_cfg_data_i;
-   SER_CFG_ADD   <= ser_cfg_add_i;
-   SER_CFG_DVAL  <= ser_cfg_dval_i;
+   MB_SER_CFG.TDATA    <= mb_ser_cfg_add & mb_ser_cfg_data;
+   MB_SER_CFG.TVALID   <= mb_ser_cfg_dval;
+   EXP_SER_CFG.TDATA   <= exp_ser_cfg_add & exp_ser_cfg_data;
+   EXP_SER_CFG.TVALID  <= exp_ser_cfg_dval;
+   
    
    -- STATUS_MOSI toujours envoyé au fpa_status_gen pour eviter des delais
    STATUS_MOSI.AWVALID <= '0';   -- registres de statut en mode lecture seulement
@@ -188,125 +179,98 @@ begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
             fpa_softw_stat_i.dval <= '0';
-            mb_struct_cfg_valid <= '0';
-            mb_cfg_serial_in_progress <= '0';
-            mb_cfg_serial_in_progress_last <= '0';
-            mb_cfg_rqst <= '0'; 
+            mb_cfg_in_progress <= '0'; 
             mb_ser_cfg_dval <= '0';
             reset_err_i<= '0';
             fpa_softw_stat_i.fpa_input <= LVDS25; -- normaement c'est un mesureur de la tension de la banque du FPGA qui doit forunir cette info (sera fait dans sur une carte ADC). Mais pour la carte ACQ ce n'Est pas le cas.
             mb_ctrled_reset_i <= '0';
-            ctrled_reset_i <= '1';
+            at_least_one_mb_cfg_received <= '0';
             
-         else 
+         else             
             
-            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;
             
-            mb_cfg_serial_in_progress_last <= mb_cfg_serial_in_progress;
+            -- MB: config serielle
+            mb_ser_cfg_add <= std_logic_vector(resize(axi_awaddr(9 downto 2),mb_ser_cfg_add'length));  -- Cela suppose que l'adresse du mB varie par pas de 4 
+            mb_ser_cfg_data <= data_i(7 downto 0); -- pour la partie serielle de la config, seule la partie (7 downto 0) est valide (voir le driver C)                  
+            mb_ser_cfg_dval <= slv_reg_wren and axi_awaddr(10);         
             
-            if slv_reg_wren = '1' then 				
+            -- MB: config structurelle
+            if slv_reg_wren = '1' then
                
-               if  axi_awaddr(10) = '1' then   -- données de configuration serielle, envoyées dans la ram du hw_driver
-                  mb_cfg_rqst <= '0'; -- fait expres. Ainsi demande non traitée par l'arbitre avant le debut de la partie serielle est perdue. En principe par design, n'arrivera jamais.
-                  mb_cfg_serial_in_progress <= '1'; 
-                  mb_ser_cfg_add <= std_logic_vector(resize(axi_awaddr(9 downto 2),mb_ser_cfg_add'length));  -- Cela suppose que l'adresse du mB varie par pas de 4 
-                  mb_ser_cfg_data <= data_i(7 downto 0); -- pour la partie serielle de la config, seule la partie (7 downto 0) est valide (voir le driver C)                  
-                  mb_ser_cfg_dval <= '1';
-                  if axi_awaddr(7 downto 0) = SERIAL_CFG_END_ADD then  -- adresse de fin de commande serielle
-                     mb_cfg_serial_in_progress <= not data_i(0);
-                     mb_ser_cfg_dval <= '0';
-                  end if;
+               case axi_awaddr(7 downto 0) is 
                   
-               else   -- données pour config du bloc
-                  
-                  mb_cfg_serial_in_progress <= '0';
-                  
-                  if axi_wstrb = "1111" then  -- c'Est obligatoire d'envoyer les données de la config structurale sur 32 bits
+                  -- comn                                                                                                  
+                  when X"00" =>    mb_struct_cfg.comn.fpa_diag_mode               <= data_i(0); mb_cfg_in_progress <= '1';                       
+                  when X"04" =>    mb_struct_cfg.comn.fpa_diag_type               <= data_i(mb_struct_cfg.comn.fpa_diag_type'length-1 downto 0); 
+                  when X"08" =>    mb_struct_cfg.comn.fpa_pwr_on                  <= data_i(0);						
+                  when X"0C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_mode          <= data_i(mb_struct_cfg.comn.fpa_trig_ctrl_mode'length-1 downto 0);
+                  when X"10" =>    mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly       <= unsigned(data_i(mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0)); 						
+                  when X"14" =>    mb_struct_cfg.comn.fpa_spare                   <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
+                  when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
+                  when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
+                  when X"20" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
                      
-                     case axi_awaddr(7 downto 0) is 
-                        
-                        -- comn                                                                                                  
-                        when X"00" =>    mb_struct_cfg.comn.fpa_diag_mode               <= data_i(0); mb_cfg_rqst <= '1';                       
-                        when X"04" =>    mb_struct_cfg.comn.fpa_diag_type               <= data_i(mb_struct_cfg.comn.fpa_diag_type'length-1 downto 0); 
-                        when X"08" =>    mb_struct_cfg.comn.fpa_pwr_on                  <= data_i(0);						
-                        when X"0C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_mode          <= data_i(mb_struct_cfg.comn.fpa_trig_ctrl_mode'length-1 downto 0);
-                        when X"10" =>    mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly       <= unsigned(data_i(mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0)); 						
-                        when X"14" =>    mb_struct_cfg.comn.fpa_spare                   <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
-                        when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
-                        when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
-                        when X"20" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
-                           
-                        -- op
-                        when X"24" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
-                        when X"28" =>    mb_struct_cfg.op.ystart                        <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));                        
-                        when X"2C" =>    mb_struct_cfg.op.xsize                         <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0));                              
-                        when X"30" =>    mb_struct_cfg.op.ysize                         <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));                                
-                        when X"34" =>    mb_struct_cfg.op.frame_time                    <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0));                                                     
-                        when X"38" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0); 
-                        when X"3C" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
-                        when X"40" =>    mb_struct_cfg.op.test_mode	                   <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);                        
-                        when X"44" =>    mb_struct_cfg.op.det_vbias                     <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);                         
-                        when X"48" =>    mb_struct_cfg.op.det_ibias                     <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0); 
-                        when X"4C" =>    mb_struct_cfg.op.det_vsat                      <= data_i(mb_struct_cfg.op.det_vsat'length-1 downto 0);                         
-                        when X"50" =>    mb_struct_cfg.op.binning                       <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);      
-                        when X"54" =>    mb_struct_cfg.op.output_chn                    <= data_i(mb_struct_cfg.op.output_chn'length-1 downto 0);   
-                        when X"58" =>    mb_struct_cfg.op.spare1		                   <= data_i(mb_struct_cfg.op.spare1'length-1 downto 0); 		 
-                        when X"5C" =>    mb_struct_cfg.op.spare2		                   <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 		 
-                        when X"60" =>    mb_struct_cfg.op.spare3		                   <= data_i(mb_struct_cfg.op.spare3'length-1 downto 0); 		 
-                        when X"64" =>    mb_struct_cfg.op.spare4                        <= data_i(mb_struct_cfg.op.spare4'length-1 downto 0);       
-                        when X"68" =>    mb_struct_cfg.op.cfg_num                       <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));          
-                        
-                        when X"6C" =>    mb_struct_cfg.diag.ysize                       <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));
-                        when X"70" =>    mb_struct_cfg.diag.xsize_div_tapnum            <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));
-                        when X"74" =>    mb_struct_cfg.diag.lovh_mclk_source            <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
-                        when X"78" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0)); 
-                        when X"7C" =>    mb_struct_cfg.int_dly_cst                      <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
-                        when X"80" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
-                        when X"84" =>    mb_struct_cfg.itr                              <= data_i(0);
-                        when X"88" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
-                        
-                        when X"8C" =>    mb_struct_cfg.cmd_hder                         <= data_i(mb_struct_cfg.cmd_hder'length-1 downto 0);
-                        when X"90" =>    mb_struct_cfg.int_cmd_id                       <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);
-                        when X"94" =>    mb_struct_cfg.int_cmd_dlen                     <= data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0);
-                        when X"98" =>    mb_struct_cfg.int_cmd_offs_add                 <= data_i(mb_struct_cfg.int_cmd_offs_add'length-1 downto 0);
-                        when X"9C" =>    mb_struct_cfg.fpa_serdes_lval_num              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
-                        when X"A0" =>    mb_struct_cfg.fpa_serdes_lval_len              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
-                        
-                        when X"A4" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
-                        when X"A8" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);
-                        
-                        -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"AC" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
-                           
-                        -- trig lecture de temperature(le changement de numero est vu comme un changement de config impliquant la repogrammation)
-                        when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
-                           
-                        -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
-                        when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
-                        when X"E4" =>    fpa_softw_stat_i.fpa_output <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';  
-                           
-                        -- pour effacer erreurs latchées
-                        when X"EC" =>    reset_err_i <= data_i(0);
-                           
-                        -- pour un reset complet du module FPA
-                        when X"F0" =>   mb_ctrled_reset_i <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
-                        --fpa_softw_stat_i.dval <='0' permet de ne pas rallumer automatiquement la carte DDC après un reset controllé.
-                        when others => --do nothing
-                        
-                     end case;                     
+                  -- op
+                  when X"24" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
+                  when X"28" =>    mb_struct_cfg.op.ystart                        <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));                        
+                  when X"2C" =>    mb_struct_cfg.op.xsize                         <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0));                              
+                  when X"30" =>    mb_struct_cfg.op.ysize                         <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));                                
+                  when X"34" =>    mb_struct_cfg.op.frame_time                    <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0));                                                     
+                  when X"38" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0); 
+                  when X"3C" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
+                  when X"40" =>    mb_struct_cfg.op.test_mode	                   <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);                        
+                  when X"44" =>    mb_struct_cfg.op.det_vbias                     <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);                         
+                  when X"48" =>    mb_struct_cfg.op.det_ibias                     <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0); 
+                  when X"4C" =>    mb_struct_cfg.op.det_vsat                      <= data_i(mb_struct_cfg.op.det_vsat'length-1 downto 0);                         
+                  when X"50" =>    mb_struct_cfg.op.binning                       <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);      
+                  when X"54" =>    mb_struct_cfg.op.output_chn                    <= data_i(mb_struct_cfg.op.output_chn'length-1 downto 0);   
+                  when X"58" =>    mb_struct_cfg.op.spare1		                   <= data_i(mb_struct_cfg.op.spare1'length-1 downto 0); 		 
+                  when X"5C" =>    mb_struct_cfg.op.spare2		                   <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 		 
+                  when X"60" =>    mb_struct_cfg.op.spare3		                   <= data_i(mb_struct_cfg.op.spare3'length-1 downto 0); 		 
+                  when X"64" =>    mb_struct_cfg.op.spare4                        <= data_i(mb_struct_cfg.op.spare4'length-1 downto 0);       
+                  when X"68" =>    mb_struct_cfg.op.cfg_num                       <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));          
+                  
+                  when X"6C" =>    mb_struct_cfg.diag.ysize                       <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));
+                  when X"70" =>    mb_struct_cfg.diag.xsize_div_tapnum            <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));
+                  when X"74" =>    mb_struct_cfg.diag.lovh_mclk_source            <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
+                  when X"78" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0)); 
+                  when X"7C" =>    mb_struct_cfg.int_dly_cst                      <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
+                  when X"80" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
+                  when X"84" =>    mb_struct_cfg.itr                              <= data_i(0);
+                  when X"88" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
+                  
+                  when X"8C" =>    mb_struct_cfg.cmd_hder                         <= data_i(mb_struct_cfg.cmd_hder'length-1 downto 0);
+                  when X"90" =>    mb_struct_cfg.int_cmd_id                       <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);
+                  when X"94" =>    mb_struct_cfg.int_cmd_dlen                     <= data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0);
+                  when X"98" =>    mb_struct_cfg.int_cmd_offs_add                 <= data_i(mb_struct_cfg.int_cmd_offs_add'length-1 downto 0);
+                  when X"9C" =>    mb_struct_cfg.fpa_serdes_lval_num              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
+                  when X"A0" =>    mb_struct_cfg.fpa_serdes_lval_len              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
+                  
+                  when X"A4" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0); at_least_one_mb_cfg_received <= '1';
+                  when X"A8" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0); mb_cfg_in_progress <= '0';
                      
-                  end if;
-               end if;
-            else
-               mb_ser_cfg_dval <= '0';
+                  -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
+                  when X"AC" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0); 
+                     
+                  -- trig lecture de temperature(le changement de numero est vu comme un changement de config impliquant la repogrammation)
+                  when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_in_progress <= '0';
+                     
+                  -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
+                  when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
+                  when X"E4" =>    fpa_softw_stat_i.fpa_output <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';
+                  when X"E8" =>    fpa_softw_stat_i.fpa_input <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';
+                     
+                  -- pour effacer erreurs latchées
+                  when X"EC" =>    reset_err_i <= data_i(0);
+                     
+                  -- pour un reset complet du module FPA
+                  when X"F0" =>   mb_ctrled_reset_i <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                  --fpa_softw_stat_i.dval <='0' permet de ne pas rallumer automatiquement la carte DDC après un reset controllé.
+                  when others => --do nothing
+                  
+               end case;                     
+               
             end if;
-            
-            -- pragma translate_off
-            fpa_softw_stat_i.fpa_roic <= FPA_ROIC_BLACKBIRD1920;
-            fpa_softw_stat_i.fpa_output <= OUTPUT_DIGITAL;
-            fpa_softw_stat_i.dval <= '1';
-            -- pragma translate_on
-            
             
          end if;
       end if;
@@ -320,42 +284,40 @@ begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
             exp_cfg_gen_fsm <= idle;
-            exp_cfg_rqst <= '0';
             exp_checksum <= (others => '0');
-            idle_cnt <= (others => '0');
-            exp_struct_cfg_valid <= '0';
             exp_cfg_done <= '0';
             exp_ser_cfg_dval <= '0';
             exp_cfg_in_progress <= '0';
+            at_least_one_exp_cfg_received <= '0';
+            
          else
             
-            case exp_cfg_gen_fsm is
+            
+            checksum_base_add <= resize(unsigned(mb_struct_cfg.int_cmd_dlen), checksum_base_add'length) + 4;  -- +4 pour tenir compte de l'overhead de la cmd.         
+            
+            case exp_cfg_gen_fsm is       
                
                when idle  =>
                   exp_cfg_done <= '1'; 
-                  exp_cfg_rqst <= '0'; 
                   exp_checksum <= (others => '0');
-                  idle_cnt <= (others => '0');
-                  byte_cnt <= to_unsigned(1, byte_cnt'length); --
-                  exp_struct_cfg_valid <= '0'; 
+                  byte_cnt <= to_unsigned(1, byte_cnt'length); -- 
                   exp_ser_cfg_dval <= '0';
                   exp_cfg_in_progress <= '0';
-                  if int_cfg_i.int_dval = '1' or exp_cfg_en = '1' then   -- le signal int_dval_i est déjà un pulse donc impossible de boucler plusieurs fois en revenant à idle
-                     exp_cfg_latch <= int_cfg_i;
-                     exp_cfg_gen_fsm <= wait_arbiter_st;
-                     exp_cfg_rqst <= '1'; 
-                  end if;           
+                  exp_ser_cfg_data <= (others => '0');  -- fait expres pour le bon calcul du checksum
+                  if int_cfg_i.int_dval = '1' then      -- dès qu'un temps d'integration rentre, on quitte idle pour attendre sa conversion
+                     exp_cfg_in_progress <= '1';        -- ainsi, la sortie de la config est bloquée jusqu'à ce que la commande du temps d'integration soit pleinement constituée 
+                     exp_cfg_gen_fsm <= wait_mb_cfg_st;
+                  end if; 
                
-               when wait_arbiter_st =>  -- on attend l'arbitreur
-                  if exp_cfg_en = '1' then
-                     exp_cfg_in_progress <= '1';
-                     exp_cfg_rqst <= '0';
+               when wait_mb_cfg_st =>      -- il faut qu'on ait reçu au moins une config de MB car la commande seriellede EXP en utilise certains elements
+                  if at_least_one_mb_cfg_received = '1' then
+                     exp_struct_cfg <= int_cfg_i;
                      exp_cfg_gen_fsm <= serial_exp_cfg_st;
-                     exp_cfg_done <= '0';
-                     exp_ser_cfg_data <= (others => '0'); -- fait expres pour le bon calcul du checksum
                   end if;
                
-               when serial_exp_cfg_st => -- sur autorisation de l'arbitreur, on envoie la partie serielle                  
+               when serial_exp_cfg_st =>   -- on envoie la partie serielle
+                  exp_cfg_done <= '0';
+                  exp_cfg_in_progress <= '1';
                   exp_ser_cfg_dval <= '1'; 
                   exp_ser_cfg_add <= std_logic_vector(resize((byte_cnt - 1 + INT_CMD_RAM_BASE_ADD), exp_ser_cfg_add'length)); -- pour que premiere adresse impérativement 0
                   byte_cnt <= byte_cnt + 1;
@@ -370,30 +332,34 @@ begin
                   elsif byte_cnt = 6  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_offs_add(7 downto 0);        -- scd_proxy2 exp_time offset add 
                      
                      -- frame_dly
-                  elsif byte_cnt = 6  then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.frame_dly(7 downto 0));             -- exp_time en coups de 80MHz       
-                  elsif byte_cnt = 7  then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.frame_dly(15 downto 8));            -- exp_time en coups de 80MHz  
-                  elsif byte_cnt = 8  then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_cfg_latch.frame_dly(19 downto 16));           -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 6  then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.frame_dly(7 downto 0));             -- exp_time en coups de 80MHz       
+                  elsif byte_cnt = 7  then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.frame_dly(15 downto 8));            -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 8  then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.frame_dly(19 downto 16));           -- exp_time en coups de 80MHz  
                      
                      -- int_dly
-                  elsif byte_cnt = 9  then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_dly(7 downto 0));             -- exp_time en coups de 80MHz       
-                  elsif byte_cnt = 10 then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_dly(15 downto 8));            -- exp_time en coups de 80MHz  
-                  elsif byte_cnt = 11 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_cfg_latch.int_dly(19 downto 16)); 
+                  elsif byte_cnt = 9  then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_dly(7 downto 0));             -- exp_time en coups de 80MHz       
+                  elsif byte_cnt = 10 then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_dly(15 downto 8));            -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 11 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_dly(19 downto 16)); 
                      
                      -- int_time   
-                  elsif byte_cnt = 12 then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_time(7 downto 0));             -- exp_time en coups de 80MHz       
-                  elsif byte_cnt = 13 then exp_ser_cfg_data <= std_logic_vector(exp_cfg_latch.int_time(15 downto 8));            -- exp_time en coups de 80MHz  
-                  elsif byte_cnt = 14 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_cfg_latch.int_time(19 downto 16));           -- exp_time en coups de 80MHz  
-                  elsif byte_cnt = 18 then                                                         -- checksum 
+                  elsif byte_cnt = 12 then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(7 downto 0));             -- exp_time en coups de 80MHz       
+                  elsif byte_cnt = 13 then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(15 downto 8));            -- exp_time en coups de 80MHz  
+                  elsif byte_cnt = 14 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_time(19 downto 16));    -- exp_time en coups de 80MHz  
+                     
+                     -- checksum
+                  elsif byte_cnt = 18 then
+                     exp_ser_cfg_add <= std_logic_vector(resize((checksum_base_add + INT_CMD_RAM_BASE_ADD), exp_ser_cfg_add'length));
                      exp_ser_cfg_data <= std_logic_vector(unsigned(not std_logic_vector(exp_checksum)) + 1); -- le fait qu'il y ait des zeros entre byte8 et byte12 donne le temps au cheksum d'etre prêt avant le byte 12 
-                     exp_cfg_gen_fsm <= struct_exp_cfg_st; 
+                     exp_cfg_gen_fsm <= pause_st; 
                   else  -- si byte cnt entre 15 et 17  
                      exp_ser_cfg_data <= (others => '0'); -- le fait qu'il y ait des zeros entre byte15 et byte17 donne le temps au cheksum d'etre prêt avant le byte 18.
+                     exp_ser_cfg_dval <= '0';
                   end if;              
                
-               when struct_exp_cfg_st =>  -- on envoie ensuite la partie structurale
-                  exp_ser_cfg_dval <= '0'; -- en fait ici, la partie structurale est exp_time_i qui est dejà connue. L'arbitreur l'enverra 
+               when pause_st =>  -- on envoie ensuite la partie structurale
+                  exp_ser_cfg_dval <= '0'; 
                   exp_cfg_gen_fsm <= idle;               
-                  exp_struct_cfg_valid <= '1';
+                  at_least_one_exp_cfg_received <= '1';
                
                when others =>                  
                
@@ -404,104 +370,33 @@ begin
    end process; 
    
    --------------------------------
-   -- Arbitreur des configs 
+   -- gestion  de la config 
    --------------------------------
    U2: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
          if sreset = '1' then
-            cfg_arbit_fsm <= idle;
-            ser_cfg_dval_i <= '0';
-            exp_cfg_en <= '0';
             user_cfg_in_progress_i <= '0';
-            dly_cnt <= (others => '0');
-            mb_serial_assump_err <= '0';
             valid_cfg_received <= '0';
-            at_least_one_mb_cfg_received <= '0';
+            ctrled_reset_i <= '1';
             
-         else
+         else     
             
-            case cfg_arbit_fsm is
-               
-               when idle  =>
-                  exp_cfg_en <= '0';
-                  user_cfg_in_progress_i <= '0';
-                  dly_cnt <= (others => '0');
-                  mb_serial_assump_err <= mb_cfg_serial_in_progress;  -- erreur de design grave si la config serielle a commencé sans que le MB n'ait eu accces
-                  if mb_cfg_rqst = '1' then  -- priorité à la config du MB car elle n'est pas latchée. Celle du temps d'intégration est latchée
-                     cfg_source <= MB_SOURCE;
-                     cfg_arbit_fsm <= cfg_begin_pause_st;
-                     user_cfg_in_progress_i <= '1';   -- copieur alerté de la venue d'une config
-                  elsif exp_cfg_rqst = '1' and at_least_one_mb_cfg_received = '1' then
-                     cfg_source <= EXP_SOURCE;
-                     cfg_arbit_fsm <= cfg_begin_pause_st;
-                     user_cfg_in_progress_i <= '1';  -- copieur alerté de la venue d'une config                    
-                  end if;                 
-               
-               when cfg_begin_pause_st => 
-                  dly_cnt <= dly_cnt + 1;
-                  if dly_cnt = SERIAL_CFG_COPIER_START_DLY then
-                     if cfg_source = MB_SOURCE then
-                        cfg_arbit_fsm <= check_mb_serial_st;
-                     else
-                        cfg_arbit_fsm <= wait_exp_done_st;
-                        exp_cfg_en <= '1';
-                     end if;
-                  end if;
-               
-               when check_mb_serial_st =>
-                  dly_cnt <= (others => '0');
-                  if mb_cfg_serial_in_progress = '0' then 
-                     cfg_arbit_fsm <= mb_cfg_st;
-                  else
-                     cfg_arbit_fsm <= idle;
-                     mb_serial_assump_err <= '1'; -- erreur grave de design. Normalement, la partie seriale ne devrait jamais commencer avant que l'arbitre ne donne acces au MB. Sinon, perte de config
-                  end if;
-               
-               when mb_cfg_st =>  -- la config du MB est envoyée                   
-                  ser_cfg_add_i <= mb_ser_cfg_add; 
-                  ser_cfg_data_i <= mb_ser_cfg_data; 
-                  ser_cfg_dval_i <= mb_ser_cfg_dval;
-                  user_cfg_int <= user_cfg_i.int;       -- sauvegarde du présent temps d'exposition
-                  if mb_cfg_serial_in_progress = '0' and mb_cfg_serial_in_progress_last = '1' then -- fin de la comm serielle  
-                     user_cfg_i  <= mb_struct_cfg;       -- partie structurale envoyée en fin de com serielle
-                     user_cfg_i.int  <= user_cfg_int;    -- ainsi, on préserve le temps d'exposition
-                     user_cfg_i.int_time  <= user_cfg_int.int_time;
-                     cfg_arbit_fsm <= cfg_end_pause_st; 
-                  end if;
-               
-               when wait_exp_done_st =>
-                  dly_cnt <= (others => '0');
-                  if exp_cfg_done = '0' then
-                     exp_cfg_en <= '0';
-                     cfg_arbit_fsm <= exp_cfg_st;
-                  end if;  
-               
-               when exp_cfg_st =>  --
-                  ser_cfg_add_i <= exp_ser_cfg_add; 
-                  ser_cfg_data_i <= exp_ser_cfg_data; 
-                  ser_cfg_dval_i <= exp_ser_cfg_dval;
-                  if exp_struct_cfg_valid = '1' then
-                     user_cfg_i.int <= exp_cfg_latch; -- partie structurale envoyée en fin de com serielle
-                     user_cfg_i.int_time  <= user_cfg_int.int_time;
-                  elsif exp_cfg_done = '1' then 
-                     cfg_arbit_fsm <= cfg_end_pause_st; 
-                  end if;
-               
-               when cfg_end_pause_st =>  -- ce delai permet au copieur de hw_driver de commencer la copie de la ram avant l'arrivée d'une autre cfg
-                  dly_cnt <= dly_cnt + 1;
-                  user_cfg_in_progress_i <= '0';
-                  at_least_one_mb_cfg_received <= '1';
-                  if cfg_source = EXP_SOURCE then
-                     valid_cfg_received <= at_least_one_mb_cfg_received;
-                  end if;
-                  if dly_cnt = SERIAL_CFG_COPIER_END_DLY then
-                     cfg_arbit_fsm <= idle;                     
-                  end if;
-               
-               when others =>                  
-               
-            end case;        
+            user_cfg_in_progress_i <= exp_cfg_in_progress or mb_cfg_in_progress;
+            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;
+            
+            -- user_cfg_rdy
+            user_cfg_rdy_pipe(0) <= not user_cfg_in_progress_i;
+            user_cfg_rdy_pipe(7 downto 1) <= user_cfg_rdy_pipe(6 downto 0);
+            user_cfg_rdy <= not user_cfg_in_progress_i and and_reduce(user_cfg_rdy_pipe);
+            
+            -- la config au complet
+            if user_cfg_rdy = '1' then  
+               user_cfg_i <= mb_struct_cfg;
+               user_cfg_i.int <= exp_struct_cfg;
+               user_cfg_i.int_time <= exp_struct_cfg.int_time;
+               valid_cfg_received <= at_least_one_mb_cfg_received and at_least_one_exp_cfg_received;         
+            end if; 
             
          end if;
       end if;
@@ -532,12 +427,11 @@ begin
          int_indx_pipe(1)     <= int_indx_pipe(0); 
          int_indx_pipe(2)     <= int_indx_pipe(1); 
          int_indx_pipe(3)     <= int_indx_pipe(2); 
-         int_indx_pipe(4)     <= int_indx_pipe(3);
-         
+         int_indx_pipe(4)     <= int_indx_pipe(3);          
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          int_dval_pipe(0)     <= FPA_EXP_INFO.EXP_DVAL;
-         int_dval_pipe(1)     <= int_dval_pipe(0); 
+         int_dval_pipe(1)     <= FPA_EXP_INFO.EXP_DVAL and not int_dval_pipe(0); -- front montant de FPA_EXP_INFO.EXP_DVAL pour generer juste un pulse
          int_dval_pipe(2)     <= int_dval_pipe(1); 
          int_dval_pipe(3)     <= int_dval_pipe(2);
          int_dval_pipe(4)     <= int_dval_pipe(3);
@@ -549,8 +443,8 @@ begin
          int_cfg_i.int_time   <= int_time_pipe(4)(int_cfg_i.int_time'length-1 downto 0); -- suppose que (int_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
          int_cfg_i.int_dly    <= mb_struct_cfg.int_dly_cst;
          int_cfg_i.int_indx   <= int_indx_pipe(4);
-         int_cfg_i.frame_dly  <= int_cfg_i.int_time + mb_struct_cfg.frame_dly_cst; 
-         int_cfg_i.int_dval   <= int_dval_pipe(7);
+         int_cfg_i.frame_dly  <= int_cfg_i.int_time(19 downto 0) + mb_struct_cfg.frame_dly_cst; 
+         int_cfg_i.int_dval   <= or_reduce(int_dval_pipe(7 downto 5));  -- on genere un signal de largeur 2 CLK environ
       end if;
    end process;
    

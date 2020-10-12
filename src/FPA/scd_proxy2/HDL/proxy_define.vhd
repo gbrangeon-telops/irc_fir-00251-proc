@@ -101,13 +101,11 @@ package Proxy_define is
    constant TEMP_CMD_RAM_BASE_ADD    : integer  := 192;
    
    -- adresse de base de la zone securisée
-   constant CMD_SECUR_RAM_BASE_ADD   : integer  := 1024; -- adresse où se retrouve la commande copiée dans la zone securisee
+   constant CMD_SECUR_RAM_BASE_ADD   : integer  := 0; -- adresse où se retrouve la commande copiée dans la ram securisee
    
    -- quelques constantes 
    constant SERIAL_CFG_END_ADD           : std_logic_vector(7 downto 0) := x"FC"; -- adresse de fin d'envoi de la config serielle
-   constant SERIAL_CFG_COPIER_START_DLY  : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM
-   constant SERIAL_CFG_COPIER_END_DLY    : integer := 10; -- delai ajusté par simulation pour eviter corruption de config dans la RAM 
-   
+
    --------------------------------------------
    --  modes diag
    --------------------------------------------
