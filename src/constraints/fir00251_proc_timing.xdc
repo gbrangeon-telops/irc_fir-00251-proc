@@ -6,23 +6,20 @@ create_clock -period 5.000 [get_ports SYS_CLK_P1]
 create_clock -period 8.000 -name MGT_CLK_0 [get_ports AURORA_CLK_P0]
 create_clock -period 8.000 -name MGT_CLK_1 [get_ports AURORA_CLK_P1]
 create_clock -period 60.000 -name usart_clk_in [get_ports R_GIGE_BULK_CLK0]
-create_clock -period 10.0 [get_pins *TXOUTCLK -hier -filter {name =~ *gt0_data_mgt*}]
-create_clock -period 10.0 [get_pins *TXOUTCLK -hier -filter {name =~ *gt0_video_mgt*}]
-create_clock -period 10.0 [get_pins *TXOUTCLK -hier -filter {name =~ *gt0_exp_mgt*}]
 
 
 # Virtual clocks
 
 # Generated clocks
 create_generated_clock -name usart_clk [get_pins *CLKOUT0 -hier -filter {name =~ *BULK_USART*}]
-create_generated_clock -name clk_mb [get_pins *CLKOUT0 -hier -filter {name =~ *clk_wiz_0*}]
-create_generated_clock -name clk_200 [get_pins *CLKOUT1 -hier -filter {name =~ *clk_wiz_0*}]
-create_generated_clock -name clk_mgt_init [get_pins *CLKOUT2 -hier -filter {name =~ *clk_wiz_0*}]
-create_generated_clock -name clk_irig [get_pins *CLKOUT3 -hier -filter {name =~ *clk_wiz_0*}]
+create_generated_clock -name clk_mb [get_pins *mmcm_i/CLKFBOUT -hier -filter {name =~ *MIG_Code*}]
+create_generated_clock -name clk_200 [get_pins *mmcm_i/CLKOUT0 -hier -filter {name =~ *MIG_Code*}]
+create_generated_clock -name clk_mgt_init [get_pins *mmcm_i/CLKOUT1 -hier -filter {name =~ *MIG_Code*}]
+create_generated_clock -name clk_irig [get_pins *mmcm_i/CLKOUT2 -hier -filter {name =~ *MIG_Code*}]
 create_generated_clock -name clk_cal [get_pins *CLKOUT0 -hier -filter {name =~ *clk_wiz_1*}]
 create_generated_clock -name clk_data [get_pins *CLKOUT1 -hier -filter {name =~ *clk_wiz_1*}]
 create_generated_clock -name MIG_CAL_UI_CLK [get_pins *mmcm_i/CLKFBOUT -hier -filter {name =~ *CAL_DDR_MIG*}]
-create_generated_clock -name MIG_CODE_UI_CLK [get_pins *mmcm_i/CLKFBOUT -hier -filter {name =~ *MIG_Code*}]
+#create_generated_clock -name MIG_CODE_UI_CLK [get_pins *mmcm_i/CLKFBOUT -hier -filter {name =~ *MIG_Code*}]   #same as clk_mb
 
 
 # Clock Groups
@@ -30,9 +27,12 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *SYS
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *SYS_CLK_P1]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MGT_CLK_0]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MGT_CLK_1]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *data_mgt*RXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *data_mgt*TXOUTCLK]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *video_mgt*RXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *video_mgt*TXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *exp_mgt*TXOUTCLK]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *exp_mgt*RXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks usart_clk_in]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks usart_clk]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_mb]
@@ -42,7 +42,7 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_cal]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_data]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MIG_CAL_UI_CLK]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MIG_CODE_UI_CLK]
+#set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MIG_CODE_UI_CLK]   #same as clk_mb
 
 # Input and output delay constraints
 
