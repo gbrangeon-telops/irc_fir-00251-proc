@@ -3,7 +3,7 @@
 #clearlibrary 	
 
 
-#__BEGIN BUILD CLINK
+#__BEGIN BUILD BB1920 SERDES
 
 # common
 acom -incr -nowarn DAGGEN_0523 \
@@ -23,11 +23,10 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde
 
-# CLINK
+# BB1920 SERDES
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\scd_clink_dout_ctrl.vhd \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\mglk_clink_dout_ctrl.vhd \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_dout_ctrl.bde \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\clink_receiver_2ch.bde
+ d:\Telops\FIR-00251-Proc\src\clink\HDL\bb1920_dout_ctrl.vhd \
+ d:\Telops\FIR-00251-Proc\src\clink\HDL\bb1920_deserializer.bde \
+ d:\Telops\FIR-00251-Proc\src\clink\HDL\bb1920_receiver_2ch.bde
 
-#__END BUILD CLINK
+#__END BUILD BB1920 SERDES
