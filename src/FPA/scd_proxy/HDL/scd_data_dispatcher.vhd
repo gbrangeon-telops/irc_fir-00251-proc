@@ -563,7 +563,32 @@ begin
    U1B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => fpa_ch2_fifo_ovfl, CLK => CLK, Q => fpa_ch2_fifo_ovfl_sync);
    U1C: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => fpa_ch3_fifo_ovfl, CLK => CLK, Q => fpa_ch3_fifo_ovfl_sync);
    
-   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
+   
+   REFERENCE_TO_INT : if (SCD_TRIG_REFERENCED = '0') generate
+   begin  
+      -- Pelican & Hercule : integration N always start before the readout N-1 and there is an integration feedback from the proxy.
+      int_fifo_wr_source_i <= FPA_INT;    
+   end generate;
+   REFERENCE_TO_TRIG : if (SCD_TRIG_REFERENCED = '1') generate
+   begin 
+      -- BB1280 : integration N can start after the readout N-1 and there is no integration feedback from the proxy. 
+      -- We use the trig signal instead of the integration one. 
+      U2: process(CLK)
+      begin          
+         if rising_edge(CLK) then 
+            if sreset = '1' then
+               fpa_trig_pipe <= (others => '0');
+               int_fifo_wr_source_i <= '0';
+            else
+               fpa_trig_pipe(0)       <= FPA_TRIG;      
+               fpa_trig_pipe(1)       <= fpa_trig_pipe(0);
+               int_fifo_wr_source_i   <= fpa_trig_pipe(1);   
+            end if;         
+         end if;
+      end process;
+   end generate; 
+   
+   CH2_INPUTS : if (PROXY_CLINK_CHANNEL_NUM = 2) generate
    begin  
 
       diag_ch3_fifo_dout <= (others => '0');
@@ -594,12 +619,8 @@ begin
       TX_MOSI => PIX_MOSI,       
       TX_MISO => PIX_MISO       
       ); 
-      
-      -- Pelican & Hercule : integration N always start before the readout N-1 and there is an integration feedback from the proxy.
-      int_fifo_wr_source_i <= FPA_INT;
-      
    end generate;
-   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
+   CH3_INPUTS : if (PROXY_CLINK_CHANNEL_NUM = 3) generate
    begin 
       
       --------------------------------------------------
@@ -643,22 +664,6 @@ begin
       
       PIX_MOSI      <= pix_mosi_i;
       pix_link_rdy  <= PIX_MISO.TREADY; 
-      
-      -- BB1280 : integration N can start after the readout N-1 and there is no integration feedback from the proxy. 
-      -- We use the trig signal instead of the integration one. 
-      U2: process(CLK)
-      begin          
-         if rising_edge(CLK) then 
-            if sreset = '1' then
-               fpa_trig_pipe <= (others => '0');
-               int_fifo_wr_source_i <= '0';
-            else
-               fpa_trig_pipe(0)       <= FPA_TRIG;      
-               fpa_trig_pipe(1)       <= fpa_trig_pipe(0);
-               int_fifo_wr_source_i   <= fpa_trig_pipe(1);   
-            end if;         
-         end if;
-      end process;
    end generate;  
 
    --------------------------------------------------

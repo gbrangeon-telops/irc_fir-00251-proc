@@ -38,7 +38,11 @@ package FPA_define is
    constant SCD_GAIN_1                   : std_logic_vector(7 downto 0) := x"02";
    constant FPA_INT_FBK_AVAILABLE        : std_logic := '1';
    constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;      -- CLINK IN est à 80MHz ns 
-   constant IsBlackbird1280D             : std_logic := '0';
+   constant PROXY_NEED_FRAME_RES_CONFIG    : std_logic := '0';     -- BB1280 has a frame resoultion command (Pelican and Hercule don't) 
+   constant SCD_EXP_TIME_NUMERATOR_SOURCE  : std_logic := '0';     -- 1 : uB , 0 : VHDL 
+   constant SCD_TRIG_REFERENCED            : std_logic := '0';     -- 1 : reference to fsync (bb1280)  , 0 : reference to acq_int (pelican & hercule)
+
+   
    ----------------------------------------------
    -- FPA 
    ---------------------------------------------- 

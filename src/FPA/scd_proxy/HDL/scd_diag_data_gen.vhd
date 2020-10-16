@@ -332,7 +332,7 @@ begin
       DIAG_DONE => open
       ); 
       
-   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
+   CH2_INPUT : if (PROXY_CLINK_CHANNEL_NUM = 2) generate
    begin  
       pix2_diag_data <= (others => '0');
       pix2_diag_dval <= '0';
@@ -340,7 +340,7 @@ begin
       pix3_diag_dval <= '0';
    end generate;
    
-   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
+   CH3_INPUT : if (PROXY_CLINK_CHANNEL_NUM = 3) generate
    begin 
       --------------------------------------------------
       -- Pixel 2 data gen 
@@ -444,7 +444,7 @@ begin
                   fval_i <= '0';
                   diag_line_gen_en <= '0'; 
                   if DIAG_MODE_EN = '1' then 
-                     if IsBlackbird1280D = '1'  then -- BB1280 only
+                     if SCD_TRIG_REFERENCED = '1'  then -- BB1280 only
                         if fpa_trig_last = '0' and fpa_trig_i = '1' then   
                            diag_fsm <=  x_to_readout_start_dly_st;              
                         end if;
