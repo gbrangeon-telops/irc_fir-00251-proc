@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 23833
+ FREEID 23850
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -482,542 +482,6 @@ HEADER
      LINE  2, 0, 0
      {
       POINTS ( (0,0), (20,0) )
-     }
-    }
-   }
-  }
- }
- SYMBOL "#default" "t_axi4_lite32_w_fifo" "t_axi4_lite32_w_fifo"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #CUSTOM_NAME=""
-    #DESCRIPTION=""
-    #GENERIC0="FifoSize : INTEGER := 16"
-    #GENERIC1="ASYNC : BOOLEAN := false"
-    #LANGUAGE="VHDL"
-    #MODIFIED="1392000198"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="39c0b5ae-057f-40cb-9c1a-c16687f47bad"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (-40,0,280,240)
-    FREEID 160
-   }
-   
-   BODY
-   {
-    RECT  1, -1, 0
-    {
-     VARIABLES
-     {
-      #OUTLINE_FILLING="1"
-     }
-     AREA (-20,0,260,239)
-    }
-    TEXT  15, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (-6,28,87,52)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 14
-    }
-    TEXT  75, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (170,68,246,92)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 74
-    }
-    TEXT  81, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (-6,68,72,92)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 80
-    }
-    TEXT  87, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (-6,168,47,192)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 86
-    }
-    TEXT  138, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (160,128,247,152)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 137
-    }
-    TEXT  143, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (160,108,247,132)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 142
-    }
-    TEXT  148, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (-6,128,83,152)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 147
-    }
-    TEXT  153, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (-6,108,83,132)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 152
-    }
-    PIN  14, 0, 0
-    {
-     COORD (-40,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #FAMILY="Fub"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="ARESETN"
-      #NUMBER="0"
-      #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  74, 0, 0
-    {
-     COORD (280,80)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #FAMILY="Fub"
-      #INITIAL_VALUE=""
-      #LABEL="In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="TX_CLK"
-      #NUMBER="0"
-      #SIDE="right"
-      #VHDL_TYPE="STD_LOGIC"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (-20,0) )
-     }
-    }
-    PIN  80, 0, 0
-    {
-     COORD (-40,80)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #FAMILY="Fub"
-      #INITIAL_VALUE=""
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="RX_CLK"
-      #NUMBER="0"
-      #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  86, 0, 0
-    {
-     COORD (-40,180)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #FAMILY="Fub"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="OVFL"
-      #NUMBER="0"
-      #SIDE="left"
-      #VHDL_TYPE="STD_LOGIC"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  137, 0, 0
-    {
-     COORD (280,140)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LABEL="Record In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="TX_MISO"
-      #NUMBER="3"
-      #SIDE="right"
-      #VHDL_TYPE="t_axi4_lite_miso"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,3, (64,92,92)
-      POINTS ( (0,0), (-20,0) )
-     }
-    }
-    PIN  142, 0, 0
-    {
-     COORD (280,120)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #LABEL="Record Out"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="TX_MOSI"
-      #NUMBER="4"
-      #SIDE="right"
-      #VHDL_TYPE="t_axi4_lite_mosi"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,3, (64,92,92)
-      POINTS ( (0,0), (-20,0) )
-     }
-    }
-    PIN  147, 0, 0
-    {
-     COORD (-40,140)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #LABEL="Record Out"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="RX_MISO"
-      #NUMBER="5"
-      #SIDE="left"
-      #VHDL_TYPE="t_axi4_lite_miso"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,3, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  152, 0, 0
-    {
-     COORD (-40,120)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LABEL="Record In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="RX_MOSI"
-      #NUMBER="6"
-      #SIDE="left"
-      #VHDL_TYPE="t_axi4_lite_mosi"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,3, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-   }
-  }
- }
- SYMBOL "#default" "t_axi4_stream32_fifo" "t_axi4_stream32_fifo"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #CUSTOM_NAME=""
-    #DESCRIPTION=""
-    #GENERIC0="FifoSize:INTEGER:=16"
-    #GENERIC1="ASYNC:BOOLEAN:=false"
-    #LANGUAGE="VHDL"
-    #MODIFIED="1391998945"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="563ed8bc-31b5-4ab6-8726-cfea9abbcaf3"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (0,-20,380,260)
-    FREEID 214
-   }
-   
-   BODY
-   {
-    RECT  1, -1, 0
-    {
-     VARIABLES
-     {
-      #OUTLINE_FILLING="1"
-     }
-     AREA (20,0,360,240)
-    }
-    TEXT  15, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (34,28,127,52)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 14
-    }
-    TEXT  21, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (270,28,346,52)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 20
-     ORIENTATION 2
-    }
-    TEXT  159, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (259,108,346,132)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 158
-    }
-    TEXT  171, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (34,48,112,72)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 170
-    }
-    TEXT  177, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (34,188,87,212)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 176
-    }
-    TEXT  204, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (34,108,123,132)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 203
-    }
-    TEXT  209, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (34,128,123,152)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 208
-    }
-    TEXT  212, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (260,128,347,152)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 211
-    }
-    PIN  14, 0, 0
-    {
-     COORD (0,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LABEL="In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED=""
-      #NAME="ARESETN"
-      #NUMBER="1"
-      #SIDE="left"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  20, 0, 0
-    {
-     COORD (380,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LABEL="In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="TX_CLK"
-      #NUMBER="2"
-      #SIDE="right"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (-20,0) )
-     }
-    }
-    PIN  158, 0, 0
-    {
-     COORD (380,120)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #FAMILY="Fub"
-      #LABEL="Record Out"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="TX_MOSI"
-      #NUMBER="0"
-      #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI32"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,3, (64,92,92)
-      POINTS ( (0,0), (-20,0) )
-     }
-    }
-    PIN  170, 0, 0
-    {
-     COORD (0,60)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #FAMILY="Fub"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="RX_CLK"
-      #NUMBER="0"
-      #SIDE="left"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  176, 0, 0
-    {
-     COORD (0,200)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #FAMILY="Fub"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="OVFL"
-      #NUMBER="0"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  203, 0, 0
-    {
-     COORD (0,120)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LABEL="In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="RX_MOSI"
-      #NUMBER="3"
-      #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MOSI32"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  208, 0, 0
-    {
-     COORD (0,140)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #LABEL="Out"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="RX_MISO"
-      #NUMBER="4"
-      #SIDE="left"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (64,92,92)
-      POINTS ( (0,0), (20,0) )
-     }
-    }
-    PIN  211, 0, 0
-    {
-     COORD (380,140)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LABEL="Record In"
-      #LENGTH="20"
-      #MDA_RECORD_TOKEN="OTHER"
-      #MODIFIED="1"
-      #NAME="TX_MISO"
-      #NUMBER="5"
-      #SIDE="right"
-      #VHDL_TYPE="T_AXI4_STREAM_MISO"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,3, (64,92,92)
-      POINTS ( (0,0), (-20,0) )
      }
     }
    }
@@ -2738,6 +2202,542 @@ HEADER
    }
   }
  }
+ SYMBOL "#default" "t_axi4_lite32_w_fifo" "t_axi4_lite32_w_fifo"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="FifoSize : INTEGER := 16"
+    #GENERIC1="ASYNC : BOOLEAN := false"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1392000198"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="39c0b5ae-057f-40cb-9c1a-c16687f47bad"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (-40,0,280,240)
+    FREEID 160
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (-20,0,260,239)
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-6,28,87,52)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    TEXT  75, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (170,68,246,92)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 74
+    }
+    TEXT  81, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-6,68,72,92)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 80
+    }
+    TEXT  87, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-6,168,47,192)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 86
+    }
+    TEXT  138, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (160,128,247,152)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 137
+    }
+    TEXT  143, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (160,108,247,132)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 142
+    }
+    TEXT  148, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-6,128,83,152)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 147
+    }
+    TEXT  153, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (-6,108,83,132)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 152
+    }
+    PIN  14, 0, 0
+    {
+     COORD (-40,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #FAMILY="Fub"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="ARESETN"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  74, 0, 0
+    {
+     COORD (280,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #FAMILY="Fub"
+      #INITIAL_VALUE=""
+      #LABEL="In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="TX_CLK"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  80, 0, 0
+    {
+     COORD (-40,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #FAMILY="Fub"
+      #INITIAL_VALUE=""
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="RX_CLK"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  86, 0, 0
+    {
+     COORD (-40,180)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #FAMILY="Fub"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="OVFL"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  137, 0, 0
+    {
+     COORD (280,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="Record In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="TX_MISO"
+      #NUMBER="3"
+      #SIDE="right"
+      #VHDL_TYPE="t_axi4_lite_miso"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (64,92,92)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  142, 0, 0
+    {
+     COORD (280,120)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LABEL="Record Out"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="TX_MOSI"
+      #NUMBER="4"
+      #SIDE="right"
+      #VHDL_TYPE="t_axi4_lite_mosi"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (64,92,92)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  147, 0, 0
+    {
+     COORD (-40,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LABEL="Record Out"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="RX_MISO"
+      #NUMBER="5"
+      #SIDE="left"
+      #VHDL_TYPE="t_axi4_lite_miso"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  152, 0, 0
+    {
+     COORD (-40,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="Record In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="RX_MOSI"
+      #NUMBER="6"
+      #SIDE="left"
+      #VHDL_TYPE="t_axi4_lite_mosi"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "t_axi4_stream32_fifo" "t_axi4_stream32_fifo"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="FifoSize:INTEGER:=16"
+    #GENERIC1="ASYNC:BOOLEAN:=false"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1391998945"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="563ed8bc-31b5-4ab6-8726-cfea9abbcaf3"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,380,260)
+    FREEID 214
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,360,240)
+    }
+    TEXT  15, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (34,28,127,52)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 14
+    }
+    TEXT  21, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (270,28,346,52)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 20
+     ORIENTATION 2
+    }
+    TEXT  159, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (259,108,346,132)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 158
+    }
+    TEXT  171, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (34,48,112,72)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 170
+    }
+    TEXT  177, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (34,188,87,212)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 176
+    }
+    TEXT  204, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (34,108,123,132)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 203
+    }
+    TEXT  209, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (34,128,123,152)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 208
+    }
+    TEXT  212, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (260,128,347,152)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 211
+    }
+    PIN  14, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED=""
+      #NAME="ARESETN"
+      #NUMBER="1"
+      #SIDE="left"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  20, 0, 0
+    {
+     COORD (380,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="TX_CLK"
+      #NUMBER="2"
+      #SIDE="right"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  158, 0, 0
+    {
+     COORD (380,120)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #FAMILY="Fub"
+      #LABEL="Record Out"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="TX_MOSI"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI32"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (64,92,92)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  170, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #FAMILY="Fub"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="RX_CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  176, 0, 0
+    {
+     COORD (0,200)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #FAMILY="Fub"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="OVFL"
+      #NUMBER="0"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  203, 0, 0
+    {
+     COORD (0,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="RX_MOSI"
+      #NUMBER="3"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MOSI32"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  208, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LABEL="Out"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="RX_MISO"
+      #NUMBER="4"
+      #SIDE="left"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (64,92,92)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  211, 0, 0
+    {
+     COORD (380,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="Record In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED="1"
+      #NAME="TX_MISO"
+      #NUMBER="5"
+      #SIDE="right"
+      #VHDL_TYPE="T_AXI4_STREAM_MISO"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (64,92,92)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
  SYMBOL "work" "t_axi4_stream64_fifo" "t_axi4_stream64_fifo"
  {
   HEADER
@@ -4333,7 +4333,7 @@ PAGE ""
    {
     #COMPONENT="t_axi4_stream32_fifo"
     #CUSTOM_NAME=""
-    #GENERIC0="FifoSize : INTEGER := 1024"
+    #GENERIC0="FifoSize : INTEGER := 2048"
     #GENERIC1="ASYNC : BOOLEAN := false"
     #LIBRARY="#default"
     #NO_CONF="1"
@@ -8347,7 +8347,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  23816, 0, 0
+  TEXT  23833, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8358,7 +8358,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  23817, 0, 0
+  TEXT  23834, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -8369,7 +8369,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  23818, 0, 0
+  TEXT  23835, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -8379,7 +8379,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  23819, 0, 0
+  TEXT  23836, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8391,7 +8391,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  23820, 0, 0
+  TEXT  23837, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -8404,7 +8404,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  23821, 0, 0
+  TEXT  23838, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -8414,7 +8414,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  23822, 0, 0
+  TEXT  23839, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8426,7 +8426,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  23823, 0, 0
+  TEXT  23840, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -8436,7 +8436,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  23824, 0, 0
+  TEXT  23841, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -8447,7 +8447,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  23825, 0, 0
+  GROUP  23842, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,3220,5801,3601)
@@ -8459,7 +8459,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  23826, 0, 0
+  GROUP  23843, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,3420,5801,3421)
@@ -8471,7 +8471,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  23827, 0, 0
+  GROUP  23844, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,3360,5801,3361)
@@ -8483,7 +8483,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  23828, 0, 0
+  GROUP  23845, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,3480,5801,3481)
@@ -8495,7 +8495,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  23829, 0, 0
+  GROUP  23846, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,3540,5801,3541)
@@ -8507,7 +8507,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  23830, 0, 0
+  GROUP  23847, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,3220,5101,3361)
@@ -8518,7 +8518,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  23831, 0, 0
+  GROUP  23848, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,3360,5101,3601)
@@ -8529,7 +8529,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  23832, 0, 0
+  BMPPICT  23849, 0, 0
   {
    PAGEALIGN 10
    RECT (4940,3280,5079,3325)
