@@ -76,9 +76,14 @@ package body BB1920D_intf_testbench_pkg is
       variable  fpa_serdes_lval_len                                               : unsigned(31 downto  0);
       variable  op_cmd_id                                                         : unsigned(31 downto  0);
       variable  temp_cmd_id                                                       : unsigned(31 downto  0);  
-      variable  cmd_to_update_id                                                  : unsigned(31 downto  0);
+      variable  op_cmd_bram_base_add                                              : unsigned(31 downto  0);
+      variable  int_cmd_bram_base_add                                             : unsigned(31 downto  0);
+      variable  temp_cmd_bram_base_add                                            : unsigned(31 downto  0);
+      variable  int_cmd_bram_base_add_m1                                          : unsigned(31 downto  0);
+      variable  int_checksum_base_add                                             : unsigned(31 downto  0);
+      variable  cmd_overhead_bytes_num                                            : unsigned(31 downto  0);
       
-      variable y                                                                  : unsigned(44*32-1 downto 0);
+      variable y                                                                  : unsigned(49*32-1 downto 0);
       
    begin 
       
@@ -86,22 +91,21 @@ package body BB1920D_intf_testbench_pkg is
       comn_fpa_diag_mode            := (others => diag_mode);
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
-      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
-      if (diag_mode = '1') then 
-         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
-      end if;   
+      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
+--      if (diag_mode = '1') then 
+--         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
+--      end if;   
       
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(99642, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(99642, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(99642, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_trig_ctrl_timeout_dly := to_unsigned(99642, comn_fpa_trig_ctrl_timeout_dly'length);        
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(0, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_trig_ctrl_timeout_dly := to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
       diag_xsize_div_tapnum         := to_unsigned(user_xsize/TAP_NUM, 32);
       op_xstart                     := to_unsigned(0, 32);
-      op_ystart                     := to_unsigned(0, 32);
-      
+      op_ystart                     := to_unsigned(0, 32);      
           
       real_mode_active_pixel_dly    := to_unsigned(8, 32);   
    
@@ -129,15 +133,21 @@ package body BB1920D_intf_testbench_pkg is
       additional_fpa_int_time_offset := to_unsigned(0, 32);   
       itr                           := to_unsigned(1, 32);   
           
-      cmd_hder                      := "000000" & x"AA";   
-      int_cmd_id                    := "0000" & x"8500";  
+      cmd_hder                      := x"000000" & x"AA";   
+      int_cmd_id                    := x"0000" & x"8500";  
       int_cmd_dlen                  := to_unsigned(10, 32);  
       int_cmd_offs_add              := to_unsigned(0, 32);   
       fpa_serdes_lval_num           := to_unsigned(user_ysize, 32);  
       fpa_serdes_lval_len           := to_unsigned(user_ysize, 32);  
       op_cmd_id                     := to_unsigned(user_xsize/TAP_NUM, 32);  
       temp_cmd_id                   := to_unsigned(0, 32);  
-      cmd_to_update_id              := "0000" & x"8500";  
+      
+      op_cmd_bram_base_add          := to_unsigned(0, 32); 
+      int_cmd_bram_base_add         := to_unsigned(64, 32); 
+      temp_cmd_bram_base_add        := to_unsigned(192, 32); 
+      int_cmd_bram_base_add_m1      := to_unsigned(63, 32); 
+      int_checksum_base_add         := int_cmd_dlen + 4; 
+      cmd_overhead_bytes_num        := to_unsigned(7, 32);
       
       
       -- cfg usager
@@ -184,7 +194,12 @@ package body BB1920D_intf_testbench_pkg is
       & fpa_serdes_lval_len            
       & op_cmd_id                      
       & temp_cmd_id                    
-      & cmd_to_update_id;     
+      & op_cmd_bram_base_add
+      & int_cmd_bram_base_add   
+      & temp_cmd_bram_base_add  
+      & int_cmd_bram_base_add_m1
+      & int_checksum_base_add
+      & cmd_overhead_bytes_num;    
       
       return y;
    end to_intf_cfg;
