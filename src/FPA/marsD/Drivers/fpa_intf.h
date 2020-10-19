@@ -56,6 +56,7 @@
 #define FPA_NUM_CH         1  // nombre de canaux de sorties  (1 ou 2)
 
 #define FPA_COOLER_TEMP_THRES    -17300
+#define FPA_COOLER_TEMP_TOL      100
 #define FPA_DEFAULT_EXPOSURE     150.0F //[us]
 #define FPA_DEFAULT_FRAME_RATE   44.0F //[Hz]
 

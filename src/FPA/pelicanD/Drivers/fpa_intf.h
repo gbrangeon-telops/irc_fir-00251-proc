@@ -74,6 +74,7 @@
 #define FPA_MIN_PER        0  // [clock cycles]
 
 #define FPA_COOLER_TEMP_THRES    -19400
+#define FPA_COOLER_TEMP_TOL      100
 #ifdef SIM
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]

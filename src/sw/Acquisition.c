@@ -35,6 +35,7 @@
 #include "AEC.h"
 #include "Actualization.h"
 #include "SFW_ctrl.h"
+#include "fpa_intf.h"
 #include <stdbool.h> // bool
 
 static uint8_t gAcquisitionTurnOn = 0;
@@ -612,7 +613,9 @@ void Acquisition_SM()
                }
 
                // Check if sensor cooldown is done 
-               if ((sensorTemp < cooldownTempTarget) || (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
+               if ((cooldownTempTarget - FPA_COOLER_TEMP_TOL < sensorTemp) &&
+                    (sensorTemp < cooldownTempTarget + FPA_COOLER_TEMP_TOL) &&
+                    (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
                {
                   builtInTests[BITID_Cooldown].result = BITR_Passed;
                   ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,

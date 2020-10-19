@@ -59,6 +59,7 @@
 #define FPA_NUM_CH         2  // nombre de canaux de sorties  (1 ou 2)
 
 #define FPA_COOLER_TEMP_THRES    -17300
+#define FPA_COOLER_TEMP_TOL      100
 //#ifdef SIM
 //   #define FPA_DEFAULT_EXPOSURE     100.0F //[us]
 //   #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]

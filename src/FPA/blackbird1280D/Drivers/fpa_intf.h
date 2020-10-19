@@ -60,6 +60,7 @@
 #define FPA_TDC_FLAGS2           0
 
 #define FPA_COOLER_TEMP_THRES    -19400               // TODO : A verifier
+#define FPA_COOLER_TEMP_TOL      100				  // TODO : A verifier
 #ifdef SIM
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]       // TODO : A verifier
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]    // TODO : A verifier
