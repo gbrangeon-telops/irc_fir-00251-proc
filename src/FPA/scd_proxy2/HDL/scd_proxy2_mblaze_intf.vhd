@@ -122,7 +122,7 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal int_cfg_i                       : int_cfg_type;
    signal exp_struct_cfg                  : int_cfg_type;
    signal user_cfg_int                    : int_cfg_type;
-   signal checksum_base_add               : unsigned(exp_ser_cfg_add'length-1 downto 0);
+   -- signal checksum_base_add               : unsigned(exp_ser_cfg_add'length-1 downto 0);
    
    
 begin
@@ -186,8 +186,7 @@ begin
             mb_ctrled_reset_i <= '0';
             at_least_one_mb_cfg_received <= '0';
             
-         else             
-            
+         else            
             
             -- MB: config serielle
             mb_ser_cfg_add <= std_logic_vector(resize(axi_awaddr(9 downto 2),mb_ser_cfg_add'length));  -- Cela suppose que l'adresse du mB varie par pas de 4 
@@ -233,6 +232,8 @@ begin
                   when X"6C" =>    mb_struct_cfg.diag.ysize                       <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));
                   when X"70" =>    mb_struct_cfg.diag.xsize_div_tapnum            <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));
                   when X"74" =>    mb_struct_cfg.diag.lovh_mclk_source            <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
+                  
+                  -- misc (principalement variables/parametres qui ne changent pratiquement pas)
                   when X"78" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0)); 
                   when X"7C" =>    mb_struct_cfg.int_dly_cst                      <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
                   when X"80" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
@@ -246,14 +247,21 @@ begin
                   when X"9C" =>    mb_struct_cfg.fpa_serdes_lval_num              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
                   when X"A0" =>    mb_struct_cfg.fpa_serdes_lval_len              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
                   
-                  when X"A4" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0); at_least_one_mb_cfg_received <= '1';
-                  when X"A8" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0); mb_cfg_in_progress <= '0';
-                     
-                  -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                  when X"AC" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0); 
-                     
-                  -- trig lecture de temperature(le changement de numero est vu comme un changement de config impliquant la repogrammation)
-                  when X"D0" =>    mb_struct_cfg.temp.temp_read_num <= unsigned(data_i(mb_struct_cfg.temp.temp_read_num 'length-1 downto 0)); mb_cfg_in_progress <= '0';
+                  when X"A4" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0); 
+                  when X"A8" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0); 
+                  
+                  when X"AC" =>    mb_struct_cfg.op_cmd_bram_base_add             <= unsigned(data_i(mb_struct_cfg.op_cmd_bram_base_add'length-1 downto 0));
+                  when X"B0" =>    mb_struct_cfg.int_cmd_bram_base_add            <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add'length-1 downto 0));
+                  when X"B4" =>    mb_struct_cfg.temp_cmd_bram_base_add           <= unsigned(data_i(mb_struct_cfg.temp_cmd_bram_base_add'length-1 downto 0)); 
+                  
+                  when X"B8" =>    mb_struct_cfg.int_cmd_bram_base_add_m1         <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add_m1'length-1 downto 0));
+                  when X"BC" =>    mb_struct_cfg.int_checksum_base_add            <= unsigned(data_i(mb_struct_cfg.int_checksum_base_add'length-1 downto 0));
+                  when X"C0" =>    mb_struct_cfg.cmd_overhead_bytes_num           <= unsigned(data_i(mb_struct_cfg.cmd_overhead_bytes_num'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';  
+                  
+                  
+                  -- lecture de temperature
+                  when X"D0" =>    mb_struct_cfg.temp.cfg_num                     <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
+                  when X"D4" =>    mb_struct_cfg.temp.cfg_end                     <= data_i(0); mb_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -290,10 +298,9 @@ begin
             exp_cfg_in_progress <= '0';
             at_least_one_exp_cfg_received <= '0';
             
-         else
+         else             
             
-            
-            checksum_base_add <= resize(unsigned(mb_struct_cfg.int_cmd_dlen), checksum_base_add'length) + 4;  -- +4 pour tenir compte de l'overhead de la cmd.         
+            -- checksum_base_add <= resize(unsigned(mb_struct_cfg.int_cmd_dlen), checksum_base_add'length) + 4;  -- +4 pour tenir compte de l'overhead de la cmd.         
             
             case exp_cfg_gen_fsm is       
                
@@ -304,7 +311,7 @@ begin
                   exp_ser_cfg_dval <= '0';
                   exp_cfg_in_progress <= '0';
                   exp_ser_cfg_data <= (others => '0');  -- fait expres pour le bon calcul du checksum
-                  if int_cfg_i.int_dval = '1' then      -- dès qu'un temps d'integration rentre, on quitte idle pour attendre sa conversion
+                  if int_dval_pipe(1) = '1' then        -- int_dval_pipe(1) est à 1CLK près le front montant de EXP_INFO.EXP_DVAL. Donc dès qu'un temps d'integration rentre, on quitte idle pour attendre sa conversion
                      exp_cfg_in_progress <= '1';        -- ainsi, la sortie de la config est bloquée jusqu'à ce que la commande du temps d'integration soit pleinement constituée 
                      exp_cfg_gen_fsm <= wait_mb_cfg_st;
                   end if; 
@@ -317,9 +324,8 @@ begin
                
                when serial_exp_cfg_st =>   -- on envoie la partie serielle
                   exp_cfg_done <= '0';
-                  exp_cfg_in_progress <= '1';
                   exp_ser_cfg_dval <= '1'; 
-                  exp_ser_cfg_add <= std_logic_vector(resize((byte_cnt - 1 + INT_CMD_RAM_BASE_ADD), exp_ser_cfg_add'length)); -- pour que premiere adresse impérativement 0
+                  exp_ser_cfg_add <= std_logic_vector(resize((byte_cnt + mb_struct_cfg.int_cmd_bram_base_add_m1), exp_ser_cfg_add'length)); -- pour que premiere adresse impérativement 0
                   byte_cnt <= byte_cnt + 1;
                   exp_checksum <= exp_checksum + unsigned(exp_ser_cfg_data); -- somme sur 8 bits donc implicitement modulo 256. certes decalé mais les zeros entre byte8 et byte12 permettent à la valeur d'etre prête avant l'envoi
                   
@@ -348,7 +354,7 @@ begin
                      
                      -- checksum
                   elsif byte_cnt = 18 then
-                     exp_ser_cfg_add <= std_logic_vector(resize((checksum_base_add + INT_CMD_RAM_BASE_ADD), exp_ser_cfg_add'length));
+                     exp_ser_cfg_add <= std_logic_vector(resize((mb_struct_cfg.int_checksum_base_add + mb_struct_cfg.int_cmd_bram_base_add), exp_ser_cfg_add'length));
                      exp_ser_cfg_data <= std_logic_vector(unsigned(not std_logic_vector(exp_checksum)) + 1); -- le fait qu'il y ait des zeros entre byte8 et byte12 donne le temps au cheksum d'etre prêt avant le byte 12 
                      exp_cfg_gen_fsm <= pause_st; 
                   else  -- si byte cnt entre 15 et 17  

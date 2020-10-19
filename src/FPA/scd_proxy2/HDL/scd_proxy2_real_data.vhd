@@ -23,28 +23,26 @@ use work.fpa_common_pkg.all;
 entity scd_proxy2_real_data is
    port(
       
-      ARESET             : in std_logic;
-      CLK                : in std_logic;
-                         
-      FPA_INTF_CFG       : in fpa_intf_cfg_type;
-                         
-      FPA_INT            : in std_logic;
-                         
-      READOUT            : in std_logic;
-      FPA_DIN            : in std_logic_vector(57 downto 0);
-      FPA_DIN_DVAL       : in std_logic;
+      ARESET              : in std_logic;      
+      CLK                 : in std_logic;
       
-      ACQ_MODE           : in std_logic;
-      ACQ_MODE_FIRST_INT : in std_logic;
-      NACQ_MODE_FIRST_INT: in std_logic;
+      QUAD_DATA           : in std_logic_vector(71 downto 0);
+      QUAD_DVAL           : in std_logic;
       
-      ENABLE             : in std_logic;
-                         
-      FPA_DOUT_FVAL      : out std_logic;
-      FPA_DOUT           : out std_logic_vector(95 downto 0);
-      FPA_DOUT_DVAL      : out std_logic;
-                         
-      STAT               : out std_logic_vector(7 downto 0)
+      DOUT                : out std_logic_vector(95 downto 0);
+      DOUT_FVAL           : out std_logic;     
+      DOUT_DVAL           : out std_logic;
+      
+      FPA_INTF_CFG        : in fpa_intf_cfg_type;
+      ENABLE              : in std_logic;
+      
+      FPA_INT             : in std_logic;      
+      READOUT             : in std_logic;
+      ACQ_MODE            : in std_logic;
+      ACQ_MODE_FIRST_INT  : in std_logic;
+      NACQ_MODE_FIRST_INT : in std_logic;
+      
+      STAT                : out std_logic_vector(7 downto 0)
       );
 end scd_proxy2_real_data;
 
@@ -86,24 +84,40 @@ architecture rtl of scd_proxy2_real_data is
          RESET : in std_logic;
          CLK   : in std_logic
          );
+   end component; 
+   
+   component fwft_sfifo_w72_d16 is
+      port (
+         srst       : in std_logic;
+         clk        : in std_logic;
+         din        : in std_logic_vector (71 downto 0);
+         wr_en      : in std_logic;
+         rd_en      : in std_logic;
+         dout       : out std_logic_vector (71 downto 0);
+         full       : out std_logic;         
+         overflow   : out std_logic;
+         empty      : out std_logic;
+         valid      : out std_logic
+         );
    end component;
    
    type readout_fsm_type is (idle, wait_img_end_st);
+   type fifo_fsm_type is (init_st1, init_st2, init_st3, init_done);
    
-   type din_pipe_type is array (0 to C_PIPE_NMAX) of t_ll_ext_mosi56;
+   type input_data_type is
+   record
+      fval     : std_logic;    
+      pix_fval : std_logic;
+      pix_lval : std_logic;
+      pix_dval : std_logic;
+      data     : std_logic_vector(55 downto 0);
+   end record; 
    
-   signal din_pipe_i          : din_pipe_type;
-   signal first_data_en       : std_logic;
-   signal fval_pipe           : std_logic_vector(C_PIPE_NMAX downto 0);
-   signal lval_pipe           : std_logic_vector(C_PIPE_NMAX downto 0);
-   signal dout_fval_o         : std_logic;
-   signal dout_dval_o         : std_logic;
-   signal dout_o              : std_logic_vector(FPA_DOUT'LENGTH-1 downto 0);
+   signal dout_fval_o         : std_logic := '0';
+   signal dout_dval_o         : std_logic := '0';
+   signal dout_o              : std_logic_vector(DOUT'LENGTH-1 downto 0);
    signal global_areset       : std_logic;
    signal global_sreset       : std_logic;
-   signal fval_fe             : std_logic;
-   signal fval_last           : std_logic;
-   signal signal_rst          : std_logic;
    
    signal acq_data_i           : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal int_fifo_rd          : std_logic;
@@ -120,14 +134,37 @@ architecture rtl of scd_proxy2_real_data is
    signal iwr_int_fifo_wr2     : std_logic;
    signal readout_fsm          : readout_fsm_type;
    
+   signal fifo_rd              : std_logic;
+   signal past                 : input_data_type;
+   signal past_fifo_din        : std_logic_vector(71 downto 0) := (others => '0');
+   signal past_fifo_wr         : std_logic;
+   signal past_fifo_dval_i     : std_logic;
+   signal past_fifo_dout       : std_logic_vector(71 downto 0);
+   
+   signal present              : input_data_type;
+   signal present_fifo_din     : std_logic_vector(71 downto 0) := (others => '0');                    
+   signal present_fifo_wr      : std_logic;                    
+   signal present_fifo_dval_i  : std_logic;                    
+   signal present_fifo_dout    : std_logic_vector(71 downto 0);
+   
+   signal future               : input_data_type;
+   signal future_fifo_din      : std_logic_vector(71 downto 0) := (others => '0');                    
+   signal future_fifo_wr       : std_logic;                    
+   signal future_fifo_dval_i   : std_logic;                    
+   signal future_fifo_dout     : std_logic_vector(71 downto 0);
+   
+   signal pix_dval_i           : std_logic;
+   signal fifo_fsm             : fifo_fsm_type;
+   
+   
 begin
    
    --------------------------------------------------
    -- Outputs map
    --------------------------------------------------
-   FPA_DOUT_FVAL <= dout_fval_o;
-   FPA_DOUT_DVAL <= dout_dval_o; 
-   FPA_DOUT <= dout_o; --
+   DOUT_FVAL <= dout_fval_o;
+   DOUT_DVAL <= dout_dval_o; 
+   DOUT <= dout_o; --
    STAT(2) <= '0';
    STAT(1) <= '0';
    STAT(0) <= '1'; 
@@ -151,92 +188,142 @@ begin
       RESET => global_sreset
       );
    
-   din_pipe_i(0).sof  <= '0';
-   din_pipe_i(0).eof  <= '0';
-   din_pipe_i(0).sol  <= '0';
-   din_pipe_i(0).eol  <= '0';
-   din_pipe_i(0).dval <= FPA_DIN_DVAL;
-   din_pipe_i(0).data <= FPA_DIN(55 downto 0);
+   --------------------------------------------------
+   -- fifo du passé
+   --------------------------------------------------
+   fifo1 : fwft_sfifo_w72_d16
+   port map(
+      srst        => global_sreset,
+      clk         => CLK,
+      din         => past_fifo_din,
+      wr_en       => past_fifo_wr,
+      rd_en       => fifo_rd,
+      dout        => past_fifo_dout,
+      full        => open,
+      overflow    => open,
+      empty       => open,
+      valid       => past_fifo_dval_i
+      );
    
-   lval_pipe(0)       <= FPA_DIN(56);
-   fval_pipe(0)       <= FPA_DIN(57); 
+   past.fval      <= past_fifo_dout(67);
+   past.pix_fval  <= past_fifo_dout(66);   
+   past.pix_lval  <= past_fifo_dout(65);
+   past.pix_dval  <= past_fifo_dout(64);
+   past.data      <= past_fifo_dout(61 downto 48) & past_fifo_dout(45 downto 32) & past_fifo_dout(29 downto 16) & past_fifo_dout(13 downto 0);
+   
+   --------------------------------------------------
+   -- fifo du present
+   --------------------------------------------------
+   fifo2 : fwft_sfifo_w72_d16
+   port map(
+      srst        => global_sreset,
+      clk         => CLK,
+      din         => present_fifo_din,
+      wr_en       => present_fifo_wr,
+      rd_en       => fifo_rd,
+      dout        => present_fifo_dout,
+      full        => open,
+      overflow    => open,
+      empty       => open,
+      valid       => present_fifo_dval_i   
+      );
+   
+   present.fval     <= present_fifo_dout(67);
+   present.pix_fval <= present_fifo_dout(66);   
+   present.pix_lval <= present_fifo_dout(65);
+   present.pix_dval <= present_fifo_dout(64);
+   present.data     <= present_fifo_dout(61 downto 48) & present_fifo_dout(45 downto 32) & present_fifo_dout(29 downto 16) & present_fifo_dout(13 downto 0);
+   
+   --------------------------------------------------
+   -- fifo du futur
+   --------------------------------------------------
+   fifo3 : fwft_sfifo_w72_d16
+   port map(
+      srst        => global_sreset,
+      clk         => CLK,
+      din         => future_fifo_din,
+      wr_en       => future_fifo_wr,
+      rd_en       => fifo_rd,
+      dout        => future_fifo_dout,
+      full        => open,
+      overflow    => open,
+      empty       => open,
+      valid       => future_fifo_dval_i
+      );
+   
+   future.fval      <= future_fifo_dout(67);
+   future.pix_fval  <= future_fifo_dout(66);   
+   future.pix_lval  <= future_fifo_dout(65);
+   future.pix_dval  <= future_fifo_dout(64);
+   future.data      <= future_fifo_dout(61 downto 48) & past_fifo_dout(45 downto 32) & past_fifo_dout(29 downto 16) & past_fifo_dout(13 downto 0);
    
    --------------------------------------------------
    -- synchronisateur des données sortantes
-   --------------------------------------------------
+   --------------------------------------------------    
+   pix_dval_i <= present.pix_dval and present_fifo_dval_i;                    -- si les données du fifo du present sont OK, c'est que ceux du past et du futur le sont aussi
+   fifo_rd <= future_fifo_dval_i;                                             -- past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;
+   
+   
    U4: process(CLK)
       
    begin
       if rising_edge(CLK) then         
-         if global_sreset = '1' then         
-            first_data_en <= '1'; 
-            signal_rst <= '1';
-            fval_last <= '0';
+         if global_sreset = '1' then      
             dout_fval_o <= '0';
             dout_dval_o <= '0';
-            -- pragma translate_off
-            fval_pipe <= (others =>'0');
-            dout_fval_o <= '0';
-            fval_fe <= '0';
-            -- pragma translate_on
+            fifo_fsm <= init_st1;
+            past_fifo_wr <= '0';
+            present_fifo_wr <= '0';
+            future_fifo_wr <= '0';
+            
          else        
             
-            -----------------------------------------------
-            -- pipe(1) : generation de sof et sol  et eol                                         
-            -----------------------------------------------
-            fval_pipe(1)  <= fval_pipe(0);
-            lval_pipe(1)  <= lval_pipe(0);
-            din_pipe_i(1) <= din_pipe_i(0);
-            din_pipe_i(1).sol <= '0';
-            din_pipe_i(1).sof <= '0';
-            if lval_pipe(1) = '0' and lval_pipe(0) = '1' then 
-               din_pipe_i(1).sol <= '1';
-               din_pipe_i(1).sof <= first_data_en;
-               first_data_en <= '0';
-            end if;            
+            -- données entrantes
+            past_fifo_din <= QUAD_DATA;
+            past_fifo_wr  <= QUAD_DVAL;
             
-            -----------------------------------------------
-            -- pipe(2) : generation de eol                                         
-            -----------------------------------------------
-            fval_pipe(2)  <= fval_pipe(1);
-            lval_pipe(2)  <= lval_pipe(1);
-            din_pipe_i(2) <= din_pipe_i(1); 
-            din_pipe_i(2).eol <= '0';
-            if lval_pipe(1) = '1' and lval_pipe(0) = '0' then 
-               din_pipe_i(2).eol <= '1';
-            end if;
+            present_fifo_din <= QUAD_DATA;
+            present_fifo_wr  <= QUAD_DVAL;
             
-            -----------------------------------------------
-            -- pipe(3) et pipe(4) : generation de eof                                         
-            -----------------------------------------------
-            fval_pipe(3) <= fval_pipe(2);
-            lval_pipe(3) <= lval_pipe(2);
-            fval_fe <= not fval_pipe(2) and fval_pipe(3);     -- detection de la tombée de fval
-            if din_pipe_i(2).dval = '1' or fval_fe = '1' then -- un nouveau pix_dval_i ou un fval_fe poussent la donnée précédente dans le pipe vers la sortie
-               -- pipe 1
-               din_pipe_i(3) <= din_pipe_i(2);                --     
-               -- pipe 2
-               din_pipe_i(4) <= din_pipe_i(3);   
-            end if;
-            if fval_fe = '1' then 
-               din_pipe_i(4).eof  <= '1'; -- parfaitement synchro avec le pixel précédent fval_fe
-            end if; 
-            din_pipe_i(4).dval <= din_pipe_i(3).dval or fval_fe;           
-            fval_pipe(4)  <= fval_pipe(3);
-            lval_pipe(4)  <= lval_pipe(3);    
+            future_fifo_din <= QUAD_DATA;
+            future_fifo_wr  <= QUAD_DVAL;
+            
+            case fifo_fsm is
+               
+               when init_st1 =>       -- ici, on fait en sorte que le futur soit en avance de 1CLK sur le présent
+                  past_fifo_din(71 downto 64) <= (others => '0');
+                  present_fifo_din(71 downto 64) <= (others => '0');
+                  past_fifo_wr <= '1';
+                  present_fifo_wr <= '1';
+                  fifo_fsm <= init_st2;
+               
+               when init_st2 =>
+                  past_fifo_wr <= '1';
+                  present_fifo_wr <= '0';
+                  fifo_fsm <= init_st3;
+               
+               when init_st3 =>
+                  past_fifo_wr <= '0';
+                  fifo_fsm <= init_done;
+                  
+                when init_done =>  
+               
+               when others => 
+               
+            end case;
             
             --------------------------------------------------------
             -- les sorties
             --------------------------------------------------------
-            dout_dval_o          <= din_pipe_i(4).dval or (fval_last and not dout_fval_o);           -- wr_en des fifos en ava. On ecrit aussi la tombée de fval pour que le système en avl le remarque  
-            dout_fval_o          <= fval_pipe(4);                                   -- fval          
-            dout_o(55 downto 0)  <= din_pipe_i(4).data;                             -- données écrites en aval           
-            dout_o(56)           <= din_pipe_i(4).sol ;                             -- aoi_sol                              
-            dout_o(57)           <= din_pipe_i(4).eol;                              -- aoi_eol       
-            dout_o(58)           <= fval_pipe(4);                                   
-            dout_o(59)           <= din_pipe_i(4).sof;                              -- aoi_sof
-            dout_o(60)           <= din_pipe_i(4).eof;                              -- aoi_eof 
-            dout_o(61)           <= din_pipe_i(4).dval and lval_pipe(4);            -- aoi_dval    (nouvel ajout) 
+            dout_dval_o          <= fifo_rd;                                        -- wr_en des fifos en aval. On ecrit aussi la tombée de fval pour que le système en avl le remarque  
+            dout_fval_o          <= present.fval;                                   -- fval          
+            dout_o(55 downto 0)  <= present.data;                                   -- données écrites en aval           
+            dout_o(56)           <= pix_dval_i and not past.pix_lval and present.pix_lval;                   -- aoi_sol                              
+            dout_o(57)           <= pix_dval_i and not future.pix_lval and present.pix_lval;                 -- aoi_eol       
+            dout_o(58)           <= present.fval;                                   
+            dout_o(59)           <= pix_dval_i and not past.pix_fval and present.pix_fval;                   -- aoi_sof
+            dout_o(60)           <= pix_dval_i and not future.pix_fval and present.pix_fval;                 -- aoi_eof 
+            dout_o(61)           <= present.pix_dval and fifo_rd;                   -- aoi_dval    (nouvel ajout) 
             dout_o(62)           <= acq_data_i;                                     -- requis pour savoir si image à rejeter ou non
             dout_o(76 downto 63) <= (others => '0');                                -- aoi_spares  (nouvel ajout)                                                                                
             
@@ -246,17 +333,6 @@ begin
             dout_o(81 downto 80) <= (others => '0');                                -- naoi_ref_valid
             dout_o(94 downto 82) <= (others => '0');                                -- naoi_spares
             dout_o(95)           <= '0';                                            -- non utilisé
-            
-            -----------------------------------------------
-            -- RAZ
-            -----------------------------------------------
-            fval_last  <= dout_fval_o;
-            signal_rst <= fval_last and not dout_fval_o;  
-            
-            if signal_rst = '1' then 
-               first_data_en <= '1';
-            end if;
-            
             
          end if;
       end if;

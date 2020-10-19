@@ -43,8 +43,7 @@ entity scd_proxy2_serial_com is
       RAM1_RD                : out std_logic;
       RAM1_RD_ADD            : out std_logic_vector(10 downto 0);
       RAM1_RD_DATA           : in std_logic_vector(7 downto 0);
-      RAM1_RD_DVAL           : in std_logic;
-      
+      RAM1_RD_DVAL           : in std_logic;      
       
       -- interface avec la RAM2 : ram de securisation de la cfg à envoyer au proxy
       RAM2_WR                : out std_logic;
@@ -71,9 +70,7 @@ entity scd_proxy2_serial_com is
       RX_RD_EN              : out std_logic;      
       RX_ERR                : in std_logic;
       
-      READOUT               : in std_logic
-      
-      
+      READOUT               : in std_logic      
       );
 end scd_proxy2_serial_com;
 
@@ -144,7 +141,7 @@ architecture RTL of scd_proxy2_serial_com is
    type prog_seq_fsm_type is (idle, cpy_cfg_st, wait_end_cpy_cfg_st, send_cfg_st, wait_end_send_cfg_st, wait_proxy_resp_st, cmd_fail_mgmt_st);
    type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st, cpy_cfg_wr_st, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
-   type cmd_resp_fsm_type is (wait_resp_hder_st, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
+   type cmd_resp_fsm_type is (idle, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
    type com_data_array_type  is array (0 to LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
@@ -229,7 +226,7 @@ architecture RTL of scd_proxy2_serial_com is
 begin
    
    acq_mode <= TRIG_CTLER_STAT(4);
-
+   
    SERIAL_FATAL_ERR <= serial_fatal_err_i;
    SERIAL_DONE <= serial_done_i;
    PROXY_RDY <= proxy_rdy_i;
@@ -328,7 +325,7 @@ begin
                      prog_seq_fsm <= cpy_cfg_st;
                   end if; 
                
-               when cpy_cfg_st =>              -- la config est copiée de de la zone A vers la zone B sécurisée (de la RAM)                  
+               when cpy_cfg_st =>              -- la config est copiée de de la RAM1 vers la RAM2 sécurisée                  
                   cpy_cfg_en <= '1';
                   if cpy_cfg_done = '0' then
                      cpy_cfg_en <= '0';
@@ -480,10 +477,10 @@ begin
                when init_cpy_wr_st =>     -- zone securisée en ecriture
                   cfg_fifo_wr_en <= '0';
                   cfg_byte_cnt <= (others => '0');
-                  ram2_wr_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram2_wr_add_i'length); -- zone securisée sera en ecriture
+                  ram2_wr_add_i <= to_unsigned(0, ram2_wr_add_i'length); -- zone securisée sera en ecriture
                   cfg_mgmt_fsm <= cpy_cfg_wr_st;
                
-               when cpy_cfg_wr_st =>  -- la config est copiee  du fifo vers la zone securisée B  
+               when cpy_cfg_wr_st =>  -- la config est copiee  du fifo vers la RAM2 securisée  
                   cfg_fifo_rd_en <= '1';                                      -- on peut commencer la lecture les yeux fermées car le fifo contient déjà des données quand on arrive ici     
                   if cfg_fifo_dval = '1' then
                      ram2_rd_i <= '0';
@@ -491,11 +488,11 @@ begin
                      ram2_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
                      ram2_wr_data_i <= cfg_fifo_dout;
                      cfg_byte_cnt <= cfg_byte_cnt + 1;                     
-                     if cfg_byte_cnt    = 3 then               -- 3 car cfg_byte_cnt commence à 0
+                     if cfg_byte_cnt = 3 then               -- 3 car cfg_byte_cnt commence à 0
                         cfg_payload(7 downto 0) <= cfg_fifo_dout;  -- payload de la config selon SCD_PROXY2
                      elsif cfg_byte_cnt = 4 then
                         cfg_payload(15 downto 8) <= cfg_fifo_dout; -- payload de la config selon SCD_PROXY2
-                        cfg_byte_total <=  (unsigned(cfg_fifo_dout) & unsigned(cfg_payload(7 downto 0))) + CMD_OVERHEAD_BYTES_NUM; -- nombre de bytes total de la config                        
+                        cfg_byte_total <=  (unsigned(cfg_fifo_dout) & unsigned(cfg_payload(7 downto 0))) + to_integer(USER_CFG.CMD_OVERHEAD_BYTES_NUM); -- nombre de bytes total de la config                        
                      end if;
                   end if;
                   if cfg_fifo_empty = '1' then
@@ -507,9 +504,9 @@ begin
                when init_send_st =>            
                   tx_dval_i <= '0';
                   cfg_byte_cnt <= (others => '0'); 
-                  ram2_rd_add_i <= to_unsigned(CMD_SECUR_RAM_BASE_ADD, ram2_rd_add_i'length); -- zone securisée sera en lecture
+                  ram2_rd_add_i <= to_unsigned(0, ram2_rd_add_i'length); -- zone securisée sera en lecture
                   
-                  if unsigned(SERIAL_BASE_ADD) = to_unsigned(OP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
+                  if unsigned(SERIAL_BASE_ADD) = resize(USER_CFG.OP_CMD_BRAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
                      force_prog_trig_mode <= '1';
                      cfg_mgmt_fsm <= prog_trig_start_st; 
                   else
@@ -553,6 +550,11 @@ begin
                      tx_data_i <= cfg_byte;
                      cfg_mgmt_fsm <= check_frm_end_st; 
                   end if;
+                  -- pragma translate_off
+                  tx_dval_i <= '1';
+                  tx_data_i <= cfg_byte;
+                  cfg_mgmt_fsm <= check_frm_end_st;
+                  -- pragma translate_on                     
                
                when check_frm_end_st =>
                   tx_dval_i <= '0';
@@ -568,6 +570,9 @@ begin
                   if TX_EMPTY = '1' then 
                      cfg_mgmt_fsm <= uart_pause_st;
                   end if;
+                  -- pragma translate_off
+                  cfg_mgmt_fsm <= uart_pause_st;
+                  -- pragma translate_on
                
                when uart_pause_st =>                  
                   timeout_cnt <= (others => '0');
@@ -576,7 +581,10 @@ begin
                      if uart_tbaud_cnt = 10 then          --  assure que le dernier byte est transmis
                         cfg_mgmt_fsm <= wait_proxy_resp_st;  
                      end if;                  
-                  end if;        
+                  end if; 
+                  -- pragma translate_off
+                  cfg_mgmt_fsm <= wait_proxy_resp_st;
+                  -- pragma translate_on
                
                when wait_proxy_resp_st =>
                   timeout_cnt <= timeout_cnt + 1;                  
@@ -684,7 +692,7 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then  
-            cmd_resp_fsm <= wait_resp_hder_st;
+            cmd_resp_fsm <= idle;
             rx_data_cnt <= (others => '0');
             proxy_serial_err <= '0';
             rx_rd_en_i <= '0';
@@ -701,7 +709,7 @@ begin
             
             case cmd_resp_fsm is               
                
-               when wait_resp_hder_st =>   -- on cherche l'entête du header et on se synchronise dessus 
+               when idle =>   -- on cherche l'entête du header et on se synchronise dessus 
                   rx_data_cnt <= to_unsigned(1, rx_data_cnt'length);
                   rx_data_total <= (others => '1'); -- fait expres pour que bloquer la fsm dans l'etat decode_byte_st jusqu'à ;a recpetion de tous les bytes. Valeur mise à jour dans l'état decode_byte_st 
                   cmd_resp_done <= '1';
@@ -731,13 +739,13 @@ begin
                         resp_payload(7 downto 0) <= RX_DATA;
                      elsif rx_data_cnt = 5 then                      -- payload
                         resp_payload(15 downto 8) <= RX_DATA;
-                        rx_data_total <=  (unsigned(RX_DATA) & unsigned(resp_payload(7 downto 0))) + CMD_OVERHEAD_BYTES_NUM;
+                        rx_data_total <=  (unsigned(RX_DATA) & unsigned(resp_payload(7 downto 0))) + to_integer(USER_CFG.CMD_OVERHEAD_BYTES_NUM);
                         resp_dcnt <= (others => '0');
                      elsif rx_data_cnt = rx_data_total then        -- checksum                                               
                         cmd_resp_fsm <= check_resp_st;
                         rx_rd_en_i <= '0';   -- on arrête la lecture du fifo
                      elsif rx_data_cnt = 32 then                     
-                        cmd_resp_fsm <= wait_resp_hder_st;
+                        cmd_resp_fsm <= idle;
                         proxy_serial_err <= '1'; 
                         resp_err(0) <= '1';
                      else                                               -- data
@@ -755,18 +763,22 @@ begin
                         for kk in 0 to 3 loop
                            failure_resp_data(kk) <= resp_data(kk);
                         end loop;
-                        cmd_resp_fsm <= wait_resp_hder_st;
+                        cmd_resp_fsm <= idle;
                      elsif resp_id = USER_CFG.TEMP_CMD_ID then
                         proxy_serial_err <= '0'; 
                         cmd_resp_fsm <= fpa_temp_resp_st;
                      else
                         proxy_serial_err <= '0'; 
-                        cmd_resp_fsm <= wait_resp_hder_st;
+                        cmd_resp_fsm <= idle;
                      end if;                     
                   else
                      proxy_serial_err <= '1';
                      resp_err(2) <= '1';
-                     cmd_resp_fsm <= wait_resp_hder_st;
+                     cmd_resp_fsm <= idle;
+                     -- pragma translate_off
+                     proxy_serial_err <= '0';
+                     resp_err <= (others => '0');                     
+                     -- pragma translate_on                     
                   end if;
                
                when fpa_temp_resp_st =>  -- extraction de la température raw 
@@ -781,7 +793,7 @@ begin
                      fpa_temp_reg <= temp_diode - temp_gnd;
                   end if;
                   
-                  cmd_resp_fsm <= wait_resp_hder_st;
+                  cmd_resp_fsm <= idle;
                
                when others =>
                

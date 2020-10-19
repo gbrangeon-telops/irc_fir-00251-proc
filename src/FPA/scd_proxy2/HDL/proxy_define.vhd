@@ -42,7 +42,7 @@ package Proxy_define is
    constant TEMP_TRIG_PERIOD_US                   : integer := 1_000_000;  -- le trig de lecture de la temperature a une periode de 1sec pour ne pas submerger le proxy
                                                   
    -- commandes                                   
-   constant CMD_OVERHEAD_BYTES_NUM                : integer := 6; -- nombre de bytes de l'overhead (header, CommandID, length, Checksum)
+   --constant CMD_OVERHEAD_BYTES_NUM                : integer := 6; -- nombre de bytes de l'overhead (header, CommandID, length, Checksum)
    constant LONGEST_CMD_BYTES_NUM                 : integer := 32; -- longueur maximale en byte de la config d'un scd_proxy2 (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
    constant SERIAL_BAUD_RATE                      : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
  
@@ -96,12 +96,12 @@ package Proxy_define is
    constant CMD_HDER                 : std_logic_vector(7 downto 0)  := x"AA";
    
    -- partition de la ram de cfg serielle (la partie d'ecriture reservée à la config serielle a une plage d'adresse < 255)
-   constant OP_CMD_RAM_BASE_ADD      : integer  := 0;    -- adresse de base où est logée la commande operationnelle en ram
-   constant INT_CMD_RAM_BASE_ADD     : integer  := 64;   -- adresse de base où est logée la commande du temps d'integration en ram
-   constant TEMP_CMD_RAM_BASE_ADD    : integer  := 192;
+   -- constant OP_CMD_RAM_BASE_ADD      : integer  := 0;    -- adresse de base où est logée la commande operationnelle en ram
+   -- constant INT_CMD_RAM_BASE_ADD     : integer  := 64;   -- adresse de base où est logée la commande du temps d'integration en ram
+   -- constant TEMP_CMD_RAM_BASE_ADD    : integer  := 192;
    
    -- adresse de base de la zone securisée
-   constant CMD_SECUR_RAM_BASE_ADD   : integer  := 0; -- adresse où se retrouve la commande copiée dans la ram securisee
+   -- constant CMD_SECUR_RAM_BASE_ADD   : integer  := 0; -- adresse où se retrouve la commande copiée dans la ram securisee
    
    -- quelques constantes 
    constant SERIAL_CFG_END_ADD           : std_logic_vector(7 downto 0) := x"FC"; -- adresse de fin d'envoi de la config serielle
@@ -174,7 +174,8 @@ package Proxy_define is
    -- scd_proxy2 temperature
    type temp_cfg_type is
    record
-      temp_read_num       : unsigned(7 downto 0);
+      cfg_num             : unsigned(7 downto 0);
+      cfg_end             : std_logic;            -- necessaire pour que mb_cfg_in_progress retombe à '0' dans le receveur de config
    end record; 
    
    
@@ -184,7 +185,6 @@ package Proxy_define is
    type fpa_intf_cfg_type is
    record 
       
-      cmd_to_update_id               : std_logic_vector(15 downto 0); -- cet id permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
       comn                           : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
       
       -- les cmds proxy et fpa
@@ -209,8 +209,16 @@ package Proxy_define is
       fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       
       op_cmd_id                      : std_logic_vector(15 downto 0);
-      temp_cmd_id                    : std_logic_vector(15 downto 0);      
+      temp_cmd_id                    : std_logic_vector(15 downto 0);
       
+      op_cmd_bram_base_add           : unsigned(7 downto 0);
+      int_cmd_bram_base_add          : unsigned(7 downto 0);
+      temp_cmd_bram_base_add         : unsigned(7 downto 0);
+      
+      int_cmd_bram_base_add_m1       : unsigned(7 downto 0);
+      int_checksum_base_add          : unsigned(7 downto 0);
+      
+      cmd_overhead_bytes_num         : unsigned(7 downto 0);
    end record;    
    
    ----------------------------------------------								
