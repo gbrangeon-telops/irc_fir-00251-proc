@@ -15,7 +15,6 @@
 
 #include "Acquisition.h"
 #include "utils.h"
-#include "FPA_intf.h"
 #include "exposure_time_ctrl.h"
 #include "Trig_gen.h"
 #include "hder_inserter.h"
