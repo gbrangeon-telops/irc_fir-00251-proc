@@ -181,8 +181,8 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
       error = 1;
    }
 
-   //Transformation of a MPEHDRI collection into a MPFixed collection if EHDRI is disabled
-   if (flashSettings.EHDRIDisabled /* EHDRIIsImplemented*/ && collectionFileHeader.CollectionType == CCT_MultipointEHDRI)
+   // Transformation of a MPEHDRI collection into a MPFixed collection if EHDRI is not implemented
+   if (!GC_EHDRIIsImplemented && collectionFileHeader.CollectionType == CCT_MultipointEHDRI)
    {
       collectionFileHeader.CollectionType = CCT_MultipointFixed;
    }

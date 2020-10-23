@@ -21,7 +21,6 @@
 #include "xintc.h"
 #include "verbose.h"
 #include "IRC_Status.h"
-#include "FlashSettings.h"
 #include <time.h>
 #include <stdint.h>
 

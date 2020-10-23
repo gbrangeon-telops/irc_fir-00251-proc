@@ -20,14 +20,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-static void GPS_UART_IntrHandler(void *CallBackRef, u32 Event,
-      unsigned int EventData);
+static void GPS_UART_IntrHandler(void *CallBackRef, u32 Event, unsigned int EventData);
 static uint32_t toSiRFBinary(uint32_t degrees, uint32_t minutes);
-static uint32_t MinutesDigitsToSiRFBinary(uint32_t minutes_frac_digits,
-      uint32_t number_of_digits);
+static uint32_t MinutesDigitsToSiRFBinary(uint32_t minutes_frac_digits, uint32_t number_of_digits);
 static uint32_t str2int(char *data, uint32_t pos, uint32_t num);
-static GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data,
-      uint8_t receivedByte);
+static GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data, uint8_t receivedByte);
 static void GPS_Reset(t_GPS *GPS_Data);
 static void GPS_ParseGPRMC(t_GPS *GPS_Data);
 static void GPS_LowPriorityTasks(t_GPS *GPS_Data);
@@ -65,8 +62,7 @@ uint32_t toSiRFBinary(uint32_t degrees, uint32_t minutes)
  *
  * @return The SiRF binary uint32_t result.
  */
-uint32_t MinutesDigitsToSiRFBinary(uint32_t minutes_frac_digits,
-      uint32_t number_of_digits)
+uint32_t MinutesDigitsToSiRFBinary(uint32_t minutes_frac_digits, uint32_t number_of_digits)
 {
    uint32_t SiRFBinary = 0;
 
@@ -150,15 +146,12 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data, uint16_t uartDeviceId, XIntc *intc,
 
    memset(GPS_Data, 0, sizeof(t_GPS));
 
-   if (CBB_Init(&GPS_Data->rxCircDataBuffer, rxCircBuffer, rxCircBufferSize)
-         != IRC_SUCCESS)
+   if (CBB_Init(&GPS_Data->rxCircDataBuffer, rxCircBuffer, rxCircBufferSize) != IRC_SUCCESS)
    {
       return IRC_FAILURE;
    }
 
-   status = CircularUART_Init(&GPS_Data->uart, uartDeviceId, intc, uartIntrId,
-   NULL,
-   NULL, Ns550);
+   status = CircularUART_Init(&GPS_Data->uart, uartDeviceId, intc, uartIntrId, NULL, NULL, Ns550);
 
    if (status != IRC_SUCCESS)
    {
@@ -170,8 +163,7 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data, uint16_t uartDeviceId, XIntc *intc,
       return IRC_FAILURE;
    }
 
-   CircularUART_SetCircularBuffers(&GPS_Data->uart, &GPS_Data->rxCircDataBuffer,
-         NULL);
+   CircularUART_SetCircularBuffers(&GPS_Data->uart, &GPS_Data->rxCircDataBuffer, NULL);
 
    CircularUART_SetHandler(&GPS_Data->uart, GPS_UART_IntrHandler, GPS_Data);
 
@@ -205,18 +197,15 @@ IRC_Status_t GPS_Init(t_GPS *GPS_Data, uint16_t uartDeviceId, XIntc *intc,
  *
  * @return The command byte if the command is complete, otherwise GPS_NOT_DONE
  */
-GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data,
-      uint8_t receivedByte)
+GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data, uint8_t receivedByte)
 {
-
    GPS_NMEA_codes_t returnValue;	// Stores the return value (command or 0 if not done)
    uint8_t checksum;
 
-   returnValue = GPS_NOT_DONE;// Make sure to return 0 until the whole packet is received and checked
+   returnValue = GPS_NOT_DONE; // Make sure to return 0 until the whole packet is received and checked
 
    // Protection for array overflow. Error in communication
-   if (GPS_Data->field == NBR_OF_FIELD - 1
-         || GPS_Data->CharPtr == NBR_OF_CHAR - 1)
+   if (GPS_Data->field == NBR_OF_FIELD - 1 || GPS_Data->CharPtr == NBR_OF_CHAR - 1)
    {
       //	NMEA_ResetSerial(State); ??
       return -1;
@@ -227,8 +216,7 @@ GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data,
       case 0:		// Start of NMEA frame
          if (receivedByte == '$')
          {
-            GPS_Data->dataArray[GPS_Data->field][GPS_Data->CharPtr++] =
-                  receivedByte;
+            GPS_Data->dataArray[GPS_Data->field][GPS_Data->CharPtr++] = receivedByte;
             GPS_Data->checksumVal = 0;		// reset the checksum counter
             GPS_Data->index++;
          }
@@ -250,8 +238,7 @@ GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data,
          else
          {
             GPS_Data->checksumVal ^= receivedByte;
-            GPS_Data->dataArray[GPS_Data->field][GPS_Data->CharPtr++] =
-                  receivedByte;
+            GPS_Data->dataArray[GPS_Data->field][GPS_Data->CharPtr++] = receivedByte;
          }
          break;
 
@@ -267,8 +254,7 @@ GPS_NMEA_codes_t NMEA_BuildValidateCommand(t_GPS *GPS_Data,
 
       case 3:		// Process the NMEA frame
          // Verify the Checksum
-         checksum = (HEXTOBIN(GPS_Data->checksum[0]) << 4)
-               + HEXTOBIN(GPS_Data->checksum[1]);
+         checksum = (HEXTOBIN(GPS_Data->checksum[0]) << 4) + HEXTOBIN(GPS_Data->checksum[1]);
          if (checksum != GPS_Data->checksumVal)
          {
             if (!(GPS_Data->ErrFlags & GPS_BADCKSUM))
@@ -363,41 +349,33 @@ void GPS_ParseGPRMC(t_GPS *GPS_Data)
    // Extract dd
    GPS_Data->rTClock.tm_mday = str2int((char *) (GPS_Data->dataArray[9]), 0, 2);
    // Extract mm   
-   GPS_Data->rTClock.tm_mon = str2int((char *) (GPS_Data->dataArray[9]), 2, 2)
-         - 1; //Month = 0 to 11
+   GPS_Data->rTClock.tm_mon = str2int((char *) (GPS_Data->dataArray[9]), 2, 2) - 1; //Month = 0 to 11
    // Extract yy
-   GPS_Data->rTClock.tm_year = 100
-         + str2int((char *) (GPS_Data->dataArray[9]), 4, 2);
+   GPS_Data->rTClock.tm_year = 100 + str2int((char *) (GPS_Data->dataArray[9]), 4, 2);
 
    // Latitude ddmm.mmmm   
    StrLength = strlen((char *) (GPS_Data->dataArray[3]));
    // Extract dd   
-   GPS_Data->Latitude.degrees = str2int((char *) (GPS_Data->dataArray[3]), 0,
-         2);
+   GPS_Data->Latitude.degrees = str2int((char *) (GPS_Data->dataArray[3]), 0, 2);
    // Extract mm   
-   GPS_Data->Latitude.minutes = str2int((char *) (GPS_Data->dataArray[3]), 2,
-         2);
+   GPS_Data->Latitude.minutes = str2int((char *) (GPS_Data->dataArray[3]), 2, 2);
    // Calculate how many fractional digits for frac_minutes
    GPS_Data->Latitude.frac_digits = StrLength - 5;
    // Extract frac_mm   
-   GPS_Data->Latitude.frac_minutes = str2int((char *) (GPS_Data->dataArray[3]),
-         5, GPS_Data->Latitude.frac_digits);
+   GPS_Data->Latitude.frac_minutes = str2int((char *) (GPS_Data->dataArray[3]), 5, GPS_Data->Latitude.frac_digits);
    // Latitude Hemisphere (N or S)
    GPS_Data->Latitude.Hemisphere = (char) GPS_Data->dataArray[4][0];
 
    // Longitude dddmm.mmmm
    StrLength = strlen((char *) (GPS_Data->dataArray[5]));
    // Extract ddd     
-   GPS_Data->Longitude.degrees = str2int((char *) (GPS_Data->dataArray[5]), 0,
-         3);
+   GPS_Data->Longitude.degrees = str2int((char *) (GPS_Data->dataArray[5]), 0, 3);
    // Extract mm   
-   GPS_Data->Longitude.minutes = str2int((char *) (GPS_Data->dataArray[5]), 3,
-         2);
+   GPS_Data->Longitude.minutes = str2int((char *) (GPS_Data->dataArray[5]), 3, 2);
    // Calculate how many fractional digits for frac_minutes
    GPS_Data->Longitude.frac_digits = StrLength - 6;
    // Extract frac_mm   
-   GPS_Data->Longitude.frac_minutes = str2int((char *) (GPS_Data->dataArray[5]),
-         6, GPS_Data->Longitude.frac_digits);
+   GPS_Data->Longitude.frac_minutes = str2int((char *) (GPS_Data->dataArray[5]), 6, GPS_Data->Longitude.frac_digits);
    // Longitude Hemisphere (E or W)
    GPS_Data->Longitude.Hemisphere = (char) GPS_Data->dataArray[6][0];
 
@@ -428,15 +406,14 @@ void GPS_Process(t_GPS *GPS_Data)
       // Get GPS UART actual byte
       CBB_Pop(&GPS_Data->rxCircDataBuffer, &byte);
 
-      if (flashSettings.GPSDisabled == 0)
+      if (TDCFlags2Tst(GPSIsImplementedMask))
       {
          switch (NMEA_BuildValidateCommand(GPS_Data, byte))
          {
             case GPS_NOT_DONE: // NMEA not done gathering a complete sentence
                // Update gps timeout counter here
                GETTIME(&GPS_Data->CommTic);
-               if ((GPS_Data->GpsStatus == GPS_NOTDETECTED)
-                     || (GPS_Data->GpsStatus == GPS_LOST))
+               if ((GPS_Data->GpsStatus == GPS_NOTDETECTED) || (GPS_Data->GpsStatus == GPS_LOST))
                {
                   GETTIME(&GPS_Data->NmeaTic);
                   // We have something on GPS UART port so set GPS state to present
@@ -453,28 +430,22 @@ void GPS_Process(t_GPS *GPS_Data)
                // Call parsing fnct to extract time and coordinates
                GPS_ParseGPRMC(GPS_Data);
                // Update POSIXTime for the next PPS
-               GPS_Data->rTClock.tm_isdst = -1; //tells mktime()  to determine whether daylight saving time is in effect */
+               GPS_Data->rTClock.tm_isdst = -1; //tells mktime()  to determine whether daylight saving time is in effect
                POSIXTimeAtNextPPS = mktime(&GPS_Data->rTClock) + 1;
                // Overwrite of RTC time by the GPS at the next PPS
                TRIG_OverWritePOSIXNextPPS(POSIXTimeAtNextPPS, 0, &gTrig); // ENO: Sauf indication contraire, le subsec du GPS est mis à 0
 
                // Update GeniCam Reg: Latitude
-               gcRegsData.GPSLatitude = (int32_t) (toSiRFBinary(
-                     GPS_Data->Latitude.degrees, GPS_Data->Latitude.minutes)
-                     + MinutesDigitsToSiRFBinary(
-                           GPS_Data->Latitude.frac_minutes,
-                           GPS_Data->Latitude.frac_digits));
+               gcRegsData.GPSLatitude = (int32_t) (toSiRFBinary(GPS_Data->Latitude.degrees, GPS_Data->Latitude.minutes) +
+                     MinutesDigitsToSiRFBinary(GPS_Data->Latitude.frac_minutes, GPS_Data->Latitude.frac_digits));
                if (GPS_Data->Latitude.Hemisphere == 'S')
                {
                   gcRegsData.GPSLatitude *= -1;
                }
 
                // Update GeniCam Reg: Longitude
-               gcRegsData.GPSLongitude = (int32_t) (toSiRFBinary(
-                     GPS_Data->Longitude.degrees, GPS_Data->Longitude.minutes)
-                     + MinutesDigitsToSiRFBinary(
-                           GPS_Data->Longitude.frac_minutes,
-                           GPS_Data->Longitude.frac_digits));
+               gcRegsData.GPSLongitude = (int32_t) (toSiRFBinary(GPS_Data->Longitude.degrees, GPS_Data->Longitude.minutes) +
+                     MinutesDigitsToSiRFBinary(GPS_Data->Longitude.frac_minutes, GPS_Data->Longitude.frac_digits));
                if (GPS_Data->Longitude.Hemisphere == 'W')
                {
                   gcRegsData.GPSLongitude *= -1;
@@ -492,19 +463,14 @@ void GPS_Process(t_GPS *GPS_Data)
 
             case GPS_GPGGA: //$GPGGA,193917.000,4648.2933,N,07119.9534,W,1,5,1.72,5.3,M,-28.7,M,,*6D
                // Extract Altitude
-               GPS_Data->Altitude = str2int((char *) (GPS_Data->dataArray[9]),
-                     0, strlen((char *) (GPS_Data->dataArray[9])) - 2);
-               GPS_Data->Altitude_frac = str2int(
-                     (char *) (GPS_Data->dataArray[9]),
-                     strlen((char *) (GPS_Data->dataArray[9])) - 1, 1);
+               GPS_Data->Altitude = str2int((char *) (GPS_Data->dataArray[9]), 0, strlen((char *) (GPS_Data->dataArray[9])) - 2);
+               GPS_Data->Altitude_frac = str2int((char *) (GPS_Data->dataArray[9]), strlen((char *) (GPS_Data->dataArray[9])) - 1, 1);
 
                // Update GeniCam Reg: Altitude. In SiRF format and expressed in cm
-               gcRegsData.GPSAltitude = (int32_t) (100 * GPS_Data->Altitude
-                     + 10 * GPS_Data->Altitude_frac);
+               gcRegsData.GPSAltitude = (int32_t) (100 * GPS_Data->Altitude + 10 * GPS_Data->Altitude_frac);
 
                // Findout GPS signal quality: number of satellites used in position fix
-               gcRegsData.GPSNumberOfSatellitesInUse = str2int(
-                     (char *) (GPS_Data->dataArray[7]), 0, 2);
+               gcRegsData.GPSNumberOfSatellitesInUse = str2int((char *) (GPS_Data->dataArray[7]), 0, 2);
 
                // Update header
                HDER_UpdateGPSHeader(&gHderInserter, &gcRegsData);
@@ -532,8 +498,7 @@ void GPS_Process(t_GPS *GPS_Data)
       // Set ModeIndicator to "Data Not Valid" as soon as we lose communication with GPS UART
       gcRegsData.GPSModeIndicator = 'N';
       gcRegsData.GPSNumberOfSatellitesInUse = 0;
-      if ((GPS_Data->GpsStatus != GPS_LOST)
-            && (GPS_Data->GpsStatus != GPS_NOTDETECTED))
+      if ((GPS_Data->GpsStatus != GPS_LOST) && (GPS_Data->GpsStatus != GPS_NOTDETECTED))
       {
          // Set GPS to not detected   
          GPS_Data->GpsStatus = GPS_LOST;
@@ -544,8 +509,7 @@ void GPS_Process(t_GPS *GPS_Data)
       // Update header
       HDER_UpdateGPSHeader(&gHderInserter, &gcRegsData);
    }
-   else if ((elapsed_time_us(GPS_Data->NmeaTic) >= GPS_NMEA_TIMEOUT_DELAY_US)
-         && (GPS_Data->GpsStatus != GPS_BAD_COMM))
+   else if ((elapsed_time_us(GPS_Data->NmeaTic) >= GPS_NMEA_TIMEOUT_DELAY_US) && (GPS_Data->GpsStatus != GPS_BAD_COMM))
    {
       // Set GPS to present : no comm time out but NMEA timed out  
       GPS_Data->GpsStatus = GPS_BAD_COMM;
@@ -598,8 +562,7 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
       // Set ModeIndicator to "Data Not Valid" as soon as we lose communication with GPS UART
       gcRegsData.GPSModeIndicator = 'N';
       gcRegsData.GPSNumberOfSatellitesInUse = 0;
-      if ((GPS_Data->GpsStatus != GPS_LOST)
-            && (GPS_Data->GpsStatus != GPS_NOTDETECTED))
+      if ((GPS_Data->GpsStatus != GPS_LOST) && (GPS_Data->GpsStatus != GPS_NOTDETECTED))
       {
          // Set GPS to not detected
          GPS_Data->GpsStatus = GPS_LOST;
@@ -610,8 +573,7 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
       // Update header
       HDER_UpdateGPSHeader(&gHderInserter, &gcRegsData);
    }
-   else if ((elapsed_time_us(GPS_Data->NmeaTic) >= GPS_NMEA_TIMEOUT_DELAY_US)
-         && (GPS_Data->GpsStatus != GPS_BAD_COMM))
+   else if ((elapsed_time_us(GPS_Data->NmeaTic) >= GPS_NMEA_TIMEOUT_DELAY_US) && (GPS_Data->GpsStatus != GPS_BAD_COMM))
    {
       // Set GPS to present : no comm time out but NMEA timed out
       GPS_Data->GpsStatus = GPS_BAD_COMM;
@@ -634,8 +596,7 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
             GPS_ERR("PPS Timeout");
          }
       }
-      else if ((gcRegsData.TimeSource != TS_GPS)
-            && (GPS_Data->ModeIndicator != 'N')) // we have a good GPS UART comm and PPS
+      else if ((gcRegsData.TimeSource != TS_GPS) && (GPS_Data->ModeIndicator != 'N')) // we have a good GPS UART comm and PPS
       {
          // Set time sourceto GPS
          gcRegsData.TimeSource = TS_GPS;
@@ -657,9 +618,9 @@ void GPS_LowPriorityTasks(t_GPS *GPS_Data)
       GPS_Data->ErrFlags &= ~GPS_NOPPS;
    }
 
-   // Gestion d'erreur du UART overflow : In our case, the overflow will almost never accure because of LL bus data throttling, so our best indicator is the FIFO FULL signal
-   if (XUartNs550_GetLineStatusReg(
-         GPS_Data->uart.uart.Ns550.BaseAddress) & XUN_LSR_OVERRUN_ERROR)
+   // Gestion d'erreur du UART overflow : In our case, the overflow will almost never accure because
+   // of LL bus data throttling, so our best indicator is the FIFO FULL signal
+   if (XUartNs550_GetLineStatusReg(GPS_Data->uart.uart.Ns550.BaseAddress) & XUN_LSR_OVERRUN_ERROR)
    {
       GPS_Reset(GPS_Data); // reset uart and data structure
       // Set the error flag and report genicam error once if it wasn't done yet

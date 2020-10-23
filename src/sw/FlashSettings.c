@@ -36,6 +36,26 @@
 #include "XADC_Channels.h"
 #include "IRIGB.h"
 
+
+/*
+ * Defines to block advanced features.
+ *    Advanced features can be disabled/enabled by Flash Settings.
+ *    if the FEATURE_DISABLED are defined, then the Flash Settings are ignored
+ *    and the features are always disabled.
+ *    Each feature can be disabled individually.
+ */
+//#define EHDRI_DISABLED
+//#define BUFFERING_DISABLED
+//#define ADV_TRIG_DISABLED
+//#define FLAGGING_DISABLED
+//#define GATING_DISABLED
+//#define ADC_READOUT_DISABLED
+//#define IRIGB_DISABLED
+//#define GPS_DISABLED
+//#define SFW_DISABLED
+//#define SDI_DISABLED
+
+
 /**
  * Indicates whether flash settings have to be loaded immediately
  */
@@ -218,6 +238,38 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    uint8_t externalMemoryBufferDetected;
    t_bufferStatus bufStat;
    uint8_t i;
+
+   // Overwrite Flash Settings when blocking advanced features is hard coded
+#ifdef EHDRI_DISABLED
+   p_flashSettings->EHDRIDisabled = 1;
+#endif
+#ifdef BUFFERING_DISABLED
+   p_flashSettings->BufferingDisabled = 1;
+#endif
+#ifdef ADV_TRIG_DISABLED
+   p_flashSettings->AdvTrigDisabled = 1;
+#endif
+#ifdef FLAGGING_DISABLED
+   p_flashSettings->FlaggingDisabled = 1;
+#endif
+#ifdef GATING_DISABLED
+   p_flashSettings->GatingDisabled = 1;
+#endif
+#ifdef ADC_READOUT_DISABLED
+   p_flashSettings->ADCReadoutDisabled = 1;
+#endif
+#ifdef IRIGB_DISABLED
+   p_flashSettings->IRIGBDisabled = 1;
+#endif
+#ifdef GPS_DISABLED
+   p_flashSettings->GPSDisabled = 1;
+#endif
+#ifdef SFW_DISABLED
+   p_flashSettings->SFWDisabled = 1;
+#endif
+#ifdef SDI_DISABLED
+   p_flashSettings->SDIDisabled = 1;
+#endif
 
    BufferManager_GetStatus(&gBufManager, &bufStat);
    externalMemoryBufferDetected = bufStat.ext_buf_prsnt;
