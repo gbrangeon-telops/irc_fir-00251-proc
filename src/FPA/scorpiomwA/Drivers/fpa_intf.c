@@ -39,9 +39,15 @@
 #endif
 
 // Mode d'operation choisi pour le contrôleur de trig 
-#define MODE_READOUT_END_TO_TRIG_START    0x00      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du ITR uniquement
-#define MODE_INT_END_TO_TRIG_START        0x02      // provient du fichier fpa_common_pkg.vhd. Ce mode est celui du IWR et ITR
+#define MODE_READOUT_END_TO_TRIG_START    0x00
+#define MODE_TRIG_START_TO_TRIG_START     0x01
+#define MODE_INT_END_TO_TRIG_START        0x02
+#define MODE_ITR_TRIG_START_TO_TRIG_START 0x03
+#define MODE_ITR_INT_END_TO_TRIG_START    0x04
+#define MODE_ALL_END_TO_TRIG_START        0x05
  
+ 
+// mode xtra trig freq
 #define FPA_XTRA_TRIG_FREQ_MAX_HZ         50        // en extra trig, rouler à au max 50 fps afin que meme en changemet de fenetre, le delai tri soit toujours respecté pour le détecteur 
 
 // Gains  
@@ -133,9 +139,9 @@ struct scorpiomw_param_s             //
    float pclk_rate_hz;
    float tap_number;
    float pixnum_per_tap_per_mclk;
-   float fpa_delay_mclk;
+   float fpa_itr_delay_mclk;
+   float fpa_iwr_delay_mclk;
    float vhd_delay_mclk;
-   float delay_mclk;
    float lovh_mclk;
    float fovh_line;
    float fpa_reset_time_mclk;   
@@ -143,9 +149,9 @@ struct scorpiomw_param_s             //
    // parametres calculés
    float readout_mclk;   
    float readout_usec;
-   float fpa_delay_usec;
+   float fpa_itr_delay_usec;
+   float fpa_iwr_delay_usec;
    float vhd_delay_usec;
-   float delay_usec;
    float lovh_usec;
    float fovh_usec;
    float fpa_reset_time_usec;
@@ -155,6 +161,8 @@ struct scorpiomw_param_s             //
    float frame_rate_max_hz;
    float mode_int_end_to_trig_start_dly_usec;
    float mode_readout_end_to_trig_start_dly_usec;
+   float mode_trig_start_to_trig_start_dly_usec;
+   float mode_all_end_to_trig_start_dly_usec;
 };
 typedef struct scorpiomw_param_s  scorpiomw_param_t;
 
@@ -278,10 +286,24 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       if ((int32_t)gFpaDebugRegE != 0)
          ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
-         
+   
+   //  itr
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
+      ptrA->itr = 1;
+   else  // mode IWR
+      ptrA->itr = 0;
+   
+   
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;
-   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
+   if (ptrA->itr == 1) {
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+   }
+   else {
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_ALL_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_all_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //
+   }
+   
    ptrA->fpa_spare                 = 0;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
@@ -320,9 +342,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
       //ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
 
-   //  itr
-   ptrA->itr = 1;     // toujours en mode itr 
-       
    //  gain 
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
       
@@ -433,7 +452,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
-   
+
    // envoi du reste de la config              
    WriteStruct(ptrA);
 }
@@ -483,35 +502,42 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_reset_time_mclk     = 3076.0F;
-   ptrH->fpa_delay_mclk          = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->fpa_reset_time_mclk;   // FPA: estimation delai max de sortie des pixels après integration + delai après readout
+   ptrH->fpa_itr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number);
+   ptrH->fpa_iwr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + 40.0F + 10.0F;// FPA: estimation delai max de sortie des pixels après integration + delai après readout. ENO 18 juin 2020: delai supplémentaire de 10 MCLK rajouté
    ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (float)FPA_MCLK_RATE_HZ;   // estimation des differerents delais accumulés par le vhd
-   ptrH->delay_mclk              = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;   //
    ptrH->lovh_mclk               = 0.0F;
    ptrH->fovh_line               = 0.0F;   
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
-      
+
    // readout time
    ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
    ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay
    ptrH->vhd_delay_usec       = ptrH->vhd_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->fpa_delay_usec       = ptrH->fpa_delay_mclk * ptrH->mclk_period_usec;
-   ptrH->delay_usec           = ptrH->delay_mclk * ptrH->mclk_period_usec; 
+   ptrH->fpa_itr_delay_usec   = ptrH->fpa_itr_delay_mclk * ptrH->mclk_period_usec;
+   ptrH->fpa_iwr_delay_usec   = ptrH->fpa_iwr_delay_mclk * ptrH->mclk_period_usec;
    
    // integration time/signal
    ptrH->fpa_reset_time_usec  = ptrH->fpa_reset_time_mclk * ptrH->mclk_period_usec;
    ptrH->int_signal_high_time_usec = exposureTime_usec + ptrH->fpa_reset_time_usec;
       
    // calcul de la periode minimale
-   ptrH->frame_period_usec = exposureTime_usec + ptrH->delay_usec + ptrH->readout_usec;  
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
+   // mode ITR
+      ptrH->frame_period_usec = ptrH->int_signal_high_time_usec + ptrH->vhd_delay_usec + ptrH->fpa_itr_delay_usec + ptrH->readout_usec;
+   else  
+   // mode IWR
+      ptrH->frame_period_usec = MAX(ptrH->int_signal_high_time_usec, (ptrH->fpa_reset_time_usec + ptrH->fpa_iwr_delay_usec + ptrH->readout_usec)) + ptrH->vhd_delay_usec;
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
 
    //autres calculs
-   ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec;  // utilisé en mode int_end_trig_start. // pour le scorpiomW, ptrH->fpa_reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
-   ptrH->mode_readout_end_to_trig_start_dly_usec = 0.0F;                                                   // utilisé en mode readout_end_trig_start
+   ptrH->mode_int_end_to_trig_start_dly_usec = ptrH->frame_period_usec - ptrH->int_signal_high_time_usec - ptrH->vhd_delay_usec;  // utilisé en mode int_end_trig_start. // pour le scorpiomW, ptrH->fpa_reset_time_usec est vu dans le vhd comme un prolongement du temps d'integration
+   ptrH->mode_readout_end_to_trig_start_dly_usec = 0.0F;
+   ptrH->mode_trig_start_to_trig_start_dly_usec  = ptrH->frame_period_usec - ptrH->vhd_delay_usec;
+   ptrH->mode_all_end_to_trig_start_dly_usec = 1.0F * ptrH->mclk_period_usec;  // on se donne un delai de 1 MCLK en mode ALL_END_TRIG_START
 }
  
 //--------------------------------------------------------------------------                                                                            
@@ -539,7 +565,6 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    scorpiomw_param_t hh;
-   float periodMinWithNullExposure_usec;
    float presentPeriod_sec;
    float max_exposure_usec;
    float fpaAcquisitionFrameRate;
@@ -549,10 +574,16 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
-   periodMinWithNullExposure_usec = hh.frame_period_usec;
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
-   
-   max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
+   {
+      float periodMinWithNullExposure_usec = hh.frame_period_usec;
+      max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
+   }
+   else  // mode IWR
+   {
+      max_exposure_usec = (presentPeriod_sec*1e6F - hh.vhd_delay_usec) - hh.fpa_reset_time_usec;
+   }
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);

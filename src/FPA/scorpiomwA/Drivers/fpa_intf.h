@@ -45,7 +45,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (ScorpiomwDIsImplemented | ITRIsImplementedMask)
+#define FPA_TDC_FLAGS            (ScorpiomwAIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 #define FPA_NB_PIX_CLK     1
 
@@ -80,6 +80,8 @@
 #define FPA_MCLK_RATE_HZ         18E+6F            // le master clock du FPA
 
 #define FPA_PIX_THROUGHPUT_PEAK  (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
+
+#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
