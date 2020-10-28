@@ -57,7 +57,7 @@ begin
    RX_MISO <= TX_MISO;   
    
    
-   -- recodage des pixels saturés via TUSER(1)  
+   -- recodage des pixels saturés via TUSER  
    U1: process(CLK)
    begin
       if rising_edge(CLK) then
