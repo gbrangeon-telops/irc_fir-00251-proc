@@ -21,12 +21,15 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_ctrl.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde
+ d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde 
+
 
 # BB1920 SERDES
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\bb1920_dout_ctrl.vhd \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\bb1920_deserializer.bde \
- d:\Telops\FIR-00251-Proc\src\clink\HDL\bb1920_receiver_2ch.bde
+ d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd \
+ d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd \
+ d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd \
+ d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde \
+ d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\bb1920_deserializer.bde
 
 #__END BUILD BB1920 SERDES
