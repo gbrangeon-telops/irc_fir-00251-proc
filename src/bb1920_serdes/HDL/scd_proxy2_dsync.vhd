@@ -33,7 +33,7 @@ end scd_proxy2_dsync;
 
 architecture scd_proxy2_dsync of scd_proxy2_dsync is  
 
-entity fwft_afifo_wr72_rd72_d512 is
+component fwft_afifo_wr72_rd72_d512 is
   Port ( 
     rst : in STD_LOGIC;
     wr_clk : in STD_LOGIC;
@@ -46,18 +46,8 @@ entity fwft_afifo_wr72_rd72_d512 is
     empty : out STD_LOGIC;
     valid : out STD_LOGIC
   );
+end component;	
 
-end fwft_afifo_wr72_rd72_d512;	
-
-component sync_reset
-  port (
-     ARESET : in std_logic;
-     CLK    : in std_logic;
-     SRESET : out std_logic
-     );
-end component; 
-
-signal sreset : std_logic;
 signal full : std_logic;
 signal empty : std_logic;
 signal valid : std_logic;
@@ -65,28 +55,18 @@ signal rd_en : std_logic;
 
 begin
 	
-   --------------------------------------------------
-   -- synchro reset 
-   --------------------------------------------------   
-   U1 : sync_reset
-   port map(
-      ARESET => ARESET,
-      CLK    => DIN_CLK,
-      SRESET => sreset
-      );  
-	
 	rd_en <= not(empty);  
 	DOUT_DVAL <= rd_en and valid;
 
-	 entity fwft_afifo_wr72_rd72_d512 is
-	  Port ( 
+	 fifo: fwft_afifo_wr72_rd72_d512
+	  port map ( 
 	    rst 	=> ARESET,
 	    wr_clk  => DIN_CLK,
 	    rd_clk  => DOUT_CLK,
 	    din 	=> DIN,
 	    wr_en 	=> DIN_DVAL,
 	    rd_en   => rd_en,
-	    dout    => DOUT
+	    dout    => DOUT,
 	    full 	=> full,
 	    empty   => empty,
 	    valid   => valid);

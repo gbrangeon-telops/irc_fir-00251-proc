@@ -66,7 +66,7 @@ begin
 	FVAL <= fval_i;
 	
 	DOUT <= dout_i;   
-	DOUT_DVAL <= dval_i and compteur_dout = '1';
+	DOUT_DVAL <= dval_i and compteur_dout;
 	--------------------------------------------------
     -- synchro reset 
     --------------------------------------------------   
@@ -96,24 +96,24 @@ begin
 				
 				for I in fval_in'low to fval_in'high loop
 					--Pourrait aussi faire if fval_last(I) xor fval_in(I) then fval_i <= not(fval_i)
-					if fval_last(I)='0' and fval_in(I)='1' then
+					if fval_last(I)='1' and fval_in(I)='0' then
 						fval_i(I) <= '1';
-					elsif fval_last(I)='1' and fval_in(I)='1' then
+					elsif fval_last(I)='0' and fval_in(I)='1' then
 						fval_i(I) <= '0';
 					else
 						fval_i(I) <= fval_i(I);
 					end if;	 
 				end loop;
+
+				dval_i <= SUCCESS and DIN(3) and DIN(2) and DIN(1) and not(DIN(0));
+				din_i <= DIN;		
 				
-				
-				dval_i <= SUCCESS = '1' and DIN(3) and DIN(2) and DIN(1) and not(DIN(0));
-				din_i <= DIN;							
 				--Règle comme quoi il y a toujours un nombre de pixel divisible par 4 par ligne
 				if dval_i = '1' and compteur_dout = '0' then
 					dout_i(31 downto 0) <= din_i;		  
 					compteur_dout <= '1';
 				elsif dval_i = '1' and compteur_dout = '1' then
-					dout_i(71 downto 32) <= din_i;
+					dout_i(63 downto 32) <= din_i;
 					compteur_dout <= '0';
 				end if;	
 			end if;

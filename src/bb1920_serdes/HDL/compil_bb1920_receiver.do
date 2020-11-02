@@ -26,10 +26,11 @@ acom -incr -nowarn DAGGEN_0523 \
 
 # BB1920 SERDES
 acom -incr -nowarn DAGGEN_0523 \
+ d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\Stim.vhd \
  d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd \
  d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd \
  d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd \
  d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\bb1920_deserializer.bde
+-- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\bb1920_deserializer.bde
 
 #__END BUILD BB1920 SERDES
