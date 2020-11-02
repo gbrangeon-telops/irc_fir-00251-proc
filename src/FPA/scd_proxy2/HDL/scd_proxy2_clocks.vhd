@@ -40,12 +40,14 @@ architecture rtl of scd_proxy2_clocks is
          reset          : in  std_logic;
          locked         : out std_logic; 
          clk_100        : out std_logic;
-         int_clk_source : out std_logic        
+         int_clk_source : out std_logic;
+         tx_clk         : out std_logic
          );
    end component;
    
    signal  clk_100_i        : std_logic;
    signal  int_clk_source_i : std_logic;
+   signal  tx_clk_i         : std_logic;
    
 begin
    
@@ -58,10 +60,11 @@ begin
          reset           => ARESET, 
          locked          => MMCM_LOCKED,   
          clk_100         => clk_100_i,
-         int_clk_source  => int_clk_source_i            
+         int_clk_source  => int_clk_source_i,
+         tx_clk          => tx_clk_i
          ); 
       
-      TX_CLK          <=  clk_100_i;         
+      TX_CLK          <=  tx_clk_i;         
       CLK_100M        <=  clk_100_i;           
       INT_CLK_SOURCE  <=  int_clk_source_i;
       QUAD_CLK_SOURCE <=  int_clk_source_i;   

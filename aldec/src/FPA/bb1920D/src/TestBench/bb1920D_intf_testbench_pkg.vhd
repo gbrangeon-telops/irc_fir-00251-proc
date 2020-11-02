@@ -21,7 +21,7 @@ use work.fpa_define.all;
 package BB1920D_intf_testbench_pkg is           
    
    constant PAUSE_SIZE                 : integer := 2*(1);
-   constant TAP_NUM                    : integer := 4;
+   constant TAP_NUM                    : integer := 8;
    
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
@@ -96,9 +96,8 @@ package body BB1920D_intf_testbench_pkg is
 --         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
 --      end if;   
       
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(0, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(1000, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(1000, comn_fpa_xtra_trig_ctrl_dly'length);
       comn_fpa_trig_ctrl_timeout_dly := to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       

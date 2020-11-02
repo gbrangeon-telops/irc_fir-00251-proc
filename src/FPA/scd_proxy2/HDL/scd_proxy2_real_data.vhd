@@ -102,7 +102,7 @@ architecture rtl of scd_proxy2_real_data is
    end component;
    
    type readout_fsm_type is (idle, wait_img_end_st);
-   type fifo_fsm_type is (init_st1, init_st2, init_st3, idle, wait_end_st, rst_fifo_st1, rst_fifo_st2);
+   type fifo_fsm_type is (init_st1, init_st2, init_st3, init_done);
    
    type input_data_type is
    record
@@ -156,8 +156,6 @@ architecture rtl of scd_proxy2_real_data is
    signal pix_dval_i           : std_logic;
    signal fifo_fsm             : fifo_fsm_type;
    
-   signal fifo_sreset          : std_logic;
-   signal rst_cnt              : unsigned(4 downto 0);
    
 begin
    
@@ -195,7 +193,7 @@ begin
    --------------------------------------------------
    fifo1 : fwft_sfifo_w72_d16
    port map(
-      srst        => fifo_sreset,
+      srst        => global_sreset,
       clk         => CLK,
       din         => past_fifo_din,
       wr_en       => past_fifo_wr,
@@ -218,7 +216,7 @@ begin
    --------------------------------------------------
    fifo2 : fwft_sfifo_w72_d16
    port map(
-      srst        => fifo_sreset,
+      srst        => global_sreset,
       clk         => CLK,
       din         => present_fifo_din,
       wr_en       => present_fifo_wr,
@@ -241,7 +239,7 @@ begin
    --------------------------------------------------
    fifo3 : fwft_sfifo_w72_d16
    port map(
-      srst        => fifo_sreset,
+      srst        => global_sreset,
       clk         => CLK,
       din         => future_fifo_din,
       wr_en       => future_fifo_wr,
@@ -263,7 +261,7 @@ begin
    -- synchronisateur des données sortantes
    --------------------------------------------------    
    pix_dval_i <= present.pix_dval and present_fifo_dval_i;                    -- si les données du fifo du present sont OK, c'est que ceux du past et du futur le sont aussi
-   fifo_rd <= past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;                                             -- past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;
+   fifo_rd <= future_fifo_dval_i;                                             -- past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;
    
    
    U4: process(CLK)
@@ -273,12 +271,10 @@ begin
          if global_sreset = '1' then      
             dout_fval_o <= '0';
             dout_dval_o <= '0';
-            fifo_fsm <= rst_fifo_st1;
+            fifo_fsm <= init_st1;
             past_fifo_wr <= '0';
             present_fifo_wr <= '0';
             future_fifo_wr <= '0';
-            fifo_sreset <= '1';
-            rst_cnt <= (others => '0');
             
          else        
             
@@ -299,7 +295,6 @@ begin
                   present_fifo_din(71 downto 64) <= (others => '0');
                   past_fifo_wr <= '1';
                   present_fifo_wr <= '1';
-                  rst_cnt <= (others => '0');
                   fifo_fsm <= init_st2;
                
                when init_st2 =>
@@ -309,34 +304,9 @@ begin
                
                when init_st3 =>
                   past_fifo_wr <= '0';
-                  fifo_fsm <= idle;
+                  fifo_fsm <= init_done;
                
-               when idle =>
-                  if dout_fval_o = '1' then
-                     fifo_fsm <= wait_end_st;
-                  end if;
-               
-               when wait_end_st =>
-                  if dout_fval_o = '0' then
-                     fifo_fsm <= rst_fifo_st1;
-                  end if;
-               
-               when rst_fifo_st1 => 
-                  past_fifo_wr <= '0';
-                  present_fifo_wr <= '0'; 
-                  future_fifo_wr <= '0';
-                  fifo_sreset <= '1';
-                  rst_cnt <= rst_cnt + 1;
-                  if rst_cnt = 15 then 
-                     fifo_fsm <= rst_fifo_st2;
-                  end if;
-               
-               when rst_fifo_st2 => 
-                  fifo_sreset <= '0';
-                  rst_cnt <= rst_cnt - 1;
-                  if rst_cnt = 1 then 
-                     fifo_fsm <= init_st1;
-                  end if;
+               when init_done =>  
                
                when others => 
                
@@ -353,7 +323,7 @@ begin
             dout_o(58)           <= present.fval;                                   
             dout_o(59)           <= pix_dval_i and not past.pix_fval and present.pix_fval;                   -- aoi_sof
             dout_o(60)           <= pix_dval_i and not future.pix_fval and present.pix_fval;                 -- aoi_eof 
-            dout_o(61)           <= pix_dval_i and fifo_rd;                   -- aoi_dval    (nouvel ajout) 
+            dout_o(61)           <= present.pix_dval and fifo_rd;                   -- aoi_dval    (nouvel ajout) 
             dout_o(62)           <= acq_data_i;                                     -- requis pour savoir si image à rejeter ou non
             dout_o(76 downto 63) <= (others => '0');                                -- aoi_spares  (nouvel ajout)                                                                                
             
@@ -426,7 +396,8 @@ begin
                      readout_fsm <= wait_img_end_st;
                   end if;                                  
                
-               when wait_img_end_st =>                  
+               when wait_img_end_st =>
+                  int_fifo_rd <= '0';
                   if dout_fval_o = '0' then 
                      readout_fsm <= idle;
                   end if;         

@@ -46,6 +46,8 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_sim_n
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d1024\fwft_sfifo_w76_d1024_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w76_d1024\fwft_afifo_w76_d1024_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d128\fwft_afifo_w72_d128_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d256\afifo_w72_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
@@ -80,7 +82,7 @@ asim -ses bb1920D_intf_testbench_TB
 #wave UUT/U1/U4/*  
 #
 #
-#wave UUT/U1/U5/U1/* 
+wave UUT/U1/U5/U1/* 
 #wave UUT/U1/U5/U2/*
 #
 wave UUT/U1/U9/U2/U1/*
@@ -89,15 +91,19 @@ wave UUT/U1/U9/U2/U5/*
 wave UUT/U1/*
 
 wave UUT/U1/U9/U5/*
+wave UUT/U3/U3/*
 
 #
 #
 #wave UUT/U1/U9/U2/U4/U2/*
 #wave UUT/U1/U9/U2/U4/U2/UB/*
 #wave UUT/U1/U9/U1/*
---wave UUT/U1/U9/U18/U1/*
+
+wave UUT/U1/U9/g0/U17/*
+wave UUT/U1/U9/U6/* 
+wave UUT/U1/U9/U7/*
 
 --wave UUT/U1/*
-run 1.5 ms
+run 150 ms
 --run 30 ms  
 --9.1 ms
