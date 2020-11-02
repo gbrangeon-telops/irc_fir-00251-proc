@@ -66,7 +66,7 @@ begin
 	FVAL <= fval_i;
 	
 	DOUT <= dout_i;   
-	DOUT_DVAL <= dval_i;
+	DOUT_DVAL <= dval_i and compteur_dout = '1';
 	--------------------------------------------------
     -- synchro reset 
     --------------------------------------------------   
@@ -107,11 +107,14 @@ begin
 				
 				
 				dval_i <= SUCCESS = '1' and DIN(3) and DIN(2) and DIN(1) and not(DIN(0));
-				din_i <= DIN;
+				din_i <= DIN;							
+				--Règle comme quoi il y a toujours un nombre de pixel divisible par 4 par ligne
 				if dval_i = '1' and compteur_dout = '0' then
-					dout_i(31 downto 0) <= din_i;
+					dout_i(31 downto 0) <= din_i;		  
+					compteur_dout <= '1';
 				elsif dval_i = '1' and compteur_dout = '1' then
 					dout_i(71 downto 32) <= din_i;
+					compteur_dout <= '0';
 				end if;	
 			end if;
 		end if;	
