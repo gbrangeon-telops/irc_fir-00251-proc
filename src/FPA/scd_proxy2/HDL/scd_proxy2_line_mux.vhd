@@ -23,7 +23,7 @@ entity scd_proxy2_line_mux is
       ARESET        : in std_logic;
       CLK           : in std_logic;
       
-      MUX_ENABLED   : in std_logic;
+      QUAD2_ENABLED : in std_logic;
       
       QUAD1_MOSI    : in t_ll_ext_mosi72;
       QUAD1_MISO    : out t_ll_ext_miso;
@@ -41,7 +41,7 @@ end scd_proxy2_line_mux;
 
 architecture rtl of scd_proxy2_line_mux is
    
-   type line_mux_fsm_type is (idle, quad1_out_st, pause_st1, quad2_out_st, pause_st2);
+   type line_mux_fsm_type is (pause_st, quad1_out_st, quad2_out_st);
    
    component sync_reset
       port (
@@ -51,11 +51,10 @@ architecture rtl of scd_proxy2_line_mux is
          );
    end component;
    
-   component fwft_afifo_w76_d1024
+   component fwft_sfifo_w76_d1024
       port (
-         wr_clk   : in std_logic;
-         rd_clk   : in std_logic;
-         rst      : in std_logic;
+         clk : in std_logic;
+         srst : in std_logic;
          din      : in std_logic_vector(75 downto 0);
          wr_en    : in std_logic;
          rd_en    : in std_logic;
@@ -63,13 +62,9 @@ architecture rtl of scd_proxy2_line_mux is
          full     : out std_logic;
          overflow : out std_logic;
          empty    : out std_logic;
-         valid    : out std_logic;
-         wr_rst_busy : out std_logic;
-         rd_rst_busy : out std_logic
+         valid : out std_logic
          );
    end component; 
-   
-   constant C_EOL_POS     : integer := 72;
    
    signal err_i           : std_logic; 
    signal sreset          : std_logic;
@@ -88,6 +83,9 @@ architecture rtl of scd_proxy2_line_mux is
    signal quad2_fifo_rd_en: std_logic;
    signal quad2_fifo_dval : std_logic;
    signal quad2_fifo_ovfl : std_logic;
+   
+   signal quad1_dout_mosi : t_ll_ext_mosi72;
+   signal quad2_dout_mosi : t_ll_ext_mosi72;
    
 begin
    
@@ -111,19 +109,36 @@ begin
    ------------------------------------------------
    -- données entrant dans les fifos
    ------------------------------------------------
-   quad1_fifo_din  <= QUAD1_MOSI.SOF & QUAD1_MOSI.EOF & QUAD1_MOSI.SOL & QUAD1_MOSI.EOL & QUAD1_MOSI.DATA;
+   quad1_fifo_din   <= QUAD1_MOSI.SOF & QUAD1_MOSI.EOF & QUAD1_MOSI.SOL & QUAD1_MOSI.EOL & QUAD1_MOSI.DATA;
    quad1_fifo_wr_en <= QUAD1_MOSI.DVAL;   
-   quad2_fifo_din  <= QUAD2_MOSI.SOF & QUAD2_MOSI.EOF & QUAD2_MOSI.SOL & QUAD2_MOSI.EOL & QUAD2_MOSI.DATA;
+   quad2_fifo_din   <= QUAD2_MOSI.SOF & QUAD2_MOSI.EOF & QUAD2_MOSI.SOL & QUAD2_MOSI.EOL & QUAD2_MOSI.DATA;
    quad2_fifo_wr_en <= QUAD2_MOSI.DVAL; 
+   
+   
+   ------------------------------------------------
+   -- données sortant des fifos
+   ------------------------------------------------
+   quad1_dout_mosi.data <=  quad1_fifo_dout(71 downto 0);
+   quad1_dout_mosi.eol  <=  quad1_fifo_dout(72);
+   quad1_dout_mosi.sol  <=  quad1_fifo_dout(73);
+   quad1_dout_mosi.eof  <=  quad1_fifo_dout(74);
+   quad1_dout_mosi.sof  <=  quad1_fifo_dout(75);
+   quad1_dout_mosi.dval <=  quad1_fifo_dval;
+   
+   quad2_dout_mosi.data <=  quad2_fifo_dout(71 downto 0);
+   quad2_dout_mosi.eol  <=  quad2_fifo_dout(72);
+   quad2_dout_mosi.sol  <=  quad2_fifo_dout(73);
+   quad2_dout_mosi.eof  <=  quad2_fifo_dout(74);
+   quad2_dout_mosi.sof  <=  quad2_fifo_dout(75);
+   quad2_dout_mosi.dval <=  quad2_fifo_dval;  
    
    --------------------------------------------------
    -- fifo fwft line1_quad_DATA 
    -------------------------------------------------- 
-   U2A : fwft_afifo_w76_d1024
+   U2A : fwft_sfifo_w76_d1024
    port map (
-      rst => ARESET,
-      wr_clk => CLK,
-      rd_clk => CLK,
+      srst => sreset,
+      clk => CLK,
       din => quad1_fifo_din,
       wr_en => quad1_fifo_wr_en,
       rd_en => quad1_fifo_rd_en,
@@ -131,19 +146,16 @@ begin
       valid  => quad1_fifo_dval,
       full => open,
       overflow => quad1_fifo_ovfl,
-      empty => open,
-      wr_rst_busy => open,
-      rd_rst_busy => open
+      empty => open
       ); 
    
    --------------------------------------------------
    -- fifo fwft line2_quad_DATA 
    -------------------------------------------------- 
-   U2B : fwft_afifo_w76_d1024
+   U2B : fwft_sfifo_w76_d1024
    port map (
-      rst => ARESET,
-      wr_clk => CLK,
-      rd_clk => CLK,
+      srst => sreset,
+      clk => CLK,
       din => quad2_fifo_din,
       wr_en => quad2_fifo_wr_en,
       rd_en => quad2_fifo_rd_en,
@@ -151,9 +163,7 @@ begin
       valid  => quad2_fifo_dval,
       full => open,
       overflow => quad2_fifo_ovfl,
-      empty => open,
-      wr_rst_busy => open,
-      rd_rst_busy => open
+      empty => open
       );
    
    --------------------------------------------------
@@ -163,7 +173,7 @@ begin
    begin
       if rising_edge(CLK) then
          if sreset = '1' then  
-            line_mux_fsm <= idle;
+            line_mux_fsm <= quad1_out_st;
             quad1_fifo_rd_en <= '0';
             quad2_fifo_rd_en <= '0';         
             
@@ -174,40 +184,32 @@ begin
             
             case line_mux_fsm is 
                
-               when idle =>
-                  if MUX_ENABLED = '1' then
+               when quad1_out_st =>                                       
+                  if quad1_dout_mosi.dval = '1' then
+                     quad1_fifo_rd_en <= '1';
+                     if quad1_dout_mosi.eol = '1' then
+                        quad1_fifo_rd_en <= '0';
+                        line_mux_fsm <= pause_st;
+                     end if;
+                  end if;
+               
+               when pause_st =>                  
+                  if QUAD2_ENABLED = '1' then 
+                     if quad2_fifo_dval = '1' then
+                        line_mux_fsm <= quad2_out_st;  
+                     end if;
+                  else
                      line_mux_fsm <= quad1_out_st;
                   end if;
                
-               when quad1_out_st =>                     
-                  -- quad1_fifo_rd_en <= quad1_fifo_dval;                   
-                  if quad1_fifo_dval = '1' then
-                     quad1_fifo_rd_en <= '1';
-                     if quad1_fifo_dout(C_EOL_POS) = '1' then
-                        quad1_fifo_rd_en <= '0';
-                        line_mux_fsm <= pause_st1;
-                     end if;
-                  end if;
-               
-               when pause_st1 =>                  
-                  if quad2_fifo_dval = '1' then
-                     line_mux_fsm <= quad2_out_st;  
-                  end if;                 
-               
                when quad2_out_st =>
-                  -- quad2_fifo_rd_en <= quad2_fifo_dval; 
-                  if quad2_fifo_dval = '1' then
+                  if quad2_dout_mosi.dval = '1' then
                      quad2_fifo_rd_en <= '1';
-                     if quad2_fifo_dout(C_EOL_POS) = '1' then 
+                     if quad2_dout_mosi.eol = '1' then
                         quad2_fifo_rd_en <= '0';
-                        line_mux_fsm <= pause_st2;
+                        line_mux_fsm <= quad1_out_st;
                      end if;
                   end if;
-               
-               when pause_st2 =>                  
-                  if quad1_fifo_dval = '1' then
-                     line_mux_fsm <= quad1_out_st;  
-                  end if; 
                
                when others =>
                
@@ -232,19 +234,18 @@ begin
          else
             
             if quad1_fifo_rd_en = '1' then               -- line 1
-               dout_mosi_i.data <= quad1_fifo_dout(71 downto 0);
-               dout_mosi_i.eol  <= quad1_fifo_dout(72);
-               dout_mosi_i.sol  <= quad1_fifo_dout(73);
-               dout_mosi_i.sof  <= quad1_fifo_dout(75);
-               dout_mosi_i.eof  <= '0';
-               dout_mosi_i.dval <= quad1_fifo_dval;               
+               dout_mosi_i.data <= quad1_dout_mosi.data;
+               dout_mosi_i.eol  <= quad1_dout_mosi.eol;
+               dout_mosi_i.sol  <= quad1_dout_mosi.sol;
+               dout_mosi_i.sof  <= quad1_dout_mosi.sof;
+               dout_mosi_i.eof  <= quad1_dout_mosi.eof and not QUAD2_ENABLED;
+               dout_mosi_i.dval <= quad1_dout_mosi.dval;               
             elsif quad2_fifo_rd_en = '1' then            -- line 2
-               dout_mosi_i.data <= quad2_fifo_dout(71 downto 0);
-               dout_mosi_i.eol  <= quad2_fifo_dout(72);
-               dout_mosi_i.sol  <= quad2_fifo_dout(73);               
-               dout_mosi_i.sof  <= '0'; 
-               dout_mosi_i.eof  <= quad2_fifo_dout(74);
-               dout_mosi_i.dval <= quad2_fifo_dval;
+               dout_mosi_i.eol  <= quad2_dout_mosi.eol;
+               dout_mosi_i.sol  <= quad2_dout_mosi.sol;
+               dout_mosi_i.sof  <= quad2_dout_mosi.sof and not QUAD2_ENABLED;
+               dout_mosi_i.eof  <= quad2_dout_mosi.eof;
+               dout_mosi_i.dval <= quad2_dout_mosi.dval;
             else
                dout_mosi_i.dval <= '0';               
             end if;
