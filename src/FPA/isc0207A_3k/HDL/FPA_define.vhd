@@ -72,7 +72,7 @@ package FPA_define is
    constant DEFINE_ITR_MODE                       : std_logic := '0'; 
    constant DEFINE_IWR_MODE                       : std_logic := '1';
    constant DEFINE_FPA_INT_FBK_AVAILABLE          : std_logic := '0';
-   constant DEFINE_FPA_POWER_ON_WAIT_US           : integer   := 1_000_000;    -- en usec, duree d'attente après allumage  pour declarer le FPA rdy. Faible chiffre car comptabilisé dans 
+   constant DEFINE_FPA_POWER_ON_WAIT_US           : integer   := 1_200_000;  -- en usec, duree d'attente après allumage pour declarer le FPA rdy. Le ramp-up du LT3042 est d'environ 1s.
    constant DEFINE_FPA_TEMP_TRIG_PERIOD_US        : integer   := 500_000;    -- le trig de lecture de la temperature a une periode de 0.5sec
    constant DEFINE_FPA_TEMP_RAW_MIN               : integer   := 30720;      -- Minimum ADC value for isc0207A_3k power-on : 1.00 V de 2N2222 (soit 91K)  
    constant DEFINE_FPA_TEMP_RAW_MAX               : integer   := 35200;      -- Maximum ADC value for isc0207A_3k power-on : (to protect against ultra low temp). 1.039V 
