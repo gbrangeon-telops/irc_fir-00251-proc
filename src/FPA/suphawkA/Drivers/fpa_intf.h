@@ -205,6 +205,12 @@ struct s_FpaStatus    //
    
    // errors lacths
    uint32_t  errors_latchs;            // erreurs latchées. S'effacent avec la fonction FPA_ClearErr. Définition dans le fichier fpa_status_gen.vhd
+   
+   // driver status
+   uint32_t  intf_seq_stat;            // statut du sequenceur. Définition dans fpa_intf_sequencer.vhd
+   uint32_t  data_path_stat;           // statut de la chaine de données. Définition dans "fpa"_intf.bde
+   uint32_t  trig_ctler_stat;          // statut du controleur de trig. Définition dans fpa_trig_controller.vhd
+   uint32_t  fpa_driver_stat;          // statut du hw driver. Définition dans "fpa"_hw_driver.bde
 
    // pour le power management
    uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé

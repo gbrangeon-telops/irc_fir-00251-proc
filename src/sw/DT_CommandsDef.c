@@ -543,6 +543,11 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 
    DT_PRINTF("fpa.errors_latchs = 0x%08X", status.errors_latchs);
 
+   DT_PRINTF("fpa.intf_seq_stat = 0x%08X", status.intf_seq_stat);
+   DT_PRINTF("fpa.data_path_stat = 0x%08X", status.data_path_stat);
+   DT_PRINTF("fpa.trig_ctler_stat = 0x%08X", status.trig_ctler_stat);
+   DT_PRINTF("fpa.fpa_driver_stat = 0x%08X", status.fpa_driver_stat);
+
    DT_PRINTF("fpa.adc_ddc_detect_process_done = %d", status.adc_ddc_detect_process_done);
    DT_PRINTF("fpa.adc_ddc_present = %d", status.adc_ddc_present);
    DT_PRINTF("fpa.flex_flegx_detect_process_done = %d", status.flex_flegx_detect_process_done);
