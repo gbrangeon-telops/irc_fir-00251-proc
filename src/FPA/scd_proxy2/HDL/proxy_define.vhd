@@ -88,8 +88,7 @@ package Proxy_define is
    constant PIX_RES_15B              : std_logic_vector(1 downto 0) := "00";
    constant PIX_RES_14B              : std_logic_vector(1 downto 0) := "01";
    constant PIX_RES_13B              : std_logic_vector(1 downto 0) := "10";
-   constant FPA_INT_FBK_AVAILABLE        : std_logic := '1';
-   
+      
    -- cmd
    constant COM_RESP_HDER            : std_logic_vector(7 downto 0)  := x"55";
    constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
@@ -219,6 +218,8 @@ package Proxy_define is
       int_checksum_base_add          : unsigned(7 downto 0);
       
       cmd_overhead_bytes_num         : unsigned(7 downto 0);
+      
+      int_clk_period_factor          : unsigned(7 downto 0);
    end record;    
    
    ----------------------------------------------								

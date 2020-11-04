@@ -63,19 +63,25 @@ end scd_proxy2_prog_ctrler;
 
 architecture rtl of scd_proxy2_prog_ctrler is
    
-   
-   
    component sync_reset
       port(
          ARESET : in std_logic;
          SRESET : out std_logic;
-         CLK : in std_logic);
-   end component; 
+         CLK    : in std_logic);
+   end component;   
+   
+   component fpa_progr_clk_div   
+      port (
+         CLK              : in  std_logic; 	
+         ARESET           : in  std_logic;
+         PULSE_PERIOD     : in  std_logic_vector(7 downto 0);
+         PULSE            : out std_logic);
+   end component;
    
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, check_cfg_st0, check_cfg_st, pause_st1, pause_st2, 
    output_op_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, wait_updater_rdy_st, wait_updater_run_st);
-   type int_gen_fsm_type is (idle, diag_int_dly_st, check_fpa_st, diag_exp_rst_cnt_st, diag_exp_int_gen_st, diag_int_gen_st);
+   type int_gen_fsm_type is (idle, check_fpa_st, int_gen_st1, int_gen_st2, param_st);
    type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
@@ -94,13 +100,12 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal fpa_new_cfg_pending       : std_logic;
    signal user_cfg_in_progress_i    : std_logic;
    signal new_cfg                   : fpa_intf_cfg_type;
-   signal present_cfg                : fpa_intf_cfg_type;
+   signal present_cfg               : fpa_intf_cfg_type;
    signal fpa_intf_cfg_i            : fpa_intf_cfg_type;
-   signal user_cfg_to_update     : fpa_intf_cfg_type;
+   signal user_cfg_to_update        : fpa_intf_cfg_type;
    signal serial_en_i               : std_logic;
-   signal user_cfg_latch         : fpa_intf_cfg_type;
-   --signal fpa_err_check_done        : std_logic;
-   signal cnt                       : unsigned(31 downto 0);
+   signal user_cfg_latch            : fpa_intf_cfg_type;
+   signal cnt                       : unsigned(USER_CFG.INT_CLK_PERIOD_FACTOR'LENGTH-1 downto 0);
    signal proxy_int_feedbk_i        : std_logic;
    signal proxy_int_feedbk_last     : std_logic;
    signal acq_frame                 : std_logic;
@@ -121,6 +126,8 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
    signal proxy_pwr_i               : std_logic;
+   signal int_clk_pulse_i           : std_logic;
+   signal int_i                     : std_logic;
    
    -- -- attribute dont_touch                         : string;
    -- -- attribute dont_touch of acq_int_i            : signal is "true";
@@ -509,11 +516,23 @@ begin
    
    
    --------------------------------------------------
+   --  reference du temps d'integra
+   --------------------------------------------------
+   U6A : fpa_progr_clk_div
+   port map(
+      ARESET         => ARESET,
+      CLK            => CLK,       -- CLK doit être connecté à INT_CLK_SOURCE)
+      PULSE          => int_clk_pulse_i,
+      PULSE_PERIOD   => std_logic_vector(USER_CFG.INT_CLK_PERIOD_FACTOR)
+      );
+   
+   
+   --------------------------------------------------
    --  generation de acq_int_i et fpa_int_i
    --------------------------------------------------
    -- acq_int_i
    -- acq_int_i est destiné à signifier aux modules externes (TimeStamper, SFW etc...) le véritable instant de l'intégration
-   U6 : process(CLK)
+   U6B : process(CLK)
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then 
@@ -526,78 +545,66 @@ begin
             int_indx_i <= (others => '0');
             int_time_i <= (others => '0');
             fpa_int_i <= '0';
+            int_i <= '0';
             
          else
             
             proxy_int_feedbk_i <= PROXY_INT_FBK;
             proxy_int_feedbk_last <= proxy_int_feedbk_i;
             
+            fpa_int_i <= int_i;
+            acq_int_i <= int_i and acq_frame and (fpa_intf_cfg_i.comn.fpa_diag_mode or PROXY_RDY);
+            
+            
             -- fsm de generation de acq_int_i           
             case  int_gen_fsm is 
                
                when idle =>
-                  acq_int_i <= '0';
-                  cnt <= (others => '0');                 
-                  acq_frame <= '0';
-                  fpa_int_i <= '0';
+                  cnt <= to_unsigned(1, cnt'length);                 
+                  int_i <= '0';
                   if ACQ_TRIG = '1' then    -- ACQ_TRIG uniquement car ne jamais envoyer acq_int_i en mode XTRA_TRIG
                      frame_id_i <= frame_id_i + 1;
-                     int_indx_i <= fpa_intf_cfg_i.int.int_indx;
-                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.int.int_time);
                      acq_frame <= '1';
-                     if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
-                        int_gen_fsm <= diag_int_dly_st;
-                     else
-                        int_gen_fsm <= check_fpa_st;
-                     end if;
+                     int_gen_fsm <= param_st;
                   elsif XTRA_TRIG = '1' then    -- 
-                     --frame_id_i <= frame_id_i + 1; -- on ne change pas d'ID en xtraTrig pour que le client ne voit aucune discontinuité dans les ID
-                     int_indx_i <= fpa_intf_cfg_i.int.int_indx; 
-                     int_time_i <= std_logic_vector(fpa_intf_cfg_i.int.int_time);
                      acq_frame <= '0';
-                     if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
-                        int_gen_fsm <= diag_int_dly_st;
-                     else
-                        int_gen_fsm <= check_fpa_st; 
-                     end if;
-                  end if;
+                     int_gen_fsm <= param_st;
+                  end if;                  
+               
+               when param_st =>
+                  int_indx_i <= fpa_intf_cfg_i.int.int_indx;
+                  int_time_i <= std_logic_vector(fpa_intf_cfg_i.int.int_time);
+                  if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
+                     int_gen_fsm <= int_gen_st1;
+                  else
+                     int_gen_fsm <= check_fpa_st; 
+                  end if;                  
                
                when check_fpa_st =>                  
-                  if FPA_INT_FBK_AVAILABLE = '1' then                  -- FPA_INT_TIME_FBK_AVAILABLE dans fpa_define et dit si le proxy peut nous renvoyer un feedback d'intégration
-                     acq_int_i <= PROXY_INT_FBK and acq_frame;
-                     fpa_int_i <= PROXY_INT_FBK;
+                  if DEFINE_FPA_INT_FBK_AVAILABLE = '1' then                  -- FPA_INT_TIME_FBK_AVAILABLE dans fpa_define et dit si le proxy peut nous renvoyer un feedback d'intégration
+                     int_i <= PROXY_INT_FBK;
                      if proxy_int_feedbk_i = '0' and proxy_int_feedbk_last = '1' then -- on attend la fin du feedback
                         int_gen_fsm <= idle;
                      end if;
                   else
-                     int_gen_fsm <= diag_int_dly_st;           -- sinon, nous generons le feedback comme on le ferait en mode diag
+                     int_gen_fsm <= int_gen_st1;           -- sinon, nous generons le feedback comme on le ferait en mode diag
                   end if;
                
-               when diag_int_dly_st => 
-                  if cnt >= 0  then    -- FPA_INTF_CFG.fpa_fig1_or_fig2_t4_dly est le delai T4 sur les figures 1 et 2 du document Communication protocol appendix A5 (SPEC. NO: DPS3008) dans le dossier du pelicanD
-                     int_gen_fsm <= diag_exp_rst_cnt_st;
-                  else                        
-                     cnt <= cnt + 1;                
-                  end if;   
-               
-               when diag_exp_rst_cnt_st =>
-                  cnt <= (others => '0');
-                  int_gen_fsm <= diag_int_gen_st;
-               
-               when diag_int_gen_st =>           
-                  fpa_int_i <= '1';
-                  if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then 
-                     acq_int_i <= acq_frame;  
-                  else
-                     acq_int_i <= acq_frame and PROXY_RDY; 
-                  end if;                  
-                  
-                  if cnt >= fpa_intf_cfg_i.int.int_time then    -- 
-                     int_gen_fsm <= idle;
-                  else                        
-                     cnt <= cnt + 1;                
+               when int_gen_st1 => 
+                  if int_clk_pulse_i = '1' then
+                     int_i <= '1';
+                     int_gen_fsm <= int_gen_st2;
                   end if;
-                  
+               
+               when int_gen_st2 =>
+                  if int_clk_pulse_i = '1' then                     
+                     if cnt >= fpa_intf_cfg_i.int.int_time then    --
+                        int_i <= '0';
+                        int_gen_fsm <= idle;
+                     else                        
+                        cnt <= cnt + 1;
+                     end if;
+                  end if;                
                
                when others =>
                

@@ -256,8 +256,8 @@ begin
                   
                   when X"B8" =>    mb_struct_cfg.int_cmd_bram_base_add_m1         <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add_m1'length-1 downto 0));
                   when X"BC" =>    mb_struct_cfg.int_checksum_base_add            <= unsigned(data_i(mb_struct_cfg.int_checksum_base_add'length-1 downto 0));
-                  when X"C0" =>    mb_struct_cfg.cmd_overhead_bytes_num           <= unsigned(data_i(mb_struct_cfg.cmd_overhead_bytes_num'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';  
-                  
+                  when X"C0" =>    mb_struct_cfg.cmd_overhead_bytes_num           <= unsigned(data_i(mb_struct_cfg.cmd_overhead_bytes_num'length-1 downto 0));  
+                  when X"C4" =>    mb_struct_cfg.int_clk_period_factor            <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
                   
                   -- lecture de temperature
                   when X"D0" =>    mb_struct_cfg.temp.cfg_num                     <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';

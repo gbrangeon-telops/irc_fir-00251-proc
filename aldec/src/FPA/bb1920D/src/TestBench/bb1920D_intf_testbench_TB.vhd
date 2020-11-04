@@ -53,7 +53,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    end component;
    
    
-   constant QWORDS_NUM   : natural := 49;
+   constant QWORDS_NUM   : natural := 50;
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
@@ -203,7 +203,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(150, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(15, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       FPA_EXP_INFO.exp_dval <='0';
       wait for 2000 ns;

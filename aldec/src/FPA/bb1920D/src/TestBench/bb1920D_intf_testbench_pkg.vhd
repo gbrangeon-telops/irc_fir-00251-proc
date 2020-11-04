@@ -82,8 +82,9 @@ package body BB1920D_intf_testbench_pkg is
       variable  int_cmd_bram_base_add_m1                                          : unsigned(31 downto  0);
       variable  int_checksum_base_add                                             : unsigned(31 downto  0);
       variable  cmd_overhead_bytes_num                                            : unsigned(31 downto  0);
+      variable  int_clk_period_factor                                             : unsigned(31 downto  0);
       
-      variable y                                                                  : unsigned(49*32-1 downto 0);
+      variable y                                                                  : unsigned(50*32-1 downto 0);
       
    begin 
       
@@ -101,8 +102,8 @@ package body BB1920D_intf_testbench_pkg is
       comn_fpa_trig_ctrl_timeout_dly := to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
-      diag_ysize                    := to_unsigned(user_ysize, 32);                 
-      diag_xsize_div_tapnum         := to_unsigned(user_xsize/TAP_NUM, 32);
+      diag_ysize                    := to_unsigned(user_ysize/2, 32);                 
+      diag_xsize_div_tapnum         := to_unsigned(user_xsize/4, 32);
       op_xstart                     := to_unsigned(0, 32);
       op_ystart                     := to_unsigned(0, 32);      
           
@@ -124,7 +125,7 @@ package body BB1920D_intf_testbench_pkg is
       op_spare3		               := to_unsigned(0, 32);   
       op_spare4                     := to_unsigned(0, 32);  
       op_cfg_num                    := to_unsigned(send_id, 32);  
-      diag_ysize                    := to_unsigned(user_ysize, 32);  
+        
               
       diag_lovh_mclk_source         := to_unsigned(3, 32);    
       frame_dly_cst                 := to_unsigned(10, 32);  
@@ -147,6 +148,8 @@ package body BB1920D_intf_testbench_pkg is
       int_cmd_bram_base_add_m1      := to_unsigned(63, 32); 
       int_checksum_base_add         := int_cmd_dlen + 4; 
       cmd_overhead_bytes_num        := to_unsigned(7, 32);
+      
+      int_clk_period_factor         := to_unsigned(10, 32);
       
       
       -- cfg usager
@@ -198,7 +201,8 @@ package body BB1920D_intf_testbench_pkg is
       & temp_cmd_bram_base_add  
       & int_cmd_bram_base_add_m1
       & int_checksum_base_add
-      & cmd_overhead_bytes_num;    
+      & cmd_overhead_bytes_num
+      & int_clk_period_factor;    
       
       return y;
    end to_intf_cfg;
