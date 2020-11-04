@@ -19,6 +19,7 @@
 
 #include "GeniCam.h"
 #include "fpa_intf.h"
+#include "flashSettings.h"
 #include "utils.h"
 #include "IRC_status.h"
 #include "CRC.h"
@@ -681,20 +682,30 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 {
-   float diode_voltage_mV;
+   float diode_voltage_mV, diode_voltage;
    float temperature;
    //float TempCoeff[2];
    
    FPA_GetStatus(&gStat, ptrA);
 
    diode_voltage_mV = (float)gStat.fpa_temp_raw * ((float)FPA_TEMP_READER_FULL_SCALE_mV)/(powf(2.0F, FPA_TEMP_READER_ADC_DATA_RES)*(float)FPA_TEMP_READER_GAIN);
+   diode_voltage = diode_voltage_mV / 1000.0F;
    
    if (gStat.fpa_init_done == 0){   
       return FPA_INVALID_TEMP;
    }
-   else{ 
-      // courbe de conversion selon Selex 
-      temperature  =  -0.00014440F * powf(diode_voltage_mV,2) - 0.27652F * diode_voltage_mV + 524.0F;
+   else{
+      // utilisation  des valeurs de flashsettings
+      temperature  = flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+      temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+      temperature += flashSettings.FPATemperatureConversionCoef0;
+      
+      // Si flashsettings non programmés alors on utilise les valeurs par defaut
+      if ((flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
+          (flashSettings.FPATemperatureConversionCoef0 == 0)) {
+         // courbe de conversion selon Selex 
+         temperature  =  -0.00014440F * powf(diode_voltage_mV,2) - 0.27652F * diode_voltage_mV + 524.0F;
+      }
       return (int16_t)((int32_t)(100.0F * temperature) - 27315) ; // Centi celsius
    }   
 }       
