@@ -189,6 +189,7 @@ begin
             -- pragma translate_off
             user_cfg_i.ysize <= to_unsigned(DEFINE_YSIZE_MAX, user_cfg_i.ysize'length);
             -- pragma translate_on
+            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
          else                   
             

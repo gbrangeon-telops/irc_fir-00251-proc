@@ -191,6 +191,7 @@ begin
             mb_ctrled_reset_i <= '0';
             user_cfg_i.ysize <= to_unsigned(320, user_cfg_i.ysize'length);
             user_cfg_i.sat_ctrl_en <= '0';
+            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
          else                   
             
