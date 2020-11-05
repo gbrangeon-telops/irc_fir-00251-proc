@@ -79,7 +79,7 @@ acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\bb1920D\src\TestBench\bb1920D_intf_
 asim -ses bb1920D_intf_testbench_TB 
 
 -- mb_interface
-#wave UUT/U1/U4/*  
+wave UUT/U1/U4/*  
 #
 #
 wave UUT/U1/U5/U1/* 
@@ -100,10 +100,12 @@ wave UUT/U3/U3/*
 #wave UUT/U1/U9/U1/*
 
 wave UUT/U1/U9/g0/U17/*
+wave UUT/U1/U9/U18/*
 wave UUT/U1/U9/U6/* 
 wave UUT/U1/U9/U7/*
 
+
 --wave UUT/U1/*
-run 200 ms
+run 150 ms
 --run 30 ms  
 --9.1 ms

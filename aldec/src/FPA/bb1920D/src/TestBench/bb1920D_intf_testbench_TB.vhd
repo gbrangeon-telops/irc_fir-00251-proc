@@ -53,13 +53,13 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    end component;
    
    
-   constant QWORDS_NUM   : natural := 50;
+   constant QWORDS_NUM   : natural := 52;
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
    constant ACQ_TRIG_PERIOD         : time := 100 us;
    constant DOUT_CLK_PERIOD         : time := 11.765 ns;
-   constant ADC_CLK_PERIOD          : time := 45.0 ns;
+   constant ADC_CLK_PERIOD          : time := 100.0 ns;
    constant MCLK_SOURCE_PERIOD      : time := 14.3 ns;
    
    --  constant USER_FIRST_LINE_NUM : integer := 1;
@@ -201,14 +201,14 @@ begin
    -- DOUT_MISO.TREADY <= '1';
    
    
-   process
+   process(CLK_100M)
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(15, FPA_EXP_INFO.exp_time'length);
-      FPA_EXP_INFO.exp_indx <= x"05";
-      FPA_EXP_INFO.exp_dval <='0';
-      wait for 2000 ns;
-      FPA_EXP_INFO.exp_dval <= '1';
-      wait;
+      if rising_edge(CLK_100M) then
+         FPA_EXP_INFO.exp_time <= to_unsigned(100, FPA_EXP_INFO.exp_time'length);
+         FPA_EXP_INFO.exp_indx <= x"05";
+         FPA_EXP_INFO.exp_dval <='0';
+         FPA_EXP_INFO.exp_dval <= ADC_CLK_INT;
+      end if;
    end process;
    
    HDER_MISO.WREADY  <= '1';
@@ -330,7 +330,7 @@ begin
       end loop; 
       --      
       wait for 50 ms;
---      
+      --      
       for ii in 0 to QWORDS_NUM-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;

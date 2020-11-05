@@ -22,6 +22,7 @@ package BB1920D_intf_testbench_pkg is
    
    constant PAUSE_SIZE                 : integer := 2*(1);
    constant TAP_NUM                    : integer := 8;
+   constant C_FPA_INTCLK_RATE_KHZ      : integer := 35_000;
    
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
@@ -41,7 +42,9 @@ package body BB1920D_intf_testbench_pkg is
       variable  comn_fpa_spare                                                    : unsigned(31 downto  0);
       variable  comn_fpa_xtra_trig_ctrl_dly                                       : unsigned(31 downto  0);
       variable  comn_fpa_trig_ctrl_timeout_dly                                    : unsigned(31 downto  0);
-      variable  comn_fpa_stretch_acq_trig                                         : unsigned(31 downto  0);                                                         
+      variable  comn_fpa_stretch_acq_trig                                         : unsigned(31 downto  0);
+      variable  comn_clk100_to_intclk_conv_numerator                              : unsigned(31 downto  0);
+      variable  comn_intclk_to_clk100_conv_numerator                              : unsigned(31 downto  0);
       variable  op_xstart                                                         : unsigned(31 downto  0);
       variable  op_ystart                                                         : unsigned(31 downto  0);                                           
       variable  op_xsize                                                          : unsigned(31 downto  0);
@@ -84,7 +87,7 @@ package body BB1920D_intf_testbench_pkg is
       variable  cmd_overhead_bytes_num                                            : unsigned(31 downto  0);
       variable  int_clk_period_factor                                             : unsigned(31 downto  0);
       
-      variable y                                                                  : unsigned(50*32-1 downto 0);
+      variable y                                                                  : unsigned(52*32-1 downto 0);
       
    begin 
       
@@ -93,9 +96,9 @@ package body BB1920D_intf_testbench_pkg is
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
       comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
---      if (diag_mode = '1') then 
---         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
---      end if;   
+      --      if (diag_mode = '1') then 
+      --         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
+      --      end if;   
       
       comn_fpa_acq_trig_ctrl_dly    := to_unsigned(1000, comn_fpa_acq_trig_ctrl_dly'length);
       comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(1000, comn_fpa_xtra_trig_ctrl_dly'length);
@@ -106,9 +109,9 @@ package body BB1920D_intf_testbench_pkg is
       diag_xsize_div_tapnum         := to_unsigned(user_xsize/4, 32);
       op_xstart                     := to_unsigned(0, 32);
       op_ystart                     := to_unsigned(0, 32);      
-          
+      
       real_mode_active_pixel_dly    := to_unsigned(8, 32);   
-   
+      
       op_xsize                      := to_unsigned(user_xsize, 32);  
       op_ysize                      := to_unsigned(user_ysize, 32);  
       op_frame_time                 := to_unsigned(10, 32);  
@@ -125,14 +128,14 @@ package body BB1920D_intf_testbench_pkg is
       op_spare3		               := to_unsigned(0, 32);   
       op_spare4                     := to_unsigned(0, 32);  
       op_cfg_num                    := to_unsigned(send_id, 32);  
-        
-              
+      
+      
       diag_lovh_mclk_source         := to_unsigned(3, 32);    
       frame_dly_cst                 := to_unsigned(10, 32);  
       int_dly_cst                   := to_unsigned(10, 32);   
       additional_fpa_int_time_offset := to_unsigned(0, 32);   
       itr                           := to_unsigned(1, 32);   
-          
+      
       cmd_hder                      := x"000000" & x"AA";   
       int_cmd_id                    := x"0000" & x"8500";  
       int_cmd_dlen                  := to_unsigned(10, 32);  
@@ -149,7 +152,10 @@ package body BB1920D_intf_testbench_pkg is
       int_checksum_base_add         := int_cmd_dlen + 4; 
       cmd_overhead_bytes_num        := to_unsigned(7, 32);
       
-      int_clk_period_factor         := to_unsigned(10, 32);
+      int_clk_period_factor         := to_unsigned(DEFINE_INT_CLK_SOURCE_RATE_KHZ/C_FPA_INTCLK_RATE_KHZ, 32);
+      
+      comn_clk100_to_intclk_conv_numerator  := to_unsigned(integer(real(C_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), 32);
+      comn_intclk_to_clk100_conv_numerator  := to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**26)/real(C_FPA_INTCLK_RATE_KHZ)), 32);  
       
       
       -- cfg usager
@@ -161,7 +167,9 @@ package body BB1920D_intf_testbench_pkg is
       & comn_fpa_spare                 
       & comn_fpa_xtra_trig_ctrl_dly    
       & comn_fpa_trig_ctrl_timeout_dly 
-      & comn_fpa_stretch_acq_trig      
+      & comn_fpa_stretch_acq_trig
+      & comn_clk100_to_intclk_conv_numerator
+      & comn_intclk_to_clk100_conv_numerator      
       & op_xstart                      
       & op_ystart                      
       & op_xsize                       

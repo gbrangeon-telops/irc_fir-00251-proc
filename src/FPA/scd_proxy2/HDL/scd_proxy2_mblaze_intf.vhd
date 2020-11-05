@@ -55,6 +55,8 @@ architecture rtl of scd_proxy2_mblaze_intf is
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26    : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1     : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
    constant C_DIAG_LOVH_MCLK                            : natural := 8; 
+   constant C_EXP_TIME_CONV_NUMERATOR_BITLEN            : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
+   
    
    component sync_reset
       port (
@@ -69,7 +71,7 @@ architecture rtl of scd_proxy2_mblaze_intf is
    type int_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
    type int_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
-   signal int_time_pipe                   : int_time_pipe_type; 
+   signal int_time_pipe                   : int_time_pipe_type := ((others => '0'), (others => '0'), (others => '0'), (others => '0'), (others => '0')); 
    signal exp_cfg_gen_fsm                 : exp_cfg_gen_fsm_type;
    signal sreset                          : std_logic;
    signal axi_awaddr	                     : std_logic_vector(31 downto 0);
@@ -179,7 +181,7 @@ begin
       if rising_edge(MB_CLK) then
          if sreset = '1' then
             fpa_softw_stat_i.dval <= '0';
-            mb_cfg_in_progress <= '0'; 
+            mb_cfg_in_progress <= '1';  -- fait expres
             mb_ser_cfg_dval <= '0';
             reset_err_i<= '0';
             fpa_softw_stat_i.fpa_input <= LVDS25; -- normaement c'est un mesureur de la tension de la banque du FPGA qui doit forunir cette info (sera fait dans sur une carte ADC). Mais pour la carte ACQ ce n'Est pas le cas.
@@ -208,60 +210,63 @@ begin
                   when X"18" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly      <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
                   when X"1C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly   <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
                   when X"20" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
+                  when X"24" =>    mb_struct_cfg.comn.clk100_to_intclk_conv_numerator  <= unsigned(data_i(mb_struct_cfg.comn.clk100_to_intclk_conv_numerator'length-1 downto 0));
+                  when X"28" =>    mb_struct_cfg.comn.intclk_to_clk100_conv_numerator  <= unsigned(data_i(mb_struct_cfg.comn.intclk_to_clk100_conv_numerator'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
+                     
                      
                   -- op
-                  when X"24" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
-                  when X"28" =>    mb_struct_cfg.op.ystart                        <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));                        
-                  when X"2C" =>    mb_struct_cfg.op.xsize                         <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0));                              
-                  when X"30" =>    mb_struct_cfg.op.ysize                         <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));                                
-                  when X"34" =>    mb_struct_cfg.op.frame_time                    <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0));                                                     
-                  when X"38" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0); 
-                  when X"3C" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
-                  when X"40" =>    mb_struct_cfg.op.test_mode	                   <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);                        
-                  when X"44" =>    mb_struct_cfg.op.det_vbias                     <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);                         
-                  when X"48" =>    mb_struct_cfg.op.det_ibias                     <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0); 
-                  when X"4C" =>    mb_struct_cfg.op.det_vsat                      <= data_i(mb_struct_cfg.op.det_vsat'length-1 downto 0);                         
-                  when X"50" =>    mb_struct_cfg.op.binning                       <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);      
-                  when X"54" =>    mb_struct_cfg.op.output_chn                    <= data_i(mb_struct_cfg.op.output_chn'length-1 downto 0);   
-                  when X"58" =>    mb_struct_cfg.op.spare1		                   <= data_i(mb_struct_cfg.op.spare1'length-1 downto 0); 		 
-                  when X"5C" =>    mb_struct_cfg.op.spare2		                   <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 		 
-                  when X"60" =>    mb_struct_cfg.op.spare3		                   <= data_i(mb_struct_cfg.op.spare3'length-1 downto 0); 		 
-                  when X"64" =>    mb_struct_cfg.op.spare4                        <= data_i(mb_struct_cfg.op.spare4'length-1 downto 0);       
-                  when X"68" =>    mb_struct_cfg.op.cfg_num                       <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));          
+                  when X"2C" =>    mb_struct_cfg.op.xstart                        <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));                                
+                  when X"30" =>    mb_struct_cfg.op.ystart                        <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));                        
+                  when X"34" =>    mb_struct_cfg.op.xsize                         <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0));                              
+                  when X"38" =>    mb_struct_cfg.op.ysize                         <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));                                
+                  when X"3C" =>    mb_struct_cfg.op.frame_time                    <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0));                                                     
+                  when X"40" =>    mb_struct_cfg.op.gain                          <= data_i(mb_struct_cfg.op.gain'length-1 downto 0); 
+                  when X"44" =>    mb_struct_cfg.op.int_mode                      <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                        
+                  when X"48" =>    mb_struct_cfg.op.test_mode	                   <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);                        
+                  when X"4C" =>    mb_struct_cfg.op.det_vbias                     <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);                         
+                  when X"50" =>    mb_struct_cfg.op.det_ibias                     <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0); 
+                  when X"54" =>    mb_struct_cfg.op.det_vsat                      <= data_i(mb_struct_cfg.op.det_vsat'length-1 downto 0);                         
+                  when X"58" =>    mb_struct_cfg.op.binning                       <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);      
+                  when X"5C" =>    mb_struct_cfg.op.output_chn                    <= data_i(mb_struct_cfg.op.output_chn'length-1 downto 0);   
+                  when X"60" =>    mb_struct_cfg.op.spare1		                   <= data_i(mb_struct_cfg.op.spare1'length-1 downto 0); 		 
+                  when X"64" =>    mb_struct_cfg.op.spare2		                   <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 		 
+                  when X"68" =>    mb_struct_cfg.op.spare3		                   <= data_i(mb_struct_cfg.op.spare3'length-1 downto 0); 		 
+                  when X"6C" =>    mb_struct_cfg.op.spare4                        <= data_i(mb_struct_cfg.op.spare4'length-1 downto 0);       
+                  when X"70" =>    mb_struct_cfg.op.cfg_num                       <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));          
                   
-                  when X"6C" =>    mb_struct_cfg.diag.ysize                       <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));
-                  when X"70" =>    mb_struct_cfg.diag.xsize_div_tapnum            <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));
-                  when X"74" =>    mb_struct_cfg.diag.lovh_mclk_source            <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
-                  
+                  when X"74" =>    mb_struct_cfg.diag.ysize                       <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));
+                  when X"78" =>    mb_struct_cfg.diag.xsize_div_tapnum            <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));
+                  when X"7C" =>    mb_struct_cfg.diag.lovh_mclk_source            <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));
+                     
                   -- misc (principalement variables/parametres qui ne changent pratiquement pas)
-                  when X"78" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0)); 
-                  when X"7C" =>    mb_struct_cfg.int_dly_cst                      <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
-                  when X"80" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
-                  when X"84" =>    mb_struct_cfg.itr                              <= data_i(0);
-                  when X"88" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
+                  when X"80" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0)); 
+                  when X"84" =>    mb_struct_cfg.int_dly_cst                      <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
+                  when X"88" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
+                  when X"8C" =>    mb_struct_cfg.itr                              <= data_i(0);
+                  when X"90" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
                   
-                  when X"8C" =>    mb_struct_cfg.cmd_hder                         <= data_i(mb_struct_cfg.cmd_hder'length-1 downto 0);
-                  when X"90" =>    mb_struct_cfg.int_cmd_id                       <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);
-                  when X"94" =>    mb_struct_cfg.int_cmd_dlen                     <= data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0);
-                  when X"98" =>    mb_struct_cfg.int_cmd_offs_add                 <= data_i(mb_struct_cfg.int_cmd_offs_add'length-1 downto 0);
-                  when X"9C" =>    mb_struct_cfg.fpa_serdes_lval_num              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
-                  when X"A0" =>    mb_struct_cfg.fpa_serdes_lval_len              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
+                  when X"94" =>    mb_struct_cfg.cmd_hder                         <= data_i(mb_struct_cfg.cmd_hder'length-1 downto 0);
+                  when X"98" =>    mb_struct_cfg.int_cmd_id                       <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);
+                  when X"9C" =>    mb_struct_cfg.int_cmd_dlen                     <= data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0);
+                  when X"A0" =>    mb_struct_cfg.int_cmd_offs_add                 <= data_i(mb_struct_cfg.int_cmd_offs_add'length-1 downto 0);
+                  when X"A4" =>    mb_struct_cfg.fpa_serdes_lval_num              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
+                  when X"A8" =>    mb_struct_cfg.fpa_serdes_lval_len              <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
                   
-                  when X"A4" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0); 
-                  when X"A8" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0); 
+                  when X"AC" =>    mb_struct_cfg.op_cmd_id                        <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0); 
+                  when X"B0" =>    mb_struct_cfg.temp_cmd_id                      <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0); 
                   
-                  when X"AC" =>    mb_struct_cfg.op_cmd_bram_base_add             <= unsigned(data_i(mb_struct_cfg.op_cmd_bram_base_add'length-1 downto 0));
-                  when X"B0" =>    mb_struct_cfg.int_cmd_bram_base_add            <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add'length-1 downto 0));
-                  when X"B4" =>    mb_struct_cfg.temp_cmd_bram_base_add           <= unsigned(data_i(mb_struct_cfg.temp_cmd_bram_base_add'length-1 downto 0)); 
+                  when X"B4" =>    mb_struct_cfg.op_cmd_bram_base_add             <= unsigned(data_i(mb_struct_cfg.op_cmd_bram_base_add'length-1 downto 0));
+                  when X"B8" =>    mb_struct_cfg.int_cmd_bram_base_add            <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add'length-1 downto 0));
+                  when X"BC" =>    mb_struct_cfg.temp_cmd_bram_base_add           <= unsigned(data_i(mb_struct_cfg.temp_cmd_bram_base_add'length-1 downto 0)); 
                   
-                  when X"B8" =>    mb_struct_cfg.int_cmd_bram_base_add_m1         <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add_m1'length-1 downto 0));
-                  when X"BC" =>    mb_struct_cfg.int_checksum_base_add            <= unsigned(data_i(mb_struct_cfg.int_checksum_base_add'length-1 downto 0));
-                  when X"C0" =>    mb_struct_cfg.cmd_overhead_bytes_num           <= unsigned(data_i(mb_struct_cfg.cmd_overhead_bytes_num'length-1 downto 0));  
-                  when X"C4" =>    mb_struct_cfg.int_clk_period_factor            <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
-                  
+                  when X"C0" =>    mb_struct_cfg.int_cmd_bram_base_add_m1         <= unsigned(data_i(mb_struct_cfg.int_cmd_bram_base_add_m1'length-1 downto 0));
+                  when X"C4" =>    mb_struct_cfg.int_checksum_base_add            <= unsigned(data_i(mb_struct_cfg.int_checksum_base_add'length-1 downto 0));
+                  when X"C8" =>    mb_struct_cfg.cmd_overhead_bytes_num           <= unsigned(data_i(mb_struct_cfg.cmd_overhead_bytes_num'length-1 downto 0));  
+                  when X"CC" =>    mb_struct_cfg.int_clk_period_factor            <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));
+                     
                   -- lecture de temperature
-                  when X"D0" =>    mb_struct_cfg.temp.cfg_num                     <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
-                  when X"D4" =>    mb_struct_cfg.temp.cfg_end                     <= data_i(0); mb_cfg_in_progress <= '0'; 
+                  when X"D8" =>    mb_struct_cfg.temp.cfg_num                     <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
+                  when X"DC" =>    mb_struct_cfg.temp.cfg_end                     <= data_i(0); mb_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"E0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -385,6 +390,7 @@ begin
             user_cfg_in_progress_i <= '0';
             valid_cfg_received <= '0';
             ctrled_reset_i <= '1';
+            user_cfg_i.comn.clk100_to_intclk_conv_numerator <= to_unsigned(4697620, user_cfg_i.comn.clk100_to_intclk_conv_numerator'length);
             
          else     
             
@@ -419,7 +425,7 @@ begin
          
          -- pipe pour le calcul du temps d'integration en mclk
          int_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, int_time_pipe(0)'length) ;
-         int_time_pipe(1) <= resize(int_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, int_time_pipe(0)'length);          
+         int_time_pipe(1) <= resize(int_time_pipe(0) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), int_time_pipe(0)'length);          
          int_time_pipe(2) <= resize(int_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), int_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          int_time_pipe(3) <= int_time_pipe(2) + resize("00"& int_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), int_time_pipe(0)'length);  -- pour l'operation d'arrondi
          if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 

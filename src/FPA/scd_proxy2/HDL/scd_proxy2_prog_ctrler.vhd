@@ -54,7 +54,7 @@ entity scd_proxy2_prog_ctrler is
       FPA_DRIVER_STAT      : out std_logic_vector(31 downto 0);
       FRAME_ID             : out std_logic_vector(31 downto 0); --  synchronisé avec ACQ_INT
       INT_INDX             : out std_logic_vector(7 downto 0);
-      INT_TIME             : out std_logic_vector(23 downto 0);
+      INT_TIME             : out std_logic_vector(31 downto 0);
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic
@@ -105,13 +105,13 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal user_cfg_to_update        : fpa_intf_cfg_type;
    signal serial_en_i               : std_logic;
    signal user_cfg_latch            : fpa_intf_cfg_type;
-   signal cnt                       : unsigned(USER_CFG.INT_CLK_PERIOD_FACTOR'LENGTH-1 downto 0);
+   signal cnt                       : unsigned(USER_CFG.INT.INT_TIME'LENGTH-1 downto 0);
    signal proxy_int_feedbk_i        : std_logic;
    signal proxy_int_feedbk_last     : std_logic;
    signal acq_frame                 : std_logic;
    signal user_cfg_in_progress_last : std_logic;
    signal int_indx_i                : std_logic_vector(7 downto 0); 
-   signal int_time_i                : std_logic_vector(23 downto 0);
+   signal int_time_i                : std_logic_vector(31 downto 0);
    signal new_cfg_id                : std_logic_vector(7 downto 0);
    signal serial_base_add_i         : std_logic_vector(7 downto 0);
    signal cfg_ram_base_add          : unsigned(USER_CFG.OP_CMD_BRAM_BASE_ADD'LENGTH-1 downto 0);
@@ -573,7 +573,7 @@ begin
                
                when param_st =>
                   int_indx_i <= fpa_intf_cfg_i.int.int_indx;
-                  int_time_i <= std_logic_vector(fpa_intf_cfg_i.int.int_time);
+                  int_time_i <= std_logic_vector(resize(fpa_intf_cfg_i.int.int_time, 32));
                   if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
                      int_gen_fsm <= int_gen_st1;
                   else
@@ -590,7 +590,7 @@ begin
                      int_gen_fsm <= int_gen_st1;           -- sinon, nous generons le feedback comme on le ferait en mode diag
                   end if;
                
-               when int_gen_st1 => 
+               when int_gen_st1 =>                         -- ainsi on a au minimum une durée egale à la periode de int_clk_pulse_i même si fpa_intf_cfg_i.int.int_time = 0 
                   if int_clk_pulse_i = '1' then
                      int_i <= '1';
                      int_gen_fsm <= int_gen_st2;

@@ -40,34 +40,34 @@ architecture rtl of scd_proxy2_clocks is
          reset          : in  std_logic;
          locked         : out std_logic; 
          clk_100        : out std_logic;
-         int_clk_source : out std_logic;
-         tx_clk         : out std_logic
+         clk_70         : out std_logic;
+         clk_140        : out std_logic
          );
    end component;
    
-   signal  clk_100_i        : std_logic;
-   signal  int_clk_source_i : std_logic;
-   signal  tx_clk_i         : std_logic;
+   signal  clk_a     : std_logic;
+   signal  clk_b     : std_logic;
+   signal  clk_c     : std_logic;
    
 begin
    
    Gen_BB1920 : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920)  generate   
       begin  
-         
+      
       U1 :  bb1920D_clks_mmcm
       port map (   
          clk_in          => CLK_100M_IN,
          reset           => ARESET, 
          locked          => MMCM_LOCKED,   
-         clk_100         => clk_100_i,
-         int_clk_source  => int_clk_source_i,
-         tx_clk          => tx_clk_i
+         clk_100         => clk_a,
+         clk_70          => clk_b,
+         clk_140         => clk_c
          ); 
       
-      TX_CLK          <=  tx_clk_i;         
-      CLK_100M        <=  clk_100_i;           
-      INT_CLK_SOURCE  <=  int_clk_source_i;
-      QUAD_CLK_SOURCE <=  int_clk_source_i;   
+      TX_CLK          <=  clk_c;   -- 140 MHz       
+      CLK_100M        <=  clk_a;   -- 100 MHz        
+      INT_CLK_SOURCE  <=  clk_b;   --  70 MHz
+      QUAD_CLK_SOURCE <=  clk_b;   --  70 MHz
       
    end generate;
    

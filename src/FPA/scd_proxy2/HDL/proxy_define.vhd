@@ -31,8 +31,6 @@ package Proxy_define is
    constant DEFINE_PROXY                          : std_logic_vector(2 downto 0) := PROXY2_SCD;
    constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur   constant INT_TIME_MIN_US                       : integer := 1; 
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP            : integer := 1; -- pour le pelicanD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
-   constant DEFINE_FPA_INTCLK_RATE_KHZ            : integer := 10_000;  -- l'horloge d'integration
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer := 70_000;    -- c'est l'horloge à partir de laquelle est produite celle des quads.
    constant DEFINE_FPA_MCLK_SOURCE_RATE_KHZ       : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ; 
    constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer := 100_000;
    
@@ -53,18 +51,16 @@ package Proxy_define is
    -- attention aux modifs à apporter aux lignes des calculs
    constant DEFINE_DIAG_DATA_INC                         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
    constant DEFINE_FPA_TAP_NUMBER                        : integer :=  PROXY_CHANNEL_LINK_NUM;
-   constant PROXY_CLINK_CLK_1X_PERIOD_NS                 : real    := 1_000_000.0/real(DEFINE_FPA_MCLK_RATE_KHZ);      	-- CLINK IN est à 70 MHz ns 
-   constant DEFINE_FPA_PCLK_RATE_KHZ                     : integer := DEFINE_FPA_MCLK_RATE_KHZ;
-   constant DEFINE_ADC_QUAD_CLK_RATE_KHZ                 : integer := DEFINE_FPA_MCLK_RATE_KHZ; 
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS                 : real    := 1_000_000.0/real(DEFINE_FPA_PCLK_RATE_KHZ);       
    constant DEFINE_ADC_QUAD_CLK_FACTOR                   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR  
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR         : integer := 2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
-   constant DEFINE_FPA_EXP_TIME_CONV_NUMERATOR           : unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned(integer(real(DEFINE_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     --
+   -- constant DEFINE_FPA_EXP_TIME_CONV_NUMERATOR           : unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned(integer(real(DEFINE_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     --
    constant FSYNC_HIGH_TIME_FACTOR                       : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*FSYNC_HIGH_TIME_US)/1000);
    constant POWER_WAIT_FACTOR                            : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*POWER_WAIT_US)/1000);
    constant SERIAL_TX_CLK_FACTOR                         : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*1E3)/SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
    constant TEMP_TRIG_PERIOD_FACTOR                      : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*TEMP_TRIG_PERIOD_US)/1000);
-   constant DEFINE_FPA_MCLK_SOURCE_RATE_HZ               : integer := 1000*DEFINE_FPA_MCLK_SOURCE_RATE_KHZ; 
+   -- constant DEFINE_FPA_MCLK_SOURCE_RATE_HZ               : integer := 1000*DEFINE_FPA_MCLK_SOURCE_RATE_KHZ; 
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -220,6 +216,7 @@ package Proxy_define is
       cmd_overhead_bytes_num         : unsigned(7 downto 0);
       
       int_clk_period_factor          : unsigned(7 downto 0);
+      
    end record;    
    
    ----------------------------------------------								

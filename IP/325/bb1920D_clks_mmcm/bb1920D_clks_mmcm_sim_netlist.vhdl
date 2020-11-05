@@ -1,7 +1,7 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Wed Oct 28 17:21:47 2020
+-- Date        : Wed Nov 04 12:52:05 2020
 -- Host        : TELOPS228 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/325/bb1920D_clks_mmcm/bb1920D_clks_mmcm_sim_netlist.vhdl
@@ -17,8 +17,8 @@ use UNISIM.VCOMPONENTS.ALL;
 entity bb1920D_clks_mmcm_bb1920D_clks_mmcm_clk_wiz is
   port (
     clk_100 : out STD_LOGIC;
-    int_clk_source : out STD_LOGIC;
-    tx_clk : out STD_LOGIC;
+    clk_70 : out STD_LOGIC;
+    clk_140 : out STD_LOGIC;
     reset : in STD_LOGIC;
     locked : out STD_LOGIC;
     clk_in : in STD_LOGIC
@@ -29,10 +29,10 @@ end bb1920D_clks_mmcm_bb1920D_clks_mmcm_clk_wiz;
 
 architecture STRUCTURE of bb1920D_clks_mmcm_bb1920D_clks_mmcm_clk_wiz is
   signal clk_100_bb1920D_clks_mmcm : STD_LOGIC;
+  signal clk_140_bb1920D_clks_mmcm : STD_LOGIC;
+  signal clk_70_bb1920D_clks_mmcm : STD_LOGIC;
   signal clkfbout_bb1920D_clks_mmcm : STD_LOGIC;
   signal clkfbout_buf_bb1920D_clks_mmcm : STD_LOGIC;
-  signal int_clk_source_bb1920D_clks_mmcm : STD_LOGIC;
-  signal tx_clk_bb1920D_clks_mmcm : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKFBOUTB_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKFBSTOPPED_UNCONNECTED : STD_LOGIC;
   signal NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED : STD_LOGIC;
@@ -66,13 +66,13 @@ clkout1_buf: unisim.vcomponents.BUFG
     );
 clkout2_buf: unisim.vcomponents.BUFG
      port map (
-      I => int_clk_source_bb1920D_clks_mmcm,
-      O => int_clk_source
+      I => clk_70_bb1920D_clks_mmcm,
+      O => clk_70
     );
 clkout3_buf: unisim.vcomponents.BUFG
      port map (
-      I => tx_clk_bb1920D_clks_mmcm,
-      O => tx_clk
+      I => clk_140_bb1920D_clks_mmcm,
+      O => clk_140
     );
 mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
     generic map(
@@ -136,9 +136,9 @@ mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
       CLKINSTOPPED => NLW_mmcm_adv_inst_CLKINSTOPPED_UNCONNECTED,
       CLKOUT0 => clk_100_bb1920D_clks_mmcm,
       CLKOUT0B => NLW_mmcm_adv_inst_CLKOUT0B_UNCONNECTED,
-      CLKOUT1 => int_clk_source_bb1920D_clks_mmcm,
+      CLKOUT1 => clk_70_bb1920D_clks_mmcm,
       CLKOUT1B => NLW_mmcm_adv_inst_CLKOUT1B_UNCONNECTED,
-      CLKOUT2 => tx_clk_bb1920D_clks_mmcm,
+      CLKOUT2 => clk_140_bb1920D_clks_mmcm,
       CLKOUT2B => NLW_mmcm_adv_inst_CLKOUT2B_UNCONNECTED,
       CLKOUT3 => NLW_mmcm_adv_inst_CLKOUT3_UNCONNECTED,
       CLKOUT3B => NLW_mmcm_adv_inst_CLKOUT3B_UNCONNECTED,
@@ -168,8 +168,8 @@ use UNISIM.VCOMPONENTS.ALL;
 entity bb1920D_clks_mmcm is
   port (
     clk_100 : out STD_LOGIC;
-    int_clk_source : out STD_LOGIC;
-    tx_clk : out STD_LOGIC;
+    clk_70 : out STD_LOGIC;
+    clk_140 : out STD_LOGIC;
     reset : in STD_LOGIC;
     locked : out STD_LOGIC;
     clk_in : in STD_LOGIC
@@ -183,10 +183,10 @@ begin
 inst: entity work.bb1920D_clks_mmcm_bb1920D_clks_mmcm_clk_wiz
      port map (
       clk_100 => clk_100,
+      clk_140 => clk_140,
+      clk_70 => clk_70,
       clk_in => clk_in,
-      int_clk_source => int_clk_source,
       locked => locked,
-      reset => reset,
-      tx_clk => tx_clk
+      reset => reset
     );
 end STRUCTURE;
