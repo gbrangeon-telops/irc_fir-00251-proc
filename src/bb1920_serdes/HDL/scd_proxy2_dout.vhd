@@ -15,111 +15,183 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 
 entity scd_proxy2_dout is
-	 port(
-		 ARESET        : in std_logic;
-		 CLK           : in std_logic;
-       
-		 DIN           : in std_logic_vector(31 downto 0);
-         SUCCESS       : in std_logic;
-		 
-         FVAL          : out std_logic_vector(7 downto 0);
-		 LVAL          : out std_logic_vector(7 downto 0);
-		 DOUT          : out std_logic_vector(71 downto 0);
-		 DOUT_DVAL     : out std_logic
-	     );
+   port(   
+      
+      --
+      ARESET        : in std_logic;
+      CLK           : in std_logic;
+      
+      --inputs
+      DIN           : in std_logic_vector(31 downto 0);
+      SUCCESS       : in std_logic;
+      
+      -- delay calibration side
+      FVALS         : out std_logic_vector(7 downto 0);
+      LVALS         : out std_logic_vector(7 downto 0);
+      
+      -- downstream side
+      DOUT          : out std_logic_vector(31 downto 0);
+      DOUT_DVAL     : out std_logic
+      );
 end scd_proxy2_dout;
 
 architecture rtl of scd_proxy2_dout is
-
-   	component sync_reset
-   	port (
-        ARESET : in std_logic;
-        CLK    : in std_logic;
-        SRESET : out std_logic := '1'
-		);
-   	end component;
+     
+   component sync_reset
+      port (
+         ARESET : in std_logic;
+         CLK    : in std_logic;
+         SRESET : out std_logic := '1'
+         );
+   end component;
    
-   	signal sreset           : std_logic;	
-   	signal fval_last		: std_logic_vector(7 downto 0);
-   	signal fval_in			: std_logic_vector(7 downto 0);	
-	signal fval_i			: std_logic_vector(7 downto 0);	  
-	signal dval_i			: std_logic;
-	signal dout_i			: std_logic_vector(71 downto 0);
-	signal din_i			: std_logic_vector(31 downto 0);
-	signal compteur_dout	: std_logic := '0';
-	
-	type fsm_type is (idle, fval_high_st); 
-   	signal fval_fsm	     	: fsm_type; 
+    type array_type is array (0 to 7) of std_logic_vector(3 downto 0);
+   
+   signal sreset           : std_logic;	
+   signal fvals_i 	      : std_logic_vector(7 downto 0);
+   signal lvals_i 	      : std_logic_vector(7 downto 0);
+   signal ctrl_words       : array_type;
+   signal ctrl_words_last  : array_type;
+   signal dout_i           : std_logic_vector(DOUT'LENGTH-1 downto 0);
+   signal dout_dval_i      : std_logic;
+   signal ctrl_bits_i      : std_logic_vector(3 downto 0);
+   signal ctrl_bits_last   : std_logic_vector(3 downto 0);
+   signal fval_i           : std_logic;
+   signal lval_i           : std_logic;
+   signal output_en        : std_logic;
+   signal fval_last        : std_logic;
    
 begin
-	
-	--On cherche un 0xE
-	LVAL(7) <= DIN(31) and DIN(30) and DIN(29) and not(DIN(28)); 
-	LVAL(6) <= DIN(27) and DIN(26) and DIN(25) and not(DIN(24));
-	LVAL(5) <= DIN(23) and DIN(22) and DIN(21) and not(DIN(20));
-	LVAL(4) <= DIN(19) and DIN(18) and DIN(17) and not(DIN(16));
-	LVAL(3) <= DIN(15) and DIN(14) and DIN(13) and not(DIN(12));
-	LVAL(2) <= DIN(11) and DIN(10) and DIN(9) and not(DIN(8));
-	LVAL(1) <= DIN(7) and DIN(6) and DIN(5) and not(DIN(4));
-	LVAL(0) <= DIN(3) and DIN(2) and DIN(1) and not(DIN(0));	
-	
-	FVAL <= fval_i;
-	
-	DOUT <= dout_i;   
-	DOUT_DVAL <= dval_i and compteur_dout;
-	--------------------------------------------------
-    -- synchro reset 
-    --------------------------------------------------   
-    U1 : sync_reset
-    port map(
-       ARESET => ARESET,
-       CLK    => CLK,
-       SRESET => sreset);
    
-	
-	process(CLK)
-	begin
-		if rising_edge(CLK) then         
-        	if sreset = '1' then  
-			
-			else		 
-				
-				fval_in(7) <= not(DIN(31)) and not(DIN(30)) and DIN(29) and DIN(28); 
-				fval_in(6) <= not(DIN(27)) and not(DIN(26)) and DIN(25) and DIN(24);
-				fval_in(5) <= not(DIN(23)) and not(DIN(22)) and DIN(21) and DIN(20);
-				fval_in(4) <= not(DIN(19)) and not(DIN(18)) and DIN(17) and DIN(16);
-				fval_in(3) <= not(DIN(15)) and not(DIN(14)) and DIN(13) and DIN(12);
-				fval_in(2) <= not(DIN(11)) and not(DIN(10)) and DIN(9) and DIN(8);
-				fval_in(1) <= not(DIN(7)) and not(DIN(6)) and DIN(5) and DIN(4);
-				fval_in(0) <= not(DIN(3)) and not(DIN(2)) and DIN(1) and DIN(0);
-				fval_last <= fval_in;
-				
-				for I in fval_in'low to fval_in'high loop
-					--Pourrait aussi faire if fval_last(I) xor fval_in(I) then fval_i <= not(fval_i)
-					if fval_last(I)='1' and fval_in(I)='0' then
-						fval_i(I) <= '1';
-					elsif fval_last(I)='0' and fval_in(I)='1' then
-						fval_i(I) <= '0';
-					else
-						fval_i(I) <= fval_i(I);
-					end if;	 
-				end loop;
-
-				dval_i <= SUCCESS and DIN(3) and DIN(2) and DIN(1) and not(DIN(0));
-				din_i <= DIN;		
-				
-				--Règle comme quoi il y a toujours un nombre de pixel divisible par 4 par ligne
-				if dval_i = '1' and compteur_dout = '0' then
-					dout_i(31 downto 0) <= din_i;		  
-					compteur_dout <= '1';
-				elsif dval_i = '1' and compteur_dout = '1' then
-					dout_i(63 downto 32) <= din_i;
-					compteur_dout <= '0';
-				end if;	
-			end if;
-		end if;	
-	end process;
-		
-	
-
+   --------------------------------------------------
+   -- outputs mapping 
+   --------------------------------------------------    
+   FVALS        <= fvals_i;
+   LVALS        <= lvals_i;
+   DOUT         <= dout_i;   
+   DOUT_DVAL    <= dout_dval_i; 
+   
+   --------------------------------------------------
+   -- synchro reset 
+   --------------------------------------------------   
+   U1 : sync_reset
+   port map(
+      ARESET => ARESET,
+      CLK    => CLK,
+      SRESET => sreset); 
+   
+   --------------------------------------------------
+   -- inputs mapping 
+   --------------------------------------------------
+   -- toutes les combinaisons de control bits
+   U2:
+   for jj in 0 to 7 generate 
+   ctrl_words(jj) <= DIN(3 + 4*jj downto 0 + 4*jj);
+   end generate;
+   
+   -- successfull ctrl signals 
+   ctrl_bits_i <= DIN(31 downto 28);
+   fval_i      <= fvals_i(7);
+   lval_i      <= lvals_i(7);
+   
+   --------------------------------------------------
+   -- signaux pour calibration 
+   --------------------------------------------------   
+   U3: process(CLK)
+   begin
+      if rising_edge(CLK) then         
+         if sreset = '1' then             
+            lvals_i <= (others => '0');
+            fvals_i <= (others => '0');
+            for jj in 0 to 7 loop
+               ctrl_words_last(jj) <= (others => '0'); 
+            end loop;
+            
+         else		 
+            
+            -- last control bits
+            ctrl_words_last <= ctrl_words;    -- valeur précédente de ctrl_words
+            
+            for jj in 0 to 7 loop
+               
+               ---------------------------------------
+               -- fval                                
+               ---------------------------------------
+               -- montée
+               if ctrl_words_last(jj) = x"3" and ctrl_words(jj) /= x"3" then
+                  fvals_i(jj) <= '1';
+               end if;               
+               -- descente
+               if ctrl_words_last(jj) /= x"3" and ctrl_words(jj) = x"3" then
+                  fvals_i(jj) <= '0';
+               end if;               
+               
+               ---------------------------------------
+               -- lval                                
+               ---------------------------------------
+               -- montée
+               if ctrl_words_last(jj) /= x"E" and ctrl_words(jj) = x"E" then
+                  lvals_i(jj) <= '1';
+               end if;               
+               -- descente
+               if ctrl_words_last(jj) = x"E" and ctrl_words(jj) /= x"E" then
+                  lvals_i(jj) <= '0';
+               end if;               
+               
+            end loop;
+            
+         end if;
+      end if;	
+   end process;
+   
+   --------------------------------------------------
+   -- signaux de sortie 
+   --------------------------------------------------   
+   U4: process(CLK)
+   begin
+      if rising_edge(CLK) then         
+         if sreset = '1' then             
+            dout_dval_i <= '0';
+            output_en <= '0';
+            fval_last <= '0';
+            
+         else		 
+            
+            fval_last <= fval_i;
+            ctrl_bits_last <= ctrl_bits_i;
+            
+            -- generation d'un signal de synhcro de la sortie des données
+            if SUCCESS = '1' and fval_last = '0' and fval_i = '1' then
+               output_en <= '1';                 -- synchro parfaite 
+            end if;
+            
+            ---------------------------------------
+            -- definition des sorties                               
+            ---------------------------------------
+            -- dout_dval_i
+            dout_dval_i <= output_en and (fval_i or  (fval_last and not fval_i));   -- on envoie aussi la fin de fval à la sortie au moyen de (fval_last and not fval_i)
+            
+            -- dout_i
+            dout_i(31) <= '0';         -- non utilisé
+            dout_i(30) <= fval_i;      -- fval
+            
+            -- lval and dval
+            if ctrl_bits_last /= x"E" and ctrl_bits_i = x"E" then
+               dout_i(29) <= '1';    -- lval
+               dout_i(28) <= '1';    -- dval
+            end if;               
+            if ctrl_bits_last = x"E" and ctrl_bits_i /= x"E" then
+               dout_i(29) <= '0';    -- lval
+               dout_i(28) <= '0';    -- dval
+            end if;
+            
+            -- pix data
+            dout_i(27 downto 14) <= DIN(27 downto 14); -- pixel 1  
+            dout_i(13 downto 0)  <= DIN(13 downto 0);  -- pixel 0             
+            
+         end if;
+      end if;	
+   end process;
+   
+   
 end rtl;
