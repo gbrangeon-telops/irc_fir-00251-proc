@@ -129,6 +129,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    signal user_ysize2 : natural;
    signal user_xsize3 : natural;
    signal user_ysize3 : natural;
+   signal cnt         : integer := 0;
    
    
    signal user_cfg_vector1              : unsigned(QWORDS_NUM*32-1 downto 0);
@@ -206,9 +207,28 @@ begin
       if rising_edge(CLK_100M) then
          FPA_EXP_INFO.exp_time <= to_unsigned(100, FPA_EXP_INFO.exp_time'length);
          FPA_EXP_INFO.exp_indx <= x"05";
-         FPA_EXP_INFO.exp_dval <='0';
-         FPA_EXP_INFO.exp_dval <= ADC_CLK_INT;
+         
+         
+         cnt <= cnt + 1;
+         
+         case cnt is
+            
+            when 0 => 
+               FPA_EXP_INFO.exp_dval <= '0';
+            
+            when 200 => 
+               FPA_EXP_INFO.exp_dval <= '1';
+            
+            when 202 =>
+               FPA_EXP_INFO.exp_dval <= '0';
+               cnt <= 202;
+            
+            when others =>
+            
+         end case;   
+         
       end if;
+
    end process;
    
    HDER_MISO.WREADY  <= '1';

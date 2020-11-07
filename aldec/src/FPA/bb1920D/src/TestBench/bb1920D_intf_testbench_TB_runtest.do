@@ -81,7 +81,8 @@ asim -ses bb1920D_intf_testbench_TB
 -- mb_interface
 wave UUT/U1/U4/*  
 #
-#
+# 
+wave UUT/U1/U5/U1/U6A/*
 wave UUT/U1/U5/U1/* 
 #wave UUT/U1/U5/U2/*
 #
