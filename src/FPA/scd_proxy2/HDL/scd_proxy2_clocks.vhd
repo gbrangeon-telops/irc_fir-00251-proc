@@ -51,7 +51,7 @@ architecture rtl of scd_proxy2_clocks is
    
 begin
    
-   Gen_BB1920_4CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (PROXY_CHANNEL_LINK_NUM = 4) generate   
+   Gen_BB1920_4CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (DEFINE_FPA_PIX_NUM_PER_PCLK = 4) generate   
       begin  
       
       U1 :  bb1920D_clks_mmcm
@@ -71,7 +71,7 @@ begin
       
    end generate;
    
-      Gen_BB1920_8CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (PROXY_CHANNEL_LINK_NUM = 8) generate   
+      Gen_BB1920_8CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (DEFINE_FPA_PIX_NUM_PER_PCLK = 8) generate   
       begin  
       
       U1 :  bb1920D_clks_mmcm
