@@ -510,7 +510,68 @@ begin
             axi_rdata <= STATUS_MISO.RDATA;   -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
             
          elsif MB_MOSI.ARADDR(11) = '1' then  -- adresse de base pour la lecture des statuts ne provenant pas du generateur de statuts
-            axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK, axi_rdata'length));
+            
+            case MB_MOSI.ARADDR(7 downto 0) is 
+               -- feedback de la config envoyée au MB pour validation visuelle via debug_terminal
+               
+               when X"00" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_mode                   , 32));           
+               when X"04" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_type                   , 32));
+               when X"08" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_pwr_on                      , 32));
+               when X"0C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_mode              , 32));
+               when X"10" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_ctrl_dly           , 32));
+               when X"14" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_spare                       , 32));
+               when X"18" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_ctrl_dly          , 32));
+               when X"1C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_timeout_dly       , 32));
+               when X"20" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig            , 32));
+               when X"24" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.clk100_to_intclk_conv_numerator , 32));
+               when X"28" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.intclk_to_clk100_conv_numerator , 32));
+               when X"2C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xstart                            , 32));
+               when X"30" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ystart                            , 32));
+               when X"34" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xsize                             , 32));
+               when X"38" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ysize                             , 32));
+               when X"3C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.frame_time                        , 32));
+               when X"40" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.gain                              , 32));
+               when X"44" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.int_mode                          , 32));
+               when X"48" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.test_mode	                      , 32));
+               when X"4C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vbias                         , 32));
+               when X"50" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_ibias                         , 32));
+               when X"54" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vsat                          , 32));
+               when X"58" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.binning                           , 32));
+               when X"5C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.output_chn                        , 32));
+               when X"60" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare1		                      , 32));
+               when X"64" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare2		                      , 32));
+               when X"68" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare3		                      , 32));
+               when X"6C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare4                            , 32));
+               when X"70" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.cfg_num                           , 32));
+               when X"74" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.ysize                           , 32));
+               when X"78" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.xsize_div_tapnum                , 32));
+               when X"7C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.lovh_mclk_source                , 32));
+               when X"80" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.frame_dly_cst                        , 32));
+               when X"84" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_dly_cst                          , 32));
+               when X"88" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.additional_fpa_int_time_offset       , 32));
+               when X"8C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.itr                                  , 32));
+               when X"90" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly           , 32));                                                      
+               when X"94" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.cmd_hder                             , 32));
+               when X"98" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_id                           , 32));
+               when X"9C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_dlen                         , 32));
+               when X"A0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_offs_add                     , 32));
+               when X"A4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_num                  , 32));
+               when X"A8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_len                  , 32));                                                                             
+               when X"AC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_id                            , 32));
+               when X"B0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_id                          , 32));                                                                             
+               when X"B4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_bram_base_add                 , 32));
+               when X"B8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_bram_base_add                , 32));
+               when X"BC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_bram_base_add               , 32));                                                                             
+               when X"C0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_bram_base_add_m1             , 32));
+               when X"C4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_checksum_base_add                , 32));
+               when X"C8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.cmd_overhead_bytes_num               , 32));
+               when X"CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_clk_period_factor                , 32));
+                                                                                                                            
+               when X"FC" =>  axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK, 32));              
+               
+               when others =>
+               
+            end case;
             
          else 
             axi_rdata <= (others =>'1'); 
