@@ -27,51 +27,49 @@
    #define SCD_PROXY
 #endif
 
-#define FPA_DEVICE_MODEL_NAME    "PELICAND"
+#define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920"
 
-#define FPA_WIDTH_MIN      132    // les tests ont prouvé qu'en medium, les donnée ssont non corrompues jusqu'à 132. En 128, on releve des corruptions
-#define FPA_WIDTH_MAX      640
-#define FPA_WIDTH_MULT     2
+#define FPA_WIDTH_MIN      64   
+#define FPA_WIDTH_MAX      1920
+#define FPA_WIDTH_MULT     8
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
 #define FPA_HEIGHT_MIN     2
-#define FPA_HEIGHT_MAX     512
+#define FPA_HEIGHT_MAX     1536
 #define FPA_HEIGHT_MULT    2
 #define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
-#define FPA_OFFSETX_MULT   2
+#define FPA_OFFSETX_MULT   8
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 
 #define FPA_OFFSETY_MIN    0
 #define FPA_OFFSETY_MULT   2
 #define FPA_OFFSETY_MULT_CORR    4
-#define FPA_OFFSETY_MAX    508 //(FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
+#define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
-#define FPA_NUM_CH         2  // nombre de canaux de sorties  (1,2 ou 3)
-#define FPA_CLINK_PIX_NUM  2
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (PelicanDIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Blackbird1920DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
-#define FPA_EVEN_TO_ODD_DELAY 4     // CLK
-#define FPA_ODD_TO_EVEN_DELAY 144   // CLK
-#define FPA_IMAGE_DATA_DELAY  370*1E-6F   // [us]max
-#define FPA_NB_PIX_CLK     1
-#define FPA_TRI_MIN_US     50*1E-6F
+//#define FPA_EVEN_TO_ODD_DELAY 4     // CLK
+//#define FPA_ODD_TO_EVEN_DELAY 144   // CLK
+//#define FPA_IMAGE_DATA_DELAY  370*1E-6F   // [us]max
+//#define FPA_NB_PIX_CLK     1
+//#define FPA_TRI_MIN_US     50*1E-6F
 
-#define FPA_MAX_GAIN       1
-#define FPA_NUMTAPS        1  // [taps]
-#define FPA_PX_TAP         1  // [pixel/clock/tap]
-#define FPA_DELAY          11 // [clock cycles]
-#define FPA_LOVH           1  // [clock cycles]
-#define FPA_FOVH           0  // [clock cycles]
-#define FPA_MIN_PER        0  // [clock cycles]
+//#define FPA_MAX_GAIN       1
+//#define FPA_NUMTAPS        1  // [taps]
+//#define FPA_PX_TAP         1  // [pixel/clock/tap]
+//#define FPA_DELAY          11 // [clock cycles]
+//#define FPA_LOVH           1  // [clock cycles]
+//#define FPA_FOVH           0  // [clock cycles]
+//#define FPA_MIN_PER        0  // [clock cycles]
 
 #define FPA_COOLER_TEMP_THRES    -19400
 #define FPA_COOLER_TEMP_TOL      100
@@ -98,14 +96,14 @@
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
 #define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
-#define FPA_MCLK_RATE_HZ               80E+6F   // fréquence de l'horloge du SCD Proxy
+#define FPA_MCLK_RATE_HZ               70E+6F   // fréquence de l'horloge du SCD Proxy
 
 #define FPA_DATA_RESOLUTION            13
-#define FPA_PIXEL_PITCH                15E-6F
+#define FPA_PIXEL_PITCH                10E-6F
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
-#define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUM_CH * FPA_MCLK_RATE_HZ)  // [pix/sec]
+#define FPA_PIX_THROUGHPUT_PEAK        338E+6F  // [pix/sec]  avec ou sans reducteur de vitesse, on ne depassera pas virtuellement cette vitesse
 
 #define XTRA_TRIG_MODE_DELAY           100000  // us
 
@@ -118,51 +116,64 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  SIZE;
    uint32_t  ADD;
    
-   // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_diag_mode;              // utilisé par le trig_controller.vhd            
-   uint32_t  fpa_diag_type;              // utilisé par le generateur de données diag de Telops
-   uint32_t  fpa_pwr_on;                 // utilisé par le fpa_intf_sequencer.vhd            
-   uint32_t  fpa_trig_ctrl_mode;         // utilisé par le trig_controller.vhd    
-   uint32_t  fpa_acq_trig_ctrl_dly;      // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_spare;                  // utilisé par le trig_controller.vhd
-   uint32_t  fpa_xtra_trig_ctrl_dly;     // utilisé par le trig_controller.vhd  
-   uint32_t  fpa_trig_ctrl_timeout_dly;   // utilisé par le trig_controller.vhd
+   uint32_t comn_fpa_diag_mode                  ; 
+   uint32_t comn_fpa_diag_type                  ; 
+   uint32_t comn_fpa_pwr_on                     ; 
+   uint32_t comn_fpa_trig_ctrl_mode             ; 
+   uint32_t comn_fpa_acq_trig_ctrl_dly          ; 
+   uint32_t comn_fpa_spare                      ; 
+   uint32_t comn_fpa_xtra_trig_ctrl_dly         ; 
+   uint32_t comn_fpa_trig_ctrl_timeout_dly      ; 
+   uint32_t comn_fpa_stretch_acq_trig           ; 
+   uint32_t comn_clk100_to_intclk_conv_numerator; 
+   uint32_t comn_intclk_to_clk100_conv_numerator; 
    
-   // partie scd cmd operationnelle (tout changement dans cette partie entraine la reprogrammation du détecteur)
-   uint32_t  scd_xstart;                
-   uint32_t  scd_ystart;                
-   uint32_t  scd_xsize;                
-   uint32_t  scd_ysize;                
-   uint32_t  scd_gain;                 
-   uint32_t  scd_out_chn;              
-   uint32_t  scd_diode_bias;                           
-   uint32_t  scd_int_mode;
-   uint32_t  scd_boost_mode;
-   uint32_t  scd_pix_res;              
-   uint32_t  scd_frame_period_min;         
+   uint32_t op_xstart                           ; 
+   uint32_t op_ystart                           ; 
+   uint32_t op_xsize                            ; 
+   uint32_t op_ysize                            ; 
+   uint32_t op_frame_time                       ; 
+   uint32_t op_gain                             ; 
+   uint32_t op_int_mode                         ; 
+   uint32_t op_test_mode	                     ; 
+   uint32_t op_det_vbias                        ; 
+   uint32_t op_det_ibias                        ; 
+   uint32_t op_det_vsat                         ; 
+   uint32_t op_binning                          ; 
+   uint32_t op_output_chn                       ; 
+   uint32_t op_spare1		                     ; 
+   uint32_t op_spare2		                     ; 
+   uint32_t op_spare3		                     ; 
+   uint32_t op_spare4                           ; 
+   uint32_t op_cfg_num                          ; 
    
-   // partie scd cmd diag (tout changement dans cette partie entraine la reprogrammation du détecteur)
-   uint32_t  scd_bit_pattern;       
-       
-   // partie misc   (quelques parametres utilisés en mode diag Telops pour simuler le detecteur et en extra_trig . Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-
-   uint32_t  scd_x_to_readout_start_dly;              // Pelican/Hercule : delay T6 on fig 1 or 3(d1k3008-rev1), BB1280 : FR_DLY (section 3.2.4.3.2 in D15F002 REV2 )
-   uint32_t  scd_fsync_re_to_fval_re_dly;             // Pelican/Hercule : delay T1 on fig 5 (d1k3008-rev1)
-   uint32_t  scd_fval_re_to_dval_re_dly;              // Pelican/Hercule : delay T2 on fig 5 (d1k3008-rev1)
-   uint32_t  scd_hdr_high_duration;                   // Pelican/Hercule : delay T6 on fig 5 (d1k3008-rev1)
-   uint32_t  scd_lval_high_duration;                  // Pelican/Hercule : delay T3 on fig 5 (d1k3008-rev1)
-   uint32_t  scd_hdr_start_to_lval_re_dly;            // Pelican/Hercule : delay T5 on fig 5 (d1k3008-rev1)
-   uint32_t  scd_lval_pause_dly;                      // Pelican/Hercule : delay T4 on fig 5 (d1k3008-rev1)
-   uint32_t  scd_x_to_next_fsync_re_dly;              // Pelican/Hercule : delay T5 on fig 1 & 3 (d1k3008-rev1)
-   uint32_t  scd_fsync_re_to_intg_start_dly;          // Pelican/Hercule : delay T4 on fig 1 & 3 (d1k3008-rev1)
-   uint32_t  scd_xsize_div_per_pixel_num;             // Pelican/Hercule = clink base (pixel_num = 2), BB1280 = clink full (pixel_num = 4)
-   uint32_t  cfg_num;
+   uint32_t diag_ysize                          ; 
+   uint32_t diag_xsize_div_tapnum               ; 
+   uint32_t diag_lovh_mclk_source               ; 
    
-   // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
-   uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
+   uint32_t frame_dly_cst                       ; 
+   uint32_t int_dly_cst                         ; 
+   uint32_t additional_fpa_int_time_offset      ; 
+   uint32_t itr                                 ; 
+   uint32_t real_mode_active_pixel_dly          ; 
+   uint32_t cmd_hder                            ; 
    
-      // specifie la partie de la structure à mettre à jour (pour eviter des bugs)
-   uint32_t  proxy_cmd_to_update_id;
+   uint32_t int_cmd_id                          ; 
+   uint32_t int_cmd_dlen                        ; 
+   uint32_t int_cmd_offs_add                    ; 
+   
+   uint32_t fpa_serdes_lval_num                 ; 
+   uint32_t fpa_serdes_lval_len                 ; 
+   uint32_t op_cmd_id                           ; 
+   uint32_t temp_cmd_id                         ; 
+   uint32_t op_cmd_bram_base_add                ; 
+   uint32_t int_cmd_bram_base_add               ; 
+   uint32_t temp_cmd_bram_base_add              ; 
+   uint32_t int_cmd_bram_base_add_m1            ; 
+   uint32_t int_checksum_base_add               ; 
+   uint32_t cmd_overhead_bytes_num              ; 
+   uint32_t int_clk_period_factor               ; 
+   
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
