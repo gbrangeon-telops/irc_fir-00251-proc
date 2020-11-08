@@ -15,6 +15,11 @@ end BB1920D_intf_testbench_tb;
 architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    -- Component declaration of the tested unit
    component BB1920D_intf_testbench
+      
+      generic(
+         G_FPA_TAP_NUMBER : integer := 4
+         );
+      
       port(
          ARESETN        : in STD_LOGIC;
          CLK_100M       : in STD_LOGIC;
@@ -228,7 +233,7 @@ begin
          end case;   
          
       end if;
-
+      
    end process;
    
    HDER_MISO.WREADY  <= '1';
@@ -368,6 +373,11 @@ begin
    
    -- Unit Under Test port map
    UUT : BB1920D_intf_testbench
+   
+   generic map (
+      G_FPA_TAP_NUMBER   => TAP_NUM
+      )
+   
    port map (
       ARESETN              =>     ARESETN,        
       CLK_100M             =>     CLK_100M,

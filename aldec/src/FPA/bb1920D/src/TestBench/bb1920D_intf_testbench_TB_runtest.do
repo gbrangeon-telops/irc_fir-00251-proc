@@ -4,8 +4,6 @@ acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
 acom d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd
-acom d:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\FPA_define.vhd
-acom d:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\Proxy_define.vhd 
 acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 
 #utilities
@@ -67,7 +65,7 @@ acom D:\Telops\FIR-00251-Proc\IP\325\bb1920D_clks_mmcm\bb1920D_clks_mmcm_sim_net
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
 
 acom d:\Telops\FIR-00251-Common\VHDL\signal_stat\period_duration.vhd
-do D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\compil_scd_proxy2.do
+do D:\Telops\FIR-00251-Proc\src\FPA\blackbird1920D\HDL\compil_blackbird1920D.do
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\bb1920D\src\TestBench\bb1920_data_gen.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\bb1920D\src\TestBench\sim_data_gen.bde
