@@ -16,7 +16,12 @@ use work.fpa_common_pkg.all;
 use work.fpa_define.all;
 
 entity scd_proxy2_clocks is
-   port(
+   
+   generic (
+      G_FPA_PIX_NUM_PER_PCLK : integer := 4
+      );
+      
+      port(
       
       ARESET           : in std_logic;
       CLK_100M_IN      : in std_logic;
@@ -51,7 +56,7 @@ architecture rtl of scd_proxy2_clocks is
    
 begin
    
-   Gen_BB1920_4CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (DEFINE_FPA_PIX_NUM_PER_PCLK = 4) generate   
+   Gen_BB1920_4CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (G_FPA_PIX_NUM_PER_PCLK = 4) generate   
       begin  
       
       U1 :  bb1920D_clks_mmcm
@@ -71,7 +76,7 @@ begin
       
    end generate;
    
-      Gen_BB1920_8CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (DEFINE_FPA_PIX_NUM_PER_PCLK = 8) generate   
+   Gen_BB1920_8CHN : if (DEFINE_FPA_ROIC = FPA_ROIC_BLACKBIRD1920) and  (G_FPA_PIX_NUM_PER_PCLK = 8) generate   
       begin  
       
       U1 :  bb1920D_clks_mmcm

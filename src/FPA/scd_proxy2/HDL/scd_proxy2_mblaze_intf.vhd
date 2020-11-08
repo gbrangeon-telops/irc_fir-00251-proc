@@ -20,6 +20,11 @@ use work.Proxy_define.all;
 use work.Tel2000.all;
 
 entity scd_proxy2_mblaze_intf is
+   
+   generic (
+      G_FPA_PIX_NUM_PER_PCLK : integer := 4
+      );
+   
    port(
       ARESET               : in std_logic;
       MB_CLK               : in std_logic;
@@ -501,8 +506,12 @@ begin
    begin
       if rising_edge(MB_CLK) then         
          
-         if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts
-            axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
+         if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts provenant du generateur de statuts
+            axi_rdata <= STATUS_MISO.RDATA;   -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
+            
+         elsif MB_MOSI.ARADDR(11) = '1' then  -- adresse de base pour la lecture des statuts ne provenant pas du generateur de statuts
+            axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK, axi_rdata'length));
+            
          else 
             axi_rdata <= (others =>'1'); 
          end if;
