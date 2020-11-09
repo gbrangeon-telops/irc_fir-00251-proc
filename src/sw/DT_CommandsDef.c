@@ -539,8 +539,6 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.fpa_powered = %d", status.fpa_powered);
    DT_PRINTF("fpa.cooler_powered = %d", status.cooler_powered);
 
-   DT_PRINTF("fpa.itr = %d", gFpaIntf.itr);
-
    DT_PRINTF("fpa.errors_latchs = 0x%08X", status.errors_latchs);
 
    DT_PRINTF("fpa.intf_seq_stat = 0x%08X", status.intf_seq_stat);
