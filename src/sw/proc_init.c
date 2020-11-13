@@ -78,7 +78,6 @@ uint16_t gFpaElCorrMeasAtStarvation;
 uint16_t gFpaElCorrMeasAtSaturation; 
 uint16_t gFpaElCorrMeasAtReference1; 
 uint16_t gFpaElCorrMeasAtReference2;
-
 int32_t gFpaExposureTimeOffset = 0;
 int32_t gFpaDebugRegA = 0;
 int32_t gFpaDebugRegB = 0;
@@ -88,6 +87,13 @@ int32_t gFpaDebugRegE = 0;
 int32_t gFpaDebugRegF = 0;
 int32_t gFpaDebugRegG = 0;
 int32_t gFpaDebugRegH = 0;
+uint8_t gFpaDiodeBiasEnum = 0xFF;   //Undefined value, default will be used
+uint16_t gFpaDetectSub_mV = 0;
+uint16_t gFpaCtiaRef_mV = 0;
+uint16_t gFpaVTestG_mV = 0;
+uint16_t gFpaCM_mV = 0;
+uint16_t gFpaVCMO_mV = 0;
+uint16_t gFpaTapRef_mV = 0;
 t_HderInserter gHderInserter = HderInserter_Ctor(XPAR_HEADER_CTRL_BASEADDR);
 t_fan gFan = FAN_Ctor(XPAR_FAN_CTRL_BASEADDR);
 t_calib gCal = CAL_Config_Ctor(XPAR_CALIBCONFIG_AXI_BASEADDR);

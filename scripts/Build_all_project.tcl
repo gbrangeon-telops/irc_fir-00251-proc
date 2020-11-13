@@ -6,6 +6,9 @@ set release 1
 
 #Select Detector to build
 
+#lappend detector_list {blackbird1280D160}
+lappend detector_list {blackbird1280D325}
+
 lappend detector_list {hawkA160}
 #lappend detector_list {hawkA325}
 
@@ -51,8 +54,8 @@ lappend detector_list {scorpiomwD160}
 lappend detector_list {suphawkA160}
 #lappend detector_list {suphawkA325}
 
-#lappend detector_list {blackbird1280D160}
-lappend detector_list {blackbird1280D325}
+#lappend detector_list {xro3503A160}
+lappend detector_list {xro3503A325}
 
 #DO NOT MODIFY BEYOND THIS POINT
 

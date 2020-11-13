@@ -305,12 +305,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // direction de readout
    ptrA->invert = 0;
    ptrA->revert = 0;
-   
-   // fenetrage
-   ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
-   ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
-   ptrA->xsize     = (uint32_t)pGCRegs->Width;
-   ptrA->ysize     = (uint32_t)pGCRegs->Height;
       
     // DIG voltage 
    if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)

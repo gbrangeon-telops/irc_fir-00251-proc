@@ -64,3 +64,7 @@ build_proc_sw scorpiolwD_230Hz 160
 create_proc_sw suphawkA
 build_proc_sw suphawkA 160
 #build_proc_sw suphawkA 325
+
+create_proc_sw xro3503A
+build_proc_sw xro3503A 325
+#build_proc_sw xro3503A 160

@@ -25,6 +25,7 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #do  "$FIR251PROC\src\fir_00251_top_scorpiomwD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_startup_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_suphawkA_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_xro3503A_build.do"
 
 #Collective builds (non-recursive)
 #---------------------------------
@@ -84,5 +85,8 @@ acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwD.bde"
 #FPA suphawkA
 do "$FIR251PROC\src\FPA\suphawkA\HDL\compil_suphawkA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_suphawkA.bde"
+#FPA xro3503A
+do "$FIR251PROC\src\FPA\xro3503A\HDL\compil_xro3503A.do"
+acom  "$FIR251PROC\src\fir_00251_proc_xro3503A.bde"
 
 #__END BUILD ALL PROC

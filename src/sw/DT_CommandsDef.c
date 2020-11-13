@@ -53,6 +53,7 @@
 
 static IRC_Status_t DebugTerminalParseIRIG(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHDER(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseCAL(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseTRIG(circByteBuffer_t *cbuf);
@@ -92,6 +93,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"RDM", DebugTerminalParseRDM},
    {"WRM", DebugTerminalParseWRM},
    {"FPA", DebugTerminalParseFPA},
+   {"XRO", DebugTerminalParseXRO},
    {"HDER", DebugTerminalParseHDER},
    {"CAL", DebugTerminalParseCAL},
    {"TRIG", DebugTerminalParseTRIG},
@@ -593,6 +595,106 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
    DT_PRINTF("fpa.trig_to_int_delay_max = %d", status.trig_to_int_delay_max);
    DT_PRINTF("fpa.int_to_int_delay_min  = %d", status.int_to_int_delay_min);
    DT_PRINTF("fpa.int_to_int_delay_max  = %d", status.int_to_int_delay_max);
+
+   return IRC_SUCCESS;
+}
+
+/**
+ * Debug terminal get XRO status command parser.
+ * This parser is used to parse and validate get XRO status command arguments and to
+ * execute the command.
+ *
+ * @return IRC_SUCCESS when XRO status command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
+{
+   extern t_FpaIntf gFpaIntf;
+   extern uint8_t gFpaDiodeBiasEnum;
+   extern uint16_t gFpaDetectSub_mV;
+   extern uint16_t gFpaCtiaRef_mV;
+   extern uint16_t gFpaVTestG_mV;
+   extern uint16_t gFpaCM_mV;
+   extern uint16_t gFpaVCMO_mV;
+   extern uint16_t gFpaTapRef_mV;
+
+   uint8_t cmdStr[10], argStr[7];
+   uint32_t arglen;
+   uint32_t uValue;
+
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      // Read command value
+      arglen = GetNextArg(cbuf, cmdStr, sizeof(cmdStr) - 1);
+      if (arglen == 0)
+      {
+         DT_ERR("Invalid command");
+         return IRC_FAILURE;
+      }
+      cmdStr[arglen++] = '\0'; // Add string terminator
+
+      // Read argument value
+      arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
+      if ((ParseNumArg((char *)argStr, arglen, &uValue) != IRC_SUCCESS) ||
+            ((uValue < 0) && (uValue > USHRT_MAX)))
+      {
+         DT_ERR("Invalid argument");
+         return IRC_FAILURE;
+      }
+
+      // There is supposed to be no remaining bytes in the buffer
+      if (!DebugTerminal_CommandIsEmpty(cbuf))
+      {
+         DT_ERR("Unsupported command arguments");
+         return IRC_FAILURE;
+      }
+
+      // Process command
+      if (strcasecmp((char *)cmdStr, "BIAS") == 0)
+      {
+         gFpaDiodeBiasEnum = (uint8_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "DETECTSUB") == 0)
+      {
+         gFpaDetectSub_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "CTIAREF") == 0)
+      {
+         gFpaCtiaRef_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VTESTG") == 0)
+      {
+         gFpaVTestG_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "CM") == 0)
+      {
+         gFpaCM_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "VCMO") == 0)
+      {
+         gFpaVCMO_mV = (uint16_t)uValue;
+      }
+      else if (strcasecmp((char *)cmdStr, "TAPREF") == 0)
+      {
+         gFpaTapRef_mV = (uint16_t)uValue;
+      }
+      else
+      {
+         DT_ERR("Unsupported command");
+         return IRC_FAILURE;
+      }
+
+      FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
+   }
+
+   DT_PRINTF("FPA CTIA bias current enum = %d", gFpaDiodeBiasEnum);
+
+   DT_PRINTF("FPA DETECTSUB voltage = %d mV", gFpaDetectSub_mV);
+   DT_PRINTF("FPA CTIAREF voltage = %d mV", gFpaCtiaRef_mV);
+   DT_PRINTF("FPA VTESTG voltage = %d mV", gFpaVTestG_mV);
+   DT_PRINTF("FPA CM voltage = %d mV", gFpaCM_mV);
+   DT_PRINTF("FPA VCMO voltage = %d mV", gFpaVCMO_mV);
+   DT_PRINTF("FPA TAPREF voltage = %d mV", gFpaTapRef_mV);
 
    return IRC_SUCCESS;
 }
@@ -2501,6 +2603,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2|BIAS value]");
+   DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|TAPREF value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
