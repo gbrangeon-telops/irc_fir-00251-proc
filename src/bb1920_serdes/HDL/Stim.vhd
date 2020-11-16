@@ -126,13 +126,13 @@ begin
    --The format of stimulus_lineX needs to be 4 hex per line
 	read_image_process : process
 		variable l : line;
-		variable s : string(1 to 16);
+		variable s : string(1 to 8);
 	begin
 	  
       wait for clk_period * 10;
       
       --Read startup of the detector
-      file_open(stimulus_start_up, "", read_mode);
+      file_open(stimulus_start_up, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\Start_up.txt", read_mode);
       while not endfile(stimulus_start_up) loop
          wait until rising_edge(clk_i);
          readline(stimulus_start_up,l);
@@ -143,7 +143,7 @@ begin
       --Read the image in an infinite loop like the detector would
       --Only one image is read in a loop
       while true loop
-         file_open(stimulus_image, "D:\Telops\2020-08-08 Line Buffer\Simulation\Line_buffer\src\LineX.txt",  read_mode);
+         file_open(stimulus_image, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\Image.txt",  read_mode);
          while not endfile(stimulus_image) loop
             wait until rising_edge(clk_i);	
             readline(stimulus_image,l);

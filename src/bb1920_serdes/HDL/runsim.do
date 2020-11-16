@@ -1,6 +1,6 @@
-asim -ses +access +r Top_Level
+asim -ses +access +r scd_proxy2_serdes_simulation --\scd_proxy2_serdes\
 
 --do waveform.do	   
-do "D:\Telops\2020-08-08 Line Buffer\Simulation\Line_buffer\src\waveform.do"
+do "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\waveform.do"
 
 run 10 ns
