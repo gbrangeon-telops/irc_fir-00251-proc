@@ -22,6 +22,7 @@
 #include "flashSettings.h"
 #include "utils.h"
 #include "IRC_status.h"
+#include "exposure_time_ctrl.h"
 #include <math.h>
 #include <string.h>
 
@@ -45,12 +46,12 @@
 #define T_lINE_CONV_CORR                  12.0F     // [TFPP clks], Nécessaire pour ne pas faire planter le proxy (voir redmine 14065 pour justifications).
   
 
-// Parametres de la commande serielle du PelicanD
-#define SCD_LONGEST_CMD_BYTES_NUM         33      // longueur en bytes de la plus longue commande serielle du PelicanD
+// Parametres de la commande serielle du bb1920D
+#define SCD_LONGEST_CMD_BYTES_NUM         33      // longueur en bytes de la plus longue commande serielle du bb1920D
 #define SCD_CMD_OVERHEAD_BYTES_NUM        6       // longueur des bytes autres que ceux des données
 
 // Mode d'operation choisi pour le contrôleur de trig 
-#define MODE_READOUT_END_TO_TRIG_START     0x00    // provient du fichier fpa_common_pkg.vhd. Ce mode est choisi car plus simple pour le PelicanD
+#define MODE_READOUT_END_TO_TRIG_START     0x00    // provient du fichier fpa_common_pkg.vhd. Ce mode est choisi car plus simple pour le bb1920D
 #define MODE_TRIG_START_TO_TRIG_START      0x01
 #define MODE_INT_END_TO_TRIG_START         0x02
 #define MODE_ITR_TRIG_START_TO_TRIG_START  0x03    
@@ -59,23 +60,23 @@
 
 
 
-// PelicanD integration modes definies par SCD  
+// bb1920D integration modes definies par SCD  
 #define SCD_ITR_MODE                      0x00    // valeur provenant du manuel de SCD
 #define SCD_IWR_MODE                      0x01    // valeur provenant du manuel de SCD
 
-// PelicanD mode of operation define by SCD
+// bb1920D mode of operation define by SCD
 #define SCD_BOOST_MODE                    0x00    // valeur provenant du manuel de SCD
 #define SCD_NORMAL_MODE                   0x01    // valeur provenant du manuel de SCD
 
-// PelicanD gains definis par SCD  
+// bb1920D gains definis par SCD  
 #define SCD_GAIN_0                        0x00   // plus gros puits
 #define SCD_GAIN_1                        0x02   // plus petit puits
 
-// PelicanD Clink modes
+// bb1920D Clink modes
 #define SCD_CLINK_1_CHN                   0x01   // mode clink 1 channel (base) tel que défini par scd
 #define SCD_CLINK_2_CHN                   0x00   // mode clink 2 channel (medium) tel que défini par scd
 
-// PelicanD Bias
+// bb1920D Bias
 static const uint8_t Scd_DiodeBiasValues[] = {
       0x0A,    // 1pA
       0x0B,    // 10pA
@@ -88,7 +89,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_BIAS_DEFAULT_IDX              2     // 100pA (default)
 #define SCD_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues) / sizeof(Scd_DiodeBiasValues[0]))
 
-// PelicanD Pixel resolution 
+// bb1920D Pixel resolution 
 #define SCD_PIX_RESOLUTION_15BITS         0x00    // 15 bits selon SCD
 #define SCD_PIX_RESOLUTION_14BITS         0x01    // 14 bits selon SCD
 #define SCD_PIX_RESOLUTION_13BITS         0x02    // 13 bits selon SCD
@@ -101,7 +102,6 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AW_SERIAL_INT_CMD_RAM_BASE_ADD    64      // adresse de base en ram pour la cmd int_time (la commande est implémentée uniquement dans le vhd)
 #define AW_SERIAL_DIAG_CMD_RAM_BASE_ADD   128     // adresse de base en ram pour la cmd diag de scd
 #define AW_SERIAL_TEMP_CMD_RAM_BASE_ADD   192     // adresse de base en ram pour la cmd read temperature
-#define AW_SERIAL_FRAME_RES_CMD_RAM_BASE_ADD   256     // Only use by BB1280
 
 // les ID des commandes
 #define SCD_INT_CMD_ID                    0x8001
@@ -110,7 +110,8 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_TEMP_CMD_ID                   0x8021
                       
 // adresse la lecture des statuts VHD
-#define AR_STATUS_BASE_ADD                0x0400  // adresse de base 
+#define AR_SPECIFIC_STATUS_BASE_ADD       0x0800  // adresse de base des statuts specifiques 
+#define AR_STATUS_BASE_ADD                0x0400  // adresse de base des statuts generiques 
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
 #define AR_FPA_INT_TIME                   0x00C0  // adresse temps d'intégration
 
@@ -128,7 +129,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AW_SERIAL_CFG_END_ADD             0xFC    
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
-#define FPA_ROIC_PELICAND                 0x16   // provient du fichier fpa_common_pkg.vhd. La valeur 0x16 est celle de FPA_ROIC_PELICAND
+#define FPA_ROIC_BLACKBIRD1920            0x16   // provient du fichier fpa_common_pkg.vhd. La valeur 0x16 est celle de FPA_ROIC_BLACKBIRD1920
 #define OUTPUT_DIGITAL                    0x02   // provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
 
 // adresse d'écriture du régistre du reset des erreurs
@@ -142,18 +143,16 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define TELOPS_DIAG_DEGR                  0xD2      // mode diag dégradé linéaire(patron de test dégradé linéairement et généré par la carte d'acquisition).Requis en production
 #define TELOPS_DIAG_DEGR_DYN              0xD3      // mode diag dégradé linéaire dynamique(patron de test dégradé linéairement et variant d'image en image et généré par la carte d'acquisition)  
 
-#define SCD_PE_NORM_OUTPUT 0
-#define SCD_PE_IO_TEST1    2
-#define SCD_PE_IO_TEST2    3
-#define SCD_PE_TEST1       4
+#define VHD_INVALID_TEMP                  0xFFFFFFFF
+#define VHD_ITR_PIPE_DLY_SEC              500E-9F     // estimation des differerents delais accumulés par le vhd
+#define VHD_IWR_PIPE_DLY_SEC              250E-9F     // estimation des differerents delais accumulés par le vhd
 
-#define VHD_INVALID_TEMP   0xFFFFFFFF
-#define VHD_ITR_PIPE_DLY_SEC             500E-9F     // estimation des differerents delais accumulés par le vhd
-#define VHD_IWR_PIPE_DLY_SEC             250E-9F     // estimation des differerents delais accumulés par le vhd
-
+#define VHD_CLK_100M_RATE_HZ              100E+6F
+#define FPA_INTG_CLK_RATE_HZ              35E+6F      // fréquence présentement utilisée de l'horloge d'integration (fonction de la resolution)
+#define FPA_INTG_CLK_RATE_MAX_HZ          70E+6F      // fréquence maximale de l'horloge d'integration
 
 // structure interne pour les parametres des figure1 et 2 ( se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD) 
-struct Scd_Fig1orFig2Param_s             // 
+struct bb1920D_param_s             // 
 {					   
    float TFPP_CLK;                       
    float Trelax;
@@ -172,19 +171,7 @@ struct Scd_Fig1orFig2Param_s             //
    float T7;
    float T8;
 };
-typedef struct Scd_Fig1orFig2Param_s Scd_Fig1orFig2Param_t;
-
-// structure interne pour les parametres de la figure 4 ( se reporter au document Communication Protocol Appendix A5 (SPEC. NO: DPS3008) de SCD) 
-struct Scd_Fig4Param_s             // 
-{					   
-   float T1;
-   float T2;
-   float T3;
-   float T4;
-   float T5;
-   float T6;      
-};
-typedef struct Scd_Fig4Param_s Scd_Fig4Param_t;
+typedef struct bb1920D_param_s bb1920D_param_t;
 
 // structure interne pour les commandes de Scd
 struct Command_s             // 
@@ -193,7 +180,7 @@ struct Command_s             //
    uint16_t ID;
    uint16_t DataLength;
    uint8_t  Data[SCD_LONGEST_CMD_BYTES_NUM - SCD_CMD_OVERHEAD_BYTES_NUM];
-   uint16_t  SerialCmdRamBaseAdd;  // ajouté pour envoyer la commande à la bonne adresse dans la RAm
+   uint16_t SerialCmdRamBaseAdd;  // ajouté pour envoyer la commande à la bonne adresse dans la RAm
    // cheksum est calculé seulement lors de l'envoi 
 };
 typedef struct Command_s Command_t;
@@ -207,15 +194,76 @@ struct ScdPacketTx_s             //
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
 
+// statuts specifiques du vhd du module fpa
+struct s_FpaSpecificStatus    
+{
+   
+   uint32_t comn_fpa_diag_mode                     ;  
+   uint32_t comn_fpa_diag_type                     ;  
+   uint32_t comn_fpa_pwr_on                        ;  
+   uint32_t comn_fpa_trig_ctrl_mode                ;
+   uint32_t comn_fpa_acq_trig_ctrl_dly             ;
+   uint32_t comn_fpa_spare                         ;
+   uint32_t comn_fpa_xtra_trig_ctrl_dly            ;
+   uint32_t comn_fpa_trig_ctrl_timeout_dly         ;
+   uint32_t comn_fpa_stretch_acq_trig              ;
+   uint32_t comn_clk100_to_intclk_conv_numerator   ;
+   uint32_t comn_intclk_to_clk100_conv_numerator   ;
+   uint32_t op_xstart                              ;
+   uint32_t op_ystart                              ;
+   uint32_t op_xsize                               ;
+   uint32_t op_ysize                               ;
+   uint32_t op_frame_time                          ;
+   uint32_t op_gain                                ;
+   uint32_t op_int_mode                            ;
+   uint32_t op_test_mode	                       ;
+   uint32_t op_det_vbias                           ;
+   uint32_t op_det_ibias                           ;
+   uint32_t op_det_vsat                            ;
+   uint32_t op_binning                             ;
+   uint32_t op_output_rate                          ;
+   uint32_t op_spare1		                       ;
+   uint32_t op_spare2		                       ;
+   uint32_t op_spare3		                       ;
+   uint32_t op_spare4                              ;
+   uint32_t op_cfg_num                             ;
+   uint32_t diag_ysize                             ;
+   uint32_t diag_xsize_div_tapnum                  ;
+   uint32_t diag_lovh_mclk_source                  ;
+   uint32_t frame_dly_cst                          ;
+   uint32_t int_dly_cst                            ;
+   uint32_t int_time_offset         ;
+   uint32_t itr                                    ;
+   uint32_t real_mode_active_pixel_dly             ;
+   uint32_t cmd_hder                               ;
+   uint32_t int_cmd_id                             ;
+   uint32_t int_cmd_dlen                           ;
+   uint32_t int_cmd_offs_add                       ;
+   uint32_t fpa_serdes_lval_num                    ;
+   uint32_t fpa_serdes_lval_len                    ;
+   uint32_t op_cmd_id                              ;
+   uint32_t temp_cmd_id                            ;
+   uint32_t op_cmd_bram_base_add                   ;
+   uint32_t int_cmd_bram_base_add                  ;
+   uint32_t temp_cmd_bram_base_add                 ;
+   uint32_t int_cmd_bram_base_add_m1               ;
+   uint32_t int_checksum_base_add                  ;
+   uint32_t cmd_overhead_bytes_num                 ;
+   uint32_t int_clk_period_factor                  ;
+   uint32_t fpa_pix_num_per_pclk                   ;
+   uint32_t fpa_intclk_rate_khz                    ;
+   uint32_t fpa_exp_time_conv_denom_bit_pos        ;
+   
+};
+typedef struct s_FpaSpecificStatus t_FpaSpecificStatus;
+
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
-void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
-void FPA_Fig4SpecificParams(Scd_Fig4Param_t *ptrK, const gcRegistersData_t *pGCRegs);
-void FPA_SendSyntheticVideo_SerialCmd(const t_FpaIntf *ptrA);
+void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
 void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA);
 void FPA_ReadTemperature_StructCmd(const t_FpaIntf *ptrA);
 void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA);
@@ -223,10 +271,6 @@ void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 
-// Global variables (Only used by BB1280), TODO : A supprimer lorsque les commandes de debug du BB1280 ne seront plus necessaire.
-uint32_t gSCD_frame_dly = 0;
-uint32_t gSCD_intg_dly  = 0;
-uint32_t gSCD_frame_res = 0;
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -239,12 +283,9 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
+   FPA_GetVhdSpecificStatus(SpecificStat, ptrA);
 }
  
-void FPA_SetFrameResolution(t_FpaIntf *ptrA)// TODO : A supprimer après le debug de BB1280
-{
-}
-
 //--------------------------------------------------------------------------
 // pour reset des registres d'erreurs
 //--------------------------------------------------------------------------
@@ -261,12 +302,10 @@ void FPA_SetFrameResolution(t_FpaIntf *ptrA)// TODO : A supprimer après le debug
  void  FPA_Reset(const t_FpaIntf *ptrA)
 {
    uint8_t ii;
-   for(ii = 0; ii <= 10 ; ii++)
-   { 
+   for(ii = 0; ii <= 10 ; ii++) { 
       AXI4L_write32(1, ptrA->ADD + AW_CTRLED_RESET);             //on active le reset
    }
-   for(ii = 0; ii <= 10 ; ii++)
-   { 
+   for(ii = 0; ii <= 10 ; ii++) { 
       AXI4L_write32(0, ptrA->ADD + AW_CTRLED_RESET);             //on active l'effacement
    }
 }
@@ -284,7 +323,7 @@ void FPA_SetFrameResolution(t_FpaIntf *ptrA)// TODO : A supprimer après le debug
 //--------------------------------------------------------------------------
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
-   Scd_Fig1orFig2Param_t hh;
+   bb1920D_param_t hh;
    Scd_Fig4Param_t kk;
    float fpaAcquisitionFrameRate;
    extern uint8_t gFpaScdDiodeBiasEnum;
@@ -293,25 +332,21 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------                                           
    // bâtir les configurations
    
-   // on appelle les fonctions pour bâtir les parametres specifiques du pelicanD
-   FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
-   FPA_Fig4SpecificParams(&kk, pGCRegs);
+   // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
    
    // diag mode and diagType
    ptrA->fpa_diag_mode = 0;                 // par defaut
    ptrA->fpa_diag_type = 0;                 // par defaut   
-   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade)           // mode diagnostique degradé lineaire
-   {  
+   if (pGCRegs->TestImageSelector == TIS_TelopsStaticShade) {          // mode diagnostique degradé lineaire
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR;
    }   
-   else if (pGCRegs->TestImageSelector == TIS_TelopsConstantValue1)      // mode diagnostique avec valeur constante
-   {   
+   else if (pGCRegs->TestImageSelector == TIS_TelopsConstantValue1) {     // mode diagnostique avec valeur constante
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_CNST;
    }
-   else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade)
-   {
+   else if (pGCRegs->TestImageSelector == TIS_TelopsDynamicShade) {
       ptrA->fpa_diag_mode = 1;
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;   
    }
@@ -320,90 +355,122 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs (il est sur l'horolge de 100MHz)
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
-   {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le PelicanD en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
-      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)(MAX((hh.T3 + hh.T5 + hh.T6 - (float)VHD_ITR_PIPE_DLY_SEC), 0.0F) * (float)FPA_VHD_INTF_CLK_RATE_HZ); 
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) {
+      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;    // ENO : 21 juin 2016: Opérer le bb1920D en mode MODE_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration
+      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t); 
    }
-   else
-   {
+   else {
       ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ALL_END_TO_TRIG_START; // ENO : 30 mars 2020 : T5 is referenced to the end of integration or readout depending which is the longest. Thus the recommended mode is MODE_ALL_END_TO_TRIG_START
-      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.T5 - (float)VHD_IWR_PIPE_DLY_SEC) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
+      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t);
    }
 
    ptrA->fpa_spare                 = 0;   //
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
-   if (ptrA->fpa_diag_mode == 1)
-   {
+   if (ptrA->fpa_diag_mode == 1) {
       ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;    // ENO : 21 fev 2019: pour les detecteurs numeriques, operer le diag mode en MODE_READOUT_END_TO_TRIG_START car le diag_mode est plus lent que le détecteur 
       ptrA->fpa_acq_trig_ctrl_dly     = 0; 
    }
    
-#ifdef SIM
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / 2.5e3F);     //  2.5 KHz en simulation
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;
-#endif
+   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)((float)FPA_INTG_CLK_RATE_HZ * powf(2.0F, SpecificStat->fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
+   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, SpecificStat->fpa_exp_time_conv_denom_bit_pos)/(float)FPA_INTG_CLK_RATE_HZ);  
+   
+   // binning ou non
+   ptrA->op_binning = 0;
    
    
-   //  window
-   ptrA->scd_xstart = pGCRegs->OffsetX;    
-   ptrA->scd_ystart = pGCRegs->OffsetY;     
-   ptrA->scd_xsize  = pGCRegs->Width;     
-   ptrA->scd_ysize  = pGCRegs->Height;
-    
+   //  parametres de la commandde opérationnelle
+   ptrA->op_xstart  = 0;    
+   ptrA->op_ystart  = pGCRegs->OffsetY/4;      // parametre strow à la page p.20 de atlasdatasheet2.17   
+   
+   if (ptrA->op_binning == 1) && (SpecificStat->fpa_pix_num_per_pclk == 8)
+      ptrA->op_ystart  = pGCRegs->OffsetY/8;
+   
+   ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
+   ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlasdatasheet2.17   
+   
+   ptrA->op_frame_time = ;
+   
    //  gain 
-   ptrA->scd_gain = SCD_GAIN_0;
+   ptrA->op_gain = SCD_GAIN_0;
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
-      ptrA->scd_gain = SCD_GAIN_1;
-    
-   // nombre de canaux de sorties     
-   ptrA->scd_out_chn    = SCD_CLINK_2_CHN;           // nombre de canaux CLINK. Nous serons en full tout le temps car le vhd a été conçu ainsi 
-   //if ((uint32_t)FPA_NUM_CH == 1)
-      //ptrA->scd_out_chn    = SCD_CLINK_1_CHN;
-                                           
-   // bias 
-   if (gFpaScdDiodeBiasEnum >= SCD_BIAS_VALUES_NUM)
-      gFpaScdDiodeBiasEnum = SCD_BIAS_DEFAULT_IDX;    // corrige une valeur invalide
-   ptrA->scd_diode_bias = Scd_DiodeBiasValues[gFpaScdDiodeBiasEnum];
-
+      ptrA->op_gain = SCD_GAIN_1;
+   
    // integration modes
-   ptrA->scd_int_mode = SCD_IWR_MODE;
+   ptrA->op_int_mode = SCD_IWR_MODE;
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
-      ptrA->scd_int_mode = SCD_ITR_MODE; 
-
-   //Mode of operation
-   ptrA->scd_boost_mode = SCD_BOOST_MODE;
-
-   // Resolution des pixels (13, 14 ou 15 bits)
-   ptrA->scd_pix_res = SCD_PIX_RESOLUTION_13BITS;    // resolution pour l'instant figée à 13 bits   
+      ptrA->op_int_mode = SCD_ITR_MODE; 
+   
+   // patron de tests detecteur 
+   ptrA->op_test_mode = 0;                     // parametre frm_dat à la page p.21 de atlasdatasheet2.17  
+   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
+      ptrA->op_test_mode = 1;
+   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) 
+      ptrA->op_test_mode = 2;
+   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) 
+      ptrA->op_test_mode = 3;
     
+   // polarisation et saturation (valeurs par defaut)
+   ptrA->op_det_vbias = 5;                     // parametre mtx_vdet
+   ptrA->op_det_ibias = 1;                     // parametre mtx_idet
+   ptrA->op_det_vsat  = 9;                     // parametre mtx_intg_low à la page p.42 de atlasdatasheet2.17   
+   
+   // vitesse de sortie
+   ptrA->op_output_rate = 2;
+   if (SpecificStat->fpa_pix_num_per_pclk == 8)  
+      ptrA->op_output_rate = 3;
+  
+   // spares
+   ptrA->op_spare1 = 0;
+   ptrA->op_spare2 = 0;
+   ptrA->op_spare3 = 0;
+   ptrA->op_spare4 = 0;
+   
+   // diag params
+   ptrA->diag_ysize    = ptrA->ysize;
+   if (SpecificStat->fpa_pix_num_per_pclk == 8) 
+      ptrA->diag_ysize = ptrA->ysize/2;            // pour tenir compte de la seconde ligne qui sort aussi au même moment
+  
+   ptrA->diag_xsize_div_tapnum = ptrA->xsize/4 ;   // toujours diviser par même si on a 8 chn 
+   ptrA->diag_lovh_mclk_source = 8;                // à reviser si necessaire
+   
+   // misc
+   ptrA->frame_dly_cst                   = 100;    // Frame Read delay = integration_time + frame_dly_cst . C'est le delai referé à FSYNC pour la sortie des données
+   ptrA->int_dly_cst                     = 0; 
+   ptrA->int_time_offset                 = (int32_t)((float)FPA_INTG_CLK_RATE_HZ * hh.int_time_offset_usec*1e-6F);
+   ptrA->itr                             = 0; 
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
+      ptrA->itr = 1;   
+   ptrA->real_mode_active_pixel_dly      = 2;      // valeur arbitraire
+   ptrA->cmd_hder                        = 0xAA; 
+   
+   uint32_t int_cmd_id                          ; 
+   uint32_t int_cmd_dlen                        ; 
+   uint32_t int_cmd_offs_add                    ; 
+   
+   uint32_t fpa_serdes_lval_num                 ; 
+   uint32_t fpa_serdes_lval_len                 ; 
+   uint32_t op_cmd_id                           ; 
+   uint32_t temp_cmd_id                         ; 
+   uint32_t op_cmd_bram_base_add                ; 
+   uint32_t int_cmd_bram_base_add               ; 
+   uint32_t temp_cmd_bram_base_add              ; 
+   uint32_t int_cmd_bram_base_add_m1            ; 
+   uint32_t int_checksum_base_add               ; 
+   uint32_t cmd_overhead_bytes_num              ; 
+   uint32_t int_clk_period_factor               ; 
+
+
+
    // frame_period_min
    //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
-   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * (float)FPA_MCLK_RATE_HZ);
+   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * (float)FPA_INTG_CLK_RATE_HZ);
    FPGA_PRINTF("scd_frame_period_min = %d x 12.5ns\n", ptrA->scd_frame_period_min);
    
-   // mode diag scd
-   ptrA->scd_bit_pattern = 0;
-   if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
-         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
-         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
-      ptrA->scd_bit_pattern = SCD_PE_TEST1;
+
    
-   // valeurs converties en coups d'horloge du module FPA_INTF
-   // valeurs utilisées en mode patron de test seulement
-   ptrA->scd_fsync_re_to_intg_start_dly = (uint32_t)((hh.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
-   ptrA->scd_x_to_readout_start_dly = (uint32_t)((hh.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ); //horloge VHD à 100 MHz
-   ptrA->scd_x_to_next_fsync_re_dly = (uint32_t)(0.80F * (hh.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // 0.80 pour s'assurer le fonctionnement pleine vitesse en mode diag
-   ptrA->scd_fsync_re_to_fval_re_dly = (uint32_t)((kk.T1) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_fval_re_to_dval_re_dly = (uint32_t)((kk.T2) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_lval_high_duration = (uint32_t)((kk.T3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_lval_pause_dly = (uint32_t)((kk.T4) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_hdr_start_to_lval_re_dly = (uint32_t)((kk.T5) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_hdr_high_duration = (uint32_t)((kk.T6) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_xsize_div_per_pixel_num  =  ptrA->scd_xsize/FPA_CLINK_PIX_NUM;  // Les test patterns sont générés sur 2 channels, peu importe FPA_NUM_CH.
-   
+      
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
 
@@ -411,7 +478,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (cfg_num == 255)  // protection contre depassement
       cfg_num = 0;
    cfg_num++;
-   ptrA->cfg_num = (uint32_t)cfg_num;
+   ptrA->op_cfg_num = (uint32_t)op_cfg_num;
 
    //-----------------------------------------                                           
    // Envoyer commande synthetique
@@ -441,12 +508,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    // lecture et conversion de la temperature temp(n-1)
    raw_temp = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_TEMPERATURE);  // lit le registre de temperature (fort probablement pas le présent mais le passé) 
 
-   if (raw_temp == (uint32_t)VHD_INVALID_TEMP)
-   {
+   if (raw_temp == (uint32_t)VHD_INVALID_TEMP){
       return FPA_INVALID_TEMP;
    }
-   else
-   {
+   else {
       diode_voltage = (float)(raw_temp & 0x0000FFFF) * 4.5776F * 1.0e-5F;
    
       // utilisation  des valeurs de flashsettings
@@ -479,13 +544,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
    float period, MaxFrameRate;   
-   Scd_Fig1orFig2Param_t Scd_Fig1orFig2Param;
-   FPA_Fig1orFig2SpecificParams(&Scd_Fig1orFig2Param, (float)pGCRegs->ExposureTime, pGCRegs);
+   bb1920D_param_t Scd_Fig1orFig2Param;
+   FPA_SpecificParams(&Scd_Fig1orFig2Param, (float)pGCRegs->ExposureTime, pGCRegs);
    period = Scd_Fig1orFig2Param.T0;      // selon scd : T0 = frame period
 
-#ifdef SIM
-   PRINTF("FPA_Period_Min_usec = %f\n", 1e6F*period);
-#endif
    MaxFrameRate = 1.0F / period;
 
    // ENO: 10 sept 2016: Apply margin 
@@ -504,13 +566,13 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
    float maxExposure_us, periodMinWithNullExposure;
    float operatingPeriod, fpaAcquisitionFrameRate;
-   Scd_Fig1orFig2Param_t hh;
+   bb1920D_param_t hh;
 
    // ENO: 10 sept 2016: d'entrée de jeu, on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur   
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin);
 
    // ENO: 10 sept 2016: tout reste inchangé
-   FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    periodMinWithNullExposure = hh.T0;
    operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    
@@ -599,26 +661,26 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void  FPA_SoftwType(const t_FpaIntf *ptrA)
 {
-   AXI4L_write32(FPA_ROIC_PELICAND, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);          
+   AXI4L_write32(FPA_ROIC_BLACKBIRD1920, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);          
    AXI4L_write32(OUTPUT_DIGITAL, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);		     
 }
 
 //-------------------------------------------------------
-// Pelicand specifics timings
+// bb1920D specifics timings
 //-------------------------------------------------------
-void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
+void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // Se reporter au document d1k3008-rev1 et d1k3004-rev0 de SCD
    
-   uint8_t PELICAND_1CH_EMULATOR = 0;
+   uint8_t bb1920D_1CH_EMULATOR = 0;
    if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)         // 2019-07-15 ODI: emulateur 1 channel des que le diviseur > 1 (valeur par défaut)
-      PELICAND_1CH_EMULATOR = 1;
+      bb1920D_1CH_EMULATOR = 1;
    
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)
    {
-      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
-      if (PELICAND_1CH_EMULATOR)
-         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;      // ENO 24 juin 2019 : on emule un PelicanD 1 canal
+      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_INTG_CLK_RATE_HZ);
+      if (bb1920D_1CH_EMULATOR)
+         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;      // ENO 24 juin 2019 : on emule un bb1920D 1 canal
       else
          ptrH->Tline_conv = (804.0F + T_lINE_CONV_CORR) * ptrH->TFPP_CLK;       //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
 
@@ -651,9 +713,9 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
    }
    else // ITR mode
    {      
-      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_MCLK_RATE_HZ);
-      if (PELICAND_1CH_EMULATOR)
-         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;       // ENO 24 juin 2019 : on emule un PelicanD 1 canal
+      ptrH->TFPP_CLK  = 1.0F / ((float)FPA_INTG_CLK_RATE_HZ);
+      if (bb1920D_1CH_EMULATOR)
+         ptrH->Tline_conv = 1296.0F * ptrH->TFPP_CLK;       // ENO 24 juin 2019 : on emule un bb1920D 1 canal
       else
          ptrH->Tline_conv = 816.0F * ptrH->TFPP_CLK;        //13 bit resolution
 
@@ -698,8 +760,8 @@ void FPA_Fig4SpecificParams(Scd_Fig4Param_t *ptrK, const gcRegistersData_t *pGCR
    
    // Update on 2016-04-28 with spec D1K3008-RevA.1 from SCD
 
-   Scd_Fig1orFig2Param_t hh;
-   FPA_Fig1orFig2SpecificParams(&hh, 0.0F, pGCRegs);
+   bb1920D_param_t hh;
+   FPA_SpecificParams(&hh, 0.0F, pGCRegs);
    
    ptrK->T2  = 5.0F * hh.TFPP_CLK;  // un peu plus de 0
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
@@ -715,30 +777,6 @@ void FPA_Fig4SpecificParams(Scd_Fig4Param_t *ptrK, const gcRegistersData_t *pGCR
    ptrK->T5  = 80e-6F;                 // plus long 1 ou 2ch
    ptrK->T6  = 64.0F * hh.TFPP_CLK;    // 2ch
 }
-
-
-// process time non requis pour l'instant pour Tel-2000 car l'électronique ne devrait pas limiter la vitesse du FPA 
- 
-////-------------------------------------------------------
-//// FPGA Process Time
-////-------------------------------------------------------
-//float FPGA_ProcessTime()
-//{
-//   float effective_LL_CLK;
-//   float processTime;
-//   float readoutTime;
-//   
-//   readout_time = FPA_ReadoutTime();   
-//   
-//   if(pGCRegs->ClConfiguration == CC_Base)
-//      effective_LL_CLK = MIN( (float) LL_CLOCK_FREQ_HZ_BASE / 1.004F, gLimited_LL_CLK );
-//   else
-//      effective_LL_CLK = MIN( (float) LL_CLOCK_FREQ_HZ / 1.004F, gLimited_LL_CLK );   
-//   
-//   processTime = (float) (pGCRegs->Width * (pGCRegs->Height + 2)) / effective_LL_CLK;
-//   processTime = MAX(processTime, readoutTime);
-//   return processTime;
-//}
 
 //-------------------------------------------------------
 // Commande temperature : envoi partie structurale
@@ -766,8 +804,8 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint32_t vhd_int_time;
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
-   uint8_t scd_gain;
-   uint8_t scd_int_mode;
+   uint8_t op_gain;
+   uint8_t op_int_mode;
    uint8_t scd_hder_disable = 0;
    
    // quelques definitions
@@ -778,12 +816,12 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
    vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
-   vhd_int_time     = (uint32_t)MIN(MAX((float)vhd_int_time, (FPA_MIN_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F)), (FPA_MAX_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F));  // protection
+   vhd_int_time     = (uint32_t)MIN(MAX((float)vhd_int_time, (FPA_MIN_EXPOSURE * (float)FPA_INTG_CLK_RATE_HZ*1E-6F)), (FPA_MAX_EXPOSURE * (float)FPA_INTG_CLK_RATE_HZ*1E-6F));  // protection
 
    
-   scd_gain = (uint8_t)(ptrA->scd_gain);
+   op_gain = (uint8_t)(ptrA->op_gain);
    
-   scd_int_mode = (uint8_t)(ptrA->scd_int_mode);         
+   op_int_mode = (uint8_t)(ptrA->op_int_mode);         
    
    // on bâtit la commande
    Cmd.Header       =  0xAA;
@@ -797,8 +835,8 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Data[4]      =  0;                                   // reserved
    Cmd.Data[5]      =  0;                                   // reserved
                     
-   Cmd.Data[6]      =  ptrA->scd_ystart & 0xFF;                // Image Vertical Offset lsb
-   Cmd.Data[7]      = (ptrA->scd_ystart >> 8) & 0xFF;          // Image Vertical Offset msb
+   Cmd.Data[6]      =  ptrA->op_ystart & 0xFF;                // Image Vertical Offset lsb
+   Cmd.Data[7]      = (ptrA->op_ystart >> 8) & 0xFF;          // Image Vertical Offset msb
 
    Cmd.Data[8]      =  ptrA->scd_ysize & 0xFF;                 // Image Vertical Length lsb
    Cmd.Data[9]      = (ptrA->scd_ysize >> 8) & 0xFF;           // Image Vertical Length msb
@@ -806,17 +844,17 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Data[10]     =  ptrA->scd_xsize & 0xFF;                 // Image Horizontal Length lsb
    Cmd.Data[11]     = (ptrA->scd_xsize >> 8) & 0xFF;           // Image Horizontal Length msb
                         
-   Cmd.Data[12]     =  ptrA->scd_xstart & 0xFF;                // Image Horizontal Offset lsb
-   Cmd.Data[13]     = (ptrA->scd_xstart >> 8) & 0xFF;          // Image Horizontal Offset msb
+   Cmd.Data[12]     =  ptrA->op_xstart & 0xFF;                // Image Horizontal Offset lsb
+   Cmd.Data[13]     = (ptrA->op_xstart >> 8) & 0xFF;          // Image Horizontal Offset msb
                         
-   Cmd.Data[14]     =((scd_hder_disable & 0x01) << 7) + ((ptrA->scd_diode_bias & 0x0F) << 3) + (scd_gain & 0x07);
+   Cmd.Data[14]     =((scd_hder_disable & 0x01) << 7) + ((ptrA->scd_diode_bias & 0x0F) << 3) + (op_gain & 0x07);
 
    Cmd.Data[15]     =  ptrA->scd_frame_period_min & 0xFF;         // Frame period lsb
    Cmd.Data[16]     = (ptrA->scd_frame_period_min >> 8) & 0xFF;   // Frame period lsb
    Cmd.Data[17]     = (ptrA->scd_frame_period_min >> 16) & 0xFF;  // Frame period lsb
                          
    Cmd.Data[18]     = (((ptrA->scd_out_chn) & 0x01) << 7) + ((DisplayMode & 0x0F) << 3) + ((FSyncMode & 0x01) << 2) + ((ReadDirLR & 0x01) << 1) + (ReadDirUP & 0x01);
-   Cmd.Data[19]     = scd_int_mode;
+   Cmd.Data[19]     = op_int_mode;
    Cmd.Data[20]     = ((ptrA->scd_boost_mode & 0x01) << 5) + (ptrA->scd_pix_res & 0x03);
    
    Cmd.SerialCmdRamBaseAdd = (uint8_t)AW_SERIAL_OP_CMD_RAM_BASE_ADD; // adresse à laquelle envoyer la commande en RAM
@@ -929,4 +967,69 @@ void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA)
       AXI4L_write32(0, ptrA->ADD + + AW_SERIAL_CFG_SWITCH_ADD + AW_SERIAL_CFG_END_ADD);  // envoi de '0' à l'adresse de fin pour donner du temps à l'arbitreur pour detecter la fin qui s'en vient.
    };
    AXI4L_write32(1, ptrA->ADD + AW_SERIAL_CFG_SWITCH_ADD + AW_SERIAL_CFG_END_ADD); 
+}
+
+//--------------------------------------------------------------------------                                                                            
+// Pour avoir les statuts specifiques du module détecteur
+//--------------------------------------------------------------------------
+void FPA_GetSpecificStatus(t_FpaSpecificStatus *SpecificStat, const t_FpaIntf *ptrA)
+{ 
+   // config reournée par le vhd
+   SpecificStat->comn_fpa_diag_mode                   = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x00);    
+   SpecificStat->comn_fpa_diag_type                   = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x04);   
+   SpecificStat->comn_fpa_pwr_on                      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x08);   
+   SpecificStat->comn_fpa_trig_ctrl_mode              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x0C);  
+   SpecificStat->comn_fpa_acq_trig_ctrl_dly           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x10);    
+   SpecificStat->comn_fpa_spare                       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x14);  
+   SpecificStat->comn_fpa_xtra_trig_ctrl_dly          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x18);   
+   SpecificStat->comn_fpa_trig_ctrl_timeout_dly       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x1C);        
+   SpecificStat->comn_fpa_stretch_acq_trig            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x20);                        
+   SpecificStat->comn_clk100_to_intclk_conv_numerator = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x24); 
+   SpecificStat->comn_intclk_to_clk100_conv_numerator = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x28); 
+   SpecificStat->op_xstart                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x2C);                                
+   SpecificStat->op_ystart                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x30);        
+   SpecificStat->op_xsize                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x34);        
+   SpecificStat->op_ysize                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x38);                                     
+   SpecificStat->op_frame_time                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x3C);
+   SpecificStat->op_gain                              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x40);
+   SpecificStat->op_int_mode                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x44);
+   SpecificStat->op_test_mode	                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x48);
+   SpecificStat->op_det_vbias                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x4C);
+   SpecificStat->op_det_ibias                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x50);
+   SpecificStat->op_det_vsat                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x54);
+   SpecificStat->op_binning                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x58);
+   SpecificStat->op_output_rate                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x5C);
+   SpecificStat->op_spare1		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x60);
+   SpecificStat->op_spare2		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x64);
+   SpecificStat->op_spare3		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x68);
+   SpecificStat->op_spare4                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x6C);
+   SpecificStat->op_cfg_num                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x70);
+   SpecificStat->diag_ysize                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x74);
+   SpecificStat->diag_xsize_div_tapnum                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x78);
+   SpecificStat->diag_lovh_mclk_source                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x7C);
+   SpecificStat->frame_dly_cst                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x80);
+   SpecificStat->int_dly_cst                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x84);
+   SpecificStat->int_time_offset       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x88);
+   SpecificStat->itr                                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x8C);
+   SpecificStat->real_mode_active_pixel_dly           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x90);
+   SpecificStat->cmd_hder                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x94);
+   SpecificStat->int_cmd_id                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x98);
+   SpecificStat->int_cmd_dlen                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x9C);
+   SpecificStat->int_cmd_offs_add                     = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA0);
+   SpecificStat->fpa_serdes_lval_num                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA4);
+   SpecificStat->fpa_serdes_lval_len                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA8);
+   SpecificStat->op_cmd_id                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xAC);
+   SpecificStat->temp_cmd_id                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB0);
+   SpecificStat->op_cmd_bram_base_add                 = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB4);
+   SpecificStat->int_cmd_bram_base_add                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB8);
+   SpecificStat->temp_cmd_bram_base_add               = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xBC);
+   SpecificStat->int_cmd_bram_base_add_m1             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC0);
+   SpecificStat->int_checksum_base_add                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC4);
+   SpecificStat->cmd_overhead_bytes_num               = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC8);
+   SpecificStat->int_clk_period_factor                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xCC);
+      
+   // autres params
+   SpecificStat->fpa_pix_num_per_pclk                 = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD0);
+   SpecificStat->fpa_exp_time_conv_denom_bit_pos      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD4);
+   SpecificStat->int_clk_source_rate_khz              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD8);
 }

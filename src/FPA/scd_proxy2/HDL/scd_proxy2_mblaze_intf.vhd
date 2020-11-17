@@ -124,7 +124,7 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal fpa_softw_stat_i                : fpa_firmw_stat_type;
    signal reset_err_i                     : std_logic;
    signal ctrled_reset_i                  : std_logic;
-   signal abs_additional_int_time_offset_i : integer := 0; 
+   signal abs_int_time_offset_i           : integer := 0; 
    
    signal int_cfg_i                       : int_cfg_type;
    signal exp_struct_cfg                  : int_cfg_type;
@@ -231,7 +231,7 @@ begin
                   when X"50" =>    mb_struct_cfg.op.det_ibias                     <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0); 
                   when X"54" =>    mb_struct_cfg.op.det_vsat                      <= data_i(mb_struct_cfg.op.det_vsat'length-1 downto 0);                         
                   when X"58" =>    mb_struct_cfg.op.binning                       <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);      
-                  when X"5C" =>    mb_struct_cfg.op.output_chn                    <= data_i(mb_struct_cfg.op.output_chn'length-1 downto 0);   
+                  when X"5C" =>    mb_struct_cfg.op.output_rate                   <= data_i(mb_struct_cfg.op.output_rate'length-1 downto 0);   
                   when X"60" =>    mb_struct_cfg.op.spare1		                   <= data_i(mb_struct_cfg.op.spare1'length-1 downto 0); 		 
                   when X"64" =>    mb_struct_cfg.op.spare2		                   <= data_i(mb_struct_cfg.op.spare2'length-1 downto 0); 		 
                   when X"68" =>    mb_struct_cfg.op.spare3		                   <= data_i(mb_struct_cfg.op.spare3'length-1 downto 0); 		 
@@ -245,7 +245,7 @@ begin
                   -- misc (principalement variables/parametres qui ne changent pratiquement pas)
                   when X"80" =>    mb_struct_cfg.frame_dly_cst                    <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0)); 
                   when X"84" =>    mb_struct_cfg.int_dly_cst                      <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
-                  when X"88" =>    mb_struct_cfg.additional_fpa_int_time_offset   <= signed(data_i(mb_struct_cfg.additional_fpa_int_time_offset'length-1 downto 0));                            
+                  when X"88" =>    mb_struct_cfg.int_time_offset                  <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0));                            
                   when X"8C" =>    mb_struct_cfg.itr                              <= data_i(0);
                   when X"90" =>    mb_struct_cfg.real_mode_active_pixel_dly       <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));
                   
@@ -339,7 +339,7 @@ begin
                   exp_checksum <= exp_checksum + unsigned(exp_ser_cfg_data); -- somme sur 8 bits donc implicitement modulo 256. certes decalé mais les zeros entre byte8 et byte12 permettent à la valeur d'etre prête avant l'envoi
                   
                   --   cmd identification
-                  if    byte_cnt = 1  then exp_ser_cfg_data <= mb_struct_cfg.cmd_hder(7 downto 0);                       -- scd_proxy2 exp_time CMD Header
+                  if    byte_cnt = 1  then exp_ser_cfg_data <= mb_struct_cfg.cmd_hder(7 downto 0);           -- scd_proxy2 exp_time CMD Header
                   elsif byte_cnt = 2  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_id(7 downto 0);         -- scd_proxy2 exp_time CMD ID                 
                   elsif byte_cnt = 3  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_id(15 downto 8);        -- scd_proxy2 exp_time CMD ID                  
                   elsif byte_cnt = 4  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_dlen(7 downto 0);       -- scd_proxy2 exp_time data length                  
@@ -425,17 +425,17 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
-         abs_additional_int_time_offset_i <= to_integer(abs(user_cfg_i.additional_fpa_int_time_offset));
+         abs_int_time_offset_i <= to_integer(abs(user_cfg_i.int_time_offset));
          
          -- pipe pour le calcul du temps d'integration en mclk
          int_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, int_time_pipe(0)'length) ;
          int_time_pipe(1) <= resize(int_time_pipe(0) * resize(user_cfg_i.comn.clk100_to_intclk_conv_numerator, C_EXP_TIME_CONV_NUMERATOR_BITLEN), int_time_pipe(0)'length);          
          int_time_pipe(2) <= resize(int_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), int_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          int_time_pipe(3) <= int_time_pipe(2) + resize("00"& int_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), int_time_pipe(0)'length);  -- pour l'operation d'arrondi
-         if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 
-            int_time_pipe(4) <= int_time_pipe(3)+ to_unsigned(abs_additional_int_time_offset_i, int_time_pipe(4)'length);
+         if user_cfg_i.int_time_offset(31) = '0' then 
+            int_time_pipe(4) <= int_time_pipe(3)+ to_unsigned(abs_int_time_offset_i, int_time_pipe(4)'length);
          else
-            int_time_pipe(4) <= int_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, int_time_pipe(4)'length);
+            int_time_pipe(4) <= int_time_pipe(3)- to_unsigned(abs_int_time_offset_i, int_time_pipe(4)'length);
          end if; 
          
          -- pipe de synchro pour l'index           
@@ -537,7 +537,7 @@ begin
                when X"50" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_ibias                         , 32));
                when X"54" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vsat                          , 32));
                when X"58" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.binning                           , 32));
-               when X"5C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.output_chn                        , 32));
+               when X"5C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.output_rate                        , 32));
                when X"60" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare1		                      , 32));
                when X"64" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare2		                      , 32));
                when X"68" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare3		                      , 32));
@@ -548,7 +548,7 @@ begin
                when X"7C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.lovh_mclk_source                , 32));
                when X"80" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.frame_dly_cst                        , 32));
                when X"84" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_dly_cst                          , 32));
-               when X"88" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.additional_fpa_int_time_offset       , 32));
+               when X"88" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_time_offset                      , 32));
                when X"8C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.itr                                  , 32));
                when X"90" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly           , 32));                                                      
                when X"94" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.cmd_hder                             , 32));
@@ -565,9 +565,9 @@ begin
                when X"C0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_bram_base_add_m1             , 32));
                when X"C4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_checksum_base_add                , 32));
                when X"C8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.cmd_overhead_bytes_num               , 32));
-               when X"CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_clk_period_factor                , 32));
-                                                                                                                            
-               when X"FC" =>  axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK, 32));              
+               when X"CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_clk_period_factor                , 32));                                        
+               when X"D0" =>  axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK                           , 32));              
+               when X"D4" =>  axi_rdata <= std_logic_vector(to_unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS     , 32));              
                
                when others =>
                

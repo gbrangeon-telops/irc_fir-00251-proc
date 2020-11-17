@@ -38,29 +38,25 @@ package Proxy_define is
    constant FSYNC_HIGH_TIME_US                    : integer := 5;     -- duree de FSYNC en usec
    constant POWER_WAIT_US                         : integer := 2_000_000;  -- duree d'attente après allumage en usec. selon la doc, le proxy prend 1 sec. Pour plus de securité, j'en mets 2
    constant TEMP_TRIG_PERIOD_US                   : integer := 1_000_000;  -- le trig de lecture de la temperature a une periode de 1sec pour ne pas submerger le proxy
-                                                  
+   
    -- commandes                                   
-   --constant CMD_OVERHEAD_BYTES_NUM                : integer := 6; -- nombre de bytes de l'overhead (header, CommandID, length, Checksum)
    constant LONGEST_CMD_BYTES_NUM                 : integer := 32; -- longueur maximale en byte de la config d'un scd_proxy2 (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
    constant SERIAL_BAUD_RATE                      : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
- 
    
    ----------------------------------------------
    -- calculs 
    ---------------------------------------------- 
    -- attention aux modifs à apporter aux lignes des calculs
    constant DEFINE_DIAG_DATA_INC                         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
-   -- constant DEFINE_FPA_TAP_NUMBER                        : integer :=  DEFINE_FPA_PIX_NUM_PER_PCLK;     -- concept pour pouvoir utiliser les modules des analogiques
    constant PROXY_CLINK_CLK_1X_PERIOD_NS                 : real    := 1_000_000.0/real(DEFINE_FPA_PCLK_RATE_KHZ);       
    constant DEFINE_ADC_QUAD_CLK_FACTOR                   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR  
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR         : integer := 2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
-   -- constant DEFINE_FPA_EXP_TIME_CONV_NUMERATOR           : unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned(integer(real(DEFINE_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     --
    constant FSYNC_HIGH_TIME_FACTOR                       : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*FSYNC_HIGH_TIME_US)/1000);
    constant POWER_WAIT_FACTOR                            : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*POWER_WAIT_US)/1000);
    constant SERIAL_TX_CLK_FACTOR                         : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*1E3)/SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
    constant TEMP_TRIG_PERIOD_FACTOR                      : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*TEMP_TRIG_PERIOD_US)/1000);
-   -- constant DEFINE_FPA_MCLK_SOURCE_RATE_HZ               : integer := 1000*DEFINE_FPA_MCLK_SOURCE_RATE_KHZ; 
+   
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -84,7 +80,7 @@ package Proxy_define is
    constant PIX_RES_15B              : std_logic_vector(1 downto 0) := "00";
    constant PIX_RES_14B              : std_logic_vector(1 downto 0) := "01";
    constant PIX_RES_13B              : std_logic_vector(1 downto 0) := "10";
-      
+   
    -- cmd
    constant COM_RESP_HDER            : std_logic_vector(7 downto 0)  := x"55";
    constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
@@ -100,7 +96,7 @@ package Proxy_define is
    
    -- quelques constantes 
    constant SERIAL_CFG_END_ADD           : std_logic_vector(7 downto 0) := x"FC"; -- adresse de fin d'envoi de la config serielle
-
+   
    --------------------------------------------
    --  modes diag
    --------------------------------------------
@@ -136,8 +132,8 @@ package Proxy_define is
       
       -- gain et mode
       gain             : std_logic_vector(7 downto 0); 	-- op_mode de bb1920
-      int_mode         : std_logic_vector(7 downto 0);   -- itr ou iwr
-      test_mode		  : std_logic_vector(7 downto 0);   -- vid_if_bit_en de bb1920. C'est le test pattern mode
+      int_mode         : std_logic_vector(7 downto 0);  -- itr ou iwr
+      test_mode        : std_logic_vector(7 downto 0);   -- vid_if_bit_en de bb1920. C'est le test pattern mode
       
       -- bias et saturation
       det_vbias        : std_logic_vector(3 downto 0);	-- mtx_vdet de bb1920
@@ -146,13 +142,13 @@ package Proxy_define is
       
       -- misc
       binning          : std_logic_vector(1 downto 0);	  
-      output_chn       : std_logic_vector(1 downto 0); 	-- video_rate de bb1920      
+      output_rate      : std_logic_vector(1 downto 0); 	-- video_rate de bb1920      
       
       -- spares
-      spare1			  : std_logic_vector(1 downto 0);
-      spare2			  : std_logic_vector(1 downto 0);
-      spare3			  : std_logic_vector(1 downto 0);
-      spare4			  : std_logic_vector(1 downto 0);
+      spare1           : std_logic_vector(1 downto 0);
+      spare2           : std_logic_vector(1 downto 0);
+      spare3           : std_logic_vector(1 downto 0);
+      spare4           : std_logic_vector(1 downto 0);
       
       cfg_num          : unsigned(7 downto 0);      
       
@@ -191,7 +187,7 @@ package Proxy_define is
       diag                           : diag_cfg_type;   -- 
       frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = int + frame_dly_cst
       int_dly_cst                    : unsigned(19 downto 0);   -- valeur constante en provenance du MB pour le compte de int_dly
-      additional_fpa_int_time_offset : signed(31 downto 0);
+      int_time_offset                : signed(31 downto 0);
       itr                            : std_logic;
       int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       real_mode_active_pixel_dly     : unsigned(15 downto 0);

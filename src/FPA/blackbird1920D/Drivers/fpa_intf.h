@@ -95,8 +95,7 @@
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
-#define FPA_VHD_INTF_CLK_RATE_HZ       100E+6F  // fréquence de l'horloge du module FPA_Interface en Hz
-#define FPA_MCLK_RATE_HZ               70E+6F   // fréquence de l'horloge du SCD Proxy
+#define FPA_MCLK_RATE_HZ               70E+6F   // fréquence de l'horloge d'integration
 
 #define FPA_DATA_RESOLUTION            13
 #define FPA_PIXEL_PITCH                10E-6F
@@ -116,17 +115,17 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  SIZE;
    uint32_t  ADD;
    
-   uint32_t comn_fpa_diag_mode                  ; 
-   uint32_t comn_fpa_diag_type                  ; 
-   uint32_t comn_fpa_pwr_on                     ; 
-   uint32_t comn_fpa_trig_ctrl_mode             ; 
-   uint32_t comn_fpa_acq_trig_ctrl_dly          ; 
-   uint32_t comn_fpa_spare                      ; 
-   uint32_t comn_fpa_xtra_trig_ctrl_dly         ; 
-   uint32_t comn_fpa_trig_ctrl_timeout_dly      ; 
-   uint32_t comn_fpa_stretch_acq_trig           ; 
-   uint32_t comn_clk100_to_intclk_conv_numerator; 
-   uint32_t comn_intclk_to_clk100_conv_numerator; 
+   uint32_t fpa_diag_mode                  ; 
+   uint32_t fpa_diag_type                  ; 
+   uint32_t fpa_pwr_on                     ; 
+   uint32_t fpa_trig_ctrl_mode             ; 
+   uint32_t fpa_acq_trig_ctrl_dly          ; 
+   uint32_t fpa_spare                      ; 
+   uint32_t fpa_xtra_trig_ctrl_dly         ; 
+   uint32_t fpa_trig_ctrl_timeout_dly      ; 
+   uint32_t fpa_stretch_acq_trig           ; 
+   uint32_t clk100_to_intclk_conv_numerator; 
+   uint32_t intclk_to_clk100_conv_numerator; 
    
    uint32_t op_xstart                           ; 
    uint32_t op_ystart                           ; 
@@ -135,15 +134,15 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t op_frame_time                       ; 
    uint32_t op_gain                             ; 
    uint32_t op_int_mode                         ; 
-   uint32_t op_test_mode	                     ; 
+   uint32_t op_test_mode                        ; 
    uint32_t op_det_vbias                        ; 
    uint32_t op_det_ibias                        ; 
    uint32_t op_det_vsat                         ; 
    uint32_t op_binning                          ; 
-   uint32_t op_output_chn                       ; 
-   uint32_t op_spare1		                     ; 
-   uint32_t op_spare2		                     ; 
-   uint32_t op_spare3		                     ; 
+   uint32_t op_output_rate                      ; 
+   uint32_t op_spare1                           ; 
+   uint32_t op_spare2                           ; 
+   uint32_t op_spare3                           ; 
    uint32_t op_spare4                           ; 
    uint32_t op_cfg_num                          ; 
    
@@ -153,7 +152,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    
    uint32_t frame_dly_cst                       ; 
    uint32_t int_dly_cst                         ; 
-   uint32_t additional_fpa_int_time_offset      ; 
+   uint32_t int_time_offset                     ; 
    uint32_t itr                                 ; 
    uint32_t real_mode_active_pixel_dly          ; 
    uint32_t cmd_hder                            ; 
@@ -215,11 +214,11 @@ struct s_FpaStatus    //
    uint32_t  fpa_driver_stat;          // statut du hw driver. Définition dans "fpa"_hw_driver.bde
 
    // pour le power management
-   uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé
-   uint32_t  adc_ddc_present;             // dit si une carte valide est détectée
+   uint32_t  adc_ddc_detect_process_done;    // dit si le  processus de détection de la carte ADC/ DDC est achevé
+   uint32_t  adc_ddc_present;                // dit si une carte valide est détectée
    uint32_t  flex_flegx_detect_process_done; // dit si le  processus de détection du flex est achevé
    uint32_t  flex_flegx_present;             // dit si une carte valide est détectée
-   uint32_t  flegx_present;               // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
+   uint32_t  flegx_present;                  // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
 
    uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 
