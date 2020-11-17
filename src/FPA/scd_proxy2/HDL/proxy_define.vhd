@@ -47,7 +47,7 @@ package Proxy_define is
    -- calculs 
    ---------------------------------------------- 
    -- attention aux modifs à apporter aux lignes des calculs
-   constant DEFINE_DIAG_DATA_INC                         : integer :=  2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
+   constant DEFINE_DIAG_DATA_INC                         : integer := 2*integer(((2**14)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
    constant PROXY_CLINK_CLK_1X_PERIOD_NS                 : real    := 1_000_000.0/real(DEFINE_FPA_PCLK_RATE_KHZ);       
    constant DEFINE_ADC_QUAD_CLK_FACTOR                   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR  

@@ -194,8 +194,8 @@ struct ScdPacketTx_s             //
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
 
-// statuts specifiques/particuliers au vhd du module fpa
-struct s_FpaParticularStatus    
+// statuts privés du module fpa
+struct s_FpaPrivateStatus    
 {
    
    uint32_t comn_fpa_diag_mode                     ;  
@@ -255,7 +255,7 @@ struct s_FpaParticularStatus
    uint32_t fpa_exp_time_conv_denom_bit_pos        ;
    
 };
-typedef struct s_FpaParticularStatus t_FpaParticularStatus;
+typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
 
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
@@ -283,7 +283,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
-   FPA_GetVhdParticularStatus(PartStat, ptrA);
+   FPA_GetPrivateStatus(PrivateStat, ptrA);
 }
  
 //--------------------------------------------------------------------------
@@ -372,8 +372,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_acq_trig_ctrl_dly     = 0; 
    }
    
-   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)((float)FPA_INTG_CLK_RATE_HZ * powf(2.0F, PartStat->fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
-   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, PartStat->fpa_exp_time_conv_denom_bit_pos)/(float)FPA_INTG_CLK_RATE_HZ);  
+   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)((float)FPA_INTG_CLK_RATE_HZ * powf(2.0F, PrivateStat->fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
+   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, PrivateStat->fpa_exp_time_conv_denom_bit_pos)/(float)FPA_INTG_CLK_RATE_HZ);  
    
    // binning ou non
    ptrA->op_binning = 0;
@@ -383,7 +383,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_xstart  = 0;    
    ptrA->op_ystart  = pGCRegs->OffsetY/4;      // parametre strow à la page p.20 de atlasdatasheet2.17   
    
-   if (ptrA->op_binning == 1) && (PartStat->fpa_pix_num_per_pclk == 8)
+   if (ptrA->op_binning == 1) && (PrivateStat->fpa_pix_num_per_pclk == 8)
       ptrA->op_ystart  = pGCRegs->OffsetY/8;
    
    ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
@@ -417,7 +417,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // vitesse de sortie
    ptrA->op_output_rate = 2;
-   if (PartStat->fpa_pix_num_per_pclk == 8)  
+   if (PrivateStat->fpa_pix_num_per_pclk == 8)  
       ptrA->op_output_rate = 3;
   
    // spares
@@ -428,7 +428,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // diag params
    ptrA->diag_ysize    = ptrA->ysize;
-   if (PartStat->fpa_pix_num_per_pclk == 8) 
+   if (PrivateStat->fpa_pix_num_per_pclk == 8) 
       ptrA->diag_ysize = ptrA->ysize/2;            // pour tenir compte de la seconde ligne qui sort aussi au même moment
   
    ptrA->diag_xsize_div_tapnum = ptrA->xsize/4 ;   // toujours diviser par même si on a 8 chn 
@@ -449,7 +449,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->int_cmd_offs_add                    ; 
    
    ptrA->fpa_serdes_lval_num             =  ptrA->ysize; 
-   ptrA->fpa_serdes_lval_len             =  ptrA->xsize/PartStat->fpa_pix_num_per_pclk; 
+   ptrA->fpa_serdes_lval_len             =  ptrA->xsize/PrivateStat->fpa_pix_num_per_pclk; 
    ptrA->op_cmd_id                       =    ; 
    ptrA->temp_cmd_id                         ; 
    ptrA->op_cmd_bram_base_add            = 0; 
@@ -580,7 +580,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 }
 
 //--------------------------------------------------------------------------                                                                            
-// Pour avoir les statuts au complet
+// Pour avoir les statuts publics du module fpa
 //--------------------------------------------------------------------------
 void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 { 
@@ -959,66 +959,66 @@ void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA)
 }
 
 //--------------------------------------------------------------------------                                                                            
-// Pour avoir les statuts specifiques du module détecteur
+// Pour avoir les statuts privés du module détecteur
 //--------------------------------------------------------------------------
-void FPA_GetParticularStatus(t_FpaParticularStatus *PartStat, const t_FpaIntf *ptrA)
+void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA)
 { 
    // config reournée par le vhd
-   PartStat->comn_fpa_diag_mode                   = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x00);    
-   PartStat->comn_fpa_diag_type                   = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x04);   
-   PartStat->comn_fpa_pwr_on                      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x08);   
-   PartStat->comn_fpa_trig_ctrl_mode              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x0C);  
-   PartStat->comn_fpa_acq_trig_ctrl_dly           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x10);    
-   PartStat->comn_fpa_spare                       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x14);  
-   PartStat->comn_fpa_xtra_trig_ctrl_dly          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x18);   
-   PartStat->comn_fpa_trig_ctrl_timeout_dly       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x1C);        
-   PartStat->comn_fpa_stretch_acq_trig            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x20);                        
-   PartStat->comn_clk100_to_intclk_conv_numerator = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x24); 
-   PartStat->comn_intclk_to_clk100_conv_numerator = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x28); 
-   PartStat->op_xstart                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x2C);                                
-   PartStat->op_ystart                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x30);        
-   PartStat->op_xsize                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x34);        
-   PartStat->op_ysize                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x38);                                     
-   PartStat->op_frame_time                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x3C);
-   PartStat->op_gain                              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x40);
-   PartStat->op_int_mode                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x44);
-   PartStat->op_test_mode	                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x48);
-   PartStat->op_det_vbias                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x4C);
-   PartStat->op_det_ibias                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x50);
-   PartStat->op_det_vsat                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x54);
-   PartStat->op_binning                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x58);
-   PartStat->op_output_rate                       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x5C);
-   PartStat->op_spare1		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x60);
-   PartStat->op_spare2		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x64);
-   PartStat->op_spare3		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x68);
-   PartStat->op_spare4                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x6C);
-   PartStat->op_cfg_num                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x70);
-   PartStat->diag_ysize                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x74);
-   PartStat->diag_xsize_div_tapnum                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x78);
-   PartStat->diag_lovh_mclk_source                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x7C);
-   PartStat->frame_dly_cst                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x80);
-   PartStat->int_dly_cst                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x84);
-   PartStat->int_time_offset                      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x88);
-   PartStat->itr                                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x8C);
-   PartStat->real_mode_active_pixel_dly           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x90);
-   PartStat->cmd_hder                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x94);
-   PartStat->int_cmd_id                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x98);
-   PartStat->int_cmd_dlen                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x9C);
-   PartStat->int_cmd_offs_add                     = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA0);
-   PartStat->fpa_serdes_lval_num                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA4);
-   PartStat->fpa_serdes_lval_len                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA8);
-   PartStat->op_cmd_id                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xAC);
-   PartStat->temp_cmd_id                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB0);
-   PartStat->op_cmd_bram_base_add                 = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB4);
-   PartStat->int_cmd_bram_base_add                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB8);
-   PartStat->temp_cmd_bram_base_add               = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xBC);
-   PartStat->int_cmd_bram_base_add_m1             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC0);
-   PartStat->int_checksum_base_add                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC4);
-   PartStat->cmd_overhead_bytes_num               = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC8);
-   PartStat->int_clk_period_factor                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xCC);
+   PrivateStat->comn_fpa_diag_mode                   = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x00);    
+   PrivateStat->comn_fpa_diag_type                   = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x04);   
+   PrivateStat->comn_fpa_pwr_on                      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x08);   
+   PrivateStat->comn_fpa_trig_ctrl_mode              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x0C);  
+   PrivateStat->comn_fpa_acq_trig_ctrl_dly           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x10);    
+   PrivateStat->comn_fpa_spare                       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x14);  
+   PrivateStat->comn_fpa_xtra_trig_ctrl_dly          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x18);   
+   PrivateStat->comn_fpa_trig_ctrl_timeout_dly       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x1C);        
+   PrivateStat->comn_fpa_stretch_acq_trig            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x20);                        
+   PrivateStat->comn_clk100_to_intclk_conv_numerator = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x24); 
+   PrivateStat->comn_intclk_to_clk100_conv_numerator = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x28); 
+   PrivateStat->op_xstart                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x2C);                                
+   PrivateStat->op_ystart                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x30);        
+   PrivateStat->op_xsize                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x34);        
+   PrivateStat->op_ysize                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x38);                                     
+   PrivateStat->op_frame_time                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x3C);
+   PrivateStat->op_gain                              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x40);
+   PrivateStat->op_int_mode                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x44);
+   PrivateStat->op_test_mode	                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x48);
+   PrivateStat->op_det_vbias                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x4C);
+   PrivateStat->op_det_ibias                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x50);
+   PrivateStat->op_det_vsat                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x54);
+   PrivateStat->op_binning                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x58);
+   PrivateStat->op_output_rate                       = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x5C);
+   PrivateStat->op_spare1		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x60);
+   PrivateStat->op_spare2		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x64);
+   PrivateStat->op_spare3		                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x68);
+   PrivateStat->op_spare4                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x6C);
+   PrivateStat->op_cfg_num                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x70);
+   PrivateStat->diag_ysize                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x74);
+   PrivateStat->diag_xsize_div_tapnum                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x78);
+   PrivateStat->diag_lovh_mclk_source                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x7C);
+   PrivateStat->frame_dly_cst                        = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x80);
+   PrivateStat->int_dly_cst                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x84);
+   PrivateStat->int_time_offset                      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x88);
+   PrivateStat->itr                                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x8C);
+   PrivateStat->real_mode_active_pixel_dly           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x90);
+   PrivateStat->cmd_hder                             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x94);
+   PrivateStat->int_cmd_id                           = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x98);
+   PrivateStat->int_cmd_dlen                         = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0x9C);
+   PrivateStat->int_cmd_offs_add                     = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA0);
+   PrivateStat->fpa_serdes_lval_num                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA4);
+   PrivateStat->fpa_serdes_lval_len                  = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xA8);
+   PrivateStat->op_cmd_id                            = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xAC);
+   PrivateStat->temp_cmd_id                          = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB0);
+   PrivateStat->op_cmd_bram_base_add                 = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB4);
+   PrivateStat->int_cmd_bram_base_add                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xB8);
+   PrivateStat->temp_cmd_bram_base_add               = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xBC);
+   PrivateStat->int_cmd_bram_base_add_m1             = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC0);
+   PrivateStat->int_checksum_base_add                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC4);
+   PrivateStat->cmd_overhead_bytes_num               = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xC8);
+   PrivateStat->int_clk_period_factor                = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xCC);
       
    // autres params
-   PartStat->fpa_pix_num_per_pclk                 = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD0);
-   PartStat->fpa_exp_time_conv_denom_bit_pos      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD4);
-   PartStat->int_clk_source_rate_khz              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD8);
+   PrivateStat->fpa_pix_num_per_pclk                 = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD0);
+   PrivateStat->fpa_exp_time_conv_denom_bit_pos      = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD4);
+   PrivateStat->int_clk_source_rate_khz              = AXI4L_read32(ptrA->ADD + AR_SPECIFIC_STATUS_BASE_ADD + 0xD8);
 }
