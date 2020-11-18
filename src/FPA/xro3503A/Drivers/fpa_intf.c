@@ -18,6 +18,7 @@
 ------------------------------------------------------------------------------*/
 
 #include "fpa_intf.h"
+#include "tec_intf.h"
 #include "flashSettings.h"
 #include "utils.h"
 #include <math.h>
@@ -158,6 +159,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_GetTemperature(ptrA);                                                // demande de lecture
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
+   TEC_Init();                                                              // initialize le firmware du TEC
    sw_init_done = 1;
 }
  

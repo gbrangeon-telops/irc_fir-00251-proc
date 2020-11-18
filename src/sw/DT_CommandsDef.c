@@ -46,6 +46,9 @@
 #include "Autofocus.h"
 #include "IRIGB.h"
 #include "GC_Store.h"
+#ifdef ENABLE_TEC_CONTROL
+#include "tec_intf.h"
+#endif
 
 #ifdef STARTUP
 #include "DT_CommandsDef_startup.h"
@@ -85,6 +88,9 @@ static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf);
+#ifdef ENABLE_TEC_CONTROL
+static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf);
+#endif
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -128,6 +134,9 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"CI", DebugTerminalParseCI},
    {"LT", DebugTerminalParseLT},
    {"PLT", DebugTerminalParsePLT},
+#ifdef ENABLE_TEC_CONTROL
+   {"TEC", DebugTerminalParseTEC},
+#endif
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -887,12 +896,12 @@ IRC_Status_t DebugTerminalParsePOWER(circByteBuffer_t *cbuf)
    DT_PRINTF("Pleora =       %s", (Power_GetChannelPowerState(PC_PLEORA) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("ADC/DDC =      %s", (Power_GetChannelPowerState(PC_ADC_DDC) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Cooler =       %s", (Power_GetChannelPowerState(PC_COOLER) == CPS_ON)? "ON":"OFF");
-   DT_PRINTF("Buffer =       %s", (Power_GetChannelPowerState(PC_BUFFER) == CPS_ON)? "ON":"OFF");
+   //DT_PRINTF("Buffer =       %s", (Power_GetChannelPowerState(PC_BUFFER) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Filter wheel = %s", (Power_GetChannelPowerState(PC_FW) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Expansion =    %s", (Power_GetChannelPowerState(PC_EXPANSION) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Spare1 =       %s", (Power_GetChannelPowerState(PC_SPARE1) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Spare2 =       %s", (Power_GetChannelPowerState(PC_SPARE2) == CPS_ON)? "ON":"OFF");
-   DT_PRINTF("Spare =        %s", (Power_GetChannelPowerState(PC_SPARE) == CPS_ON)? "ON":"OFF");
+   //DT_PRINTF("Spare =        %s", (Power_GetChannelPowerState(PC_SPARE) == CPS_ON)? "ON":"OFF");
 
    return IRC_SUCCESS;
 }
@@ -2583,6 +2592,45 @@ IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf)
    return IRC_SUCCESS;
 }
 
+
+#ifdef ENABLE_TEC_CONTROL
+/**
+ * TEC Control command parser.
+ * This parser is used to parse and validate TEC Control
+ * command arguments and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Print Lens Table command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+
+static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf)
+{
+   uint32_t setval;
+
+   if (!DebugTerminal_CommandIsEmpty(cbuf))
+   {
+      uint8_t argStr[4];
+      uint32_t arglen;
+
+      arglen = GetNextArg(cbuf, argStr, 3);
+      if (ParseNumArg((char *)argStr, arglen, &setval) != IRC_SUCCESS)
+          return IRC_FAILURE;
+
+      TEC_SetTemperatureSetpoint(setval);
+   }
+   else
+   {
+      setval = TEC_GetTemperatureSetpoint();
+      DT_PRINTF("TEC setpoint value = %d", setval);
+   }
+
+   return IRC_SUCCESS;
+}
+#endif
+
+
 /**
  * Debug terminal Help command parser parser.
  * This parser is used to print debug terminal help.
@@ -2637,6 +2685,9 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
+   #ifdef ENABLE_TEC_CONTROL
+   DT_PRINTF("  TEC Control:        TEC [SETPOINT]");
+   #endif
    DT_PRINTF("  Print help:         HLP");
 
    /*
