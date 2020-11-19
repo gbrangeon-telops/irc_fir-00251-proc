@@ -2686,7 +2686,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
    #ifdef ENABLE_TEC_CONTROL
-   DT_PRINTF("  TEC Control:        TEC [SETPOINT]");
+   DT_PRINTF("  TEC Control:        TEC [setpoint]");
    #endif
    DT_PRINTF("  Print help:         HLP");
 
