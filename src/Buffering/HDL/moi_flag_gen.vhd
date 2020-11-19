@@ -22,9 +22,8 @@ entity moi_flag_gen is
    
       SEQ_WRITE_DONE           : in  STD_LOGIC;
       EXTERNAL_SEQ_WRITE_DONE  : in  STD_LOGIC;
-      EXT_BUF_PRSNT_N          : in  STD_LOGIC;
-      
-      BUFFER_MODE              : in BufferMode;
+      BUFFER_SWITCH            : in  std_logic_vector(3 downto 0); 
+      BUFFER_MODE              : in  BufferMode;
       ACQ_STOP                 : in  STD_LOGIC; 
       
       MOI_SIGNAL               : in STD_LOGIC;      
@@ -95,7 +94,7 @@ architecture RTL of moi_flag_gen is
 begin    
    
    areset <= not ARESETN;
-   seq_write_done_i <= SEQ_WRITE_DONE when EXT_BUF_PRSNT_N = '1' else external_seq_write_done_sync;
+   seq_write_done_i <= SEQ_WRITE_DONE when BUFFER_SWITCH(1) = '1' else external_seq_write_done_sync;
    BUFFERING_FLAG <= buffering_flag_new; 
    --------------------------------------------------
    -- synchro reset 
