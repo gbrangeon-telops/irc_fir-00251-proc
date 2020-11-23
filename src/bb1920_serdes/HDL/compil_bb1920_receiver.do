@@ -25,8 +25,8 @@ acom -incr -nowarn DAGGEN_0523 \
 
 #IP
 acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\fifo_generator_1_stub.vhdl \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\fifo_generator_1_sim_netlist.vhdl
+ d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_sim_netlist.vhdl \
+ d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_stub.vhdl
  
 # BB1920 SERDES
 acom -incr -nowarn DAGGEN_0523 \
