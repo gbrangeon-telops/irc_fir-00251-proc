@@ -53,10 +53,10 @@
 #define FPA_MAX_GAIN       0
 #define FPA_NUMTAPS        4  // [taps]
 
-#define FPA_COOLER_TEMP_THRES    -18700        // temp très basse avant allumage car détecteur à haute vitesse
-#define FPA_COOLER_TEMP_TOL      100
-#define FPA_DEFAULT_EXPOSURE     500.0F //[us]
-#define FPA_DEFAULT_FRAME_RATE   44.0F   //[Hz]
+#define FPA_COOLER_TEMP_THRES    -18700   //[cC] temp très basse avant allumage car détecteur à haute vitesse
+#define FPA_COOLER_TEMP_TOL      1000     //[cC]
+#define FPA_DEFAULT_EXPOSURE     500.0F   //[us]
+#define FPA_DEFAULT_FRAME_RATE   44.0F    //[Hz]
 
 // TODO Update EHDRI default exposure times.
 #define FPA_EHDRI_EXP_0          320.0F  //

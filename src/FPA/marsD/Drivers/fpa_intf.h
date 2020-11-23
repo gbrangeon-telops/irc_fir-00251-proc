@@ -55,10 +55,10 @@
 #define FPA_NUMTAPS        4  // [taps]
 #define FPA_NUM_CH         1  // nombre de canaux de sorties  (1 ou 2)
 
-#define FPA_COOLER_TEMP_THRES    -17300
-#define FPA_COOLER_TEMP_TOL      100
-#define FPA_DEFAULT_EXPOSURE     150.0F //[us]
-#define FPA_DEFAULT_FRAME_RATE   44.0F //[Hz]
+#define FPA_COOLER_TEMP_THRES    -17300   //[cC]
+#define FPA_COOLER_TEMP_TOL      1000     //[cC]
+#define FPA_DEFAULT_EXPOSURE     150.0F   //[us]
+#define FPA_DEFAULT_FRAME_RATE   44.0F    //[Hz]
 
 // TODO Update EHDRI default exposure times.
 #define FPA_EHDRI_EXP_0    23.0F  // Saturation à 395C
