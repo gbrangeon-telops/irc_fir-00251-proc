@@ -82,20 +82,8 @@ package Proxy_define is
    constant PIX_RES_13B              : std_logic_vector(1 downto 0) := "10";
    
    -- cmd
-   constant COM_RESP_HDER            : std_logic_vector(7 downto 0)  := x"55";
-   constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
-   constant CMD_HDER                 : std_logic_vector(7 downto 0)  := x"AA";
-   
-   -- partition de la ram de cfg serielle (la partie d'ecriture reservée à la config serielle a une plage d'adresse < 255)
-   -- constant OP_CMD_RAM_BASE_ADD      : integer  := 0;    -- adresse de base où est logée la commande operationnelle en ram
-   -- constant INT_CMD_RAM_BASE_ADD     : integer  := 64;   -- adresse de base où est logée la commande du temps d'integration en ram
-   -- constant TEMP_CMD_RAM_BASE_ADD    : integer  := 192;
-   
-   -- adresse de base de la zone securisée
-   -- constant CMD_SECUR_RAM_BASE_ADD   : integer  := 0; -- adresse où se retrouve la commande copiée dans la ram securisee
-   
-   -- quelques constantes 
-   constant SERIAL_CFG_END_ADD           : std_logic_vector(7 downto 0) := x"FC"; -- adresse de fin d'envoi de la config serielle
+   --   constant COM_RESP_HDER            : std_logic_vector(7 downto 0)  := x"55";
+   --   constant COM_RESP_FAILURE_ID      : std_logic_vector(15 downto 0) := x"FFFF";
    
    --------------------------------------------
    --  modes diag
@@ -128,7 +116,7 @@ package Proxy_define is
       ysize            : unsigned(10 downto 0);
       
       -- seq time
-      frame_time       : unsigned(19 downto 0);        	-- frame time en coups de 10 MHz
+      frame_time       : unsigned(19 downto 0);        	-- frame time en coups de int_clk
       
       -- gain et mode
       gain             : std_logic_vector(7 downto 0); 	-- op_mode de bb1920
@@ -166,8 +154,14 @@ package Proxy_define is
    type temp_cfg_type is
    record
       cfg_num             : unsigned(7 downto 0);
-      cfg_end             : std_logic;            -- necessaire pour que mb_cfg_in_progress retombe à '0' dans le receveur de config
+      cfg_end             : std_logic;                -- necessaire pour que mb_cfg_in_progress retombe à '0' dans le receveur de config
    end record; 
+   
+   type line_area_type is
+   record      
+      sol_posl            : unsigned(9 downto 0);     -- 
+      eol_posl            : unsigned(9 downto 0);     --
+   end record;
    
    
    ------------------------------------------------								
@@ -178,39 +172,52 @@ package Proxy_define is
       
       comn                           : fpa_comn_cfg_type;   -- partie commune (utilisée par les modules communs)
       
-      -- les cmds proxy et fpa
+      -- diag mode
+      diag                           : diag_cfg_type;   --
+      real_mode_active_pixel_dly     : unsigned(15 downto 0);
+      
+      -- integration mode
+      itr                            : std_logic;
+      int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
+      
+      -- aoi (cropping)
+      aoi_data                       : line_area_type;
+      aoi_flag1                      : line_area_type;
+      aoi_flag2                      : line_area_type;
+      
+      -- les cmds structurales
       op                             : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
       int                            : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
       temp                           : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
       
-      --- misc
-      diag                           : diag_cfg_type;   -- 
-      frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = int + frame_dly_cst
-      int_dly_cst                    : unsigned(19 downto 0);   -- valeur constante en provenance du MB pour le compte de int_dly
-      int_time_offset                : signed(31 downto 0);
-      itr                            : std_logic;
-      int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
-      real_mode_active_pixel_dly     : unsigned(15 downto 0);
-      
-      cmd_hder                       : std_logic_vector(7 downto 0);
+      -- cmd serielle integration 
       int_cmd_id                     : std_logic_vector(15 downto 0);
       int_cmd_dlen                   : std_logic_vector(15 downto 0);
-      int_cmd_offs_add               : std_logic_vector(7 downto 0);    
-      fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
-      fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      int_cmd_offs                   : std_logic_vector(7 downto 0);
+      int_cmd_sof_add                : unsigned(7 downto 0);
+      int_cmd_eof_add                : unsigned(7 downto 0);
+      int_cmd_sof_add_m1             : unsigned(7 downto 0);
+      int_checksum_add               : unsigned(7 downto 0);
+      frame_dly_cst                  : unsigned(19 downto 0);   -- valeur constante à ajouter pour avoir  frame_dly = int + frame_dly_cst
+      int_dly_cst                    : unsigned(19 downto 0);   -- valeur constante en provenance du MB pour le compte de int_dly
       
+      -- cmd serielle operationnelle
       op_cmd_id                      : std_logic_vector(15 downto 0);
+      op_cmd_sof_add                 : unsigned(7 downto 0);
+      op_cmd_eof_add                 : unsigned(7 downto 0);
+      
+      -- cmd serielle temperature
       temp_cmd_id                    : std_logic_vector(15 downto 0);
+      temp_cmd_sof_add               : unsigned(7 downto 0);
+      temp_cmd_eof_add               : unsigned(7 downto 0);    
       
-      op_cmd_bram_base_add           : unsigned(7 downto 0);
-      int_cmd_bram_base_add          : unsigned(7 downto 0);
-      temp_cmd_bram_base_add         : unsigned(7 downto 0);
-      
-      int_cmd_bram_base_add_m1       : unsigned(7 downto 0);
-      int_checksum_base_add          : unsigned(7 downto 0);
-      
-      cmd_overhead_bytes_num         : unsigned(7 downto 0);
-      
+      --- misc     
+      outgoing_com_hder              : std_logic_vector(7 downto 0);
+      incoming_com_hder              : std_logic_vector(7 downto 0);
+      incoming_com_fail_id           : std_logic_vector(15 downto 0);
+      incoming_com_ovh_len           : unsigned(7 downto 0);
+      fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée        
       int_clk_period_factor          : unsigned(7 downto 0);
       
    end record;    
@@ -220,13 +227,23 @@ package Proxy_define is
    ----------------------------------------------
    type hder_param_type is
    record
-      exp_time            : unsigned(31 downto 0); -- temps d'integration en coups de 100 MHz
+      exp_time            : unsigned(31 downto 0);              -- temps d'integration en coups de 100 MHz
       frame_id            : unsigned(31 downto 0);
       sensor_temp_raw     : std_logic_vector(15 downto 0);
       exp_index           : unsigned(7 downto 0);
       rdy                 : std_logic;                     -- pulse signifiant que les parametres du header sont prêts
    end record;
    
+   ----------------------------------------------								
+   -- Type serial_param
+   ----------------------------------------------
+   type serial_param_type is
+   record
+      cmd_sof_add    : unsigned(7 downto 0);
+      cmd_eof_add    : unsigned(7 downto 0);
+      run            : std_logic;
+      abort          : std_logic;  
+   end record;  
    
 end Proxy_define;
 

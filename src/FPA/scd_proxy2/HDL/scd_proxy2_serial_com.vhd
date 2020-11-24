@@ -27,11 +27,11 @@ entity scd_proxy2_serial_com is
       USER_CFG               : fpa_intf_cfg_type;
       
       -- interface avec le contrôleur
-      SERIAL_BASE_ADD        : in std_logic_vector(7 downto 0);
+      SERIAL_PARAM           : in serial_param_type;
+            
       SERIAL_FATAL_ERR       : out std_logic;
       SERIAL_DONE            : out std_logic;
-      SERIAL_EN              : in std_logic;
-      SERIAL_ABORT           : in std_logic;
+      
       PROXY_RDY              : out std_logic;
       
       -- TRIG de synchro
@@ -171,7 +171,6 @@ architecture RTL of scd_proxy2_serial_com is
    signal cfg_byte_total          : unsigned(15 downto 0);
    signal cfg_byte_cnt            : unsigned(15 downto 0);
    signal rx_data_cnt             : unsigned(15 downto 0);
-   signal cfg_payload             : std_logic_vector(15 downto 0);
    signal rx_data_total           : unsigned(15 downto 0);
    signal trig_i                  : std_logic;
    signal trig_last               : std_logic;
@@ -180,8 +179,8 @@ architecture RTL of scd_proxy2_serial_com is
    signal cmd_resp_done           : std_logic;
    signal cmd_resp_done_last      : std_logic;
    signal proxy_serial_err        : std_logic;
-   signal resp_hder               : std_logic_vector(COM_RESP_HDER'range);
-   signal resp_id                 : std_logic_vector(COM_RESP_FAILURE_ID'range);
+   signal resp_hder               : std_logic_vector(USER_CFG.INCOMING_COM_HDER'range);
+   signal resp_id                 : std_logic_vector(USER_CFG.INCOMING_COM_FAIL_ID'range);
    signal resp_payload            : std_logic_vector(15 downto 0);
    signal cfg_fifo_ovfl           : std_logic;
    signal cfg_fifo_rd_en          : std_logic;
@@ -248,7 +247,7 @@ begin
    
    FPA_TEMP_STAT.TEMP_DATA <= std_logic_vector(resize(fpa_temp_reg, FPA_TEMP_STAT.TEMP_DATA'LENGTH));
    FPA_TEMP_STAT.TEMP_DVAL <= fpa_temp_reg_dval;
-   FPA_TEMP_STAT.FPA_PWR_ON_TEMP_REACHED <= '1'; -- fait expres pour le scd_proxy2 car il n'allume le detecteur que lorsque la temperature est ok. 
+   FPA_TEMP_STAT.FPA_PWR_ON_TEMP_REACHED <= '1';        -- fait expres pour le scd_proxy2 car il n'allume le detecteur que lorsque la temperature est ok. 
    
    PROG_TRIG <= prog_trig_i;
    
@@ -317,7 +316,7 @@ begin
                   serial_err_cnt <= (others => '0');
                   cpy_cfg_en <= '0';
                   send_cfg_en <= '0';
-                  if SERIAL_EN = '1' and cpy_cfg_done = '1' then
+                  if SERIAL_PARAM.RUN = '1' and cpy_cfg_done = '1' then
                      serial_done_i <= '0';
                      if RST_ERROR_EN = '1' then 
                         serial_fatal_err_i <= '0';
@@ -332,7 +331,7 @@ begin
                      prog_seq_fsm <= wait_end_cpy_cfg_st;
                   end if;
                
-               when wait_end_cpy_cfg_st =>    -- fin de la copie de la config
+               when wait_end_cpy_cfg_st =>     -- fin de la copie de la config
                   if cpy_cfg_done = '1' and send_cfg_done = '1' then
                      prog_seq_fsm <= send_cfg_st;
                   end if; 
@@ -368,7 +367,7 @@ begin
                         prog_seq_fsm <= send_cfg_st;
                      end if;
                   else
-                     if SERIAL_ABORT = '1' then
+                     if SERIAL_PARAM.ABORT = '1' then
                         prog_seq_fsm <= idle;
                      else                        
                         prog_seq_fsm <= send_cfg_st;
@@ -441,7 +440,6 @@ begin
                   ram2_rd_i <= '0';
                   timeout_cnt <= (others => '0');
                   cfg_byte_cnt <= (others => '0');                  
-                  cfg_payload <= (others => '0');
                   cfg_fifo_rd_en <= '0';
                   uart_tbaud_cnt <= (others => '0');
                   cfg_fifo_wr_en <= '0';
@@ -466,7 +464,7 @@ begin
                when cpy_cfg_rd_st =>   -- la config est copiee de la zone A vers un fifo (avant de partir en zone sécurisée)                       
                   ram1_rd_i <= '1';
                   cfg_byte_cnt <= cfg_byte_cnt + 1;
-                  ram1_rd_add_i <= resize(unsigned(SERIAL_BASE_ADD), ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);
+                  ram1_rd_add_i <= resize(unsigned(SERIAL_PARAM.CMD_SOF_ADD), ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);
                   if ram1_rd_add_i(7 downto 0) = LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
                      cfg_mgmt_fsm <= init_cpy_wr_st;
                      ram1_rd_i <= '0';
@@ -488,12 +486,6 @@ begin
                      ram2_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
                      ram2_wr_data_i <= cfg_fifo_dout;
                      cfg_byte_cnt <= cfg_byte_cnt + 1;                     
-                     if cfg_byte_cnt = 3 then               -- 3 car cfg_byte_cnt commence à 0
-                        cfg_payload(7 downto 0) <= cfg_fifo_dout;  -- payload de la config selon SCD_PROXY2
-                     elsif cfg_byte_cnt = 4 then
-                        cfg_payload(15 downto 8) <= cfg_fifo_dout; -- payload de la config selon SCD_PROXY2
-                        cfg_byte_total <=  (unsigned(cfg_fifo_dout) & unsigned(cfg_payload(7 downto 0))) + to_integer(USER_CFG.CMD_OVERHEAD_BYTES_NUM); -- nombre de bytes total de la config                        
-                     end if;
                   end if;
                   if cfg_fifo_empty = '1' then
                      cfg_mgmt_fsm <= idle;
@@ -506,7 +498,7 @@ begin
                   cfg_byte_cnt <= (others => '0'); 
                   ram2_rd_add_i <= to_unsigned(0, ram2_rd_add_i'length); -- zone securisée sera en lecture
                   
-                  if unsigned(SERIAL_BASE_ADD) = resize(USER_CFG.OP_CMD_BRAM_BASE_ADD, SERIAL_BASE_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
+                  if unsigned(SERIAL_PARAM.CMD_SOF_ADD) = resize(USER_CFG.OP_CMD_SOF_ADD, SERIAL_PARAM.CMD_SOF_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
                      force_prog_trig_mode <= '1';
                      cfg_mgmt_fsm <= prog_trig_start_st; 
                   else
@@ -558,7 +550,7 @@ begin
                
                when check_frm_end_st =>
                   tx_dval_i <= '0';
-                  if cfg_byte_cnt = cfg_byte_total then
+                  if ram2_rd_add_i = SERIAL_PARAM.CMD_EOF_ADD then
                      cfg_mgmt_fsm <= wait_tx_fifo_empty_st;
                      cmd_resp_en <= '1';
                   else
@@ -718,7 +710,7 @@ begin
                      failure_resp_data(kk) <= (others => '0');
                   end loop;
                   if RX_DVAL = '1' then                       
-                     if  RX_DATA = COM_RESP_HDER then
+                     if  RX_DATA = USER_CFG.INCOMING_COM_HDER then
                         cmd_resp_fsm <= decode_byte_st;
                         resp_hder <= RX_DATA;
                         rx_data_cnt <= to_unsigned(2, rx_data_cnt'length);
@@ -739,16 +731,16 @@ begin
                         resp_payload(7 downto 0) <= RX_DATA;
                      elsif rx_data_cnt = 5 then                      -- payload
                         resp_payload(15 downto 8) <= RX_DATA;
-                        rx_data_total <=  (unsigned(RX_DATA) & unsigned(resp_payload(7 downto 0))) + to_integer(USER_CFG.CMD_OVERHEAD_BYTES_NUM);
+                        rx_data_total <=  (unsigned(RX_DATA) & unsigned(resp_payload(7 downto 0))) + to_integer(USER_CFG.INCOMING_COM_OVH_LEN);
                         resp_dcnt <= (others => '0');
-                     elsif rx_data_cnt = rx_data_total then        -- checksum                                               
+                     elsif rx_data_cnt = rx_data_total then          -- checksum                                               
                         cmd_resp_fsm <= check_resp_st;
-                        rx_rd_en_i <= '0';   -- on arrête la lecture du fifo
+                        rx_rd_en_i <= '0';                           -- on arrête la lecture du fifo
                      elsif rx_data_cnt = 32 then                     
                         cmd_resp_fsm <= idle;
                         proxy_serial_err <= '1'; 
                         resp_err(0) <= '1';
-                     else                                               -- data
+                     else                                             -- data
                         resp_data(to_integer(resp_dcnt)) <= RX_DATA;
                         resp_dcnt <= resp_dcnt + 1;
                      end if;                  
@@ -756,8 +748,8 @@ begin
                
                when check_resp_st =>   -- recherche du type de reponse reçue
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
-                  if resp_hder = COM_RESP_HDER then 
-                     if resp_id = COM_RESP_FAILURE_ID then
+                  if resp_hder = USER_CFG.INCOMING_COM_HDER then 
+                     if resp_id = USER_CFG.INCOMING_COM_FAIL_ID then
                         proxy_serial_err <= '1';
                         resp_err(1) <= '1';
                         for kk in 0 to 3 loop

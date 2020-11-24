@@ -41,11 +41,12 @@ entity scd_proxy2_prog_ctrler is
       FPA_INTF_CFG         : out fpa_intf_cfg_type;
       
       PROXY_RDY            : in std_logic;   -- PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès. 
-      SERIAL_EN            : out std_logic;
-      SERIAL_ABORT         : out std_logic;   --
+      
+      SERIAL_PARAM         : out serial_param_type;
+      
       SERIAL_DONE          : in std_logic;
       SERIAL_FATAL_ERR     : in std_logic;
-      SERIAL_BASE_ADD      : out std_logic_vector(7 downto 0);
+      
       
       RAM_ERR              : in std_logic;
       
@@ -103,7 +104,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal present_cfg               : fpa_intf_cfg_type;
    signal fpa_intf_cfg_i            : fpa_intf_cfg_type;
    signal user_cfg_to_update        : fpa_intf_cfg_type;
-   signal serial_en_i               : std_logic;
+   signal ser_param_i               : serial_param_type;
    signal user_cfg_latch            : fpa_intf_cfg_type;
    signal cnt                       : unsigned(USER_CFG.INT.INT_TIME'LENGTH-1 downto 0);
    signal proxy_int_feedbk_i        : std_logic;
@@ -113,12 +114,11 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal int_indx_i                : std_logic_vector(7 downto 0); 
    signal int_time_i                : std_logic_vector(31 downto 0);
    signal new_cfg_id                : std_logic_vector(7 downto 0);
-   signal serial_base_add_i         : std_logic_vector(7 downto 0);
-   signal cfg_ram_base_add          : unsigned(USER_CFG.OP_CMD_BRAM_BASE_ADD'LENGTH-1 downto 0);
+   signal serial_sof_add_i        : std_logic_vector(7 downto 0);
+   signal cfg_ser_param_i           : serial_param_type;
    signal serial_id_i               : std_logic_vector(7 downto 0);
    signal cfg_id_i                  : std_logic_vector(7 downto 0);
    signal fpa_driver_done_last      : std_logic;
-   signal serial_abort_i            : std_logic;
    signal reset_clink_n             : std_logic;
    signal update_cfg_i              : std_logic;
    signal cfg_updater_done          : std_logic;
@@ -141,9 +141,7 @@ begin
    -------------------------------------------------
    -- mappings                                                   
    -------------------------------------------------
-   SERIAL_BASE_ADD <= serial_base_add_i;
-   SERIAL_EN <= serial_en_i;
-   SERIAL_ABORT <= serial_abort_i;
+   SERIAL_PARAM <= ser_param_i;
    INT_INDX <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
    FRAME_ID <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT
    ACQ_INT <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
@@ -248,40 +246,43 @@ begin
                   end if;				  
                
                when new_op_cfg_st =>  
-                  new_cfg_id <= std_logic_vector(USER_CFG.OP_CMD_BRAM_BASE_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
-                  cfg_ram_base_add <= resize(USER_CFG.OP_CMD_BRAM_BASE_ADD, cfg_ram_base_add'length);
+                  new_cfg_id <= std_logic_vector(USER_CFG.OP_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
+                  cfg_ser_param_i.cmd_sof_add  <= USER_CFG.OP_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.OP_CMD_EOF_ADD;
                   need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
                when new_int_cfg_st =>
-                  new_cfg_id <= std_logic_vector(USER_CFG.INT_CMD_BRAM_BASE_ADD(7 downto 0));
-                  cfg_ram_base_add <= resize(USER_CFG.INT_CMD_BRAM_BASE_ADD, cfg_ram_base_add'length);
-                  fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  need_prog_rqst <= '0'; 				    -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
+                  new_cfg_id <= std_logic_vector(USER_CFG.INT_CMD_SOF_ADD(7 downto 0));
+                  cfg_ser_param_i.cmd_sof_add <= USER_CFG.INT_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.INT_CMD_EOF_ADD;
+                  fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
+                  need_prog_rqst <= '0'; 				         -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     fpa_new_cfg_pending <= '1';            -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
                when new_temp_cfg_st =>
-                  new_cfg_id <= std_logic_vector(USER_CFG.TEMP_CMD_BRAM_BASE_ADD(7 downto 0));
-                  cfg_ram_base_add <= resize(USER_CFG.TEMP_CMD_BRAM_BASE_ADD, cfg_ram_base_add'length);
-                  fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  need_prog_rqst <= '0'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
+                  new_cfg_id <= std_logic_vector(USER_CFG.TEMP_CMD_SOF_ADD(7 downto 0));
+                  cfg_ser_param_i.cmd_sof_add  <= USER_CFG.TEMP_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.TEMP_CMD_EOF_ADD;
+                  fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
+                  need_prog_rqst <= '0'; 				        -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st1;
                   else
-                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
+                     fpa_new_cfg_pending <= '1';           -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
                
@@ -309,8 +310,8 @@ begin
             driver_seq_fsm <=  idle;
             fpa_driver_done <= '0';
             fpa_driver_rqst <= '0';
-            serial_en_i <= '0';
-            serial_abort_i <= '0';
+            ser_param_i.run <= '0';
+            ser_param_i.abort <= '0';
             fpa_cfg_err <= '0';
             fpa_driver_seq_err <= '0';
             fpa_driver_done_last <= '0';
@@ -354,12 +355,12 @@ begin
                   fpa_driver_done <= '0';             
                   fpa_driver_rqst <= '0';
                   if fpa_new_cfg_pending = '1' then   -- on reverifie qu'il y a toujours une config en attente car il se pourrait q'une nouvelle config soit rentrée et egale à celle déjà dans le détecteur               
-                     serial_en_i <= '1';
-                     serial_abort_i <= '0';
-                     serial_base_add_i <= std_logic_vector(cfg_ram_base_add);
+                     ser_param_i <= cfg_ser_param_i;
+                     ser_param_i.run <= '1';
+                     ser_param_i.abort  <= '0';
                      serial_id_i <= new_cfg_id;
                      if SERIAL_DONE = '0' then 
-                        serial_en_i <= '0';
+                        ser_param_i.run <= '0';
                         user_cfg_latch <= USER_CFG;   -- la config en cours de programmation est latchée -- à partir de ce moment dans le serializer, la config est copiée tres rapidement de la ram vers le fifo de sortie avant qu'une nouvelle n'arrive.
                         driver_seq_fsm <= wait_fpa_prog_end_st;                        
                      end if;
@@ -461,14 +462,14 @@ begin
                
                when check_cfg_st0 =>
                   cfg_updater_done <= '0';
-                  if cfg_id_i = std_logic_vector(USER_CFG.TEMP_CMD_BRAM_BASE_ADD(7 downto 0)) then -- pas besoin de trig poour lea temperature. Ainsi on l'aura même en mode trig externe
+                  if cfg_id_i = std_logic_vector(USER_CFG.TEMP_CMD_SOF_ADD(7 downto 0)) then -- pas besoin de trig poour lea temperature. Ainsi on l'aura même en mode trig externe
                      cfg_updater_fsm <= check_cfg_st3; 
                   else
                      cfg_updater_fsm <= check_cfg_st1;    
                   end if;
                
                when check_cfg_st1 =>                           -- 
-                  if cfg_id_i = std_logic_vector(USER_CFG.OP_CMD_BRAM_BASE_ADD(7 downto 0)) then
+                  if cfg_id_i = std_logic_vector(USER_CFG.OP_CMD_SOF_ADD(7 downto 0)) then
                      if READOUT = '0' then
                         cfg_updater_fsm <= output_op_cfg_st;
                      end if;
@@ -477,7 +478,7 @@ begin
                   end if;
                
                when check_cfg_st2 =>                           -- 
-                  if cfg_id_i = std_logic_vector(USER_CFG.INT_CMD_BRAM_BASE_ADD(7 downto 0)) then
+                  if cfg_id_i = std_logic_vector(USER_CFG.INT_CMD_SOF_ADD(7 downto 0)) then
                      cfg_updater_fsm <= output_int_cfg_st;
                   else
                      cfg_updater_fsm <= check_cfg_st3;
