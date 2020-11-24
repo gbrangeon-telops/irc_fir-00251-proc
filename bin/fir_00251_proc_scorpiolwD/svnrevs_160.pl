@@ -1,5 +1,5 @@
-our $rel_proc_hw_rev = 25932;
-our $rel_proc_sw_rev = 25941;
-our $rel_proc_boot_rev = 25932;
-our $rel_proc_common_rev = 25894;
+our $rel_proc_hw_rev = 26009;
+our $rel_proc_sw_rev = 26024;
+our $rel_proc_boot_rev = 26009;
+our $rel_proc_common_rev = 26004;
 1;
