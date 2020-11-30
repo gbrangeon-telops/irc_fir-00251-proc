@@ -19,7 +19,7 @@ entity scd_proxy2_pix_pos is
    port(
       ARESET         : in std_logic;
       CLK            : in std_logic;
-           
+      
       RX_MOSI        : in t_ll_ext_mosi72;
       RX_MISO        : out t_ll_ext_miso;
       
@@ -72,12 +72,11 @@ begin
    -- numerotation des quads
    -----------------------------------------------------    
    U2: process(CLK)
-
+      
    begin  
       if rising_edge(CLK) then 
          if sreset = '1' then 
-            tx_mosi_i.dval <= '0';
-            tx_pos_i <= (others => '0'); 
+            tx_mosi_i.dval <= '0'; 
             err_i <= '0';  
             
          else 
@@ -88,11 +87,11 @@ begin
             -- sortie des numeros des quads
             if RX_MOSI.DVAL = '1' then 
                if RX_MOSI.SOL = '1' then 
-                  tx_pos_i <= to_unsigned(1, tx_pos_i'length);
+                  tx_pos_i <= (others => '0');
                else
                   tx_pos_i <= tx_pos_i + 1;
                end if;				  
-            end if;			
+            end if;
             
             -- erreur
             err_i <= TX_MISO.BUSY and tx_mosi_i.dval;

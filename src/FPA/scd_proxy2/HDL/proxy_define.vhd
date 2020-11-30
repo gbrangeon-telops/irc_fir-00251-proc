@@ -157,10 +157,11 @@ package Proxy_define is
       cfg_end             : std_logic;                -- necessaire pour que mb_cfg_in_progress retombe à '0' dans le receveur de config
    end record; 
    
-   type line_area_type is
+   -- sol et eol de l'aoi
+   type line_area_cfg_type is
    record      
-      sol_posl            : unsigned(9 downto 0);     -- 
-      eol_posl            : unsigned(9 downto 0);     --
+      sol_pos             : unsigned(9 downto 0);     -- position de sol de l'aoi lorsque cropping actif
+      eol_pos             : unsigned(9 downto 0);     -- position de eol de l'aoi lorsque cropping actif
    end record;
    
    
@@ -181,9 +182,9 @@ package Proxy_define is
       int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       
       -- aoi (cropping)
-      aoi_data                       : line_area_type;
-      aoi_flag1                      : line_area_type;
-      aoi_flag2                      : line_area_type;
+      aoi_data                       : line_area_cfg_type;
+      aoi_flag1                      : line_area_cfg_type;
+      aoi_flag2                      : line_area_cfg_type;
       
       -- les cmds structurales
       op                             : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
