@@ -170,7 +170,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t temp_cmd_bram_base_add              ; 
    uint32_t int_cmd_bram_base_add_m1            ; 
    uint32_t int_checksum_base_add               ; 
-   uint32_t cmd_overhead_bytes_num              ; 
+   uint32_t wr_cmd_overhead_bytes_num           ;
+   uint32_t rd_cmd_overhead_bytes_num           ;
    uint32_t int_clk_period_factor               ; 
    
 };

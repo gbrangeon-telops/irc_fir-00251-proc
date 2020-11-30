@@ -28,7 +28,7 @@ entity scd_proxy2_serial_com is
       
       -- interface avec le contrôleur
       SERIAL_PARAM           : in serial_param_type;
-            
+      
       SERIAL_FATAL_ERR       : out std_logic;
       SERIAL_DONE            : out std_logic;
       
@@ -213,6 +213,7 @@ architecture RTL of scd_proxy2_serial_com is
    signal prog_trig_start         : std_logic;
    signal prog_trig_start_last    : std_logic; 
    signal acq_mode                : std_logic;
+   signal cmd_ram2_eof_add        : unsigned(SERIAL_PARAM.CMD_EOF_ADD'LENGTH-1 downto 0);
    
    -- -- attribute dont_touch           : string;
    -- -- attribute dont_touch of resp_err             : signal is "true";
@@ -389,8 +390,6 @@ begin
    -- 1) copie de la config de la zone MB vers la zone sécurisée 
    -- 2) envoie de la config de la zone sécurisée vers le proxy
    
-   -- ATTENTION !!!!!!!!!!!!  la simulation montre que les fifos du xuart se comportent comme des fifos standard et pas comme des fwft. 
-   --  Cela veut dire que les données valides ne sont pas sur les outputs. Il faut lire es fifos et se vbaser sur les reeponses axi.
    U3 : process(CLK)
    begin
       if rising_edge(CLK) then 
@@ -428,6 +427,11 @@ begin
             
             prog_trig_done_last <= prog_trig_done;
             
+            cfg_fifo_wr_en <= RAM1_RD_DVAL; 
+            cfg_fifo_din <= RAM1_RD_DATA;
+            
+            cmd_ram2_eof_add <= SERIAL_PARAM.CMD_EOF_ADD - SERIAL_PARAM.CMD_SOF_ADD;
+            
             --fsm de contrôle            
             case  cfg_mgmt_fsm is 
                
@@ -464,40 +468,38 @@ begin
                when cpy_cfg_rd_st =>   -- la config est copiee de la zone A vers un fifo (avant de partir en zone sécurisée)                       
                   ram1_rd_i <= '1';
                   cfg_byte_cnt <= cfg_byte_cnt + 1;
-                  ram1_rd_add_i <= resize(unsigned(SERIAL_PARAM.CMD_SOF_ADD), ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);
-                  if ram1_rd_add_i(7 downto 0) = LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
+                  ram1_rd_add_i <= resize(SERIAL_PARAM.CMD_SOF_ADD, ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);
+                  if ram1_rd_add_i(7 downto 0) = to_integer(SERIAL_PARAM.CMD_EOF_ADD) then 
                      cfg_mgmt_fsm <= init_cpy_wr_st;
                      ram1_rd_i <= '0';
                   end if;
-                  cfg_fifo_wr_en <= RAM1_RD_DVAL; 
-                  cfg_fifo_din <= RAM1_RD_DATA;
                
                when init_cpy_wr_st =>     -- zone securisée en ecriture
-                  cfg_fifo_wr_en <= '0';
                   cfg_byte_cnt <= (others => '0');
                   ram2_wr_add_i <= to_unsigned(0, ram2_wr_add_i'length); -- zone securisée sera en ecriture
                   cfg_mgmt_fsm <= cpy_cfg_wr_st;
                
                when cpy_cfg_wr_st =>  -- la config est copiee  du fifo vers la RAM2 securisée  
-                  cfg_fifo_rd_en <= '1';                                      -- on peut commencer la lecture les yeux fermées car le fifo contient déjà des données quand on arrive ici     
+                  cfg_fifo_rd_en <= '1'; 
+                  ram2_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
+                  ram2_wr_data_i <= cfg_fifo_dout;				  -- on peut commencer la lecture les yeux fermées car le fifo contient déjà des données quand on arrive ici     
+                  ram2_rd_i <= '0';
                   if cfg_fifo_dval = '1' then
-                     ram2_rd_i <= '0';
-                     ram2_wr_i <= '1';                                         -- ram en mode ecriture  
-                     ram2_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
-                     ram2_wr_data_i <= cfg_fifo_dout;
+                     ram2_wr_i <= '1';                                         -- ram en mode ecriture 
                      cfg_byte_cnt <= cfg_byte_cnt + 1;                     
-                  end if;
-                  if cfg_fifo_empty = '1' then
-                     cfg_mgmt_fsm <= idle;
-                     cfg_fifo_rd_en <= '0'; 
+                  else
+                     ram2_wr_i <= '0';
+                     if cfg_fifo_empty = '1' then
+                        cfg_mgmt_fsm <= idle;
+                        cfg_fifo_rd_en <= '0'; 
+                     end if;
                   end if;
                   
                -- partie envoi de la config vers le détecteur
                when init_send_st =>            
                   tx_dval_i <= '0';
                   cfg_byte_cnt <= (others => '0'); 
-                  ram2_rd_add_i <= to_unsigned(0, ram2_rd_add_i'length); -- zone securisée sera en lecture
-                  
+                  ram2_rd_add_i <= to_unsigned(0, ram2_rd_add_i'length); -- zone securisée sera en lecture                  
                   if unsigned(SERIAL_PARAM.CMD_SOF_ADD) = resize(USER_CFG.OP_CMD_SOF_ADD, SERIAL_PARAM.CMD_SOF_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
                      force_prog_trig_mode <= '1';
                      cfg_mgmt_fsm <= prog_trig_start_st; 
@@ -531,7 +533,6 @@ begin
                   ram2_rd_i <= '0';                  
                   if RAM2_RD_DVAL = '1' then
                      cfg_byte <= RAM2_RD_DATA;
-                     cfg_byte_cnt  <= cfg_byte_cnt + 1;
                      cfg_mgmt_fsm <= send_cfg_out_st;                     
                   end if;
                
@@ -550,7 +551,7 @@ begin
                
                when check_frm_end_st =>
                   tx_dval_i <= '0';
-                  if ram2_rd_add_i = SERIAL_PARAM.CMD_EOF_ADD then
+                  if ram2_rd_add_i = to_integer(cmd_ram2_eof_add) then
                      cfg_mgmt_fsm <= wait_tx_fifo_empty_st;
                      cmd_resp_en <= '1';
                   else
@@ -776,7 +777,7 @@ begin
                when fpa_temp_resp_st =>  -- extraction de la température raw 
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
                   temp_diode := unsigned(resp_data(1)) & unsigned(resp_data(0));
-                  temp_gnd   := unsigned(resp_data(3)) & unsigned(resp_data(2));                   
+                  temp_gnd   := (others => '0');  -- unsigned(resp_data(3)) & unsigned(resp_data(2));               
                   if temp_diode /= temp_gnd then  -- au demarrage , le proxy renvoie (temp_diode - temp_gnd = 0). Ce qui pose problème. dès que cela est levé, la temperature lue est supposée valide
                      fpa_temp_error <= '0';
                   end if;              

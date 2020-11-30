@@ -87,7 +87,7 @@ begin
             sample_valid_set1 <= '0';
          end if;
          
-         if  unsigned(RX_POS) <= to_integer(CFG.SOL_POSL) then
+         if  unsigned(RX_POS) <= to_integer(CFG.EOL_POSL) then
             sample_valid_set2 <= RX_MOSI.DVAL;
          else
             sample_valid_set2 <= '0';  

@@ -114,7 +114,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal int_indx_i                : std_logic_vector(7 downto 0); 
    signal int_time_i                : std_logic_vector(31 downto 0);
    signal new_cfg_id                : std_logic_vector(7 downto 0);
-   signal serial_sof_add_i        : std_logic_vector(7 downto 0);
+   signal serial_sof_add_i          : std_logic_vector(7 downto 0);
    signal cfg_ser_param_i           : serial_param_type;
    signal serial_id_i               : std_logic_vector(7 downto 0);
    signal cfg_id_i                  : std_logic_vector(7 downto 0);

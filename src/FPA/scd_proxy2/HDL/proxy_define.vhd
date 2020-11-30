@@ -219,6 +219,7 @@ package Proxy_define is
       fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée        
       int_clk_period_factor          : unsigned(7 downto 0);
+      int_time_offset                : signed(31 downto 0);  
       
    end record;    
    
