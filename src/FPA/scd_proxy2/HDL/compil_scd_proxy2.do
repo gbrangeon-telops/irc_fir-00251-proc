@@ -59,6 +59,10 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_real_data.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_bridge.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_line_mux.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_pos.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_sel.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_cropping_core.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_cropping.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_dval_gen.bde \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_data_ctrl.bde
 
