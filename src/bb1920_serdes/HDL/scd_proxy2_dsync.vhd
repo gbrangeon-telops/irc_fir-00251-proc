@@ -74,7 +74,8 @@ architecture scd_proxy2_dsync of scd_proxy2_dsync is
    signal reg_2 : std_logic_vector(63 downto 0);
    signal reg_3 : std_logic_vector(63 downto 0);
    signal reg_4 : std_logic_vector(63 downto 0);
-   signal fval_pixel : std_logic;
+   signal fval_pixel : std_logic;         
+   signal quad_dval_i : std_logic;
    
 begin
    
@@ -158,6 +159,7 @@ begin
                reg_3 <= reg_3;
                reg_4 <= reg_4;
             end if;
+            quad_dval_i <= fifo_rd_en;
          end if;
       end if;
    end process shift_register;
@@ -168,8 +170,9 @@ begin
          if sreset = '1' then
             fval_pixel <= '0';
          else
-            --Si on a un pixel suivi d'une fin d'image 4 packet plus tard (fin de fval_pixel)
-            if reg_3(28) = '1' and reg_0(30) = '0' then
+            --Si on a un pixel suivi d'une fin d'image 4 packet plus tard (fin de fval_pixel)      
+            --28 is dval, 30 is fval
+            if reg_4(28) = '1' and reg_1(30) = '0' then
                fval_pixel <= '0';
             --Si on a une image débuté et un pixel ensuite (debut de fval_pixel)
             elsif reg_4(30) = '1' and reg_3(28) = '1' then

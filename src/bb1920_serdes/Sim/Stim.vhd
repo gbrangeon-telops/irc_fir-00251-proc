@@ -132,7 +132,7 @@ begin
       wait for clk_period * 10;
       
       --Read startup of the detector
-      file_open(stimulus_start_up, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\Start_up.txt", read_mode);
+      file_open(stimulus_start_up, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Start_up.txt", read_mode);
       while not endfile(stimulus_start_up) loop
          wait until rising_edge(clk_i);
          readline(stimulus_start_up,l);
@@ -143,7 +143,7 @@ begin
       --Read the image in an infinite loop like the detector would
       --Only one image is read in a loop
       while true loop
-         file_open(stimulus_image, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\Image.txt",  read_mode);
+         file_open(stimulus_image, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Image.txt",  read_mode);
          while not endfile(stimulus_image) loop
             wait until rising_edge(clk_i);	
             readline(stimulus_image,l);

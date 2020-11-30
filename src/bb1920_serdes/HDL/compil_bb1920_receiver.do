@@ -1,7 +1,8 @@
 #savealltabs
-#SetActiveLib -work
-#clearlibrary 	
-
+--SetActiveLib -work
+--clearlibrary 	
+alib work
+setActivelib work
 
 #__BEGIN BUILD BB1920 SERDES
 
@@ -24,19 +25,24 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde 
 
 #IP
-acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_sim_netlist.vhdl \
- d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_stub.vhdl
- 
+--acom -incr -nowarn DAGGEN_0523 \
+acom d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_sim_netlist.vhdl
+acom d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_stub.vhdl
+
+
+#SIM
+--acom -incr -nowarn DAGGEN_0523
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Stim.vhd
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\scd_proxy2_serdes_simulation.bde
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\Sim\bb1920_deserializer_simulation.bde
+
 # BB1920 SERDES
-acom -incr -nowarn DAGGEN_0523 \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\data_dispatcher.vhd \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\Stim.vhd \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_serdes_simulation.bde \
- d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\bb1920_deserializer.bde
+--acom -incr -nowarn DAGGEN_0523 \
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\data_dispatcher.vhd
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde
+acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL\bb1920_deserializer.bde
 
 #__END BUILD BB1920 SERDES

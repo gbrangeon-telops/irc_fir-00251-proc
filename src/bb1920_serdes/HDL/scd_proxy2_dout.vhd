@@ -52,7 +52,7 @@ architecture rtl of scd_proxy2_dout is
    signal lvals_i 	      : std_logic_vector(7 downto 0);
    signal ctrl_words       : array_type;
    signal ctrl_words_last  : array_type;
-   signal dout_i           : std_logic_vector(DOUT'LENGTH-1 downto 0);
+   signal dout_i           : std_logic_vector(DOUT'LENGTH-1 downto 0) := (others => '0');
    signal dout_dval_i      : std_logic;
    signal ctrl_bits_i      : std_logic_vector(3 downto 0);
    signal ctrl_bits_last   : std_logic_vector(3 downto 0);
