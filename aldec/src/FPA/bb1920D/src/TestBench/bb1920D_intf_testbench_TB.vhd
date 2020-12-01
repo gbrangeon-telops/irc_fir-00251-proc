@@ -58,7 +58,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    end component;
    
    
-   constant QWORDS_NUM   : natural := 52;
+   constant QWORDS_NUM   : natural := 65;
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
@@ -250,12 +250,12 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVDS25;        
          
          -- cfg usager
-         user_xsize1 <= 1920;
-         user_ysize1 <= 1536;
+         user_xsize1 <= 320;
+         user_ysize1 <= 256;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 1920;
-         user_ysize2 <= 1536;
+         user_xsize2 <= 320;
+         user_ysize2 <= 256;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          
          user_xsize3 <= 64;

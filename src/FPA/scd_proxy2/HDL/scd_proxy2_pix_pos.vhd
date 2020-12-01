@@ -87,9 +87,9 @@ begin
             -- sortie des numeros des quads
             if RX_MOSI.DVAL = '1' then 
                if RX_MOSI.SOL = '1' then 
-                  tx_pos_i <= (others => '0');
+                  tx_pos_i <= to_unsigned(1, tx_pos_i'length);
                else
-                  tx_pos_i <= tx_pos_i + 1;
+                  tx_pos_i <= tx_pos_i + 1;        -- 
                end if;				  
             end if;
             

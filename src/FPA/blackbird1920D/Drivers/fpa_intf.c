@@ -414,9 +414,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_serdes_lval_len             = ptrA->xsize/PrivateStat->fpa_pix_num_per_pclk; 
    ptrA->op_cmd_id                       = 0x8500;          // n'est pas utilisé par le vhd mais par le diverC
    ptrA->temp_cmd_id                     = 0x8503;          // est utilisé par le vhd et le diverC
-   ptrA->op_cmd_bram_base_add            = 0; 
-   ptrA->int_cmd_bram_base_add           = 128; 
-   ptrA->temp_cmd_bram_base_add          = 192; 
+   ptrA->op_cmd_bram_base_add            = ; 
+   ptrA->int_cmd_bram_base_add           = ; 
+   ptrA->temp_cmd_bram_base_add          = ; 
    ptrA->int_cmd_bram_base_add_m1        = ptrA->int_cmd_bram_base_add - 1; 
    ptrA->wr_cmd_overhead_bytes_num       = 6;               //p.21 du doc 21Q_dxu0003 proxy host interface specification rev_0 (uart)
    ptrA->int_checksum_base_add           = (ptrA->int_cmd_dlen - 1) + ptrA->wr_cmd_overhead_bytes_num + 1;  // (ptrA->int_cmd_dlen - 1) est le nombre de bytes de données.

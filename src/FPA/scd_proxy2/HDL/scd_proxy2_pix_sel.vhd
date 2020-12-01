@@ -81,9 +81,10 @@ begin
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then
-            
+            sample_valid_set1 <= '0';
             tx_mosi_pipe(0).dval <= '0';
             tx_mosi_pipe(1).dval <= '0';
+            sample_valid_set2 <= '0';
             
          else
             

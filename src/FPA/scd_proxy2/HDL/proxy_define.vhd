@@ -182,6 +182,8 @@ package Proxy_define is
       int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       
       -- aoi (cropping)
+      aoi_xsize                      : unsigned(10 downto 0);
+      aoi_ysize                      : unsigned(10 downto 0);
       aoi_data                       : line_area_cfg_type;
       aoi_flag1                      : line_area_cfg_type;
       aoi_flag2                      : line_area_cfg_type;
