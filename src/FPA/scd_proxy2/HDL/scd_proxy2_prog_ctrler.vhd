@@ -141,16 +141,16 @@ begin
    -------------------------------------------------
    -- mappings                                                   
    -------------------------------------------------
-   SERIAL_PARAM <= ser_param_i;
-   INT_INDX <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
-   FRAME_ID <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT
-   ACQ_INT <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
-   FPA_INT <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
-   PROXY_TRIG <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_proxy2_driver_output 
-   FPA_INTF_CFG <= fpa_intf_cfg_i;  -- sortie de la config
-   RST_CLINK_N <= reset_clink_n;
-   INT_TIME <= int_time_i;
-   PROXY_PWR <= proxy_pwr_i;
+   SERIAL_PARAM   <= ser_param_i;
+   INT_INDX       <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
+   FRAME_ID       <= std_logic_vector(frame_id_i);   --  synchronsié avec ACQ_INT
+   ACQ_INT        <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
+   FPA_INT        <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
+   PROXY_TRIG     <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_proxy2_driver_output 
+   FPA_INTF_CFG   <= fpa_intf_cfg_i;  -- sortie de la config
+   RST_CLINK_N    <= reset_clink_n;
+   INT_TIME       <= int_time_i;
+   PROXY_PWR      <= proxy_pwr_i;
    
    
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
@@ -205,7 +205,9 @@ begin
             user_cfg_in_progress_i <= '0';
             user_cfg_in_progress_last <= '0';
             new_cfg_pending_fsm <= check_cfg_st1;
-            need_prog_rqst <= '0'; 
+            need_prog_rqst <= '0';
+            cfg_ser_param_i.run   <= '0';
+            cfg_ser_param_i.abort <= '0';
             
          else 
             
@@ -353,9 +355,9 @@ begin
                
                when fpa_prog_en_st =>        -- ordre de programmation du fpa       
                   fpa_driver_done <= '0';             
-                  fpa_driver_rqst <= '0';
+                  fpa_driver_rqst <= '0'; 
+                  ser_param_i <= cfg_ser_param_i;
                   if fpa_new_cfg_pending = '1' then   -- on reverifie qu'il y a toujours une config en attente car il se pourrait q'une nouvelle config soit rentrée et egale à celle déjà dans le détecteur               
-                     ser_param_i <= cfg_ser_param_i;
                      ser_param_i.run <= '1';
                      ser_param_i.abort  <= '0';
                      serial_id_i <= new_cfg_id;
