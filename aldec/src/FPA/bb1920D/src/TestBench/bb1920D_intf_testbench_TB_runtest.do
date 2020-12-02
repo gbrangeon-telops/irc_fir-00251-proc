@@ -83,7 +83,7 @@ wave UUT/U1/U4/*
 # 
 wave UUT/U1/U5/U1/U6A/*
 wave UUT/U1/U5/U1/* 
-#wave UUT/U1/U5/U2/*
+wave UUT/U1/U5/U2/*
 #
 wave UUT/U1/U9/U2/U1/*
 wave UUT/U1/U9/U2/U5/*
@@ -106,6 +106,6 @@ wave UUT/U1/U9/U8/U5/*
 
 
 --wave UUT/U1/*
-run 150 ms
+run 10 ms
 --run 30 ms  
 --9.1 ms

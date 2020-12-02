@@ -85,7 +85,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    --   constant STRETCH_LINE_LENGTH_MCLK : natural := 1;   
    
    
-   constant OP_CFG_BASE_ADD : natural := to_integer(unsigned(x"400"));
+   constant OP_CFG_BASE_ADD : natural := 3072;
    
    
    --   constant user_sol_posl_pclk : natural := ((C_ROIC_XSIZE1 - C_USER_XSIZE1)/2)/TAP_NUM + 1; 
@@ -320,6 +320,7 @@ begin
       write_axi_lite (MB_CLK, resize(X"E8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
       wait for 500 ns;
       
+      -- la cfg des dacs fait office ici de cfg serielle operationnelle
       for ii in 0 to 8-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := dac_cfg_vector'length -1 - 32*ii;

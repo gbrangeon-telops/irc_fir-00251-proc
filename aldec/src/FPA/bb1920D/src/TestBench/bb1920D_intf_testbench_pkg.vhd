@@ -162,7 +162,7 @@ package body BB1920D_intf_testbench_pkg is
       int_cmd_sof_add               := to_unsigned(64, 32); 
       int_cmd_eof_add               := to_unsigned(64 + 15, 32); 
       int_cmd_sof_add_m1            := to_unsigned(63, 32); 
-      int_checksum_add              := to_unsigned(15, 32); 
+      int_checksum_add              := int_cmd_sof_add + to_unsigned(15, 32); 
       frame_dly_cst                 := to_unsigned(10, 32);         
       int_dly_cst                   := to_unsigned(10, 32);         
       
@@ -171,8 +171,8 @@ package body BB1920D_intf_testbench_pkg is
       op_cmd_eof_add                := to_unsigned(10, 32);
       
       temp_cmd_id                   := resize(x"8503", 32);
-      temp_cmd_sof_add              := to_unsigned(0, 32); 
-      temp_cmd_sof_add              := to_unsigned(10, 32);
+      temp_cmd_sof_add              := to_unsigned(128, 32); 
+      temp_cmd_eof_add              := to_unsigned(128 + 10, 32);
       
       outgoing_com_hder             := resize(x"AA", 32);
       incoming_com_hder             := resize(x"55", 32);
