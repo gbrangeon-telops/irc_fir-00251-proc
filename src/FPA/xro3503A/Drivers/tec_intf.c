@@ -31,14 +31,19 @@ static XIic gI2CCtrl;
 void TEC_Init(void)
 {
    XStatus status;
+   static bool init = false;
 
-   status = XIic_Initialize(&gI2CCtrl, XPAR_AXI_IIC_0_DEVICE_ID);
-   if (status != XST_SUCCESS) goto fail;
+   if (!init)
+   {
+      status = XIic_Initialize(&gI2CCtrl, XPAR_AXI_IIC_0_DEVICE_ID);
+      if (status != XST_SUCCESS) goto fail;
 
-   /* Set I2C slave address */
-   status = XIic_SetAddress(&gI2CCtrl, XII_ADDR_TO_SEND_TYPE, I2C_SLAVE_ADDR);
-   if (status != XST_SUCCESS) goto fail;
-   XIic_Start(&gI2CCtrl);
+      /* Set I2C slave address */
+      status = XIic_SetAddress(&gI2CCtrl, XII_ADDR_TO_SEND_TYPE, I2C_SLAVE_ADDR);
+      if (status != XST_SUCCESS) goto fail;
+      XIic_Start(&gI2CCtrl);
+      init = true;
+   }
 
    return;
 
