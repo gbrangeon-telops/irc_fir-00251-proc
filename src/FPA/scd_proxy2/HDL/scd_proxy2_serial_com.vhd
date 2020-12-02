@@ -24,7 +24,8 @@ entity scd_proxy2_serial_com is
       ARESET                 : in std_logic;
       CLK                    : in std_logic;
       
-      USER_CFG               : fpa_intf_cfg_type;
+      USER_CFG               : in fpa_intf_cfg_type;
+      USER_CFG_IN_PROGRESS   : in std_logic;          -- à '1' lorsque USER_CFG et son équivalent seriel sont en cours d'envoi
       
       -- interface avec le contrôleur
       SERIAL_PARAM           : in serial_param_type;
@@ -122,24 +123,16 @@ architecture RTL of scd_proxy2_serial_com is
    end component;
    
    -------------------------------------
-   -- cette constante permet de partionner la RAM de 248 bytes en 2
-   -- A) la zone d'adresse de 0 à 511  :
+   -- RAM1:
    --       elle est réservée à l'écriture de la config en provenance du MB. Le MB étant totalement asynchrone, il peut y ecrire à tout moment
-   --       pour eviter donc que la config soit corrompue par une autre pendant qu'on l'utilise pour programmer le détecteur, on copie la config de cette zone vers une autre plus sécurisée 
-   --       avant qu'elle ne soit réecrite
-   -- B) la zone d'adresse de 1024 à YYY :
-   -- c'est la zone sécurisée, la config est à l'abri de toute modification de la part du MB. Toute config ecrite dans cette zone sera envoyée au détecteur.
-   -- Comme la config est securisée, elle pourra etre renvoyée au détecteur N fois (redondance), si la communication est mauvaise.
-   --------------------------------------
-   --constant AXI_UARTLITE_RX_FIFO_ADD : std_logic_vector(7 downto 0) :=  x"00";   
-   --constant AXI_UARTLITE_TX_FIFO_ADD : std_logic_vector(7 downto 0) :=  x"04";
-   
-   --adressees d'acces des fifos de AXI UART LITE
-   
+   --       pour eviter donc que la config soit corrompue par une autre pendant qu'on l'utilise pour programmer le détecteur, on copie la config de cette RAM vers une seconde avant qu'elle ne soit réecrite
+   -- RAM2:
+   --       c'est la zone sécurisée, la config est à l'abri de toute modification de la part du MB. Toute config ecrite dans cette zone sera envoyée au détecteur.
+   --       comme la config est securisée, elle pourra etre renvoyée au détecteur N fois (redondance), si la communication est mauvaise.
    --------------------------------------
    
    type prog_seq_fsm_type is (idle, cpy_cfg_st, wait_end_cpy_cfg_st, send_cfg_st, wait_end_send_cfg_st, wait_proxy_resp_st, cmd_fail_mgmt_st);
-   type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st, cpy_cfg_wr_st, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
+   type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st1, cpy_cfg_rd_st2, cpy_cfg_wr_st, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
    type cmd_resp_fsm_type is (idle, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
    type com_data_array_type  is array (0 to LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
@@ -452,7 +445,7 @@ begin
                   
                   if cpy_cfg_en = '1' then
                      cpy_cfg_done <= '0';
-                     cfg_mgmt_fsm <= cpy_cfg_rd_st;
+                     cfg_mgmt_fsm <= cpy_cfg_rd_st1;
                      if RST_ERROR_EN = '1' then
                         serial_cmd_failure <= '0';
                      end if;
@@ -465,7 +458,12 @@ begin
                   end if;
                   
                -- partie copy de la config vers une zone securisée             
-               when cpy_cfg_rd_st =>   -- la config est copiee de la zone A vers un fifo (avant de partir en zone sécurisée)                       
+               when cpy_cfg_rd_st1 =>   -- on valide que la RAM1 n'est pas en ecriture                     
+                  if USER_CFG_IN_PROGRESS = '0' then 
+                     cfg_mgmt_fsm <= cpy_cfg_rd_st2;
+                  end if;
+               
+               when cpy_cfg_rd_st2 =>   -- la config est copiee de la ram1 vers un fifo (avant de partir en zone sécurisée)                       
                   ram1_rd_i <= '1';
                   cfg_byte_cnt <= cfg_byte_cnt + 1;
                   ram1_rd_add_i <= resize(SERIAL_PARAM.CMD_SOF_ADD, ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);

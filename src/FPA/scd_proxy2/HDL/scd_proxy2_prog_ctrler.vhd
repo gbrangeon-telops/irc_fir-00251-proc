@@ -24,7 +24,7 @@ entity scd_proxy2_prog_ctrler is
       CLK                  : in std_logic;
       
       USER_CFG             : in fpa_intf_cfg_type;  -- la cfg valide envoyée par l'usager est ici
-      USER_CFG_IN_PROGRESS : in std_logic;          -- à '1' lorsque USER_CFG et son équivalent seriel sont en cours d'envoi par le mblaze
+      USER_CFG_IN_PROGRESS : in std_logic;          -- à '1' lorsque USER_CFG et son équivalent seriel sont en cours d'envoi
       
       READOUT              : in std_logic;
       

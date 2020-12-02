@@ -200,6 +200,10 @@ begin
             mb_ser_cfg_data <= data_i(7 downto 0); -- pour la partie serielle de la config, seule la partie (7 downto 0) est valide (voir le driver C)                  
             mb_ser_cfg_dval <= slv_reg_wren and and_reduce(axi_awaddr(11 downto 10)); -- la ram est ecrite lorsque l'adresse de base est x"C00" ou "D00" ou "E00" ou "F00"       
             
+            if mb_ser_cfg_dval = '1' then 
+               mb_cfg_in_progress <= '1';  -- des qu'une commande serielle est en cours,  mb_cfg_in_progress est à '1' et tombe à '0' lorsque l'envoi de la structurale est terminée
+            end if;
+            
             -- MB: config structurelle
             if slv_reg_wren = '1' then
                
@@ -287,7 +291,6 @@ begin
                   when X"0F8" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
                   when X"0FC" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));
                   when X"100" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
-                     
                      
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
