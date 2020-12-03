@@ -896,12 +896,10 @@ IRC_Status_t DebugTerminalParsePOWER(circByteBuffer_t *cbuf)
    DT_PRINTF("Pleora =       %s", (Power_GetChannelPowerState(PC_PLEORA) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("ADC/DDC =      %s", (Power_GetChannelPowerState(PC_ADC_DDC) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Cooler =       %s", (Power_GetChannelPowerState(PC_COOLER) == CPS_ON)? "ON":"OFF");
-   //DT_PRINTF("Buffer =       %s", (Power_GetChannelPowerState(PC_BUFFER) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Filter wheel = %s", (Power_GetChannelPowerState(PC_FW) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Expansion =    %s", (Power_GetChannelPowerState(PC_EXPANSION) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Spare1 =       %s", (Power_GetChannelPowerState(PC_SPARE1) == CPS_ON)? "ON":"OFF");
    DT_PRINTF("Spare2 =       %s", (Power_GetChannelPowerState(PC_SPARE2) == CPS_ON)? "ON":"OFF");
-   //DT_PRINTF("Spare =        %s", (Power_GetChannelPowerState(PC_SPARE) == CPS_ON)? "ON":"OFF");
 
    return IRC_SUCCESS;
 }

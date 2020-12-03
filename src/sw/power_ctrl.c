@@ -61,10 +61,6 @@ IRC_Status_t Power_Init(uint16_t gpioDeviceId, XIntc *p_intc, uint16_t IntrId)
    // Set power management GPIO direction (0 for output, 1 for input)
    XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, 0x00000000);
 
-   // Set power management GPIO initial value
-   //XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, POWER_BUFFER_MASK);
-   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, POWER_COOLER_MASK);
-
    // Set direction for XADC mux address GPIO (0 for output, 1 for input)
    XGpio_SetDataDirection(&gPowerCtrl.GPIO, PGPIOC_ANALOG_MUX_ADDR, 0x00000000);
 

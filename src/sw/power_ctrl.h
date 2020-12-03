@@ -81,12 +81,10 @@ enum powerChannelEnum {
    PC_PLEORA = 0,
    PC_ADC_DDC = 1,
    PC_COOLER = 2,
-   //PC_BUFFER = 3,
    PC_FW = 3,
    PC_EXPANSION = 4,
    PC_SPARE1 = 5,
    PC_SPARE2 = 6,
-   //PC_SPARE = 8,
    PC_SELFRESET = 7,
 };
 
@@ -98,14 +96,11 @@ typedef enum powerChannelEnum powerChannel_t;
 #define POWER_PLEORA_MASK        (1L << PC_PLEORA)
 #define POWER_ADC_DDC_MASK       (1L << PC_ADC_DDC)
 #define POWER_COOLER_MASK        (1L << PC_COOLER)
-//#define POWER_BUFFER_MASK        (1L << PC_BUFFER)
 #define POWER_SFW_MASK           (1L << PC_SFW)
 #define POWER_EXPANSION_MASK     (1L << PC_EXPANSION)
 #define POWER_SPARE1_MASK        (1L << PC_SPARE1)
 #define POWER_SPARE2_MASK        (1L << PC_SPARE2)
-//#define POWER_SPARE_MASK         (1L << PC_SPARE)
 #define POWER_SELFRESET_MASK     (1L << PC_SELFRESET)
-//#define POWER_PUSH_BUTTON_MASK   (1L << PC_PUSH_BUTTON)
 
 /**
  * Push button state
