@@ -26,12 +26,11 @@
 
 /* Private data */
 static XIic gI2CCtrl;
-
+static bool init;
 
 void TEC_Init(void)
 {
    XStatus status;
-   static bool init = false;
 
    if (!init)
    {
@@ -54,8 +53,9 @@ fail:
 uint16_t TEC_GetTemperatureSetpoint(void)
 {
    unsigned ByteCount;
-   uint8_t DigipotVal;
+   uint8_t DigipotVal = 0;
 
+   if (!init) return;
    ByteCount = XIic_Recv(XPAR_AXI_IIC_0_BASEADDR, I2C_SLAVE_ADDR,
                          &DigipotVal, 1, XIIC_STOP);
    if (ByteCount != 1)
@@ -72,6 +72,7 @@ void TEC_SetTemperatureSetpoint(uint16_t SetVal)
    databuf[0] = 0x00;   /* instruction byte */
    databuf[1] = SetVal; /* data byte */
 
+   if (!init) return;
    ByteCount = XIic_Send(XPAR_AXI_IIC_0_BASEADDR, I2C_SLAVE_ADDR,
                          databuf, 2, XIIC_STOP);
    if (ByteCount != 2)
