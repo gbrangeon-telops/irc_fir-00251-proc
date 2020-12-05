@@ -55,7 +55,7 @@ uint16_t TEC_GetTemperatureSetpoint(void)
    unsigned ByteCount;
    uint8_t DigipotVal = 0;
 
-   if (!init) return;
+   if (!init) return 0;
    ByteCount = XIic_Recv(XPAR_AXI_IIC_0_BASEADDR, I2C_SLAVE_ADDR,
                          &DigipotVal, 1, XIIC_STOP);
    if (ByteCount != 1)
