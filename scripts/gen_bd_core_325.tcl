@@ -1376,6 +1376,11 @@ CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
 
   # Create instance: axi_iic_0, and set properties
   set axi_iic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_iic:2.0 axi_iic_0 ]
+  set_property -dict [ list \
+CONFIG.C_SCL_INERTIAL_DELAY {255} \
+CONFIG.C_SDA_INERTIAL_DELAY {255} \
+CONFIG.IIC_FREQ_KHZ {10} \
+ ] $axi_iic_0
 
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
@@ -1838,9 +1843,9 @@ preplace portBus bulk_interrupt -pg 1 -y 1580 -defaultsOSRD
 preplace portBus ARESETN -pg 1 -y 470 -defaultsOSRD
 preplace inst MCU -pg 1 -lvl 3 -y 2062 -defaultsOSRD
 preplace inst FlashReset_0 -pg 1 -lvl 3 -y 1420 -defaultsOSRD
-preplace inst axi_iic_0 -pg 1 -lvl 6 -y 310 -defaultsOSRD
 preplace inst vcc -pg 1 -lvl 1 -y 2340 -defaultsOSRD
 preplace inst intr_concact -pg 1 -lvl 2 -y 1610 -defaultsOSRD
+preplace inst axi_iic_0 -pg 1 -lvl 6 -y 310 -defaultsOSRD
 preplace inst axi_lens_uart -pg 1 -lvl 5 -y 40 -defaultsOSRD
 preplace inst MIG_Calibration -pg 1 -lvl 5 -y 2312 -defaultsOSRD
 preplace inst GND -pg 1 -lvl 1 -y 2430 -defaultsOSRD
@@ -1863,10 +1868,10 @@ preplace inst clk_wiz_1 -pg 1 -lvl 4 -y 7128 -defaultsOSRD
 preplace inst power_management -pg 1 -lvl 5 -y 1970 -defaultsOSRD
 preplace inst axi_quad_spi_0 -pg 1 -lvl 5 -y 3714 -defaultsOSRD
 preplace netloc S_AXIS_MM2S_CMD_1 1 0 5 -260J 2200 NJ 2200 NJ 2200 NJ 2200 2720J
-preplace netloc axi_peripheral_M04_AXI1 1 4 3 2960J 1180 NJ 1180 NJ
+preplace netloc axi_peripheral_M04_AXI1 1 4 3 2970J 1180 NJ 1180 NJ
 preplace netloc S00_AXI_2 1 2 3 550 940 NJ 940 2690
 preplace netloc axi_ndf_uart_sout 1 5 2 N 1380 6550
-preplace netloc S_AXIS_MM2S_CMD_2 1 0 5 -260J 2240 NJ 2240 NJ 2240 NJ 2240 2980J
+preplace netloc S_AXIS_MM2S_CMD_2 1 0 5 -260J 2240 NJ 2240 NJ 2240 NJ 2240 2990J
 preplace netloc mig_7series_0_DDR3 1 5 2 NJ 2262 6660
 preplace netloc axi_quad_spi_0_ip2intc_irpt 1 1 5 0 3790 NJ 3790 NJ 3790 NJ 3790 6090
 preplace netloc microblaze_1_Clk 1 2 5 530 690 960 690 2860 690 6150J 690 6600J
@@ -1881,16 +1886,16 @@ preplace netloc clk_wiz_2_locked 1 1 4 110 3760 NJ 3760 NJ 3760 2670
 preplace netloc MIG_Code_clk20 1 5 2 N 2992 6550
 preplace netloc cooler_uart_ip2intc_irpt 1 1 5 40 1840 NJ 1840 NJ 1840 2910J 1500 6100
 preplace netloc clink_uart_sout 1 5 2 N 780 6660
-preplace netloc OEM_UART_rxd_1 1 0 6 -260J 1910 NJ 1910 NJ 1910 NJ 1910 2980J 1890 6100
+preplace netloc OEM_UART_rxd_1 1 0 6 -260J 1910 NJ 1910 NJ 1910 NJ 1910 2990J 1890 6100
 preplace netloc power_management_GPIO2 1 5 2 NJ 1980 6650
-preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 110 1860 NJ 1860 NJ 1860 2920J 1490 6120
+preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 110 1860 NJ 1860 NJ 1860 2930J 1490 6120
 preplace netloc axi_iic_0_IIC 1 6 1 6600
 preplace netloc axi_gpio_0_gpio 1 5 2 NJ 160 6600
-preplace netloc axi_protocol_converter_8_m_axi 1 4 3 2930J 1550 NJ 1550 6530J
+preplace netloc axi_protocol_converter_8_m_axi 1 4 3 2920J 1550 NJ 1550 6530J
 preplace netloc MIG_Calibration_M_AXIS_MM2S 1 5 2 NJ 2282 6660
 preplace netloc axi_protocol_converter_2_m_axi 1 4 3 2730J 1250 NJ 1250 6540J
 preplace netloc axi_peripheral_m_pleora_axi 1 4 1 N
-preplace netloc xadc_wiz_1_temp_out 1 4 2 2990 3150 6090
+preplace netloc xadc_wiz_1_temp_out 1 4 2 3000 3150 6090
 preplace netloc axi_interconnect_0_M00_AXI1 1 3 2 950J 3684 NJ
 preplace netloc vn_in_1 1 0 5 -260J 3304 NJ 3304 NJ 3304 NJ 3304 NJ
 preplace netloc vp_in_1 1 0 5 -270J 3324 NJ 3324 NJ 3324 NJ 3324 NJ
@@ -1920,7 +1925,7 @@ preplace netloc axi_interconnect_1_m02_axi 1 4 1 2710
 preplace netloc SYS_CLK_1 1 0 5 NJ 2190 NJ 2190 NJ 2190 NJ 2190 2740J
 preplace netloc axi_peripheral_M15_AXI 1 4 3 2850J 1450 NJ 1450 6510J
 preplace netloc MIG_Calibration_M_AXIS_MM2S1 1 5 2 NJ 2322 6660
-preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 3 NJ 2380 970 2380 2980
+preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 3 NJ 2380 970 2380 2990
 preplace netloc oem_uart_sout 1 5 2 N 1810 6590
 preplace netloc axi_iic_0_iic2intc_irpt 1 1 6 20 240 NJ 240 NJ 240 NJ 240 NJ 240 6510
 preplace netloc S_AXIS_S2MM_2 1 0 5 -260J 2252 NJ 2252 NJ 2252 NJ 2252 NJ
@@ -1928,11 +1933,11 @@ preplace netloc axi_peripheral_M_CALIB_RAM_AXI 1 4 3 2730J 1190 NJ 1190 6520J
 preplace netloc sin_1 1 0 6 -250J 530 NJ 530 NJ 530 NJ 530 NJ 530 6090
 preplace netloc MCU_Interrupt 1 1 3 100 2230 NJ 2230 920
 preplace netloc fpga_output_uart_sout 1 5 2 N 940 6650
-preplace netloc sin_2 1 0 6 -260J 1900 NJ 1900 NJ 1900 NJ 1900 2970J 1710 6090
+preplace netloc sin_2 1 0 6 -260J 1900 NJ 1900 NJ 1900 NJ 1900 2980J 1710 6090
 preplace netloc axi_peripheral_M_FW_UART_AXI 1 4 1 2790
 preplace netloc fw_uart_ip2intc_irpt 1 1 5 50 1870 NJ 1870 NJ 1870 2950J 1510 6110
 preplace netloc CLINK_UART_rxd_1 1 0 6 -250J 850 NJ 850 NJ 850 NJ 850 NJ 850 6090
-preplace netloc ext_reset_in_1 1 1 4 -10 3092 NJ 3092 NJ 3092 2970
+preplace netloc ext_reset_in_1 1 1 4 -10 3092 NJ 3092 NJ 3092 2980
 preplace netloc axi_lens_uart_sout 1 5 2 NJ 50 6600
 preplace netloc S0_AXIS_1 1 0 3 -260J 1982 NJ 1982 NJ
 preplace netloc axi_peripheral_M_AXI 1 4 3 2700 1170 NJ 1170 6570J
@@ -1947,7 +1952,7 @@ preplace netloc SYS_CLK_0_1 1 0 5 -250J 2952 NJ 2952 NJ 2952 NJ 2952 NJ
 preplace netloc axi_peripheral_M05_AXI 1 4 3 2840J 1260 NJ 1260 6590J
 preplace netloc mcu_m_axi_dp 1 3 1 930
 preplace netloc axi_uart16550_0_ip2intc_irpt 1 1 5 110 510 NJ 510 NJ 510 NJ 510 6130
-preplace netloc axi_protocol_converter_4_m_axi 1 4 3 NJ 1720 NJ 1720 6520J
+preplace netloc axi_protocol_converter_4_m_axi 1 4 3 2960J 1720 NJ 1720 6520J
 preplace netloc axi_peripheral_m_fpgaout_axi 1 4 1 2770
 preplace netloc FlashReset_0_m_axi 1 2 2 560 1000 920
 preplace netloc axi_protocol_converter_3_m_axi 1 4 3 2760J 1160 NJ 1160 6530J
@@ -1956,16 +1961,16 @@ preplace netloc FW_UART_rxd_1 1 0 6 -250J 1830 NJ 1830 NJ 1830 NJ 1830 2940J 153
 preplace netloc pleora_uart_sout 1 5 2 NJ 1640 6580
 preplace netloc MIG_Calibration_M_AXIS_S2MM_STS1 1 5 2 NJ 2362 6660
 preplace netloc oem_uart_ip2intc_irpt 1 1 5 120 1880 NJ 1880 NJ 1880 NJ 1880 6090
-preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 90 1920 NJ 1920 NJ 1920 2990J 1900 6100
+preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 90 1920 NJ 1920 NJ 1920 3000J 1900 6100
 preplace netloc microblaze_1_xlconcat_dout 1 2 1 490
 preplace netloc axi_peripheral_M03_AXI 1 4 3 2730J 1150 NJ 1150 6540J
-preplace netloc FPGA_UART_rxd_1 1 0 6 -250J 960 NJ 960 NJ 960 NJ 960 2970J 1200 6090
+preplace netloc FPGA_UART_rxd_1 1 0 6 -250J 960 NJ 960 NJ 960 NJ 960 2980J 1200 6090
 preplace netloc clk_wiz_1_clk_out1 1 3 4 990 2310 2680 7108 NJ 7108 6620J
-preplace netloc axi_peripheral_M_TEC_I2C_AXI 1 4 2 2880 1480 6140J
 preplace netloc MIG_Calibration_M_AXIS_MM2S_STS 1 5 2 NJ 2302 6660
 preplace netloc axi_protocol_converter_1_m_axi 1 4 3 2830J 1290 NJ 1290 6580J
 preplace netloc axi_peripheral_M04_AXI 1 4 3 2800J 1270 NJ 1270 6550J
-preplace netloc clk_wiz_1_clk_out2 1 4 3 2960 7128 NJ 7128 6650J
+preplace netloc axi_peripheral_M_TEC_I2C_AXI 1 4 2 2880 1480 6140J
+preplace netloc clk_wiz_1_clk_out2 1 4 3 2970 7128 NJ 7128 6650J
 preplace netloc proc_sys_reset_1_peripheral_aresetn 1 2 5 500 2400 980 2400 2870 290 6130J 380 6520J
 preplace netloc axi_peripheral_M08_AXI 1 4 1 2830
 preplace netloc axi_interconnect_1_m00_axi 1 4 1 2700
@@ -1975,13 +1980,13 @@ preplace netloc axi_protocol_converter_0_m_axi 1 4 3 2780J 1220 NJ 1220 NJ
 preplace netloc axi_peripheral_M_DDRMIG_AXI 1 4 1 2760
 preplace netloc clk_wiz_0_clk_out3 1 1 6 100 3470 NJ 3470 NJ 3470 2760 3470 6140J 3470 6640J
 preplace netloc bulk_interrupt_1 1 0 2 -270J 1570 NJ
-preplace netloc pleora_uart_ip2intc_irpt 1 1 5 80 1890 NJ 1890 NJ 1890 2960J 1540 6100
-preplace netloc axi_protocol_converter_7_m_axi 1 4 3 2920J 1230 NJ 1230 6630J
+preplace netloc pleora_uart_ip2intc_irpt 1 1 5 80 1890 NJ 1890 NJ 1890 2970J 1540 6100
+preplace netloc axi_protocol_converter_7_m_axi 1 4 3 2930J 1230 NJ 1230 6630J
 preplace netloc s_axi_1 1 2 3 560 2210 NJ 2210 2680
 preplace netloc axi_peripheral_M_ADC_READOUT_AXI 1 4 3 2700J 500 NJ 500 6520J
 preplace netloc axi_interconnect_1_m01_axi 1 4 1 2840
 preplace netloc S00_AXI_1 1 3 2 NJ 2032 2730J
-levelinfo -pg 1 -290 -70 330 780 2480 5873 6400 6680 -top -60 -bot 8100
+levelinfo -pg 1 -290 -70 330 780 2480 5873 6400 6690 -top -60 -bot 8100
 ",
 }
 
