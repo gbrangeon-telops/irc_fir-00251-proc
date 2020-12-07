@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 2317
+ FREEID 2334
  VARIABLES
  {
   #ARCHITECTURE="scd_proxy2_serdes_simulation"
@@ -2511,77 +2511,6 @@ PAGE ""
    {
     #NAMED="1"
    }
-  }
-  GENERATE  167, 0, 0
-  {
-   VARIABLES
-   {
-    #ADDITIONAL_DECLARATIONS_EPILOG=""
-    #ADDITIONAL_DECLARATIONS_PROLOG=""
-    #CONDITION="GENERATE_CH = false"
-    #GENERATE_KIND="IF"
-    #LABEL="g0"
-   }
-   AREA (800,1480,4880,1960)
-   ASSIGNMENTS 170
-  }
-  TEXT  168, 0, 0
-  {
-   TEXT "@GENERATE_STATEMENT_DESCRIPTION"
-   RECT (800,1444,1364,1479)
-   ALIGN 8
-   MARGINS (1,1)
-   PARENT 167
-  }
-  TEXT  169, 0, 0
-  {
-   TEXT "$#ADDITIONAL_DECLARATIONS_EPILOG"
-   RECT (800,2360,800,2393)
-   PARENT 167
-  }
-  SIGNALASSIGN  170, 0, 0
-  {
-   LABEL "SignalAssignments_3"
-   TEXT 
-"ch_proxy_dclk <= '0';\t--CH_DOUT_CLK\n"+
-"ch_mmcm_locked <= '0';\t--CH_RDY\n"+
-"ch_data_i <= (others => '0');\n"+
-"ch_iserdes_rst_i <= '0';\t--n'aura pas d'effet sur le iserdes_rst \"global\"\n"+
-"ch_done_i <= '1';\t\t--n'aura pas d'effet sur le done \"global\"\n"+
-"ch_success_i <= '1';\t--n'aura pas d'effet sur le success \"global\"\n"+
-"ch_delay_i <= (others => '0');\n"+
-"ch_edges_i <= (others => '0');\n"+
-"quad_dval_i <= '0';"
-   RECT (820,1520,1940,1860)
-   OUTLINE 5,1, (0,0,0)
-   FILL (0,(255,255,156),0)
-   MARGINS (20,20)
-   FONT (12,0,0,400,0,0,0,"Arial")
-   MULTILINE
-   SYNTAXCOLORED
-   SHOWLABEL
-   SHOWTEXT
-   CORNER 10
-  }
-  GENERATE  171, 0, 0
-  {
-   VARIABLES
-   {
-    #CONDITION="GENERATE_CH = true"
-    #GENERATE_KIND="IF"
-    #LABEL="g1"
-   }
-   AREA (800,2020,4900,4680)
-   INSTANCES 209, 218, 292, 307, 326, 635, 800
-   GENERATES 532, 576
-  }
-  TEXT  172, 0, 0
-  {
-   TEXT "@GENERATE_STATEMENT_DESCRIPTION"
-   RECT (800,1985,1352,2020)
-   ALIGN 8
-   MARGINS (1,1)
-   PARENT 171
   }
   INSTANCE  173, 0, 0
   {
@@ -5803,7 +5732,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  2300, 0, 0
+  TEXT  2317, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5814,7 +5743,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  2301, 0, 0
+  TEXT  2318, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5825,7 +5754,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  2302, 0, 0
+  TEXT  2319, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5835,7 +5764,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  2303, 0, 0
+  TEXT  2320, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5847,7 +5776,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  2304, 0, 0
+  TEXT  2321, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5860,7 +5789,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  2305, 0, 0
+  TEXT  2322, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5870,7 +5799,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  2306, 0, 0
+  TEXT  2323, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5882,7 +5811,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  2307, 0, 0
+  TEXT  2324, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5892,7 +5821,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  2308, 0, 0
+  TEXT  2325, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5903,7 +5832,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  2309, 0, 0
+  GROUP  2326, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,6820,5801,7201)
@@ -5915,7 +5844,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  2310, 0, 0
+  GROUP  2327, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,7020,5801,7021)
@@ -5927,7 +5856,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  2311, 0, 0
+  GROUP  2328, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,6960,5801,6961)
@@ -5939,7 +5868,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  2312, 0, 0
+  GROUP  2329, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,7080,5801,7081)
@@ -5951,7 +5880,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  2313, 0, 0
+  GROUP  2330, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,7140,5801,7141)
@@ -5963,7 +5892,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  2314, 0, 0
+  GROUP  2331, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,6820,5101,6961)
@@ -5974,7 +5903,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  2315, 0, 0
+  GROUP  2332, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,6960,5101,7201)
@@ -5985,7 +5914,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  2316, 0, 0
+  BMPPICT  2333, 0, 0
   {
    PAGEALIGN 10
    RECT (4940,6880,5079,6925)
