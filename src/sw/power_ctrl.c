@@ -114,12 +114,6 @@ channelPowerState_t Power_SetChannelPowerState(powerChannel_t channel, channelPo
    t_FpaStatus fpaStatus;
    uint32_t cooler_volt__mV;
 
-   //if ((channel == PC_BUFFER) && (state == CPS_OFF))
-   //{
-   //   // Cannot turn off external memory buffer board
-   //   state = CPS_ON;
-   //}
-
    if ((channel == PC_COOLER) && (state == CPS_ON))
    {
       // Cooler voltage verification
