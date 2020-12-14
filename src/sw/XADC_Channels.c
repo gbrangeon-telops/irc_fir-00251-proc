@@ -21,8 +21,8 @@
 #include "FlashSettings.h"
 #include "RpOpticalProtocol.h"
 
-#define XADC_CUR_OFFSET -0.0936084549572219f
-#define XADC_CUR_GAIN   7.03f    //12.6619557089536f  --> EC
+#define XADC_CUR_OFFSET -0.005487375F // prev: -0.0936084549572219f
+#define XADC_CUR_GAIN   7.02111675F   // prev: 7.03f
 
 // Temperature coefficients
 #define TempCoeff_A 0
