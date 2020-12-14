@@ -173,17 +173,19 @@ begin
             
             -- dout_i
             dout_i(31) <= '0';         -- non utilisé
-            dout_i(30) <= fval_i;      -- fval
+            dout_i(30) <= fval_i;      -- fval  
+            dout_i(29) <= lval_i;
+            dout_i(28) <= lval_i;
             
-            -- lval and dval
-            if ctrl_bits_last /= x"E" and ctrl_bits_i = x"E" then
-               dout_i(29) <= '1';    -- lval
-               dout_i(28) <= '1';    -- dval
-            end if;               
-            if ctrl_bits_last = x"E" and ctrl_bits_i /= x"E" then
-               dout_i(29) <= '0';    -- lval
-               dout_i(28) <= '0';    -- dval
-            end if;
+            ---- lval and dval
+--            if ctrl_bits_last /= x"E" and ctrl_bits_i = x"E" then
+--               dout_i(29) <= '1';    -- lval
+--               dout_i(28) <= '1';    -- dval
+--            end if;               
+--            if ctrl_bits_last = x"E" and ctrl_bits_i /= x"E" then
+--               dout_i(29) <= '0';    -- lval
+--               dout_i(28) <= '0';    -- dval
+--            end if;
             
             -- pix data
             dout_i(27 downto 14) <= DIN(27 downto 14); -- pixel 1  

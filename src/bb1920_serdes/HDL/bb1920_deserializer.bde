@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 72515
+ FREEID 72532
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -170,13 +170,12 @@ HEADER
     #GENERIC2="FRAME_RATE_MIN:REAL:=0.1"
     #GENERIC3="DATA_WIDTH:INTEGER:=7"
     #GENERIC4="IODELAY_GROUP_NAME:STRING:=\"name\""
-    #GENERIC5="GENERATE_CH:BOOLEAN:=true"
-    #GENERIC6="MASTER:BOOLEAN:=true"
+    #GENERIC5="MASTER:BOOLEAN:=true"
     #HDL_ENTRIES=
 "library STD,IEEE,WORK;\n"+
 "use STD.STANDARD.all,ieee.std_logic_1164.all,work.Proxy_define.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1605540600"
+    #MODIFIED="1606769620"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="34f2b943-175c-4780-aba3-68795617e559"
    }
   }
@@ -1390,10 +1389,7 @@ PAGE ""
    LABEL "Architecture declarations"
    TEXT 
 "attribute IODELAY_GROUP : string;\n"+
-"attribute dont_touch : string;\n"+
-"constant GENERATE_CH0 : boolean := PROXY_CLINK_CHANNEL_NUM >= 1;\n"+
-"constant GENERATE_CH1 : boolean := PROXY_CLINK_CHANNEL_NUM >= 2;\n"+
-"--constant GENERATE_CH2 : boolean := PROXY_CLINK_CHANNEL_NUM >= 3;"
+"attribute dont_touch : string;"
    RECT (2420,2480,3560,2700)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(203,215,255),0)
@@ -1810,11 +1806,13 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
     #DOWNTO="1"
     #LIBRARY="#terminals"
     #MDA_RECORD_TOKEN="OTHER"
     #REFERENCE="QUAD_DATA(71:0)"
     #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (4960,1620)
@@ -2912,7 +2910,6 @@ PAGE ""
     #GENERIC3="DATA_WIDTH : INTEGER := DATA_WIDTH"
     #GENERIC4="RESET200ms : BOOLEAN := RESET200ms"
     #GENERIC5="CLK_PERIOD_NS : REAL := CLK_PERIOD_NS"
-    #GENERIC6="GENERATE_CH : BOOLEAN := GENERATE_CH0"
     #LIBRARY="work"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -2941,7 +2938,7 @@ PAGE ""
   TEXT  70999, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (840,2256,1412,2487)
+   RECT (840,2256,1412,2454)
    PARENT 70990
   }
   INSTANCE  71003, 0, 0
@@ -2951,7 +2948,6 @@ PAGE ""
     #COMPONENT="\\scd_proxy2_serdes\\"
     #CUSTOM_NAME=""
     #GENERIC0="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC1="GENERATE_CH : boolean := GENERATE_CH1"
     #GENERIC2="RESET200ms : boolean := RESET200ms"
     #GENERIC3="MASTER : boolean := true"
     #GENERIC4="FRAME_RATE_MIN : real := FRAME_RATE_MIN"
@@ -2986,7 +2982,7 @@ PAGE ""
   TEXT  71006, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (2820,2256,3392,2487)
+   RECT (2820,2256,3392,2454)
    PARENT 71003
   }
   VTX  71095, 0, 0
@@ -3183,9 +3179,11 @@ PAGE ""
    VARIABLES
    {
     #COMPONENT="Output"
+    #CUSTOM_NAME=""
     #LIBRARY="#terminals"
     #REFERENCE="QUAD_DVAL"
     #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC"
    }
    COORD (4960,1700)
@@ -3496,7 +3494,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  72498, 0, 0
+  TEXT  72515, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -3507,7 +3505,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  72499, 0, 0
+  TEXT  72516, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -3518,7 +3516,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  72500, 0, 0
+  TEXT  72517, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -3528,7 +3526,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  72501, 0, 0
+  TEXT  72518, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -3540,7 +3538,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  72502, 0, 0
+  TEXT  72519, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -3553,7 +3551,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  72503, 0, 0
+  TEXT  72520, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -3563,7 +3561,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  72504, 0, 0
+  TEXT  72521, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -3575,7 +3573,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  72505, 0, 0
+  TEXT  72522, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -3585,7 +3583,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  72506, 0, 0
+  TEXT  72523, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -3596,7 +3594,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  72507, 0, 0
+  GROUP  72524, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2620,5001,3001)
@@ -3608,7 +3606,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  72508, 0, 0
+  GROUP  72525, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2820,5001,2821)
@@ -3620,7 +3618,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  72509, 0, 0
+  GROUP  72526, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2760,5001,2761)
@@ -3632,7 +3630,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  72510, 0, 0
+  GROUP  72527, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2880,5001,2881)
@@ -3644,7 +3642,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  72511, 0, 0
+  GROUP  72528, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2940,5001,2941)
@@ -3656,7 +3654,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  72512, 0, 0
+  GROUP  72529, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,2620,4301,2761)
@@ -3667,7 +3665,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  72513, 0, 0
+  GROUP  72530, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,2760,4301,3001)
@@ -3678,7 +3676,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  72514, 0, 0
+  BMPPICT  72531, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,2680,4279,2725)

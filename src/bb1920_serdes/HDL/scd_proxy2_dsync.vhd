@@ -73,7 +73,6 @@ architecture scd_proxy2_dsync of scd_proxy2_dsync is
    signal reg_1 : std_logic_vector(63 downto 0);
    signal reg_2 : std_logic_vector(63 downto 0);
    signal reg_3 : std_logic_vector(63 downto 0);
-   signal reg_4 : std_logic_vector(63 downto 0);
    signal fval_pixel : std_logic;         
    signal quad_dval_i : std_logic;
    
@@ -81,17 +80,17 @@ begin
    
    fifo_rd_en <= valid_ch0_dval and valid_ch1_dval; -- lecture synchronisée des 2 fifos tout le temps. 
    QUAD_DATA_OUT(71 downto 68) <= "0000";
-   QUAD_DATA_OUT(67) <= reg_4(62);
+   QUAD_DATA_OUT(67) <= reg_3(62);
    QUAD_DATA_OUT(66) <= fval_pixel;
-   QUAD_DATA_OUT(65 downto 64) <= reg_4(61 downto 60);
+   QUAD_DATA_OUT(65 downto 64) <= reg_3(61 downto 60);
    QUAD_DATA_OUT(63 downto 62) <= "00";
-   QUAD_DATA_OUT(61 downto 48) <= reg_4(59 downto 46);
+   QUAD_DATA_OUT(61 downto 48) <= reg_3(59 downto 46);
    QUAD_DATA_OUT(47 downto 46) <= "00";
-   QUAD_DATA_OUT(45 downto 32) <= reg_4(45 downto 32);
+   QUAD_DATA_OUT(45 downto 32) <= reg_3(45 downto 32);
    QUAD_DATA_OUT(31 downto 30) <= "00";
-   QUAD_DATA_OUT(29 downto 16) <= reg_4(27 downto 14);
+   QUAD_DATA_OUT(29 downto 16) <= reg_3(27 downto 14);
    QUAD_DATA_OUT(15 downto 14) <= "00";
-   QUAD_DATA_OUT(13 downto 0) <= reg_4(13 downto 0);
+   QUAD_DATA_OUT(13 downto 0) <= reg_3(13 downto 0);
    
    QUAD_DVAL <= fifo_rd_en;
    --------------------------------------------------
@@ -144,20 +143,17 @@ begin
             reg_1 <= (others => '0');
             reg_2 <= (others => '0');
             reg_3 <= (others => '0');
-            reg_4 <= (others => '0');
          else
             if fifo_rd_en = '1' then
                reg_0 <= fifo_ch1_dout & fifo_ch0_dout;
                reg_1 <= reg_0;
                reg_2 <= reg_1;
                reg_3 <= reg_2;
-               reg_4 <= reg_3;
             else
                reg_0 <= reg_0;
                reg_1 <= reg_1;
                reg_2 <= reg_2;
                reg_3 <= reg_3;
-               reg_4 <= reg_4;
             end if;
             quad_dval_i <= fifo_rd_en;
          end if;
@@ -172,10 +168,10 @@ begin
          else
             --Si on a un pixel suivi d'une fin d'image 4 packet plus tard (fin de fval_pixel)      
             --28 is dval, 30 is fval
-            if reg_4(28) = '1' and reg_1(30) = '0' then
+            if reg_3(28) = '1' and reg_0(30) = '0' then
                fval_pixel <= '0';
             --Si on a une image débuté et un pixel ensuite (debut de fval_pixel)
-            elsif reg_4(30) = '1' and reg_3(28) = '1' then
+            elsif reg_3(30) = '1' and reg_2(28) = '1' then
                fval_pixel <= '1';
             else  
                fval_pixel <= fval_pixel;

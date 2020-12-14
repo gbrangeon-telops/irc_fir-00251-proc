@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 73164
+ FREEID 73916
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -31,7 +31,7 @@ HEADER
   PAGECOUNT="2"
   TITLE="serdes_top"
  }
- SYMBOL "work" "scd_proxy2_dsync" "scd_proxy2_dsync"
+ SYMBOL "#default" "scd_proxy2_dsync" "scd_proxy2_dsync"
  {
   HEADER
   {
@@ -323,25 +323,27 @@ HEADER
    }
   }
  }
- SYMBOL "#default" "scd_proxy2_serdes_simulation" "scd_proxy2_serdes_simulation"
+ SYMBOL "work" "scd_proxy2_serdes_simulation" "scd_proxy2_serdes_simulation"
  {
   HEADER
   {
    VARIABLES
    {
+    #COMPONENT_HEADER=""
     #CUSTOM_NAME=""
     #DESCRIPTION=""
-    #GENERIC0="RESET200ms:boolean:=true"
-    #GENERIC1="CLK_PERIOD_NS:real:=12.5"
-    #GENERIC2="FRAME_RATE_MIN:real:=0.1-- Hz"
-    #GENERIC3="DATA_WIDTH:integer:=7-- largeur des donnees du serdes"
-    #GENERIC4="IODELAY_GROUP_NAME:string:=\"name\""
-    #GENERIC5="MASTER:boolean:=true"
+    #GENERIC0="RESET200ms : boolean := "
+    #GENERIC1="DATA_WIDTH : integer := "
+    #GENERIC2="FRAME_RATE_MIN : real := "
+    #GENERIC3="CLK_PERIOD_NS : real := "
+    #GENERIC4="MASTER : boolean := "
+    #GENERIC5="IODELAY_GROUP_NAME : string := "
     #HDL_ENTRIES=
 "library STD,IEEE,WORK;\n"+
 "use STD.STANDARD.all,ieee.std_logic_1164.all,work.Proxy_define.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1606770116"
+    #MODIFIED="1607372325"
+    #PRAGMED_GENERICS=""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1919bf50-d861-4ec5-804a-b56dfa2c4817"
    }
   }
@@ -1012,6 +1014,7 @@ PAGE ""
    SHOWLABEL
    SHOWTEXT
    CORNER 10
+   VTX (  73712 )
   }
   INSTANCE  68142, 0, 0
   {
@@ -1507,10 +1510,10 @@ PAGE ""
   TEXT  68304, 0, 0
   {
    TEXT "$#NAME"
-   RECT (1298,1711,1469,1740)
+   RECT (1291,1711,1462,1740)
    ALIGN 9
    MARGINS (1,1)
-   PARENT 72605
+   PARENT 73679
   }
   INSTANCE  68305, 0, 0
   {
@@ -2677,7 +2680,7 @@ PAGE ""
    {
     #COMPONENT="scd_proxy2_dsync"
     #CUSTOM_NAME=""
-    #LIBRARY="work"
+    #LIBRARY="#default"
     #REFERENCE="U2"
     #SYMBOL="scd_proxy2_dsync"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="e5f6d817-eb56-421c-b461-4ca5e60d2bcb"
@@ -2892,42 +2895,6 @@ PAGE ""
    MARGINS (1,1)
    PARENT 72472
   }
-  INSTANCE  72567, 0, 0
-  {
-   VARIABLES
-   {
-    #COMPONENT="scd_proxy2_serdes_simulation"
-    #CUSTOM_NAME=""
-    #GENERIC0="FRAME_RATE_MIN : real := FRAME_RATE_MIN"
-    #GENERIC2="DATA_WIDTH : integer := 8"
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC4="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC5="MASTER : boolean := false"
-    #GENERIC6="RESET200ms : boolean := RESET200ms"
-    #LIBRARY="#default"
-    #PRAGMED_GENERICS=""
-    #REFERENCE="CH1"
-    #SYMBOL="scd_proxy2_serdes_simulation"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1919bf50-d861-4ec5-804a-b56dfa2c4817"
-   }
-   COORD (2820,1680)
-   VERTEXES ( (2,70735), (4,72585), (6,70739), (8,72576), (10,70737), (14,70734), (16,72589), (18,70762), (20,72579), (22,70763), (24,72597), (26,70765), (30,70743), (34,70741), (38,70731), (40,72592), (42,72594), (44,72582) )
-  }
-  TEXT  72568, 0, 0
-  {
-   TEXT "$#REFERENCE"
-   RECT (2820,1624,2880,1659)
-   ALIGN 8
-   MARGINS (1,1)
-   PARENT 72567
-  }
-  TEXT  72572, 0, 0
-  {
-   TEXT "$#COMPONENT"
-   RECT (2820,2220,3221,2255)
-   MARGINS (1,1)
-   PARENT 72567
-  }
   VTX  72576, 0, 0
   {
    COORD (3260,1740)
@@ -3059,107 +3026,6 @@ PAGE ""
   {
    NET 71999
    VTX 72597, 72598
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
-  INSTANCE  72600, 0, 0
-  {
-   VARIABLES
-   {
-    #COMPONENT="scd_proxy2_serdes_simulation"
-    #CUSTOM_NAME=""
-    #GENERIC0="CLK_PERIOD_NS : REAL := CLK_PERIOD_NS"
-    #GENERIC1="FRAME_RATE_MIN : REAL := FRAME_RATE_MIN"
-    #GENERIC3="RESET200ms : BOOLEAN := RESET200ms"
-    #GENERIC4="MASTER : BOOLEAN := true"
-    #GENERIC5="IODELAY_GROUP_NAME : STRING := \"iodelay_b13\""
-    #GENERIC7="DATA_WIDTH : INTEGER := 8"
-    #IMPL="scd_proxy2_serdes_simulation"
-    #LIBRARY="#default"
-    #NO_CONF="1"
-    #PRAGMED_GENERICS=""
-    #REFERENCE="CH0"
-    #SYMBOL="scd_proxy2_serdes_simulation"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1919bf50-d861-4ec5-804a-b56dfa2c4817"
-   }
-   COORD (840,1680)
-   VERTEXES ( (2,68910), (4,72612), (6,69765), (8,72604), (10,69768), (14,69451), (16,72616), (20,72606), (24,72642), (28,72639), (30,69800), (32,72637), (34,69797), (38,69794), (40,72619), (42,72621), (44,72609) )
-   PINPROP 6,"#PIN_COMMENT",""
-   PINPROP 6,"#PIN_STATE","0"
-   PINPROP 10,"#PIN_COMMENT",""
-   PINPROP 10,"#PIN_STATE","0"
-   PINPROP 4,"#PIN_COMMENT",""
-   PINPROP 4,"#PIN_STATE","0"
-   PINPROP 2,"#PIN_COMMENT",""
-   PINPROP 2,"#PIN_STATE","0"
-   PINPROP 34,"#PIN_COMMENT",""
-   PINPROP 34,"#PIN_STATE","0"
-   PINPROP 32,"#PIN_COMMENT",""
-   PINPROP 32,"#PIN_STATE","0"
-   PINPROP 30,"#PIN_COMMENT",""
-   PINPROP 30,"#PIN_STATE","0"
-   PINPROP 28,"#PIN_COMMENT",""
-   PINPROP 28,"#PIN_STATE","0"
-   PINPROP 26,"#PIN_COMMENT",""
-   PINPROP 26,"#PIN_STATE","0"
-   PINPROP 24,"#PIN_COMMENT",""
-   PINPROP 24,"#PIN_STATE","0"
-   PINPROP 22,"#PIN_COMMENT",""
-   PINPROP 22,"#PIN_STATE","0"
-   PINPROP 20,"#PIN_COMMENT",""
-   PINPROP 20,"#PIN_STATE","0"
-   PINPROP 38,"#PIN_COMMENT",""
-   PINPROP 38,"#PIN_STATE","0"
-   PINPROP 36,"#PIN_COMMENT",""
-   PINPROP 36,"#PIN_STATE","0"
-   PINPROP 16,"#PIN_COMMENT",""
-   PINPROP 16,"#PIN_STATE","0"
-   PINPROP 14,"#PIN_COMMENT",""
-   PINPROP 14,"#PIN_STATE","0"
-   PINPROP 12,"#PIN_COMMENT",""
-   PINPROP 12,"#PIN_STATE","0"
-   PINPROP 18,"#PIN_COMMENT",""
-   PINPROP 18,"#PIN_STATE","0"
-   PINPROP 8,"#PIN_COMMENT",""
-   PINPROP 8,"#PIN_STATE","0"
-   PINPROP 46,"#PIN_COMMENT",""
-   PINPROP 46,"#PIN_STATE","0"
-   PINPROP 44,"#PIN_COMMENT",""
-   PINPROP 44,"#PIN_STATE","0"
-   PINPROP 42,"#PIN_COMMENT",""
-   PINPROP 42,"#PIN_STATE","0"
-   PINPROP 40,"#PIN_COMMENT",""
-   PINPROP 40,"#PIN_STATE","0"
-  }
-  TEXT  72601, 0, 0
-  {
-   TEXT "$#REFERENCE"
-   RECT (840,1624,900,1659)
-   ALIGN 8
-   MARGINS (1,1)
-   PARENT 72600
-  }
-  TEXT  72602, 0, 0
-  {
-   TEXT "$#COMPONENT"
-   RECT (840,2220,1241,2255)
-   MARGINS (1,1)
-   PARENT 72600
-  }
-  VTX  72603, 0, 0
-  {
-   COORD (1620,1740)
-  }
-  VTX  72604, 0, 0
-  {
-   COORD (1280,1740)
-  }
-  WIRE  72605, 0, 0
-  {
-   NET 68168
-   VTX 72603, 72604
    VARIABLES
    {
     #NAMED="1"
@@ -3318,17 +3184,122 @@ PAGE ""
     #NAMED="1"
    }
   }
-  TEXT  72846, 0, 0
+  VTX  73677, 0, 0
+  {
+   COORD (1280,1740)
+  }
+  VTX  73678, 0, 0
+  {
+   COORD (1500,1740)
+  }
+  WIRE  73679, 0, 0
+  {
+   NET 68168
+   VTX 73677, 73678
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  73712, 0, 0
+  {
+   COORD (980,2480)
+  }
+  VTX  73717, 0, 0
+  {
+   COORD (980,2470)
+  }
+  WIRE  73718, 0, 0
+  {
+   NET 73724
+   VTX 73712, 73717
+  }
+  NET WIRE  73724, 0, 0
+  INSTANCE  73849, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="scd_proxy2_serdes_simulation"
+    #CUSTOM_NAME=""
+    #GENERIC0="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC1="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC3="RESET200ms : boolean := RESET200ms"
+    #GENERIC4="MASTER : boolean := false"
+    #GENERIC5="FRAME_RATE_MIN : real := FRAME_RATE_MIN"
+    #IMPL="scd_proxy2_serdes_simulation"
+    #LIBRARY="work"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U3"
+    #SYMBOL="scd_proxy2_serdes_simulation"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1919bf50-d861-4ec5-804a-b56dfa2c4817"
+   }
+   COORD (2820,1680)
+   VERTEXES ( (2,70735), (4,72585), (6,70739), (8,72576), (10,70737), (14,70734), (16,72589), (18,70762), (20,72579), (22,70763), (24,72597), (26,70765), (30,70743), (34,70741), (38,70731), (40,72592), (42,72594), (44,72582) )
+  }
+  TEXT  73850, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2820,1624,2859,1659)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 73849
+  }
+  TEXT  73854, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (2820,2220,3221,2255)
+   MARGINS (1,1)
+   PARENT 73849
+  }
+  INSTANCE  73871, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="scd_proxy2_serdes_simulation"
+    #CUSTOM_NAME=""
+    #GENERIC0="FRAME_RATE_MIN : real := FRAME_RATE_MIN"
+    #GENERIC1="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC2="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC3="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC4="MASTER : boolean := true"
+    #GENERIC5="RESET200ms : boolean := RESET200ms"
+    #IMPL="scd_proxy2_serdes_simulation"
+    #LIBRARY="work"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U4"
+    #SYMBOL="scd_proxy2_serdes_simulation"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="1919bf50-d861-4ec5-804a-b56dfa2c4817"
+   }
+   COORD (840,1680)
+   VERTEXES ( (2,68910), (4,72612), (6,69765), (8,73677), (10,69768), (14,69451), (16,72616), (20,72606), (24,72642), (28,72639), (30,69800), (32,72637), (34,69797), (38,69794), (40,72619), (42,72621), (44,72609) )
+  }
+  TEXT  73872, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (840,1624,879,1659)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 73871
+  }
+  TEXT  73873, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (840,2220,1241,2255)
+   MARGINS (1,1)
+   PARENT 73871
+  }
+  TEXT  73874, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
    RECT (840,2256,1412,2454)
-   PARENT 72600
+   PARENT 73871
   }
-  TEXT  72867, 0, 0
+  TEXT  73878, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
    RECT (2820,2256,3392,2454)
-   PARENT 72567
+   PARENT 73849
   }
  }
  
@@ -3355,7 +3326,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  73147, 0, 0
+  TEXT  73899, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -3366,7 +3337,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  73148, 0, 0
+  TEXT  73900, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -3377,7 +3348,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  73149, 0, 0
+  TEXT  73901, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -3387,7 +3358,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  73150, 0, 0
+  TEXT  73902, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -3399,7 +3370,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  73151, 0, 0
+  TEXT  73903, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -3412,7 +3383,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  73152, 0, 0
+  TEXT  73904, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -3422,7 +3393,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  73153, 0, 0
+  TEXT  73905, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -3434,7 +3405,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  73154, 0, 0
+  TEXT  73906, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -3444,7 +3415,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  73155, 0, 0
+  TEXT  73907, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -3455,7 +3426,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  73156, 0, 0
+  GROUP  73908, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2620,5001,3001)
@@ -3467,7 +3438,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  73157, 0, 0
+  GROUP  73909, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2820,5001,2821)
@@ -3479,7 +3450,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  73158, 0, 0
+  GROUP  73910, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2760,5001,2761)
@@ -3491,7 +3462,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  73159, 0, 0
+  GROUP  73911, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2880,5001,2881)
@@ -3503,7 +3474,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  73160, 0, 0
+  GROUP  73912, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,2940,5001,2941)
@@ -3515,7 +3486,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  73161, 0, 0
+  GROUP  73913, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,2620,4301,2761)
@@ -3526,7 +3497,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  73162, 0, 0
+  GROUP  73914, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,2760,4301,3001)
@@ -3537,7 +3508,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  73163, 0, 0
+  BMPPICT  73915, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,2680,4279,2725)

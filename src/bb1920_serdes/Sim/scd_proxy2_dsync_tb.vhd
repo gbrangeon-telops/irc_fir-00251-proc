@@ -14,7 +14,7 @@
 --
 -------------------------------------------------------------------------------
 --
--- Description : Fichier de stimulation et de vérification pour le testbench du line buffer
+-- Description : Fichier de stimulation et de vÃ©rification pour le testbench du line buffer
 --
 -------------------------------------------------------------------------------
 
@@ -28,17 +28,12 @@ use ieee.std_logic_textio.all;
 
 
 
-entity Stim is
-	port(		   
-		CLK : out STD_LOGIC;
-		ARESET : out STD_LOGIC;
-		 
-		ch_data : out std_logic_vector(31 downto 0);
-		dout : in std_logic_vector(31 downto 0));
-end Stim;
+entity scd_proxy2_dsync_tb is
+	--port();
+end scd_proxy2_dsync_tb;
 
 
-architecture Stim of Stim is	
+architecture scd_proxy2_dsync_tb of scd_proxy2_dsync_tb is	
 
 function hex_string_to_std_logic_vector(s: string)	return std_logic_vector is
 	variable slv : std_logic_vector((s'high-s'low+1)*4-1 downto 0);
@@ -101,60 +96,105 @@ begin
 	return slv;
 end hex_string_to_std_logic_vector;
 
+component scd_proxy2_dsync
+   port(
+		CLK_CH0 : in std_logic;
+      CLK_CH1 : in std_logic;
+      D_CLK : in std_logic;
+		ARESET : in std_logic;
+		 
+		CH0_DATA : in std_logic_vector(31 downto 0);
+      CH0_DVAL : in std_logic;
+      CH1_DATA : in std_logic_vector(31 downto 0);
+      CH1_DVAL : in std_logic;
+      
+      QUAD_DATA_OUT : out std_logic_vector(71 downto 0);
+	   QUAD_DVAL : out std_logic
+      );
+end component;
+
 signal datatosave : std_logic_vector(63 downto 0);
 
-file stimulus_image : text;
+file stimulus_image0 : text;
+file stimulus_image1 : text;
 file stimulus_start_up : text;
 
 constant clk_period : time := 10 ns;
 signal clk_i : std_logic;
-		
+signal ARESET : std_logic;
+signal ch_data0 : std_logic_vector(31 downto 0);
+signal ch_dval0 : std_logic;
+signal ch_data1 : std_logic_vector(31 downto 0);
+signal ch_dval1 : std_logic;
+signal quad_data_out : std_logic_vector(71 downto 0);
+signal quad_dval : std_logic;
 
 begin
 
 	--Clock 100Mhz definition
    clk_100Mhz_process : process
    begin 
-      CLK <= '0';
       clk_i <= '0';
       wait for clk_period/2;
-      CLK <= '1';
       clk_i <= '1';
       wait for clk_period/2;
    end process;
    
    --The format of stimulus_lineX needs to be 4 hex per line
-	read_image_process : process
+	read_image_process0 : process
 		variable l : line;
 		variable s : string(1 to 8);
 	begin
 	  
-      wait for clk_period * 10;
+      ch_dval0 <= '0';
       
-      --Read startup of the detector
-      file_open(stimulus_start_up, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Start_up.txt", read_mode);
-      while not endfile(stimulus_start_up) loop
-         wait until rising_edge(clk_i);
-         readline(stimulus_start_up,l);
-         read(l,s);
-         ch_data <= hex_string_to_std_logic_vector(s);
-      end loop;
+      wait for clk_period * 50;
       
       --Read the image in an infinite loop like the detector would
       --Only one image is read in a loop
       while true loop
-         file_open(stimulus_image, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Image.txt",  read_mode);
-         while not endfile(stimulus_image) loop
+         file_open(stimulus_image0, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Dsync0.txt",  read_mode);
+         while not endfile(stimulus_image0) loop
             wait until rising_edge(clk_i);	
-            readline(stimulus_image,l);
+            readline(stimulus_image0,l);
             read(l,s);
-            ch_data <= hex_string_to_std_logic_vector(s);      
+            ch_data0 <= hex_string_to_std_logic_vector(s); 
+            ch_dval0 <= '1';
          end loop;		
-         file_close(stimulus_image);
+         file_close(stimulus_image0);
+         ch_dval0 <= '0';
 		end loop;
       
       wait;
-	end process read_image_process;
+	end process read_image_process0;
+   
+      --The format of stimulus_lineX needs to be 4 hex per line
+	read_image_process1 : process
+		variable l : line;
+		variable s : string(1 to 8);
+	begin
+      
+      ch_dval1 <= '0';
+	  
+      wait for clk_period * 50;
+      
+      --Read the image in an infinite loop like the detector would
+      --Only one image is read in a loop
+      while true loop
+         file_open(stimulus_image1, "D:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Dsync1.txt",  read_mode);
+         while not endfile(stimulus_image1) loop
+            wait until rising_edge(clk_i);	
+            readline(stimulus_image1,l);
+            read(l,s);
+            ch_data1 <= hex_string_to_std_logic_vector(s);  
+            ch_dval1 <= '1';
+         end loop;		
+         file_close(stimulus_image1);
+         ch_dval1 <= '0';
+		end loop;
+      
+      wait;
+	end process read_image_process1;
    
    gen_stim : process
    begin
@@ -166,5 +206,20 @@ begin
       
       wait;
    end process;
+   
+   uut: scd_proxy2_dsync
+   port map(
+	  CLK_CH0 => clk_i,
+      CLK_CH1 => clk_i,
+      D_CLK => clk_i,
+	  ARESET => ARESET,
+		 
+      CH0_DATA => ch_data0,
+      CH0_DVAL => ch_dval0,
+      CH1_DATA => ch_data1,
+      CH1_DVAL => ch_dval1,
+      
+      QUAD_DATA_OUT => quad_data_out,
+	   QUAD_DVAL => quad_dval);
 
-end Stim;
+end scd_proxy2_dsync_tb;
