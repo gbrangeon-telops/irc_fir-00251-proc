@@ -115,71 +115,100 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  SIZE;
    uint32_t  ADD;
    
-   uint32_t fpa_diag_mode                  ; 
-   uint32_t fpa_diag_type                  ; 
-   uint32_t fpa_pwr_on                     ; 
-   uint32_t fpa_trig_ctrl_mode             ; 
-   uint32_t fpa_acq_trig_ctrl_dly          ; 
-   uint32_t fpa_spare                      ; 
-   uint32_t fpa_xtra_trig_ctrl_dly         ; 
-   uint32_t fpa_trig_ctrl_timeout_dly      ; 
-   uint32_t fpa_stretch_acq_trig           ; 
-   uint32_t clk100_to_intclk_conv_numerator; 
-   uint32_t intclk_to_clk100_conv_numerator; 
-   
-   uint32_t op_xstart                           ; 
-   uint32_t op_ystart                           ; 
-   uint32_t op_xsize                            ; 
-   uint32_t op_ysize                            ; 
-   uint32_t op_frame_time                       ; 
-   uint32_t op_gain                             ; 
-   uint32_t op_int_mode                         ; 
-   uint32_t op_test_mode                        ; 
-   uint32_t op_det_vbias                        ; 
-   uint32_t op_det_ibias                        ; 
-   uint32_t op_det_vsat                         ; 
-   uint32_t op_binning                          ; 
-   uint32_t op_output_rate                      ; 
-   uint32_t op_spare1                           ; 
-   uint32_t op_spare2                           ; 
-   uint32_t op_spare3                           ; 
-   uint32_t op_spare4                           ; 
-   uint32_t op_cfg_num                          ; 
-   
-   uint32_t diag_ysize                          ; 
-   uint32_t diag_xsize_div_tapnum               ; 
-   uint32_t diag_lovh_mclk_source               ; 
-   
-   uint32_t frame_dly_cst                       ; 
-   uint32_t int_dly_cst                         ; 
-   uint32_t int_time_offset                     ; 
-   uint32_t itr                                 ; 
-   uint32_t real_mode_active_pixel_dly          ; 
-   uint32_t cmd_hder                            ; 
-   
-   uint32_t int_cmd_id                          ; 
-   uint32_t int_cmd_dlen                        ; 
-   uint32_t int_cmd_offs_add                    ; 
-   
-   uint32_t fpa_serdes_lval_num                 ; 
-   uint32_t fpa_serdes_lval_len                 ; 
-   uint32_t op_cmd_id                           ; 
-   uint32_t temp_cmd_id                         ; 
-   uint32_t op_cmd_bram_base_add                ; 
-   uint32_t int_cmd_bram_base_add               ; 
-   uint32_t temp_cmd_bram_base_add              ; 
-   uint32_t int_cmd_bram_base_add_m1            ; 
-   uint32_t int_checksum_base_add               ; 
-   uint32_t wr_cmd_overhead_bytes_num           ;
-   uint32_t rd_cmd_overhead_bytes_num           ;
-   uint32_t int_clk_period_factor               ; 
-   
-};
-typedef struct s_FpaIntfConfig t_FpaIntf;
-
-// statuts provenant du vhd
-struct s_FpaStatus    // 
-{
+   // common   
+   uint32_t  fpa_diag_mode                     ;                                      
+   uint32_t  fpa_diag_type                     ;                                      
+   uint32_t  fpa_pwr_on                        ;                                      
+   uint32_t  fpa_trig_ctrl_mode                ;                                      
+   uint32_t  fpa_acq_trig_ctrl_dly             ;                                      
+   uint32_t  fpa_spare                         ;                                      
+   uint32_t  fpa_xtra_trig_ctrl_dly            ;                                      
+   uint32_t  fpa_trig_ctrl_timeout_dly         ;                                      
+   uint32_t  fpa_stretch_acq_trig              ;                                      
+   uint32_t  clk100_to_intclk_conv_numerator   ;                                      
+   uint32_t  intclk_to_clk100_conv_numerator   ;                                                                               
+                                              
+   // diag                                     
+   uint32_t  diag_ysize                        ;                                          
+   uint32_t  diag_xsize_div_tapnum             ;                                          
+   uint32_t  diag_lovh_mclk_source             ;                                          
+   uint32_t  real_mode_active_pixel_dly        ;                                          
+                                               
+   uint32_t  itr                               ;                                          
+                                              
+   // aoi                                      
+   uint32_t  aoi_xsize                         ;                                          
+   uint32_t  aoi_ysize                         ;                                          
+   uint32_t  aoi_data_sol_pos                  ;                                          
+   uint32_t  aoi_data_eol_pos                  ;                                          
+   uint32_t  aoi_flag1_sol_pos                 ;                                          
+   uint32_t  aoi_flag1_eol_pos                 ;                                          
+   uint32_t  aoi_flag2_sol_pos                 ;                                          
+   uint32_t  aoi_flag2_eol_pos                 ;                                          
+                                               
+   // op struct cmd                            ;
+   uint32_t  op_xstart                         ;                                          
+   uint32_t  op_ystart                         ;                                          
+   uint32_t  op_xsize                          ;                                          
+   uint32_t  op_ysize                          ;                                          
+   uint32_t  op_frame_time                     ;                                          
+   uint32_t  op_gain                           ;                                          
+   uint32_t  op_int_mode                       ;                                          
+   uint32_t  op_test_mode                      ;                                          
+   uint32_t  op_det_vbias                      ;                                          
+   uint32_t  op_det_ibias                      ;                                          
+   uint32_t  op_det_vsat                       ;                                          
+   uint32_t  op_binning                        ;                                          
+   uint32_t  op_output_rate                    ;                                          
+   uint32_t  op_spare1                         ;                                          
+   uint32_t  op_spare2                         ;                                          
+   uint32_t  op_spare3                         ;                                          
+   uint32_t  op_spare4                         ;                                          
+   uint32_t  op_cfg_num                        ;                                          
+                                              
+   // int cmd                                  
+   uint32_t  int_cmd_id                        ;
+   uint32_t  int_cmd_data_size                 ;  // new
+   uint32_t  int_cmd_dlen                      ;                                          
+   uint32_t  int_cmd_offs                      ;                                          
+   uint32_t  int_cmd_sof_add                   ;                                          
+   uint32_t  int_cmd_eof_add                   ;                                          
+   uint32_t  int_cmd_sof_add_m1                ;                                          
+   uint32_t  int_checksum_add                  ;                                          
+   uint32_t  frame_dly_cst                     ;                                          
+   uint32_t  int_dly_cst                       ;                                          
+                                              
+   // op serial cmd                            
+   uint32_t  op_cmd_id                         ;
+   uint32_t  op_cmd_data_size                  ;  // new
+   uint32_t  op_cmd_dlen                       ;  // new
+   uint32_t  op_cmd_sof_add                    ;                                          
+   uint32_t  op_cmd_eof_add                    ;                                          
+                                               ;
+   // temp serial cmd                          ;
+   uint32_t  temp_cmd_id                       ;
+   uint32_t  temp_cmd_data_size                ;  // new
+   uint32_t  temp_cmd_dlen                     ;  // new   
+   uint32_t  temp_cmd_sof_add                  ;                                          
+   uint32_t  temp_cmd_eof_add                  ;                                          
+                                              
+   // misc                                     
+   uint32_t  outgoing_com_hder                 ;
+   uint32_t  outgoing_com_ovh_len              ;
+   uint32_t  incoming_com_hder                 ;
+   uint32_t  incoming_com_fail_id              ;
+   uint32_t  incoming_com_ovh_len              ;
+   uint32_t  fpa_serdes_lval_num               ;
+   uint32_t  fpa_serdes_lval_len               ;
+   uint32_t  int_clk_period_factor             ;
+   int32_t   int_time_offset                   ;
+                                              
+};                                                              
+typedef struct s_FpaIntfConfig t_FpaIntf;                       
+                                                                
+// statuts provenant du vhd                                     
+struct s_FpaStatus    //                                        
+{                                                               
    // adc board (iddcas analogiques)
    uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
@@ -255,7 +284,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ
