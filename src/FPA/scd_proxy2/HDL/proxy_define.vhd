@@ -195,7 +195,8 @@ package Proxy_define is
       
       -- cmd serielle integration 
       int_cmd_id                     : std_logic_vector(15 downto 0);
-      int_cmd_dlen                   : std_logic_vector(15 downto 0);
+      int_cmd_data_size              : unsigned(15 downto 0);
+      int_cmd_dlen                   : unsigned(15 downto 0);
       int_cmd_offs                   : std_logic_vector(7 downto 0);
       int_cmd_sof_add                : unsigned(7 downto 0);
       int_cmd_eof_add                : unsigned(7 downto 0);
@@ -206,16 +207,21 @@ package Proxy_define is
       
       -- cmd serielle operationnelle
       op_cmd_id                      : std_logic_vector(15 downto 0);
+      op_cmd_data_size               : unsigned(15 downto 0);
+      op_cmd_dlen                    : unsigned(15 downto 0);
       op_cmd_sof_add                 : unsigned(7 downto 0);
       op_cmd_eof_add                 : unsigned(7 downto 0);
       
       -- cmd serielle temperature
       temp_cmd_id                    : std_logic_vector(15 downto 0);
+      temp_cmd_data_size             : unsigned(15 downto 0);
+      temp_cmd_dlen                  : unsigned(15 downto 0);
       temp_cmd_sof_add               : unsigned(7 downto 0);
       temp_cmd_eof_add               : unsigned(7 downto 0);    
       
       --- misc     
       outgoing_com_hder              : std_logic_vector(7 downto 0);
+      outgoing_com_ovh_len           : unsigned(7 downto 0);
       incoming_com_hder              : std_logic_vector(7 downto 0);
       incoming_com_fail_id           : std_logic_vector(15 downto 0);
       incoming_com_ovh_len           : unsigned(7 downto 0);

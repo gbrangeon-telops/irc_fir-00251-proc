@@ -263,49 +263,55 @@ begin
                      
                   -- cmd serielle integration
                   when X"0A8" =>    mb_struct_cfg.int_cmd_id                            <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);        
-                  when X"0AC" =>    mb_struct_cfg.int_cmd_dlen                          <= data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0);      
-                  when X"0B0" =>    mb_struct_cfg.int_cmd_offs                          <= data_i(mb_struct_cfg.int_cmd_offs'length-1 downto 0);      
-                  when X"0B4" =>    mb_struct_cfg.int_cmd_sof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add'length-1 downto 0));   
-                  when X"0B8" =>    mb_struct_cfg.int_cmd_eof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_eof_add'length-1 downto 0));   
-                  when X"0BC" =>    mb_struct_cfg.int_cmd_sof_add_m1                    <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add_m1'length-1 downto 0));
-                  when X"0C0" =>    mb_struct_cfg.int_checksum_add                      <= unsigned(data_i(mb_struct_cfg.int_checksum_add'length-1 downto 0));
-                  when X"0C4" =>    mb_struct_cfg.frame_dly_cst                         <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0));
-                  when X"0C8" =>    mb_struct_cfg.int_dly_cst                           <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
+                  when X"0AC" =>    mb_struct_cfg.int_cmd_data_size                     <= unsigned(data_i(mb_struct_cfg.int_cmd_data_size'length-1 downto 0));
+                  when X"0B0" =>    mb_struct_cfg.int_cmd_dlen                          <= unsigned(data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0));      
+                  when X"0B4" =>    mb_struct_cfg.int_cmd_offs                          <= data_i(mb_struct_cfg.int_cmd_offs'length-1 downto 0);      
+                  when X"0B8" =>    mb_struct_cfg.int_cmd_sof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add'length-1 downto 0));   
+                  when X"0BC" =>    mb_struct_cfg.int_cmd_eof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_eof_add'length-1 downto 0));   
+                  when X"0C0" =>    mb_struct_cfg.int_cmd_sof_add_m1                    <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add_m1'length-1 downto 0));
+                  when X"0C4" =>    mb_struct_cfg.int_checksum_add                      <= unsigned(data_i(mb_struct_cfg.int_checksum_add'length-1 downto 0));
+                  when X"0C8" =>    mb_struct_cfg.frame_dly_cst                         <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0));
+                  when X"0CC" =>    mb_struct_cfg.int_dly_cst                           <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));
                      
                   -- cmd serielle operationnelle
-                  when X"0CC" =>    mb_struct_cfg.op_cmd_id                             <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
-                  when X"0D0" =>    mb_struct_cfg.op_cmd_sof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_sof_add'length-1 downto 0));
-                  when X"0D4" =>    mb_struct_cfg.op_cmd_eof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_eof_add'length-1 downto 0));
+                  when X"0D0" =>    mb_struct_cfg.op_cmd_id                             <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
+                  when X"0D4" =>    mb_struct_cfg.op_cmd_data_size                      <= unsigned(data_i(mb_struct_cfg.op_cmd_data_size'length-1 downto 0));
+                  when X"0D8" =>    mb_struct_cfg.op_cmd_dlen                           <= unsigned(data_i(mb_struct_cfg.op_cmd_dlen'length-1 downto 0));
+                  when X"0DC" =>    mb_struct_cfg.op_cmd_sof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_sof_add'length-1 downto 0));
+                  when X"0E0" =>    mb_struct_cfg.op_cmd_eof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_eof_add'length-1 downto 0));
                      
                   -- cmd serielle temperature
-                  when X"0D8" =>    mb_struct_cfg.temp_cmd_id                           <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);
-                  when X"0DC" =>    mb_struct_cfg.temp_cmd_sof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_sof_add'length-1 downto 0));
-                  when X"0E0" =>    mb_struct_cfg.temp_cmd_eof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_eof_add'length-1 downto 0));
+                  when X"0E4" =>    mb_struct_cfg.temp_cmd_id                           <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);
+                  when X"0E8" =>    mb_struct_cfg.temp_cmd_data_size                    <= unsigned(data_i(mb_struct_cfg.op_cmd_data_size'length-1 downto 0));
+                  when X"0EC" =>    mb_struct_cfg.temp_cmd_dlen                         <= unsigned(data_i(mb_struct_cfg.op_cmd_dlen'length-1 downto 0));
+                  when X"0F0" =>    mb_struct_cfg.temp_cmd_sof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_sof_add'length-1 downto 0));
+                  when X"0F4" =>    mb_struct_cfg.temp_cmd_eof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_eof_add'length-1 downto 0));
                      
                   -- misc 
-                  when X"0E4" =>    mb_struct_cfg.outgoing_com_hder                     <= data_i(mb_struct_cfg.outgoing_com_hder'length-1 downto 0);
-                  when X"0E8" =>    mb_struct_cfg.incoming_com_hder                     <= data_i(mb_struct_cfg.incoming_com_hder'length-1 downto 0);
-                  when X"0EC" =>    mb_struct_cfg.incoming_com_fail_id                  <= data_i(mb_struct_cfg.incoming_com_fail_id'length-1 downto 0);
-                  when X"0F0" =>    mb_struct_cfg.incoming_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.incoming_com_ovh_len'length-1 downto 0));
-                  when X"0F4" =>    mb_struct_cfg.fpa_serdes_lval_num                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
-                  when X"0F8" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
-                  when X"0FC" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));
-                  when X"100" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
+                  when X"0F8" =>    mb_struct_cfg.outgoing_com_hder                     <= data_i(mb_struct_cfg.outgoing_com_hder'length-1 downto 0);
+                  when X"0FC" =>    mb_struct_cfg.outgoing_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.outgoing_com_ovh_len'length-1 downto 0));
+                  when X"100" =>    mb_struct_cfg.incoming_com_hder                     <= data_i(mb_struct_cfg.incoming_com_hder'length-1 downto 0);
+                  when X"104" =>    mb_struct_cfg.incoming_com_fail_id                  <= data_i(mb_struct_cfg.incoming_com_fail_id'length-1 downto 0);
+                  when X"108" =>    mb_struct_cfg.incoming_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.incoming_com_ovh_len'length-1 downto 0));
+                  when X"10C" =>    mb_struct_cfg.fpa_serdes_lval_num                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));
+                  when X"110" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));
+                  when X"114" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));
+                  when X"118" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
                      
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
                   when X"204" =>    mb_struct_cfg.temp.cfg_end                          <= data_i(0); mb_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
-                  when X"AE0" =>    fpa_softw_stat_i.fpa_roic   <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
-                  when X"AE4" =>    fpa_softw_stat_i.fpa_output <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';
-                  when X"AE8" =>    fpa_softw_stat_i.fpa_input  <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';
+                  when X"AE0" =>    fpa_softw_stat_i.fpa_roic                           <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
+                  when X"AE4" =>    fpa_softw_stat_i.fpa_output                         <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';
+                  when X"AE8" =>    fpa_softw_stat_i.fpa_input                          <= data_i(fpa_softw_stat_i.fpa_input'length-1 downto 0); fpa_softw_stat_i.dval <='1';
                      
                   -- pour effacer erreurs latchées
-                  when X"AEC" =>    reset_err_i <= data_i(0);
+                  when X"AEC" =>    reset_err_i                                         <= data_i(0);
                      
                   -- pour un reset complet du module FPA
-                  when X"AF0" =>   mb_ctrled_reset_i <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
+                  when X"AF0" =>   mb_ctrled_reset_i                                    <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                   
                   when others => -- do nothing
                   
@@ -366,8 +372,8 @@ begin
                   if    byte_cnt = 1  then exp_ser_cfg_data <= mb_struct_cfg.outgoing_com_hder(7 downto 0);  -- scd_proxy2 exp_time CMD Header
                   elsif byte_cnt = 2  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_id(7 downto 0);         -- scd_proxy2 exp_time CMD ID                 
                   elsif byte_cnt = 3  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_id(15 downto 8);        -- scd_proxy2 exp_time CMD ID                  
-                  elsif byte_cnt = 4  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_dlen(7 downto 0);       -- scd_proxy2 exp_time data length                  
-                  elsif byte_cnt = 5  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_dlen(15 downto 8);      -- scd_proxy2 exp_time data length 
+                  elsif byte_cnt = 4  then exp_ser_cfg_data <= std_logic_vector(mb_struct_cfg.int_cmd_dlen(7 downto 0));       -- scd_proxy2 exp_time cmd data length                  
+                  elsif byte_cnt = 5  then exp_ser_cfg_data <= std_logic_vector(mb_struct_cfg.int_cmd_dlen(15 downto 8));      -- scd_proxy2 exp_time cmd data length 
                   elsif byte_cnt = 6  then exp_ser_cfg_data <= mb_struct_cfg.int_cmd_offs(7 downto 0);       -- scd_proxy2 exp_time offset add 
                      
                      -- cmd_data: frame_dly
@@ -535,73 +541,77 @@ begin
             
          elsif MB_MOSI.ARADDR(11) = '1' then  -- adresse de base pour la lecture des statuts internes/privés (ne provenant pas du generateur de statuts)
             
-            case MB_MOSI.ARADDR(7 downto 0) is 
+            case MB_MOSI.ARADDR(8 downto 0) is 
                -- feedback de la config envoyée au MB pour validation visuelle via debug_terminal
                
-               when X"00" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_mode                        , 32));           
-               when X"04" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_type                        , 32));
-               when X"08" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_pwr_on                           , 32));
-               when X"0C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_mode                   , 32));
-               when X"10" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_ctrl_dly                , 32));
-               when X"14" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_spare                            , 32));
-               when X"18" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_ctrl_dly               , 32));
-               when X"1C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_timeout_dly            , 32));
-               when X"20" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig                 , 32));
-               when X"24" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.clk100_to_intclk_conv_numerator      , 32));
-               when X"28" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.intclk_to_clk100_conv_numerator      , 32));
-               when X"2C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.ysize                                , 32));
-               when X"30" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.xsize_div_tapnum                     , 32));
-               when X"34" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.lovh_mclk_source                     , 32));
-               when X"38" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly                , 32));
-               when X"3C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.itr                                       , 32));
-               when X"40" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.sol_pos                          , 32));
-               when X"44" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.eol_pos                          , 32));
-               when X"48" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.sol_pos                         , 32));
-               when X"4C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.eol_pos                         , 32));
-               when X"50" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.sol_pos                         , 32));
-               when X"54" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.eol_pos                          , 32));
-               when X"58" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xstart                                 , 32));
-               when X"5C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ystart                                 , 32));
-               when X"60" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xsize                                  , 32));
-               when X"64" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ysize                                  , 32));
-               when X"68" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.frame_time                             , 32));
-               when X"6C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.gain                                   , 32));
-               when X"70" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.int_mode                               , 32));
-               when X"74" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.test_mode                              , 32));
-               when X"78" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vbias                              , 32));
-               when X"7C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_ibias                              , 32));
-               when X"80" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vsat                               , 32));
-               when X"84" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.binning                                , 32));
-               when X"88" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.output_rate                            , 32));
-               when X"8C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare1                                 , 32));
-               when X"90" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare2                                 , 32));                                                      
-               when X"94" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare3                                 , 32));
-               when X"98" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare4                                 , 32));
-               when X"9C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.cfg_num                                , 32));
-               when X"A0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_id                                , 32));
-               when X"A4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_dlen                              , 32));
-               when X"A8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_offs                              , 32));                                                                             
-               when X"AC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_sof_add                           , 32));
-               when X"B0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_eof_add                           , 32));                                                                             
-               when X"B4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_sof_add_m1                        , 32));
-               when X"B8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_checksum_add                          , 32));
-               when X"BC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.frame_dly_cst                             , 32));                                                                             
-               when X"C0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_dly_cst                               , 32));
-               when X"C4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_id                                 , 32));
-               when X"C8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_sof_add                            , 32));
-               when X"CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_eof_add                            , 32));                                        
-               when X"D0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_id                               , 32));
-               when X"D4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_sof_add                          , 32)); 
-               when X"D8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_sof_add                          , 32)); 
-               when X"DC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.outgoing_com_hder                         , 32)); 
-               when X"E0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_hder                         , 32)); 
-               when X"E4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_fail_id                      , 32)); 
-               when X"E8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_ovh_len                      , 32)); 
-               when X"EC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_num                       , 32)); 
-               when X"F0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_len                       , 32)); 
-               when X"F4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_clk_period_factor                     , 32));
-               when X"F8" =>  axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK                                , 32));              
-               when X"FC" =>  axi_rdata <= std_logic_vector(to_unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS          , 32));              
+               when X"000" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_mode                        , 32));           
+               when X"004" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_type                        , 32));
+               when X"008" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_pwr_on                           , 32));
+               when X"00C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_mode                   , 32));
+               when X"010" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_ctrl_dly                , 32));
+               when X"014" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_spare                            , 32));
+               when X"018" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_ctrl_dly               , 32));
+               when X"01C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_timeout_dly            , 32));
+               when X"020" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig                 , 32));
+               when X"024" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.clk100_to_intclk_conv_numerator      , 32));
+               when X"028" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.intclk_to_clk100_conv_numerator      , 32));
+               when X"02C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.ysize                                , 32));
+               when X"030" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.xsize_div_tapnum                     , 32));
+               when X"034" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.lovh_mclk_source                     , 32));
+               when X"038" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly                , 32));
+               when X"03C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.itr                                       , 32));
+               when X"040" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.sol_pos                          , 32));
+               when X"044" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.eol_pos                          , 32));
+               when X"048" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.sol_pos                         , 32));
+               when X"04C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.eol_pos                         , 32));
+               when X"050" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.sol_pos                         , 32));
+               when X"054" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.eol_pos                          , 32));
+               when X"058" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xstart                                 , 32));
+               when X"05C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ystart                                 , 32));
+               when X"060" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xsize                                  , 32));
+               when X"064" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ysize                                  , 32));
+               when X"068" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.frame_time                             , 32));
+               when X"06C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.gain                                   , 32));
+               when X"070" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.int_mode                               , 32));
+               when X"074" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.test_mode                              , 32));
+               when X"078" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vbias                              , 32));
+               when X"07C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_ibias                              , 32));
+               when X"080" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.det_vsat                               , 32));
+               when X"084" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.binning                                , 32));
+               when X"088" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.output_rate                            , 32));
+               when X"08C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare1                                 , 32));
+               when X"090" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare2                                 , 32));                                                      
+               when X"094" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare3                                 , 32));
+               when X"098" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.spare4                                 , 32));
+               when X"09C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.cfg_num                                , 32));
+               when X"0A0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_id                                , 32));
+               when X"0A4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_dlen                              , 32));
+               when X"0A8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_offs                              , 32));                                                                             
+               when X"0AC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_sof_add                           , 32));
+               when X"0B0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_eof_add                           , 32));                                                                             
+               when X"0B4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_cmd_sof_add_m1                        , 32));
+               when X"0B8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_checksum_add                          , 32));
+               when X"0BC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.frame_dly_cst                             , 32));                                                                             
+               when X"0C0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_dly_cst                               , 32));
+               when X"0C4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_id                                 , 32));
+               when X"0C8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_sof_add                            , 32));
+               when X"0CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_eof_add                            , 32));                                        
+               when X"0D0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_id                               , 32));
+               when X"0D4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_sof_add                          , 32)); 
+               when X"0D8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_sof_add                          , 32)); 
+               when X"0DC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.outgoing_com_hder                         , 32)); 
+               when X"0E0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_hder                         , 32)); 
+               when X"0E4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_fail_id                      , 32)); 
+               when X"0E8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_ovh_len                      , 32)); 
+               when X"0EC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_num                       , 32)); 
+               when X"0F0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_len                       , 32)); 
+               when X"0F4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_clk_period_factor                     , 32));
+               when X"0F8" =>  axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK                                , 32));              
+               when X"0FC" =>  axi_rdata <= std_logic_vector(to_unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS          , 32));              
+               when X"100" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.frame_dly                                 , 32));
+               when X"104" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_dly                                   , 32));
+               when X"108" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_time                                   , 32));
+               
                
                when others =>                                                       
                
