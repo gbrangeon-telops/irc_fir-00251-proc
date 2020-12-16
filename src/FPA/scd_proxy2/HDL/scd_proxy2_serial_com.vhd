@@ -498,7 +498,7 @@ begin
                   tx_dval_i <= '0';
                   cfg_byte_cnt <= (others => '0'); 
                   ram2_rd_add_i <= to_unsigned(0, ram2_rd_add_i'length); -- zone securisée sera en lecture                  
-                  if unsigned(SERIAL_PARAM.CMD_SOF_ADD) = resize(USER_CFG.OP_CMD_SOF_ADD, SERIAL_PARAM.CMD_SOF_ADD'length)  then -- si cmd OP, alors obligatoirement mode xtra_trig forcé.
+                  if SERIAL_PARAM.PROG_TRIG_MODE = '1' then
                      force_prog_trig_mode <= '1';
                      cfg_mgmt_fsm <= prog_trig_start_st; 
                   else

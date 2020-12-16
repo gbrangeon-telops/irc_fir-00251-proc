@@ -83,7 +83,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, check_cfg_st0, check_cfg_st, pause_st1, pause_st2, 
    output_op_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, wait_updater_rdy_st, wait_updater_run_st);
    type int_gen_fsm_type is (idle, check_fpa_st, int_gen_st1, int_gen_st2, param_st);
-   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
+   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_synth_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
    signal cfg_updater_fsm           : driver_seq_fsm_type;
@@ -204,7 +204,7 @@ begin
             fpa_new_cfg_pending <= '0';
             user_cfg_in_progress_i <= '0';
             user_cfg_in_progress_last <= '0';
-            new_cfg_pending_fsm <= check_cfg_st1;
+            new_cfg_pending_fsm <= check_cfg_st0;
             need_prog_rqst <= '0';
             cfg_ser_param_i.run   <= '0';
             cfg_ser_param_i.abort <= '0';
@@ -216,9 +216,10 @@ begin
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
-            new_cfg.op   <= USER_CFG.OP;   
-            new_cfg.int  <= USER_CFG.INT;   
-            new_cfg.temp <= USER_CFG.TEMP;  
+            new_cfg.op    <= USER_CFG.OP;   
+            new_cfg.int   <= USER_CFG.INT;   
+            new_cfg.temp  <= USER_CFG.TEMP;
+            new_cfg.synth <= USER_CFG.SYNTH;
             
             --fpa_new_cfg_pending <= not user_cfg_in_progress_i; 
             
@@ -226,7 +227,14 @@ begin
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
             case new_cfg_pending_fsm is			  
                
-               when check_cfg_st1 =>
+               when check_cfg_st0 =>
+                  if new_cfg.synth /= present_cfg.synth then
+                     new_cfg_pending_fsm <= new_synth_cfg_st;					 
+                  else
+                     new_cfg_pending_fsm <= check_cfg_st1;
+                  end if;
+               
+               when check_cfg_st1 => 
                   if new_cfg.op /= present_cfg.op then
                      new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
@@ -244,17 +252,32 @@ begin
                   if new_cfg.temp /= present_cfg.temp then
                      new_cfg_pending_fsm <= new_temp_cfg_st;					 
                   else
-                     new_cfg_pending_fsm <= check_cfg_st1;
-                  end if;				  
+                     new_cfg_pending_fsm <= check_cfg_st0;
+                  end if;
+               
+               when new_synth_cfg_st =>  
+                  new_cfg_id <= std_logic_vector(USER_CFG.SYNTH_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
+                  cfg_ser_param_i.cmd_sof_add  <= USER_CFG.SYNTH_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.SYNTH_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= '1';
+                  need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
+                  if user_cfg_in_progress_i = '1' then 
+                     fpa_new_cfg_pending <= '0';
+                     new_cfg_pending_fsm <= check_cfg_st0;
+                  else
+                     fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
+                     new_cfg_pending_fsm <= wait_prog_end_st;
+                  end if;
                
                when new_op_cfg_st =>  
                   new_cfg_id <= std_logic_vector(USER_CFG.OP_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
                   cfg_ser_param_i.cmd_sof_add  <= USER_CFG.OP_CMD_SOF_ADD;
                   cfg_ser_param_i.cmd_eof_add <= USER_CFG.OP_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= '1';
                   need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= check_cfg_st0;
                   else
                      fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
@@ -264,11 +287,12 @@ begin
                   new_cfg_id <= std_logic_vector(USER_CFG.INT_CMD_SOF_ADD(7 downto 0));
                   cfg_ser_param_i.cmd_sof_add <= USER_CFG.INT_CMD_SOF_ADD;
                   cfg_ser_param_i.cmd_eof_add <= USER_CFG.INT_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= '0';
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				         -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= check_cfg_st0;
                   else
                      fpa_new_cfg_pending <= '1';            -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
@@ -278,11 +302,12 @@ begin
                   new_cfg_id <= std_logic_vector(USER_CFG.TEMP_CMD_SOF_ADD(7 downto 0));
                   cfg_ser_param_i.cmd_sof_add  <= USER_CFG.TEMP_CMD_SOF_ADD;
                   cfg_ser_param_i.cmd_eof_add <= USER_CFG.TEMP_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= '0';
                   fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				        -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= check_cfg_st0;
                   else
                      fpa_new_cfg_pending <= '1';           -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
@@ -291,7 +316,7 @@ begin
                when wait_prog_end_st =>
                   if fpa_driver_done_last = '0' and fpa_driver_done = '1' then
                      fpa_new_cfg_pending <= '0';
-                     new_cfg_pending_fsm <= check_cfg_st1;
+                     new_cfg_pending_fsm <= check_cfg_st0;
                   end if;
                
                when others =>

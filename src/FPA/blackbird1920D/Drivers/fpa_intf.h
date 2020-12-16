@@ -157,18 +157,25 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  op_test_mode                      ;                                          
    uint32_t  op_det_vbias                      ;                                          
    uint32_t  op_det_ibias                      ;                                          
-   uint32_t  op_det_vsat                       ;                                          
    uint32_t  op_binning                        ;                                          
    uint32_t  op_output_rate                    ;                                          
-   uint32_t  op_spare1                         ;                                          
-   uint32_t  op_spare2                         ;                                          
-   uint32_t  op_spare3                         ;                                          
-   uint32_t  op_spare4                         ;                                          
    uint32_t  op_cfg_num                        ;                                          
+   
+   // synth
+   uint32_t  synth_det_vsat                    ;                                          
+   uint32_t  synth_frm_res                     ;                                          
+   uint32_t  synth_frm_dat                     ;                                          
+   
+   // synth serial cmd
+   uint32_t  synth_cmd_id                      ;                                          
+   uint32_t  synth_cmd_data_size               ; 
+   uint32_t  synth_cmd_dlen                    ;
+   uint32_t  synth_cmd_sof_add                 ;
+   uint32_t  synth_cmd_eof_add                 ;
                                               
    // int cmd                                  
    uint32_t  int_cmd_id                        ;
-   uint32_t  int_cmd_data_size                 ;  // new
+   uint32_t  int_cmd_data_size                 ;  
    uint32_t  int_cmd_dlen                      ;                                          
    uint32_t  int_cmd_offs                      ;                                          
    uint32_t  int_cmd_sof_add                   ;                                          

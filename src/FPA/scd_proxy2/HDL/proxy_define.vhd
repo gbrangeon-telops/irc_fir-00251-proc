@@ -126,23 +126,23 @@ package Proxy_define is
       -- bias et saturation
       det_vbias        : std_logic_vector(3 downto 0);	-- mtx_vdet de bb1920
       det_ibias        : std_logic_vector(3 downto 0); 	-- mtx_idet de bb1920
-      det_vsat         : std_logic_vector(3 downto 0);	-- mtx_intg_low de bb1920
       
       -- misc
       binning          : std_logic_vector(1 downto 0);	  
       output_rate      : std_logic_vector(1 downto 0); 	-- video_rate de bb1920      
-      
-      -- spares
-      spare1           : std_logic_vector(1 downto 0);
-      spare2           : std_logic_vector(1 downto 0);
-      spare3           : std_logic_vector(1 downto 0);
-      spare4           : std_logic_vector(1 downto 0);
-      
       cfg_num          : unsigned(7 downto 0);      
       
    end record;
    
-   -- scd_proxy2 diag
+   -- scd_proxy2 synth
+   type synth_cfg_type is
+   record  
+      det_vsat         : std_logic_vector(3 downto 0);	-- mtx_intg_low de bb1920
+      frm_res          : unsigned(6 downto 0);
+      frm_dat          : std_logic_vector(1 downto 0);
+   end record;
+   
+   -- telops diag
    type diag_cfg_type is
    record
       ysize               : unsigned(10 downto 0);
@@ -190,6 +190,7 @@ package Proxy_define is
       
       -- les cmds structurales
       op                             : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
+      synth                          : synth_cfg_type;  -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
       int                            : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
       temp                           : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
       
@@ -211,6 +212,13 @@ package Proxy_define is
       op_cmd_dlen                    : unsigned(15 downto 0);
       op_cmd_sof_add                 : unsigned(7 downto 0);
       op_cmd_eof_add                 : unsigned(7 downto 0);
+      
+      -- cmd serielle video synthetique (diag scd)
+      synth_cmd_id                   : std_logic_vector(15 downto 0);
+      synth_cmd_data_size            : unsigned(15 downto 0);
+      synth_cmd_dlen                 : unsigned(15 downto 0);
+      synth_cmd_sof_add              : unsigned(7 downto 0);
+      synth_cmd_eof_add              : unsigned(7 downto 0);
       
       -- cmd serielle temperature
       temp_cmd_id                    : std_logic_vector(15 downto 0);
@@ -252,7 +260,8 @@ package Proxy_define is
       cmd_sof_add    : unsigned(7 downto 0);
       cmd_eof_add    : unsigned(7 downto 0);
       run            : std_logic;
-      abort          : std_logic;  
+      abort          : std_logic;
+      prog_trig_mode : std_logic;  -- à '1', impose le mode prog_trig. prog_trig avant l'envoi de la commande et prog_trig après l'envoi de la commande
    end record;  
    
 end Proxy_define;
