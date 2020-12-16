@@ -137,7 +137,7 @@ package Proxy_define is
    -- scd_proxy2 synth
    type synth_cfg_type is
    record  
-      det_vsat         : std_logic_vector(3 downto 0);	-- mtx_intg_low de bb1920
+      spare            : std_logic_vector(1 downto 0);	-- mtx_intg_low de bb1920
       frm_res          : unsigned(6 downto 0);
       frm_dat          : std_logic_vector(1 downto 0);
    end record;

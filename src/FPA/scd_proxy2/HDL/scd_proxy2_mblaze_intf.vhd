@@ -257,7 +257,7 @@ begin
                   when X"090" =>    mb_struct_cfg.op.cfg_num                            <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));                                                                                                                 
                   
                   -- synth
-                  when X"094" =>    mb_struct_cfg.synth.det_vsat                        <= data_i(mb_struct_cfg.synth.det_vsat'length-1 downto 0);  
+                  when X"094" =>    mb_struct_cfg.synth.spare                           <= data_i(mb_struct_cfg.synth.spare'length-1 downto 0);  
                   when X"098" =>    mb_struct_cfg.synth.frm_res                         <= unsigned(data_i(mb_struct_cfg.synth.frm_res'length-1 downto 0));    
                   when X"09C" =>    mb_struct_cfg.synth.frm_dat                         <= data_i(mb_struct_cfg.synth.frm_dat'length-1 downto 0);
                   

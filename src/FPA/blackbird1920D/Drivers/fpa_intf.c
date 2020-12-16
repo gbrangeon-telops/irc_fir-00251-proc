@@ -69,9 +69,9 @@
 
 //partition dans la ram Vhd des config (mappées sur FPA_define)
 #define AW_SERIAL_OP_CMD_RAM_ADD           0       // adresse de base en ram pour la cmd opertaionnelle
-#define AW_SERIAL_INT_CMD_RAM_ADD          64      // adresse de base en ram pour la cmd int_time (la commande est implémentée uniquement dans le vhd)
+#define AW_SERIAL_SYNTH_CMD_RAM_ADD        64      // adresse de base en ram pour la cmd synthetique
+#define AW_SERIAL_INT_CMD_RAM_ADD          128     // adresse de base en ram pour la cmd int_time (la commande est implémentée uniquement dans le vhd)
 #define AW_SERIAL_TEMP_CMD_RAM_ADD         192     // adresse de base en ram pour la cmd read temperature
-
                       
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                 0x0400  // adresse de base des statuts generiques
@@ -192,7 +192,7 @@ struct s_FpaPrivateStatus
    uint32_t op_test_mode                           ;
    uint32_t op_det_vbias                           ;
    uint32_t op_det_ibias                           ;
-   uint32_t op_det_vsat                            ;
+   uint32_t op_spare                            ;
    uint32_t op_binning                             ;
    uint32_t op_output_rate                         ;
    uint32_t op_spare1                              ;
@@ -348,7 +348,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegisterscmd_data_t *pGCRegs)
    ptrA->intclk_to_clk100_conv_numerator = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, PrivateStat->fpa_exp_time_conv_denom_bit_pos)/hh.fpa_intg_clk_rate_hz);  
    
    //------------------------------------------
-   // diag                             
+   // diag Telops                            
    //------------------------------------------
    ptrA->diag_ysize    = ptrA->aoi_ysize;
    if (PrivateStat->fpa_pix_num_per_pclk == 8) 
@@ -400,20 +400,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegisterscmd_data_t *pGCRegs)
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
       ptrA->op_int_mode = ITR_MODE; 
    
-   // patron de tests detecteur 
-   ptrA->op_test_mode = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
-      ptrA->op_test_mode = 1;
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) 
-      ptrA->op_test_mode = 2;
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) 
-      ptrA->op_test_mode = 3;
-    
+   ptrA->op_test_mode
+      
    // polarisation et saturation 
    ptrA->op_det_vbias = 5;                     // parametre mtx_vdet (valeur par defaut pour l'instant)
    ptrA->op_det_ibias = 1;                     // parametre mtx_idet (valeur par defaut pour l'instant)
-   ptrA->op_det_vsat  = 9;                     // parametre mtx_intg_low à la page p.42 de atlascmd_datasheet2.17 (valeur par defaut pour l'instant)   
-   
+      
    // binning ou non
    ptrA->op_binning = 0;
    
@@ -421,19 +413,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegisterscmd_data_t *pGCRegs)
    ptrA->op_output_rate = 2;
    if (PrivateStat->fpa_pix_num_per_pclk == 8)  
       ptrA->op_output_rate = 3;
-  
-   // spares
-   ptrA->op_spare1 = 0;
-   ptrA->op_spare2 = 0;
-   ptrA->op_spare3 = 0;
-   ptrA->op_spare4 = 0;
-   
+     
    // cfg_num 
    if (cfg_num == 255)                         // protection contre depassement
       cfg_num = 0;
    cfg_num++;
    ptrA->op_cfg_num = (uint32_t)op_cfg_num;
    
+   //-----------------------------------------
+   // synth : cmd structurelle
+   //-----------------------------------------
+   ptrA->synth_spare     = 0;                     
+   ptrA->synth_frm_res   = PrivateStat->int_clk_source_rate_khz/(uint32_t)hh.fpa_intg_clk_rate_hz; 
+   ptrA->synth_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
+   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
+      ptrA->synth_frm_dat = 1;
+   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) 
+      ptrA->synth_frm_dat = 2;
+   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) 
+      ptrA->synth_frm_dat = 3;
+      
    //-----------------------------------------
    // int : cmd structurelle + serielle
    //-----------------------------------------   
@@ -452,11 +451,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegisterscmd_data_t *pGCRegs)
    // op : cmd serielle
    //-----------------------------------------
    ptrA->op_cmd_id                       = 0x8500;                          // n'est pas utilisé par le vhd mais par le diverC
-   ptrA->op_cmd_data_size                = 23;                              // taille de la partie donnée exclusivement
+   ptrA->op_cmd_data_size                = 19;                              // taille de la partie donnée exclusivement
    ptrA->op_cmd_dlen                     = ptrA->op_cmd_data_size + 1;      // taille de la partie donnée + taille de l'adresse d'offset
    ptrA->op_cmd_sof_add                  = (uint32_t)AW_SERIAL_OP_CMD_RAM_ADD;
    ptrA->op_cmd_eof_add                  = ptrA->op_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->op_cmd_dlen;   // dlen = 23 + 1
    
+   //-----------------------------------------
+   // synth : cmd serielle
+   //-----------------------------------------
+   ptrA->synth_cmd_id                    = 0x8500;                             // n'est pas utilisé par le vhd mais par le diverC
+   ptrA->synth_cmd_data_size             = 3;                                  // taille de la partie donnée exclusivement
+   ptrA->synth_cmd_dlen                  = ptrA->synth_cmd_data_size + 1;      // taille de la partie donnée + taille de l'adresse d'offset
+   ptrA->synth_cmd_sof_add               = (uint32_t)AW_SERIAL_SYNTH_CMD_RAM_ADD;
+   ptrA->synth_cmd_eof_add               = ptrA->synth_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->synth_cmd_dlen;   // dlen = 23 + 1
+      
    //-----------------------------------------
    // temp : cmd serielle
    //-----------------------------------------
@@ -477,10 +485,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegisterscmd_data_t *pGCRegs)
    ptrA->fpa_serdes_lval_len             = (uint32_t)FPA_WIDTH_MAX / PrivateStat->fpa_pix_num_per_pclk;
    ptrA->int_clk_period_factor           = PrivateStat->int_clk_source_rate_khz/(uint32_t)hh.fpa_intg_clk_rate_hz;   
    ptrA->int_time_offset                 = (int32_t)(hh.fpa_intg_clk_rate_hz * hh.int_time_offset_usec*1e-6F);
-    
-   // Envoyer commande operationnelle
-   FPA_SendOperational_SerialCmd(ptrA);                                    // on envoie la partie serielle de la commande operationnelle (elle est stockée dans une autre partie de la RAM en vhd)
-   WriteStruct(ptrA);                                                      // on envoie la partie structurelle
+
+// Envoyer commande synthetique
+   FPA_SendSyntheticVideo_SerialCmd(ptrA);         // on envoie la partie serielle de la commande video synthetique (elle est stockée dans une partie de la RAM en vhd)
+
+// Envoyer commande operationnelle
+   FPA_SendOperational_SerialCmd(ptrA);            // on envoie la partie serielle de la commande operationnelle (elle est stockée dans une autre partie de la RAM en vhd)
+   WriteStruct(ptrA);                              // on envoie la partie structurelle
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -761,14 +772,43 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.data[16]       = ((PrivateStat->int_time & 0xF0000) >> 16);
    Cmd.data[17]       =   video_rate;                        
    Cmd.data[18]       = ((ptrA->op_det_vbias & 0x0F) << 4) + ((ptrA->op_det_ibias & 0x03) << 2);
-   Cmd.data[19]       = 
-   Cmd.data[20]       = 
-   Cmd.data[21]       = 
-   Cmd.data[22]       = 
    
-   Cmd.bram_sof_add = ptrA->op_cmd_sof_add; 
+   Cmd.bram_sof_add  = ptrA->op_cmd_sof_add; 
    // on batit les packets de bytes
    FPA_BuildCmdPacket(&ScdPacketTx, &Cmd);
+   
+   // on envoit les packets
+   FPA_SendCmdPacket(&ScdPacketTx, ptrA);
+
+}
+
+//------------------------------------------------------
+// Commande synthetique : envoi partie serielle               
+//------------------------------------------------------
+void FPA_SendSyntheticVideo_SerialCmd(const t_FpaIntf *ptrA)
+{
+   Command_t Cmd;
+   ScdPacketTx_t ScdPacketTx;
+
+   
+   // quelques definitions
+   uint8_t slv_adr        = 0x18;       // valeur par defaut
+   uint8_t vid_if_bit_en  = 0;          // valeur par defaut
+      
+   
+   // on bâtit la commande
+   Cmd.hder           =  ptrA->outgoing_com_hder;
+   Cmd.id             =  ptrA->synth_cmd_id;
+   Cmd.dlen           =  ptrA->synth_cmd_dlen;
+   Cmd.offs_add       =  (((uint8_t)DONOT_SEND_THIS_BYTE & 0xFF) << 8) + 20; // on evite ainsi l'envoi du MSB de offs_add                                  
+ 
+   Cmd.data[0]        =  (slv_adr & 0x7F);  
+   Cmd.data[1]        =  ptrA->synth_frm_res & 0x7F;
+   Cmd.data[2]        =  (ptrA->synth_frm_dat & 0x03) << 6 +  vid_if_bit_en;
+    
+   Cmd.bram_sof_add  = ptrA->synth_cmd_sof_add; 
+   // on batit les packets de bytes
+   FPA_BuildCmdPacket(&ScdPacketTx, &Cmd);                        
    
    // on envoit les packets
    FPA_SendCmdPacket(&ScdPacketTx, ptrA);
@@ -891,7 +931,7 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->op_test_mode                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x74);
    PrivateStat->op_det_vbias                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x78);
    PrivateStat->op_det_ibias                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x7C);
-   PrivateStat->op_det_vsat                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x80);
+   PrivateStat->op_spare                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x80);
    PrivateStat->op_binning                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x84);
    PrivateStat->op_output_rate                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x88);
    PrivateStat->op_spare1                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x8C);

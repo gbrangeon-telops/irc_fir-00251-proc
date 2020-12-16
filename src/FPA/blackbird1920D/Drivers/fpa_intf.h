@@ -162,7 +162,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  op_cfg_num                        ;                                          
    
    // synth
-   uint32_t  synth_det_vsat                    ;                                          
+   uint32_t  synth_spare                       ;                                          
    uint32_t  synth_frm_res                     ;                                          
    uint32_t  synth_frm_dat                     ;                                          
    
