@@ -200,11 +200,13 @@ begin
             user_cfg_i.reorder_column  <= '0';   -- provient pas du µBlaze
             user_cfg_i.gain <= '0';   -- provient pas du µBlaze 
             -- user_cfg_i.itr <= '1';   -- provient pas du µBlaze
-            user_cfg_i.diag.lovh_mclk_source <= to_unsigned(DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- 1MCLK de lovh converti en mclk_source
-            mb_ctrled_reset_i <= '0';
-            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
+                        mb_ctrled_reset_i <= '0';
             
-         else                   
+            
+         else
+            
+            user_cfg_i.diag.lovh_mclk_source <= to_unsigned(DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- 1MCLK de lovh converti en mclk_source
+            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;            
             

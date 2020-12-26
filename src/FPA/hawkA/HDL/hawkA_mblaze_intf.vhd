@@ -188,9 +188,11 @@ begin
             -- pragma translate_on
             user_cfg_i.ysize <= to_unsigned(640, user_cfg_i.ysize'length);
             user_cfg_i.sat_ctrl_en <= '0';
-            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
-         else                   
+            
+         else
+            
+            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;               
             

@@ -202,9 +202,11 @@ begin
             -- pragma translate_off
             user_cfg_i.additional_fpa_int_time_offset <= (others => '0');
             -- pragma translate_on
-            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
+            
             
          else                   
+            
+            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
             
