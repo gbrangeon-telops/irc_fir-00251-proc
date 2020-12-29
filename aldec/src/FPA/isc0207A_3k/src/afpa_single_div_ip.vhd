@@ -20,6 +20,7 @@ entity afpa_single_div_ip is
       
       m_axis_dout_tvalid     : OUT STD_LOGIC;
       m_axis_dout_tuser      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      m_axis_dout_tready     : IN  std_logic;
       m_axis_dout_tlast      : OUT STD_LOGIC;
       m_axis_dout_tdata      : OUT STD_LOGIC_VECTOR(39 DOWNTO 0)
       );
