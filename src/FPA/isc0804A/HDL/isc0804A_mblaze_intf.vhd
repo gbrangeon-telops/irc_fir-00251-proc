@@ -200,7 +200,7 @@ begin
             user_cfg_i.reorder_column  <= '0';   -- provient pas du µBlaze
             user_cfg_i.gain <= '0';   -- provient pas du µBlaze 
             -- user_cfg_i.itr <= '1';   -- provient pas du µBlaze
-                        mb_ctrled_reset_i <= '0';
+            mb_ctrled_reset_i <= '0';
             
             
          else

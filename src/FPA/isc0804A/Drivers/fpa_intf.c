@@ -400,8 +400,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); // mode_trig_start_to_trig_start_dly_usec tient compte de Tri et donc du mode d'integration. Donc impossible de passer en IWR accidentellement en trig externe par exemple si c'est ITR qui est demandé.
-   if (TDCStatusTst(WaitingForImageCorrectionMask) == 1){      // lorsqu'une actualisation est en cours, on passe en MODE_ITR_TRIG_START_TO_TRIG_START pour que le throughput_ctrl ajuste le throughput à celle de l'actualisation
-      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;
+   if ((TDCStatusTst(WaitingForImageCorrectionMask) == 1) || (ptrA->fpa_diag_mode == 1)){      // lorsqu'une actualisation est en cours, on passe en MODE_ITR_TRIG_START_TO_TRIG_START pour que le throughput_ctrl ajuste le throughput à celle de l'actualisation
+      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;              // ENO : 29 dec 2020 : en mode diag, on impose un MODE_ITR_TRIG_START_TO_TRIG_START pour aller à la vitesse du vhd.
    }
    ptrA->fpa_spare                 = 0;
    ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;                                                   //
