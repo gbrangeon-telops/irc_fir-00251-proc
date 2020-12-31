@@ -214,8 +214,12 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
 typedef struct s_FpaIntfConfig t_FpaIntf;                       
                                                                 
 // statuts provenant du vhd                                     
-struct s_FpaStatus    //                                        
-{                                                               
+struct s_FpaStatus    // 
+{
+   // fpa init status (ne provient pas du vhd)
+   uint32_t  fpa_init_done;            // donne l'état de l'initialisation du module FPA (hw + sw)
+   uint32_t  fpa_init_success;         // donne le résultat de l'initialisation du module FPA (hw + sw) 
+   
    // adc board (iddcas analogiques)
    uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
@@ -251,11 +255,11 @@ struct s_FpaStatus    //
    uint32_t  fpa_driver_stat;          // statut du hw driver. Définition dans "fpa"_hw_driver.bde
 
    // pour le power management
-   uint32_t  adc_ddc_detect_process_done;    // dit si le  processus de détection de la carte ADC/ DDC est achevé
-   uint32_t  adc_ddc_present;                // dit si une carte valide est détectée
+   uint32_t  adc_ddc_detect_process_done; // dit si le  processus de détection de la carte ADC/ DDC est achevé
+   uint32_t  adc_ddc_present;             // dit si une carte valide est détectée
    uint32_t  flex_flegx_detect_process_done; // dit si le  processus de détection du flex est achevé
-   uint32_t  flex_flegx_present;             // dit si une carte valide est détectée
-   uint32_t  flegx_present;                  // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
+   uint32_t  flex_flegx_present;          // dit si une carte valide est détectée
+   uint32_t  flegx_present;               // '1' dit si l'électronique de proximité est un flegX, sinon, c'est un flex
 
    uint32_t  id_cmd_in_error;             // donne la commande en erreur pour les detecteurs numeriques. 0xFF -> aucune cmd en erreur
 
@@ -265,16 +269,15 @@ struct s_FpaStatus    //
    uint8_t   fpa_serdes_delay[4];         // donne le délai de calibration des serdes pour chaque canal
    uint32_t  fpa_serdes_edges[4];         // donne les edges trouvés lors de la calibration des serdes pour chaque canal
 
-   // fpa init status
-   uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
-   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
+   // hw init status
+   uint32_t  hw_init_done;                // donne l'état de l'initialisation du hw
+   uint32_t  hw_init_success;             // donne le résultat de l'initialisation du hw
    uint32_t  prog_init_done;              // -- monte à '1' lorsque la config d'initialisation est programmée dans le ROIC. Ce qui est intéressant pour les ROIC necessitant une config d'initialisation
    
    // cooler
    uint32_t  cooler_on_curr_min_mA;       // seuil au dessus duquel considérer que le refroidisseur est allumé
    uint32_t  cooler_off_curr_max_mA;      // seuil en dessous duquel considérer que le refroidisseur est eteint
    
-   // watchdog
    uint32_t  acq_trig_cnt;    
    uint32_t  acq_int_cnt;     
    uint32_t  fpa_readout_cnt; 
