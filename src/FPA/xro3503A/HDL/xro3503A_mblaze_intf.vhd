@@ -177,14 +177,15 @@ begin
             dac_cfg_in_progress <= '1'; 
             user_cfg_i.adc_quad2_en  <= '1';     -- provient pas du µBlaze
             user_cfg_i.reorder_column <= '0'; -- non evvoyé par le MBlaze
-            user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);
-            user_cfg_i.diag.lovh_mclk_source <= to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length);
             user_cfg_i.sat_ctrl_en <= '0';
-            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             mb_ctrled_reset_i <= '0';
             
             
          else                   
+            
+            user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);
+            user_cfg_i.diag.lovh_mclk_source <= to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length);
+            user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
             
@@ -214,7 +215,7 @@ begin
                   -- diag
                   when X"028" =>    user_cfg_i.diag.ysize                      <= unsigned(data_i(user_cfg_i.diag.ysize'length-1 downto 0));
                   when X"02C" =>    user_cfg_i.diag.xsize_div_tapnum           <= unsigned(data_i(user_cfg_i.diag.xsize_div_tapnum'length-1 downto 0));
-                  
+                     
                   -- prog ctrl
                   when X"030" =>    user_cfg_i.xstart                          <= unsigned(data_i(user_cfg_i.xstart'length-1 downto 0));
                   when X"034" =>    user_cfg_i.ystart                          <= unsigned(data_i(user_cfg_i.ystart'length-1 downto 0));
@@ -225,10 +226,10 @@ begin
                   when X"048" =>    user_cfg_i.read_dir_left                   <= data_i(0);
                   when X"04C" =>    user_cfg_i.gain                            <= data_i(0);
                   when X"050" =>    user_cfg_i.ctia_bias_current               <= data_i(user_cfg_i.ctia_bias_current'length-1 downto 0);
-                  
+                     
                   -- dval gen
                   when X"054" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0)); 
-                  
+                     
                   -- readout ctrl
                   when X"058" =>    user_cfg_i.line_period_pclk                <= unsigned(data_i(user_cfg_i.line_period_pclk'length-1 downto 0));
                   when X"05C" =>    user_cfg_i.readout_pclk_cnt_max            <= unsigned(data_i(user_cfg_i.readout_pclk_cnt_max'length-1 downto 0));
@@ -240,7 +241,7 @@ begin
                   when X"074" =>    user_cfg_i.sol_posl_pclk                   <= unsigned(data_i(user_cfg_i.sol_posl_pclk'length-1 downto 0));
                   when X"078" =>    user_cfg_i.eol_posl_pclk                   <= unsigned(data_i(user_cfg_i.eol_posl_pclk'length-1 downto 0));
                   when X"07C" =>    user_cfg_i.eol_posl_pclk_p1                <= unsigned(data_i(user_cfg_i.eol_posl_pclk_p1'length-1 downto 0));
-                  
+                     
                   -- sample proc
                   when X"080" =>    user_cfg_i.pix_samp_num_per_ch             <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));
                   when X"084" =>    user_cfg_i.hgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));  
@@ -249,20 +250,20 @@ begin
                   when X"090" =>    user_cfg_i.vgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));  
                   when X"094" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0)); 
                   when X"098" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0)); 
-                  
+                     
                   -- clk gen
                   when X"09C" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));
                   when X"0A0" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
-                  
+                     
                   -- image info
                   when X"0A4" =>    user_cfg_i.offsetx                         <= unsigned(data_i(user_cfg_i.offsetx'length-1 downto 0));
                   when X"0A8" =>    user_cfg_i.offsety                         <= unsigned(data_i(user_cfg_i.offsety'length-1 downto 0));
                   when X"0AC" =>    user_cfg_i.width                           <= unsigned(data_i(user_cfg_i.width'length-1 downto 0));
                   when X"0B0" =>    user_cfg_i.height                          <= unsigned(data_i(user_cfg_i.height'length-1 downto 0));
-                  
+                     
                   -- new config
                   when X"0B4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
-                  
+                     
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
@@ -274,7 +275,7 @@ begin
                   -- pour un reset complet du module FPA
                   when X"AF0" =>    mb_ctrled_reset_i                          <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
                      
-                  ----------------------------------------------------------------------------------------------------------------------------------------                  
+                     ----------------------------------------------------------------------------------------------------------------------------------------                  
                      -- EN0 15 janv 2019: la config des DACs passe désormais par l'adresse de base 0xD00 en vue de securiser les tensions du détecteur 
                   ----------------------------------------------------------------------------------------------------------------------------------------
                   when X"D00" =>    user_cfg_i.vdac_value(1)                   <= unsigned(data_i(user_cfg_i.vdac_value(1)'length-1 downto 0)); dac_cfg_in_progress <= '1';
@@ -285,7 +286,7 @@ begin
                   when X"D14" =>    user_cfg_i.vdac_value(6)                   <= unsigned(data_i(user_cfg_i.vdac_value(6)'length-1 downto 0));
                   when X"D18" =>    user_cfg_i.vdac_value(7)                   <= unsigned(data_i(user_cfg_i.vdac_value(7)'length-1 downto 0));
                   when X"D1C" =>    user_cfg_i.vdac_value(8)                   <= unsigned(data_i(user_cfg_i.vdac_value(8)'length-1 downto 0)); dac_cfg_in_progress <= '0';
-                               
+                  
                   when others =>
                   
                end case;     

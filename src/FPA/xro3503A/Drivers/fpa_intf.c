@@ -251,6 +251,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // config du contrôleur de trigs
    ptrA->fpa_trig_ctrl_mode         = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+   if (ptrA->fpa_diag_mode == 1)    // ENO : 03 jan 2021 : en mode diag, on impose un MODE_ITR_TRIG_START_TO_TRIG_START pour aller à la vitesse maximale imposée par le patron de tests. 
+      ptrA->fpa_trig_ctrl_mode      = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;             
+   
    ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)( (hh.frame_period_usec - hh.vhd_delay_usec)*1e-6F * (float)VHD_CLK_100M_RATE_HZ);  //frame period min calculée avec ET=0
    ptrA->fpa_spare                  = 0;
    ptrA->fpa_xtra_trig_ctrl_dly     = ptrA->fpa_acq_trig_ctrl_dly;
