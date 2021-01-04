@@ -72,7 +72,6 @@ architecture rtl of mglk_diag_data_gen is
    
    component fpa_diag_line_gen
       generic (
-         ANALOG_IDDCA           : boolean := false;
          SAMP_NUM_PER_PIX       : natural range 0 to 15 := 5 
          );
       port(
@@ -240,9 +239,8 @@ begin
    -- CH1 data gen 
    --------------------------------------------------   
    U1: fpa_diag_line_gen
-   generic map(
-      ANALOG_IDDCA => false,      
-      SAMP_NUM_PER_PIX => 1
+   generic map(    
+      SAMP_NUM_PER_PIX => 1     -- toujours à 1 pour les iddcas numériques
       )
    port map(
       CLK => CLK,
@@ -263,8 +261,7 @@ begin
    -- CH2 data gen 
    --------------------------------------------------   
    U2: fpa_diag_line_gen
-   generic map(
-      ANALOG_IDDCA => false,      
+   generic map(    
       SAMP_NUM_PER_PIX => 1
       )
    port map(
