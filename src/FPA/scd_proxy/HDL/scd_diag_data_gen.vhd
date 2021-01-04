@@ -75,8 +75,7 @@ architecture rtl of scd_diag_data_gen is
    component fpa_diag_line_gen
       generic (
          ANALOG_IDDCA           : boolean := false;
-         SAMP_NUM_PER_PIX       : natural range 0 to 15 := 5;
-         ADC_QUAD_CLK_FACTOR    : natural range 0 to 15 := 5
+         SAMP_NUM_PER_PIX       : natural range 0 to 15 := 5 
          );
       port(
          CLK                : in std_logic;
@@ -293,8 +292,7 @@ begin
    U1: fpa_diag_line_gen
    generic map(
       ANALOG_IDDCA => false,      
-      SAMP_NUM_PER_PIX => 1,
-      ADC_QUAD_CLK_FACTOR => 1
+      SAMP_NUM_PER_PIX => 1
       )
    port map(
       CLK => CLK,
@@ -317,8 +315,7 @@ begin
    U2: fpa_diag_line_gen
    generic map(
       ANALOG_IDDCA => false,      
-      SAMP_NUM_PER_PIX => 1,
-      ADC_QUAD_CLK_FACTOR => 1
+      SAMP_NUM_PER_PIX => 1
       )
    port map(
       CLK => CLK,
@@ -351,8 +348,7 @@ begin
       U3: fpa_diag_line_gen
       generic map(
          ANALOG_IDDCA => false,      
-         SAMP_NUM_PER_PIX => 1,
-         ADC_QUAD_CLK_FACTOR => 1
+         SAMP_NUM_PER_PIX => 1
          )
       port map(
          CLK => CLK,
@@ -375,8 +371,7 @@ begin
       U4: fpa_diag_line_gen
       generic map(
          ANALOG_IDDCA => false,      
-         SAMP_NUM_PER_PIX => 1,
-         ADC_QUAD_CLK_FACTOR => 1
+         SAMP_NUM_PER_PIX => 1
          )
       port map(
          CLK => CLK,
