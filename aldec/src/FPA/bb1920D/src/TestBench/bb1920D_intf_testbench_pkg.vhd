@@ -20,9 +20,15 @@ use work.fpa_define.all;
 
 package BB1920D_intf_testbench_pkg is           
    
-   constant PAUSE_SIZE                 : integer := 2*(1);
-   constant TAP_NUM                    : integer := 8;
-   constant C_FPA_INTCLK_RATE_KHZ      : integer := 35_000;
+   constant PAUSE_SIZE                  : integer := 2*(1);
+   constant TAP_NUM                     : integer := 8;
+   constant C_FPA_INTCLK_RATE_KHZ       : integer := 35_000;
+   constant QWORDS_NUM                  : natural := 74;
+   
+   constant AW_SERIAL_OP_CMD_RAM_ADD    : integer   :=  0;  
+   constant AW_SERIAL_SYNTH_CMD_RAM_ADD : integer   :=  64; 
+   constant AW_SERIAL_INT_CMD_RAM_ADD   : integer   :=  128;
+   constant AW_SERIAL_TEMP_CMD_RAM_ADD  : integer   :=  192;
    
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
@@ -36,74 +42,84 @@ package body BB1920D_intf_testbench_pkg is
       
       constant FPA_WIDTH_MAX : integer := 640;
       
-      variable  comn_fpa_diag_mode                            : unsigned(31 downto  0);
-      variable  comn_fpa_diag_type                            : unsigned(31 downto  0);
-      variable  comn_fpa_pwr_on                               : unsigned(31 downto  0);
-      variable  comn_fpa_trig_ctrl_mode                       : unsigned(31 downto  0);
-      variable  comn_fpa_acq_trig_ctrl_dly                    : unsigned(31 downto  0);
-      variable  comn_fpa_spare                                : unsigned(31 downto  0);
-      variable  comn_fpa_xtra_trig_ctrl_dly                   : unsigned(31 downto  0);
-      variable  comn_fpa_trig_ctrl_timeout_dly                : unsigned(31 downto  0);
-      variable  comn_fpa_stretch_acq_trig                     : unsigned(31 downto  0);
-      variable  comn_clk100_to_intclk_conv_numerator          : unsigned(31 downto  0);
-      variable  comn_intclk_to_clk100_conv_numerator          : unsigned(31 downto  0);
-      variable  diag_ysize                                    : unsigned(31 downto  0);
-      variable  diag_xsize_div_tapnum                         : unsigned(31 downto  0);                                           
-      variable  diag_lovh_mclk_source                         : unsigned(31 downto  0);
-      variable  real_mode_active_pixel_dly                    : unsigned(31 downto  0);
-      variable  itr                                           : unsigned(31 downto  0);
-      variable  aoi_xsize                                     : unsigned(31 downto  0);
-      variable  aoi_ysize                                     : unsigned(31 downto  0);
-      variable  aoi_data_sol_pos                              : unsigned(31 downto  0);
-      variable  aoi_data_eol_pos                              : unsigned(31 downto  0);
-      variable  aoi_flag1_sol_pos                             : unsigned(31 downto  0);
-      variable  aoi_flag1_eol_pos                             : unsigned(31 downto  0);                           
-      variable  aoi_flag2_sol_pos                             : unsigned(31 downto  0);
-      variable  aoi_flag2_eol_pos                             : unsigned(31 downto  0);
-      variable  op_xstart                                     : unsigned(31 downto  0);
-      variable  op_ystart                                     : unsigned(31 downto  0);
-      variable  op_xsize                                      : unsigned(31 downto  0);
-      variable  op_ysize                                      : unsigned(31 downto  0);
-      variable  op_frame_time                                 : unsigned(31 downto  0);
-      variable  op_gain                                       : unsigned(31 downto  0);
-      variable  op_int_mode                                   : unsigned(31 downto  0);
-      variable  op_test_mode                                  : unsigned(31 downto  0);
-      variable  op_det_vbias                                  : unsigned(31 downto  0);
-      variable  op_det_ibias                                  : unsigned(31 downto  0);
-      variable  op_det_vsat                                   : unsigned(31 downto  0); 
-      variable  op_binning                                    : unsigned(31 downto  0);
-      variable  op_output_rate                                : unsigned(31 downto  0);
-      variable  op_spare1                                     : unsigned(31 downto  0);
-      variable  op_spare2                                     : unsigned(31 downto  0);
-      variable  op_spare3                                     : unsigned(31 downto  0);
-      variable  op_spare4                                     : unsigned(31 downto  0);
-      variable  op_cfg_num                                    : unsigned(31 downto  0);
-      variable  int_cmd_id                                    : unsigned(31 downto  0);
-      variable  int_cmd_dlen                                  : unsigned(31 downto  0);
-      variable  int_cmd_offs                                  : unsigned(31 downto  0);  
-      variable  int_cmd_sof_add                               : unsigned(31 downto  0);
-      variable  int_cmd_eof_add                               : unsigned(31 downto  0);
-      variable  int_cmd_sof_add_m1                            : unsigned(31 downto  0);
-      variable  int_checksum_add                              : unsigned(31 downto  0);
-      variable  frame_dly_cst                                 : unsigned(31 downto  0);
-      variable  int_dly_cst                                   : unsigned(31 downto  0);
-      variable  op_cmd_id                                     : unsigned(31 downto  0);
-      variable  op_cmd_sof_add                                : unsigned(31 downto 0);
-      variable  op_cmd_eof_add                                : unsigned(31 downto 0);
-      variable  temp_cmd_id                                   : unsigned(31 downto 0);
-      variable  temp_cmd_sof_add                              : unsigned(31 downto 0);
-      variable  temp_cmd_eof_add                              : unsigned(31 downto 0);
-      variable  outgoing_com_hder                             : unsigned(31 downto 0);
-      variable  incoming_com_hder                             : unsigned(31 downto 0);
-      variable  incoming_com_fail_id                          : unsigned(31 downto 0);
-      variable  incoming_com_ovh_len                          : unsigned(31 downto 0);
-      variable  fpa_serdes_lval_num                           : unsigned(31 downto 0);
-      variable  fpa_serdes_lval_len                           : unsigned(31 downto 0);
-      variable  int_clk_period_factor                         : unsigned(31 downto 0);
-      variable  int_time_offset                               : unsigned(31 downto 0);
+      variable  comn_fpa_diag_mode                     : unsigned(31 downto 0);
+      variable  comn_fpa_diag_type                     : unsigned(31 downto 0);
+      variable  comn_fpa_pwr_on                        : unsigned(31 downto 0);
+      variable  comn_fpa_trig_ctrl_mode                : unsigned(31 downto 0);
+      variable  comn_fpa_acq_trig_ctrl_dly             : unsigned(31 downto 0);
+      variable  comn_fpa_spare                         : unsigned(31 downto 0);
+      variable  comn_fpa_xtra_trig_ctrl_dly            : unsigned(31 downto 0);
+      variable  comn_fpa_trig_ctrl_timeout_dly         : unsigned(31 downto 0);
+      variable  comn_fpa_stretch_acq_trig              : unsigned(31 downto 0);
+      variable  comn_clk100_to_intclk_conv_numerator   : unsigned(31 downto 0);
+      variable  comn_intclk_to_clk100_conv_numerator   : unsigned(31 downto 0);
+      variable  diag_ysize                             : unsigned(31 downto 0);
+      variable  diag_xsize_div_tapnum                  : unsigned(31 downto 0);                                           
+      variable  diag_lovh_mclk_source                  : unsigned(31 downto 0);
+      variable  real_mode_active_pixel_dly             : unsigned(31 downto 0);
+      variable  itr                                    : unsigned(31 downto 0);
+      variable  aoi_xsize                              : unsigned(31 downto 0);
+      variable  aoi_ysize                              : unsigned(31 downto 0);
+      variable  aoi_data_sol_pos                       : unsigned(31 downto 0);
+      variable  aoi_data_eol_pos                       : unsigned(31 downto 0);
+      variable  aoi_flag1_sol_pos                      : unsigned(31 downto 0);
+      variable  aoi_flag1_eol_pos                      : unsigned(31 downto 0);                           
+      variable  aoi_flag2_sol_pos                      : unsigned(31 downto 0);
+      variable  aoi_flag2_eol_pos                      : unsigned(31 downto 0);
+      variable  op_xstart                              : unsigned(31 downto 0);
+      variable  op_ystart                              : unsigned(31 downto 0);
+      variable  op_xsize                               : unsigned(31 downto 0);
+      variable  op_ysize                               : unsigned(31 downto 0);
+      variable  op_frame_time                          : unsigned(31 downto 0);
+      variable  op_gain                                : unsigned(31 downto 0);
+      variable  op_int_mode                            : unsigned(31 downto 0);
+      variable  op_test_mode                           : unsigned(31 downto 0);
+      variable  op_det_vbias                           : unsigned(31 downto 0);
+      variable  op_det_ibias                           : unsigned(31 downto 0);
+      variable  op_binning                             : unsigned(31 downto 0); 
+      variable  op_output_rate                         : unsigned(31 downto 0);
+      variable  op_cfg_num                             : unsigned(31 downto 0);
+      variable  synth_spare                            : unsigned(31 downto 0);
+      variable  synth_frm_res                          : unsigned(31 downto 0);
+      variable  synth_frm_dat                          : unsigned(31 downto 0);
+      variable  synth_cmd_id                           : unsigned(31 downto 0);
+      variable  synth_cmd_data_size                    : unsigned(31 downto 0);
+      variable  synth_cmd_dlen                         : unsigned(31 downto 0);
+      variable  synth_cmd_sof_add                      : unsigned(31 downto 0);
+      variable  synth_cmd_eof_add                      : unsigned(31 downto 0);
+      variable  int_cmd_id                             : unsigned(31 downto 0);  
+      variable  int_cmd_data_size                      : unsigned(31 downto 0);
+      variable  int_cmd_dlen                           : unsigned(31 downto 0);
+      variable  int_cmd_offs                           : unsigned(31 downto 0);
+      variable  int_cmd_sof_add                        : unsigned(31 downto 0);
+      variable  int_cmd_eof_add                        : unsigned(31 downto 0);
+      variable  int_cmd_sof_add_m1                     : unsigned(31 downto 0);
+      variable  int_checksum_add                       : unsigned(31 downto 0);
+      variable  frame_dly_cst                          : unsigned(31 downto 0);
+      variable  int_dly_cst                            : unsigned(31 downto 0);
+      variable  op_cmd_id                              : unsigned(31 downto 0);
+      variable  op_cmd_data_size                       : unsigned(31 downto 0);
+      variable  op_cmd_dlen                            : unsigned(31 downto 0);
+      variable  op_cmd_sof_add                         : unsigned(31 downto 0);
+      variable  op_cmd_eof_add                         : unsigned(31 downto 0);
+      variable  temp_cmd_id                            : unsigned(31 downto 0);
+      variable  temp_cmd_data_size                     : unsigned(31 downto 0);
+      variable  temp_cmd_dlen                          : unsigned(31 downto 0);
+      variable  temp_cmd_sof_add                       : unsigned(31 downto 0);
+      variable  temp_cmd_eof_add                       : unsigned(31 downto 0);
+      variable  outgoing_com_hder                      : unsigned(31 downto 0);
+      variable  outgoing_com_ovh_len                   : unsigned(31 downto 0);
+      variable  incoming_com_hder                      : unsigned(31 downto 0);
+      variable  incoming_com_fail_id                   : unsigned(31 downto 0);
+      variable  incoming_com_ovh_len                   : unsigned(31 downto 0);
+      variable  fpa_serdes_lval_num                    : unsigned(31 downto 0);
+      variable  fpa_serdes_lval_len                    : unsigned(31 downto 0);
+      variable  int_clk_period_factor                  : unsigned(31 downto 0);
+      variable  int_time_offset                        : unsigned(31 downto 0);
       
       
-      variable y                                              : unsigned(65*32-1 downto 0);
+      variable y                                       : unsigned(QWORDS_NUM*32-1 downto 0);
+      
       
    begin 
       
@@ -118,7 +134,7 @@ package body BB1920D_intf_testbench_pkg is
       
       comn_fpa_acq_trig_ctrl_dly    := to_unsigned(1000, comn_fpa_acq_trig_ctrl_dly'length);
       comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(1000, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_trig_ctrl_timeout_dly := to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
+      comn_fpa_trig_ctrl_timeout_dly:= to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
       diag_ysize                    := to_unsigned(user_ysize/2, 32);                 
@@ -146,35 +162,42 @@ package body BB1920D_intf_testbench_pkg is
       op_int_mode                   := to_unsigned(0, 32);   
       op_test_mode	               := to_unsigned(0, 32);     
       op_det_vbias                  := to_unsigned(0, 32);    
-      op_det_ibias                  := to_unsigned(0, 32);    
-      op_det_vsat                   := to_unsigned(0, 32);    
+      op_det_ibias                  := to_unsigned(0, 32);       
       op_binning                    := to_unsigned(0, 32);    
-      -- op_output_chn                 := to_unsigned(2, 32);    
-      op_spare1		               := to_unsigned(0, 32);   
-      op_spare2		               := to_unsigned(0, 32);   
-      op_spare3		               := to_unsigned(0, 32);   
-      op_spare4                     := to_unsigned(0, 32);  
-      op_cfg_num                    := to_unsigned(send_id, 32);  
+      op_cfg_num                    := to_unsigned(send_id, 32);
       
-      int_cmd_id                    := resize(x"8500", 32); 
-      int_cmd_dlen                  := to_unsigned(10, 32); 
+      synth_spare                   := to_unsigned(0, 32);
+      synth_frm_res                 := to_unsigned(0, 32);
+      synth_frm_dat                 := to_unsigned(0, 32);
+      synth_cmd_id                  := resize(x"8500", 32);
+      synth_cmd_data_size           := to_unsigned(4, 32);
+      synth_cmd_dlen                := to_unsigned(0, 32);
+      synth_cmd_sof_add             := to_unsigned(AW_SERIAL_SYNTH_CMD_RAM_ADD, 32);
+      synth_cmd_eof_add             := to_unsigned(AW_SERIAL_SYNTH_CMD_RAM_ADD + 5, 32);   
+      
+      int_cmd_id                    := resize(x"8500", 32);
+      int_cmd_data_size             := to_unsigned(9, 32);
+      int_cmd_dlen                  := int_cmd_data_size + 1; 
       int_cmd_offs                  := to_unsigned(8, 32); 
-      int_cmd_sof_add               := to_unsigned(64, 32); 
-      int_cmd_eof_add               := to_unsigned(64 + 15, 32); 
+      int_cmd_sof_add               := to_unsigned(AW_SERIAL_INT_CMD_RAM_ADD, 32); 
+      int_cmd_eof_add               := to_unsigned(AW_SERIAL_INT_CMD_RAM_ADD + 15, 32); 
       int_cmd_sof_add_m1            := to_unsigned(63, 32); 
       int_checksum_add              := int_cmd_sof_add + to_unsigned(15, 32); 
       frame_dly_cst                 := to_unsigned(10, 32);         
       int_dly_cst                   := to_unsigned(10, 32);         
       
       op_cmd_id                     := resize(x"8500", 32);
-      op_cmd_sof_add                := to_unsigned(0, 32);
-      op_cmd_eof_add                := to_unsigned(10, 32);
+      op_cmd_data_size              := resize(x"8500", 32);
+      op_cmd_dlen                   := op_cmd_data_size + 1;      
+      op_cmd_sof_add                := to_unsigned(AW_SERIAL_OP_CMD_RAM_ADD, 32);
+      op_cmd_eof_add                := to_unsigned(AW_SERIAL_OP_CMD_RAM_ADD + 29, 32);
       
       temp_cmd_id                   := resize(x"8503", 32);
-      temp_cmd_sof_add              := to_unsigned(128, 32); 
-      temp_cmd_eof_add              := to_unsigned(128 + 10, 32);
+      temp_cmd_sof_add              := to_unsigned(AW_SERIAL_TEMP_CMD_RAM_ADD, 32); 
+      temp_cmd_eof_add              := to_unsigned(AW_SERIAL_TEMP_CMD_RAM_ADD + 7, 32);
       
       outgoing_com_hder             := resize(x"AA", 32);
+      outgoing_com_ovh_len          := resize(x"5", 32);
       incoming_com_hder             := resize(x"55", 32);
       incoming_com_fail_id          := resize(x"FFFF", 32);
       incoming_com_ovh_len          := resize(x"5", 32);          
@@ -191,71 +214,80 @@ package body BB1920D_intf_testbench_pkg is
       
       
       -- cfg usager
-      y := comn_fpa_diag_mode                  
-      & comn_fpa_diag_type                  
-      & comn_fpa_pwr_on                     
-      & comn_fpa_trig_ctrl_mode             
-      & comn_fpa_acq_trig_ctrl_dly          
-      & comn_fpa_spare                      
-      & comn_fpa_xtra_trig_ctrl_dly         
-      & comn_fpa_trig_ctrl_timeout_dly      
-      & comn_fpa_stretch_acq_trig           
-      & comn_clk100_to_intclk_conv_numerator
-      & comn_intclk_to_clk100_conv_numerator
-      & diag_ysize                          
-      & diag_xsize_div_tapnum               
-      & diag_lovh_mclk_source               
-      & real_mode_active_pixel_dly          
-      & itr                                 
-      & aoi_xsize                           
-      & aoi_ysize                           
-      & aoi_data_sol_pos                    
-      & aoi_data_eol_pos                    
-      & aoi_flag1_sol_pos                   
-      & aoi_flag1_eol_pos                   
-      & aoi_flag2_sol_pos                   
-      & aoi_flag2_eol_pos                   
-      & op_xstart                           
-      & op_ystart                           
-      & op_xsize                            
-      & op_ysize                            
-      & op_frame_time                       
-      & op_gain                             
-      & op_int_mode                         
-      & op_test_mode                        
-      & op_det_vbias                        
-      & op_det_ibias                        
-      & op_det_vsat                         
-      & op_binning                          
-      & op_output_rate                      
-      & op_spare1                           
-      & op_spare2                           
-      & op_spare3                           
-      & op_spare4                           
-      & op_cfg_num                          
-      & int_cmd_id                          
-      & int_cmd_dlen                        
-      & int_cmd_offs                        
-      & int_cmd_sof_add                     
-      & int_cmd_eof_add                     
-      & int_cmd_sof_add_m1                  
-      & int_checksum_add                    
-      & frame_dly_cst                       
-      & int_dly_cst                         
-      & op_cmd_id                           
-      & op_cmd_sof_add                      
-      & op_cmd_eof_add                      
-      & temp_cmd_id                         
-      & temp_cmd_sof_add                    
-      & temp_cmd_eof_add                    
-      & outgoing_com_hder                   
-      & incoming_com_hder                   
-      & incoming_com_fail_id                
-      & incoming_com_ovh_len                
-      & fpa_serdes_lval_num                 
-      & fpa_serdes_lval_len                 
-      & int_clk_period_factor               
-      & int_time_offset;      
+      y := comn_fpa_diag_mode                          
+      & comn_fpa_diag_type                          
+      & comn_fpa_pwr_on                             
+      & comn_fpa_trig_ctrl_mode                     
+      & comn_fpa_acq_trig_ctrl_dly                  
+      & comn_fpa_spare                              
+      & comn_fpa_xtra_trig_ctrl_dly                 
+      & comn_fpa_trig_ctrl_timeout_dly              
+      & comn_fpa_stretch_acq_trig                    
+      & comn_clk100_to_intclk_conv_numerator        
+      & comn_intclk_to_clk100_conv_numerator         
+      & diag_ysize                                   
+      & diag_xsize_div_tapnum                       
+      & diag_lovh_mclk_source                       
+      & real_mode_active_pixel_dly                  
+      & itr                                         
+      & aoi_xsize                                    
+      & aoi_ysize                                   
+      & aoi_data_sol_pos                            
+      & aoi_data_eol_pos                            
+      & aoi_flag1_sol_pos                           
+      & aoi_flag1_eol_pos                           
+      & aoi_flag2_sol_pos                            
+      & aoi_flag2_eol_pos                           
+      & op_xstart                                   
+      & op_ystart                                   
+      & op_xsize                                    
+      & op_ysize                                    
+      & op_frame_time                               
+      & op_gain                                     
+      & op_int_mode                                 
+      & op_test_mode                                
+      & op_det_vbias                                 
+      & op_det_ibias                                
+      & op_binning                                  
+      & op_output_rate                              
+      & op_cfg_num                                  
+      & synth_spare                                 
+      & synth_frm_res                               
+      & synth_frm_dat                               
+      & synth_cmd_id                                 
+      & synth_cmd_data_size                         
+      & synth_cmd_dlen                              
+      & synth_cmd_sof_add                           
+      & synth_cmd_eof_add                           
+      & int_cmd_id                                  
+      & int_cmd_data_size                           
+      & int_cmd_dlen                                
+      & int_cmd_offs                                
+      & int_cmd_sof_add                             
+      & int_cmd_eof_add                              
+      & int_cmd_sof_add_m1                          
+      & int_checksum_add                            
+      & frame_dly_cst                               
+      & int_dly_cst                                 
+      & op_cmd_id                                   
+      & op_cmd_data_size                            
+      & op_cmd_dlen                                 
+      & op_cmd_sof_add                              
+      & op_cmd_eof_add                              
+      & temp_cmd_id                                 
+      & temp_cmd_data_size                          
+      & temp_cmd_dlen                               
+      & temp_cmd_sof_add                            
+      & temp_cmd_eof_add                            
+      & outgoing_com_hder                           
+      & outgoing_com_ovh_len                        
+      & incoming_com_hder                           
+      & incoming_com_fail_id                        
+      & incoming_com_ovh_len                  
+      & fpa_serdes_lval_num                   
+      & fpa_serdes_lval_len                   
+      & int_clk_period_factor                 
+      & int_time_offset;                       
       
       return y;
    end to_intf_cfg;

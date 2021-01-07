@@ -299,7 +299,7 @@ begin
          
          user_xsize2 <= 640;
          user_ysize2 <= 512;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         user_cfg_vector2 <= to_intf_cfg('1', user_xsize2, user_ysize2, 2);
          
          user_xsize3 <= 320;
          user_ysize3 <= 256;
@@ -386,28 +386,26 @@ begin
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
+
+      wait for 30 ms;
       
-      -- wait for 20 ms;
---      wait for 30 ms;
---      
---      for ii in 0 to 87-1 loop 
---         wait until rising_edge(MB_CLK);      
---         start_pos := user_cfg_vector2'length -1 - 32*ii;
---         end_pos   := start_pos - 31;
---         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
---         wait for 30 ns;
---      end loop; 
-      --      
-      -- wait for 20 ms;
- --     wait for 10 ms;
+      for ii in 0 to 87-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector2'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
+            
+      wait for 30 ms;
       
---      for ii in 0 to 87-1 loop 
---         wait until rising_edge(MB_CLK);      
---         start_pos := user_cfg_vector3'length -1 - 32*ii;
---         end_pos   := start_pos - 31;
---         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
---         wait for 30 ns;
---      end loop;      
+      for ii in 0 to 87-1 loop 
+         wait until rising_edge(MB_CLK);      
+         start_pos := user_cfg_vector3'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop;      
       
       
       report "FCR written"; 

@@ -191,7 +191,12 @@ begin
             reset_err_i<= '0';
             fpa_softw_stat_i.fpa_input <= LVDS25; -- normaement c'est un mesureur de la tension de la banque du FPGA qui doit forunir cette info (sera fait dans sur une carte ADC). Mais pour la carte ACQ ce n'Est pas le cas.
             mb_ctrled_reset_i <= '0';
-            at_least_one_mb_cfg_received <= '0';
+            at_least_one_mb_cfg_received <= '0'; 
+            
+            -- pragma translate_off
+            mb_struct_cfg.temp.cfg_num  <= (others => '0');
+            mb_struct_cfg.temp.cfg_end  <= '0';
+            -- pragma translate_on
             
          else            
             
@@ -255,19 +260,19 @@ begin
                   when X"088" =>    mb_struct_cfg.op.binning                            <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);        
                   when X"08C" =>    mb_struct_cfg.op.output_rate                        <= data_i(mb_struct_cfg.op.output_rate'length-1 downto 0);  
                   when X"090" =>    mb_struct_cfg.op.cfg_num                            <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));                                                                                                                 
-                  
+                     
                   -- synth
                   when X"094" =>    mb_struct_cfg.synth.spare                           <= data_i(mb_struct_cfg.synth.spare'length-1 downto 0);  
                   when X"098" =>    mb_struct_cfg.synth.frm_res                         <= unsigned(data_i(mb_struct_cfg.synth.frm_res'length-1 downto 0));    
                   when X"09C" =>    mb_struct_cfg.synth.frm_dat                         <= data_i(mb_struct_cfg.synth.frm_dat'length-1 downto 0);
-                  
+                     
                   -- cmd serielle synthetique
                   when X"0A0" =>    mb_struct_cfg.synth_cmd_id                          <= data_i(mb_struct_cfg.synth_cmd_id'length-1 downto 0);         
                   when X"0A4" =>    mb_struct_cfg.synth_cmd_data_size                   <= unsigned(data_i(mb_struct_cfg.synth_cmd_data_size'length-1 downto 0));
                   when X"0A8" =>    mb_struct_cfg.synth_cmd_dlen                        <= unsigned(data_i(mb_struct_cfg.synth_cmd_dlen'length-1 downto 0));              
                   when X"0AC" =>    mb_struct_cfg.synth_cmd_sof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_sof_add'length-1 downto 0)); 
                   when X"0B0" =>    mb_struct_cfg.synth_cmd_eof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_eof_add'length-1 downto 0)); 
-                  
+                     
                   -- cmd serielle integration
                   when X"0B4" =>    mb_struct_cfg.int_cmd_id                            <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);                   
                   when X"0B8" =>    mb_struct_cfg.int_cmd_data_size                     <= unsigned(data_i(mb_struct_cfg.int_cmd_data_size'length-1 downto 0));  
@@ -279,21 +284,21 @@ begin
                   when X"0D0" =>    mb_struct_cfg.int_checksum_add                      <= unsigned(data_i(mb_struct_cfg.int_checksum_add'length-1 downto 0));   
                   when X"0D4" =>    mb_struct_cfg.frame_dly_cst                         <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0));     
                   when X"0D8" =>    mb_struct_cfg.int_dly_cst                           <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));       
-                  
+                     
                   -- cmd serielle operationnelle
                   when X"0DC" =>    mb_struct_cfg.op_cmd_id                             <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
                   when X"0E0" =>    mb_struct_cfg.op_cmd_data_size                      <= unsigned(data_i(mb_struct_cfg.op_cmd_data_size'length-1 downto 0));
                   when X"0E4" =>    mb_struct_cfg.op_cmd_dlen                           <= unsigned(data_i(mb_struct_cfg.op_cmd_dlen'length-1 downto 0));     
                   when X"0E8" =>    mb_struct_cfg.op_cmd_sof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_sof_add'length-1 downto 0));
                   when X"0EC" =>    mb_struct_cfg.op_cmd_eof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_eof_add'length-1 downto 0));
-                  
+                     
                   -- cmd serielle temperature
                   when X"0F0" =>    mb_struct_cfg.temp_cmd_id                           <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);                
                   when X"0F4" =>    mb_struct_cfg.temp_cmd_data_size                    <= unsigned(data_i(mb_struct_cfg.temp_cmd_data_size'length-1 downto 0));    
                   when X"0F8" =>    mb_struct_cfg.temp_cmd_dlen                         <= unsigned(data_i(mb_struct_cfg.temp_cmd_dlen'length-1 downto 0));      
                   when X"0FC" =>    mb_struct_cfg.temp_cmd_sof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_sof_add'length-1 downto 0)); 
                   when X"100" =>    mb_struct_cfg.temp_cmd_eof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_eof_add'length-1 downto 0)); 
-                  
+                     
                   -- misc
                   when X"104" =>    mb_struct_cfg.outgoing_com_hder                     <= data_i(mb_struct_cfg.outgoing_com_hder'length-1 downto 0);                                                                      
                   when X"108" =>    mb_struct_cfg.outgoing_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.outgoing_com_ovh_len'length-1 downto 0));                                                         
@@ -304,10 +309,10 @@ begin
                   when X"11C" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));                                                          
                   when X"120" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));                                                        
                   when X"124" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
-                  
+                     
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
-                  when X"204" =>    mb_struct_cfg.temp.cfg_end                          <= data_i(0); mb_cfg_in_progress <= '0'; 
+                  when X"204" =>    mb_struct_cfg.temp.cfg_end                          <= data_i(0); mb_cfg_in_progress <= '0';               
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                           <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

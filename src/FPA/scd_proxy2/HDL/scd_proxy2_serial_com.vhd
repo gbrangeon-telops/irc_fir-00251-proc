@@ -161,7 +161,7 @@ architecture RTL of scd_proxy2_serial_com is
    signal ram2_rd_i               : std_logic;
    signal ram2_rd_add_i           : unsigned(RAM2_RD_ADD'range);
    signal timeout_cnt             : unsigned(23 downto 0);
-   signal cfg_byte_total          : unsigned(15 downto 0);
+   -- signal cfg_byte_total          : unsigned(15 downto 0);
    signal cfg_byte_cnt            : unsigned(15 downto 0);
    signal rx_data_cnt             : unsigned(15 downto 0);
    signal rx_data_total           : unsigned(15 downto 0);
@@ -398,7 +398,6 @@ begin
             trig_rising <= '0';
             serial_cmd_failure <= '0';
             cfg_fifo_rd_en <= '0'; 
-            cfg_byte_total <= (others => '1'); -- fait exprès pour validation facile en simulation
             uart_tbaud_clk_en_last <= '0';
             cmd_resp_en <= '0';
             cfg_fifo_wr_en <= '0';

@@ -99,13 +99,13 @@ wave UUT/U3/U3/*
 #wave UUT/U1/U9/U2/U4/U2/UB/*
 #wave UUT/U1/U9/U1/*
 
-wave UUT/U1/U9/g0/U17/*
-wave UUT/U1/U9/U18/*
-wave UUT/U1/U9/U8/* 
-wave UUT/U1/U9/U8/U5/*
+#wave UUT/U1/U9/g0/U17/*
+#wave UUT/U1/U9/U18/*
+#wave UUT/U1/U9/U8/* 
+#wave UUT/U1/U9/U8/U5/*
 
 
 --wave UUT/U1/*
-run 10 ms
+run 30 ms
 --run 30 ms  
 --9.1 ms

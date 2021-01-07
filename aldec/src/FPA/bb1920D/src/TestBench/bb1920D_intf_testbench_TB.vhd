@@ -57,9 +57,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
          MB_MISO        : out t_axi4_lite_miso);
    end component;
    
-   
-   constant QWORDS_NUM   : natural := 65;
-   
+    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
    constant ACQ_TRIG_PERIOD         : time := 100 us;
@@ -85,7 +83,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    --   constant STRETCH_LINE_LENGTH_MCLK : natural := 1;   
    
    
-   constant OP_CFG_BASE_ADD : natural := 3072;
+   -- constant OP_CFG_BASE_ADD : natural := 3072;
    
    
    --   constant user_sol_posl_pclk : natural := ((C_ROIC_XSIZE1 - C_USER_XSIZE1)/2)/TAP_NUM + 1; 
@@ -250,8 +248,8 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVDS25;        
          
          -- cfg usager
-         user_xsize1 <= 320;
-         user_ysize1 <= 256;
+         user_xsize1 <= 640;
+         user_ysize1 <= 512;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
          user_xsize2 <= 320;
@@ -310,14 +308,14 @@ begin
       wait until ARESETN = '1'; 
       
       wait for 500 ns; 
-      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
-      wait for 30 ns;      
+--      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
+--      wait for 30 ns;      
       
-      write_axi_lite (MB_CLK, resize(X"E0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
-      write_axi_lite (MB_CLK, resize(X"E4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, resize(X"AE4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
-      write_axi_lite (MB_CLK, resize(X"E8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, resize(X"AE8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
       wait for 500 ns;
       
       -- la cfg des dacs fait office ici de cfg serielle operationnelle
@@ -325,7 +323,7 @@ begin
          wait until rising_edge(MB_CLK);      
          start_pos := dac_cfg_vector'length -1 - 32*ii;
          end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(OP_CFG_BASE_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(AW_SERIAL_OP_CMD_RAM_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop;      
       

@@ -165,13 +165,13 @@ wave UUT/U1/U5/U5/U5/*
 
 --wave UUT/U1/*
 --wave UUT/U1/U4/*
-                           
-wave UUT/U1/U9/U1/g0/U8/*
-wave UUT/U1/U9/U1/g0/U4/*
-wave UUT/U1/U9/U1/g0/U5/*
-wave UUT/U1/U9/U1/g0/U1/*
-wave UUT/U1/U9/U1/g0/U7/*
-wave UUT/U1/U9/U1/g0/U3/*
+#                           
+#wave UUT/U1/U9/U1/g0/U8/*
+#wave UUT/U1/U9/U1/g0/U4/*
+#wave UUT/U1/U9/U1/g0/U5/*
+#wave UUT/U1/U9/U1/g0/U1/*
+#wave UUT/U1/U9/U1/g0/U7/*
+#wave UUT/U1/U9/U1/g0/U3/*
 --wave UUT/U11/*
 --wave UUT/U1/U2/*
 
@@ -198,6 +198,6 @@ wave UUT/U1/U9/U1/g0/U3/*
 wave UUT/U1/U9/*
 
 wave UUT/U1/*
-run 50 ms
+run 100 ms
 --run 30 ms  
 --9.1 ms

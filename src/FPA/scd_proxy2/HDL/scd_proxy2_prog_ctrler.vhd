@@ -81,9 +81,9 @@ architecture rtl of scd_proxy2_prog_ctrler is
    
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, check_cfg_st0, check_cfg_st, pause_st1, pause_st2, 
-   output_op_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, wait_updater_rdy_st, wait_updater_run_st);
+   output_op_cfg_st, output_synth_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, wait_updater_rdy_st, wait_updater_run_st, wait_updater_end_st);
    type int_gen_fsm_type is (idle, check_fpa_st, int_gen_st1, int_gen_st2, param_st);
-   type new_cfg_pending_fsm_type is(idle, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_synth_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
+   type new_cfg_pending_fsm_type is(init_st, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_synth_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
    signal cfg_updater_fsm           : driver_seq_fsm_type;
@@ -204,7 +204,7 @@ begin
             fpa_new_cfg_pending <= '0';
             user_cfg_in_progress_i <= '0';
             user_cfg_in_progress_last <= '0';
-            new_cfg_pending_fsm <= check_cfg_st0;
+            new_cfg_pending_fsm <= init_st;
             need_prog_rqst <= '0';
             cfg_ser_param_i.run   <= '0';
             cfg_ser_param_i.abort <= '0';
@@ -225,7 +225,10 @@ begin
             
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
-            case new_cfg_pending_fsm is			  
+            case new_cfg_pending_fsm is
+               
+               when init_st =>                    -- cet etat donne le temps à new_cfg d'être defini
+                  new_cfg_pending_fsm <= check_cfg_st0;					 
                
                when check_cfg_st0 =>
                   if new_cfg.synth /= present_cfg.synth then
@@ -426,8 +429,13 @@ begin
                when wait_updater_run_st => 
                   if cfg_updater_done = '0' then
                      update_cfg_i <= '0';             
+                     driver_seq_fsm <= wait_updater_end_st;                     
+                  end if;
+               
+               when wait_updater_end_st =>
+                  if cfg_updater_done = '1' then          
                      driver_seq_fsm <= pause_st1;                     
-                  end if;                  
+                  end if;
                
                when pause_st1 =>                                -- fait expres pour donner du temps à new_cfg_pending de tomber
                   fpa_driver_done <= '1';                        -- fait expres pour new_cfg_pending_fsm
@@ -455,7 +463,7 @@ begin
             cfg_updater_fsm <=  idle;
             cfg_updater_done <= '0';           
             proxy_static_done <= '0';
-            present_cfg.op.xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
+            present_cfg.op.xsize <= (others => '0');      -- cette initialisation force la reprogrammation du détecteur après un reset de power management
             present_cfg.temp.cfg_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
             
          else                       
@@ -511,13 +519,25 @@ begin
                      cfg_updater_fsm <= check_cfg_st3;
                   end if;
                
-               when check_cfg_st3 =>                            --
+               when check_cfg_st3 =>                           -- 
+                  if cfg_id_i = std_logic_vector(USER_CFG.SYNTH_CMD_SOF_ADD(7 downto 0)) then
+                     cfg_updater_fsm <= output_synth_cfg_st;
+                  else
+                     cfg_updater_fsm <= check_cfg_st4;
+                  end if;
+               
+               when check_cfg_st4 =>                            --
                   cfg_updater_fsm <= output_temp_cfg_st;                
                
                when output_op_cfg_st =>                         --
                   fpa_intf_cfg_i <= user_cfg_to_update;
                   present_cfg.op <= user_cfg_to_update.op;
                   proxy_static_done <= '1';
+                  cfg_updater_fsm <= pause_st1;
+               
+               when output_synth_cfg_st =>                         --
+                  fpa_intf_cfg_i.synth <= user_cfg_to_update.synth;
+                  present_cfg.synth <= user_cfg_to_update.synth;
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- 
