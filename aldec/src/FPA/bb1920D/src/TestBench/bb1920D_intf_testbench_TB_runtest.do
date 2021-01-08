@@ -106,6 +106,6 @@ wave UUT/U3/U3/*
 
 
 --wave UUT/U1/*
-run 30 ms
+run 150 ms
 --run 30 ms  
 --9.1 ms
