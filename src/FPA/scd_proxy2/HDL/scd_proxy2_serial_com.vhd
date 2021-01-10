@@ -105,23 +105,6 @@ architecture RTL of scd_proxy2_serial_com is
          );
    end component;
    
-   component sfifo_w8_d64
-      PORT (
-         clk            : in std_logic;
-         srst            : in std_logic;
-         din            : in std_logic_vector(7 downto 0);
-         wr_en          : in std_logic;
-         rd_en          : in std_logic;
-         dout           : out std_logic_vector(7 downto 0);
-         full           : out std_logic;
-         overflow       : out std_logic;
-         empty          : out std_logic;
-         valid          : out std_logic;
-         almost_full    : out std_logic;
-         almost_empty   : out std_logic
-         );
-   end component;
-   
    -------------------------------------
    -- RAM1:
    --       elle est réservée à l'écriture de la config en provenance du MB. Le MB étant totalement asynchrone, il peut y ecrire à tout moment
@@ -132,7 +115,7 @@ architecture RTL of scd_proxy2_serial_com is
    --------------------------------------
    
    type prog_seq_fsm_type is (idle, cpy_cfg_st, wait_end_cpy_cfg_st, send_cfg_st, wait_end_send_cfg_st, wait_proxy_resp_st, cmd_fail_mgmt_st);
-   type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, init_cpy_wr_st, cpy_cfg_rd_st1, cpy_cfg_rd_st2, cpy_cfg_wr_st, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
+   type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, cpy_cfg_rd_st1, cpy_cfg_rd_st2, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
    type cmd_resp_fsm_type is (idle, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
    type com_data_array_type  is array (0 to LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
@@ -153,15 +136,12 @@ architecture RTL of scd_proxy2_serial_com is
    signal cpy_cfg_done            : std_logic;
    signal send_cfg_done           : std_logic;
    signal serial_cmd_failure      : std_logic;
-   signal ram2_wr_i               : std_logic;
    signal ram2_wr_add_i           : unsigned(RAM2_WR_ADD'range);
-   signal ram2_wr_data_i          : std_logic_vector(RAM2_WR_DATA'range);
    signal ram1_rd_i               : std_logic;
    signal ram1_rd_add_i           : unsigned(RAM1_RD_ADD'range);
    signal ram2_rd_i               : std_logic;
    signal ram2_rd_add_i           : unsigned(RAM2_RD_ADD'range);
    signal timeout_cnt             : unsigned(23 downto 0);
-   -- signal cfg_byte_total          : unsigned(15 downto 0);
    signal cfg_byte_cnt            : unsigned(15 downto 0);
    signal rx_data_cnt             : unsigned(15 downto 0);
    signal rx_data_total           : unsigned(15 downto 0);
@@ -175,17 +155,10 @@ architecture RTL of scd_proxy2_serial_com is
    signal resp_hder               : std_logic_vector(USER_CFG.INCOMING_COM_HDER'range);
    signal resp_id                 : std_logic_vector(USER_CFG.INCOMING_COM_FAIL_ID'range);
    signal resp_payload            : std_logic_vector(15 downto 0);
-   signal cfg_fifo_ovfl           : std_logic;
-   signal cfg_fifo_rd_en          : std_logic;
-   signal cfg_fifo_dout           : std_logic_vector(7 downto 0);
-   signal cfg_fifo_empty          : std_logic;
-   signal cfg_fifo_dval           : std_logic;
    signal uart_tbaud_clk_en       : std_logic;
    signal uart_tbaud_clk_en_last  : std_logic;
    signal uart_tbaud_cnt          : unsigned(7 downto 0);
    signal cmd_resp_en             : std_logic;
-   signal cfg_fifo_wr_en          : std_logic;
-   signal cfg_fifo_din            : std_logic_vector(7 downto 0);
    signal fpa_temp_reg_dval       : std_logic;
    signal fpa_temp_reg            : unsigned(15 downto 0);
    signal resp_dcnt               : unsigned(7 downto 0);
@@ -206,16 +179,9 @@ architecture RTL of scd_proxy2_serial_com is
    signal prog_trig_start         : std_logic;
    signal prog_trig_start_last    : std_logic; 
    signal acq_mode                : std_logic;
-   signal cmd_ram2_eof_add        : unsigned(SERIAL_PARAM.CMD_EOF_ADD'LENGTH-1 downto 0);
+   signal cmd_ram2_eof_add        : unsigned(SERIAL_PARAM.CMD_EOF_ADD'LENGTH-1 downto 0); 
    
-   -- -- attribute dont_touch           : string;
-   -- -- attribute dont_touch of resp_err             : signal is "true";
-   -- -- attribute dont_touch of resp_hder            : signal is "true";
-   -- -- attribute dont_touch of resp_payload         : signal is "true";
-   -- -- attribute dont_touch of resp_dcnt            : signal is "true";
-   -- -- attribute dont_touch of serial_cmd_failure   : signal is "true";
-   -- -- attribute dont_touch of resp_id              : signal is "true";
-   -- -- attribute dont_touch of failure_resp_data    : signal is "true";
+   
 begin
    
    acq_mode <= TRIG_CTLER_STAT(4);
@@ -227,10 +193,9 @@ begin
    RAM1_RD <= ram1_rd_i;                           
    RAM1_RD_ADD <= std_logic_vector(ram1_rd_add_i); 
    
-   
-   RAM2_WR <= ram2_wr_i;   
+   RAM2_WR <= RAM1_RD_DVAL;   
    RAM2_WR_ADD <= std_logic_vector(ram2_wr_add_i);
-   RAM2_WR_DATA <= ram2_wr_data_i;
+   RAM2_WR_DATA <= RAM1_RD_DATA; 
    
    RAM2_RD <= ram2_rd_i;     
    RAM2_RD_ADD <= std_logic_vector(ram2_rd_add_i);  
@@ -264,25 +229,6 @@ begin
       D   => READOUT,
       Q   => readout_i,
       RESET => sreset
-      );
-   
-   --------------------------------------------------
-   -- fifo de stockage temporaire du copieur
-   --------------------------------------------------   
-   U1C : sfifo_w8_d64
-   PORT MAP (
-      clk => CLK,
-      srst => sreset,
-      din => cfg_fifo_din,
-      wr_en => cfg_fifo_wr_en,
-      rd_en => cfg_fifo_rd_en,
-      dout => cfg_fifo_dout,
-      full => open,
-      overflow => cfg_fifo_ovfl,
-      empty => cfg_fifo_empty,
-      valid => cfg_fifo_dval,
-      almost_full => open,
-      almost_empty => open
       );
    
    --------------------------------------------------  
@@ -390,17 +336,14 @@ begin
             cfg_mgmt_fsm <=  idle;
             cpy_cfg_done <= '0';
             send_cfg_done <= '0';
-            ram2_wr_i <= '0';
             ram1_rd_i <= '0';
             ram2_rd_i <= '0';
             trig_i <= '0';
             trig_last <= '0';
             trig_rising <= '0';
-            serial_cmd_failure <= '0';
-            cfg_fifo_rd_en <= '0'; 
+            serial_cmd_failure <= '0'; 
             uart_tbaud_clk_en_last <= '0';
             cmd_resp_en <= '0';
-            cfg_fifo_wr_en <= '0';
             tx_dval_i <= '0';
             proxy_rdy_i <= '0';
             force_prog_trig_mode <= '0';   
@@ -419,10 +362,12 @@ begin
             
             prog_trig_done_last <= prog_trig_done;
             
-            cfg_fifo_wr_en <= RAM1_RD_DVAL; 
-            cfg_fifo_din <= RAM1_RD_DATA;
+            cmd_ram2_eof_add  <= SERIAL_PARAM.CMD_EOF_ADD - SERIAL_PARAM.CMD_SOF_ADD;
             
-            cmd_ram2_eof_add <= SERIAL_PARAM.CMD_EOF_ADD - SERIAL_PARAM.CMD_SOF_ADD;
+            if RAM1_RD_DVAL = '1' then
+               ram2_wr_add_i <= ram2_wr_add_i + 1;                     
+            end if;
+            
             
             --fsm de contrôle            
             case  cfg_mgmt_fsm is 
@@ -431,14 +376,11 @@ begin
                   cpy_cfg_done <= '1';
                   send_cfg_done <= '1';
                   tx_dval_i <= '0';
-                  ram2_wr_i <= '0';
                   ram1_rd_i <= '0';
                   ram2_rd_i <= '0';
                   timeout_cnt <= (others => '0');
                   cfg_byte_cnt <= (others => '0');                  
-                  cfg_fifo_rd_en <= '0';
                   uart_tbaud_cnt <= (others => '0');
-                  cfg_fifo_wr_en <= '0';
                   force_prog_trig_mode <= '0';
                   prog_trig_start <= '0';
                   
@@ -457,39 +399,19 @@ begin
                   end if;
                   
                -- partie copy de la config vers une zone securisée             
-               when cpy_cfg_rd_st1 =>   -- on valide que la RAM1 n'est pas en ecriture                     
+               when cpy_cfg_rd_st1 =>   -- on valide que la RAM1 n'est pas en ecriture
+                  ram2_wr_add_i <= to_unsigned(0, ram2_wr_add_i'length);
                   if USER_CFG_IN_PROGRESS = '0' then 
                      cfg_mgmt_fsm <= cpy_cfg_rd_st2;
                   end if;
                
-               when cpy_cfg_rd_st2 =>   -- la config est copiee de la ram1 vers un fifo (avant de partir en zone sécurisée)                       
+               when cpy_cfg_rd_st2 =>   -- la config est copiee de la ram1 vers la ram2 (zone sécurisée)                       
                   ram1_rd_i <= '1';
-                  cfg_byte_cnt <= cfg_byte_cnt + 1;
-                  ram1_rd_add_i <= resize(SERIAL_PARAM.CMD_SOF_ADD, ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);
+                  cfg_byte_cnt  <= cfg_byte_cnt + 1;
+                  ram1_rd_add_i <= resize(SERIAL_PARAM.CMD_SOF_ADD, ram1_rd_add_i'length) + cfg_byte_cnt(ram1_rd_add_i'length-1 downto 0);                        
                   if ram1_rd_add_i(7 downto 0) = to_integer(SERIAL_PARAM.CMD_EOF_ADD) then 
-                     cfg_mgmt_fsm <= init_cpy_wr_st;
+                     cfg_mgmt_fsm <= idle;
                      ram1_rd_i <= '0';
-                  end if;
-               
-               when init_cpy_wr_st =>     -- zone securisée en ecriture
-                  cfg_byte_cnt <= (others => '0');
-                  ram2_wr_add_i <= to_unsigned(0, ram2_wr_add_i'length); -- zone securisée sera en ecriture
-                  cfg_mgmt_fsm <= cpy_cfg_wr_st;
-               
-               when cpy_cfg_wr_st =>  -- la config est copiee  du fifo vers la RAM2 securisée  
-                  cfg_fifo_rd_en <= '1'; 
-                  ram2_wr_add_i(7 downto 0) <= cfg_byte_cnt(7 downto 0);    -- la config est copiée dans la zone securisée. (7 downto 0) permet de ne pas toucher à l'adresse de base
-                  ram2_wr_data_i <= cfg_fifo_dout;				  -- on peut commencer la lecture les yeux fermées car le fifo contient déjà des données quand on arrive ici     
-                  ram2_rd_i <= '0';
-                  if cfg_fifo_dval = '1' then
-                     ram2_wr_i <= '1';                                         -- ram en mode ecriture 
-                     cfg_byte_cnt <= cfg_byte_cnt + 1;                     
-                  else
-                     ram2_wr_i <= '0';
-                     if cfg_fifo_empty = '1' then
-                        cfg_mgmt_fsm <= idle;
-                        cfg_fifo_rd_en <= '0'; 
-                     end if;
                   end if;
                   
                -- partie envoi de la config vers le détecteur
@@ -520,8 +442,7 @@ begin
                      end if;
                   end if;
                
-               when send_cfg_rd_st =>          -- on lit un byte dans la zone sécurisée
-                  ram2_wr_i <= '0';     
+               when send_cfg_rd_st =>          -- on lit un byte dans la zone sécurisée     
                   ram2_rd_i <= '1';
                   tx_dval_i <= '0';
                   cfg_mgmt_fsm <= latch_data_st;
@@ -601,8 +522,7 @@ begin
                      else
                         cfg_mgmt_fsm <= idle; 
                      end if;              
-                  end if;
-                  
+                  end if;                  
                
                when timeout_mgmt_st =>
                   serial_cmd_failure  <= '1';
