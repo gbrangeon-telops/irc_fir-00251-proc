@@ -88,6 +88,7 @@ static IRC_Status_t DebugTerminalParseDTO(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf);
 #ifdef ENABLE_TEC_CONTROL
 static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf);
 #endif
@@ -134,6 +135,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"CI", DebugTerminalParseCI},
    {"LT", DebugTerminalParseLT},
    {"PLT", DebugTerminalParsePLT},
+   {"PBT", DebugTerminalParsePBT},
 #ifdef ENABLE_TEC_CONTROL
    {"TEC", DebugTerminalParseTEC},
 #endif
@@ -2591,6 +2593,38 @@ IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf)
 }
 
 
+/**
+ * Print Buffer Table command parser
+ * This parser is used to parse and validate Print Buffer Table
+ * command arguments and to execute the command.
+ *
+ * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
+ *
+ * @return IRC_SUCCESS when Print Buffer Table command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf)
+{
+   extern t_memoryTable gMemoryTable;
+   uint32_t i;
+
+   DT_PRINTF("Buffer Table:");
+   for (i = 0; i < gMemoryTable.NbValidSequences; i++)
+   {
+      uint64_t addr = (uint64_t)gMemoryTable.data[i].startAddress << BM_ADDRBITS_ALIGN;
+      DT_PRINTF("Seq %u: startAddr=0x%08x%08x, bufLen=%u, width=%u, height=%u, offX=%u, offY=%u, "
+                "start=%u, stop=%u, moi=%u",
+                i, (uint32_t) (addr >> 32),  (uint32_t) (addr & 0x00000000ffffffffull),
+                gMemoryTable.data[i].bufferLength,
+                gMemoryTable.data[i].imageWidth,  gMemoryTable.data[i].imageHeight,
+                gMemoryTable.data[i].OffsetX,  gMemoryTable.data[i].OffsetY,
+                gMemoryTable.data[i].bufImgIdx.start_img, gMemoryTable.data[i].bufImgIdx.stop_img,
+                gMemoryTable.data[i].bufImgIdx.moi_img);
+   }
+
+   return IRC_SUCCESS;
+}
+
 #ifdef ENABLE_TEC_CONTROL
 /**
  * TEC Control command parser.
@@ -2683,6 +2717,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Ctrl Intf status:   CI [SB|LB PLEORA|OEM|CLINK|OUTPUT|USART 0|1]");
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
+   DT_PRINTF("  Print Buffer Table: PBT");
    #ifdef ENABLE_TEC_CONTROL
    DT_PRINTF("  TEC Control:        TEC [setpoint]");
    #endif
