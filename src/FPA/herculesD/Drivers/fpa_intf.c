@@ -747,6 +747,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t scd_gain;
    uint8_t scd_int_mode;
    uint8_t scd_hder_disable = 0;
+   float Tint;
    
    // quelques definitions
    //uint32_t frame_period_default = 4000000;  //20 fps en coups de 12.5 ns
@@ -756,7 +757,10 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
    vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
-   vhd_int_time     = (uint32_t)MIN(MAX((float)vhd_int_time, (FPA_MIN_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F)), (FPA_MAX_EXPOSURE * (float)FPA_MCLK_RATE_HZ*1E-6F));  // protection
+   Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
+   Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection
+   Tint = Tint/1E6F; // in second
+   Tint = Tint*FPA_FPP_CLK_RATE_HZ; // in 80 MHz clks  
    
    scd_gain = (uint8_t)(ptrA->scd_gain);
    
@@ -766,9 +770,9 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Header       =  0xAA;
    Cmd.ID           =  0x8002;
    Cmd.DataLength   =  21;
-   Cmd.Data[0]      =  vhd_int_time & 0xFF;             //integration time lsb
-   Cmd.Data[1]      = (vhd_int_time >> 8) & 0xFF;
-   Cmd.Data[2]      = (vhd_int_time >> 16) & 0xFF;      //integration time msb
+   Cmd.Data[0]      =  (uint32_t)Tint & 0xFF;             //integration time lsb
+   Cmd.Data[1]      = ((uint32_t)Tint >> 8) & 0xFF;
+   Cmd.Data[2]      = ((uint32_t)Tint >> 16) & 0xFF;      //integration time msb
                     
    Cmd.Data[3]      =  0;                                   // reserved
    Cmd.Data[4]      =  0;                                   // reserved

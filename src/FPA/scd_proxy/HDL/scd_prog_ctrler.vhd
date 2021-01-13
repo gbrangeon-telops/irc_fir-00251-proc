@@ -318,7 +318,7 @@ begin
                   new_cfg_id <= SCD_TEMP_CMD_ID(7 downto 0);
                   cfg_ram_base_add <= to_unsigned(SCD_TEMP_CMD_RAM_BASE_ADD, SERIAL_BASE_ADD'length);
                   fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ram_base_add. Demande de programmation ssi aucune config en progression
-                  need_prog_rqst <= '1'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
+                  need_prog_rqst <= '0'; 				   -- temp_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs
 				      if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= init_check_cfg_st;
