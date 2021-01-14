@@ -25,10 +25,10 @@ package BB1920D_intf_testbench_pkg is
    constant C_FPA_INTCLK_RATE_KHZ       : integer := 35_000;
    constant QWORDS_NUM                  : natural := 74;
    
-   constant AW_SERIAL_OP_CMD_RAM_ADD    : integer   :=  0;  
-   constant AW_SERIAL_SYNTH_CMD_RAM_ADD : integer   :=  64; 
-   constant AW_SERIAL_INT_CMD_RAM_ADD   : integer   :=  128;
-   constant AW_SERIAL_TEMP_CMD_RAM_ADD  : integer   :=  192;
+   constant AW_SERIAL_OP_CMD_RAM_ADD    : integer :=  0;  
+   constant AW_SERIAL_SYNTH_CMD_RAM_ADD : integer :=  32; 
+   constant AW_SERIAL_INT_CMD_RAM_ADD   : integer :=  64;
+   constant AW_SERIAL_TEMP_CMD_RAM_ADD  : integer :=  96;
    
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
@@ -40,7 +40,7 @@ package body BB1920D_intf_testbench_pkg is
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned is 
       
-      constant FPA_WIDTH_MAX : integer := 640;
+      constant FPA_WIDTH_MAX : integer := 1920;
       
       variable  comn_fpa_diag_mode                     : unsigned(31 downto 0);
       variable  comn_fpa_diag_type                     : unsigned(31 downto 0);

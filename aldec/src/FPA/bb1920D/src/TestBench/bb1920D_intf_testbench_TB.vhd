@@ -26,11 +26,11 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
          ACQ_TRIG       : in STD_LOGIC;
          XTRA_TRIG      : in STD_LOGIC;
          DET_SPARE_N0   : in STD_LOGIC;
-         DET_SPARE_N1   : in STD_LOGIC;
-         DET_SPARE_N2   : in STD_LOGIC;
+         DET_SPARE_N1   : out STD_LOGIC;
+         DET_SPARE_N2   : out STD_LOGIC;
          DET_SPARE_P0   : in STD_LOGIC;
-         DET_SPARE_P1   : in STD_LOGIC;
-         DET_SPARE_P2   : in STD_LOGIC;
+         DET_SPARE_P1   : out STD_LOGIC;
+         DET_SPARE_P2   : out STD_LOGIC;
          FPA_EXP_INFO   : in exp_info_type;
          HDER_MISO      : in t_axi4_lite_miso;
          MCLK_SOURCE    : in STD_LOGIC;
@@ -57,7 +57,7 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
          MB_MISO        : out t_axi4_lite_miso);
    end component;
    
-    
+   
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
    constant ACQ_TRIG_PERIOD         : time := 100 us;
@@ -224,7 +224,13 @@ begin
             
             when 202 =>
                FPA_EXP_INFO.exp_dval <= '0';
-               cnt <= 202;
+            
+            when 700 => 
+               FPA_EXP_INFO.exp_dval <= '1';
+            
+            when 702 =>
+               FPA_EXP_INFO.exp_dval <= '0';
+               cnt <= 702;
             
             when others =>
             
@@ -248,16 +254,16 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVDS25;        
          
          -- cfg usager
-         user_xsize1 <= 640;
-         user_ysize1 <= 512;
+         user_xsize1 <= 1920;
+         user_ysize1 <= 1536;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 320;
-         user_ysize2 <= 256;
+         user_xsize2 <= 64;
+         user_ysize2 <= 8;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          
-         user_xsize3 <= 64;
-         user_ysize3 <= 4;
+         user_xsize3 <= 1920;
+         user_ysize3 <= 1536;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
          
          -- dac       
@@ -308,8 +314,8 @@ begin
       wait until ARESETN = '1'; 
       
       wait for 500 ns; 
---      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
---      wait for 30 ns;      
+      --      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
+      --      wait for 30 ns;      
       
       write_axi_lite (MB_CLK, resize(X"AE0",32), resize('0'&fpa_softw_stat_i.fpa_roic, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
@@ -383,11 +389,11 @@ begin
       ACQ_TRIG             =>     ACQ_TRIG,
       XTRA_TRIG            =>     XTRA_TRIG,
       DET_SPARE_N0         =>     '0',   
-      DET_SPARE_N1         =>     '0',   
-      DET_SPARE_N2         =>     '0',   
+      DET_SPARE_N1         =>     open,   
+      DET_SPARE_N2         =>     open,   
       DET_SPARE_P0         =>     '1',   
-      DET_SPARE_P1         =>     '1',   
-      DET_SPARE_P2         =>     '1',   
+      DET_SPARE_P1         =>     open,   
+      DET_SPARE_P2         =>     open,   
       FPA_EXP_INFO         =>     FPA_EXP_INFO,   
       HDER_MISO            =>     HDER_MISO,      
       MCLK_SOURCE          =>     MCLK_SOURCE,    
