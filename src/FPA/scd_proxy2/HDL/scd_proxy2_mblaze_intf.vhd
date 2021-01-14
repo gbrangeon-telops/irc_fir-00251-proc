@@ -106,7 +106,6 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal exp_ser_cfg_dval                : std_logic;
    signal exp_indx_i                      : std_logic_vector(7 downto 0);
    signal exp_checksum                    : unsigned(7 downto 0);
-   signal int_signal_high_time_i          : unsigned(31 downto 0);
    signal int_indx_pipe                   : int_indx_pipe_type;
    signal int_dval_pipe                   : std_logic_vector(7 downto 0) := (others => '0');
    signal at_least_one_mb_cfg_received    : std_logic;
@@ -129,7 +128,7 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal int_cfg_i                       : int_cfg_type;
    signal exp_struct_cfg                  : int_cfg_type;
    signal user_cfg_int                    : int_cfg_type;
-   -- signal checksum_base_add               : unsigned(exp_ser_cfg_add'length-1 downto 0);
+   signal subtraction_possible            : std_logic := '0';
    
    
 begin
@@ -409,7 +408,7 @@ begin
                      exp_ser_cfg_data <= std_logic_vector(unsigned(not std_logic_vector(exp_checksum)) + 1); 
                      exp_cfg_gen_fsm <= pause_st; 
                   else  -- si byte cnt vaut 16 à 18  
-                     exp_ser_cfg_data <= (others => '0');       -- le fait qu'il y ait des zeros entre byte16 et byte18 donne le temps au cheksum d'etre prêt avant le byte 18.
+                     exp_ser_cfg_data <= (others => '0');       -- le fait qu'il y ait des zeros entre byte16 et byte18 donne le temps au cheksum d'etre prêt avant le byte 19.
                      exp_ser_cfg_dval <= '0';
                   end if;              
                
@@ -452,7 +451,7 @@ begin
             if user_cfg_rdy = '1' then  
                user_cfg_i <= mb_struct_cfg;
                user_cfg_i.int <= exp_struct_cfg;
-               user_cfg_i.int_time <= exp_struct_cfg.int_time;
+               user_cfg_i.int_time <= exp_struct_cfg.int_time;  
                valid_cfg_received <= at_least_one_mb_cfg_received and at_least_one_exp_cfg_received;         
             end if; 
             
@@ -467,7 +466,12 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
-         abs_int_time_offset_i <= to_integer(abs(user_cfg_i.int_time_offset));
+         abs_int_time_offset_i <= to_integer(abs(user_cfg_i.int_time_offset));         
+         if int_time_pipe(3) > to_integer(user_cfg_i.int_time_offset) then 
+            subtraction_possible <= '1';
+         else
+            subtraction_possible <= '0';
+         end if;   
          
          -- pipe pour le calcul du temps d'integration en mclk
          int_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, int_time_pipe(0)'length) ;
@@ -477,7 +481,11 @@ begin
          if user_cfg_i.int_time_offset(31) = '0' then 
             int_time_pipe(4) <= int_time_pipe(3)+ to_unsigned(abs_int_time_offset_i, int_time_pipe(4)'length);
          else
-            int_time_pipe(4) <= int_time_pipe(3)- to_unsigned(abs_int_time_offset_i, int_time_pipe(4)'length);
+            if subtraction_possible = '1' then
+               int_time_pipe(4) <= int_time_pipe(3)- to_unsigned(abs_int_time_offset_i, int_time_pipe(4)'length);
+            else
+               int_time_pipe(4) <= to_unsigned(1, int_time_pipe(4)'length);
+            end if;
          end if; 
          
          -- pipe de synchro pour l'index           
@@ -498,11 +506,12 @@ begin
          int_dval_pipe(7)     <= int_dval_pipe(6);
          
          -- mapping de int_cfg_i        
-         int_cfg_i.int_time   <= int_time_pipe(4)(int_cfg_i.int_time'length-1 downto 0); -- suppose que (int_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
-         int_cfg_i.int_dly    <= mb_struct_cfg.int_dly_cst;
-         int_cfg_i.int_indx   <= int_indx_pipe(4);
-         int_cfg_i.frame_dly  <= int_cfg_i.int_time(19 downto 0) + mb_struct_cfg.frame_dly_cst; 
-         int_cfg_i.int_dval   <= or_reduce(int_dval_pipe(7 downto 5));  -- on genere un signal de largeur 2 CLK environ
+         int_cfg_i.int_time               <= int_time_pipe(3)(int_cfg_i.int_time'length-1 downto 0); -- temps d'integration convertie en MCLK
+         int_cfg_i.int_signal_high_time   <= int_time_pipe(4)(int_cfg_i.int_signal_high_time'length-1 downto 0); -- temps d'integration que le detecteur doit faire en tenant compte de son offset de temps interne.
+         int_cfg_i.int_dly                <= mb_struct_cfg.int_dly_cst;
+         int_cfg_i.int_indx               <= int_indx_pipe(4);
+         int_cfg_i.frame_dly              <= int_cfg_i.int_time(19 downto 0) + mb_struct_cfg.frame_dly_cst; 
+         int_cfg_i.int_dval               <= or_reduce(int_dval_pipe(7 downto 5));  -- on genere un signal de largeur 2 CLK environ
       end if;
    end process;
    
@@ -605,7 +614,7 @@ begin
                when X"B8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op_cmd_eof_add                            , 32)); 
                when X"BC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_id                               , 32));                                                                             
                when X"C0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_sof_add                          , 32)); 
-               when X"C4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_sof_add                          , 32)); 
+               when X"C4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.temp_cmd_eof_add                          , 32)); 
                when X"C8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.outgoing_com_hder                         , 32)); 
                when X"CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_hder                         , 32));                                        
                when X"D0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.incoming_com_fail_id                      , 32)); 
@@ -618,6 +627,7 @@ begin
                when X"EC" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.frame_dly                                  , 32)); 
                when X"F0" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
                when X"F4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
+               when X"F8" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
                
                when others =>                                                       
                

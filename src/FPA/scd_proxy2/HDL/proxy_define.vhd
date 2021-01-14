@@ -40,7 +40,6 @@ package Proxy_define is
    constant TEMP_TRIG_PERIOD_US                   : integer := 1_000_000;  -- le trig de lecture de la temperature a une periode de 1sec pour ne pas submerger le proxy
    
    -- commandes                                   
-   constant LONGEST_CMD_BYTES_NUM                 : integer := 32; -- longueur maximale en byte de la config d'un scd_proxy2 (incluant le header, checksum etc). Ce nombre doit être inférieur à 64 à cause d'un fifo dans le copieur
    constant SERIAL_BAUD_RATE                      : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
    
    ----------------------------------------------
@@ -99,12 +98,13 @@ package Proxy_define is
    -- scd_proxy2 integration
    type int_cfg_type is
    record
-      int_time         : unsigned(23 downto 0);            -- temps d'integration en coups de 70 MHz
-      int_dly          : unsigned(19 downto 0);            -- delay avant debut de integration. Delai entre Fsync et le debut du signal d'integration
-      int_indx         : std_logic_vector(7 downto 0);                    
-      frame_dly		  : unsigned(19 downto 0);        	  -- delay entre Fsync et le debut du readout. frame_dly = a*int + frame_dly_cst 
-      int_dval         : std_logic;
-   end record;
+      int_time             : unsigned(23 downto 0);            -- temps d'integration en coups de MCLK
+      int_signal_high_time : unsigned(23 downto 0);            -- temps d'integration que le detecteur doit faire en tenant compte de son offset interne en temps.                        -- 
+      int_dly              : unsigned(19 downto 0);            -- delay avant debut de integration. Delai entre Fsync et le debut du signal d'integration
+      int_indx             : std_logic_vector(7 downto 0);                    
+      frame_dly		      : unsigned(19 downto 0);        	   -- delay entre Fsync et le debut du readout. frame_dly = a*int + frame_dly_cst 
+      int_dval             : std_logic;
+   end record;             
    
    -- scd_proxy2 operationnelle
    type op_cfg_type is
@@ -179,7 +179,7 @@ package Proxy_define is
       
       -- integration mode
       itr                            : std_logic;
-      int_time                       : unsigned(23 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
+      int_time                       : unsigned(23 downto 0);   -- consigne du temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       
       -- aoi (cropping)
       aoi_xsize                      : unsigned(10 downto 0);

@@ -106,7 +106,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal user_cfg_to_update        : fpa_intf_cfg_type;
    signal ser_param_i               : serial_param_type;
    signal user_cfg_latch            : fpa_intf_cfg_type;
-   signal cnt                       : unsigned(USER_CFG.INT.INT_TIME'LENGTH-1 downto 0);
+   signal cnt                       : unsigned(USER_CFG.INT.INT_SIGNAL_HIGH_TIME'LENGTH-1 downto 0);
    signal proxy_int_feedbk_i        : std_logic;
    signal proxy_int_feedbk_last     : std_logic;
    signal acq_frame                 : std_logic;
@@ -590,8 +590,8 @@ begin
             proxy_int_feedbk_last <= '0';
             frame_id_i <= (others => '0');
             acq_frame <= '0';
-            int_indx_i <= (others => '0');
-            int_time_i <= (others => '0');
+            -- int_indx_i <= (others => '0');
+            -- int_time_i <= (others => '0');
             fpa_int_i <= '0';
             int_i <= '0';
             
@@ -638,7 +638,7 @@ begin
                      int_gen_fsm <= int_gen_st1;           -- sinon, nous generons le feedback comme on le ferait en mode diag
                   end if;
                
-               when int_gen_st1 =>                         -- ainsi on a au minimum une durée egale à la periode de int_clk_pulse_i même si fpa_intf_cfg_i.int.int_time = 0 
+               when int_gen_st1 =>                         -- ainsi on a au minimum une durée egale à la periode de int_clk_pulse_i même si fpa_intf_cfg_i.int.int_signal_high_time = 0 
                   if int_clk_pulse_i = '1' then
                      int_i <= '1';
                      int_gen_fsm <= int_gen_st2;
@@ -646,7 +646,7 @@ begin
                
                when int_gen_st2 =>
                   if int_clk_pulse_i = '1' then                     
-                     if cnt >= fpa_intf_cfg_i.int.int_time then    --
+                     if cnt >= fpa_intf_cfg_i.int.int_signal_high_time then    --
                         int_i <= '0';
                         int_gen_fsm <= idle;
                      else                        

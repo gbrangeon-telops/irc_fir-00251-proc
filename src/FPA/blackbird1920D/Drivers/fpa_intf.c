@@ -42,7 +42,7 @@
 #define XTRA_TRIG_FREQ_MAX_HZ              SCD_MIN_OPER_FPS
 
 // Parametres de la commande serielle du bb1920D
-#define CMD_DATA_BYTES_NUM_MAX              33      // longueur maximale admise pour la partie donnée des commandes
+#define CMD_DATA_BYTES_NUM_MAX              32      // longueur maximale admise pour la partie donnée des commandes
 
 // Mode d'operation choisi pour le contrôleur de trig 
 #define MODE_READOUT_END_TO_TRIG_START     0x00    // provient du fichier fpa_common_pkg.vhd. Ce mode est choisi car plus simple pour le bb1920D
@@ -57,8 +57,8 @@
 #define ITR_MODE                           0x00    // valeur provenant du manuel de SCD
 #define IWR_MODE                           0x01    // valeur provenant du manuel de SCD
 
-#define GAIN_0                             0x00   // ENO: à valider
-#define GAIN_1                             0x02   // ENO: à valider
+#define LOW_GAIN                           0x00   // ENO: à revalider. Ce sont les valeurs consignées dans op_mode
+#define HIGH_GAIN                          0x01   // ENO: à revalider. Ce sont les valeurs consignées dans op_mode
 
 
 // bb1920D Pixel resolution 
@@ -71,9 +71,9 @@
 
 //partition dans la ram Vhd des config (mappées sur FPA_define)
 #define AW_SERIAL_OP_CMD_RAM_ADD           0       // adresse de base en ram pour la cmd opertaionnelle
-#define AW_SERIAL_SYNTH_CMD_RAM_ADD        64      // adresse de base en ram pour la cmd synthetique
-#define AW_SERIAL_INT_CMD_RAM_ADD          128     // adresse de base en ram pour la cmd int_time (la commande est implémentée uniquement dans le vhd)
-#define AW_SERIAL_TEMP_CMD_RAM_ADD         192     // adresse de base en ram pour la cmd read temperature
+#define AW_SERIAL_SYNTH_CMD_RAM_ADD        32      // adresse de base en ram pour la cmd synthetique
+#define AW_SERIAL_INT_CMD_RAM_ADD          64      // adresse de base en ram pour la cmd int_time (la commande est implémentée uniquement dans le vhd)
+#define AW_SERIAL_TEMP_CMD_RAM_ADD         96      // adresse de base en ram pour la cmd read temperature
                       
 // adresse la lecture des statuts VHD
 #define AR_STATUS_BASE_ADD                 0x0400  // adresse de base des statuts generiques
@@ -89,8 +89,11 @@
 #define AW_FPA_INPUT_SW_TYPE               0xAE8   // obligaoire pour les deteceteurs analogiques
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
-#define FPA_ROIC_BLACKBIRD1920             0x16   // provient du fichier fpa_common_pkg.vhd. La valeur 0x16 est celle de FPA_ROIC_BLACKBIRD1920
+#define FPA_ROIC                           0x16   // provient du fichier fpa_common_pkg.vhd. La valeur 0x16 est celle de FPA_ROIC_BLACKBIRD1920
 #define OUTPUT_DIGITAL                     0x02   // provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
+#define INPUT_LVDS25                       0x01   // provient du fichier fpa_common_pkg.vhd. La valeur 0x01 est celle de LVDS25
+
+
 
 // adresse d'écriture du régistre du reset des erreurs
 #define AW_RESET_ERR                       0xAEC
@@ -154,7 +157,7 @@ struct Command_s             //
    uint16_t id;
    uint16_t dlen;
    uint16_t offs_add;
-   uint8_t  data[(uint8_t)CMD_DATA_BYTES_NUM_MAX];
+   uint8_t  data[(uint8_t)CMD_DATA_BYTES_NUM_MAX-1];
    uint16_t data_size;
    uint16_t total_len;
    uint16_t bram_sof_add;              // ajouté pour envoyer la commande à la bonne adresse dans la RAM
@@ -167,7 +170,7 @@ struct ScdPacketTx_s                      //
 {					   
    uint8_t   ScdPacketTotalBytesNum;
    uint16_t  bram_sof_add;
-   uint8_t   ScdPacketArrayTx[(uint8_t)CMD_DATA_BYTES_NUM_MAX];
+   uint8_t   ScdPacketArrayTx[(uint8_t)CMD_DATA_BYTES_NUM_MAX-1];
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
 
@@ -276,6 +279,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_GetTemperature(ptrA);
+   FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd y compris les statuts privés. Il faut que les status privés soient là avant qu'on appelle le FPA_SendConfigGC. 
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
    
@@ -322,14 +326,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    bb1920D_param_t hh;
    static uint8_t cfg_num = 0;
-   
-   //-----------------------------------------                                           
-   // Common
-   //-----------------------------------------
-   
+    
+      
    // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
    
+   //-----------------------------------------                                           
+   // Common
+   //-----------------------------------------   
    // diag mode and diagType
    ptrA->fpa_diag_mode = 0;                              // par defaut
    ptrA->fpa_diag_type = 0;                              // par defaut   
@@ -349,8 +353,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // allumage du détecteur 
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
-   // config du contrôleur de trigs (il est sur l'horolge de 100MHz)
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) {
+   // config du contrôleur de trigs (il est sur l'horloge de 100MHz)
+   if ((pGCRegs->IntegrationMode == IM_IntegrateThenRead) || (ptrA->fpa_diag_mode == 1)) {
       ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;        // mode MODE_ITR_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration et aussi s'assurer que le readout est terminé
       ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); 
    }
@@ -363,9 +367,24 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
   
-   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)(hh.fpa_intg_clk_rate_hz * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
-   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/hh.fpa_intg_clk_rate_hz);
+   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)roundf(hh.fpa_intg_clk_rate_hz * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
+   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)roundf((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/hh.fpa_intg_clk_rate_hz);
    
+   // Élargit le pulse de trig au besoin
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;    
+   
+   //-----------------------------------------
+   // aoi
+   //-----------------------------------------
+   ptrA->aoi_xsize                 = (uint32_t)pGCRegs->Width;     
+   ptrA->aoi_ysize                 = (uint32_t)pGCRegs->Height; 
+   ptrA->aoi_data_sol_pos          = (uint32_t)pGCRegs->OffsetX/4 + 1;    // Cropping: + 1 car le generateur de position dans le vhd a pour valeur d'origine 1. Et division par 4 car le bus dudit generateur est de largeur 4 pix
+   ptrA->aoi_data_eol_pos          =  ptrA->aoi_data_sol_pos - 1 + (uint32_t)pGCRegs->Width/4; // En effet,  (ptrA->aoi_data_eol_pos - ptrA->aoi_data_sol_pos) + 1  = pGCRegs->Width/4 
+   ptrA->aoi_flag1_sol_pos         =  1;
+   ptrA->aoi_flag1_eol_pos         = (uint32_t)pGCRegs->Width/4 - 1;      // ainsi, on considère la premiere partie des flags qui vont du premier pixel (SOL) jusqu'à l'avant-dernier pixel de la ligne.
+   ptrA->aoi_flag2_sol_pos         = (uint32_t)FPA_WIDTH_MAX/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
+   ptrA->aoi_flag2_eol_pos         = (uint32_t)FPA_WIDTH_MAX/4;
+      
    //------------------------------------------
    // diag Telops                            
    //------------------------------------------
@@ -381,18 +400,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->itr = 1;
    
    ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset 
-   
-   //-----------------------------------------
-   // aoi
-   //-----------------------------------------
-   ptrA->aoi_xsize                 = (uint32_t)pGCRegs->Width;     
-   ptrA->aoi_ysize                 = (uint32_t)pGCRegs->Height; 
-   ptrA->aoi_data_sol_pos          = (uint32_t)pGCRegs->OffsetX/4 + 1;            // + 1 car le generateur de position dans le vhd a pour valeur d'origine 1. Et division par 4 car le bus duditgenerateur est de largeur 4 pix
-   ptrA->aoi_data_eol_pos          =  ptrA->aoi_data_sol_pos - 1 + (uint32_t)pGCRegs->Width/4; // En effet,  (ptrA->aoi_data_eol_pos - ptrA->aoi_data_sol_pos) + 1  = pGCRegs->Width/4 
-   ptrA->aoi_flag1_sol_pos         =  1;
-   ptrA->aoi_flag1_eol_pos         = (uint32_t)pGCRegs->Width/4 - 1; 
-   ptrA->aoi_flag2_sol_pos         = (uint32_t)FPA_WIDTH_MAX/4;
-   ptrA->aoi_flag2_eol_pos         = (uint32_t)FPA_WIDTH_MAX/4;
 
    //-----------------------------------------
    // op : cmd structurelle
@@ -407,17 +414,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
    ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlascmd_datasheet2.17   
    
-   ptrA->op_frame_time = (uint32_t)gPrivateStat.int_time + (uint32_t)(hh.Frame_Time * hh.fpa_intg_clk_rate_hz);
+   ptrA->op_frame_time = 0;                    // valeur par defaut de 0 pour l'instant. Si cela ne marche pas, on essaie la formule qui est: (uint32_t)gPrivateStat.int_time + (uint32_t)(hh.Frame_Time * hh.fpa_intg_clk_rate_hz);
    
    //  gain 
-   ptrA->op_gain = (uint32_t)GAIN_0;
+   ptrA->op_gain = (uint32_t)LOW_GAIN;
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
-      ptrA->op_gain = (uint32_t)GAIN_1;
+      ptrA->op_gain = (uint32_t)HIGH_GAIN;
    
    // integration modes
-   ptrA->op_int_mode = IWR_MODE;
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
-      ptrA->op_int_mode = ITR_MODE; 
+   ptrA->op_int_mode = ITR_MODE;
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead) 
+      ptrA->op_int_mode = IWR_MODE; 
    
    ptrA->op_test_mode = 0;                     // vid_if_bit_en. 0 <=> no data during frame idle;
       
@@ -443,7 +450,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // synth : cmd structurelle
    //-----------------------------------------
    ptrA->synth_spare     = 0;                     
-   ptrA->synth_frm_res   = gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz;
+   ptrA->synth_frm_res   = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 2);  // valeur minimale est de 2
    ptrA->synth_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
    if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
       ptrA->synth_frm_dat = 1;
@@ -455,7 +462,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    // int : cmd structurelle + serielle
    //-----------------------------------------   
-   ptrA->int_cmd_id                      = 0x8500;           // n'est pas utilisé par le vhd mais par le diverC
+   ptrA->int_cmd_id                      = 0x8500;           // est utilisé par le vhd pour bâtir la cmd serielle de l'integration
    ptrA->int_cmd_data_size               = 9;                // la taille de la partie cmd_data de la commande. L'adresse d'offset est exclue
    ptrA->int_cmd_dlen                    = ptrA->int_cmd_data_size + 1;            // +1 pour tenir compte du roic_cmd_offs_add
    ptrA->int_cmd_offs                    = 8;                // voir p.46 de atlascmd_datasheet 2.17
@@ -502,7 +509,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->incoming_com_ovh_len            = 5;
    ptrA->fpa_serdes_lval_num             = ptrA->aoi_ysize;
    ptrA->fpa_serdes_lval_len             = (uint32_t)FPA_WIDTH_MAX / gPrivateStat.fpa_pix_num_per_pclk;
-   ptrA->int_clk_period_factor           = gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz;
+   ptrA->int_clk_period_factor           = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 1);
    ptrA->int_time_offset                 = (int32_t)(hh.fpa_intg_clk_rate_hz * hh.int_time_offset_usec*1e-6F);
 
 // Envoyer commande synthetique serielle
@@ -689,8 +696,9 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void  FPA_SoftwType(const t_FpaIntf *ptrA)
 {
-   AXI4L_write32(FPA_ROIC_BLACKBIRD1920, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);          
-   AXI4L_write32(OUTPUT_DIGITAL, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);		     
+   AXI4L_write32(FPA_ROIC, ptrA->ADD + AW_FPA_ROIC_SW_TYPE);          
+   AXI4L_write32(OUTPUT_DIGITAL, ptrA->ADD + AW_FPA_OUTPUT_SW_TYPE);
+   AXI4L_write32(INPUT_LVDS25, ptrA->ADD + AW_FPA_INPUT_SW_TYPE);
 }
 
 //-------------------------------------------------------
@@ -698,7 +706,9 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
 //-------------------------------------------------------
 void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
-                                   
+  
+   extern int32_t gFpaExposureTimeOffset;
+  
    ptrH->Fclock_MHz            = (float)FPA_MCLK_RATE_HZ/1E+6;;
    ptrH->Pixel_Reset           =  140.0F;
    ptrH->Pixel_Sample          =  14.0F;
@@ -713,6 +723,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->ramp2_Start           =  30.0F;
    ptrH->ramp2_Count           =  190.0F;
    ptrH->fpa_intg_clk_rate_hz  =  35E6F;
+   ptrH->int_time_offset_usec  = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
   
    ptrH->Frame_read_Init_3     = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
 
@@ -735,7 +746,6 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->Frame_Time           = ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read;
   
    ptrH->mode_int_end_to_trig_start_dly_usec =  ptrH->Frame_Time; // à reviser plus tard
-   
 
 }
 
@@ -797,8 +807,9 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.data[14]       =	  gPrivateStat.int_time & 0xFF;
    Cmd.data[15]       = ((gPrivateStat.int_time & 0xFF00) >> 8);
    Cmd.data[16]       = ((gPrivateStat.int_time & 0xF0000) >> 16);
-   Cmd.data[17]       =   video_rate;                        
+   Cmd.data[17]       =  (video_rate & 0x03);                        
    Cmd.data[18]       = ((ptrA->op_det_vbias & 0x0F) << 4) + ((ptrA->op_det_ibias & 0x03) << 2);
+   Cmd.data_size      =  ptrA->op_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->op_cmd_dlen + 1;     // +1 pour le checksum
    Cmd.bram_sof_add   =  ptrA->op_cmd_sof_add;
    
@@ -830,6 +841,7 @@ void FPA_SendSynthVideo_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.data[0]        = (slv_adr & 0x7F);  
    Cmd.data[1]        =  ptrA->synth_frm_res & 0x7F;
    Cmd.data[2]        = ((ptrA->synth_frm_dat & 0x03) << 6) +  vid_if_bit_en;
+   Cmd.data_size      =  ptrA->synth_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->synth_cmd_dlen + 1;     // +1 pour le checksum
    Cmd.bram_sof_add   =  ptrA->synth_cmd_sof_add;
    
@@ -854,6 +866,7 @@ void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.id             =  ptrA->temp_cmd_id;
    Cmd.dlen           =  ptrA->temp_cmd_dlen;
    Cmd.offs_add       =  0;                     
+   Cmd.data_size      =  ptrA->temp_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->temp_cmd_dlen + 1;     // +1 pour le checksum
    Cmd.bram_sof_add   =  ptrA->temp_cmd_sof_add;
    

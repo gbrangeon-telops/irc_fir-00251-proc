@@ -57,20 +57,6 @@
 #define FPA_TDC_FLAGS            (Blackbird1920DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
-//#define FPA_EVEN_TO_ODD_DELAY 4     // CLK
-//#define FPA_ODD_TO_EVEN_DELAY 144   // CLK
-//#define FPA_IMAGE_DATA_DELAY  370*1E-6F   // [us]max
-//#define FPA_NB_PIX_CLK     1
-//#define FPA_TRI_MIN_US     50*1E-6F
-
-//#define FPA_MAX_GAIN       1
-//#define FPA_NUMTAPS        1  // [taps]
-//#define FPA_PX_TAP         1  // [pixel/clock/tap]
-//#define FPA_DELAY          11 // [clock cycles]
-//#define FPA_LOVH           1  // [clock cycles]
-//#define FPA_FOVH           0  // [clock cycles]
-//#define FPA_MIN_PER        0  // [clock cycles]
-
 #define FPA_COOLER_TEMP_THRES    -19400   //[cC]
 #define FPA_COOLER_TEMP_TOL      1000     //[cC]
 #ifdef SIM
@@ -106,7 +92,7 @@
 
 #define XTRA_TRIG_MODE_DELAY           100000  // us
 
-#define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
+#define SCD_MIN_OPER_FPS               (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet

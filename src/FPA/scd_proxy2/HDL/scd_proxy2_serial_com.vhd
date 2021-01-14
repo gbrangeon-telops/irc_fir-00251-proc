@@ -118,7 +118,7 @@ architecture RTL of scd_proxy2_serial_com is
    type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, cpy_cfg_rd_st1, cpy_cfg_rd_st2, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
    type cmd_resp_fsm_type is (idle, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
-   type com_data_array_type  is array (0 to LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
+   type com_data_array_type  is array (0 to 32) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
    
