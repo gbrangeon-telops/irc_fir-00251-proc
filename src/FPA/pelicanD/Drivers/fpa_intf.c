@@ -782,7 +782,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
    Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection
    Tint = Tint/1E6F; // in second
-   Tint = Tint*FPA_FPP_CLK_RATE_HZ; // in 80 MHz clks  
+   Tint = Tint*FPA_MCLK_RATE_HZ; // in 80 MHz clks
    
    scd_gain = (uint8_t)(ptrA->scd_gain);
    scd_int_mode = (uint8_t)(ptrA->scd_int_mode);         
