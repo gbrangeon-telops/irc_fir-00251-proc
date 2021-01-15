@@ -135,7 +135,7 @@ begin
          -- Window1 Column Stop Data Register
          data_reg_ary(4) <= std_logic_vector(USER_CFG.XSTOP);
          -- Pixel Mode Data Register
-         data_reg_ary(5)(7)          <= '1';  -- Integration control from FSYNC
+         data_reg_ary(5)(7)          <= '0';  -- Integration control from FSYNC. La spec dit de le mettre à 1 mais c'est une erreur
          data_reg_ary(5)(6)          <= '0';  -- Reserved
          data_reg_ary(5)(5)          <= '0';  -- Reserved
          data_reg_ary(5)(4)          <= USER_CFG.GAIN;
