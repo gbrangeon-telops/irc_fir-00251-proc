@@ -296,7 +296,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 12;
+      gFpaDebugRegF = 13;
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;
    
    // readout ctrl
@@ -329,7 +329,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
  
    // gFpaDebugRegD dephasage fin des adc_clk 
    if (sw_init_done == 0)
-      gFpaDebugRegD = 0;
+      gFpaDebugRegD = 80;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;
 
    // image info
