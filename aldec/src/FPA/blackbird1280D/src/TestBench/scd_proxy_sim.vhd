@@ -100,13 +100,13 @@ end component;
 begin  
   
    
-   sgen_pelican_or_hercule : if (IsBlackbird1280D = '0') generate
+   sgen_pelican_or_hercule : if (SCD_TRIG_REFERENCED = '0') generate
    begin  
       INT_FBK_N <= not fpa_int_i;
       INT_FBK_P <= fpa_int_i;
    end generate;
    
-   sgen_bb1280 : if (IsBlackbird1280D = '1') generate
+   sgen_bb1280 : if (SCD_TRIG_REFERENCED = '1') generate
    begin 
       INT_FBK_N <= '1';
       INT_FBK_P <= '0';
