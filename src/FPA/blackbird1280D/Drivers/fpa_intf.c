@@ -121,10 +121,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 
 
 // adresse d'ecriture de la config diag du manufacturier
-#define AW_FPA_SCD_FRAME_RES_ADD           0xA0
-
-// adresse d'ecriture de la config diag du manufacturier
-#define AW_FPA_SCD_BIT_PATTERN_ADD        0xB0
+#define AW_FPA_SCD_FRAME_RES_ADD          0xA0
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0

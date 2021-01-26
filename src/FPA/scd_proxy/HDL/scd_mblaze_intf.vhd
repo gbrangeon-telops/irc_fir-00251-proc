@@ -570,9 +570,6 @@ begin
                         -- BB1280 only : frame resolution configuration 
                         when X"A0" =>    mb_struct_cfg.scd_frame_res.scd_exp_time_conv_numerator <= data_i(mb_struct_cfg.scd_frame_res.scd_exp_time_conv_numerator'length-1 downto 0); mb_cfg_rqst <= '1';                    
 
-                        -- mode diag manufacturier 
-                        when X"B0" =>    mb_struct_cfg.scd_diag.scd_bit_pattern <= data_i(mb_struct_cfg.scd_diag.scd_bit_pattern'length-1 downto 0); mb_cfg_rqst <= '1'; -- bit pattern est utilisé par le pilote Hw pour programmer le détecteur                   
-                           
                         -- trig lecture de temperatur(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.scd_temp.scd_temp_read_num <= unsigned(data_i(mb_struct_cfg.scd_temp.scd_temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';
                            
