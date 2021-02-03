@@ -504,7 +504,7 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->fpa_reset_time_mclk     = 3076.0F;
    ptrH->fpa_itr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number);
    ptrH->fpa_iwr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + 40.0F + 10.0F;// FPA: estimation delai max de sortie des pixels après integration + delai après readout. ENO 18 juin 2020: delai supplémentaire de 10 MCLK rajouté
-   ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (float)FPA_MCLK_RATE_HZ;   // estimation des differerents delais accumulés par le vhd
+   ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (1e6F/ptrH->mclk_period_usec);   // estimation des differerents delais accumulés par le vhd
    ptrH->lovh_mclk               = 0.0F;
    ptrH->fovh_line               = 0.0F;   
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
