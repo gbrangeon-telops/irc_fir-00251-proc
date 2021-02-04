@@ -225,7 +225,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaVCMO_mV;
    extern uint16_t gFpaTapRef_mV;
    static uint8_t cfg_num = 0;
-   uint32_t i;
+   static uint32_t presentSensorWellDepth = 0;
 
    // on bâtit les parametres specifiques
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);
@@ -350,11 +350,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    {
       // valeurs par défaut pour l'init
       gFpaDetectSub_mV = 3500;
-      gFpaCtiaRef_mV = 2500;
+      gFpaCtiaRef_mV = 2380;
       gFpaVTestG_mV = 3300;
-      gFpaCM_mV = 1750;
-      gFpaVCMO_mV = 1750;
+      gFpaCM_mV = 1780;
+      gFpaVCMO_mV = 1780;
       gFpaTapRef_mV = 0;
+   }
+   // Pour un changement de gain, on force certaines valeurs
+   if (presentSensorWellDepth != pGCRegs->SensorWellDepth)
+   {
+      presentSensorWellDepth = pGCRegs->SensorWellDepth;
+      if (pGCRegs->SensorWellDepth == SWD_HighGain)
+      {
+         gFpaCtiaRef_mV = 2500;
+         gFpaCM_mV = 1910;
+      }
+      else
+      {
+         gFpaCtiaRef_mV = 2380;
+         gFpaCM_mV = 1780;
+      }
    }
    ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectSub_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
    ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)gFpaCtiaRef_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
@@ -397,10 +412,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // envoi du reste de la config        
    WriteStruct(ptrA);
-
-//   FPGA_PRINTF("FPA Config sent:\n");
-//   for (i = 0; i < ptrA->SIZE; i++)
-//      PRINTF(" %u\n", ((uint32_t*)ptrA)[i+2]);
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -435,13 +446,6 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
           (flashSettings.FPATemperatureConversionCoef2 == 0) && (flashSettings.FPATemperatureConversionCoef1 == 0) &&
           (flashSettings.FPATemperatureConversionCoef0 == 0))
       {
-   /*
-         // courbe de conversion de Sofradir pour une polarisation de 100µA
-         temperature  =  -170.50F * powf(diode_voltage,4);
-         temperature +=   173.45F * powf(diode_voltage,3);
-         temperature +=   137.86F * powf(diode_voltage,2);
-         temperature += (-667.07F * diode_voltage) + 623.1F;  // 625 remplacé par 623 en guise de calibration de la diode
-   */
          // La doc de Xenics donne Temp = 418°C – (voltage / 2mV/°C) pour un courant de 150uA
          temperature = 418.0F - diode_voltage/0.002F; // celsius
          temperature = C_TO_K(temperature); // kelvin
