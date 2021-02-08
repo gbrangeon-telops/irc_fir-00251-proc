@@ -17,18 +17,23 @@ use IEEE.std_logic_1164.all;
 
 entity scd_proxy2_dsync is
    port(
-		CLK_CH0 : in std_logic;
-      CLK_CH1 : in std_logic;
-      D_CLK : in std_logic;
-		ARESET : in std_logic;
-		 
-		CH0_DATA : in std_logic_vector(31 downto 0);
-      CH0_DVAL : in std_logic;
-      CH1_DATA : in std_logic_vector(31 downto 0);
-      CH1_DVAL : in std_logic;
       
+      ARESET        : in std_logic;
+      
+      -- ch0  
+      CH0_DCLK      : in std_logic;
+      CH0_DUAL_DATA : in std_logic_vector(31 downto 0);
+      CH0_DUAL_DVAL : in std_logic;
+      
+      -- ch1 
+      CH1_DCLK      : in std_logic;
+      CH1_DUAL_DATA : in std_logic_vector(31 downto 0);
+      CH1_DUAL_DVAL : in std_logic;
+      
+      -- out
+      QUAD_DCLK         : in std_logic;     
       QUAD_DATA_OUT : out std_logic_vector(71 downto 0);
-	   QUAD_DVAL : out std_logic
+      QUAD_DVAL     : out std_logic
       );
 end scd_proxy2_dsync;
 
@@ -42,7 +47,7 @@ architecture scd_proxy2_dsync of scd_proxy2_dsync is
          SRESET : out std_logic;
          CLK : in std_logic);
    end component;
-
+   
    component fwft_afifo_w32_d16 is
       Port ( 
          rst : in STD_LOGIC;
@@ -62,8 +67,8 @@ architecture scd_proxy2_dsync of scd_proxy2_dsync is
    
    signal sreset : std_logic;
    signal fifo_rd_en : std_logic;
-   signal valid_ch0_dval : std_logic;
-   signal valid_ch1_dval : std_logic;
+   signal valid_CH0_DUAL_DVAL : std_logic;
+   signal valid_CH1_DUAL_DVAL : std_logic;
    signal fifo_ch0_dout : std_logic_vector(31 downto 0);
    signal fifo_ch1_dout : std_logic_vector(31 downto 0);
    signal fifo_ch0_ovfl : std_logic;
@@ -78,7 +83,7 @@ architecture scd_proxy2_dsync of scd_proxy2_dsync is
    
 begin
    
-   fifo_rd_en <= valid_ch0_dval and valid_ch1_dval; -- lecture synchronisée des 2 fifos tout le temps. 
+   fifo_rd_en <= valid_CH0_DUAL_DVAL and valid_CH1_DUAL_DVAL; -- lecture synchronisée des 2 fifos tout le temps. 
    QUAD_DATA_OUT(71 downto 68) <= "0000";
    QUAD_DATA_OUT(67) <= reg_3(62);
    QUAD_DATA_OUT(66) <= fval_pixel;
@@ -99,45 +104,45 @@ begin
    U0: sync_reset
    port map(
       ARESET => ARESET,
-      CLK    => D_CLK,
+      CLK    => QUAD_DCLK,
       SRESET => sreset
       );   
-	  
-	fifo_ch0 : fwft_afifo_w32_d16
-  Port map( 
-    rst => ARESET,
-    wr_clk => CLK_CH0,
-    rd_clk => D_CLK,
-    din => CH0_DATA,
-    wr_en => CH0_DVAL,
-    rd_en => fifo_rd_en,
-	dout => fifo_ch0_dout,
-    full => open,
-    overflow => fifo_ch0_ovfl,
-    empty => open,
-    valid => valid_ch0_dval,
-    wr_rst_busy => open,
+   
+   fifo_ch0 : fwft_afifo_w32_d16
+   Port map( 
+      rst         => ARESET,
+      wr_clk      => CH0_DCLK,
+      rd_clk      => QUAD_DCLK,
+      din         => CH0_DUAL_DATA,
+      wr_en       => CH0_DUAL_DVAL,
+      rd_en       => fifo_rd_en,
+      dout        => fifo_ch0_dout,
+      full        => open,
+      overflow    => fifo_ch0_ovfl,
+      empty       => open,
+      valid       => valid_CH0_DUAL_DVAL,
+      wr_rst_busy => open,
       rd_rst_busy => open);
    
-	fifo_ch1 : fwft_afifo_w32_d16
-  Port map( 
-    rst => ARESET,
-    wr_clk => CLK_CH1,
-    rd_clk => D_CLK,
-    din => CH1_DATA,
-    wr_en => CH1_DVAL,
-    rd_en => fifo_rd_en,
-	dout => fifo_ch1_dout,
-    full => open,
-    overflow => fifo_ch1_ovfl,
-    empty => open,
-    valid => valid_ch1_dval,
-    wr_rst_busy => open,
-    rd_rst_busy => open);
-
-   shift_register : process(D_CLK)
+   fifo_ch1 : fwft_afifo_w32_d16
+   Port map( 
+      rst         => ARESET,
+      wr_clk      => CH1_DCLK,
+      rd_clk      => QUAD_DCLK,
+      din         => CH1_DUAL_DATA,
+      wr_en       => CH1_DUAL_DVAL,
+      rd_en       => fifo_rd_en,
+      dout        => fifo_ch1_dout,
+      full        => open,
+      overflow    => fifo_ch1_ovfl,
+      empty       => open,
+      valid       => valid_CH1_DUAL_DVAL,
+      wr_rst_busy => open,
+      rd_rst_busy => open);
+   
+   shift_register : process(QUAD_DCLK)
    begin
-      if rising_edge(D_CLK) then
+      if rising_edge(QUAD_DCLK) then
          if sreset = '1' then
             reg_0 <= (others => '0');
             reg_1 <= (others => '0');
@@ -160,9 +165,9 @@ begin
       end if;
    end process shift_register;
    
-   fval_pixel_creation : process(D_CLK)
+   fval_pixel_creation : process(QUAD_DCLK)
    begin
-      if rising_edge(D_CLK) then
+      if rising_edge(QUAD_DCLK) then
          if sreset = '1' then
             fval_pixel <= '0';
          else
@@ -170,7 +175,7 @@ begin
             --28 is dval, 30 is fval
             if reg_3(28) = '1' and reg_0(30) = '0' then
                fval_pixel <= '0';
-            --Si on a une image débuté et un pixel ensuite (debut de fval_pixel)
+               --Si on a une image débuté et un pixel ensuite (debut de fval_pixel)
             elsif reg_3(30) = '1' and reg_2(28) = '1' then
                fval_pixel <= '1';
             else  
