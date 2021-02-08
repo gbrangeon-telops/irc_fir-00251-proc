@@ -32,7 +32,7 @@ entity scd_proxy2_dsync is
       
       -- out
       QUAD_DCLK         : in std_logic;     
-      QUAD_DATA_OUT : out std_logic_vector(71 downto 0);
+      QUAD_DATA : out std_logic_vector(71 downto 0);
       QUAD_DVAL     : out std_logic
       );
 end scd_proxy2_dsync;
@@ -84,18 +84,19 @@ architecture scd_proxy2_dsync of scd_proxy2_dsync is
 begin
    
    fifo_rd_en <= valid_CH0_DUAL_DVAL and valid_CH1_DUAL_DVAL; -- lecture synchronisée des 2 fifos tout le temps. 
-   QUAD_DATA_OUT(71 downto 68) <= "0000";
-   QUAD_DATA_OUT(67) <= reg_3(62);
-   QUAD_DATA_OUT(66) <= fval_pixel;
-   QUAD_DATA_OUT(65 downto 64) <= reg_3(61 downto 60);
-   QUAD_DATA_OUT(63 downto 62) <= "00";
-   QUAD_DATA_OUT(61 downto 48) <= reg_3(59 downto 46);
-   QUAD_DATA_OUT(47 downto 46) <= "00";
-   QUAD_DATA_OUT(45 downto 32) <= reg_3(45 downto 32);
-   QUAD_DATA_OUT(31 downto 30) <= "00";
-   QUAD_DATA_OUT(29 downto 16) <= reg_3(27 downto 14);
-   QUAD_DATA_OUT(15 downto 14) <= "00";
-   QUAD_DATA_OUT(13 downto 0) <= reg_3(13 downto 0);
+   
+   QUAD_DATA(71 downto 68) <= "0000";
+   QUAD_DATA(67) <= reg_3(62);
+   QUAD_DATA(66) <= fval_pixel;
+   QUAD_DATA(65 downto 64) <= reg_3(61 downto 60);
+   QUAD_DATA(63 downto 62) <= "00";
+   QUAD_DATA(61 downto 48) <= reg_3(59 downto 46);
+   QUAD_DATA(47 downto 46) <= "00";
+   QUAD_DATA(45 downto 32) <= reg_3(45 downto 32);
+   QUAD_DATA(31 downto 30) <= "00";
+   QUAD_DATA(29 downto 16) <= reg_3(27 downto 14);
+   QUAD_DATA(15 downto 14) <= "00";
+   QUAD_DATA(13 downto 0) <= reg_3(13 downto 0);
    
    QUAD_DVAL <= fifo_rd_en;
    --------------------------------------------------
