@@ -109,7 +109,7 @@
  
 #define FPA_XTRA_TRIG_FREQ_MAX_HZ         100           // ENO: 25 janv 2016: la programmation du dtecteur se fera à cette vitesse au max. Cela donnera assez de coups d'horloges pour les resets quelle que soit la config de fenetre
 
-#define HAWK_TAPREF_VOLTAGE_MIN_mV        2810           // valeur en provenance du fichier fpa_define
+#define HAWK_TAPREF_VOLTAGE_MIN_mV        2600           // valeur en provenance du fichier fpa_define
 #define HAWK_TAPREF_VOLTAGE_MAX_mV        6100           // valeur en provenance du fichier fpa_define
 
 #define HAWK_CONST_ELEC_OFFSET_VALUE      340            //correction d'offset non implantée sur Hawk

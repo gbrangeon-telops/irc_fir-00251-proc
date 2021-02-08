@@ -95,7 +95,7 @@ package FPA_define is
    (    0, 16210),     -- limites du DAC5 pour le Hawk
    (    0, 16210),     -- limites du DAC6 pour le Hawk
    (    0, 16210),     -- limites du DAC7 pour le Hawk
-   ( 1026, 15868));    -- limites du DAC8 pour le Hawk 
+   (    0, 15868));    -- limites du DAC8 pour le Hawk 
    
    --------------------------------------------
    --  modes diag
@@ -216,7 +216,7 @@ package FPA_define is
       
       -- ligne active = ligne excluant les portions/pixels non valides     
       active_line_start_num               : unsigned(3 downto 0);     --  pour hawk: le numero de la premiere ligne active. Il vaut 1
-      active_line_end_num                 : unsigned(10 downto 0);     --  pour hawk: le numero de la derniere ligne active. Il vaut Ysize
+      active_line_end_num                 : unsigned(10 downto 0);    --  pour hawk: le numero de la derniere ligne active. Il vaut Ysize
       
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch                 : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
