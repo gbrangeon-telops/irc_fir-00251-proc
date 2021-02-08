@@ -8,6 +8,7 @@ setActivelib work
 
 # common
 acom -incr -nowarn DAGGEN_0523 \
+ D:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd \
  d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\marsD\HDL\FPA_define.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\Megalink\HDL\proxy_define.vhd \
@@ -23,18 +24,6 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_ctrl.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde 
-
-#IP
---acom -incr -nowarn DAGGEN_0523 \
-acom d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_sim_netlist.vhdl
-acom d:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w32_d16\fwft_afifo_w32_d16_stub.vhdl
-
-
-#SIM
---acom -incr -nowarn DAGGEN_0523
-acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\Stim.vhd
-acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\SIM\scd_proxy2_serdes_simulation.bde
-acom d:\Telops\FIR-00251-Proc\src\bb1920_serdes\Sim\bb1920_deserializer_simulation.bde
 
 # BB1920 SERDES
 --acom -incr -nowarn DAGGEN_0523 \
