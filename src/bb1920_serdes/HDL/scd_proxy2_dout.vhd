@@ -22,7 +22,7 @@ entity scd_proxy2_dout is
       CLK           : in std_logic;
       
       --inputs
-      DIN           : in std_logic_vector(31 downto 0);
+      DIN           : in std_logic_vector(35 downto 0);
       SUCCESS       : in std_logic;
       
       -- delay calibration side
@@ -30,7 +30,7 @@ entity scd_proxy2_dout is
       LVALS         : out std_logic_vector(7 downto 0);
       
       -- downstream side
-      DOUT          : out std_logic_vector(31 downto 0);
+      DOUT          : out std_logic_vector(35 downto 0);
       DOUT_DVAL     : out std_logic
       );
 end scd_proxy2_dout;
@@ -52,12 +52,8 @@ architecture rtl of scd_proxy2_dout is
    signal lvals_i 	      : std_logic_vector(7 downto 0);
    signal ctrl_words       : array_type;
    signal ctrl_words_last  : array_type;
-   signal dout_i           : std_logic_vector(DOUT'LENGTH-1 downto 0) := (others => '0');
+   signal dual_data_i      : std_logic_vector(27 downto 0) := (others => '0');
    signal dout_dval_i      : std_logic;
-   signal ctrl_bits_i      : std_logic_vector(3 downto 0);
-   signal ctrl_bits_last   : std_logic_vector(3 downto 0);
-   signal fval_i           : std_logic;
-   signal lval_i           : std_logic;
    signal output_en        : std_logic;
    signal fval_last        : std_logic;
    
@@ -66,11 +62,16 @@ begin
    --------------------------------------------------
    -- outputs mapping 
    --------------------------------------------------    
-   FVALS        <= fvals_i;
-   LVALS        <= lvals_i;
-   DOUT         <= dout_i;   
-   DOUT_DVAL    <= dout_dval_i; 
-   
+   FVALS                <= fvals_i;
+   LVALS                <= lvals_i; 
+   DOUT_DVAL            <= dout_dval_i;
+   DOUT(35)             <= '0';              -- non utilisé
+   DOUT(34  downto  31) <= ctrl_words(7);    -- les controlBits. Ils sont en avance de 1 CLK sur les dual_data_i et c'est voulu ainsi.
+   DOUT(30)             <= fvals_i(7);
+   DOUT(29)             <= lvals_i(7);
+   DOUT(28)             <= lvals_i(7);       -- dval identique à lval
+   DOUT(27 downto  0)   <= dual_data_i;      -- les deux pixels. Ils sont en retard de 1 CLK sur les controlBits
+  
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
@@ -88,12 +89,7 @@ begin
    for jj in 0 to 7 generate 
    ctrl_words(jj) <= DIN(3 + 4*jj downto 0 + 4*jj);
    end generate;
-   
-   -- successfull ctrl signals 
-   ctrl_bits_i <= DIN(31 downto 28);
-   fval_i      <= fvals_i(7);
-   lval_i      <= lvals_i(7);
-   
+     
    --------------------------------------------------
    -- signaux pour calibration 
    --------------------------------------------------   
@@ -157,11 +153,10 @@ begin
             
          else		 
             
-            fval_last <= fval_i;
-            ctrl_bits_last <= ctrl_bits_i;
+            fval_last <= fvals_i(7);
             
             -- generation d'un signal de synhcro de la sortie des données
-            if SUCCESS = '1' and fval_last = '0' and fval_i = '1' then
+            if SUCCESS = '1' and fval_last = '0' and fvals_i(7) = '1' then
                output_en <= '1';                 -- synchro parfaite 
             end if;
             
@@ -169,27 +164,11 @@ begin
             -- definition des sorties                               
             ---------------------------------------
             -- dout_dval_i
-            dout_dval_i <= output_en and (fval_i or  (fval_last and not fval_i));   -- on envoie aussi la fin de fval à la sortie au moyen de (fval_last and not fval_i)
+            dout_dval_i <= output_en and (fvals_i(7) or  (fval_last and not fvals_i(7)));   -- on envoie aussi la fin de fval à la sortie au moyen de (fval_last and not fvals_i(7))
             
-            -- dout_i
-            dout_i(31) <= '0';         -- non utilisé
-            dout_i(30) <= fval_i;      -- fval  
-            dout_i(29) <= lval_i;
-            dout_i(28) <= lval_i;
-            
-            ---- lval and dval
---            if ctrl_bits_last /= x"E" and ctrl_bits_i = x"E" then
---               dout_i(29) <= '1';    -- lval
---               dout_i(28) <= '1';    -- dval
---            end if;               
---            if ctrl_bits_last = x"E" and ctrl_bits_i /= x"E" then
---               dout_i(29) <= '0';    -- lval
---               dout_i(28) <= '0';    -- dval
---            end if;
-            
-            -- pix data
-            dout_i(27 downto 14) <= DIN(27 downto 14); -- pixel 1  
-            dout_i(13 downto 0)  <= DIN(13 downto 0);  -- pixel 0             
+            -- dual_data_i
+            dual_data_i(27 downto 14) <= DIN(27 downto 14); -- pixel 1  
+            dual_data_i(13 downto 0)  <= DIN(13 downto 0);  -- pixel 0             
             
          end if;
       end if;	
