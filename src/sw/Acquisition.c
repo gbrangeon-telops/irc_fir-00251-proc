@@ -194,9 +194,10 @@ void SCD_SetRelaxMode()
 
       float frameRateBackup;
       extern t_FpaIntf gFpaIntf;
+      extern float gFpaPeriodMinMargin;
 
       frameRateBackup = gcRegsData.AcquisitionFrameRate;
-      gcRegsData.AcquisitionFrameRate = SCD_MIN_OPER_FPS;
+      gcRegsData.AcquisitionFrameRate = SCD_MIN_OPER_FPS*(1.0F - gFpaPeriodMinMargin);
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
       gcRegsData.AcquisitionFrameRate = frameRateBackup;
 
