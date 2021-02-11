@@ -143,7 +143,7 @@ begin
    ch0_lval_o         <= ch0_fifo_dout(29);
    ch0_dval_o         <= ch0_fifo_dout(28);
    
-   fifo_rd_en <= ch0_fifo_dval and ch1_fifo_dval and active_read; -- lecture synchronisee des 2 fifos tout le temps.
+   fifo_rd_en         <= ch0_fifo_dval and ch1_fifo_dval and active_read; -- lecture synchronisee des 2 fifos tout le temps.
    
    --------------------------------------------------
    -- ch0 fifo
