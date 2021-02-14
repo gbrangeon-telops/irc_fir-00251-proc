@@ -22,7 +22,7 @@ use work.TEL2000.all;
 entity scd_proxy2_dsync is
    
    generic (
-      EOF_TO_FSYNC_DLY : integer range 1 to 200 -- delai (en coups de CH0_DCLK) entre la dernier pixel et la tombée de FSYNC.
+      EOF_TO_FSYNC_DLY : integer range 1 to 200 := 16 -- delai (en coups de CH0_DCLK) entre la dernier pixel et la tombée de FSYNC.
       ); 
    
    port(
@@ -110,12 +110,15 @@ architecture rtl of scd_proxy2_dsync is
    signal quad_dval_o         : std_logic;
    
    signal dly_cnt             : unsigned(C_BITPOS downto 0);
+   signal err_i               : std_logic_vector(ERR'length-1 downto 0);
    
 begin
    
    
    QUAD_DATA <= quad_dout_o;
    QUAD_DVAL <= quad_dval_o;
+   
+   ERR <= err_i;
    
    
    --------------------------------------------------
@@ -266,6 +269,9 @@ begin
    U4: process(QUAD_DCLK)
    begin
       if rising_edge(QUAD_DCLK) then 
+         
+         err_i(err_i'length-1 downto 1) <= (others => '0');
+         err_i(0) <= ch0_fifo_ovfl or ch1_fifo_ovfl;
          
          -- non utilisés
          quad_dout_o(71 downto 68)  <= (others => '0');
