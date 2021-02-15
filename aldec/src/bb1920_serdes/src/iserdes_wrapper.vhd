@@ -72,6 +72,15 @@ begin
    Q3 <= q_reg_out(2);
    Q2 <= q_reg_out(1);
    Q1 <= q_reg_out(0);
+--   
+--   Q8 <= q_reg_out(0);
+--   Q7 <= q_reg_out(1);
+--   Q6 <= q_reg_out(2);
+--   Q5 <= q_reg_out(3);
+--   Q4 <= q_reg_out(4);
+--   Q3 <= q_reg_out(5);
+--   Q2 <= q_reg_out(6);
+--   Q1 <= q_reg_out(7);
    
    ----------------------------------
    --   reset

@@ -13,7 +13,6 @@ acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\fpa_serdes_define.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_serdes_clk_wrapper.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\idelay_wrapper.vhd \
- d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\iserdes_wrapper.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator_core.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\high_duration_meas.vhd \
  d:\Telops\FIR-00251-Common\VHDL\iserdes\clink\clink_validator_ctrler.vhd \

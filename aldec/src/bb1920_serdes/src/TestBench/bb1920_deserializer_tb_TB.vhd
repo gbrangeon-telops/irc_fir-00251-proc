@@ -35,11 +35,12 @@ architecture TB_ARCHITECTURE of bb1920_deserializer_tb_tb is
    constant DOUT_CLK_PERIOD  : time := 10 ns;
    constant DCLK_1X_PERIOD   : time := 14.288 ns;
    constant DCLK_8X_PERIOD   : time :=  1.786 ns;
+   constant ACQ_INT_PERIOD   : time :=  100 us;
       
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
-   signal ACQ_INT       : STD_LOGIC;
+   signal ACQ_INT       : STD_LOGIC := '0';
    signal ARESET        : STD_LOGIC;
-   signal CLK200        : STD_LOGIC;
+   signal CLK200        : STD_LOGIC := '0';
    signal DCLK_1X       : STD_LOGIC := '0';
    signal DCLK_8X       : STD_LOGIC := '0';
    signal DOUT_CLK      : STD_LOGIC := '0';
@@ -60,7 +61,11 @@ begin
       wait;
    end process;
    
-   ACQ_INT <= '1';
+   -- ACQ_INT
+   U01: process(ACQ_INT)
+   begin
+      ACQ_INT <= not ACQ_INT after ACQ_INT_PERIOD/2; 
+   end process;
    
    -- CLK200
    U1: process(CLK200)
@@ -92,10 +97,10 @@ begin
    FPA_INTF_CFG.COMN.fpa_diag_mode            <= '1';
    FPA_INTF_CFG.COMN.fpa_diag_type            <= DEFINE_TELOPS_DIAG_DEGR;
    
-   FPA_INTF_CFG.DIAG.YSIZE                    <= to_unsigned(YSIZE, 32);                 
-   FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM         <= to_unsigned(XSIZE/4, 32);
-   FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE         <= to_unsigned(3, 32);
-   FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY    <= to_unsigned(8, 32);
+   FPA_INTF_CFG.DIAG.YSIZE                    <= to_unsigned(YSIZE, FPA_INTF_CFG.DIAG.YSIZE'LENGTH);                 
+   FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM         <= to_unsigned(XSIZE/4, FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM'LENGTH);
+   FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE         <= to_unsigned(3, FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE'LENGTH);
+   FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY    <= to_unsigned(8, FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY'LENGTH);
    
    FPA_INTF_CFG.fpa_serdes_lval_num           <= to_unsigned(YSIZE, FPA_INTF_CFG.fpa_serdes_lval_num'LENGTH);
    FPA_INTF_CFG.fpa_serdes_lval_len           <= to_unsigned(XSIZE/4, FPA_INTF_CFG.fpa_serdes_lval_len'LENGTH);

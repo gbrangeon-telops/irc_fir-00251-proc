@@ -26,7 +26,7 @@ REFRESH_FLOW=1
 FAMILY=Xilinx VIRTEX4
 IMPL_TOOL=
 SYNTH_TOOL=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\bb1920_serdes\HDL
+fileopenfolder=D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI
 
 [LocalVerilogSets]
 EnableSLP=1
@@ -65,10 +65,6 @@ Extension7=
 [Groups]
 TestBench=1
 
-
-
-
-
 [Files]
 /..\..\..\..\src\bb1920_serdes\HDL\compil_bb1920_receiver.do=-1
 /..\..\..\..\src\bb1920_serdes\HDL\bb1920_deserializer.bde=-1
@@ -81,8 +77,6 @@ TestBench=1
 /bb1920_deserializer_tb.bde=-1
 /bb1920_data_gen.bde=-1
 /dual_data_serializer.bde=-1
-/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd=-1
-/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd=-1
 /bb1920_data_gen_dispatcher.vhd=-1
 /..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=-1
 /..\..\..\..\src\FPA\blackbird1920D\HDL\FPA_define.vhd=-1
@@ -90,6 +84,16 @@ TestBench=1
 /..\..\..\..\src\FPA\blackbird1920D\HDL\compil_blackbird1920D.do=-1
 /iserdes_wrapper.vhd=-1
 /..\..\..\..\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde=-1
+/LL8_to_serial.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_ctrl.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator_core.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_validator_ctrler.vhd=-1
+/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\high_duration_meas.vhd=-1
+/..\..\..\..\..\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd=-1
 TestBench/bb1920_deserializer_tb_TB.vhd=-1
 TestBench/bb1920_deserializer_tb_TB_runtest.do=-1
 
@@ -105,8 +109,6 @@ TestBench/bb1920_deserializer_tb_TB_runtest.do=-1
 .\src\bb1920_deserializer_tb.bde=Block Diagram
 .\src\bb1920_data_gen.bde=Block Diagram
 .\src\dual_data_serializer.bde=Block Diagram
-.\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_fifo8.vhd=VHDL Source Code
-.\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\LL8_ext_to_spi_tx.vhd=VHDL Source Code
 .\src\bb1920_data_gen_dispatcher.vhd=VHDL Source Code
 .\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd=VHDL Source Code
 .\..\..\..\src\FPA\blackbird1920D\HDL\FPA_define.vhd=VHDL Source Code
@@ -114,15 +116,41 @@ TestBench/bb1920_deserializer_tb_TB_runtest.do=-1
 .\..\..\..\src\FPA\blackbird1920D\HDL\compil_blackbird1920D.do=Macro
 .\src\iserdes_wrapper.vhd=VHDL Source Code
 .\..\..\..\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde=Block Diagram
+.\src\LL8_to_serial.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_bitslip_ctrl.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_ctrl.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator_core.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde=Block Diagram
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_validator_ctrler.vhd=VHDL Source Code
+.\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\high_duration_meas.vhd=VHDL Source Code
+.\..\..\..\..\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd=VHDL Source Code
 .\src\TestBench\bb1920_deserializer_tb_TB.vhd=VHDL Test Bench
 .\src\TestBench\bb1920_deserializer_tb_TB_runtest.do=Macro
 .\compile\dual_data_serializer.vhd=VHDL Source Code
+.\compile\clink_signals_validator.vhd=VHDL Source Code
+.\compile\clink_delay_validator.vhd=VHDL Source Code
+.\compile\clink_calibration.vhd=VHDL Source Code
 .\compile\scd_proxy2_serdes.vhd=VHDL Source Code
 .\compile\bb1920_deserializer.vhd=VHDL Source Code
 .\compile\bb1920_deserializer_tb.vhd=VHDL Source Code
 
+
+
+
+
+
+
+
 [file_out:/dual_data_serializer.bde]
 /..\compile\dual_data_serializer.vhd=-1
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde]
+/..\compile\clink_signals_validator.vhd=-1
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde]
+/..\compile\clink_delay_validator.vhd=-1
+[file_out:/..\..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
+/..\compile\clink_calibration.vhd=-1
 [file_out:/..\..\..\..\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde]
 /..\compile\scd_proxy2_serdes.vhd=-1
 [file_out:/..\..\..\..\src\bb1920_serdes\HDL\bb1920_deserializer.bde]
