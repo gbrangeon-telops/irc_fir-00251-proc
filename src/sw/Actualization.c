@@ -886,7 +886,7 @@ IRC_Status_t Actualization_SM()
             // configurer le buffering pour deltaBetaNCoadd images
 
             uint32_t nbImageMax = BM_HW_GetLocalBufferSequenceSizeMax(&gcRegsData);
-            ACT_PRINTF( "MemoryBufferSequenceSizeMax = %d\n", nbImageMax );
+            ACT_PRINTF( "Internal buffer max images = %d\n", nbImageMax );
 
             uint32_t nbImageM = 1;
             uint32_t nbImageB = numExtraImages; // + 1 because the first image is offset most of the time
@@ -901,7 +901,7 @@ IRC_Status_t Actualization_SM()
             intBufSeqSize = (nbImageM * gActualizationParams.deltaBetaNCoadd) + nbImageB;
 
             // Verify internal buffer is big enough
-            if (gcRegsData.MemoryBufferSequenceSize > nbImageMax)
+            if (intBufSeqSize > nbImageMax)
             {
                // Re-calculate deltaBetaNCoadd and total number of images < nbImageMax
                gActualizationParams.deltaBetaNCoadd = (nbImageMax - nbImageB) / nbImageM;    // Integer division
@@ -917,7 +917,7 @@ IRC_Status_t Actualization_SM()
             // start acquisition (arm is handled automatically)
             GC_SetAcquisitionStart(1);
 
-            float timeout = 1000 * intBufSeqSize/gcRegsData.AcquisitionFrameRate;
+            float timeout = 1000.0F * (float)intBufSeqSize/gcRegsData.AcquisitionFrameRate;
             StartTimer(&act_timer, timeout + ACT_WAIT_FOR_SEQ_TIMEOUT/1000);
 
             setActState(&state, ACT_WaitSequenceReady);
@@ -929,8 +929,6 @@ IRC_Status_t Actualization_SM()
          if (elapsed_time_us(tic_TotalDuration) % 5000000 < 3000)
          {
             ACT_INF("Acquiring data for actualization...");
-            //ACT_PRINTF("Current number of images in sequence = %d\n", BufferManager_GetSequenceLength(&gBufManager, 0)); // (fait planter l'enregistrement dans le buffer)
-
          }
 
          if (GC_AcquisitionStarted && BM_HW_GetLocalWriteSeqCompleted(&gBufManager))
@@ -990,18 +988,12 @@ IRC_Status_t Actualization_SM()
          // Info on the block being actualized (re-assigned if blockIdx has changed)
          blockInfo = &calibrationInfo.blocks[blockIdx];
 
-         // configure RQC LUT switch to MB read
-        CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_AXI_LITE);
-
          ACT_INF("Computing data for block index %d", blockIdx);
 
          GETTIME(&tic_AvgDuration);
          tic_RT_Duration = 0;
 
-         if (gActDebugOptions.useDebugData)
-            coaddData.NCoadd = 16;
-         else
-            coaddData.NCoadd = gActualizationParams.deltaBetaNCoadd;
+         coaddData.NCoadd = gActualizationParams.deltaBetaNCoadd;
          coaddData.currentCount = 0;
          coaddData.numProcessedPixels = 0;
 
@@ -1026,7 +1018,7 @@ IRC_Status_t Actualization_SM()
          sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR + 2 * frameSize * numExtraImages; // [bytes] the first image is skipped because it has a DL offset in some detectors
 
          // Move sequence start to the first image corresponding to the block index
-         if (findImageForBlock(blockIdx, &sequenceOffset, 2 * frameSize, gcRegsData.MemoryBufferSequenceSize - numExtraImages) == false)
+         if (findImageForBlock(blockIdx, &sequenceOffset, 2 * frameSize, intBufSeqSize - numExtraImages) == false)
          {
             ACT_ERR("No images found for block index %d", blockIdx);
             error = true;
@@ -1040,16 +1032,19 @@ IRC_Status_t Actualization_SM()
             uint32_t lutAddr = XPAR_RQC_LUT_AXI_BASEADDR + (blockIdx * RQC_LUT_PAGE_SIZE);
             uint16_t* seq_buffer = (uint16_t*) PROC_MEM_MEMORY_BUFFER_BASEADDR;
 
+            // configure RQC LUT switch to MB read
+            CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_AXI_LITE);
+
             expectedSum = 0x1000 * coaddData.NCoadd;
             test_data.deltaBeta_test = -0.1234f;
             test_data.alpha_test = 1.0;
             test_data.FcalBB_test = (float)expectedSum / (currentDeltaBeta->info.exposureTime * blockInfo->NUCMultFactor * coaddData.NCoadd) - test_data.deltaBeta_test / test_data.alpha_test;
             test_data.TcalBB_test = applyLUT(lutAddr, &blockInfo->lutRQData[0], sqrtf(test_data.FcalBB_test));
-            validateBuffers(mu_buffer, frameSize, seq_buffer, gcRegsData.MemoryBufferSequenceSize);
-         }
+            validateBuffers(mu_buffer, frameSize, seq_buffer, coaddData.NCoadd * frameSize);
 
-         // configure RQC LUT switch to FPGA
-         CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
+            // configure RQC LUT switch to FPGA
+            CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
+         }
 
          setActState(&state, ACT_ComputeAveragedImage);
          break;
@@ -1235,8 +1230,6 @@ IRC_Status_t Actualization_SM()
          CAL_ConfigureRqcLutSwitch(&gCal, LUT_SWITCH_TO_FPGA);
 
          setActState(&state, ACT_ComputeDeltaBeta);
-
-
       }
       break;
 
@@ -1745,7 +1738,7 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
          BufferManager_HW_ForceDirectInternalBufferWriteConfig(&gBufManager, &gcRegsData, 1, intBufSeqSize, 0);
 
-         float timeout = 1000 * intBufSeqSize/gcRegsData.AcquisitionFrameRate;
+         float timeout = 1000.0F * (float)intBufSeqSize/gcRegsData.AcquisitionFrameRate;
          StartTimer(&bpd_timer, timeout + ACT_WAIT_FOR_SEQ_TIMEOUT/1000);
 
          // Start acqusition
@@ -3881,7 +3874,7 @@ static bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo,
       {
          newData->info.type = ACT_ICU;
          newData->info.discardOffset = BitTst(gActualizationParams.deltaBetaDiscardOffset, 0);
-   }
+      }
       else
       {
          newData->info.type = ACT_XBB;
@@ -4305,8 +4298,8 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
 
       gBetaUpdateDone = true;
 
-         ACT_INF( "BetaQuantization took %d ms", (uint32_t)elapsed_time_us(tic_TotalDuration)/1000);
-         ACT_INF( "BetaQuantization took (real time) " _PCF(2) " s", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
+      ACT_INF( "BetaQuantization took %d ms", (uint32_t)elapsed_time_us(tic_TotalDuration)/1000);
+      ACT_INF( "BetaQuantization took (real time) " _PCF(2) " s", _FFMT((float) (tic_RT_Duration) / ((float)TIME_ONE_SECOND_US), 2) );
 
       setBqState(&state, BQ_Idle);
       rtnStatus = IRC_DONE;

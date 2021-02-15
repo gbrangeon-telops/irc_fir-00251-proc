@@ -193,9 +193,6 @@ typedef struct {
    uint32_t TestImageSelector;
    uint32_t EHDRINumberOfExposures;
    uint32_t MemoryBufferMOISource;
-   uint32_t MemoryBufferNumberOfSequences;
-   uint32_t MemoryBufferSequenceSize;
-   uint32_t MemoryBufferSequencePreMOISize;
    uint32_t MemoryBufferMode;
    uint32_t OffsetX;
    uint32_t OffsetY;
