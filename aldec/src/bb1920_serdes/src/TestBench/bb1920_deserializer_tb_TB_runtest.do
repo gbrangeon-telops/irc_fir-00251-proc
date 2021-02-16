@@ -33,7 +33,8 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\bb1920_serdes\src\TestBench\bb1920_deser
 
 asim bb1920_deserializer_tb_TB
 
-wave UUT/U3/*
-wave UUT/U5/CH0/*
+wave UUT/U5/U2/*
+wave UUT/U5/CH1/*
+wave UUT/U5/*
 
 run 7 ms
