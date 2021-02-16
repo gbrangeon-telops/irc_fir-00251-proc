@@ -14,6 +14,11 @@ acom -nowarn DAGGEN_0523 -incr \
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 
+acom \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_min_max_ctrl.vhd \
+ d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_data_cnt_min_max.bde
+
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w36_d512\fwft_afifo_w36_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
@@ -36,5 +41,6 @@ asim bb1920_deserializer_tb_TB
 wave UUT/U5/U2/*
 wave UUT/U5/CH1/*
 wave UUT/U5/*
+wave UUT/U5/U7/*
 
 run 7 ms

@@ -115,6 +115,7 @@ architecture rtl of scd_proxy2_dsync is
    signal dly_cnt             : unsigned(C_BITPOS downto 0);
    signal rst_cnt             : unsigned(5 downto 0);
    signal err_i               : std_logic_vector(ERR'length-1 downto 0);
+   signal init_in_progress    : std_logic;
    
 begin
    
@@ -134,7 +135,7 @@ begin
       CLK    => QUAD_DCLK,
       SRESET => sreset
       );
-      
+   
    --------------------------------------------------
    -- Inputs mapping
    --------------------------------------------------
@@ -203,7 +204,8 @@ begin
             active_sof   <= '0';
             active_eof   <= '0';
             fifo_areset  <= '1';
-            rst_cnt      <= (others => '0'); 
+            rst_cnt      <= (others => '0');
+            init_in_progress <= '1';
             
          else
             
@@ -222,16 +224,18 @@ begin
                   end if;
                   
                -- on fait un reset des fifos
-               when init_st3 => 
-                  fifo_areset <= '1';
+               when init_st3 =>                   
                   rst_cnt <= rst_cnt + 1;
-                  if rst_cnt(5) = '1' then  -- 32 coups d'horloge
+                  if rst_cnt(2) = '1' then     -- 4 coups d'horloge de delai pour donner du temps à l'ecriture de s'achever
+                     fifo_areset <= '1';
+                  elsif rst_cnt(5) = '1' then  -- 32 coups d'horloge
                      fifo_areset <= '0';                 
                      fsm <= idle;
                   end if;                  
                   
                --  on attend le debut d'une image              
                when idle =>
+                  init_in_progress <= '0';
                   dly_cnt <= (others => '0');
                   if ch0_fval_i = '1' then
                      fsm <= dly_st; 
@@ -293,7 +297,7 @@ begin
       if rising_edge(QUAD_DCLK) then 
          
          err_i(err_i'length-1 downto 1) <= (others => '0');
-         err_i(0) <= ch0_fifo_ovfl or ch1_fifo_ovfl;
+         err_i(0) <= (ch0_fifo_ovfl or ch1_fifo_ovfl) and not init_in_progress;
          
          -- non utilisés
          quad_dout_o(71 downto 68)  <= (others => '0');
@@ -302,9 +306,9 @@ begin
          quad_dout_o(67)            <= ch0_fval_o;                          
          
          -- pix_fval
-         if ch0_lval_o = '1' and fifo_rd_en = '1' and active_sof = '1'  then   
+         if ch0_lval_o = '1' and active_sof = '1'  then   
             quad_dout_o(66)         <= '1';                                 
-         elsif ch0_lval_o = '0' and fifo_rd_en = '1' and ch0_future_cbits_o /= x"E" and active_eof = '1'  then
+         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= x"E" and active_eof = '1'  then
             quad_dout_o(66)         <= '0';
          end if;
          

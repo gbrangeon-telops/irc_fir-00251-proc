@@ -48,15 +48,15 @@ end bb1920_data_gen_dispatcher;
 
 
 architecture rtl of bb1920_data_gen_dispatcher is 
-
-signal fval_i           : std_logic;
-signal lval_i           : std_logic;
-signal quad_dval_i      : std_logic;
-signal quad_dval_temp   : std_logic;
-signal quad_data_temp   : std_logic_vector(95 downto 0);
-signal quad_data_i      : std_logic_vector(95 downto 0);
-signal ctrl_bits        : std_logic_vector(3 downto 0);
-
+   
+   signal fval_i           : std_logic;
+   signal lval_i           : std_logic;
+   signal quad_dval_i      : std_logic;
+   signal quad_dval_temp   : std_logic;
+   signal quad_data_temp   : std_logic_vector(95 downto 0);
+   signal quad_data_i      : std_logic_vector(95 downto 0);
+   signal ctrl_bits        : std_logic_vector(3 downto 0);
+   
 begin
    
    ---------------------------------------------------
@@ -69,55 +69,63 @@ begin
    DUAL1_BYTE_MOSI3.SOF  <= quad_data_i(59);
    DUAL1_BYTE_MOSI3.EOF  <= quad_data_i(60);
    DUAL1_BYTE_MOSI3.DVAL <= quad_dval_i;
-   DUAL1_BYTE_MOSI3.DATA <= quad_data_i(63) & quad_data_i(27) & quad_data_i(23) & quad_data_i(19)& quad_data_i(15) & quad_data_i(11) & quad_data_i(7) & quad_data_i(3);
-                                                                                                                                                                       
+   DUAL1_BYTE_MOSI3.DATA <= quad_data_i(63) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
+   
    -- pix3 byte0                                                                                                                                                       
    DUAL1_BYTE_MOSI2.SOF  <= quad_data_i(59);                                                                                                                           
    DUAL1_BYTE_MOSI2.EOF  <= quad_data_i(60);                                                                                                                           
    DUAL1_BYTE_MOSI2.DVAL <= quad_dval_i;                                                                                                                               
-   DUAL1_BYTE_MOSI2.DATA <= quad_data_i(62) & quad_data_i(26) & quad_data_i(22) & quad_data_i(18)& quad_data_i(14) & quad_data_i(10) & quad_data_i(6) & quad_data_i(2);
-                                                                                                                                                                       
+   DUAL1_BYTE_MOSI2.DATA <= quad_data_i(62) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
+   
    -- pix2 byte1                                                                                                                                                       
    DUAL1_BYTE_MOSI1.SOF  <= quad_data_i(59);                                                                                                                           
    DUAL1_BYTE_MOSI1.EOF  <= quad_data_i(60);                                                                                                                           
    DUAL1_BYTE_MOSI1.DVAL <= quad_dval_i;                                                                                                                               
-   DUAL1_BYTE_MOSI1.DATA <= quad_data_i(61) & quad_data_i(25) & quad_data_i(21) & quad_data_i(17)& quad_data_i(13) & quad_data_i(9) & quad_data_i(5) & quad_data_i(1); 
-                                                                                                                                                                       
+   DUAL1_BYTE_MOSI1.DATA <= quad_data_i(61) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0); 
+   
    -- pix2 byte0                                                                                                                                                       
    DUAL1_BYTE_MOSI0.SOF  <= quad_data_i(59);                                                                                                                           
    DUAL1_BYTE_MOSI0.EOF  <= quad_data_i(60);                                                                                                                           
    DUAL1_BYTE_MOSI0.DVAL <= quad_dval_i;                                                                                                                               
-   DUAL1_BYTE_MOSI0.DATA <= quad_data_i(60) & quad_data_i(24) & quad_data_i(20) & quad_data_i(16)& quad_data_i(12) & quad_data_i(8) & quad_data_i(4) & quad_data_i(0); 
+   DUAL1_BYTE_MOSI0.DATA <= quad_data_i(60) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0); 
    
    -- pix1 byte1
    DUAL0_BYTE_MOSI3.SOF  <= quad_data_i(59);
    DUAL0_BYTE_MOSI3.EOF  <= quad_data_i(60);
    DUAL0_BYTE_MOSI3.DVAL <= quad_dval_i;
-   DUAL0_BYTE_MOSI3.DATA <= quad_data_i(31) & quad_data_i(27) & quad_data_i(23) & quad_data_i(19)& quad_data_i(15) & quad_data_i(11) & quad_data_i(7) & quad_data_i(3);
+   DUAL0_BYTE_MOSI3.DATA <= quad_data_i(31) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
    
    -- pix1 byte0
    DUAL0_BYTE_MOSI2.SOF  <= quad_data_i(59);
    DUAL0_BYTE_MOSI2.EOF  <= quad_data_i(60);
    DUAL0_BYTE_MOSI2.DVAL <= quad_dval_i;
-   DUAL0_BYTE_MOSI2.DATA <= quad_data_i(30) & quad_data_i(26) & quad_data_i(22) & quad_data_i(18)& quad_data_i(14) & quad_data_i(10) & quad_data_i(6) & quad_data_i(2);
+   DUAL0_BYTE_MOSI2.DATA <= quad_data_i(30) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
    
    -- pix0 byte1
    DUAL0_BYTE_MOSI1.SOF  <= quad_data_i(59);
    DUAL0_BYTE_MOSI1.EOF  <= quad_data_i(60);
    DUAL0_BYTE_MOSI1.DVAL <= quad_dval_i;
-   DUAL0_BYTE_MOSI1.DATA <= quad_data_i(29) & quad_data_i(25) & quad_data_i(21) & quad_data_i(17)& quad_data_i(13) & quad_data_i(9) & quad_data_i(5) & quad_data_i(1);
+   DUAL0_BYTE_MOSI1.DATA <= quad_data_i(29) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
    
    -- pix0 byte0
    DUAL0_BYTE_MOSI0.SOF  <= quad_data_i(59);
    DUAL0_BYTE_MOSI0.EOF  <= quad_data_i(60);
    DUAL0_BYTE_MOSI0.DVAL <= quad_dval_i;
-   DUAL0_BYTE_MOSI0.DATA <= quad_data_i(28) & quad_data_i(24) & quad_data_i(20) & quad_data_i(16)& quad_data_i(12) & quad_data_i(8) & quad_data_i(4) & quad_data_i(0);
+   DUAL0_BYTE_MOSI0.DATA <= quad_data_i(28) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
    ---------------------------------------------------
    -- inputs maps
    ---------------------------------------------------
    fval_i <= QUAD_DATA(58);
-   lval_i <= QUAD_DATA(63); 
+   lval_i <= QUAD_DATA(63);  
    
+--   
+--   DIAG_DATA(61)           <= aoi_dval_i;           -- aoi_dval          
+--   DIAG_DATA(60)           <= aoi_eof_i;            -- eof
+--   DIAG_DATA(59)           <= aoi_sof_i;            -- sof
+--   DIAG_DATA(58)           <= aoi_fval_i;           -- fval
+--   DIAG_DATA(57)           <= aoi_eol_i;            -- eol
+--   DIAG_DATA(56)           <= aoi_sol_i;            -- sol
+--   
    
    U1: process(MCLK_SOURCE)
    begin
