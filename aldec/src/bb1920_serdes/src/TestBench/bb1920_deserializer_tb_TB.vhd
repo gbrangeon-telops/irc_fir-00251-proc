@@ -28,16 +28,18 @@ architecture TB_ARCHITECTURE of bb1920_deserializer_tb_tb is
    end component;
    
    
-   constant XSIZE            : integer := 128;
-   constant YSIZE            : integer := 4;  
+   constant XSIZE            : integer := 320;
+   constant YSIZE            : integer := 256;  
    
    constant CLK200_PERIOD    : time := 5 ns;
    constant DOUT_CLK_PERIOD  : time := 10 ns;
    constant DCLK_1X_PERIOD   : time := 14.288 ns;
    constant DCLK_8X_PERIOD   : time :=  1.786 ns;
-   constant ACQ_INT_PERIOD   : time :=  100 us;
+   constant ACQ_INT_PERIOD   : time :=  (XSIZE/4 + 10)*YSIZE * DCLK_1X_PERIOD;
       
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
+   signal ACQ_INTi      : STD_LOGIC := '0';
+   signal ACQ_INTii     : STD_LOGIC := '0';
    signal ACQ_INT       : STD_LOGIC := '0';
    signal ARESET        : STD_LOGIC;
    signal CLK200        : STD_LOGIC := '0';
@@ -62,10 +64,13 @@ begin
    end process;
    
    -- ACQ_INT
-   U01: process(ACQ_INT)
+   U01: process(ACQ_INTi)
    begin
-      ACQ_INT <= not ACQ_INT after ACQ_INT_PERIOD/2; 
+      ACQ_INTi <= not ACQ_INTi after ACQ_INT_PERIOD/2; 
    end process;
+   ACQ_INTii <= transport ACQ_INTi after 5000 ns;
+   
+   ACQ_INT <= ACQ_INTi and not ACQ_INTii;
    
    -- CLK200
    U1: process(CLK200)

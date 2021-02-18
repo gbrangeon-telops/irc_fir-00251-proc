@@ -69,25 +69,25 @@ begin
    DUAL1_BYTE_MOSI3.SOF  <= quad_data_i(59);
    DUAL1_BYTE_MOSI3.EOF  <= quad_data_i(60);
    DUAL1_BYTE_MOSI3.DVAL <= quad_dval_i;
-   DUAL1_BYTE_MOSI3.DATA <= quad_data_i(63) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
+   DUAL1_BYTE_MOSI3.DATA <= quad_data_i(31) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
    
    -- pix3 byte0                                                                                                                                                       
    DUAL1_BYTE_MOSI2.SOF  <= quad_data_i(59);                                                                                                                           
    DUAL1_BYTE_MOSI2.EOF  <= quad_data_i(60);                                                                                                                           
    DUAL1_BYTE_MOSI2.DVAL <= quad_dval_i;                                                                                                                               
-   DUAL1_BYTE_MOSI2.DATA <= quad_data_i(62) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
+   DUAL1_BYTE_MOSI2.DATA <= quad_data_i(30) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0);
    
    -- pix2 byte1                                                                                                                                                       
    DUAL1_BYTE_MOSI1.SOF  <= quad_data_i(59);                                                                                                                           
    DUAL1_BYTE_MOSI1.EOF  <= quad_data_i(60);                                                                                                                           
    DUAL1_BYTE_MOSI1.DVAL <= quad_dval_i;                                                                                                                               
-   DUAL1_BYTE_MOSI1.DATA <= quad_data_i(61) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0); 
+   DUAL1_BYTE_MOSI1.DATA <= quad_data_i(29) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0); 
    
    -- pix2 byte0                                                                                                                                                       
    DUAL1_BYTE_MOSI0.SOF  <= quad_data_i(59);                                                                                                                           
    DUAL1_BYTE_MOSI0.EOF  <= quad_data_i(60);                                                                                                                           
    DUAL1_BYTE_MOSI0.DVAL <= quad_dval_i;                                                                                                                               
-   DUAL1_BYTE_MOSI0.DATA <= quad_data_i(60) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0); 
+   DUAL1_BYTE_MOSI0.DATA <= quad_data_i(28) & quad_data_i(58) & quad_data_i(59) & quad_data_i(60) & quad_data_i(56)& quad_data_i(57) & quad_data_i(61) & quad_data_i(0); 
    
    -- pix1 byte1
    DUAL0_BYTE_MOSI3.SOF  <= quad_data_i(59);
@@ -154,10 +154,10 @@ begin
          quad_data_i(29) <= ctrl_bits(1);
          quad_data_i(28) <= ctrl_bits(0);      
          
-         quad_data_i(63) <= ctrl_bits(3);
-         quad_data_i(62) <= ctrl_bits(2);
-         quad_data_i(61) <= ctrl_bits(1);
-         quad_data_i(60) <= ctrl_bits(0);
+--         quad_data_i(63) <= ctrl_bits(3);
+--         quad_data_i(62) <= ctrl_bits(2);
+--         quad_data_i(61) <= ctrl_bits(1);
+--         quad_data_i(60) <= ctrl_bits(0);
          
       end if;
    end process;

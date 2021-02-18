@@ -16,7 +16,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.TEL2000.all;
-
+use work.proxy_define.all;
 
 
 entity scd_proxy2_dsync is
@@ -82,7 +82,7 @@ architecture rtl of scd_proxy2_dsync is
          );
    end component;
    
-   type fsm_type is (init_st1, init_st2, init_st3, idle, dly_st, first_line_st, last_line_st, read_end_st, fifo_empty_st);
+   type fsm_type is (init_st1, init_st2, init_st3, init_st4, idle, dly_st, first_line_st, last_line_st, read_end_st, fifo_empty_st);
    
    signal fsm                 : fsm_type;
    signal sreset              : std_logic;
@@ -214,17 +214,22 @@ begin
                -- on s'assure de ne pas avoir d'image tronquée et que les deux canaux sont synchronisés
                when init_st1 =>
                   fifo_areset  <= '0';  -- on ne fait pas de reset du fifo en même temps que les données s'ecrivent dedans.
-                  if ch0_fval_i = '1' and CH0_SUCCESS = '1' and ch1_fval_i = '1' and CH1_SUCCESS = '1' then 
+                  if CH0_SUCCESS = '1' and CH1_SUCCESS = '1' then 
                      fsm <= init_st2;
                   end if;
                
-               when init_st2 =>                  
-                  if ch0_fval_i = '0' and ch1_fval_i = '0' then                     
+               when init_st2 =>
+                  if ch0_fval_i = '1' and CH0_DUAL_DVAL = '1' and ch1_fval_i = '1' and CH1_DUAL_DVAL = '1' then
                      fsm <= init_st3;
+                  end if;
+               
+               when init_st3 =>                  
+                  if ch0_fval_i = '0' and CH0_DUAL_DVAL = '1' and ch1_fval_i = '0' and CH1_DUAL_DVAL = '1' then                     
+                     fsm <= init_st4;
                   end if;
                   
                -- on fait un reset des fifos
-               when init_st3 =>                   
+               when init_st4 =>                   
                   rst_cnt <= rst_cnt + 1;
                   if rst_cnt(2) = '1' then     -- 4 coups d'horloge de delai pour donner du temps à l'ecriture de s'achever
                      fifo_areset <= '1';
@@ -241,7 +246,7 @@ begin
                      fsm <= dly_st; 
                   end if;               
                   
-               --  on decale la lecture du fifo de 8 données
+               --  on decale la lecture du fifo de EOF_TO_FSYNC_DLY données au moins
                when dly_st =>
                   if ch0_dval_i = '1' then
                      dly_cnt <= dly_cnt + 1;
@@ -254,9 +259,9 @@ begin
                when first_line_st =>
                   active_read  <= '1';
                   active_sof <= '1';
-                  if ch0_lval_o = '1' and fifo_rd_en = '1' and ch0_future_cbits_o /= x"3" then
+                  if ch0_lval_o = '1' and fifo_rd_en = '1' and ch0_future_cbits_o /= CBITS_FRM_IDLE_ID then
                      active_sof <= '0';
-                     fsm <= last_line_st;
+                     fsm <= last_line_st;                              
                   end if;
                   
                -- on attend que fval tombe à l'entrée du fifo   
@@ -308,7 +313,7 @@ begin
          -- pix_fval
          if ch0_lval_o = '1' and active_sof = '1'  then   
             quad_dout_o(66)         <= '1';                                 
-         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= x"E" and active_eof = '1'  then
+         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= CBITS_PIXEL_ID and active_eof = '1'  then
             quad_dout_o(66)         <= '0';
          end if;
          

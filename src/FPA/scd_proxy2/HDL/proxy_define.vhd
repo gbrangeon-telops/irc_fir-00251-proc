@@ -42,6 +42,11 @@ package Proxy_define is
    -- commandes                                   
    constant SERIAL_BAUD_RATE                      : integer := 921_600; -- baud rate utilisé pour Scd (utilisé juste pour generateur de delai)
    
+   -- control Bits (voir la doc atlasdatasheet2.17ext)
+   constant CBITS_PIXEL_ID                        : std_logic_vector(3 downto 0) := x"E";
+   constant CBITS_FRM_IDLE_ID                     : std_logic_vector(3 downto 0) := x"3";
+   constant CBITS_FRM_STATUS_ID                   : std_logic_vector(3 downto 0) := x"8";
+   
    ----------------------------------------------
    -- calculs 
    ---------------------------------------------- 

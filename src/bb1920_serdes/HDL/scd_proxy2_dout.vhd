@@ -13,6 +13,8 @@
 
 library IEEE;
 use IEEE.std_logic_1164.all;
+library work;
+use work.proxy_define.all;
 
 entity scd_proxy2_dout is
    port(   
@@ -114,11 +116,11 @@ begin
                -- fval                                
                ---------------------------------------
                -- montée
-               if ctrl_words_last(jj) = x"3" and ctrl_words(jj) /= x"3" then
-                  fvals_i(jj) <= '1';
+               if ctrl_words_last(jj) = CBITS_FRM_IDLE_ID and ctrl_words(jj) /= CBITS_FRM_IDLE_ID then            
+                  fvals_i(jj) <= '1';                                                
                end if;               
                -- descente
-               if ctrl_words_last(jj) /= x"3" and ctrl_words(jj) = x"3" then
+               if ctrl_words_last(jj) /= CBITS_FRM_IDLE_ID and ctrl_words(jj) = CBITS_FRM_IDLE_ID then
                   fvals_i(jj) <= '0';
                end if;               
                
@@ -126,11 +128,11 @@ begin
                -- lval                                
                ---------------------------------------
                -- montée
-               if ctrl_words_last(jj) /= x"E" and ctrl_words(jj) = x"E" then
+               if ctrl_words_last(jj) /= CBITS_PIXEL_ID and ctrl_words(jj) = CBITS_PIXEL_ID then
                   lvals_i(jj) <= '1';
                end if;               
                -- descente
-               if ctrl_words_last(jj) = x"E" and ctrl_words(jj) /= x"E" then
+               if ctrl_words_last(jj) = CBITS_PIXEL_ID and ctrl_words(jj) /= CBITS_PIXEL_ID then
                   lvals_i(jj) <= '0';
                end if;               
                
