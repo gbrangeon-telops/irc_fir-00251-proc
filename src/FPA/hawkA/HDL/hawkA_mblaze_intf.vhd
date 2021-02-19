@@ -215,6 +215,10 @@ begin
             user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
             
+            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
+            user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            
             -- reste de la config
             if slv_reg_wren = '1' then  
                case axi_awaddr(11 downto 0) is             
@@ -272,7 +276,7 @@ begin
                   when X"0B8" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                   when X"0BC" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); 
                   when X"0C0" =>    user_cfg_i.cbit_pipe_dly                   <=  unsigned(data_i(user_cfg_i.cbit_pipe_dly'length-1 downto 0)); user_cfg_in_progress <= '0'; 
-                  
+                     
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  

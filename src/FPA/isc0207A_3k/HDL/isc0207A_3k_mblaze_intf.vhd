@@ -218,10 +218,14 @@ begin
             
             -- veritable calcul des delais : valide pour le mode MODE_INT_END_TO_TRIG_START uniquement
             user_cfg_i.comn.fpa_acq_trig_ctrl_dly    <=  to_unsigned(to_integer(user_cfg_i.readout_plus_delay) + tri_min, user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length);      -- delai entre la fin de l'integration et le debut du prochain trig
-                        
+            
             -- diag    
             user_cfg_i.diag.ysize_div4_m1      <=  resize(user_cfg_i.roic.ysize_div4_m1, user_cfg_i.diag.ysize_div4_m1'length); 
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
+            
+            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
+            user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
             
             -- reste de la config            
             if slv_reg_wren = '1' then  

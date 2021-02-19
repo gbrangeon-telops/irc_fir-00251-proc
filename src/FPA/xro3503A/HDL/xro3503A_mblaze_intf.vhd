@@ -196,6 +196,10 @@ begin
                user_cfg_i.int_signal_high_time <= int_signal_high_time_i;
             end if;
             
+            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
+            user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            
             -- reste de la config
             if slv_reg_wren = '1' then  
                case axi_awaddr(11 downto 0) is             

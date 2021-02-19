@@ -646,12 +646,16 @@ begin
             reset_err_i<= '0';
             fpa_softw_stat_i.fpa_input <= LVDS25; -- normaement c'est un mesureur de la tension de la banque du FPGA qui doit forunir cette info (sera fait dans sur une carte ADC). Mais pour la carte ACQ ce n'Est pas le cas.
             ctrled_reset_i <= '1';
-
+            
          else                   
             
             ctrled_reset_i <= '0';
             
             mb_cfg_serial_in_progress_last <= mb_cfg_serial_in_progress;
+            
+            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
+            mb_struct_cfg.comn.fpa_acq_trig_mode  <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
+            mb_struct_cfg.comn.fpa_xtra_trig_mode <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
             
             if slv_reg_wren = '1' then 				
                
@@ -728,10 +732,10 @@ begin
                            
                         -- pour effacer erreurs latchées
                         when X"EC" =>    reset_err_i <= data_i(0); 
-                        
-                         -- pour un reset complet du module FPA
+                           
+                        -- pour un reset complet du module FPA
                         when X"F0" =>   ctrled_reset_i <= data_i(0); fpa_softw_stat_i.dval <='0'; -- ENO: 10 juin 2015: ce reset permet de mettre la sortie vers le DDC en 'Z' lorsqu'on etient la carte DDC et permet de faire un reset lorsqu'on allume la carte DDC
-
+                           
                         
                         when others => --do nothing
                         

@@ -208,6 +208,10 @@ begin
                mb_cfg_in_progress <= '1';  -- des qu'une commande serielle est en cours,  mb_cfg_in_progress est à '1' et tombe à '0' lorsque l'envoi de la structurale est terminée
             end if;
             
+            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
+            mb_struct_cfg.comn.fpa_acq_trig_mode  <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
+            mb_struct_cfg.comn.fpa_xtra_trig_mode <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
+            
             -- MB: config structurelle
             if slv_reg_wren = '1' then
                
