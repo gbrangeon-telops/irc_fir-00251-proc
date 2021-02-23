@@ -68,3 +68,7 @@ build_proc_sw suphawkA 160
 create_proc_sw xro3503A
 build_proc_sw xro3503A 325
 #build_proc_sw xro3503A 160
+
+#create_proc_sw blackbird1920D
+#build_proc_sw blackbird1920D 325
+#build_proc_sw blackbird1920D 160
