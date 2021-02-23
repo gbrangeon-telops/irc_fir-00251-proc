@@ -497,8 +497,13 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+   // Période d'horloge selon la variante de modèle
+   if (flashSettings.AcquisitionFrameRateMaxDivider >= 2.0F)
+      ptrH->mclk_period_usec     = 2.0F * 1e6F/(float)FPA_MCLK_RATE_HZ;
+   else
+      ptrH->mclk_period_usec     = 1e6F/(float)FPA_MCLK_RATE_HZ;
+
    // parametres statiques
-   ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_reset_time_mclk     = 3076.0F;
@@ -528,7 +533,7 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
       ptrH->frame_period_usec = ptrH->int_signal_high_time_usec + ptrH->vhd_delay_usec + ptrH->fpa_itr_delay_usec + ptrH->readout_usec;
    else  
    // mode IWR
-      ptrH->frame_period_usec = MAX(ptrH->int_signal_high_time_usec, (ptrH->fpa_reset_time_usec + ptrH->fpa_iwr_delay_usec + ptrH->readout_usec)) + ptrH->vhd_delay_usec;
+      ptrH->frame_period_usec = MAX(ptrH->int_signal_high_time_usec, ptrH->fpa_reset_time_usec + ptrH->fpa_iwr_delay_usec + ptrH->readout_usec) + ptrH->vhd_delay_usec;
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
