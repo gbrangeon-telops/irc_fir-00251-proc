@@ -22,12 +22,13 @@ set_property "target_language" "VHDL" $obj
 # Add FPA Files
 add_files [concat \
    [glob -nocomplain $FPA_path/HDL/*.vhd] \
-   [glob -nocomplain $root_dir/src/FPA/scd_proxy/HDL/*.vhd] \
+   [glob -nocomplain $root_dir/src/FPA/scd_proxy2/HDL/*.vhd] \
+   [glob -nocomplain $root_dir/src/bb1920_serdes/HDL/*.vhd] \
    [glob -nocomplain $common251_dir/iserdes/clink/*.vhd] \
    [glob -nocomplain $common251_dir/iserdes/*.vhd] \
 ]
 
-# Add Specific IP file
+# Add Specific IP file 
 
 # Add Fir-00251-Proc project file
 source $script_dir/Base_project.tcl

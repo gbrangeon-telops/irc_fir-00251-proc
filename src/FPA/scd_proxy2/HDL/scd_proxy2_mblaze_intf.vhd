@@ -569,28 +569,28 @@ begin
             case MB_MOSI.ARADDR(7 downto 0) is 
                -- feedback de la config envoyée au MB pour validation visuelle via debug_terminal
                
-               when X"00" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_mode                        , 32));           
+               when X"00" =>  axi_rdata <= resize('0' & user_cfg_i.comn.fpa_diag_mode                                         , 32);           
                when X"04" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_type                        , 32));
-               when X"08" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_pwr_on                           , 32));
+               when X"08" =>  axi_rdata <=  resize('0' & user_cfg_i.comn.fpa_pwr_on                                           , 32);
                when X"0C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_mode                   , 32));
                when X"10" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_ctrl_dly                , 32));
                when X"14" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_spare                            , 32));
                when X"18" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_ctrl_dly               , 32));
                when X"1C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_timeout_dly            , 32));
-               when X"20" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig                 , 32));
+               when X"20" =>  axi_rdata <=  resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig                                 , 32);
                when X"24" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.clk100_to_intclk_conv_numerator      , 32));
                when X"28" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.intclk_to_clk100_conv_numerator      , 32));
                when X"2C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.ysize                                , 32));
                when X"30" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.xsize_div_tapnum                     , 32));
                when X"34" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.lovh_mclk_source                     , 32));
                when X"38" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly                , 32));
-               when X"3C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.itr                                       , 32));
+               when X"3C" =>  axi_rdata <=  resize('0' & user_cfg_i.itr                                                       , 32);
                when X"40" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.sol_pos                          , 32));
                when X"44" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.eol_pos                          , 32));
                when X"48" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.sol_pos                         , 32));
                when X"4C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.eol_pos                         , 32));
                when X"50" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.sol_pos                         , 32));
-               when X"54" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.eol_pos                          , 32));
+               when X"54" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag2.eol_pos                         , 32));
                when X"58" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xstart                                 , 32));
                when X"5C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.ystart                                 , 32));
                when X"60" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.op.xsize                                  , 32));
