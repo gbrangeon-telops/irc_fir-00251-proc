@@ -180,9 +180,9 @@ struct s_FpaPrivateStatus
    uint32_t fpa_diag_mode                             ;  
    uint32_t fpa_diag_type                             ;  
    uint32_t fpa_pwr_on                                ;  
-   uint32_t fpa_trig_ctrl_mode                        ;
+   uint32_t fpa_acq_trig_mode                         ;
    uint32_t fpa_acq_trig_ctrl_dly                     ;
-   uint32_t fpa_spare                                 ;
+   uint32_t fpa_xtra_trig_mode                        ;
    uint32_t fpa_xtra_trig_ctrl_dly                    ;
    uint32_t fpa_trig_ctrl_timeout_dly                 ;
    uint32_t fpa_stretch_acq_trig                      ;
@@ -353,17 +353,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // allumage du détecteur 
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
-   // config du contrôleur de trigs (il est sur l'horloge de 100MHz)
+   // config du contrôleur pour les acq trigs (il est sur l'horloge de 100MHz)
    if ((pGCRegs->IntegrationMode == IM_IntegrateThenRead) || (ptrA->fpa_diag_mode == 1)) {
-      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;        // mode MODE_ITR_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration et aussi s'assurer que le readout est terminé
+      ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;        // mode MODE_ITR_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration et aussi s'assurer que le readout est terminé
       ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); 
    }
    else {
-      ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ALL_END_TO_TRIG_START;            // 
+      ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ALL_END_TO_TRIG_START;            // 
       ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    }
-
-   ptrA->fpa_spare                 = 0;                                               //
+   
+   // config du contrôleur pour les xtra trigs (il est sur l'horloge de 100MHz)
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;                                               //
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
   
@@ -943,9 +944,9 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->fpa_diag_mode                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
    PrivateStat->fpa_diag_type                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x04);
    PrivateStat->fpa_pwr_on                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x08);
-   PrivateStat->fpa_trig_ctrl_mode                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x0C);
+   PrivateStat->fpa_acq_trig_mode                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x0C);
    PrivateStat->fpa_acq_trig_ctrl_dly                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x10);
-   PrivateStat->fpa_spare                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x14);
+   PrivateStat->fpa_xtra_trig_mode                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x14);
    PrivateStat->fpa_xtra_trig_ctrl_dly                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x18);
    PrivateStat->fpa_trig_ctrl_timeout_dly                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x1C);
    PrivateStat->fpa_stretch_acq_trig                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x20);

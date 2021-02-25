@@ -207,11 +207,7 @@ begin
             if mb_ser_cfg_dval = '1' then 
                mb_cfg_in_progress <= '1';  -- des qu'une commande serielle est en cours,  mb_cfg_in_progress est à '1' et tombe à '0' lorsque l'envoi de la structurale est terminée
             end if;
-            
-            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
-            mb_struct_cfg.comn.fpa_acq_trig_mode  <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
-            mb_struct_cfg.comn.fpa_xtra_trig_mode <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
-            
+                        
             -- MB: config structurelle
             if slv_reg_wren = '1' then
                
@@ -221,9 +217,9 @@ begin
                   when X"000" =>    mb_struct_cfg.comn.fpa_diag_mode                    <= data_i(0); mb_cfg_in_progress <= '1';                       
                   when X"004" =>    mb_struct_cfg.comn.fpa_diag_type                    <= data_i(mb_struct_cfg.comn.fpa_diag_type'length-1 downto 0); 
                   when X"008" =>    mb_struct_cfg.comn.fpa_pwr_on                       <= data_i(0);
-                  when X"00C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_mode               <= data_i(mb_struct_cfg.comn.fpa_trig_ctrl_mode'length-1 downto 0);
+                  when X"00C" =>    mb_struct_cfg.comn.fpa_acq_trig_mode                <= data_i(mb_struct_cfg.comn.fpa_acq_trig_mode'length-1 downto 0);
                   when X"010" =>    mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly            <= unsigned(data_i(mb_struct_cfg.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0)); 
-                  when X"014" =>    mb_struct_cfg.comn.fpa_spare                        <= unsigned(data_i(mb_struct_cfg.comn.fpa_spare'length-1 downto 0));                                    
+                  when X"014" =>    mb_struct_cfg.comn.fpa_xtra_trig_mode               <= data_i(mb_struct_cfg.comn.fpa_xtra_trig_mode'length-1 downto 0);                                    
                   when X"018" =>    mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly           <= unsigned(data_i(mb_struct_cfg.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));                                    
                   when X"01C" =>    mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly        <= unsigned(data_i(mb_struct_cfg.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));                                      
                   when X"020" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig             <= data_i(0);
@@ -572,9 +568,9 @@ begin
                when X"00" =>  axi_rdata <= resize('0' & user_cfg_i.comn.fpa_diag_mode                                         , 32);           
                when X"04" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_type                        , 32));
                when X"08" =>  axi_rdata <=  resize('0' & user_cfg_i.comn.fpa_pwr_on                                           , 32);
-               when X"0C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_mode                   , 32));
+               when X"0C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_mode                    , 32));
                when X"10" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_ctrl_dly                , 32));
-               when X"14" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_spare                            , 32));
+               when X"14" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_mode                   , 32));
                when X"18" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_ctrl_dly               , 32));
                when X"1C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_timeout_dly            , 32));
                when X"20" =>  axi_rdata <=  resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig                                 , 32);

@@ -105,9 +105,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_diag_mode                     ;                                      
    uint32_t  fpa_diag_type                     ;                                      
    uint32_t  fpa_pwr_on                        ;                                      
-   uint32_t  fpa_trig_ctrl_mode                ;                                      
+   uint32_t  fpa_acq_trig_mode                 ;                                      
    uint32_t  fpa_acq_trig_ctrl_dly             ;                                      
-   uint32_t  fpa_spare                         ;                                      
+   uint32_t  fpa_xtra_trig_mode                ;                                      
    uint32_t  fpa_xtra_trig_ctrl_dly            ;                                      
    uint32_t  fpa_trig_ctrl_timeout_dly         ;                                      
    uint32_t  fpa_stretch_acq_trig              ;                                      
