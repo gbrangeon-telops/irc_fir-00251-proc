@@ -26,6 +26,9 @@ entity xro3503A_digio_map is
       FPA_INT       : in std_logic;
       FPA_MCLK      : in std_logic;
       
+      READOUT       : in std_logic;
+      FPA_INTF_CFG  : in fpa_intf_cfg_type;
+      
       ROIC_RESETN   : in std_logic;
       
       PROG_CSN      : in std_logic;
@@ -69,7 +72,7 @@ architecture rtl of xro3503A_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
-   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, fpa_pwred_st, passthru_st); 
+   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, fpa_pwred_st, passthru_st, fpa_cst_output_st, fpa_pwr_override_st); 
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
@@ -107,6 +110,8 @@ architecture rtl of xro3503A_digio_map is
    
    signal prog_mclk_i      : std_logic;
    signal prog_mclk_pipe   : std_logic_vector(7 downto 0);
+   
+   signal fpa_pwr_override : std_logic;
    
    attribute IOB : string;
    attribute IOB of fpa_on_iob      : signal is "TRUE";
@@ -159,7 +164,7 @@ begin
    U1: process(MCLK_SOURCE)
    begin
       if rising_edge(MCLK_SOURCE) then
-         fpa_on_i <= not ARESET and FPA_PWR;
+         fpa_on_i <= not ARESET and FPA_PWR and not fpa_pwr_override;
          fsm_sreset <= sreset or not FPA_PWR; 
       end if;   
    end process; 
@@ -204,10 +209,11 @@ begin
             roic_resetn_i <= '0';   -- reset activated for power-up
             prog_sclk_i <= '0';
             prog_data_i <= '0';
-            prog_csn_i <= '1';
+            prog_csn_i <= '0';   -- do not set to '1' until the FPA is powered
             lsync_i <= '0';
             fsync_i <= '0';
             mclk_i <= '0';
+            fpa_pwr_override <= '0';   -- do not override FPA_PWR by default 
             
          else
             
@@ -255,6 +261,7 @@ begin
                when fpa_pwred_st =>
                   fpa_powered_i <= '1';         -- permet au driver de placer une requete de programmation
                   roic_resetn_i <= '1';         -- on sort le roic du reset
+                  prog_csn_i <= '1';            -- inactif par defaut
                   fpa_digio_fsm <= wait_trig_stop_st;                
                   
                -- attendre que le programmateur du FPA soit activée => trig arrêté
@@ -272,6 +279,31 @@ begin
                   lsync_i <= FPA_LSYNC;
                   fsync_i <= FPA_INT;
                   mclk_i <= mclk_pipe(mclk_pipe'high);
+                  if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
+                     fpa_digio_fsm <= fpa_cst_output_st;
+                  end if;
+                  if READOUT = '0' and FPA_INTF_CFG.FPA_PWR_OVERRIDE_MODE = '1' and PROG_CSN = '1' then 
+                     fpa_digio_fsm <= fpa_pwr_override_st;
+                  end if;
+               
+               when fpa_cst_output_st => -- la sortie du detecteur reste à la valeur nulle
+                  -- on laisse passer seulement MCLK. Les autres signaux restent a leur derniere valeur
+                  mclk_i <= mclk_pipe(mclk_pipe'high);
+                  if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
+                     fpa_digio_fsm <= passthru_st;
+                  end if;
+               
+               when fpa_pwr_override_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
+                  -- Override FPA_PWR signal
+                  fpa_pwr_override <= '1';
+                  -- all io to '0' when FPA is off
+                  roic_resetn_i <= '0';
+                  prog_sclk_i <= '0';
+                  prog_data_i <= '0';
+                  prog_csn_i <= '0';
+                  lsync_i <= '0';
+                  fsync_i <= '0';
+                  mclk_i <= '0';
                
                when others =>
                

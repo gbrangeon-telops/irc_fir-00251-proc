@@ -152,6 +152,9 @@ void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {   
+   extern int32_t gFpaDebugRegH;
+
+   gFpaDebugRegH = 0;      //Make sure this debug is reset to power on FPA
    // sw_init_done = 0;                                                     // ENO: 11-sept 2019: ligne en commentaire pour que plusieurs appels de FPA_init ne créent des bugs de flashsettings.
    FPA_Reset(ptrA);
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
@@ -209,14 +212,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    //extern float gFpaDetectorElectricalRefOffset;
    //static float presentElectricalRefOffset = 0;        // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   //extern int32_t gFpaDebugRegA;                       // reservé ELCORR pour correction électronique (gain et/ou offset)
+   extern int32_t gFpaDebugRegA;                       // reservé ELCORR pour correction électronique (gain et/ou offset)
    //extern int32_t gFpaDebugRegB;                       // reservé
    extern int32_t gFpaDebugRegC;                       // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
    extern int32_t gFpaDebugRegD;                       // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                       // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                       // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    //extern int32_t gFpaDebugRegG;                       // non utilisé
-   //extern int32_t gFpaDebugRegH;                       // non utilisé
+   extern int32_t gFpaDebugRegH;                       // non utilisé
    extern uint8_t gFpaDiodeBiasEnum;
    extern uint16_t gFpaDetectSub_mV;
    extern uint16_t gFpaCtiaRef_mV;
@@ -338,6 +341,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->width    = pGCRegs->Width;
    ptrA->height   = pGCRegs->Height;
    
+   // digio
+   ptrA->roic_cst_output_mode = 0;
+   ptrA->fpa_pwr_override_mode = 0;
+   if (gFpaDebugRegA != 0)
+      ptrA->roic_cst_output_mode = 1;
+   if (gFpaDebugRegH != 0)
+      ptrA->fpa_pwr_override_mode = 1;
+
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    if (cfg_num == 255)  // protection contre depassement
       cfg_num = 0;   

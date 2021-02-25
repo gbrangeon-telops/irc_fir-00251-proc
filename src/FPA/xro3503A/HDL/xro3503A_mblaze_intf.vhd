@@ -265,8 +265,12 @@ begin
                   when X"0AC" =>    user_cfg_i.width                           <= unsigned(data_i(user_cfg_i.width'length-1 downto 0));
                   when X"0B0" =>    user_cfg_i.height                          <= unsigned(data_i(user_cfg_i.height'length-1 downto 0));
                      
+                  -- digio
+                  when X"0B4" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);
+                  when X"0B8" =>    user_cfg_i.fpa_pwr_override_mode           <= data_i(0);
+                     
                   -- new config
-                  when X"0B4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                  when X"0BC" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

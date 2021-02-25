@@ -282,6 +282,12 @@ package FPA_define is
       width                          : unsigned(9 downto 0);
       height                         : unsigned(9 downto 0);
       
+      -- maintien de la sortie du roic à valeur constante 
+      roic_cst_output_mode           : std_logic;
+      
+      -- maintien FPA_ON à '0'. Le reste du firmware agit comme si le FPA est allumé 
+      fpa_pwr_override_mode          : std_logic;
+      
       cfg_num                        : unsigned(7 downto 0); 
       
    end record;
