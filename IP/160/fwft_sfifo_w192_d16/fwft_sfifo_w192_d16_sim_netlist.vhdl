@@ -1,7 +1,7 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Tue Feb 23 09:15:00 2021
+-- Date        : Fri Feb 26 10:50:55 2021
 -- Host        : TELOPS258-7 running 64-bit Service Pack 1  (build 7601)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/fwft_sfifo_w192_d16/fwft_sfifo_w192_d16_sim_netlist.vhdl
