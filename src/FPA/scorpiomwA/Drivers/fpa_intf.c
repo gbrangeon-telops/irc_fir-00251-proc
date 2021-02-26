@@ -123,6 +123,8 @@
 
 #define TOTAL_DAC_NUM                     8
 
+#define MODEL_M100_FR_DIVIDER             1.65F          // Requis du PLM: FRmax M100 >= 125 Hz en pleine fenêtre
+
 struct s_ProximCfgConfig 
 {   
    uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
@@ -498,10 +500,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // Période d'horloge selon la variante de modèle
-   if (flashSettings.AcquisitionFrameRateMaxDivider >= 2.0F)
-      ptrH->mclk_period_usec     = 2.0F * 1e6F/(float)FPA_MCLK_RATE_HZ;
+   if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)             // 2021-02-26 ELA: modèle SPARK M100 dès que le diviseur > 1.0
+      ptrH->mclk_period_usec     = MODEL_M100_FR_DIVIDER * 1e6F/(float)FPA_MCLK_RATE_HZ; // FR diminué
    else
-      ptrH->mclk_period_usec     = 1e6F/(float)FPA_MCLK_RATE_HZ;
+      ptrH->mclk_period_usec     = 1e6F/(float)FPA_MCLK_RATE_HZ;        // modèle M200
 
    // parametres statiques
    ptrH->tap_number              = (float)FPA_NUMTAPS;
