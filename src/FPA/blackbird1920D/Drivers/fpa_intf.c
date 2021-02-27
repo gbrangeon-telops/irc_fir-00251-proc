@@ -137,14 +137,15 @@ struct bb1920D_param_s
    float Line_Readout                        ;
    float Frame_Read                          ;
    float number_of_Ref_Rows                  ;
-   float number_of_pixel_per_clk             ;
+   float number_of_pixel_per_clk_per_output             ;
    float pixel_control_time                  ;
    float Line_Conversion                     ;
    float int_time_offset_usec                ;
    float mode_int_end_to_trig_start_dly_usec ;
    float Frame_Initialization                ;
-   float Frame_Time                          ;
+   float Frame_Time_us                       ;
    float fpa_intg_clk_rate_hz                ;
+   float periodMinWithNullExposure_us        ;
 
 
 };
@@ -576,7 +577,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 
 
    FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
-   period = hh.Frame_Time;
+   period = hh.Frame_Time_us;
 
    MaxFrameRate = 1.0F / period;
 
@@ -603,7 +604,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
-   periodMinWithNullExposure = hh.Frame_Time;
+   periodMinWithNullExposure = hh.Frame_Time_us;
    operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
@@ -728,25 +729,36 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
   
    ptrH->Frame_read_Init_3     = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
 
-   ptrH->number_of_Columns     = (float) FPA_WIDTH_MAX;
-  
+   ptrH->number_of_Columns       = (float)FPA_WIDTH_MAX;
+   ptrH->number_of_Rows          = (float)pGCRegs->Height;
+   ptrH->number_of_Ref_Rows      = 0.0F;
+   
+   ptrH->number_of_pixel_per_clk_per_output = PrivateStat->fpa_pix_num_per_pclk/2;
   
    //if (ptrA->op_binning == 0)
       ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;
    //else
    //   ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 8.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 4.0F;
         
-   ptrH->Line_Readout = (2.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk / ptrH->Fclock_MHz;
+   ptrH->Line_Readout = (2.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk_per_output / ptrH->Fclock_MHz;
                
    ptrH->Line_Conversion =  (ptrH->Pch1 + ptrH->Pch2 + ptrH->Ramp1_Start + ptrH->Ramp1_Count + ptrH->No_Ramp + ptrH->ramp2_Start + ptrH->ramp2_Count) / ptrH->Fclock_MHz;
    ptrH->Frame_Read      =  ptrH->number_of_conversions *  MAX(ptrH->Line_Readout, ptrH->Line_Conversion);
 
   
-   ptrH->Frame_Initialization = ptrH->Frame_read_Init_1 + ptrH->Frame_read_Init_2 + ptrH->Frame_read_Init_3;
-   ptrH->pixel_control_time   = 2* ptrH->Pixel_Reset + ptrH->Pixel_Sample + 10;
-   ptrH->Frame_Time           = ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read;
-  
-   ptrH->mode_int_end_to_trig_start_dly_usec =  ptrH->Frame_Time; // à reviser plus tard
+   ptrH->Frame_Initialization  = ptrH->Frame_read_Init_1 + ptrH->Frame_read_Init_2 + ptrH->Frame_read_Init_3;
+   ptrH->pixel_control_time    = 2* ptrH->Pixel_Reset + ptrH->Pixel_Sample + 10.0F;
+   ptrH->Frame_Time_us = ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read; // en us
+   
+   ptrH->periodMinWithNullExposure_us = ptrH->Frame_Time_us;
+   
+   // ilfaut reviser ce qui suit en se basant sur 2.3.2 dela doc
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
+      ptrH->Frame_Time_us = ptrH->periodMinWithNullExposure_us + exposureTime_usec;
+   else
+      ptrH->Frame_Time_us = MAX(ptrH->periodMinWithNullExposure_us,  exposureTime_usec);
+   
+   ptrH->mode_int_end_to_trig_start_dly_usec =  ptrH->periodMinWithNullExposure_us; // à reviser plus tard
 
 }
 
