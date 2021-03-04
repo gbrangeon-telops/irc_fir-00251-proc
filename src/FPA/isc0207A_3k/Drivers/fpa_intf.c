@@ -171,7 +171,11 @@
 #define ELCORR_MODE_ROIC_OUTPUT_CST_IMG            6
 #define ELCORR_MODE_OFFSET_AND_GAIN_CORR           7
 #define ELCORR_MODE_FREE_WHEELING_CORR             9
-#define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19
+#define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19 
+
+// mandatory columns
+#define ISC0207_WINDOW_MANDATORY_COLUMN_POS1       128
+#define ISC0207_WINDOW_MANDATORY_COLUMN_POS2       191
 
 struct s_ProximCfgConfig 
 {   
@@ -195,12 +199,21 @@ struct isc0207_param_s             //
    float tsh_min_usec;
    float trst_min_usec;
    float itr_tri_min_usec;
-   float int_time_offset_usec;
+   float int_time_offset_usec;     
    
-   float roic_xsize; 
-   float roic_ysize; 
+   // fenetre demandée par l'usager
+   float user_xstart;        // colonne de depart de la fenetre usager (premiere position = 0)
+   float user_xend;          // colonne de fin de la fenetre usager
+   float user_ystart;
+   float user_yend;   
+   
+   // fenetre qui sera demandée au détecteur
    float roic_xstart;
+   float roic_xsize;
+   float roic_xend;
    float roic_ystart;
+   float roic_ysize;   
+   float roic_yend;
    
    float readout_mclk;
    float readout_usec;
@@ -435,7 +448,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // user area
    ptrA->user_area_line_start_num      = ptrA->raw_area_line_start_num; 
    ptrA->user_area_line_end_num        = (uint32_t)pGCRegs->Height + ptrA->user_area_line_start_num - 1;     
-   ptrA->user_area_sol_posl_pclk       = (((uint32_t)hh.roic_xsize - (uint32_t)pGCRegs->Width)/2)/FPA_NUMTAPS + 1;
+   ptrA->user_area_sol_posl_pclk       = (uint32_t)(hh.user_xstart - hh.roic_xstart)/FPA_NUMTAPS + 1;
    ptrA->user_area_eol_posl_pclk       = ptrA->user_area_sol_posl_pclk + ((uint32_t)pGCRegs->Width/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk - 1;         
    ptrA->user_area_eol_posl_pclk_p1    = ptrA->user_area_eol_posl_pclk + 1;
    
@@ -689,9 +702,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    ptrA->cfg_num  = (uint32_t)cfg_num;
    
-   if ((((float)hh.roic_xsize - (float)pGCRegs->Width)/2 >= (float)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
-      ||((elcorr_gain_corr_enabled == 1) && (ptrA->roic_cst_output_mode == 1)))
-      ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
+   //   if ((((float)hh.roic_xsize - (float)pGCRegs->Width)/2 >= (float)ELCORR_CONT_MODE_OFFSETX_MIN)  // en fenetrage centré (à réviser si decentrage), on s'assure que le AOI commence au min à ELCORR_CONT_MODE_OFFSETX_MIN pour ne pas souffrir des 64 premieres colonnes bads provenanant du changement de reference
+   //      ||((elcorr_gain_corr_enabled == 1) && (ptrA->roic_cst_output_mode == 1)))
+   //      ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode = 1;
    
    // desactivation en mode patron de tests
    if (ptrA->fpa_diag_mode == 1){
@@ -798,25 +811,61 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
       ptrH->line_stretch_mclk  = 0.0;
       speedup_unused_area = 0;
    }
+     
+   // fenetre demandée par l'usager
+   ptrH->user_xstart  = (float)pGCRegs->OffsetX;                             // colonne de depart de la fenetre usager (premiere position = 0)
+   ptrH->user_xend    =  ptrH->user_xstart + (float)pGCRegs->Width - 1.0F;   // colonne de fin de la fenetre usager. (-1 à cause de l'origine à 0)
+   ptrH->user_ystart  = (float)pGCRegs->OffsetY;  
+   ptrH->user_yend    =  ptrH->user_ystart + (float)pGCRegs->Height - 1.0F;  // ligne de fin de la fenetre usager. (-1 à cause de l'origine à 0) 
    
-   // fast windowing
-   ptrH->unused_area_clock_factor =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
+   // fenetre qui sera demandée au ROIC du FPA par defaut
+   ptrH->roic_xstart  = ptrH->user_xstart;          // au prime abord, la fenetre à demander au detecteur = celle de l'usager
+   ptrH->roic_xend    = ptrH->user_xend;
    
-   // fenetre qui sera demandée au ROIC du FPA
-   ptrH->roic_xsize     = MIN((float)pGCRegs->Width + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX);
-   if ((pGCRegs->DetectorMode == DM_Burst) || (itr_mode_enabled == 0))
-      ptrH->roic_xsize     = (float)pGCRegs->Width; 
+   // on valide que la premiere colonne de la fenetre demandée au ROIC précède la colonne ISC0207_WINDOW_MANDATORY_COLUMN_POS1
+   while(ptrH->roic_xstart > (float)ISC0207_WINDOW_MANDATORY_COLUMN_POS1){
+      ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;  
+   }
+   
+   // on valide que la derniere colonne de la fenetre demandée au ROIC vient après la colonne ISC0207_WINDOW_MANDATORY_COLUMN_POS2
+   while(ptrH->roic_xend < (float)ISC0207_WINDOW_MANDATORY_COLUMN_POS2){
+      ptrH->roic_xend = ptrH->roic_xend + (float)FPA_OFFSETX_MULT;  
+   }
+     
+   // on valide que la taille en X demandée au roic est multiple de FPA_WIDTH_INC sinon on reajuste
+   ptrH->roic_xsize = ptrH->roic_xend - ptrH->roic_xstart + 1.0F; 
+   if ((uint32_t)ptrH->roic_xsize % (uint32_t)FPA_WIDTH_INC != 0){
+      if (ptrH->roic_xend + (float)FPA_OFFSETX_MULT <= (float)FPA_WIDTH_MAX) 
+          ptrH->roic_xend = ptrH->roic_xend + (float)FPA_OFFSETX_MULT;      // de préférence, on prend plus large à droite 
+      else
+          ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;  // sinon on prend plus large à gauche
+   }  
+   
+   // taille requise lorsque fast windowing requise
+   if ((pGCRegs->DetectorMode != DM_Burst) && (itr_mode_enabled == 1)){    // fast windowing demandé
+      if (ptrH->roic_xend - ptrH->user_xend < (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number)
+       ptrH->roic_xend     = MIN(ptrH->roic_xend + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX-1);
+   }
+   
+   // la taille finalement demandée au detecteur
+   ptrH->roic_xsize = ptrH->roic_xend - ptrH->roic_xstart + 1.0F;
    ptrH->roic_ysize     = (float)pGCRegs->Height;
-   ptrH->roic_xstart    = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage
-   ptrH->roic_ystart    = ((float)FPA_HEIGHT_MAX - ptrH->roic_ysize)/2.0F;         // à cause du centrage
+   
+   // dès que la taille le permet, on fait du fast windowing même si cela n'est pas demandé expressement par l'usager
+   if (ptrH->roic_xend - ptrH->user_xend >= (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number){
+      ptrH->line_stretch_mclk   = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
+      speedup_unused_area = 1;
+   }
+    
+   // en dernier lieu, on reise le facteur du fast windowing
+   ptrH->unused_area_clock_factor =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
       
-   // readout time
    //readout part1 (zone en slow_clock)
-   ptrH->readout_mclk         = ((float)pGCRegs->Width /(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
+   ptrH->readout_mclk         = ((ptrH->user_xend - ptrH->roic_xstart)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
    
    //readout part2 (zone à rejeter en fast clock)
-   ptrH->readout_mclk         = ptrH->readout_mclk + (1.0F/ptrH->unused_area_clock_factor)*((ptrH->roic_xsize - (float)pGCRegs->Width)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
-
+   ptrH->readout_mclk         = ptrH->readout_mclk + (1.0F/ptrH->unused_area_clock_factor)*((ptrH->roic_xend - ptrH->user_xend)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) -  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
+   
    //readout part5 (coût du synchronisateur)
    ptrH->readout_mclk         = ptrH->readout_mclk + ptrH->adc_sync_dly_mclk*(float)pGCRegs->Height;
    ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;

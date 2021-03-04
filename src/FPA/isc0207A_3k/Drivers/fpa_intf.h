@@ -38,7 +38,7 @@
 #define FPA_OFFSETY_MULT   2
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
-#define FPA_FORCE_CENTER   1
+#define FPA_FORCE_CENTER   0
 #define FPA_FLIP_LR        0
 #define FPA_FLIP_UD        0
 
