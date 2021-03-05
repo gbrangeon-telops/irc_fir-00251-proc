@@ -25,7 +25,7 @@ entity isc0207A_3k_readout_kernel is
       FPA_INT         : in std_logic;
       START_GEN       : out std_logic;
       ACQ_INT         : in std_logic;  -- requis pour determiner ACQ_FRINGE
-
+      
       
       FPA_INTF_CFG    : in fpa_intf_cfg_type; 
       
@@ -80,23 +80,7 @@ architecture rtl of isc0207A_3k_readout_kernel is
          SRESET : out std_logic;
          CLK : in std_logic);
    end component;
-   
-   component fwft_sfifo_w3_d256
-      port (
-         clk         : in std_logic;
-         srst        : in std_logic;
-         din         : in std_logic_vector(2 downto 0);
-         wr_en       : in std_logic;
-         rd_en       : in std_logic;
-         dout        : out std_logic_vector(2 downto 0);
-         full        : out std_logic;
-         almost_full : out std_logic;
-         overflow    : out std_logic;
-         empty       : out std_logic;
-         valid       : out std_logic
-         );
-   end component;
-   
+      
    type ctrl_fsm_type is (idle, wait_int_fe_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
    type adc_time_stamp_type is
    record
@@ -156,7 +140,8 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal elcorr_ref_end_i      : std_logic;
    signal elcorr_ref_start_i    : std_logic;
    signal quad_clk_fe_pipe      : std_logic_vector(15 downto 0) := (others => '0');
-   --signal active_window_last  : std_logic;
+   signal acq_int_i             : std_logic;
+   signal acq_int_last          : std_logic;
    signal elcorr_ref_fval_i     : std_logic;
    signal rst_cnt_i             : unsigned(4 downto 0);
    signal rst_wdow_gen_i        : std_logic;
@@ -165,14 +150,9 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal read_end_last         : std_logic;
    signal read_start_last       : std_logic;
    signal adc_time_stamp        : adc_time_stamp_type;
-   signal int_fifo_rd           : std_logic;
-   signal int_fifo_din          : std_logic_vector(2 downto 0);
-   signal int_fifo_wr           : std_logic;
-   signal int_fifo_dval         : std_logic;
-   signal int_fifo_dout         : std_logic_vector(2 downto 0);
    signal img_in_progress_i     : std_logic;
    signal acq_data_o            : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
-   
+   signal xtra_int_fe           : std_logic;
    
    
 begin
@@ -231,24 +211,6 @@ begin
    fast_pclk_eof <= FAST_CLK_DATA(1); 
    fast_pclk     <= FAST_CLK_DATA(0);
    
-   --------------------------------------------------
-   -- fifo fwft pour edges du signal d'intégration
-   --------------------------------------------------   
-   U3A : fwft_sfifo_w3_d256
-   port map (
-      clk         => CLK,
-      srst        => sreset,
-      din         => int_fifo_din,   
-      wr_en       => int_fifo_wr,
-      rd_en       => int_fifo_rd,
-      dout        => int_fifo_dout,  
-      full        => open,
-      almost_full => open,
-      overflow    => open,
-      empty       => open,
-      valid       => int_fifo_dval
-      );
-   
    ----------------  ----------------------------------
    --  lecture des fifos et synchronisation
    --------------------------------------------------
@@ -270,26 +232,21 @@ begin
             rst_wdow_gen_i <= '1';
             fast_mclk_raw_en_i <= '0';
             elcorr_ref_enabled <= '0';
-            int_fifo_wr <= '0';
-            int_fifo_rd <= '0';
             img_in_progress_i <= '0'; 
             acq_data_o <= '0';
             
          else  
             
             --inc := '0'& fpa_mclk_re;
-            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
-            fpa_int_last <= fpa_int_i;
-            
-            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
-            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
-            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
-            int_fifo_wr <= fpa_int_last xor fpa_int_i;          -- on ecrit les edges dans le fifo
-            
+            fpa_int_i       <= FPA_INT;
+            fpa_int_last    <= fpa_int_i;
+            acq_int_i       <= ACQ_INT;
+            acq_int_last    <= acq_int_i;            
+                       
             slow_mclk_raw_last <= SLOW_MCLK_RAW;            
             fast_mclk_raw_last <= FAST_MCLK_RAW;
-            fpa_mclk_re <= not fpa_mclk_last and fpa_mclk_i;
-            fpa_mclk_fe <= fpa_mclk_last and not fpa_mclk_i; 
+            fpa_mclk_re        <= not fpa_mclk_last and fpa_mclk_i;
+            fpa_mclk_fe        <= fpa_mclk_last and not fpa_mclk_i; 
             
             -----------------------------------------------------------------
             -- activation des flows de synchronisation                       
@@ -304,35 +261,27 @@ begin
                   slow_clk_fifo_rd_i <= '0';
                   fast_clk_fifo_rd_i <= '0';
                   mclk_pause_cnt <= 1;
-                  img_in_progress_i <= '0';                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
-                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
-                     start_gen_i <= '1';
-                     int_fifo_rd <= '1';
+                  img_in_progress_i <= fpa_int_last;                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
+                  acq_data_o <= '0';
+                  start_gen_i <= fpa_int_last;                  
+                  if fpa_int_last = '1' and  fpa_int_i = '0' then   -- front descendant de int                     
                      img_in_progress_i <= '1';
-                     acq_data_o <= int_fifo_dout(2);
-                     ctrl_fsm <= wait_int_fe_st;
+                     acq_data_o <= acq_int_last;
+                     ctrl_fsm <= lsydel_dly_st;
                   end if;                               
                   rst_cnt_i <= (others => '0'); 
-                  pause_cnt <= (others => '0');                 
+                  pause_cnt <= (others => '0');                           
                
-               when wait_int_fe_st =>
-                  int_fifo_rd <= '0';
-                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then  -- front tombant de int_signal, il est quasiment en temps reel.
-                     ctrl_fsm <= lsydel_dly_st;
-                     int_fifo_rd <= '1';                     
-                  end if;               
-               
-               when lsydel_dly_st =>
-                  int_fifo_rd <= '0';
-                  start_gen_i <= '0';
+               when lsydel_dly_st =>                
                   if fpa_mclk_re = '1' then
                      pause_cnt <= pause_cnt + 1;
-                     if pause_cnt >= to_integer(FPA_INTF_CFG.LSYDEL_MCLK) then 
+                     if pause_cnt >= to_integer(FPA_INTF_CFG.LSYDEL_MCLK) then                        
                         ctrl_fsm <= wait_flows_st;
                      end if;
                   end if;
                
                when wait_flows_st =>
+                  start_gen_i <= '0';
                   if WDOW_FIFO_RDY = '1' and CLK_FIFO_RDY = '1' and fpa_mclk_re = '1' then  -- fpa_mclk_re assure une synchro
                      ctrl_fsm <= stop_raw_clk_st;
                   end if;

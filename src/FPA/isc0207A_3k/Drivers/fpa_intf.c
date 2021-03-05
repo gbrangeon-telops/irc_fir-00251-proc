@@ -419,11 +419,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->boost_mode = 0;
    
    // delai LsyDel
-   ptrA->lsydel_mclk = 4;           // LSYDEL en MCLK, obtenu par test live de dissimulation des bandes en sous-fenetrage sur M3K
+   ptrA->lsydel_mclk = 2;           // LSYDEL en MCLK, obtenu par test live de dissimulation des bandes en sous-fenetrage sur M3K
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 1; // 10 - 2*ptrA->lsydel_mclk;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
+      gFpaDebugRegF =  10 - 2*ptrA->lsydel_mclk;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // accélerateurs 
