@@ -94,22 +94,6 @@ architecture rtl of isc0804A_readout_kernel is
          Clk_div   : out std_logic);
    end component;
    
-   component fwft_sfifo_w3_d256
-      port (
-         clk         : in std_logic;
-         srst        : in std_logic;
-         din         : in std_logic_vector(2 downto 0);
-         wr_en       : in std_logic;
-         rd_en       : in std_logic;
-         dout        : out std_logic_vector(2 downto 0);
-         full        : out std_logic;
-         almost_full : out std_logic;
-         overflow    : out std_logic;
-         empty       : out std_logic;
-         valid       : out std_logic
-         );
-   end component;
-   
    type ctrl_fsm_type is (idle, wait_int_fe_st, chck_lsydel_speed_st, speedup_lsydel_clk_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, mclk_pause_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
    type adc_time_stamp_type is
    record
@@ -186,16 +170,13 @@ architecture rtl of isc0804A_readout_kernel is
    signal fast_lsydel_clk         : std_logic;
    signal fast_lsydel_clk_en_i    : std_logic := '0'; 
    signal read_start_last         : std_logic;
-   signal int_fifo_rd             : std_logic;
-   signal int_fifo_din            : std_logic_vector(2 downto 0);
-   signal int_fifo_wr             : std_logic;
-   signal int_fifo_dval           : std_logic;
-   signal int_fifo_dout           : std_logic_vector(2 downto 0);
+   signal acq_int_i               : std_logic;
+   signal acq_int_last            : std_logic;
    signal img_in_progress_i       : std_logic;
    signal lsydel_in_progress      : std_logic;
    signal lsydel_in_progress_last : std_logic;
    signal acq_data_o              : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
-
+   
    
    
 begin
@@ -269,24 +250,6 @@ begin
       Clk_div => fast_lsydel_clk   -- attention, c'est en realité un clock enable. 
       );   
    
-   --------------------------------------------------
-   -- fifo fwft pour edges du signal d'intégration
-   --------------------------------------------------   
-   U3A : fwft_sfifo_w3_d256
-   port map (
-      clk         => CLK,
-      srst        => sreset,
-      din         => int_fifo_din, 
-      wr_en       => int_fifo_wr,
-      rd_en       => int_fifo_rd,
-      dout        => int_fifo_dout,
-      full        => open,
-      almost_full => open,
-      overflow    => open,
-      empty       => open,
-      valid       => int_fifo_dval
-      );
-   
    ----------------  ----------------------------------
    --  lecture des fifos et synchronisation
    --------------------------------------------------
@@ -310,8 +273,6 @@ begin
             fast_pclk_raw_en_i <= '0';
             fast_lsydel_clk_en_i <= '0';
             elcorr_ref_enabled <= '0';
-            int_fifo_wr <= '0';
-            int_fifo_rd <= '0';
             img_in_progress_i <= '0';
             lsydel_in_progress <= '0';
             acq_data_o <= '0';
@@ -319,14 +280,10 @@ begin
             
          else  
             
-            --inc := '0'& fpa_mclk_re;
-            fpa_int_i <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
-            fpa_int_last <= fpa_int_i;                       
-            
-            int_fifo_din(2) <= ACQ_INT;                         -- acq_int rentre dans le fifo
-            int_fifo_din(1) <= not fpa_int_last and fpa_int_i;  -- front montant
-            int_fifo_din(0) <= fpa_int_last and not fpa_int_i;  -- front descendant
-            int_fifo_wr <= fpa_int_last xor fpa_int_i;          -- on ecrit les edges dans le fifo
+            fpa_int_i       <= FPA_INT;
+            fpa_int_last    <= fpa_int_i;
+            acq_int_i       <= ACQ_INT;
+            acq_int_last    <= acq_int_i; 
             
             slow_mclk_raw_last <= SLOW_MCLK_RAW;            
             fast_mclk_raw_last <= FAST_MCLK_RAW;
@@ -346,27 +303,19 @@ begin
                   slow_clk_fifo_rd_i <= '0';
                   fast_clk_fifo_rd_i <= '0';
                   mclk_pause_cnt <= 1;                  
-                  img_in_progress_i <= '0';                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
-                  if int_fifo_dout(1) = '1' and int_fifo_dval = '1' then  -- front montant de int_signal via fifo. Il n'est pas en temps reel en IWR : il a eu lieu pendant un readout et enregistré dans un fifo.
-                     start_gen_i <= '1';
-                     int_fifo_rd <= '1';
+                  img_in_progress_i <= fpa_int_last;                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
+                  acq_data_o <= '0';
+                  start_gen_i <= fpa_int_last;                  
+                  if fpa_int_last = '1' and  fpa_int_i = '0' then   -- front descendant de int                     
                      img_in_progress_i <= '1';
-                     acq_data_o <= int_fifo_dout(2);
-                     ctrl_fsm <= wait_int_fe_st;
-                  end if;                                                             
+                     acq_data_o <= acq_int_last;
+                     ctrl_fsm <= chck_lsydel_speed_st;
+                  end if;                                                              
                   rst_cnt_i <= (others => '0'); 
                   pause_cnt <= (others => '0');
                   lsydel_in_progress <= '0';
                
-               when wait_int_fe_st =>
-                  int_fifo_rd <= '0';
-                  if int_fifo_dout(0) = '1' and int_fifo_dval = '1' then  -- front tombant de int_signal, il est quasiment en temps reel.
-                     ctrl_fsm <= chck_lsydel_speed_st;
-                     int_fifo_rd <= '1';                     
-                  end if; 
-               
                when chck_lsydel_speed_st =>
-                  int_fifo_rd <= '0';
                   lsydel_in_progress <= '1';
                   if FPA_INTF_CFG.SPEEDUP_LSYDEL = '1' then 
                      if SLOW_MCLK_RAW = '0' and SLOW_PCLK_RAW = '0' then -- on vient dans cet état avec slow_mclk_raw_en_i activé. Donc pas besoin de fast_maclk_raw. Ajout de PCLK pour s'assurer qu'on ne tronque pas cette derniere

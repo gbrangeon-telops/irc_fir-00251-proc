@@ -152,7 +152,6 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal adc_time_stamp        : adc_time_stamp_type;
    signal img_in_progress_i     : std_logic;
    signal acq_data_o            : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
-   signal xtra_int_fe           : std_logic;
    
    
 begin
