@@ -26,10 +26,10 @@ acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_high_duration.vhd
 acom  D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde
 
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
-acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d16\t_axi4_stream64_afifo_d16_sim_netlist.vhdl
+-- acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d16\t_axi4_stream64_afifo_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d1024\t_axi4_stream64_afifo_d1024_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d1024\t_axi4_stream64_sfifo_d1024_sim_netlist.vhdl
+-- acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d1024\t_axi4_stream64_sfifo_d1024_sim_netlist.vhdl
 #acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d2048\t_axi4_stream64_sfifo_d2048_sim_netlist.vhdl
 #acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_sfifo_d16384_lim\t_axi4_stream64_sfifo_d16384_lim_sim_netlist.vhdl
 
@@ -184,7 +184,7 @@ asim -ses isc0207a_intf_testbench_TB
 #wave UUT/U1/U5/U5/U2/*
 #wave UUT/U1/U5/U5/U1/*
 #wave UUT/U1/U5/U5/U2/*
---wave UUT/U1/U5/U5/*
+wave UUT/U1/U5/U5/*
 #wave UUT/U1/U5/U2/U1/*
 
 wave UUT/U1/U26/U1/*

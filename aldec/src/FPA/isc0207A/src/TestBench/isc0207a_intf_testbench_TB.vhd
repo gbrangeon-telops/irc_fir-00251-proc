@@ -294,8 +294,8 @@ begin
          user_ysize2 <= 256;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2); 
          
-         user_xsize3 <= 320;
-         user_ysize3 <= 256;
+         user_xsize3 <= 64;
+         user_ysize3 <= 64;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
          
          --         user_xsize3 <= 320;
@@ -391,7 +391,7 @@ begin
       wait for 50 ns;
       
       
-      wait for 15 ms;
+      wait for 5 ms;
       
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -401,7 +401,7 @@ begin
          wait for 30 ns;
       end loop; 
       
-      wait for 4 ms;
+      wait for 5 ms;
       
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      

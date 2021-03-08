@@ -132,7 +132,7 @@ package body isc0207a_intf_testbench_pkg is
       variable additional_fpa_int_time_offset          : unsigned(31 downto  0) := (others => '0');
       variable fpa_intf_data_source                    : unsigned(31 downto  0) := (others => '0');
       
-      variable y                               : unsigned(87*32-1 downto 0); 
+      variable y                                        : unsigned(87*32-1 downto 0); 
       
       variable user_sol_posl_pclk                      : unsigned(31 downto  0);
       variable roic_ysize                              : unsigned(31 downto  0) := to_unsigned(256, 32);       -- pas utilisé dans la config
@@ -151,7 +151,8 @@ package body isc0207a_intf_testbench_pkg is
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
       diag_xsize_div_tapnum         := to_unsigned(user_xsize/TAP_NUM, 32);
       
-      roic_xsize                 := to_unsigned(user_xsize, 32);
+      roic_xsize                   := to_unsigned(user_xsize, 32); 
+      roic_ysize                   := to_unsigned(user_ysize, 32);
       
       if roic_ysize > 2 then 
          roic_ysize_div2_m1            := to_unsigned(to_integer(roic_ysize/2) - 1, 32);
