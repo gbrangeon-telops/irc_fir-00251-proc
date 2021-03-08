@@ -264,7 +264,6 @@ begin
                   acq_data_o <= '0';
                   start_gen_i <= fpa_int_last;                  
                   if fpa_int_last = '1' and  fpa_int_i = '0' then   -- front descendant de int                     
-                     img_in_progress_i <= '1';
                      acq_data_o <= acq_int_last;
                      ctrl_fsm <= lsydel_dly_st;
                   end if;                               

@@ -208,4 +208,4 @@ wave UUT/U1/*
 --wave UUT/U25/*
 
 --run 20 us
-run 25 ms
+run 7 ms

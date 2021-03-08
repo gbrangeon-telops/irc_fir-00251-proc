@@ -92,6 +92,8 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
    signal ACQ_TRIG : STD_LOGIC := '0';
+   signal ACQ_TRIGi : STD_LOGIC := '0';
+   signal ACQ_TRIG_EN : STD_LOGIC := '0';
    signal ARESET : STD_LOGIC;
    signal CLK_100M : STD_LOGIC := '0';
    signal CLK_85M : STD_LOGIC  := '0';
@@ -223,11 +225,19 @@ begin
    
    
    -- reset
-   U0: process
+   U0A: process
    begin
       areset <= '1'; 
       wait for 250 ns;
       areset <= '0';
+      wait;
+   end process;
+   
+   U0B: process
+   begin
+      ACQ_TRIG_EN <= '0'; 
+      wait for 1200 us;
+      ACQ_TRIG_EN <= '1';
       wait;
    end process;
    
@@ -251,10 +261,12 @@ begin
    end process;
    
    -- clk
-   U4: process(ACQ_TRIG)
+   U4: process(ACQ_TRIGi)
    begin
-      ACQ_TRIG <= not ACQ_TRIG after ACQ_TRIG_PERIOD/2; 
+      ACQ_TRIGi <= not ACQ_TRIGi after ACQ_TRIG_PERIOD/2; 
    end process;
+   ACQ_TRIG <= ACQ_TRIGi and ACQ_TRIG_EN;
+   
    XTRA_TRIG <= '0';
    
    DOUT_MISO.TREADY <= '1';
@@ -363,7 +375,7 @@ begin
          write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(DAC_CFG_BASE_ADD + 4*ii, 32)), std_logic_vector(dac_cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop;      
-          
+      
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
