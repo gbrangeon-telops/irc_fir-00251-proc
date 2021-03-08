@@ -253,7 +253,7 @@ begin
          -- cfg usager
          user_xsize1 <= 64;
          user_ysize1 <= 64;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
          user_xsize2 <= 64;
          user_ysize2 <= 64;

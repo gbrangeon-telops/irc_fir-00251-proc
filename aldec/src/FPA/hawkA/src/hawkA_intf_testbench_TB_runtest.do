@@ -173,4 +173,4 @@ wave UUT/U1/U9/U2/U1/U1/*
 --wave UUT/U1/U19/*
 wave UUT/U1/*
 
-run 20 ms
+run 50 ms
