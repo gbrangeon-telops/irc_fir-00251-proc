@@ -121,4 +121,4 @@ wave UUT/U1/U9/*
 
 wave UUT/U1/*
 
-run 200 ms
+run 10 ms

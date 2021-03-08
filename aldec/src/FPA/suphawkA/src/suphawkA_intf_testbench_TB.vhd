@@ -192,12 +192,12 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVCMOS33;        
          
          -- cfg usager
-         user_xsize1 <= 1280;
-         user_ysize1 <= 1024;
-         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
+         user_xsize1 <= 64;
+         user_ysize1 <= 64;
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 1280;
-         user_ysize2 <= 1024;
+         user_xsize2 <= 64;
+         user_ysize2 <= 32;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 0);
 --         
 --         user_xsize3 <= 1280;
@@ -287,7 +287,7 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
-      wait for 100 ms;
+      wait for 5 ms;
       
       for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      

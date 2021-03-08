@@ -126,7 +126,7 @@ package body suphawkA_intf_testbench_pkg is
       comn_fpa_diag_mode                     := (others => diag_mode);                                               
       comn_fpa_diag_type                     := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                        := to_unsigned(1, 32);                                               
-      comn_fpa_trig_ctrl_mode                := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);          
+      comn_fpa_trig_ctrl_mode                := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);          
       
       xstart                                 := to_unsigned(0, 32);  
       ystart                                 := to_unsigned(0, 32);  
