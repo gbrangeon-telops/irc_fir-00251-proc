@@ -41,6 +41,8 @@ entity scorpiomwA_readout_ctrler is
       FPA_INACTIVE_INT   : out std_logic;
       IMG_IN_PROGRESS    : out std_logic;
       
+      FPA_POWERED        : in std_logic;
+      
       ERR                : out std_logic_vector(1 downto 0)
       
       );  
@@ -123,9 +125,9 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal int_fifo_dval        : std_logic;
    signal int_fifo_dout        : std_logic_vector(2 downto 0);
    
-   signal true_fpa_int_i       : std_logic;
-   signal true_fpa_int_last    : std_logic;
-   signal true_fpa_int_re      : std_logic;
+   signal fpa_int_i       : std_logic;
+   signal fpa_int_last    : std_logic;
+   signal fpa_int_re      : std_logic;
    signal itr_int_fifo_wr      : std_logic;
    signal iwr_int_fifo_wr1     : std_logic;
    signal iwr_int_fifo_wr2     : std_logic;
@@ -133,6 +135,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal img_in_progress_i    : std_logic;
    signal fifo_ovfl            : std_logic;
    signal err_i                : std_logic_vector(1 downto 0);
+   signal fpa_int_fe           : std_logic;
    
    
 begin
@@ -147,6 +150,7 @@ begin
    
    FPA_INACTIVE_INT <= fpa_inactive_int_i;
    IMG_IN_PROGRESS  <= img_in_progress_i;
+   ERR <= err_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -307,25 +311,27 @@ begin
             int_fifo_rd <= '0';
             acq_data_i <= '0';
             
-            true_fpa_int_i    <= '0';
-            true_fpa_int_last <= '0'; 
-            true_fpa_int_re   <= '0'; 
+            fpa_int_i    <= '0';
+            fpa_int_last <= '0'; 
+            fpa_int_re   <= '0'; 
             itr_int_fifo_wr  <= '0';
             iwr_int_fifo_wr1 <= '0';
             iwr_int_fifo_wr2 <= '0';
             
             img_in_progress_i <= '0';
             err_i <= (others => '0');
+            fpa_int_fe <= '0';
             
          else  
             
-            true_fpa_int_i    <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
-            true_fpa_int_last <= true_fpa_int_i;
-            true_fpa_int_re   <= (not true_fpa_int_last and true_fpa_int_i);
+            fpa_int_i    <= FPA_INT;            
+            fpa_int_last <= fpa_int_i;
+            fpa_int_re   <= (not fpa_int_last and fpa_int_i);
+            fpa_int_fe   <= (fpa_int_last and not fpa_int_i);
             
-            itr_int_fifo_wr   <= true_fpa_int_re and ACQ_MODE and FPA_INTF_CFG.ITR;                                 -- en mode itr, on ecrit les RE des true_fpa_acq_int dans le fifo
-            iwr_int_fifo_wr1  <= true_fpa_int_re and ACQ_MODE and not ACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;  -- en mode iwr, on ecrit les RE des true_fpa_acq_int dans le fifo, sauf le premier
-            iwr_int_fifo_wr2  <= true_fpa_int_re and NACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
+            itr_int_fifo_wr   <= fpa_int_re and ACQ_MODE and FPA_INTF_CFG.ITR;                                 -- en mode itr, on ecrit les RE des fpa_acq_int dans le fifo
+            iwr_int_fifo_wr1  <= fpa_int_re and ACQ_MODE and not ACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;  -- en mode iwr, on ecrit les RE des fpa_acq_int dans le fifo, sauf le premier
+            iwr_int_fifo_wr2  <= fpa_int_re and NACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
             
             int_fifo_wr <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;
             
@@ -341,8 +347,9 @@ begin
                
                when idle =>   
                   readout_in_progress <= '0'; 
-                  img_in_progress_i <= int_fifo_dval;
-                  if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- debut d'une image
+                  img_in_progress_i <= '0';
+                  if (fpa_data_valid_i = '1' and fpa_data_valid_last = '0') or (FPA_POWERED = '0' and fpa_int_fe = '1') then -- debut d'une image
+                     img_in_progress_i <= '1';
                      int_fifo_rd <= int_fifo_dval; 
                      acq_data_i <= int_fifo_dval;
                      readout_fsm <= wait_mclk_fe_st;
