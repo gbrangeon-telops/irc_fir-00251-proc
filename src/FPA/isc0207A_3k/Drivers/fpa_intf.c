@@ -378,11 +378,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
-   ptrA->fpa_acq_trig_ctrl_dly     = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_spare                 = 0;   
+   ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
+   ptrA->fpa_acq_trig_ctrl_dly     = 0;                                     // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;   
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec)*1e-6F);   // ENO: 29 janv 2020: pour isc0207 en mode MODE_INT_END_TO_TRIG_START, la duree du timeout est fixée à celle d'une trame
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_trig_ctrl_timeout_dly;       // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
    
    // parametres envoyés au VHD pour calculer fpa_acq_trig_ctrl_dly, fpa_trig_ctrl_timeout_dly, fpa_xtra_trig_ctrl_dly
    ptrA->readout_plus_delay            =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F);  // (readout_time + delay -vhd_delay) converti en coups de 100MHz
@@ -394,7 +394,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // ENO 22 sept 2015 : patch temporaire pour tenir compte des delais du patron de tests.
    // Conséquence: le patron de tests sera plus lent que le detecteur mais il ne plantera plus la camera
    if (ptrA->fpa_diag_mode == 1){
-      ptrA->fpa_trig_ctrl_mode         = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START; 
+      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
       test_pattern_dly  = (uint32_t)pGCRegs->Height * (uint32_t)TEST_PATTERN_LINE_DLY;    // delay total en coups de 10 ns sur une image de patron de tests 
 	   ptrA->readout_plus_delay         =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F) + test_pattern_dly;  // (readout_time + delay -vhd_delay) converti en coups de 100MHz + test_pattern_dly qui est deja en coups de 10 ns
    }
