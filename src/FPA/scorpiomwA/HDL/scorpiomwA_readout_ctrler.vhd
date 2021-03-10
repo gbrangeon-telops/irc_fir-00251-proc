@@ -38,7 +38,10 @@ entity scorpiomwA_readout_ctrler is
       FPA_DATA_VALID     : in std_logic;         
       READOUT_INFO       : out readout_info_type;
       ADC_SYNC_FLAG      : out std_logic_vector(15 downto 0);
-      FPA_INACTIVE_INT   : out std_logic
+      FPA_INACTIVE_INT   : out std_logic;
+      IMG_IN_PROGRESS    : out std_logic;
+      
+      ERR                : out std_logic_vector(1 downto 0)
       
       );  
 end scorpiomwA_readout_ctrler;
@@ -127,6 +130,10 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal iwr_int_fifo_wr1     : std_logic;
    signal iwr_int_fifo_wr2     : std_logic;
    
+   signal img_in_progress_i    : std_logic;
+   signal fifo_ovfl            : std_logic;
+   signal err_i                : std_logic_vector(1 downto 0);
+   
    
 begin
    
@@ -139,6 +146,7 @@ begin
    fpa_data_valid_i <= FPA_DATA_VALID;
    
    FPA_INACTIVE_INT <= fpa_inactive_int_i;
+   IMG_IN_PROGRESS  <= img_in_progress_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -262,7 +270,7 @@ begin
             end case;
             
          end if;
-
+         
       end if;
    end process;    
    
@@ -279,7 +287,7 @@ begin
       dout        => int_fifo_dout,   
       full        => open,
       almost_full => open,
-      overflow    => open,
+      overflow    => fifo_ovfl,
       empty       => open,
       valid       => int_fifo_dval
       );
@@ -306,6 +314,9 @@ begin
             iwr_int_fifo_wr1 <= '0';
             iwr_int_fifo_wr2 <= '0';
             
+            img_in_progress_i <= '0';
+            err_i <= (others => '0');
+            
          else  
             
             true_fpa_int_i    <= FPA_INT and not FPA_INTF_CFG.COMN.FPA_DIAG_MODE;            
@@ -320,12 +331,17 @@ begin
             
             fpa_data_valid_last <= fpa_data_valid_i;
             
+            if fifo_ovfl = '1' then
+               err_i(0) <= '1'; 
+            end if;
+            
             
             -- contrôleur
             case readout_fsm is           
                
                when idle =>   
-                  readout_in_progress <= '0';
+                  readout_in_progress <= '0'; 
+                  img_in_progress_i <= int_fifo_dval;
                   if fpa_data_valid_i = '1' and fpa_data_valid_last = '0' then -- debut d'une image
                      int_fifo_rd <= int_fifo_dval; 
                      acq_data_i <= int_fifo_dval;

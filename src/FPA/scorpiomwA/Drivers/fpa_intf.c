@@ -298,15 +298,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // config du contrôleur de trigs
    if (ptrA->itr == 1) {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    }
    else {
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_ALL_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ALL_END_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_all_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //
    }
    
-   ptrA->fpa_spare                 = 0;
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_ALL_END_TO_TRIG_START;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    
