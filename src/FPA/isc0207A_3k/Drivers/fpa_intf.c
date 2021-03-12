@@ -56,7 +56,8 @@
 // la structure Command_t a 4 bytes d'overhead(CmdID et CmdCharNum)
 
 // adresse la lecture des statuts VHD
-#define AR_STATUS_BASE_ADD                0x0400    // adresse de base 
+#define AR_STATUS_BASE_ADD                0x0400    // adresse de base
+#define AR_PRIVATE_STATUS_BASE_ADD        0x04C4    // adresse de base des statuts specifiques ou privées
 #define AR_FPA_TEMPERATURE                0x002C    // adresse temperature
 
 // adresse d'écriture du régistre du type du pilote C 
@@ -235,8 +236,80 @@ struct isc0207_param_s             //
 };
 typedef struct isc0207_param_s  isc0207_param_t;
 
+// statuts privés du module fpa
+struct s_FpaPrivateStatus    
+{  
+   uint32_t comn_fpa_diag_mode                    ;  
+   uint32_t comn_fpa_diag_type                    ;  
+   uint32_t comn_fpa_pwr_on                       ;  
+   uint32_t comn_fpa_acq_trig_mode                ;
+   uint32_t comn_fpa_acq_trig_ctrl_dly            ;
+   uint32_t comn_fpa_xtra_trig_mode               ;
+   uint32_t comn_fpa_xtra_trig_ctrl_dly           ;
+   uint32_t comn_fpa_trig_ctrl_timeout_dly        ;
+   uint32_t comn_fpa_stretch_acq_trig             ;
+   uint32_t diag_ysize                            ;
+   uint32_t diag_xsize_div_tapnum                 ;
+   uint32_t roic_xstart                           ;
+   uint32_t roic_ystart                           ;
+   uint32_t roic_xsize                            ;
+   uint32_t roic_ysize_div2_m1                    ;
+   uint32_t gain                                  ;
+   uint32_t internal_outr                         ;
+   uint32_t real_mode_active_pixel_dly            ;
+   uint32_t speedup_lsync                         ;
+   uint32_t speedup_sample_row                    ;
+   uint32_t speedup_unused_area                   ;
+   uint32_t raw_area_line_start_num               ;
+   uint32_t raw_area_line_end_num                 ;
+   uint32_t raw_area_sof_posf_pclk                ;
+   uint32_t raw_area_eof_posf_pclk                ;
+   uint32_t raw_area_sol_posl_pclk                ;
+   uint32_t raw_area_eol_posl_pclk                ;
+   uint32_t raw_area_eol_posl_pclk_p1             ;
+   uint32_t raw_area_window_lsync_num             ;
+   uint32_t raw_area_line_period_pclk             ;
+   uint32_t raw_area_readout_pclk_cnt_max         ;
+   uint32_t user_area_line_start_num              ;
+   uint32_t user_area_line_end_num                ;
+   uint32_t user_area_sol_posl_pclk               ;
+   uint32_t user_area_eol_posl_pclk               ;
+   uint32_t user_area_eol_posl_pclk_p1            ;
+   uint32_t stretch_area_sol_posl_pclk            ;
+   uint32_t stretch_area_eol_posl_pclk            ;
+   uint32_t pix_samp_num_per_ch                   ;
+   uint32_t hgood_samp_sum_num                    ;
+   uint32_t hgood_samp_mean_numerator             ;
+   uint32_t vgood_samp_sum_num                    ;
+   uint32_t vgood_samp_mean_numerator             ;
+   uint32_t good_samp_first_pos_per_ch            ;
+   uint32_t good_samp_last_pos_per_ch             ;
+   uint32_t adc_clk_source_phase                  ;
+   uint32_t adc_clk_pipe_sel                      ;
+   uint32_t cfg_num                               ;
+   uint32_t lsydel_mclk                           ;
+   uint32_t boost_mode                            ;
+   uint32_t speedup_lsydel                        ;
+   uint32_t adc_clk_pipe_sync_pos                 ;
+   uint32_t readout_plus_delay                    ;
+   uint32_t tri_min_window_part                   ;
+   uint32_t int_time_offset_mclk                  ;
+   uint32_t roic_cst_output_mode                  ;
+   uint32_t tsh_min_minus_int_time_offset         ;
+   uint32_t elcorr_enabled                        ;
+   uint32_t elcorr_ref_cfg0_ref_enabled           ;
+   uint32_t elcorr_ref_cfg0_ref_cont_meas_mode    ;                   
+   uint32_t elcorr_ref_cfg0_start_dly_sampclk     ;
+   uint32_t elcorr_ref_cfg0_samp_num_per_ch       ;
+   uint32_t elcorr_ref_cfg0_samp_mean_numerator   ;
+   uint32_t elcorr_ref_cfg0_ref_value             ;
+  
+};
+typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
+
 // Global variables
 t_FpaStatus gStat;                        // devient une variable globale
+t_FpaPrivateStatus gPrivateStat;
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
@@ -254,6 +327,7 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
+void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -314,12 +388,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalTapsRef;
    // extern float gFpaDetectorElectricalRefOffset;
    extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
-   // extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe
+   //extern int32_t gFpaDebugRegB;                         // reservé ROIC Bistream après validation du mot de passe
    extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   // extern int32_t gFpaDebugRegG;                      // non utilisé
+   extern int32_t gFpaDebugRegG;                      // non utilisé
    // extern int32_t gFpaDebugRegH;                      // non utilisé
    uint32_t elcorr_config_mode;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
@@ -719,7 +793,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
    
-   WriteStruct(ptrA);   
+   WriteStruct(ptrA);
+   
+   // statuts privés
+   if (gFpaDebugRegG == 1)
+      FPA_GetPrivateStatus(&gPrivateStat, ptrA);
+   
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -848,8 +927,11 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    }
    
    // la taille finalement demandée au detecteur
-   ptrH->roic_xsize = ptrH->roic_xend - ptrH->roic_xstart + 1.0F;
+   ptrH->roic_xsize     = ptrH->roic_xend - ptrH->roic_xstart + 1.0F;
    ptrH->roic_ysize     = (float)pGCRegs->Height;
+   ptrH->roic_ystart    = ptrH->user_ystart; 
+   ptrH->roic_yend      = ptrH->user_yend;  
+   
    
    // dès que la taille le permet, on fait du fast windowing même si cela n'est pas demandé expressement par l'usager
    if (ptrH->roic_xend - ptrH->user_xend >= (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number){
@@ -1135,4 +1217,143 @@ void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
       AXI4L_write32(ptrD->vdac_value[ii], ptrA->ADD + AW_DAC_CFG_BASE_ADD + 4*ii);  
       ii++;
    }
+}
+
+//--------------------------------------------------------------------------                                                                            
+// Pour avoir les statuts privés du module détecteur
+//--------------------------------------------------------------------------
+void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA)
+{ 
+   // config retournée par le vhd
+   PrivateStat->comn_fpa_diag_mode                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
+   PrivateStat->comn_fpa_diag_type                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x04);
+   PrivateStat->comn_fpa_pwr_on                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x08);
+   PrivateStat->comn_fpa_acq_trig_mode               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x0C);
+   PrivateStat->comn_fpa_acq_trig_ctrl_dly           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x10);
+   PrivateStat->comn_fpa_xtra_trig_mode              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x14);
+   PrivateStat->comn_fpa_xtra_trig_ctrl_dly          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x18);
+   PrivateStat->comn_fpa_trig_ctrl_timeout_dly       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x1C);
+   PrivateStat->comn_fpa_stretch_acq_trig            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x20);
+   PrivateStat->diag_ysize                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x24);
+   PrivateStat->diag_xsize_div_tapnum                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x28);
+   PrivateStat->roic_xstart                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x2C);
+   PrivateStat->roic_ystart                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x30);
+   PrivateStat->roic_xsize                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x34);
+   PrivateStat->roic_ysize_div2_m1                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x38);
+   PrivateStat->gain                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x3C);
+   PrivateStat->internal_outr                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x40);
+   PrivateStat->real_mode_active_pixel_dly           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x44);
+   PrivateStat->speedup_lsync                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x48);
+   PrivateStat->speedup_sample_row                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x4C);
+   PrivateStat->speedup_unused_area                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x50);
+   PrivateStat->raw_area_line_start_num              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x54);
+   PrivateStat->raw_area_line_end_num                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x58);
+   PrivateStat->raw_area_sof_posf_pclk               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x5C);
+   PrivateStat->raw_area_eof_posf_pclk               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x60);
+   PrivateStat->raw_area_sol_posl_pclk               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x64);
+   PrivateStat->raw_area_eol_posl_pclk               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x68);
+   PrivateStat->raw_area_eol_posl_pclk_p1            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x6C);
+   PrivateStat->raw_area_window_lsync_num            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x70);
+   PrivateStat->raw_area_line_period_pclk            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x74);
+   PrivateStat->raw_area_readout_pclk_cnt_max        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x78);
+   PrivateStat->user_area_line_start_num             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x7C);
+   PrivateStat->user_area_line_end_num               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x80);
+   PrivateStat->user_area_sol_posl_pclk              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x84);
+   PrivateStat->user_area_eol_posl_pclk              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x88);
+   PrivateStat->user_area_eol_posl_pclk_p1           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x8C);
+   PrivateStat->stretch_area_sol_posl_pclk           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x90);
+   PrivateStat->stretch_area_eol_posl_pclk           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x94);
+   PrivateStat->pix_samp_num_per_ch                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x98);
+   PrivateStat->hgood_samp_sum_num                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x9C);
+   PrivateStat->hgood_samp_mean_numerator            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA0);
+   PrivateStat->vgood_samp_sum_num                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA4);
+   PrivateStat->vgood_samp_mean_numerator            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA8);
+   PrivateStat->good_samp_first_pos_per_ch           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xAC);
+   PrivateStat->good_samp_last_pos_per_ch            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB0);
+   PrivateStat->adc_clk_source_phase                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB4);
+   PrivateStat->adc_clk_pipe_sel                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB8);
+   PrivateStat->cfg_num                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xBC);
+   PrivateStat->lsydel_mclk                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC0);
+   PrivateStat->boost_mode                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC4);
+   PrivateStat->speedup_lsydel                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC8);
+   PrivateStat->adc_clk_pipe_sync_pos                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xCC);
+   PrivateStat->readout_plus_delay                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD0);
+   PrivateStat->tri_min_window_part                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD4);
+   PrivateStat->int_time_offset_mclk                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD8);
+   PrivateStat->roic_cst_output_mode                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xDC);
+   PrivateStat->tsh_min_minus_int_time_offset        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE0);
+   PrivateStat->elcorr_enabled                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE4);
+   PrivateStat->elcorr_ref_cfg0_ref_enabled          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
+   PrivateStat->elcorr_ref_cfg0_ref_cont_meas_mode   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
+   PrivateStat->elcorr_ref_cfg0_start_dly_sampclk    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
+   PrivateStat->elcorr_ref_cfg0_samp_num_per_ch      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF4);
+   PrivateStat->elcorr_ref_cfg0_samp_mean_numerator  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF8);
+   PrivateStat->elcorr_ref_cfg0_ref_value            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xFC);
+   
+   // affichage dans debug terminal
+   
+   FPA_PRINTF("comn_fpa_diag_mode                   = %d", PrivateStat->comn_fpa_diag_mode                   );
+   FPA_PRINTF("comn_fpa_diag_type                   = %d", PrivateStat->comn_fpa_diag_type                   );
+   FPA_PRINTF("comn_fpa_pwr_on                      = %d", PrivateStat->comn_fpa_pwr_on                      );
+   FPA_PRINTF("comn_fpa_acq_trig_mode               = %d", PrivateStat->comn_fpa_acq_trig_mode               );
+   FPA_PRINTF("comn_fpa_acq_trig_ctrl_dly           = %d", PrivateStat->comn_fpa_acq_trig_ctrl_dly           );
+   FPA_PRINTF("comn_fpa_xtra_trig_mode              = %d", PrivateStat->comn_fpa_xtra_trig_mode              );
+   FPA_PRINTF("comn_fpa_xtra_trig_ctrl_dly          = %d", PrivateStat->comn_fpa_xtra_trig_ctrl_dly          );
+   FPA_PRINTF("comn_fpa_trig_ctrl_timeout_dly       = %d", PrivateStat->comn_fpa_trig_ctrl_timeout_dly       );
+   FPA_PRINTF("comn_fpa_stretch_acq_trig            = %d", PrivateStat->comn_fpa_stretch_acq_trig            );
+   FPA_PRINTF("diag_ysize                           = %d", PrivateStat->diag_ysize                           );
+   FPA_PRINTF("diag_xsize_div_tapnum                = %d", PrivateStat->diag_xsize_div_tapnum                );
+   FPA_PRINTF("roic_xstart                          = %d", PrivateStat->roic_xstart                          );
+   FPA_PRINTF("roic_ystart                          = %d", PrivateStat->roic_ystart                          );
+   FPA_PRINTF("roic_xsize                           = %d", PrivateStat->roic_xsize                           );
+   FPA_PRINTF("roic_ysize_div2_m1                   = %d", PrivateStat->roic_ysize_div2_m1                   );
+   FPA_PRINTF("gain                                 = %d", PrivateStat->gain                                 );
+   FPA_PRINTF("internal_outr                        = %d", PrivateStat->internal_outr                        );
+   FPA_PRINTF("real_mode_active_pixel_dly           = %d", PrivateStat->real_mode_active_pixel_dly           );
+   FPA_PRINTF("speedup_lsync                        = %d", PrivateStat->speedup_lsync                        );
+   FPA_PRINTF("speedup_sample_row                   = %d", PrivateStat->speedup_sample_row                   );
+   FPA_PRINTF("speedup_unused_area                  = %d", PrivateStat->speedup_unused_area                  );
+   FPA_PRINTF("raw_area_line_start_num              = %d", PrivateStat->raw_area_line_start_num              );
+   FPA_PRINTF("raw_area_line_end_num                = %d", PrivateStat->raw_area_line_end_num                );
+   FPA_PRINTF("raw_area_sof_posf_pclk               = %d", PrivateStat->raw_area_sof_posf_pclk               );
+   FPA_PRINTF("raw_area_eof_posf_pclk               = %d", PrivateStat->raw_area_eof_posf_pclk               );
+   FPA_PRINTF("raw_area_sol_posl_pclk               = %d", PrivateStat->raw_area_sol_posl_pclk               );
+   FPA_PRINTF("raw_area_eol_posl_pclk               = %d", PrivateStat->raw_area_eol_posl_pclk               );
+   FPA_PRINTF("raw_area_eol_posl_pclk_p1            = %d", PrivateStat->raw_area_eol_posl_pclk_p1            );
+   FPA_PRINTF("raw_area_window_lsync_num            = %d", PrivateStat->raw_area_window_lsync_num            );
+   FPA_PRINTF("raw_area_line_period_pclk            = %d", PrivateStat->raw_area_line_period_pclk            );
+   FPA_PRINTF("raw_area_readout_pclk_cnt_max        = %d", PrivateStat->raw_area_readout_pclk_cnt_max        );
+   FPA_PRINTF("user_area_line_start_num             = %d", PrivateStat->user_area_line_start_num             );
+   FPA_PRINTF("user_area_line_end_num               = %d", PrivateStat->user_area_line_end_num               );
+   FPA_PRINTF("user_area_sol_posl_pclk              = %d", PrivateStat->user_area_sol_posl_pclk              );
+   FPA_PRINTF("user_area_eol_posl_pclk              = %d", PrivateStat->user_area_eol_posl_pclk              );
+   FPA_PRINTF("user_area_eol_posl_pclk_p1           = %d", PrivateStat->user_area_eol_posl_pclk_p1           );
+   FPA_PRINTF("stretch_area_sol_posl_pclk           = %d", PrivateStat->stretch_area_sol_posl_pclk           );
+   FPA_PRINTF("stretch_area_eol_posl_pclk           = %d", PrivateStat->stretch_area_eol_posl_pclk           );
+   FPA_PRINTF("pix_samp_num_per_ch                  = %d", PrivateStat->pix_samp_num_per_ch                  );
+   FPA_PRINTF("hgood_samp_sum_num                   = %d", PrivateStat->hgood_samp_sum_num                   );
+   FPA_PRINTF("hgood_samp_mean_numerator            = %d", PrivateStat->hgood_samp_mean_numerator            );
+   FPA_PRINTF("vgood_samp_sum_num                   = %d", PrivateStat->vgood_samp_sum_num                   );
+   FPA_PRINTF("vgood_samp_mean_numerator            = %d", PrivateStat->vgood_samp_mean_numerator            );
+   FPA_PRINTF("good_samp_first_pos_per_ch           = %d", PrivateStat->good_samp_first_pos_per_ch           );
+   FPA_PRINTF("good_samp_last_pos_per_ch            = %d", PrivateStat->good_samp_last_pos_per_ch            );
+   FPA_PRINTF("adc_clk_source_phase                 = %d", PrivateStat->adc_clk_source_phase                 );
+   FPA_PRINTF("adc_clk_pipe_sel                     = %d", PrivateStat->adc_clk_pipe_sel                     );
+   FPA_PRINTF("cfg_num                              = %d", PrivateStat->cfg_num                              );
+   FPA_PRINTF("lsydel_mclk                          = %d", PrivateStat->lsydel_mclk                          );
+   FPA_PRINTF("boost_mode                           = %d", PrivateStat->boost_mode                           );
+   FPA_PRINTF("speedup_lsydel                       = %d", PrivateStat->speedup_lsydel                       );
+   FPA_PRINTF("adc_clk_pipe_sync_pos                = %d", PrivateStat->adc_clk_pipe_sync_pos                );
+   FPA_PRINTF("readout_plus_delay                   = %d", PrivateStat->readout_plus_delay                   );
+   FPA_PRINTF("tri_min_window_part                  = %d", PrivateStat->tri_min_window_part                  );
+   FPA_PRINTF("int_time_offset_mclk                 = %d", PrivateStat->int_time_offset_mclk                 );
+   FPA_PRINTF("roic_cst_output_mode                 = %d", PrivateStat->roic_cst_output_mode                 );
+   FPA_PRINTF("tsh_min_minus_int_time_offset        = %d", PrivateStat->tsh_min_minus_int_time_offset        );
+   FPA_PRINTF("elcorr_enabled                       = %d", PrivateStat->elcorr_enabled                       );
+   FPA_PRINTF("elcorr_ref_cfg0_ref_enabled          = %d", PrivateStat->elcorr_ref_cfg0_ref_enabled          );
+   FPA_PRINTF("elcorr_ref_cfg0_ref_cont_meas_mode   = %d", PrivateStat->elcorr_ref_cfg0_ref_cont_meas_mode   );
+   FPA_PRINTF("elcorr_ref_cfg0_start_dly_sampclk    = %d", PrivateStat->elcorr_ref_cfg0_start_dly_sampclk    );
+   FPA_PRINTF("elcorr_ref_cfg0_samp_num_per_ch      = %d", PrivateStat->elcorr_ref_cfg0_samp_num_per_ch      );
+   FPA_PRINTF("elcorr_ref_cfg0_samp_mean_numerator  = %d", PrivateStat->elcorr_ref_cfg0_samp_mean_numerator  );
+   FPA_PRINTF("elcorr_ref_cfg0_ref_value            = %d", PrivateStat->elcorr_ref_cfg0_ref_value            );
 }
