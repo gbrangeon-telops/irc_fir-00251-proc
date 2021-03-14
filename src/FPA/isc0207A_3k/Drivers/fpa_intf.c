@@ -319,6 +319,7 @@ ProximCfg_t ProximCfg = {{12812, 12812, 12812, 8372, 8440, 12663, 5062, 12812}, 
 // definition et activation des accelerateurs
 uint8_t speedup_unused_area = 1;      // les speed_up n'ont que deux valeurs : 0 ou 1
 uint8_t itr_mode_enabled;
+uint8_t burst_mode_enabled = 0;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -393,7 +394,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   extern int32_t gFpaDebugRegG;                      // non utilisé
+   extern int32_t gFpaDebugRegG;                         // non utilisé
    // extern int32_t gFpaDebugRegH;                      // non utilisé
    uint32_t elcorr_config_mode;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
@@ -493,11 +494,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->boost_mode = 0;
    
    // delai LsyDel
-   ptrA->lsydel_mclk = 2;           // LSYDEL en MCLK, obtenu par test live de dissimulation des bandes en sous-fenetrage sur M3K
+   ptrA->lsydel_mclk = 2;           // LSYDEL en MCLK
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF =  10 - 2*ptrA->lsydel_mclk;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
+      gFpaDebugRegF =  5;    // la valeur 10 est obtenue lorsque ptrA->lsydel_mclk = 0
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
    
    // accélerateurs 
@@ -527,11 +528,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->user_area_eol_posl_pclk_p1    = ptrA->user_area_eol_posl_pclk + 1;
    
    // stretching area
-   ptrA->stretch_area_sol_posl_pclk    = ptrA->user_area_eol_posl_pclk_p1;
-   ptrA->stretch_area_eol_posl_pclk    = ptrA->stretch_area_sol_posl_pclk + hh.pixnum_per_tap_per_mclk *(uint32_t)hh.line_stretch_mclk - 1;
-
-   // si ptrA->stretch_area_eol_posl_pclk < ptrA->stretch_area_sol_posl_pclk (ie largeur de zone nulle) alors le vhd comprend qu'il n'y a pas de zone d'étirement
-
+   ptrA->stretch_area_eol_posl_pclk    = ptrA->raw_area_eol_posl_pclk - (uint32_t)gFpaDebugRegG;
+   if (ptrA->speedup_unused_area == 0)
+      ptrA->stretch_area_sol_posl_pclk = ptrA->stretch_area_eol_posl_pclk + 1; // si ptrA->stretch_area_eol_posl_pclk < ptrA->stretch_area_sol_posl_pclk (ie largeur de zone nulle) alors le vhd comprend qu'il n'y a pas de zone d'étirement
+   else
+      ptrA->stretch_area_sol_posl_pclk = ptrA->stretch_area_eol_posl_pclk - hh.pixnum_per_tap_per_mclk *(uint32_t)hh.line_stretch_mclk + 1;
 
    // nombre d'échantillons par canal  de carte ADC
    ptrA->pix_samp_num_per_ch           = (uint32_t)((float)ADC_SAMPLING_RATE_HZ/(hh.pclk_rate_hz));
@@ -795,9 +796,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    WriteStruct(ptrA);
    
-   // statuts privés
-   if (gFpaDebugRegG == 1)
-      FPA_GetPrivateStatus(&gPrivateStat, ptrA);
+//   // statuts privés
+//   if (gFpaDebugRegG == 1)
+//      FPA_GetPrivateStatus(&gPrivateStat, ptrA);
    
 }
 
@@ -849,7 +850,9 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
 
    extern int32_t gFpaExposureTimeOffset;
    extern int32_t gFpaDebugRegH;
-
+   uint8_t smooth_img_mode;    // en smooth_img_mode, on elimine (si possible) les bandes laterales dans les sous-fenetres. Donc ce cas, il peut être necessaire de demander au detecteur une fenetre plus grande que celle demandée par l'usager.
+                               // On prend plus large en vue de faire du stretching sur la fin de ligne (LSYNC). Le reste de la partie nonAI est eliminée par fastwindowing.
+                               // C'est cela qui explique la diminution du frame rate lorsque le smooth_img_mode est activé. 
    // parametres statiques
    ptrH->mclk_period_usec        = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->tap_number              = (float)FPA_NUMTAPS;
@@ -877,19 +880,17 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    // valeurs par defaut
    speedup_unused_area = 1;        
    itr_mode_enabled    = 1;        // ITR
-      
+   smooth_img_mode     = 1;        // par defaut, M3K est en smooth_img_mode
       
    /*--------------------- CALCULS-------------------------------------------------------------
       Attention aux modifs en dessous de cette ligne! Y bien réfléchir avant de les faire
    -----------------------------------------------------------------------------------------  */
    
    if ((pGCRegs->IntegrationMode == IM_IntegrateWhileRead) || (gFpaDebugRegH != 0))
-      itr_mode_enabled = 0;
+      itr_mode_enabled = 0; 
    
-   if ((pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) || (pGCRegs->DetectorMode == DM_Burst) || (itr_mode_enabled == 0)){
-      ptrH->line_stretch_mclk  = 0.0;
-      speedup_unused_area = 0;
-   }
+   if (pGCRegs->DetectorMode == DM_Burst)       // le mode burst est explicitement demandé par l'usager
+      smooth_img_mode = 0;                   // dans ce cas, on abandonne le smooth_img_mode
      
    // fenetre demandée par l'usager
    ptrH->user_xstart  = (float)pGCRegs->OffsetX;                             // colonne de depart de la fenetre usager (premiere position = 0)
@@ -903,45 +904,70 @@ void FPA_SpecificParams(isc0207_param_t *ptrH, float exposureTime_usec, const gc
    
    // on valide que la premiere colonne de la fenetre demandée au ROIC précède la colonne ISC0207_WINDOW_MANDATORY_COLUMN_POS1
    while(ptrH->roic_xstart > (float)ISC0207_WINDOW_MANDATORY_COLUMN_POS1){
-      ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;  
-   }
+      ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;
+      smooth_img_mode = 1;    // dès que la fenetre usager n'est pas centrée, on prendra plus large et donc on active obligatoirement le smooth_mode pour que la fenetre comporte peu de bandes.
+   }                          // car en effet, dès que l'usager decentre sa fenetre, c'est qu'il accepte de perdre de la performance en vitesse.
    
    // on valide que la derniere colonne de la fenetre demandée au ROIC vient après la colonne ISC0207_WINDOW_MANDATORY_COLUMN_POS2
    while(ptrH->roic_xend < (float)ISC0207_WINDOW_MANDATORY_COLUMN_POS2){
-      ptrH->roic_xend = ptrH->roic_xend + (float)FPA_OFFSETX_MULT;  
+      ptrH->roic_xend = ptrH->roic_xend + (float)FPA_OFFSETX_MULT;
+      smooth_img_mode = 1;   // dès que la fenetre usager n'est pas centrée, on prendra plus large et donc on active obligatoirement le smooth_mode pour que la fenetre comporte peu de bandes.
+   }   
+   
+   // taille requise lorsqu'on doit eliminer les bandes laterales, on regarde si on peut le faire. 
+   if (smooth_img_mode == 1)    // smooth_img_mode explicitement demandé par l'usager
+   {   
+      if (ptrH->roic_xend - ptrH->user_xend >= (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number)
+      {
+         if (ptrH->user_xstart - ptrH->roic_xstart >= (float)FPA_OFFSETX_MULT){
+               // les deux conditions remplies signifient qu'on pourra avoir effectivement le smooth_im_mode comme demandé par l'usager
+         }
+         else  // si la fenetre n'est pas suffisamment grande à gauche pour le smooth_img_mode, on voit si on peut prendre large à gauche 
+         {
+            if (ptrH->roic_xstart - (float)FPA_OFFSETX_MULT >= 0.0F)
+               ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;
+            else // sinon c'est que le smooth_img_mode, même si c'est voulu par l'usager, ne sera pas possible
+               smooth_img_mode = 0;
+         }
+      }
+      else   // si la fenetre n'est pas suffisamment grande à droite, on regarde si on peut la prendre plus grande à droite
+      {    
+         if (ptrH->roic_xend + (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number <= (float)FPA_WIDTH_MAX) // si oui, c'est parfait on la prend
+            ptrH->roic_xend =  ptrH->roic_xend + (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number;
+         else // sinon c'est que le smooth_img_mode, même si c'est voulu par l'usager, ne sera pas possible
+            smooth_img_mode = 0;
+      }
    }
-     
-   // on valide que la taille en X demandée au roic est multiple de FPA_WIDTH_INC sinon on reajuste
+   
+   // enfin, on valide que la taille en X demandée au roic est multiple de FPA_WIDTH_INC sinon on reajuste
    ptrH->roic_xsize = ptrH->roic_xend - ptrH->roic_xstart + 1.0F; 
-   if ((uint32_t)ptrH->roic_xsize % (uint32_t)FPA_WIDTH_INC != 0){
-      if (ptrH->roic_xend + (float)FPA_OFFSETX_MULT <= (float)FPA_WIDTH_MAX) 
-          ptrH->roic_xend = ptrH->roic_xend + (float)FPA_OFFSETX_MULT;      // de préférence, on prend plus large à droite 
-      else
-          ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;  // sinon on prend plus large à gauche
-   }  
-   
-   // taille requise lorsque fast windowing requise
-   if ((pGCRegs->DetectorMode != DM_Burst) && (itr_mode_enabled == 1)){    // fast windowing demandé
-      if (ptrH->roic_xend - ptrH->user_xend < (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number)
-       ptrH->roic_xend     = MIN(ptrH->roic_xend + (float)FPA_WIDTH_INC, (float)FPA_WIDTH_MAX-1);
+   if ((uint32_t)ptrH->roic_xsize % (uint32_t)FPA_WIDTH_INC != 0)
+   {
+      if (ptrH->roic_xstart - (float)FPA_OFFSETX_MULT >= 0.0F)             // de préférence, on prend plus large à gauche
+         ptrH->roic_xstart = ptrH->roic_xstart - (float)FPA_OFFSETX_MULT;
+      else 
+         ptrH->roic_xend = ptrH->roic_xend + (float)FPA_OFFSETX_MULT;     // sinon on prend plus large à droite 
    }
-   
-   // la taille finalement demandée au detecteur
+    
+   // ainsi, au sortir de toutes les conditions/recalculs, la taille finalement demandée au detecteur
    ptrH->roic_xsize     = ptrH->roic_xend - ptrH->roic_xstart + 1.0F;
    ptrH->roic_ysize     = (float)pGCRegs->Height;
    ptrH->roic_ystart    = ptrH->user_ystart; 
-   ptrH->roic_yend      = ptrH->user_yend;  
+   ptrH->roic_yend      = ptrH->user_yend;   
    
-   
-   // dès que la taille le permet, on fait du fast windowing même si cela n'est pas demandé expressement par l'usager
-   if (ptrH->roic_xend - ptrH->user_xend >= (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK * ptrH->pixnum_per_tap_per_mclk * ptrH->tap_number){
-      ptrH->line_stretch_mclk   = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
+   // egalement, au sortir de toutes les conditions/recalculs, on sait si le smooth_img_mode est permis ou non et on s'ajuste
+   if (smooth_img_mode == 1){
       speedup_unused_area = 1;
+      ptrH->line_stretch_mclk   = (float)ISC0207_FASTWINDOW_STRECTHING_AREA_MCLK;
+      ptrH->unused_area_clock_factor =  (float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ;
    }
-    
-   // en dernier lieu, on reise le facteur du fast windowing
-   ptrH->unused_area_clock_factor =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
-      
+   else{
+      speedup_unused_area = 0;
+      ptrH->line_stretch_mclk   = 0.0F;
+      ptrH->unused_area_clock_factor =  1.0F; 
+   }
+   
+   // on calcule maintenant les vitesses
    //readout part1 (zone en slow_clock)
    ptrH->readout_mclk         = ((ptrH->user_xend - ptrH->roic_xstart)/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) +  ptrH->line_stretch_mclk)*(float)pGCRegs->Height;
    
