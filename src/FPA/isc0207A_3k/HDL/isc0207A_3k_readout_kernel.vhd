@@ -80,7 +80,7 @@ architecture rtl of isc0207A_3k_readout_kernel is
          SRESET : out std_logic;
          CLK : in std_logic);
    end component;
-      
+   
    type ctrl_fsm_type is (idle, wait_int_fe_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
    type adc_time_stamp_type is
    record
@@ -147,8 +147,8 @@ architecture rtl of isc0207A_3k_readout_kernel is
    signal rst_wdow_gen_i        : std_logic;
    signal elcorr_ref_enabled    : std_logic;
    signal fpa_mclk_fe           : std_logic;
-   signal read_end_last         : std_logic;
-   signal read_start_last       : std_logic;
+   signal elcorr_tic            : std_logic;
+   signal elcorr_tac            : std_logic;
    signal adc_time_stamp        : adc_time_stamp_type;
    signal img_in_progress_i     : std_logic;
    signal acq_data_o            : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
@@ -233,7 +233,8 @@ begin
             elcorr_ref_enabled <= '0';
             img_in_progress_i <= '0'; 
             acq_data_o <= '0';
-            
+            elcorr_tic <= '0';
+            elcorr_tac <= '0';
          else  
             
             --inc := '0'& fpa_mclk_re;
@@ -241,7 +242,7 @@ begin
             fpa_int_last    <= fpa_int_i;
             acq_int_i       <= ACQ_INT;
             acq_int_last    <= acq_int_i;            
-                       
+            
             slow_mclk_raw_last <= SLOW_MCLK_RAW;            
             fast_mclk_raw_last <= FAST_MCLK_RAW;
             fpa_mclk_re        <= not fpa_mclk_last and fpa_mclk_i;
@@ -275,11 +276,13 @@ begin
                      pause_cnt <= pause_cnt + 1;
                      if pause_cnt >= to_integer(FPA_INTF_CFG.LSYDEL_MCLK) then                        
                         ctrl_fsm <= wait_flows_st;
+                        elcorr_tac <= '1';
                      end if;
                   end if;
                
                when wait_flows_st =>
                   start_gen_i <= '0';
+                  elcorr_tac <= '0';
                   if WDOW_FIFO_RDY = '1' and CLK_FIFO_RDY = '1' and fpa_mclk_re = '1' then  -- fpa_mclk_re assure une synchro
                      ctrl_fsm <= stop_raw_clk_st;
                   end if;
@@ -334,10 +337,12 @@ begin
                   slow_clk_fifo_rd_i <= '0';                     -- on descative les clocks traités
                   fast_clk_fifo_rd_i <= '0';                     -- on descative les clocks traités
                   if slow_mclk_raw_en_i = '1' then
-                     ctrl_fsm <= prep_fast_clk_st; 
+                     ctrl_fsm <= prep_fast_clk_st;
+                     elcorr_tic <= '1';
                   end if;                  
                
-               when prep_fast_clk_st =>                  
+               when prep_fast_clk_st =>
+                  elcorr_tic <= '0';
                   fast_clk_fifo_rd_i <= not fast_mclk_eof;        -- le fast_clk_fifo est préparé pour la prochaine syncronisation.
                   if fast_mclk_eof = '1' then
                      ctrl_fsm <= prep_slow_clk_st;
@@ -401,8 +406,8 @@ begin
             data_sync_err <= '0';
             quad_clk_fe_pipe <= (others => '0');
             -- pragma translate_on
-            read_start_last <= '0';
-            read_end_last <= '0';
+            -- read_start_last <= '0';
+            -- read_end_last <= '0';
             
          else 
             
@@ -413,11 +418,11 @@ begin
             fpa_mclk_last <= fpa_mclk_i;
             
             -- 
-            read_end_last <= readout_info_i.aoi.read_end;
-            read_start_last <= readout_info_i.aoi.sof;
+            -- read_end_last <= readout_info_i.aoi.read_end;
+            -- read_start_last <= readout_info_i.aoi.sof;
             
             -- elcorr_ref_start_i dure 1 PCLK             
-            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (read_end_last and not readout_info_i.aoi.read_end); -- Attention! le rd_end = debut de elc_ofs.
+            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & elcorr_tic; -- Attention! le rd_end = debut de elc_ofs.
             if unsigned(elcorr_ref_start_pipe) /= 0 then
                elcorr_ref_start_i <= '1';
                elcorr_ref_fval_i  <= '1'; 
@@ -426,7 +431,7 @@ begin
             end if;
             
             -- elcorr_ref_end_i dure 1 PCLK
-            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not read_start_last and readout_info_i.aoi.sof); -- Attention! le sof  = fin de elc_ofs.
+            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & elcorr_tac; -- Attention! le sof  = fin de elc_ofs.
             if unsigned(elcorr_ref_end_pipe) /= 0 then
                elcorr_ref_end_i <= '1';
             else
