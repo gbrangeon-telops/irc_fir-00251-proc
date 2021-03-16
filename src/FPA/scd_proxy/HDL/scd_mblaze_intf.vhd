@@ -509,6 +509,11 @@ begin
             
             mb_cfg_serial_in_progress_last <= mb_cfg_serial_in_progress;
             
+            -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
+            mb_struct_cfg.comn.fpa_acq_trig_mode  <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
+            mb_struct_cfg.comn.fpa_xtra_trig_mode <= mb_struct_cfg.comn.fpa_trig_ctrl_mode;
+
+
             if slv_reg_wren = '1' then 				
                
                if  axi_awaddr(11) = '1' then   -- données de configuration serielle, envoyées dans la ram du hw_driver
@@ -525,7 +530,8 @@ begin
                else   -- données pour config du bloc
                   
                   mb_cfg_serial_in_progress <= '0';
-                  
+                 
+
                   if axi_wstrb = "1111" then  -- c'Est obligatoire d'envoyer les données de la config structurale sur 32 bits
                      
                      case axi_awaddr(7 downto 0) is 
