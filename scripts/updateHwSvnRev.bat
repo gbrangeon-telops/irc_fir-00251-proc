@@ -73,8 +73,12 @@ echo %commonHdlDir% $WCREV$$WCMODS?*:$>> %hwRevFile%
 
 REM Common_HDL FPA files
 for /f %%G in ('dir /b /s /a:-d %commonHdlDir%\Common_Projects\TEL2000\FPA_common\src') do (
-   echo %%G $WCREV$$WCMODS?*:$>> %hwRevFile%
-   %svn_subwcrev% %%G %hwRevFile% %hwRevFile%
+   for %%H in (%srcExtensionList%) do (
+      if "%%~xG"==%%H (
+         echo %%G $WCREV$$WCMODS?*:$>> %hwRevFile%
+         %svn_subwcrev% %%G %hwRevFile% %hwRevFile%
+      )
+   )
 )
 
 REM Common_HDL gh files
