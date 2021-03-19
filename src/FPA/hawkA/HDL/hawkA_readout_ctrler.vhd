@@ -127,7 +127,8 @@ begin
    Ud: process(CLK)
    begin
       if rising_edge(CLK) then 
-         adc_sync_flag_i(15 downto 4)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(15 downto 5)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(4)  <= eof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);               -- obligatoire :
          adc_sync_flag_i(3)  <= readout_info_i.naoi.stop;
          adc_sync_flag_i(2)  <= readout_info_i.naoi.start;
          adc_sync_flag_i(1)  <= sof_pipe(C_PIPE_POS) and dval_pipe(C_PIPE_POS);                                    -- frame_flag(doit durer 1 CLK ADC au minimum). Dval_pipe permet de s'assurer que seuls les sol de la zone usager sont envoyés. Sinon, bjr les problèmes.   

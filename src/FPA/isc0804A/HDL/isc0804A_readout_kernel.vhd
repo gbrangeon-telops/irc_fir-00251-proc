@@ -98,7 +98,8 @@ architecture rtl of isc0804A_readout_kernel is
    type adc_time_stamp_type is
    record
       naoi_stop  : std_logic;
-      naoi_start : std_logic;  
+      naoi_start : std_logic;
+      aoi_eof    : std_logic;
       aoi_sof    : std_logic;  
       aoi_sol    : std_logic;     
    end record;
@@ -195,8 +196,9 @@ begin
    
    -- ADC_SYNC_FLAG 
    -- Ces flags permettent un timestamping des samples des ADC en vue d'une synchro parfaite avec les flags contenues dans readout_info 
-   ADC_SYNC_FLAG(15 downto 4)  <= (others => '0');   -- non utilisé
-   ADC_SYNC_FLAG(3)  <= adc_time_stamp.naoi_stop;    -- pas obligatoire
+   ADC_SYNC_FLAG(15 downto 5)  <= (others => '0');   -- non utilisé
+   ADC_SYNC_FLAG(4)  <= adc_time_stamp.aoi_eof;
+   ADC_SYNC_FLAG(3)  <= adc_time_stamp.naoi_stop;    -- obligatoire
    ADC_SYNC_FLAG(2)  <= adc_time_stamp.naoi_start;   -- adc time stamp obligatoire : naoi_start  (doit durer 1 CLK ADC)
    ADC_SYNC_FLAG(1)  <= adc_time_stamp.aoi_sof;      -- adc time stamp obligatoire : frame_flag  (doit durer 1 CLK ADC)
    ADC_SYNC_FLAG(0)  <= adc_time_stamp.aoi_sol;      -- adc time stamp obligatoire : line flag (doit durer 1 CLK ADC)
@@ -558,6 +560,7 @@ begin
             
             -- ADC_FLAGS
             -- flags temps reel enovoyés vers le synchronisateur d'adc pour time stamping des données ADC
+            adc_time_stamp.aoi_eof           <= WDOW_FIFO_DATA.USER.EOF and window_fifo_rd_i;
             adc_time_stamp.naoi_start        <= elcorr_ref_start_i;
             adc_time_stamp.naoi_stop         <= elcorr_ref_end_i;
             adc_time_stamp.aoi_sof           <= WDOW_FIFO_DATA.USER.SOF and window_fifo_rd_i;
