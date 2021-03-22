@@ -31,8 +31,7 @@ package Proxy_define is
    constant DEFINE_PROXY                 : std_logic_vector(2 downto 0) := PROXY_SCD;   
    constant PROG_FREE_RUNNING_TRIG       : std_logic := '0';   -- à '1', cette constante dit que les trigs n'ont pas besoin d'être arrêté lorsqu'on programme le détecteur
    constant FPA_INTF_CLK_RATE_MHZ        : integer := 100;     --  FPA_INTF_CLK_RATE en MHz
-   constant SCD_INT_TIME_MIN_US          : integer := 1; 
-   constant SCD_MASTER_CLK_RATE_MHZ      : integer := 80;     
+   constant SCD_INT_TIME_MIN_US          : integer := 1;      
    constant FPA_XTRA_IMAGE_NUM_TO_SKIP   : integer := 1; -- pour les SCD, chaque appel de FPA_SendConfigGC() déclenche l'envoi d'une config opérationnelle au proxy qui sera précédé et suivi d'au moins FPA_XTRA_IMAGE_NUM_TO_SKIP prog trig.  
    
    --------------------------------------------
@@ -104,13 +103,12 @@ package Proxy_define is
    constant SCD_FSYNC_HIGH_TIME_FACTOR     : integer := integer(FPA_INTF_CLK_RATE_MHZ*SCD_FSYNC_HIGH_TIME_US);
    constant SCD_POWER_WAIT_FACTOR          : integer := integer(FPA_INTF_CLK_RATE_MHZ*SCD_POWER_WAIT_US);
    constant SCD_SERIAL_TX_CLK_FACTOR       : integer := integer((FPA_INTF_CLK_RATE_MHZ*1E6)/SCD_SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
-   constant SCD_OP_INT_TIME_DEFAULT_FACTOR : integer := integer(real(SCD_MASTER_CLK_RATE_MHZ)*(0.5*real(SCD_INT_TIME_MIN_US))); --
    constant SCD_TEMP_TRIG_PERIOD_FACTOR    : integer := integer(FPA_INTF_CLK_RATE_MHZ*SCD_TEMP_TRIG_PERIOD_US);
    
    constant SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de SCD_EXP_TIME_CONV_DENOMINATOR  
    constant SCD_EXP_TIME_CONV_DENOMINATOR  : integer := 2**SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
    constant SCD_CLK_FACTOR                 : real    := real(SCD_MASTER_CLK_RATE_MHZ)/real(FPA_INTF_CLK_RATE_MHZ);
-   constant SCD_EXP_TIME_CONV_NUMERATOR    : unsigned(SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned(natural(SCD_CLK_FACTOR*real(2**SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS)), SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     -- (80 x 2^26 )/100
+   constant SCD_EXP_TIME_CONV_NUMERATOR    : unsigned(SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0):= to_unsigned(natural((SCD_CLK_FACTOR/SCD_FRAME_RESOLUTION)*real(2**SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS)), SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS);     -- (80 x 2^26 )/100
    constant DEFINE_DIAG_DATA_CLK_FACTOR    : integer := integer((ceil(real(FPA_INTF_CLK_RATE_MHZ * 1000) / real(DEFINE_DIAG_CLK_RATE_MAX_KHZ)))*(2.0/real(PROXY_CLINK_PIXEL_NUM)));  
    
    
@@ -151,7 +149,7 @@ package Proxy_define is
    -- scd frame resolution (BB1280 only)
    type scd_frame_res_cfg_type is
    record
-      scd_exp_time_conv_numerator   : std_logic_vector(SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS-1 downto 0);
+      cfg_num   : std_logic_vector(7 downto 0);
    end record;
    
    -- scd temperature
@@ -191,6 +189,7 @@ package Proxy_define is
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
+      scd_int_cfg_enable   : std_logic;               -- Active l'envoi de config de temps d'intégration (pour BB1280 seulement)
    end record;    
    
    ----------------------------------------------								

@@ -637,6 +637,9 @@ void Acquisition_SM()
             {
                builtInTests[BITID_SensorInitialization].result = BITR_Passed;
                ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
+               #ifdef SCD_BLACKBIRD1280D
+                  FPA_ConfigureFrameResolution(&fpaStatus, &gFpaIntf, &gcRegsData);
+               #endif
                acquisitionState = ACQ_FINALIZE_POWER_ON;
             }
             else

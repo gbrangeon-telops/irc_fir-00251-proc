@@ -42,11 +42,13 @@
 #define MODE_ALL_END_TO_TRIG_START          0x05
 
 // Frame resolution command parameter default value (D15F0002 REV3 section 3.2.4.4)
-#define OP_CMD_FRAME_RESOLUTION_DEFAULT     2    //  increment = only power of 2 are supported, min = 2*Tfpp_clk, max = 127*Tfpp_clk
+#define OP_CMD_FRAME_RESOLUTION_DEFAULT     0x46    // Initial frame resolution of SCD proxy
+#define OP_CMD_FRAME_RESOLUTION_TELOPS      0x02    // Also define in VHDL (fpa_define.vhd -> SCD_FRAME_RESOLUTION),   increment = only power of 2 are supported, min = 2*Tfpp_clk, max = 127*Tfpp_clk
+
 
 // Operational command parameters default value (D15F0002 REV3 section 3.2.3.2)
-#define OP_CMD_FRAME_DLY_DEFAULT            400 // "Frame read delay" parameter
-#define OP_CMD_INTG_DLY_DEFAULT             100 // "Integration delay" parameter
+#define OP_CMD_FRAME_DLY_DEFAULT            20E-6F // "Frame read delay" parameter, in seconds
+#define OP_CMD_INTG_DLY_DEFAULT             10E-6F // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
 
 // "Boost mode off" parameter
 #define OP_CMD_BOOST_MODE                   0x00 // "Boost mode off" is activated  (specific delay added to prevent image obstruction)
@@ -122,6 +124,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 
 // adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
+
+// adresse d'ecriture de la config diag du manufacturier
+#define AW_FPA_SCD_INT_CMD_ENABLE_ADD     0xA4
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -213,10 +218,7 @@ typedef struct ScdPacketTx_s ScdPacketTx_t;
 // Global variables
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
-uint32_t gSCD_frame_dly = (uint32_t)OP_CMD_FRAME_DLY_DEFAULT;
-uint32_t gSCD_intg_dly  = (uint32_t)OP_CMD_INTG_DLY_DEFAULT;
-uint32_t gSCD_frame_res = (uint32_t)OP_CMD_FRAME_RESOLUTION_DEFAULT;
-uint32_t gSCD_display_mode = (uint32_t)NORMAL_READOUT;
+uint32_t gSCD_frame_res;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -226,11 +228,14 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA);
 void FPA_ReadTemperature_StructCmd(const t_FpaIntf *ptrA);
 void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA);
 void FPA_SendFrameResolution_SerialCmd(const t_FpaIntf *ptrA);
+void FPA_SendFrameResolution_SerialCmd_V2(const t_FpaIntf *ptrA);
 void FPA_FrameResolution_StructCmd(const t_FpaIntf *ptrA);
+void FPA_FrameResolution_StructCmd_V2(const t_FpaIntf *ptrA);
 void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
-
+void FPA_EnableProxyExpTimeCfg(t_FpaIntf *ptrA, bool state);
+float FPA_ConvertSecondToFrameResolution(float seconds);
 
 
 //--------------------------------------------------------------------------
@@ -238,16 +243,41 @@ void FPA_Reset(const t_FpaIntf *ptrA);
 //--------------------------------------------------------------------------
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {
+
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_SetFrameResolution(ptrA);                                            // must be call before FPA_SendConfigGC()
-   FPA_GetTemperature(ptrA);
-   FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
+
+   gSCD_frame_res = (uint32_t)OP_CMD_FRAME_RESOLUTION_DEFAULT;
+   FPA_SendConfigGC(ptrA, pGCRegs);
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
 
 }
  
+void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
+{
+   gSCD_frame_res = (uint32_t)OP_CMD_FRAME_RESOLUTION_TELOPS;
+   FPA_SetFrameResolution(ptrA); // On change la résolution de frame
+   FPA_SendConfigGC(ptrA, pGCRegs); // On configure le proxy avec des paramètres cohérents avec la nouvelle résolution de frame.
+   FPA_EnableProxyExpTimeCfg(ptrA, true); // On active l'envoi de commande de configuration de temps d'exposition.
+}
+
+
+//--------------------------------------------------------------------------
+// Pour activer l'envoi de configuration de temps d'exposition au proxy.
+// Elle est désactivé par défaut pour empêcher l'envoi de commande de changement
+// de temps d'intégration (0x8001) tant que la résolution de frame "Telops" n'a pas été configuré.
+//--------------------------------------------------------------------------
+void  FPA_EnableProxyExpTimeCfg(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_INT_CMD_ENABLE_ADD);
+  }
+}
+
+
 //--------------------------------------------------------------------------
 // pour reset des registres d'erreurs
 //--------------------------------------------------------------------------
@@ -367,7 +397,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;
       ptrA->scd_int_mode  = SCD_IWR_MODE; // Test pattern only available in IWR.
    }
-   ptrA->scd_bit_pattern = SCD_PE_NORM_OUTPUT; // SCD test pattern mode is deactivated by default.
+   //ptrA->scd_bit_pattern = SCD_PE_NORM_OUTPUT; // SCD test pattern mode is deactivated by default.
    if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
@@ -381,13 +411,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    //-----------------------------------------                                           
    // Envoyer commande synthetique
+   ptrA->scd_bit_pattern = SCD_PE_TEST1;
    ptrA->proxy_cmd_to_update_id = SCD_DIAG_CMD_ID;
-   WriteStruct(ptrA);   // on envoie au complet les parametres pour toutes les parties (partie common etc...)                           
+   WriteStruct(ptrA);   // on envoie au complet les parametres pour toutes les parties (partie common etc...)
    FPA_SendSyntheticVideo_SerialCmd(ptrA);         // on envoie la partie serielle de la commande video synthetique (elle est stockée dans une partie de la RAM en vhd)
-   
+
+
+   PRINTF("ptrA->fpa_diag_mode (uint32)     = %d \n", ptrA->fpa_diag_mode);
+   PRINTF("pGCRegs->TestImageSelector (uint32)     = %d \n", pGCRegs->TestImageSelector);
+
    // Envoyer commande operationnelle
    ptrA->proxy_cmd_to_update_id = SCD_OP_CMD_ID;
-   WriteStruct(ptrA);   // on envoie de nouveau au complet les parametres pour toutes les parties (partie common etc...). Ce nouvel envoi vise à a;erter l'arbitreur vhd 
+   WriteStruct(ptrA);   // on envoie de nouveau au complet les parametres pour toutes les parties (partie common etc...). Ce nouvel envoi vise à a;erter l'arbitreur vhd
    FPA_SendOperational_SerialCmd(ptrA);            // on envoie la partie serielle de la commande operationnelle (elle est stockée dans une autre partie de la RAM en vhd)// ensuite on envoie la partie serielle de la commande pour la RAM vhd
 }
 
@@ -448,6 +483,13 @@ void FPA_SetFrameResolution(t_FpaIntf *ptrA)
    FPA_SendFrameResolution_SerialCmd(ptrA);      // envoi la commande serielle
 }
 
+void FPA_SetFrameResolution_V2(t_FpaIntf *ptrA)
+{
+   // A enlever a la fin du debug. Sert à envoyer des requete de statut au détecteur.
+   FPA_FrameResolution_StructCmd_V2(ptrA);      // envoi un interrupt au contrôleur du hw driver
+   FPA_SendFrameResolution_SerialCmd_V2(ptrA);      // envoi la commande serielle
+}
+
 
 //--------------------------------------------------------------------------
 // Pour avoir le frameRateMax avec une config donnée
@@ -457,10 +499,23 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    float fr_max;
    Scd_Param_t params;
 
+   PRINTF("--------FPA_MaxFrameRate---------- \n");
+
+
+
    FPA_SpecificParams(&params, (float)pGCRegs->ExposureTime, pGCRegs);
+
+   PRINTF("--------FPA_MaxFrameRate(suite)---------- \n");
    fr_max = 1.0F / params.frame_period_min;
+   PRINTF("(float)pGCRegs->ExposureTime: " _PCF(3) "\n", _FFMT((float)pGCRegs->ExposureTime, 3));
+   PRINTF("params.frame_period_min: " _PCF(9) "\n", _FFMT(params.frame_period_min, 9));
+   PRINTF("fr_max: " _PCF(3) "\n", _FFMT(fr_max, 3));
+
+
    fr_max = fr_max * (1.0F - gFpaPeriodMinMargin);
+   PRINTF("fr_max: " _PCF(3) "\n", _FFMT(fr_max, 3));
    fr_max = floorMultiple(fr_max, 0.01);
+   PRINTF("fr_max: " _PCF(3) "\n", _FFMT(fr_max, 3));
 
    return fr_max;
 }
@@ -473,7 +528,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    float maxExposure_us, periodMinWithNullExposure, Ta;
    float operatingPeriod, fpaAcquisitionFrameRate;
    Scd_Param_t hh;
-
+   PRINTF("--------FPA_MaxExposureTime---------- \n");
 
    fpaAcquisitionFrameRate = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); // On enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nul
@@ -481,6 +536,15 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
    
+   PRINTF("--------FPA_MaxExposureTime(suite)---------- \n");
+   PRINTF("fpaAcquisitionFrameRate: " _PCF(3) "\n", _FFMT(fpaAcquisitionFrameRate, 3));
+   PRINTF("gFpaPeriodMinMargin: " _PCF(3) "\n", _FFMT(gFpaPeriodMinMargin, 3));
+   PRINTF("periodMinWithNullExposure: " _PCF(9) "\n", _FFMT(periodMinWithNullExposure, 9));
+   PRINTF("operatingPeriod: " _PCF(9) "\n", _FFMT(operatingPeriod, 9));
+   PRINTF("maxExposure_us: " _PCF(3) "\n", _FFMT(maxExposure_us, 3));
+
+
+
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
       Ta = (hh.fr_dly + hh.ro_iwr) - hh.intg_dly;
       if (Ta > 0)
@@ -492,8 +556,12 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
          maxExposure_us = maxExposure_us + Ta*1E6F;
    }
 
+   PRINTF("Ta: " _PCF(9) "\n", _FFMT(Ta, 9));
+   PRINTF("maxExposure_us: " _PCF(2) "\n", _FFMT(maxExposure_us, 2));
    maxExposure_us = floorMultiple(maxExposure_us, 0.1);
+   PRINTF("maxExposure_us: " _PCF(2) "\n", _FFMT(maxExposure_us, 2));
    maxExposure_us = MIN(MAX(maxExposure_us, pGCRegs->ExposureTimeMin),FPA_MAX_EXPOSURE);
+   PRINTF("maxExposure_us: " _PCF(2) "\n", _FFMT(maxExposure_us, 2));
    
    return maxExposure_us;
 }
@@ -579,8 +647,20 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
    ptrH->ro                = ptrH->adc_conv/ptrH->videoRate;                              // in second
    ptrH->Tframe_init       = 40E-6F*corr_factor;                                          // in second
    ptrH->ro_itr            = ptrH->ro*(2.0F + (float)pGCRegs->Height)+ptrH->Tframe_init;  // in second
-   ptrH->fr_dly            = ((float)gSCD_frame_dly)*ptrH->frame_resolution;              // in second
-   ptrH->intg_dly          = ((float)gSCD_intg_dly)*ptrH->frame_resolution;               // in second
+   ptrH->fr_dly            = OP_CMD_FRAME_DLY_DEFAULT;                                    // in second
+   ptrH->intg_dly          = OP_CMD_INTG_DLY_DEFAULT;                                     // in second
+
+   PRINTF("--------FPA_SpecificParams---------- \n");
+
+   PRINTF("frame_resolution: " _PCF(9) "\n", _FFMT(ptrH->frame_resolution, 9));
+   PRINTF("exposure_time: " _PCF(9) "\n", _FFMT(ptrH->exposure_time, 9));
+   PRINTF("adc_conv: " _PCF(9) "\n", _FFMT(ptrH->adc_conv, 9));
+   PRINTF("ro: " _PCF(9) "\n", _FFMT(ptrH->ro, 9));
+   PRINTF("Tframe_init: " _PCF(9) "\n", _FFMT(ptrH->Tframe_init, 9));
+   PRINTF("ro_itr: " _PCF(9) "\n", _FFMT(ptrH->ro_itr, 9));
+   PRINTF("fr_dly: " _PCF(9) "\n", _FFMT(ptrH->fr_dly, 9));
+   PRINTF("intg_dly: " _PCF(9) "\n", _FFMT(ptrH->intg_dly, 9));
+
 
    if((ptrH->fr_dly <= ptrH->intg_dly) && ((ptrH->fr_dly + ptrH->ro_itr) > (ptrH->intg_dly + ptrH->exposure_time)))
    {
@@ -609,6 +689,13 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
       else
          ptrH->frame_period_min = ptrH->fr_dly+ ptrH->ro_itr + ptrH->x_to_next_fsync;
    }
+
+
+   PRINTF("m: " _PCF(9) "\n", _FFMT(ptrH->m, 9));
+   PRINTF("int_eg_rlx: " _PCF(9) "\n", _FFMT(ptrH->int_eg_rlx, 9));
+   PRINTF("ro_iwr: " _PCF(9) "\n", _FFMT(ptrH->ro_iwr, 9));
+   PRINTF("x_to_next_fsync: " _PCF(9) "\n", _FFMT(ptrH->x_to_next_fsync, 9));
+   PRINTF("frame_period_min: " _PCF(9) "\n", _FFMT(ptrH->frame_period_min, 9));
 
    // Camera Link output timing -> calcul based on figure 8 (D15F0002 REV3)
    ptrH->fig8_t1 = ptrH->fr_dly + ptrH->Tframe_init;
@@ -645,13 +732,37 @@ void FPA_ReadTemperature_StructCmd(const t_FpaIntf *ptrA)
 //-------------------------------------------------------
 void FPA_FrameResolution_StructCmd(const t_FpaIntf *ptrA)
 {
-   uint32_t scd_exp_time_conv_denominator_bit_pos = 26; // define in VHDL (proxy_define.vhd)
-   uint32_t scd_exp_time_conv_numerator = (uint32_t)(((FPA_FPP_CLK_RATE_HZ/FPA_VHD_INTF_CLK_RATE_HZ)/(float)gSCD_frame_res)*pow(2,scd_exp_time_conv_denominator_bit_pos)) & 0x3FFFFFF;
+   static uint8_t cfg_num = 0;
+
+   if (cfg_num == 255)
+      cfg_num = 0;
+   cfg_num++;
 
    // 3 envois juste pour donner du temps à l'arbitreur de prendre la commande
-   AXI4L_write32(scd_exp_time_conv_numerator, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
-   AXI4L_write32(scd_exp_time_conv_numerator, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
-   AXI4L_write32(scd_exp_time_conv_numerator, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+   AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+   AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+   AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+}
+
+void FPA_FrameResolution_StructCmd_V2(const t_FpaIntf *ptrA)
+{
+   static uint8_t cfg_num = 0;
+
+   if (cfg_num == 255)
+      cfg_num = 0;
+   cfg_num++;
+
+   // 3 envois juste pour donner du temps à l'arbitreur de prendre la commande
+   AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+   AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+   AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
+}
+
+float FPA_ConvertSecondToFrameResolution(float seconds)
+{
+   seconds =  seconds*FPA_FPP_CLK_RATE_HZ; // in 70 MHz clks
+   seconds =  seconds/(float)gSCD_frame_res; // in frame_res
+   return seconds;
 }
 
 //------------------------------------------------------
@@ -663,7 +774,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    ScdPacketTx_t ScdPacketTx;
    uint8_t scd_gain;
    uint32_t vhd_int_time;
-   float Tint, Tframe;
+   float Tint, Tframe, fr_dly, intg_dly;
    uint8_t scd_hder_disable  = 0;  // 0 => enabled, 1 => disabled
    uint8_t FSyncMode         = 0;  // 0 => external "slave" sync mode, 1 => internal "master" sync mode (default)
    uint8_t ReadDirLR         = 0;  // 0 => left to right (default), 1 => right to left
@@ -678,27 +789,48 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint32_t scd_xsize  = ptrA->scd_xsize  >> 2;  // in step of 4 pixels
 
    PRINTF("ptrA->scd_ystart (uint32)     = %d \n", ptrA->scd_ystart);
-   PRINTF("scd_ystart (uint32)     = %d \n", scd_ystart);
+   PRINTF("scd_ystart (uint32)     = %d \n", scd_ystart);               //0x0000
    PRINTF("ptrA->scd_xstart (uint32)     = %d \n", ptrA->scd_xstart);
-   PRINTF("scd_xstart (uint32)     = %d \n", scd_xstart);
+   PRINTF("scd_xstart (uint32)     = %d \n", scd_xstart);               //0x0000
    PRINTF("ptrA->scd_ysize (uint32)     = %d \n", ptrA->scd_ysize);
-   PRINTF("scd_ysize (uint32)     = %d \n", scd_ysize);
+   PRINTF("scd_ysize (uint32)     = %d \n", scd_ysize);                 //0x0200
    PRINTF("ptrA->scd_xsize (uint32)     = %d \n", ptrA->scd_xsize);
-   PRINTF("scd_xsize (uint32)     = %d \n", scd_xsize);
+   PRINTF("scd_xsize (uint32)     = %d \n", scd_xsize);                 //0x0140
 
    vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME); // read from vhdl (in 100MHz clks)
    PRINTF("vhd_int_time     = %d \n", vhd_int_time);
    Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
    Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection
    Tint = Tint/1E6F; // in second
-   Tint = Tint*FPA_FPP_CLK_RATE_HZ; // in 70 MHz clks
-   Tint = Tint/(float)gSCD_frame_res; // in frame_res
-   PRINTF("Tint (uint32)     = %d \n", (uint32_t)Tint);
+   Tint = FPA_ConvertSecondToFrameResolution(Tint);
 
    Tframe = ptrA->scd_frame_period_min/FPA_VHD_INTF_CLK_RATE_HZ; // in second
-   Tframe = Tframe*FPA_FPP_CLK_RATE_HZ; // in 70 MHz clks
-   Tframe = Tframe/(float)gSCD_frame_res; // in frame_res
+   Tframe = FPA_ConvertSecondToFrameResolution(Tframe);
+
+   intg_dly = FPA_ConvertSecondToFrameResolution(OP_CMD_INTG_DLY_DEFAULT);
+   fr_dly = FPA_ConvertSecondToFrameResolution(OP_CMD_FRAME_DLY_DEFAULT);
+
+   PRINTF("Tint (uint32)     = %d \n", (uint32_t)Tint);
    PRINTF("Tframe (uint32)     = %d \n", (uint32_t)Tframe);
+   PRINTF("intg_dly (uint32)     = %d \n", (uint32_t)intg_dly);
+   PRINTF("fr_dly (uint32)     = %d \n", (uint32_t)fr_dly);
+
+
+
+	PRINTF("scd_hder_disable (uint32)     = %d \n", scd_hder_disable);         //0x01
+	PRINTF("ptrA->scd_diode_bias (uint32)     = %d \n", ptrA->scd_diode_bias); //0x00
+	PRINTF("scd_gain (uint32)     = %d \n", scd_gain);                         //0x00
+	//PRINTF("gSCD_display_mode (uint32)     = %d \n", gSCD_display_mode);        //0x00
+	PRINTF("FSyncMode (uint32)     = %d \n", FSyncMode);                       //0x00
+	PRINTF("ReadDirLR (uint32)     = %d \n", ReadDirLR);                       //0x00
+	PRINTF("ReadDirUP (uint32)     = %d \n", ReadDirUP);                       //0x01
+	PRINTF("FPP_power_on_mode (uint32)     = %d \n", FPP_power_on_mode);       //0x00
+	PRINTF("ptrA->scd_boost_mode (uint32)     = %d \n", ptrA->scd_boost_mode); //0x00
+	PRINTF("FRM_SYNC_MOD (uint32)     = %d \n", FRM_SYNC_MOD);                 //0x00	
+   PRINTF("ptrA->scd_out_chn (uint32)     = %d \n", ptrA->scd_out_chn);       //0x02
+	PRINTF("ptrA->scd_pix_res (uint32)     = %d \n", ptrA->scd_pix_res);       //0x02
+
+
 
    // on bâtit la commande
    Cmd.Header       =  0xAA;
@@ -730,17 +862,17 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Data[16]     = ((uint32_t)Tframe >> 8) & 0xFF;
    Cmd.Data[17]     = ((uint32_t)Tframe >> 16) & 0x0F;  // Frame period msb
                          
-   Cmd.Data[18]     = (0x00 << 7) + (((gSCD_display_mode) & 0x0F) << 3) + ((FSyncMode & 0x01) << 2) + ((ReadDirLR & 0x01) << 1) + (ReadDirUP & 0x01);
+   Cmd.Data[18]     = (0x00 << 7) + ((((uint32_t)NORMAL_READOUT) & 0x0F) << 3) + ((FSyncMode & 0x01) << 2) + ((ReadDirLR & 0x01) << 1) + (ReadDirUP & 0x01);
    Cmd.Data[19]     = 0;                                          // Reserved
    Cmd.Data[20]     = ((FPP_power_on_mode & 0x03) << 6) + ((ptrA->scd_boost_mode & 0x01) << 5) + ((FRM_SYNC_MOD & 0x01) << 4) + (((ptrA->scd_out_chn) & 0x03) << 2)  + (ptrA->scd_pix_res & 0x03);
    
-   Cmd.Data[21]     =  gSCD_frame_dly & 0xFF;                   // Frame read delay lsb
-   Cmd.Data[22]     = (gSCD_frame_dly >> 8) & 0xFF;
-   Cmd.Data[23]     = (gSCD_frame_dly >> 16) & 0x0F;            // Frame read delay  msb
+   Cmd.Data[21]     =  (uint32_t)fr_dly & 0xFF;                   // Frame read delay lsb
+   Cmd.Data[22]     = ((uint32_t)fr_dly >> 8) & 0xFF;
+   Cmd.Data[23]     = ((uint32_t)fr_dly >> 16) & 0x0F;            // Frame read delay  msb
 
-   Cmd.Data[24]     =  gSCD_intg_dly & 0xFF;                 // Integration delay lsb
-   Cmd.Data[25]     = (gSCD_intg_dly >> 8) & 0xFF;
-   Cmd.Data[26]     = (gSCD_intg_dly >> 16) & 0x0F;          // Integration delay  msb
+   Cmd.Data[24]     =  (uint32_t)intg_dly & 0xFF;                 // Integration delay lsb
+   Cmd.Data[25]     = ((uint32_t)intg_dly >> 8) & 0xFF;
+   Cmd.Data[26]     = ((uint32_t)intg_dly >> 16) & 0x0F;          // Integration delay  msb
 
    Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_OP_CMD_RAM_BASE_ADD; // Adresse à laquelle envoyer la commande en RAM
    // on batit les packets de bytes
@@ -807,13 +939,30 @@ void FPA_SendFrameResolution_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Header              = 0xAA;
    Cmd.ID                  = 0x8010;
    Cmd.DataLength          = 2;
-   Cmd.Data[0]             = gSCD_frame_res & 0x7F;
+   Cmd.Data[0]             = OP_CMD_FRAME_RESOLUTION_DEFAULT & 0x7F;
    for(ii = 1; ii < Cmd.DataLength; ii++)
       Cmd.Data[ii] = 0;
    Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_FRAME_RES_CMD_RAM_BASE_ADD;
    FPA_BuildCmdPacket(&ScdPacketTx, &Cmd); // on batit les packets de bytes
    FPA_SendCmdPacket(&ScdPacketTx, ptrA);  // on envoit les packets
 }
+
+void FPA_SendFrameResolution_SerialCmd_V2(const t_FpaIntf *ptrA)
+{
+   uint8_t ii;
+   Command_t Cmd;
+   ScdPacketTx_t ScdPacketTx;
+   extern int32_t gFpaDebugRegC;
+   // on bâtit la commande
+   Cmd.Header              = 0xAA;
+   Cmd.ID                  = 0x8000 + (uint8_t)gFpaDebugRegC;
+   PRINTF("Cmd.ID = %d \n",Cmd.ID );
+   Cmd.DataLength          = 0;
+   Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_FRAME_RES_CMD_RAM_BASE_ADD;
+   FPA_BuildCmdPacket(&ScdPacketTx, &Cmd); // on batit les packets de bytes
+   FPA_SendCmdPacket(&ScdPacketTx, ptrA);  // on envoit les packets
+}
+
 
 //-------------------------------
 // scd commands packets build
@@ -846,7 +995,16 @@ void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC)
    // compute finally the checksum
    chksum %= 256;
    chksum = (~chksum) + 1;                      
-   ptrE->ScdPacketArrayTx[total_length-1] = chksum;   
+   ptrE->ScdPacketArrayTx[total_length-1] = chksum;
+
+   //PRINTF("total_length = %d \n", (uint32_t)total_length - 1);
+
+//   uint8_t i =0;
+//   for(i=0;i<total_length;++i)
+//   {
+//      PRINTF("ptrE->ScdPacketArrayTx = %d \n", (uint32_t)ptrE->ScdPacketArrayTx[i]);
+//   }
+
 }
 
 //-----------------------------------
@@ -861,6 +1019,8 @@ void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA)
    {
       AXI4L_write32(ptrE->ScdPacketArrayTx[index], ptrA->ADD + AW_SERIAL_CFG_SWITCH_ADD + 4*(ptrE->SerialCmdRamBaseAdd + index));  // dans le vhd, division par 4 avant entrée dans ram
       index++;
+      //PRINTF("BRAM ADRESSES = %d, BYTE VALUE = %d \n", ptrA->ADD + AW_SERIAL_CFG_SWITCH_ADD + 4*(ptrE->SerialCmdRamBaseAdd + index), (uint32_t)ptrE->ScdPacketArrayTx[index]);
+
    }
    for(ii = 0; ii <= 3 ; ii++)
    {      

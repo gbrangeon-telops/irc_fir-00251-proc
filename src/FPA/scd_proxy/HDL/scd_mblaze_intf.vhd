@@ -35,7 +35,6 @@ entity scd_mblaze_intf is
       
       USER_CFG_IN_PROGRESS : out std_logic;
       USER_CFG             : out fpa_intf_cfg_type;
-      FPA_INTF_CFG         : in fpa_intf_cfg_type;
       COOLER_STAT          : out fpa_cooler_stat_type;
       
       SER_CFG_DATA         : out std_logic_vector(7 downto 0);
@@ -380,21 +379,10 @@ begin
    --    end 
    --    erreur = max(abs(int_time_80MHz_appr - int_time_80MHz)) < 0.5
    
-   
-   VHD_SOURCE : if (SCD_EXP_TIME_NUMERATOR_SOURCE = '0') generate
-   begin  
-      scd_exp_time_numerator_i <= SCD_EXP_TIME_CONV_NUMERATOR;
-   end generate;
-   UB_SOURCE : if (SCD_EXP_TIME_NUMERATOR_SOURCE = '1') generate
-   begin  
-      scd_exp_time_numerator_i <= unsigned(FPA_INTF_CFG.scd_frame_res.scd_exp_time_conv_numerator);
-   end generate;
-   
-   
    U3B: process (MB_CLK)
    begin
       if rising_edge(MB_CLK) then 
-         scd_exp_time_temp1 <= exp_time_i * scd_exp_time_numerator_i; 
+         scd_exp_time_temp1 <= exp_time_i * SCD_EXP_TIME_CONV_NUMERATOR; 
          scd_exp_time_temp2 <= scd_exp_time_temp1((SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_23) downto SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS);  -- soit une division par SCD_EXP_TIME_CONV_DENOMINATOR
          if scd_exp_time_temp1(SCD_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1) = '1' then  -- pour l'operation d'arrondi
             scd_exp_time_i <= scd_exp_time_temp2 + 1;
@@ -502,7 +490,7 @@ begin
             reset_err_i<= '0';
             fpa_softw_stat_i.fpa_input <= LVDS25; -- normaement c'est un mesureur de la tension de la banque du FPGA qui doit forunir cette info (sera fait dans sur une carte ADC). Mais pour la carte ACQ ce n'Est pas le cas.
             ctrled_reset_i <= '1';
-            
+            user_cfg_i.scd_int_cfg_enable <= '0';
          else 
             
             ctrled_reset_i <= '0';
@@ -574,7 +562,10 @@ begin
                         when X"80" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                         
                         -- BB1280 only : frame resolution configuration 
-                        when X"A0" =>    mb_struct_cfg.scd_frame_res.scd_exp_time_conv_numerator <= data_i(mb_struct_cfg.scd_frame_res.scd_exp_time_conv_numerator'length-1 downto 0); mb_cfg_rqst <= '1';                    
+                        when X"A0" =>    mb_struct_cfg.scd_frame_res.cfg_num <= data_i(mb_struct_cfg.scd_frame_res.cfg_num'length-1 downto 0); mb_cfg_rqst <= '1';                    
+                       
+                        -- BB1280 only : exposure time configuration activation
+                        when X"A4" =>    user_cfg_i.scd_int_cfg_enable <= data_i(0);                   
 
                         -- trig lecture de temperatur(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.scd_temp.scd_temp_read_num <= unsigned(data_i(mb_struct_cfg.scd_temp.scd_temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';

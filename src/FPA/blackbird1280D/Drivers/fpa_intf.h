@@ -27,6 +27,10 @@
    #define SCD_PROXY
 #endif
 
+#ifndef SCD_BLACKBIRD1280D
+   #define SCD_BLACKBIRD1280D
+#endif
+
 #define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1280"
 
 #define FPA_WIDTH_MIN      64
@@ -65,8 +69,8 @@
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]       // TODO : A verifier
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]    // TODO : A verifier
 #else
-   #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]    // TODO : A verifier
-   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]      // TODO : A verifier
+   #define FPA_DEFAULT_EXPOSURE     4000.0F //[us]    // TODO : A verifier
+   #define FPA_DEFAULT_FRAME_RATE   60.0F //[Hz]      // TODO : A verifier
 #endif
 
 // TODO Update EHDRI default exposure times.
@@ -239,11 +243,17 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 //pour effacer les bits d'erreurs du bloc FPA_interface
 void FPA_ClearErr(const t_FpaIntf *ptrA);
 
+
 //pour configurer le bloc FPA_interface et le lancer
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
 
+// Pour configurer la résolution de frame du proxy d'SCD
+void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
+
+
 //pour configurer la résolution de frame
 void FPA_SetFrameResolution(t_FpaIntf *ptrA);
+void FPA_SetFrameResolution_V2(t_FpaIntf *ptrA);
 
 //pour calculer le frame rate max se rappportant à une configuration donnée
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs);

@@ -34,12 +34,11 @@ package FPA_define is
    constant PROXY_CLINK_CHANNEL_NUM      : integer := 3;         -- Number of channels on proxy clink interface   
    constant SCD_FSYNC_HIGH_TIME_US       : integer := 1;         -- duree de FSYNC en usec
    constant FPA_INT_FBK_AVAILABLE        : std_logic := '0';
-   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real    := 12.5;      -- CLINK IN est à 80MHz ns
-   constant PROXY_NEED_FRAME_RES_CONFIG   : std_logic := '1';     -- BB1280 has a frame resoultion command (Pelican and Hercule don't) 
-   constant SCD_EXP_TIME_NUMERATOR_SOURCE : std_logic := '1';     -- 1 : uB , 0 : VHDL 
-   constant SCD_TRIG_REFERENCED           : std_logic := '1';     -- 1 : reference to fsync (bb1280)  , 0 : reference to acq_int (pelican & hercule)
-
-   
+   constant PROXY_CLINK_CLK_1X_PERIOD_NS : real      := 12.5;    -- CLINK IN est à 80MHz ns
+   constant PROXY_NEED_FRAME_RES_CONFIG  : std_logic := '1';     -- BB1280 has a frame resoultion command (Pelican and Hercule don't) 
+   constant SCD_TRIG_REFERENCED          : std_logic := '1';     -- 1 : reference to fsync (bb1280)  , 0 : reference to acq_int (pelican & hercule)
+   constant SCD_FRAME_RESOLUTION         : real      := 2.0;     -- BB1280D : FRAME_RES register value. PelicanD & HerculeD dont have this parameter.
+   constant SCD_MASTER_CLK_RATE_MHZ      : integer   := 70;
    ----------------------------------------------
    -- FPA 
    ---------------------------------------------- 
@@ -47,7 +46,7 @@ package FPA_define is
    constant YSIZE_MAX                    : integer := 1024;              -- dimension en Y maximale  
    
    -- increment des données en mode diag compteur
-   constant DIAG_DATA_INC                : integer :=  2*integer(((2**13)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**16)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
+   constant DIAG_DATA_INC                : integer :=  2*integer(((2**13)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**13)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
    
 end FPA_define;
 

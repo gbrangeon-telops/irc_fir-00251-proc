@@ -450,12 +450,12 @@ begin
                   end if;
                   
                -- partie copy de la config vers une zone securisée             
-               when cpy_cfg_rd_st =>   -- la config est copiee de la zone A vers un fifo (avant de partir en zone sécurisée)                       
+               when cpy_cfg_rd_st => -- la config est copiee de la zone A vers un fifo (avant de partir en zone sécurisée)                       
                   ram_wr_i <= '0';     -- ram en mode lecture
                   ram_rd_i <= '1';
                   cfg_byte_cnt <= cfg_byte_cnt + 1;
                   ram_rd_add_i <= resize(unsigned(SERIAL_BASE_ADD), ram_rd_add_i'length) + cfg_byte_cnt(ram_rd_add_i'length-1 downto 0);
-                  if ram_rd_add_i(7 downto 0) = SCD_LONGEST_CMD_BYTES_NUM then  -- on en copie plus qu'il n'en faut mais cela simplifie le code
+                  if ram_rd_add_i(7 downto 0) = (SCD_LONGEST_CMD_BYTES_NUM + 3) then -- on en copie plus qu'il n'en faut mais cela simplifie le code
                      cfg_mgmt_fsm <= init_cpy_wr_st;
                      ram_rd_i <= '0';
                   end if;
@@ -721,7 +721,7 @@ begin
                      elsif rx_data_cnt = rx_data_total then        -- checksum                                               
                         cmd_resp_fsm <= check_resp_st;
                         rx_rd_en_i <= '0';   -- on arrête la lecture du fifo
-                     elsif rx_data_cnt = 32 then                     
+                     elsif rx_data_cnt = SCD_LONGEST_CMD_BYTES_NUM then                     
                         cmd_resp_fsm <= wait_resp_hder_st;
                         proxy_serial_err <= '1'; 
                         resp_err(0) <= '1';
@@ -740,7 +740,7 @@ begin
                         for kk in 0 to 3 loop
                            failure_resp_data(kk) <= resp_data(kk);
                         end loop;
-                        cmd_resp_fsm <= wait_resp_hder_st;
+                       cmd_resp_fsm <= wait_resp_hder_st;
                      elsif resp_id = SCD_TEMP_CMD_ID then
                         proxy_serial_err <= '0'; 
                         cmd_resp_fsm <= fpa_temp_resp_st;

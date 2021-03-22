@@ -120,10 +120,9 @@ architecture rtl of scd_prog_ctrler is
    signal update_cfg_i              : std_logic;
    signal cfg_updater_done          : std_logic;
    signal proxy_static_done         : std_logic;
-   signal proxy_op_cfg_done         : std_logic;
-   signal proxy_frame_res_cfg_done  : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
+   signal scd_int_cfg_enable_i      : std_logic := '0';
    
    
 
@@ -138,19 +137,18 @@ architecture rtl of scd_prog_ctrler is
 --   attribute keep of fpa_intf_cfg_i                 : signal is "true";   
 --   attribute keep of reset_clink_n                  : signal is "true"; 
 begin
-                      
-   
-   NO_FRAME_RES_CONFIG_NEEDED : if (PROXY_NEED_FRAME_RES_CONFIG = '0') generate
+  
+   NO_FRAME_RES_CONFIG_NEEDED : if (PROXY_NEED_FRAME_RES_CONFIG = '0') generate -- PelicanD & HerculeD
    begin  
       init_check_cfg_st    <= check_cfg_st2;
       init_cfg_updater_st  <= check_cfg_st2;
-      proxy_static_done    <= proxy_op_cfg_done;
+      scd_int_cfg_enable_i <= '1'; 
    end generate;
-   FRAME_RES_CONFIG_NEEDED : if (PROXY_NEED_FRAME_RES_CONFIG = '1') generate
+   FRAME_RES_CONFIG_NEEDED : if (PROXY_NEED_FRAME_RES_CONFIG = '1') generate  -- Blackbird1280D
    begin  
       init_check_cfg_st    <= check_cfg_st1;
-      init_cfg_updater_st  <= check_cfg_st1;
-      proxy_static_done    <= proxy_frame_res_cfg_done and proxy_op_cfg_done;
+      init_cfg_updater_st  <= check_cfg_st1;  
+      scd_int_cfg_enable_i <= USER_CFG.scd_int_cfg_enable;
    end generate;
    
    -------------------------------------------------
@@ -222,7 +220,7 @@ begin
             user_cfg_in_progress_last <= '0';
             new_cfg_pending_fsm <= init_check_cfg_st;
 			   need_prog_rqst <= '0'; 
-            
+             
          else 
             
             user_cfg_in_progress_i <= USER_CFG_IN_PROGRESS;  -- user_cfg_in_progress_i est requis pour une sychro parfaite avec new_fpa_word
@@ -240,23 +238,23 @@ begin
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
             case new_cfg_pending_fsm is			  
-               
+                                                                    
                when check_cfg_st1 =>
-                  if new_cfg.scd_frame_res /= present_cfg.scd_frame_res then
-                     new_cfg_pending_fsm <= new_frame_res_cfg_st;					 
+                  if new_cfg.scd_frame_res /= present_cfg.scd_frame_res and proxy_static_done = '1' then    
+                     new_cfg_pending_fsm <= new_frame_res_cfg_st;	
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                
                when check_cfg_st2 =>
                   if new_cfg.scd_op /= present_cfg.scd_op then
-                     new_cfg_pending_fsm <= new_op_cfg_st;					 
+                     new_cfg_pending_fsm <= new_op_cfg_st;
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_int /= present_cfg.scd_int then
+                  if new_cfg.scd_int /= present_cfg.scd_int and scd_int_cfg_enable_i = '1' then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;  
@@ -264,7 +262,7 @@ begin
                
                when check_cfg_st4 =>
                   if new_cfg.scd_diag /= present_cfg.scd_diag then
-                     new_cfg_pending_fsm <= new_diag_cfg_st;					 
+                     new_cfg_pending_fsm <= new_diag_cfg_st;
                   else
                      new_cfg_pending_fsm <= check_cfg_st5;
                   end if;
@@ -481,8 +479,6 @@ begin
          if sreset = '1' then 
             cfg_updater_fsm <=  idle;
             cfg_updater_done <= '0';           
-            proxy_op_cfg_done <= '0';
-            proxy_frame_res_cfg_done <= '0';
             present_cfg.scd_op.scd_xsize <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
             present_cfg.scd_temp.scd_temp_read_num <= (others => '0');  -- cette initialisation force la reprogrammation du détecteur après un reset de power management
             present_cfg.scd_diag.scd_bit_pattern <= (others => '1'); -- cette initialisation force la reprogrammation du détecteur après un reset                   
@@ -491,7 +487,7 @@ begin
             
             -- ENO 14 juillet 2016: requis pour supporter instabilités de la roue à filtre. Mettre à jour même si détecteur n'est pas reprogrammé
             fpa_intf_cfg_i.comn.fpa_stretch_acq_trig <= USER_CFG.comn.fpa_stretch_acq_trig;
-   
+            
             case  cfg_updater_fsm is 
                
                when idle =>
@@ -558,25 +554,24 @@ begin
                   fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;
                   fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_PIXEL_NUM;
                   present_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
-                  proxy_op_cfg_done <= '1';
+                  proxy_static_done <= '1';
                   cfg_updater_fsm <= pause_st1;
-               
+                   
                when output_int_cfg_st =>                        -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_int <= fpa_ser_cfg_to_update.scd_int;
 				      fpa_intf_cfg_i.int_time <= resize(fpa_ser_cfg_to_update.scd_int.scd_int_time, 32);
                   present_cfg.scd_int <= fpa_ser_cfg_to_update.scd_int;  
                   cfg_updater_fsm <= pause_st1;
-               
+                  
                when output_diag_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_diag <= fpa_ser_cfg_to_update.scd_diag;
                   present_cfg.scd_diag <= fpa_ser_cfg_to_update.scd_diag;  
-                  cfg_updater_fsm <= pause_st1;
-               
+                  cfg_updater_fsm <= pause_st1;    
+                  
                when output_frame_res_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_frame_res <= fpa_ser_cfg_to_update.scd_frame_res;
                   present_cfg.scd_frame_res <= fpa_ser_cfg_to_update.scd_frame_res;
-                  proxy_frame_res_cfg_done <= '1';
-                  cfg_updater_fsm <= pause_st1;
+                  cfg_updater_fsm <= pause_st1; 
                   
                when output_temp_cfg_st =>                       -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_temp <= fpa_ser_cfg_to_update.scd_temp;
