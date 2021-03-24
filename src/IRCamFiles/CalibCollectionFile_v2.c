@@ -5,7 +5,7 @@
  * This file defines the camera calibration collection file structure v2.
  *
  * Auto-generated calibration collection file library.
- * Generated from the calibration collection file structure definition XLS file version 2.3.0
+ * Generated from the calibration collection file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$

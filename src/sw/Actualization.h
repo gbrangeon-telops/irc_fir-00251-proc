@@ -76,6 +76,10 @@
 
 #define MAX_DELTA_BETA_SIZE 32 // maximum allowed number of delta beta data locations in memory
 
+#define BAD_PIX_NOISY_MASK    0x01
+#define BAD_PIX_FLICKER_MASK  0x02
+#define BAD_PIX_OUTLIER_MASK  0x04
+
 #define ACT_STATES(ACTION) \
 		ACTION(ACT_Init)                    /**< initial state with some initialisations */ \
 		ACTION(ACT_Idle)                    /**< wait for a start actualization command */ \
@@ -311,7 +315,6 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx);
 
 bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);
-uint32_t updateBadPixelMap(uint32_t* p_CalData, const uint16_t* p_bpMap, uint32_t numData);
 void ACT_resetDebugOptions();
 void ACT_parseDebugMode();
 void ACT_resetParams(actParams_t* p);

@@ -5,7 +5,7 @@
  * This file declares the camera image correction calibration file structure v2.
  *
  * Auto-generated image correction calibration file library.
- * Generated from the image correction calibration file structure definition XLS file version 2.3.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBIMAGECORRECTION_FILEMAJORVERSION_V2      2
-#define CALIBIMAGECORRECTION_FILEMINORVERSION_V2      3
+#define CALIBIMAGECORRECTION_FILEMINORVERSION_V2      4
 #define CALIBIMAGECORRECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE_V2   512
@@ -35,6 +35,12 @@
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS_V2 (1 << 10)
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_MASK_V2    (uint16_t)(0x0800)
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT_V2   11
+#define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK_V2    (uint16_t)(0x1000)
+#define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_SHIFT_V2   12
+#define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_MASK_V2    (uint16_t)(0x2000)
+#define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_SHIFT_V2   13
+#define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_MASK_V2    (uint16_t)(0x4000)
+#define CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_SHIFT_V2   14
 
 /**
  * ImageCorrectionFileHeader data structure.
@@ -96,7 +102,10 @@ typedef struct CalibImageCorrection_ImageCorrectionDataHeader_v2Struct CalibImag
  */
 struct CalibImageCorrection_ImageCorrectionData_v2Struct {
    int16_t DeltaBeta;   /**< Difference between corrected and original beta values */
-   uint8_t NewBadPixel;   /**< Indicate whether the pixel has been detected as bad when it was originally good */
+   uint8_t NewBadPixel;   /**< Indicate whether the pixel has been detected as bad (including original bad pixels from block) */
+   uint8_t NoisyBadPixel;   /**< Bad pixel identified as noisy */
+   uint8_t FlickerBadPixel;   /**< Bad pixel identified as flicker */
+   uint8_t OutlierBadPixel;   /**< Bad pixel identified as outlier */
 };
 
 /**

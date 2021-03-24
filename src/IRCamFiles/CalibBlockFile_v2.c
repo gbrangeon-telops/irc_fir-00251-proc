@@ -5,7 +5,7 @@
  * This file defines the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.3.0
+ * Generated from the calibration block file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -107,6 +107,7 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* ExtenderRingID = */ 0,
    /* ExtenderRingSerialNumber = */ 0,
    /* ExtenderRingName = */ "",
+   /* FNumber = */ 0.000000F,
    /* PixelDataPresence = */ 0,
    /* MaxTKDataPresence = */ 0,
    /* LUTNLDataPresence = */ 0,
@@ -342,7 +343,8 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->ExtenderRingSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(hdr->ExtenderRingName, &buffer[numBytes], 64); numBytes += 64;
    hdr->ExtenderRingName[64] = '\0';
-   numBytes += 30; // Skip FREE space
+   memcpy(&hdr->FNumber, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
+   numBytes += 26; // Skip FREE space
    memcpy(&hdr->PixelDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->MaxTKDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->LUTNLDataPresence, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -483,7 +485,8 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->ExtenderRingID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&buffer[numBytes], &hdr->ExtenderRingSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], hdr->ExtenderRingName, 64); numBytes += 64;
-   memset(&buffer[numBytes], 0, 30); numBytes += 30; // FREE space
+   memcpy(&buffer[numBytes], &hdr->FNumber, sizeof(float)); numBytes += sizeof(float);
+   memset(&buffer[numBytes], 0, 26); numBytes += 26; // FREE space
    memcpy(&buffer[numBytes], &hdr->PixelDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->MaxTKDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->LUTNLDataPresence, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -583,6 +586,7 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("ExtenderRingID: %u\n", hdr->ExtenderRingID);
    FPGA_PRINTF("ExtenderRingSerialNumber: %u\n", hdr->ExtenderRingSerialNumber);
    FPGA_PRINTF("ExtenderRingName: %s\n", hdr->ExtenderRingName);
+   FPGA_PRINTF("FNumber: " _PCF(3) "\n", _FFMT(hdr->FNumber, 3));
    FPGA_PRINTF("PixelDataPresence: %u 0 / 1\n", hdr->PixelDataPresence);
    FPGA_PRINTF("MaxTKDataPresence: %u 0 / 1\n", hdr->MaxTKDataPresence);
    FPGA_PRINTF("LUTNLDataPresence: %u 0 / 1\n", hdr->LUTNLDataPresence);

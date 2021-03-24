@@ -131,7 +131,7 @@ static uint16_t max_buffer[MAX_FRAME_SIZE] __attribute__ ((section (".noinit")))
 static uint16_t min_buffer[MAX_FRAME_SIZE] __attribute__ ((section (".noinit")));
 static uint16_t R_buffer[MAX_FRAME_SIZE] __attribute__ ((section (".noinit"))); // array for computing the range of each pixels
 static int32_t Z_buffer[MAX_FRAME_SIZE] __attribute__ ((section (".noinit")));  // array for computing the test statistics for the flicker pixels
-static uint8_t badPixelMap[MAX_FRAME_SIZE] __attribute__ ((section (".noinit"))); // 0x00 good, 0x01 noisy, 0x02 flicker
+static uint8_t badPixelMap[MAX_FRAME_SIZE] __attribute__ ((section (".noinit"))); // 0x00 good, 0x01 noisy, 0x02 flicker, 0x04 outlier
 
 static deltabeta_t deltaBetaArray[MAX_DELTA_BETA_SIZE] __attribute__ ((section (".noinit")));
 static deltaBetaList_t deltaBetaDB;
@@ -146,7 +146,7 @@ static float applyReverseLUT(uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float
 static LUTRQInfo_t* selectLUT(calibBlockInfo_t* blockInfo, uint8_t type);
 static void unpackLUTData(uint32_t LUTData, LUTRQInfo_t* p_LUTInfo, float* p_m, float* p_b, bool verbose );
 static void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, float Alpha_LSB, float Beta_LSB, const calibBlockInfo_t* blockInfo, float* deltaBetaOut, float* alphaOut);
-static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut);
+static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut, uint8_t badPixelTag);
 static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta);
 static fileRecord_t* findIcuReferenceBlock();
 static uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_CalData, int16_t deltaBeta, int8_t expBitShift);
@@ -2044,10 +2044,6 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
    case BPD_UpdateBPMap:
       {
-         const uint8_t flicker_mask = 0x02;
-         const uint8_t noisy_mask = 0x01;
-         const uint8_t outlier_mask = 0x04;
-
          GETTIME(&t0);
 
          // build the bad pixel map. Do not process the header data
@@ -2058,19 +2054,19 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
             if (R_buffer[k] > noiseThreshold)
             {
-               tag |= noisy_mask;
+               tag |= BAD_PIX_NOISY_MASK;
                ++numberOfNoisy;
             }
 
             if (mu_buffer[k] < outlierThreshold1 || mu_buffer[k] > outlierThreshold2)
             {
-               tag |= outlier_mask;
+               tag |= BAD_PIX_OUTLIER_MASK;
                ++numberOfOutliers;
             }
 
             if (z_val < flickerThreshold1 || z_val > flickerThreshold2)
             {
-               tag |= flicker_mask;
+               tag |= BAD_PIX_FLICKER_MASK;
                ++numberOfFlickers;
             }
 
@@ -2610,7 +2606,7 @@ static void computeDeltaBeta(uint64_t* p_CalData, float FCal, float FCalBB, floa
 #endif
 }
 
-static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut)
+static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int16_t* rawDeltaBetaOut, uint8_t badPixelTag)
 {
    static const int16_t minRawData = -CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS; //-2^10
    static const int16_t maxRawData = CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SIGNPOS - 1;  // 2^10 - 1
@@ -2640,6 +2636,17 @@ static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int1
       BitClr(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT);
    else
       BitSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT);
+
+   // Set the bad pixel tag
+   BitMaskClr(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK |
+         CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_MASK |
+         CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_MASK);
+   if (badPixelTag & BAD_PIX_NOISY_MASK)
+      BitMaskSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK);
+   if (badPixelTag & BAD_PIX_FLICKER_MASK)
+      BitMaskSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_MASK);
+   if (badPixelTag & BAD_PIX_OUTLIER_MASK)
+      BitMaskSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_MASK);
 
    *rawDeltaBetaOut = raw_delta_beta;
 
@@ -2741,6 +2748,8 @@ uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_
    const float* deltaBetaAddr = &deltaBeta->deltaBeta[startIdx];
    float offset;
 
+   uint8_t badPixelTag = 0;   //since this function is called during the BadPixelDetection_SM, the badPixelMap is not yet available
+
    if (deltaBeta->info.discardOffset || gActDebugOptions.forceDiscardOffset)
       offset = deltaBeta->p50;
    else
@@ -2748,7 +2757,7 @@ uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_
 
    while (numData)
    {
-      quantizeDeltaBeta(BetaLSB, *deltaBetaAddr - offset, &DeltaBetaL);
+      quantizeDeltaBeta(BetaLSB, *deltaBetaAddr - offset, &DeltaBetaL, badPixelTag);
       ++deltaBetaAddr;
 
       // Apply beta correction
@@ -2758,7 +2767,7 @@ uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_
       numBadPixels += updatePixelDataElement(blockInfo, &calData, DeltaBetaL, expBitshift);
       *calDataAddr = calData;
 
-      quantizeDeltaBeta(BetaLSB, *deltaBetaAddr - offset, &DeltaBetaH);
+      quantizeDeltaBeta(BetaLSB, *deltaBetaAddr - offset, &DeltaBetaH, badPixelTag);
       ++deltaBetaAddr;
 
       calDataAddr = (uint64_t*)p_CalData;
@@ -3112,6 +3121,7 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       {
          const float offset = currentDeltaBeta->stats.mu;
          int16_t* d = (int16_t*)PROC_MEM_DELTA_BETA_BASEADDR;
+         uint8_t badPixelTag;
 
          if (blockContext.blockIdx == 0)
          {
@@ -3131,7 +3141,11 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
 
          for (i=0, k=blockContext.startIndex; i<blockContext.blockLength; ++i, ++k)
          {
-            quantizeDeltaBeta(deltaBetaLSB, currentDeltaBeta->deltaBeta[k] - offset, &d[k]);
+            if (gActBPMapAvailable)
+               badPixelTag = badPixelMap[k + 2*FPA_WIDTH_MAX];
+            else
+               badPixelTag = 0;
+            quantizeDeltaBeta(deltaBetaLSB, currentDeltaBeta->deltaBeta[k] - offset, &d[k], badPixelTag);
          }
 
          ctxtIterate(&blockContext);
@@ -4275,7 +4289,6 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx)
 
          for (i=0, k=blockContext.startIndex; i<blockContext.blockLength; ++i, ++k)
          {
-            //quantizeDeltaBeta(deltaBetaLSB, currentDeltaBeta->deltaBeta[k] - offset, &d[k]))
             if (encodeBeta(betaArray[k], &calAddr[2*k], &calibrationInfo.blocks[blockIdx]))
                ++numBadPixels;
          }

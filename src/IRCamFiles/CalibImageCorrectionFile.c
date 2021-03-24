@@ -136,6 +136,11 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageC
                hdr->FileStructureMinorVersion = 3;
 
             case 3:
+               // 2.3.x -> 2.4.x
+               // Nothing to do
+               hdr->FileStructureMinorVersion = 4;
+
+            case 4:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBIMAGECORRECTION_FILESUBMINORVERSION;
                break;
@@ -233,6 +238,10 @@ uint32_t CalibImageCorrection_ParseImageCorrectionDataHeader(int fd, fileInfo_t 
                // Nothing to do
 
             case 3:
+               // 2.3.x -> 2.4.x
+               // Nothing to do
+
+            case 4:
                // Up to date, nothing to do
                break;
          }

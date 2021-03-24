@@ -5,7 +5,7 @@
  * This file defines the camera image correction calibration file structure v2.
  *
  * Auto-generated image correction calibration file library.
- * Generated from the image correction calibration file structure definition XLS file version 2.3.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -390,6 +390,9 @@ uint32_t CalibImageCorrection_ParseImageCorrectionData_v2(uint8_t *buffer, uint3
       data->DeltaBeta |= 0xF800;
    }
    data->NewBadPixel = ((rawData & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_MASK_V2) >> CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT_V2);
+   data->NoisyBadPixel = ((rawData & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK_V2) >> CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_SHIFT_V2);
+   data->FlickerBadPixel = ((rawData & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_MASK_V2) >> CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_SHIFT_V2);
+   data->OutlierBadPixel = ((rawData & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_MASK_V2) >> CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_SHIFT_V2);
 
    return numBytes;
 }
@@ -420,6 +423,12 @@ uint32_t CalibImageCorrection_WriteImageCorrectionData_v2(CalibImageCorrection_I
    rawData |= ((tmpData << CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_SHIFT_V2) & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_MASK_V2);
    tmpData = data->NewBadPixel;
    rawData |= ((tmpData << CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT_V2) & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_MASK_V2);
+   tmpData = data->NoisyBadPixel;
+   rawData |= ((tmpData << CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_SHIFT_V2) & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK_V2);
+   tmpData = data->FlickerBadPixel;
+   rawData |= ((tmpData << CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_SHIFT_V2) & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_MASK_V2);
+   tmpData = data->OutlierBadPixel;
+   rawData |= ((tmpData << CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_SHIFT_V2) & CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_MASK_V2);
 
    memcpy(buffer, &rawData, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
 

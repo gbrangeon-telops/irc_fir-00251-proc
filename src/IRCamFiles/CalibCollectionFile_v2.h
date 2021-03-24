@@ -5,7 +5,7 @@
  * This file declares the camera calibration collection file structure v2.
  *
  * Auto-generated calibration collection file library.
- * Generated from the calibration collection file structure definition XLS file version 2.3.0
+ * Generated from the calibration collection file structure definition XLS file version 2.4.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBCOLLECTION_FILEMAJORVERSION_V2      2
-#define CALIBCOLLECTION_FILEMINORVERSION_V2      3
+#define CALIBCOLLECTION_FILEMINORVERSION_V2      4
 #define CALIBCOLLECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V2   512
