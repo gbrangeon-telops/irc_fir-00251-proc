@@ -33,7 +33,7 @@
 
 #define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1280"
 
-#define FPA_WIDTH_MIN      64
+#define FPA_WIDTH_MIN      64  // La limitation à 64 est propre à Telops (minimum pour contenir un header). Le proxy est limité à 16.
 #define FPA_WIDTH_MAX      1280
 #define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
@@ -48,9 +48,9 @@
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 
 #define FPA_OFFSETY_MIN          0
-#define FPA_OFFSETY_MULT         2 // TODO : 4 if binning activated
-#define FPA_OFFSETY_MULT_CORR    4
-#define FPA_OFFSETY_MAX          1022
+#define FPA_OFFSETY_MULT         2 
+//#define FPA_OFFSETY_MULT_CORR   // Inutile pour BB1280.
+#define FPA_OFFSETY_MAX          (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   1
 #define FPA_FLIP_LR        0
@@ -69,8 +69,8 @@
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]       // TODO : A verifier
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]    // TODO : A verifier
 #else
-   #define FPA_DEFAULT_EXPOSURE     4000.0F //[us]    // TODO : A verifier
-   #define FPA_DEFAULT_FRAME_RATE   60.0F //[Hz]      // TODO : A verifier
+   #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]    // TODO : A verifier
+   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]      // TODO : A verifier
 #endif
 
 // TODO Update EHDRI default exposure times.
