@@ -36,6 +36,8 @@ acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_afifo_d512\t_axi4_stream64_
 acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d256\fwft_sfifo_w3_d256_sim_netlist.vhdl
+
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d1024\fwft_sfifo_w3_d1024_sim_netlist.vhdl
@@ -157,4 +159,4 @@ wave UUT/U1/*
 
 --wave UUT/U1/U5/U2/U6/*
 
-run 400 ms
+run 15 ms

@@ -173,7 +173,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(450000, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(15, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -197,16 +197,16 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVCMOS33;        
          
          -- cfg usager
-         user_xsize1 <= 640;
-         user_ysize1 <= 512;
+         user_xsize1 <= 64;
+         user_ysize1 <= 8;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 640;
-         user_ysize2 <= 512;
+         user_xsize2 <= 64;
+         user_ysize2 <= 10;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          --         
-         user_xsize3 <= 640;
-         user_ysize3 <= 512;
+         user_xsize3 <= 64;
+         user_ysize3 <= 16;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3); -- iwr
          --         
          --         user_xsize4 <= 1280;
@@ -292,7 +292,7 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
-      wait for 100 ms;
+      wait for 3 ms;
       
       for ii in 0 to 50-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -302,7 +302,7 @@ begin
          wait for 30 ns;
       end loop; 
       --      
-      wait for 100 ms;
+      wait for 3 ms;
       
       for ii in 0 to 50-1 loop                     -- iwr mode
          wait until rising_edge(MB_CLK);      
@@ -312,7 +312,7 @@ begin
          wait for 30 ns;
       end loop;
       --      
-      wait for 100 ms;
+      wait for 3 ms;
       
       for ii in 0 to 50-1 loop                     -- retour en itr
          wait until rising_edge(MB_CLK);      

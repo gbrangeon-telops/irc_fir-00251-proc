@@ -23,14 +23,16 @@ package BB1920D_intf_testbench_pkg is
    constant PAUSE_SIZE                  : integer := 2*(1);
    constant TAP_NUM                     : integer := 8;
    constant C_FPA_INTCLK_RATE_KHZ       : integer := 35_000;
-   constant QWORDS_NUM                  : natural := 74;
+   constant QWORDS_NUM                  : natural := 75;
    
    constant AW_SERIAL_OP_CMD_RAM_ADD    : integer :=  0;  
    constant AW_SERIAL_SYNTH_CMD_RAM_ADD : integer :=  32; 
    constant AW_SERIAL_INT_CMD_RAM_ADD   : integer :=  64;
    constant AW_SERIAL_TEMP_CMD_RAM_ADD  : integer :=  96;
    
-   
+   --constant DATA_SOURCE_INSIDE_FPGA  : std_logic := '0';  
+   --constant DATA_SOURCE_OUTSIDE_FPGA : std_logic := '1';  
+                                                          
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
    
    
@@ -53,6 +55,7 @@ package body BB1920D_intf_testbench_pkg is
       variable  comn_fpa_stretch_acq_trig              : unsigned(31 downto 0);
       variable  comn_clk100_to_intclk_conv_numerator   : unsigned(31 downto 0);
       variable  comn_intclk_to_clk100_conv_numerator   : unsigned(31 downto 0);
+      variable  comn_fpa_intf_data_source              : unsigned(31 downto 0);
       variable  diag_ysize                             : unsigned(31 downto 0);
       variable  diag_xsize_div_tapnum                  : unsigned(31 downto 0);                                           
       variable  diag_lovh_mclk_source                  : unsigned(31 downto 0);
@@ -213,6 +216,8 @@ package body BB1920D_intf_testbench_pkg is
       comn_clk100_to_intclk_conv_numerator  := to_unsigned(integer(real(C_FPA_INTCLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_100M_CLK_RATE_KHZ)), 32);
       comn_intclk_to_clk100_conv_numerator  := to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**26)/real(C_FPA_INTCLK_RATE_KHZ)), 32);  
       
+      comn_fpa_intf_data_source      := resize(unsigned('0'&DATA_SOURCE_OUTSIDE_FPGA), 32);
+      
       
       -- cfg usager
       y := comn_fpa_diag_mode                          
@@ -225,7 +230,8 @@ package body BB1920D_intf_testbench_pkg is
       & comn_fpa_trig_ctrl_timeout_dly              
       & comn_fpa_stretch_acq_trig                    
       & comn_clk100_to_intclk_conv_numerator        
-      & comn_intclk_to_clk100_conv_numerator         
+      & comn_intclk_to_clk100_conv_numerator
+      & comn_fpa_intf_data_source
       & diag_ysize                                   
       & diag_xsize_div_tapnum                       
       & diag_lovh_mclk_source                       

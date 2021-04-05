@@ -254,16 +254,16 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVDS25;        
          
          -- cfg usager
-         user_xsize1 <= 1920;
-         user_ysize1 <= 1536;
+         user_xsize1 <= 128;
+         user_ysize1 <= 64;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 64;
-         user_ysize2 <= 8;
+         user_xsize2 <= 128;
+         user_ysize2 <= 64;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          
-         user_xsize3 <= 1920;
-         user_ysize3 <= 1536;
+         user_xsize3 <= 64;
+         user_ysize3 <= 64;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
          
          -- dac       
@@ -349,7 +349,7 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
-      wait for 50 ms;
+      wait for 2 ms;
       
       for ii in 0 to QWORDS_NUM-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -359,7 +359,7 @@ begin
          wait for 30 ns;
       end loop; 
       --      
-      wait for 50 ms;
+      wait for 2 ms;
       --      
       for ii in 0 to QWORDS_NUM-1 loop 
          wait until rising_edge(MB_CLK);      
