@@ -112,7 +112,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_trig_ctrl_timeout_dly         ;                                      
    uint32_t  fpa_stretch_acq_trig              ;                                      
    uint32_t  clk100_to_intclk_conv_numerator   ;                                      
-   uint32_t  intclk_to_clk100_conv_numerator   ;                                                                               
+   uint32_t  intclk_to_clk100_conv_numerator   ;
+   uint32_t  fpa_intf_data_source              ;
                                               
    // diag                                     
    uint32_t  diag_ysize                        ;                                          
@@ -195,7 +196,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_serdes_lval_len               ;
    uint32_t  int_clk_period_factor             ;
    int32_t   int_time_offset                   ;
-                                              
+                                                 
 };                                                              
 typedef struct s_FpaIntfConfig t_FpaIntf;                       
                                                                 

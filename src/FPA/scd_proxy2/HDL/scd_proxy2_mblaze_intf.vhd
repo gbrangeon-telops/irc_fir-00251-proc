@@ -225,89 +225,90 @@ begin
                   when X"020" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig             <= data_i(0);
                   when X"024" =>    mb_struct_cfg.comn.clk100_to_intclk_conv_numerator  <= unsigned(data_i(mb_struct_cfg.comn.clk100_to_intclk_conv_numerator'length-1 downto 0));
                   when X"028" =>    mb_struct_cfg.comn.intclk_to_clk100_conv_numerator  <= unsigned(data_i(mb_struct_cfg.comn.intclk_to_clk100_conv_numerator'length-1 downto 0));
-                     
+                  when X"02C" =>    mb_struct_cfg.comn.fpa_intf_data_source             <= data_i(0);
+                  
                   -- diag
-                  when X"02C" =>    mb_struct_cfg.diag.ysize                            <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));                                
-                  when X"030" =>    mb_struct_cfg.diag.xsize_div_tapnum                 <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));                        
-                  when X"034" =>    mb_struct_cfg.diag.lovh_mclk_source                 <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));                              
-                  when X"038" =>    mb_struct_cfg.real_mode_active_pixel_dly            <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));                                
+                  when X"030" =>    mb_struct_cfg.diag.ysize                            <= unsigned(data_i(mb_struct_cfg.diag.ysize'length-1 downto 0));                                
+                  when X"034" =>    mb_struct_cfg.diag.xsize_div_tapnum                 <= unsigned(data_i(mb_struct_cfg.diag.xsize_div_tapnum'length-1 downto 0));                        
+                  when X"038" =>    mb_struct_cfg.diag.lovh_mclk_source                 <= unsigned(data_i(mb_struct_cfg.diag.lovh_mclk_source'length-1 downto 0));                              
+                  when X"03C" =>    mb_struct_cfg.real_mode_active_pixel_dly            <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));                                
                      
                   -- int mode
-                  when X"03C" =>    mb_struct_cfg.itr                                   <= data_i(0);                                                     
+                  when X"040" =>    mb_struct_cfg.itr                                   <= data_i(0);                                                     
                      
                   -- cropping
-                  when X"040" =>    mb_struct_cfg.aoi_xsize                             <= unsigned(data_i(mb_struct_cfg.aoi_xsize'length-1 downto 0)); 
-                  when X"044" =>    mb_struct_cfg.aoi_ysize                             <= unsigned(data_i(mb_struct_cfg.aoi_ysize'length-1 downto 0));                                         
-                  when X"048" =>    mb_struct_cfg.aoi_data.sol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0)); 
-                  when X"04C" =>    mb_struct_cfg.aoi_data.eol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0));                       
-                  when X"050" =>    mb_struct_cfg.aoi_flag1.sol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.sol_pos'length-1 downto 0));                       
-                  when X"054" =>    mb_struct_cfg.aoi_flag1.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.sol_pos'length-1 downto 0));                         
-                  when X"058" =>    mb_struct_cfg.aoi_flag2.sol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.sol_pos'length-1 downto 0));
-                  when X"05C" =>    mb_struct_cfg.aoi_flag2.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.sol_pos'length-1 downto 0));                       
+                  when X"044" =>    mb_struct_cfg.aoi_xsize                             <= unsigned(data_i(mb_struct_cfg.aoi_xsize'length-1 downto 0)); 
+                  when X"048" =>    mb_struct_cfg.aoi_ysize                             <= unsigned(data_i(mb_struct_cfg.aoi_ysize'length-1 downto 0));                                         
+                  when X"04C" =>    mb_struct_cfg.aoi_data.sol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0)); 
+                  when X"050" =>    mb_struct_cfg.aoi_data.eol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0));                       
+                  when X"054" =>    mb_struct_cfg.aoi_flag1.sol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.sol_pos'length-1 downto 0));                       
+                  when X"058" =>    mb_struct_cfg.aoi_flag1.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.sol_pos'length-1 downto 0));                         
+                  when X"05C" =>    mb_struct_cfg.aoi_flag2.sol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.sol_pos'length-1 downto 0));
+                  when X"060" =>    mb_struct_cfg.aoi_flag2.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.sol_pos'length-1 downto 0));                       
                      
                   -- op                                                                
-                  when X"060" =>    mb_struct_cfg.op.xstart                             <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));      
-                  when X"064" =>    mb_struct_cfg.op.ystart                             <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));   
-                  when X"068" =>    mb_struct_cfg.op.xsize                              <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0)); 
-                  when X"06C" =>    mb_struct_cfg.op.ysize                              <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));  
-                  when X"070" =>    mb_struct_cfg.op.frame_time                         <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0)); 		 
-                  when X"074" =>    mb_struct_cfg.op.gain                               <= data_i(mb_struct_cfg.op.gain'length-1 downto 0);       
-                  when X"078" =>    mb_struct_cfg.op.int_mode                           <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                           
-                  when X"07C" =>    mb_struct_cfg.op.test_mode                          <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);    
-                  when X"080" =>    mb_struct_cfg.op.det_vbias                          <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);    
-                  when X"084" =>    mb_struct_cfg.op.det_ibias                          <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0);    
-                  when X"088" =>    mb_struct_cfg.op.binning                            <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);        
-                  when X"08C" =>    mb_struct_cfg.op.output_rate                        <= data_i(mb_struct_cfg.op.output_rate'length-1 downto 0);  
-                  when X"090" =>    mb_struct_cfg.op.cfg_num                            <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));                                                                                                                 
+                  when X"064" =>    mb_struct_cfg.op.xstart                             <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));      
+                  when X"068" =>    mb_struct_cfg.op.ystart                             <= unsigned(data_i(mb_struct_cfg.op.ystart'length-1 downto 0));   
+                  when X"06C" =>    mb_struct_cfg.op.xsize                              <= unsigned(data_i(mb_struct_cfg.op.xsize'length-1 downto 0)); 
+                  when X"070" =>    mb_struct_cfg.op.ysize                              <= unsigned(data_i(mb_struct_cfg.op.ysize'length-1 downto 0));  
+                  when X"074" =>    mb_struct_cfg.op.frame_time                         <= unsigned(data_i(mb_struct_cfg.op.frame_time'length-1 downto 0)); 		 
+                  when X"078" =>    mb_struct_cfg.op.gain                               <= data_i(mb_struct_cfg.op.gain'length-1 downto 0);       
+                  when X"07C" =>    mb_struct_cfg.op.int_mode                           <= data_i(mb_struct_cfg.op.int_mode'length-1 downto 0);                           
+                  when X"080" =>    mb_struct_cfg.op.test_mode                          <= data_i(mb_struct_cfg.op.test_mode'length-1 downto 0);    
+                  when X"084" =>    mb_struct_cfg.op.det_vbias                          <= data_i(mb_struct_cfg.op.det_vbias'length-1 downto 0);    
+                  when X"088" =>    mb_struct_cfg.op.det_ibias                          <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0);    
+                  when X"08C" =>    mb_struct_cfg.op.binning                            <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);        
+                  when X"090" =>    mb_struct_cfg.op.output_rate                        <= data_i(mb_struct_cfg.op.output_rate'length-1 downto 0);  
+                  when X"094" =>    mb_struct_cfg.op.cfg_num                            <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));                                                                                                                 
                      
                   -- synth
-                  when X"094" =>    mb_struct_cfg.synth.spare                           <= data_i(mb_struct_cfg.synth.spare'length-1 downto 0);  
-                  when X"098" =>    mb_struct_cfg.synth.frm_res                         <= unsigned(data_i(mb_struct_cfg.synth.frm_res'length-1 downto 0));    
-                  when X"09C" =>    mb_struct_cfg.synth.frm_dat                         <= data_i(mb_struct_cfg.synth.frm_dat'length-1 downto 0);
+                  when X"098" =>    mb_struct_cfg.synth.spare                           <= data_i(mb_struct_cfg.synth.spare'length-1 downto 0);  
+                  when X"09C" =>    mb_struct_cfg.synth.frm_res                         <= unsigned(data_i(mb_struct_cfg.synth.frm_res'length-1 downto 0));    
+                  when X"0A0" =>    mb_struct_cfg.synth.frm_dat                         <= data_i(mb_struct_cfg.synth.frm_dat'length-1 downto 0);
                      
                   -- cmd serielle synthetique
-                  when X"0A0" =>    mb_struct_cfg.synth_cmd_id                          <= data_i(mb_struct_cfg.synth_cmd_id'length-1 downto 0);         
-                  when X"0A4" =>    mb_struct_cfg.synth_cmd_data_size                   <= unsigned(data_i(mb_struct_cfg.synth_cmd_data_size'length-1 downto 0));
-                  when X"0A8" =>    mb_struct_cfg.synth_cmd_dlen                        <= unsigned(data_i(mb_struct_cfg.synth_cmd_dlen'length-1 downto 0));              
-                  when X"0AC" =>    mb_struct_cfg.synth_cmd_sof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_sof_add'length-1 downto 0)); 
-                  when X"0B0" =>    mb_struct_cfg.synth_cmd_eof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_eof_add'length-1 downto 0)); 
+                  when X"0A4" =>    mb_struct_cfg.synth_cmd_id                          <= data_i(mb_struct_cfg.synth_cmd_id'length-1 downto 0);         
+                  when X"0A8" =>    mb_struct_cfg.synth_cmd_data_size                   <= unsigned(data_i(mb_struct_cfg.synth_cmd_data_size'length-1 downto 0));
+                  when X"0AC" =>    mb_struct_cfg.synth_cmd_dlen                        <= unsigned(data_i(mb_struct_cfg.synth_cmd_dlen'length-1 downto 0));              
+                  when X"0B0" =>    mb_struct_cfg.synth_cmd_sof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_sof_add'length-1 downto 0)); 
+                  when X"0B4" =>    mb_struct_cfg.synth_cmd_eof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_eof_add'length-1 downto 0)); 
                      
                   -- cmd serielle integration
-                  when X"0B4" =>    mb_struct_cfg.int_cmd_id                            <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);                   
-                  when X"0B8" =>    mb_struct_cfg.int_cmd_data_size                     <= unsigned(data_i(mb_struct_cfg.int_cmd_data_size'length-1 downto 0));  
-                  when X"0BC" =>    mb_struct_cfg.int_cmd_dlen                          <= unsigned(data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0));       
-                  when X"0C0" =>    mb_struct_cfg.int_cmd_offs                          <= data_i(mb_struct_cfg.int_cmd_offs'length-1 downto 0);                 
-                  when X"0C4" =>    mb_struct_cfg.int_cmd_sof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add'length-1 downto 0));    
-                  when X"0C8" =>    mb_struct_cfg.int_cmd_eof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_eof_add'length-1 downto 0));    
-                  when X"0CC" =>    mb_struct_cfg.int_cmd_sof_add_m1                    <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add_m1'length-1 downto 0)); 
-                  when X"0D0" =>    mb_struct_cfg.int_checksum_add                      <= unsigned(data_i(mb_struct_cfg.int_checksum_add'length-1 downto 0));   
-                  when X"0D4" =>    mb_struct_cfg.frame_dly_cst                         <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0));     
-                  when X"0D8" =>    mb_struct_cfg.int_dly_cst                           <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));       
+                  when X"0B8" =>    mb_struct_cfg.int_cmd_id                            <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);                   
+                  when X"0BC" =>    mb_struct_cfg.int_cmd_data_size                     <= unsigned(data_i(mb_struct_cfg.int_cmd_data_size'length-1 downto 0));  
+                  when X"0C0" =>    mb_struct_cfg.int_cmd_dlen                          <= unsigned(data_i(mb_struct_cfg.int_cmd_dlen'length-1 downto 0));       
+                  when X"0C4" =>    mb_struct_cfg.int_cmd_offs                          <= data_i(mb_struct_cfg.int_cmd_offs'length-1 downto 0);                 
+                  when X"0C8" =>    mb_struct_cfg.int_cmd_sof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add'length-1 downto 0));    
+                  when X"0CC" =>    mb_struct_cfg.int_cmd_eof_add                       <= unsigned(data_i(mb_struct_cfg.int_cmd_eof_add'length-1 downto 0));    
+                  when X"0D0" =>    mb_struct_cfg.int_cmd_sof_add_m1                    <= unsigned(data_i(mb_struct_cfg.int_cmd_sof_add_m1'length-1 downto 0)); 
+                  when X"0D4" =>    mb_struct_cfg.int_checksum_add                      <= unsigned(data_i(mb_struct_cfg.int_checksum_add'length-1 downto 0));   
+                  when X"0D8" =>    mb_struct_cfg.frame_dly_cst                         <= unsigned(data_i(mb_struct_cfg.frame_dly_cst'length-1 downto 0));     
+                  when X"0DC" =>    mb_struct_cfg.int_dly_cst                           <= unsigned(data_i(mb_struct_cfg.int_dly_cst'length-1 downto 0));       
                      
                   -- cmd serielle operationnelle
-                  when X"0DC" =>    mb_struct_cfg.op_cmd_id                             <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
-                  when X"0E0" =>    mb_struct_cfg.op_cmd_data_size                      <= unsigned(data_i(mb_struct_cfg.op_cmd_data_size'length-1 downto 0));
-                  when X"0E4" =>    mb_struct_cfg.op_cmd_dlen                           <= unsigned(data_i(mb_struct_cfg.op_cmd_dlen'length-1 downto 0));     
-                  when X"0E8" =>    mb_struct_cfg.op_cmd_sof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_sof_add'length-1 downto 0));
-                  when X"0EC" =>    mb_struct_cfg.op_cmd_eof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_eof_add'length-1 downto 0));
+                  when X"0E0" =>    mb_struct_cfg.op_cmd_id                             <= data_i(mb_struct_cfg.op_cmd_id'length-1 downto 0);
+                  when X"0E4" =>    mb_struct_cfg.op_cmd_data_size                      <= unsigned(data_i(mb_struct_cfg.op_cmd_data_size'length-1 downto 0));
+                  when X"0E8" =>    mb_struct_cfg.op_cmd_dlen                           <= unsigned(data_i(mb_struct_cfg.op_cmd_dlen'length-1 downto 0));     
+                  when X"0EC" =>    mb_struct_cfg.op_cmd_sof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_sof_add'length-1 downto 0));
+                  when X"0F0" =>    mb_struct_cfg.op_cmd_eof_add                        <= unsigned(data_i(mb_struct_cfg.op_cmd_eof_add'length-1 downto 0));
                      
                   -- cmd serielle temperature
-                  when X"0F0" =>    mb_struct_cfg.temp_cmd_id                           <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);                
-                  when X"0F4" =>    mb_struct_cfg.temp_cmd_data_size                    <= unsigned(data_i(mb_struct_cfg.temp_cmd_data_size'length-1 downto 0));    
-                  when X"0F8" =>    mb_struct_cfg.temp_cmd_dlen                         <= unsigned(data_i(mb_struct_cfg.temp_cmd_dlen'length-1 downto 0));      
-                  when X"0FC" =>    mb_struct_cfg.temp_cmd_sof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_sof_add'length-1 downto 0)); 
-                  when X"100" =>    mb_struct_cfg.temp_cmd_eof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_eof_add'length-1 downto 0)); 
+                  when X"0F4" =>    mb_struct_cfg.temp_cmd_id                           <= data_i(mb_struct_cfg.temp_cmd_id'length-1 downto 0);                
+                  when X"0F8" =>    mb_struct_cfg.temp_cmd_data_size                    <= unsigned(data_i(mb_struct_cfg.temp_cmd_data_size'length-1 downto 0));    
+                  when X"0FC" =>    mb_struct_cfg.temp_cmd_dlen                         <= unsigned(data_i(mb_struct_cfg.temp_cmd_dlen'length-1 downto 0));      
+                  when X"100" =>    mb_struct_cfg.temp_cmd_sof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_sof_add'length-1 downto 0)); 
+                  when X"104" =>    mb_struct_cfg.temp_cmd_eof_add                      <= unsigned(data_i(mb_struct_cfg.temp_cmd_eof_add'length-1 downto 0)); 
                      
                   -- misc
-                  when X"104" =>    mb_struct_cfg.outgoing_com_hder                     <= data_i(mb_struct_cfg.outgoing_com_hder'length-1 downto 0);                                                                      
-                  when X"108" =>    mb_struct_cfg.outgoing_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.outgoing_com_ovh_len'length-1 downto 0));                                                         
-                  when X"10C" =>    mb_struct_cfg.incoming_com_hder                     <= data_i(mb_struct_cfg.incoming_com_hder'length-1 downto 0);                                                                                   
-                  when X"110" =>    mb_struct_cfg.incoming_com_fail_id                  <= data_i(mb_struct_cfg.incoming_com_fail_id'length-1 downto 0);                                                                   
-                  when X"114" =>    mb_struct_cfg.incoming_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.incoming_com_ovh_len'length-1 downto 0));                                                         
-                  when X"118" =>    mb_struct_cfg.fpa_serdes_lval_num                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));                                                          
-                  when X"11C" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));                                                          
-                  when X"120" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));                                                        
-                  when X"124" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
+                  when X"108" =>    mb_struct_cfg.outgoing_com_hder                     <= data_i(mb_struct_cfg.outgoing_com_hder'length-1 downto 0);                                                                      
+                  when X"10C" =>    mb_struct_cfg.outgoing_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.outgoing_com_ovh_len'length-1 downto 0));                                                         
+                  when X"110" =>    mb_struct_cfg.incoming_com_hder                     <= data_i(mb_struct_cfg.incoming_com_hder'length-1 downto 0);                                                                                   
+                  when X"114" =>    mb_struct_cfg.incoming_com_fail_id                  <= data_i(mb_struct_cfg.incoming_com_fail_id'length-1 downto 0);                                                                   
+                  when X"118" =>    mb_struct_cfg.incoming_com_ovh_len                  <= unsigned(data_i(mb_struct_cfg.incoming_com_ovh_len'length-1 downto 0));                                                         
+                  when X"11C" =>    mb_struct_cfg.fpa_serdes_lval_num                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));                                                          
+                  when X"120" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));                                                          
+                  when X"124" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));                                                        
+                  when X"128" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
                      
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';

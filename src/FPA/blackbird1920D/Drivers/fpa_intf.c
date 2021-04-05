@@ -52,6 +52,9 @@
 #define MODE_ITR_INT_END_TO_TRIG_START     0x04
 #define MODE_ALL_END_TO_TRIG_START         0x05
 
+// identification des sources de données
+#define DATA_SOURCE_INSIDE_FPGA            0       // Provient du fichier fpa_common_pkg.vhd.
+#define DATA_SOURCE_OUTSIDE_FPGA           1       // Provient du fichier fpa_common_pkg.vhd.
 
 // bb1920D integration modes definies par SCD  
 #define ITR_MODE                           0x00    // valeur provenant du manuel de SCD
@@ -59,7 +62,6 @@
 
 #define LOW_GAIN                           0x00   // ENO: à revalider. Ce sont les valeurs consignées dans op_mode
 #define HIGH_GAIN                          0x01   // ENO: à revalider. Ce sont les valeurs consignées dans op_mode
-
 
 // bb1920D Pixel resolution 
 #define PIX_RESOLUTION_15BITS              0x00    // 15 bits selon SCD
@@ -137,7 +139,7 @@ struct bb1920D_param_s
    float Line_Readout                        ;
    float Frame_Read                          ;
    float number_of_Ref_Rows                  ;
-   float number_of_pixel_per_clk_per_output             ;
+   float number_of_pixel_per_clk_per_output  ;
    float pixel_control_time                  ;
    float Line_Conversion                     ;
    float int_time_offset_usec                ;
@@ -327,6 +329,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    bb1920D_param_t hh;
    static uint8_t cfg_num = 0;
+   extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données du proxy même lorsque le détecteur est absent
     
       
    // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
@@ -373,7 +376,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->intclk_to_clk100_conv_numerator = (uint32_t)roundf((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/hh.fpa_intg_clk_rate_hz);
    
    // Élargit le pulse de trig au besoin
-   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;    
+   ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
+   
+   // mode diag vrai et faked
+   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
+   if (ptrA->fpa_diag_mode == 1){
+      if ((int32_t)gFpaDebugRegE != 0)
+         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
+   }
    
    //-----------------------------------------
    // aoi
