@@ -19,7 +19,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0207A_3K_8.3MHz SVN_TRUNK"
+#define FPA_DEVICE_MODEL_NAME    "ISC0207A_3K_8.3MHz Off Center V1"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      320

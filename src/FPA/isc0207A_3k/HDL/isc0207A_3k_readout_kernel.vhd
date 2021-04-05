@@ -235,6 +235,7 @@ begin
             acq_data_o <= '0';
             elcorr_tic <= '0';
             elcorr_tac <= '0';
+			slow_mclk_raw_en_i <= '1';
          else  
             
             --inc := '0'& fpa_mclk_re;
