@@ -308,7 +308,8 @@ begin
                   when X"11C" =>    mb_struct_cfg.fpa_serdes_lval_num                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_num'length-1 downto 0));                                                          
                   when X"120" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));                                                          
                   when X"124" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));                                                        
-                  when X"128" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0)); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
+                  when X"128" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0));
+                  when X"12C" =>    mb_struct_cfg.proxy_alone_mode                      <= data_i(0); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
                      
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';

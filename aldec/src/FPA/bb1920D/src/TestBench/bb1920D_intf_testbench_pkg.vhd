@@ -23,7 +23,7 @@ package BB1920D_intf_testbench_pkg is
    constant PAUSE_SIZE                  : integer := 2*(1);
    constant TAP_NUM                     : integer := 8;
    constant C_FPA_INTCLK_RATE_KHZ       : integer := 35_000;
-   constant QWORDS_NUM                  : natural := 75;
+   constant QWORDS_NUM                  : natural := 76;
    
    constant AW_SERIAL_OP_CMD_RAM_ADD    : integer :=  0;  
    constant AW_SERIAL_SYNTH_CMD_RAM_ADD : integer :=  32; 
@@ -119,6 +119,7 @@ package body BB1920D_intf_testbench_pkg is
       variable  fpa_serdes_lval_len                    : unsigned(31 downto 0);
       variable  int_clk_period_factor                  : unsigned(31 downto 0);
       variable  int_time_offset                        : unsigned(31 downto 0);
+      variable  proxy_alone_mode                       : unsigned(31 downto 0);
       
       
       variable y                                       : unsigned(QWORDS_NUM*32-1 downto 0);
@@ -218,6 +219,8 @@ package body BB1920D_intf_testbench_pkg is
       
       comn_fpa_intf_data_source      := resize(unsigned('0'&DATA_SOURCE_OUTSIDE_FPGA), 32);
       
+      proxy_alone_mode               := to_unsigned(1, 32);  
+      
       
       -- cfg usager
       y := comn_fpa_diag_mode                          
@@ -294,7 +297,8 @@ package body BB1920D_intf_testbench_pkg is
       & fpa_serdes_lval_num                   
       & fpa_serdes_lval_len                   
       & int_clk_period_factor                 
-      & int_time_offset;                       
+      & int_time_offset
+      & proxy_alone_mode;                       
       
       return y;
    end to_intf_cfg;

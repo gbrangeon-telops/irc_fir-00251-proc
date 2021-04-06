@@ -241,7 +241,8 @@ package Proxy_define is
       fpa_serdes_lval_num            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée        
       int_clk_period_factor          : unsigned(7 downto 0);
-      int_time_offset                : signed(31 downto 0);  
+      int_time_offset                : signed(31 downto 0);
+      proxy_alone_mode               : std_logic;               -- à '1' pour tester le proxy SCD sans detecteur 
       
    end record;    
    

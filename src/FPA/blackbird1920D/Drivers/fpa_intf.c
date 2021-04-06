@@ -330,7 +330,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    bb1920D_param_t hh;
    static uint8_t cfg_num = 0;
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données du proxy même lorsque le détecteur est absent
-    
+   extern int32_t gFpaDebugRegA; 
       
    // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -354,6 +354,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;   
    }
    
+   // gestion du mode où juste le proxy est présent mais pas le detecteur
+   if (sw_init_done == 0)
+      gFpaDebugRegA = 1;
+   ptrA->proxy_alone_mode = gFpaDebugRegA;
+   
+   if (ptrA->proxy_alone_mode == 1){
+      ptrA->fpa_diag_mode = 1;
+      gFpaDebugRegE = 1;
+   }
+      
    // allumage du détecteur 
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
@@ -743,7 +753,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->number_of_Rows          = (float)pGCRegs->Height;
    ptrH->number_of_Ref_Rows      = 0.0F;
    
-   ptrH->number_of_pixel_per_clk_per_output = PrivateStat->fpa_pix_num_per_pclk/2;
+   ptrH->number_of_pixel_per_clk_per_output = gPrivateStat.fpa_pix_num_per_pclk/2;
   
    //if (ptrA->op_binning == 0)
       ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;

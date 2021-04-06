@@ -260,11 +260,11 @@ begin
          
          user_xsize2 <= 128;
          user_ysize2 <= 64;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         user_cfg_vector2 <= to_intf_cfg('1', user_xsize2, user_ysize2, 2);
          
          user_xsize3 <= 64;
          user_ysize3 <= 64;
-         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
+         user_cfg_vector3 <= to_intf_cfg('1', user_xsize3, user_ysize3, 3);
          
          -- dac       
          vdac_value_1               	<= to_unsigned(0, 32); 

@@ -196,6 +196,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_serdes_lval_len               ;
    uint32_t  int_clk_period_factor             ;
    int32_t   int_time_offset                   ;
+   uint32_t  proxy_alone_mode                  ;
                                                  
 };                                                              
 typedef struct s_FpaIntfConfig t_FpaIntf;                       
