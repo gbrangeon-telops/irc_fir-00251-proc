@@ -78,6 +78,7 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_dispa
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde
+acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync.vhd
 
 do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do 
 
@@ -155,6 +156,7 @@ asim -ses scorpiomwA_intf_testbench_TB
 
 wave UUT/U1/U5/U5/* 
 wave UUT/U1/U9/U18/*
+wave UUT/U1/U9/U15/*
 wave UUT/U1/*
 
 --wave UUT/U1/U5/U2/U6/*
