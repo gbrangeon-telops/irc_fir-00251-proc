@@ -42,5 +42,5 @@ acom -incr -nowarn DAGGEN_0523 \
 "$ADC_INTF\quad_data_sync_v2.vhd" \
 "$ADC_INTF\afpa_data_deserializer_8chn.bde" \
 "$ADC_INTF\afpa_data_deserializer_8chn_v2.bde" \
-"$ADC_INTF\afpa_data_deserializer_8chn.bde" \
+"$ADC_INTF\afpa_data_deserializer_16chn.bde" \
 "$ADC_INTF\afpa_data_deserializer_16chn_v2.bde"
