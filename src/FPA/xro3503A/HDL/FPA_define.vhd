@@ -53,7 +53,9 @@ package FPA_define is
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
+   --constant DEFINE_FPA_MCLK_RATE_KHZ                  : integer   := 10_000;      -- c'est fixé à 10MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
    constant DEFINE_FPA_MCLK_RATE_KHZ                  : integer   := 27_000;      -- c'est fixé à 27MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
+   --constant DEFINE_FPA_MCLK_RATE_KHZ                  : integer   := 40_000;      -- c'est fixé à 40MHz. Donc non configurable. D'où sa présence dans le fpa_define. Pour d'autres détecteurs, il peut se retrouver dans le pilote en C
    constant DEFINE_FPA_INTCLK_RATE_KHZ                : integer   := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
    constant DEFINE_FPA_PROG_SCLK_RATE_KHZ             : integer   := 1_000;       -- horloge SPI pour la programmation du FPA. Doit être entre 1 et 10 MHz.
    constant DEFINE_FPA_XTRA_IMAGE_NUM_TO_SKIP         : integer   := 3;           -- on doit laisser 3 images dès qu'on reprogramme le détecteur

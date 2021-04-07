@@ -349,6 +349,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (gFpaDebugRegH != 0)
       ptrA->fpa_pwr_override_mode = 1;
 
+   // diag lovh
+   ptrA->diag_lovh_mclk_source = (uint32_t)(hh.lovh_mclk * FPA_MCLK_SOURCE_RATE_HZ / FPA_MCLK_RATE_HZ);
+
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    if (cfg_num == 255)  // protection contre depassement
       cfg_num = 0;   
@@ -476,9 +479,15 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->fpa_delay_mclk             = 32.0F + 12.0F;   // FPA: estimation delai max de sortie des pixels après integration
    ptrH->vhd_delay_mclk             = 3.5F;   // estimation des differents delais accumulés par le vhd
    ptrH->delay_mclk                 = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;
-   ptrH->lovh_mclk                  = 15.0F;
-   if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
-      ptrH->lovh_mclk               = 12.0F;
+   if (FPA_MCLK_RATE_HZ <= 27E+6F)
+   {
+      if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
+         ptrH->lovh_mclk            = 12.0F;
+      else
+         ptrH->lovh_mclk            = 15.0F;
+   }
+   else
+      ptrH->lovh_mclk               = 36.0F;
    ptrH->fovh_line                  = 1.0F;
    ptrH->min_time_between_int_usec  = MAX(1.0F, 10.0F * ptrH->mclk_period_usec);
       

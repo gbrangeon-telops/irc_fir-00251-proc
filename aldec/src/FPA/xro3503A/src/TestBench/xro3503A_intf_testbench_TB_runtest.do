@@ -46,7 +46,9 @@ acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhd
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\xro3503A\src\var_shift_reg_w16_d32.vhd
 
+acom D:\Telops\FIR-00251-Proc\IP\325\xro3503A_10MHz_mmcm\xro3503A_10MHz_mmcm_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\xro3503A_27MHz_mmcm\xro3503A_27MHz_mmcm_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\xro3503A_40MHz_mmcm\xro3503A_40MHz_mmcm_sim_netlist.vhdl
 
 
 
@@ -123,13 +125,14 @@ wave UUT/U1/*
 
 -- hw_driver
 --wave UUT/U1/U5/* 
-wave UUT/U1/U5/U5/*
+--wave UUT/U1/U5/U5/*
 --wave UUT/U1/U5/U2/U2/*
 
 -- data_ctrl
 wave UUT/U1/U9/*
 wave UUT/U1/U9/U18/*
---wave UUT/U1/U9/U6/*
+wave UUT/U1/U9/U6/*
+wave UUT/U1/U9/U19/*
  
 -- clk_gen
 --wave UUT/U1/U26/U1/*
@@ -142,4 +145,4 @@ wave UUT/U1/U9/U18/*
 --wave UUT/TRACE_ERR*
 
 --run 20 us
-run 30 ms
+run 10 ms

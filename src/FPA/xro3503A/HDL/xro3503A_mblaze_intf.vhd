@@ -48,8 +48,7 @@ end xro3503A_mblaze_intf;
 architecture rtl of xro3503A_mblaze_intf is  
    
    constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26  : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS + 26; --pour un total de 26 bits pour le temps d'integration de 0207
-   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;   
-   constant C_DIAG_LOVH_MCLK                          : natural := 12;
+   constant C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1   : natural := DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS - 1;
    
    component sync_reset
       port(
@@ -184,7 +183,6 @@ begin
          else                   
             
             user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);
-            user_cfg_i.diag.lovh_mclk_source <= to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length);
             user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
             
             ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;           
@@ -268,9 +266,12 @@ begin
                   -- digio
                   when X"0B4" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);
                   when X"0B8" =>    user_cfg_i.fpa_pwr_override_mode           <= data_i(0);
+                  
+                  -- diag lovh
+                  when X"0BC" =>    user_cfg_i.diag.lovh_mclk_source           <= unsigned(data_i(user_cfg_i.diag.lovh_mclk_source'length-1 downto 0));
                      
                   -- new config
-                  when X"0BC" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                  when X"0C0" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

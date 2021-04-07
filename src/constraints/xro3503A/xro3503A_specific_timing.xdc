@@ -1,8 +1,15 @@
 ## Timing Constraints Section
 
 # Primary clocks
+# 10 MHz
+#create_clock -period 100.000 -name CH0_CLK [get_ports CH0_CLK_P]
+#create_clock -period 100.000 -name CH3_CLK [get_ports CH3_CLK_P]
+# 27 MHz
 create_clock -period 37.037 -name CH0_CLK [get_ports CH0_CLK_P]
 create_clock -period 37.037 -name CH3_CLK [get_ports CH3_CLK_P]
+# 40 MHz
+#create_clock -period 25.000 -name CH0_CLK [get_ports CH0_CLK_P]
+#create_clock -period 25.000 -name CH3_CLK [get_ports CH3_CLK_P]
 
 # Virtual clocks
 
@@ -12,8 +19,8 @@ create_clock -period 37.037 -name CH3_CLK [get_ports CH3_CLK_P]
 # Clock Groups
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH0_CLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH3_CLK]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks mclk_source_xro3503A_27MHz_mmcm]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks adc_clk_source_xro3503A_27MHz_mmcm]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks mclk_source_xro3503A_*]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks adc_clk_source_xro3503A_*]
 
 
 # Input and output delay constraints

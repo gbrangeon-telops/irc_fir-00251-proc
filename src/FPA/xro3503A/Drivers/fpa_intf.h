@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 
-#define FPA_DEVICE_MODEL_NAME    "XRO3503A"
+#define FPA_DEVICE_MODEL_NAME    "XRO3503A " XSTR(FPA_MCLK_RATE_HZ) " Hz"
 
 #define FPA_WIDTH_MIN      64    // camera min is 64 even if FPA can do 32
 #define FPA_WIDTH_MAX      640
@@ -73,7 +73,10 @@
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
+//#define FPA_MCLK_RATE_HZ               10E+6F    // le master clock du FPA
 #define FPA_MCLK_RATE_HZ               27E+6F    // le master clock du FPA
+//#define FPA_MCLK_RATE_HZ               40E+6F    // le master clock du FPA
+#define FPA_MCLK_SOURCE_RATE_HZ        (4.0F * FPA_MCLK_RATE_HZ)    // le master clock source
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
@@ -147,6 +150,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    // digio
    uint32_t  roic_cst_output_mode;
    uint32_t  fpa_pwr_override_mode;
+
+   // diag lovh
+   uint32_t  diag_lovh_mclk_source;
 
    // new config
    uint32_t  cfg_num;

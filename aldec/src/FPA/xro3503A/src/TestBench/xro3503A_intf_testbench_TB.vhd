@@ -49,14 +49,15 @@ architecture TB_ARCHITECTURE of xro3503a_intf_testbench_tb is
    end component;
    
    constant CLK_100M_PERIOD         : time := 10 ns;
-   constant ACQ_TRIG_PERIOD         : time := 1 ms;
+   constant ACQ_TRIG_PERIOD         : time := 4 ms;
    
    constant TAP_NUM        : integer := 16;  
    constant XSIZE          : integer := 640;
    constant YSIZE          : integer := 512;
    constant OFFSETX        : integer := 0;
    constant OFFSETY        : integer := 0;
-   constant LOVH           : integer := 12;
+   constant LOVH_27MHz     : integer := 12;  --Spec XRO3503 for full size frame
+   constant LOVH_40MHz     : integer := 36;  --Throughput must be reduced to fit data chain capacity
    constant FOVH           : integer := 1;
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
@@ -99,6 +100,7 @@ architecture TB_ARCHITECTURE of xro3503a_intf_testbench_tb is
    -- Add your code here ...
    
    signal addr : unsigned(31 downto 0);
+   signal LOVH : integer;
    
 begin
    
@@ -148,6 +150,9 @@ begin
    
    HDER_MISO.WREADY  <= '1';
    HDER_MISO.AWREADY <= '1';
+   
+   
+   LOVH <= LOVH_27MHz when (DEFINE_FPA_MCLK_RATE_KHZ <= 27_000) else LOVH_40MHz;
    
    
    process(MB_CLK)
@@ -207,6 +212,11 @@ begin
          user_cfg_i.offsety                           <= to_unsigned(OFFSETY, user_cfg_i.offsety'length);
          user_cfg_i.width                             <= to_unsigned(XSIZE, user_cfg_i.width'length);
          user_cfg_i.height                            <= to_unsigned(YSIZE, user_cfg_i.height'length);
+         
+         user_cfg_i.roic_cst_output_mode              <= '0';
+         user_cfg_i.fpa_pwr_override_mode             <= '0';
+         
+         user_cfg_i.diag.lovh_mclk_source             <= to_unsigned(LOVH * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length);
          
          user_cfg_i.cfg_num          		            <= to_unsigned(1, user_cfg_i.cfg_num'length);
       
@@ -389,6 +399,17 @@ begin
       addr <= addr + 4;
       wait for 30 ns; 
       write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.height, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.roic_cst_output_mode, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.fpa_pwr_override_mode, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.diag.lovh_mclk_source, 32)), MB_MISO,  MB_MOSI);
       addr <= addr + 4;
       wait for 30 ns;
       

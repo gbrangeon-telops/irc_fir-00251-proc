@@ -51,8 +51,7 @@ architecture rtl of xro3503A_clks_mmcm is
          );
    end component;
    
-   component xro3503A_27MHz_mmcm
-      
+   component xro3503A_10MHz_mmcm
       port
          (
          -- Status and control signals         
@@ -70,7 +69,46 @@ architecture rtl of xro3503A_clks_mmcm is
          mclk_source       : out    std_logic;         
          adc_clk_source    : out    std_logic      
          );
-      
+   end component;
+   
+   component xro3503A_27MHz_mmcm
+      port
+         (
+         -- Status and control signals         
+         reset             : in     std_logic;  
+         locked            : out    std_logic;  
+         clk_in            : in     std_logic;
+         
+         -- Dynamic phase shift ports           
+         psclk             : in     std_logic;  
+         psen              : in     std_logic;  
+         psincdec          : in     std_logic;  
+         psdone            : out    std_logic;
+         
+         -- outputs                            
+         mclk_source       : out    std_logic;         
+         adc_clk_source    : out    std_logic      
+         );
+   end component;
+   
+   component xro3503A_40MHz_mmcm
+      port
+         (
+         -- Status and control signals         
+         reset             : in     std_logic;  
+         locked            : out    std_logic;  
+         clk_in            : in     std_logic;
+         
+         -- Dynamic phase shift ports           
+         psclk             : in     std_logic;  
+         psen              : in     std_logic;  
+         psincdec          : in     std_logic;  
+         psdone            : out    std_logic;
+         
+         -- outputs                            
+         mclk_source       : out    std_logic;         
+         adc_clk_source    : out    std_logic      
+         );
    end component;
    
    type cfg_sm_type is(idle, rst_mmcm_st1, rst_mmcm_st2, wait_mmcm_rdy_st, wait_psdone_st, check_phase_st, inc_phase_st, wait_locked_st, wait_psbusy_st, update_cfg_st);   
@@ -203,24 +241,66 @@ begin
             
          end if;  
       end if;
-   end process;       
+   end process;
    
-   U2 :  xro3503A_27MHz_mmcm
-   port map (
-      reset             => mmcm_rst_i,
-      locked            => mmcm_rdy_i,
-      clk_in            => CLK_100M_IN,
-      
-      -- Dynamic phase shift ports
-      
-      psclk             => CLK_100M_IN,
-      psen              => psen_i,
-      psincdec          => psincdec_i,
-      psdone            => psdone_i,
-      
-      -- outputs      
-      mclk_source       => MCLK_SOURCE,
-      adc_clk_source    => ADC_CLK_SOURCE
-      );
+   Gen_10M : if (DEFINE_FPA_MCLK_RATE_KHZ = 10_000) generate
+   begin
+      U2 :  xro3503A_10MHz_mmcm
+      port map (
+         reset             => mmcm_rst_i,
+         locked            => mmcm_rdy_i,
+         clk_in            => CLK_100M_IN,
+         
+         -- Dynamic phase shift ports
+         psclk             => CLK_100M_IN,
+         psen              => psen_i,
+         psincdec          => psincdec_i,
+         psdone            => psdone_i,
+         
+         -- outputs      
+         mclk_source       => MCLK_SOURCE,
+         adc_clk_source    => ADC_CLK_SOURCE
+         );      
+   end generate;
+   
+   Gen_27M : if (DEFINE_FPA_MCLK_RATE_KHZ = 27_000) generate
+   begin
+      U2 :  xro3503A_27MHz_mmcm
+      port map (
+         reset             => mmcm_rst_i,
+         locked            => mmcm_rdy_i,
+         clk_in            => CLK_100M_IN,
+         
+         -- Dynamic phase shift ports
+         psclk             => CLK_100M_IN,
+         psen              => psen_i,
+         psincdec          => psincdec_i,
+         psdone            => psdone_i,
+         
+         -- outputs      
+         mclk_source       => MCLK_SOURCE,
+         adc_clk_source    => ADC_CLK_SOURCE
+         );      
+   end generate;
+   
+   Gen_40M : if (DEFINE_FPA_MCLK_RATE_KHZ = 40_000) generate
+   begin
+      U2 :  xro3503A_40MHz_mmcm
+      port map (
+         reset             => mmcm_rst_i,
+         locked            => mmcm_rdy_i,
+         clk_in            => CLK_100M_IN,
+         
+         -- Dynamic phase shift ports
+         psclk             => CLK_100M_IN,
+         psen              => psen_i,
+         psincdec          => psincdec_i,
+         psdone            => psdone_i,
+         
+         -- outputs      
+         mclk_source       => MCLK_SOURCE,
+         adc_clk_source    => ADC_CLK_SOURCE
+         );      
+   end generate;
    
 end rtl;
