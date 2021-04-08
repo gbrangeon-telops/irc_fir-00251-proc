@@ -24,7 +24,7 @@ acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w8_d16\fwft_sfifo_w8_d16_sim_net
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\sfifo_w10_d256\sfifo_w10_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\suphawkA_10_0_MHz_mmcm\suphawkA_10_0_MHz_mmcm_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl

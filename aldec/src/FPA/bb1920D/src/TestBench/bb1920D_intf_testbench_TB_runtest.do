@@ -28,7 +28,7 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_n
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w1_d16\fwft_sfifo_w1_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d256\fwft_sfifo_w3_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w64_d256\fwft_sfifo_w64_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\sfifo_w8_d64\sfifo_w8_d64_sim_netlist.vhdl

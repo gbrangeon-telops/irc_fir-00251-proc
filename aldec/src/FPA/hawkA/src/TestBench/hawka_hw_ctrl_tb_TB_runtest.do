@@ -25,7 +25,7 @@ acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w56_d16\fwft_sfifo_w56_d16_funcsim.v
 acom D:\Telops\FIR-00251-Proc\IP\fwft_afifo_w62_d16\fwft_afifo_w62_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_funcsim.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_funcsim.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_funcsim.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_funcsim.vhdl
 
 --acom d:\Telops\FIR-00251-Proc\src\FPA\hawkA\HDL\hawkA_clks_gen.vhd
 --acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
