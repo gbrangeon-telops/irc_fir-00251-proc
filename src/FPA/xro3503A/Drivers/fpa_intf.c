@@ -474,6 +474,9 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+   extern uint16_t gFpaLovh_mclk;
+   extern bool gFpaLovhFlag;
+
    // parametres statiques
    ptrH->mclk_period_usec           = 1e6F/(float)FPA_MCLK_RATE_HZ;
    ptrH->fpa_delay_mclk             = 32.0F + 12.0F;   // FPA: estimation delai max de sortie des pixels après integration
@@ -488,6 +491,9 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
    }
    else
       ptrH->lovh_mclk               = 36.0F;
+   if (gFpaLovhFlag) // Overwrite with value from debug terminal
+      ptrH->lovh_mclk               = (float)gFpaLovh_mclk;
+   gFpaLovh_mclk                    = (uint16_t)ptrH->lovh_mclk;
    ptrH->fovh_line                  = 1.0F;
    ptrH->min_time_between_int_usec  = MAX(1.0F, 10.0F * ptrH->mclk_period_usec);
       
