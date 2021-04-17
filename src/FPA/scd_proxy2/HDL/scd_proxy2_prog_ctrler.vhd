@@ -128,6 +128,8 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal proxy_pwr_i               : std_logic;
    signal int_clk_pulse_i           : std_logic;
    signal int_i                     : std_logic;
+   signal serial_done_cnt           : unsigned(15 downto 0);
+   signal serial_done_last          : std_logic;
    
    -- -- attribute dont_touch                         : string;
    -- -- attribute dont_touch of acq_int_i            : signal is "true";
@@ -153,11 +155,24 @@ begin
    PROXY_PWR      <= proxy_pwr_i;
    
    
-   FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
+   FPA_DRIVER_STAT(31) <= fpa_new_cfg_pending;
+   FPA_DRIVER_STAT(30) <= PROXY_RDY;
+   FPA_DRIVER_STAT(29) <= PROXY_POWERED;
+   FPA_DRIVER_STAT(28) <= proxy_static_done;
+   
+   FPA_DRIVER_STAT(27) <= proxy_pwr_i;
+   FPA_DRIVER_STAT(26) <= SERIAL_DONE;
+   FPA_DRIVER_STAT(25) <= '0';
+   FPA_DRIVER_STAT(24) <= '0';
+   
+   FPA_DRIVER_STAT(23 downto 20) <= (others => '0');
+   
+   FPA_DRIVER_STAT(19 downto 16) <= std_logic_vector(serial_done_cnt(3 downto 0));
+      
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err;
    FPA_DRIVER_STAT(7) <= '0'; 
    FPA_DRIVER_STAT(6) <= '0'; 
-   FPA_DRIVER_STAT(5) <= RAM_ERR;           -- erreur de colision dans la ram (à éviter)
+   FPA_DRIVER_STAT(5) <= RAM_ERR;           -- erreur de collision dans la ram (à éviter)
    FPA_DRIVER_STAT(4) <= fpa_powered; 
    FPA_DRIVER_STAT(3) <= fpa_driver_seq_err;-- 
    FPA_DRIVER_STAT(2) <= fpa_cfg_err;       -- fpa_cfg_err toute erreur de programmation retournée par le détecteur
@@ -186,10 +201,20 @@ begin
             proxy_pwr_i <= '0'; 
             fpa_powered <= '0';
             reset_clink_n <= '0';
+            serial_done_cnt <= (others => '0');
+            serial_done_last <= SERIAL_DONE;
+            
          else                  
             proxy_pwr_i <= FPA_POWER; 
             fpa_powered <= PROXY_POWERED and PROXY_RDY;  -- PROXY_POWERED signifie que le proxy est juste allumé. PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès.              
             reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
+            
+            serial_done_last <= SERIAL_DONE;
+            
+            if serial_done_last = '1' and SERIAL_DONE = '0' then 
+                 serial_done_cnt <= serial_done_cnt + 1;
+            end if;               
+            
          end if;          
       end if;
    end process;

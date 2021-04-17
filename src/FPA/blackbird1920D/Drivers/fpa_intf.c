@@ -330,7 +330,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    bb1920D_param_t hh;
    static uint8_t cfg_num = 0;
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données du proxy même lorsque le détecteur est absent
-   extern int32_t gFpaDebugRegA; 
+   extern int32_t gFpaDebugRegA;
+   extern int32_t gFpaDebugRegB;
       
    // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
@@ -390,10 +391,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // mode diag vrai et faked
    ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
-   if (ptrA->fpa_diag_mode == 1){
-      if ((int32_t)gFpaDebugRegE != 0)
-         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
-   }
+//   if (ptrA->fpa_diag_mode == 1){
+//      if ((int32_t)gFpaDebugRegE != 0)
+//         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
+//   }
    
    //-----------------------------------------
    // aoi
@@ -436,7 +437,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
    ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlascmd_datasheet2.17   
    
-   ptrA->op_frame_time = 0;                    // valeur par defaut de 0 pour l'instant. Si cela ne marche pas, on essaie la formule qui est: (uint32_t)gPrivateStat.int_time + (uint32_t)(hh.Frame_Time * hh.fpa_intg_clk_rate_hz);
+   ptrA->op_frame_time = (uint32_t)gPrivateStat.int_time + (uint32_t)((hh.Frame_Time_us * 1e-6F) * hh.fpa_intg_clk_rate_hz);                    // valeur par defaut de 0 pour l'instant. Si cela ne marche pas, on essaie la formule qui est: (uint32_t)gPrivateStat.int_time + (uint32_t)(hh.Frame_Time * hh.fpa_intg_clk_rate_hz);
    
    //  gain 
    ptrA->op_gain = (uint32_t)LOW_GAIN;
@@ -518,7 +519,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    ptrA->temp_cmd_id                     = 0x8503;                         // n'est pas utilisé par le vhd mais par le diverC
    ptrA->temp_cmd_data_size              = 0;
-   ptrA->temp_cmd_dlen                   = ptrA->op_cmd_data_size + 2;
+   ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
    ptrA->temp_cmd_sof_add                = (uint32_t)AW_SERIAL_TEMP_CMD_RAM_ADD;
    ptrA->temp_cmd_eof_add                = ptrA->temp_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->temp_cmd_dlen;     // voir la cmd 0x8503 pour comprendre
    
@@ -540,6 +541,155 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 // Envoyer commande operationnelle serielle
    FPA_SendOperational_SerialCmd(ptrA);            // on envoie la partie serielle de la commande operationnelle (elle est stockée dans une autre partie de la RAM en vhd)
    WriteStruct(ptrA);                              // on envoie la partie structurelle
+   
+      // statuts privés
+//   if (gFpaDebugRegB == 1)
+//   {
+   
+      FPA_PRINTF("gPrivateStat.fpa_diag_mode                              = %d", gPrivateStat.fpa_diag_mode                             );
+      FPA_PRINTF("gPrivateStat.fpa_diag_type                              = %d", gPrivateStat.fpa_diag_type                             );
+      FPA_PRINTF("gPrivateStat.fpa_pwr_on                                 = %d", gPrivateStat.fpa_pwr_on                                );
+      FPA_PRINTF("gPrivateStat.fpa_acq_trig_mode                          = %d", gPrivateStat.fpa_acq_trig_mode                         );
+      FPA_PRINTF("gPrivateStat.fpa_acq_trig_ctrl_dly                      = %d", gPrivateStat.fpa_acq_trig_ctrl_dly                     );
+      FPA_PRINTF("gPrivateStat.fpa_xtra_trig_mode                         = %d", gPrivateStat.fpa_xtra_trig_mode                        );
+      FPA_PRINTF("gPrivateStat.fpa_xtra_trig_ctrl_dly                     = %d", gPrivateStat.fpa_xtra_trig_ctrl_dly                    );
+      FPA_PRINTF("gPrivateStat.fpa_trig_ctrl_timeout_dly                  = %d", gPrivateStat.fpa_trig_ctrl_timeout_dly                 );
+      FPA_PRINTF("gPrivateStat.fpa_stretch_acq_trig                       = %d", gPrivateStat.fpa_stretch_acq_trig                      );
+      FPA_PRINTF("gPrivateStat.clk100_to_intclk_conv_numerator            = %d", gPrivateStat.clk100_to_intclk_conv_numerator           );
+      FPA_PRINTF("gPrivateStat.intclk_to_clk100_conv_numerator            = %d", gPrivateStat.intclk_to_clk100_conv_numerator           );
+      FPA_PRINTF("gPrivateStat.diag_ysize                                 = %d", gPrivateStat.diag_ysize                                );
+      FPA_PRINTF("gPrivateStat.diag_xsize_div_tapnum                      = %d", gPrivateStat.diag_xsize_div_tapnum                     );
+      FPA_PRINTF("gPrivateStat.diag_lovh_mclk_source                      = %d", gPrivateStat.diag_lovh_mclk_source                     );
+      FPA_PRINTF("gPrivateStat.real_mode_active_pixel_dly                 = %d", gPrivateStat.real_mode_active_pixel_dly                );
+      FPA_PRINTF("gPrivateStat.itr                                        = %d", gPrivateStat.itr                                       );
+      FPA_PRINTF("gPrivateStat.aoi_data_sol_pos                           = %d", gPrivateStat.aoi_data_sol_pos                          );
+      FPA_PRINTF("gPrivateStat.aoi_data_eol_pos                           = %d", gPrivateStat.aoi_data_eol_pos                          );
+      FPA_PRINTF("gPrivateStat.aoi_flag1_sol_pos                          = %d", gPrivateStat.aoi_flag1_sol_pos                         );
+      FPA_PRINTF("gPrivateStat.aoi_flag1_eol_pos                          = %d", gPrivateStat.aoi_flag1_eol_pos                         );
+      FPA_PRINTF("gPrivateStat.aoi_flag2_sol_pos                          = %d", gPrivateStat.aoi_flag2_sol_pos                         );
+      FPA_PRINTF("gPrivateStat.aoi_flag2_eol_pos                          = %d", gPrivateStat.aoi_flag2_eol_pos                         );
+      FPA_PRINTF("gPrivateStat.op_xstart                                  = %d", gPrivateStat.op_xstart                                 );
+      FPA_PRINTF("gPrivateStat.op_ystart                                  = %d", gPrivateStat.op_ystart                                 );
+      FPA_PRINTF("gPrivateStat.op_xsize                                   = %d", gPrivateStat.op_xsize                                  );
+      FPA_PRINTF("gPrivateStat.op_ysize                                   = %d", gPrivateStat.op_ysize                                  );
+      FPA_PRINTF("gPrivateStat.op_frame_time                              = %d", gPrivateStat.op_frame_time                             );
+      FPA_PRINTF("gPrivateStat.op_gain                                    = %d", gPrivateStat.op_gain                                   );
+      FPA_PRINTF("gPrivateStat.op_int_mode                                = %d", gPrivateStat.op_int_mode                               );
+      FPA_PRINTF("gPrivateStat.op_test_mode                               = %d", gPrivateStat.op_test_mode                              );
+      FPA_PRINTF("gPrivateStat.op_det_vbias                               = %d", gPrivateStat.op_det_vbias                              );
+      FPA_PRINTF("gPrivateStat.op_det_ibias                               = %d", gPrivateStat.op_det_ibias                              );
+      FPA_PRINTF("gPrivateStat.op_binning                                 = %d", gPrivateStat.op_binning                                );
+      FPA_PRINTF("gPrivateStat.op_output_rate                             = %d", gPrivateStat.op_output_rate                            );
+      FPA_PRINTF("gPrivateStat.op_cfg_num                                 = %d", gPrivateStat.op_cfg_num                                );
+      FPA_PRINTF("gPrivateStat.int_cmd_id                                 = %d", gPrivateStat.int_cmd_id                                );
+      FPA_PRINTF("gPrivateStat.int_cmd_dlen                               = %d", gPrivateStat.int_cmd_dlen                              );
+      FPA_PRINTF("gPrivateStat.int_cmd_offs                               = %d", gPrivateStat.int_cmd_offs                              );
+      FPA_PRINTF("gPrivateStat.int_cmd_sof_add                            = %d", gPrivateStat.int_cmd_sof_add                           );
+      FPA_PRINTF("gPrivateStat.int_cmd_eof_add                            = %d", gPrivateStat.int_cmd_eof_add                           );
+      FPA_PRINTF("gPrivateStat.int_cmd_sof_add_m1                         = %d", gPrivateStat.int_cmd_sof_add_m1                        );
+      FPA_PRINTF("gPrivateStat.int_checksum_add                           = %d", gPrivateStat.int_checksum_add                          );
+      FPA_PRINTF("gPrivateStat.frame_dly_cst                              = %d", gPrivateStat.frame_dly_cst                             );
+      FPA_PRINTF("gPrivateStat.int_dly_cst                                = %d", gPrivateStat.int_dly_cst                               );
+      FPA_PRINTF("gPrivateStat.op_cmd_id                                  = %d", gPrivateStat.op_cmd_id                                 );
+      FPA_PRINTF("gPrivateStat.op_cmd_sof_add                             = %d", gPrivateStat.op_cmd_sof_add                            );
+      FPA_PRINTF("gPrivateStat.op_cmd_eof_add                             = %d", gPrivateStat.op_cmd_eof_add                            );
+      FPA_PRINTF("gPrivateStat.temp_cmd_id                                = %d", gPrivateStat.temp_cmd_id                               );
+      FPA_PRINTF("gPrivateStat.temp_cmd_sof_add                           = %d", gPrivateStat.temp_cmd_sof_add                          );
+      FPA_PRINTF("gPrivateStat.temp_cmd_eof_add                           = %d", gPrivateStat.temp_cmd_eof_add                          );
+      FPA_PRINTF("gPrivateStat.outgoing_com_hder                          = %d", gPrivateStat.outgoing_com_hder                         );
+      FPA_PRINTF("gPrivateStat.incoming_com_hder                          = %d", gPrivateStat.incoming_com_hder                         );
+      FPA_PRINTF("gPrivateStat.incoming_com_fail_id                       = %d", gPrivateStat.incoming_com_fail_id                      );
+      FPA_PRINTF("gPrivateStat.incoming_com_ovh_len                       = %d", gPrivateStat.incoming_com_ovh_len                      );
+      FPA_PRINTF("gPrivateStat.fpa_serdes_lval_num                        = %d", gPrivateStat.fpa_serdes_lval_num                       );
+      FPA_PRINTF("gPrivateStat.fpa_serdes_lval_len                        = %d", gPrivateStat.fpa_serdes_lval_len                       ); 
+      FPA_PRINTF("gPrivateStat.int_clk_period_factor                      = %d", gPrivateStat.int_clk_period_factor                     );
+      FPA_PRINTF("gPrivateStat.fpa_pix_num_per_pclk                       = %d", gPrivateStat.fpa_pix_num_per_pclk                      );
+      FPA_PRINTF("gPrivateStat.fpa_exp_time_conv_denom_bit_pos            = %d", gPrivateStat.fpa_exp_time_conv_denom_bit_pos           );
+      FPA_PRINTF("gPrivateStat.frame_dly                                  = %d", gPrivateStat.frame_dly                                 );
+      FPA_PRINTF("gPrivateStat.int_dly                                    = %d", gPrivateStat.int_dly                                   );
+      FPA_PRINTF("gPrivateStat.int_time                                   = %d", gPrivateStat.int_time                                  );
+      FPA_PRINTF("gPrivateStat.int_clk_source_rate_hz                     = %d", gPrivateStat.int_clk_source_rate_hz                    );
+            
+      
+      
+      FPA_PRINTF("ptrA->fpa_diag_mode                              = %d", ptrA->fpa_diag_mode                               );
+      FPA_PRINTF("ptrA->fpa_diag_type                              = %d", ptrA->fpa_diag_type                               );
+      FPA_PRINTF("ptrA->fpa_pwr_on                                 = %d", ptrA->fpa_pwr_on                                  );
+      FPA_PRINTF("ptrA->fpa_acq_trig_mode                          = %d", ptrA->fpa_acq_trig_mode                           );
+      FPA_PRINTF("ptrA->fpa_acq_trig_ctrl_dly                      = %d", ptrA->fpa_acq_trig_ctrl_dly                       );
+      FPA_PRINTF("ptrA->fpa_xtra_trig_mode                         = %d", ptrA->fpa_xtra_trig_mode                          );
+      FPA_PRINTF("ptrA->fpa_xtra_trig_ctrl_dly                     = %d", ptrA->fpa_xtra_trig_ctrl_dly                      );
+      FPA_PRINTF("ptrA->fpa_trig_ctrl_timeout_dly                  = %d", ptrA->fpa_trig_ctrl_timeout_dly                   );
+      FPA_PRINTF("ptrA->fpa_stretch_acq_trig                       = %d", ptrA->fpa_stretch_acq_trig                        );
+      FPA_PRINTF("ptrA->clk100_to_intclk_conv_numerator            = %d", ptrA->clk100_to_intclk_conv_numerator             );
+      FPA_PRINTF("ptrA->intclk_to_clk100_conv_numerator            = %d", ptrA->intclk_to_clk100_conv_numerator             );
+      FPA_PRINTF("ptrA->fpa_intf_data_source                       = %d", ptrA->fpa_intf_data_source                        );
+      FPA_PRINTF("ptrA->diag_ysize                                 = %d", ptrA->diag_ysize                                  );
+      FPA_PRINTF("ptrA->diag_xsize_div_tapnum                      = %d", ptrA->diag_xsize_div_tapnum                       );
+      FPA_PRINTF("ptrA->diag_lovh_mclk_source                      = %d", ptrA->diag_lovh_mclk_source                       );
+      FPA_PRINTF("ptrA->real_mode_active_pixel_dly                 = %d", ptrA->real_mode_active_pixel_dly                  );
+      FPA_PRINTF("ptrA->itr                                        = %d", ptrA->itr                                         );
+      FPA_PRINTF("ptrA->aoi_xsize                                  = %d", ptrA->aoi_xsize                                   );
+      FPA_PRINTF("ptrA->aoi_ysize                                  = %d", ptrA->aoi_ysize                                   );
+      FPA_PRINTF("ptrA->aoi_data_sol_pos                           = %d", ptrA->aoi_data_sol_pos                            );
+      FPA_PRINTF("ptrA->aoi_data_eol_pos                           = %d", ptrA->aoi_data_eol_pos                            );
+      FPA_PRINTF("ptrA->aoi_flag1_sol_pos                          = %d", ptrA->aoi_flag1_sol_pos                           );
+      FPA_PRINTF("ptrA->aoi_flag1_eol_pos                          = %d", ptrA->aoi_flag1_eol_pos                           );
+      FPA_PRINTF("ptrA->aoi_flag2_sol_pos                          = %d", ptrA->aoi_flag2_sol_pos                           );
+      FPA_PRINTF("ptrA->aoi_flag2_eol_pos                          = %d", ptrA->aoi_flag2_eol_pos                           );
+      FPA_PRINTF("ptrA->op_xstart                                  = %d", ptrA->op_xstart                                   );
+      FPA_PRINTF("ptrA->op_ystart                                  = %d", ptrA->op_ystart                                   );
+      FPA_PRINTF("ptrA->op_xsize                                   = %d", ptrA->op_xsize                                    );
+      FPA_PRINTF("ptrA->op_ysize                                   = %d", ptrA->op_ysize                                    );
+      FPA_PRINTF("ptrA->op_frame_time                              = %d", ptrA->op_frame_time                               );
+      FPA_PRINTF("ptrA->op_gain                                    = %d", ptrA->op_gain                                     );
+      FPA_PRINTF("ptrA->op_int_mode                                = %d", ptrA->op_int_mode                                 );
+      FPA_PRINTF("ptrA->op_test_mode                               = %d", ptrA->op_test_mode                                );
+      FPA_PRINTF("ptrA->op_det_vbias                               = %d", ptrA->op_det_vbias                                );
+      FPA_PRINTF("ptrA->op_det_ibias                               = %d", ptrA->op_det_ibias                                );
+      FPA_PRINTF("ptrA->op_binning                                 = %d", ptrA->op_binning                                  );
+      FPA_PRINTF("ptrA->op_output_rate                             = %d", ptrA->op_output_rate                              );
+      FPA_PRINTF("ptrA->op_cfg_num                                 = %d", ptrA->op_cfg_num                                  );
+      FPA_PRINTF("ptrA->synth_spare                                = %d", ptrA->synth_spare                                 );
+      FPA_PRINTF("ptrA->synth_frm_res                              = %d", ptrA->synth_frm_res                               );
+      FPA_PRINTF("ptrA->synth_frm_dat                              = %d", ptrA->synth_frm_dat                               );
+      FPA_PRINTF("ptrA->synth_cmd_id                               = %d", ptrA->synth_cmd_id                                );
+      FPA_PRINTF("ptrA->synth_cmd_data_size                        = %d", ptrA->synth_cmd_data_size                         );
+      FPA_PRINTF("ptrA->synth_cmd_dlen                             = %d", ptrA->synth_cmd_dlen                              );
+      FPA_PRINTF("ptrA->synth_cmd_sof_add                          = %d", ptrA->synth_cmd_sof_add                           );
+      FPA_PRINTF("ptrA->synth_cmd_eof_add                          = %d", ptrA->synth_cmd_eof_add                           );
+      FPA_PRINTF("ptrA->int_cmd_id                                 = %d", ptrA->int_cmd_id                                  );
+      FPA_PRINTF("ptrA->int_cmd_data_size                          = %d", ptrA->int_cmd_data_size                           );
+      FPA_PRINTF("ptrA->int_cmd_dlen                               = %d", ptrA->int_cmd_dlen                                );
+      FPA_PRINTF("ptrA->int_cmd_offs                               = %d", ptrA->int_cmd_offs                                );
+      FPA_PRINTF("ptrA->int_cmd_sof_add                            = %d", ptrA->int_cmd_sof_add                             );
+      FPA_PRINTF("ptrA->int_cmd_eof_add                            = %d", ptrA->int_cmd_eof_add                             );
+      FPA_PRINTF("ptrA->int_cmd_sof_add_m1                         = %d", ptrA->int_cmd_sof_add_m1                          );
+      FPA_PRINTF("ptrA->int_checksum_add                           = %d", ptrA->int_checksum_add                            );
+      FPA_PRINTF("ptrA->frame_dly_cst                              = %d", ptrA->frame_dly_cst                               );
+      FPA_PRINTF("ptrA->int_dly_cst                                = %d", ptrA->int_dly_cst                                 ); 
+      FPA_PRINTF("ptrA->op_cmd_id                                  = %d", ptrA->op_cmd_id                                   );
+      FPA_PRINTF("ptrA->op_cmd_data_size                           = %d", ptrA->op_cmd_data_size                            );
+      FPA_PRINTF("ptrA->op_cmd_dlen                                = %d", ptrA->op_cmd_dlen                                 );
+      FPA_PRINTF("ptrA->op_cmd_sof_add                             = %d", ptrA->op_cmd_sof_add                              );
+      FPA_PRINTF("ptrA->op_cmd_eof_add                             = %d", ptrA->op_cmd_eof_add                              );
+      FPA_PRINTF("ptrA->temp_cmd_id                                = %d", ptrA->temp_cmd_id                                 );
+      FPA_PRINTF("ptrA->temp_cmd_data_size                         = %d", ptrA->temp_cmd_data_size                          );
+      FPA_PRINTF("ptrA->temp_cmd_dlen                              = %d", ptrA->temp_cmd_dlen                               );
+      FPA_PRINTF("ptrA->temp_cmd_sof_add                           = %d", ptrA->temp_cmd_sof_add                            );
+      FPA_PRINTF("ptrA->temp_cmd_eof_add                           = %d", ptrA->temp_cmd_eof_add                            );
+      FPA_PRINTF("ptrA->outgoing_com_hder                          = %d", ptrA->outgoing_com_hder                           );
+      FPA_PRINTF("ptrA->outgoing_com_ovh_len                       = %d", ptrA->outgoing_com_ovh_len                        );
+      FPA_PRINTF("ptrA->incoming_com_hder                          = %d", ptrA->incoming_com_hder                           );
+      FPA_PRINTF("ptrA->incoming_com_fail_id                       = %d", ptrA->incoming_com_fail_id                        );
+      FPA_PRINTF("ptrA->incoming_com_ovh_len                       = %d", ptrA->incoming_com_ovh_len                        );
+      FPA_PRINTF("ptrA->fpa_serdes_lval_num                        = %d", ptrA->fpa_serdes_lval_num                         );
+      FPA_PRINTF("ptrA->fpa_serdes_lval_len                        = %d", ptrA->fpa_serdes_lval_len                         );
+      FPA_PRINTF("ptrA->int_clk_period_factor                      = %d", ptrA->int_clk_period_factor                       );
+      FPA_PRINTF("ptrA->int_time_offset                            = %d", ptrA->int_time_offset                             );
+      FPA_PRINTF("ptrA->proxy_alone_mode                           = %d", ptrA->proxy_alone_mode                            );
+//   }
+   
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -583,7 +733,9 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
          temperature -=  8844.0F * powf(diode_voltage,2);
          temperature += (2941.5F * diode_voltage) + 77.3F;
       }
-      return K_TO_CC(temperature); // Centi celsius
+      
+      return -19300; // Centi celsius
+      //return K_TO_CC(temperature); // Centi celsius
    }
 }
 
@@ -597,7 +749,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 
 
    FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
-   period = hh.Frame_Time_us;
+   period = hh.Frame_Time_us * 1e-6F;
 
    MaxFrameRate = 1.0F / period;
 
@@ -624,7 +776,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
-   periodMinWithNullExposure = hh.Frame_Time_us;
+   periodMinWithNullExposure = hh.Frame_Time_us * 1e-6F;
    operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;

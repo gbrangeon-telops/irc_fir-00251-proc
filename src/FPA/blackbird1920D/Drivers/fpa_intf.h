@@ -27,7 +27,7 @@
 //   #define SCD_PROXY
 //#endif
 
-#define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920"
+#define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920 v2"
 
 #define FPA_WIDTH_MIN      64   
 #define FPA_WIDTH_MAX      1920
@@ -93,6 +93,9 @@
 #define XTRA_TRIG_MODE_DELAY           100000  // us
 
 #define SCD_MIN_OPER_FPS               (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
+
+#define FPA_PRINTF(fmt, ...)           FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+
 
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet

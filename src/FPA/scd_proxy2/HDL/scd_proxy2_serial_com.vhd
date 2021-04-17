@@ -687,14 +687,9 @@ begin
                      resp_err(2) <= '1';
                      cmd_resp_fsm <= idle;
                      -- pragma translate_off
---                     proxy_serial_err <= '0';
---                     resp_err <= (others => '0');                     
-                     -- pragma translate_on 
-                     
-                     if USER_CFG.PROXY_ALONE_MODE = '1' then 
-                        proxy_serial_err <= '0';
-                        resp_err <= (others => '0');  
-                     end if;                    
+                     --                     proxy_serial_err <= '0';
+                     --                     resp_err <= (others => '0');                     
+                     -- pragma translate_on                     
                   end if;
                
                when fpa_temp_resp_st =>  -- extraction de la température raw 
@@ -713,7 +708,12 @@ begin
                
                when others =>
                
-            end case;  
+            end case; 
+            
+            if USER_CFG.PROXY_ALONE_MODE = '1' then 
+               proxy_serial_err <= '0';
+               resp_err <= (others => '0');  
+            end if;
             
             
          end if;

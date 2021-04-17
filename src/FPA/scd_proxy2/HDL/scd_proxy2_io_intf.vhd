@@ -75,7 +75,9 @@ entity scd_proxy2_io_intf is
       );
 end scd_proxy2_io_intf;
 
-architecture scd_proxy2_io_intf of scd_proxy2_io_intf is
+architecture rtl of scd_proxy2_io_intf is
+
+constant PROXY_RST_END_FACTOR : integer := POWER_WAIT_FACTOR/4;
    
    component sync_reset
       port (
@@ -121,10 +123,10 @@ architecture scd_proxy2_io_intf of scd_proxy2_io_intf is
    end component;
    
    type proxy_trig_fsm_type is (idle, trig_on_st);
-   type scd_proxy2_io_intf_fsm_type is (idle, init_st, proxy_pwred_st);
+   type proxy2_io_intf_fsm_type is (idle, init_st, proxy_pwred_st);
    
    signal proxy_trig_fsm            : proxy_trig_fsm_type;
-   signal scd_proxy2_io_intf_fsm    : scd_proxy2_io_intf_fsm_type;
+   signal proxy2_io_intf_fsm        : proxy2_io_intf_fsm_type;
    signal sreset                    : std_logic;
    signal int_fbk_i                 : std_logic;
    signal proxy_trig_i              : std_logic;
@@ -134,7 +136,7 @@ architecture scd_proxy2_io_intf of scd_proxy2_io_intf is
    signal cnt                       : unsigned(15 downto 0);
    signal timer_cnt                 : unsigned(31 downto 0);
    signal proxy_powered_o           : std_logic;
-   signal proxy_reset_i             : std_logic;
+   signal proxy_reset_n             : std_logic;
    
 begin
    
@@ -167,7 +169,7 @@ begin
    -- sortie reset du proxy
    U3B : OBUFTDS
    port map(
-      I  => proxy_reset_i,
+      I  => proxy_reset_n,
       T  => output_disabled,
       O  => DET_SPARE_P1,
       OB => DET_SPARE_N1
@@ -283,11 +285,11 @@ begin
             proxy_powered_o <= '0';
             output_disabled <= '1';
             proxy_int_feedbk_o <= '0';
-            scd_proxy2_io_intf_fsm <=  init_st;
+            proxy2_io_intf_fsm <=  init_st;
          else
             
             
-            case scd_proxy2_io_intf_fsm is 
+            case proxy2_io_intf_fsm is 
                
                -- init_st
                when init_st =>
@@ -295,8 +297,8 @@ begin
                   output_disabled <= '1';
                   proxy_int_feedbk_o <= '0';
                   timer_cnt <= (others => '0');
-                  scd_proxy2_io_intf_fsm <= idle;
-                  proxy_reset_i <= '1';
+                  proxy2_io_intf_fsm <= idle;
+                  proxy_reset_n <= '0';
                   
                   
                -- attente du signal d'allumage du proxy
@@ -308,18 +310,18 @@ begin
                      timer_cnt <= (others => '0');
                   end if;
                   
-                  if timer_cnt = POWER_WAIT_FACTOR/4 then   -- reset du proxy
-                     proxy_reset_i <= '0';
+                  if timer_cnt = PROXY_RST_END_FACTOR then   -- fin reset du proxy
+                     proxy_reset_n <= '1';
                   end if;                  
                   
                   if timer_cnt = POWER_WAIT_FACTOR then   -- delai d'au moins 1 sec pour que le proxy soit prêt à recevoir les commandes
-                     scd_proxy2_io_intf_fsm <=  proxy_pwred_st;
+                     proxy2_io_intf_fsm <=  proxy_pwred_st;
                   end if; 
                   
                   -- pragma translate_off
                   if PROXY_PWR = '1' then
-                     scd_proxy2_io_intf_fsm <=  proxy_pwred_st;
-                      proxy_reset_i <= '0';
+                     proxy2_io_intf_fsm <=  proxy_pwred_st;
+                      proxy_reset_n <= '1';
                   end if;
                   -- pragma translate_on
                   
@@ -329,7 +331,7 @@ begin
                   proxy_powered_o <= '1';  -- pour le scd_proxy2, le signal de proxy powered est envoyé  SCD_PROXY2_POWER_WAIT usec après l'allumage du proxy
                   proxy_int_feedbk_o <= int_fbk_i;
                   if PROXY_PWR = '0' then
-                     scd_proxy2_io_intf_fsm <= init_st;
+                     proxy2_io_intf_fsm <= init_st;
                   end if;   
                
                when others =>
@@ -340,4 +342,4 @@ begin
       end if;
    end process;  
    
-end scd_proxy2_io_intf;
+end rtl;
