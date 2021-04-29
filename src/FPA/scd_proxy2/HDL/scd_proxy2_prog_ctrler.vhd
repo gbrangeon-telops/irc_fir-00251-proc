@@ -14,9 +14,12 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.std_logic_misc.all;
 use work.fpa_define.all;
 use work.Proxy_define.all;
 use work.tel2000.all;
+use work.fpa_serdes_define.all;
+
 
 entity scd_proxy2_prog_ctrler is
    port(
@@ -58,7 +61,9 @@ entity scd_proxy2_prog_ctrler is
       INT_TIME             : out std_logic_vector(31 downto 0);
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
-      RST_CLINK_N          : out std_logic
+      RST_CLINK_N          : out std_logic;
+      FPA_SERDES_STAT      : in fpa_serdes_stat_type
+      
       );                 
 end scd_proxy2_prog_ctrler;
 
@@ -128,8 +133,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal proxy_pwr_i               : std_logic;
    signal int_clk_pulse_i           : std_logic;
    signal int_i                     : std_logic;
-   signal serial_done_cnt           : unsigned(15 downto 0);
-   signal serial_done_last          : std_logic;
+   signal serdes_rdy_i              : std_logic;
    
    -- -- attribute dont_touch                         : string;
    -- -- attribute dont_touch of acq_int_i            : signal is "true";
@@ -155,20 +159,7 @@ begin
    PROXY_PWR      <= proxy_pwr_i;
    
    
-   FPA_DRIVER_STAT(31) <= fpa_new_cfg_pending;
-   FPA_DRIVER_STAT(30) <= PROXY_RDY;
-   FPA_DRIVER_STAT(29) <= PROXY_POWERED;
-   FPA_DRIVER_STAT(28) <= proxy_static_done;
-   
-   FPA_DRIVER_STAT(27) <= proxy_pwr_i;
-   FPA_DRIVER_STAT(26) <= SERIAL_DONE;
-   FPA_DRIVER_STAT(25) <= '0';
-   FPA_DRIVER_STAT(24) <= '0';
-   
-   FPA_DRIVER_STAT(23 downto 20) <= (others => '0');
-   
-   FPA_DRIVER_STAT(19 downto 16) <= std_logic_vector(serial_done_cnt(3 downto 0));
-      
+   FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err;
    FPA_DRIVER_STAT(7) <= '0'; 
    FPA_DRIVER_STAT(6) <= '0'; 
@@ -201,22 +192,12 @@ begin
             proxy_pwr_i <= '0'; 
             fpa_powered <= '0';
             reset_clink_n <= '0';
-            serial_done_cnt <= (others => '0');
-            serial_done_last <= SERIAL_DONE;
-            
          else                  
             proxy_pwr_i <= FPA_POWER; 
             fpa_powered <= PROXY_POWERED and PROXY_RDY;  -- PROXY_POWERED signifie que le proxy est juste allumé. PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès.              
             reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
-            
-            serial_done_last <= SERIAL_DONE;
-            
-            if serial_done_last = '1' and SERIAL_DONE = '0' then 
-                 serial_done_cnt <= serial_done_cnt + 1;
             end if;               
-            
          end if;          
-      end if;
    end process;
    
    ------------------------------------------------
@@ -233,6 +214,7 @@ begin
             need_prog_rqst <= '0';
             cfg_ser_param_i.run   <= '0';
             cfg_ser_param_i.abort <= '0';
+            serdes_rdy_i <= '0';
             
          else 
             
@@ -246,7 +228,8 @@ begin
             new_cfg.temp  <= USER_CFG.TEMP;
             new_cfg.synth <= USER_CFG.SYNTH;
             
-            --fpa_new_cfg_pending <= not user_cfg_in_progress_i; 
+            -- serdes rdy
+            serdes_rdy_i <= and_reduce(FPA_SERDES_STAT.DONE) and and_reduce(FPA_SERDES_STAT.SUCCESS);
             
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
@@ -285,9 +268,9 @@ begin
                
                when new_synth_cfg_st =>  
                   new_cfg_id <= std_logic_vector(USER_CFG.SYNTH_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
-                  cfg_ser_param_i.cmd_sof_add  <= USER_CFG.SYNTH_CMD_SOF_ADD;
-                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.SYNTH_CMD_EOF_ADD;
-                  cfg_ser_param_i.prog_trig_mode <= '1';
+                  cfg_ser_param_i.cmd_sof_add    <= USER_CFG.SYNTH_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add    <= USER_CFG.SYNTH_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= serdes_rdy_i;
                   need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
@@ -299,9 +282,9 @@ begin
                
                when new_op_cfg_st =>  
                   new_cfg_id <= std_logic_vector(USER_CFG.OP_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
-                  cfg_ser_param_i.cmd_sof_add  <= USER_CFG.OP_CMD_SOF_ADD;
-                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.OP_CMD_EOF_ADD;
-                  cfg_ser_param_i.prog_trig_mode <= '1';
+                  cfg_ser_param_i.cmd_sof_add    <= USER_CFG.OP_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add    <= USER_CFG.OP_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= serdes_rdy_i;
                   need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
@@ -313,8 +296,8 @@ begin
                
                when new_int_cfg_st =>
                   new_cfg_id <= std_logic_vector(USER_CFG.INT_CMD_SOF_ADD(7 downto 0));
-                  cfg_ser_param_i.cmd_sof_add <= USER_CFG.INT_CMD_SOF_ADD;
-                  cfg_ser_param_i.cmd_eof_add <= USER_CFG.INT_CMD_EOF_ADD;
+                  cfg_ser_param_i.cmd_sof_add    <= USER_CFG.INT_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add    <= USER_CFG.INT_CMD_EOF_ADD;
                   cfg_ser_param_i.prog_trig_mode <= '0';
                   fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                   need_prog_rqst <= '0'; 				         -- int_cfg : requete auprès du fpa_hw_sequencer non necessaire car on peut faire la prog sans arrêter les trigs

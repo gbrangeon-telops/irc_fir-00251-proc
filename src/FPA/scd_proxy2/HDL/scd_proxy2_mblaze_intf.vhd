@@ -155,7 +155,7 @@ begin
    MB_SER_CFG.TDATA    <= mb_ser_cfg_add & mb_ser_cfg_data;
    MB_SER_CFG.TVALID   <= mb_ser_cfg_dval;
    EXP_SER_CFG.TDATA   <= exp_ser_cfg_add & exp_ser_cfg_data;
-   EXP_SER_CFG.TVALID  <= exp_ser_cfg_dval;
+   EXP_SER_CFG.TVALID  <= '0';
    
    
    -- STATUS_MOSI toujours envoyé au fpa_status_gen pour eviter des delais

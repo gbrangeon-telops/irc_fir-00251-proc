@@ -113,7 +113,7 @@
 
 #define DONOT_SEND_THIS_BYTE               0xFF        // ce code permet de ne pas envoyer le byte qui le contient
 
-#define VHD_CLK_100M_RATE_HZ               100E+6F
+#define VHD_CLK_100M_RATE_HZ               100E+6F 
 
 
 // structure 
@@ -391,10 +391,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // mode diag vrai et faked
    ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
-//   if (ptrA->fpa_diag_mode == 1){
-//      if ((int32_t)gFpaDebugRegE != 0)
-//         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
-//   }
+   if (ptrA->fpa_diag_mode == 1){
+      if ((int32_t)gFpaDebugRegE != 0)
+         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
+   }
    
    //-----------------------------------------
    // aoi
@@ -503,7 +503,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_cmd_data_size                = 19;                              // taille de la partie donnée exclusivement
    ptrA->op_cmd_dlen                     = ptrA->op_cmd_data_size + 1;      // taille de la partie donnée + taille de l'adresse d'offset
    ptrA->op_cmd_sof_add                  = (uint32_t)AW_SERIAL_OP_CMD_RAM_ADD;
-   ptrA->op_cmd_eof_add                  = ptrA->op_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->op_cmd_dlen; 
+   ptrA->op_cmd_eof_add                  = ptrA->op_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->op_cmd_dlen;
    
    //-----------------------------------------
    // synth : cmd serielle
@@ -513,7 +513,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->synth_cmd_dlen                  = ptrA->synth_cmd_data_size + 1;      // taille de la partie donnée + taille de l'adresse d'offset
    ptrA->synth_cmd_sof_add               = (uint32_t)AW_SERIAL_SYNTH_CMD_RAM_ADD;
    ptrA->synth_cmd_eof_add               = ptrA->synth_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->synth_cmd_dlen;   // dlen = 23 + 1
-      
+   
    //-----------------------------------------
    // temp : cmd serielle
    //-----------------------------------------
@@ -1035,7 +1035,7 @@ void FPA_SendSynthVideo_SerialCmd(const t_FpaIntf *ptrA)
    
    // on envoit les packets
    FPA_SendCmdPacket(&ScdPacketTx, ptrA);
-
+   
 }
 
 //--------------------------------------------------------

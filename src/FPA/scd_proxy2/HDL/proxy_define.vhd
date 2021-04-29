@@ -56,10 +56,10 @@ package Proxy_define is
    constant DEFINE_ADC_QUAD_CLK_FACTOR                   : integer := integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ/DEFINE_ADC_QUAD_CLK_RATE_KHZ);
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS : natural := 26;  -- log2 de FPA_EXP_TIME_CONV_DENOMINATOR  
    constant DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR         : integer := 2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS;
-   constant FSYNC_HIGH_TIME_FACTOR                       : integer := integer(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*(FSYNC_HIGH_TIME_US/1000));
-   constant POWER_WAIT_FACTOR                            : integer := integer(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*(POWER_WAIT_US/1000));
-   constant SERIAL_TX_CLK_FACTOR                         : integer := integer((DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*1E3)/SERIAL_BAUD_RATE); -- utilisé juste pour generateur de delai
-   constant TEMP_TRIG_PERIOD_FACTOR                      : integer := integer(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ*(TEMP_TRIG_PERIOD_US/1000));
+   constant FSYNC_HIGH_TIME_FACTOR                       : integer := integer((real(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ) * real(FSYNC_HIGH_TIME_US))/1000.0);
+   constant POWER_WAIT_FACTOR                            : integer := integer((real(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ) * real(POWER_WAIT_US))/1000.0);
+   constant SERIAL_TX_CLK_FACTOR                         : integer := integer((real(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ)*1000.0) / real(SERIAL_BAUD_RATE)); -- utilisé juste pour generateur de delai
+   constant TEMP_TRIG_PERIOD_FACTOR                      : integer := integer((real(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ) * real(TEMP_TRIG_PERIOD_US))/1000.0);
    
    --------------------------------------------
    --  modes diag

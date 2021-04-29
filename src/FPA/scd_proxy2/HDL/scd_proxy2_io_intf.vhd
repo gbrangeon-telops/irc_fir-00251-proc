@@ -77,7 +77,9 @@ end scd_proxy2_io_intf;
 
 architecture rtl of scd_proxy2_io_intf is
 
-constant PROXY_RST_END_FACTOR : integer := POWER_WAIT_FACTOR/4;
+constant PROXY_RST_END_FACTOR    : integer     := POWER_WAIT_FACTOR/4;
+constant C_PROXY_RST_SIGNAL      : std_logic   := '1';
+
    
    component sync_reset
       port (
@@ -136,7 +138,8 @@ constant PROXY_RST_END_FACTOR : integer := POWER_WAIT_FACTOR/4;
    signal cnt                       : unsigned(15 downto 0);
    signal timer_cnt                 : unsigned(31 downto 0);
    signal proxy_powered_o           : std_logic;
-   signal proxy_reset_n             : std_logic;
+   signal proxy_reset_i             : std_logic;
+
    
 begin
    
@@ -169,7 +172,7 @@ begin
    -- sortie reset du proxy
    U3B : OBUFTDS
    port map(
-      I  => proxy_reset_n,
+      I  => proxy_reset_i,
       T  => output_disabled,
       O  => DET_SPARE_P1,
       OB => DET_SPARE_N1
@@ -286,6 +289,8 @@ begin
             output_disabled <= '1';
             proxy_int_feedbk_o <= '0';
             proxy2_io_intf_fsm <=  init_st;
+            proxy_reset_i <= C_PROXY_RST_SIGNAL;
+            
          else
             
             
@@ -298,7 +303,7 @@ begin
                   proxy_int_feedbk_o <= '0';
                   timer_cnt <= (others => '0');
                   proxy2_io_intf_fsm <= idle;
-                  proxy_reset_n <= '0';
+                  proxy_reset_i <= C_PROXY_RST_SIGNAL;
                   
                   
                -- attente du signal d'allumage du proxy
@@ -311,7 +316,7 @@ begin
                   end if;
                   
                   if timer_cnt = PROXY_RST_END_FACTOR then   -- fin reset du proxy
-                     proxy_reset_n <= '1';
+                     proxy_reset_i <= not C_PROXY_RST_SIGNAL;
                   end if;                  
                   
                   if timer_cnt = POWER_WAIT_FACTOR then   -- delai d'au moins 1 sec pour que le proxy soit prêt à recevoir les commandes
@@ -321,7 +326,7 @@ begin
                   -- pragma translate_off
                   if PROXY_PWR = '1' then
                      proxy2_io_intf_fsm <=  proxy_pwred_st;
-                      proxy_reset_n <= '1';
+                      proxy_reset_i <= not C_PROXY_RST_SIGNAL;
                   end if;
                   -- pragma translate_on
                   

@@ -179,7 +179,7 @@ architecture RTL of scd_proxy2_serial_com is
    signal prog_trig_start         : std_logic;
    signal prog_trig_start_last    : std_logic; 
    signal acq_mode                : std_logic;
-   signal cmd_ram2_eof_add        : unsigned(SERIAL_PARAM.CMD_EOF_ADD'LENGTH-1 downto 0); 
+   signal cmd_ram2_eof_add        : unsigned(SERIAL_PARAM.CMD_EOF_ADD'LENGTH-1 downto 0);
    
    
 begin
@@ -243,7 +243,7 @@ begin
             serial_fatal_err_i <= '0';
             cpy_cfg_en <= '0';
             send_cfg_en <= '0';
-            serial_err_cnt <= (others => '0'); 
+            serial_err_cnt <= (others => '0');
             
          else             
             
@@ -263,31 +263,31 @@ begin
                      end if;
                      prog_seq_fsm <= cpy_cfg_st;
                   end if; 
-               
+                  
                when cpy_cfg_st =>              -- la config est copiée de de la RAM1 vers la RAM2 sécurisée                  
                   cpy_cfg_en <= '1';
                   if cpy_cfg_done = '0' then
                      cpy_cfg_en <= '0';
                      prog_seq_fsm <= wait_end_cpy_cfg_st;
                   end if;
-               
+                  
                when wait_end_cpy_cfg_st =>     -- fin de la copie de la config
                   if cpy_cfg_done = '1' and send_cfg_done = '1' then
                      prog_seq_fsm <= send_cfg_st;
-                  end if; 
-               
+                  end if;
+                  
                when send_cfg_st =>             -- la config est envoyée de la zone sécurisée vers le proxy
                   send_cfg_en <= '1';
                   if send_cfg_done = '0' then
                      send_cfg_en <= '0';
                      prog_seq_fsm <= wait_end_send_cfg_st;
                   end if;
-               
+                  
                when wait_end_send_cfg_st =>     -- fin de l'envoi de la config
                   if send_cfg_done = '1' then
                      prog_seq_fsm <= wait_proxy_resp_st;
-                  end if;                  
-               
+                  end if; 
+                  
                when wait_proxy_resp_st =>     -- on attend la réponse du proxy
                   if send_cfg_done = '1' then
                      if serial_cmd_failure = '1' then                        
@@ -296,7 +296,7 @@ begin
                         prog_seq_fsm <= idle;                      
                      end if;                                       
                   end if;
-               
+                  
                when cmd_fail_mgmt_st =>
                   if proxy_rdy_i = '1' then 
                      if serial_err_cnt = 10 then
@@ -314,9 +314,9 @@ begin
                      end if;
                   end if;
                   
-               
+                  
                when others =>
-               
+                  
             end case;
             
          end if;
@@ -404,7 +404,7 @@ begin
                   if USER_CFG_IN_PROGRESS = '0' then 
                      cfg_mgmt_fsm <= cpy_cfg_rd_st2;
                   end if;
-               
+                  
                when cpy_cfg_rd_st2 =>   -- la config est copiee de la ram1 vers la ram2 (zone sécurisée)                       
                   ram1_rd_i <= '1';
                   cfg_byte_cnt  <= cfg_byte_cnt + 1;
@@ -425,14 +425,14 @@ begin
                   else
                      cfg_mgmt_fsm <= send_cfg_rd_st;   
                   end if;
-               
+                  
                when prog_trig_start_st =>
                   prog_trig_start <= '1';
                   if prog_trig_done = '0' then 
                      prog_trig_start <= '0';
                      cfg_mgmt_fsm <= prog_trig_end_st;			   
                   end if;
-               
+                  
                when prog_trig_end_st =>
                   if prog_trig_done = '1' then
                      if force_prog_trig_mode = '1' then
@@ -441,19 +441,19 @@ begin
                         cfg_mgmt_fsm <= idle;
                      end if;
                   end if;
-               
+                  
                when send_cfg_rd_st =>          -- on lit un byte dans la zone sécurisée     
                   ram2_rd_i <= '1';
                   tx_dval_i <= '0';
                   cfg_mgmt_fsm <= latch_data_st;
-               
+                  
                when latch_data_st =>          -- on latche le byte lu
                   ram2_rd_i <= '0';                  
                   if RAM2_RD_DVAL = '1' then
                      cfg_byte <= RAM2_RD_DATA;
                      cfg_mgmt_fsm <= send_cfg_out_st;                     
                   end if;
-               
+                  
                when send_cfg_out_st =>       -- on envoie le byte latché
                   tx_dval_i <= '0';
                   if TX_AFULL = '0' then
@@ -465,8 +465,8 @@ begin
                   tx_dval_i <= '1';
                   tx_data_i <= cfg_byte;
                   cfg_mgmt_fsm <= check_frm_end_st;
-                  -- pragma translate_on                     
-               
+                  -- pragma translate_on 
+                  
                when check_frm_end_st =>
                   tx_dval_i <= '0';
                   if ram2_rd_add_i = to_integer(cmd_ram2_eof_add) then
@@ -475,8 +475,8 @@ begin
                   else
                      cfg_mgmt_fsm <= send_cfg_rd_st;
                      ram2_rd_add_i <= ram2_rd_add_i + 1;  -- mis ici expres (incr pour la prochaine lecture)
-                  end if;                  
-               
+                  end if;
+                  
                when wait_tx_fifo_empty_st =>                  
                   if TX_EMPTY = '1' then 
                      cfg_mgmt_fsm <= uart_pause_st;
@@ -484,7 +484,7 @@ begin
                   -- pragma translate_off
                   cfg_mgmt_fsm <= uart_pause_st;
                   -- pragma translate_on
-               
+                  
                when uart_pause_st =>                  
                   timeout_cnt <= (others => '0');
                   if uart_tbaud_clk_en = '1' and uart_tbaud_clk_en_last = '0' then
@@ -496,7 +496,7 @@ begin
                   -- pragma translate_off
                   cfg_mgmt_fsm <= wait_proxy_resp_st;
                   -- pragma translate_on
-               
+                  
                when wait_proxy_resp_st =>
                   timeout_cnt <= timeout_cnt + 1;                  
                   if cmd_resp_done = '1' and cmd_resp_done_last = '0' then
@@ -504,12 +504,12 @@ begin
                   else
                      if timeout_cnt = 5_000_000 then   -- donne 50 ms sec au proxy pour donner une réponse                     
                         cfg_mgmt_fsm <= timeout_mgmt_st;
-                     end if; 
+                  end if;
                      -- pragma translate_off                     
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;
                      -- pragma translate_on
                   end if;
-               
+                  
                when cmd_resp_mgmt_st => 
                   if proxy_serial_err = '1' then
                      serial_cmd_failure  <= '1';
@@ -522,14 +522,14 @@ begin
                      else
                         cfg_mgmt_fsm <= idle; 
                      end if;              
-                  end if;                  
-               
+                  end if;
+                  
                when timeout_mgmt_st =>
                   serial_cmd_failure  <= '1';
-                  cfg_mgmt_fsm <= idle;                  
-               
+                  cfg_mgmt_fsm <= idle;
+                  
                when others =>
-               
+                  
             end case;
             
          end if;
@@ -574,7 +574,7 @@ begin
                      prog_trig_fsm <= check_prog_img_st;
                      prog_trig_i <= '1';
                   end if;
-               
+                  
                when check_prog_img_st =>                     
                   prog_trig_done <= '0';
                   if readout_last = '1' and readout_i = '0' and acq_mode = '0' then 
@@ -583,9 +583,9 @@ begin
                   if img_cnt >= FPA_XTRA_IMAGE_NUM_TO_SKIP then                        
                      prog_trig_fsm <= idle;    
                   end if; 
-               
-               when others =>
-               
+                  
+               when others => 
+                  
             end case;
             
          end if;
@@ -635,7 +635,7 @@ begin
                         rx_data_cnt <= to_unsigned(2, rx_data_cnt'length);
                      end if;
                   end if;
-               
+                  
                when decode_byte_st => -- decodage du byte lu
                   cmd_resp_done <= '0';
                   if RX_DVAL = '1' then
@@ -663,8 +663,8 @@ begin
                         resp_data(to_integer(resp_dcnt)) <= RX_DATA;
                         resp_dcnt <= resp_dcnt + 1;
                      end if;                  
-                  end if; 
-               
+                  end if;
+                  
                when check_resp_st =>   -- recherche du type de reponse reçue
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
                   if resp_hder = USER_CFG.INCOMING_COM_HDER then 
@@ -690,8 +690,13 @@ begin
                      --                     proxy_serial_err <= '0';
                      --                     resp_err <= (others => '0');                     
                      -- pragma translate_on                     
+                     
+                     if USER_CFG.PROXY_ALONE_MODE = '1' then 
+                        proxy_serial_err <= '0';
+                        resp_err <= (others => '0');  
                   end if;
-               
+                  end if;
+                  
                when fpa_temp_resp_st =>  -- extraction de la température raw 
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
                   temp_diode := unsigned(resp_data(1)) & unsigned(resp_data(0));
@@ -705,9 +710,9 @@ begin
                   end if;
                   
                   cmd_resp_fsm <= idle;
-               
+                  
                when others =>
-               
+                  
             end case; 
             
             if USER_CFG.PROXY_ALONE_MODE = '1' then 

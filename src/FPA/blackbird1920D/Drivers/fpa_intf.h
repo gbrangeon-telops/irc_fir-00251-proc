@@ -27,7 +27,7 @@
 //   #define SCD_PROXY
 //#endif
 
-#define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920 v2"
+#define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920"
 
 #define FPA_WIDTH_MIN      64   
 #define FPA_WIDTH_MAX      1920
