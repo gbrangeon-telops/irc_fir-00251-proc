@@ -6,6 +6,9 @@ set release 1
 
 #Select Detector to build
 
+#lappend detector_list {blackbird1920D160}
+#lappend detector_list {blackbird1920D325}
+
 #lappend detector_list {blackbird1280D160}
 #lappend detector_list {blackbird1280D325}
 
