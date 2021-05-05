@@ -78,7 +78,7 @@ end scd_proxy2_io_intf;
 architecture rtl of scd_proxy2_io_intf is
 
 constant PROXY_RST_END_FACTOR    : integer     := POWER_WAIT_FACTOR/4;
-constant C_PROXY_RST_SIGNAL      : std_logic   := '1';
+constant C_PROXY_RST_SIGNAL      : std_logic   := '0';
 
    
    component sync_reset
