@@ -530,8 +530,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->incoming_com_hder               = 0x55;
    ptrA->incoming_com_fail_id            = 0xFFFF;
    ptrA->incoming_com_ovh_len            = 5;
-   ptrA->fpa_serdes_lval_num             = ptrA->aoi_ysize;
-   ptrA->fpa_serdes_lval_len             = (uint32_t)FPA_WIDTH_MAX / gPrivateStat.fpa_pix_num_per_pclk;
+
+   ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
+   if (gPrivateStat.fpa_pix_num_per_pclk == 8)
+      ptrA->fpa_serdes_lval_num >>= 1; // Les lignes sortent en double.
+   ptrA->fpa_serdes_lval_len = (uint32_t)FPA_WIDTH_MAX / 4; // toujours diviser par 4 pour half et full rate. Car même si on a 8 pixels/clk, en réalité on a 2 lignes simultannés à 4 pixels/clk.
+
    ptrA->int_clk_period_factor           = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 1);
    ptrA->int_time_offset                 = (int32_t)(hh.fpa_intg_clk_rate_hz * hh.int_time_offset_usec*1e-6F);
 
