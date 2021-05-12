@@ -24,7 +24,7 @@ entity scd_proxy2_dout is
       CLK           : in std_logic;
       
       --inputs
-      DIN           : in std_logic_vector(35 downto 0);
+      DIN           : in std_logic_vector(31 downto 0);
       SUCCESS       : in std_logic;
       
       -- delay calibration side
