@@ -46,6 +46,9 @@ entity scd_proxy2_dsync is
       QUAD_DATA     : out std_logic_vector(71 downto 0);
       QUAD_DVAL     : out std_logic;
       
+      
+      FPA_INTF_CFG  : in fpa_intf_cfg_type;
+      
       -- erreur
       ERR           : out std_logic_vector(1 downto 0)
       );
@@ -116,10 +119,12 @@ architecture rtl of scd_proxy2_dsync is
    signal rst_cnt             : unsigned(5 downto 0);
    signal err_i               : std_logic_vector(ERR'length-1 downto 0);
    signal init_in_progress    : std_logic;
-   
+   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_PIXEL_ID;
+
 begin
    
-   
+   frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID  when  FPA_INTF_CFG.proxy_alone_mode = '1' else  CBITS_PIXEL_ID;
+
    QUAD_DATA <= quad_dout_o;
    QUAD_DVAL <= quad_dval_o;
    
@@ -313,7 +318,7 @@ begin
          -- pix_fval
          if ch0_lval_o = '1' and active_sof = '1'  then   
             quad_dout_o(66)         <= '1';                                 
-         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= CBITS_PIXEL_ID and active_eof = '1'  then
+         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= frame_init_tag and active_eof = '1'  then
             quad_dout_o(66)         <= '0';
          end if;
          
@@ -325,8 +330,8 @@ begin
          
          -- pixels
          quad_dout_o(63 downto 48)  <= "00" & ch1_fifo_dout(27 downto 14);  -- pix4
-         quad_dout_o(47 downto 32)  <= "00" & ch1_fifo_dout(13 downto 0);  -- pix3
-         quad_dout_o(31 downto 16)  <= "00" & ch0_fifo_dout(27 downto 14);  -- pix2
+         quad_dout_o(47 downto 32)  <= "00" & ch0_fifo_dout(27 downto 14);  -- pix3
+         quad_dout_o(31 downto 16)  <= "00" & ch1_fifo_dout(13 downto 0);   -- pix2
          quad_dout_o(15 downto  0)  <= "00" & ch0_fifo_dout(13 downto  0);  -- pix1
          quad_dval_o                <= fifo_rd_en;         
          
