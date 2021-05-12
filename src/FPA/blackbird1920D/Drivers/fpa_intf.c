@@ -706,10 +706,8 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    float temperature = 0.0F;
    
    FPA_GetStatus(&gStat, ptrA);
-   
-   // demande de lecture de la temperature temp(n)
+   FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle
    FPA_ReadTemperature_StructCmd(ptrA);      // envoi un interrupt au contrôleur du hw driver
-   FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle    
    
    if ((uint32_t)(gStat.fpa_temp_raw & 0x0000FFFF) == (uint32_t)VHD_INVALID_TEMP){
       return FPA_INVALID_TEMP;
