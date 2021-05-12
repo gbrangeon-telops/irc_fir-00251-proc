@@ -20,20 +20,23 @@ entity scd_proxy2_dout is
    port(   
       
       --
-      ARESET        : in std_logic;
-      CLK           : in std_logic;
+      ARESET             : in std_logic;
+      CLK                : in std_logic;
       
       --inputs
-      DIN           : in std_logic_vector(31 downto 0);
-      SUCCESS       : in std_logic;
+      DIN                : in std_logic_vector(31 downto 0);
+      SUCCESS            : in std_logic;
       
       -- delay calibration side
-      FVALS         : out std_logic_vector(7 downto 0);
-      LVALS         : out std_logic_vector(7 downto 0);
+      FVALS              : out std_logic_vector(7 downto 0);
+      LVALS              : out std_logic_vector(7 downto 0);
       
       -- downstream side
-      DOUT          : out std_logic_vector(35 downto 0);
-      DOUT_DVAL     : out std_logic
+      DOUT               : out std_logic_vector(35 downto 0);
+      DOUT_DVAL          : out std_logic;
+      
+      PROXY_ALONE_MODE   : in std_logic 
+      
       );
 end scd_proxy2_dout;
 
@@ -49,17 +52,20 @@ architecture rtl of scd_proxy2_dout is
    
     type array_type is array (0 to 7) of std_logic_vector(3 downto 0);
    
-   signal sreset           : std_logic;	
-   signal fvals_i 	      : std_logic_vector(7 downto 0);
-   signal lvals_i 	      : std_logic_vector(7 downto 0);
-   signal ctrl_words       : array_type;
-   signal ctrl_words_last  : array_type;
-   signal dual_data_i      : std_logic_vector(27 downto 0) := (others => '0');
-   signal dout_dval_i      : std_logic;
-   signal output_en        : std_logic;
-   signal fval_last        : std_logic;
-   
+   signal sreset             : std_logic;	
+   signal fvals_i 	        : std_logic_vector(7 downto 0);
+   signal lvals_i 	        : std_logic_vector(7 downto 0);
+   signal ctrl_words         : array_type;
+   signal ctrl_words_last    : array_type;
+   signal dual_data_i        : std_logic_vector(27 downto 0) := (others => '0');
+   signal dout_dval_i        : std_logic;
+   signal output_en          : std_logic;
+   signal fval_last          : std_logic;
+   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_PIXEL_ID;
+
 begin
+   
+   frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID  when  PROXY_ALONE_MODE = '1' else  CBITS_PIXEL_ID;
    
    --------------------------------------------------
    -- outputs mapping 
@@ -116,11 +122,11 @@ begin
                -- fval                                
                ---------------------------------------
                -- montée
-               if ctrl_words_last(jj) = CBITS_FRM_IDLE_ID and ctrl_words(jj) /= CBITS_FRM_IDLE_ID then            
+               if ctrl_words_last(jj) = frame_init_tag and ctrl_words(jj) /= frame_init_tag then            
                   fvals_i(jj) <= '1';                                                
                end if;               
                -- descente
-               if ctrl_words_last(jj) /= CBITS_FRM_IDLE_ID and ctrl_words(jj) = CBITS_FRM_IDLE_ID then
+               if ctrl_words_last(jj) /= frame_init_tag and ctrl_words(jj) = frame_init_tag then
                   fvals_i(jj) <= '0';
                end if;               
                
