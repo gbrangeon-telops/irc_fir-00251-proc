@@ -60,10 +60,10 @@
 #define FPA_EHDRI_EXP_2    500.0F
 #define FPA_EHDRI_EXP_3    1000.0F
 
-#define FPA_CAL_MIN_EXPOSURE  0.1F
+#define FPA_CAL_MIN_EXPOSURE  1.0F
 #define FPA_CAL_MAX_EXPOSURE  1000000.0F
 
-#define FPA_MIN_EXPOSURE               0.1F     // [us] 2 coups d'horloge arrondi à la hausse à 0.1
+#define FPA_MIN_EXPOSURE               1.0F     // [us] comportement non-linéaire en bas de 1us
 #define FPA_MAX_EXPOSURE               1000000.0F // [us]  ne pas depasser 2 secondes pour les détecteurs analogiques car le convertisseur vhd de temps d'exposition en depend
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
