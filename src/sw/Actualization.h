@@ -103,7 +103,8 @@
 		ACTION(ACT_DetectBadPixels)         /**< perform detection of bad pixel based on noise and flicker criteria */ \
 		ACTION(ACT_ApplyBadPixelMap)        /**< merge the bad pixel map with the delta beta map */ \
 		ACTION(ACT_ComputeDeltaBetaStats)   /**< fill the remaining fields of the deltaBeta_t structure (min, max, etc.) */ \
-		ACTION(ACT_WriteActualizationFile)  /**< the file writer state machine is on during this state */ \
+      ACTION(ACT_QuantizeDeltaBeta)       /**< quantize delta betas */ \
+      ACTION(ACT_WriteActualizationFile)  /**< the file writer state machine is on during this state */ \
 		ACTION(ACT_Finalize)                /**< a reload calibration command is issued to the calibration manager */
 
 #define BPD_STATES(ACTION) \
@@ -160,7 +161,7 @@ typedef enum {
    FWR_DELETE_PREVIOUS,
    FWR_FILE_HEADER,
    FWR_DATA_HEADER,
-   FWR_QUANTIZE_DATA,
+   FWR_BETA_PARAMS,
    FWR_CALC_CRC,
    FWR_DATA,
    FWR_CLOSEFILE
@@ -237,18 +238,24 @@ typedef struct
 
 typedef struct
 {
-   float deltaBeta[MAX_PIXEL_COUNT]; // the bad pixels from the reference block have a deltaBeta value of infinity
+   int16_t quantizedDeltaBeta[MAX_PIXEL_COUNT]; // quantized delta beta
    statistics_t stats;
    float p50; // median value
+   int8_t exp; // exponent value
    uint32_t saturatedDataCount; // number of pixel values with saturation in the NUC data
    actualisationInfo_t info;
    bool valid;
+} deltaBetaEntry_t;
+
+typedef struct {
+   float deltaBeta[MAX_PIXEL_COUNT];
+   deltaBetaEntry_t *dbEntry;
 } deltabeta_t;
 
 typedef struct
 {
    uint32_t count;
-   deltabeta_t* deltaBeta[MAX_DELTA_BETA_SIZE];
+   deltaBetaEntry_t* deltaBeta[MAX_DELTA_BETA_SIZE];
 } deltaBetaList_t;
 
 enum actualizationTypeEnum {

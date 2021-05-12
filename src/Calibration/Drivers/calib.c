@@ -298,7 +298,7 @@ IRC_Status_t CAL_SendConfigGC(t_calib *pA, gcRegistersData_t *pGCRegs)
 
          deltabeta_t* data = ACT_getSuitableDeltaBetaForBlock(&calibrationInfo, blockIndex);
          if (data)
-            pA->calib_block[blockIndex].actualizationPOSIXTime = data->info.POSIXTime;
+            pA->calib_block[blockIndex].actualizationPOSIXTime = data->dbEntry->info.POSIXTime;
          else
             pA->calib_block[blockIndex].actualizationPOSIXTime = 0;
 

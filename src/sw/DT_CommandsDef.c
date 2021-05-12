@@ -1878,7 +1878,7 @@ IRC_Status_t DebugTerminalParseFRW(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseMRW(circByteBuffer_t *cbuf)
 {
    uint8_t *p_ddrTestBuffer = (uint8_t *) XPAR_MIG_CALIBRATION_CAL_DDR_MIG_BASEADDR;
-   uint32_t bufferSize = PROC_MEM_PIXEL_DATA_SIZE + PROC_MEM_USART_RXBUFFER_SIZE + PROC_MEM_DELTA_BETA_SIZE;
+   uint32_t bufferSize = PROC_MEM_PIXEL_DATA_SIZE + PROC_MEM_USART_RXBUFFER_SIZE;
    uint32_t i;
 
    // There is supposed to be no remaining bytes in the buffer
