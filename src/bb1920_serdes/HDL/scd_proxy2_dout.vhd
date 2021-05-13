@@ -65,8 +65,6 @@ architecture rtl of scd_proxy2_dout is
 
 begin
    
-   frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID  when  PROXY_ALONE_MODE = '1' else  CBITS_PIXEL_ID;
-   
    --------------------------------------------------
    -- outputs mapping 
    --------------------------------------------------    
@@ -182,5 +180,20 @@ begin
       end if;	
    end process;
    
+      
+   U5: process(CLK)
+   begin
+      if rising_edge(CLK) then         
+         if sreset = '1' then             
+            frame_init_tag <= CBITS_PIXEL_ID;
+         else		 
+            if PROXY_ALONE_MODE = '1' then 
+               frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID;
+            else  
+               frame_init_tag <= CBITS_PIXEL_ID;
+            end if;
+         end if;
+      end if;	
+   end process;
    
 end rtl;

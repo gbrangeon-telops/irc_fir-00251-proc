@@ -123,8 +123,6 @@ architecture rtl of scd_proxy2_dsync is
 
 begin
    
-   frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID  when  FPA_INTF_CFG.proxy_alone_mode = '1' else  CBITS_PIXEL_ID;
-
    QUAD_DATA <= quad_dout_o;
    QUAD_DVAL <= quad_dval_o;
    
@@ -337,5 +335,21 @@ begin
          
       end if;
    end process;
+   
+   U5: process(QUAD_DCLK)
+   begin
+      if rising_edge(QUAD_DCLK) then         
+         if sreset = '1' then             
+            frame_init_tag <= CBITS_PIXEL_ID;
+         else		 
+            if FPA_INTF_CFG.proxy_alone_mode = '1' then 
+               frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID;
+            else  
+               frame_init_tag <= CBITS_PIXEL_ID;
+            end if;
+         end if;
+      end if;	
+   end process;
+   
    
 end rtl;
