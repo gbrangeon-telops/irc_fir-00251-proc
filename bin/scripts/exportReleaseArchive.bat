@@ -15,7 +15,8 @@ if %sensorName%==startup (
    set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_key_name% key)"
 )
 set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
-set ntxminiFile=CommonTEL2000LibProject_xml_%xmlVersion%_%sensorWidth%x%sensorHeight%.exe
+set ntxminiFileBaseName=CommonTEL2000LibProject_xml_%xmlVersion%
+set ntxminiFile=%ntxminiFileBaseName%_%sensorWidth%x%sensorHeight%.bat
 set fubatch=%releaseDir%\Release_%firmwareVersion:.=_%.bat
 set cfiFile=%binDir%\prom\%baseName%_%fpgaSize%.cfi
 
@@ -64,7 +65,10 @@ copy %storageDir%\bin\prom\*.* %releaseDir%\FIR-00257-Storage\
 if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00251-NTx-Mini\
-copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFile% 
+mkdir %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFileBaseName%
+copy %ntxminiDir%\%ntxminiFileBaseName%\%ntxminiFileBaseName%_%sensorWidth%x%sensorHeight%_*.exe %releaseDir%\FIR-00251-NTx-Mini\%ntxminiFileBaseName%
+if errorlevel 1 goto err
+copy %ntxminiDir%\%ntxminiFile% %releaseDir%\FIR-00251-NTx-Mini
 if errorlevel 1 goto err
 
 %x_xilperl% %scriptsDir%\paperwork_%fpgaSize%\generatePaperwork.pl -sensor %sensorName% -key %encrypt_key_name% ^
@@ -98,8 +102,10 @@ echo )>> %fubatch%
 echo.>> %fubatch%
 echo :start_fu>> %fubatch%
 echo.>> %fubatch%
-echo FIR-00251-NTx-Mini\%ntxminiFile%>> %fubatch%
-echo if not %%errorlevel%% == 0 goto end>> %fubatch%
+echo cd FIR-00251-NTx-Mini>> %fubatch%
+echo call %ntxminiFile%>> %fubatch%
+echo if not %%errorlevel%% == 0 goto err>> %fubatch%
+echo cd ..>> %fubatch%
 echo.>> %fubatch%
 echo %%fu_exe%% -p p FIR-00251-Proc\fir_00251_proc_%sensorName%_%fpgaSize%.mcs>> %fubatch%
 echo %%fu_exe%% -p o FIR-00251-Output\%outputBaseName%.mcs>> %fubatch%
@@ -108,6 +114,11 @@ echo.>> %fubatch%
 echo pause>> %fubatch%
 echo.>> %fubatch%
 echo :end>> %fubatch%
+echo exit>> %fubatch%
+echo.>> %fubatch%
+echo :err>> %fubatch%
+echo echo "NTx-Mini update failed!">> %fubatch%
+echo pause>> %fubatch%
 goto end
 
 :err
