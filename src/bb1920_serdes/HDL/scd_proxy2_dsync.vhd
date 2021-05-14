@@ -340,12 +340,12 @@ begin
    begin
       if rising_edge(QUAD_DCLK) then         
          if sreset = '1' then             
-            frame_init_tag <= CBITS_PIXEL_ID;
+            frame_init_tag <= CBITS_FRM_IDLE_ID;
          else		 
             if FPA_INTF_CFG.proxy_alone_mode = '1' then 
-               frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID;
+               frame_init_tag <= CBITS_FRM_IDLE_TST_PTRN_ID;
             else  
-               frame_init_tag <= CBITS_PIXEL_ID;
+               frame_init_tag <= CBITS_FRM_IDLE_ID;
             end if;
          end if;
       end if;	

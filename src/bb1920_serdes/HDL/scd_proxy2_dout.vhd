@@ -185,12 +185,12 @@ begin
    begin
       if rising_edge(CLK) then         
          if sreset = '1' then             
-            frame_init_tag <= CBITS_PIXEL_ID;
+            frame_init_tag <= CBITS_FRM_IDLE_ID;
          else		 
             if PROXY_ALONE_MODE = '1' then 
-               frame_init_tag <= CBITS_PIXEL_TST_PTRN_ID;
+               frame_init_tag <= CBITS_FRM_IDLE_TST_PTRN_ID;
             else  
-               frame_init_tag <= CBITS_PIXEL_ID;
+               frame_init_tag <= CBITS_FRM_IDLE_ID;
             end if;
          end if;
       end if;	
