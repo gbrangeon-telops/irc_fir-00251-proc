@@ -119,7 +119,7 @@ architecture rtl of scd_proxy2_dsync is
    signal rst_cnt             : unsigned(5 downto 0);
    signal err_i               : std_logic_vector(ERR'length-1 downto 0);
    signal init_in_progress    : std_logic;
-   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_PIXEL_ID;
+   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_FRM_IDLE_ID;
 
 begin
    
@@ -262,7 +262,7 @@ begin
                when first_line_st =>
                   active_read  <= '1';
                   active_sof <= '1';
-                  if ch0_lval_o = '1' and fifo_rd_en = '1' and ch0_future_cbits_o /= CBITS_FRM_IDLE_ID then
+                  if ch0_lval_o = '1' and fifo_rd_en = '1' and ch0_future_cbits_o /= frame_init_tag then
                      active_sof <= '0';
                      fsm <= last_line_st;                              
                   end if;
@@ -316,7 +316,7 @@ begin
          -- pix_fval
          if ch0_lval_o = '1' and active_sof = '1'  then   
             quad_dout_o(66)         <= '1';                                 
-         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= frame_init_tag and active_eof = '1'  then
+         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= CBITS_PIXEL_ID and active_eof = '1'  then
             quad_dout_o(66)         <= '0';
          end if;
          

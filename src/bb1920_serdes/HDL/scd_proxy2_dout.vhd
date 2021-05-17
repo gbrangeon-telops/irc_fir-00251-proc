@@ -61,7 +61,7 @@ architecture rtl of scd_proxy2_dout is
    signal dout_dval_i        : std_logic;
    signal output_en          : std_logic;
    signal fval_last          : std_logic;
-   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_PIXEL_ID;
+   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_FRM_IDLE_ID;
 
 begin
    
