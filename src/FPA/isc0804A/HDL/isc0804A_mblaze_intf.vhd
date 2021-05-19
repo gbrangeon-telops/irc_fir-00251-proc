@@ -104,6 +104,7 @@ architecture rtl of isc0804A_mblaze_intf is
    signal mb_ctrled_reset_i            : std_logic := '0';
    signal dac_cfg_in_progress          : std_logic;
    signal abs_int_time_offset_mclk_i   : integer := 0;
+   signal subtraction_possible         : std_logic := '0';
    --   
    --   -- attribute dont_touch                         : string;
    --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -389,26 +390,29 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
-         abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));
+         abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));         
+         if exp_time_pipe(3) > to_integer(user_cfg_i.int_time_offset_mclk) then 
+            subtraction_possible <= '1';
+         else
+            subtraction_possible <= '0';
+         end if;   
          
          -- pipe pour le calcul du temps d'integration en mclk
          exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
-         int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         
-         if user_cfg_i.int_time_offset_mclk(user_cfg_i.int_time_offset_mclk'length-1) = '0' then 
+         if user_cfg_i.int_time_offset_mclk(31) = '0' then 
             exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
          else
-            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
+            if subtraction_possible = '1' then
+               exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
+            else
+               exp_time_pipe(4) <= to_unsigned(1, exp_time_pipe(4)'length);
+            end if;
          end if; 
          
-         if exp_time_pipe(4)(exp_time_pipe(4)'length - 1) = '1' then
-            int_signal_high_time_i <= to_unsigned(1, int_signal_high_time_i'length);
-         else
-            int_signal_high_time_i <= exp_time_pipe(4)(int_signal_high_time_i'length-1 downto 0); -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) >= 1). 
-         end if;
+         int_signal_high_time_i <= exp_time_pipe(4)(int_signal_high_time_i'length-1 downto 0);
          
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
@@ -426,7 +430,7 @@ begin
          exp_dval_pipe(4) <= exp_dval_pipe(3);
          exp_dval_pipe(5) <= exp_dval_pipe(4);
          exp_dval_pipe(6) <= exp_dval_pipe(5);
-         int_dval_i       <= exp_dval_pipe(6);                 
+         int_dval_i       <= exp_dval_pipe(6);               
          
       end if;
    end process; 

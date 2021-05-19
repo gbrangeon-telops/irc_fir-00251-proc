@@ -18,7 +18,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0804A__11.1MHz SVN_TRUNK IWR"
+#define FPA_DEVICE_MODEL_NAME    "ISC0804A WITH IWR SVN_TRUNK v1"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
@@ -73,7 +73,7 @@
 
 #define FPA_INVALID_TEMP               -32768   // cC
 
-#define FPA_MCLK_RATE_HZ            11100000          //5500000     //11100000          //11880000          //5000000    //11100000          // le master clock du FPA
+#define FPA_MCLK_RATE_HZ            11100000            // le master clock du FPA
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ * 2.0F)  // [pix/sec] , one pixel per mclk edges (DDR) 
 

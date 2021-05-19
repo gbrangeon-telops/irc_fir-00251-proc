@@ -182,6 +182,9 @@
 #define ELCORR_MODE_FREE_WHEELING_CORR             9
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19
 
+#define ISC0804A_ENO_MARGIN_NS                     300   // marge additionnelle ENO qui pourrait être reduite à 0 pour augmenter la vitesse.
+
+
 struct s_ProximCfgConfig 
 {   
    uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
@@ -337,7 +340,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   extern int32_t gFpaDebugRegG;                         // reservé permit_lsydel_clk_rate_beyond_2x pour contrôler le clock rate dans la zone LSYLDEL
+   // extern int32_t gFpaDebugRegG;                         // reservé permit_lsydel_clk_rate_beyond_2x pour contrôler le clock rate dans la zone LSYLDEL
    // extern int32_t gFpaDebugRegH;                      // non utilisé
    uint32_t elcorr_config_mode;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
@@ -398,7 +401,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;
+   if (itr_mode_enabled == 0)
+      ptrA->fpa_trig_ctrl_mode  = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+   
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_trig_start_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); // mode_trig_start_to_trig_start_dly_usec tient compte de Tri et donc du mode d'integration. Donc impossible de passer en IWR accidentellement en trig externe par exemple si c'est ITR qui est demandé.
    if ((TDCStatusTst(WaitingForImageCorrectionMask) == 1) || (ptrA->fpa_diag_mode == 1)){      // lorsqu'une actualisation est en cours, on passe en MODE_ITR_TRIG_START_TO_TRIG_START pour que le throughput_ctrl ajuste le throughput à celle de l'actualisation
       ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_ITR_TRIG_START_TO_TRIG_START;              // ENO : 29 dec 2020 : en mode diag, on impose un MODE_ITR_TRIG_START_TO_TRIG_START pour aller à la vitesse du vhd.
@@ -424,7 +430,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->clamping_level = 4;   
     
    // electronique de proximité
-   ptrA->proxim_is_flegx = 1;
+   ptrA->proxim_is_flegx = 1;   // n'est plus utilisé ni dans le VHD, ni dans le driverC
 
    ptrA->roic_test_row_en = 0;
  
@@ -508,12 +514,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
      
    //permit_lsydel_clk_rate_beyond_2x
-   if (sw_init_done == 0){
-      gFpaDebugRegG = 0;
-      if ((float)ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ > 2.0F)
-         gFpaDebugRegG = 1;
-   }      
-   ptrA->permit_lsydel_clk_rate_beyond_2x = (uint32_t)gFpaDebugRegG; 
+   //if (sw_init_done == 0){
+   //   gFpaDebugRegG = 0;
+   //   if ((float)ROIC_LSYDEL_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ > 2.0F)
+   //      gFpaDebugRegG = 1;
+   //}      
+   ptrA->permit_lsydel_clk_rate_beyond_2x = 0; 
     
    // boostr mode
    ptrA->boost_mode = 0x17;         //ne sert plus à rien dans le vhd    
@@ -931,6 +937,7 @@ int16_t FPA_GetTemperature(t_FpaIntf *ptrA)
 void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {                                                                                                          
    extern int32_t gFpaExposureTimeOffset;
+   // extern int32_t gFpaDebugRegG;
    extern int32_t gFpaDebugRegH;
    
    // mode ITR ou non
@@ -947,7 +954,7 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->fovh_line               = 1.0F;     // ligne de tests du ISC0804
    ptrH->lovh_mclk               = 1.0F;     // duree du lsync + line pause;
    ptrH->lsydel_mclk             = 144.0F;
-   ptrH->vhd_delay_mclk          = 7.0F;
+   ptrH->vhd_delay_mclk          = 7.0F + abs(ptrH->int_time_offset_usec)/ptrH->mclk_period_usec + ((float)ISC0804A_ENO_MARGIN_NS/1000.0F)/ptrH->mclk_period_usec; // 
    ptrH->adc_sync_dly_mclk       = 0.0625F;  // le coût par ligne de lecture du synchronisateur en coup de MCLK
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
    ptrH->line_stretch_mclk       = (float)ISC0804_FASTWINDOW_STRECTHING_AREA_MCLK;
@@ -1035,11 +1042,10 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
       ptrH->fsync_high_min_usec  = 10.0F + 33.0F * (ptrH->mclk_period_usec/ptrH->lsydel_clock_factor); // valeur en IWR partiellement influencée par speedup
 
    // FsyncLow
-   if (exposureTime_usec + ptrH->int_time_offset_usec >= 1.0F * ptrH->mclk_period_usec)
+   if (exposureTime_usec + ptrH->int_time_offset_usec >= (1.0F * ptrH->mclk_period_usec))
       ptrH->fsync_low_usec = exposureTime_usec + ptrH->int_time_offset_usec;
    else
-      ptrH->fsync_low_usec = 0.0F;  // 1.0F * ptrH->mclk_period_usec;   // ne doit jamais arriver     
-
+      ptrH->fsync_low_usec = 1.0F * ptrH->mclk_period_usec;   // ne doit jamais arriver     
    
    // T_ri
    ptrH->tri_min_usec = ptrH->reset_time_usec;    // Tri du 0804 en ITR est selon le chronogramme de la doc, le temps de reset
@@ -1115,7 +1121,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    ------------------------------------------------------------*/
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // on cherche les parametres du roic
-   FPA_SpecificParams(&hh, -hh.int_time_offset_usec, pGCRegs); // on à determiner fsyncHigh. Puisque FsyncLow = exposureTime + int_time_offset, on l'obtient lorsque fsynclow = 0, ie lorsque exposureTime = -int_time_offset; 
+   FPA_SpecificParams(&hh, -hh.int_time_offset_usec, pGCRegs); // on veut FsyncHigh. Or Period = FsyncHigh + FsyncLow. Puisque FsyncLow = exposureTime + int_time_offset, on obtient FsyncHigh = Period, lorsque fsynclow = 0, ie lorsque exposureTime = -int_time_offset; 
    fsync_high_min_usec = hh.frame_period_min_usec;
    frame_period_usec = (1.0F/fpaAcquisitionFrameRate)*1e6F; // periode avec le frame rate actuel.
    fsync_low_max_usec = (frame_period_usec - fsync_high_min_usec);
