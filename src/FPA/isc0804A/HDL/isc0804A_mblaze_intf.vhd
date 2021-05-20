@@ -105,6 +105,10 @@ architecture rtl of isc0804A_mblaze_intf is
    signal dac_cfg_in_progress          : std_logic;
    signal abs_int_time_offset_mclk_i   : integer := 0;
    signal subtraction_possible         : std_logic := '0';
+   signal exp_latch                    : unsigned(FPA_EXP_INFO.EXP_TIME'LENGTH-1 downto 0) := (others => '0');
+   signal int_signal_high_time_latch   : unsigned(31 downto 0);
+   signal int_time_latch               : unsigned(31 downto 0);
+   
    --   
    --   -- attribute dont_touch                         : string;
    --   -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -391,7 +395,7 @@ begin
       if rising_edge(MB_CLK) then 
          
          abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));         
-         if exp_time_pipe(3) > to_integer(user_cfg_i.int_time_offset_mclk) then 
+         if int_time_i > abs_int_time_offset_mclk_i then 
             subtraction_possible <= '1';
          else
             subtraction_possible <= '0';
@@ -402,6 +406,8 @@ begin
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
+         int_time_i       <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
+         
          if user_cfg_i.int_time_offset_mclk(31) = '0' then 
             exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
          else
@@ -420,7 +426,7 @@ begin
          exp_indx_pipe(2) <= exp_indx_pipe(1); 
          exp_indx_pipe(3) <= exp_indx_pipe(2); 
          exp_indx_pipe(4) <= exp_indx_pipe(3);
-         int_indx_i       <= exp_indx_pipe(4);
+         int_indx_i       <= exp_indx_pipe(4);    -- precede int_dval_i
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
@@ -430,7 +436,8 @@ begin
          exp_dval_pipe(4) <= exp_dval_pipe(3);
          exp_dval_pipe(5) <= exp_dval_pipe(4);
          exp_dval_pipe(6) <= exp_dval_pipe(5);
-         int_dval_i       <= exp_dval_pipe(6);               
+         exp_dval_pipe(7) <= exp_dval_pipe(6); 
+         int_dval_i       <= exp_dval_pipe(7);
          
       end if;
    end process; 
@@ -494,13 +501,98 @@ begin
    ---------------------------------------------------------------------------- 
    U6: process(MB_CLK)
    begin
-      if rising_edge(MB_CLK) then         
+      if rising_edge(MB_CLK) then 
          
-         --if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts
-         axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
-         --else 
-         --axi_rdata <= (others =>'1'); 
-         --end if;
+         if FPA_EXP_INFO.EXP_DVAL = '1' then
+            exp_latch <= FPA_EXP_INFO.EXP_TIME;
+         end if;
+         
+         if int_dval_i = '1' then 
+            int_signal_high_time_latch <= int_signal_high_time_i;
+            int_time_latch             <= int_time_i;
+         end if;
+         
+         
+         if (MB_MOSI.ARADDR(10) and MB_MOSI.ARVALID) = '1' then    -- adresse de base pour la lecture des statuts provenant du generateur de statuts
+            axi_rdata <= STATUS_MISO.RDATA;   -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
+            
+         elsif (MB_MOSI.ARADDR(11) and MB_MOSI.ARVALID) = '1' then  -- adresse de base pour la lecture des statuts internes/privés (ne provenant pas du generateur de statuts)
+            
+            case MB_MOSI.ARADDR(7 downto 0) is 
+               -- feedback de la config envoyée au MB pour validation visuelle via debug_terminal
+               
+               when X"00" =>  axi_rdata <=                  resize('0' & user_cfg_i.comn.fpa_diag_mode                    , 32);           
+               when X"04" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_diag_type                    , 32));
+               when X"08" =>  axi_rdata <=                  resize('0' & user_cfg_i.comn.fpa_pwr_on                       , 32);
+               when X"0C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_mode                , 32));
+               when X"10" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_acq_trig_ctrl_dly            , 32));
+               when X"14" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_mode               , 32));
+               when X"18" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_xtra_trig_ctrl_dly           , 32));
+               when X"1C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.comn.fpa_trig_ctrl_timeout_dly        , 32));
+               when X"20" =>  axi_rdata <=                  resize('0' & user_cfg_i.comn.fpa_stretch_acq_trig             , 32);
+               when X"24" =>  axi_rdata <= std_logic_vector(resize('0' & exp_latch                                        , 32));
+               when X"28" =>  axi_rdata <= std_logic_vector(user_cfg_i.int_time_offset_mclk);
+               when X"2C" =>  axi_rdata <= std_logic_vector(resize('0' & int_time_latch                                   , 32));
+               when X"30" =>  axi_rdata <= std_logic_vector(resize('0' & int_signal_high_time_latch                       , 32));
+                  --               when X"34" =>  axi_rdata <= std_logic_vector(resize('0' & exp_latch                                        , 32));
+                  --               when X"38" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.roic.ysize_div2_m1                    , 32));
+                  --               when X"3C" =>  axi_rdata <=                  resize('0' & user_cfg_i.gain                                  , 32);    
+                  --               when X"40" =>  axi_rdata <=                 (resize('0' & user_cfg_i.internal_outr                         , 32));    
+                  --               when X"44" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly            , 32));    
+                  --               when X"48" =>  axi_rdata <=                 (resize('0' & user_cfg_i.speedup_lsync                         , 32));
+                  --               when X"4C" =>  axi_rdata <=                 (resize('0' & user_cfg_i.speedup_sample_row                    , 32));
+                  --               when X"50" =>  axi_rdata <=                 (resize('0' & user_cfg_i.speedup_unused_area                   , 32));
+                  --               when X"54" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.line_start_num               , 32));
+                  --               when X"58" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.line_end_num                 , 32));
+                  --               when X"5C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.sof_posf_pclk                , 32));
+                  --               when X"60" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.eof_posf_pclk                , 32));  
+                  --               when X"64" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.sol_posl_pclk                , 32));  
+                  --               when X"68" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.eol_posl_pclk                , 32));  
+                  --               when X"6C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.eol_posl_pclk_p1             , 32));
+                  --               when X"70" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.window_lsync_num             , 32));
+                  --               when X"74" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.line_period_pclk             , 32));
+                  --               when X"78" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.raw_area.readout_pclk_cnt_max         , 32));
+                  --               when X"7C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.user_area.line_start_num              , 32));
+                  --               when X"80" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.user_area.line_end_num                , 32));
+                  --               when X"84" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.user_area.sol_posl_pclk               , 32));
+                  --               when X"88" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.user_area.eol_posl_pclk               , 32));
+                  --               when X"8C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.user_area.eol_posl_pclk_p1            , 32));
+                  --               when X"90" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.stretch_area.sol_posl_pclk            , 32));    
+                  --               when X"94" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.stretch_area.eol_posl_pclk            , 32));
+                  --               when X"98" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.pix_samp_num_per_ch                   , 32));
+                  --               when X"9C" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.hgood_samp_sum_num                    , 32));
+                  --               when X"A0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.hgood_samp_mean_numerator             , 32));
+                  --               when X"A4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.vgood_samp_sum_num                    , 32));
+                  --               when X"A8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.vgood_samp_mean_numerator             , 32));                                                                         
+                  --               when X"AC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.good_samp_first_pos_per_ch            , 32));
+                  --               when X"B0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.good_samp_last_pos_per_ch             , 32));                                    
+                  --               when X"B4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.adc_clk_source_phase                  , 32));
+                  --               when X"B8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.adc_clk_pipe_sel                      , 32));
+                  --               when X"BC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.cfg_num                               , 32));                               
+                  --               when X"C0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.lsydel_mclk                           , 32));
+                  --               when X"C4" =>  axi_rdata <=                 (resize('0' & user_cfg_i.boost_mode                            , 32));
+                  --               when X"C8" =>  axi_rdata <=                 (resize('0' & user_cfg_i.speedup_lsydel                        , 32));
+                  --               when X"CC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.adc_clk_pipe_sync_pos                 , 32));
+                  --               when X"D0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.readout_plus_delay                    , 32));
+                  --               when X"D4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.tri_min_window_part                   , 32));
+                  --               when X"D8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_time_offset_mclk                  , 32));
+                  --               when X"DC" =>  axi_rdata <=                 (resize('0' & user_cfg_i.roic_cst_output_mode                  , 32));            
+                  --               when X"E0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.tsh_min_minus_int_time_offset         , 32));                                                                            
+                  --               when X"E4" =>  axi_rdata <=                 (resize('0' & user_cfg_i.elcorr_enabled                        , 32));                                                                 
+                  --               when X"E8" =>  axi_rdata <=                 (resize('0' & user_cfg_i.elcorr_ref_cfg(0).ref_enabled         , 32));                                                                 
+                  --               when X"EC" =>  axi_rdata <=                 (resize('0' & user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode  , 32));                                                                 
+                  --               when X"F0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk   , 32));                                                                                                                  
+                  --               when X"F4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch     , 32));                                      
+                  --               when X"F8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator , 32));                                    
+                  --               when X"FC" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.elcorr_ref_cfg(0).ref_value           , 32));                                                                                    
+               
+               when others =>                                                       
+               
+            end case;
+            
+         else 
+            -- axi_rdata <= (others =>'1'); 
+         end if;
          
       end if;     
    end process;   

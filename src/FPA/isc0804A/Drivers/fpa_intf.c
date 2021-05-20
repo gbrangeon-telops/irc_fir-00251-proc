@@ -57,7 +57,8 @@
 // la structure Command_t a 4 bytes d'overhead(CmdID et CmdCharNum)
 
 // adresse la lecture des statuts VHD
-#define AR_STATUS_BASE_ADD                0x0400    // adresse de base 
+#define AR_STATUS_BASE_ADD                0x0400    // adresse de base
+#define AR_PRIVATE_STATUS_BASE_ADD        0x0800    // adresse de base des statuts specifiques ou privées
 #define AR_FPA_TEMPERATURE                0x002C    // adresse temperature
 
 // adresse d'écriture du régistre du type du pilote C 
@@ -250,8 +251,81 @@ struct isc0804_param_s             //
 };
 typedef struct isc0804_param_s  isc0804_param_t;
 
+// statuts privés du module fpa
+struct s_FpaPrivateStatus    
+{  
+   uint32_t fpa_diag_mode                             ;  
+   uint32_t fpa_diag_type                             ;  
+   uint32_t fpa_pwr_on                                ;  
+   uint32_t fpa_acq_trig_mode                         ;
+   uint32_t fpa_acq_trig_ctrl_dly                     ;
+   uint32_t fpa_xtra_trig_mode                        ;
+   uint32_t fpa_xtra_trig_ctrl_dly                    ;
+   uint32_t fpa_trig_ctrl_timeout_dly                 ;
+   uint32_t fpa_stretch_acq_trig                      ;
+   uint32_t exp_latch                                 ;
+   int32_t  int_time_offset_mclk                      ;
+   uint32_t int_time_latch                            ;
+   uint32_t int_signal_high_time_latch                ;
+   //uint32_t diag_lovh_mclk_source                     ;
+   //uint32_t real_mode_active_pixel_dly                ;
+   //uint32_t itr                                       ;
+   //uint32_t aoi_data_sol_pos                          ;
+   //uint32_t aoi_data_eol_pos                          ;
+   //uint32_t aoi_flag1_sol_pos                         ;
+   //uint32_t aoi_flag1_eol_pos                         ;
+   //uint32_t aoi_flag2_sol_pos                         ;
+   //uint32_t aoi_flag2_eol_pos                         ;
+   //uint32_t op_xstart                                 ;
+   //uint32_t op_ystart                                 ;
+   //uint32_t op_xsize                                  ;
+   //uint32_t op_ysize                                  ;
+   //uint32_t op_frame_time                             ;
+   //uint32_t op_gain                                   ;
+   //uint32_t op_int_mode                               ;
+   //uint32_t op_test_mode                              ;
+   //uint32_t op_det_vbias                              ;
+   //uint32_t op_det_ibias                              ;
+   //uint32_t op_binning                                ;
+   //uint32_t op_output_rate                            ;
+   //uint32_t op_cfg_num                                ;
+   //uint32_t int_cmd_id                                ;
+   //uint32_t int_cmd_dlen                              ;
+   //uint32_t int_cmd_offs                              ;
+   //uint32_t int_cmd_sof_add                           ;
+   //uint32_t int_cmd_eof_add                           ;
+   //uint32_t int_cmd_sof_add_m1                        ;
+   //uint32_t int_checksum_add                          ;
+   //uint32_t frame_dly_cst                             ;
+   //uint32_t int_dly_cst                               ;
+   //uint32_t op_cmd_id                                 ;
+   //uint32_t op_cmd_sof_add                            ;
+   //uint32_t op_cmd_eof_add                            ;
+   //uint32_t temp_cmd_id                               ;
+   //uint32_t temp_cmd_sof_add                          ;
+   //uint32_t temp_cmd_eof_add                          ;
+   //uint32_t outgoing_com_hder                         ;
+   //uint32_t incoming_com_hder                         ;
+   //uint32_t incoming_com_fail_id                      ;
+   //uint32_t incoming_com_ovh_len                      ;
+   //uint32_t fpa_serdes_lval_num                       ;
+   //uint32_t fpa_serdes_lval_len                       ;
+   //uint32_t int_clk_period_factor                     ;
+   //uint32_t fpa_pix_num_per_pclk                      ;
+   //uint32_t fpa_exp_time_conv_denom_bit_pos           ;
+   //uint32_t frame_dly                                 ;                   
+   //uint32_t int_dly                                   ;
+   //uint32_t int_time                                  ;
+   //uint32_t int_clk_source_rate_hz                    ;
+
+};
+typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
+
+
+
 // Global variables
 t_FpaStatus gStat;                        // devient une variable globale
+t_FpaPrivateStatus gPrivateStat;
 uint8_t FPA_StretchAcqTrig = 0;
 uint8_t itr_mode_enabled;
 float gFpaPeriodMinMargin = 0.0F;
@@ -273,6 +347,7 @@ float FLEG_DacWord_To_VccVoltage(const uint32_t DacWord, const int8_t VccPositio
 uint32_t FLEG_VccVoltage_To_DacWord(const float VccVoltage_mV, const int8_t VccPosition);
 void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA);
 void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs);
+void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -791,100 +866,20 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // envoi du reste de la config 
    WriteStruct(ptrA);
    
-//   //   affichage
-//   
-//   FPA_PRINTF("pGCRegs->OffsetX = %d", (uint32_t)pGCRegs->OffsetX);
-//   FPA_PRINTF("pGCRegs->OffsetY = %d", (uint32_t)pGCRegs->OffsetY);
-//   FPA_PRINTF("pGCRegs->Width = %d", (uint32_t)pGCRegs->Width);
-//   FPA_PRINTF("pGCRegs->Height = %d", (uint32_t)pGCRegs->Height);
-//   
-//   FPA_PRINTF(" 1e3 * fpa_diag_mode                        =  %d", (int32_t)(1e3F * ptrA->fpa_diag_mode                       ) );  
-//   FPA_PRINTF("   1 * fpa_diag_type                        =  %d", (int32_t)(   1 * ptrA->fpa_diag_type                       ) );  
-//   FPA_PRINTF("   1 * fpa_pwr_on                           =  %d", (int32_t)(   1 * ptrA->fpa_pwr_on                          ) );  
-//   FPA_PRINTF(" 1e3 * fpa_trig_ctrl_mode                   =  %d", (int32_t)(1e3F * ptrA->fpa_trig_ctrl_mode                  ) );  
-//   FPA_PRINTF(" 1e3 * fpa_acq_trig_ctrl_dly                =  %d", (int32_t)(1e3F * ptrA->fpa_acq_trig_ctrl_dly               ) );  
-//   FPA_PRINTF(" 1e3 * fpa_spare                            =  %d", (int32_t)(1e3F * ptrA->fpa_spare                           ) );  
-//   FPA_PRINTF(" 1e3 * fpa_xtra_trig_ctrl_dly               =  %d", (int32_t)(1e3F * ptrA->fpa_xtra_trig_ctrl_dly              ) );  
-//   FPA_PRINTF(" 1e3 * fpa_trig_ctrl_timeout_dly            =  %d", (int32_t)(1e3F * ptrA->fpa_trig_ctrl_timeout_dly           ) );                                      
-//   FPA_PRINTF(" 1e3 * fpa_stretch_acq_trig                 =  %d", (int32_t)(1e3F * ptrA->fpa_stretch_acq_trig                ) );  
-//   FPA_PRINTF(" 1e3 * diag_ysize                           =  %d", (int32_t)(1e3F * ptrA->diag_ysize                          ) );  
-//   FPA_PRINTF(" 1e3 * diag_xsize_div_tapnum                =  %d", (int32_t)(1e3F * ptrA->diag_xsize_div_tapnum               ) );  
-//   FPA_PRINTF(" 1e3 * roic_ystart                          =  %d", (int32_t)(1e3F * ptrA->roic_ystart                         ) );  
-//   FPA_PRINTF(" 1e3 * roic_ysize_div4_m1                   =  %d", (int32_t)(1e3F * ptrA->roic_ysize_div4_m1                  ) );  
-//   FPA_PRINTF(" 1e3 * vdet_code                            =  %d", (int32_t)(1e3F * ptrA->vdet_code                           ) );  
-//   FPA_PRINTF(" 1e3 * ref_mode_en                          =  %d", (int32_t)(1e3F * ptrA->ref_mode_en                         ) );  
-//   FPA_PRINTF(" 1e3 * ref_chn_en                           =  %d", (int32_t)(1e3F * ptrA->ref_chn_en                          ) );  
-//   FPA_PRINTF(" 1e3 * clamping_level                       =  %d", (int32_t)(1e3F * ptrA->clamping_level                      ) );  
-//   FPA_PRINTF(" 1e3 * real_mode_active_pixel_dly           =  %d", (int32_t)(1e3F * ptrA->real_mode_active_pixel_dly          ) );  
-//   FPA_PRINTF(" 1e3 * speedup_lsync                        =  %d", (int32_t)(1e3F * ptrA->speedup_lsync                       ) );  
-//   FPA_PRINTF(" 1e3 * speedup_sample_row                   =  %d", (int32_t)(1e3F * ptrA->speedup_sample_row                  ) );  
-//   FPA_PRINTF(" 1e3 * speedup_unused_area                  =  %d", (int32_t)(1e3F * ptrA->speedup_unused_area                 ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_line_start_num              =  %d", (int32_t)(1e3F * ptrA->raw_area_line_start_num             ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_line_end_num                =  %d", (int32_t)(1e3F * ptrA->raw_area_line_end_num               ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_sof_posf_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_sof_posf_pclk              ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_eof_posf_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_eof_posf_pclk              ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_sol_posl_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_sol_posl_pclk              ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_eol_posl_pclk               =  %d", (int32_t)(1e3F * ptrA->raw_area_eol_posl_pclk              ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_eol_posl_pclk_p1            =  %d", (int32_t)(1e3F * ptrA->raw_area_eol_posl_pclk_p1           ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_window_lsync_num            =  %d", (int32_t)(1e3F * ptrA->raw_area_window_lsync_num           ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_line_period_pclk            =  %d", (int32_t)(1e3F * ptrA->raw_area_line_period_pclk           ) );  
-//   FPA_PRINTF(" 1e3 * raw_area_readout_pclk_cnt_max        =  %d", (int32_t)(1e3F * ptrA->raw_area_readout_pclk_cnt_max       ) );  
-//   FPA_PRINTF(" 1e3 * user_area_line_start_num             =  %d", (int32_t)(1e3F * ptrA->user_area_line_start_num            ) );  
-//   FPA_PRINTF(" 1e3 * user_area_line_end_num               =  %d", (int32_t)(1e3F * ptrA->user_area_line_end_num              ) );  
-//   FPA_PRINTF(" 1e3 * user_area_sol_posl_pclk              =  %d", (int32_t)(1e3F * ptrA->user_area_sol_posl_pclk             ) );  
-//   FPA_PRINTF(" 1e3 * user_area_eol_posl_pclk              =  %d", (int32_t)(1e3F * ptrA->user_area_eol_posl_pclk             ) );  
-//   FPA_PRINTF(" 1e3 * user_area_eol_posl_pclk_p1           =  %d", (int32_t)(1e3F * ptrA->user_area_eol_posl_pclk_p1          ) );  
-//   FPA_PRINTF(" 1e3 * stretch_area_sol_posl_pclk           =  %d", (int32_t)(1e3F * ptrA->stretch_area_sol_posl_pclk          ) );  
-//   FPA_PRINTF(" 1e3 * stretch_area_eol_posl_pclk           =  %d", (int32_t)(1e3F * ptrA->stretch_area_eol_posl_pclk          ) );  
-//   FPA_PRINTF(" 1e3 * pix_samp_num_per_ch                  =  %d", (int32_t)(1e3F * ptrA->pix_samp_num_per_ch                 ) );  
-//   FPA_PRINTF(" 1e3 * hgood_samp_sum_num                   =  %d", (int32_t)(1e3F * ptrA->hgood_samp_sum_num                  ) );  
-//   FPA_PRINTF(" 1e3 * hgood_samp_mean_numerator            =  %d", (int32_t)(1e3F * ptrA->hgood_samp_mean_numerator           ) );  
-//   FPA_PRINTF(" 1e3 * vgood_samp_sum_num                   =  %d", (int32_t)(1e3F * ptrA->vgood_samp_sum_num                  ) );  
-//   FPA_PRINTF(" 1e3 * vgood_samp_mean_numerator            =  %d", (int32_t)(1e3F * ptrA->vgood_samp_mean_numerator           ) );
-//   FPA_PRINTF(" 1e3 * good_samp_first_pos_per_ch           =  %d", (int32_t)(1e3F * ptrA->good_samp_first_pos_per_ch          ) );
-//   FPA_PRINTF(" 1e3 * good_samp_last_pos_per_ch            =  %d", (int32_t)(1e3F * ptrA->good_samp_last_pos_per_ch           ) );
-//   FPA_PRINTF(" 1e3 * adc_clk_source_phase                 =  %d", (int32_t)(1e3F * ptrA->adc_clk_source_phase                ) );  
-//   FPA_PRINTF(" 1e3 * adc_clk_pipe_sel                     =  %d", (int32_t)(1e3F * ptrA->adc_clk_pipe_sel                    ) );  
-//   FPA_PRINTF(" 1e3 * lsydel_mclk                          =  %d", (int32_t)(1e3F * ptrA->lsydel_mclk                         ) );  
-//   FPA_PRINTF(" 1e3 * boost_mode                           =  %d", (int32_t)(1e3F * ptrA->boost_mode                          ) );  
-//   FPA_PRINTF(" 1e3 * speedup_lsydel                       =  %d", (int32_t)(1e3F * ptrA->speedup_lsydel                      ) );                                      
-//   FPA_PRINTF(" 1e3 * fastrd_sync_pos                      =  %d", (int32_t)(1e3F * ptrA->fastrd_sync_pos                     ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_enabled                       =  %d", (int32_t)(1e3F * ptrA->elcorr_enabled                      ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_spare1                        =  %d", (int32_t)(1e3F * ptrA->elcorr_spare1                       ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_spare2                        =  %d", (int32_t)(1e3F * ptrA->elcorr_spare2                       ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_ref_enabled         =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_ref_enabled        ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_ref_cont_meas_mode  =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_ref_cont_meas_mode ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_start_dly_sampclk   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_start_dly_sampclk  ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_samp_num_per_ch     =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_samp_num_per_ch    ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_samp_mean_numerator =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_samp_mean_numerator) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_0_ref_value           =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_0_ref_value          ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_ref_enabled         =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_ref_enabled        ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_ref_cont_meas_mode  =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_ref_cont_meas_mode ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_start_dly_sampclk   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_start_dly_sampclk  ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_samp_num_per_ch     =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_samp_num_per_ch    ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_samp_mean_numerator =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_samp_mean_numerator) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_cfg_1_ref_value           =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_cfg_1_ref_value          ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref_dac_id                    =  %d", (int32_t)(1e3F * ptrA->elcorr_ref_dac_id                   ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_atemp_gain                    =  %d", (int32_t)(1e3F * ptrA->elcorr_atemp_gain                   ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_atemp_ofs                     =  %d", (int32_t)(1e3F * ptrA->elcorr_atemp_ofs                    ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref0_op_sel                   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref0_op_sel                  ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_ref1_op_sel                   =  %d", (int32_t)(1e3F * ptrA->elcorr_ref1_op_sel                  ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_mult_op_sel                   =  %d", (int32_t)(1e3F * ptrA->elcorr_mult_op_sel                  ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_div_op_sel                    =  %d", (int32_t)(1e3F * ptrA->elcorr_div_op_sel                   ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_add_op_sel                    =  %d", (int32_t)(1e3F * ptrA->elcorr_add_op_sel                   ) );  
-//   FPA_PRINTF(" 1e3 * sat_ctrl_en                          =  %d", (int32_t)(1e3F * ptrA->sat_ctrl_en                         ) );  
-//   FPA_PRINTF(" 1e3 * roic_dbg_reg                         =  %d", (int32_t)(1e3F * ptrA->roic_dbg_reg                        ) );  
-//   FPA_PRINTF(" 1e3 * roic_test_row_en                     =  %d", (int32_t)(1e3F * ptrA->roic_test_row_en                    ) );  
-//   FPA_PRINTF(" 1e3 * roic_cst_output_mode                 =  %d", (int32_t)(1e3F * ptrA->roic_cst_output_mode                ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_spare                         =  %d", (int32_t)(1e3F * ptrA->elcorr_spare                        ) );  
-//   FPA_PRINTF(" 1e3 * cfg_num                              =  %d", (int32_t)(1e3F * ptrA->cfg_num                             ) );  
-//   FPA_PRINTF(" 1e3 * elcorr_spare4                        =  %d", (int32_t)(1e3F * ptrA->elcorr_spare4                       ) );  
-//   FPA_PRINTF(" 1e3 * fpa_intf_data_source                 =  %d", (int32_t)(1e3F * ptrA->fpa_intf_data_source                ) );  
-//   FPA_PRINTF(" 1e3 * permit_lsydel_clk_rate_beyond_2x     =  %d", (int32_t)(1e3F * ptrA->permit_lsydel_clk_rate_beyond_2x    ) );  
-//   FPA_PRINTF(" 1e3 * spare2                               =  %d", (int32_t)(1e3F * ptrA->spare2                              ) );  
-//   FPA_PRINTF(" 1e3 * int_time_offset_mclk                 =  %d", (int32_t)(1e3F * ptrA->int_time_offset_mclk                ) ); 
-//   FPA_PRINTF(" 1e3 * itr_mode_enabled                     =  %d", (int32_t)(1e3F * ptrA->itr_mode_enabled                    ) );    
-   
+   FPA_PRINTF("gPrivateStat.fpa_diag_mode                         = %d", gPrivateStat.fpa_diag_mode                         );
+   FPA_PRINTF("gPrivateStat.fpa_diag_type                         = %d", gPrivateStat.fpa_diag_type                         );
+   FPA_PRINTF("gPrivateStat.fpa_pwr_on                            = %d", gPrivateStat.fpa_pwr_on                            );
+   FPA_PRINTF("gPrivateStat.fpa_acq_trig_mode                     = %d", gPrivateStat.fpa_acq_trig_mode                     );
+   FPA_PRINTF("gPrivateStat.fpa_acq_trig_ctrl_dly                 = %d", gPrivateStat.fpa_acq_trig_ctrl_dly                 );
+   FPA_PRINTF("gPrivateStat.fpa_xtra_trig_mode                    = %d", gPrivateStat.fpa_xtra_trig_mode                    );
+   FPA_PRINTF("gPrivateStat.fpa_xtra_trig_ctrl_dly                = %d", gPrivateStat.fpa_xtra_trig_ctrl_dly                );
+   FPA_PRINTF("gPrivateStat.fpa_trig_ctrl_timeout_dly             = %d", gPrivateStat.fpa_trig_ctrl_timeout_dly             );
+   FPA_PRINTF("gPrivateStat.fpa_stretch_acq_trig                  = %d", gPrivateStat.fpa_stretch_acq_trig                  );
+   FPA_PRINTF("gPrivateStat.exp_latch                             = %d", gPrivateStat.exp_latch                             );
+   FPA_PRINTF("gPrivateStat.int_time_offset_mclk                  = %d", gPrivateStat.int_time_offset_mclk                  );
+   FPA_PRINTF("gPrivateStat.int_time_latch                        = %d", gPrivateStat.int_time_latch                        );
+   FPA_PRINTF("gPrivateStat.int_signal_high_time_latch            = %d", gPrivateStat.int_signal_high_time_latch            );   
+
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -1245,7 +1240,11 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
       FPA_SendConfigGC(ptrA, &gcRegsData);    // cet envoi permet de reinitialiser le vhd avec les params requis puisque le type de hw présent est conniu maintenant (Stat->hw_init_done == 1).
       sw_init_done = 1;                       // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser de nouveau 
       sw_init_success = 1;
-   }  
+   } 
+   
+   // statuts privés
+   FPA_GetPrivateStatus(&gPrivateStat, ptrA);
+   
 }
 
 //////////////////////////////////////////////////////////////////////////////                                                                          
@@ -1341,3 +1340,74 @@ void FPA_SendProximCfg(const ProximCfg_t *ptrD, const t_FpaIntf *ptrA)
       ii++;
    }
 }                    
+
+//--------------------------------------------------------------------------                                                                            
+// Pour avoir les statuts privés du module détecteur
+//--------------------------------------------------------------------------
+void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA)
+{ 
+   // config retournée par le vhd
+   PrivateStat->fpa_diag_mode                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
+   PrivateStat->fpa_diag_type                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x04);
+   PrivateStat->fpa_pwr_on                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x08);
+   PrivateStat->fpa_acq_trig_mode                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x0C);
+   PrivateStat->fpa_acq_trig_ctrl_dly              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x10);
+   PrivateStat->fpa_xtra_trig_mode                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x14);
+   PrivateStat->fpa_xtra_trig_ctrl_dly             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x18);
+   PrivateStat->fpa_trig_ctrl_timeout_dly          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x1C);
+   PrivateStat->fpa_stretch_acq_trig               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x20);
+   PrivateStat->exp_latch                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x24);
+   PrivateStat->int_time_offset_mclk               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x28);
+   PrivateStat->int_time_latch                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x2C);
+   PrivateStat->int_signal_high_time_latch         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x30);
+   //PrivateStat->diag_lovh_mclk_source                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x34);
+   //PrivateStat->real_mode_active_pixel_dly               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x38);
+   //PrivateStat->itr                                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x3C);
+   //PrivateStat->aoi_data_sol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x40);
+   //PrivateStat->aoi_data_eol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x44);
+   //PrivateStat->aoi_flag1_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x48);
+   //PrivateStat->aoi_flag1_eol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x4C);
+   //PrivateStat->aoi_flag2_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x50);
+   //PrivateStat->aoi_flag2_eol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x54);
+   //PrivateStat->op_xstart                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x58);
+   //PrivateStat->op_ystart                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x5C);
+   //PrivateStat->op_xsize                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x60);
+   //PrivateStat->op_ysize                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x64);
+   //PrivateStat->op_frame_time                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x68);
+   //PrivateStat->op_gain                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x6C);
+   //PrivateStat->op_int_mode                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x70);
+   //PrivateStat->op_test_mode                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x74);
+   //PrivateStat->op_det_vbias                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x78);
+   //PrivateStat->op_det_ibias                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x7C);
+   //PrivateStat->op_binning                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x80);
+   //PrivateStat->op_output_rate                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x84);
+   //PrivateStat->op_cfg_num                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x88);
+   //PrivateStat->int_cmd_id                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x8C);
+   //PrivateStat->int_cmd_dlen                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x90);
+   //PrivateStat->int_cmd_offs                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x94);
+   //PrivateStat->int_cmd_sof_add                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x98);
+   //PrivateStat->int_cmd_eof_add                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x9C);
+   //PrivateStat->int_cmd_sof_add_m1                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA0);
+   //PrivateStat->int_checksum_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA4);
+   //PrivateStat->frame_dly_cst                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA8);
+   //PrivateStat->int_dly_cst                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xAC);
+   //PrivateStat->op_cmd_id                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB0);
+   //PrivateStat->op_cmd_sof_add                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB4);
+   //PrivateStat->op_cmd_eof_add                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB8);
+   //PrivateStat->temp_cmd_id                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xBC);
+   //PrivateStat->temp_cmd_sof_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC0);
+   //PrivateStat->temp_cmd_eof_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC4);
+   //PrivateStat->outgoing_com_hder                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC8);
+   //PrivateStat->incoming_com_hder                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xCC);
+   //PrivateStat->incoming_com_fail_id                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD0);
+   //PrivateStat->incoming_com_ovh_len                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD4);
+   //PrivateStat->fpa_serdes_lval_num                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD8);
+   //PrivateStat->fpa_serdes_lval_len                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xDC);
+   //PrivateStat->int_clk_period_factor                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE0);
+   //PrivateStat->fpa_pix_num_per_pclk                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE4);
+   //PrivateStat->fpa_exp_time_conv_denom_bit_pos          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
+   //PrivateStat->frame_dly                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
+   //PrivateStat->int_dly                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
+   //PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF4);
+   //PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF8);
+}

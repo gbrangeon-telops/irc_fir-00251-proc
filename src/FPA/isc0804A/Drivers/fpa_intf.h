@@ -18,7 +18,7 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-#define FPA_DEVICE_MODEL_NAME    "ISC0804A WITH IWR SVN_TRUNK v1"
+#define FPA_DEVICE_MODEL_NAME    "ISC0804A WITH IWR SVN_TRUNK v0"
 
 #define FPA_WIDTH_MIN      64    //
 #define FPA_WIDTH_MAX      640
