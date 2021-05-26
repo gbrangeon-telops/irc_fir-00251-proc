@@ -270,10 +270,10 @@ begin
                
                when fpa_pwred_st =>
                   fpa_powered_i <= '1';
-                  fpa_digio2_i <= ROIC_RESET_B; -- ROIC_RESET_B and PROXIM_IS_FLEGX;
+                  fpa_digio2_i <= ROIC_RESET_B and PROXIM_IS_FLEGX;
                   fpa_digio3_i <= PROG_SD;
-                  fpa_digio4_i <= lsync_reg;    -- (ROIC_RESET_B and not PROXIM_IS_FLEGX) or  (lsync_reg and PROXIM_IS_FLEGX); 
-                  fpa_digio5_i <= '0';          -- lsync_reg and not PROXIM_IS_FLEGX;      -- pour Flex 264 uniquement
+                  fpa_digio4_i <= (ROIC_RESET_B and not PROXIM_IS_FLEGX) or  (lsync_reg and PROXIM_IS_FLEGX); 
+                  fpa_digio5_i <= lsync_reg and not PROXIM_IS_FLEGX;      -- pour Flex 264 uniquement
                   fpa_digio6_i <= not FPA_INT and PROG_CSN;
                   fpa_digio7_i <= mclk_reg; 
                   if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 

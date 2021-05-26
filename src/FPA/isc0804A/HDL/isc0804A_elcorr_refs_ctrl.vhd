@@ -33,12 +33,9 @@ entity isc0804A_elcorr_refs_ctrl is
       REF_VALID         : out std_logic_vector(1 downto 0);
       REF_FEEDBK        : in std_logic_vector(1 downto 0);
       
-      PROG_TRIG         : out std_logic;
+      HW_CFG_IN_PROGRESS: in std_logic;
       
-      DONE              : out std_logic;
-      RQST              : out std_logic;
-      EN                : in std_logic 
-      
+      PROG_TRIG         : out std_logic      
       );
    
 end isc0804A_elcorr_refs_ctrl;
@@ -71,7 +68,7 @@ architecture rtl of isc0804A_elcorr_refs_ctrl is
          Clk_div   : out std_logic);
    end component;
    
-   type ctrl_fsm_type is (idle, slct_ref_st, check_value_st, rqst_st, change_ref_st, wait_done_st, pause_st, ref_valid_st, wait_fdbk_st, default_ref_st); 
+   type ctrl_fsm_type is (idle, slct_ref_st, check_value_st, change_ref_st, wait_done_st, pause_st, ref_valid_st, wait_fdbk_st, default_ref_st); 
    
    signal ctrl_fsm                  : ctrl_fsm_type;
    signal sreset                    : std_logic;
@@ -91,17 +88,13 @@ architecture rtl of isc0804A_elcorr_refs_ctrl is
    signal prog_trig_i               : std_logic;
    signal areset_i                  : std_logic;
    signal ref_feedbk_i              : std_logic_vector(1 downto 0);
-   signal rqst_i                    : std_logic;
-   signal done_i                    : std_logic;
+   -- signal elcorr_init_done_i        : std_logic;
    
 begin
    
    USER_CFG_OUT <= user_cfg_o;
    REF_VALID <= ref_valid_i;
-   PROG_TRIG <= prog_trig_i; 
-   
-   DONE <= done_i;
-   RQST <= rqst_i;
+   PROG_TRIG <= prog_trig_i;   
    
    areset_i <= ARESET or FPA_INTF_CFG.COMN.FPA_DIAG_MODE;
    --------------------------------------------------
@@ -194,9 +187,7 @@ begin
             ref_valid_i <= (others => '0');
             present_cfg_num <= not USER_CFG_IN.CFG_NUM;
             prog_trig_i <= '0'; 
-            -- elcorr_init_done_i <= '0'; 
-            done_i <= '0';
-            rqst_i <= '0';
+            -- elcorr_init_done_i <= '0';
             
          else
             
@@ -208,8 +199,6 @@ begin
                
                when idle =>
                   prog_trig_i <= '0';
-                  done_i <= '1';
-                  rqst_i <= '0';
                   if (prog_timer_pulse = '1' or prog_event_pulse = '1') and USER_CFG_IN.ELCORR_REF_CFG(0).REF_ENABLED = '1' then  
                      ctrl_fsm <= slct_ref_st;
                   end if;
@@ -243,29 +232,20 @@ begin
                when pause_st =>           -- on donne du temps à la sortie du dac programmé de se stabiliser
                   pause_cnt <= pause_cnt + 1;
                   if pause_cnt > DEFINE_ELCORR_REF_DAC_SETUP_FACTOR then   -- soit environ 50% du temps de validité d'une vref. Les mesures à l,oscillo revelent que la stabilisation s'obtient apres 250 ms 
-                     ctrl_fsm <= rqst_st;
+                     ctrl_fsm <= ref_valid_st;
                   end if;
                   -- pragma translate_off
-                  ctrl_fsm <= rqst_st;
+                  ctrl_fsm <= ref_valid_st;
                   -- pragma translate_on
                
-               when rqst_st =>           -- on fait une demande 
-                  rqst_i <= '1';         -- permet d'arreter le trig controller
-                  if EN = '1' then
-                     done_i <= '0';
-                     ctrl_fsm <= ref_valid_st;  
-                  end if;
-               
                when ref_valid_st =>            -- on diffuse l'info de la validité de la reference 
-                  rqst_i <= '0';                  
                   ref_valid_i(ref_id) <= '1';
-                  ctrl_fsm <= wait_fdbk_st;             
+                  ctrl_fsm <= wait_fdbk_st;
                
                when wait_fdbk_st =>            -- on attend qu'au moins un calcul soit fait
-                  prog_trig_i <= not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
+                  prog_trig_i <= not HW_CFG_IN_PROGRESS and not USER_CFG_IN.ELCORR_REF_CFG(ref_id).REF_CONT_MEAS_MODE and not ref_feedbk_i(ref_id); -- ENO : 26 avril 2019 !!!!!!!!!! : ne jamais lancer prog_trig de ELCPRR lorsqu'une transaction de PROG est lancée car cette requete suppose l'arret du trig_ctler, alors que le prog_trig_i à zero l'empêche de s'arrêter
                   if ref_feedbk_i(ref_id) = '1' then
                      prog_trig_i <= '0';   -- dès qu'on a ce qu'on veut, prog_trig doit être relâchée pour une programmation de détecteur puisse se faire au besoin
-                     done_i <= '1';        -- on lâche le done pour que les autres clients puisque avoir acces au lien
                      if ref_id = 0 then
                         ctrl_fsm <= idle;
                      else

@@ -94,7 +94,7 @@ architecture rtl of isc0804A_readout_kernel is
          Clk_div   : out std_logic);
    end component;
    
-   type ctrl_fsm_type is (idle, wait_int_fe_st, chck_lsydel_speed_st, speedup_lsydel_clk_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, mclk_pause_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
+   type ctrl_fsm_type is (idle, chck_lsydel_speed_st, speedup_lsydel_clk_st, lsydel_dly_st, wait_flows_st, stop_raw_clk_st, mclk_pause_st, active_flow_st, sync_flow_st, adc_sync_st, prep_slow_clk_st, prep_fast_clk_st, slow_clk_en_st, rst_wdow_gen_st);   
    type adc_time_stamp_type is
    record
       naoi_stop  : std_logic;
@@ -155,21 +155,21 @@ architecture rtl of isc0804A_readout_kernel is
    signal elcorr_ref_end_pipe   : std_logic_vector(15 downto 0);
    signal elcorr_ref_end_i      : std_logic;
    signal elcorr_ref_start_i    : std_logic;
-   signal quad_clk_fe_pipe        : std_logic_vector(63 downto 0) := (others => '0');
+   signal quad_clk_fe_pipe    : std_logic_vector(63 downto 0) := (others => '0');
    --signal active_window_last  : std_logic;
-   signal elcorr_ref_fval_i       : std_logic;
-   signal rst_cnt_i               : unsigned(4 downto 0);
-   signal rst_wdow_gen_i          : std_logic;
-   signal elcorr_ref_enabled      : std_logic;
-   signal fpa_mclk_fe             : std_logic;
-   signal read_end_last           : std_logic;
-   signal adc_time_stamp          : adc_time_stamp_type;
-   signal well_rst_start_i        : std_logic;
-   signal last_lsync_pipe         : std_logic_vector(63 downto 0) := (others => '0');
-   signal imminent_well_rst_i     : std_logic;
-   signal last_lsync_i            : std_logic;
-   signal fast_lsydel_clk         : std_logic;
-   signal fast_lsydel_clk_en_i    : std_logic := '0'; 
+   signal elcorr_ref_fval_i     : std_logic;
+   signal rst_cnt_i           : unsigned(4 downto 0);
+   signal rst_wdow_gen_i      : std_logic;
+   signal elcorr_ref_enabled  : std_logic;
+   signal fpa_mclk_fe         : std_logic;
+   signal read_end_last       : std_logic;
+   signal adc_time_stamp      : adc_time_stamp_type;
+   signal well_rst_start_i    : std_logic;
+   signal last_lsync_pipe     : std_logic_vector(63 downto 0) := (others => '0');
+   signal imminent_well_rst_i : std_logic;
+   signal last_lsync_i        : std_logic;
+   signal fast_lsydel_clk     : std_logic;
+   signal fast_lsydel_clk_en_i: std_logic := '0';
    signal read_start_last         : std_logic;
    signal acq_int_i               : std_logic;
    signal acq_int_last            : std_logic;
@@ -250,7 +250,7 @@ begin
       Clock   => CLK,    
       Reset   => sreset, 
       Clk_div => fast_lsydel_clk   -- attention, c'est en realité un clock enable. 
-      );   
+      );
    
    ----------------  ----------------------------------
    --  lecture des fifos et synchronisation
@@ -282,8 +282,9 @@ begin
             
          else  
             
-            fpa_int_i       <= FPA_INT;
-            fpa_int_last    <= fpa_int_i;
+            --inc := '0'& fpa_mclk_re;
+            fpa_int_i <= FPA_INT;
+            fpa_int_last <= fpa_int_i; 
             acq_int_i       <= ACQ_INT;
             acq_int_last    <= acq_int_i; 
             
@@ -304,20 +305,20 @@ begin
                   rst_wdow_gen_i <= '0';
                   slow_clk_fifo_rd_i <= '0';
                   fast_clk_fifo_rd_i <= '0';
-                  mclk_pause_cnt <= 1;                  
+                  mclk_pause_cnt <= 1;
                   img_in_progress_i <= fpa_int_last;                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
-                  acq_data_o <= '0';
-                  start_gen_i <= fpa_int_last;                  
-                  if fpa_int_last = '1' and  fpa_int_i = '0' then   -- front descendant de int                     
+                  if fpa_int_last = '0' and fpa_int_i = '1' then 
+                     start_gen_i <= '1';                                  -- un latch requis
+                  end if;                               
+                  if (fpa_int_last = '1' and fpa_int_i = '0')  and start_gen_i = '1' then        -- ENO: 20 juin 2017 : le mode diag n'est pas à double cadence puisque MCLK n'est pas utilisé dans le generateur diag. Ainsi, même en mode diag, le détecteur roule sans interruption.
                      acq_data_o <= acq_int_last;
-                     ctrl_fsm <= chck_lsydel_speed_st;
-                  end if;                                                              
+                     ctrl_fsm <= chck_lsydel_speed_st;                                               -- start_gen_i permet de s'assurer qu'on qa bien vu le front montant de L,integration. Sinon on peut avoir râté le FM et voir le FD ce qui cause un bug.
+                  end if;
+                  --wait_flows_dly <= 0;
                   rst_cnt_i <= (others => '0'); 
                   pause_cnt <= (others => '0');
-                  lsydel_in_progress <= '0';
                
                when chck_lsydel_speed_st =>
-                  lsydel_in_progress <= '1';
                   if FPA_INTF_CFG.SPEEDUP_LSYDEL = '1' then 
                      if SLOW_MCLK_RAW = '0' and SLOW_PCLK_RAW = '0' then -- on vient dans cet état avec slow_mclk_raw_en_i activé. Donc pas besoin de fast_maclk_raw. Ajout de PCLK pour s'assurer qu'on ne tronque pas cette derniere
                         slow_mclk_raw_en_i <= '0';
@@ -344,7 +345,6 @@ begin
                   end if;
                
                when wait_flows_st =>
-                  lsydel_in_progress <= '0';
                   if WDOW_FIFO_RDY = '1' and CLK_FIFO_RDY = '1' and fpa_mclk_re = '1' then
                      ctrl_fsm <= stop_raw_clk_st;
                   end if;
@@ -418,9 +418,9 @@ begin
                   end if;
                
                when rst_wdow_gen_st =>    --                  
-                  rst_wdow_gen_i <= '1';              
+                  rst_wdow_gen_i <= '1';                          -- le upstream subit un reset de 16 CLK
                   rst_cnt_i <= rst_cnt_i + 1;
-                  if rst_cnt_i(3) = '1' then
+                  if rst_cnt_i(4) = '1' then
                      ctrl_fsm <= idle;
                   end if;
                
@@ -465,17 +465,11 @@ begin
             quad_clk_fe_pipe <= (others => '0');
             -- pragma translate_on
             
-            read_start_last <= '0';
-            read_end_last <= '0';
-            lsydel_in_progress_last <= '0'; 
-            
          else 
             
             -- pragma translate_off 
             raw_window_i <= WDOW_FIFO_DATA.RAW;
-            -- pragma translate_on 
-            
-            lsydel_in_progress_last <= lsydel_in_progress;
+            -- pragma translate_on
             
             line_pclk_cnt_last <= WDOW_FIFO_DATA.RAW.LINE_PCLK_CNT;
             if WDOW_FIFO_DATA.RAW.LINE_PCLK_CNT /= line_pclk_cnt_last then
@@ -506,7 +500,7 @@ begin
             read_end_last <= readout_info_i.aoi.read_end;
             
             -- elcorr_ref_start_i dure 1 PCLK             
-            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not lsydel_in_progress_last and lsydel_in_progress);  -- rising edge lsydel_in_progress = debut elcorr
+            elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_start_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not read_end_last and readout_info_i.aoi.read_end); 
             if unsigned(elcorr_ref_start_pipe) /= 0 then
                elcorr_ref_start_i <= '1';
                elcorr_ref_fval_i  <= '1'; 
@@ -515,7 +509,7 @@ begin
             end if;
             
             -- elcorr_ref_end_i dure 1 PCLK
-            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (lsydel_in_progress_last and not lsydel_in_progress); -- -- falling edge lsydel_in_progress = fin elcorr 
+            elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-1 downto 0) <= elcorr_ref_end_pipe(C_FLAG_PIPE_LEN-2 downto 0) & (not fpa_int_last and fpa_int_i); -- Attention! le rising_Edge de Int = fin de elc_ofs. Cela ne marchera qu'en ITR 
             if unsigned(elcorr_ref_end_pipe) /= 0 then
                elcorr_ref_end_i <= '1';
             else
@@ -560,7 +554,7 @@ begin
             
             -- ADC_FLAGS
             -- flags temps reel enovoyés vers le synchronisateur d'adc pour time stamping des données ADC
-            adc_time_stamp.aoi_eof           <= WDOW_FIFO_DATA.USER.EOF and window_fifo_rd_i;
+            adc_time_stamp.aoi_eof           <= WDOW_FIFO_DATA.USER.EOF and window_fifo_rd_i; 
             adc_time_stamp.naoi_start        <= elcorr_ref_start_i;
             adc_time_stamp.naoi_stop         <= elcorr_ref_end_i;
             adc_time_stamp.aoi_sof           <= WDOW_FIFO_DATA.USER.SOF and window_fifo_rd_i;

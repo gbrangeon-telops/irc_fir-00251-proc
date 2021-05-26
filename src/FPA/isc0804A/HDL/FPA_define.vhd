@@ -58,7 +58,7 @@ package FPA_define is
    
    -- integration, offset d'integration,  feedback
    constant DEFINE_GENERATE_INT_FDBK_MODULE       : std_logic := '0';      -- à '0' pour dire que le signal fpa_int_fdbk = fpa_int. à  '1' sinon. Dans ce cas, le fpa_int_fdbk est genere et on doit spécifier son delai. Sa duree est d'office FPA_INT_TIME. Faire attention au calcul des delais dans le fpa_intf.c pour le mode MODE_INT_END_TO_TRIG_START
-   constant DEFINE_FPA_INT_TIME_OFFSET_nS         : integer   := 0;        -- provient du MB desormais. integer(real(3)*real(1_000_000)/real(DEFINE_FPA_MCLK_RATE_KHZ));     --  3 MCLK en ns et en fonction de la frequence d'horloge detecteur
+   constant DEFINE_FPA_INT_TIME_OFFSET_nS         : integer   := integer(real(3)*real(1_000_000)/real(DEFINE_FPA_MCLK_RATE_KHZ));     --  3 MCLK en ns et en fonction de la frequence d'horloge detecteur
    constant DEFINE_FPA_INT_FDBK_DLY               : natural   := DEFINE_FPA_INT_TIME_OFFSET_nS;        -- pour isc0209A, le fedback commence en même temps que la consigne (fpa_int) mais les deux signaux n'ont pas la même durée (DEFINE_FPA_INT_TIME_OFFSET_nS les differencie)
    --
    constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real      := 2.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 3.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 
@@ -96,7 +96,7 @@ package FPA_define is
    (    0, 16383),     -- limites du DAC4 pour le isc0804A     non utilisé
    ( 1009,  8400),     -- limites du DAC5 pour le isc0804A     VOUTREF
    (    0, 16383),     -- limites du DAC6 pour le isc0804A     non utilisé
-   (	0, 16210),     -- limites du DAC7 pour le isc0804A     inref
+   (	  0, 16210),     -- limites du DAC7 pour le isc0804A     inref
    ( 4081,  4954));    -- limites du DAC8 pour le isc0804A     VPD
    
    --------------------------------------------
@@ -137,7 +137,7 @@ package FPA_define is
    constant DEFINE_FPA_PROG_START_PAUSE_FACTOR    : integer := DEFINE_FPA_PROG_END_PAUSE_FACTOR;
    constant DEFINE_ELCORR_REF_DAC_SETUP_FACTOR    : integer := integer(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ*real(DEFINE_ELCORR_REF_DAC_SETUP_US/1000));
    constant DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR  : unsigned(31 downto 0):= to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_INTCLK_RATE_KHZ)), 32);
-
+   
    ---------------------------------------------------------------------------------								
    -- Type
    --------------------------------------------------------------------------------- 
@@ -237,7 +237,7 @@ package FPA_define is
       clamping_level                      : std_logic_vector(2 downto 0);  -- roic clamping level                  
       
       -- itr                             
-      itr_mode_enabled                    : std_logic;          
+      itr                                 : std_logic;           -- non envoyé par le MBlaze
       
       -- gain                             
       gain                                : std_logic;           -- non envoyé par le MBlaze
@@ -343,9 +343,6 @@ package FPA_define is
       -- activation de l'horloge lsydel à plus que 2xMCLK
       permit_lsydel_clk_rate_beyond_2x    : std_logic;
       
-      spare2                              : unsigned(31 downto 0);
-      int_time_offset_mclk                : signed(31 downto 0);
-          
    end record;    
    
    ----------------------------------------------								

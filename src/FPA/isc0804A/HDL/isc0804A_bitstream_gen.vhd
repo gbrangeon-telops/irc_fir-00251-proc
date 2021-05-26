@@ -181,7 +181,7 @@ begin
          -- NDRO Enable Non-Destructive Readout : '0'
          new_roic_cfg(11) <= '0';
          -- INT  Integration Mode : ''
-         new_roic_cfg(10) <= USER_CFG.ITR_MODE_ENABLED;
+         new_roic_cfg(10) <= USER_CFG.ITR;
          -- INV Row Readout Direction : '0'
          new_roic_cfg(9) <= '0';
          -- REV Column Readout Direction : '0'
