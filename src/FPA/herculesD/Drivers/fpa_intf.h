@@ -167,6 +167,10 @@ typedef struct s_FpaIntfConfig t_FpaIntf;
 // statuts provenant du vhd
 struct s_FpaStatus    // 
 {
+   // fpa init status (ne provient pas du vhd)
+   uint32_t  fpa_init_done;            // donne l'état de l'initialisation du module FPA (hw + sw)
+   uint32_t  fpa_init_success;         // donne le résultat de l'initialisation du module FPA (hw + sw)
+
    // adc board (iddcas analogiques)
    uint32_t  adc_oper_freq_max_khz;    // frequence maximale d'operation des adcs soudées sur la carte EFA-00253  (lié à l'ID)
    uint32_t  adc_analog_channel_num;   // nombre de canaux total disponible sur la carte (lié à l'ID)
@@ -216,9 +220,9 @@ struct s_FpaStatus    //
    uint8_t   fpa_serdes_delay[4];         // donne le délai de calibration des serdes pour chaque canal
    uint32_t  fpa_serdes_edges[4];         // donne les edges trouvés lors de la calibration des serdes pour chaque canal
 
-   // fpa init status
-   uint32_t  fpa_init_done;               // donne l'état de l'initialisation du FPA
-   uint32_t  fpa_init_success;            // donne le résultat de l'initialisation du FPA
+   // hw init status
+   uint32_t  hw_init_done;               // donne l'état de l'initialisation du FPA
+   uint32_t  hw_init_success;            // donne le résultat de l'initialisation du FPA
    uint32_t  prog_init_done;              // -- monte à '1' lorsque la config d'initialisation est programmée dans le ROIC. Ce qui est intéressant pour les ROIC necessitant une config d'initialisation
    
    // cooler

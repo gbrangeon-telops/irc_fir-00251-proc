@@ -436,6 +436,17 @@ begin
          
          if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts
             axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
+         
+         
+         elsif MB_MOSI.ARADDR(11) = '1' then  -- adresse de base pour la lecture des statuts internes/privés (ne provenant pas du generateur de statuts)
+            
+            case MB_MOSI.ARADDR(7 downto 0) is 
+               when X"00" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(SCD_FRAME_RESOLUTION), 32));
+               
+               when others =>                                                       
+               
+            end case;
+ 
          else 
             axi_rdata <= (others =>'1'); 
          end if;
