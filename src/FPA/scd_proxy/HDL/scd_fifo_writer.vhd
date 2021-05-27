@@ -30,7 +30,6 @@ entity scd_fifo_writer is
       
       DOUT             : out std_logic_vector(27 downto 0);
       DOUT_DVAL        : out std_logic;
-      DOUT_FVAL       : out std_logic;
       
       READOUT          : in std_logic;
       
@@ -51,24 +50,21 @@ architecture rtl of scd_fifo_writer is
    end component; 
    
    
-   type writer_fsm_type is (init_st1, init_st2, idle, wr_hder_st, wait_hder_end_st, wr_img_st, wr_frm_end_id_st, wait_readout_st, flush_fifo_st);
+   type writer_fsm_type is (init_st1, init_st2, idle, wr_img_st, wr_frm_end_id_st, wait_readout_st, flush_fifo_st);
    signal writer_fsm       : writer_fsm_type;
    signal sreset           : std_logic;
    signal dval_o           : std_logic;
    signal dout_o           : std_logic_vector(DIN'range);
    signal din_p            : std_logic_vector(DIN'range);
-   signal hder             : std_logic;
    signal fval             : std_logic;
    signal lval             : std_logic;
    signal dval             : std_logic;
-   signal hder_p           : std_logic;
    signal fval_p           : std_logic;
    signal lval_p           : std_logic;
    signal dval_p           : std_logic;
    signal flush_fifo       : std_logic;
    signal count            : unsigned(7 downto 0);
    signal readout_sync     : std_logic;
-   signal fval_o           : std_logic;
    
 begin
    
@@ -77,12 +73,10 @@ begin
    -------------------------------------------------- 
    DOUT_DVAL <= dval_o;
    DOUT <= dout_o;
-   DOUT_FVAL <= fval_o;
    
    --------------------------------------------------
    -- Inputs map
    -------------------------------------------------- 
-   hder <= DIN(23);  -- hder 
    lval <= DIN(24);  -- Lval 
    fval <= DIN(25);  -- Fval 
    dval <= DIN(26);  -- Dval 
@@ -108,12 +102,10 @@ begin
       if rising_edge(CLK) then 
          if sreset = '1' then            
             dval_o <= '0';
-            fval_o <= '0';
             writer_fsm <= init_st1;
             -- pragma translate_off
             writer_fsm <= init_st2;
             -- pragma translate_on
-            hder_p <= '0';
             fval_p <= '0';
             lval_p <= '0';
             dval_p <= '0';
@@ -129,57 +121,31 @@ begin
             
             
             -- pipe de CLK pour donner du temps à la machine à états
-            hder_p <= hder;
             fval_p <= fval;
             lval_p <= lval;
             dval_p <= dval;
-            din_p <= DIN;
+            din_p  <= DIN;
             
             case writer_fsm is               
                
                
                when init_st1 => 
                   dval_o <= '0';
-                  fval_o <= '0';
                   if fval = '1' and lval = '1' and dval = '1' then  -- je vois une image
                      writer_fsm <= init_st2;
                   end if; 
                
                when init_st2 => 
                   dval_o <= '0';
-                  fval_o <= '0';
-                  if fval = '0' and lval = '0' and dval = '0' and hder = '0' then  -- permet une synchronisation sur le header
+                  if fval = '0' and lval = '0' and dval = '0' then  -- permet une synchronisation sur le début de l'image
                      writer_fsm <= idle;
                   end if;                  
                
                when idle =>
                   dval_o <= '0';
-                  fval_o <= '0';
                   flush_fifo <= '0';
                   count <= (others => '0');
                   if fval = '1' and lval = '1' and dval = '1' then
-                     writer_fsm <= wr_hder_st;
-                  end if;
-               
-               when wr_hder_st =>                                        
-                  dout_o <= din_p;
-                  fval_o <= fval_p;				  
-                  if fval_p = '1' and lval_p ='1' and dval_p = '1' then 
-                     dval_o <= hder_p;        -- on ecrit juste les 128 coups d'horloge du header effectif.  
-                     if hder_p = '0' then  -- fin du header effectif selon la figure 4 du document Communication protocol appendix A5 (SPEC. NO: DPS3008)
-                        dval_o <= '1';     -- ecrit pour faire tomber le header_valid en aval et ainsi permettre l'envoi du header rapidement.
-                        dout_o(23) <='0';  -- hder tombe à '0';
-                        dout_o(24) <='0';  -- lval tombe à '0';
-                        dout_o(26) <='0';  -- dval tombe à '0';   Attention !!! fval_p est resté à '1'  
-                        writer_fsm <= wait_hder_end_st;
-                     end if;
-                  else
-                     dval_o <= '0'; 
-                  end if;
-               
-               when wait_hder_end_st =>
-                  dval_o <= '0';
-                  if lval_p = '0' and dval_p = '0' then
                      writer_fsm <= wr_img_st;
                   end if;
                
@@ -193,7 +159,6 @@ begin
                when  wr_frm_end_id_st => 
                   dout_o <= (others => '0'); -- permet de faire tomber le fval entre deux frames en aval 
                   dval_o <= '1';             -- sera remis automatiquement à '0' au dans le prochain etat
-                  fval_o <= '0'; 
                   count <= count + 1;
                   if count = 3 then          -- ENO:ecrire plus que 3 pour être certain le readout tombera à coup sûr
                      writer_fsm <= wait_readout_st;

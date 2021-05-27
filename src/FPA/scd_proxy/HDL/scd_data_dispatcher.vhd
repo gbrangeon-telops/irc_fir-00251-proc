@@ -70,8 +70,7 @@ entity scd_data_dispatcher is
       DIAG_CH3_DATA     : in std_logic_vector(27 downto 0);      
       DIAG_CH3_DVAL     : in std_logic;
       
-      DIAG_MODE_EN      : out std_logic;      
-      HDER_PROGRESS     : out std_logic;      
+      DIAG_MODE_EN      : out std_logic;            
       READOUT           : out std_logic;
       
       PIX_MOSI          : out t_axi4_stream_mosi64;
@@ -202,8 +201,6 @@ architecture rtl of scd_data_dispatcher is
    signal sresetn                      : std_logic;
    signal real_data_mode               : std_logic;
    signal diag_mode_en_i               : std_logic;
-   signal fpa_fifo_dval                : std_logic;
-   signal diag_fifo_dval               : std_logic;
    signal fpa_ch1_fifo_dval            : std_logic;
    signal fpa_ch2_fifo_dval            : std_logic;
    signal fpa_ch3_fifo_dval            : std_logic;
@@ -229,13 +226,9 @@ architecture rtl of scd_data_dispatcher is
    signal diag_pix3_data               : std_logic_vector(15 downto 0);
    signal diag_ch3_fifo_dout           : std_logic_vector(27 downto 0);
    signal diag_pix4_data               : std_logic_vector(15 downto 0);
-   signal diag_header                  : std_logic;
    signal diag_lval                    : std_logic;
    signal diag_dval                    : std_logic;
    signal diag_fval                    : std_logic;
-   signal fpa_ch1_header               : std_logic;
-   signal fpa_ch2_header               : std_logic; 
-   signal fpa_ch3_header               : std_logic;
    signal fpa_fifo_rd                  : std_logic;
    signal fpa_ch1_fifo_ovfl            : std_logic;
    signal fpa_ch2_fifo_ovfl            : std_logic;
@@ -285,8 +278,6 @@ architecture rtl of scd_data_dispatcher is
    signal fpa_gain                     : std_logic_vector(FPA_INTF_CFG.SCD_OP.SCD_GAIN'LENGTH-1 downto 0);
    signal fpa_temp_i                   : fpa_temp_stat_type;
    signal fpa_int_mode                 : std_logic_vector(SCD_ITR'range);
-   signal diag_header_last             : std_logic;
-   signal fpa_ch2_header_last          : std_logic;
    signal hder_mosi_i                  : t_axi4_lite_mosi;
    signal pix_mosi_i, pix_mosi_temp    : t_axi4_stream_mosi64;
    signal pix_mosi32                   : t_axi4_stream_mosi32;
@@ -350,8 +341,6 @@ architecture rtl of scd_data_dispatcher is
 --  attribute keep of diag_ch2_fifo_dval             : signal is "true";
 --  attribute keep of diag_ch3_fifo_dval             : signal is "true";  
 --  attribute keep of diag_fifo_rd                   : signal is "true";  
---  attribute keep of diag_fifo_dval                 : signal is "true";
---  attribute keep of fpa_fifo_dval                  : signal is "true";
 --  attribute keep of fpa_fifo_rd                    : signal is "true";
 --  attribute keep of hder_link_rdy                  : signal is "true";
 --  attribute keep of diag_mode_en_i                 : signal is "true";
@@ -359,11 +348,9 @@ architecture rtl of scd_data_dispatcher is
 --  attribute keep of acq_mode                       : signal is "true";
 --  attribute keep of acq_mode_first_int             : signal is "true";
 --  attribute keep of nacq_mode_first_int            : signal is "true"; 
---  attribute keep of diag_header                    : signal is "true";
 --  attribute keep of diag_fval                      : signal is "true";
 --  attribute keep of diag_lval                      : signal is "true";  
 --  attribute keep of diag_dval                      : signal is "true";
---  attribute keep of fpa_ch2_header                     : signal is "true";
 --  attribute keep of fpa_fval                       : signal is "true";
 --  attribute keep of fpa_lval                       : signal is "true";  
 --  attribute keep of fpa_dval                       : signal is "true";  
@@ -379,9 +366,6 @@ begin
    READOUT <= readout_i;
    DIAG_MODE_EN <= diag_mode_en_i; 
    hder_link_rdy <= HDER_MISO.WREADY and HDER_MISO.AWREADY;
-   
-   fpa_fifo_dval <= fpa_ch1_fifo_dval and fpa_ch2_fifo_dval and fpa_ch3_fifo_dval;     -- il le faut pour s'assurer de la synchron des 3 canaux avant de lire le fifo
-   diag_fifo_dval <= diag_ch1_fifo_dval and diag_ch2_fifo_dval and diag_ch3_fifo_dval;  -- il le faut pour s'assurer de la synchron des 3 canaux avant de lire le fifo
    
    -- lecture des fifos FPA (toujours laisser en combinatoire pour eviter des bugs)          
    fpa_fifo_rd <= fpa_ch1_fifo_dval and fpa_ch2_fifo_dval and fpa_ch3_fifo_dval; -- lecture synchronisée des 3 fifos tout le temps.        
@@ -411,7 +395,6 @@ begin
    fpa_pix1_data(13) <= fpa_ch1_fifo_dout(14);
    fpa_pix1_data(14) <= fpa_ch1_fifo_dout(10);
    fpa_pix1_data(15) <= fpa_ch1_fifo_dout(11);
-   fpa_ch1_header    <= fpa_ch1_fifo_dout(23); -- Header pris sur canal 1 uniquement (on suppose que les données sont synchronisées sur les deux canaux)
    fpa_lval          <= fpa_ch1_fifo_dout(24);  -- Lval pris sur canal 1 uniquement
    fpa_fval          <= fpa_ch1_fifo_dout(25);  -- Fval pris sur canal 1 uniquement
    fpa_dval          <= fpa_ch1_fifo_dout(26);  -- Dval pris sur canal 1 uniquement
@@ -432,7 +415,6 @@ begin
    fpa_pix2_data(13) <= fpa_ch2_fifo_dout(6);
    fpa_pix2_data(14) <= fpa_ch2_fifo_dout(27);
    fpa_pix2_data(15) <= fpa_ch2_fifo_dout(5);
-   fpa_ch2_header    <= fpa_ch2_fifo_dout(23); -- Header du canal 2 pour fin de generation d'erreur seulement
 
    fpa_pix3_data(0)  <= fpa_ch2_fifo_dout(7);
    fpa_pix3_data(1)  <= fpa_ch2_fifo_dout(8);
@@ -466,9 +448,7 @@ begin
    fpa_pix4_data(12) <= fpa_ch3_fifo_dout(13);
    fpa_pix4_data(13) <= fpa_ch3_fifo_dout(14);
    fpa_pix4_data(14) <= fpa_ch3_fifo_dout(10);
-   fpa_pix4_data(15) <= fpa_ch3_fifo_dout(11);
-   fpa_ch3_header    <= fpa_ch3_fifo_dout(23); -- Header du canal 3 pour fin de generation d'erreur seulement
-  
+   fpa_pix4_data(15) <= fpa_ch3_fifo_dout(11);  
    
    ----------------------------------------------------
    -- decodage données sortant du fifo en mode diag
@@ -489,7 +469,6 @@ begin
    diag_pix1_data(13) <= diag_ch1_fifo_dout(14);
    diag_pix1_data(14) <= diag_ch1_fifo_dout(10);
    diag_pix1_data(15) <= diag_ch1_fifo_dout(11);
-   diag_header        <= diag_ch1_fifo_dout(23); -- Header
    diag_lval          <= diag_ch1_fifo_dout(24);  -- Lval
    diag_fval          <= diag_ch1_fifo_dout(25);  -- Fval
    diag_dval          <= diag_ch1_fifo_dout(26);  -- Dval 
@@ -970,7 +949,7 @@ begin
             pix_dval_i <= pix_dval_temp;
             pix_data_i <= pix4_data_temp & pix3_data_temp & pix2_data_temp & pix1_data_temp;
             if real_data_mode = '1' then 
-               pix_dval_temp <= fpa_fifo_rd and fpa_fifo_dval and not fpa_ch2_header and fpa_dval and int_fifo_dval;
+               pix_dval_temp <= fpa_fifo_rd and fpa_dval and int_fifo_dval;
                -- verify overflow on the number of bits corresponding to resolution
                if unsigned(fpa_pix1_data) > fpa_pix_max then
                   pix1_data_temp <= std_logic_vector(fpa_pix_max);
@@ -993,7 +972,7 @@ begin
                   pix4_data_temp <= fpa_pix4_data;
                end if;
             else
-               pix_dval_temp <= diag_fifo_rd and diag_fifo_dval and not diag_header and diag_dval and int_fifo_dval;
+               pix_dval_temp <= diag_fifo_rd and diag_dval and int_fifo_dval;
                pix1_data_temp <= diag_pix1_data;
                pix2_data_temp <= diag_pix2_data;
                pix3_data_temp <= diag_pix3_data;
@@ -1017,9 +996,7 @@ begin
       if rising_edge(CLK) then         
          if sreset = '1' then
             fast_hder_sm <= idle;
-            pix_out_sm <= idle;
-            diag_header_last <= diag_header;
-            fpa_ch2_header_last <= fpa_ch2_header;          
+            pix_out_sm <= idle;         
             acq_hder_last <= '0';
             
             hder_mosi_i.awvalid <= '0';                
@@ -1071,10 +1048,7 @@ begin
             acq_eof_pipe(2) <= acq_eof_pipe(1);
             acq_eof_i <= acq_eof_pipe(2);
             
-            -- construction des données hder fast
-            diag_header_last <= diag_header;
-            fpa_ch2_header_last <= fpa_ch2_header;            
-            
+            -- construction des données hder fast          
             if real_data_mode = '1' then -- en mode réel 
                hder_param.exp_time <= resize(int_time_i, 32); 
                hder_param.frame_id <= unsigned(frame_id_i);
@@ -1204,7 +1178,6 @@ begin
             CFG_MISMATCH <= '0'; 
             FIFO_ERR <= '0';
             DONE <= '0';
-            HDER_PROGRESS <= '0';
             
          else
             
@@ -1223,10 +1196,6 @@ begin
             
             -- done
             DONE <= (not fpa_fval and real_data_mode) or (not diag_fval and not real_data_mode); 
-            
-            -- pour avertir de la progression du decodage du header     
-            HDER_PROGRESS <= (fpa_ch2_header and real_data_mode) or (diag_header and not real_data_mode);
-            
          end if;
          
       end if;

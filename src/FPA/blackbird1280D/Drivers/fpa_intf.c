@@ -762,7 +762,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t scd_gain;
    uint32_t vhd_int_time;
    float Tint, Tframe, fr_dly, intg_dly;
-   uint8_t scd_hder_disable  = 0;  // 0 => enabled, 1 => disabled
+   uint8_t scd_hder_disable  = 1;  // 0 => enabled, 1 => disabled
    uint8_t FSyncMode         = 0;  // 0 => external "slave" sync mode, 1 => internal "master" sync mode (default)
    uint8_t ReadDirLR         = 0;  // 0 => left to right (default), 1 => right to left
    uint8_t ReadDirUP         = 1;  // 0 => Up to down (default), 1 => down to up

@@ -789,7 +789,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    ScdPacketTx_t ScdPacketTx;
    uint8_t scd_gain;
    uint8_t scd_int_mode;
-   uint8_t scd_hder_disable = 0;
+   uint8_t scd_hder_disable = 1;
    float Tint;
    
    // quelques definitions

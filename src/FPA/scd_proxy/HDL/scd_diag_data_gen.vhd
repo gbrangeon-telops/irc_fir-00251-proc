@@ -42,11 +42,7 @@ entity scd_diag_data_gen is
       
       CH1_DATA     : out std_logic_vector(27 downto 0); --! sortie des données deserialisés sur CH1    
       CH2_DATA     : out std_logic_vector(27 downto 0); --! sortie des données deserialisés sur CH2 
-      CH3_DATA     : out std_logic_vector(27 downto 0); --! sortie des données deserialisés sur CH2
-      
-      DIAG_HDER    : out std_logic; --! 'à 1 pour signmifier la sortie du header
-      DIAG_LINE    : out std_logic; --! 'à 1 pour signmifier la sortie des données d'une ligne
-      DIAG_FRAME   : out std_logic
+      CH3_DATA     : out std_logic_vector(27 downto 0)  --! sortie des données deserialisés sur CH2
       
       );
 end scd_diag_data_gen;
@@ -92,7 +88,7 @@ architecture rtl of scd_diag_data_gen is
          );
    end component;
    
-   type diag_fsm_type is (idle, x_to_readout_start_dly_st, rst_cnt_st, fval_on_st,fval_re_to_dval_re_dly_st, hder_st,
+   type diag_fsm_type is (idle, x_to_readout_start_dly_st, rst_cnt_st, fval_on_st,fval_re_to_dval_re_dly_st,
    start_line_gen_st, wait_line_gen_end_st, line_pause_st, x_to_next_fsync_re_dly_st );
    type img_change_sm_type is (idle, change_st);
    
@@ -102,8 +98,8 @@ architecture rtl of scd_diag_data_gen is
    signal pix1_data_i       : std_logic_vector(15 downto 0); 
    signal pix2_data_i       : std_logic_vector(15 downto 0);
    signal pix3_data_i       : std_logic_vector(15 downto 0);
-   signal hder_i            : std_logic;
-   signal fval_i            : std_logic;
+   signal fval_i            : std_logic;  
+   signal fval_last         : std_logic;
    signal lval_i            : std_logic;
    signal dval_i            : std_logic;    
    signal sreset            : std_logic;
@@ -124,7 +120,6 @@ architecture rtl of scd_diag_data_gen is
    signal pix3_diag_dval    : std_logic;
    signal diag_done_i       : std_logic;
    signal dly_cnt           : unsigned(15 downto 0);
-   signal hder_dcnt         : unsigned(15 downto 0);
    signal line_cnt          : unsigned(15 downto 0);
    signal fpa_int_i         : std_logic;
    signal fpa_trig_i        : std_logic;
@@ -132,7 +127,6 @@ architecture rtl of scd_diag_data_gen is
    signal revert_img        : std_logic;
    signal clk_div_i         : std_logic;
    signal clk_div_last      : std_logic;
-   signal hder_data_id      : unsigned(7 downto 0);
    signal diag_clk_i        : std_logic;
    signal diag_clk_last_i   : std_logic;
    signal pix_samp_trig_i   : std_logic;
@@ -140,7 +134,6 @@ architecture rtl of scd_diag_data_gen is
    
   --attribute keep                                   : string;
   --attribute keep of diag_fsm                       : signal is "true";
-  --attribute keep of hder_i                         : signal is "true";
   --attribute keep of fval_i                         : signal is "true";
   --attribute keep of lval_i                         : signal is "true"; 
   --attribute keep of dval_i                         : signal is "true";
@@ -176,7 +169,7 @@ begin
    CH1_DATA(20) <=  pix1_data_i(3);
    CH1_DATA(21) <=  pix1_data_i(4);
    CH1_DATA(22) <=  pix1_data_i(5);   
-   CH1_DATA(23) <=  hder_i;         
+   CH1_DATA(23) <=  '0';         -- Header (not used)
    CH1_DATA(24) <=  lval_i;           
    CH1_DATA(25) <=  fval_i;           
    CH1_DATA(26) <=  dval_i;
@@ -205,7 +198,7 @@ begin
    CH2_DATA(20) <=  pix2_data_i(11);
    CH2_DATA(21) <=  pix2_data_i(12);
    CH2_DATA(22) <=  pix2_data_i(13);   
-   CH2_DATA(23) <=  hder_i;
+   CH2_DATA(23) <=  '0';             -- Header (not used)
    CH2_DATA(24) <=  lval_i; 
    CH2_DATA(25) <=  fval_i;  
    CH2_DATA(26) <=  dval_i;
@@ -234,16 +227,11 @@ begin
    CH3_DATA(20) <=  spare;
    CH3_DATA(21) <=  spare;
    CH3_DATA(22) <=  spare;   
-   CH3_DATA(23) <=  hder_i;
+   CH3_DATA(23) <=  '0';            -- Header (not used)
    CH3_DATA(24) <=  lval_i; 
    CH3_DATA(25) <=  fval_i;  
    CH3_DATA(26) <=  dval_i;
    CH3_DATA(27) <=  pix3_data_i(6);      
-   
-   
-   DIAG_HDER  <= hder_i;
-   DIAG_LINE  <= lval_i;
-   DIAG_FRAME <= fval_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -394,17 +382,23 @@ begin
          if sreset = '1' then 
             diag_fsm <=  idle;
             fval_i <= '0';
+            fval_last <= '0';
             dval_i <= '0';
             lval_i <= '0';
-            hder_i <= '0';
-            fpa_int_last <= fpa_int_i;  
+            pix0_data_i <= (others => '0');
+            pix1_data_i <= (others => '0');
+            pix2_data_i <= (others => '0');
+            pix3_data_i <= (others => '0');
+				incr_value <= (others => '0');
+				dly_cnt <= (others => '0');            fpa_int_last <= fpa_int_i;  
             fpa_trig_last <= fpa_trig_i;
          else   
             fpa_int_i <= FPA_INT;
             fpa_int_last <= fpa_int_i;
             fpa_trig_i <= FPA_TRIG;  
             fpa_trig_last <= fpa_trig_i;
-
+            fval_last <= fval_i;  
+            
             -- configuration des generateurs de lignes
             if FPA_INTF_CFG.COMN.FPA_DIAG_TYPE = TELOPS_DIAG_CNST then         -- constant               
                pix0_first_value <= std_logic_vector(to_unsigned(4096, pix0_first_value'length)); 
@@ -431,12 +425,15 @@ begin
                
                when idle =>
                   dly_cnt <= (others => '0');
-                  hder_dcnt <= to_unsigned(1, hder_dcnt'length);
-                  hder_data_id <= (others => '0');
                   line_cnt <= (others => '0');
                   dval_i <= '0';
                   lval_i <= '0';
                   fval_i <= '0';
+                  pix0_data_i <= (others => '0');
+                  pix1_data_i <= (others => '0');
+                  pix2_data_i <= (others => '0');
+                  pix3_data_i <= (others => '0');
+                  
                   diag_line_gen_en <= '0'; 
                   if DIAG_MODE_EN = '1' then 
                      if SCD_TRIG_REFERENCED = '1'  then -- BB1280 only
@@ -467,34 +464,11 @@ begin
                   dly_cnt <= (others => '0');
                
                when fval_re_to_dval_re_dly_st =>   
-                  if dly_cnt = FPA_INTF_CFG.SCD_MISC.scd_fval_re_to_dval_re_dly then 
-                     diag_fsm <=  hder_st;
+                  if dly_cnt = (FPA_INTF_CFG.SCD_MISC.scd_fval_re_to_dval_re_dly + FPA_INTF_CFG.SCD_MISC.scd_hdr_start_to_lval_re_dly) then 
+                     diag_fsm <=  start_line_gen_st;
                   else
                      dly_cnt <= dly_cnt + 1; 
                   end if;  
-
-               when hder_st =>
-                  lval_i <= '1';
-                  dval_i <= '1';
-                  hder_i <= '1';
-                  hder_dcnt <= hder_dcnt + 1;
-                  hder_data_id <= hder_data_id + 1;
-
-                  if hder_dcnt > FPA_INTF_CFG.SCD_MISC.scd_hdr_high_duration then
-                     hder_i <= '0';                     
-                  end if;
-                  if hder_dcnt > FPA_INTF_CFG.SCD_MISC.scd_lval_high_duration and hder_i = '0' then
-                     lval_i <= '0';
-                     dval_i <= '0';
-                  end if;
-                  if hder_dcnt = FPA_INTF_CFG.SCD_MISC.scd_hdr_start_to_lval_re_dly then
-                     diag_fsm <=  start_line_gen_st;
-                  end if;
-                  
-                  pix0_data_i <= (others => '0');
-                  pix1_data_i <= (others => '0');
-                  pix2_data_i <= (others => '0');
-                  pix3_data_i <= (others => '0');
 
                when start_line_gen_st =>
                   diag_line_gen_en <= '1';   -- on active le module généateur des données diag
@@ -594,7 +568,7 @@ begin
                   end if;
                
                when change_st =>
-                  if hder_i = '1' then    -- on attend le debut d'une nouvelle image pour que le chagement d'état soit effectif
+                  if fval_last = '0' and fval_i = '1' then    -- on attend le debut d'une nouvelle image pour que le chagement d'état soit effectif
                      revert_img <= not revert_img;
                      img_change_sm <= idle;
                   end if;
