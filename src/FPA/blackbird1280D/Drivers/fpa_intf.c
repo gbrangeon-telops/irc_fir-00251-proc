@@ -121,8 +121,8 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 // adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
 
-// adresse d'ecriture de la config diag du manufacturier
-#define AW_FPA_SCD_INT_CMD_ENABLE_ADD     0xA4
+// adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
+#define AW_FPA_SCD_IDDC_RDY_ADD           0xA4
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -242,7 +242,7 @@ void FPA_FrameResolution_StructCmd_V2(const t_FpaIntf *ptrA);
 void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
-void FPA_EnableProxyExpTimeCfg(t_FpaIntf *ptrA, bool state);
+void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 float FPA_ConvertSecondToFrameTimeResolution(float seconds);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
 
@@ -258,17 +258,16 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+   FPA_iddca_rdy(ptrA, false);                                              // On active l'envoi de commande de configuration de temps d'exposition.
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
-
-   //FPA_GetTemperature(ptrA);
+   FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
+
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
 
    sw_init_done = 1;
    if(gPrivateStat.fpa_frame_resolution >= 2)
       sw_init_success = 1;
-
-   PRINTF("gPrivateStat.fpa_frame_resolution = %d \n",gPrivateStat.fpa_frame_resolution);
 }
  
 void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
@@ -276,21 +275,23 @@ void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegister
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
    FPA_SetFrameResolution(ptrA); // On change la résolution de frame
    FPA_SendConfigGC(ptrA, pGCRegs); // On configure le proxy avec des paramètres cohérents avec la nouvelle résolution de frame.
-   FPA_EnableProxyExpTimeCfg(ptrA, true); // On active l'envoi de commande de configuration de temps d'exposition.
+   FPA_iddca_rdy(ptrA, true); // On active l'envoi de commande de configuration de temps d'exposition.
 }
 
 
+//*--------------------------------------------------------------------------
+//   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and the first detector loan by SCD (loan detector was not fully operational).
+//   1. No "Integration time command" or "frame resolution command" should be sent before a the first operational command.
+//   2. The serdes initialisation will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
+//       * A operational command command followed by a frame resolution command must have been sent.
+//       * The fpa temperature must be in steady state (cooldown finish).
 //--------------------------------------------------------------------------
-// Pour activer l'envoi de configuration de temps d'exposition au proxy.
-// Elle est désactivé par défaut pour empêcher l'envoi de commande de changement
-// de temps d'intégration (0x8001) tant que la résolution de frame "Telops" n'a pas été configuré.
-//--------------------------------------------------------------------------
-void  FPA_EnableProxyExpTimeCfg(t_FpaIntf *ptrA, bool state)
+void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
   for(ii = 0; ii <= 10 ; ii++)
   {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_INT_CMD_ENABLE_ADD);
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
   }
 }
 
@@ -438,7 +439,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    //-----------------------------------------                                           
    // Envoyer commande synthetique
-   //ptrA->scd_bit_pattern = SCD_PE_TEST1;
    ptrA->proxy_cmd_to_update_id = SCD_DIAG_CMD_ID;
    WriteStruct(ptrA);   // on envoie au complet les parametres pour toutes les parties (partie common etc...)
    FPA_SendSyntheticVideo_SerialCmd(ptrA);         // on envoie la partie serielle de la commande video synthetique (elle est stockée dans une partie de la RAM en vhd)
@@ -447,9 +447,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->proxy_cmd_to_update_id = SCD_OP_CMD_ID;
    WriteStruct(ptrA);   // on envoie de nouveau au complet les parametres pour toutes les parties (partie common etc...). Ce nouvel envoi vise à a;erter l'arbitreur vhd
    FPA_SendOperational_SerialCmd(ptrA);            // on envoie la partie serielle de la commande operationnelle (elle est stockée dans une autre partie de la RAM en vhd)// ensuite on envoie la partie serielle de la commande pour la RAM vhd
-
-   PRINTF("gFr_dly = %d \n",(uint16_t)(gFr_dly*1E+6F));
-   PRINTF("gIntg_dly = %d \n",(uint16_t)(gIntg_dly*1E+6F));
 }
 
 //--------------------------------------------------------------------------                                                                            

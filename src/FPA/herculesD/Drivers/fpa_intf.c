@@ -112,6 +112,12 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AR_FPA_TEMPERATURE                0x002C  // adresse temperature
 #define AR_FPA_INT_TIME                   0x00C0  // adresse temps d'intégration
 
+// BB1280 (n'est pas utilisé par le Hercule): adresse d'ecriture de la config diag du manufacturier
+#define AW_FPA_SCD_FRAME_RES_ADD          0xA0
+
+// BB1280 (n'est pas utilisé par le Hercule) : adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
+#define AW_FPA_SCD_IDDC_RDY_ADD           0xA4
+
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
 
@@ -200,6 +206,14 @@ struct ScdPacketTx_s             //
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
 
+// statuts privés du module fpa
+struct s_FpaPrivateStatus
+{
+   uint32_t fpa_frame_resolution;
+};
+typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
+
+
 // Global variables
 t_FpaPrivateStatus gPrivateStat;
 uint8_t FPA_StretchAcqTrig = 0;
@@ -219,6 +233,7 @@ void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
+void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 
 // Global variables (Only used for BB1280)
 uint32_t gSCD_frame_dly = 0;
@@ -236,6 +251,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+   FPA_iddca_rdy(ptrA, true);                                               // Always true for HerculeD (only used by BB1280) 
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
@@ -246,6 +262,18 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 
 void FPA_SetFrameResolution(t_FpaIntf *ptrA)// TODO : A supprimer après le debug de BB1280
 {
+}
+
+//*--------------------------------------------------------------------------
+//   Not used by Hercule (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+  }
 }
 
 //--------------------------------------------------------------------------

@@ -62,8 +62,9 @@ entity scd_serial_module is
       RX_RD_EN              : out std_logic;      
       RX_ERR                : in std_logic;
       
-      READOUT               : in std_logic
+      READOUT               : in std_logic; 
       
+      BB1280_IDDCA_RDY      : in std_logic  -- Étrangement, le proxy répond  des failure responses lors de l'envoi de commdande OP tant que l'IDDC n'a pas atteint sa température de consigne (on veut pouvoir les ignorer).
       
       );
 end scd_serial_module;
@@ -753,6 +754,12 @@ begin
                      resp_err(2) <= '1';
                      cmd_resp_fsm <= wait_resp_hder_st;
                   end if;
+                  
+                  if BB1280_IDDCA_RDY = '0' then
+                     proxy_serial_err <= '0';
+                     resp_err <= (others => '0');
+                  end if;
+                  
                
                when fpa_temp_resp_st =>  -- extraction de la température raw 
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 

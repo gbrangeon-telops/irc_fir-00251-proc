@@ -189,7 +189,7 @@ package Proxy_define is
       fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
-      scd_int_cfg_enable   : std_logic;               -- Active l'envoi de config de temps d'intégration (pour BB1280 seulement)
+      bb1280_iddca_rdy     : std_logic;               -- Active l'envoi de config de temps d'intégration (pour BB1280 seulement)
    end record;    
    
    ----------------------------------------------								

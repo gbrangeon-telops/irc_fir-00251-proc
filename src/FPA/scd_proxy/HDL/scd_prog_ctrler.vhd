@@ -58,7 +58,9 @@ entity scd_prog_ctrler is
       INT_TIME             : out std_logic_vector(24 downto 0);
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
-      RST_CLINK_N          : out std_logic
+      RST_CLINK_N          : out std_logic;
+      BB1280_IDDCA_RDY     : out std_logic
+      
       );                 
 end scd_prog_ctrler;
 
@@ -122,7 +124,9 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
-   signal scd_int_cfg_enable_i      : std_logic := '0';
+   signal bb1280_iddca_rdy_i          : std_logic := '0'; 
+   
+   
    
    
 
@@ -137,35 +141,37 @@ architecture rtl of scd_prog_ctrler is
 --   attribute keep of fpa_intf_cfg_i                 : signal is "true";   
 --   attribute keep of reset_clink_n                  : signal is "true"; 
 begin
-  
+      
    NO_FRAME_RES_CONFIG_NEEDED : if (PROXY_NEED_FRAME_RES_CONFIG = '0') generate -- PelicanD & HerculeD
    begin  
       init_check_cfg_st    <= check_cfg_st2;
-      init_cfg_updater_st  <= check_cfg_st2;
-      scd_int_cfg_enable_i <= '1'; 
+      init_cfg_updater_st  <= check_cfg_st2; 
    end generate;
+   
    FRAME_RES_CONFIG_NEEDED : if (PROXY_NEED_FRAME_RES_CONFIG = '1') generate  -- Blackbird1280D
    begin  
       init_check_cfg_st    <= check_cfg_st1;
       init_cfg_updater_st  <= check_cfg_st1;  
-      scd_int_cfg_enable_i <= USER_CFG.scd_int_cfg_enable;
-   end generate;
+   end generate;  
+   
+
    
    -------------------------------------------------
    -- mappings                                                   
    -------------------------------------------------
-   SERIAL_BASE_ADD <= serial_base_add_i;
-   SERIAL_EN <= serial_en_i;
-   SERIAL_ABORT <= serial_abort_i;
-   INT_INDX <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
-   FRAME_ID <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT
-   ACQ_INT <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
-   FPA_INT <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
-   PROXY_TRIG <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_driver_output 
-   FPA_INTF_CFG <= fpa_intf_cfg_i;  -- sortie de la config
-   RST_CLINK_N <= reset_clink_n;
-   INT_TIME <= int_time_i;
-   
+   SERIAL_BASE_ADD  <= serial_base_add_i;
+   SERIAL_EN        <= serial_en_i;
+   SERIAL_ABORT     <= serial_abort_i;
+   INT_INDX         <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
+   FRAME_ID         <= std_logic_vector(frame_id_i);  --  synchronsié avec ACQ_INT
+   ACQ_INT          <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
+   FPA_INT          <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
+   PROXY_TRIG       <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_driver_output 
+   FPA_INTF_CFG     <= fpa_intf_cfg_i;  -- sortie de la config
+   RST_CLINK_N      <= reset_clink_n;
+   INT_TIME         <= int_time_i; 
+   BB1280_IDDCA_RDY <= bb1280_iddca_rdy_i;
+    
                   
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
    FPA_DRIVER_STAT(15 downto 8) <= id_cmd_in_err;
@@ -203,7 +209,7 @@ begin
          else                  
             PROXY_PWR <= FPA_POWER; 
             fpa_powered <= PROXY_POWERED and PROXY_RDY;  -- PROXY_POWERED signifie que le proxy est juste allumé. PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès.              
-            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
+            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done and bb1280_iddca_rdy_i;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
          end if;          
       end if;
    end process;
@@ -225,8 +231,10 @@ begin
             
             user_cfg_in_progress_i <= USER_CFG_IN_PROGRESS;  -- user_cfg_in_progress_i est requis pour une sychro parfaite avec new_fpa_word
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
-            
-            -- on retient les champs de la config qui requierent une programmation du détecteur
+            user_cfg_in_progress_last <= user_cfg_in_progress_i;
+            bb1280_iddca_rdy_i <= USER_CFG.bb1280_iddca_rdy;
+ 
+           -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
             new_cfg.scd_op        <= USER_CFG.SCD_OP;   
             new_cfg.scd_int       <= USER_CFG.SCD_INT;  
@@ -254,7 +262,7 @@ begin
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_int /= present_cfg.scd_int and scd_int_cfg_enable_i = '1' then
+                  if new_cfg.scd_int /= present_cfg.scd_int and bb1280_iddca_rdy_i = '1' then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;  

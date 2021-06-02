@@ -501,7 +501,6 @@ begin
             reset_err_i<= '0';
             fpa_softw_stat_i.fpa_input <= LVDS25; -- normaement c'est un mesureur de la tension de la banque du FPGA qui doit forunir cette info (sera fait dans sur une carte ADC). Mais pour la carte ACQ ce n'Est pas le cas.
             ctrled_reset_i <= '1';
-            user_cfg_i.scd_int_cfg_enable <= '0';
          else 
             
             ctrled_reset_i <= '0';
@@ -575,8 +574,8 @@ begin
                         -- BB1280 only : frame resolution configuration 
                         when X"A0" =>    mb_struct_cfg.scd_frame_res.cfg_num <= data_i(mb_struct_cfg.scd_frame_res.cfg_num'length-1 downto 0); mb_cfg_rqst <= '1';                    
                        
-                        -- BB1280 only : exposure time configuration activation
-                        when X"A4" =>    user_cfg_i.scd_int_cfg_enable <= data_i(0);                   
+                        -- BB1280 only : Steady state temp reach and init config sequence done (OP CMD & FRAME_RES CMD)
+                        when X"A4" =>    user_cfg_i.bb1280_iddca_rdy <= data_i(0);  
 
                         -- trig lecture de temperatur(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.scd_temp.scd_temp_read_num <= unsigned(data_i(mb_struct_cfg.scd_temp.scd_temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';

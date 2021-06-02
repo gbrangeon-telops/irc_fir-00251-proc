@@ -467,11 +467,11 @@ void Acquisition_SM()
             {
                if (fpaStatus.adc_ddc_present == 1)
                {
-                  builtInTests[BITID_SensorControllerDetection].result = BITR_Passed;
-                  ACQ_INF("ADC or DDC detected in %dms.", elapsed_time_us(tic_timeout) / 1000);
-                  GETTIME(&tic_timeout);
-                  ACQ_INF("Waiting for cooler voltage to be available...");
-                  acquisitionState = ACQ_WAITING_FOR_COOLER_VOLTAGE;
+                     builtInTests[BITID_SensorControllerDetection].result = BITR_Passed;
+                     ACQ_INF("ADC or DDC detected in %dms.", elapsed_time_us(tic_timeout) / 1000);
+                     GETTIME(&tic_timeout);
+                     ACQ_INF("Waiting for cooler voltage to be available...");
+                     acquisitionState = ACQ_WAITING_FOR_COOLER_VOLTAGE;
                }
                else
                {
@@ -617,14 +617,20 @@ void Acquisition_SM()
                     (sensorTemp < cooldownTempTarget + FPA_COOLER_TEMP_TOL) &&
                     (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
                {
-                  builtInTests[BITID_Cooldown].result = BITR_Passed;
-                  ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
-                     ((uint32_t) elapsed_time_us( tic_cooldownStart )) / 1000000);
-                  TDCStatusClr(WaitingForCoolerMask);
-                  ACQ_INF("Waiting for sensor initialization...");
-                  acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
+
+                     #ifdef SCD_BLACKBIRD1280D
+                       FPA_ConfigureFrameResolution(&fpaStatus, &gFpaIntf, &gcRegsData);
+                       GETTIME(&tic_fpaInitTimeout);
+                     #endif
+
+                     builtInTests[BITID_Cooldown].result = BITR_Passed;
+                     ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
+                        ((uint32_t) elapsed_time_us( tic_cooldownStart )) / 1000000);
+                     TDCStatusClr(WaitingForCoolerMask);
+                     ACQ_INF("Waiting for sensor initialization...");
+                     acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
+                  }
                }
-            }
             GETTIME(&tic_cooldownSampling);
          }
          break;
@@ -637,9 +643,6 @@ void Acquisition_SM()
             {
                builtInTests[BITID_SensorInitialization].result = BITR_Passed;
                ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
-               #ifdef SCD_BLACKBIRD1280D
-                  FPA_ConfigureFrameResolution(&fpaStatus, &gFpaIntf, &gcRegsData);
-               #endif
                acquisitionState = ACQ_FINALIZE_POWER_ON;
             }
             else
