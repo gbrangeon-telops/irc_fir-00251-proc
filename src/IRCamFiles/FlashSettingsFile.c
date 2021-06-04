@@ -473,6 +473,11 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 10;
 
                case 10:
+                  // 2.10.x -> 2.11.x
+                  hdr->CenterImageForced = FlashSettings_FlashSettingsFileHeader_default.CenterImageForced;
+                  hdr->FileStructureMinorVersion = 11;
+
+               case 11:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

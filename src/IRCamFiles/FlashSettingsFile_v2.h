@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.10.0
+ * Generated from the flash settings file structure definition XLS file version 2.11.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      10
+#define FLASHSETTINGS_FILEMINORVERSION_V2      11
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -194,6 +194,7 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint8_t GPSDisabled;   /**< Disables the GPS functionality. */
    uint8_t SFWDisabled;   /**< Disables the synchronously rotating filter wheel functionality. */
    uint8_t SDIDisabled;   /**< Disables the SDI functionality. */
+   uint8_t CenterImageForced;   /**< Forces the automatic centering of the image. */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
 };
 

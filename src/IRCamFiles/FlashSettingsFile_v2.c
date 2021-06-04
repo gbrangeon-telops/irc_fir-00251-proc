@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.10.0
+ * Generated from the flash settings file structure definition XLS file version 2.11.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -188,6 +188,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* GPSDisabled = */ 0,
    /* SFWDisabled = */ 0,
    /* SDIDisabled = */ 0,
+   /* CenterImageForced = */ 0,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -414,7 +415,8 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->GPSDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->SFWDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->SDIDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 65; // Skip FREE space
+      memcpy(&hdr->CenterImageForced, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 64; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -674,7 +676,8 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->GPSDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->SFWDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->SDIDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 65); numBytes += 65; // FREE space
+      memcpy(&buffer[numBytes], &hdr->CenterImageForced, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 64); numBytes += 64; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -882,6 +885,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("GPSDisabled: %u\n", hdr->GPSDisabled);
    FPGA_PRINTF("SFWDisabled: %u\n", hdr->SFWDisabled);
    FPGA_PRINTF("SDIDisabled: %u\n", hdr->SDIDisabled);
+   FPGA_PRINTF("CenterImageForced: %u\n", hdr->CenterImageForced);
    FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);
 }
 

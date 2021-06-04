@@ -1160,6 +1160,50 @@ void FPA_GetStatus(t_FpaStatus *Stat, t_FpaIntf *ptrA)
    Stat->int_to_int_delay_max          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xB8);    
    Stat->fast_hder_cnt                 = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xBC);
    
+   Stat->integration_time             = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0xC0);
+   
+   Stat->raw_area_line_start_num        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0C4);
+   Stat->raw_area_line_end_num          = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0C8);
+   Stat->raw_area_sof_posf_pclk         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0CC);
+   Stat->raw_area_eof_posf_pclk         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0D0);
+   Stat->raw_area_sol_posl_pclk         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0D4);
+   Stat->raw_area_eol_posl_pclk         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0D8);
+   Stat->raw_area_eol_posl_pclk_p1      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0DC);
+   Stat->raw_area_window_lsync_num      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0E0);
+   Stat->raw_area_line_period_pclk      = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0E4);
+   Stat->raw_area_readout_pclk_cnt_max  = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0E8);                                           
+   Stat->user_area_line_start_num       = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0EC);
+   Stat->user_area_line_end_num         = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0F0);
+   Stat->user_area_sol_posl_pclk        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0F4);
+   Stat->user_area_eol_posl_pclk        = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0F8);
+   Stat->user_area_eol_posl_pclk_p1     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x0FC);                                   
+   Stat->stretch_area_sol_posl_pclk     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x100);
+   Stat->stretch_area_eol_posl_pclk     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + 0x104);
+
+   
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_line_start_num            = %d", Stat->raw_area_line_start_num           );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_line_end_num              = %d", Stat->raw_area_line_end_num             );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_sof_posf_pclk             = %d", Stat->raw_area_sof_posf_pclk            );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_eof_posf_pclk             = %d", Stat->raw_area_eof_posf_pclk            );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_sol_posl_pclk             = %d", Stat->raw_area_sol_posl_pclk            );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_eol_posl_pclk             = %d", Stat->raw_area_eol_posl_pclk            );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_eol_posl_pclk_p1          = %d", Stat->raw_area_eol_posl_pclk_p1         );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_window_lsync_num          = %d", Stat->raw_area_window_lsync_num         );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_line_period_pclk          = %d", Stat->raw_area_line_period_pclk         );
+//   FPA_PRINTF("fpa_intf_cfg.raw_area_readout_pclk_cnt_max      = %d", Stat->raw_area_readout_pclk_cnt_max     );
+//   FPA_PRINTF("fpa_intf_cfg.user_area_line_start_num           = %d", Stat->user_area_line_start_num          );
+//   FPA_PRINTF("fpa_intf_cfg.user_area_line_end_num             = %d", Stat->user_area_line_end_num            );
+//   FPA_PRINTF("fpa_intf_cfg.user_area_sol_posl_pclk            = %d", Stat->user_area_sol_posl_pclk           );
+//   FPA_PRINTF("fpa_intf_cfg.user_area_eol_posl_pclk            = %d", Stat->user_area_eol_posl_pclk           );
+//   FPA_PRINTF("fpa_intf_cfg.user_area_eol_posl_pclk_p1         = %d", Stat->user_area_eol_posl_pclk_p1        );
+//   FPA_PRINTF("fpa_intf_cfg.stretch_area_sol_posl_pclk         = %d", Stat->stretch_area_sol_posl_pclk        );
+//   FPA_PRINTF("fpa_intf_cfg.stretch_area_eol_posl_pclk         = %d", Stat->stretch_area_eol_posl_pclk        );
+                                                                        
+   
+   
+   
+   
+   
    // generation de fpa_init_done et fpa_init_success
    Stat->fpa_init_success = (Stat->hw_init_success & sw_init_success);
    Stat->fpa_init_done = (Stat->hw_init_done & sw_init_done);

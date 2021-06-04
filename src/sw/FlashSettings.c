@@ -534,6 +534,19 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       TDCFlags2Set(VideoOutputIsImplementedMask);
    }
 
+   // Update Centered Images
+   if (p_flashSettings->CenterImageForced)
+   {
+      // Centered Images are locked. Make sure CenterImage is set.
+      gcRegsData.LockedCenterImage = 1;
+      GC_SetCenterImage(1);
+   }
+   else
+   {
+      // Centered Images are locked according to default value. CenterImage keeps the same value.
+      gcRegsData.LockedCenterImage = gcRegsDataFactory.LockedCenterImage;
+   }
+
    // Update ExposureTimeMin register
    GC_UpdateExposureTimeMin();
 

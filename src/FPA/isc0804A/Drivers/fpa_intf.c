@@ -855,10 +855,10 @@ void FPA_SpecificParams(isc0804_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->unused_area_clock_factor    =  MAX(1.0F, ((float)ROIC_UNUSED_AREA_FAST_CLK_RATE_HZ/(float)FPA_MCLK_RATE_HZ)*(float)speedup_unused_area);
    ptrH->roic_xsize                  = (float)FPA_WIDTH_MAX;
    // fenetre qui sera demandée au ROIC du FPA
-//   if ((uint8_t)FPA_FORCE_CENTER == 1)
+//   if (pGCRegs->CenterImage)
       ptrH->roic_xstart = ((float)FPA_WIDTH_MAX - ptrH->roic_xsize)/2.0F;          // à cause du centrage
 //   else
-// ptrH->roic_xstart    = (ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)*floorf(pGCRegs->OffsetX/(ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)); // on prend le multiple de 32 immediatement inférieur à OffsetX    
+//      ptrH->roic_xstart = (ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)*floorf(pGCRegs->OffsetX/(ptrH->tap_number*ptrH->pixnum_per_tap_per_mclk)); // on prend le multiple de 32 immediatement inférieur à OffsetX
    
    ptrH->roic_ystart    = (uint32_t)pGCRegs->OffsetY;
    ptrH->roic_ysize     = (float)pGCRegs->Height;

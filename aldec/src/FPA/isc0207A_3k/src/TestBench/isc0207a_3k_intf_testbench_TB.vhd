@@ -62,7 +62,7 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_85M_PERIOD          : time := 11.765 ns;
-   constant ACQ_TRIG_PERIOD         : time := 10.000 us;
+   constant ACQ_TRIG_PERIOD         : time := 100.000 us;
    constant DOUT_CLK_PERIOD         : time := 11.765 ns;
    
    
@@ -91,7 +91,9 @@ architecture TB_ARCHITECTURE of isc0207a_3k_intf_testbench_tb is
    
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
-   signal ACQ_TRIG : STD_LOGIC := '0';
+   signal ACQ_TRIG    : STD_LOGIC := '0';
+   signal acq_trig_i  : STD_LOGIC := '0';
+   signal acq_trig_ii : STD_LOGIC := '0';
    signal ACQ_TRIGi : STD_LOGIC := '0';
    signal ACQ_TRIG_EN : STD_LOGIC := '0';
    signal ARESET : STD_LOGIC;
@@ -274,7 +276,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(30000, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(100, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -298,17 +300,17 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVTTL50;        
          
          -- cfg usager
-         user_xsize1 <= 320;
-         user_ysize1 <= 256;
+         user_xsize1 <= 64;
+         user_ysize1 <= 4;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 320;
-         user_ysize2 <= 256;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         user_xsize2 <= 64;
+         user_ysize2 <= 4;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 1);
          
          user_xsize3 <= 128;
          user_ysize3 <= 4;
-         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3);
+         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 1);
          
          -- dac       
          vdac_value_1               	<= to_unsigned(11630, 32); 
@@ -398,7 +400,7 @@ begin
       wait for 50 ns;
       
       
-      wait for 8 ms;
+      wait for 5 ms;
       
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      
@@ -408,7 +410,7 @@ begin
          wait for 30 ns;
       end loop; 
       
-      wait for 8 ms;
+      wait for 5 ms;
       
       for ii in 0 to 87-1 loop 
          wait until rising_edge(MB_CLK);      

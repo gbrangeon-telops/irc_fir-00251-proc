@@ -258,7 +258,26 @@ struct s_FpaStatus    //
    uint32_t  trig_to_int_delay_max;
    uint32_t  int_to_int_delay_min;
    uint32_t  int_to_int_delay_max; 
-   uint32_t  fast_hder_cnt; 
+   uint32_t  fast_hder_cnt;
+   uint32_t  integration_time;
+   
+   uint32_t raw_area_line_start_num        ;
+   uint32_t raw_area_line_end_num          ;
+   uint32_t raw_area_sof_posf_pclk         ;
+   uint32_t raw_area_eof_posf_pclk         ;
+   uint32_t raw_area_sol_posl_pclk         ;
+   uint32_t raw_area_eol_posl_pclk         ;
+   uint32_t raw_area_eol_posl_pclk_p1      ;
+   uint32_t raw_area_window_lsync_num      ;
+   uint32_t raw_area_line_period_pclk      ;
+   uint32_t raw_area_readout_pclk_cnt_max  ;
+   uint32_t user_area_line_start_num       ;
+   uint32_t user_area_line_end_num         ;
+   uint32_t user_area_sol_posl_pclk        ;
+   uint32_t user_area_eol_posl_pclk        ;
+   uint32_t user_area_eol_posl_pclk_p1     ;
+   uint32_t stretch_area_sol_posl_pclk     ;
+   uint32_t stretch_area_eol_posl_pclk     ;
    
 };
 typedef struct s_FpaStatus t_FpaStatus;
