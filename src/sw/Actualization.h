@@ -277,6 +277,7 @@ typedef struct
    bool verbose;
    bool forceDiscardOffset;
    uint32_t mode; // bit mask, default to 0
+   float actFrameRate;  // in FPS
 } actDebugOptions_t;
 
 // actDebugOptions_t.mode switches

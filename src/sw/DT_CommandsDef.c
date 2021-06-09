@@ -919,6 +919,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
    extern actDebugOptions_t gActDebugOptions;
    uint32_t cmd = 1000;
    uint32_t value;
+   float fValue;
    uint8_t argStr[11];
    uint32_t arglen;
 
@@ -944,6 +945,8 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       cmd = 8;
    else if (strcasecmp((char*)argStr, "LST") == 0) // List all actualization in memory and flash memory
       cmd = 9;
+   else if (strcasecmp((char*)argStr, "FR") == 0)  // set acquisition frame rate during actualization
+      cmd = 10;
 
    switch (cmd)
    {
@@ -1005,26 +1008,26 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 3: // clear buffer on/off
-            arglen = GetNextArg(cbuf, argStr, 10);
-            if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+         arglen = GetNextArg(cbuf, argStr, 10);
+         if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+         {
+            DT_ERR("Invalid data length.");
+            return IRC_FAILURE;
+         }
+         else
+         {
+            if (value == 1)
             {
-               DT_ERR("Invalid data length.");
-               return IRC_FAILURE;
+               DT_INF("will clear the buffer after actualisation");
+               gActDebugOptions.clearBufferAfterCompletion = true;
             }
             else
             {
-               if (value == 1)
-               {
-                  DT_INF("will clear the buffer after actualisation");
-                  gActDebugOptions.clearBufferAfterCompletion = true;
-               }
-               else
-               {
-                  DT_INF("will not clear the buffer after actualisation");
-                  gActDebugOptions.clearBufferAfterCompletion = false;
-               }
+               DT_INF("will not clear the buffer after actualisation");
+               gActDebugOptions.clearBufferAfterCompletion = false;
             }
-            break;
+         }
+         break;
 
       case 4: // perform actualization using ICU
          DT_INF("Triggering an actualization (icu)");
@@ -1061,72 +1064,72 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          break;
 
       case 7: // CFG mode
-               arglen = GetNextArg(cbuf, argStr, 10);
-               if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
-               {
-                  // without argument : display the current mode
-                  value = gActDebugOptions.mode;
-               }
-               else
-                  gActDebugOptions.mode = value;
+         arglen = GetNextArg(cbuf, argStr, 10);
+         if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+         {
+            // without argument : display the current mode
+            value = gActDebugOptions.mode;
+         }
+         else
+            gActDebugOptions.mode = value;
 
-               DT_PRINTF("Actualisation : current mode = 0x%02X", value);
+         DT_PRINTF("Actualisation : current mode = 0x%02X", value);
 
-               if (BitMaskTst(value, ACT_MODE_DEBUG))
-               {
-                  DT_PRINTF("Actualisation : debug mode activated (0x%02X)", ACT_MODE_DEBUG);
-               }
-               else
-               {
-                  DT_PRINTF("Actualisation : debug mode disabled (0x%02X)", ACT_MODE_DEBUG);
-               }
+         if (BitMaskTst(value, ACT_MODE_DEBUG))
+         {
+            DT_PRINTF("Actualisation : debug mode activated (0x%02X)", ACT_MODE_DEBUG);
+         }
+         else
+         {
+            DT_PRINTF("Actualisation : debug mode disabled (0x%02X)", ACT_MODE_DEBUG);
+         }
 
-               if (BitMaskTst(value, ACT_MODE_DELTA_BETA_OFF))
-               {
-                  DT_PRINTF("Actualisation : beta correction disabled (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
-               }
-               else
-               {
-                  DT_PRINTF("Actualisation : beta correction activated (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
-               }
+         if (BitMaskTst(value, ACT_MODE_DELTA_BETA_OFF))
+         {
+            DT_PRINTF("Actualisation : beta correction disabled (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
+         }
+         else
+         {
+            DT_PRINTF("Actualisation : beta correction activated (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
+         }
 
-               if (BitMaskTst(value, ACT_MODE_BP_OFF))
-               {
-                  DT_PRINTF("Actualisation : bad pixel detection disabled (0x%02X)", ACT_MODE_BP_OFF);
-               }
-               else
-               {
-                  DT_PRINTF("Actualisation : bad pixel detection activated (0x%02X)", ACT_MODE_BP_OFF);
-               }
+         if (BitMaskTst(value, ACT_MODE_BP_OFF))
+         {
+            DT_PRINTF("Actualisation : bad pixel detection disabled (0x%02X)", ACT_MODE_BP_OFF);
+         }
+         else
+         {
+            DT_PRINTF("Actualisation : bad pixel detection activated (0x%02X)", ACT_MODE_BP_OFF);
+         }
 
-               if (BitMaskTst(value, ACT_MODE_DYN_TST_PTRN))
-               {
-                  DT_PRINTF("Actualisation : dynamic test pattern is ON (0x%02X)", ACT_MODE_DYN_TST_PTRN);
-               }
-               else
-               {
-                  DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
-               }
+         if (BitMaskTst(value, ACT_MODE_DYN_TST_PTRN))
+         {
+            DT_PRINTF("Actualisation : dynamic test pattern is ON (0x%02X)", ACT_MODE_DYN_TST_PTRN);
+         }
+         else
+         {
+            DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
+         }
 
-               if (BitMaskTst(value, ACT_MODE_VERBOSE))
-               {
-                  DT_PRINTF("Actualisation : verbose is ON (0x%02X)", ACT_MODE_VERBOSE);
-               }
-               else
-               {
-                  DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
-               }
+         if (BitMaskTst(value, ACT_MODE_VERBOSE))
+         {
+            DT_PRINTF("Actualisation : verbose is ON (0x%02X)", ACT_MODE_VERBOSE);
+         }
+         else
+         {
+            DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
+         }
 
-               if (BitMaskTst(value, ACT_MODE_DISCARD_OFFSET))
-               {
-                  DT_PRINTF("Actualisation : force discard delta beta offset is ON (0x%02X)", ACT_MODE_DISCARD_OFFSET);
-               }
-               else
-               {
-                  DT_PRINTF("Actualisation : force discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
-               }
+         if (BitMaskTst(value, ACT_MODE_DISCARD_OFFSET))
+         {
+            DT_PRINTF("Actualisation : force discard delta beta offset is ON (0x%02X)", ACT_MODE_DISCARD_OFFSET);
+         }
+         else
+         {
+            DT_PRINTF("Actualisation : force discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
+         }
 
-               break;
+         break;
 
       case 8:
          DT_PRINTF("Cancelling current actualization");
@@ -1135,6 +1138,27 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
 
       case 9:
          ACT_listActualizationData();
+         break;
+
+      case 10: // FR value
+         arglen = GetNextArg(cbuf, argStr, 10);
+         if (ParseFloatNumDec((char *)argStr, arglen, &fValue) != IRC_SUCCESS)
+         {
+            DT_ERR("Invalid data length.");
+            return IRC_FAILURE;
+         }
+         else
+         {
+            if (fValue < gcRegsData.AcquisitionFrameRateMin)
+            {
+               gActDebugOptions.actFrameRate = fValue;   // limited to FRmax when set
+            }
+            else
+            {
+               DT_ERR("Invalid frame rate value");
+               return IRC_FAILURE;
+            }
+         }
          break;
 
       default:
@@ -2692,7 +2716,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Camera status:      STATUS");
    DT_PRINTF("  Power status:       POWER");
    DT_PRINTF("  Network status:     NET [0|1 [port]]");
-   DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST");
+   DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST|FR [value]");
    DT_PRINTF("  List files:         LS [FILE|COL|BLOCK|NL|ICU|ACT]");
    DT_PRINTF("  Remove file:        RM filename");
    DT_PRINTF("  File order:         FO FILE|COL|BLOCK|NL|ICU|ACT [NONE|POSIX|TYPE|NAME|CTYPE|FW|NDF|LENS|FOV]");

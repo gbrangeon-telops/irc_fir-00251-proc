@@ -706,7 +706,7 @@ IRC_Status_t Actualization_SM()
          {
             // set the starting point for the exposure time (from ICU block)
             gcRegsData.ExposureTime = (float)blockInfo->ExposureTime * CALIBBLOCK_EXP_TIME_TO_US;
-            GC_SetAcquisitionFrameRate(MAX(ACT_DEFAULT_FPS, (float)blockInfo->AcquisitionFrameRate/1000.0F));
+            GC_SetAcquisitionFrameRate(MAX(gActDebugOptions.actFrameRate, (float)blockInfo->AcquisitionFrameRate/1000.0F));
          }
          else
          {
@@ -727,7 +727,7 @@ IRC_Status_t Actualization_SM()
                gcRegsData.ExposureTime = FPA_DEFAULT_EXPOSURE;
             }
 
-            GC_SetAcquisitionFrameRate(ACT_DEFAULT_FPS);
+            GC_SetAcquisitionFrameRate(gActDebugOptions.actFrameRate);
 
             // Move the focus lens
             if (TDCFlagsTst(MotorizedFocusLensIsImplementedMask))
@@ -3401,6 +3401,7 @@ void ACT_resetDebugOptions()
 #else
    gActDebugOptions.verbose = false;
 #endif
+   gActDebugOptions.actFrameRate = ACT_DEFAULT_FPS;
 }
 
 void ACT_parseDebugMode()
