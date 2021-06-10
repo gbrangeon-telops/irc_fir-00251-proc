@@ -2,19 +2,19 @@
 
 
 ############################### GT LOC ###################################
-# IMPORTANT : Proccessing fpga can be build with or without a mgt for video streaming. A choice must be made between two set of constraints. 
+# IMPORTANT : Proccessing fpga can be build with or without a mgt for video streaming. A choice must be made between two set of constraints.
 
-	# Use the following contraints for a build without the video mgt (when MGT_2CH = false on top bde) 
+# Use the following contraints for a build without the video mgt (when MGT_2CH = false on top bde)
 #	set_logic_unconnected [get_ports {VIDEO_UPLINK_N[0]}]
-#	set_logic_unconnected [get_ports {VIDEO_UPLINK_N[1]}] 
+#	set_logic_unconnected [get_ports {VIDEO_UPLINK_N[1]}]
 #	set_logic_unconnected [get_ports {VIDEO_UPLINK_P[0]}]
-#	set_logic_unconnected [get_ports {VIDEO_UPLINK_P[1]}] 
+#	set_logic_unconnected [get_ports {VIDEO_UPLINK_P[1]}]
 
-	#Use the following contraints for a build with the video mgt (when MGT_2CH = true on top bde) 
-	set_property PACKAGE_PIN K1 [get_ports {VIDEO_UPLINK_N[0]}]
+#Use the following contraints for a build with the video mgt (when MGT_2CH = true on top bde)
+set_property PACKAGE_PIN K1 [get_ports {VIDEO_UPLINK_N[0]}]
 #	set_property PACKAGE_PIN H1 [get_ports {VIDEO_UPLINK_N[1]}]
-	
-	
+
+
 ###############  DETECTOR INTERFACE  #############
 set_property PACKAGE_PIN N23 [get_ports CH0_CLK_N]
 set_property IOSTANDARD LVDS_25 [get_ports CH0_CLK_P]
@@ -58,10 +58,10 @@ set_property PACKAGE_PIN R17 [get_ports {CH2_DATA_N[3]}]
 
 ##################### DETECTOR ################################
 
-set_property PACKAGE_PIN M26 [get_ports DET_RESET_SYS_N] 
+set_property PACKAGE_PIN N24 [get_ports DET_RESET_SYS_N]
 set_property IOSTANDARD LVCMOS25 [get_ports DET_RESET_SYS_N]
 
-set_property PACKAGE_PIN N26 [get_ports DET_FPGA_DONE]
+set_property PACKAGE_PIN P24 [get_ports DET_FPGA_DONE]
 set_property IOSTANDARD LVCMOS25 [get_ports DET_FPGA_DONE]
 
 set_property PACKAGE_PIN M20 [get_ports F_SYNC_N]
@@ -111,3 +111,4 @@ set_property IOSTANDARD LVCMOS25 [get_ports DET_SPI2]
 #SPI3
 set_property PACKAGE_PIN AF24 [get_ports DET_SPI3]
 set_property IOSTANDARD LVCMOS25 [get_ports DET_SPI3]
+
