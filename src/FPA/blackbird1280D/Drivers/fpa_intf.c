@@ -41,9 +41,11 @@
 #define MODE_ITR_INT_END_TO_TRIG_START      0x04
 #define MODE_ALL_END_TO_TRIG_START          0x05
 
-// Operational command parameters default value (D15F0002 REV3 section 3.2.3.2)
+// Operational command parameters (D15F0002 REV3 section 3.2.3.2)
 #define OP_CMD_FRAME_DLY_DEFAULT            10E-6F // "Frame read delay" parameter, in seconds
-#define OP_CMD_INTG_DLY_DEFAULT              5E-6F // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
+#define OP_CMD_INTG_DLY_DEFAULT             200E-6F // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
+#define MODEL_CORR_FACTOR_IWR_M200hd        0.949F
+#define MODEL_CORR_FACTOR_IWR_M100hd        1.7F
 
 // "Boost mode off" parameter
 #define OP_CMD_BOOST_MODE                   0x00 // "Boost mode off" is activated  (specific delay added to prevent image obstruction)
@@ -273,9 +275,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
-   FPA_SetFrameResolution(ptrA); // On change la résolution de frame
-   FPA_SendConfigGC(ptrA, pGCRegs); // On configure le proxy avec des paramètres cohérents avec la nouvelle résolution de frame.
-   FPA_iddca_rdy(ptrA, true); // On active l'envoi de commande de configuration de temps d'exposition.
+   FPA_SetFrameResolution(ptrA);
+   FPA_SendConfigGC(ptrA, pGCRegs);
 }
 
 
@@ -283,7 +284,7 @@ void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegister
 //   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and the first detector loan by SCD (loan detector was not fully operational).
 //   1. No "Integration time command" or "frame resolution command" should be sent before a the first operational command.
 //   2. The serdes initialisation will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
-//       * A operational command command followed by a frame resolution command must have been sent.
+//       * An operational command followed by a frame resolution command must have been sent.
 //       * The fpa temperature must be in steady state (cooldown finish).
 //--------------------------------------------------------------------------
 void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
@@ -369,16 +370,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_spare            = 0;
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig; // Élargit le pulse de trig
 
-   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+  if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
       ptrA->scd_gain             = MEDIUM_GAIN_IWR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
       ptrA->scd_int_mode         = SCD_IWR_MODE;            // Not used in operational command (but used in FPA VHDL module).
    }
-   else{
+   else{// Jamais testé.
       ptrA->scd_gain             = MEDIUM_GAIN_ITR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
       ptrA->scd_int_mode         = SCD_ITR_MODE;            // Not used in operational command (but used in FPA VHDL module).
    }
 
-   // Frame time calculation : define the maximum trig frequency allowed by proxy for this set of operational parameters.
+   // Frame time calculation : define the maximum trig frequency allowed by the proxy for this set of operational parameters.
    fpaAcquisitionFrameRate    = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
    ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * FPA_VHD_INTF_CLK_RATE_HZ);
 
@@ -550,7 +551,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
       if (Ta > 0)
          maxExposure_us = maxExposure_us + Ta*1E6F;
    }
-   else{
+   else{// Jamais testé.
       Ta = hh.fr_dly - hh.intg_dly;
       if (Ta > 0)
          maxExposure_us = maxExposure_us + Ta*1E6F;
@@ -637,18 +638,27 @@ void  FPA_SoftwType(const t_FpaIntf *ptrA)
 void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
    // Consulter le document D15F0002 REV3
-   float corr_factor = ((float)FPA_FPP_CLK_RATE_HZ/(float)FPA_CLINK_CLK_RATE_HZ); // value in datasheet are refered to 70MHz instead of 80 MHz. (TODO : hypothèse non confirmé pour l'instant)
    extern float gFr_dly;
    extern float gIntg_dly;
+
+   float corr_factor;
+
+   if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)
+      corr_factor = MODEL_CORR_FACTOR_IWR_M100hd;
+   else
+      corr_factor = MODEL_CORR_FACTOR_IWR_M200hd;
+
+
+
 
    ptrH->Tfpp_clk          = 1.0F / ((float)FPA_FPP_CLK_RATE_HZ);                         // in second
    ptrH->Tclink_clk        = 1.0F / ((float)FPA_CLINK_CLK_RATE_HZ);                       // in second
    ptrH->frame_resolution  = ((float)gPrivateStat.fpa_frame_resolution)*ptrH->Tfpp_clk;   // in second
    ptrH->exposure_time     = exposureTime_usec*1E-6F;                                     // in second
-   ptrH->adc_conv          = 10.65E-6F*corr_factor;                                       // in second
+   ptrH->adc_conv          = 10.65E-6F*corr_factor;                                 // in second
    ptrH->videoRate         = 2.0F;
    ptrH->ro                = ptrH->adc_conv/ptrH->videoRate;                              // in second
-   ptrH->Tframe_init       = 40E-6F*corr_factor;                                          // in second
+   ptrH->Tframe_init       = 40E-6F*corr_factor;                                    // in second
    ptrH->ro_itr            = ptrH->ro*(2.0F + (float)pGCRegs->Height)+ptrH->Tframe_init;  // in second
    ptrH->fr_dly            = gFr_dly;                                                     // in second
    ptrH->intg_dly          = gIntg_dly;                                                   // in second
@@ -671,7 +681,7 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
       ptrH->x_to_next_fsync  = 315.0E-6F*corr_factor; // Delay between the end of integration or readout (whichever one happening last) and the next fsync
       ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->ro_iwr, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
    }
-   else{
+   else{// Jamais testé.
       ptrH->x_to_next_fsync  = 190.0E-6F*corr_factor; // Delay between the end of readout and the next fsync
       // Here, we assume that the proxy manage the FR_DLY internally in function of the exposure time.
       // Thus, there is no need to send an operational command to adjust FR_DLY when the exposure time change during acquisition.
@@ -744,9 +754,10 @@ void FPA_FrameResolution_StructCmd_V2(const t_FpaIntf *ptrA)
 
 float FPA_ConvertSecondToFrameTimeResolution(float seconds)
 {
-   seconds =  seconds*FPA_FPP_CLK_RATE_HZ; // in 70 MHz clks
-   seconds =  seconds/((float)gPrivateStat.fpa_frame_resolution); // in frame_res
-   return seconds;
+   float regValue;
+   regValue =  seconds*FPA_FPP_CLK_RATE_HZ; // in 70 MHz clks
+   regValue =  regValue/((float)gPrivateStat.fpa_frame_resolution); // in frame_res
+   return regValue;
 }
 
 //------------------------------------------------------
@@ -904,7 +915,6 @@ void FPA_SendFrameResolution_SerialCmd(const t_FpaIntf *ptrA)
 
 void FPA_SendFrameResolution_SerialCmd_V2(const t_FpaIntf *ptrA)
 {
-   uint8_t ii;
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
    extern int32_t gFpaDebugRegC;

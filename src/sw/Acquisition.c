@@ -551,6 +551,11 @@ void Acquisition_SM()
 
          if (sensorTemp != FPA_INVALID_TEMP)
          {
+
+            #ifdef SCD_BLACKBIRD1280D
+              FPA_ConfigureFrameResolution(&fpaStatus, &gFpaIntf, &gcRegsData);
+            #endif
+
             ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
 
             GETTIME(&tic_cooldownStart);
@@ -619,7 +624,7 @@ void Acquisition_SM()
                {
 
                      #ifdef SCD_BLACKBIRD1280D
-                       FPA_ConfigureFrameResolution(&fpaStatus, &gFpaIntf, &gcRegsData);
+                       FPA_iddca_rdy(&gFpaIntf, true);
                        GETTIME(&tic_fpaInitTimeout);
                      #endif
 
