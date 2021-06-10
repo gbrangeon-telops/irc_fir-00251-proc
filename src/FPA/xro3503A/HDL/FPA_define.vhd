@@ -96,7 +96,7 @@ package FPA_define is
    (        0,  9454+100),     -- limites du DAC3 -> VTESTG 0V à 3.3V
    ( 3373-100,  5063+100),     -- limites du DAC4 -> CM 1.5V à 2V
    ( 3373-100,  5063+100),     -- limites du DAC5 -> VCMO 1.5V à 2V
-   (        0,     16383),     -- limites du DAC6 -> TAP_REF not used
+   (        0,     16383),     -- limites du DAC6 -> not connected
    (        0,     16383),     -- limites du DAC7 -> not connected
    (        0,     16383));    -- limites du DAC8 -> not connected
    
