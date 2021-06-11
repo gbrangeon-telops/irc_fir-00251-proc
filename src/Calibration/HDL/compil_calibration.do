@@ -18,12 +18,10 @@ acom -nowarn DAGGEN_0523 \
 
 acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\axil_channels_ctrl.vhd \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\lut_axil_absolute_add.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_config.vhd \
  -relax D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_block_sel.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_param_sequencer.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\param_fifo_block.bde \
- D:\Telops\FIR-00251-Proc\src\Calibration\HDL\param_lut_fifo.bde \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\param16_fifo.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_status_gen.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_fast_hder_gen.vhd \
