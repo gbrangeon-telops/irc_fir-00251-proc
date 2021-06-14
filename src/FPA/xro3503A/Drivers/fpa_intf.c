@@ -227,6 +227,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaCM_mV;
    extern uint16_t gFpaVCMO_mV;
    extern uint16_t gFpaTapRef_mV;
+   extern uint8_t gFpaSubWindowMode;
    static uint8_t cfg_num = 0;
    static uint32_t presentSensorWellDepth = 0;
 
@@ -282,9 +283,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->xstop    = (pGCRegs->OffsetX + pGCRegs->Width - 1) / FPA_NUMTAPS;
    ptrA->ystop    = (pGCRegs->OffsetY + pGCRegs->Height - 1) / 4;
 
-   ptrA->sub_window_mode = 1;
-   if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
-      ptrA->sub_window_mode = 0;
+   if (gFpaSubWindowMode > 1)
+   {
+      // valeur invalide, on utilise le défaut
+      if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
+         ptrA->sub_window_mode = 0;
+      else
+         ptrA->sub_window_mode = 1;
+   }
+   else
+      ptrA->sub_window_mode = gFpaSubWindowMode;
    
    ptrA->read_dir_down = 0;
    ptrA->read_dir_left = 0;

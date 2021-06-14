@@ -619,6 +619,7 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
    extern uint16_t gFpaTapRef_mV;
    extern uint16_t gFpaLovh_mclk;
    extern bool gFpaLovhFlag;
+   extern uint8_t gFpaSubWindowMode;
 
    uint8_t cmdStr[10], argStr[7];
    uint32_t arglen;
@@ -688,6 +689,10 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
          else
             gFpaLovhFlag = false;
       }
+      else if (strcasecmp((char *)cmdStr, "SWM") == 0)
+      {
+         gFpaSubWindowMode = (uint8_t)uValue;
+      }
       else
       {
          DT_ERR("Unsupported command");
@@ -707,6 +712,8 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA TAPREF voltage = %d mV", gFpaTapRef_mV);
 
    DT_PRINTF("FPA LOVH = %d MCLK", gFpaLovh_mclk);
+
+   DT_PRINTF("FPA Sub-window mode = %d", gFpaSubWindowMode);
 
    return IRC_SUCCESS;
 }
@@ -2708,7 +2715,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2|BIAS value]");
-   DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|TAPREF|LOVH value]");
+   DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|TAPREF|LOVH|SWM value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
