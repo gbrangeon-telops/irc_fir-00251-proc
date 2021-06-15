@@ -20,7 +20,7 @@
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 12.9.0
+// Generated from XML camera definition file version 13.0.0
 // using updateGenICamCallback.m Matlab script.
 
 void GC_Callback_Init();
