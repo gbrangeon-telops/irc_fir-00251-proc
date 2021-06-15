@@ -234,6 +234,7 @@ void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
 void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
 
 // Global variables (Only used for BB1280)
 uint32_t gSCD_frame_dly = 0;
@@ -252,6 +253,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_iddca_rdy(ptrA, true);                                               // Always true for HerculeD (only used by BB1280) 
+   FPA_TurnOnProxyFailureResponseManagement(ptrA, true);                    // Always true for HerculeD (only used by BB1280) 
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
@@ -274,6 +276,18 @@ void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
   {
      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
   }
+}
+
+//*--------------------------------------------------------------------------
+//   Not used by Hercule (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+{
+   uint8_t ii;
+   for(ii = 0; ii <= 10 ; ii++)
+   {
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+   }
 }
 
 //--------------------------------------------------------------------------
