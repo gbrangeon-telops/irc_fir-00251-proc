@@ -772,6 +772,9 @@ IRC_Status_t Proc_GC_Init()
 IRC_Status_t Proc_QSPIFlash_Init()
 {
    IRC_Status_t status;
+   static uint8_t iddata[FLASH_ID_SIZE];
+   qspiFlashID_t flashID;
+   const char *labels[] = { "MT25QL128", "MT25QL256", "S25FL256" };
 
    // QSPI flash initialization
    status = QSPIFlash_Init(&gQSPIFlash,
@@ -789,6 +792,22 @@ IRC_Status_t Proc_QSPIFlash_Init()
     */
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_AXI_QUAD_SPI_0_IP2INTC_IRPT_INTR);
 
+   /* Read flash ID */
+   do
+   {
+      status = QSPIFlash_ReadID(&gQSPIFlash, iddata);
+   } while (status == IRC_NOT_DONE);
+   if (status == IRC_FAILURE)
+      return IRC_FAILURE;
+
+   flashID = QSPIFlash_DecodeID(iddata);
+   if (flashID >= QSPIFID_MICRON_UNKNOWN_MEMTYPE)
+   {
+      PRINTF("Unknown NOR Flash detected.");
+      return IRC_FAILURE;
+   }
+
+   PRINTF("%s NOR Flash detected.", labels[flashID]);
    return IRC_SUCCESS;
 }
 
