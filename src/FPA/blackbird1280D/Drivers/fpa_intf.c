@@ -43,13 +43,13 @@
 
 // Operational command parameters (D15F0002 REV3 section 3.2.3.2)
 #define OP_CMD_FRAME_DLY_DEFAULT            10E-6F // "Frame read delay" parameter, in seconds
-#define OP_CMD_INTG_DLY_DEFAULT             200E-6F // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
-#define MODEL_CORR_FACTOR_IWR_M200hd        0.949F
+#define OP_CMD_INTG_DLY_DEFAULT             1E-6F  // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
+#define MODEL_CORR_FACTOR_IWR_M200hd        0.9536F
 #define MODEL_CORR_FACTOR_IWR_M100hd        1.7F
 
 // "Boost mode off" parameter
 #define OP_CMD_BOOST_MODE                   0x00 // "Boost mode off" is activated  (specific delay added to prevent image obstruction)
-#define OP_CMD_NORMAL_MODE                  0x01 // "Boost mode on" is desactivated (no delay added)
+#define OP_CMD_NORMAL_MODE                  0x01 // "Boost mode off" is desactivated (no delay added)
 // "Pixel gain modes" parameter
 #define MEDIUM_GAIN_IWR                     0x00 // default mode
 #define HIGH_GAIN_2_IWR                     0x01
@@ -124,7 +124,8 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
 
 // adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
-#define AW_FPA_SCD_IDDC_RDY_ADD           0xA4
+#define AW_FPA_SCD_IDDC_RDY_ADD                          0xA4
+#define AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD           0xA8
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -247,6 +248,7 @@ void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 float FPA_ConvertSecondToFrameTimeResolution(float seconds);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -260,7 +262,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_iddca_rdy(ptrA, false);                                              // On active l'envoi de commande de configuration de temps d'exposition.
+   FPA_iddca_rdy(ptrA, false);
+   FPA_TurnOnProxyFailureResponseManagement(ptrA, false);
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
@@ -268,7 +271,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
 
    sw_init_done = 1;
-   if(gPrivateStat.fpa_frame_resolution >= 2)
+   if(gPrivateStat.fpa_frame_resolution >= 2 && gPrivateStat.fpa_frame_resolution <= 127) // see D15F0002_3.pdf
       sw_init_success = 1;
 }
  
@@ -294,6 +297,15 @@ void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
   {
      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
   }
+}
+
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+{
+   uint8_t ii;
+   for(ii = 0; ii <= 10 ; ii++)
+   {
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+   }
 }
 
 
@@ -364,7 +376,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (gFpaScdDiodeBiasEnum >= SCD_BIAS_VALUES_NUM)      // Photo-diode bias
       gFpaScdDiodeBiasEnum    = SCD_BIAS_DEFAULT_IDX;    // Corrige une valeur invalide
    ptrA->scd_diode_bias       = Scd_DiodeBiasValues[gFpaScdDiodeBiasEnum];
-   ptrA->scd_boost_mode       = OP_CMD_BOOST_MODE;       // Mode of operation
+   ptrA->scd_boost_mode       = OP_CMD_NORMAL_MODE;       // Mode of operation
    ptrA->scd_pix_res          = SCD_PIX_RESOLUTION_13BITS;
    ptrA->fpa_pwr_on           = 1;                       // Allumage du détecteur (Le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies)
    ptrA->fpa_spare            = 0;
@@ -776,9 +788,18 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirUP         = 1;  // 0 => Up to down (default), 1 => down to up
    uint8_t FRM_SYNC_MOD      = 0;  // 0 => Integ@start, 1 => Integ@end
    uint8_t FPP_power_on_mode = 0;  // 00 => FPP PS On, only at cryogenic temperature (conditional power up)
+   uint32_t diode_bias = 0;
    extern float gFr_dly;
    extern float gIntg_dly;
-   
+   extern int32_t gFpaDebugRegF;
+
+   // Debug
+   if(gFpaDebugRegF != 0)
+      diode_bias = (uint32_t)gFpaDebugRegF;
+   else
+      diode_bias = ptrA->scd_diode_bias;
+  //------------
+
    scd_gain = (uint8_t)(ptrA->scd_gain);
    uint32_t scd_ystart = ptrA->scd_ystart >> 1; // in step of 2 rows
    uint32_t scd_xstart = ptrA->scd_xstart >> 2; // in step of 4 pixels
@@ -822,7 +843,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Data[12]     =  scd_xstart & 0xFF;                // Image Horizontal Offset lsb
    Cmd.Data[13]     = (scd_xstart >> 8) & 0xFF;          // Image Horizontal Offset msb
                         
-   Cmd.Data[14]     =((scd_hder_disable & 0x01) << 7) + ((ptrA->scd_diode_bias & 0x0F) << 3) + (scd_gain & 0x07);
+   Cmd.Data[14]     =((scd_hder_disable & 0x01) << 7) + ((diode_bias & 0x0F) << 3) + (scd_gain & 0x07);
 
    Cmd.Data[15]     =  (uint32_t)Tframe & 0xFF;         // Frame period lsb
    Cmd.Data[16]     = ((uint32_t)Tframe >> 8) & 0xFF;

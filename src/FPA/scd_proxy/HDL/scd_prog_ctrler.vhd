@@ -59,7 +59,7 @@ entity scd_prog_ctrler is
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic;
-      BB1280_IDDCA_RDY     : out std_logic
+      FAILURE_RESP_MNG     : out std_logic
       
       );                 
 end scd_prog_ctrler;
@@ -124,7 +124,8 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
-   signal bb1280_iddca_rdy_i          : std_logic := '0'; 
+   signal bb1280_iddca_rdy_i        : std_logic := '0'; 
+   signal failure_resp_management   : std_logic := '0';
    
    
    
@@ -170,7 +171,7 @@ begin
    FPA_INTF_CFG     <= fpa_intf_cfg_i;  -- sortie de la config
    RST_CLINK_N      <= reset_clink_n;
    INT_TIME         <= int_time_i; 
-   BB1280_IDDCA_RDY <= bb1280_iddca_rdy_i;
+   FAILURE_RESP_MNG <= failure_resp_management;
     
                   
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
@@ -233,7 +234,8 @@ begin
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
             bb1280_iddca_rdy_i <= USER_CFG.bb1280_iddca_rdy;
- 
+            failure_resp_management <= USER_CFG.failure_resp_management;
+            
            -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
             new_cfg.scd_op        <= USER_CFG.SCD_OP;   

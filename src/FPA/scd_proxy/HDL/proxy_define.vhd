@@ -178,18 +178,19 @@ package Proxy_define is
    ------------------------------------------------
    type fpa_intf_cfg_type is
    record     
-      cmd_to_update_id     : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
-      comn                 : fpa_comn_cfg_type;       -- partie commune (utilisée par les modules communs)
-      scd_op               : scd_op_cfg_type;         -- tout changement dans scd_op entraine la programmation du detecteur (commande operationnelle)
-      scd_int              : scd_int_cfg_type;        -- tout changement dans scd_int entraine la programmation du detecteur (commande temps d'intégration)
-      scd_diag             : scd_diag_cfg_type;       -- tout changement dans scd_diag entraine la programmation du detecteur (commande PE Syntehtique)
-      scd_frame_res        : scd_frame_res_cfg_type;  -- tout changement dans scd_frame_res entraine la programmation du detecteur (commande frame resolution)
-      scd_temp             : scd_temp_cfg_type;       -- tout changement dans scd_temp entraine la programmation du detecteur (commande temperature read)  
-      scd_misc             : scd_misc_cfg_type;       -- les changements dans scd_misc ne font pas programmer le detecteur
-      fpa_serdes_lval_num  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
-      fpa_serdes_lval_len  : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
-      int_time             : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
-      bb1280_iddca_rdy     : std_logic;               -- Active l'envoi de config de temps d'intégration (pour BB1280 seulement)
+      cmd_to_update_id        : std_logic_vector(15 downto 0); -- cet ide permet de saoir quelle partie de la commande rentrante est à mettre à jour. Important pour regler bugs
+      comn                    : fpa_comn_cfg_type;       -- partie commune (utilisée par les modules communs)
+      scd_op                  : scd_op_cfg_type;         -- tout changement dans scd_op entraine la programmation du detecteur (commande operationnelle)
+      scd_int                 : scd_int_cfg_type;        -- tout changement dans scd_int entraine la programmation du detecteur (commande temps d'intégration)
+      scd_diag                : scd_diag_cfg_type;       -- tout changement dans scd_diag entraine la programmation du detecteur (commande PE Syntehtique)
+      scd_frame_res           : scd_frame_res_cfg_type;  -- tout changement dans scd_frame_res entraine la programmation du detecteur (commande frame resolution)
+      scd_temp                : scd_temp_cfg_type;       -- tout changement dans scd_temp entraine la programmation du detecteur (commande temperature read)  
+      scd_misc                : scd_misc_cfg_type;       -- les changements dans scd_misc ne font pas programmer le detecteur
+      fpa_serdes_lval_num     : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      fpa_serdes_lval_len     : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
+      int_time                : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
+      bb1280_iddca_rdy        : std_logic;               -- Active l'envoi de config de temps d'intégration et l'initialisation des SERDES (pour BB1280 seulement)
+      failure_resp_management : std_logic;               -- Active la gestion des erreurs suite à la reception d'une "failure response" du proxy
    end record;    
    
    ----------------------------------------------								
