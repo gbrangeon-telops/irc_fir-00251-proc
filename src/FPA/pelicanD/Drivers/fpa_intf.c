@@ -120,6 +120,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 
 // BB1280 (n'est pas utilisé par le Hercule): adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
 #define AW_FPA_SCD_IDDC_RDY_ADD           0xA4
+#define AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD           0xA8
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
