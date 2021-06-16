@@ -788,17 +788,9 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirUP         = 1;  // 0 => Up to down (default), 1 => down to up
    uint8_t FRM_SYNC_MOD      = 0;  // 0 => Integ@start, 1 => Integ@end
    uint8_t FPP_power_on_mode = 0;  // 00 => FPP PS On, only at cryogenic temperature (conditional power up)
-   uint32_t diode_bias = 0;
    extern float gFr_dly;
    extern float gIntg_dly;
-   extern int32_t gFpaDebugRegF;
 
-   // Debug
-   if(gFpaDebugRegF != 0)
-      diode_bias = (uint32_t)gFpaDebugRegF;
-   else
-      diode_bias = ptrA->scd_diode_bias;
-  //------------
 
    scd_gain = (uint8_t)(ptrA->scd_gain);
    uint32_t scd_ystart = ptrA->scd_ystart >> 1; // in step of 2 rows
@@ -843,7 +835,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.Data[12]     =  scd_xstart & 0xFF;                // Image Horizontal Offset lsb
    Cmd.Data[13]     = (scd_xstart >> 8) & 0xFF;          // Image Horizontal Offset msb
                         
-   Cmd.Data[14]     =((scd_hder_disable & 0x01) << 7) + ((diode_bias & 0x0F) << 3) + (scd_gain & 0x07);
+   Cmd.Data[14]     =((scd_hder_disable & 0x01) << 7) + ((ptrA->scd_diode_bias & 0x0F) << 3) + (scd_gain & 0x07);
 
    Cmd.Data[15]     =  (uint32_t)Tframe & 0xFF;         // Frame period lsb
    Cmd.Data[16]     = ((uint32_t)Tframe >> 8) & 0xFF;
