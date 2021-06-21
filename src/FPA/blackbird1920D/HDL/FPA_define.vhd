@@ -40,7 +40,7 @@ package FPA_define is
    
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ           : integer    := DEFINE_FPA_PCLK_RATE_KHZ;
    
-   constant DEFINE_FPA_PIX_SAMPLE_NUM_PER_CH       : integer    := 1;  
+   constant DEFINE_DIAG_PIX_SAMPLE_NUM_PER_CH      : integer    := 1;  
     
    constant XSIZE_MAX                              : integer    := 1920;              -- dimension en X maximale                                      -- dimension en X maximale
    constant YSIZE_MAX                              : integer    := 1536;              -- dimension en Y maximale  
