@@ -1158,12 +1158,12 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          {
             if (fValue < gcRegsData.AcquisitionFrameRateMin)
             {
-               gActDebugOptions.actFrameRate = fValue;   // limited to FRmax when set
+               DT_ERR("Invalid frame rate value");
+               return IRC_FAILURE;
             }
             else
             {
-               DT_ERR("Invalid frame rate value");
-               return IRC_FAILURE;
+               gActDebugOptions.actFrameRate = fValue;   // limited to FRmax when set
             }
          }
          break;
