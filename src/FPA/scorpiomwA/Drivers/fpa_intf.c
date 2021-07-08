@@ -298,7 +298,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // config du contrôleur de trigs
    if (ptrA->itr == 1) {
-      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    }
    else {
@@ -341,8 +341,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //  windowing
    ptrA->sizea_sizeb = 0;           // 0 --> toujours en mode windowing 2020-05-06 ODI: pour conservation de la calibration en sous-fenêtre
-   //if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
-      //ptrA->sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
+   
+   // full_window_mode              // dit si le detecteur est reellement en pleine fentre car on ne peut plus se fier sur sizea_sizeb 
+   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+      ptrA->full_window_mode = 1;        // mode pleine fenetre
 
    //  gain 
    ptrA->gain = FPA_GAIN_0;   	//Low gain only
@@ -363,7 +365,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 0; 
+      gFpaDebugRegF = 7; 
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
       
    // quad2

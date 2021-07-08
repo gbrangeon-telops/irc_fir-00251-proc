@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 57455
+ FREEID 57489
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -69,11 +69,12 @@ HEADER
     #GENERIC1="CLK_PERIOD_NS:real:=12.5"
     #GENERIC2="DATA_WIDTH:integer:=14"
     #GENERIC3="GENERATE_8_CHN:std_logic:='1'"
+    #GENERIC4="G_INVERT_VIDEO_DATA:std_logic:='0'"
     #HDL_ENTRIES=
 "library IEEE;\n"+
 "use ieee.std_logic_1164.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1617747462"
+    #MODIFIED="1625666223"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="cfdeac5c-c060-40b1-b11b-eb5bd8c03524"
    }
   }
@@ -6685,7 +6686,7 @@ PAGE ""
   TEXT  47359, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (2960,2944,2999,2979)
+   RECT (2980,2965,3019,3000)
    ALIGN 8
    MARGINS (1,1)
    PARENT 47358
@@ -7745,10 +7746,11 @@ PAGE ""
    {
     #COMPONENT="afpa_data_deserializer_8chn_v2"
     #CUSTOM_NAME=""
-    #GENERIC0="RESET200ms : boolean := true"
-    #GENERIC1="GENERATE_8_CHN : std_logic := DEFINE_GENERATE_QUAD2_CHAIN"
-    #GENERIC2="DATA_WIDTH : integer := 14"
-    #GENERIC3="CLK_PERIOD_NS : real := ADC_SERDES_CLK_1X_PERIOD_NS"
+    #GENERIC0="CLK_PERIOD_NS : real := ADC_SERDES_CLK_1X_PERIOD_NS"
+    #GENERIC1="RESET200ms : boolean := true"
+    #GENERIC2="GENERATE_8_CHN : std_logic := DEFINE_GENERATE_QUAD2_CHAIN"
+    #GENERIC3="G_INVERT_VIDEO_DATA : std_logic := DEFINE_FPA_VIDEO_DATA_INVERTED"
+    #GENERIC4="DATA_WIDTH : integer := 14"
     #IMPL="sch"
     #LIBRARY="#default"
     #NO_CONF="1"
@@ -7763,7 +7765,7 @@ PAGE ""
   TEXT  51825, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (1740,3085,1779,3120)
+   RECT (1740,3105,1779,3140)
    ALIGN 8
    MARGINS (1,1)
    PARENT 51824
@@ -7778,7 +7780,7 @@ PAGE ""
   TEXT  51827, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (1500,4120,2323,4252)
+   RECT (1500,4120,2432,4285)
    PARENT 51824
   }
   NET WIRE  51866, 0, 0
@@ -16164,7 +16166,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  57438, 0, 0
+  TEXT  57472, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16175,7 +16177,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57439, 0, 0
+  TEXT  57473, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -16186,7 +16188,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  57440, 0, 0
+  TEXT  57474, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -16196,7 +16198,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57441, 0, 0
+  TEXT  57475, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16208,7 +16210,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  57442, 0, 0
+  TEXT  57476, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -16221,7 +16223,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  57443, 0, 0
+  TEXT  57477, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -16231,7 +16233,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57444, 0, 0
+  TEXT  57478, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -16243,7 +16245,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  57445, 0, 0
+  TEXT  57479, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -16253,7 +16255,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  57446, 0, 0
+  TEXT  57480, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -16264,7 +16266,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  57447, 0, 0
+  GROUP  57481, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6220,8601,6601)
@@ -16276,7 +16278,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57448, 0, 0
+  GROUP  57482, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6420,8601,6421)
@@ -16288,7 +16290,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57449, 0, 0
+  GROUP  57483, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6360,8601,6361)
@@ -16300,7 +16302,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57450, 0, 0
+  GROUP  57484, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6480,8601,6481)
@@ -16312,7 +16314,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57451, 0, 0
+  GROUP  57485, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6540,8601,6541)
@@ -16324,7 +16326,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  57452, 0, 0
+  GROUP  57486, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6220,7901,6361)
@@ -16335,7 +16337,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  57453, 0, 0
+  GROUP  57487, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6360,7901,6601)
@@ -16346,7 +16348,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  57454, 0, 0
+  BMPPICT  57488, 0, 0
   {
    PAGEALIGN 10
    RECT (7740,6280,7879,6325)

@@ -200,6 +200,7 @@ package FPA_define is
       windcfg_part4                  : unsigned(7 downto 0);     -- serdat(7 downto 0)  
       uprow_upcol                    : std_logic;
       sizea_sizeb                    : std_logic;
+      full_window_mode               : std_logic;
       
       -- readout mode
       itr                            : std_logic;

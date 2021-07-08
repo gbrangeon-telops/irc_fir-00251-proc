@@ -143,7 +143,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t   fpa_stretch_acq_trig;       
    uint32_t   reorder_column;                  
    uint32_t   fpa_intf_data_source;       
-    int32_t   additional_fpa_int_time_offset;     
+    int32_t   additional_fpa_int_time_offset;
+   uint32_t   full_window_mode;               // dit si le detecteur est rellemnt en pleine fentre car on ne peut plus se fier sur sizea_sizeb
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
  
