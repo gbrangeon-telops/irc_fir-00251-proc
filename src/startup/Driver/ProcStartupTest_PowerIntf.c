@@ -175,9 +175,7 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
    for (channelIndex = PC_PLEORA; channelIndex <= PC_SELFRESET; channelIndex++)
    {
 
-      if (channelIndex != PC_SELFRESET && channelIndex != PC_BUFFER && channelIndex != PC_COOLER &&
-            //channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_PUSH_BUTTON) --> EC
-            channelIndex != PC_SPARE && channelIndex != PC_FW && channelIndex != PC_SPARE2)
+      if (channelIndex != PC_SELFRESET && channelIndex != PC_COOLER && channelIndex != PC_FW && channelIndex != PC_SPARE2)
       {
          Power_TurnOn(channelIndex);
          ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
@@ -205,16 +203,6 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
          }
 
          Power_TurnOn(channelIndex);
-         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-      }
-
-      // Cannot turn off PC_BUFFER power channel
-      if (channelIndex == PC_BUFFER)
-      {
          ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
          if (!AutoTest_getUserYN())
          {
@@ -405,16 +393,16 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       }
    }
 
-   // Requires validation with theoretical values
+   // Measurement output
+   ATR_PRINTF("XADC -- Cooler Voltage:");
    if (extAdcChannels[XEC_COOLER_SENSE].raw.unipolar <= 0xF0)
-      {
-         ATR_PRINTF("XADC -- Cooler Voltage..........");
-         PRINTF("\t\tNC");
-         XADC_Result[XADC_measIdx] = 1;
-      }
+   {
+      PRINTF("\tNC");
+      XADC_Result[XADC_measIdx] = 1;
+   }
    else
    {
-      ATR_PRINTF("XADC -- Cooler Voltage : " _PCF(3) " V", _FFMT(DeviceVoltageAry[DVS_Cooler], 3));
+      PRINTF(" " _PCF(3) " V", _FFMT(DeviceVoltageAry[DVS_Cooler], 3));
       if ((DeviceVoltageAry[DVS_Cooler] >= COOLER_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_Cooler] <= COOLER_VOLTAGE_MAX))
       {
          PRINTF("\tPASS");
@@ -423,21 +411,22 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       else
       {
          PRINTF("\tFAIL");
+         XADC_Result[XADC_measIdx] = 0;
          invalidValue = true;
       }
+      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(COOLER_VOLTAGE_MIN, 3), _FFMT(COOLER_VOLTAGE_MAX, 3));
    }
-
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_Cooler];
 
+   ATR_PRINTF("XADC -- Cooler Current:");
    if (extAdcChannels[XEC_COOLER_CUR].raw.unipolar <= 0xF0)
-      {
-         ATR_PRINTF("XADC -- Cooler Current...........");
-         PRINTF("\tNC");
-         XADC_Result[XADC_measIdx] = 1;
-      }
+   {
+      PRINTF("\tNC");
+      XADC_Result[XADC_measIdx] = 1;
+   }
    else
    {
-      ATR_PRINTF("XADC -- Cooler Current : " _PCF(3)" A", _FFMT(DeviceCurrentAry[DCS_Cooler], 3));
+      PRINTF(" " _PCF(3)" A", _FFMT(DeviceCurrentAry[DCS_Cooler], 3));
       if ((DeviceCurrentAry[DCS_Cooler] >= COOLER_CURRENT_MIN) && (DeviceCurrentAry[DCS_Cooler] <= COOLER_CURRENT_MAX))
       {
          PRINTF("\tPASS");
@@ -446,13 +435,14 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       else
       {
          PRINTF("\tFAIL");
+         XADC_Result[XADC_measIdx] = 0;
          invalidValue = true;
       }
+      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(COOLER_CURRENT_MIN, 3), _FFMT(COOLER_CURRENT_MAX, 3));
    }
-
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DCS_Cooler];
 
-   ATR_PRINTF("XADC -- 24V Voltage :    " _PCF(3) " V", _FFMT(DeviceVoltageAry[DVS_Supply24V], 3));
+   ATR_PRINTF("XADC -- 24V Voltage: " _PCF(3) " V", _FFMT(DeviceVoltageAry[DVS_Supply24V], 3));
    if ((DeviceVoltageAry[DVS_Supply24V] >= P24V_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_Supply24V] <= P24V_VOLTAGE_MAX))
    {
       PRINTF("\tPASS");
@@ -461,12 +451,13 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    else
    {
       PRINTF("\tFAIL");
+      XADC_Result[XADC_measIdx] = 0;
       invalidValue = true;
    }
-
+   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(P24V_VOLTAGE_MIN, 3), _FFMT(P24V_VOLTAGE_MAX, 3));
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_Supply24V];
 
-   ATR_PRINTF("XADC -- 24V Current :    " _PCF(3) " A", _FFMT(DeviceCurrentAry[DCS_Supply24V], 3));
+   ATR_PRINTF("XADC -- 24V Current: " _PCF(3) " A", _FFMT(DeviceCurrentAry[DCS_Supply24V], 3));
    if ((DeviceCurrentAry[DCS_Supply24V] >= P24V_CURRENT_MIN) && (DeviceCurrentAry[DCS_Supply24V] <= P24V_CURRENT_MAX))
    {
       PRINTF("\tPASS");
@@ -475,16 +466,15 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    else
    {
       PRINTF("\tFAIL");
+      XADC_Result[XADC_measIdx] = 0;
       invalidValue = true;
    }
-
+   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(P24V_CURRENT_MIN, 3), _FFMT(P24V_CURRENT_MAX, 3));
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DCS_Supply24V];
 
    if (XADC_measIdx != XADC_MEASUREMENT_EXT_INTF_IDX) {
       ATR_ERR("Invalid XADC Measurement Index.");
    }
-
-   // ajouter le test analog input ici (J15) --> EC
 
    PRINTF("\n");
 
