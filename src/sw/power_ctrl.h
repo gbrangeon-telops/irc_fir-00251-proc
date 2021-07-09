@@ -85,7 +85,7 @@ enum powerChannelEnum {
    PC_EXPANSION = 4,
    PC_SPARE1 = 5,
    PC_SPARE2 = 6,
-   PC_SELFRESET = 7,
+   PC_SELFRESET = 7
 };
 
 /**
