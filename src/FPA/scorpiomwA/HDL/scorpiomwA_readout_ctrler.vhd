@@ -27,13 +27,9 @@ entity scorpiomwA_readout_ctrler is
       FPA_MCLK           : in std_logic;  -- 
       FPA_INTF_CFG       : in fpa_intf_cfg_type;      
       FPA_INT            : in std_logic;  -- requis pour ScorpioMW puisque les signaux LSYNC et autres sont generés à la fin de la consigne d'integration (Montée de FSYNC)
-      FPA_INT_FDBK       : in std_logic;  -- requis pour ScorpioMW puisque l'offset se calcule lorsque se fait l'integration du ROIC, donc à l'intérieur le feedback d'integration
       ACQ_INT            : in std_logic;  -- requis pour determiner ACQ_DATA
       
       QUAD_CLK_COPY      : in std_logic;
-      ACQ_MODE           : in std_logic;
-      ACQ_MODE_FIRST_INT : in std_logic;
-      NACQ_MODE_FIRST_INT: in std_logic;
       
       FPA_DATA_VALID     : in std_logic;         
       READOUT_INFO       : out readout_info_type;
@@ -56,7 +52,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
    constant C_FPA_WELL_RESET_TIME_FACTOR : integer := DEFINE_FPA_INT_TIME_OFFSET_FACTOR - 1; --  donne une incertitude de 1.5 MCL sur le début réel de l'integration
    
    type int_reset_fsm_type is (idle, active_rst_st, wait_int_end_st);
-   type readout_fsm_type is (idle, readout_st, wait_mclk_fe_st, wait_readout_end_st);
+   type readout_fsm_type is (idle, check_mode_st, wait_dval_st, wait_int_fe_st, readout_st, wait_mclk_fe_st, wait_readout_end_st);
    type line_cnt_pipe_type is array (0 to 3) of unsigned(10 downto 0);
    component sync_reset
       port(
@@ -64,22 +60,7 @@ architecture rtl of scorpiomwA_readout_ctrler is
          SRESET : out std_logic;
          CLK : in std_logic);
    end component; 
-   
-   component fwft_sfifo_w3_d256
-      port (
-         clk         : in std_logic;
-         srst        : in std_logic;
-         din         : in std_logic_vector(2 downto 0);
-         wr_en       : in std_logic;
-         rd_en       : in std_logic;
-         dout        : out std_logic_vector(2 downto 0);
-         full        : out std_logic;
-         almost_full : out std_logic;
-         overflow    : out std_logic;
-         empty       : out std_logic;
-         valid       : out std_logic
-         );
-   end component;
+  
    
    signal sreset               : std_logic;
    signal readout_fsm          : readout_fsm_type;
@@ -112,25 +93,16 @@ architecture rtl of scorpiomwA_readout_ctrler is
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0); 
    signal fpa_data_valid_i     : std_logic;
    signal fpa_data_valid_last  : std_logic;
-   --signal fpa_int_i            : std_logic;
    signal fpa_inactive_int_i   : std_logic;
    signal fpa_mclk_rising_edge : std_logic;
    signal mclk_cnt             : integer range 0 to C_FPA_WELL_RESET_TIME_FACTOR;
    
    signal acq_data_i           : std_logic;  -- dit si les données associées aux flags sont à envoyer dans la chaine ou pas.
    signal readout_info_i       : readout_info_type;
-   signal int_fifo_rd          : std_logic;
-   signal int_fifo_din         : std_logic_vector(2 downto 0) := (others => '0'); -- non utilisé
-   signal int_fifo_wr          : std_logic;
-   signal int_fifo_dval        : std_logic;
-   signal int_fifo_dout        : std_logic_vector(2 downto 0);
    
    signal fpa_int_i            : std_logic;
    signal fpa_int_last         : std_logic;
    signal fpa_int_re           : std_logic;
-   signal itr_int_fifo_wr      : std_logic;
-   signal iwr_int_fifo_wr1     : std_logic;
-   signal iwr_int_fifo_wr2     : std_logic;
    
    signal img_in_progress_i    : std_logic;
    signal fifo_ovfl            : std_logic;
@@ -190,13 +162,8 @@ begin
             readout_info_i.naoi.samp_pulse <= '0';
             readout_info_i.naoi.start <= '0';
             readout_info_i.naoi.stop <= '0';
-            -- fpa_int_i <= FPA_INT;            
-            -- fpa_int_last <= fpa_int_i;
             
-         else           
-            
-            -- fpa_int_i <= FPA_INT;            
-            -- fpa_int_last <= fpa_int_i;            
+         else                      
             
             fpa_pclk_last <= FPA_PCLK;
             pclk_rise <= not fpa_pclk_last and FPA_PCLK; 
@@ -281,24 +248,6 @@ begin
    end process;    
    
    --------------------------------------------------
-   -- fifo fwft pour edge de l'intégration
-   --------------------------------------------------
-   Ue : fwft_sfifo_w3_d256
-   port map (
-      clk         => CLK,
-      srst        => sreset,
-      din         => int_fifo_din,    
-      wr_en       => int_fifo_wr,
-      rd_en       => int_fifo_rd,
-      dout        => int_fifo_dout,   
-      full        => open,
-      almost_full => open,
-      overflow    => fifo_ovfl,
-      empty       => open,
-      valid       => int_fifo_dval
-      );
-   
-   --------------------------------------------------
    -- generation de readout_in_progress
    --------------------------------------------------
    U3: process(CLK)
@@ -309,17 +258,11 @@ begin
             readout_fsm <= idle;
             readout_in_progress <= '0';
             fpa_data_valid_last <= fpa_data_valid_i; 
-            int_fifo_wr <= '0';
-            int_fifo_rd <= '0';
             acq_data_i <= '0';
             
             fpa_int_i    <= '0';
             fpa_int_last <= '0'; 
-            fpa_int_re   <= '0'; 
-            itr_int_fifo_wr  <= '0';
-            iwr_int_fifo_wr1 <= '0';
-            iwr_int_fifo_wr2 <= '0';
-            
+            fpa_int_re   <= '0';             
             img_in_progress_i <= '0';
             err_i <= (others => '0');
             fpa_int_fe <= '0';
@@ -331,12 +274,6 @@ begin
             fpa_int_re   <= (not fpa_int_last and fpa_int_i);
             fpa_int_fe   <= (fpa_int_last and not fpa_int_i);
             
-            itr_int_fifo_wr   <= fpa_int_re and ACQ_MODE and FPA_INTF_CFG.ITR;                                 -- en mode itr, on ecrit les RE des fpa_acq_int dans le fifo
-            iwr_int_fifo_wr1  <= fpa_int_re and ACQ_MODE and not ACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;  -- en mode iwr, on ecrit les RE des fpa_acq_int dans le fifo, sauf le premier
-            iwr_int_fifo_wr2  <= fpa_int_re and NACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;              -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
-            
-            int_fifo_wr <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;
-            
             fpa_data_valid_last <= fpa_data_valid_i;
             
             if fifo_ovfl = '1' then
@@ -347,30 +284,55 @@ begin
             -- contrôleur
             case readout_fsm is           
                
+               -- attente du debut d'une integration
                when idle =>   
                   readout_in_progress <= '0'; 
                   img_in_progress_i <= '0';
-                  if (fpa_data_valid_i = '1' and fpa_data_valid_last = '0') or (FPA_POWERED = '0' and fpa_int_fe = '1') then -- debut d'une image
-                     img_in_progress_i <= '1';
-                     int_fifo_rd <= int_fifo_dval; 
-                     acq_data_i <= int_fifo_dval;
+                  if fpa_int_re = '1' then 
+                     img_in_progress_i <= '1'; 
+                     acq_data_i <= ACQ_INT;
+                     readout_fsm <= check_mode_st;                     
+                  end if;
+                  
+               -- voir si detecteur en fonction
+               when check_mode_st =>
+                  if FPA_POWERED = '1' then
+                     readout_fsm <= wait_dval_st;
+                  else 
+                     readout_fsm <= wait_int_fe_st;
+                  end if;
+                  
+               -- si detecteur en fonction, attendre le dval
+               when wait_dval_st =>
+                  if (fpa_data_valid_i = '1' and fpa_data_valid_last = '0') then
                      readout_fsm <= wait_mclk_fe_st;
                   end if;
                
+                  
+               -- si detecteur non en fonction, attendre la tombée de fval                  
+               when wait_int_fe_st =>
+                  if fpa_int_fe = '1' then -- fin de l'integration
+                     readout_fsm <= wait_mclk_fe_st;
+                  end if;
+                  
+               -- synchro horloge
                when wait_mclk_fe_st => 
-                  int_fifo_rd <= '0';
                   if pclk_rise = '1' then                                      -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
-                  end if;                           
+                  end if; 
                
+                  
+               -- lancer la generation des flags de readout
                when readout_st =>                   
                   readout_in_progress <= '1';
-                  readout_fsm <= wait_readout_end_st;          
+                  readout_fsm <= wait_readout_end_st;
                
+                  
+               -- attendre fin du readout
                when wait_readout_end_st =>                  
                   if rd_end_pipe(0) = '1' then 
                      readout_fsm <= idle;
-                  end if;         
+                  end if;
                
                when others =>
                

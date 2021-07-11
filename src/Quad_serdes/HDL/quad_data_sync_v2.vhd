@@ -52,7 +52,11 @@ end quad_data_sync_v2;
 
 architecture rtl of quad_data_sync_v2 is
    
-   constant C_FIFO_RDY_DLY  : natural := 100;
+   constant C_FIFO_RDY_DLY  : natural := 10_000_000   
+   -- pragma translate_off
+   /100_000
+   -- pragma translate_on
+   ;
    
    component fwft_afifo_w72_d16 is
       port (
@@ -89,6 +93,7 @@ architecture rtl of quad_data_sync_v2 is
    signal dly_cnt                   : natural range 0 to C_FIFO_RDY_DLY + 1;
    signal fifo_rst                  : std_logic := '1'; 
    signal wr_rst_busy               : std_logic := '1';
+   signal rd_rst_busy               : std_logic := '1';
    signal sreset_clkd               : std_logic := '1';
    
    
@@ -130,7 +135,7 @@ begin
             adc_clk_ref        <= SYNC_FLAG(5);  -- en realité c'est un clock enable.
             adc_clk_ref_last   <= adc_clk_ref;   -- adc_clk_ref doit être toujours vivant. Sinon le fifo debordera.
             
-            fifo_rd_i          <= (not adc_clk_ref_last and adc_clk_ref) and fifo_dval_i;
+            fifo_rd_i          <= (not adc_clk_ref_last and adc_clk_ref) and fifo_dval_i and not rd_rst_busy;
             
          end if;   
       end if;
@@ -148,12 +153,6 @@ begin
       fifo_din_i <= x"0000" & not (D3 & D2 & D1 & D0);
    end generate;   
    
-   fifo_wr_i  <= DVAL_IN 
-   -- pragma translate_off
-   and not wr_rst_busy 
-   -- pragma translate_on
-   ;
-   
    U3 : fwft_afifo_w72_d16
    port map(
       rst         => fifo_rst,
@@ -169,7 +168,7 @@ begin
       empty       => open,
       valid       => fifo_dval_i,
       wr_rst_busy => wr_rst_busy,  
-      rd_rst_busy => open      
+      rd_rst_busy => rd_rst_busy      
       );
    
    ---------------------------------------------------
@@ -180,13 +179,18 @@ begin
       if rising_edge(CLKD) then
          if sreset_clkd = '1' then
             dly_cnt <= 0;
-            fifo_rst <= '1'; 
+            fifo_rst <= '1';
+            fifo_wr_i  <= '0';
+            
          else
+            
             if dly_cnt < C_FIFO_RDY_DLY then
                dly_cnt <= dly_cnt + 1;
             else
-               fifo_rst <= '0';    
-            end if;   
+               fifo_rst <= '0'; 
+               fifo_wr_i  <= DVAL_IN and not wr_rst_busy;    
+            end if;      
+            
          end if;
       end if;
    end process;

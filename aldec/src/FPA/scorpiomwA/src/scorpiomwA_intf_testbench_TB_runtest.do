@@ -43,6 +43,7 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d1024\fwft_sfifo_w3_d1024_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d1024\fwft_sfifo_w8_d1024_sim_netlist.vhdl
 
+acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w72_d16\fwft_afifo_w72_d16_sim_netlist.vhdl
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
@@ -79,6 +80,8 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_g
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde
 acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync.vhd
+acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync_v2.vhd
+
 
 do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do 
 
@@ -159,6 +162,6 @@ wave UUT/U1/U9/U18/*
 wave UUT/U1/U9/U15/*
 wave UUT/U1/*
 
---wave UUT/U1/U5/U2/U6/*
+wave UUT/U11/*
 
-run 15 ms
+run 200 ms

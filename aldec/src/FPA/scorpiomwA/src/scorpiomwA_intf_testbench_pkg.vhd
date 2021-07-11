@@ -86,8 +86,9 @@ package body scorpiomwA_intf_testbench_pkg is
       variable reorder_column                                      : unsigned(31 downto 0);                 
       variable comn_fpa_intf_data_source                           : unsigned(31 downto 0) := (others => '0'); 
       variable additional_fpa_int_time_offset                      : unsigned(31 downto 0) := (others => '0');
+      variable full_window                                         : unsigned(31 downto 0) := (others => '1');
       
-      variable y                                                   : unsigned(50*32-1 downto 0);
+      variable y                                                   : unsigned(51*32-1 downto 0);
       
    begin
       comn_fpa_diag_mode               :=  (others => diag_mode);                                               
@@ -95,19 +96,19 @@ package body scorpiomwA_intf_testbench_pkg is
       comn_fpa_pwr_on                  :=  (others =>'1');                                               
       comn_fpa_acq_trig_mode           :=  resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32); 
       comn_fpa_xtra_trig_mode          :=  resize(unsigned(MODE_ALL_END_TO_TRIG_START),32);
-      comn_fpa_acq_trig_ctrl_dly       :=  to_unsigned(480, comn_fpa_acq_trig_ctrl_dly'length);            
-      comn_fpa_trig_ctrl_timeout_dly   :=  to_unsigned(480, comn_fpa_trig_ctrl_timeout_dly'length);        
-      comn_fpa_xtra_trig_ctrl_dly      :=  to_unsigned(480, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_ctrl_dly       :=  to_unsigned(100000, comn_fpa_acq_trig_ctrl_dly'length);            
+      comn_fpa_trig_ctrl_timeout_dly   :=  to_unsigned(100000, comn_fpa_trig_ctrl_timeout_dly'length);        
+      comn_fpa_xtra_trig_ctrl_dly      :=  to_unsigned(100, comn_fpa_xtra_trig_ctrl_dly'length);
       
       itr                              := (others => '1');      
-      if send_id = 3 then 
-         itr := (others => '0');   
-      end if;
+--      if send_id = 3 then 
+--         itr := (others => '0');   
+--      end if;
       
-      if diag_mode = '1' or itr(0) = '1' then
-         comn_fpa_acq_trig_mode       :=  resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);
-         comn_fpa_acq_trig_ctrl_dly    :=  to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length); 
-      end if;
+--      if diag_mode = '1' or itr(0) = '1' then
+--         comn_fpa_acq_trig_mode       :=  resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);
+--         comn_fpa_acq_trig_ctrl_dly    :=  to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length); 
+--      end if;
       
       xstart                           := to_unsigned(0, 32);  
       ystart                           := to_unsigned(0, 32);  
@@ -217,7 +218,8 @@ package body scorpiomwA_intf_testbench_pkg is
       & comn_fpa_stretch_acq_trig       
       & reorder_column                  
       & comn_fpa_intf_data_source
-      & additional_fpa_int_time_offset;
+      & additional_fpa_int_time_offset
+      & full_window;
       
       return y;
    end to_intf_cfg;

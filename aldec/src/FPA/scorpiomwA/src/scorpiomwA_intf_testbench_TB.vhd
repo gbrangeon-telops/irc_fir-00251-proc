@@ -111,7 +111,7 @@ architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
    signal user_ysize4 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(50*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(51*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector4              : unsigned(user_cfg_vector1'length-1 downto 0);
@@ -197,16 +197,16 @@ begin
          fpa_softw_stat_i.fpa_input    <= LVCMOS33;        
          
          -- cfg usager
-         user_xsize1 <= 64;
-         user_ysize1 <= 8;
+         user_xsize1 <= 640;
+         user_ysize1 <= 512;
          user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 64;
-         user_ysize2 <= 10;
+         user_xsize2 <= 640;
+         user_ysize2 <= 512;
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          --         
          user_xsize3 <= 64;
-         user_ysize3 <= 16;
+         user_ysize3 <= 64;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3); -- iwr
          --         
          --         user_xsize4 <= 1280;
@@ -277,7 +277,7 @@ begin
       end loop;
       
       
-      for ii in 0 to 50-1 loop 
+      for ii in 0 to 51-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -292,9 +292,9 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
-      wait for 3 ms;
+      wait for 50 ms;
       
-      for ii in 0 to 50-1 loop 
+      for ii in 0 to 51-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -302,9 +302,9 @@ begin
          wait for 30 ns;
       end loop; 
       --      
-      wait for 3 ms;
+      wait for 50 ms;
       
-      for ii in 0 to 50-1 loop                     -- iwr mode
+      for ii in 0 to 51-1 loop                     -- iwr mode
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -312,9 +312,9 @@ begin
          wait for 30 ns;
       end loop;
       --      
-      wait for 3 ms;
+      wait for 50 ms;
       
-      for ii in 0 to 50-1 loop                     -- retour en itr
+      for ii in 0 to 51-1 loop                     -- retour en itr
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;

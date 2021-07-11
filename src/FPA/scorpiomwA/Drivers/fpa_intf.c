@@ -289,26 +289,26 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
    
-   //  itr
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
+   //  itr forcé
+   //if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
       ptrA->itr = 1;
-   else  // mode IWR
-      ptrA->itr = 0;
+   //else  // mode IWR
+   //   ptrA->itr = 0;
    
    
    // config du contrôleur de trigs
-   if (ptrA->itr == 1) {
+   // if (ptrA->itr == 1) {
       ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
-   }
-   else {
-      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ALL_END_TO_TRIG_START;
-      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_all_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //
-   }
+   // }
+   // else {
+   //   ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ALL_END_TO_TRIG_START;
+   //   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_all_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //
+   // }
    
    ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_ALL_END_TO_TRIG_START;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
+   ptrA->fpa_trig_ctrl_timeout_dly = 2*ptrA->fpa_xtra_trig_ctrl_dly;
    
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
@@ -532,12 +532,12 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->int_signal_high_time_usec = exposureTime_usec + ptrH->fpa_reset_time_usec;
       
    // calcul de la periode minimale
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
+   //if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
    // mode ITR
       ptrH->frame_period_usec = ptrH->int_signal_high_time_usec + ptrH->vhd_delay_usec + ptrH->fpa_itr_delay_usec + ptrH->readout_usec;
-   else  
+   //else  
    // mode IWR
-      ptrH->frame_period_usec = MAX(ptrH->int_signal_high_time_usec, ptrH->fpa_reset_time_usec + ptrH->fpa_iwr_delay_usec + ptrH->readout_usec) + ptrH->vhd_delay_usec;
+   //   ptrH->frame_period_usec = MAX(ptrH->int_signal_high_time_usec, ptrH->fpa_reset_time_usec + ptrH->fpa_iwr_delay_usec + ptrH->readout_usec) + ptrH->vhd_delay_usec;
 
    //calcul du frame rate maximal
    ptrH->frame_rate_max_hz = 1.0F/(ptrH->frame_period_usec*1e-6F);
@@ -584,15 +584,15 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
    presentPeriod_sec = 1.0F/fpaAcquisitionFrameRate; // periode avec le frame rate actuel.
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
-   {
+   //if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
+   //{
       float periodMinWithNullExposure_usec = hh.frame_period_usec;
       max_exposure_usec = (presentPeriod_sec*1e6F - periodMinWithNullExposure_usec);
-   }
-   else  // mode IWR
-   {
-      max_exposure_usec = (presentPeriod_sec*1e6F - hh.vhd_delay_usec) - hh.fpa_reset_time_usec;
-   }
+   //}
+   //else  // mode IWR
+   //{
+   //   max_exposure_usec = (presentPeriod_sec*1e6F - hh.vhd_delay_usec) - hh.fpa_reset_time_usec;
+   //}
 
    // Round exposure time
    max_exposure_usec = floorMultiple(max_exposure_usec, 0.1);
