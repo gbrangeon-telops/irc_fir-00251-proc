@@ -298,17 +298,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // config du contrôleur de trigs
    // if (ptrA->itr == 1) {
-      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
-      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_readout_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    // }
    // else {
    //   ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ALL_END_TO_TRIG_START;
    //   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_all_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //
    // }
    
-   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_ALL_END_TO_TRIG_START;
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
-   ptrA->fpa_trig_ctrl_timeout_dly = 2*ptrA->fpa_xtra_trig_ctrl_dly;
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((hh.mode_readout_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    
    // fenetrage
    ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
@@ -512,8 +512,8 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->pixnum_per_tap_per_mclk = 1.0F;
    ptrH->fpa_reset_time_mclk     = 3076.0F;
    ptrH->fpa_itr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number);
-   ptrH->fpa_iwr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + 40.0F + 10.0F;// FPA: estimation delai max de sortie des pixels après integration + delai après readout. ENO 18 juin 2020: delai supplémentaire de 10 MCLK rajouté
-   ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (1e6F/ptrH->mclk_period_usec);   // estimation des differerents delais accumulés par le vhd
+   ptrH->fpa_iwr_delay_mclk      = 4.0F + pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + 40.0F;// FPA: estimation delai max de sortie des pixels après integration + delai après readout. 
+   ptrH->vhd_delay_mclk          = (float)VHD_PIXEL_PIPE_DLY_SEC * (1e6F/ptrH->mclk_period_usec) + 14.0F;   // estimation des differerents delais accumulés par le vhd. ENO 11 juillet 2021: delai supplémentaire de 14 MCLK rajouté à tous les modes (ITR et IWR)
    ptrH->lovh_mclk               = 0.0F;
    ptrH->fovh_line               = 0.0F;   
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;

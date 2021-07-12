@@ -306,10 +306,9 @@ begin
                when wait_dval_st =>
                   if (fpa_data_valid_i = '1' and fpa_data_valid_last = '0') then
                      readout_fsm <= wait_mclk_fe_st;
-                  end if;
-               
+                  end if;                
                   
-               -- si detecteur non en fonction, attendre la tombée de fval                  
+               -- si detecteur non en fonction, attendre la tombée de integ                  
                when wait_int_fe_st =>
                   if fpa_int_fe = '1' then -- fin de l'integration
                      readout_fsm <= wait_mclk_fe_st;
