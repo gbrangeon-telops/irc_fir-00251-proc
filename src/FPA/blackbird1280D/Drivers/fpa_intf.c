@@ -42,10 +42,13 @@
 #define MODE_ALL_END_TO_TRIG_START          0x05
 
 // Operational command parameters (D15F0002 REV3 section 3.2.3.2)
-#define OP_CMD_FRAME_DLY_DEFAULT            10E-6F // "Frame read delay" parameter, in seconds
-#define OP_CMD_INTG_DLY_DEFAULT             1E-6F  // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
+#define OP_CMD_IWR_FRAME_DLY_DEFAULT        10E-6F // "Frame read delay" parameter, in seconds
+#define OP_CMD_IWR_INTG_DLY_DEFAULT         1E-6F  // "Integration delay" parameter, in seconds (200us recommended in SCD doc)
+#define OP_CMD_ITR_INTG_DLY_DEFAULT         10E-6F
 #define MODEL_CORR_FACTOR_IWR_M200hd        0.9536F
+#define MODEL_CORR_FACTOR_ITR_M200hd        0.9655F
 #define MODEL_CORR_FACTOR_IWR_M100hd        1.7F
+#define MODEL_CORR_FACTOR_ITR_M100hd        1.7F
 
 // "Boost mode off" parameter
 #define OP_CMD_BOOST_MODE                   0x00 // "Boost mode off" is activated  (specific delay added to prevent image obstruction)
@@ -161,13 +164,15 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define SCD_FPA_TEST3                     6 // row counter (source = FPA)
 
 #define VHD_INVALID_TEMP                  0xFFFFFFFF
-#define VHD_PIPE_DLY_SEC                  250E-9F     // estimation des differerents delais accumulés par le vhd
+#define VHD_ITR_PIPE_DLY_SEC              500E-9F     // estimation des differerents delais accumulés par le vhd
+#define VHD_IWR_PIPE_DLY_SEC              250E-9F     // estimation des differerents delais accumulés par le vhd
+
 
 // Struct field are in seconds
 struct Scd_Param_s
 {
    float Tfpp_clk;          // in second
-   float Tclink_clk;          // in second
+   float Tclink_clk;        // in second
    float frame_resolution;  // in second
    float exposure_time;     // in second
    float adc_conv;          // in second
@@ -228,8 +233,8 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
-float gIntg_dly = OP_CMD_INTG_DLY_DEFAULT;
-float gFr_dly = OP_CMD_FRAME_DLY_DEFAULT;
+float gIntg_dly = 0.0F;
+float gFr_dly = 0.0F;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -275,7 +280,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
       sw_init_success = 1;
 }
  
-void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
+void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 {
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
    FPA_SetFrameResolution(ptrA);
@@ -284,7 +289,7 @@ void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegister
 
 
 //*--------------------------------------------------------------------------
-//   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and the first detector loan by SCD (loan detector was not fully operational).
+//   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and with the first detector lend by SCD (the loan detector was not fully operational).
 //   1. No "Integration time command" or "frame resolution command" should be sent before a the first operational command.
 //   2. The serdes initialisation will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
 //       * An operational command followed by a frame resolution command must have been sent.
@@ -350,6 +355,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    Scd_Param_t hh;
    float fpaAcquisitionFrameRate;
+   float scd_frame_period_min;
    float diag_corr_factor, diag_lval_high_duration;
    extern uint8_t gFpaScdDiodeBiasEnum;
    static uint8_t cfg_num = 0;
@@ -358,14 +364,69 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gIntg_dly;
    extern float gFr_dly;
 
-   //---- Debug ------
-   if(gFpaDebugRegG != 0)
-      gFr_dly = (float)gFpaDebugRegG/1E+6F;
-   if(gFpaDebugRegH != 0)
-      gIntg_dly = (float)gFpaDebugRegH/1E+6F;
-   //------------------
 
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs); // Specific parameters are independent of exposure time.
+   // Frame time calculation : define the maximum trig frequency allowed by the proxy for this set of operational parameters.
+   fpaAcquisitionFrameRate    = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
+   scd_frame_period_min       = 1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate);
+
+   ptrA->scd_frame_period_min = (uint32_t)(scd_frame_period_min* FPA_VHD_INTF_CLK_RATE_HZ);
+
+
+   // Calcul "integration mode dependent" parameters
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      if(gFpaDebugRegH != 0)
+         gIntg_dly = (float)gFpaDebugRegH/1E+6F;
+      else
+         gIntg_dly = OP_CMD_IWR_INTG_DLY_DEFAULT;
+
+      if(gFpaDebugRegG != 0)
+         gFr_dly = (float)gFpaDebugRegG/1E+6F;
+      else
+         gFr_dly = OP_CMD_IWR_FRAME_DLY_DEFAULT;
+
+      FPA_SpecificParams(&hh, 0.0F, pGCRegs); // Specific parameters are independent of exposure time.
+
+      ptrA->scd_gain             = MEDIUM_GAIN_IWR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
+      ptrA->scd_int_mode         = SCD_IWR_MODE;            // Not used in operational command (but used in FPA VHDL module).
+      ptrA->scd_boost_mode       = OP_CMD_NORMAL_MODE;      // Mode of operation
+
+      // Trig controller configuration : any trig pulse that don't respect the minimum frame time period will be discarded.
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly     = ptrA->scd_frame_period_min - (uint32_t)((hh.intg_dly + VHD_IWR_PIPE_DLY_SEC)* FPA_VHD_INTF_CLK_RATE_HZ);
+
+      ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
+      ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
+
+   }
+    else{
+
+      if(gFpaDebugRegH != 0)
+         gIntg_dly = (float)gFpaDebugRegH/1E+6F;
+      else
+         gIntg_dly =  OP_CMD_ITR_INTG_DLY_DEFAULT;
+
+      FPA_SpecificParams(&hh, 0.0F, pGCRegs); // Specific parameters are independent of exposure time.
+
+      if(gFpaDebugRegG != 0){
+         gFr_dly = (float)gFpaDebugRegG/1E+6F;
+      }
+      else{
+         // gFr_dly doit toujours être plus petit que : gIntg_dly + exposure_time
+         gFr_dly = scd_frame_period_min - (hh.ro_itr + hh.x_to_next_fsync);
+      }
+
+      ptrA->scd_gain             = MEDIUM_GAIN_ITR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
+      ptrA->scd_int_mode         = SCD_ITR_MODE;            // Not used in operational command (but used in FPA VHDL module);
+      ptrA->scd_boost_mode       = OP_CMD_BOOST_MODE;       // Mode of operation
+
+      // Trig controller configuration : any trig pulse that don't respect the minimum frame time period will be discarded.
+      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+      ptrA->fpa_acq_trig_ctrl_dly     = ptrA->scd_frame_period_min - (uint32_t)((hh.intg_dly + VHD_ITR_PIPE_DLY_SEC)* FPA_VHD_INTF_CLK_RATE_HZ);
+
+      ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
+      ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
+    }
+
 
    ptrA->scd_xstart           = pGCRegs->OffsetX;        // Image horizontal offset
    ptrA->scd_ystart           = pGCRegs->OffsetY;        // Image vertical offset
@@ -376,31 +437,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (gFpaScdDiodeBiasEnum >= SCD_BIAS_VALUES_NUM)      // Photo-diode bias
       gFpaScdDiodeBiasEnum    = SCD_BIAS_DEFAULT_IDX;    // Corrige une valeur invalide
    ptrA->scd_diode_bias       = Scd_DiodeBiasValues[gFpaScdDiodeBiasEnum];
-   ptrA->scd_boost_mode       = OP_CMD_NORMAL_MODE;       // Mode of operation
+
    ptrA->scd_pix_res          = SCD_PIX_RESOLUTION_13BITS;
    ptrA->fpa_pwr_on           = 1;                       // Allumage du détecteur (Le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies)
    ptrA->fpa_spare            = 0;
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig; // Élargit le pulse de trig
-
-  if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
-      ptrA->scd_gain             = MEDIUM_GAIN_IWR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
-      ptrA->scd_int_mode         = SCD_IWR_MODE;            // Not used in operational command (but used in FPA VHDL module).
-   }
-   else{// Jamais testé.
-      ptrA->scd_gain             = MEDIUM_GAIN_ITR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
-      ptrA->scd_int_mode         = SCD_ITR_MODE;            // Not used in operational command (but used in FPA VHDL module).
-   }
-
-   // Frame time calculation : define the maximum trig frequency allowed by the proxy for this set of operational parameters.
-   fpaAcquisitionFrameRate    = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
-   ptrA->scd_frame_period_min = (uint32_t)(1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate) * FPA_VHD_INTF_CLK_RATE_HZ);
-
-   // Trig controller configuration : any trig pulse that don't respect the minimum frame time period will be discarded.
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
-   ptrA->fpa_acq_trig_ctrl_dly     = ptrA->scd_frame_period_min - (uint32_t)((hh.intg_dly + VHD_PIPE_DLY_SEC)* FPA_VHD_INTF_CLK_RATE_HZ);
-
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
 
    // The following parameters are only required for "Telops" test pattern generation.
    ptrA->scd_fsync_re_to_intg_start_dly = (uint32_t)((hh.intg_dly) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
@@ -519,9 +560,10 @@ void FPA_SetFrameResolution(t_FpaIntf *ptrA)
    FPA_SendFrameResolution_SerialCmd(ptrA);      // envoi la commande serielle
 }
 
+// TODO: A enlever a la fin du debug. Sert à envoyer des requete de statut au détecteur.
 void FPA_SetFrameResolution_V2(t_FpaIntf *ptrA)
 {
-   // A enlever a la fin du debug. Sert à envoyer des requete de statut au détecteur.
+
    FPA_FrameResolution_StructCmd_V2(ptrA);      // envoi un interrupt au contrôleur du hw driver
    FPA_SendFrameResolution_SerialCmd_V2(ptrA);      // envoi la commande serielle
 }
@@ -560,11 +602,6 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
       Ta = (hh.fr_dly + hh.ro_iwr) - hh.intg_dly;
-      if (Ta > 0)
-         maxExposure_us = maxExposure_us + Ta*1E6F;
-   }
-   else{// Jamais testé.
-      Ta = hh.fr_dly - hh.intg_dly;
       if (Ta > 0)
          maxExposure_us = maxExposure_us + Ta*1E6F;
    }
@@ -653,15 +690,21 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
    extern float gFr_dly;
    extern float gIntg_dly;
 
+   //float fpaAcquisitionFrameRate;
    float corr_factor;
 
-   if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)
-      corr_factor = MODEL_CORR_FACTOR_IWR_M100hd;
-   else
-      corr_factor = MODEL_CORR_FACTOR_IWR_M200hd;
-
-
-
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)
+         corr_factor = MODEL_CORR_FACTOR_IWR_M100hd;
+      else
+         corr_factor = MODEL_CORR_FACTOR_IWR_M200hd;
+   }
+   else{
+      if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)
+         corr_factor = MODEL_CORR_FACTOR_ITR_M100hd;
+      else
+         corr_factor = MODEL_CORR_FACTOR_ITR_M200hd;
+   }
 
    ptrH->Tfpp_clk          = 1.0F / ((float)FPA_FPP_CLK_RATE_HZ);                         // in second
    ptrH->Tclink_clk        = 1.0F / ((float)FPA_CLINK_CLK_RATE_HZ);                       // in second
@@ -687,20 +730,16 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
          ptrH->m = 0.0F;
    }
    ptrH->int_eg_rlx       = 17.2E-6F*corr_factor;
-   ptrH->ro_iwr           = ptrH->ro_itr + ptrH->m*(ptrH->int_eg_rlx + MAX(ptrH->adc_conv, ptrH->frame_resolution));
 
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      ptrH->ro_iwr           = ptrH->ro_itr + ptrH->m*(ptrH->int_eg_rlx + MAX(ptrH->adc_conv, ptrH->frame_resolution));
       ptrH->x_to_next_fsync  = 315.0E-6F*corr_factor; // Delay between the end of integration or readout (whichever one happening last) and the next fsync
       ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->ro_iwr, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
    }
-   else{// Jamais testé.
+   else{
       ptrH->x_to_next_fsync  = 190.0E-6F*corr_factor; // Delay between the end of readout and the next fsync
-      // Here, we assume that the proxy manage the FR_DLY internally in function of the exposure time.
-      // Thus, there is no need to send an operational command to adjust FR_DLY when the exposure time change during acquisition.
-      if ((ptrH->intg_dly + ptrH->exposure_time - ptrH->fr_dly) > 0)
-         ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->ro_itr + ptrH->x_to_next_fsync;
-      else
-         ptrH->frame_period_min = ptrH->fr_dly+ ptrH->ro_itr + ptrH->x_to_next_fsync;
+      ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->ro_itr + ptrH->x_to_next_fsync;
+
    }
 
    // Camera Link output timing -> calcul based on figure 8 (D15F0002 REV3)
@@ -711,7 +750,8 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
 
 
    ptrH->fig8_t5 = 100E-6F;
-   ptrH->fig8_t6 = 16E-6F/(float)FPA_CLINK_PIX_NUM;
+   //ptrH->fig8_t6 = 16E-6F/(float)FPA_CLINK_PIX_NUM;
+   ptrH->fig8_t6 = 0.0F; // No header
 }
 
 
@@ -750,6 +790,8 @@ void FPA_FrameResolution_StructCmd(const t_FpaIntf *ptrA)
    AXI4L_write32((uint32_t)cfg_num, ptrA->ADD + AW_FPA_SCD_FRAME_RES_ADD);
 }
 
+
+//TODO : À supprimer
 void FPA_FrameResolution_StructCmd_V2(const t_FpaIntf *ptrA)
 {
    static uint8_t cfg_num = 0;
@@ -930,10 +972,10 @@ void FPA_SendFrameResolution_SerialCmd_V2(const t_FpaIntf *ptrA)
 {
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
-   extern int32_t gFpaDebugRegC;
+   extern int32_t gFpaDebugRegA;
    // on bâtit la commande
    Cmd.Header              = 0xAA;
-   Cmd.ID                  = 0x8000 + (uint8_t)gFpaDebugRegC;
+   Cmd.ID                  = 0x8000 + (uint8_t)gFpaDebugRegA;
    PRINTF("Cmd.ID = %d \n",Cmd.ID );
    Cmd.DataLength          = 0;
    Cmd.SerialCmdRamBaseAdd = (uint16_t)AW_SERIAL_FRAME_RES_CMD_RAM_BASE_ADD;

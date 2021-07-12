@@ -58,19 +58,19 @@
 #define FPA_NUM_CH         3  // nombre de canaux de sorties  (1, 2 ou 3)
 #define FPA_CLINK_PIX_NUM  4
 
-#define FPA_INTEGRATION_MODE     IM_IntegrateWhileRead
+#define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Blackbird1280DIsImplemented | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Blackbird1280DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           0
 
-#define FPA_COOLER_TEMP_THRES    -19400   //[cC]      // TODO : A verifier
-#define FPA_COOLER_TEMP_TOL      1000     //[cC]      // TODO : A verifier
+#define FPA_COOLER_TEMP_THRES    -19400   //[cC]
+#define FPA_COOLER_TEMP_TOL      1000     //[cC]
 #ifdef SIM
-   #define FPA_DEFAULT_EXPOSURE     5.0F //[us]       // TODO : A verifier
-   #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]    // TODO : A verifier
+   #define FPA_DEFAULT_EXPOSURE     5.0F //[us]
+   #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]
 #else
-   #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]    // TODO : A verifier
-   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]      // TODO : A verifier
+   #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]
+   #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]
 #endif
 
 // TODO Update EHDRI default exposure times.
@@ -79,11 +79,11 @@
 #define FPA_EHDRI_EXP_2    1000.0F
 #define FPA_EHDRI_EXP_3    6893.0F  // Saturation à 28
 
-#define FPA_CAL_MIN_EXPOSURE  0.5F      // TODO : A verifier
-#define FPA_CAL_MAX_EXPOSURE  85000.0F // TODO : A verifier
+#define FPA_CAL_MIN_EXPOSURE  0.5F
+#define FPA_CAL_MAX_EXPOSURE  85000.0F
 
-#define FPA_MIN_EXPOSURE               0.5F     // [us] // TODO : A verifier
-#define FPA_MAX_EXPOSURE               80000.0F // [us] // TODO : A verifier
+#define FPA_MIN_EXPOSURE               0.5F     // [us]
+#define FPA_MAX_EXPOSURE               80000.0F // [us]
 
 #define FPA_AECP_MIN_EXPOSURE          FPA_MIN_EXPOSURE // [us] Minimum exposure time when AEC+ is active.
 
@@ -100,7 +100,7 @@
 
 #define XTRA_TRIG_MODE_DELAY           100000  // us
 
-#define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement // TODO : A verifier
+#define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet
@@ -252,7 +252,7 @@ void FPA_ClearErr(const t_FpaIntf *ptrA);
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
 
 // Pour configurer la résolution de frame du proxy d'SCD
-void FPA_ConfigureFrameResolution(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
+void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 
 

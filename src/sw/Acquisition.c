@@ -543,36 +543,36 @@ void Acquisition_SM()
          break;
          
       case ACQ_WAITING_FOR_SENSOR_TEMP:
-         sensorTemp = FPA_GetTemperature(&gFpaIntf);
+            sensorTemp = FPA_GetTemperature(&gFpaIntf);
 
-         #ifdef SIM
-         sensorTemp = FPA_COOLER_TEMP_THRES - 100;
-         #endif
-
-         if (sensorTemp != FPA_INVALID_TEMP)
-         {
-
-            #ifdef SCD_BLACKBIRD1280D
-              FPA_ConfigureFrameResolution(&fpaStatus, &gFpaIntf, &gcRegsData);
+            #ifdef SIM
+            sensorTemp = FPA_COOLER_TEMP_THRES - 100;
             #endif
 
-            ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
+            if (sensorTemp != FPA_INVALID_TEMP)
+            {
 
-            GETTIME(&tic_cooldownStart);
-            GETTIME(&tic_cooldownStability);
-            tic_cooldownSampling = 0;
-            initial_temp = sensorTemp;
-            min_temp = sensorTemp;
-            max_temp = sensorTemp;
+               #ifdef SCD_BLACKBIRD1280D
+                 FPA_ConfigureFrameResolution(&gFpaIntf, &gcRegsData);
+               #endif
 
-            acquisitionState = ACQ_WAITING_FOR_SENSOR_COOLDOWN;
-         }
-         else if (elapsed_time_us(tic_timeout) > WAITING_FOR_SENSOR_TEMP_TIMEOUT_US)
-         {
-            builtInTests[BITID_Cooldown].result = BITR_Failed;
-            ACQ_ERR("Sensor temperature timeout.");
-            acquisitionState = ACQ_POWER_RESET;
-         }
+               ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
+
+               GETTIME(&tic_cooldownStart);
+               GETTIME(&tic_cooldownStability);
+               tic_cooldownSampling = 0;
+               initial_temp = sensorTemp;
+               min_temp = sensorTemp;
+               max_temp = sensorTemp;
+
+               acquisitionState = ACQ_WAITING_FOR_SENSOR_COOLDOWN;
+            }
+            else if (elapsed_time_us(tic_timeout) > WAITING_FOR_SENSOR_TEMP_TIMEOUT_US)
+            {
+               builtInTests[BITID_Cooldown].result = BITR_Failed;
+               ACQ_ERR("Sensor temperature timeout.");
+               acquisitionState = ACQ_POWER_RESET;
+            }
          break;
 
       case ACQ_WAITING_FOR_SENSOR_COOLDOWN:
@@ -641,28 +641,28 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_FPA_INIT:
-         FPA_GetStatus(&fpaStatus, &gFpaIntf);
-         if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
-         {
-            if (fpaStatus.fpa_init_success == 1)
+            FPA_GetStatus(&fpaStatus, &gFpaIntf);
+            if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
             {
-               builtInTests[BITID_SensorInitialization].result = BITR_Passed;
-               ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
-               acquisitionState = ACQ_FINALIZE_POWER_ON;
+               if (fpaStatus.fpa_init_success == 1)
+               {
+                  builtInTests[BITID_SensorInitialization].result = BITR_Passed;
+                  ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
+                  acquisitionState = ACQ_FINALIZE_POWER_ON;
+               }
+               else
+               {
+                  builtInTests[BITID_SensorInitialization].result = BITR_Failed;
+                  ACQ_ERR("Sensor initialization failed.");
+                  acquisitionState = ACQ_POWER_RESET;
+               }
             }
-            else
+            else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
             {
                builtInTests[BITID_SensorInitialization].result = BITR_Failed;
-               ACQ_ERR("Sensor initialization failed.");
+               ACQ_ERR("Sensor initialization timeout.");
                acquisitionState = ACQ_POWER_RESET;
             }
-         }
-         else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
-         {
-            builtInTests[BITID_SensorInitialization].result = BITR_Failed;
-            ACQ_ERR("Sensor initialization timeout.");
-            acquisitionState = ACQ_POWER_RESET;
-         }
          break;
 
       case ACQ_FINALIZE_POWER_ON:
