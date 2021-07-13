@@ -18,7 +18,9 @@ set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
 set ntxminiFileBaseName=CommonTEL2000LibProject_xml_%xmlVersion%
 set ntxminiFile=%ntxminiFileBaseName%_%sensorWidth%x%sensorHeight%.bat
 set fubatch=%releaseDir%\Release_%firmwareVersion:.=_%.bat
+set fubatchJtag=%releaseDir%\Release_%firmwareVersion:.=_%_jtag.bat
 set cfiFile=%binDir%\prom\%baseName%_%fpgaSize%.cfi
+set jtagPromBridgeDir="\\STARK\DisqueTELOPS\Production\IRCAM\Tools\PROM-JTAG Bridge"
 
 rem Clean up
 del %paperworkTemplateDir%.zip
@@ -54,14 +56,17 @@ exit
 rem Prepare firmware package
 mkdir %releaseDir%\FIR-00251-Proc\
 copy %binDir%\prom\%baseName%_%fpgaSize%.* %releaseDir%\FIR-00251-Proc\
+copy %jtagPromBridgeDir%\scripts\jtag_prom_prog.bat %releaseDir%\FIR-00251-Proc\
 if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00251-Output\
 copy %outputDir%\bin\prom\%outputBaseName%.* %releaseDir%\FIR-00251-Output\
+copy %jtagPromBridgeDir%\scripts\jtag_prom_prog.bat %releaseDir%\FIR-00251-Output\
 if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00257-Storage\
 copy %storageDir%\bin\prom\*.* %releaseDir%\FIR-00257-Storage\
+copy %jtagPromBridgeDir%\scripts\jtag_prom_prog.bat %releaseDir%\FIR-00257-Storage\
 if errorlevel 1 goto err
 
 mkdir %releaseDir%\FIR-00251-NTx-Mini\
@@ -119,6 +124,33 @@ echo.>> %fubatch%
 echo :err>> %fubatch%
 echo echo "NTx-Mini update failed!">> %fubatch%
 echo pause>> %fubatch%
+
+rem Generate firmware programmer batch file for JTAG
+echo @echo off> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo set PATH=%%PATH%%;F:\Temp\ELA\bridges\scripts>> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo :start_fu>> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo cd FIR-00251-NTx-Mini>> %fubatchJtag%
+echo call %ntxminiFile%>> %fubatchJtag%
+echo if not %%errorlevel%% == 0 goto err>> %fubatchJtag%
+echo cd ..>> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo cd FIR-00251-Proc>> %fubatchJtag%
+echo call jtag_prom_prog.bat>> %fubatchJtag%
+echo cd ..\FIR-00251-Output>> %fubatchJtag%
+echo call jtag_prom_prog.bat>> %fubatchJtag%
+echo cd ..\FIR-00251-Storage>> %fubatchJtag%
+echo call jtag_prom_prog.bat>> %fubatchJtag%
+echo cd ..>> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo :end>> %fubatchJtag%
+echo exit>> %fubatchJtag%
+echo.>> %fubatchJtag%
+echo :err>> %fubatchJtag%
+echo echo "NTx-Mini update failed!">> %fubatchJtag%
+echo pause>> %fubatchJtag%
 goto end
 
 :err
