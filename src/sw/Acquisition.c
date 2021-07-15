@@ -417,9 +417,12 @@ void Acquisition_SM()
             #ifdef SCD_PROXY
                if(gFrameRateChangePostponed)
                {
-                  TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
-                  StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
-                  acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
+                  if(!GC_FWSynchronouslyRotatingModeIsActive || !TDCStatusTst(WaitingForFilterWheelMask))
+                  {
+                     TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
+                     StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
+                     acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
+                  }
                }
             #endif
          }
