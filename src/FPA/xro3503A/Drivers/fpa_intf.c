@@ -492,7 +492,7 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
    // Delai mesure experimentalement a 2.5us en 640x8, c'est-a-dire environ le temps du header divise par 9.
    // TODO: enlever ce delai lorsque le header inserter sera sur 4 pix de large.
    ptrH->fpa_delay_mclk            += (float)pGCRegs->Width / 9.0F;
-   ptrH->vhd_delay_mclk             = 3.5F;   // estimation des differents delais accumulés par le vhd
+   ptrH->vhd_delay_mclk             = 6.0F;   // estimation des differents delais accumulés par le vhd
    ptrH->delay_mclk                 = ptrH->fpa_delay_mclk + ptrH->vhd_delay_mclk;
    if (FPA_MCLK_RATE_HZ <= 27E+6F)
    {
