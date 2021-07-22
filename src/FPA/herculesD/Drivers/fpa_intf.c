@@ -812,7 +812,11 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t ReadDirLR   = 0;  // 0 => left to right (default), 1 => right to left
    uint8_t ReadDirUP   = 1;  // 0 => Up to down (default), 1 => down to up
    
-   vhd_int_time     = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
+   if (GC_FWSynchronouslyRotatingModeIsActive)
+      vhd_int_time = 0.0F;
+   else
+      vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME);
+
    Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
    Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection
    Tint = Tint/1E6F; // in second

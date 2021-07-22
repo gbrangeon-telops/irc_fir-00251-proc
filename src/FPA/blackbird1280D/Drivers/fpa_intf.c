@@ -840,7 +840,10 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint32_t scd_ysize  = ptrA->scd_ysize  >> 1;  // in step of 2 rows
    uint32_t scd_xsize  = ptrA->scd_xsize  >> 2;  // in step of 4 pixels
 
-   vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME); // read from vhdl (in 100MHz clks)
+   if (GC_FWSynchronouslyRotatingModeIsActive)
+      vhd_int_time = 0.0F;
+   else
+      vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME); // read from vhdl (in 100MHz clks)
 
    Tint = (float)vhd_int_time*(1E6F/FPA_VHD_INTF_CLK_RATE_HZ); // in us
    Tint = MIN(MAX(Tint, FPA_MIN_EXPOSURE), FPA_MAX_EXPOSURE);  // protection
