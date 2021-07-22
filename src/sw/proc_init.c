@@ -774,7 +774,7 @@ IRC_Status_t Proc_QSPIFlash_Init()
    IRC_Status_t status;
    static uint8_t iddata[FLASH_ID_SIZE];
    qspiFlashID_t flashID;
-   const char *labels[] = { "MT25QL128", "MT25QL256", "S25FL256" };
+   const char *labels[] = { "MT25QL128", "MT25QL256", "S25FL256S", "S25FL256L" };
 
    // QSPI flash initialization
    status = QSPIFlash_Init(&gQSPIFlash,
