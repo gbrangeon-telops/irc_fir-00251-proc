@@ -17,7 +17,6 @@
 #define XADC_VALID_H_
 
 #define TOLERANCE           0.0165f
-#define THERM_TOL           0.0048828125f       // 20 LSBs of a 12-bit ADC, VREF = 1V
 
 #define COOLER_VOLTAGE_MAX    (24.0f * (1.0f + TOLERANCE))
 #define COOLER_VOLTAGE_MIN  	(24.0f * (1.0f - TOLERANCE))
@@ -81,30 +80,40 @@
 								
 #define FPGA_ITEMP_MAX      	(100.0f)
 #define FPGA_ITEMP_MIN      	(-40.0f)
+
+
+#define THERM_TOL             0.003f         // R @ ±0.1% + VREF @ ±0.2%
+#define THERM_VAL_1           0.19967987f    // Volt value for R=4.99k
+#define THERM_VAL_1_MAX       (THERM_VAL_1 * (1.0f + THERM_TOL))
+#define THERM_VAL_1_MIN       (THERM_VAL_1 * (1.0f - THERM_TOL))
+#define THERM_VAL_2           0.83333333f    // Volt value for R=100k
+#define THERM_VAL_2_MAX       (THERM_VAL_2 * (1.0f + THERM_TOL))
+#define THERM_VAL_2_MIN       (THERM_VAL_2 * (1.0f - THERM_TOL))
 								
-#define INT_LENS_TEMP_MAX   	(0.84335f + THERM_TOL)
-#define INT_LENS_TEMP_MIN   	(0.84335f - THERM_TOL)
+#define INT_LENS_TEMP_MAX   	THERM_VAL_1_MAX
+#define INT_LENS_TEMP_MIN   	THERM_VAL_1_MIN
 								
-#define EXT_LENS_TEMP_MAX   	(0.57822f + THERM_TOL)
-#define EXT_LENS_TEMP_MIN   	(0.57822f - THERM_TOL)
+#define EXT_LENS_TEMP_MAX   	THERM_VAL_2_MAX
+#define EXT_LENS_TEMP_MIN   	THERM_VAL_2_MIN
 								
-#define ICU_TEMP_MAX        	(0.33433f + THERM_TOL)
-#define ICU_TEMP_MIN        	(0.33433f - THERM_TOL)
+#define ICU_TEMP_MAX        	THERM_VAL_1_MAX
+#define ICU_TEMP_MIN        	THERM_VAL_1_MIN
 								
-#define SFW_TEMP_MAX        	(0.20404f + THERM_TOL)
-#define SFW_TEMP_MIN        	(0.20404f - THERM_TOL)
+#define SFW_TEMP_MAX        	THERM_VAL_2_MAX
+#define SFW_TEMP_MIN        	THERM_VAL_2_MIN
 								
-#define COMPR_TEMP_MAX      	(0.13103f + THERM_TOL)
-#define COMPR_TEMP_MIN      	(0.13103f - THERM_TOL)
+#define COMPR_TEMP_MAX      	THERM_VAL_1_MAX
+#define COMPR_TEMP_MIN      	THERM_VAL_1_MIN
 								
-#define COLD_FINGER_TEMP_MAX	(0.047743f + THERM_TOL)
-#define COLD_FINGER_TEMP_MIN	(0.047743f - THERM_TOL)
+#define COLD_FINGER_TEMP_MAX	THERM_VAL_2_MAX
+#define COLD_FINGER_TEMP_MIN	THERM_VAL_2_MIN
 								
-#define SPARE_TEMP_MAX      	(0.024857f + THERM_TOL)
-#define SPARE_TEMP_MIN      	(0.024857f - THERM_TOL)
+#define SPARE_TEMP_MAX      	THERM_VAL_1_MAX
+#define SPARE_TEMP_MIN      	THERM_VAL_1_MIN
 								
-#define EXT_THERM_TEMP_MAX  	(0.011766f + THERM_TOL)
-#define EXT_THERM_TEMP_MIN  	(0.011766f - THERM_TOL)
+#define EXT_THERM_TEMP_MAX  	THERM_VAL_2_MAX
+#define EXT_THERM_TEMP_MIN  	THERM_VAL_2_MIN
+
 								
 #define USB_BUS_VOLTAGE_MAX 	(5.0f * (1.0f + TOLERANCE))
 #define USB_BUS_VOLTAGE_MIN 	(5.0f * (1.0f - TOLERANCE))
