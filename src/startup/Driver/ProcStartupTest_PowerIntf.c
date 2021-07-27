@@ -141,27 +141,12 @@ IRC_Status_t AutoTest_ExtFanCtrl(void) {
  * @return IRC_SUCCESS if every step completed successfully
  * @return IRC_FAILURE otherwise
  *
- * @note The BUFFER power line cannot be switched OFF (the control MOSFET is
- *       jumped in hardware)
  */
 IRC_Status_t AutoTest_PwrConnectOnOff(void) {
 
    bool testFailed = false;
+   uint32_t regValue;
 
-   powerChannel_t channelIndex;
-   static char* powerChannelEnumStrings[] = {
-         "PLEORA",
-         "ADC_DDC",
-         "COOLER",
-         "BUFFER",
-         "FW",
-         "EXPANSION",
-         //"SPARE1",
-         //"SPARE2",
-         "SPARE3",
-         "SELF RESET",
-         //"PUSH_BUTTON"
-   };
 
    PRINTF("\n");
    ATR_PRINTF("...............................................");
@@ -172,70 +157,82 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
 
    AutoTest_getUserNULL();
 
-   for (channelIndex = PC_PLEORA; channelIndex <= PC_SELFRESET; channelIndex++)
+
+   // PLEORA is not tested since all components are DNP on the 252.
+
+
+   // ADC_DDC
+   Power_TurnOn(PC_ADC_DDC);
+   ATR_PRINTF("Is the ADC_DDC LED Power Indicator ON? (Y/N) ");
+   if (!AutoTest_getUserYN())
    {
-
-      if (channelIndex != PC_SELFRESET && channelIndex != PC_COOLER && channelIndex != PC_FW && channelIndex != PC_SPARE2)
-      {
-         Power_TurnOn(channelIndex);
-         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-
-         Power_TurnOff(channelIndex);
-         ATR_PRINTF("Is the %s LED Power Indicator OFF? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-      }
-
-      // Filter Wheel power channel is already ON at startup, therefore we reverse the operation order
-      if (channelIndex == PC_FW)
-      {
-         Power_TurnOff(channelIndex);
-         ATR_PRINTF("Is the %s LED Power Indicator OFF? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-
-         Power_TurnOn(channelIndex);
-         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-      }
-
-      // The COOLER power line requires special handling, as the regular Power_TurnOn function
-      // does not allow COOLER power channel control.
-      if (channelIndex == PC_COOLER)
-      {
-         uint32_t mask = 1 << channelIndex;
-         uint32_t regValue;
-
-         regValue = XGpio_DiscreteRead(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT) | mask;
-         XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
-
-         ATR_PRINTF("Is the %s LED Power Indicator ON? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-
-         regValue &= ~mask;
-         XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
-
-         ATR_PRINTF("Is the %s LED Power Indicator OFF? (Y/N) ", powerChannelEnumStrings[channelIndex]);
-         if (!AutoTest_getUserYN())
-         {
-            testFailed = true;
-         }
-      }
+      testFailed = true;
    }
+
+   Power_TurnOff(PC_ADC_DDC);
+   ATR_PRINTF("Is the ADC_DDC LED Power Indicator OFF? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+
+   // The COOLER power line requires special handling, as the regular Power_TurnOn function
+   // does not allow COOLER power channel control.
+   regValue = XGpio_DiscreteRead(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT) | POWER_COOLER_MASK;
+   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
+   ATR_PRINTF("Is the COOLER LED Power Indicator ON? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+   regValue &= ~POWER_COOLER_MASK;
+   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
+   ATR_PRINTF("Is the COOLER LED Power Indicator OFF? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+
+   // FW power channel is already ON at startup, therefore we reverse the operation order
+   Power_TurnOff(PC_FW);
+   ATR_PRINTF("Is the FW LED Power Indicator OFF? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+   Power_TurnOn(PC_FW);
+   ATR_PRINTF("Is the FW LED Power Indicator ON? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+
+   // EXPANSION
+   Power_TurnOn(PC_EXPANSION);
+   ATR_PRINTF("Is the EXPANSION LED Power Indicator ON? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+   Power_TurnOff(PC_EXPANSION);
+   ATR_PRINTF("Is the EXPANSION LED Power Indicator OFF? (Y/N) ");
+   if (!AutoTest_getUserYN())
+   {
+      testFailed = true;
+   }
+
+
+   // SPARE1 and SPARE2 are not tested since they are always enabled (patch on 252).
+
+
+   // TODO: add SELFRESET test
+
 
    return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;
 }
