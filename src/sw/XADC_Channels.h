@@ -80,13 +80,20 @@ enum xadcExtChEnum {
 typedef enum xadcExtChEnum xadcExtCh_t;
 
 /**
- * DeviceVoltageSelector for calibration enumeration values
+ * DeviceVoltageCalibrationSelector for calibration enumeration values
  */
 enum DeviceVoltageCalibrationSelectorEnum {
    DVCS_Ref0 = 0,
    DVCS_Ref1 = 1,
-   DVCS_Ref2 = 2
+   DVCS_Ref2 = 2,
+   DVCS_COUNT
 };
+
+/**
+ * DeviceVoltageCalibrationSelector enumeration values data type
+ */
+typedef enum DeviceVoltageCalibrationSelectorEnum DeviceVoltageCalibrationSelector_t;
+
 
 enum thermistorModelEnum {
    MC65F103A = 0,    // Model Standard MC65F103A
@@ -95,13 +102,8 @@ enum thermistorModelEnum {
 };
 typedef enum thermistorModelEnum thermistorModel_t;
 
-/**
- * DeviceVoltageSelector enumeration values data type
- */
-typedef enum DeviceVoltageCalibrationSelectorEnum DeviceVoltageCalibrationSelector_t;
 
-
-
+extern float DeviceVoltageCalibrationAry[DVCS_COUNT];
 extern xadcChannel_t intAdcChannels[XIC_COUNT];
 extern xadcChannel_t extAdcChannels[XEC_COUNT];
 

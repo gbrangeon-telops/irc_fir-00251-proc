@@ -52,7 +52,7 @@ void XADC_ThPhyConv_MotorLens(xadcChannel_t *xadcCh);
 void XADC_ThUpdated(xadcChannel_t *xadcCh);
 
 // Array for xadc calibration voltage reference
-float DeviceVoltageCalibrationAry[3] = {0.0F, 0.0F, 0.0F};
+float DeviceVoltageCalibrationAry[DVCS_COUNT] = {0.0F, 0.0F, 0.0F};
 
 xadcChannel_t intAdcChannels[XIC_COUNT] =
 {
