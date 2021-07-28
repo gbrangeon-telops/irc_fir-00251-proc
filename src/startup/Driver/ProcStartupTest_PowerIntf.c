@@ -355,7 +355,6 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    xadcExtCh_t curExtChannel;
    bool invalidValue = false;
 
-   // External Interfaces use XADC measurement indices 4 to 15
    XADC_measIdx = XADC_MEASUREMENT_PWR_IDX;
 
    ATR_PRINTF("Make sure the following test harnesses are disconnected:");
@@ -468,6 +467,7 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    }
    PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(P24V_CURRENT_MIN, 3), _FFMT(P24V_CURRENT_MAX, 3));
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DCS_Supply24V];
+
 
    if (XADC_measIdx != XADC_MEASUREMENT_EXT_INTF_IDX) {
       ATR_ERR("Invalid XADC Measurement Index.");

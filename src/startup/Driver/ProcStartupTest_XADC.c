@@ -37,7 +37,6 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    xadcExtCh_t curExtChannel;
    bool invalidValue = false;
 
-   // External Interfaces use XADC measurement indices 4 to 15
    XADC_measIdx = XADC_MEASUREMENT_EXT_INTF_IDX;
 
    //ATR_PRINTF("Connect the Thermistor Test Harness to J17 and J20.\nPress ENTER to continue...");   --> EC
@@ -51,20 +50,7 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
       return IRC_FAILURE;
    }
 
-   for (curExtChannel = XEC_INTERNAL_LENS; curExtChannel < XEC_COOLER_SENSE; curExtChannel++)
-   {
-      // Keep alive
-      AutoTest_RunMinimalStateMachines();
-
-      XADC_SM_Test(curExtChannel);
-      if (!extAdcChannels[curExtChannel].isValid)
-      {
-         ATR_ERR("Invalid XADC reading on external channel %d.", curExtChannel);
-         return IRC_FAILURE;
-      }
-   }
-
-   for (curExtChannel = XEC_USB_VBUS_SENSE; curExtChannel < XEC_VCCAUX_IO_P_SENSE; curExtChannel++)
+   for (curExtChannel = XEC_INTERNAL_LENS; curExtChannel <= XEC_EXT_THERMISTOR; curExtChannel++)
    {
       // Keep alive
       AutoTest_RunMinimalStateMachines();
@@ -197,6 +183,52 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(EXT_THERM_TEMP_MIN, 3), _FFMT(EXT_THERM_TEMP_MAX, 3));
    XADC_Measurement[XADC_measIdx++] = extAdcChannels[XEC_EXT_THERMISTOR].voltage;
 
+
+   if (XADC_measIdx != XADC_MEASUREMENT_EXT_VOLT_IDX) {
+      ATR_ERR("Invalid XADC Measurement Index.");
+   }
+
+   PRINTF("\n");
+
+   return (invalidValue) ? IRC_FAILURE : IRC_SUCCESS;
+}
+
+/*
+ * Uses a modified XADC state machine (XADC_SM_Test) to acquire ADC readings
+ * from the external voltage channels.
+ *
+ * @return IRC_SUCCESS if every measurement completed successfully and every
+ *         value is in range.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t AutoTest_XADCExtVolt(void) {
+
+   xadcExtCh_t curExtChannel;
+   bool invalidValue = false;
+
+   XADC_measIdx = XADC_MEASUREMENT_EXT_VOLT_IDX;
+
+   IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);
+   if (Status != IRC_SUCCESS)
+   {
+      ATR_ERR("Failed to initialize Device: XADC\n");
+      return IRC_FAILURE;
+   }
+
+   for (curExtChannel = XEC_USB_VBUS_SENSE; curExtChannel < XEC_COUNT; curExtChannel++)
+   {
+      // Keep alive
+      AutoTest_RunMinimalStateMachines();
+
+      XADC_SM_Test(curExtChannel);
+      if (!extAdcChannels[curExtChannel].isValid)
+      {
+         ATR_ERR("Invalid XADC reading on external channel %d.", curExtChannel);
+         return IRC_FAILURE;
+      }
+   }
+
+   // Measurement output
    ATR_PRINTF("XADC -- USB Bus Voltage:");
    if (extAdcChannels[XEC_USB_VBUS_SENSE].raw.unipolar <= 0xF0)
    {
@@ -293,52 +325,6 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    }
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_VCC10GigE];
 
-   if (XADC_measIdx != XADC_MEASUREMENT_EXT_VOLT_IDX) {
-      ATR_ERR("Invalid XADC Measurement Index.");
-   }
-
-   PRINTF("\n");
-
-   return (invalidValue) ? IRC_FAILURE : IRC_SUCCESS;
-}
-
-/*
- * Uses a modified XADC state machine (XADC_SM_Test) to acquire ADC readings
- * from the external voltage channels.
- *
- * @return IRC_SUCCESS if every measurement completed successfully and every
- *         value is in range.
- * @return IRC_FAILURE otherwise.
- */
-IRC_Status_t AutoTest_XADCExtVolt(void) {
-
-   xadcExtCh_t curExtChannel;
-   bool invalidValue = false;
-
-   // External Interfaces use XADC measurement indices 4 to 15
-   XADC_measIdx = XADC_MEASUREMENT_EXT_VOLT_IDX;
-
-   IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);
-   if (Status != IRC_SUCCESS)
-   {
-      ATR_ERR("Failed to initialize Device: XADC\n");
-      return IRC_FAILURE;
-   }
-
-   for (curExtChannel = XEC_VCCAUX_IO_P_SENSE; curExtChannel < XEC_COUNT; curExtChannel++)
-   {
-      // Keep alive
-      AutoTest_RunMinimalStateMachines();
-
-      XADC_SM_Test(curExtChannel);
-      if (!extAdcChannels[curExtChannel].isValid)
-      {
-         ATR_ERR("Invalid XADC reading on external channel %d.", curExtChannel);
-         return IRC_FAILURE;
-      }
-   }
-
-   // Measurement output
    ATR_PRINTF("XADC -- Auxiliary Processing I/O Voltage:");
    if (extAdcChannels[XEC_VCCAUX_IO_P_SENSE].raw.unipolar <= 0xF0)
    {
@@ -580,6 +566,70 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    }
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_Supply5V];
 
+   ATR_PRINTF("XADC -- ADC Reference 1 Voltage:");
+   if (extAdcChannels[XEC_ADC_REF_1].raw.unipolar <= 0xF0)
+   {
+      PRINTF("\tNC");
+      XADC_Result[XADC_measIdx] = 1;
+   }
+   else
+   {
+      PRINTF(" " _PCF(3) " V", _FFMT(DeviceVoltageCalibrationAry[DVCS_Ref0], 3));
+      if ((DeviceVoltageCalibrationAry[DVCS_Ref0] >= ADC_REF_1_MIN) && (DeviceVoltageCalibrationAry[DVCS_Ref0] <= ADC_REF_1_MAX))
+      {
+         PRINTF("\tPASS");
+         XADC_Result[XADC_measIdx] = 2;
+      }
+      else
+      {
+         PRINTF("\tFAIL");
+         XADC_Result[XADC_measIdx] = 0;
+         invalidValue = true;
+      }
+      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ADC_REF_1_MIN, 3), _FFMT(ADC_REF_1_MAX, 3));
+   }
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageCalibrationAry[DVCS_Ref0];
+
+   ATR_PRINTF("XADC -- ADC Reference 2 Voltage:");
+   if (extAdcChannels[XEC_ADC_REF_2].raw.unipolar <= 0xF0)
+   {
+      PRINTF("\tNC");
+      XADC_Result[XADC_measIdx] = 1;
+   }
+   else
+   {
+      PRINTF(" " _PCF(3) " V", _FFMT(DeviceVoltageCalibrationAry[DVCS_Ref1], 3));
+      if ((DeviceVoltageCalibrationAry[DVCS_Ref1] >= ADC_REF_2_MIN) && (DeviceVoltageCalibrationAry[DVCS_Ref1] <= ADC_REF_2_MAX))
+      {
+         PRINTF("\tPASS");
+         XADC_Result[XADC_measIdx] = 2;
+      }
+      else
+      {
+         PRINTF("\tFAIL");
+         XADC_Result[XADC_measIdx] = 0;
+         invalidValue = true;
+      }
+      PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ADC_REF_2_MIN, 3), _FFMT(ADC_REF_2_MAX, 3));
+   }
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageCalibrationAry[DVCS_Ref1];
+
+   ATR_PRINTF("XADC -- ADC Reference 3 Voltage: " _PCF(3) " V", _FFMT(DeviceVoltageCalibrationAry[DVCS_Ref2], 3));
+   if ((DeviceVoltageCalibrationAry[DVCS_Ref2] >= ADC_REF_3_MIN) && (DeviceVoltageCalibrationAry[DVCS_Ref2] <= ADC_REF_3_MAX))
+   {
+      PRINTF("\tPASS");
+      XADC_Result[XADC_measIdx] = 2;
+   }
+   else
+   {
+      PRINTF("\tFAIL");
+      XADC_Result[XADC_measIdx] = 0;
+      invalidValue = true;
+   }
+   PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(ADC_REF_3_MIN, 3), _FFMT(ADC_REF_3_MAX, 3));
+   XADC_Measurement[XADC_measIdx++] = DeviceVoltageCalibrationAry[DVCS_Ref2];
+
+
    if (XADC_measIdx != XADC_MEASUREMENT_INT_VOLT_IDX) {
       ATR_ERR("Invalid XADC Measurement Index.");
    }
@@ -602,7 +652,6 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
    xadcIntCh_t curIntChannel;
    bool invalidValue = false;
 
-   // External Interfaces use XADC measurement indices 4 to 15
    XADC_measIdx = XADC_MEASUREMENT_INT_VOLT_IDX;
 
    IRC_Status_t Status = XADC_Init(XADC_DEVICE_ADDR);
@@ -713,6 +762,7 @@ IRC_Status_t AutoTest_XADCIntVolt(void) {
    }
    PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(FPGA_VBRAM_MIN, 3), _FFMT(FPGA_VBRAM_MAX, 3));
    XADC_Measurement[XADC_measIdx++] = DeviceVoltageAry[DVS_ProcessingFPGA_VBRAM];
+
 
    if (XADC_measIdx != XADC_MEASUREMENT_END_IDX) {
       ATR_ERR("Invalid XADC Measurement Index.");
