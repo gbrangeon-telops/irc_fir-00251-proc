@@ -159,6 +159,7 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
 
 
    // PLEORA is not tested since all components are DNP on the 252.
+   // SPARE1 and SPARE2 are not tested since they are always enabled (patch on 252).
 
 
    // ADC_DDC
@@ -228,10 +229,20 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
    }
 
 
-   // SPARE1 and SPARE2 are not tested since they are always enabled (patch on 252).
+   // SELFRESET can't be used normally because it would reset the setup.
+   // SELFRESET has the same effect as the Push Button. It won't reset if we release the IO before 3 sec.
+   XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
+   Power_TurnOn(PC_SELFRESET);   // same as button pushed
+   if (Power_GetPushButtonState() != PBS_PUSHED)
+   {
+      testFailed = true;
+   }
 
-
-   // TODO: add SELFRESET test
+   Power_TurnOff(PC_SELFRESET);  // same as button released
+   if (Power_GetPushButtonState() != PBS_RELEASED)
+   {
+      testFailed = true;
+   }
 
 
    return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;
