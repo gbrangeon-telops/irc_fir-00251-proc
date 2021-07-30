@@ -189,10 +189,8 @@ IRC_Status_t ReleaseInfo_Validate(releaseInfo_t *releaseInfo)
 
 /**
  * Print firmware release information.
- *
- * @param releaseInfo is the pointer to the firmware release information structure to fill.
  */
-void ReleaseInfo_Print(releaseInfo_t *releaseInfo)
+void ReleaseInfo_Print()
 {
    RI_INF("Firmware version: %s", gcRegsData.DeviceVersion);
    RI_INF("Processing FPGA hardware revision: %d", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGAHardwareRevision]);

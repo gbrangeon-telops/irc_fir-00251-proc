@@ -83,6 +83,6 @@ typedef struct releaseInfoStruct releaseInfo_t;
 
 IRC_Status_t ReleaseInfo_Read(qspiFlash_t *qspiFlash, releaseInfo_t *releaseInfo);
 IRC_Status_t ReleaseInfo_Validate(releaseInfo_t *releaseInfo);
-void ReleaseInfo_Print(releaseInfo_t *releaseInfo);
+void ReleaseInfo_Print();
 
 #endif // RELEASEINFO_H
