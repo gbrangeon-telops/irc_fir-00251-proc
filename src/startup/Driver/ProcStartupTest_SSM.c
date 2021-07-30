@@ -52,48 +52,48 @@ void XADC_SM_Test(xadcExtCh_t ExtCh)
    uint32_t i;
 
    // case XADC_INIT
-      if (ExtCh != XEC_COUNT)
-      {
-         Power_SetMuxAddr(extAdcChannels[ExtCh].muxAddr);
-      }
+   if (ExtCh != XEC_COUNT)
+   {
+      Power_SetMuxAddr(extAdcChannels[ExtCh].muxAddr);
+   }
 
-      GETTIME(&tic_xadcSampling);
+   GETTIME(&tic_xadcSampling);
 
    // case XADC_START_SEQUENCE:
 
-      /* Wait for sampling time instead of checking if sampling time has passed */
-      while (elapsed_time_us(tic_xadcSampling) < XADC_SAMPLING_PERIOD_US);
+   /* Wait for sampling time instead of checking if sampling time has passed */
+   while (elapsed_time_us(tic_xadcSampling) < XADC_SAMPLING_PERIOD_US);
 
-      StartXADCSequence();
+   StartXADCSequence();
 
    // case XADC_READ_CHANNELS:
-      // Wait the end of internal sequence
-      while ((XSysMon_GetStatus(&xsm) & XSM_SR_EOS_MASK) != XSM_SR_EOS_MASK);
+   // Wait the end of internal sequence
+   while ((XSysMon_GetStatus(&xsm) & XSM_SR_EOS_MASK) != XSM_SR_EOS_MASK);
 
-      if (ExtCh == XEC_COUNT)
+   if (ExtCh == XEC_COUNT)
+   {
+      // Read the internal ADC channels data from the data registers
+      intAdcChannels[XIC_TEMP].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_TEMP);
+      intAdcChannels[XIC_VCCINT].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VCCINT);
+      intAdcChannels[XIC_VCCAUX].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VCCAUX);
+      intAdcChannels[XIC_VREFP].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VREFP);
+      intAdcChannels[XIC_VREFN].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VREFN);
+      intAdcChannels[XIC_VBRAM].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VBRAM);
+
+      // Process internal ADC channels data
+      for (i = 0; i < XIC_COUNT; ++i)
       {
-         // Read the internal ADC channels data from the data registers
-         intAdcChannels[XIC_TEMP].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_TEMP);
-         intAdcChannels[XIC_VCCINT].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VCCINT);
-         intAdcChannels[XIC_VCCAUX].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VCCAUX);
-         intAdcChannels[XIC_VREFP].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VREFP);
-         intAdcChannels[XIC_VREFN].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VREFN);
-         intAdcChannels[XIC_VBRAM].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VBRAM);
-
-         // Process internal ADC channels data
-         for (i = 0; i < XIC_COUNT; ++i)
-         {
-            ProcessAdcChannel(&intAdcChannels[i]);
-         }
+         ProcessAdcChannel(&intAdcChannels[i]);
       }
-      else
-      {
-         // Read the external ADC channel data from the data register
-         extAdcChannels[ExtCh].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VPVN);
+   }
+   else
+   {
+      // Read the external ADC channel data from the data register
+      extAdcChannels[ExtCh].raw.unipolar = XSysMon_GetAdcData(&xsm, XSM_CH_VPVN);
 
-         // Process external ADC channel data
-         ProcessAdcChannel(&extAdcChannels[ExtCh]);
-      }
+      // Process external ADC channel data
+      ProcessAdcChannel(&extAdcChannels[ExtCh]);
+   }
 }
 
 /****************************************************************************************

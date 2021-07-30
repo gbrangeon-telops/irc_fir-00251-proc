@@ -78,6 +78,10 @@ enum automatedTestIDEnum {
    ATID_Count
 };
 
+/*
+ * Automated test ID data type
+ */
+typedef enum automatedTestIDEnum autoTestID_t;
 
 
 #endif // PROCSTARTUPTESTDEF_H

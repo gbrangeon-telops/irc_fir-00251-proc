@@ -20,6 +20,7 @@
 #include "fpa_intf.h"
 #include "GC_Callback.h"
 #include "xintc.h"
+#include "ReleaseInfo.h"
 
 static IRC_Status_t AutoTest_Check(void);
 static IRC_Status_t AutoTest_Initialize(void);
@@ -169,7 +170,7 @@ static IRC_Status_t AutoTest_GetGlobalResult(AutoTest_GlobalResult_t *result) {
 
    memset(result, 0, sizeof(AutoTest_GlobalResult_t));
 
-   for (i = ATID_ProcessingCalibrationMemory; i < ATID_Count; i++)
+   for (i = 0; i < ATID_Count; i++)
    {
       if (autoTests[i].result == ATR_FAILED)
       {
@@ -184,11 +185,6 @@ static IRC_Status_t AutoTest_GetGlobalResult(AutoTest_GlobalResult_t *result) {
       else if (autoTests[i].result == ATR_PASSED)
       {
          result->passed++;
-         totalResults++;
-      }
-      else if (autoTests[i].result == ATR_SKIPPED)
-      {
-         result->skipped++;
          totalResults++;
       }
    }
@@ -211,6 +207,7 @@ static void AutoTest_PrintGlobalResult(void) {
    AutoTest_GlobalResult_t results;
    autoTestID_t testIndex;
    char testResultString[10];
+   XADC_MeasurementID_t XADC_measIdx;
    IRC_Status_t status;
 
    PRINTF("\n\n");
@@ -225,20 +222,17 @@ static void AutoTest_PrintGlobalResult(void) {
 
       switch(autoTests[testIndex].result) {
          case ATR_PASSED:
-            snprintf(testResultString, sizeof(testResultString), "PASSED");
+            snprintf(testResultString, sizeof(testResultString), "PASS");
             break;
          case ATR_FAILED:
-            snprintf(testResultString, sizeof(testResultString), "FAILED");
-            break;
-         case ATR_SKIPPED:
-            snprintf(testResultString, sizeof(testResultString), "SKIPPED");
+            snprintf(testResultString, sizeof(testResultString), "FAIL");
             break;
          case ATR_PENDING:
             snprintf(testResultString, sizeof(testResultString), "PENDING");
             break;
       }
 
-      ATR_PRINTF("%-58s%s", autoTests[testIndex].description, testResultString);
+      ATR_PRINTF("%2d : %-58s%s", autoTests[testIndex].id, autoTests[testIndex].description, testResultString);
    }
 
    PRINTF("\n");
@@ -255,6 +249,29 @@ static void AutoTest_PrintGlobalResult(void) {
    }
 
    PRINTF("\n");
+
+   ATR_PRINTF("XADC Measurement Summary");
+   for (XADC_measIdx = 0; XADC_measIdx < XADC_CHANNEL_COUNT; XADC_measIdx++) {
+
+      switch(XADC_Tests[XADC_measIdx].result) {
+         case XMR_PASS:
+            snprintf(testResultString, sizeof(testResultString), "PASS");
+            break;
+         case XMR_FAIL:
+            snprintf(testResultString, sizeof(testResultString), "FAIL");
+            break;
+         case XMR_NC:
+            snprintf(testResultString, sizeof(testResultString), "NC");
+            break;
+         case XMR_PENDING:
+            snprintf(testResultString, sizeof(testResultString), "PENDING");
+            break;
+      }
+
+      ATR_PRINTF("%2d %s" _PCF(3) "\t%s", XADC_Tests[XADC_measIdx].id, XADC_Tests[XADC_measIdx].description, _FFMT(XADC_Tests[XADC_measIdx].measurement, 3), testResultString);
+   }
+
+   PRINTF("\n\n");
 
    return;
 }
@@ -348,99 +365,24 @@ static void AutoTest_RunUnitaryTests(void) {
 
 /*
  * Tells the user to enable console logging, then prints all test results to the console
- * using printing format #testIdx.testResult;args:#
  * Includes a system revisions header for easier tracking.
  *
  * @return void
  */
 static void AutoTest_GenerateTestReport(void) {
 
-   autoTestID_t testIdx;
-   uint8_t aryIdx;
-
-   char* testResultDesc[4] = {
-         "FAIL",
-         "SKIP",
-         "PASS",
-         "PENDING"
-   };
-
-   char* XADCResultDesc[4] = {
-         "FAIL",
-         "NC",
-         "PASS",
-         "PENDING"
-   };
-
-   char* XADC_ChannelDesc[XADC_CHANNEL_COUNT] = {
-         "Cooler Voltage",
-         "Cooler Current",
-         "24V Voltage",
-         "24V Current",
-         "Internal Lens Temperature voltage",
-         "External Lens Temperature voltage",
-         "ICU Temperature voltage",
-         "SFW Temperature voltage",
-         "Compressor Temperature voltage",
-         "Cold Finger Temperature voltage",
-         "SPARE Temperature voltage",
-         "External Thermistor Temperature voltage",
-         "USB BUS Voltage",
-         "USB 1V8 Voltage",
-         "DDR3 Reference Voltage",
-         "10GigE Reference Voltage",
-         "Processing Auxiliary I/O Voltage",
-         "Output Auxiliary I/O Voltage",
-         "3V3 Supply Voltage",
-         "2V5 Supply Voltage",
-         "1V8 Supply Voltage",
-         "1V5 Supply Voltage",
-         "MGT 1.0V Voltage",
-         "MGT 1.2V Voltage",
-         "12V Supply Voltage",
-         "5V Supply Voltage",
-         "ADC Reference 1 Voltage",
-         "ADC Reference 2 Voltage",
-         "ADC Reference 3 Voltage",
-         "FPGA Internal Temperature",
-         "FPGA Internal VCC",
-         "FPGA Auxiliary VCC",
-         "FPGA Positive Reference Voltage",
-         "FPGA Negative Reference Voltage",
-         "FPGA BRAM Voltage"
-   };
-
    ATR_PRINTF("Enable the console logging function (File -> Log...)\nPress ENTER to continue...\n\n");
    AutoTest_getUserNULL();
 
    // Print system revisions
-   PRINTF("\"Device Version\",\"%s\"\n", gcRegsData.DeviceVersion);    // Firmware version
-   PRINTF("\"Processing FPGA Hardware Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGAHardwareRevision]);
-   PRINTF("\"Processing FPGA Software Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGASoftwareRevision]);
-   PRINTF("\"Processing FPGA Bootloader Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGABootLoaderRevision]);
-   PRINTF("\"Processing FPGA Common Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_ProcessingFPGACommonRevision]);
-   PRINTF("\"Output FPGA Hardware Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGAHardwareRevision]);
-   PRINTF("\"Output FPGA Software Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGASoftwareRevision]);
-   PRINTF("\"Output FPGA Bootloader Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGABootLoaderRevision]);
-   PRINTF("\"Output FPGA Common Rev\",\"%d\"\n", DeviceFirmwareModuleRevisionAry[DFMS_OutputFPGACommonRevision]);
-   PRINTF("\"XML Version\",\"%d.%d.%d\"\n", gcRegsData.DeviceXMLMajorVersion, gcRegsData.DeviceXMLMinorVersion, gcRegsData.DeviceXMLSubMinorVersion);
+   ReleaseInfo_Print();
 
-   PRINTF("\n\n");
+   PRINTF("\n");
 
-   PRINTF("\"Test Index\",\"Test Description\",\"Test Result\"\n");
+   // Print results summary
+   AutoTest_PrintGlobalResult();
 
-   for (testIdx = 0; testIdx < ATID_Count; testIdx++) {
-      PRINTF("%d,\"%s\",\"%s\"\n", testIdx, autoTests[testIdx].description, testResultDesc[autoTests[testIdx].result]);
-   }
-
-   PRINTF("\n\n");
-   PRINTF("\"XADC Measurement Index\",\"XADC Channel\",\"Measurement Value\",\"Measurement Result\"\n");
-
-   for (aryIdx = 0; aryIdx < XADC_MEASUREMENT_END_IDX; aryIdx++) {
-      PRINTF("%d,\"%s\",\"" _PCF(3) "\",\"%s\"\n", aryIdx, XADC_ChannelDesc[aryIdx], _FFMT(XADC_Measurement[aryIdx], 3), XADCResultDesc[XADC_Result[aryIdx]]);
-   }
-
-   PRINTF("\n\n\n");
+   PRINTF("\n");
 
    return;
 }

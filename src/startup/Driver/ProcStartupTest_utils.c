@@ -61,10 +61,49 @@ static float    TriggerDelay;
 static uint32_t TriggerFrameCount;
 static uint32_t DeviceTimeSource;
 
-// XADC Measurements storage variables
-float XADC_Measurement[XADC_MEASUREMENT_END_IDX] = { 0 };
-uint8_t XADC_Result[XADC_MEASUREMENT_END_IDX] = { 0 };
-uint8_t XADC_measIdx = 0;
+
+/*
+ * XADC tests structure
+ */
+XADC_Test_t XADC_Tests[XADC_CHANNEL_COUNT] =
+{
+   // Test ID                 Test Description                                               Test Measurement  Test Result
+   {VOLTAGE_COOLER,           "XADC -- Cooler Voltage [V]:                           ",       0.0F,             XMR_PENDING},
+   {CURRENT_COOLER,           "XADC -- Cooler Current [A]:                           ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_24V,              "XADC -- 24V Voltage [V]:                              ",       0.0F,             XMR_PENDING},
+   {CURRENT_24V,              "XADC -- 24V Current [A]:                              ",       0.0F,             XMR_PENDING},
+   {INTERNAL_LENS_TEMP,       "XADC -- Internal Lens Temperature Voltage [V]:        ",       0.0F,             XMR_PENDING},
+   {EXTERNAL_LENS_TEMP,       "XADC -- External Lens Temperature Voltage [V]:        ",       0.0F,             XMR_PENDING},
+   {ICU_TEMP,                 "XADC -- ICU Temperature Voltage [V]:                  ",       0.0F,             XMR_PENDING},
+   {SFW_TEMP,                 "XADC -- SFW Temperature Voltage [V]:                  ",       0.0F,             XMR_PENDING},
+   {COMPRESSOR_TEMP,          "XADC -- Compressor Temperature Voltage [V]:           ",       0.0F,             XMR_PENDING},
+   {COLDFINGER_TEMP,          "XADC -- Cold Finger Temperature Voltage [V]:          ",       0.0F,             XMR_PENDING},
+   {SPARE_TEMP,               "XADC -- SPARE Temperature Voltage [V]:                ",       0.0F,             XMR_PENDING},
+   {EXTERNAL_TEMP,            "XADC -- External Thermistor Temperature Voltage [V]:  ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_USB_BUS,          "XADC -- USB Bus Voltage [V]:                          ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_USB_1V8,          "XADC -- USB 1.8V Source Voltage [V]:                  ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_DDR3_REF,         "XADC -- DDR3 Reference Voltage [V]:                   ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_10GIGE,           "XADC -- 10GigE Supply Voltage [V]:                    ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_AUX_IO_PROC,      "XADC -- Auxiliary Processing I/O Voltage [V]:         ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_AUX_IO_OUT,       "XADC -- Auxiliary Output I/O Voltage [V]:             ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_3V3,              "XADC -- 3.3V Supply Voltage [V]:                      ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_2V5,              "XADC -- 2.5V Supply Voltage [V]:                      ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_1V8,              "XADC -- 1.8V Supply Voltage [V]:                      ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_1V5,              "XADC -- 1.5V - 1.35V Supply Voltage [V]:              ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_MGT_1V0,          "XADC -- MGT 1.0V Voltage [V]:                         ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_MGT_1V2,          "XADC -- MGT 1.2V Voltage [V]:                         ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_12V,              "XADC -- 12V Supply Voltage [V]:                       ",       0.0F,             XMR_PENDING},
+   {VOLTAGE_5V,               "XADC -- 5V Supply Voltage [V]:                        ",       0.0F,             XMR_PENDING},
+   {ADC_REF_1,                "XADC -- ADC Reference 1 Voltage [V]:                  ",       0.0F,             XMR_PENDING},
+   {ADC_REF_2,                "XADC -- ADC Reference 2 Voltage [V]:                  ",       0.0F,             XMR_PENDING},
+   {ADC_REF_3,                "XADC -- ADC Reference 3 Voltage [V]:                  ",       0.0F,             XMR_PENDING},
+   {FPGA_INTERNAL_TEMP,       "XADC -- Internal FPGA Temperature [°C]:               ",       0.0F,             XMR_PENDING},
+   {FPGA_VCCINT,              "XADC -- Internal VCC [V]:                             ",       0.0F,             XMR_PENDING},
+   {FPGA_AUX_VCC,             "XADC -- Auxiliary VCC [V]:                            ",       0.0F,             XMR_PENDING},
+   {FPGA_VREF_POS,            "XADC -- Reference V+ [V]:                             ",       0.0F,             XMR_PENDING},
+   {FPGA_VREF_NEG,            "XADC -- Reference V- [V]:                             ",       0.0F,             XMR_PENDING},
+   {FPGA_BRAM,                "XADC -- BRAM Voltage [V]:                             ",       0.0F,             XMR_PENDING}
+};
 
 /*
  * Function package which includes every state machine that must be kept alive to

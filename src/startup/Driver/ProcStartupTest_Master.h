@@ -35,16 +35,10 @@
 // Type definitions
 
 /*
- * Automated test ID data type
- */
-typedef enum automatedTestIDEnum autoTestID_t;
-
-/*
  * Automated test result
  */
 enum automatedTestResultEnum {
    ATR_FAILED = 0,
-   ATR_SKIPPED,
    ATR_PASSED,
    ATR_PENDING
 };
@@ -64,7 +58,6 @@ typedef IRC_Status_t (*autoTestFunc_t)();
  */
 struct AutomatedTestResultStruct {
    uint32_t pending;
-   uint32_t skipped;
    uint32_t failed;
    uint32_t passed;
 };

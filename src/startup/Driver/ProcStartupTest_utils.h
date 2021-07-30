@@ -61,8 +61,10 @@ extern volatile bool breakBatchMode;
 extern volatile IRC_Status_t oTestResult;
 extern volatile int32_t unitaryTestIndex;
 
-// XADC Measurements storage variables
-enum XADC_MeasurementEnum {
+/*
+ * XADC Measurement ID enum
+ */
+enum XADC_MeasurementIDEnum {
    VOLTAGE_COOLER = 0,
    CURRENT_COOLER,
    VOLTAGE_24V,
@@ -102,15 +104,42 @@ enum XADC_MeasurementEnum {
    XADC_CHANNEL_COUNT
 };
 
-#define XADC_MEASUREMENT_PWR_IDX          VOLTAGE_COOLER
-#define XADC_MEASUREMENT_EXT_INTF_IDX     INTERNAL_LENS_TEMP
-#define XADC_MEASUREMENT_EXT_VOLT_IDX     VOLTAGE_USB_BUS
-#define XADC_MEASUREMENT_INT_VOLT_IDX     FPGA_INTERNAL_TEMP
-#define XADC_MEASUREMENT_END_IDX          XADC_CHANNEL_COUNT
+/*
+ * XADC Measurement ID data type
+ */
+typedef enum XADC_MeasurementIDEnum XADC_MeasurementID_t;
 
-extern float XADC_Measurement[XADC_CHANNEL_COUNT];
-extern uint8_t XADC_Result[XADC_CHANNEL_COUNT];
-extern uint8_t XADC_measIdx;
+/*
+ *  XADC Measurement result
+ */
+enum XADC_MeasurementResultEnum {
+   XMR_FAIL = 0,
+   XMR_NC,
+   XMR_PASS,
+   XMR_PENDING
+};
+
+/*
+ *  XADC Measurement result data type
+ */
+typedef enum XADC_MeasurementResultEnum XADC_MeasurementResult_t;
+
+/*
+ * XADC test structure
+ */
+struct XADC_TestStruct {
+   XADC_MeasurementID_t id;
+   char *description;
+   float measurement;
+   XADC_MeasurementResult_t result;
+};
+
+/*
+ * XADC test data type
+ */
+typedef struct XADC_TestStruct XADC_Test_t;
+
+extern XADC_Test_t XADC_Tests[XADC_CHANNEL_COUNT];
 
 void AutoTest_RunMinimalStateMachines(void);
 bool AutoTest_getUserYN(void);
