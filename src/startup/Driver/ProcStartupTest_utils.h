@@ -41,7 +41,6 @@
 #define ATR_ERR(fmt, ...)        PRINTF("\nATR> Error: " fmt, ##__VA_ARGS__)
 #define ATR_INF(fmt, ...)        PRINTF("\nATR> Info: " fmt, ##__VA_ARGS__)
 #define ATR_PRINTF(fmt, ...)     PRINTF("\nATR> " fmt, ##__VA_ARGS__)
-#define ATR_PRINT(fmt, ...)      PRINTF("\nATR> " fmt, ##__VA_ARGS__)
 
 #ifdef ATR_VERBOSE
    #define ATR_DBG(fmt, ...)     PRINTF("\nATR> Debug: " fmt, ##__VA_ARGS__)

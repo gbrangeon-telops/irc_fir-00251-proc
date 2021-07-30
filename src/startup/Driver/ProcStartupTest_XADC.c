@@ -232,7 +232,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_USB_VBUS_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -256,7 +256,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_USB_1V8_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -280,7 +280,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_DDR3_VREF_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -304,7 +304,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_VCC_10GigE_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -328,7 +328,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_VCCAUX_IO_P_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -352,7 +352,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_VCCAUX_IO_O_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -376,7 +376,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_3V3_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -400,7 +400,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_2V5_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -424,7 +424,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V8_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -448,7 +448,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V5_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -474,7 +474,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V0MGT_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -498,7 +498,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_1V2MGT_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -522,7 +522,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_12V_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -545,7 +545,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_5V0_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -569,7 +569,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_ADC_REF_1].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -593,7 +593,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_ADC_REF_2].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else

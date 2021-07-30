@@ -233,17 +233,30 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
    // SELFRESET has the same effect as the Push Button. It won't reset if we release the IO before 3 sec.
    XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
    Power_TurnOn(PC_SELFRESET);   // same as button pushed
-   if (Power_GetPushButtonState() != PBS_PUSHED)
+   ATR_PRINTF("Self Reset activation... ");
+   if (Power_GetPushButtonState() == PBS_PUSHED)
    {
+      PRINTF("succeed");
+   }
+   else
+   {
+      PRINTF("failed");
       testFailed = true;
    }
 
    Power_TurnOff(PC_SELFRESET);  // same as button released
-   if (Power_GetPushButtonState() != PBS_RELEASED)
+   ATR_PRINTF("Self Reset deactivation... ");
+   if (Power_GetPushButtonState() == PBS_RELEASED)
    {
+      PRINTF("succeed");
+   }
+   else
+   {
+      PRINTF("failed");
       testFailed = true;
    }
 
+   PRINTF("\n");
 
    return (testFailed) ? IRC_FAILURE : IRC_SUCCESS;
 }
@@ -364,6 +377,7 @@ IRC_Status_t AutoTest_PwrBtnInt(void) {
 IRC_Status_t AutoTest_XADCPwrMonitor(void) {
 
    xadcExtCh_t curExtChannel;
+   uint32_t regValue;
    bool invalidValue = false;
 
    XADC_MeasurementID_t XADC_measIdx = VOLTAGE_COOLER;
@@ -387,6 +401,10 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       return IRC_FAILURE;
    }
 
+   // Turn the cooler on to have a valid cooler current measurement
+   regValue = XGpio_DiscreteRead(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT) | POWER_COOLER_MASK;
+   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
+
    for (curExtChannel = XEC_COOLER_SENSE; curExtChannel <= XEC_24V_CUR; curExtChannel++)
    {
       // Keep alive
@@ -400,11 +418,15 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       }
    }
 
+   // Turn the cooler off
+   regValue &= ~POWER_COOLER_MASK;
+   XGpio_DiscreteWrite(&gPowerCtrl.GPIO, PGPIOC_POWER_MANAGEMENT, regValue);
+
    // Measurement output
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_COOLER_SENSE].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -428,7 +450,7 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
    ATR_PRINTF("%s", XADC_Tests[XADC_measIdx].description);
    if (extAdcChannels[XEC_COOLER_CUR].raw.unipolar <= 0xF0)
    {
-      PRINTF("\tNC");
+      PRINTF("\t\tNC");
       XADC_Tests[XADC_measIdx].result = XMR_NC;
    }
    else
@@ -447,7 +469,7 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       }
       PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(COOLER_CURRENT_MIN, 3), _FFMT(COOLER_CURRENT_MAX, 3));
    }
-   XADC_Tests[XADC_measIdx++].measurement = DeviceVoltageAry[DCS_Cooler];
+   XADC_Tests[XADC_measIdx++].measurement = DeviceCurrentAry[DCS_Cooler];
 
    ATR_PRINTF("%s" _PCF(3), XADC_Tests[XADC_measIdx].description, _FFMT(DeviceVoltageAry[DVS_Supply24V], 3));
    if ((DeviceVoltageAry[DVS_Supply24V] >= P24V_VOLTAGE_MIN) && (DeviceVoltageAry[DVS_Supply24V] <= P24V_VOLTAGE_MAX))
@@ -477,7 +499,7 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
       invalidValue = true;
    }
    PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(P24V_CURRENT_MIN, 3), _FFMT(P24V_CURRENT_MAX, 3));
-   XADC_Tests[XADC_measIdx].measurement = DeviceVoltageAry[DCS_Supply24V];
+   XADC_Tests[XADC_measIdx].measurement = DeviceCurrentAry[DCS_Supply24V];
 
 
    if (XADC_measIdx != CURRENT_24V) {

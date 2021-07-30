@@ -23,8 +23,8 @@
 #define COOLER_VOLTAGE_MAX    (24.0f * (1.0f + VOLTAGE_TOL))
 #define COOLER_VOLTAGE_MIN  	(24.0f * (1.0f - VOLTAGE_TOL))
 								
-#define COOLER_CURRENT_MAX  	0
-#define COOLER_CURRENT_MIN  	0
+#define COOLER_CURRENT_MAX  	(0.5f)
+#define COOLER_CURRENT_MIN  	(0.1f)
 								
 #define P24V_VOLTAGE_MAX    	(24.0f * (1.0f + VOLTAGE_TOL))
 #define P24V_VOLTAGE_MIN    	(24.0f * (1.0f - VOLTAGE_TOL))
