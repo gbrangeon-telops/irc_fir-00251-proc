@@ -228,7 +228,6 @@ void Acquisition_SM()
    extern t_FpaIntf gFpaIntf;
    extern flashDynamicValues_t gFlashDynamicValues;
    extern t_Trig gTrig;
-   extern t_FpaIntf gFpaIntf;
 
    #ifdef SCD_PROXY
       extern uint8_t gFrameRateChangePostponed;
@@ -462,6 +461,7 @@ void Acquisition_SM()
             }
          #endif
          break;
+
       case ACQ_WAITING_FOR_ADC_DDC_PRESENCE:
          FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if (fpaStatus.adc_ddc_detect_process_done == 1)
@@ -644,28 +644,28 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_FPA_INIT:
-            FPA_GetStatus(&fpaStatus, &gFpaIntf);
-            if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);
+         if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
+         {
+            if (fpaStatus.fpa_init_success == 1)
             {
-               if (fpaStatus.fpa_init_success == 1)
-               {
-                  builtInTests[BITID_SensorInitialization].result = BITR_Passed;
-                  ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
-                  acquisitionState = ACQ_FINALIZE_POWER_ON;
-               }
-               else
-               {
-                  builtInTests[BITID_SensorInitialization].result = BITR_Failed;
-                  ACQ_ERR("Sensor initialization failed.");
-                  acquisitionState = ACQ_POWER_RESET;
-               }
+               builtInTests[BITID_SensorInitialization].result = BITR_Passed;
+               ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
+               acquisitionState = ACQ_FINALIZE_POWER_ON;
             }
-            else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
+            else
             {
                builtInTests[BITID_SensorInitialization].result = BITR_Failed;
-               ACQ_ERR("Sensor initialization timeout.");
+               ACQ_ERR("Sensor initialization failed.");
                acquisitionState = ACQ_POWER_RESET;
             }
+         }
+         else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
+         {
+            builtInTests[BITID_SensorInitialization].result = BITR_Failed;
+            ACQ_ERR("Sensor initialization timeout.");
+            acquisitionState = ACQ_POWER_RESET;
+         }
          break;
 
       case ACQ_FINALIZE_POWER_ON:
