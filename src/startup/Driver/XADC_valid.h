@@ -58,8 +58,10 @@
 #define USB_1V8_MAX           (1.8f * (1.0f + VOLTAGE_TOL))
 #define USB_1V8_MIN           (1.8f * (1.0f - VOLTAGE_TOL))
 
-#define DDR3_VREF_MAX         (0.75f * (1.0f + VOLTAGE_TOL))
-#define DDR3_VREF_MIN         (0.75f * (1.0f - VOLTAGE_TOL))
+//#define DDR3_VREF_MAX         (0.75f * (1.0f + VOLTAGE_TOL))
+//#define DDR3_VREF_MIN         (0.75f * (1.0f - VOLTAGE_TOL))
+#define DDR3_VREF_MAX         (0.86f)     // experimentally determined
+#define DDR3_VREF_MIN         (0.81f)
 
 #define GIGE_VCC10_MAX        SUPPLY_12V_MAX
 #define GIGE_VCC10_MIN        SUPPLY_12V_MIN
@@ -98,8 +100,10 @@
 #define SUPPLY_5V_MIN       	(5.0f * (1.0f - VOLTAGE_TOL))
 
 
-#define ADC_REF_1_MAX         (0.97516f + 0.003f)  // ADC Ref needs to be precise
-#define ADC_REF_1_MIN         (0.97516f - 0.003f)
+//#define ADC_REF_1_MAX         (0.97516f + 0.003f)  // ADC Ref needs to be precise
+//#define ADC_REF_1_MIN         (0.97516f - 0.003f)
+#define ADC_REF_1_MAX         (0.979f + 0.003f)    // differs from theoretical value because
+#define ADC_REF_1_MIN         (0.979f - 0.003f)    // it is very close to the max XADC value
 
 #define ADC_REF_2_MAX         (0.09942f + 0.003f)  // ADC Ref needs to be precise
 #define ADC_REF_2_MIN         (0.09942f - 0.003f)
@@ -109,9 +113,13 @@
 
 
 #define THERM_TOL             0.003f         // R @ ±0.1% + VREF @ ±0.2%
-#define THERM_VAL_1           0.19967987f    // Volt value for R=4.99k
-#define THERM_VAL_1_MAX       (THERM_VAL_1 * (1.0f + THERM_TOL))
-#define THERM_VAL_1_MIN       (THERM_VAL_1 * (1.0f - THERM_TOL))
+
+//#define THERM_VAL_1           0.19967987f    // Volt value for R=4.99k
+//#define THERM_VAL_1_MAX       (THERM_VAL_1 * (1.0f + THERM_TOL))
+//#define THERM_VAL_1_MIN       (THERM_VAL_1 * (1.0f - THERM_TOL))
+#define THERM_VAL_1_MAX       (0.210f)       // experimentally determined
+#define THERM_VAL_1_MIN       (0.204f)
+
 #define THERM_VAL_2           0.83333333f    // Volt value for R=100k
 #define THERM_VAL_2_MAX       (THERM_VAL_2 * (1.0f + THERM_TOL))
 #define THERM_VAL_2_MIN       (THERM_VAL_2 * (1.0f - THERM_TOL))
