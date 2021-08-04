@@ -178,6 +178,7 @@ IRC_Status_t AutoTest_XADCExtIntf(void) {
    else
    {
       PRINTF("\tFAIL");
+      XADC_Tests[XADC_measIdx].result = XMR_FAIL;
       invalidValue = true;
    }
    PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(EXT_THERM_TEMP_MIN, 3), _FFMT(EXT_THERM_TEMP_MAX, 3));
@@ -536,6 +537,7 @@ IRC_Status_t AutoTest_XADCExtVolt(void) {
       else
       {
          PRINTF("\tFAIL");
+         XADC_Tests[XADC_measIdx].result = XMR_FAIL;
          invalidValue = true;
       }
       PRINTF("\tValid interval = [" _PCF(3) ", " _PCF(3) "]", _FFMT(SUPPLY_12V_MIN, 3), _FFMT(SUPPLY_12V_MAX, 3));

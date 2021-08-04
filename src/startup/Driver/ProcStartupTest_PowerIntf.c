@@ -197,16 +197,16 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
    }
 
 
-   // FW power channel is already ON at startup, therefore we reverse the operation order
-   Power_TurnOff(PC_FW);
-   ATR_PRINTF("Is the FW LED Power Indicator OFF? (Y/N) ");
+   // FW
+   Power_TurnOn(PC_FW);
+   ATR_PRINTF("Is the FW LED Power Indicator ON? (Y/N) ");
    if (!AutoTest_getUserYN())
    {
       testFailed = true;
    }
 
-   Power_TurnOn(PC_FW);
-   ATR_PRINTF("Is the FW LED Power Indicator ON? (Y/N) ");
+   Power_TurnOff(PC_FW);
+   ATR_PRINTF("Is the FW LED Power Indicator OFF? (Y/N) ");
    if (!AutoTest_getUserYN())
    {
       testFailed = true;
@@ -234,6 +234,7 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
    XIntc_Disable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
    Power_TurnOn(PC_SELFRESET);   // same as button pushed
    ATR_PRINTF("Self Reset activation... ");
+   WAIT_US(50000);   // wait 50 ms
    if (Power_GetPushButtonState() == PBS_PUSHED)
    {
       PRINTF("succeed");
@@ -246,6 +247,7 @@ IRC_Status_t AutoTest_PwrConnectOnOff(void) {
 
    Power_TurnOff(PC_SELFRESET);  // same as button released
    ATR_PRINTF("Self Reset deactivation... ");
+   WAIT_US(50000);   // wait 50 ms
    if (Power_GetPushButtonState() == PBS_RELEASED)
    {
       PRINTF("succeed");
@@ -417,6 +419,10 @@ IRC_Status_t AutoTest_XADCPwrMonitor(void) {
          return IRC_FAILURE;
       }
    }
+
+   // Read the cooler current to full the filter, otherwise the average is wrong
+   for (int i = 0; i < XADC_FILTER_DEPTH; i++)
+      XADC_SM_Test(XEC_COOLER_CUR);
 
    // Turn the cooler off
    regValue &= ~POWER_COOLER_MASK;
