@@ -158,6 +158,13 @@ package Proxy_define is
       scd_temp_read_num       : unsigned(7 downto 0);
    end record; 
    
+   -- sol et eol de l'aoi
+   type line_area_cfg_type is
+   record      
+      sol_pos             : unsigned(8 downto 0);     -- position de sol de l'aoi lorsque cropping actif
+      eol_pos             : unsigned(8 downto 0);     -- position de eol de l'aoi lorsque cropping actif
+   end record;
+   
    -- scd misc 
    type scd_misc_cfg_type is
    record
@@ -186,6 +193,7 @@ package Proxy_define is
       scd_frame_res           : scd_frame_res_cfg_type;  -- tout changement dans scd_frame_res entraine la programmation du detecteur (commande frame resolution)
       scd_temp                : scd_temp_cfg_type;       -- tout changement dans scd_temp entraine la programmation du detecteur (commande temperature read)  
       scd_misc                : scd_misc_cfg_type;       -- les changements dans scd_misc ne font pas programmer le detecteur
+      aoi_data                : line_area_cfg_type;      -- Config cropping
       fpa_serdes_lval_num     : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       fpa_serdes_lval_len     : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée
       int_time                : unsigned(31 downto 0);   -- temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.

@@ -239,6 +239,7 @@ begin
                      user_cfg_i.scd_misc      <= mb_struct_cfg.scd_misc;
                      user_cfg_i.scd_frame_res <= mb_struct_cfg.scd_frame_res;
                      user_cfg_i.scd_temp      <= mb_struct_cfg.scd_temp;
+                     user_cfg_i.aoi_data      <= mb_struct_cfg.aoi_data;
                      if mb_struct_cfg.cmd_to_update_id = SCD_OP_CMD_ID then
                         user_cfg_i.scd_op     <= mb_struct_cfg.scd_op;
                      elsif mb_struct_cfg.cmd_to_update_id = SCD_DIAG_CMD_ID then
@@ -565,11 +566,13 @@ begin
                         when X"6C" =>    mb_struct_cfg.scd_misc.scd_x_to_next_fsync_re_dly               <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_x_to_next_fsync_re_dly'length-1 downto 0));
                         when X"70" =>    mb_struct_cfg.scd_misc.scd_fsync_re_to_intg_start_dly           <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_fsync_re_to_intg_start_dly'length-1 downto 0));
                         when X"74" =>    mb_struct_cfg.scd_misc.scd_xsize_div_per_pixel_num              <= unsigned(data_i(mb_struct_cfg.scd_misc.scd_xsize_div_per_pixel_num'length-1 downto 0));
-                        when X"78" =>    mb_struct_cfg.scd_op.cfg_num                   <= unsigned(data_i(mb_struct_cfg.scd_op.cfg_num'length-1 downto 0));
-                        when X"7C" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig        <= data_i(0);
+                        when X"78" =>    mb_struct_cfg.aoi_data.sol_pos                                  <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0));
+                        when X"7C" =>    mb_struct_cfg.aoi_data.eol_pos                                  <= unsigned(data_i(mb_struct_cfg.aoi_data.eol_pos'length-1 downto 0));
+                        when X"80" =>    mb_struct_cfg.scd_op.cfg_num                                    <= unsigned(data_i(mb_struct_cfg.scd_op.cfg_num'length-1 downto 0));
+                        when X"84" =>    mb_struct_cfg.comn.fpa_stretch_acq_trig                         <= data_i(0);
                            
                         -- Id de la partie de mb_Struct_cg qu.il faut mettre à jour
-                        when X"80" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
+                        when X"88" =>    mb_struct_cfg.cmd_to_update_id                 <= data_i(mb_struct_cfg.cmd_to_update_id'length-1 downto 0);
                         
                         -- BB1280 only : frame resolution configuration 
                         when X"A0" =>    mb_struct_cfg.scd_frame_res.cfg_num <= data_i(mb_struct_cfg.scd_frame_res.cfg_num'length-1 downto 0); mb_cfg_rqst <= '1';                    

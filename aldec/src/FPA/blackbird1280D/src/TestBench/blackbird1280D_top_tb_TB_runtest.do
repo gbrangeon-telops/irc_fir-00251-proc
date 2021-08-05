@@ -34,7 +34,8 @@ acom -incr -nowarn DAGGEN_0523 d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\pr
 acom "D:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\TestBench\blackbird1280D_testbench_pkg.vhd"	
 do D:\Telops\FIR-00251-Proc\src\FPA\blackbird1280D\hdl\compil_blackbird1280D.do
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\TestBench\scd_proxy_sim.vhd
-acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\blackbird1280D_top_tb.bde
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\blackbird1280D_top_tb.bde   
+acom "D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_RandomMiso.vhd"
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\blackbird1280D\src\TestBench\blackbird1280D_top_tb_TB.vhd
 
 
@@ -111,7 +112,7 @@ add wave -named_row "---------------------Sim diag data -----------------------"
 add wave UUT/U3/U1/*
 
 add wave -named_row "---------------------Fifo out -----------------------"
-add wave UUT/U8/*
+add wave UUT/U5/*
 
 
 add wave -named_row "---------------------Data dispatcher _ test pattern -----------------------"
@@ -146,7 +147,10 @@ wave UUT/U1/U19/*
 add wave -named_row "---------------------fpa intf sequencer -----------------------"
 wave UUT/U1/U2/*
 
-add wave -named_row "---------------------watchdog -----------------------"
-wave UUT/U1/U26/*	
+#add wave -named_row "---------------------watchdog -----------------------"
+#wave UUT/U1/U26/*	
+
+add wave -named_row "---------------------sim -----------------------"
+wave UUT/U1/g0/U32/*
 
 run 30 ms

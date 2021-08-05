@@ -61,4 +61,5 @@ acom -incr -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_io_interface.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
+ D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_proxy_cropping.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_proxy_intf.bde

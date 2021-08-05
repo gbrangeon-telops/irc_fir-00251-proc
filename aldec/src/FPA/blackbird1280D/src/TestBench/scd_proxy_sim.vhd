@@ -70,11 +70,8 @@ component scd_diag_data_gen
       
       CH1_DATA     : out std_logic_vector(27 downto 0); --! sortie des données deserialisés sur CH1    
       CH2_DATA     : out std_logic_vector(27 downto 0); --! sortie des données deserialisés sur CH2 
-      CH3_DATA     : out std_logic_vector(27 downto 0); --! sortie des données deserialisés sur CH3 
+      CH3_DATA     : out std_logic_vector(27 downto 0) --! sortie des données deserialisés sur CH3 
       
-      DIAG_HDER    : out std_logic; --! 'à 1 pour signifier la sortie du header
-      DIAG_LINE    : out std_logic; --! 'à 1 pour signifier la sortie des données d'une ligne
-      DIAG_FRAME   : out std_logic
       
       );
 end component;
@@ -130,10 +127,7 @@ begin
       FPA_TRIG => FSYNC,
       CH1_DATA => CH1_DATA,
       CH2_DATA => CH2_DATA,   
-      CH3_DATA => CH3_DATA,
-      DIAG_HDER => open,
-      DIAG_LINE => open,   
-      DIAG_FRAME => open  
+      CH3_DATA => CH3_DATA 
       );   
  
    

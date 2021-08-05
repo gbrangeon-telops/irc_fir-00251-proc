@@ -244,7 +244,8 @@ begin
             new_cfg.scd_frame_res <= USER_CFG.SCD_FRAME_RES;
             new_cfg.scd_temp      <= USER_CFG.SCD_TEMP; 
             new_cfg.scd_misc      <= USER_CFG.SCD_MISC; 
-           
+            new_cfg.aoi_data      <= USER_CFG.AOI_DATA;
+            
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
             case new_cfg_pending_fsm is			  
@@ -591,6 +592,7 @@ begin
                when pause_st1 =>                                -- fait expres pour donner du temps à new_cfg_pending de tomber
                   fpa_intf_cfg_i.comn <= fpa_ser_cfg_to_update.comn;
                   fpa_intf_cfg_i.scd_misc <= fpa_ser_cfg_to_update.scd_misc;
+                  fpa_intf_cfg_i.aoi_data <= fpa_ser_cfg_to_update.aoi_data;
                   cfg_updater_fsm <= idle;
                
                when others =>

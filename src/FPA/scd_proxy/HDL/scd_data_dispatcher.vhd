@@ -272,8 +272,6 @@ architecture rtl of scd_data_dispatcher is
    signal gain_mismatch                : std_logic;
    signal fpa_temp_pos                 : unsigned(15 downto 0);
    signal fpa_temp_neg                 : unsigned(15 downto 0);
-   signal fpa_ysize                    : unsigned(FPA_INTF_CFG.SCD_OP.SCD_YSIZE'LENGTH-1 downto 0);
-   signal fpa_xsize                    : unsigned(FPA_INTF_CFG.SCD_OP.SCD_XSIZE'LENGTH-1 downto 0);
    signal fpa_temp_reg                 : std_logic_vector(15 downto 0);
    signal fpa_gain                     : std_logic_vector(FPA_INTF_CFG.SCD_OP.SCD_GAIN'LENGTH-1 downto 0);
    signal fpa_temp_i                   : fpa_temp_stat_type;
@@ -297,9 +295,6 @@ architecture rtl of scd_data_dispatcher is
    signal acq_eof_i                    : std_logic;
    signal frame_start_id               : std_logic_vector(7 downto 0);
    signal last_cmd_id                  : std_logic_vector(15 downto 0);
-   signal byte_18                      : std_logic_vector(7 downto 0);
-   signal byte_19                      : std_logic_vector(7 downto 0);
-   signal byte_20                      : std_logic_vector(7 downto 0);
    
    signal int_fifo_rd                  : std_logic;
    signal int_fifo_din                 : std_logic_vector(2 downto 0) := (others => '0'); -- non utilisé

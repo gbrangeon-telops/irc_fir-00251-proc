@@ -289,7 +289,8 @@ void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 
 
 //*--------------------------------------------------------------------------
-//   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and with the first detector lend by SCD (the loan detector was not fully operational).
+//   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and with the first detector lend by SCD (also confirmed by SCD).
+//   SCD said that they will probably correct the problem in futur firmware release.
 //   1. No "Integration time command" or "frame resolution command" should be sent before a the first operational command.
 //   2. The serdes initialisation will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
 //       * An operational command followed by a frame resolution command must have been sent.
@@ -434,6 +435,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_ysize            = pGCRegs->Height;         // Image height
    ptrA->scd_out_chn          = CLINK_FULL;              // Only Full is available for BB1280 (3 channels, 4 pixels).  Not used in VHDL FPA module.
 
+   ptrA->aoi_data_sol_pos          = (uint32_t)pGCRegs->OffsetX/4 + 1;    // Cropping: + 1 car le generateur de position dans le vhd a pour valeur d'origine 1. Et division par 4 car le bus dudit generateur est de largeur 4 pix
+   ptrA->aoi_data_eol_pos          =  ptrA->aoi_data_sol_pos - 1 + (uint32_t)pGCRegs->Width/4; // En effet,  (ptrA->aoi_data_eol_pos - ptrA->aoi_data_sol_pos) + 1  = pGCRegs->Width/4
+
    if (gFpaScdDiodeBiasEnum >= SCD_BIAS_VALUES_NUM)      // Photo-diode bias
       gFpaScdDiodeBiasEnum    = SCD_BIAS_DEFAULT_IDX;    // Corrige une valeur invalide
    ptrA->scd_diode_bias       = Scd_DiodeBiasValues[gFpaScdDiodeBiasEnum];
@@ -452,9 +456,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_lval_high_duration         = (uint32_t)((hh.fig8_t3) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
    ptrA->scd_hdr_start_to_lval_re_dly   = (uint32_t)((hh.fig8_t5) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
    ptrA->scd_hdr_high_duration          = (uint32_t)((hh.fig8_t6) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
-   ptrA->scd_xsize_div_per_pixel_num    =  ptrA->scd_xsize/FPA_CLINK_PIX_NUM;
+   ptrA->scd_xsize_div_per_pixel_num    =  (uint32_t)FPA_WIDTH_MAX/FPA_CLINK_PIX_NUM; // Seulement utilisé par le générateur de patron de test.
 
-   diag_lval_high_duration =  ptrA->scd_xsize_div_per_pixel_num / (float)FPA_VHD_INTF_CLK_RATE_HZ;
+
+   diag_lval_high_duration =  (float)(ptrA->scd_xsize/FPA_CLINK_PIX_NUM) / (float)FPA_VHD_INTF_CLK_RATE_HZ;
    diag_corr_factor = hh.fig8_t3 - diag_lval_high_duration;
    ptrA->scd_lval_pause_dly = (uint32_t)((hh.fig8_t4 + diag_corr_factor) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // We add a delay to account for time difference between test pattern clock (100 MHz) and real data clock (80 MHz).
    
@@ -563,7 +568,6 @@ void FPA_SetFrameResolution(t_FpaIntf *ptrA)
 // TODO: A enlever a la fin du debug. Sert à envoyer des requete de statut au détecteur.
 void FPA_SetFrameResolution_V2(t_FpaIntf *ptrA)
 {
-
    FPA_FrameResolution_StructCmd_V2(ptrA);      // envoi un interrupt au contrôleur du hw driver
    FPA_SendFrameResolution_SerialCmd_V2(ptrA);      // envoi la commande serielle
 }
@@ -835,10 +839,10 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 
 
    scd_gain = (uint8_t)(ptrA->scd_gain);
-   uint32_t scd_ystart = ptrA->scd_ystart >> 1; // in step of 2 rows
-   uint32_t scd_xstart = ptrA->scd_xstart >> 2; // in step of 4 pixels
-   uint32_t scd_ysize  = ptrA->scd_ysize  >> 1;  // in step of 2 rows
-   uint32_t scd_xsize  = ptrA->scd_xsize  >> 2;  // in step of 4 pixels
+   uint32_t scd_ystart = ptrA->scd_ystart >> 1;           // in step of 2 rows
+   uint32_t scd_xstart = 0;                               // in step of 4 pixels
+   uint32_t scd_ysize  = ptrA->scd_ysize  >> 1;           // in step of 2 rows
+   uint32_t scd_xsize  = (uint32_t)FPA_WIDTH_MAX  >> 2;   // in step of 4 pixels
 
    if (GC_FWSynchronouslyRotatingModeIsActive)
       vhd_int_time = 0.0F;
@@ -1034,8 +1038,6 @@ void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA)
    {
       AXI4L_write32(ptrE->ScdPacketArrayTx[index], ptrA->ADD + AW_SERIAL_CFG_SWITCH_ADD + 4*(ptrE->SerialCmdRamBaseAdd + index));  // dans le vhd, division par 4 avant entrée dans ram
       index++;
-      //PRINTF("BRAM ADRESSES = %d, BYTE VALUE = %d \n", ptrA->ADD + AW_SERIAL_CFG_SWITCH_ADD + 4*(ptrE->SerialCmdRamBaseAdd + index), (uint32_t)ptrE->ScdPacketArrayTx[index]);
-
    }
    for(ii = 0; ii <= 3 ; ii++)
    {      

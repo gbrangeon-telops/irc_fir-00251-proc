@@ -154,6 +154,8 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  scd_x_to_next_fsync_re_dly;              // Pelican/Hercule : delay T5 on fig 1 & 3 (d1k3008-rev1)
    uint32_t  scd_fsync_re_to_intg_start_dly;          // Pelican/Hercule : delay T4 on fig 1 & 3 (d1k3008-rev1)
    uint32_t  scd_xsize_div_per_pixel_num;             // Pelican/Hercule = clink base (pixel_num = 2), BB1280 = clink full (pixel_num = 4)
+   uint32_t  aoi_data_sol_pos;                        // Config module de cropping.
+   uint32_t  aoi_data_eol_pos;                        // Config module de cropping.  
    uint32_t  cfg_num;
    
    // partie commune (modules communs dans le vhd de fpa_interface. Les changements dans cette partie n'affectent pas la reprogrammation du detecteur)
@@ -246,7 +248,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 // pour initialiser le module vhd avec les bons parametres de départ
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);

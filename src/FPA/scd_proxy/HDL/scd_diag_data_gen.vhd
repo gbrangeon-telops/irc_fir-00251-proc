@@ -390,7 +390,8 @@ begin
             pix2_data_i <= (others => '0');
             pix3_data_i <= (others => '0');
 				incr_value <= (others => '0');
-				dly_cnt <= (others => '0');            fpa_int_last <= fpa_int_i;  
+				dly_cnt <= (others => '0');           
+            fpa_int_last <= fpa_int_i;  
             fpa_trig_last <= fpa_trig_i;
          else   
             fpa_int_i <= FPA_INT;

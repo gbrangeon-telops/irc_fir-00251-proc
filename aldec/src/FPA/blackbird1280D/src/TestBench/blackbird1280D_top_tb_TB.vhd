@@ -199,7 +199,10 @@ begin
       sim_cfg_i.offsetx <= 0;
       sim_cfg_i.exp_time <= 18; -- 0.5 us
       sim_cfg_i.frame_res <= 2; -- 2*(1/70MHz)
-      
+      sim_cfg_i.aoi_sol <= to_unsigned(1,sim_cfg_i.aoi_sol'length);
+      sim_cfg_i.aoi_eol <= to_unsigned(16,sim_cfg_i.aoi_sol'length);
+
+         
       sim_cfg_i.fpa_stretch_acq_trig <= '0'; -- don't care
       sim_cfg_i.cmd_to_update_id <= SCD_OP_CMD_ID;
       
@@ -255,6 +258,14 @@ begin
       wait for 150 ns;
       write_axi_lite (MB_CLK, resize(X"E4",32), resize(OUTPUT_DIGITAL, 32), MB_MISO,  MB_MOSI);
       wait for 150 ns;
+      
+      --FPA_iddca_rdy(ptrA, false);
+      write_axi_lite (MB_CLK, resize(X"A4",32), resize('1', 32), MB_MISO,  MB_MOSI);
+      wait for 150 ns;
+      --FPA_TurnOnProxyFailureResponseManagement(ptrA, false);
+      write_axi_lite (MB_CLK, resize(X"A8",32), resize('0', 32), MB_MISO,  MB_MOSI); 
+      wait for 150 ns;
+
       -- 4. FPA_GetTemperature()   -- On néglige la lecture de température 
 
       -- 5.  Envoi de la commande de frame resolution.
@@ -283,7 +294,8 @@ begin
       write_axi_lite (MB_CLK, resize(X"8FC",32), (others => '0'), MB_MISO,  MB_MOSI);  
       wait for  30 ns;
       write_axi_lite (MB_CLK, resize(X"8FC",32), (others => '1'), MB_MISO,  MB_MOSI); 
-      wait for 100 us;
+      wait for 100 us;  
+      
       -- 6. FPA_SendConfigGC() (Lors de la configuration pendant l'init, le mode de patron test est activé) 
       -- 6.1 Envoi de la commande synthétique 
       sim_cfg_i.cmd_to_update_id <= SCD_DIAG_CMD_ID; 

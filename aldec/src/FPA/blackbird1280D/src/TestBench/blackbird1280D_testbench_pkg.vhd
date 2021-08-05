@@ -53,7 +53,7 @@ package blackbird1280D_testbench_pkg is
    constant CLINK_MEDIUM              : std_logic_vector(7 downto 0) := x"01";
    constant CLINK_FULL                : std_logic_vector(7 downto 0) := x"02";
    
-   constant NB_PARAM_CFG              : integer := 33; 
+   constant NB_PARAM_CFG              : integer := 35; 
    
    type sim_cfg_type is
    record 
@@ -61,7 +61,9 @@ package blackbird1280D_testbench_pkg is
       height                : integer range 2 to 512; -- step of 2 rows 
       width                 : integer range 4 to 320; -- step of 4 pixels
       offsety               : integer range 0 to 511; -- step of 2 rows; for binning 4 rows
-      offsetx               : integer range 0 to 320; -- step of 4 pixels
+      offsetx               : integer range 0 to 320; -- step of 4 pixels 
+      aoi_sol               : unsigned(9 downto 0); 
+      aoi_eol               : unsigned(9 downto 0); 
       exp_time              : integer range 0 to 1048575;
       frame_res             : integer range 2 to 127;
       fpa_stretch_acq_trig  : std_logic; 
@@ -156,8 +158,8 @@ package body blackbird1280D_testbench_pkg is
       params.scd_op.scd_out_chn             := '0'; -- Pas utilise dans le vhd  
       params.scd_op.scd_diode_bias          := BIAS_DEFAULT; 
       params.scd_op.scd_int_mode            := x"01";  -- IWR
-      params.scd_op.scd_boost_mode          :=  '0'; -- Boost mode is on (delays are added to prevent image obstruction) 
-      params.scd_op.scd_pix_res             :=  SCD_PIX_RES_13B;     
+      params.scd_op.scd_boost_mode          := '0'; -- Boost mode is on (delays are added to prevent image obstruction) 
+      params.scd_op.scd_pix_res             := SCD_PIX_RES_13B;     
       
       if SCD_MIN_OPER_FPS > sim_cfg.framerate then
          params.scd_op.scd_frame_period_min    := resize(sec_to_clks(1.0/SCD_MIN_OPER_FPS),params.scd_op.scd_frame_period_min'length);
@@ -176,14 +178,17 @@ package body blackbird1280D_testbench_pkg is
       params.scd_misc.scd_lval_high_duration                  := resize(sec_to_clks(fig8_t3),params.scd_misc.scd_lval_high_duration'length);
       params.scd_misc.scd_lval_pause_dly                      := resize(sec_to_clks(FIG8_T4),params.scd_misc.scd_lval_pause_dly'length);   
       params.scd_misc.scd_hdr_start_to_lval_re_dly            := resize(sec_to_clks(FIG8_T5),params.scd_misc.scd_hdr_start_to_lval_re_dly'length);
-      --params.scd_misc.scd_hdr_high_duration                   := resize(sec_to_clks(FIG8_T6),params.scd_misc.scd_hdr_high_duration'length);
+      --params.scd_misc.scd_hdr_high_duration                 := resize(sec_to_clks(FIG8_T6),params.scd_misc.scd_hdr_high_duration'length);
       params.scd_misc.scd_hdr_high_duration                   := resize(sec_to_clks(FIG8_T6),params.scd_misc.scd_hdr_high_duration'length);
       params.scd_misc.scd_xsize_div_per_pixel_num             := to_unsigned(integer((real(sim_cfg.width)*4.0)/real(PROXY_CLINK_PIXEL_NUM)),params.scd_misc.scd_xsize_div_per_pixel_num'length);
+      params.aoi_data.sol_pos                                 := resize(sim_cfg.aoi_sol,params.aoi_data.sol_pos'length);
+      params.aoi_data.eol_pos                                 := resize(sim_cfg.aoi_eol,params.aoi_data.eol_pos'length);
+      
       params.scd_op.cfg_num                                   := sim_cfg.cfg_num;
       params.comn.fpa_stretch_acq_trig                        := sim_cfg.fpa_stretch_acq_trig;
       params.cmd_to_update_id                                 := sim_cfg.cmd_to_update_id;
       params.scd_int.scd_int_time                             := to_unsigned(integer(exp_time_s*(real(FPA_INTF_CLK_RATE_MHZ)*1000000.0)),params.scd_int.scd_int_time'length);--! temps d'integration en coups de 80Mhz
-      --params.scd_int.diag_int_time                            :=resize(sec_to_clks(real(exp_time_s)),params.scd_int.diag_int_time'length);     --! temps d'integration en coups de 100Mhz
+      --params.scd_int.diag_int_time                          :=resize(sec_to_clks(real(exp_time_s)),params.scd_int.diag_int_time'length);     --! temps d'integration en coups de 100Mhz
       params.scd_int.scd_int_indx                             :=(others =>'0');
       params.int_time                                         :=resize(params.scd_int.scd_int_time,params.int_time'length);
       
@@ -229,11 +234,13 @@ package body blackbird1280D_testbench_pkg is
       variable scd_hdr_start_to_lval_re_dly             : unsigned(31 downto  0);
       variable scd_hdr_high_duration                    : unsigned(31 downto  0);
       variable scd_xsize_div_per_pixel_num              : unsigned(31 downto  0);
+      variable aoi_sol_pos                              : unsigned(31 downto  0);
+      variable aoi_eol_pos                              : unsigned(31 downto  0); 
       variable scd_cfg_num                              : unsigned(31 downto  0);
       variable fpa_stretch_acq_trig                     : unsigned(31 downto  0);
       variable proxy_cmd_to_update_id                   : unsigned(31 downto  0);
       
-      variable y                              : unsigned(NB_PARAM_CFG*32-1 downto 0);  
+      variable y                                        : unsigned(NB_PARAM_CFG*32-1 downto 0);  
       
    begin
       
@@ -267,6 +274,8 @@ package body blackbird1280D_testbench_pkg is
       scd_hdr_start_to_lval_re_dly                           := resize(cfg.scd_misc.scd_hdr_start_to_lval_re_dly,32);
       scd_hdr_high_duration                                  := resize(cfg.scd_misc.scd_hdr_high_duration,32);
       scd_xsize_div_per_pixel_num                            := resize(cfg.scd_misc.scd_xsize_div_per_pixel_num,32);
+      aoi_sol_pos                                            := resize(cfg.aoi_data.sol_pos,32);
+      aoi_eol_pos                                            := resize(cfg.aoi_data.eol_pos,32);
       scd_cfg_num                                            := resize(cfg.scd_op.cfg_num,32);
       fpa_stretch_acq_trig                                   := (others => cfg.comn.fpa_stretch_acq_trig);
       proxy_cmd_to_update_id                                 := resize(unsigned(cfg.cmd_to_update_id),32);  
@@ -301,7 +310,9 @@ package body blackbird1280D_testbench_pkg is
       & scd_lval_pause_dly  
       & scd_x_to_next_fsync_re_dly
       & scd_fsync_re_to_intg_start_dly
-      & scd_xsize_div_per_pixel_num  
+      & scd_xsize_div_per_pixel_num 
+      & aoi_sol_pos
+      & aoi_eol_pos
       & scd_cfg_num
       & fpa_stretch_acq_trig
       & proxy_cmd_to_update_id

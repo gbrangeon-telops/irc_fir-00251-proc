@@ -402,7 +402,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_ystart = pGCRegs->OffsetY;     
    ptrA->scd_xsize  = pGCRegs->Width;     
    ptrA->scd_ysize  = pGCRegs->Height;
-    
+   
+   ptrA->aoi_data_sol_pos = 0; //Don't care, cropping deactivated for PelicanD   
+   ptrA->aoi_data_eol_pos = 0; //Don't care, cropping deactivated for PelicanD  
+
    //  gain 
    ptrA->scd_gain = SCD_GAIN_0;
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
