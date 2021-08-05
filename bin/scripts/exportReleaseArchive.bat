@@ -141,7 +141,7 @@ echo cd FIR-00251-Proc>> %fubatchJtag%
 echo call jtag_prom_prog.bat>> %fubatchJtag%
 echo cd ..\FIR-00251-Output>> %fubatchJtag%
 echo call jtag_prom_prog.bat>> %fubatchJtag%
-echo cd ..\FIR-00251-Storage>> %fubatchJtag%
+echo cd ..\FIR-00257-Storage>> %fubatchJtag%
 echo call jtag_prom_prog.bat>> %fubatchJtag%
 echo cd ..>> %fubatchJtag%
 echo.>> %fubatchJtag%
