@@ -628,6 +628,7 @@ void Acquisition_SM()
 
                      #ifdef SCD_BLACKBIRD1280D
                        FPA_iddca_rdy(&gFpaIntf, true);
+                       FPA_TurnOnProxyFailureResponseManagement(&gFpaIntf, true);
                        GETTIME(&tic_fpaInitTimeout);
                      #endif
 

@@ -42,6 +42,7 @@ package FPA_define is
    constant PROXY_NEED_FRAME_RES_CONFIG  : std_logic := '0';     -- BB1280 has a frame resoultion command (Pelican and Hercule don't) 
    constant SCD_TRIG_REFERENCED          : std_logic := '0';     -- 1 : reference to fsync (bb1280)  , 0 : reference to acq_int (pelican & hercule)
    constant SCD_CROPPING_NEEDED          : std_logic := '0';     -- 1 : Cropping module activated (bb1280)  , 0 : Cropping module deactivated (pelican & hercule)  
+   constant SCD_FILTER_FAILURE_RESP      : std_logic := '0';     -- 1 : ignore some specific failure response (bb1280)  , 0 : don't ignore any failure response (pelican & hercule)
    constant SCD_FRAME_RESOLUTION : real  := 1.0;     -- BB1280D : FRAME_RES register value. PelicanD & HerculeD dont have this parameter.
    constant SCD_MASTER_CLK_RATE_MHZ      : integer   := 80;
    ----------------------------------------------

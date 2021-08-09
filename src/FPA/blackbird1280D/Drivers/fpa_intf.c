@@ -250,10 +250,8 @@ void FPA_FrameResolution_StructCmd_V2(const t_FpaIntf *ptrA);
 void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
-void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 float FPA_ConvertSecondToFrameTimeResolution(float seconds);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ

@@ -28,7 +28,7 @@ package FPA_define is
    --------------------------------------------   
    constant DEFINE_FPA_ROIC              : std_logic_vector(7 downto 0) := FPA_ROIC_BLACKBIRD1280;  -- roic du détecteur. Cela veut dire que le vhd actuel peut contrôler in détecteur de ce type qque soit le cooler.
    constant DEFINE_FPA_OUTPUT            : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL; 
-   constant DEFINE_FPA_INIT_CFG_NEEDED   : std_logic := '0';     -- pas besoin de config particulière au demarrage du PelicanD
+   constant DEFINE_FPA_INIT_CFG_NEEDED   : std_logic := '0';     -- pas besoin de config particulière au demarrage 
    constant DEFINE_DIAG_CLK_RATE_MAX_KHZ : integer := 80_000;    -- vitesse max de l'horloge de sortie des pixels en mode diag (vitesse totale des sorties divisée par 2 canaux en mode diag 
    constant PROXY_CLINK_PIXEL_NUM        : integer := 4;         -- Number of pixels on proxy clink interface
    constant PROXY_CLINK_CHANNEL_NUM      : integer := 3;         -- Number of channels on proxy clink interface   
@@ -37,17 +37,19 @@ package FPA_define is
    constant PROXY_CLINK_CLK_1X_PERIOD_NS : real      := 12.5;    -- CLINK IN est à 80MHz ns
    constant PROXY_NEED_FRAME_RES_CONFIG  : std_logic := '1';     -- BB1280 has a frame resoultion command (Pelican and Hercule don't) 
    constant SCD_TRIG_REFERENCED          : std_logic := '1';     -- 1 : reference to fsync (bb1280)  , 0 : reference to acq_int (pelican & hercule)
+   constant SCD_CROPPING_NEEDED          : std_logic := '1';     -- 1 : Cropping module activated (bb1280)  , 0 : Cropping module deactivated (pelican & hercule)  
+   constant SCD_FILTER_FAILURE_RESP      : std_logic := '1';     -- 1 : ignore some specific failure response (bb1280)  , 0 : don't ignore any failure response (pelican & hercule)
    constant SCD_FRAME_RESOLUTION         : real      := 7.0;     -- BB1280D : FRAME_RES register value. PelicanD & HerculeD dont have this parameter.
    constant SCD_MASTER_CLK_RATE_MHZ      : integer   := 70;
    ----------------------------------------------
    -- FPA 
    ---------------------------------------------- 
-   constant XSIZE_MAX                    : integer := 1280;              -- dimension en X maximale                                      -- dimension en X maximale
-   constant YSIZE_MAX                    : integer := 1024;              -- dimension en Y maximale  
-   
+   constant XSIZE_MAX                     : integer := 1280;              -- dimension en X maximale                                      -- dimension en X maximale
+   constant YSIZE_MAX                     : integer := 1024;              -- dimension en Y maximale  
+      
    -- increment des données en mode diag compteur
    constant DIAG_DATA_INC                : integer :=  2*integer(((2**13)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- 2*integer(((2**13)- 1 - XSIZE_MAX)/(2*XSIZE_MAX)) + 1; -- nombre toujours impair. Pour provoquer SSO
-   
+     
 end FPA_define;
 
 package body FPA_define is

@@ -102,7 +102,7 @@ architecture RTL of scd_serial_module is
    component sfifo_w8_d64
       PORT (
          clk            : in std_logic;
-         srst            : in std_logic;
+         srst           : in std_logic;
          din            : in std_logic_vector(7 downto 0);
          wr_en          : in std_logic;
          rd_en          : in std_logic;
@@ -138,7 +138,6 @@ architecture RTL of scd_serial_module is
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
    type cmd_resp_fsm_type is (wait_resp_hder_st, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
    type com_data_array_type  is array (0 to SCD_LONGEST_CMD_BYTES_NUM) of std_logic_vector(7 downto 0);
-   type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
 
    signal prog_seq_fsm            : prog_seq_fsm_type;
@@ -196,7 +195,6 @@ architecture RTL of scd_serial_module is
    signal rx_rd_en_i              : std_logic;
    signal proxy_rdy_i             : std_logic;
    signal resp_err                : std_logic_vector(7 downto 0);
-   signal failure_resp_data       : failure_resp_data_type;
    signal fpa_temp_error          : std_logic;
    signal force_prog_trig_mode    : std_logic;
    signal prog_trig_i             : std_logic;
@@ -216,7 +214,6 @@ architecture RTL of scd_serial_module is
    -- -- attribute dont_touch of resp_dcnt            : signal is "true";
    -- -- attribute dont_touch of serial_cmd_failure   : signal is "true";
    -- -- attribute dont_touch of resp_id              : signal is "true";
-   -- -- attribute dont_touch of failure_resp_data    : signal is "true";
 begin
    
    acq_mode <= TRIG_CTLER_STAT(4);
@@ -693,7 +690,7 @@ begin
                   cmd_resp_done <= '1';
                   resp_err(1) <= '0';
                   for kk in 0 to 3 loop
-                     failure_resp_data(kk) <= (others => '0');
+                     resp_data(kk) <= (others => '0');
                   end loop;
                   if RX_DVAL = '1' then                       
                      if  RX_DATA = SCD_COM_RESP_HDER then
@@ -735,13 +732,22 @@ begin
                when check_resp_st =>   -- recherche du type de reponse reçue
                   rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
                   if resp_hder = SCD_COM_RESP_HDER then 
-                     if resp_id = SCD_COM_RESP_FAILURE_ID then
-                        proxy_serial_err <= '1';
-                        resp_err(1) <= '1';
-                        for kk in 0 to 3 loop
-                           failure_resp_data(kk) <= resp_data(kk);
-                        end loop;
-                       cmd_resp_fsm <= wait_resp_hder_st;
+                     if resp_id = SCD_COM_RESP_FAILURE_ID then                                          
+                        if SCD_FILTER_FAILURE_RESP = '1' then
+                           -- For BB1280, these errors must be ignored (this is an known issue that will be corrected by SCD in their futur release...)
+                           if (resp_data(0) & resp_data(1) & resp_data(2) & resp_data(3)) = x"00000000" or
+                              (resp_data(0) & resp_data(1) & resp_data(2) & resp_data(3)) = x"80000000" then                               
+                              proxy_serial_err <= '0';
+                              resp_err(1) <= '0'; 
+                           else
+                              proxy_serial_err <= '1'; 
+                              resp_err(1) <= '1';
+                           end if;
+                        else 
+                           proxy_serial_err <= '1'; 
+                           resp_err(1) <= '1';
+                        end if;
+                        cmd_resp_fsm <= wait_resp_hder_st;
                      elsif resp_id = SCD_TEMP_CMD_ID then
                         proxy_serial_err <= '0'; 
                         cmd_resp_fsm <= fpa_temp_resp_st;
