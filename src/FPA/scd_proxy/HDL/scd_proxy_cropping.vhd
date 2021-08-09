@@ -44,24 +44,7 @@ architecture rtl of scd_proxy_cropping is
    signal sample_valid_set1           : std_logic;
    signal sample_valid_set2           : std_logic;
    
-   constant FULL_LINE_CNT : integer := XSIZE_MAX/4;       -- Nombre de transaction axistream (4 pix de large) pour une ligne complète.
-   --constant FULL_LINE_CNT : integer := 16;       -- Nombre de transaction axistream (4 pixels de large) pour une ligne complète.
-  
-    
-       
-     attribute dont_touch           : string;
-     attribute dont_touch of FPA_INTF_CFG             : signal is "true";
-     attribute dont_touch of pix_mosi_pipe                             : signal is "true";
-     attribute dont_touch of pix_i                                     : signal is "true";
-     attribute dont_touch of sample_valid_set1                                     : signal is "true";
-     attribute dont_touch of sample_valid_set2                                     : signal is "true";
-     attribute dont_touch of last_full_line_transaction                                     : signal is "true";
-
-     attribute dont_touch of eol_data_reg                                     : signal is "true";
-
-     attribute dont_touch of eol_dval_reg                                     : signal is "true";
-
-            
+   constant FULL_LINE_CNT : integer := XSIZE_MAX/4;       -- Nombre de transaction axistream (4 pix de large) pour une ligne complète.       
 begin
    
    TX_MOSI <= pix_mosi_pipe(1);
