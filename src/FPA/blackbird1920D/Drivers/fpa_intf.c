@@ -60,8 +60,11 @@
 #define ITR_MODE                           0x00    // valeur provenant du manuel de SCD
 #define IWR_MODE                           0x01    // valeur provenant du manuel de SCD
 
-#define LOW_GAIN                           0x00   // ENO: à revalider. Ce sont les valeurs consignées dans op_mode
-#define HIGH_GAIN                          0x01   // ENO: à revalider. Ce sont les valeurs consignées dans op_mode
+#define LOW_GAIN                           0x00   // LowGain: "Hercules-like" pixel operation IWR/ITR
+#define HIGH_GAIN                          0x01   // A/B pixel caps operation, lowest noise, ITR/IWR
+#define UNIFIED_CAP_LOW_GAIN               0x02   // UnifiedCap-LowGain: same capacity as LowGain with lower noise, ITR only
+#define HIGH_CAPACITY                      0x03   // High Capacity: largest capacity, ITR/IWR
+#define UNIFIED_CAP_MEDIUM_GAIN            0x04   // UnifiedCap-Medium Gain: ITR only
 
 // bb1920D Pixel resolution 
 #define PIX_RESOLUTION_15BITS              0x00    // 15 bits selon SCD
@@ -916,11 +919,14 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->number_of_Rows          = (float)pGCRegs->Height;
    ptrH->number_of_Ref_Rows      = 0.0F;
    
-   ptrH->number_of_pixel_per_clk_per_output = gPrivateStat.fpa_pix_num_per_pclk/2;
+   if(gPrivateStat.fpa_pix_num_per_pclk == 0)
+      ptrH->number_of_pixel_per_clk_per_output = 2.0f;
+   else
+      ptrH->number_of_pixel_per_clk_per_output = gPrivateStat.fpa_pix_num_per_pclk/2;
   
    //if (ptrA->op_binning == 0)
       ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;
-   //else
+      //else
    //   ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 8.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 4.0F;
         
    ptrH->Line_Readout = (2.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk_per_output / ptrH->Fclock_MHz;
