@@ -117,7 +117,7 @@ architecture RTL of scd_proxy2_serial_com is
    type prog_seq_fsm_type is (idle, cpy_cfg_st, wait_end_cpy_cfg_st, send_cfg_st, wait_end_send_cfg_st, wait_proxy_resp_st, cmd_fail_mgmt_st);
    type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, cpy_cfg_rd_st1, cpy_cfg_rd_st2, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
-   type cmd_resp_fsm_type is (idle, rd_rx_fifo_st, decode_byte_st, check_resp_st, fpa_temp_resp_st);
+   type cmd_resp_fsm_type is (idle, decode_byte_st, check_resp_st, fpa_temp_resp_st);
    type com_data_array_type  is array (0 to 32) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
@@ -180,6 +180,12 @@ architecture RTL of scd_proxy2_serial_com is
    signal prog_trig_start_last    : std_logic; 
    signal acq_mode                : std_logic;
    signal cmd_ram2_eof_add        : unsigned(SERIAL_PARAM.CMD_EOF_ADD'LENGTH-1 downto 0);
+
+   --attribute dont_touch           : string;
+   --attribute dont_touch of resp_hder            : signal is "true";
+   --attribute dont_touch of resp_payload         : signal is "true";
+   --attribute dont_touch of resp_dcnt            : signal is "true";
+   --attribute dont_touch of resp_id              : signal is "true";
    
    
 begin
@@ -449,9 +455,16 @@ begin
                
                when latch_data_st =>          -- on latche le byte lu
                   ram2_rd_i <= '0';                  
-                  if RAM2_RD_DVAL = '1' then
-                     cfg_byte <= RAM2_RD_DATA;
-                     cfg_mgmt_fsm <= send_cfg_out_st;                     
+                  if RAM2_RD_DVAL = '1' then 
+                     -- En mode proxy_alone il ne faut pas envoyer de commande au ROIC. 
+                     -- Sinon le proxy arrete de sortir le test pattern.
+                     -- On transforme donc toute commandes en commande de type "proxy field read".
+                     if USER_CFG.PROXY_ALONE_MODE = '1' and ram2_rd_add_i = 1 then
+                        cfg_byte <= x"03";
+                     else
+                        cfg_byte <= RAM2_RD_DATA; 
+                     end if;
+                     cfg_mgmt_fsm <= send_cfg_out_st; 
                   end if;
                
                when send_cfg_out_st =>       -- on envoie le byte latché
@@ -503,8 +516,8 @@ begin
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;                                        
                   else
                      if timeout_cnt = 5_000_000 then   -- donne 50 ms sec au proxy pour donner une réponse                     
-                        cfg_mgmt_fsm <= timeout_mgmt_st;
-                     end if;
+                           cfg_mgmt_fsm <= timeout_mgmt_st;
+                        end if;
                      -- pragma translate_off                     
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;
                      -- pragma translate_on
@@ -686,15 +699,6 @@ begin
                      proxy_serial_err <= '1';
                      resp_err(2) <= '1';
                      cmd_resp_fsm <= idle;
-                     -- pragma translate_off
-                     --                     proxy_serial_err <= '0';
-                     --                     resp_err <= (others => '0');                     
-                     -- pragma translate_on                     
-                     
-                     if USER_CFG.PROXY_ALONE_MODE = '1' then 
-                        proxy_serial_err <= '0';
-                        resp_err <= (others => '0');  
-                     end if;
                   end if;
                
                when fpa_temp_resp_st =>  -- extraction de la température raw 

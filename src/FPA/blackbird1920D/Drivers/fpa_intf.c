@@ -332,7 +332,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données du proxy même lorsque le détecteur est absent
    extern int32_t gFpaDebugRegA;
    extern int32_t gFpaDebugRegB;
-      
    // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
    
@@ -414,7 +413,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->diag_ysize    = ptrA->aoi_ysize;
    if (gPrivateStat.fpa_pix_num_per_pclk == 8)
       ptrA->diag_ysize = ptrA->aoi_ysize/2;                                       // pour tenir compte de la seconde ligne qui sort aussi au même moment
-   ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 chn
+   ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
    ptrA->diag_lovh_mclk_source           = 8;                                     // à reviser si necessaire
    ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
     
@@ -532,9 +531,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->incoming_com_ovh_len            = 5;
 
    ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
-   if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-      ptrA->fpa_serdes_lval_num >>= 1; // Les lignes sortent en double.
-   ptrA->fpa_serdes_lval_len = (uint32_t)FPA_WIDTH_MAX / 4; // toujours diviser par 4 pour half et full rate. Car même si on a 8 pixels/clk, en réalité on a 2 lignes simultannés à 4 pixels/clk.
+   if (gPrivateStat.fpa_pix_num_per_pclk == 4 && ptrA->proxy_alone_mode == 1){
+      // Le proxy de démarrage (sans détecteur) est configuré par defaut sur 4 canaux (impossible de le configurer autrement).
+      // En utilisant seulement les 2 premiers canaux, on obtient une moitié d'image (768 lignes de 1920 pixels).
+      ptrA->fpa_serdes_lval_num >>= 1;
+   }
+   else if (gPrivateStat.fpa_pix_num_per_pclk == 8)
+   {
+      ptrA->fpa_serdes_lval_num >>= 1;
+   }
+
+   ptrA->fpa_serdes_lval_len = (uint32_t)FPA_WIDTH_MAX / 4; // toujours diviser par 4 même si on a 8 pixels/clk (en réalité on a 2 lignes simultannés à 4 pixels/clk).
 
    ptrA->int_clk_period_factor           = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 1);
    ptrA->int_time_offset                 = (int32_t)(hh.fpa_intg_clk_rate_hz * hh.int_time_offset_usec*1e-6F);
@@ -547,8 +554,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    WriteStruct(ptrA);                              // on envoie la partie structurelle
    
       // statuts privés
-//   if (gFpaDebugRegB == 1)
-//   {
+   if (gFpaDebugRegB == 1)
+   {
    
       FPA_PRINTF("gPrivateStat.fpa_diag_mode                              = %d", gPrivateStat.fpa_diag_mode                             );
       FPA_PRINTF("gPrivateStat.fpa_diag_type                              = %d", gPrivateStat.fpa_diag_type                             );
@@ -692,7 +699,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("ptrA->int_clk_period_factor                      = %d", ptrA->int_clk_period_factor                       );
       FPA_PRINTF("ptrA->int_time_offset                            = %d", ptrA->int_time_offset                             );
       FPA_PRINTF("ptrA->proxy_alone_mode                           = %d", ptrA->proxy_alone_mode                            );
-//   }
+   }
    
 }
 
@@ -714,7 +721,7 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
    }
    else {
       diode_voltage = (float)(gStat.fpa_temp_raw & 0x0000FFFF) * 0.000125F;
-   
+      
       // utilisation  des valeurs de flashsettings
       temperature  = flashSettings.FPATemperatureConversionCoef5 * powf(diode_voltage,5);
       temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
@@ -736,8 +743,10 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
          temperature += (2941.5F * diode_voltage) + 77.3F;
       }
       
-      return -19300; // Centi celsius
-      //return K_TO_CC(temperature); // Centi celsius
+      if (ptrA->proxy_alone_mode == 1)
+         return FPA_COOLER_TEMP_THRES; // Centi celsius
+      else
+         return K_TO_CC(temperature); // Centi celsius
    }
 }
 

@@ -100,9 +100,25 @@ architecture rtl of scd_proxy2_real_data is
          valid      : out std_logic
          );
    end component;
+
+   COMPONENT fwft_sfifo_w3_d16
+     PORT (
+       clk : IN STD_LOGIC;
+       srst : IN STD_LOGIC;
+       din : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+       wr_en : IN STD_LOGIC;
+       rd_en : IN STD_LOGIC;
+       dout : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+       full : OUT STD_LOGIC;
+       almost_full : OUT STD_LOGIC;
+       overflow : OUT STD_LOGIC;
+       empty : OUT STD_LOGIC;
+       valid : OUT STD_LOGIC
+     );
+   END COMPONENT;
    
    type readout_fsm_type is (idle, wait_img_end_st);
-   type fifo_fsm_type is (init_st1, init_st2, init_st3, init_done);
+   type fifo_fsm_type is (init_st1, init_st2, init_st3, init_st4, init_st5, init_done);
    
    type input_data_type is
    record
@@ -135,11 +151,18 @@ architecture rtl of scd_proxy2_real_data is
    signal readout_fsm          : readout_fsm_type;
    
    signal fifo_rd              : std_logic;
-   signal past                 : input_data_type;
-   signal past_fifo_din        : std_logic_vector(71 downto 0) := (others => '0');
-   signal past_fifo_wr         : std_logic;
-   signal past_fifo_dval_i     : std_logic;
-   signal past_fifo_dout       : std_logic_vector(71 downto 0);
+   
+   signal past1                 : input_data_type;
+   signal past1_fifo_din        : std_logic_vector(2 downto 0) := (others => '0');
+   signal past1_fifo_wr         : std_logic;
+   signal past1_fifo_dval_i     : std_logic;
+   signal past1_fifo_dout       : std_logic_vector(2 downto 0);
+   
+   signal past2                 : input_data_type;
+   signal past2_fifo_din        : std_logic_vector(2 downto 0) := (others => '0');
+   signal past2_fifo_wr         : std_logic;
+   signal past2_fifo_dval_i     : std_logic;
+   signal past2_fifo_dout       : std_logic_vector(2 downto 0);
    
    signal present              : input_data_type;
    signal present_fifo_din     : std_logic_vector(71 downto 0) := (others => '0');                    
@@ -147,11 +170,17 @@ architecture rtl of scd_proxy2_real_data is
    signal present_fifo_dval_i  : std_logic;                    
    signal present_fifo_dout    : std_logic_vector(71 downto 0);
    
-   signal future               : input_data_type;
-   signal future_fifo_din      : std_logic_vector(71 downto 0) := (others => '0');                    
-   signal future_fifo_wr       : std_logic;                    
-   signal future_fifo_dval_i   : std_logic;                    
-   signal future_fifo_dout     : std_logic_vector(71 downto 0);
+   signal future1               : input_data_type;
+   signal future1_fifo_din      : std_logic_vector(2 downto 0) := (others => '0');
+   signal future1_fifo_wr       : std_logic;                    
+   signal future1_fifo_dval_i   : std_logic;                    
+   signal future1_fifo_dout     : std_logic_vector(2 downto 0);
+   
+   signal future2               : input_data_type;
+   signal future2_fifo_din      : std_logic_vector(2 downto 0) := (others => '0');
+   signal future2_fifo_wr       : std_logic;                    
+   signal future2_fifo_dval_i   : std_logic;                    
+   signal future2_fifo_dout     : std_logic_vector(2 downto 0);
    
    signal pix_dval_i           : std_logic;
    signal fifo_fsm             : fifo_fsm_type;
@@ -189,27 +218,48 @@ begin
       );
    
    --------------------------------------------------
-   -- fifo du passé
+   -- fifo du passé2
+   --------------------------------------------------  
+   fifo0 : fwft_sfifo_w3_d16
+   PORT MAP (
+      clk          => CLK,
+      srst         => global_sreset,
+      din          => past2_fifo_din,
+      wr_en        => past2_fifo_wr,
+      rd_en        => fifo_rd,
+      dout         => past2_fifo_dout,
+      full         => open,
+      almost_full  => open,
+      overflow     => open,
+      empty        => open,
+      valid        => past2_fifo_dval_i
+   );
+  
+   past2.fval      <= past2_fifo_dout(2);   
+   past2.pix_lval  <= past2_fifo_dout(1);
+   past2.pix_dval  <= past2_fifo_dout(0);
+     
    --------------------------------------------------
-   fifo1 : fwft_sfifo_w72_d16
-   port map(
-      srst        => global_sreset,
-      clk         => CLK,
-      din         => past_fifo_din,
-      wr_en       => past_fifo_wr,
-      rd_en       => fifo_rd,
-      dout        => past_fifo_dout,
-      full        => open,
-      overflow    => open,
-      empty       => open,
-      valid       => past_fifo_dval_i
-      );
+   -- fifo du passé1
+   --------------------------------------------------
+   fifo1 : fwft_sfifo_w3_d16
+   PORT MAP (
+      clk          => CLK,
+      srst         => global_sreset,
+      din          => past1_fifo_din,
+      wr_en        => past1_fifo_wr,
+      rd_en        => fifo_rd,
+      dout         => past1_fifo_dout,
+      full         => open,
+      almost_full  => open,
+      overflow     => open,
+      empty        => open,
+      valid        => past1_fifo_dval_i
+   );
    
-   past.fval      <= past_fifo_dout(67);
-   past.pix_fval  <= past_fifo_dout(66);   
-   past.pix_lval  <= past_fifo_dout(65);
-   past.pix_dval  <= past_fifo_dout(64);
-   past.data      <= past_fifo_dout(61 downto 48) & past_fifo_dout(45 downto 32) & past_fifo_dout(29 downto 16) & past_fifo_dout(13 downto 0);
+   past1.fval      <= past1_fifo_dout(2);   
+   past1.pix_lval  <= past1_fifo_dout(1);
+   past1.pix_dval  <= past1_fifo_dout(0);  
    
    --------------------------------------------------
    -- fifo du present
@@ -228,40 +278,60 @@ begin
       valid       => present_fifo_dval_i   
       );
    
-   present.fval     <= present_fifo_dout(67);
-   present.pix_fval <= present_fifo_dout(66);   
+   present.fval     <= present_fifo_dout(66);   
    present.pix_lval <= present_fifo_dout(65);
    present.pix_dval <= present_fifo_dout(64);
    present.data     <= present_fifo_dout(61 downto 48) & present_fifo_dout(45 downto 32) & present_fifo_dout(29 downto 16) & present_fifo_dout(13 downto 0);
    
    --------------------------------------------------
-   -- fifo du futur
+   -- fifo du futur1
    --------------------------------------------------
-   fifo3 : fwft_sfifo_w72_d16
-   port map(
-      srst        => global_sreset,
-      clk         => CLK,
-      din         => future_fifo_din,
-      wr_en       => future_fifo_wr,
-      rd_en       => fifo_rd,
-      dout        => future_fifo_dout,
-      full        => open,
-      overflow    => open,
-      empty       => open,
-      valid       => future_fifo_dval_i
-      );
+   fifo3 : fwft_sfifo_w3_d16
+   PORT MAP (
+      clk          => CLK,
+      srst         => global_sreset,
+      din          => future1_fifo_din,
+      wr_en        => future1_fifo_wr,
+      rd_en        => fifo_rd,
+      dout         => future1_fifo_dout,
+      full         => open,
+      almost_full  => open,
+      overflow     => open,
+      empty        => open,
+      valid        => future1_fifo_dval_i
+   );    
    
-   future.fval      <= future_fifo_dout(67);
-   future.pix_fval  <= future_fifo_dout(66);   
-   future.pix_lval  <= future_fifo_dout(65);
-   future.pix_dval  <= future_fifo_dout(64);
-   future.data      <= future_fifo_dout(61 downto 48) & past_fifo_dout(45 downto 32) & past_fifo_dout(29 downto 16) & past_fifo_dout(13 downto 0);
+   future1.fval      <= future1_fifo_dout(2);  
+   future1.pix_lval  <= future1_fifo_dout(1);
+   future1.pix_dval  <= future1_fifo_dout(0);
+   
+   --------------------------------------------------
+   -- fifo du futur2
+   --------------------------------------------------
+   fifo4 : fwft_sfifo_w3_d16
+   PORT MAP (
+      clk          => CLK,
+      srst         => global_sreset,
+      din          => future2_fifo_din,
+      wr_en        => future2_fifo_wr,
+      rd_en        => fifo_rd,
+      dout         => future2_fifo_dout,
+      full         => open,
+      almost_full  => open,
+      overflow     => open,
+      empty        => open,
+      valid        => future2_fifo_dval_i
+   ); 
+   
+   future2.fval      <= future2_fifo_dout(2);  
+   future2.pix_lval  <= future2_fifo_dout(1);
+   future2.pix_dval  <= future2_fifo_dout(0);
    
    --------------------------------------------------
    -- synchronisateur des données sortantes
    --------------------------------------------------    
    pix_dval_i <= present.pix_dval and present_fifo_dval_i;                    -- si les données du fifo du present sont OK, c'est que ceux du past et du futur le sont aussi
-   fifo_rd <= future_fifo_dval_i;                                             -- past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;
+   fifo_rd <= future2_fifo_dval_i;                                             -- past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;
    
    
    U4: process(CLK)
@@ -272,40 +342,70 @@ begin
             dout_fval_o <= '0';
             dout_dval_o <= '0';
             fifo_fsm <= init_st1;
-            past_fifo_wr <= '0';
+            past2_fifo_wr <= '0';
+            past1_fifo_wr <= '0';
             present_fifo_wr <= '0';
-            future_fifo_wr <= '0';
-            
+            future1_fifo_wr <= '0';
+            future2_fifo_wr <= '0';
          else        
             
             -- données entrantes
-            past_fifo_din <= QUAD_DATA;
-            past_fifo_wr  <= QUAD_DVAL;
+            past2_fifo_din <= QUAD_DATA(66 downto 64);
+            past2_fifo_wr  <= QUAD_DVAL;
+            
+            past1_fifo_din <= QUAD_DATA(66 downto 64);
+            past1_fifo_wr  <= QUAD_DVAL;
             
             present_fifo_din <= QUAD_DATA;
             present_fifo_wr  <= QUAD_DVAL;
             
-            future_fifo_din <= QUAD_DATA;
-            future_fifo_wr  <= QUAD_DVAL;
+            future1_fifo_din <= QUAD_DATA(66 downto 64);
+            future1_fifo_wr  <= QUAD_DVAL;
+            
+            future2_fifo_din <= QUAD_DATA(66 downto 64);
+            future2_fifo_wr  <= QUAD_DVAL;
             
             case fifo_fsm is
                
                when init_st1 =>       -- ici, on fait en sorte que le futur soit en avance de 1CLK sur le présent
-                  past_fifo_din(71 downto 64) <= (others => '0');
+                  past2_fifo_din(2 downto 0) <= (others => '0');
+                  past1_fifo_din(2 downto 0) <= (others => '0');
                   present_fifo_din(71 downto 64) <= (others => '0');
-                  past_fifo_wr <= '1';
-                  present_fifo_wr <= '1';
+                  future1_fifo_din(2 downto 0) <= (others => '0');
+                  past2_fifo_wr <= '1';
+                  past1_fifo_wr <= '1';
+                  present_fifo_wr <= '1'; 
+                  future1_fifo_wr <= '1';
                   fifo_fsm <= init_st2;
                
                when init_st2 =>
-                  past_fifo_wr <= '1';
-                  present_fifo_wr <= '0';
+                  past2_fifo_wr <= '1';
+                  past1_fifo_wr <= '1';
+                  present_fifo_wr <= '1';
+                  future1_fifo_wr <= '0';
                   fifo_fsm <= init_st3;
                
                when init_st3 =>
-                  past_fifo_wr <= '0';
+                  past2_fifo_wr <= '1';
+                  past1_fifo_wr <= '1';
+                  present_fifo_wr <= '0';
+                  future1_fifo_wr <= '0';
+                  fifo_fsm <= init_st4;
+                  
+               when init_st4 =>
+                  past2_fifo_wr <= '1';
+                  past1_fifo_wr <= '0';
+                  present_fifo_wr <= '0';
+                  future1_fifo_wr <= '0';
+                  fifo_fsm <= init_st5;
+                  
+               when init_st5 =>
+                  past2_fifo_wr <= '0';
+                  past1_fifo_wr <= '0';
+                  present_fifo_wr <= '0';
+                  future1_fifo_wr <= '0';
                   fifo_fsm <= init_done;
-               
+                  
                when init_done =>  
                
                when others => 
@@ -318,11 +418,15 @@ begin
             dout_dval_o          <= fifo_rd;                                        -- wr_en des fifos en aval. On ecrit aussi la tombée de fval pour que le système en avl le remarque  
             dout_fval_o          <= present.fval;                                   -- fval          
             dout_o(55 downto 0)  <= present.data;                                   -- données écrites en aval           
-            dout_o(56)           <= pix_dval_i and not past.pix_lval and present.pix_lval;                   -- aoi_sol                              
-            dout_o(57)           <= pix_dval_i and not future.pix_lval and present.pix_lval;                 -- aoi_eol       
+            dout_o(56)           <= pix_dval_i and not past1.pix_lval and present.pix_lval;                   -- aoi_sol                              
+            dout_o(57)           <= pix_dval_i and not future1.pix_lval and present.pix_lval;                 -- aoi_eol       
             dout_o(58)           <= present.fval;                                   
-            dout_o(59)           <= pix_dval_i and not past.pix_fval and present.pix_fval;                   -- aoi_sof
-            dout_o(60)           <= pix_dval_i and not future.pix_fval and present.pix_fval;                 -- aoi_eof 
+                        
+            -- aoi_sof
+            dout_o(59)           <= pix_dval_i and past2.fval and not past2.pix_lval and past1.fval and not past1.pix_lval and present.fval and present.pix_lval;                   
+            -- aoi_eof
+            dout_o(60)           <= pix_dval_i and present.fval and present.pix_lval and future1.fval and not future1.pix_lval and not future2.fval and not future2.pix_lval;                   
+
             dout_o(61)           <= present.pix_dval and fifo_rd;                   -- aoi_dval    (nouvel ajout) 
             dout_o(62)           <= acq_data_i;                                     -- requis pour savoir si image à rejeter ou non
             dout_o(76 downto 63) <= (others => '0');                                -- aoi_spares  (nouvel ajout)                                                                                

@@ -27,30 +27,32 @@ entity scd_proxy2_dsync is
    
    port(
       
-      ARESET        : in std_logic;
+      ARESET           : in std_logic;
       
       -- ch0  
-      CH0_DCLK      : in std_logic;
-      CH0_DUAL_DATA : in std_logic_vector(35 downto 0);
-      CH0_DUAL_DVAL : in std_logic;
-      CH0_SUCCESS   : in std_logic;
+      CH0_DCLK         : in std_logic;
+      CH0_DUAL_DATA    : in std_logic_vector(35 downto 0);
+      CH0_DUAL_DVAL    : in std_logic;
+      CH0_SUCCESS      : in std_logic;
       
       -- ch1 
       CH1_DCLK      : in std_logic;
       CH1_DUAL_DATA : in std_logic_vector(35 downto 0);
       CH1_DUAL_DVAL : in std_logic;
-      CH1_SUCCESS   : in std_logic;
+      CH1_SUCCESS      : in std_logic;
       
       -- out
-      QUAD_DCLK     : in std_logic;     
-      QUAD_DATA     : out std_logic_vector(71 downto 0);
-      QUAD_DVAL     : out std_logic;
+      QUAD_DCLK        : in std_logic;     
+      QUAD_DATA        : out std_logic_vector(71 downto 0);
+      QUAD_DVAL        : out std_logic;
       
       
-      FPA_INTF_CFG  : in fpa_intf_cfg_type;
+      FPA_INTF_CFG     : in fpa_intf_cfg_type;
+      
+      INIT_IN_PROGRESS : out std_logic;
       
       -- erreur
-      ERR           : out std_logic_vector(1 downto 0)
+      ERR              : out std_logic_vector(1 downto 0)
       );
 end scd_proxy2_dsync;
 
@@ -85,15 +87,13 @@ architecture rtl of scd_proxy2_dsync is
          );
    end component;
    
-   type fsm_type is (init_st1, init_st2, init_st3, init_st4, idle, dly_st, first_line_st, last_line_st, read_end_st, fifo_empty_st);
+   type fifo_ctrl_fsm_type is (init_st1, init_st2, init_st3, init_st4, idle, dly_st, first_line_st, last_line_st, read_end_st, fifo_empty_st);
    
-   signal fsm                 : fsm_type;
+   signal fifo_ctrl_fsm       : fifo_ctrl_fsm_type;
    signal sreset              : std_logic;
    signal fifo_rd_en          : std_logic;
    signal fifo_areset         : std_logic;
    signal active_read         : std_logic;
-   signal active_sof          : std_logic;
-   signal active_eof          : std_logic;
    signal ch0_future_cbits_i  : std_logic_vector(3 downto 0);
    signal ch0_fval_i          : std_logic;
    signal ch0_lval_i          : std_logic;
@@ -118,9 +118,9 @@ architecture rtl of scd_proxy2_dsync is
    signal dly_cnt             : unsigned(C_BITPOS downto 0);
    signal rst_cnt             : unsigned(5 downto 0);
    signal err_i               : std_logic_vector(ERR'length-1 downto 0);
-   signal init_in_progress    : std_logic;
-   signal frame_init_tag     : std_logic_vector(3 downto 0) := CBITS_FRM_IDLE_ID;
-
+   signal init_in_progress_i    : std_logic;
+   signal frame_init_tag      : std_logic_vector(3 downto 0) := CBITS_FRM_IDLE_ID;
+   
 begin
    
    QUAD_DATA <= quad_dout_o;
@@ -156,6 +156,8 @@ begin
    ch1_fval_i         <= CH1_DUAL_DATA(30); 
    
    fifo_rd_en         <= ch0_fifo_dval and ch1_fifo_dval and active_read; -- lecture synchronisee des 2 fifos tout le temps.
+   
+   INIT_IN_PROGRESS <= init_in_progress_i;
    
    --------------------------------------------------
    -- ch0 fifo
@@ -202,33 +204,31 @@ begin
    begin
       if rising_edge(QUAD_DCLK) then 
          if sreset = '1' then
-            fsm <= init_st1;
+            fifo_ctrl_fsm <= init_st1;
             active_read  <= '0';
-            active_sof   <= '0';
-            active_eof   <= '0';
             fifo_areset  <= '1';
             rst_cnt      <= (others => '0');
-            init_in_progress <= '1';
+            init_in_progress_i <= '1';
             
          else
             
-            case fsm is
+            case fifo_ctrl_fsm is
                
                -- on s'assure de ne pas avoir d'image tronquée et que les deux canaux sont synchronisés
                when init_st1 =>
                   fifo_areset  <= '0';  -- on ne fait pas de reset du fifo en même temps que les données s'ecrivent dedans.
                   if CH0_SUCCESS = '1' and CH1_SUCCESS = '1' then 
-                     fsm <= init_st2;
+                     fifo_ctrl_fsm <= init_st2;
                   end if;
                
                when init_st2 =>
                   if ch0_fval_i = '1' and CH0_DUAL_DVAL = '1' and ch1_fval_i = '1' and CH1_DUAL_DVAL = '1' then
-                     fsm <= init_st3;
+                     fifo_ctrl_fsm <= init_st3;
                   end if;
                
                when init_st3 =>                  
                   if ch0_fval_i = '0' and CH0_DUAL_DVAL = '1' and ch1_fval_i = '0' and CH1_DUAL_DVAL = '1' then                     
-                     fsm <= init_st4;
+                     fifo_ctrl_fsm <= init_st4;
                   end if;
                   
                -- on fait un reset des fifos
@@ -238,15 +238,15 @@ begin
                      fifo_areset <= '1';
                   elsif rst_cnt(5) = '1' then  -- 32 coups d'horloge
                      fifo_areset <= '0';                 
-                     fsm <= idle;
+                     fifo_ctrl_fsm <= idle;
                   end if;                  
                   
                --  on attend le debut d'une image              
                when idle =>
-                  init_in_progress <= '0';
+                  init_in_progress_i <= '0';
                   dly_cnt <= (others => '0');
                   if ch0_fval_i = '1' then
-                     fsm <= dly_st; 
+                     fifo_ctrl_fsm <= dly_st; 
                   end if;               
                   
                --  on decale la lecture du fifo de EOF_TO_FSYNC_DLY données au moins
@@ -255,36 +255,32 @@ begin
                      dly_cnt <= dly_cnt + 1;
                   end if;
                   if dly_cnt(C_BITPOS) = '1' then    -- un peu plus que EOF_TO_FSYNC_DLY coups d'horloge de delai avant debut de lecture du fifo
-                     fsm <= first_line_st;
+                     fifo_ctrl_fsm <= first_line_st;
                   end if;
                   
                --  on permet la lecture des données du fifo
                when first_line_st =>
                   active_read  <= '1';
-                  active_sof <= '1';
                   if ch0_lval_o = '1' and fifo_rd_en = '1' and ch0_future_cbits_o /= frame_init_tag then
-                     active_sof <= '0';
-                     fsm <= last_line_st;                              
+                     fifo_ctrl_fsm <= last_line_st;                              
                   end if;
                   
                -- on attend que fval tombe à l'entrée du fifo   
                when last_line_st =>
                   if ch0_fval_i = '0' then
-                     active_eof <= '1';
-                     fsm <= read_end_st;
+                     fifo_ctrl_fsm <= read_end_st;
                   end if;
                   
                --  on attend que fval tombe à la sortie du fifo
                when read_end_st =>
                   if ch0_fval_o = '0' and fifo_rd_en = '1' then                      
-                     fsm <= fifo_empty_st;
+                     fifo_ctrl_fsm <= fifo_empty_st;
                   end if;
                
                when fifo_empty_st =>
                   if ch0_fifo_empty = '1' then 
                      active_read  <= '0'; 
-                     active_eof <= '0';
-                     fsm <= idle;
+                     fifo_ctrl_fsm <= idle;
                   end if;
                   
                
@@ -305,25 +301,13 @@ begin
       if rising_edge(QUAD_DCLK) then 
          
          err_i(err_i'length-1 downto 1) <= (others => '0');
-         err_i(0) <= (ch0_fifo_ovfl or ch1_fifo_ovfl) and not init_in_progress;
+         err_i(0) <= (ch0_fifo_ovfl or ch1_fifo_ovfl) and not init_in_progress_i;
          
          -- non utilisés
-         quad_dout_o(71 downto 68)  <= (others => '0');
+         quad_dout_o(71 downto 67)  <= (others => '0');
          
-         -- fval
-         quad_dout_o(67)            <= ch0_fval_o;                          
-         
-         -- pix_fval
-         if ch0_lval_o = '1' and active_sof = '1'  then   
-            quad_dout_o(66)         <= '1';                                 
-         elsif ch0_lval_o = '0' and ch0_future_cbits_o /= CBITS_PIXEL_ID and active_eof = '1'  then
-            quad_dout_o(66)         <= '0';
-         end if;
-         
-         -- pix_lval
+         quad_dout_o(66)            <= ch0_fval_o;                          
          quad_dout_o(65)            <= ch0_lval_o;                          
-         
-         -- pix_dval
          quad_dout_o(64)            <= ch0_dval_o;
          
          -- pixels

@@ -135,12 +135,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal int_i                     : std_logic;
    signal serdes_rdy_i              : std_logic;
    
-   -- -- attribute dont_touch                         : string;
-   -- -- attribute dont_touch of acq_int_i            : signal is "true";
-   -- -- attribute dont_touch of fpa_int_i            : signal is "true";
-   -- -- attribute dont_touch of proxy_int_feedbk_i   : signal is "true";
-   -- -- attribute dont_touch of int_indx_i           : signal is "true"; 
-   
+     
 begin
    
    
@@ -251,7 +246,7 @@ begin
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
-               
+                  
                when check_cfg_st2 =>
                   if new_cfg.int /= present_cfg.int then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 

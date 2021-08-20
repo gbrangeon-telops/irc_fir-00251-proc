@@ -71,7 +71,7 @@ architecture rtl of scd_proxy2_mblaze_intf is
          );
    end component;     
    
-   type exp_cfg_gen_fsm_type is (idle, wait_int_dval_st, wait_mb_cfg_st, serial_exp_cfg_st, pause_st);
+   type exp_cfg_gen_fsm_type is (idle, wait_mb_cfg_st, serial_exp_cfg_st, pause_st);
    
    type int_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
    type int_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
