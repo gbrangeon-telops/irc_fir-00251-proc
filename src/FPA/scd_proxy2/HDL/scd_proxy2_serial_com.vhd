@@ -515,9 +515,13 @@ begin
                   if cmd_resp_done = '1' and cmd_resp_done_last = '0' then
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;                                        
                   else
-                     if timeout_cnt = 5_000_000 then   -- donne 50 ms sec au proxy pour donner une réponse                     
+                     if timeout_cnt = 5_000_000 then   -- donne 50 ms sec au proxy pour donner une réponse
+                        if USER_CFG.PROXY_ALONE_MODE = '1' then
+                           cfg_mgmt_fsm <= cmd_resp_mgmt_st; 
+                        else 
                            cfg_mgmt_fsm <= timeout_mgmt_st;
                         end if;
+                     end if;
                      -- pragma translate_off                     
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;
                      -- pragma translate_on
