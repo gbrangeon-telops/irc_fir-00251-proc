@@ -630,6 +630,7 @@ begin
                when X"F0" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
                when X"F4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
                when X"F8" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
+               when X"FC" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(DEFINE_SCD_FRAME_RESOLUTION)                  , 32));
                
                when others =>                                                       
                

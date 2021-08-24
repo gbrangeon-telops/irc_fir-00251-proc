@@ -62,7 +62,7 @@
 
 #define LOW_GAIN                           0x00   // LowGain: "Hercules-like" pixel operation IWR/ITR
 #define HIGH_GAIN                          0x01   // A/B pixel caps operation, lowest noise, ITR/IWR
-#define UNIFIED_CAP_LOW_GAIN               0x02   // UnifiedCap-LowGain: same capacity as LowGain with lower noise, ITR only
+#define UNIFIED_CAP_MEDIUM_GAIN            0x02   // UnifiedCap-LowGain: same capacity as LowGain with lower noise, ITR only
 #define HIGH_CAPACITY                      0x03   // High Capacity: largest capacity, ITR/IWR
 #define UNIFIED_CAP_MEDIUM_GAIN            0x04   // UnifiedCap-Medium Gain: ITR only
 
@@ -246,7 +246,7 @@ struct s_FpaPrivateStatus
    uint32_t int_dly                                   ;
    uint32_t int_time                                  ;
    uint32_t int_clk_source_rate_hz                    ;
-
+   uint32_t synth_frame_resolution                    ; //Resolution temporelle du ROIC en nombre de clks de 70 MHz.
 };
 typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
  
@@ -372,11 +372,19 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // config du contrôleur pour les acq trigs (il est sur l'horloge de 100MHz)
    if ((pGCRegs->IntegrationMode == IM_IntegrateThenRead) || (ptrA->fpa_diag_mode == 1)) {
+      ptrA->op_int_mode = ITR_MODE;
+      ptrA->itr    = 1;
+      ptrA->op_gain = (uint32_t)UNIFIED_CAP_MEDIUM_GAIN;
+
       ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;        // mode MODE_ITR_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration et aussi s'assurer que le readout est terminé
-      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); 
+      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    }
    else {
-      ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ALL_END_TO_TRIG_START;            // 
+      ptrA->op_int_mode = IWR_MODE;
+      ptrA->itr    = 0;
+      ptrA->op_gain = (uint32_t)LOW_GAIN;
+
+      ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ALL_END_TO_TRIG_START;            
       ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    }
    
@@ -420,12 +428,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->diag_lovh_mclk_source           = 8;                                     // à reviser si necessaire
    ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
     
-   ptrA->itr    = 0; 
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
-      ptrA->itr = 1;
-   
    ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset 
-
    //-----------------------------------------
    // op : cmd structurelle
    //-----------------------------------------   
@@ -440,17 +443,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlascmd_datasheet2.17   
    
    ptrA->op_frame_time = (uint32_t)gPrivateStat.int_time + (uint32_t)((hh.Frame_Time_us * 1e-6F) * hh.fpa_intg_clk_rate_hz);                    // valeur par defaut de 0 pour l'instant. Si cela ne marche pas, on essaie la formule qui est: (uint32_t)gPrivateStat.int_time + (uint32_t)(hh.Frame_Time * hh.fpa_intg_clk_rate_hz);
-   
-   //  gain 
-   ptrA->op_gain = (uint32_t)LOW_GAIN;
-   if (pGCRegs->SensorWellDepth == SWD_HighGain)
-      ptrA->op_gain = (uint32_t)HIGH_GAIN;
-   
-   // integration modes
-   ptrA->op_int_mode = ITR_MODE;
-   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead) 
-      ptrA->op_int_mode = IWR_MODE; 
-   
+
    ptrA->op_test_mode = 0;                     // vid_if_bit_en. 0 <=> no data during frame idle;
       
    // polarisation et saturation 
@@ -475,7 +468,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // synth : cmd structurelle
    //-----------------------------------------
    ptrA->synth_spare     = 0;                     
-   ptrA->synth_frm_res   = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 2);  // valeur minimale est de 2
+   ptrA->synth_frm_res   = MAX(gPrivateStat.synth_frame_resolution, 2);  // valeur minimale est de 2
+
    ptrA->synth_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
    if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
       ptrA->synth_frm_dat = 1;
@@ -910,7 +904,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->No_Ramp               =	 70.0F;
    ptrH->ramp2_Start           =  30.0F;
    ptrH->ramp2_Count           =  190.0F;
-   ptrH->fpa_intg_clk_rate_hz  =  35E6F;
+   ptrH->fpa_intg_clk_rate_hz  =  (float)FPA_MCLK_RATE_HZ/(float)gPrivateStat.synth_frame_resolution;
    ptrH->int_time_offset_usec  = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
   
    ptrH->Frame_read_Init_3     = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
