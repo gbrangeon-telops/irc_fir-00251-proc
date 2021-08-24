@@ -410,7 +410,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          gFr_dly = (float)gFpaDebugRegG/1E+6F;
       }
       else{
-         // gFr_dly doit toujours être plus petit que : gIntg_dly + exposure_time
+         // gFr_dly doit toujours être plus grand que : gIntg_dly + exposure_time
          gFr_dly = scd_frame_period_min - (hh.ro_itr + hh.x_to_next_fsync);
       }
 
@@ -712,10 +712,10 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
    ptrH->Tclink_clk        = 1.0F / ((float)FPA_CLINK_CLK_RATE_HZ);                       // in second
    ptrH->frame_resolution  = ((float)gPrivateStat.fpa_frame_resolution)*ptrH->Tfpp_clk;   // in second
    ptrH->exposure_time     = exposureTime_usec*1E-6F;                                     // in second
-   ptrH->adc_conv          = 10.65E-6F*corr_factor;                                 // in second
+   ptrH->adc_conv          = 10.65E-6F*corr_factor;                                       // in second
    ptrH->videoRate         = 2.0F;
    ptrH->ro                = ptrH->adc_conv/ptrH->videoRate;                              // in second
-   ptrH->Tframe_init       = 40E-6F*corr_factor;                                    // in second
+   ptrH->Tframe_init       = 40E-6F*corr_factor;                                          // in second
    ptrH->ro_itr            = ptrH->ro*(2.0F + (float)pGCRegs->Height)+ptrH->Tframe_init;  // in second
    ptrH->fr_dly            = gFr_dly;                                                     // in second
    ptrH->intg_dly          = gIntg_dly;                                                   // in second
