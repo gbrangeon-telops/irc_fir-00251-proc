@@ -87,7 +87,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, check_cfg_st0, check_cfg_st, pause_st1, pause_st2, 
    output_op_cfg_st, output_synth_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, wait_updater_rdy_st, wait_updater_run_st, wait_updater_end_st);
-   type int_gen_fsm_type is (idle, check_fpa_st, int_gen_st1, int_gen_st2, param_st);
+   type int_gen_fsm_type is (idle, check_fpa_st, intg_dly_st,int_gen_st1, int_gen_st2, param_st);
    type new_cfg_pending_fsm_type is(init_st, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_synth_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
@@ -354,7 +354,7 @@ begin
          else                       
             
             fpa_driver_done_last <= fpa_driver_done;
-            --fsm de contrôle de la partie de config demandant la reprogrammarion du fpa  
+            -- fsm de contrôle de la partie de config demandant la reprogrammarion du fpa  
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings
             
             if SERIAL_FATAL_ERR = '1' then
@@ -626,7 +626,7 @@ begin
                   int_indx_i <= fpa_intf_cfg_i.int.int_indx;
                   int_time_i <= std_logic_vector(resize(fpa_intf_cfg_i.int.int_time, 32));
                   if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
-                     int_gen_fsm <= int_gen_st1;
+                     int_gen_fsm <= intg_dly_st;
                   else
                      int_gen_fsm <= check_fpa_st; 
                   end if;                  
@@ -638,7 +638,17 @@ begin
                         int_gen_fsm <= idle;
                      end if;
                   else
-                     int_gen_fsm <= int_gen_st1;           -- sinon, nous generons le feedback comme on le ferait en mode diag
+                     int_gen_fsm <= intg_dly_st;           -- sinon, nous generons le feedback comme on le ferait en mode diag
+                  end if;     
+                  
+               when intg_dly_st =>  
+                  if int_clk_pulse_i = '1' then                     
+                     if cnt >= fpa_intf_cfg_i.int.int_dly then    
+                        cnt <= to_unsigned(1, cnt'length);
+                        int_gen_fsm <= int_gen_st1;
+                     else                        
+                        cnt <= cnt + 1;
+                     end if;
                   end if;
                
                when int_gen_st1 =>                         -- ainsi on a au minimum une durée egale à la periode de int_clk_pulse_i même si fpa_intf_cfg_i.int.int_signal_high_time = 0 

@@ -234,7 +234,7 @@ begin
                   when X"03C" =>    mb_struct_cfg.real_mode_active_pixel_dly            <= unsigned(data_i(mb_struct_cfg.real_mode_active_pixel_dly'length-1 downto 0));                                
                      
                   -- int mode
-                  when X"040" =>    mb_struct_cfg.itr                                   <= data_i(0);                                                     
+                  when X"040" =>    mb_struct_cfg.spare                                 <= data_i(0);                                                     
                      
                   -- cropping
                   when X"044" =>    mb_struct_cfg.aoi_xsize                             <= unsigned(data_i(mb_struct_cfg.aoi_xsize'length-1 downto 0)); 
@@ -512,7 +512,7 @@ begin
          int_cfg_i.int_signal_high_time   <= int_time_pipe(4)(int_cfg_i.int_signal_high_time'length-1 downto 0); -- temps d'integration que le detecteur doit faire en tenant compte de son offset de temps interne.
          int_cfg_i.int_dly                <= mb_struct_cfg.int_dly_cst;
          int_cfg_i.int_indx               <= int_indx_pipe(4);
-         int_cfg_i.frame_dly              <= int_cfg_i.int_time(19 downto 0) + mb_struct_cfg.frame_dly_cst; 
+         int_cfg_i.frame_dly              <= mb_struct_cfg.frame_dly_cst; 
          int_cfg_i.int_dval               <= or_reduce(int_dval_pipe(7 downto 5));  -- on genere un signal de largeur 2 CLK environ
       end if;
    end process;
@@ -582,7 +582,7 @@ begin
                when X"30" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.xsize_div_tapnum                     , 32));
                when X"34" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.diag.lovh_mclk_source                     , 32));
                when X"38" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.real_mode_active_pixel_dly                , 32));
-               when X"3C" =>  axi_rdata <=  resize('0' & user_cfg_i.itr                                                       , 32);
+               when X"3C" =>  axi_rdata <=  resize('0' & user_cfg_i.spare                                                     , 32);
                when X"40" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.sol_pos                          , 32));
                when X"44" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_data.eol_pos                          , 32));
                when X"48" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.aoi_flag1.sol_pos                         , 32));
@@ -630,7 +630,6 @@ begin
                when X"F0" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
                when X"F4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
                when X"F8" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
-               when X"FC" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(DEFINE_SCD_FRAME_RESOLUTION)                  , 32));
                
                when others =>                                                       
                

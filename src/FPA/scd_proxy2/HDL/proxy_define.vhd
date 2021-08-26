@@ -184,7 +184,7 @@ package Proxy_define is
       real_mode_active_pixel_dly     : unsigned(15 downto 0);
       
       -- integration mode
-      itr                            : std_logic;
+      spare                            : std_logic;
       int_time                       : unsigned(23 downto 0);   -- consigne du temps d'integration actuellement utilisé en coups de MCLK. Sert juste à generer un statut.
       
       -- aoi (cropping)

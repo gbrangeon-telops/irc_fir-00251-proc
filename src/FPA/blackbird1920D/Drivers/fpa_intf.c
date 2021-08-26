@@ -62,7 +62,7 @@
 
 #define LOW_GAIN                           0x00   // LowGain: "Hercules-like" pixel operation IWR/ITR
 #define HIGH_GAIN                          0x01   // A/B pixel caps operation, lowest noise, ITR/IWR
-#define UNIFIED_CAP_MEDIUM_GAIN            0x02   // UnifiedCap-LowGain: same capacity as LowGain with lower noise, ITR only
+#define UNIFIED_CAP_LOW_GAIN               0x02   // UnifiedCap-LowGain: same capacity as LowGain with lower noise, ITR only
 #define HIGH_CAPACITY                      0x03   // High Capacity: largest capacity, ITR/IWR
 #define UNIFIED_CAP_MEDIUM_GAIN            0x04   // UnifiedCap-Medium Gain: ITR only
 
@@ -118,6 +118,48 @@
 
 #define VHD_CLK_100M_RATE_HZ               100E+6F 
 
+#define OP_CMD_IWR_FRAME_DLY_DEFAULT        50E-6F // "Frame read delay" parameter, in seconds
+#define OP_CMD_IWR_INTG_DLY_DEFAULT         10E-6F  // "Integration delay" parameter, in seconds (set to 0 if possible)
+#define OP_CMD_ITR_INTG_DLY_DEFAULT         10E-6F // "Integration delay" parameter, in seconds (set to 0 if possible)
+
+#define FRAME_RESOLUTION_DEFAULT            7  // 0.1us
+
+
+// "Photo-diode bias" parameter (and anti-blooming control)
+static const uint8_t Scd_DiodeBiasValues_Vdet[] = {
+      0x00,    // 1mV
+      0x01,    // 20mV
+      0x02,    // 40mV
+      0x03,    // 60mV
+      0x04,    // 80mV
+      0x05,    // 100mV(default mode)
+      0x06,    // 150mV
+      0x07,    // 200mV
+      0x08,    // 250mV
+      0x09,    // 300mV
+      0x0A,    // 350mV
+      0x0B,    // 400mV
+      0x0C,    // 450mV
+      0x0D,    // 500mV
+      0x0E,    // 600mV  FORBIDDEN!!! WILL DAMAGE THE ROIC !!!
+      0x0F,    // 700mV  FORBIDDEN!!! WILL DAMAGE THE ROIC !!!
+
+};
+// WARNING !!! At room temperature, Vdet and Idet sould be kept at their minimum. The ROIC will be damage otherwise(see atlasdatasheet2.17ext.pdf p. 42).
+#define SCD_VDET_BIAS_FORBIDDEN_THRESHOLD_IDX  14  //Vdet = 600mV or 700mV will damage de ROIC (see atlasdatasheet2.17ext.pdf p. 42)
+#define SCD_VDET_BIAS_DEFAULT_IDX              0     // 1mV
+#define SCD_VDET_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues_Vdet) / sizeof(Scd_DiodeBiasValues_Vdet[0]))
+
+static const uint8_t Scd_DiodeBiasValues_Idet[] = {
+      0x00,    // 10pA
+      0x01,    // 30pA
+      0x02,    // 100pA
+      0x03,    // 300pA
+};
+// WARNING !!! At room temperature, Vdet and Idet sould be kept at their minimum. The ROIC will be damage otherwise(see atlasdatasheet2.17ext.pdf p. 42).
+#define SCD_IDET_BIAS_DEFAULT_IDX              0     // 10pA (default)
+#define SCD_IDET_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues_Idet) / sizeof(Scd_DiodeBiasValues_Idet[0]))
+
 
 // structure 
 struct bb1920D_param_s
@@ -146,12 +188,14 @@ struct bb1920D_param_s
    float pixel_control_time                  ;
    float Line_Conversion                     ;
    float int_time_offset_usec                ;
-   float mode_int_end_to_trig_start_dly_usec ;
    float Frame_Initialization                ;
-   float Frame_Time_us                       ;
+   float Frame_Time                          ;
    float fpa_intg_clk_rate_hz                ;
-   float periodMinWithNullExposure_us        ;
-
+   float frame_period_min                    ;
+   float fr_dly                              ;
+   float intg_dly                            ;
+   float x_to_next_fsync                     ;
+   float exposure_time                       ;
 
 };
 typedef struct bb1920D_param_s bb1920D_param_t;
@@ -198,7 +242,7 @@ struct s_FpaPrivateStatus
    uint32_t diag_xsize_div_tapnum                     ;
    uint32_t diag_lovh_mclk_source                     ;
    uint32_t real_mode_active_pixel_dly                ;
-   uint32_t itr                                       ;
+   uint32_t spare                                     ;
    uint32_t aoi_data_sol_pos                          ;
    uint32_t aoi_data_eol_pos                          ;
    uint32_t aoi_flag1_sol_pos                         ;
@@ -258,7 +302,8 @@ uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
 uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
-
+float gIntg_dly = 0.0F;
+float gFr_dly = 0.0F;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -270,6 +315,7 @@ void FPA_SendSynthVideo_SerialCmd(const t_FpaIntf *ptrA);
 void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
+float FPA_ConvertSecondToFrameTimeResolution(float seconds);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
 
 
@@ -331,12 +377,11 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    bb1920D_param_t hh;
+   float frame_period, fpaAcquisitionFrameRate;
+   uint8_t det_vbias_idx;
    static uint8_t cfg_num = 0;
-   extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données du proxy même lorsque le détecteur est absent
-   extern int32_t gFpaDebugRegA;
-   extern int32_t gFpaDebugRegB;
-   // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
-   FPA_SpecificParams(&hh, 0.0F, pGCRegs);               //le temps d'integration est nul car aucune influence sur les parametres sauf sur la periode. Mais le VHD ajoutera le int_time pour avoir la vraie periode
+   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegG, gFpaDebugRegH;
+   extern uint8_t gFpaScdDiodeBiasEnum;
    
    //-----------------------------------------                                           
    // Common
@@ -370,26 +415,59 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // allumage du détecteur 
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
+   // Frame time calculation : define the maximum trig frequency allowed by the proxy for this set of operational parameters.
+   fpaAcquisitionFrameRate    = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
+   frame_period               = 1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate);
+
+
    // config du contrôleur pour les acq trigs (il est sur l'horloge de 100MHz)
    if ((pGCRegs->IntegrationMode == IM_IntegrateThenRead) || (ptrA->fpa_diag_mode == 1)) {
-      ptrA->op_int_mode = ITR_MODE;
-      ptrA->itr    = 1;
-      ptrA->op_gain = (uint32_t)UNIFIED_CAP_MEDIUM_GAIN;
+      if(gFpaDebugRegH != 0)
+         gIntg_dly = (float)gFpaDebugRegH/1E+6F;
+      else
+         gIntg_dly =  OP_CMD_ITR_INTG_DLY_DEFAULT;
 
-      ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;        // mode MODE_ITR_INT_END_TO_TRIG_START pour s'affranchir du temps d'intégration et aussi s'assurer que le readout est terminé
-      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+      // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
+      FPA_SpecificParams(&hh, 0.0F, pGCRegs);
+
+      if(gFpaDebugRegG != 0){
+         gFr_dly = (float)gFpaDebugRegG/1E+6F;
+   }
+      else if(gFpaDebugRegE == 1){ // mode proxy alone
+         gFr_dly = 0.0002F; // 0.2 ms (mesuré avec ILA).
+      }
+      else{
+         // gFr_dly doit toujours être plus grand que : gIntg_dly + exposure_time
+         gFr_dly = frame_period - (hh.Frame_Time + hh.x_to_next_fsync);
+      }
+      ptrA->op_int_mode = ITR_MODE;
+      ptrA->op_gain = (uint32_t)UNIFIED_CAP_LOW_GAIN;
    }
    else {
-      ptrA->op_int_mode = IWR_MODE;
-      ptrA->itr    = 0;
-      ptrA->op_gain = (uint32_t)LOW_GAIN;
 
-      ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_ALL_END_TO_TRIG_START;            
-      ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+      if(gFpaDebugRegH != 0)
+         gIntg_dly = (float)gFpaDebugRegH/1E+6F;
+      else
+         gIntg_dly = OP_CMD_IWR_INTG_DLY_DEFAULT;
+
+      if(gFpaDebugRegG != 0)
+         gFr_dly = (float)gFpaDebugRegG/1E+6F;
+      else
+         gFr_dly = OP_CMD_IWR_FRAME_DLY_DEFAULT;
+
+      // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
+      FPA_SpecificParams(&hh, 0.0F, pGCRegs);
+
+      ptrA->op_int_mode = IWR_MODE;
+      ptrA->op_gain = (uint32_t)LOW_GAIN;
    }
    
+   // config du contrôleur pour les acq_trigs (il est sur l'horloge de 100MHz)
+   ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+   ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((frame_period - (hh.intg_dly + VHD_PIPE_DLY_SEC))*(float)VHD_CLK_100M_RATE_HZ);
+
    // config du contrôleur pour les xtra trigs (il est sur l'horloge de 100MHz)
-   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;                                               //
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;                                               //
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
   
@@ -442,13 +520,25 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
    ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlascmd_datasheet2.17   
    
-   ptrA->op_frame_time = (uint32_t)gPrivateStat.int_time + (uint32_t)((hh.Frame_Time_us * 1e-6F) * hh.fpa_intg_clk_rate_hz);                    // valeur par defaut de 0 pour l'instant. Si cela ne marche pas, on essaie la formule qui est: (uint32_t)gPrivateStat.int_time + (uint32_t)(hh.Frame_Time * hh.fpa_intg_clk_rate_hz);
+   ptrA->op_frame_time = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(frame_period);
 
    ptrA->op_test_mode = 0;                     // vid_if_bit_en. 0 <=> no data during frame idle;
       
    // polarisation et saturation 
-   ptrA->op_det_vbias = 5;                     // parametre mtx_vdet (valeur par defaut pour l'instant)
-   ptrA->op_det_ibias = 1;                     // parametre mtx_idet (valeur par defaut pour l'instant)
+   if (gFpaScdDiodeBiasEnum >= SCD_IDET_BIAS_VALUES_NUM)      // Photo-diode bias (Idet)
+       gFpaScdDiodeBiasEnum    = SCD_IDET_BIAS_DEFAULT_IDX;    // Corrige une valeur invalide
+   ptrA->op_det_ibias     = Scd_DiodeBiasValues_Idet[gFpaScdDiodeBiasEnum];
+
+   det_vbias_idx = (uint8_t)gFpaDebugRegC;
+   if (det_vbias_idx == 0){// Photo-diode bias (Vdet)
+      ptrA->op_det_vbias     = (uint32_t)SCD_VDET_BIAS_DEFAULT_IDX;
+   }
+   else{
+      if (det_vbias_idx >= SCD_VDET_BIAS_FORBIDDEN_THRESHOLD_IDX)
+         ptrA->op_det_vbias = SCD_VDET_BIAS_DEFAULT_IDX;
+      else
+         ptrA->op_det_vbias = Scd_DiodeBiasValues_Vdet[det_vbias_idx];
+   }
       
    // binning ou non
    ptrA->op_binning = 0;
@@ -468,7 +558,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // synth : cmd structurelle
    //-----------------------------------------
    ptrA->synth_spare     = 0;                     
-   ptrA->synth_frm_res   = MAX(gPrivateStat.synth_frame_resolution, 2);  // valeur minimale est de 2
+   ptrA->synth_frm_res   = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2
 
    ptrA->synth_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
    if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
@@ -489,8 +579,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->int_cmd_eof_add                 = ptrA->int_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->int_cmd_dlen;
    ptrA->int_cmd_sof_add_m1              = ptrA->int_cmd_sof_add - 1;
    ptrA->int_checksum_add                = ptrA->int_cmd_eof_add;
-   ptrA->frame_dly_cst                   = 100;                             // Frame Read delay = integration_time + frame_dly_cst. C'est le delai referé à FSYNC pour la sortie des données
-   ptrA->int_dly_cst                     = 0; 
+   ptrA->frame_dly_cst                   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gFr_dly);                             // Frame Read delay = integration_time + frame_dly_cst. C'est le delai referé à FSYNC pour la sortie des données
+   ptrA->int_dly_cst                     = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gIntg_dly);
    
    //-----------------------------------------
    // op : cmd serielle
@@ -569,7 +659,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("gPrivateStat.diag_xsize_div_tapnum                      = %d", gPrivateStat.diag_xsize_div_tapnum                     );
       FPA_PRINTF("gPrivateStat.diag_lovh_mclk_source                      = %d", gPrivateStat.diag_lovh_mclk_source                     );
       FPA_PRINTF("gPrivateStat.real_mode_active_pixel_dly                 = %d", gPrivateStat.real_mode_active_pixel_dly                );
-      FPA_PRINTF("gPrivateStat.itr                                        = %d", gPrivateStat.itr                                       );
+      FPA_PRINTF("gPrivateStat.spare                                      = %d", gPrivateStat.spare                                     );
       FPA_PRINTF("gPrivateStat.aoi_data_sol_pos                           = %d", gPrivateStat.aoi_data_sol_pos                          );
       FPA_PRINTF("gPrivateStat.aoi_data_eol_pos                           = %d", gPrivateStat.aoi_data_eol_pos                          );
       FPA_PRINTF("gPrivateStat.aoi_flag1_sol_pos                          = %d", gPrivateStat.aoi_flag1_sol_pos                         );
@@ -636,7 +726,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("ptrA->diag_xsize_div_tapnum                      = %d", ptrA->diag_xsize_div_tapnum                       );
       FPA_PRINTF("ptrA->diag_lovh_mclk_source                      = %d", ptrA->diag_lovh_mclk_source                       );
       FPA_PRINTF("ptrA->real_mode_active_pixel_dly                 = %d", ptrA->real_mode_active_pixel_dly                  );
-      FPA_PRINTF("ptrA->itr                                        = %d", ptrA->itr                                         );
+      FPA_PRINTF("ptrA->spare                                      = %d", ptrA->spare                                       );
       FPA_PRINTF("ptrA->aoi_xsize                                  = %d", ptrA->aoi_xsize                                   );
       FPA_PRINTF("ptrA->aoi_ysize                                  = %d", ptrA->aoi_ysize                                   );
       FPA_PRINTF("ptrA->aoi_data_sol_pos                           = %d", ptrA->aoi_data_sol_pos                            );
@@ -752,22 +842,16 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
-   float period, MaxFrameRate;   
+   float fr_max;;
    bb1920D_param_t hh;
 
 
    FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
-   period = hh.Frame_Time_us * 1e-6F;
+   fr_max = 1.0F / hh.frame_period_min;
+   fr_max = fr_max * (1.0F - gFpaPeriodMinMargin);
+   fr_max = floorMultiple(fr_max, 0.01);
 
-   MaxFrameRate = 1.0F / period;
-
-   // ENO: 10 sept 2016: Apply margin 
-   MaxFrameRate = MaxFrameRate * (1.0F - gFpaPeriodMinMargin);
-   
-   // Round maximum frame rate
-   MaxFrameRate = floorMultiple(MaxFrameRate, 0.01);
-
-   return MaxFrameRate;
+   return fr_max;
 }
 
 //--------------------------------------------------------------------------                                                                            
@@ -775,7 +859,7 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 //--------------------------------------------------------------------------
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
-   float maxExposure_us, periodMinWithNullExposure;
+   float maxExposure_us, periodMinWithNullExposure, Ta;
    float operatingPeriod, fpaAcquisitionFrameRate;
    bb1920D_param_t hh;
 
@@ -784,11 +868,17 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 
    // ENO: 10 sept 2016: tout reste inchangé
    FPA_SpecificParams(&hh, 0.0F, pGCRegs); // periode minimale admissible si le temps d'exposition était nulle
-   periodMinWithNullExposure = hh.Frame_Time_us * 1e-6F;
+   periodMinWithNullExposure = hh.frame_period_min;
    operatingPeriod = 1.0F / MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate); // periode avec le frame rate actuel. Doit tenir compte de la contrainte d'opération du détecteur
    
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
    
+   if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
+      Ta = (hh.fr_dly + hh.Frame_Time) - hh.intg_dly;
+      if (Ta > 0)
+         maxExposure_us = maxExposure_us + Ta*1E6F;
+   }
+
    maxExposure_us = maxExposure_us/1.001F;    // cette division tient du fait que dans la formule de T0, le temps d'exposition intervient avec un facteur 1 + 0.1/100
    
    // Round exposure time
@@ -890,23 +980,27 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
 {
   
    extern int32_t gFpaExposureTimeOffset;
-  
+   extern int32_t gFpaDebugRegE;
+
    ptrH->Fclock_MHz            = (float)FPA_MCLK_RATE_HZ/1E+6;;
-   ptrH->Pixel_Reset           =  140.0F;
-   ptrH->Pixel_Sample          =  14.0F;
-   ptrH->Frame_read_Init_1     =  28.0F;
-   ptrH->Frame_read_Init_2     =  14.0F;
-   ptrH->Frame_read_Init_3_clk =  10.0F;
-   ptrH->Pch1                  =  55.0F;
-   ptrH->Pch2                  =  50.0F;
-   ptrH->Ramp1_Start           =  40.0F;
-   ptrH->Ramp1_Count           =  255.0F;
-   ptrH->No_Ramp               =	 70.0F;
-   ptrH->ramp2_Start           =  30.0F;
-   ptrH->ramp2_Count           =  190.0F;
-   ptrH->fpa_intg_clk_rate_hz  =  (float)FPA_MCLK_RATE_HZ/(float)gPrivateStat.synth_frame_resolution;
+   ptrH->Pixel_Reset           =  140.0F; // in us
+   ptrH->Pixel_Sample          =  14.0F;  // in us
+   ptrH->Frame_read_Init_1     =  28.0F;  // in us
+   ptrH->Frame_read_Init_2     =  14.0F;  // in us
+   ptrH->Frame_read_Init_3_clk =  10.0F;  // in us
+   ptrH->Pch1                  =  55.0F;  // in us
+   ptrH->Pch2                  =  50.0F;  // in us
+   ptrH->Ramp1_Start           =  40.0F;  // in us
+   ptrH->Ramp1_Count           =  255.0F; // in us
+   ptrH->No_Ramp               =	 70.0F;  // in us
+   ptrH->ramp2_Start           =  30.0F;  // in us
+   ptrH->ramp2_Count           =  190.0F; // in us
+   ptrH->fpa_intg_clk_rate_hz  =  (float)FPA_MCLK_RATE_HZ/(float)FRAME_RESOLUTION_DEFAULT;
    ptrH->int_time_offset_usec  = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
-  
+   ptrH->fr_dly                = gFr_dly;                                                     // in second
+   ptrH->intg_dly              = gIntg_dly;                                                   // in second
+   ptrH->exposure_time         = exposureTime_usec*1E-6F;
+
    ptrH->Frame_read_Init_3     = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
 
    ptrH->number_of_Columns       = (float)FPA_WIDTH_MAX;
@@ -931,17 +1025,17 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
   
    ptrH->Frame_Initialization  = ptrH->Frame_read_Init_1 + ptrH->Frame_read_Init_2 + ptrH->Frame_read_Init_3;
    ptrH->pixel_control_time    = 2* ptrH->Pixel_Reset + ptrH->Pixel_Sample + 10.0F;
-   ptrH->Frame_Time_us = ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read; // en us
-   
-   ptrH->periodMinWithNullExposure_us = ptrH->Frame_Time_us;
-   
-   // ilfaut reviser ce qui suit en se basant sur 2.3.2 dela doc
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) 
-      ptrH->Frame_Time_us = ptrH->periodMinWithNullExposure_us + exposureTime_usec;
-   else
-      ptrH->Frame_Time_us = MAX(ptrH->periodMinWithNullExposure_us,  exposureTime_usec);
-   
-   ptrH->mode_int_end_to_trig_start_dly_usec =  ptrH->periodMinWithNullExposure_us; // à reviser plus tard
+   ptrH->Frame_Time = (ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F; // en seconde
+
+
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead || gFpaDebugRegE == 1){
+      ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
+      ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->Frame_Time + ptrH->x_to_next_fsync;
+   }
+   else{
+      ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
+      ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->Frame_Time, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
+   }
 
 }
 
@@ -1151,7 +1245,7 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->diag_xsize_div_tapnum                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x30);
    PrivateStat->diag_lovh_mclk_source                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x34);
    PrivateStat->real_mode_active_pixel_dly               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x38);
-   PrivateStat->itr                                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x3C);
+   PrivateStat->spare                                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x3C);
    PrivateStat->aoi_data_sol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x40);
    PrivateStat->aoi_data_eol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x44);
    PrivateStat->aoi_flag1_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x48);
@@ -1199,4 +1293,13 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->int_dly                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
    PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF4);
    PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF8);
+}
+
+float FPA_ConvertSecondToFrameTimeResolution(float seconds)
+{
+   float regValue;
+
+   regValue =  seconds*FPA_MCLK_RATE_HZ; // in 70 MHz clks
+   regValue =  regValue/((float)FRAME_RESOLUTION_DEFAULT); // in frame_res
+   return regValue;
 }

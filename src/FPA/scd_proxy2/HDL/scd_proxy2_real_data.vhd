@@ -484,9 +484,9 @@ begin
             fpa_int_last <= fpa_int_i;
             fpa_int_re   <= (not fpa_int_last and fpa_int_i);
             
-            itr_int_fifo_wr   <= fpa_int_re and ACQ_MODE and FPA_INTF_CFG.ITR;                                 -- en mode itr, on ecrit les RE des fpa_acq_int dans le fifo
-            iwr_int_fifo_wr1  <= fpa_int_re and ACQ_MODE and not ACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;  -- en mode iwr, on ecrit les RE des fpa_acq_int dans le fifo, sauf le premier
-            iwr_int_fifo_wr2  <= fpa_int_re and NACQ_MODE_FIRST_INT and not FPA_INTF_CFG.ITR;                  -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
+            itr_int_fifo_wr   <= fpa_int_re and ACQ_MODE and not FPA_INTF_CFG.OP.int_mode(0);                         -- en mode itr, on ecrit les RE des fpa_acq_int dans le fifo
+            iwr_int_fifo_wr1  <= fpa_int_re and ACQ_MODE and not ACQ_MODE_FIRST_INT and FPA_INTF_CFG.OP.int_mode(0);  -- en mode iwr, on ecrit les RE des fpa_acq_int dans le fifo, sauf le premier
+            iwr_int_fifo_wr2  <= fpa_int_re and NACQ_MODE_FIRST_INT and FPA_INTF_CFG.OP.int_mode(0);                  -- en mode iwr, on ecrit le RE de l'integration resultant du premier xtra_trig/prog_trig.
             
             int_fifo_wr  <= itr_int_fifo_wr or iwr_int_fifo_wr1 or iwr_int_fifo_wr2;          
             

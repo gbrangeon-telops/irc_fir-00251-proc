@@ -46,9 +46,7 @@ package FPA_define is
    constant YSIZE_MAX                              : integer    := 1536;              -- dimension en Y maximale  
    
    constant ACTIVE_RWI_MODE                        : std_logic  := '1';               -- '1' <=> mode RWI;  '0' <=> mode IWR
-   
-   constant DEFINE_SCD_FRAME_RESOLUTION            : real      := 7.0;                -- Resolution temporelle du ROIC en nombre de clks de 70 MHz. 
-   
+
 end FPA_define;
 
 package body FPA_define is

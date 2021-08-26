@@ -124,7 +124,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  diag_lovh_mclk_source             ;                                          
    uint32_t  real_mode_active_pixel_dly        ;                                          
                                                
-   uint32_t  itr                               ;                                          
+   uint32_t  spare                             ;
                                               
    // aoi                                      
    uint32_t  aoi_xsize                         ;                                          
