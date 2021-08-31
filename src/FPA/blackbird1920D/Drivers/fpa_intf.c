@@ -290,8 +290,7 @@ struct s_FpaPrivateStatus
    uint32_t int_dly                                   ;
    uint32_t int_time                                  ;
    uint32_t int_clk_source_rate_hz                    ;
-   uint32_t synth_frame_resolution                    ; //Resolution temporelle du ROIC en nombre de clks de 70 MHz.
-};
+   };
 typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
  
  

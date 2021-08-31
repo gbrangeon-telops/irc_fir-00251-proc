@@ -62,7 +62,9 @@ entity scd_proxy2_prog_ctrler is
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic;
-      FPA_SERDES_STAT      : in fpa_serdes_stat_type
+      
+      FPA_SERDES_STAT      : in fpa_serdes_stat_type;     
+      INIT_IN_PROGRESS     : in std_logic
       
       );                 
 end scd_proxy2_prog_ctrler;
@@ -135,7 +137,7 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal int_i                     : std_logic;
    signal serdes_rdy_i              : std_logic;
    
-     
+   
 begin
    
    
@@ -224,7 +226,7 @@ begin
             new_cfg.synth <= USER_CFG.SYNTH;
             
             -- serdes rdy
-            serdes_rdy_i <= and_reduce(FPA_SERDES_STAT.DONE) and and_reduce(FPA_SERDES_STAT.SUCCESS);
+            serdes_rdy_i <= and_reduce(FPA_SERDES_STAT.DONE) and and_reduce(FPA_SERDES_STAT.SUCCESS) and not INIT_IN_PROGRESS;
             
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
@@ -642,7 +644,7 @@ begin
                   end if;     
                   
                when intg_dly_st =>  
-                  if int_clk_pulse_i = '1' then                     
+                  if int_clk_pulse_i = '1' then 
                      if cnt >= fpa_intf_cfg_i.int.int_dly then    
                         cnt <= to_unsigned(1, cnt'length);
                         int_gen_fsm <= int_gen_st1;
