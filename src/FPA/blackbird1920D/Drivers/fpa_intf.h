@@ -23,9 +23,9 @@
 #include "GC_Registers.h"
 #include "IRC_status.h"
 
-//#ifndef SCD_PROXY
-//   #define SCD_PROXY
-//#endif
+#ifndef SCD_PROXY
+   #define SCD_PROXY
+#endif
 
 #define FPA_DEVICE_MODEL_NAME    "BLACKBIRD1920"
 
