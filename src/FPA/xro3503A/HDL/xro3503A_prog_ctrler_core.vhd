@@ -187,6 +187,7 @@ begin
                   prog_rqst_i <= '1';                                
                   if PROG_EN = '1' then
                      prog_done_i <= '0';
+					 prog_rqst_i <= '0';
                      if first_prog_done = '0' then
                         pause_cnt <= (others => '0');
                         prog_fsm <= wait_pre_reset_st;
