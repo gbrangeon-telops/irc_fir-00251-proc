@@ -257,6 +257,9 @@ begin
             
             when X"94" => axi_rdata <= resize(TRIG_DELAY_MIN,32);
             when X"98" => axi_rdata <= resize(TRIG_DELAY_MAX,32);
+			
+            -- pps source
+            when X"E0" => axi_rdata <= resize('0' & pps_source_i,32);		
 
             when others=> axi_rdata <= (others =>'1');
          end case;        
