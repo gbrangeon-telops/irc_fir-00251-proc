@@ -93,7 +93,6 @@ uint16_t gFpaCtiaRef_mV = 0;
 uint16_t gFpaVTestG_mV = 0;
 uint16_t gFpaCM_mV = 0;
 uint16_t gFpaVCMO_mV = 0;
-uint16_t gFpaTapRef_mV = 0;
 uint16_t gFpaLovh_mclk = 0;
 bool gFpaLovhFlag = false;
 uint8_t gFpaSubWindowMode = 1;

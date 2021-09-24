@@ -99,9 +99,6 @@
 #define XRO3503_POL_VOLTAGE_MIN_mV                 100      // pas spécifié, VPOLmin = DETECTSUBmin - CTIA_REFmax
 #define XRO3503_POL_VOLTAGE_MAX_mV                 1400     // pas spécifié, VPOLmax = DETECTSUBmax - CTIA_REFmin
 
-#define XRO3503_TAPREF_VOLTAGE_MIN_mV              500.0F   // limite du LDO
-#define XRO3503_TAPREF_VOLTAGE_MAX_mV              5300.0F  // limite du LDO, AD8130 absolute max Vin est ±8.4V
-
 #define TOTAL_DAC_NUM                              8
 
 struct s_ProximCfgConfig
@@ -229,7 +226,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaVTestG_mV;
    extern uint16_t gFpaCM_mV;
    extern uint16_t gFpaVCMO_mV;
-   extern uint16_t gFpaTapRef_mV;
    extern uint8_t gFpaSubWindowMode;
    static uint8_t cfg_num = 0;
    static uint32_t presentSensorWellDepth = 0;
@@ -380,7 +376,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaVTestG_mV = 3300;
       gFpaCM_mV = 1780;
       gFpaVCMO_mV = 1780;
-      gFpaTapRef_mV = 0;
    }
    // Pour un changement de gain, on force certaines valeurs
    if (presentSensorWellDepth != pGCRegs->SensorWellDepth)
@@ -402,7 +397,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)gFpaVTestG_mV); // DAC3 -> VTESTG (current skimming and antibloom disabled)
    ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)gFpaCM_mV); // DAC4 -> CM 1.5V à 2V
    ProximCfg.vdac_value[4] = FLEG_VccVoltage_To_DacWord((float)gFpaVCMO_mV); // DAC5 -> VCMO 1.5V à 2V
-   ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord((float)gFpaTapRef_mV); // DAC6 -> TAP_REF connecté au GND, le LDO (501mV) est non connecté
+   ProximCfg.vdac_value[5] = 0;                                   // DAC6 -> non connecté
    ProximCfg.vdac_value[6] = 0;                                   // DAC7 -> non connecté
    ProximCfg.vdac_value[7] = 0;                                   // DAC8 -> non connecté
 
@@ -411,18 +406,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    gFpaVTestG_mV     = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[2]);
    gFpaCM_mV         = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[3]);
    gFpaVCMO_mV       = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4]);
-   gFpaTapRef_mV     = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[5]);
 
 /*
-   // Reference of the taps (DAC6)
-   if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
-   {
-      if ((gFpaDetectorElectricalTapsRef >= XRO3503_TAPREF_VOLTAGE_MIN_mV) && (gFpaDetectorElectricalTapsRef <= XRO3503_TAPREF_VOLTAGE_MAX_mV))
-         ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord(gFpaDetectorElectricalTapsRef);
-   }
-   presentElectricalTapsRef = FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[5]);
-   gFpaDetectorElectricalTapsRef = presentElectricalTapsRef;
-
    // Polarization voltage (VPOL = DETECTSUB - CTIA_REF)
    if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)
    {

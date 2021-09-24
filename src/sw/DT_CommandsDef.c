@@ -616,7 +616,6 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
    extern uint16_t gFpaVTestG_mV;
    extern uint16_t gFpaCM_mV;
    extern uint16_t gFpaVCMO_mV;
-   extern uint16_t gFpaTapRef_mV;
    extern uint16_t gFpaLovh_mclk;
    extern bool gFpaLovhFlag;
    extern uint8_t gFpaSubWindowMode;
@@ -677,10 +676,6 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
       {
          gFpaVCMO_mV = (uint16_t)uValue;
       }
-      else if (strcasecmp((char *)cmdStr, "TAPREF") == 0)
-      {
-         gFpaTapRef_mV = (uint16_t)uValue;
-      }
       else if (strcasecmp((char *)cmdStr, "LOVH") == 0)
       {
          gFpaLovh_mclk = (uint16_t)uValue;
@@ -709,7 +704,6 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
    DT_PRINTF("FPA VTESTG voltage = %d mV", gFpaVTestG_mV);
    DT_PRINTF("FPA CM voltage = %d mV", gFpaCM_mV);
    DT_PRINTF("FPA VCMO voltage = %d mV", gFpaVCMO_mV);
-   DT_PRINTF("FPA TAPREF voltage = %d mV", gFpaTapRef_mV);
 
    DT_PRINTF("FPA LOVH = %d MCLK", gFpaLovh_mclk);
 
@@ -2715,7 +2709,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Write memory:       WRM address value");
    DT_PRINTF("  IRIG status:        IRIG [DLY value]");
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2|BIAS value]");
-   DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|TAPREF|LOVH|SWM value]");
+   DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
    DT_PRINTF("  HDER status:        HDER");
    DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
