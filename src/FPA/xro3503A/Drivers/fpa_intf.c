@@ -228,7 +228,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaVCMO_mV;
    extern uint8_t gFpaSubWindowMode;
    static uint8_t cfg_num = 0;
-   static uint32_t presentSensorWellDepth = 0;
+   //static uint32_t presentSensorWellDepth = 0;
 
    // on bâtit les parametres specifiques
    FPA_SpecificParams(&hh, 0.0F, pGCRegs);
@@ -371,13 +371,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (sw_init_done == 0)
    {
       // valeurs par défaut pour l'init
-      gFpaDetectSub_mV = 3500;
-      gFpaCtiaRef_mV = 2380;
+      gFpaDetectSub_mV = 2900;
+      gFpaCtiaRef_mV = 2500;
       gFpaVTestG_mV = 3300;
-      gFpaCM_mV = 1780;
-      gFpaVCMO_mV = 1780;
+      gFpaCM_mV = 1700;
+      gFpaVCMO_mV = 1750;
    }
-   // Pour un changement de gain, on force certaines valeurs
+/*   // Pour un changement de gain, on force certaines valeurs
    if (presentSensorWellDepth != pGCRegs->SensorWellDepth)
    {
       presentSensorWellDepth = pGCRegs->SensorWellDepth;
@@ -391,7 +391,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          gFpaCtiaRef_mV = 2380;
          gFpaCM_mV = 1780;
       }
-   }
+   }*/
    ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectSub_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
    ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)gFpaCtiaRef_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
    ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)gFpaVTestG_mV); // DAC3 -> VTESTG (current skimming and antibloom disabled)
