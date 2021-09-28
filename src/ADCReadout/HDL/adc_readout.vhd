@@ -228,13 +228,13 @@ begin
       end if;
    end process;
    
-   --sync_INT : double_sync port map(D => IMG_INFO.exp_feedbk, Q => int_sync, RESET => sreset, CLK => CLK);
+   sync_INT : double_sync port map(D => IMG_INFO.exp_feedbk, Q => int_sync, RESET => sreset, CLK => CLK);
    
    conversion_trigger : gh_edge_det
    port map (
       clk => CLK_DATA,
       rst => ARESET,
-      D => IMG_INFO.exp_feedbk,
+      D => int_sync,
       re => open,
       fe => open,
       sre => start_transaction, 
