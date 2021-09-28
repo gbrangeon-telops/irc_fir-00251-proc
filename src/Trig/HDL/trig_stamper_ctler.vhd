@@ -65,7 +65,19 @@ architecture RTL of trig_stamper_ctler is
          ARESET : in std_logic;
          SRESET : out std_logic;
          CLK    : in std_logic);
-   end component;      
+   end component;
+   
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
    
    component gh_edge_det
       port(
@@ -89,6 +101,7 @@ architecture RTL of trig_stamper_ctler is
    signal subseconds_temp_cnt       : unsigned(23 downto 0);
    signal subseconds_wrap           : std_logic;
    signal exposure_feedbk           : std_logic;
+   signal exposure_feedbk_i         : std_logic;
    signal clk_10M_re                : std_logic;  -- Rising edge
    signal pps_re                    : std_logic;  -- Rising edge
    signal mb_overwrite_re           : std_logic;  -- Rising edge	
@@ -124,10 +137,13 @@ begin
    BUFFERING_FLAG_UPDATE_DONE <= buffering_flag_update_done_i;
 
    
+   -- Sync
+   S1: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => exposure_feedbk, CLK => CLK, Q => exposure_feedbk_i);	
+   
    -- Detect various rising edges   
    E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => CLK_10M, sre => clk_10M_re, re => open, fe => open, sfe => open);      
    E2 : gh_edge_det port map(clk => CLK, rst => sreset, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
-   E3 : gh_edge_det port map(clk => CLK, rst => sreset, D => exposure_feedbk, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
+   E3 : gh_edge_det port map(clk => CLK, rst => sreset, D => exposure_feedbk_i, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
    E4 : gh_edge_det port map(clk => CLK, rst => sreset, D => PPS_sync_i, sre => pps_re, re => open, fe => open, sfe => open); 
    E5 : gh_edge_det port map(clk => CLK, rst => sreset, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
    E6 : gh_edge_det port map(clk => CLK, rst => sreset, D => BUFFERING_FLAG.dval, sre => buffering_dval_re, re => open, fe => open, sfe => open); 
