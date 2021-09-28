@@ -115,8 +115,8 @@ architecture rtl of gating_SM is
    
 begin
 
-   E1: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IMG_INFO.exp_feedbk, CLK => CLK, Q => exp_feedbk_i);	
-   E2: gh_edge_det port map(clk => CLK, rst => sreset, D => exp_feedbk_i, sre => exp_feedbk_sre, re => open, fe => open, sfe => open);      
+   S1: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IMG_INFO.exp_feedbk, CLK => CLK, Q => exp_feedbk_i);	
+   E1: gh_edge_det port map(clk => CLK, rst => sreset, D => exp_feedbk_i, sre => exp_feedbk_sre, re => open, fe => open, sfe => open);      
 
    ----------------------------------------------------------------------------
    --  synchro reset
