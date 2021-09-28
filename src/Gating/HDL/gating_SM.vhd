@@ -52,8 +52,20 @@ architecture rtl of gating_SM is
          CLK    : in std_logic;
          SRESET : out std_logic := '1'
          );
-   end component;      
+   end component;	
    
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+
    component gh_edge_det
       port(
          clk   : in STD_LOGIC;
@@ -98,11 +110,13 @@ architecture rtl of gating_SM is
    signal soft_trig_proc_sreset        : std_logic := '1';
    signal delay_proc_sreset            : std_logic := '1';
    signal flagging_proc_sreset         : std_logic := '1';
-   signal exp_feedbk_sre              : std_logic;
+   signal exp_feedbk_i                 : std_logic;
+   signal exp_feedbk_sre               : std_logic;
    
 begin
 
-   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => IMG_INFO.exp_feedbk, sre => exp_feedbk_sre, re => open, fe => open, sfe => open);      
+   E1: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IMG_INFO.exp_feedbk, CLK => CLK, Q => exp_feedbk_i);	
+   E2: gh_edge_det port map(clk => CLK, rst => sreset, D => exp_feedbk_i, sre => exp_feedbk_sre, re => open, fe => open, sfe => open);      
 
    ----------------------------------------------------------------------------
    --  synchro reset
@@ -410,7 +424,7 @@ begin
                   end if;
                   
                when WAIT_NEXT_FEEDBACK =>
-                  if IMG_INFO.exp_feedbk = '0' then
+                  if exp_feedbk_i = '0' then
                      writing_state <= WRITE_STANDBY;
                   end if;
                   
