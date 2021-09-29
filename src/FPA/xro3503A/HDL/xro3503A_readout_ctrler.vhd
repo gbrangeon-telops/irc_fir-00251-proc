@@ -113,6 +113,7 @@ architecture rtl of xro3503A_readout_ctrler is
    signal acq_int_fifo_din     : std_logic_vector(0 downto 0) := (others => '1');
    signal int_to_readout_delay_cnt : natural range 1 to DEFINE_FPA_INT_END_TO_LSYNC;
    signal acq_int_fdbk_gate    : std_logic;
+   signal acq_int_fdbk_i       : std_logic;
    
 begin
    
@@ -123,7 +124,7 @@ begin
    ADC_SYNC_FLAG <= adc_sync_flag_i;
    READOUT_INFO  <= readout_info_i;
    IMG_IN_PROGRESS <= img_in_progress_i;
-   ACQ_INT_FDBK <= FPA_INT_FDBK when acq_int_fdbk_gate = '1' else '0';  -- on laisse passer FPA_INT_FDBK seulement si c'est un ACQ_INT
+   ACQ_INT_FDBK <= acq_int_fdbk_i;
    
    --------------------------------------------------
    -- synchro reset 
@@ -134,6 +135,16 @@ begin
       CLK    => CLK,
       SRESET => sreset
       );
+
+   --------------------------------------------------
+   -- ACQ_INT_FDBK
+   --------------------------------------------------
+   Ua: process(CLK)
+   begin
+      if rising_edge(CLK) then
+		 acq_int_fdbk_i <= FPA_INT_FDBK and acq_int_fdbk_gate;  -- on laisse passer FPA_INT_FDBK seulement si c'est un ACQ_INT
+      end if;
+   end process;
    
    --------------------------------------------------
    -- definition sync_flag
