@@ -158,6 +158,7 @@ void Acquisition_Start()
 
 /**
  * Update exposure time.
+ * When gFrameRateChangePostponed = 1, new ETx isn't send immediately to the VHD (This measure was needed to prevent sending an invalid config to SCD proxy).
  */
 void SCD_UpdatePostponedExposureTimeChange()
 {
@@ -166,12 +167,8 @@ void SCD_UpdatePostponedExposureTimeChange()
       extern float FWExposureTime[MAX_NUM_FILTER];
       uint8_t i;
 
-      // When gFrameRateChangePostponed = 1, new ETx isn't send immediately to the VHD (This measure was needed to prevent sending an invalid config to SCD proxy).
-      if (!GC_FWSynchronouslyRotatingModeIsActive)
-      {
-         EXP_SendConfigGC(&gExposureTime, &gcRegsData);
-      }
-      else
+      EXP_SendConfigGC(&gExposureTime, &gcRegsData);
+      if (GC_FWSynchronouslyRotatingModeIsActive)
       {
          for (i = 0; i < NUM_OF(FWExposureTime); i++)
          {
