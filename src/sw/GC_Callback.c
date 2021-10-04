@@ -72,6 +72,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 #ifdef SCD_PROXY
    extern uint8_t gFrameRateChangePostponed;
+   extern uint8_t gWaitingForFilterWheel;
 #endif
 
 /* AUTO-CODE BEGIN */
@@ -437,6 +438,9 @@ void GC_AcquisitionFrameRateCallback(gcCallbackPhase_t phase, gcCallbackAccess_t
    {
       if (GC_FWSynchronouslyRotatingModeIsActive)
       {
+         #ifdef SCD_PROXY
+            gWaitingForFilterWheel = 1;
+         #endif
          FW_CalculateSpeedSetpoint(&gcRegsData);
          SFW_FrameRateChanged(&gcRegsData);
       }

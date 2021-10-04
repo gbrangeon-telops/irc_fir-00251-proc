@@ -229,6 +229,8 @@ void Acquisition_SM()
    #ifdef SCD_PROXY
       extern uint8_t gFrameRateChangePostponed;
       extern t_HderInserter gHderInserter;
+      extern uint8_t gWaitingForFilterWheel;
+      static timerData_t trig_mode_transition_timer;
    #endif
 
    static acquisitionState_t acquisitionState = ACQ_STOPPED;
@@ -246,10 +248,6 @@ void Acquisition_SM()
    static uint64_t tic_cooldownStart;
    static int16_t min_temp;
    static int16_t max_temp;
-
-#ifdef SCD_PROXY
-   static timerData_t trig_mode_transition_timer;
-#endif
 
    acquisitionState_t prevAcquisitionState = acquisitionState;
    int16_t sensorTemp;
@@ -411,15 +409,12 @@ void Acquisition_SM()
             }
 
             #ifdef SCD_PROXY
-               if(gFrameRateChangePostponed)
-               {
-                  if(!GC_FWSynchronouslyRotatingModeIsActive || !TDCStatusTst(WaitingForFilterWheelMask))
-                  {
-                     TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
-                     StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
-                     acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
-                  }
-               }
+            if(gFrameRateChangePostponed)
+            {
+                  TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
+                  StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
+                  acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
+            }
             #endif
          }
          break;
@@ -432,7 +427,7 @@ void Acquisition_SM()
              * at least 1/SCD_XTRA_TRIG_FREQ_MAX_HZ ms before generating a prog_trig.
              * Otherwise the detector VHD module may crash unexpectedly.
             */
-            if(TimedOut(&trig_mode_transition_timer))
+            if(TimedOut(&trig_mode_transition_timer) && !gWaitingForFilterWheel)
             {
                StopTimer(&trig_mode_transition_timer);
 

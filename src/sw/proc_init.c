@@ -140,6 +140,7 @@ autofocusCtrl_t theAutoCtrl;
 
 #ifdef SCD_PROXY
    uint8_t gFrameRateChangePostponed = 0;
+   uint8_t gWaitingForFilterWheel = 0;
 #endif
 
 /**

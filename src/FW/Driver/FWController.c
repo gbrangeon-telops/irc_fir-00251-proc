@@ -221,8 +221,11 @@ void FW_ControllerProcess()
    bool targetChanged = false;
    static int numRetryErrorMode = 0;
    FWCommand_t cmd;
-
    static uint32_t prevPosition = 100000000;
+
+   #ifdef SCD_PROXY
+      extern uint8_t gWaitingForFilterWheel;
+   #endif
 
    if (FW_Reset || FW_initialized == false)
    {
@@ -241,6 +244,10 @@ void FW_ControllerProcess()
    if (CB_Empty(&FW_CmdQueue) && modeReady)
    {
       TDCStatusClr(WaitingForFilterWheelMask);
+
+      #ifdef SCD_PROXY
+         gWaitingForFilterWheel = 0;
+      #endif
    }
    else
    {
