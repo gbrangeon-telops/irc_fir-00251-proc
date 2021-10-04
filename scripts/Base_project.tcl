@@ -81,6 +81,7 @@ add_files [concat \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_stretch.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_edge_det.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_edge_det_xcd.vhd \
+   $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_binary2gray.vhd \
    $common_hdl_dir/gh_vhdl_lib/memory/gh_fifo_async_sr.vhd \
    $common_hdl_dir/Utilities/err_sync.vhd \
    $common_hdl_dir/Utilities/Clk_Divider.vhd \

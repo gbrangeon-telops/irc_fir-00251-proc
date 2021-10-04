@@ -50,6 +50,14 @@ architecture rtl of xro3503A_prog_ctrler_core is
          SRESET : out std_logic := '1'
          );
    end component;
+
+   component double_sync_vector is
+	 port(
+	 	 D : in STD_LOGIC_vector;
+		 Q : out STD_LOGIC_vector;
+		 CLK : in STD_LOGIC
+         );
+   end component;
    
    constant C_ROIC_RESET_DURATION_FACTOR  : positive := integer(ceil(real(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ) / 1000.0));   -- 1µs de reset. Reset tenu pendant le plus grand de 6 MCLK ou 1µs.
    constant C_PRE_ROIC_RESET_WAIT_FACTOR  : positive := 6 * DEFINE_FPA_MCLK_RATE_FACTOR;     -- min 6 MCLK
@@ -80,12 +88,22 @@ architecture rtl of xro3503A_prog_ctrler_core is
    signal spi_data_i                : std_logic_vector(SPI_DATA'length-1 downto 0);
    signal first_prog_done           : std_logic;
    signal roic_resetn_i             : std_logic;
+   signal cfg_num                   : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
+   signal cfg_num_i                 : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
    signal new_cfg_num               : unsigned(USER_CFG.CFG_NUM'length-1 downto 0);
    signal present_cfg_num           : unsigned(USER_CFG.CFG_NUM'length-1 downto 0);
    signal new_cfg_num_pending       : std_logic;
    
 begin
-   
+
+   --------------------------------------------------
+   -- INPUTS
+   --------------------------------------------------
+   cfg_num <= std_logic_vector(USER_CFG.CFG_NUM);
+	
+   --------------------------------------------------
+   -- OUTPUTS
+   --------------------------------------------------
    PROG_RQST <= prog_rqst_i;
    PROG_DONE <= prog_done_i;
    
@@ -100,16 +118,21 @@ begin
    U1 : sync_reset port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
    
    --------------------------------------------------
+   -- Sync config num
+   --------------------------------------------------
+   U2A: double_sync_vector port map (D => cfg_num, CLK => CLK, Q => cfg_num_i);
+   
+   --------------------------------------------------
    --  cfg_num
    --------------------------------------------------
    -- ENO: 26 nov 2018: Pour eviter bugs , reprogrammer le ROIC, dès qu'une config est reçue du MB.
-   U2 : process(CLK)
+   U2B : process(CLK)
    begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= USER_CFG.CFG_NUM;    
-         
+         new_cfg_num <= unsigned(cfg_num_i);	   
+		 
          -- detection du changement
          if present_cfg_num /= new_cfg_num then
             new_cfg_num_pending <= '1';
