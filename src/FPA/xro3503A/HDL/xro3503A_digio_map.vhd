@@ -72,6 +72,18 @@ architecture rtl of xro3503A_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
    type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, fpa_pwred_st, passthru_st, fpa_cst_output_st, fpa_pwr_override_st); 
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
@@ -81,6 +93,7 @@ architecture rtl of xro3503A_digio_map is
    signal fpa_timer_cnt    : natural;
    signal fpa_powered_i    : std_logic;
    signal dac_powered_i    : std_logic;
+   signal readout_i        : std_logic;
    
    signal fpa_on_i         : std_logic;
    signal roic_resetn_i    : std_logic;
@@ -154,9 +167,13 @@ begin
    --------------------------------------------------------
    -- Sync reset
    -------------------------------------------------------- 
-   U0 : sync_reset
-   port map(ARESET => ARESET, CLK => MCLK_SOURCE, SRESET => sreset); 
+   U0A : sync_reset
+   port map(ARESET => ARESET, CLK => MCLK_SOURCE, SRESET => sreset);
    
+   --------------------------------------------------
+   -- double sync 
+   --------------------------------------------------   
+   U1B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => READOUT, CLK => MCLK_SOURCE, Q => readout_i);
    
    --------------------------------------------------------- 
    -- gestion de l'allumage du proxy (process indépendant)
@@ -279,17 +296,17 @@ begin
                   lsync_i <= FPA_LSYNC;
                   fsync_i <= FPA_INT;
                   mclk_i <= mclk_pipe(mclk_pipe'high);
-                  if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
+                  if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
                      fpa_digio_fsm <= fpa_cst_output_st;
                   end if;
-                  if READOUT = '0' and FPA_INTF_CFG.FPA_PWR_OVERRIDE_MODE = '1' and PROG_CSN = '1' then 
+                  if readout_i = '0' and FPA_INTF_CFG.FPA_PWR_OVERRIDE_MODE = '1' and PROG_CSN = '1' then 
                      fpa_digio_fsm <= fpa_pwr_override_st;
                   end if;
                
                when fpa_cst_output_st => -- la sortie du detecteur reste à la valeur nulle
                   -- on laisse passer seulement MCLK. Les autres signaux restent a leur derniere valeur
                   mclk_i <= mclk_pipe(mclk_pipe'high);
-                  if READOUT = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
+                  if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
                      fpa_digio_fsm <= passthru_st;
                   end if;
                
