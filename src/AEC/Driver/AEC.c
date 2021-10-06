@@ -276,7 +276,12 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
    AEC_Int_FWPosition = AXI4L_read32(AEC_BASE_ADDR + AEC_FWPOSITION_OFFSET);
 
-   if (AEC_Int_FWPosition != FWPOSITION_IN_TRANSITION) {
+   if (AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION)
+   {
+      AEC_ClearMem(pAEC_CTRL);
+   }
+   else
+   {
 
       // Read Data
       AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
