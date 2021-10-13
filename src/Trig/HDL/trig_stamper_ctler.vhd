@@ -21,7 +21,7 @@ use work.BufferingDefine.all;
 
 entity trig_stamper_ctler is
    port(
-      ARESET                  : in std_logic;
+      SRESET                  : in std_logic;
       CLK                     : in std_logic;		
       
       -- External very accurate 10MHz clock and PPS signal
@@ -60,13 +60,6 @@ end trig_stamper_ctler;
 
 architecture RTL of trig_stamper_ctler is
    
-   component sync_reset
-      port(
-         ARESET : in std_logic;
-         SRESET : out std_logic;
-         CLK    : in std_logic);
-   end component;
-   
    component double_sync is
       generic(
          INIT_VALUE : bit := '0'
@@ -95,7 +88,6 @@ architecture RTL of trig_stamper_ctler is
    type   buffering_flag_update_sm_type is (idle_st, moi_check_st);
    signal buffering_flag_update_sm  : buffering_flag_update_sm_type;
 
-   signal sreset                    : std_logic;
    signal seconds_cnt               : unsigned(31 downto 0);
    signal subseconds_cnt            : unsigned(23 downto 0);
    signal subseconds_temp_cnt       : unsigned(23 downto 0);
@@ -138,29 +130,21 @@ begin
 
    
    -- Sync
-   S1: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => exposure_feedbk, CLK => CLK, Q => exposure_feedbk_i);	
+   S1: double_sync generic map(INIT_VALUE => '0') port map (RESET => SRESET, D => exposure_feedbk, CLK => CLK, Q => exposure_feedbk_i);	
    
    -- Detect various rising edges   
-   E1 : gh_edge_det port map(clk => CLK, rst => sreset, D => CLK_10M, sre => clk_10M_re, re => open, fe => open, sfe => open);      
-   E2 : gh_edge_det port map(clk => CLK, rst => sreset, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
-   E3 : gh_edge_det port map(clk => CLK, rst => sreset, D => exposure_feedbk_i, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
-   E4 : gh_edge_det port map(clk => CLK, rst => sreset, D => PPS_sync_i, sre => pps_re, re => open, fe => open, sfe => open); 
-   E5 : gh_edge_det port map(clk => CLK, rst => sreset, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
-   E6 : gh_edge_det port map(clk => CLK, rst => sreset, D => BUFFERING_FLAG.dval, sre => buffering_dval_re, re => open, fe => open, sfe => open); 
+   E1 : gh_edge_det port map(clk => CLK, rst => SRESET, D => CLK_10M, sre => clk_10M_re, re => open, fe => open, sfe => open);      
+   E2 : gh_edge_det port map(clk => CLK, rst => SRESET, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
+   E3 : gh_edge_det port map(clk => CLK, rst => SRESET, D => exposure_feedbk_i, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
+   E4 : gh_edge_det port map(clk => CLK, rst => SRESET, D => PPS_sync_i, sre => pps_re, re => open, fe => open, sfe => open); 
+   E5 : gh_edge_det port map(clk => CLK, rst => SRESET, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
+   E6 : gh_edge_det port map(clk => CLK, rst => SRESET, D => BUFFERING_FLAG.dval, sre => buffering_dval_re, re => open, fe => open, sfe => open); 
    
-   -----------------------------------------------------
-   -- Synchronisation reset
-   -----------------------------------------------------
-   U1: sync_reset
-   Port map(		
-      ARESET   => ARESET,		
-      SRESET   => sreset,
-      CLK   => CLK);  
    
    -----------------------------------------------------------------
    -- Process to handle the permit window valid signal
    -----------------------------------------------------------------
-   U2: process(CLK)
+   U1: process(CLK)
    begin		 
       if rising_edge(CLK) then
          if start_pps_permit_windw_re = '1' then
@@ -176,7 +160,7 @@ begin
          end if;
          
          -- Reset
-         if sreset = '1' then
+         if SRESET = '1' then
             permit_pps_overwrite <= '0';
             SnapShotSubseconds <= (others => '0');
          end if;         
@@ -186,7 +170,7 @@ begin
    -----------------------------------------------------------------
    -- Process to handle the permit window valid signal
    -----------------------------------------------------------------
-   U3: process(CLK)
+   U2: process(CLK)
    begin		 
       if rising_edge(CLK) then   
          
@@ -227,7 +211,7 @@ begin
          end if;
          
          -- Reset
-         if sreset = '1' then
+         if SRESET = '1' then
             seconds_cnt <= (others => '0');   
             subseconds_temp_cnt <= (others => '0'); 
             subseconds_wrap <= '0';
@@ -240,7 +224,7 @@ begin
    ---------------------------------------------------------------------
    -- Process for PPS Time-out
    ---------------------------------------------------------------------
-   U4: process(CLK)
+   U3: process(CLK)
    begin
       if rising_edge(CLK) then
          
@@ -258,7 +242,7 @@ begin
          end if;
          
          -- Reset
-         if sreset = '1' then						  
+         if SRESET = '1' then						  
             PpsOccurrenceTimeOut <= '0';		   
             PpsOccurrenceTimeOut_cnt <= (others=>'0');
          end if;
@@ -269,10 +253,10 @@ begin
    ---------------------------------------------------------------------
    -- Process for sending header Parts of the stamper
    ---------------------------------------------------------------------
-   U5: process(CLK)
+   U4: process(CLK)
    begin
       if rising_edge(CLK) then
-         if sreset = '1' then
+         if SRESET = '1' then
             hder_mosi_i.awvalid <= '0';
             hder_mosi_i.wvalid <= '0';
             hder_mosi_i.wstrb <= (others => '0');
@@ -337,11 +321,11 @@ begin
    ---------------------------------------------------------------------
    -- Process to handle buffering flag update
    ---------------------------------------------------------------------
-   U6: process(CLK)
+   U5: process(CLK)
    begin
       if rising_edge(CLK) then
       
-         if sreset = '1' then  
+         if SRESET = '1' then  
             
             buffering_flag_update_sm <= idle_st;
             buffering_flag_val_sync <= NONE_FLAG;
