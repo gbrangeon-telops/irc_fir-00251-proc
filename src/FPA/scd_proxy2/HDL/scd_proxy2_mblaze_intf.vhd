@@ -155,7 +155,7 @@ begin
    MB_SER_CFG.TDATA    <= mb_ser_cfg_add & mb_ser_cfg_data;
    MB_SER_CFG.TVALID   <= mb_ser_cfg_dval;
    EXP_SER_CFG.TDATA   <= exp_ser_cfg_add & exp_ser_cfg_data;
-   EXP_SER_CFG.TVALID  <= '0';
+   EXP_SER_CFG.TVALID  <= exp_ser_cfg_dval;
    
    
    -- STATUS_MOSI toujours envoyé au fpa_status_gen pour eviter des delais
@@ -310,7 +310,7 @@ begin
                   when X"124" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));                                                        
                   when X"128" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0));
                   when X"12C" =>    mb_struct_cfg.proxy_alone_mode                      <= data_i(0); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
-                     
+                  
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
                   when X"204" =>    mb_struct_cfg.temp.cfg_end                          <= data_i(0); mb_cfg_in_progress <= '0';               
@@ -370,11 +370,11 @@ begin
                
                when wait_mb_cfg_st =>      -- il faut qu'on ait reçu au moins une config de MB car la commande seriellede EXP en utilise certains elements
                   if at_least_one_mb_cfg_received = '1' then
-                     exp_struct_cfg <= int_cfg_i;
                      exp_cfg_gen_fsm <= serial_exp_cfg_st;
                   end if;
                
-               when serial_exp_cfg_st =>   -- on envoie la partie serielle
+               when serial_exp_cfg_st =>   -- on envoie la partie serielle  
+                  exp_struct_cfg <= int_cfg_i;
                   exp_cfg_done <= '0';
                   exp_ser_cfg_dval <= '1'; 
                   exp_ser_cfg_add <= std_logic_vector(resize((byte_cnt + mb_struct_cfg.int_cmd_sof_add_m1), exp_ser_cfg_add'length)); -- pour que premiere adresse impérativement 0
