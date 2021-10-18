@@ -57,14 +57,6 @@ architecture rtl of xro3503A_mblaze_intf is
          CLK : in std_logic);
    end component;
    
-   component gh_binary2gray
-      GENERIC (size: INTEGER := 8);
-	  PORT(	
-         B   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);
-		 G   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0)
-       );
-   end component;
-   
    type exp_indx_pipe_type is array (0 to 3) of std_logic_vector(7 downto 0);
    type exp_time_pipe_type is array (0 to 3) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
    
@@ -104,8 +96,6 @@ architecture rtl of xro3503A_mblaze_intf is
    signal sreset                       : std_logic;
    signal user_cfg_rdy_pipe            : std_logic_vector(7 downto 0) := (others => '0');
    signal user_cfg_rdy                 : std_logic := '0';
-   signal cfg_num_i                    : unsigned(7 downto 0);
-   signal cfg_num_gray                 : std_logic_vector(7 downto 0);
    signal exp_time_reg                 : unsigned(30 downto 0);
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
@@ -133,7 +123,7 @@ begin
    ------------------------------------------------  
    -- sortie de la config                              
    -------------------------------------------------  
-   U2A: process(MB_CLK)
+   U2: process(MB_CLK)
    begin
       if rising_edge(MB_CLK) then
          
@@ -145,15 +135,7 @@ begin
             valid_cfg_received <= '1';
          end if;
       end if;  
-   end process;
-   
-   ------------------------------------------------  
-   -- encodage Gray du # de config 
-   ------------------------------------------------
-   U2B: gh_binary2gray
-     generic map (size => 8) 
-     port map (B => std_logic_vector(cfg_num_i), G => cfg_num_gray);
-   user_cfg_i.cfg_num <= unsigned(cfg_num_gray);
+   end process;   
    
    -------------------------------------------------  
    -- liens axil                           
@@ -289,8 +271,7 @@ begin
                   when X"0BC" =>    user_cfg_i.diag.lovh_mclk_source           <= unsigned(data_i(user_cfg_i.diag.lovh_mclk_source'length-1 downto 0));
                      
                   -- new config
-                  --when X"0C0" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
-				  when X"0C0" =>    cfg_num_i                                  <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                  when X"0C0" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

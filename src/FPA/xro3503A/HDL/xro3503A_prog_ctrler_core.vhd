@@ -59,6 +59,14 @@ architecture rtl of xro3503A_prog_ctrler_core is
          );
    end component;
    
+   component gh_binary2gray
+      GENERIC (size: INTEGER := 8);
+	  PORT(	
+         B   : IN STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+		 G   : out STD_LOGIC_VECTOR(size-1 DOWNTO 0)
+       );
+   end component;
+   
    constant C_ROIC_RESET_DURATION_FACTOR  : positive := integer(ceil(real(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ) / 1000.0));   -- 1µs de reset. Reset tenu pendant le plus grand de 6 MCLK ou 1µs.
    constant C_PRE_ROIC_RESET_WAIT_FACTOR  : positive := 6 * DEFINE_FPA_MCLK_RATE_FACTOR;     -- min 6 MCLK
    constant C_POST_ROIC_RESET_WAIT_FACTOR : positive := 6 * DEFINE_FPA_MCLK_RATE_FACTOR;     -- min 6 MCLK
@@ -89,6 +97,7 @@ architecture rtl of xro3503A_prog_ctrler_core is
    signal first_prog_done           : std_logic;
    signal roic_resetn_i             : std_logic;
    signal cfg_num                   : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
+   signal cfg_num_gray              : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
    signal cfg_num_i                 : std_logic_vector(USER_CFG.CFG_NUM'length-1 downto 0);
    signal new_cfg_num               : unsigned(USER_CFG.CFG_NUM'length-1 downto 0);
    signal present_cfg_num           : unsigned(USER_CFG.CFG_NUM'length-1 downto 0);
@@ -116,11 +125,18 @@ begin
    -- Sync reset
    -------------------------------------------------- 
    U1 : sync_reset port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
+      
+   ------------------------------------------------  
+   -- encodage Gray du # de config 
+   ------------------------------------------------
+   U1A: gh_binary2gray
+     generic map (size => USER_CFG.CFG_NUM'length) 
+     port map (B => cfg_num, G => cfg_num_gray);
    
    --------------------------------------------------
    -- Sync config num
    --------------------------------------------------
-   U2A: double_sync_vector port map (D => cfg_num, CLK => CLK, Q => cfg_num_i);
+   U1B: double_sync_vector port map (D => cfg_num_gray, CLK => CLK, Q => cfg_num_i);
    
    --------------------------------------------------
    --  cfg_num
