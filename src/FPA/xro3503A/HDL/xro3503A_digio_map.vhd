@@ -313,6 +313,7 @@ begin
                when fpa_pwr_override_st =>           -- on sort de cet état quand fsm_reset = '1' <=> sreset = '1' ou FPA_PWR = '0'
                   -- Override FPA_PWR signal
                   fpa_pwr_override <= '1';
+				  fpa_powered_i <= '0';
                   -- all io to '0' when FPA is off
                   roic_resetn_i <= '0';
                   prog_sclk_i <= '0';
