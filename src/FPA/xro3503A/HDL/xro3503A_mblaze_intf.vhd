@@ -269,9 +269,12 @@ begin
                   
                   -- diag lovh
                   when X"0BC" =>    user_cfg_i.diag.lovh_mclk_source           <= unsigned(data_i(user_cfg_i.diag.lovh_mclk_source'length-1 downto 0));
-                     
+
+                  -- fpa temp correction
+                  when X"0C0" =>    user_cfg_i.fpa_temp_pwroff_correction      <= unsigned(data_i(user_cfg_i.fpa_temp_pwroff_correction'length-1 downto 0));
+				  
                   -- new config
-                  when X"0C0" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                  when X"0C4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

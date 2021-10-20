@@ -34,4 +34,6 @@ d:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler_core.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_prog_spi_feeder.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_hw_driver.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_afpa_services.bde \
+D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_afpa_services_ctrl.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL\xro3503A_intf.bde

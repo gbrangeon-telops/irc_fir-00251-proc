@@ -86,6 +86,7 @@
 #define FPA_TEMP_READER_ADC_DATA_RES               16       // la donnée de temperature est sur 16 bits
 #define FPA_TEMP_READER_FULL_SCALE_mV              2048     // plage dynamnique de l'ADC
 #define FPA_TEMP_READER_GAIN                       1        // gain du canal de lecture de temperature sur la carte ADC
+#define FPA_TEMP_PWROFF_CORRECTION                 1000     // correction de la température avec le FPA fermé<
 
 // fleg
 #define FLEG_DAC_RESOLUTION_BITS                   14       // le DAC est à 14 bits
@@ -359,6 +360,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // diag lovh
    ptrA->diag_lovh_mclk_source = (uint32_t)(hh.lovh_mclk * FPA_MCLK_SOURCE_RATE_HZ / FPA_MCLK_RATE_HZ);
+
+   // fpa temp correction
+   ptrA->fpa_temp_pwroff_correction = FPA_TEMP_PWROFF_CORRECTION;
 
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    if (cfg_num == 255)  // protection contre depassement

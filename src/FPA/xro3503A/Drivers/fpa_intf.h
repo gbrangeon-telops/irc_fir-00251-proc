@@ -154,6 +154,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    // diag lovh
    uint32_t  diag_lovh_mclk_source;
 
+   // fpa temp correction
+   uint32_t  fpa_temp_pwroff_correction;
+
    // new config
    uint32_t  cfg_num;
 };
