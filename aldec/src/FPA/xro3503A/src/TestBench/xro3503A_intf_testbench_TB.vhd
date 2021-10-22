@@ -59,6 +59,7 @@ architecture TB_ARCHITECTURE of xro3503a_intf_testbench_tb is
    constant LOVH_27MHz     : integer := 12;  --Spec XRO3503 for full size frame
    constant LOVH_40MHz     : integer := 36;  --Throughput must be reduced to fit data chain capacity
    constant FOVH           : integer := 1;
+   constant FPA_TEMP_PWROFF_CORRECTION : integer := 1000; -- correction de saut de lecture de température FPA
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
    signal ACQ_TRIG : STD_LOGIC := '0';
@@ -217,6 +218,8 @@ begin
          user_cfg_i.fpa_pwr_override_mode             <= '0';
          
          user_cfg_i.diag.lovh_mclk_source             <= to_unsigned(LOVH * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length);
+		 
+		 user_cfg_i.fpa_temp_pwroff_correction        <= to_unsigned(FPA_TEMP_PWROFF_CORRECTION, user_cfg_i.fpa_temp_pwroff_correction'length);
          
          user_cfg_i.cfg_num          		            <= to_unsigned(1, user_cfg_i.cfg_num'length);
       
@@ -412,7 +415,11 @@ begin
       write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.diag.lovh_mclk_source, 32)), MB_MISO,  MB_MOSI);
       addr <= addr + 4;
       wait for 30 ns;
-      
+
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.fpa_temp_pwroff_correction, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+	  
       write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.cfg_num, 32)), MB_MISO,  MB_MOSI);
       addr <= addr + 4;
       wait for 30 ns;

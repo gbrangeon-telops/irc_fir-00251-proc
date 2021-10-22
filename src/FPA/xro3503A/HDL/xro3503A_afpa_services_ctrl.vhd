@@ -45,6 +45,7 @@ entity xro3503A_afpa_services_ctrl is
 	  USER_CFG              : in fpa_intf_cfg_type;
 	  
 	  -- interface avec xro3503A_digio_map
+	  FPA_ON                : in std_logic;
 	  FPA_POWERED           : in std_logic;
       
       -- erreurs entrantes
@@ -110,7 +111,9 @@ architecture rtl of xro3503A_afpa_services_ctrl is
    signal adc_alive                  : std_logic;
    signal adc_alive_sm               : adc_alive_sm_type;
    signal user_cfg_i                 : fpa_intf_cfg_type;
+   signal fpa_on_i                   : std_logic;
    signal fpa_powered_i              : std_logic;
+   signal temp_read_en               : std_logic;
    signal temp_reached               : std_logic;
    
    ---- attribute dont_touch              : string;
@@ -141,9 +144,10 @@ begin
       );		   
 	  
    --------------------------------------------------
-   -- Sync FPA_POWERED
+   -- Sync FPA_ON et FPA_POWERED
    --------------------------------------------------   
-   U0B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => FPA_POWERED, CLK => CLK, Q => fpa_powered_i);
+   U0B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => FPA_ON, CLK => CLK, Q => fpa_on_i);
+   U0C: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => FPA_POWERED, CLK => CLK, Q => fpa_powered_i);
    
    --------------------------------------------------
    -- synchro reset 
@@ -371,6 +375,8 @@ begin
    -- Envoi de la Température du détecteur
    ----------------------------------------------------------------------------
    -- fsm dans le but de reduire les contraintes de timings
+   temp_read_en <= not fpa_on_i or fpa_powered_i;  -- ELA: temps mort de lecture de température durant le ramp-up de l'allumage du FPA
+
    U3: process(CLK)
    begin          
       if rising_edge(CLK) then 
@@ -386,7 +392,7 @@ begin
             case fpa_temp_sm is       -- pour generer le fpa_temp_stat_i.fpa_pwr_on_temp_reached
                
                when idle =>                  
-                  if FPA_TEMP.DVAL = '1' then
+                  if temp_read_en = '1' and FPA_TEMP.DVAL = '1' then
                      fpa_temp_sm <= check_temp_max_st;
 					 if fpa_powered_i = '1' then
                      	fpa_temp_stat_i.temp_data <= std_logic_vector(resize(unsigned(FPA_TEMP.DATA), fpa_temp_stat_i.temp_data'length)); -- ENO: faut pas deplacer cette ligne
@@ -461,6 +467,5 @@ begin
          end if;
       end if;
    end process; 
-   
    
 end rtl;

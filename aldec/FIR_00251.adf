@@ -41,8 +41,8 @@ REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
 fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL
-fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\Lut
-fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\Lut
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\FPA\xro3503A\HDL
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -298,7 +298,6 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 .\..\src\fir_00251_top_startup_build.do=Macro
 .\..\src\fir_00251_top_suphawkA_build.do=Macro
 .\..\src\fir_00251_top_xro3503A_build.do=Macro
-.\..\src\FPA\xro3503A\HDL\xro3503A_afpa_services_ctrl.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_readout.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_readout_mb_intf.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_switch.vhd=VHDL Source Code
@@ -675,6 +674,7 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 .\..\src\FPA\xro3503A\HDL\xro3503A_hw_driver.bde=Block Diagram
 .\..\src\FPA\xro3503A\HDL\xro3503A_intf.bde=Block Diagram
 .\..\src\FPA\xro3503A\HDL\xro3503A_afpa_services.bde=Block Diagram
+.\..\src\FPA\xro3503A\HDL\xro3503A_afpa_services_ctrl.vhd=VHDL Source Code
 .\..\src\FPA\xro3503A\HDL\xro3503A_mblaze_intf.vhd=VHDL Source Code
 .\..\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler.bde=Block Diagram
 .\..\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler_core.vhd=VHDL Source Code
@@ -807,6 +807,7 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 .\..\..\FIR-00251-Common\VHDL\USART\usart_mmcm_rst.vhd=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=Macro
 .\..\src\USB\hdl\USB_CTRL.bde=Block Diagram
+.\compile\xro3503A_afpa_services.vhd=VHDL Source Code
 .\compile\param_lut_fifo.vhd=VHDL Source Code
 .\compile\axis_lut_X_to_ADD.vhd=VHDL Source Code
 .\compile\axis_lut_core_a32_d32.vhd=VHDL Source Code
@@ -859,7 +860,6 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 .\compile\xro3503A_clks_gen.vhd=VHDL Source Code
 .\compile\xro3503A_prog_ctrler.vhd=VHDL Source Code
 .\compile\xro3503A_hw_driver.vhd=VHDL Source Code
-.\compile\xro3503A_afpa_services.vhd=VHDL Source Code
 .\compile\xro3503A_intf.vhd=VHDL Source Code
 .\compile\clink_calibration.vhd=VHDL Source Code
 .\compile\quad_pattern_validator.vhd=VHDL Source Code
@@ -1142,6 +1142,8 @@ Testbench\IP\AXI4_Stream64_to_32/..\..\..\..\compile\AXI4_Stream64_to_32_tb.vhd=
 
 [file_out:Testbench\Proc_Only/Processing_tb.bde]
 Testbench\Proc_Only/..\..\..\compile\Processing_tb.vhd=-1
+
+
 
 
 
@@ -1863,8 +1865,6 @@ FPA\xro3503A/..\..\..\compile\xro3503A_prog_ctrler.vhd=-1
 FPA\xro3503A/..\..\..\compile\xro3503A_hw_driver.vhd=-1
 [file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_afpa_services.bde]
 FPA\xro3503A/..\..\..\compile\xro3503A_afpa_services.vhd=-1
-[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_intf.bde]
-FPA\xro3503A/..\..\..\compile\xro3503A_intf.vhd=-1
 [file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
 CLINK/..\..\compile\clink_calibration.vhd=-1
 [file_out:Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde]
@@ -1877,3 +1877,5 @@ Quad_serdes/..\..\compile\afpa_data_deserializer_8chn.vhd=-1
 Quad_serdes/..\..\compile\afpa_data_deserializer_16chn.vhd=-1
 [file_out:/..\..\src\fir_00251_proc_xro3503A.bde]
 /..\compile\fir_00251_proc_xro3503A.vhd=-1
+[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_intf.bde]
+FPA\xro3503A/..\..\..\compile\xro3503A_intf.vhd=-1
