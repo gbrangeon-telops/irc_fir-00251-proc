@@ -90,6 +90,15 @@ architecture RTL of suphawkA_detector_ctrler is
          );
    end component;
    
+   -- double_sync_vector
+   component double_sync_vector
+	  port(
+	 	 D : in STD_LOGIC_vector;
+		 Q : out STD_LOGIC_vector;
+		 CLK : in STD_LOGIC
+         );
+   end component;
+   
    type dcr_fsm_type is (idle, check_st, first_dcr_wr, wait_first_dcr_wr_end, first_pause_st, reg_wr_st, second_dcr_wr, wait_second_dcr_wr_end, second_pause_st, what_else_st, dcr_rqst_st);
    signal dcr_fsm        : dcr_fsm_type;
    signal reg_en         : std_logic_vector(2 downto 0);
@@ -106,6 +115,7 @@ architecture RTL of suphawkA_detector_ctrler is
    
    signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num_sync    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
    
@@ -157,21 +167,28 @@ begin
    --------------------------------------------------
    -- Sync reset
    -------------------------------------------------- 
-   U3: sync_reset
+   U3A: sync_reset
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);
    
+   --------------------------------------------------
+   -- Sync cfg_num
+   --------------------------------------------------
+   U3B : double_sync_vector  
+   port map(
+      D => std_logic_vector(USER_CFG.CFG_NUM),
+      Q => new_cfg_num_sync,
+      CLK => CLK); 
    
    --------------------------------------------------
    --  cfg_num
    --------------------------------------------------
    -- ENO: 26 nov 2018: Pour eviter bugs , reprogrammer le ROIC, dès qu'une config est reçue du MB.
-   
    U2C : process(CLK)
    begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= USER_CFG.CFG_NUM;    
+		 new_cfg_num <= unsigned(new_cfg_num_sync);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then

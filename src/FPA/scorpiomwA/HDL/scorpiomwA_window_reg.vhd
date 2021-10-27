@@ -56,6 +56,14 @@ architecture rtl of scorpiomwA_window_reg is
          );
    end component;
    
+   component double_sync_vector
+	  port(
+	 	 D : in STD_LOGIC_vector;
+		 Q : out STD_LOGIC_vector;
+		 CLK : in STD_LOGIC
+         );
+   end component;
+   
    type   roic_cfg_fsm_type is (idle, check_done_st, rqst_st, cfg_io_st, check_init_st, send_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_reg_st, pause_st);
    signal roic_cfg_fsm        : roic_cfg_fsm_type;  
    signal spi_en_i            : std_logic;
@@ -76,7 +84,8 @@ architecture rtl of scorpiomwA_window_reg is
    signal error_i             : std_logic;
    signal fpa_error_i         : std_logic;
    signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num      : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num     : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num_sync    : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    --0-signal 
    
@@ -105,8 +114,17 @@ begin
    --------------------------------------------------
    -- Sync reset
    -------------------------------------------------- 
-   U1 : sync_reset
-   port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
+   U1A : sync_reset
+   port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);
+   
+   --------------------------------------------------
+   -- Sync cfg_num
+   --------------------------------------------------
+   U1B : double_sync_vector  
+   port map(
+      D => std_logic_vector(FPA_INTF_CFG.CFG_NUM),
+      Q => new_cfg_num_sync,
+      CLK => CLK); 
    
    --------------------------------------------------
    --  cfg_num
@@ -117,7 +135,7 @@ begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= FPA_INTF_CFG.CFG_NUM;    
+		 new_cfg_num <= unsigned(new_cfg_num_sync);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then

@@ -100,7 +100,8 @@ architecture rtl of isc0804A_bitstream_gen is
    signal cp                  : std_logic_vector(2 downto 0);
    
    signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num      : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num_sync    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
 begin    
@@ -114,16 +115,26 @@ begin
    
    DONE  <= done_i;
    RQST <= rqst_i;
+   
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1A : sync_reset
    port map(
       ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset
       ); 
-  
+
+   --------------------------------------------------
+   -- Sync cfg_num
+   --------------------------------------------------
+   U1B : double_sync_vector  
+   port map(
+      D => std_logic_vector(USER_CFG.CFG_NUM),
+      Q => new_cfg_num_sync,
+      CLK => CLK); 
+	  
    --------------------------------------------------
    --  bistream builder
    --------------------------------------------------
@@ -258,7 +269,7 @@ begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= USER_CFG.CFG_NUM;    
+		 new_cfg_num <= unsigned(new_cfg_num_sync);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then

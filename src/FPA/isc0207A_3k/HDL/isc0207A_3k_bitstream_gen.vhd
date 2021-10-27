@@ -53,6 +53,14 @@ architecture rtl of isc0207A_3k_bitstream_gen is
          CLK    : in std_logic);
    end component;
    
+   component double_sync_vector
+	  port(
+	 	 D : in STD_LOGIC_vector;
+		 Q : out STD_LOGIC_vector;
+		 CLK : in STD_LOGIC
+         );
+   end component;
+   
    type reset_fsm_type  is (assert_rst_st, desassert_rst_st, done_st);  
    type cfg_fsm_type is (idle, check_done_st, rqst_st, check_init_st, send_roic_cfg_st, wait_err_st, check_roic_err_st, wait_end_st, update_roic_st, update_aoi_st, pause_st, update_cfg_num_st);
    
@@ -82,7 +90,8 @@ architecture rtl of isc0207A_3k_bitstream_gen is
    signal new_cfg_pending     : std_logic; 
    
    signal new_cfg_num         : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal present_cfg_num      : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal present_cfg_num     : unsigned(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
+   signal new_cfg_num_sync    : std_logic_vector(USER_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
    
    
@@ -97,16 +106,27 @@ begin
    
    DONE  <= done_i;
    RQST <= rqst_i;
+   
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1A : sync_reset
    port map(
       ARESET => ARESET,
       CLK    => CLK,
       SRESET => sreset
       ); 
    
+   --------------------------------------------------
+   -- Sync cfg_num
+   --------------------------------------------------
+   U1B : double_sync_vector  
+   port map(
+      D => std_logic_vector(USER_CFG.CFG_NUM),
+      Q => new_cfg_num_sync,
+      CLK => CLK); 
+	  
+	  
    --------------------------------------------------
    --  bistream builder
    --------------------------------------------------
@@ -245,7 +265,7 @@ begin
       if rising_edge(CLK) then 
          
          -- nouvelle config lorsque cfg_num change
-         new_cfg_num <= USER_CFG.CFG_NUM;    
+		 new_cfg_num <= unsigned(new_cfg_num_sync);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then
