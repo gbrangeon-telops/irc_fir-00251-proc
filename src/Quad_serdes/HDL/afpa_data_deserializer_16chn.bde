@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 19695
+ FREEID 19746
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -1486,11 +1486,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="RESET200ms : boolean := true"
-    #GENERIC1="MASTER : boolean := true"
-    #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC4="DATA_WIDTH : integer := 14"
+    #GENERIC0="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC1="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC2="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC3="RESET200ms : boolean := RESET200ms"
+    #GENERIC4="MASTER : boolean := true"
     #IMPL="sch"
     #LIBRARY="work"
     #NO_CONF="1"
@@ -1876,10 +1876,10 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="DATA_WIDTH : integer := 14"
-    #GENERIC1="RESET200ms : boolean := true"
-    #GENERIC2="MASTER : boolean := false"
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC0="MASTER : boolean := false"
+    #GENERIC1="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC2="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC3="RESET200ms : boolean := RESET200ms"
     #GENERIC4="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
     #IMPL="sch"
     #LIBRARY="work"
@@ -2309,7 +2309,7 @@ PAGE ""
 "CLK_PERIOD_NS : real := 12.5;\n"+
 "DATA_WIDTH : integer := 14;\n"+
 ""
-   RECT (980,3060,1520,3200)
+   RECT (840,3000,1520,3200)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,219,179),0)
    MARGINS (20,20)
@@ -2540,8 +2540,8 @@ PAGE ""
     #GENERIC0="MASTER : boolean := false"
     #GENERIC1="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
     #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC3="DATA_WIDTH : integer := 14"
-    #GENERIC4="RESET200ms : boolean := true"
+    #GENERIC3="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC4="RESET200ms : boolean := RESET200ms"
     #IMPL="sch"
     #LIBRARY="work"
     #PRAGMED_GENERICS=""
@@ -2825,10 +2825,10 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="RESET200ms : boolean := true"
+    #GENERIC0="RESET200ms : boolean := RESET200ms"
     #GENERIC1="MASTER : boolean := true"
     #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b12\""
-    #GENERIC3="DATA_WIDTH : integer := 14"
+    #GENERIC3="DATA_WIDTH : integer := DATA_WIDTH"
     #GENERIC4="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
     #LIBRARY="work"
     #NO_CONF="1"
@@ -4818,7 +4818,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  19678, 0, 0
+  TEXT  19729, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4829,7 +4829,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19679, 0, 0
+  TEXT  19730, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -4840,7 +4840,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  19680, 0, 0
+  TEXT  19731, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -4850,7 +4850,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19681, 0, 0
+  TEXT  19732, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4862,7 +4862,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  19682, 0, 0
+  TEXT  19733, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -4875,7 +4875,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  19683, 0, 0
+  TEXT  19734, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -4885,7 +4885,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19684, 0, 0
+  TEXT  19735, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4897,7 +4897,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  19685, 0, 0
+  TEXT  19736, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -4907,7 +4907,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19686, 0, 0
+  TEXT  19737, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -4918,7 +4918,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  19687, 0, 0
+  GROUP  19738, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2820,4201,3201)
@@ -4930,7 +4930,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19688, 0, 0
+  GROUP  19739, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3020,4201,3021)
@@ -4942,7 +4942,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19689, 0, 0
+  GROUP  19740, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2960,4201,2961)
@@ -4954,7 +4954,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19690, 0, 0
+  GROUP  19741, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3080,4201,3081)
@@ -4966,7 +4966,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19691, 0, 0
+  GROUP  19742, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3140,4201,3141)
@@ -4978,7 +4978,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19692, 0, 0
+  GROUP  19743, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2820,3501,2961)
@@ -4989,7 +4989,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  19693, 0, 0
+  GROUP  19744, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2960,3501,3201)
@@ -5000,7 +5000,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  19694, 0, 0
+  BMPPICT  19745, 0, 0
   {
    PAGEALIGN 10
    RECT (3340,2880,3479,2925)

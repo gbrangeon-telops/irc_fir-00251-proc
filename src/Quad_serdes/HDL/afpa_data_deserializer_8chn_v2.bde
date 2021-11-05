@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 22920
+ FREEID 22971
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -29,422 +29,6 @@ HEADER
   CREATIONDATE="5/29/2015"
   PAGECOUNT="2"
   TITLE="adc_data_deserializer"
- }
- SYMBOL "KINTEX7" "IBUFGDS" "IBUFGDS"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #BLACK_BOX="0"
-    #CUSTOM_NAME=""
-    #DESCRIPTION="Input Buffer"
-    #GENERIC0="IOSTANDARD:STRING:=\"DEFAULT\""
-    #GENERIC1="IBUF_DELAY_VALUE:STRING:=\"0\""
-    #GENERIC2="CAPACITANCE:STRING:=\"DONT_CARE\""
-    #GENERIC3="DIFF_TERM:BOOLEAN:=FALSE"
-    #GENERIC4="IBUF_LOW_PWR:BOOLEAN:=TRUE"
-    #LANGUAGE="VHDL"
-    #MODIFIED="1282290759"
-    #NO_SYMBOL_NAME="1"
-    #NO_SYMBOL_REFERENCE="1"
-    #PRAGMED_GENERICS="DIFF_TERM"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="8e5f3794-95cd-4c2e-a4d7-cd8ed44f0d24"
-    LEVEL="XILINX"
-    LIBVER="2.0.0"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (0,0,140,40)
-    FREEID 10
-   }
-   
-   BODY
-   {
-    TEXT  2, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (10,-27,16,0)
-     ALIGN 8
-     COLOR (0,0,255)
-     PARENT 1
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    TEXT  4, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (-11,13,11,40)
-     ALIGN 8
-     COLOR (0,0,255)
-     PARENT 3
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    TEXT  6, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (121,-7,140,20)
-     ALIGN 10
-     COLOR (0,0,255)
-     PARENT 5
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    ELLIPSE  7, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     AREA (28,34,40,46)
-     FILL (1,(0,255,255),0)
-    }
-    LINE  8, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     POINTS ( (40,0), (40,40), (80,20), (40,0) )
-     FILL (1,(0,255,255),0)
-    }
-    TEXT  9, 0, 0
-    {
-     TEXT "IBUFGDS"
-     RECT (60,29,146,51)
-     ALIGN 4
-     COLOR (191,0,191)
-     FONT (8,0,0,400,0,0,0,"Arial")
-    }
-    PIN  1, 0, 0
-    {
-     COORD (0,0)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="I"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="IN"
-      PORT_ID="5"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (40,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-    PIN  3, 0, 0
-    {
-     COORD (0,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="IB"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="IN"
-      PORT_ID="2"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (28,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-    PIN  5, 0, 0
-    {
-     COORD (140,20)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="O"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="OUT"
-      PORT_ID="1"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (-60,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-   }
-  }
- }
- SYMBOL "KINTEX7" "IDELAYCTRL" "IDELAYCTRL"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #BLACK_BOX="0"
-    #CUSTOM_NAME=""
-    #DESCRIPTION="IDELAY tap delay value control"
-    #HDL_ENTRIES=
-"library IEEE;\n"+
-"use ieee.std_logic_1164.all;"
-    #LANGUAGE="VHDL"
-    #MODIFIED="1282290759"
-    #NO_SYMBOL_NAME="1"
-    #NO_SYMBOL_REFERENCE="1"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5b49cdb9-3c4f-42fb-8396-4658f0f787e4"
-    LEVEL="XILINX"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (0,-40,280,140)
-    FREEID 13
-   }
-   
-   BODY
-   {
-    RECT  1, -1, 0
-    {
-     VARIABLES
-     {
-      #OUTLINE_FILLING="1"
-     }
-     OUTLINE 0,1, (57,60,156)
-     AREA (40,0,240,120)
-     FILL (1,(255,255,180),0)
-    }
-    TEXT  3, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (45,30,124,54)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 2
-    }
-    TEXT  5, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (193,30,235,54)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 4
-    }
-    TEXT  7, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (45,70,86,94)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 6
-    }
-    TEXT  12, 0, 0
-    {
-     TEXT "IDELAYCTRL"
-     RECT (89,-24,209,-2)
-     ALIGN 9
-     COLOR (191,0,191)
-     FONT (8,0,0,400,0,0,0,"Arial")
-    }
-    PIN  2, 0, 0
-    {
-     COORD (0,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LENGTH="40"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="REFCLK"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (0,0), (40,0) )
-     }
-    }
-    PIN  4, 0, 0
-    {
-     COORD (280,40)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #LENGTH="40"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="RDY"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (-40,0), (0,0) )
-     }
-    }
-    PIN  6, 0, 0
-    {
-     COORD (0,80)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LENGTH="40"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="RST"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (0,0), (40,0) )
-     }
-    }
-   }
-  }
- }
- SYMBOL "kintex7" "IBUFDS" "IBUFDS"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #BLACK_BOX="0"
-    #CUSTOM_NAME=""
-    #DESCRIPTION="Input Buffer"
-    #GENERIC0="IFD_DELAY_VALUE:STRING:=\"AUTO\""
-    #GENERIC1="DIFF_TERM:BOOLEAN:=FALSE"
-    #GENERIC2="CAPACITANCE:STRING:=\"DONT_CARE\""
-    #GENERIC3="IOSTANDARD:STRING:=\"DEFAULT\""
-    #GENERIC4="IBUF_DELAY_VALUE:STRING:=\"0\""
-    #GENERIC5="IBUF_LOW_PWR:BOOLEAN:=TRUE"
-    #GENERIC6="DQS_BIAS:STRING:=\"FALSE\""
-    #LANGUAGE="VHDL"
-    #MODIFIED="1376988805"
-    #NO_SYMBOL_NAME="1"
-    #NO_SYMBOL_REFERENCE="1"
-    #PRAGMED_GENERICS="DIFF_TERM"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="d359b884-da45-494c-830c-73e9ff1aac36"
-    LEVEL="XILINX"
-    LIBVER="2.0.0"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (0,0,140,40)
-    FREEID 10
-   }
-   
-   BODY
-   {
-    TEXT  2, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (10,-27,16,0)
-     ALIGN 8
-     COLOR (0,0,255)
-     PARENT 1
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    TEXT  4, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (-11,13,11,40)
-     ALIGN 8
-     COLOR (0,0,255)
-     PARENT 3
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    TEXT  6, 0, 1
-    {
-     TEXT "$#NAME"
-     RECT (121,-7,140,20)
-     ALIGN 10
-     COLOR (0,0,255)
-     PARENT 5
-     FONT (10,0,0,400,0,0,0,"Arial")
-    }
-    ELLIPSE  7, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     AREA (28,34,40,46)
-     FILL (1,(0,255,255),0)
-    }
-    LINE  8, 0, 0
-    {
-     OUTLINE 0,1, (0,0,191)
-     POINTS ( (40,0), (40,40), (80,20), (40,0) )
-     FILL (1,(0,255,255),0)
-    }
-    TEXT  9, 0, 0
-    {
-     TEXT "IBUFDS"
-     RECT (60,29,131,51)
-     ALIGN 4
-     COLOR (191,0,191)
-     FONT (8,0,0,400,0,0,0,"Arial")
-    }
-    PIN  1, 0, 0
-    {
-     COORD (0,0)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="I"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="IN"
-      PORT_ID="5"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (40,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-    PIN  3, 0, 0
-    {
-     COORD (0,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="IB"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="IN"
-      PORT_ID="2"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (28,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-    PIN  5, 0, 0
-    {
-     COORD (140,20)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="O"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-      PINTYPE="OUT"
-      PORT_ID="1"
-     }
-     LINE  1, 0, 0
-     {
-      OUTLINE 0,1, (0,0,191)
-      POINTS ( (-60,0), (0,0) )
-      FILL (1,(0,0,0),0)
-     }
-    }
-   }
-  }
  }
  SYMBOL "#default" "quad_data_deserializer" "quad_data_deserializer"
  {
@@ -1418,6 +1002,422 @@ HEADER
    }
   }
  }
+ SYMBOL "KINTEX7" "IBUFGDS" "IBUFGDS"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #BLACK_BOX="0"
+    #CUSTOM_NAME=""
+    #DESCRIPTION="Input Buffer"
+    #GENERIC0="IOSTANDARD:STRING:=\"DEFAULT\""
+    #GENERIC1="IBUF_DELAY_VALUE:STRING:=\"0\""
+    #GENERIC2="CAPACITANCE:STRING:=\"DONT_CARE\""
+    #GENERIC3="DIFF_TERM:BOOLEAN:=FALSE"
+    #GENERIC4="IBUF_LOW_PWR:BOOLEAN:=TRUE"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1282290759"
+    #NO_SYMBOL_NAME="1"
+    #NO_SYMBOL_REFERENCE="1"
+    #PRAGMED_GENERICS="DIFF_TERM"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="8e5f3794-95cd-4c2e-a4d7-cd8ed44f0d24"
+    LEVEL="XILINX"
+    LIBVER="2.0.0"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,140,40)
+    FREEID 10
+   }
+   
+   BODY
+   {
+    TEXT  2, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (10,-27,16,0)
+     ALIGN 8
+     COLOR (0,0,255)
+     PARENT 1
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    TEXT  4, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (-11,13,11,40)
+     ALIGN 8
+     COLOR (0,0,255)
+     PARENT 3
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    TEXT  6, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (121,-7,140,20)
+     ALIGN 10
+     COLOR (0,0,255)
+     PARENT 5
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    ELLIPSE  7, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     AREA (28,34,40,46)
+     FILL (1,(0,255,255),0)
+    }
+    LINE  8, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     POINTS ( (40,0), (40,40), (80,20), (40,0) )
+     FILL (1,(0,255,255),0)
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "IBUFGDS"
+     RECT (60,29,146,51)
+     ALIGN 4
+     COLOR (191,0,191)
+     FONT (8,0,0,400,0,0,0,"Arial")
+    }
+    PIN  1, 0, 0
+    {
+     COORD (0,0)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="I"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="IN"
+      PORT_ID="5"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (40,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+    PIN  3, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="IB"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="IN"
+      PORT_ID="2"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (28,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+    PIN  5, 0, 0
+    {
+     COORD (140,20)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="O"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="OUT"
+      PORT_ID="1"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (-60,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "KINTEX7" "IDELAYCTRL" "IDELAYCTRL"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #BLACK_BOX="0"
+    #CUSTOM_NAME=""
+    #DESCRIPTION="IDELAY tap delay value control"
+    #HDL_ENTRIES=
+"library IEEE;\n"+
+"use ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1282290759"
+    #NO_SYMBOL_NAME="1"
+    #NO_SYMBOL_REFERENCE="1"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5b49cdb9-3c4f-42fb-8396-4658f0f787e4"
+    LEVEL="XILINX"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-40,280,140)
+    FREEID 13
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     OUTLINE 0,1, (57,60,156)
+     AREA (40,0,240,120)
+     FILL (1,(255,255,180),0)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (45,30,124,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (193,30,235,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (45,70,86,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  12, 0, 0
+    {
+     TEXT "IDELAYCTRL"
+     RECT (89,-24,209,-2)
+     ALIGN 9
+     COLOR (191,0,191)
+     FONT (8,0,0,400,0,0,0,"Arial")
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="40"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="REFCLK"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (40,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (280,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="40"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RDY"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-40,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="40"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RST"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (40,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "kintex7" "IBUFDS" "IBUFDS"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #BLACK_BOX="0"
+    #CUSTOM_NAME=""
+    #DESCRIPTION="Input Buffer"
+    #GENERIC0="IFD_DELAY_VALUE:STRING:=\"AUTO\""
+    #GENERIC1="DIFF_TERM:BOOLEAN:=FALSE"
+    #GENERIC2="CAPACITANCE:STRING:=\"DONT_CARE\""
+    #GENERIC3="IOSTANDARD:STRING:=\"DEFAULT\""
+    #GENERIC4="IBUF_DELAY_VALUE:STRING:=\"0\""
+    #GENERIC5="IBUF_LOW_PWR:BOOLEAN:=TRUE"
+    #GENERIC6="DQS_BIAS:STRING:=\"FALSE\""
+    #LANGUAGE="VHDL"
+    #MODIFIED="1376988805"
+    #NO_SYMBOL_NAME="1"
+    #NO_SYMBOL_REFERENCE="1"
+    #PRAGMED_GENERICS="DIFF_TERM"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="d359b884-da45-494c-830c-73e9ff1aac36"
+    LEVEL="XILINX"
+    LIBVER="2.0.0"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,140,40)
+    FREEID 10
+   }
+   
+   BODY
+   {
+    TEXT  2, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (10,-27,16,0)
+     ALIGN 8
+     COLOR (0,0,255)
+     PARENT 1
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    TEXT  4, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (-11,13,11,40)
+     ALIGN 8
+     COLOR (0,0,255)
+     PARENT 3
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    TEXT  6, 0, 1
+    {
+     TEXT "$#NAME"
+     RECT (121,-7,140,20)
+     ALIGN 10
+     COLOR (0,0,255)
+     PARENT 5
+     FONT (10,0,0,400,0,0,0,"Arial")
+    }
+    ELLIPSE  7, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     AREA (28,34,40,46)
+     FILL (1,(0,255,255),0)
+    }
+    LINE  8, 0, 0
+    {
+     OUTLINE 0,1, (0,0,191)
+     POINTS ( (40,0), (40,40), (80,20), (40,0) )
+     FILL (1,(0,255,255),0)
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "IBUFDS"
+     RECT (60,29,131,51)
+     ALIGN 4
+     COLOR (191,0,191)
+     FONT (8,0,0,400,0,0,0,"Arial")
+    }
+    PIN  1, 0, 0
+    {
+     COORD (0,0)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="I"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="IN"
+      PORT_ID="5"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (40,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+    PIN  3, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="IB"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="IN"
+      PORT_ID="2"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (28,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+    PIN  5, 0, 0
+    {
+     COORD (140,20)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="O"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+      PINTYPE="OUT"
+      PORT_ID="1"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (0,0,191)
+      POINTS ( (-60,0), (0,0) )
+      FILL (1,(0,0,0),0)
+     }
+    }
+   }
+  }
+ }
 }
 
 PAGE ""
@@ -1724,7 +1724,7 @@ PAGE ""
 "GENERATE_8_CHN : std_logic := '1';\n"+
 "G_INVERT_VIDEO_DATA : std_logic := '0';\n"+
 ""
-   RECT (3580,260,4120,480)
+   RECT (3500,260,4120,520)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,219,179),0)
    MARGINS (20,20)
@@ -1935,11 +1935,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="RESET200ms : boolean := true"
-    #GENERIC1="MASTER : boolean := true"
+    #GENERIC0="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC1="RESET200ms : boolean := RESET200ms"
     #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC4="DATA_WIDTH : integer := 14"
+    #GENERIC3="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC4="MASTER : boolean := true"
     #IMPL="sch"
     #LIBRARY="#default"
     #NO_CONF="1"
@@ -2109,11 +2109,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="DATA_WIDTH : integer := 14"
-    #GENERIC1="RESET200ms : boolean := true"
-    #GENERIC2="MASTER : boolean := false"
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC4="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC0="MASTER : boolean := false"
+    #GENERIC1="RESET200ms : boolean := RESET200ms"
+    #GENERIC2="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC3="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC4="DATA_WIDTH : integer := DATA_WIDTH"
     #IMPL="sch"
     #LIBRARY="#default"
     #PRAGMED_GENERICS=""
@@ -4105,7 +4105,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  22903, 0, 0
+  TEXT  22954, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4116,7 +4116,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  22904, 0, 0
+  TEXT  22955, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -4127,7 +4127,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  22905, 0, 0
+  TEXT  22956, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -4137,7 +4137,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  22906, 0, 0
+  TEXT  22957, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4149,7 +4149,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  22907, 0, 0
+  TEXT  22958, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -4162,7 +4162,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  22908, 0, 0
+  TEXT  22959, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -4172,7 +4172,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  22909, 0, 0
+  TEXT  22960, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4184,7 +4184,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  22910, 0, 0
+  TEXT  22961, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -4194,7 +4194,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  22911, 0, 0
+  TEXT  22962, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -4205,7 +4205,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  22912, 0, 0
+  GROUP  22963, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2820,4201,3201)
@@ -4217,7 +4217,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  22913, 0, 0
+  GROUP  22964, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3020,4201,3021)
@@ -4229,7 +4229,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  22914, 0, 0
+  GROUP  22965, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2960,4201,2961)
@@ -4241,7 +4241,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  22915, 0, 0
+  GROUP  22966, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3080,4201,3081)
@@ -4253,7 +4253,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  22916, 0, 0
+  GROUP  22967, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3140,4201,3141)
@@ -4265,7 +4265,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  22917, 0, 0
+  GROUP  22968, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2820,3501,2961)
@@ -4276,7 +4276,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  22918, 0, 0
+  GROUP  22969, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2960,3501,3201)
@@ -4287,7 +4287,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  22919, 0, 0
+  BMPPICT  22970, 0, 0
   {
    PAGEALIGN 10
    RECT (3340,2880,3479,2925)

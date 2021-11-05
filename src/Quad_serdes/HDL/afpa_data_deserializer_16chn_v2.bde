@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 19900
+ FREEID 19934
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -39,132 +39,6 @@ HEADER
   CREATIONDATE="5/29/2015"
   PAGECOUNT="2"
   TITLE="adc_data_deserializer"
- }
- SYMBOL "KINTEX7" "IDELAYCTRL" "IDELAYCTRL"
- {
-  HEADER
-  {
-   VARIABLES
-   {
-    #BLACK_BOX="0"
-    #CUSTOM_NAME=""
-    #DESCRIPTION="IDELAY tap delay value control"
-    #HDL_ENTRIES=
-"library IEEE;\n"+
-"use ieee.std_logic_1164.all;"
-    #LANGUAGE="VHDL"
-    #MODIFIED="1282290759"
-    #NO_SYMBOL_NAME="1"
-    #NO_SYMBOL_REFERENCE="1"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5b49cdb9-3c4f-42fb-8396-4658f0f787e4"
-    LEVEL="XILINX"
-   }
-  }
-  PAGE "" 
-  {
-   PAGEHEADER
-   {
-    RECT (0,-40,280,140)
-    FREEID 13
-   }
-   
-   BODY
-   {
-    RECT  1, -1, 0
-    {
-     VARIABLES
-     {
-      #OUTLINE_FILLING="1"
-     }
-     OUTLINE 0,1, (57,60,156)
-     AREA (40,0,240,120)
-     FILL (1,(255,255,180),0)
-    }
-    TEXT  3, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (45,30,124,54)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 2
-    }
-    TEXT  5, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (193,30,235,54)
-     ALIGN 6
-     MARGINS (1,1)
-     PARENT 4
-    }
-    TEXT  7, 0, 0
-    {
-     TEXT "$#NAME"
-     RECT (45,70,86,94)
-     ALIGN 4
-     MARGINS (1,1)
-     PARENT 6
-    }
-    TEXT  12, 0, 0
-    {
-     TEXT "IDELAYCTRL"
-     RECT (89,-24,209,-2)
-     ALIGN 9
-     COLOR (191,0,191)
-     FONT (8,0,0,400,0,0,0,"Arial")
-    }
-    PIN  2, 0, 0
-    {
-     COORD (0,40)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LENGTH="40"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="REFCLK"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (0,0), (40,0) )
-     }
-    }
-    PIN  4, 0, 0
-    {
-     COORD (280,40)
-     VARIABLES
-     {
-      #DIRECTION="OUT"
-      #LENGTH="40"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="RDY"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (-40,0), (0,0) )
-     }
-    }
-    PIN  6, 0, 0
-    {
-     COORD (0,80)
-     VARIABLES
-     {
-      #DIRECTION="IN"
-      #LENGTH="40"
-      #MDA_RECORD_TOKEN="OTHER"
-      #NAME="RST"
-      #NUMBER="0"
-      #VHDL_TYPE="std_ulogic"
-     }
-     LINE  2, 0, 0
-     {
-      POINTS ( (0,0), (40,0) )
-     }
-    }
-   }
-  }
  }
  SYMBOL "#default" "quad_data_deserializer" "quad_data_deserializer"
  {
@@ -1138,6 +1012,132 @@ HEADER
    }
   }
  }
+ SYMBOL "KINTEX7" "IDELAYCTRL" "IDELAYCTRL"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #BLACK_BOX="0"
+    #CUSTOM_NAME=""
+    #DESCRIPTION="IDELAY tap delay value control"
+    #HDL_ENTRIES=
+"library IEEE;\n"+
+"use ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1282290759"
+    #NO_SYMBOL_NAME="1"
+    #NO_SYMBOL_REFERENCE="1"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="5b49cdb9-3c4f-42fb-8396-4658f0f787e4"
+    LEVEL="XILINX"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-40,280,140)
+    FREEID 13
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     OUTLINE 0,1, (57,60,156)
+     AREA (40,0,240,120)
+     FILL (1,(255,255,180),0)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (45,30,124,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (193,30,235,54)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (45,70,86,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  12, 0, 0
+    {
+     TEXT "IDELAYCTRL"
+     RECT (89,-24,209,-2)
+     ALIGN 9
+     COLOR (191,0,191)
+     FONT (8,0,0,400,0,0,0,"Arial")
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="40"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="REFCLK"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (40,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (280,40)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="40"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RDY"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-40,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="40"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="RST"
+      #NUMBER="0"
+      #VHDL_TYPE="std_ulogic"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (40,0) )
+     }
+    }
+   }
+  }
+ }
 }
 
 PAGE ""
@@ -1485,12 +1485,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="RESET200ms : boolean := true"
-    #GENERIC1="MASTER : boolean := true"
-    #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC4="DATA_WIDTH : integer := 14"
-    #IMPL="sch"
+    #GENERIC0="MASTER : boolean := true"
+    #GENERIC1="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC2="RESET200ms : boolean := RESET200ms"
+    #GENERIC3="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC4="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
     #LIBRARY="#default"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -1877,11 +1876,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="DATA_WIDTH : integer := 14"
-    #GENERIC1="RESET200ms : boolean := true"
+    #GENERIC0="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC1="RESET200ms : boolean := RESET200ms"
     #GENERIC2="MASTER : boolean := false"
-    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC4="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC3="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
+    #GENERIC4="DATA_WIDTH : integer := DATA_WIDTH"
     #IMPL="sch"
     #LIBRARY="#default"
     #PRAGMED_GENERICS=""
@@ -2313,7 +2312,7 @@ PAGE ""
 "DATA_WIDTH : integer := 14;\n"+
 "G_INVERT_VIDEO_DATA : std_logic := '0';\n"+
 ""
-   RECT (980,3060,1520,3200)
+   RECT (820,3000,1520,3200)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,219,179),0)
    MARGINS (20,20)
@@ -2541,11 +2540,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="MASTER : boolean := false"
-    #GENERIC1="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
-    #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
-    #GENERIC3="DATA_WIDTH : integer := 14"
-    #GENERIC4="RESET200ms : boolean := true"
+    #GENERIC0="DATA_WIDTH : integer := DATA_WIDTH"
+    #GENERIC1="RESET200ms : boolean := RESET200ms"
+    #GENERIC2="MASTER : boolean := false"
+    #GENERIC3="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC4="IODELAY_GROUP_NAME : string := \"iodelay_b13\""
     #IMPL="sch"
     #LIBRARY="#default"
     #PRAGMED_GENERICS=""
@@ -2833,11 +2832,11 @@ PAGE ""
    {
     #COMPONENT="quad_data_deserializer"
     #CUSTOM_NAME=""
-    #GENERIC0="RESET200ms : boolean := true"
-    #GENERIC1="MASTER : boolean := true"
+    #GENERIC0="RESET200ms : boolean := RESET200ms"
+    #GENERIC1="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
     #GENERIC2="IODELAY_GROUP_NAME : string := \"iodelay_b12\""
-    #GENERIC3="DATA_WIDTH : integer := 14"
-    #GENERIC4="CLK_PERIOD_NS : real := CLK_PERIOD_NS"
+    #GENERIC3="MASTER : boolean := true"
+    #GENERIC4="DATA_WIDTH : integer := DATA_WIDTH"
     #LIBRARY="#default"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -4852,7 +4851,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  19883, 0, 0
+  TEXT  19917, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4863,7 +4862,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19884, 0, 0
+  TEXT  19918, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -4874,7 +4873,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  19885, 0, 0
+  TEXT  19919, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -4884,7 +4883,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19886, 0, 0
+  TEXT  19920, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4896,7 +4895,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  19887, 0, 0
+  TEXT  19921, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -4909,7 +4908,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  19888, 0, 0
+  TEXT  19922, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -4919,7 +4918,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19889, 0, 0
+  TEXT  19923, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4931,7 +4930,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  19890, 0, 0
+  TEXT  19924, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -4941,7 +4940,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  19891, 0, 0
+  TEXT  19925, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -4952,7 +4951,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  19892, 0, 0
+  GROUP  19926, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2820,4201,3201)
@@ -4964,7 +4963,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19893, 0, 0
+  GROUP  19927, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3020,4201,3021)
@@ -4976,7 +4975,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19894, 0, 0
+  GROUP  19928, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,2960,4201,2961)
@@ -4988,7 +4987,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19895, 0, 0
+  GROUP  19929, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3080,4201,3081)
@@ -5000,7 +4999,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19896, 0, 0
+  GROUP  19930, 0, 0
   {
    PAGEALIGN 10
    RECT (3320,3140,4201,3141)
@@ -5012,7 +5011,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  19897, 0, 0
+  GROUP  19931, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2820,3501,2961)
@@ -5023,7 +5022,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  19898, 0, 0
+  GROUP  19932, 0, 0
   {
    PAGEALIGN 10
    RECT (3500,2960,3501,3201)
@@ -5034,7 +5033,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  19899, 0, 0
+  BMPPICT  19933, 0, 0
   {
    PAGEALIGN 10
    RECT (3340,2880,3479,2925)
