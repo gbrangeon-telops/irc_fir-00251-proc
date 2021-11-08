@@ -33,7 +33,7 @@ package FPA_define is
    constant DEFINE_FPA_OUTPUT                         : std_logic_vector(1 downto 0) := OUTPUT_ANALOG; 
    constant DEFINE_FPA_INPUT                          : std_logic_vector(7 downto 0) := LVCMOS33;
    constant DEFINE_FPA_VIDEO_DATA_INVERTED            : std_logic := '0';      -- les données sont en video non inverse
-   constant DEFINE_FPA_TEMP_DIODE_CURRENT_uA          : natural   := 150;      -- consigne pour courant de polarisation de la diode de lecture de température
+   constant DEFINE_FPA_TEMP_DIODE_CURRENT_uA          : natural   := 100;      -- pas utilisé: source courant sur EFA-00305-002. consigne pour courant de polarisation de la diode de lecture de température
    constant DEFINE_FPA_TAP_NUMBER                     : natural   := 16;                                                                                     
    constant DEFINE_FLEX_VOLTAGEP_mV                   : natural   := 8000;     -- le flex de ce détecteur doit être alimenté à 8V 
    constant DEFINE_FPA_TEMP_CH_GAIN                   : real      := 1.0;      -- le gain entre le voltage de la diode de temperature et le voltage à l'entrée de l'ADC de lecture de la temperature. (Vadc_in/Vdiode). Tenir compte de l,ampli buffer et des resistances entre les deux 
