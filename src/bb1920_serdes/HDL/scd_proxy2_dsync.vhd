@@ -326,7 +326,7 @@ begin
          if sreset = '1' then             
             frame_init_tag <= CBITS_FRM_IDLE_ID;
          else		 
-            if FPA_INTF_CFG.proxy_alone_mode = '1' then 
+            if FPA_INTF_CFG.vid_if_bit_en = '1' then 
                frame_init_tag <= CBITS_FRM_IDLE_TST_PTRN_ID;
             else  
                frame_init_tag <= CBITS_FRM_IDLE_ID;

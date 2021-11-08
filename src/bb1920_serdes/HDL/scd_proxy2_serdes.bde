@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 76031
+ FREEID 76203
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -2411,7 +2411,7 @@ HEADER
    {
     #CUSTOM_NAME=""
     #LANGUAGE="VHDL"
-    #MODIFIED="1620821471"
+    #MODIFIED="1635354521"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="086da257-6af1-4522-a7ea-590b5339ee9a"
    }
   }
@@ -2419,8 +2419,8 @@ HEADER
   {
    PAGEHEADER
    {
-    RECT (0,-20,360,360)
-    FREEID 56
+    RECT (0,-20,360,380)
+    FREEID 59
    }
    
    BODY
@@ -2431,7 +2431,7 @@ HEADER
      {
       #OUTLINE_FILLING="1"
      }
-     AREA (20,0,340,340)
+     AREA (20,0,340,360)
     }
     TEXT  3, 0, 0
     {
@@ -2497,13 +2497,13 @@ HEADER
      MARGINS (1,1)
      PARENT 52
     }
-    TEXT  55, 0, 0
+    TEXT  57, 0, 0
     {
      TEXT "$#NAME"
-     RECT (25,270,238,294)
+     RECT (25,270,168,294)
      ALIGN 4
      MARGINS (1,1)
-     PARENT 54
+     PARENT 56
     }
     PIN  2, 0, 0
     {
@@ -2655,7 +2655,7 @@ HEADER
       POINTS ( (0,0), (20,0) )
      }
     }
-    PIN  54, 0, 0
+    PIN  56, 0, 0
     {
      COORD (0,280)
      VARIABLES
@@ -2663,7 +2663,7 @@ HEADER
       #DIRECTION="IN"
       #LENGTH="20"
       #MDA_RECORD_TOKEN="OTHER"
-      #NAME="PROXY_ALONE_MODE"
+      #NAME="VID_IF_BIT_EN"
       #NUMBER="0"
       #SIDE="left"
      }
@@ -3342,7 +3342,7 @@ PAGE ""
    TEXT 
 "lval_num    <= std_logic_vector(FPA_INTF_CFG.fpa_serdes_lval_num);\n"+
 "lval_length <= std_logic_vector(FPA_INTF_CFG.fpa_serdes_lval_len);\n"+
-"proxy_alone_mode <= FPA_INTF_CFG.proxy_alone_mode;\n"+
+"vid_if_bit_en <= FPA_INTF_CFG.vid_if_bit_en;\n"+
 "\n"+
 "\n"+
 ""
@@ -4073,12 +4073,12 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="086da257-6af1-4522-a7ea-590b5339ee9a"
    }
    COORD (2700,3480)
-   VERTEXES ( (2,75052), (8,75050), (14,75767), (20,75310), (32,75127), (38,75336), (50,75046), (52,75313), (54,76011) )
+   VERTEXES ( (2,75052), (8,75050), (14,75767), (20,75310), (32,75127), (38,75336), (50,75046), (52,75313), (56,76115) )
   }
   TEXT  68155, 0, 0
   {
    TEXT "$#COMPONENT"
-   RECT (2722,3820,2942,3855)
+   RECT (2720,3840,2940,3875)
    MARGINS (1,1)
    PARENT 68154
   }
@@ -8504,30 +8504,30 @@ PAGE ""
   TEXT  75985, 0, 0
   {
    TEXT "$#NAME"
-   RECT (2458,3731,2663,3760)
+   RECT (2556,3731,2692,3760)
    ALIGN 9
    MARGINS (1,1)
-   PARENT 76013
+   PARENT 76117
   }
-  NET WIRE  75992, 0, 0
+  NET WIRE  76082, 0, 0
   {
    VARIABLES
    {
-    #NAME="proxy_alone_mode"
+    #NAME="vid_if_bit_en"
    }
   }
-  VTX  76011, 0, 0
+  VTX  76115, 0, 0
   {
    COORD (2700,3760)
   }
-  VTX  76012, 0, 0
+  VTX  76116, 0, 0
   {
-   COORD (2420,3760)
+   COORD (2520,3760)
   }
-  WIRE  76013, 0, 0
+  WIRE  76117, 0, 0
   {
-   NET 75992
-   VTX 76011, 76012
+   NET 76082
+   VTX 76115, 76116
    VARIABLES
    {
     #NAMED="1"
@@ -8558,7 +8558,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  76014, 0, 0
+  TEXT  76186, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8569,7 +8569,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  76015, 0, 0
+  TEXT  76187, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -8580,7 +8580,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  76016, 0, 0
+  TEXT  76188, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -8590,7 +8590,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  76017, 0, 0
+  TEXT  76189, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8602,7 +8602,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  76018, 0, 0
+  TEXT  76190, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -8615,7 +8615,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  76019, 0, 0
+  TEXT  76191, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -8625,7 +8625,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  76020, 0, 0
+  TEXT  76192, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8637,7 +8637,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  76021, 0, 0
+  TEXT  76193, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -8647,7 +8647,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  76022, 0, 0
+  TEXT  76194, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -8658,7 +8658,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  76023, 0, 0
+  GROUP  76195, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4620,5001,5001)
@@ -8670,7 +8670,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  76024, 0, 0
+  GROUP  76196, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4820,5001,4821)
@@ -8682,7 +8682,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  76025, 0, 0
+  GROUP  76197, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4760,5001,4761)
@@ -8694,7 +8694,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  76026, 0, 0
+  GROUP  76198, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4880,5001,4881)
@@ -8706,7 +8706,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  76027, 0, 0
+  GROUP  76199, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4940,5001,4941)
@@ -8718,7 +8718,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  76028, 0, 0
+  GROUP  76200, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,4620,4301,4761)
@@ -8729,7 +8729,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  76029, 0, 0
+  GROUP  76201, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,4760,4301,5001)
@@ -8740,7 +8740,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  76030, 0, 0
+  BMPPICT  76202, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,4680,4279,4725)

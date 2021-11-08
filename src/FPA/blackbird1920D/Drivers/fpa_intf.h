@@ -63,7 +63,7 @@
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]
    #define FPA_DEFAULT_FRAME_RATE   1000.0F //[Hz]
 #else
-   #define FPA_DEFAULT_EXPOSURE     5000.0F //[us]
+   #define FPA_DEFAULT_EXPOSURE     10.0F //[us]
    #define FPA_DEFAULT_FRAME_RATE   12.0F //[Hz]
 #endif
 
@@ -199,8 +199,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  fpa_serdes_lval_len               ;
    uint32_t  int_clk_period_factor             ;
    int32_t   int_time_offset                   ;
-   uint32_t  proxy_alone_mode                  ;
-                                                 
+   uint32_t  vid_if_bit_en                     ;
+   uint32_t  failure_resp_management           ;
+   uint32_t  proxy_external_int_ctrl           ;
 };                                                              
 typedef struct s_FpaIntfConfig t_FpaIntf;                       
                                                                 
@@ -285,7 +286,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -293,6 +294,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 
 //pour effacer les bits d'erreurs du bloc FPA_interface
 void FPA_ClearErr(const t_FpaIntf *ptrA);
+
+void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 
 //pour configurer le bloc FPA_interface et le lancer
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 

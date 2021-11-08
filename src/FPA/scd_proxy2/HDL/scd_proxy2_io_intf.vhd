@@ -25,52 +25,48 @@ use IEEE.vital_timing.all;
 entity scd_proxy2_io_intf is
    port(
       
-      CLK           : in std_logic;
-      ARESET        : in std_logic;     
+      CLK             : in std_logic;
+      ARESET          : in std_logic;     
       
       -- hw_driver side
-      PROXY_PWR     : in std_logic;
-      PROXY_TRIG    : in std_logic;
-      PROXY_POWERED : out std_logic;
-      DET_FPA_ON    : out std_logic;
-      PROXY_TX      : in std_logic;
-      PROXY_RX      : out std_logic;
-      PROXY_INT_FBK : out std_logic;    -- non disponible sur BB1920. C'est pour cela que DEFINE_FPA_INT_FBK_AVAILABLE est à '0' dans fpa_define
+      PROXY_PWR       : in std_logic;
+      PROXY_TRIG      : in std_logic;
+      PROXY_INTEGRATE : in std_logic;
+      PROXY_POWERED   : out std_logic;
+      DET_FPA_ON      : out std_logic;
+      PROXY_TX        : in std_logic;
+      PROXY_RX        : out std_logic;
       
       -- spares
-      DET_SPARE_N0  : in std_logic;     -- non utilisé       
-      DET_SPARE_P0  : in std_logic;     -- non utilisé 
+      DET_SPARE_N0    : in std_logic;     -- non utilisé       
+      DET_SPARE_P0    : in std_logic;     -- non utilisé 
       
-      DET_SPARE_N1  : out std_logic;   -- c'est la sortie S_RESET_N
-      DET_SPARE_P1  : out std_logic;   -- c'est la sortie S_RESET_P
-      DET_SPARE_N2  : out std_logic;   -- c'est la sortie S_INTEGRATE_N
-      DET_SPARE_P2  : out std_logic;   -- c'est la sortie S_INTEGRATE_P
+      DET_SPARE_N1    : out std_logic;   -- c'est la sortie S_RESET_N
+      DET_SPARE_P1    : out std_logic;   -- c'est la sortie S_RESET_P
+      DET_SPARE_N2    : out std_logic;   -- c'est la sortie S_INTEGRATE_N
+      DET_SPARE_P2    : out std_logic;   -- c'est la sortie S_INTEGRATE_P
       
       -- Clink TFG
-      SER_TFG_N     : in std_logic;
-      SER_TFG_P     : in std_logic;     
+      SER_TFG_N       : in std_logic;
+      SER_TFG_P       : in std_logic;     
       
       -- Clink TC
-      SER_TC_N      : out std_logic;
-      SER_TC_P      : out std_logic;
-      
-      -- int fdbkin
-      INT_FBK_N     : in std_logic;     -- non disonible sur BB1920 
-      INT_FBK_P     : in std_logic;     -- non disonible sur BB1920 
+      SER_TC_N        : out std_logic;
+      SER_TC_P        : out std_logic;
       
       -- Clink CC
-      DET_CC_N1     : out std_logic;    -- non utilisé 
-      DET_CC_P1     : out std_logic;    -- non utilisé   
-      DET_CC_N2     : out std_logic;    -- non utilisé 
-      DET_CC_P2     : out std_logic;    -- non utilisé 
-      DET_CC_N3     : out std_logic;    -- non utilisé 
-      DET_CC_P3     : out std_logic;    -- non utilisé 
-      DET_CC_N4     : out std_logic;    -- non utilisé 
-      DET_CC_P4     : out std_logic;    -- non utilisé
+      DET_CC_N1       : out std_logic;    -- non utilisé 
+      DET_CC_P1       : out std_logic;    -- non utilisé   
+      DET_CC_N2       : out std_logic;    -- non utilisé 
+      DET_CC_P2       : out std_logic;    -- non utilisé 
+      DET_CC_N3       : out std_logic;    -- non utilisé 
+      DET_CC_P3       : out std_logic;    -- non utilisé 
+      DET_CC_N4       : out std_logic;    -- non utilisé 
+      DET_CC_P4       : out std_logic;    -- non utilisé
       
       -- Fsync
-      FSYNC_N       : out std_logic;
-      FSYNC_P       : out std_logic    
+      FSYNC_N         : out std_logic;
+      FSYNC_P         : out std_logic    
       
       );
 end scd_proxy2_io_intf;
@@ -130,11 +126,11 @@ constant C_PROXY_RST_SIGNAL      : std_logic   := '0';
    signal proxy_trig_fsm            : proxy_trig_fsm_type;
    signal proxy2_io_intf_fsm        : proxy2_io_intf_fsm_type;
    signal sreset                    : std_logic;
-   signal int_fbk_i                 : std_logic;
    signal proxy_trig_i              : std_logic;
+   signal proxy_integrate_i         : std_logic;
    signal output_disabled           : std_logic;
    signal proxy_trig_o              : std_logic;
-   signal proxy_int_feedbk_o        : std_logic;
+   signal proxy_integrate_o         : std_logic;
    signal cnt                       : unsigned(15 downto 0);
    signal timer_cnt                 : unsigned(31 downto 0);
    signal proxy_powered_o           : std_logic;
@@ -151,7 +147,9 @@ begin
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset); 
    
    -- sortie du trig vers proxy
-   proxy_trig_i <= PROXY_TRIG;
+   proxy_trig_i <= PROXY_TRIG; 
+   proxy_integrate_i <= PROXY_INTEGRATE; 
+   
    U2 : OBUFTDS
    port map(
       I  => proxy_trig_o,
@@ -181,7 +179,7 @@ begin
    -- sortie signal integration vers proxy
    U3C : OBUFTDS
    port map(
-      I  => '0',              -- pour l'instant, l'integration est envoyée via RS232. Nous n'envoyons pas de signal d'integration directement au proxy
+      I  => proxy_integrate_o,              
       T  => output_disabled,
       O  => DET_SPARE_P2,
       OB => DET_SPARE_N2
@@ -193,15 +191,6 @@ begin
       O  => PROXY_RX,
       I  => SER_TFG_P,
       IB => SER_TFG_N
-      );
-   
-   -- int fdbkin    
-   PROXY_INT_FBK <= proxy_int_feedbk_o;
-   U5 : IBUFDS
-   port map(
-      O  => int_fbk_i,
-      I  => INT_FBK_P,
-      IB => INT_FBK_N
       );
    
    -- sortie des CLINK CC
@@ -256,6 +245,7 @@ begin
             proxy_trig_fsm <= idle;
          else
             
+            proxy_integrate_o <= proxy_integrate_i;
             case proxy_trig_fsm is
                
                when idle =>
@@ -287,7 +277,6 @@ begin
             timer_cnt <= (others => '0');
             proxy_powered_o <= '0';
             output_disabled <= '1';
-            proxy_int_feedbk_o <= '0';
             proxy2_io_intf_fsm <=  init_st;
             proxy_reset_i <= C_PROXY_RST_SIGNAL;
             
@@ -300,7 +289,6 @@ begin
                when init_st =>
                   proxy_powered_o <= '0';
                   output_disabled <= '1';
-                  proxy_int_feedbk_o <= '0';
                   timer_cnt <= (others => '0');
                   proxy2_io_intf_fsm <= idle;
                   proxy_reset_i <= C_PROXY_RST_SIGNAL;
@@ -334,7 +322,6 @@ begin
                when proxy_pwred_st =>                    
                   output_disabled <= '0';
                   proxy_powered_o <= '1';  -- pour le scd_proxy2, le signal de proxy powered est envoyé  SCD_PROXY2_POWER_WAIT usec après l'allumage du proxy
-                  proxy_int_feedbk_o <= int_fbk_i;
                   if PROXY_PWR = '0' then
                      proxy2_io_intf_fsm <= init_st;
                   end if;   

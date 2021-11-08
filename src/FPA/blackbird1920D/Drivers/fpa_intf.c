@@ -93,6 +93,8 @@
 #define AW_FPA_OUTPUT_SW_TYPE              0xAE4   // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
 #define AW_FPA_INPUT_SW_TYPE               0xAE8   // obligaoire pour les deteceteurs analogiques
 
+#define AW_FPA_SCD_IDDC_RDY_ADD            0x138
+
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                           0x16   // provient du fichier fpa_common_pkg.vhd. La valeur 0x16 est celle de FPA_ROIC_BLACKBIRD1920
 #define OUTPUT_DIGITAL                     0x02   // provient du fichier fpa_common_pkg.vhd. La valeur 0x02 est celle de OUTPUT_DIGITAL
@@ -118,11 +120,14 @@
 
 #define VHD_CLK_100M_RATE_HZ               100E+6F 
 
-#define OP_CMD_IWR_FRAME_DLY_DEFAULT        50E-6F // "Frame read delay" parameter, in seconds
-#define OP_CMD_IWR_INTG_DLY_DEFAULT         10E-6F  // "Integration delay" parameter, in seconds (set to 0 if possible)
-#define OP_CMD_ITR_INTG_DLY_DEFAULT         10E-6F // "Integration delay" parameter, in seconds (set to 0 if possible)
+#define OP_CMD_IWR_FRAME_DLY_DEFAULT       200E-6F // "Frame read delay" parameter, in seconds
+#define OP_CMD_IWR_INTG_DLY_DEFAULT        100E-6F  // "Integration delay" parameter, in seconds (set to 0 if possible)
+#define OP_CMD_ITR_INTG_DLY_DEFAULT        100E-6F // "Integration delay" parameter, in seconds (set to 0 if possible)
 
-#define FRAME_RESOLUTION_DEFAULT            7  // 0.1us
+#define FPA_MAX_FRAME_RATE                 57.0F // [Hz]
+
+// La résolution maximale supportée par le vhdl est 44 (0.63us).
+#define FRAME_RESOLUTION_DEFAULT           7  // 0.1us
 
 
 // "Photo-diode bias" parameter (and anti-blooming control)
@@ -147,7 +152,7 @@ static const uint8_t Scd_DiodeBiasValues_Vdet[] = {
 };
 // WARNING !!! At room temperature, Vdet and Idet sould be kept at their minimum. The ROIC will be damage otherwise(see atlasdatasheet2.17ext.pdf p. 42).
 #define SCD_VDET_BIAS_FORBIDDEN_THRESHOLD_IDX  14  //Vdet = 600mV or 700mV will damage de ROIC (see atlasdatasheet2.17ext.pdf p. 42)
-#define SCD_VDET_BIAS_DEFAULT_IDX              0     // 1mV
+#define SCD_VDET_BIAS_DEFAULT_IDX              3     // 60mV
 #define SCD_VDET_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues_Vdet) / sizeof(Scd_DiodeBiasValues_Vdet[0]))
 
 static const uint8_t Scd_DiodeBiasValues_Idet[] = {
@@ -157,7 +162,7 @@ static const uint8_t Scd_DiodeBiasValues_Idet[] = {
       0x03,    // 300pA
 };
 // WARNING !!! At room temperature, Vdet and Idet sould be kept at their minimum. The ROIC will be damage otherwise(see atlasdatasheet2.17ext.pdf p. 42).
-#define SCD_IDET_BIAS_DEFAULT_IDX              0     // 10pA (default)
+#define SCD_IDET_BIAS_DEFAULT_IDX              1     // 30pA (default)
 #define SCD_IDET_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues_Idet) / sizeof(Scd_DiodeBiasValues_Idet[0]))
 
 
@@ -242,7 +247,6 @@ struct s_FpaPrivateStatus
    uint32_t diag_xsize_div_tapnum                     ;
    uint32_t diag_lovh_mclk_source                     ;
    uint32_t real_mode_active_pixel_dly                ;
-   uint32_t spare                                     ;
    uint32_t aoi_data_sol_pos                          ;
    uint32_t aoi_data_eol_pos                          ;
    uint32_t aoi_flag1_sol_pos                         ;
@@ -256,7 +260,6 @@ struct s_FpaPrivateStatus
    uint32_t op_frame_time                             ;
    uint32_t op_gain                                   ;
    uint32_t op_int_mode                               ;
-   uint32_t op_test_mode                              ;
    uint32_t op_det_vbias                              ;
    uint32_t op_det_ibias                              ;
    uint32_t op_binning                                ;
@@ -329,7 +332,8 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_GetTemperature(ptrA);
+   FPA_iddca_rdy(ptrA, false);
+   //FPA_GetTemperature(ptrA);
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd y compris les statuts privés. Il faut que les status privés soient là avant qu'on appelle le FPA_SendConfigGC. 
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
@@ -338,6 +342,15 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    sw_init_success = 1;
 }
  
+void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+  }
+}
+
 //--------------------------------------------------------------------------
 // pour reset des registres d'erreurs
 //--------------------------------------------------------------------------
@@ -379,9 +392,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    float frame_period, fpaAcquisitionFrameRate;
    uint8_t det_vbias_idx;
    static uint8_t cfg_num = 0;
-   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegG, gFpaDebugRegH;
+   extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegC, gFpaDebugRegE, gFpaDebugRegF, gFpaDebugRegG, gFpaDebugRegH;
+   extern int16_t gFpaDetectorPolarizationVoltage;
    extern uint8_t gFpaScdDiodeBiasEnum;
-   
+
+   FPA_GetPrivateStatus(&gPrivateStat, ptrA);
+
    //-----------------------------------------                                           
    // Common
    //-----------------------------------------   
@@ -401,16 +417,22 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->fpa_diag_type = TELOPS_DIAG_DEGR_DYN;   
    }
    
-   // gestion du mode où juste le proxy est présent mais pas le detecteur
-   if (sw_init_done == 0)
-      gFpaDebugRegA = 1;
-   ptrA->proxy_alone_mode = gFpaDebugRegA;
-   
-   if (ptrA->proxy_alone_mode == 1){
-      ptrA->fpa_diag_mode = 1;
-      gFpaDebugRegE = 1;
-   }
-      
+   /* Contrairement à ce que dit la doc le paramètre vid_if_bit_en est write only...
+    * Il est toujours à '1' lors de sa lecture et ce peut importe ce qu'on y écrit.
+    * On utilise ce paramètre pour configurer le module SERDES afin qu'il se base sur le bon "ctrl bit" pour générer le fval.
+    * Si vid_if_bit_en = 1,  il faut se référer à la figure 13 du document atlasdatasheet2.17ext.pdf (ctrl bits = 0x3 en frame read idle)
+    * Si vid_if_bit_en = 0,  il faut se référer à la figure 3 de l'appendix F du document DXU_0003_1.pdf (ctrl bits = 0x0 en frame read idle)
+   */
+   ptrA->vid_if_bit_en = 1;
+
+   // Ce mode permet de désactiver la gestion des "response failures" en provenance du détecteur.
+   // Ce mode est utilisé à des fins de debug.
+   ptrA->failure_resp_management = 0;
+
+   // Ce paramètre permet d'opérer le détecteur en mode "External integration control" (voir section 2.3.3 du document atlasdatasheet2.17ext.pdf)
+   // Le mode "externe d'intégration" n'a pas été testé. On utilise pour l'instant la commande sérielle pour configurer le temps d'intégration.
+   ptrA->proxy_external_int_ctrl = 0;
+
    // allumage du détecteur 
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
@@ -431,9 +453,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
       if(gFpaDebugRegG != 0){
          gFr_dly = (float)gFpaDebugRegG/1E+6F;
-   }
-      else if(gFpaDebugRegE == 1){ // mode proxy alone
-         gFr_dly = 0.0002F; // 0.2 ms (mesuré avec ILA).
       }
       else{
          // gFr_dly doit toujours être plus grand que : gIntg_dly + exposure_time
@@ -460,7 +479,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->op_int_mode = IWR_MODE;
       ptrA->op_gain = (uint32_t)LOW_GAIN;
    }
-   
+
    // config du contrôleur pour les acq_trigs (il est sur l'horloge de 100MHz)
    ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((frame_period - (hh.intg_dly + VHD_PIPE_DLY_SEC))*(float)VHD_CLK_100M_RATE_HZ);
@@ -476,11 +495,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // Élargit le pulse de trig au besoin
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
-   // mode diag vrai et faked
-   ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
+   ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    if (ptrA->fpa_diag_mode == 1){
-      if ((int32_t)gFpaDebugRegE != 0)
-         ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
+      ptrA->fpa_intf_data_source = DATA_SOURCE_INSIDE_FPGA;     // fpa_intf_data_source n'est utilisé/regardé par le vhd que lorsque fpa_diag_mode = 1
    }
    
    //-----------------------------------------
@@ -520,9 +537,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlascmd_datasheet2.17   
    
    ptrA->op_frame_time = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(frame_period);
+   // La période réelle configuré dans le ROIC doit être légèrement inférieure à celle des trigs générés.
+   //ptrA->op_frame_time = ptrA->op_frame_time - 3;
 
-   ptrA->op_test_mode = 0;                     // vid_if_bit_en. 0 <=> no data during frame idle;
-      
    // polarisation et saturation 
    if (gFpaScdDiodeBiasEnum >= SCD_IDET_BIAS_VALUES_NUM)      // Photo-diode bias (Idet)
        gFpaScdDiodeBiasEnum    = SCD_IDET_BIAS_DEFAULT_IDX;    // Corrige une valeur invalide
@@ -557,7 +574,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // synth : cmd structurelle
    //-----------------------------------------
    ptrA->synth_spare     = 0;                     
-   ptrA->synth_frm_res   = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2
+   ptrA->synth_frm_res   = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2 et la résolution maximale supportée par le vhdl est 44 (0.63us).
 
    ptrA->synth_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
    if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
@@ -578,14 +595,31 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->int_cmd_eof_add                 = ptrA->int_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->int_cmd_dlen;
    ptrA->int_cmd_sof_add_m1              = ptrA->int_cmd_sof_add - 1;
    ptrA->int_checksum_add                = ptrA->int_cmd_eof_add;
-   ptrA->frame_dly_cst                   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gFr_dly);                             // Frame Read delay = integration_time + frame_dly_cst. C'est le delai referé à FSYNC pour la sortie des données
-   ptrA->int_dly_cst                     = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gIntg_dly);
-   
+   //ptrA->frame_dly_cst                   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gFr_dly);                             // Frame Read delay = integration_time + frame_dly_cst. C'est le delai referé à FSYNC pour la sortie des données
+   //ptrA->int_dly_cst                     = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gIntg_dly);
+
+
+   // TODO Debug
+   if(gFpaDebugRegH != 0)
+      ptrA->int_dly_cst = (uint32_t)gFpaDebugRegH;
+   else
+      ptrA->int_dly_cst = (uint32_t)1000;
+
+   if(gFpaDebugRegG != 0)
+      ptrA->frame_dly_cst = (uint32_t)gFpaDebugRegG;
+   else
+      ptrA->frame_dly_cst = (uint32_t)2000;
+
+   if(gFpaDebugRegE != 0)
+      ptrA->op_frame_time = ptrA->op_frame_time - (uint32_t)gFpaDebugRegE;
+   else
+      ptrA->op_frame_time = ptrA->op_frame_time - 3;
+
    //-----------------------------------------
    // op : cmd serielle
    //-----------------------------------------
    ptrA->op_cmd_id                       = 0x8500;                          // n'est pas utilisé par le vhd mais par le diverC
-   ptrA->op_cmd_data_size                = 19;                              // taille de la partie donnée exclusivement
+   ptrA->op_cmd_data_size                = 23;                              // taille de la partie donnée exclusivement
    ptrA->op_cmd_dlen                     = ptrA->op_cmd_data_size + 1;      // taille de la partie donnée + taille de l'adresse d'offset
    ptrA->op_cmd_sof_add                  = (uint32_t)AW_SERIAL_OP_CMD_RAM_ADD;
    ptrA->op_cmd_eof_add                  = ptrA->op_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->op_cmd_dlen;
@@ -602,9 +636,36 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //-----------------------------------------
    // temp : cmd serielle
    //-----------------------------------------
-   ptrA->temp_cmd_id                     = 0x8503;                         // n'est pas utilisé par le vhd mais par le diverC
-   ptrA->temp_cmd_data_size              = 0;
-   ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
+
+
+   if (gFpaDebugRegF == 0) // Normal temp cmd
+   {
+      ptrA->temp_cmd_id                     = 0x8503;                         // n'est pas utilisé par le vhd mais par le diverC
+      ptrA->temp_cmd_data_size              = 0;
+      ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
+   }
+   else // Overide temp cmd
+   {
+      ptrA->temp_cmd_id                     = 0x8500 + (uint32_t)gFpaDebugRegA;                         // n'est pas utilisé par le vhd mais par le diverC
+
+      if (gFpaDebugRegA == 2) //  proxy write
+      {
+         ptrA->temp_cmd_data_size              = 1;
+         ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
+      }
+      else if(gFpaDebugRegA == 3) //  proxy read
+      {
+         ptrA->temp_cmd_data_size              = 0;
+         ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 2;
+      }
+      else//  detector read/write
+      {
+         ptrA->temp_cmd_data_size              = 1;
+         ptrA->temp_cmd_dlen                   = ptrA->temp_cmd_data_size + 1;
+      }
+
+   }
+
    ptrA->temp_cmd_sof_add                = (uint32_t)AW_SERIAL_TEMP_CMD_RAM_ADD;
    ptrA->temp_cmd_eof_add                = ptrA->temp_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->temp_cmd_dlen;     // voir la cmd 0x8503 pour comprendre
    
@@ -614,12 +675,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->outgoing_com_hder               = 0xAA;
    ptrA->incoming_com_hder               = 0x55;
    ptrA->incoming_com_fail_id            = 0xFFFF;
-   ptrA->incoming_com_ovh_len            = 5;
+   ptrA->incoming_com_ovh_len            = 6;
 
    ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
-   if (gPrivateStat.fpa_pix_num_per_pclk == 4 && ptrA->proxy_alone_mode == 1){
-      // Le proxy de démarrage (sans détecteur) est configuré par defaut sur 4 canaux (impossible de le configurer autrement).
-      // En utilisant seulement les 2 premiers canaux, on obtient une moitié d'image (768 lignes de 1920 pixels).
+   if (gPrivateStat.fpa_pix_num_per_pclk == 4){
       ptrA->fpa_serdes_lval_num >>= 1;
    }
    else if (gPrivateStat.fpa_pix_num_per_pclk == 8)
@@ -639,8 +698,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    FPA_SendOperational_SerialCmd(ptrA);            // on envoie la partie serielle de la commande operationnelle (elle est stockée dans une autre partie de la RAM en vhd)
    WriteStruct(ptrA);                              // on envoie la partie structurelle
    
-      // statuts privés
-   if (gFpaDebugRegB == 1)
+// statuts privés
+   if (gFpaDetectorPolarizationVoltage == 1)
    {
    
       FPA_PRINTF("gPrivateStat.fpa_diag_mode                              = %d", gPrivateStat.fpa_diag_mode                             );
@@ -658,7 +717,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("gPrivateStat.diag_xsize_div_tapnum                      = %d", gPrivateStat.diag_xsize_div_tapnum                     );
       FPA_PRINTF("gPrivateStat.diag_lovh_mclk_source                      = %d", gPrivateStat.diag_lovh_mclk_source                     );
       FPA_PRINTF("gPrivateStat.real_mode_active_pixel_dly                 = %d", gPrivateStat.real_mode_active_pixel_dly                );
-      FPA_PRINTF("gPrivateStat.spare                                      = %d", gPrivateStat.spare                                     );
       FPA_PRINTF("gPrivateStat.aoi_data_sol_pos                           = %d", gPrivateStat.aoi_data_sol_pos                          );
       FPA_PRINTF("gPrivateStat.aoi_data_eol_pos                           = %d", gPrivateStat.aoi_data_eol_pos                          );
       FPA_PRINTF("gPrivateStat.aoi_flag1_sol_pos                          = %d", gPrivateStat.aoi_flag1_sol_pos                         );
@@ -672,7 +730,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("gPrivateStat.op_frame_time                              = %d", gPrivateStat.op_frame_time                             );
       FPA_PRINTF("gPrivateStat.op_gain                                    = %d", gPrivateStat.op_gain                                   );
       FPA_PRINTF("gPrivateStat.op_int_mode                                = %d", gPrivateStat.op_int_mode                               );
-      FPA_PRINTF("gPrivateStat.op_test_mode                               = %d", gPrivateStat.op_test_mode                              );
       FPA_PRINTF("gPrivateStat.op_det_vbias                               = %d", gPrivateStat.op_det_vbias                              );
       FPA_PRINTF("gPrivateStat.op_det_ibias                               = %d", gPrivateStat.op_det_ibias                              );
       FPA_PRINTF("gPrivateStat.op_binning                                 = %d", gPrivateStat.op_binning                                );
@@ -725,7 +782,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("ptrA->diag_xsize_div_tapnum                      = %d", ptrA->diag_xsize_div_tapnum                       );
       FPA_PRINTF("ptrA->diag_lovh_mclk_source                      = %d", ptrA->diag_lovh_mclk_source                       );
       FPA_PRINTF("ptrA->real_mode_active_pixel_dly                 = %d", ptrA->real_mode_active_pixel_dly                  );
-      FPA_PRINTF("ptrA->spare                                      = %d", ptrA->spare                                       );
       FPA_PRINTF("ptrA->aoi_xsize                                  = %d", ptrA->aoi_xsize                                   );
       FPA_PRINTF("ptrA->aoi_ysize                                  = %d", ptrA->aoi_ysize                                   );
       FPA_PRINTF("ptrA->aoi_data_sol_pos                           = %d", ptrA->aoi_data_sol_pos                            );
@@ -741,7 +797,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("ptrA->op_frame_time                              = %d", ptrA->op_frame_time                               );
       FPA_PRINTF("ptrA->op_gain                                    = %d", ptrA->op_gain                                     );
       FPA_PRINTF("ptrA->op_int_mode                                = %d", ptrA->op_int_mode                                 );
-      FPA_PRINTF("ptrA->op_test_mode                               = %d", ptrA->op_test_mode                                );
       FPA_PRINTF("ptrA->op_det_vbias                               = %d", ptrA->op_det_vbias                                );
       FPA_PRINTF("ptrA->op_det_ibias                               = %d", ptrA->op_det_ibias                                );
       FPA_PRINTF("ptrA->op_binning                                 = %d", ptrA->op_binning                                  );
@@ -784,7 +839,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("ptrA->fpa_serdes_lval_len                        = %d", ptrA->fpa_serdes_lval_len                         );
       FPA_PRINTF("ptrA->int_clk_period_factor                      = %d", ptrA->int_clk_period_factor                       );
       FPA_PRINTF("ptrA->int_time_offset                            = %d", ptrA->int_time_offset                             );
-      FPA_PRINTF("ptrA->proxy_alone_mode                           = %d", ptrA->proxy_alone_mode                            );
    }
    
 }
@@ -795,44 +849,53 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 {
 
+   extern int32_t gFpaDebugRegF;
    float diode_voltage;
    float temperature = 0.0F;
-   
-   FPA_GetStatus(&gStat, ptrA);
-   FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle
-   FPA_ReadTemperature_StructCmd(ptrA);      // envoi un interrupt au contrôleur du hw driver
-   
-   if ((uint32_t)(gStat.fpa_temp_raw & 0x0000FFFF) == (uint32_t)VHD_INVALID_TEMP){
-      return FPA_INVALID_TEMP;
-   }
-   else {
-      diode_voltage = (float)(gStat.fpa_temp_raw & 0x0000FFFF) * 0.000125F;
-      
-      // utilisation  des valeurs de flashsettings
-      temperature  = flashSettings.FPATemperatureConversionCoef5 * powf(diode_voltage,5);
-      temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
-      temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
-      temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
-      temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
-      temperature += flashSettings.FPATemperatureConversionCoef0;  
- 
-      // Si flashsettings non programmés alors on utilise les valeurs par defaut
-      if ((flashSettings.FPATemperatureConversionCoef5 == 0) && (flashSettings.FPATemperatureConversionCoef4 == 0) &&
-            (flashSettings.FPATemperatureConversionCoef3 == 0) && (flashSettings.FPATemperatureConversionCoef2 == 0) &&
-            (flashSettings.FPATemperatureConversionCoef1 == 0) && (flashSettings.FPATemperatureConversionCoef0 == 0))
-      {
-         // courbe de conversion de SCD
-         temperature  =  1655.2F * powf(diode_voltage,5);
-         temperature -=  6961.7F * powf(diode_voltage,4);
-         temperature += 11235.0F * powf(diode_voltage,3);
-         temperature -=  8844.0F * powf(diode_voltage,2);
-         temperature += (2941.5F * diode_voltage) + 77.3F;
+
+   if (gFpaDebugRegF == 0) // Normal temp cmd
+   {
+      FPA_GetStatus(&gStat, ptrA);
+      FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle
+      FPA_ReadTemperature_StructCmd(ptrA);      // envoi un interrupt au contrôleur du hw driver
+
+      if ((uint32_t)(gStat.fpa_temp_raw & 0x0000FFFF) == (uint32_t)VHD_INVALID_TEMP){
+         return FPA_INVALID_TEMP;
       }
-      
-      if (ptrA->proxy_alone_mode == 1)
-         return FPA_COOLER_TEMP_THRES; // Centi celsius
       else
-         return K_TO_CC(temperature); // Centi celsius
+      {
+         diode_voltage = (float)(gStat.fpa_temp_raw & 0x0000FFFF) * 0.000125F;
+
+         // utilisation  des valeurs de flashsettings
+         temperature  = flashSettings.FPATemperatureConversionCoef5 * powf(diode_voltage,5);
+         temperature += flashSettings.FPATemperatureConversionCoef4 * powf(diode_voltage,4);
+         temperature += flashSettings.FPATemperatureConversionCoef3 * powf(diode_voltage,3);
+         temperature += flashSettings.FPATemperatureConversionCoef2 * powf(diode_voltage,2);
+         temperature += flashSettings.FPATemperatureConversionCoef1 * diode_voltage;
+         temperature += flashSettings.FPATemperatureConversionCoef0;
+
+         // Si flashsettings non programmés alors on utilise les valeurs par defaut
+         if ((flashSettings.FPATemperatureConversionCoef5 == 0) && (flashSettings.FPATemperatureConversionCoef4 == 0) &&
+               (flashSettings.FPATemperatureConversionCoef3 == 0) && (flashSettings.FPATemperatureConversionCoef2 == 0) &&
+               (flashSettings.FPATemperatureConversionCoef1 == 0) && (flashSettings.FPATemperatureConversionCoef0 == 0))
+         {
+            // courbe de conversion de SCD
+            temperature  =  1655.2F * powf(diode_voltage,5);
+            temperature -=  6961.7F * powf(diode_voltage,4);
+            temperature += 11235.0F * powf(diode_voltage,3);
+            temperature -=  8844.0F * powf(diode_voltage,2);
+            temperature += (2941.5F * diode_voltage) + 77.3F;
+         }
+
+
+           return K_TO_CC(temperature); // Centi celsius
+      }
+   }
+   else
+   {
+      FPA_ReadTemperature_SerialCmd(ptrA);      // envoi la commande serielle
+      FPA_ReadTemperature_StructCmd(ptrA);      // envoi un interrupt au contrôleur du hw driver
+      return FPA_COOLER_TEMP_THRES;
    }
 }
 
@@ -841,9 +904,8 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
-   float fr_max;;
+   float fr_max;
    bb1920D_param_t hh;
-
 
    FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
    fr_max = 1.0F / hh.frame_period_min;
@@ -979,21 +1041,20 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
 {
   
    extern int32_t gFpaExposureTimeOffset;
-   extern int32_t gFpaDebugRegE;
 
    ptrH->Fclock_MHz            = (float)FPA_MCLK_RATE_HZ/1E+6;;
    ptrH->Pixel_Reset           =  140.0F; // in us
    ptrH->Pixel_Sample          =  14.0F;  // in us
    ptrH->Frame_read_Init_1     =  28.0F;  // in us
    ptrH->Frame_read_Init_2     =  14.0F;  // in us
-   ptrH->Frame_read_Init_3_clk =  10.0F;  // in us
-   ptrH->Pch1                  =  55.0F;  // in us
-   ptrH->Pch2                  =  50.0F;  // in us
-   ptrH->Ramp1_Start           =  40.0F;  // in us
-   ptrH->Ramp1_Count           =  255.0F; // in us
-   ptrH->No_Ramp               =	 70.0F;  // in us
-   ptrH->ramp2_Start           =  30.0F;  // in us
-   ptrH->ramp2_Count           =  190.0F; // in us
+   ptrH->Frame_read_Init_3_clk =  10.0F;  // in clks
+   ptrH->Pch1                  =  55.0F;  // in clks
+   ptrH->Pch2                  =  50.0F;  // in clks
+   ptrH->Ramp1_Start           =  40.0F;  // in clks
+   ptrH->Ramp1_Count           =  255.0F; // in clks
+   ptrH->No_Ramp               =	 70.0F;  // in clks
+   ptrH->ramp2_Start           =  30.0F;  // in clks
+   ptrH->ramp2_Count           =  190.0F; // in clks
    ptrH->fpa_intg_clk_rate_hz  =  (float)FPA_MCLK_RATE_HZ/(float)FRAME_RESOLUTION_DEFAULT;
    ptrH->int_time_offset_usec  = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
    ptrH->fr_dly                = gFr_dly;                                                     // in second
@@ -1021,13 +1082,11 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->Line_Conversion =  (ptrH->Pch1 + ptrH->Pch2 + ptrH->Ramp1_Start + ptrH->Ramp1_Count + ptrH->No_Ramp + ptrH->ramp2_Start + ptrH->ramp2_Count) / ptrH->Fclock_MHz;
    ptrH->Frame_Read      =  ptrH->number_of_conversions *  MAX(ptrH->Line_Readout, ptrH->Line_Conversion);
 
-  
    ptrH->Frame_Initialization  = ptrH->Frame_read_Init_1 + ptrH->Frame_read_Init_2 + ptrH->Frame_read_Init_3;
    ptrH->pixel_control_time    = 2* ptrH->Pixel_Reset + ptrH->Pixel_Sample + 10.0F;
    ptrH->Frame_Time = (ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F; // en seconde
 
-
-   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead || gFpaDebugRegE == 1){
+   if (pGCRegs->IntegrationMode == IM_IntegrateThenRead){
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
       ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->Frame_Time + ptrH->x_to_next_fsync;
    }
@@ -1036,6 +1095,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
       ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->Frame_Time, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
    }
 
+   //ptrH->frame_period_min = MAX(1/FPA_MAX_FRAME_RATE, ptrH->frame_period_min);
 }
 
 //-------------------------------------------------------
@@ -1062,42 +1122,77 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 {
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
-   
-   // quelques definitions
-   uint8_t cgf_updt_en  = 1;
-   uint8_t frame_en     = 0;
-   uint8_t vdir         = 0;  
-   uint8_t hdir         = 0;
-   uint8_t frm_sync_mod = 0;
-   uint8_t video_rate   = 2; 
-   
+
+   uint8_t cgf_updt_en   = 1;
+   uint8_t frame_en      = 1; // 1 : Enable frame sequence operation (system control)
+   uint8_t vdir          = 1; // 1 : Up: Readout from 1'st row up (decrement)
+   uint8_t hdir          = 0; // 0 : Left to right row readout;
+   uint8_t frm_sync_mod  = 0; // 0 : INTG_DLY start is referred at FSYNC
+   uint8_t video_rate    = 2; // 2 : Half: 2 video ports active (4pixels/cc)
+   uint16_t strow        = 0; // Start address for row readout (0 to 767)
+   uint16_t wsize        = 0; // Vertical window size in 2-row resolution when BINN=0
+   uint8_t slv_adr       = 0x18;  // valeur par defaut
+   uint8_t mtx_intg_low  = 0xb1;  // valeur par lue sur la première unité de BB1920. ATTENTION les bits 0 à 3 sont reserved par SCD.
+   uint32_t int_time     = 0;
+
+
+   if(ptrA->proxy_external_int_ctrl == 1)
+      int_time = 0;
+   else
+      int_time = gPrivateStat.int_time;
+
    if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-      video_rate = 3;        
-   
+      video_rate = 3;
+
+   if(ptrA->op_binning == 0)
+   {
+      strow = (uint16_t)((ptrA->op_ystart >> 1) & 0x000003FF);
+      wsize = ptrA->op_ysize;
+   }
+   else
+   {
+      if(video_rate == 3)
+         strow = (uint16_t)((ptrA->op_ystart >> 3) & 0x000003FF);
+      else
+         strow = (uint16_t)((ptrA->op_ystart >> 2) & 0x000003FF);
+
+      wsize = (uint16_t)((ptrA->op_ysize >> 1) & 0x000003FF);
+   }
+
    // on bâtit la commande
    Cmd.hder           =  ptrA->outgoing_com_hder;
    Cmd.id             =  ptrA->op_cmd_id;
    Cmd.dlen           =  ptrA->op_cmd_dlen;
    Cmd.offs_add       = (((uint8_t)DONOT_SEND_THIS_BYTE & 0xFF) << 8) + 0; // on evite ainsi l'envoi du MSB de offs_add                                  
    Cmd.data[0]        = ((cgf_updt_en & 0x01) << 7) + (frame_en & 0x01) ;  
-   Cmd.data[1]        =   ptrA->op_ystart & 0xFF;
-   Cmd.data[2]        = ((ptrA->op_binning & 0x01) << 7) + ((vdir & 0x01) << 6) + ((hdir & 0x01) << 5) + ((ptrA->op_ystart & 0x0300) >> 8);
-   Cmd.data[3]        =   ptrA->op_ysize & 0xFF;           
-   Cmd.data[4]        = ((ptrA->op_ysize & 0x0300) >> 8);                               
-   Cmd.data[5]        =   ptrA->op_frame_time & 0xFF;                
-   Cmd.data[6]        = ((ptrA->op_frame_time & 0xFF00) >> 8);                
-   Cmd.data[7]        = ((frm_sync_mod & 0x01) << 7) + ((ptrA->op_gain & 0x07) << 4) + ((ptrA->op_frame_time & 0xF0000) >> 16);					  
-   Cmd.data[8]        =   gPrivateStat.frame_dly & 0xFF;
-   Cmd.data[9]        = ((gPrivateStat.frame_dly & 0xFF00) >> 8);
-   Cmd.data[10]       = ((gPrivateStat.frame_dly & 0xF0000) >> 16);
-   Cmd.data[11]       =   gPrivateStat.int_dly & 0xFF;
-   Cmd.data[12]       = ((gPrivateStat.int_dly & 0xFF00) >> 8);
-   Cmd.data[13]       = ((gPrivateStat.int_dly & 0xF0000) >> 16);
-   Cmd.data[14]       =	  gPrivateStat.int_time & 0xFF;
-   Cmd.data[15]       = ((gPrivateStat.int_time & 0xFF00) >> 8);
-   Cmd.data[16]       = ((gPrivateStat.int_time & 0xF0000) >> 16);
-   Cmd.data[17]       =  (video_rate & 0x03);                        
+   Cmd.data[1]        =   strow & 0xFF;
+   Cmd.data[2]        = ((ptrA->op_binning & 0x01) << 7) + ((vdir & 0x01) << 6) + ((hdir & 0x01) << 5) + ((strow & 0x0300) >> 8);
+   Cmd.data[3]        =   wsize & 0xFF;
+   Cmd.data[4]        = ((wsize & 0x0300) >> 8);
+   Cmd.data[5]        =   ptrA->op_frame_time & 0xFF;
+   Cmd.data[6]        = ((ptrA->op_frame_time & 0xFF00) >> 8);
+   Cmd.data[7]        = ((frm_sync_mod & 0x01) << 7) + ((ptrA->op_gain & 0x07) << 4) + ((ptrA->op_frame_time & 0xF0000) >> 16);
+   Cmd.data[8]        =   ptrA->frame_dly_cst & 0xFF;
+   Cmd.data[9]        = ((ptrA->frame_dly_cst & 0xFF00) >> 8);
+   Cmd.data[10]       = ((ptrA->frame_dly_cst & 0xF0000) >> 16);
+   Cmd.data[11]       =   ptrA->int_dly_cst & 0xFF;
+   Cmd.data[12]       = ((ptrA->int_dly_cst & 0xFF00) >> 8);
+   Cmd.data[13]       = ((ptrA->int_dly_cst & 0xF0000) >> 16);
+   Cmd.data[14]       =	  int_time & 0xFF;
+   Cmd.data[15]       = ((int_time & 0xFF00) >> 8);
+   Cmd.data[16]       = ((int_time & 0xF0000) >> 16);
+   Cmd.data[17]       =  (video_rate & 0x03);
    Cmd.data[18]       = ((ptrA->op_det_vbias & 0x0F) << 4) + ((ptrA->op_det_ibias & 0x03) << 2);
+
+
+
+   // Pour test avec mtx_intg_low...
+   Cmd.data[19]        = (mtx_intg_low & 0xFF);
+   Cmd.data[20]        = (slv_adr & 0x7F);
+   Cmd.data[21]        =  ptrA->synth_frm_res & 0x7F;
+   Cmd.data[22]        = ((ptrA->synth_frm_dat & 0x03) << 6) +  ((uint8_t)ptrA->vid_if_bit_en & 0x01);
+
+
    Cmd.data_size      =  ptrA->op_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->op_cmd_dlen + 1;     // +1 pour le checksum
    Cmd.bram_sof_add   =  ptrA->op_cmd_sof_add;
@@ -1117,11 +1212,10 @@ void FPA_SendSynthVideo_SerialCmd(const t_FpaIntf *ptrA)
 {
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
-   
+
    // quelques definitions
    uint8_t slv_adr        = 0x18;                        // valeur par defaut
-   uint8_t vid_if_bit_en  = ptrA->op_test_mode;          //
-   
+
    // on bâtit la commande
    Cmd.hder           =  ptrA->outgoing_com_hder;
    Cmd.id             =  ptrA->synth_cmd_id;
@@ -1129,7 +1223,7 @@ void FPA_SendSynthVideo_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.offs_add       = (((uint8_t)DONOT_SEND_THIS_BYTE & 0xFF) << 8) + 20; // on evite ainsi l'envoi du MSB de offs_add
    Cmd.data[0]        = (slv_adr & 0x7F);  
    Cmd.data[1]        =  ptrA->synth_frm_res & 0x7F;
-   Cmd.data[2]        = ((ptrA->synth_frm_dat & 0x03) << 6) +  vid_if_bit_en;
+   Cmd.data[2]        = ((ptrA->synth_frm_dat & 0x03) << 6) +  ((uint8_t)ptrA->vid_if_bit_en & 0x01);
    Cmd.data_size      =  ptrA->synth_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->synth_cmd_dlen + 1;     // +1 pour le checksum
    Cmd.bram_sof_add   =  ptrA->synth_cmd_sof_add;
@@ -1149,12 +1243,26 @@ void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA)
 {    
    Command_t Cmd;
    ScdPacketTx_t ScdPacketTx;
-	
+	extern int32_t gFpaDebugRegA, gFpaDebugRegB, gFpaDebugRegD, gFpaDebugRegF ;
+
    // on bâtit la commande
    Cmd.hder           =  ptrA->outgoing_com_hder;
    Cmd.id             =  ptrA->temp_cmd_id;
    Cmd.dlen           =  ptrA->temp_cmd_dlen;
-   Cmd.offs_add       =  0;                     
+
+   if(gFpaDebugRegF == 0)
+   {
+      Cmd.offs_add       =  0;
+   }
+   else
+   {
+      if (gFpaDebugRegA > 1)
+         Cmd.offs_add       =  (uint16_t)gFpaDebugRegD;
+      else
+         Cmd.offs_add       =  (((uint8_t)DONOT_SEND_THIS_BYTE & 0xFF) << 8) + (uint16_t)gFpaDebugRegD;
+      Cmd.data[0]        = (uint8_t)gFpaDebugRegB;
+   }
+
    Cmd.data_size      =  ptrA->temp_cmd_data_size;
    Cmd.total_len      =  ptrA->outgoing_com_ovh_len + ptrA->temp_cmd_dlen + 1;     // +1 pour le checksum
    Cmd.bram_sof_add   =  ptrA->temp_cmd_sof_add;
@@ -1244,54 +1352,52 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->diag_xsize_div_tapnum                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x30);
    PrivateStat->diag_lovh_mclk_source                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x34);
    PrivateStat->real_mode_active_pixel_dly               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x38);
-   PrivateStat->spare                                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x3C);
-   PrivateStat->aoi_data_sol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x40);
-   PrivateStat->aoi_data_eol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x44);
-   PrivateStat->aoi_flag1_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x48);
-   PrivateStat->aoi_flag1_eol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x4C);
-   PrivateStat->aoi_flag2_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x50);
-   PrivateStat->aoi_flag2_eol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x54);
-   PrivateStat->op_xstart                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x58);
-   PrivateStat->op_ystart                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x5C);
-   PrivateStat->op_xsize                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x60);
-   PrivateStat->op_ysize                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x64);
-   PrivateStat->op_frame_time                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x68);
-   PrivateStat->op_gain                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x6C);
-   PrivateStat->op_int_mode                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x70);
-   PrivateStat->op_test_mode                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x74);
-   PrivateStat->op_det_vbias                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x78);
-   PrivateStat->op_det_ibias                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x7C);
-   PrivateStat->op_binning                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x80);
-   PrivateStat->op_output_rate                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x84);
-   PrivateStat->op_cfg_num                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x88);
-   PrivateStat->int_cmd_id                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x8C);
-   PrivateStat->int_cmd_dlen                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x90);
-   PrivateStat->int_cmd_offs                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x94);
-   PrivateStat->int_cmd_sof_add                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x98);
-   PrivateStat->int_cmd_eof_add                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x9C);
-   PrivateStat->int_cmd_sof_add_m1                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA0);
-   PrivateStat->int_checksum_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA4);
-   PrivateStat->frame_dly_cst                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA8);
-   PrivateStat->int_dly_cst                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xAC);
-   PrivateStat->op_cmd_id                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB0);
-   PrivateStat->op_cmd_sof_add                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB4);
-   PrivateStat->op_cmd_eof_add                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB8);
-   PrivateStat->temp_cmd_id                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xBC);
-   PrivateStat->temp_cmd_sof_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC0);
-   PrivateStat->temp_cmd_eof_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC4);
-   PrivateStat->outgoing_com_hder                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC8);
-   PrivateStat->incoming_com_hder                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xCC);
-   PrivateStat->incoming_com_fail_id                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD0);
-   PrivateStat->incoming_com_ovh_len                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD4);
-   PrivateStat->fpa_serdes_lval_num                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD8);
-   PrivateStat->fpa_serdes_lval_len                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xDC);
-   PrivateStat->int_clk_period_factor                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE0);
-   PrivateStat->fpa_pix_num_per_pclk                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE4);
-   PrivateStat->fpa_exp_time_conv_denom_bit_pos          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
-   PrivateStat->frame_dly                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
-   PrivateStat->int_dly                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
-   PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF4);
-   PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF8);
+   PrivateStat->aoi_data_sol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x3C);
+   PrivateStat->aoi_data_eol_pos                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x40);
+   PrivateStat->aoi_flag1_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x44);
+   PrivateStat->aoi_flag1_eol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x48);
+   PrivateStat->aoi_flag2_sol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x4C);
+   PrivateStat->aoi_flag2_eol_pos                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x50);
+   PrivateStat->op_xstart                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x54);
+   PrivateStat->op_ystart                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x58);
+   PrivateStat->op_xsize                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x5C);
+   PrivateStat->op_ysize                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x60);
+   PrivateStat->op_frame_time                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x64);
+   PrivateStat->op_gain                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x68);
+   PrivateStat->op_int_mode                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x6C);
+   PrivateStat->op_det_vbias                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x70);
+   PrivateStat->op_det_ibias                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x74);
+   PrivateStat->op_binning                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x78);
+   PrivateStat->op_output_rate                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x7C);
+   PrivateStat->op_cfg_num                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x80);
+   PrivateStat->int_cmd_id                               = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x84);
+   PrivateStat->int_cmd_dlen                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x88);
+   PrivateStat->int_cmd_offs                             = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x8C);
+   PrivateStat->int_cmd_sof_add                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x90);
+   PrivateStat->int_cmd_eof_add                          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x94);
+   PrivateStat->int_cmd_sof_add_m1                       = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x98);
+   PrivateStat->int_checksum_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x9C);
+   PrivateStat->frame_dly_cst                            = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA0);
+   PrivateStat->int_dly_cst                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA4);
+   PrivateStat->op_cmd_id                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xA8);
+   PrivateStat->op_cmd_sof_add                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xAC);
+   PrivateStat->op_cmd_eof_add                           = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB0);
+   PrivateStat->temp_cmd_id                              = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB4);
+   PrivateStat->temp_cmd_sof_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xB8);
+   PrivateStat->temp_cmd_eof_add                         = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xBC);
+   PrivateStat->outgoing_com_hder                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC0);
+   PrivateStat->incoming_com_hder                        = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC4);
+   PrivateStat->incoming_com_fail_id                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xC8);
+   PrivateStat->incoming_com_ovh_len                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xCC);
+   PrivateStat->fpa_serdes_lval_num                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD0);
+   PrivateStat->fpa_serdes_lval_len                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD4);
+   PrivateStat->int_clk_period_factor                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD8);
+   PrivateStat->fpa_pix_num_per_pclk                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xDC);
+   PrivateStat->fpa_exp_time_conv_denom_bit_pos          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE0);
+   PrivateStat->frame_dly                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE4);
+   PrivateStat->int_dly                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
+   PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
+   PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
 }
 
 float FPA_ConvertSecondToFrameTimeResolution(float seconds)

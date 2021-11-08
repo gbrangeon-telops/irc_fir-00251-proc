@@ -36,7 +36,7 @@ entity scd_proxy2_dout is
       DOUT               : out std_logic_vector(35 downto 0);
       DOUT_DVAL          : out std_logic;
       
-      PROXY_ALONE_MODE   : in std_logic 
+      VID_IF_BIT_EN      : in std_logic 
       
       );
 end scd_proxy2_dout;
@@ -201,7 +201,7 @@ begin
          if sreset = '1' then             
             frame_init_tag <= CBITS_FRM_IDLE_ID;
          else		 
-            if PROXY_ALONE_MODE = '1' then 
+            if VID_IF_BIT_EN = '1' then 
                frame_init_tag <= CBITS_FRM_IDLE_TST_PTRN_ID;
             else  
                frame_init_tag <= CBITS_FRM_IDLE_ID;

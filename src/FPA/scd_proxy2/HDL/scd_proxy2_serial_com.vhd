@@ -187,7 +187,6 @@ architecture RTL of scd_proxy2_serial_com is
    --attribute dont_touch of resp_dcnt            : signal is "true";
    --attribute dont_touch of resp_id              : signal is "true";
    
-   
 begin
    
    acq_mode <= TRIG_CTLER_STAT(4);
@@ -456,14 +455,7 @@ begin
                when latch_data_st =>          -- on latche le byte lu
                   ram2_rd_i <= '0';                  
                   if RAM2_RD_DVAL = '1' then 
-                     -- En mode proxy_alone il ne faut pas envoyer de commande au ROIC. 
-                     -- Sinon le proxy arrete de sortir le test pattern.
-                     -- On transforme donc toute commandes en commande de type "proxy field read".
-                     if USER_CFG.PROXY_ALONE_MODE = '1' and ram2_rd_add_i = 1 then
-                        cfg_byte <= x"03";
-                     else
-                        cfg_byte <= RAM2_RD_DATA; 
-                     end if;
+                     cfg_byte <= RAM2_RD_DATA; 
                      cfg_mgmt_fsm <= send_cfg_out_st; 
                   end if;
                
@@ -516,11 +508,7 @@ begin
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;                                        
                   else
                      if timeout_cnt = 5_000_000 then   -- donne 50 ms sec au proxy pour donner une réponse
-                        if USER_CFG.PROXY_ALONE_MODE = '1' then
-                           cfg_mgmt_fsm <= cmd_resp_mgmt_st; 
-                        else 
                            cfg_mgmt_fsm <= timeout_mgmt_st;
-                        end if;
                      end if;
                      -- pragma translate_off                     
                      cfg_mgmt_fsm <= cmd_resp_mgmt_st;
@@ -723,7 +711,7 @@ begin
                
             end case; 
             
-            if USER_CFG.PROXY_ALONE_MODE = '1' then 
+            if USER_CFG.failure_resp_management = '0' then 
                proxy_serial_err <= '0';
                resp_err <= (others => '0');  
             end if;

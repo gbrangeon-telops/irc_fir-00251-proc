@@ -30,8 +30,7 @@ package FPA_define is
    
    constant DEFINE_FPA_ROIC                        : std_logic_vector(7 downto 0) := FPA_ROIC_BLACKBIRD1920;  	-- roic du détecteur. Cela veut dire que le vhd actuel peut contrôler in détecteur de ce type qque soit le cooler.
    constant DEFINE_FPA_OUTPUT                      : std_logic_vector(1 downto 0) := OUTPUT_DIGITAL; 
-   constant DEFINE_FPA_INIT_CFG_NEEDED             : std_logic  := '0';     									-- pas besoin de config particulière au demarrage du PelicanD
-   constant DEFINE_FPA_INT_FBK_AVAILABLE           : std_logic  := '0';   
+   constant DEFINE_FPA_INIT_CFG_NEEDED             : std_logic  := '0';     									-- pas besoin de config particulière au demarrage du PelicanD  
     
    constant DEFINE_INT_CLK_SOURCE_RATE_KHZ         : integer    := 70_000;           -- frequence de l'horloge source de laquelle est tirée celle de INT
    constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ    : integer    := 70_000;           -- frequence de l'horloge source de laquelle est tirée celle de ADC_QUAD_CLK

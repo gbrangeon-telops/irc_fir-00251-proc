@@ -30,8 +30,7 @@ entity scd_proxy2_prog_ctrler is
       USER_CFG_IN_PROGRESS : in std_logic;          -- à '1' lorsque USER_CFG et son équivalent seriel sont en cours d'envoi
       
       READOUT              : in std_logic;
-      
-      PROXY_INT_FBK        : in std_logic;
+
       PROXY_POWERED        : in std_logic;
       
       FPA_POWER            : in std_logic;
@@ -55,6 +54,7 @@ entity scd_proxy2_prog_ctrler is
       
       PROXY_PWR            : out std_logic;
       PROXY_TRIG           : out std_logic;
+      PROXY_INTEGRATE      : out std_logic;
       FPA_DRIVER_STAT      : out std_logic_vector(31 downto 0);
       FRAME_ID             : out std_logic_vector(31 downto 0); --  synchronisé avec ACQ_INT
       INT_INDX             : out std_logic_vector(7 downto 0);
@@ -63,7 +63,7 @@ entity scd_proxy2_prog_ctrler is
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic;
       
-      FPA_SERDES_STAT      : in fpa_serdes_stat_type;     
+      FPA_SERDES_STAT      : in fpa_serdes_stat_type;  
       INIT_IN_PROGRESS     : in std_logic
       
       );                 
@@ -86,10 +86,22 @@ architecture rtl of scd_proxy2_prog_ctrler is
          PULSE            : out std_logic);
    end component;
    
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, check_cfg_st0, check_cfg_st, pause_st1, pause_st2, 
    output_op_cfg_st, output_synth_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, wait_updater_rdy_st, wait_updater_run_st, wait_updater_end_st);
-   type int_gen_fsm_type is (idle, check_fpa_st, intg_dly_st,int_gen_st1, int_gen_st2, param_st);
+   type int_gen_fsm_type is (idle, intg_dly_st,int_gen_st1, int_gen_st2, param_st);
    type new_cfg_pending_fsm_type is(init_st, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_synth_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
@@ -114,8 +126,6 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal ser_param_i               : serial_param_type;
    signal user_cfg_latch            : fpa_intf_cfg_type;
    signal cnt                       : unsigned(USER_CFG.INT.INT_SIGNAL_HIGH_TIME'LENGTH-1 downto 0);
-   signal proxy_int_feedbk_i        : std_logic;
-   signal proxy_int_feedbk_last     : std_logic;
    signal acq_frame                 : std_logic;
    signal user_cfg_in_progress_last : std_logic;
    signal int_indx_i                : std_logic_vector(7 downto 0); 
@@ -135,7 +145,9 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal proxy_pwr_i               : std_logic;
    signal int_clk_pulse_i           : std_logic;
    signal int_i                     : std_logic;
-   signal serdes_rdy_i              : std_logic;
+   signal serdes_rdy_i              : std_logic; 
+   signal iddca_rdy_i               : std_logic := '0'; 
+   signal init_in_progress_i        : std_logic := '1'; 
    
    
 begin
@@ -144,16 +156,18 @@ begin
    -------------------------------------------------
    -- mappings                                                   
    -------------------------------------------------
-   SERIAL_PARAM   <= ser_param_i;
-   INT_INDX       <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
-   FRAME_ID       <= std_logic_vector(frame_id_i);   --  synchronsié avec ACQ_INT
-   ACQ_INT        <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
-   FPA_INT        <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
-   PROXY_TRIG     <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_proxy2_driver_output 
-   FPA_INTF_CFG   <= fpa_intf_cfg_i;  -- sortie de la config
-   RST_CLINK_N    <= reset_clink_n;
-   INT_TIME       <= int_time_i;
-   PROXY_PWR      <= proxy_pwr_i;
+   SERIAL_PARAM    <= ser_param_i;
+   INT_INDX        <= int_indx_i;                     --  synchronsié avec ACQ_INT et FPA_INT
+   FRAME_ID        <= std_logic_vector(frame_id_i);   --  synchronsié avec ACQ_INT
+   ACQ_INT         <= acq_int_i;  -- acq_int_i n'existe pas en extraTrig. De plus il signale à coup sûre une integration. Ainsi toute donnée de detecteur ne faisant pas suite à acq_trig, provient de extra_trig
+   FPA_INT         <= fpa_int_i;   -- fpa_int_i existe pour toute integration (que l'image soit à envoyer dans la chaine ou non)
+   PROXY_TRIG      <= ACQ_TRIG or XTRA_TRIG; -- PROXY_TRIG sera regeneré avec la durée adequate et avec une bascule dans le module scd_proxy2_driver_output 
+   PROXY_INTEGRATE <= acq_int_i; 
+   
+   FPA_INTF_CFG    <= fpa_intf_cfg_i;  -- sortie de la config
+   RST_CLINK_N     <= reset_clink_n;
+   INT_TIME        <= int_time_i;
+   PROXY_PWR       <= proxy_pwr_i;
    
    
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
@@ -168,10 +182,13 @@ begin
    FPA_DRIVER_STAT(0) <= fpa_driver_done;   --
    
    
+   U1A: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => INIT_IN_PROGRESS, CLK => CLK, Q => init_in_progress_i);
+
+   
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1B : sync_reset
    port map(
       ARESET => ARESET,
       CLK    => CLK,
@@ -190,11 +207,13 @@ begin
             fpa_powered <= '0';
             reset_clink_n <= '0';
          else                  
-            proxy_pwr_i <= FPA_POWER; 
+            proxy_pwr_i <= FPA_POWER;   
+            iddca_rdy_i <= USER_CFG.iddca_rdy;
+            
             fpa_powered <= PROXY_POWERED and PROXY_RDY;  -- PROXY_POWERED signifie que le proxy est juste allumé. PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès.              
-            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
-            end if;               
-         end if;          
+            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done and iddca_rdy_i;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
+         end if;               
+      end if;          
    end process;
    
    ------------------------------------------------
@@ -215,8 +234,8 @@ begin
             
          else 
             
-            user_cfg_in_progress_i <= USER_CFG_IN_PROGRESS;  -- 
-            user_cfg_in_progress_last <= user_cfg_in_progress_i;
+            user_cfg_in_progress_i <= USER_CFG_IN_PROGRESS;  
+            user_cfg_in_progress_last <= user_cfg_in_progress_i; 
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
@@ -226,7 +245,7 @@ begin
             new_cfg.synth <= USER_CFG.SYNTH;
             
             -- serdes rdy
-            serdes_rdy_i <= and_reduce(FPA_SERDES_STAT.DONE) and and_reduce(FPA_SERDES_STAT.SUCCESS) and not INIT_IN_PROGRESS;
+            serdes_rdy_i <= and_reduce(FPA_SERDES_STAT.DONE) and and_reduce(FPA_SERDES_STAT.SUCCESS) and not init_in_progress_i;
             
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
@@ -237,7 +256,7 @@ begin
                
                when check_cfg_st0 =>
                   if new_cfg.synth /= present_cfg.synth then
-                     new_cfg_pending_fsm <= new_synth_cfg_st;					 
+                     new_cfg_pending_fsm <= new_synth_cfg_st;	
                   else
                      new_cfg_pending_fsm <= check_cfg_st1;
                   end if;
@@ -250,8 +269,8 @@ begin
                   end if;
                   
                when check_cfg_st2 =>
-                  if new_cfg.int /= present_cfg.int then
-                     new_cfg_pending_fsm <= new_int_cfg_st;					 
+                  if new_cfg.int /= present_cfg.int  then
+                     new_cfg_pending_fsm <= new_int_cfg_st;	 				 
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;  
                   end if;
@@ -591,19 +610,13 @@ begin
          if sreset = '1' then 
             int_gen_fsm <= idle;
             acq_int_i <= '0'; 
-            proxy_int_feedbk_i <= '0';
-            proxy_int_feedbk_last <= '0';
             frame_id_i <= (others => '0');
             acq_frame <= '0';
-            -- int_indx_i <= (others => '0');
-            -- int_time_i <= (others => '0');
             fpa_int_i <= '0';
             int_i <= '0';
             
          else
             
-            proxy_int_feedbk_i <= PROXY_INT_FBK;
-            proxy_int_feedbk_last <= proxy_int_feedbk_i;
             
             fpa_int_i <= int_i;
             acq_int_i <= int_i and acq_frame and (fpa_intf_cfg_i.comn.fpa_diag_mode or PROXY_RDY);
@@ -626,22 +639,8 @@ begin
                
                when param_st =>
                   int_indx_i <= fpa_intf_cfg_i.int.int_indx;
-                  int_time_i <= std_logic_vector(resize(fpa_intf_cfg_i.int.int_time, 32));
-                  if fpa_intf_cfg_i.comn.fpa_diag_mode = '1' then              
-                     int_gen_fsm <= intg_dly_st;
-                  else
-                     int_gen_fsm <= check_fpa_st; 
-                  end if;                  
-               
-               when check_fpa_st =>                  
-                  if DEFINE_FPA_INT_FBK_AVAILABLE = '1' then                  -- FPA_INT_TIME_FBK_AVAILABLE dans fpa_define et dit si le proxy peut nous renvoyer un feedback d'intégration
-                     int_i <= PROXY_INT_FBK;
-                     if proxy_int_feedbk_i = '0' and proxy_int_feedbk_last = '1' then -- on attend la fin du feedback
-                        int_gen_fsm <= idle;
-                     end if;
-                  else
-                     int_gen_fsm <= intg_dly_st;           -- sinon, nous generons le feedback comme on le ferait en mode diag
-                  end if;     
+                  int_time_i <= std_logic_vector(resize(fpa_intf_cfg_i.int.int_time, 32));                
+                  int_gen_fsm <= intg_dly_st; 
                   
                when intg_dly_st =>  
                   if int_clk_pulse_i = '1' then 
