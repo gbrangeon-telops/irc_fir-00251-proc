@@ -51,6 +51,7 @@
 #include "SightLineSLAProtocol.h"
 #include "GC_Store.h"
 #include "mgt_ctrl.h"
+#include "fpa_intf.h"
 
 extern t_Trig gTrig;
 extern t_FpaIntf gFpaIntf;

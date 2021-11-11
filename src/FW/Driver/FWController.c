@@ -29,6 +29,7 @@
 #include "GC_Registers.h"
 #include "GC_Events.h"
 #include "SFW_Ctrl.h"
+#include "fpa_intf.h"
 
 #include <string.h>
 #include <stdlib.h>
