@@ -4,7 +4,7 @@
 #ifdef ARCH_FPGA_160
 
 #define SVN_HARDWARE_REV      26938
-#define SVN_SOFTWARE_REV      26940
+#define SVN_SOFTWARE_REV      26955
 #define SVN_BOOTLOADER_REV    26769
 #define SVN_COMMON_REV        26738
 
