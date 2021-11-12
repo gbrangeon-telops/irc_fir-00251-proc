@@ -20,6 +20,7 @@
 #include "utils.h"
 #include "FlashSettings.h"
 #include "RpOpticalProtocol.h"
+#include "HwRevision.h"
 
 #define XADC_CUR_OFFSET -0.005487375F // prev: -0.0936084549572219f
 #define XADC_CUR_GAIN   7.02111675F   // prev: 7.03f
@@ -280,9 +281,11 @@ void xadcCalibrationUpdate(xadcChannel_t *xadcCh)
    float offset = 0.0F;
    uint8_t i = 0;
    static bool firstpass = true;
+   extern brd_rev_ver_t gBrdRevid;
 
 
-   if (xadcCh->isValid)
+   if (xadcCh->isValid &&
+         (gBrdRevid != BRD_REV_00x))   // XADC Ref are not available on this revision
    {
       //Check if the Flash setting reference value are available( not equal 0)
       // REf 1 should be 0.9765625Volt and Ref 2 = 0.099940 Volts
