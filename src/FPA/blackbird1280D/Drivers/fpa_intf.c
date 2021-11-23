@@ -297,6 +297,14 @@ void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
+  uint32_t ExposureAutoBackup;
+
+  ExposureAutoBackup = gcRegsData.ExposureAuto;
+  if(gcRegsData.ExposureAuto != EA_Off)
+     GC_SetExposureAuto(EA_Off);
+  GC_SetExposureTimeSetToMin(1);
+  GC_SetExposureAuto(ExposureAutoBackup);
+
   for(ii = 0; ii <= 10 ; ii++)
   {
      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);

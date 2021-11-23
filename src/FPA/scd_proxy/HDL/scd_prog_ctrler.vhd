@@ -265,7 +265,7 @@ begin
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_int /= present_cfg.scd_int and bb1280_iddca_rdy_i = '1' then
+                  if new_cfg.scd_int /= present_cfg.scd_int then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;  
@@ -562,8 +562,13 @@ begin
                   
                when output_op_cfg_st =>                         -- cet état est crée juste pour ameliorer timing
                   fpa_intf_cfg_i.scd_op <= fpa_ser_cfg_to_update.scd_op;
-                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;
-                  fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_PIXEL_NUM;
+                  fpa_intf_cfg_i.fpa_serdes_lval_num <= fpa_ser_cfg_to_update.scd_op.scd_ysize;  
+                  if SCD_CROPPING_NEEDED = '0' then
+                     fpa_intf_cfg_i.fpa_serdes_lval_len <= fpa_ser_cfg_to_update.scd_op.scd_xsize / PROXY_CLINK_PIXEL_NUM; 
+                  else
+                     fpa_intf_cfg_i.fpa_serdes_lval_len <= to_unsigned(XSIZE_MAX, fpa_intf_cfg_i.fpa_serdes_lval_len'length) / PROXY_CLINK_PIXEL_NUM;
+                  end if;
+                  
                   present_cfg.scd_op <= fpa_ser_cfg_to_update.scd_op;
                   proxy_static_done <= '1';
                   cfg_updater_fsm <= pause_st1;
