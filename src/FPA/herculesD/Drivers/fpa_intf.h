@@ -277,4 +277,6 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
 
+// pour imposer une séquence d'initialisation particulière (seulement utilisé pour BB1280)
+bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
 #endif // __FPA_INTF_H__

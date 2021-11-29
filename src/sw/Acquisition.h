@@ -97,7 +97,8 @@ enum acquisitionStateEnum {
 
    ACQ_POWER_RESET,                     /**< Reset acquisition power state */
 
-   ACQ_WAIT_SCD_TRIG_MODE_TRANSITION    /**< Wait delay required for SCD detector */
+   ACQ_WAIT_SCD_TRIG_MODE_TRANSITION,    /**< Wait delay required for SCD detector */
+   ACQ_WAIT_SCD_SPECIFIC_INIT_SEQ       /**< SCD specific detector initialization sequence */
 };
 
 /**

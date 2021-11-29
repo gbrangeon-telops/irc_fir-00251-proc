@@ -102,6 +102,8 @@
 
 #define SCD_MIN_OPER_FPS (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
+#define SEND_CONFIG_DELAY             TIME_ONE_SECOND_US
+
 // structure de config envoyée au vhd 
 // c'est la commande operationnelle de scd étendue au vhd complet
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
@@ -277,5 +279,24 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
+
+bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
+
+/**
+ * FPA Initialization state.
+ */
+enum fpaInitStateEnum {
+   // Initialization states
+   IDLE = 0,
+   SEND_1ST_FPA_CONFIG,
+   SEND_FRAME_RESOLUTION_CONFIG,
+   SEND_2ND_FPA_CONFIG,
+   START_SERDES_INITIALIZATION
+};
+
+/**
+ * FPA Initialization state data type.
+ */
+typedef enum fpaInitStateEnum fpaInitState_t;
 
 #endif // __FPA_INTF_H__

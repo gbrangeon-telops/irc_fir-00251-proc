@@ -22,6 +22,7 @@
 #include "flashSettings.h"
 #include "utils.h"
 #include "IRC_status.h"
+#include <stdbool.h> // bool
 #include <math.h>
 #include <string.h>
 
@@ -1002,4 +1003,9 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
 {
    // config retournée par le vhd
    PrivateStat->fpa_frame_resolution = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
+}
+
+bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
+{
+   return true;
 }

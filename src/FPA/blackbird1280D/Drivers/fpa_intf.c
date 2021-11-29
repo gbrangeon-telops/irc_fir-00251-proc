@@ -22,9 +22,10 @@
 #include "flashSettings.h"
 #include "utils.h"
 #include "IRC_status.h"
+#include "mb_axi4l_bridge.h"
+#include <stdbool.h> // bool
 #include <math.h>
 #include <string.h>
-#include "mb_axi4l_bridge.h"
 
 // Periode minimale des xtratrigs (utilisé par le hw pour avoir le temps de programmer le détecteur entre les trigs. Commande operationnelle et syhthetique seulement)
 #define SCD_XTRA_TRIG_FREQ_MAX_HZ           SCD_MIN_OPER_FPS
@@ -287,23 +288,16 @@ void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
 
 
 //*--------------------------------------------------------------------------
-//   BB1280 need a specific initialisation sequence. This was demontrated by test performed on proxy electronic alone and with the first detector lend by SCD (also confirmed by SCD).
-//   SCD said that they will probably correct the problem in futur firmware release.
+//   BB1280 need a specific initialization sequence (confirmed by SCD).
+//   SCD said that they will probably correct the problem in future firmware release.
 //   1. No "Integration time command" or "frame resolution command" should be sent before a the first operational command.
-//   2. The serdes initialisation will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
+//   2. The serdes initialization will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
 //       * An operational command followed by a frame resolution command must have been sent.
 //       * The fpa temperature must be in steady state (cooldown finish).
 //--------------------------------------------------------------------------
 void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
-  uint32_t ExposureAutoBackup;
-
-  ExposureAutoBackup = gcRegsData.ExposureAuto;
-  if(gcRegsData.ExposureAuto != EA_Off)
-     GC_SetExposureAuto(EA_Off);
-  GC_SetExposureTimeSetToMin(1);
-  GC_SetExposureAuto(ExposureAutoBackup);
 
   for(ii = 0; ii <= 10 ; ii++)
   {
@@ -396,15 +390,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->scd_gain             = MEDIUM_GAIN_IWR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
       ptrA->scd_int_mode         = SCD_IWR_MODE;            // Not used in operational command (but used in FPA VHDL module).
       ptrA->scd_boost_mode       = OP_CMD_NORMAL_MODE;      // Mode of operation
-
-      // Trig controller configuration : any trig pulse that don't respect the minimum frame time period will be discarded.
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
-      ptrA->fpa_acq_trig_ctrl_dly     = ptrA->scd_frame_period_min - (uint32_t)((hh.intg_dly + VHD_IWR_PIPE_DLY_SEC)* FPA_VHD_INTF_CLK_RATE_HZ);
-
-      ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
-      ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
-
-   }
+    }
     else{
 
       if(gFpaDebugRegH != 0)
@@ -425,15 +411,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       ptrA->scd_gain             = MEDIUM_GAIN_ITR;         // for BB1280, integration mode is determine by the "Pixel gain" operational parameter
       ptrA->scd_int_mode         = SCD_ITR_MODE;            // Not used in operational command (but used in FPA VHDL module);
       ptrA->scd_boost_mode       = OP_CMD_BOOST_MODE;       // Mode of operation
-
-      // Trig controller configuration : any trig pulse that don't respect the minimum frame time period will be discarded.
-      ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
-      ptrA->fpa_acq_trig_ctrl_dly     = ptrA->scd_frame_period_min - (uint32_t)((hh.intg_dly + VHD_ITR_PIPE_DLY_SEC)* FPA_VHD_INTF_CLK_RATE_HZ);
-
-      ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)FPA_VHD_INTF_CLK_RATE_HZ / (float)SCD_XTRA_TRIG_FREQ_MAX_HZ);
-      ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
     }
 
+   // Trig controller configuration : any trig pulse that don't respect the minimum frame time period will be discarded.
+   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+   ptrA->fpa_acq_trig_ctrl_dly     = ptrA->scd_frame_period_min - (uint32_t)((hh.intg_dly + VHD_IWR_PIPE_DLY_SEC)* FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)(((1.0F/(float)SCD_XTRA_TRIG_FREQ_MAX_HZ)-(hh.intg_dly + VHD_ITR_PIPE_DLY_SEC))* FPA_VHD_INTF_CLK_RATE_HZ);
+   ptrA->fpa_trig_ctrl_timeout_dly = ptrA->fpa_xtra_trig_ctrl_dly;
 
    ptrA->scd_xstart           = pGCRegs->OffsetX;        // Image horizontal offset
    ptrA->scd_ystart           = pGCRegs->OffsetY;        // Image vertical offset
@@ -464,8 +448,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_hdr_high_duration          = (uint32_t)((hh.fig8_t6) * (float)FPA_VHD_INTF_CLK_RATE_HZ);
    ptrA->scd_xsize_div_per_pixel_num    =  (uint32_t)FPA_WIDTH_MAX/FPA_CLINK_PIX_NUM; // Seulement utilisé par le générateur de patron de test.
 
-
-   diag_lval_high_duration =  (float)(ptrA->scd_xsize/FPA_CLINK_PIX_NUM) / (float)FPA_VHD_INTF_CLK_RATE_HZ;
+   diag_lval_high_duration =  ptrA->scd_xsize_div_per_pixel_num / (float)FPA_VHD_INTF_CLK_RATE_HZ;
    diag_corr_factor = hh.fig8_t3 - diag_lval_high_duration;
    ptrA->scd_lval_pause_dly = (uint32_t)((hh.fig8_t4 + diag_corr_factor) * (float)FPA_VHD_INTF_CLK_RATE_HZ); // We add a delay to account for time difference between test pattern clock (100 MHz) and real data clock (80 MHz).
    
@@ -753,7 +736,7 @@ void FPA_SpecificParams(Scd_Param_t *ptrH, float exposureTime_usec, const gcRegi
    }
 
    // Camera Link output timing -> calcul based on figure 8 (D15F0002 REV3)
-   ptrH->fig8_t1 = ptrH->fr_dly + ptrH->Tframe_init;
+   ptrH->fig8_t1 = OP_CMD_IWR_FRAME_DLY_DEFAULT;
    ptrH->fig8_t2 = ceilMultiple(6.0F*ptrH->Tclink_clk, 1.0F/FPA_VHD_INTF_CLK_RATE_HZ);
    ptrH->fig8_t3 = ((float)FPA_WIDTH_MAX/(float)FPA_CLINK_PIX_NUM)*ptrH->Tclink_clk;
    ptrH->fig8_t4 = 800E-9F;
@@ -1059,5 +1042,68 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
 {
    // config retournée par le vhd
    PrivateStat->fpa_frame_resolution = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
+}
+
+
+bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
+{
+
+   static fpaInitState_t fpaInitState = IDLE;
+   static bool proxy_init_status = false;
+   static uint64_t tic_delay;
+   uint32_t ExposureAutoBackup;
+
+   switch (fpaInitState)
+   {
+      case IDLE:
+         proxy_init_status = false;
+         if(run == true)
+            fpaInitState = SEND_1ST_FPA_CONFIG;
+         break;
+
+      case SEND_1ST_FPA_CONFIG:
+         FPA_SendConfigGC(ptrA, pGCRegs);
+         GETTIME(&tic_delay);
+         fpaInitState = SEND_FRAME_RESOLUTION_CONFIG;
+         break;
+
+      case SEND_FRAME_RESOLUTION_CONFIG:
+         if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
+         {
+            FPA_ConfigureFrameResolution(ptrA, pGCRegs);
+            GETTIME(&tic_delay);
+            fpaInitState = SEND_2ND_FPA_CONFIG;
+         }
+
+         break;
+
+      case SEND_2ND_FPA_CONFIG:
+         if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
+         {
+            FPA_SendConfigGC(ptrA, pGCRegs);
+            GETTIME(&tic_delay);
+            fpaInitState = START_SERDES_INITIALIZATION;
+         }
+
+         break;
+
+      case START_SERDES_INITIALIZATION:
+         if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
+         {
+
+            ExposureAutoBackup = pGCRegs->ExposureAuto;
+            if(pGCRegs->ExposureAuto != EA_Off)
+               GC_SetExposureAuto(EA_Off);
+            GC_SetExposureTimeSetToMin(1);
+            GC_SetExposureAuto(ExposureAutoBackup);
+
+            FPA_iddca_rdy(ptrA, true);
+            FPA_TurnOnProxyFailureResponseManagement(ptrA, true);
+            proxy_init_status = true;
+            fpaInitState = IDLE;
+         }
+         break;
+   }
+   return proxy_init_status;
 }
 
