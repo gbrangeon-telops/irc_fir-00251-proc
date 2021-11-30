@@ -125,6 +125,7 @@ architecture rtl of scd_prog_ctrler is
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
    signal bb1280_iddca_rdy_i        : std_logic := '0'; 
+   signal ignore_exptime_cmd        : std_logic := '0';
    signal failure_resp_management   : std_logic := '0';
    
    
@@ -234,6 +235,7 @@ begin
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
             bb1280_iddca_rdy_i <= USER_CFG.bb1280_iddca_rdy;
+            ignore_exptime_cmd <= USER_CFG.ignore_exptime_cmd;
             failure_resp_management <= USER_CFG.failure_resp_management;
             
            -- on retient les champs de la config qui requierent une programmation du détecteur
@@ -265,7 +267,7 @@ begin
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_int /= present_cfg.scd_int then
+                  if new_cfg.scd_int /= present_cfg.scd_int and ignore_exptime_cmd = '0' then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;  

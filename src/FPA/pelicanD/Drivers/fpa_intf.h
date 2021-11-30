@@ -263,9 +263,6 @@ void FPA_ClearErr(const t_FpaIntf *ptrA);
 //pour configurer le bloc FPA_interface et le lancer
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
 
-//pour configurer la résolution de frame
-void FPA_SetFrameResolution(t_FpaIntf *ptrA);// Not used (needed for BB1280)
-
 //pour calculer le frame rate max se rappportant à une configuration donnée
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs);
 
@@ -283,5 +280,9 @@ void  FPA_PowerDown(const t_FpaIntf *ptrA);
 
 // pour imposer une séquence d'initialisation particulière (seulement utilisé pour BB1280)
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
+
+// pour désactiver l'envoi de commande de temps d'intégration
+void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state);
+
 
 #endif // __FPA_INTF_H__

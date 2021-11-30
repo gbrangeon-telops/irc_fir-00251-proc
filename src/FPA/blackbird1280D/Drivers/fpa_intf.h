@@ -259,6 +259,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs);
 void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
+void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 
 
 //pour configurer la résolution de frame

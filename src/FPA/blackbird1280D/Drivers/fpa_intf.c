@@ -130,6 +130,7 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 // adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
 #define AW_FPA_SCD_IDDC_RDY_ADD                          0xA4
 #define AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD           0xA8
+#define AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD                0xAC
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -236,6 +237,7 @@ uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
 float gIntg_dly = 0.0F;
 float gFr_dly = 0.0F;
+bool gFpaInit;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -266,6 +268,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
+   FPA_IgnoreExposureTimeCMD(ptrA, true);                                   // On ignore toutes commandes de temps d'exposition tant que le fpa n'est bien initialisé.
    FPA_iddca_rdy(ptrA, false);
    FPA_TurnOnProxyFailureResponseManagement(ptrA, false);
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
@@ -285,35 +288,6 @@ void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_SetFrameResolution(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);
 }
-
-
-//*--------------------------------------------------------------------------
-//   BB1280 need a specific initialization sequence (confirmed by SCD).
-//   SCD said that they will probably correct the problem in future firmware release.
-//   1. No "Integration time command" or "frame resolution command" should be sent before a the first operational command.
-//   2. The serdes initialization will fail if the 2 following conditions aren't met (for more detail see redmine http://hawking/redmine/issues/17590):
-//       * An operational command followed by a frame resolution command must have been sent.
-//       * The fpa temperature must be in steady state (cooldown finish).
-//--------------------------------------------------------------------------
-void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
-{
-  uint8_t ii;
-
-  for(ii = 0; ii <= 10 ; ii++)
-  {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
-  }
-}
-
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
-{
-   uint8_t ii;
-   for(ii = 0; ii <= 10 ; ii++)
-   {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
-   }
-}
-
 
 //--------------------------------------------------------------------------
 // pour reset des registres d'erreurs
@@ -825,6 +799,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t FPP_power_on_mode = 0;  // 00 => FPP PS On, only at cryogenic temperature (conditional power up)
    extern float gFr_dly;
    extern float gIntg_dly;
+   extern bool gFpaInit;
 
 
    scd_gain = (uint8_t)(ptrA->scd_gain);
@@ -833,7 +808,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint32_t scd_ysize  = ptrA->scd_ysize  >> 1;           // in step of 2 rows
    uint32_t scd_xsize  = (uint32_t)FPA_WIDTH_MAX  >> 2;   // in step of 4 pixels
 
-   if (GC_FWSynchronouslyRotatingModeIsActive)
+   if (GC_FWSynchronouslyRotatingModeIsActive || gFpaInit)
       vhd_int_time = 0.0F;
    else
       vhd_int_time = AXI4L_read32(ptrA->ADD + AR_STATUS_BASE_ADD + AR_FPA_INT_TIME); // read from vhdl (in 100MHz clks)
@@ -1044,14 +1019,63 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->fpa_frame_resolution = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
 }
 
+//---------------------------------------------------------------------------------------------------------------
+// pour signifier au vhdl que le détecteur est prêt et que la procédure d'initialisation des SERDES peut démarrer.
+//---------------------------------------------------------------------------------------------------------------
+void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
 
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+  }
+}
+
+//---------------------------------------------------------------------------------------------------------------
+// pour activer/désactiver la gestion des erreurs retournés par le proxy. 
+//---------------------------------------------------------------------------------------------------------------
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+{
+   uint8_t ii;
+   for(ii = 0; ii <= 10 ; ii++)
+   {
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+   }
+}
+
+//---------------------------------------------------------------------------------------------------------------
+// pour empêcher toutes commande de temps d'exposition
+//---------------------------------------------------------------------------------------------------------------
+void  FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
+
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD);
+  }
+}
+
+//*--------------------------------------------------------------------------
+//   BB1280 need a specific initialization sequence (confirmed by SCD).
+//   SCD said that they will probably correct some of the problems in future firmware release.
+//   1. No "Integration time command" or "frame resolution command" should be sent before a first operational command as been send.
+//   2. The sending of the first operational command is triggered by the call of FPA_Init().
+//   3. A few trigs should be send to the proxy between the first operational command and the frame resolution command.
+//      This step is performed in the SEND_1ST_FPA_CONFIG state (the call to FPA_SendConfigGC() generate 2 prog trig).
+//   4. At least one operational command should be sent when the fpa temperature setpoint as been reach.
+//   5. The SERDES initialization should be done after the fpa temperature as reach steady state.
+//   6. Minimum integration time have to be set during the serdes initialization.
+//      If not, the procedure will fail because of well saturation at ambient temperature.
+//--------------------------------------------------------------------------
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
 {
 
    static fpaInitState_t fpaInitState = IDLE;
    static bool proxy_init_status = false;
    static uint64_t tic_delay;
-   uint32_t ExposureAutoBackup;
+   extern bool gFpaInit;
 
    switch (fpaInitState)
    {
@@ -1074,7 +1098,6 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
             GETTIME(&tic_delay);
             fpaInitState = SEND_2ND_FPA_CONFIG;
          }
-
          break;
 
       case SEND_2ND_FPA_CONFIG:
@@ -1084,19 +1107,11 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
             GETTIME(&tic_delay);
             fpaInitState = START_SERDES_INITIALIZATION;
          }
-
          break;
 
       case START_SERDES_INITIALIZATION:
          if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
          {
-
-            ExposureAutoBackup = pGCRegs->ExposureAuto;
-            if(pGCRegs->ExposureAuto != EA_Off)
-               GC_SetExposureAuto(EA_Off);
-            GC_SetExposureTimeSetToMin(1);
-            GC_SetExposureAuto(ExposureAutoBackup);
-
             FPA_iddca_rdy(ptrA, true);
             FPA_TurnOnProxyFailureResponseManagement(ptrA, true);
             proxy_init_status = true;
@@ -1104,6 +1119,8 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
          }
          break;
    }
+
+   gFpaInit = !proxy_init_status;
    return proxy_init_status;
 }
 

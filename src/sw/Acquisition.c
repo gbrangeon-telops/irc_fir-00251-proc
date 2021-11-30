@@ -607,6 +607,10 @@ void Acquisition_SM()
                      builtInTests[BITID_SensorInitialization].result = BITR_Passed;
                      ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
                      acquisitionState = ACQ_FINALIZE_POWER_ON;
+
+                     #ifdef SCD_PROXY
+                        FPA_IgnoreExposureTimeCMD(&gFpaIntf, false);
+                     #endif
                   }
                   else
                   {
@@ -703,7 +707,7 @@ void Acquisition_SM()
 
       case ACQ_WAIT_SCD_TRIG_MODE_TRANSITION:
          #ifdef SCD_PROXY
-            /* After setting the xtra_trig mode, it is required to observe a delay of
+            /* PelicanD & HerculeD : after setting the xtra_trig mode, it is required to observe a delay of
              * at least 1/SCD_XTRA_TRIG_FREQ_MAX_HZ ms before generating a prog_trig.
              * Otherwise the detector VHD module may crash unexpectedly.
             */

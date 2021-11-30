@@ -576,10 +576,10 @@ begin
                         
                         -- BB1280 only : frame resolution configuration 
                         when X"A0" =>    mb_struct_cfg.scd_frame_res.cfg_num <= data_i(mb_struct_cfg.scd_frame_res.cfg_num'length-1 downto 0); mb_cfg_rqst <= '1';                    
-                       
-                        -- BB1280 only : Steady state temp reach and init config sequence done (OP CMD & FRAME_RES CMD)
                         when X"A4" =>    user_cfg_i.bb1280_iddca_rdy <= data_i(0);  
                         when X"A8" =>    user_cfg_i.failure_resp_management <= data_i(0); 
+                        when X"AC" =>    user_cfg_i.ignore_exptime_cmd <= data_i(0); 
+
                         
                         -- trig lecture de temperatur(le changement de numero est vu comme un changement de config impliquant la repogrammation)
                         when X"D0" =>    mb_struct_cfg.scd_temp.scd_temp_read_num <= unsigned(data_i(mb_struct_cfg.scd_temp.scd_temp_read_num 'length-1 downto 0)); mb_cfg_rqst <= '1';

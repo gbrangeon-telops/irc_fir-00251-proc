@@ -119,9 +119,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 // BB1280 (n'est pas utilisé par le Hercule): adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
 
-// BB1280 (n'est pas utilisé par le Hercule): adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
-#define AW_FPA_SCD_IDDC_RDY_ADD           0xA4
+#define AW_FPA_SCD_IDDC_RDY_ADD                          0xA4
 #define AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD           0xA8
+#define AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD                0xAC
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -261,40 +261,13 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_iddca_rdy(ptrA, true);                                               // Always true for PelicanD (only used by BB1280) 
    FPA_TurnOnProxyFailureResponseManagement(ptrA, true);                    // Always true for PelicanD (only used by BB1280)
+   FPA_IgnoreExposureTimeCMD(ptrA, false);                                  // Always false for PelicanD (only used by BB1280)   
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
    
    sw_init_done = 1;
    sw_init_success = 1;
-}
- 
-void FPA_SetFrameResolution(t_FpaIntf *ptrA)// TODO : A supprimer après le debug de BB1280
-{
-}
-
-//*--------------------------------------------------------------------------
-//   Not used by PelicanD (needed for BB1280, see driver)
-//--------------------------------------------------------------------------
-void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
-{
-  uint8_t ii;
-  for(ii = 0; ii <= 10 ; ii++)
-  {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
-  }
-}
-
-//*--------------------------------------------------------------------------
-//   Not used by PelicanD (needed for BB1280, see driver)
-//--------------------------------------------------------------------------
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
-{
-   uint8_t ii;
-   for(ii = 0; ii <= 10 ; ii++)
-   {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
-   }
 }
 
 //--------------------------------------------------------------------------
@@ -1005,7 +978,48 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->fpa_frame_resolution = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0x00);
 }
 
+//*--------------------------------------------------------------------------
+//   Not used by Hercule (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
 {
    return true;
 }
+
+//*--------------------------------------------------------------------------
+//   Not used by Hercule (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
+{
+   uint8_t ii;
+   for(ii = 0; ii <= 10 ; ii++)
+   {
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+   }
+}
+
+
+//*--------------------------------------------------------------------------
+//   Not used by PelicanD (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+  }
+}
+
+//*--------------------------------------------------------------------------
+//   Not used by PelicanD (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+{
+   uint8_t ii;
+   for(ii = 0; ii <= 10 ; ii++)
+   {
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+   }
+}
+
