@@ -703,7 +703,7 @@ void Acquisition_SM()
 
       case ACQ_WAIT_SCD_TRIG_MODE_TRANSITION:
          #ifdef SCD_PROXY
-            /* PelicanD & HerculeD : after setting the xtra_trig mode, it is required to observe a delay of
+            /* After setting the xtra_trig mode, it is required to observe a delay of
              * at least 1/SCD_XTRA_TRIG_FREQ_MAX_HZ ms before generating a prog_trig.
              * Otherwise the detector VHD module may crash unexpectedly.
             */
@@ -735,7 +735,7 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAIT_SCD_SPECIFIC_INIT_SEQ:
-
+         #ifdef SCD_PROXY
          if (FPA_Specific_Init_SM(&gFpaIntf, &gcRegsData, false) == true)
          {
             acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
@@ -746,6 +746,7 @@ void Acquisition_SM()
             ACQ_ERR("Sensor specific initialization timeout.");
             acquisitionState = ACQ_POWER_RESET;
          }
+         #endif
          break;
 
    }
