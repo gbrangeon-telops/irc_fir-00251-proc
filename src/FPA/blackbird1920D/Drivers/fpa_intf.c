@@ -577,11 +577,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->synth_frm_res   = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2 et la résolution maximale supportée par le vhdl est 44 (0.63us).
 
    ptrA->synth_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17  
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) 
-      ptrA->synth_frm_dat = 1;
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) 
-      ptrA->synth_frm_dat = 2;
-   if (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) 
+   if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage))
       ptrA->synth_frm_dat = 3;
       
    //-----------------------------------------

@@ -78,7 +78,7 @@ extern float FWExposureTime[MAX_NUM_FILTER];
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam registers callback functions definition.
-// Generated from XML camera definition file version 13.0.0
+// Generated from XML camera definition file version 13.1.0
 // using updateGenICamCallback.m Matlab script.
 
 /**

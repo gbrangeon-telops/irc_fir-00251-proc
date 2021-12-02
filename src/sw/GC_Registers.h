@@ -51,10 +51,10 @@ extern uint8_t gGC_ProprietaryFeatureKeyIsValid;
 
 /* AUTO-CODE BEGIN */
 // Auto-generated GeniCam library.
-// Generated from XML camera definition file version 13.0.0
+// Generated from XML camera definition file version 13.1.0
 // using generateGenICamCLib.m Matlab script.
 
-#if ((GC_XMLMAJORVERSION != 13) || (GC_XMLMINORVERSION != 0) || (GC_XMLSUBMINORVERSION != 0))
+#if ((GC_XMLMAJORVERSION != 13) || (GC_XMLMINORVERSION != 1) || (GC_XMLSUBMINORVERSION != 0))
 #error "XML version mismatch."
 #endif
 

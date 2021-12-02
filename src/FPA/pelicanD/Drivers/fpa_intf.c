@@ -416,7 +416,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->scd_bit_pattern = 0;
    if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
-         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3))
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) ||
+         (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage))
       ptrA->scd_bit_pattern = SCD_PE_TEST1;
    
    // valeurs converties en coups d'horloge du module FPA_INTF
