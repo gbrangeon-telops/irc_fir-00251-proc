@@ -21,7 +21,8 @@ use work.tel2000.all;
 entity scd_proxy2_line_mux is
    port(
       ARESET        : in std_logic;
-      CLK           : in std_logic;
+      RX_CLK        : in std_logic;
+      TX_CLK        : in std_logic;
       
       QUAD2_ENABLED : in std_logic;
       
@@ -50,22 +51,27 @@ architecture rtl of scd_proxy2_line_mux is
          SRESET : out std_logic := '1'
          );
    end component;
-   
-   component fwft_sfifo_w76_d1024
+ 
+   component fwft_afifo_w76_d1024
       port (
-         clk : in std_logic;
-         srst : in std_logic;
-         din      : in std_logic_vector(75 downto 0);
-         wr_en    : in std_logic;
-         rd_en    : in std_logic;
-         dout     : out std_logic_vector(75 downto 0);
-         full     : out std_logic;
-         overflow : out std_logic;
-         empty    : out std_logic;
-         valid : out std_logic
+         rst : in STD_LOGIC;
+         wr_clk : in STD_LOGIC;
+         rd_clk : in STD_LOGIC;
+         din : in STD_LOGIC_VECTOR ( 75 downto 0 );
+         wr_en : in STD_LOGIC;
+         rd_en : in STD_LOGIC;
+         dout : out STD_LOGIC_VECTOR ( 75 downto 0 );
+         full : out STD_LOGIC;
+         overflow : out STD_LOGIC;
+         empty : out STD_LOGIC;
+         valid : out STD_LOGIC;
+         wr_rst_busy : out STD_LOGIC;
+         rd_rst_busy : out STD_LOGIC
          );
    end component; 
    
+
+    
    signal err_i           : std_logic; 
    signal sreset          : std_logic;
    signal dout_mosi_i     : t_ll_ext_mosi72;
@@ -101,7 +107,7 @@ begin
    U1 : sync_reset
    port map(
       ARESET => ARESET,
-      CLK    => CLK,
+      CLK    => TX_CLK,
       SRESET => sreset
       );
    
@@ -135,10 +141,11 @@ begin
    --------------------------------------------------
    -- fifo fwft line1_quad_DATA 
    -------------------------------------------------- 
-   U2A : fwft_sfifo_w76_d1024
+   U2A : fwft_afifo_w76_d1024
    port map (
-      srst => sreset,
-      clk => CLK,
+      rst => sreset,
+      wr_clk => RX_CLK,
+      rd_clk => TX_CLK,
       din => quad1_fifo_din,
       wr_en => quad1_fifo_wr_en,
       rd_en => quad1_fifo_rd_en,
@@ -146,16 +153,21 @@ begin
       valid  => quad1_fifo_dval,
       full => open,
       overflow => quad1_fifo_ovfl,
-      empty => open
-      ); 
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
+      );       
+      
+   
    
    --------------------------------------------------
    -- fifo fwft line2_quad_DATA 
    -------------------------------------------------- 
-   U2B : fwft_sfifo_w76_d1024
-   port map (
-      srst => sreset,
-      clk => CLK,
+   U2B : fwft_afifo_w76_d1024
+   port map ( 
+      rst => sreset,
+      wr_clk => RX_CLK,
+      rd_clk => TX_CLK,
       din => quad2_fifo_din,
       wr_en => quad2_fifo_wr_en,
       rd_en => quad2_fifo_rd_en,
@@ -163,15 +175,17 @@ begin
       valid  => quad2_fifo_dval,
       full => open,
       overflow => quad2_fifo_ovfl,
-      empty => open
+      empty => open,
+      wr_rst_busy => open,
+      rd_rst_busy => open
       );
    
    --------------------------------------------------
    -- pipe1 : multiplexage
    -------------------------------------------------- 
-   U3 :  process(CLK) 
+   U3 :  process(TX_CLK) 
    begin
-      if rising_edge(CLK) then
+      if rising_edge(TX_CLK) then
          if sreset = '1' then  
             line_mux_fsm <= quad1_out_st;
             quad1_fifo_rd_en <= '0';
@@ -225,9 +239,9 @@ begin
    --------------------------------------------------
    -- pipe2 : sortie des données
    -------------------------------------------------- 
-   U4 :  process(CLK) 
+   U4 :  process(TX_CLK) 
    begin
-      if rising_edge(CLK) then
+      if rising_edge(TX_CLK) then
          if sreset = '1' then  
             dout_mosi_i.dval <= '0';
             
