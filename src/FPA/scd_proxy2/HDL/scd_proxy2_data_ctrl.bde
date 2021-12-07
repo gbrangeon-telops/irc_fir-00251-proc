@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 47013
+ FREEID 47049
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -10,11 +10,11 @@ HEADER
   #BLOCKTABLE_INCLUDED="1"
   #DEFAULT_RANGE0="<range<name=\"dbus1\"><left=\"95\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE1="<range<name=\"dval_gen_stat\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE2="<range<name=\"frame_id\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE3="<range<name=\"int_indx\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE4="<range<name=\"int_time\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE5="<range<name=\"quad1_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE6="<range<name=\"quad2_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE2="<range<name=\"even_line_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE3="<range<name=\"frame_id\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE4="<range<name=\"int_indx\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE5="<range<name=\"int_time\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE6="<range<name=\"odd_line_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE7="<range<name=\"trig_ctler_stat\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #ENTITY="scd_proxy2_data_ctrl"
   #LANGUAGE="VHDL"
@@ -2018,7 +2018,7 @@ PAGE ""
     #DOWNTO="1"
     #LIBRARY="#terminals"
     #MDA_RECORD_TOKEN="OTHER"
-    #REFERENCE="QUAD1_DATA(71:0)"
+    #REFERENCE="EVEN_LINE_DATA(71:0)"
     #SYMBOL="BusInput"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
@@ -2028,7 +2028,7 @@ PAGE ""
   TEXT  7, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (293,964,565,999)
+   RECT (236,964,565,999)
    ALIGN 2
    MARGINS (1,1)
    COLOR (0,0,192)
@@ -2064,7 +2064,7 @@ PAGE ""
     #COMPONENT="Input"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="QUAD1_DVAL"
+    #REFERENCE="EVEN_LINE_DVAL"
     #SYMBOL="Input"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
@@ -2074,7 +2074,7 @@ PAGE ""
   TEXT  31, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (372,984,565,1019)
+   RECT (315,984,565,1019)
    ALIGN 2
    MARGINS (1,1)
    COLOR (0,0,192)
@@ -2966,23 +2966,14 @@ PAGE ""
   TEXT  41728, 0, 0
   {
    TEXT "$#NAME"
-   RECT (562,1752,779,1779)
+   RECT (543,1752,797,1779)
    ALIGN 9
    PARENT 44075
-  }
-  NET WIRE  41732, 0, 0
-  {
-   VARIABLES
-   {
-    #CUSTOM_NAME=""
-    #NAME="QUAD2_DVAL"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
-   }
   }
   TEXT  41733, 0, 0
   {
    TEXT "$#NAME"
-   RECT (599,1772,753,1799)
+   RECT (581,1772,772,1799)
    ALIGN 9
    PARENT 44076
   }
@@ -2995,17 +2986,16 @@ PAGE ""
     #DOWNTO="1"
     #LIBRARY="#terminals"
     #MDA_RECORD_TOKEN="OTHER"
-    #REFERENCE="QUAD2_DATA(71:0)"
+    #REFERENCE="ODD_LINE_DATA(71:0)"
     #SYMBOL="BusInput"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
    }
    COORD (500,1780)
   }
   TEXT  41772, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (173,1764,445,1799)
+   RECT (129,1764,445,1799)
    ALIGN 2
    MARGINS (1,1)
    COLOR (0,0,192)
@@ -3018,7 +3008,7 @@ PAGE ""
     #COMPONENT="Input"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="QUAD2_DVAL"
+    #REFERENCE="ODD_LINE_DVAL"
     #SYMBOL="Input"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
@@ -3027,7 +3017,7 @@ PAGE ""
   TEXT  41774, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (252,1784,445,1819)
+   RECT (208,1784,445,1819)
    ALIGN 2
    MARGINS (1,1)
    COLOR (0,0,192)
@@ -3899,7 +3889,7 @@ PAGE ""
   }
   BUS  44075, 0, 0
   {
-   NET 45826
+   NET 47013
    VTX 43973, 43974
    VARIABLES
    {
@@ -3908,7 +3898,7 @@ PAGE ""
   }
   WIRE  44076, 0, 0
   {
-   NET 41732
+   NET 47014
    VTX 43975, 43976
    VARIABLES
    {
@@ -4788,18 +4778,6 @@ PAGE ""
     #NAMED="1"
    }
   }
-  NET BUS  45826, 0, 0
-  {
-   VARIABLES
-   {
-    #CUSTOM_NAME=""
-    #DOWNTO="1"
-    #MDA_RECORD_TOKEN="OTHER"
-    #NAME="QUAD2_DATA(71:0)"
-    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
-    #VHDL_TYPE="STD_LOGIC_VECTOR"
-   }
-  }
   NET BUS  45896, 0, 0
   {
    VARIABLES
@@ -5252,6 +5230,26 @@ PAGE ""
    NET 46840
    VTX 46937, 46938
   }
+  NET BUS  47013, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="ODD_LINE_DATA(71:0)"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  NET WIRE  47014, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #NAME="ODD_LINE_DVAL"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
  }
  
 }
@@ -5277,7 +5275,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  46996, 0, 0
+  TEXT  47032, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5288,7 +5286,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  46997, 0, 0
+  TEXT  47033, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5299,7 +5297,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  46998, 0, 0
+  TEXT  47034, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5309,7 +5307,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  46999, 0, 0
+  TEXT  47035, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5321,7 +5319,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  47000, 0, 0
+  TEXT  47036, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5334,7 +5332,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  47001, 0, 0
+  TEXT  47037, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5344,7 +5342,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  47002, 0, 0
+  TEXT  47038, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5356,7 +5354,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  47003, 0, 0
+  TEXT  47039, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5366,7 +5364,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  47004, 0, 0
+  TEXT  47040, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5377,7 +5375,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  47005, 0, 0
+  GROUP  47041, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2420,5801,2801)
@@ -5389,7 +5387,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  47006, 0, 0
+  GROUP  47042, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2620,5801,2621)
@@ -5401,7 +5399,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  47007, 0, 0
+  GROUP  47043, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2560,5801,2561)
@@ -5413,7 +5411,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  47008, 0, 0
+  GROUP  47044, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2680,5801,2681)
@@ -5425,7 +5423,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  47009, 0, 0
+  GROUP  47045, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2740,5801,2741)
@@ -5437,7 +5435,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  47010, 0, 0
+  GROUP  47046, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,2420,5101,2561)
@@ -5448,7 +5446,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  47011, 0, 0
+  GROUP  47047, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,2560,5101,2801)
@@ -5459,7 +5457,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  47012, 0, 0
+  BMPPICT  47048, 0, 0
   {
    PAGEALIGN 10
    RECT (4940,2480,5079,2525)

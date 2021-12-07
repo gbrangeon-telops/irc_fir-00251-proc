@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 85772
+ FREEID 85789
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -27,13 +27,13 @@ HEADER
   #DEFAULT_RANGE22="<range<name=\"ch3_dual_data\"><left=\"35\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE23="<range<name=\"ch3_edges\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE24="<range<name=\"err\"><left=\"3\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE25="<range<name=\"even_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE26="<range<name=\"even_data_i\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE27="<range<name=\"even_err\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE28="<range<name=\"odd_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE29="<range<name=\"odd_data_i\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE25="<range<name=\"even_data_i\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE26="<range<name=\"even_err\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE27="<range<name=\"even_line_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE28="<range<name=\"odd_data_i\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE29="<range<name=\"odd_err\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE3="<range<name=\"ch0_dual_data\"><left=\"35\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
-  #DEFAULT_RANGE30="<range<name=\"odd_err\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE30="<range<name=\"odd_line_data\"><left=\"71\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE4="<range<name=\"ch0_edges\"><left=\"31\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE5="<range<name=\"ch0_even_dual_data\"><left=\"35\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
   #DEFAULT_RANGE6="<range<name=\"ch0_odd_dual_data\"><left=\"35\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
@@ -2360,7 +2360,7 @@ PAGE ""
     #DOWNTO="1"
     #LIBRARY="#terminals"
     #MDA_RECORD_TOKEN="OTHER"
-    #REFERENCE="EVEN_DATA(71:0)"
+    #REFERENCE="EVEN_LINE_DATA(71:0)"
     #SYMBOL="BusOutput"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE=""
@@ -2371,7 +2371,7 @@ PAGE ""
   TEXT  73476, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (4800,2383,5050,2418)
+   RECT (4800,2383,5129,2418)
    ALIGN 4
    MARGINS (1,1)
    PARENT 73474
@@ -2383,7 +2383,7 @@ PAGE ""
     #COMPONENT="Output"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="EVEN_DVAL"
+    #REFERENCE="EVEN_LINE_DVAL"
     #SYMBOL="Output"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC"
@@ -2394,7 +2394,7 @@ PAGE ""
   TEXT  73479, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (4792,2363,4963,2398)
+   RECT (4792,2363,5042,2398)
    ALIGN 4
    MARGINS (1,1)
    PARENT 73477
@@ -3394,7 +3394,7 @@ PAGE ""
     #DOWNTO="1"
     #LIBRARY="#terminals"
     #MDA_RECORD_TOKEN="OTHER"
-    #REFERENCE="ODD_DATA(71:0)"
+    #REFERENCE="ODD_LINE_DATA(71:0)"
     #SYMBOL="BusOutput"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE=""
@@ -3405,7 +3405,7 @@ PAGE ""
   TEXT  75941, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (4800,3343,5037,3378)
+   RECT (4800,3343,5116,3378)
    ALIGN 4
    MARGINS (1,1)
    PARENT 75939
@@ -3417,7 +3417,7 @@ PAGE ""
     #COMPONENT="Output"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="ODD_DVAL"
+    #REFERENCE="ODD_LINE_DVAL"
     #SYMBOL="Output"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
     #VHDL_TYPE="STD_LOGIC"
@@ -3428,7 +3428,7 @@ PAGE ""
   TEXT  75944, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (4792,3323,4950,3358)
+   RECT (4792,3323,5029,3358)
    ALIGN 4
    MARGINS (1,1)
    PARENT 75942
@@ -8617,7 +8617,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  85755, 0, 0
+  TEXT  85772, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8628,7 +8628,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  85756, 0, 0
+  TEXT  85773, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -8639,7 +8639,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  85757, 0, 0
+  TEXT  85774, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -8649,7 +8649,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  85758, 0, 0
+  TEXT  85775, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8661,7 +8661,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  85759, 0, 0
+  TEXT  85776, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -8674,7 +8674,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  85760, 0, 0
+  TEXT  85777, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -8684,7 +8684,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  85761, 0, 0
+  TEXT  85778, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -8696,7 +8696,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  85762, 0, 0
+  TEXT  85779, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -8706,7 +8706,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  85763, 0, 0
+  TEXT  85780, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -8717,7 +8717,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  85764, 0, 0
+  GROUP  85781, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5020,5001,5401)
@@ -8729,7 +8729,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  85765, 0, 0
+  GROUP  85782, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5220,5001,5221)
@@ -8741,7 +8741,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  85766, 0, 0
+  GROUP  85783, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5160,5001,5161)
@@ -8753,7 +8753,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  85767, 0, 0
+  GROUP  85784, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5280,5001,5281)
@@ -8765,7 +8765,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  85768, 0, 0
+  GROUP  85785, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5340,5001,5341)
@@ -8777,7 +8777,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  85769, 0, 0
+  GROUP  85786, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,5020,4301,5161)
@@ -8788,7 +8788,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  85770, 0, 0
+  GROUP  85787, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,5160,4301,5401)
@@ -8799,7 +8799,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  85771, 0, 0
+  BMPPICT  85788, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,5080,4279,5125)
