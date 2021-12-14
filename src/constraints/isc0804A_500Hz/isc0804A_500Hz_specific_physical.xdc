@@ -1,8 +1,5 @@
 ## Physical Constraints Section
 
-############### DEVICE PARAMETER ##################
-set_property DCI_CASCADE {34} [get_iobanks 33]
-
 ############################### GT LOC ###################################
 # IMPORTANT : Proccessing fpga can be build with or without a mgt for video streaming. A choice must be made between two set of constraints. 
 
