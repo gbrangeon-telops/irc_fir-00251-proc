@@ -46,6 +46,11 @@
 #include "Autofocus.h"
 #include "IRIGB.h"
 #include "GC_Store.h"
+
+#ifdef MEM_4DDR
+#include "FrameBuffer.h"
+#endif
+
 #ifdef ENABLE_TEC_CONTROL
 #include "tec_intf.h"
 #endif
@@ -92,6 +97,12 @@ static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf);
 #ifdef ENABLE_TEC_CONTROL
 static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf);
 #endif
+
+#ifdef MEM_4DDR
+static IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf);
+#endif
+
+
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -138,6 +149,9 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"PBT", DebugTerminalParsePBT},
 #ifdef ENABLE_TEC_CONTROL
    {"TEC", DebugTerminalParseTEC},
+#endif
+#ifdef MEM_4DDR
+   {"FB", DebugTerminalParseFB},
 #endif
 #ifdef STARTUP
    DT_STARTUP_CMDS
@@ -2688,6 +2702,33 @@ static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf)
 }
 #endif
 
+#ifdef MEM_4DDR
+/**
+ * Debug terminal get FB status & errors.
+ *
+ * @return IRC_SUCCESS when FB command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
+{
+
+   extern t_FB gFB_ctrl;
+
+   DT_PRINTF("FB_BUFFER_A_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_A_BASE_ADDR_OFFSET));
+   DT_PRINTF("FB_BUFFER_B_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_B_BASE_ADDR_OFFSET));
+   DT_PRINTF("FB_BUFFER_C_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_C_BASE_ADDR_OFFSET));
+   DT_PRINTF("FB_FRAME_BYTE_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FRAME_BYTE_SIZE_OFFSET));
+   DT_PRINTF("FB_HDR_PIX_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_HDR_PIX_SIZE_OFFSET));
+   DT_PRINTF("FB_IMG_PIX_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_IMG_PIX_SIZE_OFFSET));
+   DT_PRINTF("FB_FVAL_PAUSE_MIN = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FVAL_PAUSE_MIN_OFFSET));
+   DT_PRINTF("FB_FLUSH = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FLUSH_OFFSET));
+
+   DT_PRINTF("ERRORS = 0x%08X", FB_getErrors(&gFB_ctrl));
+   DT_PRINTF("STATUS = 0x%08X", FB_getStatus(&gFB_ctrl));
+
+   return IRC_SUCCESS;
+}
+#endif
 
 /**
  * Debug terminal Help command parser parser.
@@ -2711,7 +2752,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
    DT_PRINTF("  HDER status:        HDER");
-   DT_PRINTF("  CAL status:         CAL");
+	DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
    DT_PRINTF("  Buffering status:   BUF");
    DT_PRINTF("  Camera status:      STATUS");
@@ -2746,6 +2787,9 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Print Buffer Table: PBT");
    #ifdef ENABLE_TEC_CONTROL
    DT_PRINTF("  TEC Control:        TEC [setpoint]");
+   #endif
+	#ifdef MEM_4DDR
+	DT_PRINTF("  FB status & errors :  FB");
    #endif
    DT_PRINTF("  Print help:         HLP");
 

@@ -50,7 +50,9 @@ do D:\telops\FIR-00251-Proc\src\ADCReadout\HDL\build_adc_readout.do
 
 #Buffering
 do D:\Telops\FIR-00251-Proc\src\Buffering\HDL\build_buffering_intf.do
-								 
+	
+# Frame buffer
+do D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\build_frame_buffer.do  
 #EHDRI
 do D:\Telops\FIR-00251-Proc\src\eHDRI\HDL\build_ehdri_intf.do
 

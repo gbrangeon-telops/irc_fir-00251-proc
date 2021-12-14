@@ -45,7 +45,9 @@ package FPA_define is
    constant YSIZE_MAX                              : integer    := 1536;              -- dimension en Y maximale  
    
    constant ACTIVE_RWI_MODE                        : std_logic  := '1';               -- '1' <=> mode RWI;  '0' <=> mode IWR
-
+   constant C_FPA_PIX_NUM_PER_CLK                  : integer    := 8;  -- Full rate = 8, Half rate = 4 
+   
+   
 end FPA_define;
 
 package body FPA_define is

@@ -15,6 +15,7 @@
 
 #include "Acquisition.h"
 #include "utils.h"
+#include "FPA_intf.h"
 #include "exposure_time_ctrl.h"
 #include "Trig_gen.h"
 #include "hder_inserter.h"
@@ -34,7 +35,11 @@
 #include "AEC.h"
 #include "Actualization.h"
 #include "SFW_ctrl.h"
-#include "fpa_intf.h"
+
+#ifdef MEM_4DDR
+#include "FrameBuffer.h"
+#endif
+
 #include <stdbool.h> // bool
 
 static uint8_t gAcquisitionTurnOn = 0;
@@ -112,6 +117,9 @@ void Acquisition_Arm()
    extern t_FlagCfg gFlagging_ctrl;
    extern t_GatingCfg gGating_ctrl;
    extern t_bufferManager gBufManager;
+   #ifdef MEM_4DDR
+      extern t_FB gFB_ctrl;
+   #endif
 
    TRIG_SendConfigGC(&gTrig, &gcRegsData);
 
@@ -133,6 +141,10 @@ void Acquisition_Arm()
    AEC_Arm();
 
    BufferManager_HW_MoiHandlerConfig(&gBufManager, 0);
+
+   #ifdef MEM_4DDR
+      FB_SendConfigGC(&gFB_ctrl, &gcRegsData);
+   #endif
 
    TDCStatusClr(WaitingForArmMask);
 
@@ -225,6 +237,10 @@ void Acquisition_SM()
    extern t_FpaIntf gFpaIntf;
    extern flashDynamicValues_t gFlashDynamicValues;
    extern t_Trig gTrig;
+
+   #ifdef MEM_4DDR
+      extern t_FB gFB_ctrl;
+   #endif
 
    #ifdef SCD_PROXY
       extern uint8_t gFrameRateChangePostponed;
@@ -365,6 +381,10 @@ void Acquisition_SM()
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
 
+            #ifdef MEM_4DDR
+               FB_Flush(&gFB_ctrl);
+            #endif
+
             #ifdef SCD_PROXY
                StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
                acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
@@ -388,6 +408,9 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
+            #ifdef MEM_4DDR
+               FB_Flush(&gFB_ctrl);
+            #endif
 
             #ifdef SCD_PROXY
                StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
@@ -409,12 +432,12 @@ void Acquisition_SM()
             }
 
             #ifdef SCD_PROXY
-            if(gFrameRateChangePostponed)
-            {
+               if(gFrameRateChangePostponed)
+               {
                   TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
                   StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
                   acquisitionState = ACQ_WAIT_SCD_TRIG_MODE_TRANSITION;
-            }
+               }
             #endif
          }
          break;
@@ -427,11 +450,11 @@ void Acquisition_SM()
             {
                if (fpaStatus.adc_ddc_present == 1)
                {
-                     builtInTests[BITID_SensorControllerDetection].result = BITR_Passed;
-                     ACQ_INF("ADC or DDC detected in %dms.", elapsed_time_us(tic_timeout) / 1000);
-                     GETTIME(&tic_timeout);
-                     ACQ_INF("Waiting for cooler voltage to be available...");
-                     acquisitionState = ACQ_WAITING_FOR_COOLER_VOLTAGE;
+                  builtInTests[BITID_SensorControllerDetection].result = BITR_Passed;
+                  ACQ_INF("ADC or DDC detected in %dms.", elapsed_time_us(tic_timeout) / 1000);
+                  GETTIME(&tic_timeout);
+                  ACQ_INF("Waiting for cooler voltage to be available...");
+                  acquisitionState = ACQ_WAITING_FOR_COOLER_VOLTAGE;
                }
                else
                {
@@ -450,28 +473,28 @@ void Acquisition_SM()
          break;
 
       case ACQ_WAITING_FOR_COOLER_VOLTAGE:
-            if (extAdcChannels[XEC_COOLER_SENSE].isValid)
+         if (extAdcChannels[XEC_COOLER_SENSE].isValid)
+         {
+               // Turn on the cooler
+            if (Power_TurnOn(PC_COOLER) == CPS_ON)
             {
-                  // Turn on the cooler
-               if (Power_TurnOn(PC_COOLER) == CPS_ON)
-               {
-                  ACQ_INF("Cooler voltage available in %dms.", elapsed_time_us(tic_timeout) / 1000);
-                  extAdcChannels[XEC_COOLER_CUR].isValid = 0;
-                  GETTIME(&tic_timeout);
-                  ACQ_INF("Waiting for cooler power on...");
-                  acquisitionState = ACQ_WAITING_FOR_COOLER_POWER_ON;
-               }
-               else
-               {
-                  ACQ_ERR("Cooler cannot be turned on.");
-                  acquisitionState = ACQ_POWER_RESET;
-               }
+               ACQ_INF("Cooler voltage available in %dms.", elapsed_time_us(tic_timeout) / 1000);
+               extAdcChannels[XEC_COOLER_CUR].isValid = 0;
+               GETTIME(&tic_timeout);
+               ACQ_INF("Waiting for cooler power on...");
+               acquisitionState = ACQ_WAITING_FOR_COOLER_POWER_ON;
             }
-            else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_VOLTAGE_TIMEOUT_US)
+            else
             {
-               ACQ_ERR("Cooler voltage detection timeout.");
+               ACQ_ERR("Cooler cannot be turned on.");
                acquisitionState = ACQ_POWER_RESET;
             }
+         }
+         else if (elapsed_time_us(tic_timeout) > WAITING_FOR_COOLER_VOLTAGE_TIMEOUT_US)
+         {
+            ACQ_ERR("Cooler voltage detection timeout.");
+            acquisitionState = ACQ_POWER_RESET;
+         }
          break;
 
       case ACQ_WAITING_FOR_COOLER_POWER_ON:
@@ -503,38 +526,38 @@ void Acquisition_SM()
          break;
          
       case ACQ_WAITING_FOR_SENSOR_TEMP:
-               sensorTemp = FPA_GetTemperature(&gFpaIntf);
+         sensorTemp = FPA_GetTemperature(&gFpaIntf);
 
-               #ifdef SIM
-               sensorTemp = FPA_COOLER_TEMP_THRES - 100;
-               #endif
+         #ifdef SIM
+         sensorTemp = FPA_COOLER_TEMP_THRES - 100;
+         #endif
 
-               if (sensorTemp != FPA_INVALID_TEMP)
-               {
+         if (sensorTemp != FPA_INVALID_TEMP)
+         {
 
-                  ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
+            ACQ_INF("Sensor temperature available in %dms.", elapsed_time_us(tic_timeout) / 1000);
 
-                  GETTIME(&tic_cooldownStart);
-                  GETTIME(&tic_cooldownStability);
-                  tic_cooldownSampling = 0;
-                  initial_temp = sensorTemp;
-                  min_temp = sensorTemp;
-                  max_temp = sensorTemp;
+            GETTIME(&tic_cooldownStart);
+            GETTIME(&tic_cooldownStability);
+            tic_cooldownSampling = 0;
+            initial_temp = sensorTemp;
+            min_temp = sensorTemp;
+            max_temp = sensorTemp;
 
-                  acquisitionState = ACQ_WAITING_FOR_SENSOR_COOLDOWN;
-               }
-               else if (elapsed_time_us(tic_timeout) > WAITING_FOR_SENSOR_TEMP_TIMEOUT_US)
-               {
-                  builtInTests[BITID_Cooldown].result = BITR_Failed;
-                  ACQ_ERR("Sensor temperature timeout.");
-                  acquisitionState = ACQ_POWER_RESET;
-               }
+            acquisitionState = ACQ_WAITING_FOR_SENSOR_COOLDOWN;
+         }
+         else if (elapsed_time_us(tic_timeout) > WAITING_FOR_SENSOR_TEMP_TIMEOUT_US)
+         {
+            builtInTests[BITID_Cooldown].result = BITR_Failed;
+            ACQ_ERR("Sensor temperature timeout.");
+            acquisitionState = ACQ_POWER_RESET;
+         }
          break;
 
       case ACQ_WAITING_FOR_SENSOR_COOLDOWN:
          if (( uint32_t) elapsed_time_us(tic_cooldownSampling) > COOLDOWN_SAMPLING_PERIOD_US)
          {
-				sensorTemp = FPA_GetTemperature(&gFpaIntf);
+            sensorTemp = FPA_GetTemperature(&gFpaIntf);
 
             #ifdef SIM
             sensorTemp = cooldownTempTarget - 100;
@@ -577,54 +600,54 @@ void Acquisition_SM()
                   if ((cooldownTempTarget - FPA_COOLER_TEMP_TOL < sensorTemp) &&
                        (sensorTemp < cooldownTempTarget + FPA_COOLER_TEMP_TOL) &&
                        (elapsed_time_us(tic_cooldownStability) >= COOLDOWN_STABILITY_PERIOD_US))
-                  {
+               {
 
-                     builtInTests[BITID_Cooldown].result = BITR_Passed;
-                     ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
-                        ((uint32_t) elapsed_time_us( tic_cooldownStart )) / 1000000);
-                     TDCStatusClr(WaitingForCoolerMask);
-                     ACQ_INF("Waiting for sensor initialization...");
+                  builtInTests[BITID_Cooldown].result = BITR_Passed;
+                  ACQ_INF("Cooled down from %dcC to %dcC in %d s.", initial_temp, sensorTemp,
+                     ((uint32_t) elapsed_time_us( tic_cooldownStart )) / 1000000);
+                  TDCStatusClr(WaitingForCoolerMask);
+                  ACQ_INF("Waiting for sensor initialization...");
 
                      #ifdef SCD_PROXY
                         GETTIME(&tic_fpaInitTimeout);
                         FPA_Specific_Init_SM(&gFpaIntf, &gcRegsData, true);
                         acquisitionState = ACQ_WAIT_SCD_SPECIFIC_INIT_SEQ;
                      #else
-                        acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
+                  acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
                      #endif
-                  }
                }
+            }
             GETTIME(&tic_cooldownSampling);
          }
          break;
 
       case ACQ_WAITING_FOR_FPA_INIT:
-            FPA_GetStatus(&fpaStatus, &gFpaIntf);
-               if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
-               {
-                  if (fpaStatus.fpa_init_success == 1)
-                  {
-                     builtInTests[BITID_SensorInitialization].result = BITR_Passed;
-                     ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
-                     acquisitionState = ACQ_FINALIZE_POWER_ON;
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);
+         if ((fpaStatus.fpa_init_done == 1) && (fpaStatus.fpa_powered == 1))
+         {
+            if (fpaStatus.fpa_init_success == 1)
+            {
+               builtInTests[BITID_SensorInitialization].result = BITR_Passed;
+               ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
+               acquisitionState = ACQ_FINALIZE_POWER_ON;
 
                      #ifdef SCD_PROXY
                         FPA_IgnoreExposureTimeCMD(&gFpaIntf, false);
                      #endif
-                  }
-                  else
-                  {
-                     builtInTests[BITID_SensorInitialization].result = BITR_Failed;
-                     ACQ_ERR("Sensor initialization failed.");
-                     acquisitionState = ACQ_POWER_RESET;
-                  }
-               }
-               else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
-               {
-                  builtInTests[BITID_SensorInitialization].result = BITR_Failed;
-                  ACQ_ERR("Sensor initialization timeout.");
-                  acquisitionState = ACQ_POWER_RESET;
-               }
+            }
+            else
+            {
+               builtInTests[BITID_SensorInitialization].result = BITR_Failed;
+               ACQ_ERR("Sensor initialization failed.");
+               acquisitionState = ACQ_POWER_RESET;
+            }
+         }
+         else if (elapsed_time_us(tic_fpaInitTimeout) > WAITING_FOR_FPA_INIT_TIMEOUT_US)
+         {
+            builtInTests[BITID_SensorInitialization].result = BITR_Failed;
+            ACQ_ERR("Sensor initialization timeout.");
+            acquisitionState = ACQ_POWER_RESET;
+         }
          break;
 
       case ACQ_FINALIZE_POWER_ON:
@@ -722,7 +745,7 @@ void Acquisition_SM()
                   TDCStatusSet(WaitingForArmMask);
                   PRINT("Acquisition stopped!\n");
                   acquisitionState = ACQ_STOPPED;
-               }
+   }
                else
                {
                   //Frame rate was changed during acquisition.

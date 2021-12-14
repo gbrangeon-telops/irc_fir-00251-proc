@@ -18,7 +18,7 @@ _HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 0x400;
 MEMORY
 {
    MCU_microblaze_0_local_memory_ilmb_bram_if_cntlr_Mem_MCU_microblaze_0_local_memory_dlmb_bram_if_cntlr_Mem : ORIGIN = 0x50, LENGTH = 0x1FFB0
-   MIG_Code_mig_7series_0_memaddr : ORIGIN = 0xC0000000, LENGTH = 0x10000000
+   MIG_Code_mig_7series_0_memaddr : ORIGIN = 0x70000000, LENGTH = 0x10000000
    MIG_Calibration_CAL_DDR_MIG_memaddr : ORIGIN = 0x80000000, LENGTH = 0x40000000
 }
 

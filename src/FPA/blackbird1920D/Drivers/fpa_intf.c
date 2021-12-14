@@ -23,6 +23,7 @@
 #include "utils.h"
 #include "IRC_status.h"
 #include "exposure_time_ctrl.h"
+#include <stdbool.h>
 #include <math.h>
 #include <string.h>
 
@@ -306,6 +307,7 @@ uint32_t sw_init_done = 0;
 uint32_t sw_init_success = 0;
 float gIntg_dly = 0.0F;
 float gFr_dly = 0.0F;
+bool gFpaInit;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -333,6 +335,7 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
    FPA_iddca_rdy(ptrA, false);
+   FPA_IgnoreExposureTimeCMD(ptrA, false);                                  //  (only used by BB1280)
    //FPA_GetTemperature(ptrA);
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd y compris les statuts privés. Il faut que les status privés soient là avant qu'on appelle le FPA_SendConfigGC. 
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
@@ -340,15 +343,6 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    
    sw_init_done = 1;                                                        // le sw est initialisé. il ne restera que le vhd qui doit s'initialiser
    sw_init_success = 1;
-}
- 
-void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
-{
-  uint8_t ii;
-  for(ii = 0; ii <= 10 ; ii++)
-  {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
-  }
 }
 
 //--------------------------------------------------------------------------
@@ -485,7 +479,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((frame_period - (hh.intg_dly + VHD_PIPE_DLY_SEC))*(float)VHD_CLK_100M_RATE_HZ);
 
    // config du contrôleur pour les xtra trigs (il est sur l'horloge de 100MHz)
-   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;                                               //
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
   
@@ -519,7 +513,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (gPrivateStat.fpa_pix_num_per_pclk == 8)
       ptrA->diag_ysize = ptrA->aoi_ysize/2;                                       // pour tenir compte de la seconde ligne qui sort aussi au même moment
    ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
-   ptrA->diag_lovh_mclk_source           = 8;                                     // à reviser si necessaire
+   ptrA->diag_lovh_mclk_source           = 287;                                     // à reviser si necessaire
    ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
     
    ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset 
@@ -560,12 +554,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_binning = 0;
    
    // vitesse de sortie
-   ptrA->op_output_rate = 2;
+   ptrA->op_output_rate = 2; // half rate
    if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-      ptrA->op_output_rate = 3;
+      ptrA->op_output_rate = 3; // full rate (2 simultaneous lines)
      
    // cfg_num 
-   if (cfg_num == 255)                         // protection contre depassement
+   if (cfg_num == 255)
       cfg_num = 0;
    cfg_num++;
    ptrA->op_cfg_num = (uint32_t)cfg_num;
@@ -676,15 +670,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->incoming_com_fail_id            = 0xFFFF;
    ptrA->incoming_com_ovh_len            = 6;
 
-   ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
-   if (gPrivateStat.fpa_pix_num_per_pclk == 4){
-      ptrA->fpa_serdes_lval_num >>= 1;
-   }
-   else if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-   {
-      ptrA->fpa_serdes_lval_num >>= 1;
-   }
 
+   // Configuration des SERDES (independante du nombre du canaux)
+   ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
+      ptrA->fpa_serdes_lval_num >>= 1;
    ptrA->fpa_serdes_lval_len = (uint32_t)FPA_WIDTH_MAX / 4; // toujours diviser par 4 même si on a 8 pixels/clk (en réalité on a 2 lignes simultannés à 4 pixels/clk).
 
    ptrA->int_clk_period_factor           = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 1);
@@ -1066,14 +1055,14 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->number_of_Rows          = (float)pGCRegs->Height;
    ptrH->number_of_Ref_Rows      = 0.0F;
    
-   if(gPrivateStat.fpa_pix_num_per_pclk == 0)
-      ptrH->number_of_pixel_per_clk_per_output = 2.0f;
+   if(gPrivateStat.fpa_pix_num_per_pclk == 0) // gestion du cas ou gPrivateStat n'est pas encore initialisé
+      ptrH->number_of_pixel_per_clk_per_output = 4.0f; // Full rate par défaut
    else
       ptrH->number_of_pixel_per_clk_per_output = gPrivateStat.fpa_pix_num_per_pclk/2;
   
    //if (ptrA->op_binning == 0)
       ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;
-      //else
+   //else
    //   ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 8.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 4.0F;
         
    ptrH->Line_Readout = (2.0F * ptrH->number_of_Columns + 18.0F) /2.0F / ptrH->number_of_pixel_per_clk_per_output / ptrH->Fclock_MHz;
@@ -1127,14 +1116,15 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    uint8_t vdir          = 1; // 1 : Up: Readout from 1'st row up (decrement)
    uint8_t hdir          = 0; // 0 : Left to right row readout;
    uint8_t frm_sync_mod  = 0; // 0 : INTG_DLY start is referred at FSYNC
-   uint8_t video_rate    = 2; // 2 : Half: 2 video ports active (4pixels/cc)
+   uint8_t video_rate    = 3; // 3 : Full: 4 video ports active (2 simultaneous lines, 4 pixels/line)
+
    uint16_t strow        = 0; // Start address for row readout (0 to 767)
    uint16_t wsize        = 0; // Vertical window size in 2-row resolution when BINN=0
    uint8_t slv_adr       = 0x18;  // valeur par defaut
    uint8_t mtx_intg_low  = 0xb1;  // valeur par lue sur la première unité de BB1920. ATTENTION les bits 0 à 3 sont reserved par SCD.
    uint32_t int_time     = 0;
 
-
+// Gestion du mode de controle externe d'intégration
    if(ptrA->proxy_external_int_ctrl == 1)
       int_time = 0;
    else
@@ -1182,8 +1172,6 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
    Cmd.data[16]       = ((int_time & 0xF0000) >> 16);
    Cmd.data[17]       =  (video_rate & 0x03);
    Cmd.data[18]       = ((ptrA->op_det_vbias & 0x0F) << 4) + ((ptrA->op_det_ibias & 0x03) << 2);
-
-
 
    // Pour test avec mtx_intg_low...
    Cmd.data[19]        = (mtx_intg_low & 0xFF);
@@ -1407,3 +1395,96 @@ float FPA_ConvertSecondToFrameTimeResolution(float seconds)
    regValue =  regValue/((float)FRAME_RESOLUTION_DEFAULT); // in frame_res
    return regValue;
 }
+
+//*--------------------------------------------------------------------------
+//   Not used (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
+{
+   static fpaInitState_t fpaInitState = IDLE;
+    static bool proxy_init_status = false;
+    static uint64_t tic_delay;
+    extern bool gFpaInit;
+
+    switch (fpaInitState)
+    {
+       case IDLE:
+          proxy_init_status = false;
+          if(run == true)
+             fpaInitState = START_SERDES_INITIALIZATION;
+          break;
+
+//       case SEND_1ST_FPA_CONFIG:
+//          FPA_SendConfigGC(ptrA, pGCRegs);
+//          GETTIME(&tic_delay);
+//          fpaInitState = SEND_FRAME_RESOLUTION_CONFIG;
+//          break;
+//
+//       case SEND_FRAME_RESOLUTION_CONFIG:
+//          if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
+//          {
+//             FPA_ConfigureFrameResolution(ptrA, pGCRegs);
+//             GETTIME(&tic_delay);
+//             fpaInitState = SEND_2ND_FPA_CONFIG;
+//          }
+//          break;
+//
+//       case SEND_2ND_FPA_CONFIG:
+//          if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
+//          {
+//             FPA_SendConfigGC(ptrA, pGCRegs);
+//             GETTIME(&tic_delay);
+//             fpaInitState = START_SERDES_INITIALIZATION;
+//          }
+//          break;
+
+       case START_SERDES_INITIALIZATION:
+          if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
+          {
+             FPA_iddca_rdy(ptrA, true);
+             FPA_TurnOnProxyFailureResponseManagement(ptrA, true);
+             proxy_init_status = true;
+             fpaInitState = IDLE;
+          }
+          break;
+    }
+
+    gFpaInit = !proxy_init_status;
+    return proxy_init_status;
+}
+
+void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+{
+  uint8_t ii;
+  for(ii = 0; ii <= 10 ; ii++)
+  {
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+  }
+}
+
+
+//---------------------------------------------------------------------------------------------------------------
+// pour activer/désactiver la gestion des erreurs retournés par le proxy.
+//---------------------------------------------------------------------------------------------------------------
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+{
+//   uint8_t ii;
+//   for(ii = 0; ii <= 10 ; ii++)
+//   {
+//      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+//   }
+}
+
+//*--------------------------------------------------------------------------
+//   Not used (needed for BB1280, see driver)
+//--------------------------------------------------------------------------
+void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
+{
+//   uint8_t ii;
+//
+//   for(ii = 0; ii <= 10 ; ii++)
+//   {
+//      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD);
+//   }
+}
+

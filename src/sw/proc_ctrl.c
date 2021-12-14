@@ -186,6 +186,9 @@ void disable_caches()
    BuiltInTest_Execute(BITID_DeviceKeyValidation);
    BuiltInTest_Execute(BITID_MotorizedLensInitialization);
    BuiltInTest_Execute(BITID_AutofocusModuleInitialization);
+#ifdef MEM_4DDR
+   BuiltInTest_Execute(BITID_FrameBufferInitialization);
+#endif
 
 
    Power_UpdateDeviceLedIndicatorState(&gLedCtrl, 1);

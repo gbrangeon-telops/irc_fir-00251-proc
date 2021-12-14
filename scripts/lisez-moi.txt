@@ -1,10 +1,12 @@
-Pour un build à neuf :
+﻿Pour un build à neuf :
 
 1. Vivado => "source D:/Telops/FIR-00251-Proc/scripts/gen_managed_projet_FPGA_SIZE.tcl" (génère le projet des IP).
 
 2. Dans la fenêtre Sources, sélectionner tous les IP et faire Generate Output Products (génère les sources pour les IP).
 
-3. Dans la fenêtre Sources, sélectionner le core (Block Designs) et faire Generate Output Products (génère les sources pour le Block Design).
+**3.1 Dans la fenêtre Sources, sélectionner le core (Block Designs) et faire Generate Output Products (génère les sources pour le Block Design).
+**3.2 Dans la fenêtre Sources, sélectionner le core_4DDR (Block Designs) et faire Generate Output Products (génère les sources pour le Block Design).
+
 
 4. Aldec => compilation des sources en exécutant le .do (génère les .vhd à partir des .bde).
 
@@ -19,4 +21,7 @@ Pour un build à neuf :
 
 9. Vivado => Generate Bitstream et File > Export > Export Bitstream File à D:/Telops/FIR-00251-Proc/sdk/fir_00251_proc_DETECTEUR/fir_00251_proc_DETECTEUR.bit
 
-10. Générer le .mcs avec le script D:/Telops/FIR-00251-Proc/bin/DETECTEUR/scripts/FPGA_SIZE/generatePromFile.bat
+10. Générer le .mcs avec le script D:/Telops/FIR-00251-Proc/bin/DETECTEUR/scripts/FPGA_SIZE/generatePromFile.batà
+
+
+** Il n'est pas nécessaire de systématiquement générer les Output Products des 2 Block Designs. Cela dépend des firmwares qu'on prévoit builder. 

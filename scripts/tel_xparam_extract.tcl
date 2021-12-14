@@ -7,7 +7,7 @@
 # This could be done(in adress editor) by clicking on the segment in the cell column
 # and changing the name in the adress segment properties windows
 
-open_bd_design [get_files *.bd]
+open_bd_design [get_files *core.bd]
 
 #Extract the clock information
 set clkName [get_property NAME [get_bd_ports -filter {TYPE == clk && DIR == O}]]

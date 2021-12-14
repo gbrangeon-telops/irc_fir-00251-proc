@@ -94,6 +94,9 @@
 
 #define SCD_MIN_OPER_FPS               (float)12.0 // [Hz] fréquence minimale pour la configuration du SCD. N'empêche pas de le trigger plus lentement
 
+
+#define SEND_CONFIG_DELAY             TIME_ONE_SECOND_US
+
 #define FPA_PRINTF(fmt, ...)           FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
 
 
@@ -317,5 +320,32 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
+
+// pour imposer une séquence d'initialisation particulière (seulement utilisé pour BB1280)
+bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
+
+// pour désactiver l'envoi de commande de temps d'intégration (seulement utilisé pour BB1280)
+void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state);
+
+// pour activer/désactiver la gestion des erreurs retournés par le proxy.
+void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
+
+/**
+ * FPA Initialization state.
+ */
+enum fpaInitStateEnum {
+   // Initialization states
+   IDLE = 0,
+   //SEND_1ST_FPA_CONFIG,
+   //SEND_FRAME_RESOLUTION_CONFIG,
+   //SEND_2ND_FPA_CONFIG,
+   START_SERDES_INITIALIZATION
+};
+
+/**
+ * FPA Initialization state data type.
+ */
+typedef enum fpaInitStateEnum fpaInitState_t;
+
 
 #endif // __FPA_INTF_H__

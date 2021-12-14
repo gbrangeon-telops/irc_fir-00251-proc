@@ -45,6 +45,7 @@ add_files [concat \
    [glob -nocomplain $src_dir/SFW/HDL/*.vhd] \
    [glob -nocomplain $src_dir/startup/HDL/*.vhd] \
    [glob -nocomplain $src_dir/Trig/HDL/*.vhd] \
+   [glob -nocomplain $src_dir/FrameBuffer/HDL/*.vhd] \
 ]
 
 # Add common project sources 
@@ -93,8 +94,13 @@ add_files [concat \
 
 
 #Read Block Design
-read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd
-add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/hdl/core_wrapper.vhd
+if {$MEM_4DDR=="0"} {
+   read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd
+   add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/hdl/core_wrapper.vhd
+} else {
+   read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core_4DDR/core_4DDR.bd
+   add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core_4DDR/hdl/core_4DDR_wrapper.vhd
+}
 
 #Associate bootloader file to microblaze
 set boot_file $root_dir/sdk/$top_lvl/${top_lvl}_boot_${FPGA_SIZE}/Release/${top_lvl}_boot_${FPGA_SIZE}.elf

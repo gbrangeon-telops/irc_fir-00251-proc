@@ -1757,8 +1757,8 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   create_bd_addr_seg -range 0x00010000 -offset 0x00000000 [get_bd_addr_spaces MCU/microblaze_1/Instruction] [get_bd_addr_segs MCU/microblaze_1_local_memory/ilmb_bram_if_cntlr/SLMB/Mem] SEG_ilmb_bram_if_cntlr_Mem
   create_bd_addr_seg -range 0x00001000 -offset 0x41400000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs MCU/mdm_1/S_AXI/Reg] SEG_mdm_1_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x41200000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs MCU/microblaze_1_axi_intc/S_AXI/Reg] SEG_microblaze_1_axi_intc_Reg
-  create_bd_addr_seg -range 0x10000000 -offset 0xC0000000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs MIG_Code/mig_7series_0/memmap/memaddr] SEG_mig_7series_0_memaddr
-  create_bd_addr_seg -range 0x10000000 -offset 0xC0000000 [get_bd_addr_spaces MCU/microblaze_1/Instruction] [get_bd_addr_segs MIG_Code/mig_7series_0/memmap/memaddr] SEG_mig_7series_0_memaddr
+  create_bd_addr_seg -range 0x10000000 -offset 0x70000000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs MIG_Code/mig_7series_0/memmap/memaddr] SEG_mig_7series_0_memaddr
+  create_bd_addr_seg -range 0x10000000 -offset 0x70000000 [get_bd_addr_spaces MCU/microblaze_1/Instruction] [get_bd_addr_segs MIG_Code/mig_7series_0/memmap/memaddr] SEG_mig_7series_0_memaddr
   create_bd_addr_seg -range 0x00010000 -offset 0x44BB0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs oem_uart/S_AXI/Reg] SEG_oem_uart_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44BC0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs pleora_uart/S_AXI/Reg] SEG_pleora_uart_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x40010000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs power_management/S_AXI/Reg] SEG_power_management_Reg

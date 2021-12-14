@@ -61,5 +61,5 @@
 // #define RP_VERBOSE
 // #define SL_VERBOSE
 // #define AUTO_VERBOSE
-
+// #define FB_VERBOSE
 #endif // VERBOSE_H

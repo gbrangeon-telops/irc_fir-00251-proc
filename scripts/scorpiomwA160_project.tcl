@@ -2,6 +2,7 @@
 set root_dir "d:/Telops/fir-00251-Proc"
 set sensor "scorpiomwA"
 set FPGA_SIZE "160"
+set MEM_4DDR "0"
 set proj_name "fir_00251_proc_${FPGA_SIZE}_${sensor}"
 set top_lvl "fir_00251_proc_${sensor}"
 set FPA_path $root_dir/src/FPA/${sensor}
