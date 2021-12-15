@@ -63,10 +63,8 @@
 #include "DeviceKey.h"
 #include "HwRevision.h"
 #include "GC_Store.h"
-
-#ifdef MEM_4DDR
 #include "FrameBuffer.h"
-#endif
+
 
 #include <string.h>
 
@@ -112,6 +110,7 @@ t_mgt gMGT = MGT_Ctor(XPAR_MGT_CTRL_BASEADDR);
 t_FlagCfg gFlagging_ctrl = Flagging_config_Ctor(XPAR_TRIGGER_CTRL_BASEADDR + FLAGGING_AXILITE_OFFSET);
 t_GatingCfg gGating_ctrl = Gating_config_Ctor(XPAR_TRIGGER_CTRL_BASEADDR + GATING_AXILITE_OFFSET);
 t_SfwCtrl gSFW_Ctrl = sfw_Intf_Ctor(XPAR_SFW_CTRL_BASEADDR);
+t_FB gFB_ctrl = FB_Intf_Ctor(FB_CTRL_BASE_ADDR);
 
 XIntc gProcIntc;
 t_GPS Gps_struct;
@@ -143,14 +142,13 @@ rpCtrl_t theRpCtrl;
 slCtrl_t theSlCtrl;
 autofocusCtrl_t theAutoCtrl;
 
+
 #ifdef SCD_PROXY
    uint8_t gFrameRateChangePostponed = 0;
    uint8_t gWaitingForFilterWheel = 0;
 #endif
 
-#ifdef MEM_4DDR
-t_FB gFB_ctrl = FB_Intf_Ctor(FB_CTRL_BASE_ADDR);
-#endif
+
 
 /**
  * Initializes network interface
@@ -1383,7 +1381,7 @@ IRC_Status_t Proc_BoardRevisionValidation()
    return Get_board_hw_revision(XPAR_AXI_GPIO_0_DEVICE_ID,&gBrdRevid);
 }
 
-#ifdef MEM_4DDR
+
 /**
  * Initializes Frame buffer.
  *
@@ -1394,4 +1392,4 @@ IRC_Status_t Proc_FB_Init()
 {
    return FB_Init(&gFB_ctrl, &gcRegsData);
 }
-#endif
+

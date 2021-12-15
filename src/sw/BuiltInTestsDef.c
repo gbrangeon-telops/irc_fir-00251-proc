@@ -66,8 +66,6 @@ builtInTest_t builtInTests[BITID_Count] =
    {BITID_DeviceSerialPortsInitialization, "Initializing device serial ports", Proc_DeviceSerialPorts_Init, BITR_Pending},
    {BITID_BoardRevisionValidation, "Check for HW board revision", Proc_BoardRevisionValidation, BITR_Pending},
    {BITID_MotorizedLensInitialization, "Initializing RPOptical interface", Proc_RP_Init, BITR_Pending},
-   #ifdef MEM_4DDR
-      {BITID_FrameBufferInitialization, "Initializing Frame Buffer", Proc_FB_Init, BITR_Pending},
-   #endif
+   {BITID_FrameBufferInitialization, "Initializing Frame Buffer", Proc_FB_Init, BITR_Pending},
    {BITID_AutofocusModuleInitialization, "Initializing SightLine interface", Proc_SL_Init, BITR_Pending}
 };

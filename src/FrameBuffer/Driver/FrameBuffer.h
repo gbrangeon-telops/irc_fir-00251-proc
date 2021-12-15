@@ -23,11 +23,18 @@
 
 
 /************************** Constant Definitions ****************************/
-#define FB_CTRL_BASE_ADDR                XPAR_FRAME_BUFFER_CTRL_BASEADDR
 
-#define FB_NB_BUFFER                      3 // Number of buffers in the frame buffer
-#define FB_BUFFER_SIZE                    FPA_WIDTH_MAX * (FPA_HEIGHT_MAX + 2) * sizeof(uint16_t) // Number of bytes in a single buffer, +2 lines for the header
-#define FB_FRAME_BUFFER_SIZE              FB_NB_BUFFER*FB_BUFFER_SIZE
+#ifdef MEM_4DDR
+   #define FB_FRAME_BUFFER_SIZE              FB_NB_BUFFER*FB_BUFFER_SIZE
+   #define FB_CTRL_BASE_ADDR                 XPAR_FRAME_BUFFER_CTRL_BASEADDR
+   #define FB_NB_BUFFER                      3 // Number of buffers in the frame buffer
+   #define FB_BUFFER_SIZE                    FPA_WIDTH_MAX * (FPA_HEIGHT_MAX + 2) * sizeof(uint16_t) // Number of bytes in a single buffer, +2 lines for the header
+#else
+   #define FB_FRAME_BUFFER_SIZE              0
+   #define FB_CTRL_BASE_ADDR                 0
+   #define FB_NB_BUFFER                      0
+   #define FB_BUFFER_SIZE                    0
+#endif
 
 // Read/Write adresses
 #define FB_BUFFER_A_BASE_ADDR_OFFSET	   0x00

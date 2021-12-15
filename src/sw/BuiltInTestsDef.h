@@ -69,10 +69,7 @@ enum builtInTestIDEnum {
    BITID_BoardRevisionValidation,
    BITID_MotorizedLensInitialization,
    BITID_AutofocusModuleInitialization,
-	#ifdef MEM_4DDR
-	   BITID_FrameBufferInitialization,
-	#endif
-
+	BITID_FrameBufferInitialization,
 
    // When a built-in test is added to this list, the following tools must be updated:
    //    - tsirinfo

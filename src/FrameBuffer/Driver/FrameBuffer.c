@@ -16,18 +16,21 @@
 */
 IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 {
-   pFB_ctrl->fb_buffer_a_base_address = PROC_MEM_FRAME_BUFFER_BASEADDR;
-   pFB_ctrl->fb_buffer_b_base_address = pFB_ctrl->fb_buffer_a_base_address + FB_BUFFER_SIZE;
-   pFB_ctrl->fb_buffer_c_base_address = pFB_ctrl->fb_buffer_b_base_address + FB_BUFFER_SIZE;
-   pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2)*pGCRegs->Width* sizeof(uint16_t);
-   pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
-   pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
-   pFB_ctrl->fb_fval_pause_min        = 10;
-   pFB_ctrl->fb_flush                 = 0;
+   #ifdef MEM_4DDR
+      pFB_ctrl->fb_buffer_a_base_address = PROC_MEM_FRAME_BUFFER_BASEADDR;
+      pFB_ctrl->fb_buffer_b_base_address = pFB_ctrl->fb_buffer_a_base_address + FB_BUFFER_SIZE;
+      pFB_ctrl->fb_buffer_c_base_address = pFB_ctrl->fb_buffer_b_base_address + FB_BUFFER_SIZE;
+      pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2)*pGCRegs->Width* sizeof(uint16_t);
+      pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
+      pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
+      pFB_ctrl->fb_fval_pause_min        = 10;
+      pFB_ctrl->fb_flush                 = 0;
 
-   WriteStruct(pFB_ctrl);
-
-   return IRC_SUCCESS;
+      WriteStruct(pFB_ctrl);
+      return IRC_SUCCESS;
+   #else
+      return IRC_SUCCESS;
+   #endif
 }
 
 
@@ -45,17 +48,19 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 */
 void FB_SendConfigGC(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 {
-   if(FB_isFrameBufferReady(pFB_ctrl) && FB_getErrors(pFB_ctrl) == 0)
-   {
-      pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2) * pGCRegs->Width * sizeof(uint16_t);
-      pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
-      pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
-      WriteStruct(pFB_ctrl);
-   }
-   else
-   {
-      FB_ERR("Configuration failed : frame buffer is not ready or is in error\n");
-   }
+   #ifdef MEM_4DDR
+      if(FB_isFrameBufferReady(pFB_ctrl) && FB_getErrors(pFB_ctrl) == 0)
+      {
+         pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2) * pGCRegs->Width * sizeof(uint16_t);
+         pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
+         pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
+         WriteStruct(pFB_ctrl);
+      }
+      else
+      {
+         FB_ERR("Configuration failed : frame buffer is not ready or is in error\n");
+      }
+   #endif
 }
 
 
@@ -105,17 +110,19 @@ uint32_t FB_getStatus(t_FB *pFB_ctrl)
 */
 void FB_Flush(t_FB *pFB_ctrl)
 {
-   if(FB_isFrameBufferReady(pFB_ctrl) && FB_getErrors(pFB_ctrl) == 0)
-   {
-      pFB_ctrl->fb_flush = 1;
-      WriteStruct(pFB_ctrl);
-      pFB_ctrl->fb_flush = 0;
-      WriteStruct(pFB_ctrl);
-   }
-   else
-   {
-      FB_ERR("Flush failed : frame buffer is not ready or is in error\n");
-   }
+   #ifdef MEM_4DDR
+      if(FB_isFrameBufferReady(pFB_ctrl) && FB_getErrors(pFB_ctrl) == 0)
+      {
+         pFB_ctrl->fb_flush = 1;
+         WriteStruct(pFB_ctrl);
+         pFB_ctrl->fb_flush = 0;
+         WriteStruct(pFB_ctrl);
+      }
+      else
+      {
+         FB_ERR("Flush failed : frame buffer is not ready or is in error\n");
+      }
+   #endif
 }
 
 

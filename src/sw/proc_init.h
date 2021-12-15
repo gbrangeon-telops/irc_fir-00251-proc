@@ -90,7 +90,5 @@ IRC_Status_t Proc_BufferManager_Init();
 IRC_Status_t Proc_Timer_Init();
 IRC_Status_t Proc_DeviceKeyValidation();
 IRC_Status_t Proc_BoardRevisionValidation();
-#ifdef MEM_4DDR
 IRC_Status_t Proc_FB_Init();
-#endif
 #endif // PROC_INIT_H

@@ -46,10 +46,7 @@
 #include "Autofocus.h"
 #include "IRIGB.h"
 #include "GC_Store.h"
-
-#ifdef MEM_4DDR
 #include "FrameBuffer.h"
-#endif
 
 #ifdef ENABLE_TEC_CONTROL
 #include "tec_intf.h"
@@ -94,13 +91,14 @@ static IRC_Status_t DebugTerminalParseFWPID(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf);
+
 #ifdef ENABLE_TEC_CONTROL
 static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf);
 #endif
 
-#ifdef MEM_4DDR
-static IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf);
-#endif
+
+
 
 
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
@@ -147,12 +145,11 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"LT", DebugTerminalParseLT},
    {"PLT", DebugTerminalParsePLT},
    {"PBT", DebugTerminalParsePBT},
+   {"FB", DebugTerminalParseFB},
 #ifdef ENABLE_TEC_CONTROL
    {"TEC", DebugTerminalParseTEC},
 #endif
-#ifdef MEM_4DDR
-   {"FB", DebugTerminalParseFB},
-#endif
+
 #ifdef STARTUP
    DT_STARTUP_CMDS
 #endif
@@ -2702,7 +2699,7 @@ static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf)
 }
 #endif
 
-#ifdef MEM_4DDR
+
 /**
  * Debug terminal get FB status & errors.
  *
@@ -2711,7 +2708,7 @@ static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf)
  */
 IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
 {
-
+   #ifdef MEM_4DDR
    extern t_FB gFB_ctrl;
 
    DT_PRINTF("FB_BUFFER_A_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_A_BASE_ADDR_OFFSET));
@@ -2727,8 +2724,13 @@ IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
    DT_PRINTF("STATUS = 0x%08X", FB_getStatus(&gFB_ctrl));
 
    return IRC_SUCCESS;
+
+   #else
+   DT_PRINTF("Frame Buffer is not implemented.");
+   return IRC_SUCCESS;
+   #endif
 }
-#endif
+
 
 /**
  * Debug terminal Help command parser parser.
@@ -2785,11 +2787,9 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Lens Table:         LT rowIndex fieldIndex value");
    DT_PRINTF("  Print Lens Table:   PLT");
    DT_PRINTF("  Print Buffer Table: PBT");
+   DT_PRINTF("  FB status & errors :  FB");
    #ifdef ENABLE_TEC_CONTROL
    DT_PRINTF("  TEC Control:        TEC [setpoint]");
-   #endif
-	#ifdef MEM_4DDR
-	DT_PRINTF("  FB status & errors :  FB");
    #endif
    DT_PRINTF("  Print help:         HLP");
 

@@ -35,10 +35,7 @@
 #include "AEC.h"
 #include "Actualization.h"
 #include "SFW_ctrl.h"
-
-#ifdef MEM_4DDR
 #include "FrameBuffer.h"
-#endif
 
 #include <stdbool.h> // bool
 
@@ -117,9 +114,7 @@ void Acquisition_Arm()
    extern t_FlagCfg gFlagging_ctrl;
    extern t_GatingCfg gGating_ctrl;
    extern t_bufferManager gBufManager;
-   #ifdef MEM_4DDR
-      extern t_FB gFB_ctrl;
-   #endif
+   extern t_FB gFB_ctrl;
 
    TRIG_SendConfigGC(&gTrig, &gcRegsData);
 
@@ -142,9 +137,9 @@ void Acquisition_Arm()
 
    BufferManager_HW_MoiHandlerConfig(&gBufManager, 0);
 
-   #ifdef MEM_4DDR
-      FB_SendConfigGC(&gFB_ctrl, &gcRegsData);
-   #endif
+
+   FB_SendConfigGC(&gFB_ctrl, &gcRegsData);
+
 
    TDCStatusClr(WaitingForArmMask);
 
@@ -237,10 +232,8 @@ void Acquisition_SM()
    extern t_FpaIntf gFpaIntf;
    extern flashDynamicValues_t gFlashDynamicValues;
    extern t_Trig gTrig;
+   extern t_FB gFB_ctrl;
 
-   #ifdef MEM_4DDR
-      extern t_FB gFB_ctrl;
-   #endif
 
    #ifdef SCD_PROXY
       extern uint8_t gFrameRateChangePostponed;
@@ -380,10 +373,8 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
+            FB_Flush(&gFB_ctrl);
 
-            #ifdef MEM_4DDR
-               FB_Flush(&gFB_ctrl);
-            #endif
 
             #ifdef SCD_PROXY
                StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
@@ -408,9 +399,7 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
-            #ifdef MEM_4DDR
-               FB_Flush(&gFB_ctrl);
-            #endif
+            FB_Flush(&gFB_ctrl);
 
             #ifdef SCD_PROXY
                StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);
