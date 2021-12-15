@@ -76,7 +76,7 @@ enum builtInTestIDEnum {
 
    // When a built-in test is added to this list, the following tools must be updated:
    //    - tsirinfo
-   //    - IRCAM_TEL2000\Test\DeviceBuiltInTests\ParseDeviceBuiltInTestsResults.m (called in TSIRDiag)
+   //    - IRCam R&D\Test\DeviceBuiltInTests\ParseDeviceBuiltInTestsResults.m (called in TSIRDiag)
 
    // Built-in test count
    BITID_Count
