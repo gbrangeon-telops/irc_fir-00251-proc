@@ -24,6 +24,7 @@
 #include "xil_cache.h"
 #include "FileManager.h"
 #include "FirmwareUpdater.h"
+#include "FPA_intf.h"
 #include "GC_Manager.h"
 #include "GC_Poller.h"
 #include "GC_Store.h"
@@ -52,7 +53,6 @@
 #include "verbose.h"
 
 #define DEVICE_RUNNING_TIME_REFRESH_PERIOD_US   TIME_ONE_MINUTE_US
-#define COOLER_CURRENT_THRESHOLD_A   0.1F
 
 static void apply_resolution(void);
 
@@ -123,9 +123,11 @@ void disable_caches()
    extern slCtrl_t theSlCtrl;
    extern autofocusCtrl_t theAutoCtrl;
    extern qspiFlash_t gQSPIFlash;
+   extern t_FpaIntf gFpaIntf;
    statistics_t prof_stats;
    uint64_t profiler, profiler2;
    uint64_t tic;
+   t_FpaStatus fpaStatus;
 
    Stack_ConfigStackViolationException();
 
@@ -220,8 +222,9 @@ void disable_caches()
          gFlashDynamicValues.DeviceRunningTime += DEVICE_RUNNING_TIME_REFRESH_PERIOD_US / 1000000;
 
          // Update DeviceCoolerRunningTime according to measured cooler current
+         FPA_GetStatus(&fpaStatus, &gFpaIntf);
          if ((extAdcChannels[XEC_COOLER_CUR].isValid) &&
-               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) > COOLER_CURRENT_THRESHOLD_A))
+               (*(extAdcChannels[XEC_COOLER_CUR].p_physical) >= (float)fpaStatus.cooler_on_curr_min_mA / 1000.0F))
          {
             gFlashDynamicValues.DeviceCoolerRunningTime += DEVICE_RUNNING_TIME_REFRESH_PERIOD_US / 1000000;
          }
