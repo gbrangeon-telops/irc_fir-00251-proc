@@ -216,7 +216,27 @@ end bd_wrapper;
 
 
 architecture bd_wrapper of bd_wrapper is
-   
+       
+   component IOBUFDS_DIFF_OUT_DCIEN is
+      generic(
+         DIFF_TERM        : string  := "TRUE";
+         IBUF_LOW_PWR     : string  :=  "TRUE";
+         IOSTANDARD       : string  :=  "DIFF_SSTL15_T_DCI";
+         USE_IBUFDISABLE  : string  := "TRUE"
+         );    
+      port(
+         O               : out std_ulogic;
+         OB              : out std_ulogic;
+         IO              : inout std_ulogic; 
+         IOB             : inout std_ulogic;
+         DCITERMDISABLE  : in std_ulogic;
+         I               : in std_ulogic;
+         IBUFDISABLE     : in std_ulogic;
+         TM              : in std_ulogic;
+         TS              : in std_ulogic
+         );      
+   end component;
+
    component core_wrapper is
       port (
             ADC_READOUT_CTRL_araddr : out STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -1982,44 +2002,82 @@ begin
 
       );
 
-       --FRAME BUFFER CTRL WRAPPER
-         FB_CTRL_MOSI.araddr <= (others => '0');
-         FB_CTRL_MOSI.arprot  <= (others => '0');
-         FB_CTRL_MOSI.arvalid  <= '0';
-         FB_CTRL_MOSI.awaddr  <=  (others => '0');
-         FB_CTRL_MOSI.awprot  <=  (others => '0');
-         FB_CTRL_MOSI.awvalid  <= '0';
-         FB_CTRL_MOSI.bready  <=  '0';
-         FB_CTRL_MOSI.rready  <= '0';
-         FB_CTRL_MOSI.wdata  <= (others => '0');
-         FB_CTRL_MOSI.wstrb  <= (others => '0');
-         FB_CTRL_MOSI.wvalid <=  '0';
-         
-         AXIS_MM2S_DATA_MOSI_FB.tdata <= (others => '0');
-         AXIS_MM2S_DATA_MOSI_FB.tkeep <= (others => '0');
-         AXIS_MM2S_DATA_MOSI_FB.tlast <= '0';
-         AXIS_MM2S_DATA_MOSI_FB.tvalid <= '0'; 
-
-         AXIS_MM2S_STS_MOSI_FB.tdata <= (others => '0');
-         AXIS_MM2S_STS_MOSI_FB.tkeep <= (others => '0');
-         AXIS_MM2S_STS_MOSI_FB.tlast <= '0';
-         AXIS_MM2S_STS_MOSI_FB.tvalid <= '0';
-
-         AXIS_MM2S_CMD_MISO_FB.tready <= '0';
-         AXIS_S2MM_DATA_MISO_FB.tready <= '0';
-
-         AXIS_S2MM_STS_MOSI_FB.tdata <= (others => '0');
-         AXIS_S2MM_STS_MOSI_FB.tkeep <= (others => '0');
-         AXIS_S2MM_STS_MOSI_FB.tlast <= '0';
-         AXIS_S2MM_STS_MOSI_FB.tvalid <= '0';
-
-         AXIS_S2MM_CMD_MISO_FB.tready <= '0';
          
          CAL_DDR_dm(7 downto 4) <= (others => '0');
-         CAL_DDR_dq(63 downto 32) <= (others => '0');
-         CAL_DDR_dqs_n(7 downto 4) <= (others => '1');
-         CAL_DDR_dqs_p(7 downto 4) <= (others => '0');
+         CAL_DDR_dq(63 downto 32) <= (others => '0'); 
+
+         IOBUFDS_DIFF_OUT_DCIEN_4 : IOBUFDS_DIFF_OUT_DCIEN
+         generic map (
+         DIFF_TERM => "TRUE", -- Differential Termination (TRUE/FALSE)
+         IBUF_LOW_PWR => "TRUE", -- Low Power - TRUE, High Performance = FALSE
+         IOSTANDARD => "DIFF_SSTL15_T_DCI", -- Specify the I/O standard
+         USE_IBUFDISABLE => "TRUE") -- Use IBUFDISABLE function, "TRUE" or "FALSE"
+         port map (
+         O => open, -- Buffer p-side output
+         OB => open, -- Buffer n-side output
+         IO => CAL_DDR_dqs_p(4), -- Diff_p inout (connect directly to top-level port)
+         IOB => CAL_DDR_dqs_n(4), -- Diff_n inout (connect directly to top-level port)
+         DCITERMDISABLE => '0', -- DCI Termination enable input
+         I => '0', -- Buffer input
+         IBUFDISABLE => '0', -- input disable input, low=disable
+         TM => '0', -- 3-state enable input, high=input, low=output
+         TS => '0' -- 3-state enable input, high=output, low=input
+         ); 
          
+         IOBUFDS_DIFF_OUT_DCIEN_5 : IOBUFDS_DIFF_OUT_DCIEN
+         generic map (
+         DIFF_TERM => "TRUE", -- Differential Termination (TRUE/FALSE)
+         IBUF_LOW_PWR => "TRUE", -- Low Power - TRUE, High Performance = FALSE
+         IOSTANDARD => "DIFF_SSTL15_T_DCI", -- Specify the I/O standard
+         USE_IBUFDISABLE => "TRUE") -- Use IBUFDISABLE function, "TRUE" or "FALSE"
+         port map (
+         O => open, -- Buffer p-side output
+         OB => open, -- Buffer n-side output
+         IO => CAL_DDR_dqs_p(5), -- Diff_p inout (connect directly to top-level port)
+         IOB => CAL_DDR_dqs_n(5), -- Diff_n inout (connect directly to top-level port)
+         DCITERMDISABLE => '0', -- DCI Termination enable input
+         I => '0', -- Buffer input
+         IBUFDISABLE => '0', -- input disable input, low=disable
+         TM => '0', -- 3-state enable input, high=input, low=output
+         TS => '0' -- 3-state enable input, high=output, low=input
+         );
+         
+         IOBUFDS_DIFF_OUT_DCIEN_6 : IOBUFDS_DIFF_OUT_DCIEN
+         generic map (
+         DIFF_TERM => "TRUE", -- Differential Termination (TRUE/FALSE)
+         IBUF_LOW_PWR => "TRUE", -- Low Power - TRUE, High Performance = FALSE
+         IOSTANDARD => "DIFF_SSTL15_T_DCI", -- Specify the I/O standard
+         USE_IBUFDISABLE => "TRUE") -- Use IBUFDISABLE function, "TRUE" or "FALSE"
+         port map (
+         O => open, -- Buffer p-side output
+         OB => open, -- Buffer n-side output
+         IO => CAL_DDR_dqs_p(6), -- Diff_p inout (connect directly to top-level port)
+         IOB => CAL_DDR_dqs_n(6), -- Diff_n inout (connect directly to top-level port)
+         DCITERMDISABLE => '0', -- DCI Termination enable input
+         I => '0', -- Buffer input
+         IBUFDISABLE => '0', -- input disable input, low=disable
+         TM => '0', -- 3-state enable input, high=input, low=output
+         TS => '0' -- 3-state enable input, high=output, low=input
+         );
+         
+         IOBUFDS_DIFF_OUT_DCIEN_7 : IOBUFDS_DIFF_OUT_DCIEN
+         generic map (
+         DIFF_TERM => "TRUE", -- Differential Termination (TRUE/FALSE)
+         IBUF_LOW_PWR => "TRUE", -- Low Power - TRUE, High Performance = FALSE
+         IOSTANDARD => "DIFF_SSTL15_T_DCI", -- Specify the I/O standard
+         USE_IBUFDISABLE => "TRUE") -- Use IBUFDISABLE function, "TRUE" or "FALSE"
+         port map (
+         O => open, -- Buffer p-side output
+         OB => open, -- Buffer n-side output
+         IO => CAL_DDR_dqs_p(7), -- Diff_p inout (connect directly to top-level port)
+         IOB => CAL_DDR_dqs_n(7), -- Diff_n inout (connect directly to top-level port)
+         DCITERMDISABLE => '0', -- DCI Termination enable input
+         I => '0', -- Buffer input
+         IBUFDISABLE => '0', -- input disable input, low=disable
+         TM => '0', -- 3-state enable input, high=input, low=output
+         TS => '0' -- 3-state enable input, high=output, low=input
+         );
+
    end generate;
    
    MIG_4DDR : if (G_4DDR = true) generate
