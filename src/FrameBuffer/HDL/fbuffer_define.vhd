@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
 --
--- Title       : fb_define
+-- Title       : fbuffer_define
 -- Design      : tb_frame_buffer
 -- Author      : Philippe Couture   
 -- Company     : Telops
 --
 -------------------------------------------------------------------------------
 --
--- File        : D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_define.vhd
+-- File        : D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fbuffer_define.vhd
 -- Generated   : Mon Aug 10 13:21:40 2020
 -- From        : interface description file
 -- By          : Itf2Vhdl ver. 1.22
@@ -23,7 +23,7 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all; 
 use work.tel2000.all; 
 
-package fb_define is    	  
+package fbuffer_define is    	  
 
   
       
@@ -84,8 +84,8 @@ package fb_define is
    );
    type axis64_mosi_pipe is array (natural range 0 to 1) of t_axi4_stream_mosi64;
    
-end fb_define;
+end fbuffer_define;
 
-package body fb_define is
+package body fbuffer_define is
    
-end package body fb_define; 
+end package body fbuffer_define; 

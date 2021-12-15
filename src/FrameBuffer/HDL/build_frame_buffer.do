@@ -7,7 +7,7 @@ setenv UTILITIES "D:\Telops\Common_HDL\Utilities"
 
 # Package
 acom "$COMMON\VHDL\tel2000pkg.vhd"	 
-acom "$PROC\src\FrameBuffer\HDL\fb_define.vhd"
+acom "$PROC\src\FrameBuffer\HDL\fbuffer_define.vhd"
 
 #common_hdl
 do "D:\Telops\FIR-00251-Proc\src\compil_utilities.do"

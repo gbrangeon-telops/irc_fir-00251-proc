@@ -22,7 +22,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all; 
 use ieee.numeric_std.all;
 use work.TEL2000.all;
-use work.fb_define.all;
+use work.fbuffer_define.all;
 
 entity fb_manager is
 
