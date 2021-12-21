@@ -39,9 +39,7 @@
 */
 static uint32_t             FW_errors = 0;
 static bool                 FW_Reset = false;
-static bool                 FW_HomingValid = false;
 static int32_t              FW_RequestedTarget;
-static FW_ControllerMode_t  FW_currentMode = FW_STARTUP_MODE;
 static int32_t FW_currentRawPosition = 1000000;
 
 static FH_ctrl_t* FH_instance = 0;
@@ -361,9 +359,6 @@ void FW_ControllerProcess()
    // Update last cycle memory
    modeChanged = (currentMode != lastMode);
    lastMode = currentMode;
-   
-   // Set FW_HomingValid to false and it can be changed if the currentMode is FW_POSITION_MODE
-   FW_HomingValid = false;
 
    //////////////////////////////////////////////////////////////////////////////////
    // Output of the state machine : Processing to be done in each state
@@ -397,7 +392,6 @@ void FW_ControllerProcess()
 
       case FW_POSITION_MODE:
          modeReady = FWPositionMode(modeChanged, targetChanged);
-         FW_HomingValid = modeReady;
          //gcRegsData.FWPosition is updated in FWPositionMode()
 
          break;
@@ -425,36 +419,8 @@ void FW_ControllerProcess()
       FW_INF("Updating FWPosition in header (%d)", gcRegsData.FWPosition);
    }
 
-   FW_currentMode = currentMode;
-
    // handle commands in the pipe
    FH_sendPendingCmds(FH_instance);
-}
-
-/*
- * Name         : getFWControllerModes
- *
- * Synopsis     : FWControllerModes_t getFWControllerModes()
- * Description  : Return the current mode of FW
- * 
- * Returns      : FWControllerModes_t : state of the Controller
- */
-FW_ControllerMode_t getFWControllerMode()
-{
-   return FW_currentMode;
-}
-
-/*
- * Name         : IsFWHomingValid
- *
- * Synopsis     : bool IsFWHomingValid()
- * Description  : Return FW_HomingValid;
- * 
- * Returns      : bool : false -> homing is not valid, true homing is valid
- */
-bool IsFWHomingValid()
-{
-   return FW_HomingValid;
 }
 
 /*
@@ -941,7 +907,7 @@ static bool FWVelocityMode(bool reset, bool newTarget )
                FW_ClearErrors(FW_ERR_FAULHABER_RESP_TIMEOUT);
 
                FW_INF("Current Velocity : %d", value);
-               if( (value > ( currentTarget - FW_VEL_THRESHOLD)) && (value < ( currentTarget + FW_VEL_THRESHOLD)))
+               if( (value > ( currentTarget - VELOCITY_TOLERANCE)) && (value < ( currentTarget + VELOCITY_TOLERANCE)))
                {
                   FW_INF("Target Velocity Reached\n");
 

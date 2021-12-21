@@ -201,9 +201,6 @@ typedef struct FWCommandStruct FWCommand_t;
 void FWControllerReset();
 void ChangeFWControllerMode(FW_ControllerMode_t newMode, int32_t target);
 void FW_ControllerProcess();
-bool IsFWControllerReady();
-FW_ControllerMode_t getFWControllerMode();
-bool IsFWHomingValid();
 IRC_Status_t FWControllerInit(FH_ctrl_t* instance);
 void FW_initPositionLUT();
 
