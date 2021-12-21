@@ -207,6 +207,8 @@ void FPA_PowerDown(const t_FpaIntf *ptrA)
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    xro3503_param_t hh;
+   uint32_t roicWidth;
+   uint32_t roicOffsetX;
    //extern int16_t gFpaDetectorPolarizationVoltage;
    //static int16_t presentPolarizationVoltage = 150;
    //extern float gFpaDetectorElectricalTapsRef;
@@ -274,20 +276,36 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          ptrA->fpa_intf_data_source = DATA_SOURCE_OUTSIDE_FPGA;
    }
 
-   // diag
+   // Pour corriger la calibration en sous-fenetre on lit les 16 colonnes précédentes.
+   if (pGCRegs->OffsetX == 0)
+   {
+      roicOffsetX             = pGCRegs->OffsetX;
+      roicWidth               = pGCRegs->Width;
+      ptrA->sof_posf_pclk     = 1;
+      ptrA->sol_posl_pclk     = 1;
+   }
+   else
+   {
+      roicOffsetX             = pGCRegs->OffsetX - FPA_NUMTAPS;
+      roicWidth               = pGCRegs->Width + FPA_NUMTAPS;
+      ptrA->sof_posf_pclk     = 2;
+      ptrA->sol_posl_pclk     = 2;
+   }
+
+   // diag (sans la correction pour la calibration en sous-fenêtre)
    ptrA->diag_ysize              = pGCRegs->Height;
    ptrA->diag_xsize_div_tapnum   = pGCRegs->Width / FPA_NUMTAPS;
 
    // prog ctrl
-   ptrA->xstart   = pGCRegs->OffsetX / FPA_NUMTAPS;
+   ptrA->xstart   = roicOffsetX / FPA_NUMTAPS;
    ptrA->ystart   = pGCRegs->OffsetY / 4;
-   ptrA->xstop    = (pGCRegs->OffsetX + pGCRegs->Width - 1) / FPA_NUMTAPS;
+   ptrA->xstop    = (roicOffsetX + roicWidth - 1) / FPA_NUMTAPS;
    ptrA->ystop    = (pGCRegs->OffsetY + pGCRegs->Height - 1) / 4;
 
    if (gFpaSubWindowMode > 1)
    {
       // valeur invalide, on utilise le défaut
-      if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
+      if ((roicWidth == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
          ptrA->sub_window_mode = 0;
       else
          ptrA->sub_window_mode = 1;
@@ -312,16 +330,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;
 
    // readout ctrl
-   ptrA->line_period_pclk                  = (pGCRegs->Width / FPA_NUMTAPS + (uint32_t)hh.lovh_mclk);
+   ptrA->line_period_pclk                  = (roicWidth / FPA_NUMTAPS + (uint32_t)hh.lovh_mclk);
    ptrA->window_lsync_num                  = pGCRegs->Height + (uint32_t)hh.fovh_line;
    ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * ptrA->window_lsync_num + 1;
 
    ptrA->active_line_start_num             = 1;
    ptrA->active_line_end_num               = ptrA->active_line_start_num + pGCRegs->Height - 1;
 
-   ptrA->sof_posf_pclk                     = 1;
    ptrA->eof_posf_pclk                     = ptrA->active_line_end_num * ptrA->line_period_pclk - (uint32_t)hh.lovh_mclk;
-   ptrA->sol_posl_pclk                     = 1;
    ptrA->eol_posl_pclk                     = ptrA->sol_posl_pclk + pGCRegs->Width / FPA_NUMTAPS - 1;
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
@@ -344,7 +360,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDebugRegD = 80;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;
 
-   // image info
+   // image info (sans la correction pour la calibration en sous-fenêtre)
    ptrA->offsetx  = pGCRegs->OffsetX;
    ptrA->offsety  = pGCRegs->OffsetY;
    ptrA->width    = pGCRegs->Width;
@@ -477,6 +493,7 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
 {
    extern uint16_t gFpaLovh_mclk;
    extern bool gFpaLovhFlag;
+   uint32_t readoutWidth;
 
    // parametres statiques
    ptrH->mclk_period_usec           = 1e6F/(float)FPA_MCLK_RATE_HZ;
@@ -503,7 +520,13 @@ void FPA_SpecificParams(xro3503_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->min_time_between_int_usec  = MAX(1.0F, 10.0F * ptrH->mclk_period_usec);
 
    // readout time
-   ptrH->readout_mclk   = ((float)(pGCRegs->Width / FPA_NUMTAPS) + ptrH->lovh_mclk) * ((float)pGCRegs->Height + ptrH->fovh_line);
+   if (pGCRegs->Width == FPA_WIDTH_MAX)
+      readoutWidth = pGCRegs->Width;
+   else
+      // Pour corriger la calibration en sous-fenetre on lit 16 colonnes de plus.
+      // En réalité ces colonnes sont lues seulement si OffsetX != 0, mais on ignore ce détail pour le calcul du FRmax.
+      readoutWidth = pGCRegs->Width + FPA_NUMTAPS;
+   ptrH->readout_mclk   = ((float)(readoutWidth / FPA_NUMTAPS) + ptrH->lovh_mclk) * ((float)pGCRegs->Height + ptrH->fovh_line);
    ptrH->readout_usec   = ptrH->readout_mclk * ptrH->mclk_period_usec;
 
    // delay

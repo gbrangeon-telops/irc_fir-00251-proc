@@ -102,6 +102,10 @@ architecture TB_ARCHITECTURE of xro3503a_intf_testbench_tb is
    
    signal addr : unsigned(31 downto 0);
    signal LOVH : integer;
+   signal ROIC_OFFSETX : integer;
+   signal ROIC_XSIZE : integer;
+   signal SOF : integer;
+   signal SOL : integer;
    
 begin
    
@@ -155,6 +159,12 @@ begin
    
    LOVH <= LOVH_27MHz when (DEFINE_FPA_MCLK_RATE_KHZ <= 27_000) else LOVH_40MHz;
    
+   -- Pour corriger la calibration en sous-fenetre on lit les 16 colonnes précédentes
+   ROIC_OFFSETX <= OFFSETX when (OFFSETX = 0) else OFFSETX - TAP_NUM;
+   ROIC_XSIZE   <= XSIZE   when (OFFSETX = 0) else XSIZE + TAP_NUM;
+   SOF          <= 1       when (OFFSETX = 0) else 2;
+   SOL          <= 1       when (OFFSETX = 0) else 2;
+   
    
    process(MB_CLK)
    begin
@@ -163,7 +173,7 @@ begin
          user_cfg_i.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR;
          user_cfg_i.COMN.fpa_pwr_on <= '1';
          user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_TRIG_START_TO_TRIG_START;--MODE_READOUT_END_TO_TRIG_START;
-         user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned((DEFINE_FPA_INT_END_TO_LSYNC + (XSIZE/TAP_NUM + LOVH) * (YSIZE + FOVH)) * DEFINE_FPA_MCLK_RATE_FACTOR_100M, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);    -- delay + readout (full window)
+         user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned((DEFINE_FPA_INT_END_TO_LSYNC + (ROIC_XSIZE/TAP_NUM + LOVH) * (YSIZE + FOVH)) * DEFINE_FPA_MCLK_RATE_FACTOR_100M, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);    -- delay + readout (full window)
          user_cfg_i.COMN.fpa_spare <= (others => '0');
          user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= resize(user_cfg_i.COMN.fpa_acq_trig_ctrl_dly, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
          user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly <= to_unsigned(0, user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly'length);
@@ -173,9 +183,9 @@ begin
          user_cfg_i.diag.ysize <= to_unsigned(YSIZE, user_cfg_i.diag.ysize'length);
          user_cfg_i.diag.xsize_div_tapnum <= to_unsigned(XSIZE/TAP_NUM, user_cfg_i.diag.xsize_div_tapnum'length);
          
-         user_cfg_i.xstart <= to_unsigned(OFFSETX/TAP_NUM, user_cfg_i.xstart'length);
+         user_cfg_i.xstart <= to_unsigned(ROIC_OFFSETX/TAP_NUM, user_cfg_i.xstart'length);
          user_cfg_i.ystart <= to_unsigned(OFFSETY/4, user_cfg_i.ystart'length);
-         user_cfg_i.xstop  <= to_unsigned((OFFSETX+XSIZE-1)/TAP_NUM, user_cfg_i.xstop'length);
+         user_cfg_i.xstop  <= to_unsigned((ROIC_OFFSETX+ROIC_XSIZE-1)/TAP_NUM, user_cfg_i.xstop'length);
          user_cfg_i.ystop  <= to_unsigned((OFFSETY+YSIZE-1)/4, user_cfg_i.ystop'length);
          user_cfg_i.sub_window_mode <= '1';  
          user_cfg_i.read_dir_down <= '0';
@@ -185,16 +195,16 @@ begin
          
          user_cfg_i.real_mode_active_pixel_dly  <= to_unsigned(12, user_cfg_i.real_mode_active_pixel_dly'length);
          
-         user_cfg_i.line_period_pclk <= to_unsigned((XSIZE/TAP_NUM + LOVH), user_cfg_i.line_period_pclk'length);
+         user_cfg_i.line_period_pclk <= to_unsigned((ROIC_XSIZE/TAP_NUM + LOVH), user_cfg_i.line_period_pclk'length);
          user_cfg_i.window_lsync_num <= to_unsigned((YSIZE + FOVH), user_cfg_i.window_lsync_num'length);
          user_cfg_i.readout_pclk_cnt_max <= resize(user_cfg_i.window_lsync_num * user_cfg_i.line_period_pclk + 1, user_cfg_i.readout_pclk_cnt_max'length);
          
          user_cfg_i.active_line_start_num <= to_unsigned(1, user_cfg_i.active_line_start_num'length); 
          user_cfg_i.active_line_end_num <= to_unsigned(to_integer(user_cfg_i.active_line_start_num) + YSIZE - 1, user_cfg_i.active_line_end_num'length);
          
-         user_cfg_i.sof_posf_pclk <= to_unsigned(1, user_cfg_i.sof_posf_pclk'length);
+         user_cfg_i.sof_posf_pclk <= to_unsigned(SOF, user_cfg_i.sof_posf_pclk'length);
          user_cfg_i.eof_posf_pclk <= resize(user_cfg_i.active_line_end_num * user_cfg_i.line_period_pclk - LOVH, user_cfg_i.eof_posf_pclk'length);
-         user_cfg_i.sol_posl_pclk <= to_unsigned(1, user_cfg_i.sol_posl_pclk'length);
+         user_cfg_i.sol_posl_pclk <= to_unsigned(SOL, user_cfg_i.sol_posl_pclk'length);
          user_cfg_i.eol_posl_pclk <= to_unsigned(to_integer(user_cfg_i.sol_posl_pclk) + (XSIZE/TAP_NUM) - 1, user_cfg_i.eol_posl_pclk'length);
          user_cfg_i.eol_posl_pclk_p1 <= user_cfg_i.eol_posl_pclk + 1;
          

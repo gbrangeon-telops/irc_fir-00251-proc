@@ -129,10 +129,10 @@ wave UUT/U1/*
 --wave UUT/U1/U5/U2/U2/*
 
 -- data_ctrl
-wave UUT/U1/U9/*
-wave UUT/U1/U9/U18/*
-wave UUT/U1/U9/U6/*
-wave UUT/U1/U9/U19/*
+--wave UUT/U1/U9/*
+--wave UUT/U1/U9/U18/*
+--wave UUT/U1/U9/U6/*
+--wave UUT/U1/U9/U19/*
  
 -- clk_gen
 --wave UUT/U1/U26/U1/*
