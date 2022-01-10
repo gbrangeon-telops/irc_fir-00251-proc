@@ -23,7 +23,7 @@ use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 use work.tel2000.all; 
 use work.fb_testbench_pkg.all; 
-use work.fb_define.all;
+use work.fbuffer_define.all;
 
 entity stim is
    port(                                

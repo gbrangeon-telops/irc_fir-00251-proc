@@ -13,7 +13,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all; 
 use IEEE.numeric_std.all;
-use work.fb_define.all;
+use work.fbuffer_define.all;
 
 package fb_testbench_pkg is                                         
 

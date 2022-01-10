@@ -9,7 +9,7 @@ setenv UTILITIES "D:\Telops\Common_HDL\Utilities"
 -- frame buffer src
 do "D:\Telops\FIR-00251-Proc\src\compil_utilities.do"
 acom  "$COMMON\VHDL\tel2000pkg.vhd"	 
-acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_define.vhd"
+acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fbuffer_define.vhd"
 
 acom "D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd"
 
@@ -28,7 +28,7 @@ acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\FrameBuffer.bde"
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\src\fb_testbench_pkg.vhd"
 
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\src\datamover_frame_buffer_sim_netlist.vhdl"
-acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\data_mover_wrapper.vhd"
+acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\src\data_mover_wrapper.vhd"
 
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\src\fifo_generator_0_sim_netlist.vhdl"
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\Sim\src\AXI4_FIFO.vhd"
