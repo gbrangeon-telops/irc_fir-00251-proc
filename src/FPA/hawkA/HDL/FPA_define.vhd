@@ -54,6 +54,7 @@ package FPA_define is
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
    constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- on ne fait aucune correction électronique
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait aucune correction de gain
+   constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -166,7 +167,14 @@ package FPA_define is
       ref_value                      : unsigned(13 downto 0); -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
    end record;
    
-   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type;
+   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type; 
+   
+   -- sol et eol de l'aoi
+   type line_area_cfg_type is
+   record      
+      sol_pos                        : unsigned(9 downto 0);     -- position de sol de l'aoi lorsque cropping actif
+      eol_pos                        : unsigned(9 downto 0);     -- position de eol de l'aoi lorsque cropping actif
+   end record;
    
    
    type fpa_intf_cfg_type is
@@ -283,6 +291,11 @@ package FPA_define is
       cfg_num                        : unsigned(7 downto 0);
       
       cbit_pipe_dly                  : unsigned(3 downto 0);
+      
+      -- cropping
+      aoi_data                       : line_area_cfg_type;
+      aoi_flag1                      : line_area_cfg_type;
+      aoi_flag2                      : line_area_cfg_type;
       
    end record; 
    

@@ -52,6 +52,7 @@ package FPA_define is
    constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait pas que la correctioon de l'offset mais aussi du gain
    -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- n'a aucune importance pour un 16 taps
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
+   constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 11_111.0; -- 12_125.0; --11_880.0; -- 11_111.0;    
    constant DEFINE_FPA_INTCLK_RATE_KHZ            : real      := DEFINE_FPA_MCLK_RATE_KHZ;  -- l'horloge d'integration
@@ -202,7 +203,14 @@ package FPA_define is
       ref_value                      : unsigned(13 downto 0); -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
    end record;
    
-   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type;
+   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type; 
+   
+   -- sol et eol de l'aoi
+   type line_area_cfg_type is
+   record      
+      sol_pos                        : unsigned(9 downto 0);     -- position de sol de l'aoi lorsque cropping actif
+      eol_pos                        : unsigned(9 downto 0);     -- position de eol de l'aoi lorsque cropping actif
+   end record;
    
    
    ------------------------------------------------								
@@ -342,6 +350,11 @@ package FPA_define is
       
       -- activation de l'horloge lsydel à plus que 2xMCLK
       permit_lsydel_clk_rate_beyond_2x    : std_logic;
+      
+      -- cropping
+      aoi_data                            : line_area_cfg_type;
+      aoi_flag1                           : line_area_cfg_type;
+      aoi_flag2                           : line_area_cfg_type;
       
    end record;    
    

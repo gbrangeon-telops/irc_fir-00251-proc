@@ -49,6 +49,7 @@ package FPA_define is
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.   constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';       -- n'a aucune importance pour les 16 taps
    -- constant DEFINE_GENERATE_QUAD2_PROCESSING_CHAIN: std_logic := '0';      -- n'a aucune importance pour les 16 taps
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 500_000;  -- en usec, le delaui de stabilisation (analog setup)
+   constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
    
    constant DEFINE_FPA_MCLK_RATE_KHZ              : real      := 5_000.0;   --
    constant DEFINE_FPA_FAST_MCLK_RATE_KHZ         : real      := 2.0*DEFINE_FPA_MCLK_RATE_KHZ;   -- 
@@ -287,7 +288,14 @@ package FPA_define is
       ref_value                      : unsigned(13 downto 0); -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
    end record;
    
-   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type;
+   type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type; 
+   
+   -- sol et eol de l'aoi
+   type line_area_cfg_type is
+   record      
+      sol_pos                        : unsigned(9 downto 0);     -- position de sol de l'aoi lorsque cropping actif
+      eol_pos                        : unsigned(9 downto 0);     -- position de eol de l'aoi lorsque cropping actif
+   end record;
    
    ------------------------------------------------								
    -- Configuration du Bloc FPA_interface
@@ -413,7 +421,12 @@ package FPA_define is
       tsh_min_minus_int_time_offset       : unsigned(15 downto 0);
       
       -- additional exposure time offset from driver C
-      additional_fpa_int_time_offset      : signed(31 downto 0);  
+      additional_fpa_int_time_offset      : signed(31 downto 0);
+      
+      -- cropping
+      aoi_data                            : line_area_cfg_type;
+      aoi_flag1                           : line_area_cfg_type;
+      aoi_flag2                           : line_area_cfg_type;
       
    end record;     
    
