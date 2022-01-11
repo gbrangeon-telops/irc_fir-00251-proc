@@ -240,11 +240,11 @@ begin
                   when X"044" =>    mb_struct_cfg.aoi_xsize                             <= unsigned(data_i(mb_struct_cfg.aoi_xsize'length-1 downto 0)); 
                   when X"048" =>    mb_struct_cfg.aoi_ysize                             <= unsigned(data_i(mb_struct_cfg.aoi_ysize'length-1 downto 0));                                         
                   when X"04C" =>    mb_struct_cfg.aoi_data.sol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0)); 
-                  when X"050" =>    mb_struct_cfg.aoi_data.eol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.sol_pos'length-1 downto 0));                       
+                  when X"050" =>    mb_struct_cfg.aoi_data.eol_pos                      <= unsigned(data_i(mb_struct_cfg.aoi_data.eol_pos'length-1 downto 0));                       
                   when X"054" =>    mb_struct_cfg.aoi_flag1.sol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.sol_pos'length-1 downto 0));                       
-                  when X"058" =>    mb_struct_cfg.aoi_flag1.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.sol_pos'length-1 downto 0));                         
+                  when X"058" =>    mb_struct_cfg.aoi_flag1.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag1.eol_pos'length-1 downto 0));                         
                   when X"05C" =>    mb_struct_cfg.aoi_flag2.sol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.sol_pos'length-1 downto 0));
-                  when X"060" =>    mb_struct_cfg.aoi_flag2.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.sol_pos'length-1 downto 0));                       
+                  when X"060" =>    mb_struct_cfg.aoi_flag2.eol_pos                     <= unsigned(data_i(mb_struct_cfg.aoi_flag2.eol_pos'length-1 downto 0));                       
                      
                   -- op                                                                
                   when X"064" =>    mb_struct_cfg.op.xstart                             <= unsigned(data_i(mb_struct_cfg.op.xstart'length-1 downto 0));      
