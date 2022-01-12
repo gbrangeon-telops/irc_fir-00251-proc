@@ -159,10 +159,23 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
 
    // new config
    uint32_t  cfg_num;
+   
+   // cropping
+   uint32_t  aoi_data_sol_pos;
+   uint32_t  aoi_data_eol_pos;
+   uint32_t  aoi_flag1_sol_pos;
+   uint32_t  aoi_flag1_eol_pos;
+   uint32_t  aoi_flag2_sol_pos;
+   uint32_t  aoi_flag2_eol_pos;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 

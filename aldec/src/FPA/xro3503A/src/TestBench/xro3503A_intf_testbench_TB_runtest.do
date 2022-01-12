@@ -32,9 +32,11 @@ acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d8192_lim\t_axi4_stre
 acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d16384_lim\t_axi4_stream64_sfifo_d16384_lim_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w1_d16\fwft_sfifo_w1_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d256\fwft_sfifo_w3_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w4_d1024\fwft_sfifo_w4_d1024_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d16\fwft_sfifo_w8_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w56_d256\fwft_sfifo_w56_d256_sim_netlist.vhdl

@@ -53,7 +53,7 @@ architecture TB_ARCHITECTURE of xro3503a_intf_testbench_tb is
    
    constant TAP_NUM        : integer := 16;  
    constant XSIZE          : integer := 640;
-   constant YSIZE          : integer := 512;
+   constant YSIZE          : integer := 8;
    constant OFFSETX        : integer := 0;
    constant OFFSETY        : integer := 0;
    constant LOVH_27MHz     : integer := 12;  --Spec XRO3503 for full size frame
@@ -102,10 +102,9 @@ architecture TB_ARCHITECTURE of xro3503a_intf_testbench_tb is
    
    signal addr : unsigned(31 downto 0);
    signal LOVH : integer;
+   signal ROIC_ADDITIONAL_PIX : integer;
    signal ROIC_OFFSETX : integer;
    signal ROIC_XSIZE : integer;
-   signal SOF : integer;
-   signal SOL : integer;
    
 begin
    
@@ -160,10 +159,9 @@ begin
    LOVH <= LOVH_27MHz when (DEFINE_FPA_MCLK_RATE_KHZ <= 27_000) else LOVH_40MHz;
    
    -- Pour corriger la calibration en sous-fenetre on lit les 16 colonnes précédentes
-   ROIC_OFFSETX <= OFFSETX when (OFFSETX = 0) else OFFSETX - TAP_NUM;
-   ROIC_XSIZE   <= XSIZE   when (OFFSETX = 0) else XSIZE + TAP_NUM;
-   SOF          <= 1       when (OFFSETX = 0) else 2;
-   SOL          <= 1       when (OFFSETX = 0) else 2;
+   ROIC_ADDITIONAL_PIX <= 0 when (OFFSETX = 0) else TAP_NUM;
+   ROIC_OFFSETX <= OFFSETX - ROIC_ADDITIONAL_PIX;
+   ROIC_XSIZE   <= XSIZE + ROIC_ADDITIONAL_PIX;
    
    
    process(MB_CLK)
@@ -181,7 +179,7 @@ begin
          user_cfg_i.comn.fpa_intf_data_source <= '0';
          
          user_cfg_i.diag.ysize <= to_unsigned(YSIZE, user_cfg_i.diag.ysize'length);
-         user_cfg_i.diag.xsize_div_tapnum <= to_unsigned(XSIZE/TAP_NUM, user_cfg_i.diag.xsize_div_tapnum'length);
+         user_cfg_i.diag.xsize_div_tapnum <= to_unsigned(ROIC_XSIZE/TAP_NUM, user_cfg_i.diag.xsize_div_tapnum'length);
          
          user_cfg_i.xstart <= to_unsigned(ROIC_OFFSETX/TAP_NUM, user_cfg_i.xstart'length);
          user_cfg_i.ystart <= to_unsigned(OFFSETY/4, user_cfg_i.ystart'length);
@@ -193,7 +191,7 @@ begin
          user_cfg_i.gain <= '0';
          user_cfg_i.ctia_bias_current  <= (others => '1');
          
-         user_cfg_i.real_mode_active_pixel_dly  <= to_unsigned(12, user_cfg_i.real_mode_active_pixel_dly'length);
+         user_cfg_i.real_mode_active_pixel_dly  <= to_unsigned(13, user_cfg_i.real_mode_active_pixel_dly'length);
          
          user_cfg_i.line_period_pclk <= to_unsigned((ROIC_XSIZE/TAP_NUM + LOVH), user_cfg_i.line_period_pclk'length);
          user_cfg_i.window_lsync_num <= to_unsigned((YSIZE + FOVH), user_cfg_i.window_lsync_num'length);
@@ -202,10 +200,10 @@ begin
          user_cfg_i.active_line_start_num <= to_unsigned(1, user_cfg_i.active_line_start_num'length); 
          user_cfg_i.active_line_end_num <= to_unsigned(to_integer(user_cfg_i.active_line_start_num) + YSIZE - 1, user_cfg_i.active_line_end_num'length);
          
-         user_cfg_i.sof_posf_pclk <= to_unsigned(SOF, user_cfg_i.sof_posf_pclk'length);
+         user_cfg_i.sof_posf_pclk <= to_unsigned(1, user_cfg_i.sof_posf_pclk'length);
          user_cfg_i.eof_posf_pclk <= resize(user_cfg_i.active_line_end_num * user_cfg_i.line_period_pclk - LOVH, user_cfg_i.eof_posf_pclk'length);
-         user_cfg_i.sol_posl_pclk <= to_unsigned(SOL, user_cfg_i.sol_posl_pclk'length);
-         user_cfg_i.eol_posl_pclk <= to_unsigned(to_integer(user_cfg_i.sol_posl_pclk) + (XSIZE/TAP_NUM) - 1, user_cfg_i.eol_posl_pclk'length);
+         user_cfg_i.sol_posl_pclk <= to_unsigned(1, user_cfg_i.sol_posl_pclk'length);
+         user_cfg_i.eol_posl_pclk <= to_unsigned(to_integer(user_cfg_i.sol_posl_pclk) + (ROIC_XSIZE/TAP_NUM) - 1, user_cfg_i.eol_posl_pclk'length);
          user_cfg_i.eol_posl_pclk_p1 <= user_cfg_i.eol_posl_pclk + 1;
          
          user_cfg_i.pix_samp_num_per_ch               <= to_unsigned(1, user_cfg_i.pix_samp_num_per_ch'length);
@@ -228,11 +226,18 @@ begin
          user_cfg_i.fpa_pwr_override_mode             <= '0';
          
          user_cfg_i.diag.lovh_mclk_source             <= to_unsigned(LOVH * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length);
-		 
-		 user_cfg_i.fpa_temp_pwroff_correction        <= to_unsigned(FPA_TEMP_PWROFF_CORRECTION, user_cfg_i.fpa_temp_pwroff_correction'length);
+         
+         user_cfg_i.fpa_temp_pwroff_correction        <= to_unsigned(FPA_TEMP_PWROFF_CORRECTION, user_cfg_i.fpa_temp_pwroff_correction'length);
          
          user_cfg_i.cfg_num          		            <= to_unsigned(1, user_cfg_i.cfg_num'length);
-      
+         
+         user_cfg_i.aoi_data.sol_pos                  <= to_unsigned(ROIC_ADDITIONAL_PIX/4 + 1, user_cfg_i.aoi_data.sol_pos'length);
+         user_cfg_i.aoi_data.eol_pos                  <= to_unsigned(ROIC_XSIZE/4, user_cfg_i.aoi_data.eol_pos'length);
+         user_cfg_i.aoi_flag1.sol_pos                 <= to_unsigned(1, user_cfg_i.aoi_flag1.sol_pos'length);
+         user_cfg_i.aoi_flag1.eol_pos                 <= to_unsigned(XSIZE/4 - 1, user_cfg_i.aoi_flag1.eol_pos'length);
+         user_cfg_i.aoi_flag2.sol_pos                 <= to_unsigned(ROIC_XSIZE/4, user_cfg_i.aoi_flag2.sol_pos'length);
+         user_cfg_i.aoi_flag2.eol_pos                 <= user_cfg_i.aoi_flag2.sol_pos;
+         
          user_cfg_i.vdac_value(1)               		<= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
          user_cfg_i.vdac_value(2)               		<= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 
          user_cfg_i.vdac_value(3)               		<= to_unsigned(11630, user_cfg_i.vdac_value(3)'length);
@@ -431,6 +436,25 @@ begin
       wait for 30 ns;
 	  
       write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.cfg_num, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.aoi_data.sol_pos, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.aoi_data.eol_pos, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.aoi_flag1.sol_pos, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.aoi_flag1.eol_pos, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.aoi_flag2.sol_pos, 32)), MB_MISO,  MB_MOSI);
+      addr <= addr + 4;
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, std_logic_vector(addr), std_logic_vector(resize(user_cfg_i.aoi_flag2.eol_pos, 32)), MB_MISO,  MB_MOSI);
       addr <= addr + 4;
       wait for 30 ns;
       

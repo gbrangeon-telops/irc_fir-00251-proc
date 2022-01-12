@@ -207,6 +207,7 @@ void FPA_PowerDown(const t_FpaIntf *ptrA)
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 {
    xro3503_param_t hh;
+   uint32_t roicAdditionalPix;
    uint32_t roicWidth;
    uint32_t roicOffsetX;
    //extern int16_t gFpaDetectorPolarizationVoltage;
@@ -277,24 +278,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    }
 
    // Pour corriger la calibration en sous-fenetre on lit les 16 colonnes précédentes.
+   // Ensuite on utilise le cropping pour se débarasser des colonnes supplémentaires.
    if (pGCRegs->OffsetX == 0)
-   {
-      roicOffsetX             = pGCRegs->OffsetX;
-      roicWidth               = pGCRegs->Width;
-      ptrA->sof_posf_pclk     = 1;
-      ptrA->sol_posl_pclk     = 1;
-   }
+      roicAdditionalPix = 0;
    else
-   {
-      roicOffsetX             = pGCRegs->OffsetX - FPA_NUMTAPS;
-      roicWidth               = pGCRegs->Width + FPA_NUMTAPS;
-      ptrA->sof_posf_pclk     = 2;
-      ptrA->sol_posl_pclk     = 2;
-   }
+      roicAdditionalPix = FPA_NUMTAPS;
+   roicOffsetX    = pGCRegs->OffsetX - roicAdditionalPix;
+   roicWidth      = pGCRegs->Width + roicAdditionalPix;
 
-   // diag (sans la correction pour la calibration en sous-fenêtre)
+   // diag (pour simplifier la config, on applique la correction pour la calibration en sous-fenêtre)
    ptrA->diag_ysize              = pGCRegs->Height;
-   ptrA->diag_xsize_div_tapnum   = pGCRegs->Width / FPA_NUMTAPS;
+   ptrA->diag_xsize_div_tapnum   = roicWidth / FPA_NUMTAPS;
 
    // prog ctrl
    ptrA->xstart   = roicOffsetX / FPA_NUMTAPS;
@@ -337,8 +331,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->active_line_start_num             = 1;
    ptrA->active_line_end_num               = ptrA->active_line_start_num + pGCRegs->Height - 1;
 
+   ptrA->sof_posf_pclk                     = 1;
    ptrA->eof_posf_pclk                     = ptrA->active_line_end_num * ptrA->line_period_pclk - (uint32_t)hh.lovh_mclk;
-   ptrA->eol_posl_pclk                     = ptrA->sol_posl_pclk + pGCRegs->Width / FPA_NUMTAPS - 1;
+   ptrA->sol_posl_pclk                     = 1;
+   ptrA->eol_posl_pclk                     = ptrA->sol_posl_pclk + roicWidth / FPA_NUMTAPS - 1;
    ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
 
    // sample proc
@@ -385,6 +381,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       cfg_num = 0;
    cfg_num++;
    ptrA->cfg_num  = (uint32_t)cfg_num;
+   
+   // cropping
+   // le compteur de position démarre à 1 avec le SOL du readout et incrémente de 1 à chaque transaction du bus de 4 pixels (d'où les divisions par 4).
+   // aoi_data représente les pixels à conserver.
+   ptrA->aoi_data_sol_pos          = roicAdditionalPix/4 + 1;  // les pixels à conserver commencent au 1er pixel après les pixels supplémentaires
+   ptrA->aoi_data_eol_pos          = roicWidth/4;              // aoi_data conserve les pixels jusqu'au dernier. Nombre de pixels = Width.
+   // aoi_flag représente les flags (SOF, EOF, SOL et EOL) à conserver. Ils s'accrochent 1 à 1 aux pixels conservés, donc aoi_data et aoi_flag doivent être de même taille.
+   // aoi_flag1 et aoi_flag2 ne doivent pas se chevaucher.
+   ptrA->aoi_flag1_sol_pos         = 1;                        // SOF et SOL sont toujours sur le 1er pixel
+   ptrA->aoi_flag1_eol_pos         = pGCRegs->Width/4 - 1;     // aoi_flag1 conserve les flags des Width-1 premiers pixels. Nombre de pixels = Width-1.
+   ptrA->aoi_flag2_sol_pos         = roicWidth/4;              // EOF et EOL sont toujours sur le dernier pixel
+   ptrA->aoi_flag2_eol_pos         = ptrA->aoi_flag2_sol_pos;  // aoi_flag2 conserve les flags du dernier pixel de la ligne. Nombre de pixels = 1.
 
 
    // les DACs (1 à 8)

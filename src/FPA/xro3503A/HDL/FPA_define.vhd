@@ -50,7 +50,7 @@ package FPA_define is
    constant DEFINE_GENERATE_VPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.   
    constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '0';      -- on ne fait aucune correction électronique
    constant DEFINE_GENERATE_ELCORR_GAIN               : std_logic := '0';      -- on ne fait aucune correction de gain
-   constant DEFINE_GENERATE_CROPPING_CHAIN            : std_logic := '0';      -- on ne fait pas de cropping
+   constant DEFINE_GENERATE_CROPPING_CHAIN            : std_logic := '1';      -- on génère le module de cropping
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
