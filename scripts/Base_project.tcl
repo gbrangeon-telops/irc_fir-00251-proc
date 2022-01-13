@@ -6,6 +6,8 @@ set ip_dir "$root_dir/IP/${FPGA_SIZE}"
 set proj_name [get_project]
 set sensor [string range $proj_name 19 end]
 
+source $root_dir/scripts/readHardwareMemoryConfig.tcl
+set MEM_HW [readHardwareMemoryConfig $root_dir $sensor $FPGA_SIZE]
 
 #Add Telops IP Repos
 set_property  ip_repo_paths  "$ip_dir/AEC/histogram_axis_tmi_4pix_v1_0 $ip_dir/FlashReset" [current_project]
@@ -94,12 +96,12 @@ add_files [concat \
 
 
 #Read Block Design
-if {$MEM_4DDR=="0"} {
-   read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd
-   add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/hdl/core_wrapper.vhd
-} else {
+if {$MEM_HW=="4DDR"} {
    read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core_4DDR/core_4DDR.bd
    add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core_4DDR/hdl/core_4DDR_wrapper.vhd
+} else {
+   read_bd $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd
+   add_files $ip_dir/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/hdl/core_wrapper.vhd
 }
 
 #Associate bootloader file to microblaze
