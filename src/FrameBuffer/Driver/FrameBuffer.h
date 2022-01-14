@@ -49,6 +49,12 @@
 // Read only adresses
 #define FB_STATUS_OFFSET                  0x20
 #define FB_ERROR_OFFSET                   0x24
+#define FB_WR_FR_MIN_STAT_OFFSET          0x28
+#define FB_WR_FR_STAT_OFFSET              0x2C
+#define FB_WR_FR_MAX_STAT_OFFSET          0x30
+#define FB_RD_FR_MIN_STAT_OFFSET          0x34
+#define FB_RD_FR_STAT_OFFSET              0x38
+#define FB_RD_FR_MAX_STAT_OFFSET          0x3C
 
 // Status mask
 #define FB_INIT_CFG_DONE_MASK             0x01
@@ -78,6 +84,20 @@ struct s_FB
   };
 typedef struct s_FB t_FB;
 
+// structure de statut
+struct s_FrameBufferStatus
+{
+   uint32_t FB_in_FR_min;
+   uint32_t FB_in_FR;
+   uint32_t FB_in_FR_max;
+   uint32_t FB_out_FR_min;
+   uint32_t FB_out_FR;
+   uint32_t FB_out_FR_max;
+   uint32_t global_status;
+   uint32_t errors;
+};
+
+typedef struct s_FrameBufferStatus t_FrameBufferStatus;
 
 /***************** Macros (Inline Functions) Definitions ********************/
 
@@ -88,8 +108,7 @@ typedef struct s_FB t_FB;
 IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs);
 void FB_SendConfigGC( t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs);
 bool FB_isFrameBufferReady(t_FB *pFB_ctrl);
-uint32_t FB_getErrors(t_FB *pFB_ctrl);
-uint32_t FB_getStatus(t_FB *pFB_ctrl);
+t_FrameBufferStatus FB_getStatusAndErrors(t_FB *pFB_ctrl);
 void FB_Flush(t_FB *pFB_ctrl);
 
 

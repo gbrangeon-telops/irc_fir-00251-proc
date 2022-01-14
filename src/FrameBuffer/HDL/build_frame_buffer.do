@@ -19,7 +19,8 @@ acom -nowarn DAGGEN_0523 -incr \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_manager.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_ctrl_intf.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\reader_fsm.vhd" \
-"D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\writer_fsm.vhd"
+"D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\writer_fsm.vhd" \
+"D:\Telops\FIR-00251-Common\VHDL\axis64_frame_rate.vhd"
 
 #Top
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\FrameBuffer.bde"

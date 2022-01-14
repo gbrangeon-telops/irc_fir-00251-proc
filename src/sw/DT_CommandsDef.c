@@ -2710,6 +2710,7 @@ IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
 {
    #ifdef MEM_4DDR
    extern t_FB gFB_ctrl;
+   t_FrameBufferStatus status;
 
    DT_PRINTF("FB_BUFFER_A_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_A_BASE_ADDR_OFFSET));
    DT_PRINTF("FB_BUFFER_B_BASE_ADDR = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_BUFFER_B_BASE_ADDR_OFFSET));
@@ -2720,8 +2721,13 @@ IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
    DT_PRINTF("FB_FVAL_PAUSE_MIN = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FVAL_PAUSE_MIN_OFFSET));
    DT_PRINTF("FB_FLUSH = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FLUSH_OFFSET));
 
-   DT_PRINTF("ERRORS = 0x%08X", FB_getErrors(&gFB_ctrl));
-   DT_PRINTF("STATUS = 0x%08X", FB_getStatus(&gFB_ctrl));
+   status = FB_getStatusAndErrors(&gFB_ctrl);
+
+   DT_PRINTF("FrameBuffer.Input_FR  = (min=%u, present=%u, max=%u) fps", status.FB_in_FR_min, status.FB_in_FR, status.FB_in_FR_max);
+   DT_PRINTF("FrameBuffer.Output_FR = (min=%u, present=%u, max=%u) fps", status.FB_out_FR_min, status.FB_out_FR, status.FB_out_FR_max);
+
+   DT_PRINTF("ERRORS = 0x%08X", status.errors);
+   DT_PRINTF("STATUS = 0x%08X", status.global_status);
 
    return IRC_SUCCESS;
 

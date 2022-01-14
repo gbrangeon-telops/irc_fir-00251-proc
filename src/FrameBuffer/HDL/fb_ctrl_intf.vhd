@@ -37,7 +37,9 @@ entity fb_ctrl_intf is
       USER_CFG                  : out frame_buffer_cfg_type;
       FB_CFG                    : in frame_buffer_cfg_type;
             
-      STATUS                    : in std_logic_vector(7 downto 0);
+      STATUS                    : in std_logic_vector(7 downto 0); 
+      WR_FR_STAT                : in axis_frame_rate_type;
+      RD_FR_STAT                : in axis_frame_rate_type;
       ERROR                     : in std_logic_vector(15 downto 0)
    );     
 end fb_ctrl_intf;
@@ -160,8 +162,14 @@ begin
             when X"18" => axi_rdata                <= resize(std_logic_vector(FB_CFG.fval_pause_min),32);               
             when X"1C" => axi_rdata                <= resize(FB_CFG.flush,32);                       
             when X"20" => axi_rdata                <= resize(status_i,32);
-            when X"24" => axi_rdata                <= resize(error_i,32);
-         when others=> axi_rdata <= (others =>'1');
+            when X"24" => axi_rdata                <= resize(error_i,32); 
+            when X"28" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_min,32);
+            when X"2C" => axi_rdata                <= resize(WR_FR_STAT.frame_rate,32);
+            when X"30" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_max,32);
+            when X"34" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_min,32);
+            when X"38" => axi_rdata                <= resize(RD_FR_STAT.frame_rate,32);
+            when X"3C" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_max,32);         
+            when others=> axi_rdata <= (others =>'1');
          end case;        
       end if;     
    end process;   

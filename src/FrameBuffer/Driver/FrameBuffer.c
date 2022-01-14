@@ -48,8 +48,9 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 */
 void FB_SendConfigGC(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 {
+
    #ifdef MEM_4DDR
-      if(FB_isFrameBufferReady(pFB_ctrl) && FB_getErrors(pFB_ctrl) == 0)
+      if(FB_isFrameBufferReady(pFB_ctrl) &&  FB_getStatusAndErrors(pFB_ctrl).errors == 0)
       {
          pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2) * pGCRegs->Width * sizeof(uint16_t);
          pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
@@ -75,11 +76,18 @@ bool FB_isFrameBufferReady(t_FB *pFB_ctrl)
    return isReady;
 }
 
-uint32_t FB_getErrors(t_FB *pFB_ctrl)
+t_FrameBufferStatus FB_getStatusAndErrors(t_FB *pFB_ctrl)
 {
-   uint32_t errors;
-   errors = AXI4L_read32(pFB_ctrl->ADD + FB_ERROR_OFFSET);
-   return errors;
+   t_FrameBufferStatus Status;
+   Status.global_status = AXI4L_read32(pFB_ctrl->ADD + FB_STATUS_OFFSET);
+   Status.errors = AXI4L_read32(pFB_ctrl->ADD + FB_ERROR_OFFSET);
+   Status.FB_in_FR_min = AXI4L_read32(pFB_ctrl->ADD + FB_WR_FR_MIN_STAT_OFFSET);
+   Status.FB_in_FR = AXI4L_read32(pFB_ctrl->ADD + FB_WR_FR_STAT_OFFSET);
+   Status.FB_in_FR_max = AXI4L_read32(pFB_ctrl->ADD + FB_WR_FR_MAX_STAT_OFFSET);
+   Status.FB_out_FR_min = AXI4L_read32(pFB_ctrl->ADD + FB_RD_FR_MIN_STAT_OFFSET);
+   Status.FB_out_FR = AXI4L_read32(pFB_ctrl->ADD + FB_RD_FR_STAT_OFFSET);
+   Status.FB_out_FR_max = AXI4L_read32(pFB_ctrl->ADD + FB_RD_FR_MAX_STAT_OFFSET);
+   return Status;
 }
 
 /* This function read the status from the frame buffer VHDL module.
@@ -111,7 +119,7 @@ uint32_t FB_getStatus(t_FB *pFB_ctrl)
 void FB_Flush(t_FB *pFB_ctrl)
 {
    #ifdef MEM_4DDR
-      if(FB_isFrameBufferReady(pFB_ctrl) && FB_getErrors(pFB_ctrl) == 0)
+      if(FB_isFrameBufferReady(pFB_ctrl) && FB_getStatusAndErrors(pFB_ctrl).errors == 0)
       {
          pFB_ctrl->fb_flush = 1;
          WriteStruct(pFB_ctrl);
