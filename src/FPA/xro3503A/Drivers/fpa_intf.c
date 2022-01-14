@@ -353,7 +353,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // gFpaDebugRegD dephasage fin des adc_clk
    if (sw_init_done == 0)
-      gFpaDebugRegD = 80;
+      gFpaDebugRegD = 208;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;
 
    // image info (sans la correction pour la calibration en sous-fenêtre)
