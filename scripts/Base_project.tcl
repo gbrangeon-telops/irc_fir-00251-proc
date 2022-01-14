@@ -107,7 +107,11 @@ if {$MEM_HW=="4DDR"} {
 #Associate bootloader file to microblaze
 set boot_file $root_dir/sdk/$top_lvl/${top_lvl}_boot_${FPGA_SIZE}/Release/${top_lvl}_boot_${FPGA_SIZE}.elf
 add_files $boot_file
-set_property SCOPED_TO_REF core [get_files $boot_file]
+if {$MEM_HW=="4DDR"} {
+	set_property SCOPED_TO_REF core_4DDR [get_files $boot_file]
+} else {
+	set_property SCOPED_TO_REF core [get_files $boot_file]
+}
 set_property SCOPED_TO_CELLS {MCU/microblaze_1} [get_files $boot_file]
 
 #Add constraint files
