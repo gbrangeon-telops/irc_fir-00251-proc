@@ -2,7 +2,7 @@
 set root_dir "d:/Telops/fir-00251-Proc"
 set sensor "blackbird1920D"
 set FPGA_SIZE "325"
-set MEM_4DDR "1"
+set core_name "core_4DDR"
 set proj_name "fir_00251_proc_${FPGA_SIZE}_${sensor}"
 set top_lvl "fir_00251_proc_${sensor}"
 set FPA_path $root_dir/src/FPA/${sensor}

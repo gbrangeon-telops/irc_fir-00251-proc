@@ -26,17 +26,9 @@ proc build_tsir_project {{release 0}} {
       set_property is_enabled false [get_files -of [get_filesets { constrs_1}] -filter {NAME !~ "*release*"} *target.xdc]
       set_property target_constrs_file [get_files -of [get_filesets { constrs_1}] *release_target.xdc] [current_fileset -constrset]
 	}
-    
-   source $base_dir/scripts/readHardwareMemoryConfig.tcl
-   set MEM_HW [readHardwareMemoryConfig $base_dir $sensor $FPGA_SIZE]
    
    #export hardware to sdk
-   if {$MEM_HW == "4DDR"} {
-      generate_target all [get_files $base_dir/IP/${FPGA_SIZE}/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core_4DDR/core_4DDR.bd]
-   } else {
-      generate_target all [get_files $base_dir/IP/${FPGA_SIZE}/managed_ip_project/managed_ip_project.srcs/sources_1/bd/core/core.bd]
-   }
-
+   generate_target all [get_files *.bd]
    write_hwdef -force -file $base_dir/sdk/${top_lvl}/fir_00251_proc_${sensor}_${FPGA_SIZE}.hdf
    
    #create and build bootloader

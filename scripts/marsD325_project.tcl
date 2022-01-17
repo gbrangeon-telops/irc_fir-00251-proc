@@ -2,7 +2,7 @@
 set root_dir "d:/Telops/fir-00251-Proc"
 set sensor "marsD"
 set FPGA_SIZE "325"
-set MEM_4DDR "0"
+set core_name "core"
 set proj_name "fir_00251_proc_${FPGA_SIZE}_${sensor}"
 set top_lvl "fir_00251_proc_${sensor}"
 set FPA_path $root_dir/src/FPA/${sensor}
