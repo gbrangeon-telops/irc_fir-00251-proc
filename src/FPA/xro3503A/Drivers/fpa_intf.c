@@ -402,7 +402,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       gFpaDetectSub_mV = 2900;
       gFpaCtiaRef_mV = 2600;
       gFpaVTestG_mV = 3300;
-      gFpaCM_mV = 1700;
+      gFpaCM_mV = 1750;
       gFpaVCMO_mV = 1750;
    }
 /*   // Pour un changement de gain, on force certaines valeurs
