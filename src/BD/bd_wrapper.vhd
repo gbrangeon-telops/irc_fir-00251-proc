@@ -140,7 +140,8 @@ entity bd_wrapper is
       clk_irig : out STD_LOGIC;
       clk_200 : out STD_LOGIC;
       clk_mgt_init : out STD_LOGIC;
-      clk_data : out STD_LOGIC;
+      clk_data : out STD_LOGIC;   
+      clk_din : in STD_LOGIC;
       ext_reset_in : in STD_LOGIC;
       vn_in : in STD_LOGIC;
       vp_in : in STD_LOGIC;
@@ -1363,6 +1364,7 @@ architecture bd_wrapper of bd_wrapper is
          clk_200 : out STD_LOGIC;
          clk_cal : out STD_LOGIC;
          clk_data : out STD_LOGIC;
+         clk_din : in STD_LOGIC;
          clk_irig : out STD_LOGIC;
          clk_mb : out STD_LOGIC;
          clk_mgt_init : out STD_LOGIC;
@@ -2584,6 +2586,7 @@ begin
          clk_mb     => clk_mb,
          clk_cal    => clk_cal,
          clk_200     => clk_200,
+         clk_din      => clk_din,
          clk_irig      => clk_irig,
          clk_mgt_init  => clk_mgt_init,
          clk_data    => clk_data,
