@@ -38,9 +38,9 @@
 #define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
-#define FPA_HEIGHT_MIN     4
+#define FPA_HEIGHT_MIN     8
 #define FPA_HEIGHT_MAX     1024
-#define FPA_HEIGHT_MULT    2
+#define FPA_HEIGHT_MULT    4
 #define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
@@ -48,8 +48,8 @@
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 
 #define FPA_OFFSETY_MIN          0
-#define FPA_OFFSETY_MULT         2 
-//#define FPA_OFFSETY_MULT_CORR   // Inutile pour BB1280.
+#define FPA_OFFSETY_MULT         4
+//#define FPA_OFFSETY_MULT_CORR    4   // Inutile pour BB1280.
 #define FPA_OFFSETY_MAX          (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   1
@@ -60,7 +60,7 @@
 
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
-#define FPA_TDC_FLAGS            (Blackbird1280DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
+#define FPA_TDC_FLAGS            (Blackbird1280DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask)
 #define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
 
 #define FPA_COOLER_TEMP_THRES    -19400   //[cC]
