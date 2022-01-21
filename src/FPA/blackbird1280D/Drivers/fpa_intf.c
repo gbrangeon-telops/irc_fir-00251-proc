@@ -452,7 +452,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage2) ||
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage3) ||
          (pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage))
-      ptrA->scd_bit_pattern = SCD_FPA_TEST1; // column counter (source = FPP)
+      ptrA->scd_bit_pattern = SCD_PE_TEST1; 
 
    // Changement de cfg_num dès qu'une nouvelle cfg est envoyée au vhd. Permet de forcer la reprogramation du proxy à chaque fois que cette fonction est appelée.
    if (cfg_num == 255)  // protection contre depassement
