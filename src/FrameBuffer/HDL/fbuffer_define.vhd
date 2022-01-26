@@ -27,9 +27,13 @@ package fbuffer_define is
 
   
       
-   constant PIXEL_WIDTH   : integer := 4; -- Pixel stream width (TDATA = 64 bits)
+   constant STREAM_PIXEL_WIDTH   : integer := 4; -- Pixel stream width (TDATA = 64 bits)
    constant NB_PIPE_STAGE : integer := 2; -- Writer_sm : number of input pipe stages
    
+   -- CLINK FULL throughtput limit is 4*85M*(Line_Width/(Line_Width+LVAL_PAUSE)), Where LVAL_PAUSE = 4 for clink slow mode  
+   constant LVAL_PAUSE    : unsigned(31 downto 0) := to_unsigned(4,32);
+   constant FVAL_PAUSE    : unsigned(31 downto 0) := to_unsigned(4,32);
+
    constant BUFFER_A_IDX  : integer := 0;
    constant BUFFER_B_IDX  : integer := 1;
    constant BUFFER_C_IDX  : integer := 2;
@@ -48,7 +52,8 @@ package fbuffer_define is
       frame_byte_size           : unsigned(31 downto 0);                -- frame size in bytes
       hdr_pix_size              : unsigned(31 downto 0);                -- header size in bytes 
       img_pix_size              : unsigned(31 downto 0);                -- image size in bytes
-      fval_pause_min            : unsigned(31 downto 0);                -- minimum pause between outputed frame 
+      fval_pause_min            : unsigned(31 downto 0);                -- minimum pause between outputed frame
+      lval_pause_min            : unsigned(31 downto 0);                -- minimum pause between outputed frame 
       flush                     : std_logic;                            -- flush frame buffer
       dval                      : std_logic;                            -- config valid flag
    end record frame_buffer_cfg_type;
@@ -63,20 +68,16 @@ package fbuffer_define is
    signal s_fb_cfg : frame_buffer_cfg_type;
    constant fb_cfg_default : frame_buffer_cfg_type := (
    std_logic_vector(to_unsigned(0,32)),    
-   std_logic_vector(to_unsigned(4*1024,32)),   
-   std_logic_vector(to_unsigned(2*4*1024,32)),   
---   to_unsigned(1024,s_fb_cfg.frame_byte_size'LENGTH),   
---   to_unsigned(128,s_fb_cfg.hdr_pix_size'LENGTH),          
---   to_unsigned(384,s_fb_cfg.img_pix_size'LENGTH),      
---   to_unsigned(10,s_fb_cfg.fval_pause_min'LENGTH), 
-   to_unsigned(2048,s_fb_cfg.frame_byte_size'LENGTH),   
-   to_unsigned(256,s_fb_cfg.hdr_pix_size'LENGTH),          
-   to_unsigned(384,s_fb_cfg.img_pix_size'LENGTH),      
-   to_unsigned(10,s_fb_cfg.fval_pause_min'LENGTH),
+   std_logic_vector(to_unsigned(2*1920*1538,32)),   
+   std_logic_vector(to_unsigned(2*2*1920*1538,32)),   
+   to_unsigned(2*1920*1538,s_fb_cfg.frame_byte_size'LENGTH),   
+   to_unsigned(1920*2,s_fb_cfg.hdr_pix_size'LENGTH),          
+   to_unsigned(1920*1536,s_fb_cfg.img_pix_size'LENGTH),      
+   FVAL_PAUSE,
+   LVAL_PAUSE,
    '0',
    '0'
-   );
-   
+   );  
    constant buf_sts_default : buffer_status_type := (
    '0',
    std_logic_vector(to_unsigned(0,32)), 

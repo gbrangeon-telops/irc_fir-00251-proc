@@ -159,16 +159,17 @@ begin
             when X"0C" => axi_rdata                <= resize(std_logic_vector(FB_CFG.frame_byte_size),32);             
             when X"10" => axi_rdata                <= resize(std_logic_vector(FB_CFG.hdr_pix_size),32);                
             when X"14" => axi_rdata                <= resize(std_logic_vector(FB_CFG.img_pix_size),32);                
-            when X"18" => axi_rdata                <= resize(std_logic_vector(FB_CFG.fval_pause_min),32);               
-            when X"1C" => axi_rdata                <= resize(FB_CFG.flush,32);                       
-            when X"20" => axi_rdata                <= resize(status_i,32);
-            when X"24" => axi_rdata                <= resize(error_i,32); 
-            when X"28" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_min,32);
-            when X"2C" => axi_rdata                <= resize(WR_FR_STAT.frame_rate,32);
-            when X"30" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_max,32);
-            when X"34" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_min,32);
-            when X"38" => axi_rdata                <= resize(RD_FR_STAT.frame_rate,32);
-            when X"3C" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_max,32);         
+            when X"18" => axi_rdata                <= resize(std_logic_vector(FB_CFG.fval_pause_min),32);
+            when X"1C" => axi_rdata                <= resize(std_logic_vector(FB_CFG.lval_pause_min),32);
+            when X"20" => axi_rdata                <= resize(FB_CFG.flush,32);                       
+            when X"24" => axi_rdata                <= resize(status_i,32);
+            when X"28" => axi_rdata                <= resize(error_i,32);
+            when X"2C" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_min,32);
+            when X"30" => axi_rdata                <= resize(WR_FR_STAT.frame_rate,32);
+            when X"34" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_max,32);
+            when X"38" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_min,32);
+            when X"3C" => axi_rdata                <= resize(RD_FR_STAT.frame_rate,32);
+            when X"40" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_max,32);         
             when others=> axi_rdata <= (others =>'1');
          end case;        
       end if;     
@@ -224,7 +225,8 @@ begin
                   when X"10" => user_cfg_i.hdr_pix_size                <= unsigned(data_i(user_cfg_i.hdr_pix_size'length-1 downto 0));
                   when X"14" => user_cfg_i.img_pix_size                <= unsigned(data_i(user_cfg_i.img_pix_size'length-1 downto 0));
                   when X"18" => user_cfg_i.fval_pause_min              <= unsigned(data_i(user_cfg_i.fval_pause_min'length-1 downto 0)); 
-                  when X"1C" => user_cfg_i.flush                       <= data_i(0); user_cfg_i.dval <= '1';
+                  when X"1C" => user_cfg_i.lval_pause_min              <= unsigned(data_i(user_cfg_i.lval_pause_min'length-1 downto 0)); 
+                  when X"20" => user_cfg_i.flush                       <= data_i(0); user_cfg_i.dval <= '1';
 
                   
                   when others => --do nothing

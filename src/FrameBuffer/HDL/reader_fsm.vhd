@@ -76,6 +76,25 @@ architecture reader_fsm of reader_fsm is
          CLK   : in std_logic
          );
    end component;
+   
+  component t_axi4_stream64_fifo
+  generic(
+       ASYNC : BOOLEAN := false;
+       FifoSize : INTEGER := 16;
+       PACKET_MODE : BOOLEAN := false
+  );
+  port (
+       ARESETN : in STD_LOGIC;
+       RX_CLK : in STD_LOGIC;
+       RX_MOSI : in T_AXI4_STREAM_MOSI64;
+       TX_CLK : in STD_LOGIC;
+       TX_MISO : in T_AXI4_STREAM_MISO;
+       OVFL : out STD_LOGIC;
+       RX_MISO : out T_AXI4_STREAM_MISO;
+       TX_MOSI : out T_AXI4_STREAM_MOSI64
+  ); 
+  
+end component;
 
    signal areset_i                  : std_logic; 
    signal sreset                    : std_logic;    
@@ -84,17 +103,28 @@ architecture reader_fsm of reader_fsm is
    signal done                      : std_logic;
    signal done_last                 : std_logic;
    signal dm_rdy                    : std_logic;
-   signal force_tlast               : std_logic;
+   signal gen_tlast                 : std_logic;
+   signal gen_tid                   : std_logic;
    signal buf_sts_update            : std_logic;
    signal pix_cnt                   : unsigned(31 downto 0);
+   signal lval_cnt                  : unsigned(31 downto 0);
    signal fval_cnt                  : unsigned(31 downto 0);
+   signal width                     : unsigned(31 downto 0);
    signal sts_ack_i                 : std_logic;
-   signal flush_i                   : std_logic;    
+   signal flush_i                   : std_logic; 
+   signal stall_i                   : std_logic;
+   signal tready_last_i             : std_logic;
    signal buf_sts_i                 : buffer_status_type;
    signal mm2s_cmd_mosi             : t_axi4_stream_mosi_cmd32;
    signal mm2s_cmd_miso             : t_axi4_stream_miso;
    signal mm2s_sts_mosi             : t_axi4_stream_mosi_status;
-   signal mm2s_sts_miso             : t_axi4_stream_miso;  
+   signal mm2s_sts_miso             : t_axi4_stream_miso; 
+   signal axis_mm2s_fifo_in_miso    : t_axi4_stream_miso;
+   signal axis_mm2s_fifo_in_mosi    : t_axi4_stream_mosi64; 
+   
+   signal axis_mm2s_fifo_out_miso   : t_axi4_stream_miso;
+   signal axis_mm2s_fifo_out_mosi   : t_axi4_stream_mosi64;
+     
    signal mm2s_addr                 : std_logic_vector(31 downto 0) := (others => '0');
    signal mm2s_eof                  : std_logic := '0';
    signal mm2s_btt                  : std_logic_vector(22 downto 0) := (others => '0');
@@ -108,7 +138,15 @@ architecture reader_fsm of reader_fsm is
    
    type dm_sts_ack_sm_type is (idle_st, waiting_dm_sts_ack_st); 
    signal dm_sts_ack_sm                 : dm_sts_ack_sm_type;
-                                  
+   
+   type throttle_sm_type is (idle_st, stall_st); 
+   signal throttle_sm                 : throttle_sm_type; 
+   
+   attribute KEEP : string;
+   attribute KEEP of throttle_sm      : signal is "true";
+   attribute KEEP of output_sm        : signal is "true";
+   attribute KEEP of reader_sm        : signal is "true";
+   
 begin      
    
    -- I/O Connections assignments
@@ -120,15 +158,28 @@ begin
    mm2s_cmd_miso                 <= AXIS_MM2S_CMD_MISO;
    mm2s_sts_mosi                 <= AXIS_MM2S_STS_MOSI;
    mm2s_cmd_mosi.TDATA           <= std_logic_vector(RSVD & TAG & mm2s_addr & DRR & mm2s_eof & DSA & CTYPE & mm2s_btt);
-   AXIS_MM2S_DATA_MISO.TREADY    <= AXIS_TX_DATA_MISO.TREADY;
-   AXIS_TX_DATA_MOSI.TDATA       <= AXIS_MM2S_DATA_MOSI.TDATA;  
-   AXIS_TX_DATA_MOSI.TLAST       <= AXIS_MM2S_DATA_MOSI.TLAST when force_tlast = '0' else '1';
    
-   AXIS_TX_DATA_MOSI.TSTRB       <= (others => '1');  
-   AXIS_TX_DATA_MOSI.TKEEP       <= (others => '1');  
-   AXIS_TX_DATA_MOSI.TDEST       <= (others => '0'); 
-   AXIS_TX_DATA_MOSI.TUSER       <= (others => '0'); 
-   AXIS_TX_DATA_MOSI.TVALID      <= AXIS_MM2S_DATA_MOSI.TVALID;
+   axis_mm2s_fifo_in_mosi.TDATA  <= AXIS_MM2S_DATA_MOSI.TDATA;  
+   axis_mm2s_fifo_in_mosi.TLAST  <= AXIS_MM2S_DATA_MOSI.TLAST when gen_tlast = '0' else '1';
+   axis_mm2s_fifo_in_mosi.TID  <= (others => '0') when gen_tid = '0' else (others => '1');
+   axis_mm2s_fifo_in_mosi.TSTRB  <= AXIS_MM2S_DATA_MOSI.TSTRB;
+   axis_mm2s_fifo_in_mosi.TKEEP  <= AXIS_MM2S_DATA_MOSI.TKEEP;
+   axis_mm2s_fifo_in_mosi.TDEST  <= AXIS_MM2S_DATA_MOSI.TDEST;
+   axis_mm2s_fifo_in_mosi.TUSER  <= AXIS_MM2S_DATA_MOSI.TUSER;
+   axis_mm2s_fifo_in_mosi.TVALID <= AXIS_MM2S_DATA_MOSI.TVALID;
+   AXIS_MM2S_DATA_MISO.TREADY    <= axis_mm2s_fifo_in_miso.tready;
+   
+   
+   AXIS_TX_DATA_MOSI.TDATA <= axis_mm2s_fifo_out_mosi.TDATA;   
+   AXIS_TX_DATA_MOSI.TLAST <= axis_mm2s_fifo_out_mosi.TLAST;  
+   AXIS_TX_DATA_MOSI.TID   <= axis_mm2s_fifo_out_mosi.TID;
+   AXIS_TX_DATA_MOSI.TSTRB <= (others => '1');
+   AXIS_TX_DATA_MOSI.TKEEP <= (others => '1');
+   AXIS_TX_DATA_MOSI.TDEST <= (others => '0');
+   AXIS_TX_DATA_MOSI.TUSER <= (others => '0');
+   AXIS_TX_DATA_MOSI.TVALID <= axis_mm2s_fifo_out_mosi.TVALID and not stall_i;   
+   axis_mm2s_fifo_out_miso.tready <= AXIS_TX_DATA_MISO.TREADY and not stall_i;
+   
    READER_DONE                   <= done;
    fb_cfg_i                      <= FB_CFG when FB_CFG.dval = '1' else fb_cfg_default; 
       
@@ -181,7 +232,6 @@ begin
                         mm2s_btt <= resize(std_logic_vector(fb_cfg_i.frame_byte_size),mm2s_btt'length); 
                         mm2s_cmd_mosi.tvalid <= '1';  
                         reader_sm <= wait_rd_cmd_ack; 
-                     
                      end if;
                      
                   when wait_rd_cmd_ack =>
@@ -223,8 +273,9 @@ begin
    end process;    
 
    -- This process reconstruct the AXI-STREAM signals : 
-       --> TID (1 = hdr, 0 = img)
-       --> TLAST associated with end of header.
+      --> TID (1 = hdr, 0 = img)
+      --> TLAST associated with end of header.
+      
    U4: process(CLK)        
    begin
       if rising_edge(CLK) then
@@ -232,40 +283,41 @@ begin
             output_sm <= hdr_st;
             pix_cnt <= (others => '0');
             eof <= '0';
-            AXIS_TX_DATA_MOSI.TID(0) <= '1'; 
+            gen_tid <= '1';
+            gen_tlast <= '0';
          else 
             
                case output_sm is 
                   
                   when hdr_st =>
-                     AXIS_TX_DATA_MOSI.TID(0) <= '1'; 
+                     gen_tid <= '1'; 
                      eof <= '0';  
-                     force_tlast <= '0';
-                     if pix_cnt = (fb_cfg_i.hdr_pix_size-8) then
-                        force_tlast <= '1'; 
-                        pix_cnt <= (others => '0');
-                        output_sm <= img_st;
-                     elsif AXIS_TX_DATA_MISO.TREADY = '1' and AXIS_MM2S_DATA_MOSI.TVALID = '1' then 
-                        pix_cnt <= pix_cnt + PIXEL_WIDTH;
+                     if axis_mm2s_fifo_in_miso.tready = '1' and axis_mm2s_fifo_in_mosi.TVALID = '1' then 
+                        pix_cnt <= pix_cnt + STREAM_PIXEL_WIDTH;  
+                        gen_tlast <= '0';
+                        if pix_cnt = (fb_cfg_i.hdr_pix_size-STREAM_PIXEL_WIDTH) then  
+                           pix_cnt <= (others => '0');
+                           gen_tid <= '0';
+                           output_sm <= img_st;
+                        elsif pix_cnt = (fb_cfg_i.hdr_pix_size-2*STREAM_PIXEL_WIDTH) then
+                           gen_tlast <= '1';  
+                        end if;   
                      end if;   
-
+                     
                   when img_st =>  
-                     AXIS_TX_DATA_MOSI.TID(0) <= '0';
-                     force_tlast <= '0';
-                     if pix_cnt = (fb_cfg_i.img_pix_size) then
+                     if axis_mm2s_fifo_in_miso.tready = '1' and axis_mm2s_fifo_in_mosi.TVALID = '1' and axis_mm2s_fifo_in_mosi.TLAST = '1'then 
+                        gen_tid <= '1';
                         eof <= '1';
-                        pix_cnt <= (others => '0');
                         output_sm <= hdr_st;
-                     elsif AXIS_TX_DATA_MISO.TREADY = '1' and AXIS_MM2S_DATA_MOSI.TVALID = '1' then 
-                        pix_cnt <= pix_cnt + PIXEL_WIDTH;
-                     end if;  
+                     end if;
                      
                   when others =>
                   
-               end case;               
+               end case;
+   
          end if;     
       end if;
-   end process;
+   end process;  
    
    
    -- This process ensure that the data mover is ready to receive a new command.
@@ -321,6 +373,64 @@ begin
                else
                    mm2s_err_o <= mm2s_err_o;
                end if;
+            end if;
+       end if;
+   end process;
+  
+ -- This fifo break the tready chain to favorize timming closure
+ U7 : t_axi4_stream64_fifo
+ generic map (
+      ASYNC => false,
+      FifoSize => 16,
+      PACKET_MODE => false
+ )  
+ port map(
+      ARESETN => ARESETN,
+      OVFL => open,
+      RX_CLK => CLK,
+      RX_MISO => axis_mm2s_fifo_in_miso,
+      RX_MOSI => axis_mm2s_fifo_in_mosi,
+      TX_CLK => CLK,
+      TX_MISO => axis_mm2s_fifo_out_miso,
+      TX_MOSI => axis_mm2s_fifo_out_mosi
+ );
+ 
+ -- This process throttle the axis stream throughtput to impose a minimum pause 
+ -- between line (must be greater or equal to clink LVAL_PAUSE in output fpga)
+ U8 : process(CLK)
+   begin
+       if rising_edge(CLK) then
+            if sreset = '1' then
+               lval_cnt <= to_unsigned(0,lval_cnt'length);
+               throttle_sm <= idle_st; 
+               stall_i                        <= '0';    
+            else
+               width <= resize(shift_right(fb_cfg_i.hdr_pix_size, 3), width'length);
+               case throttle_sm is 
+                  when idle_st =>  
+                     if axis_mm2s_fifo_out_mosi.tvalid = '1' and axis_mm2s_fifo_out_miso.tready = '1' then
+                        if lval_cnt = width-1 then
+                           stall_i <= '1';
+                           lval_cnt <= to_unsigned(0,lval_cnt'length);
+                           throttle_sm <= stall_st; 
+                        else
+                           lval_cnt <= lval_cnt +1;
+                        end if;
+                     end if;
+                                         
+                  when stall_st =>
+                     if lval_cnt = fb_cfg_i.lval_pause_min-1 then 
+                        lval_cnt <= to_unsigned(0,lval_cnt'length);
+                        stall_i <= '0'; 
+                        throttle_sm <= idle_st;
+                     else
+                        lval_cnt <= lval_cnt +1;
+                     end if;
+                     
+                  when others =>  
+                  
+               end case;
+               
             end if;
        end if;
    end process;

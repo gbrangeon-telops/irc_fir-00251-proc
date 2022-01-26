@@ -33,9 +33,10 @@ package body fb_testbench_pkg is
       variable hdr_pix_size              : unsigned(31 downto 0) := (others => '0');                -- header size in byte 
       variable img_pix_size              : unsigned(31 downto 0) := (others => '0');                -- image size in byte
       variable fval_pause_min            : unsigned(31 downto 0) := (others => '0');                -- minimum pause between at frame buffer output
+      variable lval_pause_min            : unsigned(31 downto 0) := (others => '0');                -- minimum pause between line
       variable flush                     : unsigned(31 downto 0) := (others => '0');                
 
-      variable y                         : unsigned(8*32-1 downto 0);  
+      variable y                         : unsigned(9*32-1 downto 0);  
       
       
    begin
@@ -53,6 +54,7 @@ package body fb_testbench_pkg is
       & cfg.hdr_pix_size
       & cfg.img_pix_size
       & cfg.fval_pause_min
+      & cfg.lval_pause_min
       & flush;
       return y;
       

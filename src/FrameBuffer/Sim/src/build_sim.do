@@ -13,13 +13,16 @@ acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fbuffer_define.vhd"
 
 acom "D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd"
 
-
+acom "D:\Telops\FIR-00251-Common\VHDL\axis64_frame_rate.vhd"
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_manager.vhd"
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_ctrl_intf.vhd"
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\reader_fsm.vhd"
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\writer_fsm.vhd"
-
+acom "D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_RandomMiso.vhd"
+  
+acom "D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_afifo_d16\t_axi4_stream64_afifo_d16_sim_netlist.vhdl"  
 acom "D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d128\t_axi4_stream64_sfifo_d128_sim_netlist.vhdl"
+acom "D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_sfifo_d512\t_axi4_stream64_sfifo_d512_sim_netlist.vhdl"
 acom "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd"
 
 acom "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\FrameBuffer.bde"

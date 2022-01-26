@@ -44,17 +44,18 @@
 #define FB_HDR_PIX_SIZE_OFFSET	         0x10
 #define FB_IMG_PIX_SIZE_OFFSET	         0x14
 #define FB_FVAL_PAUSE_MIN_OFFSET	         0x18
-#define FB_FLUSH_OFFSET	                  0x1C
+#define FB_LVAL_PAUSE_MIN_OFFSET	         0x1C
+#define FB_FLUSH_OFFSET	                  0x20
 
 // Read only adresses
-#define FB_STATUS_OFFSET                  0x20
-#define FB_ERROR_OFFSET                   0x24
-#define FB_WR_FR_MIN_STAT_OFFSET          0x28
-#define FB_WR_FR_STAT_OFFSET              0x2C
-#define FB_WR_FR_MAX_STAT_OFFSET          0x30
-#define FB_RD_FR_MIN_STAT_OFFSET          0x34
-#define FB_RD_FR_STAT_OFFSET              0x38
-#define FB_RD_FR_MAX_STAT_OFFSET          0x3C
+#define FB_STATUS_OFFSET                  0x24
+#define FB_ERROR_OFFSET                   0x28
+#define FB_WR_FR_MIN_STAT_OFFSET          0x2c
+#define FB_WR_FR_STAT_OFFSET              0x30
+#define FB_WR_FR_MAX_STAT_OFFSET          0x34
+#define FB_RD_FR_MIN_STAT_OFFSET          0x38
+#define FB_RD_FR_STAT_OFFSET              0x3c
+#define FB_RD_FR_MAX_STAT_OFFSET          0x40
 
 // Status mask
 #define FB_INIT_CFG_DONE_MASK             0x01
@@ -80,6 +81,7 @@ struct s_FB
    uint32_t fb_hdr_pix_size;          // header size in bytes
    uint32_t fb_img_pix_size;          // image size in bytes
    uint32_t fb_fval_pause_min;        // minimum pause between read frame
+   uint32_t fb_lval_pause_min;        // minimum pause between line
    uint32_t fb_flush;                 // flush frame buffer
   };
 typedef struct s_FB t_FB;
