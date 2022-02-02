@@ -153,23 +153,21 @@ begin
          
          case axi_araddr(7 downto 0) is 
       
-            when X"00" => axi_rdata                <= resize(FB_CFG.buffer_a_addr,32);
-            when X"04" => axi_rdata                <= resize(FB_CFG.buffer_b_addr,32);               
-            when X"08" => axi_rdata                <= resize(FB_CFG.buffer_c_addr,32);               
+            when X"00" => axi_rdata                <= resize(std_logic_vector(FB_CFG.buffer_a_addr),32);
+            when X"04" => axi_rdata                <= resize(std_logic_vector(FB_CFG.buffer_b_addr),32);               
+            when X"08" => axi_rdata                <= resize(std_logic_vector(FB_CFG.buffer_c_addr),32);               
             when X"0C" => axi_rdata                <= resize(std_logic_vector(FB_CFG.frame_byte_size),32);             
             when X"10" => axi_rdata                <= resize(std_logic_vector(FB_CFG.hdr_pix_size),32);                
             when X"14" => axi_rdata                <= resize(std_logic_vector(FB_CFG.img_pix_size),32);                
-            when X"18" => axi_rdata                <= resize(std_logic_vector(FB_CFG.fval_pause_min),32);
-            when X"1C" => axi_rdata                <= resize(std_logic_vector(FB_CFG.lval_pause_min),32);
-            when X"20" => axi_rdata                <= resize(FB_CFG.flush,32);                       
-            when X"24" => axi_rdata                <= resize(status_i,32);
-            when X"28" => axi_rdata                <= resize(error_i,32);
-            when X"2C" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_min,32);
-            when X"30" => axi_rdata                <= resize(WR_FR_STAT.frame_rate,32);
-            when X"34" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_max,32);
-            when X"38" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_min,32);
-            when X"3C" => axi_rdata                <= resize(RD_FR_STAT.frame_rate,32);
-            when X"40" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_max,32);         
+            when X"18" => axi_rdata                <= resize(std_logic_vector(FB_CFG.lval_pause_min),32);                      
+            when X"1C" => axi_rdata                <= resize(status_i,32);
+            when X"20" => axi_rdata                <= resize(error_i,32);
+            when X"24" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_min,32);
+            when X"28" => axi_rdata                <= resize(WR_FR_STAT.frame_rate,32);
+            when X"2C" => axi_rdata                <= resize(WR_FR_STAT.frame_rate_max,32);
+            when X"30" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_min,32);
+            when X"34" => axi_rdata                <= resize(RD_FR_STAT.frame_rate,32);
+            when X"38" => axi_rdata                <= resize(RD_FR_STAT.frame_rate_max,32);         
             when others=> axi_rdata <= (others =>'1');
          end case;        
       end if;     
@@ -179,7 +177,7 @@ begin
    -- WR : contrôle du flow 
    ---------------------------------------------------------------------------- 
    -- (pour l'instant transaction se fait à au max 1 CLK sur 2 
-   U6: process (CLK)
+   U6: process (CLK)     
    begin
       if rising_edge(CLK) then 
          if sreset = '1' then
@@ -218,16 +216,14 @@ begin
             if slv_reg_wren = '1' and MB_MOSI.WSTRB =  "1111" then -- Master write, toutes les transcations à 32 bits !!! comme dans IRCDEV 					
                case axi_awaddr(7 downto 0) is 
                   
-                  when X"00" => user_cfg_i.buffer_a_addr               <= data_i(user_cfg_i.buffer_a_addr'length-1 downto 0);user_cfg_i.dval <= '0';
-                  when X"04" => user_cfg_i.buffer_b_addr               <= data_i(user_cfg_i.buffer_b_addr'length-1 downto 0);
-                  when X"08" => user_cfg_i.buffer_c_addr               <= data_i(user_cfg_i.buffer_c_addr'length-1 downto 0);
+                  when X"00" => user_cfg_i.buffer_a_addr               <= unsigned(data_i(user_cfg_i.buffer_a_addr'length-1 downto 0));user_cfg_i.dval <= '0';
+                  when X"04" => user_cfg_i.buffer_b_addr               <= unsigned(data_i(user_cfg_i.buffer_b_addr'length-1 downto 0));
+                  when X"08" => user_cfg_i.buffer_c_addr               <= unsigned(data_i(user_cfg_i.buffer_c_addr'length-1 downto 0));
                   when X"0C" => user_cfg_i.frame_byte_size             <= unsigned(data_i(user_cfg_i.frame_byte_size'length-1 downto 0));
                   when X"10" => user_cfg_i.hdr_pix_size                <= unsigned(data_i(user_cfg_i.hdr_pix_size'length-1 downto 0));
                   when X"14" => user_cfg_i.img_pix_size                <= unsigned(data_i(user_cfg_i.img_pix_size'length-1 downto 0));
-                  when X"18" => user_cfg_i.fval_pause_min              <= unsigned(data_i(user_cfg_i.fval_pause_min'length-1 downto 0)); 
-                  when X"1C" => user_cfg_i.lval_pause_min              <= unsigned(data_i(user_cfg_i.lval_pause_min'length-1 downto 0)); 
-                  when X"20" => user_cfg_i.flush                       <= data_i(0); user_cfg_i.dval <= '1';
-
+                  when X"18" => user_cfg_i.lval_pause_min              <= unsigned(data_i(user_cfg_i.lval_pause_min'length-1 downto 0));user_cfg_i.dval <= '1'; 
+                  
                   
                   when others => --do nothing
                end case;  

@@ -2718,8 +2718,7 @@ IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
    DT_PRINTF("FB_FRAME_BYTE_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FRAME_BYTE_SIZE_OFFSET));
    DT_PRINTF("FB_HDR_PIX_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_HDR_PIX_SIZE_OFFSET));
    DT_PRINTF("FB_IMG_PIX_SIZE = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_IMG_PIX_SIZE_OFFSET));
-   DT_PRINTF("FB_FVAL_PAUSE_MIN = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FVAL_PAUSE_MIN_OFFSET));
-   DT_PRINTF("FB_FLUSH = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_FLUSH_OFFSET));
+   DT_PRINTF("FB_LVAL_PAUSE_MIN = 0x%08X",  AXI4L_read32(gFB_ctrl.ADD + FB_LVAL_PAUSE_MIN_OFFSET));
 
    status = FB_getStatusAndErrors(&gFB_ctrl);
 

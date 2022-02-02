@@ -24,14 +24,20 @@ use ieee.numeric_std.all;
 use work.TEL2000.all;
 use work.fbuffer_define.all;
 
+
+    
 entity reader_fsm is
    Port ( 
    
     CLK                       : in STD_LOGIC;    --CLK_DATA
     ARESETN                   : in STD_LOGIC; 
     
-    FB_CFG                    : in frame_buffer_cfg_type;  
-    READER_DONE               : out STD_LOGIC;
+    FB_CFG                    : in frame_buffer_cfg_type;
+    
+    CFG_UPDATE_PENDING        : in STD_LOGIC;
+    FLUSH                     : in STD_LOGIC;
+    RD_IN_PROGRESS            : out STD_LOGIC;
+    
     
     AXIS_MM2S_CMD_MOSI        : out t_axi4_stream_mosi_cmd32;
     AXIS_MM2S_CMD_MISO        : in t_axi4_stream_miso;
@@ -45,10 +51,9 @@ entity reader_fsm is
     AXIS_TX_DATA_MOSI         : out t_axi4_stream_mosi64;
     AXIS_TX_DATA_MISO         : in t_axi4_stream_miso;
     
-    RD_BUFFER_STATUS          : in buffer_status_type;    
-    RD_BUFFER_STATUS_UPDATE   : out STD_LOGIC;
-    
-    FLUSH                     : in STD_LOGIC;
+    CURRENT_RD_BUFFER         : out buffer_status_type;
+    CURRENT_WR_BUFFER         : in buffer_status_type;
+    NEXT_RD_BUFFER            : in buffer_status_type;
     
     ERROR                     : out std_logic_vector(2 downto 0)
         
@@ -97,24 +102,28 @@ architecture reader_fsm of reader_fsm is
 end component;
 
    signal areset_i                  : std_logic; 
-   signal sreset                    : std_logic;    
+   signal sreset                    : std_logic; 
+   signal flush_i                   : std_logic;
    signal fb_cfg_i                  : frame_buffer_cfg_type;
-   signal eof                       : std_logic;
    signal done                      : std_logic;
    signal done_last                 : std_logic;
-   signal dm_rdy                    : std_logic;
    signal gen_tlast                 : std_logic;
    signal gen_tid                   : std_logic;
-   signal buf_sts_update            : std_logic;
+   signal read_in_progress          : std_logic;
+   signal next_read_buffer_valid    : std_logic;
+   signal current_write_buffer_valid : std_logic;
+   signal cfg_update_pending_i      : std_logic;
+  
+   signal next_read_buffer_sync     : buffer_status_type := buf_sts_default;   
+   signal current_read_buffer       : buffer_status_type := buf_sts_default; 
+   signal current_write_buffer_sync : buffer_status_type := buf_sts_default;
+   
    signal pix_cnt                   : unsigned(31 downto 0);
    signal lval_cnt                  : unsigned(31 downto 0);
    signal fval_cnt                  : unsigned(31 downto 0);
-   signal width                     : unsigned(31 downto 0);
-   signal sts_ack_i                 : std_logic;
-   signal flush_i                   : std_logic; 
+   signal width                     : unsigned(31 downto 0);                                                                    
+     
    signal stall_i                   : std_logic;
-   signal tready_last_i             : std_logic;
-   signal buf_sts_i                 : buffer_status_type;
    signal mm2s_cmd_mosi             : t_axi4_stream_mosi_cmd32;
    signal mm2s_cmd_miso             : t_axi4_stream_miso;
    signal mm2s_sts_mosi             : t_axi4_stream_mosi_status;
@@ -127,41 +136,43 @@ end component;
      
    signal mm2s_addr                 : std_logic_vector(31 downto 0) := (others => '0');
    signal mm2s_eof                  : std_logic := '0';
-   signal mm2s_btt                  : std_logic_vector(22 downto 0) := (others => '0');
+   signal mm2s_btt                  : std_logic_vector(22 downto 0) := (others => '0'); 
+   signal mm2s_tag                  : std_logic_vector(3 downto 0) := (others => '0');
    signal mm2s_err_o                : std_logic_vector(2 downto 0); -- (SLVERR & DECERR & INTERR)
 
-   type reader_sm_type is (standby_rd, wait_rd_cmd_ack, wait_buf_sts_update_ack, wait_eof, wait_fval_pause); 
+   type reader_sm_type is (standby_rd, wait_rd_cmd_ack, validate_rd_frame, error_rd); 
    signal reader_sm                 : reader_sm_type; 
    
    type output_sm_type is (hdr_st, img_st); 
    signal output_sm                 : output_sm_type;
    
-   type dm_sts_ack_sm_type is (idle_st, waiting_dm_sts_ack_st); 
-   signal dm_sts_ack_sm                 : dm_sts_ack_sm_type;
    
    type throttle_sm_type is (idle_st, stall_st); 
    signal throttle_sm                 : throttle_sm_type; 
    
-   attribute KEEP : string;
-   attribute KEEP of throttle_sm      : signal is "true";
-   attribute KEEP of output_sm        : signal is "true";
-   attribute KEEP of reader_sm        : signal is "true";
-   
+--   attribute KEEP : string;
+--   attribute KEEP of throttle_sm      : signal is "true";
+--   attribute KEEP of output_sm        : signal is "true";
+--   attribute KEEP of reader_sm        : signal is "true";
 begin      
    
    -- I/O Connections assignments
    areset_i                      <= not ARESETN; 
-   flush_i                       <= FLUSH;
-   RD_BUFFER_STATUS_UPDATE       <= buf_sts_update;
    ERROR                         <= mm2s_err_o;
+   fb_cfg_i                      <= FB_CFG;
+
+   mm2s_sts_mosi                 <= AXIS_MM2S_STS_MOSI;
+   AXIS_MM2S_STS_MISO            <= mm2s_sts_miso;
+   mm2s_cmd_mosi.TDATA           <= std_logic_vector(RSVD & mm2s_tag & mm2s_addr & DRR & mm2s_eof & DSA & CTYPE & mm2s_btt);
    AXIS_MM2S_CMD_MOSI            <= mm2s_cmd_mosi;
    mm2s_cmd_miso                 <= AXIS_MM2S_CMD_MISO;
-   mm2s_sts_mosi                 <= AXIS_MM2S_STS_MOSI;
-   mm2s_cmd_mosi.TDATA           <= std_logic_vector(RSVD & TAG & mm2s_addr & DRR & mm2s_eof & DSA & CTYPE & mm2s_btt);
    
+   
+   CURRENT_RD_BUFFER             <= current_read_buffer;
+    
    axis_mm2s_fifo_in_mosi.TDATA  <= AXIS_MM2S_DATA_MOSI.TDATA;  
    axis_mm2s_fifo_in_mosi.TLAST  <= AXIS_MM2S_DATA_MOSI.TLAST when gen_tlast = '0' else '1';
-   axis_mm2s_fifo_in_mosi.TID  <= (others => '0') when gen_tid = '0' else (others => '1');
+   axis_mm2s_fifo_in_mosi.TID    <= (others => '0') when gen_tid = '0' else (others => '1');
    axis_mm2s_fifo_in_mosi.TSTRB  <= AXIS_MM2S_DATA_MOSI.TSTRB;
    axis_mm2s_fifo_in_mosi.TKEEP  <= AXIS_MM2S_DATA_MOSI.TKEEP;
    axis_mm2s_fifo_in_mosi.TDEST  <= AXIS_MM2S_DATA_MOSI.TDEST;
@@ -169,104 +180,149 @@ begin
    axis_mm2s_fifo_in_mosi.TVALID <= AXIS_MM2S_DATA_MOSI.TVALID;
    AXIS_MM2S_DATA_MISO.TREADY    <= axis_mm2s_fifo_in_miso.tready;
    
-   
-   AXIS_TX_DATA_MOSI.TDATA <= axis_mm2s_fifo_out_mosi.TDATA;   
-   AXIS_TX_DATA_MOSI.TLAST <= axis_mm2s_fifo_out_mosi.TLAST;  
-   AXIS_TX_DATA_MOSI.TID   <= axis_mm2s_fifo_out_mosi.TID;
-   AXIS_TX_DATA_MOSI.TSTRB <= (others => '1');
-   AXIS_TX_DATA_MOSI.TKEEP <= (others => '1');
-   AXIS_TX_DATA_MOSI.TDEST <= (others => '0');
-   AXIS_TX_DATA_MOSI.TUSER <= (others => '0');
-   AXIS_TX_DATA_MOSI.TVALID <= axis_mm2s_fifo_out_mosi.TVALID and not stall_i;   
+   AXIS_TX_DATA_MOSI.TDATA       <= axis_mm2s_fifo_out_mosi.TDATA;   
+   AXIS_TX_DATA_MOSI.TLAST       <= axis_mm2s_fifo_out_mosi.TLAST;  
+   AXIS_TX_DATA_MOSI.TID         <= axis_mm2s_fifo_out_mosi.TID;
+   AXIS_TX_DATA_MOSI.TSTRB       <= (others => '1');
+   AXIS_TX_DATA_MOSI.TKEEP       <= (others => '1');
+   AXIS_TX_DATA_MOSI.TDEST       <= (others => '0');
+   AXIS_TX_DATA_MOSI.TUSER       <= (others => '0');
+   AXIS_TX_DATA_MOSI.TVALID      <= axis_mm2s_fifo_out_mosi.TVALID and not stall_i;   
    axis_mm2s_fifo_out_miso.tready <= AXIS_TX_DATA_MISO.TREADY and not stall_i;
    
-   READER_DONE                   <= done;
-   fb_cfg_i                      <= FB_CFG when FB_CFG.dval = '1' else fb_cfg_default; 
+   RD_IN_PROGRESS                <= read_in_progress;
       
    U0: sync_reset
    port map(ARESET => areset_i, CLK    => CLK, SRESET => sreset ); 
    
-   U1: double_sync
+   U1A: double_sync
    generic map (INIT_VALUE => '0')
-   port map(D => RD_BUFFER_STATUS.ack, Q => sts_ack_i, RESET => sreset, CLK => CLK ); 
+   port map(D => NEXT_RD_BUFFER.valid, Q => next_read_buffer_valid, RESET => sreset, CLK => CLK ); 
+   
+   U1B: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => CURRENT_WR_BUFFER.valid, Q => current_write_buffer_valid, RESET => sreset, CLK => CLK ); 
+     
+   U1C: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => CFG_UPDATE_PENDING, Q => cfg_update_pending_i, RESET => sreset, CLK => CLK ); 
+     
+   U1D: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => FLUSH, Q => flush_i, RESET => sreset, CLK => CLK ); 
    
    U2 : process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
-            buf_sts_i <= buf_sts_default;
+            next_read_buffer_sync <= buf_sts_default;
          else    
-            if sts_ack_i = '1' then 
-               buf_sts_i <= RD_BUFFER_STATUS;
+           
+            if flush_i = '1' then
+               next_read_buffer_sync <= buf_sts_default;     
+            elsif next_read_buffer_valid = '1' then 
+               next_read_buffer_sync <= NEXT_RD_BUFFER;
             else
-               buf_sts_i <= buf_sts_i;
+               next_read_buffer_sync <= next_read_buffer_sync;
             end if;
          end if;     
       end if;
    end process;
    
-   U3: process(CLK)
+   U3 : process(CLK)        
+   begin
+      if rising_edge(CLK) then
+         if sreset = '1' then
+            current_write_buffer_sync <= buf_sts_default;
+         else    
+            if flush_i = '1' then
+               current_write_buffer_sync <= buf_sts_default;     
+            elsif current_write_buffer_valid = '1' then 
+               current_write_buffer_sync <= CURRENT_WR_BUFFER;
+            else
+               current_write_buffer_sync <= current_write_buffer_sync;
+            end if;
+         end if;     
+      end if;
+   end process;
+   
+   
+   U4: process(CLK)
    begin
       if rising_edge(CLK) then
          if sreset = '1' then 
             reader_sm <= standby_rd;
-            buf_sts_update <= '0';
             mm2s_addr <= (others => '0');
             mm2s_eof <='1'; 
             mm2s_btt <= (others => '0');
             mm2s_cmd_mosi.tvalid <= '0';
+            mm2s_sts_miso.tready <= '0';
             fval_cnt <= (others => '0');
-            done <= '0';
+            current_read_buffer <=  buf_sts_default;
+            read_in_progress <= '0';
+            mm2s_err_o(2 downto 0) <= (others =>'0');
          else
             
-               case reader_sm is 
-                  when standby_rd => 
-                     done <= '1';
-                           
-                     if buf_sts_i.full = '1' and dm_rdy = '1' and flush_i = '0' then
-                        -- Wait for pointed buffer to have a complete frame available 
-                        done <= '0';
-                        -- Send cmd to data mover's read engine                     
-                        mm2s_addr <= resize(std_logic_vector(buf_sts_i.pbuf), mm2s_addr'length);
-                        mm2s_eof <=  '1';
-                        mm2s_btt <= resize(std_logic_vector(fb_cfg_i.frame_byte_size),mm2s_btt'length); 
-                        mm2s_cmd_mosi.tvalid <= '1';  
-                        reader_sm <= wait_rd_cmd_ack; 
-                     end if;
-                     
-                  when wait_rd_cmd_ack =>
-                     -- Wait for read cmd to be acknoledge by data mover
-                     if mm2s_cmd_miso.tready = '1' then  
-                        mm2s_cmd_mosi.tvalid <= '0';
-                        reader_sm <= wait_eof;
-                     end if;
+            if flush_i = '1' then  
+               current_read_buffer <=  buf_sts_default;
+            end if;
+            
+            case reader_sm is 
+               when standby_rd => 
+                  read_in_progress <= '0';
+                  if (next_read_buffer_sync.tag /= "00") and (current_write_buffer_sync.tag /= next_read_buffer_sync.tag) and (current_read_buffer.tag /= next_read_buffer_sync.tag) and next_read_buffer_valid = '0' and current_write_buffer_valid = '0' and cfg_update_pending_i = '0' then  
+                     read_in_progress <= '1';
+                     current_read_buffer.pbuf <=  next_read_buffer_sync.pbuf;
+                     current_read_buffer.tag <=  next_read_buffer_sync.tag;
+                     current_read_buffer.valid <= '1';
+                     mm2s_addr <= resize(std_logic_vector(next_read_buffer_sync.pbuf), mm2s_addr'length);
+                     mm2s_eof <=  '1';
+                     mm2s_btt <= resize(std_logic_vector(fb_cfg_i.frame_byte_size),mm2s_btt'length); 
+                     mm2s_tag <= "00" & std_logic_vector(next_read_buffer_sync.tag);
+                     mm2s_cmd_mosi.tvalid <= '1';
+                     mm2s_sts_miso.tready <= '0';
+                     reader_sm <= wait_rd_cmd_ack;
+                  else
+                     mm2s_sts_miso.tready <= '0';
+                     mm2s_cmd_mosi.tvalid <= '0';
+                  end if;
                   
-                  when wait_eof =>
-                     -- Wait for the last pixel of the frame
-                     if eof = '1' then
-                       buf_sts_update <= '1';
-                       reader_sm <= wait_buf_sts_update_ack;
-                     end if;
-                     
-                  when wait_buf_sts_update_ack =>
-                      -- Wait for the buffer manager to update current pointed buffer status & read pointer 
-                      if sts_ack_i = '1' then
-                         buf_sts_update <= '0';               
-                         reader_sm <= wait_fval_pause;
+               when wait_rd_cmd_ack =>
+                  current_read_buffer.valid <= '0';
+                  if mm2s_cmd_miso.tready = '1' then  
+                     mm2s_cmd_mosi.tvalid <= '0';
+                     mm2s_sts_miso.tready <= '1';
+                     reader_sm <= validate_rd_frame; 
+                  else
+                     mm2s_sts_miso.tready <= '0';
+                     mm2s_cmd_mosi.tvalid <= '1';                        
+                  end if;
+               
+               when validate_rd_frame =>   
+                  
+                  if mm2s_sts_mosi.tvalid = '1' then
+                     mm2s_sts_miso.tready <= '0';
+                     mm2s_cmd_mosi.tvalid <= '0';
+                     if ( (mm2s_sts_mosi.tdata(7) = '1') and (mm2s_sts_mosi.tdata(6 downto 2) = "00000") and (mm2s_sts_mosi.tdata(1 downto 0) = std_logic_vector(current_read_buffer.tag)) ) then --transmit valid
+                        done <= '1'; 
+                        reader_sm <= standby_rd;
+                     else   
+                        mm2s_err_o(2 downto 0) <= mm2s_sts_mosi.tdata(6 downto 4);
+                        reader_sm <= error_rd;
                      end if;
 
-                  when wait_fval_pause => 
-                     if fval_cnt >= fb_cfg_i.fval_pause_min then 
-                       done <= '1';
-                       fval_cnt <= (others => '0');
-                       reader_sm <= standby_rd;
-                     else
-                       fval_cnt <= fval_cnt + 1;
-                     end if;
-                     
-                  when others =>
-                  
-               end case;
+                   else   
+                      mm2s_cmd_mosi.tvalid <= '0';
+                      mm2s_sts_miso.tready <= '1';
+                   end if;
+
+               when error_rd =>
+                  mm2s_err_o <= mm2s_err_o;
+                  reader_sm <= error_rd;
+               
+               when others =>
+                  reader_sm <= error_rd;
+            end case;
          end if;
          
       end if;     
@@ -274,111 +330,49 @@ begin
 
    -- This process reconstruct the AXI-STREAM signals : 
       --> TID (1 = hdr, 0 = img)
-      --> TLAST associated with end of header.
-      
-   U4: process(CLK)        
+      --> TLAST associated with end of header.     
+   U5: process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
             output_sm <= hdr_st;
             pix_cnt <= (others => '0');
-            eof <= '0';
             gen_tid <= '1';
             gen_tlast <= '0';
          else 
-            
-               case output_sm is 
-                  
-                  when hdr_st =>
-                     gen_tid <= '1'; 
-                     eof <= '0';  
-                     if axis_mm2s_fifo_in_miso.tready = '1' and axis_mm2s_fifo_in_mosi.TVALID = '1' then 
-                        pix_cnt <= pix_cnt + STREAM_PIXEL_WIDTH;  
-                        gen_tlast <= '0';
-                        if pix_cnt = (fb_cfg_i.hdr_pix_size-STREAM_PIXEL_WIDTH) then  
-                           pix_cnt <= (others => '0');
-                           gen_tid <= '0';
-                           output_sm <= img_st;
-                        elsif pix_cnt = (fb_cfg_i.hdr_pix_size-2*STREAM_PIXEL_WIDTH) then
-                           gen_tlast <= '1';  
-                        end if;   
+           
+            case output_sm is 
+               
+               when hdr_st =>
+                  gen_tid <= '1';  
+                  if axis_mm2s_fifo_in_miso.tready = '1' and axis_mm2s_fifo_in_mosi.TVALID = '1' then
+                     
+                     pix_cnt <= pix_cnt + STREAM_PIXEL_WIDTH;  
+                     gen_tlast <= '0';
+                     if pix_cnt = (fb_cfg_i.hdr_pix_size-STREAM_PIXEL_WIDTH) then  
+                        pix_cnt <= (others => '0');
+                        gen_tid <= '0';
+                        output_sm <= img_st;
+                     elsif pix_cnt = (fb_cfg_i.hdr_pix_size-2*STREAM_PIXEL_WIDTH) then
+                        gen_tlast <= '1';  
                      end if;   
-                     
-                  when img_st =>  
-                     if axis_mm2s_fifo_in_miso.tready = '1' and axis_mm2s_fifo_in_mosi.TVALID = '1' and axis_mm2s_fifo_in_mosi.TLAST = '1'then 
-                        gen_tid <= '1';
-                        eof <= '1';
-                        output_sm <= hdr_st;
-                     end if;
-                     
-                  when others =>
+                  end if;   
                   
-               end case;
+               when img_st =>  
+                  if axis_mm2s_fifo_in_miso.tready = '1' and axis_mm2s_fifo_in_mosi.TVALID = '1' and axis_mm2s_fifo_in_mosi.TLAST = '1'then 
+                     gen_tid <= '1';
+                     output_sm <= hdr_st;
+                  end if;
+                  
+               when others =>
+               
+            end case;
    
          end if;     
       end if;
    end process;  
-   
-   
-   -- This process ensure that the data mover is ready to receive a new command.
-   -- It is appart from the main fsm because the eof can happen before or after 
-   -- the status ack is generated by the data mover.
-   U5 : process(CLK)
-   begin
-       if rising_edge(CLK) then
-            if sreset = '1' then
-               done_last <= '0';
-               dm_rdy   <= '1';
-               AXIS_MM2S_STS_MISO.tready <= '0';
-            else                 
-               
-               done_last <= done;
-               
-               case dm_sts_ack_sm is 
-                  
-                  when idle_st =>       
-                     
-                     if done = '0' and done_last = '1' then
-                        dm_rdy   <= '0';
-                        AXIS_MM2S_STS_MISO.tready <= '1';
-                        dm_sts_ack_sm <= waiting_dm_sts_ack_st;
-                     end if;
-                     
-                  when waiting_dm_sts_ack_st =>
-                     
-                     if AXIS_MM2S_STS_MOSI.tvalid = '1' then 
-                        AXIS_MM2S_STS_MISO.tready <= '0';
-                        dm_rdy   <= '1';
-                        dm_sts_ack_sm <= idle_st;
-                     end if;
-                     
-                  when others =>  
-                  
-               end case;
-            end if;
-       end if;
-   end process;                 
-   
-   U6 : process(CLK)
-   begin
-       if rising_edge(CLK) then
-            if sreset = '1' then
-               mm2s_err_o <= (others => '0');
-            else
-               if( mm2s_sts_mosi.tvalid = '1') then
 
-                   if(mm2s_sts_mosi.tdata(6 downto 4) /= "000") then
-                       mm2s_err_o(2 downto 0) <= mm2s_sts_mosi.tdata(6 downto 4);
-                   end if;
-               else
-                   mm2s_err_o <= mm2s_err_o;
-               end if;
-            end if;
-       end if;
-   end process;
-  
- -- This fifo break the tready chain to favorize timming closure
- U7 : t_axi4_stream64_fifo
+ U6 : t_axi4_stream64_fifo
  generic map (
       ASYNC => false,
       FifoSize => 16,
@@ -396,19 +390,19 @@ begin
  );
  
  -- This process throttle the axis stream throughtput to impose a minimum pause 
- -- between line (must be greater or equal to clink LVAL_PAUSE in output fpga)
- U8 : process(CLK)
+ -- between line (the pause must be configure to be greater or equal to clink LVAL_PAUSE in output fpga)
+ U7 : process(CLK)
    begin
        if rising_edge(CLK) then
             if sreset = '1' then
                lval_cnt <= to_unsigned(0,lval_cnt'length);
                throttle_sm <= idle_st; 
-               stall_i                        <= '0';    
+               stall_i <= '0';    
             else
                width <= resize(shift_right(fb_cfg_i.hdr_pix_size, 3), width'length);
                case throttle_sm is 
                   when idle_st =>  
-                     if axis_mm2s_fifo_out_mosi.tvalid = '1' and axis_mm2s_fifo_out_miso.tready = '1' then
+                     if axis_mm2s_fifo_out_mosi.tvalid = '1' and axis_mm2s_fifo_out_miso.tready = '1' and fb_cfg_i.lval_pause_min > 0 then
                         if lval_cnt = width-1 then
                            stall_i <= '1';
                            lval_cnt <= to_unsigned(0,lval_cnt'length);

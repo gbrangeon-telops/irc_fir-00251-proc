@@ -32,30 +32,21 @@ package body fb_testbench_pkg is
       variable frame_byte_size           : unsigned(31 downto 0) := (others => '0');                -- frame size in byte
       variable hdr_pix_size              : unsigned(31 downto 0) := (others => '0');                -- header size in byte 
       variable img_pix_size              : unsigned(31 downto 0) := (others => '0');                -- image size in byte
-      variable fval_pause_min            : unsigned(31 downto 0) := (others => '0');                -- minimum pause between at frame buffer output
       variable lval_pause_min            : unsigned(31 downto 0) := (others => '0');                -- minimum pause between line
-      variable flush                     : unsigned(31 downto 0) := (others => '0');                
 
-      variable y                         : unsigned(9*32-1 downto 0);  
+      variable y                         : unsigned(7*32-1 downto 0);  
       
       
    begin
-      
-      buffer_a_addr := unsigned(cfg.buffer_a_addr);
-      buffer_b_addr := unsigned(cfg.buffer_b_addr);
-      buffer_c_addr := unsigned(cfg.buffer_c_addr);   
-      flush(0) := cfg.flush;
-      
+        
       -- cfg usager
-      y := buffer_a_addr
-      & buffer_b_addr
-      & buffer_c_addr
+      y := cfg.buffer_a_addr
+      & cfg.buffer_b_addr
+      & cfg.buffer_c_addr
       & cfg.frame_byte_size 
       & cfg.hdr_pix_size
       & cfg.img_pix_size
-      & cfg.fval_pause_min
-      & cfg.lval_pause_min
-      & flush;
+      & cfg.lval_pause_min;
       return y;
       
    end to_intf_cfg;

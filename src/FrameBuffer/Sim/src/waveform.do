@@ -2,54 +2,49 @@ onerror { resume }
 transcript off	  
 
 #add wave -named_row "stim" 		
-add wave -noreg -logic {/Top/U1/CLK_DIN}
-add wave -noreg -logic {/Top/U1/transmit}
-add wave -noreg -logic {/top/U1/CLK_DATA}
-
-add wave -named_row "------------------------fifo out-------------------------------------"
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}	 
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}	
-add wave -noreg -logic {}	 
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}	 
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}	
-
-		
- add wave -named_row "------------------------AXIS_64-------------------------------------"
-add wave -noreg -logic {/Top/U2/g0/WRITE_FR/pix_counter}	 
-add wave -noreg -logic {/Top/U2/g0/WRITE_FR/FRAME_RATE_MIN}
-add wave -noreg -logic {/Top/U2/g0/WRITE_FR/FRAME_RATE_MAX}
-add wave -noreg -logic {}	 
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}	 
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}	 
-add wave -noreg -logic {}
-add wave -noreg -logic {}
  
-add wave -named_row "------------------------WRITER-------------------------------------"
-add wave -noreg -logic {/Top/U1/CLK_DIN} 
-add wave -noreg -logic {/top/U2/g0/U6/fb_cfg_i}
-add wave -noreg -logic {/top/U2/g0/U6/sof_i}	   
+  add wave -named_row "CFG UPDATER"
+add wave -noreg -logic {/Top/U2/g0/U6/cfg_update_done}	
+add wave -noreg -logic {/Top/U2/g0/U6/cfg_updater_sm}	 
+add wave -noreg -logic {/Top/U2/g0/U6/init_cfg_done}
+add wave -noreg -logic {/Top/U2/g0/U6/flush_i}
+add wave -noreg -logic {/Top/U2/g0/U6/USER_CFG}	 
+add wave -noreg -logic {}
+add wave -noreg -logic {}
+add wave -noreg -logic {}	
+
+
+
+add wave -named_row "------------------------writer-------------------------------------" 
+add wave -noreg -logic {/Top/U1/CLK_DIN} 	 
+add wave -noreg -logic {/Top/U2/g0/U6/ARESETN}
+add wave -noreg -logic {/Top/U2/g0/U6/switch_sm} 
+add wave -noreg -logic {/Top/U2/g0/U6/writer_sm}
+add wave -noreg -logic {/Top/U2/g0/U6/sof_i} 
+add wave -noreg -logic {/Top/U2/g0/U6/done}	 
+add wave -noreg -logic {/Top/U2/g0/U6/done_last}
+add wave -noreg -logic {/Top/U2/g0/U6/sts_tvalid_last}	 
 add wave -noreg -logic {/Top/U2/g0/U6/wr_next_incoming_frame}
-add wave -noreg -logic {/Top/U2/g0/U6/done}
-add wave -noreg -logic {/Top/U2/g0/U6/writer_sm}		  
+ 
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_addr}
+
+add wave -noreg -logic {/Top/U2/g0/U6/write_in_progress}	 
+add wave -noreg -logic {/Top/U2/g0/U6/current_read_buffer_sync}	
+add wave -noreg -logic {/Top/U2/g0/U6/current_write_buffer}
+add wave -noreg -logic {/Top/U2/g0/U6/next_write_buffer}
+add wave -noreg -logic {/Top/U2/g0/U6/next_read_buffer}	
+add wave -noreg -logic {/Top/U2/g0/U6/STALL_WRITER}	 
+
+add wave -named_row "input"
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TVALID}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TDATA}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TLAST}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TID}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MISO.TREADY}
+add wave -noreg -logic {/top/U2/g0/U6/fb_cfg_i}   	  
 add wave -noreg -logic {/Top/U2/g0/U6/s2mm_addr} 
-add wave -named_row "buffer manager intf"
-add wave -noreg -logic {/Top/U2/g0/U6/WR_BUFFER_STATUS}
-add wave -noreg -logic {/Top/U2/g0/U6/WR_BUFFER_STATUS_UPDATE}
-add wave -noreg -logic {/Top/U2/g0/U6/STALL_WRITER} 
- 	  
-			  
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_tag}
+
 add wave -named_row "cmd & status"
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_CMD_MOSI.TVALID}
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_CMD_MOSI.TDATA}
@@ -57,8 +52,6 @@ add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_CMD_MISO.TREADY}
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_STS_MOSI.TVALID}
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_STS_MOSI.TDATA}
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_STS_MISO.TREADY}
-
-
 
 add wave -named_row "input"
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TVALID}
@@ -73,8 +66,18 @@ add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TLAST}
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TID}
 add wave -noreg -logic {/Top/U2/vU6/AXIS_S2MM_DATA_MISO.TREADY}
  
-add wave -noreg -logic {/Top/U2/g0/U6/switch_sm} 
+ add wave -named_row "fifo"
+add wave -noreg -logic {/Top/U2/g0/U3/TX_MOSI.TVALID}
+add wave -noreg -logic {/Top/U2/g0/U3/TX_MOSI.TDATA}
+add wave -noreg -logic {/Top/U2/g0/U3/TX_MOSI.TLAST}	 
+add wave -noreg -logic {/Top/U2/g0/U3/TX_MOSI.TID}
+add wave -noreg -logic {/Top/U2/g0/U3/TX_MISO.TREADY}  
 
+		
+ add wave -named_row "------------------------AXIS_64-------------------------------------"
+add wave -noreg -logic {/Top/U2/g0/WRITE_FR/pix_counter}	 
+add wave -noreg -logic {/Top/U2/g0/WRITE_FR/FRAME_RATE_MIN}
+add wave -noreg -logic {/Top/U2/g0/WRITE_FR/FRAME_RATE_MAX}
 
 add wave -named_row "--------------------------FIFO----------------------------------"
 add wave -noreg -logic {/Top/U2/g0/U7/TX_MOSI.TVALID}
@@ -83,13 +86,20 @@ add wave -noreg -logic {/Top/U2/g0/U7/TX_MOSI.TLAST}
 add wave -noreg -logic {/Top/U2/g0/U7/TX_MISO.TREADY}
 add wave -noreg -logic {/Top/U2/g0/U6/mask_tlast} 
 
-
-
-
-
 add wave -named_row "--------------------------READER----------------------------------"	   
 
 add wave -noreg -logic {/Top/U2/g0/U5/reader_sm} 
+add wave -noreg -logic {/Top/U2/g0/U5/next_read_buffer_sync}
+add wave -noreg -logic {/Top/U2/g0/U5/current_read_buffer}
+add wave -noreg -logic {/Top/U2/g0/U5/current_write_buffer_sync}
+add wave -noreg -logic {/Top/U2/g0/U5/mm2s_addr}
+add wave -noreg -logic {/Top/U2/g0/U5/mm2s_eof}
+add wave -noreg -logic {/Top/U2/g0/U5/mm2s_btt}
+add wave -noreg -logic {/Top/U2/g0/U5/mm2s_tag}	
+add wave -noreg -logic {/Top/U2/g0/U5/read_in_progress}	 
+add wave -noreg -logic {/Top/U2/g0/U5/cfg_update_pending_i}
+add wave -noreg -logic {}
+add wave -noreg -logic {}	
 add wave -noreg -logic {/Top/U2/g0/U5/done} 
 add wave -noreg -logic {/top/U2/g0/U5/eof}
 
@@ -202,7 +212,7 @@ add wave -noreg -logic {/Top/U2/g0/U2/writer_rqst_sm}
 add wave -noreg -logic {/Top/U2/g0/U2/writer_rqst_latch}
 add wave -noreg -logic {/Top/U2/g0/U2/reader_rqst_latch_o}
 add wave -noreg -logic {}
-add wave -noreg -logic {}
+add wave -noreg -logic {/Top/U2/g0/U2/next_rd_buffer}
 
 add wave -named_row "--------------------------uBlaze intf ----------------------------------"
 
@@ -222,4 +232,10 @@ add wave -noreg -logic {/Top/U3/AXI_BRAM_MOSI}
 add wave -noreg -logic {/Top/U3/AXI_BRAM_MISO}
 
   
+add wave -named_row "reader" 
+wave /top/U2/g0U5/* 
+ add wave -named_row "writer" 
+wave /top/U2/g0U6/* 
+add wave -named_row "manager" 
+wave /top/U2/g0U2/* 
 transcript on

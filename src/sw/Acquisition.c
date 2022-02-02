@@ -373,7 +373,6 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig, &gcRegsData);
-            FB_Flush(&gFB_ctrl);
 
 
             #ifdef SCD_PROXY
@@ -399,7 +398,6 @@ void Acquisition_SM()
          if (gcRegsData.AcquisitionStop)
          {
             TRIG_ChangeAcqWindow(&gTrig, TRIG_ExtraTrig,  &gcRegsData);
-            FB_Flush(&gFB_ctrl);
 
             #ifdef SCD_PROXY
                StartTimer(&trig_mode_transition_timer, ((float)XTRA_TRIG_MODE_DELAY)/1000.0F);

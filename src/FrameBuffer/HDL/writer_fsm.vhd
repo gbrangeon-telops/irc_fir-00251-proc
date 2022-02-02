@@ -21,7 +21,9 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use ieee.numeric_std.all;
+use ieee.numeric_std.all;  
+
+
 use work.TEL2000.all;
 use work.fbuffer_define.all;
 
@@ -31,10 +33,17 @@ entity writer_fsm is
     CLK                       : in STD_LOGIC;
     ARESETN                   : in STD_LOGIC;
     
-    FB_CFG                    : in frame_buffer_cfg_type;  
-    STALL_WRITER              : in STD_LOGIC;
-    WRITER_DONE               : out STD_LOGIC;
-
+    USER_CFG                  : in frame_buffer_cfg_type;
+    
+    FB_CFG                    : out frame_buffer_cfg_type; 
+    CFG_UPDATE_PENDING        : out STD_LOGIC;
+    FLUSH                     : out STD_LOGIC;
+    RD_IN_PROGRESS            : in STD_LOGIC; 
+    
+    NEXT_RD_BUFFER            : out buffer_status_type;  
+    CURRENT_RD_BUFFER         : in  buffer_status_type;
+    CURRENT_WR_BUFFER         : out buffer_status_type;
+    
     AXIS_RX_DATA_MOSI         : in t_axi4_stream_mosi64;
     AXIS_RX_DATA_MISO         : out t_axi4_stream_miso;
     
@@ -46,14 +55,10 @@ entity writer_fsm is
         
     AXIS_S2MM_STS_MOSI        : in t_axi4_stream_mosi_status;
     AXIS_S2MM_STS_MISO        : out t_axi4_stream_miso;
-
-    WR_BUFFER_STATUS          : in buffer_status_type;    
-    WR_BUFFER_STATUS_UPDATE   : out STD_LOGIC;
     
+    STATUS                    : out std_logic_vector(7 downto 0);
     ERROR                     : out std_logic_vector(2 downto 0) 
    );
-   
-   
 end writer_fsm;
 
 
@@ -78,20 +83,39 @@ architecture writer_fsm of writer_fsm is
          CLK   : in std_logic
          );
    end component;
-
+   
+   component gh_stretch 
+	GENERIC (stretch_count: integer :=1023);
+	 port(
+		 CLK : in STD_LOGIC;
+		 rst : in STD_LOGIC;
+		 D : in STD_LOGIC;
+		 Q : out STD_LOGIC
+	     );
+   end component;
+   
    signal areset_i                       : std_logic; 
    signal sreset                         : std_logic;    
-   signal fb_cfg_i                       : frame_buffer_cfg_type;
+   signal fb_cfg_i                       : frame_buffer_cfg_type; 
+   signal flush_i                        : std_logic;
    signal sof_i                          : std_logic;
    signal eof_i                          : std_logic;
    signal sof_last                       : std_logic;
    signal wr_next_incoming_frame         : std_logic;
    signal wr_next_incoming_frame_last    : std_logic;
-   signal done                           : std_logic;
-   signal buf_sts_update                 : std_logic;
+   signal done                           : std_logic; 
+   signal done_last                      : std_logic;
+   signal write_in_progress              : std_logic;
+   signal read_in_progress               : std_logic;   
+   signal sts_tvalid_last                : std_logic;
    signal mask_tlast                     : std_logic;
-   signal sts_ack_i                      : std_logic;
-   signal buf_sts_i                      : buffer_status_type;
+   signal next_read_buffer               : buffer_status_type := buf_sts_default;
+   signal next_write_buffer              : buffer_status_type := buf_sts_default;
+   signal current_read_buffer_sync       : buffer_status_type := buf_sts_default;
+   signal current_write_buffer           : buffer_status_type := buf_sts_default;
+   signal current_read_buffer_valid        : std_logic;
+
+  
    signal s2mm_cmd_mosi                  : t_axi4_stream_mosi_cmd32;
    signal s2mm_cmd_miso                  : t_axi4_stream_miso;
    signal s2mm_sts_mosi                  : t_axi4_stream_mosi_status;
@@ -100,14 +124,30 @@ architecture writer_fsm of writer_fsm is
    signal s2mm_data_mosi_pipe            : axis64_mosi_pipe;
    signal s2mm_addr                      : std_logic_vector(31 downto 0) := (others => '0');
    signal s2mm_eof                       : std_logic := '0';
-   signal s2mm_btt                       : std_logic_vector(22 downto 0) := (others => '0');   
+   signal s2mm_btt                       : std_logic_vector(22 downto 0) := (others => '0'); 
+   signal s2mm_tag                       : std_logic_vector(3 downto 0) := (others => '0');
    signal s2mm_err_o                     : std_logic_vector(2 downto 0); -- (SLVERR & DECERR & INTERR)
-      
-   type writer_sm_type is (standby_wr, wait_wr_cmd_ack, wait_buf_sts_update_ack, wait_wr_sts_ack); 
+   
+   signal cfg_dval_last                  : std_logic;
+   signal init_cfg_done                  : std_logic;
+   signal cfg_update_done                : std_logic;
+   signal cfg_update_done_last           : std_logic;
+   signal cnt                            : unsigned(3 downto 0);
+   
+   type cfg_updater_sm_type is (idle_st, wait_empty_fb_st, cfg_updater_rqst_st); 
+   signal cfg_updater_sm             : cfg_updater_sm_type;
+   
+   type writer_sm_type is (standby_wr, wait_wr_cmd_ack, wait_wr_end, error_wr); 
    signal writer_sm                      : writer_sm_type;
 
    type switch_sm_type is (fall_st, wr_st); 
    signal switch_sm                      : switch_sm_type; 
+   
+--   attribute KEEP : string;
+--   attribute KEEP of writer_sm                : signal is "true";
+--   attribute KEEP of switch_sm                : signal is "true";
+--   attribute KEEP of wr_next_incoming_frame   : signal is "true";
+--   attribute KEEP of write_in_progress        : signal is "true";
    
 begin 
    
@@ -115,8 +155,9 @@ begin
    areset_i                    <= not ARESETN;   
    s2mm_cmd_miso               <= AXIS_S2MM_CMD_MISO;
    s2mm_sts_mosi               <= AXIS_S2MM_STS_MOSI; 
-   s2mm_cmd_mosi.TDATA         <= std_logic_vector(RSVD & TAG & s2mm_addr & DRR & s2mm_eof & DSA & CTYPE & s2mm_btt);
-   fb_cfg_i                    <= FB_CFG when FB_CFG.dval = '1' else fb_cfg_default;
+   s2mm_cmd_mosi.TDATA         <= std_logic_vector(RSVD & s2mm_tag & s2mm_addr & DRR & s2mm_eof & DSA & CTYPE & s2mm_btt);
+   FB_CFG                      <= fb_cfg_i;
+   CFG_UPDATE_PENDING          <= not cfg_update_done;
    AXIS_RX_DATA_MISO.TREADY    <= axis_rx_data_miso_i.TREADY;
    axis_rx_data_miso_i.TREADY  <= AXIS_S2MM_DATA_MISO.TREADY when wr_next_incoming_frame = '1' else '1';
    AXIS_S2MM_DATA_MOSI.TDATA   <= s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TDATA;  
@@ -129,94 +170,185 @@ begin
    AXIS_S2MM_DATA_MOSI.TVALID  <=  s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TVALID when wr_next_incoming_frame = '1' else '0';
    AXIS_S2MM_CMD_MOSI          <= s2mm_cmd_mosi;
    AXIS_S2MM_STS_MISO          <= s2mm_sts_miso; 
-   WRITER_DONE                 <= done;   
-   WR_BUFFER_STATUS_UPDATE     <= buf_sts_update;
+   FLUSH                       <= flush_i;
    ERROR                       <= s2mm_err_o;
+   STATUS                      <= "000000" & cfg_update_done & init_cfg_done;
    
    U0: sync_reset
    port map(ARESET => areset_i, CLK    => CLK, SRESET => sreset );  
-   
-   U1: double_sync
+    
+   U1A: double_sync
    generic map (INIT_VALUE => '0')
-   port map(D => WR_BUFFER_STATUS.ack, Q => sts_ack_i, RESET => sreset, CLK => CLK ); 
+   port map(D => CURRENT_RD_BUFFER.valid, Q => current_read_buffer_valid, RESET => sreset, CLK => CLK ); 
+   
+   U1B: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => RD_IN_PROGRESS, Q => read_in_progress, RESET => sreset, CLK => CLK ); 
    
    U2 : process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
-            buf_sts_i <= buf_sts_default;
+            current_read_buffer_sync <= buf_sts_default;
          else    
-            if sts_ack_i = '1' then 
-               buf_sts_i <= WR_BUFFER_STATUS;
+            
+            if flush_i = '1' then
+               current_read_buffer_sync <= buf_sts_default;     
+            elsif current_read_buffer_valid = '1' then 
+               current_read_buffer_sync <= CURRENT_RD_BUFFER;
             else
-               buf_sts_i <= buf_sts_i;
+               current_read_buffer_sync <= current_read_buffer_sync;
             end if;
          end if;     
       end if;
-   end process;
+   end process; 
    
-   U3 : process(CLK)
+   NEXT_RD_BUFFER.pbuf    <= next_read_buffer.pbuf;
+   NEXT_RD_BUFFER.tag     <= next_read_buffer.tag;
+   U3A: gh_stretch generic map (stretch_count => 10) port map(CLK => CLK, rst => sreset, D => next_read_buffer.valid , Q => NEXT_RD_BUFFER.valid);
+   
+   CURRENT_WR_BUFFER.pbuf <=  current_write_buffer.pbuf;
+   CURRENT_WR_BUFFER.tag  <=  current_write_buffer.tag;
+   U3B: gh_stretch generic map (stretch_count => 10) port map(CLK => CLK, rst => sreset, D => current_write_buffer.valid , Q => CURRENT_WR_BUFFER.valid);
+   
+   
+   U3 : process(CLK)        
+   begin
+      if rising_edge(CLK) then
+         if sreset = '1' then
+            done_last <= '1';
+            sts_tvalid_last <= '1';
+            write_in_progress <= '0';
+         else   
+            done_last <= done; 
+            sts_tvalid_last <= s2mm_sts_mosi.tvalid;
+            
+            if done_last = '1' and done = '0' then 
+               write_in_progress <= '1';
+            end if;
+            
+            if sts_tvalid_last = '0' and s2mm_sts_mosi.tvalid = '1' and write_in_progress = '1' then
+               write_in_progress <= '0';
+            end if;
+                       
+         end if;     
+      end if;
+   end process; 
+   
+   U4 : process(CLK)
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
             writer_sm <= standby_wr;
-            buf_sts_update <= '0';
             s2mm_addr <= (others => '0');
             s2mm_eof <='1'; 
             s2mm_btt <= (others => '0');
             s2mm_cmd_mosi.tvalid <= '0';
-            s2mm_sts_miso.tready <= '0';
             wr_next_incoming_frame_last <= '1';
-            done <= '0';
+            done <= '1';  
+            s2mm_err_o <= (others => '0');
+            s2mm_sts_miso.tready <= '1';     
+            next_read_buffer  <= buf_sts_default;
+            next_write_buffer <= buf_sts_default;
+            current_write_buffer <= buf_sts_default;
          else
-
+            
+               if flush_i = '1' then
+                  next_write_buffer.tag  <= BUFFER_A_TAG;
+                  next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
+                  next_read_buffer       <= buf_sts_default; 
+                  current_write_buffer   <= buf_sts_default;
+               end if;
+         
                wr_next_incoming_frame_last <= wr_next_incoming_frame;
                
                case writer_sm is 
                   when standby_wr => 
-                     done <= '1';
+                  
+                     done <= '1';  
+                     next_read_buffer.valid <= '0';
+                     current_write_buffer.valid <= '0';
+                     
                      if wr_next_incoming_frame = '1' and wr_next_incoming_frame_last = '0' then
-                        done <= '0';
-                        -- Send cmd to data mover's write engine
-                        s2mm_addr <= resize(std_logic_vector(buf_sts_i.pbuf), s2mm_addr'length); 
+                        done <= '0'; 
+                        current_write_buffer.pbuf <= next_write_buffer.pbuf;
+                        current_write_buffer.tag <= next_write_buffer.tag;
+                        current_write_buffer.valid <= '1';
+                        s2mm_addr <= resize(std_logic_vector(next_write_buffer.pbuf), s2mm_addr'length); 
                         s2mm_eof <=  '1';
                         s2mm_btt <= resize(std_logic_vector(fb_cfg_i.frame_byte_size),s2mm_btt'length);
+                        s2mm_tag <=  "00" & std_logic_vector(next_write_buffer.tag);
                         s2mm_cmd_mosi.tvalid <= '1';
                         writer_sm <= wait_wr_cmd_ack; 
+                     else
+                        s2mm_cmd_mosi.tvalid <= '0'; 
                      end if;
                   
-                  when wait_wr_cmd_ack =>  
-                     -- Wait for write cmd to be acknoledge by data mover
+                  when wait_wr_cmd_ack => 
+                  
+                     current_write_buffer.valid <= '0';
+                  
                      if s2mm_cmd_miso.tready = '1' then                  
                         s2mm_cmd_mosi.tvalid <= '0';
-                        s2mm_sts_miso.tready <= '1'; 
-                        writer_sm <= wait_wr_sts_ack;
+                        writer_sm <= wait_wr_end;
                     end if; 
-                    
-                  when wait_wr_sts_ack =>
-                     -- Wait for end of data mover transfer
-                     if s2mm_sts_mosi.tvalid = '1' then 
-                       s2mm_sts_miso.tready <= '0';
-                       buf_sts_update <= '1'; 
-                       writer_sm <= wait_buf_sts_update_ack;
-                     end if;
                   
-                  when wait_buf_sts_update_ack =>   
-                      -- Wait for buffer manager to update current pointed buffer status & write pointer 
-                      if sts_ack_i = '1' then
-                       buf_sts_update <= '0';
-                       done <= '1';
-                       writer_sm <= standby_wr;
-                     end if;
+                  when wait_wr_end =>  
+                  
+                     if( s2mm_sts_mosi.tvalid = '1') then 
+                     
+                        if(s2mm_sts_mosi.tdata(6 downto 4) /= "000") then
+                           s2mm_err_o(2 downto 0) <= s2mm_sts_mosi.tdata(6 downto 4);
+                           next_read_buffer       <= buf_sts_default;
+                           next_write_buffer      <= buf_sts_default; 
+                           writer_sm              <= error_wr;
+                        else
+                           
+                           next_read_buffer.tag <= unsigned(s2mm_sts_mosi.tdata(1 downto 0)); 
+                           next_read_buffer.valid <= '1';
+                           
+                           if unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_A_TAG then
+                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_a_addr;
+                              next_write_buffer.pbuf <= fb_cfg_i.buffer_b_addr;
+                              next_write_buffer.tag  <= BUFFER_B_TAG;
+                           elsif unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_B_TAG then 
+                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_b_addr;
+                              next_write_buffer.pbuf <= fb_cfg_i.buffer_c_addr;
+                              next_write_buffer.tag <= BUFFER_C_TAG;
+                           elsif unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_C_TAG then 
+                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_c_addr;
+                              next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
+                              next_write_buffer.tag <= BUFFER_A_TAG;
+                           else
+                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_a_addr;
+                              next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
+                              next_write_buffer.tag <= (others => '0'); 
+                              next_read_buffer      <= buf_sts_default;
+                           end if;
+                           
+                           current_write_buffer.pbuf  <= to_unsigned(0,current_write_buffer.pbuf'length);
+                           current_write_buffer.tag   <= to_unsigned(0,current_write_buffer.tag'length);
+                           current_write_buffer.valid <= '1';     
+                           
+                           writer_sm <= standby_wr;
+                        end if;             
+                     else
+                        writer_sm <= wait_wr_end;
+                     end if;                                                                 
+                     
+                  when error_wr =>  
+                     s2mm_err_o <= s2mm_err_o;
+                     writer_sm <= error_wr;  
+                     
                   when others =>
-                  
+                     writer_sm <= error_wr;
                end case;
          end if;
       end if;     
    end process; 
    
      
-   U4 : process(CLK)        
+   U5 : process(CLK)        
    begin
       if rising_edge(CLK) then 
             s2mm_data_mosi_pipe(0) <= AXIS_RX_DATA_MOSI;
@@ -227,19 +359,20 @@ begin
    end process;    
       
    
-   U5 : process(CLK)        
+   U6 : process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
             switch_sm <= fall_st;
             wr_next_incoming_frame <= '0';
             mask_tlast <= '0';
-         else    
+         else  
+            
                case switch_sm is 
                   
                   when fall_st =>
                      
-                     if sof_i = '1' and buf_sts_i.full = '0' and done = '1' and STALL_WRITER = '0' then 
+                     if sof_i = '1'and write_in_progress = '0' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' then 
                         mask_tlast <= '1';
                         wr_next_incoming_frame <= '1';
                         switch_sm <= wr_st;
@@ -257,13 +390,14 @@ begin
                      end if;
                      
                   when others =>
+                     switch_sm <= fall_st;    
                   
                end case;
          end if;     
       end if;
    end process;
    
-   U6 : process(CLK)
+   U7 : process(CLK)
    begin
       if rising_edge(CLK) then
          if sreset = '1' then            
@@ -283,24 +417,56 @@ begin
          end if;
       end if;
    end process; 
-   
-   
-   U7 : process(CLK)
+
+   U8: process(CLK)
    begin
-       if rising_edge(CLK) then
-            if sreset = '1' then
-               s2mm_err_o <= (others => '0');
-            else
-               if( s2mm_sts_mosi.tvalid = '1') then
-
-                   if(s2mm_sts_mosi.tdata(6 downto 4) /= "000") then
-                       s2mm_err_o(2 downto 0) <= s2mm_sts_mosi.tdata(6 downto 4);
-                   end if;
-               else
-                   s2mm_err_o <= s2mm_err_o;
-               end if;
-            end if;
-       end if;
+      if rising_edge(CLK) then
+         if sreset = '1' then
+            cfg_update_done <= '0'; 
+            fb_cfg_i <= fb_cfg_default;
+            cfg_updater_sm <= idle_st; 
+            cfg_dval_last <= '0'; 
+            init_cfg_done <= '0';
+            cfg_update_done_last <= '0';
+            cnt <= (others => '0');
+            flush_i <= '0';
+         else              
+            
+            cfg_dval_last <= USER_CFG.dval;
+            cfg_update_done_last <= cfg_update_done;
+            
+            case cfg_updater_sm is 
+               when idle_st => 
+                  fb_cfg_i <= fb_cfg_i;
+                  cfg_update_done <= '1';
+                  flush_i <= '0';
+                  if USER_CFG.dval = '1' and cfg_dval_last = '0' then 
+                     cfg_update_done <= '0';
+                     cfg_updater_sm <= wait_empty_fb_st;    
+                  end if;  
+               
+               when wait_empty_fb_st => 
+                  if read_in_progress = '0' and write_in_progress = '0' then 
+                     fb_cfg_i <= USER_CFG;
+                     flush_i <= '1';
+                     cnt <= (others => '0');
+                     cfg_updater_sm <= cfg_updater_rqst_st;
+                  end if;
+               
+               when cfg_updater_rqst_st =>
+                  init_cfg_done <= '1';  
+                  cnt <= cnt + 1;
+                  if cnt > 10 then 
+                     cfg_updater_sm <= idle_st; 
+                  end if;
+                  
+               when others =>    
+                  
+            end case;      
+         end if;
+         
+      end if;     
    end process;
-
+   
+   
 end writer_fsm;

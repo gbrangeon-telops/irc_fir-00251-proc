@@ -43,19 +43,17 @@
 #define FB_FRAME_BYTE_SIZE_OFFSET	      0x0C
 #define FB_HDR_PIX_SIZE_OFFSET	         0x10
 #define FB_IMG_PIX_SIZE_OFFSET	         0x14
-#define FB_FVAL_PAUSE_MIN_OFFSET	         0x18
-#define FB_LVAL_PAUSE_MIN_OFFSET	         0x1C
-#define FB_FLUSH_OFFSET	                  0x20
+#define FB_LVAL_PAUSE_MIN_OFFSET	         0x18
 
 // Read only adresses
-#define FB_STATUS_OFFSET                  0x24
-#define FB_ERROR_OFFSET                   0x28
-#define FB_WR_FR_MIN_STAT_OFFSET          0x2c
-#define FB_WR_FR_STAT_OFFSET              0x30
-#define FB_WR_FR_MAX_STAT_OFFSET          0x34
-#define FB_RD_FR_MIN_STAT_OFFSET          0x38
-#define FB_RD_FR_STAT_OFFSET              0x3c
-#define FB_RD_FR_MAX_STAT_OFFSET          0x40
+#define FB_STATUS_OFFSET                  0x1C
+#define FB_ERROR_OFFSET                   0x20
+#define FB_WR_FR_MIN_STAT_OFFSET          0x24
+#define FB_WR_FR_STAT_OFFSET              0x28
+#define FB_WR_FR_MAX_STAT_OFFSET          0x2C
+#define FB_RD_FR_MIN_STAT_OFFSET          0x30
+#define FB_RD_FR_STAT_OFFSET              0x34
+#define FB_RD_FR_MAX_STAT_OFFSET          0x38
 
 // Status mask
 #define FB_INIT_CFG_DONE_MASK             0x01
@@ -80,9 +78,7 @@ struct s_FB
    uint32_t fb_frame_byte_size;       // frame size in bytes
    uint32_t fb_hdr_pix_size;          // header size in bytes
    uint32_t fb_img_pix_size;          // image size in bytes
-   uint32_t fb_fval_pause_min;        // minimum pause between read frame
    uint32_t fb_lval_pause_min;        // minimum pause between line
-   uint32_t fb_flush;                 // flush frame buffer
   };
 typedef struct s_FB t_FB;
 
@@ -103,7 +99,7 @@ typedef struct s_FrameBufferStatus t_FrameBufferStatus;
 
 /***************** Macros (Inline Functions) Definitions ********************/
 
-#define FB_Intf_Ctor(add) {sizeof(t_FB)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FB_Intf_Ctor(add) {sizeof(t_FB)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0}
 
 /************************** Function Prototypes *****************************/
 
@@ -111,7 +107,6 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs);
 void FB_SendConfigGC( t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs);
 bool FB_isFrameBufferReady(t_FB *pFB_ctrl);
 t_FrameBufferStatus FB_getStatusAndErrors(t_FB *pFB_ctrl);
-void FB_Flush(t_FB *pFB_ctrl);
 
 
 #endif

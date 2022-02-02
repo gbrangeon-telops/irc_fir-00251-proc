@@ -23,9 +23,7 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
       pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2)*pGCRegs->Width* sizeof(uint16_t);
       pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
       pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
-      pFB_ctrl->fb_fval_pause_min        = 4;
       pFB_ctrl->fb_lval_pause_min        = 4;
-      pFB_ctrl->fb_flush                 = 0;
 
       WriteStruct(pFB_ctrl);
       return IRC_SUCCESS;
@@ -59,8 +57,6 @@ void FB_SendConfigGC(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
          pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
          pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
 
-         if (gFpaDebugRegA > 0)
-            pFB_ctrl->fb_fval_pause_min        = (uint32_t)gFpaDebugRegA;
          if (gFpaDebugRegB > 0)
             pFB_ctrl->fb_lval_pause_min        = (uint32_t)gFpaDebugRegB;
 
@@ -115,31 +111,5 @@ uint32_t FB_getStatus(t_FB *pFB_ctrl)
    return status;
 }
 
-/* This function flush any remaining frame in the buffer.
- * The frame buffer behavior when receiving flush command is the following one :
- *    1. Set Status(1) = 0.
- *    2. Stop writing frames (all new incoming frames will be discard).
- *    3. Finish reading the current frame.
- *    4. Reset both wr & rd pointer to buffer A.
- *    5. Set all buffers statuses to empty : status(4 downto 2) = "000".
- *    6. Set Status(1) = 1.
- *
-*/
-void FB_Flush(t_FB *pFB_ctrl)
-{
-   #ifdef MEM_4DDR
-      if(FB_isFrameBufferReady(pFB_ctrl) && FB_getStatusAndErrors(pFB_ctrl).errors == 0)
-      {
-         pFB_ctrl->fb_flush = 1;
-         WriteStruct(pFB_ctrl);
-         pFB_ctrl->fb_flush = 0;
-         WriteStruct(pFB_ctrl);
-      }
-      else
-      {
-         FB_ERR("Flush failed : frame buffer is not ready or is in error\n");
-      }
-   #endif
-}
 
 
