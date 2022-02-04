@@ -21,10 +21,6 @@ use work.Tel2000.all;
 
 entity scd_proxy2_mblaze_intf is
    
-   generic (
-      G_FPA_PIX_NUM_PER_PCLK : integer := 4
-      );
-   
    port(
       ARESET               : in std_logic;
       MB_CLK               : in std_logic;
@@ -633,12 +629,11 @@ begin
                when X"D0" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_num                       , 32)); 
                when X"D4" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.fpa_serdes_lval_len                       , 32)); 
                when X"D8" =>  axi_rdata <= std_logic_vector(resize('0' & user_cfg_i.int_clk_period_factor                     , 32)); 
-               when X"DC" =>  axi_rdata <= std_logic_vector(to_unsigned(G_FPA_PIX_NUM_PER_PCLK                                , 32)); 
-               when X"E0" =>  axi_rdata <= std_logic_vector(to_unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS          , 32)); 
-               when X"E4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.frame_dly                                  , 32)); 
-               when X"E8" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
-               when X"EC" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
-               when X"F0" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
+               when X"DC" =>  axi_rdata <= std_logic_vector(to_unsigned(DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS          , 32)); 
+               when X"E0" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.frame_dly                                  , 32)); 
+               when X"E4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
+               when X"E8" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
+               when X"EC" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
                
                when others =>                                                       
                

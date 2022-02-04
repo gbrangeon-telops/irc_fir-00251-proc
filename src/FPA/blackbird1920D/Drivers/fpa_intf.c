@@ -288,7 +288,6 @@ struct s_FpaPrivateStatus
    uint32_t fpa_serdes_lval_num                       ;
    uint32_t fpa_serdes_lval_len                       ;
    uint32_t int_clk_period_factor                     ;
-   uint32_t fpa_pix_num_per_pclk                      ;
    uint32_t fpa_exp_time_conv_denom_bit_pos           ;
    uint32_t frame_dly                                 ;                   
    uint32_t int_dly                                   ;
@@ -424,7 +423,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->failure_resp_management = 0;
 
    // Ce paramètre permet d'opérer le détecteur en mode "External integration control" (voir section 2.3.3 du document atlasdatasheet2.17ext.pdf)
-   // Le mode "externe d'intégration" n'a pas été testé. On utilise pour l'instant la commande sérielle pour configurer le temps d'intégration.
+   // Ce mode "externe d'intégration" n'a pas été testé. On utilise pour l'instant la commande sérielle pour configurer le temps d'intégration.
    ptrA->proxy_external_int_ctrl = 0;
 
    // allumage du détecteur 
@@ -509,11 +508,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //------------------------------------------
    // diag Telops                            
    //------------------------------------------
-   ptrA->diag_ysize    = ptrA->aoi_ysize;
-   if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-      ptrA->diag_ysize = ptrA->aoi_ysize/2;                                       // pour tenir compte de la seconde ligne qui sort aussi au même moment
+
+   ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au même moment
    ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
-   ptrA->diag_lovh_mclk_source           = 287;                                     // à reviser si necessaire
+   ptrA->diag_lovh_mclk_source           = 287;                                   // à reviser si necessaire
    ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
     
    ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset 
@@ -524,7 +522,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_xstart  = 0;    
    ptrA->op_ystart  = pGCRegs->OffsetY/4;      // parametre strow à la page p.20 de atlascmd_datasheet2.17   
    
-   if ((ptrA->op_binning == 1) && (gPrivateStat.fpa_pix_num_per_pclk == 8))
+   if (ptrA->op_binning == 1)
       ptrA->op_ystart  = pGCRegs->OffsetY/8;
    
    ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
@@ -554,9 +552,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->op_binning = 0;
    
    // vitesse de sortie
-   ptrA->op_output_rate = 2; // half rate
-   if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-      ptrA->op_output_rate = 3; // full rate (2 simultaneous lines)
+   ptrA->op_output_rate = 3; // full rate (2 simultaneous lines)
      
    // cfg_num 
    if (cfg_num == 255)
@@ -745,7 +741,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       FPA_PRINTF("gPrivateStat.fpa_serdes_lval_num                        = %d", gPrivateStat.fpa_serdes_lval_num                       );
       FPA_PRINTF("gPrivateStat.fpa_serdes_lval_len                        = %d", gPrivateStat.fpa_serdes_lval_len                       ); 
       FPA_PRINTF("gPrivateStat.int_clk_period_factor                      = %d", gPrivateStat.int_clk_period_factor                     );
-      FPA_PRINTF("gPrivateStat.fpa_pix_num_per_pclk                       = %d", gPrivateStat.fpa_pix_num_per_pclk                      );
       FPA_PRINTF("gPrivateStat.fpa_exp_time_conv_denom_bit_pos            = %d", gPrivateStat.fpa_exp_time_conv_denom_bit_pos           );
       FPA_PRINTF("gPrivateStat.frame_dly                                  = %d", gPrivateStat.frame_dly                                 );
       FPA_PRINTF("gPrivateStat.int_dly                                    = %d", gPrivateStat.int_dly                                   );
@@ -1055,10 +1050,9 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->number_of_Rows          = (float)pGCRegs->Height;
    ptrH->number_of_Ref_Rows      = 0.0F;
    
-   if(gPrivateStat.fpa_pix_num_per_pclk == 0) // gestion du cas ou gPrivateStat n'est pas encore initialisé
-      ptrH->number_of_pixel_per_clk_per_output = 4.0f; // Full rate par défaut
-   else
-      ptrH->number_of_pixel_per_clk_per_output = gPrivateStat.fpa_pix_num_per_pclk/2;
+
+   ptrH->number_of_pixel_per_clk_per_output = 4.0f; // Full rate par défaut
+
   
    //if (ptrA->op_binning == 0)
       ptrH->number_of_conversions  =  floorf(ptrH->number_of_Rows / 2.0F) +  2.0F  +  ptrH->number_of_Ref_Rows / 2.0F;
@@ -1129,9 +1123,6 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
       int_time = 0;
    else
       int_time = gPrivateStat.int_time;
-
-   if (gPrivateStat.fpa_pix_num_per_pclk == 8)
-      video_rate = 3;
 
    if(ptrA->op_binning == 0)
    {
@@ -1379,12 +1370,11 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
    PrivateStat->fpa_serdes_lval_num                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD0);
    PrivateStat->fpa_serdes_lval_len                      = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD4);
    PrivateStat->int_clk_period_factor                    = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xD8);
-   PrivateStat->fpa_pix_num_per_pclk                     = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xDC);
-   PrivateStat->fpa_exp_time_conv_denom_bit_pos          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE0);
-   PrivateStat->frame_dly                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE4);
-   PrivateStat->int_dly                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
-   PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
-   PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xF0);
+   PrivateStat->fpa_exp_time_conv_denom_bit_pos          = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xDC);
+   PrivateStat->frame_dly                                = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE0);
+   PrivateStat->int_dly                                  = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE4);
+   PrivateStat->int_time                                 = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xE8);
+   PrivateStat->int_clk_source_rate_hz                   = AXI4L_read32(ptrA->ADD + AR_PRIVATE_STATUS_BASE_ADD + 0xEC);
 }
 
 float FPA_ConvertSecondToFrameTimeResolution(float seconds)
@@ -1401,7 +1391,7 @@ float FPA_ConvertSecondToFrameTimeResolution(float seconds)
 //--------------------------------------------------------------------------
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
 {
-   static fpaInitState_t fpaInitState = IDLE;
+    static fpaInitState_t fpaInitState = IDLE;
     static bool proxy_init_status = false;
     static uint64_t tic_delay;
     extern bool gFpaInit;
