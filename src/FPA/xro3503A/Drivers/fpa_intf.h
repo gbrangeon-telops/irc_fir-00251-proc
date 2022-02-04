@@ -50,15 +50,14 @@
 #define FPA_NUMTAPS        16  // [taps]
 
 #define FPA_COOLER_TEMP_THRES    2500     //[cC]
-#define FPA_COOLER_TEMP_TOL      4000      //[cC]  TODO: restreindre cette valeur plus tard
-#define FPA_DEFAULT_EXPOSURE     100.0F   //[us]
-#define FPA_DEFAULT_FRAME_RATE   50.0F    //[Hz]
+#define FPA_COOLER_TEMP_TOL      500      //[cC]
+#define FPA_DEFAULT_EXPOSURE     5000.0F  //[us]
+#define FPA_DEFAULT_FRAME_RATE   25.0F    //[Hz]
 
-// TODO Update EHDRI default exposure times.
-#define FPA_EHDRI_EXP_0    10.0F
-#define FPA_EHDRI_EXP_1    250.0F
-#define FPA_EHDRI_EXP_2    500.0F
-#define FPA_EHDRI_EXP_3    1000.0F
+#define FPA_EHDRI_EXP_0    50.0F
+#define FPA_EHDRI_EXP_1    200.0F
+#define FPA_EHDRI_EXP_2    1000.0F
+#define FPA_EHDRI_EXP_3    5000.0F
 
 #define FPA_CAL_MIN_EXPOSURE  1.0F
 #define FPA_CAL_MAX_EXPOSURE  1000000.0F
