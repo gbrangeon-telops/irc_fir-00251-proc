@@ -17,7 +17,6 @@ acom "D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd"
 acom -nowarn DAGGEN_0523 -incr \
 "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd64_fifo.vhd" \
 "D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd" \
-"D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_manager.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\fb_ctrl_intf.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\reader_fsm.vhd" \
 "D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL\writer_fsm.vhd" \
