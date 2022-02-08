@@ -2,19 +2,6 @@
 
 ############### DEVICE PARAMETER ##################
 set_property DCI_CASCADE {32 34} [get_iobanks 33]
-
-############################### GT LOC ###################################
-# IMPORTANT : Proccessing fpga can be build with or without a mgt for video streaming. A choice must be made between two set of constraints. 
-
-	# Use the following contraints for a build without the video mgt (when MGT_2CH = false on top bde) 
-#	set_logic_unconnected [get_ports {VIDEO_UPLINK_N[0]}]
-#	set_logic_unconnected [get_ports {VIDEO_UPLINK_N[1]}] 
-#	set_logic_unconnected [get_ports {VIDEO_UPLINK_P[0]}]
-#	set_logic_unconnected [get_ports {VIDEO_UPLINK_P[1]}] 
-
-	#Use the following contraints for a build with the video mgt (when MGT_2CH = true on top bde) 
-	set_property PACKAGE_PIN K1 [get_ports {VIDEO_UPLINK_N[0]}]
-	#set_property PACKAGE_PIN H1 [get_ports {VIDEO_UPLINK_N[1]}]
 	
 
 ###############  DETECTOR INTERFACE  #############

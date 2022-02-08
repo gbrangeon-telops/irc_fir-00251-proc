@@ -37,7 +37,6 @@ set_property PACKAGE_PIN D5 [get_ports AURORA_CLK_N1]
 ############################### GT LOC ###################################
 
 set_property PACKAGE_PIN P1 [get_ports {DATA_UPLINK_N[0]}]
-#set_property PACKAGE_PIN M1 [get_ports {DATA_UPLINK_N[1]}]
 
 
 set_property PACKAGE_PIN F1 [get_ports {PROC_EXP_N[0]}]
