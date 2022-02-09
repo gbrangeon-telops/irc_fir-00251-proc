@@ -21,7 +21,14 @@ read_ip $ipfilelist
 add_files $fpa_common_dir
 
 # Add ALDEC sources
-add_files $aldec_dir
+# On exclut les top-level du startup pour que le fir_00251_proc_isc0207A soit montré comme
+# l'entité de tête dans sa hiérarchie.
+# Les projets de startup doivent ajouter le fir_00251_proc_startup.
+set aldec_dir_files {}
+foreach file [glob -nocomplain $aldec_dir/*.vhd] {
+   if {[string match *fir_00251_proc_startup* $file] == 0} {lappend aldec_dir_files $file}
+}
+add_files $aldec_dir_files
 
 # Add Project sources
 add_files [concat \

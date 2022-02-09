@@ -42,5 +42,6 @@ source $script_dir/Base_project.tcl
 set_property is_enabled false [get_files -of [get_filesets { constrs_1}] *encrypt*.xdc]
 
 #Set top level design
+add_files $aldec_dir/fir_00251_proc_startup_${FPGA_SIZE}.vhd
 set_property top $top_lvl [current_fileset]
 update_compile_order -fileset sources_1
