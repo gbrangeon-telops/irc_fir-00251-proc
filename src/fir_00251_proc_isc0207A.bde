@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 56051
+ FREEID 56069
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -11520,7 +11520,7 @@ PAGE ""
   RECT  53981, 0, 0
   {
    OUTLINE 0,6, (49,101,255)
-   AREA (4420,920,6240,5620)
+   AREA (4420,920,6240,5760)
    FILL (1,(0,0,0),0)
   }
   TEXT  53982, 0, 0
@@ -16388,12 +16388,12 @@ PAGE ""
    {
     #COMPONENT="fir_00251_proc_acq"
     #CUSTOM_NAME=""
-    #GENERIC0="TRIG_MEASURE_GEN : boolean := true"
-    #GENERIC1="IMG_HEIGHT_MAX : integer := YSIZE_MAX"
-    #GENERIC2="G_4DDR : boolean := false"
+    #GENERIC0="IMG_HEIGHT_MAX : integer := YSIZE_MAX"
+    #GENERIC1="TRIG_MEASURE_GEN : boolean := true"
+    #GENERIC2="MGT_2CH : boolean := MGT_2CH"
     #GENERIC3="CAL_2CH : boolean := false"
     #GENERIC4="IMG_WIDTH_MAX : integer := XSIZE_MAX"
-    #GENERIC5="MGT_2CH : boolean := false"
+    #GENERIC5="G_4DDR : boolean := false"
     #LIBRARY="work"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
@@ -17035,6 +17035,25 @@ PAGE ""
    VTX 55995, 55996
   }
   NET BUS  55999, 0, 0
+  GENERIC  56051, 0, 0
+  {
+   LABEL "Generic_3"
+   TEXT 
+"-- These generics are provided by the startup top-level\n"+
+"-- Change default value to apply to isc0207A\n"+
+"MGT_2CH : boolean := false;\n"+
+""
+   RECT (4980,5840,5740,6020)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,219,179),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
  }
  
 }
@@ -17060,7 +17079,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  56034, 0, 0
+  TEXT  56052, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17071,7 +17090,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56035, 0, 0
+  TEXT  56053, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -17082,7 +17101,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  56036, 0, 0
+  TEXT  56054, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -17092,7 +17111,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56037, 0, 0
+  TEXT  56055, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17104,7 +17123,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  56038, 0, 0
+  TEXT  56056, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -17117,7 +17136,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  56039, 0, 0
+  TEXT  56057, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -17127,7 +17146,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56040, 0, 0
+  TEXT  56058, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17139,7 +17158,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  56041, 0, 0
+  TEXT  56059, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -17149,7 +17168,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  56042, 0, 0
+  TEXT  56060, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -17160,7 +17179,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  56043, 0, 0
+  GROUP  56061, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6220,8601,6601)
@@ -17172,7 +17191,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56044, 0, 0
+  GROUP  56062, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6420,8601,6421)
@@ -17184,7 +17203,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56045, 0, 0
+  GROUP  56063, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6360,8601,6361)
@@ -17196,7 +17215,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56046, 0, 0
+  GROUP  56064, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6480,8601,6481)
@@ -17208,7 +17227,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56047, 0, 0
+  GROUP  56065, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6540,8601,6541)
@@ -17220,7 +17239,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  56048, 0, 0
+  GROUP  56066, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6220,7901,6361)
@@ -17231,7 +17250,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  56049, 0, 0
+  GROUP  56067, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6360,7901,6601)
@@ -17242,7 +17261,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  56050, 0, 0
+  BMPPICT  56068, 0, 0
   {
    PAGEALIGN 10
    RECT (7740,6280,7879,6325)
