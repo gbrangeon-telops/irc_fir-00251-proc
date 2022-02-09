@@ -62,9 +62,7 @@ entity scd_proxy2_prog_ctrler is
       ACQ_INT              : out std_logic;  -- feedback d'integration d'une image à envoyer dans la chaine.
       FPA_INT              : out std_logic;  -- feedback d'integration d'une image. (requis pour le module de generation des données en diag)
       RST_CLINK_N          : out std_logic;
-      
-      FPA_SERDES_STAT      : in fpa_serdes_stat_type;  
-      INIT_IN_PROGRESS     : in std_logic
+      SERDES_RDY           : in std_logic
       
       );                 
 end scd_proxy2_prog_ctrler;
@@ -145,10 +143,10 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal proxy_pwr_i               : std_logic;
    signal int_clk_pulse_i           : std_logic;
    signal int_i                     : std_logic;
-   signal serdes_rdy_i              : std_logic; 
+   signal serdes_rdy_i              : std_logic := '0'; 
    signal iddca_rdy_i               : std_logic := '0'; 
-   signal init_in_progress_i        : std_logic := '1'; 
-   
+
+                                               
    
 begin
    
@@ -182,7 +180,7 @@ begin
    FPA_DRIVER_STAT(0) <= fpa_driver_done;   --
    
    
-   U1A: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => INIT_IN_PROGRESS, CLK => CLK, Q => init_in_progress_i);
+   U1A: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => SERDES_RDY, CLK => CLK, Q => serdes_rdy_i);
 
    
    --------------------------------------------------
@@ -230,7 +228,6 @@ begin
             need_prog_rqst <= '0';
             cfg_ser_param_i.run   <= '0';
             cfg_ser_param_i.abort <= '0';
-            serdes_rdy_i <= '0';
             
          else 
             
@@ -243,10 +240,7 @@ begin
             new_cfg.int   <= USER_CFG.INT;   
             new_cfg.temp  <= USER_CFG.TEMP;
             new_cfg.synth <= USER_CFG.SYNTH;
-            
-            -- serdes rdy
-            serdes_rdy_i <= and_reduce(FPA_SERDES_STAT.DONE) and and_reduce(FPA_SERDES_STAT.SUCCESS) and not init_in_progress_i;
-            
+                        
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
             case new_cfg_pending_fsm is
