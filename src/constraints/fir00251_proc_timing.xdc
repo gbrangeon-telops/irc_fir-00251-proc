@@ -29,8 +29,6 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MGT_
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks MGT_CLK_1]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *data_mgt*RXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *data_mgt*TXOUTCLK]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *video_mgt*RXOUTCLK]
-set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *video_mgt*TXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *exp_mgt*TXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks *exp_mgt*RXOUTCLK]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks usart_clk_in]

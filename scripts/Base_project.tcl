@@ -113,15 +113,14 @@ set_property SCOPED_TO_CELLS {MCU/microblaze_1} [get_files $boot_file]
 #Add constraint files
 add_files -fileset constrs_1  [concat \
    $constr_dir/fir00251_proc_physical.xdc \
-   $constr_dir/fir00251_proc_physical_${FPGA_SIZE}.xdc \
    $constr_dir/fir00251_proc_timing.xdc \
+   $constr_dir/fir00251_proc_specific_${FPGA_SIZE}.xdc \
    [glob -nocomplain $constr_dir/$sensor/*.xdc] \
    [glob -nocomplain $constr_dir/_encryption/*${FPGA_SIZE}*.xdc] \
 ]
 
 # make sure the files are in correct precedence order (as per UG903 recommendation)
-reorder_files -fileset constrs_1 -before [get_files -of [get_filesets { constrs_1}] fir00251_proc_timing.xdc] [get_files -of [get_filesets { constrs_1}] *physical*.xdc]
-reorder_files -fileset constrs_1 -before [get_files -of [get_filesets { constrs_1}] *specific_physical.xdc] [get_files -of [get_filesets { constrs_1}] -filter {NAME !~ "*specific*"} *physical*.xdc]
+reorder_files -fileset constrs_1 -after  [get_files -of [get_filesets { constrs_1}] fir00251_proc_physical.xdc] [get_files -of [get_filesets { constrs_1}] *specific_physical.xdc]
 reorder_files -fileset constrs_1 -after  [get_files -of [get_filesets { constrs_1}] fir00251_proc_timing.xdc] [get_files -of [get_filesets { constrs_1}] *specific_timing.xdc]
 reorder_files -fileset constrs_1 -back   [get_files -of [get_filesets { constrs_1}] *target.xdc]
 reorder_files -fileset constrs_1 -after  [get_files -of [get_filesets { constrs_1}] *release_target.xdc] [get_files -of [get_filesets { constrs_1}] -filter {NAME !~ "*release*"} *target.xdc]
