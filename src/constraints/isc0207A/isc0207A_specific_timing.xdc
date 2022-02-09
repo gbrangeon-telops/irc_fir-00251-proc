@@ -12,4 +12,4 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH3_
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks mclk_source_isc0207A_5_0_MHz_mmcm]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks adc_clk_source_isc0207A_5_0_MHz_mmcm]
 
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U3/U26/U2/U2/inst/adc_clk_source_isc0207A_5_0_MHz_mmcm]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets -hier *adc_clk_source_isc0207A_5_0_MHz_mmcm]
