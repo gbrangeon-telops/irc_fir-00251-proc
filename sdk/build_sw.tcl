@@ -11,7 +11,7 @@ if {$argc >= 4} {set compile_arg [lindex $argv 3]} else {set compile_arg "both"}
 
 #Create project
 if {$create_project == 1} {
-   create_proc_sw $detector
+   create_proc_sw $detector $size
 }
 
 #Build project

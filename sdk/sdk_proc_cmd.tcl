@@ -1,4 +1,5 @@
-proc create_proc_sw {detector} {
+# Supported size_arg: "160", "325" and "both"
+proc create_proc_sw {detector {size_arg "both"}} {
 set current_path [exec pwd]
 
 #Switch directory
@@ -7,28 +8,38 @@ cd "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}"
 #Set workspace
 setws -switch "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/"
 
-#Create HW projects
-createhw -name hw_platform_160 -hwspec fir_00251_proc_${detector}_160.hdf
-createhw -name hw_platform_325 -hwspec fir_00251_proc_${detector}_325.hdf
+if {$size_arg == "both" || $size_arg == "160"} {
+   #Create HW projects
+   createhw -name hw_platform_160 -hwspec fir_00251_proc_${detector}_160.hdf
 
-#Create BSP projects
-createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1
-createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1
+   #Create BSP projects
+   createbsp -name standalone_bsp_160 -hwproject hw_platform_160 -proc MCU_microblaze_1
 
-#Import projects
-importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
-importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"
-importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
-importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
+   #Import projects
+   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
+   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"
+   after 1000
 
-#Clean projects
-projects -clean
+   #Configure in release mode
+   configapp -app fir_00251_proc_${detector}_boot_160 build-config release
+   configapp -app fir_00251_proc_${detector}_160 build-config release
+}
+if {$size_arg == "both" || $size_arg == "325"} {
+   #Create HW projects
+   createhw -name hw_platform_325 -hwspec fir_00251_proc_${detector}_325.hdf
 
-#Configure in release mode
-configapp -app fir_00251_proc_${detector}_boot_160 build-config release
-configapp -app fir_00251_proc_${detector}_160 build-config release
-configapp -app fir_00251_proc_${detector}_boot_325 build-config release
-configapp -app fir_00251_proc_${detector}_325 build-config release
+   #Create BSP projects
+   createbsp -name standalone_bsp_325 -hwproject hw_platform_325 -proc MCU_microblaze_1
+
+   #Import projects
+   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
+   importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
+   after 1000
+
+   #Configure in release mode
+   configapp -app fir_00251_proc_${detector}_boot_325 build-config release
+   configapp -app fir_00251_proc_${detector}_325 build-config release
+}
 
 #Return to initial path
 cd $current_path
