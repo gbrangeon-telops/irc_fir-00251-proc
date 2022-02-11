@@ -65,7 +65,7 @@ begin
          clk_140         => clk_c
          ); 
           
-      TX_CLK          <=  clk_a;   -- 100 MHz       
+      TX_CLK          <=  clk_c;   -- 100 MHz       
       CLK_100M        <=  clk_a;   -- 100 MHz        
       INT_CLK_SOURCE  <=  clk_b;   --  70 MHz
       QUAD_CLK_SOURCE <=  clk_b;   --  70 MHz

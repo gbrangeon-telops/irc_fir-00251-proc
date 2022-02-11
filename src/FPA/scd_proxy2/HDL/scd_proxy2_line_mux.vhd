@@ -52,7 +52,7 @@ architecture rtl of scd_proxy2_line_mux is
          );
    end component;
  
-   component fwft_afifo_w76_d1024
+   component fwft_afifo_w76_d512
       port (
          rst : in STD_LOGIC;
          wr_clk : in STD_LOGIC;
@@ -141,7 +141,7 @@ begin
    --------------------------------------------------
    -- fifo fwft line1_quad_DATA 
    -------------------------------------------------- 
-   U2A : fwft_afifo_w76_d1024
+   U2A : fwft_afifo_w76_d512
    port map (
       rst => sreset,
       wr_clk => RX_CLK,
@@ -163,7 +163,7 @@ begin
    --------------------------------------------------
    -- fifo fwft line2_quad_DATA 
    -------------------------------------------------- 
-   U2B : fwft_afifo_w76_d1024
+   U2B : fwft_afifo_w76_d512
    port map ( 
       rst => sreset,
       wr_clk => RX_CLK,

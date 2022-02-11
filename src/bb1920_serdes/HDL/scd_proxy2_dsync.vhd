@@ -69,6 +69,18 @@ architecture rtl of scd_proxy2_dsync is
          clk    : in std_logic);
    end component;
    
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
    component fwft_afifo_w36_d512      
       port (
          rst         : in std_logic;
@@ -87,13 +99,13 @@ architecture rtl of scd_proxy2_dsync is
          );
    end component;
    
-   type fifo_ctrl_fsm_type is (init_st1, init_st2, init_st3, init_st4, idle, dly_st, first_line_st, last_line_st, read_end_st, fifo_empty_st);
-   
-   signal fifo_ctrl_fsm       : fifo_ctrl_fsm_type;
+   type fifo_init_fsm_type is (init_st1, init_st2, init_st3, init_st4, init_done);
+   signal fifo_init_fsm_ch0   : fifo_init_fsm_type;
+   signal fifo_init_fsm_ch1   : fifo_init_fsm_type;
    signal sreset              : std_logic;
    signal fifo_rd_en          : std_logic;
-   signal fifo_areset         : std_logic;
-   signal active_read         : std_logic;
+   signal fifo_areset_ch0     : std_logic;
+   signal fifo_areset_ch1     : std_logic;
    signal ch0_future_cbits_i  : std_logic_vector(3 downto 0);
    signal ch0_fval_i          : std_logic;
    signal ch0_lval_i          : std_logic;
@@ -112,15 +124,18 @@ architecture rtl of scd_proxy2_dsync is
    signal ch1_fifo_ovfl       : std_logic;
    signal ch1_fifo_dval       : std_logic;
    signal quad_dout_o         : std_logic_vector(71 downto 0) := (others => '0');
-   signal quad_dval_o         : std_logic;
-   signal ch0_fifo_empty      : std_logic;
-   
-   signal dly_cnt             : unsigned(C_BITPOS downto 0);
-   signal rst_cnt             : unsigned(5 downto 0);
+   signal quad_dval_o         : std_logic;       
+   signal rst_cnt_ch0         : unsigned(5 downto 0); 
+   signal rst_cnt_ch1         : unsigned(5 downto 0);
    signal err_i               : std_logic_vector(ERR'length-1 downto 0);
-   signal init_in_progress_i    : std_logic;
+   signal init_done_ch0       : std_logic;
+   signal init_done_ch1       : std_logic;
+   signal init_done_ch0_sync  : std_logic;
+   signal init_done_ch1_sync  : std_logic;
+   signal init_in_progress_i  : std_logic := '1';
    signal frame_init_tag      : std_logic_vector(3 downto 0) := CBITS_FRM_IDLE_ID;
-   
+   signal vid_if_bit_en_i     : std_logic := '1';
+    
 begin
    
    QUAD_DATA <= quad_dout_o;
@@ -132,13 +147,25 @@ begin
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U0: sync_reset
+   U0A: sync_reset
    port map(
       ARESET => ARESET,
       CLK    => QUAD_DCLK,
       SRESET => sreset
       );
    
+   U0B: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => init_done_ch0, Q => init_done_ch0_sync, RESET => sreset, CLK => QUAD_DCLK ); 
+   
+   U0C: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => init_done_ch1, Q => init_done_ch1_sync, RESET => sreset, CLK => QUAD_DCLK ); 
+  
+   U0D: double_sync
+   generic map (INIT_VALUE => '1')
+   port map(D => FPA_INTF_CFG.vid_if_bit_en, Q => vid_if_bit_en_i, RESET => sreset, CLK => QUAD_DCLK ); 
+
    --------------------------------------------------
    -- Inputs mapping
    --------------------------------------------------
@@ -155,16 +182,19 @@ begin
    
    ch1_fval_i         <= CH1_DUAL_DATA(30); 
    
-   fifo_rd_en         <= ch0_fifo_dval and ch1_fifo_dval and active_read; -- lecture synchronisee des 2 fifos tout le temps.
+   fifo_rd_en         <= ch0_fifo_dval and ch1_fifo_dval and (not init_in_progress_i); -- lecture synchronisee des 2 fifos tout le temps.
    
-   INIT_IN_PROGRESS <= init_in_progress_i;
+   init_in_progress_i <= not (init_done_ch0_sync and init_done_ch1_sync);
+   INIT_IN_PROGRESS   <= init_in_progress_i;
+   
+   
    
    --------------------------------------------------
    -- ch0 fifo
    --------------------------------------------------
    U1 : fwft_afifo_w36_d512
    Port map( 
-      rst         => fifo_areset,
+      rst         => fifo_areset_ch0,
       wr_clk      => CH0_DCLK,
       rd_clk      => QUAD_DCLK,
       din         => CH0_DUAL_DATA,
@@ -173,7 +203,7 @@ begin
       dout        => ch0_fifo_dout,
       full        => open,
       overflow    => ch0_fifo_ovfl,
-      empty       => ch0_fifo_empty,
+      empty       => open,
       valid       => ch0_fifo_dval,
       wr_rst_busy => open,
       rd_rst_busy => open);
@@ -183,7 +213,7 @@ begin
    --------------------------------------------------
    U2 : fwft_afifo_w36_d512
    Port map( 
-      rst         => fifo_areset,
+      rst         => fifo_areset_ch1,
       wr_clk      => CH1_DCLK,
       rd_clk      => QUAD_DCLK,
       din         => CH1_DUAL_DATA,
@@ -197,98 +227,106 @@ begin
       wr_rst_busy => open,
       rd_rst_busy => open); 
    
+      
+        
    --------------------------------------------------
-   -- fsm de contrôle
+   -- fsm d'init fifo ch0
    --------------------------------------------------
-   U3: process(QUAD_DCLK)
+   U3: process(CH0_DCLK)
    begin
-      if rising_edge(QUAD_DCLK) then 
+      if rising_edge(CH0_DCLK) then 
          if sreset = '1' then
-            fifo_ctrl_fsm <= init_st1;
-            active_read  <= '0';
-            fifo_areset  <= '1';
-            rst_cnt      <= (others => '0');
-            init_in_progress_i <= '1';
+            fifo_init_fsm_ch0 <= init_st1;
+            fifo_areset_ch0  <= '1';
+            rst_cnt_ch0      <= (others => '0');
+            init_done_ch0 <= '0';
             
          else
             
-            case fifo_ctrl_fsm is
-               
-               -- on s'assure de ne pas avoir d'image tronquée et que les deux canaux sont synchronisés
+            case fifo_init_fsm_ch0 is
+
                when init_st1 =>
-                  fifo_areset  <= '0';  -- on ne fait pas de reset du fifo en même temps que les données s'ecrivent dedans.
-                  if CH0_SUCCESS = '1' and CH1_SUCCESS = '1' then 
-                     fifo_ctrl_fsm <= init_st2;
+                  fifo_areset_ch0  <= '0';  
+                  if CH0_SUCCESS = '1' then 
+                     fifo_init_fsm_ch0 <= init_st2;
                   end if;
                
                when init_st2 =>
-                  if ch0_fval_i = '1' and CH0_DUAL_DVAL = '1' and ch1_fval_i = '1' and CH1_DUAL_DVAL = '1' then
-                     fifo_ctrl_fsm <= init_st3;
+                  if ch0_fval_i = '1' and CH0_DUAL_DVAL = '1' then
+                     fifo_init_fsm_ch0 <= init_st3;
                   end if;
                
                when init_st3 =>                  
-                  if ch0_fval_i = '0' and CH0_DUAL_DVAL = '1' and ch1_fval_i = '0' and CH1_DUAL_DVAL = '1' then                     
-                     fifo_ctrl_fsm <= init_st4;
+                  if ch0_fval_i = '0' and CH0_DUAL_DVAL = '1' then                     
+                     fifo_init_fsm_ch0 <= init_st4;
                   end if;
-                  
-               -- on fait un reset des fifos
+
                when init_st4 =>                   
-                  rst_cnt <= rst_cnt + 1;
-                  if rst_cnt(2) = '1' then     -- 4 coups d'horloge de delai pour donner du temps à l'ecriture de s'achever
-                     fifo_areset <= '1';
-                  elsif rst_cnt(5) = '1' then  -- 32 coups d'horloge
-                     fifo_areset <= '0';                 
-                     fifo_ctrl_fsm <= idle;
-                  end if;                  
+                  rst_cnt_ch0 <= rst_cnt_ch0 + 1;
+                  if rst_cnt_ch0(2) = '1' then     -- 4 coups d'horloge de delai pour donner du temps à l'ecriture de s'achever
+                     fifo_areset_ch0 <= '1';
+                  elsif rst_cnt_ch0(5) = '1' then  -- 32 coups d'horloge
+                     fifo_areset_ch0 <= '0';                 
+                     fifo_init_fsm_ch0 <= init_done;
+                  end if; 
                   
-               --  on attend le debut d'une image              
-               when idle =>
-                  init_in_progress_i <= '0';
-                  dly_cnt <= (others => '0');
-                  if ch0_fval_i = '1' then
-                     fifo_ctrl_fsm <= dly_st; 
-                  end if;               
+               when init_done => 
+                  init_done_ch0 <= '1';
+                  fifo_init_fsm_ch0 <= init_done; 
                   
-               --  on decale la lecture du fifo de EOF_TO_FSYNC_DLY données au moins
-               when dly_st =>
-                  if ch0_dval_i = '1' then
-                     dly_cnt <= dly_cnt + 1;
-                  end if;
-                  if dly_cnt(C_BITPOS) = '1' then    -- un peu plus que EOF_TO_FSYNC_DLY coups d'horloge de delai avant debut de lecture du fifo
-                     fifo_ctrl_fsm <= first_line_st;
-                  end if;
-                  
-               --  on permet la lecture des données du fifo
-               when first_line_st =>
-                  active_read  <= '1';
-                  if ch0_lval_o = '1' and fifo_rd_en = '1' and ch0_future_cbits_o /= frame_init_tag then
-                     fifo_ctrl_fsm <= last_line_st;                              
-                  end if;
-                  
-               -- on attend que fval tombe à l'entrée du fifo   
-               when last_line_st =>
-                  if ch0_fval_i = '0' then
-                     fifo_ctrl_fsm <= read_end_st;
-                  end if;
-                  
-               --  on attend que fval tombe à la sortie du fifo
-               when read_end_st =>
-                  if ch0_fval_o = '0' and fifo_rd_en = '1' then                      
-                     fifo_ctrl_fsm <= fifo_empty_st;
+               when others =>
+                   fifo_init_fsm_ch0 <= init_st1;
+            end case;
+         end if;
+      end if;
+   end process;
+
+   --------------------------------------------------
+   -- fsm d'init fifo ch1
+   --------------------------------------------------
+   U4: process(CH1_DCLK)
+   begin
+      if rising_edge(CH1_DCLK) then 
+         if sreset = '1' then
+            fifo_init_fsm_ch1 <= init_st1;
+            fifo_areset_ch1  <= '1';
+            rst_cnt_ch1      <= (others => '0');
+            init_done_ch1 <= '0';
+         else
+            
+            case fifo_init_fsm_ch1 is
+               when init_st1 =>
+                  fifo_areset_ch1  <= '0';  
+                  if CH1_SUCCESS = '1' then 
+                     fifo_init_fsm_ch1 <= init_st2;
                   end if;
                
-               when fifo_empty_st =>
-                  if ch0_fifo_empty = '1' then 
-                     active_read  <= '0'; 
-                     fifo_ctrl_fsm <= idle;
+               when init_st2 =>
+                  if ch1_fval_i = '1' and CH1_DUAL_DVAL = '1' then
+                     fifo_init_fsm_ch1 <= init_st3;
+                  end if;
+               
+               when init_st3 =>                  
+                  if ch1_fval_i = '0' and CH1_DUAL_DVAL = '1' then                     
+                     fifo_init_fsm_ch1 <= init_st4;
                   end if;
                   
+               when init_st4 =>                   
+                  rst_cnt_ch1 <= rst_cnt_ch1 + 1;
+                  if rst_cnt_ch1(2) = '1' then     -- 4 coups d'horloge de delai pour donner du temps à l'ecriture de s'achever
+                     fifo_areset_ch1 <= '1';
+                  elsif rst_cnt_ch1(5) = '1' then  -- 32 coups d'horloge
+                     fifo_areset_ch1 <= '0';                 
+                     fifo_init_fsm_ch1 <= init_done;
+                  end if; 
+                  
+               when init_done => 
+                  init_done_ch1 <= '1';
+                  fifo_init_fsm_ch1 <= init_done;
                
                when others =>
-               
+                  fifo_init_fsm_ch1 <= init_st1;
             end case;
-            
-            
          end if;
       end if;
    end process;
@@ -296,7 +334,7 @@ begin
    --------------------------------------------------
    -- outputs
    --------------------------------------------------
-   U4: process(QUAD_DCLK)
+   U5: process(QUAD_DCLK)
    begin
       if rising_edge(QUAD_DCLK) then 
          
@@ -320,7 +358,7 @@ begin
       end if;
    end process;
    
-   U5: process(QUAD_DCLK)
+   U6: process(QUAD_DCLK)
    begin
       if rising_edge(QUAD_DCLK) then         
          if sreset = '1' then             

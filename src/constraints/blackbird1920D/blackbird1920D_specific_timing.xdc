@@ -12,5 +12,6 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH0_
 #set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH2_CLK_P]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks CH3_CLK_P]
 
-
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_140_bb1920D_clks_mmcm]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_100_bb1920D_clks_mmcm]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk_70_bb1920D_clks_mmcm]
