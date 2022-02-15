@@ -56,6 +56,10 @@ void FB_SendConfigGC(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
          pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2) * pGCRegs->Width * sizeof(uint16_t);
          pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
          pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
+
+         if (gFpaDebugRegB > 0)
+            pFB_ctrl->fb_lval_pause_min        = (uint32_t)gFpaDebugRegB;
+
          WriteStruct(pFB_ctrl);
       }
       else
@@ -77,12 +81,6 @@ bool FB_isFrameBufferReady(t_FB *pFB_ctrl)
    return isReady;
 }
 
-/* This function read the status and errors from the frame buffer VHDL module.
- *
- * Status definition :
- *    -> Status(0) : True if the frame buffer has already been initialize.
- *    -> Status(1) : Become false during the time a new config is received but not yet accepted (read or write may still be in progress)
-*/
 t_FrameBufferStatus FB_getStatusAndErrors(t_FB *pFB_ctrl)
 {
    t_FrameBufferStatus Status;
@@ -96,3 +94,22 @@ t_FrameBufferStatus FB_getStatusAndErrors(t_FB *pFB_ctrl)
    Status.FB_out_FR_max = AXI4L_read32(pFB_ctrl->ADD + FB_RD_FR_MAX_STAT_OFFSET);
    return Status;
 }
+
+/* This function read the status from the frame buffer VHDL module.
+ *
+ * Status definition :
+ *    -> Status(0) : True if the frame buffer has already been initialize.
+ *    -> Status(1) : Become false during the time a new config is received by the buffer but has not been accepted because the frame buffer is not empty.
+ *    -> Status(2) : True if buffer A contain a frame available to read or is currently being read.
+ *    -> Status(3) : True if buffer B contain a frame available to read or is currently being read.
+ *    -> Status(4) : True if buffer C contain a frame available to read or is currently being read.
+*/
+uint32_t FB_getStatus(t_FB *pFB_ctrl)
+{
+   uint32_t status;
+   status = AXI4L_read32(pFB_ctrl->ADD + FB_STATUS_OFFSET);
+   return status;
+}
+
+
+

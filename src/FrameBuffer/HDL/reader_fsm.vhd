@@ -131,6 +131,9 @@ end component;
    signal axis_mm2s_fifo_in_miso     : t_axi4_stream_miso;
    signal axis_mm2s_fifo_in_mosi     : t_axi4_stream_mosi64; 
    
+   signal axis_output_fifo_in_miso   : t_axi4_stream_miso;
+   signal axis_output_fifo_in_mosi   : t_axi4_stream_mosi64; 
+   
    signal axis_mm2s_fifo_out_miso    : t_axi4_stream_miso;
    signal axis_mm2s_fifo_out_mosi    : t_axi4_stream_mosi64;
      
@@ -180,17 +183,17 @@ begin
    axis_mm2s_fifo_in_mosi.TVALID  <= AXIS_MM2S_DATA_MOSI.TVALID;
    AXIS_MM2S_DATA_MISO.TREADY     <= axis_mm2s_fifo_in_miso.tready;
    
-   AXIS_TX_DATA_MOSI.TDATA        <= axis_mm2s_fifo_out_mosi.TDATA;   
-   AXIS_TX_DATA_MOSI.TLAST        <= axis_mm2s_fifo_out_mosi.TLAST;  
-   AXIS_TX_DATA_MOSI.TID          <= axis_mm2s_fifo_out_mosi.TID;
-   AXIS_TX_DATA_MOSI.TSTRB        <= (others => '1');
-   AXIS_TX_DATA_MOSI.TKEEP        <= (others => '1');
-   AXIS_TX_DATA_MOSI.TDEST        <= (others => '0');
-   AXIS_TX_DATA_MOSI.TUSER        <= (others => '0');
-   AXIS_TX_DATA_MOSI.TVALID       <= axis_mm2s_fifo_out_mosi.TVALID and not stall_i;   
-   axis_mm2s_fifo_out_miso.tready <= AXIS_TX_DATA_MISO.TREADY and not stall_i;
-   
-   RD_IN_PROGRESS                 <= read_in_progress;
+   axis_output_fifo_in_mosi.TDATA  <= axis_mm2s_fifo_out_mosi.TDATA;   
+   axis_output_fifo_in_mosi.TLAST  <= axis_mm2s_fifo_out_mosi.TLAST;  
+   axis_output_fifo_in_mosi.TID    <= axis_mm2s_fifo_out_mosi.TID;
+   axis_output_fifo_in_mosi.TSTRB  <= (others => '1');
+   axis_output_fifo_in_mosi.TKEEP  <= (others => '1');
+   axis_output_fifo_in_mosi.TDEST  <= (others => '0');
+   axis_output_fifo_in_mosi.TUSER  <= (others => '0');
+   axis_output_fifo_in_mosi.TVALID <= axis_mm2s_fifo_out_mosi.TVALID and not stall_i;   
+   axis_mm2s_fifo_out_miso.tready  <= axis_output_fifo_in_miso.TREADY and not stall_i;
+
+   RD_IN_PROGRESS                  <= read_in_progress;
       
    U0: sync_reset
    port map(ARESET => areset_i, CLK    => CLK, SRESET => sreset ); 
@@ -374,7 +377,6 @@ begin
       end if;
    end process;  
  
- -- This fifo is necessary for timming closure (breaking of the TREADY chain)
  U6 : t_axi4_stream64_fifo
  generic map (
       ASYNC => false,
@@ -431,5 +433,23 @@ begin
             end if;
        end if;
    end process;
-   
+ 
+ -- Output fifo
+ U8 : t_axi4_stream64_fifo
+ generic map (
+      ASYNC => false,
+      FifoSize => 16,
+      PACKET_MODE => false
+ )  
+ port map(
+      ARESETN => ARESETN,
+      OVFL => open,
+      RX_CLK => CLK,
+      RX_MISO => axis_output_fifo_in_miso,
+      RX_MOSI => axis_output_fifo_in_mosi,
+      TX_CLK => CLK,
+      TX_MISO => AXIS_TX_DATA_MISO,
+      TX_MOSI => AXIS_TX_DATA_MOSI
+ );
+ 
 end reader_fsm;
