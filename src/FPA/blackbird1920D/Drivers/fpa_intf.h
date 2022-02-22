@@ -151,20 +151,18 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  op_det_vbias                      ;                                          
    uint32_t  op_det_ibias                      ;                                          
    uint32_t  op_binning                        ;                                          
-   uint32_t  op_output_rate                    ;                                          
-   uint32_t  op_cfg_num                        ;                                          
-   
-   // synth
-   uint32_t  synth_spare                       ;                                          
-   uint32_t  synth_frm_res                     ;                                          
-   uint32_t  synth_frm_dat                     ;                                          
-   
-   // synth serial cmd
-   uint32_t  synth_cmd_id                      ;                                          
-   uint32_t  synth_cmd_data_size               ; 
-   uint32_t  synth_cmd_dlen                    ;
-   uint32_t  synth_cmd_sof_add                 ;
-   uint32_t  synth_cmd_eof_add                 ;
+   uint32_t  op_output_rate                    ;
+   uint32_t  op_mtx_int_low                    ;
+   uint32_t  op_frm_res                        ;
+   uint32_t  op_frm_dat                        ;
+   uint32_t  op_cfg_num                        ;
+
+   // roic read serial cmd
+   uint32_t  roic_reg_cmd_id                  ;
+   uint32_t  roic_reg_cmd_data_size           ;
+   uint32_t  roic_reg_cmd_dlen                ;
+   uint32_t  roic_reg_cmd_sof_add             ;
+   uint32_t  roic_reg_cmd_eof_add             ;
                                               
    // int cmd                                  
    uint32_t  int_cmd_id                        ;
@@ -180,15 +178,15 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
                                               
    // op serial cmd                            
    uint32_t  op_cmd_id                         ;
-   uint32_t  op_cmd_data_size                  ;  // new
-   uint32_t  op_cmd_dlen                       ;  // new
+   uint32_t  op_cmd_data_size                  ;
+   uint32_t  op_cmd_dlen                       ;
    uint32_t  op_cmd_sof_add                    ;                                          
    uint32_t  op_cmd_eof_add                    ;                                          
                                                ;
    // temp serial cmd                          ;
    uint32_t  temp_cmd_id                       ;
-   uint32_t  temp_cmd_data_size                ;  // new
-   uint32_t  temp_cmd_dlen                     ;  // new   
+   uint32_t  temp_cmd_data_size                ;
+   uint32_t  temp_cmd_dlen                     ;
    uint32_t  temp_cmd_sof_add                  ;                                          
    uint32_t  temp_cmd_eof_add                  ;                                          
                                               
@@ -203,8 +201,6 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  int_clk_period_factor             ;
    int32_t   int_time_offset                   ;
    uint32_t  vid_if_bit_en                     ;
-   uint32_t  failure_resp_management           ;
-   uint32_t  proxy_external_int_ctrl           ;
 };                                                              
 typedef struct s_FpaIntfConfig t_FpaIntf;                       
                                                                 
@@ -289,7 +285,7 @@ typedef struct s_FpaStatus t_FpaStatus;
 																						  
 // Function prototypes
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -297,8 +293,6 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 
 //pour effacer les bits d'erreurs du bloc FPA_interface
 void FPA_ClearErr(const t_FpaIntf *ptrA);
-
-void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
 
 //pour configurer le bloc FPA_interface et le lancer
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
@@ -321,14 +315,13 @@ void FPA_GetStatus(t_FpaStatus *Stat, const t_FpaIntf *ptrA);
 // pour mttre les io en 'Z' avant d'éteindre la carte DDC
 void  FPA_PowerDown(const t_FpaIntf *ptrA);
 
-// pour imposer une séquence d'initialisation particulière (seulement utilisé pour BB1280)
+// pour imposer une séquence d'initialisation particulière
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
 
-// pour désactiver l'envoi de commande de temps d'intégration (seulement utilisé pour BB1280)
+// pour désactiver l'envoi de commande de temps d'intégration
 void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 
-// pour activer/désactiver la gestion des erreurs retournés par le proxy.
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
+void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal);
 
 /**
  * FPA Initialization state.
@@ -336,9 +329,9 @@ void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
 enum fpaInitStateEnum {
    // Initialization states
    IDLE = 0,
-   //SEND_1ST_FPA_CONFIG,
-   //SEND_FRAME_RESOLUTION_CONFIG,
-   //SEND_2ND_FPA_CONFIG,
+   READ_ROIC_REG19,
+   WAIT_RESPONSE,
+   SEND_1ST_CFG,
    START_SERDES_INITIALIZATION
 };
 

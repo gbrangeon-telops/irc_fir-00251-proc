@@ -44,11 +44,14 @@ entity scd_proxy2_mblaze_intf is
       
       FPA_SOFTW_STAT       : out fpa_firmw_stat_type;
       
+      ROIC_READ_REG        : in std_logic_vector(7 downto 0);
+      ROIC_READ_REG_DVAL   : in std_logic;
+      
       ERR                  : out std_logic  
       );
 end scd_proxy2_mblaze_intf;
 
-
+   
 architecture rtl of scd_proxy2_mblaze_intf is
    
    constant C_MB_SOURCE  : std_logic_vector(1 downto 0)   :=  "00";
@@ -71,7 +74,7 @@ architecture rtl of scd_proxy2_mblaze_intf is
    
    type int_indx_pipe_type is array (0 to 4) of std_logic_vector(7 downto 0);
    type int_time_pipe_type is array (0 to 4) of unsigned(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto 0);
-   
+    
    signal int_time_pipe                   : int_time_pipe_type := ((others => '0'), (others => '0'), (others => '0'), (others => '0'), (others => '0')); 
    signal exp_cfg_gen_fsm                 : exp_cfg_gen_fsm_type;
    signal sreset                          : std_logic;
@@ -126,7 +129,8 @@ architecture rtl of scd_proxy2_mblaze_intf is
    signal user_cfg_int                    : int_cfg_type;
    signal subtraction_possible            : std_logic := '0';
    
-   
+   signal roic_read_reg_i	            : std_logic_vector(7 downto 0);
+            
 begin
    
    CTRLED_RESET            <= ctrled_reset_i;
@@ -166,7 +170,7 @@ begin
    STATUS_MOSI.ARADDR  <= resize(MB_MOSI.ARADDR(9 downto 0), 32); -- (9 downto 0) permet d'adresser tous les registres de statuts 
    STATUS_MOSI.ARPROT  <= MB_MOSI.ARPROT; 
    STATUS_MOSI.RREADY  <= MB_MOSI.RREADY; 
-   
+    
    --------------------------------------------------
    -- Sync reset
    -------------------------------------------------- 
@@ -255,19 +259,17 @@ begin
                   when X"088" =>    mb_struct_cfg.op.det_ibias                          <= data_i(mb_struct_cfg.op.det_ibias'length-1 downto 0);    
                   when X"08C" =>    mb_struct_cfg.op.binning                            <= data_i(mb_struct_cfg.op.binning'length-1 downto 0);        
                   when X"090" =>    mb_struct_cfg.op.output_rate                        <= data_i(mb_struct_cfg.op.output_rate'length-1 downto 0);  
-                  when X"094" =>    mb_struct_cfg.op.cfg_num                            <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));                                                                                                                 
-                     
-                  -- synth
-                  when X"098" =>    mb_struct_cfg.synth.spare                           <= data_i(mb_struct_cfg.synth.spare'length-1 downto 0);  
-                  when X"09C" =>    mb_struct_cfg.synth.frm_res                         <= unsigned(data_i(mb_struct_cfg.synth.frm_res'length-1 downto 0));    
-                  when X"0A0" =>    mb_struct_cfg.synth.frm_dat                         <= data_i(mb_struct_cfg.synth.frm_dat'length-1 downto 0);
-                     
-                  -- cmd serielle synthetique
-                  when X"0A4" =>    mb_struct_cfg.synth_cmd_id                          <= data_i(mb_struct_cfg.synth_cmd_id'length-1 downto 0);         
-                  when X"0A8" =>    mb_struct_cfg.synth_cmd_data_size                   <= unsigned(data_i(mb_struct_cfg.synth_cmd_data_size'length-1 downto 0));
-                  when X"0AC" =>    mb_struct_cfg.synth_cmd_dlen                        <= unsigned(data_i(mb_struct_cfg.synth_cmd_dlen'length-1 downto 0));              
-                  when X"0B0" =>    mb_struct_cfg.synth_cmd_sof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_sof_add'length-1 downto 0)); 
-                  when X"0B4" =>    mb_struct_cfg.synth_cmd_eof_add                     <= unsigned(data_i(mb_struct_cfg.synth_cmd_eof_add'length-1 downto 0)); 
+                  when X"094" =>    mb_struct_cfg.op.mtx_int_low                        <= data_i(mb_struct_cfg.op.mtx_int_low'length-1 downto 0);  
+                  when X"098" =>    mb_struct_cfg.op.frm_res                            <= unsigned(data_i(mb_struct_cfg.op.frm_res'length-1 downto 0));    
+                  when X"09C" =>    mb_struct_cfg.op.frm_dat                            <= data_i(mb_struct_cfg.op.frm_dat'length-1 downto 0);
+                  when X"0A0" =>    mb_struct_cfg.op.cfg_num                            <= unsigned(data_i(mb_struct_cfg.op.cfg_num'length-1 downto 0));                                                                                                                 
+
+                  -- cmd serielle roic reg
+                  when X"0A4" =>    mb_struct_cfg.roic_reg_cmd_id                          <= data_i(mb_struct_cfg.roic_reg_cmd_id'length-1 downto 0);         
+                  when X"0A8" =>    mb_struct_cfg.roic_reg_cmd_data_size                   <= unsigned(data_i(mb_struct_cfg.roic_reg_cmd_data_size'length-1 downto 0));
+                  when X"0AC" =>    mb_struct_cfg.roic_reg_cmd_dlen                        <= unsigned(data_i(mb_struct_cfg.roic_reg_cmd_dlen'length-1 downto 0));              
+                  when X"0B0" =>    mb_struct_cfg.roic_reg_cmd_sof_add                     <= unsigned(data_i(mb_struct_cfg.roic_reg_cmd_sof_add'length-1 downto 0)); 
+                  when X"0B4" =>    mb_struct_cfg.roic_reg_cmd_eof_add                     <= unsigned(data_i(mb_struct_cfg.roic_reg_cmd_eof_add'length-1 downto 0)); 
                      
                   -- cmd serielle integration
                   when X"0B8" =>    mb_struct_cfg.int_cmd_id                            <= data_i(mb_struct_cfg.int_cmd_id'length-1 downto 0);                   
@@ -305,16 +307,23 @@ begin
                   when X"120" =>    mb_struct_cfg.fpa_serdes_lval_len                   <= unsigned(data_i(mb_struct_cfg.fpa_serdes_lval_len'length-1 downto 0));                                                          
                   when X"124" =>    mb_struct_cfg.int_clk_period_factor                 <= unsigned(data_i(mb_struct_cfg.int_clk_period_factor'length-1 downto 0));                                                        
                   when X"128" =>    mb_struct_cfg.int_time_offset                       <= signed(data_i(mb_struct_cfg.int_time_offset'length-1 downto 0));
-                  when X"12C" =>    mb_struct_cfg.vid_if_bit_en                         <= data_i(0);  
-                  when X"130" =>    mb_struct_cfg.failure_resp_management               <= data_i(0);  
-                  when X"134" =>    mb_struct_cfg.proxy_external_int_ctrl               <= data_i(0); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1';
+                  when X"12C" =>    mb_struct_cfg.vid_if_bit_en                         <= data_i(0); mb_cfg_in_progress <= '0'; at_least_one_mb_cfg_received <= '1'; 
                   
-                  when X"138" =>    mb_struct_cfg.iddca_rdy                             <= data_i(0);
 
                   -- lecture de temperature
                   when X"200" =>    mb_struct_cfg.temp.cfg_num                          <= unsigned(data_i(mb_struct_cfg.temp.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
                   when X"204" =>    mb_struct_cfg.temp.cfg_end                          <= data_i(0); mb_cfg_in_progress <= '0';               
-                     
+                  
+                  -- lecture d'un registre du roic
+                  when X"300" =>    mb_struct_cfg.roic_reg.cfg_num                     <= unsigned(data_i(mb_struct_cfg.roic_reg.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
+                  when X"304" =>    mb_struct_cfg.roic_reg.cfg_end                     <= data_i(0); mb_cfg_in_progress <= '0';               
+                  
+                  when X"AA0" =>    mb_struct_cfg.iddca_rdy                             <= data_i(0);
+                  when X"AA4" =>    mb_struct_cfg.ignore_exptime_cmd                    <= data_i(0);
+                  when X"AA8" =>    mb_struct_cfg.ignore_op_cmd                         <= data_i(0);
+                  when X"AAC" =>    mb_struct_cfg.failure_resp_management               <= data_i(0);  
+                  when X"AB0" =>    mb_struct_cfg.proxy_external_int_ctrl               <= data_i(0);  
+
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                           <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                         <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0); fpa_softw_stat_i.dval <='1';
@@ -462,8 +471,12 @@ begin
                valid_cfg_received <= at_least_one_mb_cfg_received and at_least_one_exp_cfg_received;         
             end if; 
             
-            user_cfg_i.iddca_rdy <=  mb_struct_cfg.iddca_rdy;
-            
+            user_cfg_i.iddca_rdy               <=  mb_struct_cfg.iddca_rdy;
+            user_cfg_i.ignore_exptime_cmd      <=  mb_struct_cfg.ignore_exptime_cmd;
+            user_cfg_i.ignore_op_cmd           <=  mb_struct_cfg.ignore_op_cmd;
+            user_cfg_i.failure_resp_management <=  mb_struct_cfg.failure_resp_management; 
+            user_cfg_i.proxy_external_int_ctrl <=  mb_struct_cfg.proxy_external_int_ctrl; 
+         
          end if;
       end if;
    end process;
@@ -566,6 +579,12 @@ begin
    begin
       if rising_edge(MB_CLK) then         
          
+         if  ROIC_READ_REG_DVAL = '0' then
+            roic_read_reg_i <= (others => '1');
+         else   
+            roic_read_reg_i <= ROIC_READ_REG;
+         end if;
+         
          if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts provenant du generateur de statuts
             axi_rdata <= STATUS_MISO.RDATA;   -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
             
@@ -634,7 +653,8 @@ begin
                when X"E4" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_dly                                    , 32)); 
                when X"E8" =>  axi_rdata <= std_logic_vector(resize('0' & int_cfg_i.int_time                                   , 32));              
                when X"EC" =>  axi_rdata <= std_logic_vector(to_unsigned(1000*DEFINE_INT_CLK_SOURCE_RATE_KHZ                   , 32));
-               
+               when X"F0" =>  axi_rdata <= resize('0' & roic_read_reg_i                                                       , 32);
+
                when others =>                                                       
                
             end case;

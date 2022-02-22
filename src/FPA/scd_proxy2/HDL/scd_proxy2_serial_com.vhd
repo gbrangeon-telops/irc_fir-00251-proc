@@ -58,6 +58,8 @@ entity scd_proxy2_serial_com is
       -- temperature du détecteur
       FPA_TEMP_STAT         : out fpa_temp_stat_type;
       TRIG_CTLER_STAT       : in std_logic_vector(7 downto 0);
+      ROIC_READ_REG         : out std_logic_vector(7 downto 0);
+      ROIC_READ_REG_DVAL    : out std_logic;
       
       -- lien TX avec le uart block
       TX_AFULL              : in std_logic;
@@ -117,7 +119,7 @@ architecture RTL of scd_proxy2_serial_com is
    type prog_seq_fsm_type is (idle, cpy_cfg_st, wait_end_cpy_cfg_st, send_cfg_st, wait_end_send_cfg_st, wait_proxy_resp_st, cmd_fail_mgmt_st);
    type cfg_mgmt_fsm_type is (idle, init_cpy_rd_st, cpy_cfg_rd_st1, cpy_cfg_rd_st2, init_send_st, prog_trig_start_st, prog_trig_end_st, send_cfg_rd_st, 
    latch_data_st, send_cfg_out_st, wait_tx_fifo_empty_st, wait_proxy_resp_st, check_frm_end_st, uart_pause_st, cmd_resp_mgmt_st, timeout_mgmt_st);  
-   type cmd_resp_fsm_type is (idle, decode_byte_st, check_resp_st, fpa_temp_resp_st);
+   type cmd_resp_fsm_type is (idle, decode_byte_st, check_resp_st, fpa_temp_resp_st, roic_read_resp_st);
    type com_data_array_type  is array (0 to 32) of std_logic_vector(7 downto 0);
    type failure_resp_data_type  is array (0 to 3) of std_logic_vector(7 downto 0);
    type prog_trig_fsm_type is (idle, check_prog_img_st);
@@ -160,7 +162,9 @@ architecture RTL of scd_proxy2_serial_com is
    signal uart_tbaud_cnt          : unsigned(7 downto 0);
    signal cmd_resp_en             : std_logic;
    signal fpa_temp_reg_dval       : std_logic;
-   signal fpa_temp_reg            : unsigned(15 downto 0);
+   signal roic_read_reg_dval_i    : std_logic;
+   signal fpa_temp_reg            : unsigned(15 downto 0);  
+   signal roic_read_reg_i         : unsigned(7 downto 0);
    signal resp_dcnt               : unsigned(7 downto 0);
    signal tx_data_i               : std_logic_vector(7 downto 0);
    signal tx_dval_i               : std_logic;
@@ -214,7 +218,8 @@ begin
    FPA_TEMP_STAT.FPA_PWR_ON_TEMP_REACHED <= '1';        -- fait expres pour le scd_proxy2 car il n'allume le detecteur que lorsque la temperature est ok. 
    
    PROG_TRIG <= prog_trig_i;
-   
+   ROIC_READ_REG_DVAL <= roic_read_reg_dval_i; 
+   ROIC_READ_REG      <= std_logic_vector(roic_read_reg_i);
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
@@ -602,8 +607,9 @@ begin
    --------------------------------------------------
    -- vérifier si la réponse reçue du proxy valide la commande envoyée ou pas
    U6 : process(CLK)
-      variable temp_diode : unsigned(15 downto 0);
-      variable temp_gnd   : unsigned(15 downto 0);
+      variable temp_diode      : unsigned(15 downto 0);
+      variable temp_gnd        : unsigned(15 downto 0);  
+      
       
    begin
       if rising_edge(CLK) then 
@@ -614,7 +620,9 @@ begin
             rx_rd_en_i <= '0';
             cmd_resp_done <= '0';
             cmd_resp_done_last <= '0';
-            fpa_temp_reg_dval <= '0';
+            fpa_temp_reg_dval <= '0'; 
+            roic_read_reg_dval_i <= '0';  
+            roic_read_reg_i <= (others => '1');
             resp_dcnt <= (others => '0');
             fpa_temp_error <= '1'; -- à '1' tant qu'une lecture valide n'est pas reçue
          else
@@ -679,7 +687,12 @@ begin
                         for kk in 0 to 3 loop
                            failure_resp_data(kk) <= resp_data(kk);
                         end loop;
-                        cmd_resp_fsm <= idle;
+                        cmd_resp_fsm <= idle;   
+                                                      
+                     elsif resp_id = DEFINE_ROIC_READ_CMD then 
+                        proxy_serial_err <= '0'; 
+                        cmd_resp_fsm <= roic_read_resp_st;                        
+
                      elsif resp_id = USER_CFG.TEMP_CMD_ID then
                         proxy_serial_err <= '0'; 
                         cmd_resp_fsm <= fpa_temp_resp_st;
@@ -707,6 +720,13 @@ begin
                   
                   cmd_resp_fsm <= idle;
                
+                  
+               when roic_read_resp_st =>  -- extraction de la valeur du registre
+                  rx_rd_en_i <= '0';   -- on arrête la lecture du fifo 
+                  roic_read_reg_dval_i <= '1';     
+                  roic_read_reg_i <= unsigned(resp_data(0));
+                  cmd_resp_fsm <= idle;   
+                  
                when others =>
                
             end case; 

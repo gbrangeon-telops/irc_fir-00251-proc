@@ -98,9 +98,9 @@ architecture rtl of scd_proxy2_prog_ctrler is
    
    type driver_seq_fsm_type  is (idle, diag_only_st, fpa_prog_rqst_st, fpa_prog_en_st, wait_new_cfg_end_st,
    wait_fpa_prog_end_st, check_fpa_ser_fatal_err_st, check_cfg_st0, check_cfg_st, pause_st1, pause_st2, 
-   output_op_cfg_st, output_synth_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, wait_updater_rdy_st, wait_updater_run_st, wait_updater_end_st);
+   output_op_cfg_st, output_roic_reg_cfg_st, output_int_cfg_st, output_temp_cfg_st, check_cfg_st1, check_cfg_st2, check_cfg_st3, check_cfg_st4, wait_updater_rdy_st, wait_updater_run_st, wait_updater_end_st);
    type int_gen_fsm_type is (idle, intg_dly_st,int_gen_st1, int_gen_st2, param_st);
-   type new_cfg_pending_fsm_type is(init_st, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_synth_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
+   type new_cfg_pending_fsm_type is(init_st, wait_prog_end_st, check_cfg_st0, check_cfg_st1, check_cfg_st2, check_cfg_st3, new_roic_reg_cfg_st, new_op_cfg_st, new_int_cfg_st, new_temp_cfg_st);
    
    signal driver_seq_fsm            : driver_seq_fsm_type;
    signal cfg_updater_fsm           : driver_seq_fsm_type;
@@ -145,8 +145,8 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal int_i                     : std_logic;
    signal serdes_rdy_i              : std_logic := '0'; 
    signal iddca_rdy_i               : std_logic := '0'; 
-
-                                               
+   signal ignore_exptime_cmd        : std_logic := '0';
+   signal ignore_op_cmd             : std_logic := '1';                                            
    
 begin
    
@@ -230,16 +230,17 @@ begin
             cfg_ser_param_i.abort <= '0';
             
          else 
-            
-            user_cfg_in_progress_i <= USER_CFG_IN_PROGRESS;  
+            user_cfg_in_progress_i    <= USER_CFG_IN_PROGRESS;  
             user_cfg_in_progress_last <= user_cfg_in_progress_i; 
+            ignore_exptime_cmd        <= USER_CFG.ignore_exptime_cmd;
+            ignore_op_cmd             <= USER_CFG.ignore_op_cmd;
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
-            new_cfg.op    <= USER_CFG.OP;   
-            new_cfg.int   <= USER_CFG.INT;   
-            new_cfg.temp  <= USER_CFG.TEMP;
-            new_cfg.synth <= USER_CFG.SYNTH;
+            new_cfg.op        <= USER_CFG.OP;   
+            new_cfg.int       <= USER_CFG.INT;   
+            new_cfg.temp      <= USER_CFG.TEMP;
+            new_cfg.roic_reg  <= USER_CFG.roic_reg;
                         
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
@@ -249,21 +250,21 @@ begin
                   new_cfg_pending_fsm <= check_cfg_st0;					 
                
                when check_cfg_st0 =>
-                  if new_cfg.synth /= present_cfg.synth then
-                     new_cfg_pending_fsm <= new_synth_cfg_st;	
+                  if new_cfg.roic_reg /= present_cfg.roic_reg then
+                     new_cfg_pending_fsm <= new_roic_reg_cfg_st;	
                   else
                      new_cfg_pending_fsm <= check_cfg_st1;
                   end if;
                
                when check_cfg_st1 => 
-                  if new_cfg.op /= present_cfg.op then
+                  if new_cfg.op /= present_cfg.op and ignore_op_cmd = '0' then
                      new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                   
                when check_cfg_st2 =>
-                  if new_cfg.int /= present_cfg.int  then
+                  if new_cfg.int /= present_cfg.int and ignore_exptime_cmd = '0' then
                      new_cfg_pending_fsm <= new_int_cfg_st;	 				 
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;  
@@ -276,12 +277,13 @@ begin
                      new_cfg_pending_fsm <= check_cfg_st0;
                   end if;
                
-               when new_synth_cfg_st =>  
-                  new_cfg_id <= std_logic_vector(USER_CFG.SYNTH_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
-                  cfg_ser_param_i.cmd_sof_add    <= USER_CFG.SYNTH_CMD_SOF_ADD;
-                  cfg_ser_param_i.cmd_eof_add    <= USER_CFG.SYNTH_CMD_EOF_ADD;
-                  cfg_ser_param_i.prog_trig_mode <= serdes_rdy_i;
-                  need_prog_rqst <= '1'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
+               when new_roic_reg_cfg_st =>  
+                  new_cfg_id <= std_logic_vector(USER_CFG.ROIC_REG_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
+                  cfg_ser_param_i.cmd_sof_add    <= USER_CFG.ROIC_REG_CMD_SOF_ADD;
+                  cfg_ser_param_i.cmd_eof_add    <= USER_CFG.ROIC_REG_CMD_EOF_ADD;
+                  cfg_ser_param_i.prog_trig_mode <= '0';
+                  fpa_new_cfg_pending <= '1';              -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
+                  need_prog_rqst <= '0'; 				       -- op_cfg : requete auprès du fpa_hw_sequencer necessaire afin qu'il arrête les trigs
                   if user_cfg_in_progress_i = '1' then 
                      fpa_new_cfg_pending <= '0';
                      new_cfg_pending_fsm <= check_cfg_st0;
@@ -289,7 +291,7 @@ begin
                      fpa_new_cfg_pending <= '1';               -- pour parfaite synchro avec new_cfg_id et cfg_ser_param_i.cmd_sof_add. Demande de programmation ssi aucune config en progression
                      new_cfg_pending_fsm <= wait_prog_end_st;
                   end if;
-               
+                 
                when new_op_cfg_st =>  
                   new_cfg_id <= std_logic_vector(USER_CFG.OP_CMD_SOF_ADD(7 downto 0));     -- les 7 derniers bits suffisent largement
                   cfg_ser_param_i.cmd_sof_add    <= USER_CFG.OP_CMD_SOF_ADD;
@@ -516,7 +518,7 @@ begin
                when check_cfg_st0 =>
                   cfg_updater_done <= '0';
                   if cfg_id_i = std_logic_vector(USER_CFG.TEMP_CMD_SOF_ADD(7 downto 0)) then -- pas besoin de trig poour lea temperature. Ainsi on l'aura même en mode trig externe
-                     cfg_updater_fsm <= check_cfg_st3; 
+                     cfg_updater_fsm <= check_cfg_st4; 
                   else
                      cfg_updater_fsm <= check_cfg_st1;    
                   end if;
@@ -538,8 +540,8 @@ begin
                   end if;
                
                when check_cfg_st3 =>                           -- 
-                  if cfg_id_i = std_logic_vector(USER_CFG.SYNTH_CMD_SOF_ADD(7 downto 0)) then
-                     cfg_updater_fsm <= output_synth_cfg_st;
+                  if cfg_id_i = std_logic_vector(USER_CFG.ROIC_REG_CMD_SOF_ADD(7 downto 0)) then
+                     cfg_updater_fsm <= output_roic_reg_cfg_st;
                   else
                      cfg_updater_fsm <= check_cfg_st4;
                   end if;
@@ -553,9 +555,9 @@ begin
                   proxy_static_done <= '1';
                   cfg_updater_fsm <= pause_st1;
                
-               when output_synth_cfg_st =>                         --
-                  fpa_intf_cfg_i.synth <= user_cfg_to_update.synth;
-                  present_cfg.synth <= user_cfg_to_update.synth;
+               when output_roic_reg_cfg_st =>                         --
+                  fpa_intf_cfg_i.roic_reg <= user_cfg_to_update.roic_reg;
+                  present_cfg.roic_reg <= user_cfg_to_update.roic_reg;
                   cfg_updater_fsm <= pause_st1;
                
                when output_int_cfg_st =>                        -- 

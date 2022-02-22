@@ -98,6 +98,9 @@ package Proxy_define is
    constant DEFINE_TELOPS_DIAG_DEGR               : std_logic_vector(7 downto 0):= x"D2";  -- mode diag degradé pour la prod
    constant DEFINE_TELOPS_DIAG_DEGR_DYN           : std_logic_vector(7 downto 0):= x"D3";  -- mode diag degradé dynamique pour FAU
    
+   
+   constant DEFINE_ROIC_READ_CMD                  : std_logic_vector(15 downto 0):= x"8501"; 
+   
    ---------------------------------------------------------------------------------								
    -- Configuration regroupant les éléments vraiment propres au détecteur
    ---------------------------------------------------------------------------------
@@ -135,19 +138,24 @@ package Proxy_define is
       
       -- misc
       binning          : std_logic_vector(1 downto 0);	  
-      output_rate      : std_logic_vector(1 downto 0); 	-- video_rate de bb1920      
+      output_rate      : std_logic_vector(1 downto 0); 	-- video_rate de bb1920 
+      
+      mtx_int_low      : std_logic_vector(3 downto 0);	-- mtx_intg_low de bb1920
+      frm_res          : unsigned(6 downto 0);
+      frm_dat          : std_logic_vector(1 downto 0);
+      
       cfg_num          : unsigned(7 downto 0);      
       
    end record;
    
-   -- scd_proxy2 synth
-   type synth_cfg_type is
+   -- scd_proxy2 roic read
+   type roic_reg_cfg_type is
    record  
-      spare            : std_logic_vector(1 downto 0);	-- mtx_intg_low de bb1920
-      frm_res          : unsigned(6 downto 0);
-      frm_dat          : std_logic_vector(1 downto 0);
+      cfg_num             : unsigned(7 downto 0);
+      cfg_end             : std_logic;                -- necessaire pour que mb_cfg_in_progress retombe à '0' dans le receveur de config
    end record;
    
+
    -- telops diag
    type diag_cfg_type is
    record
@@ -196,7 +204,7 @@ package Proxy_define is
       
       -- les cmds structurales
       op                             : op_cfg_type;     -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
-      synth                          : synth_cfg_type;  -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
+      roic_reg                       : roic_reg_cfg_type;  -- tout changement dans op entraine la programmation du detecteur (commnde operationnelle)
       int                            : int_cfg_type;    -- tout changement dans int entraine la programmation du detecteur (commnde temps d'intégration)
       temp                           : temp_cfg_type;   -- tout changement dans temp entraine la programmation du detecteur (commnde temperature read)  
       
@@ -219,12 +227,12 @@ package Proxy_define is
       op_cmd_sof_add                 : unsigned(7 downto 0);
       op_cmd_eof_add                 : unsigned(7 downto 0);
       
-      -- cmd serielle video synthetique (diag scd)
-      synth_cmd_id                   : std_logic_vector(15 downto 0);
-      synth_cmd_data_size            : unsigned(15 downto 0);
-      synth_cmd_dlen                 : unsigned(15 downto 0);
-      synth_cmd_sof_add              : unsigned(7 downto 0);
-      synth_cmd_eof_add              : unsigned(7 downto 0);
+      -- cmd serielle de lecture de registre du roic
+      roic_reg_cmd_id               : std_logic_vector(15 downto 0);
+      roic_reg_cmd_data_size        : unsigned(15 downto 0);
+      roic_reg_cmd_dlen             : unsigned(15 downto 0);
+      roic_reg_cmd_sof_add          : unsigned(7 downto 0);
+      roic_reg_cmd_eof_add          : unsigned(7 downto 0);
       
       -- cmd serielle temperature
       temp_cmd_id                    : std_logic_vector(15 downto 0);
@@ -243,12 +251,13 @@ package Proxy_define is
       fpa_serdes_lval_len            : unsigned(10 downto 0);   -- pour la calibration des serdes d'entrée        
       int_clk_period_factor          : unsigned(7 downto 0);
       int_time_offset                : signed(31 downto 0);
-      vid_if_bit_en                  : std_logic;  
-      failure_resp_management        : std_logic;  
-      proxy_external_int_ctrl        : std_logic;  
-      
-      iddca_rdy                      : std_logic;
+      vid_if_bit_en                  : std_logic; 
 
+      iddca_rdy                      : std_logic;   -- Sert à retarder l'init de SERDES après le cooldown.
+      failure_resp_management        : std_logic;   -- Active la gestion des erreurs retournés par le proxy
+      ignore_exptime_cmd             : std_logic;   -- Active l'envoi de config de temps d'intégration par commande serielle
+      ignore_op_cmd                  : std_logic;   -- Active l'envoi de config doperationelles par commande serielle
+      proxy_external_int_ctrl        : std_logic;   -- Active le controle externe du temps d'intégration (non testé)
    end record;    
    
    ----------------------------------------------								
