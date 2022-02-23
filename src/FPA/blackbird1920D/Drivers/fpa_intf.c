@@ -94,11 +94,11 @@
 #define AW_FPA_OUTPUT_SW_TYPE              0xAE4   // adresse à lauquelle on dit au VHD quel type de sortie de fpa e pilote en C est conçu pour.
 #define AW_FPA_INPUT_SW_TYPE               0xAE8   // obligaoire pour les deteceteurs analogiques
 
-#define AW_FPA_SCD_IDDC_RDY_ADD            0xAA0 // Sert à retarder l'init de SERDES après le cooldown.
-#define AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD  0xAA4 // Active l'envoi de config de temps d'intégration par commande serielle
-#define AW_FPA_SCD_IGNORE_OP_CMD_ADD       0xAA8 // Active l'envoi de config de temps d'intégration par commande serielle
-#define AW_FPA_SCD_FAILURE_RESP_MNGT_ADD   0xAAC // Active la gestion des erreurs retournés par le proxy
-#define AW_FPA_SCD_EXT_INT_CTRL_MNGT_ADD   0xAB0 // Active le controle externe du temps d'intégration (non testé)
+#define AW_FPA_SCD_EN_SERDES_INIT_ADD       0xAA0 // Sert à retarder l'init de SERDES après le cooldown.
+#define AW_FPA_SCD_EN_EXPTIME_CMD_ADD       0xAA4 // Active l'envoi de config de temps d'intégration par commande serielle
+#define AW_FPA_SCD_EN_OP_CMD_ADD            0xAA8 // Active l'envoi de config operationnelle par commande serielle
+#define AW_FPA_SCD_EN_FAILURE_RESP_MNGT_ADD 0xAAC // Active la gestion des erreurs retournés par le proxy
+#define AW_FPA_SCD_EN_EXT_INT_CTRL_ADD      0xAB0 // Active le controle externe du temps d'intégration (non testé)
 
 //informations sur le pilote C. Le vhd s'en sert pour compatibility check
 #define FPA_ROIC                           0x16   // provient du fichier fpa_common_pkg.vhd. La valeur 0x16 est celle de FPA_ROIC_BLACKBIRD1920
@@ -333,11 +333,12 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
 void FPA_SendRoicRead_SerialCmd(const t_FpaIntf *ptrA, uint8_t regAdd);
 void FPA_SendRoicWrite_SerialCmd(const t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal);
 void FPA_SendRoicReg_StructCmd(const t_FpaIntf *ptrA);
-void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state); // pour retarder l'init de SERDES après le cooldown.
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state); // pour activer/désactiver la gestion des erreurs retournés par le proxy.
-void FPA_IgnoreOpCMD(t_FpaIntf *ptrA, bool state); // pour désactiver l'envoi de commande operationelle
-void FPA_ActivateExternalIntegrationCMD(t_FpaIntf *ptrA, bool state); // Active le controle externe du temps d'intégration (non testé)
+void FPA_EnableSerdesInit(t_FpaIntf *ptrA, bool state); // pour retarder l'init de SERDES après le cooldown.
+void FPA_EnableFailureResponseManagement(t_FpaIntf *ptrA, bool state); // pour activer/désactiver la gestion des erreurs retournés par le proxy.
+void FPA_EnableSerialOpCMD(t_FpaIntf *ptrA, bool state); // pour désactiver l'envoi de commande operationelle
+void FPA_EnableExternalIntegrationCtrl(t_FpaIntf *ptrA, bool state); // Active le controle externe du temps d'intégration (non testé)
 void FPA_ReadRoicReg19(t_FpaIntf *ptrA);
+
 
 /* Fonction d'initialization du module fpa */
 void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
@@ -349,18 +350,14 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
 
-   FPA_iddca_rdy(ptrA, false);
-   FPA_IgnoreOpCMD(ptrA, true);
-
-   // Ce mode permet d'activer la gestion des "response failures" en provenance du détecteur.
-   FPA_TurnOnProxyFailureResponseManagement(ptrA, true);
-
-   //pour éviter qu'une scène saturée fasse échouer l'initialisation des SERDES
-   FPA_IgnoreExposureTimeCMD(ptrA, true);
+   FPA_EnableSerdesInit(ptrA, false);
+   FPA_EnableSerialOpCMD(ptrA, false);
+   FPA_EnableSerialExposureTimeCMD(ptrA, false); //pour éviter qu'une scène saturée fasse échouer l'initialisation des SERDES
+   FPA_EnableFailureResponseManagement(ptrA, true); // Ce mode permet d'activer la gestion des "response failures" en provenance du détecteur.
 
    // Commande d'activation mode "External integration control" (voir section 2.3.3 du document atlasdatasheet2.17ext.pdf)
    // Ce mode "externe d'intégration" n'a pas été testé. On l'utilise pour l'instant la commande sérielle pour configurer le temps d'intégration.
-   FPA_ActivateExternalIntegrationCMD(ptrA, false);
+   FPA_EnableExternalIntegrationCtrl(ptrA, false);
 
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd y compris les statuts privés. Il faut que les status privés soient là avant qu'on appelle le FPA_SendConfigGC. 
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
@@ -414,7 +411,7 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
           if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
           {
              GETTIME(&tic_delay);
-             FPA_IgnoreOpCMD(ptrA, false);
+             FPA_EnableSerialOpCMD(ptrA, true);
              fpaInitState = START_SERDES_INITIALIZATION;
           }
           break;
@@ -422,7 +419,7 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
        case START_SERDES_INITIALIZATION:
           if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
           {
-             FPA_iddca_rdy(ptrA, true);
+             FPA_EnableSerdesInit(ptrA, true);
              proxy_init_status = true;
              fpaInitState = IDLE;
           }
@@ -605,8 +602,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // vitesse de sortie
    ptrA->op_output_rate = 3; // full rate (2 simultaneous lines)
 
-
-
    ptrA->op_frm_res   = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2 et la résolution maximale supportée par le vhdl est 44 (0.63us).
 
    ptrA->op_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17
@@ -763,6 +758,22 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    }
 }
 
+/* Cette fonction calcule le frame rate maximal associé à une configuration donnée.
+ * Le FRmax varie en fonction du height et du exposure time.
+ */
+float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
+{
+   float fr_max;
+   bb1920D_param_t hh;
+
+   FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
+   fr_max = 1.0F / hh.frame_period_min;
+   fr_max = fr_max * (1.0F - gFpaPeriodMinMargin);
+   fr_max = floorMultiple(fr_max, 0.01);
+
+   return fr_max;
+}
+
 /* Cette fonction calcule le exposure time associé à une configuration donnée.
  * Le ETmax varie en fonction du frame rate, du height et du mode d'intégration.
  */
@@ -890,23 +901,6 @@ void FPA_ReadTemperature_SerialCmd(const t_FpaIntf *ptrA)
    FPA_SendCmdPacket(&ScdPacketTx, ptrA); // on envoit les packets
 }
 
-
-/* Cette fonction calcule le frame rate maximal associé à une configuration donnée.
- * Le FRmax varie en fonction du height et du exposure time.
- */
-float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
-{
-   float fr_max;
-   bb1920D_param_t hh;
-
-   FPA_SpecificParams(&hh, (float)pGCRegs->ExposureTime, pGCRegs);
-   fr_max = 1.0F / hh.frame_period_min;
-   fr_max = fr_max * (1.0F - gFpaPeriodMinMargin);
-   fr_max = floorMultiple(fr_max, 0.01);
-
-   return fr_max;
-}
-
 /* Cette fonction envoi la partie sérielle de la commande operationnelle */
 void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 {
@@ -1002,38 +996,38 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 }
 
 // pour permettre le démarrage de la procédure d'initialisation des SERDES
-void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+void  FPA_EnableSerdesInit(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
   for(ii = 0; ii <= 10 ; ii++)
   {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_EN_SERDES_INIT_ADD);
   }
 }
 
 /* Cette fonction active/désactive la gestion des erreurs retournés par le proxy (debug). */
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+void FPA_EnableFailureResponseManagement(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
    for(ii = 0; ii <= 10 ; ii++)
    {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MNGT_ADD);
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_EN_FAILURE_RESP_MNGT_ADD);
    }
 }
 
 /* Cette fonction active/désactive l'envoi sérielle de toute commande de changement de temps d'intégration
  *  au détecteur */
-void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
+void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
    for(ii = 0; ii <= 10 ; ii++)
    {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD);
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_EN_EXPTIME_CMD_ADD);
    }
 }
 
 /* Cette fonction active/désactive l'envoi sérielle de toute commande operationelle au détecteur */
-void FPA_IgnoreOpCMD(t_FpaIntf *ptrA, bool state)
+void FPA_EnableSerialOpCMD(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
    extern uint8_t gRoicReg19;
@@ -1046,13 +1040,13 @@ void FPA_IgnoreOpCMD(t_FpaIntf *ptrA, bool state)
    {
       for(ii = 0; ii <= 10 ; ii++)
       {
-         AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IGNORE_OP_CMD_ADD);
+         AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_EN_OP_CMD_ADD);
       }
    }
 }
 
 /* Cette fonction active/désactive le mode externe de controle de l'intégration (non testé). */
-void FPA_ActivateExternalIntegrationCMD(t_FpaIntf *ptrA, bool state)
+void FPA_EnableExternalIntegrationCtrl(t_FpaIntf *ptrA, bool state)
 {
    extern bool gExtIntCtrl;
    uint8_t ii;
@@ -1060,7 +1054,7 @@ void FPA_ActivateExternalIntegrationCMD(t_FpaIntf *ptrA, bool state)
    gExtIntCtrl = state;
    for(ii = 0; ii <= 10 ; ii++)
    {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_EXT_INT_CTRL_MNGT_ADD);
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_EN_EXT_INT_CTRL_ADD);
    }
 }
 
@@ -1305,7 +1299,7 @@ float FPA_ConvertSecondToFrameTimeResolution(float seconds)
  {
     extern uint8_t gRoicReg19;
 
-    FPA_IgnoreOpCMD(ptrA, true); // On ne doit pas activer l'envoi de commande sérielle tant que le registre 19 n'a pas été lu.
+    FPA_EnableSerialOpCMD(ptrA, false); // On ne doit pas activer l'envoi de commande sérielle tant que le registre 19 n'a pas été lu.
     ptrA->roic_reg_cmd_id = 0x8501;
     FPA_SendConfigGC(ptrA, &gcRegsData);
 
@@ -1319,10 +1313,10 @@ float FPA_ConvertSecondToFrameTimeResolution(float seconds)
  /* Pour du debug (no testé)*/
  void FPA_WriteRoicReg(t_FpaIntf *ptrA, uint8_t regAdd, uint8_t regVal)
  {
-       FPA_IgnoreOpCMD(ptrA, true);
+       FPA_EnableSerialOpCMD(ptrA, false);
        ptrA->roic_reg_cmd_id = 0x8500;
        FPA_SendConfigGC(ptrA, &gcRegsData);
-       FPA_IgnoreOpCMD(ptrA, false);
+       FPA_EnableSerialOpCMD(ptrA, true);
 
        FPA_SendRoicWrite_SerialCmd(ptrA, regAdd, regVal); // envoi la commande serielle
        FPA_SendRoicReg_StructCmd(ptrA); // envoi un interrupt au contrôleur du hw driver

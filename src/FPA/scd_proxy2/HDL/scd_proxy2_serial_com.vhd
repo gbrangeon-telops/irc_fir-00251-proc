@@ -731,7 +731,7 @@ begin
                
             end case; 
             
-            if USER_CFG.failure_resp_management = '0' then 
+            if USER_CFG.enable_failure_resp_management = '0' then 
                proxy_serial_err <= '0';
                resp_err <= (others => '0');  
             end if;

@@ -318,11 +318,11 @@ begin
                   when X"300" =>    mb_struct_cfg.roic_reg.cfg_num                     <= unsigned(data_i(mb_struct_cfg.roic_reg.cfg_num'length-1 downto 0)); mb_cfg_in_progress <= '1';
                   when X"304" =>    mb_struct_cfg.roic_reg.cfg_end                     <= data_i(0); mb_cfg_in_progress <= '0';               
                   
-                  when X"AA0" =>    mb_struct_cfg.iddca_rdy                             <= data_i(0);
-                  when X"AA4" =>    mb_struct_cfg.ignore_exptime_cmd                    <= data_i(0);
-                  when X"AA8" =>    mb_struct_cfg.ignore_op_cmd                         <= data_i(0);
-                  when X"AAC" =>    mb_struct_cfg.failure_resp_management               <= data_i(0);  
-                  when X"AB0" =>    mb_struct_cfg.proxy_external_int_ctrl               <= data_i(0);  
+                  when X"AA0" =>    mb_struct_cfg.enable_serdes_init                   <= data_i(0);
+                  when X"AA4" =>    mb_struct_cfg.enable_serial_exptime_cmd            <= data_i(0);
+                  when X"AA8" =>    mb_struct_cfg.enable_serial_op_cmd                 <= data_i(0);
+                  when X"AAC" =>    mb_struct_cfg.enable_failure_resp_management       <= data_i(0);  
+                  when X"AB0" =>    mb_struct_cfg.enable_external_int_ctrl             <= data_i(0);  
 
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                           <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
@@ -409,14 +409,14 @@ begin
                   elsif byte_cnt = 12 then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_dly(19 downto 16)); 
                   
                   -- cmd_data: int_time
-                  elsif (byte_cnt = 13 and mb_struct_cfg.proxy_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');                   
-                  elsif (byte_cnt = 13 and mb_struct_cfg.proxy_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(7 downto 0));                    
+                  elsif (byte_cnt = 13 and mb_struct_cfg.enable_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');                   
+                  elsif (byte_cnt = 13 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(7 downto 0));                    
 
-                  elsif (byte_cnt = 14 and mb_struct_cfg.proxy_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');            
-                  elsif (byte_cnt = 14 and mb_struct_cfg.proxy_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(15 downto 8));              
+                  elsif (byte_cnt = 14 and mb_struct_cfg.enable_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');            
+                  elsif (byte_cnt = 14 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= std_logic_vector(exp_struct_cfg.int_time(15 downto 8));              
 
-                  elsif (byte_cnt = 15 and mb_struct_cfg.proxy_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');    
-                  elsif (byte_cnt = 15 and mb_struct_cfg.proxy_external_int_ctrl = '0') then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_time(19 downto 16));     
+                  elsif (byte_cnt = 15 and mb_struct_cfg.enable_external_int_ctrl = '1') then exp_ser_cfg_data <= (others => '0');    
+                  elsif (byte_cnt = 15 and mb_struct_cfg.enable_external_int_ctrl = '0') then exp_ser_cfg_data <= x"0" & std_logic_vector(exp_struct_cfg.int_time(19 downto 16));     
    
                      -- checksum
                   elsif byte_cnt = 19 then
@@ -471,11 +471,11 @@ begin
                valid_cfg_received <= at_least_one_mb_cfg_received and at_least_one_exp_cfg_received;         
             end if; 
             
-            user_cfg_i.iddca_rdy               <=  mb_struct_cfg.iddca_rdy;
-            user_cfg_i.ignore_exptime_cmd      <=  mb_struct_cfg.ignore_exptime_cmd;
-            user_cfg_i.ignore_op_cmd           <=  mb_struct_cfg.ignore_op_cmd;
-            user_cfg_i.failure_resp_management <=  mb_struct_cfg.failure_resp_management; 
-            user_cfg_i.proxy_external_int_ctrl <=  mb_struct_cfg.proxy_external_int_ctrl; 
+            user_cfg_i.enable_serdes_init             <=  mb_struct_cfg.enable_serdes_init;
+            user_cfg_i.enable_serial_exptime_cmd      <=  mb_struct_cfg.enable_serial_exptime_cmd;
+            user_cfg_i.enable_serial_op_cmd           <=  mb_struct_cfg.enable_serial_op_cmd;
+            user_cfg_i.enable_failure_resp_management <=  mb_struct_cfg.enable_failure_resp_management; 
+            user_cfg_i.enable_external_int_ctrl       <=  mb_struct_cfg.enable_external_int_ctrl; 
          
          end if;
       end if;

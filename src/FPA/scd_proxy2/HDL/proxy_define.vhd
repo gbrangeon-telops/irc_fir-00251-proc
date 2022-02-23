@@ -253,11 +253,11 @@ package Proxy_define is
       int_time_offset                : signed(31 downto 0);
       vid_if_bit_en                  : std_logic; 
 
-      iddca_rdy                      : std_logic;   -- Sert à retarder l'init de SERDES après le cooldown.
-      failure_resp_management        : std_logic;   -- Active la gestion des erreurs retournés par le proxy
-      ignore_exptime_cmd             : std_logic;   -- Active l'envoi de config de temps d'intégration par commande serielle
-      ignore_op_cmd                  : std_logic;   -- Active l'envoi de config doperationelles par commande serielle
-      proxy_external_int_ctrl        : std_logic;   -- Active le controle externe du temps d'intégration (non testé)
+      enable_serdes_init             : std_logic;   -- Sert à retarder l'init de SERDES après le cooldown.
+      enable_serial_exptime_cmd      : std_logic;   -- Active l'envoi de config de temps d'intégration par commande serielle
+      enable_serial_op_cmd           : std_logic;   -- Active l'envoi de config doperationelles par commande serielle
+      enable_failure_resp_management : std_logic;   -- Active la gestion des erreurs retournés par le proxy
+      enable_external_int_ctrl       : std_logic;   -- Active le controle externe du temps d'intégration (non testé)
    end record;    
    
    ----------------------------------------------								

@@ -144,9 +144,9 @@ architecture rtl of scd_proxy2_prog_ctrler is
    signal int_clk_pulse_i           : std_logic;
    signal int_i                     : std_logic;
    signal serdes_rdy_i              : std_logic := '0'; 
-   signal iddca_rdy_i               : std_logic := '0'; 
-   signal ignore_exptime_cmd        : std_logic := '0';
-   signal ignore_op_cmd             : std_logic := '1';                                            
+   signal enable_serdes_init        : std_logic := '0'; 
+   signal enable_serial_exptime_cmd : std_logic := '0';
+   signal enable_serial_op_cmd      : std_logic := '0';                                            
    
 begin
    
@@ -206,10 +206,10 @@ begin
             reset_clink_n <= '0';
          else                  
             proxy_pwr_i <= FPA_POWER;   
-            iddca_rdy_i <= USER_CFG.iddca_rdy;
+            enable_serdes_init <= USER_CFG.enable_serdes_init;
             
             fpa_powered <= PROXY_POWERED and PROXY_RDY;  -- PROXY_POWERED signifie que le proxy est juste allumé. PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès.              
-            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done and iddca_rdy_i;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
+            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done and enable_serdes_init;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
          end if;               
       end if;          
    end process;
@@ -232,15 +232,15 @@ begin
          else 
             user_cfg_in_progress_i    <= USER_CFG_IN_PROGRESS;  
             user_cfg_in_progress_last <= user_cfg_in_progress_i; 
-            ignore_exptime_cmd        <= USER_CFG.ignore_exptime_cmd;
-            ignore_op_cmd             <= USER_CFG.ignore_op_cmd;
+            enable_serial_exptime_cmd <= USER_CFG.enable_serial_exptime_cmd;
+            enable_serial_op_cmd      <= USER_CFG.enable_serial_op_cmd;
             
             -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
             new_cfg.op        <= USER_CFG.OP;   
             new_cfg.int       <= USER_CFG.INT;   
             new_cfg.temp      <= USER_CFG.TEMP;
-            new_cfg.roic_reg  <= USER_CFG.roic_reg;
+            new_cfg.ROIC_REG  <= USER_CFG.ROIC_REG;
                         
             -- détection nouvelle programmation (fsm pour reduire les problèmes de timing)
             -- la machine a états comporte plusieurs états afin d'ameliorer les timings	
@@ -257,14 +257,14 @@ begin
                   end if;
                
                when check_cfg_st1 => 
-                  if new_cfg.op /= present_cfg.op and ignore_op_cmd = '0' then
+                  if new_cfg.op /= present_cfg.op and enable_serial_op_cmd = '1' then
                      new_cfg_pending_fsm <= new_op_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st2;
                   end if;
                   
                when check_cfg_st2 =>
-                  if new_cfg.int /= present_cfg.int and ignore_exptime_cmd = '0' then
+                  if new_cfg.int /= present_cfg.int and enable_serial_exptime_cmd = '1' then
                      new_cfg_pending_fsm <= new_int_cfg_st;	 				 
                   else
                      new_cfg_pending_fsm <= check_cfg_st3;  
