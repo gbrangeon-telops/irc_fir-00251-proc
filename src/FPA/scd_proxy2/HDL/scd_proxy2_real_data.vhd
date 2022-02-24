@@ -37,7 +37,6 @@ entity scd_proxy2_real_data is
       ENABLE              : in std_logic;
       
       FPA_INT             : in std_logic;      
-      READOUT             : in std_logic;
       ACQ_MODE            : in std_logic;
       ACQ_MODE_FIRST_INT  : in std_logic;
       NACQ_MODE_FIRST_INT : in std_logic;
