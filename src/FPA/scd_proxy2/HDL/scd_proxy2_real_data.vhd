@@ -154,30 +154,34 @@ architecture rtl of scd_proxy2_real_data is
    signal past1                 : input_data_type;
    signal past1_fifo_din        : std_logic_vector(2 downto 0) := (others => '0');
    signal past1_fifo_wr         : std_logic;
+   signal past1_init_fifo_wr    : std_logic;
    signal past1_fifo_dval_i     : std_logic;
    signal past1_fifo_dout       : std_logic_vector(2 downto 0);
    
    signal past2                 : input_data_type;
    signal past2_fifo_din        : std_logic_vector(2 downto 0) := (others => '0');
    signal past2_fifo_wr         : std_logic;
+   signal past2_init_fifo_wr    : std_logic;
    signal past2_fifo_dval_i     : std_logic;
    signal past2_fifo_dout       : std_logic_vector(2 downto 0);
    
    signal present              : input_data_type;
    signal present_fifo_din     : std_logic_vector(71 downto 0) := (others => '0');                    
-   signal present_fifo_wr      : std_logic;                    
+   signal present_fifo_wr      : std_logic;
+   signal present_init_fifo_wr : std_logic;
    signal present_fifo_dval_i  : std_logic;                    
    signal present_fifo_dout    : std_logic_vector(71 downto 0);
-   
+      
    signal future1               : input_data_type;
    signal future1_fifo_din      : std_logic_vector(2 downto 0) := (others => '0');
-   signal future1_fifo_wr       : std_logic;                    
+   signal future1_fifo_wr       : std_logic; 
+   signal future1_init_fifo_wr  : std_logic; 
    signal future1_fifo_dval_i   : std_logic;                    
    signal future1_fifo_dout     : std_logic_vector(2 downto 0);
    
    signal future2               : input_data_type;
    signal future2_fifo_din      : std_logic_vector(2 downto 0) := (others => '0');
-   signal future2_fifo_wr       : std_logic;                    
+   signal future2_fifo_wr       : std_logic;
    signal future2_fifo_dval_i   : std_logic;                    
    signal future2_fifo_dout     : std_logic_vector(2 downto 0);
    
@@ -215,7 +219,7 @@ begin
       Q   => fpa_int_i,
       RESET => global_sreset
       );
-   
+      
    --------------------------------------------------
    -- fifo du passé2
    --------------------------------------------------  
@@ -233,7 +237,8 @@ begin
       empty        => open,
       valid        => past2_fifo_dval_i
    );
-  
+   
+   past2_fifo_wr <= QUAD_DVAL or past2_init_fifo_wr;
    past2.fval      <= past2_fifo_dout(2);   
    past2.pix_lval  <= past2_fifo_dout(1);
    past2.pix_dval  <= past2_fifo_dout(0);
@@ -254,8 +259,9 @@ begin
       overflow     => open,
       empty        => open,
       valid        => past1_fifo_dval_i
-   );
+   );  
    
+   past1_fifo_wr <= QUAD_DVAL or past1_init_fifo_wr; 
    past1.fval      <= past1_fifo_dout(2);   
    past1.pix_lval  <= past1_fifo_dout(1);
    past1.pix_dval  <= past1_fifo_dout(0);  
@@ -275,8 +281,9 @@ begin
       overflow    => open,
       empty       => open,
       valid       => present_fifo_dval_i   
-      );
-   
+      );  
+      
+   present_fifo_wr <= QUAD_DVAL or present_init_fifo_wr;
    present.fval     <= present_fifo_dout(66);   
    present.pix_lval <= present_fifo_dout(65);
    present.pix_dval <= present_fifo_dout(64);
@@ -300,6 +307,7 @@ begin
       valid        => future1_fifo_dval_i
    );    
    
+   future1_fifo_wr <= QUAD_DVAL or future1_init_fifo_wr;
    future1.fval      <= future1_fifo_dout(2);  
    future1.pix_lval  <= future1_fifo_dout(1);
    future1.pix_dval  <= future1_fifo_dout(0);
@@ -322,6 +330,7 @@ begin
       valid        => future2_fifo_dval_i
    ); 
    
+   future2_fifo_wr <= QUAD_DVAL;
    future2.fval      <= future2_fifo_dout(2);  
    future2.pix_lval  <= future2_fifo_dout(1);
    future2.pix_dval  <= future2_fifo_dout(0);
@@ -331,7 +340,17 @@ begin
    --------------------------------------------------    
    pix_dval_i <= present.pix_dval and present_fifo_dval_i;                    -- si les données du fifo du present sont OK, c'est que ceux du past et du futur le sont aussi
    fifo_rd <= future2_fifo_dval_i;                                             -- past_fifo_dval_i and present_fifo_dval_i and future_fifo_dval_i;
+            
    
+   -- données entrantes
+   past2_fifo_din <= QUAD_DATA(66 downto 64);
+   past1_fifo_din <= QUAD_DATA(66 downto 64);
+   present_fifo_din <= QUAD_DATA(71 downto 0);
+   future1_fifo_din <= QUAD_DATA(66 downto 64);
+   future2_fifo_din <= QUAD_DATA(66 downto 64);
+   
+   
+ 
    
    U4: process(CLK)
       
@@ -341,73 +360,53 @@ begin
             dout_fval_o <= '0';
             dout_dval_o <= '0';
             fifo_fsm <= init_st1;
-            past2_fifo_wr <= '0';
-            past1_fifo_wr <= '0';
-            present_fifo_wr <= '0';
-            future1_fifo_wr <= '0';
-            future2_fifo_wr <= '0';
+            past2_init_fifo_wr <= '0';
+            past1_init_fifo_wr <= '0';
+            present_init_fifo_wr <= '0';  
+            future1_init_fifo_wr <= '0'; 
+
          else        
             
-            -- données entrantes
-            past2_fifo_din <= QUAD_DATA(66 downto 64);
-            past2_fifo_wr  <= QUAD_DVAL;
-            
-            past1_fifo_din <= QUAD_DATA(66 downto 64);
-            past1_fifo_wr  <= QUAD_DVAL;
-            
-            present_fifo_din <= QUAD_DATA;
-            present_fifo_wr  <= QUAD_DVAL;
-            
-            future1_fifo_din <= QUAD_DATA(66 downto 64);
-            future1_fifo_wr  <= QUAD_DVAL;
-            
-            future2_fifo_din <= QUAD_DATA(66 downto 64);
-            future2_fifo_wr  <= QUAD_DVAL;
             
             case fifo_fsm is
                
                when init_st1 =>       -- ici, on fait en sorte que le futur soit en avance de 1CLK sur le présent
-                  past2_fifo_din(2 downto 0) <= (others => '0');
-                  past1_fifo_din(2 downto 0) <= (others => '0');
-                  present_fifo_din(71 downto 64) <= (others => '0');
-                  future1_fifo_din(2 downto 0) <= (others => '0');
-                  past2_fifo_wr <= '1';
-                  past1_fifo_wr <= '1';
-                  present_fifo_wr <= '1'; 
-                  future1_fifo_wr <= '1';
+                  past2_init_fifo_wr <= '1';
+                  past1_init_fifo_wr <= '1';
+                  present_init_fifo_wr <= '1'; 
+                  future1_init_fifo_wr <= '1';
                   fifo_fsm <= init_st2;
                
                when init_st2 =>
-                  past2_fifo_wr <= '1';
-                  past1_fifo_wr <= '1';
-                  present_fifo_wr <= '1';
-                  future1_fifo_wr <= '0';
+                  past2_init_fifo_wr <= '1';
+                  past1_init_fifo_wr <= '1';
+                  present_init_fifo_wr <= '1';
+                  future1_init_fifo_wr <= '0';
                   fifo_fsm <= init_st3;
                
                when init_st3 =>
-                  past2_fifo_wr <= '1';
-                  past1_fifo_wr <= '1';
-                  present_fifo_wr <= '0';
-                  future1_fifo_wr <= '0';
+                  past2_init_fifo_wr <= '1';
+                  past1_init_fifo_wr <= '1';
+                  present_init_fifo_wr <= '0';
+                  future1_init_fifo_wr <= '0';
                   fifo_fsm <= init_st4;
                   
                when init_st4 =>
-                  past2_fifo_wr <= '1';
-                  past1_fifo_wr <= '0';
-                  present_fifo_wr <= '0';
-                  future1_fifo_wr <= '0';
+                  past2_init_fifo_wr <= '1';
+                  past1_init_fifo_wr <= '0';
+                  present_init_fifo_wr <= '0';
+                  future1_init_fifo_wr <= '0';
                   fifo_fsm <= init_st5;
                   
                when init_st5 =>
-                  past2_fifo_wr <= '0';
-                  past1_fifo_wr <= '0';
-                  present_fifo_wr <= '0';
-                  future1_fifo_wr <= '0';
-                  fifo_fsm <= init_done;
-                  
-               when init_done =>  
-               
+                  past2_init_fifo_wr <= '0';
+                  past1_init_fifo_wr <= '0';
+                  present_init_fifo_wr <= '0';
+                  future1_init_fifo_wr <= '0';
+                  fifo_fsm <= init_st5;
+
                when others => 
+                  fifo_fsm <= init_st5; 
                
             end case;
             

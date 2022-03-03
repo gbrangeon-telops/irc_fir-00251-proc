@@ -134,6 +134,12 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    signal user_ysize3 : natural;
    signal cnt         : integer := 0;
    
+   signal enable_serdes_init : STD_LOGIC := '1';
+   signal enable_serial_exptime_cmd : STD_LOGIC := '1';
+   signal enable_serial_op_cmd : STD_LOGIC := '1';
+   signal enable_failure_resp_management : STD_LOGIC := '1';
+   signal enable_external_int_ctrl : STD_LOGIC := '0';
+   
    
    signal user_cfg_vector1              : unsigned(QWORDS_NUM*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
@@ -151,19 +157,18 @@ architecture TB_ARCHITECTURE of BB1920D_intf_testbench_tb is
    
    signal add                           : unsigned(31 downto 0) := (others => '0');
    signal status                        : std_logic_vector(31 downto 0);
-   -- Add your code here _..
    
 begin
    
    
    -- reset
-   U0: process
-   begin
-      ARESETN <= '0'; 
-      wait for 350 ns;
-      ARESETN <= '1';
-      wait;
-   end process;
+--   U0: process
+--   begin
+--      ARESETN <= '0'; 
+--      wait for 1000 ns;
+--      ARESETN <= '1';
+--      wait;
+--   end process;
    
    -- clk
    U1a: process(CLK_100M)
@@ -172,11 +177,11 @@ begin
    end process;
    MB_CLK <= CLK_100M;
    
-   -- clk
-   U1b: process(MCLK_SOURCE)
-   begin
-      MCLK_SOURCE <= not MCLK_SOURCE after MCLK_SOURCE_PERIOD/2; 
-   end process;
+--   -- clk
+--   U1b: process(MCLK_SOURCE)
+--   begin
+--      MCLK_SOURCE <= not MCLK_SOURCE after MCLK_SOURCE_PERIOD/2; 
+--   end process;
    
    -- clk
    U2: process(CLK_85M)
@@ -253,6 +258,12 @@ begin
          fpa_softw_stat_i.fpa_output   <= OUTPUT_DIGITAL;    
          fpa_softw_stat_i.fpa_input    <= LVDS25;        
          
+         enable_serdes_init <= '1'; 
+         enable_serial_exptime_cmd <= '1';
+         enable_serial_op_cmd <= '1';
+         enable_failure_resp_management <= '0';
+         enable_external_int_ctrl <= '0';
+
          -- cfg usager
          user_xsize1 <= 128;
          user_ysize1 <= 64;
@@ -275,7 +286,6 @@ begin
          vdac_value_6               	<= to_unsigned(0, 32); 
          vdac_value_7               	<= to_unsigned(0, 32); 
          vdac_value_8               	<= to_unsigned(11630, 32); 
-         
          -- fleg dac
          dac_cfg_vector <= vdac_value_1               
          & vdac_value_2                   
@@ -310,8 +320,12 @@ begin
       MB_MOSI.bready <= '0';
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';
+      ARESETN <= '0'; 
+      wait for 350 ns;
       
-      wait until ARESETN = '1'; 
+      --wait until rising_edge(MB_CLK); 
+      ARESETN <= '1'; 
+      
       
       wait for 500 ns; 
       --      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
@@ -322,6 +336,19 @@ begin
       write_axi_lite (MB_CLK, resize(X"AE4",32), resize('0'&fpa_softw_stat_i.fpa_output, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns; 
       write_axi_lite (MB_CLK, resize(X"AE8",32), resize('0'&fpa_softw_stat_i.fpa_input, 32), MB_MISO,  MB_MOSI);
+   
+      
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AA0",32), resize('0'&enable_serdes_init, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AA4",32), resize('0'&enable_serial_exptime_cmd, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AA8",32), resize('0'&enable_serial_op_cmd, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AAC",32), resize('0'&enable_failure_resp_management, 32), MB_MISO,  MB_MOSI);
+      wait for 30 ns; 
+      write_axi_lite (MB_CLK, resize(X"AB0",32), resize('0'&enable_external_int_ctrl, 32), MB_MISO,  MB_MOSI);
+      
       wait for 500 ns;
       
       -- la cfg des dacs fait office ici de cfg serielle operationnelle
@@ -349,25 +376,25 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
-      wait for 2 ms;
-      
-      for ii in 0 to QWORDS_NUM-1 loop 
-         wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector2'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop; 
-      --      
-      wait for 2 ms;
-      --      
-      for ii in 0 to QWORDS_NUM-1 loop 
-         wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector3'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop;      
+      wait;
+--      
+--      for ii in 0 to QWORDS_NUM-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector2'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop; 
+--      --      
+--      wait for 2 ms;
+--      --      
+--      for ii in 0 to QWORDS_NUM-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector3'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop;      
       
       
       report "FCR written"; 

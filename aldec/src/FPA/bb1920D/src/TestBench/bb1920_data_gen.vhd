@@ -122,7 +122,7 @@ architecture rtl of bb1920_data_gen is
    constant  C_DIAG_TAP_NUMBER_M1 : integer := G_DIAG_TAP_NUMBER - 1;
    constant  C_DIAG_BASE_OFFSET   : integer := (G_DIAG_QUAD_ID - 1) * DEFINE_DIAG_DATA_INC * G_DIAG_TAP_NUMBER;
    
-   type diag_fsm_type is (idle, wait_int_fe_st, int_st, junk_data_st, tir_dly_st, get_line_data_st, cfg_line_gen_st, lovh_dly_st, check_end_st);
+   type diag_fsm_type is (idle, wait_int_fe_st, int_st, junk_data_st, tir_dly_st, get_line_data_st, cfg_line_gen_st, lovh_dly_st, fovh_dly_st, check_end_st);
    type img_change_sm_type is (idle, change_st); 
    type data_type is array (0 to C_DIAG_TAP_NUMBER_M1) of std_logic_vector(15 downto 0);
    
@@ -143,6 +143,7 @@ architecture rtl of bb1920_data_gen is
    signal diag_done         : std_logic_vector(C_DIAG_TAP_NUMBER_M1 downto 0);
    signal dly_cnt           : unsigned(15 downto 0);
    signal lovh_dly_cnt      : unsigned(15 downto 0);
+   signal fovh_dly_cnt      : unsigned(15 downto 0);
    signal data_cnt          : unsigned(15 downto 0);
    signal line_cnt          : unsigned(FPA_INTF_CFG.DIAG.YSIZE'length-1 downto 0);
    signal fpa_int_last      : std_logic;
@@ -181,32 +182,19 @@ architecture rtl of bb1920_data_gen is
    signal addtional_dval_i  : std_logic;
    signal g_reset           : std_logic;
    
-   
-begin
+   begin
    
    ----------------------------------------------
    -- OUTPUTS                                    
    ----------------------------------------------
    DIAG_FVAL               <= aoi_fval_i;
    
-   DIAG_DATA(95)           <= '0';                  -- non_utilisé;
-   DIAG_DATA(94 downto 80) <= (others => '0');
-   DIAG_DATA(79)           <= '0';
-   DIAG_DATA(78)           <= '0';
-   DIAG_DATA(77)           <= '0';                  -- non aoi dval = '0' pour que le patron de tests ne bousille pas le contenu des regitres de stockage des refrences de calculs de gain et offset deja existances
-   
-   DIAG_DATA(76 downto 65) <= (others => '0');      -- aoi spares(14 downto 3)
-   DIAG_DATA(64)           <= aoi_pix_fval_i;       -- pix_fval
-   DIAG_DATA(63)           <= aoi_lval_i;           -- lval
-   DIAG_DATA(62)           <= acq_data_i;           -- aoi_spare(0)
-   
-   DIAG_DATA(61)           <= aoi_dval_i;           -- aoi_dval          
-   DIAG_DATA(60)           <= aoi_eof_i;            -- eof
-   DIAG_DATA(59)           <= aoi_sof_i;            -- sof
-   DIAG_DATA(58)           <= aoi_fval_i;           -- fval
-   DIAG_DATA(57)           <= aoi_eol_i;            -- eol
-   DIAG_DATA(56)           <= aoi_sol_i;            -- sol
-   DIAG_DATA(55 downto 0)  <= data(3)(13 downto 0)  & data(2)(13 downto 0)  & data(1)(13 downto 0)  & data(0)(13 downto 0);
+
+   DIAG_DATA(95 downto 67) <= (others => '0');      -- aoi spares(14 downto 3)
+   DIAG_DATA(66)           <= aoi_fval_i;       -- fval
+   DIAG_DATA(65)           <= aoi_lval_i;       -- pix_lval
+   DIAG_DATA(64)           <= aoi_dval_i;       -- pix_dval
+   DIAG_DATA(63 downto 0)  <= data(3)  & data(2)  & data(1)  & data(0);
    DIAG_DVAL               <= aoi_dval_i or addtional_dval_i;
    
    --------------------------------------------------
@@ -379,9 +367,7 @@ begin
                sim_cnt <= sim_cnt + 1;            
             end if;            
             -- pragma translate_on 
-            
-            addtional_dval_i <= '0';
-            
+  
             -- configuration des generateurs de lignes
             if FPA_INTF_CFG.COMN.FPA_DIAG_TYPE = DEFINE_TELOPS_DIAG_CNST then  -- constant
                for ii in 0 to C_DIAG_TAP_NUMBER_M1 loop
@@ -430,24 +416,27 @@ begin
                
                when tir_dly_st =>
                   int_fifo_rd <= '0';
-                  diag_frame_done <= '0';   
+                  diag_frame_done <= '0';
+                  aoi_fval_i <= '1'; 
+                  addtional_dval_i <= '1';
                   dly_cnt <= dly_cnt + 1;
                   if dly_cnt >= to_integer(FPA_INTF_CFG.REAL_MODE_ACTIVE_PIXEL_DLY) then 
-                     diag_fsm <= cfg_line_gen_st;
+                     diag_fsm <= cfg_line_gen_st; 
                      aoi_img_start <= '1';
                   end if;                         
                
                when cfg_line_gen_st => 
                   aoi_img_start <= '0';
                   diag_line_gen_en <= '1';                              -- on active le module généateur des données diag
-                  aoi_fval_i <= '1';
                   line_size <= std_logic_vector(resize(FPA_INTF_CFG.DIAG.XSIZE_DIV_TAPNUM, line_size'length)); 
                   dly_cnt <= (others => '0');
                   lovh_dly_cnt <= (others => '0');
+                  fovh_dly_cnt <= (others => '0'); 
+                  
                   diag_fsm <=  get_line_data_st;
                
                when get_line_data_st => 
-                  aoi_dval_i <= diag_dval_i(0);                  
+                  aoi_dval_i <= diag_dval_i(0);
                   if diag_done(0) = '0' then
                      diag_line_gen_en <= '0';                     
                   end if;
@@ -463,7 +452,8 @@ begin
                   end if;                  
                   
                   -- compteur de lignes
-                  if diag_eol(0) = '0' and diag_eol_last = '1' then  
+                  if diag_eol(0) = '0' and diag_eol_last = '1' then
+                     addtional_dval_i <= '1';
                      diag_fsm <=  check_end_st;                     
                   end if;
                   
@@ -491,25 +481,32 @@ begin
                   aoi_eol_i <= diag_eol(0);
                   aoi_lval_i <= diag_lval(0);
                
-               when check_end_st =>
+               when check_end_st => 
                   if line_cnt >= to_integer(FPA_INTF_CFG.DIAG.YSIZE) then
-                     if pixel_samp_trig = '1' then
-                        diag_fsm <=  idle;
+                     if pixel_samp_trig = '1' then 
+                        fovh_dly_cnt <= (others => '0');
+                        diag_fsm <=  fovh_dly_st;
                         aoi_fval_i <= '0';
-                        addtional_dval_i <= pixel_samp_trig;
                      end if;
-                  else
+                  else   
+                     addtional_dval_i <= '0';
                      diag_fsm <= lovh_dly_st; 
                      line_cnt <= line_cnt + 1; 
                   end if;
                
                when lovh_dly_st =>         -- permet de ralentir le mode diag express. Ainsi le détecteur ne sera pas surcadencé
-                  addtional_dval_i <= pixel_samp_trig;
                   lovh_dly_cnt <= lovh_dly_cnt + 1;                  
                   if lovh_dly_cnt >= to_integer(FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE) then 
                      diag_fsm <= cfg_line_gen_st;
                   end if;
                
+               when fovh_dly_st =>         -- permet de ralentir le mode diag express. Ainsi le détecteur ne sera pas surcadencé
+                  fovh_dly_cnt <= fovh_dly_cnt + 1;                  
+                  if fovh_dly_cnt >= to_integer(FPA_INTF_CFG.DIAG.LOVH_MCLK_SOURCE) then 
+                     addtional_dval_i <= '0';
+                     diag_fsm <= idle;
+                  end if;
+                  
                when others =>
                
             end case;

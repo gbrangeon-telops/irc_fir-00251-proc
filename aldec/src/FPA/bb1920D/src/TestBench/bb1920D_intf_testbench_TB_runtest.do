@@ -45,18 +45,15 @@ acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w4_d1024\fwft_sfifo_w4_d1024_sim
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d1024\fwft_sfifo_w76_d1024_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w76_d1024\fwft_afifo_w76_d1024_sim_netlist.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d128\fwft_afifo_w72_d128_sim_netlist.vhdl
---acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d256\afifo_w72_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w76_d512\fwft_afifo_w76_d512_sim_netlist.vhdl
+
 --acom D:\Telops\FIR-00251-Proc\IP\325\afpa_single_div_ip\afpa_single_div_ip_sim_netlist.vhdl
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d16\fwft_afifo_w72_d16_sim_netlist.vhdl	 
 acom D:\Telops\FIR-00251-Proc\IP\325\tdp_ram_w8_d2048\tdp_ram_w8_d2048_sim_netlist.vhdl
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
@@ -76,8 +73,26 @@ acom D:\Telops\FIR-00251-Proc\aldec\src\FPA\bb1920D\src\bb1920_intf_testbench.bd
 acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\bb1920D\src\TestBench\bb1920D_intf_testbench_TB.vhd
 
 asim -ses bb1920D_intf_testbench_TB 
+   
+add wave -named_row "------------------------line mux-------------------------------------" 
+wave UUT/U1/U9/U17/*
 
--- mb_interface
+-- mb_interface	   
+add wave -named_row "------------------------bb1920 data gen-------------------------------------"		 
+wave UUT/U3/U3/*
+		 
+		 
+add wave -named_row "------------------------real_data(even)-------------------------------------" 
+wave UUT/U1/U9/U2/U1/*
+
+add wave -named_row "------------------------data dispatcher (even)-------------------------------------" 
+wave UUT/U1/U9/U18/*
+
+ add wave -named_row "------------------------sequencer-------------------------------------" 
+ wave UUT/U1/U2/*
+   add wave -named_row "------------------------trig ctler-------------------------------------" 
+wave UUT/U1/U1/*
+
 wave UUT/U1/U4/*  
 #
 # 
@@ -88,9 +103,10 @@ wave UUT/U1/U5/U2/*
 wave UUT/U1/U9/U2/U1/*
 wave UUT/U1/U9/U2/U5/*
 
-wave UUT/U1/*
 
-wave UUT/U1/U9/U5/*
+
+wave UUT/U1/U9/U5/*	  
+wave UUT/U3/*
 wave UUT/U3/U3/*
 
 #

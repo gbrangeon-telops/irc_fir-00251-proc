@@ -57,6 +57,7 @@ acom -incr -nowarn DAGGEN_0523 \
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_real_data.vhd \
+ d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_dummy_dispatcher.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_bridge.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_line_mux.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_pix_pos.vhd \

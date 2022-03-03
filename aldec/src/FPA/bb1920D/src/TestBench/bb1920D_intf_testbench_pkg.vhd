@@ -20,19 +20,16 @@ use work.fpa_define.all;
 
 package BB1920D_intf_testbench_pkg is           
    
-   constant PAUSE_SIZE                  : integer := 2*(1);
-   constant TAP_NUM                     : integer := 8;
-   constant C_FPA_INTCLK_RATE_KHZ       : integer := 35_000;
-   constant QWORDS_NUM                  : natural := 76;
+   constant PAUSE_SIZE                     : integer := 2*(1);
+   constant TAP_NUM                        : integer := 8;
+   constant C_FPA_INTCLK_RATE_KHZ          : integer := 35_000;
+   constant QWORDS_NUM                     : natural := 76;
    
-   constant AW_SERIAL_OP_CMD_RAM_ADD    : integer :=  0;  
-   constant AW_SERIAL_SYNTH_CMD_RAM_ADD : integer :=  32; 
-   constant AW_SERIAL_INT_CMD_RAM_ADD   : integer :=  64;
-   constant AW_SERIAL_TEMP_CMD_RAM_ADD  : integer :=  96;
-   
-   --constant DATA_SOURCE_INSIDE_FPGA  : std_logic := '0';  
-   --constant DATA_SOURCE_OUTSIDE_FPGA : std_logic := '1';  
-                                                          
+   constant AW_SERIAL_OP_CMD_RAM_ADD       : integer :=  0;  
+   constant AW_SERIAL_ROIC_REG_CMD_RAM_ADD : integer :=  32; 
+   constant AW_SERIAL_INT_CMD_RAM_ADD      : integer :=  64;
+   constant AW_SERIAL_TEMP_CMD_RAM_ADD     : integer :=  96;
+                                                   
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
    
    
@@ -60,7 +57,7 @@ package body BB1920D_intf_testbench_pkg is
       variable  diag_xsize_div_tapnum                  : unsigned(31 downto 0);                                           
       variable  diag_lovh_mclk_source                  : unsigned(31 downto 0);
       variable  real_mode_active_pixel_dly             : unsigned(31 downto 0);
-      variable  itr                                    : unsigned(31 downto 0);
+      variable  spare                                  : unsigned(31 downto 0);
       variable  aoi_xsize                              : unsigned(31 downto 0);
       variable  aoi_ysize                              : unsigned(31 downto 0);
       variable  aoi_data_sol_pos                       : unsigned(31 downto 0);
@@ -81,15 +78,15 @@ package body BB1920D_intf_testbench_pkg is
       variable  op_det_ibias                           : unsigned(31 downto 0);
       variable  op_binning                             : unsigned(31 downto 0); 
       variable  op_output_rate                         : unsigned(31 downto 0);
+      variable  op_mtx_int_low                            : unsigned(31 downto 0); 
+      variable  op_frm_res                                : unsigned(31 downto 0); 
+      variable  op_frm_dat                                : unsigned(31 downto 0); 
       variable  op_cfg_num                             : unsigned(31 downto 0);
-      variable  synth_spare                            : unsigned(31 downto 0);
-      variable  synth_frm_res                          : unsigned(31 downto 0);
-      variable  synth_frm_dat                          : unsigned(31 downto 0);
-      variable  synth_cmd_id                           : unsigned(31 downto 0);
-      variable  synth_cmd_data_size                    : unsigned(31 downto 0);
-      variable  synth_cmd_dlen                         : unsigned(31 downto 0);
-      variable  synth_cmd_sof_add                      : unsigned(31 downto 0);
-      variable  synth_cmd_eof_add                      : unsigned(31 downto 0);
+      variable  roic_reg_cmd_id                        : unsigned(31 downto 0);
+      variable  roic_reg_cmd_data_size                 : unsigned(31 downto 0);
+      variable  roic_reg_cmd_dlen                      : unsigned(31 downto 0);
+      variable  roic_reg_cmd_sof_add                   : unsigned(31 downto 0);
+      variable  roic_reg_cmd_eof_add                   : unsigned(31 downto 0);
       variable  int_cmd_id                             : unsigned(31 downto 0);  
       variable  int_cmd_data_size                      : unsigned(31 downto 0);
       variable  int_cmd_dlen                           : unsigned(31 downto 0);
@@ -119,7 +116,7 @@ package body BB1920D_intf_testbench_pkg is
       variable  fpa_serdes_lval_len                    : unsigned(31 downto 0);
       variable  int_clk_period_factor                  : unsigned(31 downto 0);
       variable  int_time_offset                        : unsigned(31 downto 0);
-      variable  proxy_alone_mode                       : unsigned(31 downto 0);
+      variable  vid_if_bit_en                          : unsigned(31 downto 0);
       
       
       variable y                                       : unsigned(QWORDS_NUM*32-1 downto 0);
@@ -131,20 +128,20 @@ package body BB1920D_intf_testbench_pkg is
       comn_fpa_diag_mode            := (others => diag_mode);
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
-      comn_fpa_acq_trig_mode        := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
-      comn_fpa_xtra_trig_mode       := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
+      comn_fpa_acq_trig_mode        := resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
+      comn_fpa_xtra_trig_mode       := resize(unsigned(MODE_TRIG_START_TO_TRIG_START),32);
       --      if (diag_mode = '1') then 
       --         comn_fpa_acq_trig_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
       --      end if;   
       
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(1000, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(1000, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(50000, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(50000, comn_fpa_xtra_trig_ctrl_dly'length);
       comn_fpa_trig_ctrl_timeout_dly:= to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
       diag_ysize                    := to_unsigned(user_ysize/2, 32);                 
       diag_xsize_div_tapnum         := to_unsigned(FPA_WIDTH_MAX/4, 32);
-      diag_lovh_mclk_source         := to_unsigned(3, 32);
+      diag_lovh_mclk_source         := to_unsigned(0, 32);
       real_mode_active_pixel_dly    := to_unsigned(8, 32);
       
       aoi_xsize                     := to_unsigned(user_xsize, 32);
@@ -164,21 +161,23 @@ package body BB1920D_intf_testbench_pkg is
       op_ysize                      := to_unsigned(user_ysize, 32);  
       op_frame_time                 := to_unsigned(10, 32);  
       op_gain                       := to_unsigned(1, 32);   
-      op_int_mode                   := to_unsigned(0, 32);   
+      op_int_mode                   := to_unsigned(1, 32);   
       op_test_mode	               := to_unsigned(0, 32);     
       op_det_vbias                  := to_unsigned(0, 32);    
       op_det_ibias                  := to_unsigned(0, 32);       
       op_binning                    := to_unsigned(0, 32);    
+      op_output_rate                := to_unsigned(3, 32);
+      op_mtx_int_low               := to_unsigned(9, 32);
+      op_frm_res                    := to_unsigned(7, 32);
+      op_frm_dat                    := to_unsigned(0, 32);
       op_cfg_num                    := to_unsigned(send_id, 32);
       
-      synth_spare                   := to_unsigned(0, 32);
-      synth_frm_res                 := to_unsigned(0, 32);
-      synth_frm_dat                 := to_unsigned(0, 32);
-      synth_cmd_id                  := resize(x"8500", 32);
-      synth_cmd_data_size           := to_unsigned(4, 32);
-      synth_cmd_dlen                := to_unsigned(0, 32);
-      synth_cmd_sof_add             := to_unsigned(AW_SERIAL_SYNTH_CMD_RAM_ADD, 32);
-      synth_cmd_eof_add             := to_unsigned(AW_SERIAL_SYNTH_CMD_RAM_ADD + 5, 32);   
+
+      roic_reg_cmd_id               := resize(x"8501", 32);
+      roic_reg_cmd_data_size        := to_unsigned(1, 32);
+      roic_reg_cmd_dlen             := roic_reg_cmd_data_size + 1;
+      roic_reg_cmd_sof_add          := to_unsigned(AW_SERIAL_ROIC_REG_CMD_RAM_ADD, 32);
+      roic_reg_cmd_eof_add          := to_unsigned(AW_SERIAL_ROIC_REG_CMD_RAM_ADD + 7, 32);   
       
       int_cmd_id                    := resize(x"8500", 32);
       int_cmd_data_size             := to_unsigned(9, 32);
@@ -192,7 +191,7 @@ package body BB1920D_intf_testbench_pkg is
       int_dly_cst                   := to_unsigned(10, 32);         
       
       op_cmd_id                     := resize(x"8500", 32);
-      op_cmd_data_size              := resize(x"8500", 32);
+      op_cmd_data_size              := to_unsigned(23, 32);
       op_cmd_dlen                   := op_cmd_data_size + 1;      
       op_cmd_sof_add                := to_unsigned(AW_SERIAL_OP_CMD_RAM_ADD, 32);
       op_cmd_eof_add                := to_unsigned(AW_SERIAL_OP_CMD_RAM_ADD + 29, 32);
@@ -210,7 +209,7 @@ package body BB1920D_intf_testbench_pkg is
       fpa_serdes_lval_len           := resize(x"5", 32); 
       int_time_offset               := to_unsigned(0, 32); 
       
-      itr                           := to_unsigned(1, 32);   
+      spare                         := to_unsigned(0, 32);   
       
       int_clk_period_factor         := to_unsigned(DEFINE_INT_CLK_SOURCE_RATE_KHZ/C_FPA_INTCLK_RATE_KHZ, 32);
       
@@ -219,7 +218,7 @@ package body BB1920D_intf_testbench_pkg is
       
       comn_fpa_intf_data_source      := resize(unsigned('0'&DATA_SOURCE_OUTSIDE_FPGA), 32);
       
-      proxy_alone_mode               := to_unsigned(1, 32);  
+      vid_if_bit_en                  := to_unsigned(1, 32);  
       
       
       -- cfg usager
@@ -239,7 +238,7 @@ package body BB1920D_intf_testbench_pkg is
       & diag_xsize_div_tapnum                       
       & diag_lovh_mclk_source                       
       & real_mode_active_pixel_dly                  
-      & itr                                         
+      & spare                                         
       & aoi_xsize                                    
       & aoi_ysize                                   
       & aoi_data_sol_pos                            
@@ -259,16 +258,16 @@ package body BB1920D_intf_testbench_pkg is
       & op_det_vbias                                 
       & op_det_ibias                                
       & op_binning                                  
-      & op_output_rate                              
-      & op_cfg_num                                  
-      & synth_spare                                 
-      & synth_frm_res                               
-      & synth_frm_dat                               
-      & synth_cmd_id                                 
-      & synth_cmd_data_size                         
-      & synth_cmd_dlen                              
-      & synth_cmd_sof_add                           
-      & synth_cmd_eof_add                           
+      & op_output_rate 
+      & op_mtx_int_low 
+      & op_frm_res 
+      & op_frm_dat 
+      & op_cfg_num                                                               
+      & roic_reg_cmd_id                                 
+      & roic_reg_cmd_data_size                         
+      & roic_reg_cmd_dlen                              
+      & roic_reg_cmd_sof_add                           
+      & roic_reg_cmd_eof_add                           
       & int_cmd_id                                  
       & int_cmd_data_size                           
       & int_cmd_dlen                                
@@ -298,7 +297,7 @@ package body BB1920D_intf_testbench_pkg is
       & fpa_serdes_lval_len                   
       & int_clk_period_factor                 
       & int_time_offset
-      & proxy_alone_mode;                       
+      & vid_if_bit_en;                       
       
       return y;
    end to_intf_cfg;
