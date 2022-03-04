@@ -104,10 +104,8 @@ architecture writer_fsm of writer_fsm is
    signal wr_next_incoming_frame         : std_logic;
    signal wr_next_incoming_frame_last    : std_logic;
    signal done                           : std_logic; 
-   signal done_last                      : std_logic;
    signal write_in_progress              : std_logic;
    signal read_in_progress               : std_logic;   
-   signal sts_tvalid_last                : std_logic;
    signal mask_tlast                     : std_logic;
    signal next_read_buffer               : buffer_status_type := buf_sts_default;
    signal next_write_buffer              : buffer_status_type := buf_sts_default;
@@ -129,12 +127,13 @@ architecture writer_fsm of writer_fsm is
    signal init_cfg_done                  : std_logic;
    signal cfg_update_done                : std_logic;
    signal cfg_update_done_last           : std_logic;
+   signal fall_i                         : std_logic;
    signal cnt                            : unsigned(3 downto 0);
-   
+    
    type cfg_updater_sm_type is (idle_st, wait_empty_fb_st, cfg_updater_rqst_st); 
    signal cfg_updater_sm             : cfg_updater_sm_type;
    
-   type writer_sm_type is (standby_wr, wait_wr_cmd_ack, wait_wr_end, error_wr); 
+   type writer_sm_type is (standby_wr, wait_wr_cmd_ack, update_write_pointer, error_wr); 
    signal writer_sm                      : writer_sm_type;
 
    type switch_sm_type is (fall_st, wr_st); 
@@ -145,7 +144,7 @@ architecture writer_fsm of writer_fsm is
 --   attribute KEEP of switch_sm                : signal is "true";
 --   attribute KEEP of wr_next_incoming_frame   : signal is "true";
 --   attribute KEEP of write_in_progress        : signal is "true";
-   
+       
 begin 
    
   -- I/O Connections assignments
@@ -156,7 +155,7 @@ begin
    FB_CFG                      <= fb_cfg_i;
    CFG_UPDATE_PENDING          <= not cfg_update_done;
    AXIS_RX_DATA_MISO.TREADY    <= axis_rx_data_miso_i.TREADY;
-   axis_rx_data_miso_i.TREADY  <= AXIS_S2MM_DATA_MISO.TREADY when wr_next_incoming_frame = '1' else '1';
+   axis_rx_data_miso_i.TREADY  <= AXIS_S2MM_DATA_MISO.TREADY when fall_i = '0' else '1';
    AXIS_S2MM_DATA_MOSI.TDATA   <= s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TDATA;  
    AXIS_S2MM_DATA_MOSI.TSTRB   <= (others => '1');  
    AXIS_S2MM_DATA_MOSI.TKEEP   <= (others => '1'); 
@@ -164,7 +163,7 @@ begin
    AXIS_S2MM_DATA_MOSI.TLAST   <= s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TLAST when mask_tlast = '0' else '0';     
    AXIS_S2MM_DATA_MOSI.TDEST   <= (others => '0');  
    AXIS_S2MM_DATA_MOSI.TUSER   <= (others => '0');    
-   AXIS_S2MM_DATA_MOSI.TVALID  <=  s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TVALID when wr_next_incoming_frame = '1' else '0';
+   AXIS_S2MM_DATA_MOSI.TVALID  <=  s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TVALID when fall_i = '0' else '0';
    AXIS_S2MM_CMD_MOSI          <= s2mm_cmd_mosi;
    AXIS_S2MM_STS_MISO          <= s2mm_sts_miso; 
    FLUSH                       <= flush_i;
@@ -208,31 +207,7 @@ begin
    CURRENT_WR_BUFFER.pbuf <=  current_write_buffer.pbuf;
    CURRENT_WR_BUFFER.tag  <=  current_write_buffer.tag;
    U3B: gh_stretch generic map (stretch_count => 10) port map(CLK => CLK, rst => sreset, D => current_write_buffer.valid , Q => CURRENT_WR_BUFFER.valid);
-   
-   -- This process indicate when a buffer is currently being write to.
-   U4 : process(CLK)        
-   begin
-      if rising_edge(CLK) then
-         if sreset = '1' then
-            done_last <= '1';
-            sts_tvalid_last <= '1';
-            write_in_progress <= '0';
-         else   
-            done_last <= done; 
-            sts_tvalid_last <= s2mm_sts_mosi.tvalid;
-            
-            if done_last = '1' and done = '0' then 
-               write_in_progress <= '1';
-            end if;
-            
-            if sts_tvalid_last = '0' and s2mm_sts_mosi.tvalid = '1' and write_in_progress = '1' then
-               write_in_progress <= '0';
-            end if;
-                       
-         end if;     
-      end if;
-   end process; 
-   
+
    -- This process manage the command & status interface of the data mover
    U5 : process(CLK)
    begin
@@ -245,9 +220,7 @@ begin
             s2mm_cmd_mosi.tvalid        <= '0';
             wr_next_incoming_frame_last <= '1';
             done                        <= '1';  
-            s2mm_err_o                  <= (others => '0');
             s2mm_sts_miso.tready        <= '1';     
-            next_read_buffer            <= buf_sts_default;
             next_write_buffer           <= buf_sts_default;
             current_write_buffer        <= buf_sts_default;
          else
@@ -255,7 +228,6 @@ begin
                if flush_i = '1' then
                   next_write_buffer.tag  <= BUFFER_A_TAG;
                   next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
-                  next_read_buffer       <= buf_sts_default; 
                   current_write_buffer   <= buf_sts_default;
                end if;
          
@@ -265,7 +237,6 @@ begin
                   when standby_wr => 
                   
                      done                       <= '1';  
-                     next_read_buffer.valid     <= '0';
                      current_write_buffer.valid <= '0';
                      
                      if wr_next_incoming_frame = '1' and wr_next_incoming_frame_last = '0' then
@@ -278,7 +249,13 @@ begin
                         s2mm_btt                   <= resize(std_logic_vector(fb_cfg_i.frame_byte_size),s2mm_btt'length);
                         s2mm_tag                   <= "00" & std_logic_vector(next_write_buffer.tag);
                         s2mm_cmd_mosi.tvalid       <= '1';
-                        writer_sm                  <= wait_wr_cmd_ack; 
+                        
+                        if s2mm_err_o /= "000" then
+                           writer_sm                  <= error_wr; 
+                        else
+                           writer_sm                  <= wait_wr_cmd_ack;
+                        end if;
+                        
                      else
                         s2mm_cmd_mosi.tvalid <= '0'; 
                      end if;
@@ -289,64 +266,79 @@ begin
                   
                      if s2mm_cmd_miso.tready = '1' then                  
                         s2mm_cmd_mosi.tvalid <= '0';
-                        writer_sm            <= wait_wr_end;
+                        writer_sm            <= update_write_pointer; 
                     end if; 
                   
-                  when wait_wr_end =>  
+                  when update_write_pointer =>  
                   
-                     if( s2mm_sts_mosi.tvalid = '1') then 
-                     
-                        if(s2mm_sts_mosi.tdata(6 downto 4) /= "000") then
-                           s2mm_err_o(2 downto 0) <= s2mm_sts_mosi.tdata(6 downto 4);
-                           next_read_buffer       <= buf_sts_default;
-                           next_write_buffer      <= buf_sts_default; 
-                           writer_sm              <= error_wr;
-                        else
-                           
-                           next_read_buffer.tag <= unsigned(s2mm_sts_mosi.tdata(1 downto 0)); 
-                           next_read_buffer.valid <= '1';
-                           
-                           if unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_A_TAG then
-                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_a_addr;
-                              next_write_buffer.pbuf <= fb_cfg_i.buffer_b_addr;
-                              next_write_buffer.tag  <= BUFFER_B_TAG;
-                           elsif unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_B_TAG then 
-                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_b_addr;
-                              next_write_buffer.pbuf <= fb_cfg_i.buffer_c_addr;
-                              next_write_buffer.tag  <= BUFFER_C_TAG;
-                           elsif unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_C_TAG then 
-                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_c_addr;
-                              next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
-                              next_write_buffer.tag  <= BUFFER_A_TAG;
-                           else
-                              next_read_buffer.pbuf  <= fb_cfg_i.buffer_a_addr;
-                              next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
-                              next_write_buffer.tag  <= (others => '0'); 
-                              next_read_buffer       <= buf_sts_default;
-                           end if;
-                           
-                           current_write_buffer.pbuf  <= to_unsigned(0,current_write_buffer.pbuf'length);
-                           current_write_buffer.tag   <= to_unsigned(0,current_write_buffer.tag'length);
-                           current_write_buffer.valid <= '1';     
-                           
-                           writer_sm <= standby_wr;
-                        end if;             
+                     if current_write_buffer.tag = BUFFER_A_TAG then
+                        next_write_buffer.pbuf <= fb_cfg_i.buffer_b_addr;
+                        next_write_buffer.tag  <= BUFFER_B_TAG;
+                     elsif current_write_buffer.tag = BUFFER_B_TAG then 
+                        next_write_buffer.pbuf <= fb_cfg_i.buffer_c_addr;
+                        next_write_buffer.tag  <= BUFFER_C_TAG;
+                     elsif current_write_buffer.tag = BUFFER_C_TAG then 
+                        next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
+                        next_write_buffer.tag  <= BUFFER_A_TAG;
                      else
-                        writer_sm <= wait_wr_end;
-                     end if;                                                                 
+                        next_write_buffer.pbuf <= fb_cfg_i.buffer_a_addr;
+                        next_write_buffer.tag  <= (others => '0'); 
+                     end if;
+                       
+                     writer_sm <= standby_wr;  
                      
                   when error_wr =>  
-                     s2mm_err_o <= s2mm_err_o;
                      writer_sm  <= error_wr;  
                      
                   when others =>
                      writer_sm <= error_wr;
+                  
                end case;
          end if;
       end if;     
    end process; 
    
-   -- Input stage pipe for pixels stream.  
+   -- This process update the read buffer pointer.
+   U5A : process(CLK)        
+   begin
+      if rising_edge(CLK) then 
+         if sreset = '1' then
+            s2mm_err_o       <= (others => '0');
+            next_read_buffer <= buf_sts_default;
+         else 
+            
+            next_read_buffer.valid     <= '0';
+            
+            if( s2mm_sts_mosi.tvalid = '1') then 
+                     
+               if(s2mm_sts_mosi.tdata(6 downto 4) /= "000") then
+                  s2mm_err_o(2 downto 0) <= s2mm_sts_mosi.tdata(6 downto 4);
+               elsif flush_i = '1' then
+                  next_read_buffer       <= buf_sts_default; 
+               else
+                  next_read_buffer.tag <= unsigned(s2mm_sts_mosi.tdata(1 downto 0)); 
+                  next_read_buffer.valid <= '1';
+                  
+                  if unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_A_TAG then
+                     next_read_buffer.pbuf  <= fb_cfg_i.buffer_a_addr;
+                  elsif unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_B_TAG then 
+                     next_read_buffer.pbuf  <= fb_cfg_i.buffer_b_addr;
+                  elsif unsigned(s2mm_sts_mosi.tdata(1 downto 0)) = BUFFER_C_TAG then 
+                     next_read_buffer.pbuf  <= fb_cfg_i.buffer_c_addr;
+                  else
+                     next_read_buffer.pbuf  <= fb_cfg_i.buffer_a_addr;
+                     next_read_buffer       <= buf_sts_default;
+                  end if; 
+                  
+               end if; 
+            else
+               s2mm_err_o <= s2mm_err_o;
+            end if;             
+         end if; 
+      end if;
+   end process;    
+   
+   -- Input stage pipe for pixels stream. 
    U6 : process(CLK)        
    begin
       if rising_edge(CLK) then 
@@ -355,37 +347,70 @@ begin
                 s2mm_data_mosi_pipe(i) <= s2mm_data_mosi_pipe(i-1);        
             end loop;         
       end if;
-   end process;    
-      
-   -- This process decide whether a frame should be write to the buffer or flushed.
+   end process; 
+    
+   -- This process decide whether a frame should be writen to the frame buffer or flushed. 
+ 
+   -- Required conditions to write a new incomming frame in the frame buffer :
+   -- 1. A start of frame condition is detected and the writer_sm is ready to send a new command to the data mover.
+   -- 2. The next buffer to be written to is not the buffer that is currently being read ** See note for justification**.
+   -- 3. The frame buffer as been configured at least once.
+   -- 4. The frame buffer isn't currently being configured.
+   -- 5. No error has been return by the data mover.
+   -- 6. Explanation on the following condition "not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)" : 
+   --    For write speed far greater than read speed, if all 3 buffers have been writen to before a first read has begin, 
+   --    we have to stall the write operation :   
+   
+   --    ** Note : The present algorithm allow the write operation to be stalled by the read one. 
+   --              The frame buffer aim to limit stream throughtput to respect the camera link limit.
+   --              We work under the hypothesis that the clink output is only a visual preview and 
+   --              that frame are being discard only for very high frame rate. It doesn't matter if 
+   --              we don't always write to most recent incomming frame.
+   --              This have the advandtage of limiting the DDR bandwith used. 
+     
    U7 : process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
             switch_sm <= fall_st;
-            wr_next_incoming_frame <= '0';
+            wr_next_incoming_frame <= '0'; 
+            fall_i <= '1';
             mask_tlast <= '0';
+            sof_latch <= '0';
          else  
             
                case switch_sm is 
                   
                   when fall_st =>
                      
-                     if sof_i = '1'and write_in_progress = '0' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' then 
+                     if sof_i = '1' and done = '1' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and (not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' and s2mm_err_o = "000" then 
                         mask_tlast             <= '1';
                         wr_next_incoming_frame <= '1';
+                        fall_i                 <= '0';
                         switch_sm              <= wr_st;
                      end if;
 
                   when wr_st =>  
-               
+                  
+                     wr_next_incoming_frame <= '1';
+                     
                      if s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TID(0) = '0' then
                         mask_tlast <= '0';    
                      end if;
 
                      if s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tvalid = '1' and AXIS_S2MM_DATA_MISO.TREADY = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tlast = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tid(0) = '0' then
                         wr_next_incoming_frame <= '0';
-                        switch_sm              <= fall_st;
+                        -- Gestion du cas ou il n'y a aucune pause entre la fin d'un frame et l'envoi du hder du frame suivant (ce cas peut arriver en IWR).
+                        if sof_i = '1' and done = '1' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and (not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' and s2mm_err_o = "000"  then
+                           fall_i                 <= '0'; 
+                           sof_latch              <= '0';
+                           mask_tlast             <= '1';
+                           switch_sm              <= wr_st;  
+                        else  
+                           fall_i                 <= '1';
+                           switch_sm              <= fall_st; 
+                        end if;
+                     
                      end if;
                      
                   when others =>
@@ -417,7 +442,7 @@ begin
          end if;
       end if;
    end process; 
-  
+
    -- This process manage the configuration update.
    -- Any new config received will flush the frame buffer.
    U9: process(CLK)
@@ -432,11 +457,18 @@ begin
             cfg_update_done_last <= '0';
             cnt                  <= (others => '0');
             flush_i              <= '0';
+            write_in_progress    <= '0';
          else              
             
             cfg_dval_last <= USER_CFG.dval;
             cfg_update_done_last <= cfg_update_done;
             
+            if next_read_buffer.tag = current_write_buffer.tag and done = '1' then 
+               write_in_progress <= '0';
+            else
+               write_in_progress <= '1';
+            end if;
+
             case cfg_updater_sm is 
                when idle_st => 
                   fb_cfg_i        <= fb_cfg_i;

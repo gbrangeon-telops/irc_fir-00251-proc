@@ -105,8 +105,6 @@ end component;
    signal sreset                     : std_logic; 
    signal flush_i                    : std_logic;
    signal fb_cfg_i                   : frame_buffer_cfg_type;
-   signal done                       : std_logic;
-   signal done_last                  : std_logic;
    signal gen_tlast                  : std_logic;
    signal gen_tid                    : std_logic;
    signal read_in_progress           : std_logic;
@@ -275,7 +273,7 @@ begin
             case reader_sm is 
                when standby_rd => 
                   read_in_progress <= '0';
-                  if (next_read_buffer_sync.tag /= "00") and (current_write_buffer_sync.tag /= next_read_buffer_sync.tag) and (current_read_buffer.tag /= next_read_buffer_sync.tag) and next_read_buffer_valid = '0' and current_write_buffer_valid = '0' and cfg_update_pending_i = '0' then  
+                  if (next_read_buffer_sync.tag /= "00") and (current_read_buffer.tag /= next_read_buffer_sync.tag) and next_read_buffer_valid = '0' and current_write_buffer_valid = '0' and cfg_update_pending_i = '0' then  
                      read_in_progress          <= '1';
                      current_read_buffer.pbuf  <= next_read_buffer_sync.pbuf;
                      current_read_buffer.tag   <= next_read_buffer_sync.tag;
@@ -309,7 +307,6 @@ begin
                      mm2s_sts_miso.tready <= '0';
                      mm2s_cmd_mosi.tvalid <= '0';
                      if ( (mm2s_sts_mosi.tdata(7) = '1') and (mm2s_sts_mosi.tdata(6 downto 2) = "00000") and (mm2s_sts_mosi.tdata(1 downto 0) = std_logic_vector(current_read_buffer.tag)) ) then --transmit valid
-                        done      <= '1'; 
                         reader_sm <= standby_rd;
                      else   
                         mm2s_err_o(2 downto 0) <= mm2s_sts_mosi.tdata(6 downto 4);

@@ -57,10 +57,10 @@ constant CLK85_PERIOD : time := 100 ns;
 constant CLK142_5_PERIOD : time := 10 ns; 
 
 --IMAGE PARAM
-constant FRAME_WIDTH : unsigned := to_unsigned(640,32);
+constant FRAME_WIDTH : unsigned := to_unsigned(64,32);
 constant FRAME_HEIGHT : unsigned := to_unsigned(4,32); --header included
 constant FRAME_SIZE : unsigned := resize(FRAME_HEIGHT * FRAME_WIDTH,32);
-constant IMG_DLY : unsigned := to_unsigned(200,32);
+constant IMG_DLY : unsigned := to_unsigned(0,32);
 constant HDR_DLY : unsigned := to_unsigned(0,32);
 constant FRAME_BYTE_SIZE    : unsigned(31 downto 0) := resize(FRAME_SIZE*2,32);
 
@@ -254,10 +254,35 @@ begin
                         
                         
                         if pixel_index = frame_size_i then                             
-                           cnt <= (others => '0');
-                           AXIS_MOSI.TVALID  <= '0';  
+
                            frame_index <= frame_index + 1;
-                           frame_gen_state <= img_delay_st;
+                           cnt <= to_unsigned(1,32);
+                           AXIS_MOSI.TVALID  <= '0';
+                           
+                           if IMG_DLY > 0 then
+                              frame_gen_state <= img_delay_st;
+                           else   
+                              
+                              AXIS_MOSI.TDATA(15 downto 0) <= x"43" & x"54";    --TC
+                              AXIS_MOSI.TDATA(31 downto 16) <= x"00" & x"01";   --XML_MINOR_VER & XML_MAJOR_VER
+                              AXIS_MOSI.TDATA(47 downto 32) <= (others => '0'); --IMG_HDR_LEN & x"0000"
+                              AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
+                              AXIS_MOSI.TVALID  <= '0';
+                              AXIS_MOSI.TLAST <= '0';
+                              AXIS_MOSI.TKEEP <= (others => '1');
+                              AXIS_MOSI.TDEST <= (others => '0');
+                              AXIS_MOSI.TUSER   <= (others => '0');
+                              AXIS_MOSI.TID     <= (others => '1');
+                              pixel_index <= to_unsigned(4,16); 
+                              
+                              if transmit = '1' then 
+                                 frame_gen_state <= transmit_hdr;
+                                 AXIS_MOSI.TVALID  <= '1';
+                              else
+                                 frame_gen_state <= Frame_Reset;
+                              end if;                                                
+
+                           end if;
                         else  
                            frame_gen_state <= transmit_img;
                         end if; 
@@ -272,7 +297,7 @@ begin
                      AXIS_MOSI.TDATA(63 downto 48) <= (others => '0');
                      AXIS_MOSI.TVALID  <= '0'; 
                      AXIS_MOSI.TID     <= (others => '1');
-                     if cnt > IMG_DLY then
+                     if cnt >= IMG_DLY then
                         if transmit = '1' then 
                            AXIS_MOSI.TVALID  <= '1';
                            frame_gen_state <= transmit_hdr;

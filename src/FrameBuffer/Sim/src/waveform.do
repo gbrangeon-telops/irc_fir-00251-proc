@@ -44,6 +44,9 @@ add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MISO.TREADY}
 add wave -noreg -logic {/top/U2/g0/U6/fb_cfg_i}   	  
 add wave -noreg -logic {/Top/U2/g0/U6/s2mm_addr} 
 add wave -noreg -logic {/Top/U2/g0/U6/s2mm_tag}
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_btt}
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_eof}
+
 
 add wave -named_row "cmd & status"
 add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_CMD_MOSI.TVALID}
@@ -73,7 +76,13 @@ add wave -noreg -logic {/Top/U2/g0/U3/TX_MOSI.TLAST}
 add wave -noreg -logic {/Top/U2/g0/U3/TX_MOSI.TID}
 add wave -noreg -logic {/Top/U2/g0/U3/TX_MISO.TREADY}  
 
-		
+	
+ add wave -named_row "random miso"	
+	add wave -noreg -logic {/Top/U8/RX_MOSI}
+add wave -noreg -logic {/Top/U8/RX_MISO} 
+add wave -noreg -logic {/Top/U8/TX_MOSI}
+add wave -noreg -logic {/Top/U8/TX_MISO}
+add wave -noreg -logic {}
  add wave -named_row "------------------------AXIS_64-------------------------------------"
 add wave -noreg -logic {/Top/U2/g0/WRITE_FR/pix_counter}	 
 add wave -noreg -logic {/Top/U2/g0/WRITE_FR/FRAME_RATE_MIN}
@@ -167,6 +176,16 @@ add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TDATA}
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TLAST}
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TID}
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MISO.TREADY}	  
+  
+  
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_data_mosi_pipe} 
+add wave -noreg -logic {}
+add wave -noreg -logic {}
+add wave -noreg -logic {}
+add wave -noreg -logic {} 
+add wave -noreg -logic {}
+add wave -noreg -logic {}
+add wave -noreg -logic {}
 
 add wave -named_row "--------------------------AXIS 64 FR----------------------------------"	
 add wave -noreg -logic {/Top/U2/g0/READ_FR/FRAME_RATE_MIN}
