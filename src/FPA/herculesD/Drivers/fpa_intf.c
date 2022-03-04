@@ -116,9 +116,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 // BB1280 (n'est pas utilisé par le Hercule): adresse d'ecriture de la config diag du manufacturier
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
 
-#define AW_FPA_SCD_IDDC_RDY_ADD                          0xA4
-#define AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD           0xA8
-#define AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD                0xAC
+#define AW_FPA_SCD_ENABLE_SERDES_INIT_ADD                0xA4
+#define AW_FPA_SCD_ENABLE_FAILURE_RESP_MANAGEMENT_ADD    0xA8
+#define AW_FPA_SCD_ENABLE_SERIAL_EXPTIME_CMD_ADD         0xAC
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -220,8 +220,8 @@ typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
 t_FpaPrivateStatus gPrivateStat;
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
-uint32_t sw_init_done = 0;
-uint32_t sw_init_success = 0;
+static uint32_t sw_init_done = 0;
+static uint32_t sw_init_success = 0;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -235,13 +235,10 @@ void FPA_BuildCmdPacket(ScdPacketTx_t *ptrE, const Command_t *ptrC);
 void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
-void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
+void FPA_EnableSerdesInit(t_FpaIntf *ptrA, bool state);
+void FPA_EnableFailureResponseManagement(t_FpaIntf *ptrA, bool state);
 
-// Global variables (Only used for BB1280)
-uint32_t gSCD_frame_dly = 0;
-uint32_t gSCD_intg_dly  = 0;
-uint32_t gSCD_frame_res = 0;
+
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -254,9 +251,9 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_iddca_rdy(ptrA, true);                                               // Always true for HerculeD (only used by BB1280) 
-   FPA_TurnOnProxyFailureResponseManagement(ptrA, true);                    // Always true for HerculeD (only used by BB1280) 
-   FPA_IgnoreExposureTimeCMD(ptrA, false);                                  // Always false for HerculeD (only used by BB1280) 
+   FPA_EnableSerdesInit(ptrA, true);                                        // Always true for HerculeD (only used by BB1280)
+   FPA_EnableFailureResponseManagement(ptrA, true);                         // Always true for HerculeD (only used by BB1280)
+   FPA_EnableSerialExposureTimeCMD(ptrA, true);                             // Always false for HerculeD (only used by BB1280)
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
    FPA_GetStatus(Stat, ptrA);                                               // statut global du vhd.
@@ -971,35 +968,35 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
 //*--------------------------------------------------------------------------
 //   Not used by Hercule (needed for BB1280, see driver)
 //--------------------------------------------------------------------------
-void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+void  FPA_EnableSerdesInit(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
   for(ii = 0; ii <= 10 ; ii++)
   {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_ENABLE_SERDES_INIT_ADD);
   }
 }
 
 //*--------------------------------------------------------------------------
 //   Not used by Hercule (needed for BB1280, see driver)
 //--------------------------------------------------------------------------
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+void FPA_EnableFailureResponseManagement(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
    for(ii = 0; ii <= 10 ; ii++)
    {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_ENABLE_FAILURE_RESP_MANAGEMENT_ADD);
    }
 }
 
 //*--------------------------------------------------------------------------
 //   Not used by Hercule (needed for BB1280, see driver)
 //--------------------------------------------------------------------------
-void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
+void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
    for(ii = 0; ii <= 10 ; ii++)
    {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_ENABLE_SERIAL_EXPTIME_CMD_ADD);
    }
 }

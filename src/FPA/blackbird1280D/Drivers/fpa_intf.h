@@ -255,12 +255,8 @@ void FPA_ClearErr(const t_FpaIntf *ptrA);
 //pour configurer le bloc FPA_interface et le lancer
 void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs); 
 
-// Pour configurer la résolution de frame du proxy d'SCD
-void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
-void FPA_iddca_rdy(t_FpaIntf *ptrA, bool state);
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state);
-void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 
+void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 
 //pour configurer la résolution de frame
 void FPA_SetFrameResolution(t_FpaIntf *ptrA);

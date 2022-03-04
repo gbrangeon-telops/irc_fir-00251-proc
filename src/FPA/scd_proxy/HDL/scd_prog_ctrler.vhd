@@ -124,11 +124,11 @@ architecture rtl of scd_prog_ctrler is
    signal proxy_static_done         : std_logic;
    signal id_cmd_in_err             : std_logic_vector(7 downto 0);
    signal need_prog_rqst            : std_logic;
-   signal bb1280_iddca_rdy_i        : std_logic := '0'; 
-   signal ignore_exptime_cmd        : std_logic := '0';
-   signal failure_resp_management   : std_logic := '0';
+   signal enable_serdes_init        : std_logic := '0'; 
+   signal enable_serial_exptime_cmd        : std_logic := '0';
+   signal enable_failure_resp_management   : std_logic := '0';
    
-   
+         
    
    
 
@@ -172,7 +172,7 @@ begin
    FPA_INTF_CFG     <= fpa_intf_cfg_i;  -- sortie de la config
    RST_CLINK_N      <= reset_clink_n;
    INT_TIME         <= int_time_i; 
-   FAILURE_RESP_MNG <= failure_resp_management;
+   FAILURE_RESP_MNG <= enable_failure_resp_management;
     
                   
    FPA_DRIVER_STAT(31 downto 16) <= (others => '0');
@@ -211,7 +211,7 @@ begin
          else                  
             PROXY_PWR <= FPA_POWER; 
             fpa_powered <= PROXY_POWERED and PROXY_RDY;  -- PROXY_POWERED signifie que le proxy est juste allumé. PROXY_RDY signifie qu'au moins une réponse a été reçue avec succès.              
-            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done and bb1280_iddca_rdy_i;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
+            reset_clink_n <= PROXY_POWERED and PROXY_RDY and proxy_static_done and enable_serdes_init;  -- il faut que le module clink soit en reset tant que le proxy n'est pas prêt
          end if;          
       end if;
    end process;
@@ -234,9 +234,9 @@ begin
             user_cfg_in_progress_i <= USER_CFG_IN_PROGRESS;  -- user_cfg_in_progress_i est requis pour une sychro parfaite avec new_fpa_word
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
             user_cfg_in_progress_last <= user_cfg_in_progress_i;
-            bb1280_iddca_rdy_i <= USER_CFG.bb1280_iddca_rdy;
-            ignore_exptime_cmd <= USER_CFG.ignore_exptime_cmd;
-            failure_resp_management <= USER_CFG.failure_resp_management;
+            enable_serdes_init <= USER_CFG.enable_serdes_init;
+            enable_serial_exptime_cmd <= USER_CFG.enable_serial_exptime_cmd;
+            enable_failure_resp_management <= USER_CFG.enable_failure_resp_management;
             
            -- on retient les champs de la config qui requierent une programmation du détecteur
             -- config entrante synchronisé sur l'horloge local
@@ -267,7 +267,7 @@ begin
                   end if;
                
                when check_cfg_st3 =>
-                  if new_cfg.scd_int /= present_cfg.scd_int and ignore_exptime_cmd = '0' then
+                  if new_cfg.scd_int /= present_cfg.scd_int and enable_serial_exptime_cmd = '1' then
                      new_cfg_pending_fsm <= new_int_cfg_st;					 
                   else
                      new_cfg_pending_fsm <= check_cfg_st4;  

@@ -513,7 +513,7 @@ void Acquisition_SM()
          break;
          
       case ACQ_WAITING_FOR_SENSOR_TEMP:
-         sensorTemp = FPA_GetTemperature(&gFpaIntf);
+            sensorTemp = FPA_GetTemperature(&gFpaIntf);
 
          #ifdef SIM
          sensorTemp = FPA_COOLER_TEMP_THRES - 100;
@@ -600,7 +600,7 @@ void Acquisition_SM()
                         FPA_Specific_Init_SM(&gFpaIntf, &gcRegsData, true);
                         acquisitionState = ACQ_WAIT_SCD_SPECIFIC_INIT_SEQ;
                      #else
-                  acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
+                        acquisitionState = ACQ_WAITING_FOR_FPA_INIT;
                      #endif
                }
             }
@@ -618,9 +618,9 @@ void Acquisition_SM()
                ACQ_INF("Sensor initialized in %dms.", elapsed_time_us(tic_fpaInitTimeout) / 1000);
                acquisitionState = ACQ_FINALIZE_POWER_ON;
 
-                     #ifdef SCD_PROXY
-                        FPA_IgnoreExposureTimeCMD(&gFpaIntf, false);
-                     #endif
+               #ifdef SCD_PROXY
+                  FPA_EnableSerialExposureTimeCMD(&gFpaIntf, true);
+               #endif
             }
             else
             {

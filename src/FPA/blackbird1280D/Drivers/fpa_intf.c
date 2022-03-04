@@ -128,9 +128,9 @@ static const uint8_t Scd_DiodeBiasValues[] = {
 #define AW_FPA_SCD_FRAME_RES_ADD          0xA0
 
 // adresse d'ecriture du registre signifiant que l'IDDCA est prêt pour démarrer l'intialisation des SERDES (temperature du fpa en régime permanent et configuration initiale complétée)
-#define AW_FPA_SCD_IDDC_RDY_ADD                          0xA4
-#define AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD           0xA8
-#define AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD                0xAC
+#define AW_FPA_SCD_ENABLE_SERDES_INIT_ADD                0xA4
+#define AW_FPA_SCD_ENABLE_FAILURE_RESP_MANAGEMENT_ADD    0xA8
+#define AW_FPA_SCD_ENABLE_SERIAL_EXPTIME_CMD_ADD         0xAC
 
 // adresse d'ecriture du signal declencant la lecture de temperature
 #define AW_TEMP_READ_NUM_ADD              0xD0
@@ -233,11 +233,11 @@ typedef struct s_FpaPrivateStatus t_FpaPrivateStatus;
 t_FpaPrivateStatus gPrivateStat;
 uint8_t FPA_StretchAcqTrig = 0;
 float gFpaPeriodMinMargin = 0.0F;
-uint32_t sw_init_done = 0;
-uint32_t sw_init_success = 0;
-float gIntg_dly = 0.0F;
-float gFr_dly = 0.0F;
-bool gFpaInit;
+static uint32_t sw_init_done = 0;
+static uint32_t sw_init_success = 0;
+static float gIntg_dly = 0.0F;
+static float gFr_dly = 0.0F;
+static bool gFpaInit;
 
 // Prototypes fonctions internes
 void FPA_SoftwType(const t_FpaIntf *ptrA);
@@ -255,6 +255,9 @@ void FPA_SendCmdPacket(ScdPacketTx_t *ptrE, const t_FpaIntf *ptrA);
 void FPA_Reset(const t_FpaIntf *ptrA);
 float FPA_ConvertSecondToFrameTimeResolution(float seconds);
 void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA);
+void FPA_EnableFailureResponseManagement(t_FpaIntf *ptrA, bool state);
+void FPA_EnableSerdesInit(t_FpaIntf *ptrA, bool state);
+void FPA_ConfigureFrameResolution(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs);
 
 //--------------------------------------------------------------------------
 // pour initialiser le module vhd avec les bons parametres de départ
@@ -268,9 +271,9 @@ void FPA_Init(t_FpaStatus *Stat, t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs)
    FPA_Reset(ptrA);                                                         // on fait un reset du module FPA. 
    FPA_ClearErr(ptrA);                                                      // effacement des erreurs non valides SCD Detector   
    FPA_SoftwType(ptrA);                                                     // dit au VHD quel type de roiC de fpa le pilote en C est conçu pour.
-   FPA_IgnoreExposureTimeCMD(ptrA, true);                                   // On ignore toutes commandes de temps d'exposition tant que le fpa n'est bien initialisé.
-   FPA_iddca_rdy(ptrA, false);
-   FPA_TurnOnProxyFailureResponseManagement(ptrA, false);
+   FPA_EnableSerialExposureTimeCMD(ptrA, false);                            // On ignore toutes commandes de temps d'exposition tant que le fpa n'est bien initialisé.
+   FPA_EnableSerdesInit(ptrA, false);
+   FPA_EnableFailureResponseManagement(ptrA, false);
    FPA_GetPrivateStatus(&gPrivateStat, ptrA);
    FPA_GetTemperature(ptrA);
    FPA_SendConfigGC(ptrA, pGCRegs);                                         // commande par defaut envoyée au vhd qui le stock dans une RAM. Il attendra l'allumage du proxy pour le programmer
@@ -1023,38 +1026,38 @@ void FPA_GetPrivateStatus(t_FpaPrivateStatus *PrivateStat, const t_FpaIntf *ptrA
 //---------------------------------------------------------------------------------------------------------------
 // pour signifier au vhdl que le détecteur est prêt et que la procédure d'initialisation des SERDES peut démarrer.
 //---------------------------------------------------------------------------------------------------------------
-void  FPA_iddca_rdy(t_FpaIntf *ptrA, bool state)
+void  FPA_EnableSerdesInit(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
 
   for(ii = 0; ii <= 10 ; ii++)
   {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IDDC_RDY_ADD);
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_ENABLE_SERDES_INIT_ADD);
   }
 }
 
 //---------------------------------------------------------------------------------------------------------------
 // pour activer/désactiver la gestion des erreurs retournés par le proxy. 
 //---------------------------------------------------------------------------------------------------------------
-void FPA_TurnOnProxyFailureResponseManagement(t_FpaIntf *ptrA, bool state)
+void FPA_EnableFailureResponseManagement(t_FpaIntf *ptrA, bool state)
 {
    uint8_t ii;
    for(ii = 0; ii <= 10 ; ii++)
    {
-      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_FAILURE_RESP_MANAGEMENT_ADD);
+      AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_ENABLE_FAILURE_RESP_MANAGEMENT_ADD);
    }
 }
 
 //---------------------------------------------------------------------------------------------------------------
 // pour empêcher toutes commande de temps d'exposition
 //---------------------------------------------------------------------------------------------------------------
-void  FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
+void  FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state)
 {
   uint8_t ii;
 
   for(ii = 0; ii <= 10 ; ii++)
   {
-     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_IGNORE_EXPTIME_CMD_ADD);
+     AXI4L_write32((uint32_t)state, ptrA->ADD + AW_FPA_SCD_ENABLE_SERIAL_EXPTIME_CMD_ADD);
   }
 }
 
@@ -1068,7 +1071,7 @@ void  FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state)
 //   4. At least one operational command should be sent when the fpa temperature setpoint as been reach.
 //   5. The SERDES initialization should be done after the fpa temperature as reach steady state.
 //   6. Minimum integration time have to be set during the serdes initialization.
-//      If not, the procedure will fail because of well saturation at ambient temperature.
+//      If not, the procedure may fail because of well saturation at ambient temperature.
 //--------------------------------------------------------------------------
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
 {
@@ -1113,8 +1116,8 @@ bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run)
       case START_SERDES_INITIALIZATION:
          if(elapsed_time_us(tic_delay) > SEND_CONFIG_DELAY)
          {
-            FPA_iddca_rdy(ptrA, true);
-            FPA_TurnOnProxyFailureResponseManagement(ptrA, true);
+            FPA_EnableSerdesInit(ptrA, true);
+            FPA_EnableFailureResponseManagement(ptrA, true);
             proxy_init_status = true;
             fpaInitState = IDLE;
          }

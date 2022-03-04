@@ -282,7 +282,7 @@ void  FPA_PowerDown(const t_FpaIntf *ptrA);
 bool FPA_Specific_Init_SM(t_FpaIntf *ptrA, gcRegistersData_t *pGCRegs, bool run);
 
 // pour désactiver l'envoi de commande de temps d'intégration
-void FPA_IgnoreExposureTimeCMD(t_FpaIntf *ptrA, bool state);
+void FPA_EnableSerialExposureTimeCMD(t_FpaIntf *ptrA, bool state);
 
 
 #endif // __FPA_INTF_H__

@@ -64,7 +64,7 @@ entity scd_serial_module is
       
       READOUT               : in std_logic; 
       
-      FAILURE_RESP_MNG      : in std_logic  -- Étrangement, le proxy répond  des failure responses lors de l'envoi de commdande OP tant que l'IDDC n'a pas atteint sa température de consigne (on veut pouvoir les ignorer). 
+      FAILURE_RESP_MNG      : in std_logic  
       
       );
 end scd_serial_module;
