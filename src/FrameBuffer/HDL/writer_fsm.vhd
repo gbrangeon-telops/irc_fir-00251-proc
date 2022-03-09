@@ -418,7 +418,7 @@ begin
                      if s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tvalid = '1' and s2mm_miso_pipe(NB_PIPE_STAGE-1) = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tlast = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tid(0) = '0' then
                         wr_next_incoming_frame <= '0';
                         -- Gestion du cas ou il n'y a aucune pause entre la fin d'un frame et l'envoi du hder du frame suivant (ce cas peut arriver en IWR).
-                        if sof_last = '1' and done = '1' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and (not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' and s2mm_err_o = "000"  then
+                        if (sof_i = '1' or sof_last = '1') and done = '1' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and (not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' and s2mm_err_o = "000"  then
                            fall_i                 <= '0'; 
                            mask_tlast             <= '1'; 
                            switch_sm              <= wr_st;  
