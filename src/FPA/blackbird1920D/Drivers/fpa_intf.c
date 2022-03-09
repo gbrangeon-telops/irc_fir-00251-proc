@@ -125,7 +125,7 @@
 
 #define VHD_CLK_100M_RATE_HZ               100E+6F 
 
-#define OP_CMD_IWR_FRAME_DLY_DEFAULT       200E-6F // "Frame read delay" parameter, in seconds
+#define OP_CMD_IWR_FRAME_DLY_DEFAULT       2E-6F // "Frame read delay" parameter, in seconds
 #define OP_CMD_IWR_INTG_DLY_DEFAULT        1E-6F  // "Integration delay" parameter, in seconds
 #define OP_CMD_ITR_INTG_DLY_DEFAULT        1E-6F // "Integration delay" parameter, in seconds
 
@@ -133,8 +133,9 @@
 // Les performances du détecteur ne suivent pas le modèle du frame rate calculator de SCD (ex : le détecteur est barré a 114Hz en plein fenêtre).
 // En d'autre mots, le détecteur commence à ignorer des trigs pour des frame rates inférieurs aux prédictions du modèle du frame rate calculator de SCD (validées par des mesures).
 // Ce facteur d'ajustement vient corriger le modèle pour être à l'intérieur des performances réelles observées.
-#define MODEL_CORR_FACTOR                  1.105F
-
+#define MODEL_FR_CORR_FACTOR_ITR                  1.105F
+#define MODEL_FR_CORR_FACTOR_IWR                  1.114F
+#define MODEL_EXPTIME_CORR_FACTOR_IWR_US          300E-6F // in us
 
 // La résolution maximale supportée par le vhdl est 44 (0.63us).
 #define FRAME_RESOLUTION_DEFAULT           7  // 0.1us
@@ -467,22 +468,24 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     * Si vid_if_bit_en = 1,  il faut se référer à la figure 13 du document atlasdatasheet2.17ext.pdf (ctrl bits = 0x3 en frame read idle)
     * Si vid_if_bit_en = 0,  il faut se référer à la figure 3 de l'appendix F du document DXU_0003_1.pdf (ctrl bits = 0x0 en frame read idle)
    */
-   ptrA->vid_if_bit_en = 1;
+   ptrA->vid_if_bit_en  = 1;
 
-   ptrA->fpa_pwr_on  = 1;    // allumage du détecteur, le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
+   ptrA->fpa_pwr_on     = 1;     // allumage du détecteur, le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
+   ptrA->op_binning     = 0;     // binning ou non
+   ptrA->op_output_rate = 3;     // vitesse de sortie : full rate (2 simultaneous lines)
+   ptrA->op_frm_res     = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2 et la résolution maximale supportée par le vhdl est 44 (0.63us).
+
    
    // Frame time calculation : define the maximum trig frequency allowed by the proxy for this set of operational parameters.
    fpaAcquisitionFrameRate    = pGCRegs->AcquisitionFrameRate/(1.0F - gFpaPeriodMinMargin); //on enleve la marge artificielle pour retrouver la vitesse reelle du detecteur
    frame_period               = 1.0F/MAX(SCD_MIN_OPER_FPS, fpaAcquisitionFrameRate);
 
-   // config du contrôleur pour les acq trigs (il est sur l'horloge de 100MHz)
    if ((pGCRegs->IntegrationMode == IM_IntegrateThenRead) || (ptrA->fpa_diag_mode == 1)) {
       if(gFpaDebugRegH != 0)
          gIntg_dly = (float)gFpaDebugRegH/1E+6F;
       else
          gIntg_dly =  OP_CMD_ITR_INTG_DLY_DEFAULT;
 
-      // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
       FPA_SpecificParams(&hh, 0.0F, pGCRegs);
 
       if(gFpaDebugRegG != 0){
@@ -507,16 +510,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       else
          gFr_dly = OP_CMD_IWR_FRAME_DLY_DEFAULT;
 
-      // on appelle les fonctions pour bâtir les parametres specifiques du bb1920D
       FPA_SpecificParams(&hh, 0.0F, pGCRegs);
 
       ptrA->op_int_mode = IWR_MODE;
       ptrA->op_gain = (uint32_t)LOW_GAIN;
    }
 
-   ptrA->op_frame_time = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(frame_period);
-   // La période réelle configuré dans le ROIC doit être légèrement inférieure à celle des trigs générés.
-   ptrA->op_frame_time = ptrA->op_frame_time - 3;
+   ptrA->frame_dly_cst   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gFr_dly);
+   ptrA->int_dly_cst     = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gIntg_dly);
+   ptrA->op_frame_time   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(frame_period);
+   ptrA->op_frame_time   = ptrA->op_frame_time - 3; // La période réelle configuré dans le ROIC doit être légèrement inférieure à celle des trigs générés.
 
    // config du contrôleur pour les acq_trigs (il est sur l'horloge de 100MHz)
    ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
@@ -550,18 +553,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->aoi_flag2_sol_pos         = (uint32_t)FPA_WIDTH_MAX/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
    ptrA->aoi_flag2_eol_pos         = (uint32_t)FPA_WIDTH_MAX/4;
       
-   //------------------------------------------
-   // diag Telops                            
-   //------------------------------------------
-
-   ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au même moment
-   ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
-   ptrA->diag_lovh_mclk_source           = 287;                                   // à reviser si necessaire
-   ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag   
-   ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset 
-   //-----------------------------------------
-   // op : cmd structurelle
-   //-----------------------------------------   
    //  parametres de la commandde opérationnelle
    ptrA->op_xstart  = 0;    
    ptrA->op_ystart  = pGCRegs->OffsetY/4;      // parametre strow à la page p.20 de atlascmd_datasheet2.17   
@@ -596,13 +587,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if(ptrA->op_mtx_int_low > 0xD) //Protection, car 0xE et 0xF sont des valeurs interdites
       ptrA->op_mtx_int_low = 0xD;
 
-   // binning ou non
-   ptrA->op_binning = 0;
-   
-   // vitesse de sortie
-   ptrA->op_output_rate = 3; // full rate (2 simultaneous lines)
+   //Test pattern Telops
+   ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au même moment
+   ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
+   ptrA->diag_lovh_mclk_source           = 287;                                   // à reviser si necessaire
+   ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
+   ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset
 
-   ptrA->op_frm_res   = FRAME_RESOLUTION_DEFAULT;  // valeur minimale est de 2 et la résolution maximale supportée par le vhdl est 44 (0.63us).
+   // Test pattern manufacturier
 
    ptrA->op_frm_dat   = 0;                     // parametre frm_dat à la page p.21 de atlascmd_datasheet2.17
    if ((pGCRegs->TestImageSelector == TIS_ManufacturerStaticImage1) ||
@@ -628,8 +620,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->int_cmd_eof_add                 = ptrA->int_cmd_sof_add + ptrA->outgoing_com_ovh_len + ptrA->int_cmd_dlen;
    ptrA->int_cmd_sof_add_m1              = ptrA->int_cmd_sof_add - 1;
    ptrA->int_checksum_add                = ptrA->int_cmd_eof_add;
-   ptrA->frame_dly_cst                   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gFr_dly);                             // Frame Read delay = integration_time + frame_dly_cst. C'est le delai referé à FSYNC pour la sortie des données
-   ptrA->int_dly_cst                     = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gIntg_dly);
 
    //-----------------------------------------
    // op : cmd serielle
@@ -746,21 +736,20 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
 
    ptrH->Frame_Initialization  = ptrH->Frame_read_Init_1 + ptrH->Frame_read_Init_2 + ptrH->Frame_read_Init_3;
    ptrH->pixel_control_time    = 2* ptrH->Pixel_Reset + ptrH->Pixel_Sample + 10.0F;
-   ptrH->Frame_Time = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_CORR_FACTOR; // en seconde
 
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead){
+      ptrH->Frame_Time = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_FR_CORR_FACTOR_ITR; // en seconde
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
       ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->Frame_Time + ptrH->x_to_next_fsync;
    }
    else{
+      ptrH->Frame_Time = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_FR_CORR_FACTOR_IWR; // en seconde
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
       ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->Frame_Time, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
    }
 }
 
-/* Cette fonction calcule le frame rate maximal associé à une configuration donnée.
- * Le FRmax varie en fonction du height et du exposure time.
- */
+/* Cette fonction calcule le frame rate maximal associé à une configuration donnée. */
 float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
 {
    float fr_max;
@@ -774,12 +763,11 @@ float FPA_MaxFrameRate(const gcRegistersData_t *pGCRegs)
    return fr_max;
 }
 
-/* Cette fonction calcule le exposure time associé à une configuration donnée.
- * Le ETmax varie en fonction du frame rate, du height et du mode d'intégration.
- */
+/* Cette fonction calcule le exposure time associé à une configuration donnée. */
 float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
 {
-   float maxExposure_us, periodMinWithNullExposure, Ta;
+   float maxExposure_us, periodMinWithNullExposure;
+   float Ta = 0.0F;
    float operatingPeriod, fpaAcquisitionFrameRate;
    bb1920D_param_t hh;
 
@@ -790,7 +778,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
 
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
-      Ta = (hh.fr_dly + hh.Frame_Time) - hh.intg_dly;
+      Ta = ((hh.fr_dly + hh.Frame_Time) - hh.intg_dly)- MODEL_EXPTIME_CORR_FACTOR_IWR_US;
       if (Ta > 0)
          maxExposure_us = maxExposure_us + Ta*1E6F;
    }
