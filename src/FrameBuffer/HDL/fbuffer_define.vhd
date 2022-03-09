@@ -29,6 +29,9 @@ package fbuffer_define is
       
    constant STREAM_PIXEL_WIDTH   : integer := 4; -- Pixel stream width (TDATA = 64 bits)
    constant NB_PIPE_STAGE : integer := 2; -- Writer_sm : number of input pipe stages
+   constant RD_NB_CMD_QUEUE : integer := 2; -- Writer_sm : number of input pipe stages
+
+   
    
    -- CLINK FULL throughtput limit is 4*85M*(Line_Width/(Line_Width+LVAL_PAUSE)), Where LVAL_PAUSE = 4 for clink slow mode  
    constant LVAL_PAUSE    : unsigned(31 downto 0) := to_unsigned(4,32);

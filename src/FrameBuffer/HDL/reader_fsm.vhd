@@ -120,8 +120,11 @@ end component;
    signal lval_cnt                   : unsigned(31 downto 0);
    signal fval_cnt                   : unsigned(31 downto 0);
    signal width                      : unsigned(31 downto 0);                                                                    
-     
-   signal stall_i                    : std_logic;
+   signal cmd_cnt                    : unsigned(31 downto 0); 
+                                    
+   signal mm2s_cmd_tvalid_last       : std_logic; 
+   signal stall_i                    : std_logic; 
+   signal discard_cmd                : std_logic;
    signal mm2s_cmd_mosi              : t_axi4_stream_mosi_cmd32;
    signal mm2s_cmd_miso              : t_axi4_stream_miso;
    signal mm2s_sts_mosi              : t_axi4_stream_mosi_status;
@@ -160,7 +163,6 @@ begin
    -- I/O Connections assignments
    areset_i                       <= not ARESETN; 
    ERROR                          <= mm2s_err_o;
-   fb_cfg_i                       <= FB_CFG;
 
    mm2s_sts_mosi                  <= AXIS_MM2S_STS_MOSI;
    AXIS_MM2S_STS_MISO             <= mm2s_sts_miso;
@@ -212,27 +214,42 @@ begin
    generic map (INIT_VALUE => '0')
    port map(D => FLUSH, Q => flush_i, RESET => sreset, CLK => CLK ); 
    
+   
    -- This process update the next read buffer status
-   U2 : process(CLK)        
+   U2A : process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
             next_read_buffer_sync <= buf_sts_default;
          else    
            
-            if flush_i = '1' then
+            if flush_i = '1' then 
                next_read_buffer_sync <= buf_sts_default;     
             elsif next_read_buffer_valid = '1' then 
                next_read_buffer_sync <= NEXT_RD_BUFFER;
-            else
+            else  
                next_read_buffer_sync <= next_read_buffer_sync;
             end if;
          end if;     
       end if;
    end process;  
    
+    -- This process update the ublaze config.
+   U2B : process(CLK)        
+   begin
+      if rising_edge(CLK) then
+         if flush_i = '1' then 
+            fb_cfg_i <= FB_CFG;     
+         else  
+            fb_cfg_i <= fb_cfg_i;
+         end if;    
+      end if;
+   end process;  
+   
+   
+   
    -- This process update the current write buffer status 
-   U3 : process(CLK)        
+   U2C : process(CLK)        
    begin
       if rising_edge(CLK) then
          if sreset = '1' then
@@ -248,7 +265,46 @@ begin
          end if;     
       end if;
    end process;
+  
    
+      
+   U3 : process(CLK)        
+   begin
+      if rising_edge(CLK) then
+         if sreset = '1' then
+            cmd_cnt <= (others => '0'); 
+            read_in_progress <= '0'; 
+            mm2s_cmd_tvalid_last <= '1';
+            discard_cmd <= '0';
+         else    
+            
+            mm2s_cmd_tvalid_last <= mm2s_cmd_mosi.tvalid;
+            
+            if mm2s_cmd_mosi.tvalid = '1' and mm2s_cmd_tvalid_last = '0' and axis_output_fifo_in_miso.tready = '1' and axis_output_fifo_in_mosi.TVALID = '1' and axis_output_fifo_in_mosi.TLAST = '1'  and axis_output_fifo_in_mosi.TID(0) = '0' then
+               cmd_cnt <= cmd_cnt;
+            elsif mm2s_cmd_mosi.tvalid = '1' and mm2s_cmd_tvalid_last = '0' then
+               cmd_cnt <= cmd_cnt + 1;     
+            elsif axis_output_fifo_in_miso.tready = '1' and axis_output_fifo_in_mosi.TVALID = '1' and axis_output_fifo_in_mosi.TLAST = '1' and axis_output_fifo_in_mosi.TID(0) = '0' then
+               cmd_cnt <= cmd_cnt - 1;     
+            end if;  
+            
+            if cmd_cnt > 0 then
+               read_in_progress <= '1';
+            else
+               read_in_progress <= '0';
+            end if;
+            
+            if cmd_cnt > (RD_NB_CMD_QUEUE - 1) then
+               discard_cmd <= '1';
+            else
+               discard_cmd <= '0';
+            end if;
+            
+            
+         end if;     
+      end if;
+   end process;
+
    -- This process manage the command & status interface of the data mover
    U4: process(CLK)
    begin
@@ -262,7 +318,6 @@ begin
             mm2s_sts_miso.tready   <= '0';
             fval_cnt               <= (others => '0');
             current_read_buffer    <=  buf_sts_default;
-            read_in_progress       <= '0';
             mm2s_err_o(2 downto 0) <= (others =>'0');
          else
             
@@ -272,9 +327,7 @@ begin
             
             case reader_sm is 
                when standby_rd => 
-                  read_in_progress <= '0';
-                  if (next_read_buffer_sync.tag /= "00") and (current_read_buffer.tag /= next_read_buffer_sync.tag) and next_read_buffer_valid = '0' and current_write_buffer_valid = '0' and cfg_update_pending_i = '0' then  
-                     read_in_progress          <= '1';
+                  if (next_read_buffer_sync.tag /= "00") and (current_read_buffer.tag /= next_read_buffer_sync.tag) and next_read_buffer_valid = '0' and current_write_buffer_valid = '0' and cfg_update_pending_i = '0' and discard_cmd = '0' then  
                      current_read_buffer.pbuf  <= next_read_buffer_sync.pbuf;
                      current_read_buffer.tag   <= next_read_buffer_sync.tag;
                      current_read_buffer.valid <= '1';

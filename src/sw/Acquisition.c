@@ -357,7 +357,7 @@ void Acquisition_SM()
          break;
 
       case ACQ_SENSOR_READY:
-         if (gcRegsData.AcquisitionStart)
+         if (gcRegsData.AcquisitionStart && FB_isFrameBufferReady(&gFB_ctrl))
          {
             GC_SetAcquisitionStart(0);
 
@@ -717,9 +717,10 @@ void Acquisition_SM()
 
       case ACQ_WAIT_SCD_TRIG_MODE_TRANSITION:
          #ifdef SCD_PROXY
-            /* PelicanD & HerculeD : after setting the xtra_trig mode, it is required to observe a delay of
+            /* After setting the xtra_trig mode, it is required to observe a delay of
              * at least 1/SCD_XTRA_TRIG_FREQ_MAX_HZ ms before generating a prog_trig.
              * Otherwise the detector VHD module may crash unexpectedly.
+             * This mechanism was necessary for PelicanD & HerculeD but is also used for BB1280 & BB1920.
             */
             if(TimedOut(&trig_mode_transition_timer) && !gWaitingForFilterWheel)
             {

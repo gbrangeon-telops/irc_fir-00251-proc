@@ -105,8 +105,7 @@ typedef struct s_FrameBufferStatus t_FrameBufferStatus;
 
 IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs);
 void FB_SendConfigGC( t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs);
-bool FB_isFrameBufferReady(t_FB *pFB_ctrl);
 t_FrameBufferStatus FB_getStatusAndErrors(t_FB *pFB_ctrl);
-
+bool FB_isFrameBufferReady(t_FB *pFB_ctrl);
 
 #endif

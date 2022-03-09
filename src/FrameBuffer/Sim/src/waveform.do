@@ -16,6 +16,16 @@ add wave -noreg -logic {}
 
 
 add wave -named_row "------------------------writer-------------------------------------" 
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_data_mosi_pipe} 
+add wave -noreg -logic {/Top/U2/g0/U6/s2mm_err_o}
+add wave -noreg -logic {/Top/U2/g0/U6/ERROR}
+add wave -noreg -logic {/Top/U2/g0/U6/mask_tlast}
+add wave -noreg -logic {/Top/U2/g0/U6/fall_i}
+add wave -noreg -logic {/Top/U2/g0/U6/user_cfg_dval}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MISO}
+add wave -noreg -logic {}
+add wave -noreg -logic {}
+
 add wave -noreg -logic {/Top/U1/CLK_DIN} 	 
 add wave -noreg -logic {/Top/U2/g0/U6/ARESETN}
 add wave -noreg -logic {/Top/U2/g0/U6/switch_sm} 
@@ -107,8 +117,12 @@ add wave -noreg -logic {/Top/U2/g0/U5/mm2s_btt}
 add wave -noreg -logic {/Top/U2/g0/U5/mm2s_tag}	
 add wave -noreg -logic {/Top/U2/g0/U5/read_in_progress}	 
 add wave -noreg -logic {/Top/U2/g0/U5/cfg_update_pending_i}
+add wave -noreg -logic {/Top/U2/g0/U5/cmd_cnt}
+add wave -noreg -logic {/Top/U2/g0/U5/FB_CFG}
+add wave -noreg -logic {/Top/U2/g0/U5/fb_cfg_i}
+add wave -noreg -logic {/Top/U2/g0/U5/discard_cmd}
 add wave -noreg -logic {}
-add wave -noreg -logic {}	
+add wave -noreg -logic {}
 add wave -noreg -logic {/Top/U2/g0/U5/done} 
 add wave -noreg -logic {/top/U2/g0/U5/eof}
 
@@ -178,8 +192,7 @@ add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TID}
 add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MISO.TREADY}	  
   
   
-add wave -noreg -logic {/Top/U2/g0/U6/s2mm_data_mosi_pipe} 
-add wave -noreg -logic {}
+
 add wave -noreg -logic {}
 add wave -noreg -logic {}
 add wave -noreg -logic {} 
@@ -197,41 +210,16 @@ add wave -noreg -logic {}
 add wave -noreg -logic {}
 add wave -noreg -logic {}
  
-add wave -named_row "buffer manager intf"
-add wave -noreg -logic {/Top/U2/g0/U5/throttler_sm}
-add wave -noreg -logic {/Top/U2/g0/U5/cnt}
-add wave -noreg -logic {}
-add wave -noreg -logic {}
-add wave -noreg -logic {}
 
-add wave -named_row "--------------------------BUFFER MANAGER ----------------------------------"
-add wave -noreg -logic {/top/U2/g0/U3/USER_CFG}
-add wave -noreg -logic {/Top/U2/g0/U3/init_cfg_done} 
-add wave -noreg -logic {/Top/U2/g0/U2/cfg_updater_sm}
-add wave -noreg -logic /Top/U2/g0/U2/reader_rqst{}
-add wave -noreg -logic {/Top/U2/g0/U2/writer_rqst}
-add wave -noreg -logic {/Top/U2/g0/U2/wr_buffer_status_i}
-add wave -noreg -logic {/Top/U2/g0/U2/rd_buffer_status_i}
-add wave -noreg -logic {/Top/U2/g0/U2/wr_sts_ack_i}
-add wave -noreg -logic {/Top/U2/U2/rd_sts_ack_i}
-add wave -noreg -logic {/Top/U2/g0/U2/wr_sts_ack_o}
-add wave -noreg -logic {/Top/U2/g0/U2/rd_sts_ack_o}
-add wave -noreg -logic {/Top/U2/g0/U2/flush_i}
-add wave -noreg -logic {/Top/U2/g0/U2/buffer_full_sts}
-add wave -noreg -logic {/Top/U2/g0/U2/reader_done_i}
-add wave -noreg -logic {/Top/U2/g0/U2/writer_done_i}
-add wave -noreg -logic {/Top/U2/g0/U2/cfg_updater_rqst}
-add wave -noreg -logic {/Top/U2/g0/U2/init_cfg_done}
-add wave -noreg -logic {/Top/U2/g0/U2/cfg_update_done}
 
-add wave -noreg -logic {/Top/U2/g0/U2/reader_rqst_sm} 
-add wave -noreg -logic {/Top/U2/g0/U2/reader_rqst_latch}
-
-add wave -noreg -logic {/Top/U2/g0/U2/writer_rqst_sm}
-add wave -noreg -logic {/Top/U2/g0/U2/writer_rqst_latch}
-add wave -noreg -logic {/Top/U2/g0/U2/reader_rqst_latch_o}
+add wave -named_row "--------------------------STIM----------------------------------"
+add wave -noreg -logic {/Top/U1/cfg_i}
+add wave -noreg -logic {/Top/U1/frame_size_i}
+add wave -noreg -logic {/Top/U1/frame_height_i}
+add wave -noreg -logic {/Top/U1/frame_width_i} 
 add wave -noreg -logic {}
-add wave -noreg -logic {/Top/U2/g0/U2/next_rd_buffer}
+add wave -noreg -logic {}
+add wave -noreg -logic {} 
 
 add wave -named_row "--------------------------uBlaze intf ----------------------------------"
 
@@ -251,10 +239,5 @@ add wave -noreg -logic {/Top/U3/AXI_BRAM_MOSI}
 add wave -noreg -logic {/Top/U3/AXI_BRAM_MISO}
 
   
-add wave -named_row "reader" 
-wave /top/U2/g0U5/* 
- add wave -named_row "writer" 
-wave /top/U2/g0U6/* 
-add wave -named_row "manager" 
-wave /top/U2/g0U2/* 
+ 
 transcript on

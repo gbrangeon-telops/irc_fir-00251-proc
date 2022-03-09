@@ -127,7 +127,9 @@ architecture writer_fsm of writer_fsm is
    signal init_cfg_done                  : std_logic;
    signal cfg_update_done                : std_logic;
    signal cfg_update_done_last           : std_logic;
-   signal fall_i                         : std_logic;
+   signal fall_i                         : std_logic; 
+   signal s2mm_miso_pipe                 : std_logic_vector(NB_PIPE_STAGE-1 downto 0);
+   signal user_cfg_dval                  : std_logic;
    signal cnt                            : unsigned(3 downto 0);
     
    type cfg_updater_sm_type is (idle_st, wait_empty_fb_st, cfg_updater_rqst_st); 
@@ -180,6 +182,10 @@ begin
    U1B: double_sync
    generic map (INIT_VALUE => '0')
    port map(D => RD_IN_PROGRESS, Q => read_in_progress, RESET => sreset, CLK => CLK ); 
+
+   U1C: double_sync
+   generic map (INIT_VALUE => '0')
+   port map(D => USER_CFG.dval, Q => user_cfg_dval, RESET => sreset, CLK => CLK ); 
    
    -- This process update the current read buffer status
    U2 : process(CLK)        
@@ -239,7 +245,7 @@ begin
                      done                       <= '1';  
                      current_write_buffer.valid <= '0';
                      
-                     if wr_next_incoming_frame = '1' and wr_next_incoming_frame_last = '0' then
+                     if  wr_next_incoming_frame = '1' and  wr_next_incoming_frame_last = '0' then
                         done                       <= '0'; 
                         current_write_buffer.pbuf  <= next_write_buffer.pbuf;
                         current_write_buffer.tag   <= next_write_buffer.tag;
@@ -309,12 +315,14 @@ begin
             
             next_read_buffer.valid     <= '0';
             
+            if flush_i = '1' then
+               next_read_buffer       <= buf_sts_default; 
+            end if;
+               
             if( s2mm_sts_mosi.tvalid = '1') then 
                      
                if(s2mm_sts_mosi.tdata(6 downto 4) /= "000") then
                   s2mm_err_o(2 downto 0) <= s2mm_sts_mosi.tdata(6 downto 4);
-               elsif flush_i = '1' then
-                  next_read_buffer       <= buf_sts_default; 
                else
                   next_read_buffer.tag <= unsigned(s2mm_sts_mosi.tdata(1 downto 0)); 
                   next_read_buffer.valid <= '1';
@@ -345,7 +353,14 @@ begin
             s2mm_data_mosi_pipe(0) <= AXIS_RX_DATA_MOSI;
             for i in 1 to NB_PIPE_STAGE-1 loop
                 s2mm_data_mosi_pipe(i) <= s2mm_data_mosi_pipe(i-1);        
-            end loop;         
+            end loop;  
+            
+            s2mm_miso_pipe(0) <= AXIS_S2MM_DATA_MISO.TREADY;
+            for i in 1 to NB_PIPE_STAGE-1 loop
+                s2mm_miso_pipe(i) <= s2mm_miso_pipe(i-1);        
+            end loop; 
+            
+           
       end if;
    end process; 
     
@@ -376,8 +391,10 @@ begin
             wr_next_incoming_frame <= '0'; 
             fall_i <= '1';
             mask_tlast <= '0';
-            sof_latch <= '0';
+            sof_last <= '0';
          else  
+            
+               sof_last <= sof_i;
             
                case switch_sm is 
                   
@@ -393,18 +410,17 @@ begin
                   when wr_st =>  
                   
                      wr_next_incoming_frame <= '1';
-                     
+
                      if s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).TID(0) = '0' then
                         mask_tlast <= '0';    
                      end if;
 
-                     if s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tvalid = '1' and AXIS_S2MM_DATA_MISO.TREADY = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tlast = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tid(0) = '0' then
+                     if s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tvalid = '1' and s2mm_miso_pipe(NB_PIPE_STAGE-1) = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tlast = '1' and s2mm_data_mosi_pipe(NB_PIPE_STAGE-1).tid(0) = '0' then
                         wr_next_incoming_frame <= '0';
                         -- Gestion du cas ou il n'y a aucune pause entre la fin d'un frame et l'envoi du hder du frame suivant (ce cas peut arriver en IWR).
-                        if sof_i = '1' and done = '1' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and (not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' and s2mm_err_o = "000"  then
+                        if sof_last = '1' and done = '1' and (current_read_buffer_sync.tag /= next_write_buffer.tag) and (not (current_read_buffer_sync.tag = "00" and current_write_buffer.tag = BUFFER_C_TAG)) and current_read_buffer_valid = '0'  and cfg_update_done = '1' and init_cfg_done = '1' and s2mm_err_o = "000"  then
                            fall_i                 <= '0'; 
-                           sof_latch              <= '0';
-                           mask_tlast             <= '1';
+                           mask_tlast             <= '1'; 
                            switch_sm              <= wr_st;  
                         else  
                            fall_i                 <= '1';
@@ -460,12 +476,12 @@ begin
             write_in_progress    <= '0';
          else              
             
-            cfg_dval_last <= USER_CFG.dval;
+            cfg_dval_last <= user_cfg_dval;
             cfg_update_done_last <= cfg_update_done;
             
             if next_read_buffer.tag = current_write_buffer.tag and done = '1' then 
                write_in_progress <= '0';
-            else
+            elsif next_read_buffer.tag /= current_write_buffer.tag and done = '0' then 
                write_in_progress <= '1';
             end if;
 
@@ -474,13 +490,13 @@ begin
                   fb_cfg_i        <= fb_cfg_i;
                   cfg_update_done <= '1';
                   flush_i         <= '0';
-                  if USER_CFG.dval = '1' and cfg_dval_last = '0' then 
+                  if user_cfg_dval = '1' and cfg_dval_last = '0' then 
                      cfg_update_done <= '0';
                      cfg_updater_sm  <= wait_empty_fb_st;    
                   end if;  
                
                when wait_empty_fb_st => 
-                  if read_in_progress = '0' and write_in_progress = '0' then 
+                  if read_in_progress = '0' and write_in_progress = '0' and user_cfg_dval = '1' then 
                      fb_cfg_i       <= USER_CFG;
                      flush_i        <= '1';
                      cnt            <= (others => '0');
@@ -490,7 +506,7 @@ begin
                when cfg_updater_rqst_st =>
                   init_cfg_done <= '1';  
                   cnt           <= cnt + 1;
-                  if cnt > 10 then 
+                  if cnt = 15 then 
                      cfg_updater_sm <= idle_st; 
                   end if;
                   

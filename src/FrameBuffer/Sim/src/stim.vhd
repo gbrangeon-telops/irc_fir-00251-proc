@@ -49,18 +49,18 @@ architecture stim of stim is
 
 ------------------- Constants definition -------------------------- 
 -- Clocks frequency 
---constant CLK85_PERIOD : time := 11.764705882352941176470588235294 ns; 
+constant CLK85_PERIOD : time := 11.764705882352941176470588235294 ns; 
 constant CLK100_PERIOD : time := 10 ns; 
---constant CLK142_5_PERIOD : time := 7.0175438596491228070175438596491 ns; 
+constant CLK142_5_PERIOD : time := 7.0175438596491228070175438596491 ns; 
 --constant CLK142_5_PERIOD : time := 10 ns; 
-constant CLK85_PERIOD : time := 100 ns; 
-constant CLK142_5_PERIOD : time := 10 ns; 
+--constant CLK85_PERIOD : time := 50 ns; 
+--constant CLK142_5_PERIOD : time := 10 ns; 
 
 --IMAGE PARAM
-constant FRAME_WIDTH : unsigned := to_unsigned(64,32);
+constant FRAME_WIDTH : unsigned := to_unsigned(16,32);
 constant FRAME_HEIGHT : unsigned := to_unsigned(4,32); --header included
 constant FRAME_SIZE : unsigned := resize(FRAME_HEIGHT * FRAME_WIDTH,32);
-constant IMG_DLY : unsigned := to_unsigned(0,32);
+constant IMG_DLY : unsigned := to_unsigned(10,32);
 constant HDR_DLY : unsigned := to_unsigned(0,32);
 constant FRAME_BYTE_SIZE    : unsigned(31 downto 0) := resize(FRAME_SIZE*2,32);
 
@@ -368,12 +368,24 @@ sim: process is
       wait for 1 us;
       transmit <= '1'; 
       
-      wait for 250 us;
-
-      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN2;
+      wait for 50 us;
+      transmit <= '0';
+      wait for 10 us;
+      
+      frame_width_i  <= resize(2*FRAME_WIDTH,32);
+      frame_size_i   <= resize(2*FRAME_SIZE,32);
+      wait for 100 ns; 
+      cfg_i.buffer_a_addr   <= resize(2*BUFFER_A_ADDR,32);
+      cfg_i.buffer_b_addr   <= resize(2*BUFFER_B_ADDR,32);
+      cfg_i.buffer_c_addr   <= resize(2*BUFFER_C_ADDR,32);
+      
+      cfg_i.frame_byte_size <= resize(2*frame_size_i,32); 
+      cfg_i.hdr_pix_size    <= resize(2*HDR_PIX_SIZE,32);
+      cfg_i.img_pix_size    <= resize(2*IMG_PIX_SIZE,32);
+      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN2; 
+      
       wait for 100 ns;   
       
-      -- flush frame buffer
       cfg_vector <= to_intf_cfg(cfg_i);  
       for ii in 0 to NB_CFG_PARAM-1 loop 
          wait until rising_edge(clk_mb_o);      
@@ -382,11 +394,50 @@ sim: process is
          write_axi_lite(clk_mb_o, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
          wait for 30 ns;
       end loop; 
+      wait for 100 ns;
+      transmit <= '1'; 
+      
+      wait for 50 us;
+      
+      
+     transmit <= '0';
+      wait for 10 us;
+      
+      frame_width_i  <= resize(4*FRAME_WIDTH,32);
+      frame_size_i   <= resize(4*FRAME_SIZE,32);
       wait for 100 ns; 
-      wait for 250 us;
-      transmit <= '0';   
-      wait for 1000 us;  
-      transmit <= '1';   
+      cfg_i.buffer_a_addr   <= resize(4*BUFFER_A_ADDR,32);
+      cfg_i.buffer_b_addr   <= resize(4*BUFFER_B_ADDR,32);
+      cfg_i.buffer_c_addr   <= resize(4*BUFFER_C_ADDR,32);
+      
+      cfg_i.frame_byte_size <= resize(2*frame_size_i,32); 
+      cfg_i.hdr_pix_size    <= resize(4*HDR_PIX_SIZE,32);
+      cfg_i.img_pix_size    <= resize(4*IMG_PIX_SIZE,32);
+      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN2; 
+--      
+--      frame_width_i  <= resize(FRAME_WIDTH,32);
+--      frame_size_i   <= resize(FRAME_SIZE,32);
+--      cfg_i.buffer_a_addr   <= BUFFER_A_ADDR;
+--      cfg_i.buffer_b_addr   <= BUFFER_B_ADDR;
+--      cfg_i.buffer_c_addr   <= BUFFER_C_ADDR;
+--      cfg_i.frame_byte_size <= FRAME_BYTE_SIZE; 
+--      cfg_i.hdr_pix_size    <= HDR_PIX_SIZE;
+--      cfg_i.img_pix_size    <= IMG_PIX_SIZE;
+--      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN;
+      
+      wait for 100 ns;   
+      
+      cfg_vector <= to_intf_cfg(cfg_i);  
+      for ii in 0 to NB_CFG_PARAM-1 loop 
+         wait until rising_edge(clk_mb_o);      
+         start_pos := cfg_vector'length -1 - 32*ii;
+         end_pos   := start_pos - 31;
+         write_axi_lite(clk_mb_o, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(cfg_vector(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+         wait for 30 ns;
+      end loop; 
+      wait for 100 ns;
+      transmit <= '1'; 
+   
       
 --
 --      
