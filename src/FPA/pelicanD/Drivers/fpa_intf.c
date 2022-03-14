@@ -543,7 +543,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    maxExposure_us = maxExposure_us/1.001F;    // cette division tient du fait que dans la formule de T0, le temps d'exposition intervient avec un facteur 1 + 0.1/100
    
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead)
-      maxExposure_us += (hh.T3 + hh.T6 + T0_CORR)*1e6F;
+      maxExposure_us += (hh.T3 + hh.T6)*1e6F;
    // Round exposure time
    maxExposure_us = floorMultiple(maxExposure_us, 0.1);
    
