@@ -199,17 +199,7 @@ begin
    begin
       ADC_CLK_INT <= not ADC_CLK_INT after ADC_CLK_PERIOD/2; 
    end process;
-   
-   -- clk
-   U4: process(ACQ_TRIG)
-   begin
-      ACQ_TRIG <= '1'; 
-   end process;
-   XTRA_TRIG <= '0';
-   
-   -- DOUT_MISO.TREADY <= '1';
-   
-   
+
    process(CLK_100M)
    begin
       if rising_edge(CLK_100M) then
@@ -326,7 +316,11 @@ begin
       --wait until rising_edge(MB_CLK); 
       ARESETN <= '1'; 
       
-      
+      wait for 350 ns;
+      ACQ_TRIG <= '1';
+      XTRA_TRIG <= '0';
+   
+   
       wait for 500 ns; 
       --      write_axi_lite (MB_CLK, resize(X"AE0",32), resize("00", 32), MB_MISO,  MB_MOSI); -- pour faire semblant d'envoyer une cfg serielle
       --      wait for 30 ns;      
@@ -376,7 +370,12 @@ begin
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;  
       
+      
+      wait for 1.5 ms;
+      ACQ_TRIG <= '0';
+      XTRA_TRIG <= '1';
       wait;
+      
 --      
 --      for ii in 0 to QWORDS_NUM-1 loop 
 --         wait until rising_edge(MB_CLK);      

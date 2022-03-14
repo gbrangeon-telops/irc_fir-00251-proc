@@ -589,7 +589,7 @@ begin
    U6A : fpa_progr_clk_div
    port map(
       ARESET         => ARESET,
-      CLK            => CLK,       -- CLK doit être connecté à INT_CLK_SOURCE)
+      CLK            => CLK,      
       PULSE          => int_clk_pulse_i,
       PULSE_PERIOD   => std_logic_vector(USER_CFG.INT_CLK_PERIOD_FACTOR)
       );

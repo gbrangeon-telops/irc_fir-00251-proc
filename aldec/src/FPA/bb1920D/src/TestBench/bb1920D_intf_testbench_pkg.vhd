@@ -134,8 +134,8 @@ package body BB1920D_intf_testbench_pkg is
       --         comn_fpa_acq_trig_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
       --      end if;   
       
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(50000, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(50000, comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(24000, comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(24000, comn_fpa_xtra_trig_ctrl_dly'length);
       comn_fpa_trig_ctrl_timeout_dly:= to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       

@@ -523,7 +523,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // config du contrôleur pour les acq_trigs (il est sur l'horloge de 100MHz)
    ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
-   ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((frame_period - (hh.intg_dly + VHD_PIPE_DLY_SEC))*(float)VHD_CLK_100M_RATE_HZ);
+   ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((frame_period - (gIntg_dly + VHD_PIPE_DLY_SEC))*(float)VHD_CLK_100M_RATE_HZ);
 
    // config du contrôleur pour les xtra trigs (il est sur l'horloge de 100MHz)
    ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
@@ -553,7 +553,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->aoi_flag2_sol_pos         = (uint32_t)FPA_WIDTH_MAX/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
    ptrA->aoi_flag2_eol_pos         = (uint32_t)FPA_WIDTH_MAX/4;
       
-   //  parametres de la commandde opérationnelle
+   //  parametres de la commande opérationnelle
    ptrA->op_xstart  = 0;    
    ptrA->op_ystart  = pGCRegs->OffsetY/4;      // parametre strow à la page p.20 de atlascmd_datasheet2.17   
    
@@ -716,8 +716,6 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->ramp2_Count                        =  190.0F; // in clks
    ptrH->fpa_intg_clk_rate_hz               =  (float)FPA_MCLK_RATE_HZ/(float)FRAME_RESOLUTION_DEFAULT;
    ptrH->int_time_offset_usec               = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
-   ptrH->fr_dly                             = gFr_dly;                                                     // in second
-   ptrH->intg_dly                           = gIntg_dly;                                                   // in second
    ptrH->exposure_time                      = exposureTime_usec*1E-6F;
    ptrH->Frame_read_Init_3                  = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
    ptrH->number_of_Columns                  = (float)FPA_WIDTH_MAX;
@@ -737,13 +735,17 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->Frame_Initialization  = ptrH->Frame_read_Init_1 + ptrH->Frame_read_Init_2 + ptrH->Frame_read_Init_3;
    ptrH->pixel_control_time    = 2* ptrH->Pixel_Reset + ptrH->Pixel_Sample + 10.0F;
 
+   ptrH->fr_dly                = gFr_dly;                                                     // in second
+
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead){
+      ptrH->intg_dly                           = gIntg_dly;                // in second
       ptrH->Frame_Time = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_FR_CORR_FACTOR_ITR; // en seconde
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
       ptrH->frame_period_min = ptrH->intg_dly + ptrH->exposure_time + ptrH->Frame_Time + ptrH->x_to_next_fsync;
    }
    else{
-      ptrH->Frame_Time = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_FR_CORR_FACTOR_IWR; // en seconde
+      ptrH->intg_dly         = gIntg_dly + MODEL_EXPTIME_CORR_FACTOR_IWR_US;                // in second
+      ptrH->Frame_Time       = ((ptrH->pixel_control_time + ptrH->Frame_Initialization  + ptrH->Frame_Read)/1E6F)*MODEL_FR_CORR_FACTOR_IWR; // en seconde
       ptrH->x_to_next_fsync  = 0.0F; // Delay between the end of readout (or integration) and the next fsync (in second)
       ptrH->frame_period_min = MAX(ptrH->fr_dly + ptrH->Frame_Time, ptrH->intg_dly + ptrH->exposure_time) + ptrH->x_to_next_fsync;
    }
@@ -778,7 +780,7 @@ float FPA_MaxExposureTime(const gcRegistersData_t *pGCRegs)
    maxExposure_us = (operatingPeriod - periodMinWithNullExposure)*1e6F;
 
    if (pGCRegs->IntegrationMode == IM_IntegrateWhileRead){
-      Ta = ((hh.fr_dly + hh.Frame_Time) - hh.intg_dly)- MODEL_EXPTIME_CORR_FACTOR_IWR_US;
+      Ta = ((hh.fr_dly + hh.Frame_Time) - hh.intg_dly);
       if (Ta > 0)
          maxExposure_us = maxExposure_us + Ta*1E6F;
    }

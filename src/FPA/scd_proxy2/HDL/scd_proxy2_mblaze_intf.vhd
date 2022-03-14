@@ -126,11 +126,10 @@ architecture rtl of scd_proxy2_mblaze_intf is
    
    signal int_cfg_i                       : int_cfg_type;
    signal exp_struct_cfg                  : int_cfg_type;
-   signal user_cfg_int                    : int_cfg_type;
    signal subtraction_possible            : std_logic := '0';
    
-   signal roic_read_reg_i	            : std_logic_vector(7 downto 0);
-            
+   signal roic_read_reg_i	               : std_logic_vector(7 downto 0);
+   
 begin
    
    CTRLED_RESET            <= ctrled_reset_i;

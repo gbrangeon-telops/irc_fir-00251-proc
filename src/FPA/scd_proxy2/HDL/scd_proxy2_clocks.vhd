@@ -26,8 +26,6 @@ entity scd_proxy2_clocks is
       
       TX_CLK           : out std_logic;
       CLK_100M         : out std_logic;
-      
-      INT_CLK_SOURCE   : out std_logic;
       QUAD_CLK_SOURCE  : out std_logic      
       
       );
@@ -67,7 +65,6 @@ begin
           
       TX_CLK          <=  clk_c;   -- 100 MHz       
       CLK_100M        <=  clk_a;   -- 100 MHz        
-      INT_CLK_SOURCE  <=  clk_b;   --  70 MHz
       QUAD_CLK_SOURCE <=  clk_b;   --  70 MHz
       
    end generate;
