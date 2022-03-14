@@ -118,7 +118,7 @@ end component;
    
    signal pix_cnt                    : unsigned(31 downto 0);
    signal lval_cnt                   : unsigned(31 downto 0);
-   signal fval_cnt                   : unsigned(31 downto 0);
+   signal lval_pause_cnt             : unsigned(31 downto 0);
    signal width                      : unsigned(31 downto 0);                                                                    
    signal cmd_cnt                    : unsigned(31 downto 0); 
                                     
@@ -316,7 +316,6 @@ begin
             mm2s_btt               <= (others => '0');
             mm2s_cmd_mosi.tvalid   <= '0';
             mm2s_sts_miso.tready   <= '0';
-            fval_cnt               <= (others => '0');
             current_read_buffer    <=  buf_sts_default;
             mm2s_err_o(2 downto 0) <= (others =>'0');
          else
@@ -456,19 +455,41 @@ begin
             else
                width <= resize(shift_right(fb_cfg_i.hdr_pix_size, 3), width'length);
                case throttle_sm is 
-                  when idle_st =>  
-                     if axis_mm2s_fifo_out_mosi.tvalid = '1' and axis_mm2s_fifo_out_miso.tready = '1' and fb_cfg_i.lval_pause_min > 0 then
-                        if lval_cnt = width-1 then
-                           stall_i <= '1';
+                  when idle_st => 
+                     if axis_mm2s_fifo_out_mosi.tvalid = '1' and axis_mm2s_fifo_out_miso.tready = '1' then
+                        if lval_cnt = width-1  then
+                           
                            lval_cnt <= to_unsigned(0,lval_cnt'length);
-                           throttle_sm <= stall_st; 
+                           
+                           if axis_mm2s_fifo_out_mosi.tlast = '1' then --eof or "end of header"
+                              lval_pause_cnt <= fb_cfg_i.fval_pause_min; 
+                              if fb_cfg_i.fval_pause_min > 0 then
+                                 stall_i <= '1';
+                                 throttle_sm <= stall_st;
+                              else
+                                 stall_i <= '0';
+                                 throttle_sm <= idle_st;
+                              end if;
+                              
+                           else --eol
+                              lval_pause_cnt <= fb_cfg_i.lval_pause_min; 
+                              if fb_cfg_i.lval_pause_min > 0 then
+                                 stall_i <= '1';
+                                 throttle_sm <= stall_st;
+                              else
+                                 stall_i <= '0';
+                                 throttle_sm <= idle_st;
+                              end if; 
+                           end if; 
+
                         else
                            lval_cnt <= lval_cnt +1;
                         end if;
                      end if;
                                          
-                  when stall_st =>
-                     if lval_cnt = fb_cfg_i.lval_pause_min-1 then 
+                  when stall_st => 
+                  
+                     if lval_cnt = lval_pause_cnt-1 then 
                         lval_cnt <= to_unsigned(0,lval_cnt'length);
                         stall_i <= '0'; 
                         throttle_sm <= idle_st;

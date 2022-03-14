@@ -49,12 +49,12 @@ architecture stim of stim is
 
 ------------------- Constants definition -------------------------- 
 -- Clocks frequency 
-constant CLK85_PERIOD : time := 11.764705882352941176470588235294 ns; 
+--constant CLK85_PERIOD : time := 11.764705882352941176470588235294 ns; 
 constant CLK100_PERIOD : time := 10 ns; 
-constant CLK142_5_PERIOD : time := 7.0175438596491228070175438596491 ns; 
+--constant CLK142_5_PERIOD : time := 7.0175438596491228070175438596491 ns; 
 --constant CLK142_5_PERIOD : time := 10 ns; 
---constant CLK85_PERIOD : time := 50 ns; 
---constant CLK142_5_PERIOD : time := 10 ns; 
+constant CLK85_PERIOD : time := 50 ns; 
+constant CLK142_5_PERIOD : time := 10 ns; 
 
 --IMAGE PARAM
 constant FRAME_WIDTH : unsigned := to_unsigned(16,32);
@@ -70,9 +70,11 @@ constant BUFFER_C_ADDR      : unsigned(31 downto 0) := resize(3*FRAME_BYTE_SIZE,
 
 constant HDR_PIX_SIZE       : unsigned(31 downto 0) := resize(FRAME_WIDTH*2,32); 
 constant IMG_PIX_SIZE       : unsigned(31 downto 0) := resize(FRAME_SIZE - 2*(FRAME_WIDTH),32); 
-constant LVAL_PAUSE_MIN     : unsigned(31 downto 0) := to_unsigned(10,32); 
+constant LVAL_PAUSE_MIN     : unsigned(31 downto 0) := to_unsigned(0,32);
+constant FVAL_PAUSE_MIN     : unsigned(31 downto 0) := to_unsigned(0,32); 
+
 constant LVAL_PAUSE_MIN2     : unsigned(31 downto 0) := to_unsigned(5,32); 
-constant NB_CFG_PARAM       : integer := 7; 
+constant NB_CFG_PARAM       : integer := 8; 
 
 
 type  frame_gen_state_t is (Frame_Reset, transmit_hdr, hdr_delay_st ,transmit_img, img_delay_st);
@@ -341,6 +343,10 @@ sim: process is
       MB_MOSI.arvalid <= '0';
       MB_MOSI.rready <= '0';  
       
+      wait for 150 ns;
+      rst_n <= '1';
+      wait for 1 us; 
+      
       frame_width_i  <= FRAME_WIDTH;
       frame_size_i   <= FRAME_SIZE;
 
@@ -351,10 +357,9 @@ sim: process is
       cfg_i.hdr_pix_size    <= HDR_PIX_SIZE;
       cfg_i.img_pix_size    <= IMG_PIX_SIZE;
       cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN;
-
+      cfg_i.fval_pause_min  <= FVAL_PAUSE_MIN;
       wait for 150 ns;
-      rst_n <= '1';
-      wait for 1 us; 
+
 
       cfg_vector <= to_intf_cfg(cfg_i);  
       for ii in 0 to NB_CFG_PARAM-1 loop 
@@ -382,7 +387,8 @@ sim: process is
       cfg_i.frame_byte_size <= resize(2*frame_size_i,32); 
       cfg_i.hdr_pix_size    <= resize(2*HDR_PIX_SIZE,32);
       cfg_i.img_pix_size    <= resize(2*IMG_PIX_SIZE,32);
-      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN2; 
+      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN; 
+      cfg_i.fval_pause_min  <= FVAL_PAUSE_MIN;
       
       wait for 100 ns;   
       
@@ -413,7 +419,8 @@ sim: process is
       cfg_i.frame_byte_size <= resize(2*frame_size_i,32); 
       cfg_i.hdr_pix_size    <= resize(4*HDR_PIX_SIZE,32);
       cfg_i.img_pix_size    <= resize(4*IMG_PIX_SIZE,32);
-      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN2; 
+      cfg_i.lval_pause_min  <= LVAL_PAUSE_MIN; 
+      cfg_i.fval_pause_min  <= FVAL_PAUSE_MIN;
 --      
 --      frame_width_i  <= resize(FRAME_WIDTH,32);
 --      frame_size_i   <= resize(FRAME_SIZE,32);

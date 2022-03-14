@@ -29,12 +29,13 @@ package body fb_testbench_pkg is
       variable buffer_a_addr	           : unsigned(31 downto 0) := (others => '0');          -- frame buffer base adresse
       variable buffer_b_addr             : unsigned(31 downto 0) := (others => '0');          -- buffer a size in byte
       variable buffer_c_addr             : unsigned(31 downto 0) := (others => '0');          -- buffer b size in byte
-      variable frame_byte_size           : unsigned(31 downto 0) := (others => '0');                -- frame size in byte
-      variable hdr_pix_size              : unsigned(31 downto 0) := (others => '0');                -- header size in byte 
-      variable img_pix_size              : unsigned(31 downto 0) := (others => '0');                -- image size in byte
-      variable lval_pause_min            : unsigned(31 downto 0) := (others => '0');                -- minimum pause between line
+      variable frame_byte_size           : unsigned(31 downto 0) := (others => '0');          -- frame size in byte
+      variable hdr_pix_size              : unsigned(31 downto 0) := (others => '0');          -- header size in byte 
+      variable img_pix_size              : unsigned(31 downto 0) := (others => '0');          -- image size in byte
+      variable lval_pause_min            : unsigned(31 downto 0) := (others => '0');          -- minimum pause between line
+      variable fval_pause_min            : unsigned(31 downto 0) := (others => '0');          -- minimum pause between frame
 
-      variable y                         : unsigned(7*32-1 downto 0);  
+      variable y                         : unsigned(8*32-1 downto 0);  
       
       
    begin
@@ -46,7 +47,8 @@ package body fb_testbench_pkg is
       & cfg.frame_byte_size 
       & cfg.hdr_pix_size
       & cfg.img_pix_size
-      & cfg.lval_pause_min;
+      & cfg.lval_pause_min
+      & cfg.fval_pause_min;
       return y;
       
    end to_intf_cfg;

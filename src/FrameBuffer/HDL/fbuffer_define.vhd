@@ -28,22 +28,20 @@ package fbuffer_define is
   
       
    constant STREAM_PIXEL_WIDTH   : integer := 4; -- Pixel stream width (TDATA = 64 bits)
-   constant NB_PIPE_STAGE : integer := 2; -- Writer_sm : number of input pipe stages
-   constant RD_NB_CMD_QUEUE : integer := 2; -- Writer_sm : number of input pipe stages
+   constant NB_PIPE_STAGE        : integer := 2; -- Writer_sm : number of input pipe stages
+   constant RD_NB_CMD_QUEUE      : integer := 2; -- Writer_sm : number of input pipe stages 
+   constant LVAL_PAUSE           : unsigned(31 downto 0) := to_unsigned(1,32);
+   constant FVAL_PAUSE           : unsigned(31 downto 0) := to_unsigned(3,32);
 
+  
+   constant BUFFER_A_TAG         : unsigned(1 downto 0) := to_unsigned(1,2);
+   constant BUFFER_B_TAG         : unsigned(1 downto 0) := to_unsigned(2,2);
+   constant BUFFER_C_TAG         : unsigned(1 downto 0) := to_unsigned(3,2);
    
-   
-   -- CLINK FULL throughtput limit is 4*85M*(Line_Width/(Line_Width+LVAL_PAUSE)), Where LVAL_PAUSE = 4 for clink slow mode  
-   constant LVAL_PAUSE    : unsigned(31 downto 0) := to_unsigned(4,32);
-
-   constant BUFFER_A_TAG  : unsigned(1 downto 0) := to_unsigned(1,2);
-   constant BUFFER_B_TAG  : unsigned(1 downto 0) := to_unsigned(2,2);
-   constant BUFFER_C_TAG  : unsigned(1 downto 0) := to_unsigned(3,2);
-   
-   constant RSVD          : std_logic_vector(3 downto 0) := "0000"; -- Not used 
-   constant DRR           : std_logic := '0'; -- Not used
-   constant DSA           : std_logic_vector(5 downto 0) := "000000"; -- Not used
-   constant CTYPE         : std_logic := '1'; -- FIXED=0 , INCR=1 
+   constant RSVD                 : std_logic_vector(3 downto 0) := "0000"; -- Not used 
+   constant DRR                  : std_logic := '0'; -- Not used
+   constant DSA                  : std_logic_vector(5 downto 0) := "000000"; -- Not used
+   constant CTYPE                : std_logic := '1'; -- FIXED=0 , INCR=1 
    
    type frame_buffer_cfg_type is
    record 
@@ -53,7 +51,8 @@ package fbuffer_define is
       frame_byte_size           : unsigned(31 downto 0);                -- frame size in bytes
       hdr_pix_size              : unsigned(31 downto 0);                -- header size in bytes 
       img_pix_size              : unsigned(31 downto 0);                -- image size in bytes
-      lval_pause_min            : unsigned(31 downto 0);                -- minimum pause between outputed frame 
+      lval_pause_min            : unsigned(31 downto 0);                -- minimum pause between lines 
+      fval_pause_min            : unsigned(31 downto 0);                -- minimum pause between frames
       dval                      : std_logic;                            -- config valid flag
    end record frame_buffer_cfg_type;
  
@@ -73,6 +72,7 @@ package fbuffer_define is
    to_unsigned(1920*2,s_fb_cfg.hdr_pix_size'LENGTH),          
    to_unsigned(1920*1536,s_fb_cfg.img_pix_size'LENGTH),      
    LVAL_PAUSE,
+   FVAL_PAUSE,
    '0'
    );  
    

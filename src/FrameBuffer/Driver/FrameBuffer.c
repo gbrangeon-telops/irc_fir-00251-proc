@@ -26,7 +26,8 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
       pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2)*pGCRegs->Width* sizeof(uint16_t);
       pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
       pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
-      pFB_ctrl->fb_lval_pause_min        = 1; // limite du lien CLINK (CL_LVAL_PAUSE_FAST = 1)
+      pFB_ctrl->fb_lval_pause_min        = 1; // minimum pause between lines, limite du lien CLINK (CL_LVAL_PAUSE_FAST = 1)
+      pFB_ctrl->fb_fval_pause_min        = 3; // minimum pause between frames and between header end image, limite du lien CLINK (CL_FVAL_PAUSE_FAST = 3)
 
       WriteStruct(pFB_ctrl);
       return IRC_SUCCESS;
@@ -49,11 +50,25 @@ IRC_Status_t FB_Init(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 void FB_SendConfigGC(t_FB *pFB_ctrl, gcRegistersData_t *pGCRegs)
 {
    #ifdef MEM_4DDR
+      //extern int32_t gFpaDebugRegA, gFpaDebugRegB;
       if(FB_getStatusAndErrors(pFB_ctrl).errors == 0)
       {
          pFB_ctrl->fb_frame_byte_size       = (pGCRegs->Height + 2) * pGCRegs->Width * sizeof(uint16_t);
          pFB_ctrl->fb_hdr_pix_size          = pGCRegs->Width * 2;
          pFB_ctrl->fb_img_pix_size          = (pGCRegs->Width * pGCRegs->Height);
+
+         //if (gFpaDebugRegA > 0)
+         //   pFB_ctrl->fb_fval_pause_min        = (uint32_t)gFpaDebugRegA;
+         //else
+         //   pFB_ctrl->fb_fval_pause_min        = 3;
+
+
+         //if (gFpaDebugRegB > 0)
+         //   pFB_ctrl->fb_lval_pause_min        = (uint32_t)gFpaDebugRegB;
+         //else
+         //   pFB_ctrl->fb_lval_pause_min        = 1;
+
+
          WriteStruct(pFB_ctrl);
       }
       else
