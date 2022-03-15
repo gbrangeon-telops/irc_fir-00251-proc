@@ -42,7 +42,7 @@
 #define SCD_XTRA_TRIG_FREQ_MAX_HZ         SCD_MIN_OPER_FPS
 
 //  PCO 23 avril 2020 : Correction par rapport à la doc de SCD (d1k3008-rev1).
-#define T0_CORR                           -40.0E-6F // [s],  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
+#define T0_CORR                           40.0E-6F // [s],  Nécessaire pour maintenir des specs équivalentes entre IWR et ITR (voir redmine 14065 pour justifications).
 #define T_lINE_CONV_CORR                  12.0F     // [TFPP clks], Nécessaire pour ne pas faire planter le proxy (voir redmine 14065 pour justifications).
   
 
@@ -658,7 +658,7 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
       ptrH->T_lc2int  = 5E-6F;
       ptrH->T_iwr_delay = ptrH->T_lc2int + ptrH->Trelax;
 
-      ptrH->T6 = 5.4E-6F + (ptrH->Tframe_init + ptrH->T_iwr_delay); //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
+      ptrH->T6 = 5.4E-6F + ptrH->Tframe_init + ptrH->T_iwr_delay - T0_CORR; //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
 
       ptrH->T8        = 250E-6F; // worst case
       ptrH->T3        = ptrH->Tframe_init + (ptrH->Tline_conv * ((float)pGCRegs->Height / 2.0F + 3.0F)) + ptrH->T_iwr_delay;
@@ -668,10 +668,10 @@ void FPA_Fig1orFig2SpecificParams(Scd_Fig1orFig2Param_t *ptrH, float exposureTim
          // T0 = T2 + T4 + T5  and  T5 = T5min + 0.1%T0
          ptrH->T0        = (ptrH->T2 + ptrH->T4 + ptrH->T5min) / (99.9F / 100.0F);
       else
-      // T0 = T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
-      ptrH->T0        = (ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
+         // T0 = T3 + T4 + T5 + T6  and  T5 = T5min + 0.1%T0
+         ptrH->T0        = (ptrH->T3 + ptrH->T4 + ptrH->T5min + ptrH->T6) / (99.9F / 100.0F);
 
-      ptrH->T0        = ptrH->T0 + T0_CORR;    //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
+      ptrH->T0        = ptrH->T0;    //  PCO 23 avril 2020 : Non respect de la doc d1k3008-rev1 (voir redmine 14065 pour justifications).
       ptrH->T0        = MIN(ptrH->T0, 90E-3F); // don't forget that T0 must be < 90msec
 
       ptrH->T5        = ptrH->T5min + (ptrH->T0 * 0.1F / 100.0F);
