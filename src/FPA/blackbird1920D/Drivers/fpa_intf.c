@@ -125,6 +125,7 @@
 
 #define VHD_CLK_100M_RATE_HZ               100E+6F 
 
+// INTG_DLY should be lesser than FR_DLY to avoid integration time inconsistency (see atlasdatasheet2.17ext section 9.2)
 #define OP_CMD_IWR_FRAME_DLY_DEFAULT       2E-6F // "Frame read delay" parameter, in seconds
 #define OP_CMD_IWR_INTG_DLY_DEFAULT        1E-6F  // "Integration delay" parameter, in seconds
 #define OP_CMD_ITR_INTG_DLY_DEFAULT        1E-6F // "Integration delay" parameter, in seconds
@@ -137,7 +138,7 @@
 #define MODEL_FR_CORR_FACTOR_IWR                  1.114F
 #define MODEL_EXPTIME_CORR_FACTOR_IWR_US          300E-6F // in us
 
-// La résolution maximale supportée par le vhdl est 44 (0.63us).
+// La résolution maximale supportée par le vhdl est 44 (0.63us). (Sinon overflow).
 #define FRAME_RESOLUTION_DEFAULT           7  // 0.1us
 
 
@@ -176,8 +177,6 @@ static const uint8_t Scd_DiodeBiasValues_Idet[] = {
 #define SCD_IDET_BIAS_DEFAULT_IDX              1     // 30pA (default)
 #define SCD_IDET_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues_Idet) / sizeof(Scd_DiodeBiasValues_Idet[0]))
 
-
-// structure 
 struct bb1920D_param_s
 {					   
    float Fclock_MHz                          ;
@@ -216,7 +215,7 @@ struct bb1920D_param_s
 };
 typedef struct bb1920D_param_s bb1920D_param_t;
 
-// structure interne pour les commandes de Scd
+// Structure interne pour les commandes de Scd
 struct Command_s             // 
 {					   
    uint8_t  hder;
@@ -231,7 +230,7 @@ struct Command_s             //
 };
 typedef struct Command_s Command_t;
 
-// structure interne pour les packets de Scd
+// Structure interne pour les packets de Scd
 struct ScdPacketTx_s                      // 
 {					   
    uint8_t   ScdPacketTotalBytesNum;
@@ -240,7 +239,7 @@ struct ScdPacketTx_s                      //
 };
 typedef struct ScdPacketTx_s ScdPacketTx_t;
 
-// statuts privés du module fpa
+// Statuts privés du module fpa
 struct s_FpaPrivateStatus    
 {  
    uint32_t fpa_diag_mode                             ;  
@@ -701,7 +700,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
 
    extern int32_t gFpaExposureTimeOffset;
 
-   ptrH->Fclock_MHz                         = (float)FPA_MCLK_RATE_HZ/1E+6;;
+   ptrH->Fclock_MHz                         = (float)FPA_MCLK_RATE_HZ/1E+6;
    ptrH->Pixel_Reset                        =  140.0F; // in us
    ptrH->Pixel_Sample                       =  14.0F;  // in us
    ptrH->Frame_read_Init_1                  =  28.0F;  // in us

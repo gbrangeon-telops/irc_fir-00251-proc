@@ -31,10 +31,10 @@
 
 #define FPA_WIDTH_MIN      64   
 #define FPA_WIDTH_MAX      1920
-#define FPA_WIDTH_MULT     8
+#define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
-#define FPA_HEIGHT_MIN     2
+#define FPA_HEIGHT_MIN     4
 #define FPA_HEIGHT_MAX     1536
 #define FPA_HEIGHT_MULT    2
 #define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
