@@ -266,7 +266,6 @@ begin
       end if;
    end process;
   
-   
       
    U3 : process(CLK)        
    begin
@@ -358,7 +357,7 @@ begin
                   if mm2s_sts_mosi.tvalid = '1' then
                      mm2s_sts_miso.tready <= '0';
                      mm2s_cmd_mosi.tvalid <= '0';
-                     if ( (mm2s_sts_mosi.tdata(7) = '1') and (mm2s_sts_mosi.tdata(6 downto 2) = "00000") and (mm2s_sts_mosi.tdata(1 downto 0) = std_logic_vector(current_read_buffer.tag)) ) then --transmit valid
+                     if ( (mm2s_sts_mosi.tdata(7) = '1') and (mm2s_sts_mosi.tdata(6 downto 2) = "00000") and (mm2s_sts_mosi.tdata(1 downto 0) = std_logic_vector(current_read_buffer.tag)) ) then
                         reader_sm <= standby_rd;
                      else   
                         mm2s_err_o(2 downto 0) <= mm2s_sts_mosi.tdata(6 downto 4);
@@ -444,7 +443,7 @@ begin
  );
  
  -- This process throttle the axis stream throughtput to impose a minimum pause 
- -- between lines (the pause must be configure to be greater or equal to clink LVAL_PAUSE in output fpga)
+ -- between lines and frames (the pause must be configure to be greater or equal to clink LVAL_PAUSE/FVAL_PAUSE in output fpga)
  U7 : process(CLK)
    begin
        if rising_edge(CLK) then
