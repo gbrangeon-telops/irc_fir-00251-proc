@@ -478,6 +478,14 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 11;
 
                case 11:
+                  // 2.11.x -> 2.12.x
+                  hdr->FpaXroDetectSub = FlashSettings_FlashSettingsFileHeader_default.FpaXroDetectSub;
+                  hdr->FpaXroCtiaRef = FlashSettings_FlashSettingsFileHeader_default.FpaXroCtiaRef;
+                  hdr->FpaXroCM = FlashSettings_FlashSettingsFileHeader_default.FpaXroCM;
+                  hdr->FpaXroCtiaBiasEnum = FlashSettings_FlashSettingsFileHeader_default.FpaXroCtiaBiasEnum;
+                  hdr->FileStructureMinorVersion = 12;
+
+               case 12:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

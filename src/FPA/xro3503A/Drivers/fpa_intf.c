@@ -97,6 +97,21 @@
 
 #define XRO3503_CTIA_BIAS_MAX                      0xF      // value must be in 0x0 to 0xF
 
+#define XRO3503_DETECT_SUB_DEFAULT_mV              2900     // Default DetectSub = 2900 mV
+#define XRO3503_DETECT_SUB_MIN_mV                  2900     // 2900 mV <= DetectSub <= 3500 mV
+#define XRO3503_DETECT_SUB_MAX_mV                  3500
+
+#define XRO3503_CTIA_REF_DEFAULT_mV                2600     // Default CTIA Ref = 2600 mV
+#define XRO3503_CTIA_REF_MIN_mV                    2100     // 2100 mV <= CTIA Ref <= 2800 mV
+#define XRO3503_CTIA_REF_MAX_mV                    2800
+
+#define XRO3503_CM_DEFAULT_mV                      1750     // Default CM = 1750 mV
+#define XRO3503_CM_MIN_mV                          1500     // 1500 mV <= CM <= 2000 mV
+#define XRO3503_CM_MAX_mV                          2000
+
+#define XRO3503_VCMO_DEFAULT_mV                    1750     // Default VCMO = 1750 mV
+#define XRO3503_VTESTG_DEFAULT_mV                  3300     // Default VTestG = 3300 mV
+
 #define XRO3503_POL_VOLTAGE_MIN_mV                 100      // pas spécifié, VPOLmin = DETECTSUBmin - CTIA_REFmax
 #define XRO3503_POL_VOLTAGE_MAX_mV                 1400     // pas spécifié, VPOLmax = DETECTSUBmax - CTIA_REFmin
 
@@ -210,12 +225,6 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    uint32_t roicAdditionalPix;
    uint32_t roicWidth;
    uint32_t roicOffsetX;
-   //extern int16_t gFpaDetectorPolarizationVoltage;
-   //static int16_t presentPolarizationVoltage = 150;
-   //extern float gFpaDetectorElectricalTapsRef;
-   //static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   //extern float gFpaDetectorElectricalRefOffset;
-   //static float presentElectricalRefOffset = 0;        // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    extern int32_t gFpaDebugRegA;                       // reservé ELCORR pour correction électronique (gain et/ou offset)
    //extern int32_t gFpaDebugRegB;                       // reservé
    extern int32_t gFpaDebugRegC;                       // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
@@ -224,11 +233,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegF;                       // reservé real_mode_active_pixel_dly pour ajustement du début AOI
    //extern int32_t gFpaDebugRegG;                       // non utilisé
    extern int32_t gFpaDebugRegH;                       // non utilisé
-   extern uint8_t gFpaDiodeBiasEnum;
+   extern uint8_t gFpaCtiaBiasEnum;
    extern uint16_t gFpaDetectSub_mV;
+   static uint16_t presentFpaDetectSub_mV = XRO3503_DETECT_SUB_DEFAULT_mV;
    extern uint16_t gFpaCtiaRef_mV;
+   static uint16_t presentFpaCtiaRef_mV = XRO3503_CTIA_REF_DEFAULT_mV;
    extern uint16_t gFpaVTestG_mV;
    extern uint16_t gFpaCM_mV;
+   static uint16_t presentFpaCM_mV = XRO3503_CM_DEFAULT_mV;
    extern uint16_t gFpaVCMO_mV;
    extern uint8_t gFpaSubWindowMode;
    static uint8_t cfg_num = 0;
@@ -314,9 +326,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
       ptrA->gain = 1;	//High gain
 
-   if (gFpaDiodeBiasEnum > XRO3503_CTIA_BIAS_MAX)  // corrige une valeur invalide
-      gFpaDiodeBiasEnum = XRO3503_CTIA_BIAS_MAX;   // valeur max est le défaut pour l'instant
-   ptrA->ctia_bias_current = gFpaDiodeBiasEnum;
+   // CTIA Bias Current
+   if (gFpaCtiaBiasEnum > XRO3503_CTIA_BIAS_MAX)  // corrige une valeur invalide
+      gFpaCtiaBiasEnum = XRO3503_CTIA_BIAS_MAX;   // valeur max est le défaut pour l'instant
+   ptrA->ctia_bias_current = gFpaCtiaBiasEnum;
 
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
@@ -399,52 +412,48 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if (sw_init_done == 0)
    {
       // valeurs par défaut pour l'init
-      gFpaDetectSub_mV = 2900;
-      gFpaCtiaRef_mV = 2600;
-      gFpaVTestG_mV = 3300;
-      gFpaCM_mV = 1750;
-      gFpaVCMO_mV = 1750;
+      gFpaVTestG_mV = XRO3503_VTESTG_DEFAULT_mV;
+      gFpaVCMO_mV = XRO3503_VCMO_DEFAULT_mV;
    }
-/*   // Pour un changement de gain, on force certaines valeurs
-   if (presentSensorWellDepth != pGCRegs->SensorWellDepth)
-   {
-      presentSensorWellDepth = pGCRegs->SensorWellDepth;
-      if (pGCRegs->SensorWellDepth == SWD_HighGain)
-      {
-         gFpaCtiaRef_mV = 2500;
-         gFpaCM_mV = 1910;
-      }
-      else
-      {
-         gFpaCtiaRef_mV = 2380;
-         gFpaCM_mV = 1780;
-      }
-   }*/
-   ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectSub_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
-   ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)gFpaCtiaRef_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
+
+   ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)XRO3503_DETECT_SUB_DEFAULT_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
+   ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)XRO3503_CTIA_REF_DEFAULT_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
    ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)gFpaVTestG_mV); // DAC3 -> VTESTG (current skimming and antibloom disabled)
-   ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)gFpaCM_mV); // DAC4 -> CM 1.5V à 2V
+   ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)XRO3503_CM_DEFAULT_mV); // DAC4 -> CM 1.5V à 2V
    ProximCfg.vdac_value[4] = FLEG_VccVoltage_To_DacWord((float)gFpaVCMO_mV); // DAC5 -> VCMO 1.5V à 2V
    ProximCfg.vdac_value[5] = 0;                                   // DAC6 -> non connecté
    ProximCfg.vdac_value[6] = 0;                                   // DAC7 -> non connecté
    ProximCfg.vdac_value[7] = 0;                                   // DAC8 -> non connecté
 
-   gFpaDetectSub_mV  = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[0]);
-   gFpaCtiaRef_mV    = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[1]);
    gFpaVTestG_mV     = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[2]);
-   gFpaCM_mV         = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[3]);
    gFpaVCMO_mV       = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4]);
 
-/*
-   // Polarization voltage (VPOL = DETECTSUB - CTIA_REF)
-   if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage)
+   // DETECTSUB (VCC1)
+   if (gFpaDetectSub_mV != presentFpaDetectSub_mV)
    {
-      if ((gFpaDetectorPolarizationVoltage >= XRO3503_POL_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= XRO3503_POL_VOLTAGE_MAX_mV))
-         ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord(FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[0]) - (float)gFpaDetectorPolarizationVoltage);
+      if (gFpaDetectSub_mV >= XRO3503_DETECT_SUB_MIN_mV && gFpaDetectSub_mV <= XRO3503_DETECT_SUB_MAX_mV)
+         ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectSub_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
    }
-   presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[0]) - FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[1]));
-   gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;
-*/
+   presentFpaDetectSub_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[0]);
+   gFpaDetectSub_mV = presentFpaDetectSub_mV;
+
+   // CTIA_REF (VCC2)
+   if (gFpaCtiaRef_mV != presentFpaCtiaRef_mV)
+   {
+      if (gFpaCtiaRef_mV >= XRO3503_CTIA_REF_MIN_mV && gFpaCtiaRef_mV <= XRO3503_CTIA_REF_MAX_mV)
+         ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)gFpaCtiaRef_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
+   }
+   presentFpaCtiaRef_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[1]);
+   gFpaCtiaRef_mV = presentFpaCtiaRef_mV;
+
+   // CM (VCC4)
+   if (gFpaCM_mV != presentFpaCM_mV)
+   {
+      if (gFpaCM_mV >= XRO3503_CM_MIN_mV && gFpaCM_mV <= XRO3503_CM_MAX_mV)
+         ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)gFpaCM_mV); // DAC4 -> CM 1.5V à 2V
+   }
+   presentFpaCM_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[3]);
+   gFpaCM_mV = presentFpaCM_mV;
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal
    FPA_SendProximCfg(&ProximCfg, ptrA);

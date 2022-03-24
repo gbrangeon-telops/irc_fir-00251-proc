@@ -223,6 +223,10 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
 {
    extern ICU_config_t gICU_ctrl;
    extern uint8_t gFpaScdDiodeBiasEnum;
+   extern uint8_t gFpaCtiaBiasEnum;
+   extern uint16_t gFpaDetectSub_mV;
+   extern uint16_t gFpaCtiaRef_mV;
+   extern uint16_t gFpaCM_mV;
    extern int16_t gFpaDetectorPolarizationVoltage;
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
@@ -377,6 +381,10 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
 
    // Update detector parameters
    gFpaScdDiodeBiasEnum = p_flashSettings->FpaScdDiodeBiasEnum;
+   gFpaCtiaBiasEnum = p_flashSettings->FpaXroCtiaBiasEnum;
+   gFpaDetectSub_mV = p_flashSettings->FpaXroDetectSub;
+   gFpaCtiaRef_mV = p_flashSettings->FpaXroCtiaRef;
+   gFpaCM_mV = p_flashSettings->FpaXroCM;
    gFpaDetectorPolarizationVoltage = p_flashSettings->DetectorPolarizationVoltage;
    gFpaDetectorElectricalTapsRef = p_flashSettings->DetectorElectricalTapsRef;
    gFpaDetectorElectricalRefOffset = p_flashSettings->DetectorElectricalRefOffset;

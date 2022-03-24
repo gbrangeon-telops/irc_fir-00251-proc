@@ -621,7 +621,7 @@ IRC_Status_t DebugTerminalParseFPA(circByteBuffer_t *cbuf)
 IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
 {
    extern t_FpaIntf gFpaIntf;
-   extern uint8_t gFpaDiodeBiasEnum;
+   extern uint8_t gFpaCtiaBiasEnum;
    extern uint16_t gFpaDetectSub_mV;
    extern uint16_t gFpaCtiaRef_mV;
    extern uint16_t gFpaVTestG_mV;
@@ -665,7 +665,7 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
       // Process command
       if (strcasecmp((char *)cmdStr, "BIAS") == 0)
       {
-         gFpaDiodeBiasEnum = (uint8_t)uValue;
+         gFpaCtiaBiasEnum = (uint8_t)uValue;
       }
       else if (strcasecmp((char *)cmdStr, "DETECTSUB") == 0)
       {
@@ -708,7 +708,7 @@ IRC_Status_t DebugTerminalParseXRO(circByteBuffer_t *cbuf)
       FPA_SendConfigGC(&gFpaIntf, &gcRegsData);
    }
 
-   DT_PRINTF("FPA CTIA bias current enum = %d", gFpaDiodeBiasEnum);
+   DT_PRINTF("FPA CTIA bias current enum = %d", gFpaCtiaBiasEnum);
 
    DT_PRINTF("FPA DETECTSUB voltage = %d mV", gFpaDetectSub_mV);
    DT_PRINTF("FPA CTIAREF voltage = %d mV", gFpaCtiaRef_mV);

@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.11.0
+ * Generated from the flash settings file structure definition XLS file version 2.12.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -189,6 +189,10 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* SFWDisabled = */ 0,
    /* SDIDisabled = */ 0,
    /* CenterImageForced = */ 0,
+   /* FpaXroDetectSub = */ 2900,
+   /* FpaXroCtiaRef = */ 2600,
+   /* FpaXroCM = */ 1750,
+   /* FpaXroCtiaBiasEnum = */ 15,
    /* FileHeaderCRC16 = */ 0,
 };
 
@@ -416,7 +420,11 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->SFWDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->SDIDisabled, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->CenterImageForced, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 64; // Skip FREE space
+      memcpy(&hdr->FpaXroDetectSub, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->FpaXroCtiaRef, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->FpaXroCM, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&hdr->FpaXroCtiaBiasEnum, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      numBytes += 57; // Skip FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -677,7 +685,11 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->SFWDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->SDIDisabled, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->CenterImageForced, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 64); numBytes += 64; // FREE space
+      memcpy(&buffer[numBytes], &hdr->FpaXroDetectSub, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->FpaXroCtiaRef, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->FpaXroCM, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
+      memcpy(&buffer[numBytes], &hdr->FpaXroCtiaBiasEnum, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
+      memset(&buffer[numBytes], 0, 57); numBytes += 57; // FREE space
 
       *crc16 = CRC16(0xFFFF, buffer, numBytes);
    }
@@ -886,6 +898,10 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("SFWDisabled: %u\n", hdr->SFWDisabled);
    FPGA_PRINTF("SDIDisabled: %u\n", hdr->SDIDisabled);
    FPGA_PRINTF("CenterImageForced: %u\n", hdr->CenterImageForced);
+   FPGA_PRINTF("FpaXroDetectSub: %u mV\n", hdr->FpaXroDetectSub);
+   FPGA_PRINTF("FpaXroCtiaRef: %u mV\n", hdr->FpaXroCtiaRef);
+   FPGA_PRINTF("FpaXroCM: %u mV\n", hdr->FpaXroCM);
+   FPGA_PRINTF("FpaXroCtiaBiasEnum: %u\n", hdr->FpaXroCtiaBiasEnum);
    FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);
 }
 
