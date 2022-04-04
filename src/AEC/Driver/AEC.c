@@ -225,7 +225,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    uint16_t PDRmax = 0;
    float CorrectionFactor = 0.0f;
    float TargetExpTime = 0.0f;
-   float ProposedExposureTime = 0.0f;
+   float ProposedExposureTimeLast = 0.0f;
    float DeltaT = 0.0;
    float alpha       = 0.0f;
    float PET = 0.0f;
@@ -279,16 +279,17 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    if ((AEC_Int_FWPosition == FWPOSITION_NOT_IMPLEMENTED) || (pGCRegs->FWMode == FWM_Fixed))
    {
       AEC_Int_FWPosition = 0;    // on utilise l'index 0 lorsque sans roue a filtre
-      ProposedExposureTime = gcRegsData.ExposureTime;
+      ProposedExposureTimeLast = gcRegsData.ExposureTime;
    }
    else
    {
-      ProposedExposureTime = *((float*)pGcRegsDefExposureTimeX[AEC_Int_FWPosition]->p_data);
+      ProposedExposureTimeLast = *((float*)pGcRegsDefExposureTimeX[AEC_Int_FWPosition]->p_data);
    }
 
    AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
-   if ((AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION) || (fabsf(ProposedExposureTime - AEC_Int_expTime) > AEC_EXPOSURE_TIME_RESOLUTION))
+   if ((AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION) || (fabsf(ProposedExposureTimeLast - AEC_Int_expTime) > AEC_EXPOSURE_TIME_RESOLUTION))
    {
+      // On reset l'histogramme lorsqu'on est à l'extérieur d'une plage valide ou si le PET précédent n'a pas encore été appliqué.
       AEC_ClearMem(pAEC_CTRL);
    }
    else
