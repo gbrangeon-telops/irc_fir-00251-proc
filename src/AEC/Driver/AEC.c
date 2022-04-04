@@ -225,8 +225,9 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    uint16_t PDRmax = 0;
    float CorrectionFactor = 0.0f;
    float TargetExpTime = 0.0f;
+   float ProposedExposureTime = 0.0f;
    float DeltaT = 0.0;
-   float alpha = 0.0f;
+   float alpha       = 0.0f;
    float PET = 0.0f;
    float den;
 
@@ -275,8 +276,18 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    }
 
    AEC_Int_FWPosition = AXI4L_read32(AEC_BASE_ADDR + AEC_FWPOSITION_OFFSET);
+   if ((AEC_Int_FWPosition == FWPOSITION_NOT_IMPLEMENTED) || (pGCRegs->FWMode == FWM_Fixed))
+   {
+      AEC_Int_FWPosition = 0;    // on utilise l'index 0 lorsque sans roue a filtre
+      ProposedExposureTime = gcRegsData.ExposureTime;
+   }
+   else
+   {
+      ProposedExposureTime = *((float*)pGcRegsDefExposureTimeX[AEC_Int_FWPosition]->p_data);
+   }
 
-   if (AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION)
+   AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
+   if ((AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION) || (fabsf(ProposedExposureTime - AEC_Int_expTime) > AEC_EXPOSURE_TIME_RESOLUTION))
    {
       AEC_ClearMem(pAEC_CTRL);
    }
@@ -284,7 +295,6 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    {
 
       // Read Data
-      AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
       AEC_Int_lowerbinId         = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERBINID_OFFSET);
       AEC_Int_lowercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_LOWERCUMSUM_OFFSET);
       AEC_Int_uppercumsum        = AXI4L_read32(AEC_BASE_ADDR + AEC_UPPERCUMSUM_OFFSET);
@@ -294,11 +304,6 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
       //Clear MEM
       AEC_ClearMem(pAEC_CTRL);
-
-      if ((AEC_Int_FWPosition == FWPOSITION_NOT_IMPLEMENTED) || (pGCRegs->FWMode == FWM_Fixed))
-      {
-         AEC_Int_FWPosition = 0;    // on utilise l'index 0 lorsque sans roue a filtre
-      }
 
       if (AEC_TimeStamps_d1[AEC_Int_FWPosition] == 0) // Condition where filter was changed but haven't reached setpoint in AEC+
       {
@@ -404,7 +409,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
       PET = (1-alpha) * TargetExpTime + alpha * AEC_Int_expTime;
 
       //round to 0.1us
-      PET = ((float)((uint32_t)(PET*10.0f))) / 10.0f;
+      PET = ((float)((uint32_t)(PET/AEC_EXPOSURE_TIME_RESOLUTION))) * AEC_EXPOSURE_TIME_RESOLUTION;
 
       //Limite to ETmin and ETmax
       if(PET < pGCRegs->ExposureTimeMin)
