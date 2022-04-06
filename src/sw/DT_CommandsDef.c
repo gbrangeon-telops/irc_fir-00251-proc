@@ -937,7 +937,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
 
    arglen = GetNextArg(cbuf, argStr, sizeof(argStr) - 1);
    argStr[arglen++] = '\0';
-   if (strcasecmp((char*)argStr, "DBG") == 0) // data debug diagnosis mode
+   if (strcasecmp((char*)argStr, "DBG") == 0) // use debug mode
       cmd = 0;
    else if (strcasecmp((char*)argStr, "RST") == 0) // reset options
       cmd = 1;
@@ -951,7 +951,7 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       cmd = 5;
    else if (strcasecmp((char*)argStr, "AEC") == 0) // AEC enable/disable
       cmd = 6;
-   else if (strcasecmp((char*)argStr, "CFG") == 0) // Mode configuration
+   else if (strcasecmp((char*)argStr, "VRB") == 0) // Verbose configuration
       cmd = 7;
    else if (strcasecmp((char*)argStr, "STP") == 0) // Cancel currently running actualization
       cmd = 8;
@@ -959,10 +959,12 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
       cmd = 9;
    else if (strcasecmp((char*)argStr, "FR") == 0)  // set acquisition frame rate during actualization
       cmd = 10;
+   else if (strcasecmp((char*)argStr, "CNST") == 0)  // Constant value data
+      cmd = 11;
 
    switch (cmd)
    {
-      case 0: // debug data on/off
+      case 0: // debug mode on/off
          arglen = GetNextArg(cbuf, argStr, 10);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
@@ -973,13 +975,13 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          {
             if (value == 0)
             {
-               DT_INF("using detector data for actualization");
-               gActDebugOptions.useDebugData = false;
+               DT_INF("Normal mode (no bypass) activated");
+               gActDebugOptions.bypassChecks = false;
             }
             else
             {
-               DT_INF("using constant test pattern data for actualization");
-               gActDebugOptions.useDebugData = true;
+               DT_INF("Debug mode (bypass) activated");
+               gActDebugOptions.bypassChecks = true;
             }
          }
          break;
@@ -1028,15 +1030,15 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          }
          else
          {
-            if (value == 1)
-            {
-               DT_INF("will clear the buffer after actualisation");
-               gActDebugOptions.clearBufferAfterCompletion = true;
-            }
-            else
+            if (value == 0)
             {
                DT_INF("will not clear the buffer after actualisation");
                gActDebugOptions.clearBufferAfterCompletion = false;
+            }
+            else
+            {
+               DT_INF("will clear the buffer after actualisation");
+               gActDebugOptions.clearBufferAfterCompletion = true;
             }
          }
          break;
@@ -1062,85 +1064,39 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
          }
          else
          {
-            if (value == 1)
-            {
-               DT_INF("AEC enabled during actualisation");
-               gActDebugOptions.bypassAEC = false;
-            }
-            else
+            if (value == 0)
             {
                DT_INF("AEC disabled during actualisation");
                gActDebugOptions.bypassAEC = true;
             }
+            else
+            {
+               DT_INF("AEC enabled during actualisation");
+               gActDebugOptions.bypassAEC = false;
+            }
          }
          break;
 
-      case 7: // CFG mode
+      case 7: // Verbose on/off
          arglen = GetNextArg(cbuf, argStr, 10);
          if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
          {
-            // without argument : display the current mode
-            value = gActDebugOptions.mode;
-         }
-         else
-            gActDebugOptions.mode = value;
-
-         DT_PRINTF("Actualisation : current mode = 0x%02X", value);
-
-         if (BitMaskTst(value, ACT_MODE_DEBUG))
-         {
-            DT_PRINTF("Actualisation : debug mode activated (0x%02X)", ACT_MODE_DEBUG);
+            DT_ERR("Invalid data length.");
+            return IRC_FAILURE;
          }
          else
          {
-            DT_PRINTF("Actualisation : debug mode disabled (0x%02X)", ACT_MODE_DEBUG);
+            if (value == 0)
+            {
+               DT_INF("Verbose is OFF");
+               gActDebugOptions.verbose = false;
+            }
+            else
+            {
+               DT_INF("Verbose is ON");
+               gActDebugOptions.verbose = true;
+            }
          }
-
-         if (BitMaskTst(value, ACT_MODE_DELTA_BETA_OFF))
-         {
-            DT_PRINTF("Actualisation : beta correction disabled (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
-         }
-         else
-         {
-            DT_PRINTF("Actualisation : beta correction activated (0x%02X)", ACT_MODE_DELTA_BETA_OFF);
-         }
-
-         if (BitMaskTst(value, ACT_MODE_BP_OFF))
-         {
-            DT_PRINTF("Actualisation : bad pixel detection disabled (0x%02X)", ACT_MODE_BP_OFF);
-         }
-         else
-         {
-            DT_PRINTF("Actualisation : bad pixel detection activated (0x%02X)", ACT_MODE_BP_OFF);
-         }
-
-         if (BitMaskTst(value, ACT_MODE_DYN_TST_PTRN))
-         {
-            DT_PRINTF("Actualisation : dynamic test pattern is ON (0x%02X)", ACT_MODE_DYN_TST_PTRN);
-         }
-         else
-         {
-            DT_PRINTF("Actualisation : dynamic test pattern is OFF (0x%02X)", ACT_MODE_DYN_TST_PTRN);
-         }
-
-         if (BitMaskTst(value, ACT_MODE_VERBOSE))
-         {
-            DT_PRINTF("Actualisation : verbose is ON (0x%02X)", ACT_MODE_VERBOSE);
-         }
-         else
-         {
-            DT_PRINTF("Actualisation : verbose is OFF (0x%02X)", ACT_MODE_VERBOSE);
-         }
-
-         if (BitMaskTst(value, ACT_MODE_DISCARD_OFFSET))
-         {
-            DT_PRINTF("Actualisation : force discard delta beta offset is ON (0x%02X)", ACT_MODE_DISCARD_OFFSET);
-         }
-         else
-         {
-            DT_PRINTF("Actualisation : force discard delta beta offset is OFF (0x%02X)", ACT_MODE_DISCARD_OFFSET);
-         }
-
          break;
 
       case 8:
@@ -1169,6 +1125,28 @@ IRC_Status_t DebugTerminalParseACT(circByteBuffer_t *cbuf)
             else
             {
                gActDebugOptions.actFrameRate = fValue;   // limited to FRmax when set
+            }
+         }
+         break;
+
+      case 11: // Constant value data on/off
+         arglen = GetNextArg(cbuf, argStr, 10);
+         if (ParseNumArg((char *)argStr, arglen, &value) != IRC_SUCCESS)
+         {
+            DT_ERR("Invalid data length.");
+            return IRC_FAILURE;
+         }
+         else
+         {
+            if (value == 0)
+            {
+               DT_INF("using detector data for actualization");
+               gActDebugOptions.useDebugData = false;
+            }
+            else
+            {
+               DT_INF("using constant test pattern data for actualization");
+               gActDebugOptions.useDebugData = true;
             }
          }
          break;
@@ -2759,13 +2737,13 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  FPA status:         FPA [POL|REF|OFF|ETOFF|REGA|REGB|REGC|REGD|REGE|REGF|REGG|REGH|STAR|SATU|REF1|REF2|BIAS value]");
    DT_PRINTF("  xro3503A status:    XRO [BIAS|DETECTSUB|CTIAREF|VTESTG|CM|VCMO|LOVH|SWM value]");
    DT_PRINTF("  HDER status:        HDER");
-	DT_PRINTF("  CAL status:         CAL");
+   DT_PRINTF("  CAL status:         CAL");
    DT_PRINTF("  TRIG status:        TRIG");
    DT_PRINTF("  Buffering status:   BUF");
    DT_PRINTF("  Camera status:      STATUS");
    DT_PRINTF("  Power status:       POWER");
    DT_PRINTF("  Network status:     NET [0|1 [port]]");
-   DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|CFG|STP|LST|FR [value]");
+   DT_PRINTF("  Actualization:      ACT DBG|RST|INV|CLR|ICU|XBB|AEC|VRB|STP|LST|FR|CNST [value]");
    DT_PRINTF("  List files:         LS [FILE|COL|BLOCK|NL|ICU|ACT]");
    DT_PRINTF("  Remove file:        RM filename");
    DT_PRINTF("  File order:         FO FILE|COL|BLOCK|NL|ICU|ACT [NONE|POSIX|TYPE|NAME|CTYPE|FW|NDF|LENS|FOV]");

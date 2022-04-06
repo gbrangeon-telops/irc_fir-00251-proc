@@ -26,7 +26,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ACT_VERBOSE_LEVEL 1
 
 #ifdef ACT_VERBOSE
    #define ACT_PRINTF(fmt, ...)  FPGA_PRINTF("ACT: " fmt, ##__VA_ARGS__)
@@ -37,13 +36,9 @@
 #define ACT_ERR(fmt, ...)        FPGA_PRINTF("ACT: Error: " fmt "\n", ##__VA_ARGS__)
 #define ACT_INF(fmt, ...)        FPGA_PRINTF("ACT: Info: " fmt "\n", ##__VA_ARGS__)
 
-#if ACT_VERBOSE_LEVEL>1
-   #define ACT_TRC(fmt, ...)        ACT_PRINTF("Trace: " fmt "\n", ##__VA_ARGS__)
-#else
-   #define ACT_TRC(fmt, ...)        DUMMY_PRINTF("Trace: " fmt "\n", ##__VA_ARGS__)
-#endif
 
-#define ACT_MAX_PIX_DATA_TO_PROCESS   8192 // number of pixels to process in a single time shared pass. Must be even
+#define ACT_MAX_PIX_DATA_TO_PROCESS   8192 // number of pixels to process in a single time shared pass.
+                                           // WARNING: must be a factor of MAX_PIXEL_COUNT
 #define ACT_MAX_DATABLOCK_TO_WRITE    256 // for file IO
 
 #define ACT_ICU_TEMP_TOL              (float)0.25f // [°C]
@@ -68,8 +63,6 @@
 
 #define ACT_DEFAULT_FPS         (float)25.0f
 #define ACT_MAX_N_COADD         (uint32_t)256 // maximum number of images to coadd
-
-#define ACT_NUM_DEBUG_FRAMES   12
 
 #define MAX_FRAME_SIZE ((uint32_t)(FPA_HEIGHT_MAX+2) * (uint32_t)FPA_WIDTH_MAX)
 #define MAX_PIXEL_COUNT ((uint32_t)(FPA_HEIGHT_MAX) * (uint32_t)FPA_WIDTH_MAX)
@@ -118,7 +111,6 @@
 		ACTION(BPD_BuildCriteria) \
 		ACTION(BPD_AdjustThresholds) \
 		ACTION(BPD_UpdateBPMap) \
-		ACTION(BPD_DebugState) \
 		ACTION(BPD_Finalize)
 
 #define BQ_STATES(ACTION) \
@@ -271,22 +263,9 @@ typedef struct
    bool clearBufferAfterCompletion; // defaults to true
    bool bypassAEC; // defaults to false
    bool bypassChecks;
-   bool disableDeltaBeta;
-   bool disableBPDetection;
-   bool useDynamicTestPattern;
    bool verbose;
-   bool forceDiscardOffset;
-   uint32_t mode; // bit mask, default to 0
    float actFrameRate;  // in FPS
 } actDebugOptions_t;
-
-// actDebugOptions_t.mode switches
-#define ACT_MODE_DELTA_BETA_OFF 0x01 // go directly to bad pixel detection (if enabled)
-#define ACT_MODE_BP_OFF 0x02
-#define ACT_MODE_DEBUG 0x04 // bypass some verifications, buffer not cleared, bypass stabilisation phases
-#define ACT_MODE_DYN_TST_PTRN 0x08 // use the dynamic test pattern (always the case if the cooler is off)
-#define ACT_MODE_VERBOSE 0x10 // add some verbose
-#define ACT_MODE_DISCARD_OFFSET 0x20
 
 typedef struct
 {
@@ -324,7 +303,6 @@ IRC_Status_t BetaQuantizer_SM(uint8_t blockIdx);
 bool ACT_shouldUpdateCurrentCalibration(const calibrationInfo_t* calibInfo, uint8_t blockIdx);
 uint32_t ACT_updateCurrentCalibration(const calibBlockInfo_t* blockInfo, uint32_t* p_CalData, const deltabeta_t* deltaBeta, uint32_t startIdx, uint32_t numData);
 void ACT_resetDebugOptions();
-void ACT_parseDebugMode();
 void ACT_resetParams(actParams_t* p);
 
 void updateMoments(float* m1, float* m2, float* m3, float x, uint32_t N); /**< iterative statistical moments update. */
