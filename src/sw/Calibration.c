@@ -429,7 +429,6 @@ void Calibration_SM()
    static uint32_t lutRQCount;
    static uint32_t lutNLCount;
    static uint8_t startup = 1;
-   static deltabeta_t* deltaBetaDataAddr = NULL;
    static bool once = false;
    static bool gpsDisabled;
 
@@ -892,12 +891,6 @@ void Calibration_SM()
                      cmCurrentState = CMS_UPDATE_PIXEL_DATA;
                      gStartBetaQuantization = true;
                      dataOffset = 0;
-                     deltaBetaDataAddr = ACT_getSuitableDeltaBetaForBlock(&calibrationInfo, blockIndex);
-                     if (deltaBetaDataAddr == NULL)
-                     {
-                        CM_ERR("No actualisation found");
-                        cmCurrentState = CMS_LOAD_MAXTK_DATA_HEADER;
-                     }
                      GETTIME(&tic_calibUpdate);
                   }
                   else
