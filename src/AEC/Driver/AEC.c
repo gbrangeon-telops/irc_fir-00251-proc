@@ -233,7 +233,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
 
    bool done = false;
 
-   const float binWidth = powf(2.0F, (float)FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
+   const float binWidth = exp2f((float)FPA_DATA_RESOLUTION) / (float)AEC_NB_BIN;
    extern gcRegister_t* pGcRegsDefExposureTimeX[MAX_NUM_FILTER];
 
 #ifdef AEC_ENABLE_PROFILER

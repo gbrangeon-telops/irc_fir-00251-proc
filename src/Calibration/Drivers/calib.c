@@ -553,15 +553,15 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
             p_blockInfo->lutNLData.LUT_Xrange,
             p_blockInfo->lutNLData.LUT_Size);
       blockRam.range_offset_fp32       = p_blockInfo->pixelData.Range_Off;
-      blockRam.pow2_offset_exp_fp32    = powf(2.0F, (float)p_blockInfo->pixelData.Offset_Exp);
-      blockRam.pow2_range_exp_fp32     = powf(2.0F, (float)p_blockInfo->pixelData.Range_Exp);
-      blockRam.nlc_pow2_m_exp_fp32     = powf(2.0F, (float)p_blockInfo->lutNLData.M_Exp);
-      blockRam.nlc_pow2_b_exp_fp32     = powf(2.0F, (float)p_blockInfo->lutNLData.B_Exp);
+      blockRam.pow2_offset_exp_fp32    = exp2f((float)p_blockInfo->pixelData.Offset_Exp);
+      blockRam.pow2_range_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Range_Exp);
+      blockRam.nlc_pow2_m_exp_fp32     = exp2f((float)p_blockInfo->lutNLData.M_Exp);
+      blockRam.nlc_pow2_b_exp_fp32     = exp2f((float)p_blockInfo->lutNLData.B_Exp);
       blockRam.delta_temp_fp32         = 0.0F;  // written in CAL_UpdateDeltaF
       blockRam.alpha_offset_fp32       = p_blockInfo->pixelData.Alpha_Off;
-      blockRam.pow2_alpha_exp_fp32     = powf(2.0F, (float)p_blockInfo->pixelData.Alpha_Exp);
-      blockRam.pow2_beta0_exp_fp32     = powf(2.0F, (float)p_blockInfo->pixelData.Beta0_Exp);
-      blockRam.pow2_kappa_exp_fp32     = powf(2.0F, (float)p_blockInfo->pixelData.Kappa_Exp);
+      blockRam.pow2_alpha_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Alpha_Exp);
+      blockRam.pow2_beta0_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Beta0_Exp);
+      blockRam.pow2_kappa_exp_fp32     = exp2f((float)p_blockInfo->pixelData.Kappa_Exp);
       blockRam.nuc_mult_factor_fp32    = p_blockInfo->NUCMultFactor;
 
       if ((lutRQIndex < LUTRQI_MAX_NUM_OF_LUTRQ) && (p_blockInfo->lutRQData[lutRQIndex].isValid))
@@ -570,10 +570,10 @@ IRC_Status_t CAL_WriteBlockParam(const t_calib *pA, const gcRegistersData_t *pGC
                p_blockInfo->lutRQData[lutRQIndex].LUT_Xmin,
                p_blockInfo->lutRQData[lutRQIndex].LUT_Xrange,
                p_blockInfo->lutRQData[lutRQIndex].LUT_Size);
-         blockRam.rqc_pow2_m_exp_fp32     = powf(2.0F, (float)p_blockInfo->lutRQData[lutRQIndex].M_Exp);
-         blockRam.rqc_pow2_b_exp_fp32     = powf(2.0F, (float)p_blockInfo->lutRQData[lutRQIndex].B_Exp);
+         blockRam.rqc_pow2_m_exp_fp32     = exp2f((float)p_blockInfo->lutRQData[lutRQIndex].M_Exp);
+         blockRam.rqc_pow2_b_exp_fp32     = exp2f((float)p_blockInfo->lutRQData[lutRQIndex].B_Exp);
          blockRam.offset_fp32             = p_blockInfo->lutRQData[lutRQIndex].Data_Off;
-         blockRam.pow2_lsb_fp32           = powf(2.0F, (float)p_blockInfo->lutRQData[lutRQIndex].Data_Exp);
+         blockRam.pow2_lsb_fp32           = exp2f((float)p_blockInfo->lutRQData[lutRQIndex].Data_Exp);
       }
       else
       {

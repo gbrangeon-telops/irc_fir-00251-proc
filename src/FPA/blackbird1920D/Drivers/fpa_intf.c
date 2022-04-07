@@ -529,8 +529,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)XTRA_TRIG_FREQ_MAX_HZ);
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)ptrA->fpa_xtra_trig_ctrl_dly);
   
-   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)roundf(hh.fpa_intg_clk_rate_hz * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
-   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)roundf((float)VHD_CLK_100M_RATE_HZ * powf(2.0F, gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/hh.fpa_intg_clk_rate_hz);
+   ptrA->clk100_to_intclk_conv_numerator = (uint32_t)roundf(hh.fpa_intg_clk_rate_hz * exp2f(gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/(float)VHD_CLK_100M_RATE_HZ);
+   ptrA->intclk_to_clk100_conv_numerator = (uint32_t)roundf((float)VHD_CLK_100M_RATE_HZ * exp2f(gPrivateStat.fpa_exp_time_conv_denom_bit_pos)/hh.fpa_intg_clk_rate_hz);
    
    // Élargit le pulse de trig au besoin
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;

@@ -110,7 +110,7 @@ void XADC_ThPhyConv(xadcChannel_t *xadcCh)
 {
    float Vth = xadcCh->voltage;
    float Rth_100K = 0;
-   float Rth;
+   float Rth, log_Rth;
    int range;
    float partial_result;
 
@@ -140,14 +140,16 @@ void XADC_ThPhyConv(xadcChannel_t *xadcCh)
          range = 0;
       }
 
+      log_Rth = logf(Rth);
+
       // a + b(Ln Rt/R25)
-      partial_result =   Conv_Fact_MC65[TempCoeff_A][range] + (Conv_Fact_MC65[TempCoeff_B][range]*logf(Rth));
+      partial_result =   Conv_Fact_MC65[TempCoeff_A][range] + (Conv_Fact_MC65[TempCoeff_B][range]*log_Rth);
 
       // + c(Ln(Rt/R25))?
-      partial_result += (Conv_Fact_MC65[TempCoeff_C][range]*powf(logf(Rth), 2));
+      partial_result += (Conv_Fact_MC65[TempCoeff_C][range]*powf(log_Rth, 2));
 
       // + d(Ln(Rt/R25))?
-      partial_result += (Conv_Fact_MC65[TempCoeff_D][range]*powf(logf(Rth), 3));
+      partial_result += (Conv_Fact_MC65[TempCoeff_D][range]*powf(log_Rth, 3));
 
       *(xadcCh->p_physical) = K_TO_C(1.0F/partial_result);
    }
@@ -157,7 +159,7 @@ void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh)
 {
    float Vth = xadcCh->voltage;
    float Rth_100K = 0;
-   float Rth;
+   float Rth, log_Rth;
    int range;
    float partial_result;
 
@@ -182,15 +184,17 @@ void XADC_ThPhyConv_USX3431(xadcChannel_t *xadcCh)
          range = 0;
       }
 
+      log_Rth = logf(Rth);
+
       // a + b(Ln Rt)
       partial_result =   Conv_Fact_USX3431[TempCoeff_A][range] +
-                        (Conv_Fact_USX3431[TempCoeff_B][range]*logf(Rth));
+                        (Conv_Fact_USX3431[TempCoeff_B][range]*log_Rth);
 
       // + c(Ln(Rt))^3
-      partial_result += (Conv_Fact_USX3431[TempCoeff_C][range]*powf(logf(Rth), 3));
+      partial_result += (Conv_Fact_USX3431[TempCoeff_C][range]*powf(log_Rth, 3));
 
       // + d(Ln(Rt))^5?
-      partial_result += (Conv_Fact_USX3431[TempCoeff_D][range]*powf(logf(Rth), 5));
+      partial_result += (Conv_Fact_USX3431[TempCoeff_D][range]*powf(log_Rth, 5));
 
       *(xadcCh->p_physical) = K_TO_C(1.0F/partial_result);
    }
