@@ -61,7 +61,7 @@
 #define FPA_INTEGRATION_MODE     IM_IntegrateThenRead
 #define FPA_SENSOR_WELL_DEPTH    SWD_LowGain
 #define FPA_TDC_FLAGS            (Blackbird1280DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask)
-#define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
+#define FPA_TDC_FLAGS2           0
 
 #define FPA_COOLER_TEMP_THRES    -19400   //[cC]
 #define FPA_COOLER_TEMP_TOL      1000     //[cC]
