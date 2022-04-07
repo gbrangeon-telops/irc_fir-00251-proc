@@ -6,7 +6,7 @@
 #define SVN_HARDWARE_REV      25630
 #define SVN_SOFTWARE_REV      25634
 #define SVN_BOOTLOADER_REV    25630
-#define SVN_COMMON_REV        27001
+#define SVN_COMMON_REV        27156
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -14,7 +14,7 @@
 #warning Uncommitted changes detected.
 #endif
 
-#define HARDWARE_MISMATCH (0)
+#define HARDWARE_MISMATCH (1)
 
 #if HARDWARE_MISMATCH
 #error D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_blackbird1280D\hw_platform_160\system.hdf does not match D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_blackbird1280D\fir_00251_proc_blackbird1280D_160.hdf
@@ -22,10 +22,10 @@
 
 #elif defined(ARCH_FPGA_325)
 
-#define SVN_HARDWARE_REV      27075
-#define SVN_SOFTWARE_REV      27083
+#define SVN_HARDWARE_REV      -27075
+#define SVN_SOFTWARE_REV      27084
 #define SVN_BOOTLOADER_REV    26769
-#define SVN_COMMON_REV        27001
+#define SVN_COMMON_REV        27156
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
