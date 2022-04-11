@@ -58,6 +58,7 @@ add_files [concat \
 add_files [concat \
    [glob -nocomplain $common251_dir/*.vhd] \
    [glob -nocomplain $common251_dir/Buffering/*.vhd] \
+   [glob -nocomplain $common251_dir/decimator/Hdl/*.vhd] \
    [glob -nocomplain $common251_dir/Calibration/*.vhd] \
    [glob -nocomplain $common251_dir/Fifo/*.vhd] \
    [glob -nocomplain $common251_dir/hdr_extractor/*.vhd] \
