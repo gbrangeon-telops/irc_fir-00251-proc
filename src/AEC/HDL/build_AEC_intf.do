@@ -19,11 +19,15 @@ acom -nowarn DAGGEN_0523 "$COMMON_HDL\Utilities\SYNC_RESET.vhd" \
 
 #source Histogram
 acom "$PROC\IP\160\histogram_axis_tmi_4pix_0\histogram_axis_tmi_4pix_0_stub.vhdl"
+ 
+#source decimator
+do "D:\Telops\FIR-00251-Common\VHDL\decimator\Hdl\build_decimator.do"
 
 #source AEC
 acom -nowarn DAGGEN_0523 "$AEC_INTF\AEC_CUMSUM.vhd" \
- -relax "$AEC_INTF\AEC_Ctrl.vhd" \
+-relax "$AEC_INTF\AEC_Ctrl.vhd" \
  "$AEC_INTF\AECPlus.vhd" \
+ "$AEC_INTF\aec_decimator_wrapper.bde" \
  "$AEC_INTF\AEC.bde"
 
 #sim

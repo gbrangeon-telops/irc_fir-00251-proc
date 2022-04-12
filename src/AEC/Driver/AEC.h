@@ -21,6 +21,8 @@
 #include "tel2000_param.h"
 #include "verbose.h"
 
+#include <math.h>
+
 #ifdef AEC_VERBOSE
    #define AEC_PRINTF(fmt, ...)  FPGA_PRINTF("AEC: " fmt, ##__VA_ARGS__)
 #else
@@ -51,6 +53,8 @@
 #define AECP_SUMCNT_LSB_OFFSET         0x44
 #define AECP_NBPIXELS_OFFSET           0x48
 #define AECP_DATAVALID_OFFSET          0x4C
+#define DECIMATOR_INPUT_WIDTH_OFFSET   0x50
+#define DECIMATOR_ENABLE_OFFSET        0x54
 
 /************************** Constant Definitions ****************************/
 #define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR // TO CONFIRM
@@ -62,6 +66,14 @@
 
 #define DEFAULT_PIXDYNRANGEMIN 0
 #define DEFAULT_PIXDYNRANGEMAX ((1 << FPA_DATA_RESOLUTION)-1)
+
+#define DECIMATOR_THRESHOLD             exp2f(21.0f)-1
+#define DECIMATOR_INPUT_WIDTH_MIN       64
+#define DECIMATOR_INPUT_HEIGHT_MIN      4
+#define DECIMATOR_DESACTIVATED_MASK     0x00000000
+#define DECIMATOR_ROW_MASK              0x00000001
+#define DECIMATOR_COLUMN_MASK           0x00000002
+#define DECIMATOR_ACTIVATED_MASK        0x00000003
 
 /**************************** Type Definitions ******************************/
 
@@ -77,6 +89,8 @@ struct s_AEC
    uint32_t AEC_MSB_Pos;			// Nb de bit de l'image raw0 (13bits = 0, 14bits=1, 15bits =2, 16 bits= 3)
    uint32_t AEC_clearmem;			// Histogram Clear mem signal
    uint32_t AEC_NewConfigFlag;   // new config flag
+   uint32_t AEC_DecimatorInputWidth;
+   uint32_t AEC_DecimatorEnable;
   };
 typedef struct s_AEC t_AEC;
 
@@ -105,7 +119,7 @@ enum AEC_Mode_Enum {
 typedef enum AEC_Mode_Enum AEC_Mode_t;
 
 /***************** Macros (Inline Functions) Definitions ********************/
-#define AEC_Intf_Ctor(add) {sizeof(t_AEC)/4 - 2, add, 0, 0, 0, 0, 0}
+#define AEC_Intf_Ctor(add) {sizeof(t_AEC)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0}
 
 /************************** Function Prototypes *****************************/
 

@@ -17,6 +17,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.ALL;
+use work.decimator_define.all;
 
 entity AEC_CUMSUM is
    generic(
@@ -39,6 +40,8 @@ entity AEC_CUMSUM is
       MSB_POS              : in std_logic_vector(1 downto 0);
       AEC_CTRL_CLEARMEM    : in std_logic;
       NEW_CONFIG           : in std_logic;
+      DECIMATOR_CFG        : in decimator_cfg_type;
+      DECIMATOR_CFG_OUT    : out decimator_cfg_type;
       
       CUMSUM_ERROR         : out std_logic;
       
@@ -180,7 +183,7 @@ begin
       CLK    => CLK_DATA,
       SRESET => sreset
       );
-      
+ 
    U0 : double_sync port map (D => AEC_CTRL_CLEARMEM, Q => aec_ctrl_clearmem_s, 
                               RESET => sreset, CLK => CLK_DATA);
    U1 : double_sync port map (D => NEW_CONFIG, Q => new_config_s, 
@@ -222,6 +225,7 @@ begin
             image_fraction_s  <= (others => '1');
             nb_bin_s <= (others => '0'); 
             msb_pos_s <= (others => '0');
+            DECIMATOR_CFG_OUT.valid <= '0';
         else
             if new_config_s = '1' then
                 aec_mode_s <= AEC_MODE;
@@ -229,6 +233,9 @@ begin
                     image_fraction_s  <= unsigned(IMAGE_FRACTION);
                     nb_bin_s <= NB_BIN;
                     msb_pos_s <= MSB_POS; 
+                    DECIMATOR_CFG_OUT.input_width <= DECIMATOR_CFG.input_width; 
+                    DECIMATOR_CFG_OUT.enable <= DECIMATOR_CFG.enable;
+                    DECIMATOR_CFG_OUT.valid <= '1';
                 end if;
             end if;
         end if;

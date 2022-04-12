@@ -40,9 +40,9 @@ LANGUAGE=VHDL
 REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
-fileopenfolder=D:\Telops\FIR-00251-Proc\src
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL
-fileopenfolder=D:\Telops\FIR-00251-Proc\src\FrameBuffer\HDL
+fileopenfolder=D:\Telops\FIR-00251-Proc\src\AEC\HDL
+fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\decimator\Hdl
+fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\decimator\Hdl
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -261,6 +261,7 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 [Groups]
 ADCReadout=1
 AEC=1
+AEC\decimator=1
 BD=1
 Buffering=1
 Calib=1
@@ -379,6 +380,12 @@ AEC/..\..\..\src\AEC\HDL\netlist\sysgen\synth_reg_w_init.vhd=-1
 AEC/..\..\..\src\AEC\HDL\netlist\sysgen\xlclockdriver_rd.vhd=-1
 AEC/..\..\..\src\AEC\HDL\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl=-1
 AEC/..\..\..\..\FIR-00251-Common\VHDL\Utilities\axis16_img_extractor.vhd=-1
+AEC/..\..\..\src\AEC\HDL\aec_decimator_wrapper.bde=-1
+AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\build_decimator.do=-1
+AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\column_decimator.vhd=-1
+AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator.bde=-1
+AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator_define.vhd=-1
+AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\row_decimator.vhd=-1
 BD/..\..\..\src\BD\bd_wrapper.vhd=-1
 Buffering/..\..\..\src\Buffering\HDL\moi_source_selector.vhd=-1
 Buffering/..\..\..\src\Buffering\HDL\build_buffering_intf.do=-1
@@ -943,6 +950,12 @@ FrameBuffer/..\..\..\src\FrameBuffer\HDL\fbuffer_define.vhd=-1
 .\..\src\AEC\HDL\netlist\sysgen\xlclockdriver_rd.vhd=VHDL Source Code
 .\..\src\AEC\HDL\netlist\hdl_netlist\histogram_axis_tmi.srcs\sources_1\ip\histogram_axis_tmi_blk_mem_gen_v8_1_0\histogram_axis_tmi_blk_mem_gen_v8_1_0_funcsim.vhdl=VHDL Source Code
 .\..\..\FIR-00251-Common\VHDL\Utilities\axis16_img_extractor.vhd=VHDL Source Code
+.\..\src\AEC\HDL\aec_decimator_wrapper.bde=Block Diagram
+.\..\..\FIR-00251-Common\VHDL\decimator\Hdl\build_decimator.do=Macro
+.\..\..\FIR-00251-Common\VHDL\decimator\Hdl\column_decimator.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator.bde=Block Diagram
+.\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator_define.vhd=VHDL Source Code
+.\..\..\FIR-00251-Common\VHDL\decimator\Hdl\row_decimator.vhd=VHDL Source Code
 .\..\src\BD\bd_wrapper.vhd=VHDL Source Code
 .\..\src\Buffering\HDL\moi_source_selector.vhd=VHDL Source Code
 .\..\src\Buffering\HDL\build_buffering_intf.do=Macro
@@ -1443,68 +1456,12 @@ FrameBuffer/..\..\..\src\FrameBuffer\HDL\fbuffer_define.vhd=-1
 .\..\src\FrameBuffer\HDL\reader_fsm.vhd=VHDL Source Code
 .\..\src\FrameBuffer\HDL\writer_fsm.vhd=VHDL Source Code
 .\..\src\FrameBuffer\HDL\fbuffer_define.vhd=VHDL Source Code
-.\compile\param_lut_fifo.vhd=VHDL Source Code
-.\compile\axis_lut_X_to_ADD.vhd=VHDL Source Code
-.\compile\axis_lut_core_a32_d32.vhd=VHDL Source Code
-.\compile\mgt_block.vhd=VHDL Source Code
-.\compile\mgt_wrapper.vhd=VHDL Source Code
-.\compile\exposure_time_ctrl.vhd=VHDL Source Code
-.\compile\hder_inserter.vhd=VHDL Source Code
-.\compile\trig_gen_ctler.vhd=VHDL Source Code
-.\compile\trig_stamper.vhd=VHDL Source Code
-.\compile\trig_gen.vhd=VHDL Source Code
-.\compile\USB_CTRL.vhd=VHDL Source Code
-.\compile\irig_signal_conditioner_v2.vhd=VHDL Source Code
-.\compile\irig_alphab_decoder_v2.vhd=VHDL Source Code
-.\compile\expb_irig_v2.vhd=VHDL Source Code
-.\compile\NLC.vhd=VHDL Source Code
-.\compile\FSU.vhd=VHDL Source Code
-.\compile\RQC.vhd=VHDL Source Code
-.\compile\FCC.vhd=VHDL Source Code
-.\compile\CFF.vhd=VHDL Source Code
-.\compile\param_fifo_block.vhd=VHDL Source Code
-.\compile\ddr_data_decoder.vhd=VHDL Source Code
-.\compile\calibration_common.vhd=VHDL Source Code
-.\compile\calibration_core.vhd=VHDL Source Code
-.\compile\calibration.vhd=VHDL Source Code
-.\compile\Flash_intf.vhd=VHDL Source Code
-.\compile\USART.vhd=VHDL Source Code
+.\compile\aec_decimator_wrapper.vhd=VHDL Source Code
 .\compile\AEC.vhd=VHDL Source Code
-.\compile\ICU_toplevel.vhd=VHDL Source Code
-.\compile\adc_readout_top.vhd=VHDL Source Code
-.\compile\moi_handler.vhd=VHDL Source Code
-.\compile\buffering.vhd=VHDL Source Code
-.\compile\buffering_wrapper.vhd=VHDL Source Code
-.\compile\FrameBuffer.vhd=VHDL Source Code
-.\compile\EHDRI_toplevel.vhd=VHDL Source Code
-.\compile\flagging_top.vhd=VHDL Source Code
-.\compile\gating_top.vhd=VHDL Source Code
-.\compile\SFW.vhd=VHDL Source Code
-.\compile\fir_00251_proc_acq.vhd=VHDL Source Code
-.\compile\fpa_watchdog_module.vhd=VHDL Source Code
-.\compile\afpa_elec_ref_proc.vhd=VHDL Source Code
-.\compile\afpa_analog_chain_corr.vhd=VHDL Source Code
-.\compile\afpa_real_data_gen.vhd=VHDL Source Code
-.\compile\afpa_dval_gen.vhd=VHDL Source Code
-.\compile\afpa_hsample_proc.vhd=VHDL Source Code
-.\compile\afpa_vsample_proc.vhd=VHDL Source Code
-.\compile\afpa_data_ctrl.vhd=VHDL Source Code
-.\compile\afpa_data_ctrl_16chn.vhd=VHDL Source Code
-.\compile\afpa_services.vhd=VHDL Source Code
-.\compile\afpa_services_sadc.vhd=VHDL Source Code
-.\compile\fleG_prog_ctrler.vhd=VHDL Source Code
-.\compile\xro3503A_clks_gen.vhd=VHDL Source Code
-.\compile\xro3503A_prog_ctrler.vhd=VHDL Source Code
-.\compile\xro3503A_hw_driver.vhd=VHDL Source Code
-.\compile\xro3503A_afpa_services.vhd=VHDL Source Code
-.\compile\xro3503A_intf.vhd=VHDL Source Code
-.\compile\clink_calibration.vhd=VHDL Source Code
-.\compile\quad_pattern_validator.vhd=VHDL Source Code
-.\compile\quad_data_deserializer.vhd=VHDL Source Code
-.\compile\afpa_data_deserializer_8chn.vhd=VHDL Source Code
-.\compile\afpa_data_deserializer_16chn.vhd=VHDL Source Code
-.\compile\fir_00251_proc_xro3503A.vhd=VHDL Source Code
+.\compile\decimator.vhd=VHDL Source Code
 
+[file_out:/..\..\src\fir_00251_proc_acq.bde]
+/..\compile\fir_00251_proc_acq.vhd=-1
 
 [file_out:/..\..\src\fir_00251_proc_blackbird1280D.bde]
 /..\compile\fir_00251_proc_blackbird1280D.vhd=-1
@@ -1560,21 +1517,52 @@ FrameBuffer/..\..\..\src\FrameBuffer\HDL\fbuffer_define.vhd=-1
 [file_out:/..\..\src\fir_00251_proc_suphawkA.bde]
 /..\compile\fir_00251_proc_suphawkA.vhd=-1
 
+[file_out:/..\..\src\fir_00251_proc_xro3503A.bde]
+/..\compile\fir_00251_proc_xro3503A.vhd=-1
+
+[file_out:ADCReadout/..\..\..\src\ADCReadout\HDL\adc_readout_top.bde]
+ADCReadout/..\..\compile\adc_readout_top.vhd=-1
 
 
 
+[file_out:Buffering/..\..\..\src\Buffering\HDL\Buffering_wrapper.bde]
+Buffering/..\..\compile\buffering_wrapper.vhd=-1
 
+[file_out:Buffering/..\..\..\..\FIR-00251-Common\VHDL\Buffering\Buffering.bde]
+Buffering/..\..\compile\buffering.vhd=-1
 
+[file_out:Buffering/..\..\..\src\Buffering\HDL\moi_handler.bde]
+Buffering/..\..\compile\moi_handler.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\calibration.bde]
+Calib/..\..\compile\calibration.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\calibration_core.bde]
+Calib/..\..\compile\calibration_core.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\calibration_common.bde]
+Calib/..\..\compile\calibration_common.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\NLC.bde]
+Calib/..\..\compile\NLC.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\FSU.bde]
+Calib/..\..\compile\FSU.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\FCC.bde]
+Calib/..\..\compile\FCC.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\RQC.bde]
+Calib/..\..\compile\RQC.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\CFF.bde]
+Calib/..\..\compile\CFF.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\ddr_data_decoder.bde]
+Calib/..\..\compile\ddr_data_decoder.vhd=-1
 
+[file_out:Calib/..\..\..\src\Calibration\HDL\param_fifo_block.bde]
+Calib/..\..\compile\param_fifo_block.vhd=-1
 
 [file_out:CLINK/..\..\..\src\clink\HDL\clink_receiver_3ch.bde]
 CLINK/..\..\compile\clink_receiver_3ch.vhd=-1
@@ -1585,6 +1573,8 @@ CLINK/..\..\compile\clink_deserializer.vhd=-1
 [file_out:CLINK/..\..\..\src\clink\HDL\clink_dout_ctrl_v2.bde]
 CLINK/..\..\compile\clink_dout_ctrl_v2.vhd=-1
 
+[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
+CLINK/..\..\compile\clink_calibration.vhd=-1
 
 [file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_delay_validator.bde]
 CLINK/..\..\compile\clink_delay_validator.vhd=-1
@@ -1592,21 +1582,48 @@ CLINK/..\..\compile\clink_delay_validator.vhd=-1
 [file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_signals_validator.bde]
 CLINK/..\..\compile\clink_signals_validator.vhd=-1
 
+[file_out:EHDRI/..\..\..\src\eHDRI\HDL\EHDRI_toplevel.bde]
+EHDRI/..\..\compile\EHDRI_toplevel.vhd=-1
 
+[file_out:ExposureTime/..\..\..\src\ExposureTime\HDL\exposure_time_ctrl.bde]
+ExposureTime/..\..\compile\exposure_time_ctrl.vhd=-1
 
+[file_out:Flagging/..\..\..\src\Flagging\HDL\flagging_top.bde]
+Flagging/..\..\compile\flagging_top.vhd=-1
 
+[file_out:Flash_Ctrl/..\..\..\src\Flash_Ctrl\HDL\Flash_intf.bde]
+Flash_Ctrl/..\..\compile\Flash_intf.vhd=-1
+Flash_Ctrl/SFW=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
+FPA\Common/..\..\..\compile\afpa_services.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde]
+FPA\Common/..\..\..\compile\afpa_services_sadc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
+FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
+FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde]
+FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\uart_block_tel2000.bde]
 FPA\Common/..\..\..\compile\uart_block_tel2000.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
+FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
+FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
+FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
 
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_offset_proc.bde]
 FPA\Common/..\compile\afpa_elec_offset_proc.vhd=-1
@@ -1620,8 +1637,14 @@ FPA\Common/..\..\..\compile\fastrd_wdow_info_rate_ctrler.vhd=-1
 [file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd_wdow_mem.bde]
 FPA\Common/..\..\..\compile\fastrd_wdow_mem.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde]
+FPA\Common/..\..\..\compile\afpa_analog_chain_corr.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde]
+FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
 
+[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde]
+FPA\Common/..\..\..\compile\fpa_watchdog_module.vhd=-1
 
 [file_out:FPA\HawkA/..\..\..\..\src\FPA\hawkA\HDL\hawkA_clks_gen.bde]
 FPA\HawkA/..\..\..\compile\hawkA_clks_gen.vhd=-1
@@ -1767,26 +1790,68 @@ FPA\suphawkA/..\..\..\compile\suphawkA_intf.vhd=-1
 [file_out:FPA\suphawkA/..\..\..\..\src\FPA\suphawkA\HDL\suphawkA_prog_ctrler.bde]
 FPA\suphawkA/..\..\..\compile\suphawkA_prog_ctrler.vhd=-1
 
+[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_clks_gen.bde]
+FPA\xro3503A/..\..\..\compile\xro3503A_clks_gen.vhd=-1
 
+[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_hw_driver.bde]
+FPA\xro3503A/..\..\..\compile\xro3503A_hw_driver.vhd=-1
 
+[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_intf.bde]
+FPA\xro3503A/..\..\..\compile\xro3503A_intf.vhd=-1
 
+[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_afpa_services.bde]
+FPA\xro3503A/..\..\..\compile\xro3503A_afpa_services.vhd=-1
 
+[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler.bde]
+FPA\xro3503A/..\..\..\compile\xro3503A_prog_ctrler.vhd=-1
 
+[file_out:Gating/..\..\..\src\Gating\HDL\gating_top.bde]
+Gating/..\..\compile\gating_top.vhd=-1
 
+[file_out:HeaderInserter/..\..\..\src\Hder\HDL\hder_inserter.bde]
+HeaderInserter/..\..\compile\hder_inserter.vhd=-1
 
+[file_out:ICU/..\..\..\src\ICU\HDL\ICU_toplevel.bde]
+ICU/..\..\compile\ICU_toplevel.vhd=-1
 
+[file_out:Irig/..\..\..\src\Irig\HDL\expb_irig_v2.bde]
+Irig/..\..\compile\expb_irig_v2.vhd=-1
 
+[file_out:Irig/..\..\..\src\Irig\HDL\irig_alphab_decoder_v2.bde]
+Irig/..\..\compile\irig_alphab_decoder_v2.vhd=-1
 
+[file_out:Irig/..\..\..\src\Irig\HDL\irig_signal_conditioner_v2.bde]
+Irig/..\..\compile\irig_signal_conditioner_v2.vhd=-1
 
+[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\param_lut_fifo.bde]
+LUT/..\..\compile\param_lut_fifo.vhd=-1
 
+[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_core_a32_d32.bde]
+LUT/..\..\compile\axis_lut_core_a32_d32.vhd=-1
 
+[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_X_to_ADD.bde]
+LUT/..\..\compile\axis_lut_X_to_ADD.vhd=-1
 
+[file_out:MGT/..\..\..\src\MGT\HDL\mgt_block.bde]
+MGT/..\..\compile\mgt_block.vhd=-1
 
+[file_out:MGT/..\..\..\src\MGT\HDL\mgt_wrapper.bde]
+MGT/..\..\compile\mgt_wrapper.vhd=-1
 
+[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_deserializer.bde]
+Quad_serdes/..\..\compile\quad_data_deserializer.vhd=-1
 
+[file_out:Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde]
+Quad_serdes/..\..\compile\quad_pattern_validator.vhd=-1
 
+[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde]
+Quad_serdes/..\..\compile\afpa_data_deserializer_8chn.vhd=-1
 
+[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde]
+Quad_serdes/..\..\compile\afpa_data_deserializer_16chn.vhd=-1
 
+[file_out:SFW/..\..\..\src\SFW\HDL\SFW.bde]
+SFW/..\..\compile\SFW.vhd=-1
 
 [file_out:Testbench\IP\data_mgt/data_mgt_tb.bde]
 Testbench\IP\data_mgt/..\..\..\..\compile\data_mgt_tb.vhd=-1
@@ -1803,10 +1868,20 @@ Testbench\IP\AXI4_Stream64_to_32/..\..\..\..\compile\AXI4_Stream64_to_32_tb.vhd=
 [file_out:Testbench\Proc_Only/Processing_tb.bde]
 Testbench\Proc_Only/..\..\..\compile\Processing_tb.vhd=-1
 
+[file_out:Trig/..\..\..\src\Trig\HDL\trig_gen.bde]
+Trig/..\..\compile\trig_gen.vhd=-1
 
+[file_out:Trig/..\..\..\src\Trig\HDL\trig_gen_ctler.bde]
+Trig/..\..\compile\trig_gen_ctler.vhd=-1
 
+[file_out:Trig/..\..\..\src\Trig\HDL\trig_stamper.bde]
+Trig/..\..\compile\trig_stamper.vhd=-1
 
+[file_out:USART/..\..\..\..\FIR-00251-Common\VHDL\USART\USART.bde]
+USART/..\..\compile\USART.vhd=-1
 
+[file_out:USB/..\..\..\src\USB\hdl\USB_CTRL.bde]
+USB/..\..\compile\USB_CTRL.vhd=-1
 
 [file_out:bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\bb1920_deserializer.bde]
 bb1920_deserializer/..\..\compile\bb1920_deserializer.vhd=-1
@@ -1814,127 +1889,12 @@ bb1920_deserializer/..\..\compile\bb1920_deserializer.vhd=-1
 [file_out:bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde]
 bb1920_deserializer/..\..\compile\scd_proxy2_serdes.vhd=-1
 
-
-[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\param_lut_fifo.bde]
-LUT/..\..\compile\param_lut_fifo.vhd=-1
-[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_X_to_ADD.bde]
-LUT/..\..\compile\axis_lut_X_to_ADD.vhd=-1
-[file_out:LUT/..\..\..\..\FIR-00251-Common\VHDL\Lut\axis_lut_core_a32_d32.bde]
-LUT/..\..\compile\axis_lut_core_a32_d32.vhd=-1
-[file_out:MGT/..\..\..\src\MGT\HDL\mgt_block.bde]
-MGT/..\..\compile\mgt_block.vhd=-1
-[file_out:MGT/..\..\..\src\MGT\HDL\mgt_wrapper.bde]
-MGT/..\..\compile\mgt_wrapper.vhd=-1
-[file_out:ExposureTime/..\..\..\src\ExposureTime\HDL\exposure_time_ctrl.bde]
-ExposureTime/..\..\compile\exposure_time_ctrl.vhd=-1
-[file_out:HeaderInserter/..\..\..\src\Hder\HDL\hder_inserter.bde]
-HeaderInserter/..\..\compile\hder_inserter.vhd=-1
-[file_out:Trig/..\..\..\src\Trig\HDL\trig_gen_ctler.bde]
-Trig/..\..\compile\trig_gen_ctler.vhd=-1
-[file_out:Trig/..\..\..\src\Trig\HDL\trig_stamper.bde]
-Trig/..\..\compile\trig_stamper.vhd=-1
-[file_out:Trig/..\..\..\src\Trig\HDL\trig_gen.bde]
-Trig/..\..\compile\trig_gen.vhd=-1
-[file_out:USB/..\..\..\src\USB\hdl\USB_CTRL.bde]
-USB/..\..\compile\USB_CTRL.vhd=-1
-[file_out:Irig/..\..\..\src\Irig\HDL\irig_signal_conditioner_v2.bde]
-Irig/..\..\compile\irig_signal_conditioner_v2.vhd=-1
-[file_out:Irig/..\..\..\src\Irig\HDL\irig_alphab_decoder_v2.bde]
-Irig/..\..\compile\irig_alphab_decoder_v2.vhd=-1
-[file_out:Irig/..\..\..\src\Irig\HDL\expb_irig_v2.bde]
-Irig/..\..\compile\expb_irig_v2.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\NLC.bde]
-Calib/..\..\compile\NLC.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\FSU.bde]
-Calib/..\..\compile\FSU.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\RQC.bde]
-Calib/..\..\compile\RQC.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\FCC.bde]
-Calib/..\..\compile\FCC.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\CFF.bde]
-Calib/..\..\compile\CFF.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\param_fifo_block.bde]
-Calib/..\..\compile\param_fifo_block.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\ddr_data_decoder.bde]
-Calib/..\..\compile\ddr_data_decoder.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\calibration_common.bde]
-Calib/..\..\compile\calibration_common.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\calibration_core.bde]
-Calib/..\..\compile\calibration_core.vhd=-1
-[file_out:Calib/..\..\..\src\Calibration\HDL\calibration.bde]
-Calib/..\..\compile\calibration.vhd=-1
-[file_out:Flash_Ctrl/..\..\..\src\Flash_Ctrl\HDL\Flash_intf.bde]
-Flash_Ctrl/..\..\compile\Flash_intf.vhd=-1
-Flash_Ctrl/SFW=-1
-[file_out:USART/..\..\..\..\FIR-00251-Common\VHDL\USART\USART.bde]
-USART/..\..\compile\USART.vhd=-1
-[file_out:AEC/..\..\..\src\AEC\HDL\AEC.bde]
-AEC/..\..\compile\AEC.vhd=-1
-[file_out:ICU/..\..\..\src\ICU\HDL\ICU_toplevel.bde]
-ICU/..\..\compile\ICU_toplevel.vhd=-1
-[file_out:ADCReadout/..\..\..\src\ADCReadout\HDL\adc_readout_top.bde]
-ADCReadout/..\..\compile\adc_readout_top.vhd=-1
-[file_out:Buffering/..\..\..\src\Buffering\HDL\moi_handler.bde]
-Buffering/..\..\compile\moi_handler.vhd=-1
-[file_out:Buffering/..\..\..\..\FIR-00251-Common\VHDL\Buffering\Buffering.bde]
-Buffering/..\..\compile\buffering.vhd=-1
-[file_out:Buffering/..\..\..\src\Buffering\HDL\Buffering_wrapper.bde]
-Buffering/..\..\compile\buffering_wrapper.vhd=-1
 [file_out:FrameBuffer/..\..\..\src\FrameBuffer\HDL\FrameBuffer.bde]
 FrameBuffer/..\..\compile\FrameBuffer.vhd=-1
-[file_out:EHDRI/..\..\..\src\eHDRI\HDL\EHDRI_toplevel.bde]
-EHDRI/..\..\compile\EHDRI_toplevel.vhd=-1
-[file_out:Flagging/..\..\..\src\Flagging\HDL\flagging_top.bde]
-Flagging/..\..\compile\flagging_top.vhd=-1
-[file_out:Gating/..\..\..\src\Gating\HDL\gating_top.bde]
-Gating/..\..\compile\gating_top.vhd=-1
-[file_out:SFW/..\..\..\src\SFW\HDL\SFW.bde]
-SFW/..\..\compile\SFW.vhd=-1
-[file_out:/..\..\src\fir_00251_proc_acq.bde]
-/..\compile\fir_00251_proc_acq.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_watchdog_module.bde]
-FPA\Common/..\..\..\compile\fpa_watchdog_module.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_elec_ref_proc.bde]
-FPA\Common/..\..\..\compile\afpa_elec_ref_proc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_analog_chain_corr.bde]
-FPA\Common/..\..\..\compile\afpa_analog_chain_corr.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_real_data_gen.bde]
-FPA\Common/..\..\..\compile\afpa_real_data_gen.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_dval_gen.bde]
-FPA\Common/..\..\..\compile\afpa_dval_gen.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_hsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_hsample_proc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_vsample_proc.bde]
-FPA\Common/..\..\..\compile\afpa_vsample_proc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_ctrl_16chn.bde]
-FPA\Common/..\..\..\compile\afpa_data_ctrl_16chn.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde]
-FPA\Common/..\..\..\compile\afpa_services.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services_sadc.bde]
-FPA\Common/..\..\..\compile\afpa_services_sadc.vhd=-1
-[file_out:FPA\Common/..\..\..\..\..\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleG_prog_ctrler.bde]
-FPA\Common/..\..\..\compile\fleG_prog_ctrler.vhd=-1
-[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_clks_gen.bde]
-FPA\xro3503A/..\..\..\compile\xro3503A_clks_gen.vhd=-1
-[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler.bde]
-FPA\xro3503A/..\..\..\compile\xro3503A_prog_ctrler.vhd=-1
-[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_hw_driver.bde]
-FPA\xro3503A/..\..\..\compile\xro3503A_hw_driver.vhd=-1
-[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_afpa_services.bde]
-FPA\xro3503A/..\..\..\compile\xro3503A_afpa_services.vhd=-1
-[file_out:FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_intf.bde]
-FPA\xro3503A/..\..\..\compile\xro3503A_intf.vhd=-1
-[file_out:CLINK/..\..\..\..\FIR-00251-Common\VHDL\iserdes\clink\clink_calibration.bde]
-CLINK/..\..\compile\clink_calibration.vhd=-1
-[file_out:Quad_serdes/..\..\..\..\FIR-00251-Common\VHDL\iserdes\adc\quad_pattern_validator.bde]
-Quad_serdes/..\..\compile\quad_pattern_validator.vhd=-1
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\quad_data_deserializer.bde]
-Quad_serdes/..\..\compile\quad_data_deserializer.vhd=-1
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_8chn.bde]
-Quad_serdes/..\..\compile\afpa_data_deserializer_8chn.vhd=-1
-[file_out:Quad_serdes/..\..\..\src\Quad_serdes\HDL\afpa_data_deserializer_16chn.bde]
-Quad_serdes/..\..\compile\afpa_data_deserializer_16chn.vhd=-1
-[file_out:/..\..\src\fir_00251_proc_xro3503A.bde]
-/..\compile\fir_00251_proc_xro3503A.vhd=-1
+
+[file_out:AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator.bde]
+AEC\decimator/..\..\..\compile\decimator.vhd=-1
+[file_out:AEC/..\..\..\src\AEC\HDL\aec_decimator_wrapper.bde]
+AEC/..\..\compile\aec_decimator_wrapper.vhd=-1
+[file_out:AEC/..\..\..\src\AEC\HDL\AEC.bde]
+AEC/..\..\compile\AEC.vhd=-1

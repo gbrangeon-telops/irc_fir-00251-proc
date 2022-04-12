@@ -86,6 +86,8 @@ IRC_Status_t AEC_Init(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    pAEC_CTRL->AEC_clearmem = 1;
    pAEC_CTRL->AEC_NB_Bin = AEC_NB_BIN;
    pAEC_CTRL->AEC_NewConfigFlag = 0;
+   pAEC_CTRL->AEC_DecimatorInputWidth = pGCRegs->SensorWidth;
+   pAEC_CTRL->AEC_DecimatorEnable &= DECIMATOR_DESACTIVATED_MASK;
 
    memset(AEC_TimeStamps_d1, 0, sizeof(AEC_TimeStamps_d1));
 
@@ -149,8 +151,6 @@ void AEC_UpdateMode(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    AXI4L_write32(pAEC_CTRL->AEC_clearmem, pAEC_CTRL->ADD + AEC_CLEARMEM_OFFSET);
 
    AXI4L_write32(pAEC_CTRL->AEC_Mode, pAEC_CTRL->ADD + AEC_MODE_OFFSET);
-   //pAEC_CTRL->AEC_ImageFraction =(uint32_t) ( pGCRegs->Height * pGCRegs->Width * (pGCRegs->AECImageFraction / 100.0f)); // IMAGE FRaction between 0 and 100
-   //AXI4L_write32(pAEC_CTRL->AEC_ImageFraction, AEC_BASE_ADDR + AEC_IMAGEFRACTION_OFFSET);
    pAEC_CTRL->AEC_clearmem = 0;
    AXI4L_write32(pAEC_CTRL->AEC_clearmem, pAEC_CTRL->ADD + AEC_CLEARMEM_OFFSET);
 
@@ -164,8 +164,27 @@ void AEC_UpdateMode(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
 ---------------------------------------------------------*/
 void AEC_UpdateImageFraction(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
 {
-   pAEC_CTRL->AEC_ImageFraction =(uint32_t) ( pGCRegs->Height * pGCRegs->Width * (pGCRegs->AECImageFraction / 100.0f)); // IMAGE FRaction between 0 and 100
+   uint32_t AECImgHeight;
+
+   // Decimator configuration
+   pAEC_CTRL->AEC_DecimatorInputWidth = pGCRegs->Width;
+   AECImgHeight = pGCRegs->Height;
+   pAEC_CTRL->AEC_DecimatorEnable &= DECIMATOR_DESACTIVATED_MASK; // Decimation deactivated by default
+
+   // Row decimation is activated when a full image pixel size cannot fit all into one histogram bin (max bin size is 2^21-1 pixels).
+   if(pGCRegs->Width*pGCRegs->Height > (uint32_t)DECIMATOR_THRESHOLD &&
+      pGCRegs->Height > 2*DECIMATOR_INPUT_HEIGHT_MIN)
+   {
+      AECImgHeight  = pGCRegs->Height >> 1;  //decimate one out of two rows
+      pAEC_CTRL->AEC_DecimatorEnable |= (uint32_t)DECIMATOR_ROW_MASK;
+   }
+
+   // Image fraction update
+   pAEC_CTRL->AEC_ImageFraction =(uint32_t) ( AECImgHeight * pAEC_CTRL->AEC_DecimatorInputWidth * (pGCRegs->AECImageFraction / 100.0f)); // IMAGE FRaction between 0 and 100
    AXI4L_write32(pAEC_CTRL->AEC_ImageFraction, pAEC_CTRL->ADD + AEC_IMAGEFRACTION_OFFSET);
+
+   AXI4L_write32(pAEC_CTRL->AEC_DecimatorInputWidth, pAEC_CTRL->ADD + DECIMATOR_INPUT_WIDTH_OFFSET);
+   AXI4L_write32(pAEC_CTRL->AEC_DecimatorEnable, pAEC_CTRL->ADD + DECIMATOR_ENABLE_OFFSET);
 
    // Toggle new config flag to AEC
    AXI4L_write32(1, pAEC_CTRL->ADD + AEC_NEW_CONFIG_FLAG_OFFSET);
@@ -291,7 +310,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    {
       // On reset l'histogramme lorsqu'on est à l'extérieur d'une plage valide ou si le PET précédent n'a pas encore été appliqué.
       // Quelques explications sur la condition qui détermine si le PET précédent a été appliqué ou non: La raison pourquoi on n'utilise pas la condition "AEC_Int_expTime != ProposedExposureTimeLast"
-      // est qu'il y a parfois une légère instabilité numérique entre ce qui est lue dans le VHDL et ce qui est attendu dans ProposedExposureTimeLast. Le critère de temps doit être inférieur à AEC_EXPOSURE_TIME_RESOLUTION
+      // est qu'il y a parfois une légère instabilité numérique entre ce qui est lue dans le VHDL et ce qui est attendu dans ProposedExposureTimeLast. De plus, le critère de temps doit être inférieur à AEC_EXPOSURE_TIME_RESOLUTION
       // sinon il peut appraitre des oscillations en régime permanent d'amplitude égal à AEC_EXPOSURE_TIME_RESOLUTION. J'ai décidé arbitrairement de mettre le critère égal à 1/10 de la résolution.
       AEC_ClearMem(pAEC_CTRL);
    }
