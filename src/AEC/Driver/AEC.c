@@ -131,6 +131,7 @@ void AEC_UpdateMode(gcRegistersData_t *pGCRegs, t_AEC *pAEC_CTRL)
    if(pGCRegs->ExposureAuto == EA_Off)
    {
       pAEC_CTRL->AEC_Mode = AEC_OFF;
+      memset(AEC_TimeStamps_d1, 0, sizeof(AEC_TimeStamps_d1));
    }
    else if(pGCRegs->ExposureAuto == EA_Continuous)
    {
