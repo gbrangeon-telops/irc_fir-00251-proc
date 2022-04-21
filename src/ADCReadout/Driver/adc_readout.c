@@ -8,7 +8,7 @@
 #include <time.h>
 #include <stdint.h>
 
-extern brd_rev_ver_t gBrdRevid;
+extern detected_hw_t gDetectedHw;
 
 uint32_t N_ADC_BITS; //used in startup
 
@@ -30,7 +30,7 @@ IRC_Status_t ADC_readout_init()
 #endif
    
    if (flashSettings.ADCReadoutDisabled ||
-         (gBrdRevid == BRD_REV_00x && !flashSettings.ADCReadoutEnabled))
+         (gDetectedHw.BrdRevid == BRD_REV_00x && !flashSettings.ADCReadoutEnabled))
    {
       TDCFlagsClr(ADCReadoutIsImplementedMask);
       adcReadoutcgf = ADC_IRIG_ONLY;
@@ -39,7 +39,7 @@ IRC_Status_t ADC_readout_init()
    {
       TDCFlagsSet(ADCReadoutIsImplementedMask);
 
-      if (gBrdRevid == BRD_REV_00x)
+      if (gDetectedHw.BrdRevid == BRD_REV_00x)
       {
          adcReadoutcgf = ADC_READOUT;
          N_ADC_BITS = 12;

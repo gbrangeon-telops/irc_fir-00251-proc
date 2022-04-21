@@ -137,7 +137,7 @@ FH_ctrl_t gNDFFaulhaberCtrl;
 releaseInfo_t gReleaseInfo;
 ledCtrl_t gLedCtrl;
 flashDynamicValues_t gFlashDynamicValues;
-brd_rev_ver_t gBrdRevid;
+detected_hw_t gDetectedHw;
 rpCtrl_t theRpCtrl;
 slCtrl_t theSlCtrl;
 autofocusCtrl_t theAutoCtrl;
@@ -1378,7 +1378,7 @@ IRC_Status_t Proc_DeviceKeyValidation()
 IRC_Status_t Proc_BoardRevisionValidation()
 {
 
-   return Get_board_hw_revision(XPAR_AXI_GPIO_0_DEVICE_ID,&gBrdRevid);
+   return Get_board_hw_revision(XPAR_AXI_GPIO_0_DEVICE_ID,&gDetectedHw);
 }
 
 

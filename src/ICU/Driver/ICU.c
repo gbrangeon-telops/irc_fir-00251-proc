@@ -28,7 +28,7 @@ enum ICU_SETPOINT_enum
 };
 
 extern ICU_config_t gICU_ctrl;
-extern brd_rev_ver_t gBrdRevid;
+extern detected_hw_t gDetectedHw;
 
 static bool reset = true;
 
@@ -53,7 +53,7 @@ IRC_Status_t ICU_init(gcRegistersData_t *pGCRegs, ICU_config_t *pICU_ctrl)
 	pICU_ctrl->ICU_TransitionDuration = flashSettings.ICUTransitionDuration * ICU_CLK_PER_MS;
 
 	// Check brd revision to know if we are using Si9986 or DRV8871 h-bridge
-	if(gBrdRevid == BRD_REV_00x)
+	if(gDetectedHw.BrdRevid == BRD_REV_00x)
 	{
 	   AXI4L_write32((uint32_t)0, pICU_ctrl->ADD + ICU_BRAKEPOLARITY_OFFSET);  // Si9986 h-birdge brake on InA-InB = '0'
 	}

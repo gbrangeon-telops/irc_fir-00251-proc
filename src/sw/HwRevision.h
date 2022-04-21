@@ -21,7 +21,7 @@
 #include "xparameters.h"
 #include "xgpio.h"
 #include "stdint.h"
-
+#include <stdbool.h>
 #ifdef HWR_VERBOSE
    #define HWR_PRINTF(fmt, ...)      FPGA_PRINTF("HWR: " fmt, ##__VA_ARGS__)
 #else
@@ -44,8 +44,14 @@ enum brd_rev_ver {
 
 typedef enum brd_rev_ver brd_rev_ver_t;
 
+struct s_detected_hw
+{
+   brd_rev_ver_t BrdRevid;
+   uint8_t       NbDDR3;
+};
 
-IRC_Status_t Get_board_hw_revision(uint16_t gpioDeviceId, brd_rev_ver_t* brd_rev_id);
+typedef struct s_detected_hw detected_hw_t;
 
+IRC_Status_t Get_board_hw_revision(uint16_t gpioDeviceId, detected_hw_t* detected_hw);
 
 #endif // HWREVISION_H

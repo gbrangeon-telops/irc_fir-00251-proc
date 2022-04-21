@@ -285,11 +285,11 @@ void xadcCalibrationUpdate(xadcChannel_t *xadcCh)
    float offset = 0.0F;
    uint8_t i = 0;
    static bool firstpass = true;
-   extern brd_rev_ver_t gBrdRevid;
+   extern detected_hw_t gDetectedHw;
 
 
    if (xadcCh->isValid &&
-         (gBrdRevid != BRD_REV_00x))   // XADC Ref are not available on this revision
+         (gDetectedHw.BrdRevid != BRD_REV_00x))   // XADC Ref are not available on this revision
    {
       //Check if the Flash setting reference value are available( not equal 0)
       // REf 1 should be 0.9765625Volt and Ref 2 = 0.099940 Volts

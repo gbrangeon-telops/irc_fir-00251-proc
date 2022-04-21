@@ -47,6 +47,8 @@
 #include "IRIGB.h"
 #include "GC_Store.h"
 #include "FrameBuffer.h"
+#include "xparameters.h"
+#include "HwRevision.h"
 
 #ifdef ENABLE_TEC_CONTROL
 #include "tec_intf.h"
@@ -92,6 +94,7 @@ static IRC_Status_t DebugTerminalParseLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf);
+static IRC_Status_t DebugTerminalParseHWID(circByteBuffer_t *cbuf);
 
 #ifdef ENABLE_TEC_CONTROL
 static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf);
@@ -146,6 +149,7 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"PLT", DebugTerminalParsePLT},
    {"PBT", DebugTerminalParsePBT},
    {"FB", DebugTerminalParseFB},
+   {"HWID", DebugTerminalParseHWID},
 #ifdef ENABLE_TEC_CONTROL
    {"TEC", DebugTerminalParseTEC},
 #endif
@@ -2716,6 +2720,20 @@ IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf)
 
 
 /**
+ * Debug terminal get Hardware ID.
+ *
+ * @return IRC_SUCCESS when HWID command was successfully executed.
+ * @return IRC_FAILURE otherwise.
+ */
+IRC_Status_t DebugTerminalParseHWID(circByteBuffer_t *cbuf)
+{
+   extern detected_hw_t gDetectedHw;
+   Get_board_hw_revision(XPAR_AXI_GPIO_0_DEVICE_ID,&gDetectedHw);
+   return IRC_SUCCESS;
+
+}
+
+/**
  * Debug terminal Help command parser parser.
  * This parser is used to print debug terminal help.
  *
@@ -2771,6 +2789,7 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Print Lens Table:   PLT");
    DT_PRINTF("  Print Buffer Table: PBT");
    DT_PRINTF("  FB status & errors :  FB");
+   DT_PRINTF("  Get Hardware ID    :  HWID");
    #ifdef ENABLE_TEC_CONTROL
    DT_PRINTF("  TEC Control:        TEC [setpoint]");
    #endif
