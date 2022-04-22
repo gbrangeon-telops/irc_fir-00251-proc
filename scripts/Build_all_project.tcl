@@ -10,7 +10,10 @@ set release 1
 lappend detector_list {blackbird1280D325}
 
 #lappend detector_list {blackbird1920D160}
-#lappend detector_list {blackbird1920D325}
+lappend detector_list {blackbird1920D325}
+
+#lappend detector_list {blackbird1520D160}
+lappend detector_list {blackbird1520D325}
 
 lappend detector_list {hawkA160}
 #lappend detector_list {hawkA325}

@@ -6,7 +6,11 @@ build_proc_sw blackbird1280D 325
 #build_proc_sw blackbird1280D 160
 
 #create_proc_sw blackbird1920D
-#build_proc_sw blackbird1920D 325
+build_proc_sw blackbird1920D 325
+#build_proc_sw blackbird1920D 160
+
+#create_proc_sw blackbird1920D
+build_proc_sw blackbird1520D 325
 #build_proc_sw blackbird1920D 160
 
 create_proc_sw hawkA
