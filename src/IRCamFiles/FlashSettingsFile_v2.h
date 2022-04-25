@@ -5,7 +5,7 @@
  * This file declares the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.12.0
+ * Generated from the flash settings file structure definition XLS file version 2.13.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define FLASHSETTINGS_FILEMAJORVERSION_V2      2
-#define FLASHSETTINGS_FILEMINORVERSION_V2      12
+#define FLASHSETTINGS_FILEMINORVERSION_V2      13
 #define FLASHSETTINGS_FILESUBMINORVERSION_V2   0
 
 #define FLASHSETTINGS_FLASHSETTINGSFILEHEADER_SIZE_V2   65536
@@ -41,13 +41,14 @@ struct FlashSettings_FlashSettingsFileHeader_v2Struct {
    uint32_t FileHeaderLength;   /**< File header length. */
    uint32_t DeviceSerialNumber;   /**< Device serial number. */
    char DeviceModelName[21];   /**< Device model name. */
-   uint8_t SensorID;   /**< Sensor  ID. */
+   uint8_t SensorID;   /**< Sensor ID. */
    uint8_t PixelDataResolution;   /**< Default pixel data resolution. */
    uint8_t ReverseX;   /**< Flip horizontally the image sent by the device. */
    uint8_t ReverseY;   /**< Flip vertically the image sent by the device. */
    uint8_t ICUPresent;   /**< Indicates whether a ICU is installed in the camera. */
    uint8_t ICUMode;   /**< ICU mode. */
    uint8_t ICUCalibPosition;   /**< Direction of the ICU command for calibration position. */
+   uint8_t SensorIDMSB;   /**< Sensor ID Most Significant Byte. */
    uint16_t ICUPulseWidth;   /**< Duration of the command. */
    uint16_t ICUPeriod;   /**< Period of the pulse in repeat mode. */
    uint16_t ICUTransitionDuration;   /**< Duration of the moving state after a newly commanded set point. */

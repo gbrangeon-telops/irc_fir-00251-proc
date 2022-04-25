@@ -139,7 +139,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
 
 /* AUTO-CODE BEGIN */
 // Auto-generated IRCam header inserter driver.
-// Generated from the IRCam header definition XLS file version 13.1
+// Generated from the IRCam header definition XLS file version 13.2
 // using generateIRCamHeaderInserterDriver.m Matlab script.
 
    for (i = 0; i < 2; ++i)
@@ -207,6 +207,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    memcpy((void*)&data32, (void*)&(pGCRegs->ExternalBlackBodyTemperature), sizeof(uint32_t));
    AXI4L_write32(data32, a->ADD + A_BASE_HEADER + ExternalBlackBodyTemperatureHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_Sensor] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureSensorHdrAddr);
+   AXI4L_write8((uint8_t)((pGCRegs->SensorID >> 8) & 0xFF), a->ADD + A_BASE_HEADER + SensorIDMSBHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_InternalLens] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureInternalLensHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_ExternalLens] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureExternalLensHdrAddr);
    AXI4L_write16((int16_t)(DeviceTemperatureAry[DTS_InternalCalibrationUnit] * 100.0F), a->ADD + A_BASE_HEADER + TemperatureInternalCalibrationUnitHdrAddr);
@@ -217,7 +218,7 @@ void HDER_SendHeaderGC(const t_HderInserter *a, const gcRegistersData_t *pGCRegs
    AXI4L_write32((uint32_t)(0), a->ADD + A_BASE_HEADER + CalibrationBlockPOSIXTimeHdrAddr);
    AXI4L_write32((uint32_t)(pGCRegs->ExternalLensSerialNumber), a->ADD + A_BASE_HEADER + ExternalLensSerialNumberHdrAddr);
    AXI4L_write32((uint32_t)(pGCRegs->ManualFilterSerialNumber), a->ADD + A_BASE_HEADER + ManualFilterSerialNumberHdrAddr);
-   AXI4L_write8((uint8_t)(pGCRegs->SensorID), a->ADD + A_BASE_HEADER + SensorIDHdrAddr);
+   AXI4L_write8((uint8_t)(pGCRegs->SensorID & 0xFF), a->ADD + A_BASE_HEADER + SensorIDHdrAddr);
    AXI4L_write8((uint8_t)(pGCRegs->PixelDataResolution), a->ADD + A_BASE_HEADER + PixelDataResolutionHdrAddr);
    AXI4L_write16((uint16_t)(pGCRegs->HFOV * 10.0F), a->ADD + A_BASE_HEADER + HFOVHdrAddr);
    AXI4L_write16((uint16_t)(pGCRegs->VFOV * 10.0F), a->ADD + A_BASE_HEADER + VFOVHdrAddr);

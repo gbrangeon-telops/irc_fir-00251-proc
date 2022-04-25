@@ -486,6 +486,11 @@ IRC_Status_t FlashSettings_ParseFlashSettingsFileHeader(int fd, FlashSettings_Fl
                   hdr->FileStructureMinorVersion = 12;
 
                case 12:
+                  // 2.12.x -> 2.13.x
+                  hdr->SensorIDMSB = FlashSettings_FlashSettingsFileHeader_default.SensorIDMSB;
+                  hdr->FileStructureMinorVersion = 13;
+
+               case 13:
                   // Up to date, nothing to do
                   hdr->FileStructureSubMinorVersion = FLASHSETTINGS_FILESUBMINORVERSION;
                   break;

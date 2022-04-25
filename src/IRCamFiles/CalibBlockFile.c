@@ -201,6 +201,11 @@ uint32_t CalibBlock_ParseBlockFileHeader(int fd, CalibBlock_BlockFileHeader_t *h
                hdr->FileStructureMinorVersion = 4;
 
             case 4:
+               // 2.4.x -> 2.5.x
+               hdr->SensorIDMSB = CalibBlock_BlockFileHeader_default.SensorIDMSB;
+               hdr->FileStructureMinorVersion = 5;
+
+            case 5:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBBLOCK_FILESUBMINORVERSION;
                break;
@@ -302,6 +307,10 @@ uint32_t CalibBlock_ParsePixelDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 4:
+               // 2.4.x -> 2.5.x
+               // Nothing to do
+
+            case 5:
                // Up to date, nothing to do
                break;
          }
@@ -397,6 +406,10 @@ uint32_t CalibBlock_ParseMaxTKDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 4:
+               // 2.4.x -> 2.5.x
+               // Nothing to do
+
+            case 5:
                // Up to date, nothing to do
                break;
          }
@@ -492,6 +505,10 @@ uint32_t CalibBlock_ParseLUTNLDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 4:
+               // 2.4.x -> 2.5.x
+               // Nothing to do
+
+            case 5:
                // Up to date, nothing to do
                break;
          }
@@ -587,6 +604,10 @@ uint32_t CalibBlock_ParseLUTRQDataHeader(int fd, fileInfo_t *fileInfo, CalibBloc
                // Nothing to do
 
             case 4:
+               // 2.4.x -> 2.5.x
+               // Nothing to do
+
+            case 5:
                // Up to date, nothing to do
                break;
          }

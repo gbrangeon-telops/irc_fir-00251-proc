@@ -223,7 +223,7 @@ struct calibCollectionInfoStruct {
    uint32_t POSIXTime;                 /**< Collection file generation date and time. */
    CalibrationCollectionType_t CollectionType; /**< Collection type */
    calibrationType_t CalibrationType;  /**< Calibration type */
-   uint8_t SensorID;                   /**< Sensor ID */
+   uint16_t SensorID;                   /**< Sensor ID */
    uint8_t IntegrationMode;            /**< Integration mode */
    uint8_t SensorWellDepth;            /**< Sensor well depth */
    uint8_t PixelDataResolution;        /**< Effective size in bits of a pixel of the image */

@@ -5,7 +5,7 @@
  * This file defines the camera calibration block file structure v2.
  *
  * Auto-generated calibration block file library.
- * Generated from the calibration block file structure definition XLS file version 2.4.0
+ * Generated from the calibration block file structure definition XLS file version 2.5.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -104,6 +104,7 @@ CalibBlock_BlockFileHeader_v2_t CalibBlock_BlockFileHeader_v2_default = {
    /* SSEParameter2 = */ 0.000000F,
    /* SSEParameter3 = */ 1.000000F,
    /* SSEModel = */ 0,
+   /* SensorIDMSB = */ 0,
    /* ExtenderRingID = */ 0,
    /* ExtenderRingSerialNumber = */ 0,
    /* ExtenderRingName = */ "",
@@ -338,7 +339,7 @@ uint32_t CalibBlock_ParseBlockFileHeader_v2(uint8_t *buffer, uint32_t buflen, Ca
    memcpy(&hdr->SSEParameter2, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->SSEParameter3, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->SSEModel, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 1; // Skip FREE space
+   memcpy(&hdr->SensorIDMSB, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->ExtenderRingID, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&hdr->ExtenderRingSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(hdr->ExtenderRingName, &buffer[numBytes], 64); numBytes += 64;
@@ -481,7 +482,7 @@ uint32_t CalibBlock_WriteBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr
    memcpy(&buffer[numBytes], &hdr->SSEParameter2, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->SSEParameter3, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->SSEModel, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->SensorIDMSB, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->ExtenderRingID, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
    memcpy(&buffer[numBytes], &hdr->ExtenderRingSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], hdr->ExtenderRingName, 64); numBytes += 64;
@@ -583,6 +584,7 @@ void CalibBlock_PrintBlockFileHeader_v2(CalibBlock_BlockFileHeader_v2_t *hdr)
    FPGA_PRINTF("SSEParameter2: " _PCF(3) "\n", _FFMT(hdr->SSEParameter2, 3));
    FPGA_PRINTF("SSEParameter3: " _PCF(3) "\n", _FFMT(hdr->SSEParameter3, 3));
    FPGA_PRINTF("SSEModel: %u enum\n", hdr->SSEModel);
+   FPGA_PRINTF("SensorIDMSB: %u\n", hdr->SensorIDMSB);
    FPGA_PRINTF("ExtenderRingID: %u\n", hdr->ExtenderRingID);
    FPGA_PRINTF("ExtenderRingSerialNumber: %u\n", hdr->ExtenderRingSerialNumber);
    FPGA_PRINTF("ExtenderRingName: %s\n", hdr->ExtenderRingName);

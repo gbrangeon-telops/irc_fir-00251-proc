@@ -293,7 +293,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
    gcRegsData.PixelDataResolution = p_flashSettings->PixelDataResolution;
 
    // Update sensor ID
-   gcRegsData.SensorID = p_flashSettings->SensorID;
+   gcRegsData.SensorID = ((uint32_t)p_flashSettings->SensorIDMSB << 8) + (uint32_t)p_flashSettings->SensorID;
 
    // Update reverse X/Y
    if (calibrationInfo.isValid)

@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.12.0
+ * Generated from the flash settings file structure definition XLS file version 2.13.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -42,6 +42,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* ICUPresent = */ 0,
    /* ICUMode = */ 1,
    /* ICUCalibPosition = */ 0,
+   /* SensorIDMSB = */ 0,
    /* ICUPulseWidth = */ 150,
    /* ICUPeriod = */ 1000,
    /* ICUTransitionDuration = */ 500,
@@ -258,7 +259,7 @@ uint32_t FlashSettings_ParseFlashSettingsFileHeader_v2(uint8_t *buffer, uint32_t
       memcpy(&hdr->ICUPresent, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->ICUMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->ICUCalibPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      numBytes += 1; // Skip FREE space
+      memcpy(&hdr->SensorIDMSB, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&hdr->ICUPulseWidth, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->ICUPeriod, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&hdr->ICUTransitionDuration, &buffer[numBytes], sizeof(uint16_t)); numBytes += sizeof(uint16_t);
@@ -523,7 +524,7 @@ uint32_t FlashSettings_WriteFlashSettingsFileHeader_v2(FlashSettings_FlashSettin
       memcpy(&buffer[numBytes], &hdr->ICUPresent, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->ICUMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->ICUCalibPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-      memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+      memcpy(&buffer[numBytes], &hdr->SensorIDMSB, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
       memcpy(&buffer[numBytes], &hdr->ICUPulseWidth, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->ICUPeriod, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
       memcpy(&buffer[numBytes], &hdr->ICUTransitionDuration, sizeof(uint16_t)); numBytes += sizeof(uint16_t);
@@ -751,6 +752,7 @@ void FlashSettings_PrintFlashSettingsFileHeader_v2(FlashSettings_FlashSettingsFi
    FPGA_PRINTF("ICUPresent: %u\n", hdr->ICUPresent);
    FPGA_PRINTF("ICUMode: %u\n", hdr->ICUMode);
    FPGA_PRINTF("ICUCalibPosition: %u\n", hdr->ICUCalibPosition);
+   FPGA_PRINTF("SensorIDMSB: %u\n", hdr->SensorIDMSB);
    FPGA_PRINTF("ICUPulseWidth: %u ms\n", hdr->ICUPulseWidth);
    FPGA_PRINTF("ICUPeriod: %u ms\n", hdr->ICUPeriod);
    FPGA_PRINTF("ICUTransitionDuration: %u ms\n", hdr->ICUTransitionDuration);

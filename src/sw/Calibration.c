@@ -310,7 +310,7 @@ IRC_Status_t Calibration_LoadCollectionFile(fileRecord_t *file, calibCollectionI
    collectionInfo->POSIXTime = collectionFileHeader.POSIXTime;
    collectionInfo->CollectionType = collectionFileHeader.CollectionType;
    collectionInfo->CalibrationType = collectionFileHeader.CalibrationType;
-   collectionInfo->SensorID = collectionFileHeader.SensorID;
+   collectionInfo->SensorID = ((uint16_t)collectionFileHeader.SensorIDMSB << 8) + (uint16_t)collectionFileHeader.SensorID;
    collectionInfo->IntegrationMode = collectionFileHeader.IntegrationMode;
    collectionInfo->SensorWellDepth = collectionFileHeader.SensorWellDepth;
    collectionInfo->PixelDataResolution = collectionFileHeader.PixelDataResolution;
@@ -585,6 +585,8 @@ void Calibration_SM()
          }
          else
          {
+            uint16_t blockFileSensorID = ((uint16_t)headerData.blockFile.SensorIDMSB << 8) + (uint16_t)headerData.blockFile.SensorID;
+
             cmCurrentState = CMS_LOAD_PIXEL_DATA_HEADER;
 
             if (headerData.blockFile.DeviceSerialNumber != flashSettings.DeviceSerialNumber)
@@ -611,9 +613,9 @@ void Calibration_SM()
                   cmCurrentState = CMS_ERROR;
                }
 
-               if (headerData.blockFile.SensorID != calibrationInfo.collection.SensorID)
+               if (blockFileSensorID != calibrationInfo.collection.SensorID)
                {
-                  CM_ERR("Block %d: Sensor ID mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.SensorID, headerData.blockFile.SensorID);
+                  CM_ERR("Block %d: Sensor ID mismatch (C: %d, B: %d).", headerData.blockFile.POSIXTime, calibrationInfo.collection.SensorID, blockFileSensorID);
                   cmCurrentState = CMS_ERROR;
                }
 
@@ -737,7 +739,7 @@ void Calibration_SM()
                   calibrationInfo.collection.POSIXTime = headerData.blockFile.POSIXTime;
                   calibrationInfo.collection.CollectionType =  DefaultCollectionType(headerData.blockFile.CalibrationType);
                   calibrationInfo.collection.CalibrationType = headerData.blockFile.CalibrationType;
-                  calibrationInfo.collection.SensorID = headerData.blockFile.SensorID;
+                  calibrationInfo.collection.SensorID = blockFileSensorID;
                   calibrationInfo.collection.IntegrationMode = headerData.blockFile.IntegrationMode;
                   calibrationInfo.collection.SensorWellDepth = headerData.blockFile.SensorWellDepth;
                   calibrationInfo.collection.PixelDataResolution = headerData.blockFile.PixelDataResolution;

@@ -183,6 +183,11 @@ uint32_t CalibCollection_ParseCollectionFileHeader(int fd, CalibCollection_Colle
                hdr->FileStructureMinorVersion = 4;
 
             case 4:
+               // 2.4.x -> 2.5.x
+               hdr->SensorIDMSB = CalibCollection_CollectionFileHeader_default.SensorIDMSB;
+               hdr->FileStructureMinorVersion = 5;
+
+            case 5:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBCOLLECTION_FILESUBMINORVERSION;
                break;

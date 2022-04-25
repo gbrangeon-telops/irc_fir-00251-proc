@@ -2499,16 +2499,14 @@ static bool quantizeDeltaBeta(const float BetaLSB, const float deltaBetaIn, int1
       raw_delta_beta = maxRawData;
    }
 
+   // Clear every bit that is not part of the delta beta (bad pixel tags and unused bits)
+   raw_delta_beta &= CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_DELTABETA_MASK;
+
    // now set the NewBadPixel bit (in reverse logic)
-   if (isNewBadPixel)
-      BitClr(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT);
-   else
+   if (!isNewBadPixel)
       BitSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NEWBADPIXEL_SHIFT);
 
    // Set the bad pixel tag
-   BitMaskClr(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK |
-         CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_FLICKERBADPIXEL_MASK |
-         CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_OUTLIERBADPIXEL_MASK);
    if (badPixelTag & BAD_PIX_NOISY_MASK)
       BitMaskSet(raw_delta_beta, CALIBIMAGECORRECTION_IMAGECORRECTIONDATA_NOISYBADPIXEL_MASK);
    if (badPixelTag & BAD_PIX_FLICKER_MASK)
@@ -2886,7 +2884,8 @@ static IRC_Status_t ActualizationFileWriter_SM(deltabeta_t* currentDeltaBeta)
       actFileHeader.OffsetX = 0;
       actFileHeader.OffsetY = 0;
       actFileHeader.ReferencePOSIXTime = currentDeltaBeta->dbEntry->info.referencePOSIXTime;
-      actFileHeader.SensorID = calibrationInfo.collection.SensorID;
+      actFileHeader.SensorID = (uint8_t)(calibrationInfo.collection.SensorID & 0xFF);
+      actFileHeader.SensorIDMSB = (uint8_t)((calibrationInfo.collection.SensorID >> 8) & 0xFF);
 
       actFileHeader.ImageCorrectionType = currentDeltaBeta->dbEntry->info.type;
       actFileHeader.TemperatureInternalLens = currentDeltaBeta->dbEntry->info.internalLensTemperature;

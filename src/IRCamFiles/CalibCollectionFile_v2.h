@@ -5,7 +5,7 @@
  * This file declares the camera calibration collection file structure v2.
  *
  * Auto-generated calibration collection file library.
- * Generated from the calibration collection file structure definition XLS file version 2.4.0
+ * Generated from the calibration collection file structure definition XLS file version 2.5.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBCOLLECTION_FILEMAJORVERSION_V2      2
-#define CALIBCOLLECTION_FILEMINORVERSION_V2      4
+#define CALIBCOLLECTION_FILEMINORVERSION_V2      5
 #define CALIBCOLLECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBCOLLECTION_COLLECTIONFILEHEADER_SIZE_V2   512
@@ -64,6 +64,7 @@ struct CalibCollection_CollectionFileHeader_v2Struct {
    float FluxRatio01;   /**< Ratio de flux entre NDF0 et NDF1 */
    float FluxRatio12;   /**< Ratio de flux entre NDF1 et NDF2 */
    uint8_t FOVPosition;   /**< Motorized FOV lens position */
+   uint8_t SensorIDMSB;   /**< Sensor ID Most Significant Byte */
    uint32_t ExtenderRingSerialNumber;   /**< Unique Telops 32-bit extender ring serial number */
    char ExtenderRingName[65];   /**< Extender ring name */
    int16_t Block1ImageShiftX;   /**< Block #1: horizontal (X) shift that must be applied to the unflipped image to ensure co-registration of the sequence */

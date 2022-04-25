@@ -5,7 +5,7 @@
  * This file defines the camera image correction calibration file structure v2.
  *
  * Auto-generated image correction calibration file library.
- * Generated from the image correction calibration file structure definition XLS file version 2.4.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.5.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -49,6 +49,7 @@ CalibImageCorrection_ImageCorrectionFileHeader_v2_t CalibImageCorrection_ImageCo
    /* TemperatureReference = */ 0.000000F,
    /* ExposureTime = */ 0.000000F,
    /* AcquisitionFrameRate = */ 0,
+   /* SensorIDMSB = */ 0,
    /* FWMode = */ 0,
    /* FocusPositionRaw = */ 0,
    /* FileHeaderCRC16 = */ 0,
@@ -134,7 +135,8 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader_v2(uint8_t *buffer,
    memcpy(&hdr->TemperatureReference, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->ExposureTime, &buffer[numBytes], sizeof(float)); numBytes += sizeof(float);
    memcpy(&hdr->AcquisitionFrameRate, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   numBytes += 3; // Skip FREE space
+   numBytes += 2; // Skip FREE space
+   memcpy(&hdr->SensorIDMSB, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->FWMode, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->FocusPositionRaw, &buffer[numBytes], sizeof(int32_t)); numBytes += sizeof(int32_t);
    numBytes += 386; // Skip FREE space
@@ -212,7 +214,8 @@ uint32_t CalibImageCorrection_WriteImageCorrectionFileHeader_v2(CalibImageCorrec
    memcpy(&buffer[numBytes], &hdr->TemperatureReference, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->ExposureTime, sizeof(float)); numBytes += sizeof(float);
    memcpy(&buffer[numBytes], &hdr->AcquisitionFrameRate, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
-   memset(&buffer[numBytes], 0, 3); numBytes += 3; // FREE space
+   memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
+   memcpy(&buffer[numBytes], &hdr->SensorIDMSB, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->FWMode, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->FocusPositionRaw, sizeof(int32_t)); numBytes += sizeof(int32_t);
    memset(&buffer[numBytes], 0, 386); numBytes += 386; // FREE space
@@ -251,6 +254,7 @@ void CalibImageCorrection_PrintImageCorrectionFileHeader_v2(CalibImageCorrection
    FPGA_PRINTF("TemperatureReference: " _PCF(3) " K\n", _FFMT(hdr->TemperatureReference, 3));
    FPGA_PRINTF("ExposureTime: " _PCF(3) " us\n", _FFMT(hdr->ExposureTime, 3));
    FPGA_PRINTF("AcquisitionFrameRate: %u mHz\n", hdr->AcquisitionFrameRate);
+   FPGA_PRINTF("SensorIDMSB: %u\n", hdr->SensorIDMSB);
    FPGA_PRINTF("FWMode: %u enum\n", hdr->FWMode);
    FPGA_PRINTF("FocusPositionRaw: %d counts\n", hdr->FocusPositionRaw);
    FPGA_PRINTF("FileHeaderCRC16: %u\n", hdr->FileHeaderCRC16);

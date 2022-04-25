@@ -5,7 +5,7 @@
  * This file declares the camera calibration spectral response file structure v2.
  *
  * Auto-generated calibration spectral response file library.
- * Generated from the calibration spectral response file structure definition XLS file version 2.0.0
+ * Generated from the calibration spectral response file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBSPECTRALRESPONSE_FILEMAJORVERSION_V2      2
-#define CALIBSPECTRALRESPONSE_FILEMINORVERSION_V2      0
+#define CALIBSPECTRALRESPONSE_FILEMINORVERSION_V2      1
 #define CALIBSPECTRALRESPONSE_FILESUBMINORVERSION_V2   0
 
 #define CALIBSPECTRALRESPONSE_SPECTRALRESPONSEFILEHEADER_SIZE_V2   512
@@ -48,6 +48,7 @@ struct CalibSpectralResponse_SpectralResponseFileHeader_v2Struct {
    uint32_t POSIXTime;   /**< File generation date and time */
    char FileDescription[65];   /**< File description */
    uint8_t SensorID;   /**< Sensor identification number. */
+   uint8_t SensorIDMSB;   /**< Sensor ID Most Significant Byte. */
    uint32_t ExternalLensSerialNumber;   /**< Unique Telops 32-bit external lens serial number */
    uint32_t ManualFilterSerialNumber;   /**< Unique Telops 32-bit manual filter serial number */
    uint8_t FWPosition;   /**< Filter wheel position */

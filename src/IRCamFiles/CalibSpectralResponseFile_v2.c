@@ -5,7 +5,7 @@
  * This file defines the camera calibration spectral response file structure v2.
  *
  * Auto-generated calibration spectral response file library.
- * Generated from the calibration spectral response file structure definition XLS file version 2.0.0
+ * Generated from the calibration spectral response file structure definition XLS file version 2.1.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -37,6 +37,7 @@ CalibSpectralResponse_SpectralResponseFileHeader_v2_t CalibSpectralResponse_Spec
    /* POSIXTime = */ 0,
    /* FileDescription = */ "",
    /* SensorID = */ 0,
+   /* SensorIDMSB = */ 0,
    /* ExternalLensSerialNumber = */ 0,
    /* ManualFilterSerialNumber = */ 0,
    /* FWPosition = */ 0,
@@ -123,7 +124,7 @@ uint32_t CalibSpectralResponse_ParseSpectralResponseFileHeader_v2(uint8_t *buffe
    hdr->FileDescription[64] = '\0';
    numBytes += 2; // Skip FREE space
    memcpy(&hdr->SensorID, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   numBytes += 1; // Skip FREE space
+   memcpy(&hdr->SensorIDMSB, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&hdr->ExternalLensSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&hdr->ManualFilterSerialNumber, &buffer[numBytes], sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&hdr->FWPosition, &buffer[numBytes], sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -193,7 +194,7 @@ uint32_t CalibSpectralResponse_WriteSpectralResponseFileHeader_v2(CalibSpectralR
    memcpy(&buffer[numBytes], hdr->FileDescription, 64); numBytes += 64;
    memset(&buffer[numBytes], 0, 2); numBytes += 2; // FREE space
    memcpy(&buffer[numBytes], &hdr->SensorID, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
-   memset(&buffer[numBytes], 0, 1); numBytes += 1; // FREE space
+   memcpy(&buffer[numBytes], &hdr->SensorIDMSB, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
    memcpy(&buffer[numBytes], &hdr->ExternalLensSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], &hdr->ManualFilterSerialNumber, sizeof(uint32_t)); numBytes += sizeof(uint32_t);
    memcpy(&buffer[numBytes], &hdr->FWPosition, sizeof(uint8_t)); numBytes += sizeof(uint8_t);
@@ -229,6 +230,7 @@ void CalibSpectralResponse_PrintSpectralResponseFileHeader_v2(CalibSpectralRespo
    FPGA_PRINTF("POSIXTime: %u s\n", hdr->POSIXTime);
    FPGA_PRINTF("FileDescription: %s\n", hdr->FileDescription);
    FPGA_PRINTF("SensorID: %u\n", hdr->SensorID);
+   FPGA_PRINTF("SensorIDMSB: %u\n", hdr->SensorIDMSB);
    FPGA_PRINTF("ExternalLensSerialNumber: %u\n", hdr->ExternalLensSerialNumber);
    FPGA_PRINTF("ManualFilterSerialNumber: %u\n", hdr->ManualFilterSerialNumber);
    FPGA_PRINTF("FWPosition: %u enum\n", hdr->FWPosition);

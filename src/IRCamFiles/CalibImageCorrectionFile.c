@@ -141,6 +141,11 @@ uint32_t CalibImageCorrection_ParseImageCorrectionFileHeader(int fd, CalibImageC
                hdr->FileStructureMinorVersion = 4;
 
             case 4:
+               // 2.4.x -> 2.5.x
+               hdr->SensorIDMSB = CalibImageCorrection_ImageCorrectionFileHeader_default.SensorIDMSB;
+               hdr->FileStructureMinorVersion = 5;
+
+            case 5:
                // Up to date, nothing to do
                hdr->FileStructureSubMinorVersion = CALIBIMAGECORRECTION_FILESUBMINORVERSION;
                break;
@@ -242,6 +247,10 @@ uint32_t CalibImageCorrection_ParseImageCorrectionDataHeader(int fd, fileInfo_t 
                // Nothing to do
 
             case 4:
+               // 2.4.x -> 2.5.x
+               // Nothing to do
+
+            case 5:
                // Up to date, nothing to do
                break;
          }

@@ -5,7 +5,7 @@
  * This file declares the camera image correction calibration file structure v2.
  *
  * Auto-generated image correction calibration file library.
- * Generated from the image correction calibration file structure definition XLS file version 2.4.0
+ * Generated from the image correction calibration file structure definition XLS file version 2.5.0
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define CALIBIMAGECORRECTION_FILEMAJORVERSION_V2      2
-#define CALIBIMAGECORRECTION_FILEMINORVERSION_V2      4
+#define CALIBIMAGECORRECTION_FILEMINORVERSION_V2      5
 #define CALIBIMAGECORRECTION_FILESUBMINORVERSION_V2   0
 
 #define CALIBIMAGECORRECTION_IMAGECORRECTIONFILEHEADER_SIZE_V2   512
@@ -67,6 +67,7 @@ struct CalibImageCorrection_ImageCorrectionFileHeader_v2Struct {
    float TemperatureReference;   /**< Temperature of the reference surface */
    float ExposureTime;   /**< Exposure time used for image correction acquisition */
    uint32_t AcquisitionFrameRate;   /**< Acquisition rate (in millihertz) */
+   uint8_t SensorIDMSB;   /**< Sensor ID Most Significant Byte */
    uint8_t FWMode;   /**< Acquisition mode of the filter wheel */
    int32_t FocusPositionRaw;   /**< Motorized focus lens encoder position */
    uint16_t FileHeaderCRC16;   /**< File header CRC-16 */
