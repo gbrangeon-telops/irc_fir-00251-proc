@@ -36,6 +36,9 @@ do  "$FIR251PROC\src\fir_00251_proc_acq_build.do"
 
 #CLINK receivers
 do  "$FIR251PROC\src\clink\HDL\compil_clink_receiver.do"
+ 
+#CLINK receivers (scd2)
+do  "$FIR251PROC\src\bb1920_serdes\HDL\compil_bb1920_receiver.do"
 
 #ADC receiver interface
 do  "$FIR251PROC\src\quad_serdes\HDL\build_quad_receiver.do"
@@ -48,9 +51,9 @@ acom  "$FIR251PROC\src\fir_00251_proc_blackbird1280D.bde"
 do "$FIR251PROC\src\FPA\blackbird1920D\hdl\compil_blackbird1920D.do"
 acom  "$FIR251PROC\src\fir_00251_proc_blackbird1920D.bde"
 
-#FPA blackbird1920D
-#do "$FIR251PROC\src\FPA\blackbird1520D\hdl\compil_blackbird1520D.do"
-#acom  "$FIR251PROC\src\fir_00251_proc_blackbird1520D.bde"
+#FPA blackbird1520D
+do "$FIR251PROC\src\FPA\blackbird1520D\hdl\compil_blackbird1520D.do"
+acom  "$FIR251PROC\src\fir_00251_proc_blackbird1520D.bde"
 
 #FPA hawkA
 do "$FIR251PROC\src\FPA\hawkA\HDL\compil_hawkA.do"
