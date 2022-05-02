@@ -88,7 +88,8 @@ architecture rtl of isc0207A_3k_readout_kernel is
       naoi_start : std_logic;
       aoi_eof    : std_logic;
       aoi_sof    : std_logic;  
-      aoi_sol    : std_logic;     
+      aoi_sol    : std_logic; 
+	  samp_pulse : std_logic;
    end record;
    
    signal fpa_pclk_i          : std_logic;
@@ -168,7 +169,8 @@ begin
    
    -- ADC_SYNC_FLAG 
    -- Ces flags permettent un timestamping des samples des ADC en vue d'une synchro parfaite avec les flags contenues dans readout_info 
-   ADC_SYNC_FLAG(15 downto 5)  <= (others => '0');   -- non utilisé
+   ADC_SYNC_FLAG(15 downto 6)  <= (others => '0');   -- non utilisé
+   ADC_SYNC_FLAG(5)  <= adc_time_stamp.samp_pulse;   -- clk_enable
    ADC_SYNC_FLAG(4)  <= adc_time_stamp.aoi_eof;      -- adc time stamp obligatoire :
    ADC_SYNC_FLAG(3)  <= adc_time_stamp.naoi_stop;    -- adc time stamp obligatoire :
    ADC_SYNC_FLAG(2)  <= adc_time_stamp.naoi_start;   -- adc time stamp obligatoire : naoi_start  (doit durer 1 CLK ADC)
@@ -484,6 +486,7 @@ begin
             adc_time_stamp.naoi_stop         <= elcorr_ref_end_i and elcorr_ref_fval_i and DEFINE_GENERATE_ELCORR_CHAIN;
             adc_time_stamp.aoi_sof           <= WDOW_FIFO_DATA.USER.SOF and window_fifo_rd_i;
             adc_time_stamp.aoi_sol           <= WDOW_FIFO_DATA.USER.SOL and window_fifo_rd_i;
+            adc_time_stamp.samp_pulse        <= readout_info_i.samp_pulse;
             
          end if; 
       end if;

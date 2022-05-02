@@ -124,7 +124,8 @@ begin
    Ud: process(CLK)
    begin
       if rising_edge(CLK) then 
-         adc_sync_flag_i(15 downto 5)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(15 downto 6)  <= (others => '0');    -- non utilisé
+         adc_sync_flag_i(5)  <= readout_info_i.samp_pulse;    -- clk_enable
          adc_sync_flag_i(4)  <= readout_info_i.aoi.eof;
          adc_sync_flag_i(3)  <= readout_info_i.naoi.stop;
          adc_sync_flag_i(2)  <= readout_info_i.naoi.start;
