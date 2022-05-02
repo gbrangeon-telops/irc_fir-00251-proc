@@ -85,9 +85,10 @@ architecture rtl of quad_data_sync_v2 is
    end component;
    
    signal sreset_clkout             : std_logic;
-   signal fifo_wr_i, fifo_dval_i    : std_logic;
+   signal fifo_wr_i                 : std_logic := '0';
+   signal fifo_dval_i               : std_logic;
    signal fifo_din_i, fifo_dout_i   : std_logic_vector(Q'length-1 downto 0);
-   signal fifo_rd_i                 : std_logic;
+   signal fifo_rd_i                 : std_logic := '0';
    signal adc_clk_ref               : std_logic;
    signal adc_clk_ref_last          : std_logic;
    signal dly_cnt                   : natural range 0 to C_FIFO_RDY_DLY + 1;
