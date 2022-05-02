@@ -85,7 +85,9 @@ architecture RTL of fpa_trig_precontroller is
    signal acq_trig_in_i                : std_logic; 
    signal xtra_trig_in_i               : std_logic;
    signal acq_trig_temp                : std_logic;
+   signal xtra_trig_temp               : std_logic;
    signal acq_trig_stretch             : std_logic;
+   signal xtra_trig_stretch            : std_logic;
    signal acq_trig_o                   : std_logic;
    signal xtra_trig_o                  : std_logic;
    signal done                         : std_logic;
@@ -110,13 +112,22 @@ begin
    
    
    
-   U0 : gh_stretch 
+   U0A : gh_stretch 
    generic map (stretch_count => 3072)   -- sur demande de MDA, acq_trig étiré de 30 usec pour supporter instabilité de la roue à filtres en mode synchrone uniquement et ce, pour les SCD 
    port map(
       CLK  => CLK,
       rst  => sreset,
       D    => acq_trig_temp,
       Q    => acq_trig_stretch
+      );
+   
+   U0B : gh_stretch 
+   generic map (stretch_count => 3072)   -- ODI: xtra_trig est étiré comme acq_trig
+   port map(
+      CLK  => CLK,
+      rst  => sreset,
+      D    => xtra_trig_temp,
+      Q    => xtra_trig_stretch
       );
    
    --------------------------------------------------
@@ -168,14 +179,17 @@ begin
             fpa_readout_last <= '0';
             xtra_img_cnt <= (others => '0');
             acq_trig_temp <= '0';
+            xtra_trig_temp <= '0';
             
          else
             
             -- étirement ou non 
             if FPA_INTF_CFG.comn.fpa_stretch_acq_trig = '1' then 
-               acq_trig_o <= acq_trig_stretch;               
+               acq_trig_o <= acq_trig_stretch;
+               xtra_trig_o <= xtra_trig_stretch;
             else
-               acq_trig_o <= acq_trig_temp; 
+               acq_trig_o <= acq_trig_temp;
+               xtra_trig_o <= xtra_trig_temp;
             end if;
             
             
@@ -188,7 +202,7 @@ begin
                -- etat init_st : oin envoie les trigs tels qu,on les reçoit et on attend que l'idDCA soit fonctionnel.
                when init_st =>
                   acq_trig_temp <= acq_trig_in_i;
-                  xtra_trig_o <= xtra_trig_in_i;
+                  xtra_trig_temp <= xtra_trig_in_i;
                   if fpa_readout_i = '1' and FPA_INTF_CFG.COMN.FPA_DIAG_MODE = '0' and PRIM_XTRA_TRIG_ACTIVE = '0' then -- donc l'IDDCA est actif et on veut se synchroniser sur le prochain PRIM_XTRA_TRIG_ACTIVE = '1'
                      trig_prectrl_sm <= idle;
                   end if;                   
@@ -196,18 +210,18 @@ begin
                -- etat idle
                when idle => 
                   acq_trig_temp <= acq_trig_in_i;
-                  xtra_trig_o <= xtra_trig_in_i;
+                  xtra_trig_temp <= xtra_trig_in_i;
                   done <= '1'; 
                   xtra_img_cnt <= (others => '0');
                   if PRIM_XTRA_TRIG_ACTIVE = '1' then
-                     xtra_trig_o <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
+                     xtra_trig_temp <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
                      acq_trig_temp <= '0';
                      trig_prectrl_sm <= prim_xtra_st;                        
                   end if;                     
                   
                -- mode xtra_trig 1. on y reste tant que  PRIM_XTRA_TRIG_ACTIVE reste à '1'
                when prim_xtra_st => 
-                  xtra_trig_o <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
+                  xtra_trig_temp <= '1';    -- permet de lancer le détecteur en mode xtraTrig à vitesse max possible  
                   acq_trig_temp <= '0';
                   if fpa_readout_last = '1' and  fpa_readout_i = '0' then --! fin du readout.
                      trig_prectrl_sm <= wait_xtra_img_st;
