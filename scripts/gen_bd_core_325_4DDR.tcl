@@ -637,7 +637,6 @@ proc create_hier_cell_axi_peripheral { parentCell nameHier } {
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_QSPI_AXI
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_RQC_LUT_AXI
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_SFWCTRL_AXI
-  create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_TEC_I2C_AXI
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_TIMER_AXI
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_TRIGGERCTRL_AXI
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M_USBUART_AXI
@@ -665,7 +664,7 @@ CONFIG.M01_HAS_DATA_FIFO {0} \
 CONFIG.M11_HAS_DATA_FIFO {0} \
 CONFIG.M12_HAS_DATA_FIFO {0} \
 CONFIG.M15_HAS_DATA_FIFO {0} \
-CONFIG.NUM_MI {16} \
+CONFIG.NUM_MI {15} \
 CONFIG.S00_HAS_DATA_FIFO {0} \
  ] $axi_interconnect_1
 
@@ -712,7 +711,6 @@ CONFIG.NUM_MI {10} \
   connect_bd_intf_net -intf_net axi_interconnect_1_M12_AXI [get_bd_intf_pins axi_interconnect_1/M12_AXI] [get_bd_intf_pins axi_interconnect_2/S00_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_1_M13_AXI [get_bd_intf_pins M_FW_UART_AXI] [get_bd_intf_pins axi_interconnect_1/M13_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_1_M14_AXI [get_bd_intf_pins M_LENS_UART_AXI] [get_bd_intf_pins axi_interconnect_1/M14_AXI]
-  connect_bd_intf_net -intf_net axi_interconnect_1_M15_AXI [get_bd_intf_pins M_TEC_I2C_AXI] [get_bd_intf_pins axi_interconnect_1/M15_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_2_M00_AXI [get_bd_intf_pins M_CALIBCONFIG_AXI] [get_bd_intf_pins axi_interconnect_2/M00_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_2_M01_AXI [get_bd_intf_pins M_EXPTIMECTRL_AXI] [get_bd_intf_pins axi_interconnect_2/M01_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_2_M02_AXI [get_bd_intf_pins M_INTC_AXI] [get_bd_intf_pins axi_interconnect_2/M02_AXI]
@@ -722,9 +720,110 @@ CONFIG.NUM_MI {10} \
 
   # Create port connections
   connect_bd_net -net ARESETN_2 [get_bd_pins INTERCONNECT_ARESETN] [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins axi_interconnect_1/ARESETN] [get_bd_pins axi_interconnect_2/ARESETN]
-  connect_bd_net -net clk_wiz_1_clk_out1 [get_bd_pins aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/M01_ACLK] [get_bd_pins axi_interconnect_0/M02_ACLK] [get_bd_pins axi_interconnect_0/M03_ACLK] [get_bd_pins axi_interconnect_0/M04_ACLK] [get_bd_pins axi_interconnect_0/M06_ACLK] [get_bd_pins axi_interconnect_0/M07_ACLK] [get_bd_pins axi_interconnect_0/M08_ACLK] [get_bd_pins axi_interconnect_0/M09_ACLK] [get_bd_pins axi_interconnect_0/M10_ACLK] [get_bd_pins axi_interconnect_0/M12_ACLK] [get_bd_pins axi_interconnect_0/M13_ACLK] [get_bd_pins axi_interconnect_0/M14_ACLK] [get_bd_pins axi_interconnect_0/M15_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_interconnect_1/ACLK] [get_bd_pins axi_interconnect_1/M00_ACLK] [get_bd_pins axi_interconnect_1/M01_ACLK] [get_bd_pins axi_interconnect_1/M02_ACLK] [get_bd_pins axi_interconnect_1/M03_ACLK] [get_bd_pins axi_interconnect_1/M04_ACLK] [get_bd_pins axi_interconnect_1/M05_ACLK] [get_bd_pins axi_interconnect_1/M06_ACLK] [get_bd_pins axi_interconnect_1/M07_ACLK] [get_bd_pins axi_interconnect_1/M08_ACLK] [get_bd_pins axi_interconnect_1/M09_ACLK] [get_bd_pins axi_interconnect_1/M10_ACLK] [get_bd_pins axi_interconnect_1/M11_ACLK] [get_bd_pins axi_interconnect_1/M12_ACLK] [get_bd_pins axi_interconnect_1/M13_ACLK] [get_bd_pins axi_interconnect_1/M14_ACLK] [get_bd_pins axi_interconnect_1/M15_ACLK] [get_bd_pins axi_interconnect_1/S00_ACLK] [get_bd_pins axi_interconnect_2/ACLK] [get_bd_pins axi_interconnect_2/M00_ACLK] [get_bd_pins axi_interconnect_2/M01_ACLK] [get_bd_pins axi_interconnect_2/M02_ACLK] [get_bd_pins axi_interconnect_2/M03_ACLK] [get_bd_pins axi_interconnect_2/M04_ACLK] [get_bd_pins axi_interconnect_2/M05_ACLK] [get_bd_pins axi_interconnect_2/M06_ACLK] [get_bd_pins axi_interconnect_2/M07_ACLK] [get_bd_pins axi_interconnect_2/M08_ACLK] [get_bd_pins axi_interconnect_2/M09_ACLK] [get_bd_pins axi_interconnect_2/S00_ACLK]
+  connect_bd_net -net clk_wiz_1_clk_out1 [get_bd_pins aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/M01_ACLK] [get_bd_pins axi_interconnect_0/M02_ACLK] [get_bd_pins axi_interconnect_0/M03_ACLK] [get_bd_pins axi_interconnect_0/M04_ACLK] [get_bd_pins axi_interconnect_0/M06_ACLK] [get_bd_pins axi_interconnect_0/M07_ACLK] [get_bd_pins axi_interconnect_0/M08_ACLK] [get_bd_pins axi_interconnect_0/M09_ACLK] [get_bd_pins axi_interconnect_0/M10_ACLK] [get_bd_pins axi_interconnect_0/M12_ACLK] [get_bd_pins axi_interconnect_0/M13_ACLK] [get_bd_pins axi_interconnect_0/M14_ACLK] [get_bd_pins axi_interconnect_0/M15_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_interconnect_1/ACLK] [get_bd_pins axi_interconnect_1/M00_ACLK] [get_bd_pins axi_interconnect_1/M01_ACLK] [get_bd_pins axi_interconnect_1/M02_ACLK] [get_bd_pins axi_interconnect_1/M03_ACLK] [get_bd_pins axi_interconnect_1/M04_ACLK] [get_bd_pins axi_interconnect_1/M05_ACLK] [get_bd_pins axi_interconnect_1/M06_ACLK] [get_bd_pins axi_interconnect_1/M07_ACLK] [get_bd_pins axi_interconnect_1/M08_ACLK] [get_bd_pins axi_interconnect_1/M09_ACLK] [get_bd_pins axi_interconnect_1/M10_ACLK] [get_bd_pins axi_interconnect_1/M11_ACLK] [get_bd_pins axi_interconnect_1/M12_ACLK] [get_bd_pins axi_interconnect_1/M13_ACLK] [get_bd_pins axi_interconnect_1/M14_ACLK] [get_bd_pins axi_interconnect_1/S00_ACLK] [get_bd_pins axi_interconnect_2/ACLK] [get_bd_pins axi_interconnect_2/M00_ACLK] [get_bd_pins axi_interconnect_2/M01_ACLK] [get_bd_pins axi_interconnect_2/M02_ACLK] [get_bd_pins axi_interconnect_2/M03_ACLK] [get_bd_pins axi_interconnect_2/M04_ACLK] [get_bd_pins axi_interconnect_2/M05_ACLK] [get_bd_pins axi_interconnect_2/M06_ACLK] [get_bd_pins axi_interconnect_2/M07_ACLK] [get_bd_pins axi_interconnect_2/M08_ACLK] [get_bd_pins axi_interconnect_2/M09_ACLK] [get_bd_pins axi_interconnect_2/S00_ACLK]
   connect_bd_net -net m_axi_aclk_1 [get_bd_pins m_axi_aclk] [get_bd_pins axi_interconnect_0/M05_ACLK] [get_bd_pins axi_interconnect_0/M11_ACLK]
-  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins PERIPHERAL_ARESETN] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/M01_ARESETN] [get_bd_pins axi_interconnect_0/M02_ARESETN] [get_bd_pins axi_interconnect_0/M03_ARESETN] [get_bd_pins axi_interconnect_0/M04_ARESETN] [get_bd_pins axi_interconnect_0/M05_ARESETN] [get_bd_pins axi_interconnect_0/M06_ARESETN] [get_bd_pins axi_interconnect_0/M07_ARESETN] [get_bd_pins axi_interconnect_0/M08_ARESETN] [get_bd_pins axi_interconnect_0/M09_ARESETN] [get_bd_pins axi_interconnect_0/M10_ARESETN] [get_bd_pins axi_interconnect_0/M11_ARESETN] [get_bd_pins axi_interconnect_0/M12_ARESETN] [get_bd_pins axi_interconnect_0/M13_ARESETN] [get_bd_pins axi_interconnect_0/M14_ARESETN] [get_bd_pins axi_interconnect_0/M15_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_interconnect_1/M00_ARESETN] [get_bd_pins axi_interconnect_1/M01_ARESETN] [get_bd_pins axi_interconnect_1/M02_ARESETN] [get_bd_pins axi_interconnect_1/M03_ARESETN] [get_bd_pins axi_interconnect_1/M04_ARESETN] [get_bd_pins axi_interconnect_1/M05_ARESETN] [get_bd_pins axi_interconnect_1/M06_ARESETN] [get_bd_pins axi_interconnect_1/M07_ARESETN] [get_bd_pins axi_interconnect_1/M08_ARESETN] [get_bd_pins axi_interconnect_1/M09_ARESETN] [get_bd_pins axi_interconnect_1/M10_ARESETN] [get_bd_pins axi_interconnect_1/M11_ARESETN] [get_bd_pins axi_interconnect_1/M12_ARESETN] [get_bd_pins axi_interconnect_1/M13_ARESETN] [get_bd_pins axi_interconnect_1/M14_ARESETN] [get_bd_pins axi_interconnect_1/M15_ARESETN] [get_bd_pins axi_interconnect_1/S00_ARESETN] [get_bd_pins axi_interconnect_2/M00_ARESETN] [get_bd_pins axi_interconnect_2/M01_ARESETN] [get_bd_pins axi_interconnect_2/M02_ARESETN] [get_bd_pins axi_interconnect_2/M03_ARESETN] [get_bd_pins axi_interconnect_2/M04_ARESETN] [get_bd_pins axi_interconnect_2/M05_ARESETN] [get_bd_pins axi_interconnect_2/M06_ARESETN] [get_bd_pins axi_interconnect_2/M07_ARESETN] [get_bd_pins axi_interconnect_2/M08_ARESETN] [get_bd_pins axi_interconnect_2/M09_ARESETN] [get_bd_pins axi_interconnect_2/S00_ARESETN]
+  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins PERIPHERAL_ARESETN] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/M01_ARESETN] [get_bd_pins axi_interconnect_0/M02_ARESETN] [get_bd_pins axi_interconnect_0/M03_ARESETN] [get_bd_pins axi_interconnect_0/M04_ARESETN] [get_bd_pins axi_interconnect_0/M05_ARESETN] [get_bd_pins axi_interconnect_0/M06_ARESETN] [get_bd_pins axi_interconnect_0/M07_ARESETN] [get_bd_pins axi_interconnect_0/M08_ARESETN] [get_bd_pins axi_interconnect_0/M09_ARESETN] [get_bd_pins axi_interconnect_0/M10_ARESETN] [get_bd_pins axi_interconnect_0/M11_ARESETN] [get_bd_pins axi_interconnect_0/M12_ARESETN] [get_bd_pins axi_interconnect_0/M13_ARESETN] [get_bd_pins axi_interconnect_0/M14_ARESETN] [get_bd_pins axi_interconnect_0/M15_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_interconnect_1/M00_ARESETN] [get_bd_pins axi_interconnect_1/M01_ARESETN] [get_bd_pins axi_interconnect_1/M02_ARESETN] [get_bd_pins axi_interconnect_1/M03_ARESETN] [get_bd_pins axi_interconnect_1/M04_ARESETN] [get_bd_pins axi_interconnect_1/M05_ARESETN] [get_bd_pins axi_interconnect_1/M06_ARESETN] [get_bd_pins axi_interconnect_1/M07_ARESETN] [get_bd_pins axi_interconnect_1/M08_ARESETN] [get_bd_pins axi_interconnect_1/M09_ARESETN] [get_bd_pins axi_interconnect_1/M10_ARESETN] [get_bd_pins axi_interconnect_1/M11_ARESETN] [get_bd_pins axi_interconnect_1/M12_ARESETN] [get_bd_pins axi_interconnect_1/M13_ARESETN] [get_bd_pins axi_interconnect_1/M14_ARESETN] [get_bd_pins axi_interconnect_1/S00_ARESETN] [get_bd_pins axi_interconnect_2/M00_ARESETN] [get_bd_pins axi_interconnect_2/M01_ARESETN] [get_bd_pins axi_interconnect_2/M02_ARESETN] [get_bd_pins axi_interconnect_2/M03_ARESETN] [get_bd_pins axi_interconnect_2/M04_ARESETN] [get_bd_pins axi_interconnect_2/M05_ARESETN] [get_bd_pins axi_interconnect_2/M06_ARESETN] [get_bd_pins axi_interconnect_2/M07_ARESETN] [get_bd_pins axi_interconnect_2/M08_ARESETN] [get_bd_pins axi_interconnect_2/M09_ARESETN] [get_bd_pins axi_interconnect_2/S00_ARESETN]
+
+  # Perform GUI Layout
+  regenerate_bd_layout -hierarchy [get_bd_cells /axi_peripheral] -layout_string {
+   guistr: "# # String gsaved with Nlview 6.6.5b  2016-09-06 bk=1.3687 VDI=39 GEI=35 GUI=JA:1.6
+#  -string -flagsOSRD
+preplace port M_XADC_AXI -pg 1 -y 650 -defaultsOSRD
+preplace port M_PLEORA_AXI -pg 1 -y 1540 -defaultsOSRD
+preplace port M_FLASHINTF_AXI -pg 1 -y 610 -defaultsOSRD
+preplace port S00_AXI -pg 1 -y 380 -defaultsOSRD
+preplace port M_MGT_AXI -pg 1 -y 1060 -defaultsOSRD
+preplace port M_BULK_AXI -pg 1 -y 630 -defaultsOSRD
+preplace port M_BUF_TABLE -pg 1 -y 280 -defaultsOSRD
+preplace port M_USBUART_AXI -pg 1 -y 1260 -defaultsOSRD
+preplace port M_FLASHRESET_AXI -pg 1 -y 360 -defaultsOSRD
+preplace port M_FPACTRL_AXI -pg 1 -y 1140 -defaultsOSRD
+preplace port M_TIMER_AXI -pg 1 -y 1220 -defaultsOSRD
+preplace port M_LEDGPIO_AXI -pg 1 -y 1020 -defaultsOSRD
+preplace port M_COOLER_UART -pg 1 -y 320 -defaultsOSRD
+preplace port M_NLC_LUT_AXI -pg 1 -y 1080 -defaultsOSRD
+preplace port M_LENS_UART_AXI -pg 1 -y 1580 -defaultsOSRD
+preplace port M_EHDRI_CTRL -pg 1 -y 300 -defaultsOSRD
+preplace port M_CLINKUART_AXI -pg 1 -y 730 -defaultsOSRD
+preplace port M_CALIB_RAM_AXI -pg 1 -y 1180 -defaultsOSRD
+preplace port M_BUFFERING_CTRL -pg 1 -y 260 -defaultsOSRD
+preplace port M_RQC_LUT_AXI -pg 1 -y 1200 -defaultsOSRD
+preplace port M_GPS_UART -pg 1 -y 1520 -defaultsOSRD
+preplace port M_FPGAOUT_AXI -pg 1 -y 1000 -defaultsOSRD
+preplace port M09_AXI -pg 1 -y 380 -defaultsOSRD
+preplace port aclk -pg 1 -y 400 -defaultsOSRD
+preplace port M_POWER_AXI -pg 1 -y 1100 -defaultsOSRD
+preplace port M_ICU_AXI -pg 1 -y 1280 -defaultsOSRD
+preplace port M_CALIBCONFIG_AXI -pg 1 -y 200 -defaultsOSRD
+preplace port m_axi_aclk -pg 1 -y 320 -defaultsOSRD
+preplace port M_QSPI_AXI -pg 1 -y 670 -defaultsOSRD
+preplace port M_OEMUART_AXI -pg 1 -y 710 -defaultsOSRD
+preplace port M_IRIG_AXI -pg 1 -y 1040 -defaultsOSRD
+preplace port M_HEADERCTRL_AXI -pg 1 -y 1240 -defaultsOSRD
+preplace port M_SFWCTRL_AXI -pg 1 -y 1600 -defaultsOSRD
+preplace port M_FW_UART_AXI -pg 1 -y 1560 -defaultsOSRD
+preplace port M_FAN_AXI -pg 1 -y 980 -defaultsOSRD
+preplace port M_DDRCAL_AXI -pg 1 -y 590 -defaultsOSRD
+preplace port M_TRIGGERCTRL_AXI -pg 1 -y 1120 -defaultsOSRD
+preplace port M_MDM_AXI -pg 1 -y 690 -defaultsOSRD
+preplace port M_INTC_AXI -pg 1 -y 240 -defaultsOSRD
+preplace port M_EXPTIMECTRL_AXI -pg 1 -y 220 -defaultsOSRD
+preplace port M_AECCTRL_AXI -pg 1 -y 1160 -defaultsOSRD
+preplace port M_ADC_READOUT_AXI -pg 1 -y 340 -defaultsOSRD
+preplace portBus PERIPHERAL_ARESETN -pg 1 -y 440 -defaultsOSRD
+preplace portBus INTERCONNECT_ARESETN -pg 1 -y 420 -defaultsOSRD
+preplace inst axi_interconnect_0 -pg 1 -lvl 2 -y 1130 -defaultsOSRD
+preplace inst axi_interconnect_1 -pg 1 -lvl 1 -y 740 -defaultsOSRD
+preplace inst axi_interconnect_2 -pg 1 -lvl 2 -y 290 -defaultsOSRD
+preplace netloc Conn1 1 2 1 NJ
+preplace netloc axi_interconnect_1_M08_AXI 1 1 2 330J 680 700J
+preplace netloc axi_interconnect_2_M01_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_0_M09_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M14_AXI 1 1 2 290J 1580 NJ
+preplace netloc axi_interconnect_2_M02_AXI 1 2 1 NJ
+preplace netloc Conn2 1 2 1 NJ
+preplace netloc axi_interconnect_0_M12_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M05_AXI 1 1 2 NJ 700 720J
+preplace netloc axi_interconnect_0_M13_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M01_AXI 1 1 2 NJ 620 720J
+preplace netloc Conn3 1 2 1 NJ
+preplace netloc axi_interconnect_1_M04_AXI 1 1 2 300J 640 720J
+preplace netloc Conn4 1 2 1 NJ
+preplace netloc axi_interconnect_0_M02_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M07_AXI 1 1 2 320J 670 710J
+preplace netloc axi_interconnect_0_M10_AXI 1 2 1 NJ
+preplace netloc Conn5 1 2 1 NJ
+preplace netloc ARESETN_2 1 0 2 10 90 370
+preplace netloc axi_interconnect_0_M07_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M13_AXI 1 1 2 310J 1560 NJ
+preplace netloc axi_interconnect_1_M02_AXI 1 1 2 290J 630 NJ
+preplace netloc axi_interconnect_2_M07_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M12_AXI 1 1 1 310
+preplace netloc axi_interconnect_0_M04_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_0_M08_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_2_M08_AXI 1 2 1 NJ
+preplace netloc S00_AXI_1 1 0 1 30J
+preplace netloc axi_interconnect_2_M06_AXI 1 2 1 NJ
+preplace netloc clk_wiz_1_clk_out1 1 0 2 20 1150 380
+preplace netloc axi_interconnect_1_M10_AXI 1 1 2 300J 1600 NJ
+preplace netloc axi_interconnect_0_M05_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_0_M00_AXI 1 2 1 NJ
+preplace netloc S00_AXI_2 1 1 1 400
+preplace netloc m_axi_aclk_1 1 0 2 NJ 320 350
+preplace netloc axi_interconnect_1_M03_AXI 1 1 2 NJ 660 710J
+preplace netloc axi_interconnect_1_M06_AXI 1 1 2 340J 710 NJ
+preplace netloc axi_interconnect_0_M01_AXI 1 2 1 NJ
+preplace netloc proc_sys_reset_1_interconnect_aresetn 1 0 2 0 1170 390
+preplace netloc axi_interconnect_0_M14_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_0_M06_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_1_M09_AXI 1 1 2 360J 690 690J
+preplace netloc axi_interconnect_1_M00_AXI 1 1 2 NJ 600 720J
+preplace netloc axi_interconnect_2_M00_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_0_M11_AXI 1 2 1 NJ
+preplace netloc axi_interconnect_0_M03_AXI 1 2 1 NJ
+levelinfo -pg 1 -20 160 560 770 -top 0 -bot 1640
+",
+}
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -1075,7 +1174,7 @@ proc create_hier_cell_MCU { parentCell nameHier } {
   create_bd_pin -dir I -from 0 -to 0 LMB_Rst
   create_bd_pin -dir I -type rst Reset
   create_bd_pin -dir I S_AXI_ACLK
-  create_bd_pin -dir I -from 16 -to 0 intr
+  create_bd_pin -dir I -from 15 -to 0 intr
   create_bd_pin -dir I -type rst s_axi_aresetn
 
   # Create instance: mdm_1, and set properties
@@ -1428,7 +1527,6 @@ CONFIG.TDEST_WIDTH {0} \
 CONFIG.TID_WIDTH {0} \
 CONFIG.TUSER_WIDTH {0} \
  ] $S_AXIS_USART
-  set TEC_I2C [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 TEC_I2C ]
   set TRIGGER_CTRL [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 TRIGGER_CTRL ]
   set_property -dict [ list \
 CONFIG.ADDR_WIDTH {32} \
@@ -1528,14 +1626,6 @@ CONFIG.C_S_AXI_ACLK_FREQ_HZ {100000000} \
 CONFIG.C_EXTERNAL_XIN_CLK_HZ.VALUE_SRC {DEFAULT} \
 CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
  ] $axi_gps_uart
-
-  # Create instance: axi_iic_0, and set properties
-  set axi_iic_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_iic:2.0 axi_iic_0 ]
-  set_property -dict [ list \
-CONFIG.C_SCL_INERTIAL_DELAY {255} \
-CONFIG.C_SDA_INERTIAL_DELAY {255} \
-CONFIG.IIC_FREQ_KHZ {10} \
- ] $axi_iic_0
 
   # Create instance: axi_interconnect_0, and set properties
   set axi_interconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0 ]
@@ -1668,7 +1758,7 @@ CONFIG.C_S_AXI_ACLK_FREQ_HZ.VALUE_SRC {DEFAULT} \
   # Create instance: intr_concact, and set properties
   set intr_concact [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 intr_concact ]
   set_property -dict [ list \
-CONFIG.NUM_PORTS {17} \
+CONFIG.NUM_PORTS {16} \
  ] $intr_concact
 
   # Create instance: oem_uart, and set properties
@@ -1776,7 +1866,6 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   connect_bd_intf_net -intf_net S_AXIS_S2MM_CMD_2 [get_bd_intf_ports S_AXIS_S2MM_CMD_BUF] [get_bd_intf_pins MIG_Calibration/S_AXIS_S2MM_CMD_BUF]
   connect_bd_intf_net -intf_net axi_gpio_0_GPIO2 [get_bd_intf_ports REV_GPIO] [get_bd_intf_pins axi_gpio_0/GPIO2]
   connect_bd_intf_net -intf_net axi_gpio_0_gpio [get_bd_intf_ports LED_GPIO] [get_bd_intf_pins axi_gpio_0/GPIO]
-  connect_bd_intf_net -intf_net axi_iic_0_IIC [get_bd_intf_ports TEC_I2C] [get_bd_intf_pins axi_iic_0/IIC]
   connect_bd_intf_net -intf_net axi_interconnect_0_M00_AXI1 [get_bd_intf_pins axi_interconnect_0/M00_AXI] [get_bd_intf_pins axi_quad_spi_0/AXI_LITE]
   connect_bd_intf_net -intf_net axi_interconnect_0_m00_axi [get_bd_intf_pins axi_peripheral/M_TIMER_AXI] [get_bd_intf_pins axi_timer_0/S_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_1_m00_axi [get_bd_intf_pins axi_peripheral/M_XADC_AXI] [get_bd_intf_pins xadc_wiz_1/s_axi_lite]
@@ -1803,7 +1892,6 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   connect_bd_intf_net -intf_net axi_peripheral_M_FLASHRESET_AXI [get_bd_intf_pins FlashReset_0/s_axi] [get_bd_intf_pins axi_peripheral/M_FLASHRESET_AXI]
   connect_bd_intf_net -intf_net axi_peripheral_M_FW_UART_AXI [get_bd_intf_pins axi_peripheral/M_FW_UART_AXI] [get_bd_intf_pins fw_uart/S_AXI]
   connect_bd_intf_net -intf_net axi_peripheral_M_LENS_UART_AXI [get_bd_intf_pins axi_lens_uart/S_AXI] [get_bd_intf_pins axi_peripheral/M_LENS_UART_AXI]
-  connect_bd_intf_net -intf_net axi_peripheral_M_TEC_I2C_AXI [get_bd_intf_pins axi_iic_0/S_AXI] [get_bd_intf_pins axi_peripheral/M_TEC_I2C_AXI]
   connect_bd_intf_net -intf_net axi_peripheral_m_fpgaout_axi [get_bd_intf_pins axi_peripheral/M_FPGAOUT_AXI] [get_bd_intf_pins fpga_output_uart/S_AXI]
   connect_bd_intf_net -intf_net axi_peripheral_m_pleora_axi [get_bd_intf_pins axi_peripheral/M_PLEORA_AXI] [get_bd_intf_pins pleora_uart/S_AXI]
   connect_bd_intf_net -intf_net axi_peripheral_m_usbuart_axi [get_bd_intf_pins axi_peripheral/M_USBUART_AXI] [get_bd_intf_pins axi_usb_uart/S_AXI]
@@ -1839,7 +1927,6 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   connect_bd_net -net NDF_UART_rxd_1 [get_bd_ports NDF_UART_rxd] [get_bd_pins axi_ndf_uart/sin]
   connect_bd_net -net OEM_UART_rxd_1 [get_bd_ports OEM_UART_rxd] [get_bd_pins oem_uart/sin]
   connect_bd_net -net axi_gps_uart_sout [get_bd_ports GPS_UART_txd] [get_bd_pins axi_gps_uart/sout]
-  connect_bd_net -net axi_iic_0_iic2intc_irpt [get_bd_pins axi_iic_0/iic2intc_irpt] [get_bd_pins intr_concact/In16]
   connect_bd_net -net axi_lens_uart_sout [get_bd_ports LENS_UART_SOUT] [get_bd_pins axi_lens_uart/sout]
   connect_bd_net -net axi_ndf_uart1_ip2intc_irpt [get_bd_pins axi_lens_uart/ip2intc_irpt] [get_bd_pins intr_concact/In15]
   connect_bd_net -net axi_ndf_uart_sout [get_bd_ports NDF_UART_txd] [get_bd_pins axi_ndf_uart/sout]
@@ -1863,7 +1950,7 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   connect_bd_net -net fw_uart_sout [get_bd_ports FW_UART_txd] [get_bd_pins fw_uart/sout]
   connect_bd_net -net mcu_debug_sys_rst [get_bd_pins MCU/Debug_SYS_Rst] [get_bd_pins proc_sys_reset_1/mb_debug_sys_rst]
   create_bd_net microblaze_1_Clk
-  connect_bd_net -net [get_bd_nets microblaze_1_Clk] [get_bd_ports clk_mb] [get_bd_pins FlashReset_0/m_axi_aclk] [get_bd_pins FlashReset_0/s_axi_aclk] [get_bd_pins MCU/Clk] [get_bd_pins MCU/S_AXI_ACLK] [get_bd_pins MIG_Calibration/CLK_MB] [get_bd_pins MIG_Code/CLK_MB] [get_bd_pins MIG_Code/ui_clk] [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins axi_gps_uart/s_axi_aclk] [get_bd_pins axi_iic_0/s_axi_aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_interconnect_0/S01_ACLK] [get_bd_pins axi_lens_uart/s_axi_aclk] [get_bd_pins axi_ndf_uart/s_axi_aclk] [get_bd_pins axi_peripheral/aclk] [get_bd_pins axi_quad_spi_0/s_axi_aclk] [get_bd_pins axi_timer_0/s_axi_aclk] [get_bd_pins axi_usb_uart/s_axi_aclk] [get_bd_pins clink_uart/s_axi_aclk] [get_bd_pins clk_wiz_1/clk_in1] [get_bd_pins fpga_output_uart/s_axi_aclk] [get_bd_pins fw_uart/s_axi_aclk] [get_bd_pins oem_uart/s_axi_aclk] [get_bd_pins pleora_uart/s_axi_aclk] [get_bd_pins power_management/s_axi_aclk] [get_bd_pins xadc_wiz_1/s_axi_aclk]
+  connect_bd_net -net [get_bd_nets microblaze_1_Clk] [get_bd_ports clk_mb] [get_bd_pins FlashReset_0/m_axi_aclk] [get_bd_pins FlashReset_0/s_axi_aclk] [get_bd_pins MCU/Clk] [get_bd_pins MCU/S_AXI_ACLK] [get_bd_pins MIG_Calibration/CLK_MB] [get_bd_pins MIG_Code/CLK_MB] [get_bd_pins MIG_Code/ui_clk] [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins axi_gps_uart/s_axi_aclk] [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins axi_interconnect_0/S01_ACLK] [get_bd_pins axi_lens_uart/s_axi_aclk] [get_bd_pins axi_ndf_uart/s_axi_aclk] [get_bd_pins axi_peripheral/aclk] [get_bd_pins axi_quad_spi_0/s_axi_aclk] [get_bd_pins axi_timer_0/s_axi_aclk] [get_bd_pins axi_usb_uart/s_axi_aclk] [get_bd_pins clink_uart/s_axi_aclk] [get_bd_pins clk_wiz_1/clk_in1] [get_bd_pins fpga_output_uart/s_axi_aclk] [get_bd_pins fw_uart/s_axi_aclk] [get_bd_pins oem_uart/s_axi_aclk] [get_bd_pins pleora_uart/s_axi_aclk] [get_bd_pins power_management/s_axi_aclk] [get_bd_pins xadc_wiz_1/s_axi_aclk]
   connect_bd_net -net microblaze_1_xlconcat_dout [get_bd_pins MCU/intr] [get_bd_pins intr_concact/dout]
   connect_bd_net -net oem_uart_ip2intc_irpt [get_bd_pins intr_concact/In13] [get_bd_pins oem_uart/ip2intc_irpt]
   connect_bd_net -net oem_uart_sout [get_bd_ports OEM_UART_txd] [get_bd_pins oem_uart/sout]
@@ -1872,7 +1959,7 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   connect_bd_net -net proc_sys_reset_1_bus_struct_reset [get_bd_pins MCU/LMB_Rst] [get_bd_pins proc_sys_reset_1/bus_struct_reset]
   connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins MIG_Calibration/INTERCONNECT_ARESETN] [get_bd_pins MIG_Code/INTERCONNECT_ARESETN] [get_bd_pins axi_peripheral/INTERCONNECT_ARESETN] [get_bd_pins proc_sys_reset_1/interconnect_aresetn]
   connect_bd_net -net proc_sys_reset_1_mb_reset [get_bd_pins MCU/Reset] [get_bd_pins proc_sys_reset_1/mb_reset]
-  connect_bd_net -net proc_sys_reset_1_peripheral_aresetn [get_bd_ports ARESETN] [get_bd_pins FlashReset_0/m_axi_aresetn] [get_bd_pins FlashReset_0/s_axi_aresetn] [get_bd_pins MCU/s_axi_aresetn] [get_bd_pins MIG_Calibration/PERIPHERAL_ARESETN] [get_bd_pins MIG_Code/PERIPHERAL_ARESETN] [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins axi_gps_uart/s_axi_aresetn] [get_bd_pins axi_iic_0/s_axi_aresetn] [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_interconnect_0/S01_ARESETN] [get_bd_pins axi_lens_uart/s_axi_aresetn] [get_bd_pins axi_ndf_uart/s_axi_aresetn] [get_bd_pins axi_peripheral/PERIPHERAL_ARESETN] [get_bd_pins axi_quad_spi_0/s_axi_aresetn] [get_bd_pins axi_timer_0/s_axi_aresetn] [get_bd_pins axi_usb_uart/s_axi_aresetn] [get_bd_pins clink_uart/s_axi_aresetn] [get_bd_pins fpga_output_uart/s_axi_aresetn] [get_bd_pins fw_uart/s_axi_aresetn] [get_bd_pins oem_uart/s_axi_aresetn] [get_bd_pins pleora_uart/s_axi_aresetn] [get_bd_pins power_management/s_axi_aresetn] [get_bd_pins proc_sys_reset_1/peripheral_aresetn] [get_bd_pins xadc_wiz_1/s_axi_aresetn]
+  connect_bd_net -net proc_sys_reset_1_peripheral_aresetn [get_bd_ports ARESETN] [get_bd_pins FlashReset_0/m_axi_aresetn] [get_bd_pins FlashReset_0/s_axi_aresetn] [get_bd_pins MCU/s_axi_aresetn] [get_bd_pins MIG_Calibration/PERIPHERAL_ARESETN] [get_bd_pins MIG_Code/PERIPHERAL_ARESETN] [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins axi_gps_uart/s_axi_aresetn] [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins axi_interconnect_0/S01_ARESETN] [get_bd_pins axi_lens_uart/s_axi_aresetn] [get_bd_pins axi_ndf_uart/s_axi_aresetn] [get_bd_pins axi_peripheral/PERIPHERAL_ARESETN] [get_bd_pins axi_quad_spi_0/s_axi_aresetn] [get_bd_pins axi_timer_0/s_axi_aresetn] [get_bd_pins axi_usb_uart/s_axi_aresetn] [get_bd_pins clink_uart/s_axi_aresetn] [get_bd_pins fpga_output_uart/s_axi_aresetn] [get_bd_pins fw_uart/s_axi_aresetn] [get_bd_pins oem_uart/s_axi_aresetn] [get_bd_pins pleora_uart/s_axi_aresetn] [get_bd_pins power_management/s_axi_aresetn] [get_bd_pins proc_sys_reset_1/peripheral_aresetn] [get_bd_pins xadc_wiz_1/s_axi_aresetn]
   connect_bd_net -net sin_1 [get_bd_ports GPS_UART_rxd] [get_bd_pins axi_gps_uart/sin]
   connect_bd_net -net sin_2 [get_bd_ports PLEORA_UART_SIN] [get_bd_pins pleora_uart/sin]
   connect_bd_net -net vcc_const [get_bd_pins proc_sys_reset_1/ext_reset_in] [get_bd_pins vcc/dout]
@@ -1900,15 +1987,14 @@ CONFIG.SEQUENCER_MODE.VALUE_SRC {DEFAULT} \
   create_bd_addr_seg -range 0x00010000 -offset 0x44AC0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_BULK_AXI/Reg] SEG_M_BULK_AXI_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44AD0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_EHDRI_CTRL/Reg] SEG_M_EHDRI_CTRL_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44AE0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_FLASHINTF_AXI/Reg] SEG_M_FLASHINTF_AXI_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x44C00000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_FRAME_BUFFER_CTRL/Reg] SEG_M_FRAME_BUFFER_CTRL_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x44AF0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_ICU_AXI/Reg] SEG_M_ICU_AXI_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x44B00000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs NLC_LUT_AXI/Reg] SEG_NLC_LUT_AXI_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x44B10000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs RQC_LUT_AXI/Reg] SEG_RQC_LUT_AXI_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x44B20000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs SFW_CTRL/Reg] SEG_SFW_CTRL_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x44B30000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs TRIGGER_CTRL/Reg] SEG_TRIGGER_CTRL_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44AF0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_FRAME_BUFFER_CTRL/Reg] SEG_M_FRAME_BUFFER_CTRL_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44B00000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs M_ICU_AXI/Reg] SEG_M_ICU_AXI_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44B10000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs NLC_LUT_AXI/Reg] SEG_NLC_LUT_AXI_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44B20000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs RQC_LUT_AXI/Reg] SEG_RQC_LUT_AXI_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44B30000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs SFW_CTRL/Reg] SEG_SFW_CTRL_Reg
+  create_bd_addr_seg -range 0x00010000 -offset 0x44C00000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs TRIGGER_CTRL/Reg] SEG_TRIGGER_CTRL_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x40000000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] SEG_axi_gpio_0_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44B40000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs axi_gps_uart/S_AXI/Reg] SEG_axi_gps_uart_Reg
-  create_bd_addr_seg -range 0x00010000 -offset 0x40800000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs axi_iic_0/S_AXI/Reg] SEG_axi_iic_0_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44BE0000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs axi_lens_uart/S_AXI/Reg] SEG_axi_lens_uart_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44B50000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs axi_ndf_uart/S_AXI/Reg] SEG_axi_ndf_uart_Reg
   create_bd_addr_seg -range 0x00010000 -offset 0x44B60000 [get_bd_addr_spaces MCU/microblaze_1/Data] [get_bd_addr_segs axi_quad_spi_0/AXI_LITE/Reg] SEG_axi_quad_spi_0_Reg
@@ -1950,7 +2036,6 @@ preplace port clk_din -pg 1 -y 3930 -defaultsOSRD
 preplace port vn_in -pg 1 -y 2980 -defaultsOSRD
 preplace port BUTTON -pg 1 -y 2150 -defaultsOSRD
 preplace port CLINK_UART_rxd -pg 1 -y 530 -defaultsOSRD
-preplace port TEC_I2C -pg 1 -y 2100 -defaultsOSRD
 preplace port S_AXIS_S2MM_BUF -pg 1 -y 3430 -defaultsOSRD
 preplace port M_AXIS_CALDDR_MM2S -pg 1 -y 3700 -defaultsOSRD
 preplace port S_AXIS_USART -pg 1 -y 2470 -defaultsOSRD
@@ -1969,9 +2054,9 @@ preplace port POWER_GPIO -pg 1 -y 1210 -defaultsOSRD
 preplace port AEC_CTRL -pg 1 -y 900 -defaultsOSRD
 preplace port M_AXIS_MM2S_FB -pg 1 -y 3760 -defaultsOSRD
 preplace port SYS_CLK_0 -pg 1 -y 2390 -defaultsOSRD
-preplace port clk_mgt_init -pg 1 -y 2660 -defaultsOSRD
 preplace port SYS_CLK_1 -pg 1 -y 3320 -defaultsOSRD
 preplace port S_AXIS_S2MM_CMD_BUF -pg 1 -y 3570 -defaultsOSRD
+preplace port clk_mgt_init -pg 1 -y 2660 -defaultsOSRD
 preplace port M_BULK_AXI -pg 1 -y 960 -defaultsOSRD
 preplace port REV_GPIO -pg 1 -y 1110 -defaultsOSRD
 preplace port CODE_DDR -pg 1 -y 2620 -defaultsOSRD
@@ -2017,258 +2102,154 @@ preplace portBus bulk_interrupt -pg 1 -y 1770 -defaultsOSRD
 preplace portBus ARESETN -pg 1 -y 180 -defaultsOSRD
 preplace inst MCU -pg 1 -lvl 3 -y 2550 -defaultsOSRD
 preplace inst FlashReset_0 -pg 1 -lvl 3 -y 2180 -defaultsOSRD
-preplace inst MIG_Calibration|axi_dm_frame_buffer -pg 1 -lvl 2 -y 4006 -defaultsOSRD
 preplace inst vcc -pg 1 -lvl 1 -y 2760 -defaultsOSRD
 preplace inst intr_concact -pg 1 -lvl 2 -y 1810 -defaultsOSRD
-preplace inst axi_iic_0 -pg 1 -lvl 5 -y 2110 -defaultsOSRD
-preplace inst MIG_Calibration|axi_datamover_ddrcal -pg 1 -lvl 2 -y 4246 -defaultsOSRD
 preplace inst axi_lens_uart -pg 1 -lvl 5 -y 1360 -defaultsOSRD
 preplace inst MIG_Calibration -pg 1 -lvl 6 -y 3766 -defaultsOSRD
 preplace inst GND -pg 1 -lvl 1 -y 2840 -defaultsOSRD
-preplace inst MIG_Calibration|axi_interconnect_ddrcal -pg 1 -lvl 3 -y 3856 -defaultsOSRD
 preplace inst xadc_wiz_1 -pg 1 -lvl 5 -y 2990 -defaultsOSRD
 preplace inst axi_ndf_uart -pg 1 -lvl 5 -y 430 -defaultsOSRD
 preplace inst oem_uart -pg 1 -lvl 5 -y 1570 -defaultsOSRD
 preplace inst axi_timer_0 -pg 1 -lvl 5 -y 1940 -defaultsOSRD
 preplace inst axi_peripheral -pg 1 -lvl 4 -y 1252 -defaultsOSRD
 preplace inst axi_gpio_0 -pg 1 -lvl 5 -y 1090 -defaultsOSRD
-preplace inst axi_peripheral|axi_interconnect_0 -pg 1 -lvl 2 -y 1902 -defaultsOSRD
 preplace inst proc_sys_reset_1 -pg 1 -lvl 2 -y 2780 -defaultsOSRD
 preplace inst axi_gps_uart -pg 1 -lvl 5 -y 770 -defaultsOSRD
-preplace inst axi_peripheral|axi_interconnect_1 -pg 1 -lvl 1 -y 1582 -defaultsOSRD
 preplace inst fw_uart -pg 1 -lvl 5 -y 100 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_0 -pg 1 -lvl 4 -y 4386 -defaultsOSRD
-preplace inst MIG_Calibration|axi_dm_buffer -pg 1 -lvl 2 -y 3726 -defaultsOSRD
-preplace inst axi_peripheral|axi_interconnect_2 -pg 1 -lvl 2 -y 1122 -defaultsOSRD
 preplace inst fpga_output_uart -pg 1 -lvl 5 -y 270 -defaultsOSRD
 preplace inst axi_usb_uart -pg 1 -lvl 5 -y 2270 -defaultsOSRD
 preplace inst MIG_Code -pg 1 -lvl 5 -y 2670 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_1 -pg 1 -lvl 4 -y 4026 -defaultsOSRD
 preplace inst axi_interconnect_0 -pg 1 -lvl 4 -y 3014 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_2 -pg 1 -lvl 4 -y 4206 -defaultsOSRD
 preplace inst clink_uart -pg 1 -lvl 5 -y 600 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_3 -pg 1 -lvl 1 -y 4036 -defaultsOSRD
-preplace inst MIG_Calibration|CAL_DDR_MIG -pg 1 -lvl 4 -y 4576 -defaultsOSRD
 preplace inst pleora_uart -pg 1 -lvl 5 -y 1740 -defaultsOSRD
 preplace inst clk_wiz_1 -pg 1 -lvl 4 -y 3604 -defaultsOSRD
-preplace inst MIG_Calibration|axis_clock_converter_4 -pg 1 -lvl 1 -y 4546 -defaultsOSRD
 preplace inst power_management -pg 1 -lvl 5 -y 1210 -defaultsOSRD
 preplace inst axi_quad_spi_0 -pg 1 -lvl 5 -y 2450 -defaultsOSRD
-preplace netloc axi_peripheral|S00_AXI_2 1 1 1 1610
-preplace netloc S_AXIS_MM2S_CMD_1 1 0 6 NJ 3340 NJ 3340 NJ 3340 NJ 3340 NJ 3340 3550
-preplace netloc axi_peripheral_M04_AXI1 1 4 3 2370J 940 NJ 940 NJ
-preplace netloc S00_AXI_2 1 3 2 1040 2844 2290
-preplace netloc axi_ndf_uart_sout 1 5 2 NJ 440 5500J
-preplace netloc axi_peripheral|axi_interconnect_1_M06_AXI 1 1 2 1570 2522 NJ
-preplace netloc axi_peripheral|axi_interconnect_1_M00_AXI 1 1 2 N 1432 NJ
-preplace netloc axi_peripheral|axi_interconnect_1_M02_AXI 1 1 2 N 1472 1970J
-preplace netloc S_AXIS_MM2S_CMD_2 1 0 6 NJ 3360 NJ 3360 NJ 3360 NJ 3360 NJ 3360 3530
-preplace netloc MIG_Calibration_M_AXIS_S2MM_STS 1 6 1 5540
-preplace netloc mig_7series_0_DDR3 1 6 1 5430
-preplace netloc axi_quad_spi_0_ip2intc_irpt 1 1 5 200 760 NJ 760 NJ 760 2330J 890 3450
-preplace netloc microblaze_1_Clk 1 2 5 620 3824 980 3824 2550 3824 3480 2740 NJ
-preplace netloc MIG_Calibration|axis_clock_converter_2_M_AXIS 1 4 1 N
-preplace netloc axi_peripheral|axi_interconnect_1_M13_AXI 1 1 2 1560 2332 2040J
-preplace netloc S_AXIS_MM2S_CMD_3 1 0 6 NJ 3380 NJ 3380 NJ 3380 NJ 3380 NJ 3380 3510
-preplace netloc mig_7series_0_DDR4 1 5 2 NJ 2610 5430J
-preplace netloc axi_peripheral_M_LENS_UART_AXI 1 4 1 2540
-preplace netloc axi_peripheral_M14_AXI1 1 4 1 2440
-preplace netloc axi_timer_0_interrupt 1 1 5 180 780 NJ 780 NJ 780 2370J 900 3420
-preplace netloc MIG_Calibration|S_AXI_1 1 0 3 NJ 4376 NJ 4376 4540
-preplace netloc MIG_Calibration|ARESETN_1 1 0 4 3770J 4416 NJ 4416 4600 4136 4910
-preplace netloc axi_peripheral|axi_interconnect_1_M03_AXI 1 1 2 1550 2722 NJ
-preplace netloc axi_quad_spi_0_SPI_0 1 5 2 NJ 2430 5430J
-preplace netloc axi_peripheral_M_COOLER_UART 1 4 1 2350
-preplace netloc MIG_Code_mmcm_locked 1 3 3 1030 2830 NJ 2830 3370
-preplace netloc clk_wiz_2_locked 1 1 4 70 680 NJ 680 NJ 680 2310
-preplace netloc MIG_Code_clk20 1 5 2 NJ 2630 5430J
-preplace netloc axi_peripheral|axi_interconnect_0_M12_AXI 1 2 1 1940
-preplace netloc axi_peripheral|axi_interconnect_0_M01_AXI 1 2 1 2100
-preplace netloc cooler_uart_ip2intc_irpt 1 1 5 150 190 NJ 190 NJ 190 NJ 190 3390
-preplace netloc clink_uart_sout 1 5 2 NJ 610 5500J
-preplace netloc OEM_UART_rxd_1 1 0 6 -60J 660 NJ 660 NJ 660 NJ 660 2680J 680 3440
-preplace netloc MIG_Calibration|ACLK_1 1 0 3 3750J 4406 NJ 4406 4610
-preplace netloc axi_peripheral|axi_interconnect_0_M02_AXI 1 2 1 2010
-preplace netloc axi_peripheral|axi_interconnect_0_M08_AXI 1 2 1 2110
-preplace netloc power_management_GPIO2 1 5 2 NJ 1220 5500J
-preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 100 180 NJ 180 NJ 180 NJ 180 3370
-preplace netloc axi_iic_0_IIC 1 5 2 NJ 2090 5490J
-preplace netloc axi_gpio_0_gpio 1 5 2 NJ 1080 5500J
-preplace netloc axi_protocol_converter_8_m_axi 1 4 3 2620J 2530 NJ 2530 5500J
-preplace netloc MIG_Calibration_M_AXIS_MM2S 1 6 1 5440
-preplace netloc axi_peripheral|axi_interconnect_0_M06_AXI 1 2 1 1970
-preplace netloc axi_protocol_converter_2_m_axi 1 4 3 2510J 1470 NJ 1470 5450J
-preplace netloc MIG_Calibration|proc_sys_reset_1_interconnect_aresetn 1 0 4 3760 4426 4060 4356 4520 4366 4940
-preplace netloc axi_peripheral|axi_interconnect_1_M07_AXI 1 1 2 1590 1422 2040J
-preplace netloc axi_peripheral_M09_AXI 1 4 3 2380J 1010 NJ 1010 5430J
-preplace netloc axi_peripheral_m_pleora_axi 1 4 1 2590
-preplace netloc xadc_wiz_1_temp_out 1 4 2 2680 3904 3450
-preplace netloc axi_interconnect_0_M00_AXI1 1 4 1 2300
-preplace netloc axi_peripheral|axi_interconnect_0_M14_AXI 1 2 1 1930
-preplace netloc axi_peripheral|axi_interconnect_2_M08_AXI 1 2 1 2090
-preplace netloc axi_peripheral|axi_interconnect_0_M09_AXI 1 2 1 2050
-preplace netloc vn_in_1 1 0 5 NJ 2980 NJ 2980 NJ 2980 1000J 2864 2320J
-preplace netloc vp_in_1 1 0 5 NJ 3000 NJ 3000 NJ 3000 960J 2854 2330J
-preplace netloc MIG_Calibration|CAL_DDR_MIG_DDR3 1 4 1 5240
-preplace netloc axi_peripheral|axi_interconnect_1_M04_AXI 1 1 2 1580 2582 NJ
-preplace netloc S_AXIS_S2MM_CMD_1 1 0 6 -80J 3724 NJ 3724 NJ 3724 NJ 3724 NJ 3724 3460
-preplace netloc axi_peripheral_M06_AXI 1 4 3 2330J 2180 NJ 2180 5510J
-preplace netloc axi_interconnect_1_m12_axi 1 4 1 2480
-preplace netloc MIG_Calibration|axi_dm_buffer_M_AXI_MM2S 1 2 1 4580
-preplace netloc axi_peripheral|axi_interconnect_0_M11_AXI 1 2 1 1960
-preplace netloc S_AXIS_S2MM_CMD_2 1 0 6 -70J 3704 NJ 3704 NJ 3704 NJ 3704 NJ 3704 3470
-preplace netloc axi_gpio_0_GPIO2 1 5 2 NJ 1100 5500J
-preplace netloc axi_peripheral_M_BULK_AXI 1 4 3 2400J 960 NJ 960 NJ
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS1 1 6 1 5480
+preplace netloc S_AXIS_MM2S_CMD_1 1 0 6 NJ 3340 NJ 3340 NJ 3340 NJ 3340 NJ 3340 3450
+preplace netloc axi_peripheral_M04_AXI1 1 4 3 NJ 952 NJ 952 4090J
+preplace netloc S00_AXI_2 1 3 2 990 810 1750
+preplace netloc axi_ndf_uart_sout 1 5 2 NJ 440 4080J
+preplace netloc S_AXIS_MM2S_CMD_2 1 0 6 NJ 3360 NJ 3360 NJ 3360 NJ 3360 NJ 3360 3400
+preplace netloc MIG_Calibration_M_AXIS_S2MM_STS 1 6 1 4100
+preplace netloc mig_7series_0_DDR3 1 6 1 4100
+preplace netloc axi_quad_spi_0_ip2intc_irpt 1 1 5 70 2060 NJ 2060 NJ 2060 NJ 2060 3390
+preplace netloc microblaze_1_Clk 1 2 5 600 2800 980 2800 1950 2800 3420 2800 4120J
+preplace netloc S_AXIS_MM2S_CMD_3 1 0 6 NJ 3380 NJ 3380 NJ 3380 NJ 3380 NJ 3380 3380
+preplace netloc mig_7series_0_DDR4 1 5 2 NJ 2610 4080J
+preplace netloc axi_peripheral_M_LENS_UART_AXI 1 4 1 1930
+preplace netloc axi_peripheral_M14_AXI1 1 4 1 1880
+preplace netloc axi_timer_0_interrupt 1 1 5 120 2070 NJ 2070 NJ 2070 NJ 2070 3370
+preplace netloc axi_quad_spi_0_SPI_0 1 5 2 NJ 2430 4100J
+preplace netloc axi_peripheral_M_COOLER_UART 1 4 1 1800
+preplace netloc MIG_Code_mmcm_locked 1 3 3 1010 3420 NJ 3420 3370
+preplace netloc clk_wiz_2_locked 1 1 4 150 3440 NJ 3440 NJ 3440 1740
+preplace netloc MIG_Code_clk20 1 5 2 NJ 2630 4080J
+preplace netloc cooler_uart_ip2intc_irpt 1 1 5 150 780 NJ 780 NJ 780 1770J 860 3430
+preplace netloc clink_uart_sout 1 5 2 NJ 610 4080J
+preplace netloc OEM_UART_rxd_1 1 0 6 NJ 670 NJ 670 NJ 670 NJ 670 2000J 880 3400
+preplace netloc power_management_GPIO2 1 5 2 NJ 1220 4080J
+preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 80 180 NJ 180 NJ 180 NJ 180 3390
+preplace netloc axi_gpio_0_gpio 1 5 2 NJ 1080 4120J
+preplace netloc axi_protocol_converter_8_m_axi 1 4 3 1930J 1490 NJ 1490 4120J
+preplace netloc MIG_Calibration_M_AXIS_MM2S 1 6 1 4100
+preplace netloc axi_protocol_converter_2_m_axi 1 4 3 1900J 1010 NJ 1010 4110J
+preplace netloc axi_peripheral_M09_AXI 1 4 3 1770J 870 NJ 870 4080J
+preplace netloc axi_peripheral_m_pleora_axi 1 4 1 1860
+preplace netloc xadc_wiz_1_temp_out 1 4 2 2000 3906 3390
+preplace netloc axi_interconnect_0_M00_AXI1 1 4 1 1770
+preplace netloc vn_in_1 1 0 5 NJ 2980 NJ 2980 NJ 2980 930J 2870 1730J
+preplace netloc vp_in_1 1 0 5 NJ 3000 NJ 3000 NJ 3000 970J 2850 1740J
+preplace netloc S_AXIS_S2MM_CMD_1 1 0 6 -90J 3726 NJ 3726 NJ 3726 NJ 3726 NJ 3726 N
+preplace netloc axi_peripheral_M06_AXI 1 4 3 1910J 1450 NJ 1450 4110J
+preplace netloc axi_interconnect_1_m12_axi 1 4 1 1860
+preplace netloc S_AXIS_S2MM_CMD_2 1 0 6 -80J 3706 NJ 3706 NJ 3706 NJ 3706 NJ 3706 N
+preplace netloc axi_gpio_0_GPIO2 1 5 2 NJ 1100 4120J
+preplace netloc axi_peripheral_M_BULK_AXI 1 4 3 NJ 972 NJ 972 4110J
+preplace netloc MIG_Calibration_M_AXIS_MM2S_STS1 1 6 1 4100
 preplace netloc vcc_const 1 1 1 NJ
-preplace netloc S01_AXI_1 1 3 2 920J 2790 2370
-preplace netloc mcu_debug_sys_rst 1 1 3 210 2680 NJ 2680 900
-preplace netloc proc_sys_reset_1_bus_struct_reset 1 2 1 560
-preplace netloc MIG_Calibration|axis_clock_converter_0_M_AXIS 1 4 1 5230
-preplace netloc axi_peripheral|Conn1 1 2 1 N
-preplace netloc axi_peripheral_M05_AXI1 1 4 3 2490J 1650 NJ 1650 NJ
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS2 1 6 1 5500
-preplace netloc NDF_UART_rxd_1 1 0 6 -60J 350 NJ 350 NJ 350 NJ 350 NJ 350 3370
-preplace netloc axi_usb_uart_ip2intc_irpt 1 1 5 130 630 NJ 630 NJ 630 2650J 990 3410
+preplace netloc S01_AXI_1 1 3 2 NJ 2560 1730
+preplace netloc mcu_debug_sys_rst 1 1 3 150 2410 NJ 2410 900
+preplace netloc proc_sys_reset_1_bus_struct_reset 1 2 1 550
+preplace netloc axi_peripheral_M05_AXI1 1 4 3 1920J 1650 NJ 1650 NJ
+preplace netloc MIG_Calibration_M_AXIS_MM2S_STS2 1 6 1 4100
+preplace netloc NDF_UART_rxd_1 1 0 6 -90J 350 NJ 350 NJ 350 NJ 350 NJ 350 3390
+preplace netloc axi_usb_uart_ip2intc_irpt 1 1 5 60 2280 NJ 2280 NJ 2280 1750J 2100 3370
 preplace netloc fw_uart_sout 1 5 2 NJ 110 NJ
-preplace netloc axi_peripheral|Conn2 1 2 1 N
-preplace netloc axi_usb_uart_uart 1 5 2 NJ 2260 5430J
-preplace netloc axi_peripheral_M_FLASHINTF_AXI 1 4 3 2460J 1830 NJ 1830 NJ
-preplace netloc axi_peripheral_m_usbuart_axi 1 4 1 2280
-preplace netloc axi_peripheral_M_FLASHRESET_AXI 1 2 3 620 770 NJ 770 2280
-preplace netloc proc_sys_reset_1_mb_reset 1 2 1 570
-preplace netloc axi_ndf_uart1_ip2intc_irpt 1 1 5 90 670 NJ 670 NJ 670 2670J 690 3430
-preplace netloc axi_interconnect_0_m00_axi 1 4 1 2510
-preplace netloc AEC_INTC_1 1 0 2 NJ 1730 NJ
-preplace netloc MIG_Calibration|Conn10 1 2 3 4490 3586 NJ 3586 5260J
-preplace netloc axi_peripheral|Conn3 1 2 1 N
-preplace netloc axi_interconnect_1_m02_axi 1 4 1 2360
-preplace netloc MIG_Calibration|Conn11 1 2 3 4570 4156 4890J 4116 5220J
-preplace netloc axi_peripheral|Conn4 1 2 1 2110
-preplace netloc S_AXIS_S2MM_1 1 0 6 -70J 3744 NJ 3744 NJ 3744 NJ 3744 NJ 3744 3440
-preplace netloc SYS_CLK_1 1 0 6 NJ 3320 NJ 3320 NJ 3320 NJ 3320 NJ 3320 3560
-preplace netloc axi_peripheral_M15_AXI 1 4 3 2520J 1280 NJ 1280 5500J
-preplace netloc MIG_Calibration_M_AXIS_MM2S1 1 6 1 5460
-preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 4 530J 1242 950 3844 2660 3844 3410
-preplace netloc oem_uart_sout 1 5 2 NJ 1580 5520J
-preplace netloc axi_iic_0_iic2intc_irpt 1 1 5 210 2660 550J 2810 NJ 2810 NJ 2810 3380
-preplace netloc MIG_Calibration|m_axi_s2mm_aclk_1 1 0 2 3780 4436 4130
-preplace netloc MIG_Calibration|S02_ACLK_1 1 0 4 3730 4396 4070 4336 NJ 4336 4880
-preplace netloc axi_peripheral|Conn5 1 2 1 1970
-preplace netloc S_AXIS_S2MM_2 1 0 6 -60J 3684 NJ 3684 NJ 3684 NJ 3684 NJ 3684 3490
-preplace netloc MIG_Calibration_M_AXIS_MM2S2 1 6 1 5470
-preplace netloc axi_peripheral_M_CALIB_RAM_AXI 1 4 3 2430J 1000 NJ 1000 NJ
-preplace netloc sin_1 1 0 6 NJ 750 NJ 750 NJ 750 NJ 750 2610J 860 3390
-preplace netloc MIG_Calibration|Conn13 1 2 3 4550 4296 NJ 4296 NJ
-preplace netloc MIG_Calibration|axis_clock_converter_1_M_AXIS 1 4 1 5250
-preplace netloc MIG_Calibration|axi_dm_buffer_M_AXI_S2MM 1 2 1 N
-preplace netloc MCU_Interrupt 1 1 3 170 1510 NJ 1510 910
+preplace netloc axi_usb_uart_uart 1 5 2 NJ 2260 4110J
+preplace netloc axi_peripheral_M_FLASHINTF_AXI 1 4 3 1980J 1830 NJ 1830 NJ
+preplace netloc axi_peripheral_m_usbuart_axi 1 4 1 1800
+preplace netloc axi_peripheral_M_FLASHRESET_AXI 1 2 3 600 770 NJ 770 1740
+preplace netloc proc_sys_reset_1_mb_reset 1 2 1 560
+preplace netloc axi_ndf_uart1_ip2intc_irpt 1 1 5 100 680 NJ 680 NJ 680 NJ 680 3410
+preplace netloc axi_interconnect_0_m00_axi 1 4 1 1840
+preplace netloc AEC_INTC_1 1 0 2 -90J 1740 NJ
+preplace netloc axi_interconnect_1_m02_axi 1 4 1 1810
+preplace netloc S_AXIS_S2MM_1 1 0 6 -80J 3746 NJ 3746 NJ 3746 NJ 3746 NJ 3746 N
+preplace netloc SYS_CLK_1 1 0 6 NJ 3320 NJ 3320 NJ 3320 NJ 3320 NJ 3320 3480
+preplace netloc axi_peripheral_M15_AXI 1 4 3 1970J 1280 NJ 1280 4080J
+preplace netloc MIG_Calibration_M_AXIS_MM2S1 1 6 1 4100
+preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 4 530J 1232 940 3846 1980 3846 N
+preplace netloc oem_uart_sout 1 5 2 NJ 1580 4120J
+preplace netloc S_AXIS_S2MM_2 1 0 6 -70J 3686 NJ 3686 NJ 3686 NJ 3686 NJ 3686 N
+preplace netloc MIG_Calibration_M_AXIS_MM2S2 1 6 1 4100
+preplace netloc axi_peripheral_M_CALIB_RAM_AXI 1 4 3 1860J 1000 NJ 1000 NJ
+preplace netloc sin_1 1 0 6 -90J 690 NJ 690 NJ 690 NJ 690 NJ 690 3390
+preplace netloc MCU_Interrupt 1 1 3 140 2050 NJ 2050 910
 preplace netloc fpga_output_uart_sout 1 5 2 NJ 280 NJ
-preplace netloc sin_2 1 0 6 NJ 800 NJ 800 NJ 800 NJ 800 2560J 930 3390
-preplace netloc MIG_Calibration|Conn14 1 2 3 4510 4666 NJ 4666 NJ
-preplace netloc MIG_Calibration|CAL_DDR_MIG_ui_clk1 1 0 5 3800 4456 4100 4156 4560 4146 4930 4486 5220
-preplace netloc axi_peripheral|axi_interconnect_0_M07_AXI 1 2 1 1950
-preplace netloc axi_peripheral|axi_interconnect_2_M01_AXI 1 2 1 2030
-preplace netloc axi_peripheral|clk_wiz_1_clk_out1 1 0 2 1250 2042 1630
-preplace netloc axi_peripheral_M_FW_UART_AXI 1 4 1 2340
-preplace netloc fw_uart_ip2intc_irpt 1 1 5 120 20 NJ 20 NJ 20 NJ 20 3370
-preplace netloc CLINK_UART_rxd_1 1 0 6 -60J 520 NJ 520 NJ 520 NJ 520 NJ 520 3370
-preplace netloc MIG_Calibration|Conn15 1 0 2 3730J 3946 N
-preplace netloc MIG_Calibration|SYS_CLK_1 1 0 4 3740J 4126 4050J 4346 NJ 4346 4880
-preplace netloc MIG_Calibration|m_axi_mm2s_aclk_1 1 0 4 3720J 4386 4110 4366 4490J 4426 NJ
-preplace netloc axi_peripheral|axi_interconnect_1_M14_AXI 1 1 2 1530 2442 NJ
-preplace netloc MIG_Calibration|Conn16 1 0 2 NJ 4156 4080
-preplace netloc axi_peripheral|axi_interconnect_1_M08_AXI 1 1 2 1620 2322 2090J
-preplace netloc ext_reset_in_1 1 1 5 60 3924 NJ 3924 NJ 3924 2670 3924 3370
-preplace netloc axi_lens_uart_sout 1 5 2 NJ 1370 5500J
-preplace netloc axi_peripheral|axi_interconnect_1_M10_AXI 1 1 2 1520 2622 NJ
-preplace netloc axi_peripheral|axi_interconnect_1_M05_AXI 1 1 2 1600 2462 NJ
+preplace netloc sin_2 1 0 6 -70J 790 NJ 790 NJ 790 NJ 790 1990J 910 3390
+preplace netloc axi_peripheral_M_FW_UART_AXI 1 4 1 1780
+preplace netloc fw_uart_ip2intc_irpt 1 1 5 130 20 NJ 20 NJ 20 NJ 20 3390
+preplace netloc CLINK_UART_rxd_1 1 0 6 -70J 520 NJ 520 NJ 520 NJ 520 NJ 520 3390
+preplace netloc ext_reset_in_1 1 1 5 100 3926 NJ 3926 NJ 3926 1990 3926 N
+preplace netloc axi_lens_uart_sout 1 5 2 NJ 1370 4080J
 preplace netloc S0_AXIS_1 1 0 3 NJ 2470 NJ 2470 NJ
-preplace netloc axi_peripheral_M_AXI 1 4 3 2570J 1440 NJ 1440 5430J
-preplace netloc LENS_UART_SIN_1 1 0 6 NJ 650 NJ 650 NJ 650 NJ 650 2660J 870 3400
-preplace netloc MIG_Calibration|axi_datamover_0_M_AXI_MM2S 1 2 1 4590
-preplace netloc axi_peripheral|proc_sys_reset_1_interconnect_aresetn 1 0 2 1240 2022 1640
-preplace netloc RQC_LUT_AXI 1 4 3 2600J 2350 NJ 2350 5480J
-preplace netloc power_management_GPIO 1 5 2 NJ 1200 5500J
-preplace netloc MCU_M0_AXIS 1 3 4 990J 2760 2610J 2190 NJ 2190 5470J
-preplace netloc clink_uart_ip2intc_irpt 1 1 5 80 510 NJ 510 NJ 510 NJ 510 3390
-preplace netloc MIG_Calibration|axi_datamover_ddrcal_M_AXIS_MM2S 1 2 2 4530 4356 4920J
-preplace netloc axi_peripheral|axi_interconnect_0_M00_AXI 1 2 1 2060
-preplace netloc axi_peripheral|axi_interconnect_2_M07_AXI 1 2 1 2040
-preplace netloc FlashReset_0_ip2intc_irpt 1 1 3 210 1500 NJ 1500 920
-preplace netloc axi_gps_uart_sout 1 5 2 NJ 780 5500J
-preplace netloc axi_peripheral|axi_interconnect_0_M04_AXI 1 2 1 1990
-preplace netloc SYS_CLK_0_1 1 0 5 NJ 2390 NJ 2390 NJ 2390 1000J 2770 2630J
-preplace netloc axi_peripheral_M05_AXI 1 4 3 2320J 1660 NJ 1660 5520J
-preplace netloc mcu_m_axi_dp 1 3 1 930
-preplace netloc axi_uart16550_0_ip2intc_irpt 1 1 5 140 610 NJ 610 NJ 610 2320J 850 3370
-preplace netloc axi_peripheral|axi_interconnect_2_M02_AXI 1 2 1 2020
-preplace netloc axi_protocol_converter_4_m_axi 1 4 3 2390J 2790 NJ 2790 5520J
-preplace netloc axi_peripheral_m_fpgaout_axi 1 4 1 2390
-preplace netloc FlashReset_0_m_axi 1 3 1 970
-preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXI_MM2S 1 2 1 4510
-preplace netloc MIG_Calibration|axi_dm_buffer_M_AXIS_MM2S 1 2 2 4490 4126 4870J
-preplace netloc axi_protocol_converter_3_m_axi 1 4 3 2410J 1020 NJ 1020 5440J
-preplace netloc s_axi1_1 1 2 3 610 740 NJ 740 2290
-preplace netloc FW_UART_rxd_1 1 0 6 NJ 10 NJ 10 NJ 10 NJ 10 NJ 10 3390
-preplace netloc axi_peripheral|axi_interconnect_1_M09_AXI 1 1 2 1540 2542 NJ
-preplace netloc axi_peripheral|axi_interconnect_0_M05_AXI 1 2 1 1980
-preplace netloc pleora_uart_sout 1 5 2 NJ 1750 5520J
-preplace netloc MIG_Calibration|axis_clock_converter_3_M_AXIS 1 1 1 4020
-preplace netloc MIG_Calibration_M_AXIS_S2MM_STS1 1 6 1 5520
-preplace netloc oem_uart_ip2intc_irpt 1 1 5 110 690 NJ 690 NJ 690 2590J 1480 3370
-preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 190 790 NJ 790 NJ 790 2570J 910 3460
-preplace netloc microblaze_1_xlconcat_dout 1 2 1 590
-preplace netloc axi_peripheral_M03_AXI 1 4 3 2330J 920 NJ 920 NJ
-preplace netloc FPGA_UART_rxd_1 1 0 6 -60J 0 NJ 0 NJ 0 NJ 0 NJ 0 3430
-preplace netloc MIG_Calibration|S_AXIS_S2MM_BUF_1 1 0 1 N
-preplace netloc MIG_Calibration|Conn1 1 0 2 NJ 3916 4090
-preplace netloc axi_peripheral|axi_interconnect_0_M03_AXI 1 2 1 2000
-preplace netloc axi_peripheral|axi_interconnect_1_M01_AXI 1 1 2 N 1452 2080J
-preplace netloc clk_wiz_1_clk_out1 1 3 4 1020 3530 2510 3530 3520J 3530 5540
-preplace netloc MIG_Calibration|Conn2 1 2 3 4500 4476 NJ 4476 5270J
-preplace netloc MIG_Calibration|sys_rst_1 1 0 4 NJ 4686 NJ 4686 NJ 4686 4940
-preplace netloc axi_peripheral|m_axi_aclk_1 1 0 2 NJ 2002 1590
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS 1 6 1 5450
-preplace netloc axi_protocol_converter_1_m_axi 1 4 3 2460J 2040 NJ 2040 5440J
-preplace netloc axi_peripheral_M04_AXI 1 4 3 2470J 1840 NJ 1840 5510J
-preplace netloc axi_peripheral_M_TEC_I2C_AXI 1 4 1 2350
-preplace netloc clk_wiz_1_clk_out2 1 4 3 NJ 3604 3540J 2820 NJ
-preplace netloc proc_sys_reset_1_peripheral_aresetn 1 2 5 580 3160 1010 3164 2530 3160 3500J 3160 5460
-preplace netloc axi_peripheral|axi_interconnect_0_M10_AXI 1 2 1 2070
-preplace netloc axi_peripheral|axi_interconnect_1_M12_AXI 1 1 1 1560
-preplace netloc MIG_Calibration|axi_interconnect_ddrcal_M00_AXI 1 3 1 4900
-preplace netloc MIG_Calibration|S_AXIS_S2MM_FB_1 1 0 1 3740
-preplace netloc MIG_Calibration|axis_clock_converter_4_M_AXIS 1 1 1 4120
-preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXIS_MM2S 1 2 2 4500 4166 NJ
-preplace netloc MIG_Calibration|device_temp_i_1 1 0 4 3790J 4446 4030J 4676 NJ 4676 4930
-preplace netloc axi_peripheral|ARESETN_2 1 0 2 1240 922 1620
-preplace netloc axi_peripheral_M08_AXI 1 4 1 2560
-preplace netloc axi_interconnect_1_m00_axi 1 4 1 2350
-preplace netloc clk_din_1 1 0 6 -70J 3884 NJ 3884 NJ 3884 NJ 3884 NJ 3884 3390
-preplace netloc MIG_Code_clk200 1 5 2 NJ 2690 5430J
+preplace netloc axi_peripheral_M_AXI 1 4 3 2000J 1440 NJ 1440 4080J
+preplace netloc LENS_UART_SIN_1 1 0 6 -90J 510 NJ 510 NJ 510 NJ 510 NJ 510 3420
+preplace netloc RQC_LUT_AXI 1 4 3 1870J 1480 NJ 1480 NJ
+preplace netloc power_management_GPIO 1 5 2 NJ 1200 4120J
+preplace netloc MCU_M0_AXIS 1 3 4 930J 2190 NJ 2190 NJ 2190 4090J
+preplace netloc clink_uart_ip2intc_irpt 1 1 5 90 190 NJ 190 NJ 190 NJ 190 3410
+preplace netloc FlashReset_0_ip2intc_irpt 1 1 3 110 2040 NJ 2040 900
+preplace netloc axi_gps_uart_sout 1 5 2 NJ 780 4080J
+preplace netloc SYS_CLK_0_1 1 0 5 NJ 2390 NJ 2390 NJ 2390 NJ 2390 1750J
+preplace netloc axi_peripheral_M05_AXI 1 4 3 1970J 1660 NJ 1660 4080J
+preplace netloc mcu_m_axi_dp 1 3 1 920
+preplace netloc axi_uart16550_0_ip2intc_irpt 1 1 5 140 760 NJ 760 NJ 760 1790J 850 3390
+preplace netloc axi_protocol_converter_4_m_axi 1 4 3 1850J 1820 NJ 1820 4120J
+preplace netloc axi_peripheral_m_fpgaout_axi 1 4 1 1820
+preplace netloc FlashReset_0_m_axi 1 3 1 950
+preplace netloc axi_protocol_converter_3_m_axi 1 4 3 1830J 900 NJ 900 NJ
+preplace netloc s_axi1_1 1 2 3 580 740 NJ 740 1760
+preplace netloc FW_UART_rxd_1 1 0 6 NJ 10 NJ 10 NJ 10 NJ 10 NJ 10 3410
+preplace netloc pleora_uart_sout 1 5 2 NJ 1750 4080J
+preplace netloc MIG_Calibration_M_AXIS_S2MM_STS1 1 6 1 4100
+preplace netloc oem_uart_ip2intc_irpt 1 1 5 150 2020 NJ 2020 NJ 2020 1780J 2050 3380
+preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 130 2030 NJ 2030 NJ 2030 1770J 2090 3380
+preplace netloc microblaze_1_xlconcat_dout 1 2 1 540
+preplace netloc axi_peripheral_M03_AXI 1 4 3 NJ 932 NJ 932 4080J
+preplace netloc FPGA_UART_rxd_1 1 0 6 -90J 0 NJ 0 NJ 0 NJ 0 NJ 0 3430
+preplace netloc clk_wiz_1_clk_out1 1 3 4 1000 3530 1900 3530 3460J 3530 4110
+preplace netloc MIG_Calibration_M_AXIS_MM2S_STS 1 6 1 4100
+preplace netloc axi_protocol_converter_1_m_axi 1 4 3 1960J 1470 NJ 1470 4090J
+preplace netloc axi_peripheral_M04_AXI 1 4 3 1990J 1840 NJ 1840 4080J
+preplace netloc clk_wiz_1_clk_out2 1 4 3 NJ 3604 3470J 2820 NJ
+preplace netloc proc_sys_reset_1_peripheral_aresetn 1 2 5 570 3866 960 3866 1940 3866 3440J 180 N
+preplace netloc axi_peripheral_M08_AXI 1 4 1 1900
+preplace netloc axi_interconnect_1_m00_axi 1 4 1 1760
+preplace netloc clk_din_1 1 0 6 -80J 3886 NJ 3886 NJ 3886 NJ 3886 NJ 3886 N
+preplace netloc MIG_Code_clk200 1 5 2 NJ 2690 4090J
 preplace netloc BUTTON_1 1 0 3 NJ 2150 NJ 2150 NJ
-preplace netloc MIG_Calibration|Conn7 1 0 2 NJ 3936 4030
-preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXI_S2MM 1 2 1 4500
-preplace netloc axi_peripheral|axi_interconnect_0_M13_AXI 1 2 1 N
-preplace netloc axi_protocol_converter_0_m_axi 1 4 3 2500J 1460 NJ 1460 NJ
-preplace netloc axi_peripheral_M_DDRMIG_AXI 1 4 2 2450J 3764 3430
-preplace netloc clk_wiz_0_clk_out3 1 1 6 200 2670 540J 2800 NJ 2800 2650 2800 3470 2800 5530J
-preplace netloc bulk_interrupt_1 1 0 2 NJ 1770 NJ
-preplace netloc pleora_uart_ip2intc_irpt 1 1 5 160 700 NJ 700 NJ 700 2580J 1490 3380
-preplace netloc MIG_Calibration|Conn8 1 0 2 NJ 4136 4040
-preplace netloc axi_peripheral|axi_interconnect_2_M06_AXI 1 2 1 2100
-preplace netloc axi_protocol_converter_7_m_axi 1 4 3 2420J 980 NJ 980 NJ
-preplace netloc s_axi_1 1 2 3 600 720 NJ 720 2300
-preplace netloc axi_peripheral_M_ADC_READOUT_AXI 1 4 3 2320J 880 NJ 880 NJ
-preplace netloc axi_interconnect_1_m01_axi 1 4 1 2580
-preplace netloc axi_peripheral|axi_interconnect_1_M15_AXI 1 1 2 1510 2642 NJ
-preplace netloc axi_peripheral|axi_interconnect_2_M00_AXI 1 2 1 1950
-preplace netloc axi_peripheral|S00_AXI_1 1 0 1 N
-preplace netloc S00_AXI_1 1 3 2 940J 2780 2640
-levelinfo -pg 1 -100 0 370 760 1540 3210 3870 5560 -top -10 -bot 6080
-levelinfo -hier MIG_Calibration * 3910 4310 4740 5080 *
-levelinfo -hier axi_peripheral * 1380 1800 *
+preplace netloc axi_protocol_converter_0_m_axi 1 4 3 1890J 1460 NJ 1460 NJ
+preplace netloc axi_peripheral_M_DDRMIG_AXI 1 4 2 1830J 3766 N
+preplace netloc clk_wiz_0_clk_out3 1 1 6 140 2370 NJ 2370 NJ 2370 2000 2370 3420 2370 4090J
+preplace netloc bulk_interrupt_1 1 0 2 -70J 1780 NJ
+preplace netloc pleora_uart_ip2intc_irpt 1 1 5 80 2080 NJ 2080 NJ 2080 NJ 2080 3400
+preplace netloc axi_protocol_converter_7_m_axi 1 4 3 1830J 990 NJ 990 4120J
+preplace netloc s_axi_1 1 2 3 590 800 NJ 800 1730
+preplace netloc axi_peripheral_M_ADC_READOUT_AXI 1 4 3 1790J 890 NJ 890 4080J
+preplace netloc axi_interconnect_1_m01_axi 1 4 1 1880
+preplace netloc S00_AXI_1 1 3 2 NJ 2520 1740
+levelinfo -pg 1 -110 0 370 760 1540 3210 3870 5560 -top -10 -bot 6080
 ",
 }
 

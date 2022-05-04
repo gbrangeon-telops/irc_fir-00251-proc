@@ -50,10 +50,6 @@
 #include "xparameters.h"
 #include "HwRevision.h"
 
-#ifdef ENABLE_TEC_CONTROL
-#include "tec_intf.h"
-#endif
-
 #ifdef STARTUP
 #include "DT_CommandsDef_startup.h"
 #endif
@@ -95,15 +91,6 @@ static IRC_Status_t DebugTerminalParsePLT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseFB(circByteBuffer_t *cbuf);
 static IRC_Status_t DebugTerminalParseHWID(circByteBuffer_t *cbuf);
-
-#ifdef ENABLE_TEC_CONTROL
-static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf);
-#endif
-
-
-
-
-
 static IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf);
 
 debugTerminalCommand_t gDebugTerminalCommands[] =
@@ -150,9 +137,6 @@ debugTerminalCommand_t gDebugTerminalCommands[] =
    {"PBT", DebugTerminalParsePBT},
    {"FB", DebugTerminalParseFB},
    {"HWID", DebugTerminalParseHWID},
-#ifdef ENABLE_TEC_CONTROL
-   {"TEC", DebugTerminalParseTEC},
-#endif
 
 #ifdef STARTUP
    DT_STARTUP_CMDS
@@ -2644,43 +2628,6 @@ static IRC_Status_t DebugTerminalParsePBT(circByteBuffer_t *cbuf)
    return IRC_SUCCESS;
 }
 
-#ifdef ENABLE_TEC_CONTROL
-/**
- * TEC Control command parser.
- * This parser is used to parse and validate TEC Control
- * command arguments and to execute the command.
- *
- * @param cbuf is the pointer to the circular buffer containing the data to be parsed.
- *
- * @return IRC_SUCCESS when Print Lens Table command was successfully executed.
- * @return IRC_FAILURE otherwise.
- */
-
-static IRC_Status_t DebugTerminalParseTEC(circByteBuffer_t *cbuf)
-{
-   uint32_t setval;
-
-   if (!DebugTerminal_CommandIsEmpty(cbuf))
-   {
-      uint8_t argStr[4];
-      uint32_t arglen;
-
-      arglen = GetNextArg(cbuf, argStr, 3);
-      if (ParseNumArg((char *)argStr, arglen, &setval) != IRC_SUCCESS)
-          return IRC_FAILURE;
-
-      TEC_SetTemperatureSetpoint(setval);
-   }
-   else
-   {
-      setval = TEC_GetTemperatureSetpoint();
-      DT_PRINTF("TEC setpoint value = %d", setval);
-   }
-
-   return IRC_SUCCESS;
-}
-#endif
-
 
 /**
  * Debug terminal get FB status & errors.
@@ -2790,9 +2737,6 @@ IRC_Status_t DebugTerminalParseHLP(circByteBuffer_t *cbuf)
    DT_PRINTF("  Print Buffer Table: PBT");
    DT_PRINTF("  FB status & errors :  FB");
    DT_PRINTF("  Get Hardware ID    :  HWID");
-   #ifdef ENABLE_TEC_CONTROL
-   DT_PRINTF("  TEC Control:        TEC [setpoint]");
-   #endif
    DT_PRINTF("  Print help:         HLP");
 
    /*

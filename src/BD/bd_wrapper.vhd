@@ -205,11 +205,7 @@ entity bd_wrapper is
       qspi_io1_io : inout STD_LOGIC;
       qspi_io2_io : inout STD_LOGIC;
       qspi_io3_io : inout STD_LOGIC;
-      qspi_ss_io : inout STD_LOGIC;
-      
-      -- TEC I2C 
-      TEC_I2C_SCL : inout STD_LOGIC;
-      TEC_I2C_SDA : inout STD_LOGIC
+      qspi_ss_io : inout STD_LOGIC
 );
 end bd_wrapper;
 
@@ -781,8 +777,6 @@ architecture bd_wrapper of bd_wrapper is
             qspi_io3_io : inout STD_LOGIC;
             qspi_ss_io : inout STD_LOGIC_VECTOR ( 0 to 0 );
             rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 3 downto 0 );
-            tec_i2c_scl_io : inout STD_LOGIC;
-            tec_i2c_sda_io : inout STD_LOGIC;
             vn_in : in STD_LOGIC;
             vp_in : in STD_LOGIC
          );
@@ -1377,8 +1371,6 @@ architecture bd_wrapper of bd_wrapper is
          qspi_io3_io : inout STD_LOGIC;
          qspi_ss_io : inout STD_LOGIC_VECTOR ( 0 to 0 );
          rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 3 downto 0 );
-         tec_i2c_scl_io : inout STD_LOGIC;
-         tec_i2c_sda_io : inout STD_LOGIC;
          vn_in : in STD_LOGIC;
          vp_in : in STD_LOGIC   
          );
@@ -1996,12 +1988,7 @@ begin
          NDF_UART_txd => UART_NDF_TX,
          
          --aec intc
-         AEC_INTC => AEC_INTC,
-         
-         -- TEC I2C
-         tec_i2c_scl_io => TEC_I2C_SCL,
-         tec_i2c_sda_io => TEC_I2C_SDA
-
+         AEC_INTC => AEC_INTC
       );
 
          
@@ -2746,11 +2733,7 @@ begin
          NDF_UART_txd => UART_NDF_TX,
          
          --aec intc
-         AEC_INTC => AEC_INTC,
-         
-         -- TEC I2C
-         tec_i2c_scl_io => TEC_I2C_SCL,
-         tec_i2c_sda_io => TEC_I2C_SDA
+         AEC_INTC => AEC_INTC
       );  
    end generate;
    
