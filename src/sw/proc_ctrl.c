@@ -161,7 +161,7 @@ void disable_caches()
    if (Proc_DebugTerminal_InitPhase2() != IRC_SUCCESS) gDebugTerminalStatus = IRC_FAILURE;
    BuiltInTest_Execute(BITID_PowerManagerInitialization);
    BuiltInTest_Execute(BITID_LedControllerInitialization);
-      BuiltInTest_Execute(BITID_NetworkInterfaceInitialization);
+   BuiltInTest_Execute(BITID_NetworkInterfaceInitialization);
    BuiltInTest_Execute(BITID_DebugTerminalInitialization);
    BuiltInTest_Execute(BITID_GenICamManagerInitialization);
    BuiltInTest_Execute(BITID_BoardRevisionValidation);
