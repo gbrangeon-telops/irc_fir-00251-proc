@@ -129,7 +129,12 @@ begin
          
          -- irig data  
          if time_dval_sre = '1' then      
-            irig_data_latch  <= IRIG_DATA;                                        
+            irig_data_latch.seconds_reg  <= IRIG_DATA.seconds_reg;
+            irig_data_latch.minutes_reg  <= IRIG_DATA.minutes_reg;
+            irig_data_latch.hours_reg  <= IRIG_DATA.hours_reg;
+            irig_data_latch.dayofyear_reg  <= IRIG_DATA.dayofyear_reg;
+            irig_data_latch.tenthsofsec_reg  <= IRIG_DATA.tenthsofsec_reg;
+            irig_data_latch.year_reg  <= IRIG_DATA.year_reg;
             irig_data_rdy <= '1';
          end if;
          
