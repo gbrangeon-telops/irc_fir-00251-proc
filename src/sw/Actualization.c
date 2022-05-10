@@ -459,7 +459,10 @@ IRC_Status_t Actualization_SM()
          GC_SetFWMode(FWM_Fixed); // stop SFW
          GC_SetEHDRINumberOfExposures(1); // disable EHDRI
          GC_SetCalibrationMode(CM_RT); // make sure the RT LUTRQ gets loaded by the calibration manager
-         gcRegsData.TestImageSelector = TIS_Off;
+         if (gActDebugOptions.useDebugData)
+            gcRegsData.TestImageSelector = TIS_TelopsConstantValue1;
+         else
+            gcRegsData.TestImageSelector = TIS_Off;
          gcRegsData.BadPixelReplacement = 0; // disabled
          TriggerModeAry[TS_AcquisitionStart] = TM_Off;   // internal trigger
          TriggerModeAry[TS_Gating] = TM_Off; // disabled
@@ -715,7 +718,9 @@ IRC_Status_t Actualization_SM()
 
       case ACT_StartAECAcquisition:
          // Ensure that camera is ready to be armed
-         if (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask) && (gcRegsData.FOVPosition != FOVP_FOVInTransition))
+         if ((!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask) &&
+               (gcRegsData.FOVPosition != FOVP_FOVInTransition)) ||
+               gActDebugOptions.bypassChecks)
          {
             ACT_INF( "Ready for AEC acquisition! (%dms)", (uint32_t) elapsed_time_us( tic_TotalDuration ) / 1000 );
 
@@ -835,7 +840,8 @@ IRC_Status_t Actualization_SM()
 
       case ACT_WaitAcquisitionReady:
          // Ensure that camera is ready to be armed
-         if (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask))
+         if (!TDCStatusTstAny(TDCStatusAllowSensorAcquisitionArmMask & ~WaitingForImageCorrectionMask) ||
+               gActDebugOptions.bypassChecks)
          {
             StartTimer(&act_timer, 0); // no need to wait again
             setActState(&state, ACT_StartAcquisition);
@@ -852,11 +858,6 @@ IRC_Status_t Actualization_SM()
          // Wait until the previous acquisition stop is effective
          if (GC_AcquisitionStarted == 0 && TimedOut(&act_timer))
          {
-            if (gActDebugOptions.useDebugData)
-            {
-               gcRegsData.TestImageSelector = TIS_TelopsConstantValue1;
-            }
-
             ACT_INF( "AcquisitionFrameRate = %d fps", (uint32_t) gcRegsData.AcquisitionFrameRate );
 
             // configurer le buffering pour deltaBetaNCoadd images
