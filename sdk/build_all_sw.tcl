@@ -5,12 +5,12 @@ create_proc_sw blackbird1280D
 build_proc_sw blackbird1280D 325
 #build_proc_sw blackbird1280D 160
 
-#create_proc_sw blackbird1920D
-build_proc_sw blackbird1920D 325
-#build_proc_sw blackbird1920D 160
-
-#create_proc_sw blackbird1920D
+create_proc_sw blackbird1520D
 build_proc_sw blackbird1520D 325
+#build_proc_sw blackbird1520D 160
+
+create_proc_sw blackbird1920D
+build_proc_sw blackbird1920D 325
 #build_proc_sw blackbird1920D 160
 
 create_proc_sw hawkA
@@ -49,14 +49,6 @@ create_proc_sw pelicanD
 build_proc_sw pelicanD 160
 #build_proc_sw pelicanD 325
 
-create_proc_sw scorpiomwD
-build_proc_sw scorpiomwD 160
-#build_proc_sw scorpiomwD 325
-
-create_proc_sw scorpiomwA
-build_proc_sw scorpiomwA 160
-#build_proc_sw scorpiomwA 325
-
 create_proc_sw scorpiolwD
 build_proc_sw scorpiolwD 160
 #build_proc_sw scorpiolwD 325
@@ -65,9 +57,17 @@ create_proc_sw scorpiolwD_230Hz
 build_proc_sw scorpiolwD_230Hz 160
 #build_proc_sw scorpiolwD_230Hz 325
 
-#create_proc_sw startup
-#build_proc_sw startup 160
-#build_proc_sw startup 325
+create_proc_sw scorpiomwA
+build_proc_sw scorpiomwA 160
+#build_proc_sw scorpiomwA 325
+
+create_proc_sw scorpiomwD
+build_proc_sw scorpiomwD 160
+#build_proc_sw scorpiomwD 325
+
+create_proc_sw startup
+build_proc_sw startup 160
+build_proc_sw startup 325
 
 create_proc_sw suphawkA
 build_proc_sw suphawkA 160

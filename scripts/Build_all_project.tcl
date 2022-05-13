@@ -9,11 +9,11 @@ set release 1
 #lappend detector_list {blackbird1280D160}
 lappend detector_list {blackbird1280D325}
 
-#lappend detector_list {blackbird1920D160}
-lappend detector_list {blackbird1920D325}
-
 #lappend detector_list {blackbird1520D160}
 lappend detector_list {blackbird1520D325}
+
+#lappend detector_list {blackbird1920D160}
+lappend detector_list {blackbird1920D325}
 
 lappend detector_list {hawkA160}
 #lappend detector_list {hawkA325}
@@ -54,8 +54,8 @@ lappend detector_list {scorpiomwA160}
 lappend detector_list {scorpiomwD160}
 #lappend detector_list {scorpiomwD325}
 
-# lappend detector_list {startup160}
-# lappend detector_list {startup325}
+lappend detector_list {startup160}
+lappend detector_list {startup325}
 
 lappend detector_list {suphawkA160}
 #lappend detector_list {suphawkA325}
