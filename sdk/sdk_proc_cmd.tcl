@@ -18,7 +18,7 @@ if {$size_arg == "both" || $size_arg == "160"} {
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_160"
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_160"
-   after 2000
+   after 3000
 
    #Configure in release mode
    configapp -app fir_00251_proc_${detector}_boot_160 build-config release
@@ -34,7 +34,7 @@ if {$size_arg == "both" || $size_arg == "325"} {
    #Import projects
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_boot_325"
    importprojects "d:/Telops/fir-00251-Proc/sdk/fir_00251_proc_${detector}/fir_00251_proc_${detector}_325"
-   after 2000
+   after 3000
 
    #Configure in release mode
    configapp -app fir_00251_proc_${detector}_boot_325 build-config release
