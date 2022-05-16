@@ -128,7 +128,7 @@ echo pause>> %fubatch%
 rem Generate firmware programmer batch file for JTAG
 echo @echo off> %fubatchJtag%
 echo.>> %fubatchJtag%
-echo set PATH=%%PATH%%;F:\Temp\ELA\bridges\scripts>> %fubatchJtag%
+echo set PATH=%%PATH%%;F:\Production\IRCAM\Tools\PROM-JTAG Bridge\scripts>> %fubatchJtag%
 echo.>> %fubatchJtag%
 echo :start_fu>> %fubatchJtag%
 echo.>> %fubatchJtag%
