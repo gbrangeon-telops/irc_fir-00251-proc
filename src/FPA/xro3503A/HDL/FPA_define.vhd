@@ -92,8 +92,8 @@ package FPA_define is
    -- ATTENTION il faut avoir completer la correspondance entre VCC et  les tensions du détecteur avant que le script ne donne des resultats valides
    -- Les marges de 100 counts représentent environ 30mV.
    constant DEFINE_DAC_LIMIT : fleg_vdac_limit_array_type   := (
-   ( 8102-100, 10130+100),     -- limites du DAC1 -> DETECTSUB 2.9V à 3.5V
-   ( 5400-100,  7765+100),     -- limites du DAC2 -> CTIA_REF 2.1V à 2.8V
+   ( 7765-100, 10130+100),     -- limites du DAC1 -> DETECTSUB 2.8V à 3.5V
+   ( 5400-100,  7427+100),     -- limites du DAC2 -> CTIA_REF 2.1V à 2.7V
    (        0,  9454+100),     -- limites du DAC3 -> VTESTG 0V à 3.3V
    ( 3373-100,  5063+100),     -- limites du DAC4 -> CM 1.5V à 2V
    ( 3373-100,  5063+100),     -- limites du DAC5 -> VCMO 1.5V à 2V

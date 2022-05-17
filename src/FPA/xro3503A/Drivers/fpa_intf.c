@@ -97,12 +97,12 @@
 #define XRO3503_CTIA_BIAS_MAX                      0xF      // value must be in 0x0 to 0xF
 
 #define XRO3503_DETECT_SUB_DEFAULT_mV              2900     // Default DetectSub = 2900 mV
-#define XRO3503_DETECT_SUB_MIN_mV                  2900     // 2900 mV <= DetectSub <= 3500 mV
+#define XRO3503_DETECT_SUB_MIN_mV                  2800     // 2800 mV <= DetectSub <= 3500 mV
 #define XRO3503_DETECT_SUB_MAX_mV                  3500
 
 #define XRO3503_CTIA_REF_DEFAULT_mV                2600     // Default CTIA Ref = 2600 mV
-#define XRO3503_CTIA_REF_MIN_mV                    2100     // 2100 mV <= CTIA Ref <= 2800 mV
-#define XRO3503_CTIA_REF_MAX_mV                    2800
+#define XRO3503_CTIA_REF_MIN_mV                    2100     // 2100 mV <= CTIA Ref <= 2700 mV
+#define XRO3503_CTIA_REF_MAX_mV                    2700
 
 #define XRO3503_CM_DEFAULT_mV                      1750     // Default CM = 1750 mV
 #define XRO3503_CM_MIN_mV                          1500     // 1500 mV <= CM <= 2000 mV
@@ -110,9 +110,6 @@
 
 #define XRO3503_VCMO_DEFAULT_mV                    1750     // Default VCMO = 1750 mV
 #define XRO3503_VTESTG_DEFAULT_mV                  3300     // Default VTestG = 3300 mV
-
-#define XRO3503_POL_VOLTAGE_MIN_mV                 100      // pas spécifié, VPOLmin = DETECTSUBmin - CTIA_REFmax
-#define XRO3503_POL_VOLTAGE_MAX_mV                 1400     // pas spécifié, VPOLmax = DETECTSUBmax - CTIA_REFmin
 
 #define TOTAL_DAC_NUM                              8
 
