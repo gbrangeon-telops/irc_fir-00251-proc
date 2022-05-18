@@ -158,13 +158,13 @@ static const uint8_t Scd_DiodeBiasValues_Vdet[] = {
       0x0B,    // 400mV
       0x0C,    // 450mV
       0x0D,    // 500mV
-      0x0E,    // 600mV  FORBIDDEN!!! WILL DAMAGE THE ROIC !!!
-      0x0F,    // 700mV  FORBIDDEN!!! WILL DAMAGE THE ROIC !!!
+      0x0E,    // 600mV  
+      0x0F,    // 700mV  
 
 };
 // WARNING !!! At room temperature, Vdet and Idet sould be kept at their minimum. The ROIC will be damage otherwise(see atlasdatasheet2.17ext.pdf p. 42).
-#define SCD_VDET_BIAS_FORBIDDEN_THRESHOLD_IDX  14  //Vdet = 600mV or 700mV will damage de ROIC (see atlasdatasheet2.17ext.pdf p. 42)
-#define SCD_VDET_BIAS_DEFAULT_IDX              3     // 60mV
+#define SCD_VDET_BIAS_FORBIDDEN_THRESHOLD_IDX  16    // no protection for now  
+#define SCD_VDET_BIAS_DEFAULT_IDX              5     // 100mV (default)
 #define SCD_VDET_BIAS_VALUES_NUM               (sizeof(Scd_DiodeBiasValues_Vdet) / sizeof(Scd_DiodeBiasValues_Vdet[0]))
 
 static const uint8_t Scd_DiodeBiasValues_Idet[] = {
@@ -581,7 +581,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    if(gFpaDebugRegE != 0 && gFpaDebugRegE <= 0xD)
       ptrA->op_mtx_int_low = (uint32_t)gFpaDebugRegE;
    else
-      ptrA->op_mtx_int_low = 0xB; // default value
+      ptrA->op_mtx_int_low = 0x9; // 2.4V (default)
 
    if(ptrA->op_mtx_int_low > 0xD) //Protection, car 0xE et 0xF sont des valeurs interdites
       ptrA->op_mtx_int_low = 0xD;
