@@ -355,7 +355,9 @@ IRC_Status_t Actualization_SM()
    static bool actSyncFW;
    static int intBufSeqSize;
 
-   const uint32_t numExtraImages = 1; // number of frames to skip at the beginning of the buffer sequence
+   const uint32_t numExtraImages = 3;  // Number of frames to skip at the beginning of the buffer sequence
+                                       // The first images are offset most of the time
+                                       // Sometimes we have 2 frames with wrong ET at start of syncFW mode
 
    uint32_t i;
    uint32_t k;
@@ -866,7 +868,7 @@ IRC_Status_t Actualization_SM()
             ACT_PRINTF( "Internal buffer max images = %d\n", nbImageMax );
 
             uint32_t nbImageM = 1;
-            uint32_t nbImageB = numExtraImages; // + 1 because the first image is offset most of the time
+            uint32_t nbImageB = numExtraImages;
 
             // Calculate total number of images
             if (actSyncFW)
@@ -983,7 +985,7 @@ IRC_Status_t Actualization_SM()
          currentDeltaBeta->dbEntry->info.FWMode = gcRegsData.FWMode;
          currentDeltaBeta->dbEntry->info.FocusPositionRaw = gcRegsData.FocusPositionRaw;
 
-         sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR + 2 * frameSize * numExtraImages; // [bytes] the first image is skipped because it has a DL offset in some detectors
+         sequenceOffset = PROC_MEM_MEMORY_BUFFER_BASEADDR + 2 * frameSize * numExtraImages; // [bytes]
 
          // Move sequence start to the first image corresponding to the block index
          if (findImageForBlock(blockIdx, &sequenceOffset, 2 * frameSize, intBufSeqSize - numExtraImages) == false)
