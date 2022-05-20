@@ -3,10 +3,10 @@
 
 #ifdef ARCH_FPGA_160
 
-#define SVN_HARDWARE_REV      26593
-#define SVN_SOFTWARE_REV      26698
-#define SVN_BOOTLOADER_REV    26593
-#define SVN_COMMON_REV        26551
+#define SVN_HARDWARE_REV      27479
+#define SVN_SOFTWARE_REV      26699
+#define SVN_BOOTLOADER_REV    27479
+#define SVN_COMMON_REV        27401
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -25,7 +25,7 @@
 #define SVN_HARDWARE_REV      23419
 #define SVN_SOFTWARE_REV      23419
 #define SVN_BOOTLOADER_REV    25079
-#define SVN_COMMON_REV        26551
+#define SVN_COMMON_REV        27401
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -33,7 +33,7 @@
 #warning Uncommitted changes detected.
 #endif
 
-#define HARDWARE_MISMATCH (0)
+#define HARDWARE_MISMATCH (1)
 
 #if HARDWARE_MISMATCH
 #error D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_scorpiolwD_230Hz\hw_platform_325\system.hdf does not match D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_scorpiolwD_230Hz\fir_00251_proc_scorpiolwD_230Hz_325.hdf
