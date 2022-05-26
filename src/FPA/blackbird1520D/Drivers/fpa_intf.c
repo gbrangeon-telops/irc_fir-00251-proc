@@ -134,8 +134,8 @@
 // Les performances du détecteur ne suivent pas le modèle du frame rate calculator de SCD (ex : le détecteur est barré a 114Hz en plein fenêtre).
 // En d'autre mots, le détecteur commence à ignorer des trigs pour des frame rates inférieurs aux prédictions du modèle du frame rate calculator de SCD (validées par des mesures).
 // Ce facteur d'ajustement vient corriger le modèle pour être à l'intérieur des performances réelles observées.
-#define MODEL_FR_CORR_FACTOR_ITR                  1.105F
-#define MODEL_FR_CORR_FACTOR_IWR                  1.114F
+#define MODEL_FR_CORR_FACTOR_ITR                  1.881815F
+#define MODEL_FR_CORR_FACTOR_IWR                  1.880432F
 #define MODEL_EXPTIME_CORR_FACTOR_IWR_US          300E-6F // in us
 
 // La résolution maximale supportée par le vhdl est 44 (0.63us). (Sinon overflow).
