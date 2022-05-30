@@ -20,8 +20,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.MATH_REAL.all;
-use work.fpa_common_pkg.all; 
+use work.fpa_common_pkg.all;
 use work.fleg_brd_define.all;
+use work.fastrd2_define.all;
 
 package FPA_define is    
    
@@ -57,6 +58,28 @@ package FPA_define is
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 300_000;  -- en usec, le delai de stabilisation (analog setup)
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
    
+   ------------------------------------------------------------
+   -- fastrd2
+   ------------------------------------------------------------
+   -- definition les differentes horloges MCLK. Les IDs sont definis par les positions des bits occupées dans l'argument de la fonction gen_fpa_clk_info_func
+   constant DEFINE_FPA_NOMINAL_MCLK_ID            : integer := 0;       -- l'horloge nominale doit toujours occuper l'ID 0
+   constant DEFINE_FPA_SIDEBAND_MCLK_ID           : integer := 1;       -- horloge de la bande latérale
+   constant DEFINE_FPA_LINEPAUSE_MCLK_ID          : integer := 2;       -- horloge du blank
+   constant DEFINE_FPA_MCLK_NUM                   : integer := 3;
+   constant DEFINE_FPA_NOMINAL_MCLK_RATE_HZ       : integer := 10_000_000; -- vitesse nominale
+   constant DEFINE_FPA_SIDEBAND_MCLK_RATE_HZ      : integer := 5_000_000;  -- vitesse d'opération dans la zone de bande laterale
+   constant DEFINE_FPA_LINEPAUSE_MCLK_RATE_HZ     : integer := 15_000_000; -- vitesse d'opération dans la zone interligne pour compenser le SIDEBAND_MCLK_RATE_KHZ
+   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ  : integer := 60_000_000; -- -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz, 80MHz et 60 MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
+   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer := DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ/1000; --fréquence de horloge principale MCLK_SOURCE en kHz
+
+   -- generation des infos d'horloge
+   -- position 0     -> clk ayant le clk rate nominal 
+   -- position 7 à 1 -> les autres horloges
+   -- mettre 0 comme valeur aux positions non utilisées 
+   constant DEFINE_FPA_CLK_INFO                   : fpa_clk_info_type := gen_fpa_clk_info_func(
+   DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ, DEFINE_FPA_PIX_PER_MCLK_PER_TAP, (0, 0, 0, 0, 0, DEFINE_FPA_LINEPAUSE_MCLK_RATE_HZ, 
+   DEFINE_FPA_SIDEBAND_MCLK_RATE_HZ, DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)); -- mettre 0 comme valeur aux positions non utilisées 
+   constant DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ      : real := real(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)/1000.0; 
    
    -- quelques caractéristiques du FPA
    --constant DEFINE_FPA_INT_TIME_MIN_US            : integer   := 1; 
@@ -77,14 +100,12 @@ package FPA_define is
    
    constant PROG_FREE_RUNNING_TRIG                : std_logic := '0';        -- cette constante dit que les trigs doivent être arrêtés lorsqu'on programme le détecteur
    constant DEFINE_FPA_100M_CLK_RATE_KHZ          : integer   := 100_000;    --  horloge de 100M en KHz
-   constant DEFINE_FPA_80M_CLK_RATE_KHZ           : integer   := 80_000;     --  horloge de 80M en KHz
    
    -- quelques caractéristiques de la carte ADC requise
    constant DEFINE_ADC_QUAD_CLK_RATE_DEFAULT_KHZ  : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       -- 
    constant DEFINE_ADC_QUAD_CLK_RATE_KHZ          : integer   := DEFINE_FPA_MCLK_RATE_KHZ;       --
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_80M_CLK_RATE_KHZ;    -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz et 80MHz.
-   constant DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ : integer   := DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ;     -- c'est l'horloge à partir de laquelle est produite celle du détecteur. On a le choix entre 100MHz et 80MHz.Il faut que ce soit rigoureusement la m^me source que les ADC. Ainsi le dehphasage entre le FPA_MASTER_CLK et les clocks des quads sera toujours le même. 
-   
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ   : integer   := DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ; -- c'est l'horloge à partir de laquelle est produite celle des quads. On a le choix entre 100MHz, 80MHz et 60MHz.
+      
    -- limites imposées aux tensions VDAC deduites de celles de FP_VCC1 à FP_VCC8 du Fleg 
    -- provient du script F:\Bibliotheque\Electronique\PCB\EFP-00266-001 (Generic Flex Board TEL-2000)\Documentation\calcul_LT3042.m
    -- ATTENTION il faut avoir completer la correspondance entre VCC et  les tensions du détecteur avant que le script ne donne des resultats valides
@@ -131,6 +152,7 @@ package FPA_define is
    constant DEFINE_ELCORR_REF_DAC_SETUP_FACTOR    : integer := integer(real(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ)*real(DEFINE_ELCORR_REF_DAC_SETUP_US/1000));
    constant DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR  : unsigned(31 downto 0):= to_unsigned(integer(real(DEFINE_FPA_100M_CLK_RATE_KHZ)*real(2**DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS)/real(DEFINE_FPA_INTCLK_RATE_KHZ)), 32);
 
+   
    ---------------------------------------------------------------------------------								
    -- Configuration
    ---------------------------------------------------------------------------------  
@@ -221,23 +243,8 @@ package FPA_define is
       adc_quad2_en                        : std_logic; -- à '1' si les données du quad2 doivent êre prises en compte par la chaine
       chn_diversity_en                    : std_logic; -- dit quoi faire avec les données du quad2. '1' si ces données sont des repliques du quad1 => chn diversity. '0' si ces données doient être considérées comme des des données de taps 5, 6, 7, 8 d'un détrecteur 8 taps.
       
-      -- pour les referentiels de trame et de lignes
-      readout_pclk_cnt_max                : unsigned(18 downto 0);    --  pour suphawk: readout_pclk_cnt_max = taille en pclk de l'image incluant les pauses, les lignes non valides etc.. = (XSIZE/TAP_NUM + LOVH)* (YSIZE + FOVH) + 1  (un dernier PCLK pur finir)
-      line_period_pclk                    : unsigned(7 downto 0);     --  pour suphawk: nombre de pclk =  (XSIZE/TAP_NUM + LOVH)
-      
-      -- ligne active = ligne excluant les portions/pixels non valides     
-      active_line_start_num               : unsigned(3 downto 0);     --  pour suphawk: le numero de la premiere ligne active. Il vaut 1
-      active_line_end_num                 : unsigned(10 downto 0);    --  pour suphawk: le numero de la derniere ligne active. Il vaut Ysize
-      
       -- nombre d'échantillons dans un pixel
       pix_samp_num_per_ch                 : unsigned(7 downto 0);     --  nombre d'echantillons constituant un pixel =  ADC_SAMP_RATE/PIX_RATE_PER_TAP
-      
-      -- delimiteurs de trames et de lignes
-      sof_posf_pclk                       : unsigned(8 downto 0);     --  pour suphawk: 
-      eof_posf_pclk                       : unsigned(18 downto 0);    --  pour suphawk:
-      sol_posl_pclk                       : unsigned(7 downto 0);     --  pour suphawk:
-      eol_posl_pclk                       : unsigned(7 downto 0);     --  pour suphawk:
-      eol_posl_pclk_p1                    : unsigned(7 downto 0);     --  pour suphawk: eol_posl_pclk + 1
       
       -- calculs pour diversité des canaux
       hgood_samp_sum_num                  : unsigned(3 downto 0);    --  nombre d'échantillons horizontaux par pixel et par canal 
@@ -297,8 +304,6 @@ package FPA_define is
       -- pour placer le superhawk en mode output constant
       roic_cst_output_mode                : std_logic;
       
-      cfg_num                             : unsigned(7 downto 0);
-      
       -- additional exposure time offset from driver C
       additional_fpa_int_time_offset      : signed(31 downto 0);
       
@@ -306,7 +311,18 @@ package FPA_define is
       aoi_data                            : line_area_cfg_type;
       aoi_flag1                           : line_area_cfg_type;
       aoi_flag2                           : line_area_cfg_type;
-      
+	  
+	  -- fastrd2
+	  raw_area                            : area_cfg_type; -- zone brute
+	  user_area                           : area_cfg_type; -- zone AOI demandée par l'usager
+      clk_area_a                          : area_cfg_type; -- zone d'horloge 
+      clk_area_b                          : area_cfg_type; -- zone d'horloge
+	  roic_rst_time_mclk                  : unsigned(9 downto 0);  -- duree du reset du puits du superhawk en mclk
+	  sideband_cancel_en                  : std_logic;
+	  spare4                              : unsigned(3 downto 0);
+
+      cfg_num                             : unsigned(7 downto 0);
+	  
    end record; 
    
    ----------------------------------

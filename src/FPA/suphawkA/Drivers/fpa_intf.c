@@ -154,6 +154,14 @@
 #define ELCORR_TARGET_STARVATION_DL       650         // @ centered pix (640, 512)
 #define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (640, 512)
 
+// clk area (en provenance de fpa_define)
+#define  VHD_DEFINE_FPA_NOMINAL_MCLK_ID         0    // horloge nominale (l'horloge par défaut)
+#define  VHD_DEFINE_FPA_SIDEBAND_MCLK_ID        1    // horloge de la bande laterale
+#define  VHD_DEFINE_FPA_LINEPAUSE_MCLK_ID       2    // horloge de la zone interligne
+
+#define REGC_DEFAULT_VAL 4             // valeur pour le registre REGC
+#define REGD_DEFAULT_VAL 282           // valeur pour le registre REGD
+#define REGF_DEFAULT_VAL 11            // valeur pour le registre REGF
 
 struct s_ProximCfgConfig 
 {   
@@ -272,8 +280,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
    extern int32_t gFpaDebugRegE;                         // reservé fpa_intf_data_source pour sortir les données des ADCs même lorsque le détecteur/flegX est absent
    extern int32_t gFpaDebugRegF;                         // reservé real_mode_active_pixel_dly pour ajustement du début AOI
-   //extern int32_t gFpaDebugRegG;                         // non utilisé
-   //extern int32_t gFpaDebugRegH;                         // non utilisé
+   extern int32_t gFpaDebugRegG;                         // annulation de la bande latérale (par défaut, correction active)
+   //extern int32_t gFpaDebugRegH;                       // non utilisé
    uint32_t elcorr_reg;
    static float presentElectricalTapsRef;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
    static uint16_t presentElCorrMeasAtStarvation;
@@ -339,11 +347,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;                         // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
 
    // fenetrage
-   ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
-   ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
-   ptrA->xsize     = (uint32_t)pGCRegs->Width;
-   ptrA->ysize     = (uint32_t)pGCRegs->Height;
+   ptrA->xstart    = pGCRegs->OffsetX;
+   ptrA->ystart    = pGCRegs->OffsetY;
+   ptrA->xsize     = pGCRegs->Width;
+   ptrA->ysize     = pGCRegs->Height;
     
+   // cropping en sous-fenetrage pour eliminer bande laterale
+   if (pGCRegs->Width < FPA_WIDTH_MAX){
+      ptrA->xstart    = pGCRegs->OffsetX - FPA_OFFSETX_MULT;
+      ptrA->xsize     = pGCRegs->Width + FPA_WIDTH_MULT;
+   }
    //  gain 
    ptrA->gain = FPA_GAIN_0;   //Low gain
    if (pGCRegs->SensorWellDepth == SWD_HighGain)
@@ -354,16 +367,16 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->revert = 0; 
    
    // formule implantée pour le mode normal (revert = 0, Invert = 0) 
-   ptrA->colstart =  ptrA->xstart / (uint32_t)FPA_NUMTAPS;
-   ptrA->colstop  =  ptrA->colstart  + (uint32_t)pGCRegs->Width / (uint32_t)FPA_NUMTAPS - 1;
+   ptrA->colstart =  ptrA->xstart / FPA_NUMTAPS;
+   ptrA->colstop  =  ptrA->colstart  + ptrA->xsize / FPA_NUMTAPS - 1;
    ptrA->rowstart =  ptrA->ystart;
-   ptrA->rowstop  =  ptrA->rowstart  + (uint32_t)pGCRegs->Height - 1;
+   ptrA->rowstop  =  ptrA->rowstart  + pGCRegs->Height - 1;
    
    // CBIT 
    ptrA->cbit_en = 1;                    
    
    // mode windowing ou non
-   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+   if ((pGCRegs->Width == FPA_WIDTH_MAX) && (pGCRegs->Height == FPA_HEIGHT_MAX))
       ptrA->active_subwindow = 0;
    else
       ptrA->active_subwindow = 1;
@@ -381,24 +394,10 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // quad2    
    ptrA->adc_quad2_en = 1;                          
    ptrA->chn_diversity_en = 0;             // ENO : 07 nov 2017 : pas besoin de la diversité de canal dans un suphawk
-     
-   //
-   ptrA->line_period_pclk                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS + (uint32_t)(hh.lovh_mclk * hh.pixnum_per_tap_per_mclk);
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * ptrA->ysize + (uint32_t)(hh.fpa_rst_dly_mclk * hh.pixnum_per_tap_per_mclk);                              // ligne de reset du suphawk prise en compte
-   
-   ptrA->active_line_start_num             = 1;                    // pour le suphawk, numero de la première ligne active
-   ptrA->active_line_end_num               = ptrA->ysize;          // pour le suphawk, numero de la derniere ligne active
-   
+
    // nombre d'échantillons par canal  de carte ADC
    ptrA->pix_samp_num_per_ch               = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ; 
    
-   // identificateurs de trames
-   ptrA->sof_posf_pclk                     = hh.lovh_mclk;
-   ptrA->eof_posf_pclk                     = ptrA->active_line_end_num * ptrA->line_period_pclk - 1;
-   ptrA->sol_posl_pclk                     = hh.lovh_mclk;
-   ptrA->eol_posl_pclk                     = ptrA->line_period_pclk - 1;
-   ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
-
    // echantillons choisis
    ptrA->good_samp_first_pos_per_ch        = MAX((uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ - 1, 1);     // position premier echantillon
    ptrA->good_samp_last_pos_per_ch         = (uint32_t)ADC_SAMPLING_RATE_HZ/(uint32_t)FPA_MCLK_RATE_HZ;     // position dernier echantillon    ENO: 05 avril 2017: on prend juste un echantillon par canal pour reduire le Ghost. Le bruit augmentera à 6 cnts max sur 16 bits
@@ -423,7 +422,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0){
-      gFpaDebugRegF = 5;
+      gFpaDebugRegF = REGF_DEFAULT_VAL;
       if (ptrA->hgood_samp_sum_num > 1)
          gFpaDebugRegF = 3;
    }   
@@ -443,14 +442,14 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
     
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    if (sw_init_done == 0)
-      gFpaDebugRegC = 3;
+      gFpaDebugRegC = REGC_DEFAULT_VAL;
    if (ptrA->adc_clk_pipe_sel != (uint32_t)gFpaDebugRegC)
       need_rst_fpa_module = 1;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
    
    // adc clk source phase
    if (sw_init_done == 0)         
-      gFpaDebugRegD = 400;
+      gFpaDebugRegD = REGD_DEFAULT_VAL;
    if (ptrA->adc_clk_source_phase != (uint32_t)gFpaDebugRegD)
       need_rst_fpa_module = 1;   
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
@@ -661,10 +660,68 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // additional exposure time offset coming from flash 
    ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
-   
+
+   // Contrôleur de readout
+
+   // raw area (fenêtre en provenance du ROIC)
+   ptrA->raw_area_line_start_num = 1;
+   ptrA->raw_area_line_end_num = ptrA->raw_area_line_start_num + ptrA->ysize - 1;
+   ptrA->raw_area_line_period_pclk = ptrA->xsize/FPA_NUMTAPS + (uint32_t)(hh.lovh_mclk * hh.pixnum_per_tap_per_mclk);
+   ptrA->raw_area_sof_posf_pclk = (uint32_t)hh.lovh_mclk + 1;
+   ptrA->raw_area_eof_posf_pclk = ptrA->raw_area_line_end_num * ptrA->raw_area_line_period_pclk;
+   ptrA->raw_area_sol_posl_pclk = (uint32_t)hh.lovh_mclk + 1;
+   ptrA->raw_area_eol_posl_pclk = ptrA->raw_area_line_period_pclk;
+   ptrA->raw_area_readout_pclk_cnt_max =  ptrA->raw_area_line_period_pclk * ptrA->ysize + (uint32_t)(hh.fpa_rst_dly_mclk * hh.pixnum_per_tap_per_mclk);
+            // ligne de reset du suphawk prise en compte;
+   ptrA->raw_area_lsync_start_posl_pclk = 1;
+   ptrA->raw_area_lsync_end_posl_pclk = 1;
+   ptrA->raw_area_lsync_num = ptrA->raw_area_line_end_num;
+   ptrA->raw_area_clk_id = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+
+   // user area (fenetre à envoyer à l'usager)
+   ptrA->user_area_line_start_num = ptrA->raw_area_line_start_num;
+   ptrA->user_area_line_end_num = ptrA->raw_area_line_end_num;
+   ptrA->user_area_sol_posl_pclk = ptrA->raw_area_sol_posl_pclk;
+   ptrA->user_area_eol_posl_pclk = ptrA->raw_area_eol_posl_pclk;
+   ptrA->user_area_clk_id = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+
+   // cropping en sous-fenetrage pour eliminer bande laterale
+   if (pGCRegs->Width < FPA_WIDTH_MAX)
+      ++ptrA->user_area_sol_posl_pclk;
+
+   // définition de la zone a (bande latérale)
+   ptrA->clk_area_a_line_start_num = ptrA->user_area_line_start_num;
+   ptrA->clk_area_a_line_end_num = ptrA->user_area_line_end_num;
+   ptrA->clk_area_a_sol_posl_pclk = ptrA->user_area_sol_posl_pclk;
+   ptrA->clk_area_a_eol_posl_pclk = ptrA->user_area_sol_posl_pclk;
+   ptrA->clk_area_a_clk_id = VHD_DEFINE_FPA_SIDEBAND_MCLK_ID;
+   ptrA->clk_area_a_spare = 0;
+
+   // cropping en sous-fenetrage pour eliminer bande laterale
+   if (pGCRegs->Width < FPA_WIDTH_MAX)
+      ptrA->clk_area_a_clk_id = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+
+   // définition de la zone b (pause interligne)
+   ptrA->clk_area_b_line_start_num = 0;
+   ptrA->clk_area_b_line_end_num = ptrA->user_area_line_end_num;
+   ptrA->clk_area_b_sol_posl_pclk = 1;
+   ptrA->clk_area_b_eol_posl_pclk = ptrA->user_area_sol_posl_pclk - 1; // juste avant le debut de la zone user  ;
+   ptrA->clk_area_b_clk_id = VHD_DEFINE_FPA_LINEPAUSE_MCLK_ID;
+   ptrA->clk_area_b_spare = 0;
+
+   // others
+   ptrA->roic_rst_time_mclk = (uint32_t)hh.fpa_rst_dly_mclk;
+   ptrA->sideband_cancel_en = (gFpaDebugRegG == 0 ? 1 : 0);
+   ptrA->spare4 = 0;
+
+   if (!ptrA->sideband_cancel_en){
+      ptrA->clk_area_a_clk_id = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+      ptrA->clk_area_b_clk_id = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+   }
+
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
-   
+
    // envoi du reste de la config 
    WriteStruct(ptrA);
    

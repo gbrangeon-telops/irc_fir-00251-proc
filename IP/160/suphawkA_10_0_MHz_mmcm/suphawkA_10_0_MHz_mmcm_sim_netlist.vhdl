@@ -1,7 +1,7 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Fri Feb 18 12:27:19 2022
+-- Date        : Sat May 28 11:48:15 2022
 -- Host        : TELOPS258 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               D:/Telops/FIR-00251-Proc/IP/160/suphawkA_10_0_MHz_mmcm/suphawkA_10_0_MHz_mmcm_sim_netlist.vhdl
@@ -80,16 +80,16 @@ clkout2_buf: unisim.vcomponents.BUFG
 mmcm_adv_inst: unisim.vcomponents.MMCME2_ADV
     generic map(
       BANDWIDTH => "OPTIMIZED",
-      CLKFBOUT_MULT_F => 48.000000,
+      CLKFBOUT_MULT_F => 51.000000,
       CLKFBOUT_PHASE => 0.000000,
       CLKFBOUT_USE_FINE_PS => false,
       CLKIN1_PERIOD => 10.000000,
       CLKIN2_PERIOD => 0.000000,
-      CLKOUT0_DIVIDE_F => 12.000000,
+      CLKOUT0_DIVIDE_F => 17.000000,
       CLKOUT0_DUTY_CYCLE => 0.500000,
       CLKOUT0_PHASE => 0.000000,
       CLKOUT0_USE_FINE_PS => false,
-      CLKOUT1_DIVIDE => 12,
+      CLKOUT1_DIVIDE => 17,
       CLKOUT1_DUTY_CYCLE => 0.500000,
       CLKOUT1_PHASE => 0.000000,
       CLKOUT1_USE_FINE_PS => true,

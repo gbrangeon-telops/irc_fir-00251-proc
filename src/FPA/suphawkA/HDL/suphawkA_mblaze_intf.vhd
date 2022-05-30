@@ -252,69 +252,112 @@ begin
                   when X"05C" =>    user_cfg_i.real_mode_active_pixel_dly              <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));
                   when X"060" =>    user_cfg_i.adc_quad2_en                            <= data_i(0);
                   when X"064" =>    user_cfg_i.chn_diversity_en                        <= data_i(0);
-                  when X"068" =>    user_cfg_i.readout_pclk_cnt_max                    <= unsigned(data_i(user_cfg_i.readout_pclk_cnt_max'length-1 downto 0));
-                  when X"06C" =>    user_cfg_i.line_period_pclk                        <= unsigned(data_i(user_cfg_i.line_period_pclk'length-1 downto 0));
-                  when X"070" =>    user_cfg_i.active_line_start_num                   <= unsigned(data_i(user_cfg_i.active_line_start_num'length-1 downto 0));
-                  when X"074" =>    user_cfg_i.active_line_end_num                     <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));
-                  when X"078" =>    user_cfg_i.pix_samp_num_per_ch                     <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));
-                  when X"07C" =>    user_cfg_i.sof_posf_pclk                           <= unsigned(data_i(user_cfg_i.sof_posf_pclk'length-1 downto 0));
-                  when X"080" =>    user_cfg_i.eof_posf_pclk                           <= unsigned(data_i(user_cfg_i.eof_posf_pclk'length-1 downto 0));
-                  when X"084" =>    user_cfg_i.sol_posl_pclk                           <= unsigned(data_i(user_cfg_i.sol_posl_pclk'length-1 downto 0));
-                  when X"088" =>    user_cfg_i.eol_posl_pclk                           <= unsigned(data_i(user_cfg_i.eol_posl_pclk'length-1 downto 0));
-                  when X"08C" =>    user_cfg_i.eol_posl_pclk_p1                        <= unsigned(data_i(user_cfg_i.eol_posl_pclk_p1'length-1 downto 0));
-                  when X"090" =>    user_cfg_i.hgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));  
-                  when X"094" =>    user_cfg_i.hgood_samp_mean_numerator               <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0)); 
-                  when X"098" =>    user_cfg_i.vgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));  
-                  when X"09C" =>    user_cfg_i.vgood_samp_mean_numerator               <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));  
-                  when X"0A0" =>    user_cfg_i.good_samp_first_pos_per_ch              <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0)); 
-                  when X"0A4" =>    user_cfg_i.good_samp_last_pos_per_ch               <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));
-                  when X"0A8" =>    user_cfg_i.xsize_div_tapnum                        <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0)); 
+                  when X"068" =>    user_cfg_i.pix_samp_num_per_ch                     <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));
+
+				  when X"06C" =>    user_cfg_i.hgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));  
+                  when X"070" =>    user_cfg_i.hgood_samp_mean_numerator               <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0)); 
+                  when X"074" =>    user_cfg_i.vgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));  
+                  when X"078" =>    user_cfg_i.vgood_samp_mean_numerator               <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));  
+                  when X"07C" =>    user_cfg_i.good_samp_first_pos_per_ch              <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0)); 
+                  when X"080" =>    user_cfg_i.good_samp_last_pos_per_ch               <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));
+                  when X"084" =>    user_cfg_i.xsize_div_tapnum                        <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0)); 
                   
-                  when X"0AC" =>    user_cfg_i.adc_clk_source_phase                    <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
-                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel                        <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
-                  when X"0B4" =>    user_cfg_i.comn.fpa_stretch_acq_trig               <= data_i(0); 
+                  when X"088" =>    user_cfg_i.adc_clk_source_phase                    <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
+                  when X"08C" =>    user_cfg_i.adc_clk_pipe_sel                        <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
+                  when X"090" =>    user_cfg_i.comn.fpa_stretch_acq_trig               <= data_i(0); 
                   
-                  when X"0B8" =>    user_cfg_i.spare1                                  <= data_i(user_cfg_i.spare1'length-1 downto 0);
-                  when X"0BC" =>    user_cfg_i.spare2                                  <= data_i(user_cfg_i.spare2'length-1 downto 0);
+                  when X"094" =>    user_cfg_i.spare1                                  <= data_i(user_cfg_i.spare1'length-1 downto 0);
+                  when X"098" =>    user_cfg_i.spare2                                  <= data_i(user_cfg_i.spare2'length-1 downto 0);
                      
                   -- electrical correction                                                                                                                                                                                                                                                                                                         
-                  when X"0C0" =>    user_cfg_i.elcorr_enabled                          <= data_i(0);
-                  when X"0C4" =>    user_cfg_i.elcorr_spare1                           <= data_i(0);
-                  when X"0C8" =>    user_cfg_i.elcorr_spare2                           <= unsigned(data_i(user_cfg_i.elcorr_spare2'length-1 downto 0));
+                  when X"09C" =>    user_cfg_i.elcorr_enabled                          <= data_i(0);
+                  when X"0A0" =>    user_cfg_i.elcorr_spare1                           <= data_i(0);
+                  when X"0A4" =>    user_cfg_i.elcorr_spare2                           <= unsigned(data_i(user_cfg_i.elcorr_spare2'length-1 downto 0));
                   
-                  when X"0CC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_enabled           <= data_i(0);
-                  when X"0D0" =>    user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode    <= data_i(0);
-                  when X"0D4" =>    user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk'length-1 downto 0)); 
-                  when X"0D8" =>    user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch       <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch'length-1 downto 0)); 
-                  when X"0DC" =>    user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator 'length-1 downto 0));
-                  when X"0E0" =>    user_cfg_i.elcorr_ref_cfg(0).ref_value             <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).ref_value'length-1 downto 0));
+                  when X"0A8" =>    user_cfg_i.elcorr_ref_cfg(0).ref_enabled           <= data_i(0);
+                  when X"0AC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode    <= data_i(0);
+                  when X"0B0" =>    user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk'length-1 downto 0)); 
+                  when X"0B4" =>    user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch       <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch'length-1 downto 0)); 
+                  when X"0B8" =>    user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator 'length-1 downto 0));
+                  when X"0BC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_value             <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).ref_value'length-1 downto 0));
                   
-                  when X"0E4" =>    user_cfg_i.elcorr_ref_cfg(1).ref_enabled           <= data_i(0);
-                  when X"0E8" =>    user_cfg_i.elcorr_ref_cfg(1).ref_cont_meas_mode    <= data_i(0);
-                  when X"0EC" =>    user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk'length-1 downto 0)); 
-                  when X"0F0" =>    user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch       <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch'length-1 downto 0)); 
-                  when X"0F4" =>    user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator 'length-1 downto 0));
-                  when X"0F8" =>    user_cfg_i.elcorr_ref_cfg(1).ref_value             <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).ref_value'length-1 downto 0));
+                  when X"0C0" =>    user_cfg_i.elcorr_ref_cfg(1).ref_enabled           <= data_i(0);
+                  when X"0C4" =>    user_cfg_i.elcorr_ref_cfg(1).ref_cont_meas_mode    <= data_i(0);
+                  when X"0C8" =>    user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk'length-1 downto 0)); 
+                  when X"0CC" =>    user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch       <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch'length-1 downto 0)); 
+                  when X"0D0" =>    user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator 'length-1 downto 0));
+                  when X"0D4" =>    user_cfg_i.elcorr_ref_cfg(1).ref_value             <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).ref_value'length-1 downto 0));
                   
-                  when X"0FC" =>    user_cfg_i.elcorr_ref_dac_id                       <= unsigned(data_i(user_cfg_i.elcorr_ref_dac_id'length-1 downto 0));                  
-                  when X"100" =>    user_cfg_i.elcorr_atemp_gain                       <= signed(data_i(user_cfg_i.elcorr_atemp_gain'length-1 downto 0));      
-                  when X"104" =>    user_cfg_i.elcorr_atemp_ofs                        <= signed(data_i(user_cfg_i.elcorr_atemp_ofs'length-1 downto 0));
+                  when X"0D8" =>    user_cfg_i.elcorr_ref_dac_id                       <= unsigned(data_i(user_cfg_i.elcorr_ref_dac_id'length-1 downto 0));                  
+                  when X"0DC" =>    user_cfg_i.elcorr_atemp_gain                       <= signed(data_i(user_cfg_i.elcorr_atemp_gain'length-1 downto 0));      
+                  when X"0E0" =>    user_cfg_i.elcorr_atemp_ofs                        <= signed(data_i(user_cfg_i.elcorr_atemp_ofs'length-1 downto 0));
                   
-                  when X"108" =>    user_cfg_i.elcorr_ref0_op_sel                      <= data_i(user_cfg_i.elcorr_ref0_op_sel'length-1 downto 0);
-                  when X"10C" =>    user_cfg_i.elcorr_ref1_op_sel                      <= data_i(user_cfg_i.elcorr_ref1_op_sel'length-1 downto 0);
-                  when X"110" =>    user_cfg_i.elcorr_mult_op_sel                      <= data_i(user_cfg_i.elcorr_mult_op_sel'length-1 downto 0);
-                  when X"114" =>    user_cfg_i.elcorr_div_op_sel                       <= data_i(user_cfg_i.elcorr_div_op_sel'length-1 downto 0);
-                  when X"118" =>    user_cfg_i.elcorr_add_op_sel                       <= data_i(user_cfg_i.elcorr_add_op_sel'length-1 downto 0);
+                  when X"0E4" =>    user_cfg_i.elcorr_ref0_op_sel                      <= data_i(user_cfg_i.elcorr_ref0_op_sel'length-1 downto 0);
+                  when X"0E8" =>    user_cfg_i.elcorr_ref1_op_sel                      <= data_i(user_cfg_i.elcorr_ref1_op_sel'length-1 downto 0);
+                  when X"0EC" =>    user_cfg_i.elcorr_mult_op_sel                      <= data_i(user_cfg_i.elcorr_mult_op_sel'length-1 downto 0);
+                  when X"0F0" =>    user_cfg_i.elcorr_div_op_sel                       <= data_i(user_cfg_i.elcorr_div_op_sel'length-1 downto 0);
+                  when X"0F4" =>    user_cfg_i.elcorr_add_op_sel                       <= data_i(user_cfg_i.elcorr_add_op_sel'length-1 downto 0);
                   
-                  when X"11C" =>    user_cfg_i.sat_ctrl_en                             <= data_i(0);              
-                  when X"120" =>    user_cfg_i.elcorr_spare3                           <= data_i(0);
+                  when X"0F8" =>    user_cfg_i.sat_ctrl_en                             <= data_i(0);              
+                  when X"0FC" =>    user_cfg_i.elcorr_spare3                           <= data_i(0);
                   
-                  when X"124" =>    user_cfg_i.roic_cst_output_mode                    <= data_i(0);
+                  when X"100" =>    user_cfg_i.roic_cst_output_mode                    <= data_i(0);
                   
-                  when X"128" =>    user_cfg_i.cfg_num                                 <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));                    
-                  when X"12C" =>    user_cfg_i.comn.fpa_intf_data_source               <= data_i(0); 
+                  when X"104" =>    user_cfg_i.comn.fpa_intf_data_source               <= data_i(0); 
                   
-                  when X"130" =>    user_cfg_i.additional_fpa_int_time_offset          <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0)); user_cfg_in_progress <= '0'; 
+                  when X"108" =>    user_cfg_i.additional_fpa_int_time_offset          <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0));
+				  
+                  -- cropping
+                  when X"10C" =>    user_cfg_i.aoi_data.sol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.sol_pos'length-1 downto 0)); 
+				  when X"110" =>    user_cfg_i.aoi_data.eol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.eol_pos'length-1 downto 0));                       
+				  when X"114" =>    user_cfg_i.aoi_flag1.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.sol_pos'length-1 downto 0));                       
+                  when X"118" =>    user_cfg_i.aoi_flag1.eol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.eol_pos'length-1 downto 0));                         
+				  when X"11C" =>    user_cfg_i.aoi_flag2.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.sol_pos'length-1 downto 0));
+                  when X"120" =>    user_cfg_i.aoi_flag2.eol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.eol_pos'length-1 downto 0));
+
+                  -- raw_area                                                                                                                                                                     
+                  when X"124" =>    user_cfg_i.raw_area.line_start_num         <= unsigned(data_i(user_cfg_i.raw_area.line_start_num'length-1 downto 0));                                                                                                                                                                                                                                                
+                  when X"128" =>    user_cfg_i.raw_area.line_end_num           <= unsigned(data_i(user_cfg_i.raw_area.line_end_num'length-1 downto 0));                                                                                                                                         
+                  when X"12C" =>    user_cfg_i.raw_area.sof_posf_pclk          <= unsigned(data_i(user_cfg_i.raw_area.sof_posf_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"130" =>    user_cfg_i.raw_area.eof_posf_pclk          <= unsigned(data_i(user_cfg_i.raw_area.eof_posf_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"134" =>    user_cfg_i.raw_area.sol_posl_pclk          <= unsigned(data_i(user_cfg_i.raw_area.sol_posl_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"138" =>    user_cfg_i.raw_area.eol_posl_pclk          <= unsigned(data_i(user_cfg_i.raw_area.eol_posl_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"13C" =>    user_cfg_i.raw_area.lsync_start_posl_pclk  <= unsigned(data_i(user_cfg_i.raw_area.lsync_start_posl_pclk'length-1 downto 0)); 
+                  when X"140" =>    user_cfg_i.raw_area.lsync_end_posl_pclk    <= unsigned(data_i(user_cfg_i.raw_area.lsync_end_posl_pclk'length-1 downto 0));                  
+                  when X"144" =>    user_cfg_i.raw_area.lsync_num              <= unsigned(data_i(user_cfg_i.raw_area.lsync_num'length-1 downto 0));                                                                                  
+                  when X"148" =>    user_cfg_i.raw_area.clk_id                 <= unsigned(data_i(user_cfg_i.raw_area.clk_id'length-1 downto 0));
+                  when X"14C" =>    user_cfg_i.raw_area.line_period_pclk       <= unsigned(data_i(user_cfg_i.raw_area.line_period_pclk'length-1 downto 0));                                                                                                                                     
+                  when X"150" =>    user_cfg_i.raw_area.readout_pclk_cnt_max   <= unsigned(data_i(user_cfg_i.raw_area.readout_pclk_cnt_max'length-1 downto 0));
+				  
+   				  -- user_area                                                                                                                                                                    
+                  when X"154" =>    user_cfg_i.user_area.line_start_num        <= unsigned(data_i(user_cfg_i.user_area.line_start_num'length-1 downto 0));                                                                                                                                                                                                                                                
+                  when X"158" =>    user_cfg_i.user_area.line_end_num          <= unsigned(data_i(user_cfg_i.user_area.line_end_num'length-1 downto 0));                                                                                                                                           
+                  when X"15C" =>    user_cfg_i.user_area.sol_posl_pclk         <= unsigned(data_i(user_cfg_i.user_area.sol_posl_pclk'length-1 downto 0));                                                                                                                                          
+                  when X"160" =>    user_cfg_i.user_area.eol_posl_pclk         <= unsigned(data_i(user_cfg_i.user_area.eol_posl_pclk'length-1 downto 0));                                 
+                  when X"164" =>    user_cfg_i.user_area.clk_id                <= unsigned(data_i(user_cfg_i.user_area.clk_id'length-1 downto 0)); 
+
+                  -- clk_area_a                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                  when X"168" =>    user_cfg_i.clk_area_a.line_start_num       <= unsigned(data_i(user_cfg_i.clk_area_a.line_start_num'length-1 downto 0));                                                                                                                                                                                                                                                
+                  when X"16C" =>    user_cfg_i.clk_area_a.line_end_num         <= unsigned(data_i(user_cfg_i.clk_area_a.line_end_num'length-1 downto 0));                                                                                                                                           
+                  when X"170" =>    user_cfg_i.clk_area_a.sol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_a.sol_posl_pclk'length-1 downto 0));                                                                                                                                          
+                  when X"174" =>    user_cfg_i.clk_area_a.eol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_a.eol_posl_pclk'length-1 downto 0));                                
+                  when X"178" =>    user_cfg_i.clk_area_a.clk_id               <= unsigned(data_i(user_cfg_i.clk_area_a.clk_id'length-1 downto 0));                                                                                                                                                               
+                  when X"17C" =>    user_cfg_i.clk_area_a.spare                <= unsigned(data_i(user_cfg_i.clk_area_a.spare'length-1 downto 0));
+
+                  -- clk_area_b                                                                                                                                                                   
+                  when X"180" =>    user_cfg_i.clk_area_b.line_start_num       <= unsigned(data_i(user_cfg_i.clk_area_b.line_start_num'length-1 downto 0));                               
+                  when X"184" =>    user_cfg_i.clk_area_b.line_end_num         <= unsigned(data_i(user_cfg_i.clk_area_b.line_end_num'length-1 downto 0));                                 
+                  when X"188" =>    user_cfg_i.clk_area_b.sol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_b.sol_posl_pclk'length-1 downto 0));                                
+                  when X"18C" =>    user_cfg_i.clk_area_b.eol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_b.eol_posl_pclk'length-1 downto 0));
+                  when X"190" =>    user_cfg_i.clk_area_b.clk_id               <= unsigned(data_i(user_cfg_i.clk_area_b.clk_id'length-1 downto 0)); 
+                  when X"194" =>    user_cfg_i.clk_area_b.spare                <= unsigned(data_i(user_cfg_i.clk_area_b.spare'length-1 downto 0)); 
+
+                  -- others
+                  when X"198" =>    user_cfg_i.roic_rst_time_mclk              <= unsigned(data_i(user_cfg_i.roic_rst_time_mclk'length-1 downto 0));
+                  when X"19C" =>    user_cfg_i.sideband_cancel_en              <= data_i(0); 
+                  when X"1A0" =>    user_cfg_i.spare4                          <= unsigned(data_i(user_cfg_i.spare4'length-1 downto 0)); 
+				  
+				  when X"1A4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                          <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

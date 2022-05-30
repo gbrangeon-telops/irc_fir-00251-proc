@@ -82,6 +82,8 @@
 
 #define FPA_PIX_THROUGHPUT_PEAK        (FPA_NUMTAPS * FPA_MCLK_RATE_HZ)  // [pix/sec]
 
+#define FPA_PRINTF(fmt, ...)           FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+
 // structure de config envoyée au vhd 
 struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_time. le temps d'integration n'est plus défini par le module FPA_INTF
 {
@@ -117,16 +119,7 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  real_mode_active_pixel_dly;                       
    uint32_t  adc_quad2_en;                    
    uint32_t  chn_diversity_en;                
-   uint32_t  readout_pclk_cnt_max;            
-   uint32_t  line_period_pclk;                
-   uint32_t  active_line_start_num;           
-   uint32_t  active_line_end_num;             
    uint32_t  pix_samp_num_per_ch;             
-   uint32_t  sof_posf_pclk;                   
-   uint32_t  eof_posf_pclk;                    
-   uint32_t  sol_posl_pclk;                    
-   uint32_t  eol_posl_pclk;                    
-   uint32_t  eol_posl_pclk_p1;                
    uint32_t  hgood_samp_sum_num;               
    uint32_t  hgood_samp_mean_numerator;        
    uint32_t  vgood_samp_sum_num;               
@@ -165,14 +158,69 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  sat_ctrl_en;          
    uint32_t  elcorr_spare3;
    uint32_t  roic_cst_output_mode;
-   uint32_t  cfg_num;
    uint32_t  fpa_intf_data_source;
    int32_t   additional_fpa_int_time_offset;// additional offset coming from flash settings
+
+   // cropping
+   uint32_t  aoi_data_sol_pos;
+   uint32_t  aoi_data_eol_pos;
+   uint32_t  aoi_flag1_sol_pos;
+   uint32_t  aoi_flag1_eol_pos;
+   uint32_t  aoi_flag2_sol_pos;
+   uint32_t  aoi_flag2_eol_pos;
+
+   // raw area
+   uint32_t  raw_area_line_start_num;
+   uint32_t  raw_area_line_end_num;
+   uint32_t  raw_area_sof_posf_pclk;
+   uint32_t  raw_area_eof_posf_pclk;
+   uint32_t  raw_area_sol_posl_pclk;
+   uint32_t  raw_area_eol_posl_pclk;
+   uint32_t  raw_area_lsync_start_posl_pclk;
+   uint32_t  raw_area_lsync_end_posl_pclk;
+   uint32_t  raw_area_lsync_num;
+   uint32_t  raw_area_clk_id;
+   uint32_t  raw_area_line_period_pclk;
+   uint32_t  raw_area_readout_pclk_cnt_max;
+
+   // user area
+   uint32_t  user_area_line_start_num;
+   uint32_t  user_area_line_end_num;
+   uint32_t  user_area_sol_posl_pclk;
+   uint32_t  user_area_eol_posl_pclk;
+   uint32_t  user_area_clk_id;
+
+   // client area a
+   uint32_t  clk_area_a_line_start_num;
+   uint32_t  clk_area_a_line_end_num;
+   uint32_t  clk_area_a_sol_posl_pclk;
+   uint32_t  clk_area_a_eol_posl_pclk;
+   uint32_t  clk_area_a_clk_id;
+   uint32_t  clk_area_a_spare;
+
+   // client area b
+   uint32_t  clk_area_b_line_start_num;
+   uint32_t  clk_area_b_line_end_num;
+   uint32_t  clk_area_b_sol_posl_pclk;
+   uint32_t  clk_area_b_eol_posl_pclk;
+   uint32_t  clk_area_b_clk_id;
+   uint32_t  clk_area_b_spare;
+
+   // others
+   uint32_t  roic_rst_time_mclk;
+   uint32_t  sideband_cancel_en;
+   uint32_t  spare4;
+
+   uint32_t  cfg_num;
 
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\
+		                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\
+		                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\
+		                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\
+		                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 
 // statuts provenant du vhd

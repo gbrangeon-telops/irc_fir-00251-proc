@@ -19,10 +19,11 @@ use work.fpa_define.all;
 
 package suphawkA_intf_testbench_pkg is           
    
-   constant USER_CFG_VECTOR_SIZE       : natural := 77;  -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE       : natural := 106;  -- number of variables to write in the USER_CFG
    
    constant PAUSE_SIZE                 : integer := 3;
    constant TAP_NUM                    : integer := 8;
+   constant FPA_RST_DLY_MCLK		   : integer := 165;
    constant C_ELCORR_ENABLED           : std_logic := '0';
    constant C_elcorr_ref0_image_map_enabled : std_logic := '0';
    constant C_elcorr_ref1_image_map_enabled : std_logic := '0';
@@ -68,16 +69,7 @@ package body suphawkA_intf_testbench_pkg is
       variable real_mode_active_pixel_dly             : unsigned(31 downto 0);           
       variable adc_quad2_en                           : unsigned(31 downto 0);
       variable chn_diversity_en                       : unsigned(31 downto 0);
-      variable readout_pclk_cnt_max                   : unsigned(31 downto 0);
-      variable line_period_pclk                       : unsigned(31 downto 0);
-      variable active_line_start_num                  : unsigned(31 downto 0);
-      variable active_line_end_num                    : unsigned(31 downto 0);
       variable pix_samp_num_per_ch                    : unsigned(31 downto 0); 
-      variable sof_posf_pclk                          : unsigned(31 downto 0);
-      variable eof_posf_pclk                          : unsigned(31 downto 0);
-      variable sol_posl_pclk                          : unsigned(31 downto 0);
-      variable eol_posl_pclk                          : unsigned(31 downto 0);
-      variable eol_posl_pclk_p1                       : unsigned(31 downto 0);      
       variable hgood_samp_sum_num                     : unsigned(31 downto 0);
       variable hgood_samp_mean_numerator              : unsigned(31 downto 0);
       variable vgood_samp_sum_num                     : unsigned(31 downto 0);
@@ -116,145 +108,227 @@ package body suphawkA_intf_testbench_pkg is
       variable sat_ctrl_en                            : unsigned(31 downto 0);                      
       variable elcorr_spare3                          : unsigned(31 downto 0);                      
       variable roic_cst_output_mode                   : unsigned(31 downto 0);                      
-      variable cfg_num                                : unsigned(31 downto 0);
       variable comn_fpa_intf_data_source              : unsigned(31 downto 0);  
       variable additional_fpa_int_time_offset         : unsigned(31 downto 0);
-      
+	  variable aoi_data_sol_pos 				      : unsigned(31 downto 0);
+	  variable aoi_data_eol_pos 				      : unsigned(31 downto 0);
+	  variable aoi_flag1_sol_pos 				      : unsigned(31 downto 0);
+	  variable aoi_flag1_eol_pos 				      : unsigned(31 downto 0);
+	  variable aoi_flag2_sol_pos 				      : unsigned(31 downto 0);
+	  variable aoi_flag2_eol_pos 				      : unsigned(31 downto 0);
+	  variable raw_area_line_start_num 			      : unsigned(31 downto 0);
+	  variable raw_area_line_end_num 			      : unsigned(31 downto 0);
+	  variable raw_area_sof_posf_pclk 			      : unsigned(31 downto 0);
+	  variable raw_area_eof_posf_pclk 			      : unsigned(31 downto 0);
+	  variable raw_area_sol_posl_pclk 			      : unsigned(31 downto 0);
+	  variable raw_area_eol_posl_pclk 			      : unsigned(31 downto 0);
+	  variable raw_area_lsync_start_posl_pclk	      : unsigned(31 downto 0);
+	  variable raw_area_lsync_end_posl_pclk		      : unsigned(31 downto 0);
+	  variable raw_area_lsync_num		 			  : unsigned(31 downto 0);
+	  variable raw_area_clk_id			 			  : unsigned(31 downto 0);
+	  variable raw_area_line_period_pclk			  : unsigned(31 downto 0);
+	  variable raw_area_readout_pclk_cnt_max		  : unsigned(31 downto 0);
+	  variable user_area_line_start_num				  : unsigned(31 downto 0);
+	  variable user_area_line_end_num				  : unsigned(31 downto 0);
+	  variable user_area_sol_posl_pclk				  : unsigned(31 downto 0);
+	  variable user_area_eol_posl_pclk				  : unsigned(31 downto 0);
+	  variable user_area_clk_id						  : unsigned(31 downto 0);
+	  variable clk_area_a_line_start_num			  : unsigned(31 downto 0);
+	  variable clk_area_a_line_end_num			 	  : unsigned(31 downto 0);
+	  variable clk_area_a_sol_posl_pclk			 	  : unsigned(31 downto 0);
+	  variable clk_area_a_eol_posl_pclk			 	  : unsigned(31 downto 0);
+	  variable clk_area_a_clk_id				 	  : unsigned(31 downto 0);
+	  variable clk_area_a_spare					 	  : unsigned(31 downto 0);
+	  variable clk_area_b_line_start_num			  : unsigned(31 downto 0);
+	  variable clk_area_b_line_end_num			 	  : unsigned(31 downto 0);
+	  variable clk_area_b_sol_posl_pclk			 	  : unsigned(31 downto 0);
+	  variable clk_area_b_eol_posl_pclk			 	  : unsigned(31 downto 0);
+	  variable clk_area_b_clk_id				 	  : unsigned(31 downto 0);
+	  variable clk_area_b_spare					 	  : unsigned(31 downto 0);
+	  variable roic_rst_time_mclk				 	  : unsigned(31 downto 0);
+	  variable sideband_cancel_en				 	  : unsigned(31 downto 0);
+	  variable spare4							 	  : unsigned(31 downto 0);
+      variable cfg_num                                : unsigned(31 downto 0);
       variable y                                      : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
       
    begin
-      comn_fpa_diag_mode                     := (others => diag_mode);                                               
-      comn_fpa_diag_type                     := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
-      comn_fpa_pwr_on                        := to_unsigned(1, 32);                                               
-      comn_fpa_trig_ctrl_mode                := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);          
+      comn_fpa_diag_mode                    := (others => diag_mode);                                               
+      comn_fpa_diag_type                    := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
+      comn_fpa_pwr_on                       := to_unsigned(1, 32);                                               
+      comn_fpa_trig_ctrl_mode               := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);          
       
-      xstart                                 := to_unsigned(0, 32);  
-      ystart                                 := to_unsigned(0, 32);  
-      xsize                                  := to_unsigned(user_xsize, 32);  
-      ysize                                  := to_unsigned(user_ysize, 32);  
-      gain                                   := (others => '0');
-      invert                                 := (others => '0');
-      revert                                 := (others => '0');
-      cbit_en                                := to_unsigned(1, 32);
-      dig_code                               := resize(x"00D3", 32);      
-      colstart                               := xstart/TAP_NUM;  
-      colstop                                := colstart + xsize/TAP_NUM - 1;  
-      rowstart                               := ystart;  
-      rowstop                                := rowstart + ysize - 1;
+      xstart                                := to_unsigned(0, 32);  
+      ystart                                := to_unsigned(0, 32);  
+      xsize                                 := to_unsigned(user_xsize, 32);  
+      ysize                                 := to_unsigned(user_ysize, 32);  
+      gain                                  := (others => '0');
+      invert                                := (others => '0');
+      revert                                := (others => '0');
+      cbit_en                               := to_unsigned(1, 32);
+      dig_code                              := resize(x"00D3", 32);      
+      colstart                              := xstart/TAP_NUM;  
+      colstop                               := colstart + xsize/TAP_NUM - 1;  
+      rowstart                              := ystart;  
+      rowstop                               := rowstart + ysize - 1;
       
-      active_subwindow                       := to_unsigned(0, 32); 
-      prv_dac_nominal_value                  := to_unsigned(1234, 32);  
-      real_mode_active_pixel_dly             := to_unsigned(5, 32);
-      adc_quad2_en                           := to_unsigned(1, 32);  
-      chn_diversity_en                       := to_unsigned(0, 32);
+      active_subwindow                      := to_unsigned(0, 32); 
+      prv_dac_nominal_value                 := to_unsigned(1234, 32);  
+      real_mode_active_pixel_dly            := to_unsigned(5, 32);
+      adc_quad2_en                          := to_unsigned(1, 32);  
+      chn_diversity_en                      := to_unsigned(0, 32);
       
-      readout_pclk_cnt_max                   := to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + 165, 32);
-      line_period_pclk                       := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);
-      active_line_start_num                  := to_unsigned(1, 32);
-      if user_ysize > 1 then 
-         active_line_end_num                 := active_line_start_num + to_unsigned(user_ysize - 1, 32);
-      end if;
-      pix_samp_num_per_ch                    := to_unsigned(1, 32);
-      
-      sof_posf_pclk                          := to_unsigned(PAUSE_SIZE, 32);
-      if user_ysize > 1 then 
-         eof_posf_pclk                       := to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE) - 1, 32);
-      end if;
-      sol_posl_pclk                          := to_unsigned(PAUSE_SIZE, 32);
-      eol_posl_pclk                          := line_period_pclk - 1;
-      eol_posl_pclk_p1                       := eol_posl_pclk + 1;
+      pix_samp_num_per_ch                   := to_unsigned(1, 32);
       
       -- sampling
-      good_samp_first_pos_per_ch             := to_unsigned(1, 32);
-      good_samp_last_pos_per_ch              := to_unsigned(1, 32);   
-      hgood_samp_sum_num                     := to_unsigned(1, 32); 
-      hgood_samp_mean_numerator              := to_unsigned(2**21 / to_integer(hgood_samp_sum_num), 32);
-      vgood_samp_sum_num                     := 1 + chn_diversity_en;
-      vgood_samp_mean_numerator              := to_unsigned(2**21 / to_integer(vgood_samp_sum_num), 32);      
-      xsize_div_tapnum                       := to_unsigned(user_xsize/TAP_NUM, 32);
+      good_samp_first_pos_per_ch            := to_unsigned(1, 32);
+      good_samp_last_pos_per_ch             := to_unsigned(1, 32);   
+      hgood_samp_sum_num                    := to_unsigned(1, 32); 
+      hgood_samp_mean_numerator             := to_unsigned(2**21 / to_integer(hgood_samp_sum_num), 32);
+      vgood_samp_sum_num                    := 1 + chn_diversity_en;
+      vgood_samp_mean_numerator             := to_unsigned(2**21 / to_integer(vgood_samp_sum_num), 32);      
+      xsize_div_tapnum                      := to_unsigned(user_xsize/TAP_NUM, 32);
       
-      adc_clk_source_phase                   :=  to_unsigned(400, 32);
-      adc_clk_pipe_sel                       :=  to_unsigned(3, 32);
-      comn_fpa_stretch_acq_trig              :=  to_unsigned(0, 32);
-      spare1                                 :=  to_unsigned(0, 32);
-      spare2                                 :=  to_unsigned(0, 32);
+      adc_clk_source_phase                  :=  to_unsigned(400, 32);
+      adc_clk_pipe_sel                      :=  to_unsigned(3, 32);
+      comn_fpa_stretch_acq_trig             :=  to_unsigned(0, 32);
+      spare1                                :=  to_unsigned(0, 32);
+      spare2                                :=  to_unsigned(0, 32);
       
       -- Electronic chain correction                    
       -- valeurs par defaut (mode normal)                                                                                                                                               
-      elcorr_enabled                         := (others => C_ELCORR_ENABLED);
+      elcorr_enabled                        := (others => C_ELCORR_ENABLED);
       if (diag_mode = '1') then 
-         elcorr_enabled                      := (others => '0');
+         elcorr_enabled                     := (others => '0');
       end if; 
       
-      elcorr_spare1                          := (others => '0');              
-      elcorr_spare2                          := (others => '0');                     
+      elcorr_spare1                         := (others => '0');              
+      elcorr_spare2                         := (others => '0');                     
       
-      elcorr_ref_cfg_0_ref_enabled           := to_unsigned(1, 32);               
-      elcorr_ref_cfg_0_ref_cont_meas_mode    := (others => '0');              
-      elcorr_ref_cfg_0_start_dly_sampclk     := to_unsigned(2, 32);        
-      elcorr_ref_cfg_0_samp_num_per_ch       := to_unsigned(4, 32);
-      elcorr_ref_cfg_0_samp_mean_numerator   := to_unsigned(2**21/4, 32);     
-      elcorr_ref_cfg_0_ref_value             := to_unsigned(2000, 32);  --      
+      elcorr_ref_cfg_0_ref_enabled          := to_unsigned(1, 32);               
+      elcorr_ref_cfg_0_ref_cont_meas_mode   := (others => '0');              
+      elcorr_ref_cfg_0_start_dly_sampclk    := to_unsigned(2, 32);        
+      elcorr_ref_cfg_0_samp_num_per_ch      := to_unsigned(4, 32);
+      elcorr_ref_cfg_0_samp_mean_numerator  := to_unsigned(2**21/4, 32);     
+      elcorr_ref_cfg_0_ref_value            := to_unsigned(2000, 32);  --      
       
-      elcorr_ref_cfg_1_ref_enabled           := to_unsigned(1, 32);          
-      elcorr_ref_cfg_1_ref_cont_meas_mode    := (others => '0');             
-      elcorr_ref_cfg_1_start_dly_sampclk     := to_unsigned(2, 32);          
-      elcorr_ref_cfg_1_samp_num_per_ch       := to_unsigned(4, 32);         
-      elcorr_ref_cfg_1_samp_mean_numerator   := to_unsigned(2**21/4, 32);      
-      elcorr_ref_cfg_1_ref_value             := to_unsigned(4000, 32);  --   
+      elcorr_ref_cfg_1_ref_enabled          := to_unsigned(1, 32);          
+      elcorr_ref_cfg_1_ref_cont_meas_mode   := (others => '0');             
+      elcorr_ref_cfg_1_start_dly_sampclk    := to_unsigned(2, 32);          
+      elcorr_ref_cfg_1_samp_num_per_ch      := to_unsigned(4, 32);         
+      elcorr_ref_cfg_1_samp_mean_numerator  := to_unsigned(2**21/4, 32);      
+      elcorr_ref_cfg_1_ref_value            := to_unsigned(4000, 32);  --   
       
-      elcorr_ref_dac_id                      := to_unsigned(5, 32);  --       
-      elcorr_atemp_gain                      := to_unsigned(1, 32);          
-      elcorr_atemp_ofs                       := to_unsigned(540, 32);
+      elcorr_ref_dac_id                     := to_unsigned(5, 32);  --       
+      elcorr_atemp_gain                     := to_unsigned(1, 32);          
+      elcorr_atemp_ofs                      := to_unsigned(540, 32);
       
-      elcorr_ref0_op_sel                     := resize(ELCORR_SW_TO_NORMAL_OP, 32);
-      elcorr_ref1_op_sel                     := resize(ELCORR_SW_TO_NORMAL_OP, 32);
-      elcorr_mult_op_sel                     := resize(ELCORR_SW_TO_PATH1, 32);
-      elcorr_div_op_sel                      := resize(ELCORR_SW_TO_PATH1, 32); 
-      elcorr_add_op_sel                      := resize(ELCORR_SW_TO_NORMAL_OP, 32);  
+      elcorr_ref0_op_sel                    := resize(ELCORR_SW_TO_NORMAL_OP, 32);
+      elcorr_ref1_op_sel                    := resize(ELCORR_SW_TO_NORMAL_OP, 32);
+      elcorr_mult_op_sel                    := resize(ELCORR_SW_TO_PATH1, 32);
+      elcorr_div_op_sel                     := resize(ELCORR_SW_TO_PATH1, 32); 
+      elcorr_add_op_sel                     := resize(ELCORR_SW_TO_NORMAL_OP, 32);  
       
       -- sortie de la reference0
       if (C_elcorr_ref0_image_map_enabled = '1')  then              -- pour sortir l'image de la reference0
-         elcorr_ref0_op_sel                  := resize(ELCORR_SW_TO_PATH2, 32);
-         elcorr_ref1_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32);  -- pas necessaire
-         elcorr_mult_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32);
-         elcorr_div_op_sel                   := resize(ELCORR_SW_TO_PATH1, 32); 
-         elcorr_add_op_sel                   := resize(ELCORR_SW_TO_PATH1, 32); 
+         elcorr_ref0_op_sel                 := resize(ELCORR_SW_TO_PATH2, 32);
+         elcorr_ref1_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32);  -- pas necessaire
+         elcorr_mult_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32);
+         elcorr_div_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32); 
+         elcorr_add_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32); 
       end if;
       
       -- sortie de la reference1
       if (C_elcorr_ref1_image_map_enabled = '1')  then              -- pour sortir l'image de la reference1
-         elcorr_ref0_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32); -- pas necessaire
-         elcorr_ref1_op_sel                  := resize(ELCORR_SW_TO_PATH2, 32);  
-         elcorr_mult_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32);
-         elcorr_div_op_sel                   := resize(ELCORR_SW_TO_PATH2, 32); 
-         elcorr_add_op_sel                   := resize(ELCORR_SW_TO_PATH1, 32); 
+         elcorr_ref0_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32); -- pas necessaire
+         elcorr_ref1_op_sel                 := resize(ELCORR_SW_TO_PATH2, 32);  
+         elcorr_mult_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32);
+         elcorr_div_op_sel                  := resize(ELCORR_SW_TO_PATH2, 32); 
+         elcorr_add_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32); 
       end if;
       
       -- desactivation de la correction electronique
       if (elcorr_enabled = 0)  then
-         elcorr_ref0_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32); 
-         elcorr_ref1_op_sel                  := resize(ELCORR_SW_TO_PATH2, 32); -- pas necessaire 
-         elcorr_mult_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32);
-         elcorr_div_op_sel                   := resize(ELCORR_SW_TO_PATH1, 32); 
-         elcorr_add_op_sel                   := resize(ELCORR_SW_TO_PATH1, 32);   
+         elcorr_ref0_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32); 
+         elcorr_ref1_op_sel                 := resize(ELCORR_SW_TO_PATH2, 32); -- pas necessaire 
+         elcorr_mult_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32);
+         elcorr_div_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32); 
+         elcorr_add_op_sel                  := resize(ELCORR_SW_TO_PATH1, 32);   
       end if; 
       
-      sat_ctrl_en                            := (others => '0');
-      elcorr_spare3                          := (others => '0');
-      roic_cst_output_mode                   := (others => '0');
-      
-      cfg_num                                := to_unsigned(send_id, cfg_num'length);
-      
-      comn_fpa_intf_data_source              := (others => '0');
-      additional_fpa_int_time_offset         := (others => '0');
-      
-      comn_fpa_acq_trig_ctrl_dly             := to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_spare                         := (others => '0');
-      comn_fpa_xtra_trig_ctrl_dly            := to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_trig_ctrl_timeout_dly         := to_unsigned(10*to_integer(readout_pclk_cnt_max), comn_fpa_trig_ctrl_timeout_dly'length);
-      
-      
+      sat_ctrl_en                           := (others => '0');
+      elcorr_spare3                         := (others => '0');
+      roic_cst_output_mode                  := (others => '0');
+           
+      comn_fpa_intf_data_source             := (others => '0');
+      additional_fpa_int_time_offset        := (others => '0');   
+	  
+	  -- cropping
+  	  aoi_data_sol_pos         				:= (others => '0');
+	  aoi_data_eol_pos         				:= (others => '0');
+	  aoi_flag1_sol_pos        				:= (others => '0');
+	  aoi_flag1_eol_pos        				:= (others => '0');
+	  aoi_flag2_sol_pos        				:= (others => '0');
+	  aoi_flag2_eol_pos        				:= (others => '0');
+
+	  -- raw_area
+	  raw_area_line_start_num        		:= to_unsigned(1, 32);      
+      if user_ysize > 1 then 
+        raw_area_line_end_num		        := raw_area_line_start_num + to_unsigned(user_ysize - 1, 32);
+      end if;
+      raw_area_line_period_pclk 		    := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);	  
+      raw_area_readout_pclk_cnt_max  		:= to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + 165, 32);   
+	  raw_area_sof_posf_pclk         		:= to_unsigned(PAUSE_SIZE + 1, 32);      
+      if user_ysize > 1 then 
+         raw_area_eof_posf_pclk  		    := to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE), 32);
+      end if;      
+      raw_area_sol_posl_pclk         		:= to_unsigned(PAUSE_SIZE + 1, 32);
+      raw_area_eol_posl_pclk         		:= raw_area_line_period_pclk;
+	  raw_area_lsync_start_posl_pclk 		:= to_unsigned(1, 32);
+	  raw_area_lsync_end_posl_pclk 		 	:= to_unsigned(1, 32);
+	  raw_area_lsync_num 		 	 		:= raw_area_line_end_num;
+	  raw_area_clk_id						:= to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32);
+
+      -- user_area
+      user_area_line_start_num        		:= raw_area_line_start_num;      
+	  user_area_line_end_num          		:= raw_area_line_end_num;  
+      user_area_sol_posl_pclk         		:= raw_area_sol_posl_pclk;
+      user_area_eol_posl_pclk         		:= raw_area_eol_posl_pclk;
+	  user_area_clk_id						:= to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32);
+	  
+      -- clk_area_a
+	  clk_area_a_line_start_num		     	:= user_area_line_start_num; 
+	  clk_area_a_line_end_num      			:= user_area_line_end_num;
+	  clk_area_a_sol_posl_pclk 				:= to_unsigned(PAUSE_SIZE  + 1, 32);
+	  clk_area_a_eol_posl_pclk      		:= to_unsigned(PAUSE_SIZE + 1, 32);
+	  clk_area_a_clk_id					 	:= to_unsigned(DEFINE_FPA_SIDEBAND_MCLK_ID, 32);
+	  clk_area_a_spare	     		 		:= (others => '0');
+
+	  -- clk_area_b
+	  clk_area_b_line_start_num	      		:= (others => '0');
+	  clk_area_b_line_end_num				:= user_area_line_end_num;
+	  clk_area_b_sol_posl_pclk 				:= to_unsigned(1, 32);
+	  clk_area_b_eol_posl_pclk	        	:= to_unsigned(3, 32);
+	  clk_area_b_clk_id						:= to_unsigned(DEFINE_FPA_LINEPAUSE_MCLK_ID, 32);
+	  clk_area_b_spare						:= (others => '0');
+	  
+	  -- others
+	  roic_rst_time_mclk				  	:= to_unsigned(FPA_RST_DLY_MCLK, 32);
+	  
+      sideband_cancel_en             		:= to_unsigned(1, 32);
+	  --sideband_cancel_en             		:= to_unsigned(0, 32);
+      if sideband_cancel_en = 0 then 
+         clk_area_a_clk_id           		:= to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32);
+         clk_area_b_clk_id           		:= to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32);
+      end if;
+
+	  spare4								 := (others => '0');
+	  
+	  cfg_num                                := to_unsigned(send_id, cfg_num'length);
+	  
+	  comn_fpa_spare                         := (others => '0');
+	  comn_fpa_acq_trig_ctrl_dly     		 :=  to_unsigned(1*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_acq_trig_ctrl_dly'length);
+	  comn_fpa_xtra_trig_ctrl_dly			 :=  to_unsigned(1*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_xtra_trig_ctrl_dly'length);
+	  comn_fpa_trig_ctrl_timeout_dly		 :=  to_unsigned(1*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_trig_ctrl_timeout_dly'length);        
       
       
       -- cfg usager
@@ -283,17 +357,8 @@ package body suphawkA_intf_testbench_pkg is
       & prv_dac_nominal_value                    
       & real_mode_active_pixel_dly               
       & adc_quad2_en                             
-      & chn_diversity_en                         
-      & readout_pclk_cnt_max                
-      & line_period_pclk                    
-      & active_line_start_num               
-      & active_line_end_num
-      & pix_samp_num_per_ch                      
-      & sof_posf_pclk                       
-      & eof_posf_pclk                       
-      & sol_posl_pclk                       
-      & eol_posl_pclk                       
-      & eol_posl_pclk_p1                    
+      & chn_diversity_en
+	  & pix_samp_num_per_ch                      
       & hgood_samp_sum_num                       
       & hgood_samp_mean_numerator                
       & vgood_samp_sum_num                       
@@ -332,9 +397,47 @@ package body suphawkA_intf_testbench_pkg is
       & sat_ctrl_en                              
       & elcorr_spare3                            
       & roic_cst_output_mode                     
-      & cfg_num                                  
       & comn_fpa_intf_data_source                
-      & additional_fpa_int_time_offset;           
+      & additional_fpa_int_time_offset
+	  & aoi_data_sol_pos
+	  & aoi_data_eol_pos
+	  & aoi_flag1_sol_pos
+	  & aoi_flag1_eol_pos
+	  & aoi_flag2_sol_pos
+	  & aoi_flag2_eol_pos
+	  & raw_area_line_start_num
+	  & raw_area_line_end_num
+	  & raw_area_sof_posf_pclk
+	  & raw_area_eof_posf_pclk
+	  & raw_area_sol_posl_pclk
+	  & raw_area_eol_posl_pclk
+	  & raw_area_lsync_start_posl_pclk
+	  & raw_area_lsync_end_posl_pclk
+	  & raw_area_lsync_num
+	  & raw_area_clk_id	  
+	  & raw_area_line_period_pclk
+	  & raw_area_readout_pclk_cnt_max
+	  & user_area_line_start_num
+	  & user_area_line_end_num
+	  & user_area_sol_posl_pclk
+	  & user_area_eol_posl_pclk
+	  & user_area_clk_id
+	  & clk_area_a_line_start_num
+	  & clk_area_a_line_end_num
+	  & clk_area_a_sol_posl_pclk
+	  & clk_area_a_eol_posl_pclk
+	  & clk_area_a_clk_id
+	  & clk_area_a_spare
+	  & clk_area_b_line_start_num
+	  & clk_area_b_line_end_num
+	  & clk_area_b_sol_posl_pclk
+	  & clk_area_b_eol_posl_pclk
+	  & clk_area_b_clk_id
+	  & clk_area_b_spare
+	  & roic_rst_time_mclk
+	  & sideband_cancel_en
+	  & spare4
+	  & cfg_num;
       
       return y;
    end to_intf_cfg;
