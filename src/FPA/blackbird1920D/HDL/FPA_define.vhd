@@ -33,7 +33,7 @@ package FPA_define is
    constant DEFINE_FPA_INIT_CFG_NEEDED             : std_logic  := '0';     									-- pas besoin de config particulière au demarrage du PelicanD  
     
    constant DEFINE_INT_CLK_SOURCE_RATE_KHZ         : integer    := 70_000;           -- frequence de l'horloge source de laquelle est tirée celle de INT
-   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ    : integer    := 70_000;           -- frequence de l'horloge source de laquelle est tirée celle de ADC_QUAD_CLK
+   constant DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ    : integer    := 70_000;           -- frequence de l'horloge source de laquelle est tirée celle de ADC_QUAD_CLK Test
    constant DEFINE_FPA_PCLK_RATE_KHZ               : integer    := 70_000;
    constant DEFINE_XTAL_CLK_RATE_HZ                : integer    := 70_000_000;           -- frequence de l'horloge XTAL pour le RS232
    
