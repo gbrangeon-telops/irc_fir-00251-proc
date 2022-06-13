@@ -31,6 +31,7 @@
 
 #define FPA_WIDTH_MIN      64   
 #define FPA_WIDTH_MAX      1520
+#define FPA_REAL_WIDTH_MAX 1920
 #define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
