@@ -247,7 +247,7 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    float TargetExpTime = 0.0f;
    float ProposedExposureTimeLast = 0.0f;
    float DeltaT = 0.0;
-   float alpha       = 0.0f;
+   float alpha  = 0.0f;
    float PET = 0.0f;
    float den;
 
@@ -307,12 +307,9 @@ void AEC_InterruptProcess(gcRegistersData_t *pGCRegs,  t_AEC *pAEC_CTRL)
    }
 
    AEC_Int_expTime            = ((float) AXI4L_read32(AEC_BASE_ADDR + AEC_EXPOSURETIME_OFFSET)) / 100.0f; // in us
-   if ((AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION) || (fabsf(ProposedExposureTimeLast - AEC_Int_expTime) > AEC_EXPOSURE_TIME_RESOLUTION/10.0f)) // 
+   if ((AEC_Int_FWPosition == FWPOSITION_IN_TRANSITION) || (fabsf(ProposedExposureTimeLast - AEC_Int_expTime) >= AEC_EXPTIME_THRESHOLD))
    {
       // On reset l'histogramme lorsqu'on est à l'extérieur d'une plage valide ou si le PET précédent n'a pas encore été appliqué.
-      // Quelques explications sur la condition qui détermine si le PET précédent a été appliqué ou non: La raison pourquoi on n'utilise pas la condition "AEC_Int_expTime != ProposedExposureTimeLast"
-      // est qu'il y a parfois une légère instabilité numérique entre ce qui est lue dans le VHDL et ce qui est attendu dans ProposedExposureTimeLast. De plus, le critère de temps doit être inférieur à AEC_EXPOSURE_TIME_RESOLUTION
-      // sinon il peut appraitre des oscillations en régime permanent d'amplitude égal à AEC_EXPOSURE_TIME_RESOLUTION. J'ai décidé arbitrairement de mettre le critère égal à 1/10 de la résolution.
       AEC_ClearMem(pAEC_CTRL);
    }
    else

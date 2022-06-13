@@ -60,6 +60,7 @@
 #define AEC_INTR_ID		XPAR_MCU_MICROBLAZE_1_AXI_INTC_SYSTEM_AEC_INTC_INTR // TO CONFIRM
 #define AEC_NB_BIN		                  128
 #define AEC_EXPOSURE_TIME_RESOLUTION      0.1f // in us.
+#define AEC_EXPTIME_THRESHOLD             2.2f // in us. Must be greater than one 5MHz clock period to support all detectors.
 #define CORRECTION_FACTOR_MIN             0.1f
 #define CORRECTION_FACTOR_MAX             10.0f
 #define AEC_BASE_CLOCK_FREQ_HZ     CLK_DATA_FREQ_HZ
