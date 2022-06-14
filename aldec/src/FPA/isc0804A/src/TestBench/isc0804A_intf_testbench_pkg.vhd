@@ -297,7 +297,7 @@ package body isc0804A_intf_testbench_pkg is
          elcorr_gain_cont_calc_mode := (others => '1');
       end if; 
       
-      int_time_offset_mclk := unsigned(to_signed(0, 32));
+      int_time_offset_mclk := unsigned(to_signed(-3, 32));
       
       
       -- cfg usager

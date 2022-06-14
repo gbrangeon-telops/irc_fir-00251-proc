@@ -276,17 +276,17 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs
    if (pGCRegs->IntegrationMode == IM_IntegrateThenRead)
    {
-      ptrA->fpa_trig_ctrl_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode          = (uint32_t)MODE_INT_END_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
-      ptrA->fpa_spare                  = 0;
+      ptrA->fpa_xtra_trig_mode         = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
       ptrA->fpa_trig_ctrl_timeout_dly  = (uint32_t)(0.8F*(hh.mode_int_end_to_trig_start_dly_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
       ptrA->fpa_xtra_trig_ctrl_dly     = ptrA->fpa_trig_ctrl_timeout_dly;                          // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
    }
    else
    {
-      ptrA->fpa_trig_ctrl_mode         = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode          = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
       ptrA->fpa_acq_trig_ctrl_dly      = (uint32_t)( (hh.frame_period_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);  //frame period min calculée avec ET=0
-      ptrA->fpa_spare                  = 0;
+      ptrA->fpa_xtra_trig_mode         = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
       ptrA->fpa_trig_ctrl_timeout_dly  = ptrA->fpa_acq_trig_ctrl_dly;
       ptrA->fpa_xtra_trig_ctrl_dly     = ptrA->fpa_acq_trig_ctrl_dly;
    }

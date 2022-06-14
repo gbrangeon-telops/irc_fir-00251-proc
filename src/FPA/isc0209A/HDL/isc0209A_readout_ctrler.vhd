@@ -242,7 +242,7 @@ begin
                   if lsync_pipe(1) = '1' and lsync_pipe(0) = '0' then    -- on compte les lsync
                      lsync_cnt <= lsync_cnt + 1; 
                   end if;
-                  if lsync_cnt = FPA_INTF_CFG.WINDOW_LSYNC_NUM then 
+                  if lsync_cnt >= FPA_INTF_CFG.WINDOW_LSYNC_NUM then 
                      readout_fsm <= wait_readout_end_st;
                   end if;                  
                

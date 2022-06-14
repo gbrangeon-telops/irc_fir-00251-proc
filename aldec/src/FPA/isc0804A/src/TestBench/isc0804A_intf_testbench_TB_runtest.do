@@ -102,7 +102,7 @@ asim -ses isc0804A_intf_testbench_TB
 --wave UUT/U1/U21/U5/U2/* 
 
 -- mb_interface
---wave UUT/U1/U4/*  
+wave UUT/U1/U4/*  
 
 
 --
