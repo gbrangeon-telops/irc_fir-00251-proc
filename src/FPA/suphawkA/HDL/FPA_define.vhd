@@ -53,8 +53,8 @@ package FPA_define is
    constant DEFINE_GENERATE_VPROC_CHAIN           : std_logic := '0';      -- diversité de canaux
    constant DEFINE_GENERATE_QUAD2_CHAIN           : std_logic := '1';      -- à '1' permet de generer la chaine de traitement pour le quad 2 puisqu'il faut 8 canaux
    constant DEFINE_FPA_LINE_SYNC_MODE             : boolean   := true;     -- utilisé dans le module afpa_real_data_gen pour signaler à TRUE qu'il faille se synchroniser sur chaque ligne et à false pour signaler qu'une synchro en debut de trame est suffisante ou s
-   constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '1';      -- on fait de la correction électronique
-   constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '1';      -- on ne fait aucune correction de gain, mais juste l'offset au besoin
+   constant DEFINE_GENERATE_ELCORR_CHAIN          : std_logic := '0';      -- on fait de la correction électronique
+   constant DEFINE_GENERATE_ELCORR_GAIN           : std_logic := '0';      -- on ne fait aucune correction de gain, mais juste l'offset au besoin
    constant DEFINE_ELCORR_REF_DAC_SETUP_US        : integer   := 300_000;  -- en usec, le delai de stabilisation (analog setup)
    constant DEFINE_GENERATE_CROPPING_CHAIN        : std_logic := '0';      -- on ne fait pas de cropping
    
