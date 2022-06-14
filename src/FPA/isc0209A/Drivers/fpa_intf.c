@@ -320,7 +320,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (init_done == 0)
-      gFpaDebugRegF = 13; 
+      gFpaDebugRegF = 19; 
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;   
    
    // quad2
@@ -389,12 +389,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
      
    // gFpaDebugRegC dephasage grossier des adc_clk 
    if (init_done == 0)
-      gFpaDebugRegC = 3;
+      gFpaDebugRegC = 4;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
  
    // gFpaDebugRegD dephasage fin des adc_clk 
    if (init_done == 0)         
-      gFpaDebugRegD = 350;
+      gFpaDebugRegD = 500;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD; 
       
    // Élargit le pulse de trig

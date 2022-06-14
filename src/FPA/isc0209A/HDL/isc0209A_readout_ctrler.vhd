@@ -224,7 +224,7 @@ begin
                   readout_in_progress <= '0';
                   lsync_cnt <=  (others => '0');
                   lsync_pipe(0) <= '0';
-                  img_in_progress_i <= fpa_int_last;                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction
+                  img_in_progress_i <= fpa_int_last;                -- ENO 29 janv 2020: on s'assure que img_in_progress_i ne tombe à zero que si aucune image n'est en transaction. ENO: 14 juin 2022: il faut  qu'en mode XTRA_TRIG/PROG_TRIG qu'il y ait un delai suffisant d'une image à l'autre sinon bug car la mise à jour des cfgs ne se fera pas.
                   acq_data_i <= '0';                 
                   if fpa_int_last = '1' and  fpa_int_i = '0' then   -- front descendant de int                     
                      acq_data_i <= acq_int_last;
