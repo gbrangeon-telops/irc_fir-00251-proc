@@ -147,7 +147,7 @@ begin
          end if;
          
          -- delai en fonction du temps d'intégration
-         if int_dval_i = '1' and (user_cfg_i.comn.fpa_trig_ctrl_mode =  MODE_ITR_TRIG_START_TO_TRIG_START) then
+         if int_dval_i = '1' and (user_cfg_i.comn.fpa_acq_trig_mode=  MODE_ITR_TRIG_START_TO_TRIG_START) then
             USER_CFG.COMN.FPA_ACQ_TRIG_CTRL_DLY <= user_cfg_i.comn.fpa_acq_trig_ctrl_dly + FPA_EXP_INFO.EXP_TIME;  -- En MODE_ITR_TRIG_START_TO_TRIG_START ou MODE_TRIG_START_TO_TRIG_START, le delai est calculé en coups de 100MHz pour un temps d'intégration nul
          end if;
          
@@ -216,8 +216,8 @@ begin
             end if; 
             
             -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
-            user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
-            user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            -- user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            -- user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
             
             -- 
             user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);  -- 
@@ -232,11 +232,11 @@ begin
                   when X"000" =>    user_cfg_i.comn.fpa_diag_mode              <= data_i(0); user_cfg_in_progress <= '1';                       
                   when X"004" =>    user_cfg_i.comn.fpa_diag_type              <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
                   when X"008" =>    user_cfg_i.comn.fpa_pwr_on                 <= data_i(0);						
-                  when X"00C" =>    user_cfg_i.comn.fpa_trig_ctrl_mode         <= data_i(user_cfg_i.comn.fpa_trig_ctrl_mode'length-1 downto 0);                                                                        
-                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
-                  when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
-                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
-                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
+                  when X"00C" =>    user_cfg_i.comn.fpa_acq_trig_mode          <= data_i(user_cfg_i.comn.fpa_acq_trig_mode'length-1 downto 0);                                                                        
+                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));	
+                  when X"014" =>    user_cfg_i.comn.fpa_xtra_trig_mode         <= data_i(user_cfg_i.comn.fpa_xtra_trig_mode'length-1 downto 0);                                                                
+                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));					                                                  
+                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));			                                                     
                   when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                      
                   -- diag

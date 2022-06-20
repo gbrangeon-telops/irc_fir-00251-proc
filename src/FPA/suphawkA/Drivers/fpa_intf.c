@@ -337,15 +337,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
+   ptrA->fpa_acq_trig_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
    if (ptrA->fpa_diag_mode == 1) 
-      ptrA->fpa_trig_ctrl_mode  = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode  = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
       
-   ptrA->fpa_acq_trig_ctrl_dly  = (uint32_t)((hh.frame_period_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_spare              = 0;
+   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.frame_period_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)FPA_XTRA_TRIG_FREQ_MAX_HZ); //(uint32_t)(0.8F*(hh.frame_period_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
-   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;                         // je n'ai pas enlevé le int_time, ni le readout_time mais pas grave car c'est en xtra_trig
-
+   
    // fenetrage
    ptrA->xstart    = pGCRegs->OffsetX;
    ptrA->ystart    = pGCRegs->OffsetY;

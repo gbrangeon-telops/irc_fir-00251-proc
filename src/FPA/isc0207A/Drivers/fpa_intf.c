@@ -328,12 +328,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_pwr_on  = 1;    // le vhd a le dernier mot. Il peut refuser l'allumage si les conditions ne sont pas réunies
    
    // config du contrôleur de trigs
-   ptrA->fpa_trig_ctrl_mode        = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
+   ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;  // permet de supporter le mode ITR et IWR et la pleine vitesse 
    ptrA->fpa_acq_trig_ctrl_dly     = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_spare                 = 0;   // 
+   ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
+   ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;
    ptrA->fpa_trig_ctrl_timeout_dly = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   ptrA->fpa_xtra_trig_ctrl_dly    = 0;   // ENO: 20 août 2015: pour isc0207, valeur arbitraire car valeur reelle sera calculée dans le vhd à partir du temps d'integration
-   
+     
    // parametres envoyés au VHD pour calculer fpa_acq_trig_ctrl_dly, fpa_trig_ctrl_timeout_dly, fpa_xtra_trig_ctrl_dly
    ptrA->readout_plus_delay            =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * (hh.readout_usec + hh.delay_usec - hh.vhd_delay_usec)*1e-6F);  // (readout_time + delay -vhd_delay) converti en coups de 100MHz
    ptrA->tri_window_and_intmode_part   =  (uint32_t)((float)VHD_CLK_100M_RATE_HZ * hh.tri_window_and_intmode_part_usec*1e-6F);        //   tri_window_and_intmode_part_usec converti en coups de 100MHz
@@ -647,9 +647,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // FPA_PRINTF(" fpa_diag_mode                         =  %d", (uint32_t)ptrA->fpa_diag_mode                        );  
    // FPA_PRINTF(" fpa_diag_type                         =  %d", (uint32_t)ptrA->fpa_diag_type                        );  
    // FPA_PRINTF(" fpa_pwr_on                            =  %d", (uint32_t)ptrA->fpa_pwr_on                           );  
-   // FPA_PRINTF(" fpa_trig_ctrl_mode                    =  %d", (uint32_t)ptrA->fpa_trig_ctrl_mode                   );  
+   // FPA_PRINTF(" fpa_acq_trig_mode                    =  %d", (uint32_t)ptrA->fpa_acq_trig_mode                   );  
    // FPA_PRINTF(" fpa_acq_trig_ctrl_dly                 =  %d", (uint32_t)ptrA->fpa_acq_trig_ctrl_dly                );  
-   // FPA_PRINTF(" fpa_spare                             =  %d", (uint32_t)ptrA->fpa_spare                            );  
+   // FPA_PRINTF(" fpa_xtra_trig_mode                             =  %d", (uint32_t)ptrA->fpa_xtra_trig_mode                            );  
    // FPA_PRINTF(" fpa_xtra_trig_ctrl_dly                =  %d", (uint32_t)ptrA->fpa_xtra_trig_ctrl_dly               );  
    // FPA_PRINTF(" fpa_trig_ctrl_timeout_dly             =  %d", (uint32_t)ptrA->fpa_trig_ctrl_timeout_dly            );                                      
    // FPA_PRINTF(" fpa_stretch_acq_trig                  =  %d", (uint32_t)ptrA->fpa_stretch_acq_trig                 );  

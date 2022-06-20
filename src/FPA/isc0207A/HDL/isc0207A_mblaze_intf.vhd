@@ -231,8 +231,8 @@ begin
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
             
             -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
-            user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
-            user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            -- user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
+            -- user_cfg_i.comn.fpa_xtra_trig_mode <= user_cfg_i.comn.fpa_trig_ctrl_mode;
             
             -- reste de la config            
             if slv_reg_wren = '1' then  
@@ -241,11 +241,11 @@ begin
                   when X"000" =>    user_cfg_i.comn.fpa_diag_mode              <= data_i(0); user_cfg_in_progress <= '1';                       
                   when X"004" =>    user_cfg_i.comn.fpa_diag_type              <= data_i(user_cfg_i.comn.fpa_diag_type'length-1 downto 0); 
                   when X"008" =>    user_cfg_i.comn.fpa_pwr_on                 <= data_i(0);						
-                  when X"00C" =>    user_cfg_i.comn.fpa_trig_ctrl_mode         <= data_i(user_cfg_i.comn.fpa_trig_ctrl_mode'length-1 downto 0);                                                                        
-                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));    -- ici la valeur que contient le registre est insensée	
-                  when X"014" =>    user_cfg_i.comn.fpa_spare                  <= unsigned(data_i(user_cfg_i.comn.fpa_spare'length-1 downto 0));  -- ici la valeur que contient le registre est insensée                                                                
-                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- ici la valeur que contient le registre est insensée					                                                  
-                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0)); -- ici la valeur que contient le registre est insensée				                                                     
+                  when X"00C" =>    user_cfg_i.comn.fpa_acq_trig_mode          <= data_i(user_cfg_i.comn.fpa_acq_trig_mode'length-1 downto 0);                                                                        
+                  when X"010" =>    user_cfg_i.comn.fpa_acq_trig_ctrl_dly      <= unsigned(data_i(user_cfg_i.comn.fpa_acq_trig_ctrl_dly'length-1 downto 0));	
+                  when X"014" =>    user_cfg_i.comn.fpa_xtra_trig_mode         <= data_i(user_cfg_i.comn.fpa_xtra_trig_mode'length-1 downto 0);                                                                
+                  when X"018" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));					                                                  
+                  when X"01C" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));				                                                     
                   when X"020" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
                      
                   -- diag
