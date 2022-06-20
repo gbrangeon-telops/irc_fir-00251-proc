@@ -307,7 +307,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // }
    
    ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
-   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((hh.mode_readout_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+   ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((1.0*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); // ENO 20 juin 2022: delai de 1usec pour eviter que IMG_IN_PROGRESS ne soit toujours à '1' d'aune image à l'autreen mode XTRA_TRIG ou PROG_TRIG
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    
    // fenetrage
