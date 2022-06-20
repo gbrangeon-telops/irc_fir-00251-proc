@@ -52,6 +52,12 @@ entity calib_tb_stim is
       TX_MISO  : in t_axi4_stream_miso;
       
       --------------------------------
+      -- LDS Data
+      --------------------------------
+      LDS_MOSI  : out t_axi4_stream_mosi32;
+      LDS_MISO  : in t_axi4_stream_miso;
+      
+      --------------------------------
       -- MISC
       --------------------------------
       CLK160   : out std_logic;
@@ -89,7 +95,7 @@ architecture rtl of calib_tb_stim is
    
    signal sync_mosi_tlast  : std_logic;
    signal fl_pipe_i        : std_logic;
-
+   
 begin
    --! Assign clock
    CLK160 <= clk160_o;
@@ -408,6 +414,35 @@ begin
       
       wait until rising_edge(clk80_o);
       write_axis64(clk80_o, x"0007000600050004", '1', TX_MISO, TX_MOSI);
+      
+   end process;
+   
+   --! LDS Data simulation
+   LDS_DATA_GEN : process
+   begin
+      
+      wait until rstn_i = '1';
+      wait for 1 us;
+   
+      ------------------------------------------
+      -- AXI Stream function signatures
+      ------------------------------------------
+      --procedure write_axis32 (signal Clk : in std_logic; Value : in std_logic_vector; tlast : in std_logic; signal miso : in  t_axi4_stream_miso; signal mosi : out t_axi4_stream_mosi32 ) is
+      
+      wait until rising_edge(clk160_o);
+      write_axis32(clk160_o, x"00000000", '0', LDS_MISO, LDS_MOSI);
+      
+      wait until rising_edge(clk160_o);
+      write_axis32(clk160_o, x"00000001", '0', LDS_MISO, LDS_MOSI);
+      
+      wait until rising_edge(clk160_o);
+      write_axis32(clk160_o, x"80000001", '0', LDS_MISO, LDS_MOSI);
+      
+      wait until rising_edge(clk160_o);
+      write_axis32(clk160_o, x"0000FFFF", '0', LDS_MISO, LDS_MOSI);
+      
+      wait until rising_edge(clk160_o);
+      write_axis32(clk160_o, x"00000002", '1', LDS_MISO, LDS_MOSI);
       
    end process;
 

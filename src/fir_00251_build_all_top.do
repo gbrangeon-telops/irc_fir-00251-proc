@@ -10,8 +10,8 @@ setenv COMMON "D:\Telops\FIR-00251-Common"
 #Individual builds
 #-----------------
 #do  "$FIR251PROC\src\fir_00251_top_blackbird1280D_build.do"
-#do  "$FIR251PROC\src\fir_00251_top_blackbird1920D_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_blackbird1520D_build.do"
+#do  "$FIR251PROC\src\fir_00251_top_blackbird1920D_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_hawkA_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_herculesD_build.do"
 #do  "$FIR251PROC\src\fir_00251_top_isc0207A_build.do"

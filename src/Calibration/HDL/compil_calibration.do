@@ -27,6 +27,7 @@ acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\calib_fast_hder_gen.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\pixel_saturation_flag.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\pixel_saturation_repl.vhd \
+ D:\Telops\FIR-00251-Proc\src\Calibration\HDL\pixel_negative_flag.vhd \
  D:\Telops\FIR-00251-Proc\src\Calibration\HDL\pixel_bpr_flag.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Utilities\pixel_bad_repl.vhd \
  D:\Telops\FIR-00251-Common\VHDL\Math\axis_fi32tou32.vhd  

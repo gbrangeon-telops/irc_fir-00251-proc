@@ -60,5 +60,15 @@ add wave -noreg -decimal -literal {/tb_calib_top/pix_out_mosi}
 add wave -noreg -logic {/tb_calib_top/DOUT_MISO.TREADY}
 add wave -noreg -decimal -literal {/tb_calib_top/DOUT_MOSI}
 add wave -noreg -decimal -literal {/tb_calib_top/pix_combine_err}
+add wave -named_row "LDS"
+add wave -noreg -logic {/tb_calib_top/clk_cal}
+add wave -noreg -decimal -literal {/tb_calib_top/LDS_MOSI}
+add wave -noreg -decimal -literal {/tb_calib_top/LDS_MISO}
+add wave -noreg -decimal -literal {/tb_calib_top/FLAG_MOSI}
+add wave -noreg -decimal -literal {/tb_calib_top/FLAG_MISO}
+add wave -noreg -decimal -literal {/tb_calib_top/CALIB_OUT_MOSI}
+add wave -noreg -decimal -literal {/tb_calib_top/CALIB_OUT_MISO}
+add wave -noreg -decimal -literal {/tb_calib_top/VIDEO_OUT_MOSI}
+add wave -noreg -decimal -literal {/tb_calib_top/VIDEO_OUT_MISO}
 cursor "Cursor 1" 12us  
 transcript on
