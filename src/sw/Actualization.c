@@ -66,24 +66,6 @@ typedef struct {
    uint16_t b;
 } lut_data_t;
 
-/**
-  * Wrapper function to Xil_In32 macro
-  *
-  *   @param address of the LUT element
-  *
-  *   @return uint32_t packed LUT element
-  *
-  *   Note(s): workaround for the read access bug to the LUT
-  *
-  *--------------------------------------------------------------------------------
-  */
-uint32_t Xil_In32_(uint32_t add)
-{
-   Xil_In32(add); // first call does not return the right value.
-
-   return Xil_In32(add); // this call reads the data prepared (but not returned) by the previous call
-}
-
 // private type for co-adding status
 typedef struct {
    uint32_t NCoadd;
@@ -2251,7 +2233,7 @@ float applyLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, float x )
    // xi = ( i * XRange / Size ) + XMin, the abscissa value of the start of interval i
    xi = ( (float) i * p_LUTInfo->LUT_Xrange / p_LUTInfo->LUT_Size ) + p_LUTInfo->LUT_Xmin;
 
-   unpackLUTData(Xil_In32_(LUTDataAddr + i) , p_LUTInfo, &m, &bi, gActDebugOptions.verbose);
+   unpackLUTData(Xil_In32(LUTDataAddr + i) , p_LUTInfo, &m, &bi, gActDebugOptions.verbose);
 
    y = m * ( x - xi ) + bi;
 
@@ -2298,7 +2280,7 @@ static float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, floa
    i = 0;
    do
    {
-      data = Xil_In32_(LUTDataAddr + i);
+      data = Xil_In32(LUTDataAddr + i);
       unpackLUTData( data, p_LUTInfo, &m, &bi, false );
       y = bi;
 
@@ -2318,7 +2300,7 @@ static float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, floa
    {
       // Read last m and bi value
       --i;
-      data = Xil_In32_(LUTDataAddr + i);
+      data = Xil_In32(LUTDataAddr + i);
       unpackLUTData( data, p_LUTInfo, &m, &bi, verbose );
    }
 #else
@@ -2333,7 +2315,7 @@ static float applyReverseLUT( uint32_t LUTDataAddr, LUTRQInfo_t* p_LUTInfo, floa
       i = (imax + imin)/2;
 
       // CR_TRICKY : address offset is in 32-bit word offset. nth element is at base+n (not base+4*n)
-      data = Xil_In32_(LUTDataAddr + i);
+      data = Xil_In32(LUTDataAddr + i);
       unpackLUTData( data, p_LUTInfo, &m, &bi, false );
 
       if (bi < y_target)
