@@ -3,10 +3,10 @@
 
 #ifdef ARCH_FPGA_160
 
-#define SVN_HARDWARE_REV      -27574
-#define SVN_SOFTWARE_REV      -27574
-#define SVN_BOOTLOADER_REV    27574
-#define SVN_COMMON_REV        27401
+#define SVN_HARDWARE_REV      27605
+#define SVN_SOFTWARE_REV      27575
+#define SVN_BOOTLOADER_REV    27605
+#define SVN_COMMON_REV        27602
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -25,7 +25,7 @@
 #define SVN_HARDWARE_REV      23419
 #define SVN_SOFTWARE_REV      23419
 #define SVN_BOOTLOADER_REV    25079
-#define SVN_COMMON_REV        27401
+#define SVN_COMMON_REV        27602
 
 #define SVN_UNCOMMITTED_CHANGES  ((SVN_HARDWARE_REV < 0) || (SVN_SOFTWARE_REV < 0) || (SVN_BOOTLOADER_REV < 0) || (SVN_COMMON_REV < 0))
 
@@ -33,7 +33,7 @@
 #warning Uncommitted changes detected.
 #endif
 
-#define HARDWARE_MISMATCH (0)
+#define HARDWARE_MISMATCH (1)
 
 #if HARDWARE_MISMATCH
 #error D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_isc0209A\hw_platform_325\system.hdf does not match D:\Telops\FIR-00251-Proc\sdk\fir_00251_proc_isc0209A\fir_00251_proc_isc0209A_325.hdf
