@@ -141,6 +141,7 @@
 // La résolution maximale supportée par le vhdl est 44 (0.63us). (Sinon overflow).
 #define FRAME_RESOLUTION_DEFAULT           7  // 0.1us
 
+#define FRAME_TIME_CLKS_MARGIN             10  // en frame time resolution
 
 // "Photo-diode bias" parameter (and anti-blooming control)
 static const uint8_t Scd_DiodeBiasValues_Vdet[] = {
@@ -518,7 +519,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->frame_dly_cst   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gFr_dly);
    ptrA->int_dly_cst     = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(gIntg_dly);
    ptrA->op_frame_time   = (uint32_t)FPA_ConvertSecondToFrameTimeResolution(frame_period);
-   ptrA->op_frame_time   = ptrA->op_frame_time - 3; // La période réelle configuré dans le ROIC doit être légèrement inférieure à celle des trigs générés.
+   ptrA->op_frame_time   = ptrA->op_frame_time - FRAME_TIME_CLKS_MARGIN; // La période réelle configuré dans le ROIC doit être légèrement inférieure à celle des trigs générés.
 
    // config du contrôleur pour les acq_trigs (il est sur l'horloge de 100MHz)
    ptrA->fpa_acq_trig_mode      = (uint32_t)MODE_TRIG_START_TO_TRIG_START;
