@@ -66,11 +66,11 @@
 #define GIGE_VCC10_MAX        SUPPLY_12V_MAX
 #define GIGE_VCC10_MIN        SUPPLY_12V_MIN
 								
-#define PROC_IO_VOLTAGE_MAX 	(2.0f * (1.0f + VOLTAGE_TOL))    // could be 1.8V
-#define PROC_IO_VOLTAGE_MIN 	(2.0f * (1.0f - VOLTAGE_TOL))
+#define PROC_IO_VOLTAGE_MAX 	(1.8f * (1.0f + VOLTAGE_TOL))    // could be 2.0V
+#define PROC_IO_VOLTAGE_MIN 	(1.8f * (1.0f - VOLTAGE_TOL))
 								
-#define OUT_IO_VOLTAGE_MAX  	(2.0f * (1.0f + VOLTAGE_TOL))    // could be 1.8V
-#define OUT_IO_VOLTAGE_MIN  	(2.0f * (1.0f - VOLTAGE_TOL))
+#define OUT_IO_VOLTAGE_MAX  	(1.8f * (1.0f + VOLTAGE_TOL))    // could be 2.0V
+#define OUT_IO_VOLTAGE_MIN  	(1.8f * (1.0f - VOLTAGE_TOL))
 								
 #define SUPPLY_3V3_MAX      	(3.3f * (1.0f + VOLTAGE_TOL))
 #define SUPPLY_3V3_MIN      	(3.3f * (1.0f - VOLTAGE_TOL))
