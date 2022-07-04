@@ -31,7 +31,7 @@
 
 #define FPA_WIDTH_MIN      64   
 #define FPA_WIDTH_MAX      1520
-#define FPA_REAL_WIDTH_MAX 1920
+
 #define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
@@ -58,7 +58,7 @@
 #define FPA_TDC_FLAGS            (Blackbird1520DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
 
-#define FPA_COOLER_TEMP_THRES    -19400   //[cC]
+#define FPA_COOLER_TEMP_THRES    -20815   //[cC]
 #define FPA_COOLER_TEMP_TOL      1000     //[cC]
 #ifdef SIM
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]

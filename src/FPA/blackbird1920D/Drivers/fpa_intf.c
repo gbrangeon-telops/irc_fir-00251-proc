@@ -141,6 +141,7 @@
 // La résolution maximale supportée par le vhdl est 44 (0.63us). (Sinon overflow).
 #define FRAME_RESOLUTION_DEFAULT           7  // 0.1us
 
+#define FULL_ROW_SIZE                      1920
 #define FRAME_TIME_CLKS_MARGIN             10  // en frame time resolution
 
 // "Photo-diode bias" parameter (and anti-blooming control)
@@ -550,18 +551,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->aoi_data_eol_pos          =  ptrA->aoi_data_sol_pos - 1 + (uint32_t)pGCRegs->Width/4; // En effet,  (ptrA->aoi_data_eol_pos - ptrA->aoi_data_sol_pos) + 1  = pGCRegs->Width/4 
    ptrA->aoi_flag1_sol_pos         =  1;
    ptrA->aoi_flag1_eol_pos         = (uint32_t)pGCRegs->Width/4 - 1;      // ainsi, on considère la premiere partie des flags qui vont du premier pixel (SOL) jusqu'à l'avant-dernier pixel de la ligne.
-   ptrA->aoi_flag2_sol_pos         = (uint32_t)FPA_WIDTH_MAX/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
-   ptrA->aoi_flag2_eol_pos         = (uint32_t)FPA_WIDTH_MAX/4;
+   ptrA->aoi_flag2_sol_pos         = (uint32_t)FULL_ROW_SIZE/4;           // quand à la seconde partie des flags, elle se resume au EOL qui se retrouve toujours à la fin de la ligne complète (pleine ligne)
+   ptrA->aoi_flag2_eol_pos         = (uint32_t)FULL_ROW_SIZE/4;
       
    //  parametres de la commande opérationnelle
-   ptrA->op_xstart  = 0;    
-   ptrA->op_ystart  = pGCRegs->OffsetY/4;      // parametre strow à la page p.20 de atlascmd_datasheet2.17   
-   
-   if (ptrA->op_binning == 1)
-      ptrA->op_ystart  = pGCRegs->OffsetY/8;
-   
-   ptrA->op_xsize  = (uint32_t)FPA_WIDTH_MAX;     
-   ptrA->op_ysize  = pGCRegs->Height/2;        // parametre wsize à la page p.20 de atlascmd_datasheet2.17   
+   ptrA->op_ystart  = pGCRegs->OffsetY/2;      // TODO : En binning, mettre un FPA_HEIGHT_INC = 8
+   ptrA->op_ysize  = pGCRegs->Height/2;
 
    // polarisation et saturation 
    if (gFpaScdDiodeBiasEnum >= SCD_IDET_BIAS_VALUES_NUM)      // Photo-diode bias (Idet)
@@ -589,7 +584,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    //Test pattern Telops
    ptrA->diag_ysize = ptrA->aoi_ysize/2;                                          // pour tenir compte de la seconde ligne qui sort aussi au même moment
-   ptrA->diag_xsize_div_tapnum           = (uint32_t)FPA_WIDTH_MAX/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
+   ptrA->diag_xsize_div_tapnum           = (uint32_t)FULL_ROW_SIZE/4 ;            // toujours diviser par 4 même si on a 8 pixels/clk
    ptrA->diag_lovh_mclk_source           = 287;                                   // à reviser si necessaire
    ptrA->real_mode_active_pixel_dly      = 2;                                     // valeur arbitraire utilisée par le système en mode diag
    ptrA->outgoing_com_ovh_len            = 5;          // pour la cmd sortante, nombre de bytes avant le champ d'offset
@@ -684,7 +679,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // Configuration des SERDES (independante du nombre du canaux)
    ptrA->fpa_serdes_lval_num = ptrA->aoi_ysize;
       ptrA->fpa_serdes_lval_num >>= 1;
-   ptrA->fpa_serdes_lval_len = (uint32_t)FPA_WIDTH_MAX / 4; // toujours diviser par 4 même si on a 8 pixels/clk (en réalité on a 2 lignes simultannés à 4 pixels/clk).
+   ptrA->fpa_serdes_lval_len = (uint32_t)FULL_ROW_SIZE / 4; // toujours diviser par 4 même si on a 8 pixels/clk (en réalité on a 2 lignes simultannés à 4 pixels/clk).
 
    ptrA->int_clk_period_factor           = MAX(gPrivateStat.int_clk_source_rate_hz/(uint32_t)hh.fpa_intg_clk_rate_hz, 1);
    ptrA->int_time_offset                 = (int32_t)(hh.fpa_intg_clk_rate_hz * hh.int_time_offset_usec*1e-6F);
@@ -718,7 +713,7 @@ void FPA_SpecificParams(bb1920D_param_t *ptrH, float exposureTime_usec, const gc
    ptrH->int_time_offset_usec               = ((float)gFpaExposureTimeOffset /(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ)* 1e6F;
    ptrH->exposure_time                      = exposureTime_usec*1E-6F;
    ptrH->Frame_read_Init_3                  = ptrH->Frame_read_Init_3_clk/ptrH->Fclock_MHz;
-   ptrH->number_of_Columns                  = (float)FPA_WIDTH_MAX;
+   ptrH->number_of_Columns                  = (float)FULL_ROW_SIZE;
    ptrH->number_of_Rows                     = (float)pGCRegs->Height;
    ptrH->number_of_Ref_Rows                 = 0.0F;
    ptrH->number_of_pixel_per_clk_per_output = 4.0f; // Full rate par défaut
@@ -935,17 +930,13 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 
    if(ptrA->op_binning == 0)
    {
-      strow = (uint16_t)((ptrA->op_ystart >> 1) & 0x000003FF);
-      wsize = ptrA->op_ysize;
+      strow = (uint16_t)(ptrA->op_ystart & 0x000003FC);
+      wsize = (uint16_t)(ptrA->op_ysize & 0x000003FF);
    }
    else
    {
-      if(ptrA->op_output_rate == 3)
-         strow = (uint16_t)((ptrA->op_ystart >> 3) & 0x000003FF);
-      else
-         strow = (uint16_t)((ptrA->op_ystart >> 2) & 0x000003FF);
-
-      wsize = (uint16_t)((ptrA->op_ysize >> 1) & 0x000003FF);
+      strow = (uint16_t)(ptrA->op_ystart & 0x000003F8);
+      wsize = (uint16_t)(ptrA->op_ysize & 0x000003FE);
    }
 
    // on bâtit la commande

@@ -57,7 +57,7 @@
 #define FPA_TDC_FLAGS            (Blackbird1920DIsImplemented | ITRIsImplementedMask | IWRIsImplementedMask | HighGainSWDIsImplementedMask)
 #define FPA_TDC_FLAGS2           (ManufacturerStaticImageIsImplementedMask)
 
-#define FPA_COOLER_TEMP_THRES    -19400   //[cC]
+#define FPA_COOLER_TEMP_THRES    -20815   //[cC]
 #define FPA_COOLER_TEMP_TOL      1000     //[cC]
 #ifdef SIM
    #define FPA_DEFAULT_EXPOSURE     5.0F //[us]
