@@ -96,7 +96,7 @@
 
 #define XRO3503_CTIA_BIAS_MAX                      0xF      // value must be in 0x0 to 0xF
 
-#define XRO3503_DETECT_SUB_DEFAULT_mV              2900     // Default DetectSub = 2900 mV
+#define XRO3503_DETECT_SUB_DEFAULT_mV              3500     // Default DetectSub = 3500 mV
 #define XRO3503_DETECT_SUB_MIN_mV                  2800     // 2800 mV <= DetectSub <= 3500 mV
 #define XRO3503_DETECT_SUB_MAX_mV                  3500
 
@@ -104,12 +104,17 @@
 #define XRO3503_CTIA_REF_MIN_mV                    2100     // 2100 mV <= CTIA Ref <= 2700 mV
 #define XRO3503_CTIA_REF_MAX_mV                    2700
 
+#define XRO3503_VTESTG_DEFAULT_mV                  3300     // Default VTestG = 3300 mV (current skimming and antibloom disabled)
+#define XRO3503_VTESTG_MIN_mV                      0        // 0 mV <= VTestG <= 3300 mV
+#define XRO3503_VTESTG_MAX_mV                      3300
+
 #define XRO3503_CM_DEFAULT_mV                      1750     // Default CM = 1750 mV
 #define XRO3503_CM_MIN_mV                          1500     // 1500 mV <= CM <= 2000 mV
 #define XRO3503_CM_MAX_mV                          2000
 
 #define XRO3503_VCMO_DEFAULT_mV                    1750     // Default VCMO = 1750 mV
-#define XRO3503_VTESTG_DEFAULT_mV                  3300     // Default VTestG = 3300 mV
+#define XRO3503_VCMO_MIN_mV                        1500     // 1500 mV <= VCMO <= 2000 mV
+#define XRO3503_VCMO_MAX_mV                        2000
 
 #define TOTAL_DAC_NUM                              8
 
@@ -234,9 +239,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern uint16_t gFpaCtiaRef_mV;
    static uint16_t presentFpaCtiaRef_mV = XRO3503_CTIA_REF_DEFAULT_mV;
    extern uint16_t gFpaVTestG_mV;
+   static uint16_t presentFpaVTestG_mV = XRO3503_VTESTG_DEFAULT_mV;
    extern uint16_t gFpaCM_mV;
    static uint16_t presentFpaCM_mV = XRO3503_CM_DEFAULT_mV;
    extern uint16_t gFpaVCMO_mV;
+   static uint16_t presentFpaVCMO_mV = XRO3503_VCMO_DEFAULT_mV;
    extern uint8_t gFpaSubWindowMode;
    static uint8_t cfg_num = 0;
    //static uint32_t presentSensorWellDepth = 0;
@@ -404,51 +411,59 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
 
    // les DACs (1 à 8)
-   if (sw_init_done == 0)
-   {
-      // valeurs par défaut pour l'init
-      gFpaVTestG_mV = XRO3503_VTESTG_DEFAULT_mV;
-      gFpaVCMO_mV = XRO3503_VCMO_DEFAULT_mV;
-   }
+   ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)presentFpaDetectSub_mV);   // DAC1 -> DETECTSUB
+   ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)presentFpaCtiaRef_mV);     // DAC2 -> CTIA_REF
+   ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)presentFpaVTestG_mV);      // DAC3 -> VTESTG
+   ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)presentFpaCM_mV);          // DAC4 -> CM
+   ProximCfg.vdac_value[4] = FLEG_VccVoltage_To_DacWord((float)presentFpaVCMO_mV);        // DAC5 -> VCMO
+   ProximCfg.vdac_value[5] = 0;                                                           // DAC6 -> non connecté
+   ProximCfg.vdac_value[6] = 0;                                                           // DAC7 -> non connecté
+   ProximCfg.vdac_value[7] = 0;                                                           // DAC8 -> non connecté
 
-   ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)presentFpaDetectSub_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
-   ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)presentFpaCtiaRef_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
-   ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)gFpaVTestG_mV); // DAC3 -> VTESTG (current skimming and antibloom disabled)
-   ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)presentFpaCM_mV); // DAC4 -> CM 1.5V à 2V
-   ProximCfg.vdac_value[4] = FLEG_VccVoltage_To_DacWord((float)gFpaVCMO_mV); // DAC5 -> VCMO 1.5V à 2V
-   ProximCfg.vdac_value[5] = 0;                                   // DAC6 -> non connecté
-   ProximCfg.vdac_value[6] = 0;                                   // DAC7 -> non connecté
-   ProximCfg.vdac_value[7] = 0;                                   // DAC8 -> non connecté
-
-   gFpaVTestG_mV     = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[2]);
-   gFpaVCMO_mV       = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4]);
-
-   // DETECTSUB (VCC1)
+   // DETECTSUB
    if (gFpaDetectSub_mV != presentFpaDetectSub_mV)
    {
       if (gFpaDetectSub_mV >= XRO3503_DETECT_SUB_MIN_mV && gFpaDetectSub_mV <= XRO3503_DETECT_SUB_MAX_mV)
-         ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectSub_mV); // DAC1 -> DETECTSUB 2.9V à 3.5V
+         ProximCfg.vdac_value[0] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectSub_mV);
    }
    presentFpaDetectSub_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[0]);
    gFpaDetectSub_mV = presentFpaDetectSub_mV;
 
-   // CTIA_REF (VCC2)
+   // CTIA_REF
    if (gFpaCtiaRef_mV != presentFpaCtiaRef_mV)
    {
       if (gFpaCtiaRef_mV >= XRO3503_CTIA_REF_MIN_mV && gFpaCtiaRef_mV <= XRO3503_CTIA_REF_MAX_mV)
-         ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)gFpaCtiaRef_mV); // DAC2 -> CTIA_REF 2.1V à 2.8V
+         ProximCfg.vdac_value[1] = FLEG_VccVoltage_To_DacWord((float)gFpaCtiaRef_mV);
    }
    presentFpaCtiaRef_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[1]);
    gFpaCtiaRef_mV = presentFpaCtiaRef_mV;
 
-   // CM (VCC4)
+   // VTESTG
+   if (gFpaVTestG_mV != presentFpaVTestG_mV)
+   {
+      if (gFpaVTestG_mV >= XRO3503_VTESTG_MIN_mV && gFpaVTestG_mV <= XRO3503_VTESTG_MAX_mV)
+         ProximCfg.vdac_value[2] = FLEG_VccVoltage_To_DacWord((float)gFpaVTestG_mV);
+   }
+   presentFpaVTestG_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[2]);
+   gFpaVTestG_mV = presentFpaVTestG_mV;
+
+   // CM
    if (gFpaCM_mV != presentFpaCM_mV)
    {
       if (gFpaCM_mV >= XRO3503_CM_MIN_mV && gFpaCM_mV <= XRO3503_CM_MAX_mV)
-         ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)gFpaCM_mV); // DAC4 -> CM 1.5V à 2V
+         ProximCfg.vdac_value[3] = FLEG_VccVoltage_To_DacWord((float)gFpaCM_mV);
    }
    presentFpaCM_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[3]);
    gFpaCM_mV = presentFpaCM_mV;
+
+   // VCMO
+   if (gFpaVCMO_mV != presentFpaVCMO_mV)
+   {
+      if (gFpaVCMO_mV >= XRO3503_VCMO_MIN_mV && gFpaVCMO_mV <= XRO3503_VCMO_MAX_mV)
+         ProximCfg.vdac_value[4] = FLEG_VccVoltage_To_DacWord((float)gFpaVCMO_mV);
+   }
+   presentFpaVCMO_mV = (uint16_t)FLEG_DacWord_To_VccVoltage(ProximCfg.vdac_value[4]);
+   gFpaVCMO_mV = presentFpaVCMO_mV;
 
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal
    FPA_SendProximCfg(&ProximCfg, ptrA);
