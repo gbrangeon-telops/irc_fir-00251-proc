@@ -5,7 +5,7 @@
  * This file defines the camera flash settings file structure v2.
  *
  * Auto-generated flash settings file library.
- * Generated from the flash settings file structure definition XLS file version 2.13.0
+ * Generated from the flash settings file structure definition XLS file version 2.13.1
  * using generateIRCamFileCLib.m Matlab script.
  *
  * $Rev$
@@ -190,7 +190,7 @@ FlashSettings_FlashSettingsFileHeader_v2_t FlashSettings_FlashSettingsFileHeader
    /* SFWDisabled = */ 0,
    /* SDIDisabled = */ 0,
    /* CenterImageForced = */ 0,
-   /* FpaXroDetectSub = */ 2900,
+   /* FpaXroDetectSub = */ 3500,
    /* FpaXroCtiaRef = */ 2600,
    /* FpaXroCM = */ 1750,
    /* FpaXroCtiaBiasEnum = */ 15,
