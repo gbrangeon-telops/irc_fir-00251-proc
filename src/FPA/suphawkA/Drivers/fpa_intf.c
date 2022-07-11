@@ -339,12 +339,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // config du contrôleur de trigs
    ptrA->fpa_acq_trig_mode     = (uint32_t)MODE_INT_END_TO_TRIG_START;
    if (ptrA->fpa_diag_mode == 1) 
-      ptrA->fpa_acq_trig_mode  = (uint32_t)MODE_ITR_INT_END_TO_TRIG_START;
+      ptrA->fpa_acq_trig_mode  = (uint32_t)MODE_READOUT_END_TO_TRIG_START;  //  ENO: 11 juillet 2022: mode patron de tests toujours en MODE_READOUT_END_TO_TRIG_START car le patron de tests est toujours plus lent et MODE_READOUT_END_TO_TRIG_START est plus sécuritaire
       
    ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.frame_period_usec*1e-6F - (float)VHD_PIXEL_PIPE_DLY_SEC) * (float)VHD_CLK_100M_RATE_HZ);
    ptrA->fpa_xtra_trig_mode        = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
    ptrA->fpa_xtra_trig_ctrl_dly    = ptrA->fpa_acq_trig_ctrl_dly;
-   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ / (float)FPA_XTRA_TRIG_FREQ_MAX_HZ); //(uint32_t)(0.8F*(hh.frame_period_usec*1e-6F)* (float)VHD_CLK_100M_RATE_HZ);
+   ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ * 2.0F*(float)FPA_MAX_EXPOSURE*1e-6F); // ENO: 11 juillet 2022: le delai de timeout est egale à 2 fois la durée du temps d'exposition max pour securiser le mode MODE_READOUT_END_TO_TRIG_START.
    
    // fenetrage
    ptrA->xstart    = pGCRegs->OffsetX;
