@@ -865,6 +865,24 @@ IRC_Status_t Proc_Intc_Init()
       return IRC_FAILURE;
    }
 
+   /*** Note: moved here for QSPI early access ***/
+   /*
+    * Initialize the exception table.
+    */
+   Xil_ExceptionInit();
+
+   /*
+    * Register the interrupt controller handler with the exception table.
+    */
+   Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
+          (Xil_ExceptionHandler)XIntc_InterruptHandler,
+          &gProcIntc);
+
+   /*
+    * Enable exceptions.
+    */
+   Xil_ExceptionEnable();
+
    return IRC_SUCCESS;
 }
 
@@ -927,22 +945,23 @@ IRC_Status_t Proc_Intc_Start()
    XIntc_Enable(&gProcIntc, XPAR_MCU_MICROBLAZE_1_AXI_INTC_FLASHRESET_0_IP2INTC_IRPT_INTR);
 #endif
 
-   /*
-    * Initialize the exception table.
-    */
-   Xil_ExceptionInit();
-
-   /*
-    * Register the interrupt controller handler with the exception table.
-    */
-   Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-          (Xil_ExceptionHandler)XIntc_InterruptHandler,
-          &gProcIntc);
-
-   /*
-    * Enable exceptions.
-    */
-   Xil_ExceptionEnable();
+   /*** Note: moved to Proc_Intc_Init() for QSPI early access ***/
+//   /*
+//    * Initialize the exception table.
+//    */
+//   Xil_ExceptionInit();
+//
+//   /*
+//    * Register the interrupt controller handler with the exception table.
+//    */
+//   Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
+//          (Xil_ExceptionHandler)XIntc_InterruptHandler,
+//          &gProcIntc);
+//
+//   /*
+//    * Enable exceptions.
+//    */
+//   Xil_ExceptionEnable();
 
    return IRC_SUCCESS;
 }
