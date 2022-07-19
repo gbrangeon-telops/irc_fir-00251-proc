@@ -7,9 +7,9 @@
 -------------------------------------------------------------------------------
 --
 -- SVN modified fields:
--- $Revision: 12286 $
--- $Author: pdaraiche $
--- $LastChangedDate: 2013-01-25 14:24:16 -0500 (ven., 25 janv. 2013) $
+-- $Revision: 26972 $
+-- $Author: enofodjie $
+-- $LastChangedDate: 2021-11-18 15:25:09 -0500 (jeu., 18 nov. 2021) $
 --
 -------------------------------------------------------------------------------
 --
@@ -124,6 +124,17 @@
 #define TOTAL_DAC_NUM                     8
 
 #define MODEL_M100_FR_DIVIDER             1.65F          // Requis du PLM: FRmax M100 >= 125 Hz en pleine fenêtre
+
+// clk area (en provenance de fpa_define)
+#define  VHD_DEFINE_FPA_NOMINAL_MCLK_ID       0    // horloge nominale
+#define  VHD_DEFINE_FPA_MCLK1_ID              1    // horloge MCLK1
+#define  VHD_DEFINE_FPA_MCLK2_ID              2    // horloge MCLK2
+
+#define DEFINE_FPA_NOMINAL_MCLK_RATE_HZ       18000000
+#define DEFINE_FPA_FAST1_MCLK_RATE_HZ         (0.5*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)
+#define DEFINE_FPA_FAST2_MCLK_RATE_HZ         (2*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ) 
+
+#define AR_PRIVATE_STATUS_BASE_ADD         0x0800  // adresse de base des statuts specifiques ou privées
 
 struct s_ProximCfgConfig 
 {   
@@ -250,7 +261,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    extern float gFpaDetectorElectricalRefOffset;
    static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
    static float presentElectricalRefOffset = 0;      // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul
-   //extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
+   extern int32_t gFpaDebugRegA;                         // reservé ELCORR pour correction électronique (gain et/ou offset)
    //extern int32_t gFpaDebugRegB;                         // reservé
    extern int32_t gFpaDebugRegC;                         // reservé adc_clk_pipe_sel pour ajustemnt grossier phase adc_clk
    extern int32_t gFpaDebugRegD;                         // reservé adc_clk_source_phase pour ajustement fin phase adc_clk
@@ -291,15 +302,15 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //  itr forcé
    //if (pGCRegs->IntegrationMode == IM_IntegrateThenRead) // mode ITR
-      ptrA->itr = 1;
+      ptrA->roic_itr = 1;
    //else  // mode IWR
-   //   ptrA->itr = 0;
+   //   ptrA->roic_itr = 0;
    
    
    // config du contrôleur de trigs
-   // if (ptrA->itr == 1) {
-      ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_READOUT_END_TO_TRIG_START;
-      ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_readout_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
+  // if (ptrA->roic_itr == 1) {
+   ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_INT_END_TO_TRIG_START;
+   ptrA->fpa_acq_trig_ctrl_dly     = (uint32_t)((hh.mode_int_end_to_trig_start_dly_usec*1e-6F) * (float)VHD_CLK_100M_RATE_HZ);
    // }
    // else {
    //   ptrA->fpa_acq_trig_mode         = (uint32_t)MODE_ALL_END_TO_TRIG_START;
@@ -311,94 +322,119 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    
    // fenetrage
-   ptrA->xstart    = (uint32_t)pGCRegs->OffsetX;
-   ptrA->ystart    = (uint32_t)pGCRegs->OffsetY;
-   ptrA->xsize     = (uint32_t)pGCRegs->Width;
-   ptrA->ysize     = (uint32_t)pGCRegs->Height;
+   ptrA->roic_xstart    = (uint32_t)pGCRegs->OffsetX;
+   ptrA->roic_ystart    = (uint32_t)pGCRegs->OffsetY;
+   ptrA->roic_xsize     = (uint32_t)pGCRegs->Width;
+   ptrA->roic_ysize     = (uint32_t)pGCRegs->Height;
    
    // direction de lecture
-   ptrA->uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
+   ptrA->roic_uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
    
    // calculé specialement pour le ScorpioMW
-   Cmin  = (uint32_t)pGCRegs->OffsetX/4;
-   Cmax  = (uint32_t)pGCRegs->OffsetX/4 + (uint32_t)pGCRegs->Width/4 - 1;
-   Rmin  = (uint32_t)pGCRegs->OffsetY;
-   Rmax  = (uint32_t)pGCRegs->OffsetY + (uint32_t)pGCRegs->Height - 1;
+   Cmin  = ptrA->roic_xstart/4;
+   Cmax  = ptrA->roic_xstart/4 + ptrA->roic_xsize/4 - 1;
+   Rmin  = ptrA->roic_ystart;
+   Rmax  = ptrA->roic_ystart + ptrA->roic_ysize - 1;
     
    // config détecteur 
-   if (ptrA->uprow_upcol == 1){   
-      ptrA->windcfg_part1 = Rmin;
-      ptrA->windcfg_part2 = Rmax;
-      ptrA->windcfg_part3 = Cmin;
-      ptrA->windcfg_part4 = Cmax;
+   if (ptrA->roic_uprow_upcol == 1){   
+      ptrA->roic_windcfg_part1 = Rmin;
+      ptrA->roic_windcfg_part2 = Rmax;
+      ptrA->roic_windcfg_part3 = Cmin;
+      ptrA->roic_windcfg_part4 = Cmax;
    }
    else{   
-      ptrA->windcfg_part1 = Rmax;
-      ptrA->windcfg_part2 = Rmin;
-      ptrA->windcfg_part3 = Cmax;
-      ptrA->windcfg_part4 = Cmin;
+      ptrA->roic_windcfg_part1 = Rmax;
+      ptrA->roic_windcfg_part2 = Rmin;
+      ptrA->roic_windcfg_part3 = Cmax;
+      ptrA->roic_windcfg_part4 = Cmin;
    }
    
    //  windowing
-   ptrA->sizea_sizeb = 0;           // 0 --> toujours en mode windowing 2020-05-06 ODI: pour conservation de la calibration en sous-fenêtre
-   
-   // full_window_mode              // dit si le detecteur est reellement en pleine fentre car on ne peut plus se fier sur sizea_sizeb 
-   if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
-      ptrA->full_window_mode = 1;        // mode pleine fenetre
+   ptrA->roic_sizea_sizeb = 0;           // 0 --> toujours en mode windowing 2020-05-06 ODI: pour conservation de la calibration en sous-fenêtre
+   //if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+      //ptrA->roic_sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
 
    //  gain 
-   ptrA->gain = FPA_GAIN_0;   	//Low gain only
+   ptrA->roic_gain = FPA_GAIN_0;   	//Low gain only 
+   
+   ptrA->roic_reset_time_mclk  = (uint32_t)hh.fpa_reset_time_mclk;
       
    // GPOL voltage 
    if (sw_init_done == 0){
       ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord(700.0F, 6);
-      ptrA->gpol_code = (int32_t)ProximCfg.vdac_value[5];
+      ptrA->roic_gpol_code = (int32_t)ProximCfg.vdac_value[5];
    }      
    if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage){      // gFpaDetectorPolarizationVoltage est en milliVolt
       if ((gFpaDetectorPolarizationVoltage >= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MIN_mV) && (gFpaDetectorPolarizationVoltage <= (int16_t)SCORPIOMW_DET_BIAS_VOLTAGE_MAX_mV)){
-         ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // gpol_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
-         ptrA->gpol_code = (int32_t)ProximCfg.vdac_value[5];
+         ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord((float)gFpaDetectorPolarizationVoltage, 6);  // roic_gpol_code change si la nouvelle valeur est conforme. Sinon la valeur precedente est conservée. (voir FpaIntf_Ctor) pour la valeur d'initialisation
+         ptrA->roic_gpol_code = (int32_t)ProximCfg.vdac_value[5];
       }   
    }
-   presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->gpol_code, 6));
+   presentPolarizationVoltage = (int16_t)(FLEG_DacWord_To_VccVoltage((uint32_t)ptrA->roic_gpol_code, 6));
    gFpaDetectorPolarizationVoltage = presentPolarizationVoltage;                        
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 7; 
+      gFpaDebugRegF = 8; 
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
       
-   // quad2
-   ptrA->adc_quad2_en = 0;   //
+   ptrA->diag_ysize             = ptrA->roic_ysize;
+   ptrA->diag_xsize_div_tapnum  = ptrA->roic_xsize/(uint32_t)hh.tap_number;
+    
+   // quad2                                                                
+   ptrA->adc_quad2_en = 0;   //                                            
    ptrA->chn_diversity_en = ptrA->adc_quad2_en;                      // 
    
-   //
-   ptrA->line_period_pclk                  = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)+ hh.lovh_mclk) *  hh.pixnum_per_tap_per_mclk;
-   ptrA->readout_pclk_cnt_max              = ptrA->line_period_pclk * (ptrA->ysize + hh.fovh_line) + 1;                    //
+   // raw area 
+   ptrA->raw_area_line_start_num          = 1;
+   ptrA->raw_area_line_end_num            = ptrA->roic_ysize + ptrA->raw_area_line_start_num - 1;
+   ptrA->raw_area_line_period_pclk        = (ptrA->roic_xsize/((uint32_t)FPA_NUMTAPS * (uint32_t)hh.pixnum_per_tap_per_mclk)+ (uint32_t)hh.lovh_mclk) *  (uint32_t)hh.pixnum_per_tap_per_mclk;
+   ptrA->raw_area_sof_posf_pclk           = ptrA->raw_area_line_period_pclk * (ptrA->raw_area_line_start_num - 1) + 1;                 
+   ptrA->raw_area_eof_posf_pclk           = ptrA->raw_area_line_end_num * ptrA->raw_area_line_period_pclk - (uint32_t)(hh.lovh_mclk * hh.pixnum_per_tap_per_mclk);                 
+   ptrA->raw_area_sol_posl_pclk           = 1;                 
+   ptrA->raw_area_eol_posl_pclk           = (ptrA->roic_xsize/((uint32_t)FPA_NUMTAPS * (uint32_t)hh.pixnum_per_tap_per_mclk)) * (uint32_t)hh.pixnum_per_tap_per_mclk;
+   ptrA->raw_area_readout_pclk_cnt_max    = ptrA->raw_area_line_period_pclk * (ptrA->roic_ysize + (uint32_t)hh.fovh_line + ptrA->raw_area_line_start_num - 1) + 1;
+   ptrA->raw_area_lsync_start_posl_pclk   = 1;
+   ptrA->raw_area_lsync_end_posl_pclk     = 2;
+   ptrA->raw_area_lsync_num               = ptrA->raw_area_line_end_num;   
+   ptrA->raw_area_clk_id                  = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+  
+   // user area 
+   ptrA->user_area_line_start_num         = ptrA->raw_area_line_start_num;    // ligne de debut à 1 et comme on n'utilise plus fpa_data_valid, on a ne ligne avant les données
+   ptrA->user_area_line_end_num           = ptrA->raw_area_line_end_num;     
+   ptrA->user_area_sol_posl_pclk          = ptrA->raw_area_sol_posl_pclk;
+   ptrA->user_area_eol_posl_pclk          = ptrA->raw_area_eol_posl_pclk;         
+   ptrA->user_area_clk_id                 = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
    
-   ptrA->active_line_start_num             = 1;                    // pour le scorpiomw, numero de la première ligne active
-   ptrA->active_line_end_num               = ptrA->ysize + ptrA->active_line_start_num - 1;          // pour le scorpiomw, numero de la derniere ligne active
+   // definition de la zone a. Zone additionnelle de changement d'horloge
+   ptrA->clk_area_a_line_start_num        = ptrA->user_area_line_start_num;
+   ptrA->clk_area_a_line_end_num          = ptrA->user_area_line_end_num;
+   ptrA->clk_area_a_sol_posl_pclk         = ptrA->user_area_sol_posl_pclk;
+   ptrA->clk_area_a_eol_posl_pclk         = ptrA->user_area_eol_posl_pclk;   
+   ptrA->clk_area_a_clk_id                = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
+   ptrA->clk_area_a_spare                 = 0;
    
-   // nombre d'échantillons par canal  de carte ADC
-   ptrA->pix_samp_num_per_ch               = (uint32_t)((float)ADC_SAMPLING_RATE_HZ/(hh.pclk_rate_hz));
-   
-   // identificateurs de trames
-   ptrA->sof_posf_pclk                     = ptrA->line_period_pclk * (ptrA->active_line_start_num - 1) + 1;
-   ptrA->eof_posf_pclk                     = ptrA->active_line_end_num * ptrA->line_period_pclk - hh.lovh_mclk*hh.pixnum_per_tap_per_mclk;
-   ptrA->sol_posl_pclk                     = 1;
-   ptrA->eol_posl_pclk                     = (ptrA->xsize/((uint32_t)FPA_NUMTAPS * hh.pixnum_per_tap_per_mclk)) * hh.pixnum_per_tap_per_mclk;
-   ptrA->eol_posl_pclk_p1                  = ptrA->eol_posl_pclk + 1;
+   // definition de la zone b. Zone additionnelle de changement d'horloge
+   ptrA->clk_area_b_line_start_num        = ptrA->user_area_line_start_num;
+   ptrA->clk_area_b_line_end_num          = ptrA->user_area_line_end_num;  
+   ptrA->clk_area_b_sol_posl_pclk         = ptrA->user_area_sol_posl_pclk;         
+   ptrA->clk_area_b_eol_posl_pclk         = ptrA->user_area_eol_posl_pclk;      
+   ptrA->clk_area_b_clk_id                = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;                
+   ptrA->clk_area_b_spare                 = 0;  
+                        
+   ptrA->int_time_offset_mclk    = ptrA->roic_reset_time_mclk;
 
    // echantillons choisis
-   ptrA->good_samp_first_pos_per_ch        = ptrA->pix_samp_num_per_ch;     // position premier echantillon
-   ptrA->good_samp_last_pos_per_ch         = ptrA->pix_samp_num_per_ch;     // position dernier echantillon
+   ptrA->good_samp_first_pos_per_ch        = 1;     // n'est pas utilisé
+   ptrA->good_samp_last_pos_per_ch         = 1;     // n'est pas utilisé
    ptrA->hgood_samp_sum_num                = ptrA->good_samp_last_pos_per_ch - ptrA->good_samp_first_pos_per_ch + 1;
    ptrA->hgood_samp_mean_numerator         = (uint32_t)(exp2f((float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->hgood_samp_sum_num);                            
    ptrA->vgood_samp_sum_num                = ptrA->chn_diversity_en + 1;
    ptrA->vgood_samp_mean_numerator         = (uint32_t)(exp2f((float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->vgood_samp_sum_num);                              
       
    // calculs
-   ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;                                        
+   // ptrA->xsize_div_tapnum                  = ptrA->xsize/(uint32_t)FPA_NUMTAPS;
    
    // les DACs (1 à 8)
    ProximCfg.vdac_value[0]                 = FLEG_VccVoltage_To_DacWord(3300.0F, 1);      // VCC1 -> VDDA = 3300 mV
@@ -406,7 +442,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[2]                 = FLEG_VccVoltage_To_DacWord(3400.0F, 3);      // VCC3 -> VLED = 3400 mV  // pour allumer la LED
    ProximCfg.vdac_value[3]                 = FLEG_VccVoltage_To_DacWord(3300.0F, 4);      // VCC4 -> VDD  = 3300 mV
    ProximCfg.vdac_value[4]                 = FLEG_VccVoltage_To_DacWord(3000.0F, 5);      // VCC5 -> VR   = 3000 mV
-   ProximCfg.vdac_value[5]                 = ptrA->gpol_code;                             // VCC6 -> GPOL
+   ProximCfg.vdac_value[5]                 = ptrA->roic_gpol_code;                             // VCC6 -> GPOL
 
    // Reference of the tap (VCC7 ou DAC6)      
    if (gFpaDetectorElectricalTapsRef != presentElectricalTapsRef)
@@ -433,32 +469,113 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
  
    // gFpaDebugRegD dephasage fin des adc_clk 
    if (sw_init_done == 0)         
-      gFpaDebugRegD = 680;
+      gFpaDebugRegD = 64;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;  
    
    // Élargit le pulse de trig
    ptrA->fpa_stretch_acq_trig = (uint32_t)FPA_StretchAcqTrig;
    
-   // reorder column
-   ptrA->reorder_column = 0;
-   if ((ptrA->fpa_diag_mode == 0)&&(ptrA->uprow_upcol == 0))  // en mode détecteur et avec uprow_upcol=0 le scorpioMW inverse les colonnes
-      ptrA->reorder_column = 1; 
-      
+   // delai tir observé dans le mode où on ignore fpa_data_valid
+   ptrA->tir_dly_adc_clk              = (uint32_t)(hh.fpa_itr_delay_mclk);   
+   ptrA->nominal_clk_id_sample_pos    = 1;
+   ptrA->fast1_clk_id_sample_pos      = 1;
+   ptrA->fast2_clk_id_sample_pos      = 1;
+   
    // changement de cfg_num des qu'une nouvelle cfg est envoyée au vhd. Il s'en sert pour detecter le mode hors acquisition et ainsi en profite pour calculer le gain electronique
    if (cfg_num == 255)  // protection contre depassement
       cfg_num = 0;   
    cfg_num++;
    
-   ptrA->cfg_num  = (uint32_t)cfg_num;
+   ptrA->cfg_num  = (uint32_t)cfg_num;   
    
    // additional exposure time offset coming from flash 
-   ptrA->additional_fpa_int_time_offset = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
+   //ptrA->int_time_offset_mclk = (int32_t)((float)gFpaExposureTimeOffset*(float)FPA_MCLK_RATE_HZ/(float)EXPOSURE_TIME_BASE_CLOCK_FREQ_HZ);
    
    // envoi de la configuration de l'électronique de proximité (les DACs en l'occurrence) par un autre canal 
    FPA_SendProximCfg(&ProximCfg, ptrA);
 
    // envoi du reste de la config              
    WriteStruct(ptrA);
+   
+   // printf
+   if ((uint32_t)gFpaDebugRegA == 1)
+   {
+      FPA_PRINTF("ptrA->fpa_diag_mode                         = %d", ptrA->fpa_diag_mode                          );
+      FPA_PRINTF("ptrA->fpa_diag_type                         = %d", ptrA->fpa_diag_type                          );
+      FPA_PRINTF("ptrA->fpa_pwr_on                            = %d", ptrA->fpa_pwr_on                             );
+      FPA_PRINTF("ptrA->fpa_init_cfg                          = %d", ptrA->fpa_init_cfg                           );
+      FPA_PRINTF("ptrA->fpa_init_cfg_received                 = %d", ptrA->fpa_init_cfg_received                  );
+      FPA_PRINTF("ptrA->fpa_acq_trig_mode                     = %d", ptrA->fpa_acq_trig_mode                      );
+      FPA_PRINTF("ptrA->fpa_acq_trig_ctrl_dly                 = %d", ptrA->fpa_acq_trig_ctrl_dly                  );
+      FPA_PRINTF("ptrA->fpa_xtra_trig_mode                    = %d", ptrA->fpa_xtra_trig_mode                     );
+      FPA_PRINTF("ptrA->fpa_xtra_trig_ctrl_dly                = %d", ptrA->fpa_xtra_trig_ctrl_dly                 );
+      FPA_PRINTF("ptrA->fpa_trig_ctrl_timeout_dly             = %d", ptrA->fpa_trig_ctrl_timeout_dly              );
+      FPA_PRINTF("ptrA->fpa_stretch_acq_trig                  = %d", ptrA->fpa_stretch_acq_trig                   );
+      FPA_PRINTF("ptrA->fpa_intf_data_source                  = %d", ptrA->fpa_intf_data_source                   );
+      FPA_PRINTF("ptrA->roic_xstart                           = %d", ptrA->roic_xstart                            );
+      FPA_PRINTF("ptrA->roic_ystart                           = %d", ptrA->roic_ystart                            );
+      FPA_PRINTF("ptrA->roic_xsize                            = %d", ptrA->roic_xsize                             );
+      FPA_PRINTF("ptrA->roic_ysize                            = %d", ptrA->roic_ysize                             );
+      FPA_PRINTF("ptrA->roic_windcfg_part1                    = %d", ptrA->roic_windcfg_part1                     );
+      FPA_PRINTF("ptrA->roic_windcfg_part2                    = %d", ptrA->roic_windcfg_part2                     );
+      FPA_PRINTF("ptrA->roic_windcfg_part3                    = %d", ptrA->roic_windcfg_part3                     );
+      FPA_PRINTF("ptrA->roic_windcfg_part4                    = %d", ptrA->roic_windcfg_part4                     );
+      FPA_PRINTF("ptrA->roic_uprow_upcol                      = %d", ptrA->roic_uprow_upcol                       );
+      FPA_PRINTF("ptrA->roic_sizea_sizeb                      = %d", ptrA->roic_sizea_sizeb                       );
+      FPA_PRINTF("ptrA->roic_itr                              = %d", ptrA->roic_itr                               );
+      FPA_PRINTF("ptrA->roic_gain                             = %d", ptrA->roic_gain                              );
+      FPA_PRINTF("ptrA->roic_gpol_code                        = %d", ptrA->roic_gpol_code                         );
+      FPA_PRINTF("ptrA->roic_reset_time_mclk                  = %d", ptrA->roic_reset_time_mclk                   );
+      FPA_PRINTF("ptrA->diag_ysize                            = %d", ptrA->diag_ysize                             );
+      FPA_PRINTF("ptrA->diag_xsize_div_tapnum                 = %d", ptrA->diag_xsize_div_tapnum                  );
+      FPA_PRINTF("ptrA->real_mode_active_pixel_dly            = %d", ptrA->real_mode_active_pixel_dly             );
+      FPA_PRINTF("ptrA->adc_quad2_en                          = %d", ptrA->adc_quad2_en                           );
+      FPA_PRINTF("ptrA->chn_diversity_en                      = %d", ptrA->chn_diversity_en                       );
+      FPA_PRINTF("ptrA->raw_area_line_start_num               = %d", ptrA->raw_area_line_start_num                );
+      FPA_PRINTF("ptrA->raw_area_line_end_num                 = %d", ptrA->raw_area_line_end_num                  );
+      FPA_PRINTF("ptrA->raw_area_sof_posf_pclk                = %d", ptrA->raw_area_sof_posf_pclk                 );
+      FPA_PRINTF("ptrA->raw_area_eof_posf_pclk                = %d", ptrA->raw_area_eof_posf_pclk                 );
+      FPA_PRINTF("ptrA->raw_area_sol_posl_pclk                = %d", ptrA->raw_area_sol_posl_pclk                 );
+      FPA_PRINTF("ptrA->raw_area_eol_posl_pclk                = %d", ptrA->raw_area_eol_posl_pclk                 );
+      FPA_PRINTF("ptrA->raw_area_lsync_start_posl_pclk        = %d", ptrA->raw_area_lsync_start_posl_pclk         );
+      FPA_PRINTF("ptrA->raw_area_lsync_end_posl_pclk          = %d", ptrA->raw_area_lsync_end_posl_pclk           );
+      FPA_PRINTF("ptrA->raw_area_lsync_num                    = %d", ptrA->raw_area_lsync_num                     );
+      FPA_PRINTF("ptrA->raw_area_clk_id                       = %d", ptrA->raw_area_clk_id                        );
+      FPA_PRINTF("ptrA->raw_area_line_period_pclk             = %d", ptrA->raw_area_line_period_pclk              );
+      FPA_PRINTF("ptrA->raw_area_readout_pclk_cnt_max         = %d", ptrA->raw_area_readout_pclk_cnt_max          );
+      FPA_PRINTF("ptrA->user_area_line_start_num              = %d", ptrA->user_area_line_start_num               );
+      FPA_PRINTF("ptrA->user_area_line_end_num                = %d", ptrA->user_area_line_end_num                 );
+      FPA_PRINTF("ptrA->user_area_sol_posl_pclk               = %d", ptrA->user_area_sol_posl_pclk                );
+      FPA_PRINTF("ptrA->user_area_eol_posl_pclk               = %d", ptrA->user_area_eol_posl_pclk                );
+      FPA_PRINTF("ptrA->user_area_clk_id                      = %d", ptrA->user_area_clk_id                       );
+      FPA_PRINTF("ptrA->clk_area_a_line_start_num             = %d", ptrA->clk_area_a_line_start_num              );
+      FPA_PRINTF("ptrA->clk_area_a_line_end_num               = %d", ptrA->clk_area_a_line_end_num                );
+      FPA_PRINTF("ptrA->clk_area_a_sol_posl_pclk              = %d", ptrA->clk_area_a_sol_posl_pclk               );
+      FPA_PRINTF("ptrA->clk_area_a_eol_posl_pclk              = %d", ptrA->clk_area_a_eol_posl_pclk               );
+      FPA_PRINTF("ptrA->clk_area_a_clk_id                     = %d", ptrA->clk_area_a_clk_id                      );
+      FPA_PRINTF("ptrA->clk_area_a_spare                      = %d", ptrA->clk_area_a_spare                       );
+      FPA_PRINTF("ptrA->clk_area_b_line_start_num             = %d", ptrA->clk_area_b_line_start_num              );
+      FPA_PRINTF("ptrA->clk_area_b_line_end_num               = %d", ptrA->clk_area_b_line_end_num                ); 
+      FPA_PRINTF("ptrA->clk_area_b_sol_posl_pclk              = %d", ptrA->clk_area_b_sol_posl_pclk               );
+      FPA_PRINTF("ptrA->clk_area_b_eol_posl_pclk              = %d", ptrA->clk_area_b_eol_posl_pclk               );
+      FPA_PRINTF("ptrA->clk_area_b_clk_id                     = %d", ptrA->clk_area_b_clk_id                      );
+      FPA_PRINTF("ptrA->clk_area_b_spare                      = %d", ptrA->clk_area_b_spare                       );
+      FPA_PRINTF("ptrA->hgood_samp_sum_num                    = %d", ptrA->hgood_samp_sum_num                     );
+      FPA_PRINTF("ptrA->hgood_samp_mean_numerator             = %d", ptrA->hgood_samp_mean_numerator              );
+      FPA_PRINTF("ptrA->vgood_samp_sum_num                    = %d", ptrA->vgood_samp_sum_num                     );
+      FPA_PRINTF("ptrA->vgood_samp_mean_numerator             = %d", ptrA->vgood_samp_mean_numerator              );
+      FPA_PRINTF("ptrA->good_samp_first_pos_per_ch            = %d", ptrA->good_samp_first_pos_per_ch             );
+      FPA_PRINTF("ptrA->good_samp_last_pos_per_ch             = %d", ptrA->good_samp_last_pos_per_ch              );
+      FPA_PRINTF("ptrA->adc_clk_source_phase                  = %d", ptrA->adc_clk_source_phase                   );
+      FPA_PRINTF("ptrA->adc_clk_pipe_sel                      = %d", ptrA->adc_clk_pipe_sel                       );
+      FPA_PRINTF("ptrA->cfg_num                               = %d", ptrA->cfg_num                                );
+      FPA_PRINTF("ptrA->int_time_offset_mclk                  = %d", ptrA->int_time_offset_mclk                   );
+      FPA_PRINTF("ptrA->nominal_clk_id_sample_pos             = %d", ptrA->nominal_clk_id_sample_pos              ); 
+      FPA_PRINTF("ptrA->fast1_clk_id_sample_pos               = %d", ptrA->fast1_clk_id_sample_pos                ); 
+      FPA_PRINTF("ptrA->fast2_clk_id_sample_pos               = %d", ptrA->fast2_clk_id_sample_pos                ); 
+      // FPA_PRINTF("reference_image_mode_en                     = %d", reference_image_mode_en                      );
+      FPA_PRINTF("ptrA->single_samp_mode_en                   = %d", ptrA->single_samp_mode_en                    ); 
+   }
 }
 
 //--------------------------------------------------------------------------                                                                            

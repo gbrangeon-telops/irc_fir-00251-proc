@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 26574 $
+--!   $Author: enofodjie $
+--!   $Date: 2021-06-21 12:55:36 -0400 (lun., 21 juin 2021) $
+--!   $Id: scorpiomwA_digio_map.vhd 26574 2021-06-21 16:55:36Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00272-FleG/trunk/src/FPA/scorpiomwA/HDL/scorpiomwA_digio_map.vhd $
 ------------------------------------------------------------------
 
 library IEEE;
@@ -60,7 +60,7 @@ entity scorpiomwA_digio_map is
       FPA_DIGIO11    : in std_logic;
       FPA_DIGIO12    : in std_logic;
       
-     TRUE_FPA_INT_FDBK  : out std_logic;
+      TRUE_FPA_INT_FDBK  : out std_logic;
       
       FPA_DVALID_ERR : out std_logic
       
@@ -70,7 +70,6 @@ end scorpiomwA_digio_map;
 
 architecture rtl of scorpiomwA_digio_map is
    
-   constant C_FPA_MCLK_RATE_FACTOR_M1 : integer := DEFINE_FPA_MCLK_RATE_FACTOR - 1;
    constant C_FLEG_DLY_FACTOR         : integer := DEFINE_FLEG_LDO_DLY_FACTOR - DEFINE_FLEG_DAC_PWR_WAIT_FACTOR;
    
    component sync_reset
@@ -141,10 +140,10 @@ architecture rtl of scorpiomwA_digio_map is
    signal error_filt       : std_logic;
    
    signal fsm_sreset       : std_logic;
-   signal cnter            : integer range 0 to DEFINE_FPA_MCLK_RATE_FACTOR + 1;
    
    signal mclk_reg         : std_logic;
    signal mclk_pipe        : std_logic_vector(7 downto 0);
+   signal fpa_int_pipe     : std_logic_vector(7 downto 0);
    signal dval_en          : std_logic;
    
    signal dval_length_cnt     : unsigned(26 downto 0);
@@ -214,7 +213,29 @@ begin
          fpa_on_i <= not ARESET and FPA_PWR;
          fsm_sreset <= sreset or not FPA_PWR; 
       end if;   
-   end process;    
+   end process; 
+   
+   
+   --------------------------------------------------------- 
+   -- Pipe grossier sur l'integration
+   --------------------------------------------------------- 
+   Uf: process(MCLK_SOURCE)
+   begin
+      if rising_edge(MCLK_SOURCE) then
+         if sreset = '1' then 
+           fpa_int_pipe <= (others => '0'); 
+         
+         else
+            
+            if mclk_pipe(1) = '0' and mclk_pipe(0) = '1' then 
+               fpa_int_pipe(0) <= FPA_INT;
+               fpa_int_pipe(7 downto 1) <= fpa_int_pipe(6 downto 0); 
+            end if;
+            
+         end if;
+      end if;   
+   end process; 
+   
    
    --------------------------------------------------------- 
    -- registres dans iob
@@ -317,35 +338,6 @@ begin
             mclk_pipe(7 downto 1) <= mclk_pipe(6 downto 0); 
             mclk_reg <= mclk_pipe(0);   -- ajusté via simulation  
             
-            case mclk_fsm is 
-               
-               when run_st =>                  
-                  if PROG_EN = '1' then 
-                     mclk_fsm <= stop_st1;
-                  end if;
-               
-               when stop_st1 =>
-                  if mclk_reg = '0' then                          -- pour un arret sans troncature de mclk
-                     mclk_reg <= '0';
-                     mclk_fsm <= stop_st2;
-                  end if;       
-               
-               when stop_st2 =>
-                  mclk_reg <= '0';
-                  if PROG_CSN = '0' then 
-                     mclk_fsm <= wait_st;
-                  end if;
-               
-               when wait_st =>
-                  mclk_reg <= '0';
-                  if PROG_CSN = '1' and mclk_pipe(0) = '0' then  -- pour une reprise sans troncature de mclk
-                     mclk_fsm <= run_st; 
-                  end if;
-               
-               when others =>
-               
-            end case;
-            
          end if;
       end if;
    end process;  
@@ -367,7 +359,7 @@ begin
             mclk_temp <= '0';
             mclk_i <= '0';
             error_i <= '0';
-            data_valid_i <= '0';
+            data_valid_i <= '0'; -- not fpa_int_pipe(0) and fpa_int_pipe(7); -- on genere un data_valid factice lorsque le détecteur n'est pas allumé
             uprow_upcol_i <= '0';
             itr_i <= '0';
             
@@ -439,7 +431,7 @@ begin
                   prog_data_i <= PROG_SD;
                   sizea_sizeb_i <= SIZEA_SIZEB;
                   int_i <= FPA_INT;
-                  mclk_i <= (mclk_reg and PROG_CSN) or (PROG_SCLK and not PROG_CSN);  --
+                  mclk_i <= mclk_reg;  --
                   itr_i <= ITR;
                   uprow_upcol_i <= UPROW_UPCOL;
                   error_i <= error_iob and PROG_CSN; -- le signal d'erreur est considéré uniqument à la fin de la communicaio spi

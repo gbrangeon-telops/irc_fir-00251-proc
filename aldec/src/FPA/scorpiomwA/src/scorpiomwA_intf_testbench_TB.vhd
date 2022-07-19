@@ -50,7 +50,7 @@ architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
    
    constant CLK_100M_PERIOD         : time := 10 ns;
    constant CLK_80M_PERIOD          : time := 12.5 ns;
-   constant ACQ_TRIG_PERIOD         : time := 500 us;
+   constant ACQ_TRIG_PERIOD         : time := 50 us;
    constant DOUT_CLK_PERIOD         : time := 6.25 ns;   
    
    constant DAC_CFG_BASE_ADD       : natural := to_integer(unsigned(x"D00"));
@@ -111,7 +111,7 @@ architecture TB_ARCHITECTURE of scorpiomwA_intf_testbench_tb is
    signal user_ysize4 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(51*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(QWORDS_NUM*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector4              : unsigned(user_cfg_vector1'length-1 downto 0);
@@ -173,7 +173,7 @@ begin
    
    process
    begin
-      FPA_EXP_INFO.exp_time <= to_unsigned(15, FPA_EXP_INFO.exp_time'length);
+      FPA_EXP_INFO.exp_time <= to_unsigned(10, FPA_EXP_INFO.exp_time'length);
       FPA_EXP_INFO.exp_indx <= x"05";
       --FPA_EXP_INFO.exp_dval <='0';
       --wait for 300 ns;
@@ -206,7 +206,7 @@ begin
          user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          --         
          user_xsize3 <= 64;
-         user_ysize3 <= 64;
+         user_ysize3 <= 8;
          user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3); -- iwr
          --         
          --         user_xsize4 <= 1280;
@@ -277,7 +277,7 @@ begin
       end loop;
       
       
-      for ii in 0 to 51-1 loop 
+      for ii in 0 to QWORDS_NUM-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -294,7 +294,7 @@ begin
       
       wait for 50 ms;
       
-      for ii in 0 to 51-1 loop 
+      for ii in 0 to QWORDS_NUM-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -302,9 +302,9 @@ begin
          wait for 30 ns;
       end loop; 
       --      
-      wait for 50 ms;
+      wait for 100 ms;
       
-      for ii in 0 to 51-1 loop                     -- iwr mode
+      for ii in 0 to QWORDS_NUM-1 loop                     -- iwr mode
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -312,9 +312,9 @@ begin
          wait for 30 ns;
       end loop;
       --      
-      wait for 50 ms;
+      wait for 100 ms;
       
-      for ii in 0 to 51-1 loop                     -- retour en itr
+      for ii in 0 to QWORDS_NUM-1 loop                     -- retour en itr
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;

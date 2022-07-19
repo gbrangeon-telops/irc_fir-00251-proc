@@ -1,0 +1,4622 @@
+SCHM0104
+
+HEADER
+{
+ FREEID 13744
+ VARIABLES
+ {
+  #ARCHITECTURE="SCH"
+  #BLOCKTABLE_FILE="#table.bde"
+  #BLOCKTABLE_INCLUDED="1"
+  #DEFAULT_RANGE0="<range<name=\"adc_sync_flag\"><left=\"15\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE1="<range<name=\"err\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE2="<range<name=\"erri\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE3="<range<name=\"ref_valid\"><left=\"1\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #DEFAULT_RANGE4="<range<name=\"trig_ctler_stat\"><left=\"7\"><direction=\"downto\"><right=\"0\"><initial_value=\"\"><delay=\"\">>"
+  #ENTITY="scorpiomwA_readout_ctrler"
+  #LANGUAGE="VHDL"
+  AUTHOR="Unknown"
+  COMPANY="Unknown"
+  CREATIONDATE="5/12/2017"
+  PAGECOUNT="2"
+  TITLE="isc0804A_readout_module"
+ }
+ SYMBOL "#default" "fastrd2_area_info_mem" "fastrd2_area_info_mem"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="G_FIFO_FULL_THRESHOLD:integer:=448"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1569019362"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="49ad64bb-c568-4717-a37d-30fd08916338"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (-20,-20,460,240)
+    FREEID 62
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (0,-15,440,221)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (5,30,85,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (5,50,45,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (392,170,435,194)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 16
+    }
+    TEXT  31, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (261,110,435,134)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 30
+    }
+    TEXT  33, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (262,90,435,114)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 32
+    }
+    TEXT  35, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (248,130,435,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 34
+    }
+    TEXT  57, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (285,70,435,94)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 56
+     ORIENTATION 2
+    }
+    TEXT  59, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (5,130,188,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 58
+     ORIENTATION 2
+    }
+    TEXT  61, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (5,110,117,134)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 60
+    }
+    PIN  2, 0, 0
+    {
+     COORD (-20,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESET"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (-20,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (460,180)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ERR"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  30, 0, 0
+    {
+     COORD (460,120)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_FIFO_DATA"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="area_info_type"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  32, 0, 0
+    {
+     COORD (460,100)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_FIFO_DVAL"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  34, 0, 0
+    {
+     COORD (460,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_FIFO_EMPTY"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  56, 0, 0
+    {
+     COORD (460,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_FIFO_RD"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  58, 0, 0
+    {
+     COORD (-20,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #INITIAL_VALUE=""
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_INFO_AFULL"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE=""
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  60, 0, 0
+    {
+     COORD (-20,120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_INFO"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="area_info_type"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "fastrd2_clk_area_gen" "fastrd2_clk_area_gen"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.FPA_define.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1567064956"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="62da8319-5e33-4b6f-bfc1-f3891f2555e1"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,440,240)
+    FREEID 30
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,420,220)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,105,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,65,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  25, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,90,181,114)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 24
+    }
+    TEXT  27, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,154,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 26
+    }
+    TEXT  29, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (277,130,415,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 28
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESET"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  24, 0, 0
+    {
+     COORD (0,100)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="Record In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="CLK_AREA_CFG"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_CFG_TYPE"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (0,0,128)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  26, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_INFO_I"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  28, 0, 0
+    {
+     COORD (440,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_INFO_O"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="AREA_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "work" "fastrd2_raw_area_gen" "fastrd2_raw_area_gen"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library STD,IEEE,WORK;\n"+
+"use STD.STANDARD.all,ieee.std_logic_1164.all,work.fastrd2_define.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1624724970"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="b2708b7e-7f8a-4e30-8982-96c5a0f8c369"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,-20,440,240)
+    FREEID 18
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,420,220)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,105,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (303,130,415,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,65,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (353,170,415,194)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 8
+     ORIENTATION 2
+    }
+    TEXT  11, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,90,189,114)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 10
+    }
+    TEXT  13, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,170,91,194)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 12
+    }
+    TEXT  17, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (360,68,417,92)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 16
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESET"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (440,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_INFO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="AREA_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (440,180)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AFULL"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  10, 0, 0
+    {
+     COORD (0,100)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RAW_AREA_CFG"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_CFG_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  12, 0, 0
+    {
+     COORD (0,180)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="START"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  16, 0, 0
+    {
+     COORD (440,80)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #INITIAL_VALUE=""
+      #LABEL="Out"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED=""
+      #NAME="DONE"
+      #NUMBER="1"
+      #SIDE="right"
+      #VHDL_TYPE=""
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (128,128,128)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "fastrd2_user_area_gen" "fastrd2_user_area_gen"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #HDL_ENTRIES=
+"library IEEE,WORK;\n"+
+"use ieee.std_logic_1164.all,work.FPA_define.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1566925117"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="62da8319-5e33-4b6f-bfc1-f3891f2555e1"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,440,240)
+    FREEID 30
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,420,220)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,105,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,50,65,74)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  25, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,90,196,114)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 24
+    }
+    TEXT  27, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,130,154,154)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 26
+    }
+    TEXT  29, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (277,130,415,154)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 28
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESET"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,60)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  24, 0, 0
+    {
+     COORD (0,100)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="USER_AREA_CFG"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_CFG_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  26, 0, 0
+    {
+     COORD (0,140)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_INFO_I"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  28, 0, 0
+    {
+     COORD (440,140)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_INFO_O"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="AREA_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "gh_stretch" "gh_stretch"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="stretch_count:INTEGER:=1023"
+    #HDL_ENTRIES=
+"library STD,IEEE;\n"+
+"use STD.STANDARD.all,ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1510244733"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="344ecc69-f62f-4409-96b9-54635549fbac"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,140,100)
+    FREEID 10
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,120,100)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,10,65,34)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (98,70,115,94)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,48,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,70,41,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 8
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,20)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (140,80)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="Q"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="rst"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="D"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "#default" "gh_stretch" "gh_stretch"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #GENERIC0="stretch_count:INTEGER:=1023"
+    #HDL_ENTRIES=
+"library STD,IEEE;\n"+
+"use STD.STANDARD.all,ieee.std_logic_1164.all;"
+    #LANGUAGE="VHDL"
+    #MODIFIED="1510244733"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="c7c6571d-a12a-4106-952c-939ec9e2647f"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,0,140,100)
+    FREEID 10
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,0,120,100)
+    }
+    TEXT  3, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,10,65,34)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 2
+    }
+    TEXT  5, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (98,70,115,94)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 4
+    }
+    TEXT  7, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,30,48,54)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 6
+    }
+    TEXT  9, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,70,41,94)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 8
+    }
+    PIN  2, 0, 0
+    {
+     COORD (0,20)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  4, 0, 0
+    {
+     COORD (140,80)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="Q"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (-20,0), (0,0) )
+     }
+    }
+    PIN  6, 0, 0
+    {
+     COORD (0,40)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="rst"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  8, 0, 0
+    {
+     COORD (0,80)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="D"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="STD_LOGIC"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+ SYMBOL "work" "scorpiomwA_readout_kernel" "scorpiomwA_readout_kernel"
+ {
+  HEADER
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DESCRIPTION=""
+    #LANGUAGE="VHDL"
+    #MODIFIED="1656184080"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="3f5a62f4-9928-4d06-936e-4d34feb5aa4a"
+   }
+  }
+  PAGE "" 
+  {
+   PAGEHEADER
+   {
+    RECT (0,260,380,1500)
+    FREEID 178
+   }
+   
+   BODY
+   {
+    RECT  1, -1, 0
+    {
+     VARIABLES
+     {
+      #OUTLINE_FILLING="1"
+     }
+     AREA (20,277,360,1489)
+     FILL (0,(198,198,198),0)
+    }
+    TEXT  53, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,330,105,354)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 52
+    }
+    TEXT  55, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,350,65,374)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 54
+    }
+    TEXT  63, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (202,670,355,694)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 62
+    }
+    TEXT  65, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (273,990,355,1014)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 64
+    }
+    TEXT  81, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,610,107,634)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 80
+    }
+    TEXT  83, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,670,171,694)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 82
+    }
+    TEXT  85, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,730,143,754)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 84
+     ORIENTATION 2
+    }
+    TEXT  101, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (137,690,355,714)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 100
+    }
+    TEXT  117, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,830,167,854)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 116
+    }
+    TEXT  119, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (115,870,355,894)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 118
+     ORIENTATION 2
+    }
+    TEXT  121, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,450,212,474)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 120
+    }
+    TEXT  123, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,430,199,454)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 122
+    }
+    TEXT  125, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,410,198,434)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 124
+    }
+    TEXT  129, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,390,175,414)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 128
+     ORIENTATION 2
+    }
+    TEXT  133, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (251,750,355,774)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 132
+    }
+    TEXT  135, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (166,810,355,834)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 134
+    }
+    TEXT  137, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,750,118,774)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 136
+     ORIENTATION 2
+    }
+    TEXT  149, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,630,111,654)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 148
+    }
+    TEXT  151, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,790,234,814)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 150
+    }
+    TEXT  153, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (210,550,355,574)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 152
+    }
+    TEXT  157, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,930,137,954)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 156
+    }
+    TEXT  159, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,950,247,974)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 158
+    }
+    TEXT  161, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,970,260,994)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 160
+    }
+    TEXT  163, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (184,850,355,874)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 162
+     ORIENTATION 2
+    }
+    TEXT  165, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (172,770,355,794)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 164
+    }
+    TEXT  167, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,1010,177,1034)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 166
+    }
+    TEXT  171, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (24,708,133,732)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 170
+    }
+    TEXT  173, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,1110,205,1134)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 172
+    }
+    TEXT  175, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (179,1090,355,1114)
+     ALIGN 6
+     MARGINS (1,1)
+     PARENT 174
+     ORIENTATION 2
+    }
+    TEXT  177, 0, 0
+    {
+     TEXT "$#NAME"
+     RECT (25,1050,205,1074)
+     ALIGN 4
+     MARGINS (1,1)
+     PARENT 176
+     ORIENTATION 2
+    }
+    PIN  52, 0, 0
+    {
+     COORD (0,340)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ARESET"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  54, 0, 0
+    {
+     COORD (0,360)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  62, 0, 0
+    {
+     COORD (380,680)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="READOUT_INFO"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="READOUT_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  64, 0, 0
+    {
+     COORD (380,1000)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ERR(1:0)"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  80, 0, 0
+    {
+     COORD (0,620)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_INT"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  82, 0, 0
+    {
+     COORD (0,680)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="FPA_INTF_CFG"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="FPA_INTF_CFG_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  84, 0, 0
+    {
+     COORD (0,740)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="GEN_START"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  100, 0, 0
+    {
+     COORD (380,700)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #DOWNTO="1"
+      #LABEL="Bus Out"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ADC_SYNC_FLAG(15:0)"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,3, (0,0,128)
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  116, 0, 0
+    {
+     COORD (0,840)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ADC_REF_CLK"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  118, 0, 0
+    {
+     COORD (380,880)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #DOWNTO="1"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ELCORR_REF_VALID(1:0)"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  120, 0, 0
+    {
+     COORD (0,460)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_FIFO_EMPTY"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  122, 0, 0
+    {
+     COORD (0,440)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="AREA_FIFO_DATA"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_INFO_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  124, 0, 0
+    {
+     COORD (0,420)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_FIFO_DVAL"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  128, 0, 0
+    {
+     COORD (0,400)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="AREA_FIFO_RD"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  132, 0, 0
+    {
+     COORD (380,760)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_MCLK"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  134, 0, 0
+    {
+     COORD (380,820)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="IMG_IN_PROGRESS"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  136, 0, 0
+    {
+     COORD (0,760)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="GEN_RST"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  148, 0, 0
+    {
+     COORD (0,640)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ACQ_INT"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  150, 0, 0
+    {
+     COORD (0,800)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="NOMINAL_MCLK_RAW"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  152, 0, 0
+    {
+     COORD (380,560)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="RAW_WINDOW"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE="AREA_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  156, 0, 0
+    {
+     COORD (0,940)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ACQ_MODE"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  158, 0, 0
+    {
+     COORD (0,960)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="ACQ_MODE_FIRST_INT"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  160, 0, 0
+    {
+     COORD (0,980)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="NACQ_MODE_FIRST_INT"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  162, 0, 0
+    {
+     COORD (380,860)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_DATA_VALID"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  164, 0, 0
+    {
+     COORD (380,780)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_INACTIVE_INT"
+      #NUMBER="0"
+      #SIDE="right"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  166, 0, 0
+    {
+     COORD (0,1020)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_POWERED"
+      #NUMBER="0"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  170, 0, 0
+    {
+     COORD (0,720)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LABEL="In"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #MODIFIED=""
+      #NAME="GEN_DONE"
+      #NUMBER="1"
+      #SIDE="left"
+     }
+     LINE  1, 0, 0
+     {
+      OUTLINE 0,1, (128,128,128)
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  172, 0, 0
+    {
+     COORD (0,1120)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="PROG_MCLK_RAW"
+      #NUMBER="0"
+      #SIDE="left"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+    PIN  174, 0, 0
+    {
+     COORD (380,1100)
+     VARIABLES
+     {
+      #DIRECTION="IN"
+      #INITIAL_VALUE=""
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="OTHER"
+      #NAME="FPA_PROG_MODE"
+      #NUMBER="0"
+      #SIDE="right"
+      #VHDL_TYPE=""
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (-20,0) )
+     }
+    }
+    PIN  176, 0, 0
+    {
+     COORD (0,1060)
+     VARIABLES
+     {
+      #DIRECTION="OUT"
+      #LENGTH="20"
+      #MDA_RECORD_TOKEN="RECORD"
+      #NAME="CLK_AREA_CFG_B"
+      #NUMBER="0"
+      #SIDE="left"
+      #VHDL_TYPE="AREA_CFG_TYPE"
+     }
+     LINE  2, 0, 0
+     {
+      POINTS ( (0,0), (20,0) )
+     }
+    }
+   }
+  }
+ }
+}
+
+PAGE ""
+{
+ PAGEHEADER
+ {
+  PAGESIZE (6200,2200)
+  MARGINS (200,200,200,200)
+  RECT (0,0,0,0)
+ }
+ 
+ BODY
+ {
+  NET WIRE  1, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ARESET"
+   }
+  }
+  INSTANCE  593, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="ADC_REF_CLK"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4340,1140)
+   VERTEXES ( (2,13080) )
+  }
+  TEXT  595, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4071,1123,4280,1158)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 593
+   ORIENTATION 2
+  }
+  VHDLDESIGNUNITHDR  612, 0, 0
+  {
+   LABEL "Design Unit Header"
+   TEXT 
+"library IEEE;\n"+
+"use IEEE.std_logic_1164.all;\n"+
+"use IEEE.numeric_std.all;\n"+
+"use work.fpa_define.all;\n"+
+"use work.fastrd2_define.all;\n"+
+"\n"+
+"library work;\n"+
+"library work;"
+   RECT (200,200,600,440)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(239,235,255),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  INSTANCE  1051, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="FPA_INTF_CFG"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="fpa_intf_cfg_type"
+   }
+   COORD (920,1220)
+  }
+  TEXT  1052, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (652,1203,869,1238)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1051
+  }
+  INSTANCE  1192, 5, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="fastrd2_user_area_gen"
+    #CUSTOM_NAME=""
+    #IMPL="rtl"
+    #LIBRARY="#default"
+    #REFERENCE="U2"
+    #SYMBOL="fastrd2_user_area_gen"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="62da8319-5e33-4b6f-bfc1-f3891f2555e1"
+   }
+   COORD (1380,600)
+   VERTEXES ( (2,10477), (24,10476), (28,10482), (6,12234), (26,10480) )
+  }
+  TEXT  1193, 5, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (1400,565,1439,600)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 1192
+  }
+  TEXT  1197, 5, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (1400,820,1702,855)
+   MARGINS (1,1)
+   PARENT 1192
+  }
+  INSTANCE  1550, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="scorpiomwA_readout_kernel"
+    #CUSTOM_NAME=""
+    #IMPL="rtl"
+    #LIBRARY="work"
+    #NO_CONF="1"
+    #REFERENCE="U5"
+    #SYMBOL="scorpiomwA_readout_kernel"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="3f5a62f4-9928-4d06-936e-4d34feb5aa4a"
+   }
+   COORD (4520,300)
+   VERTEXES ( (52,13243), (54,13057), (62,13043), (64,13389), (80,13049), (82,13047), (84,13037), (100,13041), (116,13079), (118,13039), (120,13092), (122,13088), (124,13090), (128,13094), (132,13045), (134,13053), (136,13052), (148,13055), (150,13077), (152,13599), (156,13198), (158,13200), (160,13202), (162,13083), (164,13081), (166,13306), (170,13637), (172,13660), (176,13697), (174,13724) )
+  }
+  TEXT  1551, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (4520,1800,4891,1835)
+   MARGINS (1,1)
+   PARENT 1550
+  }
+  TEXT  1555, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4540,545,4579,580)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 1550
+  }
+  INSTANCE  1723, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="MCLK_SOURCE"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (360,660)
+   VERTEXES ( (2,12504) )
+  }
+  TEXT  1724, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (88,643,309,678)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 1723
+  }
+  INSTANCE  2984, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="fastrd2_area_info_mem"
+    #CUSTOM_NAME=""
+    #GENERIC0="G_FIFO_FULL_THRESHOLD : integer := 448"
+    #IMPL="SCH"
+    #LIBRARY="#default"
+    #NO_CONF="1"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U6"
+    #SYMBOL="fastrd2_area_info_mem"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="49ad64bb-c568-4717-a37d-30fd08916338"
+   }
+   COORD (3600,620)
+   VERTEXES ( (2,11621), (60,11665), (58,11663), (4,12272), (56,13093), (32,13089), (30,13087), (34,13091), (16,13240) )
+  }
+  TEXT  2985, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (3600,840,3910,875)
+   MARGINS (1,1)
+   PARENT 2984
+  }
+  TEXT  2989, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (3600,565,3639,600)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 2984
+  }
+  INSTANCE  3342, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="ERR(1:0)"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (5860,1420)
+  }
+  TEXT  3343, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5912,1403,6035,1438)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 3342
+  }
+  INSTANCE  4408, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_INT"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4340,920)
+   VERTEXES ( (2,13050) )
+  }
+  TEXT  4409, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4159,903,4280,938)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 4408
+  }
+  NET WIRE  4410, 0, 0
+  TEXT  4466, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4349,1011,4492,1040)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13095
+  }
+  TEXT  4473, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (389,751,532,780)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12498
+  }
+  INSTANCE  6484, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="gh_stretch"
+    #CUSTOM_NAME=""
+    #GENERIC0="stretch_count : INTEGER := 10"
+    #LIBRARY="#default"
+    #NO_CONF="1"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U8"
+    #SYMBOL="gh_stretch"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="344ecc69-f62f-4409-96b9-54635549fbac"
+   }
+   COORD (5580,1200)
+   VERTEXES ( (2,13455), (6,13457), (8,13469), (4,13459) )
+  }
+  TEXT  6485, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5600,1165,5639,1200)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 6484
+  }
+  TEXT  6489, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (5580,1300,5718,1335)
+   MARGINS (1,1)
+   PARENT 6484
+  }
+  NET WIRE  6503, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ERR(1)"
+   }
+  }
+  TEXT  6505, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5740,1251,5821,1280)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13477
+  }
+  TEXT  6519, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5455,1211,5551,1240)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13476
+  }
+  TEXT  6521, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5486,1190,5534,1219)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13475
+  }
+  TEXT  6542, 0, 0
+  {
+   TEXT "@GENERIC_ACTUAL_VALUES()"
+   RECT (5520,1340,5777,1373)
+   PARENT 6484
+  }
+  TEXT  7361, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (403,611,517,640)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12501
+  }
+  TEXT  7371, 5, 0
+  {
+   TEXT "$#NAME"
+   RECT (1243,611,1357,640)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 10485
+  }
+  TEXT  7381, 5, 0
+  {
+   TEXT "$#NAME"
+   RECT (1963,611,2077,640)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 9766
+  }
+  INSTANCE  7835, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="OTHER"
+    #REFERENCE="REF_VALID(1:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1180)
+   ORIENTATION 2
+   VERTEXES ( (2,13040) )
+  }
+  TEXT  7836, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5040,1163,5258,1198)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 7835
+  }
+  NET BUS  8478, 0, 0
+  {
+   VARIABLES
+   {
+    #DOWNTO="1"
+    #NAME="ADC_SYNC_FLAG(15:0)"
+   }
+  }
+  INSTANCE  8504, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #LIBRARY="#terminals"
+    #REFERENCE="ADC_SYNC_FLAG(15:0)"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1000)
+   VERTEXES ( (2,13042) )
+  }
+  TEXT  8505, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5032,983,5359,1018)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 8504
+  }
+  INSTANCE  8509, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusOutput"
+    #CUSTOM_NAME=""
+    #IS_UNCONSTRAINED_PORT="1"
+    #LIBRARY="#terminals"
+    #MDA_RECORD_TOKEN="RECORD"
+    #REFERENCE="READOUT_INFO"
+    #SYMBOL="BusOutput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+    #VHDL_TYPE="READOUT_INFO_TYPE"
+   }
+   COORD (4980,980)
+   VERTEXES ( (2,13044) )
+  }
+  TEXT  8510, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5032,963,5262,998)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 8509
+  }
+  NET RECORD  8514, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="RECORD8514"
+    #VHDL_TYPE="readout_info_type"
+    READOUT_INFO_TYPE=""
+    RECORD=""
+   }
+  }
+  INSTANCE  8600, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="fastrd2_raw_area_gen"
+    #CUSTOM_NAME=""
+    #LIBRARY="work"
+    #NO_CONF="1"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U4"
+    #SYMBOL="fastrd2_raw_area_gen"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="b2708b7e-7f8a-4e30-8982-96c5a0f8c369"
+   }
+   COORD (600,600)
+   VERTEXES ( (2,12500), (4,10479), (6,12503), (8,9868), (10,12530), (12,12497), (16,13326) )
+  }
+  TEXT  8601, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (620,565,659,600)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 8600
+  }
+  TEXT  8605, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (620,820,912,855)
+   MARGINS (1,1)
+   PARENT 8600
+  }
+  INSTANCE  8672, 5, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="fastrd2_clk_area_gen"
+    #CUSTOM_NAME=""
+    #IMPL="rtl"
+    #LIBRARY="#default"
+    #NO_CONF="1"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U10"
+    #SYMBOL="fastrd2_clk_area_gen"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="62da8319-5e33-4b6f-bfc1-f3891f2555e1"
+   }
+   COORD (2140,600)
+   VERTEXES ( (2,9683), (24,9675), (26,10481), (28,9670), (6,12261) )
+   PINPROP 26,"#PIN_COMMENT",""
+   PINPROP 26,"#PIN_STATE","0"
+   PINPROP 24,"#PIN_COMMENT",""
+   PINPROP 24,"#PIN_STATE","0"
+   PINPROP 6,"#PIN_COMMENT",""
+   PINPROP 6,"#PIN_STATE","0"
+   PINPROP 2,"#PIN_COMMENT",""
+   PINPROP 2,"#PIN_STATE","0"
+   PINPROP 28,"#PIN_COMMENT",""
+   PINPROP 28,"#PIN_STATE","0"
+  }
+  TEXT  8673, 5, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2160,565,2215,600)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 8672
+  }
+  TEXT  8677, 5, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (2160,820,2441,855)
+   MARGINS (1,1)
+   PARENT 8672
+  }
+  INSTANCE  8694, 8, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="fastrd2_clk_area_gen"
+    #CUSTOM_NAME=""
+    #IMPL="rtl"
+    #LIBRARY="#default"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U1"
+    #SYMBOL="fastrd2_clk_area_gen"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="62da8319-5e33-4b6f-bfc1-f3891f2555e1"
+   }
+   COORD (2860,600)
+   VERTEXES ( (2,9679), (24,9672), (26,9671), (28,11664), (6,12258) )
+  }
+  TEXT  8696, 12, 0
+  {
+   TEXT "$#NAME"
+   RECT (2683,611,2797,640)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 9764
+  }
+  TEXT  8700, 12, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (2880,565,2919,600)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 8694
+  }
+  TEXT  8701, 8, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (2880,820,3161,855)
+   MARGINS (1,1)
+   PARENT 8694
+  }
+  NET RECORD  8759, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="USER_AREA_CFG"
+    #VHDL_TYPE="AREA_CFG_TYPE"
+    AREA_CFG_TYPE=""
+    RECORD=""
+   }
+  }
+  TEXT  8761, 5, 0
+  {
+   TEXT "$#NAME"
+   RECT (1176,671,1384,700)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 10484
+  }
+  NET RECORD  8784, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="AREA_INFO_1"
+    #VHDL_TYPE="area_info_type"
+    AREA_INFO_TYPE=""
+    RECORD=""
+   }
+  }
+  NET RECORD  8810, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="AREA_INFO_2"
+    #VHDL_TYPE="area_info_type"
+    AREA_INFO_TYPE=""
+    RECORD=""
+   }
+  }
+  NET RECORD  8830, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="AREA_INFO_3"
+    #VHDL_TYPE="area_info_type"
+    AREA_INFO_TYPE=""
+    RECORD=""
+   }
+  }
+  TEXT  8835, 5, 0
+  {
+   TEXT "$#NAME"
+   RECT (1932,671,2148,700)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 9762
+  }
+  TEXT  8846, 12, 0
+  {
+   TEXT "$#NAME"
+   RECT (2632,671,2849,700)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 9761
+  }
+  TEXT  9000, 5, 0
+  {
+   TEXT "$#NAME"
+   RECT (1893,710,2054,739)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 10487
+  }
+  TEXT  9004, 7, 0
+  {
+   TEXT "$#NAME"
+   RECT (1105,712,1264,739)
+   ALIGN 9
+   PARENT 10486
+  }
+  TEXT  9008, 12, 0
+  {
+   TEXT "$#NAME"
+   RECT (2640,710,2801,739)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 9760
+  }
+  NET RECORD  9012, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="AREA_INFO_4"
+    #VHDL_TYPE="area_info_type"
+    AREA_INFO_TYPE=""
+    RECORD=""
+   }
+  }
+  TEXT  9013, 8, 0
+  {
+   TEXT "$#NAME"
+   RECT (3404,711,3565,740)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 11697
+  }
+  NET WIRE  9028, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="AREA_ERR"
+   }
+  }
+  TEXT  9029, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4076,771,4204,800)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13242
+  }
+  INSTANCE  9055, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="gh_stretch"
+    #CUSTOM_NAME=""
+    #GENERIC0="stretch_count : INTEGER := 10"
+    #LIBRARY="#default"
+    #NO_CONF="1"
+    #PRAGMED_GENERICS=""
+    #REFERENCE="U9"
+    #SYMBOL="gh_stretch"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="c7c6571d-a12a-4106-952c-939ec9e2647f"
+   }
+   COORD (5580,1440)
+   VERTEXES ( (2,13464), (6,13462), (8,13467), (4,13466) )
+  }
+  TEXT  9060, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5600,1405,5639,1440)
+   ALIGN 8
+   MARGINS (1,1)
+   PARENT 9055
+  }
+  TEXT  9061, 0, 0
+  {
+   TEXT "$#COMPONENT"
+   RECT (5580,1540,5718,1575)
+   MARGINS (1,1)
+   PARENT 9055
+  }
+  TEXT  9062, 0, 0
+  {
+   TEXT "@GENERIC_ACTUAL_VALUES()"
+   RECT (5520,1580,5777,1613)
+   PARENT 9055
+  }
+  TEXT  9063, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5440,1451,5536,1480)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13478
+  }
+  TEXT  9065, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5466,1430,5514,1459)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13479
+  }
+  NET WIRE  9067, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ERR(0)"
+   }
+  }
+  TEXT  9069, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5739,1491,5820,1520)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13480
+   ORIENTATION 2
+  }
+  TEXT  9070, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5420,1490,5548,1519)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13481
+   ORIENTATION 2
+  }
+  NET RECORD  9133, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="RAW_AREA_CFG"
+    #VHDL_TYPE="AREA_CFG_TYPE"
+    AREA_CFG_TYPE=""
+    RECORD=""
+   }
+  }
+  TEXT  9135, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (362,671,559,700)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12532
+  }
+  SIGNALASSIGN  9275, 0, 0
+  {
+   LABEL "SignalAssignments_1"
+   TEXT 
+"RAW_AREA_CFG        <= FPA_INTF_CFG.RAW_AREA;\n"+
+"USER_AREA_CFG    \t  <= FPA_INTF_CFG.USER_AREA;\n"+
+"CLK_AREA_CFG_A  \t  <= FPA_INTF_CFG.CLK_AREA_A;\n"+
+"-- CLK_AREA_CFG_B \t  <= FPA_INTF_CFG.CLK_AREA_B;\n"+
+"\n"+
+"\n"+
+""
+   RECT (940,1140,1820,1320)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  NET WIRE  9429, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="DOWNSTREAM_AFULL"
+   }
+  }
+  TEXT  9433, 7, 0
+  {
+   TEXT "$#NAME"
+   RECT (1030,751,1291,780)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 9870
+  }
+  VTX  9670, 0, 0
+  {
+   COORD (2580,740)
+  }
+  VTX  9671, 0, 0
+  {
+   COORD (2860,740)
+  }
+  VTX  9672, 0, 0
+  {
+   COORD (2860,700)
+  }
+  VTX  9673, 0, 0
+  {
+   COORD (2640,700)
+  }
+  VTX  9674, 0, 0
+  {
+   COORD (1920,700)
+  }
+  VTX  9675, 0, 0
+  {
+   COORD (2140,700)
+  }
+  VTX  9678, 0, 0
+  {
+   COORD (2640,640)
+  }
+  VTX  9679, 0, 0
+  {
+   COORD (2860,640)
+  }
+  VTX  9682, 0, 0
+  {
+   COORD (1920,640)
+  }
+  VTX  9683, 0, 0
+  {
+   COORD (2140,640)
+  }
+  RECORD  9760, 14, 0
+  {
+   NET 8830
+   VTX 9670, 9671
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  9761, 12, 0
+  {
+   NET 12524
+   VTX 9672, 9673
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  9762, 5, 0
+  {
+   NET 12523
+   VTX 9674, 9675
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  9764, 12, 0
+  {
+   NET 13337
+   VTX 9678, 9679
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  9766, 5, 0
+  {
+   NET 13337
+   VTX 9682, 9683
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  9809, 0, 0
+  {
+   OUTLINE 0,1, (0,0,0)
+   TEXT "scorpiomwA readout crtler"
+   RECT (2280,220,3663,355)
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (48,0,0,400,0,0,0,"Arial")
+   FILL (0,(206,255,206),0)
+  }
+  VTX  9868, 0, 0
+  {
+   COORD (1040,780)
+  }
+  VTX  9869, 0, 0
+  {
+   COORD (1280,780)
+  }
+  WIRE  9870, 6, 0
+  {
+   NET 9429
+   VTX 9868, 9869
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  10104, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (3402,631,3516,660)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 11675
+  }
+  TEXT  10191, 0, 0
+  {
+   TEXT "@GENERIC_ACTUAL_VALUES()"
+   RECT (3600,880,4086,913)
+   PARENT 2984
+  }
+  RECT  10420, -1, 0
+  {
+   OUTLINE 0,1, (0,0,0)
+   AREA (1860,540,3400,1000)
+   FILL (0,(198,198,198),0)
+  }
+  TEXT  10438, 0, 0
+  {
+   OUTLINE 0,1, (0,0,0)
+   TEXT 
+"           \n"+
+"\n"+
+"les zones RAW et USER  ont leur horloge definie dans leur config. \n"+
+"Cependant, le design comporte deux CLK_AREA qui peuvent ecrire, si necessaire, par dessus n'importe\n"+
+"quelle zone prédefinie."
+   RECT (1860,1060,3400,1320)
+   MARGINS (1,1)
+   COLOR (255,255,255)
+   FONT (14,0,0,400,0,0,0,"Bookman Old Style")
+   UPDATE 0
+   FILL (0,(198,198,198),0)
+  }
+  VTX  10475, 0, 0
+  {
+   COORD (1180,700)
+  }
+  VTX  10476, 0, 0
+  {
+   COORD (1380,700)
+  }
+  VTX  10477, 0, 0
+  {
+   COORD (1380,640)
+  }
+  VTX  10478, 0, 0
+  {
+   COORD (1180,640)
+  }
+  VTX  10479, 0, 0
+  {
+   COORD (1040,740)
+  }
+  VTX  10480, 0, 0
+  {
+   COORD (1380,740)
+  }
+  VTX  10481, 0, 0
+  {
+   COORD (2140,740)
+  }
+  VTX  10482, 0, 0
+  {
+   COORD (1820,740)
+  }
+  RECORD  10484, 0, 0
+  {
+   NET 8759
+   VTX 10475, 10476
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  10485, 0, 0
+  {
+   NET 13337
+   VTX 10477, 10478
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  10486, 0, 0
+  {
+   NET 8784
+   VTX 10479, 10480
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  10487, 0, 0
+  {
+   NET 8810
+   VTX 10481, 10482
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  10628, 0, 0
+  NET WIRE  10633, 0, 0
+  NET WIRE  10642, 0, 0
+  NET BUS  10699, 0, 0
+  TEXT  10703, 8, 0
+  {
+   TEXT "$#NAME"
+   RECT (4320,711,4481,740)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13124
+  }
+  NET RECORD  10707, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="AREA_INFO_5"
+    #VHDL_TYPE="area_info_type"
+    AREA_INFO_TYPE=""
+    RECORD=""
+   }
+  }
+  NET WIRE  10811, 0, 0
+  INSTANCE  10956, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_MCLK"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1060)
+   VERTEXES ( (2,13046) )
+  }
+  TEXT  10957, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5032,1043,5185,1078)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 10956
+  }
+  NET WIRE  10961, 0, 0
+  INSTANCE  10965, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="IMG_IN_PROGRESS"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1120)
+   VERTEXES ( (2,13054) )
+  }
+  TEXT  10966, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5032,1103,5311,1138)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 10965
+  }
+  NET WIRE  10970, 0, 0
+  NET RECORD  11011, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="FPA_INTF_CFG"
+    #VHDL_TYPE="FPA_INTF_CFG_TYPE"
+    FPA_INTF_CFG_TYPE=""
+    RECORD=""
+   }
+  }
+  TEXT  11013, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4332,951,4509,980)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13100
+  }
+  TEXT  11115, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4349,1031,4463,1060)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13102
+  }
+  NET WIRE  11266, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #NAME="CLK"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  NET WIRE  11288, 0, 0
+  TEXT  11482, 8, 0
+  {
+   TEXT "$#NAME"
+   RECT (3330,731,3591,760)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 11696
+  }
+  VTX  11620, 0, 0
+  {
+   COORD (3360,660)
+  }
+  VTX  11621, 0, 0
+  {
+   COORD (3580,660)
+  }
+  VTX  11662, 0, 0
+  {
+   COORD (3340,760)
+  }
+  VTX  11663, 0, 0
+  {
+   COORD (3580,760)
+  }
+  VTX  11664, 0, 0
+  {
+   COORD (3300,740)
+  }
+  VTX  11665, 0, 0
+  {
+   COORD (3580,740)
+  }
+  WIRE  11675, 0, 0
+  {
+   NET 13337
+   VTX 11620, 11621
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  11696, 0, 0
+  {
+   NET 9429
+   VTX 11662, 11663
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  11697, 0, 0
+  {
+   NET 9012
+   VTX 11664, 11665
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  11836, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="ARESET"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4340,640)
+   VERTEXES ( (2,13244) )
+  }
+  TEXT  11837, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4171,623,4289,658)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 11836
+  }
+  INSTANCE  12044, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="ACQ_INT"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4340,940)
+   VERTEXES ( (2,13056) )
+  }
+  TEXT  12045, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4161,923,4289,958)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 12044
+  }
+  NET WIRE  12049, 0, 0
+  INSTANCE  12090, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="NOMINAL_MCLK_RAW"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4340,1100)
+   VERTEXES ( (2,13078) )
+  }
+  TEXT  12091, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (3976,1083,4289,1118)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 12090
+  }
+  NET WIRE  12095, 0, 0
+  VTX  12234, 0, 0
+  {
+   COORD (1380,660)
+  }
+  VTX  12235, 0, 0
+  {
+   COORD (1180,660)
+  }
+  WIRE  12237, 0, 0
+  {
+   NET 12239
+   VTX 12234, 12235
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  12239, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #NAME="MCLK_SOURCE"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  TEXT  12240, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1189,630,1371,659)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12237
+  }
+  TEXT  12247, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (2649,630,2831,659)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12260
+  }
+  TEXT  12251, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1929,630,2111,659)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12263
+  }
+  VTX  12258, 0, 0
+  {
+   COORD (2860,660)
+  }
+  VTX  12259, 0, 0
+  {
+   COORD (2640,660)
+  }
+  WIRE  12260, 0, 0
+  {
+   NET 12239
+   VTX 12258, 12259
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  12261, 0, 0
+  {
+   COORD (2140,660)
+  }
+  VTX  12262, 0, 0
+  {
+   COORD (1920,660)
+  }
+  WIRE  12263, 0, 0
+  {
+   NET 12239
+   VTX 12261, 12262
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  12267, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (3369,651,3551,680)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 12273
+  }
+  VTX  12271, 0, 0
+  {
+   COORD (3360,680)
+  }
+  VTX  12272, 0, 0
+  {
+   COORD (3580,680)
+  }
+  WIRE  12273, 0, 0
+  {
+   NET 12239
+   VTX 12271, 12272
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  12277, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4329,631,4511,660)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13105
+  }
+  VTX  12496, 0, 0
+  {
+   COORD (320,780)
+  }
+  VTX  12497, 0, 0
+  {
+   COORD (600,780)
+  }
+  WIRE  12498, 0, 0
+  {
+   NET 13336
+   VTX 12496, 12497
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  12499, 0, 0
+  {
+   COORD (320,640)
+  }
+  VTX  12500, 0, 0
+  {
+   COORD (600,640)
+  }
+  WIRE  12501, 0, 0
+  {
+   NET 13337
+   VTX 12499, 12500
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  12503, 0, 0
+  {
+   COORD (600,660)
+  }
+  VTX  12504, 0, 0
+  {
+   COORD (360,660)
+  }
+  WIRE  12505, 0, 0
+  {
+   NET 11288
+   VTX 12503, 12504
+  }
+  NET RECORD  12523, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="CLK_AREA_CFG_A"
+    #VHDL_TYPE="area_cfg_type"
+    AREA_CFG_TYPE=""
+    RECORD=""
+   }
+  }
+  NET RECORD  12524, 0, 0
+  {
+   VARIABLES
+   {
+    #MDA_RECORD_TOKEN="RECORD"
+    #NAME="CLK_AREA_CFG_B"
+    #VHDL_TYPE="area_cfg_type"
+    AREA_CFG_TYPE=""
+    RECORD=""
+   }
+  }
+  VTX  12530, 0, 0
+  {
+   COORD (600,700)
+  }
+  VTX  12531, 0, 0
+  {
+   COORD (320,700)
+  }
+  RECORD  12532, 0, 0
+  {
+   NET 9133
+   VTX 12530, 12531
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  12901, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Output"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_INACTIVE_INT"
+    #SYMBOL="Output"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1080)
+   VERTEXES ( (2,13082) )
+  }
+  TEXT  12902, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5032,1063,5301,1098)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 12901
+  }
+  NET WIRE  12906, 0, 0
+  INSTANCE  12913, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_DATA_VALID"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1160)
+   ORIENTATION 2
+   VERTEXES ( (2,13084) )
+  }
+  TEXT  12914, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5040,1143,5290,1178)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 12913
+  }
+  NET WIRE  12918, 0, 0
+  INSTANCE  13012, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="BusInput"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="TRIG_CTLER_STAT(7:0)"
+    #SYMBOL="BusInput"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4160,1360)
+  }
+  TEXT  13013, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (3773,1343,4109,1378)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 13012
+  }
+  SIGNALASSIGN  13014, 0, 0
+  {
+   LABEL "SignalAssignments_2"
+   TEXT 
+"ACQ_MODE_FIRST_INT    <= TRIG_CTLER_STAT(5);\n"+
+"ACQ_MODE                        <= TRIG_CTLER_STAT(4);\n"+
+"NACQ_MODE_FIRST_INT <= TRIG_CTLER_STAT(1);\n"+
+"\n"+
+""
+   RECT (3440,1160,4200,1320)
+   OUTLINE 5,1, (0,0,0)
+   FILL (0,(255,255,156),0)
+   MARGINS (20,20)
+   FONT (12,0,0,400,0,0,0,"Arial")
+   MULTILINE
+   SYNTAXCOLORED
+   SHOWLABEL
+   SHOWTEXT
+   CORNER 10
+  }
+  VTX  13037, 0, 0
+  {
+   COORD (4520,1040)
+  }
+  VTX  13038, 0, 0
+  {
+   COORD (4300,1040)
+  }
+  VTX  13039, 0, 0
+  {
+   COORD (4900,1180)
+  }
+  VTX  13040, 0, 0
+  {
+   COORD (4980,1180)
+  }
+  VTX  13041, 0, 0
+  {
+   COORD (4900,1000)
+  }
+  VTX  13042, 0, 0
+  {
+   COORD (4980,1000)
+  }
+  VTX  13043, 0, 0
+  {
+   COORD (4900,980)
+  }
+  VTX  13044, 0, 0
+  {
+   COORD (4980,980)
+  }
+  VTX  13045, 0, 0
+  {
+   COORD (4900,1060)
+  }
+  VTX  13046, 0, 0
+  {
+   COORD (4980,1060)
+  }
+  VTX  13047, 0, 0
+  {
+   COORD (4520,980)
+  }
+  VTX  13048, 0, 0
+  {
+   COORD (4300,980)
+  }
+  VTX  13049, 0, 0
+  {
+   COORD (4520,920)
+  }
+  VTX  13050, 0, 0
+  {
+   COORD (4340,920)
+  }
+  VTX  13051, 0, 0
+  {
+   COORD (4300,1060)
+  }
+  VTX  13052, 0, 0
+  {
+   COORD (4520,1060)
+  }
+  VTX  13053, 0, 0
+  {
+   COORD (4900,1120)
+  }
+  VTX  13054, 0, 0
+  {
+   COORD (4980,1120)
+  }
+  VTX  13055, 0, 0
+  {
+   COORD (4520,940)
+  }
+  VTX  13056, 0, 0
+  {
+   COORD (4340,940)
+  }
+  VTX  13057, 0, 0
+  {
+   COORD (4520,660)
+  }
+  VTX  13058, 0, 0
+  {
+   COORD (4320,660)
+  }
+  VTX  13077, 0, 0
+  {
+   COORD (4520,1100)
+  }
+  VTX  13078, 0, 0
+  {
+   COORD (4340,1100)
+  }
+  VTX  13079, 0, 0
+  {
+   COORD (4520,1140)
+  }
+  VTX  13080, 0, 0
+  {
+   COORD (4340,1140)
+  }
+  VTX  13081, 0, 0
+  {
+   COORD (4900,1080)
+  }
+  VTX  13082, 0, 0
+  {
+   COORD (4980,1080)
+  }
+  VTX  13083, 0, 0
+  {
+   COORD (4900,1160)
+  }
+  VTX  13084, 0, 0
+  {
+   COORD (4980,1160)
+  }
+  VTX  13087, 0, 0
+  {
+   COORD (4060,740)
+  }
+  VTX  13088, 0, 0
+  {
+   COORD (4520,740)
+  }
+  VTX  13089, 0, 0
+  {
+   COORD (4060,720)
+  }
+  VTX  13090, 0, 0
+  {
+   COORD (4520,720)
+  }
+  VTX  13091, 0, 0
+  {
+   COORD (4060,760)
+  }
+  VTX  13092, 0, 0
+  {
+   COORD (4520,760)
+  }
+  VTX  13093, 0, 0
+  {
+   COORD (4060,700)
+  }
+  VTX  13094, 0, 0
+  {
+   COORD (4520,700)
+  }
+  WIRE  13095, 0, 0
+  {
+   NET 13336
+   VTX 13037, 13038
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  BUS  13096, 0, 0
+  {
+   NET 10699
+   VTX 13039, 13040
+  }
+  BUS  13097, 0, 0
+  {
+   NET 8478
+   VTX 13041, 13042
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  RECORD  13098, 0, 0
+  {
+   NET 8514
+   VTX 13043, 13044
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13099, 0, 0
+  {
+   NET 10961
+   VTX 13045, 13046
+  }
+  RECORD  13100, 0, 0
+  {
+   NET 11011
+   VTX 13047, 13048
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13101, 0, 0
+  {
+   NET 4410
+   VTX 13049, 13050
+  }
+  WIRE  13102, 0, 0
+  {
+   NET 13337
+   VTX 13051, 13052
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13103, 0, 0
+  {
+   NET 10970
+   VTX 13053, 13054
+  }
+  WIRE  13104, 0, 0
+  {
+   NET 12049
+   VTX 13055, 13056
+  }
+  WIRE  13105, 0, 0
+  {
+   NET 12239
+   VTX 13057, 13058
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13119, 0, 0
+  {
+   NET 12095
+   VTX 13077, 13078
+  }
+  WIRE  13120, 0, 0
+  {
+   NET 10811
+   VTX 13079, 13080
+  }
+  WIRE  13121, 0, 0
+  {
+   NET 12906
+   VTX 13081, 13082
+  }
+  WIRE  13122, 0, 0
+  {
+   NET 12918
+   VTX 13083, 13084
+  }
+  RECORD  13124, 0, 0
+  {
+   NET 10707
+   VTX 13087, 13088
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13125, 0, 0
+  {
+   NET 10633
+   VTX 13089, 13090
+  }
+  WIRE  13126, 0, 0
+  {
+   NET 10642
+   VTX 13091, 13092
+  }
+  WIRE  13127, 0, 0
+  {
+   NET 10628
+   VTX 13093, 13094
+  }
+  NET WIRE  13174, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ACQ_MODE"
+   }
+  }
+  NET WIRE  13179, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ACQ_MODE_FIRST_INT"
+   }
+  }
+  NET WIRE  13184, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="NACQ_MODE_FIRST_INT"
+   }
+  }
+  TEXT  13185, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4332,1211,4469,1240)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13203
+  }
+  TEXT  13189, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4246,1231,4514,1260)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13204
+  }
+  TEXT  13193, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4238,1251,4523,1280)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13205
+  }
+  VTX  13197, 0, 0
+  {
+   COORD (4280,1240)
+  }
+  VTX  13198, 0, 0
+  {
+   COORD (4520,1240)
+  }
+  VTX  13199, 0, 0
+  {
+   COORD (4280,1260)
+  }
+  VTX  13200, 0, 0
+  {
+   COORD (4520,1260)
+  }
+  VTX  13201, 0, 0
+  {
+   COORD (4280,1280)
+  }
+  VTX  13202, 0, 0
+  {
+   COORD (4520,1280)
+  }
+  WIRE  13203, 0, 0
+  {
+   NET 13174
+   VTX 13197, 13198
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13204, 0, 0
+  {
+   NET 13179
+   VTX 13199, 13200
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13205, 0, 0
+  {
+   NET 13184
+   VTX 13201, 13202
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  13240, 0, 0
+  {
+   COORD (4060,800)
+  }
+  VTX  13241, 0, 0
+  {
+   COORD (4220,800)
+  }
+  WIRE  13242, 0, 0
+  {
+   NET 9028
+   VTX 13240, 13241
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  13243, 0, 0
+  {
+   COORD (4520,640)
+  }
+  VTX  13244, 0, 0
+  {
+   COORD (4340,640)
+  }
+  WIRE  13245, 0, 0
+  {
+   NET 1
+   VTX 13243, 13244
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  INSTANCE  13297, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_POWERED"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4500,1320)
+   VERTEXES ( (2,13307) )
+  }
+  TEXT  13298, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4223,1303,4449,1338)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 13297
+  }
+  NET WIRE  13302, 0, 0
+  VTX  13306, 0, 0
+  {
+   COORD (4520,1320)
+  }
+  VTX  13307, 0, 0
+  {
+   COORD (4500,1320)
+  }
+  WIRE  13308, 0, 0
+  {
+   NET 13302
+   VTX 13306, 13307
+  }
+  VTX  13326, 0, 0
+  {
+   COORD (1040,680)
+  }
+  VTX  13327, 0, 0
+  {
+   COORD (1180,680)
+  }
+  WIRE  13329, 0, 0
+  {
+   NET 13335
+   VTX 13326, 13327
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  13331, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (1042,650,1178,679)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13329
+  }
+  NET WIRE  13335, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="GEN_DONE"
+   }
+  }
+  NET WIRE  13336, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="GEN_START"
+   }
+  }
+  NET WIRE  13337, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="GEN_RST"
+   }
+  }
+  VTX  13389, 0, 0
+  {
+   COORD (4900,1300)
+  }
+  VTX  13390, 0, 0
+  {
+   COORD (5000,1300)
+  }
+  BUS  13392, 0, 0
+  {
+   NET 13506
+   VTX 13389, 13390
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  13395, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4897,1270,5003,1299)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13392
+  }
+  INSTANCE  13399, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="or2"
+    #CUSTOM_NAME=""
+    #LIBRARY="#builtin"
+    #REFERENCE="U3"
+    #SYMBOL="or2"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (5380,1240)
+   VERTEXES ( (6,13473), (2,13471), (4,13470) )
+  }
+  NET WIRE  13400, 0, 0
+  TEXT  13417, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5287,1270,5373,1299)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13483
+  }
+  TEXT  13421, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (5287,1230,5373,1259)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13484
+  }
+  VTX  13455, 0, 0
+  {
+   COORD (5580,1220)
+  }
+  VTX  13456, 0, 0
+  {
+   COORD (5420,1220)
+  }
+  VTX  13457, 0, 0
+  {
+   COORD (5580,1240)
+  }
+  VTX  13458, 0, 0
+  {
+   COORD (5420,1240)
+  }
+  VTX  13459, 0, 0
+  {
+   COORD (5720,1280)
+  }
+  VTX  13460, 0, 0
+  {
+   COORD (5880,1280)
+  }
+  VTX  13461, 0, 0
+  {
+   COORD (5400,1480)
+  }
+  VTX  13462, 0, 0
+  {
+   COORD (5580,1480)
+  }
+  VTX  13463, 0, 0
+  {
+   COORD (5400,1460)
+  }
+  VTX  13464, 0, 0
+  {
+   COORD (5580,1460)
+  }
+  VTX  13465, 0, 0
+  {
+   COORD (5880,1520)
+  }
+  VTX  13466, 0, 0
+  {
+   COORD (5720,1520)
+  }
+  VTX  13467, 0, 0
+  {
+   COORD (5580,1520)
+  }
+  VTX  13468, 0, 0
+  {
+   COORD (5400,1520)
+  }
+  VTX  13469, 0, 0
+  {
+   COORD (5580,1280)
+  }
+  VTX  13470, 0, 0
+  {
+   COORD (5540,1280)
+  }
+  VTX  13471, 0, 0
+  {
+   COORD (5380,1300)
+  }
+  VTX  13472, 0, 0
+  {
+   COORD (5280,1300)
+  }
+  VTX  13473, 0, 0
+  {
+   COORD (5380,1260)
+  }
+  VTX  13474, 0, 0
+  {
+   COORD (5280,1260)
+  }
+  WIRE  13475, 0, 0
+  {
+   NET 11266
+   VTX 13455, 13456
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13476, 0, 0
+  {
+   NET 1
+   VTX 13457, 13458
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13477, 0, 0
+  {
+   NET 6503
+   VTX 13459, 13460
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13478, 0, 0
+  {
+   NET 1
+   VTX 13461, 13462
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13479, 0, 0
+  {
+   NET 11266
+   VTX 13463, 13464
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13480, 0, 0
+  {
+   NET 9067
+   VTX 13465, 13466
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13481, 0, 0
+  {
+   NET 9028
+   VTX 13467, 13468
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13482, 0, 0
+  {
+   NET 13400
+   VTX 13469, 13470
+  }
+  WIRE  13483, 0, 0
+  {
+   NET 13504
+   VTX 13471, 13472
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  WIRE  13484, 0, 0
+  {
+   NET 13505
+   VTX 13473, 13474
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  13504, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ERRi(0)"
+   }
+  }
+  NET WIRE  13505, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="ERRi(1)"
+   }
+  }
+  NET BUS  13506, 0, 0
+  {
+   VARIABLES
+   {
+    #CUSTOM_NAME=""
+    #DOWNTO="1"
+    #MDA_RECORD_TOKEN="OTHER"
+    #NAME="ERRi(1:0)"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+  }
+  VTX  13599, 0, 0
+  {
+   COORD (4900,860)
+  }
+  VTX  13600, 0, 0
+  {
+   COORD (5040,860)
+  }
+  NET RECORD  13601, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="RAW_WINDOW"
+    #VHDL_TYPE="AREA_TYPE"
+    AREA_TYPE=""
+    RECORD=""
+   }
+  }
+  RECORD  13602, 0, 0
+  {
+   NET 13601
+   VTX 13599, 13600
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  13603, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4883,830,5058,859)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13602
+  }
+  TEXT  13622, 0, 0
+  {
+   TEXT "$#NAME"
+   RECT (4349,991,4485,1020)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13639
+  }
+  VTX  13637, 0, 0
+  {
+   COORD (4520,1020)
+  }
+  VTX  13638, 0, 0
+  {
+   COORD (4300,1020)
+  }
+  WIRE  13639, 0, 0
+  {
+   NET 13335
+   VTX 13637, 13638
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  NET WIRE  13644, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="PROG_MCLK_RAW"
+   }
+  }
+  NET WIRE  13649, 0, 0
+  {
+   VARIABLES
+   {
+    #NAME="PROG_MODE"
+   }
+  }
+  INSTANCE  13650, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="PROG_MCLK_RAW"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4500,1420)
+   VERTEXES ( (2,13661) )
+  }
+  TEXT  13651, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (4180,1403,4449,1438)
+   ALIGN 6
+   MARGINS (1,1)
+   PARENT 13650
+  }
+  INSTANCE  13655, 0, 0
+  {
+   VARIABLES
+   {
+    #COMPONENT="Input"
+    #CUSTOM_NAME=""
+    #LIBRARY="#terminals"
+    #REFERENCE="FPA_PROG_MODE"
+    #SYMBOL="Input"
+    #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
+   }
+   COORD (4980,1400)
+   ORIENTATION 2
+   VERTEXES ( (2,13725) )
+  }
+  TEXT  13656, 0, 0
+  {
+   TEXT "$#REFERENCE"
+   RECT (5031,1383,5293,1418)
+   ALIGN 4
+   MARGINS (1,1)
+   PARENT 13655
+   ORIENTATION 2
+  }
+  VTX  13660, 0, 0
+  {
+   COORD (4520,1420)
+  }
+  VTX  13661, 0, 0
+  {
+   COORD (4500,1420)
+  }
+  WIRE  13662, 0, 0
+  {
+   NET 13644
+   VTX 13660, 13661
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  TEXT  13693, 12, 0
+  {
+   TEXT "$#NAME"
+   RECT (4292,1331,4509,1360)
+   ALIGN 9
+   MARGINS (1,1)
+   PARENT 13699
+  }
+  VTX  13697, 0, 0
+  {
+   COORD (4520,1360)
+  }
+  VTX  13698, 0, 0
+  {
+   COORD (4300,1360)
+  }
+  RECORD  13699, 0, 0
+  {
+   NET 12524
+   VTX 13697, 13698
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+  VTX  13724, 0, 0
+  {
+   COORD (4900,1400)
+  }
+  VTX  13725, 0, 0
+  {
+   COORD (4980,1400)
+  }
+  WIRE  13726, 0, 0
+  {
+   NET 13649
+   VTX 13724, 13725
+   VARIABLES
+   {
+    #NAMED="1"
+   }
+  }
+ }
+ 
+}
+
+PAGE ""
+{
+ PAGEHEADER
+ {
+  PAGESIZE (6200,2200)
+  MARGINS (200,200,200,200)
+  RECT (0,0,0,0)
+  VARIABLES
+  {
+   #BLOCKTABLE_PAGE="1"
+   #BLOCKTABLE_TEMPL="1"
+   #BLOCKTABLE_VISIBLE="0"
+   #MODIFIED="1380227736"
+   PAGENAME=""
+   PAGENUMBER="1"
+   REVISION="1.0"
+  }
+ }
+ 
+ BODY
+ {
+  TEXT  13727, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "Created:"
+   RECT (5140,1766,5257,1819)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,0,0,"Arial")
+  }
+  TEXT  13728, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$CREATIONDATE"
+   RECT (5314,1762,5984,1822)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,128,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  13729, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "Title:"
+   RECT (5138,1826,5209,1879)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,0,0,"Arial")
+  }
+  TEXT  13730, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "$TITLE"
+   RECT (5311,1822,5981,1882)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,128,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  13731, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT 
+"(C)ALDEC. Inc\n"+
+"2260 Corporate Circle\n"+
+"Henderson, NV 89074"
+   RECT (5340,1640,5635,1741)
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,0,0,"Arial")
+   MULTILINE
+  }
+  TEXT  13732, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "Page:"
+   RECT (5138,1944,5217,1997)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,0,0,"Arial")
+  }
+  TEXT  13733, 0, 0
+  {
+   PAGEALIGN 10
+   OUTLINE 5,1, (0,0,0)
+   TEXT "$PAGENUMBER / $PAGECOUNT     $PAGENAME"
+   RECT (5310,1940,5980,2000)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,128,0,"Arial")
+   UPDATE 0
+  }
+  TEXT  13734, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "Revision:"
+   RECT (5136,1884,5264,1937)
+   ALIGN 4
+   MARGINS (1,10)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,0,0,"Arial")
+  }
+  TEXT  13735, 0, 0
+  {
+   PAGEALIGN 10
+   TEXT "$Revision"
+   RECT (5310,1894,5970,1929)
+   ALIGN 4
+   MARGINS (1,1)
+   COLOR (0,0,0)
+   FONT (12,0,0,700,0,204,0,"Arial")
+   UPDATE 0
+  }
+  GROUP  13736, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5120,1620,6001,2001)
+   FREEID 1
+   LINE  594, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (880,380), (880,0), (0,0), (0,380), (880,380) )
+    FILL (1,(0,0,0),0)
+   }
+  }
+  GROUP  13737, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5120,1820,6001,1821)
+   FREEID 1
+   LINE  578, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (0,0), (880,0) )
+    FILL (1,(0,0,0),0)
+   }
+  }
+  GROUP  13738, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5120,1760,6001,1761)
+   FREEID 1
+   LINE  577, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (0,0), (880,0) )
+    FILL (1,(0,0,0),0)
+   }
+  }
+  GROUP  13739, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5120,1880,6001,1881)
+   FREEID 1
+   LINE  583, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (0,0), (880,0) )
+    FILL (1,(0,0,0),0)
+   }
+  }
+  GROUP  13740, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5120,1940,6001,1941)
+   FREEID 1
+   LINE  582, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (0,0), (880,0) )
+    FILL (1,(0,0,0),0)
+   }
+  }
+  GROUP  13741, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5300,1620,5301,1761)
+   FREEID 1
+   LINE  581, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (0,0), (0,140) )
+   }
+  }
+  GROUP  13742, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5300,1760,5301,2001)
+   FREEID 1
+   LINE  579, 0, 0
+   {
+    OUTLINE 0,1, (128,128,128)
+    POINTS ( (0,0), (0,240) )
+   }
+  }
+  BMPPICT  13743, 0, 0
+  {
+   PAGEALIGN 10
+   RECT (5140,1680,5279,1725)
+   TEXT
+   "ezE1QTMzOEZELTk0QjYtNGZmNC1BMUUwLTZCREEwNTg1QzkwRH0A/EkAACgAAACLAAAALQAAAAEAGAAAAAAA1kkAABILAAASCwAAAAAAAAAAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8+vX28OHu5Mji0KDYv37QsmTLqlTKqFHNrFjStWrbxInn16/y6tT69u3///////////////////////////////////////////////////////////////////8AAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////749Onw5sziz5/Wu3bPsGHNrFjLqlTKp07GoULBmTO+kye5ixazgQKygAC3iBDHo0bbxIju5Mj8+vX///////////////////////////////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+/vz28eLt4sXr377v5cr38uX+/fv////////////////////69+7x6NDm1avVunXDnDmygACygACzgQLGoUPfy5b69u3///////////////////////////////////////////////8AAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////78+/b+/vz////////////////////////////////////////////////////7+PHu48bStWu4ihSygACygAC+lCjhzZr9+/f///////////////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////179/Wu3a3iBGygACygADGoULw5sz///////////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v5MnIpEmygACygAC5ixbhzpz///////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9/frZwIC0gweygACygADWu3b+/fv///////////////////////8AAAD////q3Ljv5cr////n2LHx6NH////m1q328ODq3LjXvHnWvHjy6dP////////k0qXYv3/fy5b59er////m1avXvnzYv37r377cxYrbxIn48+f07dvm1av////w5s3awYPcxYv07Nnu5Mju48f////p2rXq3bv////////////x6NDfy5b////9/PjfypXXvHnbxInz69bm1av9+/fo2bPw5szn2LD07drl1ar+/fv////t4sTr377////q3LjXvXviz57p27fu48b////z69fn167y6tXo2bL////w5szq3Lj////v5cvYvn3iz57+/vz1797o2bL////x6NDk0qT+/vz////////49Ojdx47XvXvx6ND9/frfypTZwYLz69b8+vXm1av69+7q3Lj69u3s37/w5szn2LH179/////p2rXw5sz////x6NHo2bLs4MDw5s3////m1avt4sX////n167z7Nj////////////////////////////////////k06a3iBGygACygADUuHD9/fr///////////////////8AAAD////Orl3awoX////Jpkziz5/////Ho0bp27bMq1bStGnm1qz28OD////+/fvAly7awoTWu3fHo0f69+/GoULUuHDo2bPr3r3gzJjWvHjNrVvm1qzKp0/t4cLAly/fy5bQsmTVuXPZwIHbxIj59eq3iBHUuHH////////////Ttm2ygAD07dv59uy9kSPfypXq3brp2rXFoED179/EnTvp27fIpEjm1avEnj3////////Wu3bVunTm1avAmDDdx47n2LHdx47Jpk338uTQsWPWu3bk06bJpkz////cxYrRs2fw5s3CmjTeyZLNrVvWu3fn2LDLqlT+/vzEnjzEnTr9/Pj////69+7GoEHPsGDhzZrv5cvQsmTPr1/eyJHFnz/r3r3Jpk3t4sW4iRPp27fTt27eyZPJpkzo2bL////dxo3LqlT38uTNrVvawYPVunXdyJD49OiygAHawoX////IpEjl1Kn////////////////////////////////////////n2LG2hw6ygACygADYv3////////////////////8AAAD////Rs2bcxoz////NrVrPr1/l1KjCmjTs4MHOr17UuXLq3Lj7+fP////9/frEnTvy6tX////IpUrhzp3NrFnXvHnp27f///759uzUuXLNrFjo2bLOrlzQsmXawoX9/PnLqlTUuXLbxIneyJHawoW8kCHawYP////////38uXKp07MqlXbw4f8+/bAly7hzpzu48fu5MjAly/Orl3NrFj8+/bHo0fo2rTDnDjgy5fx6NDbxIjVunXIpUrm1qz////////28OHAly7MqlW5jBjx58/m1q3Mq1b////dyJDVunTWvHjVunT////28OHDnDjcxYrUt2/m1au9kiXOr178+vT////j0aLFnz/////////v5cu/lSv6+PD////StWvStWrStGndxo3BmTLawoTTtmzk06bLqVPKp07j0aLx58++lCnKqFC7jx7w5szXvXrgy5fVuXO+kyfeyZP////GoUPk06f////////////////////////////////////////////l1Km0hAiygACygADk06f///////////////8AAAD////TtmzeyZP////Pr1/EnjzVunW9kiXt4sXPsGDMqlXgy5f59uz////9/frEnTvy6dP////Pr1/cxYvOrl3Orlzhzp3x6NHGoULUuHD38uXn16/NrVrRs2bcxoz9/Pnn2LH07dvcxYvLqVLNrFjbw4fWu3b////////o2rTKp07v5MnIpUr7+PHAly/Wu3bo2bLt4sXCmjXcxYrMq1fy6tTJpk3p2rXCmzbYvn3t4sTcxYrVunTIpEnr3rz////////////QsWLeyZLJpk39/Pnn167NrVr////eyZPVunXUuXLZwID////69u3DnDjcxYrNrFjJpUvfypXNrFn7+fL////hzp3Ho0f////////u48fAmDD9+/f////Wu3fRs2bUt2/GoEHk0qXStGnHokTo2bLLqlTeyZPNrFncxYrTtm3dyJDKp0/8+vTZwYLKp0/QsWPawYPcxoz07du+kyfQsmT////////////////////////////////////////////////aw4aygACygAC6jhz07Nn///////////8AAADy6dPGoUPPsGH17t3JpUvhzpz////GoUPq3LjLqVPawoXy6tX7+fL////+/fu/lizk06fm1qzAli3x58/HokXcxYvz7Njn16++lCns37/48+fk06fJpUvr377BmDHl1Knw5s39+/faw4aygADs4MHdx4/QsmX////////NrVvWvHj////DnDnl1arBmTPp27f17t3r377BmTPs37/BmTPp2rXHo0fm1q3BmTLt4sX38ePWu3fVunTiz5/FoEDq3Lnt4cP+/v3iz5+2hw7XvHn38ePVunTCmzby6tXZwYLStWrs37/Cmzbr3rzWu3bMq1fq3buygADcxYrs4MHGoUL7+fL////38+bEnTrawoXt4sXz69fKqFDYv3/q3brAmDDs4MHLqVO4ihT7+fPYv3+zgQPs4MHHokTj0aPQsWLawoThzp23iBHYv37////UuXKygADx6NDcxYvWu3fNrFnhzpzNrVrhzZr////////////////////////////////////////////+/vzJpUuygACygADNrFj+/v3///////8AAADVunXNrVvMq1beyZPfypTt4sX////dx47y6tThzpzMqlXPr1/z69b////////bxIjQsmTTtm3s37/////cxozNrVrQsWL07dvj0KHMq1fn16/x6dLcxoz////q3brQsmTOrl3z7Njp27fVunX////p27fk0qT///////7ZwIHw5sz////hzp3l1KnXvXrNrVvWvHj179/UuXLQsWLi0KD8+vXcxYry6tTUuHHMq1bfypXn2LDl1Kj////hzp3OrlzVunX9+/f48+fPsGHx6NDiz5/NrFjNrFnXvXrk0qTj0aP////o2bLPsGDVunT49On07NnPsGD8+vT07Nndx479+/f////////07NnUuHDNrFnr37759uzVunXPr1/n167////cxozawoX////y6dPRtGj28OHgzJjPsGDZwID6+PD07tzRs2bx6ND////j0aLbw4f////q3LndyJDYvn39/Pjt4cPbw4f///7////////////////////////////////////////////x6dK4ihWygAC0gwbp27b///////8AAAD///////////////////////////////////////////////////////////////////7///////////////////////////////////////////////////////////////////////////////////////////////7///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7////////////////////////////////////////////////XvnyygACygADHo0f///7///8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////38uW6jRqygACzgQLt4sX///8AAADs37/n2LHo2rTo2rTo2rTn16/z7Nj////////////////////////////////////////////////////////49Ojo2bLo2rTo2rTo2rTo2rTp27b49Onq3bro2bPo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2bL07Nn////t4sXn2LDo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTr3rzy6tX+/vz////////////////8+vXr377n2LHo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2rTo2bPq3Ln8+vX////////////////9/Pnt4cPi0KDdx47bw4fZwIDYvn3Yvn3Yvn3Yvn3Yvn3XvnzZwIDbw4fdx47hzpzq3Lj48+f////////////w587l1arp2rX9+/f////////////////////////////////////UuHCygACygADStWv///8AAADYv36zggS0gwe0gwe0gwe0ggXBmTL48+f////////////////////////////////////////////////////Wu3a0gwa0gwe0gwe0gwe0gwfCmjTw5866jRu0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwbStWr////Ho0e0gwa0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe1hQq4ihTBmDHdx479+/f////////48+fAli20gwa0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe0gwe1hAnx58/////////////o2bPCmjW2hg2ygACygACygACygACygACygACygACygACygACygACygACygACygACygAC1hAm6jhzStWr49Oj59uzeyJHbxIjcxYrp27f////////////////////////////////////v5cuzgQOygADAli369+4AAAD48+e/lSqygACygACygACygACygADVunX////////////////////////////////////////////////69u26jBmygACygACygACygACygADZwYL7+fK9kiWygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADKp07////NrVuygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADIpUr49On////9/frBmTKygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACy"+
+"gACygACygADq3br////////l1aq1hAmygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADBmDHo2bLm1qzTtmziz5/l1ar////////////////////////////////////8+vTDnDmygAC2hgzs4MEAAAD////k0qSzgQKygACygACygACygAC2hg3q3bv38uX28OH28OH28OH28OH179/07Nnz7Njz7Njz7Nj17t3dx4+ygACygACygACygACygAC3hw/v5cv////Enj2ygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADEnTr////VunSygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADStGn////////JpUuygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADk06b////59eu8kCCygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADIpEjk0qXdx47cxYr07dr////////////////////////////////////////UuXKygACygADgzJgAAAD////////IpEiygACygACygACygACygAC0gwa3iRK3iBC3iBC3iBC3iBC3hw+1hQu1hQq1hQq1hQq1hQuzgQKygACygACygACygACygADHokT+/v3///7LqVKygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC7jx7+/v3cxYuygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC0ggXx6dL////PsGGygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADbxIj////j0KGygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADr3rz49Oj69+/////////////////////////////////////////////j0aOygACygADUuHAAAAD////////v5cu2hgyygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADfypX////////Rs2aygACygACygACygACygAC6jBm9kya9kSO9kSO9kSO9kSO9kSO9kSO9kSO9kSO8kCHCmjX7+fLk0qWygACygACygACygACygAC2hgy7jh26jRu6jRu6jRu6jRu5ixe5ixa6jRu6jRq0gweygACygACygACygACygACygACygADawYP////Wu3eygACygACygACygACygAC5ixa9kya9kSO9kSO9kSO9kSO9kSO9kSO9kSO9kSO9kSO9kSO9kSO9kSO7jx/awoX////Wu3aygACygACygACygACygACygACygACzggS9kSPAli2/liy/liy/lizAli2+lCm3iRKygACygACygACygACygACygACygADVunT////////////////////////////////////////////////////s4MG2hgyygADNrFgAAAD////////////UuHCygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC4iRP38+b////////XvHmygACygACygACygACygADgzJj38uX38uT38uT38uT38uT38uT38uT38uT38uT38eP38uX+/v3q3bqzggSygACygACygACygADMq1b28OD28OD28OD28OD28OD179717t328OD179/y6dPYv361hQuygACygACygACygACygADJpkz////dx46ygACygACygACygACygADZwIH38uX38uT38uT38uT38uT38uT38uT38uT38uT38uT38uT38uT38uT28eL69+/////Rs2aygACygACygACygACygACygAHRtGjx58/38eP49Oj49Oj49Oj49Oj49Oj38+b07dvj0aK7jx+ygACygACygACygACygADHokT////////////////////////////////////////////////////z69a7jh2ygADIpUoAAAD////////////28OG9kiSygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADPsGD////////////eyJGygACygACygACygACygADfypT////////////////////////////////////////////////x58+0gweygACygACygACygADKqFD////////////////////////////////////////////dxo2zgQKygACygACygACygADAly/////l1KmygACygACygACygACygADXvXr////////////////////////////////////////////////////////////////StWuygACygACygACygACygADEnjz///7////////////////////////////////////////k0qSzgQKygACygACygACygAC9kiX9/Pj////////////////////////////////////////////////38eO+kyeygADGoEEAAAD////////////////fypWygACygACygACygACygACygAC2hg23hw+2hgy1hQu0gwa0ggW0gwa0gweygACygACygACygACygACygADp27f////////////k06eygACygACygACygACygADXvXr////////////////////////////////////////////////38eO3hw+ygACygACygACygADCmzb+/v3////////////////////////////////////////69+66jRqygACygACygACygAC7jx/7+fPt4cKzgQKygACygACygACygADPr1/////////////////////////////////////////////////////////////////Yvn2ygACygACygACygACygADTtmz////////////////////////////////////////////38uW7jx61hAm2hgy2hgy0hAi9kyb59uz////////////////////////////////////////////////38+a+lCiygADIpEgAAAD////////////////+/fvEnjyygACygACygACygACygADPr1/38uX17t307dvy6tTy6tT07drRs2aygACygACygACygACygADAly/69u3////////////p27e0gweygACygACygACygADQsWP////////////////////////////////////////////////7+fO8kCGygACygACygACygAC9kiT6+PD////////////////////////////////////////////Enj2ygACygACygACygAC5ixb07tz07du0gwaygACygACygACygAC4iRPFnz/Fnz7Fnz7Fnz7Fnz7Fnz7Fnz7Fnz7Fnz7Fnz7Fnz7Fnz7DnDjQsmX7+fP////eyZOygACygACygACygACygADTtm3////////////////////////////////////////////////28OD07dv07tz07tz07dv28OD+/fv////////////////////////////////////////////////38uW+kyeygADMqlUAAAD////////////////////r3r21hAmygACygACygACygAC5jBjy6tT////////////////////BmTKygACygACygACygACygADXvXv////////////////u5Mi4ihSygACygACygACygADIpUr+/fv///////////////////////////////////////////////7CmjSygACygACygACygAC6jRv179/////////////////////////////////////////////LqlSygACygACygACygAC2hw7u48f7+PG4ihSygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC7jh338uX////l1aqzgQOygACygACygACygADMq1f////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////07du8kCCygADStWoAAAD///////////////////////7QsWKygACygACygACygACygADNrFj////////////////s4MCzgQOygACygACygACygAC2hw7u5Mj////////////////07dq8kCGygACygACygACygADCmjT9+/f////////////////////////////////////////////////IpUqygACygACygACygAC3iRLv5cv////////////////////////////////////////////TtmyygACygACygACygAC0gwbn2LH///69kiWygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC3iBH1797////s4MG0hAiygACygACygACygADFnz/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////u5Mi3iBCygADdxo0AAAD////////////////////////07Nm6jRuygACygACygACygACzgQLq3Ln////////////TtmyygACygACygACygACygADGoUL////////////////////59eu/liyygACygACygACygAC8kCD7+PH////////////////////////////////////////////////QsWOygACygACygACygAC0hAjp27b////////////////////////////////////////////awoWygACygACygACygACygADhzpz////EnTqygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADu5Mj////z7Ni2hgyygACygACygACygAC/lSr9/Pj////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////n166ygACzggTp27cAAAD////////////////////////////bxIiygACygACygACygACygADGoEH8+vT////59evAli2ygACygACygACygACygADgzJj////////////////////9/frDnDmygACygACygACygAC3hw/28OH////////////////////////////////////////////////XvXuygACygACygACygACygAHk0qT////////////////////////////////////////////hzp2ygACygACygACygACygADbxIn////KqFGygACygACygACygACzggTCmjXIpUrHo0bHo0bHo0bHo0bHo0bHo0bHo0bHo0bHo0bHo0bHo0bGoUPv5cv////49Om5ixaygACygACygACygAC6jRv38+b////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////awoSygAC8kSL38eMAAAD////////////////////////////8+vTBmDGygACygACygACygACygADi0KD////m1q2zgQKygACygACygACygAC4ihT38+b////////////////////////Jpk2ygACygACygACygACygAHw587////////////////////////////////////////////////eyZOygACygACygACygACygADdyJD////////////////////////////////////////////fy5aygACygACygACygACygADUuHH////StWuygACygACygACygAC0hAjn2LD9/Pj9+/f9+/f9+/f9+/f9+/f9+/f9+/f9+/f9+/f9+/f9+/f8+/b+/vz////9/Pm+lCiygACygACygACygAC1hQvs4MD////////////////////////////////////////////q3brVuXPWu3fWu3fWu3bWu3bu48f////////////////////////////////////////////9/frKp06ygADLqlT///8AAAD////////////////////////////////n1660hAiygACygACygACygAC/lSr6+PDRtGiygACygACygACygACygADQsWL///7////////////////////////QsmWygACygACygACygACygADp27f////////////////////////////////////////////////l1KmygACygACygACygACygADXvnz////////////////////////////////////////8+vXFnz6ygACygACygACygACygADOrlz////awoSygACygACygACygACygADk06b////////////////////////////////////////////////////////////////Ho0aygACygACygACygACygADUt2/////////////////////////////////////////////StGmygACygACygACygACygADZwIH////////////////////////////////////////////179+4iROygADl1Kj///8AAAD////////////////////////////////9/frLqlSygACygACygACygACygADPsGC8kSKygACygACygACygACzgQLo2bL////////////////////////////XvHmygACygACygACygACygADi0KD////////////////////////////////////////////////s37+ygACygACygACygACygADLqlTz69by6tXy6tTy6tTx6NDx58/y6tTy6tXx6NHk06bHokWygACygACygACygACygACygADMq1b////hzZqygACygACygACygACygADYv3/69+738+b38uX38uX38uX38uX38uX38uX38uX38uX38uX38uX38uX38uT7+fP////Wu3aygACygACygACygACygAC1hQvWvHjx6ND69u38+vT8+vT8+vT8+vT8+vT8+vX69+/n16+5jBiygACygACygACygACygADVunX////////////////////////////////////////////hzpyygAC9kiX7+fP///8AAAD////////////////////////////////////x6NG3iBCygACygACygACygACygACygACygACygACygACygADBmTL59uz////////////////////////////eyJGygACygACygACygACygADbxIj////////////////////////////////////////////////x6dK1hQuygACygACygACygACzgQK0hAi0hAi0gwe0gwe0gwe0gwe0gwe0hAi0gweygACygACygACygACygACygACygACygADRs2b////n2LCygACygACygACygACygAC1hAm4ihW4iRO4iRO4iRO4iRO4iRO4iRO4iRO4iRO4iRO4iRO4iRO3iRK2hgzZwID////q3LiygACygACygACygACygACygACygAC0hAi6jBm9kSO8kSK8kSK8kSK8kSK9kiS6jRqzgQKygACygACygACygACygACygADUuHD////////////////////////////////////////+/vzDnDiygADdx4////////8AAAD////////////////////////////////////////XvXqygACygACygACygACygACygACygACygACygACygADXvHn////////////////////////////////l1KmygACygACygACygACygADTt27////////////////////////////////////////////////07ty6jhyygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADfy5b////t4cKzgQKygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADOrlz////7+fLBmTOygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADZwYL////////////////////////////////////////o2bOygAG9kiX59er///////8AAAD////////////////////////////////////////49Oi+lCmygACygACygACygACygACygACygACygAC1hQrx58/////////////////////////////////s4MCzgQKygACygACygACygADNrFn////////////////////////////////////////////////48+fAly+ygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC8kSL48+f////x6NG3iBGygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADIpUr///7////k06eygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAHp27b////////////////////////////////////9/PjFoECygADj0aP///////////8AAAD////////////////////////////////////////////i0KCzggSygACygACygACygACygACygACygADGoUL////////////////////////////////////z69a0gwaygACygACygACygADGoUL////////////////////////////////////////////////7+fLGoEGygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC8kCHr"+
+"3r3////////17t28kSKygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADEnTv7+fL////////bxIi0hAiygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygADJpk39/fr////////////////////////////////////hzpyygADMq1b///////////////8AAAD////////////////////////////////////////////8+/bIpEiygACygACygACygACygACygACygADhzpz////////////////////////////////////49Om3iBGygACygACygACygAC/lSr8+/b////////////////////////////////////////////+/v3LqVKygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC2hg3BmTLXvnz07Nn////////////49OjBmDGygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC+lCn38eP////////////q3LjNrFm4ihSygACygACygACygACygACygACygACygACygACygACygACygACygACygACygAC3iBHQsmX48+f////////////////////////////////////17963iRK+lCn38uT///////////////8AAAD////////////////////////////////////////////////38uTr3rzq3bvo2rTo2bPo2bPo2bLo2rT8+vT////////////////////////////////////+/v3t4sXq3bvr3r3r3r3q3bvu48b+/fv////////////////////////////////////////////////z69bq3brr3r3r3r3r3r3r3r3r3r3r3r3r3r3r377p27fp27br377r3r3r3r3r3rzr377w5sz28OH8+vX////////////////////+/vzw5szq3bvr3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3q3bvt4sT8+vX///////////////////738+br377i0KDcxYraw4bbw4fbw4fbw4fbw4fbw4fbw4fbw4faw4bcxYvhzZvp27f28eL////////////////////////////////////////9/PjFoEC1hQrt4sX///////////////////8AAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7RtGi0gwbp27b///////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VunS3iRLo2bL///////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9/PnStGm+lCjt4sX///////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////28OHMq1fKqFH179////////////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9/Pjp2rXNrFjgy5f+/fv///////////////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////07driz5/dx47179////////////////////////////////////////////////8AAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+/vz17t3t4sX17t3///////////////////////////////////////////////////////8AAAA="
+  }
+ }
+ 
+}
+

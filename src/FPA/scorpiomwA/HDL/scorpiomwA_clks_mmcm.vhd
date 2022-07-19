@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 22734 $
+--!   $Rev: 26854 $
 --!   $Author: enofodjie $
---!   $Date: 2019-01-16 13:41:00 -0500 (mer., 16 janv. 2019) $
---!   $Id: scorpiomwA_clks_mmcm.vhd 22734 2019-01-16 18:41:00Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2018-09-04%20Forrest%20Gump%20Release/src/FPA/scorpiomwA/HDL/scorpiomwA_clks_mmcm.vhd $
+--!   $Date: 2021-10-13 11:58:28 -0400 (mer., 13 oct. 2021) $
+--!   $Id: scorpiomwA_clks_mmcm.vhd 26854 2021-10-13 15:58:28Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00272-FleG/trunk/src/FPA/scorpiomwA/HDL/scorpiomwA_clks_mmcm.vhd $
 ------------------------------------------------------------------
 
 library IEEE;
@@ -51,8 +51,49 @@ architecture rtl of scorpiomwA_clks_mmcm is
          );
    end component;
    
-   component scorpiomwA_18MHz_mmcm
+   component scorpiomwA_18MHz_mmcm       
+      port
+         (
+         -- Status and control signals         
+         reset             : in     std_logic;  
+         locked            : out    std_logic;  
+         clk_in            : in     std_logic;
+         
+         -- Dynamic phase shift ports           
+         psclk             : in     std_logic;  
+         psen              : in     std_logic;  
+         psincdec          : in     std_logic;  
+         psdone            : out    std_logic;
+         
+         -- outputs                            
+         mclk_source       : out    std_logic;         
+         adc_clk_source    : out    std_logic      
+         );
       
+   end component;
+   
+   component scorpiomwA_144MHz_to_18MHz_mmcm       
+      port
+         (
+         -- Status and control signals         
+         reset             : in     std_logic;  
+         locked            : out    std_logic;  
+         clk_in            : in     std_logic;
+         
+         -- Dynamic phase shift ports           
+         psclk             : in     std_logic;  
+         psen              : in     std_logic;  
+         psincdec          : in     std_logic;  
+         psdone            : out    std_logic;
+         
+         -- outputs                            
+         mclk_source       : out    std_logic;         
+         adc_clk_source    : out    std_logic      
+         );
+      
+   end component;
+   
+   component scorpiomwA_108MHz_to_27MHz_mmcm       
       port
          (
          -- Status and control signals         
@@ -75,19 +116,22 @@ architecture rtl of scorpiomwA_clks_mmcm is
    
    type cfg_sm_type is(idle, rst_mmcm_st1, rst_mmcm_st2, wait_mmcm_rdy_st, wait_psdone_st, check_phase_st, inc_phase_st, wait_locked_st, wait_psbusy_st, update_cfg_st);   
    
-   signal cfg_sm              : cfg_sm_type;
-   signal mmcm_locked_i       : std_logic;
-   signal sreset              : std_logic;
-   signal mmcm_rdy_i          : std_logic;
-   signal new_cfg_pending     : std_logic;
-   signal present_adc_clk_phase: std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
-   signal phase_cnt_i         : unsigned(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
-   signal pause_cnt           : unsigned(25 downto 0);
-   signal cfg_in_progress_i   : std_logic;
-   signal psen_i              : std_logic;
-   signal psdone_i            : std_logic;
-   signal psincdec_i          : std_logic;
-   signal mmcm_rst_i          : std_logic;
+   signal cfg_sm                 : cfg_sm_type;
+   signal mmcm_locked_i          : std_logic;
+   signal sreset                 : std_logic;
+   signal mmcm_rdy_i             : std_logic;
+   signal new_cfg_pending        : std_logic;
+   signal present_adc_clk_phase1 : std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
+   signal present_adc_clk_phase2 : std_logic_vector(FPA_INT_CFG.ADC_CLK_PIPE_SEL'LENGTH-1 downto 0);
+   signal phase_cnt_i            : unsigned(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE'LENGTH-1 downto 0);
+   signal pause_cnt              : unsigned(25 downto 0);
+   signal cfg_in_progress_i      : std_logic;
+   signal psen_i                 : std_logic;
+   signal psdone_i               : std_logic;
+   signal psincdec_i             : std_logic;
+   signal mmcm_rst_i             : std_logic;
+   signal new_cfg_part1          : std_logic;
+   signal new_cfg_part2          : std_logic;
    
 begin
    
@@ -113,18 +157,29 @@ begin
             new_cfg_pending <= '0';
             cfg_in_progress_i <= '0';
             mmcm_locked_i <= '0';
-            present_adc_clk_phase <= (others => '0');
-            mmcm_rst_i <= '1';
+            present_adc_clk_phase1 <= (others => '0'); 
+            present_adc_clk_phase2 <= (others => '0');
+            mmcm_rst_i <= '1'; 
+            new_cfg_part1 <= '0';
+            new_cfg_part2 <= '0';
             
-         else                      
+            else                      
             
             mmcm_locked_i <= not cfg_in_progress_i; 
             
-            if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= present_adc_clk_phase then 
-               new_cfg_pending <= '1';
+            if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= present_adc_clk_phase1 then 
+               new_cfg_part1 <= '1';
             else
-               new_cfg_pending <= '0';
-            end if;               
+               new_cfg_part1 <= '0';
+            end if; 
+            
+            if std_logic_vector(FPA_INT_CFG.ADC_CLK_PIPE_SEL) /= present_adc_clk_phase2 then 
+               new_cfg_part2 <= '1';
+            else
+               new_cfg_part2 <= '0';
+            end if; 
+            
+            new_cfg_pending <= new_cfg_part1 or new_cfg_part2;
             
             -- fsm de prog de phase
             case cfg_sm is
@@ -178,7 +233,7 @@ begin
                   if psdone_i = '0' then 
                      cfg_sm <= wait_psdone_st;
                   end if;
-                                         
+               
                when wait_psdone_st =>      -- fin du dephasage unitaire fait par le mmcm. On retourne voir si le dephasage total demandé est atteint ou non
                   if psdone_i = '1' then 
                      cfg_sm <= check_phase_st;
@@ -191,7 +246,8 @@ begin
                   end if;               
                
                when update_cfg_st =>       -- mise à jour de la cfg
-                  present_adc_clk_phase <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
+                  present_adc_clk_phase1 <= std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE);
+                  present_adc_clk_phase2 <= std_logic_vector(FPA_INT_CFG.ADC_CLK_PIPE_SEL);
                   pause_cnt <= pause_cnt + 1;
                   if pause_cnt(3) = '1' then 
                      cfg_sm <= idle; 
@@ -205,22 +261,70 @@ begin
       end if;
    end process;       
    
-   U2 :  scorpiomwA_18MHz_mmcm
-   port map (   
-      reset             => mmcm_rst_i,
-      locked            => mmcm_rdy_i,
-      clk_in            => CLK_100M_IN,
-      
-      -- Dynamic phase shift ports
-      
-      psclk             =>   CLK_100M_IN,
-      psen              =>   psen_i,
-      psincdec          =>   psincdec_i,
-      psdone            =>   psdone_i,
-      
-      -- outputs      
-      mclk_source       => MCLK_SOURCE,      
-      adc_clk_source    => ADC_CLK_SOURCE         
-      );     
+   
+   Gen1 : if abs(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ - 72_000_000) <= 10_000 generate   
+      begin    
+      U1 :  scorpiomwA_18MHz_mmcm
+      port map (   
+         reset             => mmcm_rst_i,
+         locked            => mmcm_rdy_i,
+         clk_in            => CLK_100M_IN,
+         
+         -- Dynamic phase shift ports
+         
+         psclk             =>   CLK_100M_IN,
+         psen              =>   psen_i,
+         psincdec          =>   psincdec_i,
+         psdone            =>   psdone_i,
+         
+         -- outputs      
+         mclk_source       => MCLK_SOURCE,      
+         adc_clk_source    => ADC_CLK_SOURCE         
+         );
+   end generate;
+   
+   Gen2 : if abs(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ - 144_000_000) <= 10_000 generate   
+      begin                                             
+      U2 :  scorpiomwA_144MHz_to_18MHz_mmcm
+      port map (   
+         reset             => mmcm_rst_i,
+         locked            => mmcm_rdy_i,
+         clk_in            => CLK_100M_IN,
+         
+         -- Dynamic phase shift ports
+         
+         psclk             =>   CLK_100M_IN,
+         psen              =>   psen_i,
+         psincdec          =>   psincdec_i,
+         psdone            =>   psdone_i,
+         
+         -- outputs      
+         mclk_source       => MCLK_SOURCE,      
+         adc_clk_source    => ADC_CLK_SOURCE         
+         );     
+   end generate; 
+   
+   Gen3 : if abs(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ - 108_000_000) <= 10_000 generate   
+      begin                                             
+      U2 :  scorpiomwA_108MHz_to_27MHz_mmcm
+      port map (   
+         reset             => mmcm_rst_i,
+         locked            => mmcm_rdy_i,
+         clk_in            => CLK_100M_IN,
+         
+         -- Dynamic phase shift ports
+         
+         psclk             =>   CLK_100M_IN,
+         psen              =>   psen_i,
+         psincdec          =>   psincdec_i,
+         psdone            =>   psdone_i,
+         
+         -- outputs      
+         mclk_source       => MCLK_SOURCE,      
+         adc_clk_source    => ADC_CLK_SOURCE         
+         );     
+   end generate;
+   
+   
    
 end rtl;

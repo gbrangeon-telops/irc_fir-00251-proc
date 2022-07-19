@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 26862 $
+--!   $Author: enofodjie $
+--!   $Date: 2021-10-18 11:19:42 -0400 (lun., 18 oct. 2021) $
+--!   $Id: scorpiomwA_window_reg.vhd 26862 2021-10-18 15:19:42Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00272-FleG/trunk/src/FPA/scorpiomwA/HDL/scorpiomwA_window_reg.vhd $
 ------------------------------------------------------------------
 
 
@@ -56,11 +56,11 @@ architecture rtl of scorpiomwA_window_reg is
          );
    end component;
    
-   component double_sync_vector
-	  port(
-	 	 D : in STD_LOGIC_vector;
-		 Q : out STD_LOGIC_vector;
-		 CLK : in STD_LOGIC
+   component double_sync_vector is       -- ENO : 10 oct 2017: necessaire pour ce module
+      port(
+         D : in std_logic_vector;
+         Q : out std_logic_vector;
+         CLK : in std_logic
          );
    end component;
    
@@ -85,19 +85,19 @@ architecture rtl of scorpiomwA_window_reg is
    signal fpa_error_i         : std_logic;
    signal new_cfg_num         : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal present_cfg_num     : unsigned(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
-   signal new_cfg_num_sync    : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    signal new_cfg_num_pending : std_logic;
+   signal new_cfg_num_sync    : std_logic_vector(FPA_INTF_CFG.CFG_NUM'LENGTH-1 downto 0);
    --0-signal 
    
---   attribute KEEP : string;
---   attribute KEEP of new_cfg_num : signal is "TRUE";
---   attribute KEEP of present_cfg_num : signal is "TRUE";
---   attribute KEEP of new_cfg_num_pending : signal is "TRUE";
---   attribute KEEP of new_cfg : signal is "TRUE";
---   attribute KEEP of present_cfg : signal is "TRUE";
---   attribute KEEP of new_cfg_pending : signal is "TRUE";
---   attribute KEEP of roic_cfg_fsm : signal is "TRUE";
---   attribute KEEP of fpa_error_i : signal is "TRUE";
+   --   attribute KEEP : string;
+   --   attribute KEEP of new_cfg_num : signal is "TRUE";
+   --   attribute KEEP of present_cfg_num : signal is "TRUE";
+   --   attribute KEEP of new_cfg_num_pending : signal is "TRUE";
+   --   attribute KEEP of new_cfg : signal is "TRUE";
+   --   attribute KEEP of present_cfg : signal is "TRUE";
+   --   attribute KEEP of new_cfg_pending : signal is "TRUE";
+   --   attribute KEEP of roic_cfg_fsm : signal is "TRUE";
+   --   attribute KEEP of fpa_error_i : signal is "TRUE";
    
 begin
    
@@ -118,7 +118,7 @@ begin
    port map(ARESET => ARESET, CLK => CLK, SRESET => sreset);
    
    --------------------------------------------------
-   -- Sync cfg_num
+   --  cfg_num
    --------------------------------------------------
    U1B : double_sync_vector  
    port map(
@@ -134,8 +134,7 @@ begin
    begin
       if rising_edge(CLK) then 
          
-         -- nouvelle config lorsque cfg_num change
-		 new_cfg_num <= unsigned(new_cfg_num_sync);
+         new_cfg_num <= unsigned(new_cfg_num_sync);
          
          -- detection du changement
          if present_cfg_num /= new_cfg_num then
@@ -158,15 +157,15 @@ begin
          new_cfg(39 downto 37) <= (others => '0');
          
          -- mode du window et readout(à ne pas envoyer via spi)
-         new_cfg(36) <= FPA_INTF_CFG.ITR; 
-         new_cfg(35) <= FPA_INTF_CFG.UPROW_UPCOL; 
-         new_cfg(34) <= FPA_INTF_CFG.SIZEA_SIZEB;
+         new_cfg(36) <= FPA_INTF_CFG.ROIC.ITR; 
+         new_cfg(35) <= FPA_INTF_CFG.ROIC.UPROW_UPCOL; 
+         new_cfg(34) <= FPA_INTF_CFG.ROIC.SIZEA_SIZEB;
          
          -- taille et position du window (à envoyer via spi)
-         new_cfg(33 downto 25) <= std_logic_vector(FPA_INTF_CFG.WINDCFG_PART1(8 downto 0));    
-         new_cfg(24 downto 16) <= std_logic_vector(FPA_INTF_CFG.WINDCFG_PART2(8 downto 0));    
-         new_cfg(15 downto 8)  <= std_logic_vector(FPA_INTF_CFG.WINDCFG_PART3(7 downto 0));    
-         new_cfg(7 downto 0)   <= std_logic_vector(FPA_INTF_CFG.WINDCFG_PART4(7 downto 0));
+         new_cfg(33 downto 25) <= std_logic_vector(FPA_INTF_CFG.ROIC.WINDCFG_PART1(8 downto 0));    
+         new_cfg(24 downto 16) <= std_logic_vector(FPA_INTF_CFG.ROIC.WINDCFG_PART2(8 downto 0));    
+         new_cfg(15 downto 8)  <= std_logic_vector(FPA_INTF_CFG.ROIC.WINDCFG_PART3(7 downto 0));    
+         new_cfg(7 downto 0)   <= std_logic_vector(FPA_INTF_CFG.ROIC.WINDCFG_PART4(7 downto 0));
          
          -- detection du changement
          for ii in 0 to 4 loop
@@ -196,16 +195,16 @@ begin
             done_i <= '0'; 
             rqst_i <= '0';
             roic_cfg_fsm <= idle;
-            itr_i <= FPA_INTF_CFG.ITR;                  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
-            uprow_upcol_i <= FPA_INTF_CFG.UPROW_UPCOL;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
-            sizea_sizeb_i <= '1';                       -- FPA_INTF_CFG.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
+            itr_i <= FPA_INTF_CFG.ROIC.ITR;                  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
+            uprow_upcol_i <= FPA_INTF_CFG.ROIC.UPROW_UPCOL;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
+            sizea_sizeb_i <= '1';                       -- FPA_INTF_CFG.ROIC.SIZEA_SIZEB;  -- on s'assure ainsi qu'au bootup et donc après reception de la config d'initialisation, c'est cette derniere qui est prise en compte
             present_cfg(39) <= '1';   -- le bit 39 seul forcé à '1'. Cela suffit pour eviter des bugs en power management. En fait cela force la reprogrammation après un reset
             error_i <= '0';
             present_cfg_num <= not new_cfg_num;
             
          else    
             
-            fpa_error_i <= FPA_ERROR and not FPA_INTF_CFG.FULL_WINDOW_MODE;  -- utilisé seulemnent en mode windowing
+            fpa_error_i <= FPA_ERROR and not sizea_sizeb_i;  -- utilisé seulemnent en mode windowing
             en_i <= EN;
             
             -- configuration du detecteur	

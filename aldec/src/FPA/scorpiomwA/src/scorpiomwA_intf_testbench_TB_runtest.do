@@ -4,8 +4,10 @@ acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
 acom d:\Telops\FIR-00251-Common\VHDL\img_header_define.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_common_pkg.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define.vhd
-acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\FPA_define.vhd
-acom d:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\Proxy_define.vhd 
+acom D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd2\fastrd2_define.vhd
+#acom D:\Telops\FIR-00251-Proc\src\FPA\common\tests\tests2x_define.vhd
+acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\FPA_define.vhd
+acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\Proxy_define.vhd 
 acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 
 #utilities
@@ -27,23 +29,24 @@ acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d16\fwft_sfifo_w72_d16_sim_netlist.vhdl
 #acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w33_d16\fwft_sfifo_w33_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d16\fwft_sfifo_w76_d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d256\fwft_sfifo_w8_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w32_d256\fwft_sfifo_w32_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w16_d256\fwft_sfifo_w16_d256_sim_netlist.vhdl
--- acom D:\Telops\FIR-00251-Proc\IP\325\sfifo_w10_d256\sfifo_w10_d256_sim_netlist.vhdl 
+
+acom D:\Telops\FIR-00251-Proc\IP\160\ip_axis32_merge_axis64\ip_axis32_merge_axis64_sim_netlist.vhdl 
 acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream32_sfifo_d2048\t_axi4_stream32_sfifo_d2048_sim_netlist.vhdl
+
 acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
-acom D:\Telops\FIR-00251-Proc\IP\160\fwft_sfifo_w3_d256\fwft_sfifo_w3_d256_sim_netlist.vhdl
-
 
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w72_d512\fwft_sfifo_w72_d512_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d1024\fwft_sfifo_w3_d1024_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w8_d1024\fwft_sfifo_w8_d1024_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w76_d256\fwft_sfifo_w76_d256_sim_netlist.vhdl
 
-acom D:\Telops\FIR-00251-Proc\IP\160\fwft_afifo_w72_d16\fwft_afifo_w72_d16_sim_netlist.vhdl
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
@@ -51,6 +54,14 @@ acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.v
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\var_shift_reg_w16_d32.vhd
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w71_d256\fwft_sfifo_w71_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\160\scorpiomwA_18MHz_mmcm\scorpiomwA_18MHz_mmcm_sim_netlist.vhdl
+#acom D:\Telops\FIR-00251-Proc\IP\160\scorpiomwA_144MHz_to_18MHz_mmcm\scorpiomwA_144MHz_to_18MHz_mmcm_sim_netlist.vhdl
+
+
+acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream32_fifo.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_auto_sw_2_1.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_auto_sw_1_2.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axis32_merge_axis64.vhd
 
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\brd_id_reader.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\adc_brd_id_reader.vhd
@@ -79,12 +90,8 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_data_dispa
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fpa_diag_line_gen.vhd
 acom D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\afpa_services.bde
-acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync.vhd
-acom D:\Telops\FIR-00251-Proc\src\Quad_serdes\HDL\quad_data_sync_v2.vhd
-
 
 do D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do 
-
 
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\brd_mux_dummy.vhd
 acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A\src\monit_adc_dummy.vhd
@@ -126,7 +133,7 @@ asim -ses scorpiomwA_intf_testbench_TB
 --wave UUT/U1/U21/U8/* 
 
 -- mb_interface
---wave UUT/U1/U4/*  
+wave UUT/U1/U4/*  
 
 -- digio map
 --wave UUT/U1/U19/*
@@ -157,11 +164,37 @@ asim -ses scorpiomwA_intf_testbench_TB
 --wave UUT/U1/U9/U2/U1/* 
 --wave UUT/U1/U9/U18/*
 
-wave UUT/U1/U5/U5/* 
+wave UUT/U1/U5/U5/U4/* 
+wave UUT/U1/U5/U5/U2/* 
+wave UUT/U1/U5/U5/U10/*
+wave UUT/U1/U5/U5/U1/*
+wave UUT/U1/U5/U5/U6/U1/*
+wave UUT/U1/U5/U5/U5/*
 wave UUT/U1/U9/U18/*
+
 wave UUT/U1/U9/U15/*
+wave UUT/U1/U9/U2/U1/*
+wave UUT/U1/U9/U2/U2/*
+wave UUT/U1/U9/U2/U4/*
+#
+#wave UUT/U1/U27/U2/*
+#wave UUT/U1/U27/U1/U1/*
+#wave UUT/U1/U27/U1/U19/*
+#wave UUT/U1/U27/U1/U18/*
+#wave UUT/U1/U27/U1/U28/*
+
+
+wave UUT/U1/U29/*
+wave UUT/U1/U29/U1/*
+wave UUT/U1/U29/U2/*
+wave UUT/U1/U29/U5/*
+
 wave UUT/U1/*
 
-wave UUT/U11/*
+--wave UUT/U1/U5/U2/U6/*
 
-run 200 ms
+run 400 ms  
+
+
+
+

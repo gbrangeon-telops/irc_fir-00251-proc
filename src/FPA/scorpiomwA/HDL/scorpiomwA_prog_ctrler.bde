@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 13660
+ FREEID 13680
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -1078,7 +1078,7 @@ PAGE ""
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="16ab8094-e3d8-4d3e-b908-59f6b8678306"
    }
    COORD (2360,920)
-   VERTEXES ( (2,11812), (4,11798), (6,11897), (8,13180), (10,11796), (12,11806), (14,11800), (16,11808), (18,13221), (20,11802), (22,11817) )
+   VERTEXES ( (2,11812), (4,11798), (6,11897), (8,13180), (10,11796), (12,11806), (14,11800), (16,11808), (20,11802), (22,11817), (18,13660) )
   }
   TEXT  10115, 0, 0
   {
@@ -2042,101 +2042,18 @@ PAGE ""
     #SYMBOL="Input"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
-   COORD (1860,740)
+   COORD (2200,1020)
+   VERTEXES ( (2,13661) )
   }
   TEXT  13201, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (1656,723,1809,758)
+   RECT (1996,1003,2149,1038)
    ALIGN 6
    MARGINS (1,1)
    PARENT 13200
   }
-  SIGNALASSIGN  13219, 0, 0
-  {
-   LABEL "SignalAssignments_1"
-   TEXT 
-"   U5A: process (CLK)\n"+
-"   begin\n"+
-"      if rising_edge(CLK) then\n"+
-"         sclk_counter <= sclk_counter + 1;\n"+
-"         sclk_i <= sclk_counter(3);\n"+
-"       end if;\n"+
-"   end process;\n"+
-"   \n"+
-"   \n"+
-"   U5B: process (CLK)\n"+
-"   begin\n"+
-"      if rising_edge(CLK) then\n"+
-"\n"+
-"       end if;\n"+
-"   end process; \n"+
-"\n"+
-"\n"+
-"\n"+
-"\n"+
-""
-   RECT (1240,1540,1880,1820)
-   OUTLINE 5,1, (0,0,0)
-   FILL (0,(255,255,156),0)
-   MARGINS (20,20)
-   FONT (12,0,0,400,0,0,0,"Arial")
-   MULTILINE
-   SYNTAXCOLORED
-   SHOWLABEL
-   SHOWTEXT
-   CORNER 10
-  }
-  ARCHITECTUREDECLARATIONS  13220, 0, 0
-  {
-   LABEL "Architecture declarations"
-   TEXT 
-"signal sclk_counter : unsigned(3 downto 0) :=  (others => '0');\n"+
-"\n"+
-""
-   RECT (1140,1380,2000,1500)
-   OUTLINE 5,1, (0,0,0)
-   FILL (0,(203,215,255),0)
-   MARGINS (20,20)
-   FONT (12,0,0,400,0,0,0,"Arial")
-   MULTILINE
-   SYNTAXCOLORED
-   SHOWLABEL
-   SHOWTEXT
-   CORNER 10
-  }
-  VTX  13221, 0, 0
-  {
-   COORD (2300,1020)
-  }
-  VTX  13222, 0, 0
-  {
-   COORD (2160,1020)
-  }
-  WIRE  13223, 0, 0
-  {
-   NET 13224
-   VTX 13221, 13222
-   VARIABLES
-   {
-    #NAMED="1"
-   }
-  }
   NET WIRE  13224, 0, 0
-  {
-   VARIABLES
-   {
-    #NAME="sclk_i"
-   }
-  }
-  TEXT  13225, 0, 0
-  {
-   TEXT "$#NAME"
-   RECT (2199,990,2261,1019)
-   ALIGN 9
-   MARGINS (1,1)
-   PARENT 13223
-  }
   TEXT  13586, 0, 0
   {
    OUTLINE 0,1, (255,0,0)
@@ -2221,6 +2138,19 @@ PAGE ""
    MARGINS (1,1)
    PARENT 13618
   }
+  VTX  13660, 0, 0
+  {
+   COORD (2300,1020)
+  }
+  VTX  13661, 0, 0
+  {
+   COORD (2200,1020)
+  }
+  WIRE  13662, 0, 0
+  {
+   NET 13224
+   VTX 13660, 13661
+  }
  }
  
 }
@@ -2246,7 +2176,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  13643, 0, 0
+  TEXT  13663, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2257,7 +2187,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13644, 0, 0
+  TEXT  13664, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -2268,7 +2198,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  13645, 0, 0
+  TEXT  13665, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -2278,7 +2208,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13646, 0, 0
+  TEXT  13666, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2290,7 +2220,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  13647, 0, 0
+  TEXT  13667, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -2303,7 +2233,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  13648, 0, 0
+  TEXT  13668, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -2313,7 +2243,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13649, 0, 0
+  TEXT  13669, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -2325,7 +2255,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  13650, 0, 0
+  TEXT  13670, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -2335,7 +2265,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  13651, 0, 0
+  TEXT  13671, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -2346,7 +2276,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  13652, 0, 0
+  GROUP  13672, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1620,3201,2001)
@@ -2358,7 +2288,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13653, 0, 0
+  GROUP  13673, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1820,3201,1821)
@@ -2370,7 +2300,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13654, 0, 0
+  GROUP  13674, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1760,3201,1761)
@@ -2382,7 +2312,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13655, 0, 0
+  GROUP  13675, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1880,3201,1881)
@@ -2394,7 +2324,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13656, 0, 0
+  GROUP  13676, 0, 0
   {
    PAGEALIGN 10
    RECT (2320,1940,3201,1941)
@@ -2406,7 +2336,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  13657, 0, 0
+  GROUP  13677, 0, 0
   {
    PAGEALIGN 10
    RECT (2500,1620,2501,1761)
@@ -2417,7 +2347,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  13658, 0, 0
+  GROUP  13678, 0, 0
   {
    PAGEALIGN 10
    RECT (2500,1760,2501,2001)
@@ -2428,7 +2358,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  13659, 0, 0
+  BMPPICT  13679, 0, 0
   {
    PAGEALIGN 10
    RECT (2340,1680,2479,1725)

@@ -3,17 +3,18 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev: 24393 $
+--!   $Rev: 27266 $
 --!   $Author: enofodjie $
---!   $Date: 2019-10-29 12:58:00 -0400 (mar., 29 oct. 2019) $
---!   $Id: scorpiomwA_mblaze_intf.vhd 24393 2019-10-29 16:58:00Z enofodjie $
---!   $URL: http://einstein/svn/firmware/FIR-00251-Proc/branchs/2019-09-23%20-%20scorpiomwA%20Derisk%2020MHz/src/FPA/scorpiomwA/HDL/scorpiomwA_mblaze_intf.vhd $
+--!   $Date: 2022-03-28 15:39:27 -0400 (lun., 28 mars 2022) $
+--!   $Id: scorpiomwA_mblaze_intf.vhd 27266 2022-03-28 19:39:27Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00272-FleG/trunk/src/FPA/scorpiomwA/HDL/scorpiomwA_mblaze_intf.vhd $
 ------------------------------------------------------------------
 
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.std_logic_misc.all;
 use work.tel2000.all;
 use work.FPA_define.all;
 use work.fpa_common_pkg.all;
@@ -36,12 +37,15 @@ entity scorpiomwA_mblaze_intf is
       STATUS_MISO           : in t_axi4_lite_miso;
       CTRLED_RESET          : out std_logic;
       
+      PRIVATE_HDER          : out t_axi4_stream_mosi64;
+      
       FPA_DRIVER_STAT       : in std_logic_vector(31 downto 0);
       
       USER_CFG              : out fpa_intf_cfg_type;
       COOLER_STAT           : out fpa_cooler_stat_type;
       
-      FPA_SOFTW_STAT        : out fpa_firmw_stat_type      
+      FPA_SOFTW_STAT        : out fpa_firmw_stat_type
+      
       );
 end scorpiomwA_mblaze_intf; 
 
@@ -104,7 +108,13 @@ architecture rtl of scorpiomwA_mblaze_intf is
    signal valid_cfg_received           : std_logic := '0';
    signal mb_ctrled_reset_i            : std_logic := '0';
    signal dac_cfg_in_progress          : std_logic;
-   signal abs_additional_int_time_offset_i : integer := 0;
+   signal abs_int_time_offset_mclk_i   : integer := 0;
+   signal subtraction_possible         : std_logic := '0';
+   
+   signal private_hder_dval            : std_logic;
+   signal private_hder_data            : std_logic_vector(31 downto 0);
+   signal private_hder_add             : std_logic_vector(7 downto 0);
+   
    
    --   -- -- -- attribute dont_touch                         : string;
    --   -- -- -- attribute dont_touch of fpa_softw_stat_i     : signal is "true";
@@ -118,10 +128,14 @@ architecture rtl of scorpiomwA_mblaze_intf is
 begin   
    
    
-   CTRLED_RESET <= ctrled_reset_i;
-   RESET_ERR <= reset_err_i;
-   FPA_SOFTW_STAT <= fpa_softw_stat_i;
-   COOLER_STAT.COOLER_ON <= '1';     
+   CTRLED_RESET            <= ctrled_reset_i;
+   RESET_ERR               <= reset_err_i;
+   FPA_SOFTW_STAT          <= fpa_softw_stat_i;
+   COOLER_STAT.COOLER_ON   <= '1'; 
+   
+   -- ecriture du private header en bram  
+   PRIVATE_HDER.TDATA(39 downto 0)  <= private_hder_add & private_hder_data;
+   PRIVATE_HDER.TVALID              <= private_hder_dval;
    
    --------------------------------------------------
    -- Sync reset
@@ -182,19 +196,13 @@ begin
             reset_err_i <= '0';
             user_cfg_in_progress <= '1'; -- fait expres pour qu'il soit mis à '0' ssi au moins une config rentre  
             dac_cfg_in_progress <= '1'; 
-            user_cfg_i.reorder_column <= '0'; -- pas envoyé par le MB et reste toujours à '0';
             mb_ctrled_reset_i <= '0';
-            user_cfg_i.sat_ctrl_en <= '0';
-            user_cfg_i.additional_fpa_int_time_offset <= (others => '0');
-            -- pragma translate_off
-            user_cfg_i.ysize <= to_unsigned(DEFINE_YSIZE_MAX, user_cfg_i.ysize'length);
-            -- pragma translate_on             
+            user_cfg_i.sat_ctrl_en <= '0';            
             
          else                   
             
+            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received; 
             user_cfg_i.comn.intclk_to_clk100_conv_numerator <= DEFINE_FPA_EXP_TIME_RECONV_NUMERATOR;
-            
-            ctrled_reset_i <= mb_ctrled_reset_i or not valid_cfg_received;               
             
             -- temps d'exposition  en mclk
             if int_dval_i = '1' then
@@ -206,14 +214,10 @@ begin
             -- 
             user_cfg_i.int_fdbk_dly <= to_unsigned(DEFINE_FPA_INT_FDBK_DLY, user_cfg_i.int_fdbk_dly'length);  -- isc0209A
             
-            -- diag 
-            user_cfg_i.diag.xstart             <=  user_cfg_i.xstart;               
-            user_cfg_i.diag.ystart             <=  user_cfg_i.ystart;               
-            user_cfg_i.diag.xsize              <=  user_cfg_i.xsize;  
-            user_cfg_i.diag.ysize              <=  user_cfg_i.ysize;  
-            user_cfg_i.diag.xsize_div_tapnum   <=  user_cfg_i.xsize_div_tapnum;    
-            user_cfg_i.diag.ysize_div4_m1      <=  to_unsigned(to_integer(user_cfg_i.ysize(user_cfg_i.ysize'length-1 downto 2)) - 1, user_cfg_i.diag.ysize_div4_m1'length);
-            user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
+            -- MB: private header
+            private_hder_add  <= std_logic_vector(resize(axi_awaddr(7 downto 2),private_hder_add'length));  -- Cela suppose que l'adresse du mB varie par pas de 4 
+            private_hder_data <= data_i(31 downto 0); -- pour la partie serielle de la config, seule la partie (7 downto 0) est valide (voir le driver C)                  
+            private_hder_dval <= slv_reg_wren and and_reduce(axi_awaddr(11 downto 8)); -- la ram est ecrite lorsque l'adresse de base est x"C00" ou "D00" ou "E00" ou "F00"       
             
             -- reste de la config
             if slv_reg_wren = '1' then  
@@ -230,51 +234,89 @@ begin
                   when X"01C" =>    user_cfg_i.comn.fpa_xtra_trig_mode         <= data_i(user_cfg_i.comn.fpa_xtra_trig_mode'length-1 downto 0);                 -- 			                                                     
                   when X"020" =>    user_cfg_i.comn.fpa_xtra_trig_ctrl_dly     <= unsigned(data_i(user_cfg_i.comn.fpa_xtra_trig_ctrl_dly'length-1 downto 0));   -- 				                                                     
                   when X"024" =>    user_cfg_i.comn.fpa_trig_ctrl_timeout_dly  <= unsigned(data_i(user_cfg_i.comn.fpa_trig_ctrl_timeout_dly'length-1 downto 0));-- 		                                                     
+                  when X"028" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);                      
+                  when X"02C" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0);
                      
-                  -- non common
-                  when X"028" =>    user_cfg_i.xstart                          <= unsigned(data_i(user_cfg_i.xstart'length-1 downto 0));                                                                                                                                               
-                  when X"02C" =>    user_cfg_i.ystart                          <= unsigned(data_i(user_cfg_i.ystart'length-1 downto 0));                                                                                                                                               
-                  when X"030" =>    user_cfg_i.xsize                           <= unsigned(data_i(user_cfg_i.xsize'length-1 downto 0));                                                                                                                                                
-                  when X"034" =>    user_cfg_i.ysize                           <= unsigned(data_i(user_cfg_i.ysize'length-1 downto 0));                                                                                                                                                
-                  when X"038" =>    user_cfg_i.windcfg_part1                   <= unsigned(data_i(user_cfg_i.windcfg_part1'length-1 downto 0));                                                                                                                                        
-                  when X"03C" =>    user_cfg_i.windcfg_part2                   <= unsigned(data_i(user_cfg_i.windcfg_part2'length-1 downto 0));                                                                                                                                        
-                  when X"040" =>    user_cfg_i.windcfg_part3                   <= unsigned(data_i(user_cfg_i.windcfg_part3'length-1 downto 0));                                                                                                                                        
-                  when X"044" =>    user_cfg_i.windcfg_part4                   <= unsigned(data_i(user_cfg_i.windcfg_part4'length-1 downto 0));                                                                                                                                        
-                  when X"048" =>    user_cfg_i.uprow_upcol                     <= data_i(0);                                                                                                                                                                                           
-                  when X"04C" =>    user_cfg_i.sizea_sizeb                     <= data_i(0);                                                                                                                                                                                           
-                  when X"050" =>    user_cfg_i.itr                             <= data_i(0);                                                                                                                                                                                           
-                  when X"054" =>    user_cfg_i.gain                            <= data_i(0);                                                                                                                                                                                           
-                  when X"058" =>    user_cfg_i.gpol_code                       <= data_i(user_cfg_i.gpol_code'length-1 downto 0);                                                                                                                                                      
-                  when X"05C" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));                                                                                                                           
-                  when X"060" =>    user_cfg_i.adc_quad2_en                    <= data_i(0);                                                                                                                                                                                           
-                  when X"064" =>    user_cfg_i.chn_diversity_en                <= data_i(0);                                                                                                                                                                                           
-                  when X"068" =>    user_cfg_i.line_period_pclk                <= unsigned(data_i(user_cfg_i.line_period_pclk'length-1 downto 0));                                                                                                                                     
-                  when X"06C" =>    user_cfg_i.readout_pclk_cnt_max            <= unsigned(data_i(user_cfg_i.readout_pclk_cnt_max'length-1 downto 0));                                                                                                                                 
-                  when X"070" =>    user_cfg_i.active_line_start_num           <= unsigned(data_i(user_cfg_i.active_line_start_num'length-1 downto 0));                                                                                                                                
-                  when X"074" =>    user_cfg_i.active_line_end_num             <= unsigned(data_i(user_cfg_i.active_line_end_num'length-1 downto 0));                                                                                                                                  
-                  when X"078" =>    user_cfg_i.pix_samp_num_per_ch             <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));                                                                                                                                  
-                  when X"07C" =>    user_cfg_i.sof_posf_pclk                   <= unsigned(data_i(user_cfg_i.sof_posf_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"080" =>    user_cfg_i.eof_posf_pclk                   <= unsigned(data_i(user_cfg_i.eof_posf_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"084" =>    user_cfg_i.sol_posl_pclk                   <= unsigned(data_i(user_cfg_i.sol_posl_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"088" =>    user_cfg_i.eol_posl_pclk                   <= unsigned(data_i(user_cfg_i.eol_posl_pclk'length-1 downto 0));                                                                                                                                        
-                  when X"08C" =>    user_cfg_i.eol_posl_pclk_p1                <= unsigned(data_i(user_cfg_i.eol_posl_pclk_p1'length-1 downto 0));                                                                                                                                     
-                  when X"090" =>    user_cfg_i.hgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
-                  when X"094" =>    user_cfg_i.hgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
-                  when X"098" =>    user_cfg_i.vgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
-                  when X"09C" =>    user_cfg_i.vgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
-                  when X"0A0" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0));                                                                                                                           
-                  when X"0A4" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
-                  when X"0A8" =>    user_cfg_i.xsize_div_tapnum                <= unsigned(data_i(user_cfg_i.xsize_div_tapnum'length-1 downto 0));                                                                                                                                     
+                  -- roic
+                  when X"030" =>    user_cfg_i.roic.xstart                     <= unsigned(data_i(user_cfg_i.roic.xstart'length-1 downto 0));                                                                                                                                               
+                  when X"034" =>    user_cfg_i.roic.ystart                     <= unsigned(data_i(user_cfg_i.roic.ystart'length-1 downto 0));                                                                                                                                               
+                  when X"038" =>    user_cfg_i.roic.xsize                      <= unsigned(data_i(user_cfg_i.roic.xsize'length-1 downto 0));                                                                                                                                                
+                  when X"03C" =>    user_cfg_i.roic.ysize                      <= unsigned(data_i(user_cfg_i.roic.ysize'length-1 downto 0));                                                                                                                                                
+                  when X"040" =>    user_cfg_i.roic.windcfg_part1              <= unsigned(data_i(user_cfg_i.roic.windcfg_part1'length-1 downto 0));                                                                                                                                        
+                  when X"044" =>    user_cfg_i.roic.windcfg_part2              <= unsigned(data_i(user_cfg_i.roic.windcfg_part2'length-1 downto 0));                                                                                                                                        
+                  when X"048" =>    user_cfg_i.roic.windcfg_part3              <= unsigned(data_i(user_cfg_i.roic.windcfg_part3'length-1 downto 0));                                                                                                                                        
+                  when X"04C" =>    user_cfg_i.roic.windcfg_part4              <= unsigned(data_i(user_cfg_i.roic.windcfg_part4'length-1 downto 0));                                                                                                                                        
+                  when X"050" =>    user_cfg_i.roic.uprow_upcol                <= data_i(0);                                                                                                                                                                                           
+                  when X"054" =>    user_cfg_i.roic.sizea_sizeb                <= data_i(0);                                                                                                                                                                                           
+                  when X"058" =>    user_cfg_i.roic.itr                        <= data_i(0);                                                                                                                                                                                           
+                  when X"05C" =>    user_cfg_i.roic.gain                       <= data_i(0);                                                                                                                                                                                           
+                  when X"060" =>    user_cfg_i.roic.gpol_code                  <= data_i(user_cfg_i.roic.gpol_code'length-1 downto 0);                                                                                                                                                      
+                  when X"064" =>    user_cfg_i.roic.reset_time_mclk            <= unsigned(data_i(user_cfg_i.roic.reset_time_mclk'length-1 downto 0));
+                     
+                  -- diag
+                  when X"068" =>    user_cfg_i.diag.ysize                      <= unsigned(data_i(user_cfg_i.diag.ysize'length-1 downto 0));                                 
+                  when X"06C" =>    user_cfg_i.diag.xsize_div_tapnum           <= unsigned(data_i(user_cfg_i.diag.xsize_div_tapnum'length-1 downto 0)); 
                   
-                  when X"0AC" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));                                                                                                                                       
-                  when X"0B0" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
-                  when X"0B4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
-                  when X"0B8" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);                     
-                  when X"0BC" =>    user_cfg_i.reorder_column                  <= data_i(0); 
-                  when X"0C0" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); 
-                  when X"0C4" =>    user_cfg_i.additional_fpa_int_time_offset  <= signed(data_i(user_cfg_i.additional_fpa_int_time_offset'length-1 downto 0));          
-                  when X"0C8" =>    user_cfg_i.full_window_mode                <= data_i(0); user_cfg_in_progress <= '0';    
+                  when X"070" =>    user_cfg_i.real_mode_active_pixel_dly      <= unsigned(data_i(user_cfg_i.real_mode_active_pixel_dly'length-1 downto 0));                                                                                                                           
+                  when X"074" =>    user_cfg_i.adc_quad2_en                    <= data_i(0);                                                                                                                                                                                           
+                  when X"078" =>    user_cfg_i.chn_diversity_en                <= data_i(0);                                                                                                                                                                                           
                      
+                  -- raw_area                                                                                                                                                                     
+                  when X"07C" =>    user_cfg_i.raw_area.line_start_num         <= unsigned(data_i(user_cfg_i.raw_area.line_start_num'length-1 downto 0));                                                                                                                                                                                                                                                
+                  when X"080" =>    user_cfg_i.raw_area.line_end_num           <= unsigned(data_i(user_cfg_i.raw_area.line_end_num'length-1 downto 0));                                                                                                                                         
+                  when X"084" =>    user_cfg_i.raw_area.sof_posf_pclk          <= unsigned(data_i(user_cfg_i.raw_area.sof_posf_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"088" =>    user_cfg_i.raw_area.eof_posf_pclk          <= unsigned(data_i(user_cfg_i.raw_area.eof_posf_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"08C" =>    user_cfg_i.raw_area.sol_posl_pclk          <= unsigned(data_i(user_cfg_i.raw_area.sol_posl_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"090" =>    user_cfg_i.raw_area.eol_posl_pclk          <= unsigned(data_i(user_cfg_i.raw_area.eol_posl_pclk'length-1 downto 0));                                                                                                                                        
+                  when X"094" =>    user_cfg_i.raw_area.lsync_start_posl_pclk  <= unsigned(data_i(user_cfg_i.raw_area.lsync_start_posl_pclk'length-1 downto 0)); 
+                  when X"098" =>    user_cfg_i.raw_area.lsync_end_posl_pclk    <= unsigned(data_i(user_cfg_i.raw_area.lsync_end_posl_pclk'length-1 downto 0));                  
+                  when X"09C" =>    user_cfg_i.raw_area.lsync_num              <= unsigned(data_i(user_cfg_i.raw_area.lsync_num'length-1 downto 0));                                                                                  
+                  when X"0A0" =>    user_cfg_i.raw_area.clk_id                 <= unsigned(data_i(user_cfg_i.raw_area.clk_id'length-1 downto 0));
+                  when X"0A4" =>    user_cfg_i.raw_area.line_period_pclk       <= unsigned(data_i(user_cfg_i.raw_area.line_period_pclk'length-1 downto 0));                                                                                                                                     
+                  when X"0A8" =>    user_cfg_i.raw_area.readout_pclk_cnt_max   <= unsigned(data_i(user_cfg_i.raw_area.readout_pclk_cnt_max'length-1 downto 0));                                                                                                                                                                                                                                                                                   
+                     
+                  -- user_area                                                                                                                                                                    
+                  when X"0AC" =>    user_cfg_i.user_area.line_start_num        <= unsigned(data_i(user_cfg_i.user_area.line_start_num'length-1 downto 0));                                                                                                                                                                                                                                                
+                  when X"0B0" =>    user_cfg_i.user_area.line_end_num          <= unsigned(data_i(user_cfg_i.user_area.line_end_num'length-1 downto 0));                                                                                                                                           
+                  when X"0B4" =>    user_cfg_i.user_area.sol_posl_pclk         <= unsigned(data_i(user_cfg_i.user_area.sol_posl_pclk'length-1 downto 0));                                                                                                                                          
+                  when X"0B8" =>    user_cfg_i.user_area.eol_posl_pclk         <= unsigned(data_i(user_cfg_i.user_area.eol_posl_pclk'length-1 downto 0));                                 
+                  when X"0BC" =>    user_cfg_i.user_area.clk_id                <= unsigned(data_i(user_cfg_i.user_area.clk_id'length-1 downto 0)); 
+                     
+                  -- clk_area_a                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                  when X"0C0" =>    user_cfg_i.clk_area_a.line_start_num       <= unsigned(data_i(user_cfg_i.clk_area_a.line_start_num'length-1 downto 0));                                                                                                                                                                                                                                                
+                  when X"0C4" =>    user_cfg_i.clk_area_a.line_end_num         <= unsigned(data_i(user_cfg_i.clk_area_a.line_end_num'length-1 downto 0));                                                                                                                                           
+                  when X"0C8" =>    user_cfg_i.clk_area_a.sol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_a.sol_posl_pclk'length-1 downto 0));                                                                                                                                          
+                  when X"0CC" =>    user_cfg_i.clk_area_a.eol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_a.eol_posl_pclk'length-1 downto 0));                                
+                  when X"0D0" =>    user_cfg_i.clk_area_a.clk_id               <= unsigned(data_i(user_cfg_i.clk_area_a.clk_id'length-1 downto 0));                                                                                                                                                               
+                  when X"0D4" =>    user_cfg_i.clk_area_a.spare                <= unsigned(data_i(user_cfg_i.clk_area_a.spare'length-1 downto 0));
+                     
+                  -- clk_area_b                                                                                                                                                                   
+                  when X"0D8" =>    user_cfg_i.clk_area_b.line_start_num       <= unsigned(data_i(user_cfg_i.clk_area_b.line_start_num'length-1 downto 0));                               
+                  when X"0DC" =>    user_cfg_i.clk_area_b.line_end_num         <= unsigned(data_i(user_cfg_i.clk_area_b.line_end_num'length-1 downto 0));                                 
+                  when X"0E0" =>    user_cfg_i.clk_area_b.sol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_b.sol_posl_pclk'length-1 downto 0));                                
+                  when X"0E4" =>    user_cfg_i.clk_area_b.eol_posl_pclk        <= unsigned(data_i(user_cfg_i.clk_area_b.eol_posl_pclk'length-1 downto 0));
+                  when X"0E8" =>    user_cfg_i.clk_area_b.clk_id               <= unsigned(data_i(user_cfg_i.clk_area_b.clk_id'length-1 downto 0)); 
+                  when X"0EC" =>    user_cfg_i.clk_area_b.spare                <= unsigned(data_i(user_cfg_i.clk_area_b.spare'length-1 downto 0));
+                     
+                  -- data_ctrl param 
+                  when X"0F0" =>    user_cfg_i.hgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
+                  when X"0F4" =>    user_cfg_i.hgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
+                  when X"0F8" =>    user_cfg_i.vgood_samp_sum_num              <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));                                                                                                                                   
+                  when X"0FC" =>    user_cfg_i.vgood_samp_mean_numerator       <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));                                                                                                                            
+                  when X"100" =>    user_cfg_i.good_samp_first_pos_per_ch      <= unsigned(data_i(user_cfg_i.good_samp_first_pos_per_ch'length-1 downto 0));                                                                                                                           
+                  when X"104" =>    user_cfg_i.good_samp_last_pos_per_ch       <= unsigned(data_i(user_cfg_i.good_samp_last_pos_per_ch'length-1 downto 0));                                                                                                                            
+                     
+                  -- -- misc 
+                  when X"108" =>    user_cfg_i.adc_clk_source_phase            <= unsigned(data_i(user_cfg_i.adc_clk_source_phase'length-1 downto 0));      
+                  when X"10C" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));          
+                  when X"110" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));                   
+                  when X"114" =>    user_cfg_i.int_time_offset_mclk            <= signed(data_i(user_cfg_i.int_time_offset_mclk'length-1 downto 0));        
+                  when X"118" =>    user_cfg_i.nominal_clk_id_sample_pos       <= unsigned(data_i(user_cfg_i.nominal_clk_id_sample_pos'length-1 downto 0)); 
+                  when X"11C" =>    user_cfg_i.fast1_clk_id_sample_pos         <= unsigned(data_i(user_cfg_i.fast1_clk_id_sample_pos'length-1 downto 0));                  
+                  when X"120" =>    user_cfg_i.fast2_clk_id_sample_pos         <= unsigned(data_i(user_cfg_i.fast2_clk_id_sample_pos'length-1 downto 0));                                                                                                                                 
+                  when X"124" =>    user_cfg_i.tir_dly_adc_clk                 <= unsigned(data_i(user_cfg_i.tir_dly_adc_clk'length-1 downto 0));        
+                  when X"128" =>    user_cfg_i.single_samp_mode_en             <= data_i(0); user_cfg_in_progress <= '0';                                
+
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
                   when X"AE4" =>    fpa_softw_stat_i.fpa_output                <= data_i(fpa_softw_stat_i.fpa_output'length-1 downto 0);  
@@ -314,20 +356,31 @@ begin
    begin
       if rising_edge(MB_CLK) then 
          
-         abs_additional_int_time_offset_i <= to_integer(abs(user_cfg_i.additional_fpa_int_time_offset));
+         abs_int_time_offset_mclk_i <= to_integer(abs(user_cfg_i.int_time_offset_mclk));         
+         if int_time_i > abs_int_time_offset_mclk_i then 
+            subtraction_possible <= '1';
+         else
+            subtraction_possible <= '0';
+         end if;   
          
          -- pipe pour le calcul du temps d'integration en mclk
          exp_time_pipe(0) <= resize(FPA_EXP_INFO.EXP_TIME, exp_time_pipe(0)'length) ;
          exp_time_pipe(1) <= resize(exp_time_pipe(0) * DEFINE_FPA_EXP_TIME_CONV_NUMERATOR, exp_time_pipe(0)'length);          
          exp_time_pipe(2) <= resize(exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_P_26 downto DEFINE_FPA_EXP_TIME_CONV_DENOMINATOR_BIT_POS), exp_time_pipe(0)'length);  -- soit une division par 2^EXP_TIME_CONV_DENOMINATOR
          exp_time_pipe(3) <= exp_time_pipe(2) + resize("00"& exp_time_pipe(1)(C_EXP_TIME_CONV_DENOMINATOR_BIT_POS_M_1), exp_time_pipe(0)'length);  -- pour l'operation d'arrondi
-         int_time_i <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
-         if user_cfg_i.additional_fpa_int_time_offset(31) = '0' then 
-            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+         int_time_i       <= exp_time_pipe(3)(int_time_i'length-1 downto 0);
+         
+         if user_cfg_i.int_time_offset_mclk(31) = '0' then 
+            exp_time_pipe(4) <= exp_time_pipe(3)+ to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
          else
-            exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_additional_int_time_offset_i, exp_time_pipe(4)'length);
+            if subtraction_possible = '1' then
+               exp_time_pipe(4) <= exp_time_pipe(3)- to_unsigned(abs_int_time_offset_mclk_i, exp_time_pipe(4)'length);
+            else
+               exp_time_pipe(4) <= to_unsigned(1, exp_time_pipe(4)'length);
+            end if;
          end if; 
-         int_signal_high_time_i <= exp_time_pipe(4)(int_time_i'length-1 downto 0) + DEFINE_FPA_INT_TIME_OFFSET_FACTOR; -- suppose que (exp_time_pipe(3)(int_time_i'length-1 downto 0) > DEFINE_FPA_INT_TIME_OFFSET_FACTOR). int_signal_high_time est parfaitement synchrosnié avec in_time_i
+         
+         int_signal_high_time_i <= exp_time_pipe(4)(int_signal_high_time_i'length-1 downto 0);
          
          -- pipe de synchro pour l'index           
          exp_indx_pipe(0) <= FPA_EXP_INFO.EXP_INDX;
@@ -335,7 +388,7 @@ begin
          exp_indx_pipe(2) <= exp_indx_pipe(1); 
          exp_indx_pipe(3) <= exp_indx_pipe(2); 
          exp_indx_pipe(4) <= exp_indx_pipe(3);
-         int_indx_i       <= exp_indx_pipe(4);
+         int_indx_i       <= exp_indx_pipe(4);    -- precede int_dval_i
          
          -- pipe pour rendre valide la donnée qques CLKs apres sa sortie
          exp_dval_pipe(0) <= FPA_EXP_INFO.EXP_DVAL;
@@ -345,7 +398,8 @@ begin
          exp_dval_pipe(4) <= exp_dval_pipe(3);
          exp_dval_pipe(5) <= exp_dval_pipe(4);
          exp_dval_pipe(6) <= exp_dval_pipe(5);
-         int_dval_i       <= exp_dval_pipe(6);          
+         exp_dval_pipe(7) <= exp_dval_pipe(6); 
+         int_dval_i       <= exp_dval_pipe(7);
          
       end if;
    end process; 
@@ -411,11 +465,27 @@ begin
    begin
       if rising_edge(MB_CLK) then         
          
-         --if  MB_MOSI.ARADDR(10) = '1' then    -- adresse de base pour la lecture des statuts
-         axi_rdata <= STATUS_MISO.RDATA; -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
-         --else 
-         --axi_rdata <= (others =>'1'); 
-         --end if;
+         if  MB_MOSI.ARADDR(10) = '1' and MB_MOSI.ARVALID = '1' then    -- adresse de base pour la lecture des statuts provenant du generateur de statuts
+            axi_rdata <= STATUS_MISO.RDATA;    -- la donnée de statut est valide 1CLK après MB_MOSI.ARVALID            
+            
+         elsif MB_MOSI.ARADDR(11) = '1' and MB_MOSI.ARVALID = '1' then  -- adresse de base pour la lecture des statuts internes/privés (ne provenant pas du generateur de statuts)
+            
+            case MB_MOSI.ARADDR(7 downto 0) is 
+               -- feedback de la config envoyée au MB pour validation visuelle via debug_terminal
+               
+               when X"00" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(DEFINE_ADC_QUAD_CLK_SOURCE_RATE_KHZ)               , 32));           
+               when X"04" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_KHZ)             , 32));
+               when X"08" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(DEFINE_ADC_QUAD_CLK_RATE_KHZ)                      , 32));
+               when X"0C" =>  axi_rdata <= std_logic_vector(to_unsigned(integer(DEFINE_FPA_NOMINAL_MCLK_RATE_HZ)                   , 32));
+               
+               when others =>                                                       
+                  -- axi_rdata <= (others => '0');
+               
+            end case;
+            
+         else 
+            axi_rdata <= (others =>'1'); 
+         end if;
          
       end if;     
    end process;   
@@ -471,4 +541,4 @@ begin
       end if;
    end process;
    
-end rtl;
+end rtl; 

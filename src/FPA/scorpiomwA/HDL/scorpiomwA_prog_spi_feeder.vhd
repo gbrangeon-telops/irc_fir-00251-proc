@@ -3,11 +3,11 @@
 --!   @brief
 --!   @details
 --!
---!   $Rev$
---!   $Author$
---!   $Date$
---!   $Id$
---!   $URL$
+--!   $Rev: 26574 $
+--!   $Author: enofodjie $
+--!   $Date: 2021-06-21 12:55:36 -0400 (lun., 21 juin 2021) $
+--!   $Id: scorpiomwA_prog_spi_feeder.vhd 26574 2021-06-21 16:55:36Z enofodjie $
+--!   $URL: http://einstein/svn/firmware/FIR-00272-FleG/trunk/src/FPA/scorpiomwA/HDL/scorpiomwA_prog_spi_feeder.vhd $
 ------------------------------------------------------------------
 
 
