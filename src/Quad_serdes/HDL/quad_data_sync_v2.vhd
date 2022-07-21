@@ -92,8 +92,8 @@ architecture rtl of quad_data_sync_v2 is
    signal adc_clk_ref               : std_logic;
    signal adc_clk_ref_last          : std_logic;
    signal dly_cnt                   : natural range 0 to C_FIFO_RDY_DLY + 1;
-   signal wr_rst_busy               : std_logic := '1';
-   signal rd_rst_busy               : std_logic := '1';
+   signal wr_rst_busy               : std_logic;
+   signal rd_rst_busy               : std_logic;
    signal sreset_clkd               : std_logic := '1';
    
    
