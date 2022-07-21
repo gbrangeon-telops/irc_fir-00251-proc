@@ -94,7 +94,8 @@ architecture rtl of quad_data_sync is
          CLK    : in std_logic);
    end component;
    
-   signal sreset_clkout  : std_logic;
+   signal sreset_clkout    : std_logic := '1';
+   signal sreset_clkd      : std_logic := '1';
    signal dval_i, dval_out : std_logic;
    signal data_i, data_o   : std_logic_vector(Q'length-1 downto 0);
    signal sync_flag_i      : std_logic_vector(SYNC_FLAG'length-1 downto 0);
@@ -116,13 +117,20 @@ begin
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1A : sync_reset
    port map(
       ARESET => ARESET,
       CLK    => CLK_DOUT,
       SRESET => sreset_clkout
       ); 
-   
+
+   U1B : sync_reset
+   port map(
+      ARESET => ARESET,
+      CLK    => CLKD,
+      SRESET => sreset_clkd
+      ); 
+      
    sync_en : double_sync_vector  
    port map(
       D => SYNC_FLAG,
@@ -132,10 +140,14 @@ begin
    merge_proc : process(CLKD)
    begin
       if rising_edge(CLKD) then
-         if DVAL_IN = '1' and wr_rst_busy = '0' then
-            dval_i <= '1';
-         else
+         if sreset_clkd = '1' then
             dval_i <= '0';
+         else
+            if DVAL_IN = '1' and wr_rst_busy = '0' then
+               dval_i <= '1';
+            else
+               dval_i <= '0';
+            end if;
          end if;
          data_i <= sync_flag_i & D3 & D2 & D1 & D0;
       end if;
