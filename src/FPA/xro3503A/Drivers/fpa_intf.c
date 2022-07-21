@@ -424,6 +424,13 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ProximCfg.vdac_value[6] = 0;                                                           // DAC7 -> non connecté
    ProximCfg.vdac_value[7] = 0;                                                           // DAC8 -> non connecté
 
+   if (sw_init_done == 0)
+   {
+      // valeurs par défaut pour les champs qui ne viennent pas des flash settings
+      gFpaVTestG_mV = XRO3503_VTESTG_DEFAULT_mV;
+      gFpaVCMO_mV = XRO3503_VCMO_DEFAULT_mV;
+   }
+
    // DETECTSUB
    if (gFpaDetectSub_mV != presentFpaDetectSub_mV)
    {
