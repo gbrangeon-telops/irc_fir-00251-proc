@@ -116,6 +116,10 @@
 #define XRO3503_VCMO_MIN_mV                        1500     // 1500 mV <= VCMO <= 2000 mV
 #define XRO3503_VCMO_MAX_mV                        2000
 
+#define XRO3503_DEFAULT_REGC                       2        // Default RegC value = 2
+#define XRO3503_DEFAULT_REGD                       144      // Default RegD value = 144
+#define XRO3503_DEFAULT_REGF                       26       // Default RegF value = 26
+
 #define TOTAL_DAC_NUM                              8
 
 struct s_ProximCfgConfig
@@ -335,7 +339,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 13;
+      gFpaDebugRegF = XRO3503_DEFAULT_REGF;
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;
 
    // readout ctrl
@@ -363,12 +367,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // gFpaDebugRegC dephasage grossier des adc_clk
    if (sw_init_done == 0)
-      gFpaDebugRegC = 0;
+      gFpaDebugRegC = XRO3503_DEFAULT_REGC;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;
 
    // gFpaDebugRegD dephasage fin des adc_clk
    if (sw_init_done == 0)
-      gFpaDebugRegD = 208;
+      gFpaDebugRegD = XRO3503_DEFAULT_REGD;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;
 
    // image info (sans la correction pour la calibration en sous-fenêtre)

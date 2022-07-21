@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 55382
+ FREEID 55416
  VARIABLES
  {
   #ARCHITECTURE="sch"
@@ -64,7 +64,7 @@ HEADER
   PAGECOUNT="2"
   TITLE="No Title"
  }
- SYMBOL "work" "afpa_data_deserializer_16chn" "afpa_data_deserializer_16chn"
+ SYMBOL "#default" "afpa_data_deserializer_16chn_v2" "afpa_data_deserializer_16chn_v2"
  {
   HEADER
   {
@@ -75,11 +75,12 @@ HEADER
     #GENERIC0="RESET200ms:boolean:=true"
     #GENERIC1="CLK_PERIOD_NS:real:=12.5"
     #GENERIC2="DATA_WIDTH:integer:=14"
+    #GENERIC3="G_INVERT_VIDEO_DATA:std_logic:='0'"
     #HDL_ENTRIES=
 "library IEEE;\n"+
 "use ieee.std_logic_1164.all;"
     #LANGUAGE="VHDL"
-    #MODIFIED="1508423019"
+    #MODIFIED="1658351634"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="cfdeac5c-c060-40b1-b11b-eb5bd8c03524"
    }
   }
@@ -88,7 +89,7 @@ HEADER
    PAGEHEADER
    {
     RECT (0,-20,440,900)
-    FREEID 149
+    FREEID 148
    }
    
    BODY
@@ -16245,21 +16246,22 @@ PAGE ""
   {
    VARIABLES
    {
-    #COMPONENT="afpa_data_deserializer_16chn"
+    #COMPONENT="afpa_data_deserializer_16chn_v2"
     #CUSTOM_NAME=""
     #GENERIC0="DATA_WIDTH : integer := 14"
-    #GENERIC1="RESET200ms : boolean := true"
-    #GENERIC2="CLK_PERIOD_NS : real := ADC_SERDES_CLK_1X_PERIOD_NS"
+    #GENERIC1="CLK_PERIOD_NS : real := ADC_SERDES_CLK_1X_PERIOD_NS"
+    #GENERIC2="RESET200ms : boolean := true"
+    #GENERIC3="G_INVERT_VIDEO_DATA : std_logic := DEFINE_FPA_VIDEO_DATA_INVERTED"
     #IMPL="sch"
-    #LIBRARY="work"
+    #LIBRARY="#default"
     #NO_CONF="1"
     #PRAGMED_GENERICS=""
     #REFERENCE="U1"
-    #SYMBOL="afpa_data_deserializer_16chn"
+    #SYMBOL="afpa_data_deserializer_16chn_v2"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER="cfdeac5c-c060-40b1-b11b-eb5bd8c03524"
    }
    COORD (1720,3180)
-   VERTEXES ( (4,53966), (8,53968), (20,53970), (24,53972), (72,53974), (132,53976), (136,53978), (140,53980), (2,54945), (48,54942), (138,54948), (46,54933), (14,54911), (10,54909), (52,54923), (50,54921), (22,54915), (18,54913), (56,54927), (54,54925), (30,54919), (26,54917), (60,54931), (58,54929), (36,54937), (34,54935), (64,54941), (62,54939), (146,55009), (12,55121), (28,55123), (16,55125), (32,55127) )
+   VERTEXES ( (2,54945), (4,53966), (8,53968), (10,54909), (12,55121), (14,54911), (16,55125), (18,54913), (20,53970), (22,54915), (24,53972), (26,54917), (28,55123), (30,54919), (32,55127), (34,54935), (36,54937), (46,54933), (48,54942), (50,54921), (52,54923), (54,54925), (56,54927), (58,54929), (60,54931), (62,54939), (64,54941), (72,53974), (132,53976), (136,53978), (138,54948), (140,53980), (146,55009) )
   }
   TEXT  54760, 0, 0
   {
@@ -16272,14 +16274,14 @@ PAGE ""
   TEXT  54761, 0, 0
   {
    TEXT "$#COMPONENT"
-   RECT (1740,4080,2131,4115)
+   RECT (1740,4080,2176,4115)
    MARGINS (1,1)
    PARENT 54739
   }
   TEXT  54762, 0, 0
   {
    TEXT "@GENERIC_ACTUAL_VALUES()"
-   RECT (1740,4120,2528,4219)
+   RECT (1740,4120,2672,4252)
    PARENT 54739
   }
   TEXT  54763, 0, 0
@@ -17335,7 +17337,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  55365, 0, 0
+  TEXT  55399, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17346,7 +17348,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  55366, 0, 0
+  TEXT  55400, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -17357,7 +17359,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  55367, 0, 0
+  TEXT  55401, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -17367,7 +17369,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  55368, 0, 0
+  TEXT  55402, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17379,7 +17381,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  55369, 0, 0
+  TEXT  55403, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -17392,7 +17394,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  55370, 0, 0
+  TEXT  55404, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -17402,7 +17404,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  55371, 0, 0
+  TEXT  55405, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -17414,7 +17416,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  55372, 0, 0
+  TEXT  55406, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -17424,7 +17426,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  55373, 0, 0
+  TEXT  55407, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -17435,7 +17437,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  55374, 0, 0
+  GROUP  55408, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6220,8601,6601)
@@ -17447,7 +17449,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  55375, 0, 0
+  GROUP  55409, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6420,8601,6421)
@@ -17459,7 +17461,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  55376, 0, 0
+  GROUP  55410, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6360,8601,6361)
@@ -17471,7 +17473,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  55377, 0, 0
+  GROUP  55411, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6480,8601,6481)
@@ -17483,7 +17485,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  55378, 0, 0
+  GROUP  55412, 0, 0
   {
    PAGEALIGN 10
    RECT (7720,6540,8601,6541)
@@ -17495,7 +17497,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  55379, 0, 0
+  GROUP  55413, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6220,7901,6361)
@@ -17506,7 +17508,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  55380, 0, 0
+  GROUP  55414, 0, 0
   {
    PAGEALIGN 10
    RECT (7900,6360,7901,6601)
@@ -17517,7 +17519,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  55381, 0, 0
+  BMPPICT  55415, 0, 0
   {
    PAGEALIGN 10
    RECT (7740,6280,7879,6325)
