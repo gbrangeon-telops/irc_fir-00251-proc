@@ -19,6 +19,8 @@ use work.fpa_define.all;
 
 package isc0207a_intf_testbench_pkg is           
    
+   constant USER_CFG_VECTOR_SIZE       : natural := 87;  -- number of variables to write in the USER_CFG
+   
    constant PAUSE_SIZE                 : integer := 0;
    constant TAP_NUM                    : integer := 16;
    constant USER_FIRST_LINE_NUM        : integer := 1;
@@ -44,109 +46,109 @@ package body isc0207a_intf_testbench_pkg is
    
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned is
       
-      variable comn_fpa_diag_mode             : unsigned(31 downto  0);
-      variable comn_fpa_diag_type             : unsigned(31 downto  0);
-      variable comn_fpa_pwr_on                : unsigned(31 downto  0);
-      variable comn_fpa_trig_ctrl_mode        : unsigned(31 downto  0);
-      variable comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto  0);
-      variable comn_fpa_acq_trig_period_min   : unsigned(31 downto  0);
-      variable comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto  0);
-      variable comn_fpa_xtra_trig_period_min  : unsigned(31 downto  0);
-      variable comn_fpa_stretch_acq_trig      : unsigned(31 downto  0);
-      variable diag_ysize                     : unsigned(31 downto  0);                 
-      variable diag_xsize_div_tapnum          : unsigned(31 downto  0);
-      variable roic_xstart                    : unsigned(31 downto  0);                                         
-      variable roic_ystart                    : unsigned(31 downto  0);
-      variable roic_xsize                     : unsigned(31 downto  0)  := to_unsigned(320, 32);                                           
-      variable roic_ysize_div2_m1             : unsigned(31 downto  0);
-      variable gain                           : unsigned(31 downto  0);
-      variable internal_outr                  : unsigned(31 downto  0);
-      variable real_mode_active_pixel_dly     : unsigned(31 downto  0);
-      variable speedup_lsync                  : unsigned(31 downto  0);
-      variable speedup_sample_row             : unsigned(31 downto  0);
-      variable speedup_unused_area            : unsigned(31 downto  0);
-      variable raw_area_line_start_num        : unsigned(31 downto  0);
-      variable raw_area_line_end_num          : unsigned(31 downto  0);                           
-      variable raw_area_sof_posf_pclk         : unsigned(31 downto  0);
-      variable raw_area_eof_posf_pclk         : unsigned(31 downto  0);
-      variable raw_area_sol_posl_pclk         : unsigned(31 downto  0);
-      variable raw_area_eol_posl_pclk         : unsigned(31 downto  0);
-      variable raw_area_eol_posl_pclk_p1      : unsigned(31 downto  0);
-      variable raw_area_window_lsync_num      : unsigned(31 downto  0);
-      variable raw_area_line_period_pclk      : unsigned(31 downto  0);
-      variable raw_area_readout_pclk_cnt_max  : unsigned(31 downto  0);
-      variable user_area_line_start_num       : unsigned(31 downto  0);
-      variable user_area_line_end_num         : unsigned(31 downto  0);
-      variable user_area_sol_posl_pclk        : unsigned(31 downto  0);
-      variable user_area_eol_posl_pclk        : unsigned(31 downto  0);
-      variable user_area_eol_posl_pclk_p1     : unsigned(31 downto  0);
-      variable stretch_area_sol_posl_pclk     : unsigned(31 downto  0);
-      variable stretch_area_eol_posl_pclk     : unsigned(31 downto  0);
-      variable pix_samp_num_per_ch            : unsigned(31 downto  0);
-      variable hgood_samp_sum_num             : unsigned(31 downto  0);
-      variable hgood_samp_mean_numerator      : unsigned(31 downto  0);
-      variable vgood_samp_sum_num             : unsigned(31 downto  0);
-      variable vgood_samp_mean_numerator      : unsigned(31 downto  0);
-      variable good_samp_first_pos_per_ch     : unsigned(31 downto  0);
-      variable good_samp_last_pos_per_ch      : unsigned(31 downto  0);
-      variable adc_clk_source_phase                : unsigned(31 downto  0);
-      variable adc_clk_pipe_sel                : unsigned(31 downto  0);
-      variable spare1                : unsigned(31 downto  0);
-      variable lsydel_mclk                    : unsigned(31 downto  0); 
-      variable boost_mode                     : unsigned(31 downto  0); 
-      variable speedup_lsydel                 : unsigned(31 downto  0);
-      variable adc_clk_pipe_sync_pos          : unsigned(31 downto  0);      
-      variable readout_plus_delay              : unsigned(31 downto  0);
-      variable tri_window_and_intmode_part     : unsigned(31 downto  0); 
-      variable int_time_offset                 : unsigned(31 downto  0);
-      variable tsh_min                         : unsigned(31 downto  0);
-      variable tsh_min_minus_int_time_offset   : unsigned(31 downto  0);      
-      variable elcorr_enabled                  : unsigned(31 downto  0);      
-      variable elcorr_pix_faked_value_forced   : unsigned(31 downto  0);      
-      variable elcorr_pix_faked_value          : unsigned(31 downto  0);                                    
-      variable elcorr_ref_cfg_0_ref_enabled         : unsigned(31 downto  0);  
-      variable elcorr_ref_cfg_0_null_forced         : unsigned(31 downto  0);  
-      variable elcorr_ref_cfg_0_start_dly_sampclk   : unsigned(31 downto  0);  
-      variable elcorr_ref_cfg_0_samp_num_per_ch     : unsigned(31 downto  0);  
-      variable elcorr_ref_cfg_0_samp_mean_numerator : unsigned(31 downto  0);  
-      variable elcorr_ref_cfg_0_ref_value           : unsigned(31 downto  0);                                           
+      variable comn_fpa_diag_mode                     : unsigned(31 downto  0);
+      variable comn_fpa_diag_type                     : unsigned(31 downto  0);
+      variable comn_fpa_pwr_on                        : unsigned(31 downto  0);
+      variable comn_fpa_acq_trig_mode                 : unsigned(31 downto  0);
+      variable comn_fpa_acq_trig_ctrl_dly             : unsigned(31 downto  0);
+      variable comn_fpa_xtra_trig_mode                : unsigned(31 downto  0);
+      variable comn_fpa_xtra_trig_ctrl_dly            : unsigned(31 downto  0);
+      variable comn_fpa_trig_ctrl_timeout_dly         : unsigned(31 downto  0);
+      variable comn_fpa_stretch_acq_trig              : unsigned(31 downto  0);
+      variable diag_ysize                             : unsigned(31 downto  0);                 
+      variable diag_xsize_div_tapnum                  : unsigned(31 downto  0);
+      variable roic_xstart                            : unsigned(31 downto  0);                                         
+      variable roic_ystart                            : unsigned(31 downto  0);
+      variable roic_xsize                             : unsigned(31 downto  0);
+      variable roic_ysize_div2_m1                     : unsigned(31 downto  0);
+      variable gain                                   : unsigned(31 downto  0);
+      variable internal_outr                          : unsigned(31 downto  0);
+      variable real_mode_active_pixel_dly             : unsigned(31 downto  0);
+      variable speedup_lsync                          : unsigned(31 downto  0);
+      variable speedup_sample_row                     : unsigned(31 downto  0);
+      variable speedup_unused_area                    : unsigned(31 downto  0);
+      variable raw_area_line_start_num                : unsigned(31 downto  0);
+      variable raw_area_line_end_num                  : unsigned(31 downto  0);                           
+      variable raw_area_sof_posf_pclk                 : unsigned(31 downto  0);
+      variable raw_area_eof_posf_pclk                 : unsigned(31 downto  0);
+      variable raw_area_sol_posl_pclk                 : unsigned(31 downto  0);
+      variable raw_area_eol_posl_pclk                 : unsigned(31 downto  0);
+      variable raw_area_eol_posl_pclk_p1              : unsigned(31 downto  0);
+      variable raw_area_window_lsync_num              : unsigned(31 downto  0);
+      variable raw_area_line_period_pclk              : unsigned(31 downto  0);
+      variable raw_area_readout_pclk_cnt_max          : unsigned(31 downto  0);
+      variable user_area_line_start_num               : unsigned(31 downto  0);
+      variable user_area_line_end_num                 : unsigned(31 downto  0);
+      variable user_area_sol_posl_pclk                : unsigned(31 downto  0);
+      variable user_area_eol_posl_pclk                : unsigned(31 downto  0);
+      variable user_area_eol_posl_pclk_p1             : unsigned(31 downto  0);
+      variable stretch_area_sol_posl_pclk             : unsigned(31 downto  0);
+      variable stretch_area_eol_posl_pclk             : unsigned(31 downto  0);
+      variable pix_samp_num_per_ch                    : unsigned(31 downto  0);
+      variable hgood_samp_sum_num                     : unsigned(31 downto  0);
+      variable hgood_samp_mean_numerator              : unsigned(31 downto  0);
+      variable vgood_samp_sum_num                     : unsigned(31 downto  0);
+      variable vgood_samp_mean_numerator              : unsigned(31 downto  0);
+      variable good_samp_first_pos_per_ch             : unsigned(31 downto  0);
+      variable good_samp_last_pos_per_ch              : unsigned(31 downto  0);
+      variable adc_clk_source_phase                   : unsigned(31 downto  0);
+      variable adc_clk_pipe_sel                       : unsigned(31 downto  0);
+      variable spare1                                 : unsigned(31 downto  0);
+      variable lsydel_mclk                            : unsigned(31 downto  0); 
+      variable boost_mode                             : unsigned(31 downto  0); 
+      variable speedup_lsydel                         : unsigned(31 downto  0);
+      variable adc_clk_pipe_sync_pos                  : unsigned(31 downto  0);      
+      variable readout_plus_delay                     : unsigned(31 downto  0);
+      variable tri_window_and_intmode_part            : unsigned(31 downto  0); 
+      variable int_time_offset                        : unsigned(31 downto  0);
+      variable tsh_min                                : unsigned(31 downto  0);
+      variable tsh_min_minus_int_time_offset          : unsigned(31 downto  0);      
+      variable elcorr_enabled                         : unsigned(31 downto  0);      
+      variable elcorr_spare1                          : unsigned(31 downto  0);      
+      variable elcorr_spare2                          : unsigned(31 downto  0);                                    
+      variable elcorr_ref_cfg_0_ref_enabled           : unsigned(31 downto  0);  
+      variable elcorr_ref_cfg_0_ref_cont_meas_mode    : unsigned(31 downto  0);  
+      variable elcorr_ref_cfg_0_start_dly_sampclk     : unsigned(31 downto  0);  
+      variable elcorr_ref_cfg_0_samp_num_per_ch       : unsigned(31 downto  0);  
+      variable elcorr_ref_cfg_0_samp_mean_numerator   : unsigned(31 downto  0);  
+      variable elcorr_ref_cfg_0_ref_value             : unsigned(31 downto  0);                                           
       variable elcorr_ref_cfg_1_ref_enabled           : unsigned(31 downto  0);  
-      variable elcorr_ref_cfg_1_null_forced           : unsigned(31 downto  0);  
+      variable elcorr_ref_cfg_1_ref_cont_meas_mode    : unsigned(31 downto  0);  
       variable elcorr_ref_cfg_1_start_dly_sampclk     : unsigned(31 downto  0);  
       variable elcorr_ref_cfg_1_samp_num_per_ch       : unsigned(31 downto  0);  
       variable elcorr_ref_cfg_1_samp_mean_numerator   : unsigned(31 downto  0);  
       variable elcorr_ref_cfg_1_ref_value             : unsigned(31 downto  0);  
-      variable elcorr_ref_dac_id                       : unsigned(31 downto  0);  
-      variable elcorr_atemp_gain                       : unsigned(31 downto  0);  
-      variable elcorr_atemp_ofs                        : unsigned(31 downto  0);  
-      variable elcorr_ref0_op_sel                      : unsigned(31 downto  0);
-      variable elcorr_ref1_op_sel                      : unsigned(31 downto  0);  
-      variable elcorr_mult_op_sel                      : unsigned(31 downto  0);  
-      variable elcorr_div_op_sel                       : unsigned(31 downto  0);  
-      variable elcorr_add_op_sel                       : unsigned(31 downto  0);  
-      variable elcorr_gain_cont_calc_mode              : unsigned(31 downto  0);     
-      variable sat_ctrl_en                             : unsigned(31 downto  0);  
-      variable cfg_num                                 : unsigned(31 downto  0);  
-      variable dac_free_running_mode                   : unsigned(31 downto  0);  
-      variable roic_cst_output_mode                    : unsigned(31 downto  0);
-      variable additional_fpa_int_time_offset          : unsigned(31 downto  0) := (others => '0');
-      variable fpa_intf_data_source                    : unsigned(31 downto  0) := (others => '0');
+      variable elcorr_ref_dac_id                      : unsigned(31 downto  0);  
+      variable elcorr_atemp_gain                      : unsigned(31 downto  0);  
+      variable elcorr_atemp_ofs                       : unsigned(31 downto  0);  
+      variable elcorr_ref0_op_sel                     : unsigned(31 downto  0);
+      variable elcorr_ref1_op_sel                     : unsigned(31 downto  0);  
+      variable elcorr_mult_op_sel                     : unsigned(31 downto  0);  
+      variable elcorr_div_op_sel                      : unsigned(31 downto  0);  
+      variable elcorr_add_op_sel                      : unsigned(31 downto  0);  
+      variable elcorr_spare3                          : unsigned(31 downto  0);     
+      variable sat_ctrl_en                            : unsigned(31 downto  0);  
+      variable cfg_num                                : unsigned(31 downto  0);  
+      variable elcorr_spare4                          : unsigned(31 downto  0);  
+      variable roic_cst_output_mode                   : unsigned(31 downto  0);
+      variable additional_fpa_int_time_offset         : unsigned(31 downto  0);
+      variable fpa_intf_data_source                   : unsigned(31 downto  0);
       
-      variable y                                        : unsigned(87*32-1 downto 0); 
+      variable y                                      : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0); 
       
-      variable user_sol_posl_pclk                      : unsigned(31 downto  0);
-      variable roic_ysize                              : unsigned(31 downto  0) := to_unsigned(256, 32);       -- pas utilisé dans la config
+      variable user_sol_posl_pclk                     : unsigned(31 downto  0);
+      variable roic_ysize                             : unsigned(31 downto  0);
       
       
    begin
       comn_fpa_diag_mode            := (others => diag_mode);
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
-      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
+      comn_fpa_acq_trig_mode        := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
       comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_acq_trig_period_min  := to_unsigned(0, comn_fpa_acq_trig_period_min'length);
+      comn_fpa_xtra_trig_mode       := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
       comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(0, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_period_min := to_unsigned(0, comn_fpa_xtra_trig_period_min'length);        
+      comn_fpa_trig_ctrl_timeout_dly:= to_unsigned(0, comn_fpa_trig_ctrl_timeout_dly'length);
       comn_fpa_stretch_acq_trig     := (others =>'0');       
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
       diag_xsize_div_tapnum         := to_unsigned(user_xsize/TAP_NUM, 32);
@@ -162,10 +164,9 @@ package body isc0207a_intf_testbench_pkg is
       
       gain                          := (others => '0');
       internal_outr                 := (others => '0');
-      --ref_chn_en                    := (others => '0');
-      --itr                           := (others => '0');            
+      
       real_mode_active_pixel_dly    := to_unsigned(13, 32);   
-      speedup_lsydel                := (others =>'0');
+      
       speedup_lsync                 := (others =>'0');            
       speedup_sample_row            := (others =>'0');         
       speedup_unused_area           := (others =>'1');   
@@ -189,7 +190,7 @@ package body isc0207a_intf_testbench_pkg is
       user_area_eol_posl_pclk_p1         := user_area_eol_posl_pclk + 1;       
       stretch_area_sol_posl_pclk         := user_area_eol_posl_pclk_p1;
       stretch_area_eol_posl_pclk         := to_unsigned(((to_integer(user_area_sol_posl_pclk) + user_xsize/TAP_NUM - 1) + 1 + 2*STRETCH_LINE_LENGTH_MCLK - 1), 32);   
-      pix_samp_num_per_ch           := to_unsigned(DEFINE_FPA_PIX_SAMPLE_NUM_PER_CH, 32);
+      pix_samp_num_per_ch           := to_unsigned(1, 32);
       hgood_samp_sum_num            := to_unsigned(1, 32);                                      
       hgood_samp_mean_numerator     := to_unsigned(2**21, 32);                           
       vgood_samp_sum_num            := to_unsigned(1, 32);                                      
@@ -208,6 +209,7 @@ package body isc0207a_intf_testbench_pkg is
       
       lsydel_mclk                   := to_unsigned(2,32);
       boost_mode                    := to_unsigned(0,32);
+      speedup_lsydel                := (others =>'0');
       adc_clk_pipe_sync_pos         := to_unsigned(2,32);
       
       readout_plus_delay                := to_unsigned(51320, readout_plus_delay'length);          
@@ -224,18 +226,18 @@ package body isc0207a_intf_testbench_pkg is
          elcorr_enabled                    := (others => '0');
       end if; 
       
-      elcorr_pix_faked_value_forced        := (others => '0');              
-      elcorr_pix_faked_value               := (others => '0');                     
+      elcorr_spare1                        := (others => '0');              
+      elcorr_spare2                        := (others => '0');                     
       
       elcorr_ref_cfg_0_ref_enabled         := to_unsigned(1, 32);               
-      elcorr_ref_cfg_0_null_forced         := (others => '0');              
+      elcorr_ref_cfg_0_ref_cont_meas_mode  := (others => '0');              
       elcorr_ref_cfg_0_start_dly_sampclk   := to_unsigned(2, 32);        
       elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(20, 32);
       elcorr_ref_cfg_0_samp_mean_numerator := to_unsigned(2**21/20, 32);     
       elcorr_ref_cfg_0_ref_value           := to_unsigned(2000, 32);  --      
       
       elcorr_ref_cfg_1_ref_enabled         := to_unsigned(1, 32);          
-      elcorr_ref_cfg_1_null_forced         := (others => '0');             
+      elcorr_ref_cfg_1_ref_cont_meas_mode  := (others => '0');             
       elcorr_ref_cfg_1_start_dly_sampclk   := to_unsigned(2, 32);          
       elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(20, 32);         
       elcorr_ref_cfg_1_samp_mean_numerator := to_unsigned(2**21/20, 32);      
@@ -243,8 +245,7 @@ package body isc0207a_intf_testbench_pkg is
       
       elcorr_ref_dac_id                    := to_unsigned(5, 32);  --       
       elcorr_atemp_gain                    := to_unsigned(1, 32);          
-      elcorr_atemp_ofs                     := to_unsigned(540, 32);                     
-      sat_ctrl_en                          := (others => '0');                        
+      elcorr_atemp_ofs                     := to_unsigned(540, 32);
       
       elcorr_ref0_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
       elcorr_ref1_op_sel                   := resize(ELCORR_SW_TO_NORMAL_OP, 32);
@@ -254,7 +255,6 @@ package body isc0207a_intf_testbench_pkg is
       
       -- sortie de la reference0
       if (C_elcorr_ref0_image_map_enabled = '1')  then              -- pour sortir l'image de la reference0
-         elcorr_pix_faked_value_forced     := to_unsigned(1, 32);         -- etape 1: on permet de forcer la valeur des pixels à une valeur nulle. 
          elcorr_ref0_op_sel                := resize(ELCORR_SW_TO_PATH2, 32);
          elcorr_ref1_op_sel                := resize(ELCORR_SW_TO_PATH1, 32);  -- pas necessaire
          elcorr_mult_op_sel                := resize(ELCORR_SW_TO_PATH1, 32);
@@ -280,25 +280,25 @@ package body isc0207a_intf_testbench_pkg is
          elcorr_add_op_sel                 := resize(ELCORR_SW_TO_PATH1, 32);   
       end if; 
       
-      roic_cst_output_mode := (others => '0');
-      elcorr_gain_cont_calc_mode := (others => '0');
+      elcorr_spare3 := (others => '0');
+      sat_ctrl_en := (others => '0');
       
       cfg_num  := to_unsigned(send_id, cfg_num'length);                   
-      dac_free_running_mode  := (others => '0');
-      if user_xsize <= 320 then
-         dac_free_running_mode  := (others => '1');
-         elcorr_gain_cont_calc_mode := (others => '1');
-      end if;           
+      elcorr_spare4  := (others => '0');
+      
+      roic_cst_output_mode := (others => '0');
+      additional_fpa_int_time_offset := (others => '0');
+      fpa_intf_data_source := (others => '0');
       
       -- cfg usager
       y :=  comn_fpa_diag_mode                         
       & comn_fpa_diag_type             
       & comn_fpa_pwr_on                
-      & comn_fpa_trig_ctrl_mode        
-      & comn_fpa_acq_trig_ctrl_dly     
-      & comn_fpa_acq_trig_period_min   
-      & comn_fpa_xtra_trig_ctrl_dly    
-      & comn_fpa_xtra_trig_period_min  
+      & comn_fpa_acq_trig_mode        
+      & comn_fpa_acq_trig_ctrl_dly   
+      & comn_fpa_xtra_trig_mode    
+      & comn_fpa_xtra_trig_ctrl_dly
+      & comn_fpa_trig_ctrl_timeout_dly
       & comn_fpa_stretch_acq_trig         
       & diag_ysize                     
       & diag_xsize_div_tapnum         
@@ -349,16 +349,16 @@ package body isc0207a_intf_testbench_pkg is
       & tsh_min                        
       & tsh_min_minus_int_time_offset
       & elcorr_enabled
-      & elcorr_pix_faked_value_forced
-      & elcorr_pix_faked_value 
+      & elcorr_spare1
+      & elcorr_spare2 
       & elcorr_ref_cfg_0_ref_enabled
-      & elcorr_ref_cfg_0_null_forced 
+      & elcorr_ref_cfg_0_ref_cont_meas_mode 
       & elcorr_ref_cfg_0_start_dly_sampclk  
       & elcorr_ref_cfg_0_samp_num_per_ch     
       & elcorr_ref_cfg_0_samp_mean_numerator 
       & elcorr_ref_cfg_0_ref_value           
       & elcorr_ref_cfg_1_ref_enabled         
-      & elcorr_ref_cfg_1_null_forced         
+      & elcorr_ref_cfg_1_ref_cont_meas_mode         
       & elcorr_ref_cfg_1_start_dly_sampclk   
       & elcorr_ref_cfg_1_samp_num_per_ch     
       & elcorr_ref_cfg_1_samp_mean_numerator 
@@ -371,10 +371,10 @@ package body isc0207a_intf_testbench_pkg is
       & elcorr_mult_op_sel                      
       & elcorr_div_op_sel                       
       & elcorr_add_op_sel                       
-      & elcorr_gain_cont_calc_mode              
+      & elcorr_spare3              
       & sat_ctrl_en                             
       & cfg_num                                 
-      & dac_free_running_mode                   
+      & elcorr_spare4                   
       & roic_cst_output_mode
       & additional_fpa_int_time_offset
       & fpa_intf_data_source;
