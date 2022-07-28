@@ -40,7 +40,7 @@ my $error = 0;
 
 # Parse proc build info file
 my $procBuildInfoFileStr = read_file($procBuildInfoFile);
-my $procBuildInfoFileSubstr = substr($procBuildInfoFileStr, index($procBuildInfoFileStr, $fpgaSize));
+my $procBuildInfoFileSubstr = substr($procBuildInfoFileStr, index($procBuildInfoFileStr, "ARCH_FPGA_${fpgaSize}"));
 my $procBuildInfoHardware;
 my $procBuildInfoSoftware;
 my $procBuildInfoBootLoader;
@@ -58,7 +58,7 @@ if ($error == 1)
 
 # Parse output build info file
 my $outputBuildInfoFileStr = read_file($outputBuildInfoFile);
-my $outputBuildInfoFileSubstr = substr($outputBuildInfoFileStr, index($outputBuildInfoFileStr, $outputFpgaSize));
+my $outputBuildInfoFileSubstr = substr($outputBuildInfoFileStr, index($outputBuildInfoFileStr, "ARCH_FPGA_${outputFpgaSize}"));
 my $outputBuildInfoHardware;
 my $outputBuildInfoSoftware;
 my $outputBuildInfoBootLoader;
@@ -76,7 +76,7 @@ if ($error == 1)
 
 # Parse storage build info file
 my $storageBuildInfoFileStr = read_file($storageBuildInfoFile);
-my $storageBuildInfoFileSubstr1 = substr($storageBuildInfoFileStr, index($storageBuildInfoFileStr, 16));
+my $storageBuildInfoFileSubstr1 = substr($storageBuildInfoFileStr, index($storageBuildInfoFileStr, "MEMCONF == 16"));
 my $storageBuildInfoHardware1;
 my $storageBuildInfoSoftware1;
 my $storageBuildInfoBootLoader1;
@@ -87,7 +87,7 @@ if ($storageBuildInfoFileSubstr1 =~ /SVN_SOFTWARE_REV[^\n\r0-9]+(\d+)/) { $stora
 if ($storageBuildInfoFileSubstr1 =~ /SVN_BOOTLOADER_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoBootLoader1 = $1; } else { $error = 1; }
 if ($storageBuildInfoFileSubstr1 =~ /SVN_COMMON_REV[^\n\r0-9]+(\d+)/) { $storageBuildInfoCommon1 = $1; } else { $error = 1; }
 
-my $storageBuildInfoFileSubstr2 = substr($storageBuildInfoFileStr, index($storageBuildInfoFileStr, 32));
+my $storageBuildInfoFileSubstr2 = substr($storageBuildInfoFileStr, index($storageBuildInfoFileStr, "MEMCONF == 32"));
 my $storageBuildInfoHardware2;
 my $storageBuildInfoSoftware2;
 my $storageBuildInfoBootLoader2;
