@@ -229,6 +229,7 @@ begin
             -- diag    
             user_cfg_i.diag.ysize_div4_m1      <=  resize(user_cfg_i.roic.ysize_div4_m1, user_cfg_i.diag.ysize_div4_m1'length); 
             user_cfg_i.diag.lovh_mclk_source   <=  to_unsigned(C_DIAG_LOVH_MCLK * DEFINE_FPA_MCLK_RATE_FACTOR, user_cfg_i.diag.lovh_mclk_source'length); -- vrai pour les 4 taps uniquement
+            user_cfg_i.roic.ysize              <=  resize(user_cfg_i.diag.ysize, user_cfg_i.roic.ysize'length);
             
             -- ENO: 19 fev 2021 :les nouveaux parametres fpa_xtra_trig_mode et fpa_acq_trig_mode
             -- user_cfg_i.comn.fpa_acq_trig_mode  <= user_cfg_i.comn.fpa_trig_ctrl_mode;
