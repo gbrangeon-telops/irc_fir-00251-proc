@@ -18,7 +18,7 @@ acom -nowarn DAGGEN_0523 -incr \
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 
-# sources FPa common 
+# sources FPA common 
 acom -relax d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\ad5648_driver.vhd 
 do d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\compil_fpa_common.do
 do D:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fastrd2\compil_fastrd2_common.do

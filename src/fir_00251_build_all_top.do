@@ -89,6 +89,9 @@ acom  "$FIR251PROC\src\fir_00251_proc_scorpiolwD_230Hz.bde"
 #FPA scorpiomwA
 do "$FIR251PROC\src\FPA\scorpiomwA\HDL\compil_scorpiomwA.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwA.bde"
+#FPA scorpiomwA_300Hz
+do "$FIR251PROC\src\FPA\scorpiomwA_300Hz\HDL\compil_scorpiomwA_300Hz.do"
+acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwA_300Hz.bde"
 #FPA scorpiomwD
 do "$FIR251PROC\src\FPA\scorpiomwD\HDL\compil_scorpiomwD.do"
 acom  "$FIR251PROC\src\fir_00251_proc_scorpiomwD.bde"

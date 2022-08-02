@@ -51,6 +51,9 @@ lappend detector_list {scorpiolwD_230Hz160}
 lappend detector_list {scorpiomwA160}
 #lappend detector_list {scorpiomwA325}
 
+lappend detector_list {scorpiomwA_300Hz160}
+#lappend detector_list {scorpiomwA_300Hz325}
+
 lappend detector_list {scorpiomwD160}
 #lappend detector_list {scorpiomwD325}
 

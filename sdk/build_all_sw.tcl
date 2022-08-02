@@ -61,6 +61,10 @@ create_proc_sw scorpiomwA
 build_proc_sw scorpiomwA 160
 #build_proc_sw scorpiomwA 325
 
+create_proc_sw scorpiomwA_300Hz
+build_proc_sw scorpiomwA_300Hz 160
+#build_proc_sw scorpiomwA_300Hz 325
+
 create_proc_sw scorpiomwD
 build_proc_sw scorpiomwD 160
 #build_proc_sw scorpiomwD 325

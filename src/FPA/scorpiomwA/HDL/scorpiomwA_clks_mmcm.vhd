@@ -93,7 +93,7 @@ architecture rtl of scorpiomwA_clks_mmcm is
       
    end component;
    
-   component scorpiomwA_108MHz_to_27MHz_mmcm       
+   component scorpiomwA_27MHz_mmcm       
       port
          (
          -- Status and control signals         
@@ -306,7 +306,7 @@ begin
    
    Gen3 : if abs(DEFINE_FPA_MASTER_CLK_SOURCE_RATE_HZ - 108_000_000) <= 10_000 generate   
       begin                                             
-      U2 :  scorpiomwA_108MHz_to_27MHz_mmcm
+      U2 :  scorpiomwA_27MHz_mmcm
       port map (   
          reset             => mmcm_rst_i,
          locked            => mmcm_rdy_i,
