@@ -117,7 +117,7 @@
 #define XRO3503_VCMO_MAX_mV                        2000
 
 #define XRO3503_DEFAULT_REGC                       2        // Default RegC value = 2
-#define XRO3503_DEFAULT_REGD                       144      // Default RegD value = 144
+#define XRO3503_DEFAULT_REGD                       192      // Default RegD value = 192
 #define XRO3503_DEFAULT_REGF                       26       // Default RegF value = 26
 
 #define TOTAL_DAC_NUM                              8
