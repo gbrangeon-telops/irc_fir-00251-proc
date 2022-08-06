@@ -60,20 +60,20 @@ architecture rtl of quad_data_sync_v2 is
    
    component fwft_afifo_w72_d16 is
       port (
-         rst             : in std_logic;
-         wr_clk          : in std_logic;
-         rd_clk          : in std_logic;
-         din             : in std_logic_vector (71 downto 0);
-         wr_en           : in std_logic;
-         rd_en           : in std_logic;
-         dout            : out std_logic_vector (71 downto 0);
-         full            : out std_logic;         
-         almost_full     : out std_logic;
-         overflow        : out std_logic;
-         empty           : out std_logic;
-         valid           : out std_logic;
-         wr_rst_busy     : out std_logic;
-         rd_rst_busy     : out std_logic
+         RST            : in std_logic;
+         WR_CLK         : in std_logic;
+         RD_CLK         : in std_logic;
+         DIN            : in std_logic_vector (71 downto 0);
+         WR_EN          : in std_logic;
+         RD_EN          : in std_logic;
+         DOUT           : out std_logic_vector (71 downto 0);
+         FULL           : out std_logic;         
+         ALMOST_FULL    : out std_logic;
+         OVERFLOW       : out std_logic;
+         EMPTY          : out std_logic;
+         VALID          : out std_logic;
+         WR_RST_BUSY    : out std_logic;
+         RD_RST_BUSY    : out std_logic
          );
    end component;
    
@@ -92,8 +92,9 @@ architecture rtl of quad_data_sync_v2 is
    signal adc_clk_ref               : std_logic;
    signal adc_clk_ref_last          : std_logic;
    signal dly_cnt                   : natural range 0 to C_FIFO_RDY_DLY + 1;
-   signal wr_rst_busy               : std_logic;
-   signal rd_rst_busy               : std_logic;
+   signal fifo_rst                  : std_logic := '1'; 
+   signal wr_rst_busy               : std_logic := '1';
+   signal rd_rst_busy               : std_logic := '1';
    signal sreset_clkd               : std_logic := '1';
    
    
@@ -123,7 +124,7 @@ begin
       SRESET => sreset_clkd
       ); 
    
-   U2 : process(CLK_DOUT)    -- read du fifo
+   U2 : process(CLK_DOUT)    -- permet de prolonger le delai d'inactivité sur les signaux de contrôle au delà du reset du fifo
    begin
       if rising_edge(CLK_DOUT) then
          if sreset_clkout = '1' then
@@ -155,7 +156,7 @@ begin
    
    U3 : fwft_afifo_w72_d16
    port map(
-      rst         => ARESET,
+      rst         => fifo_rst,
       wr_clk      => CLKD,
       rd_clk      => CLK_DOUT,
       din         => fifo_din_i,
@@ -172,15 +173,25 @@ begin
       );
    
    ---------------------------------------------------
-   --  write du fifo
+   --  rst rallongé du fifo
    ---------------------------------------------------
    U4 : process(CLKD)   
    begin
       if rising_edge(CLKD) then
          if sreset_clkd = '1' then
-            fifo_wr_i  <= '0';                
+            dly_cnt <= 0;
+            fifo_rst <= '1';
+            fifo_wr_i  <= '0';
+            
          else
-            fifo_wr_i  <= DVAL_IN and not wr_rst_busy;         
+            
+            if dly_cnt < C_FIFO_RDY_DLY then
+               dly_cnt <= dly_cnt + 1;
+            else
+               fifo_rst <= '0'; 
+               fifo_wr_i  <= DVAL_IN and not wr_rst_busy;    
+            end if;      
+            
          end if;
       end if;
    end process;
