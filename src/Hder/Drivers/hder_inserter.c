@@ -93,8 +93,8 @@ void HDER_SendConfigGC(t_HderInserter *a, const gcRegistersData_t *pGCRegs)
    a->eff_hder_len = EFFECTIVE_HDER_LENGTH;
    a->zero_pad_len = 2*pGCRegs->Width - a->eff_hder_len;	
    a->hder_len = a->eff_hder_len + a->zero_pad_len ;
-   a->eff_hder_len_div2_m1 = a->eff_hder_len/2 - 1;
-   a->zero_pad_len_div2_m1     = a->zero_pad_len/2 - 1;   
+   a->eff_hder_len_div2_m2 = a->eff_hder_len/2 - 2;
+   a->zero_pad_len_div2_m2     = a->zero_pad_len/2 - 2;
    if (a->zero_pad_len > 0)                         // necessite du padding
    {
       a->need_padding       = 1;

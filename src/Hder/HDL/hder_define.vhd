@@ -33,10 +33,7 @@ package hder_define is
    ------------------------------------------------------
    -- calculs                                            
    ------------------------------------------------------
-   -- ne rien changer dans les calculs
    constant ALEN_M1                          : integer := ALEN - 1;               
-   constant HDER_FIFO32_SIZE                 : integer := FAST_HDER_LEN_MIN/2; -- la profondeur minimale du fifo32 pour le header   
-   
    
    
    -----------------------------------------------------							
@@ -47,8 +44,8 @@ package hder_define is
       eff_hder_len            : unsigned(7 downto 0);  -- taille pertinente/effective du HDER (sans zero padd)en pixels
       zero_pad_len            : unsigned(12 downto 0); -- taille du zero padd en pixels 
       hder_len                : unsigned(12 downto 0); -- longueur totale du HDER en pixels(depend de SizeX et SizeY)
-      eff_hder_len_div2_m1    : unsigned(6 downto 0);
-      zero_pad_len_div2_m1    : unsigned(11 downto 0);      
+      eff_hder_len_div2_m2    : unsigned(6 downto 0);
+      zero_pad_len_div2_m2    : unsigned(11 downto 0);      
       need_padding            : std_logic;	-- need padding
       hder_tlast_en           : std_logic;   -- à '1' si le header doit être terminé par un TLAST ou pas lors de l'envoi 
       --run                     : std_logic;   -- run ou stop
@@ -60,8 +57,8 @@ package hder_define is
    to_unsigned(64,s_hder_insert_cfg.eff_hder_len'length),
    to_unsigned(0,s_hder_insert_cfg.zero_pad_len'length),
    to_unsigned(0,s_hder_insert_cfg.hder_len'length),
-   to_unsigned(0,s_hder_insert_cfg.eff_hder_len_div2_m1'length),
-   to_unsigned(0,s_hder_insert_cfg.zero_pad_len_div2_m1'length),
+   to_unsigned(0,s_hder_insert_cfg.eff_hder_len_div2_m2'length),
+   to_unsigned(0,s_hder_insert_cfg.zero_pad_len_div2_m2'length),
    '0',
    '0'
    --'0'

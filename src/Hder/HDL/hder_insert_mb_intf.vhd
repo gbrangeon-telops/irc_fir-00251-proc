@@ -243,8 +243,8 @@ begin
             when X"00" => axi_rdata <= resize(std_logic_vector(config_i.eff_hder_len),32); 
             when X"04" => axi_rdata <= resize(std_logic_vector(config_i.zero_pad_len),32);
             when X"08" => axi_rdata <= resize(std_logic_vector(config_i.hder_len),32);
-            when X"0C" => axi_rdata <= resize(std_logic_vector(config_i.eff_hder_len_div2_m1),32);
-            when X"10" => axi_rdata <= resize(std_logic_vector(config_i.zero_pad_len_div2_m1),32);
+            when X"0C" => axi_rdata <= resize(std_logic_vector(config_i.eff_hder_len_div2_m2),32);
+            when X"10" => axi_rdata <= resize(std_logic_vector(config_i.zero_pad_len_div2_m2),32);
             when X"14" => axi_rdata <= resize(("0000"& config_i.need_padding),32);
             when X"18" => axi_rdata <= resize(("0000"& config_i.hder_tlast_en),32);
             -- statut
@@ -334,10 +334,10 @@ begin
                            config_i.hder_len <= unsigned(data_i(config_i.hder_len'length-1 downto 0));
                         
                         when X"0C" => 
-                           config_i.eff_hder_len_div2_m1 <= unsigned(data_i(config_i.eff_hder_len_div2_m1'length-1 downto 0));
+                           config_i.eff_hder_len_div2_m2 <= unsigned(data_i(config_i.eff_hder_len_div2_m2'length-1 downto 0));
                         
                         when X"10" => 
-                           config_i.zero_pad_len_div2_m1 <= unsigned(data_i(config_i.zero_pad_len_div2_m1'length-1 downto 0));
+                           config_i.zero_pad_len_div2_m2 <= unsigned(data_i(config_i.zero_pad_len_div2_m2'length-1 downto 0));
                         
                         when X"14" => 
                            config_i.need_padding <= data_i(0);

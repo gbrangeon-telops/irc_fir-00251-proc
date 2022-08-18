@@ -54,10 +54,10 @@ entity hder_insert_sequencer is
       
       RAM_RD           : out std_logic;
       RAM_RD_ADD       : out std_logic_vector(5 downto 0);
-      RAM_RD_DATA      : in std_logic_vector(31 downto 0);
+      RAM_RD_DATA      : in std_logic_vector(63 downto 0);
       RAM_RD_DVAL      : in std_logic;
       
-      OUT_MOSI         : out t_axi4_stream_mosi32;
+      OUT_MOSI         : out t_axi4_stream_mosi64;
       OUT_MISO         : in t_axi4_stream_miso;
       
       HDER_TLAST_OUT   : in std_logic;
@@ -150,8 +150,8 @@ architecture rtl of hder_insert_sequencer is
    signal ram_rd_add_i                 : signed(8 downto 0);
    signal ram_wr_data_i, data_buff     : std_logic_vector(31 downto 0);
    signal ram_bwe_i                    : std_logic_vector(3 downto 0);
-   signal out_mosi_i                   : t_axi4_stream_mosi32;
-   signal data_cnt                     : unsigned(CONFIG.ZERO_PAD_LEN_DIV2_M1'length-1 downto 0);
+   signal out_mosi_i                   : t_axi4_stream_mosi64;
+   signal data_cnt                     : unsigned(CONFIG.ZERO_PAD_LEN_DIV2_M2'length-1 downto 0);
    signal ram_rd_i                     : std_logic;
    signal sequencer_done               : std_logic;
    signal ram_reader_done              : std_logic;
@@ -161,10 +161,11 @@ architecture rtl of hder_insert_sequencer is
    signal wstrb_buff                   : std_logic_vector(3 downto 0);
    signal fpa_hder_fast_received       : std_logic;
    signal cal_hder_fast_received       : std_logic;
-   signal hder_cycle_end               : std_logic;
+   signal hder_cycle_end               : std_logic; 
+   signal hder_tlast_out_sync          : std_logic;
    -- signal out_incr_en                  : std_logic_vector(1 downto 0);
    --signal out_rdy_i                    : std_logic;
-   
+  
 begin
    
    OUT_MOSI <= out_mosi_i;
@@ -272,6 +273,13 @@ begin
       RESET => sreset
       );
    
+   U1C : double_sync
+   port map(
+      CLK => CLK,
+      D   => HDER_TLAST_OUT,
+      Q   => hder_tlast_out_sync,
+      RESET => sreset
+      );
    -------------------------------------------------------------------
    -- Ecriture de l'id du header dans un fifo
    -------------------------------------------------------------------   
@@ -322,7 +330,7 @@ begin
             hder_cycle_end <= '0';
          else				
             
-            hder_cycle_end <= HDER_TLAST_OUT;
+            hder_cycle_end <= hder_tlast_out_sync;
             
             case sequencer_sm is	
                
@@ -517,7 +525,7 @@ begin
                when idle => 
                   ram_reader_done <= '1';
                   ram_rd_i <= '0';
-                  ram_rd_add_i <= to_signed(-1, ram_rd_add_i'length);  -- ainsi, la premiere adresse à lire sera -1 + 1 = 0 
+                  ram_rd_add_i <= to_signed(-2, ram_rd_add_i'length);  -- ainsi, la premiere adresse à lire sera -2 + 2 = 0 
                   if ram_reader_en = '1' then 
                      ram_reader_sm <= pause_st1;
                      ram_reader_done <= '0';
@@ -528,8 +536,8 @@ begin
                
                when read_st =>          -- aucun support de busy lors de la lecture des 64 pix de la RAM. Voilà pourquoi le fifo à l'extérieur a 64 pix de profond.
                   ram_rd_i <= '1';
-                  ram_rd_add_i <= ram_rd_add_i + 1;
-                  if ram_rd_add_i = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M1) then                     
+                  ram_rd_add_i <= ram_rd_add_i + 2;
+                  if ram_rd_add_i = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M2) then                     
                      ram_reader_sm <= pause_st2;
                   end if;
                
@@ -562,16 +570,16 @@ begin
          else                          
             
             -- assignation par défaut
-            out_mosi_i.tstrb <= "1111";
-            out_mosi_i.tkeep <= "1111";
+            out_mosi_i.tstrb <= (others => '1');
+            out_mosi_i.tkeep <= (others => '1');
             out_mosi_i.tuser <= (others => '0');
             out_mosi_i.tdest <= (others => '0');
             out_mosi_i.tid <= (others => '1');   -- pour downstream, permet identification du header
-            out_mosi_i.tdata <= RAM_RD_DATA(15 downto 0) & RAM_RD_DATA(31 downto 16); -- ainsi on supprime dbus_reorder
+            out_mosi_i.tdata <= RAM_RD_DATA(47 downto 32) & RAM_RD_DATA(63 downto 48) & RAM_RD_DATA(15 downto 0) & RAM_RD_DATA(31 downto 16); -- ainsi on supprime dbus_reorder
             
             -- autres assignations
-            ram_cnt_incr := '0'&  RAM_RD_DVAL;
-            rdy_cnt_incr := '0'&  OUT_MISO.TREADY;
+            ram_cnt_incr := RAM_RD_DVAL & '0' ;
+            rdy_cnt_incr := OUT_MISO.TREADY & '0' ;
             
             -- fsm
             case sender_sm is 
@@ -600,7 +608,7 @@ begin
                   hder_sender_done <= '0';         
                   data_cnt <= data_cnt + to_integer(unsigned(ram_cnt_incr)); 
                   out_mosi_i.tvalid <= RAM_RD_DVAL;
-                  if data_cnt = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M1) then
+                  if data_cnt = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M2) then
                      out_mosi_i.tlast <= CONFIG.HDER_TLAST_EN and not CONFIG.NEED_PADDING;
                      sender_sm <= check_zpad_st; 
                   end if;
@@ -621,7 +629,7 @@ begin
                   out_mosi_i.tdata <= (others =>'0'); 
                   data_cnt <= data_cnt + to_integer(unsigned(rdy_cnt_incr)); 
                   out_mosi_i.tvalid <= '1'; 
-                  if OUT_MISO.TREADY = '1' and data_cnt = to_integer(CONFIG.ZERO_PAD_LEN_DIV2_M1) then         -- on gère le busy ici car les donnnées ne proviennent pas d'une RAM                                          
+                  if OUT_MISO.TREADY = '1' and data_cnt = to_integer(CONFIG.ZERO_PAD_LEN_DIV2_M2) then         -- on gère le busy ici car les donnnées ne proviennent pas d'une RAM                                          
                      sender_sm <= idle;
                      out_mosi_i.tlast <= CONFIG.HDER_TLAST_EN;                 
                   end if;          

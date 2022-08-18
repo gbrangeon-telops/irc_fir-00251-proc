@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 39004
+ FREEID 39106
  VARIABLES
  {
   #ARCHITECTURE="FrameBuffer"
@@ -2671,7 +2671,7 @@ PAGE ""
    TEXT 
 "AXIS_TX_DATA_MOSI_o <= AXIS_RX_DATA_MOSI_i;\n"+
 "AXIS_RX_DATA_MISO_i <= AXIS_TX_DATA_MISO_o;\n"+
-"HDR_CLK <= CLK_RD;"
+"DCLK <= CLK_RD;"
    RECT (260,640,1060,780)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,255,156),0)
@@ -2711,7 +2711,7 @@ PAGE ""
     #GENERATE_KIND="IF"
     #LABEL="g1"
    }
-   AREA (220,600,1080,800)
+   AREA (220,600,1080,840)
    ASSIGNMENTS 27032
   }
   TEXT  27731, 0, 0
@@ -3726,7 +3726,7 @@ PAGE ""
     #COMPONENT="Output"
     #CUSTOM_NAME=""
     #LIBRARY="#terminals"
-    #REFERENCE="HDR_CLK"
+    #REFERENCE="DCLK"
     #SYMBOL="Output"
     #SYMBOL_GLOBALLY_UNIQUE_IDENTIFIER=""
    }
@@ -3737,7 +3737,7 @@ PAGE ""
   TEXT  30841, 0, 0
   {
    TEXT "$#REFERENCE"
-   RECT (262,1223,399,1258)
+   RECT (320,1223,399,1258)
    ALIGN 6
    MARGINS (1,1)
    PARENT 30839
@@ -3813,7 +3813,7 @@ PAGE ""
   SIGNALASSIGN  30882, 0, 0
   {
    LABEL "SignalAssignments_3"
-   TEXT "HDR_CLK <= CLK_WR;"
+   TEXT "DCLK <= CLK_WR;"
    RECT (1140,760,1540,840)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(255,255,156),0)
@@ -5323,7 +5323,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  38987, 0, 0
+  TEXT  39089, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5334,7 +5334,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  38988, 0, 0
+  TEXT  39090, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5345,7 +5345,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  38989, 0, 0
+  TEXT  39091, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5355,7 +5355,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  38990, 0, 0
+  TEXT  39092, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5367,7 +5367,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  38991, 0, 0
+  TEXT  39093, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5380,7 +5380,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  38992, 0, 0
+  TEXT  39094, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5390,7 +5390,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  38993, 0, 0
+  TEXT  39095, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5402,7 +5402,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  38994, 0, 0
+  TEXT  39096, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5412,7 +5412,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  38995, 0, 0
+  TEXT  39097, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5423,7 +5423,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  38996, 0, 0
+  GROUP  39098, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2020,5801,2401)
@@ -5435,7 +5435,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  38997, 0, 0
+  GROUP  39099, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2220,5801,2221)
@@ -5447,7 +5447,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  38998, 0, 0
+  GROUP  39100, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2160,5801,2161)
@@ -5459,7 +5459,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  38999, 0, 0
+  GROUP  39101, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2280,5801,2281)
@@ -5471,7 +5471,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  39000, 0, 0
+  GROUP  39102, 0, 0
   {
    PAGEALIGN 10
    RECT (4920,2340,5801,2341)
@@ -5483,7 +5483,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  39001, 0, 0
+  GROUP  39103, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,2020,5101,2161)
@@ -5494,7 +5494,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  39002, 0, 0
+  GROUP  39104, 0, 0
   {
    PAGEALIGN 10
    RECT (5100,2160,5101,2401)
@@ -5505,7 +5505,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  39003, 0, 0
+  BMPPICT  39105, 0, 0
   {
    PAGEALIGN 10
    RECT (4940,2080,5079,2125)

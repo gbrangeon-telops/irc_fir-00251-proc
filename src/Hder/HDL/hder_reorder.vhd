@@ -30,7 +30,7 @@ entity hder_reorder is
       BWE_SLOW     : in std_logic_vector(3 downto 0); -- byte write enable
       RD           : in std_logic;                    -- sert juste à generer DVAL
       RD_ADD       : in std_logic_vector(5 downto 0);
-      RD_DATA      : out std_logic_vector(31 downto 0);
+      RD_DATA      : out std_logic_vector(63 downto 0);
       RD_DVAL      : out std_logic       
       );
 end hder_reorder;                           
@@ -52,7 +52,7 @@ architecture RTL of hder_reorder is
          wea : in std_logic_vector(3 downto 0);
          addra : in std_logic_vector(5 downto 0);
          dina : in std_logic_vector(31 downto 0);
-         douta : out std_logic_vector(31 downto 0);
+         douta : out std_logic_vector(63 downto 0);
          clkb : in std_logic;
          rstb : in std_logic;
          enb : in std_logic;
