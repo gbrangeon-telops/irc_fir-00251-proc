@@ -82,7 +82,7 @@ entity bd_wrapper is
       AXIS_S2MM_CMD_MISO_FB         : out t_axi4_stream_miso;
       AXIS_S2MM_STS_MOSI_FB         : out t_axi4_stream_mosi_status;
       AXIS_S2MM_STS_MISO_FB         : in t_axi4_stream_miso;
-      AXIS_S2MM_DATA_MOSI_FB        : in t_axi4_stream_mosi64;
+      AXIS_S2MM_DATA_MOSI_FB        : in t_axi4_stream_mosi128;
       AXIS_S2MM_DATA_MISO_FB        : out t_axi4_stream_miso;
       
       UART_CLINK_TX : out STD_LOGIC;
@@ -1312,8 +1312,8 @@ architecture bd_wrapper of bd_wrapper is
          S_AXIS_S2MM_CMD_FB_tdata : in STD_LOGIC_VECTOR ( 71 downto 0 );
          S_AXIS_S2MM_CMD_FB_tready : out STD_LOGIC;
          S_AXIS_S2MM_CMD_FB_tvalid : in STD_LOGIC;
-         S_AXIS_S2MM_FB_tdata : in STD_LOGIC_VECTOR ( 63 downto 0 );
-         S_AXIS_S2MM_FB_tkeep : in STD_LOGIC_VECTOR ( 7 downto 0 );
+         S_AXIS_S2MM_FB_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
+         S_AXIS_S2MM_FB_tkeep : in STD_LOGIC_VECTOR ( 15 downto 0 );
          S_AXIS_S2MM_FB_tlast : in STD_LOGIC;
          S_AXIS_S2MM_FB_tready : out STD_LOGIC;
          S_AXIS_S2MM_FB_tvalid : in STD_LOGIC;
