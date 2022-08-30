@@ -914,8 +914,8 @@ CONFIG.XML_INPUT_FILE {mig_a.prj} \
 CONFIG.c_enable_mm2s {1} \
 CONFIG.c_enable_s2mm {0} \
 CONFIG.c_m_axi_mm2s_data_width {512} \
-CONFIG.c_m_axis_mm2s_tdata_width {128} \
-CONFIG.c_mm2s_burst_size {64} \
+CONFIG.c_m_axis_mm2s_tdata_width {256} \
+CONFIG.c_mm2s_burst_size {32} \
  ] $axi_datamover_ddrcal
 
   # Create instance: axi_dm_buffer, and set properties
@@ -989,6 +989,12 @@ CONFIG.STRATEGY {0} \
   # Create instance: axis_clock_converter_8, and set properties
   set axis_clock_converter_8 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_clock_converter:1.1 axis_clock_converter_8 ]
 
+  # Create instance: axis_dwidth_converter_0, and set properties
+  set axis_dwidth_converter_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_dwidth_converter:1.1 axis_dwidth_converter_0 ]
+  set_property -dict [ list \
+CONFIG.M_TDATA_NUM_BYTES {16} \
+ ] $axis_dwidth_converter_0
+
   # Create interface connections
   connect_bd_intf_net -intf_net CAL_DDR_MIG_DDR3 [get_bd_intf_pins DDR3] [get_bd_intf_pins CAL_DDR_MIG/DDR3]
   connect_bd_intf_net -intf_net Conn7 [get_bd_intf_pins S_AXIS_MM2S_CMD_BUF] [get_bd_intf_pins axi_dm_buffer/S_AXIS_MM2S_CMD]
@@ -1014,7 +1020,7 @@ CONFIG.STRATEGY {0} \
   connect_bd_intf_net -intf_net axi_dm_frame_buffer_M_AXI_MM2S [get_bd_intf_pins axi_dm_frame_buffer/M_AXI_MM2S] [get_bd_intf_pins axi_interconnect_ddrcal/S05_AXI]
   connect_bd_intf_net -intf_net axi_dm_frame_buffer_M_AXI_S2MM [get_bd_intf_pins axi_dm_frame_buffer/M_AXI_S2MM] [get_bd_intf_pins axi_interconnect_ddrcal/S04_AXI]
   connect_bd_intf_net -intf_net axi_interconnect_ddrcal_M00_AXI [get_bd_intf_pins CAL_DDR_MIG/S_AXI] [get_bd_intf_pins axi_interconnect_ddrcal/M00_AXI]
-  connect_bd_intf_net -intf_net axis_clock_converter_0_M_AXIS [get_bd_intf_pins M_AXIS_CALDDR_MM2S] [get_bd_intf_pins axis_clock_converter_0/M_AXIS]
+  connect_bd_intf_net -intf_net axis_clock_converter_0_M_AXIS [get_bd_intf_pins axis_clock_converter_0/M_AXIS] [get_bd_intf_pins axis_dwidth_converter_0/S_AXIS]
   connect_bd_intf_net -intf_net axis_clock_converter_1_M_AXIS [get_bd_intf_pins M_AXIS_MM2S_BUF] [get_bd_intf_pins axis_clock_converter_1/M_AXIS]
   connect_bd_intf_net -intf_net axis_clock_converter_2_M_AXIS [get_bd_intf_pins M_AXIS_MM2S_FB] [get_bd_intf_pins axis_clock_converter_2/M_AXIS]
   connect_bd_intf_net -intf_net axis_clock_converter_3_M_AXIS [get_bd_intf_pins axi_dm_buffer/S_AXIS_S2MM] [get_bd_intf_pins axis_clock_converter_3/M_AXIS]
@@ -1023,6 +1029,7 @@ CONFIG.STRATEGY {0} \
   connect_bd_intf_net -intf_net axis_clock_converter_6_M_AXIS [get_bd_intf_pins M_AXIS_CALDDR_MM2S_STS] [get_bd_intf_pins axis_clock_converter_6/M_AXIS]
   connect_bd_intf_net -intf_net axis_clock_converter_7_M_AXIS [get_bd_intf_pins axi_dm_frame_buffer/S_AXIS_S2MM_CMD] [get_bd_intf_pins axis_clock_converter_7/M_AXIS]
   connect_bd_intf_net -intf_net axis_clock_converter_8_M_AXIS [get_bd_intf_pins M_AXIS_S2MM_STS_FB] [get_bd_intf_pins axis_clock_converter_8/M_AXIS]
+  connect_bd_intf_net -intf_net axis_dwidth_converter_0_M_AXIS [get_bd_intf_pins M_AXIS_CALDDR_MM2S] [get_bd_intf_pins axis_dwidth_converter_0/M_AXIS]
 
   # Create port connections
   connect_bd_net -net ACLK_1 [get_bd_pins CLK_MB] [get_bd_pins axi_interconnect_ddrcal/S00_ACLK]
@@ -1030,9 +1037,9 @@ CONFIG.STRATEGY {0} \
   connect_bd_net -net CAL_DDR_MIG_ui_clk1 [get_bd_pins CAL_DDR_MIG/ui_clk] [get_bd_pins axi_datamover_ddrcal/m_axi_mm2s_aclk] [get_bd_pins axi_datamover_ddrcal/m_axis_mm2s_cmdsts_aclk] [get_bd_pins axi_dm_buffer/m_axi_mm2s_aclk] [get_bd_pins axi_dm_buffer/m_axi_s2mm_aclk] [get_bd_pins axi_dm_frame_buffer/m_axi_mm2s_aclk] [get_bd_pins axi_dm_frame_buffer/m_axi_s2mm_aclk] [get_bd_pins axi_dm_frame_buffer/m_axis_s2mm_cmdsts_awclk] [get_bd_pins axi_interconnect_ddrcal/ACLK] [get_bd_pins axi_interconnect_ddrcal/M00_ACLK] [get_bd_pins axi_interconnect_ddrcal/S01_ACLK] [get_bd_pins axi_interconnect_ddrcal/S02_ACLK] [get_bd_pins axi_interconnect_ddrcal/S03_ACLK] [get_bd_pins axi_interconnect_ddrcal/S04_ACLK] [get_bd_pins axi_interconnect_ddrcal/S05_ACLK] [get_bd_pins axis_clock_converter_0/s_axis_aclk] [get_bd_pins axis_clock_converter_1/s_axis_aclk] [get_bd_pins axis_clock_converter_2/s_axis_aclk] [get_bd_pins axis_clock_converter_3/m_axis_aclk] [get_bd_pins axis_clock_converter_4/m_axis_aclk] [get_bd_pins axis_clock_converter_5/m_axis_aclk] [get_bd_pins axis_clock_converter_6/s_axis_aclk] [get_bd_pins axis_clock_converter_7/m_axis_aclk] [get_bd_pins axis_clock_converter_8/s_axis_aclk]
   connect_bd_net -net S02_ACLK_1 [get_bd_pins CLK_DATA] [get_bd_pins axi_dm_buffer/m_axis_mm2s_cmdsts_aclk] [get_bd_pins axi_dm_buffer/m_axis_s2mm_cmdsts_awclk] [get_bd_pins axi_dm_frame_buffer/m_axis_mm2s_cmdsts_aclk] [get_bd_pins axis_clock_converter_1/m_axis_aclk] [get_bd_pins axis_clock_converter_2/m_axis_aclk] [get_bd_pins axis_clock_converter_3/s_axis_aclk]
   connect_bd_net -net device_temp_i_1 [get_bd_pins device_temp_i] [get_bd_pins CAL_DDR_MIG/device_temp_i]
-  connect_bd_net -net m_axi_mm2s_aclk_1 [get_bd_pins CLK_CAL] [get_bd_pins axis_clock_converter_0/m_axis_aclk] [get_bd_pins axis_clock_converter_5/s_axis_aclk] [get_bd_pins axis_clock_converter_6/m_axis_aclk]
+  connect_bd_net -net m_axi_mm2s_aclk_1 [get_bd_pins CLK_CAL] [get_bd_pins axis_clock_converter_0/m_axis_aclk] [get_bd_pins axis_clock_converter_5/s_axis_aclk] [get_bd_pins axis_clock_converter_6/m_axis_aclk] [get_bd_pins axis_dwidth_converter_0/aclk]
   connect_bd_net -net m_axi_s2mm_aclk_1 [get_bd_pins clk_din] [get_bd_pins axis_clock_converter_4/s_axis_aclk] [get_bd_pins axis_clock_converter_7/s_axis_aclk] [get_bd_pins axis_clock_converter_8/m_axis_aclk]
-  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins PERIPHERAL_ARESETN] [get_bd_pins CAL_DDR_MIG/aresetn] [get_bd_pins axi_datamover_ddrcal/m_axi_mm2s_aresetn] [get_bd_pins axi_datamover_ddrcal/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_buffer/m_axi_mm2s_aresetn] [get_bd_pins axi_dm_buffer/m_axi_s2mm_aresetn] [get_bd_pins axi_dm_buffer/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_buffer/m_axis_s2mm_cmdsts_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axi_mm2s_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axi_s2mm_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axis_s2mm_cmdsts_aresetn] [get_bd_pins axi_interconnect_ddrcal/M00_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S00_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S01_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S02_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S03_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S04_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S05_ARESETN] [get_bd_pins axis_clock_converter_0/m_axis_aresetn] [get_bd_pins axis_clock_converter_0/s_axis_aresetn] [get_bd_pins axis_clock_converter_1/m_axis_aresetn] [get_bd_pins axis_clock_converter_1/s_axis_aresetn] [get_bd_pins axis_clock_converter_2/m_axis_aresetn] [get_bd_pins axis_clock_converter_2/s_axis_aresetn] [get_bd_pins axis_clock_converter_3/m_axis_aresetn] [get_bd_pins axis_clock_converter_3/s_axis_aresetn] [get_bd_pins axis_clock_converter_4/m_axis_aresetn] [get_bd_pins axis_clock_converter_4/s_axis_aresetn] [get_bd_pins axis_clock_converter_5/m_axis_aresetn] [get_bd_pins axis_clock_converter_5/s_axis_aresetn] [get_bd_pins axis_clock_converter_6/m_axis_aresetn] [get_bd_pins axis_clock_converter_6/s_axis_aresetn] [get_bd_pins axis_clock_converter_7/m_axis_aresetn] [get_bd_pins axis_clock_converter_7/s_axis_aresetn] [get_bd_pins axis_clock_converter_8/m_axis_aresetn] [get_bd_pins axis_clock_converter_8/s_axis_aresetn]
+  connect_bd_net -net proc_sys_reset_1_interconnect_aresetn [get_bd_pins PERIPHERAL_ARESETN] [get_bd_pins CAL_DDR_MIG/aresetn] [get_bd_pins axi_datamover_ddrcal/m_axi_mm2s_aresetn] [get_bd_pins axi_datamover_ddrcal/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_buffer/m_axi_mm2s_aresetn] [get_bd_pins axi_dm_buffer/m_axi_s2mm_aresetn] [get_bd_pins axi_dm_buffer/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_buffer/m_axis_s2mm_cmdsts_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axi_mm2s_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axi_s2mm_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axis_mm2s_cmdsts_aresetn] [get_bd_pins axi_dm_frame_buffer/m_axis_s2mm_cmdsts_aresetn] [get_bd_pins axi_interconnect_ddrcal/M00_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S00_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S01_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S02_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S03_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S04_ARESETN] [get_bd_pins axi_interconnect_ddrcal/S05_ARESETN] [get_bd_pins axis_clock_converter_0/m_axis_aresetn] [get_bd_pins axis_clock_converter_0/s_axis_aresetn] [get_bd_pins axis_clock_converter_1/m_axis_aresetn] [get_bd_pins axis_clock_converter_1/s_axis_aresetn] [get_bd_pins axis_clock_converter_2/m_axis_aresetn] [get_bd_pins axis_clock_converter_2/s_axis_aresetn] [get_bd_pins axis_clock_converter_3/m_axis_aresetn] [get_bd_pins axis_clock_converter_3/s_axis_aresetn] [get_bd_pins axis_clock_converter_4/m_axis_aresetn] [get_bd_pins axis_clock_converter_4/s_axis_aresetn] [get_bd_pins axis_clock_converter_5/m_axis_aresetn] [get_bd_pins axis_clock_converter_5/s_axis_aresetn] [get_bd_pins axis_clock_converter_6/m_axis_aresetn] [get_bd_pins axis_clock_converter_6/s_axis_aresetn] [get_bd_pins axis_clock_converter_7/m_axis_aresetn] [get_bd_pins axis_clock_converter_7/s_axis_aresetn] [get_bd_pins axis_clock_converter_8/m_axis_aresetn] [get_bd_pins axis_clock_converter_8/s_axis_aresetn] [get_bd_pins axis_dwidth_converter_0/aresetn]
   connect_bd_net -net sys_rst_1 [get_bd_pins sys_rst] [get_bd_pins CAL_DDR_MIG/sys_rst]
 
   # Restore current instance
@@ -2013,13 +2020,21 @@ preplace port HEADER_CTRL -pg 1 -y 1420 -defaultsOSRD
 preplace port PLEORA_UART_SIN -pg 1 -y 800 -defaultsOSRD
 preplace portBus bulk_interrupt -pg 1 -y 1770 -defaultsOSRD
 preplace portBus ARESETN -pg 1 -y 180 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_5 -pg 1 -lvl 1 -y 2160 -defaultsOSRD
 preplace inst MCU -pg 1 -lvl 3 -y 2550 -defaultsOSRD
 preplace inst FlashReset_0 -pg 1 -lvl 3 -y 2180 -defaultsOSRD
+preplace inst MIG_Calibration|axis_dwidth_converter_0 -pg 1 -lvl 3 -y 2230 -defaultsOSRD
+preplace inst MIG_Calibration|axi_dm_frame_buffer -pg 1 -lvl 2 -y 2510 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_6 -pg 1 -lvl 5 -y 2040 -defaultsOSRD
 preplace inst vcc -pg 1 -lvl 1 -y 2760 -defaultsOSRD
 preplace inst intr_concact -pg 1 -lvl 2 -y 1810 -defaultsOSRD
+preplace inst MIG_Calibration|axi_datamover_ddrcal -pg 1 -lvl 6 -y 2630 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_7 -pg 1 -lvl 1 -y 2340 -defaultsOSRD
 preplace inst axi_lens_uart -pg 1 -lvl 5 -y 1360 -defaultsOSRD
-preplace inst MIG_Calibration -pg 1 -lvl 6 -y 3612 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_8 -pg 1 -lvl 5 -y 2790 -defaultsOSRD
+preplace inst MIG_Calibration -pg 1 -lvl 6 -y 2190 -defaultsOSRD
 preplace inst GND -pg 1 -lvl 1 -y 2840 -defaultsOSRD
+preplace inst MIG_Calibration|axi_interconnect_ddrcal -pg 1 -lvl 4 -y 2780 -defaultsOSRD
 preplace inst xadc_wiz_1 -pg 1 -lvl 5 -y 3224 -defaultsOSRD
 preplace inst axi_ndf_uart -pg 1 -lvl 5 -y 430 -defaultsOSRD
 preplace inst oem_uart -pg 1 -lvl 5 -y 1570 -defaultsOSRD
@@ -2029,140 +2044,191 @@ preplace inst axi_gpio_0 -pg 1 -lvl 5 -y 1090 -defaultsOSRD
 preplace inst proc_sys_reset_1 -pg 1 -lvl 2 -y 2780 -defaultsOSRD
 preplace inst axi_gps_uart -pg 1 -lvl 5 -y 770 -defaultsOSRD
 preplace inst fw_uart -pg 1 -lvl 5 -y 100 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_0 -pg 1 -lvl 5 -y 2230 -defaultsOSRD
+preplace inst MIG_Calibration|axi_dm_buffer -pg 1 -lvl 2 -y 2870 -defaultsOSRD
 preplace inst fpga_output_uart -pg 1 -lvl 5 -y 270 -defaultsOSRD
 preplace inst axi_usb_uart -pg 1 -lvl 5 -y 2270 -defaultsOSRD
 preplace inst MIG_Code -pg 1 -lvl 5 -y 2672 -defaultsOSRD
-preplace inst axi_interconnect_0 -pg 1 -lvl 4 -y 3748 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_1 -pg 1 -lvl 5 -y 2610 -defaultsOSRD
+preplace inst axi_interconnect_0 -pg 1 -lvl 4 -y 3750 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_2 -pg 1 -lvl 5 -y 2420 -defaultsOSRD
 preplace inst clink_uart -pg 1 -lvl 5 -y 600 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_3 -pg 1 -lvl 1 -y 2850 -defaultsOSRD
+preplace inst MIG_Calibration|CAL_DDR_MIG -pg 1 -lvl 5 -y 2970 -defaultsOSRD
 preplace inst pleora_uart -pg 1 -lvl 5 -y 1740 -defaultsOSRD
 preplace inst clk_wiz_1 -pg 1 -lvl 4 -y 4340 -defaultsOSRD
+preplace inst MIG_Calibration|axis_clock_converter_4 -pg 1 -lvl 1 -y 2520 -defaultsOSRD
 preplace inst power_management -pg 1 -lvl 5 -y 1210 -defaultsOSRD
 preplace inst axi_quad_spi_0 -pg 1 -lvl 5 -y 2450 -defaultsOSRD
-preplace netloc S_AXIS_MM2S_CMD_1 1 0 6 -160J 3472 NJ 3472 NJ 3472 NJ 3472 NJ 3472 N
-preplace netloc axi_peripheral_M04_AXI1 1 4 3 1820J 930 NJ 930 5350J
-preplace netloc S00_AXI_2 1 3 2 1020 1720 1750
+preplace netloc S_AXIS_MM2S_CMD_1 1 0 6 NJ 3340 NJ 3340 NJ 3340 NJ 3340 1580J 2120 N
+preplace netloc axi_peripheral_M04_AXI1 1 4 3 1400J 930 NJ 930 5360J
+preplace netloc S00_AXI_2 1 3 2 930 1720 1330
 preplace netloc axi_ndf_uart_sout 1 5 2 NJ 440 5300J
-preplace netloc S_AXIS_MM2S_CMD_2 1 0 6 -170J 3492 NJ 3492 NJ 3492 NJ 3492 NJ 3492 N
-preplace netloc MIG_Calibration_M_AXIS_S2MM_STS 1 6 1 5210
-preplace netloc mig_7series_0_DDR3 1 6 1 5320
-preplace netloc axi_quad_spi_0_ip2intc_irpt 1 1 5 70 2070 560J 2040 NJ 2040 1800J 2110 4010
-preplace netloc microblaze_1_Clk 1 2 5 620 2790 1000 2790 1950 2790 4120 2790 5290J
-preplace netloc S_AXIS_MM2S_CMD_3 1 0 6 NJ 3380 NJ 3380 NJ 3380 NJ 3380 NJ 3380 4110
-preplace netloc mig_7series_0_DDR4 1 5 2 NJ 2612 5230J
-preplace netloc axi_peripheral_M_LENS_UART_AXI 1 4 1 1940
-preplace netloc axi_peripheral_M14_AXI1 1 4 1 1850
-preplace netloc axi_timer_0_interrupt 1 1 5 100 2080 570J 2070 NJ 2070 1810J 2080 4020
-preplace netloc axi_quad_spi_0_SPI_0 1 5 2 NJ 2430 5210J
-preplace netloc axi_peripheral_M_COOLER_UART 1 4 1 1780
-preplace netloc MIG_Code_mmcm_locked 1 3 3 1030 3510 NJ 3510 4020
-preplace netloc clk_wiz_2_locked 1 1 4 160 3550 NJ 3550 NJ 3550 1750
-preplace netloc MIG_Code_clk20 1 5 2 NJ 2632 5210J
-preplace netloc cooler_uart_ip2intc_irpt 1 1 5 130 460 NJ 460 NJ 460 2040J 1660 4080
+preplace netloc S_AXIS_MM2S_CMD_2 1 0 6 NJ 3360 NJ 3360 NJ 3360 NJ 3360 1600J 2140 2160
+preplace netloc MIG_Calibration_M_AXIS_S2MM_STS 1 6 1 5120
+preplace netloc mig_7series_0_DDR3 1 6 1 5200
+preplace netloc axi_quad_spi_0_ip2intc_irpt 1 1 5 60 2360 NJ 2360 NJ 2360 NJ 2360 2000
+preplace netloc microblaze_1_Clk 1 2 5 530 2710 880 810 1530 4350 2070 4350 5350J
+preplace netloc MIG_Calibration|axis_clock_converter_5_M_AXIS 1 1 5 NJ 2160 NJ 2160 NJ 2160 4140J 2700 4540
+preplace netloc MIG_Calibration|axis_clock_converter_2_M_AXIS 1 5 2 NJ 2420 N
+preplace netloc S_AXIS_MM2S_CMD_3 1 0 6 NJ 3380 NJ 3380 NJ 3380 NJ 3380 NJ 3380 2170
+preplace netloc mig_7series_0_DDR4 1 5 2 2120J 1930 5210J
+preplace netloc axi_peripheral_M_LENS_UART_AXI 1 4 1 1540
+preplace netloc axi_peripheral_M14_AXI1 1 4 1 1430
+preplace netloc axi_timer_0_interrupt 1 1 5 120 2050 NJ 2050 NJ 2050 NJ 2050 2000
+preplace netloc MIG_Calibration|S_AXI_1 1 0 4 2580J 2660 NJ 2660 NJ 2660 3700
+preplace netloc MIG_Calibration|ARESETN_1 1 0 4 NJ 2710 NJ 2710 NJ 2710 N
+preplace netloc axi_quad_spi_0_SPI_0 1 5 2 2070J 1910 5250J
+preplace netloc axi_peripheral_M_COOLER_UART 1 4 1 1360
+preplace netloc MIG_Code_mmcm_locked 1 3 3 940 2880 NJ 2880 2000
+preplace netloc clk_wiz_2_locked 1 1 4 140 2930 NJ 2930 NJ 2930 1330
+preplace netloc MIG_Code_clk20 1 5 2 2060J 1850 5260J
+preplace netloc cooler_uart_ip2intc_irpt 1 1 5 140 460 NJ 460 NJ 460 1610J 1660 2040
 preplace netloc clink_uart_sout 1 5 2 NJ 610 5300J
-preplace netloc OEM_UART_rxd_1 1 0 6 -150J 680 NJ 680 NJ 680 NJ 680 NJ 680 4070
-preplace netloc power_management_GPIO2 1 5 2 NJ 1220 5290J
-preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 130 2010 540J 2060 NJ 2060 NJ 2060 4120
-preplace netloc axi_gpio_0_gpio 1 5 2 NJ 1080 5350J
-preplace netloc axi_protocol_converter_8_m_axi 1 4 3 1930J 1490 NJ 1490 5270J
-preplace netloc MIG_Calibration_M_AXIS_MM2S 1 6 1 5310
-preplace netloc axi_protocol_converter_2_m_axi 1 4 3 1920J 1000 NJ 1000 5320J
-preplace netloc axi_peripheral_M09_AXI 1 4 3 1750J 860 NJ 860 NJ
-preplace netloc axi_peripheral_m_pleora_axi 1 4 1 1970
-preplace netloc xadc_wiz_1_temp_out 1 4 2 2070 3752 4030
-preplace netloc axi_interconnect_0_M00_AXI1 1 4 1 2010
-preplace netloc vn_in_1 1 0 5 -150J 3214 NJ 3214 NJ 3214 NJ 3214 NJ
-preplace netloc vp_in_1 1 0 5 -170J 3234 NJ 3234 NJ 3234 NJ 3234 NJ
-preplace netloc S_AXIS_S2MM_CMD_1 1 0 6 -160J 3572 NJ 3572 NJ 3572 NJ 3572 NJ 3572 N
-preplace netloc axi_peripheral_M06_AXI 1 4 3 1930J 940 NJ 940 5280J
-preplace netloc axi_interconnect_1_m12_axi 1 4 1 1890
-preplace netloc S_AXIS_S2MM_CMD_2 1 0 6 -170J 3540 NJ 3540 NJ 3540 NJ 3540 NJ 3540 4060
-preplace netloc axi_gpio_0_GPIO2 1 5 2 NJ 1100 5350J
-preplace netloc axi_peripheral_M_BULK_AXI 1 4 3 1840J 960 NJ 960 NJ
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS1 1 6 1 5260
+preplace netloc OEM_UART_rxd_1 1 0 6 -90J 680 NJ 680 NJ 680 NJ 680 NJ 680 2030
+preplace netloc MIG_Calibration|ACLK_1 1 0 4 NJ 2690 NJ 2690 NJ 2690 3680
+preplace netloc power_management_GPIO2 1 5 2 NJ 1220 5310J
+preplace netloc fpga_output_uart_ip2intc_irpt 1 1 5 70 190 NJ 190 NJ 190 NJ 190 2030
+preplace netloc axi_gpio_0_gpio 1 5 2 NJ 1080 5360J
+preplace netloc axi_protocol_converter_8_m_axi 1 4 3 1510J 1490 NJ 1490 5270J
+preplace netloc MIG_Calibration_M_AXIS_MM2S 1 6 1 5190
+preplace netloc axi_protocol_converter_2_m_axi 1 4 3 1490J 1000 NJ 1000 5330J
+preplace netloc MIG_Calibration|proc_sys_reset_1_interconnect_aresetn 1 0 6 2630 2020 2880 2020 3330 2020 3720 2020 4160 3080 4560
+preplace netloc axi_peripheral_M09_AXI 1 4 3 1330J 860 NJ 860 NJ
+preplace netloc axi_peripheral_m_pleora_axi 1 4 1 1440
+preplace netloc xadc_wiz_1_temp_out 1 4 2 1640 3060 2010
+preplace netloc axi_interconnect_0_M00_AXI1 1 4 1 1610
+preplace netloc vn_in_1 1 0 5 -110J 3214 NJ 3214 NJ 3214 NJ 3214 NJ
+preplace netloc vp_in_1 1 0 5 -120J 3234 NJ 3234 NJ 3234 NJ 3234 NJ
+preplace netloc MIG_Calibration|CAL_DDR_MIG_DDR3 1 5 2 N 2930 4950J
+preplace netloc S_AXIS_S2MM_CMD_1 1 0 6 NJ 3590 NJ 3590 NJ 3590 NJ 3590 NJ 3590 2190
+preplace netloc axi_peripheral_M06_AXI 1 4 3 1510J 940 NJ 940 5280J
+preplace netloc axi_interconnect_1_m12_axi 1 4 1 1520
+preplace netloc MIG_Calibration|axi_dm_buffer_M_AXI_MM2S 1 2 2 NJ 2810 3690
+preplace netloc S_AXIS_S2MM_CMD_2 1 0 6 NJ 3570 NJ 3570 NJ 3570 NJ 3570 NJ 3570 2160
+preplace netloc axi_gpio_0_GPIO2 1 5 2 NJ 1100 5360J
+preplace netloc axi_peripheral_M_BULK_AXI 1 4 3 1420J 960 NJ 960 NJ
+preplace netloc MIG_Calibration_M_AXIS_MM2S_STS1 1 6 1 5150
 preplace netloc vcc_const 1 1 1 NJ
-preplace netloc S01_AXI_1 1 3 2 NJ 2560 1750
-preplace netloc mcu_debug_sys_rst 1 1 3 160 2690 NJ 2690 930
-preplace netloc proc_sys_reset_1_bus_struct_reset 1 2 1 600
-preplace netloc axi_peripheral_M05_AXI1 1 4 3 1910J 980 NJ 980 5210J
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS2 1 6 1 5250
-preplace netloc NDF_UART_rxd_1 1 0 6 -150J 350 NJ 350 NJ 350 NJ 350 NJ 350 4080
-preplace netloc axi_usb_uart_ip2intc_irpt 1 1 5 60 2090 630J 2080 NJ 2080 1780J 2100 4020
+preplace netloc S01_AXI_1 1 3 2 NJ 2560 1330
+preplace netloc mcu_debug_sys_rst 1 1 3 140 2690 460J 2700 860
+preplace netloc proc_sys_reset_1_bus_struct_reset 1 2 1 490
+preplace netloc MIG_Calibration|axis_clock_converter_0_M_AXIS 1 2 4 3340 2330 NJ 2330 NJ 2330 4520
+preplace netloc axi_peripheral_M05_AXI1 1 4 3 1480J 980 NJ 980 5150J
+preplace netloc MIG_Calibration_M_AXIS_MM2S_STS2 1 6 1 5130
+preplace netloc NDF_UART_rxd_1 1 0 6 -90J 350 NJ 350 NJ 350 NJ 350 NJ 350 2030
+preplace netloc axi_usb_uart_ip2intc_irpt 1 1 5 80 2320 NJ 2320 NJ 2320 1640J 2190 2000
 preplace netloc fw_uart_sout 1 5 2 NJ 110 NJ
-preplace netloc axi_usb_uart_uart 1 5 2 NJ 2260 5210J
-preplace netloc axi_peripheral_M_FLASHINTF_AXI 1 4 3 1980J 1830 NJ 1830 NJ
-preplace netloc axi_peripheral_m_usbuart_axi 1 4 1 1830
-preplace netloc axi_peripheral_M_FLASHRESET_AXI 1 2 3 640 1730 NJ 1730 1780
-preplace netloc proc_sys_reset_1_mb_reset 1 2 1 610
-preplace netloc axi_ndf_uart1_ip2intc_irpt 1 1 5 140 2060 530J 1970 NJ 1970 1910J 2050 4050
-preplace netloc axi_interconnect_0_m00_axi 1 4 1 1890
-preplace netloc AEC_INTC_1 1 0 2 -150J 1740 NJ
-preplace netloc axi_interconnect_1_m02_axi 1 4 1 1790
-preplace netloc S_AXIS_S2MM_1 1 0 6 -150J 3590 NJ 3590 NJ 3590 NJ 3590 NJ 3590 4040
-preplace netloc SYS_CLK_1 1 0 6 -150J 3452 NJ 3452 NJ 3452 NJ 3452 NJ 3452 N
-preplace netloc axi_peripheral_M15_AXI 1 4 3 2020J 1280 NJ 1280 5290J
-preplace netloc MIG_Calibration_M_AXIS_MM2S1 1 6 1 5290
-preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 4 NJ 2800 960 2800 2050 2800 4080
-preplace netloc oem_uart_sout 1 5 2 NJ 1580 5250J
-preplace netloc S_AXIS_S2MM_2 1 0 6 NJ 3430 NJ 3430 NJ 3430 NJ 3430 NJ 3430 4070
-preplace netloc MIG_Calibration_M_AXIS_MM2S2 1 6 1 5280
-preplace netloc axi_peripheral_M_CALIB_RAM_AXI 1 4 3 1880J 970 NJ 970 5350J
-preplace netloc sin_1 1 0 6 -150J 690 NJ 690 NJ 690 NJ 690 NJ 690 4010
-preplace netloc MCU_Interrupt 1 1 3 150 2040 550J 2010 940
+preplace netloc axi_usb_uart_uart 1 5 2 2080J 1920 5240J
+preplace netloc axi_peripheral_M_FLASHINTF_AXI 1 4 3 1550J 1830 NJ 1830 NJ
+preplace netloc axi_peripheral_m_usbuart_axi 1 4 1 1380
+preplace netloc axi_peripheral_M_FLASHRESET_AXI 1 2 3 530 1940 NJ 1940 1360
+preplace netloc proc_sys_reset_1_mb_reset 1 2 1 500
+preplace netloc axi_ndf_uart1_ip2intc_irpt 1 1 5 90 1580 NJ 1580 900J 1700 1630J 1460 2000
+preplace netloc axi_interconnect_0_m00_axi 1 4 1 1400
+preplace netloc AEC_INTC_1 1 0 2 -90J 1740 NJ
+preplace netloc MIG_Calibration|Conn10 1 2 5 3340J 2500 NJ 2500 4120J 2510 4520J 2440 N
+preplace netloc axi_interconnect_1_m02_axi 1 4 1 1370
+preplace netloc MIG_Calibration|Conn11 1 2 5 3320J 2320 NJ 2320 NJ 2320 NJ 2320 4920
+preplace netloc S_AXIS_S2MM_1 1 0 6 -90J 2300 NJ 2300 NJ 2300 NJ 2300 1590J 2160 2130
+preplace netloc SYS_CLK_1 1 0 6 -100J 2040 NJ 2040 NJ 2040 NJ 2040 NJ 2040 2090
+preplace netloc axi_peripheral_M15_AXI 1 4 3 1600J 1280 NJ 1280 5290J
+preplace netloc MIG_Calibration_M_AXIS_MM2S1 1 6 1 5170
+preplace netloc proc_sys_reset_1_interconnect_aresetn 1 2 4 NJ 2800 890 2800 1620 2800 2180
+preplace netloc oem_uart_sout 1 5 2 NJ 1580 5210J
+preplace netloc MIG_Calibration|axis_clock_converter_6_M_AXIS 1 5 2 NJ 2040 4960
+preplace netloc MIG_Calibration|m_axi_s2mm_aclk_1 1 0 5 2600 2040 NJ 2040 NJ 2040 NJ 2040 4150
+preplace netloc MIG_Calibration|S02_ACLK_1 1 0 5 2580 2670 2920 2670 NJ 2670 3680J 2350 4130
+preplace netloc S_AXIS_S2MM_2 1 0 6 NJ 3430 NJ 3430 NJ 3430 NJ 3430 NJ 3430 2150
+preplace netloc MIG_Calibration_M_AXIS_MM2S2 1 6 1 5160
+preplace netloc axi_peripheral_M_CALIB_RAM_AXI 1 4 3 1440J 970 NJ 970 5360J
+preplace netloc sin_1 1 0 6 -90J 690 NJ 690 NJ 690 NJ 690 NJ 690 2000
+preplace netloc MIG_Calibration|Conn13 1 2 5 NJ 2510 NJ 2510 4090J 2520 4540J 2510 N
+preplace netloc MIG_Calibration|axis_clock_converter_1_M_AXIS 1 5 2 4530J 2400 N
+preplace netloc MIG_Calibration|axi_dm_buffer_M_AXI_S2MM 1 2 2 NJ 2830 3670
+preplace netloc MCU_Interrupt 1 1 3 110 2630 470J 2690 850
 preplace netloc fpga_output_uart_sout 1 5 2 NJ 280 NJ
-preplace netloc sin_2 1 0 6 -150J 790 NJ 790 NJ 790 NJ 790 2050J 900 4020
-preplace netloc axi_peripheral_M_FW_UART_AXI 1 4 1 1810
-preplace netloc fw_uart_ip2intc_irpt 1 1 5 100 130 NJ 130 NJ 130 2060J 1460 4090
-preplace netloc CLINK_UART_rxd_1 1 0 6 -150J 520 NJ 520 NJ 520 NJ 520 NJ 520 4070
-preplace netloc ext_reset_in_1 1 1 5 60 2870 NJ 2870 NJ 2870 2060 2870 4050
-preplace netloc axi_lens_uart_sout 1 5 2 NJ 1370 5260J
+preplace netloc sin_2 1 0 6 -90J 790 NJ 790 NJ 790 NJ 790 1630J 900 2010
+preplace netloc MIG_Calibration|CAL_DDR_MIG_ui_clk1 1 0 6 2640 2060 2910 2060 NJ 2060 3710 2060 4100 3090 4550
+preplace netloc axi_peripheral_M_FW_UART_AXI 1 4 1 1390
+preplace netloc fw_uart_ip2intc_irpt 1 1 5 80 20 NJ 20 NJ 20 NJ 20 2030
+preplace netloc CLINK_UART_rxd_1 1 0 6 -90J 520 NJ 520 NJ 520 NJ 520 NJ 520 2030
+preplace netloc MIG_Calibration|Conn15 1 0 2 NJ 2630 2890
+preplace netloc MIG_Calibration|SYS_CLK_1 1 0 5 NJ 2030 NJ 2030 NJ 2030 NJ 2030 4110
+preplace netloc MIG_Calibration|m_axi_mm2s_aclk_1 1 0 5 2610 2050 NJ 2050 3320J 2050 NJ 2050 4170
+preplace netloc MIG_Calibration|axis_clock_converter_7_M_AXIS 1 1 1 2920
+preplace netloc ext_reset_in_1 1 1 5 30 2870 NJ 2870 NJ 2870 1630 2870 2050J
+preplace netloc axi_lens_uart_sout 1 5 2 NJ 1370 5290J
+preplace netloc MIG_Calibration|S_AXIS_S2MM_CMD_FB_1 1 0 1 2620
 preplace netloc S0_AXIS_1 1 0 3 NJ 2470 NJ 2470 NJ
-preplace netloc axi_peripheral_M_AXI 1 4 3 2010J 1440 NJ 1440 5220J
-preplace netloc LENS_UART_SIN_1 1 0 6 NJ 650 NJ 650 NJ 650 NJ 650 2070J 850 4010
-preplace netloc RQC_LUT_AXI 1 4 3 1990J 1480 NJ 1480 NJ
-preplace netloc power_management_GPIO 1 5 2 NJ 1200 5330J
-preplace netloc MCU_M0_AXIS 1 3 4 980J 2190 NJ 2190 NJ 2190 5210J
-preplace netloc clink_uart_ip2intc_irpt 1 1 5 110 630 NJ 630 NJ 630 2000J 2070 4100
-preplace netloc FlashReset_0_ip2intc_irpt 1 1 3 90 2050 NJ 2050 930
+preplace netloc axi_peripheral_M_AXI 1 4 3 1570J 1440 NJ 1440 5180J
+preplace netloc LENS_UART_SIN_1 1 0 6 NJ 650 NJ 650 NJ 650 NJ 650 1640J 850 2000
+preplace netloc MIG_Calibration|axi_datamover_0_M_AXI_MM2S 1 3 4 3750 3070 NJ 3070 NJ 3070 4940
+preplace netloc MIG_Calibration|S_AXIS_CAL_MM2S_CMD_1 1 0 1 N
+preplace netloc RQC_LUT_AXI 1 4 3 1620J 1450 NJ 1450 5270J
+preplace netloc power_management_GPIO 1 5 2 NJ 1200 5340J
+preplace netloc MCU_M0_AXIS 1 3 4 900J 1840 NJ 1840 NJ 1840 5270J
+preplace netloc clink_uart_ip2intc_irpt 1 1 5 130 2060 NJ 2060 NJ 2060 NJ 2060 2050
+preplace netloc MIG_Calibration|axi_datamover_ddrcal_M_AXIS_MM2S 1 4 3 4190 3060 NJ 3060 4920
+preplace netloc FlashReset_0_ip2intc_irpt 1 1 3 50 2330 NJ 2330 850
 preplace netloc axi_gps_uart_sout 1 5 2 NJ 780 5300J
-preplace netloc SYS_CLK_0_1 1 0 5 NJ 2390 NJ 2390 NJ 2390 NJ 2390 1770J
-preplace netloc axi_peripheral_M05_AXI 1 4 3 2020J 1450 NJ 1450 5260J
-preplace netloc mcu_m_axi_dp 1 3 1 950
-preplace netloc axi_uart16550_0_ip2intc_irpt 1 1 5 160 800 NJ 800 NJ 800 2030J 1650 4030
-preplace netloc axi_protocol_converter_4_m_axi 1 4 3 1910J 1820 NJ 1820 5260J
-preplace netloc axi_peripheral_m_fpgaout_axi 1 4 1 1830
-preplace netloc FlashReset_0_m_axi 1 3 1 970
-preplace netloc axi_protocol_converter_3_m_axi 1 4 3 1770J 890 NJ 890 5300J
-preplace netloc s_axi1_1 1 2 3 640 2310 NJ 2310 1760
-preplace netloc FW_UART_rxd_1 1 0 6 NJ 10 NJ 10 NJ 10 NJ 10 NJ 10 4090
-preplace netloc pleora_uart_sout 1 5 2 NJ 1750 5210J
-preplace netloc MIG_Calibration_M_AXIS_S2MM_STS1 1 6 1 5230
-preplace netloc oem_uart_ip2intc_irpt 1 1 5 160 2020 NJ 2020 NJ 2020 1880J 2040 4010
-preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 80 2930 NJ 2930 NJ 2930 NJ 2930 4010
-preplace netloc microblaze_1_xlconcat_dout 1 2 1 580
-preplace netloc axi_peripheral_M03_AXI 1 4 3 1800J 910 NJ 910 5350J
-preplace netloc FPGA_UART_rxd_1 1 0 6 NJ 190 NJ 190 NJ 190 NJ 190 NJ 190 4080
-preplace netloc clk_wiz_1_clk_out1 1 3 4 1010 3600 1770 4320 4090J 4320 5330
-preplace netloc MIG_Calibration_M_AXIS_MM2S_STS 1 6 1 5300
-preplace netloc axi_protocol_converter_1_m_axi 1 4 3 1970J 1010 NJ 1010 5310J
-preplace netloc axi_peripheral_M04_AXI 1 4 3 1870J 920 NJ 920 5300J
-preplace netloc clk_wiz_1_clk_out2 1 4 3 NJ 4340 4130J 4340 5350J
-preplace netloc proc_sys_reset_1_peripheral_aresetn 1 2 5 590 2820 990 2820 1960 2820 4100J 2820 5240
-preplace netloc axi_peripheral_M08_AXI 1 4 1 1920
-preplace netloc axi_interconnect_1_m00_axi 1 4 1 1790
-preplace netloc clk_din_1 1 0 6 NJ 3930 NJ 3930 NJ 3930 NJ 3930 NJ 3930 4120
-preplace netloc MIG_Code_clk200 1 5 2 NJ 2692 5210J
+preplace netloc SYS_CLK_0_1 1 0 5 NJ 2390 NJ 2390 NJ 2390 NJ 2390 1420J
+preplace netloc axi_peripheral_M05_AXI 1 4 3 1580J 1470 NJ 1470 5260J
+preplace netloc mcu_m_axi_dp 1 3 1 860
+preplace netloc axi_uart16550_0_ip2intc_irpt 1 1 5 130 800 NJ 800 NJ 800 1590J 1650 2020
+preplace netloc axi_protocol_converter_4_m_axi 1 4 3 1640J 1480 NJ 1480 5180J
+preplace netloc axi_peripheral_m_fpgaout_axi 1 4 1 1410
+preplace netloc FlashReset_0_m_axi 1 3 1 870
+preplace netloc MIG_Calibration|axi_datamover_ddrcal_M_AXIS_MM2S_STS 1 4 3 4180 2880 NJ 2880 4930
+preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXI_MM2S 1 2 2 NJ 2450 3740
+preplace netloc MIG_Calibration|axi_dm_buffer_M_AXIS_MM2S 1 2 3 NJ 2890 3670J 3050 4090
+preplace netloc axi_protocol_converter_3_m_axi 1 4 3 1350J 890 NJ 890 5300J
+preplace netloc s_axi1_1 1 2 3 540 1960 NJ 1960 1340
+preplace netloc FW_UART_rxd_1 1 0 6 NJ 10 NJ 10 NJ 10 NJ 10 NJ 10 2040
+preplace netloc pleora_uart_sout 1 5 2 NJ 1750 5150J
+preplace netloc MIG_Calibration|axis_clock_converter_3_M_AXIS 1 1 1 2860
+preplace netloc MIG_Calibration_M_AXIS_S2MM_STS1 1 6 1 5140
+preplace netloc oem_uart_ip2intc_irpt 1 1 5 140 2070 NJ 2070 NJ 2070 NJ 2070 2030
+preplace netloc xadc_wiz_1_ip2intc_irpt 1 1 5 40 3020 NJ 3020 NJ 3020 NJ 3020 2000
+preplace netloc microblaze_1_xlconcat_dout 1 2 1 510
+preplace netloc axi_peripheral_M03_AXI 1 4 3 1380J 910 NJ 910 5360J
+preplace netloc FPGA_UART_rxd_1 1 0 6 -90J 180 NJ 180 NJ 180 NJ 180 NJ 180 2040
+preplace netloc MIG_Calibration|S_AXIS_S2MM_BUF_1 1 0 1 2590
+preplace netloc clk_wiz_1_clk_out1 1 3 4 920 2810 1340 4320 2200J 4320 5310J
+preplace netloc MIG_Calibration|sys_rst_1 1 0 5 NJ 3090 NJ 3090 NJ 3090 NJ 3090 4080
+preplace netloc MIG_Calibration_M_AXIS_MM2S_STS 1 6 1 5180
+preplace netloc axi_protocol_converter_1_m_axi 1 4 3 1540J 1010 NJ 1010 5320J
+preplace netloc axi_peripheral_M04_AXI 1 4 3 1450J 920 NJ 920 5300J
+preplace netloc clk_wiz_1_clk_out2 1 4 3 NJ 4340 2210J 4340 5360J
+preplace netloc proc_sys_reset_1_peripheral_aresetn 1 2 5 480 2820 910 2820 1560 2820 2100J 1360 5180
+preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXIS_S2MM_STS 1 2 3 NJ 2490 NJ 2490 4080
+preplace netloc MIG_Calibration|axis_dwidth_converter_0_M_AXIS 1 3 4 3680J 2140 NJ 2140 NJ 2140 N
+preplace netloc MIG_Calibration|axis_clock_converter_8_M_AXIS 1 5 2 NJ 2790 4960
+preplace netloc MIG_Calibration|axi_interconnect_ddrcal_M00_AXI 1 4 1 4080
+preplace netloc MIG_Calibration|S_AXIS_S2MM_FB_1 1 0 1 N
+preplace netloc MIG_Calibration|axis_clock_converter_4_M_AXIS 1 1 1 2860
+preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXIS_MM2S 1 2 3 3330J 2380 NJ 2380 N
+preplace netloc MIG_Calibration|device_temp_i_1 1 0 5 NJ 3060 NJ 3060 NJ 3060 NJ 3060 4120
+preplace netloc axi_peripheral_M08_AXI 1 4 1 1490
+preplace netloc axi_interconnect_1_m00_axi 1 4 1 1370
+preplace netloc clk_din_1 1 0 6 NJ 3930 NJ 3930 NJ 3930 NJ 3930 NJ 3930 2220
+preplace netloc MIG_Code_clk200 1 5 2 2040J 1860 5230J
 preplace netloc BUTTON_1 1 0 3 NJ 2150 NJ 2150 NJ
-preplace netloc axi_protocol_converter_0_m_axi 1 4 3 1900J 950 NJ 950 5340J
-preplace netloc axi_peripheral_M_DDRMIG_AXI 1 4 2 1860J 3612 N
-preplace netloc clk_wiz_0_clk_out3 1 1 6 150 2680 NJ 2680 NJ 2680 2030 2530 4070 2530 5220J
-preplace netloc bulk_interrupt_1 1 0 2 -150J 1780 NJ
-preplace netloc pleora_uart_ip2intc_irpt 1 1 5 120 2030 NJ 2030 NJ 2030 1820J 2090 4070
-preplace netloc axi_protocol_converter_7_m_axi 1 4 3 1890J 990 NJ 990 5220J
-preplace netloc s_axi_1 1 2 3 630 2280 NJ 2280 1770
-preplace netloc axi_peripheral_M_ADC_READOUT_AXI 1 4 3 1760J 880 NJ 880 NJ
-preplace netloc axi_interconnect_1_m01_axi 1 4 1 2010
-preplace netloc S00_AXI_1 1 3 2 NJ 2520 1760
-levelinfo -pg 1 -190 0 370 790 1560 3846 4993 5370 -top -220 -bot 6080
+preplace netloc MIG_Calibration|Conn7 1 0 2 NJ 2250 2900
+preplace netloc MIG_Calibration|axi_dm_frame_buffer_M_AXI_S2MM 1 2 2 NJ 2470 3730
+preplace netloc axi_protocol_converter_0_m_axi 1 4 3 1470J 950 NJ 950 5350J
+preplace netloc axi_peripheral_M_DDRMIG_AXI 1 4 2 1500J 1020 2140J
+preplace netloc clk_wiz_0_clk_out3 1 1 6 130 2370 NJ 2370 NJ 2370 1570 2370 2110 1890 5220J
+preplace netloc bulk_interrupt_1 1 0 2 -90J 1780 NJ
+preplace netloc pleora_uart_ip2intc_irpt 1 1 5 100 2080 NJ 2080 NJ 2080 NJ 2080 2010
+preplace netloc MIG_Calibration|Conn8 1 0 2 NJ 2430 2870
+preplace netloc axi_protocol_converter_7_m_axi 1 4 3 1460J 990 NJ 990 5270J
+preplace netloc s_axi_1 1 2 3 520 1950 NJ 1950 1350
+preplace netloc axi_peripheral_M_ADC_READOUT_AXI 1 4 3 1340J 880 NJ 880 NJ
+preplace netloc axi_interconnect_1_m01_axi 1 4 1 1570
+preplace netloc S00_AXI_1 1 3 2 NJ 2520 1340
+levelinfo -pg 1 -140 -30 300 710 1140 1840 2810 5410 -top -220 -bot 6080
+levelinfo -hier MIG_Calibration * 2750 3140 3570 3941 4380 4740 *
 ",
 }
 
