@@ -49,7 +49,7 @@ entity irig_frame_decoder_v2 is
       -- interface avec le µBlaze Inbterface
       IRIG_DATA        : out irig_data_type;
       IRIG_PPS         : out std_logic;
-	  DELAY   : in   std_logic_vector(31 downto 0)  
+      DELAY            : in  std_logic_vector(31 downto 0)  
 	  
       );
 end irig_frame_decoder_v2;
@@ -105,14 +105,7 @@ architecture RTL of irig_frame_decoder_v2 is
    signal valid_irig_detected      : std_logic;
    signal idle_cnt                 : unsigned(2 downto 0);
    signal irig_data_i              : irig_data_type;
-   signal delay_i                  : std_logic_vector(31 downto 0); 
-   
-   -- -- attribute dont_touch : string; 
-   -- -- attribute dont_touch of irig_data_i          : signal is "true"; 
-   -- -- attribute dont_touch of frm_received         : signal is "true";  
-   -- -- attribute dont_touch of irig_dout            : signal is "true";
-   -- -- attribute dont_touch of irig_dout_dval       : signal is "true";
-   -- -- attribute dont_touch of irig_dout_sel        : signal is "true";
+   signal delay_i                  : std_logic_vector(31 downto 0);
    
    
 begin 
@@ -443,7 +436,7 @@ begin
             
          end if;
       end if;
-   end process;   
+   end process;
    
    --------------------------------------------------
    -- qques signaux de monitoring

@@ -4,6 +4,7 @@ acom -nowarn DAGGEN_0523 -incr \
  D:\Telops\Common_HDL\Utilities\dcm_reset.vhd \
  D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_edge_det_xcd.vhd \
  D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_stretch.vhd \
+ D:\Telops\Common_HDL\gh_vhdl_lib\custom_MSI\gh_debounce.vhd \
  D:\Telops\Common_HDL\Utilities\err_sync.vhd \
  D:\Telops\Common_HDL\Utilities\double_sync.vhd \
  D:\Telops\Common_HDL\Utilities\Clk_Divider.vhd \

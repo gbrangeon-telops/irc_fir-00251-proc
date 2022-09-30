@@ -19,8 +19,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all; 
-library Common_HDL;
-use Common_HDL.telops.all; 
+--library Common_HDL;
+--use Common_HDL.telops.all; 
 
 
 package IRIG_Testbench_define is    

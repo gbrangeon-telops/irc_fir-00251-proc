@@ -32,7 +32,8 @@
 #define AR_IRIG_PPS_DELAY           0x24
 #define AR_IRIG_MB_SPEED_ERR        0x28
 
-#define IRIG_HW_DELAY               750U // TODO Eventually, thIS delay will have to be set in the flash settings.
+// TODO Eventually, this delay will have to be set in the flash settings.
+#define IRIG_HW_DELAY               750U
 
 /**************************** Type Definitions ******************************/
 typedef struct
@@ -55,7 +56,7 @@ typedef struct
 
 /************************** Function Prototypes *****************************/
 
-void IRIG_Initialize();
+void IRIG_Initialize(gcRegistersData_t *pGCRegs);
 void IRIG_Read_Global_Status();
 void IRIG_Processing(gcRegistersData_t *pGCRegs);
 

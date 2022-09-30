@@ -19,6 +19,7 @@ IRIG_POSIXTime_t IRIG_POSIXTime;
 struct tm rTClock;
 
 //***************************** Private Functions prototypes**************/
+void IRIG_Enable(TimeSource_t TimeSource);
 void IRIG_Read_Status();
 void IRIG_Read_Time();
 uint16_t UnsignedBcd16ToDec(uint16_t unsignedBCD16);
@@ -30,6 +31,7 @@ uint16_t UnsignedBcd16ToDec(uint16_t unsignedBCD16);
 
 void IRIG_Processing(gcRegistersData_t *pGCRegs)
 {
+   static uint32_t prevTimeSource = 0xFFFFFFFF; //Undefined value to trigger a change
    extern t_HderInserter gHderInserter;
    uint32_t POSIXSecAtNextPPS;
   
@@ -41,7 +43,6 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
       if (IRIG_POSIXTime.Status.Valid_Source == 1)
       {
          pGCRegs->TimeSource = TS_IRIGB;         // on specifie IRIG tant qu'une source valide est detectée
-         AXI4L_write32(1, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Activation du module HW
 
          if (IRIG_POSIXTime.Status.Valid_Data == 1)  // Un POSIX time a été décodé et est prêt à être lue 
          {
@@ -53,19 +54,34 @@ void IRIG_Processing(gcRegistersData_t *pGCRegs)
       else
       {
          pGCRegs->TimeSource = TS_InternalRealTimeClock;  // Si IRIG et GPS ne sont pas détectés
-         AXI4L_write32(0, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
       }
+   }
 
+   // Update if necessary
+   if (prevTimeSource != pGCRegs->TimeSource)
+   {
       // Update header
       HDER_UpdateTimeSourceHeader(&gHderInserter, pGCRegs->TimeSource);
-      // La source du PPS est IRIG
+      // Update PPS source
       TRIG_PpsSrcSelect(pGCRegs->TimeSource, &gTrig);
+      // Enable/disable
+      IRIG_Enable(pGCRegs->TimeSource);
    }
-   else
-   {
-      AXI4L_write32(0, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
-   }
+
+   prevTimeSource = pGCRegs->TimeSource;
 }
+
+//--------------------------------------------------------------------------
+//  Fonction   IRIG_Enable
+//--------------------------------------------------------------------------
+void IRIG_Enable(TimeSource_t TimeSource)
+{
+   if (TimeSource == TS_IRIGB)
+      AXI4L_write32(1, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Activation du module HW
+   else
+      AXI4L_write32(0, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_ENABLE); // Désactivation du module HW
+}
+
 //---------------------------------------------------------------------------------    
 //  Fonction   IRIG_Read_Status                                                                                 
 //---------------------------------------------------------------------------------
@@ -110,11 +126,13 @@ void IRIG_Read_Global_Status()
 //  Fonction   Initialize IRIGB
 //---------------------------------------------------------------------------------
  
-void IRIG_Initialize()
+void IRIG_Initialize(gcRegistersData_t *pGCRegs)
 {
    AXI4L_write32(IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
    // TODO Eventually, the delay will have to be set in the flash setting.
    //AXI4L_write32(flashSettings.IRIG_HW_DELAY, XPAR_IRIG_CTRL_BASEADDR + AW_IRIG_DELAY);
+
+   IRIG_Enable(pGCRegs->TimeSource);
 }
  
  

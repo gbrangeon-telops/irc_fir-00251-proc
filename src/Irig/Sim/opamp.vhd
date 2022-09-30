@@ -22,8 +22,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.math_real.all;
-library COMMON_HDL;
-use COMMON_HDL.Telops.all;
+--library COMMON_HDL;
+--use COMMON_HDL.Telops.all;
 
 entity opamp is
    port(
@@ -44,7 +44,7 @@ architecture RTL of opamp is
    
 begin
    
-   OPAMP_OUT <= Uto0(std_logic_vector(to_unsigned(opamp_out_i,8)));
+   OPAMP_OUT <= std_logic_vector(to_unsigned(opamp_out_i,8));
    
    U0: process(CLK)
       variable opamp_temp   : integer;
@@ -64,7 +64,7 @@ begin
                end if;
             end loop;
             
-            opamp_temp := to_integer(unsigned(Uto0(OPAMP_IN)))* real_opam_gain(to_integer(unsigned(opamp_gain_sel)));
+            opamp_temp := to_integer(unsigned(OPAMP_IN))* real_opam_gain(to_integer(unsigned(opamp_gain_sel)));
             if opamp_temp > 255  then
                opamp_out_i <= 255;  -- saturation de la sortie
             else

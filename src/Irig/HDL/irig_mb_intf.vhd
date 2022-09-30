@@ -22,12 +22,11 @@ entity irig_mb_intf is
    port(
       ARESET            : in std_logic;
       
-      CLK_20M           : in std_logic;
       MB_CLK            : in std_logic;     
       
-      IRIG_PPS          : in std_logic;
+      IRIG_PPS_IN       : in std_logic;
       PPS_ACQ_WINDOW    : out std_logic;      
-      IRIG_ENABLE       : out std_logic;
+      IRIG_PPS_OUT      : out std_logic;
       IRIG_DATA         : in irig_data_type;
       
       IRIG_VALID_SOURCE : in std_logic;
@@ -48,7 +47,19 @@ architecture rtl of irig_mb_intf is
          CLK    : in std_logic;
          SRESET : out std_logic := '1'
          );
-   end component;        
+   end component;
+   
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
    
    component gh_edge_det
       port(
@@ -85,16 +96,27 @@ architecture rtl of irig_mb_intf is
    signal mb_on_time                : std_logic;
    signal irig_data_rdy             : std_logic; 
    signal irig_data_rdy_last        : std_logic;
+   signal irig_data_available       : std_logic;
    signal irig_pps_sync             : std_logic;
    signal irig_valid_pps            : std_logic;
-   signal irig_valid_source_i       : std_logic;
+   signal irig_valid_source_sync    : std_logic;
    signal delay_i                   : std_logic_vector(31 downto 0) := x"000002EE";
    signal time_dval_sre             : std_logic; 
+   signal time_dval_sync            : std_logic;
+   signal status_dval_sync          : std_logic;
+   
+   attribute keep : string; 
+   attribute keep of irig_data_rdy          : signal is "true";
+   attribute keep of irig_data_available          : signal is "true";
+   attribute keep of irig_reg_read_by_mb          : signal is "true";
+   attribute keep of irig_pps_sync          : signal is "true";
+   attribute keep of irig_valid_pps          : signal is "true";
+   
 begin
    
    DELAY <= delay_i;
    
-   IRIG_ENABLE <= irig_en_i;
+   IRIG_PPS_OUT <= irig_valid_pps;  --output only valid pps
    
    -- I/O Connections assignments
    MB_MISO.AWREADY  <= axi_awready;
@@ -118,7 +140,18 @@ begin
       );
    
    
-   E1 : gh_edge_det port map(clk => MB_CLK, rst => sreset, D => IRIG_DATA.TIME_DVAL, sre => time_dval_sre, re => open, fe => open, sfe => open);      
+   -- synchronize time_dval
+   S1 : double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IRIG_DATA.TIME_DVAL, CLK => MB_CLK, Q => time_dval_sync);
+   E1 : gh_edge_det port map(clk => MB_CLK, rst => sreset, D => time_dval_sync, sre => time_dval_sre, re => open, fe => open, sfe => open);
+   
+   -- synchronize status_dval
+   S2 : double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IRIG_DATA.STATUS_DVAL, CLK => MB_CLK, Q => status_dval_sync);
+   
+   -- synchronize IRIG_PPS
+   S3 : double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IRIG_PPS_IN, CLK => MB_CLK, Q => irig_pps_sync);
+   
+   -- synchronize IRIG_VALID_SOURCE
+   S4 : double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => IRIG_VALID_SOURCE, CLK => MB_CLK, Q => irig_valid_source_sync);
 
    ----------------------------------------------------------------------------
    --  stockage des infos dans des registres 
@@ -138,12 +171,12 @@ begin
             irig_data_rdy <= '1';
          end if;
          
-         if irig_pps_sync = '1' or irig_valid_source = '0' then       
+         if irig_pps_sync = '1' or irig_valid_source_sync = '0' then       
             irig_data_rdy <= '0';
          end if;
          
          -- irig status
-         if IRIG_DATA.STATUS_DVAL = '1' then  
+         if status_dval_sync = '1' then  
             irig_data_latch.status_reg <= IRIG_DATA.STATUS_REG;
          end if;
          
@@ -161,14 +194,10 @@ begin
             mb_on_time <= '1';
             irig_data_rdy_last <= irig_data_rdy; 
             irig_en_last <= irig_en_i;
-            irig_valid_source_i <= '0';
+            irig_data_available <= '0';
          else    
             
-            -- flag de detection source valide de IRIG
-            irig_valid_source_i <= IRIG_VALID_SOURCE;            
-            
             -- le pps de irig
-            irig_pps_sync <= IRIG_PPS;
             irig_valid_pps <= irig_pps_sync and irig_en_i;
             
             -- misc
@@ -198,6 +227,13 @@ begin
                mb_speed_err_i <='0';                    -- à remetre à '0' lorsqu'on est certain que le MB est à l'ecoute. Il n'est pas à l'ecoute de IRIG au demarrage du système
             end if;
             
+            -- manage irig data available
+            if irig_data_rdy_last = '0' and irig_data_rdy = '1' then
+               irig_data_available <= '1';   -- de nouvelles données sont disponibles
+            end if;
+            if irig_reg_read_by_mb = '1' or irig_data_rdy = '0' then
+               irig_data_available <= '0';   -- les données ont été lues ou invalidées
+            end if;
             
          end if;
       end if;    
@@ -257,12 +293,12 @@ begin
             when X"0C" =>  axi_rdata <= resize(irig_data_latch.dayofyear_reg, 32);
             when X"10" =>  axi_rdata <= resize(irig_data_latch.tenthsofsec_reg, 32);
             when X"14" =>  axi_rdata <= resize(irig_data_latch.year_reg, 32);          irig_reg_read_by_mb <= '1'; -- ne pas deplacer  irig_reg_read_by_mb de cette ligne  
-            when X"18" =>  axi_rdata <= resize('0' & irig_valid_source_i, 32);   
-            when X"1C" =>  axi_rdata <= resize('0' & irig_data_rdy, 32); 
+            when X"18" =>  axi_rdata <= resize('0' & irig_valid_source_sync, 32);   
+            when X"1C" =>  axi_rdata <= resize('0' & irig_data_available, 32); 
             when X"20" =>  axi_rdata <= resize(irig_data_latch.status_reg, 32);
             when X"24" =>  axi_rdata <= resize('0' & delay_i, 32);
-			when X"28" =>  axi_rdata <= resize('0' & mb_speed_err_i, 32);
-       
+            when X"28" =>  axi_rdata <= resize('0' & mb_speed_err_i, 32);
+            
             when others=>  axi_rdata <= (others =>'1');
          end case;        
       end if;     

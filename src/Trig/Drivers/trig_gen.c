@@ -120,6 +120,7 @@ void TRIG_Init(t_Trig *a, const gcRegistersData_t *pGCRegs)
 	TRIG_ClearErr(a);
 	TRIG_SendConfigGC(a, pGCRegs);
 	TRIG_ChangeAcqWindow(a, TRIG_ExtraTrig, pGCRegs);
+	TRIG_PpsSrcSelect(pGCRegs->TimeSource, a);   // set default PPS source
 }
 
 //--------------------------------------------------------------------------

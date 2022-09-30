@@ -87,6 +87,7 @@ add_files [concat \
    $common_hdl_dir/SPI/spi_rx.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_PWM.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_stretch.vhd \
+   $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_debounce.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_edge_det.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_edge_det_xcd.vhd \
    $common_hdl_dir/gh_vhdl_lib/custom_MSI/gh_binary2gray.vhd \

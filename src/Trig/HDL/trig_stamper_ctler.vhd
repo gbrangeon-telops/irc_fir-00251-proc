@@ -22,17 +22,10 @@ use work.BufferingDefine.all;
 entity trig_stamper_ctler is
    port(
       SRESET                  : in std_logic;
-      CLK                     : in std_logic;		
-      
-      -- External very accurate 10MHz clock and PPS signal
-      CLK_10M                 : in std_logic; -- 10 MHz clk enable
-      PPS                     : in std_logic;  -- Not used for now. Will be used for synchro to GPS or IRIG-B     
+      CLK_100M                : in std_logic;   -- Explicitly specified to use a 100MHz clock
       
       -- Signal from FPA which triggers the latching of a time stamp.
-      FPA_IMG_INFO            : in img_info_type; 
-      
-      -- External trigger
-      EXT_TRIG                : in std_logic;  
+      FPA_IMG_INFO            : in img_info_type;  
       
       -- Buffering  
       BUFFERING_FLAG          : in buffering_flag_type;
@@ -48,6 +41,7 @@ entity trig_stamper_ctler is
       POSIX_TIME              : out POSIX_time_type;
       
       -- interface avec le module GPS/IRIG
+      PPS                     : in std_logic;
       PPS_SYNC                : out std_logic;
       PPS_ACQ_WINDOW          : in std_logic ;     
       PPS_TIMEOUT_RE          : out std_logic;
@@ -90,19 +84,16 @@ architecture RTL of trig_stamper_ctler is
 
    signal seconds_cnt               : unsigned(31 downto 0);
    signal subseconds_cnt            : unsigned(23 downto 0);
-   signal subseconds_temp_cnt       : unsigned(23 downto 0);
    signal subseconds_wrap           : std_logic;
    signal exposure_feedbk           : std_logic;
    signal exposure_feedbk_i         : std_logic;
-   signal clk_10M_re                : std_logic;  -- Rising edge
+   signal clk_10M_cnt               : unsigned(3 downto 0);   -- 10 cycles of CLK_100M to increment subseconds_cnt
    signal pps_re                    : std_logic;  -- Rising edge
    signal mb_overwrite_re           : std_logic;  -- Rising edge	
    signal exposure_feedbk_re        : std_logic;  -- Rising edge
-   signal start_pps_permit_windw_re : std_logic;  -- Rising edge   
-   signal ext_trig_sync             : std_logic;		  
-   signal PPS_sync_i			         : std_logic; 
+   signal start_pps_permit_windw_re : std_logic;  -- Rising edge    
    signal permit_pps_overwrite      : std_logic;	  
-   signal SnapShotSubseconds        : unsigned(23 downto 0); 
+   signal permit_pps_timeout        : unsigned(seconds_cnt'range); 
    signal PpsOccurrenceTimeOut_cnt  : unsigned(2 downto 0);
    signal PpsOccurrenceTimeOut      : std_logic;
    signal time_stamp_i              : POSIX_time_type;
@@ -115,13 +106,21 @@ architecture RTL of trig_stamper_ctler is
    signal buffering_flag_val_sync   : std_logic_vector(BUFFERING_FLAG.val'range);
    signal buffering_flag_update_done_i : std_logic;
    signal buffering_dval_re         : std_logic;
+   
+   attribute keep : string; 
+   attribute keep of permit_pps_overwrite          : signal is "true";
+   attribute keep of pps_re          : signal is "true";
+   attribute keep of PPS_ACQ_WINDOW          : signal is "true";
+   attribute keep of permit_pps_timeout          : signal is "true";
+   attribute keep of subseconds_cnt          : signal is "true";
+   attribute keep of seconds_cnt          : signal is "true";
 
 begin      
    
    HDER_MOSI <= hder_mosi_i;   
    POSIX_TIME.Seconds <= seconds_cnt;    
    POSIX_TIME.SubSeconds <= subseconds_cnt;
-   PPS_SYNC <=  pps_sync_i;
+   PPS_SYNC <=  PPS;
    exposure_feedbk <= FPA_IMG_INFO.EXP_FEEDBK;
    hder_link_rdy <= HDER_MISO.WREADY and HDER_MISO.AWREADY;
    
@@ -130,39 +129,37 @@ begin
 
    
    -- Sync
-   S1: double_sync generic map(INIT_VALUE => '0') port map (RESET => SRESET, D => exposure_feedbk, CLK => CLK, Q => exposure_feedbk_i);	
+   S1: double_sync generic map(INIT_VALUE => '0') port map (RESET => SRESET, D => exposure_feedbk, CLK => CLK_100M, Q => exposure_feedbk_i);	
    
-   -- Detect various rising edges   
-   E1 : gh_edge_det port map(clk => CLK, rst => SRESET, D => CLK_10M, sre => clk_10M_re, re => open, fe => open, sfe => open);      
-   E2 : gh_edge_det port map(clk => CLK, rst => SRESET, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
-   E3 : gh_edge_det port map(clk => CLK, rst => SRESET, D => exposure_feedbk_i, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
-   E4 : gh_edge_det port map(clk => CLK, rst => SRESET, D => PPS_sync_i, sre => pps_re, re => open, fe => open, sfe => open); 
-   E5 : gh_edge_det port map(clk => CLK, rst => SRESET, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
-   E6 : gh_edge_det port map(clk => CLK, rst => SRESET, D => BUFFERING_FLAG.dval, sre => buffering_dval_re, re => open, fe => open, sfe => open); 
+   -- Detect various rising edges      
+   E2 : gh_edge_det port map(clk => CLK_100M, rst => SRESET, D => MB_OVERWRITE, sre => mb_overwrite_re, re => open, fe => open, sfe => open);   
+   E3 : gh_edge_det port map(clk => CLK_100M, rst => SRESET, D => exposure_feedbk_i, sre => exposure_feedbk_re, re => open, fe => open, sfe => open);
+   E4 : gh_edge_det port map(clk => CLK_100M, rst => SRESET, D => PPS, sre => pps_re, re => open, fe => open, sfe => open); 
+   E5 : gh_edge_det port map(clk => CLK_100M, rst => SRESET, D => START_PPS_PERMIT_WINDW, sre => start_pps_permit_windw_re, re => open, fe => open, sfe => open); 
+   E6 : gh_edge_det port map(clk => CLK_100M, rst => SRESET, D => BUFFERING_FLAG.dval, sre => buffering_dval_re, re => open, fe => open, sfe => open); 
    
    
    -----------------------------------------------------------------
    -- Process to handle the permit window valid signal
    -----------------------------------------------------------------
-   U1: process(CLK)
+   U1: process(CLK_100M)
    begin		 
-      if rising_edge(CLK) then
+      if rising_edge(CLK_100M) then
          if start_pps_permit_windw_re = '1' then
-            -- Set "overwite permit" signal when requested by MB on each decoded valid NMEA RMC.
+            -- Set "overwrite permit" signal when requested by MB on each decoded valid NMEA RMC.
             permit_pps_overwrite <= '1';
-            -- And take a snapshot of the subseconds counter.
-            SnapShotSubseconds <= subseconds_cnt-1;
-         elsif (SnapShotSubseconds = subseconds_cnt)or (pps_re = '1') then
-            -- Clear "overwite permit" signal when one exact second TimeOut was expired(Subsecond counter
-            -- wrapped to the same value we've snaped before), or a PPS was recieved. MB will set it back up 
-            -- at the next valid NMEA RMC.
+            -- The IRIG sends 1 PPS out of 2, so the delay to receive the next PPS is between 1 and 2 seconds.
+            -- Since 2 seconds is valid, the timeout is set to 3 seconds.
+            permit_pps_timeout <= seconds_cnt + 3;
+         elsif (seconds_cnt >= permit_pps_timeout) or (pps_re = '1') then
+            -- Clear "overwrite permit" signal when timeout is expired or a PPS is received. 
+            -- MB will set it back up at the next valid NMEA RMC.
             permit_pps_overwrite <= '0';
          end if;
          
          -- Reset
          if SRESET = '1' then
             permit_pps_overwrite <= '0';
-            SnapShotSubseconds <= (others => '0');
          end if;         
       end if;
    end process; 
@@ -170,33 +167,33 @@ begin
    -----------------------------------------------------------------
    -- Process to handle the permit window valid signal
    -----------------------------------------------------------------
-   U2: process(CLK)
+   U2: process(CLK_100M)
    begin		 
-      if rising_edge(CLK) then   
-         
-         ext_trig_sync <= EXT_TRIG;
-         PPS_sync_i	   <= PPS;	
+      if rising_edge(CLK_100M) then	
          
          -- Default value
-         subseconds_wrap <= '0';                           
+         subseconds_wrap <= '0';                
          
-         -- Manage subseconds counter
-         if clk_10M_re = '1' then
-            if subseconds_temp_cnt = 9_999_999 then -- Wrap to zero
-               subseconds_temp_cnt <= (others => '0'); 
-               subseconds_wrap <= '1';
-            else   
-               subseconds_temp_cnt <= subseconds_temp_cnt + 1;                
-            end if;
-         end if;                
-         subseconds_cnt <= subseconds_temp_cnt; -- decalage de subseconds_temp_cnt de 1CLK pour synchro parfaite avec seconds_cnt
-         
-         -- Manage seconds counter
+         -- Overwrite now by the µBlaze or synchronized with the PPS (GPS or IRIG-B)
          if mb_overwrite_re = '1' or (permit_pps_overwrite = '1' and PPS_ACQ_WINDOW = '1' and pps_re = '1') then
             seconds_cnt <= unsigned(MB_TIME_SEC);
-            subseconds_temp_cnt <= unsigned(MB_TIME_SUBSEC); 
-         elsif subseconds_wrap = '1' then
-            seconds_cnt <= seconds_cnt + 1;   
+            subseconds_cnt <= unsigned(MB_TIME_SUBSEC);
+            clk_10M_cnt <= (others => '0');
+         -- Verify roll over of the clk_10M counter. This means 1 subsecond has passed
+         elsif clk_10M_cnt = 9 then
+            clk_10M_cnt <= (others => '0');
+            -- Verify roll over of the subseconds counter. This means 1 second has passed
+            if subseconds_cnt = 9_999_999 then
+               subseconds_cnt <= (others => '0'); 
+               subseconds_wrap <= '1';       -- stays high for one clock cycle to specify to other processes that 1 second has passed
+               seconds_cnt <= seconds_cnt + 1;
+            -- Increment the subseconds counter
+            else   
+               subseconds_cnt <= subseconds_cnt + 1;                
+            end if;
+         -- Increment the clk_10M counter
+         else
+            clk_10M_cnt <= clk_10M_cnt + 1;   
          end if; 
          
          -- Latching of time stamp
@@ -213,8 +210,9 @@ begin
          -- Reset
          if SRESET = '1' then
             seconds_cnt <= (others => '0');   
-            subseconds_temp_cnt <= (others => '0'); 
+            subseconds_cnt <= (others => '0'); 
             subseconds_wrap <= '0';
+            clk_10M_cnt <= (others => '0');
             img_time_stamp_rdy <= '0'; 
          end if;          
          
@@ -224,9 +222,9 @@ begin
    ---------------------------------------------------------------------
    -- Process for PPS Time-out
    ---------------------------------------------------------------------
-   U3: process(CLK)
+   U3: process(CLK_100M)
    begin
-      if rising_edge(CLK) then
+      if rising_edge(CLK_100M) then
          
          -- PPS timeout counter 
          if pps_re = '1' then
@@ -253,9 +251,9 @@ begin
    ---------------------------------------------------------------------
    -- Process for sending header Parts of the stamper
    ---------------------------------------------------------------------
-   U4: process(CLK)
+   U4: process(CLK_100M)
    begin
-      if rising_edge(CLK) then
+      if rising_edge(CLK_100M) then
          if SRESET = '1' then
             hder_mosi_i.awvalid <= '0';
             hder_mosi_i.wvalid <= '0';
@@ -321,9 +319,9 @@ begin
    ---------------------------------------------------------------------
    -- Process to handle buffering flag update
    ---------------------------------------------------------------------
-   U5: process(CLK)
+   U5: process(CLK_100M)
    begin
-      if rising_edge(CLK) then
+      if rising_edge(CLK_100M) then
       
          if SRESET = '1' then  
             

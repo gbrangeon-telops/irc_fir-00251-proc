@@ -29,8 +29,7 @@ package IRIG_define_v2 is
    --------------------------------------------   
    constant IRIG_MORPHEME_PER_FRAME          : integer := 100;              -- il y a toujours 100 mophemes par trame.
    constant IRIG_CARRIER_FREQ_HZ             : integer := 1000;             -- frequence de la porteuse du signal IRIG à 1KHz
-   constant SYS_CLK_FREQ_HZ                  : integer := 20_000_000;       -- frequence de l'horloge système   
-   constant CLK_DETECTOR_DIV_FACTOR          : integer := 64;               -- absolument une puissance de 2, c'est le diviseur de l'horloge-systeme pour obtnenir l'horloge principale du module IRIG_CLK_DETECTOR 
+   constant SYS_CLK_FREQ_HZ                  : integer := 20_000_000;       -- frequence de l'horloge système
    constant ADC_SAMPLE_CLK_DIV_FACTOR        : integer := 512;              -- absolument une puissance de 2, c'est le diviseur de l'horloge-systeme pour obtnenir la frequence d'echantillonnage de l'ADC
    constant IRIG_MORPHEME_RATE_HZ            : integer := 100;              -- frequence des elements de l,alphabet (morpheme) du signal IRIG B122 = 100 bits/sec
    constant IRIG_ADC_RANGE                   : integer := 2**8;             -- on a un ADC 8 bits    
@@ -42,15 +41,12 @@ package IRIG_define_v2 is
    
    --------------------------------------------
    -- CALCULS : (ne pas changer)
-   --------------------------------------------    
-   constant CLK_DETECTOR_FREQ_HZ             : integer := SYS_CLK_FREQ_HZ/CLK_DETECTOR_DIV_FACTOR;   
+   --------------------------------------------
    constant IRIG_CARRIER_PERIOD              : integer := SYS_CLK_FREQ_HZ/IRIG_CARRIER_FREQ_HZ; 
-   constant CLK_DETECTOR_PERIOD              : integer := SYS_CLK_FREQ_HZ/CLK_DETECTOR_FREQ_HZ;
    constant IRIG_MORPHEME_PERIOD             : integer := SYS_CLK_FREQ_HZ/IRIG_MORPHEME_RATE_HZ;
-   constant IRIG_CARRIER_PERIOD_FACTOR       : integer := integer(IRIG_CARRIER_PERIOD/CLK_DETECTOR_PERIOD);   
-   constant CLK_DETECTOR_DIV_BIT             : integer := log2(CLK_DETECTOR_DIV_FACTOR)-1; -- position du bit diviseur d'horloge dans le module IRIG_CLK_DETECTOR
-   constant IRIG_CARRIER_PERIOD_MIN_FACTOR   : integer := IRIG_CARRIER_PERIOD_FACTOR - 2*CLK_DETECTOR_DIV_FACTOR;
-   constant IRIG_CARRIER_PERIOD_MAX_FACTOR   : integer := IRIG_CARRIER_PERIOD_FACTOR + 2*CLK_DETECTOR_DIV_FACTOR;
+   constant IRIG_CARRIER_PERIOD_TOL          : integer := (4*IRIG_CARRIER_PERIOD)/10;  -- on tolérance 40% de la période de la porteuse
+   constant IRIG_CARRIER_PERIOD_MIN_FACTOR   : integer := IRIG_CARRIER_PERIOD - IRIG_CARRIER_PERIOD_TOL;
+   constant IRIG_CARRIER_PERIOD_MAX_FACTOR   : integer := IRIG_CARRIER_PERIOD + IRIG_CARRIER_PERIOD_TOL;
    constant ADC_SAMPLE_CLK_DIV_BIT           : integer := log2(ADC_SAMPLE_CLK_DIV_FACTOR)-1; -- position du bit diviseur d'horloge dans le module IRIG_CLK_DETECTOR
    constant IRIG_MORPHEME_RATE_FACTOR        : integer := IRIG_CARRIER_FREQ_HZ/IRIG_MORPHEME_RATE_HZ; -- nombre de cycles de la porteuse comprises dans un element d'alphabet (morpheme).
    constant IRIG_ALPHABET_ONE                : integer := (5*IRIG_MORPHEME_RATE_FACTOR)/10;   -- durée du morpheme '1' en cycles de porteuse 

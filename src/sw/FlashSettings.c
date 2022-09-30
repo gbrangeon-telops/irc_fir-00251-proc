@@ -418,7 +418,7 @@ IRC_Status_t FlashSettings_UpdateCameraSettings(flashSettings_t *p_flashSettings
       TDCFlagsClr(IRIGBIsImplementedMask);
    else
       TDCFlagsSet(IRIGBIsImplementedMask);
-   IRIG_Initialize();
+   IRIG_Initialize(&gcRegsData);
 
    // Update Thermistor model type
    xadcSetphyConverter(&extAdcChannels[XEC_INTERNAL_LENS] , p_flashSettings->InternalLensThType);

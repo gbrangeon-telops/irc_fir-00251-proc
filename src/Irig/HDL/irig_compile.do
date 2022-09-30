@@ -31,6 +31,7 @@ acom D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_refclk_generator_v2.vhd
 acom -nowarn DAGGEN_0523 \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_comparator_v2.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_threshold_gen_v2.vhd \
+ D:\Telops\FIR-00251-Proc\src\Irig\HDL\LL8_Fanout2_v2.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_alphab_detector_v2.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_alphab_decoder_ctrl_v2.vhd \
  D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_alphab_decoder_v2.bde

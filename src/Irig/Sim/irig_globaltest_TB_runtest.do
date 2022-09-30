@@ -3,6 +3,9 @@
 SetActiveLib -work
 clearlibrary work
 
+acom d:\Telops\FIR-00251-Common\VHDL\tel2000pkg.vhd
+do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
+
 #acom D:\Telops\FIR-00251-Proc\src\Irig\HDL\IRIG_define.vhd
 
 do D:\Telops\FIR-00251-Proc\src\Irig\HDL\irig_compile.do
@@ -19,42 +22,46 @@ acom D:\Telops\FIR-00251-Proc\src\Irig\Sim\Irig_GlobalTest.bde
 
 acom D:\Telops\FIR-00251-Proc\src\Irig\Sim\irig_globaltest_TB.vhd 
 asim -ses irig_globaltest_TB 
+-- module complet
+wave UUT/*
+wave UUT/U7/*
+
 -- detecteur d'horloge
---wave /UUT/U7/U2/*     
+--wave UUT/U7/U2/*
 
--- adc sample en
---wave /UUT/U7/U1/U2/* 
+-- conditionner : adc sample en
+--wave UUT/U7/U1/U2/* 
   
--- pilote ADC
---wave /UUT/U7/U1/U1/*  
+-- conditionner : pilote ADC
+--wave UUT/U7/U1/U1/*  
                   
--- adc sample counter
---wave /UUT/U7/U1/U14/*   
+-- conditionner : adc sample counter
+--wave UUT/U7/U1/U14/*   
 
---adc sample averaging
---wave /UUT/U7/U1/U3/*  
+-- conditionner : adc sample averaging
+--wave UUT/U7/U1/U3/*  
                        
 -- alphab : threshold
---wave /UUT/U7/U3/U1/*
+--wave UUT/U7/U3/U1/*
 
 -- alphab : irig_comparartor
---wave /UUT/U7/U3/U3/*  
+--wave UUT/U7/U3/U3/*  
 
 -- alphab : detector
---wave /UUT/U7/U3/U4/*  
+--wave UUT/U7/U3/U4/*  
 
--- Ctrl : contrôleur IRIG
--- wave /UUT/U7/U5/* 
+-- contrôleur IRIG
+--wave UUT/U7/U5/* 
 
--- Ctrl : decodeur IRIG
---wave /UUT/U7/U4/* 
+-- frame decodeur IRIG
+--wave UUT/U7/U4/* 
 
 
 #SetActiveLib -work
 #comp -include "$dsn\compile\Irig_GlobalTest.vhd" 
 #comp -include "$dsn\src\Hdl\Sim\irig_globaltest_TB.vhd" 
 --asim +access +r TESTBENCH_FOR_irig_globaltest 
-wave -ports /irig_globaltest_tb/UUT/U8/*
+--wave -ports /irig_globaltest_tb/UUT/U8/*
 --wave -signals /irig_globaltest_tb/UUT/U7/U2/*
 
 
