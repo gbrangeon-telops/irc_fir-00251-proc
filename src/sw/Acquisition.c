@@ -319,17 +319,14 @@ void Acquisition_SM()
          {
             if (gcRegsData.AcquisitionStart)
             {
-               if (BM_MemoryBufferRead)
-                  GC_SetAcquisitionStart(0);
-               else // Arm camera before starting acquisition
-                  GC_SetAcquisitionArm(1);
+               GC_SetAcquisitionArm(1);
             }
 
             if (gcRegsData.AcquisitionArm)
             {
                GC_SetAcquisitionArm(0);
 
-               if (GC_DeviceRegistersVerification() == IRC_SUCCESS)
+               if (GC_DeviceRegistersVerification() == IRC_SUCCESS && !BM_MemoryBufferRead)
                {
                   Acquisition_Arm();
 

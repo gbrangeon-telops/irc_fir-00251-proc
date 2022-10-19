@@ -923,7 +923,7 @@ CONFIG.c_mm2s_burst_size {32} \
   set_property -dict [ list \
 CONFIG.c_m_axi_mm2s_data_width {512} \
 CONFIG.c_m_axi_s2mm_data_width {512} \
-CONFIG.c_m_axis_mm2s_tdata_width {16} \
+CONFIG.c_m_axis_mm2s_tdata_width {64} \
 CONFIG.c_mm2s_btt_used {23} \
 CONFIG.c_mm2s_burst_size {8} \
 CONFIG.c_s2mm_btt_used {23} \

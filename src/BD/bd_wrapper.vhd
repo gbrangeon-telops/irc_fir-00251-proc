@@ -185,7 +185,7 @@ entity bd_wrapper is
       AXIS_BUF_S2MM_STS_MOSI : out t_axi4_stream_mosi_status;
       AXIS_BUF_S2MM_STS_MISO : in t_axi4_stream_miso;
       
-      AXIS_BUF_MM2S_MOSI : out t_axi4_stream_mosi16;
+      AXIS_BUF_MM2S_MOSI : out t_axi4_stream_mosi64;
       AXIS_BUF_MM2S_MISO : in t_axi4_stream_miso;
       
       AXIS_BUF_MM2S_CMD_MOSI : in t_axi4_stream_mosi_cmd32;
@@ -478,8 +478,8 @@ architecture bd_wrapper of bd_wrapper is
             M_AXIS_CALDDR_MM2S_tlast : out STD_LOGIC;
             M_AXIS_CALDDR_MM2S_tready : in STD_LOGIC;
             M_AXIS_CALDDR_MM2S_tvalid : out STD_LOGIC;
-            M_AXIS_MM2S_BUF_tdata : out STD_LOGIC_VECTOR ( 15 downto 0 );
-            M_AXIS_MM2S_BUF_tkeep : out STD_LOGIC_VECTOR ( 1 downto 0 );
+            M_AXIS_MM2S_BUF_tdata : out STD_LOGIC_VECTOR ( 63 downto 0 );
+            M_AXIS_MM2S_BUF_tkeep : out STD_LOGIC_VECTOR ( 7 downto 0 );
             M_AXIS_MM2S_BUF_tlast : out STD_LOGIC;
             M_AXIS_MM2S_BUF_tready : in STD_LOGIC;
             M_AXIS_MM2S_BUF_tvalid : out STD_LOGIC;
@@ -1026,8 +1026,8 @@ architecture bd_wrapper of bd_wrapper is
          M_AXIS_CALDDR_MM2S_tlast : out STD_LOGIC;
          M_AXIS_CALDDR_MM2S_tready : in STD_LOGIC;
          M_AXIS_CALDDR_MM2S_tvalid : out STD_LOGIC;
-         M_AXIS_MM2S_BUF_tdata : out STD_LOGIC_VECTOR ( 15 downto 0 );
-         M_AXIS_MM2S_BUF_tkeep : out STD_LOGIC_VECTOR ( 1 downto 0 );
+         M_AXIS_MM2S_BUF_tdata : out STD_LOGIC_VECTOR ( 63 downto 0 );
+         M_AXIS_MM2S_BUF_tkeep : out STD_LOGIC_VECTOR ( 7 downto 0 );
          M_AXIS_MM2S_BUF_tlast : out STD_LOGIC;
          M_AXIS_MM2S_BUF_tready : in STD_LOGIC;
          M_AXIS_MM2S_BUF_tvalid : out STD_LOGIC;

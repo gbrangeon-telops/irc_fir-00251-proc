@@ -43,7 +43,7 @@ acom -relax "$COMMON\VHDL\hdr_extractor\axis64_hder_extractor.vhd"
 acom "$BUF_INTF\moi_source_selector.vhd" 
 acom "$BUF_INTF\moi_flag_gen.vhd" 
 acom "$BUF_INTF\moi_handler.bde" 
-
+acom "$COMMON\VHDL\Buffering\flow_controller.vhd"
 #Top
 acom "$COMMON\VHDL\Buffering\buffering.bde"
 acom "$BUF_INTF\buffering_wrapper.bde"

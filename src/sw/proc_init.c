@@ -1362,6 +1362,9 @@ IRC_Status_t Proc_BufferManager_Init()
    // Share new flags value
    GC_SetTDCFlags(gcRegsData.TDCFlags);
 
+   TDCFlags2Set(BufferClinkDownloadIsImplementedMask);
+   GC_SetTDCFlags2(gcRegsData.TDCFlags2);
+
    return BufferManager_Init(&gBufManager, &gcRegsData);
 }
 
