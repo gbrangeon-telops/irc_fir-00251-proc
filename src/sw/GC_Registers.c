@@ -1855,6 +1855,7 @@ void GC_UpdateJumboFrameHeight(gcRegistersData_t *pGCRegs, bool heightChanged)
    {
      if (suggestedJumboFrameHeightIsValid)
        suggestedJumboFrameHeightIsValid = false;
+
        GC_SetMemoryBufferSequenceDownloadFrameImageCount(1);
 
        if (!heightChanged) // No need to restore the user define height if this function is called in GC_HeightCallback()
@@ -1862,6 +1863,6 @@ void GC_UpdateJumboFrameHeight(gcRegistersData_t *pGCRegs, bool heightChanged)
           pGCRegs->Height =  MIN(NTxMiniHeight, pGCRegs->HeightMax);
           GC_BroadcastRegisterWrite(&gcRegsDef[HeightIdx]);
        }
-     }
    }
 }
+
