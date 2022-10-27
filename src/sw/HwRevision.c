@@ -40,9 +40,10 @@ IRC_Status_t Get_board_hw_revision(uint16_t gpioDeviceId, detected_hw_t* detecte
    }
 
    hw_id = XGpio_DiscreteRead(&hw_rev_gpio, REV_GPIO_CHANNEL);
+   PRINTF("hw_id = %u", hw_id);
    brd_rev = (uint8_t)(hw_id & 0x0000007F); // Board rev is the 7 LSB bits of the ID word.
 
-   if((hw_id & 0x00000080) == 1) // DDR memory HW config is the MSB bit of the ID word.
+   if((hw_id & 0x00000080) == 0x00000080) // DDR memory HW config is the MSB bit of the ID word.
    {
       detected_hw->NbDDR3 = 4;
       TDCFlags2Set(Mem4DDRIsImplementedMask);

@@ -117,7 +117,7 @@ entity bd_wrapper is
       
       MUX_ADDR : out std_logic_vector(4 downto 0);
       
-      REV_GPIO : in std_logic_vector(3 downto 0);
+      REV_GPIO : in std_logic_vector(7 downto 0);
       
       Code_mem_addr : out STD_LOGIC_VECTOR ( 13 downto 0 );
       Code_mem_ba : out STD_LOGIC_VECTOR ( 2 downto 0 );
@@ -776,7 +776,7 @@ architecture bd_wrapper of bd_wrapper is
             qspi_io2_io : inout STD_LOGIC;
             qspi_io3_io : inout STD_LOGIC;
             qspi_ss_io : inout STD_LOGIC_VECTOR ( 0 to 0 );
-            rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 3 downto 0 );
+            rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 7 downto 0 );
             vn_in : in STD_LOGIC;
             vp_in : in STD_LOGIC
          );
@@ -1370,7 +1370,7 @@ architecture bd_wrapper of bd_wrapper is
          qspi_io2_io : inout STD_LOGIC;
          qspi_io3_io : inout STD_LOGIC;
          qspi_ss_io : inout STD_LOGIC_VECTOR ( 0 to 0 );
-         rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 3 downto 0 );
+         rev_gpio_tri_i : in STD_LOGIC_VECTOR ( 7 downto 0 );
          vn_in : in STD_LOGIC;
          vp_in : in STD_LOGIC   
          );
