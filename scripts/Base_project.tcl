@@ -120,6 +120,7 @@ add_files -fileset constrs_1  [concat \
    [glob -nocomplain $constr_dir/$sensor/*.xdc] \
    [glob -nocomplain $constr_dir/_encryption/*${FPGA_SIZE}*.xdc] \
 ]
+if {$core_name == "core"} {add_files -fileset constrs_1 [glob -nocomplain $constr_dir/cal_2ddr_mig_specific_physical.xdc]}
 
 # make sure the files are in correct precedence order (as per UG903 recommendation)
 reorder_files -fileset constrs_1 -after  [get_files -of [get_filesets { constrs_1}] fir00251_proc_physical.xdc] [get_files -of [get_filesets { constrs_1}] *specific_physical.xdc]

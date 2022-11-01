@@ -73,6 +73,9 @@ create_proc_sw startup
 build_proc_sw startup 160
 build_proc_sw startup 325
 
+create_proc_sw startup_4DDR 325
+build_proc_sw startup_4DDR 325
+
 create_proc_sw suphawkA
 build_proc_sw suphawkA 160
 #build_proc_sw suphawkA 325

@@ -12,7 +12,11 @@ rem Set variables
 if %sensorName%==startup (
    set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%_%fpgaSize%, %encrypt_key_name% key)"
 ) else (
-   set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_key_name% key)"
+   if %sensorName%==startup_4DDR ( 
+      set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%_%fpgaSize%, %encrypt_key_name% key)"
+   ) else (
+      set releaseDir="%binDir%\Release_%firmwareVersion:.=_% (%sensorName%, %encrypt_key_name% key)"
+   ) 
 )
 set paperworkTemplateDir=%scriptsDir%\paperwork_%fpgaSize%\template
 set ntxminiFileBaseName=CommonTEL2000LibProject_xml_%xmlVersion%
