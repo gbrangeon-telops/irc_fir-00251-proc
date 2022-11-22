@@ -60,6 +60,11 @@ bool gActAllowAcquisitionStart = false; /**< allows the Actualization SM to init
 actDebugOptions_t gActDebugOptions;
 actParams_t gActualizationParams;
 
+// Progression variables
+uint8_t gActTotalSteps = 0;
+uint8_t gActStepsLeft = 0;
+#define ACT_PROGRESS()        FPGA_PRINTF("ACT: Step %d/%d completed\n", gActTotalSteps-gActStepsLeft, gActTotalSteps)
+
 // private type for lut data (data is stored in little endian)
 typedef struct {
    uint16_t m;
@@ -171,6 +176,11 @@ static void setActState( ACT_State_t *p_state, ACT_State_t next_state )
    else
       ACT_PRINTF( "State = %d (unknown)\n", next_state);
 
+   // Manage progression
+   if (gActStepsLeft > 0)
+      gActStepsLeft--;
+   ACT_PROGRESS();
+
    return;
 }
 
@@ -183,6 +193,11 @@ static void setBpdState(BPD_State_t* p_state, BPD_State_t next_state)
       ACT_PRINTF("State = %s\n", BPD_State_str[next_state]);
    else
       ACT_PRINTF( "State = %d (unknown)\n", next_state);
+
+   // Manage progression
+   if (gActStepsLeft > 0)
+      gActStepsLeft--;
+   ACT_PROGRESS();
 
    return;
 }
@@ -278,6 +293,55 @@ void stopActualization()
    gStopActualization = true;
 }
 
+uint8_t ACT_updateTotalSteps()
+{
+   const uint8_t actGeneralSteps = 3;  //ACT_Idle, ACT_Start, ACT_Finalize
+   const uint8_t actIcuSteps = ACT_StabilizeICU - ACT_TransitionICU + 1;
+   const uint8_t actAcquisitionSteps = ACT_FinalizeSequence - ACT_WaitForCalibData + 1 - actIcuSteps;
+   const uint8_t actComputationSteps = ACT_ComputeDeltaBeta - ACT_InitComputation + 1;
+   const uint8_t actWriteSteps = ACT_WriteActualizationFile - ACT_ComputeDeltaBetaStats + 1;
+   const uint8_t badPixelDetectionSteps = BPD_Finalize - BPD_Idle + 1 + 1;  // all the states of the BadPixelDetection_SM + ACT_DetectBadPixels
+   const uint8_t actApplyBadPixelMapSteps = 1;  //ACT_ApplyBadPixelMap
+
+   uint8_t nbBlocks;
+   uint8_t multiBlockSteps;
+
+   if (gcRegsData.ImageCorrectionMode == ICM_ICU)
+   {
+      // Add all steps, there are always 2 ICU phases
+      gActTotalSteps = actGeneralSteps + 2*actIcuSteps + actAcquisitionSteps + actComputationSteps + actWriteSteps;
+      // Add bad pixel detection steps if it is enabled, bad pixel map is always applied after bad pixel detection
+      if (flashSettings.BPDetectionEnabled)
+         gActTotalSteps += badPixelDetectionSteps + actApplyBadPixelMapSteps;
+   }
+   else
+   {
+      // Number of blocks to actualize
+      if (gcRegsData.ImageCorrectionBlockSelector == ICBS_AllBlocks)
+         nbBlocks = calibrationInfo.collection.NumberOfBlocks;
+      else
+         nbBlocks = 1;
+
+      // Multi-block steps, computation and write steps are done for each block
+      multiBlockSteps = actComputationSteps + actWriteSteps;
+      // Bad pixel map is applied if it is available (from a previous ICM_ICU correction)
+      if (gActBPMapAvailable == true)
+         multiBlockSteps += actApplyBadPixelMapSteps;
+
+      if (gcRegsData.ImageCorrectionFWMode == ICFWM_SynchronouslyRotating)
+         // Add all steps, acquisition steps are done only once
+         gActTotalSteps = actGeneralSteps + actAcquisitionSteps + nbBlocks*multiBlockSteps;
+      else
+         // Add all steps, acquisition steps are also done for each block
+         // Subtract ACT_WaitAcquisitionReady from acquisition steps when not in ICFWM_SynchronouslyRotating
+         gActTotalSteps = actGeneralSteps + nbBlocks*(actAcquisitionSteps-1 + multiBlockSteps);
+
+      // Bad pixel detection is never done in ICM_BlackBody
+   }
+
+   return gActTotalSteps;
+}
+
 /**
   *  Beta correction state machine.
   *
@@ -298,8 +362,6 @@ void stopActualization()
   *   Note(s):
   *
   */
-
-
 IRC_Status_t Actualization_SM()
 {
    static ACT_State_t state = ACT_Init;
@@ -397,6 +459,7 @@ IRC_Status_t Actualization_SM()
             ACT_resetParams(&gActualizationParams);
             gStartActualization = 0;
             savedCalibPosixTime = 0;
+            gActStepsLeft = ACT_updateTotalSteps();
             setActState(&state, ACT_Start);
          }
       }
@@ -1390,6 +1453,7 @@ IRC_Status_t Actualization_SM()
                ACT_invalidateActualizations(ACT_XBB);
 
             // Reset state machine
+            gActStepsLeft = 1;   //make sure it will be decremented to 0
             setActState(&state, ACT_Idle);
          }
          break;
@@ -1431,6 +1495,7 @@ IRC_Status_t Actualization_SM()
       TDCStatusClr(WaitingForImageCorrectionMask);
 
       // Reset state machine
+      gActStepsLeft = 1;   //make sure it will be decremented to 0
       setActState(&state, ACT_Idle);
 
       rtnStatus = IRC_FAILURE;
