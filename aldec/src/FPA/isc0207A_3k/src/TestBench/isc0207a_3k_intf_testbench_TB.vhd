@@ -391,13 +391,8 @@ begin
       read_axi_lite (MB_CLK, x"00000404", MB_MISO, MB_MOSI, status);
       --wait for 10 ns;
       read_axi_lite (MB_CLK, x"00000400", MB_MISO, MB_MOSI, status);
-      --wait for 10 ns; 
+      --wait for 10 ns;
       
-      wait for 500 us;
-      write_axi_lite (MB_CLK, x"00000AF0", std_logic_vector(to_unsigned(1, 32)), MB_MISO,  MB_MOSI);
-      wait for 50 ns;
-      write_axi_lite (MB_CLK, x"00000AF0", std_logic_vector(to_unsigned(0, 32)), MB_MISO,  MB_MOSI);
-      wait for 50 ns;
       
       
       wait for 5 ms;

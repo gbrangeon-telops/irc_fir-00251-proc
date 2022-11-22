@@ -103,12 +103,20 @@ architecture TB_ARCHITECTURE of scorpiomwA_300Hz_intf_testbench_tb is
    
    signal user_xsize1 : natural;
    signal user_ysize1 : natural;
+   signal offsetx1 : natural;
+   signal offsety1 : natural;
    signal user_xsize2 : natural;
    signal user_ysize2 : natural;
+   signal offsetx2 : natural;
+   signal offsety2 : natural;
    signal user_xsize3 : natural;
    signal user_ysize3 : natural;
+   signal offsetx3 : natural;
+   signal offsety3 : natural;
    signal user_xsize4 : natural;
    signal user_ysize4 : natural;
+   signal offsetx4 : natural;
+   signal offsety4 : natural;
    
    
    signal user_cfg_vector1              : unsigned(QWORDS_NUM*32-1 downto 0);
@@ -199,19 +207,27 @@ begin
          -- cfg usager
          user_xsize1 <= 640;
          user_ysize1 <= 512;
-         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
+         offsetx1 <= 0;
+         offsety1 <= 0;
+         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, offsetx1, offsety1, 1); 
          
-         user_xsize2 <= 640;
-         user_ysize2 <= 512;
-         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
+         user_xsize2 <= 136;
+         user_ysize2 <= 2;
+         offsetx2 <= 0;
+         offsety2 <= 2;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, offsetx2, offsety2, 2);
          --         
          user_xsize3 <= 64;
          user_ysize3 <= 8;
-         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, 3); -- iwr
+         offsetx3 <= 0;
+         offsety3 <= 0;
+         user_cfg_vector3 <= to_intf_cfg('0', user_xsize3, user_ysize3, offsetx3, offsety3, 3); -- iwr
          --         
          --         user_xsize4 <= 1280;
          --         user_ysize4 <= 1024;
-         --         user_cfg_vector4 <= to_intf_cfg('0', user_xsize4, user_ysize4, 3);
+         --         offsetx4 <= 0;
+         --         offsety4 <= 0;
+         --         user_cfg_vector4 <= to_intf_cfg('0', user_xsize4, user_ysize4, offsetx4, offsety4, 4);
          
          -- dac       
          vdac_value_1               	<= to_unsigned(11630, 32); 

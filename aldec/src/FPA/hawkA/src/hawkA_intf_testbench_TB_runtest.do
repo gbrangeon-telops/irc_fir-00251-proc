@@ -12,6 +12,7 @@ acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 
 acom D:\Telops\Common_HDL\Utilities\reset_extension.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd
 
 # sources FPa common 
@@ -102,8 +103,8 @@ acom  d:\Telops\FIR-00251-Proc\aldec\src\FPA\hawkA\src\hawkA_intf_testbench_TB.v
 asim -ses hawkA_intf_testbench_TB 
 
 
-wave UUT/U1/U5/U2/U1/* 
---wave UUT/U1/U5/*
+--wave UUT/U1/U5/U2/U1/* 
+wave UUT/U1/U5/*
 
 -- wave UUT/U1/U2/* 
 
@@ -162,15 +163,15 @@ wave UUT/U1/U5/U2/U1/*
 --wave UUT/U1/U9/U2/U1/* 
 --wave UUT/U1/U9/U18/*
 --wave UUT/U1/U19/*
-wave UUT/U1/U5/U5/*
+--wave UUT/U1/U5/U5/*
 wave UUT/U1/U9/U18/*
-wave UUT/U1/U9/U2/U4/*
-wave UUT/U1/U9/U2/U2/*
-wave UUT/U1/U9/U2/U1/U1/*
+--wave UUT/U1/U9/U2/U4/*
+--wave UUT/U1/U9/U2/U2/*
+--wave UUT/U1/U9/U2/U1/U1/*
 
 #wave UUT/U1/U5/U2/U5/*
 #wave UUT/U1/U5/U2/U1/*
 --wave UUT/U1/U19/*
 wave UUT/U1/*
 
-run 50 ms
+run 10 ms

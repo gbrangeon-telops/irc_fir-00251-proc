@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Fri Feb 18 14:47:40 2022
+-- Date        : Tue Jul 19 10:06:58 2022
 -- Host        : TELOPS258 running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim
---               D:/Telops/FIR-00251-Proc/IP/325/fwft_afifo_w32_d16/fwft_afifo_w32_d16_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim -rename_top fwft_afifo_w32_d16 -prefix
+--               fwft_afifo_w32_d16_ fwft_afifo_w32_d16_sim_netlist.vhdl
 -- Design      : fwft_afifo_w32_d16
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -27,8 +27,6 @@ entity fwft_afifo_w32_d16_blk_mem_gen_prim_wrapper is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_blk_mem_gen_prim_wrapper : entity is "blk_mem_gen_prim_wrapper";
 end fwft_afifo_w32_d16_blk_mem_gen_prim_wrapper;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_blk_mem_gen_prim_wrapper is
@@ -194,8 +192,6 @@ entity fwft_afifo_w32_d16_rd_bin_cntr is
     E : in STD_LOGIC_VECTOR ( 0 to 0 );
     rd_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_rd_bin_cntr : entity is "rd_bin_cntr";
 end fwft_afifo_w32_d16_rd_bin_cntr;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_rd_bin_cntr is
@@ -427,8 +423,6 @@ entity fwft_afifo_w32_d16_rd_fwft is
     Q : in STD_LOGIC_VECTOR ( 0 to 0 );
     \gc0.count_reg[3]\ : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_rd_fwft : entity is "rd_fwft";
 end fwft_afifo_w32_d16_rd_fwft;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_rd_fwft is
@@ -707,8 +701,6 @@ entity fwft_afifo_w32_d16_rd_status_flags_as is
     \ngwrdrst.grst.g7serrst.rd_rst_reg_reg[2]\ : in STD_LOGIC_VECTOR ( 0 to 0 );
     SCKT_RD_RST_O : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_rd_status_flags_as : entity is "rd_status_flags_as";
 end fwft_afifo_w32_d16_rd_status_flags_as;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_rd_status_flags_as is
@@ -760,8 +752,6 @@ entity fwft_afifo_w32_d16_synchronizer_ff is
     \out\ : in STD_LOGIC;
     wr_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff : entity is "synchronizer_ff";
 end fwft_afifo_w32_d16_synchronizer_ff;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff is
@@ -796,21 +786,8 @@ use UNISIM.VCOMPONENTS.ALL;
 entity fwft_afifo_w32_d16_synchronizer_ff_0 is
   port (
     \out\ : out STD_LOGIC;
-    wr_rst_busy : out STD_LOGIC;
-    wr_rst_busy_i2_out : out STD_LOGIC;
-    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\ : out STD_LOGIC;
-    \gof.gof1.overflow_i_reg\ : out STD_LOGIC;
     \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC;
-    \grstd1.grst_full.grst_f.rst_d3_reg\ : in STD_LOGIC;
-    sckt_wr_rst_i_q : in STD_LOGIC;
-    wr_en : in STD_LOGIC;
-    ram_full_fb_i_reg : in STD_LOGIC;
-    \Q_reg_reg[0]_1\ : in STD_LOGIC;
-    \Q_reg_reg[0]_2\ : in STD_LOGIC;
-    \Q_reg_reg[0]_3\ : in STD_LOGIC;
-    \Q_reg_reg[0]_4\ : in STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
+    wr_clk : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_0 : entity is "synchronizer_ff";
@@ -822,18 +799,13 @@ architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_0 is
   attribute async_reg of Q_reg : signal is "true";
   attribute msgon : string;
   attribute msgon of Q_reg : signal is "true";
-  signal \^wr_rst_busy_i2_out\ : STD_LOGIC;
   attribute ASYNC_REG_boolean : boolean;
   attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
   attribute KEEP : string;
   attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
   attribute msgon of \Q_reg_reg[0]\ : label is "true";
-  attribute SOFT_HLUTNM : string;
-  attribute SOFT_HLUTNM of \gof.gof1.overflow_i_i_1\ : label is "soft_lutpair6";
-  attribute SOFT_HLUTNM of wr_rst_busy_INST_0 : label is "soft_lutpair6";
 begin
   \out\ <= Q_reg;
-  wr_rst_busy_i2_out <= \^wr_rst_busy_i2_out\;
 \Q_reg_reg[0]\: unisim.vcomponents.FDRE
     generic map(
       INIT => '0'
@@ -844,48 +816,6 @@ begin
       D => \Q_reg_reg[0]_0\,
       Q => Q_reg,
       R => '0'
-    );
-\gof.gof1.overflow_i_i_1\: unisim.vcomponents.LUT4
-    generic map(
-      INIT => X"CCC8"
-    )
-        port map (
-      I0 => \^wr_rst_busy_i2_out\,
-      I1 => wr_en,
-      I2 => ram_full_fb_i_reg,
-      I3 => \grstd1.grst_full.grst_f.rst_d3_reg\,
-      O => \gof.gof1.overflow_i_reg\
-    );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_i_1\: unisim.vcomponents.LUT2
-    generic map(
-      INIT => X"E"
-    )
-        port map (
-      I0 => \^wr_rst_busy_i2_out\,
-      I1 => sckt_wr_rst_i_q,
-      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\
-    );
-wr_rst_busy_INST_0: unisim.vcomponents.LUT2
-    generic map(
-      INIT => X"E"
-    )
-        port map (
-      I0 => \^wr_rst_busy_i2_out\,
-      I1 => \grstd1.grst_full.grst_f.rst_d3_reg\,
-      O => wr_rst_busy
-    );
-wr_rst_busy_INST_0_i_1: unisim.vcomponents.LUT6
-    generic map(
-      INIT => X"FFFFFFFFFFFFFFFE"
-    )
-        port map (
-      I0 => Q_reg,
-      I1 => \Q_reg_reg[0]_1\,
-      I2 => \Q_reg_reg[0]_2\,
-      I3 => \Q_reg_reg[0]_3\,
-      I4 => \Q_reg_reg[0]_4\,
-      I5 => in0(0),
-      O => \^wr_rst_busy_i2_out\
     );
 end STRUCTURE;
 library IEEE;
@@ -973,832 +903,6 @@ use UNISIM.VCOMPONENTS.ALL;
 entity fwft_afifo_w32_d16_synchronizer_ff_11 is
   port (
     \out\ : out STD_LOGIC;
-    \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_11 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_11;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_11 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \Q_reg_reg[0]_0\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_12 is
-  port (
-    \out\ : in STD_LOGIC;
-    rd_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_12 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_12;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_12 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_13 is
-  port (
-    \out\ : out STD_LOGIC;
-    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\ : out STD_LOGIC;
-    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_reg\ : out STD_LOGIC;
-    \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC;
-    fifo_wrst_done : in STD_LOGIC;
-    fifo_rrst_done : in STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    \Q_reg_reg[0]_1\ : in STD_LOGIC;
-    \Q_reg_reg[0]_2\ : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_13 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_13;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_13 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \Q_reg_reg[0]_0\,
-      Q => Q_reg,
-      R => '0'
-    );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_i_1\: unisim.vcomponents.LUT4
-    generic map(
-      INIT => X"4F44"
-    )
-        port map (
-      I0 => fifo_wrst_done,
-      I1 => fifo_rrst_done,
-      I2 => Q_reg,
-      I3 => \Q_reg_reg[0]_0\,
-      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\
-    );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_i_1\: unisim.vcomponents.LUT6
-    generic map(
-      INIT => X"7070707F70707070"
-    )
-        port map (
-      I0 => fifo_rrst_done,
-      I1 => fifo_wrst_done,
-      I2 => in0(0),
-      I3 => Q_reg,
-      I4 => \Q_reg_reg[0]_1\,
-      I5 => \Q_reg_reg[0]_2\,
-      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_reg\
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_14 is
-  port (
-    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg\ : out STD_LOGIC;
-    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg_0\ : out STD_LOGIC;
-    \out\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC;
-    fifo_wrst_done : in STD_LOGIC;
-    fifo_rrst_done : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_14 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_14;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_14 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_i_1\: unisim.vcomponents.LUT4
-    generic map(
-      INIT => X"2F22"
-    )
-        port map (
-      I0 => fifo_wrst_done,
-      I1 => fifo_rrst_done,
-      I2 => Q_reg,
-      I3 => \out\,
-      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg_0\
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_15 is
-  port (
-    \out\ : out STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    rd_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_15 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_15;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_15 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => in0(0),
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_16 is
-  port (
-    \out\ : out STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_16 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_16;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_16 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => in0(0),
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_17 is
-  port (
-    \Q_reg_reg[0]_0\ : out STD_LOGIC;
-    \out\ : in STD_LOGIC;
-    rd_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_17 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_17;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_17 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \Q_reg_reg[0]_0\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_18 is
-  port (
-    \Q_reg_reg[0]_0\ : out STD_LOGIC;
-    \out\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_18 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_18;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_18 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \Q_reg_reg[0]_0\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_19 is
-  port (
-    \out\ : out STD_LOGIC;
-    \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\ : out STD_LOGIC;
-    \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    rd_clk : in STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_19 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_19;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_19 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => \Q_reg_reg[0]_0\,
-      Q => Q_reg,
-      R => '0'
-    );
-\ngwrdrst.grst.g7serrst.rd_rst_asreg_i_1\: unisim.vcomponents.LUT2
-    generic map(
-      INIT => X"2"
-    )
-        port map (
-      I0 => in0(0),
-      I1 => Q_reg,
-      O => \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_2 is
-  port (
-    \out\ : out STD_LOGIC;
-    \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_2 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_2;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_2 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \Q_reg_reg[0]_0\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_20 is
-  port (
-    \out\ : out STD_LOGIC;
-    \ngwrdrst.grst.g7serrst.wr_rst_asreg_reg\ : out STD_LOGIC;
-    \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_20 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_20;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_20 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \Q_reg_reg[0]_0\,
-      Q => Q_reg,
-      R => '0'
-    );
-\ngwrdrst.grst.g7serrst.wr_rst_asreg_i_1\: unisim.vcomponents.LUT2
-    generic map(
-      INIT => X"2"
-    )
-        port map (
-      I0 => in0(0),
-      I1 => Q_reg,
-      O => \ngwrdrst.grst.g7serrst.wr_rst_asreg_reg\
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_21 is
-  port (
-    AS : out STD_LOGIC_VECTOR ( 0 to 0 );
-    \out\ : in STD_LOGIC;
-    rd_clk : in STD_LOGIC;
-    rd_rst_active : in STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_21 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_21;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_21 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-\ngwrdrst.grst.g7serrst.rd_rst_reg[2]_i_1\: unisim.vcomponents.LUT3
-    generic map(
-      INIT => X"BA"
-    )
-        port map (
-      I0 => rd_rst_active,
-      I1 => Q_reg,
-      I2 => in0(0),
-      O => AS(0)
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_22 is
-  port (
-    AS : out STD_LOGIC_VECTOR ( 0 to 0 );
-    \out\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_22 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_22;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_22 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-\ngwrdrst.grst.g7serrst.wr_rst_reg[2]_i_1\: unisim.vcomponents.LUT2
-    generic map(
-      INIT => X"2"
-    )
-        port map (
-      I0 => in0(0),
-      I1 => Q_reg,
-      O => AS(0)
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_3 is
-  port (
-    \out\ : out STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    rd_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_3 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_3;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_3 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => in0(0),
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_4 is
-  port (
-    \Q_reg_reg[0]_0\ : out STD_LOGIC;
-    \out\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_4 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_4;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_4 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \Q_reg_reg[0]_0\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_5 is
-  port (
-    \out\ : out STD_LOGIC;
-    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_5 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_5;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_5 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => in0(0),
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_6 is
-  port (
-    \Q_reg_reg[0]_0\ : out STD_LOGIC;
-    \out\ : in STD_LOGIC;
-    rd_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_6 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_6;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_6 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \Q_reg_reg[0]_0\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => rd_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_7 is
-  port (
-    \out\ : out STD_LOGIC;
-    \Q_reg_reg[0]_0\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_7 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_7;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_7 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \out\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \Q_reg_reg[0]_0\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_8 is
-  port (
-    \Q_reg_reg[0]_0\ : out STD_LOGIC;
-    \out\ : in STD_LOGIC;
-    wr_clk : in STD_LOGIC
-  );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_8 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_8;
-
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_8 is
-  signal Q_reg : STD_LOGIC;
-  attribute async_reg : string;
-  attribute async_reg of Q_reg : signal is "true";
-  attribute msgon : string;
-  attribute msgon of Q_reg : signal is "true";
-  attribute ASYNC_REG_boolean : boolean;
-  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
-  attribute KEEP : string;
-  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
-  attribute msgon of \Q_reg_reg[0]\ : label is "true";
-begin
-  \Q_reg_reg[0]_0\ <= Q_reg;
-\Q_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => wr_clk,
-      CE => '1',
-      D => \out\,
-      Q => Q_reg,
-      R => '0'
-    );
-end STRUCTURE;
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-entity fwft_afifo_w32_d16_synchronizer_ff_9 is
-  port (
-    \out\ : out STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : out STD_LOGIC_VECTOR ( 0 to 0 );
     \ngwrdrst.grst.g7serrst.gsckt_wrst.rd_rst_active_reg\ : out STD_LOGIC;
     \ngwrdrst.grst.g7serrst.gsckt_wrst.rd_rst_middle_reg\ : out STD_LOGIC;
@@ -1814,10 +918,10 @@ entity fwft_afifo_w32_d16_synchronizer_ff_9 is
     E : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
   attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_9 : entity is "synchronizer_ff";
-end fwft_afifo_w32_d16_synchronizer_ff_9;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_11 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_11;
 
-architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_9 is
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_11 is
   signal Q_reg : STD_LOGIC;
   attribute async_reg : string;
   attribute async_reg of Q_reg : signal is "true";
@@ -1883,6 +987,1396 @@ begin
       I3 => \Q_reg_reg[0]_1\,
       I4 => \Q_reg_reg[0]_2\,
       O => \ngwrdrst.grst.g7serrst.gsckt_wrst.rd_rst_middle_reg\
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_12 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_12 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_12;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_12 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_13 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_13 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_13;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_13 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_14 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_14 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_14;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_14 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_15 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_15 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_15;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_15 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_16 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_16 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_16;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_16 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_17 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_17 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_17;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_17 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_18 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_18 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_18;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_18 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_19 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_19 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_19;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_19 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_2 is
+  port (
+    \out\ : out STD_LOGIC;
+    \gof.gof1.overflow_i_reg\ : out STD_LOGIC;
+    \gof.gof1.overflow_i_reg_0\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC;
+    \Q_reg_reg[0]_1\ : in STD_LOGIC;
+    \Q_reg_reg[0]_2\ : in STD_LOGIC;
+    \Q_reg_reg[0]_3\ : in STD_LOGIC;
+    wr_en : in STD_LOGIC;
+    ram_full_fb_i_reg : in STD_LOGIC;
+    \Q_reg_reg[0]_4\ : in STD_LOGIC;
+    \Q_reg_reg[0]_5\ : in STD_LOGIC;
+    sckt_wrst_i : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_2 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_2;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_2 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  signal \^gof.gof1.overflow_i_reg_0\ : STD_LOGIC;
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \gof.gof1.overflow_i_reg_0\ <= \^gof.gof1.overflow_i_reg_0\;
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+\gof.gof1.overflow_i_i_1\: unisim.vcomponents.LUT6
+    generic map(
+      INIT => X"FFFF0000FFFE0000"
+    )
+        port map (
+      I0 => \^gof.gof1.overflow_i_reg_0\,
+      I1 => \Q_reg_reg[0]_1\,
+      I2 => \Q_reg_reg[0]_2\,
+      I3 => \Q_reg_reg[0]_3\,
+      I4 => wr_en,
+      I5 => ram_full_fb_i_reg,
+      O => \gof.gof1.overflow_i_reg\
+    );
+wr_rst_busy_INST_0_i_1: unisim.vcomponents.LUT5
+    generic map(
+      INIT => X"FFFFFFFE"
+    )
+        port map (
+      I0 => Q_reg,
+      I1 => \Q_reg_reg[0]_0\,
+      I2 => \Q_reg_reg[0]_4\,
+      I3 => \Q_reg_reg[0]_5\,
+      I4 => sckt_wrst_i,
+      O => \^gof.gof1.overflow_i_reg_0\
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_20 is
+  port (
+    \out\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_20 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_20;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_20 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_21 is
+  port (
+    \out\ : out STD_LOGIC;
+    wr_rst_busy_i2_out : out STD_LOGIC;
+    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\ : out STD_LOGIC;
+    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_reg\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC;
+    \Q_reg_reg[0]_1\ : in STD_LOGIC;
+    \Q_reg_reg[0]_2\ : in STD_LOGIC;
+    \Q_reg_reg[0]_3\ : in STD_LOGIC;
+    \Q_reg_reg[0]_4\ : in STD_LOGIC;
+    \Q_reg_reg[0]_5\ : in STD_LOGIC;
+    sckt_wrst_i : in STD_LOGIC;
+    \Q_reg_reg[0]_6\ : in STD_LOGIC;
+    fifo_wrst_done : in STD_LOGIC;
+    fifo_rrst_done : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_21 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_21;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_21 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wr_rst_i_q_i_2_n_0\ : STD_LOGIC;
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_i_1\: unisim.vcomponents.LUT4
+    generic map(
+      INIT => X"4F44"
+    )
+        port map (
+      I0 => fifo_wrst_done,
+      I1 => fifo_rrst_done,
+      I2 => Q_reg,
+      I3 => \Q_reg_reg[0]_0\,
+      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wr_rst_i_q_i_1\: unisim.vcomponents.LUT6
+    generic map(
+      INIT => X"FFFFFFFFFFFFFFFE"
+    )
+        port map (
+      I0 => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wr_rst_i_q_i_2_n_0\,
+      I1 => \Q_reg_reg[0]_1\,
+      I2 => \Q_reg_reg[0]_2\,
+      I3 => \Q_reg_reg[0]_3\,
+      I4 => \Q_reg_reg[0]_4\,
+      I5 => \Q_reg_reg[0]_5\,
+      O => wr_rst_busy_i2_out
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wr_rst_i_q_i_2\: unisim.vcomponents.LUT3
+    generic map(
+      INIT => X"FE"
+    )
+        port map (
+      I0 => sckt_wrst_i,
+      I1 => Q_reg,
+      I2 => \Q_reg_reg[0]_6\,
+      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wr_rst_i_q_i_2_n_0\
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_i_1\: unisim.vcomponents.LUT6
+    generic map(
+      INIT => X"7070707F70707070"
+    )
+        port map (
+      I0 => fifo_rrst_done,
+      I1 => fifo_wrst_done,
+      I2 => sckt_wrst_i,
+      I3 => Q_reg,
+      I4 => \Q_reg_reg[0]_6\,
+      I5 => \Q_reg_reg[0]_5\,
+      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_reg\
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_22 is
+  port (
+    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg\ : out STD_LOGIC;
+    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC;
+    fifo_wrst_done : in STD_LOGIC;
+    fifo_rrst_done : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_22 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_22;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_22 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_i_1\: unisim.vcomponents.LUT4
+    generic map(
+      INIT => X"2F22"
+    )
+        port map (
+      I0 => fifo_wrst_done,
+      I1 => fifo_rrst_done,
+      I2 => Q_reg,
+      I3 => \out\,
+      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg_0\
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_23 is
+  port (
+    \out\ : out STD_LOGIC;
+    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_23 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_23;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_23 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => in0(0),
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_24 is
+  port (
+    \out\ : out STD_LOGIC;
+    in0 : in STD_LOGIC_VECTOR ( 0 to 0 );
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_24 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_24;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_24 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => in0(0),
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_25 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_25 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_25;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_25 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_26 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_26 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_26;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_26 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_27 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_27 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_27;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_27 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_28 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_28 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_28;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_28 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_29 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_29 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_29;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_29 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_3 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_3 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_3;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_3 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_30 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_30 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_30;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_30 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_31 is
+  port (
+    \out\ : out STD_LOGIC;
+    \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC;
+    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_31 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_31;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_31 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.rd_rst_asreg_i_1\: unisim.vcomponents.LUT2
+    generic map(
+      INIT => X"2"
+    )
+        port map (
+      I0 => in0(0),
+      I1 => Q_reg,
+      O => \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_32 is
+  port (
+    \out\ : out STD_LOGIC;
+    \ngwrdrst.grst.g7serrst.wr_rst_asreg_reg\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC;
+    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_32 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_32;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_32 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.wr_rst_asreg_i_1\: unisim.vcomponents.LUT2
+    generic map(
+      INIT => X"2"
+    )
+        port map (
+      I0 => in0(0),
+      I1 => Q_reg,
+      O => \ngwrdrst.grst.g7serrst.wr_rst_asreg_reg\
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_33 is
+  port (
+    AS : out STD_LOGIC_VECTOR ( 0 to 0 );
+    \out\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC;
+    rd_rst_active : in STD_LOGIC;
+    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_33 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_33;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_33 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.rd_rst_reg[2]_i_1\: unisim.vcomponents.LUT3
+    generic map(
+      INIT => X"BA"
+    )
+        port map (
+      I0 => rd_rst_active,
+      I1 => Q_reg,
+      I2 => in0(0),
+      O => AS(0)
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_34 is
+  port (
+    AS : out STD_LOGIC_VECTOR ( 0 to 0 );
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC;
+    in0 : in STD_LOGIC_VECTOR ( 0 to 0 )
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_34 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_34;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_34 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.wr_rst_reg[2]_i_1\: unisim.vcomponents.LUT2
+    generic map(
+      INIT => X"2"
+    )
+        port map (
+      I0 => in0(0),
+      I1 => Q_reg,
+      O => AS(0)
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_4 is
+  port (
+    \out\ : out STD_LOGIC;
+    wr_rst_busy : out STD_LOGIC;
+    \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC;
+    \Q_reg_reg[0]_1\ : in STD_LOGIC;
+    \Q_reg_reg[0]_2\ : in STD_LOGIC;
+    \grstd1.grst_full.grst_f.rst_d3_reg\ : in STD_LOGIC;
+    sckt_wr_rst_i_q : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_4 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_4;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_4 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_i_1\: unisim.vcomponents.LUT5
+    generic map(
+      INIT => X"FFFFFFFE"
+    )
+        port map (
+      I0 => Q_reg,
+      I1 => \Q_reg_reg[0]_0\,
+      I2 => \Q_reg_reg[0]_1\,
+      I3 => \Q_reg_reg[0]_2\,
+      I4 => sckt_wr_rst_i_q,
+      O => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\
+    );
+wr_rst_busy_INST_0: unisim.vcomponents.LUT5
+    generic map(
+      INIT => X"FFFFFFFE"
+    )
+        port map (
+      I0 => Q_reg,
+      I1 => \Q_reg_reg[0]_0\,
+      I2 => \Q_reg_reg[0]_1\,
+      I3 => \Q_reg_reg[0]_2\,
+      I4 => \grstd1.grst_full.grst_f.rst_d3_reg\,
+      O => wr_rst_busy
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_5 is
+  port (
+    \out\ : out STD_LOGIC;
+    sckt_wrst_i : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_5 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_5;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_5 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => sckt_wrst_i,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_6 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_6 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_6;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_6 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_7 is
+  port (
+    \out\ : out STD_LOGIC;
+    sckt_wrst_i : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_7 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_7;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_7 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => sckt_wrst_i,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_8 is
+  port (
+    \Q_reg_reg[0]_0\ : out STD_LOGIC;
+    \out\ : in STD_LOGIC;
+    rd_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_8 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_8;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_8 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \Q_reg_reg[0]_0\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      D => \out\,
+      Q => Q_reg,
+      R => '0'
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity fwft_afifo_w32_d16_synchronizer_ff_9 is
+  port (
+    \out\ : out STD_LOGIC;
+    \Q_reg_reg[0]_0\ : in STD_LOGIC;
+    wr_clk : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_synchronizer_ff_9 : entity is "synchronizer_ff";
+end fwft_afifo_w32_d16_synchronizer_ff_9;
+
+architecture STRUCTURE of fwft_afifo_w32_d16_synchronizer_ff_9 is
+  signal Q_reg : STD_LOGIC;
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+begin
+  \out\ <= Q_reg;
+\Q_reg_reg[0]\: unisim.vcomponents.FDRE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      D => \Q_reg_reg[0]_0\,
+      Q => Q_reg,
+      R => '0'
     );
 end STRUCTURE;
 library IEEE;
@@ -2055,8 +2549,7 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized2\ is
   port (
-    \out\ : out STD_LOGIC_VECTOR ( 3 downto 0 );
-    D : out STD_LOGIC_VECTOR ( 0 to 0 );
+    D : out STD_LOGIC_VECTOR ( 3 downto 0 );
     \Q_reg_reg[3]_0\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     rd_clk : in STD_LOGIC;
     SCKT_RD_RST_O : in STD_LOGIC
@@ -2066,6 +2559,335 @@ entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized2\ is
 end \fwft_afifo_w32_d16_synchronizer_ff__parameterized2\;
 
 architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized2\ is
+  signal Q_reg : STD_LOGIC_VECTOR ( 3 downto 0 );
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[1]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[1]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[1]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[2]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[2]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[2]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[3]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[3]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[3]\ : label is "true";
+begin
+  D(3 downto 0) <= Q_reg(3 downto 0);
+\Q_reg_reg[0]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(0),
+      Q => Q_reg(0)
+    );
+\Q_reg_reg[1]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(1),
+      Q => Q_reg(1)
+    );
+\Q_reg_reg[2]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(2),
+      Q => Q_reg(2)
+    );
+\Q_reg_reg[3]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(3),
+      Q => Q_reg(3)
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ is
+  port (
+    D : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    \Q_reg_reg[3]_0\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    wr_clk : in STD_LOGIC;
+    SCKT_WR_RST_O : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ : entity is "synchronizer_ff";
+end \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\;
+
+architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ is
+  signal Q_reg : STD_LOGIC_VECTOR ( 3 downto 0 );
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[1]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[1]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[1]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[2]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[2]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[2]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[3]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[3]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[3]\ : label is "true";
+begin
+  D(3 downto 0) <= Q_reg(3 downto 0);
+\Q_reg_reg[0]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(0),
+      Q => Q_reg(0)
+    );
+\Q_reg_reg[1]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(1),
+      Q => Q_reg(1)
+    );
+\Q_reg_reg[2]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(2),
+      Q => Q_reg(2)
+    );
+\Q_reg_reg[3]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(3),
+      Q => Q_reg(3)
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized4\ is
+  port (
+    D : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    \Q_reg_reg[3]_0\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    rd_clk : in STD_LOGIC;
+    SCKT_RD_RST_O : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of \fwft_afifo_w32_d16_synchronizer_ff__parameterized4\ : entity is "synchronizer_ff";
+end \fwft_afifo_w32_d16_synchronizer_ff__parameterized4\;
+
+architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized4\ is
+  signal Q_reg : STD_LOGIC_VECTOR ( 3 downto 0 );
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[1]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[1]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[1]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[2]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[2]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[2]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[3]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[3]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[3]\ : label is "true";
+begin
+  D(3 downto 0) <= Q_reg(3 downto 0);
+\Q_reg_reg[0]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(0),
+      Q => Q_reg(0)
+    );
+\Q_reg_reg[1]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(1),
+      Q => Q_reg(1)
+    );
+\Q_reg_reg[2]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(2),
+      Q => Q_reg(2)
+    );
+\Q_reg_reg[3]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => rd_clk,
+      CE => '1',
+      CLR => SCKT_RD_RST_O,
+      D => \Q_reg_reg[3]_0\(3),
+      Q => Q_reg(3)
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized5\ is
+  port (
+    D : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    \Q_reg_reg[3]_0\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    wr_clk : in STD_LOGIC;
+    SCKT_WR_RST_O : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of \fwft_afifo_w32_d16_synchronizer_ff__parameterized5\ : entity is "synchronizer_ff";
+end \fwft_afifo_w32_d16_synchronizer_ff__parameterized5\;
+
+architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized5\ is
+  signal Q_reg : STD_LOGIC_VECTOR ( 3 downto 0 );
+  attribute async_reg : string;
+  attribute async_reg of Q_reg : signal is "true";
+  attribute msgon : string;
+  attribute msgon of Q_reg : signal is "true";
+  attribute ASYNC_REG_boolean : boolean;
+  attribute ASYNC_REG_boolean of \Q_reg_reg[0]\ : label is std.standard.true;
+  attribute KEEP : string;
+  attribute KEEP of \Q_reg_reg[0]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[0]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[1]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[1]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[1]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[2]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[2]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[2]\ : label is "true";
+  attribute ASYNC_REG_boolean of \Q_reg_reg[3]\ : label is std.standard.true;
+  attribute KEEP of \Q_reg_reg[3]\ : label is "yes";
+  attribute msgon of \Q_reg_reg[3]\ : label is "true";
+begin
+  D(3 downto 0) <= Q_reg(3 downto 0);
+\Q_reg_reg[0]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(0),
+      Q => Q_reg(0)
+    );
+\Q_reg_reg[1]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(1),
+      Q => Q_reg(1)
+    );
+\Q_reg_reg[2]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(2),
+      Q => Q_reg(2)
+    );
+\Q_reg_reg[3]\: unisim.vcomponents.FDCE
+    generic map(
+      INIT => '0'
+    )
+        port map (
+      C => wr_clk,
+      CE => '1',
+      CLR => SCKT_WR_RST_O,
+      D => \Q_reg_reg[3]_0\(3),
+      Q => Q_reg(3)
+    );
+end STRUCTURE;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized6\ is
+  port (
+    \out\ : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    D : out STD_LOGIC_VECTOR ( 0 to 0 );
+    \Q_reg_reg[3]_0\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    rd_clk : in STD_LOGIC;
+    SCKT_RD_RST_O : in STD_LOGIC
+  );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of \fwft_afifo_w32_d16_synchronizer_ff__parameterized6\ : entity is "synchronizer_ff";
+end \fwft_afifo_w32_d16_synchronizer_ff__parameterized6\;
+
+architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized6\ is
   signal Q_reg : STD_LOGIC_VECTOR ( 3 downto 0 );
   attribute async_reg : string;
   attribute async_reg of Q_reg : signal is "true";
@@ -2145,7 +2967,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ is
+entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized7\ is
   port (
     \out\ : out STD_LOGIC_VECTOR ( 3 downto 0 );
     D : out STD_LOGIC_VECTOR ( 0 to 0 );
@@ -2154,10 +2976,10 @@ entity \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ is
     SCKT_WR_RST_O : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ : entity is "synchronizer_ff";
-end \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\;
+  attribute ORIG_REF_NAME of \fwft_afifo_w32_d16_synchronizer_ff__parameterized7\ : entity is "synchronizer_ff";
+end \fwft_afifo_w32_d16_synchronizer_ff__parameterized7\;
 
-architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized3\ is
+architecture STRUCTURE of \fwft_afifo_w32_d16_synchronizer_ff__parameterized7\ is
   signal Q_reg : STD_LOGIC_VECTOR ( 3 downto 0 );
   attribute async_reg : string;
   attribute async_reg of Q_reg : signal is "true";
@@ -2250,8 +3072,6 @@ entity fwft_afifo_w32_d16_wr_bin_cntr is
     E : in STD_LOGIC_VECTOR ( 0 to 0 );
     wr_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_wr_bin_cntr : entity is "wr_bin_cntr";
 end fwft_afifo_w32_d16_wr_bin_cntr;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_wr_bin_cntr is
@@ -2456,11 +3276,9 @@ use UNISIM.VCOMPONENTS.ALL;
 entity fwft_afifo_w32_d16_wr_handshaking_flags is
   port (
     overflow : out STD_LOGIC;
-    ram_full_fb_i_reg : in STD_LOGIC;
+    \Q_reg_reg[0]\ : in STD_LOGIC;
     wr_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_wr_handshaking_flags : entity is "wr_handshaking_flags";
 end fwft_afifo_w32_d16_wr_handshaking_flags;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_wr_handshaking_flags is
@@ -2472,7 +3290,7 @@ begin
         port map (
       C => wr_clk,
       CE => '1',
-      D => ram_full_fb_i_reg,
+      D => \Q_reg_reg[0]\,
       Q => overflow,
       R => '0'
     );
@@ -2486,14 +3304,14 @@ entity fwft_afifo_w32_d16_wr_status_flags_as is
     full : out STD_LOGIC;
     \out\ : out STD_LOGIC;
     E : out STD_LOGIC_VECTOR ( 0 to 0 );
+    \gof.gof1.overflow_i_reg\ : out STD_LOGIC;
     \gic0.gc0.count_d1_reg[0]\ : in STD_LOGIC;
     wr_clk : in STD_LOGIC;
     \grstd1.grst_full.grst_f.rst_d2_reg\ : in STD_LOGIC;
     SR : in STD_LOGIC_VECTOR ( 0 to 0 );
-    wr_en : in STD_LOGIC
+    wr_en : in STD_LOGIC;
+    \grstd1.grst_full.grst_f.rst_d3_reg\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_wr_status_flags_as : entity is "wr_status_flags_as";
 end fwft_afifo_w32_d16_wr_status_flags_as;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_wr_status_flags_as is
@@ -2521,6 +3339,15 @@ begin
       I0 => wr_en,
       I1 => ram_full_fb_i,
       O => E(0)
+    );
+\gof.gof1.overflow_i_i_2\: unisim.vcomponents.LUT2
+    generic map(
+      INIT => X"E"
+    )
+        port map (
+      I0 => ram_full_fb_i,
+      I1 => \grstd1.grst_full.grst_f.rst_d3_reg\,
+      O => \gof.gof1.overflow_i_reg\
     );
 ram_full_fb_i_reg: unisim.vcomponents.FDSE
     generic map(
@@ -2562,8 +3389,6 @@ entity fwft_afifo_w32_d16_blk_mem_gen_prim_width is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_blk_mem_gen_prim_width : entity is "blk_mem_gen_prim_width";
 end fwft_afifo_w32_d16_blk_mem_gen_prim_width;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_blk_mem_gen_prim_width is
@@ -2607,8 +3432,6 @@ entity fwft_afifo_w32_d16_clk_x_pntrs is
     SCKT_RD_RST_O : in STD_LOGIC;
     \gc0.count_d1_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_clk_x_pntrs : entity is "clk_x_pntrs";
 end fwft_afifo_w32_d16_clk_x_pntrs;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_clk_x_pntrs is
@@ -2616,14 +3439,18 @@ architecture STRUCTURE of fwft_afifo_w32_d16_clk_x_pntrs is
   signal \__1_n_0\ : STD_LOGIC;
   signal \__2_n_0\ : STD_LOGIC;
   signal bin2gray : STD_LOGIC_VECTOR ( 2 downto 0 );
-  signal \gnxpm_cdc.gsync_stage[2].wr_stg_inst_n_4\ : STD_LOGIC;
+  signal \gnxpm_cdc.gsync_stage[4].wr_stg_inst_n_4\ : STD_LOGIC;
   signal gray2bin : STD_LOGIC_VECTOR ( 1 to 1 );
   signal \^out\ : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal p_0_out : STD_LOGIC;
+  signal p_10_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal p_25_out : STD_LOGIC_VECTOR ( 3 downto 2 );
   signal p_3_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal p_4_out : STD_LOGIC_VECTOR ( 3 downto 0 );
+  signal p_5_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal p_6_out : STD_LOGIC_VECTOR ( 3 downto 0 );
+  signal p_7_out : STD_LOGIC_VECTOR ( 3 downto 0 );
+  signal p_8_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal \^ram_full_fb_i_reg_0\ : STD_LOGIC_VECTOR ( 1 downto 0 );
   signal ram_full_i_i_2_n_0 : STD_LOGIC;
   signal ram_full_i_i_3_n_0 : STD_LOGIC;
@@ -2653,10 +3480,10 @@ begin
       INIT => X"6996"
     )
         port map (
-      I0 => p_6_out(1),
-      I1 => p_6_out(0),
-      I2 => p_6_out(3),
-      I3 => p_6_out(2),
+      I0 => p_10_out(1),
+      I1 => p_10_out(0),
+      I2 => p_10_out(3),
+      I3 => p_10_out(2),
       O => \__1_n_0\
     );
 \__2\: unisim.vcomponents.LUT3
@@ -2664,9 +3491,9 @@ begin
       INIT => X"96"
     )
         port map (
-      I0 => p_6_out(2),
-      I1 => p_6_out(1),
-      I2 => p_6_out(3),
+      I0 => p_10_out(2),
+      I1 => p_10_out(1),
+      I2 => p_10_out(3),
       O => \__2_n_0\
     );
 \gnxpm_cdc.gsync_stage[1].rd_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized0\
@@ -2685,18 +3512,46 @@ begin
     );
 \gnxpm_cdc.gsync_stage[2].rd_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized2\
      port map (
-      D(0) => p_0_out,
+      D(3 downto 0) => p_5_out(3 downto 0),
       \Q_reg_reg[3]_0\(3 downto 0) => p_3_out(3 downto 0),
       SCKT_RD_RST_O => SCKT_RD_RST_O,
-      \out\(3 downto 0) => \^out\(3 downto 0),
       rd_clk => rd_clk
     );
 \gnxpm_cdc.gsync_stage[2].wr_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized3\
      port map (
-      D(0) => \gnxpm_cdc.gsync_stage[2].wr_stg_inst_n_4\,
+      D(3 downto 0) => p_6_out(3 downto 0),
       \Q_reg_reg[3]_0\(3 downto 0) => p_4_out(3 downto 0),
       SCKT_WR_RST_O => SCKT_WR_RST_O,
-      \out\(3 downto 0) => p_6_out(3 downto 0),
+      wr_clk => wr_clk
+    );
+\gnxpm_cdc.gsync_stage[3].rd_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized4\
+     port map (
+      D(3 downto 0) => p_7_out(3 downto 0),
+      \Q_reg_reg[3]_0\(3 downto 0) => p_5_out(3 downto 0),
+      SCKT_RD_RST_O => SCKT_RD_RST_O,
+      rd_clk => rd_clk
+    );
+\gnxpm_cdc.gsync_stage[3].wr_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized5\
+     port map (
+      D(3 downto 0) => p_8_out(3 downto 0),
+      \Q_reg_reg[3]_0\(3 downto 0) => p_6_out(3 downto 0),
+      SCKT_WR_RST_O => SCKT_WR_RST_O,
+      wr_clk => wr_clk
+    );
+\gnxpm_cdc.gsync_stage[4].rd_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized6\
+     port map (
+      D(0) => p_0_out,
+      \Q_reg_reg[3]_0\(3 downto 0) => p_7_out(3 downto 0),
+      SCKT_RD_RST_O => SCKT_RD_RST_O,
+      \out\(3 downto 0) => \^out\(3 downto 0),
+      rd_clk => rd_clk
+    );
+\gnxpm_cdc.gsync_stage[4].wr_stg_inst\: entity work.\fwft_afifo_w32_d16_synchronizer_ff__parameterized7\
+     port map (
+      D(0) => \gnxpm_cdc.gsync_stage[4].wr_stg_inst_n_4\,
+      \Q_reg_reg[3]_0\(3 downto 0) => p_8_out(3 downto 0),
+      SCKT_WR_RST_O => SCKT_WR_RST_O,
+      \out\(3 downto 0) => p_10_out(3 downto 0),
       wr_clk => wr_clk
     );
 \gnxpm_cdc.rd_pntr_bin_reg[0]\: unisim.vcomponents.FDCE
@@ -2729,7 +3584,7 @@ begin
       C => wr_clk,
       CE => '1',
       CLR => SCKT_WR_RST_O,
-      D => \gnxpm_cdc.gsync_stage[2].wr_stg_inst_n_4\,
+      D => \gnxpm_cdc.gsync_stage[4].wr_stg_inst_n_4\,
       Q => p_25_out(2)
     );
 \gnxpm_cdc.rd_pntr_bin_reg[3]\: unisim.vcomponents.FDCE
@@ -2740,7 +3595,7 @@ begin
       C => wr_clk,
       CE => '1',
       CLR => SCKT_WR_RST_O,
-      D => p_6_out(3),
+      D => p_10_out(3),
       Q => p_25_out(3)
     );
 \gnxpm_cdc.rd_pntr_gc_reg[0]\: unisim.vcomponents.FDCE
@@ -2978,8 +3833,6 @@ entity fwft_afifo_w32_d16_rd_logic is
     \gnxpm_cdc.wr_pntr_bin_reg[2]\ : in STD_LOGIC;
     Q : in STD_LOGIC_VECTOR ( 3 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_rd_logic : entity is "rd_logic";
 end fwft_afifo_w32_d16_rd_logic;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_rd_logic is
@@ -3041,22 +3894,20 @@ entity fwft_afifo_w32_d16_reset_blk_ramfifo is
     \out\ : out STD_LOGIC;
     ram_empty_i_reg : out STD_LOGIC_VECTOR ( 0 to 0 );
     ram_full_i_reg : out STD_LOGIC;
-    \gof.gof1.overflow_i_reg\ : out STD_LOGIC;
+    ram_full_fb_i_reg : out STD_LOGIC;
     SR : out STD_LOGIC_VECTOR ( 0 to 0 );
     \gpregsm1.curr_fwft_state_reg[1]\ : out STD_LOGIC_VECTOR ( 0 to 0 );
     wr_rst_busy : out STD_LOGIC;
-    \gof.gof1.overflow_i_reg_0\ : out STD_LOGIC;
+    \gof.gof1.overflow_i_reg\ : out STD_LOGIC;
     \gfwft_rst_done.fwft_rst_done_reg\ : out STD_LOGIC;
     rd_clk : in STD_LOGIC;
     wr_clk : in STD_LOGIC;
     rst : in STD_LOGIC;
     fwft_rst_done_q : in STD_LOGIC;
     wr_en : in STD_LOGIC;
-    ram_full_fb_i_reg : in STD_LOGIC;
+    ram_full_fb_i_reg_0 : in STD_LOGIC;
     E : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_reset_blk_ramfifo : entity is "reset_blk_ramfifo";
 end fwft_afifo_w32_d16_reset_blk_ramfifo;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_reset_blk_ramfifo is
@@ -3065,20 +3916,23 @@ architecture STRUCTURE of fwft_afifo_w32_d16_reset_blk_ramfifo is
   signal \arst_sync_q[2]_3\ : STD_LOGIC;
   signal \arst_sync_q[3]_4\ : STD_LOGIC;
   signal \arst_sync_q[4]_5\ : STD_LOGIC;
+  signal \arst_sync_q[5]_6\ : STD_LOGIC;
+  signal \arst_sync_q[6]_7\ : STD_LOGIC;
   signal fifo_rrst_done : STD_LOGIC;
   signal fifo_wrst_done : STD_LOGIC;
   signal \gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/sckt_rd_rst_fwft\ : STD_LOGIC;
   signal \grstd1.grst_full.grst_f.rst_d3_i_1_n_0\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[2].arst_sync_inst_n_3\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[4].arst_sync_inst_n_2\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[6].arst_sync_inst_n_2\ : STD_LOGIC;
   signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].rd_rst_inst_n_2\ : STD_LOGIC;
   signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].rd_rst_inst_n_3\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst_n_1\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst_n_2\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].wr_rst_ext_inst_n_1\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst_n_2\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst_n_3\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].wr_rst_ext_inst_n_1\ : STD_LOGIC;
   signal \ngwrdrst.grst.g7serrst.gsckt_wrst.rd_rst_middle_reg_n_0\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst_n_1\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst_n_1\ : STD_LOGIC;
-  signal \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst_n_0\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].rrst_inst_n_1\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].wrst_inst_n_1\ : STD_LOGIC;
+  signal \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].wrst_inst_n_0\ : STD_LOGIC;
   signal \^out\ : STD_LOGIC;
   signal p_10_out : STD_LOGIC;
   signal p_11_out : STD_LOGIC;
@@ -3086,19 +3940,26 @@ architecture STRUCTURE of fwft_afifo_w32_d16_reset_blk_ramfifo is
   signal p_13_out : STD_LOGIC;
   signal p_14_out : STD_LOGIC;
   signal p_15_out : STD_LOGIC;
-  signal p_8_out : STD_LOGIC;
-  signal p_9_out : STD_LOGIC;
+  signal p_16_out : STD_LOGIC;
+  signal p_17_out : STD_LOGIC;
+  signal p_18_out : STD_LOGIC;
+  signal p_19_out : STD_LOGIC;
   signal rd_rst_active : STD_LOGIC;
   signal rd_rst_asreg : STD_LOGIC;
   signal rd_rst_comb : STD_LOGIC;
   signal rd_rst_reg : STD_LOGIC_VECTOR ( 2 downto 0 );
   attribute DONT_TOUCH : boolean;
   attribute DONT_TOUCH of rd_rst_reg : signal is std.standard.true;
-  signal \rrst_q[1]_6\ : STD_LOGIC;
-  signal \rrst_q[2]_7\ : STD_LOGIC;
-  signal \rrst_wr_q[2]_8\ : STD_LOGIC;
-  signal \rrst_wr_q[3]_10\ : STD_LOGIC;
-  signal \rrst_wr_q[4]_12\ : STD_LOGIC;
+  signal \rrst_q[1]_8\ : STD_LOGIC;
+  signal \rrst_q[2]_11\ : STD_LOGIC;
+  signal \rrst_q[4]_16\ : STD_LOGIC;
+  signal \rrst_q[5]_19\ : STD_LOGIC;
+  signal \rrst_wr_q[1]_9\ : STD_LOGIC;
+  signal \rrst_wr_q[2]_12\ : STD_LOGIC;
+  signal \rrst_wr_q[3]_14\ : STD_LOGIC;
+  signal \rrst_wr_q[4]_17\ : STD_LOGIC;
+  signal \rrst_wr_q[5]_20\ : STD_LOGIC;
+  signal \rrst_wr_q[6]_22\ : STD_LOGIC;
   signal rst_d1 : STD_LOGIC;
   attribute async_reg : string;
   attribute async_reg of rst_d1 : signal is "true";
@@ -3128,9 +3989,12 @@ architecture STRUCTURE of fwft_afifo_w32_d16_reset_blk_ramfifo is
   signal wr_rst_busy_i2_out : STD_LOGIC;
   signal wr_rst_reg : STD_LOGIC_VECTOR ( 2 downto 0 );
   attribute DONT_TOUCH of wr_rst_reg : signal is std.standard.true;
-  signal \wrst_ext_q[2]_9\ : STD_LOGIC;
-  signal \wrst_ext_q[3]_11\ : STD_LOGIC;
-  signal \wrst_ext_q[4]_13\ : STD_LOGIC;
+  signal \wrst_ext_q[1]_10\ : STD_LOGIC;
+  signal \wrst_ext_q[2]_13\ : STD_LOGIC;
+  signal \wrst_ext_q[3]_15\ : STD_LOGIC;
+  signal \wrst_ext_q[4]_18\ : STD_LOGIC;
+  signal \wrst_ext_q[5]_21\ : STD_LOGIC;
+  signal \wrst_ext_q[6]_23\ : STD_LOGIC;
   attribute ASYNC_REG_boolean : boolean;
   attribute ASYNC_REG_boolean of \grstd1.grst_full.grst_f.rst_d1_reg\ : label is std.standard.true;
   attribute KEEP : string;
@@ -3175,9 +4039,9 @@ architecture STRUCTURE of fwft_afifo_w32_d16_reset_blk_ramfifo is
   attribute equivalent_register_removal of \ngwrdrst.grst.g7serrst.wr_rst_reg_reg[2]\ : label is "no";
 begin
   SR(0) <= \^sr\(0);
-  \gof.gof1.overflow_i_reg\ <= rst_d3;
   \out\ <= \^out\;
   ram_empty_i_reg(0) <= rd_rst_reg(2);
+  ram_full_fb_i_reg <= rst_d3;
   ram_full_i_reg <= rst_d2;
 \grstd1.grst_full.grst_f.rst_d1_reg\: unisim.vcomponents.FDPE
     generic map(
@@ -3230,21 +4094,8 @@ begin
 \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[2].arst_sync_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_0
      port map (
       \Q_reg_reg[0]_0\ => \arst_sync_q[1]_2\,
-      \Q_reg_reg[0]_1\ => \arst_sync_q[3]_4\,
-      \Q_reg_reg[0]_2\ => \arst_sync_q[4]_5\,
-      \Q_reg_reg[0]_3\ => \wrst_ext_q[4]_13\,
-      \Q_reg_reg[0]_4\ => \rrst_wr_q[4]_12\,
-      \gof.gof1.overflow_i_reg\ => \gof.gof1.overflow_i_reg_0\,
-      \grstd1.grst_full.grst_f.rst_d3_reg\ => rst_d3,
-      in0(0) => sckt_wrst_i,
-      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[2].arst_sync_inst_n_3\,
       \out\ => \arst_sync_q[2]_3\,
-      ram_full_fb_i_reg => ram_full_fb_i_reg,
-      sckt_wr_rst_i_q => sckt_wr_rst_i_q,
-      wr_clk => wr_clk,
-      wr_en => wr_en,
-      wr_rst_busy => wr_rst_busy,
-      wr_rst_busy_i2_out => wr_rst_busy_i2_out
+      wr_clk => wr_clk
     );
 \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[3].arst_sync_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_1
      port map (
@@ -3255,8 +4106,36 @@ begin
 \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[4].arst_sync_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_2
      port map (
       \Q_reg_reg[0]_0\ => \arst_sync_q[3]_4\,
+      \Q_reg_reg[0]_1\ => \arst_sync_q[2]_3\,
+      \Q_reg_reg[0]_2\ => \arst_sync_q[5]_6\,
+      \Q_reg_reg[0]_3\ => \arst_sync_q[6]_7\,
+      \Q_reg_reg[0]_4\ => \wrst_ext_q[6]_23\,
+      \Q_reg_reg[0]_5\ => \rrst_wr_q[6]_22\,
+      \gof.gof1.overflow_i_reg\ => \gof.gof1.overflow_i_reg\,
+      \gof.gof1.overflow_i_reg_0\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[4].arst_sync_inst_n_2\,
+      \out\ => \arst_sync_q[4]_5\,
+      ram_full_fb_i_reg => ram_full_fb_i_reg_0,
+      sckt_wrst_i => sckt_wrst_i,
+      wr_clk => wr_clk,
+      wr_en => wr_en
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[5].arst_sync_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_3
+     port map (
+      \Q_reg_reg[0]_0\ => \arst_sync_q[5]_6\,
       \out\ => \arst_sync_q[4]_5\,
       wr_clk => wr_clk
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[6].arst_sync_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_4
+     port map (
+      \Q_reg_reg[0]_0\ => \arst_sync_q[5]_6\,
+      \Q_reg_reg[0]_1\ => \arst_sync_q[2]_3\,
+      \Q_reg_reg[0]_2\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[4].arst_sync_inst_n_2\,
+      \grstd1.grst_full.grst_f.rst_d3_reg\ => rst_d3,
+      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[6].arst_sync_inst_n_2\,
+      \out\ => \arst_sync_q[6]_7\,
+      sckt_wr_rst_i_q => sckt_wr_rst_i_q,
+      wr_clk => wr_clk,
+      wr_rst_busy => wr_rst_busy
     );
 \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\: unisim.vcomponents.FDRE
     generic map(
@@ -3265,7 +4144,7 @@ begin
         port map (
       C => wr_clk,
       CE => '1',
-      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst_n_1\,
+      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst_n_2\,
       Q => fifo_rrst_done,
       R => '0'
     );
@@ -3276,50 +4155,50 @@ begin
         port map (
       C => wr_clk,
       CE => '1',
-      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].wr_rst_ext_inst_n_1\,
+      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].wr_rst_ext_inst_n_1\,
       Q => fifo_wrst_done,
       R => '0'
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[1].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_3
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[1].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_5
      port map (
-      in0(0) => sckt_wrst_i,
-      \out\ => \rrst_q[1]_6\,
-      rd_clk => rd_clk
+      \out\ => \rrst_q[1]_8\,
+      rd_clk => rd_clk,
+      sckt_wrst_i => sckt_wrst_i
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[1].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_4
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[1].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_6
      port map (
-      \Q_reg_reg[0]_0\ => p_9_out,
+      \Q_reg_reg[0]_0\ => \rrst_wr_q[1]_9\,
       \out\ => \^out\,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[1].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_5
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[1].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_7
      port map (
-      in0(0) => sckt_wrst_i,
-      \out\ => p_8_out,
+      \out\ => \wrst_ext_q[1]_10\,
+      sckt_wrst_i => sckt_wrst_i,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[2].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_6
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[2].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_8
      port map (
-      \Q_reg_reg[0]_0\ => \rrst_q[2]_7\,
-      \out\ => \rrst_q[1]_6\,
+      \Q_reg_reg[0]_0\ => \rrst_q[2]_11\,
+      \out\ => \rrst_q[1]_8\,
       rd_clk => rd_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[2].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_7
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[2].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_9
      port map (
-      \Q_reg_reg[0]_0\ => p_9_out,
-      \out\ => \rrst_wr_q[2]_8\,
+      \Q_reg_reg[0]_0\ => \rrst_wr_q[1]_9\,
+      \out\ => \rrst_wr_q[2]_12\,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[2].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_8
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[2].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_10
      port map (
-      \Q_reg_reg[0]_0\ => \wrst_ext_q[2]_9\,
-      \out\ => p_8_out,
+      \Q_reg_reg[0]_0\ => \wrst_ext_q[2]_13\,
+      \out\ => \wrst_ext_q[1]_10\,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_9
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_11
      port map (
       E(0) => E(0),
-      \Q_reg_reg[0]_0\ => \rrst_q[2]_7\,
+      \Q_reg_reg[0]_0\ => \rrst_q[2]_11\,
       \Q_reg_reg[0]_1\ => p_14_out,
       \Q_reg_reg[0]_2\ => p_12_out,
       fwft_rst_done_q => fwft_rst_done_q,
@@ -3333,43 +4212,84 @@ begin
       rd_rst_active => rd_rst_active,
       sckt_rd_rst_fwft => \gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/sckt_rd_rst_fwft\
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_10
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_12
      port map (
-      \Q_reg_reg[0]_0\ => \rrst_wr_q[3]_10\,
-      \out\ => \rrst_wr_q[2]_8\,
+      \Q_reg_reg[0]_0\ => \rrst_wr_q[3]_14\,
+      \out\ => \rrst_wr_q[2]_12\,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_11
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[3].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_13
      port map (
-      \Q_reg_reg[0]_0\ => \wrst_ext_q[2]_9\,
-      \out\ => \wrst_ext_q[3]_11\,
+      \Q_reg_reg[0]_0\ => \wrst_ext_q[2]_13\,
+      \out\ => \wrst_ext_q[3]_15\,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_12
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_14
      port map (
+      \Q_reg_reg[0]_0\ => \rrst_q[4]_16\,
       \out\ => \^out\,
       rd_clk => rd_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_13
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_15
      port map (
-      \Q_reg_reg[0]_0\ => \rrst_wr_q[3]_10\,
-      \Q_reg_reg[0]_1\ => \wrst_ext_q[4]_13\,
-      \Q_reg_reg[0]_2\ => \arst_sync_q[4]_5\,
-      fifo_rrst_done => fifo_rrst_done,
-      fifo_wrst_done => fifo_wrst_done,
-      in0(0) => sckt_wrst_i,
-      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst_n_1\,
-      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_reg\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst_n_2\,
-      \out\ => \rrst_wr_q[4]_12\,
+      \Q_reg_reg[0]_0\ => \rrst_wr_q[3]_14\,
+      \out\ => \rrst_wr_q[4]_17\,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_14
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_16
+     port map (
+      \Q_reg_reg[0]_0\ => \wrst_ext_q[4]_18\,
+      \out\ => \wrst_ext_q[3]_15\,
+      wr_clk => wr_clk
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[5].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_17
+     port map (
+      \Q_reg_reg[0]_0\ => \rrst_q[4]_16\,
+      \out\ => \rrst_q[5]_19\,
+      rd_clk => rd_clk
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[5].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_18
+     port map (
+      \Q_reg_reg[0]_0\ => \rrst_wr_q[5]_20\,
+      \out\ => \rrst_wr_q[4]_17\,
+      wr_clk => wr_clk
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[5].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_19
+     port map (
+      \Q_reg_reg[0]_0\ => \wrst_ext_q[4]_18\,
+      \out\ => \wrst_ext_q[5]_21\,
+      wr_clk => wr_clk
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_20
+     port map (
+      \out\ => \rrst_q[5]_19\,
+      rd_clk => rd_clk
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_21
+     port map (
+      \Q_reg_reg[0]_0\ => \rrst_wr_q[5]_20\,
+      \Q_reg_reg[0]_1\ => \arst_sync_q[3]_4\,
+      \Q_reg_reg[0]_2\ => \arst_sync_q[4]_5\,
+      \Q_reg_reg[0]_3\ => \arst_sync_q[2]_3\,
+      \Q_reg_reg[0]_4\ => \arst_sync_q[5]_6\,
+      \Q_reg_reg[0]_5\ => \arst_sync_q[6]_7\,
+      \Q_reg_reg[0]_6\ => \wrst_ext_q[6]_23\,
+      fifo_rrst_done => fifo_rrst_done,
+      fifo_wrst_done => fifo_wrst_done,
+      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_rrst_done_reg\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst_n_2\,
+      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.sckt_wrst_i_reg\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst_n_3\,
+      \out\ => \rrst_wr_q[6]_22\,
+      sckt_wrst_i => sckt_wrst_i,
+      wr_clk => wr_clk,
+      wr_rst_busy_i2_out => wr_rst_busy_i2_out
+    );
+\ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].wr_rst_ext_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_22
      port map (
       fifo_rrst_done => fifo_rrst_done,
       fifo_wrst_done => fifo_wrst_done,
-      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg\ => \wrst_ext_q[4]_13\,
-      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg_0\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].wr_rst_ext_inst_n_1\,
-      \out\ => \wrst_ext_q[3]_11\,
+      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg\ => \wrst_ext_q[6]_23\,
+      \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.fifo_wrst_done_reg_0\ => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].wr_rst_ext_inst_n_1\,
+      \out\ => \wrst_ext_q[5]_21\,
       wr_clk => wr_clk
     );
 \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.safety_ckt_wr_rst_i_reg\: unisim.vcomponents.FDRE
@@ -3379,7 +4299,7 @@ begin
         port map (
       C => wr_clk,
       CE => '1',
-      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[2].arst_sync_inst_n_3\,
+      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.garst_sync[6].arst_sync_inst_n_2\,
       Q => \^sr\(0),
       R => '0'
     );
@@ -3401,7 +4321,7 @@ begin
         port map (
       C => wr_clk,
       CE => '1',
-      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[4].rd_rst_wr_inst_n_2\,
+      D => \ngwrdrst.grst.g7serrst.gsckt_wrst.gic_rst.garst_sync_ic[6].rd_rst_wr_inst_n_3\,
       Q => sckt_wrst_i,
       R => '0'
     );
@@ -3438,59 +4358,83 @@ begin
       Q => \gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/sckt_rd_rst_fwft\,
       R => '0'
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_15
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_23
      port map (
       in0(0) => rd_rst_asreg,
       \out\ => p_10_out,
       rd_clk => rd_clk
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_16
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[1].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_24
      port map (
       in0(0) => wr_rst_asreg,
       \out\ => p_11_out,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_17
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_25
      port map (
       \Q_reg_reg[0]_0\ => p_12_out,
       \out\ => p_10_out,
       rd_clk => rd_clk
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_18
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[2].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_26
      port map (
       \Q_reg_reg[0]_0\ => p_13_out,
       \out\ => p_11_out,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_19
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_27
      port map (
       \Q_reg_reg[0]_0\ => p_12_out,
-      in0(0) => rd_rst_asreg,
-      \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\ => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst_n_1\,
       \out\ => p_14_out,
       rd_clk => rd_clk
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_20
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_28
      port map (
       \Q_reg_reg[0]_0\ => p_13_out,
-      in0(0) => wr_rst_asreg,
-      \ngwrdrst.grst.g7serrst.wr_rst_asreg_reg\ => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst_n_1\,
       \out\ => p_15_out,
       wr_clk => wr_clk
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_21
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_29
+     port map (
+      \Q_reg_reg[0]_0\ => p_16_out,
+      \out\ => p_14_out,
+      rd_clk => rd_clk
+    );
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_30
+     port map (
+      \Q_reg_reg[0]_0\ => p_17_out,
+      \out\ => p_15_out,
+      wr_clk => wr_clk
+    );
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_31
+     port map (
+      \Q_reg_reg[0]_0\ => p_16_out,
+      in0(0) => rd_rst_asreg,
+      \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\ => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].rrst_inst_n_1\,
+      \out\ => p_18_out,
+      rd_clk => rd_clk
+    );
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_32
+     port map (
+      \Q_reg_reg[0]_0\ => p_17_out,
+      in0(0) => wr_rst_asreg,
+      \ngwrdrst.grst.g7serrst.wr_rst_asreg_reg\ => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].wrst_inst_n_1\,
+      \out\ => p_19_out,
+      wr_clk => wr_clk
+    );
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].rrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_33
      port map (
       AS(0) => rd_rst_comb,
       in0(0) => rd_rst_asreg,
-      \out\ => p_14_out,
+      \out\ => p_18_out,
       rd_clk => rd_clk,
       rd_rst_active => rd_rst_active
     );
-\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_22
+\ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].wrst_inst\: entity work.fwft_afifo_w32_d16_synchronizer_ff_34
      port map (
-      AS(0) => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst_n_0\,
+      AS(0) => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].wrst_inst_n_0\,
       in0(0) => wr_rst_asreg,
-      \out\ => p_15_out,
+      \out\ => p_19_out,
       wr_clk => wr_clk
     );
 \ngwrdrst.grst.g7serrst.rd_rst_asreg_reg\: unisim.vcomponents.FDPE
@@ -3500,7 +4444,7 @@ begin
         port map (
       C => rd_clk,
       CE => '1',
-      D => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].rrst_inst_n_1\,
+      D => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].rrst_inst_n_1\,
       PRE => rst_rd_reg2,
       Q => rd_rst_asreg
     );
@@ -3588,7 +4532,7 @@ begin
         port map (
       C => wr_clk,
       CE => '1',
-      D => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[3].wrst_inst_n_1\,
+      D => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[5].wrst_inst_n_1\,
       PRE => rst_wr_reg2,
       Q => wr_rst_asreg
     );
@@ -3600,7 +4544,7 @@ begin
       C => wr_clk,
       CE => '1',
       D => '0',
-      PRE => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst_n_0\,
+      PRE => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].wrst_inst_n_0\,
       Q => wr_rst_reg(0)
     );
 \ngwrdrst.grst.g7serrst.wr_rst_reg_reg[1]\: unisim.vcomponents.FDPE
@@ -3611,7 +4555,7 @@ begin
       C => wr_clk,
       CE => '1',
       D => '0',
-      PRE => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst_n_0\,
+      PRE => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].wrst_inst_n_0\,
       Q => wr_rst_reg(1)
     );
 \ngwrdrst.grst.g7serrst.wr_rst_reg_reg[2]\: unisim.vcomponents.FDPE
@@ -3622,7 +4566,7 @@ begin
       C => wr_clk,
       CE => '1',
       D => '0',
-      PRE => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[4].wrst_inst_n_0\,
+      PRE => \ngwrdrst.grst.g7serrst.gwrrd_rst_sync_stage[6].wrst_inst_n_0\,
       Q => wr_rst_reg(2)
     );
 end STRUCTURE;
@@ -3633,47 +4577,46 @@ use UNISIM.VCOMPONENTS.ALL;
 entity fwft_afifo_w32_d16_wr_logic is
   port (
     full : out STD_LOGIC;
-    \out\ : out STD_LOGIC;
     overflow : out STD_LOGIC;
     WEBWE : out STD_LOGIC_VECTOR ( 0 to 0 );
     Q : out STD_LOGIC_VECTOR ( 1 downto 0 );
     ram_full_fb_i_reg : out STD_LOGIC;
+    \gof.gof1.overflow_i_reg\ : out STD_LOGIC;
     \gic0.gc0.count_d2_reg[3]\ : out STD_LOGIC_VECTOR ( 3 downto 0 );
     \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM18.ram\ : out STD_LOGIC_VECTOR ( 3 downto 0 );
     \gic0.gc0.count_d1_reg[0]\ : in STD_LOGIC;
     wr_clk : in STD_LOGIC;
-    \grstd1.grst_full.grst_f.rst_d2_reg\ : in STD_LOGIC;
+    \out\ : in STD_LOGIC;
     SR : in STD_LOGIC_VECTOR ( 0 to 0 );
-    ram_full_fb_i_reg_0 : in STD_LOGIC;
+    \Q_reg_reg[0]\ : in STD_LOGIC;
     wr_en : in STD_LOGIC;
     \gnxpm_cdc.rd_pntr_bin_reg[1]\ : in STD_LOGIC_VECTOR ( 1 downto 0 );
     \grstd1.grst_full.grst_f.rst_d3_reg\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_wr_logic : entity is "wr_logic";
 end fwft_afifo_w32_d16_wr_logic;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_wr_logic is
   signal \^webwe\ : STD_LOGIC_VECTOR ( 0 to 0 );
-  signal \^out\ : STD_LOGIC;
+  signal \gwas.wsts_n_1\ : STD_LOGIC;
 begin
   WEBWE(0) <= \^webwe\(0);
-  \out\ <= \^out\;
 \gwas.wsts\: entity work.fwft_afifo_w32_d16_wr_status_flags_as
      port map (
       E(0) => \^webwe\(0),
       SR(0) => SR(0),
       full => full,
       \gic0.gc0.count_d1_reg[0]\ => \gic0.gc0.count_d1_reg[0]\,
-      \grstd1.grst_full.grst_f.rst_d2_reg\ => \grstd1.grst_full.grst_f.rst_d2_reg\,
-      \out\ => \^out\,
+      \gof.gof1.overflow_i_reg\ => \gof.gof1.overflow_i_reg\,
+      \grstd1.grst_full.grst_f.rst_d2_reg\ => \out\,
+      \grstd1.grst_full.grst_f.rst_d3_reg\ => \grstd1.grst_full.grst_f.rst_d3_reg\,
+      \out\ => \gwas.wsts_n_1\,
       wr_clk => wr_clk,
       wr_en => wr_en
     );
 \gwhf.whf\: entity work.fwft_afifo_w32_d16_wr_handshaking_flags
      port map (
+      \Q_reg_reg[0]\ => \Q_reg_reg[0]\,
       overflow => overflow,
-      ram_full_fb_i_reg => ram_full_fb_i_reg_0,
       wr_clk => wr_clk
     );
 wpntr: entity work.fwft_afifo_w32_d16_wr_bin_cntr
@@ -3685,7 +4628,7 @@ wpntr: entity work.fwft_afifo_w32_d16_wr_bin_cntr
       \gic0.gc0.count_d2_reg[3]_0\(3 downto 0) => \gic0.gc0.count_d2_reg[3]\(3 downto 0),
       \gnxpm_cdc.rd_pntr_bin_reg[1]\(1 downto 0) => \gnxpm_cdc.rd_pntr_bin_reg[1]\(1 downto 0),
       \grstd1.grst_full.grst_f.rst_d3_reg\ => \grstd1.grst_full.grst_f.rst_d3_reg\,
-      \out\ => \^out\,
+      \out\ => \gwas.wsts_n_1\,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       wr_clk => wr_clk
     );
@@ -3707,8 +4650,6 @@ entity fwft_afifo_w32_d16_blk_mem_gen_generic_cstr is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
 end fwft_afifo_w32_d16_blk_mem_gen_generic_cstr;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_blk_mem_gen_generic_cstr is
@@ -3744,8 +4685,6 @@ entity fwft_afifo_w32_d16_blk_mem_gen_top is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_blk_mem_gen_top : entity is "blk_mem_gen_top";
 end fwft_afifo_w32_d16_blk_mem_gen_top;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_blk_mem_gen_top is
@@ -3781,8 +4720,6 @@ entity fwft_afifo_w32_d16_blk_mem_gen_v8_3_4_synth is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_blk_mem_gen_v8_3_4_synth : entity is "blk_mem_gen_v8_3_4_synth";
 end fwft_afifo_w32_d16_blk_mem_gen_v8_3_4_synth;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_blk_mem_gen_v8_3_4_synth is
@@ -3818,8 +4755,6 @@ entity fwft_afifo_w32_d16_blk_mem_gen_v8_3_4 is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_blk_mem_gen_v8_3_4 : entity is "blk_mem_gen_v8_3_4";
 end fwft_afifo_w32_d16_blk_mem_gen_v8_3_4;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_blk_mem_gen_v8_3_4 is
@@ -3855,8 +4790,6 @@ entity fwft_afifo_w32_d16_memory is
     \gic0.gc0.count_d2_reg[3]\ : in STD_LOGIC_VECTOR ( 3 downto 0 );
     din : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_memory : entity is "memory";
 end fwft_afifo_w32_d16_memory;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_memory is
@@ -3895,8 +4828,6 @@ entity fwft_afifo_w32_d16_fifo_generator_ramfifo is
     rst : in STD_LOGIC;
     rd_en : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_fifo_generator_ramfifo : entity is "fifo_generator_ramfifo";
 end fwft_afifo_w32_d16_fifo_generator_ramfifo;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_fifo_generator_ramfifo is
@@ -3907,8 +4838,8 @@ architecture STRUCTURE of fwft_afifo_w32_d16_fifo_generator_ramfifo is
   signal \gntv_or_sync_fifo.gl0.rd_n_10\ : STD_LOGIC;
   signal \gntv_or_sync_fifo.gl0.rd_n_11\ : STD_LOGIC;
   signal \gntv_or_sync_fifo.gl0.rd_n_12\ : STD_LOGIC;
-  signal \gntv_or_sync_fifo.gl0.wr_n_1\ : STD_LOGIC;
-  signal \gntv_or_sync_fifo.gl0.wr_n_3\ : STD_LOGIC;
+  signal \gntv_or_sync_fifo.gl0.wr_n_2\ : STD_LOGIC;
+  signal \gntv_or_sync_fifo.gl0.wr_n_5\ : STD_LOGIC;
   signal \gntv_or_sync_fifo.gl0.wr_n_6\ : STD_LOGIC;
   signal \gr1.gr1_int.rfwft/fwft_rst_done_q\ : STD_LOGIC;
   signal gray2bin : STD_LOGIC_VECTOR ( 0 to 0 );
@@ -3917,7 +4848,7 @@ architecture STRUCTURE of fwft_afifo_w32_d16_fifo_generator_ramfifo is
   signal p_14_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal p_24_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal p_25_out : STD_LOGIC_VECTOR ( 1 downto 0 );
-  signal p_5_out : STD_LOGIC_VECTOR ( 3 downto 0 );
+  signal p_9_out : STD_LOGIC_VECTOR ( 3 downto 0 );
   signal rd_pntr_plus1 : STD_LOGIC_VECTOR ( 2 downto 0 );
   signal rd_rst_i : STD_LOGIC_VECTOR ( 2 to 2 );
   signal rst_full_ff_i : STD_LOGIC;
@@ -3945,9 +4876,9 @@ begin
       \gic0.gc0.count_d1_reg[3]\(3 downto 0) => p_14_out(3 downto 0),
       \gic0.gc0.count_d2_reg[3]\(3 downto 0) => p_13_out(3 downto 0),
       \gic0.gc0.count_reg[3]\(1 downto 0) => wr_pntr_plus2(3 downto 2),
-      \gnxpm_cdc.rd_pntr_bin_reg[0]_0\ => \gntv_or_sync_fifo.gl0.wr_n_6\,
+      \gnxpm_cdc.rd_pntr_bin_reg[0]_0\ => \gntv_or_sync_fifo.gl0.wr_n_5\,
       \grstd1.grst_full.grst_f.rst_d3_reg\ => rst_full_gen_i,
-      \out\(3 downto 0) => p_5_out(3 downto 0),
+      \out\(3 downto 0) => p_9_out(3 downto 0),
       ram_empty_i_reg => \gntv_or_sync_fifo.gcx.clkx_n_4\,
       ram_full_fb_i_reg => \gntv_or_sync_fifo.gcx.clkx_n_9\,
       ram_full_fb_i_reg_0(1 downto 0) => p_25_out(1 downto 0),
@@ -3960,10 +4891,10 @@ begin
       INIT => X"6996"
     )
         port map (
-      I0 => p_5_out(1),
-      I1 => p_5_out(0),
-      I2 => p_5_out(3),
-      I3 => p_5_out(2),
+      I0 => p_9_out(1),
+      I1 => p_9_out(0),
+      I2 => p_9_out(3),
+      I3 => p_9_out(2),
       O => gray2bin(0)
     );
 \gntv_or_sync_fifo.gl0.rd\: entity work.fwft_afifo_w32_d16_rd_logic
@@ -3993,25 +4924,25 @@ begin
      port map (
       \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM18.ram\(3 downto 0) => p_13_out(3 downto 0),
       Q(1 downto 0) => wr_pntr_plus2(3 downto 2),
+      \Q_reg_reg[0]\ => rstblk_n_7,
       SR(0) => rstblk_n_4,
-      WEBWE(0) => \gntv_or_sync_fifo.gl0.wr_n_3\,
+      WEBWE(0) => \gntv_or_sync_fifo.gl0.wr_n_2\,
       full => full,
       \gic0.gc0.count_d1_reg[0]\ => \gntv_or_sync_fifo.gcx.clkx_n_9\,
       \gic0.gc0.count_d2_reg[3]\(3 downto 0) => p_14_out(3 downto 0),
       \gnxpm_cdc.rd_pntr_bin_reg[1]\(1 downto 0) => p_25_out(1 downto 0),
-      \grstd1.grst_full.grst_f.rst_d2_reg\ => rst_full_ff_i,
+      \gof.gof1.overflow_i_reg\ => \gntv_or_sync_fifo.gl0.wr_n_6\,
       \grstd1.grst_full.grst_f.rst_d3_reg\ => rst_full_gen_i,
-      \out\ => \gntv_or_sync_fifo.gl0.wr_n_1\,
+      \out\ => rst_full_ff_i,
       overflow => overflow,
-      ram_full_fb_i_reg => \gntv_or_sync_fifo.gl0.wr_n_6\,
-      ram_full_fb_i_reg_0 => rstblk_n_7,
+      ram_full_fb_i_reg => \gntv_or_sync_fifo.gl0.wr_n_5\,
       wr_clk => wr_clk,
       wr_en => wr_en
     );
 \gntv_or_sync_fifo.mem\: entity work.fwft_afifo_w32_d16_memory
      port map (
       ADDRARDADDR(3 downto 0) => p_0_out_0(3 downto 0),
-      WEBWE(0) => \gntv_or_sync_fifo.gl0.wr_n_3\,
+      WEBWE(0) => \gntv_or_sync_fifo.gl0.wr_n_2\,
       din(31 downto 0) => din(31 downto 0),
       dout(31 downto 0) => dout(31 downto 0),
       \gic0.gc0.count_d2_reg[3]\(3 downto 0) => p_13_out(3 downto 0),
@@ -4027,12 +4958,12 @@ rstblk: entity work.fwft_afifo_w32_d16_reset_blk_ramfifo
       SR(0) => rstblk_n_4,
       fwft_rst_done_q => \gr1.gr1_int.rfwft/fwft_rst_done_q\,
       \gfwft_rst_done.fwft_rst_done_reg\ => rstblk_n_8,
-      \gof.gof1.overflow_i_reg\ => rst_full_gen_i,
-      \gof.gof1.overflow_i_reg_0\ => rstblk_n_7,
+      \gof.gof1.overflow_i_reg\ => rstblk_n_7,
       \gpregsm1.curr_fwft_state_reg[1]\(0) => rstblk_n_5,
       \out\ => \^sckt_rd_rst_o\,
       ram_empty_i_reg(0) => rd_rst_i(2),
-      ram_full_fb_i_reg => \gntv_or_sync_fifo.gl0.wr_n_1\,
+      ram_full_fb_i_reg => rst_full_gen_i,
+      ram_full_fb_i_reg_0 => \gntv_or_sync_fifo.gl0.wr_n_6\,
       ram_full_i_reg => rst_full_ff_i,
       rd_clk => rd_clk,
       rst => rst,
@@ -4061,8 +4992,6 @@ entity fwft_afifo_w32_d16_fifo_generator_top is
     rst : in STD_LOGIC;
     rd_en : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_fifo_generator_top : entity is "fifo_generator_top";
 end fwft_afifo_w32_d16_fifo_generator_top;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_fifo_generator_top is
@@ -4104,8 +5033,6 @@ entity fwft_afifo_w32_d16_fifo_generator_v13_1_2_synth is
     rst : in STD_LOGIC;
     rd_en : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_fifo_generator_v13_1_2_synth : entity is "fifo_generator_v13_1_2_synth";
 end fwft_afifo_w32_d16_fifo_generator_v13_1_2_synth;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_fifo_generator_v13_1_2_synth is
@@ -4692,7 +5619,7 @@ entity fwft_afifo_w32_d16_fifo_generator_v13_1_2 is
   attribute C_SELECT_XPM : integer;
   attribute C_SELECT_XPM of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is 0;
   attribute C_SYNCHRONIZER_STAGE : integer;
-  attribute C_SYNCHRONIZER_STAGE of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is 2;
+  attribute C_SYNCHRONIZER_STAGE of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is 4;
   attribute C_UNDERFLOW_LOW : integer;
   attribute C_UNDERFLOW_LOW of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is 0;
   attribute C_USE_COMMON_OVERFLOW : integer;
@@ -4769,8 +5696,6 @@ entity fwft_afifo_w32_d16_fifo_generator_v13_1_2 is
   attribute C_WR_PNTR_WIDTH_WRCH of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is 4;
   attribute C_WR_RESPONSE_LATENCY : integer;
   attribute C_WR_RESPONSE_LATENCY of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is 1;
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of fwft_afifo_w32_d16_fifo_generator_v13_1_2 : entity is "fifo_generator_v13_1_2";
 end fwft_afifo_w32_d16_fifo_generator_v13_1_2;
 
 architecture STRUCTURE of fwft_afifo_w32_d16_fifo_generator_v13_1_2 is
@@ -5782,7 +6707,7 @@ architecture STRUCTURE of fwft_afifo_w32_d16 is
   attribute C_SELECT_XPM : integer;
   attribute C_SELECT_XPM of U0 : label is 0;
   attribute C_SYNCHRONIZER_STAGE : integer;
-  attribute C_SYNCHRONIZER_STAGE of U0 : label is 2;
+  attribute C_SYNCHRONIZER_STAGE of U0 : label is 4;
   attribute C_UNDERFLOW_LOW : integer;
   attribute C_UNDERFLOW_LOW of U0 : label is 0;
   attribute C_USE_COMMON_OVERFLOW : integer;

@@ -157,9 +157,12 @@ begin
    end process;
    
    -- clk
-   U4: process(ACQ_TRIG)
+   U4: process
    begin
-      ACQ_TRIG <= not ACQ_TRIG after ACQ_TRIG_PERIOD/2; 
+      ACQ_TRIG <= '0';
+      wait for (ACQ_TRIG_PERIOD - 100 ns);
+      ACQ_TRIG <= '1';
+      wait for 100 ns; 
    end process;
    XTRA_TRIG <= '0';
    

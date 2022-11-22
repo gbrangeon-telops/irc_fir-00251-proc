@@ -12,6 +12,7 @@ acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 
 acom D:\Telops\Common_HDL\Utilities\reset_extension.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
 acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\signal_filter.vhd
 
 # sources FPa common 

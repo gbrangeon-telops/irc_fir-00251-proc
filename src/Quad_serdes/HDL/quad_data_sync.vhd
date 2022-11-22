@@ -94,14 +94,16 @@ architecture rtl of quad_data_sync is
          CLK    : in std_logic);
    end component;
    
-   signal sreset_clkout  : std_logic;
+   signal sreset_clkout    : std_logic := '1';
+   signal sreset_clkd      : std_logic := '1';
    signal dval_i, dval_out : std_logic;
    signal data_i, data_o   : std_logic_vector(Q'length-1 downto 0);
    signal sync_flag_i      : std_logic_vector(SYNC_FLAG'length-1 downto 0);
    
    signal full_i, empty_i  : std_logic;
-   signal dly_cnt          : natural range 0 to C_FIFO_RDY_DLY;
    signal fifo_rdy         : std_logic;
+   signal wr_rst_busy      : std_logic;
+   signal rd_rst_busy      : std_logic;
    
    --   attribute keep : string;
    --   attribute keep of dval_out : signal is "true";
@@ -115,13 +117,20 @@ begin
    --------------------------------------------------
    -- synchro reset 
    --------------------------------------------------   
-   U1 : sync_reset
+   U1A : sync_reset
    port map(
       ARESET => ARESET,
       CLK    => CLK_DOUT,
       SRESET => sreset_clkout
       ); 
-   
+
+   U1B : sync_reset
+   port map(
+      ARESET => ARESET,
+      CLK    => CLKD,
+      SRESET => sreset_clkd
+      ); 
+      
    sync_en : double_sync_vector  
    port map(
       D => SYNC_FLAG,
@@ -131,27 +140,26 @@ begin
    merge_proc : process(CLKD)
    begin
       if rising_edge(CLKD) then
-         if DVAL_IN = '1' and fifo_rdy = '1' then
-            dval_i <= '1';
-         else
+         if sreset_clkd = '1' then
             dval_i <= '0';
+         else
+            if DVAL_IN = '1' and wr_rst_busy = '0' then
+               dval_i <= '1';
+            else
+               dval_i <= '0';
+            end if;
          end if;
          data_i <= sync_flag_i & D3 & D2 & D1 & D0;
       end if;
    end process;
    
-   rd_proc : process(CLK_DOUT)    -- permet de prolonger le delai d'inactivité sur les signaux de contrôle au delà du reset du fifo
+   rd_proc : process(CLK_DOUT)
    begin
       if rising_edge(CLK_DOUT) then
          if sreset_clkout = '1' then
-            dly_cnt <= 0;
             fifo_rdy <= '0'; 
          else
-            if dly_cnt < C_FIFO_RDY_DLY then
-               dly_cnt <= dly_cnt + 1;
-            else
-               fifo_rdy <= '1';    
-            end if;   
+            fifo_rdy <= not rd_rst_busy;    
          end if;
       end if;
    end process;
@@ -170,8 +178,8 @@ begin
       overflow => open,
       empty => empty_i,
       valid => dval_out,
-      wr_rst_busy => open,  
-      rd_rst_busy => open      
+      wr_rst_busy => wr_rst_busy,  
+      rd_rst_busy => rd_rst_busy      
       );
    
 end rtl;

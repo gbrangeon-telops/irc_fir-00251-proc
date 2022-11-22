@@ -36,7 +36,6 @@ entity isc0209A_clks_gen_core is
       FPA_FAST_PCLK          : out std_logic;  -- 
       
       QUAD_CLK_COPY          : out std_logic;  -- quad_clk utilisé par le readout_ctrler
-      QUAD_CLK_ENABLED       : out std_logic;
       
       QUAD1_CLK              : out std_logic;
       QUAD2_CLK              : out std_logic;
@@ -97,13 +96,12 @@ architecture rtl of isc0209A_clks_gen_core is
          almost_full : out std_logic;
          overflow : out std_logic;
          empty   : out std_logic;
-         valid   : out std_logic
+         valid   : out std_logic;
+         wr_rst_busy  : out std_logic;
+         rd_rst_busy  : out std_logic
          );
    end component;
    
-   constant C_CLK_RDY_DLY_ms   : real := 1000.0;
-   constant C_DLY_BIT_POS      : integer := integer(ceil(log(C_CLK_RDY_DLY_ms * real(DEFINE_FPA_MCLK_RATE_KHZ))/MATH_LOG_OF_2));
-      
    type sync_fsm_type is (idle, done_st);
    
    signal sync_fsm                       : sync_fsm_type;
@@ -121,13 +119,12 @@ architecture rtl of isc0209A_clks_gen_core is
    signal quad_clk_raw                   : std_logic := '0';
    signal quad_clk_from_mclk_source      : std_logic := '0';
    --signal quad_clk_from_adc_clk_source   : std_logic := '0';
-   signal quad_clk_enabled_i             : std_logic := '0';
    signal quad_clk_copy_i                : std_logic := '0';
    signal quad_clk_pipe                  : std_logic_vector(63 downto 0);
    --signal quad_clk_sel                   : std_logic;
    signal cfg_in_progress_i              : std_logic;
    signal adc_clk_pipe_sel_i             : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL'LENGTH-1 downto 0);
-   signal idle_cnt                       : unsigned(C_DLY_BIT_POS downto 0);
+   signal idle_cnt                       : unsigned(15 downto 0);
    
    signal fifo_wr_en                     : std_logic;
    signal fifo_din                       : std_logic_vector(7 downto 0);
@@ -136,6 +133,7 @@ architecture rtl of isc0209A_clks_gen_core is
    
    signal fpa_mclk_last                  : std_logic;
    signal fpa_mclk_re                    : std_logic;
+   signal wr_rst_busy                    : std_logic;
    
    
    attribute equivalent_register_removal : string;
@@ -159,7 +157,6 @@ begin
    FPA_PCLK <= fpa_pclk_i;             -- pour le isc0209, Pixel clock (PCLK) = master clock (MCLK). C'est le double pour les indigo 
    FPA_FAST_MCLK <= fpa_fast_mclk_i;    -- horloge ultrarapide pour le fast windowing
    FPA_FAST_PCLK <= fpa_fast_pclk_i;    -- horloge ultrarapide pour le fast windowing
-   QUAD_CLK_ENABLED <= quad_clk_enabled_i;
    
    -----------------------------------------------------
    -- Synchronisation reset
@@ -218,7 +215,6 @@ begin
             sync_fsm <= idle; 
             idle_cnt <= (others => '0');
             fifo_wr_en <= '0';
-            quad_clk_enabled_i <= '0';
             fpa_mclk_last <= fpa_mclk_i;
             fpa_mclk_re <= '0';
             
@@ -238,20 +234,12 @@ begin
                      idle_cnt <= idle_cnt + 1;
                   end if;
                   if idle_cnt(6) = '1' then
-                     sync_fsm <= done_st; 
+                     sync_fsm <= done_st;
+                     idle_cnt <= (others => '0');
                   end if;
                
                when done_st =>
-                  fifo_wr_en <= '1';
-                  if fpa_mclk_re = '1' then 
-                     idle_cnt <= idle_cnt + 1;
-                  end if;
-                  if idle_cnt(C_DLY_BIT_POS) = '1' then
-                     quad_clk_enabled_i <= '1';
-                  end if;
-                  -- pragma translate_off
-                  quad_clk_enabled_i <= '1';
-                  -- pragma translate_on 
+                  fifo_wr_en <= not wr_rst_busy; 
                
                when others =>
                
@@ -330,7 +318,9 @@ begin
       almost_full => open,
       overflow => open,
       empty    => open,
-      valid    => fifo_dout_dval
+      valid    => fifo_dout_dval,
+      wr_rst_busy => wr_rst_busy,  
+      rd_rst_busy => open
       );
    
    

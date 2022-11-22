@@ -170,8 +170,9 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
  
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 671, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1346, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
                                                                                                 //ENO 11 mai 2016:  ne pas changer le 671, ce n'est pas en mV mais en cnt DAC qui donneront 700 mV
+                                                                                                //ELA 29 Août 2022: valeur par défaut de GFOL changée à 900 mV
 // statuts provenant du vhd
 struct s_FpaStatus    // 
 {

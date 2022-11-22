@@ -40,6 +40,7 @@ package body BB1920D_intf_testbench_pkg is
    function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned is 
       
       constant FPA_WIDTH_MAX : integer := 1920;
+      constant FPA_MCLK_RATE_MHZ : real := real(DEFINE_FPA_MCLK_SOURCE_RATE_KHZ)/1000.0;
       
       variable  comn_fpa_diag_mode                     : unsigned(31 downto 0);
       variable  comn_fpa_diag_type                     : unsigned(31 downto 0);
@@ -121,8 +122,31 @@ package body BB1920D_intf_testbench_pkg is
       
       variable y                                       : unsigned(QWORDS_NUM*32-1 downto 0);
       
+      -- working variables
+      variable number_of_conversions : real;
+      variable Line_Readout : real;
+      variable Line_Conversion : real;
+      variable Frame_Read : real;
+      variable Frame_Initialization : real;
+      variable pixel_control_time : real;
+      variable Frame_Time : real;
       
-   begin 
+      
+   begin
+      
+      number_of_conversions := real(user_ysize) / 2.0 +  2.0;
+      Line_Readout := (2.0 * real(FPA_WIDTH_MAX) + 18.0) / 2.0 / 4.0 / FPA_MCLK_RATE_MHZ; -- in us
+      Line_Conversion :=  (55.0 + 50.0 + 40.0 + 255.0 + 70.0 + 30.0 + 190.0) / FPA_MCLK_RATE_MHZ; -- in us
+      if Line_Readout > Line_Conversion then
+         Frame_Read :=  number_of_conversions * Line_Readout; -- in us
+      else
+         Frame_Read :=  number_of_conversions * Line_Conversion; -- in us
+      end if;
+      
+      Frame_Initialization := 28.0 + 14.0 + (10.0/FPA_MCLK_RATE_MHZ); -- in us
+      pixel_control_time := (2.0 * 140.0) + 14.0 + 10.0; -- in us
+      
+      Frame_Time := ((pixel_control_time + Frame_Initialization + Frame_Read)/1_000_000.0) * 1.105; -- en seconde
       
       
       comn_fpa_diag_mode            := (others => diag_mode);
@@ -134,9 +158,9 @@ package body BB1920D_intf_testbench_pkg is
       --         comn_fpa_acq_trig_mode    := resize(unsigned(MODE_ITR_TRIG_START_TO_TRIG_START),32);
       --      end if;   
       
-      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(24000, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(24000, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_trig_ctrl_timeout_dly:= to_unsigned(60000, comn_fpa_trig_ctrl_timeout_dly'length);        
+      comn_fpa_acq_trig_ctrl_dly    := to_unsigned(integer(Frame_Time * real(DEFINE_FPA_100M_CLK_RATE_KHZ)*1000.0), comn_fpa_acq_trig_ctrl_dly'length);
+      comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(integer(Frame_Time * real(DEFINE_FPA_100M_CLK_RATE_KHZ)*1000.0), comn_fpa_xtra_trig_ctrl_dly'length);
+      comn_fpa_trig_ctrl_timeout_dly:= resize(comn_fpa_xtra_trig_ctrl_dly, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
       diag_ysize                    := to_unsigned(user_ysize/2, 32);                 
@@ -161,7 +185,7 @@ package body BB1920D_intf_testbench_pkg is
       op_ysize                      := to_unsigned(user_ysize, 32);  
       op_frame_time                 := to_unsigned(10, 32);  
       op_gain                       := to_unsigned(1, 32);   
-      op_int_mode                   := to_unsigned(1, 32);   
+      op_int_mode                   := to_unsigned(0, 32);  --ITR=0, IWR=1   
       op_test_mode	               := to_unsigned(0, 32);     
       op_det_vbias                  := to_unsigned(0, 32);    
       op_det_ibias                  := to_unsigned(0, 32);       

@@ -208,7 +208,7 @@ package body blackbird1280D_testbench_pkg is
       variable comn_fpa_diag_type                       : unsigned(31 downto  0);
       variable comn_fpa_pwr_on                          : unsigned(31 downto  0);
       variable comn_fpa_trig_ctrl_mode                  : unsigned(31 downto  0);
-      variable comn_fpa_acq_trig_ctrl_clks              : unsigned(31 downto  0);
+      variable comn_fpa_acq_trig_ctrl_dly               : unsigned(31 downto  0);
       variable comn_fpa_spare                           : unsigned(31 downto  0);
       variable comn_fpa_xtra_trig_ctrl_dly              : unsigned(31 downto  0);
       variable comn_fpa_trig_ctrl_timeout_dly           : unsigned(31 downto  0); 
@@ -248,7 +248,7 @@ package body blackbird1280D_testbench_pkg is
       comn_fpa_diag_type                                     := resize(unsigned(cfg.comn.fpa_diag_type),32);
       comn_fpa_pwr_on                                        := (others => cfg.comn.fpa_pwr_on);
       comn_fpa_trig_ctrl_mode                                := resize(unsigned(cfg.comn.fpa_trig_ctrl_mode),32);
-      comn_fpa_acq_trig_ctrl_clks                            := resize(cfg.comn.fpa_acq_trig_ctrl_dly,32);
+      comn_fpa_acq_trig_ctrl_dly                             := resize(cfg.comn.fpa_acq_trig_ctrl_dly,32);
       comn_fpa_spare                                         := resize(cfg.comn.fpa_spare,32);
       comn_fpa_xtra_trig_ctrl_dly                            := resize(cfg.comn.fpa_xtra_trig_ctrl_dly,32);
       comn_fpa_trig_ctrl_timeout_dly                         := resize(cfg.comn.fpa_trig_ctrl_timeout_dly,32); 
@@ -285,7 +285,7 @@ package body blackbird1280D_testbench_pkg is
       & comn_fpa_diag_type              
       & comn_fpa_pwr_on                 
       & comn_fpa_trig_ctrl_mode         
-      & comn_fpa_acq_trig_ctrl_clks
+      & comn_fpa_acq_trig_ctrl_dly
       & comn_fpa_spare      
       & comn_fpa_xtra_trig_ctrl_dly
       & comn_fpa_trig_ctrl_timeout_dly

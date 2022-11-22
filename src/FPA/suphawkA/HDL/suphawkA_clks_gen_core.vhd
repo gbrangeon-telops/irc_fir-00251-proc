@@ -31,7 +31,6 @@ entity suphawkA_clks_gen_core is
       NOMINAL_MCLK_RAW       : out std_logic;
      
       ADC_REF_CLK            : out std_logic;  -- quad_clk utilisé par le readout_ctrler
-      QUAD_CLK_ENABLED       : out std_logic;
       
       QUAD1_CLK              : out std_logic;
       QUAD2_CLK              : out std_logic
@@ -96,9 +95,6 @@ architecture rtl of suphawkA_clks_gen_core is
          );
    end component;
    
-   constant C_CLK_RDY_DLY_ms   : real := 1000.0;
-   constant C_DLY_BIT_POS      : integer := integer(ceil(log(C_CLK_RDY_DLY_ms * real(DEFINE_FPA_NOMINAL_MCLK_RATE_KHZ))/MATH_LOG_OF_2));
-   
    type sync_fsm_type is (idle, done_st);
    
    signal sync_fsm                       : sync_fsm_type;
@@ -111,12 +107,11 @@ architecture rtl of suphawkA_clks_gen_core is
   
    signal quad_clk_raw                   : std_logic := '0';
    signal quad_clk_from_mclk_source      : std_logic := '0';
-   signal quad_clk_enabled_i             : std_logic := '0';
    signal adc_ref_clk_i                : std_logic := '0';
    signal quad_clk_pipe                  : std_logic_vector(63 downto 0);
    signal cfg_in_progress_i              : std_logic;
    signal adc_clk_pipe_sel               : std_logic_vector(FPA_INTF_CFG.ADC_CLK_PIPE_SEL'LENGTH-1 downto 0);
-   signal idle_cnt                       : unsigned(C_DLY_BIT_POS downto 0);
+   signal idle_cnt                       : unsigned(15 downto 0);
    
    signal fifo_wr_en                     : std_logic;
    signal fifo_din                       : std_logic_vector(7 downto 0);
@@ -125,6 +120,7 @@ architecture rtl of suphawkA_clks_gen_core is
    
    signal nominal_clk_last               : std_logic;
    signal nominal_clk_re                 : std_logic;
+   signal wr_rst_busy                    : std_logic;
    
    
    attribute equivalent_register_removal : string;
@@ -143,7 +139,6 @@ begin
    -- Eviter d'utiliser directement des outputs ports sans des process 
    
    NOMINAL_MCLK_RAW <= nominal_mclk_raw_i;      -- le not permet un alignement des edges de MCLK et PCLK
-   QUAD_CLK_ENABLED <= quad_clk_enabled_i;
    
    -----------------------------------------------------
    -- Synchronisation reset
@@ -189,7 +184,6 @@ begin
             sync_fsm <= idle; 
             idle_cnt <= (others => '0');
             fifo_wr_en <= '0';
-            quad_clk_enabled_i <= '0';
             nominal_clk_last <= nominal_mclk_raw_i;
             nominal_clk_re <= '0';
             
@@ -209,20 +203,12 @@ begin
                      idle_cnt <= idle_cnt + 1;
                   end if;
                   if idle_cnt(6) = '1' then
-                     sync_fsm <= done_st; 
+                     sync_fsm <= done_st;
+                     idle_cnt <= (others => '0');
                   end if;
                
                when done_st =>
-                  fifo_wr_en <= '1';
-                  if nominal_clk_re = '1' then 
-                     idle_cnt <= idle_cnt + 1;
-                  end if;
-                  if idle_cnt(C_DLY_BIT_POS) = '1' then
-                     quad_clk_enabled_i <= '1';
-                  end if;
-                  -- pragma translate_off
-                  quad_clk_enabled_i <= '1';
-                  -- pragma translate_on
+                  fifo_wr_en <= not wr_rst_busy;
                
                when others =>
                
@@ -274,7 +260,7 @@ begin
       overflow => open,
       empty    => open,
       valid    => fifo_dout_dval,
-      wr_rst_busy => open,  
+      wr_rst_busy => wr_rst_busy,  
       rd_rst_busy => open
       );    
    

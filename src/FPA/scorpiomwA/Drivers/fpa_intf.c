@@ -120,6 +120,11 @@
 
 #define SCORPIOMWA_CONST_ELEC_OFFSET_VALUE 340            // aussi pour ne pas provoquer saturation au dela de (2^14 - 1) soit 16383
 
+#define SCORPIOMWA_DEFAULT_REGC              2           // Default RegC value = 2
+#define SCORPIOMWA_DEFAULT_REGD              160         // Default RegD value = 160
+#define SCORPIOMWA_DEFAULT_REGF              8           // Default RegF value = 8
+#define SCORPIOMWA_DEFAULT_POL               900         // Default detector polarization = 900 mV
+
 
 #define TOTAL_DAC_NUM                     8
 
@@ -256,7 +261,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    uint32_t Cmin, Cmax, Rmin, Rmax;
    extern int16_t gFpaDetectorPolarizationVoltage;
-   static int16_t presentPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   static int16_t presentPolarizationVoltage = SCORPIOMWA_DEFAULT_POL;      // ELA 29 Août 2022: 900 mV comme valeur par defaut pour GPOL (avant: 700 mV)
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
    static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
@@ -362,7 +367,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       
    // GPOL voltage 
    if (sw_init_done == 0){
-      ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord(700.0F, 6);
+      ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord((float)SCORPIOMWA_DEFAULT_POL, 6);
       ptrA->roic_gpol_code = (int32_t)ProximCfg.vdac_value[5];
    }      
    if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage){      // gFpaDetectorPolarizationVoltage est en milliVolt
@@ -376,7 +381,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 8; 
+      gFpaDebugRegF = SCORPIOMWA_DEFAULT_REGF;
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
       
    ptrA->diag_ysize             = ptrA->roic_ysize;
@@ -464,12 +469,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // gFpaDebugRegC dephasage grossier des adc_clk 
    if (sw_init_done == 0)
-      gFpaDebugRegC = 0;
+      gFpaDebugRegC = SCORPIOMWA_DEFAULT_REGC;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
  
    // gFpaDebugRegD dephasage fin des adc_clk 
    if (sw_init_done == 0)         
-      gFpaDebugRegD = 64;
+      gFpaDebugRegD = SCORPIOMWA_DEFAULT_REGD;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;  
    
    // Élargit le pulse de trig

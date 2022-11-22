@@ -47,9 +47,9 @@ package body isc0207a_3k_intf_testbench_pkg is
       variable comn_fpa_diag_mode             : unsigned(31 downto  0);
       variable comn_fpa_diag_type             : unsigned(31 downto  0);
       variable comn_fpa_pwr_on                : unsigned(31 downto  0);
-      variable comn_fpa_trig_ctrl_mode        : unsigned(31 downto  0);
+      variable comn_fpa_acq_trig_mode         : unsigned(31 downto  0);
       variable comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto  0);
-      variable comn_fpa_spare                 : unsigned(31 downto  0);
+      variable comn_fpa_xtra_trig_mode        : unsigned(31 downto  0);
       variable comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto  0);
       variable comn_fpa_trig_ctrl_timeout_dly : unsigned(31 downto  0);
       variable comn_fpa_stretch_acq_trig      : unsigned(31 downto  0);
@@ -142,12 +142,12 @@ package body isc0207a_3k_intf_testbench_pkg is
       comn_fpa_diag_mode            := (others => diag_mode);
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
-      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
+      comn_fpa_acq_trig_mode        := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
       --if comn_fpa_diag_mode > 0 then
-      --   comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);  
+      --   comn_fpa_acq_trig_mode       := resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);  
       --end if;
       comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_spare  := to_unsigned(0, comn_fpa_spare'length);
+      comn_fpa_xtra_trig_mode       := resize(unsigned(MODE_ITR_INT_END_TO_TRIG_START),32);
       comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(0, comn_fpa_xtra_trig_ctrl_dly'length);
       comn_fpa_trig_ctrl_timeout_dly := to_unsigned(0, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');       
@@ -195,7 +195,7 @@ package body isc0207a_3k_intf_testbench_pkg is
       user_area_eol_posl_pclk_p1         := user_area_eol_posl_pclk + 1;       
       stretch_area_sol_posl_pclk         := user_area_eol_posl_pclk_p1;
       stretch_area_eol_posl_pclk         := to_unsigned(((to_integer(user_area_sol_posl_pclk) + user_xsize/TAP_NUM - 1) + 1 + 2*STRETCH_LINE_LENGTH_MCLK - 1), 32);   
-      pix_samp_num_per_ch           := to_unsigned(DEFINE_FPA_PIX_SAMPLE_NUM_PER_CH, 32);
+      pix_samp_num_per_ch           := to_unsigned(1, 32);
       hgood_samp_sum_num            := to_unsigned(1, 32);                                      
       hgood_samp_mean_numerator     := to_unsigned(2**21, 32);                           
       vgood_samp_sum_num            := to_unsigned(1, 32);                                      
@@ -291,71 +291,71 @@ package body isc0207a_3k_intf_testbench_pkg is
       end if;
       
       
---      comn_fpa_diag_mode                := to_unsigned(0        , 32);
---      comn_fpa_diag_type                := to_unsigned(0        , 32);
-      comn_fpa_pwr_on                   := to_unsigned(1        , 32);
-      comn_fpa_trig_ctrl_mode           := to_unsigned(2        , 32);
-      comn_fpa_acq_trig_ctrl_dly        := to_unsigned(0        , 32);
-      comn_fpa_spare                    := to_unsigned(0        , 32);
-      comn_fpa_xtra_trig_ctrl_dly       := to_unsigned(389      , 32);
-      comn_fpa_trig_ctrl_timeout_dly    := to_unsigned(389      , 32);
-      comn_fpa_stretch_acq_trig         := to_unsigned(0        , 32);
-      diag_ysize                        := to_unsigned(4        , 32);
-      diag_xsize_div_tapnum             := to_unsigned(4        , 32);
-      roic_xstart                       := to_unsigned(128      , 32);
-      roic_ystart                       := to_unsigned(0        , 32);
-      roic_xsize                        := to_unsigned(192      , 32);
-      roic_ysize_div2_m1                := to_unsigned(1        , 32);
-      gain                              := to_unsigned(1        , 32);
-      internal_outr                     := to_unsigned(0        , 32);
-      real_mode_active_pixel_dly        := to_unsigned(1        , 32);
-      speedup_lsync                     := to_unsigned(0        , 32);
-      speedup_sample_row                := to_unsigned(0        , 32);
-      speedup_unused_area               := to_unsigned(0        , 32);
-      raw_area_line_start_num           := to_unsigned(1        , 32);
-      raw_area_line_end_num             := to_unsigned(4        , 32);
-      raw_area_sof_posf_pclk            := to_unsigned(1        , 32);
-      raw_area_eof_posf_pclk            := to_unsigned(48       , 32);
-      raw_area_sol_posl_pclk            := to_unsigned(1        , 32);
-      raw_area_eol_posl_pclk            := to_unsigned(12       , 32);
-      raw_area_eol_posl_pclk_p1         := to_unsigned(13       , 32);
-      raw_area_window_lsync_num         := to_unsigned(4        , 32);
-      raw_area_line_period_pclk         := to_unsigned(12       , 32);
-      raw_area_readout_pclk_cnt_max     := to_unsigned(49       , 32);
-      user_area_line_start_num          := to_unsigned(1        , 32);
-      user_area_line_end_num            := to_unsigned(4        , 32);
-      user_area_sol_posl_pclk           := to_unsigned(9        , 32);
-      user_area_eol_posl_pclk           := to_unsigned(12       , 32);
-      user_area_eol_posl_pclk_p1        := to_unsigned(13       , 32);
-      stretch_area_sol_posl_pclk        := to_unsigned(13       , 32);
-      stretch_area_eol_posl_pclk        := to_unsigned(12       , 32);
-      pix_samp_num_per_ch               := to_unsigned(1        , 32);
-      hgood_samp_sum_num                := to_unsigned(1        , 32);
-      hgood_samp_mean_numerator         := to_unsigned(2097152  , 32);
-      vgood_samp_sum_num                := to_unsigned(1        , 32);
-      vgood_samp_mean_numerator         := to_unsigned(2097152  , 32);
-      good_samp_first_pos_per_ch        := to_unsigned(1        , 32);
-      good_samp_last_pos_per_ch         := to_unsigned(1        , 32);
-      adc_clk_source_phase              := to_unsigned(144000   , 32);
-      adc_clk_pipe_sel                  := to_unsigned(2        , 32);
-      spare1                            := to_unsigned(0        , 32);
-      lsydel_mclk                       := to_unsigned(4        , 32);
-      boost_mode                        := to_unsigned(0        , 32);
-      speedup_lsydel                    := to_unsigned(0        , 32);
-      adc_clk_pipe_sync_pos             := to_unsigned(2        , 32);
-      readout_plus_delay                := to_unsigned(358      , 32);
-      tri_min_window_part               := to_signed(200      , 32);
-      int_time_offset_mclk              := to_signed(6        , 32);
-      --spare2                            := to_unsigned(0        , 32);
+      -- comn_fpa_diag_mode                := to_unsigned(0        , 32);
+      -- comn_fpa_diag_type                := to_unsigned(0        , 32);
+      -- comn_fpa_pwr_on                   := to_unsigned(1        , 32);
+      -- comn_fpa_acq_trig_mode            := to_unsigned(2        , 32);
+      -- comn_fpa_acq_trig_ctrl_dly        := to_unsigned(0        , 32);
+      -- comn_fpa_xtra_trig_mode           := to_unsigned(0        , 32);
+      -- comn_fpa_xtra_trig_ctrl_dly       := to_unsigned(389      , 32);
+      -- comn_fpa_trig_ctrl_timeout_dly    := to_unsigned(389      , 32);
+      -- comn_fpa_stretch_acq_trig         := to_unsigned(0        , 32);
+      -- diag_ysize                        := to_unsigned(4        , 32);
+      -- diag_xsize_div_tapnum             := to_unsigned(4        , 32);
+      -- roic_xstart                       := to_unsigned(128      , 32);
+      -- roic_ystart                       := to_unsigned(0        , 32);
+      -- roic_xsize                        := to_unsigned(192      , 32);
+      -- roic_ysize_div2_m1                := to_unsigned(1        , 32);
+      -- gain                              := to_unsigned(1        , 32);
+      -- internal_outr                     := to_unsigned(0        , 32);
+      -- real_mode_active_pixel_dly        := to_unsigned(1        , 32);
+      -- speedup_lsync                     := to_unsigned(0        , 32);
+      -- speedup_sample_row                := to_unsigned(0        , 32);
+      -- speedup_unused_area               := to_unsigned(0        , 32);
+      -- raw_area_line_start_num           := to_unsigned(1        , 32);
+      -- raw_area_line_end_num             := to_unsigned(4        , 32);
+      -- raw_area_sof_posf_pclk            := to_unsigned(1        , 32);
+      -- raw_area_eof_posf_pclk            := to_unsigned(48       , 32);
+      -- raw_area_sol_posl_pclk            := to_unsigned(1        , 32);
+      -- raw_area_eol_posl_pclk            := to_unsigned(12       , 32);
+      -- raw_area_eol_posl_pclk_p1         := to_unsigned(13       , 32);
+      -- raw_area_window_lsync_num         := to_unsigned(4        , 32);
+      -- raw_area_line_period_pclk         := to_unsigned(12       , 32);
+      -- raw_area_readout_pclk_cnt_max     := to_unsigned(49       , 32);
+      -- user_area_line_start_num          := to_unsigned(1        , 32);
+      -- user_area_line_end_num            := to_unsigned(4        , 32);
+      -- user_area_sol_posl_pclk           := to_unsigned(9        , 32);
+      -- user_area_eol_posl_pclk           := to_unsigned(12       , 32);
+      -- user_area_eol_posl_pclk_p1        := to_unsigned(13       , 32);
+      -- stretch_area_sol_posl_pclk        := to_unsigned(13       , 32);
+      -- stretch_area_eol_posl_pclk        := to_unsigned(12       , 32);
+      -- pix_samp_num_per_ch               := to_unsigned(1        , 32);
+      -- hgood_samp_sum_num                := to_unsigned(1        , 32);
+      -- hgood_samp_mean_numerator         := to_unsigned(2097152  , 32);
+      -- vgood_samp_sum_num                := to_unsigned(1        , 32);
+      -- vgood_samp_mean_numerator         := to_unsigned(2097152  , 32);
+      -- good_samp_first_pos_per_ch        := to_unsigned(1        , 32);
+      -- good_samp_last_pos_per_ch         := to_unsigned(1        , 32);
+      -- adc_clk_source_phase              := to_unsigned(144000   , 32);
+      -- adc_clk_pipe_sel                  := to_unsigned(2        , 32);
+      -- spare1                            := to_unsigned(0        , 32);
+      -- lsydel_mclk                       := to_unsigned(4        , 32);
+      -- boost_mode                        := to_unsigned(0        , 32);
+      -- speedup_lsydel                    := to_unsigned(0        , 32);
+      -- adc_clk_pipe_sync_pos             := to_unsigned(2        , 32);
+      -- readout_plus_delay                := to_unsigned(358      , 32);
+      -- tri_min_window_part               := to_signed(200      , 32);
+      -- int_time_offset_mclk              := to_signed(6        , 32);
+      -- spare2                            := to_unsigned(0        , 32);
       
       
       -- cfg usager
       y :=  comn_fpa_diag_mode                         
       & comn_fpa_diag_type             
       & comn_fpa_pwr_on                
-      & comn_fpa_trig_ctrl_mode        
+      & comn_fpa_acq_trig_mode        
       & comn_fpa_acq_trig_ctrl_dly     
-      & comn_fpa_spare   
+      & comn_fpa_xtra_trig_mode   
       & comn_fpa_xtra_trig_ctrl_dly    
       & comn_fpa_trig_ctrl_timeout_dly  
       & comn_fpa_stretch_acq_trig         

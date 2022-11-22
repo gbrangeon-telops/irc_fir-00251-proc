@@ -7,6 +7,7 @@ acom d:\Telops\Common_HDL\Common_Projects\TEL2000\FPA_common\src\fleg_brd_define
 acom d:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\FPA_define.vhd
 acom d:\Telops\FIR-00251-Proc\src\FPA\isc0804A\HDL\Proxy_define.vhd 
 acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
 
 #utilities
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do

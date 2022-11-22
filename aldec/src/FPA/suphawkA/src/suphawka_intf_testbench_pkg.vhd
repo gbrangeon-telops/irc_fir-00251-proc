@@ -46,9 +46,9 @@ package body suphawkA_intf_testbench_pkg is
       variable comn_fpa_diag_mode                     : unsigned(31 downto 0);
       variable comn_fpa_diag_type                     : unsigned(31 downto 0);
       variable comn_fpa_pwr_on                        : unsigned(31 downto 0);
-      variable comn_fpa_trig_ctrl_mode                : unsigned(31 downto 0);
+      variable comn_fpa_acq_trig_mode                 : unsigned(31 downto 0);
       variable comn_fpa_acq_trig_ctrl_dly             : unsigned(31 downto 0);
-      variable comn_fpa_spare                         : unsigned(31 downto 0);
+      variable comn_fpa_xtra_trig_mode                : unsigned(31 downto 0);
       variable comn_fpa_xtra_trig_ctrl_dly            : unsigned(31 downto 0);
       variable comn_fpa_trig_ctrl_timeout_dly         : unsigned(31 downto 0);                            
       variable xstart                                 : unsigned(31 downto 0);
@@ -155,7 +155,8 @@ package body suphawkA_intf_testbench_pkg is
       comn_fpa_diag_mode                    := (others => diag_mode);                                               
       comn_fpa_diag_type                    := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                       := to_unsigned(1, 32);                                               
-      comn_fpa_trig_ctrl_mode               := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);          
+      comn_fpa_acq_trig_mode                := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
+      comn_fpa_xtra_trig_mode               := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);
       
       xstart                                := to_unsigned(0, 32);  
       ystart                                := to_unsigned(0, 32);  
@@ -276,7 +277,7 @@ package body suphawkA_intf_testbench_pkg is
         raw_area_line_end_num		        := raw_area_line_start_num + to_unsigned(user_ysize - 1, 32);
       end if;
       raw_area_line_period_pclk 		    := to_unsigned(user_xsize/TAP_NUM + PAUSE_SIZE, 32);	  
-      raw_area_readout_pclk_cnt_max  		:= to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + 165, 32);   
+      raw_area_readout_pclk_cnt_max  		:= to_unsigned((user_xsize/TAP_NUM + PAUSE_SIZE)*(user_ysize) + FPA_RST_DLY_MCLK, 32);   
 	  raw_area_sof_posf_pclk         		:= to_unsigned(PAUSE_SIZE + 1, 32);      
       if user_ysize > 1 then 
          raw_area_eof_posf_pclk  		    := to_unsigned(user_ysize * (user_xsize/TAP_NUM + PAUSE_SIZE), 32);
@@ -325,19 +326,19 @@ package body suphawkA_intf_testbench_pkg is
 	  
 	  cfg_num                                := to_unsigned(send_id, cfg_num'length);
 	  
-	  comn_fpa_spare                         := (others => '0');
-	  comn_fpa_acq_trig_ctrl_dly     		 :=  to_unsigned(1*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_acq_trig_ctrl_dly'length);
-	  comn_fpa_xtra_trig_ctrl_dly			 :=  to_unsigned(1*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_xtra_trig_ctrl_dly'length);
-	  comn_fpa_trig_ctrl_timeout_dly		 :=  to_unsigned(1*to_integer(raw_area_readout_pclk_cnt_max), comn_fpa_trig_ctrl_timeout_dly'length);        
+	  
+	  comn_fpa_acq_trig_ctrl_dly     	 :=  to_unsigned(to_integer(raw_area_readout_pclk_cnt_max)*DEFINE_FPA_100M_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, comn_fpa_acq_trig_ctrl_dly'length);
+	  comn_fpa_xtra_trig_ctrl_dly			 :=  to_unsigned(to_integer(raw_area_readout_pclk_cnt_max)*DEFINE_FPA_100M_CLK_RATE_KHZ/DEFINE_FPA_MCLK_RATE_KHZ, comn_fpa_xtra_trig_ctrl_dly'length);
+	  comn_fpa_trig_ctrl_timeout_dly		 :=  to_unsigned(2*1*DEFINE_FPA_100M_CLK_RATE_KHZ*1000, comn_fpa_trig_ctrl_timeout_dly'length); --ENO: 11 juillet 2022: le delai de timeout est egale à 2 fois la durée du temps d'exposition max pour securiser le mode MODE_READOUT_END_TO_TRIG_START.
       
       
       -- cfg usager
       y :=  comn_fpa_diag_mode              
       & comn_fpa_diag_type                       
       & comn_fpa_pwr_on                          
-      & comn_fpa_trig_ctrl_mode                  
+      & comn_fpa_acq_trig_mode                  
       & comn_fpa_acq_trig_ctrl_dly               
-      & comn_fpa_spare                           
+      & comn_fpa_xtra_trig_mode                           
       & comn_fpa_xtra_trig_ctrl_dly              
       & comn_fpa_trig_ctrl_timeout_dly           
       & xstart                                   

@@ -29,14 +29,14 @@ package scorpiomwA_300Hz_intf_testbench_pkg is
    constant ELCORR_SW_TO_PATH2             : unsigned(1 downto 0) :=   "10";
    constant ELCORR_SW_TO_NORMAL_OP         : unsigned(1 downto 0) :=   "11";
    
-   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned;
+   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; offsetx:natural; offsety:natural; send_id:natural) return unsigned;
    
    
 end scorpiomwA_300Hz_intf_testbench_pkg;
 
 package body scorpiomwA_300Hz_intf_testbench_pkg is
    
-   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; send_id:natural) return unsigned is 
+   function to_intf_cfg(diag_mode:std_logic; user_xsize:natural; user_ysize:natural; offsetx:natural; offsety:natural; send_id:natural) return unsigned is 
       
       variable comn_fpa_diag_mode                                  : unsigned(31 downto 0);
       variable comn_fpa_diag_type                                  : unsigned(31 downto 0);
@@ -120,9 +120,18 @@ package body scorpiomwA_300Hz_intf_testbench_pkg is
       
       variable y                                                   : unsigned(QWORDS_NUM*32-1 downto 0);
       
+      variable ROIC_ADDED_LINES : integer;
+      
       
       
    begin
+      -- Pour corriger la calibration en sous-fenetre on lit les 2 lignes précédentes
+      if offsety < 2 then
+         ROIC_ADDED_LINES := 0;
+      else
+         ROIC_ADDED_LINES := 2;
+      end if;
+      
       comn_fpa_diag_mode               :=  (others => diag_mode);                                               
       comn_fpa_diag_type               :=  resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);                 
       comn_fpa_pwr_on                  :=  (others =>'1');                                               
@@ -137,10 +146,10 @@ package body scorpiomwA_300Hz_intf_testbench_pkg is
       
       roic_itr                         := (others => '1');      
       
-      roic_xstart                      := to_unsigned(0, 32);  
-      roic_ystart                      := to_unsigned(0, 32);  
+      roic_xstart                      := to_unsigned(offsetx, 32);  
+      roic_ystart                      := to_unsigned(offsety - ROIC_ADDED_LINES, 32);  
       roic_xsize                       := to_unsigned(user_xsize, 32);  
-      roic_ysize                       := to_unsigned(user_ysize, 32);  
+      roic_ysize                       := to_unsigned(user_ysize + ROIC_ADDED_LINES, 32);  
       roic_gain                        := (others => '0');
       roic_windcfg_part1               := to_unsigned(1, roic_windcfg_part1'length);
       roic_windcfg_part2               := to_unsigned(2, roic_windcfg_part2'length);
@@ -172,7 +181,7 @@ package body scorpiomwA_300Hz_intf_testbench_pkg is
       raw_area_clk_id                := to_unsigned(DEFINE_FPA_NOMINAL_MCLK_ID, 32); -- horloge par defaut
       
       -- user area (fenetre à envoyer à l'usager) 
-      user_area_line_start_num       := to_unsigned(1, 32); 
+      user_area_line_start_num       := raw_area_line_start_num + ROIC_ADDED_LINES; 
       user_area_line_end_num         := raw_area_line_end_num;
       user_area_sol_posl_pclk        := raw_area_sol_posl_pclk; 
       user_area_eol_posl_pclk        := raw_area_eol_posl_pclk;

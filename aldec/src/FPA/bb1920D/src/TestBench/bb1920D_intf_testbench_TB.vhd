@@ -255,13 +255,13 @@ begin
          enable_external_int_ctrl <= '0';
 
          -- cfg usager
-         user_xsize1 <= 128;
-         user_ysize1 <= 64;
-         user_cfg_vector1 <= to_intf_cfg('1', user_xsize1, user_ysize1, 1); 
+         user_xsize1 <= 1920;
+         user_ysize1 <= 1536;
+         user_cfg_vector1 <= to_intf_cfg('0', user_xsize1, user_ysize1, 1); 
          
-         user_xsize2 <= 128;
-         user_ysize2 <= 64;
-         user_cfg_vector2 <= to_intf_cfg('1', user_xsize2, user_ysize2, 2);
+         user_xsize2 <= 320;
+         user_ysize2 <= 128;
+         user_cfg_vector2 <= to_intf_cfg('0', user_xsize2, user_ysize2, 2);
          
          user_xsize3 <= 64;
          user_ysize3 <= 64;
@@ -371,10 +371,9 @@ begin
       --wait for 10 ns;  
       
       
-      wait for 1.5 ms;
-      ACQ_TRIG <= '0';
-      XTRA_TRIG <= '1';
-      wait;
+--      wait for 3.5 ms;
+--      ACQ_TRIG <= '0';
+--      XTRA_TRIG <= '1';
       
 --      
 --      for ii in 0 to QWORDS_NUM-1 loop 
@@ -400,6 +399,7 @@ begin
       
       report "END OF SIMULATION" 
       severity error;
+      wait;
    end process ublaze_sim;   
    
    -- Unit Under Test port map

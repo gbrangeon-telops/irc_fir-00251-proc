@@ -59,7 +59,7 @@ package body pelicand_testbench_pkg is
       variable comn_fpa_diag_type             : unsigned(31 downto  0);
       variable comn_fpa_pwr_on                : unsigned(31 downto  0);
       variable comn_fpa_trig_ctrl_mode        : unsigned(31 downto  0);
-      variable comn_fpa_acq_trig_ctrl_clks    : unsigned(31 downto  0);
+      variable comn_fpa_acq_trig_ctrl_dly    : unsigned(31 downto  0);
       variable comn_fpa_spare                 : unsigned(31 downto  0);
       variable comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto  0);
       variable comn_fpa_trig_ctrl_timeout_dly : unsigned(31 downto  0); 
@@ -147,7 +147,7 @@ package body pelicand_testbench_pkg is
          scd_fig1_or_fig2_t5_clks := sec_to_clks(0.8*(FIG1_FIG2_T5_MIN_ITR_SEC + (fig1_or_fig2_t0_sec*(0.1/100.0)))); 
          
          comn_fpa_trig_ctrl_mode        := resize(unsigned(MODE_INT_END_TO_TRIG_START),32);         
-         comn_fpa_acq_trig_ctrl_clks    := sec_to_clks(fig1_or_fig2_t3_sec) + scd_fig1_or_fig2_t5_clks + scd_fig1_or_fig2_t6_clks - sec_to_clks(VHD_PIXEL_PIPE_DLY_ITR);
+         comn_fpa_acq_trig_ctrl_dly    := sec_to_clks(fig1_or_fig2_t3_sec) + scd_fig1_or_fig2_t5_clks + scd_fig1_or_fig2_t6_clks - sec_to_clks(VHD_PIXEL_PIPE_DLY_ITR);
          scd_fig4_t1_clks               := scd_fig4_t2_clks; 
       
       elsif int_mode = 1 then 
@@ -173,14 +173,14 @@ package body pelicand_testbench_pkg is
          
          scd_fig1_or_fig2_t5_clks       := sec_to_clks((FIG1_FIG2_T5_MIN_IWR_SEC + (fig1_or_fig2_t0_sec*(0.1/100.0))));
          comn_fpa_trig_ctrl_mode        := resize(unsigned(MODE_ALL_END_TO_TRIG_START),32);         
-         comn_fpa_acq_trig_ctrl_clks    := scd_fig1_or_fig2_t5_clks - sec_to_clks(VHD_PIXEL_PIPE_DLY_IWR);  
+         comn_fpa_acq_trig_ctrl_dly    := scd_fig1_or_fig2_t5_clks - sec_to_clks(VHD_PIXEL_PIPE_DLY_IWR);  
          scd_fig4_t1_clks               := sec_to_clks(T_LINE_CONV_SEC + 0.000002);
          
       end if;
       
       if comn_fpa_diag_mode > 0 then 
          comn_fpa_trig_ctrl_mode        := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
-         comn_fpa_acq_trig_ctrl_clks    := to_unsigned(0, comn_fpa_acq_trig_ctrl_clks'length);
+         comn_fpa_acq_trig_ctrl_dly    := to_unsigned(0, comn_fpa_acq_trig_ctrl_dly'length);
       end if;
 
       scd_fig4_t3_clks         := sec_to_clks(320.0*TFPP_CLK_SEC);
@@ -198,7 +198,7 @@ package body pelicand_testbench_pkg is
       & comn_fpa_diag_type              
       & comn_fpa_pwr_on                 
       & comn_fpa_trig_ctrl_mode         
-      & comn_fpa_acq_trig_ctrl_clks
+      & comn_fpa_acq_trig_ctrl_dly
       & comn_fpa_spare      
       & comn_fpa_xtra_trig_ctrl_dly
       & comn_fpa_trig_ctrl_timeout_dly

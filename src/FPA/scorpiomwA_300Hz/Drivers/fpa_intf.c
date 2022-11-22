@@ -93,7 +93,7 @@
 #define VHD_CLK_100M_RATE_HZ              100000000
 
 // horloge des ADCs
-#define ADC_SAMPLING_RATE_HZ              27000000    // les ADC roulent à 18MHz
+#define ADC_SAMPLING_RATE_HZ              27000000    // les ADC roulent à 27MHz
 
 // lecture de température FPA
 #define FPA_TEMP_READER_ADC_DATA_RES      16            // la donnée de temperature est sur 16 bits
@@ -120,6 +120,12 @@
 
 #define SCORPIOMWA_CONST_ELEC_OFFSET_VALUE 340            // aussi pour ne pas provoquer saturation au dela de (2^14 - 1) soit 16383
 
+#define SCORPIOMWA_300HZ_DEFAULT_REGC              2      // Default RegC value = 2
+#define SCORPIOMWA_300HZ_DEFAULT_REGD              387    // Default RegD value = 387
+#define SCORPIOMWA_300HZ_DEFAULT_REGF              8      // Default RegF value = 8
+
+#define SCORPIOMWA_300HZ_DEFAULT_POL               900    // Default detector polarization = 900 mV
+
 
 #define TOTAL_DAC_NUM                     8
 
@@ -135,6 +141,8 @@
 #define DEFINE_FPA_FAST2_MCLK_RATE_HZ         (2*DEFINE_FPA_NOMINAL_MCLK_RATE_HZ) 
 
 #define AR_PRIVATE_STATUS_BASE_ADD         0x0800  // adresse de base des statuts specifiques ou privées
+
+#define ROIC_ADDITIONAL_LINES                   2  // Pour corriger la calibration en sous-fenetre on lit 2 lignes de plus.
 
 struct s_ProximCfgConfig 
 {   
@@ -255,8 +263,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    //gcRegistersData_t localGCRegs;
    
    uint32_t Cmin, Cmax, Rmin, Rmax;
+   uint32_t roicAddedLines;
    extern int16_t gFpaDetectorPolarizationVoltage;
-   static int16_t presentPolarizationVoltage = 700;      //  700 mV comme valeur par defaut pour GPOL
+   static int16_t presentPolarizationVoltage = SCORPIOMWA_300HZ_DEFAULT_POL; // ELA 29 Août 2022: 900 mV comme valeur par defaut pour GPOL (avant: 700 mV)
    extern float gFpaDetectorElectricalTapsRef;
    extern float gFpaDetectorElectricalRefOffset;
    static float presentElectricalTapsRef = 10;       // valeur arbitraire d'initialisation. La bonne valeur sera calculée apres passage dans la fonction de calcul 
@@ -321,11 +330,18 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->fpa_xtra_trig_ctrl_dly    = (uint32_t)((1.0*1e-6F) * (float)VHD_CLK_100M_RATE_HZ); // ENO 20 juin 2022: delai de 1usec pour eviter que IMG_IN_PROGRESS ne soit toujours à '1' d'aune image à l'autreen mode XTRA_TRIG ou PROG_TRIG
    ptrA->fpa_trig_ctrl_timeout_dly = (uint32_t)((float)VHD_CLK_100M_RATE_HZ/(float)FPA_XTRA_TRIG_FREQ_MAX_HZ);
    
+   // Pour corriger la calibration en sous-fenetre on lit les lignes précédentes.
+   // Ensuite on utilise le fast read pour se débarasser des lignes supplémentaires.
+   if (pGCRegs->OffsetY < ROIC_ADDITIONAL_LINES)
+      roicAddedLines = 0;
+   else
+      roicAddedLines = ROIC_ADDITIONAL_LINES;
+   
    // fenetrage
    ptrA->roic_xstart    = (uint32_t)pGCRegs->OffsetX;
-   ptrA->roic_ystart    = (uint32_t)pGCRegs->OffsetY;
+   ptrA->roic_ystart    = (uint32_t)pGCRegs->OffsetY - roicAddedLines;
    ptrA->roic_xsize     = (uint32_t)pGCRegs->Width;
-   ptrA->roic_ysize     = (uint32_t)pGCRegs->Height;
+   ptrA->roic_ysize     = (uint32_t)pGCRegs->Height + roicAddedLines;
    
    // direction de lecture
    ptrA->roic_uprow_upcol = 1;      //  (uprow_upcol = 1 => uprow = 1 and upcol = 1) or (uprow_upcol = 0 => uprow = 0 and upcol = 0)
@@ -352,7 +368,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    //  windowing
    ptrA->roic_sizea_sizeb = 0;           // 0 --> toujours en mode windowing 2020-05-06 ODI: pour conservation de la calibration en sous-fenêtre
-   //if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)pGCRegs->Height == (uint32_t)FPA_HEIGHT_MAX))
+   //if (((uint32_t)pGCRegs->Width == (uint32_t)FPA_WIDTH_MAX) && ((uint32_t)ptrA->roic_ysize == (uint32_t)FPA_HEIGHT_MAX))
       //ptrA->roic_sizea_sizeb = 1;        // mode pleine fenetre à l'initialisation
 
    //  gain 
@@ -362,7 +378,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
       
    // GPOL voltage 
    if (sw_init_done == 0){
-      ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord(700.0F, 6);
+      ProximCfg.vdac_value[5] = FLEG_VccVoltage_To_DacWord((float)SCORPIOMWA_300HZ_DEFAULT_POL, 6);
       ptrA->roic_gpol_code = (int32_t)ProximCfg.vdac_value[5];
    }      
    if (gFpaDetectorPolarizationVoltage != presentPolarizationVoltage){      // gFpaDetectorPolarizationVoltage est en milliVolt
@@ -376,10 +392,11 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0)
-      gFpaDebugRegF = 8; 
+      gFpaDebugRegF = SCORPIOMWA_300HZ_DEFAULT_REGF;
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF;  
       
-   ptrA->diag_ysize             = ptrA->roic_ysize;
+   // diag (sans la correction pour la calibration en sous-fenêtre)
+   ptrA->diag_ysize             = pGCRegs->Height;
    ptrA->diag_xsize_div_tapnum  = ptrA->roic_xsize/(uint32_t)hh.tap_number;
     
    // quad2                                                                
@@ -401,8 +418,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->raw_area_clk_id                  = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
   
    // user area 
-   ptrA->user_area_line_start_num         = ptrA->raw_area_line_start_num;    // ligne de debut à 1 et comme on n'utilise plus fpa_data_valid, on a ne ligne avant les données
-   ptrA->user_area_line_end_num           = ptrA->raw_area_line_end_num;     
+   ptrA->user_area_line_start_num         = ptrA->raw_area_line_start_num + roicAddedLines;  // on commence a la 1re ligne après les lignes supplémentaires
+   ptrA->user_area_line_end_num           = ptrA->raw_area_line_end_num;                     // on conserve les lignes jusqu'a la derniere. Nombre de lignes = Height.
    ptrA->user_area_sol_posl_pclk          = ptrA->raw_area_sol_posl_pclk;
    ptrA->user_area_eol_posl_pclk          = ptrA->raw_area_eol_posl_pclk;         
    ptrA->user_area_clk_id                 = VHD_DEFINE_FPA_NOMINAL_MCLK_ID;
@@ -464,12 +481,12 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // gFpaDebugRegC dephasage grossier des adc_clk 
    if (sw_init_done == 0)
-      gFpaDebugRegC = 0;
+      gFpaDebugRegC = SCORPIOMWA_300HZ_DEFAULT_REGC;
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
  
    // gFpaDebugRegD dephasage fin des adc_clk 
    if (sw_init_done == 0)         
-      gFpaDebugRegD = 64;
+      gFpaDebugRegD = SCORPIOMWA_300HZ_DEFAULT_REGD;
    ptrA->adc_clk_source_phase = (uint32_t)gFpaDebugRegD;  
    
    // Élargit le pulse de trig
@@ -618,6 +635,8 @@ int16_t FPA_GetTemperature(const t_FpaIntf *ptrA)
 //--------------------------------------------------------------------------
 void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const gcRegistersData_t *pGCRegs)
 {
+   uint32_t readoutHeight;
+   
    // Période d'horloge selon la variante de modèle
    if (flashSettings.AcquisitionFrameRateMaxDivider > 1.0F)             // 2021-02-26 ELA: modèle SPARK M100 dès que le diviseur > 1.0
       ptrH->mclk_period_usec     = MODEL_M100_FR_DIVIDER * 1e6F/(float)FPA_MCLK_RATE_HZ; // FR diminué
@@ -636,7 +655,13 @@ void FPA_SpecificParams(scorpiomw_param_t *ptrH, float exposureTime_usec, const 
    ptrH->pclk_rate_hz            = ptrH->pixnum_per_tap_per_mclk * (float)FPA_MCLK_RATE_HZ;
 
    // readout time
-   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(pGCRegs->Height + ptrH->fovh_line);
+   if (pGCRegs->Height <= FPA_HEIGHT_MAX - ROIC_ADDITIONAL_LINES)
+      // Pour corriger la calibration en sous-fenetre on lit des lignes de plus.
+      // En réalité ces lignes sont lues seulement si OffsetY != 0, mais on ignore ce détail pour le calcul du FRmax.
+      readoutHeight = pGCRegs->Height + ROIC_ADDITIONAL_LINES;
+   else
+      readoutHeight = pGCRegs->Height;
+   ptrH->readout_mclk         = (pGCRegs->Width/(ptrH->pixnum_per_tap_per_mclk*ptrH->tap_number) + ptrH->lovh_mclk)*(readoutHeight + ptrH->fovh_line);
    ptrH->readout_usec         = ptrH->readout_mclk * ptrH->mclk_period_usec;
    
    // delay

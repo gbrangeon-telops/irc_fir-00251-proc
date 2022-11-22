@@ -181,6 +181,10 @@
 #define ELCORR_MODE_FREE_WHEELING_CORR             9
 #define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19
 
+#define ISC0804_500HZ_DEFAULT_REGC              3      // Default RegC value = 3
+#define ISC0804_500HZ_DEFAULT_REGD              164736 // Default RegD value = 164736
+#define ISC0804_500HZ_DEFAULT_REGF              15     // Default RegF value = 15
+
 struct s_ProximCfgConfig 
 {   
    uint32_t  vdac_value[(uint8_t)TOTAL_DAC_NUM];
@@ -499,9 +503,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // Registre F : ajustement des delais de la chaine
    if (init_done == 0){
-      gFpaDebugRegF = 8;    //
+      gFpaDebugRegF = ISC0804_500HZ_DEFAULT_REGF;    //
       if (ptrA->pix_samp_num_per_ch > 1)
-         gFpaDebugRegF = 10; 
+         gFpaDebugRegF = ISC0804_500HZ_DEFAULT_REGF;
    }   
    ptrA->real_mode_active_pixel_dly = (uint32_t)gFpaDebugRegF; 
      
@@ -519,21 +523,21 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    // adc clk source phase
    if (init_done == 0){
-      ptrA->adc_clk_pipe_sel = 1;
+      ptrA->adc_clk_pipe_sel = ISC0804_500HZ_DEFAULT_REGC;
       if ((Stat.flex_flegx_detect_process_done == 1) && (Stat.flex_flegx_present == 1) && (flegx_present == 0))  // cas du LN2
-         ptrA->adc_clk_pipe_sel = 1;
+         ptrA->adc_clk_pipe_sel = ISC0804_500HZ_DEFAULT_REGC;
    }       
    if ((gFpaDebugRegC != (int32_t) ptrA->adc_clk_pipe_sel) && (init_done == 1)){
    ptrA->adc_clk_pipe_sel = (uint32_t)gFpaDebugRegC;                                              
       need_rst_fpa_module = 1;
    }
-   gFpaDebugRegC= (int32_t)ptrA->adc_clk_pipe_sel;                                              
+   gFpaDebugRegC = (int32_t)ptrA->adc_clk_pipe_sel;
    
    // adc clk source phase
    if (init_done == 0){         
-      ptrA->adc_clk_source_phase = 354000; //179200;
+      ptrA->adc_clk_source_phase = ISC0804_500HZ_DEFAULT_REGD;
       if ((Stat.flex_flegx_detect_process_done == 1) && (Stat.flex_flegx_present == 1) && (flegx_present == 0))  // cas du LN2
-         ptrA->adc_clk_source_phase = 354000; 
+         ptrA->adc_clk_source_phase = ISC0804_500HZ_DEFAULT_REGD;
    }
    if ((gFpaDebugRegD != (int32_t) ptrA->adc_clk_source_phase) && (init_done == 1)){
       ptrA->adc_clk_source_phase = (int32_t)gFpaDebugRegD;

@@ -13,9 +13,9 @@ acom -nowarn DAGGEN_0523 -incr \
 
 
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
 
-
-acom D:\Telops\FIR-00251-Proc\IP\325\afifo_w72_d16\afifo_w72_d16_sim_netlist.vhdl
+acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w72_d16\fwft_afifo_w72_d16_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w8_d256\fwft_afifo_w8_d256_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_afifo_w96_d128\fwft_afifo_w96_d128_sim_netlist.vhdl
 acom D:\Telops\FIR-00251-Proc\IP\325\fwft_sfifo_w3_d16\fwft_sfifo_w3_d16_sim_netlist.vhdl
@@ -85,10 +85,10 @@ asim -ses suphawkA_intf_testbench_TB
 --wave UUT/U1/U21/U8/* 
 
 #-- mb_interface
-wave UUT/U1/U4/*  
+--wave UUT/U1/U4/*  
 
 #-- clks
-wave UUT/U1/U26/*  
+--wave UUT/U1/U26/*  
 
 
 -- intf_sequencer
@@ -102,12 +102,12 @@ wave UUT/U1/U26/*
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U21/U6/*
 
-#wave UUT/U1/U9/*
+wave UUT/U1/U9/*
 --wave UUT/U1/U9/U22/*  OK
 --wave UUT/U1/U9/U23/*  OK
 --wave UUT/U1/U9/U7/*
 --wave UUT/U1/U9/U2/U1/U1/* 
---wave UUT/U1/U9/U18/*
+wave UUT/U1/U9/U18/*
 
 --wave UUT/U1/U19/*
 
@@ -122,7 +122,7 @@ wave UUT/U1/U26/*
 
 #Readout controller
 wave UUT/U1/U5/U5/*
-wave UUT/U1/U5/U5/U6/*
+--wave UUT/U1/U5/U5/U6/*
 
 wave UUT/U1/*
 

@@ -46,11 +46,11 @@ package body isc0804A_intf_testbench_pkg is
       variable comn_fpa_diag_mode             : unsigned(31 downto  0);
       variable comn_fpa_diag_type             : unsigned(31 downto  0);
       variable comn_fpa_pwr_on                : unsigned(31 downto  0);
-      variable comn_fpa_trig_ctrl_mode        : unsigned(31 downto  0);
+      variable comn_fpa_acq_trig_mode         : unsigned(31 downto  0);
       variable comn_fpa_acq_trig_ctrl_dly     : unsigned(31 downto  0);
-      variable comn_fpa_acq_trig_period_min   : unsigned(31 downto  0);
+      variable comn_fpa_xtra_trig_mode        : unsigned(31 downto  0);
       variable comn_fpa_xtra_trig_ctrl_dly    : unsigned(31 downto  0);
-      variable comn_fpa_xtra_trig_period_min  : unsigned(31 downto  0);
+      variable comn_fpa_trig_ctrl_timeout_dly : unsigned(31 downto  0);
       variable comn_fpa_stretch_acq_trig      : unsigned(31 downto  0);                 
       variable diag_ysize                     : unsigned(31 downto  0);
       variable diag_xsize_div_tapnum          : unsigned(31 downto  0);                                         
@@ -149,15 +149,15 @@ package body isc0804A_intf_testbench_pkg is
       comn_fpa_diag_mode            := (others => diag_mode);
       comn_fpa_diag_type            := resize(unsigned(DEFINE_TELOPS_DIAG_DEGR),32);
       comn_fpa_pwr_on               := (others =>'1');
-      comn_fpa_trig_ctrl_mode       := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
+      comn_fpa_acq_trig_mode        := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
       if (diag_mode = '1') then 
-         comn_fpa_trig_ctrl_mode    := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
+         comn_fpa_acq_trig_mode     := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
       end if;   
       
       comn_fpa_acq_trig_ctrl_dly    := to_unsigned(10, comn_fpa_acq_trig_ctrl_dly'length);
-      comn_fpa_acq_trig_period_min  := to_unsigned(99642, comn_fpa_acq_trig_period_min'length);
+      comn_fpa_xtra_trig_mode       := resize(unsigned(MODE_READOUT_END_TO_TRIG_START),32);
       comn_fpa_xtra_trig_ctrl_dly   := to_unsigned(10, comn_fpa_xtra_trig_ctrl_dly'length);
-      comn_fpa_xtra_trig_period_min := to_unsigned(99642, comn_fpa_xtra_trig_period_min'length);        
+      comn_fpa_trig_ctrl_timeout_dly := to_unsigned(99642, comn_fpa_trig_ctrl_timeout_dly'length);        
       comn_fpa_stretch_acq_trig     := (others =>'0');      
       
       diag_ysize                    := to_unsigned(user_ysize, 32);                 
@@ -200,7 +200,7 @@ package body isc0804A_intf_testbench_pkg is
       stretch_area_eol_posl_pclk         := to_unsigned(((to_integer(user_area_sol_posl_pclk) + user_xsize/TAP_NUM - 1) + 1 + 2*stretch_line_length_mclk - 1), 32);
       
       
-      pix_samp_num_per_ch           := to_unsigned(DEFINE_FPA_PIX_SAMPLE_NUM_PER_CH, 32);
+      pix_samp_num_per_ch           := to_unsigned(DEFINE_FPA_PIX_PER_MCLK_PER_TAP, 32);
       
       hgood_samp_sum_num            := to_unsigned(1, 32);                                      
       hgood_samp_mean_numerator     := to_unsigned(2**21, 32);                           
@@ -304,11 +304,11 @@ package body isc0804A_intf_testbench_pkg is
       y :=  comn_fpa_diag_mode              
       & comn_fpa_diag_type              
       & comn_fpa_pwr_on                 
-      & comn_fpa_trig_ctrl_mode         
+      & comn_fpa_acq_trig_mode         
       & comn_fpa_acq_trig_ctrl_dly      
-      & comn_fpa_acq_trig_period_min    
+      & comn_fpa_xtra_trig_mode    
       & comn_fpa_xtra_trig_ctrl_dly     
-      & comn_fpa_xtra_trig_period_min   
+      & comn_fpa_trig_ctrl_timeout_dly   
       & comn_fpa_stretch_acq_trig       
       & diag_ysize                      
       & diag_xsize_div_tapnum           

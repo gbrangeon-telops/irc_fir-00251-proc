@@ -343,23 +343,23 @@ begin
       
       wait for 10 ms;
       
-      for ii in 0 to 49-1 loop 
-         wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector2'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop; 
-      
-      wait for 10 ms;
-      
-      for ii in 0 to 49-1 loop 
-         wait until rising_edge(MB_CLK);      
-         start_pos := user_cfg_vector3'length -1 - 32*ii;
-         end_pos   := start_pos - 31;
-         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
-         wait for 30 ns;
-      end loop;
+--      for ii in 0 to 49-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector2'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector2(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop; 
+--      
+--      wait for 10 ms;
+--      
+--      for ii in 0 to 49-1 loop 
+--         wait until rising_edge(MB_CLK);      
+--         start_pos := user_cfg_vector3'length -1 - 32*ii;
+--         end_pos   := start_pos - 31;
+--         write_axi_lite (MB_CLK, std_logic_vector(to_unsigned(4*ii, 32)), std_logic_vector(user_cfg_vector3(start_pos downto end_pos)), MB_MISO,  MB_MOSI);
+--         wait for 30 ns;
+--      end loop;
       
       
       

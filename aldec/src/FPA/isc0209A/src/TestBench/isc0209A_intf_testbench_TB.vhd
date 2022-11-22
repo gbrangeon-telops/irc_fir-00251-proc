@@ -151,9 +151,9 @@ begin
          user_cfg_i.COMN.FPA_DIAG_MODE <= '0';
          user_cfg_i.COMN.FPA_DIAG_TYPE <= DEFINE_TELOPS_DIAG_DEGR;
          user_cfg_i.COMN.fpa_pwr_on <= '1';
-         user_cfg_i.COMN.fpa_trig_ctrl_mode <= MODE_TRIG_START_TO_TRIG_START;--MODE_READOUT_END_TO_TRIG_START;
+         user_cfg_i.COMN.fpa_acq_trig_mode <= MODE_TRIG_START_TO_TRIG_START;--MODE_READOUT_END_TO_TRIG_START;
          user_cfg_i.COMN.fpa_acq_trig_ctrl_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_acq_trig_ctrl_dly'length);    -- delay + readout (full window)
-         user_cfg_i.COMN.fpa_spare <= (others => '0');
+         user_cfg_i.COMN.fpa_xtra_trig_mode <= MODE_TRIG_START_TO_TRIG_START;
          user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly'length);
          user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly <= to_unsigned(289130, user_cfg_i.COMN.fpa_trig_ctrl_timeout_dly'length);  
          user_cfg_i.XSTART <= (others => '0');
@@ -242,11 +242,11 @@ begin
       wait for 30 ns;      
       write_axi_lite (MB_CLK,  x"00000008", resize('0'&user_cfg_i.COMN.fpa_pwr_on, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"0000000C", resize('0'&user_cfg_i.COMN.fpa_trig_ctrl_mode, 32), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"0000000C", resize('0'&user_cfg_i.COMN.fpa_acq_trig_mode, 32), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
       write_axi_lite (MB_CLK, x"00000010", std_logic_vector(resize(user_cfg_i.COMN.fpa_acq_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
-      write_axi_lite (MB_CLK, x"00000014", std_logic_vector(resize(user_cfg_i.COMN.fpa_spare, 32)), MB_MISO,  MB_MOSI);
+      write_axi_lite (MB_CLK, x"00000014", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_mode, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      
       write_axi_lite (MB_CLK, x"00000018", std_logic_vector(resize(user_cfg_i.COMN.fpa_xtra_trig_ctrl_dly, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;      

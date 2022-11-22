@@ -10,6 +10,7 @@ acom D:\Telops\FIR-00251-Common\VHDL\iserdes\adc\fpa_serdes_define.vhd
 do D:\Telops\FIR-00251-Proc\src\compil_utilities.do
 
 acom D:\Telops\Common_HDL\Utilities\reset_extension.vhd
+acom D:\Telops\FIR-00251-Common\VHDL\Utilities\rst_conditioner.vhd
 
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
 acom D:\Telops\FIR-00251-Proc\IP\325\t_axi4_stream64_afifo_d16\t_axi4_stream64_afifo_d16_sim_netlist.vhdl
@@ -99,29 +100,24 @@ wave UUT/U1/U4/*
 wave UUT/U1/U5/U1/U6A/*
 wave UUT/U1/U5/U1/* 
 wave UUT/U1/U5/U2/*
-#
-wave UUT/U1/U9/U2/U1/*
-wave UUT/U1/U9/U2/U5/*
 
 
 
 wave UUT/U1/U9/U5/*	  
-wave UUT/U3/*
-wave UUT/U3/U3/*
+#wave UUT/U3/*
+#wave UUT/U3/U3/*
 
 #
 #
 #wave UUT/U1/U9/U2/U4/U2/*
-wave UUT/U1/U9/U2/U2/*
+#wave UUT/U1/U9/U2/U2/*
 #wave UUT/U1/U9/U1/*
 
-#wave UUT/U1/U9/g0/U17/*
-#wave UUT/U1/U9/U18/*
 #wave UUT/U1/U9/U8/* 
 #wave UUT/U1/U9/U8/U5/*
 
 
---wave UUT/U1/*
-run 10 ms
---run 30 ms  
+wave UUT/U1/*
+--run 10 ms
+run 40 ms  
 --9.1 ms
