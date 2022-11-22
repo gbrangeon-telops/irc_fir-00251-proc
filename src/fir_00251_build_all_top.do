@@ -62,8 +62,7 @@ do "$FIR251PROC\src\FPA\isc0207A\HDL\compil_isc0207A.do"
 acom  "$FIR251PROC\src\fir_00251_proc_isc0207A.bde"
 #startup
 acom  "$FIR251PROC\src\fir_00251_proc_startup_160.bde"
-acom  "$FIR251PROC\src\fir_00251_proc_startup_325.bde"	
-#startup
+acom  "$FIR251PROC\src\fir_00251_proc_startup_325.bde"
 acom  "$FIR251PROC\src\fir_00251_proc_startup_4DDR_325.bde"
 #FPA isc0207A_3k
 do  "$FIR251PROC\src\FPA\isc0207A_3k\HDL\compil_isc0207A_3k.do"

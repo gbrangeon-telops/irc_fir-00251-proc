@@ -41,8 +41,8 @@ REFRESH_FLOW=1
 FLOWTOOLS=NONE
 FAMILY=
 fileopenfolder=D:\Telops\FIR-00251-Proc\src
-fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\Buffering
-fileopenfolder=D:\Telops\FIR-00251-Common\VHDL\Buffering
+fileopenfolder=D:\Telops\FIR-00251-Proc\src
+fileopenfolder=D:\Telops\FIR-00251-Proc\src
 IMPL_TOOL=
 SYNTH_TOOL=
 CDebugWatchList=
@@ -302,9 +302,9 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 .\..\src\fir_00251_top_scorpiomwA_300Hz_build.do=Macro
 .\..\src\fir_00251_top_scorpiomwD_build.do=Macro
 .\..\src\fir_00251_top_startup_build.do=Macro
+.\..\src\fir_00251_top_startup_4DDR_build.do=Macro
 .\..\src\fir_00251_top_suphawkA_build.do=Macro
 .\..\src\fir_00251_top_xro3503A_build.do=Macro
-.\..\src\fir_00251_top_startup_4DDR_build.do=Macro
 .\..\src\ADCReadout\HDL\adc_readout.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_readout_mb_intf.vhd=VHDL Source Code
 .\..\src\ADCReadout\HDL\adc_switch.vhd=VHDL Source Code
@@ -905,9 +905,6 @@ ADC_deserializer/..\..\compile\adc_data_deserializer.vhd=-1
 [file_out:/..\..\src\fir_00251_proc_startup_325.bde]
 /..\compile\fir_00251_proc_startup_325.vhd=-1
 
-[file_out:/..\..\src\fir_00251_proc_startup_4DDR_325.bde]
-/..\compile\fir_00251_proc_startup_4DDR_325.vhd=-1
-
 [file_out:/..\..\src\fir_00251_proc_suphawkA.bde]
 /..\compile\fir_00251_proc_suphawkA.vhd=-1
 
@@ -1314,10 +1311,14 @@ bb1920_deserializer/..\..\compile\scd_proxy2_serdes.vhd=-1
 [file_out:FrameBuffer/..\..\..\src\FrameBuffer\HDL\FrameBuffer.bde]
 FrameBuffer/..\..\compile\FrameBuffer.vhd=-1
 
+[file_out:/..\..\src\fir_00251_proc_startup_4DDR_325.bde]
+/..\compile\fir_00251_proc_startup_4DDR_325.vhd=-1
+
 [Groups]
 ADCReadout=1
 AEC=1
 AEC\decimator=1
+bb1920_deserializer=1
 BD=1
 Buffering=1
 Calib=1
@@ -1351,6 +1352,7 @@ FPA\ScorpiomwA_300Hz=1
 FPA\ScorpiomwD=1
 FPA\suphawkA=1
 FPA\xro3503A=1
+FrameBuffer=1
 Gating=1
 HeaderInserter=1
 ICU=1
@@ -1372,8 +1374,6 @@ Testbench\Proc_Out=1
 Trig=1
 USART=1
 USB=1
-bb1920_deserializer=1
-FrameBuffer=1
 
 [Files]
 /..\..\src\fir_00251_proc_acq.bde=-1
@@ -1449,6 +1449,12 @@ AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\column_decimato
 AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator.bde=-1
 AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\decimator_define.vhd=-1
 AEC\decimator/..\..\..\..\..\FIR-00251-Common\VHDL\decimator\Hdl\row_decimator.vhd=-1
+bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\bb1920_deserializer.bde=-1
+bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd=-1
+bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\compil_bb1920_receiver.do=-1
+bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd=-1
+bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd=-1
+bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde=-1
 BD/..\..\..\src\BD\bd_wrapper.vhd=-1
 Buffering/..\..\..\src\Buffering\HDL\moi_source_selector.vhd=-1
 Buffering/..\..\..\src\Buffering\HDL\build_buffering_intf.do=-1
@@ -1820,6 +1826,12 @@ FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler.bde=-1
 FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_prog_ctrler_core.vhd=-1
 FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_prog_spi_feeder.vhd=-1
 FPA\xro3503A/..\..\..\..\src\FPA\xro3503A\HDL\xro3503A_readout_ctrler.vhd=-1
+FrameBuffer/..\..\..\src\FrameBuffer\HDL\build_frame_buffer.do=-1
+FrameBuffer/..\..\..\src\FrameBuffer\HDL\fb_ctrl_intf.vhd=-1
+FrameBuffer/..\..\..\src\FrameBuffer\HDL\FrameBuffer.bde=-1
+FrameBuffer/..\..\..\src\FrameBuffer\HDL\reader_fsm.vhd=-1
+FrameBuffer/..\..\..\src\FrameBuffer\HDL\writer_fsm.vhd=-1
+FrameBuffer/..\..\..\src\FrameBuffer\HDL\fbuffer_define.vhd=-1
 Gating/..\..\..\src\Gating\HDL\gating_compile.do=-1
 Gating/..\..\..\src\Gating\HDL\gating_define.vhd=-1
 Gating/..\..\..\src\Gating\HDL\gating_mblaze_intf.vhd=-1
@@ -1950,16 +1962,4 @@ USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_tx.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\usart_mmcm_rst.vhd=-1
 USART/..\..\..\..\FIR-00251-Common\VHDL\USART\build_usart.do=-1
 USB/..\..\..\src\USB\hdl\USB_CTRL.bde=-1
-bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\bb1920_deserializer.bde=-1
-bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\clink_serdes8_clk_wrapper.vhd=-1
-bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\compil_bb1920_receiver.do=-1
-bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_dout.vhd=-1
-bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_dsync.vhd=-1
-bb1920_deserializer/..\..\..\src\bb1920_serdes\HDL\scd_proxy2_serdes.bde=-1
-FrameBuffer/..\..\..\src\FrameBuffer\HDL\build_frame_buffer.do=-1
-FrameBuffer/..\..\..\src\FrameBuffer\HDL\fb_ctrl_intf.vhd=-1
-FrameBuffer/..\..\..\src\FrameBuffer\HDL\FrameBuffer.bde=-1
-FrameBuffer/..\..\..\src\FrameBuffer\HDL\reader_fsm.vhd=-1
-FrameBuffer/..\..\..\src\FrameBuffer\HDL\writer_fsm.vhd=-1
-FrameBuffer/..\..\..\src\FrameBuffer\HDL\fbuffer_define.vhd=-1
 
