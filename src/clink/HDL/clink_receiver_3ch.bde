@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 66842
+ FREEID 66961
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -1186,10 +1186,11 @@ PAGE ""
 "use IEEE.numeric_std.all;\n"+
 "use IEEE.MATH_REAL.ALL;\n"+
 "library work;\n"+
+"use work.tel2000.all;\n"+
 "use work.proxy_define.all;\n"+
 "use work.fpa_define.all;\n"+
 "use work.fpa_serdes_define.all;"
-   RECT (200,240,660,560)
+   RECT (200,240,660,600)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(239,235,255),0)
    MARGINS (20,20)
@@ -1483,9 +1484,10 @@ PAGE ""
 "constant GENERATE_CH0 : boolean := PROXY_CLINK_CHANNEL_NUM >= 1;\n"+
 "constant GENERATE_CH1 : boolean := PROXY_CLINK_CHANNEL_NUM >= 2;\n"+
 "constant GENERATE_CH2 : boolean := PROXY_CLINK_CHANNEL_NUM >= 3;\n"+
-" \n"+
-" constant STAB_AREA_WIDTH_MIN   : integer := integer(ceil(0.5*((CLK_PERIOD_NS / real(DATA_WIDTH)) / C_DELAY_RESOLUTION_NS))); -- 50% of bit time in phase shift count"
-   RECT (1580,240,3940,580)
+"\n"+
+" -- 50% of bit time in phase shift count. Use 14 (old hardcoded value) when the calculated value is too big to fit in idelay counts (slow detectors).\n"+
+"constant STAB_AREA_WIDTH_MIN   : integer := MIN(integer(ceil(0.5*((CLK_PERIOD_NS / real(DATA_WIDTH)) / C_DELAY_RESOLUTION_NS))), 14);"
+   RECT (1560,240,3720,580)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(203,215,255),0)
    MARGINS (20,20)
@@ -4377,7 +4379,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  66825, 0, 0
+  TEXT  66944, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4388,7 +4390,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  66826, 0, 0
+  TEXT  66945, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -4399,7 +4401,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  66827, 0, 0
+  TEXT  66946, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -4409,7 +4411,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  66828, 0, 0
+  TEXT  66947, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4421,7 +4423,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  66829, 0, 0
+  TEXT  66948, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -4434,7 +4436,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  66830, 0, 0
+  TEXT  66949, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -4444,7 +4446,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  66831, 0, 0
+  TEXT  66950, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -4456,7 +4458,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  66832, 0, 0
+  TEXT  66951, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -4466,7 +4468,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  66833, 0, 0
+  TEXT  66952, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -4477,7 +4479,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  66834, 0, 0
+  GROUP  66953, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4820,5001,5201)
@@ -4489,7 +4491,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  66835, 0, 0
+  GROUP  66954, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5020,5001,5021)
@@ -4501,7 +4503,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  66836, 0, 0
+  GROUP  66955, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,4960,5001,4961)
@@ -4513,7 +4515,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  66837, 0, 0
+  GROUP  66956, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5080,5001,5081)
@@ -4525,7 +4527,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  66838, 0, 0
+  GROUP  66957, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5140,5001,5141)
@@ -4537,7 +4539,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  66839, 0, 0
+  GROUP  66958, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,4820,4301,4961)
@@ -4548,7 +4550,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  66840, 0, 0
+  GROUP  66959, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,4960,4301,5201)
@@ -4559,7 +4561,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  66841, 0, 0
+  BMPPICT  66960, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,4880,4279,4925)
