@@ -2,7 +2,7 @@ SCHM0104
 
 HEADER
 {
- FREEID 88947
+ FREEID 88998
  VARIABLES
  {
   #ARCHITECTURE="SCH"
@@ -542,7 +542,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_INTF_CFG"
       #NUMBER="0"
       #VHDL_TYPE="FPA_INTF_CFG_TYPE"
@@ -957,7 +957,7 @@ HEADER
      {
       #DIRECTION="IN"
       #LENGTH="20"
-      #MDA_RECORD_TOKEN="RECORD"
+      #MDA_RECORD_TOKEN="OTHER"
       #NAME="FPA_INTF_CFG"
       #NUMBER="0"
       #SIDE="left"
@@ -1169,6 +1169,7 @@ PAGE ""
 "use IEEE.std_logic_misc.all;\n"+
 "use IEEE.MATH_REAL.ALL;\n"+
 "library work;\n"+
+"use work.tel2000.all;\n"+
 "use work.proxy_define.all;\n"+
 "use work.fpa_define.all;\n"+
 "use work.fpa_serdes_define.all;\n"+
@@ -1420,8 +1421,9 @@ PAGE ""
 "attribute IODELAY_GROUP : string;\n"+
 "attribute dont_touch : string;\n"+
 "\n"+
-"constant STAB_AREA_WIDTH_MIN   : integer := integer(ceil(0.5*((CLK_PERIOD_NS / real(DATA_WIDTH)) / C_DELAY_RESOLUTION_NS))); -- 50% of bit time in phase shift count"
-   RECT (1740,240,4420,440)
+"-- 50% of bit time in phase shift count. Use 14 (old hardcoded value) when the calculated value is too big to fit in idelay counts (slow detectors).\n"+
+"constant STAB_AREA_WIDTH_MIN   : integer := MIN(integer(ceil(0.5*((CLK_PERIOD_NS / real(DATA_WIDTH)) / C_DELAY_RESOLUTION_NS))), 14);"
+   RECT (1740,240,4420,520)
    OUTLINE 5,1, (0,0,0)
    FILL (0,(203,215,255),0)
    MARGINS (20,20)
@@ -5816,7 +5818,7 @@ PAGE ""
  
  BODY
  {
-  TEXT  88930, 0, 0
+  TEXT  88981, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5827,7 +5829,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  88931, 0, 0
+  TEXT  88982, 0, 0
   {
    PAGEALIGN 10
    TEXT "$CREATIONDATE"
@@ -5838,7 +5840,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  88932, 0, 0
+  TEXT  88983, 0, 0
   {
    PAGEALIGN 10
    TEXT "Title:"
@@ -5848,7 +5850,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  88933, 0, 0
+  TEXT  88984, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5860,7 +5862,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  88934, 0, 0
+  TEXT  88985, 0, 0
   {
    PAGEALIGN 10
    TEXT 
@@ -5873,7 +5875,7 @@ PAGE ""
    FONT (12,0,0,700,0,0,0,"Arial")
    MULTILINE
   }
-  TEXT  88935, 0, 0
+  TEXT  88986, 0, 0
   {
    PAGEALIGN 10
    TEXT "Page:"
@@ -5883,7 +5885,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  88936, 0, 0
+  TEXT  88987, 0, 0
   {
    PAGEALIGN 10
    OUTLINE 5,1, (0,0,0)
@@ -5895,7 +5897,7 @@ PAGE ""
    FONT (12,0,0,700,0,128,0,"Arial")
    UPDATE 0
   }
-  TEXT  88937, 0, 0
+  TEXT  88988, 0, 0
   {
    PAGEALIGN 10
    TEXT "Revision:"
@@ -5905,7 +5907,7 @@ PAGE ""
    COLOR (0,0,0)
    FONT (12,0,0,700,0,0,0,"Arial")
   }
-  TEXT  88938, 0, 0
+  TEXT  88989, 0, 0
   {
    PAGEALIGN 10
    TEXT "$Revision"
@@ -5916,7 +5918,7 @@ PAGE ""
    FONT (12,0,0,700,0,204,0,"Arial")
    UPDATE 0
   }
-  GROUP  88939, 0, 0
+  GROUP  88990, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5020,5001,5401)
@@ -5928,7 +5930,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  88940, 0, 0
+  GROUP  88991, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5220,5001,5221)
@@ -5940,7 +5942,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  88941, 0, 0
+  GROUP  88992, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5160,5001,5161)
@@ -5952,7 +5954,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  88942, 0, 0
+  GROUP  88993, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5280,5001,5281)
@@ -5964,7 +5966,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  88943, 0, 0
+  GROUP  88994, 0, 0
   {
    PAGEALIGN 10
    RECT (4120,5340,5001,5341)
@@ -5976,7 +5978,7 @@ PAGE ""
     FILL (1,(0,0,0),0)
    }
   }
-  GROUP  88944, 0, 0
+  GROUP  88995, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,5020,4301,5161)
@@ -5987,7 +5989,7 @@ PAGE ""
     POINTS ( (0,0), (0,140) )
    }
   }
-  GROUP  88945, 0, 0
+  GROUP  88996, 0, 0
   {
    PAGEALIGN 10
    RECT (4300,5160,4301,5401)
@@ -5998,7 +6000,7 @@ PAGE ""
     POINTS ( (0,0), (0,240) )
    }
   }
-  BMPPICT  88946, 0, 0
+  BMPPICT  88997, 0, 0
   {
    PAGEALIGN 10
    RECT (4140,5080,4279,5125)
