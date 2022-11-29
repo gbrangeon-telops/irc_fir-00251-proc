@@ -23,8 +23,12 @@ if {$size_arg == "both" || $size_arg == "160"} {
    after 6000
 
    #Configure in release mode
-   configapp -app fir_00251_proc_${detector}_boot_160 build-config release
-   configapp -app fir_00251_proc_${detector}_160 build-config release
+   if {[catch {configapp -app fir_00251_proc_${detector}_boot_160 build-config release} errMsg]} {
+      puts "Warning: Could not set release configuration."
+   }
+   if {[catch {configapp -app fir_00251_proc_${detector}_160 build-config release} errMsg]} {
+      puts "Warning: Could not set release configuration."
+   }
 }
 if {$size_arg == "both" || $size_arg == "325"} {
    #Create HW projects
@@ -41,8 +45,12 @@ if {$size_arg == "both" || $size_arg == "325"} {
    after 6000
 
    #Configure in release mode
-   configapp -app fir_00251_proc_${detector}_boot_325 build-config release
-   configapp -app fir_00251_proc_${detector}_325 build-config release
+   if {[catch {configapp -app fir_00251_proc_${detector}_boot_325 build-config release} errMsg]} {
+      puts "Warning: Could not set release configuration."
+   }
+   if {[catch {configapp -app fir_00251_proc_${detector}_325 build-config release} errMsg]} {
+      puts "Warning: Could not set release configuration."
+   }
 }
 
 #Return to initial path
