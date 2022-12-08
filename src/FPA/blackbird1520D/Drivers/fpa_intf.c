@@ -930,7 +930,7 @@ void FPA_SendOperational_SerialCmd(const t_FpaIntf *ptrA)
 
    if(ptrA->op_binning == 0)
    {
-      strow = (uint16_t)(ptrA->op_ystart & 0x000003FC);
+      strow = (uint16_t)(ptrA->op_ystart & 0x000003FE);
       wsize = (uint16_t)(ptrA->op_ysize & 0x000003FF);
    }
    else

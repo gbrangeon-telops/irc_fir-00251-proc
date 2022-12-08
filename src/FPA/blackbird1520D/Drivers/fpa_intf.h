@@ -35,9 +35,9 @@
 #define FPA_WIDTH_MULT     4
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
 
-#define FPA_HEIGHT_MIN     4
+#define FPA_HEIGHT_MIN     8
 #define FPA_HEIGHT_MAX     1536
-#define FPA_HEIGHT_MULT    2
+#define FPA_HEIGHT_MULT    4
 #define FPA_HEIGHT_INC     lcm(FPA_HEIGHT_MULT, 2 * FPA_OFFSETY_MULT)
 
 #define FPA_OFFSETX_MIN    0
@@ -45,8 +45,8 @@
 #define FPA_OFFSETX_MAX    (FPA_WIDTH_MAX-FPA_WIDTH_MIN)
 
 #define FPA_OFFSETY_MIN    0
-#define FPA_OFFSETY_MULT   2
-#define FPA_OFFSETY_MULT_CORR    4
+#define FPA_OFFSETY_MULT   4
+//#define FPA_OFFSETY_MULT_CORR    4
 #define FPA_OFFSETY_MAX    (FPA_HEIGHT_MAX-FPA_HEIGHT_MIN)
 
 #define FPA_FORCE_CENTER   1
