@@ -495,7 +495,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
 
    // Registre F : ajustement des delais de la chaine
    if (sw_init_done == 0){
-      gFpaDebugRegF = 8;    //
+      gFpaDebugRegF = 16;    //
       if (ptrA->pix_samp_num_per_ch > 1)
          gFpaDebugRegF = 10; 
    }   
@@ -515,7 +515,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    // dephasage des adc_clk avec gFpaDebugRegC et gFpaDebugRegD
    // adc clk source phase
    if (sw_init_done == 0){
-      gFpaDebugRegC = 3;
+      gFpaDebugRegC = 1;
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas du LN2
          gFpaDebugRegC = 3;
    }       
@@ -523,7 +523,7 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    
    // adc clk source phase
    if (sw_init_done == 0){         
-      gFpaDebugRegD = 140800; //179200;
+      gFpaDebugRegD = 76800;
       if ((gStat.hw_init_done == 1) && (gStat.flegx_present == 0))  // cas du LN2
          gFpaDebugRegD = 230400; 
    }
