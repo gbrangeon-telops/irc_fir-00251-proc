@@ -47,6 +47,13 @@ package Proxy_define is
    constant CBITS_FRM_IDLE_TST_PTRN_ID            : std_logic_vector(3 downto 0) := x"0"; -- As per DXU0003_1.pdf p.66
    constant CBITS_FRM_IDLE_ID                     : std_logic_vector(3 downto 0) := x"3"; -- As per atlasdatasheet2.17ext.pdf p.26
    constant CBITS_FRM_STATUS_ID                   : std_logic_vector(3 downto 0) := x"8";
+   constant CBITS_FRM_READ_INIT_WAKEUP            : std_logic_vector(3 downto 0) := x"1";
+   constant CBITS_FRM_READ_INIT_ID                : std_logic_vector(3 downto 0) := x"2";
+   constant CBITS_SYNC_DATA                       : std_logic_vector(3 downto 0) := x"9";
+   constant CBITS_ADC_FLOOR                       : std_logic_vector(3 downto 0) := x"B";
+   constant CBITS_COLUMN_REF                      : std_logic_vector(3 downto 0) := x"C";
+   constant CBITS_ROW_REF                         : std_logic_vector(3 downto 0) := x"F";
+   constant CBITS_AUXILIARY                       : std_logic_vector(3 downto 0) := x"D";
    
    ----------------------------------------------
    -- calculs 

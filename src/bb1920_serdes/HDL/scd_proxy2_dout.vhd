@@ -6,7 +6,7 @@
 --!   $Rev$
 --!   $Author$
 --!   $Date$
---!   $Id$
+--!   $Id$		 							  
 --!   $URL$
 ------------------------------------------------------------------
 
@@ -54,8 +54,8 @@ architecture rtl of scd_proxy2_dout is
    type array_type is array (0 to 7) of std_logic_vector(3 downto 0);
    
    signal sreset             : std_logic;	
-   signal fvals_i 	        : std_logic_vector(7 downto 0);
-   signal lvals_i 	        : std_logic_vector(7 downto 0);
+   signal fvals_i 	         : std_logic_vector(7 downto 0);
+   signal lvals_i 	         : std_logic_vector(7 downto 0);
    signal ctrl_words         : array_type;
    signal ctrl_words_last    : array_type;
    signal dual_data_i        : std_logic_vector(27 downto 0) := (others => '0');
@@ -119,11 +119,11 @@ begin
                -- fval                                
                ---------------------------------------
                -- montée
-               if ctrl_words_last(jj) = frame_init_tag and ctrl_words(jj) /= frame_init_tag then            
+               if ctrl_words_last(jj) = CBITS_ROW_REF and ctrl_words(jj) = CBITS_AUXILIARY then            
                   fvals_i(jj) <= '1';                                                
                end if;               
                -- descente
-               if ctrl_words_last(jj) /= frame_init_tag and ctrl_words(jj) = frame_init_tag then
+               if ctrl_words_last(jj) = CBITS_FRM_STATUS_ID and ctrl_words(jj) = frame_init_tag then
                   fvals_i(jj) <= '0';
                end if;               
                
@@ -131,11 +131,11 @@ begin
                -- lval                                
                ---------------------------------------
                -- montée
-               if ctrl_words_last(jj) /= CBITS_PIXEL_ID and ctrl_words(jj) = CBITS_PIXEL_ID then
+               if ctrl_words_last(jj) = CBITS_COLUMN_REF and ctrl_words(jj) = CBITS_PIXEL_ID then
                   lvals_i(jj) <= '1';
                end if;               
                -- descente
-               if ctrl_words_last(jj) = CBITS_PIXEL_ID and ctrl_words(jj) /= CBITS_PIXEL_ID then
+               if ctrl_words_last(jj) = CBITS_PIXEL_ID and ctrl_words(jj) = CBITS_AUXILIARY then
                   lvals_i(jj) <= '0';
                end if;               
                
@@ -155,7 +155,7 @@ begin
             dout_dval_i <= '0';
             dout_reg <= (others => '0');
             output_en <= '0';
-            lval_last <= '0';
+            lval_last <= '0'; 
          else		 
 
             lval_last <= lvals_i(7);
@@ -185,11 +185,10 @@ begin
             
             dout_reg(35)             <= '0';              -- non utilisé
             dout_reg(34  downto  31) <= ctrl_words(7);    -- les controlBits. Ils sont en avance de 1 CLK sur les dual_data_i et c'est voulu ainsi.
-            dout_reg(30)             <= fvals_i(7);
-            dout_reg(29)             <= lvals_i(7);
-            dout_reg(28)             <= lvals_i(7);       -- dval identique à lval
+            dout_reg(30)             <= fvals_i(7); 
+            dout_reg(29)             <= lvals_i(7) and fvals_i(7);
+            dout_reg(28)             <= lvals_i(7) and fvals_i(7);      
             dout_reg(27 downto  0)   <= dual_data_i;      -- les deux pixels. Ils sont en retard de 1 CLK sur les controlBits
-
          end if;
       end if;	
    end process;
