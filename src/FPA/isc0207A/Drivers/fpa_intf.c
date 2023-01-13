@@ -595,6 +595,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_0_samp_mean_numerator = (uint32_t)(exp2f((float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_0_samp_num_per_ch);     
    ptrA->elcorr_ref_cfg_0_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF0_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //      
+   ptrA->elcorr_ref_cfg_0_forced_val_enabled  = 0; // si actif la valeur forcee remplace la valeur echantillonnee
+   ptrA->elcorr_ref_cfg_0_forced_val          = 0; // ignoree si le enabled est 0
     
    // reference 1: 
    ptrA->elcorr_ref_cfg_1_ref_enabled         = Stat.flegx_present;  // on active la reference 2 ssi on est rn présence d'un fleG            
@@ -605,7 +607,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_1_samp_mean_numerator = (uint32_t)(exp2f((float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_1_samp_num_per_ch);     
    ptrA->elcorr_ref_cfg_1_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF1_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //
-   
+   ptrA->elcorr_ref_cfg_1_forced_val_enabled  = 0; // si actif la valeur forcee remplace la valeur echantillonnee
+   ptrA->elcorr_ref_cfg_1_forced_val          = 0; // ignoree si le enabled est 0
+    
    ptrA->elcorr_ref_dac_id                    = (uint32_t)ELCORR_REF_DAC_ID;  //       
    ptrA->elcorr_atemp_gain                    = (int32_t)elcorr_atemp_gain;      
    ptrA->elcorr_atemp_ofs                     = (int32_t)elcorr_atemp_ofs;

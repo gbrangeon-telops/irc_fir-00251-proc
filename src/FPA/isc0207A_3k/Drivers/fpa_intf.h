@@ -178,6 +178,10 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  roic_cst_output_mode;
    int32_t   spare3;// additional offset coming from flash settings
    uint32_t  fpa_intf_data_source;
+   uint32_t  elcorr_ref_cfg_0_forced_val_enabled;
+   uint32_t  elcorr_ref_cfg_0_forced_val;
+   uint32_t  elcorr_ref_cfg_1_forced_val_enabled;
+   uint32_t  elcorr_ref_cfg_1_forced_val;
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 

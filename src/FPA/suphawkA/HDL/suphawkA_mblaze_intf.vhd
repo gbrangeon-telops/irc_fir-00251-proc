@@ -254,7 +254,7 @@ begin
                   when X"064" =>    user_cfg_i.chn_diversity_en                        <= data_i(0);
                   when X"068" =>    user_cfg_i.pix_samp_num_per_ch                     <= unsigned(data_i(user_cfg_i.pix_samp_num_per_ch'length-1 downto 0));
 
-				  when X"06C" =>    user_cfg_i.hgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));  
+                  when X"06C" =>    user_cfg_i.hgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.hgood_samp_sum_num'length-1 downto 0));  
                   when X"070" =>    user_cfg_i.hgood_samp_mean_numerator               <= unsigned(data_i(user_cfg_i.hgood_samp_mean_numerator'length-1 downto 0)); 
                   when X"074" =>    user_cfg_i.vgood_samp_sum_num                      <= unsigned(data_i(user_cfg_i.vgood_samp_sum_num'length-1 downto 0));  
                   when X"078" =>    user_cfg_i.vgood_samp_mean_numerator               <= unsigned(data_i(user_cfg_i.vgood_samp_mean_numerator'length-1 downto 0));  
@@ -309,10 +309,10 @@ begin
 				  
                   -- cropping
                   when X"10C" =>    user_cfg_i.aoi_data.sol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.sol_pos'length-1 downto 0)); 
-				  when X"110" =>    user_cfg_i.aoi_data.eol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.eol_pos'length-1 downto 0));                       
-				  when X"114" =>    user_cfg_i.aoi_flag1.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.sol_pos'length-1 downto 0));                       
+                  when X"110" =>    user_cfg_i.aoi_data.eol_pos                <= unsigned(data_i(user_cfg_i.aoi_data.eol_pos'length-1 downto 0));                       
+                  when X"114" =>    user_cfg_i.aoi_flag1.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.sol_pos'length-1 downto 0));                       
                   when X"118" =>    user_cfg_i.aoi_flag1.eol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag1.eol_pos'length-1 downto 0));                         
-				  when X"11C" =>    user_cfg_i.aoi_flag2.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.sol_pos'length-1 downto 0));
+                  when X"11C" =>    user_cfg_i.aoi_flag2.sol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.sol_pos'length-1 downto 0));
                   when X"120" =>    user_cfg_i.aoi_flag2.eol_pos               <= unsigned(data_i(user_cfg_i.aoi_flag2.eol_pos'length-1 downto 0));
 
                   -- raw_area                                                                                                                                                                     
@@ -357,7 +357,13 @@ begin
                   when X"19C" =>    user_cfg_i.sideband_cancel_en              <= data_i(0); 
                   when X"1A0" =>    user_cfg_i.spare4                          <= unsigned(data_i(user_cfg_i.spare4'length-1 downto 0)); 
 				  
-				  when X"1A4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0)); user_cfg_in_progress <= '0';
+                  when X"1A4" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
+                  
+                  when X"1A8" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val_enabled    <= data_i(0);
+                  when X"1AC" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).forced_val'length-1 downto 0));
+                  when X"1B0" =>    user_cfg_i.elcorr_ref_cfg(1).forced_val_enabled    <= data_i(0);
+                  when X"1B4" =>    user_cfg_i.elcorr_ref_cfg(1).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).forced_val'length-1 downto 0));
+                                    user_cfg_in_progress <= '0';
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                          <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

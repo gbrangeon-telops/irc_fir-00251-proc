@@ -19,6 +19,8 @@ use work.fpa_define.all;
 
 package isc0207a_3k_intf_testbench_pkg is           
    
+   constant USER_CFG_VECTOR_SIZE       : natural := 91;  -- number of variables to write in the USER_CFG
+   
    constant PAUSE_SIZE                 : integer := 0;
    constant TAP_NUM                    : integer := 16;
    constant USER_FIRST_LINE_NUM        : integer := 1;
@@ -131,8 +133,12 @@ package body isc0207a_3k_intf_testbench_pkg is
       variable roic_cst_output_mode                    : unsigned(31 downto  0);
       variable spare3                                  : unsigned(31 downto  0);
       variable fpa_intf_data_source                    : unsigned(31 downto  0) := (others => '0');
+      variable elcorr_ref_cfg_0_forced_val_enabled    : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_0_forced_val            : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_1_forced_val_enabled    : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_1_forced_val            : unsigned(31 downto  0);
       
-      variable y                               : unsigned(87*32-1 downto 0); 
+      variable y                                      : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0); 
       
       variable user_sol_posl_pclk              : unsigned(31 downto  0);
       variable roic_ysize                      : unsigned(31 downto  0);       -- pas utilisé dans la config
@@ -233,6 +239,8 @@ package body isc0207a_3k_intf_testbench_pkg is
       elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(4, 32);
       elcorr_ref_cfg_0_samp_mean_numerator := to_unsigned(2**21/20, 32);     
       elcorr_ref_cfg_0_ref_value           := to_unsigned(2000, 32);  --      
+      elcorr_ref_cfg_0_forced_val_enabled  := to_unsigned(0, 32);
+      elcorr_ref_cfg_0_forced_val          := to_unsigned(0, 32);
       
       elcorr_ref_cfg_1_ref_enabled         := (others => C_ELCORR_ENABLED);          
       elcorr_ref_cfg_1_null_forced         := (others => '0');             
@@ -240,6 +248,8 @@ package body isc0207a_3k_intf_testbench_pkg is
       elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(4, 32);         
       elcorr_ref_cfg_1_samp_mean_numerator := to_unsigned(2**21/20, 32);      
       elcorr_ref_cfg_1_ref_value           := to_unsigned(4000, 32);  --   
+      elcorr_ref_cfg_1_forced_val_enabled  := to_unsigned(0, 32);
+      elcorr_ref_cfg_1_forced_val          := to_unsigned(0, 32);
       
       elcorr_ref_dac_id                    := to_unsigned(5, 32);  --       
       elcorr_atemp_gain                    := to_unsigned(1, 32);          
@@ -436,7 +446,11 @@ package body isc0207a_3k_intf_testbench_pkg is
       & dac_free_running_mode                   
       & roic_cst_output_mode
       & spare3
-      & fpa_intf_data_source;
+      & fpa_intf_data_source
+      & elcorr_ref_cfg_0_forced_val_enabled
+      & elcorr_ref_cfg_0_forced_val
+      & elcorr_ref_cfg_1_forced_val_enabled
+      & elcorr_ref_cfg_1_forced_val;
       
       
       return y;

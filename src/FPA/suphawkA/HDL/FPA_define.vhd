@@ -187,7 +187,9 @@ package FPA_define is
       start_dly_sampclk              : unsigned(7 downto 0);
       samp_num_per_ch                : unsigned(7 downto 0);
       samp_mean_numerator            : unsigned(22 downto 0);
-      ref_value                      : unsigned(13 downto 0); -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
+      ref_value                      : unsigned(13 downto 0);  -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
+      forced_val_enabled             : std_logic;              -- permet de forcer la valeur de la reference a la valeur du registre forced_val
+      forced_val                     : unsigned(13 downto 0);  -- la reference prend cette valeur si forced_val_enabled = 1. Les valeurs echantillonnees de la reference sont ignorees
    end record;
    
    type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type; 

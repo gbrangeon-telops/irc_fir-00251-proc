@@ -19,7 +19,7 @@ use work.fpa_define.all;
 
 package suphawkA_intf_testbench_pkg is           
    
-   constant USER_CFG_VECTOR_SIZE       : natural := 106;  -- number of variables to write in the USER_CFG
+   constant USER_CFG_VECTOR_SIZE       : natural := 110;  -- number of variables to write in the USER_CFG
    
    constant PAUSE_SIZE                 : integer := 3;
    constant TAP_NUM                    : integer := 8;
@@ -149,6 +149,10 @@ package body suphawkA_intf_testbench_pkg is
 	  variable sideband_cancel_en				 	  : unsigned(31 downto 0);
 	  variable spare4							 	  : unsigned(31 downto 0);
       variable cfg_num                                : unsigned(31 downto 0);
+      variable elcorr_ref_cfg_0_forced_val_enabled    : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_0_forced_val            : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_1_forced_val_enabled    : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_1_forced_val            : unsigned(31 downto  0);
       variable y                                      : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
       
    begin
@@ -211,6 +215,8 @@ package body suphawkA_intf_testbench_pkg is
       elcorr_ref_cfg_0_samp_num_per_ch      := to_unsigned(4, 32);
       elcorr_ref_cfg_0_samp_mean_numerator  := to_unsigned(2**21/4, 32);     
       elcorr_ref_cfg_0_ref_value            := to_unsigned(2000, 32);  --      
+      elcorr_ref_cfg_0_forced_val_enabled  := to_unsigned(0, 32);
+      elcorr_ref_cfg_0_forced_val          := to_unsigned(0, 32);
       
       elcorr_ref_cfg_1_ref_enabled          := to_unsigned(1, 32);          
       elcorr_ref_cfg_1_ref_cont_meas_mode   := (others => '0');             
@@ -218,6 +224,8 @@ package body suphawkA_intf_testbench_pkg is
       elcorr_ref_cfg_1_samp_num_per_ch      := to_unsigned(4, 32);         
       elcorr_ref_cfg_1_samp_mean_numerator  := to_unsigned(2**21/4, 32);      
       elcorr_ref_cfg_1_ref_value            := to_unsigned(4000, 32);  --   
+      elcorr_ref_cfg_1_forced_val_enabled  := to_unsigned(0, 32);
+      elcorr_ref_cfg_1_forced_val          := to_unsigned(0, 32);
       
       elcorr_ref_dac_id                     := to_unsigned(5, 32);  --       
       elcorr_atemp_gain                     := to_unsigned(1, 32);          
@@ -438,7 +446,11 @@ package body suphawkA_intf_testbench_pkg is
 	  & roic_rst_time_mclk
 	  & sideband_cancel_en
 	  & spare4
-	  & cfg_num;
+	  & cfg_num
+     & elcorr_ref_cfg_0_forced_val_enabled
+     & elcorr_ref_cfg_0_forced_val
+     & elcorr_ref_cfg_1_forced_val_enabled
+     & elcorr_ref_cfg_1_forced_val;
       
       return y;
    end to_intf_cfg;

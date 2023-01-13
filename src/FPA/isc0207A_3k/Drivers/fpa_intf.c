@@ -164,15 +164,17 @@
 #define ELCORR_TARGET_SATURATION_DL       16000       // @ centered pix (160, 128)
 
 // Electrical correction : les differents modes
-#define ELCORR_MODE_OFF                            0
-#define ELCORR_MODE_REF1_IMG                       1
-#define ELCORR_MODE_REF2_IMG                       2
-#define ELCORR_MODE_DIFF_REF_IMG                   3
-#define ELCORR_MODE_OFFSET_CORR                    5
-#define ELCORR_MODE_ROIC_OUTPUT_CST_IMG            6
-#define ELCORR_MODE_OFFSET_AND_GAIN_CORR           7
-#define ELCORR_MODE_FREE_WHEELING_CORR             9
-#define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR    19 
+#define ELCORR_MODE_OFF                               0
+#define ELCORR_MODE_OFF_WITH_DYN_RANGE_COMP           10
+#define ELCORR_MODE_REF1_IMG                          1
+#define ELCORR_MODE_REF2_IMG                          2
+#define ELCORR_MODE_DIFF_REF_IMG                      3
+#define ELCORR_MODE_OFFSET_CORR                       5
+#define ELCORR_MODE_OFFSET_CORR_WITH_DYN_RANGE_COMP   15
+#define ELCORR_MODE_ROIC_OUTPUT_CST_IMG               6
+#define ELCORR_MODE_OFFSET_AND_GAIN_CORR              7
+#define ELCORR_MODE_FREE_WHEELING_CORR                9
+#define ELCORR_MODE_FREE_WHEELING_WITH_REF_CORR       19 
 
 // mandatory columns
 #define ISC0207_WINDOW_MANDATORY_COLUMN_POS1       128
@@ -683,6 +685,8 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_ref_cfg_0_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_0_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_0_samp_mean_numerator = (uint32_t)(exp2f((float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_0_samp_num_per_ch);     
    ptrA->elcorr_ref_cfg_0_ref_value           = ProximCfg.vdac_value[3]; // FLEG_VccVoltage_To_DacWord((float)ELCORR_REF1_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //      
+   ptrA->elcorr_ref_cfg_0_forced_val_enabled  = 0; // si actif la valeur forcee remplace la valeur echantillonnee
+   ptrA->elcorr_ref_cfg_0_forced_val          = 0; // ignoree si le enabled est 0
     
    // vhd reference 1: 
    ptrA->elcorr_ref_cfg_1_ref_enabled         = 0;  // on n'active pas la reference la reference 2 que si on a un fleGX avec un OUTR deconnecté        
@@ -693,7 +697,9 @@ void FPA_SendConfigGC(t_FpaIntf *ptrA, const gcRegistersData_t *pGCRegs)
    ptrA->elcorr_ref_cfg_1_samp_num_per_ch     = (uint32_t)MIN(ptrA->elcorr_ref_cfg_1_samp_num_per_ch, ELCORR_REF_MAXIMUM_SAMP);
    ptrA->elcorr_ref_cfg_1_samp_mean_numerator = (uint32_t)(exp2f((float)GOOD_SAMP_MEAN_DIV_BIT_POS)/ptrA->elcorr_ref_cfg_1_samp_num_per_ch);     
    ptrA->elcorr_ref_cfg_1_ref_value           = (uint32_t) FLEG_VccVoltage_To_DacWord((float)ELCORR_REF2_VALUE_mV, (int8_t)ELCORR_REF_DAC_ID);  //
-   
+   ptrA->elcorr_ref_cfg_1_forced_val_enabled  = 0; // si actif la valeur forcee remplace la valeur echantillonnee
+   ptrA->elcorr_ref_cfg_1_forced_val          = 0; // ignoree si le enabled est 0
+    
    ptrA->elcorr_ref_dac_id                    = (uint32_t)ELCORR_REF_DAC_ID;  //       
    ptrA->elcorr_atemp_gain                    = (int32_t)elcorr_atemp_gain;      
    ptrA->elcorr_atemp_ofs                     = (int32_t)elcorr_atemp_ofs;

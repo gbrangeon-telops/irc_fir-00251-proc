@@ -203,7 +203,7 @@ architecture TB_ARCHITECTURE of isc0804A_intf_testbench_tb is
    signal user_ysize3 : natural;
    
    
-   signal user_cfg_vector1              : unsigned(87*32-1 downto 0);
+   signal user_cfg_vector1              : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
    signal user_cfg_vector2              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal user_cfg_vector3              : unsigned(user_cfg_vector1'length-1 downto 0);
    signal vdac_value_1                  : unsigned(31 downto  0);
@@ -372,7 +372,7 @@ begin
       end loop;      
       
       
-      for ii in 0 to 87-1 loop 
+      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector1'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -389,7 +389,7 @@ begin
 
       wait for 30 ms;
       
-      for ii in 0 to 87-1 loop 
+      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector2'length -1 - 32*ii;
          end_pos   := start_pos - 31;
@@ -399,7 +399,7 @@ begin
             
       wait for 30 ms;
       
-      for ii in 0 to 87-1 loop 
+      for ii in 0 to USER_CFG_VECTOR_SIZE-1 loop 
          wait until rising_edge(MB_CLK);      
          start_pos := user_cfg_vector3'length -1 - 32*ii;
          end_pos   := start_pos - 31;

@@ -19,6 +19,8 @@ use work.fpa_define.all;
 
 package isc0804A_intf_testbench_pkg is           
    
+   constant USER_CFG_VECTOR_SIZE       : natural := 91;  -- number of variables to write in the USER_CFG
+   
    constant PAUSE_SIZE                 : integer := 2*(1);
    constant TAP_NUM                    : integer := 16;
    constant USER_FIRST_LINE_NUM        : integer := 2;
@@ -134,12 +136,17 @@ package body isc0804A_intf_testbench_pkg is
       variable int_time_offset_mclk                 : unsigned(31 downto 0);
       variable itr_mode_enabled                     : unsigned(31 downto  0);
       
+      variable elcorr_ref_cfg_0_forced_val_enabled    : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_0_forced_val            : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_1_forced_val_enabled    : unsigned(31 downto  0);
+      variable elcorr_ref_cfg_1_forced_val            : unsigned(31 downto  0);
+      
       
       variable roic_xsize : natural            := 640;
       variable roic_ysize : natural            := user_ysize;                             -- pas utilisé dans la config
       variable user_sol_posl_pclk : natural    := ((roic_xsize - user_xsize)/2)/TAP_NUM + 1;
       
-      variable y                               : unsigned(87*32-1 downto 0);
+      variable y                               : unsigned(USER_CFG_VECTOR_SIZE*32-1 downto 0);
       
    begin 
       
@@ -236,6 +243,8 @@ package body isc0804A_intf_testbench_pkg is
       elcorr_ref_cfg_0_samp_num_per_ch     := to_unsigned(120, 32);
       elcorr_ref_cfg_0_samp_mean_numerator := to_unsigned(17476, 32);     
       elcorr_ref_cfg_0_ref_value           := to_unsigned(5829, 32);  --      
+      elcorr_ref_cfg_0_forced_val_enabled  := to_unsigned(0, 32);
+      elcorr_ref_cfg_0_forced_val          := to_unsigned(0, 32);
       
       elcorr_ref_cfg_1_ref_enabled         := to_unsigned(1, 32);          
       elcorr_ref_cfg_1_null_forced         := (others => '0');             
@@ -243,6 +252,8 @@ package body isc0804A_intf_testbench_pkg is
       elcorr_ref_cfg_1_samp_num_per_ch     := to_unsigned(120, 32);         
       elcorr_ref_cfg_1_samp_mean_numerator := to_unsigned(17476, 32);      
       elcorr_ref_cfg_1_ref_value           := to_unsigned(2359, 32);  --   
+      elcorr_ref_cfg_1_forced_val_enabled  := to_unsigned(0, 32);
+      elcorr_ref_cfg_1_forced_val          := to_unsigned(0, 32);
       
       elcorr_ref_dac_id                    := to_unsigned(5, 32);  --       
       elcorr_atemp_gain                    := to_unsigned(7918, 32);          
@@ -387,7 +398,11 @@ package body isc0804A_intf_testbench_pkg is
       & permit_lsydel_clk_rate_beyond_2x
       & spare2              
       & int_time_offset_mclk
-      & itr_mode_enabled;     
+      & itr_mode_enabled
+      & elcorr_ref_cfg_0_forced_val_enabled
+      & elcorr_ref_cfg_0_forced_val
+      & elcorr_ref_cfg_1_forced_val_enabled
+      & elcorr_ref_cfg_1_forced_val;
       
       return y;
    end to_intf_cfg;

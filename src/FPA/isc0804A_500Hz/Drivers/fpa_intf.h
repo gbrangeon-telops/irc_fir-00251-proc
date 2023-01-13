@@ -213,6 +213,11 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  elcorr_spare4;
    uint32_t  fpa_intf_data_source;
    
+   uint32_t  elcorr_ref_cfg_0_forced_val_enabled;
+   uint32_t  elcorr_ref_cfg_0_forced_val;
+   uint32_t  elcorr_ref_cfg_1_forced_val_enabled;
+   uint32_t  elcorr_ref_cfg_1_forced_val;
+   
 };                                  
 typedef struct s_FpaIntfConfig t_FpaIntf;
 

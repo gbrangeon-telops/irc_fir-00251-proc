@@ -77,8 +77,8 @@ create_proc_sw startup_4DDR
 build_proc_sw startup_4DDR 325
 
 create_proc_sw suphawkA
-build_proc_sw suphawkA 160
-#build_proc_sw suphawkA 325
+build_proc_sw suphawkA 325
+#build_proc_sw suphawkA 160
 
 create_proc_sw xro3503A
 build_proc_sw xro3503A 325

@@ -342,7 +342,13 @@ begin
                   when X"14C" =>    user_cfg_i.elcorr_spare4                   <= data_i(0); 
                   when X"150" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);                  
                   when X"154" =>    user_cfg_i.spare3                          <= signed(data_i(user_cfg_i.spare3'length-1 downto 0));                   
-                  when X"158" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
+                  when X"158" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0);
+                  
+                  when X"15C" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val_enabled    <= data_i(0);
+                  when X"160" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).forced_val'length-1 downto 0));
+                  when X"164" =>    user_cfg_i.elcorr_ref_cfg(1).forced_val_enabled    <= data_i(0);
+                  when X"168" =>    user_cfg_i.elcorr_ref_cfg(1).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).forced_val'length-1 downto 0));
+                                    user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                  <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);
