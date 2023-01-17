@@ -53,10 +53,23 @@ architecture TB_ARCHITECTURE of isc0209a_intf_testbench_tb is
    
    constant EXP_TIME_US    : integer := 2000;
    
-   constant PAUSE_SIZE     : integer := 16; 
-   constant TAP_NUM        : integer := 4;  
+   constant PAUSE_SIZE     : integer := 16;
+   constant TAP_NUM        : integer := 4;
    constant xsize : natural := 320;
-   constant ysize : natural := 256; 
+   constant ysize : natural := 256;
+   
+   -- Electrical correction : embedded switches control
+   constant ELCORR_SW_TO_PATH1             : std_logic_vector(1 downto 0) :=   "01";
+   constant ELCORR_SW_TO_PATH2             : std_logic_vector(1 downto 0) :=   "10";
+   constant ELCORR_SW_TO_NORMAL_OP         : std_logic_vector(1 downto 0) :=   "11";
+   
+   -- Electrical correction : modes
+   constant ELCORR_MODE_OFF                            : integer := 0;
+   constant ELCORR_MODE_REF1_IMG                       : integer := 1;
+   constant ELCORR_MODE_REF2_IMG                       : integer := 2;
+   constant ELCORR_MODE_OFFSET_AND_GAIN_CORR           : integer := 7;
+   
+   signal elcorr_reg : integer := ELCORR_MODE_OFFSET_AND_GAIN_CORR;
    
    
    -- Stimulus signals - signals mapped to the input and inout ports of tested entity
@@ -146,6 +159,8 @@ begin
    
    
    process(MB_CLK)
+      variable ref0_samp_num_per_ch : integer;
+      variable ref1_samp_num_per_ch : integer;
    begin
       if rising_edge(MB_CLK) then 
          user_cfg_i.COMN.FPA_DIAG_MODE <= '0';
@@ -198,15 +213,84 @@ begin
          user_cfg_i.cfg_num          		            <= to_unsigned(1, user_cfg_i.cfg_num'length);
          user_cfg_i.comn.fpa_stretch_acq_trig         <= '0';
          user_cfg_i.comn.fpa_intf_data_source         <= '0';
+         
+         
+         -- Electronic chain correction
+         
+         if (user_cfg_i.COMN.FPA_DIAG_MODE = '1') then 
+            elcorr_reg <= ELCORR_MODE_OFF;
+         end if;
+         
+         if (elcorr_reg = ELCORR_MODE_OFFSET_AND_GAIN_CORR) then
+            user_cfg_i.elcorr_enabled                       <= '1';
+            user_cfg_i.elcorr_ref0_op_sel                   <= ELCORR_SW_TO_NORMAL_OP;
+            user_cfg_i.elcorr_ref1_op_sel                   <= ELCORR_SW_TO_NORMAL_OP;
+            user_cfg_i.elcorr_mult_op_sel                   <= ELCORR_SW_TO_NORMAL_OP;
+            user_cfg_i.elcorr_div_op_sel                    <= ELCORR_SW_TO_NORMAL_OP;
+            user_cfg_i.elcorr_add_op_sel                    <= ELCORR_SW_TO_NORMAL_OP;
+         elsif (elcorr_reg = ELCORR_MODE_REF1_IMG) then
+            user_cfg_i.elcorr_enabled                       <= '1';
+            user_cfg_i.elcorr_ref0_op_sel                   <= ELCORR_SW_TO_PATH2;
+            user_cfg_i.elcorr_ref1_op_sel                   <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_mult_op_sel                   <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_div_op_sel                    <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_add_op_sel                    <= ELCORR_SW_TO_PATH1;
+         elsif (elcorr_reg = ELCORR_MODE_REF2_IMG) then
+            user_cfg_i.elcorr_enabled                       <= '1';
+            user_cfg_i.elcorr_ref0_op_sel                   <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_ref1_op_sel                   <= ELCORR_SW_TO_PATH2;
+            user_cfg_i.elcorr_mult_op_sel                   <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_div_op_sel                    <= ELCORR_SW_TO_PATH2;
+            user_cfg_i.elcorr_add_op_sel                    <= ELCORR_SW_TO_PATH1;
+         else  --ELCORR_MODE_OFF
+            user_cfg_i.elcorr_enabled                       <= '0';
+            user_cfg_i.elcorr_ref0_op_sel                   <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_ref1_op_sel                   <= ELCORR_SW_TO_PATH2;
+            user_cfg_i.elcorr_mult_op_sel                   <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_div_op_sel                    <= ELCORR_SW_TO_PATH1;
+            user_cfg_i.elcorr_add_op_sel                    <= ELCORR_SW_TO_PATH1;
+         end if;
+         
+         user_cfg_i.elcorr_spare1                           <= '0';  -- not used
+         user_cfg_i.elcorr_spare2                           <= (others => '0');  -- not used
+         
+         ref0_samp_num_per_ch := 49 - 1;
+         user_cfg_i.elcorr_ref_cfg(0).ref_enabled           <= '1';
+         user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode    <= '0';  -- not used
+         user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk     <= to_unsigned(0, user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk'length);
+         user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch       <= to_unsigned(ref0_samp_num_per_ch, user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch'length);
+         user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator   <= to_unsigned(2**21/ref0_samp_num_per_ch, user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator'length);
+         user_cfg_i.elcorr_ref_cfg(0).ref_value             <= (others => '0');  -- not used
+         user_cfg_i.elcorr_ref_cfg(0).forced_val_enabled    <= '1';  -- use forced value in testbench since we don't have real reference value
+         user_cfg_i.elcorr_ref_cfg(0).forced_val            <= to_unsigned(300, user_cfg_i.elcorr_ref_cfg(1).forced_val'length);
+         
+         ref1_samp_num_per_ch := xsize/4 - 1;
+         user_cfg_i.elcorr_ref_cfg(1).ref_enabled           <= '1';
+         user_cfg_i.elcorr_ref_cfg(1).ref_cont_meas_mode    <= '0';  -- not used
+         user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk     <= to_unsigned(0, user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk'length);
+         user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch       <= to_unsigned(ref1_samp_num_per_ch, user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch'length);
+         user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator   <= to_unsigned(2**21/ref1_samp_num_per_ch, user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator'length);
+         user_cfg_i.elcorr_ref_cfg(1).ref_value             <= (others => '0');  -- not used
+         user_cfg_i.elcorr_ref_cfg(1).forced_val_enabled    <= '1';  -- use forced value in testbench since we don't have real reference value
+         user_cfg_i.elcorr_ref_cfg(1).forced_val            <= to_unsigned(100, user_cfg_i.elcorr_ref_cfg(1).forced_val'length);
+         
+         user_cfg_i.elcorr_ref_dac_id                       <= (others => '0');  -- not used
+         user_cfg_i.elcorr_atemp_gain                       <= to_signed(2, user_cfg_i.elcorr_atemp_gain'length);
+         user_cfg_i.elcorr_atemp_ofs                        <= to_signed(1, user_cfg_i.elcorr_atemp_ofs'length);
+         user_cfg_i.sat_ctrl_en                             <= '1'; 
+         
+         user_cfg_i.roic_cst_output_mode                    <= '0';
+         user_cfg_i.elcorr_spare3                           <= '0'; -- not used
+         user_cfg_i.elcorr_spare4                           <= '0'; -- not used 
       
-         user_cfg_i.vdac_value(1)               		<= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
-         user_cfg_i.vdac_value(2)               		<= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 
-         user_cfg_i.vdac_value(3)               		<= to_unsigned(11630, user_cfg_i.vdac_value(3)'length);
-         user_cfg_i.vdac_value(4)               		<= to_unsigned(11630, user_cfg_i.vdac_value(4)'length); 
-         user_cfg_i.vdac_value(5)               		<= to_unsigned(11630, user_cfg_i.vdac_value(5)'length); 
-         user_cfg_i.vdac_value(6)               		<= to_unsigned(11630, user_cfg_i.vdac_value(6)'length); 
-         user_cfg_i.vdac_value(7)               		<= to_unsigned(11630, user_cfg_i.vdac_value(7)'length); 
-         user_cfg_i.vdac_value(8)               		<= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);
+         user_cfg_i.vdac_value(1)               <= to_unsigned(11630, user_cfg_i.vdac_value(1)'length); 
+         user_cfg_i.vdac_value(2)               <= to_unsigned(11630, user_cfg_i.vdac_value(2)'length); 
+         user_cfg_i.vdac_value(3)               <= to_unsigned(11630, user_cfg_i.vdac_value(3)'length);
+         user_cfg_i.vdac_value(4)               <= to_unsigned(11630, user_cfg_i.vdac_value(4)'length); 
+         user_cfg_i.vdac_value(5)               <= to_unsigned(11630, user_cfg_i.vdac_value(5)'length); 
+         user_cfg_i.vdac_value(6)               <= to_unsigned(11630, user_cfg_i.vdac_value(6)'length); 
+         user_cfg_i.vdac_value(7)               <= to_unsigned(11630, user_cfg_i.vdac_value(7)'length); 
+         user_cfg_i.vdac_value(8)               <= to_unsigned(11630, user_cfg_i.vdac_value(8)'length);
       end if;
    end process;
    
@@ -326,6 +410,69 @@ begin
       write_axi_lite (MB_CLK, x"000000A4", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_stretch_acq_trig, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
       write_axi_lite (MB_CLK, x"000000A8", std_logic_vector(resize('0'&user_cfg_i.comn.fpa_intf_data_source, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      
+      write_axi_lite (MB_CLK, x"000000AC", std_logic_vector(resize(user_cfg_i.elcorr_enabled, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000B0", std_logic_vector(resize(user_cfg_i.elcorr_spare1, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000B4", std_logic_vector(resize(user_cfg_i.elcorr_spare2, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000B8", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).ref_enabled, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000BC", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000C0", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000C4", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000C8", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000CC", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).ref_value, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000D0", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).ref_enabled, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000D4", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).ref_cont_meas_mode, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000D8", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000DC", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000E0", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000E4", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).ref_value, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000E8", std_logic_vector(resize(user_cfg_i.elcorr_ref_dac_id, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000EC", std_logic_vector(resize(user_cfg_i.elcorr_atemp_gain, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000F0", std_logic_vector(resize(user_cfg_i.elcorr_atemp_ofs, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000F4", std_logic_vector(resize(user_cfg_i.elcorr_ref0_op_sel, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000F8", std_logic_vector(resize(user_cfg_i.elcorr_ref1_op_sel, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"000000FC", std_logic_vector(resize(user_cfg_i.elcorr_mult_op_sel, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000100", std_logic_vector(resize(user_cfg_i.elcorr_div_op_sel, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000104", std_logic_vector(resize(user_cfg_i.elcorr_add_op_sel, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000108", std_logic_vector(resize(user_cfg_i.elcorr_spare3, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"0000010C", std_logic_vector(resize(user_cfg_i.sat_ctrl_en, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000110", std_logic_vector(resize(user_cfg_i.roic_cst_output_mode, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000114", std_logic_vector(resize(user_cfg_i.elcorr_spare4, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000118", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).forced_val_enabled, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"0000011C", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(0).forced_val, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000120", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).forced_val_enabled, 32)), MB_MISO,  MB_MOSI);
+      wait for 30 ns;
+      write_axi_lite (MB_CLK, x"00000124", std_logic_vector(resize(user_cfg_i.elcorr_ref_cfg(1).forced_val, 32)), MB_MISO,  MB_MOSI);
       wait for 30 ns;
       
       write_axi_lite (MB_CLK, x"00000D00", std_logic_vector(resize(user_cfg_i.vdac_value(1), 32)), MB_MISO,  MB_MOSI);

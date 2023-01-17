@@ -272,7 +272,47 @@ begin
                   when X"09C" =>    user_cfg_i.adc_clk_pipe_sel                <= unsigned(data_i(user_cfg_i.adc_clk_pipe_sel'length-1 downto 0));
                   when X"0A0" =>    user_cfg_i.cfg_num                         <= unsigned(data_i(user_cfg_i.cfg_num'length-1 downto 0));
                   when X"0A4" =>    user_cfg_i.comn.fpa_stretch_acq_trig       <= data_i(0);
-                  when X"0A8" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); user_cfg_in_progress <= '0'; 
+                  when X"0A8" =>    user_cfg_i.comn.fpa_intf_data_source       <= data_i(0); 
+                     
+                  -- electrical correction
+                  when X"0AC" =>    user_cfg_i.elcorr_enabled                        <= data_i(0);
+                  when X"0B0" =>    user_cfg_i.elcorr_spare1                         <= data_i(0);
+                  when X"0B4" =>    user_cfg_i.elcorr_spare2                         <= unsigned(data_i(user_cfg_i.elcorr_spare2'length-1 downto 0));
+                  
+                  when X"0B8" =>    user_cfg_i.elcorr_ref_cfg(0).ref_enabled         <= data_i(0);
+                  when X"0BC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_cont_meas_mode  <= data_i(0);
+                  when X"0C0" =>    user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).start_dly_sampclk'length-1 downto 0)); 
+                  when X"0C4" =>    user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_num_per_ch'length-1 downto 0)); 
+                  when X"0C8" =>    user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).samp_mean_numerator 'length-1 downto 0));
+                  when X"0CC" =>    user_cfg_i.elcorr_ref_cfg(0).ref_value           <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).ref_value'length-1 downto 0));
+                  
+                  when X"0D0" =>    user_cfg_i.elcorr_ref_cfg(1).ref_enabled         <= data_i(0);
+                  when X"0D4" =>    user_cfg_i.elcorr_ref_cfg(1).ref_cont_meas_mode  <= data_i(0);
+                  when X"0D8" =>    user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk   <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).start_dly_sampclk'length-1 downto 0)); 
+                  when X"0DC" =>    user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch     <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_num_per_ch'length-1 downto 0)); 
+                  when X"0E0" =>    user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).samp_mean_numerator 'length-1 downto 0));
+                  when X"0E4" =>    user_cfg_i.elcorr_ref_cfg(1).ref_value           <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).ref_value'length-1 downto 0));
+                  
+                  when X"0E8" =>    user_cfg_i.elcorr_ref_dac_id               <= unsigned(data_i(user_cfg_i.elcorr_ref_dac_id'length-1 downto 0));                  
+                  when X"0EC" =>    user_cfg_i.elcorr_atemp_gain               <= signed(data_i(user_cfg_i.elcorr_atemp_gain'length-1 downto 0));      
+                  when X"0F0" =>    user_cfg_i.elcorr_atemp_ofs                <= signed(data_i(user_cfg_i.elcorr_atemp_ofs'length-1 downto 0));
+                  
+                  when X"0F4" =>    user_cfg_i.elcorr_ref0_op_sel              <= data_i(user_cfg_i.elcorr_ref0_op_sel'length-1 downto 0);
+                  when X"0F8" =>    user_cfg_i.elcorr_ref1_op_sel              <= data_i(user_cfg_i.elcorr_ref1_op_sel'length-1 downto 0);
+                  when X"0FC" =>    user_cfg_i.elcorr_mult_op_sel              <= data_i(user_cfg_i.elcorr_mult_op_sel'length-1 downto 0);
+                  when X"100" =>    user_cfg_i.elcorr_div_op_sel               <= data_i(user_cfg_i.elcorr_div_op_sel'length-1 downto 0);
+                  when X"104" =>    user_cfg_i.elcorr_add_op_sel               <= data_i(user_cfg_i.elcorr_add_op_sel'length-1 downto 0);
+                  
+                  when X"108" =>    user_cfg_i.elcorr_spare3                   <= data_i(0);
+                  when X"10C" =>    user_cfg_i.sat_ctrl_en                     <= data_i(0);
+                  when X"110" =>    user_cfg_i.roic_cst_output_mode            <= data_i(0);
+                  when X"114" =>    user_cfg_i.elcorr_spare4                   <= data_i(0);
+                  
+                  when X"118" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val_enabled    <= data_i(0);
+                  when X"11C" =>    user_cfg_i.elcorr_ref_cfg(0).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(0).forced_val'length-1 downto 0));
+                  when X"120" =>    user_cfg_i.elcorr_ref_cfg(1).forced_val_enabled    <= data_i(0);
+                  when X"124" =>    user_cfg_i.elcorr_ref_cfg(1).forced_val            <= unsigned(data_i(user_cfg_i.elcorr_ref_cfg(1).forced_val'length-1 downto 0));
+                                    user_cfg_in_progress <= '0'; 
                      
                   -- fpa_softw_stat_i qui dit au sequenceur general quel pilote C est en utilisation
                   when X"AE0" =>    fpa_softw_stat_i.fpa_roic                <= data_i(fpa_softw_stat_i.fpa_roic'length-1 downto 0);

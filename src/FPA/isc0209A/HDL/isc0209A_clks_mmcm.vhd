@@ -118,7 +118,7 @@ begin
             
          else                      
             
-            mmcm_locked_i <= not cfg_in_progress_i; 
+            mmcm_locked_i <= not cfg_in_progress_i and mmcm_rdy_i; 
             
             if std_logic_vector(FPA_INT_CFG.ADC_CLK_SOURCE_PHASE) /= present_adc_clk_phase then 
                new_cfg_pending <= '1';

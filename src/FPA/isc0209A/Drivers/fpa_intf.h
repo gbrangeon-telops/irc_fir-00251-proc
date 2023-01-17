@@ -18,6 +18,8 @@
 #include <stdint.h>
 #include "GC_Registers.h"
 
+#define FPA_PRINTF(fmt, ...)      FPGA_PRINTF("FPA: " fmt "\n", ##__VA_ARGS__)
+
 /************************************************************************/
 // If needed, the DEFINE_HSI should be added to the SDK project symbols.
 // This define enables the functionalities required for HSI project:
@@ -27,10 +29,10 @@
 #ifdef DEFINE_HSI
 #define FPA_DEVICE_MODEL_NAME    "ISC0209A__SMARTADC_HSI"
 #else
-#define FPA_DEVICE_MODEL_NAME    "ISC0209A"
+#define FPA_DEVICE_MODEL_NAME    "ISC0209A_ELCORR"
 #endif
 
-#define FPA_WIDTH_MIN      128    //
+#define FPA_WIDTH_MIN      128
 #define FPA_WIDTH_MAX      320
 #define FPA_WIDTH_MULT     8
 #define FPA_WIDTH_INC      FPA_WIDTH_MULT
@@ -69,11 +71,10 @@
 #define FPA_DEFAULT_EXPOSURE     100.0F   //[us]
 #define FPA_DEFAULT_FRAME_RATE   50.0F    //[Hz]
 
-// TODO Update EHDRI default exposure times.
 #define FPA_EHDRI_EXP_0    10.0F
-#define FPA_EHDRI_EXP_1    250.0F
-#define FPA_EHDRI_EXP_2    500.0F
-#define FPA_EHDRI_EXP_3    1000.0F
+#define FPA_EHDRI_EXP_1    50.0F
+#define FPA_EHDRI_EXP_2    100.0F
+#define FPA_EHDRI_EXP_3    200.0F
 
 #define FPA_CAL_MIN_EXPOSURE  5.1F
 #define FPA_CAL_MAX_EXPOSURE  1000000.0F
@@ -145,11 +146,50 @@ struct s_FpaIntfConfig    // Remarquer la disparition du champ fpa_integration_t
    uint32_t  cfg_num;                        
    uint32_t  fpa_stretch_acq_trig;     // utilisé par le trig_precontroller.vhd
    uint32_t  fpa_intf_data_source;
+
+   uint32_t  elcorr_enabled;
+   uint32_t  elcorr_spare1;
+   uint32_t  elcorr_spare2;
+   uint32_t  elcorr_ref_cfg_0_ref_enabled;
+   uint32_t  elcorr_ref_cfg_0_ref_cont_meas_mode;
+   uint32_t  elcorr_ref_cfg_0_start_dly_sampclk;
+   uint32_t  elcorr_ref_cfg_0_samp_num_per_ch;
+   uint32_t  elcorr_ref_cfg_0_samp_mean_numerator;
+   uint32_t  elcorr_ref_cfg_0_ref_value;
+   uint32_t  elcorr_ref_cfg_1_ref_enabled;
+   uint32_t  elcorr_ref_cfg_1_ref_cont_meas_mode;
+   uint32_t  elcorr_ref_cfg_1_start_dly_sampclk;
+   uint32_t  elcorr_ref_cfg_1_samp_num_per_ch;
+   uint32_t  elcorr_ref_cfg_1_samp_mean_numerator;
+   uint32_t  elcorr_ref_cfg_1_ref_value;
+   uint32_t  elcorr_ref_dac_id;
+   uint32_t  elcorr_atemp_gain;
+   uint32_t  elcorr_atemp_ofs;
+   uint32_t  elcorr_ref0_op_sel;
+   uint32_t  elcorr_ref1_op_sel;
+   uint32_t  elcorr_mult_op_sel;
+   uint32_t  elcorr_div_op_sel;
+   uint32_t  elcorr_add_op_sel;
+   uint32_t  elcorr_spare3;
+   uint32_t  sat_ctrl_en;
+   uint32_t  roic_cst_output_mode;
+   uint32_t  elcorr_spare4;
+   uint32_t  elcorr_ref_cfg_0_forced_val_enabled;
+   uint32_t  elcorr_ref_cfg_0_forced_val;
+   uint32_t  elcorr_ref_cfg_1_forced_val_enabled;
+   uint32_t  elcorr_ref_cfg_1_forced_val;
     
 };
 typedef struct s_FpaIntfConfig t_FpaIntf;
 
-#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0,0}
+#define FpaIntf_Ctor(add) {sizeof(t_FpaIntf)/4 - 2, add, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 51, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+                                                         0, 0, 0, 0}
 
 // statuts provenant du vhd
 struct s_FpaStatus    // 

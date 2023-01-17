@@ -54,8 +54,8 @@ package FPA_define is
    constant DEFINE_FPA_INIT_CFG_NEEDED                : std_logic := '0';      -- pas besoin de config particulière au demarrage du ISC0209 
    constant DEFINE_GENERATE_HPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité temporelle doncn ne plus utiliser la chaine Hprocessing.  
    constant DEFINE_GENERATE_VPROC_CHAIN               : std_logic := '0';      -- on peut ne fait plus de diversité de canaux donc ne plus utiliser la chaine Vprocessing.   
-   constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '0';      -- pour le isc0209, on ne fait aucune correction électronique
-   constant DEFINE_GENERATE_ELCORR_GAIN               : std_logic := '0';      -- on ne fait aucune correction de gain
+   constant DEFINE_GENERATE_ELCORR_CHAIN              : std_logic := '1';      -- pour le isc0209, on fait la correction électronique
+   constant DEFINE_GENERATE_ELCORR_GAIN               : std_logic := '1';      -- on fait la correction de l'offset et du gain
    constant DEFINE_GENERATE_CROPPING_CHAIN            : std_logic := '0';      -- on ne fait pas de cropping
    
    -- quelques caractéristiques du FPA
@@ -165,7 +165,9 @@ package FPA_define is
       start_dly_sampclk              : unsigned(7 downto 0);
       samp_num_per_ch                : unsigned(7 downto 0);
       samp_mean_numerator            : unsigned(22 downto 0);
-      ref_value                      : unsigned(13 downto 0); -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
+      ref_value                      : unsigned(13 downto 0);  -- dac word correspondant à la valeur de refrence voulue pour la caorrection des offsets
+      forced_val_enabled             : std_logic;              -- permet de forcer la valeur de la reference a la valeur du registre forced_val
+      forced_val                     : unsigned(13 downto 0);  -- la reference prend cette valeur si forced_val_enabled = 1. Les valeurs echantillonnees de la reference sont ignorees
    end record;
    
    type elcorr_ref_cfg_array_type is array (0 to 1) of  elcorr_ref_cfg_type; 
@@ -292,6 +294,12 @@ package FPA_define is
       aoi_data                       : line_area_cfg_type;
       aoi_flag1                      : line_area_cfg_type;
       aoi_flag2                      : line_area_cfg_type;
+      
+      -- maintien de la sortie  du roic à voutref 
+      roic_cst_output_mode           : std_logic;
+      
+      -- dac free running mode 
+      elcorr_spare4                  : std_logic;
       
    end record;    
    

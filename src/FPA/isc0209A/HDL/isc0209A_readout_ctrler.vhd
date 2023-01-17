@@ -81,7 +81,6 @@ architecture rtl of isc0209A_readout_ctrler is
    signal global_reset         : std_logic;
    signal lsync_pipe           : std_logic_vector(7 downto 0);
    signal lsync_cnt            : unsigned(FPA_INTF_CFG.WINDOW_LSYNC_NUM'LENGTH-1 downto 0);
-   signal line_cnt             : unsigned(FPA_INTF_CFG.ACTIVE_LINE_END_NUM'LENGTH-1 downto 0);
    signal line_cnt_pipe        : line_cnt_pipe_type;
    signal fpa_mclk_last        : std_logic;
    signal sol_pipe_pclk        : std_logic_vector(1 downto 0);
@@ -95,6 +94,12 @@ architecture rtl of isc0209A_readout_ctrler is
    signal fpa_int_i            : std_logic;
    signal fpa_int_last         : std_logic;
    signal img_in_progress_i    : std_logic;
+   
+   signal eof_posf_pclk_p1     : unsigned(FPA_INTF_CFG.EOF_POSF_PCLK'length-1 downto 0);
+   signal pre_fval_active      : std_logic;
+   signal elcorr_ref0_start_pipe, elcorr_ref1_start_pipe : std_logic_vector(3 downto 0);
+   signal elcorr_ref0_stop_pipe, elcorr_ref1_stop_pipe : std_logic_vector(3 downto 0);
+   signal elcorr_ref0_dval_pipe, elcorr_ref1_dval_pipe : std_logic_vector(3 downto 0);
    
 begin                                     
    
@@ -170,10 +175,12 @@ begin
             readout_info_i.aoi.spare(0)      <= acq_data_i;
             
             -- naoi
-            readout_info_i.naoi.start        <= '0';
-            readout_info_i.naoi.stop         <= '0';
-            readout_info_i.naoi.dval         <= '0';
-            readout_info_i.naoi.samp_pulse   <= '0'; 
+            readout_info_i.naoi.ref_valid(1) <= elcorr_ref1_dval_pipe(C_PIPE_POS);--REF_VALID(1);        -- le Rising_edge = start du voltage reference(1) et falling edge = fin du voltage refrence(1)
+            readout_info_i.naoi.ref_valid(0) <= elcorr_ref0_dval_pipe(C_PIPE_POS);--REF_VALID(0);        -- le Rising_edge = start du voltage reference(0) et falling edge = fin du voltage refrence(0)
+            readout_info_i.naoi.start        <= elcorr_ref0_start_pipe(C_PIPE_POS) or elcorr_ref1_start_pipe(C_PIPE_POS);  -- start global de zone naoi
+            readout_info_i.naoi.stop         <= elcorr_ref0_stop_pipe(C_PIPE_POS) or elcorr_ref1_stop_pipe(C_PIPE_POS);    -- end global de zone naoi
+            readout_info_i.naoi.dval         <= elcorr_ref0_dval_pipe(C_PIPE_POS) or elcorr_ref1_dval_pipe(C_PIPE_POS);
+            readout_info_i.naoi.samp_pulse   <= (quad_clk_copy_last and not quad_clk_copy_i); 
             
             readout_info_i.samp_pulse        <= (quad_clk_copy_last and not quad_clk_copy_i);
             
@@ -201,6 +208,7 @@ begin
             acq_int_i <= ACQ_INT;            
             acq_int_last <= acq_int_i;
             img_in_progress_i <= '0';
+            pre_fval_active <= '0';
             
          else  
             
@@ -208,6 +216,7 @@ begin
             if pclk_fall = '1' then
                sol_pipe_pclk(0) <= sol_pipe(0);
                sol_pipe_pclk(1) <= sol_pipe_pclk(0);
+               pre_fval_active <= '0';    -- il est toujours à 0 sauf si mis à 1 plus bas
             end if;
             
             lsync_pipe(7 downto 1) <= lsync_pipe(6 downto 0);
@@ -234,6 +243,7 @@ begin
                when wait_mclk_fe_st => 
                   if pclk_fall = '1' then  -- on attend la tombée de la MCLK pour eviter des troncatures 
                      readout_fsm <= readout_st;
+                     pre_fval_active <= '1';    -- mis à 1 jusqu'au prochain pclk_fall qui correspond à la montée du fval (fval_pclk_cnt = 1)
                   end if;                           
                
                when readout_st =>                    --
@@ -289,6 +299,9 @@ begin
    U5: process(CLK)
    begin
       if rising_edge(CLK) then         
+         
+         eof_posf_pclk_p1 <= FPA_INTF_CFG.EOF_POSF_PCLK + 1;
+         
          -------------------------
          -- pipe 0 pour generation identificateurs 
          -------------------------
@@ -330,6 +343,20 @@ begin
          
          rd_end_pipe(0) <= fval_pipe(1) and not fval_pipe(0); -- read_end se trouve en dehors de fval. C'est voulu. le suivre pour comprendre ce qu'il fait.
          
+         -- reference 0 pour la correction electronique: on utilise la periode entre 2 readouts
+         -- le start est le pixel suivant le eof
+         if fval_pclk_cnt = eof_posf_pclk_p1 then
+            elcorr_ref0_start_pipe(0) <= '1';
+         else
+            elcorr_ref0_start_pipe(0) <= '0';
+         end if;
+         -- le stop est le dernier pixel avant le readout suivant
+         if pre_fval_active = '1' then
+            elcorr_ref0_stop_pipe(0) <= '1';
+         else
+            elcorr_ref0_stop_pipe(0) <= '0';
+         end if;
+         
          -------------------------
          -- pipe 1 pour generation premisse dval
          -------------------------
@@ -342,7 +369,9 @@ begin
          rd_end_pipe(1) <= rd_end_pipe(0);
          if sol_pipe(1) = '0' and sol_pipe(0) = '1' then 
             line_cnt_pipe(1) <= line_cnt_pipe(1) + 1;
-         end if; 
+         end if;
+         elcorr_ref0_start_pipe(1) <= elcorr_ref0_start_pipe(0);
+         elcorr_ref0_stop_pipe(1) <= elcorr_ref0_stop_pipe(0);
          
          -------------------------
          -- pipe 2 pour generation premisse dval
@@ -360,6 +389,8 @@ begin
          else
             active_line_en1 <= '0';
          end if;                  
+         elcorr_ref0_start_pipe(2) <= elcorr_ref0_start_pipe(1);
+         elcorr_ref0_stop_pipe(2) <= elcorr_ref0_stop_pipe(1);
          
          -------------------------
          -- pipe 3 pour generation dval         
@@ -377,19 +408,36 @@ begin
          else
             dval_pipe(3)   <= '0';
          end if;
+         -- reference 1 pour la correction electronique: on utilise la ligne 2 au complet
+         if line_cnt_pipe(2) = 2 then
+            elcorr_ref1_dval_pipe(3) <= lval_pipe(2); -- le dval dure toute la ligne 2
+            elcorr_ref1_start_pipe(3) <= sol_pipe(2); -- start synchronisé avec sol
+            elcorr_ref1_stop_pipe(3) <= eol_pipe(2);  -- stop synchronisé avec eol
+         else
+            elcorr_ref1_dval_pipe(3) <= '0';
+            elcorr_ref1_start_pipe(3) <= '0';
+            elcorr_ref1_stop_pipe(3) <= '0';
+         end if;
+         -- reference 0 pour la correction electronique
+         elcorr_ref0_start_pipe(3) <= elcorr_ref0_start_pipe(2);
+         elcorr_ref0_stop_pipe(3) <= elcorr_ref0_stop_pipe(2);
+         if elcorr_ref0_start_pipe(3) = '0' and elcorr_ref0_start_pipe(2) = '1' then
+            elcorr_ref0_dval_pipe(3) <= '1'; -- le dval monte en meme temps que le start
+         elsif elcorr_ref0_stop_pipe(3) = '1' and elcorr_ref0_stop_pipe(2) = '0' then
+            elcorr_ref0_dval_pipe(3) <= '0'; -- le dval descend en meme temps que le stop
+         end if;
          
          global_reset <= sreset or rd_end_pipe(2);
          
          -- generation de samp_pulse_i : on echantillonne les signaux fval, lval etc avec samp_pulse_i
          quad_clk_copy_i <= QUAD_CLK_COPY;
          quad_clk_copy_last <= quad_clk_copy_i;
-         samp_pulse_pipe(3) <= ((not quad_clk_copy_last and quad_clk_copy_i)and fval_pipe(3)); 
+         samp_pulse_pipe(3) <= (quad_clk_copy_last and not quad_clk_copy_i) and fval_pipe(3);
          
          -------------------------
          -- reset des identificateurs
          -------------------------
          if global_reset = '1' then
-            line_cnt <= (others => '0');
             active_line_en1 <= '0';
             dval_pipe   <= (others => '0');
             fval_pipe   <= (others => '0');
@@ -405,6 +453,14 @@ begin
             for ii in 0 to lval_pipe'length-1 loop
                line_cnt_pipe(ii) <= (others => '0'); 
             end loop;
+         end if;
+         if sreset = '1' then
+            elcorr_ref0_start_pipe <= (others => '0');
+            elcorr_ref1_start_pipe <= (others => '0');
+            elcorr_ref0_stop_pipe <= (others => '0');
+            elcorr_ref1_stop_pipe <= (others => '0');
+            elcorr_ref0_dval_pipe <= (others => '0');
+            elcorr_ref1_dval_pipe <= (others => '0');
          end if;   
       end if;
    end process; 

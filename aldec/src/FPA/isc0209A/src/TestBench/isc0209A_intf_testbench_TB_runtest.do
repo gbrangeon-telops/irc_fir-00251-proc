@@ -28,6 +28,9 @@ acom D:\Telops\FIR-00251-Proc\src\FPA\scorpiomwA\HDL\sc_high_low_duration.bde
 
 acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
 
+--acom D:\Telops\FIR-00251-Proc\IP\160\afpa_single_div_ip\afpa_single_div_ip_sim_netlist.vhdl
+acom d:\Telops\FIR-00251-Proc\aldec\src\FPA\isc0207A_3k\src\afpa_single_div_ip.vhd
+
 acom D:\Telops\FIR-00251-Proc\IP\160\t_axi4_stream64_afifo_d512\t_axi4_stream64_afifo_d512_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Proc\IP\160\afifo_w57d16\afifo_w57d16_sim_netlist.vhdl
 --acom D:\Telops\FIR-00251-Common\VHDL\Utilities\axil32_to_native.vhd
@@ -135,7 +138,7 @@ asim -ses isc0209A_intf_testbench_TB
 --wave UUT/U1/U21/U5/U2/* 
 
 -- mb_interface
-wave UUT/U1/U4/*  
+--wave UUT/U1/U4/*  
 
 -- digio map
 --wave UUT/U1/U19/*
@@ -146,10 +149,6 @@ wave UUT/U1/U4/*
 -- fpa_prog_controller
 --wave UUT/U1/U5/U2/* 
 
-
--- module FPA
-#wave UUT/U1/U9/U6/* 
-
 --wave UUT/U14/U1/* 
 --wave UUT/U14/U11/*
 --wave UUT/TRACE_ERR*
@@ -158,12 +157,19 @@ wave UUT/U1/U4/*
 --wave UUT/U1/U21/U6/U2/*
 --wave UUT/U1/U26/U1/*
 
---wave UUT/U1/U5/U5/* 
+#wave UUT/U1/U5/U5/* 
 
-#wave UUT/U1/U9/U18/*                                                                      l
+#wave UUT/U1/U9/U5/*
+#wave UUT/U1/U9/U5/g0/U8/*
+#wave UUT/U1/U9/U5/g0/U1/U7/*
+#wave UUT/U1/U9/U5/g0/U1/U1/*
+#wave UUT/U1/U9/U5/g0/U2/U7/*
+#wave UUT/U1/U9/U5/g0/U2/U1/*
+#wave UUT/U1/U9/U18/*
 #wave UUT/U1/U9/U1/U1/g0/U1/*
-wave UUT/U1/*
 #wave UUT/U1/U9/*
 
---run 20 us
-run 8 ms
+wave UUT/U1/*
+
+run 20 ms
+--run 4 ms

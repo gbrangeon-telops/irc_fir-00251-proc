@@ -26,6 +26,9 @@ entity isc0209A_digio_map is
       FPA_INT       : in std_logic;
       FPA_MCLK      : in std_logic;
       
+      READOUT       : in std_logic;
+      FPA_INTF_CFG  : in fpa_intf_cfg_type;
+      
       PROG_CSN      : in std_logic;  
       PROG_SD       : in std_logic;
       PROG_EN       : in std_logic;
@@ -66,7 +69,19 @@ architecture rtl of isc0209A_digio_map is
          CLK    : in STD_LOGIC);
    end component;
    
-   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, fpa_pwred_st, passthru_st); 
+   component double_sync is
+      generic(
+         INIT_VALUE : bit := '0'
+         );
+      port(
+         D     : in std_logic;
+         Q     : out std_logic := '0';
+         RESET : in std_logic;
+         CLK   : in std_logic
+         );
+   end component;
+   
+   type fpa_digio_fsm_type   is (idle, ldo_pwr_pause_st, rst_cnt_st, fpa_pwr_pause_st, wait_trig_stop_st, fpa_pwred_st, passthru_st, fpa_cst_output_st); 
    type dac_digio_fsm_type   is (dac_pwr_pause_st, dac_pwred_st); 
    signal fpa_digio_fsm    : fpa_digio_fsm_type;
    signal dac_digio_fsm    : dac_digio_fsm_type;
@@ -75,6 +90,7 @@ architecture rtl of isc0209A_digio_map is
    signal fpa_timer_cnt    : natural;
    signal fpa_powered_i    : std_logic;
    signal dac_powered_i    : std_logic;
+   signal readout_i        : std_logic;
    
    signal fpa_on_i         : std_logic;
    signal prog_data_i      : std_logic;
@@ -139,6 +155,10 @@ begin
    U0 : sync_reset
    port map(ARESET => ARESET, CLK => MCLK_SOURCE, SRESET => sreset); 
    
+   --------------------------------------------------
+   -- double sync 
+   --------------------------------------------------   
+   U1B: double_sync generic map(INIT_VALUE => '0') port map (RESET => sreset, D => READOUT, CLK => MCLK_SOURCE, Q => readout_i);
    
    --------------------------------------------------------- 
    -- gestion de l'allumage du proxy (process indépendant)
@@ -206,7 +226,13 @@ begin
                   fpa_timer_cnt <= fpa_timer_cnt + 1;
                   if fpa_timer_cnt = DEFINE_FLEG_LDO_DLY_FACTOR then  -- delai implanté via U14 (LTC6994IS6-1#TRMPBF) du fleG
                      fpa_digio_fsm <= rst_cnt_st;
-                  end if; 
+                  end if;
+                  
+                  -- pragma translate_off
+                  if fpa_timer_cnt = 50 then 
+                     fpa_digio_fsm <= rst_cnt_st;
+                  end if;                
+                  -- pragma translate_on 
                
                when rst_cnt_st =>
                   fpa_timer_cnt <= 0;
@@ -220,9 +246,15 @@ begin
                      fpa_digio_fsm <=  fpa_pwred_st;
                   end if;
                   
+                  -- pragma translate_off
+                  if fpa_timer_cnt = 50 then 
+                     fpa_digio_fsm <= fpa_pwred_st;
+                  end if;                
+                  -- pragma translate_on
+                  
                -- annoncer la bonne nouvelle relative à l'allumage du détecteur
                when fpa_pwred_st =>
-                  fpa_powered_i <= '1';        -- permet au driver de placer une requete de programmation              
+                  fpa_powered_i <= '1';        -- permet au driver de placer une requete de programmation
                   fpa_digio_fsm <= wait_trig_stop_st;                
                   
                -- attendre que le programmateur du FPA soit activée => trig arrêté
@@ -236,7 +268,19 @@ begin
                   prog_data_i <= PROG_SD;
                   lsync_i <= FPA_LSYNC;
                   fsync_i <= not FPA_INT and PROG_CSN;  -- normalement on n'aura jamais FPA_INT à '1' et PROG_CSN à '0' en même temps => un et un seul de ces deux signaux fait baisser fsync_i 
-                  mclk_i <= FPA_MCLK;  --             
+                  mclk_i <= FPA_MCLK; 
+                  if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '1' and PROG_CSN = '1' then 
+                     fpa_digio_fsm <= fpa_cst_output_st;
+                  end if;
+               
+               when fpa_cst_output_st => -- la sortie du detecteur reste à la valeur de VOUTREF
+                  mclk_i <= FPA_MCLK;   -- horloge active
+                  lsync_i <= '0';       -- aucun lsync
+                  fsync_i <= '1';       -- aucune integration
+                  prog_data_i <= '0';
+                  if readout_i = '0' and FPA_INTF_CFG.ROIC_CST_OUTPUT_MODE = '0' and PROG_CSN = '1' then 
+                     fpa_digio_fsm <= passthru_st;
+                  end if;
                
                when others =>
                
