@@ -311,8 +311,11 @@ uint8_t ACT_updateTotalSteps()
       // Add all steps, there are always 2 ICU phases
       gActTotalSteps = actGeneralSteps + 2*actIcuSteps + actAcquisitionSteps + actComputationSteps + actWriteSteps;
       // Add bad pixel detection steps if it is enabled, bad pixel map is always applied after bad pixel detection
-      if (flashSettings.BPDetectionEnabled)
+      if (gActualizationParams.badPixelsDetection)
          gActTotalSteps += badPixelDetectionSteps + actApplyBadPixelMapSteps;
+      // Bad pixel map is applied if it is available (from a previous bad pixel detection)
+      else if (gActBPMapAvailable == true)
+         gActTotalSteps += actApplyBadPixelMapSteps;
    }
    else
    {
@@ -1254,7 +1257,7 @@ IRC_Status_t Actualization_SM()
                ACT_INF("%d pixel value(s) reached saturation value during delta beta measurement", currentDeltaBeta->dbEntry->saturatedDataCount);
             }
 
-            if (usingICU) // update bad pixel map only if using ICU
+            if (usingICU && gActualizationParams.badPixelsDetection) // do bad pixel detection if enabled and if using ICU
             {
                currentDeltaBeta->dbEntry->valid = 1;  // doit être updaté avant détection bad pixel
                gStartBadPixelDetection = 1;
@@ -1273,7 +1276,7 @@ IRC_Status_t Actualization_SM()
       break;
 
       case ACT_DetectBadPixels:
-         detectionStatus = BadPixelDetection_SM(blockIdx);    // returns DONE if disabled
+         detectionStatus = BadPixelDetection_SM(blockIdx);
 
          if (detectionStatus == IRC_DONE)
          {
@@ -1548,13 +1551,6 @@ IRC_Status_t BadPixelDetection_SM(uint8_t blockIdx)
 
    uint32_t i, k;
    IRC_Status_t rtnStatus = IRC_NOT_DONE;
-
-   if (gActualizationParams.badPixelsDetection == 0)
-   {
-      gStartBadPixelDetection = false;
-      gActBPMapAvailable = false;
-      return IRC_DONE;
-   }
 
    switch (state)
    {
@@ -3232,7 +3228,10 @@ void ACT_resetDebugOptions()
 
 void ACT_resetParams(actParams_t* p)
 {
-   p->badPixelsDetection = flashSettings.BPDetectionEnabled;
+   if (gActBPMapAvailable == true)
+      p->badPixelsDetection = 0;    // Bad pixel detection is only done once
+   else
+      p->badPixelsDetection = flashSettings.BPDetectionEnabled;
    p->deltaBetaNCoadd = MIN(flashSettings.ImageCorrectionNumberOfImagesCoadd, ACT_MAX_N_COADD);
    p->flickerThreshold = flashSettings.BPFlickerThreshold; // normalized threshold for a P_fa of 0.1%
    p->noiseThreshold = flashSettings.BPNoiseThreshold; // normalized threshold for a P_fa of 0.1%
