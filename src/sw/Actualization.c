@@ -131,7 +131,7 @@ static fileRecord_t* findIcuReferenceBlock();
 static uint8_t updatePixelDataElement(const calibBlockInfo_t* blockInfo, uint64_t *p_CalData, int16_t deltaBeta, int8_t expBitShift);
 static bool isBadPixel(uint64_t* pixelData);
 
-static IRC_Status_t deleteExternalActualizationFiles();
+static IRC_Status_t deleteActualizationFiles();
 static fileRecord_t* findActualizationFile(uint32_t ref_posixtime);
 static bool allocateDeltaBetaForCurrentBlock(const calibrationInfo_t* calibInfo, uint8_t blockIdx, bool actTypeICU, deltabeta_t** newDataOut);
 static void initDeltaBetaData(deltaBetaEntry_t* data);
@@ -439,7 +439,7 @@ IRC_Status_t Actualization_SM()
       case ACT_Init:
          ACT_init();
 
-         deleteExternalActualizationFiles();
+         deleteActualizationFiles();
 
          StartTimer(&age_timer, age_increment * 1000);
 
@@ -3406,51 +3406,21 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
          deltaBetaDB.deltaBeta[i]->valid = 0;
 }
 
-static IRC_Status_t deleteExternalActualizationFiles()
+static IRC_Status_t deleteActualizationFiles()
 {
    IRC_Status_t status = IRC_SUCCESS;
    int i;
-   int fd;
    fileRecord_t* file = NULL;
-   CalibImageCorrection_ImageCorrectionFileHeader_t header;
-   uint32_t length;
 
-   ACT_INF("Deleting external image correction files from a previous boot up");
+   ACT_INF("Deleting all image correction files from a previous boot up");
 
    i = gFM_calibrationActualizationFiles.count-1;
    while (i>=0)
    {
-      fileType_t type;
-
       file = gFM_calibrationActualizationFiles.item[i];
-      type = file->type;
 
-      if (type != FT_TSIC)
-      {
-         if (type == FT_TSAC)
-         {
-            ACT_INF("Deleting obsolete TSAC file %s", file->name);
-            FM_RemoveFile(file);
-         }
-         --i;
-         continue;
-      }
-
-      fd = FM_OpenFile(file->name, UO_RDONLY);
-      length = CalibImageCorrection_ParseImageCorrectionFileHeader(fd, &header, NULL);
-      uffs_close(fd);
-
-      if (length == 0)
-      {
-         status = IRC_FAILURE;
-         break;
-      }
-
-      if (length>0 && header.ImageCorrectionType == 1)
-      {
-         ACT_INF("Deleting %s", file->name);
-         FM_RemoveFile(file);
-      }
+      ACT_INF("Deleting %s", file->name);
+      FM_RemoveFile(file);
 
       --i;
    }
