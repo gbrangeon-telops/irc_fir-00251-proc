@@ -3378,32 +3378,43 @@ void ACT_invalidateActualizations(int type) // todo invalider seulement les actu
 
    switch (type)
    {
-   case ACT_ALL:
-      ACT_INF("Invalidating all image correction data");
-      break;
+      case ACT_ICU:
+         ACT_INF("Invalidating ICU image correction data");
+         for (i=0; i<deltaBetaDB.count; ++i)
+            if (deltaBetaDB.deltaBeta[i]->info.type == ACT_ICU)
+               deltaBetaDB.deltaBeta[i]->valid = 0;
+         gActBPMapAvailable = false;
+         break;
 
-   case ACT_CURRENT:
-      current = ACT_getActiveDeltaBeta();
-      if (current != NULL)
-      {
-         current->dbEntry->valid = 0;
-         ACT_INF("Invalidating active image correction data");
-      }
-      else
-         ACT_ERR("Active image correction not found");
+      case ACT_XBB:
+         ACT_INF("Invalidating external BB image correction data");
+         for (i=0; i<deltaBetaDB.count; ++i)
+            if (deltaBetaDB.deltaBeta[i]->info.type == ACT_XBB)
+               deltaBetaDB.deltaBeta[i]->valid = 0;
+         break;
 
-      break;
+      case ACT_ALL:
+         ACT_INF("Invalidating all image correction data");
+         for (i=0; i<deltaBetaDB.count; ++i)
+            deltaBetaDB.deltaBeta[i]->valid = 0;
+         gActBPMapAvailable = false;
+         break;
 
-   default:
-      ACT_INF("Invalidating %s image correction data", type == ACT_ICU ? "ICU":"ext BB");
+      case ACT_CURRENT:
+      default:
+         current = ACT_getActiveDeltaBeta();
+         if (current != NULL)
+         {
+            current->dbEntry->valid = 0;
+            ACT_INF("Invalidating active image correction data");
+            if (current->dbEntry->info.type == ACT_XBB)
+               gActBPMapAvailable = false;
+         }
+         else
+            ACT_ERR("No active image correction found");
+
+         break;
    };
-
-   if (type == ACT_CURRENT)
-      return;
-
-   for (i=0; i<deltaBetaDB.count; ++i)
-      if (type == ACT_ALL || deltaBetaDB.deltaBeta[i]->info.type == type)
-         deltaBetaDB.deltaBeta[i]->valid = 0;
 }
 
 static IRC_Status_t deleteActualizationFiles()
