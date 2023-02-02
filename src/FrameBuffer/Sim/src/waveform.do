@@ -1,24 +1,69 @@
 onerror { resume }
 transcript off	  
+   
+add wave -named_row "--------------------------STIM----------------------------------"
 
-		
- add wave -named_row "------------------------stim-------------------------------------"
- 
-  add wave -noreg -logic {/Top/U1/CLK_MB}	
-  add wave -noreg -logic {/Top/U1/CLK_DATA}	
-  add wave -noreg -logic {/Top/U1/CLK_DIN}
-  
-  add wave -noreg -logic {/Top/U1/MB_MOSI}
-  add wave -noreg -logic {/Top/U1/MB_MISO}
-	  
-add wave -noreg -logic {/Top/U1/AXIS_MOSI.TVALID}	
+add wave -noreg -logic {/Top/U1/clk_din_o}
+add wave -noreg -logic {/Top/U1/clk_data_o}
+add wave -noreg -logic {/Top/U1/rst_n} 
+add wave -noreg -logic {/Top/U1/cnt}
+add wave -noreg -logic {/Top/U1/pixel_index}
+add wave -noreg -logic {/Top/U1/frame_index}
+add wave -noreg -logic {/Top/U1/frame_gen_state}
+
 add wave -noreg -logic {/Top/U1/AXIS_MOSI.TDATA}
-add wave -noreg -logic {/Top/U1/AXIS_MISO.TREADY}	
+add wave -noreg -logic {/Top/U1/AXIS_MOSI.TVALID}
 add wave -noreg -logic {/Top/U1/AXIS_MOSI.TLAST}
-	
-	
-	
- # add wave -named_row "CFG UPDATER"
+add wave -noreg -logic {/Top/U1/AXIS_MISO.TREADY}
+
+
+add wave -named_row "------------------------Frame Buffer-------------------------------------"  
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI_i}	 
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MISO_i}		 
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI_ii}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MISO_ii} 
+add wave -named_row "input"
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TVALID}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TDATA}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TLAST}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MOSI.TID} 
+
+
+add wave -noreg -logic {/Top/U2/g0/U10/AXIS_S2MM_DATA_MOSI}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI}							 
+add wave -noreg -logic {/Top/U2/g0/U6/fall_i} 
+ 
+add wave -noreg -logic {/Top/U2/AXIS_S2MM_DATA_MISO}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MISO.TREADY}
+
+add wave -noreg -logic {/Top/U2/g0/U6/axis_rx_data_miso_i.TREADY}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_RX_DATA_MISO.TREADY}
+
+add wave -named_row "output"
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TVALID}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TDATA}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TLAST}
+add wave -noreg -logic {/Top/U2/g0/U6/AXIS_S2MM_DATA_MOSI.TID}
+add wave -noreg -logic {/Top/U2/vU6/AXIS_S2MM_DATA_MISO.TREADY}	
+add wave -named_row "---------------wr128_RD128----------------------" 
+add wave -noreg -logic {/Top/U2/g0/U2/AXIS_S2MM_DATA_MOSI_i}   
+add wave -noreg -logic {/Top/U2/g0/U2/AXIS_S2MM_DATA_MISO_i}  
+add wave -named_row "---------------reader----------------------"
+#add wave -noreg -logic {/Top/U2/g0/U6/AXIS_TX_DATA_MOSI_o}
+#add wave -noreg -logic {/Top/U2/g0/U6/AXIS_TX_DATA_MISO_o}
+add wave -noreg -logic {/Top/U2/g0/U5/cnt}
+add wave -noreg -logic {/Top/U2/g0/U5/axis_mm2s_data_tx_mosi}
+add wave -noreg -logic {/Top/U2/g0/U5/axis_mm2s_data_tx_miso}
+add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TVALID}
+add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TDATA}
+add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TLAST}
+add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TID}
+add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MISO.TREADY}
+
+   
+#add wave -named_row "stim" 		
+# 
+#  add wave -named_row "CFG UPDATER"
 #add wave -noreg -logic {/Top/U2/g0/U6/cfg_update_done}	
 #add wave -noreg -logic {/Top/U2/g0/U6/cfg_updater_sm}	 
 #add wave -noreg -logic {/Top/U2/g0/U6/init_cfg_done}
@@ -136,8 +181,7 @@ add wave -noreg -logic {/Top/U1/AXIS_MOSI.TLAST}
 #add wave -noreg -logic {/Top/U2/g0/U5/FB_CFG}
 #add wave -noreg -logic {/Top/U2/g0/U5/fb_cfg_i}
 #add wave -noreg -logic {/Top/U2/g0/U5/discard_cmd}
-#add wave -noreg -logic {}
-#add wave -noreg -logic {}
+
 #add wave -noreg -logic {/Top/U2/g0/U5/done} 
 #add wave -noreg -logic {/top/U2/g0/U5/eof}
 #
@@ -196,24 +240,12 @@ add wave -noreg -logic {/Top/U1/AXIS_MOSI.TLAST}
 #add wave -noreg -logic {/Top/U2/g0/U5/cnt}
 #add wave -noreg -logic {/Top/U2/g0/U5/axis_mm2s_data_tx_mosi}
 #add wave -noreg -logic {/Top/U2/g0/U5/axis_mm2s_data_tx_miso}
-#add wave -noreg -logic {} 
-#add wave -noreg -logic {}
-#add wave -noreg -logic {}
-#add wave -noreg -logic {}
 #add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TVALID}
 #add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TDATA}
 #add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TLAST}
 #add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MOSI.TID}
 #add wave -noreg -logic {/Top/U2/g0/U5/AXIS_TX_DATA_MISO.TREADY}	  
-#  
-#  
-#
-#add wave -noreg -logic {}
-#add wave -noreg -logic {}
-#add wave -noreg -logic {} 
-#add wave -noreg -logic {}
-#add wave -noreg -logic {}
-#add wave -noreg -logic {}
+
 #
 #add wave -named_row "--------------------------AXIS 64 FR----------------------------------"	
 #add wave -noreg -logic {/Top/U2/g0/READ_FR/FRAME_RATE_MIN}
@@ -252,7 +284,8 @@ add wave -noreg -logic {/Top/U1/AXIS_MOSI.TLAST}
 #
 #add wave -noreg -logic {/Top/U3/AXI_BRAM_MOSI}
 #add wave -noreg -logic {/Top/U3/AXI_BRAM_MISO}
-
-  
- 
-transcript on
+#
+#  
+# 
+#transcript on
+#

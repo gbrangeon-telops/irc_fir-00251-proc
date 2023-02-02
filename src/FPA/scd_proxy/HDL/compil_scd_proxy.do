@@ -58,7 +58,7 @@ acom -incr -nowarn DAGGEN_0523 \
 # top level intf
 acom -incr -nowarn DAGGEN_0523 \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_mblaze_intf.vhd \
- D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd \
+ D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_io_interface.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\fpa_trig_precontroller.vhd \
  D:\Telops\FIR-00251-Proc\src\FPA\scd_proxy\HDL\scd_proxy_cropping.vhd \

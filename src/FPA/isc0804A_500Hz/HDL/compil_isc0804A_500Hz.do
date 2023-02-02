@@ -38,6 +38,7 @@ d:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_spi_feeder.vh
 d:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_kernel.vhd \
 d:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_elcorr_refs_ctrl.vhd \
 D:\Telops\FIR-00251-Common\VHDL\Utilities\axis64_throughput_ctrl.vhd \
+D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_readout_ctrler.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_prog_ctrler.bde \
 D:\Telops\FIR-00251-Proc\src\FPA\isc0804A_500Hz\HDL\isc0804A_500Hz_hw_driver.bde \

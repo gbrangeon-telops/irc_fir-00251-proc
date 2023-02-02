@@ -81,7 +81,7 @@ package fbuffer_define is
    to_unsigned(0,2),
    '0'
    );
-   type axis64_mosi_pipe is array (natural range 0 to 1) of t_axi4_stream_mosi64;
+   type axis128_mosi_pipe is array (natural range 0 to 1) of t_axi4_stream_mosi128;
    
 end fbuffer_define;
 

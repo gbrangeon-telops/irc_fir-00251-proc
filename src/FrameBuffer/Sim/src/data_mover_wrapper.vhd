@@ -58,7 +58,7 @@ entity data_mover_wrapper is
     AXI_S2MM_DATA_MOSI         : out t_axi4_a32_d128_mosi;
     AXI_S2MM_DATA_MISO         : in t_axi4_a32_d128_miso;
     
-    AXIS_S2MM_DATA_MOSI        : in t_axi4_stream_mosi64;
+    AXIS_S2MM_DATA_MOSI        : in t_axi4_stream_mosi128;
     AXIS_S2MM_DATA_MISO        : out t_axi4_stream_miso
 
    );
@@ -143,8 +143,8 @@ architecture data_mover_wrapper of data_mover_wrapper is
     m_axi_s2mm_bvalid           : in STD_LOGIC;
     m_axi_s2mm_bready           : out STD_LOGIC;
     
-    s_axis_s2mm_tdata           : in STD_LOGIC_VECTOR ( 63 downto 0 );
-    s_axis_s2mm_tkeep           : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    s_axis_s2mm_tdata           : in STD_LOGIC_VECTOR ( 127 downto 0 );
+    s_axis_s2mm_tkeep           : in STD_LOGIC_VECTOR ( 15 downto 0 );
     s_axis_s2mm_tlast           : in STD_LOGIC;
     s_axis_s2mm_tvalid          : in STD_LOGIC;
     s_axis_s2mm_tready          : out STD_LOGIC);

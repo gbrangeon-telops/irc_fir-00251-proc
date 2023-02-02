@@ -54,10 +54,10 @@ entity hder_insert_sequencer is
       
       RAM_RD           : out std_logic;
       RAM_RD_ADD       : out std_logic_vector(5 downto 0);
-      RAM_RD_DATA      : in std_logic_vector(63 downto 0);
+      RAM_RD_DATA      : in std_logic_vector(127 downto 0);
       RAM_RD_DVAL      : in std_logic;
       
-      OUT_MOSI         : out t_axi4_stream_mosi64;
+      OUT_MOSI         : out t_axi4_stream_mosi128;
       OUT_MISO         : in t_axi4_stream_miso;
       
       HDER_TLAST_OUT   : in std_logic;
@@ -150,8 +150,8 @@ architecture rtl of hder_insert_sequencer is
    signal ram_rd_add_i                 : signed(8 downto 0);
    signal ram_wr_data_i, data_buff     : std_logic_vector(31 downto 0);
    signal ram_bwe_i                    : std_logic_vector(3 downto 0);
-   signal out_mosi_i                   : t_axi4_stream_mosi64;
-   signal data_cnt                     : unsigned(CONFIG.ZERO_PAD_LEN_DIV2_M2'length-1 downto 0);
+   signal out_mosi_i                   : t_axi4_stream_mosi128;
+   signal data_cnt                     : unsigned(CONFIG.ZERO_PAD_LEN_DIV2_M4'length-1 downto 0);		--M4
    signal ram_rd_i                     : std_logic;
    signal sequencer_done               : std_logic;
    signal ram_reader_done              : std_logic;
@@ -525,7 +525,7 @@ begin
                when idle => 
                   ram_reader_done <= '1';
                   ram_rd_i <= '0';
-                  ram_rd_add_i <= to_signed(-2, ram_rd_add_i'length);  -- ainsi, la premiere adresse à lire sera -2 + 2 = 0 
+                  ram_rd_add_i <= to_signed(-4, ram_rd_add_i'length);  -- ainsi, la premiere adresse à lire sera -4 + 4 = 0 
                   if ram_reader_en = '1' then 
                      ram_reader_sm <= pause_st1;
                      ram_reader_done <= '0';
@@ -536,8 +536,8 @@ begin
                
                when read_st =>          -- aucun support de busy lors de la lecture des 64 pix de la RAM. Voilà pourquoi le fifo à l'extérieur a 64 pix de profond.
                   ram_rd_i <= '1';
-                  ram_rd_add_i <= ram_rd_add_i + 2;
-                  if ram_rd_add_i = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M2) then                     
+                  ram_rd_add_i <= ram_rd_add_i + 4;
+                  if ram_rd_add_i = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M4) then                     
                      ram_reader_sm <= pause_st2;
                   end if;
                
@@ -558,8 +558,8 @@ begin
    
    -- sender 
    U6B: process(CLK)
-      variable ram_cnt_incr: std_logic_vector(1 downto 0);
-      variable rdy_cnt_incr: std_logic_vector(1 downto 0);
+      variable ram_cnt_incr: std_logic_vector(2 downto 0);
+      variable rdy_cnt_incr: std_logic_vector(2 downto 0);
    begin  
       if rising_edge(CLK) then
          if sreset = '1' then 
@@ -575,11 +575,11 @@ begin
             out_mosi_i.tuser <= (others => '0');
             out_mosi_i.tdest <= (others => '0');
             out_mosi_i.tid <= (others => '1');   -- pour downstream, permet identification du header
-            out_mosi_i.tdata <= RAM_RD_DATA(47 downto 32) & RAM_RD_DATA(63 downto 48) & RAM_RD_DATA(15 downto 0) & RAM_RD_DATA(31 downto 16); -- ainsi on supprime dbus_reorder
+            out_mosi_i.tdata <= RAM_RD_DATA(111 downto 96) & RAM_RD_DATA(127 downto 112) & RAM_RD_DATA(79 downto 64) & RAM_RD_DATA(95 downto 80) & RAM_RD_DATA(47 downto 32) & RAM_RD_DATA(63 downto 48) & RAM_RD_DATA(15 downto 0) & RAM_RD_DATA(31 downto 16); -- ainsi on supprime dbus_reorder	 78563412- right subsequence of data to be mapped
             
-            -- autres assignations
-            ram_cnt_incr := RAM_RD_DVAL & '0' ;
-            rdy_cnt_incr := OUT_MISO.TREADY & '0' ;
+            -- autres assignations	   
+            ram_cnt_incr := RAM_RD_DVAL & '0'& '0' ;
+            rdy_cnt_incr := OUT_MISO.TREADY & '0'& '0' ;
             
             -- fsm
             case sender_sm is 
@@ -608,7 +608,7 @@ begin
                   hder_sender_done <= '0';         
                   data_cnt <= data_cnt + to_integer(unsigned(ram_cnt_incr)); 
                   out_mosi_i.tvalid <= RAM_RD_DVAL;
-                  if data_cnt = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M2) then
+                  if data_cnt = to_integer(CONFIG.EFF_HDER_LEN_DIV2_M4) then
                      out_mosi_i.tlast <= CONFIG.HDER_TLAST_EN and not CONFIG.NEED_PADDING;
                      sender_sm <= check_zpad_st; 
                   end if;
@@ -629,7 +629,7 @@ begin
                   out_mosi_i.tdata <= (others =>'0'); 
                   data_cnt <= data_cnt + to_integer(unsigned(rdy_cnt_incr)); 
                   out_mosi_i.tvalid <= '1'; 
-                  if OUT_MISO.TREADY = '1' and data_cnt = to_integer(CONFIG.ZERO_PAD_LEN_DIV2_M2) then         -- on gère le busy ici car les donnnées ne proviennent pas d'une RAM                                          
+                  if OUT_MISO.TREADY = '1' and data_cnt = to_integer(CONFIG.ZERO_PAD_LEN_DIV2_M4) then         -- on gère le busy ici car les donnnées ne proviennent pas d'une RAM                                          
                      sender_sm <= idle;
                      out_mosi_i.tlast <= CONFIG.HDER_TLAST_EN;                 
                   end if;          

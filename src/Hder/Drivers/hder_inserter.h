@@ -35,8 +35,8 @@ struct s_HderInserter
    uint32_t eff_hder_len;           // Number d'elements du header sans le zero pad (unité = pixel)   
    uint32_t zero_pad_len;           // Number de zeros à padder (unité = pixel)					   
    uint32_t hder_len;               // Number d'éléments au total constituant le header (unité = pixel) 						   
-   uint32_t eff_hder_len_div2_m2;   // HeadRealLen/2-2
-   uint32_t zero_pad_len_div2_m2;   // ZPadLen/2-2
+   uint32_t eff_hder_len_div2_m4;   // HeadRealLen/2-4
+   uint32_t zero_pad_len_div2_m4;   // ZPadLen/2-4
    uint32_t need_padding;           // dit si on a besoin de padder le header
    uint32_t hder_tlast_en;          // dit s'il doit y avoir un TLAST à la fin du header ou pas
    };

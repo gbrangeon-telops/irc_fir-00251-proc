@@ -78,6 +78,6 @@ acom -incr -nowarn DAGGEN_0523 \
 acom -incr \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_mblaze_intf.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_clocks.vhd \
- D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream64_fifo.vhd \
+ D:\Telops\FIR-00251-Common\VHDL\Fifo\t_axi4_stream_wr64_rd128_fifo.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_io_intf.vhd \
  d:\Telops\FIR-00251-Proc\src\FPA\scd_proxy2\HDL\scd_proxy2_intf.bde

@@ -44,10 +44,10 @@ entity writer_fsm is
     CURRENT_RD_BUFFER         : in  buffer_status_type;
     CURRENT_WR_BUFFER         : out buffer_status_type;
     
-    AXIS_RX_DATA_MOSI         : in  t_axi4_stream_mosi64;
+    AXIS_RX_DATA_MOSI         : in  t_axi4_stream_mosi128;
     AXIS_RX_DATA_MISO         : out t_axi4_stream_miso;
     
-    AXIS_S2MM_DATA_MOSI       : out t_axi4_stream_mosi64;
+    AXIS_S2MM_DATA_MOSI       : out t_axi4_stream_mosi128;
     AXIS_S2MM_DATA_MISO       : in  t_axi4_stream_miso;
     
     AXIS_S2MM_CMD_MOSI        : out t_axi4_stream_mosi_cmd32;
@@ -117,7 +117,7 @@ architecture writer_fsm of writer_fsm is
    signal s2mm_sts_mosi                  : t_axi4_stream_mosi_status;
    signal s2mm_sts_miso                  : t_axi4_stream_miso;
    signal axis_rx_data_miso_i            : t_axi4_stream_miso;
-   signal s2mm_data_mosi_pipe            : axis64_mosi_pipe;
+   signal s2mm_data_mosi_pipe            : axis128_mosi_pipe;
    signal s2mm_addr                      : std_logic_vector(31 downto 0) := (others => '0');
    signal s2mm_eof                       : std_logic := '0';
    signal s2mm_btt                       : std_logic_vector(22 downto 0) := (others => '0'); 
