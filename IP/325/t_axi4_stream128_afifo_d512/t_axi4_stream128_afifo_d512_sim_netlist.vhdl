@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.3 (win64) Build 1682563 Mon Oct 10 19:07:27 MDT 2016
--- Date        : Mon Nov 21 15:26:58 2022
+-- Date        : Thu Feb 09 12:36:20 2023
 -- Host        : Telops280 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
---               d:/Telops/FIR-00251-Proc/IP/325/t_axi4_stream128_afifo_d512/t_axi4_stream128_afifo_d512_sim_netlist.vhdl
+--               D:/Telops/FIR-00251-Proc/IP/325/t_axi4_stream128_afifo_d512/t_axi4_stream128_afifo_d512_sim_netlist.vhdl
 -- Design      : t_axi4_stream128_afifo_d512
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -558,7 +558,7 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_wrapper__parameterized1\ is
   port (
-    m_axis_tdata : out STD_LOGIC_VECTOR ( 36 downto 0 );
+    m_axis_tdata : out STD_LOGIC_VECTOR ( 52 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -566,7 +566,7 @@ entity \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_wrapper__parameterized1\ is
     p_6_out : in STD_LOGIC;
     Q : in STD_LOGIC_VECTOR ( 8 downto 0 );
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
-    s_axis_tdata : in STD_LOGIC_VECTOR ( 36 downto 0 )
+    s_axis_tdata : in STD_LOGIC_VECTOR ( 52 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_wrapper__parameterized1\ : entity is "blk_mem_gen_prim_wrapper";
@@ -575,31 +575,15 @@ end \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_wrapper__parameterized1\;
 architecture STRUCTURE of \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_wrapper__parameterized1\ is
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_21\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_22\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_23\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_24\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_29\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_30\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_31\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_37\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_38\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_39\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_45\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_46\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_47\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_53\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_54\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_55\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_56\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_61\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_62\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_63\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_69\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_70\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_71\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_72\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_77\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_78\ : STD_LOGIC;
-  signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_79\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_85\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_86\ : STD_LOGIC;
   signal \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_87\ : STD_LOGIC;
@@ -811,59 +795,43 @@ begin
       CLKARDCLK => m_aclk,
       CLKBWRCLK => s_aclk,
       DBITERR => \NLW_DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_DBITERR_UNCONNECTED\,
-      DIADI(31 downto 28) => B"0000",
-      DIADI(27 downto 24) => s_axis_tdata(18 downto 15),
-      DIADI(23 downto 21) => B"000",
-      DIADI(20 downto 16) => s_axis_tdata(14 downto 10),
-      DIADI(15 downto 13) => B"000",
-      DIADI(12 downto 8) => s_axis_tdata(9 downto 5),
-      DIADI(7 downto 5) => B"000",
-      DIADI(4 downto 0) => s_axis_tdata(4 downto 0),
-      DIBDI(31 downto 28) => B"0000",
-      DIBDI(27 downto 24) => s_axis_tdata(36 downto 33),
-      DIBDI(23 downto 21) => B"000",
-      DIBDI(20 downto 16) => s_axis_tdata(32 downto 28),
-      DIBDI(15 downto 12) => B"0000",
-      DIBDI(11 downto 8) => s_axis_tdata(27 downto 24),
-      DIBDI(7 downto 5) => B"000",
-      DIBDI(4 downto 0) => s_axis_tdata(23 downto 19),
+      DIADI(31 downto 30) => B"00",
+      DIADI(29 downto 24) => s_axis_tdata(26 downto 21),
+      DIADI(23) => '0',
+      DIADI(22 downto 16) => s_axis_tdata(20 downto 14),
+      DIADI(15) => '0',
+      DIADI(14 downto 8) => s_axis_tdata(13 downto 7),
+      DIADI(7) => '0',
+      DIADI(6 downto 0) => s_axis_tdata(6 downto 0),
+      DIBDI(31 downto 30) => B"00",
+      DIBDI(29 downto 24) => s_axis_tdata(52 downto 47),
+      DIBDI(23) => '0',
+      DIBDI(22 downto 16) => s_axis_tdata(46 downto 40),
+      DIBDI(15 downto 14) => B"00",
+      DIBDI(13 downto 8) => s_axis_tdata(39 downto 34),
+      DIBDI(7) => '0',
+      DIBDI(6 downto 0) => s_axis_tdata(33 downto 27),
       DIPADIP(3 downto 0) => B"0000",
       DIPBDIP(3 downto 0) => B"0000",
       DOADO(31) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_21\,
       DOADO(30) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_22\,
-      DOADO(29) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_23\,
-      DOADO(28) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_24\,
-      DOADO(27 downto 24) => m_axis_tdata(18 downto 15),
+      DOADO(29 downto 24) => m_axis_tdata(26 downto 21),
       DOADO(23) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_29\,
-      DOADO(22) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_30\,
-      DOADO(21) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_31\,
-      DOADO(20 downto 16) => m_axis_tdata(14 downto 10),
+      DOADO(22 downto 16) => m_axis_tdata(20 downto 14),
       DOADO(15) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_37\,
-      DOADO(14) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_38\,
-      DOADO(13) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_39\,
-      DOADO(12 downto 8) => m_axis_tdata(9 downto 5),
+      DOADO(14 downto 8) => m_axis_tdata(13 downto 7),
       DOADO(7) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_45\,
-      DOADO(6) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_46\,
-      DOADO(5) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_47\,
-      DOADO(4 downto 0) => m_axis_tdata(4 downto 0),
+      DOADO(6 downto 0) => m_axis_tdata(6 downto 0),
       DOBDO(31) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_53\,
       DOBDO(30) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_54\,
-      DOBDO(29) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_55\,
-      DOBDO(28) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_56\,
-      DOBDO(27 downto 24) => m_axis_tdata(36 downto 33),
+      DOBDO(29 downto 24) => m_axis_tdata(52 downto 47),
       DOBDO(23) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_61\,
-      DOBDO(22) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_62\,
-      DOBDO(21) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_63\,
-      DOBDO(20 downto 16) => m_axis_tdata(32 downto 28),
+      DOBDO(22 downto 16) => m_axis_tdata(46 downto 40),
       DOBDO(15) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_69\,
       DOBDO(14) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_70\,
-      DOBDO(13) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_71\,
-      DOBDO(12) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_72\,
-      DOBDO(11 downto 8) => m_axis_tdata(27 downto 24),
+      DOBDO(13 downto 8) => m_axis_tdata(39 downto 34),
       DOBDO(7) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_77\,
-      DOBDO(6) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_78\,
-      DOBDO(5) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_79\,
-      DOBDO(4 downto 0) => m_axis_tdata(23 downto 19),
+      DOBDO(6 downto 0) => m_axis_tdata(33 downto 27),
       DOPADOP(3) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_85\,
       DOPADOP(2) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_86\,
       DOPADOP(1) => \DEVICE_7SERIES.NO_BMM_INFO.SDP.WIDE_PRIM36_NO_ECC.ram_n_87\,
@@ -4373,7 +4341,7 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 entity \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_width__parameterized1\ is
   port (
-    m_axis_tdata : out STD_LOGIC_VECTOR ( 36 downto 0 );
+    m_axis_tdata : out STD_LOGIC_VECTOR ( 52 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -4381,7 +4349,7 @@ entity \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_width__parameterized1\ is
     p_6_out : in STD_LOGIC;
     Q : in STD_LOGIC_VECTOR ( 8 downto 0 );
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
-    s_axis_tdata : in STD_LOGIC_VECTOR ( 36 downto 0 )
+    s_axis_tdata : in STD_LOGIC_VECTOR ( 52 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of \t_axi4_stream128_afifo_d512_blk_mem_gen_prim_width__parameterized1\ : entity is "blk_mem_gen_prim_width";
@@ -4395,11 +4363,11 @@ begin
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
-      m_axis_tdata(36 downto 0) => m_axis_tdata(36 downto 0),
+      m_axis_tdata(52 downto 0) => m_axis_tdata(52 downto 0),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(36 downto 0) => s_axis_tdata(36 downto 0)
+      s_axis_tdata(52 downto 0) => s_axis_tdata(52 downto 0)
     );
 end STRUCTURE;
 library IEEE;
@@ -5937,9 +5905,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_generic_cstr is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -5949,9 +5917,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_generic_cstr is
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 )
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of t_axi4_stream128_afifo_d512_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
@@ -5962,29 +5930,17 @@ begin
 \ramloop[0].ram.r\: entity work.t_axi4_stream128_afifo_d512_blk_mem_gen_prim_width
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIBDI(31 downto 24) => s_axis_tdata(17 downto 10),
-      DIBDI(23 downto 16) => s_axis_tdata(8 downto 1),
-      DIBDI(15 downto 8) => s_axis_tstrb(15 downto 8),
-      DIBDI(7 downto 1) => s_axis_tstrb(6 downto 0),
-      DIBDI(0) => s_axis_tkeep(2),
-      DIPADIP(3 downto 2) => s_axis_tkeep(1 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
-      DIPBDIP(3) => s_axis_tdata(18),
-      DIPBDIP(2) => s_axis_tdata(9),
-      DIPBDIP(1) => s_axis_tdata(0),
-      DIPBDIP(0) => s_axis_tstrb(7),
+      DIBDI(31 downto 30) => s_axis_tdata(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(3) => s_axis_tdata(2),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOBDO(31 downto 24) => m_axis_tdata(17 downto 10),
-      DOBDO(23 downto 16) => m_axis_tdata(8 downto 1),
-      DOBDO(15 downto 8) => m_axis_tstrb(15 downto 8),
-      DOBDO(7 downto 1) => m_axis_tstrb(6 downto 0),
-      DOBDO(0) => m_axis_tkeep(2),
-      DOPADOP(3 downto 2) => m_axis_tkeep(1 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
-      DOPBDOP(3) => m_axis_tdata(18),
-      DOPBDOP(2) => m_axis_tdata(9),
-      DOPBDOP(1) => m_axis_tdata(0),
-      DOPBDOP(0) => m_axis_tstrb(7),
+      DOBDO(31 downto 30) => m_axis_tdata(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(3) => m_axis_tdata(2),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       Q(8 downto 0) => Q(8 downto 0),
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
@@ -5999,11 +5955,11 @@ begin
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
-      m_axis_tdata(71 downto 0) => m_axis_tdata(90 downto 19),
+      m_axis_tdata(71 downto 0) => m_axis_tdata(74 downto 3),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(71 downto 0) => s_axis_tdata(90 downto 19)
+      s_axis_tdata(71 downto 0) => s_axis_tdata(74 downto 3)
     );
 \ramloop[2].ram.r\: entity work.\t_axi4_stream128_afifo_d512_blk_mem_gen_prim_width__parameterized1\
      port map (
@@ -6011,11 +5967,11 @@ begin
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
-      m_axis_tdata(36 downto 0) => m_axis_tdata(127 downto 91),
+      m_axis_tdata(52 downto 0) => m_axis_tdata(127 downto 75),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(36 downto 0) => s_axis_tdata(127 downto 91)
+      s_axis_tdata(52 downto 0) => s_axis_tdata(127 downto 75)
     );
 end STRUCTURE;
 library IEEE;
@@ -6162,9 +6118,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_top is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -6174,9 +6130,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_top is
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 )
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of t_axi4_stream128_afifo_d512_blk_mem_gen_top : entity is "blk_mem_gen_top";
@@ -6187,22 +6143,22 @@ begin
 \valid.cstr\: entity work.t_axi4_stream128_afifo_d512_blk_mem_gen_generic_cstr
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       Q(8 downto 0) => Q(8 downto 0),
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0)
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0)
     );
 end STRUCTURE;
 library IEEE;
@@ -6213,9 +6169,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4_synth is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -6225,9 +6181,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4_synth is
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 )
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4_synth : entity is "blk_mem_gen_v8_3_4_synth";
@@ -6238,22 +6194,22 @@ begin
 \gnbram.gnativebmg.native_blk_mem_gen\: entity work.t_axi4_stream128_afifo_d512_blk_mem_gen_top
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       Q(8 downto 0) => Q(8 downto 0),
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0)
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0)
     );
 end STRUCTURE;
 library IEEE;
@@ -6264,9 +6220,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4 is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -6276,9 +6232,9 @@ entity t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4 is
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 )
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4 : entity is "blk_mem_gen_v8_3_4";
@@ -6289,22 +6245,22 @@ begin
 inst_blk_mem_gen: entity work.t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4_synth
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       Q(8 downto 0) => Q(8 downto 0),
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0)
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0)
     );
 end STRUCTURE;
 library IEEE;
@@ -6315,9 +6271,9 @@ entity t_axi4_stream128_afifo_d512_memory is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     m_aclk : in STD_LOGIC;
     s_aclk : in STD_LOGIC;
     \gpregsm1.curr_fwft_state_reg[1]\ : in STD_LOGIC;
@@ -6327,9 +6283,9 @@ entity t_axi4_stream128_afifo_d512_memory is
     \gic0.gc0.count_d2_reg[8]\ : in STD_LOGIC_VECTOR ( 8 downto 0 );
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 )
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 )
   );
   attribute ORIG_REF_NAME : string;
   attribute ORIG_REF_NAME of t_axi4_stream128_afifo_d512_memory : entity is "memory";
@@ -6340,22 +6296,22 @@ begin
 \gbm.gbmg.gbmgb.ngecc.bmg\: entity work.t_axi4_stream128_afifo_d512_blk_mem_gen_v8_3_4
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       Q(8 downto 0) => Q(8 downto 0),
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => \gic0.gc0.count_d2_reg[8]\(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gpregsm1.curr_fwft_state_reg[1]\,
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => ram_full_fb_i_reg,
       s_aclk => s_aclk,
-      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0)
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0)
     );
 end STRUCTURE;
 library IEEE;
@@ -6366,9 +6322,9 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_ramfifo is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     wr_rst_busy : out STD_LOGIC;
     s_axis_tready : out STD_LOGIC;
     m_axis_tvalid : out STD_LOGIC;
@@ -6378,9 +6334,9 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_ramfifo is
     s_aclk : in STD_LOGIC;
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 );
     s_aresetn : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
@@ -6468,22 +6424,22 @@ begin
 \gntv_or_sync_fifo.mem\: entity work.t_axi4_stream128_afifo_d512_memory
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       Q(8 downto 0) => p_0_out(8 downto 0),
       \gic0.gc0.count_d2_reg[8]\(8 downto 0) => p_13_out(8 downto 0),
       \gpregsm1.curr_fwft_state_reg[1]\ => \gntv_or_sync_fifo.gl0.rd_n_2\,
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       p_6_out => p_6_out,
       ram_full_fb_i_reg => \gntv_or_sync_fifo.gl0.wr_n_0\,
       s_aclk => s_aclk,
-      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0)
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0)
     );
 rstblk: entity work.t_axi4_stream128_afifo_d512_reset_blk_ramfifo
      port map (
@@ -6510,9 +6466,9 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_top is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     wr_rst_busy : out STD_LOGIC;
     s_axis_tready : out STD_LOGIC;
     m_axis_tvalid : out STD_LOGIC;
@@ -6522,9 +6478,9 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_top is
     s_aclk : in STD_LOGIC;
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 );
     s_aresetn : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
@@ -6536,21 +6492,21 @@ begin
 \grf.rf\: entity work.t_axi4_stream128_afifo_d512_fifo_generator_ramfifo
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
       m_axis_tready => m_axis_tready,
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       m_axis_tvalid => m_axis_tvalid,
       s_aclk => s_aclk,
       s_aresetn => s_aresetn,
       s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
       s_axis_tready => s_axis_tready,
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0),
       s_axis_tvalid => s_axis_tvalid,
       wr_rst_busy => wr_rst_busy
     );
@@ -6563,9 +6519,9 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2_synth is
   port (
     DOADO : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    DOPADOP : out STD_LOGIC_VECTOR ( 1 downto 0 );
+    DOBDO : out STD_LOGIC_VECTOR ( 29 downto 0 );
+    DOPADOP : out STD_LOGIC_VECTOR ( 3 downto 0 );
+    DOPBDOP : out STD_LOGIC_VECTOR ( 2 downto 0 );
     wr_rst_busy : out STD_LOGIC;
     s_axis_tready : out STD_LOGIC;
     m_axis_tvalid : out STD_LOGIC;
@@ -6575,9 +6531,9 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2_synth is
     s_aclk : in STD_LOGIC;
     DIADI : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    DIPADIP : in STD_LOGIC_VECTOR ( 1 downto 0 );
+    DIBDI : in STD_LOGIC_VECTOR ( 29 downto 0 );
+    DIPADIP : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    DIPBDIP : in STD_LOGIC_VECTOR ( 2 downto 0 );
     s_aresetn : in STD_LOGIC
   );
   attribute ORIG_REF_NAME : string;
@@ -6589,21 +6545,21 @@ begin
 \gaxis_fifo.gaxisf.axisf\: entity work.t_axi4_stream128_afifo_d512_fifo_generator_top
      port map (
       DIADI(31 downto 0) => DIADI(31 downto 0),
-      DIPADIP(1 downto 0) => DIPADIP(1 downto 0),
+      DIBDI(29 downto 0) => DIBDI(29 downto 0),
+      DIPADIP(3 downto 0) => DIPADIP(3 downto 0),
+      DIPBDIP(2 downto 0) => DIPBDIP(2 downto 0),
       DOADO(31 downto 0) => DOADO(31 downto 0),
-      DOPADOP(1 downto 0) => DOPADOP(1 downto 0),
+      DOBDO(29 downto 0) => DOBDO(29 downto 0),
+      DOPADOP(3 downto 0) => DOPADOP(3 downto 0),
+      DOPBDOP(2 downto 0) => DOPBDOP(2 downto 0),
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 0) => m_axis_tkeep(2 downto 0),
       m_axis_tready => m_axis_tready,
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       m_axis_tvalid => m_axis_tvalid,
       s_aclk => s_aclk,
       s_aresetn => s_aresetn,
       s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 0) => s_axis_tkeep(2 downto 0),
       s_axis_tready => s_axis_tready,
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0),
       s_axis_tvalid => s_axis_tvalid,
       wr_rst_busy => wr_rst_busy
     );
@@ -6757,7 +6713,7 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 is
     s_axis_tlast : in STD_LOGIC;
     s_axis_tid : in STD_LOGIC_VECTOR ( 0 to 0 );
     s_axis_tdest : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    s_axis_tuser : in STD_LOGIC_VECTOR ( 15 downto 0 );
+    s_axis_tuser : in STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tvalid : out STD_LOGIC;
     m_axis_tready : in STD_LOGIC;
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
@@ -6766,7 +6722,7 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 is
     m_axis_tlast : out STD_LOGIC;
     m_axis_tid : out STD_LOGIC_VECTOR ( 0 to 0 );
     m_axis_tdest : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    m_axis_tuser : out STD_LOGIC_VECTOR ( 15 downto 0 );
+    m_axis_tuser : out STD_LOGIC_VECTOR ( 31 downto 0 );
     axi_aw_injectsbiterr : in STD_LOGIC;
     axi_aw_injectdbiterr : in STD_LOGIC;
     axi_aw_prog_full_thresh : in STD_LOGIC_VECTOR ( 3 downto 0 );
@@ -6871,7 +6827,7 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 is
   attribute C_AXIS_TSTRB_WIDTH : integer;
   attribute C_AXIS_TSTRB_WIDTH of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 16;
   attribute C_AXIS_TUSER_WIDTH : integer;
-  attribute C_AXIS_TUSER_WIDTH of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 16;
+  attribute C_AXIS_TUSER_WIDTH of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 32;
   attribute C_AXIS_TYPE : integer;
   attribute C_AXIS_TYPE of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 0;
   attribute C_AXI_ADDR_WIDTH : integer;
@@ -6907,7 +6863,7 @@ entity t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 is
   attribute C_DIN_WIDTH : integer;
   attribute C_DIN_WIDTH of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 18;
   attribute C_DIN_WIDTH_AXIS : integer;
-  attribute C_DIN_WIDTH_AXIS of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 181;
+  attribute C_DIN_WIDTH_AXIS of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 197;
   attribute C_DIN_WIDTH_RACH : integer;
   attribute C_DIN_WIDTH_RACH of t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2 : entity is 32;
   attribute C_DIN_WIDTH_RDCH : integer;
@@ -7790,38 +7746,50 @@ VCC: unisim.vcomponents.VCC
     );
 inst_fifo_gen: entity work.t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2_synth
      port map (
-      DIADI(31 downto 24) => s_axis_tkeep(13 downto 6),
-      DIADI(23 downto 19) => s_axis_tkeep(4 downto 0),
-      DIADI(18) => s_axis_tid(0),
-      DIADI(17 downto 16) => s_axis_tdest(2 downto 1),
+      DIADI(31 downto 30) => s_axis_tdest(1 downto 0),
+      DIADI(29 downto 24) => s_axis_tuser(31 downto 26),
+      DIADI(23 downto 16) => s_axis_tuser(24 downto 17),
       DIADI(15 downto 8) => s_axis_tuser(15 downto 8),
       DIADI(7 downto 1) => s_axis_tuser(6 downto 0),
       DIADI(0) => s_axis_tlast,
-      DIPADIP(1) => s_axis_tdest(0),
+      DIBDI(29 downto 24) => s_axis_tstrb(15 downto 10),
+      DIBDI(23 downto 16) => s_axis_tstrb(8 downto 1),
+      DIBDI(15 downto 8) => s_axis_tkeep(15 downto 8),
+      DIBDI(7 downto 1) => s_axis_tkeep(6 downto 0),
+      DIBDI(0) => s_axis_tid(0),
+      DIPADIP(3) => s_axis_tdest(2),
+      DIPADIP(2) => s_axis_tuser(25),
+      DIPADIP(1) => s_axis_tuser(16),
       DIPADIP(0) => s_axis_tuser(7),
-      DOADO(31 downto 24) => m_axis_tkeep(13 downto 6),
-      DOADO(23 downto 19) => m_axis_tkeep(4 downto 0),
-      DOADO(18) => m_axis_tid(0),
-      DOADO(17 downto 16) => m_axis_tdest(2 downto 1),
+      DIPBDIP(2) => s_axis_tstrb(9),
+      DIPBDIP(1) => s_axis_tstrb(0),
+      DIPBDIP(0) => s_axis_tkeep(7),
+      DOADO(31 downto 30) => m_axis_tdest(1 downto 0),
+      DOADO(29 downto 24) => m_axis_tuser(31 downto 26),
+      DOADO(23 downto 16) => m_axis_tuser(24 downto 17),
       DOADO(15 downto 8) => m_axis_tuser(15 downto 8),
       DOADO(7 downto 1) => m_axis_tuser(6 downto 0),
       DOADO(0) => m_axis_tlast,
-      DOPADOP(1) => m_axis_tdest(0),
+      DOBDO(29 downto 24) => m_axis_tstrb(15 downto 10),
+      DOBDO(23 downto 16) => m_axis_tstrb(8 downto 1),
+      DOBDO(15 downto 8) => m_axis_tkeep(15 downto 8),
+      DOBDO(7 downto 1) => m_axis_tkeep(6 downto 0),
+      DOBDO(0) => m_axis_tid(0),
+      DOPADOP(3) => m_axis_tdest(2),
+      DOPADOP(2) => m_axis_tuser(25),
+      DOPADOP(1) => m_axis_tuser(16),
       DOPADOP(0) => m_axis_tuser(7),
+      DOPBDOP(2) => m_axis_tstrb(9),
+      DOPBDOP(1) => m_axis_tstrb(0),
+      DOPBDOP(0) => m_axis_tkeep(7),
       m_aclk => m_aclk,
       m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
-      m_axis_tkeep(2 downto 1) => m_axis_tkeep(15 downto 14),
-      m_axis_tkeep(0) => m_axis_tkeep(5),
       m_axis_tready => m_axis_tready,
-      m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
       m_axis_tvalid => m_axis_tvalid,
       s_aclk => s_aclk,
       s_aresetn => s_aresetn,
       s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
-      s_axis_tkeep(2 downto 1) => s_axis_tkeep(15 downto 14),
-      s_axis_tkeep(0) => s_axis_tkeep(5),
       s_axis_tready => s_axis_tready,
-      s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0),
       s_axis_tvalid => s_axis_tvalid,
       wr_rst_busy => wr_rst_busy
     );
@@ -7843,7 +7811,7 @@ entity t_axi4_stream128_afifo_d512 is
     s_axis_tlast : in STD_LOGIC;
     s_axis_tid : in STD_LOGIC_VECTOR ( 0 to 0 );
     s_axis_tdest : in STD_LOGIC_VECTOR ( 2 downto 0 );
-    s_axis_tuser : in STD_LOGIC_VECTOR ( 15 downto 0 );
+    s_axis_tuser : in STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_tvalid : out STD_LOGIC;
     m_axis_tready : in STD_LOGIC;
     m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
@@ -7852,7 +7820,7 @@ entity t_axi4_stream128_afifo_d512 is
     m_axis_tlast : out STD_LOGIC;
     m_axis_tid : out STD_LOGIC_VECTOR ( 0 to 0 );
     m_axis_tdest : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    m_axis_tuser : out STD_LOGIC_VECTOR ( 15 downto 0 )
+    m_axis_tuser : out STD_LOGIC_VECTOR ( 31 downto 0 )
   );
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of t_axi4_stream128_afifo_d512 : entity is true;
@@ -8007,7 +7975,7 @@ architecture STRUCTURE of t_axi4_stream128_afifo_d512 is
   attribute C_AXIS_TSTRB_WIDTH : integer;
   attribute C_AXIS_TSTRB_WIDTH of U0 : label is 16;
   attribute C_AXIS_TUSER_WIDTH : integer;
-  attribute C_AXIS_TUSER_WIDTH of U0 : label is 16;
+  attribute C_AXIS_TUSER_WIDTH of U0 : label is 32;
   attribute C_AXIS_TYPE : integer;
   attribute C_AXIS_TYPE of U0 : label is 0;
   attribute C_AXI_ADDR_WIDTH : integer;
@@ -8043,7 +8011,7 @@ architecture STRUCTURE of t_axi4_stream128_afifo_d512 is
   attribute C_DIN_WIDTH : integer;
   attribute C_DIN_WIDTH of U0 : label is 18;
   attribute C_DIN_WIDTH_AXIS : integer;
-  attribute C_DIN_WIDTH_AXIS of U0 : label is 181;
+  attribute C_DIN_WIDTH_AXIS of U0 : label is 197;
   attribute C_DIN_WIDTH_RACH : integer;
   attribute C_DIN_WIDTH_RACH of U0 : label is 32;
   attribute C_DIN_WIDTH_RDCH : integer;
@@ -8535,7 +8503,7 @@ U0: entity work.t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2
       m_axis_tlast => m_axis_tlast,
       m_axis_tready => m_axis_tready,
       m_axis_tstrb(15 downto 0) => m_axis_tstrb(15 downto 0),
-      m_axis_tuser(15 downto 0) => m_axis_tuser(15 downto 0),
+      m_axis_tuser(31 downto 0) => m_axis_tuser(31 downto 0),
       m_axis_tvalid => m_axis_tvalid,
       overflow => NLW_U0_overflow_UNCONNECTED,
       prog_empty => NLW_U0_prog_empty_UNCONNECTED,
@@ -8607,7 +8575,7 @@ U0: entity work.t_axi4_stream128_afifo_d512_fifo_generator_v13_1_2
       s_axis_tlast => s_axis_tlast,
       s_axis_tready => s_axis_tready,
       s_axis_tstrb(15 downto 0) => s_axis_tstrb(15 downto 0),
-      s_axis_tuser(15 downto 0) => s_axis_tuser(15 downto 0),
+      s_axis_tuser(31 downto 0) => s_axis_tuser(31 downto 0),
       s_axis_tvalid => s_axis_tvalid,
       sbiterr => NLW_U0_sbiterr_UNCONNECTED,
       sleep => '0',
