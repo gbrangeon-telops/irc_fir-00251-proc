@@ -152,44 +152,39 @@ begin
       wait for 1 us; 
 	  wait until rising_edge(CLK_100M);
 	  
-	  write_axi_lite (CLK_100M, resize(X"000",32), (others => '0'), MB_MISO,  MB_MOSI); -- user_cfg_in_progress = 1
-      wait for 150 ns;
+--//	  write_axi_lite (CLK_100M, resize(X"000",32), (others => '0'), MB_MISO,  MB_MOSI); -- user_cfg_in_progress = 1
+--      wait for 150 ns;
 	  wait until rising_edge(CLK_100M);
 	  write_axi_lite (CLK_100M, resize(X"014",32), std_logic_vector(FPA_EXP_INFO.exp_time), MB_MISO,  MB_MOSI); -- fpa_spare 
       wait for 150 ns;
---------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 	  wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"12C",32), (others => '0'), MB_MISO,  MB_MOSI);		   --dval  
+	  write_axi_lite (CLK_100M, resize(X"000",32), (others => '0'), MB_MISO,  MB_MOSI);		   --dval  
 	  wait for 150 ns;
 	  wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"064",32), resize(X"1",32), MB_MISO,  MB_MOSI); 	   --stalled_cnt                         
+	  write_axi_lite (CLK_100M, resize(X"004",32), resize(X"1",32), MB_MISO,  MB_MOSI); 	   --stalled_cnt                         
       wait for 150 ns;
 	  wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"068",32), resize(X"1",32), MB_MISO,  MB_MOSI);		   --valid_cnt                           
+	  write_axi_lite (CLK_100M, resize(X"008",32), resize(X"1",32), MB_MISO,  MB_MOSI);		   --valid_cnt                           
 	  wait for 150 ns;
 	  wait until rising_edge(CLK_100M);	
-	  write_axi_lite (CLK_100M, resize(X"0F0",32),STD_LOGIC_VECTOR(to_unsigned(integer(WIDTH),32)) , MB_MISO,  MB_MOSI); 	   --width   
-	  
+	  write_axi_lite (CLK_100M, resize(X"02C",32),STD_LOGIC_VECTOR(to_unsigned(integer(WIDTH),32)) , MB_MISO,  MB_MOSI); 	   --width   
       wait for 150 ns;
 	  wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"0E4",32), resize(X"A",32), MB_MISO,  MB_MOSI);		   --lval_pause_min                      
+	  write_axi_lite (CLK_100M, resize(X"01C",32), resize(X"A",32), MB_MISO,  MB_MOSI);		   --lval_pause_min                      
 	  wait for 150 ns;	
 	  wait until rising_edge(CLK_100M);	
-	  write_axi_lite (CLK_100M, resize(X"0E8",32), resize(X"3",32), MB_MISO,  MB_MOSI); 	   --fval_pause_min 
+	  write_axi_lite (CLK_100M, resize(X"020",32), resize(X"3",32), MB_MISO,  MB_MOSI); 	   --fval_pause_min 
 	  wait for 150 ns;	
 	  wait until rising_edge(CLK_100M);	
-	 -- write_axi_lite (CLK_100M, resize(X"134",32), resize(X"134",32), MB_MISO,  MB_MOSI); 	   --memory_buffer_download_output       
-      --wait for 150 ns;
-	  --wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"12C",32), (others => '1'), MB_MISO,  MB_MOSI);		   --dval				  
------------------------------------------------------------------------------------------------------
+	  write_axi_lite (CLK_100M, resize(X"000",32), (others => '1'), MB_MISO,  MB_MOSI);		   --dval				  
       wait for 150 ns;	
 	  wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"024",32), std_logic_vector(HEIGHT), MB_MISO,  MB_MOSI); -- diag.ysize 
+	  write_axi_lite (CLK_100M, resize(X"028",32), std_logic_vector(HEIGHT), MB_MISO,  MB_MOSI); -- diag.ysize 
       wait for 150 ns; 
-	  wait until rising_edge(CLK_100M);
-	  write_axi_lite (CLK_100M, resize(X"028",32), std_logic_vector(XSIZE_DIV_TAP_NUM), MB_MISO,  MB_MOSI); -- diag.xsize_div_tapnum 
-      wait for 150 ns;
+	  wait until rising_edge(CLK_100M);	
+	  	  -----------------------------------------------------------------------------------------------------
+	  write_axi_lite (CLK_100M, resize(X"02C",32), std_logic_vector(XSIZE_DIV_TAP_NUM), MB_MISO,  MB_MOSI); -- diag.xsize_div_tapnum 
 	  wait until rising_edge(CLK_100M);
 	  write_axi_lite (CLK_100M, resize(X"154",32), (others => '0'), MB_MISO,  MB_MOSI); -- int_time_offset_mclk = 0 us
       wait for 150 ns;
